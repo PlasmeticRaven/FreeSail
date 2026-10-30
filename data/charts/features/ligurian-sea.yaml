@@ -344,14 +344,15 @@ features:
     says: 'Palmaria, the high island at the west side of the gulf''s entrance, covered with olives, making the harbour of Porto Venere.'
 
   - id: tino
-    kind: rock
+    kind: island
     name: the Isle Tino
     modern: Isola del Tino
     lat_deg: 44.0267
     lon_deg: 9.85
     height_m: 122
     extent_m: 250
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 73: off the south side of Palmaria is the Isle Tino, the passage between 16 to 18 fathoms; close to the southward of Tino two rocks above water and several covered, approach them no nearer than 14 fathoms; Admiralty 1916, p. 276: Tino 306 feet high, Tinetto an islet one cable south of it, the ground between rocky and foul'
     says: 'The Isle Tino off the south end of Palmaria, with the Tinetto and foul rocks close south of it: keep in 14 fathoms.'
 
@@ -624,14 +625,15 @@ features:
     says: 'Piombino, small and well fortified at the end of its promontory, the Channel of Piombino between it and Elba.'
 
   - id: palmaiola
-    kind: rock
+    kind: island
     name: the isle Palmaria of Piombino
     modern: Isola di Palmaiola
     lat_deg: 42.865
     lon_deg: 10.473
     height_m: 105
     extent_m: 300
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 95: south of the fort of Piombino two isles a mile apart named Palmaria and Cerboli, very high, each with a watch-tower; near Palmaria a rock, but you may range along and pass between them; Derrotero 1849, OCR l. 4921: two small high round islands with watch-towers in mid-channel; Smyth 1854, p. 437: Palmajola I., 344 feet'
     says: 'Palmaiola, the high isle with its watch-tower in the Channel of Piombino; Cerboli three miles east of it, and a clear passage either side.'
 
@@ -775,14 +777,15 @@ features:
   # ---------------------------------------------------------------------------
 
   - id: giraglia
-    kind: rock
+    kind: island
     name: Giraglia
     modern: Île de la Giraglia
     lat_deg: 43.027
     lon_deg: 9.4045
     height_m: 65
     extent_m: 450
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 75: ''At about a mile from the middle of the north coast is an islet, named Giraglia, with a watch-tower on it; and there is a passage between it and the cape-land, having a depth of from 9 to 7 fathoms; but this channel should be attempted only with a leading wind''; Derrotero 1849, pp. 105 to 106: an island a little lower than the cape, steep to the north, ''con una hermosa torre en la cumbre'', the channel a mile wide with 7 to 10 brazas, sand and coral; Admiralty 1916, p. 201: steep, whitish, 180 feet high near the north end, an old square tower on the north end.'
     says: 'The Giraglia, off the head of Cape Corse, a steep whitish islet with its watch-tower; the channel inside it is fit only with a leading wind.'
 
@@ -942,14 +945,15 @@ features:
     says: No light on Cape Blanco in these years; the strait is run by day.
 
   - id: lavezzi
-    kind: rock
+    kind: island
     name: Lavezzi
     modern: Île Lavezzi
     lat_deg: 41.341
     lon_deg: 9.255
     height_m: 40
     extent_m: 600
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 78: the strait bounded on the north by ''the islands Cavallo, Lavezzi, and Perduto, all of which are encompassed with dangerous rocks and shoals... it is necessary to give Lavezzi a good berth, in order to avoid the sunken rocks, which lie off its southern side''; Derrotero 1849, p. 123: shaped like a T, of whitish rocks not very high; Admiralty 1916, p. 213: nearly a mile long, granite blocks heaped together, the south-eastern part 90 feet high. Height JUDGEMENT from the Admiralty''s figure.'
     says: 'Lavezzi, a heap of grey granite at the strait''s eastern mouth; give it a good berth for the sunken rocks off its south side.'
 
@@ -1024,14 +1028,15 @@ features:
     says: 'The Parata, the north point of Ajaccio gulf, a round tower on a hill that looks an island from far off.'
 
   - id: sanguinaires
-    kind: rock
+    kind: island
     name: Sanguinara Isles
     modern: Grande Sanguinaire (Îles Sanguinaires)
     lat_deg: 41.8775
     lon_deg: 8.5935
     height_m: 80
     extent_m: 500
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 80: ''The isles of Sanguinara lie to the S.W. of the cape; the larger one has a tower upon it, and some islets and rocks about it... when coming in from the northward, give Sanguinara Island and rocks... a good berth''; Michelot 1709, OCR l. 10687: ''la grosse Isle des Sangonaires qui est fort haute; sur son sommet il y a une Tour armée de deux pièces de canons''; Derrotero 1849, p. 111: the great Sanguinaria very high, a tower on its summit and another on its SW point, a walled lazaretto on its east side; Admiralty 1916, p. 176: 263 feet at the higher peak.'
     says: 'The great Sanguinara, high and ragged, its tower on the summit; give it and its rocks a good berth going into Ajaccio.'
 

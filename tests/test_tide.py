@@ -577,15 +577,21 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     """The brief: TICON's gauges of the block read as package 34 read the file, the
     eleven gauges and their figures unmoved. The file has Weymouth, St Helier, Saint-Malo
     and Cherbourg (four of the eleven) and Bournemouth and Portsmouth beside them, which
-    are held, read by nothing (a twelfth gauge would move every Channel position's
-    blend); it has none at St Peter Port, Dartmouth or Portland."""
+    were held, read by nothing (a twelfth gauge would move every Channel position's
+    blend), and since package 94 serve the tide region `solent` alone; it has none at St
+    Peter Port, Dartmouth or Portland."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # the Channel east's two (Biscay north's nine, package 39b, are held beside them;
-    # the Channel's east block's six, package 79b, east of 1 W)
-    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0}
+    # the Channel east's two (the Channel's east block's six, package 79b, east of 1 W)
+    held = {
+        g["id"]: g
+        for g in doc["gauges"]
+        if g.get("block") and g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0
+    }
     assert set(held) == {"bournemouth", "portsmouth"}
+    assert all(_own_block(g) == "solent" for g in held.values())
+    assert "held_gauges" not in doc
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
     assert {"weymouth", "st-helier", "saint-malo", "cherbourg"} <= {g.id for g in tide.gauges}
@@ -604,8 +610,14 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
 
 def _blocks_gauges(doc, block):
     """A block's gauges as the file has them (package 89: `gauges:` entries with their
-    `block:`, after the eleven)."""
-    return [g for g in doc["gauges"] if g.get("block") == block]
+    `block:`, after the eleven): those whose own block it is, the first of a list (package
+    94: a list's further blocks are the rule of the seams')."""
+    return [g for g in doc["gauges"] if _own_block(g) == block]
+
+
+def _own_block(g):
+    raw = g.get("block")
+    return raw[0] if isinstance(raw, list) else raw
 
 
 def _naive_blend(doc):
@@ -650,11 +662,11 @@ def test_the_blocks_gauges_are_read_and_serve_their_own_water_and_not_the_channe
         assert g["record"].startswith("GESLA-2, REFMAR") and 3.0 <= g["mean_level_m"] <= 4.0
         for name in ("M2", "S2", "N2"):
             assert 0.2 < g[name]["amplitude_m"] < 2.0 and 70.0 < g[name]["phase_deg"] < 150.0
-    # (north of 42 N and west of 3 E: the Channel east's two of 39a, still held, the
+    # (north of 42 N and west of 3 E: the Channel east's two of 39a, the Solent's since 94, the
     # Channel's east block's six of 79b and Biscay south's eleven of 39c beside these)
     north_of_42 = [
         g
-        for g in doc["gauges"] + doc["held_gauges"]
+        for g in doc["gauges"]
         if g["lat_deg"] >= 42.0
         and g["lon_deg"] < 3.0
         and g["id"] not in {x.id for x in tide.gauges}
@@ -1089,11 +1101,15 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 73
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 75
     for g in blocks:
-        s, n, w, e = bounds[g["block"]]
+        # its own block first (a list's further blocks are the rule of the seams': below)
+        own = g["block"][0] if isinstance(g["block"], list) else g["block"]
+        s, n, w, e = bounds[own]
         assert s <= g["lat_deg"] <= n and w <= g["lon_deg"] <= e, g["id"]
-    assert {g["block"] for g in blocks} == {
+    assert {
+        b for g in blocks for b in (g["block"] if isinstance(g["block"], list) else [g["block"]])
+    } == {
         "biscay-north",
         "biscay-south",
         "portugal",
@@ -1106,6 +1122,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         "gulf-of-lion",
         "ligurian-sea",
         "tyrrhenian",
+        "solent",  # package 94: a tide region of the manifest, bounds and no tiles
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1166,3 +1183,56 @@ def test_the_fill_is_raised_by_the_elevens_level_as_the_tiles_were_built():
         assert float(grid.values[r, c]) == pytest.approx(eleven.constants_at(centre)[0], abs=0.01)
     dieppe = Position(49.9292, 1.0845)
     assert tide.constants_at(dieppe)[0] - eleven.constants_at(dieppe)[0] > 0.9
+
+
+def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(tide):
+    """Package 94, step 5 (the lead's ruling of 2026-10-30): a gauge serves its own block,
+    and also a block whose seam with its own lies within the taper's band
+    (`SEAM_BAND_NM`, ten miles) of the gauge, since the water a cable either side of a seam
+    is the near gauge's and no other's; a gauge beyond the band of a seam serves its own
+    block alone. Today the rule catches three: Portsmouth's (4.2 miles from 1 W, the
+    Solent's and the Channel east's), the Isle of Aix's (6.4 from 45.9 N, Biscay north's
+    and south's) and Cadiz's (8.0 from 36.4 N, Portugal's and the Strait's); Bournemouth,
+    Gibraltar (17 miles from 5 W) and every other gauge their own block's alone."""
+    bounds = T.region_bounds()
+
+    def seams(a: str, b: str) -> list[tuple[str, float, float, float]]:
+        s1, n1, w1, e1 = bounds[a]
+        s2, n2, w2, e2 = bounds[b]
+        out = []
+        for x in {w1, e1} & {w2, e2}:
+            if min(n1, n2) > max(s1, s2):
+                out.append(("lon", x, max(s1, s2), min(n1, n2)))
+        for y in {s1, n1} & {s2, n2}:
+            if min(e1, e2) > max(w1, w2):
+                out.append(("lat", y, max(w1, w2), min(e1, e2)))
+        return out
+
+    def miles(p: Position, seam: tuple[str, float, float, float]) -> float:
+        axis, at, lo, hi = seam
+        lon_nm = 60.0 * math.cos(math.radians(p.lat_deg))
+        if axis == "lat":
+            return math.hypot(
+                (p.lat_deg - at) * 60.0, (p.lon_deg - min(max(p.lon_deg, lo), hi)) * lon_nm
+            )
+        return math.hypot(
+            (p.lon_deg - at) * lon_nm, (p.lat_deg - min(max(p.lat_deg, lo), hi)) * 60.0
+        )
+
+    names = sorted({b for g in tide.block_gauges for b in g.blocks})
+    caught = {}
+    for g in tide.block_gauges:
+        own = g.blocks[0]
+        near = {
+            b
+            for b in names
+            if b != own and any(miles(g.position, sm) <= T.SEAM_BAND_NM for sm in seams(own, b))
+        }
+        assert set(g.blocks[1:]) == near, (g.id, g.blocks, near)
+        if near:
+            caught[g.id] = g.blocks
+    assert caught == {
+        "portsmouth": ("solent", "channel-east"),
+        "ile-daix": ("biscay-north", "biscay-south"),
+        "cadiz": ("portugal", "strait"),
+    }

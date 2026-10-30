@@ -67,7 +67,7 @@ on these packages; that is the owner's choice.
 | 91 | Opus | **The viewer's light and air** (the owner's references of 2026-10-29, decision 57): the ship's own lights warm and distinct at night (the stern lantern, the top lights and the binnacle 71 already hoists, each a glow on the faces near it); the scene's light by the hour and the sky (the sun's altitude and azimuth from `core/moon.py`, the weather's cover and visibility: a gradient sky and sea, the faces tinted by their side to the light, dusk's warmth, night's dark with the lights alone, haze by the visibility); a lively telltale at the masthead and a waving ensign, canned but driven by the apparent wind the physics already gives (direction, a flutter whose rate and amplitude follow the speed), animated between snapshots; all in the present SVG viewer, stylesheet-driven, drawing only, nothing of the world read that the readings do not give | after 81 and 75's hull; when the owner likes; the two reference pictures stay with the owner (another game's work), described in the decision |
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
 | 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93` |
-| 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary |
+| 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -1028,6 +1028,72 @@ design's eleven: a finding for the magazine's table, booked to 77 with its sourc
 Wharf issuing at Spithead under the Regulations of 1806); (4) the modern ports land in the
 grid where 1805 had water or sand, no sheet read: a later package with Bellin's plans of
 the Havre and Dunkirk; (5) and (6) as the builder has them.
+
+### Package 94 as merged (2026-10-30)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-94` at `6a30975` (six commits
+on the trunk's `9b07813`, one an item, the records, and a step 5 by the lead's rulings; no
+conflict, the merge's tree the branch's head's; 18 files, 1,203 lines added and 135
+removed); ruff clean; the builder's proof the one 89's was (the eleven recorded passages
+by node id, the gate selection and the captain's trials) run on a clean worktree of the
+head first, on item 3's tree and on the final tree last, identical each time (every digest
+held, the lee-shore trial's container digest the one failure on each); its touched files'
+slow tier (10) and truths 7-264 and 7-270 to 7-314 (41) green, its fast tier whole with the
+pictures' flake the one failure, passing alone; the lead's runs of the tide's, chart's,
+islands', ports', lookout's and geo's tests with the moved and the new truths on the head
+before step 5 (175 and 10 passed, none failed) and of the tide's, chart's and ports' tests
+with twelve truths on step 5's (140 and 12 passed, none failed); **the whole suite on the
+merged tree in the cloud (run 18, the figures written here when it ends).**
+
+**Item 1, an island the grid lacks, taken another way and accepted:** the brief's island
+with an extent alone would have made Belle Isle and seven other islands the grid holds
+discs of ground over their roads; an islet the grid lacks says so, `grid_lacks: true`
+beside its height and `extent_m` (`chart.Feature.is_ground`, `is_hazard`), ground to the
+keel by its height within its extent as a rock that stands above the water, a hazard on
+the pilot's and the captain's line, land to the lookout by its name and stood into by its
+extent; nineteen islets of 79c's and 79d's recast by their source lines (an isle or an
+islet in the period's words an island, a rock a rock), six rocks kept; the index
+byte-identical, the manifest's counts moved by text (a slip of four duplicated lines, found
+at review, mended at step 5); truth 7-303 recast to the kind, nothing loosened; truth
+7-310. **Item 2:** a road's bottom read as an anchorage's (`BOTTOM_NOTE_KINDS`); no
+feature of kind `road` exists, so nothing moves; truth 7-311. **Item 3, the seam's taper:**
+within ten miles of a block's open edge (charted water no block holds, the eleven within
+reach) the block's water rises from the eleven's alone to its own by the smoothstep, on
+each constituent's amplitude and phase and on the level (mixed as complex numbers the 114
+degrees between the two M2s at 1 W made a false node mid-band, so the mix is the amplitude's
+and the phase's); a seam between two blocks and an edge beyond which nothing is charted are
+no open edge; outside every block the old arithmetic to the bit; the step at 1 W from 4.3
+to 7.6 feet to 0.045, the Iroise's from 1.6 to 0.04; Concarneau's judged rise 13 to 14, the
+taper reaching its gauge across Brittany (a finding, said, not mended); truth 7-282
+re-measured old beside new, 7-312. **Item 4, the Solent:** the manifest's `tide_regions:`
+(bounds and no tiles, for the gauges' membership alone; written by `tools/build_charts.py`
+from `TIDE_REGIONS` so that 93's rebuild keeps it, the one change beyond the brief, said),
+`solent` 50.62 to 51 N and 2.2 to 1 W by judgement from the gauges' places and the Wight's
+shores; Bournemouth and Portsmouth serve it, `held_gauges:` gone, no figure moved;
+Spithead's high waters within four minutes of Portsmouth's gauge where the eleven were four
+hours and a half out; the Solent's judged rises re-worked (Norie's Spithead 10 to 12,
+Moore's Portsmouth 9 to 12, Pool 8 to 5); the Downs to Spithead sailed on each tree, no
+grounding, the truth's limits held; truths 7-313, 7-314, 7-283 re-measured. **Step 5, by
+the lead's rulings:** the Solent's seam with the Channel east at 1 W north of 50.62 N (a
+step of three feet and a half off Chichester, the taper being a block's against the eleven's
+and no seam's) ruled way (a) under **the rule of the seams**: a gauge serves its own block
+and also a block whose seam with its own lies within the taper's band (ten miles) of the
+gauge, the water a cable either side of a seam being the near gauge's and no other's; the
+rule catches three, Portsmouth (4.2 miles from 1 W), the Isle of Aix (6.4 from 45.9 N) and
+Cadiz (8.0 from 36.4 N), each taken, `test_tide.py` holding the rule over every gauge; the
+steps at 1 W 3.4 to 3.6 feet to 1.5 to 1.7, at 45.9 N 3.9 to 0.3; Beachy Head 18.99 to
+18.86, within truth 7-280's words, which stand; three judged rises across the foot (Norie's
+Cape Trafalgar 3 to 5, Moore's Shoreham 18 to 17 and Dungeness 20 to 19); way (b), the
+eight gauges serving both, measured and not taken (Beachy Head 18.73 past the truth's words,
+the block's far gauges weighing at its own places against Norie's figures). **Findings,
+booked by the lead:** the seam at 36.4 N keeps eight feet, which the lead measured as the
+mean level's and not the constituents' (Portugal's 1.63 m against the Strait's 3.98, the
+eleven's there, the Strait's gauges' levels unread; the M2s 1.01 and 0.83 m a cable apart),
+a tide data tidy, the Strait's and the islands' gauges' mean levels read from a source; a
+taper by distance reaching a gauge across land (a taper by water a design question); the
+western Solent and the Needles within the band of the region's south bound; `fathoms_words`
+giving "in 13 fathoms" where the words say twelve (a words tidy); the pictures' flake under
+the fast tier's load; the lee-shore trial's container digest as recorded since 79d.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -3106,3 +3172,48 @@ strikes; Winfield's lists are now on the owner's shelf as a source, with plans s
 through most sections, to be cited by page as James and Steel are. Nothing of this is
 booked yet; the session may name candidates with their sources in its plan when 90's
 design is written, for the owner's choosing.
+
+**2026-10-30, Ext §17.11 approved, the four points ruled, and the in-world rule coming**
+(the session's message on `6fcc35a`; B3.1 with B5.2, B3.2 with B5.3 and B3.5 with B5.5 on
+the branch, each with the fast tier, the guard sets and the seed-7 trace identical; B1's
+stage B running). **§17.11 is approved as written:** the driver's boom out with the shift on
+the engine's own `Spar.rigged_out`, keyed on a `boom` that a lateen cut at the mast names
+and refused on any other, so that nothing moves on the eight or the razee; the phases as
+tabled (120 s each way, the judgement said); nothing in `physics/` or `combat/`, the stowed
+boom's windage and its hit said plainly as the small untruth it is; truth 7-230's band
+13-16 to 15-19 minutes old beside new, the toggle (the key absent against present on the
+fixture) the proof; B5.5's "boom amidships" cases moved old beside new; §17.10's items 6
+(for the driver), 9 and 10 closed by it; the order as proposed (B1's stage B, the stage-0
+commit, one step by the engine's workflow with B3 and B5 together, her regeneration, then
+the owner's testing report). **The four points:** (1) the library's evolution count
+(`tests/test_agents.py`) 98 to 104 for the lateen's six is confirmed, a pin of structure
+moved old beside new in its own commit as 86 moved it, and 108 at the settee the same way;
+(2) `physics/strain.py:631`'s membership (`spar.is_yard or spar.cls == "lateen_yard"`) is
+the log's words and no equation, so it is allowed under the gate, one line in its own
+commit, said in the notes, with a case in the strain's tests on the fixture where the
+carrying-away's words have one: a lateen yard is slung, and "in the slings" is its; (3) as
+built: the sprit yards stay in "spritsails" and "all sail" and out of "yards" and "head
+yards" in the 64's and the 74's files, the spritsail yard being the forecastle's and not the
+braces', and "square the yards" leaving it the period's; whether the harbour stow squares it
+is a later question with the harbour stow; (4) the draught rules: the 64's bowsprit root on
+the stem head as 1407F draws it, at the measured 27°, the end down 1.2 m, old beside new in
+B1's report. **SW-2:** the three Greenwich draughts of Build-Ships §5.9 (ZAZ2587 and ZAZ2559
+the *Amazon* class, ZAZ4491 and ZAZ4492 the *Diligence* class, ZAZ6381 and its fellows the
+*Sherbourne*), marked "to read" until measured, change its sources and not its order,
+accepted. B1 is taken whole at her testing report, as agreed. **Coming toward the branch, to
+build for now rather than mend at the merge:** package 85 (the orders, the primer and the
+library for a model reader) merges onto the trunk in the next hours with a rule and a test:
+the primer and the library's served topics (the catalogue's served head of every
+`data/evolutions/*.yaml`, the grammar, the briefs, the tools' words) are in-world documents
+and carry no reference to a milestone, a package, a spec's section, a truth's or a
+decision's number, a ruling, a gate, a builder, a playtest, the lead or the owner's rulings,
+or a model's or a vendor's name; `tests/test_in_world.py` scans them all and fails naming
+the line. 85 moved every evolution file's build notes below a blank line under a head
+`# Build notes (not served by the library's catalogue)`, where the catalogue's reader stops,
+the served head keeping the evolution, its steps, its sources in the period's books and what
+is judgement. The session's new evolution files (the lateen's six and any after) and the
+primer's chapter on the ships want the same form before the merge, so that the trunk's test
+passes at it: the served head in the period's words with its sources, the package's and the
+Ext's references below the build-notes head. The trunk's head is `1e3523b` (package 94
+merged: the chart's islets, the tide's seam taper and the Solent's region; nothing of the
+ships' files); 85's merge will be noted here when it lands.

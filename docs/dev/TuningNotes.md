@@ -13357,6 +13357,443 @@ the pictures' known flake ("the chart is blank (std 8.0)" under the tier's load)
 passes alone on this tree; the pilot off Aix passes. The whole slow tier not run (the
 lead's in the cloud at the merge).
 
+## Package 94: the chart's tidies from 79c, 79d and 89 (2026-10-30)
+
+Four tidies the three packages left, each its own commit in the brief's order, the trunk
+brought in at each boundary (package 93 rebuilding the blocks' tiles beside it: no tile,
+coast or index file of any region is touched here). Independent of 93's rebuild: nothing
+here reads a tile's fill.
+
+### Item 1: an island the grid lacks
+
+**The kind, as built.** `island` was a kind already, a mark of the land (`LAND_KINDS`),
+and five islands the grid holds carry an `extent_m` that is the isle's size and read by
+nothing (Belle Isle's 9,000 m, Groix's 3,000, the Glenans', Houat's, the Isle Dieu's in
+Biscay north; the Hormigas of Oran and the isle of Arzeo; Mal di Ventre). Taken so far as
+the brief has it ("an island with `extent_m` grounds"), Belle Isle would have become a disc
+of ground nine kilometres about its centre, over Le Palais and the road. **Taken another
+way, said so:** an island the grid lacks says it, `grid_lacks: true`, beside its height and
+`extent_m` (`chart.Feature.grid_lacks`; the builder's loader takes the key as data). Such
+an island is ground to the keel by its height within its extent, as a rock that stands
+above the water is (`Feature.is_ground`, `head_above_datum_m` its height, never covered;
+`Chart.danger_under`, `dangers_about`), and the grounding says "(island)" where a rock's
+says "(rock)"; it is a hazard on the pilot's line and the captain's chart
+(`Feature.is_hazard`: `line_passes`, `dangers_ahead`, `dangers_near`), so that the pilot's
+warning and keep-off, the captain's planner and the master's dangers read it exactly as
+they read the rock; and the lookout sees it as land (`_seen_as`: "land", by day at its
+horizon and by night close aboard, never "a danger") and calls it by its name ("The Isla
+del Rey bearing ..., distant ..."), the pilot's words already its name. The lookout's
+"standing into" (`Lookout._first_ahead`) takes it by its extent as it takes a danger, the
+tiles having water there (`getattr` on the sighting's feature, a sail's or a cask's having
+none). Nothing in the Channel's water carries the key: the recorded passages read nothing
+new (the proof below).
+
+**The islets recast, each by its source line** (an isle, an islet or an island in the
+period's words an island; a rock in them a rock):
+
+| Region | Recast as islands | Kept rocks, by their words |
+|---|---|---|
+| mediterranean-west | Alboran ("the isle"), the Great Hormiga ("a small flat islet"), Isla Grosa | |
+| balearics | the Isle Ayre, the Lazaretto ("an islet"), Quarantine Island, the Isla del Rey, Rata (Tofiño's "Redonda, an islet"; Purdy's "large rock" between "the two islands") | |
+| gulf-of-lion | Planier ("a small island"), Great Ribaud ("the Ribaud Isles"), Bagaud ("the little island") | the Fourmigues of Giens ("a cluster of rocks above water"), the Boute of Gourjean ("a rock above water like a great boat") |
+| ligurian-sea | Tino ("the Isle Tino"), Palmaiola ("two isles"), the Giraglia ("an islet"), Lavezzi ("the islands"), the Sanguinaires ("the isles") | the Formiche of Grosseto (Purdy's and the file's "three flat rocks") |
+| tyrrhenian | Cavoli ("an oblong isle"), Santo Stefano ("an islet"), Li Galli ("three rocky islets") | the Toro ("Toro rock", "an enormous isolated steep rock"), the Catalano ("a small black rock"), the Botte ("a large rock") |
+
+Nineteen islands, six rocks kept: 79c's eight (its seven named and Redonda, which its
+notes count among Port Mahon's islands) and 79d's eleven of seventeen. Each entry's kind,
+the key and its `fix:` words changed ("an island the grid lacks ... a rock until package
+94"); every other key of every feature is as it was (checked by loading the files before
+and after).
+
+**The index, by the how-to's road for a mark changed** (ChartBlocks.md item 3, the lead's
+road at 39a's and 39b's merges): `build_index` over each of the five features files, no
+build and no fetch. The index holds ids by their cell and no kind, so it came out
+byte-identical for all five and no index file changed; the manifest's `features_by_kind`
+of the five regions edited by text to the files' counts (rock to island: 3, 5, 3, 5, 3),
+`feature_count` unchanged, no other key or region touched; `--check` of each region prints
+its features within the bounds and its seam's kept tiles as before. ChartBlocks.md says
+the road ("a mark whose kind changes and whose place does not") and rewrites "An isle the
+grid lacks".
+
+**The truths.** 7-303 (Li Galli grounds a frigate where the tiles read forty metres) now
+asserts the kind `island` with `grid_lacks` where it asserted `rock`, its grounding and its
+clearance a mile off asserted as before: the kind follows the data's recast, nothing
+loosened. **7-310**: the Isla del Rey is land to the lookout by day and by night two cables
+off, its words its name and never "a danger"; the lookout standing for it from two cables
+west has it ahead by its extent over the tiles' water; the keel touches it ("the Isla del
+Rey, or Hospital Island (island)") and a cable and a half south, in Tofiño's passage, is
+clear; the pilot's line and the master's dangers name it. `test_chart.py`: an islet with
+the key is ground and a hazard, an island without it (Belle Isle) neither; the nineteen
+carry a height and an extent under a kilometre, lie in the five regions, and each grounds
+a ship over its place.
+
+### Item 2: a road with a bottom
+
+`Chart.bottom_near` reads the note of the ground from the kinds `chart.BOTTOM_NOTE_KINDS`,
+`bottom`, `anchorage` and now `road` (79d's finding: a road with a `bottom:` gave no
+note, the roads being anchorages). **No feature file changes and nothing moves**: no
+feature of any region is of kind `road` today (79d gave its roads as anchorages, and the
+earlier blocks did the same), so every note the lead's arming, the grounding's words
+and the world's `bottom` read is the same as before; the roads' files are unchanged, as
+the brief has it. ChartBlocks.md's 79d bullet and item 5 say a road's bottom counts.
+**7-311**: on a chart of its own (not the shared one), Naples' road as an `anchorage`
+gives the arming of the lead its "mud and clay, fine sand"; recast in memory as a `road`
+it gives the same; as a `town` the note is not that.
+
+### Item 3: the seam's taper
+
+**The rule, as built** (`freesail/world/tide.py`). Within a block, the block's water rises
+from the eleven's alone at the block's **open edge** to its own whole over a band of
+**ten miles** inside it (`SEAM_BAND_NM`, **judgement**: a few hours of a ship's run, so
+that the tide she rides changes as she sails and never between one minute and the next,
+and narrow enough that the blocks' ports and gauges lie in their own water whole, all but
+those tabled below). The weight is the **smoothstep** 3x² − 2x³ of the distance's
+fraction of the band (judgement: no step in the water nor in its gradient at either side
+of the band; `Tide.taper_at`). The two waters are mixed **on each constituent's amplitude
+and on its phase**, the shorter way round, and on the level, by the weight (`_taper`);
+mixed as complex numbers first, the 114 degrees between the eleven's M2 and the block's a
+few miles inside 1 W made a false node, the spring range dipping to 5.9 feet five miles in
+between 10.1 and 11.2 on either side, so the mix is the amplitude's and the phase's.
+**Outside every block nothing changes**: the arithmetic there is the old one to the bit
+(the blend factored into `Tide._blend` with its operations in the same order; truth
+7-282's west position and 7-283's grid equal to the eleven's alone with `==`), and
+beyond the band inside a block 89's water to the bit (a weight of one mixes nothing).
+
+**The open edge** (`Tide.open_edges`, `_open_edges`): the stretches of the blocks' bounds
+whose far side is **charted water no block holds** (a region's bounds or the corridor's,
+`charted_bounds()`: the manifest's regions and corridors), each box's edge less what
+another block holds beyond it and kept where a charted box does. So a seam between two
+blocks (the Mediterranean west's at 0.05 E, the Strait's at 5 W, Biscay north's and south's
+at 45.9 N) is no open edge, its two blocks' waters meeting as 89 left them; an edge beyond
+which nothing is charted (the Channel east's at 2.5 E and 51.5 N, the Mediterranean's
+blocks' every edge but the corridor's) is none either: no ship sails there. The open edges
+are 1 W from 49 to 51 N (the Channel east against channel-mid), 48 N from 5 W to 1 W
+(Biscay north against the Channel west and the corridor), Biscay north's 5 W and Biscay
+south's 9.33 W and 45.9 N (the corridor's ocean), and Portugal's, the Strait's, Madeira's,
+the Azores' and the Mediterranean west's corridor sides. **Where the eleven are beyond
+their reach** (`far`: Portugal's ocean edge, the Strait's, the islands', the Alboran's
+south edge west of 1 W) a far gauge's guess is no water to taper toward, and the block's
+own stands to its edge (the mix is skipped there). **First cut, taken back:** every edge of
+every block, land and unreached ocean included, put Genoa's gauge 5.4 miles from its
+block's north bound (the Apennines), Port-Vendres' 4.8 from its west bound, Dunkirk's 5
+from 2.5 E, and would have drawn them toward Le Conquet's far tide or Dover's; the edges
+are kept to charted water and the mix to the eleven's reach.
+
+**The cell cache** keys the taper by the cell, as it keys the membership: the weight is
+the cell's centre's, so a cell's constants are one value however it is first asked, and
+the cache's key (the cell's indices) is unchanged; a cell is worked once and is a lookup
+after, as before (7-284 holds the pace of a fresh cell outside every block and the
+lookup). Within the band a fresh cell works the blend twice (the block's and the
+eleven's); beyond it once. A Tide pickled before the package has no open edges (the class
+default) and no taper.
+
+**The step, before and after** (the heights a cable either side of the seam, every ten
+minutes through the day of springs of 12 June 1805, the greatest gap):
+
+| Seam | 89's rule | With the taper |
+|---|---|---|
+| 1 W, 49.1 to 50.9 N | 4.25 to 7.56 ft (2.3 m at 50.9 N) | 0.04 to 0.045 ft |
+| 48 N at 4 42 W (the Iroise) | 1.64 ft | 0.043 ft |
+| 48 N at 4 54 W | 1.38 ft | 0.040 ft |
+
+At 50.6 N east of 1 W (the world's spring range, feet; the eleven's alone beside it):
+
+| Miles in | 1 | 2 | 3 | 5 | 8 | 10 | 11 | 15 |
+|---|---|---|---|---|---|---|---|---|
+| The weight | 0.028 | 0.104 | 0.216 | 0.5 | 0.896 | 1 | 1 | 1 |
+| With the taper | 10.07 | 9.91 | 9.82 | 9.76 | 10.48 | 11.15 | 11.38 | 12.71 |
+| The eleven's | 10.11 | 10.05 | 10.01 | 9.85 | 9.60 | 9.41 | 9.34 | 8.84 |
+
+**What lies within a band**, of the blocks' gauges and the master's places (the distance
+from the nearest open edge; the eleven not far):
+
+| Place | Miles | The weight | M2 by 89's water | M2 now | Spring range, feet |
+|---|---|---|---|---|---|
+| Concarneau's gauge (biscay-north) | 7.6 from 48 N, across Brittany's land | 0.853 | 1.481 m at 99.0 (the gauge's own) | 1.558 m at 104.1 | 13.25 to 13.92 |
+| Selsey Bill (Norie's, a given rise of 16) | 8.1 from 1 W | 0.901 | 1.292 m at 306.9 | 1.261 m at 296.9 | 11.07 to 10.87 |
+| the Owers (Norie's, given 15) | 11.8 | 1.0 | as before | | |
+
+Concarneau's is the one cost: the bound at 48 N runs over Brittany there, and the taper,
+a distance and not a passage by water, reaches the gauge across the land; its own water is
+five degrees of M2 (ten minutes) and eight centimetres off its gauge's. Said, not mended
+(a taper by water would want the chart in the tide; the gauge stays seven miles and a half
+from the bound). **The master's judged rise at Concarneau** (Norie's table, Faden giving
+no rise there: the 37j rule, the world's spring range to the foot) re-worked, old beside
+new: **13 to 14 feet** (13.26 by 89's water, 13.92 now), in `establishments.yaml` with the
+reason; no other judged rise moved (every place of both tables checked: Concarneau the one
+whose range moved by more than a hundredth of a foot), no given rise and no hour moved.
+
+**The truths.** **7-282** re-measured on the taper, old beside new: the west position to
+the bit as before; a mile east the block's water at a thirty-sixth of its weight, its
+constants other than the eleven's and its spring range within half a foot of theirs
+(10.07 against 10.11 feet; 89's rule gave 8.6 against 10.2, "other by feet"), and eleven
+miles east, past the band, the block's own whole (11.38 against 9.34, other by feet as
+the truth had it a mile east). **7-312**: a cable either side of 1 W at six latitudes from
+49.1 to 50.9 N and of 48 N in the Iroise, every ten minutes through a day of springs, the
+heights within a tenth of a foot (at most 0.045); the weight a cable in under a hundredth,
+at 7.6 miles in between a half and one, at 11.4 miles whole.
+
+**Run on this item's tree** (this session's container, four cores, nothing beside it): the
+proof as 89 ran it, the eleven recorded passages by node id, `-k "gate_5b or gate_5c"`
+and the captain's trials, **identical to the head's** (a clean worktree of `21a25e7` run
+first): 11 passed; the one test selected passed; the trials five passed, the gale with
+sea room its expected failure, the lee-shore trial's container digest `7fad0ce7e46ba366`
+against the pin `ed48ca3d61e52f20` the one failure on both trees (79d's, 84's and 89's
+records have it). The naval cruise's Diamond patrols across 48 N within the Iroise's band:
+her stream there is the taper's now, and the cruise's digests stand. `test_tide.py` and
+`test_islands.py` whole; the truths 7-270 to 7-312 with `--slow`, 38 passed.
+
+### Item 4: Bournemouth and Portsmouth, the Solent's tide region
+
+**Taken.** The manifest may carry a region with bounds and no tiles for the gauges'
+membership alone: `tide_regions:` (a title and bounds), read by `Tide.region_bounds` beside
+the chart's `regions:` (the small change in the tide's reader of the manifest), and read by
+nothing of the chart (`Chart` and `load_chart` read `regions:` and `charts:`). **One more
+change than the brief names, said so:** the manifest is written whole by
+`tools/build_charts.py` at every build and drops a key the tool does not know, so a
+region's rebuild (package 93's, beside this) would have dropped the tide region; the tool
+writes it from `TIDE_REGIONS` beside `REGIONS`, building nothing of it. The manifest's
+text gained the block after `corridors:` in the form the tool writes; no region's entry,
+tile list or count moved.
+
+**The region** `solent`: 50.62 to 51 N and 2.2 to 1 W, **judgement** from the gauges' places
+and the Wight's shores: Bournemouth (1.87 W) twelve miles inside its west bound, past St
+Alban's Head; Portsmouth's gauge and Spithead nine miles inside its south bound, south of
+the Wight's north shore and of the Needles; its east bound the Channel east's 1 W; its
+north channel-mid's 51 N; and **north of 50.6 N**, where truth 7-282 holds the eleven's
+water a mile west of 1 W to the bit (the brief's binding). The two gauges moved from
+`held_gauges:` (now gone) into `gauges:` with `block: solent`, no figure moved (checked by
+loading both files); their mean levels unread (null), so the level there is the eleven's,
+as before. Under item 3's taper: its south and west bounds open onto channel-mid's water
+and are tapered; its east bound meets the Channel east at 1 W and is a seam between two
+blocks.
+
+**What the Solent reads after** (M2 amplitude in metres and phase in degrees; the world's
+spring range, feet; the taper's weight):
+
+| Place | Before (the eleven) | After | Range before | after | Weight |
+|---|---|---|---|---|---|
+| Spithead | 1.01 at 189.1 | 1.39 at 324.6 | 9.4 | 12.0 | 0.99 |
+| Portsmouth's gauge | | its own 1.41 at 326.7 | | | 1.0 |
+| Cowes | 1.03 at 187.6 | 1.18 at 317.2 | 9.6 | 10.1 | 0.95 |
+| Southampton | 0.98 at 185.5 | 0.92 at 317.8 | 9.2 | 7.8 | 1.0 |
+| St Helens road | 1.04 at 190.1 | 1.17 at 259.5 | 9.7 | 10.4 | 0.47 |
+| Yarmouth | 1.02 at 186.9 | 0.78 at 257.1 | 9.5 | 7.0 | 0.56 |
+| the Needles | 1.01 at 187.1 | 0.91 at 204.7 | 9.5 | 8.5 | 0.18 |
+| Poole bar | 0.84 at 186.4 | 0.76 at 201.5 | 8.0 | 7.3 | 0.15 |
+
+**Spithead's high waters** on 12 June 1805: by the eleven 06:56 and 19:11, by Portsmouth's
+gauge alone 11:33 and 23:49 (four hours and a half, 39a's finding); now **11:29 and
+23:45**, within four minutes of the gauge's (truth 7-313). The western Solent and the
+Needles, within the band of the region's south bound, read between the eleven's and the
+gauges' (the Needles channel opens on the Channel there; a finding, not mended).
+
+**The Solent's judged rises** (the 37j rule, the world's spring range at the place to the
+foot), old beside new: Norie's Spithead **10 to 12** (11.83 feet), Moore's Spithead **10 to
+12**, Moore's Portsmouth **9 to 12** (12.10), Moore's Pool **8 to 5** (5.36); Moore's St
+Helen's 10 kept (10.4). The given rises (Norie's Portsmouth 18, St Helen's 16, Poole 7) and
+every hour as they were. No other judged rise moved.
+
+**The Downs to Spithead** (`spithead.yaml` at seed 7, truth 7-279's run; the head, a clean
+worktree of `21a25e7`; item 3's tree; this tree):
+
+| | The head | Item 3 | Item 4 | Step 5 (the rule) |
+|---|---|---|---|---|
+| St Helens for the night | 21h28m, nine fathoms and a half | 21h38m, ten | 21h38m, nine and a half | 21h40m, eight |
+| The Portsmouth pilot aboard | 24h45m | 24h47m | 24h50m | 24h47m |
+| Spithead | 26h08m, twelve fathoms | 26h04m, eleven and a half | 26h06m, thirteen | 26h00m, fourteen |
+| The pilot leaves | 26h30m | 26h26m | 26h28m | 26h23m |
+| Off the spot at the end | 0.84 mile | 0.77 | 0.80 | 0.84 |
+| The log's lines | 1,183 | 1,173 | 1,209 | 1,176 |
+
+(The step 5 column sailed on step 5's final tree, the rule of the seams in.) No grounding on any tree; the truth's limits (three anchorings, the pilot, 27 hours, half a
+mile of Spithead's mark) held on each. (The log says "in 13 fathoms" in figures where it
+says "twelve" and "eleven and a half" in words: `fathoms_words` gives whole figures above
+twelve so; the words', not this package's.)
+
+**For the lead: the seam at 1 W north of 50.62 N.** The Solent's water meets the Channel
+east's at 1 W off Chichester, Hayling and Selsey's west, and the taper, which is the
+inside of a block against the eleven's, does not smooth a seam between two blocks: a cable
+either side of 1 W the heights differ by **0.41 ft at 50.65 N, 3.4 at 50.75, 3.6 at 50.85,
+3.0 at 50.95** through a day of springs (with item 3 alone, the water west of 1 W the
+eleven's, 0.04 to 0.05 ft). Spithead cannot have Portsmouth's tide unless the Solent's
+water reaches 1 W whole there (the band of an open edge at 1 W would leave Spithead, four
+miles from it, at a third of the gauges' weight). Two ways were measured and **not taken**,
+each going beyond the brief: (a) Portsmouth serving the Channel east too (`block: [solent,
+channel-east]`): the step 0.25 to 2.1 ft, Beachy Head 18.99 to 18.86 feet; (b) the eight
+gauges serving both (the six of the Channel east `[channel-east, solent]`, the two
+`[solent, channel-east]`): every seam within 0.05 ft (1 W at 50.65 to 50.95 N; 50.62 N at
+2.0, 1.5 and 1.2 W), Spithead as now, but the Channel east's water moves where Portsmouth
+weighs (Beachy Head 18.99 to **18.73**, past truth 7-280's "a foot and a quarter" of
+Norie's twenty; Shoreham 17.87 to 16.91, Moore's judged 18 to 17; the Downs 19.47 to 19.39;
+Newhaven, Dieppe and the Havre unchanged). (b) is the better water, at the cost of a
+block's truth re-measured; the lead's to rule.
+
+### The truths (7-310 to 7-314, behaviours)
+
+- **7-310**: the Isla del Rey is an island to the lookout (land by day and by night close
+  aboard, called by its name, never "a danger"; stood into by its extent over the tiles'
+  water) and ground to the keel, a cable and a half south clear; the pilot's line and the
+  master's dangers name it (item 1).
+- **7-311**: a road's bottom in the lead's note as an anchorage's (item 2).
+- **7-312**: a cable either side of 1 W from 49.1 to 50.6 N and of 48 N in the Iroise, the
+  tide within a tenth of a foot through a day of springs (at most 0.045 ft; 89's rule 4.3
+  to 7.3 ft at 1 W, 1.4 to 1.6 in the Iroise) (item 3).
+- **7-313**: Spithead's high waters within the hour of Portsmouth's gauge (within four
+  minutes; the eleven's four hours and a half out), its spring range the gauges' water,
+  the eleven's a mile west of 1 W at 50.6 N to the bit (item 4, taken).
+- **7-314**: over channel-west and channel-mid outside the Solent's region the tide is the
+  eleven's to the bit, a cable outside the region's south and west bounds as everywhere;
+  the recorded passages themselves the proof (below).
+
+Re-measured, old beside new, each with its reason in its words: **7-303** (the kind follows
+the recast), **7-282** (a mile east of 1 W within the band), **7-283** (the grid's three
+positions in the Solent's region), **7-312** (its 50.9 N in the Solent's region, item 4).
+Recast to the gauges' `block:` as 89 recast the held gauges' tests, every data assertion
+kept: `test_tide.py`'s Channel east's gauges (the two serve `solent`), Biscay north's
+count north of 42 N (the file has no `held_gauges:` now), the blocks' gauges' count (73 to
+75) and their blocks' names (with `solent`).
+
+### Found on the way (package 94)
+
+- **The brief's island with `extent_m` alone** would have made Belle Isle and seven other
+  islands the grid holds discs of ground over their roads: `grid_lacks` (item 1).
+- **The brief's file list, and what else was touched, said so**: `freesail/world/lookout.py`
+  (the lookout's "standing into" by an islet's extent, item 1); `data/tides/
+  establishments.yaml` (Concarneau's judged rise by item 3's water, the Solent's four by
+  item 4's, the 37j rule that `test_tide.py` holds); `tools/build_charts.py`
+  (`TIDE_REGIONS`, written into the manifest so that a rebuild keeps the tide region: 93
+  rebuilds regions beside this, and the lead's merge of both wants the tool to carry it).
+  No tile, coast or index file of any region touched.
+- **A taper by distance reaches across land**: Concarneau's gauge, 7.6 miles from 48 N
+  over Brittany, reads its water at 0.85 of its weight (five degrees of M2). A taper by
+  water would want the chart in the tide; said, not mended.
+- **The seam between the Solent's region and the Channel east** at 1 W north of 50.62 N,
+  a step of three feet and a half off Chichester; two ways measured and not taken, the
+  lead's (item 4).
+- **The western Solent and the Needles** lie within the band of the region's south bound
+  and read between the eleven's and the gauges' (the Needles' M2 at 205 degrees, Yarmouth's
+  257, against Portsmouth's 327): the Needles channel opens on the Channel there; a finding.
+- **The log's "in 13 fathoms"** where it says "twelve fathoms" in words (`fathoms_words`):
+  not this package's.
+- **No road feature** exists in any region (79d's and the earlier blocks' roads are
+  anchorages): item 2 moves nothing today.
+
+### The suite, as run (package 94)
+
+On this session's container (four cores, nothing beside it); `ruff check .` and `ruff
+format --check .` clean at every commit; the trunk brought in at each item's boundary
+(`9b07813`, 85's item 7, at item 2's; nothing new at 3's and 4's). **The proof, first and
+last** (`proof.sh` in the session's scratchpad: the eleven by node id, the gate selection,
+the captain's trials, `--slow -n 4`): on a clean worktree of the head `21a25e7` first, on
+item 3's tree, and on the final tree `a124454` last, **identical**: the eleven passed (the
+frigate's passage of gate 5b and its pace, the schooner's with her octant and her pilot,
+the merchant passage and its deep-sea cast, the naval cruise and its stranger, truths 72,
+77 and 78), every pinned digest, line count and tick held; `-k "gate_5b or gate_5c"`, the
+one test selected, passed; the captain's trials five passed, the gale with sea room its
+expected failure, the lee-shore trial's container digest `7fad0ce7e46ba366` against the
+pin `ed48ca3d61e52f20` the one failure, the same on all three trees. **The slow tier of
+the files touched** (`--slow -m slow -n 4 tests/test_chart.py tests/test_tide.py
+tests/test_ports.py tests/test_scenarios.py`): 10 passed. **The truths 7-270 to 7-314**
+with `--slow -n 4`: 40 passed. **The fast tier**, once on the final tree (`python -m pytest
+-n auto -q -p no:cacheprovider`, 379 slow tests left out): one failure, the pictures' known
+flake ("the chart is blank (std 8.0)" under the tier's load), which passes alone on this
+tree. The whole slow tier not run (the lead's, in the cloud at the merge).
+
+### Step 5: the lead's rulings of 2026-10-30, carried out
+
+**(1) The seam at 1 W north of 50.62 N: way (a), under the rule of the seams.** The rule,
+the lead's: **a gauge serves its own block, and also a block whose seam with its own lies
+within the taper's band (ten miles) of the gauge**, the water a cable either side of a
+seam being the near gauge's and no other's; a gauge beyond the band of a seam serves its
+own block alone. A gauge's `block:` is a list then, its own block first. Every seam
+between two blocks checked by it (the shared stretches of the bounds: the Mediterranean
+west's with the Balearics at 0.05 E, the Strait's with it at 5 W, Biscay north's and
+south's at 45.9 N, Biscay south's and Portugal's at 42 N, Portugal's and the Strait's at
+36.4 N, the Balearics' and the Gulf's at 40.56 N, the Solent's and the Channel east's at
+1 W; the Gulf's and the Ligurian sea's bounds meet at no shared edge, 7.73 against 7.74 E,
+and no gauge lies within twelve miles of either; the Ligurian sea and the Tyrrhenian
+overlap, a membership of both and no seam). **The rule catches three, not one**, each
+taken, said so:
+
+| Gauge | Its own block | The seam | Miles | Serves now |
+|---|---|---|---|---|
+| Portsmouth | solent | 1 W (the Channel east) | 4.2 | `[solent, channel-east]` |
+| the Isle of Aix | biscay-north | 45.9 N (Biscay south) | 6.4 | `[biscay-north, biscay-south]` |
+| Cadiz | portugal | 36.4 N (the Strait) | 8.0 | `[portugal, strait]` |
+
+Beyond the band and their own block's alone: La Rochelle 15.5 from 45.9 N, Le Verdon 19.9,
+Vigo 14.3 from 42 N, Ceuta 15.4 and Gibraltar 17.0 from 5 W, Bournemouth 17 from 1 W and
+the Channel east's six far from it. `test_tide.py` holds the rule over every gauge (the
+blocks after a gauge's own are exactly the ones whose seam lies within the band) and names
+the three. No figure of any gauge moved (the `block:` lines alone).
+
+**The figures, old (each gauge its own block's) beside new (the rule):**
+
+| The step a cable either side, through a day of springs | Old | New |
+|---|---|---|
+| 1 W at 50.65 N | 0.41 ft | 0.25 |
+| 1 W at 50.75 N | 3.40 | 1.48 |
+| 1 W at 50.85 N | 3.59 | 1.66 |
+| 1 W at 50.95 N | 2.96 | 2.09 |
+| 45.9 N at 1 12 W (the Pertuis d'Antioche's south) | 3.87 | 0.32 |
+| 45.9 N at 1 30 W | 3.61 | 0.68 |
+| 45.9 N at 2 30 W | 2.53 | 1.20 |
+| 36.4 N at 6 06 W (Cadiz bay's south) | 10.24 | 8.39 |
+| 36.4 N at 6 24 W | 10.24 | 7.97 |
+
+Spithead's high waters 11:29 and 23:45 both ways (Portsmouth's gauge 11:33 and 23:49):
+truth 7-313's figures do not move, its assertion of the gauge's `block:` follows the list.
+Truth 7-312's 50.9 N, left out at item 4 as a seam between two blocks, reads 2.09 ft now
+(3.0 before the rule) and stays out, said in its words. The seam at 36.4 N keeps eight
+feet: Cadiz's bay against the Strait's own gauges, a seam the near gauge narrows and does
+not close (for the lead).
+
+**The blocks' places, the world's spring range in feet** (every place of both epitomes
+whose range moved by more than a hundredth of a foot): the Channel east's Beachy Head
+18.99 to **18.86** (Norie's twenty: within truth 7-280's foot and a quarter, its words
+standing, its docstring given the figure), Selsey Bill 11.07 to 11.65 (given 16), the Owers
+12.07 to 11.95 (15), Shoreham 17.70 to 17.09 (Norie's given 16; Moore's judged 18),
+Hastings 18.35 to 18.08 (judged 18), Rye 18.75 to 18.52, Dungeness 19.59 to 19.43 (Norie's
+given 24; Moore's judged 20), Folkestone 19.50 to 19.47 (judged 19), the Downs 19.47 to
+19.44, Ramsgate 19.24 to 19.17 (judged 19), the North Foreland 19.07 to 18.97 (Moore's
+judged 19), Gris Nez 22.63 to 22.59 (judged 23), Gravelines 19.64 to 19.61, the Somme 21.07
+to 20.90 (judged 21), St Valery en Caux 22.83 to 22.63, Fécamp 19.32 to 19.08 (judged 19),
+Honfleur 22.27 to 22.22 (judged 22); Biscay south's Brouage 12.82 to 15.02 (given 15), the
+Tower of Cordouan 13.20 to 13.29 (15), Passages 11.51 to 11.52, Cape Ortegal 10.49 to
+10.51; the Strait's Cape Trafalgar 3.17 to 4.83 (judged 3), Tangier 3.24 to 3.50 (given
+5). The gauges' own places: no gauge's spring range moved (each is its own block's first
+gauge, weighed at the floor's hundred metres). **Judged rises moved, the range crossing the
+foot (the 37j rule)**: Norie's **Cape Trafalgar 3 to 5** (4.83), Moore's **Shoreham 18 to
+17** (17.09) and Moore's **Dungeness 20 to 19** (19.43), each with its reason in
+`establishments.yaml`; every other judged rise above within its foot, kept. No given rise
+and no hour moved.
+
+**Way (b) stays measured and not taken**, the reason: it weighs the block's far gauges at
+the block's own places against Norie's figures (the six of the Channel east serving the
+Solent and the two the Channel east: Beachy Head 18.73, past 7-280's words; Shoreham's
+judged 18 to 17 from 16.91) for a seam the near gauge alone should close; the rule closes
+the seams within the band of a gauge and leaves the rest a finding.
+
+**(2) The manifest's slip.** The text edit of item 1 duplicated the last line of four
+regions' `features_by_kind` (`town: 6` under mediterranean-west, `transit: 1` under
+balearics, `transit: 2` under gulf-of-lion, `town: 19` under ligurian-sea): the four lines
+removed by text, the file loaded before and after equal (the loader had taken the last of
+each repeated key, the values equal), the counts the features files' (islands and rocks
+13/8, 12/7, 14/10, 23/8, 18/6; the totals 95, 87, 114, 140, 123).
+
+**The suites on step 5's final tree** (this container, four cores, nothing beside it; ruff
+check and format clean; the trunk brought in, nothing new). **The proof**, as before: the
+eleven recorded passages by node id passed, every digest held; `-k "gate_5b or gate_5c"`
+the one test passed; the captain's trials five passed, the gale with sea room its expected
+failure, the lee-shore container digest `7fad0ce7e46ba366` the one failure: **identical
+to the head's** again (the rule of the seams moves no water of channel-west or of
+channel-mid outside the Solent). The Downs to Spithead sailed once more (the table's step 5
+column). **The slow tier of the files touched** (`test_chart`, `test_tide`, `test_ports`,
+`test_scenarios`, `test_islands`): 10 passed. **The truths** 7-264 (Cadiz's water) and
+7-270 to 7-314 with `--slow`: 41 passed. **The fast tier** once: the pictures' known flake
+the one failure ("std 8.0" under the load), passing alone on this tree.
+
 ## Package 85: the orders, the primer and the library for a model reader (2026-10-30)
 
 A review that mends what it finds, by the owner's word of 2026-10-27 (the notes 3 to 6 of

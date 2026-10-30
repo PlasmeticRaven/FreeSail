@@ -50,6 +50,14 @@ of the blend, since one gauge within the reach of Falmouth moved every recorded 
 The membership is the cell's centre's, as the blend is. A block's gauge with no mean
 level read gives the blend its constants and not its level; where no gauge of the blend
 has a level (the Strait's, the islands') the level is the eleven's there, as it was.
+**The seam's taper** (package 94): within `SEAM_BAND_NM` of a block's open edge (where it
+meets charted water no block holds, `Tide.open_edges`) the block's water rises from the
+eleven's alone to its own, each constituent's amplitude and phase and the level by the
+smoothstep of the distance's fraction of the band (`Tide.taper_at`), so that no step
+stands at the seam; not where the eleven are beyond their reach, and nothing outside every
+block changes. The weight is the cell's centre's, so the cache keys it by the cell. A
+gauge's block may be a tide region of the manifest (`tide_regions:`, bounds and no tiles,
+`region_bounds`): the Solent's, for Bournemouth and Portsmouth.
 """
 
 from __future__ import annotations
@@ -111,6 +119,16 @@ GAUGE_FLOOR_M = 100.0
 # region lies from Dover, so that every Channel position blends the eleven gauges as
 # package 34 pinned it.
 GAUGE_REACH_NM = 400.0
+# The seam's taper (package 94): within a block, the block's water rises from the eleven's
+# alone at the block's edge to its own whole over this band inside it, so that no step
+# stands where a block's water meets the water the eleven alone serve (89's step at 1 W off
+# Selsey Bill was 102 degrees of M2). Ten miles, judgement: a few hours of a ship's run, so
+# that the tide she rides changes as she sails and never between one minute and the next,
+# and narrow enough that a block's ports and gauges lie in their own water whole (the
+# nearest of them to an open edge are tabled in docs/dev/TuningNotes.md, package 94).
+# The taper rises as the smoothstep 3x^2 - 2x^3 of the distance's fraction of the band
+# (judgement: no step in the water nor in its gradient at either side of the band).
+SEAM_BAND_NM = 10.0
 # The regions' bounds a block's gauge is kept to (package 89): the manifest's `regions:`.
 MANIFEST_PATH = Path(__file__).resolve().parents[2] / "data" / "charts" / "manifest.yaml"
 # A place beyond this many miles from the nearest place in the master's table is far
@@ -337,6 +355,9 @@ class Tide:
     # package 89: a Tide pickled before the blocks' gauges were given their water
     block_gauges: list[Gauge] = []  # noqa: RUF012 (the class default an old pickle reads)
     block_bounds: dict[str, tuple[float, float, float, float]] = {}  # noqa: RUF012
+    # package 94: a Tide pickled before the seam's taper has no open edges, and no taper
+    open_edges: list[tuple[str, float, float, float]] = []  # noqa: RUF012
+    band_nm: float = SEAM_BAND_NM
 
     def __init__(
         self,
@@ -383,6 +404,11 @@ class Tide:
                             "manifest does not name"
                         )
                     self.block_bounds[b] = known[b]
+        # the edges of the blocks' water where it meets charted water the eleven alone
+        # serve (package 94: the seam's taper reads the distance to them)
+        charted = list((charted_bounds() if regions is None else regions).values())
+        self.open_edges = _open_edges(list(self.block_bounds.values()), charted)
+        self.band_nm = SEAM_BAND_NM
         interpolation = constituents.get("interpolation") or {}
         self.power = float(interpolation.get("power", 2))
         self.reach_m = float(interpolation.get("reach_nm", GAUGE_REACH_NM)) * units.NAUTICAL_MILE
@@ -454,6 +480,38 @@ class Tide:
         # the membership (package 89), by the cell's centre as the blend is: the eleven,
         # and within a block's bounds the block's gauges beside them
         gauges = self.gauges_at(centre)
+        mean_level, sums, nearest, far = self._blend(centre, gauges)
+        if gauges is not self.gauges:
+            # the seam's taper (package 94): within the band inside a block's open edge
+            # the block's water and the eleven's alone, mixed on each constituent's
+            # amplitude and phase (`_taper`) and on the level by the taper's weight
+            # there (the cell's centre's, as the membership is), so that the cache's key,
+            # the cell, is the taper's too; not where the eleven are beyond their reach
+            # (far: a far gauge's guess is no water to taper toward, and the block's own
+            # stands to its edge)
+            weight = self.taper_at(centre)
+            far_11 = True
+            if weight < 1.0:
+                level_11, sums_11, _, far_11 = self._blend(centre, self.gauges)
+            if not far_11:
+                mean_level = weight * mean_level + (1.0 - weight) * level_11
+                sums = {name: _taper(sums_11[name], z, weight) for name, z in sums.items()}
+        consts = {
+            name: (abs(z), (-math.degrees(cmath.phase(z))) % 360.0) for name, z in sums.items()
+        }
+        out = (mean_level, consts, nearest / units.NAUTICAL_MILE, far)
+        if len(cache) > 256:
+            cache.clear()
+        cache[key] = out
+        return out
+
+    def _blend(
+        self, centre: Position, gauges: list[Gauge]
+    ) -> tuple[float, dict[str, complex], float, bool]:
+        """The blend of `gauges` at a cell's centre: the mean level, each constituent's
+        complex constant A e^{-ig} by the inverse square of the distance over the gauges
+        within the reach (the nearest alone beyond it), the nearest's distance in metres
+        and whether it is far."""
         distances = [bearing_and_distance(centre, g.position)[1] for g in gauges]
         nearest = min(distances)
         within = [g for g, d in zip(gauges, distances, strict=True) if d <= self.reach_m]
@@ -473,21 +531,42 @@ class Tide:
                 level += w * g.mean_level_m
             for name, (amp, lag) in g.constants.items():
                 sums[name] += w * cmath.rect(amp, -math.radians(lag))
-        consts = {}
-        for name, z in sums.items():
-            z /= total
-            consts[name] = (abs(z), (-math.degrees(cmath.phase(z))) % 360.0)
+        for name in sums:
+            sums[name] /= total
         if level_total > 0.0:
             mean_level = level / level_total
         else:
             # every gauge of the blend a block's with its level unread (the Strait's, the
             # islands'): the level is the eleven's there, as it was, and not invented
             mean_level = self._eleven_level(centre)
-        out = (mean_level, consts, nearest / units.NAUTICAL_MILE, far)
-        if len(cache) > 256:
-            cache.clear()
-        cache[key] = out
-        return out
+        return mean_level, sums, nearest, far
+
+    def open_edge_nm(self, pos: Position) -> float:
+        """The distance in miles from a position to the nearest edge of the blocks' water
+        where it meets water no block holds (`open_edges`; package 94), by the flat
+        approximation at the position's latitude; infinite with no edge."""
+        mile_lon = math.cos(math.radians(pos.lat_deg))
+        best = math.inf
+        for axis, at, lo, hi in self.open_edges:
+            if axis == "lat":
+                dy = (pos.lat_deg - at) * 60.0
+                dx = (pos.lon_deg - min(max(pos.lon_deg, lo), hi)) * 60.0 * mile_lon
+            else:
+                dx = (pos.lon_deg - at) * 60.0 * mile_lon
+                dy = (pos.lat_deg - min(max(pos.lat_deg, lo), hi)) * 60.0
+            best = min(best, math.hypot(dx, dy))
+        return best
+
+    def taper_at(self, pos: Position) -> float:
+        """The weight of a block's water against the eleven's alone at a position within a
+        block (package 94): nought at the block's open edge, whole beyond `band_nm` inside
+        it, rising between as the smoothstep of the distance's fraction of the band."""
+        if self.band_nm <= 0.0:
+            return 1.0
+        x = self.open_edge_nm(pos) / self.band_nm
+        if x >= 1.0:
+            return 1.0
+        return x * x * (3.0 - 2.0 * x)
 
     def blocks_at(self, pos: Position) -> frozenset[str]:
         """The blocks whose bounds hold a position, of those the gauges name (package
@@ -652,12 +731,82 @@ def _gauge_blocks(g: dict[str, Any]) -> tuple[str, ...]:
     return blocks
 
 
+def _taper(eleven: complex, block: complex, weight: float) -> complex:
+    """A constituent's constant between the eleven's and the block's (package 94): the
+    amplitude and the phase each by the weight, the phase the shorter way round, so that
+    the range across the band runs from the one to the other with no false node where
+    the two are far apart in phase (mixed as complex numbers, 89's step of 102 degrees
+    at 1 W gave the spring range a dip to three fifths mid-band)."""
+    turn = (math.degrees(cmath.phase(block) - cmath.phase(eleven)) + 180.0) % 360.0 - 180.0
+    amplitude = weight * abs(block) + (1.0 - weight) * abs(eleven)
+    return cmath.rect(amplitude, cmath.phase(eleven) + math.radians(weight * turn))
+
+
+def _open_edges(
+    boxes: list[tuple[float, float, float, float]],
+    charted: list[tuple[float, float, float, float]],
+) -> list[tuple[str, float, float, float]]:
+    """The edges of the union of the blocks' bounds (south, north, west, east) that meet
+    charted water no block holds (package 94), as ("lat", the latitude, the west end, the
+    east end) and ("lon", the longitude, the south end, the north end): each box's edge
+    less the stretches another block covers on its far side (a seam between two blocks,
+    the Mediterranean west's at 0.05 E, is no open edge) and kept where a region or the
+    corridor (`charted`) lies on its far side (the Channel east's at 1 W, where
+    channel-mid's water is the eleven's, is open; its east bound at 2.5 E, beyond which
+    nothing is charted, is not)."""
+
+    def less(lo: float, hi: float, cuts: list[tuple[float, float]]) -> list[tuple[float, float]]:
+        out = [(lo, hi)]
+        for a, b in cuts:
+            nxt = []
+            for x, y in out:
+                if b <= x or a >= y:
+                    nxt.append((x, y))
+                    continue
+                if a > x:
+                    nxt.append((x, a))
+                if b < y:
+                    nxt.append((b, y))
+            out = nxt
+        return out
+
+    def keep(
+        parts: list[tuple[float, float]], spans: list[tuple[float, float]]
+    ) -> list[tuple[float, float]]:
+        out = []
+        for x, y in parts:
+            for a, b in spans:
+                lo, hi = max(x, a), min(y, b)
+                if hi > lo:
+                    out.append((lo, hi))
+        return out
+
+    blocks = sorted(set(boxes))
+    edges: list[tuple[str, float, float, float]] = []
+    for box in blocks:
+        s, n, w, e = box
+        others = [c for c in blocks if c != box]
+        # each edge: the boxes that hold the water just beyond it, and the stretch of the
+        # edge along them (the south edge's west to east, the west edge's south to north)
+        for kind, at, lo, hi, beyond, span in (
+            ("lat", s, w, e, lambda c, s=s: c[0] < s <= c[1], lambda c: (c[2], c[3])),
+            ("lat", n, w, e, lambda c, n=n: c[0] <= n < c[1], lambda c: (c[2], c[3])),
+            ("lon", w, s, n, lambda c, w=w: c[2] < w <= c[3], lambda c: (c[0], c[1])),
+            ("lon", e, s, n, lambda c, e=e: c[2] <= e < c[3], lambda c: (c[0], c[1])),
+        ):
+            parts = less(lo, hi, [span(c) for c in others if beyond(c)])
+            parts = keep(parts, [span(c) for c in charted if beyond(c)])
+            edges += [(kind, at, a, b) for a, b in parts]
+    return list(dict.fromkeys(edges))  # a stretch two charted boxes hold, once
+
+
 _REGION_BOUNDS: dict[str, dict[str, tuple[float, float, float, float]]] = {}
 
 
 def region_bounds(path: str | Path = MANIFEST_PATH) -> dict[str, tuple[float, float, float, float]]:
     """The regions' bounds of the chart's manifest (south, north, west, east), read once a
-    process (package 89: the blocks a gauge is kept to)."""
+    process (package 89: the blocks a gauge is kept to), and the manifest's tide regions,
+    bounds with no tiles for the gauges' membership alone (package 94: `solent`)."""
     key = str(path)
     found = _REGION_BOUNDS.get(key)
     if found is not None:
@@ -666,10 +815,35 @@ def region_bounds(path: str | Path = MANIFEST_PATH) -> dict[str, tuple[float, fl
     doc = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=loader) or {}  # noqa: S506
     out = {
         str(name): tuple(float(r["bounds"][k]) for k in ("south", "north", "west", "east"))
-        for name, r in (doc.get("regions") or {}).items()
+        for name, r in {**(doc.get("regions") or {}), **(doc.get("tide_regions") or {})}.items()
         if r.get("bounds")
     }
     _REGION_BOUNDS[key] = out
+    return out
+
+
+_CHARTED_BOUNDS: dict[str, dict[str, tuple[float, float, float, float]]] = {}
+
+
+def charted_bounds(
+    path: str | Path = MANIFEST_PATH,
+) -> dict[str, tuple[float, float, float, float]]:
+    """The bounds of the charted water (south, north, west, east): the manifest's regions
+    and its corridors, read once a process (package 94: the seam's taper is toward charted
+    water alone)."""
+    key = str(path)
+    found = _CHARTED_BOUNDS.get(key)
+    if found is not None:
+        return found
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # the manifest is long
+    doc = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=loader) or {}  # noqa: S506
+    out = dict(region_bounds(path))
+    for name, c in (doc.get("corridors") or {}).items():
+        if c.get("bounds"):
+            out[f"corridor:{name}"] = tuple(
+                float(c["bounds"][k]) for k in ("south", "north", "west", "east")
+            )
+    _CHARTED_BOUNDS[key] = out
     return out
 
 
