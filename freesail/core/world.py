@@ -469,7 +469,17 @@ class World:
     @property
     def own(self) -> Any:
         stack = _current_hulls(self)
-        return stack[-1] if stack else self.__dict__["_own"]
+        if stack:
+            return stack[-1]
+        # the followed hull by default (package 84, step 10: the drivers follow a hull), the
+        # player's own hull until `follow` names another; before the hulls are made, hers
+        d = self.__dict__
+        hulls = d.get("hulls")
+        if hulls:
+            hull = hulls.get(d.get("followed"))
+            if hull is not None:
+                return hull
+        return d["_own"]
 
     @own.setter
     def own(self, hull: Any) -> None:
@@ -487,16 +497,60 @@ class World:
 
     @property
     def is_followed(self) -> bool:
-        """Whether the current hull is the World's own (the followed hull): the shared
-        parts of the tick (the clock, the world orders, the far bodies, the switch, the
-        ports' jobs, the business) run for her alone."""
-        return self.own is self.__dict__["_own"]
+        """Whether the current hull is the followed hull (the player's own until `follow`
+        names another; package 84, step 10): the shared parts of the tick (the clock, the
+        world orders, the far bodies, the switch, the ports' jobs, the business) run for
+        her alone, and the drivers read her."""
+        d = self.__dict__
+        hulls = d.get("hulls")
+        followed = hulls.get(d.get("followed")) if hulls else None
+        return self.own is (followed if followed is not None else d["_own"])
+
+    @property
+    def players(self) -> Any:
+        """The player's own hull (her ship's; `hulls[PLAYER_ID]`), whichever hull is
+        followed or current (package 84, step 10): the sea is hers, her vessel on it is
+        `Vessels.own`, and the readers that mean the player's ship by name read her."""
+        return self.__dict__["_own"]
 
     @property
     def sea_vessels(self) -> Any:
-        """The `Vessels` of the sea, whichever hull is current (another hull's `vessels` is
-        her view of them)."""
+        """The `Vessels` of the sea, whichever hull is current or followed (another hull's
+        `vessels` is her view of them): kept on the player's own hull."""
         return self.__dict__["_own"].vessels
+
+    def follow(self, words: str, source: str = "the driver") -> Event:
+        """`follow "X"` (package 84, step 10; 82's §11): the drivers' centre moves to the
+        hull named, the player's ship by her name or 'the ship', another ship's hull by her
+        name (made in the far shape when she has none); the World's names read her by
+        default from here, the promotion's range and the lookout's are hers, and her log is
+        the one the drivers show. A driver's line, journaled and replayed; refused in words
+        (a `ValueError`) for a ship not on the sea or one with no captain of her own."""
+        from freesail.world.orders import WorldOrderError, hull_named
+
+        try:
+            hull = hull_named(self, words)
+        except WorldOrderError as e:
+            raise ValueError(str(e)) from None
+        if hull is self:
+            hull = self.players  # the player's ship by her name or 'the ship'
+        hid = str(hull.id)
+        if hid not in self.hulls:
+            raise ValueError(f"No ship followed: {words!r} names no hull of this world")
+        self.followed = hid
+        name = str(getattr(hull.ship, "name", "") or hid)
+        return self.record_driver(
+            "routine", "driver.follow", f"Following the {name}.", {"ship": hid, "name": name}
+        )
+
+    @property
+    def followed_words(self) -> str:
+        """The followed hull's name for the drivers' words, or 'no ship followed'."""
+        hulls = self.__dict__.get("hulls") or {}
+        hull = hulls.get(self.__dict__.get("followed"))
+        if hull is None:
+            return "no ship followed"
+        return str(getattr(getattr(hull, "ship", None), "name", "") or hull.id)
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # The Hull (package 84, step 1; `freesail.world.hulls`): what this World keeps of
@@ -516,6 +570,10 @@ class World:
         # fields the World's names read when no other hull is current (`as_hull`)
         self.hulls: dict[str, Any] = {self.own.id: self.own}
         self.followed: str = self.own.id
+        # the offices' room (package 84, step 10; the design's 2.10): a station of the world
+        # and of no hull, M8's to build; an empty mapping beside the hulls so that an office
+        # may be added without touching them
+        self.offices: dict[str, Any] = {}
         # The registry of the world's persons and things (package 84, step 2; `people.
         # Registry`): one for the game, so a crewed ship's World (`CrewedWorld.parent`, set
         # before this constructor runs) is given its parent's and her company is a view of
@@ -1438,7 +1496,7 @@ class World:
 
     # -- the world-order channel (spec M5 §26; package 36) -----------------------------
 
-    def world_order(self, text: str, source: str = "the harness") -> Event:
+    def world_order(self, text: str, source: str = "the harness", by: str = "") -> Event:
         """A world order from outside the scenario (the lead's test harness; the owner's
         live order; the director of milestone 7b): journaled in `inputs` at this tick with
         its source, so that a replay gives it again, then carried out and logged at the
@@ -1454,14 +1512,23 @@ class World:
             with acts.aside(self):
                 # what the order writes (the carpenter's report, the driver's line) is the
                 # order's own, given again by the act, as a station's order's lines are
-                return self._apply_world_order(text, source)
-        self.inputs.append({"tick": self.clock.tick, "world_order": text, "source": str(source)})
-        return self._apply_world_order(text, source)
+                return self._apply_world_order(text, source, by)
+        entry: dict[str, Any] = {
+            "tick": self.clock.tick,
+            "world_order": text,
+            "source": str(source),
+        }
+        if by:
+            entry["by"] = str(by)  # the purview the order is given under (package 84, step 10)
+        self.inputs.append(entry)
+        return self._apply_world_order(text, source, by)
 
-    def _apply_world_order(self, text: str, source: str) -> Event:
+    def _apply_world_order(self, text: str, source: str, by: str = "") -> Event:
         from freesail.world import orders as world_orders
 
         order = world_orders.parse(text)
+        if by:
+            order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
         try:
             words, data = world_orders.apply(self, order)
             result = "done"
@@ -2288,7 +2355,14 @@ class World:
     # -- save ----------------------------------------------------------------
 
     def save(self) -> dict[str, Any]:
-        """Everything needed to rebuild this world by replay: seed, scenario, journal."""
+        """Everything needed to rebuild this world by replay: seed, scenario, journal. The
+        game's, whichever hull the drivers follow (package 84, step 10): the player's own
+        hull is current for the writing, so the seed, the scenario, the ship and the
+        stations at the top are hers and every other hull's are in `hulls`."""
+        with self.as_hull(self.players):
+            return self._save()
+
+    def _save(self) -> dict[str, Any]:
         return {
             "format": SAVE_FORMAT,
             "engine": ENGINE_VERSION,

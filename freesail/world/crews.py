@@ -584,10 +584,15 @@ def _crew_ids(world: World) -> tuple[str, ...]:
 def crewed(world: World) -> list[Any]:
     """The vessels at full detail now (a station's World kept in the far shape is not
     one: it costs little and counts nothing against the cap)."""
+    players = getattr(world, "players", None)
     return [
         v
         for v in world.vessels.vessels
-        if v.crew is not None and v.crew.shape == "full" and not v.done and not v.crew.is_followed
+        if v.crew is not None
+        and v.crew.shape == "full"
+        and not v.done
+        and not v.crew.is_followed
+        and v.crew is not players  # the player's own hull is awake always (step 10)
     ]
 
 

@@ -241,6 +241,8 @@ def test_api_ship_and_state(client):
         "snapshot_every": 1,
         # the pace rule (package 41): the rule, the rate now and the samples open
         "pace": {"rule": "pace", "compression": 1.0, "rate": 1.0, "held": False, "open": []},
+        # the hull the drivers follow (package 84, step 10): the player's own until told
+        "followed": {"id": "the ship", "name": ship["name"]},
     }
     assert len(state["sails"]) == len(ship["sails"])
 
@@ -259,11 +261,13 @@ def test_post_order_and_driver(client):
     assert r.json()["running"] is False
     assert client.get("/api/state").json()["tick"] == 120
     r = client.post("/api/driver", json={"action": "time", "value": 60})
+    name = client.get("/api/ship").json()["name"]
     assert r.json() == {
         "running": False,
         "compression": 60.0,
         "snapshot_every": 60,
         "pace": {"rule": "pace", "compression": 60.0, "rate": 60.0, "held": False, "open": []},
+        "followed": {"id": "the ship", "name": name},
     }
     r = client.post("/api/driver", json={"action": "go"})
     assert r.json()["running"] is True

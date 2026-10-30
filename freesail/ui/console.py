@@ -27,6 +27,8 @@ Driver commands (not ship orders, not journaled):
     time N          the same as speed N
     tick N          advance N ticks, then hold
     state           print a summary of the ship and the weather
+    follow SHIP     the drivers follow her hull: her readings, her log, her chart (the
+                    player's ship by her name or 'the ship' to come back)
     muster          muster the crew: the watch bill, station by station
     the sail room   what the sail room holds: each sail, its canvas and condition
     the booms       the spare spars aboard, by class (also `the spare spars`)
@@ -586,7 +588,15 @@ class Console:
                 )
             else:
                 self._print(f"Advanced {n} ticks to {self.world.clock.stamp()}.")
+        elif cmd == "follow":
+            # the drivers follow a hull (package 84, step 10; 82's §11): a driver's line
+            try:
+                e = self.world.follow(" ".join(args))
+                self._print(e.text)
+            except ValueError as err:
+                self._print(str(err).rstrip(".") + ".")
         elif cmd == "state":
+            self._print(f"Following the {self.world.followed_words}.")
             for s in self.world.summary_lines():
                 self._print(s)
             if self.desk is not None:

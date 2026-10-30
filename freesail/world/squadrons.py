@@ -512,7 +512,7 @@ class Squadron:
         """The commander off his plan (chasing, investigating, engaging, evading): the
         convoy stands on by the guide's reckoning and does not follow him."""
         if self.commander == PLAYER_ID:
-            cap = getattr(world, "captain", None)
+            cap = _players_captain(world)
             state = getattr(cap, "state", None) if cap is not None and cap.commands else None
         else:
             body = _body(world, self.commander)
@@ -695,7 +695,7 @@ class Squadron:
         rules commander; None when a model or the player holds the commander's station, or
         the director's hand holds him (then the signals are theirs)."""
         if self.commander == PLAYER_ID:
-            cap = getattr(world, "captain", None)
+            cap = _players_captain(world)
             if cap is None or not getattr(cap, "commands", False):
                 return None
             from freesail.world.captains import Perception
@@ -983,7 +983,7 @@ class Squadron:
         leaders = [self.commander] + [d.leader for d in self.divisions.values() if d.detached]
         for lead in leaders:
             if lead == PLAYER_ID:
-                cap = getattr(world, "captain", None)
+                cap = _players_captain(world)
                 if cap is not None and getattr(cap, "commands", False):
                     saved.setdefault(lead, cap.intent_words)
                     try:
@@ -1016,7 +1016,7 @@ class Squadron:
             if not words:
                 continue
             if lead == PLAYER_ID:
-                cap = getattr(world, "captain", None)
+                cap = _players_captain(world)
                 if cap is not None:
                     try:
                         cap.set_intent(words)
@@ -1383,11 +1383,22 @@ def _body(world: Any, vid: str) -> Any:
 
 
 def _followed_hull(body: Any) -> Any:
-    """The followed hull when `body` is her vessel (package 84, step 7), else None: her way
-    and her frame are her ship's own, as the shadow's were, where another hull's are her
-    far body's mirrored record."""
+    """The player's own hull when `body` is her vessel (package 84, step 7; the player's
+    whichever hull is followed since step 10), else None: her way and her frame are her
+    ship's own, as the shadow's were, where another hull's are her far body's mirrored
+    record."""
     hull = getattr(body, "crew", None) if body is not None else None
-    return hull if hull is not None and getattr(hull, "is_followed", False) else None
+    if hull is None:
+        return None
+    world = getattr(hull, "world", None)
+    players = world.__dict__.get("_own") if world is not None else None
+    return hull if hull is players else None
+
+
+def _players_captain(world: Any) -> Any:
+    """The player's ship's captain, whichever hull is followed (package 84, step 10)."""
+    players = getattr(world, "players", None)
+    return getattr(players if players is not None else world, "captain", None)
 
 
 def _velocity_of(world: Any, vid: str) -> tuple[float, float]:

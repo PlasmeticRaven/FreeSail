@@ -1041,3 +1041,28 @@ def test_the_rule_of_reach_counts_a_held_station_on_another_hull():
     assert any(name == "captain" for name, _p, _w in WO.held_stations_everywhere(w) if True) or True
     e = w.world_order(f'say as {cap.name}: "All well."', "t")
     assert e.data["result"] == "refused" and "held" in e.text, e.text
+
+
+def test_a_world_order_given_under_a_purview_is_checked_against_it():
+    """Package 84, step 10 (the design's 2.10, the offices' room): a world order given
+    under a purview (`by`) passes whole for the director's and the bare order, and an
+    unknown purview is refused in words; the purview rides the input and a replay gives it
+    again."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as R
+
+    w = world_for()
+    e = w.world_order("port falmouth: price of tin 130", "t", by="the director")
+    assert e.data["result"] == "done", e.text
+    e = w.world_order("port falmouth: price of tin 140", "t", by="the port admiral at Plymouth")
+    assert e.data["result"] == "refused" and "no purview this world knows" in e.text
+    assert (
+        WO.purview_allows("", "ship") is None and WO.purview_allows("director", "weather") is None
+    )
+    assert [i.get("by") for i in w.inputs if "world_order" in i] == [
+        "the director",
+        "the port admiral at Plymouth",
+    ]
+    w.run(60)
+    copy = R.replay(w.save(), ship_factory)
+    assert copy.log.digest() == w.log.digest()

@@ -4955,14 +4955,19 @@ def all_agents(world: Any) -> list[tuple[str, Any, Any]]:
     World): the player's ship's under their own names, and those on the other ships
     (package 43; spec M6 §20) as 'captain of <ship>', each in that ship's own World."""
     out: list[tuple[str, Any, Any]] = []
-    for name, h in (getattr(world, "agents", None) or {}).items():
-        out.append((name, h, world))
-    for v in getattr(getattr(world, "vessels", None), "vessels", None) or []:
-        crew = getattr(v, "crew", None)
-        if crew is None:
-            continue
-        for name, h in (getattr(crew, "agents", None) or {}).items():
-            out.append((f"{name} of {v.name}", h, crew))
+    hulls = list((getattr(world, "hulls", None) or {}).values())
+    if not hulls:
+        for name, h in (getattr(world, "agents", None) or {}).items():
+            out.append((name, h, world))
+        return out
+    # every hull once (package 84, step 10): the followed hull's stations under their own
+    # names, every other hull's as 'captain of <ship>' (a walk over the vessels' hulls counted
+    # the player's twice since step 7, her vessel on the sea)
+    followed = getattr(world, "own", None)
+    for hull in hulls:
+        her = str(getattr(getattr(hull, "ship", None), "name", "") or hull.id)
+        for name, h in (hull.__dict__.get("agents") or {}).items():
+            out.append((name if hull is followed else f"{name} of {her}", h, hull))
     return out
 
 
