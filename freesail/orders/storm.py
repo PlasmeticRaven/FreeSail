@@ -321,6 +321,17 @@ def flying_topsail_lines(ship: Ship) -> list[str]:
     ]
 
 
+def bowsprit_sail_lines(ship: Ship) -> list[str]:
+    """`shorten sail`'s first lines in a ship with square sails under her bowsprit (package
+    75; docs/design/Design-ShipsEngineExtensions.md §4.3): each set one taken in, the
+    outermost first as the jibs are (judgement: Lever gives no order between them), with the
+    royals as the wind rises (Lever 1808, OCR l. 9962-9966: "... prudent to take in Sail. The
+    Royals, Top Gallant Studding Sails, Spritsail ..."). They are none of the courses or the
+    topsails, so the list never reefs them."""
+    sails = [sl for sl in ship.sails.values() if sl.is_set and ship.under_bowsprit(sl)]
+    return [f"take in the {_name(ship, sl)}" for sl in sorted(sails, key=lambda sl: -sl.x_m)]
+
+
 def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
     """What `shorten sail` adds to its list (see the module's head): each jib loaded to
     `HEAD_SAIL_IN_RATIO` of its rating or more, outermost first; and over the storm line

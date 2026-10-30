@@ -1107,9 +1107,13 @@ def _trim(
             wants[yard.id] = want
         # on a wind: the lowest yard of every mast wants to go sharper than it can (package
         # 37p: the lowest of each mast, so that a fore-and-after whose yards begin at the
-        # topsail is judged by it, where before only a course yard was read)
+        # topsail is judged by it, where before only a course yard was read); not by a
+        # yard under the bowsprit, which no mast carries (package 75;
+        # docs/design/Design-ShipsEngineExtensions.md §4.2)
         lowest: dict[str, Spar] = {}
         for yard in rig:
+            if ship.under_bowsprit(yard):
+                continue
             mast = ship.mast_of(yard)
             key = mast.id if mast is not None else yard.id
             if key not in lowest or _level_rank(ship, yard) < _level_rank(ship, lowest[key]):

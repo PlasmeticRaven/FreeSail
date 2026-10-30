@@ -186,7 +186,7 @@ class Ship:
         sail bent to one (package 75; docs/design/Design-ShipsEngineExtensions.md §4.2): a
         spar of class `yard` whose chain roots at a bowsprit. Not a jib, whose chain roots
         there too: the rule names the yards and their square sails alone. Read through
-        `mast_of`'s memo; called by nothing yet, the engine's bowsprit step will read it."""
+        `mast_of`'s memo, at the nine places of §4.2 (the engine's bowsprit step, B3.2)."""
         p: Part | None = self._part(part)
         if isinstance(p, Sail):
             p = self.yard_of(p) if p.cls == "square" else None

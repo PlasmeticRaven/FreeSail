@@ -486,8 +486,13 @@ def working_yards(ship: Ship) -> list[Spar]:
 
 
 def _masts_with_yards(ship: Ship) -> list[Spar]:
+    """The masts that carry braced yards: never the bowsprit, though the spritsail yard and
+    the sprit-topsail yard are crossed under it (`Ship.under_bowsprit`; package 75,
+    docs/design/Design-ShipsEngineExtensions.md §4.2)."""
     masts: list[Spar] = []
     for y in working_yards(ship):
+        if ship.under_bowsprit(y):
+            continue
         m = ship.mast_of(y)
         if m is not None and m not in masts:
             masts.append(m)
@@ -497,13 +502,16 @@ def _masts_with_yards(ship: Ship) -> list[Spar]:
 def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
     """Split the yards into the head yards (on the foremost mast that carries
     yards) and the after yards (all the rest). A ship whose yards are all on
-    one mast, like a topsail schooner, has head yards only."""
+    one mast, like a topsail schooner, has head yards only. The yards under the
+    bowsprit are head yards, swung with the fore yards and never with the after
+    yards (package 75; Ext §4.2, §4.3)."""
     masts = _masts_with_yards(ship)
     if not masts:
         return [], []
     foremost = max(masts, key=lambda m: m.x_m)
-    head = [y for y in working_yards(ship) if ship.mast_of(y) is foremost]
-    after = [y for y in working_yards(ship) if ship.mast_of(y) is not foremost]
+    yards = working_yards(ship)
+    head = [y for y in yards if ship.mast_of(y) is foremost or ship.under_bowsprit(y)]
+    after = [y for y in yards if ship.mast_of(y) is not foremost and not ship.under_bowsprit(y)]
     return head, after
 
 
@@ -604,7 +612,10 @@ def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
     yards' mast: the light head sails. Hove to they are clewed up (Luce 1866
     ch. XXVI: 'settle down the top-gallant sails and royals, or clew them
     up'); left set, the fore topgallant drives her ahead at a knot and a half
-    and lies her a point too broad (package 10, truth 12)."""
+    and lies her a point too broad (package 10, truth 12). And the square sails
+    under the bowsprit, the spritsail and the sprit topsail, set (package 75;
+    docs/design/Design-ShipsEngineExtensions.md §4.3): left set, a spritsail pays her
+    head off (judgement, carrying Luce's rule to them)."""
     masts = [ship.mast_of(y) for y in backed]
     if not masts or any(m is None for m in masts):
         return []
@@ -612,6 +623,9 @@ def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
     out = []
     for sl in ship.sails.values():
         if not (sl.is_set and sl.cls == "square"):
+            continue
+        if ship.under_bowsprit(sl):
+            out.append(sl)
             continue
         yard = ship.yard_of(sl)
         above = ship.parent_of(yard) if yard is not None else None
@@ -2324,7 +2338,12 @@ class HeaveToScript(Script):
         for sl in light:
             sl.state = SailState.IN_THE_GEAR
         if light:
-            self.note(f"Clewed up {names_of_sails(self.ship, light)}.")
+            # with the sails under the bowsprit among them, named as a list ("the fore
+            # topgallant, the spritsail and the sprit topsail": package 75, Ext §4.3); every
+            # other ship's words as they have always been
+            sprit = any(self.ship.under_bowsprit(sl) for sl in light)
+            names = _names(self.ship, light) if sprit else names_of_sails(self.ship, light)
+            self.note(f"Clewed up {names}.")
         self.headsail = None
         if self.fore_and_after():
             # the fore-and-after's way (Luce 1884, ch. XXXIV, 'To Heave to'): the main

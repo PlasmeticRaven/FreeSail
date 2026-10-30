@@ -441,9 +441,16 @@ def compute_sail_forces(ship: Ship, wind: Wind, dt: float = 0.0) -> SailForces:
         luff_sum += sail_luff * luff_weight
         luff_area += luff_weight
         luff_angle = luff_sum / luff_area
-        if square_rigged and sail.cls == "square" and d.square_chord is not None:
+        if (
+            square_rigged
+            and sail.cls == "square"
+            and d.square_chord is not None
+            and not d.under_bowsprit
+        ):
             # the deck's apparent wind at which this sail begins to lift: its own luff
-            # less what its height frees the wind it feels (package 37p, the helm's mark)
+            # less what its height frees the wind it feels (package 37p, the helm's mark);
+            # never a sail under the bowsprit, no mast's and no level's (package 75;
+            # docs/design/Design-ShipsEngineExtensions.md §4.2), read once a tick (`_Drawing`)
             lifts = sail_luff - (abs(flow.awa) - abs(deck.awa))
             square_lifts.append((_yard_level(ship, sail), lifts, sail.id))
         if by_hand and d.square_chord is not None:
@@ -526,6 +533,7 @@ class _Drawing:
     held: bool = False  # held on the weather side by its sheet: aback by the sheet
     flogging: bool = False  # every sheet let fly: it flogs
     working_sheet: str | None = None  # the sheet that carries its pull
+    under_bowsprit: bool = False  # a square sail under the bowsprit (package 75): no mast's
 
 
 @dataclass
@@ -623,6 +631,7 @@ def _read_rig(ship: Ship) -> _Rig:
                 held=held,
                 flogging=flogging,
                 working_sheet=working,
+                under_bowsprit=sail.cls == "square" and ship.under_bowsprit(sail),
             )
         )
     driving_ids = {s.id for s in driving}
@@ -855,13 +864,14 @@ def _square_rigged(ship: Ship) -> bool:
     """Whether her yards stand on two masts or more (a ship, a brig), kept per ship: her
     helm steers full and by the highest square sail set. A fore-and-after with a square
     topsail on one mast (the topsail schooner, the cutter) sails by her fore-and-aft
-    canvas with the topsail shaking, and keeps the mean of her sails (package 4)."""
+    canvas with the topsail shaking, and keeps the mean of her sails (package 4). The
+    yards under the bowsprit stand on no mast (package 75, `Ship.under_bowsprit`)."""
     rigged = ship.extra.get("sails.square_rigged")
     if not isinstance(rigged, bool):
         masts = {
             ship.mast_of(sp).id
             for sp in ship.spars.values()
-            if sp.is_yard and ship.mast_of(sp) is not None
+            if sp.is_yard and ship.mast_of(sp) is not None and not ship.under_bowsprit(sp)
         }
         rigged = len(masts) >= 2
         ship.extra["sails.square_rigged"] = rigged
@@ -1569,7 +1579,8 @@ def _spar_centre_height(ship: Ship, spar: Spar) -> float:
 
 
 def _spar_x(ship: Ship, spar: Spar) -> float:
-    if spar.parent is None:
+    if spar.parent is None or ship.under_bowsprit(spar):
+        # a yard under the bowsprit at its own station, where its sail is (package 75)
         return spar.x_m
     root = ship.mast_of(spar)
     return root.x_m if root is not None else spar.x_m

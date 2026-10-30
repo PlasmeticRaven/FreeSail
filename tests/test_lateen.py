@@ -16,10 +16,9 @@ the lateen's own curve and trim, and is no driver.
 None of the eight files carries a lateen (`tests/test_rig_classing.py`, the probe), so the tests
 run on the fixture `frigate_with_mizen_yard()` (`tests/rig_fixtures.py`): the frigate-36 with her
 spanker, gaff and boom replaced by the 64's mizen course on its yard, and a spritsail yard and a
-sprit-topsail yard under her bowsprit. Those two yards are the engine's next step's (B3.2, Ext
-§4): until it keeps them out of the classing the bowsprit counts as a mast with yards, the
-foremost, so the classing here and the manoeuvres, which brace the head yards, sail the fixture
-with them taken out (`_frigate_doc`). The orders and the evolutions run on the fixture whole.
+sprit-topsail yard under her bowsprit. Every test sails the fixture whole, those two yards with
+it: the engine's bowsprit step (B3.2, Ext §4; `tests/test_bowsprit_yards.py`) keeps them out of
+the classing, and the manoeuvres swing them with the head yards.
 """
 
 from __future__ import annotations
@@ -54,8 +53,8 @@ from freesail.world.ships import _trim_for
 ROOT = Path(__file__).resolve().parents[1]
 COURSE = "mizzen.course"
 YARD = "mizzen.yard"
-# the yards under the bowsprit, with their sails and lines: B3.2's (Ext §4)
-SPRIT = {"spritsail", "sprit_topsail", "spritsail.yard", "sprit_topsail.yard"}
+# the yards under the bowsprit (B3.2's, Ext §4): head yards, no mast's
+SPRIT_YARDS = ("spritsail.yard", "sprit_topsail.yard")
 
 # The gaff's sheet range (`evolutions.trim.TRIM_RANGE`), which the course cut at the mast takes,
 # against the lateen's own floor, which a whole lateen keeps (Ext §3.1).
@@ -67,17 +66,8 @@ CLOSE = math.radians(-30.0)
 
 
 def _frigate_doc(whole_lateen: bool = False) -> dict:
-    """The fixture without its yards under the bowsprit (B3.2's), for the classing and the
-    manoeuvres; `whole_lateen`, its course a whole lateen, the key taken out."""
+    """The fixture whole; `whole_lateen`, its course a whole lateen, the key taken out."""
     doc = frigate_with_mizen_yard_doc()
-    doc["spars"] = [s for s in doc["spars"] if s["id"] not in SPRIT]
-    doc["sails"] = [s for s in doc["sails"] if s["id"] not in SPRIT]
-    doc["lines"] = [ln for ln in doc["lines"] if ln["of"] not in SPRIT]
-    doc["groups"] = {
-        g: [m for m in members if m not in SPRIT]
-        for g, members in doc["groups"].items()
-        if g != "spritsails"
-    }
     if whole_lateen:
         next(s for s in doc["sails"] if s["id"] == COURSE).pop("cut_at_mast")
     return doc
@@ -125,11 +115,11 @@ def _under_plain_sail(ship: Ship) -> Ship:
 
 
 def test_the_fixtures_classing_is_the_frigates_row_with_the_course_her_driver():
-    """Ext §10.2: the classing of the fixture equals the frigate's row of the golden table
-    (`tests/test_rig_classing.py`), her driver and her boom sail the mizen course where they
-    were the spanker; the lateen yard is none of the after yards. And on the fixture whole,
-    whatever its yards under the bowsprit do until B3.2, the lateen yard is no working yard
-    and the course is her driver and her boom sail."""
+    """Ext §10.2: the classing of the fixture whole, its yards under the bowsprit with it,
+    equals the frigate's row of the golden table (`tests/test_rig_classing.py`), her driver and
+    her boom sail the mizen course where they were the spanker: the head yards on the masts the
+    fore's four, the two under the bowsprit beside them (B3.2's place 2); the lateen yard no
+    working yard and none of the after yards."""
     ship = _under_plain_sail(_ship())
     assert [m.id for m in scripts._masts_with_yards(ship)] == [
         "fore.mast",
@@ -137,20 +127,18 @@ def test_the_fixtures_classing_is_the_frigates_row_with_the_course_her_driver():
         "mizzen.mast",
     ]
     head, after = scripts.head_and_after_yards(ship)
-    assert (len(head), len(after)) == (4, 8)
-    assert YARD not in {y.id for y in after}
+    on_masts = [y for y in head if not ship.under_bowsprit(y)]
+    assert (len(on_masts), len(after)) == (4, 8)
+    assert [y.id for y in head if ship.under_bowsprit(y)] == list(SPRIT_YARDS)
+    assert YARD not in {y.id for y in scripts.working_yards(ship)}
     assert ship.mast_of(scripts.yards_to_back(ship)[0]).id == "main.mast"
     assert _square_rigged(ship) is True
     targets = {y.id: y.brace_limit for y in scripts.working_yards(ship)}
     assert yard_trim.stagger(ship, targets)[1] == pytest.approx(2.0, abs=0.05)
     assert [s.id for s in scripts.after_gaff_sails(ship)] == [COURSE]
     assert [s.id for s in scripts.boom_sails(ship)] == [COURSE]
+    assert [s.id for s in scripts.after_gaff_sails_all(ship)] == [COURSE]
     assert scripts.dipping_lugs(ship) == []
-    whole = _under_plain_sail(frigate_with_mizen_yard())
-    assert YARD not in {y.id for y in scripts.working_yards(whole)}
-    assert [s.id for s in scripts.after_gaff_sails(whole)] == [COURSE]
-    assert [s.id for s in scripts.boom_sails(whole)] == [COURSE]
-    assert [s.id for s in scripts.after_gaff_sails_all(whole)] == [COURSE]
 
 
 def test_the_lateen_yard_is_no_braced_yard_but_still_a_yard_to_send_down():
@@ -596,9 +584,9 @@ def test_the_rating_pass_rates_a_course_cut_at_the_mast_at_the_gaffs_peak():
 
 
 def _world(tmp_path, heading_deg: float = 300.0, knots: float = 15.0):
-    """The fixture (its yards under the bowsprit out: B3.2's) in a fifteen-knot northerly on
-    the starboard tack, sixty degrees off the wind, under plain sail and settled with the yards
-    trimmed, as the truths settle the frigate (`tests/test_known_truths.py`)."""
+    """The fixture whole in a fifteen-knot northerly on the starboard tack, sixty degrees off
+    the wind, under plain sail and settled with the yards trimmed, as the truths settle the
+    frigate (`tests/test_known_truths.py`)."""
     scenario = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=knots,

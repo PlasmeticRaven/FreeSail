@@ -109,7 +109,9 @@ def stagger(
     the after yards' rigging will not give, against the main yard of its level (the
     after mast nearest the head). With `head_sharper` it is the after yards that are
     eased, to that much less than the head yard of their level (art. 96). A mizzen yard
-    whose own limit is below the head yards' is left at it.
+    whose own limit is below the head yards' is left at it. A yard under the bowsprit is
+    on no mast here and keeps its own target (package 75;
+    docs/design/Design-ShipsEngineExtensions.md §4.2).
 
     Returns the new targets and the difference the log names: the main yard's angle
     less the head yard's at the lowest level both have, in degrees (negative with the
@@ -123,7 +125,7 @@ def stagger(
     for yid in targets:
         yard = ship.spars[yid]
         mast = ship.mast_of(yard)
-        if mast is None:
+        if mast is None or ship.under_bowsprit(yard):
             continue
         masts[mast.id] = mast
         by_level.setdefault((mast.id, _level(ship, yard)), yid)
@@ -159,14 +161,15 @@ def by_level(ship: Ship, targets: dict[str, float]) -> dict[str, float]:
     and never sharper than its own target. `targets` are unsigned angles from square
     (radians), each within its yard's limit; the yards of one mast are taken from the
     lowest up. Applied before `stagger`, which then braces the after yards of each level
-    sharper than the head yard of theirs as before."""
+    sharper than the head yard of theirs as before. The yards under the bowsprit are no
+    mast's and keep their own targets (package 75)."""
     step = units.deg_to_rad(UPPER_YARDS_IN_DEG)
     out = dict(targets)
     by_mast: dict[str, list[tuple[int, str]]] = {}
     for yid in targets:
         yard = ship.spars[yid]
         mast = ship.mast_of(yard)
-        if mast is None:
+        if mast is None or ship.under_bowsprit(yard):
             continue
         level = _level(ship, yard)
         rank = _LEVELS.index(level) if level in _LEVELS else 0
@@ -209,14 +212,15 @@ def heavy_weather_trim(ship: Ship) -> bool:
 
 def eased_lowest(ship: Ship, targets: dict[str, float]) -> dict[str, float]:
     """Every mast's lowest yard among `targets` braced in `HEAVY_WEATHER_EASE_DEG`
-    (`heavy_weather_trim`)."""
+    (`heavy_weather_trim`); a yard under the bowsprit is no mast's and keeps its target
+    (package 75)."""
     step = units.deg_to_rad(HEAVY_WEATHER_EASE_DEG)
     out = dict(targets)
     lowest: dict[str, tuple[int, str]] = {}
     for yid in targets:
         yard = ship.spars[yid]
         mast = ship.mast_of(yard)
-        if mast is None:
+        if mast is None or ship.under_bowsprit(yard):
             continue
         level = _level(ship, yard)
         rank = _LEVELS.index(level) if level in _LEVELS else 0
