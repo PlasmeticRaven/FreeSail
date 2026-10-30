@@ -192,7 +192,7 @@ wardroom:
       by the bill and learns the reckoning from the master.
     note: A midshipman as the captain's messenger, one of the boys of the afterguard.
   # the detachment's officer and serjeant (the 44's column: two lieutenants, two serjeants, two
-  # corporals and a drummer; Ind §4.2), drawn from the fifty so that the muster's count stands
+  # corporals and a drummer; Ind §4.2), drawn from the detachment so that the muster's count stands
   - role: lieutenant of marines
     drawn: {station: marines, rating: marine}
     rank: lieutenant of marines
@@ -205,7 +205,7 @@ wardroom:
       gangway, the guard, the drill in the forenoon; at quarters the marines at the
       quarterdeck's carronades and on the gangways, the fire by volley within musket shot,
       the boarders' backbone and the guard on the prisoners.
-    note: The lieutenant of marines, drawn from the detachment (one of the fifty).
+    note: The lieutenant of marines, drawn from the detachment.
   - role: sergeant of marines
     drawn: {station: marines, rating: marine}
     rank: sergeant of marines

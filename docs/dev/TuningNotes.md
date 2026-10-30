@@ -11773,3 +11773,524 @@ again, passed). `test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the
 alone on this tree (run once after), and its picture is the default scenario's chart about
 Falmouth, which this block does not reach. Not run again whole, as the suites' rule has it.
 
+## Package 75, the first ship: HMS *Indefatigable*, the 64 and the razee (2026-10-30)
+
+Her stage B (`docs/design/Design-Ship-Indefatigable.md`, cited as Indf; the lead's notes of
+2026-10-29, item 2): the rig whole on `data/ships/sixty-four.yaml` and `data/ships/razee-44.yaml`,
+the lateral resistance tuned against it, her truths measured. **Old is stage A at 53f27e2; new is
+the files as they stand.** Everything below was measured at seed 7 on the owner's machine, in the
+forms of `tests/test_known_truths.py` and of `polar_of` (`world/ships.py`), with no change in
+`freesail/`. It holds what the files' notes used to carry: by the lead's ruling the notes keep
+sources, departures and judgements, and a figure a rule computes from the file's own keys lives
+in the generator's report (`her_report()`, printed as her files are written) and in her tests
+(`tests/test_indefatigable.py`), where it cannot go stale.
+
+### What was tuned, and within what
+
+| Knob | Bounds | The 64: start, stage A, now | The razee: start, stage A, now | Why |
+|---|---|---|---|---|
+| `clr_x_m` | the helm's truths (Indf §9, §16 items 3 and 6) | +4.1, +5.2, **+4.8** | +4.1, +4.1, **+4.5** | below |
+| `hull_speed_kn` | D24 (a): 12.5-13.0 for the 64, 13-14.5 for the razee | 12.8, 12.8, **12.8** | 14.0, 14.0, **14.0** | kept: no truth asks more, and neither end closes a gap (below) |
+| the brace limits | only with a source | the frigate's, kept | the frigate's, kept | the owner: "Reasonable" (Indf §17) |
+
+**The 64, +5.2 to +4.8 m.** With the whole rig at +5.2 she griped getting under way from rest:
+truth 17's form took her aback at 31.2° off with 1.39 kn of sternway. Taking one change out at a
+time at +5.2: without the long pole-heads she holds (59.4° off, 450 s), and without the course cut
+at the mast (the stand-in's gaff, no driver's boom) she holds (63.9°, 347 s); without the bowsprit
+on the stem head, the yards under the bowsprit or the driver's boom alone she is still aback (31.3°,
+27.8°, 34.9°); the clew check's raise cannot be taken out, the course then ending under her
+roundhouse deck. Truth 17's form holds to +4.9 (56.9°, 477 s) and breaks at +5.0 (34.7°, 1.32 kn of
+sternway). +4.8 holds that form at 15 and 16 kn and is taken aback from 17 (below): a lead of 11.0%
+against stage A's 11.8%. She keeps
+weather helm from seven points to eleven, small, less than the frigate-36's, as a mizen course of
+104 m² against a spanker of 167 m² would give her. At six points she carries lee helm, -0.91° against
+stage A's -0.05°, and that is the one figure to watch. Of the 0.86° moved there, the clr's retune is
+about 0.63° (the whole rig at +5.2 gives -0.28°) and the yards under the bowsprit about 0.52° (both out
+at +4.8, -0.39°; at 60° -3.84° becomes -2.76°), and the rest of the rig gives back about 0.29°. It is
+banded now, -1.5° to 0° (`test_her_helm_as_tuned_holds_truths_6_and_17`). **For the lead:** is lee helm
+at her own close-hauled course acceptable, -0.91° at six points and -0.49° at 70°, against the
+*Bellona*'s weatherly helm (Bel §2.1, §9; Lavery 1985 p. 9)? Stage A moved off +4.1 for lee helm
+close-hauled.
+*Bel §2.1's start for the 74 reads "the 64's tuned lead of 11.8%" and now stands at 11.0%.*
+
+**The razee, +4.1 to +4.5 m.** Her spanker, cut smaller on its boom raised clear of her roundhouse
+(218 to 191 m²; Indf §17; the lead's notes, within 8% of Steel's driver for a 38), took her helm
+away: at +4.1 from 1.37-2.05° to 1.08-1.44° from six points to eleven. +4.5 gives back stage A's
+figures within 0.05° at seven points, the beam and nine points, within about 0.2° elsewhere from six
+points to eleven, and stands her nearer the frigate-36's 1.45-2.19°. It costs time in stays, 347-393 s
+to 400-471 s, inside truth 10's band and not above the frigate-36's 343-447 s by more than half a
+minute, and gains less to windward, every heading still gaining. At +4.8 she tacks in 8 minutes and barely gains at the third
+heading (+3 m); at +5.1 she loses ground at two of three and gathers 0.64 kn of sternway filling
+away; so +4.5.
+
+The sweeps, each with the rig whole (the frigate-36's helm at the same angles: -0.16, +1.45, +1.99,
++1.99, +1.94):
+
+*The 64:*
+
+| `clr_x_m` | helm at 60° | at 67.5° | at 78.75° | at 90° | at 120° | truth 6 (plain, headsails in, after sail in) | truth 17 (nearest, settled) | truth 10 (three headings) | hove to |
+|---|---|---|---|---|---|---|---|---|---|
+| +4.2 | -5.42 | -1.84 | -0.45 | -0.07 | +0.53 | -0.07, +1.76, -1.25 | 64.2°, 360 s | 184 s (+107 m), 187 s (+96 m), 231 s (+70 m) | 59.1-64.5°, 1.32 kn |
+| +4.4 | -4.88 | -1.51 | -0.23 | +0.10 | +0.61 | +0.10, +1.92, -1.07 | 64.4°, 374 s | 217 s (+102 m), 186 s (+96 m), 243 s (+69 m) | 58.1-64.4°, 1.25 kn |
+| +4.6 | -4.34 | -1.22 | -0.02 | +0.27 | +0.69 | +0.27, +2.09, -0.89 | 63.5°, 398 s | 233 s (+104 m), 238 s (+93 m), 252 s (+68 m) | 57.2-63.8°, 1.18 kn |
+| **+4.8** | -3.84 | -0.91 | +0.19 | +0.44 | +0.76 | +0.44, +2.25, -0.71 | 60.5°, 428 s | 246 s (+105 m), 252 s (+95 m), 262 s (+66 m) | 56.3-63.1°, 1.11 kn |
+| +5.0 | -3.31 | -0.59 | +0.42 | +0.61 | +0.84 | +0.61, +2.41, -0.54 | aback, 34.7°, 1.32 kn astern | 260 s (+107 m), 265 s (+97 m), 281 s (+66 m) | 55.5-61.8°, 1.04 kn |
+
+*The razee:*
+
+| `clr_x_m` | helm at 60° | at 67.5° | at 78.75° | at 90° | at 120° | truth 6 (plain, headsails in, after sail in) | truth 17 (nearest, settled) | truth 10 (three headings) | hove to |
+|---|---|---|---|---|---|---|---|---|---|
+| +3.7 | -0.31 | +0.46 | +0.82 | +0.74 | +1.18 | +0.74, +2.75, -1.64 | 59.3°, 382 s | 308 s (+108 m), 302 s (+101 m), 332 s (+54 m) | 60.8-63.2°, 1.50 kn |
+| +4.1 | +0.74 | +1.23 | +1.25 | +1.08 | +1.34 | +1.08, +3.08, -1.25 | 58.6°, 383 s | 351 s (+99 m), 347 s (+94 m), 393 s (+37 m) | 59.1-64.3°, 1.31 kn |
+| +4.3 | +1.24 | +1.53 | +1.46 | +1.26 | +1.41 | +1.26, +3.24, -1.06 | 59.9°, 374 s | 377 s (+91 m), 369 s (+91 m), 433 s (+31 m) | 58.3-63.8°, 1.24 kn |
+| **+4.5** | +1.72 | +1.84 | +1.67 | +1.42 | +1.49 | +1.42, +3.40, -0.88 | 59.7°, 375 s | 405 s (+84 m), 400 s (+77 m), 471 s (+34 m) | 57.6-63.2°, 1.17 kn |
+| +4.8 | +2.43 | +2.29 | +1.92 | +1.67 | +1.60 | +1.67, +3.64, -0.60 | 59.2°, 378 s | 478 s (+59 m), 480 s (+35 m), 483 s (+3 m) | 56.3-61.6°, 1.07 kn |
+| +5.1 | +3.13 | +2.73 | +2.23 | +1.91 | +1.71 | +1.91, +3.87, -0.33 | 57.9°, 386 s | 477 s (+6 m), 480 s (-21 m), 483 s (-31 m) | 55.0-58.8°, 1.05 kn |
+
+`clr_x_m` does not reach the polar at all: `_balanced_speed_ms` balances thrust against resistance
+and takes no moment, so every figure of the polar above stands for any of these.
+
+**Hull speed.** The 64 at 12.5 and 13.0: best in 25 kn 10.90 and
+11.07 against 11.00, best in 15 kn 7.61 and
+7.67 against 7.65. The razee at 13.0 and
+14.5: best in 25 kn 11.30 and 11.77 against 11.62,
+best in 15 kn 7.91 and 8.05 against 8.01. Neither
+end of her band closes the gap to the frigate-36 (below), and at 13.0 her best in 25 kn would still
+meet the *Virginie* chase's 11.2. Kept.
+
+### The polars, old beside new, with the frigate-36's
+
+In 8 kn:
+
+| Off the wind | the 64, stage A | the 64 now | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|
+| 50° | 0.99 | 0.89 | 1.14 | 1.07 | 1.18 |
+| 60° | 2.13 | 2.09 | 2.23 | 2.21 | 2.30 |
+| 70° | 3.12 | 3.12 | 3.21 | 3.22 | 3.31 |
+| 80° | 3.88 | 3.90 | 3.98 | 4.01 | 4.13 |
+| 90° | 4.25 | 4.29 | 4.41 | 4.45 | 4.62 |
+| 100° | 4.22 | 4.26 | 4.38 | 4.42 | 4.60 |
+| 110° | 4.16 | 4.21 | 4.30 | 4.35 | 4.54 |
+| 120° | 4.03 | 4.05 | 4.19 | 4.20 | 4.42 |
+| 130° | 3.81 | 3.85 | 3.95 | 3.97 | 4.07 |
+| 140° | 3.59 | 3.64 | 3.71 | 3.73 | 3.83 |
+| 150° | 3.37 | 3.40 | 3.45 | 3.48 | 3.55 |
+| 160° | 3.25 | 3.28 | 3.32 | 3.34 | 3.40 |
+| 170° | 3.02 | 3.08 | 3.10 | 3.15 | 3.21 |
+| 180° | 2.95 | 2.99 | 3.03 | 3.06 | 3.17 |
+| **best** | **4.25** | **4.29** | **4.41** | **4.45** | **4.62** |
+
+In 15 kn:
+
+| Off the wind | the 64, stage A | the 64 now | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|
+| 50° | 1.85 | 1.66 | 2.14 | 2.01 | 2.21 |
+| 60° | 3.98 | 3.92 | 4.17 | 4.14 | 4.29 |
+| 70° | 5.78 | 5.78 | 5.97 | 5.99 | 6.14 |
+| 80° | 7.07 | 7.11 | 7.31 | 7.36 | 7.51 |
+| 90° | 7.59 | 7.65 | 7.93 | 8.01 | 8.19 |
+| 100° | 7.56 | 7.63 | 7.89 | 7.96 | 8.15 |
+| 110° | 7.47 | 7.55 | 7.78 | 7.90 | 8.07 |
+| 120° | 7.27 | 7.31 | 7.60 | 7.63 | 7.86 |
+| 130° | 6.93 | 6.99 | 7.21 | 7.25 | 7.40 |
+| 140° | 6.57 | 6.65 | 6.81 | 6.85 | 6.99 |
+| 150° | 6.22 | 6.27 | 6.39 | 6.43 | 6.53 |
+| 160° | 6.00 | 6.05 | 6.16 | 6.19 | 6.28 |
+| 170° | 5.60 | 5.71 | 5.76 | 5.84 | 5.94 |
+| 180° | 5.47 | 5.54 | 5.63 | 5.68 | 5.88 |
+| **best** | **7.59** | **7.65** | **7.93** | **8.01** | **8.19** |
+
+In 25 kn:
+
+| Off the wind | the 64, stage A | the 64 now | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|
+| 50° | 3.08 | 2.76 | 3.56 | 3.36 | 3.68 |
+| 60° | 6.53 | 6.45 | 6.86 | 6.82 | 7.03 |
+| 70° | 9.11 | 9.12 | 9.49 | 9.53 | 9.62 |
+| 80° | 10.55 | 10.61 | 11.08 | 11.15 | 11.14 |
+| 90° | 10.88 | 10.94 | 11.54 | 11.61 | 11.59 |
+| 100° | 10.92 | 11.00 | 11.54 | 11.62 | 11.63 |
+| 110° | 10.87 | 10.96 | 11.52 | 11.60 | 11.55 |
+| 120° | 10.66 | 10.71 | 11.27 | 11.31 | 11.22 |
+| 130° | 10.32 | 10.39 | 10.87 | 10.91 | 10.88 |
+| 140° | 9.95 | 10.04 | 10.43 | 10.47 | 10.46 |
+| 150° | 9.57 | 9.64 | 9.97 | 10.02 | 10.01 |
+| 160° | 9.34 | 9.33 | 9.70 | 9.75 | 9.73 |
+| 170° | 8.81 | 8.96 | 9.16 | 9.28 | 9.31 |
+| 180° | 8.65 | 8.74 | 8.99 | 9.06 | 9.23 |
+| **best** | **10.92** | **11.00** | **11.54** | **11.62** | **11.63** |
+
+All closest at 50°. `beat_deg(15)`: the 64 60° to 70° (made good by a hair: 3.92 kn at 60° against
+5.78 at 70°), the razee 60° as before, the frigate-36 60°.
+
+**The light airs** (Bel §17.2 item 8; `_balanced_speed_ms`, plain sail, kn):
+
+| Wind, off | the 64, stage A | the 64 now | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|
+| 4 kn, 60° | 1.06 | 1.05 | 1.11 | 1.11 | 1.15 |
+| 4 kn, 70° | 1.56 | 1.56 | 1.61 | 1.61 | 1.66 |
+| 4 kn, 90° | 2.14 | 2.16 | 2.21 | 2.24 | 2.32 |
+| 4 kn, 120° | 2.02 | 2.04 | 2.10 | 2.11 | 2.22 |
+| 4 kn, 150° | 1.69 | 1.70 | 1.73 | 1.74 | 1.78 |
+| 6 kn, 60° | 1.59 | 1.57 | 1.67 | 1.66 | 1.72 |
+| 6 kn, 70° | 2.34 | 2.34 | 2.41 | 2.42 | 2.49 |
+| 6 kn, 90° | 3.20 | 3.23 | 3.32 | 3.35 | 3.48 |
+| 6 kn, 120° | 3.03 | 3.05 | 3.15 | 3.16 | 3.33 |
+| 6 kn, 150° | 2.53 | 2.55 | 2.59 | 2.61 | 2.67 |
+
+Steel's long pole-heads are what lifts the light airs on the beam and abaft it: on the 64, 4 kn on
+the beam 2.14 to 2.18 by the pole-heads alone and 2.16 by the whole rig, 6 kn 3.20 to 3.23.
+Close-hauled the whole rig gives back a little (4 kn at 60° 1.06 to 1.05; 6 kn 1.59 to 1.57).
+
+**Beside the scratch 74** (Bel §9, the frigate's rig; Indf §9 asks it): best in 8, 15, 25 kn 4.48, 7.83,
+10.99, against the 64's 4.29, 7.65, 11.00. She stands under it at 8 and 15 kn, against Ind §7.3's
+ranking, the razee, then a crack French frigate, then the 64 in good trim, then the line. The scratch
+carries the frigate's rig, so it is a warning for B7's polar and the lead and no defect of hers; the 64's
+hull-speed band cannot close it (13.0 gives 7.67 in 15 kn).
+
+**The 64's polar step by step** (15 kn at 50/60/90/120/150°; best in 8, 15, 25 kn):
+
+| Step | 15 kn | Best |
+|---|---|---|
+| Stage A | 1.85, 3.98, 7.59, 7.27, 6.22 | 4.25, 7.59, 10.92 |
+| + the long pole-heads | 1.86, 4.02, 7.71, 7.33, 6.27 | 4.34, 7.71, 11.05 |
+| + the bowsprit on the stem head | 1.85, 4.02, 7.71, 7.33, 6.27 | |
+| + the clew check's raise | 1.80, 3.99, 7.68, 7.31, 6.27 | |
+| + the course cut at the mast | 1.76, 3.97, 7.67, 7.31, 6.25 | |
+| + the yards under the bowsprit | 1.69, 3.94, 7.66, 7.31, 6.26 | |
+| + the driver's boom (the whole) | 1.66, 3.92, 7.65, 7.31, 6.27 | 4.29, 7.65, 11.00 |
+
+**Sailed**, under plain sail with the yards trimmed in 15 kn (speed, heel, weather helm):
+
+| Off the wind | the 64, stage A | the 64 now | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|
+| 60° | 3.41 kn, 2.4°, -2.04° | 3.28 kn, 2.5°, -3.84° | 3.60 kn, 2.1°, +2.23° | 3.51 kn, 2.2°, +1.72° | 3.63 kn, 2.6°, -0.16° |
+| 70° | 5.28 kn, 3.5°, +0.28° | 5.23 kn, 3.7°, -0.49° | 5.45 kn, 3.0°, +2.02° | 5.42 kn, 3.2°, +1.86° | 5.53 kn, 3.9°, +1.69° |
+| 78.75° | 6.58 kn, 4.2°, +0.75° | 6.58 kn, 4.5°, +0.19° | 6.78 kn, 3.7°, +1.64° | 6.80 kn, 3.9°, +1.67° | 6.90 kn, 4.9°, +1.99° |
+| 90° | 7.50 kn, 4.6°, +0.89° | 7.55 kn, 4.9°, +0.44° | 7.79 kn, 4.0°, +1.41° | 7.85 kn, 4.3°, +1.42° | 7.97 kn, 5.5°, +1.99° |
+| 112.5° | 7.24 kn, 2.8°, +1.12° | 7.32 kn, 3.1°, +0.80° | 7.60 kn, 2.5°, +1.71° | 7.67 kn, 2.7°, +1.65° | 7.72 kn, 3.6°, +2.08° |
+| 120° | 7.14 kn, 2.0°, +1.06° | 7.18 kn, 2.2°, +0.76° | 7.47 kn, 1.8°, +1.61° | 7.49 kn, 1.9°, +1.49° | 7.53 kn, 2.7°, +1.94° |
+| 150° | 6.22 kn, 0.2°, -0.75° | 6.27 kn, 0.2°, -0.73° | 6.40 kn, 0.1°, -0.32° | 6.44 kn, 0.1°, -0.40° | 6.55 kn, 0.1°, -0.72° |
+
+### The helm's and the handling's forms, old beside new
+
+| Form | the 64, stage A | the 64 now | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|
+| `clr_x_m` | +5.2 | +4.8 | +4.1 | +4.5 | +3.0 |
+| truth 6: on the beam | +0.89° | +0.44° | +1.41° | +1.42° | +1.99° |
+| headsails in | +2.72° | +2.25° | +3.48° | +3.40° | +5.07° |
+| after sail in | -0.43° | -0.71° | -1.15° | -0.88° | -1.98° |
+| truth 17: nearest the wind | 65.2° | 60.5° | 66.1° | 59.7° | 57.2° |
+| settled | 345 s | 428 s | 389 s | 375 s | 386 s |
+| aback, sternway | 0, 0.0 kn | 0, 0.0 kn | 0, 0.0 kn | 0, 0.0 kn | 0, 0.0 kn |
+| truth 10 from 290° | 259 s, +127 m | 246 s, +105 m | 391 s, +124 m | 405 s, +84 m | 343 s, +51 m |
+| truth 10 from 292.5° | 283 s, +112 m | 252 s, +95 m | 361 s, +126 m | 400 s, +77 m | 447 s, -37 m |
+| truth 10 from 295° | 327 s, +105 m | 262 s, +66 m | 428 s, +71 m | 471 s, +34 m | 370 s, +25 m |
+| truth 11: wears | 496 s, 217 m lost | 497 s, 229 m lost | 492 s, 229 m lost | 493 s, 233 m lost | 513 s, 234 m lost |
+| truth 12: lies | 54.6-62.4°, 1.11 kn | 56.3-63.1°, 1.11 kn | 59.6-63.7°, 1.41 kn | 57.6-63.2°, 1.17 kn | 58.4-61.8°, 1.38 kn |
+| fills away, settled | 199 s | 201 s | 171 s | 183 s | 161 s |
+| truth 10's form from 300°, five points | 276 s, +8 m | missed stays at 85 s, in at 3.28 kn | 480 s, +10 m | 467 s, 0 m | 415 s, -68 m |
+
+**From five points she misses stays, where stage A stayed.** Truth 10's own case has a ship missing
+under three knots; she misses with 3.28 kn on her, the razee and the frigate-36 still staying from
+there (the frigate-36 from 57.5° as well, in at 3.02 kn, 328 s). The cause is the yards under the
+bowsprit, not her way: with both out at +4.8 she goes in at 3.32 kn, 0.04 kn more, and stays in 289 s,
++22 m; with the sprit-topsail yard alone out she still misses. No clr mends it: +4.9, +5.0 and +5.2 all
+miss, at 84-85 s. From 62.5° she stays, 249 s, +40 m (stage A 422 s, +63 m). Her exposure is limited,
+"full and by" being six points (`close_hauled_true_angle`), so she reaches 60° only on a course ordered
+nearer the wind, but it bears on "she stays quickly" and on *Agamemnon* working "as exactly as if
+turning into Spithead" (Ind §7.2 item 7). **For the lead:** is a 64 with her yards crossed to miss stays
+at 60° off, or is the yards' windage to be looked at? No clr is moved for it, since none mends it.
+
+**From 17 kn the same form takes her aback.** Truth 17's form from rest, under plain sail
+close-hauled; nearest the wind after six minutes, and where she was taken aback her sternway:
+
+| Wind | the 64, stage A | the 64 now, +4.8 | the 64 at +4.6 | the 64 at +4.4 | the razee, stage A | the razee now | the frigate-36 |
+|---|---|---|---|---|---|---|---|
+| 15 kn | 65.2° | 60.5° | 63.5° | 64.4° | 66.1° | 59.7° | 57.2° |
+| 16 kn | 65.0° | 56.5° | 62.2° | 63.9° | 62.9° | 56.9° | aback, 16.0°, 1.84 kn |
+| 17 kn | 64.8° | aback, 34.5°, 1.46 kn | 59.4° | 61.9° | 54.9° | aback, 25.3°, 1.64 kn | aback, 9.7°, 2.07 kn |
+| 18 kn | 64.4° | aback, 32.2°, 1.55 kn | 55.9° | 59.7° | aback, 21.2°, 1.82 kn | aback, 23.8°, 1.82 kn | aback, 16.7°, 2.04 kn |
+| 20 kn | 63.4° | aback, 31.8°, 1.68 kn | aback, 33.1°, 1.63 kn | 56.4° | aback, 22.4°, 1.94 kn | aback, 27.0°, 1.94 kn | aback, 29.8°, 1.95 kn |
+| 22 kn | 63.2° | aback, 50.0°, 1.86 kn | | | aback, 27.1°, 2.05 kn | aback, 33.0°, 2.20 kn | aback, 18.4°, 2.40 kn |
+| 25 kn | 60.3° | 52.4° | | | aback, 45.2°, 2.32 kn | aback, 26.6°, 2.18 kn | aback, 6.3°, 2.99 kn |
+
+Stage A's 64 held at every wind tried. No truth asks past 15 kn, and being taken aback from rest in a
+fresh breeze is the frigate-36's own behaviour from 16 kn. **For the lead, the trade, not moved
+without a ruling:** +4.8 keeps her helm (-0.91° at six points, +0.44° on the beam) and her tacks at
+246-262 s; +4.6 holds the form to 18 kn at -1.22° and 233-252 s; +4.4 holds it to 20 kn at -1.51° and
+186-243 s.
+
+### Truth 7-187: the razee against the 64 and the frigate-36
+
+**The razee faster than the 64** at every angle from her closest to 180° (Indf §14 truth 2's speed
+clause): by 0.13-0.36 kn in 15 kn and 0.32-0.67 kn in 25 kn. **Pinned**
+(`test_truth_7_187_...`). Indf §9's targets that hold besides: her best in 25 kn at or above 11.2 kn
+(11.62); `closest_deg` within a step of the frigate-36's (50°, 50°).
+
+**The razee against the frigate-36 close-hauled and running large** (Indf §14 truth 4; D24) does
+**not** hold, and is reported, not forced, as the owner left it (Indf §17: "We'll rely on tuning for
+this, the razee could be right and the frigate-36 too fast, or the razee too slow and the frigate-36
+right"):
+
+| Off the wind, 15 kn | the razee, stage A | the razee now | at 14.5 kn hull speed | the frigate-36 |
+|---|---|---|---|---|
+| 60° | 4.17 | 4.14 | 4.14 | 4.29 |
+| 70° | 5.97 | 5.99 | 5.99 | 6.14 |
+| 120° | 7.60 | 7.63 | 7.66 | 7.86 |
+| 130° | 7.21 | 7.25 | 7.27 | 7.40 |
+| 140° | 6.81 | 6.85 | 6.87 | 6.99 |
+| 150° | 6.39 | 6.43 | 6.44 | 6.53 |
+
+At 14.5, the top of D24's band, she gains 0.03 kn at most at those angles; `clr_x_m` does not reach
+the polar; the brace limits move only with a source. Plain sail per (displacement)^(2/3) by the files
+now: the razee 12.2 m² per t^(2/3), the 64 10.8, the frigate-36 13.5 (Indf §9's risk): no knob of hers
+closes it. Sailed, she is under by less: 60° 3.51 against 3.63, 120° 7.49 against 7.53.
+
+### Truth 9 on her long pole-heads
+
+Pinned on both files (`test_her_long_pole_heads_hold_truth_9`). In 20 kn under plain sail nothing
+carries away and nothing warns. In 35 kn under all sail the 64 loses 5 parts from tick 644 (the main
+and fore royal masts, the mizzen royal yard, the mizzen and fore topgallant yards), the razee 7 from
+tick 619 (the mizzen and fore royal masts, the main royal yard, the three topgallant yards, a main
+topgallant staysail sheet), the frigate-36 4 from tick 633. Sailed 100° off in 25 kn under plain sail,
+her fore and mizzen topgallant yards warn on both files and the frigate-36's do not: the long
+pole-heads hold more sail on the same yards. She still sails 10.69 kn and 11.31 kn against the
+frigate-36's 11.17.
+
+### Truth 7-189: the 64 in stays, wearing and hove to
+
+Against the *Bellona*'s report (Lavery 1985 p. 9; Bel §9; Ext §12 lens 4): she stayed and wore
+quickly, and lay to best under the mainsail and mizen staysail. Pinned, in
+`test_truth_7_189_...` (two tests):
+
+- **Her classing as the frigate's row, the head counted on the masts.** "Mainsail haul" swings the
+  main and mizzen yards alone, the yards under the bowsprit going with the head yards at "let go and
+  haul"; the mizen yard never braced; the mizen course hauled aft at helm's a-lee (flat aft, 18°).
+- **She stays quickly.** From 290, 292.5 and 295°: 246, 252, 262 s, gaining 105, 95, 66 m (stage A
+  259, 283, 327 s; the frigate-36 343, 447, 370 s, gaining 51, -37, 25 m). Under Luce's "five to ten"
+  by under a minute. The report gives no time, so the band is no source's: quicker than the frigate-36's
+  quickest, which the test tacks for itself, and no quicker than four minutes, a round floor of
+  judgement 6 s under her quickest. **She is under truth 10's 285 s at all three headings** (stage A at
+  two), a band the razee keeps; for the lead to rule. *For the lead:* a two-decker of 2,170 t staying in a little over four
+  minutes against a frigate's six to seven is the model's mizen course doing less than her spanker
+  at helm's a-lee. It agrees with the report; it may be too much of a good thing.
+- **She wears**, brailing the mizen course at "up helm" and hauling it out by the wind, in 497 s
+  (truth 11's band; the frigate-36 513 s; lost 229 m against 234). No quicker to speak of: the
+  wearing script's times are the crew's more than the ship's. Reported.
+- **Hove to**, the course brailed up, the spritsail and sprit topsail clewed up if set; she lies
+  56.3-63.1° off at 1.11 kn at most, no aback, within truth 12's band.
+
+Not pinned: **lying to as the *Bellona* did**, under the mainsail and mizen staysail alone, helm
+a-lee (all else in, set by name): in 15 kn 44-70° off at 1.09 kn, in 25 kn 42-78° at 1.78, with an
+aback on the way; the frigate-36 42-76° at 1.49 and 41-85° at 1.45. So no steady lie, the same on
+both ships: the model lies to steady by "heave to" and not by this. For the lead, not hers.
+
+### Truth 7-230, her own clauses, and her tack with the driver
+
+Pinned on `sixty-four.yaml`: **the shift at her company**, ten knots 120° off: 102, 205, 171, 273,
+137 s against the file's 90, 180, 150, 240, 120, the whole 888 s (the fixture 890), each phase within
+its time and a quarter more; trimmed she draws ahead, 4.93 to 5.12 kn. **The polar with the driver**
+above the course's from 90° to 150° in 10 kn: it holds, by 0.15 at 90°, 0.14 at 120°, 0.09 at 150°
+(5.32 to 5.47; 5.04 to 5.18; 4.24 to 4.33), and in 6 kn by 0.09, 0.09, 0.06. **The driver** hauled
+aft at helm's a-lee, flat at 18°, and brailed up hove to; brailed at "up helm" wearing and hauled out
+by the wind; set after the cast getting under way.
+
+**Measured and not pinned: her tack with the driver bent** (Ext §17.7 as built; beside Steel's
+"occasionally hoisted ... in light fair winds", OCR l. 13816-13843). She settles with the driver set
+by name, as `_world` in her tests does:
+
+| Start | The course: "Tacked", to windward | The driver: "Tacked", to windward | In stays (within 20° of the wind), course, driver | On her course (±5°, over 3 kn, a minute), course, driver | To windward at 20 minutes, course, driver |
+|---|---|---|---|---|---|
+| 60° off, 15 kn | missed stays at 85 s (3.28 kn going in) | 491 s, -65 m | 16 s, 67 s | never, 1012 s | -470 m, +29 m |
+| 67.5°, 15 kn | 252 s, +95 m | 479 s, +34 m | 63 s, 59 s | 279 s, 795 s | +870 m, +402 m |
+| 75°, 15 kn | 231 s, +129 m | 475 s, +119 m | 53 s, 52 s | 256 s, 607 s | +922 m, +665 m |
+| 67.5°, 10 kn | 282 s, +104 m | 498 s, +151 m | 79 s, 75 s | 480 s, 607 s | +558 m, +540 m |
+| 75°, 10 kn | 265 s, +139 m | 490 s, +186 m | 70 s, 67 s | 452 s, 608 s | +611 m, +577 m |
+| 75°, 8 kn | 345 s, +145 m | 505 s, +170 m | 80 s, 78 s | never, never | +477 m, +440 m |
+
+The driver's "Tacked" is the steady phase's timeout (`steady_timeout_s`, 300 s, data/evolutions/
+tack.yaml), not her being on her course: at 479 s she lies about 50° off at under a knot. So "Tacked" does
+not compare the two gains at one time, and the last column does.
+
+The fixture gave 471 s against 181 s from 60° off in 15 kn. "Mainsail haul" and "Let go and haul"
+come a little sooner with the driver, and she is through the wind in the same time; what takes the
+extra four minutes is the new tack. From six points off in 15 kn she falls off to 60° by 150 s, as
+with the course, and then the driver gripes her back to 41-51° off at under a knot, her helm 18-24°
+to weather and too little way for it, until "Tacked" at 479 s and four minutes past it; left alone
+she is away at 5.3 kn six minutes after "Tacked". With the course she is at 4.7 kn by 360 s. Taking
+in the driver at "Tacked" has her away within four minutes; "full and by", the same at 6.1 kn in
+six. In 10 kn she gets away within a minute or two of "Tacked". By the sails' yaw moment in 10 kn (+
+for weather helm, kN m, course then driver): 50° -57, +8; 60° -46, +30; 70° -26, +53; 80° -5, +73;
+90° +14, +84; 120° +29, +68; 150° -23, -11: so 40-79 kN m more from 60° to 120°, against the
+fixture's 55-62. At equal times, 10, 15, 20 and 25 minutes after the order, she is behind the course
+at every wind: by 10-42 m in 10 kn, 12-43 m in 8 kn from 75°, 244-270 m in 15 kn from 75° and 325-475 m
+from six points. In 15 kn from 60° she gets through where the course misses stays. Steel's words fit: it is a sail for light fair winds, and a master working to windward
+in a breeze would shift it back first (thirteen minutes), which the logs do not always show
+(*Audacious* set it before she tacked in a chase: Ext §17.1). **For the lead and the owner:** no
+truth is asked of it, and the trap at 50° off is the model's plain answer to a big after sail with
+little way on; it is worth the owner's eye at the first test.
+
+**The driver in a breeze** (Ext §17.9 risk 3): set and drawing under plain sail, trimmed, seed 7, no
+gusts, 50 minutes. Its peak cloth load over its rating at 15, 20, 25, 30, 35, 40 kn: on the beam 0.21,
+0.37, 0.56, 0.79, 1.07, 1.39; at 120° 0.17, 0.30, 0.48, 0.69, 0.94, 1.22 (the course on the beam 0.16,
+0.27, 0.41, 0.58, 0.78, 1.07). A sail blows out for certain at 1.8 (`BLOW_OUT_RATIO`), so its cloth
+does not by 40 kn. Its gear goes first: the 3-in halyard (13.9 kN), filed for all of Steel's "four or
+five pair", strains at 25 kn on the beam (13.8 kN, warned), carries 18.9 kN at 30 kn, and parts at tick
+627 in 35 kn, the sail falling into the gear. The mizen yard reaches 43.9 kN of its 41.3 in 35 kn at
+120°. Beside Steel's "light fair winds" and the logs' fresh breezes it stands well clear. Sailed in 15 kn
+at six points, seven, the beam, ten, 120° and 150°, her helm is +3.07, +2.38, +1.87, +1.92, +1.67, -0.31°
+with the driver against -0.91, +0.19, +0.44, +0.80, +0.76, -0.73° with the course.
+
+Worn with the driver: 495 s, lost 216 m (the course 497 s, 229 m). Hove to with it: 55.1-60.9° off at
+1.04 kn, no aback.
+
+### The rig's moved figures, old beside new
+
+Old is the file at 53f27e2. Heights above the datum unless "above water". Each is held by a named
+test of hers, or by Steel's table as her notes give it; those that were figures in the notes are
+marked (†) and now print in the generator's report.
+
+- **The 64's mizen course** cut at the mast (Ext §3.4): class gaff to lateen, `cut_at_mast`; yard
+  class gaff to `lateen_yard`, 11.1 to 23.5 m (Steel's whole 77 ft), its fore part 0.53 bare; lateral
+  offset the stand-in's 11.1-m head to 0.8√A, 8.16 m (Indf §16 item 3); the throat and peak halyards
+  to jeers, derrick, lifts, vangs, bowlines as guys, one sheet, one tack; 104 m²; x -21.4 to -21.5 m (the
+  tack raised along the raked mast); reef band and canvas as they were; yard rating 40.1 to 41.3 kN.
+- **The mizen yard's lines against Steel's list for a 64** (Indf §4.2's check; Steel 1794 vol. II, '64 Gun
+  Ship', OCR, read here and not on the page image, l. 24844-24867): the derrick 4 in in double blocks (l.
+  24857), the vang pendants 4 in (l. 24862), and by its place in the list a garbled line of 3 in (l.
+  24865), the bowlines, to be confirmed on the page image; the jeers' size is not legible (l. 24855-24856).
+  Taken, against the rule on her rope: derrick 4 1/4 to 4 in, 111.9 to 99.2 kN; vangs 3 3/4 to 4 in, 21.8 to
+  24.8 kN; bowlines 3 3/4 to 3 in, 21.8 to 13.9 kN. The driver's halyard, tack and downhaul are confirmed
+  at 3, 3 and 2 in (l. 24844-24847); its sheet's size is garbled there and stays judgement. The rest of
+  her rope is not yet read against the list.
+- **The clew check** (Bel §1.5; the lead's notes; the head room at 6 ft, the 74's, no check breaking
+  to send it to 5): the 64's tack above water 7.45 to 9.43 m (†), 6.5 to 13.0 ft above her quarterdeck,
+  8.8 ft above the roundhouse deck at the mast; clew over that deck at the side -0.14 to +1.84 m (†);
+  corners tack [-16.49, 4.23] to [-16.56, 6.21], throat [-16.81, 12.69] to [-16.88, 14.67], peak
+  [-25.09, 20.00] to [-25.17, 21.98], clew [-25.35, 4.23] to [-25.42, 6.21]; truss 12.7 to 14.67 m,
+  1.53 m under the crossjack yard; centre above water 13.6 to 15.6 m. **For the lead: the head room on a
+  loose foot.** The 6 ft is the 74's boom's figure (Bel §4.6, judgement); Bel §1.5 asks a course's clew
+  only to clear the deck, and Bel §4.5's own pick stands about 1.1 ft clear. The note of 2026-10-29 can be
+  read either way ("the head room goes first", then for the razee "raised clear by the least that
+  clears"), so her file keeps pass 1's reading, marked judgement, and these are the others, each passing
+  every check of `mizen_yard.driver`, the boom keeping its 6 ft:
+
+  | Tack above water | Reading | Clew over the deck | Driver, after leech, jaws (set by) | Course's centre | 15 kn at 50/60/70/90/120/150° |
+  |---|---|---|---|---|---|
+  | 7.60 m | 7 ft above her quarterdeck, Steel's upper figure; the least that clears | 0.01 m (the drawn sag of 0.14 m dips under it) | 186 m² (-6%), 18.06 m, 9.69 m (head room) | 13.8 m | not sailed |
+  | 7.93 m | the 74's 1.1 ft clear, 8.1 ft above her quarterdeck | 0.34 m | 191 m² (-4%), 18.38 m, 9.69 m (head room) | 14.1 m | 1.71, 3.95, 5.81, 7.67, 7.33, 6.29 |
+  | 8.73 m | Steel's 6 ft 6 in from the roundhouse deck, the deck at the mast | 1.14 m | 203 m² (+2%), 19.16 m, 9.69 m (head room) | 14.9 m | 1.66, 3.92, 5.78, 7.64, 7.31, 6.26 |
+  | **9.43 m** | **the file: 6 ft of head room, 13.0 ft above her quarterdeck** | 1.84 m | 207 m² (+4%), 19.42 m, 10.12 m (after leech) | 15.6 m | 1.66, 3.92, 5.78, 7.65, 7.31, 6.27 |
+
+  None brings back the 60° beat of 15 kn (70° on the file and on the two sailed); `clr_x_m` and her truths
+  would be measured again on any of them. The pick put to the lead is 8.73 m: it departs from none of
+  Steel's words, reading the deck as the deck the mast stands through there, and clears by more than the
+  74's margin. The mizen yard's derrick, drawn nearly level at 9.43 m, rises with it (0.13 m to about
+  0.83 m).
+- **The razee's spanker boom**: jaws above water 5.82 to 7.85 m (†), raised 2.03 m; 0.20 m under her
+  roundhouse deck and 1.33 m under her taffrail, to 1.84 m (6 ft) over the one and 0.70 m over the
+  other; file height 2.12 to 4.18 m; spanker 218 to 191 m² (†), +7.9% to -5.4% of Steel's 202, within
+  the owner's 8%; centre above water 13.0 to 14.1 m; x -24.2 to -24.3 m; gaff and boom ratings 83.1 to 74.1
+  kN; ringtail 65 to 58 m², its boom 2.12 to 4.18 m. Measured and not taken: clear of the taffrail alone
+  200 m²; 5 ft of head room 195 m². Its boom overhangs her taffrail by 29.5 ft (†), not Ind §3.3's 33-34
+  ft, her taffrail having since been measured farther aft.
+- **The storm mizzen** (both; judgement, as the clew check): cut 4 ft above her quarterdeck, its foot ran
+  through the deck over it, the 64's up to 0.91 m under her roundhouse deck and the razee's 0.95 m. Its tack
+  now stands at her rail over the foot's run, 0.8 of the stay's run and the foot kept: the 64's tack 6.69 to
+  7.99 m above water, 48 to 43 m², centre 10.2 to 11.2 m, cloth rating 44.1 to 39.5 kN; the razee's 5.05 to
+  6.17 m, 48 to 44 m², centre 8.6 to 9.4 m, cloth rating 44.1 to 40.5 kN. Her gale's and lying-to clauses
+  hold. **The fore storm staysail** follows the bowsprit: the 64's corners [30.92, 6.08], [19.86, 16.38],
+  [20.06, 5.87] to [31.18, 4.73], [20.61, 15.54], [20.32, 5.03], centre 12.7 to 11.7 m; the razee's 55 to 57
+  m², [30.92, 6.08], [19.14, 15.14], [20.31, 4.87] to [31.18, 4.73], [19.75, 14.61], [20.34, 4.12], centre
+  12.4 to 11.5 m.
+- **The 64's driver and boom** (new, in the sail room; Ext §17.2): boom 19.9 m; jaws 10.12 m above
+  water (†), Ext's 2.4 m above the quarterdeck being level with the roundhouse deck at the stern, and
+  6 ft of head room alone (9.69 m) leaving the after leech at 19.90 m against Steel's top of 19.43, so
+  the after leech sets them; 2.26 m (7.4 ft) over the deck, 1.59 m over the taffrail. Against Ext's
+  first cut: fore leech 6.98 to 7.77 m (Steel's 8.69), after leech 18.71 to 19.42 m (band 17.60-19.43),
+  four corners 197 to 207 m² (Steel's rule 198.5, +4%), centre above water 14.51 to 17.1 m, 6.10 m
+  beyond the yard's peak (limit 7.01); sail room 19 to 20 spares (the razee's stays 20); rating 83.8 kN.
+  The boom is now 1.5 of 69.4 of a shot aloft's spar weight, 2.2% (`_spar_weight`; 37 spars and 63.9 at
+  stage A, 40 now with the yards under the bowsprit). Her spars' windage 170.2 to 203.3 m²: the boom 9.9
+  m², the whole mizen yard 3.1 to 13.8, the sprit yards 7.7 and 2.8, the rest the long pole-heads (the
+  razee's 175.5 to 185.2).
+- **The yards under the bowsprit** (new; Ext §4.1): the 64's spritsail yard at x 35.40, 6.08 m, 17.5 m
+  long, 30° (judgement), spritsail 102 m², foot 2.44 m above water (†); sprit-topsail yard at x 42.60,
+  10.05 m, 10.5 m long, 0.78 of the jib-boom, where the slant is Steel's depth, sprit topsail 103 m²,
+  centre x 38.7, 11.1 m above water. The razee's spritsail yard at x 35.40, 6.07 m, spritsail 102 m²,
+  foot 2.89 m above water (†); no sprit-topsail yard. **Risk 9, closed:** the yards' heights 3.97 m apart, the slant
+  8.22 m as filed: drawn by the heights' trapezoid it was 52 m² against 103, and along the slant, as the
+  viewer's `squareCut` now draws it (Ext §6.2 as built), head 9.30 and foot 15.75 m, the file's area (†).
+- **The bowsprit on the stem head** (both): `x_m` 24.63 to 25.15; outboard 46.3 to 44.4 ft (14.1 to
+  13.5 m); end 9.3 to 7.8 m (the 64), 9.32 to 7.82 (the razee), its x unchanged about 37.2 m; jib-boom
+  end 12.8 to 11.3, 12.82 to 11.32; drawn steeve on the 64 32.8° to 27.05°, on the razee 27.8° (27.2°
+  from the stem head, the viewer's rule lowering her heel 0.12 m to her rail). Tacks on the 64: fore
+  staysail [30.92, 6.08] to [31.18, 4.73], fore topmast staysail [37.20, 9.28] to [37.20, 7.80], jib
+  [44.13, 12.81] to [44.13, 11.33]; centres above water 12.7 to 11.7, 16.9 to 15.6, 19.4 to 18.4 m;
+  razee's fore staysail 55 to 57 m². Ratings by the shared pass, now from the sprit sails: the 64's
+  bowsprit 171.0 to 100.6 kN, jib-boom 27.3 to 16.1; the razee's bowsprit 169.7 to 47.2, jib-boom 27.2
+  to 26.9. **For the lead:** the headsails' named ratings drop out of that pass once a sail hangs
+  from the spar.
+- **The long pole-heads** (Steel 1794 vol. I p. 16, OCR l. 2934-2942, and p. 42, OCR l. 4701-4702; Bel
+  §4.2, whose "pp. 41-42" and the owner's "p. 42" name the table's page alone; both files): topgallant mast height, main, fore,
+  mizzen, 3.5, 3.1, 2.8 to 6.1, 5.5, 4.7 m; royal pole 3.5, 3.1, 2.6 to 5.4, 4.9, 4.0 m; yard heights on
+  the 64: main topgallant 39.9 to 42.5, royal 43.6 to 48.1, fore 35.9 to 38.2, 39.2 to 43.3, mizzen 32.4
+  to 34.4, 35.1 to 38.5 m. Sails, m² (Steel's table): main topgallant 66 to 101 (111), fore 52 to 80
+  (88), mizzen 35 to 53 (58); main royal 37 to 56 (64), fore 29 to 44 (50), mizzen 18 to 28 (31): the
+  share of the table 0.58-0.60 to 0.88-0.91. Topgallant studding sails: fore 24 to 37, main 30 to 45
+  m². Main topgallant staysail 80 to 109 m², cut to the table (+21%; the generator's rule's +26% left
+  its band). Plain sail: the 64 1,722 to 1,803, the razee 1,836 to 1,890 m² (†); her rope's scale 1.043
+  to 1.067, 1.077 to 1.092 (†); lines re-rated 105 of 294 on the 64, 21 of 277 on the razee. Main truck
+  above water 47.2 to 51.7 m, the razee's 45.7 to 50.2. The razee's yard heights: main topgallant 37.92 to
+  40.52, royal 41.62 to 46.12, fore 33.92 to 36.32, 37.32 to 41.32, mizzen 30.42 to 32.32, 33.02 to 36.42 m.
+  Ratings, main, fore, mizzen, kN, the 64 then the razee: lower masts 805.1, 505.5, 302.6 to 865.8, 533.4,
+  323.8; 793.9, 498.9, 363.1 to 854.1, 527.9, 368.9. Topmasts 301.0, 185.7, 95.7 to 333.2, 200.8, 105.9;
+  298.3, 184.4, 94.4 to 330.1, 199.4, 104.5. Topgallant masts 27.1, 11.5, 7.4 to 39.7, 17.8, 11.4; 26.9,
+  11.4, 7.3 to 39.3, 17.7, 11.3. Topgallant yards 9.5, 7.3, 4.8 to 14.7, 11.4, 7.4; 9.4, 7.3, 4.8 to 14.5,
+  11.3, 7.3. Royal masts and yards 3.5, 2.7, 1.6 to 5.4, 4.1, 2.6; 3.5, 2.7, 1.6 to 5.3, 4.1, 2.5.
+
+### What left the notes (their figures, for the record)
+
+- **The hull as drawn** (†, by `g.hull_form`, which writes no note now): the 64's drawn displacement
+  2,158 t against 2,170 (-1%), drawn 5.52 m deep at the greatest section against the file's draught
+  of 6.33 m; the razee's 1,906 t against 1,925 (-1%), 5.08 m against 5.88 m. Each port's gap in the
+  report, deck by deck, the worst +0.39 m (the 64's upper deck) and -0.35 m (the razee's chase port);
+  none measured at its port, none moved (Build-Ships.md §5.0 principle 8).
+- **The 64's `clr_x_m`, stage A:** from her start at +4.1 m she had lee helm close-hauled (4.6° at six
+  points, 1.2° at seven) and none on the beam, and tacked in 3-3½ minutes, under Luce's five; at +5.2 m
+  she carried +0.3° at 70°, 0.9° on the beam, 1.1° at 120°, and tacked in 4¼-5½ minutes.
+- **The razee's `clr_x_m` before now:** at +3.5 m her helm close-hauled fell to a degree and she
+  forereached 1.6 kn hove to. With the staysails cut to Steel's table (2026-10-29) the helm moved by
+  0.01-0.04°, truth 17's by 0.22° (+1.63 to +1.85), her closest there 66.0 to 65.9° off: the furled
+  staysails' windage. Under D18 (c): on the beam +1.46 to +1.41, at six points +2.47 to +2.23; truth
+  6's form 3.58 to 3.48, 1.20 to 1.15; truth 17 under way 388 to 389 s, 65.9 to 66.1° off; tacking
+  368-470 to 361-428 s.
+- **The razee's datum, D18 (c)** (the owner: "I say C, it looks slightly more right to me"; Indf §2.2):
+  the datum 3.665 m above her water, (a) her gun deck 1.39 m; each written height 2.28 m less; each
+  lower mast's `x_m` moved 0.01-0.09 m aft as written, not in place (at her gun deck the fore 19.23 m).
+  What it moved: the deck's wind's eye 2.28 m higher, on the beam in 15 kn 15.00 to 15.76 kn apparent;
+  the lower masts' windage 7.0 m² less (her spars' 182.5 to 175.5), its middle 1.14 m higher; the
+  blanket's reach 71.1 to 64.3 m, leaving outside it only the ringtail's shadow on the jib and the fore
+  topmast staysail, 66-69 m, a studding sail's, out of plain sail; the spanker sheet's lead, the
+  boom's written height 4.4 to 2.12 m at that step (4.18 m now, the boom raised), the sheet on the beam
+  in 15 kn 5.02 to 4.40 kN, 4.77 with the drop as (a) read it (rated 93.7 kN at that step). Under way
+  on the beam then: 7.78 to 7.79 kn, heel 4.06 to 4.04°, helm +1.46 to +1.41°; with the lower masts'
+  windage as (a) read it 7.788 kn, 4.05°, +1.42°, the windage about a third of the heel's and helm's
+  change and nearly half the speed's, the deck's wind's eye the rest; the masts' `x_m` alone 0.004° of
+  helm. Her polar moved by 0.04 kn at most.
+- **Her short roundhouse:** her taffrail 7.15 m above her water (†), was 5.26 m on stage A's ZAZ2375
+  taffrail; her quarterdeck rail 36.7 ft above K at the mizen, her roundhouse's rail 1.3-2.6 ft over
+  ZAZ2371's drawn top forward of AP; the stem head 4.9 ft above her forecastle deck; her transom's
+  half-breadth 9.69 ft at her taffrail; the quarter gallery's top 0.8 ft under her roundhouse's deck
+  and 4.6 ft under her taffrail, its after end 3.3 ft forward of her stern's top; the lights' top 1.3
+  ft under the deck at her stern and 5.1 ft under her taffrail. Stage A's top of her side stood up to
+  0.43 m inside the 64's at the same timbers aft.
+- **The quarter bill** (†): the 64's 351 seamen, 296 men at the guns, none of them marines, and 2 at the
+  wheel leave 53 trimmers; the razee's 238, 193, 36 of them marines, and 2 leave 79. At the beat
+  (`crew/quarters.py`; held by her test), every gun crew fills, 84 and 50 marines at the guns, 84 and 18
+  of them at the long guns, no marines' division, the trimmers 137 and 93, the topmen the guns leave
+  among them. The razee's broadside by the far-detail rule 714 lb against James's 702 (truth 7-188).
+- **Figures of the stores and sails as filed:** the keys themselves, not repeated: water 186 and 125
+  tons, hold 138 tons, shot plugs 64 and 46, launch 33 ft, every spar's `rating_kn`, the main topmast
+  staysail 225 and 226 m², leech 20.6 m, bunt 10.2 and 10.4 m, foot 14.6 m.

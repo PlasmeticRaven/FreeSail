@@ -688,24 +688,29 @@ KEEL_SIDING_OF_BREADTH = 0.036
 SWEEP_STEP_DEG = 15.0
 
 
-def hull_form(hull, notes, *, form, marks, measured=()):
+def hull_form(hull, *, form, marks, measured=(), report=None):
     """The hull's form and its marks added to its profile (Build-Ships.md §5.1, §5.3: stage
     0H's `form` and `marks`), and the hull as drawn checked against the file. `hull` is the
     ship's hull mapping, her profile in it from `hull_profile` and her displacement and draught
-    beside it; `notes`, her hull notes. `form` is {fullness, stern, head} in §5.1's form and
-    `marks` each line's one word, {line: word} (§5.0 principle 4); either None or empty gives
-    none. The form is written in the schema's order, its metres to the centimetre and its
-    fullness to two places, a band's count of lights whole and its words as given (not through
-    `_centimetres`, which would make a count a float); the marks in the profile's order.
+    beside it. `form` is {fullness, stern, head} in §5.1's form and `marks` each line's one word,
+    {line: word} (§5.0 principle 4); either None or empty gives none. The form is written in the
+    schema's order, its metres to the centimetre and its fullness to two places, a band's count
+    of lights whole and its words as given (not through `_centimetres`, which would make a count
+    a float); the marks in the profile's order.
 
     Whatever the load would refuse raises ValueError with the schema's own sentence, and then
-    `freesail.ship.form.check` draws the hull, raising where the drawing fails. Written into the
-    notes, beside the file's own figures and never in their place (§5.0 principles 7 and 8):
-    the drawn displacement beside the filed one (`displacement_kg`), the drawn depth beside the
-    draught (`draught_m`), and each port triple's gap to the drawn side at its sill, deck by
-    deck (`profile.ports_m.<deck>`). `measured` names the triples the ship's sources measured,
-    each a deck word (all its ports) or (deck word, x): a gap over `form.PORT_GAP_M` raises for
-    one of them and is reported for every other. No triple is ever written from the drawing.
+    `freesail.ship.form.check` draws the hull, raising where the drawing fails. `measured` names
+    the triples the ship's sources measured, each a deck word (all its ports) or (deck word, x):
+    a gap over `form.PORT_GAP_M` raises for one of them and is reported for every other. No
+    triple is ever written from the drawing (§5.0 principles 7 and 8).
+
+    Nothing it computes goes into a note: a ship's notes carry sources, departures and
+    judgements, and a figure a rule computes from the file's own keys belongs in the generator's
+    report and the tests, where it cannot go stale (the lead's notes of 2026-10-29, item 2).
+    `report`, a list if given, gets those as sentences for the generator to print: the drawn
+    displacement beside the filed one, the drawn depth beside the draught, and each port triple's
+    gap to the drawn side at its sill, deck by deck.
+
     Returns each triple's gap in metres, the drawn side less the triple's half-breadth, keyed
     (deck word, x)."""
     from freesail.ship import form as drawn
@@ -765,13 +770,18 @@ def hull_form(hull, notes, *, form, marks, measured=()):
         )
 
     hull["profile"] = shaped
-    said = "The hull as drawn (freesail/ship/form.py):"
-    _add_note(notes, "displacement_kg", f"{said} {_line_of(lines, 'drawn displacement ')}.")
-    _add_note(notes, "draught_m", f"{said} {_line_of(lines, ' deep at the greatest section')}.")
+    if report is None:
+        return gaps
+    said = "the hull as drawn (freesail/ship/form.py):"
+    report.append(f"{said} {_line_of(lines, 'drawn displacement ')}.")
+    report.append(f"{said} {_line_of(lines, ' deep at the greatest section')}.")
     for word, triples in spec.profile.ports_m:
         off = [x for x, _sill, _hb in triples if abs(gaps[(word, x)]) > drawn.PORT_GAP_M]
         figures = ", ".join(f"{round(gaps[(word, x)], 2) + 0.0:+.2f}" for x, _s, _h in triples)
-        text = f"{said} the side at each sill, aft to forward, off the half-breadth by {figures} m"
+        text = (
+            f"{said} the {word} deck's ports: the side at each sill, aft to forward, off the "
+            f"half-breadth by {figures} m"
+        )
         if off:
             text += (
                 f"; more than {drawn.PORT_GAP_M:g} m at x {', '.join(f'{x:g}' for x in off)}, "
@@ -780,7 +790,7 @@ def hull_form(hull, notes, *, form, marks, measured=()):
         mine = sum(1 for x, _s, _h in triples if (word, x) in named)
         if mine:
             text += f"; the {mine} measured each within {drawn.PORT_GAP_M:g} m"
-        _add_note(notes, f"profile.ports_m.{word}", text + ".")
+        report.append(text + ".")
     return gaps
 
 
@@ -854,11 +864,6 @@ def _marks_in_order(marks):
 def _line_of(lines, words):
     """The one of `form.check`'s lines that says `words`."""
     return next(line for line in lines if words in line)
-
-
-def _add_note(notes, key, text):
-    """A sentence added to a hull note, after what it says already."""
-    notes[key] = f"{notes[key]} {text}" if notes.get(key) else text[0].upper() + text[1:]
 
 
 def midship_section(

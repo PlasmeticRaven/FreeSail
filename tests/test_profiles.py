@@ -8,8 +8,9 @@ file changes with them (the two-way byte test, `tests/test_ship_particulars.py`)
   which are `g.hull_form`'s;
 - `g.hull_form` adds the form and the marks as given, metres to the centimetre and a band's
   count of lights whole, and refuses in the schema's words what the load would refuse. It
-  writes into the notes the drawn displacement and depth beside the filed ones and each port
-  triple's gap to the drawn side at its sill: a gap over 0.05 m raises for a triple the ship
+  writes no computed figure into a ship's notes (the lead's notes of 2026-10-29, item 2): it
+  gives the generator's report the drawn displacement and depth beside the filed ones and each
+  port triple's gap to the drawn side at its sill: a gap over 0.05 m raises for a triple the ship
   measured and is reported for any other, and no triple is ever moved (§5.0 principle 8);
 - `g.midship_section` makes a section by Steel's sweeps, simplified, through its inputs;
 - `g.from_steel_table` turns one of Steel's bodies tables into a stand-in's main breadth and
@@ -23,6 +24,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import inspect
 import math
 from pathlib import Path
 
@@ -121,6 +123,7 @@ WRITTEN_MARKS = {
     "form.head": "judged",
 }
 NOTES = {"displacement_kg": "The filed displacement.", "draught_m": "The filed draught."}
+SAID = "the hull as drawn (freesail/ship/form.py): "
 
 
 def _hull(gen, **changes) -> dict:
@@ -150,17 +153,18 @@ def _spec(hull: dict):
     return spec_from_dict(_doc(hull), "p.yaml").hull
 
 
-def _formed(gen, measured=(), **changes) -> tuple[dict, dict, dict]:
-    """Her hull with the form and the marks added, her notes and the gaps `hull_form` returns."""
-    hull, notes = _hull(gen, **changes), dict(NOTES)
-    gaps = gen.hull_form(hull, notes, form=FORM, marks=MARKS, measured=measured)
-    return hull, notes, gaps
+def _formed(gen, measured=(), **changes) -> tuple[dict, list, dict]:
+    """Her hull with the form and the marks added, the generator's report `hull_form` gives and
+    the gaps it returns."""
+    hull, report = _hull(gen, **changes), []
+    gaps = gen.hull_form(hull, form=FORM, marks=MARKS, measured=measured, report=report)
+    return hull, report, gaps
 
 
 def _on_the_side(gen, off: dict | None = None) -> dict:
     """The ports with each half-breadth the drawn side's at its sill to the centimetre, but the
     ones given in `off`, {x: metres}, moved out by so much."""
-    hull, _notes, gaps = _formed(gen)
+    hull, _report, gaps = _formed(gen)
     off = off or {}
     return {
         "upper": [
@@ -203,7 +207,7 @@ def test_hull_profile_takes_the_six_shape_lines_and_not_the_form_or_the_marks(ge
 
 
 def test_hull_form_writes_the_form_and_the_marks_as_given(gen):
-    hull, _notes, _gaps = _formed(gen)
+    hull, _report, _gaps = _formed(gen)
     before = _hull(gen)["profile"]
     p = hull["profile"]
     assert list(p) == list(PROFILE_KEYS)  # every key, the form and the marks last
@@ -227,7 +231,7 @@ def test_hull_form_writes_the_form_and_the_marks_as_given(gen):
     assert loaded.marks == tuple(WRITTEN_MARKS.items())
     # a form or marks left out, or given None, writes none
     hull = _hull(gen)
-    gen.hull_form(hull, {}, form={"head": "knee", "fullness": None}, marks=None)
+    gen.hull_form(hull, form={"head": "knee", "fullness": None}, marks=None)
     assert hull["profile"]["form"] == {"head": "knee"} and "marks" not in hull["profile"]
 
 
@@ -275,57 +279,63 @@ REFUSALS = [
 def test_hull_form_refuses_in_the_schemas_words_and_leaves_the_hull_as_it_was(
     gen, words, form, marks, match
 ):
-    hull, notes = _hull(gen), dict(NOTES)
-    before, said = copy.deepcopy(hull), dict(notes)
+    hull, report = _hull(gen), []
+    before = copy.deepcopy(hull)
     with pytest.raises(ValueError, match=match) as e:
-        gen.hull_form(hull, notes, form=form, marks=marks)
+        gen.hull_form(hull, form=form, marks=marks, report=report)
     assert str(e.value).startswith("hull_form: the profile's ")
-    assert hull == before and notes == said
+    assert hull == before and report == []
 
 
 def test_hull_form_wants_a_profile_and_adds_the_form_once(gen):
     with pytest.raises(ValueError, match="hull_form: the hull has no profile; hull_profile makes"):
-        gen.hull_form({"length_waterline_m": 40.0}, {}, form=FORM, marks=None)
-    hull, notes, _gaps = _formed(gen)
+        gen.hull_form({"length_waterline_m": 40.0}, form=FORM, marks=None)
+    hull, _report, _gaps = _formed(gen)
     with pytest.raises(ValueError, match="has its form or its marks already; hull_form adds them"):
-        gen.hull_form(hull, notes, form=None, marks={"rail_m": "sourced"})
+        gen.hull_form(hull, form=None, marks={"rail_m": "sourced"})
 
 
 def test_a_drawing_that_misses_a_given_point_is_refused(gen):
     """`form.check`'s own refusal, a main breadth above the rail, raised from `hull_form`."""
     hull = _hull(gen, breadth_line=[[-12.0, 1.4, 4.4], [0.0, 4.5, 5.1], [12.0, 1.6, 4.1]])
     with pytest.raises(ValueError, match="^hull_form: the drawn side misses breadth_line_m's poi"):
-        gen.hull_form(hull, {}, form=None, marks=None)
+        gen.hull_form(hull, form=None, marks=None)
     assert "form" not in hull["profile"]
 
 
-# -- the notes: the drawn hull beside the file's figures; the gap rule ----------------------
+# -- the report: the drawn hull beside the file's figures, in no note; the gap rule ----------
 
 
-def test_hull_form_writes_the_drawn_hull_beside_the_files_figures(gen):
-    """The drawn displacement beside the filed one and the drawn depth beside the draught,
-    each after the note's own words, as `form.check` gives them; each port's gap to the drawn
-    side at its sill, the drawn half-breadth less the triple's, aft to forward, those over
-    0.05 m named; the triples themselves as they were."""
-    hull, notes, gaps = _formed(gen)
+def test_hull_form_reports_the_drawn_hull_beside_the_files_figures_and_writes_no_note(gen):
+    """The lead's notes of 2026-10-29, item 2: a ship's notes carry sources, departures and
+    judgements, and a figure a rule computes from the file's own keys belongs in the generator's
+    report and the tests. So `hull_form` takes no notes. It gives its report the drawn displacement
+    beside the filed one and the drawn depth beside the draught, as `form.check` gives them; each
+    port's gap to the drawn side at its sill, the drawn half-breadth less the triple's, aft to
+    forward, those over 0.05 m named; the triples themselves as they were."""
+    assert "notes" not in inspect.signature(gen.hull_form).parameters
+    hull, report, gaps = _formed(gen)
     spec = _spec(hull)
     lines = drawn.check(spec)
-    said = "The hull as drawn (freesail/ship/form.py): "
-    assert notes["displacement_kg"] == f"The filed displacement. {said}{lines[0]}."
-    assert notes["draught_m"] == f"The filed draught. {said}{lines[1]}."
+    assert report[0] == f"{SAID}{lines[0]}."
+    assert report[1] == f"{SAID}{lines[1]}."
     assert lines[0].startswith("drawn displacement") and "the file's draught of 4.5 m" in lines[1]
     triples = PARTS["ports"]["upper"]
     assert hull["profile"]["ports_m"]["upper"] == triples  # never moved
     expected = {("upper", x): drawn.half_breadth_at(spec, x, sill) - hb for x, sill, hb in triples}
     assert gaps == expected
     figures = ", ".join(f"{round(g, 2) + 0.0:+.2f}" for g in expected.values())
-    note = notes["profile.ports_m.upper"]
-    assert note.startswith(f"{said[0].upper()}{said[1:]}the side at each sill, aft to forward, off")
-    assert f"off the half-breadth by {figures} m" in note
+    line = report[2]
+    assert line.startswith(f"{SAID}the upper deck's ports: the side at each sill, aft to forward")
+    assert f"off the half-breadth by {figures} m" in line
     over = [f"{x:g}" for (_w, x), g in expected.items() if abs(g) > 0.05]
     assert over  # the hand-built ports stand off her drawn side
-    assert f"; more than 0.05 m at x {', '.join(over)}, reported" in note
-    assert "measured" not in note
+    assert f"; more than 0.05 m at x {', '.join(over)}, reported" in line
+    assert "measured" not in line
+    # with no report asked for it does the same work and says nothing
+    quiet = _hull(gen)
+    assert gen.hull_form(quiet, form=FORM, marks=MARKS) == gaps
+    assert quiet == hull
 
 
 def test_a_measured_triple_off_the_drawn_side_raises_and_any_other_is_reported(gen):
@@ -333,9 +343,9 @@ def test_a_measured_triple_off_the_drawn_side_raises_and_any_other_is_reported(g
     deck and x, and is reported for every other; within it a measured triple passes. No triple
     is ever moved to the drawing, and `measured` names only triples the profile gives."""
     on = _on_the_side(gen)
-    hull, notes, gaps = _formed(gen, measured=("upper",), ports=on)
+    hull, report, gaps = _formed(gen, measured=("upper",), ports=on)
     assert all(abs(g) <= 0.005 for g in gaps.values())
-    assert "; the 3 measured each within 0.05 m." in notes["profile.ports_m.upper"]
+    assert "; the 3 measured each within 0.05 m." in report[2]
     off = _on_the_side(gen, {8.0: 0.2})
     for measured in (("upper",), [("upper", 8.0)], [("upper", 8.004)]):
         with pytest.raises(ValueError) as e:
@@ -344,12 +354,11 @@ def test_a_measured_triple_off_the_drawn_side_raises_and_any_other_is_reported(g
             "hull_form: the drawn side misses a measured port triple by more than 0.05 m at its "
             "sill: the upper port at x 8, -0.20 m."
         )
-    hull, notes, gaps = _formed(gen, measured=[("upper", 0.0), ("upper", -8.0)], ports=off)
+    hull, report, gaps = _formed(gen, measured=[("upper", 0.0), ("upper", -8.0)], ports=off)
     assert gaps[("upper", 8.0)] == pytest.approx(-0.2, abs=0.006)
     assert hull["profile"]["ports_m"]["upper"] == off["upper"]  # never moved
-    note = notes["profile.ports_m.upper"]
-    assert "; more than 0.05 m at x 8, reported and never moved to the drawing" in note
-    assert note.endswith("; the 2 measured each within 0.05 m.")
+    assert "; more than 0.05 m at x 8, reported and never moved to the drawing" in report[2]
+    assert report[2].endswith("; the 2 measured each within 0.05 m.")
     with pytest.raises(ValueError, match="names the quarterdeck deck's ports, and the profile"):
         _formed(gen, measured=("quarterdeck",))
     with pytest.raises(ValueError, match="names the upper port at x 4, and the profile gives no"):
@@ -464,7 +473,7 @@ def test_a_made_section_is_drawn_through_and_marked_judged(gen):
         tumblehome_m=0.4, rail_z=4.0,
     )  # fmt: skip
     hull = _hull(gen, section=sec, sections=None, breadth_line=None)
-    gen.hull_form(hull, {}, form=None, marks={"section_m": "judged"})
+    gen.hull_form(hull, form=None, marks={"section_m": "judged"})
     spec = _spec(hull)
     assert spec.profile.section_m == tuple(tuple(pt) for pt in sec)
     assert drawn.check(spec)
@@ -610,12 +619,12 @@ def test_from_steel_tables_parts_draw_a_stand_in(gen):
             **parts,
         ),
     }
-    notes = {}
-    gen.hull_form(hull, notes, form=None, marks={"breadth_m": "stand-in", **marks})
+    report = []
+    gen.hull_form(hull, form=None, marks={"breadth_m": "stand-in", **marks}, report=report)
     spec = _spec(hull)
     for x, z, hb in spec.profile.sections_m + spec.profile.breadth_line_m:
         assert drawn.half_breadth_at(spec, x, z) == pytest.approx(hb, abs=0.001), (x, z)
-    assert "against the file's draught of 5.44 m" in notes["draught_m"]
+    assert "against the file's draught of 5.44 m" in report[1]
 
 
 FROM_TABLE_REFUSALS = [
@@ -651,7 +660,8 @@ def test_from_steel_table_refuses_a_table_it_cannot_read(gen, words, change, mat
 
 
 def test_the_dump_writes_the_form_as_blocks_and_the_sections_a_station_a_line(gen, tmp_path):
-    hull, notes, _gaps = _formed(gen)
+    hull, _report, _gaps = _formed(gen)
+    notes = dict(NOTES)
     notes.update(
         {
             "profile.sections_m": "The sections, measured.",
@@ -695,6 +705,6 @@ def test_the_dump_writes_the_form_as_blocks_and_the_sections_a_station_a_line(ge
         "      form.head: judged\n"
         "spars:\n"
     ) in text
-    assert "  # The filed displacement. The hull as drawn (freesail/ship/form.py): drawn " in text
+    assert "  # The filed displacement.\n" in text and "The hull as drawn" not in text
     assert yaml.safe_load(text)["hull"]["profile"] == hull["profile"]
     assert load_ship(path).spec.hull.profile == _spec(hull).profile
