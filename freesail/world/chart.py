@@ -185,6 +185,22 @@ MARK_KINDS = frozenset(
 )
 LAND_KINDS = frozenset({"headland", "island", "hill", "town", "place"})
 DANGER_KINDS = frozenset({"rock", "ledge", "drying"})
+# An island the grid lacks (package 94; ChartBlocks.md, "An isle the grid lacks"): EMODnet's
+# sixteenth of a minute reads water over an islet of a few hundred metres, so the feature
+# carries its ground, `grid_lacks: true` with its height and `extent_m`. The keel takes it
+# as she takes a rock that stands above the water (`Feature.is_ground`), the pilot and the
+# captain's chart as a danger on the line; the lookout sees it as the land it is and calls
+# it by its name. An island the grid holds (Belle Isle, its `extent_m` the isle's size) is
+# the tiles' ground and the feature's mark alone, as before.
+ISLAND_KIND = "island"
+
+
+# The kinds whose `bottom:` is a note of the ground (`Chart.bottom_near`; the road since
+# package 94).
+BOTTOM_NOTE_KINDS = frozenset({"bottom", "anchorage", "road"})
+
+_GROUND_SEARCH_KINDS = DANGER_KINDS | {ISLAND_KIND}
+_HAZARD_SEARCH_KINDS = HAZARD_KINDS | {ISLAND_KIND}
 
 
 # How far either side of a shoal ahead the pilot looks for the deeper water (package 45c;
@@ -300,16 +316,33 @@ class Feature:
     # see it) and whether there is water over it for the keel (the aground test). None: a
     # rock or ledge taken as awash at the datum, a bank as nothing.
     dries_m: float | None = None
+    # An island the grid lacks (package 94, `ISLAND_KIND`): its ground is the feature's
+    grid_lacks: bool = False
 
     @property
     def position(self) -> Position:
         return Position(self.lat_deg, self.lon_deg)
 
+    @property
+    def is_ground(self) -> bool:
+        """Whether the keel can touch it by the feature itself: a danger (a rock, a ledge,
+        a drying rock), or an island the grid lacks (package 94)."""
+        return self.kind in DANGER_KINDS or (self.kind == ISLAND_KIND and self.grid_lacks)
+
+    @property
+    def is_hazard(self) -> bool:
+        """Whether the pilot and the captain's chart name it on the line: the hazards'
+        kinds (`HAZARD_KINDS`), and an island the grid lacks (package 94)."""
+        return self.kind in HAZARD_KINDS or (self.kind == ISLAND_KIND and self.grid_lacks)
+
     def head_above_datum_m(self) -> float | None:
         """A danger's head above the datum: `dries_m` (the pilot's figure for the water
         over it at low water, or how far it dries), else its height above the water for
         a rock that stands above it, else the datum itself for a rock or a ledge the pilot
-        gives no figure for; None for a kind that is no danger."""
+        gives no figure for; an island the grid lacks by its height, as a rock that stands
+        (package 94); None for a kind that is no danger."""
+        if self.kind == ISLAND_KIND and self.grid_lacks:
+            return self.height
         if self.kind not in DANGER_KINDS:
             return None
         if self.dries_m is not None:
@@ -367,6 +400,7 @@ class Feature:
             bottom=str(d.get("bottom", "")),
             depth_fathoms=None if d.get("depth_fathoms") is None else float(d["depth_fathoms"]),
             dries_m=None if d.get("dries_m") is None else float(d["dries_m"]),
+            grid_lacks=bool(d.get("grid_lacks", False)),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -394,6 +428,8 @@ class Feature:
             out["dries_m"] = self.dries_m
         if self.view:
             out["view"] = self.view
+        if self.grid_lacks:
+            out["grid_lacks"] = True
         return out
 
 
@@ -1152,16 +1188,19 @@ class Chart:
             reach = max(float(f.extent_m), units.CABLE)
             for where, px, py in places:
                 if math.hypot(fx - px, fy - py) <= reach:
-                    return Grounding(water, draught_m, where, f"{f.name} (rock)")
+                    what = "island" if f.kind == ISLAND_KIND else "rock"
+                    return Grounding(water, draught_m, where, f"{f.name} ({what})")
         return None
 
     def dangers_about(self, pos: Position, length_m: float) -> list[Feature]:
-        """The charted dangers within reach of her (the longest extent and her length)."""
+        """The charted dangers within reach of her (the longest extent and her length),
+        an island the grid lacks among them (package 94)."""
         reach = 2000.0 + length_m
         return [
             f
-            for f in self.nearby(pos, reach, DANGER_KINDS)
-            if bearing_and_distance(pos, f.position)[1]
+            for f in self.nearby(pos, reach, _GROUND_SEARCH_KINDS)
+            if f.is_ground
+            and bearing_and_distance(pos, f.position)[1]
             <= max(float(f.extent_m), units.CABLE) + length_m
         ]
 
@@ -1231,9 +1270,11 @@ class Chart:
         return math.degrees(math.atan2(gx, gy)) % 360.0
 
     def bottom_near(self, pos: Position, within_m: float = 3000.0) -> str:
-        """The ground from the nearest bottom note within `within_m`, or ''."""
+        """The ground from the nearest bottom note within `within_m`, or '': a `bottom`
+        feature's, an anchorage's, or a road's (package 94: a road is an anchorage, and
+        79d's roads with their `bottom:` had given no note of it)."""
         best = None
-        for f in self.nearby(pos, within_m, {"bottom", "anchorage"}):
+        for f in self.nearby(pos, within_m, BOTTOM_NOTE_KINDS):
             if f.bottom:
                 _, d = bearing_and_distance(pos, f.position)
                 if best is None or d < best[0]:
@@ -1541,10 +1582,13 @@ class Chart:
         return index.get(key)
 
     def dangers_near(self, pos: Position, radius_m: float) -> list[tuple[Feature, float, float]]:
-        """The charted dangers (`HAZARD_KINDS`) within `radius_m` of a point, nearest
-        first, each with its bearing in degrees true and its distance in metres."""
+        """The charted dangers (`HAZARD_KINDS`, and an island the grid lacks) within
+        `radius_m` of a point, nearest first, each with its bearing in degrees true and its
+        distance in metres."""
         out = []
-        for f in self.nearby(pos, radius_m, HAZARD_KINDS):
+        for f in self.nearby(pos, radius_m, _HAZARD_SEARCH_KINDS):
+            if not f.is_hazard:
+                continue
             bearing, distance = bearing_and_distance(pos, f.position)
             out.append((f, bearing, distance))
         out.sort(key=lambda t: t[2])
@@ -1567,7 +1611,9 @@ class Chart:
         mid_lon = a.lon_deg + 0.5 * _wrap(b.lon_deg - a.lon_deg)
         mid = Position(0.5 * (a.lat_deg + b.lat_deg), mid_lon)
         out = []
-        for f in self.nearby(mid, reach, HAZARD_KINDS):
+        for f in self.nearby(mid, reach, _HAZARD_SEARCH_KINDS):
+            if not f.is_hazard:
+                continue
             fx, fy = a.offset_to(f.position)
             along = fx * ux + fy * uy
             if along < 0.0 or along > length:

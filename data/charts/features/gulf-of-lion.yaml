@@ -285,14 +285,15 @@ features:
     says: 'The Regas, a ledge of rock and sand a mile off Cape Couronne with but five or six feet on it, breaking in any wind; pass without it.'
 
   - id: planier
-    kind: rock
+    kind: island
     name: Planier
     modern: Île du Planier
     lat_deg: 43.199
     lon_deg: 5.23
     height_m: 10
     extent_m: 200
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Michelot 1715, p. 43: a small island called Planier, because it is very plain and low, upon which there is an uninhabited tower which only serves to let you know it; do not come near it to the SW, SE and East for rocks stretching about a mile; p. 41: a small flat island lying a great way out with a tower upon it, called the Tower of Planier; Purdy 1826, p. 52: the Isle of Planier, almost level with the water, but having a white tower on it which may be seen afar off; p. 54 (Mr. Smith, master of the Ganymede, 1818): a light is exhibited by night on the white tower, seen 3 or 4 leagues (the year it was first lit not found in the sources, so no light is entered); height JUDGEMENT for the low island and its tower'
     says: 'Planier, a low flat island far out in the mouth of the bay with a white tower on it, seen before the island; foul with rocks a mile to the south-east and south-west.'
 
@@ -797,14 +798,15 @@ features:
     says: 'Cape Escampebariou, the steep west end of the peninsula of Giens, which looks an island from the offing; flaws and a great swell off it.'
 
   - id: grand-ribaud
-    kind: rock
+    kind: island
     name: Great Ribaud
     modern: Grand Ribaud
     lat_deg: 43.0185
     lon_deg: 6.144
     height_m: 40
     extent_m: 250
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 57: the Ribaud Isles, the greater less than half a mile in extent, a quadrangle, nearly half-way between the capes; the Little Ribaud between it and the main, a channel 200 fathoms broad with 3 or 4 fathoms; p. 58 (Smith, 1818): the Little Pass between Porquerolles on the south and Great Ribaud and Cape Esterel on the north, about a mile wide, 24 to 7 fathoms; Derrotero 1849, p. 33: Ribaud grande, a triangle, its south point Cape Meridional with rocks and a hidden ledge east of them; a battery on its south part; the height JUDGEMENT'
     says: 'Great Ribaud, the islet off Giens on the north side of the Little Pass; mind the sunken ledge east of its southern point.'
 
@@ -923,14 +925,15 @@ features:
     says: 'The Seraniers, two great rocks off the south-east point of Porquerolles on the west side of the Great Pass.'
 
   - id: bagaud
-    kind: rock
+    kind: island
     name: Bagueau
     modern: Île de Bagaud
     lat_deg: 43.0115
     lon_deg: 6.362
     height_m: 58
     extent_m: 350
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 58: about 4 miles eastward from the east end of Porquerolles the little island Bagueau; the channel between called the Great Pass, with no less than 20 fathoms in its shoalest part; close to its south end the north-west point of Portcros, leaving the narrow Little Pass of Bagueau; Michelot 1715, p. 49: the Great Passage, through which men of war generally go, between these islands, no danger; Derrotero 1849, p. 35: the Great Pass, 20 to 50 brazas, by which squadrons from the west generally enter; James 1837, vol. 3, p. 238: the Grande-Passe (June 1804); the height JUDGEMENT'
     says: 'Bagueau, the little high isle off Portcros; the Great Pass between it and Porquerolles is four miles wide and has twenty fathoms and more, the fleet''s way into the road.'
 

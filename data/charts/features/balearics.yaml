@@ -646,49 +646,53 @@ features:
   says: 'The shelf of Es Redo under St Philip''s batteries, a third of a cable off, which breaks only in a northerly gale: mind it beating in with the wind south-west.'
   fix: 'a third of a cable off the south shore opposite Philipet, FROM MEMORY; its depth unstated (it breaks only in a gale): 2 m, JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals)'
 - id: mahon-lazaretto
-  kind: rock
+  kind: island
   name: the Lazaretto
   modern: Illa del Llatzeret (then joined to the north shore by a sand neck; the canal of 1900 is later)
   lat_deg: 39.8752
   lon_deg: 4.3055
   height_m: 15
   extent_m: 100
+  grid_lacks: true
   source: 'Tofiño 1787, p. 212: past the points one may close either shore, 5 brazas close to, 12 and 18 in the middle, but the south shore is preferred, passing between it and the island where the Lazareto is; Vargas Ponce 1787, p. 116: below where the castle of San Felipe was, and nearer the coast of Cape Mola, an islet they call of the quarantine or Lazareto, with storehouses fit to keep goods from a suspect place; Grasset 1807, pp. 159 to 160: the lazaret holds the third islet, joined to the land of Minorca by a little tongue of sand almost always covered by the waves, for passengers and goods from places suspected of plague; begun some twenty years ago on a vast plan, in 1804 only a quarter built, yet its storehouses could already take much goods; the English lodged some 3000 men in it for their last Egyptian expedition (1800, the year FROM MEMORY)'
   says: The Lazaretto on its islet under the north shore within the mouth, its great buildings a quarter finished.
-  fix: 'FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the Lazaretto''s island against the north shore, joined to it by a neck of sand (Grasset 1807); a rock of its height with extent 100 m, the grid lacking it, and Tofiño''s passage between it and the south shore left open'
+  fix: 'FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the Lazaretto''s island against the north shore, joined to it by a neck of sand (Grasset 1807); an island the grid lacks (`grid_lacks`; a rock until package 94) of its height with extent 100 m, the grid lacking it, and Tofiño''s passage between it and the south shore left open'
 - id: quarantine-island
-  kind: rock
+  kind: island
   name: Quarantine Island
   modern: Illa Plana or Illa de la Quarentena (Port de Maó)
   lat_deg: 39.8778
   lon_deg: 4.3025
   height_m: 5
   extent_m: 50
+  grid_lacks: true
   source: 'Grasset 1807, p. 159: on the second islet the quarantine is built, a building of little size in two storeys, the first of storehouses shut with wooden grilles to air the goods, the second of rooms for passengers; it takes few goods and few persons, and only those with a clean bill; the vessels in quarantine anchor near the islet; Purdy 1826, p. 44, the officer''s: you pass Quarantine Island, the first, on your starboard side (Purdy''s translation of Tofiño, p. 43, puts ''Quarantine Island'' for Tofiño''s island of the Lazareto)'
   says: Quarantine Island, the little flat islet with its quarantine house, near which vessels with a clean bill ride out their quarantine.
-  fix: 'FROM MEMORY; the identification of Grasset''s second islet with Illa Plana JUDGEMENT; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the small island near the north-east shore; a rock of its height with extent 50 m, the grid lacking it'
+  fix: 'FROM MEMORY; the identification of Grasset''s second islet with Illa Plana JUDGEMENT; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the small island near the north-east shore; an island the grid lacks (`grid_lacks`; a rock until package 94) of its height with extent 50 m, the grid lacking it'
 - id: isla-del-rey
-  kind: rock
+  kind: island
   name: the Isla del Rey, or Hospital Island
   modern: Illa del Rei (Port de Maó)
   lat_deg: 39.8805
   lon_deg: 4.2995
   height_m: 15
   extent_m: 120
+  grid_lacks: true
   source: 'Tofiño 1787, p. 212: reaching Cala Pedrera with a ship of the line or frigate keep nearer the south shore to pass between it and the Islands of the Rey (where the Hospital is) and Redonda, an islet; for though on the north side there is a channel of 5 brazas it is narrow and wants much practice; Vargas Ponce 1787, pp. 116 to 117: the Isla del Rey, so called because Don Alonso III landed on it in 1287, below the English Cove, the widest of the port; 12 acres; the fine Seamen''s Hospital, begun 1773 and finished 1776, for 700 sick; Grasset 1807, pp. 154 to 156: the first of the four islets nearer the right-hand shore entering; Jennings built a naval hospital on it in 1711; the present begun 177- (the year illegible in the OCR), finished 1776, for land and sea troops, three buildings round a fine court; Purdy 1826, p. 43 (''the Isla del Rey, or Bloody Island, on which stands the Naval hospital'')'
   says: 'The Isla del Rey with the great naval hospital: ships of the line pass south of it, between it and the south shore.'
-  fix: 'FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the island is the grid''s mid-channel ridge of 9 to 11 m at 39.8805 N, 4.298 to 4.301 E, the deep water (26 m) on its south-west side, Tofiño''s passage between it and the south shore; a rock of its height with extent 120 m'
+  fix: 'FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the island is the grid''s mid-channel ridge of 9 to 11 m at 39.8805 N, 4.298 to 4.301 E, the deep water (26 m) on its south-west side, Tofiño''s passage between it and the south shore; an island the grid lacks (`grid_lacks`; a rock until package 94) of its height with extent 120 m'
 - id: rat-island
-  kind: rock
+  kind: island
   name: Rata, or Rat Island
   modern: Illa de les Rates (Port de Maó; removed in the 20th century)
   lat_deg: 39.8793
   lon_deg: 4.301
   height_m: 3
   extent_m: 40
+  grid_lacks: true
   source: 'Tofiño 1787, p. 212: pass between the south shore and the Islands of the Rey and Redonda, which is an islet, or between it and this; Purdy 1826, p. 43: the Isla del Rey and Rata, or Rat Island, a large rock to the westward of it; you may pass between the two islands, the least depth 4 1/2 fathoms, but the passage is narrow and not for strangers; Grasset 1807, p. 124 (''l''île du Roi, ou de l''Hôpital, et de Redonda qui n''est qu''un petit îlot'')'
   says: 'Rat Island, the large rock west of the Isla del Rey: the passage between them is narrow, four and a half fathoms, not for strangers.'
-  fix: 'west of the Isla del Rey by Purdy''s words, FROM MEMORY (the islet no longer exists: its site to be read from an older chart); the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): Tofiño''s islotillo Redonda by the Isla del Rey (the draft''s Rat Island, JUDGEMENT that they are one); a rock with extent 40 m'
+  fix: 'west of the Isla del Rey by Purdy''s words, FROM MEMORY (the islet no longer exists: its site to be read from an older chart); the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): Tofiño''s islotillo Redonda by the Isla del Rey (the draft''s Rat Island, JUDGEMENT that they are one); an island the grid lacks (`grid_lacks`; a rock until package 94) with extent 40 m'
 - id: isla-del-rey-shoal
   kind: shoal
   name: the flat ENE of the Isla del Rey
@@ -798,16 +802,17 @@ features:
   says: Cape Dartuch, so low a man may step ashore from a boat, but steep-to, eighteen brazas two cables off.
   fix: FROM MEMORY; the height JUDGEMENT; moved 451 m to the nearest land of the tiles
 - id: isla-del-aire
-  kind: rock
+  kind: island
   name: the Isle Ayre
   modern: Illa de l'Aire
   lat_deg: 39.8
   lon_deg: 4.292
   height_m: 15
   extent_m: 300
+  grid_lacks: true
   source: 'Tofiño 1787, ''Isla del Ayre'', p. 225: very low on its NW side and higher and sheer to the sea on its SE, where one may lie close almost touching; but the NW side forms the freo, which a ship of much draught must pass by its middle, the greatest depth 7 or 7 1/2 brazas, shoaling toward both shores to 3 brazas at a cable off; the Puntas of Cova de Corps and Algaret make the narrowest part of the channel; Purdy 1826, p. 48 (''nearly a mile from the S.E.'' of Minorca)'
   says: 'The Isle Ayre, low to the north-west and sheer to the south-east: pass its freo in the middle, seven brazas.'
-  fix: 'FROM MEMORY; the height JUDGEMENT; its light is of 1860 (FROM MEMORY, not in these texts) and so no light entry is made; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 300 m (the island some 600 m long, low, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+  fix: 'FROM MEMORY; the height JUDGEMENT; its light is of 1860 (FROM MEMORY, not in these texts) and so no light entry is made; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is given as one the grid lacks (`grid_lacks`; a rock until package 94), its height with an extent_m of 300 m (the island some 600 m long, low, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
 - id: mostaganem
   kind: town
   name: Mostagan
