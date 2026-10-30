@@ -74,6 +74,8 @@ cannot stand. No file of the eight carries any of them. Beyond the refusals here
 none of which differs for a ship without them, until the engine's steps build their behaviour.
 The driver (Ext §17.4) adds one allowance: a lateen cut at the mast may name a `boom`, its foot
 spread on it as Steel's driver boomsail's is; a whole lateen naming one is refused in words.
+That boom alone of its class may file `rigged_out` (Ext §17.11): it goes out with the sail and
+in with it, and a gaff sail's boom is never rigged in, so the key is refused on any other.
 
 Package 75's stage 0H (docs/design/Build-Ships.md §3.5, §5.1, §5.2) adds the hull's shape to the
 profile, drawn only: the knee of the head (`head_m`), the main breadth by station
@@ -1947,7 +1949,9 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
 
 def _rigged_out(s: dict, cls: str, where: str, source: str, running: bool = False) -> bool | None:
     """A studding sail boom's starting state (spec 3b §7), if the file gives one; a running
-    bowsprit's too (package 32b: out to its full length, or reefed)."""
+    bowsprit's too (package 32b: out to its full length, or reefed); and the boom of a lateen
+    cut at the mast (package 75, Ext §17.11: out only while the driver is bent), which
+    `validate` checks once the sails are read: a boom of any other sail is refused there."""
     value = s.get("rigged_out")
     if value is None:
         return None
@@ -1956,10 +1960,10 @@ def _rigged_out(s: dict, cls: str, where: str, source: str, running: bool = Fals
             f"{source}: {where} has rigged_out = {value!r}; say true (run out along its yard) "
             "or false (rigged in)."
         )
-    if cls != "studdingsail_boom" and not running:
+    if cls not in ("studdingsail_boom", "boom") and not running:
         raise ShipFileError(
             f"{source}: {where} is a {cls.replace('_', ' ')}; only a studding sail boom or a "
-            "running bowsprit is rigged out or in."
+            "running bowsprit is rigged out or in, and a driver's boom with its sail."
         )
     return value
 
@@ -2342,6 +2346,15 @@ def validate(spec: ShipSpec) -> None:
             raise ShipFileError(
                 f"{src}: sail '{sl.id}' is jib-headed but names neither a 'stay' to hank to "
                 f"nor a 'mast' to hoist on."
+            )
+    # the driver's boom, out with the sail and in with it (package 75; Ext §17.11)
+    drivers_booms = {sl.roles.get("boom") for sl in spec.sails if sl.cut_at_mast}
+    for s in spec.spars:
+        if s.cls == "boom" and s.rigged_out is not None and s.id not in drivers_booms:
+            raise ShipFileError(
+                f"{src}: spar '{s.id}' has rigged_out, but no lateen cut at the mast names it as "
+                "its boom; a gaff sail's boom is never rigged in, and only a driver's goes out "
+                "and in with its sail."
             )
 
     # lines: target exists and is a permitted kind

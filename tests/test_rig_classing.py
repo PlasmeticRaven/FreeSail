@@ -34,6 +34,8 @@ sheet of the sail's curve class; and the served graph and snapshot carry `settee
 The driver's stage 0 (Ext §17.4, §17.7, §17.8): a lateen cut at the mast may name a boom, and a
 whole lateen naming one is refused in words; no file of the eight carries a lateen naming a
 boom (the probe); and `frigate_with_driver()` loads, bent and unbent, cut to §17.2's contract.
+That boom alone of its class may file `rigged_out` (Ext §17.11), and no file of the eight has it
+on a boom (the probe); `tests/test_driver.py` has what the engine does with the key.
 """
 
 from __future__ import annotations
@@ -450,6 +452,7 @@ def test_no_file_of_the_eight_carries_a_new_key_a_lateen_yard_or_a_yard_under_th
     spars = {s["id"]: s for s in doc["spars"]}
     assert [s["id"] for s in doc["sails"] if {"settee", "cut_at_mast"} & set(s)] == []
     assert [s["id"] for s in doc["sails"] if s["class"] == "lateen" and "boom" in s] == []
+    assert [s["id"] for s in doc["spars"] if s["class"] == "boom" and "rigged_out" in s] == []
     assert [s["id"] for s in doc["spars"] if "heave_to_aback" in s] == []
     assert [s["id"] for s in doc["spars"] if s["class"] == "lateen_yard"] == []
     yards = [s for s in doc["spars"] if s["class"] == "yard"]
@@ -719,6 +722,81 @@ def test_a_boom_spreads_a_lateen_cut_at_the_mast_and_is_refused_on_a_whole_one()
     next(s for s in yard_for_boom["sails"] if s["id"] == "mizzen.course")["boom"] = "fore.yard"
     with pytest.raises(ShipFileError, match="names 'fore.yard' as its boom, but that is a yard"):
         ship_from_dict(yard_for_boom, "bad.yaml")
+
+
+def _boom_of(doc: dict) -> dict:
+    return next(s for s in doc["spars"] if s["id"] == "mizzen.boom")
+
+
+@pytest.mark.parametrize("filed, out", [(False, False), (True, True)])
+def test_the_boom_of_a_lateen_cut_at_the_mast_may_file_rigged_out(filed, out):
+    """Ext §17.11: the key is allowed on a `boom` that a lateen cut at the mast names, and is the
+    engine's own field; its class stays `boom`. Left out, the boom reads out, as every boom of
+    its class has."""
+    doc = _rig_with_boom()
+    assert ship_from_dict(doc, "rig.yaml").spars["mizzen.boom"].rigged_out is True
+    _boom_of(doc)["rigged_out"] = filed
+    boom = ship_from_dict(doc, "rig.yaml").spars["mizzen.boom"]
+    assert boom.rigged_out is out and boom.cls == "boom" and not boom.running
+
+
+def _frigate_doc() -> dict:
+    return yaml.safe_load((ROOT / "data" / "ships" / "frigate-36.yaml").read_text(encoding="utf-8"))
+
+
+def test_rigged_out_is_refused_on_a_gaff_sails_boom_and_on_every_other_boom_in_words():
+    """Ext §17.11: a gaff sail's boom is never rigged in, so the key is refused on it, and on a
+    boom no sail names, and on a whole lateen's, which names no boom at all."""
+    gaff = _frigate_doc()
+    _boom_of(gaff)["rigged_out"] = False
+    with pytest.raises(ShipFileError) as e:
+        ship_from_dict(gaff, "bad.yaml")
+    assert str(e.value) == (
+        "bad.yaml: spar 'mizzen.boom' has rigged_out, but no lateen cut at the mast names it as "
+        "its boom; a gaff sail's boom is never rigged in, and only a driver's goes out and in "
+        "with its sail."
+    )
+    bare = _rig_with_boom()
+    del next(s for s in bare["sails"] if s["id"] == "mizzen.course")["boom"]
+    _boom_of(bare)["rigged_out"] = True
+    with pytest.raises(ShipFileError, match="no lateen cut at the mast names it as its boom"):
+        ship_from_dict(bare, "bad.yaml")
+    whole = _rig_with_boom(cut_at_mast=None, mast=None, corners_m=None)
+    _boom_of(whole)["rigged_out"] = False
+    with pytest.raises(ShipFileError, match="is a whole lateen and names a boom"):
+        ship_from_dict(whole, "bad.yaml")
+
+
+def test_rigged_out_is_refused_on_a_spar_of_any_other_class_and_when_it_is_no_truth_value():
+    """The refusal of a key on a spar that is never rigged in or out keeps its words, and adds
+    the driver's boom to them; a value that is neither true nor false is refused as before."""
+    yard = _rig("mizzen.yard", rigged_out=False)
+    with pytest.raises(ShipFileError) as e:
+        ship_from_dict(yard, "bad.yaml")
+    assert str(e.value).endswith(
+        "is a lateen yard; only a studding sail boom or a running bowsprit is rigged out or in, "
+        "and a driver's boom with its sail."
+    )
+    doc = _rig_with_boom()
+    _boom_of(doc)["rigged_out"] = "no"
+    with pytest.raises(ShipFileError, match="has rigged_out = 'no'; say true"):
+        ship_from_dict(doc, "bad.yaml")
+
+
+def test_the_fixtures_boom_is_rigged_in_with_the_driver_below_and_out_with_it_bent():
+    """Ext §17.11, the fixture: the boom filed `rigged_out: false`; with `bent`, true, and the
+    course's canvas in the sail room in the driver's stead, as a shift leaves it (Ext §17.10 item
+    9, closed: "shift the driver for the mizen" was refused on the bent variant for want of it).
+    Filed so, the count of spares is the same in both."""
+    below, bent = frigate_with_driver(), frigate_with_driver(bent=True)
+    assert below.spars["mizzen.boom"].rigged_out is False
+    assert bent.spars["mizzen.boom"].rigged_out is True
+    room = frigate_with_driver_doc(bent=True)["crew"]["stores"]["sails"]
+    mine = ("mizzen.course", "mizzen.driver")
+    assert [(s["kind"], s["canvas_no"]) for s in room if s["kind"] in mine] == [
+        ("mizzen.course", 2)
+    ]
+    assert scripts.spare_sails(below) == scripts.spare_sails(bent)
 
 
 def _off_the_line(p, a, b) -> float:

@@ -19,9 +19,10 @@ what is built against them is built against the contracts the ship builders writ
   `mizzen.boom` put back, lengthened to the 64's and hung where the 64's driver puts its jaws,
   and the 64's driver boomsail (Steel's, Ext §17.1-§17.2) on its four corners, a lateen cut at
   the mast on the mizen yard and the boom, filed after the course in its place and in the sail
-  room; `bent=True` gives it bent in the course's place, the course in the sail room, for the
-  drawing. The storm mizzen stays in the course's place, so that the one-place rule has its
-  case; the ringtail and its boom stay out, as the 64 carries none (Indf §4.7).
+  room, the boom rigged in (Ext §17.11); `bent=True` gives it bent in the course's place, the
+  boom rigged out and the course's canvas in the sail room, for the drawing and for the shift
+  back. The storm mizzen stays in the course's place, so that the one-place rule has its case;
+  the ringtail and its boom stay out, as the 64 carries none (Indf §4.7).
 
 Each `..._doc()` gives the document, fresh at every call, for a test that changes it or
 writes it out (`write_ship`, for `make_world`, which reads a path); the three functions above
@@ -171,8 +172,8 @@ def brig_with_settee() -> Ship:
 def frigate_with_driver_doc(bent: bool = False) -> dict[str, Any]:
     """`frigate_with_mizen_yard_doc()` with the 64's driver (Ext §17.8): the frigate's boom put
     back, lengthened and hung at the driver's jaws, and the driver filed after the course in its
-    place, in the sail room; `bent`, bent in the course's place with the course in the sail
-    room, for the drawing (Ext §17.6)."""
+    place, in the sail room, the boom rigged in; `bent`, bent in the course's place with the boom
+    rigged out and the course in the sail room (Ext §17.6, §17.11), as a shift leaves her."""
     doc = frigate_with_mizen_yard_doc()
     _driver(doc, doc["hull"]["deck_height_m"], bent)
     return doc
@@ -298,9 +299,9 @@ def _driver(doc: dict[str, Any], deck: float, bent: bool) -> None:
     area, cx, cz = area_centroid(corners)
     # the frigate's spanker boom put back, lengthened to the 64's and hung at the jaws; its
     # horse and its rating kept (the rating pass loads nothing on a boom whose sail starts in
-    # the sail room: Ext §17.2)
+    # the sail room: Ext §17.2); out only while the driver is bent (Ext §17.11)
     boom = dict(_by_id(frigate["spars"])["mizzen.boom"])
-    boom.update(length_m=DRIVER_BOOM_M, height_m=round(jaws_z, 2))
+    boom.update(length_m=DRIVER_BOOM_M, height_m=round(jaws_z, 2), rigged_out=bent)
     driver = {
         "id": "mizzen.driver",
         "class": "lateen",
@@ -315,8 +316,9 @@ def _driver(doc: dict[str, Any], deck: float, bent: bool) -> None:
         "centre_height_m": round(deck + cz, 1),  # above the water
         "canvas_no": DRIVER_CANVAS_NO,
     }
+    course = _by_id(doc["sails"])["mizzen.course"]
     if bent:
-        _by_id(doc["sails"])["mizzen.course"]["bent"] = False  # in the sail room
+        course["bent"] = False  # in the sail room
     else:
         driver["bent"] = False
     driver["in_place_of"] = "mizzen.course"
@@ -342,10 +344,15 @@ def _driver(doc: dict[str, Any], deck: float, bent: bool) -> None:
         doc["aliases"][name] = d
     for name in ("driver boom", "spanker boom"):
         doc["aliases"][name] = "mizzen.boom"
-    # its spare in the sail room, with the occasional sails' (Ext §17.2)
-    doc["crew"]["stores"]["sails"].append(
-        {"kind": d, "canvas_no": DRIVER_CANVAS_NO, "condition": 100}
+    # its spare in the sail room, with the occasional sails' (Ext §17.2); bent, the course's
+    # canvas in the driver's stead, as a shift leaves it (Ext §17.10 item 9), so that the count
+    # of spares stands and "shift the driver for the mizen" has a sail to bend
+    spare = (
+        {"kind": course["id"], "canvas_no": course["canvas_no"], "condition": 100}
+        if bent
+        else {"kind": d, "canvas_no": DRIVER_CANVAS_NO, "condition": 100}
     )
+    doc["crew"]["stores"]["sails"].append(spare)
 
 
 # ---------------------------------------------------------------------------
