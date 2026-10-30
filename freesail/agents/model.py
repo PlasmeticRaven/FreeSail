@@ -75,6 +75,11 @@ class Reply:
     calls: tuple[ToolCall, ...] = ()
     raw: str | None = None
     served_tokens: dict[str, int] | None = field(default=None, compare=False)
+    # the results of the calls that ran before a stand-by in this reply ended the turn
+    # (`{"name", "args", "result"}` each, in the calls' order; the model officer's first
+    # point: those calls ran, and are answered with their results, not "not run"); set
+    # by the harness on the turn it keeps, carried in the transcript, empty otherwise
+    ran: tuple[dict[str, Any], ...] = field(default=(), compare=False)
 
     @property
     def is_silent(self) -> bool:
@@ -100,6 +105,8 @@ class Reply:
         d = {"text": self.text, "calls": [c.to_dict() for c in self.calls], "raw": self.raw}
         if self.served_tokens:
             d["served_tokens"] = dict(self.served_tokens)
+        if self.ran:
+            d["ran"] = [dict(r) for r in self.ran]
         return d
 
     @classmethod
@@ -109,6 +116,7 @@ class Reply:
             tuple(ToolCall.from_dict(c) for c in (d.get("calls") or [])),
             d.get("raw"),
             served_tokens_of(d.get("served_tokens")),
+            tuple(dict(r) for r in (d.get("ran") or [])),
         )
 
 

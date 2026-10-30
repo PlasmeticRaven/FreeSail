@@ -66,6 +66,8 @@ Each shot is laid for the range by its gun captain, the quoin answering only so 
 ! Forenoon watch (10:05)  Shot from a cutter: two shot through the side to starboard; three killed and one wounded.
 ```
 
+The minute's line of your own fire is notable (marked `*`) when a shot struck her or when it opened the fire on her, and routine when the minute's shot all fell short, over or wide; the line of shot that struck you is notable, and urgent (`!`) when it killed a man or carried away a spar or the helm. So a station standing by until *a notable event* in action is woken for what matters, a hit, a strike, a change of state, and not for every discharge at the clock's pace; at quarters the trimmers' bracing yard by yard is routine too, and a trim's one line for all the yards notable as ever.
+
 `the enemy` reads the mark in the lookout's words with her range in cables by his estimate; `the range` compares in the standing dialect (`when the range is under 2 cables then fire as they bear`).
 
 ## The damage

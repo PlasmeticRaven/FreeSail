@@ -12262,3 +12262,58 @@ def test_truth_7_241_the_war_is_what_the_ship_knows_and_the_news_is_entered_in_h
     assert "by the pilot off Falmouth: peace made between Britain and Spain." in said
     assert "As she knows it now: Britain at war with the Batavian Republic and France;" in said
     assert "peace made between Britain and Spain" in w.papers.page("the news of the war").lines[-2]
+
+
+def test_truth_7_242_the_calls_before_a_stand_by_are_answered_with_their_results():
+    """The model officer's first point: an order given before the stand-by in the same
+    reply ran, and the door told it "not run". The harness keeps the results of the calls
+    that ran on the turn (`Reply.ran`), the doors answer them with those, and say "not
+    run" only of the calls after the stand-by."""
+    from freesail.agents.model import MODEL
+    from tests.test_agents import call, point_world, reply, stationed
+    from tests.test_local_runner import A_GLASS_S, llama, model_for
+
+    world = point_world()
+    h, _fake, _ = stationed(
+        world,
+        [
+            reply(
+                "",
+                call("journal", note="steady"),
+                call("stand_by", until="a glass"),
+                call("readings"),
+            ),
+            "Awake.",
+        ],
+    )
+    assert h.agent.standing_by
+    turn = next(t for t in reversed(h.turns) if t.role == MODEL)
+    assert [r["name"] for r in turn.content.ran] == ["journal"]
+    world.run(A_GLASS_S)
+    answers = [x["content"] for x in model_for(llama([])).messages(h.turns) if x["role"] == "tool"]
+    assert answers[0] == "Noted in the journal."
+    assert answers[1].startswith("Standing by: this ended your turn")
+    assert answers[2] == "Not run: a stand-by earlier in the reply ended your turn."
+
+
+def test_truth_7_243_in_action_a_notable_event_is_a_hit_a_strike_or_a_change_of_state():
+    """The model officer's fourth point, with the owner's "the flow of the game through the
+    log" as the measure: the firer's minute line is notable when a shot struck her or the
+    fire opened, routine when the minute's shot all missed; a shot that struck us is
+    notable, urgent when it killed or carried away a spar; at quarters the trimmers' yard by
+    yard is routine. So a stand-by on 'a notable event' is not woken by every discharge."""
+    w, v, enemy, battery = _two_cutters_at_pistol_shot()
+    w.submit("fire as they bear")
+    w.run(600)
+    fired = [e for e in w.log if e.kind == "action.fired"]
+    assert fired and fired[0].severity is Severity.NOTABLE
+    assert all(
+        e.severity
+        is (Severity.NOTABLE if (e.data.get("struck") or e is fired[0]) else Severity.ROUTINE)
+        for e in fired
+    )
+    assert all(
+        e.severity in (Severity.NOTABLE, Severity.URGENT)
+        for e in enemy.log
+        if e.kind == "action.hit"
+    )

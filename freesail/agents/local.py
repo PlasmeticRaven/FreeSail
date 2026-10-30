@@ -650,6 +650,7 @@ class LocalModel:
         out: list[dict[str, Any]] = []
         last_ids: list[str] = []
         last_calls: tuple[ToolCall, ...] = ()
+        last_ran: tuple[dict[str, Any], ...] = ()
         # the readings as the samples so far make them, and for each message of a sample
         # that carries only the changes, the same sample with every reading (package 31c)
         picture: dict[str, Any] = {}
@@ -657,17 +658,25 @@ class LocalModel:
         pinned: set[int] = set()  # the handover note folded in after the brief
 
         def answer_the_ids() -> None:
-            # a turn that ended on a stand-by has no results (package 28c); the protocol
-            # wants every call answered, so the ids are answered in words
+            # a turn that ended on a stand-by has no results turn (package 28c); the
+            # protocol wants every call answered: the calls before the stand-by with the
+            # results they returned (`Reply.ran`, kept by the harness), the stand-by with
+            # its words, and only the calls after it with "not run"
             nonlocal last_ids
-            for cid, c in zip(last_ids, last_calls, strict=False):
-                content = (
-                    f"Standing by: this ended your turn ({TURN_ENDS_WORDS[0].lower()}"
-                    f"{TURN_ENDS_WORDS[1:-1]}), and the next message is the sample that "
-                    "ended the stand-by."
-                    if c.name == "stand_by"
-                    else "Not run: a stand-by earlier in the reply ended your turn."
-                )
+            for k, (cid, c) in enumerate(zip(last_ids, last_calls, strict=False)):
+                if k < len(last_ran):
+                    value = last_ran[k].get("result")
+                    content = (
+                        value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+                    )
+                elif c.name == "stand_by":
+                    content = (
+                        f"Standing by: this ended your turn ({TURN_ENDS_WORDS[0].lower()}"
+                        f"{TURN_ENDS_WORDS[1:-1]}), and the next message is the sample that "
+                        "ended the stand-by."
+                    )
+                else:
+                    content = "Not run: a stand-by earlier in the reply ended your turn."
                 out.append({"role": "tool", "tool_call_id": cid, "content": content})
             last_ids = []
 
@@ -679,6 +688,7 @@ class LocalModel:
                 answer_the_ids()
                 r: Reply = t.content
                 last_calls = r.calls
+                last_ran = r.ran
                 last_ids = [f"call_{i}_{k}" for k in range(len(r.calls))]
                 msg: dict[str, Any] = {"role": "assistant", "content": r.text or ""}
                 if r.calls:

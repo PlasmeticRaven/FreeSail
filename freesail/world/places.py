@@ -914,10 +914,26 @@ class Papers:
             from freesail.world.signals import books_for
 
             books = books_for(world)
+            if books.root == "basic":
+                # the common book of no nation: whose it is not, said first (the model
+                # officer's fifth point: a generic list taken for the ship's own)
+                head = (
+                    "The common signal book, in the period's general form and no nation's own: "
+                    "this ship's nation keeps no book of her own in the game, so hers is this "
+                    "one, and no other ship's numbers are to be read from it; "
+                )
+            else:
+                nation = getattr(world, "nations", None)
+                name = (
+                    nation.get(books.nation).name
+                    if nation is not None and books.nation in nation.nations
+                    else books.nation
+                )
+                head = f"The {name} signal books, this ship's own by her service ({books.system}): "
             lines = [
-                f"The {books.nation} signal books ({books.system}): the day signals by number, "
-                "the night and fog signals, the convoy's instructions; a signal is made by its "
-                "meaning ('make the signal to tack in succession')."
+                head + "the day signals by number, the night and fog signals, the convoy's "
+                "instructions; a signal is made by its meaning ('make the signal to tack in "
+                "succession')."
             ]
             lines.extend(
                 f"  No. {e.number}: {e.meaning}" + (f" ({e.original})" if e.original else "")

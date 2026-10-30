@@ -1333,7 +1333,14 @@ class Runner:
             data["reason"] = reason
         if inst.script is not None:
             data.update(inst.script.data())
-        ship.note(outcome.severity, outcome.kind, text, inst.subject_id, data)
+        severity = outcome.severity
+        if outcome.kind == "yard.braced" and _at_quarters(ship):
+            # the flow of the game through the log (the model officer's fourth point): at
+            # quarters the trimmers' yard by yard is the routine of the action, and a
+            # stand-by on 'a notable event' is not woken by each; a trim's one line for all
+            # of them (`_group_done`) and the sails set or taken in stay notable
+            severity = "routine"
+        ship.note(severity, outcome.kind, text, inst.subject_id, data)
 
     def _format_context(self, inst: Instance) -> dict[str, Any]:
         ship = self.ship
@@ -1492,6 +1499,12 @@ def gerund(verb: str) -> str:
     ):
         return v + v[-1] + "ing"
     return v + "ing"
+
+
+def _at_quarters(ship: Ship) -> bool:
+    """Whether the ship is at quarters (the drum beaten and the hands at the guns)."""
+    quarters = (getattr(ship, "extra", None) or {}).get("quarters")
+    return bool(quarters is not None and getattr(quarters, "at_quarters", False))
 
 
 def _record(ship: Ship, note: Any) -> None:

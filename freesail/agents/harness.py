@@ -150,7 +150,7 @@ import json
 import re
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any
 
 from freesail.agents import tools
@@ -1943,6 +1943,18 @@ class Harness:
     # its first, and in a checkpoint from before
     _replied_tick: int | None = None
 
+    def _keep_ran(self, ran: list[dict[str, Any]]) -> None:
+        """The results of the calls that ran before this reply's stand-by, kept on the
+        model's turn (`Reply.ran`), so that every door answers those calls with what they
+        returned and says "not run" only of the calls after the stand-by."""
+        if not ran:
+            return
+        for i in range(len(self.turns) - 1, -1, -1):
+            t = self.turns[i]
+            if t.role == MODEL:
+                self.turns[i] = Turn(MODEL, replace(t.content, ran=tuple(dict(r) for r in ran)))
+                return
+
     def _with_the_cost(self, line: str) -> str:
         """**The cost of thinking** (package 58a; the owner's observation of 2026-10-17 and
         the lugger officer's account of time, the cold review's §7.2): the line closes
@@ -2223,6 +2235,10 @@ class Harness:
             # what ran before it, said when the stand-by ends (package 30b)
             self._ran_before_stand_by = _ran_before(results[:-1])
             self.stood_results.append((len(self.turns) - 1, results))
+            # ...and answered to the model with its own results at the doors (the model
+            # officer's first point: an order given before the stand-by ran, and was told
+            # "not run"): the turn kept carries them, the calls after the stand-by none
+            self._keep_ran(results[:-1])
             if self._nudge_unread and self._nudge_text:
                 # a nudge given in this same reply went with a result the stand-by has
                 # dropped: the sample that ends the stand-by carries it

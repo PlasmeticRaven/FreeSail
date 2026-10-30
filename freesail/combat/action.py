@@ -108,7 +108,15 @@ def tick_action(world: Any) -> None:
         line = battery.minute_line(tick)
         if line is not None:
             text, data = line
-            world.record(Severity.NOTABLE, "action.fired", text, data=data)
+            # the flow of the game through the log (the model officer's fourth point: a
+            # stand-by on 'a notable event' woken by every discharge at 1x): the minute's
+            # fire is notable when a shot struck her, or when it opened the fire on her;
+            # a minute of shot that fell short, over or wide is the routine of an action
+            opened = bool(target is not None and target.id not in opened_before)
+            notable = bool(data.get("struck")) or opened or bool(data.get("sea"))
+            world.record(
+                Severity.NOTABLE if notable else Severity.ROUTINE, "action.fired", text, data=data
+            )
         _damage_minute(world, ship, tick)
         _judge_morale(world, ship, battery, tick)
         _watch_struck(world, battery, tick)
