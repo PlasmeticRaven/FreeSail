@@ -437,6 +437,9 @@ DANGER_AHEAD_STATES = frozenset(
     {"on passage", "beating", "keeping station", "in company", "running for shelter"}
 )
 DANGER_AHEAD_AGAIN_S = 600
+# A mark engaged and chased beyond the engaging distance is a chase whose staleness gives it up
+# (package 88, found on item 1; `Judgement._read_chase`): the law's switch for the bisection.
+ENGAGING_CHASE_STALE = True
 BOW_POINTS = 4  # on the bow: within four points of her head
 
 
@@ -1850,7 +1853,7 @@ class Judgement:
         log = getattr(self, "_chase_log", None)
         if log is None:
             log = self._chase_log = []
-        if self.state == "engaging" and self._stranger is not None:
+        if self.state == "engaging" and self._stranger is not None and ENGAGING_CHASE_STALE:
             # package 88 (found on item 1, the lead's ruling): a mark engaged and chased
             # beyond the engaging distance is a chase like any other (the trade trial's
             # French brig hung two to four miles astern of the faster schooner for seven

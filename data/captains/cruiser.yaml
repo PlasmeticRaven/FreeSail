@@ -88,6 +88,7 @@ thresholds:
   road_cables: {value: 3, source: "spec M6 §4"}
   wear_wind_kn: {value: 30, source: "as the King's ship's (package 45)"}
   aback_recover_minutes: {value: 3, source: "as the King's ship's (package 88): Luce 1866 ch. XXV, 'To Box Off'; the minutes judgement"}
+  danger_ahead_nm: {value: 1.5, source: "as the King's ship's (package 88): Falconer 1780, CLAWING; the distance judgement"}
   tack_regardless_nm: {value: 2, source: "as the King's ship's (package 45)"}
   sail_again_kn: {value: 25, source: "as the King's ship's (package 45)"}
   sail_again_minutes: {value: 30, source: "as above; halved when the glass is rising"}

@@ -95,6 +95,11 @@ thresholds:
   # and boxed off if she lies so another while (freesail/world/captains.py
   # `_aback_with_no_way`)
   aback_recover_minutes: {value: 3, source: "Luce 1866 ch. XXV, Wind Baffling, 'Coming to against the Helm' and 'To Box Off' (OCR lines 28496 to 28523): the helm and head sheets serve 'if the vessel has headway on', else 'Up mainsail and spanker! ... Brace abox the head yards!'; the three minutes judgement: a minute more than the helmsman's own box-off when pressed aback (freesail/evolutions/scripts.py BOX_OFF_AFTER_S), so that his comes first where it can"}
+  # Package 88 (item 2): the land on her bow by the lookout, or with no land in sight the land
+  # or a charted danger on her course by the chart at the account, within this distance puts
+  # her about (freesail/world/captains.py `_danger_ahead_by_chart`), tacked where a wear would
+  # cost the ground (`tack_regardless_nm`, now read from this file by freesail/orders/navigation.py)
+  danger_ahead_nm: {value: 1.5, source: "Falconer 1780, CLAWING (OCR line 5576): beating off a lee-shore 'so as to acquire a sufficient distance from it'; the mile and a half judgement: a tack of eight minutes and a half in stays (the convoy's brig, package 86) at the seven knots the lee-shore trial's frigate struck the Four at is a mile, and half a mile for the stays missed"}
   tack_regardless_nm: {value: 2, source: "the planner's danger berth doubled: wearing a ship's length and more to leeward with the land two miles off is the ground she cannot spare; judgement"}
   # Sail after the gale (item 5): the wind under `sail_again_kn` for `sail_again_minutes`
   # and sail is made again whatever his state (Luce 1884 ch. XXIX p. 479, 'After the gale

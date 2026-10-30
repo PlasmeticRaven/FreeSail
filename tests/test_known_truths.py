@@ -12861,3 +12861,46 @@ def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxe
     old.run(2400)
     assert not [e for e in old.log if e.kind == "ship.boxed_off" or "aback with no way" in e.text]
     assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
+
+
+def test_truth_7_341_among_the_molene_islands_she_is_tacked_and_never_worn_onto_the_land(
+    monkeypatch,
+):
+    """Package 88, item 2 (57's station gale: the frigate beating for her station off Ushant
+    in a westerly gale was worn round with the land two miles under her lee, would not come
+    round, and set down on the islands of the Molène passage). Two miles west of Molène in a
+    westerly of 34 knots, her head N by W at four knots, the land a mile on her starboard
+    bow: `put her about` tacks her ("where wearing would lose the ground"), where by the wind
+    alone it would wear her; and a course shaped on the other tack that she has not the way
+    to stay for is not worn round but kept full and by on her tack to claw off. The room a
+    wear takes is the doctrine's `tack_regardless_nm` (two miles) over the lee half, by the
+    lookout's nearest land, the coast by the chart at the account and the charted dangers
+    (`navigation.no_room_to_wear`); with the law's switch off (`navigation.WEAR_ROOM`) she
+    is worn as before."""
+    from freesail.orders import navigation as N
+
+    sc = Scenario(
+        start_time=datetime(1805, 1, 12, 22, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=34.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 48.397, "lon_deg": -5.03},
+        region="channel-west",
+        ports=["brest"],
+        nation="britain",
+        ship_heading_deg=350.0,
+        ship_speed_kn=4.0,
+    )
+    w = make_world(SEED, "data/ships/frigate-36.yaml", sc)
+    w.run(120)
+    assert N.no_room_to_wear(w.ship) == "the land a mile under her lee"
+    verb, why = N.put_about_choice(w.ship)
+    assert verb == "tack ship" and "where wearing would lose the ground" in why, why
+    # the other tack's close-hauled course, SSW, with too little way to stay: kept full and by
+    w.ship.dyn.u = w.ship.dyn.speed = units.knots_to_ms(1.5)
+    judged = N.judge_course(w.ship, math.radians(200.0), helm_order=False)
+    assert judged.branch == "full_and_by" and "no room to wear" in judged.words, judged
+    monkeypatch.setattr(N, "WEAR_ROOM", False)
+    assert N.put_about_choice(w.ship)[0] == "wear ship"
+    assert N.judge_course(w.ship, math.radians(200.0), helm_order=False).branch == "wear"
