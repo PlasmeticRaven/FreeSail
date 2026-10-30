@@ -318,13 +318,13 @@ REGIONS: dict[str, dict[str, Any]] = {
             "bayona": {"south": 42.10, "north": 42.14, "west": -8.88, "east": -8.82},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
-        # GEBCO's fill raised to the chart's datum by the coast's own mean level, 2.5 m:
-        # SHOM's RAM gives NM 2.48 at Arcachon, 2.53 at Boucau-Bayonne and 2.51 at
-        # Saint-Jean-de-Luz (3.33 at Le Verdon); the Spanish coast's not read, the same
-        # taken (judgement). Not the world's, which over the block is the Channel's blend,
-        # 3.9 to 6.8 m, while the block's gauges are held
+        # GEBCO's fill raised to the chart's datum by the world's mean level, the block's
+        # own gauges' since package 89 (2.48 to 3.88 m within the bounds: SHOM's RAM's NM
+        # 2.48 at Arcachon, 2.53 at Boucau-Bayonne, 3.33 at Le Verdon; the Spanish gauges'
+        # levels unread, the eleven's in the blend over Galicia). Package 39c's one figure,
+        # `fill_mean_level_m: 2.5`, was made while the gauges were held and the world's
+        # level the Channel's blend; package 93 took it out for the rule
         "fill_to_chart_datum": True,
-        "fill_mean_level_m": 2.5,
         # the box takes in Castile, León and the Landes: their dry tiles are the corridor's
         "skip_dry_tiles": True,
     },

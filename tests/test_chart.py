@@ -1697,14 +1697,20 @@ def test_biscay_south_abuts_its_neighbours_lists_none_of_their_tiles_and_skips_t
     two of the southern row that Portugal lists are theirs (the seam rule), not written
     and not listed; the 59 tiles with no water at the datum (Castile, León, the Landes)
     are computed and not written (`skip_dry_tiles`), the corridor answering there; GEBCO's
-    fill raised by the French gauges' mean level, 2.5 m (`fill_mean_level_m`); no
-    override, no period sheet's datum having been read; under the region's size; the
-    checks pass."""
+    fill raised by the world's mean level, the block's own gauges' (package 93: 39c's one
+    figure, the French gauges' 2.5 m in `fill_mean_level_m`, made while the gauges were
+    held, gave way to the rule; at Arcachon the raise is its gauge's 2.48 m); no override,
+    no period sheet's datum having been read; under the region's size; the checks pass."""
     tool = build_tool()
     entry = manifest["regions"][SOUTH]
     assert entry["bounds"] == {"south": 42.0, "north": 45.9, "west": -9.33, "east": -0.9}
     assert entry["bounds"] == tool.REGIONS[SOUTH]["bounds"]
-    assert entry["skip_dry_tiles"] is True and entry["fill_mean_level_m"] == 2.5
+    assert entry["skip_dry_tiles"] is True and entry["fill_to_chart_datum"] is True
+    assert "fill_mean_level_m" not in entry and "fill_mean_level_m" not in tool.REGIONS[SOUTH]
+    grid = tool.mean_level_grid({"south": 44.6, "north": 44.7, "west": -1.2, "east": -1.1})
+    r = int((44.66 - grid.south) / grid.cell)
+    c = int((-1.16 - grid.west) / grid.cell)
+    assert float(grid.values[r, c]) == pytest.approx(2.48, abs=0.02)
     mine = {lv: {t["name"] for t in ts} for lv, ts in entry["tiles"].items()}
     for other in ("channel-west", MID, BISCAY, "portugal"):
         tiles = manifest["regions"][other]["tiles"]

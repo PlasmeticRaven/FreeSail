@@ -13506,3 +13506,39 @@ untouched. **The block's tests**: the six files fast 203 passed, slow 11 passed;
 45c's pilot off Aix (`test_ports.py`, 89's step 4d) among the fast, passed. **The scenario**
 `biscay-north.yaml`, 9 hours with `--reckoning`, on the head's tree and this one: **the same
 log byte for byte**, 348 lines, digest `28c449dbbda73eb1`.
+
+### The region `biscay-south`
+
+The recipe loses `fill_mean_level_m: 2.5` (above). The control: the head's tool on today's
+fetch gives the committed tiles byte for byte (39c's were written by `save_tile`). `python
+tools/build_charts.py --region biscay-south --reuse-world`: the checks as printed (136 of
+136 features, ids unique, no override, the fetch box covering the tiles, "12 kept");
+"GEBCO's fill raised to the chart's datum by the world's mean level, 1.89 to 6.83 m"
+(within the bounds 2.48 to 3.88: the French coast its gauges' 2.48 to 3.33, Galicia's and
+the Cantabrian coast's the eleven's blended with them, the Spanish gauges' levels unread;
+the 6.83 in the interior of Spain south of 42 N and east of 6 W, outside every block, a dry
+tile not written); 59 dry tiles not written, as before. **The shore's sweep 5,058 cells in
+305 places** (the old raise's, by the control, 5,675 in 310): the largest the marshes of
+Santoña (177; 168), the ría of Arousa's head (139; 160), the Ulla's at Padrón (89 and 82;
+100) and the Arcachon basin's shores (89, 84, 80): water.
+
+| | Old (39c, 2.5 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 129 tiles, 16.54 MB | 129 tiles, 16.89 MB |
+| level 3 | 30 tiles, 2.27 MB | 30 tiles, 2.26 MB |
+| coast | 878 pieces, 12,917 points, 363,313 bytes | 884 pieces, 13,098 points, 367,692 bytes |
+| tiles changed | | 90 of level 2, all 30 of level 3 |
+| cells changed | | 4,567,212 at level 2, 4,245,383 at level 3, the largest 2.00 m |
+| below the datum to above | | 1,152 at level 2, 7,690 at level 3 |
+| above the datum to below | | 1 at level 2 |
+
+`git status` after the build: the region's 120 changed tiles, its coast, the manifest's
+entry (`fill_mean_level_m` gone from it) and fetch records, the recipe; no other region's
+tile, coast or index, the index and every port file and mark untouched. **One test recast**:
+`test_chart.py::test_biscay_south_abuts_its_neighbours_lists_none_of_their_tiles_and_skips_the_dry`
+asserted the manifest's `fill_mean_level_m == 2.5`; it now asserts the key gone from the
+entry and the recipe and the raise at Arcachon its gauge's 2.48 m within 2 cm, every other
+assertion kept. **The block's tests**: the six files fast 203 passed after the recast (one
+failed before it, the above), slow 11 passed; truths 7-260 to 7-269, 10 passed. **The
+scenario** `biscay-south.yaml`, 30 hours: **the same log byte for byte**, 880 lines, digest
+`922f024f1d07d067`.
