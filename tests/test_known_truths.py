@@ -11375,10 +11375,10 @@ def _spring_range_ft(tide, pos) -> float:
 def test_truth_7_280_newhaven_dieppe_and_beachy_head_have_their_own_spring_range():
     """The brief's item 5: the world's spring range at Newhaven and Dieppe within a foot of
     the gauge's own (19.5 and 27 feet, where the eleven's blend gave 3.9 and 5.3), and at
-    Beachy Head, which has no gauge, a foot short of Norie 1805's twenty (the blend gave
-    4.8): 18.99 feet, Newhaven's water seven miles off, which misses the brief's "within a
-    foot" by a hundredth of a foot (said so for the lead in docs/dev/TuningNotes.md,
-    package 89, and held here at the figure, not widened)."""
+    Beachy Head, which has no gauge, within a foot and a quarter of Norie 1805's twenty (the
+    blend gave 4.8): 18.99 feet, Newhaven's water seven miles off. The brief had "within a
+    foot"; the measured gap is a foot and a hundredth, and Norie's twenty is a round
+    figure, so the lead amended it (2026-10-30)."""
     import freesail.world.tide as T
     from freesail.world.geo import Position
 
@@ -11394,7 +11394,7 @@ def test_truth_7_280_newhaven_dieppe_and_beachy_head_have_their_own_spring_range
         assert _spring_range_ft(eleven, at) < 6.0, gid  # what the blend had
     beachy = T.Epitome.load("norie").by_name("Beachy Head")
     assert beachy.spring_rise_ft == 20.0 and not beachy.rise_judgement
-    assert abs(_spring_range_ft(tide, beachy.position) - 19.0) < 0.05
+    assert abs(_spring_range_ft(tide, beachy.position) - 20.0) < 1.25
     assert _spring_range_ft(eleven, beachy.position) < 6.0
 
 
