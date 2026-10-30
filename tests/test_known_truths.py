@@ -7859,8 +7859,9 @@ def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_bei
     The head sail straining at its bolt-ropes is taken in by the captain before it blows
     out (the trial lost its fore topmast staysail at 08:29 before); she is hove to for
     weather and lies a-try under the close-reefed main topsail and the staysails, as the
-    book has it, and in the four hours and more she lies so she is never taken aback, no
-    sail is lost, and she drifts at under two knots on the mean. What she does when she
+    book has it, and in the hours she lies so (four and more before package 88, three and a
+    half since) she is never taken aback, no sail is lost, and she drifts at under two knots
+    on the mean. What she does when she
     fills away for the station in the gale's tail is the trial's own pin, an expected
     failure until the lead has played it (`tests/test_captain_trials.py`)."""
     from freesail.physics.hull import hull_state
@@ -7884,7 +7885,11 @@ def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_bei
     taken = [e for e in w.log if e.text.endswith("(straining at the bolt-ropes).")]
     assert taken and "taking in the fore topmast staysail" in taken[0].text
     assert not [e for e in w.log if e.kind in ("sail.blown_out", "sail.split")]
-    assert lying >= 4 * 60 and aback == 0
+    # package 88 (item 2, by bisection: `navigation.WEAR_ROOM` off gives 243 minutes again):
+    # tacked and not worn with Ushant two miles under her lee in the forenoon, she reaches
+    # the lee-shore line sooner and is filled away at 28560 (30780): 207 minutes lying a-try,
+    # never aback, 1.83 knots on the mean (243 minutes and 1.81 before; four hours the band)
+    assert lying >= 200 and aback == 0
     assert sum(knots) / len(knots) < 2.0
     assert not [e for e in w.log if e.kind == "ship.aground"]
 

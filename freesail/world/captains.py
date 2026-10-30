@@ -3042,15 +3042,16 @@ class Captain(Judgement):
             )
             if off <= BOW_POINTS * 11.25 and float(near["metres"]) <= reach:
                 what = f"{near.get('words') or 'the land on her bow'}"
-        step = units.CABLE
-        k = 1
-        while not what and not p.land_in_sight and k * step <= reach:
-            depth = chart.depth_at(dest(here, p.heading_deg, k * step))
-            if depth is not None and depth <= 0.0:
-                what = f"the land ahead by the chart, {plain_cables(k * step)}"
-                reach = k * step
-                break
-            k += 1
+        if not what and not p.land_in_sight:
+            # the chart's coast tried along her course, as the planner tries a line
+            # (`chart.line_shore`: the captain's own paper, the points the account's)
+            shore = chart.line_shore(here, dest(here, p.heading_deg, reach), 0.0)
+            if shore is not None and shore[2]:
+                from freesail.world.geo import bearing_and_distance as bd
+
+                along_m = bd(here, shore[1])[1]
+                what = f"the land ahead by the chart, {plain_cables(max(along_m, units.CABLE))}"
+                reach = along_m
         hull = getattr(world.ship, "hull", None)
         draught = float(hull.spec.draught_m) if hull is not None else 2.0
         found = (
