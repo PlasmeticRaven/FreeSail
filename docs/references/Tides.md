@@ -25,8 +25,9 @@ that a block's figures move no other water. Within ten miles of a block's edge w
 meets charted water the eleven alone serve (1 W off the Wight, 48 N in the Iroise), the
 block's water rises from the eleven's to its own, each constituent's amplitude and phase
 by the smoothstep of the distance's fraction of the band (package 94; judgement), so that
-no step stands at the seam. Bournemouth and Portsmouth (39a's, in
-`channel-mid`) stay under `held_gauges:`, read by nothing, for the lead's ruling.
+no step stands at the seam. Bournemouth and Portsmouth (39a's, in `channel-mid`), held
+until package 94, serve the manifest's tide region `solent` (the Solent, Spithead and Poole
+bay: bounds and no tiles, for the gauges' membership alone).
 
 The streams (`data/tides/streams.yaml`) are rates and directions by area, each entry with
 its `source`: the headland table of Bowditch 1802 ('Of the Tides', the rates off the

@@ -55,7 +55,9 @@ meets charted water no block holds, `Tide.open_edges`) the block's water rises f
 eleven's alone to its own, each constituent's amplitude and phase and the level by the
 smoothstep of the distance's fraction of the band (`Tide.taper_at`), so that no step
 stands at the seam; not where the eleven are beyond their reach, and nothing outside every
-block changes. The weight is the cell's centre's, so the cache keys it by the cell.
+block changes. The weight is the cell's centre's, so the cache keys it by the cell. A
+gauge's block may be a tide region of the manifest (`tide_regions:`, bounds and no tiles,
+`region_bounds`): the Solent's, for Bournemouth and Portsmouth.
 """
 
 from __future__ import annotations
@@ -803,7 +805,8 @@ _REGION_BOUNDS: dict[str, dict[str, tuple[float, float, float, float]]] = {}
 
 def region_bounds(path: str | Path = MANIFEST_PATH) -> dict[str, tuple[float, float, float, float]]:
     """The regions' bounds of the chart's manifest (south, north, west, east), read once a
-    process (package 89: the blocks a gauge is kept to)."""
+    process (package 89: the blocks a gauge is kept to), and the manifest's tide regions,
+    bounds with no tiles for the gauges' membership alone (package 94: `solent`)."""
     key = str(path)
     found = _REGION_BOUNDS.get(key)
     if found is not None:
@@ -812,7 +815,7 @@ def region_bounds(path: str | Path = MANIFEST_PATH) -> dict[str, tuple[float, fl
     doc = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=loader) or {}  # noqa: S506
     out = {
         str(name): tuple(float(r["bounds"][k]) for k in ("south", "north", "west", "east"))
-        for name, r in (doc.get("regions") or {}).items()
+        for name, r in {**(doc.get("regions") or {}), **(doc.get("tide_regions") or {})}.items()
         if r.get("bounds")
     }
     _REGION_BOUNDS[key] = out

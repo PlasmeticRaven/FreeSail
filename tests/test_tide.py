@@ -577,15 +577,21 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     """The brief: TICON's gauges of the block read as package 34 read the file, the
     eleven gauges and their figures unmoved. The file has Weymouth, St Helier, Saint-Malo
     and Cherbourg (four of the eleven) and Bournemouth and Portsmouth beside them, which
-    are held, read by nothing (a twelfth gauge would move every Channel position's
-    blend); it has none at St Peter Port, Dartmouth or Portland."""
+    were held, read by nothing (a twelfth gauge would move every Channel position's
+    blend), and since package 94 serve the tide region `solent` alone; it has none at St
+    Peter Port, Dartmouth or Portland."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # the Channel east's two (Biscay north's nine, package 39b, are held beside them;
-    # the Channel's east block's six, package 79b, east of 1 W)
-    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0}
+    # the Channel east's two (the Channel's east block's six, package 79b, east of 1 W)
+    held = {
+        g["id"]: g
+        for g in doc["gauges"]
+        if g.get("block") and g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0
+    }
     assert set(held) == {"bournemouth", "portsmouth"}
+    assert all(g["block"] == "solent" for g in held.values())
+    assert "held_gauges" not in doc
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
     assert {"weymouth", "st-helier", "saint-malo", "cherbourg"} <= {g.id for g in tide.gauges}
@@ -650,11 +656,11 @@ def test_the_blocks_gauges_are_read_and_serve_their_own_water_and_not_the_channe
         assert g["record"].startswith("GESLA-2, REFMAR") and 3.0 <= g["mean_level_m"] <= 4.0
         for name in ("M2", "S2", "N2"):
             assert 0.2 < g[name]["amplitude_m"] < 2.0 and 70.0 < g[name]["phase_deg"] < 150.0
-    # (north of 42 N and west of 3 E: the Channel east's two of 39a, still held, the
+    # (north of 42 N and west of 3 E: the Channel east's two of 39a, the Solent's since 94, the
     # Channel's east block's six of 79b and Biscay south's eleven of 39c beside these)
     north_of_42 = [
         g
-        for g in doc["gauges"] + doc["held_gauges"]
+        for g in doc["gauges"]
         if g["lat_deg"] >= 42.0
         and g["lon_deg"] < 3.0
         and g["id"] not in {x.id for x in tide.gauges}
@@ -1089,7 +1095,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 73
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 75
     for g in blocks:
         s, n, w, e = bounds[g["block"]]
         assert s <= g["lat_deg"] <= n and w <= g["lon_deg"] <= e, g["id"]
@@ -1106,6 +1112,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         "gulf-of-lion",
         "ligurian-sea",
         "tyrrhenian",
+        "solent",  # package 94: a tide region of the manifest, bounds and no tiles
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None

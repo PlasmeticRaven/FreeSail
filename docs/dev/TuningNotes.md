@@ -13542,3 +13542,89 @@ against the pin `ed48ca3d61e52f20` the one failure on both trees (79d's, 84's an
 records have it). The naval cruise's Diamond patrols across 48 N within the Iroise's band:
 her stream there is the taper's now, and the cruise's digests stand. `test_tide.py` and
 `test_islands.py` whole; the truths 7-270 to 7-312 with `--slow`, 38 passed.
+
+### Item 4: Bournemouth and Portsmouth, the Solent's tide region
+
+**Taken.** The manifest may carry a region with bounds and no tiles for the gauges'
+membership alone: `tide_regions:` (a title and bounds), read by `Tide.region_bounds` beside
+the chart's `regions:` (the small change in the tide's reader of the manifest), and read by
+nothing of the chart (`Chart` and `load_chart` read `regions:` and `charts:`). **One more
+change than the brief names, said so:** the manifest is written whole by
+`tools/build_charts.py` at every build and drops a key the tool does not know, so a
+region's rebuild (package 93's, beside this) would have dropped the tide region; the tool
+writes it from `TIDE_REGIONS` beside `REGIONS`, building nothing of it. The manifest's
+text gained the block after `corridors:` in the form the tool writes; no region's entry,
+tile list or count moved.
+
+**The region** `solent`: 50.62 to 51 N and 2.2 to 1 W, **judgement** from the gauges' places
+and the Wight's shores: Bournemouth (1.87 W) twelve miles inside its west bound, past St
+Alban's Head; Portsmouth's gauge and Spithead nine miles inside its south bound, south of
+the Wight's north shore and of the Needles; its east bound the Channel east's 1 W; its
+north channel-mid's 51 N; and **north of 50.6 N**, where truth 7-282 holds the eleven's
+water a mile west of 1 W to the bit (the brief's binding). The two gauges moved from
+`held_gauges:` (now gone) into `gauges:` with `block: solent`, no figure moved (checked by
+loading both files); their mean levels unread (null), so the level there is the eleven's,
+as before. Under item 3's taper: its south and west bounds open onto channel-mid's water
+and are tapered; its east bound meets the Channel east at 1 W and is a seam between two
+blocks.
+
+**What the Solent reads after** (M2 amplitude in metres and phase in degrees; the world's
+spring range, feet; the taper's weight):
+
+| Place | Before (the eleven) | After | Range before | after | Weight |
+|---|---|---|---|---|---|
+| Spithead | 1.01 at 189.1 | 1.39 at 324.6 | 9.4 | 12.0 | 0.99 |
+| Portsmouth's gauge | | its own 1.41 at 326.7 | | | 1.0 |
+| Cowes | 1.03 at 187.6 | 1.18 at 317.2 | 9.6 | 10.1 | 0.95 |
+| Southampton | 0.98 at 185.5 | 0.92 at 317.8 | 9.2 | 7.8 | 1.0 |
+| St Helens road | 1.04 at 190.1 | 1.17 at 259.5 | 9.7 | 10.4 | 0.47 |
+| Yarmouth | 1.02 at 186.9 | 0.78 at 257.1 | 9.5 | 7.0 | 0.56 |
+| the Needles | 1.01 at 187.1 | 0.91 at 204.7 | 9.5 | 8.5 | 0.18 |
+| Poole bar | 0.84 at 186.4 | 0.76 at 201.5 | 8.0 | 7.3 | 0.15 |
+
+**Spithead's high waters** on 12 June 1805: by the eleven 06:56 and 19:11, by Portsmouth's
+gauge alone 11:33 and 23:49 (four hours and a half, 39a's finding); now **11:29 and
+23:45**, within four minutes of the gauge's (truth 7-313). The western Solent and the
+Needles, within the band of the region's south bound, read between the eleven's and the
+gauges' (the Needles channel opens on the Channel there; a finding, not mended).
+
+**The Solent's judged rises** (the 37j rule, the world's spring range at the place to the
+foot), old beside new: Norie's Spithead **10 to 12** (11.83 feet), Moore's Spithead **10 to
+12**, Moore's Portsmouth **9 to 12** (12.10), Moore's Pool **8 to 5** (5.36); Moore's St
+Helen's 10 kept (10.4). The given rises (Norie's Portsmouth 18, St Helen's 16, Poole 7) and
+every hour as they were. No other judged rise moved.
+
+**The Downs to Spithead** (`spithead.yaml` at seed 7, truth 7-279's run; the head, a clean
+worktree of `21a25e7`; item 3's tree; this tree):
+
+| | The head | Item 3 | Item 4 |
+|---|---|---|---|
+| St Helens for the night | 21h28m, nine fathoms and a half | 21h38m, ten | 21h38m, nine and a half |
+| The Portsmouth pilot aboard | 24h45m | 24h47m | 24h50m |
+| Spithead | 26h08m, twelve fathoms | 26h04m, eleven and a half | 26h06m, thirteen |
+| The pilot leaves | 26h30m | 26h26m | 26h28m |
+| Off the spot at the end | 0.84 mile | 0.77 | 0.80 |
+| The log's lines | 1,183 | 1,173 | 1,209 |
+
+No grounding on any tree; the truth's limits (three anchorings, the pilot, 27 hours, half a
+mile of Spithead's mark) held on each. (The log says "in 13 fathoms" in figures where it
+says "twelve" and "eleven and a half" in words: `fathoms_words` gives whole figures above
+twelve so; the words', not this package's.)
+
+**For the lead: the seam at 1 W north of 50.62 N.** The Solent's water meets the Channel
+east's at 1 W off Chichester, Hayling and Selsey's west, and the taper, which is the
+inside of a block against the eleven's, does not smooth a seam between two blocks: a cable
+either side of 1 W the heights differ by **0.41 ft at 50.65 N, 3.4 at 50.75, 3.6 at 50.85,
+3.0 at 50.95** through a day of springs (with item 3 alone, the water west of 1 W the
+eleven's, 0.04 to 0.05 ft). Spithead cannot have Portsmouth's tide unless the Solent's
+water reaches 1 W whole there (the band of an open edge at 1 W would leave Spithead, four
+miles from it, at a third of the gauges' weight). Two ways were measured and **not taken**,
+each going beyond the brief: (a) Portsmouth serving the Channel east too (`block: [solent,
+channel-east]`): the step 0.25 to 2.1 ft, Beachy Head 18.99 to 18.86 feet; (b) the eight
+gauges serving both (the six of the Channel east `[channel-east, solent]`, the two
+`[solent, channel-east]`): every seam within 0.05 ft (1 W at 50.65 to 50.95 N; 50.62 N at
+2.0, 1.5 and 1.2 W), Spithead as now, but the Channel east's water moves where Portsmouth
+weighs (Beachy Head 18.99 to **18.73**, past truth 7-280's "a foot and a quarter" of
+Norie's twenty; Shoreham 17.87 to 16.91, Moore's judged 18 to 17; the Downs 19.47 to 19.39;
+Newhaven, Dieppe and the Havre unchanged). (b) is the better water, at the cost of a
+block's truth re-measured; the lead's to rule.

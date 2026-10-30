@@ -161,10 +161,22 @@ region's, its tide and its weather are rows in tables that already reach its wat
    water reaches into the block (a ship of its other sail patrolling across the block's
    bound) say which, with the old digest beside the new, for the lead to rule; never
    re-pin to make it pass. Bournemouth and Portsmouth (package 39a) lie in `channel-mid`,
-   whose water west of 1 W the rule keeps the eleven's; they stay under `held_gauges:`,
-   read by nothing, by the lead's ruling of 2026-10-30 (channel-mid's passages are pinned
-   on the eleven; the options and the seam's step at 1 W in docs/dev/TuningNotes.md,
-   package 89). **The seam's taper** (package 94): where a block's bounds meet charted
+   whose water west of 1 W the rule keeps the eleven's, and were held under
+   `held_gauges:`, read by nothing, by the lead's ruling of 2026-10-30. **A tide region**
+   (package 94): the manifest may carry, under `tide_regions:`, a region with a title and
+   bounds and no tiles, for the gauges' membership alone; `Tide.region_bounds` reads it
+   beside the chart's regions, a gauge's `block:` may name it, and nothing of the chart
+   reads it (`Chart` and `load_chart` read `regions:` and `charts:` only). It is written
+   from `TIDE_REGIONS` in `tools/build_charts.py` at every build, beside `REGIONS`, so
+   that a region's rebuild keeps it (the manifest is written whole and drops a key the tool
+   does not know). The first is `solent`, 50.62 to 51 N and 2.2 to 1 W (judgement from the
+   gauges' places and the Wight's shores: Bournemouth twelve miles inside its west bound,
+   Spithead nine inside its south, and north of 50.6 N, where the eleven's water a mile
+   west of 1 W is a truth's), and Bournemouth and Portsmouth serve it (`block: solent`):
+   Spithead has Portsmouth's tide within minutes where the eleven's blend was four hours
+   and a half wrong. Where a tide region meets a block of the chart (the Solent and the
+   Channel east at 1 W north of 50.62 N) the seam is a seam between two blocks, and the
+   taper does not smooth it (docs/dev/TuningNotes.md, package 94, for the lead). **The seam's taper** (package 94): where a block's bounds meet charted
    water no block holds (a region's or the corridor's: 1 W where channel-mid meets
    channel-east, 48 N where Biscay north meets the Channel west, Biscay's and Portugal's
    ocean edges; not a seam between two blocks, and not an edge beyond which nothing is
@@ -449,8 +461,8 @@ Rance's mouth, four metres deeper in Bellin's day).
 
 **The tide, as read.** TICON's file holds, in the block's water, Weymouth, St Helier,
 Saint-Malo and Cherbourg (four of the eleven, their figures again to the centimetre) and
-Bournemouth and Portsmouth (held, above); no gauge at St Peter Port, Dartmouth or
-Portland. The streams of the Race and the Swinge are White's own (half-ebb to half-flood
+Bournemouth and Portsmouth (held, above; the Solent's since package 94); no gauge at St
+Peter Port, Dartmouth or Portland. The streams of the Race and the Swinge are White's own (half-ebb to half-flood
 south-westward, seven knots and more at springs); the Russels' hour Faden's; Portland's
 hour Bowditch's; the rest judgement, marked.
 

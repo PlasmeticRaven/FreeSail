@@ -10830,6 +10830,14 @@ corridors:
       bytes: 31361
       sha256: 9f5b168b6c6ad98bec3ece64aa32bad45d0ce10bd7230fec596d443d083f7203
     bytes: 9746887
+tide_regions:
+  solent:
+    title: 'The Solent, Spithead and Poole bay: a tide region, no tiles'
+    bounds:
+      south: 50.62
+      north: 51.0
+      west: -2.2
+      east: -1.0
 world:
   level: 0
   bounds:

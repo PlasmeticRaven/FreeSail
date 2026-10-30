@@ -11486,6 +11486,11 @@ def test_truth_7_283_the_recorded_passages_water_reads_the_tide_it_read():
             pos = Position(lat10 / 10.0 + 0.005, lon10 / 10.0 + 0.005)
             if lon10 > -30 and lat10 < 485:
                 continue  # south of channel-mid, Biscay north's water
+            if lon10 > -23 and 506 < lat10 < 510:
+                # the Solent's water since package 94 (its tide region, 50.62 to 51 N and
+                # 2.2 to 1 W): three positions of the grid, none a recorded passage's
+                assert tide.blocks_at(pos) == {"solent"}, pos
+                continue
             assert not tide.blocks_at(pos), pos
             for h in (0, 5, 13, 19):
                 when = datetime(1805, 6, 12) + timedelta(hours=h)
@@ -12302,7 +12307,7 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
     ten miles inside it (`tide.SEAM_BAND_NM`, the smoothstep of the distance's fraction),
     so that a cable inside 1 W the tide is within a tenth of a foot of the tide a cable
     outside, every ten minutes through a day of springs, along the seam from 49.1 to
-    50.9 N; the same across the seam at 48 N in the Iroise, where Biscay north meets the
+    50.6 N; the same across the seam at 48 N in the Iroise, where Biscay north meets the
     Channel west. The taper is the cell's: a cell's centre gives its weight, so a cell once
     worked is a lookup as before."""
     import freesail.world.tide as T
@@ -12311,7 +12316,9 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
     tide = T.load_tide()
     foot = units.feet_to_m(0.1)
     pairs = []
-    for lat in (49.1, 49.5, 50.0, 50.3, 50.6, 50.9):
+    # (north of 50.62 N the seam at 1 W is the Solent's tide region's with the Channel
+    # east's since package 94's item 4, a seam between two blocks: truth 7-313)
+    for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
         cable = 0.1 / 60.0 / math.cos(math.radians(lat))
         pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
     for lon in (-4.7, -4.9):
@@ -12325,3 +12332,76 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
             assert gap < foot, (inside, when, gap)
     assert 0.5 < tide.taper_at(Position(50.6, -1.0 + 0.2)) < 1.0  # 7.6 miles in
     assert tide.taper_at(Position(50.6, -1.0 + 0.3)) == 1.0  # 11.4 miles in: whole
+
+
+def test_truth_7_313_spithead_has_portsmouths_tide_within_the_hour():
+    """The brief's item 4: Bournemouth's and Portsmouth's gauges (39a's, held until package
+    94) serve the manifest's tide region `solent` (bounds and no tiles, 50.62 to 51 N and
+    2.2 to 1 W), under the seam's taper. The eleven's blend over the Solent was four hours
+    and a half wrong (39a's finding again in 89's notes): Spithead's high water by it fell
+    at 06:56 and 19:11 on 12 June 1805 where Portsmouth's gauge has 11:33 and 23:49. Now
+    Spithead's high waters are within the hour of the gauge's (within five minutes), its
+    spring range the gauge's water (twelve feet where the eleven gave nine and a half),
+    and a mile west of 1 W at 50.6 N, outside the region, the eleven's to the bit (truth
+    7-282). The seam between the Solent's water and the Channel east's at 1 W north of
+    50.62 N is a seam between two blocks, a step of three feet and a half off Chichester
+    (docs/dev/TuningNotes.md, package 94, for the lead)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauge = next(g for g in doc["gauges"] if g["id"] == "portsmouth")
+    assert gauge["block"] == "solent" and T.region_bounds()["solent"] == (50.62, 51.0, -2.2, -1.0)
+    # the gauge's own tide: Portsmouth alone (a level given for the loader; the hours of
+    # high water do not read it)
+    alone = {k: v for k, v in gauge.items() if k != "block"} | {"mean_level_m": 4.0}
+    own = T.Tide({"constituents": doc["constituents"], "gauges": [alone]}, {"areas": []})
+    eleven = _the_eleven_alone()
+    spithead = Position(50.775, -1.10)
+    assert tide.blocks_at(spithead) == {"solent"} and tide.taper_at(spithead) > 0.95
+    start = datetime(1805, 6, 12)
+    theirs = [w for w, _ in own.high_waters(Position(gauge["lat_deg"], gauge["lon_deg"]), start)]
+    for name, t, within_h in ((None, tide, 1.0), ("the eleven", eleven, None)):
+        ours = [w for w, _ in t.high_waters(spithead, start)]
+        gaps = [min(abs((a - b).total_seconds()) / 3600.0 for b in theirs) for a in ours]
+        if within_h is None:
+            assert min(gaps) > 4.0, (name, gaps)  # the old water, four hours and more out
+        else:
+            assert len(ours) == 2 and max(gaps) < within_h, gaps
+            assert max(gaps) < 5.0 / 60.0
+    assert _spring_range_ft(tide, spithead) > 11.5 and _spring_range_ft(eleven, spithead) < 10.0
+    mile_deg = 1.0 / 60.0 / math.cos(math.radians(50.6))
+    west = Position(50.6, -1.0 - mile_deg)
+    assert not tide.blocks_at(west)
+    assert tide.constants_about(west) == eleven.constants_about(west)
+
+
+def test_truth_7_314_every_recorded_passages_water_is_the_elevens_outside_the_solent():
+    """The brief's item 5: every recorded passage unchanged. The proof is the passages
+    themselves, run by node id on a clean worktree of the head and on the final tree,
+    identical (docs/dev/TuningNotes.md, package 94); as a behaviour: the recorded passages
+    sail the Channel west and its approaches, and over the whole of `channel-west` and of
+    `channel-mid` outside the Solent's tide region (and west of 1 W) the tide is the
+    eleven's to the bit, a cable from the Solent's west and south bounds as everywhere, the
+    taper being the inside of a block's alone; the Solent's water begins at its bounds."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    cable = 0.1 / 60.0
+    places = [Position(50.62 - cable, lon) for lon in (-2.1, -1.6, -1.1)]
+    places += [Position(lat, -2.2 - cable / math.cos(math.radians(lat))) for lat in (50.7, 50.9)]
+    for lat10 in range(485, 511, 5):
+        for lon10 in range(-70, -10, 5):
+            places.append(Position(lat10 / 10.0 + 0.003, lon10 / 10.0 + 0.003))
+    for pos in places:
+        if tide.blocks_at(pos):
+            assert tide.blocks_at(pos) == {"solent"}, pos
+            continue
+        for h in (0, 7, 15):
+            when = datetime(1805, 6, 12) + timedelta(hours=h)
+            assert tide.at(pos, when) == eleven.at(pos, when), (pos, h)
+    inside = Position(50.62 + cable, -1.6)
+    assert tide.blocks_at(inside) == {"solent"} and 0.0 < tide.taper_at(inside) < 0.01
