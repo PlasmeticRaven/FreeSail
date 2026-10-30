@@ -1616,7 +1616,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | **7-197** | the bilander's particulars hold their sources, and by the wind she lies as close as a brig | her design; her polar's `closest_deg` and `beat_deg(15)` no wider than the brig's 50° and 60° (rule 1: Ext §5.9) | B4 | the brief item 6; D46 rule 1 |
 | **7-198** | the settee in stays is kept drawing, its ourse to leeward, and dipped last | Ext §10.3 item 1 (D46 rules 2 and 3), and rule 5's case if Ext §5.10's measure holds (else that half goes to the lead) | B4, on B3.3 | D3(b), D46 |
 | **7-199** | in wearing the settee is lowered as she bears up and hoisted on the new lee once the stern is past the wind | Ext §10.3 item 2 (D46 rule 4) | B4, on B3.3 | D46 |
-| **7-230** | the driver, filed as the frigate's spanker, is the spanker to the physics, and the shift of the mizen for the driver takes about thirteen minutes | row 3′'s equality (Ext §17.5); the shift's phases and ticks in a band | B3 at B3.5, in `tests/test_driver.py` | the lead's allotment (the lead's notes of 2026-10-29, at ea5ad59 on the lead's branch, brought in at the next merge) |
+| **7-230** | the driver, filed as the frigate's spanker, is the spanker to the physics, and the shift of the mizen for the driver takes about seventeen minutes at her company, its boom out with it (Ext §17.11; thirteen as first allotted) | row 3′'s equality (Ext §17.5); the shift's phases and ticks in a band | B3 at B3.5, in `tests/test_driver.py` | the lead's allotment (the lead's notes of 2026-10-29, at ea5ad59 on the lead's branch, brought in at the next merge) |
 
 **Not truths, said:**
 - **Each scenario's round trip** (the shared draft's 7-188; Indf's truth 5): B6's tests. The

@@ -1416,7 +1416,8 @@ front edge is laced to the mast, its top edge hangs along the slanting mizen yar
 past the yard's end on a short extra yard, and its bottom edge is stretched along a long pole,
 the boom, that reaches out over the stern. In these ships' day it was bent beside the mizen
 course, which was brailed up while the driver drew. In the game it lives in the sail room and
-is shifted for the mizen course, about thirteen minutes' work, when the wind is fair and
+is shifted for the mizen course, about fifteen minutes' work with its boom (§17.11; thirteen as
+first designed), when the wind is fair and
 moderate, giving her about twice the sail aft. Shifting one for the other is the game's choice,
 so that only one after sail is ever bent (§17.3). It comes in before it blows hard or when the
 wind is right astern.
@@ -1688,7 +1689,7 @@ after sail".
   paths are the polar's "plain sail"; `_set_fore_and_aft` after the cast, which sets only a
   furled, loosed or brailed sail and never an unbent one; the gale; and the captains. Both
   sails bent would need a new exclusion on each of those paths, each a place to miss.
-- **What is lost.** The shift's thirteen minutes against brailing the course and setting the
+- **What is lost.** The shift's fifteen minutes (§17.11) against brailing the course and setting the
   driver, and the brailed course's windage while the driver draws.
 - **Open** for the owner, should they want it later (§17.9 item 2); they chose (b) with the
   shift explained.
@@ -1814,7 +1815,7 @@ draws differently.
 - **The boom's swing.** `sheetAngleOf(sparId)` returns the sheet angle of the first gaff or
   sprit sail on the spar. It also takes a lateen cut at the mast that is not unbent (a
   membership). With the driver in the sail room the boom lies amidships, as a boom with no
-  sail does now.
+  sail does now. *Since §17.11: rigged in with the driver below, and not drawn.*
 - **The sail**, in §6.1's branch for a sail cut at the mast:
   - with `roles.boom`, the tack is at the boom's jaws and the clew along the boom (`Bm.a`,
     `Bm.b`, as the gaff branch's `Bm`);
@@ -2021,7 +2022,7 @@ waits for it.
    words-only fix would change the frigate's words in that state, so it is left.
 5. A ringtail on a driver boom would already find the driver as its host (`_gaff_host` reads the
    fore-and-aft sail naming the boom). The 64 carries none (Indf §4.7).
-6. (B3.5) A shift bends and sets the new sail on a wrecked or sent-down spar: "shift the mizen
+6. *(Closed for the driver by §17.11; the other sails' gap stands.)* (B3.5) A shift bends and sets the new sail on a wrecked or sent-down spar: "shift the mizen
    for the driver" sets the driver on a wrecked boom, round `set_lateen`'s new boom check, as
    the frigate's "shift the storm mizzen for the spanker" does over a wrecked gaff or boom
    today. Older than the driver; for the lead.
@@ -2031,10 +2032,10 @@ waits for it.
    either moves the frigate's words; for the lead.
 8. (B3.5) `set_lateen.yaml`'s served header described only the course; it names the driver now,
    with the six lateen files' move to the in-world form (the lead's note of 2026-10-30).
-9. (B3.5) The bent variant of `frigate_with_driver()` files the course in the sail room but
+9. *(Closed by §17.11's stage-0 commit.)* (B3.5) The bent variant of `frigate_with_driver()` files the course in the sail room but
    stows no course canvas there, so "shift the driver for the mizen" is refused on it. Stage
    0's fixture: stow the course's canvas when `bent`.
-10. (B5.5) With the course bent and the driver in the sail room, the bare boom is drawn
+10. *(Closed by §17.11.)* (B5.5) With the course bent and the driver in the sail room, the bare boom is drawn
     amidships with its jaws 1.5 m up the course's laced luff, its foot below the boom. Right
     by §17.6; the 64's file decides whether the boom is topped up or unshipped while the course
     is set.
@@ -2092,3 +2093,27 @@ a spar on the booms, and accepted, since mending it would need a read in `physic
 (B3 and B5 together, the guard sets and the trace), then B1's regeneration, before the owner's
 testing report. **Not chosen:** the boom out on setting from furled and in on furling, the owner's
 other offer, which needs its own evolution files and moves the library's count.
+
+**Approved by the lead as written (2026-10-30). As built (391cde9, 231f4b8, 2e4ab06, bb49fa8):**
+- `scripts.driver_boom` reads the file's key, so it is narrower than the table: with the key
+  absent everything is as before, the boom, the phases and the two refusals. That is what the
+  toggle shows. On the bare fixture twenty orders run, and every answer, part and log line but
+  the boom's own are equal; under way at seed 7, through a tack, a wear and a heave-to, the logs,
+  dynamics and parts are equal to the last figure.
+- **Lines beyond the table, each reached only through `driver_boom`:** a spare swayed for the
+  boom lands rigged in (`ShiftSparScript`); clearing a wreck that takes the driver down brings a
+  standing boom in, at no extra time (`ClearWreckScript`); "belay that" with the driver below
+  brings the boom in; a shift to the driver over a mizen yard carried away is refused as over
+  the boom; a driver left in the room when its boom is hit and the wreck cleared is no longer
+  flagged wrecked. A driver shifted for another driver on the one boom runs neither phase.
+- **The shift** at the file's times: 780 s to 900 s from a drawing sail, 570 s to 690 s from a
+  furled one. "Bend the driver" 480 s; "unbend the driver" 390 s, 270 s on a wrecked boom. At the
+  fixture's company 1,027 s; at the 64's, 102, 205, 171, 137, 273 and 137 = 1,025 s each way,
+  about seventeen minutes. Truth 7-230's band 15-19 minutes.
+- **The drawing:** only a served `rigged_out` of false takes the boom away (`boomRiggedIn`), and
+  the frame holds its swing, so the view is equal across the shift.
+- **Found, for the lead, not mended:** a shift or a bend belayed after `send_up` loses the canvas
+  drawn, on any sail, which on the 64 loses her driver for the voyage; the frigate's ringtail
+  keeps `wrecked` after its boom's wreck is cleared, as the driver did; a boom hit while rigged
+  in is not drawn though the refusal says its wreck "still hangs aloft"; `shift_sail.yaml`,
+  `bend_sail.yaml` and `unbend_sail.yaml` do not name the boom's phases in their served heads.

@@ -12143,7 +12143,7 @@ Pinned on both files (`test_her_long_pole_heads_hold_truth_9`). In 20 kn under p
 carries away and nothing warns. In 35 kn under all sail the 64 loses 6 parts from tick 644 (the three
 royal masts, the three topgallant yards; 5 on the first reading, the same first tick), the razee 5 from
 tick 632 (the mizzen royal, the fore royal mast, the main topgallant mast, the fore and mizzen topgallant
-yards; 7 from tick 619 on the first reading), the frigate-36 4 from tick 633. The order past the first part
+yards; 6 from tick 619 on the first reading), the frigate-36 4 from tick 633. The order past the first part
 is chaotic in a rig coming apart, and the clause is on what goes, not how many. Sailed 100° off in 25 kn under plain sail,
 her fore and mizzen topgallant yards warn on both files and the frigate-36's do not: the long
 pole-heads hold more sail on the same yards. She still sails 10.68 kn and 11.32 kn against the

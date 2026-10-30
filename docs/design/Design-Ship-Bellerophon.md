@@ -762,7 +762,7 @@ band; the four corners about 237 m², 10.6% under Steel's area. Both of Ext §17
 recorded in her polar notes with the driver bent. The boom over the poop is otherwise drawing.
 
 **The period:** the driver was bent beside the course and brailed; the game shifts one for the other
-in about thirteen minutes (Ext §17.3). *Vanguard*, an Arrogant, "Set driver" at the Nile (NRS vol. 2
+in about fifteen minutes by the file's times, seventeen at the 64's company, its boom going out with it (Ext §17.3, §17.11). *Vanguard*, an Arrogant, "Set driver" at the Nile (NRS vol. 2
 p. 53): §9's check S7 is taken with the driver bent. The 1773 driver hung abaft a set course (Lavery
 Table 15) is not built (the lead's ruling, Ext §14 item 10).
 

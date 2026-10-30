@@ -612,7 +612,7 @@ approved it (2026-10-29).
 
 Gaff 40 ft 10 in (12.45 m) and driver boom 65 ft 4 in (19.91 m) by Steel p. 40 on the 64's main
 topsail yard (read on the page image in Ind §3.1). The boom overhangs the taffrail by 33-34 ft
-(Ind §3.3); no source objects. The spanker cut by the frigate's rule on her gaff, boom and mast
+(Ind §3.3; 29.4 ft as her taffrail was since measured); no source objects. The spanker cut by the frigate's rule on her gaff, boom and mast
 (head 0.9 of the gaff, foot 0.9 of the boom, the gaff peaked 40°, `gen_ships.py:1841-1906`): about
 **240 m²** (measured here: a hoist of 43.7 ft from boom to throat; judgement, ±10%), against the
 frigate-36's 167 m² and Steel's 64 driver of about 198 m². B1 reads Steel's table IV rows for the
@@ -1225,7 +1225,8 @@ after the wiring. Her files' byte identity is the package's generator truth.
    it.
 5. **The quarter bills at 44-72 guns** (193-312 men at the guns) may leave a crew unfilled or the
    marines' division empty; B1 measures `Quarters.beat` and records it.
-6. **The razee's spanker** (about 240 m² against the frigate's 167; a 33-34 ft overhang) moves
+6. **The razee's spanker** (about 240 m² as first cut, 200 m² as filed, against the frigate's 167; a
+   33-34 ft overhang, 29.4 ft as filed) moves
    her balance; `clr_x_m` is tuned with it and recorded as tuned.
 7. **Unmeasured profile points** (stem head, rails, roundhouse, taffrail, end-port half-breadths,
    the upper and quarterdeck sills) until §3.5's tasks are done; each marked judgement meanwhile.
@@ -1301,7 +1302,9 @@ razee against the frigate-36, the brace limits):
   topgallant staysail, which his 64 column has not, left out. Done at the refinement of stage A
   (§3.5 item 9's step).
 - **The razee's spanker:** kept at 218 m², the frigate's rule on her spars, within 8% of
-  Steel's driver for a 38 (202 m²) (the owner: "meant 218").
+  Steel's driver for a 38 (202 m²) (the owner: "meant 218"). *Since (the lead's ruling of
+  2026-10-30, the owner told):* 218 m² cannot stand with her boom clear of her taffrail, and it
+  is 200 m² at the least that clears, within the owner's 8% (191 at 6 ft of head room, 195 at 5).
 - **The razee against the frigate-36** (7-187's clause 4, 0.13-0.26 kn short in 15 kn): "We'll
   rely on tuning for this, the razee could be right and the frigate-36 too fast, or the razee
   too slow and the frigate-36 right." Left to tuning of both ships against the period's
