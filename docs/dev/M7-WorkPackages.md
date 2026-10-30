@@ -2520,6 +2520,15 @@ the intent binds.
    bell, a gun, all hands and the ship striking everywhere aboard; a word where it is said,
    66's rule as it stands), with the design's default for a kind not listed, so that a new
    kind of line is placed by its author or falls to the default and never leaks by accident.
+   **And the other half of the same rule (decision 60): a reply's prose is the person's own
+   note, never a word in the world.** Today the free text of a reply is said aloud where the
+   station stands (`agent.note` through `say_aboard`, package 41's deck conversation), so
+   a model's out-of-character words reach the player as speech and nothing obliges it to
+   `say`; the free text becomes a note in the station's journal, read by the director's
+   log and the owner's eye (`show the <station>'s journal`) and heard by nobody, a thing
+   heard only when said (`say`, `say to`, `hail`, `answer` to a question put); the brief
+   and the tools' words say so once, the harness's notice when prose alone leaves an answer
+   owed names the tool, and the tests of 41's rule move old beside new with the reason.
 2. **Report, the messenger and the call.** What a person below is told: the officer of the
    watch reports to the captain by the rules of the period (a sail sighted, a change of
    wind, the land, a strange sail's colours, the ship in danger: the captain is called), the
@@ -2561,13 +2570,10 @@ the intent binds.
    who sees all and is untouched, and the director's `say as` for a person where he is; the
    replay (the rule is a read of the world and changes no input, so no digest moves: the
    proof); the pace (the filter's cost measured under 84's pace rule); the stations' briefs
-   saying the rule once (85's in-world words); and **the player at the prompt:** the design
-   decides, for the owner's word, whether the player seated as a person (the console's
-   captain, a `--seat`) reads by his place as a model does, with the owner's eye kept by the
-   director's station and `follow`, or whether the prompt stays the owner's whole view and
-   the rule binds the stations alone; the lead's reading is the first, since the player is a
-   person aboard and the one world has the owner's eye elsewhere, with a scenario key to
-   turn the rule off for testing (`knowledge: all`), said in the design.
+   saying the rule once (85's in-world words); and **the player at the prompt, ruled (decision 59):** the player
+   seated as a person (the console's captain, a `--seat`) reads by his place as a model
+   does, the owner's eye the director's station and `follow`, with a scenario key
+   (`knowledge: all`) that turns the rule off for testing, said in the design and the primer.
 7. **Truths and records.** 7-370 onward: a captain in the cabin whose sample carries no
    deck reading and whose officer's report of a sail reaches him there; a captain ashore at
    Plymouth with nothing of the ship but the boat's report; a sleeping station woken by the
