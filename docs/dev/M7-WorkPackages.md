@@ -52,7 +52,7 @@ on these packages; that is the owner's choice.
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
-| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d`; **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
+| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
@@ -750,7 +750,8 @@ slow tier of the known truths, the trials and the touched files 185 of 194 passe
 left out by their marks and the lee-shore trial's container digest the one failure as at
 every step, its pace within step 8's spread; the lead's run of the touched files and the
 gate selection (202 passed, none failed); **the whole suite on the merged tree in the cloud
-(run 14, the figures below).** **The step:** the drivers follow a hull. The World's default
+(run 14 on `90cef2c`: lint green, 4,312 passed over the six shards, 3 skipped, 11 expected
+failures, none failed, 34 minutes; the pace tests 10 of 10 in 205 seconds).** **The step:** the drivers follow a hull. The World's default
 hull is the followed one, the player's own until `follow "X"` names another, and with it
 every per-ship name of the World's, the drivers' state, the browser's snapshot and chart,
 the console's prompt and the log the drivers show; the player's hull stands apart as
@@ -768,6 +769,58 @@ words standing ready; whether the director's door follows the drivers or stays w
 player's ship is 82's question, noted; no office built. The parity table lists `follow` as
 the owner's by design, as the clock's commands are. The step 9 tidies are booked in its
 notes for step 11. Nothing pinned moved.
+
+### Package 79d as merged (2026-10-30)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-79d` at `7ceaae7` (the trunk
+merged into it at `9b3deb8` with 79c's block, the shared files kept both sides in order and
+the counts summed; merged here over 84's step 10 with the tuning notes the one conflict,
+both kept; 46 files beside the tiles, 12,843 lines added and 24 removed; 443 tile, coast and
+index files, none of another region's touched); ruff clean; the builder's eleven recorded
+passages by node id to their digests before and after its merge of the trunk, the touched
+files' slow tests 14, truths 7-295 to 7-304 with 7-261 11, its fast tier on the final tree
+with the pictures' known flake the one failure, the three regions rebuilt after the merge
+with no tile of theirs or 79c's changed, the scenario sailed again to the same digest; the
+lead's run of the touched files with five of its truths and the gate selection (268 passed,
+none failed); **the whole suite on the merged tree in the cloud (run 15, the figures
+below).** **The block, three regions by the lead's ruling at the builder's report of the
+Gulf at 46.1 MB:** `gulf-of-lion`, 3 to 7.73 E, its south bound moved to the row edge
+40.56 N where `balearics` ends so that the strip between the blocks answers, 120 level-2
+tiles, the patches of Toulon, Marseille, the Hyères road and Villefranche, 28.1 MB;
+`ligurian-sea`, 7.73 to 11 E, 72 level-2 tiles, the patches of Genoa, Leghorn, Porto
+Ferrajo, Bastia, Ajaccio, San Fiorenzo and the Maddalena, 20.6 MB; `tyrrhenian`, 8 to
+15.5 E and 38.5 to 42.5 N, its boundary with the Gulf at the row edge 40.99 N west of
+11.15 E, the patches of Cagliari, Alghero, Civita Vecchia, Gaeta, Naples and Ponza,
+37.8 MB; all after `balearics` in the chart. The marks from the research pass's texts
+(the Derrotero of 1849, Lamberti, Michelot, Purdy, Norie, Smyth), seventeen islets the
+grid lacks given as rocks of their height and extent, the lights dated from the earliest
+text that has them (Porto Ferrajo's and Bastia's `from` 1826, the later ones unverified).
+Sixteen port files (Toulon, Marseille, Hyères and Villefranche French and hostile; Genoa,
+Leghorn, Porto Ferrajo, Bastia, Ajaccio, San Fiorenzo, the Maddalena, Cagliari, Alghero,
+Civita Vecchia, Gaeta and Naples), and `sardinia`, `naples`, `etruria`, `liguria` and the
+Papal state as data in Morocco's form, each relation sourced to James or said from memory;
+**a port's nation by date** (Genoa the Ligurian Republic's until 3 June 1805 and France's
+from the 4th), the smallest change in `world/ports.py`, the loader taking the scenario's
+first day and `Ports.stance` the world's, the other readers named in the notes, a test of
+the form and of Genoa's two dates, no recorded passage moved. The gauges held with
+verified mean levels; the currents of the directions as `current:` with no tidal stream;
+Norie's places; two weather boxes from the Admiralty's tables (Marseille's, Ajaccio's,
+Genoa's, Leghorn's, Naples' and Cagliari's), the Gulf's taking the mistral's lows and saying
+the easterlies it leaves short. `agincourt-sound.yaml` sailed at seed 7 from the Maddalena
+to look into Toulon and back, not pinned. Truths 7-295 to 7-304 as behaviours. No gauge
+of the eleven moved, no recorded passage's digest moved. **The lead's rulings on its
+findings:** (1) the world's tide over the Mediterranean is Le Conquet's alone while the
+gauges are held, two metres of M2 against the gauges' centimetres, and the master's account
+allows a flood in a sea that has none: 89's case, now the strongest, its brief to say so;
+(2) the lights of 1805 dated from the earliest text on file is the rule working, and Porto
+Ferrajo's of 1788 from memory stays a note until a text dates it; (3) a `road` with a
+bottom gives no note of it, the roads being anchorages: a chart tidy booked with the island
+kind and the inland tiles; (4) each port's produce cheap and its wants dear by judgement,
+so that the business draws a trader in the Mediterranean: accepted, said so in the files,
+as 79c's grain was; (5) the weather's one track a month cannot carry two wind regimes in
+one box: a finding for the weather's design, recorded for the lead, not this package's;
+(6) Porto Santo Stefano, Giannutri, Monte Limbara and the Adriatic's shore not given, and
+Sicily, the Lipari islands and Messina a later block, as the notes say.
 
 ### Package 79c as merged (2026-10-29)
 
@@ -1891,7 +1944,7 @@ north's nine, Vigo, Portugal's five, the islands' five, the Channel east's six) 
 read, verified and **held** under `held_gauges:`, the world's tide over their water the
 eleven's blend and wrong: at Newhaven the world's spring range is 3.9 feet for the gauge's
 19.5, at Dieppe 5.3 for 27, at Beachy Head 4.8 for Norie's 20 (79b's tuning notes), over
-Biscay the Channel's tide (39b's), at Cape Trafalgar Le Conquet's eighteen feet (39f's), **and over the Balearics Saint-Malo's, a mean level of 6.83 m and an M2 of 3.7 m where Mahón's is five centimetres (79c's), the block's nine gauges held with their mean levels verified from REDMAR so that the blend gives the Mediterranean its own foot of tide at once**. Read
+Biscay the Channel's tide (39b's), at Cape Trafalgar Le Conquet's eighteen feet (39f's), **and over the Balearics Saint-Malo's, a mean level of 6.83 m and an M2 of 3.7 m where Mahón's is five centimetres (79c's), the block's nine gauges held with their mean levels verified from REDMAR so that the blend gives the Mediterranean its own foot of tide at once; and over the Gulf of Lion and the Tyrrhenian Le Conquet's alone, two metres of M2 against the gauges' five to twelve centimetres, the master's account allowing a flood in a sea that has none to speak of (79d's)**. Read
 `docs/dev/ChartBlocks.md` item 6, `docs/references/Tides.md`, the tide module's head and the
 blocks' tuning notes on their gauges before anything.
 
