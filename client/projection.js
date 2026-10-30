@@ -490,6 +490,21 @@
     }
     /** Whether a sail cut at the mast is spread on this boom, bent or not (package 75, B5.5;
      *  Ext §17.6: the driver's boom). */
+    /** A gaff sail filed with its four corners [tack, throat, peak, clew], on a hull drawn from
+     *  her profile (package 75, the razee's spanker, her stage B): the run and the rise of its head
+     *  and the length of its foot, by which its gaff and its sail are drawn as they are filed, in
+     *  place of the fixed peak (GAFF_PEAK_ANGLE) and the whole of its spars; or null. */
+    function gaffCutOn(gaffId) {
+      if (!profile) return null;
+      var sail = (sailsBySpar[gaffId] || []).filter(function (s) {
+        return s.class === "gaff" && s.corners_m && s.corners_m.length === 4;
+      })[0];
+      if (!sail) return null;
+      var c = sail.corners_m;
+      var run = c[1][0] - c[2][0], rise = c[2][1] - c[1][1];
+      return { angle: Math.atan2(rise, run), head: Math.hypot(run, rise), foot: Math.abs(c[0][0] - c[3][0]) };
+    }
+
     function boomOfCut(sparId) {
       return (sailsBySpar[sparId] || []).some(function (s) {
         return !!s.cut_at_mast && (s.roles || {}).boom === sparId;
@@ -793,6 +808,11 @@
           if (underBowsprit(spec)) {
             r.x = spec.x_m || r.x;
             r.everyWay = true; // the frame reaches its swing every way (`fullRigFrame`)
+            // and at the foot of the sail hanging from it, as well as at its slings, so that the
+            // foot stays inside the frame when she heels: on the razee, with no sprit-topsail
+            // yard above it, the spritsail set and braced passed the frame by 2 cm (measured)
+            var hangs = yardBelowId[id] ? null : squareSailOn(id);
+            if (hangs) r.heights = [z, z - hangs.area_m2 / Math.max(HEAD_SPREAD * L, 1)];
           }
           // package 57: a square yard is slung before its mast (YARD_BEFORE_MAST_OF_BEAM)
           if (spec.class === "yard" && parent && MAST_CLASSES[parent.cls]) r.x += yardBefore;
@@ -812,7 +832,9 @@
           r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
           var gDir = sheetDirection(sheetAngleOf(id), tack);
           r.a = v(r.x, 0, deck + H); // the throat, at the mast
-          r.b = add(r.a, add(mul(gDir, L * Math.cos(GAFF_PEAK_ANGLE)), v(0, 0, L * Math.sin(GAFF_PEAK_ANGLE))));
+          var gCut = gaffCutOn(id);
+          var gPeak = gCut ? gCut.angle : GAFF_PEAK_ANGLE;
+          r.b = add(r.a, add(mul(gDir, L * Math.cos(gPeak)), v(0, 0, L * Math.sin(gPeak))));
           r.dir = gDir;
         } else if (spec.class === "boom") {
           r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
@@ -822,8 +844,10 @@
           r.dir = bDir;
           // package 75 (B5.5; Ext §17.6): a driver's boom reaches far beyond the taffrail, and
           // swung to the quarter past the frame's four directions: its swing is reached every
-          // way, so that the view does not rescale as it is sheeted or as the driver is shifted
-          if (boomOfCut(id)) r.everyWay = true;
+          // way, so that the view does not rescale as it is sheeted or as the driver is shifted.
+          // So does the razee's spanker boom, as long, 7.4 m past the four directions seen on the
+          // quarter (measured): every boom on a hull drawn from her profile (her stage B)
+          if (boomOfCut(id) || profile) r.everyWay = true;
         } else if (spec.class === "sprit") {
           r.x = parent ? parent.x : spec.x_m || 0;
           var sDir = sheetDirection(sheetAngleOf(id), tack);
@@ -846,6 +870,7 @@
             r.normal = cross(parent.dir, [0, 0, 1]);
             r.pivot = parent.a; // it swings with the boom about the mast
             r.reach = len(sub(parent.b, parent.a)) + L;
+            if (parent.everyWay) r.everyWay = true; // and is reached as its boom is
           } else {
             var ss = sideSign(spec.side);
             var yard = parent && parent.arm ? parent : null;
@@ -994,6 +1019,15 @@
     }
     var lineOf = indexBy(graph.lines, "id");
 
+    /** Where a sheet from forward of the fore mast ends on side `sign`: at the deck, a little
+     *  abaft that mast (SPRIT_SHEET_ABAFT_M), half the beam out, or on a hull drawn from her
+     *  profile on her drawn side there, which is narrower so far forward (package 75, her
+     *  stage B: on the 64 the beam's half stood 1.5 m outboard of her side). */
+    function foreSheetLead(sign) {
+      var x = lowerMasts[0].x - SPRIT_SHEET_ABAFT_M;
+      return v(x, sign * (profile ? drawnSideAt(hull)(x, deck) : beam / 2), deck);
+    }
+
     var figures = [];
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
@@ -1016,6 +1050,33 @@
       if (YARD_CLASSES[s.class] && r.parent && !r.onDeck && !underBowsprit(s)) {
         fig.mastId = r.parent.id; // the painter's correction for the mast's rake (package 57)
         fig.centre = r.centre;
+      }
+      // package 75 (the 64's stage B): a jib-boom with a yard hung under it is sorted at its
+      // heel: the sprit topsail stands forward of the spar all the way up to that yard, and sorted
+      // at the spar's middle the spar was drawn over the sail from ahead, ending in its cloth
+      if (s.class === "jib_boom" && graph.spars.some(function (y) { return y.parent === s.id && underBowsprit(y); })) {
+        fig.sortAt = r.a;
+      }
+      // package 75 (the 64's stage B): the mizen yard reaches far fore and aft of its mast, its
+      // after part up to 8.3 m abaft the mizzen topsail, so as one figure it stood on the wrong
+      // side of that sail either way: from astern the topsail hid the part that carries the
+      // course's head, and from the bow that part crossed the topsail. It is cut at its truss
+      // into two pieces, each sorted at its own middle, as a lower mast's foot is below
+      if (r.cutAtMast) {
+        var foreOfYard = {};
+        Object.keys(fig).forEach(function (key) {
+          foreOfYard[key] = fig[key];
+        });
+        foreOfYard.pts = [r.a, r.truss];
+        foreOfYard.piece = "fore";
+        delete foreOfYard.mastId;
+        delete foreOfYard.centre;
+        foreOfYard.sortAt = lerp(r.a, r.truss, 0.5);
+        figures.push(foreOfYard);
+        fig.pts = [r.truss, r.b];
+        delete fig.mastId;
+        delete fig.centre;
+        fig.sortAt = lerp(r.truss, r.b, 0.5);
       }
       // package 75 (B5.6): with a profile, a lower mast's foot, from the deck it stands on up to
       // the top of the side there, is a piece of its own sorted at its own middle, so that the
@@ -1201,22 +1262,25 @@
      *  now; and the depth it is reckoned by for its belly and its festoons, its own between
      *  the yards at their hoists, less the reefs. A sail with no yard below hangs from its
      *  yard as deep as its area over its breadth, less the reefs (a course's reef bands are
-     *  at its head: its foot rises). */
+     *  at its head: its foot rises). A sprit topsail, between two yards under the bowsprit
+     *  (package 75, the 64's stage B; Ext §6.2, risk 9): its depth is the slant between the
+     *  yards, along which the sail lies, not the heights between them. */
     function squareCut(spec, dyn, Y) {
       var L = Y.half * 2;
       var belowId = yardBelowId[Y.id];
       var B = belowId ? spars[belowId] : null;
       var gap = belowId ? (Y.spec.height_m || 0) - (sparSpecs[belowId].height_m || 0) : 0;
       if (B && B.arm && !sentDown(B) && gap > 0.5) {
+        var along = underBowsprit(Y.spec) ? len(sub(Y.centre, B.centre)) : gap;
         var foot = CLEW_SPREAD * B.half * 2;
-        var head = Math.min(Math.max((2 * spec.area_m2) / gap - foot, 0.5 * L), L);
+        var head = Math.min(Math.max((2 * spec.area_m2) / along - foot, 0.5 * L), L);
         // the clews at the yard below's arms; where that yard is lowered further than the
         // sail reaches (a topgallant set over a topsail on the cap), at the sail's own depth
         var reach = Y.centre[2] - gap * reefFraction(spec, dyn);
         var fc = B.centre[2] >= reach - 0.05 ? B.centre : v(B.centre[0], B.centre[1], reach);
         return {
           corners: [sub(Y.centre, mul(Y.arm, head / 2)), add(Y.centre, mul(Y.arm, head / 2)), add(fc, mul(B.arm, foot / 2)), sub(fc, mul(B.arm, foot / 2))],
-          depth: gap * reefFraction(spec, dyn),
+          depth: along * reefFraction(spec, dyn),
           head: head,
           foot: foot,
         };
@@ -1284,6 +1348,9 @@
         var cfig = sailFigure(spec, dyn, [mp[1], mp[2], clewC, tackC], mcs.normal, spars[roles.yard] || mcs.mast, luffC);
         cfig.mastId = mcs.mast.id;
         cfig.clewAt = clewC; // where its sheet is drawn from
+        // its luff is laced to the mast (Falconer 1780; Ext §3.4), so it does not belly as a leech
+        // does: drawn it stood a metre off the mast (the 64's course and driver, measured)
+        if (cfig.path.length === 5) cfig.path[4] = [lerp(tackC, mp[1], 0.5), mp[1]];
         // Steel's driver yard, which "expands the head of the driver without the peek of the
         // gaff" (Steel 1794 vol. I, OCR l. 20863), is not filed as a spar: it goes aloft with
         // the sail and comes down with it. Beyond the mizen yard's peak the head is drawn on
@@ -1365,7 +1432,16 @@
         var raise = luff * (1 - reefFraction(spec, dyn));
         var tackPt = v(M.x, 0, footZ + raise);
         var clew;
-        if (Bm) {
+        var cutG = Bm && Bm.dir && cls === "gaff" ? gaffCutOn(roles.gaff) : null;
+        if (cutG) {
+          // her spanker on its file's cut: its head and foot the file's along the gaff and the
+          // boom, which it does not fill, its tack at the jaws. By the fixed rule it was drawn 215
+          // m2 against the filed 191, its peak 1.6 m farther aft (the razee, measured)
+          var gaffL = len(sub(G.b, G.a));
+          peak = lerp(G.a, G.b, Math.min(cutG.head / gaffL, 1));
+          tackPt = add(Bm.a, v(0, 0, raise));
+          clew = add(add(Bm.a, mul(Bm.dir, Math.min(cutG.foot, len(sub(Bm.b, Bm.a))))), v(0, 0, raise));
+        } else if (Bm) {
           clew = add(Bm.b, v(0, 0, raise));
         } else {
           // loose-footed: the clew from the area, in the plane of the sail
@@ -1628,13 +1704,24 @@
             // package 75 (B5.3; Ext §6.2): the spritsail's sheets aft to the side abaft the
             // fore mast, at the deck (Lavery I30), not abreast the clew forward of the stem; the
             // sprit topsail's go to the spritsail yard's arms, as every topsail's to the yard below
-            lead = v(lowerMasts[0].x - SPRIT_SHEET_ABAFT_M, (s2 * beam) / 2, deck);
+            lead = foreSheetLead(s2);
           }
           pts = [clew, lead];
         } else {
           var clew2 = sf.corners[2];
           var lee = sideSign(ln.side || (tack === "starboard" ? "larboard" : "starboard"));
           pts = [clew2, v(clew2[0] - 2, (lee * beam) / 2, deck)];
+          // package 75 (her stage B): on a hull drawn from her profile the sheet of a sail forward
+          // of the fore mast, whose rule above stopped abreast the knee of the head, in the air,
+          // leads aft to her drawn side abaft the fore mast, as the spritsail's does
+          if (profile && lowerMasts.length && sheetSpec.x_m > lowerMasts[0].x) pts = [clew2, foreSheetLead(lee)];
+          // package 75 (the razee, her stage B): on a hull drawn from her profile the sheet of a
+          // sail on a boom swung about the mast (her spanker's, her ringtail's) is drawn from its
+          // clew to the taffrail on the centreline, as the driver's is (Ext §17.6), not to the
+          // side abaft the clew: that boom overhangs her stern by 9 m, and that lead stood 11 m
+          // abaft her, in the air. It is rove at the boom's end, as the driver's is
+          var boomS = spars[(sheetSpec.roles || {}).boom];
+          if (profile && boomS && boomS.dir) pts = [sheetSpec.class === "gaff" ? boomS.b : clew2, taffrail(hull)];
         }
         if (state === "parted") pts = [pts[0], add(pts[0], v(-1, 0, -2))];
         figures.push({ kind: "line", id: ln.id, cls: "sheet", of: ln.of, state: state, pts: pts, busy: !!busy[ln.of] });
@@ -1694,9 +1781,11 @@
    *  and no spar sent down changes it; and the hull. A yard under the bowsprit (package 75,
    *  B5.3) stands foremost of the rig, where braced its arm reaches past the four directions
    *  seen on the bow: its swing is reached every way, by sixteen points about its slings whose
-   *  figure's sides touch the circle its arms sweep. So is a driver's boom about its jaws
+   *  figure's sides touch the circle its arms sweep, at the height of its slings and of the
+   *  foot of a sail hanging from it. So is a driver's boom about its jaws
    *  (B5.5): it reaches far beyond the taffrail, and sheeted to the quarter its end reaches
-   *  past the four directions seen on the quarter. */
+   *  past the four directions seen on the quarter; and every boom on a hull drawn from her
+   *  profile (the razee's spanker's, her stage B). */
   function fullRigFrame(graph, spars, hull) {
     var pts = [];
     var dirs = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];
@@ -2574,6 +2663,25 @@
   }
 
   var FORM_HULLS = typeof WeakMap === "function" ? new WeakMap() : null; // drawn once a graph
+  var DRAWN_SIDES = typeof WeakMap === "function" ? new WeakMap() : null; // reckoned once a profile
+
+  /** Her drawn side's half-breadth, (x, z) => metres, on a hull drawn from its profile. */
+  function drawnSideAt(hull) {
+    var profile = drawnProfile(hull);
+    var kept = DRAWN_SIDES && DRAWN_SIDES.get(profile);
+    if (kept) return kept;
+    var hb;
+    if (servedStations(hull)) {
+      hb = formHull(hull).hbAt;
+    } else {
+      var H = profileHull(profile);
+      hb = function (x, z) {
+        return hbOnStation(H.station(x), z);
+      };
+    }
+    if (DRAWN_SIDES) DRAWN_SIDES.set(profile, hb);
+    return hb;
+  }
 
   /**
    * The hull's figures on the served stations (B5.6, §6), in SHIP COORDINATES as `hullFigures`,
