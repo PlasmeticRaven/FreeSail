@@ -264,6 +264,9 @@ transitions:
   - {from: chasing, on: stranger spoken, to: on passage}
   - {from: chasing, on: stranger lost, to: on passage}
   - {from: chasing, on: chase stale, to: on passage}
+  # package 88 (found on item 1): a mark engaged beyond the engaging distance and not
+  # gained on in `chase_stale_hours` is a stale chase, given up as one
+  - {from: engaging, on: chase stale, to: on passage}
   - {from: investigating a stranger, on: chase stale, to: on passage}
   # package 70 (spec M7 §10): into the action and out of it
   - {from: keeping station, on: overmatched, to: evading}
