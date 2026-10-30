@@ -174,9 +174,15 @@ region's, its tide and its weather are rows in tables that already reach its wat
    Spithead nine inside its south, and north of 50.6 N, where the eleven's water a mile
    west of 1 W is a truth's), and Bournemouth and Portsmouth serve it (`block: solent`):
    Spithead has Portsmouth's tide within minutes where the eleven's blend was four hours
-   and a half wrong. Where a tide region meets a block of the chart (the Solent and the
-   Channel east at 1 W north of 50.62 N) the seam is a seam between two blocks, and the
-   taper does not smooth it (docs/dev/TuningNotes.md, package 94, for the lead). **The seam's taper** (package 94): where a block's bounds meet charted
+   and a half wrong. **The rule of the seams** (the lead's ruling of 2026-10-30,
+   package 94): a gauge serves its own block, and also a block whose seam with its own
+   lies within the taper's band (ten miles) of the gauge, the water a cable either side of
+   a seam being the near gauge's; its `block:` a list then, its own block first
+   (Portsmouth's `[solent, channel-east]`, the Isle of Aix's `[biscay-north,
+   biscay-south]`, Cadiz's `[portugal, strait]`; `test_tide.py` holds it over every
+   gauge). A block that adds a gauge within ten miles of a seam with another block lists
+   that block too; the taper smooths a block's open edges, the rule the seams near a
+   gauge, and a seam between two blocks far from every gauge stays a step (a finding). **The seam's taper** (package 94): where a block's bounds meet charted
    water no block holds (a region's or the corridor's: 1 W where channel-mid meets
    channel-east, 48 N where Biscay north meets the Channel west, Biscay's and Portugal's
    ocean edges; not a seam between two blocks, and not an edge beyond which nothing is

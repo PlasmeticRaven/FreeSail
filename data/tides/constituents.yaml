@@ -274,7 +274,7 @@ gauges:
     N2: {amplitude_m: 0.364, phase_deg: 79.6}
   - id: ile-daix
     name: Île d'Aix
-    block: biscay-north
+    block: [biscay-north, biscay-south]  # the rule of the seams (package 94, step 5)
     lat_deg: 46.0074
     lon_deg: -1.1743
     record: "GESLA-2, REFMAR, 1973 to 2014"
@@ -485,7 +485,7 @@ gauges:
     N2: {amplitude_m: 0.190, phase_deg: 48.0}
   - id: cadiz
     name: Cadiz
-    block: portugal
+    block: [portugal, strait]  # the rule of the seams (package 94, step 5)
     lat_deg: 36.5333
     lon_deg: -6.2833
     record: "GESLA-2, IEO, 1961 to 2012"
@@ -1111,7 +1111,7 @@ gauges:
     N2: {amplitude_m: 0.107, phase_deg: 247.9}
   - id: portsmouth
     name: Portsmouth
-    block: solent
+    block: [solent, channel-east]  # the rule of the seams (package 94, step 5)
     lat_deg: 50.8026
     lon_deg: -1.1118
     record: "GESLA-2, BODC, 1991 to 2014"

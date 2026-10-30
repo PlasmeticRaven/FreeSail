@@ -13597,16 +13597,16 @@ every hour as they were. No other judged rise moved.
 **The Downs to Spithead** (`spithead.yaml` at seed 7, truth 7-279's run; the head, a clean
 worktree of `21a25e7`; item 3's tree; this tree):
 
-| | The head | Item 3 | Item 4 |
-|---|---|---|---|
-| St Helens for the night | 21h28m, nine fathoms and a half | 21h38m, ten | 21h38m, nine and a half |
-| The Portsmouth pilot aboard | 24h45m | 24h47m | 24h50m |
-| Spithead | 26h08m, twelve fathoms | 26h04m, eleven and a half | 26h06m, thirteen |
-| The pilot leaves | 26h30m | 26h26m | 26h28m |
-| Off the spot at the end | 0.84 mile | 0.77 | 0.80 |
-| The log's lines | 1,183 | 1,173 | 1,209 |
+| | The head | Item 3 | Item 4 | Step 5 (the rule) |
+|---|---|---|---|---|
+| St Helens for the night | 21h28m, nine fathoms and a half | 21h38m, ten | 21h38m, nine and a half | 21h40m, eight |
+| The Portsmouth pilot aboard | 24h45m | 24h47m | 24h50m | 24h47m |
+| Spithead | 26h08m, twelve fathoms | 26h04m, eleven and a half | 26h06m, thirteen | 26h00m, fourteen |
+| The pilot leaves | 26h30m | 26h26m | 26h28m | 26h23m |
+| Off the spot at the end | 0.84 mile | 0.77 | 0.80 | 0.84 |
+| The log's lines | 1,183 | 1,173 | 1,209 | 1,176 |
 
-No grounding on any tree; the truth's limits (three anchorings, the pilot, 27 hours, half a
+(The step 5 column sailed on step 5's final tree, the rule of the seams in.) No grounding on any tree; the truth's limits (three anchorings, the pilot, 27 hours, half a
 mile of Spithead's mark) held on each. (The log says "in 13 fathoms" in figures where it
 says "twelve" and "eleven and a half" in words: `fathoms_words` gives whole figures above
 twelve so; the words', not this package's.)
@@ -13699,3 +13699,97 @@ with `--slow -n 4`: 40 passed. **The fast tier**, once on the final tree (`pytho
 -n auto -q -p no:cacheprovider`, 379 slow tests left out): one failure, the pictures' known
 flake ("the chart is blank (std 8.0)" under the tier's load), which passes alone on this
 tree. The whole slow tier not run (the lead's, in the cloud at the merge).
+
+### Step 5: the lead's rulings of 2026-10-30, carried out
+
+**(1) The seam at 1 W north of 50.62 N: way (a), under the rule of the seams.** The rule,
+the lead's: **a gauge serves its own block, and also a block whose seam with its own lies
+within the taper's band (ten miles) of the gauge**, the water a cable either side of a
+seam being the near gauge's and no other's; a gauge beyond the band of a seam serves its
+own block alone. A gauge's `block:` is a list then, its own block first. Every seam
+between two blocks checked by it (the shared stretches of the bounds: the Mediterranean
+west's with the Balearics at 0.05 E, the Strait's with it at 5 W, Biscay north's and
+south's at 45.9 N, Biscay south's and Portugal's at 42 N, Portugal's and the Strait's at
+36.4 N, the Balearics' and the Gulf's at 40.56 N, the Solent's and the Channel east's at
+1 W; the Gulf's and the Ligurian sea's bounds meet at no shared edge, 7.73 against 7.74 E,
+and no gauge lies within twelve miles of either; the Ligurian sea and the Tyrrhenian
+overlap, a membership of both and no seam). **The rule catches three, not one**, each
+taken, said so:
+
+| Gauge | Its own block | The seam | Miles | Serves now |
+|---|---|---|---|---|
+| Portsmouth | solent | 1 W (the Channel east) | 4.2 | `[solent, channel-east]` |
+| the Isle of Aix | biscay-north | 45.9 N (Biscay south) | 6.4 | `[biscay-north, biscay-south]` |
+| Cadiz | portugal | 36.4 N (the Strait) | 8.0 | `[portugal, strait]` |
+
+Beyond the band and their own block's alone: La Rochelle 15.5 from 45.9 N, Le Verdon 19.9,
+Vigo 14.3 from 42 N, Ceuta 15.4 and Gibraltar 17.0 from 5 W, Bournemouth 17 from 1 W and
+the Channel east's six far from it. `test_tide.py` holds the rule over every gauge (the
+blocks after a gauge's own are exactly the ones whose seam lies within the band) and names
+the three. No figure of any gauge moved (the `block:` lines alone).
+
+**The figures, old (each gauge its own block's) beside new (the rule):**
+
+| The step a cable either side, through a day of springs | Old | New |
+|---|---|---|
+| 1 W at 50.65 N | 0.41 ft | 0.25 |
+| 1 W at 50.75 N | 3.40 | 1.48 |
+| 1 W at 50.85 N | 3.59 | 1.66 |
+| 1 W at 50.95 N | 2.96 | 2.09 |
+| 45.9 N at 1 12 W (the Pertuis d'Antioche's south) | 3.87 | 0.32 |
+| 45.9 N at 1 30 W | 3.61 | 0.68 |
+| 45.9 N at 2 30 W | 2.53 | 1.20 |
+| 36.4 N at 6 06 W (Cadiz bay's south) | 10.24 | 8.39 |
+| 36.4 N at 6 24 W | 10.24 | 7.97 |
+
+Spithead's high waters 11:29 and 23:45 both ways (Portsmouth's gauge 11:33 and 23:49):
+truth 7-313's figures do not move, its assertion of the gauge's `block:` follows the list.
+Truth 7-312's 50.9 N, left out at item 4 as a seam between two blocks, reads 2.09 ft now
+(3.0 before the rule) and stays out, said in its words. The seam at 36.4 N keeps eight
+feet: Cadiz's bay against the Strait's own gauges, a seam the near gauge narrows and does
+not close (for the lead).
+
+**The blocks' places, the world's spring range in feet** (every place of both epitomes
+whose range moved by more than a hundredth of a foot): the Channel east's Beachy Head
+18.99 to **18.86** (Norie's twenty: within truth 7-280's foot and a quarter, its words
+standing, its docstring given the figure), Selsey Bill 11.07 to 11.65 (given 16), the Owers
+12.07 to 11.95 (15), Shoreham 17.70 to 17.09 (Norie's given 16; Moore's judged 18),
+Hastings 18.35 to 18.08 (judged 18), Rye 18.75 to 18.52, Dungeness 19.59 to 19.43 (Norie's
+given 24; Moore's judged 20), Folkestone 19.50 to 19.47 (judged 19), the Downs 19.47 to
+19.44, Ramsgate 19.24 to 19.17 (judged 19), the North Foreland 19.07 to 18.97 (Moore's
+judged 19), Gris Nez 22.63 to 22.59 (judged 23), Gravelines 19.64 to 19.61, the Somme 21.07
+to 20.90 (judged 21), St Valery en Caux 22.83 to 22.63, Fécamp 19.32 to 19.08 (judged 19),
+Honfleur 22.27 to 22.22 (judged 22); Biscay south's Brouage 12.82 to 15.02 (given 15), the
+Tower of Cordouan 13.20 to 13.29 (15), Passages 11.51 to 11.52, Cape Ortegal 10.49 to
+10.51; the Strait's Cape Trafalgar 3.17 to 4.83 (judged 3), Tangier 3.24 to 3.50 (given
+5). The gauges' own places: no gauge's spring range moved (each is its own block's first
+gauge, weighed at the floor's hundred metres). **Judged rises moved, the range crossing the
+foot (the 37j rule)**: Norie's **Cape Trafalgar 3 to 5** (4.83), Moore's **Shoreham 18 to
+17** (17.09) and Moore's **Dungeness 20 to 19** (19.43), each with its reason in
+`establishments.yaml`; every other judged rise above within its foot, kept. No given rise
+and no hour moved.
+
+**Way (b) stays measured and not taken**, the reason: it weighs the block's far gauges at
+the block's own places against Norie's figures (the six of the Channel east serving the
+Solent and the two the Channel east: Beachy Head 18.73, past 7-280's words; Shoreham's
+judged 18 to 17 from 16.91) for a seam the near gauge alone should close; the rule closes
+the seams within the band of a gauge and leaves the rest a finding.
+
+**(2) The manifest's slip.** The text edit of item 1 duplicated the last line of four
+regions' `features_by_kind` (`town: 6` under mediterranean-west, `transit: 1` under
+balearics, `transit: 2` under gulf-of-lion, `town: 19` under ligurian-sea): the four lines
+removed by text, the file loaded before and after equal (the loader had taken the last of
+each repeated key, the values equal), the counts the features files' (islands and rocks
+13/8, 12/7, 14/10, 23/8, 18/6; the totals 95, 87, 114, 140, 123).
+
+**The suites on step 5's final tree** (this container, four cores, nothing beside it; ruff
+check and format clean; the trunk brought in, nothing new). **The proof**, as before: the
+eleven recorded passages by node id passed, every digest held; `-k "gate_5b or gate_5c"`
+the one test passed; the captain's trials five passed, the gale with sea room its expected
+failure, the lee-shore container digest `7fad0ce7e46ba366` the one failure: **identical
+to the head's** again (the rule of the seams moves no water of channel-west or of
+channel-mid outside the Solent). The Downs to Spithead sailed once more (the table's step 5
+column). **The slow tier of the files touched** (`test_chart`, `test_tide`, `test_ports`,
+`test_scenarios`, `test_islands`): 10 passed. **The truths** 7-264 (Cadiz's water) and
+7-270 to 7-314 with `--slow`: 41 passed. **The fast tier** once: the pictures' known flake
+the one failure ("std 8.0" under the load), passing alone on this tree.

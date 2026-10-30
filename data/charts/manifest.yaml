@@ -7065,7 +7065,6 @@ regions:
       shoal: 3
       tower: 2
       town: 6
-      town: 6
   balearics:
     title: The Balearics, and Barbary from Mostaganem to Algiers
     bounds:
@@ -8038,7 +8037,6 @@ regions:
       tower: 4
       town: 5
       transit: 1
-      transit: 1
   gulf-of-lion:
     title: The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche
     bounds:
@@ -8886,7 +8884,6 @@ regions:
       tower: 4
       town: 15
       transit: 2
-      transit: 2
   ligurian-sea:
     title: The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena
     bounds:
@@ -9503,7 +9500,6 @@ regions:
       rock: 8
       shoal: 7
       tower: 7
-      town: 19
       town: 19
   tyrrhenian:
     title: The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples

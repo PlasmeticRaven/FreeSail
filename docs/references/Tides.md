@@ -27,7 +27,9 @@ block's water rises from the eleven's to its own, each constituent's amplitude a
 by the smoothstep of the distance's fraction of the band (package 94; judgement), so that
 no step stands at the seam. Bournemouth and Portsmouth (39a's, in `channel-mid`), held
 until package 94, serve the manifest's tide region `solent` (the Solent, Spithead and Poole
-bay: bounds and no tiles, for the gauges' membership alone).
+bay: bounds and no tiles, for the gauges' membership alone), and Portsmouth the Channel
+east's too: a gauge serves also a block whose seam with its own lies within ten miles of
+it (the rule of the seams, package 94; the Isle of Aix's and Cadiz's likewise).
 
 The streams (`data/tides/streams.yaml`) are rates and directions by area, each entry with
 its `source`: the headland table of Bowditch 1802 ('Of the Tides', the rates off the

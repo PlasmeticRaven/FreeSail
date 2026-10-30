@@ -11378,7 +11378,9 @@ def test_truth_7_280_newhaven_dieppe_and_beachy_head_have_their_own_spring_range
     Beachy Head, which has no gauge, within a foot and a quarter of Norie 1805's twenty (the
     blend gave 4.8): 18.99 feet, Newhaven's water seven miles off. The brief had "within a
     foot"; the measured gap is a foot and a hundredth, and Norie's twenty is a round
-    figure, so the lead amended it (2026-10-30)."""
+    figure, so the lead amended it (2026-10-30). Since package 94's rule of the seams
+    (Portsmouth's gauge serving the Channel east within ten miles of 1 W) 18.86 feet, within
+    the words (the lead's ruling of 2026-10-30)."""
     import freesail.world.tide as T
     from freesail.world.geo import Position
 
@@ -12317,7 +12319,9 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
     foot = units.feet_to_m(0.1)
     pairs = []
     # (north of 50.62 N the seam at 1 W is the Solent's tide region's with the Channel
-    # east's since package 94's item 4, a seam between two blocks: truth 7-313)
+    # east's since package 94's item 4, a seam between two blocks: truth 7-313; with
+    # Portsmouth's gauge serving both by the rule of the seams, step 5, its step at
+    # 50.9 N is 2.09 ft, 3.0 before the rule, and it stays out)
     for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
         cable = 0.1 / 60.0 / math.cos(math.radians(lat))
         pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
@@ -12352,7 +12356,9 @@ def test_truth_7_313_spithead_has_portsmouths_tide_within_the_hour():
     tide = T.load_tide()
     doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
     gauge = next(g for g in doc["gauges"] if g["id"] == "portsmouth")
-    assert gauge["block"] == "solent" and T.region_bounds()["solent"] == (50.62, 51.0, -2.2, -1.0)
+    # the Solent's own, and the Channel east's by the rule of the seams (step 5)
+    assert gauge["block"] == ["solent", "channel-east"]
+    assert T.region_bounds()["solent"] == (50.62, 51.0, -2.2, -1.0)
     # the gauge's own tide: Portsmouth alone (a level given for the loader; the hours of
     # high water do not read it)
     alone = {k: v for k, v in gauge.items() if k != "block"} | {"mean_level_m": 4.0}
