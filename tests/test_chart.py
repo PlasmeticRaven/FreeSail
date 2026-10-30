@@ -2188,3 +2188,36 @@ def test_the_mediterranean_wests_roads_and_its_seams_at_5_w_and_0_05_e():
         assert whole.region_at(a) == west and whole.region_at(b) == east
         assert whole.level_at(a) == whole.level_at(b) == 2
         assert abs(whole.depth_at(a) - whole.depth_at(b)) < 6.0
+
+
+# ---------------------------------------------------------------------------
+# Package 94: the island the grid lacks
+
+
+def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
+    """An island whose feature says the grid lacks it (`grid_lacks`, package 94) is ground
+    to the keel by its height and within its extent, a hazard on the pilot's and the
+    captain's line, and seen as the land it is; an island the grid holds (Belle Isle, its
+    `extent_m` the isle's size, nine kilometres) is no ground of the feature's, its land the
+    tiles'. Every islet given so carries a height and an extent under a kilometre, as a
+    danger's extent is kept, and each of 79c's and 79d's names the grid's water under it."""
+    d = {"id": "x", "kind": "island", "name": "the Isle X", "lat_deg": 40.0, "lon_deg": 4.0}
+    islet = Feature.from_dict(d | {"height_m": 15, "extent_m": 120, "grid_lacks": True})
+    assert islet.is_ground and islet.is_hazard and islet.head_above_datum_m() == 15.0
+    assert not islet.covered(5.0) and islet.to_dict()["grid_lacks"] is True
+    great = Feature.from_dict(d | {"height_m": 60, "extent_m": 9000})
+    assert not great.is_ground and not great.is_hazard and great.head_above_datum_m() is None
+    assert "grid_lacks" not in great.to_dict()
+    whole = load_chart(WHOLE)
+    lacking = [f for f in whole.features.values() if f.grid_lacks]
+    assert all(f.kind == "island" for f in lacking)
+    assert all(f.height_m and 0 < f.extent_m < 1000 for f in lacking)
+    regions = {whole.region_of[f.id] for f in lacking}
+    assert regions == {MEDW, BALEARICS, "gulf-of-lion", "ligurian-sea", "tyrrhenian"}
+    assert len(lacking) == 19
+    for f in lacking:
+        assert whole.depth_at(f.position) is not None, f.id
+        assert whole.danger_under(f.position, 0.0, 30.0, 3.0) is not None, f.id
+    belle = whole.feature("belle-isle")
+    assert belle.kind == "island" and belle.extent_m == 9000 and not belle.is_ground
+    assert not [f for f in whole.dangers_about(belle.position, 30.0) if f.id == "belle-isle"]

@@ -11378,7 +11378,9 @@ def test_truth_7_280_newhaven_dieppe_and_beachy_head_have_their_own_spring_range
     Beachy Head, which has no gauge, within a foot and a quarter of Norie 1805's twenty (the
     blend gave 4.8): 18.99 feet, Newhaven's water seven miles off. The brief had "within a
     foot"; the measured gap is a foot and a hundredth, and Norie's twenty is a round
-    figure, so the lead amended it (2026-10-30)."""
+    figure, so the lead amended it (2026-10-30). Since package 94's rule of the seams
+    (Portsmouth's gauge serving the Channel east within ten miles of 1 W) 18.86 feet, within
+    the words (the lead's ruling of 2026-10-30)."""
     import freesail.world.tide as T
     from freesail.world.geo import Position
 
@@ -11422,7 +11424,13 @@ def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_th
     """The brief's item 5: a position a mile west of 1 W in `channel-mid` reads the same
     tide to the centimetre as before the package (the eleven alone), its height and stream
     hour by hour through a day of springs; a position a mile east, in `channel-east`,
-    reads the block's (its gauges in the blend, the spring range other by feet)."""
+    reads the block's (its gauges in the blend, the spring range other by feet).
+    Re-measured by package 94's taper: a mile east the block's water is a thirty-sixth
+    part in (the smoothstep of a tenth of the band), its constants other than the eleven's
+    and its spring range within half a foot of theirs (10.07 feet against 10.11; 89's
+    rule gave 8.6 against 10.2); the block's own water whole from the band's ten miles in,
+    eleven miles east the spring range 11.4 feet against the eleven's 9.3, other by feet
+    as the truth had it a mile east. The west position to the bit, as before."""
     import freesail.world.tide as T
     from freesail.world.geo import Position
 
@@ -11439,8 +11447,11 @@ def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_th
         assert abs(now.stream_kn - then.stream_kn) < 0.01 and now.area_id == then.area_id
         assert now == then  # to the bit, not only to the centimetre
     assert tide.constants_about(west) == eleven.constants_about(west)
-    assert abs(_spring_range_ft(tide, east) - _spring_range_ft(eleven, east)) > 1.0
+    assert abs(_spring_range_ft(tide, east) - _spring_range_ft(eleven, east)) < 0.5
     assert tide.constants_at(east) != eleven.constants_at(east)
+    beyond = Position(50.6, -1.0 + 11.0 * mile_deg)  # past the taper's band
+    assert tide.taper_at(beyond) == 1.0
+    assert abs(_spring_range_ft(tide, beyond) - _spring_range_ft(eleven, beyond)) > 1.0
 
 
 def test_truth_7_283_the_recorded_passages_water_reads_the_tide_it_read():
@@ -11477,6 +11488,11 @@ def test_truth_7_283_the_recorded_passages_water_reads_the_tide_it_read():
             pos = Position(lat10 / 10.0 + 0.005, lon10 / 10.0 + 0.005)
             if lon10 > -30 and lat10 < 485:
                 continue  # south of channel-mid, Biscay north's water
+            if lon10 > -23 and 506 < lat10 < 510:
+                # the Solent's water since package 94 (its tide region, 50.62 to 51 N and
+                # 2.2 to 1 W): three positions of the grid, none a recorded passage's
+                assert tide.blocks_at(pos) == {"solent"}, pos
+                continue
             assert not tide.blocks_at(pos), pos
             for h in (0, 5, 13, 19):
                 when = datetime(1805, 6, 12) + timedelta(hours=h)
@@ -12175,14 +12191,15 @@ def test_truth_7_303_an_islet_the_grid_lacks_grounds_a_ship_though_the_tiles_rea
     some hundreds of metres (Li Galli off the Sorrento shore read forty metres), so the
     block gives each as a rock of its height and extent (ChartBlocks.md, "An isle the grid
     lacks"): a frigate's keel over Li Galli touches it though the tile there is deep, and a
-    mile off she is clear."""
+    mile off she is clear. Since package 94 the three rocky islets are an island the grid
+    lacks (`grid_lacks`, by Purdy's and Norie's words), ground to the keel as the rock was."""
     import math as _m
 
     from freesail.world.geo import destination
 
     w = _gulf_at(40.60, 14.40, datetime(1805, 6, 12, 12, 0), ports=TYRRHENIAN_PORTS)
     galli = w.chart.feature("li-galli")
-    assert galli.kind == "rock" and galli.extent_m >= 300.0
+    assert galli.kind == "island" and galli.grid_lacks and galli.extent_m >= 300.0
     assert w.chart.depth_at(galli.position) > 20.0  # the grid's water
     hit = w.chart.danger_under(galli.position, _m.radians(90.0), 45.0, 5.0)
     assert hit is not None
@@ -12266,8 +12283,9 @@ def test_truth_7_305_the_channel_easts_low_shore_against_its_own_high_water():
     """The brief's truth (93), the lead's wording amended at the measurement (the ruling of
     2026-10-30): on the rebuilt tiles the Somme's banks and Dungeness's shingle foreland
     stand above the world's high water springs; the raise at Romney Marsh is the block's
-    mean level, the eleven's and 0.35 m more at the grid's cell, to the centimetre; and Romney Marsh and the
-    Pevensey Levels lie below high water springs on the tiles, as they lie behind the
+    mean level, the eleven's and 0.35 m more at the grid's cell, to the centimetre; and
+    Romney Marsh and the Pevensey Levels lie below high water springs on the tiles, as they
+    lie behind the
     Dymchurch Wall and the Pevensey sea walls in truth: dyked levels, which GEBCO's fifteen
     seconds cannot hold (a finding, for a land patch when a sheet with its datum is read;
     the medians were 1.3 and 1.7 m under on the old tiles, 1.0 and 1.2 now)."""
@@ -12457,3 +12475,186 @@ def test_truth_7_309_the_strait_and_the_islands_raise_as_the_rule_gives_them():
     assert sound["fill_raise"] == "eleven"
     berth = Position(41.1870, 9.3790)
     assert eleven.constants_at(berth)[0] - tide.constants_at(berth)[0] > 6.0
+
+
+# Package 94: the chart's tidies from 79c, 79d and 89 (truths 7-310 to 7-314)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_310_the_isla_del_rey_is_an_island_to_the_lookout_and_ground_to_the_keel():
+    """79c's finding: the Isla del Rey, which the grid smooths into a ridge of nine to
+    eleven metres in Port Mahon, was given as a rock of its height so that nothing sails
+    through it, and the lookout called it "a danger". As an island the grid lacks (package
+    94) the lookout makes it out as the land it is and calls it by its name, by day and by
+    night close aboard, never "a danger"; the keel touches it within its extent as she
+    touched the rock, and a cable and a half south of it, in Tofiño's passage, she is clear;
+    the pilot names it ahead on her line, and the master's chart names it among the
+    dangers."""
+    import math as _m
+
+    from freesail.world.chart import DANGER_KINDS
+    from freesail.world.geo import destination
+    from freesail.world.lookout import Lookout
+
+    when = datetime(1805, 6, 15, 12, 0)
+    w = _med_at(*MAHON_MOUTH, when)
+    rey = w.chart.feature("isla-del-rey")
+    assert rey.kind == "island" and rey.grid_lacks and rey.kind not in DANGER_KINDS
+    assert w.chart.depth_at(rey.position) > 5.0  # the grid's ridge, water
+    # the lookout: land, by its name, not a danger
+    near = destination(rey.position, 270.0, 2.0 * units.CABLE)
+    for daylight in ("day", "night"):
+        seen = {s.feature.id: s for s in w.chart.in_sight(near, 10.0, None, daylight, when)}
+        assert "isla-del-rey" in seen and seen["isla-del-rey"].seen_as == "land", daylight
+    found = w.chart.in_sight(near, 10.0, None, "day", when)
+    words = Lookout.words(next(s for s in found if s.feature is rey), 0.0)
+    assert words.startswith("The Isla del Rey") and "danger" not in words
+    # standing for it from two cables west, the tiles' water clear, the lookout has it
+    # ahead by its extent
+    assert w.chart.depth_at(near) > 5.0
+    hit = Lookout(w.chart)._first_ahead(near, _m.radians(90.0), 600.0, 0.5, found)
+    assert hit is not None and hit[2] is not None and hit[2].feature is rey
+    # the keel
+    hit = w.chart.danger_under(rey.position, _m.radians(270.0), 45.0, 5.0)
+    assert hit is not None and hit.bottom == "the Isla del Rey, or Hospital Island (island)"
+    south = destination(rey.position, 200.0, 1.5 * units.CABLE)
+    assert w.chart.danger_under(south, _m.radians(270.0), 45.0, 5.0) is None
+    # the pilot's line and the master's chart
+    ahead = w.chart.dangers_ahead(near, 90.0, 1500.0, units.CABLE, 0.5, 6.0)
+    assert ahead and ahead[0][0].id == "isla-del-rey"
+    assert "isla-del-rey" in {f.id for f, _b, _d in w.chart.dangers_near(near, 2000.0)}
+
+
+def test_truth_7_311_a_roads_bottom_is_in_the_leads_note_as_an_anchorages_is():
+    """79d's finding: `Chart.bottom_near` read the note of the ground from `anchorage` and
+    `bottom` features alone, so a `road` with its `bottom:` gave none, and 79d gave its
+    roads as anchorages. Since package 94 a road's bottom is read as an anchorage's: the
+    road of Naples as a `road` gives the arming of the lead and the grounding its mud and
+    clay as the anchorage did; a feature of another kind with a `bottom:` gives nothing."""
+    from dataclasses import replace
+
+    from freesail.world.chart import Chart, load_manifest
+    from freesail.world.reckoning import ground_words
+
+    chart = Chart("tyrrhenian", load_manifest())  # its own, not the shared chart
+    road = chart.feature("naples-road")
+    assert road.kind == "anchorage" and road.bottom
+    near = road.position.advanced(300.0, 300.0)
+    assert ground_words(chart, near, 30.0) == road.bottom
+    chart.features[road.id] = replace(road, kind="road")
+    assert chart.bottom_near(near) == road.bottom
+    assert ground_words(chart, near, 30.0) == road.bottom
+    chart.features[road.id] = replace(road, kind="town")
+    assert chart.bottom_near(near) != road.bottom
+
+
+def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_foot():
+    """The brief's item 3: package 89's rule left a step where a block's water meets the
+    water the eleven alone serve, 102 degrees of M2 at 1 W off Selsey Bill (a cable either
+    side of 1 W the heights four to seven and a half feet apart through a day of springs).
+    The block's water now rises from the eleven's alone at its open edge to its own over
+    ten miles inside it (`tide.SEAM_BAND_NM`, the smoothstep of the distance's fraction),
+    so that a cable inside 1 W the tide is within a tenth of a foot of the tide a cable
+    outside, every ten minutes through a day of springs, along the seam from 49.1 to
+    50.6 N; the same across the seam at 48 N in the Iroise, where Biscay north meets the
+    Channel west. The taper is the cell's: a cell's centre gives its weight, so a cell once
+    worked is a lookup as before."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    foot = units.feet_to_m(0.1)
+    pairs = []
+    # (north of 50.62 N the seam at 1 W is the Solent's tide region's with the Channel
+    # east's since package 94's item 4, a seam between two blocks: truth 7-313; with
+    # Portsmouth's gauge serving both by the rule of the seams, step 5, its step at
+    # 50.9 N is 2.09 ft, 3.0 before the rule, and it stays out)
+    for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
+        cable = 0.1 / 60.0 / math.cos(math.radians(lat))
+        pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
+    for lon in (-4.7, -4.9):
+        pairs.append((Position(48.0 - 0.1 / 60.0, lon), Position(48.0 + 0.1 / 60.0, lon)))
+    for inside, outside in pairs:
+        assert tide.blocks_at(inside) and not tide.blocks_at(outside)
+        assert 0.0 < tide.taper_at(inside) < 0.01
+        for m in range(0, 25 * 60, 10):
+            when = datetime(1805, 6, 12) + timedelta(minutes=m)
+            gap = abs(tide.height_at(inside, when) - tide.height_at(outside, when))
+            assert gap < foot, (inside, when, gap)
+    assert 0.5 < tide.taper_at(Position(50.6, -1.0 + 0.2)) < 1.0  # 7.6 miles in
+    assert tide.taper_at(Position(50.6, -1.0 + 0.3)) == 1.0  # 11.4 miles in: whole
+
+
+def test_truth_7_313_spithead_has_portsmouths_tide_within_the_hour():
+    """The brief's item 4: Bournemouth's and Portsmouth's gauges (39a's, held until package
+    94) serve the manifest's tide region `solent` (bounds and no tiles, 50.62 to 51 N and
+    2.2 to 1 W), under the seam's taper. The eleven's blend over the Solent was four hours
+    and a half wrong (39a's finding again in 89's notes): Spithead's high water by it fell
+    at 06:56 and 19:11 on 12 June 1805 where Portsmouth's gauge has 11:33 and 23:49. Now
+    Spithead's high waters are within the hour of the gauge's (within five minutes), its
+    spring range the gauge's water (twelve feet where the eleven gave nine and a half),
+    and a mile west of 1 W at 50.6 N, outside the region, the eleven's to the bit (truth
+    7-282). The seam between the Solent's water and the Channel east's at 1 W north of
+    50.62 N is a seam between two blocks, a step of three feet and a half off Chichester
+    (docs/dev/TuningNotes.md, package 94, for the lead)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauge = next(g for g in doc["gauges"] if g["id"] == "portsmouth")
+    # the Solent's own, and the Channel east's by the rule of the seams (step 5)
+    assert gauge["block"] == ["solent", "channel-east"]
+    assert T.region_bounds()["solent"] == (50.62, 51.0, -2.2, -1.0)
+    # the gauge's own tide: Portsmouth alone (a level given for the loader; the hours of
+    # high water do not read it)
+    alone = {k: v for k, v in gauge.items() if k != "block"} | {"mean_level_m": 4.0}
+    own = T.Tide({"constituents": doc["constituents"], "gauges": [alone]}, {"areas": []})
+    eleven = _the_eleven_alone()
+    spithead = Position(50.775, -1.10)
+    assert tide.blocks_at(spithead) == {"solent"} and tide.taper_at(spithead) > 0.95
+    start = datetime(1805, 6, 12)
+    theirs = [w for w, _ in own.high_waters(Position(gauge["lat_deg"], gauge["lon_deg"]), start)]
+    for name, t, within_h in ((None, tide, 1.0), ("the eleven", eleven, None)):
+        ours = [w for w, _ in t.high_waters(spithead, start)]
+        gaps = [min(abs((a - b).total_seconds()) / 3600.0 for b in theirs) for a in ours]
+        if within_h is None:
+            assert min(gaps) > 4.0, (name, gaps)  # the old water, four hours and more out
+        else:
+            assert len(ours) == 2 and max(gaps) < within_h, gaps
+            assert max(gaps) < 5.0 / 60.0
+    assert _spring_range_ft(tide, spithead) > 11.5 and _spring_range_ft(eleven, spithead) < 10.0
+    mile_deg = 1.0 / 60.0 / math.cos(math.radians(50.6))
+    west = Position(50.6, -1.0 - mile_deg)
+    assert not tide.blocks_at(west)
+    assert tide.constants_about(west) == eleven.constants_about(west)
+
+
+def test_truth_7_314_every_recorded_passages_water_is_the_elevens_outside_the_solent():
+    """The brief's item 5: every recorded passage unchanged. The proof is the passages
+    themselves, run by node id on a clean worktree of the head and on the final tree,
+    identical (docs/dev/TuningNotes.md, package 94); as a behaviour: the recorded passages
+    sail the Channel west and its approaches, and over the whole of `channel-west` and of
+    `channel-mid` outside the Solent's tide region (and west of 1 W) the tide is the
+    eleven's to the bit, a cable from the Solent's west and south bounds as everywhere, the
+    taper being the inside of a block's alone; the Solent's water begins at its bounds."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    cable = 0.1 / 60.0
+    places = [Position(50.62 - cable, lon) for lon in (-2.1, -1.6, -1.1)]
+    places += [Position(lat, -2.2 - cable / math.cos(math.radians(lat))) for lat in (50.7, 50.9)]
+    for lat10 in range(485, 511, 5):
+        for lon10 in range(-70, -10, 5):
+            places.append(Position(lat10 / 10.0 + 0.003, lon10 / 10.0 + 0.003))
+    for pos in places:
+        if tide.blocks_at(pos):
+            assert tide.blocks_at(pos) == {"solent"}, pos
+            continue
+        for h in (0, 7, 15):
+            when = datetime(1805, 6, 12) + timedelta(hours=h)
+            assert tide.at(pos, when) == eleven.at(pos, when), (pos, h)
+    inside = Position(50.62 + cable, -1.6)
+    assert tide.blocks_at(inside) == {"solent"} and 0.0 < tide.taper_at(inside) < 0.01

@@ -618,6 +618,23 @@ CORRIDORS: dict[str, dict[str, Any]] = {
     },
 }
 
+# The tide's regions (package 94): bounds and no tiles, for the gauges' membership alone
+# (`freesail/world/tide.py`'s `region_bounds`: a gauge's `block:` names a region of the
+# chart or one of these). The build builds nothing of them and writes them into the
+# manifest whole at every build, so that a region's rebuild keeps them. `solent`: the
+# Solent, Spithead and Poole bay, for Bournemouth's and Portsmouth's gauges (package 39a's,
+# held until package 94), the bounds judgement from the gauges' places and the Wight's
+# shores: from 2.2 W (St Alban's Head's west, Bournemouth twelve miles inside) to 1 W
+# (the Channel east's bound), and from 50.62 N (south of the Wight's north shore and of
+# the Needles, Spithead nine miles inside; north of 50.6 N, where truth 7-282 holds the
+# eleven's water a mile west of 1 W) to 51 N (channel-mid's north bound).
+TIDE_REGIONS: dict[str, dict[str, Any]] = {
+    "solent": {
+        "title": "The Solent, Spithead and Poole bay: a tide region, no tiles",
+        "bounds": {"south": 50.62, "north": 51.0, "west": -2.2, "east": -1.0},
+    },
+}
+
 # The charts (spec M6 §26; package 38): each names the regions it holds, in the order
 # their features are indexed and their coasts drawn, and the corridor under them. A
 # region named here and not yet built is left out of the manifest's chart with a note;
@@ -2648,6 +2665,8 @@ class Build:
             "regions": regions,
             # the corridor (package 38): level 1 over the voyage's water, committed
             "corridors": corridors,
+            # the tide's regions (package 94): bounds alone, for the gauges' membership
+            "tide_regions": {k: dict(v) for k, v in TIDE_REGIONS.items()},
             # the world and the Atlantic are built by --world and --atlantic on the
             # developer's machine and never committed (spec M5 §10): the manifest says so,
             # lists their tiles only when this build made them, and the runtime reads

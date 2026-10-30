@@ -71,8 +71,12 @@ region's, its tide and its weather are rows in tables that already reach its wat
    touched). A block's own index is written by its build alone: marks added after the
    first build (the build is best made early, to fetch) are found by id and not by the
    lookout, nor a port's road by its note of the bottom, until the block is built again
-   with `--skip-fetch` (package 39c, whose first tests failed so). When the encyclopaedias
-   refuse the build network for its rate (39b, 39c: every request answered 429), the
+   with `--skip-fetch` (package 39c, whose first tests failed so). **A mark whose kind
+   changes and whose place does not** (package 94, the islets recast as islands) wants no
+   build: the index holds the ids by their cell and no kind, so `build_index` over the
+   features file gives the same bytes (say so, having run it), and the manifest's
+   `features_by_kind` for the region follows the file, edited alone, no tile, coast or
+   other region's entry touched. When the encyclopaedias refuse the build network for its rate (39b, 39c: every request answered 429), the
    lights' years are read from the Lighthouse Directory (R. Rowlett, ibiblio.org/
    lighthouse, a page a country's coast), which gives the year each station was first lit.
    The period's Spanish sources are on the Internet Archive in full: Tofiño's *Derrotero de
@@ -114,8 +118,8 @@ region's, its tide and its weather are rows in tables that already reach its wat
    machinery does not read). The port is entered in the ports' index of
    `data/nations.yaml` (`ports:`, which `tests/test_nations.py` holds equal to the
    files), and `tests/test_ports.py` names the port files in a list: the block adds its
-   own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage
-   or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
+   own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage,
+   a road or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
    on the whole chart), and every book the game ships names places of the whole chart
    (`test_log_lines.py`). `tests/test_ports.py` holds every port file to ten goods at
    least in its market, a yard's or a chandler's topmast and water, the three ratings
@@ -156,10 +160,41 @@ region's, its tide and its weather are rows in tables that already reach its wat
    water reaches into the block (a ship of its other sail patrolling across the block's
    bound) say which, with the old digest beside the new, for the lead to rule; never
    re-pin to make it pass. Bournemouth and Portsmouth (package 39a) lie in `channel-mid`,
-   whose water west of 1 W the rule keeps the eleven's; they stay under `held_gauges:`,
-   read by nothing, by the lead's ruling of 2026-10-30 (channel-mid's passages are pinned
-   on the eleven; the options and the seam's step at 1 W in docs/dev/TuningNotes.md,
-   package 89; a taper of the weights across a seam band is a later tidy).
+   whose water west of 1 W the rule keeps the eleven's, and were held under
+   `held_gauges:`, read by nothing, by the lead's ruling of 2026-10-30. **A tide region**
+   (package 94): the manifest may carry, under `tide_regions:`, a region with a title and
+   bounds and no tiles, for the gauges' membership alone; `Tide.region_bounds` reads it
+   beside the chart's regions, a gauge's `block:` may name it, and nothing of the chart
+   reads it (`Chart` and `load_chart` read `regions:` and `charts:` only). It is written
+   from `TIDE_REGIONS` in `tools/build_charts.py` at every build, beside `REGIONS`, so
+   that a region's rebuild keeps it (the manifest is written whole and drops a key the tool
+   does not know). The first is `solent`, 50.62 to 51 N and 2.2 to 1 W (judgement from the
+   gauges' places and the Wight's shores: Bournemouth twelve miles inside its west bound,
+   Spithead nine inside its south, and north of 50.6 N, where the eleven's water a mile
+   west of 1 W is a truth's), and Bournemouth and Portsmouth serve it (`block: solent`):
+   Spithead has Portsmouth's tide within minutes where the eleven's blend was four hours
+   and a half wrong. **The rule of the seams** (the lead's ruling of 2026-10-30,
+   package 94): a gauge serves its own block, and also a block whose seam with its own
+   lies within the taper's band (ten miles) of the gauge, the water a cable either side of
+   a seam being the near gauge's; its `block:` a list then, its own block first
+   (Portsmouth's `[solent, channel-east]`, the Isle of Aix's `[biscay-north,
+   biscay-south]`, Cadiz's `[portugal, strait]`; `test_tide.py` holds it over every
+   gauge). A block that adds a gauge within ten miles of a seam with another block lists
+   that block too; the taper smooths a block's open edges, the rule the seams near a
+   gauge, and a seam between two blocks far from every gauge stays a step (a finding). **The seam's taper** (package 94): where a block's bounds meet charted
+   water no block holds (a region's or the corridor's: 1 W where channel-mid meets
+   channel-east, 48 N where Biscay north meets the Channel west, Biscay's and Portugal's
+   ocean edges; not a seam between two blocks, and not an edge beyond which nothing is
+   charted), the block's water rises over `SEAM_BAND_NM` (ten miles, judgement) inside it
+   from the eleven's alone to its own, each constituent's amplitude and phase and the
+   level by the smoothstep of the distance's fraction (`Tide.taper_at`, `open_edges`);
+   where the eleven are beyond their reach (Portugal's and the islands' ocean edges, the
+   Strait's) there is no honest water to taper toward and the block's own stands to its
+   edge. Outside every block nothing changes. A block's gauge or port within the band of
+   an open edge reads the taper's water, not its gauge's own whole: keep the ports and the
+   gauges a block is tested by ten miles inside an open edge, or say which are not
+   (package 94 tabled them: Concarneau's gauge 7.6 miles from 48 N across Brittany's land,
+   Selsey Bill and the Owers within the band of 1 W).
    The stream areas in `data/tides/streams.yaml`, each with `chart: <region>` (and,
    for an area with no polygon, `bounds:`) and its `book:` in the period's form
    (`tests/test_tide.py` holds every statement to it: the set to a point, the springs to
@@ -286,9 +321,21 @@ Strait (package 39f, after 39d's merge): its files of the two tiles taken as
 **An isle the grid lacks.** EMODnet's sixteenth of a minute interpolates its soundings
 across an isle a few hundred metres long, so the tiles have water where Santa Clara at St
 Sebastian, Mouro at Santander and the Estelas stand forty metres high (package 39c): the
-block's features give such an isle as a `rock` of its height and an `extent_m` of its
-size, so that a ship cannot sail through it; a land patch is better, where a sheet can
-be read with its datum.
+block's features give such an isle as an **`island` with `grid_lacks: true`**, its
+`height_m` and an `extent_m` of its size (under a kilometre, laid over the isle as a
+danger's is), so that a ship cannot sail through it (package 94; the blocks before gave
+it as a `rock` of its height, and the lookout called it "a danger"). The keel takes it as
+it takes a rock that stands above the water (`Feature.is_ground`, `Chart.danger_under`),
+the pilot and the captain's chart name it on the line as a danger (`Feature.is_hazard`,
+`Chart.line_passes`, `dangers_ahead`, `dangers_near`), the lookout makes it out as land
+and calls it by its name, and stands into it by its extent though the tiles have water
+there. Which kind is the source's: an isle or an islet by the pilot's words is an island,
+a rock above water by his words a rock of its height (79c's and 79d's recast so, each by
+its source line: the Fourmigues of Giens, the Boute of Gourjean, the Formiche of
+Grosseto, the Toro, the Catalano and the Botte of Ponza stay rocks). An island the grid
+holds is the tiles' ground and the feature's mark alone, `grid_lacks` absent, its
+`extent_m` if any the isle's size and read by nothing (Belle Isle's nine kilometres). A
+land patch is better, where a sheet can be read with its datum.
 
 **A harbour patch whose land the grid smears keeps the eleven's raise until a sheet is
 read, said so** (package 93, the lead's ruling): where EMODnet has no sounding over a
@@ -428,8 +475,8 @@ Rance's mouth, four metres deeper in Bellin's day).
 
 **The tide, as read.** TICON's file holds, in the block's water, Weymouth, St Helier,
 Saint-Malo and Cherbourg (four of the eleven, their figures again to the centimetre) and
-Bournemouth and Portsmouth (held, above); no gauge at St Peter Port, Dartmouth or
-Portland. The streams of the Race and the Swinge are White's own (half-ebb to half-flood
+Bournemouth and Portsmouth (held, above; the Solent's since package 94); no gauge at St
+Peter Port, Dartmouth or Portland. The streams of the Race and the Swinge are White's own (half-ebb to half-flood
 south-westward, seven knots and more at springs); the Russels' hour Faden's; Portland's
 hour Bowditch's; the rest judgement, marked.
 
@@ -500,8 +547,8 @@ Gulf of Lion and Tyrrhenian among them):
   3851, Alcudia 3853, Mahón 3860).
 - **Isles the grid lacks**, again (39e's finding): Alboran, the Hormiga off Cape Palos, Isla
   Grosa, the Isla del Aire and Port Mahon's harbour islands are water in EMODnet's grid;
-  each is a rock of its height with an extent. A harbour's islands so smoothed become shoals
-  in its channel (the Isla del Rey a ridge of 9 to 11 m): place them by the period's plan
+  each a rock of its height with an extent then, an island the grid lacks since package
+  94. A harbour's islands so smoothed become shoals in its channel (the Isla del Rey a ridge of 9 to 11 m): place them by the period's plan
   of the entry and keep the pilot's passage open.
 - **Draft positions from memory miss by a kilometre** on a coast the builder does not know
   well: the features rule moves most within its reach, but render each harbour with its
@@ -601,10 +648,13 @@ where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea
   would be twenty feet.
 - **Islets the grid lacks are many here**: seventeen of the three regions (Planier, Tino,
   the Giraglia, the Lavezzi, the Sanguinaires, Li Galli ...) read as water in EMODnet's
-  sixteenth of a minute; each a rock of its height and extent ("An isle the grid lacks").
-- **A road with its bottom is a feature of kind `anchorage`**: `Chart.bottom_near` reads the
-  note from `anchorage` and `bottom` features only, so a `road` with a `bottom:` leaves a
-  port's spots without a note (`test_tackle_orders.py`).
+  sixteenth of a minute; each a rock of its height and extent then, eleven of them an
+  island the grid lacks since package 94 ("An isle the grid lacks").
+- **A road with its bottom was a feature of kind `anchorage`**: `Chart.bottom_near` read the
+  note from `anchorage` and `bottom` features only, so a `road` with a `bottom:` left a
+  port's spots without a note (`test_tackle_orders.py`). Since package 94 a `road`'s
+  `bottom:` is read as an anchorage's (`chart.BOTTOM_NOTE_KINDS`); the roads given as
+  anchorages stay so.
 - **The business needs prices that differ**: a cargo is drawn between two of a region's
   ports only where a good's price at one is 1.3 times the other's; ports priced from one
   table draw no trader at all. Give each port its own produce cheap and its wants dear.
