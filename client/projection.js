@@ -22,7 +22,8 @@
  * Conventions the skeleton relies on (from the ship files, spec section 6):
  *   spar.height_m   above the deck at midships; for a bowsprit-family spar,
  *                   the height of its outer end
- *   spar.x_m        root spars only; a child spar stands at its parent's x
+ *   spar.x_m        root spars only; a child spar stands at its parent's x, but
+ *                   a yard under the bowsprit or the jib-boom at its own (package 75)
  *   brace_angle     radians from square, positive = starboard yardarm forward
  *   sheet_angle     radians from the centreline, unsigned; the sail lies to lee
  *   heel            radians, positive = heeled to starboard
@@ -113,6 +114,14 @@
   var YARD_BEFORE_MAST_OF_BEAM = 0.05;
   var LUG_LEE_OF_MAST_OF_BEAM = 0.03;
   var ON_DECK_M = 0.6;
+  // Package 75 (B5.3; docs/design/Design-ShipsEngineExtensions.md §6.2). A yard under the
+  // bowsprit or the jib-boom (the spritsail yard, the sprit-topsail yard) stands at its own
+  // station, where its file has it. Its braces lead to the fore stay and up to the fore top,
+  // drawn to the fore mast's head less a metre; the spritsail's sheets lead aft along the side
+  // to a sheave abaft the foremost fore shroud (Lavery I30), drawn to the side at the deck this
+  // far abaft the fore mast (judgement).
+  var SPRIT_SHEET_ABAFT_M = 1.0;
+  var FORE_TOP_BELOW_HEAD_M = 1.0;
   // Package 75 (B5.1; docs/design/Build-Ships.md §6): a hull whose file gives a profile
   // (`hull.profile`, §5.1: x forward of midships, z above her waterline) is drawn from it, as
   // herself. Each side is drawn in strips, one polygon between each two neighbouring stations,
@@ -528,6 +537,11 @@
     function isUpperMast(spec) {
       return !!(spec && MAST_CLASSES[spec.class] && spec.parent);
     }
+    /** A yard crossed under the bowsprit or the jib-boom (package 75, B5.3; Ext §6.2): a spar
+     *  of class `yard` whose chain roots at a bowsprit, as `Ship.under_bowsprit` has it. */
+    function underBowsprit(spec) {
+      return !!(spec && spec.class === "yard" && (sparSpecs[chainTop(spec)] || {}).class === "bowsprit");
+    }
     /** A topsail over a bare yard the ship file does not carry (the schooner's fore yard,
      *  "a bare spread yard for the topsail's foot; it is not a part here", gen_ships.py):
      *  its sail's foot where that yard is, at its hoist, the file's centre midway down the
@@ -614,12 +628,19 @@
           r.x = spec.x_m || 0;
           r.a = v(r.x, 0, deck);
           var dz = Math.min(H, L * 0.95);
-          r.b = v(r.x + Math.sqrt(Math.max(L * L - dz * dz, 0)), 0, deck + dz);
-          r.tip = r.b;
-          // package 75 (B5.1; Indf §12.3): with a profile, the heel at the stem head, or the
-          // rail there if that is lower, and the tip where it was
+          // package 75 (B5.1, B5.3; Indf §12.3; the lead's ruling of 2026-10-29): with a
+          // profile, the heel at the stem head, or the rail there if that is lower, and the
+          // whole spar from there, its length rising to its end's height as the file has it,
+          // so that the yards under it hang from a bowsprit that stands where the file has
+          // it; the jib-boom roots at its end. B5.1 drew the heel there and left the end where
+          // a heel on the datum put it, short of the file's length
           var heel = profile ? stemHead(profile) : null;
-          if (heel) r.a = v(heel[0], 0, heel[1]);
+          if (heel) {
+            r.a = v(heel[0], 0, heel[1]);
+            dz = Math.min(Math.max(deck + H - heel[1], 0), L * 0.95);
+          }
+          r.b = v(r.a[0] + Math.sqrt(Math.max(L * L - dz * dz, 0)), 0, r.a[2] + dz);
+          r.tip = r.b;
         } else if (HEAD_CLASSES[spec.class]) {
           var rootP = parent && parent.tip ? parent.tip : v(hull.length_waterline_m / 2, 0, deck);
           var tipZ = deck + H;
@@ -729,6 +750,14 @@
             z = lowered + r.hoist * (hoisted - lowered);
           }
           r.x = parent ? (parent.xAt ? parent.xAt(z) : parent.x) : spec.x_m || 0;
+          // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom at its own
+          // station (its file's `x_m`; its spar's x where a file gives none), not at its spar's
+          // heel, where the trial's spritsail hung with its foot under the water (Eng §5); it
+          // neither hoists nor is slung before a mast
+          if (underBowsprit(spec)) {
+            r.x = spec.x_m || r.x;
+            r.everyWay = true; // the frame reaches its swing every way (`fullRigFrame`)
+          }
           // package 57: a square yard is slung before its mast (YARD_BEFORE_MAST_OF_BEAM)
           if (spec.class === "yard" && parent && MAST_CLASSES[parent.cls]) r.x += yardBefore;
           r.centre = v(r.x, 0, z);
@@ -942,7 +971,9 @@
       if (r.hoist !== undefined) fig.hoist = r.hoist; // a yard: 1 at its hoist, 0 lowered
       if (r.flyingDown) fig.state = "sent_down_flying"; // package 57: on deck with its sail
       if (s.class === "yard" && !r.onDeck) fig.brace = r.brace || 0; // package 57: said in its title
-      if (YARD_CLASSES[s.class] && r.parent && !r.onDeck) {
+      // package 75 (B5.3): a yard under the bowsprit or the jib-boom hangs from no mast, and is
+      // sorted at its own middle; that correction would move it half its spar's run forward
+      if (YARD_CLASSES[s.class] && r.parent && !r.onDeck && !underBowsprit(s)) {
         fig.mastId = r.parent.id; // the painter's correction for the mast's rake (package 57)
         fig.centre = r.centre;
       }
@@ -1256,7 +1287,9 @@
           return;
         }
         var sqFig = sailFigure(spec, dyn, corners, Y.normal, Y, depth);
-        sqFig.mastId = Y.parent ? Y.parent.id : null;
+        // sorted against its mast; a sail under the bowsprit or the jib-boom at its own centre
+        // (package 75, B5.3)
+        sqFig.mastId = Y.parent && !underBowsprit(Y.spec) ? Y.parent.id : null;
         figures.push(sqFig);
       } else if (cls === "gaff" || cls === "sprit") {
         var M = spars[roles.mast];
@@ -1472,6 +1505,13 @@
         var from = ss > 0 ? Y.b : Y.a;
         var m = mastAftOf(Y.x);
         var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : v(Y.x - Y.half * 0.8, (ss * beam) / 2, deck);
+        if (underBowsprit(Y.spec) && lowerMasts.length) {
+          // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom is braced
+          // up to the fore top (Lavery I30), not level aft
+          var foreM = lowerMasts[0];
+          var topZ = foreM.head[2] - FORE_TOP_BELOW_HEAD_M;
+          to = v(foreM.xAt ? foreM.xAt(topZ) : foreM.x, ss * 0.3, topZ);
+        }
         if (state === "parted") to = add(from, v(-1.5, 0, -2.5));
         figures.push({ kind: "line", id: ln.id, cls: "brace", of: ln.of, state: state, pts: [from, to], busy: !!busy[ln.of] });
       } else if (ln.class === "lift") {
@@ -1483,13 +1523,16 @@
         // one a twentieth nearer the mast, so that the pair are not drawn one over the other;
         // the derrick (its lift with no side) from two-thirds along it toward the peak,
         // "between the slings and the peak" (Steel 1794 vol. I p. 207; judgement)
+        // A yard under the bowsprit or the jib-boom (B5.3; Ext §6.2) is lifted as every yard is,
+        // up to the head of the spar it hangs on: that spar's end.
         var Yl = spars[ln.of];
-        if (!Yl || !Yl.arm || sentDown(Yl) || Yl.onDeck || !Yl.parent || !Yl.parent.head) return;
+        var liftedFrom = Yl && Yl.parent ? Yl.parent.head || (underBowsprit(Yl.spec) ? Yl.parent.tip : null) : null;
+        if (!Yl || !Yl.arm || sentDown(Yl) || Yl.onDeck || !liftedFrom) return;
         var arm = sideSign(ln.side) > 0 ? Yl.b : Yl.a;
         if (Yl.cutAtMast) {
           arm = lerp(Yl.truss, Yl.b, ln.side ? 0.5 + 0.05 * sideSign(ln.side) : 2 / 3);
         }
-        var up = state === "parted" ? add(arm, v(0, 0, -2.5)) : Yl.parent.head;
+        var up = state === "parted" ? add(arm, v(0, 0, -2.5)) : liftedFrom;
         figures.push({ kind: "line", id: ln.id, cls: "lift", of: ln.of, state: state, pts: [arm, up], busy: !!busy[ln.of] });
       } else if (ln.class === "sheet") {
         var sf = sailFigById[ln.of];
@@ -1516,6 +1559,12 @@
           var clew = s2 > 0 ? sf.corners[2] : sf.corners[3];
           var below = Yy ? yardBelow(Yy) : null;
           var lead = below ? (s2 > 0 ? below.b : below.a) : v(clew[0], (s2 * beam) / 2, deck);
+          if (!below && Yy && underBowsprit(Yy.spec) && lowerMasts.length) {
+            // package 75 (B5.3; Ext §6.2): the spritsail's sheets aft to the side abaft the
+            // fore mast, at the deck (Lavery I30), not abreast the clew forward of the stem; the
+            // sprit topsail's go to the spritsail yard's arms, as every topsail's to the yard below
+            lead = v(lowerMasts[0].x - SPRIT_SHEET_ABAFT_M, (s2 * beam) / 2, deck);
+          }
           pts = [clew, lead];
         } else {
           var clew2 = sf.corners[2];
@@ -1577,10 +1626,17 @@
    *  the ship file, aloft whatever its state now, with each swinging spar's reach about its
    *  pivot in all four horizontal directions (at each height its swing reaches from, for the
    *  mizen yard of a course cut at the mast: package 75), so that no brace or sheet angle
-   *  and no spar sent down changes it; and the hull. */
+   *  and no spar sent down changes it; and the hull. A yard under the bowsprit (package 75,
+   *  B5.3) stands foremost of the rig, where braced its arm reaches past the four directions
+   *  seen on the bow: its swing is reached every way, by sixteen points about its slings whose
+   *  figure's sides touch the circle its arms sweep. */
   function fullRigFrame(graph, spars, hull) {
     var pts = [];
     var dirs = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];
+    var everyWay = [];
+    for (var k = 0; k < 16; k++) {
+      everyWay.push(mul([Math.cos((k * Math.PI) / 8), Math.sin((k * Math.PI) / 8), 0], 1 / Math.cos(Math.PI / 16)));
+    }
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
       if (!r) return;
@@ -1603,7 +1659,7 @@
       // at the pivot's height, or at each height a swing reaches from (the mizen yard's)
       (r.heights || [pivot[2]]).forEach(function (z) {
         var at = v(pivot[0], pivot[1], z);
-        dirs.forEach(function (d) {
+        (r.everyWay ? everyWay : dirs).forEach(function (d) {
           pts.push(add(at, mul(d, reach)));
         });
       });

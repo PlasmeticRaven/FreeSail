@@ -28,6 +28,13 @@ fields the projection reads always run.
   part to windward, its lifts from the yard's after part, its sheet to the taffrail; brailed to
   the mast and up under the yard, furled along it, reefed from the foot; the frame equal across
   states; a whole lateen with its cut drawn as a standing lug to leeward.
+- Package 75 (B5.3, Ext §6.2), on the same fixture and on the profiled files with its yards cut
+  on their own spars: each yard under the bowsprit or the jib-boom at its station, hanging
+  under its spar; the spritsail hung from its yard, the sprit topsail's clews at the spritsail
+  yard's arms, every foot above the water; the braces up to the fore top, the spritsail's
+  sheets aft to the side, the lifts to the spar's end; each sorted at its own middle; and, by
+  the lead's ruling of 2026-10-29, the bowsprit stood from the profile's stem head as long as
+  the file has it, the jib-boom from its end.
 """
 
 from __future__ import annotations
@@ -40,7 +47,17 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
-from rig_fixtures import frigate_with_mizen_yard, frigate_with_mizen_yard_doc, write_ship
+from rig_fixtures import (
+    SPREAD,
+    SPRIT_TOPSAIL_HANG_M,
+    SPRIT_TOPSAIL_STATION,
+    SPRITSAIL_FOOT_ABOVE_WATER_M,
+    SPRITSAIL_HANG_M,
+    SPRITSAIL_STATION,
+    frigate_with_mizen_yard,
+    frigate_with_mizen_yard_doc,
+    write_ship,
+)
 
 from freesail.api import queries
 from freesail.api.session import make_ship, make_world
@@ -1120,11 +1137,23 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
         assert got["fore.mast"][0][2] == pytest.approx(5.26, abs=0.01)  # her forecastle
 
 
+# How far forward of B5.1's the end of each profiled file's bowsprit is drawn since B5.3, metres
+# (the 64's 35.228 -> 37.001, the razee's 35.211 -> 36.903; their jib-booms' ends with them)
+BOWSPRIT_END_FORWARD_OF_B5_1 = {SIXTY_FOUR: 1.773, RAZEE: 1.692}
+
+
 @needs_node
 @pytest.mark.parametrize("path", PROFILED)
-def test_the_bowsprits_heel_is_at_the_stem_head_and_its_tip_where_it_was(tmp_path, path):
-    """Indf §12.3: the heel at the stem head, or the rail there if that is lower (the razee's);
-    the tip at the file's height above the datum, as before."""
+def test_the_bowsprit_stands_from_the_stem_head_its_length_up_to_its_ends_height(tmp_path, path):
+    """Indf §12.3: the heel at the stem head, or the rail there if that is lower (the razee's).
+    B5.3 (the lead's ruling of 2026-10-29, Ext §6.2): the whole spar from there, as long as the
+    file has it, up to its end's height above the datum, so that the yards under it hang from a
+    bowsprit that stands where the file has it; the jib-boom from its end, as before.
+
+    Old beside new: B5.1 drew the heel there and kept the end where a heel on the datum put it,
+    `x_m` + sqrt(L^2 - min(H, 0.95 L)^2) forward at deck + H, so that the drawn spar fell short
+    of the file's length (the 64's 12.65 m of 14.1, the razee's 12.72); its end now stands at
+    the same height the file's length farther forward (BOWSPRIT_END_FORWARD_OF_B5_1)."""
     graph = graph_of(path)
     profile = graph["hull"]["profile"]
     deck = graph["hull"]["deck_height_m"]
@@ -1134,9 +1163,20 @@ def test_the_bowsprits_heel_is_at_the_stem_head_and_its_tip_where_it_was(tmp_pat
     hx, hz = profile["stem_m"][-1]
     assert heel == pytest.approx([hx, 0.0, min(hz, interp(profile["rail_m"], hx))], abs=0.001)
     length, height = bowsprit["length_m"], bowsprit["height_m"]
+    assert math.dist(heel, tip) == pytest.approx(length)
+    assert tip[1] == 0.0 and tip[2] == pytest.approx(deck + height)
+    assert tip[0] > heel[0]
+    # old (B5.1) beside new
     rise = min(height, 0.95 * length)
-    reach = math.sqrt(length * length - rise * rise)
-    assert tip == pytest.approx([bowsprit["x_m"] + reach, 0.0, deck + rise], abs=1e-9)
+    old_tip = [bowsprit["x_m"] + math.sqrt(length * length - rise * rise), 0.0, deck + rise]
+    assert tip[2] == pytest.approx(old_tip[2])
+    assert tip[0] - old_tip[0] == pytest.approx(BOWSPRIT_END_FORWARD_OF_B5_1[path], abs=0.001)
+    # the jib-boom from the bowsprit's end, its length up to its own end's height
+    jib_heel, jib_end = got["jib_boom"]
+    (jib_boom,) = [s for s in graph["spars"] if s["class"] == "jib_boom"]
+    assert jib_heel == pytest.approx(tip)
+    assert math.dist(jib_heel, jib_end) == pytest.approx(jib_boom["length_m"])
+    assert jib_end[2] == pytest.approx(deck + jib_boom["height_m"])
     if path == RAZEE:
         assert heel[2] < hz  # her rail at the stem head stands below the stem head
 
@@ -2515,3 +2555,480 @@ def test_the_course_as_the_game_serves_it_is_drawn_at_its_mast(tmp_path):
         pytest.approx(set_["corners"][2]),
         pytest.approx([-0.52 * length, 0.0, 1.02 * deck]),
     ]
+
+
+# ---------------------------------------------------------------------------
+# Package 75 (B5.3, docs/design/Design-ShipsEngineExtensions.md §6.2): the yards under the
+# bowsprit, on the fixture (tests/rig_fixtures.py; no file carries them yet) and on the profiled
+# files with the fixture's yards cut on their own bowsprit and jib-boom; the bowsprit stood from
+# the profile's stem head (the lead's ruling of 2026-10-29)
+# ---------------------------------------------------------------------------
+
+SPRIT_YARDS = ("spritsail.yard", "sprit_topsail.yard")
+SPRIT_SAILS = ("spritsail", "sprit_topsail")
+# each yard's spar, and how far the fixture hangs it under that spar's line
+SPRIT_HANG = {
+    "spritsail.yard": ("bowsprit", SPRITSAIL_HANG_M),
+    "sprit_topsail.yard": ("jib_boom", SPRIT_TOPSAIL_HANG_M),
+}
+CLEW_SPREAD = 0.9  # client/projection.js: a topsail's clews at nine-tenths of the yard below
+HEAD_SPREAD = 0.9  # and a sail with no yard below as broad as nine-tenths of its own
+
+
+def sprit_sails(
+    state: SailState = SailState.SET,
+    reefs: int = 0,
+    brace_deg: float = 0.0,
+    tack: str = "larboard",
+) -> dict:
+    """`frigate_with_mizen_yard()` under plain sail on `tack` with the wind on the quarter, her
+    spritsail and sprit topsail in `state` (the spritsail with `reefs`), the two yards braced
+    `brace_deg` from square (positive, the starboard yardarm forward): the graph and snapshot."""
+    ship = frigate_with_mizen_yard()
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    for sid in SPRIT_SAILS:
+        sail = ship.sails[sid]
+        sail.state, sail.reefs = state, min(reefs, sail.reef_bands)
+    for yid in SPRIT_YARDS:
+        ship.spars[yid].brace_angle = math.radians(brace_deg)
+    awa = math.radians(120.0) * (1.0 if tack == "starboard" else -1.0)
+    return ship_state(ship, awa=awa, tack=tack)
+
+
+SPRIT_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap || null);
+    const mine = ['spritsail.yard', 'sprit_topsail.yard', 'spritsail', 'sprit_topsail'];
+    const spar = id => {
+      const r = sk.spars[id];
+      return r ? {a: r.a, b: r.b, centre: r.centre || null, half: r.half || null} : null;
+    };
+    const sails = {};
+    sk.figures.filter(f => f.kind === 'sail' && mine.includes(f.id)).forEach(f => {
+      sails[f.id] = {state: f.state, corners: f.corners, path: P.flattenPath(f.path)};
+    });
+    const fore = sk.spars['fore.mast'];
+    const topZ = fore.head[2] - 1;
+    return {
+      spars: {bowsprit: spar('bowsprit'), jib_boom: spar('jib_boom'),
+              'spritsail.yard': spar('spritsail.yard'),
+              'sprit_topsail.yard': spar('sprit_topsail.yard')},
+      drawn: sk.figures.filter(f => f.kind === 'spar' && mine.includes(f.id))
+        .map(f => ({id: f.id, pts: f.pts, hoist: f.hoist})),
+      sails: sails,
+      lines: sk.figures.filter(f => f.kind === 'line' && mine.includes(f.of))
+        .map(f => ({id: f.id, cls: f.cls, pts: f.pts})),
+      foreTop: [fore.xAt(topZ), topZ],
+      foreX: fore.x,
+    };
+"""
+
+
+def head_chain(graph: dict) -> dict[str, tuple[list, list]]:
+    """The bowsprit and the booms on it, heel and end, as the drawing stands them: with a
+    profile, the bowsprit from the stem head (the rail there if that is lower), as long as the
+    file has it, up to its end's height above the datum (B5.3; the lead's ruling of
+    2026-10-29); without one, from its `x_m` on the datum, rising its `height_m` (at most 0.95
+    of its length), as before; a boom from the end of the spar it is on, up to its own end's
+    height (at most 0.7 of its length)."""
+    hull = graph["hull"]
+    deck, profile = hull["deck_height_m"], hull.get("profile")
+    spars = {s["id"]: s for s in graph["spars"]}
+    out: dict[str, tuple[list, list]] = {}
+
+    def place(sid: str) -> tuple[list, list]:
+        if sid not in out:
+            s = spars[sid]
+            length, height = s["length_m"], s["height_m"]
+            if s["class"] == "bowsprit" and profile:
+                hx, hz = profile["stem_m"][-1]
+                heel = [hx, 0.0, min(hz, interp(profile["rail_m"], hx))]
+                rise = min(max(deck + height - heel[2], 0.0), 0.95 * length)
+            elif s["class"] == "bowsprit":
+                heel, rise = [s["x_m"], 0.0, deck], min(height, 0.95 * length)
+            else:
+                heel = place(s["parent"])[1]
+                rise = max(min(deck + height - heel[2], 0.7 * length), 0.0)
+            reach = math.sqrt(max(length * length - rise * rise, 0.0))
+            out[sid] = (heel, [heel[0] + reach, 0.0, heel[2] + rise])
+        return out[sid]
+
+    for s in graph["spars"]:
+        if s["class"] in ("bowsprit", "jib_boom", "flying_jib_boom"):
+            place(s["id"])
+    return out
+
+
+def _on_the_line(heel: list, end: list, x: float) -> float:
+    """The height of the line heel-end at x."""
+    return heel[2] + (end[2] - heel[2]) * (x - heel[0]) / (end[0] - heel[0])
+
+
+def with_sprit_yards(path: str) -> dict:
+    """The file's served graph with the fixture's two yards under the bowsprit, their square
+    sails and their lines (tests/rig_fixtures.py), cut on her own bowsprit and jib-boom as they
+    are drawn from her stem head (`head_chain`) as the fixture cuts them on the frigate's: at
+    its stations and hangs, as long as her fore topsail and fore topgallant yards, the spritsail
+    down to a metre above the water and the sprit topsail the trapezoid to the spritsail yard's
+    arms; both set (the graph's state: no snapshot)."""
+    graph = graph_of(path)
+    fixture = queries.ship_graph(frigate_with_mizen_yard())
+    deck = graph["hull"]["deck_height_m"]
+    chain = head_chain(graph)
+    length = {s["id"]: s["length_m"] for s in graph["spars"]}
+
+    def station(on: str, share: float, hang: float) -> tuple[float, float]:
+        heel, end = chain[on]
+        return heel[0] + share * (end[0] - heel[0]), heel[2] + share * (end[2] - heel[2]) - hang
+
+    ss_x, ss_z = station("bowsprit", SPRITSAIL_STATION, SPRITSAIL_HANG_M)
+    st_x, st_z = station("jib_boom", SPRIT_TOPSAIL_STATION, SPRIT_TOPSAIL_HANG_M)
+    ss_len, st_len = length["fore.topsail.yard"], length["fore.topgallant.yard"]
+    ss_depth = ss_z - SPRITSAIL_FOOT_ABOVE_WATER_M
+    head, foot, gap = SPREAD * st_len, SPREAD * ss_len, st_z - ss_z
+    up = (2.0 * head + foot) / (3.0 * (head + foot))
+    spars = {
+        "spritsail.yard": {"x_m": ss_x, "height_m": ss_z - deck, "length_m": ss_len},
+        "sprit_topsail.yard": {"x_m": st_x, "height_m": st_z - deck, "length_m": st_len},
+    }
+    sails = {
+        "spritsail": {
+            "area_m2": SPREAD * ss_len * ss_depth,
+            "x_m": ss_x,
+            "centre_height_m": ss_z - 0.5 * ss_depth,
+        },
+        "sprit_topsail": {
+            "area_m2": 0.5 * (head + foot) * gap,
+            "x_m": ss_x + up * (st_x - ss_x),
+            "centre_height_m": ss_z + up * gap,
+        },
+    }
+    graph["spars"] += [{**s, **spars[s["id"]]} for s in fixture["spars"] if s["id"] in spars]
+    graph["sails"] += [
+        {**s, **sails[s["id"]], "state": "set"} for s in fixture["sails"] if s["id"] in sails
+    ]
+    graph["lines"] += [ln for ln in fixture["lines"] if ln["of"] in spars or ln["of"] in sails]
+    return graph
+
+
+@needs_node
+@pytest.mark.parametrize("state", [SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED])
+def test_each_yard_under_the_bowsprit_stands_at_its_station_under_its_spar(tmp_path, state):
+    """Ext §6.2: a yard on the bowsprit or the jib-boom stands at its own `x_m` at deck plus its
+    `height_m`, with no slinging offset and no hoist whatever its sail's state, its arms across
+    the ship, as far under its spar's drawn line as the fixture hangs it (within its file's
+    tenth of a metre); not at its spar's heel, where the trial's spritsail hung with its foot
+    two metres under the water (Eng §5)."""
+    data = sprit_sails(state)
+    got = run_js(tmp_path, data, SPRIT_FIGURES)
+    deck = data["graph"]["hull"]["deck_height_m"]
+    spars = {s["id"]: s for s in data["graph"]["spars"]}
+    for yid, (on, hang) in SPRIT_HANG.items():
+        yard, drawn = spars[yid], got["spars"][yid]
+        at = [yard["x_m"], 0.0, deck + yard["height_m"]]
+        half = yard["length_m"] / 2.0
+        assert yard["parent"] == on
+        assert drawn["centre"] == pytest.approx(at, abs=1e-9)
+        assert drawn["a"] == pytest.approx([at[0], -half, at[2]], abs=1e-9)
+        assert drawn["b"] == pytest.approx([at[0], half, at[2]], abs=1e-9)
+        heel, end = got["spars"][on]["a"], got["spars"][on]["b"]
+        assert heel[0] + 1.0 < at[0] < end[0]  # under its spar, not at its heel
+        assert _on_the_line(heel, end, at[0]) - at[2] == pytest.approx(hang, abs=0.1)
+    assert {f["id"]: f["hoist"] for f in got["drawn"]} == {yid: 1 for yid in SPRIT_YARDS}
+
+
+@needs_node
+def test_the_spritsail_hangs_from_its_yard_and_the_sprit_topsail_is_sheeted_to_its_arms(tmp_path):
+    """Ext §6.2: the spritsail, with no yard below it, hangs from its yard as `squareCut` hangs
+    any such sail, nine-tenths of its yard broad, head and foot, and its area over that deep.
+    The sprit topsail's clews are at the spritsail yard's arms, at nine-tenths of it as every
+    topsail's are at the yard below (within 0.1 m: Ext §6.5), and its head along its own yard:
+    the trapezoid between the two yards. Each is drawn to its file's area by the heights between
+    its yards within a twentieth, and its centre where the file puts the sail's force (its `x_m`
+    and `centre_height_m`, within 0.1 m: the drawing against the physics)."""
+    data = sprit_sails()
+    got = run_js(tmp_path, data, SPRIT_FIGURES)
+    sails = {s["id"]: s for s in data["graph"]["sails"]}
+    yard, top_yard = got["spars"]["spritsail.yard"], got["spars"]["sprit_topsail.yard"]
+    ss = got["sails"]["spritsail"]["corners"]  # larboard head, starboard head, clews
+    st = got["sails"]["sprit_topsail"]["corners"]
+    x, _y, z = yard["centre"]
+    spread = HEAD_SPREAD * 2.0 * yard["half"]
+    deep = sails["spritsail"]["area_m2"] / spread
+    assert ss == [
+        pytest.approx([x, -spread / 2.0, z]),
+        pytest.approx([x, spread / 2.0, z]),
+        pytest.approx([x, spread / 2.0, z - deep]),
+        pytest.approx([x, -spread / 2.0, z - deep]),
+    ]
+    arm = CLEW_SPREAD * yard["half"]
+    assert math.dist(st[2], [x, arm, z]) <= 0.1 and math.dist(st[3], [x, -arm, z]) <= 0.1
+    for corner in st[:2]:  # the head along its own yard
+        assert corner[0] == pytest.approx(top_yard["centre"][0])
+        assert corner[2] == pytest.approx(top_yard["centre"][2])
+    assert span(st[0], st[1]) <= 2.0 * top_yard["half"] + 1e-6
+    for sid, c in (("spritsail", ss), ("sprit_topsail", st)):
+        assert quad_area(c) == pytest.approx(sails[sid]["area_m2"], rel=0.05), sid
+        head, foot = span(c[0], c[1]), span(c[3], c[2])
+        up = (2.0 * head + foot) / (3.0 * (head + foot))  # the trapezoid's centroid, from the foot
+        mid_head = [(p + q) / 2.0 for p, q in zip(c[0], c[1], strict=True)]
+        mid_foot = [(p + q) / 2.0 for p, q in zip(c[3], c[2], strict=True)]
+        centre = [f + up * (h - f) for f, h in zip(mid_foot, mid_head, strict=True)]
+        file = [sails[sid]["x_m"], 0.0, sails[sid]["centre_height_m"]]
+        assert centre == pytest.approx(file, abs=0.1), sid
+
+
+SPRIT_STATES = [
+    (SailState.SET, 0),
+    (SailState.SET, 1),
+    (SailState.SET, 2),
+    (SailState.GOOSE_WINGED, 0),
+    (SailState.LOOSED, 0),
+    (SailState.IN_THE_GEAR, 0),
+    (SailState.FURLED, 0),
+]
+
+
+@needs_node
+@pytest.mark.parametrize("brace_deg", [0.0, 30.0, -30.0])
+def test_every_sprit_sails_foot_stands_above_the_water_in_every_state(tmp_path, brace_deg):
+    """Ext §6.5: upright, each sail under the bowsprit and its yard stand clear of the water in
+    every state: the spritsail set, reefed once and twice, goose-winged, loosed, in the gear and
+    furled, square and braced to its limit either way; the lowest point of each drawn outline,
+    its belly and its foot's sag taken, above the sea."""
+    states = {f"{s.value}-{r}": sprit_sails(s, r, brace_deg) for s, r in SPRIT_STATES}
+    body = """
+        const mine = ['spritsail.yard', 'sprit_topsail.yard', 'spritsail', 'sprit_topsail'];
+        const out = {};
+        Object.keys(d).forEach(k => {
+          const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+          out[k] = sk.figures.filter(f => mine.includes(f.id)).map(f =>
+            [f.id, Math.min(...(f.path ? P.flattenPath(f.path) : f.pts).map(p => p[2]))]);
+        });
+        return out;
+    """
+    got = run_js(tmp_path, states, body)
+    for name, figs in got.items():
+        assert {fid for fid, _low in figs} == set(SPRIT_YARDS) | set(SPRIT_SAILS), name
+        for fid, low in figs:
+            assert low > 0.0, (name, fid, low)
+
+
+@needs_node
+@pytest.mark.parametrize("brace_deg", [0.0, 30.0])
+def test_the_braces_lead_up_to_the_fore_top_the_sheets_aft_and_the_lifts_to_the_spars_end(
+    tmp_path, brace_deg
+):
+    """Ext §6.2: the braces of a yard under the bowsprit or the jib-boom lead from its arms up to
+    the fore top, the fore mast's head less a metre on its raked line, a little to their own
+    side, not level aft (Lavery I30). The spritsail's sheets lead from its clews aft along the
+    side to the deck a metre abaft the fore mast (I30's sheave in the side), not abreast the
+    clew forward of the stem; the sprit topsail's to the spritsail yard's arms, as every
+    topsail's to the yard below. Their lifts, as every yard's, from the arms up to the head of
+    the spar each hangs on: the bowsprit's end and the jib-boom's. The guys are not drawn."""
+    data = sprit_sails(brace_deg=brace_deg)
+    got = run_js(tmp_path, data, SPRIT_FIGURES)
+    deck = data["graph"]["hull"]["deck_height_m"]
+    beam = data["graph"]["hull"]["beam_m"]
+    lines = {ln["id"]: ln["pts"] for ln in got["lines"]}
+    fore_x, top_z = got["foreTop"]
+    for yid, (on, _hang) in SPRIT_HANG.items():
+        yard = got["spars"][yid]
+        for side, s in (("starboard", 1.0), ("larboard", -1.0)):
+            arm = yard["b"] if s > 0 else yard["a"]
+            brace = lines[f"{yid}.brace.{side}"]
+            assert brace == [pytest.approx(arm), pytest.approx([fore_x, 0.3 * s, top_z])]
+            lift = lines[f"{yid}.lift.{side}"]
+            assert lift == [pytest.approx(arm), pytest.approx(got["spars"][on]["b"])]
+    assert top_z > got["spars"]["sprit_topsail.yard"]["centre"][2] + 5.0  # up, not level aft
+    below = got["spars"]["spritsail.yard"]
+    ss, st = got["sails"]["spritsail"]["corners"], got["sails"]["sprit_topsail"]["corners"]
+    for side, s in (("starboard", 1.0), ("larboard", -1.0)):
+        sheet = lines[f"spritsail.sheet.{side}"]
+        lead = [got["foreX"] - 1.0, s * beam / 2.0, deck]
+        assert sheet == [pytest.approx(ss[2] if s > 0 else ss[3]), pytest.approx(lead)]
+        sheet = lines[f"sprit_topsail.sheet.{side}"]
+        clew, arm = (st[2], below["b"]) if s > 0 else (st[3], below["a"])
+        assert sheet == [pytest.approx(clew), pytest.approx(arm)]
+    assert not [ln for ln in got["lines"] if ln["cls"] == "guy"]
+
+
+@needs_node
+@pytest.mark.parametrize("facing_deg", [0.0, 45.0, 90.0])
+def test_a_yard_and_sail_under_the_bowsprit_are_sorted_at_their_own_middle(tmp_path, facing_deg):
+    """The painter's correction for a mast's rake (package 57) sorts a yard or a sail by where
+    its mast stands at its height. A yard under the bowsprit hangs from no mast, and that
+    correction would carry it and its sail half its spar's run forward (4.7 m on the fixture):
+    each is sorted at its own middle, a yard at its centre and a sail at its centre."""
+    facing = math.radians(facing_deg)
+    body = f"""
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const proj = P.makeProjector({facing}, 0);
+        const mine = ['spritsail.yard', 'sprit_topsail.yard', 'spritsail', 'sprit_topsail'];
+        const own = {{}};
+        sk.figures.filter(f => mine.includes(f.id)).forEach(f => {{
+          const at = f.kind === 'sail' ? f.centre : sk.spars[f.id].centre;
+          own[f.id] = [f.sortAt || null, proj(at).depth];
+        }});
+        return P.project(sk, {facing}, 0).figures.filter(f => mine.includes(f.id))
+          .map(f => [f.id, f.depth, own[f.id]]);
+    """
+    got = run_js(tmp_path, sprit_sails(), body)
+    assert sorted(fid for fid, _depth, _own in got) == sorted(SPRIT_YARDS + SPRIT_SAILS)
+    for fid, depth, (sort_at, own) in got:
+        assert sort_at is None, fid
+        assert depth == pytest.approx(own, abs=1e-9), fid
+
+
+@needs_node
+@pytest.mark.parametrize("facing_deg", [0.0, 45.0, 90.0, 135.0, 225.0])
+def test_the_frame_holds_the_yards_under_the_bowsprit_across_states(tmp_path, facing_deg):
+    """The fixed scale (spec M3 §9 item 14): `fullRigFrame` reaches each yard's swing about its
+    slings, so every point of the yards under the bowsprit, their sails and their lines lies
+    within the frame alone, upright or heeled; and the view's scale is the same on either tack,
+    square or braced to the limit either way, set, in the gear or furled."""
+    states = {
+        f"{tack}-{brace}-{state.value}": sprit_sails(state, brace_deg=brace, tack=tack)
+        for tack in ("starboard", "larboard")
+        for brace in (-30.0, 0.0, 30.0)
+        for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED)
+    }
+    body = f"""
+        const f = {math.radians(facing_deg)};
+        const ids = ['spritsail.yard', 'sprit_topsail.yard', 'spritsail', 'sprit_topsail'];
+        const mine = g => ids.includes(g.id) || ids.includes(g.of);
+        const out = {{}};
+        Object.keys(d).forEach(k => {{
+          const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+          out[k] = {json.dumps(HEELS)}.map(h => {{
+            const proj = P.makeProjector(f, h);
+            const fr = sk.frame.map(proj);
+            const xs = fr.map(p => p.x), ys = fr.map(p => p.y);
+            const box = {{minX: Math.min(...xs), maxX: Math.max(...xs),
+                          minY: Math.min(...ys), maxY: Math.max(...ys)}};
+            let over = -1e9, n = 0;
+            sk.figures.filter(mine).forEach(g => {{
+              (g.path ? P.flattenPath(g.path) : g.pts).map(proj).forEach(q => {{
+                over = Math.max(over, box.minX - q.x, q.x - box.maxX, box.minY - q.y,
+                                q.y - box.maxY);
+                n += 1;
+              }});
+            }});
+            return {{frame: box, over: over, n: n, bounds: P.project(sk, f, h).bounds}};
+          }});
+        }});
+        return out;
+    """
+    got = run_js(tmp_path, states, body)
+    first = got[next(iter(got))]
+    for name, views in got.items():
+        for heel, view, same in zip(HEELS, views, first, strict=True):
+            assert view["n"] > 10 and view["over"] <= 1e-6, (name, heel, view["over"])
+            for k in ("minX", "maxX", "minY", "maxY"):
+                assert view["frame"][k] == pytest.approx(same["frame"][k], abs=1e-6), (name, k)
+                assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_on_a_hull_drawn_from_her_profile_the_yards_hang_from_the_bowsprit_as_it_stands(
+    tmp_path, path
+):
+    """The lead's ruling of 2026-10-29: where the file gives a profile, the yards under the
+    bowsprit hang from a bowsprit stood from the stem head as long as the file has it, and the
+    stand-in of a heel on the datum goes. The fixture's two yards cut on her own bowsprit and
+    jib-boom as they stand (`with_sprit_yards`) hang exactly as far under the drawn spars as
+    they were cut, at their own stations; the spritsail's foot a metre above the water, the
+    sprit topsail's clews at the spritsail yard's arms, the braces up to her fore top."""
+    graph = with_sprit_yards(path)
+    got = run_js(tmp_path, {"graph": graph}, SPRIT_FIGURES)
+    deck = graph["hull"]["deck_height_m"]
+    chain = head_chain(graph)
+    for sid in ("bowsprit", "jib_boom"):
+        drawn = [got["spars"][sid]["a"], got["spars"][sid]["b"]]
+        assert drawn == [pytest.approx(p, abs=1e-9) for p in chain[sid]], sid
+    spars = {s["id"]: s for s in graph["spars"]}
+    for yid, (on, hang) in SPRIT_HANG.items():
+        yard, drawn = spars[yid], got["spars"][yid]
+        at = [yard["x_m"], 0.0, deck + yard["height_m"]]
+        assert drawn["centre"] == pytest.approx(at, abs=1e-9)
+        assert _on_the_line(*chain[on], at[0]) - at[2] == pytest.approx(hang, abs=1e-6)
+    ss = got["sails"]["spritsail"]["corners"]
+    assert min(p[2] for p in ss) == pytest.approx(SPRITSAIL_FOOT_ABOVE_WATER_M)
+    assert min(p[2] for p in got["sails"]["spritsail"]["path"]) > 0.0
+    yard = got["spars"]["spritsail.yard"]
+    x, _y, z = yard["centre"]
+    st = got["sails"]["sprit_topsail"]["corners"]
+    arm = CLEW_SPREAD * yard["half"]
+    assert math.dist(st[2], [x, arm, z]) <= 0.1 and math.dist(st[3], [x, -arm, z]) <= 0.1
+    fore_x, top_z = got["foreTop"]
+    brace = {ln["id"]: ln["pts"] for ln in got["lines"]}["spritsail.yard.brace.starboard"]
+    assert brace[1] == pytest.approx([fore_x, 0.3, top_z])
+
+
+@needs_node
+@pytest.mark.parametrize("path", WITHOUT_PROFILE)
+def test_without_a_profile_the_bowsprit_and_its_booms_stand_as_before(tmp_path, path):
+    """A graph with no profile draws its bowsprit from its `x_m` on the datum, rising its
+    `height_m`, and the booms on it from its end, as before B5.3 (`head_chain`): the eight files
+    and the 64 with her profile taken away alike."""
+    graph = graph_of(SIXTY_FOUR if path.startswith("the 64") else path)
+    graph["hull"].pop("profile", None)
+    graph["hull"].pop("stations", None)
+    got = run_js(tmp_path, {"graph": graph}, SPARS_DRAWN)
+    chain = head_chain(graph)
+    assert chain
+    for sid, (heel, end) in chain.items():
+        assert got[sid] == [pytest.approx(heel, abs=1e-12), pytest.approx(end, abs=1e-12)], sid
+
+
+@needs_node
+def test_the_yards_under_the_bowsprit_as_the_game_serves_them(tmp_path):
+    """The fixture's world through the game's own doors (`/api/ship`, `/api/state`): the graph
+    serves each yard's own `x_m` and its spar, and the drawing takes them as above. As she
+    starts, the sprit sails furled on their yards at their stations; then set and the yards
+    braced, each yard turned about its slings by the brace the state gives, and the sprit
+    topsail's clews at the spritsail yard's arms."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.ui.server import Driver, create_app
+
+    path = write_ship(frigate_with_mizen_yard_doc(), tmp_path)
+    scenario = Scenario(wind_from_deg=0.0, wind_speed_kn=10.0, ship_heading_deg=150.0)
+    world = make_world(7, str(path), scenario)
+    world.tick()
+    with TestClient(create_app(Driver(world))) as client:
+        start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
+        for sid in SPRIT_SAILS:
+            world.ship.sails[sid].state = SailState.SET
+        for yid in SPRIT_YARDS:
+            world.ship.spars[yid].brace_angle = math.radians(20.0)
+        world.tick()
+        braced = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
+    deck = start["graph"]["hull"]["deck_height_m"]
+    spars = {s["id"]: s for s in start["graph"]["spars"]}
+    for yid, (on, _hang) in SPRIT_HANG.items():
+        assert spars[yid]["parent"] == on and spars[yid]["x_m"] > spars["bowsprit"]["x_m"]
+    furled = run_js(tmp_path, start, SPRIT_FIGURES)
+    for yid in SPRIT_YARDS:
+        at = [spars[yid]["x_m"], 0.0, deck + spars[yid]["height_m"]]
+        assert furled["spars"][yid]["centre"] == pytest.approx(at)
+    assert {sid: s["state"] for sid, s in furled["sails"].items()} == dict.fromkeys(
+        SPRIT_SAILS, "furled"
+    )
+    set_ = run_js(tmp_path, braced, SPRIT_FIGURES)
+    angle = {s["id"]: s["brace_angle"] for s in braced["snap"]["spars"]}
+    for yid in SPRIT_YARDS:
+        yard, th = set_["spars"][yid], angle[yid]
+        x, _y, z = yard["centre"]
+        assert abs(th) > 0.1
+        assert yard["centre"] == pytest.approx(furled["spars"][yid]["centre"])
+        want = [x + yard["half"] * math.sin(th), yard["half"] * math.cos(th), z]
+        assert yard["b"] == pytest.approx(want)
+    assert {sid: s["state"] for sid, s in set_["sails"].items()} == dict.fromkeys(
+        SPRIT_SAILS, "set"
+    )
+    below = set_["spars"]["spritsail.yard"]
+    arm = [c + CLEW_SPREAD * (b - c) for c, b in zip(below["centre"], below["b"], strict=True)]
+    assert math.dist(set_["sails"]["sprit_topsail"]["corners"][2], arm) <= 0.1
