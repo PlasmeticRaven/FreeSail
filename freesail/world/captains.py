@@ -408,6 +408,26 @@ RELAY_LEAST_S = 1800  # a glass between layings for the stream's change
 RELAY_TURN_LEAST_S = 600  # ten minutes for the tide's turn (a course shaped at the turn holds)
 
 
+# The states a rules captain recovers his ship in when she lies aback with no way (package
+# 88, item 1; `Captain._aback_with_no_way`): every state that sails her, but the action
+# (whose helm is the engaging's), lying to and the ground. `ABACK_RECOVER` is the law's
+# switch, for the bisection of what it moved (the tuning notes, package 88): off, she lies
+# aback with no way until something else pays her off, as before.
+ABACK_RECOVER = True
+ABACK_RECOVER_STATES = frozenset(
+    {
+        "on passage",
+        "beating",
+        "running for shelter",
+        "keeping station",
+        "investigating a stranger",
+        "chasing",
+        "evading",
+        "in company",
+    }
+)
+
+
 def actor_for(state: str) -> str:
     return f"{ACTOR_PREFIX}'{state}'"
 
@@ -1489,6 +1509,13 @@ class Perception:
     # package 58b: the depth of water by the chart at the account, in fathoms (None off the
     # chart or on the land)
     chart_fathoms: float | None = None
+    # package 88 (item 1): headway by the course's reading (none with no way on, in stays or
+    # going astern), and whether she has square sail set and none of it drawing (every one
+    # shaking or aback by its reading), for the recovery when aback with no way
+    headway: bool = True
+    work_in_hand: list[str] = field(default_factory=list)  # doing and waiting, in words
+    square_set: bool = False
+    square_none_drawing: bool = False
 
     @classmethod
     def read(cls, world: Any) -> Perception:
@@ -1507,6 +1534,7 @@ class Perception:
         p.heading_deg = units.rad_to_deg(float(heading)) % 360.0 if heading is not None else None
         speed = view.value("speed")
         p.speed_kn = units.ms_to_knots(float(speed)) if speed is not None else 0.0
+        p.headway = view.value("course") is not None
         vis = view.value("visibility")
         if isinstance(vis, dict):
             p.visibility = str(vis.get("words") or "")
@@ -1528,6 +1556,7 @@ class Perception:
             # an anchor being brought to (package 40c): the evolution is work, not a
             # manoeuvre, and she is not under way again while it is in hand
             doing = list(work.get("doing") or []) + list(work.get("waiting") or [])
+            p.work_in_hand = [str(w) for w in doing]
             p.anchoring = any("anchor" in str(w) for w in doing)
         # the nearest shore by his account on the chart in his hands (package 40c, the
         # captain's trials): in thick weather or by night the lookout sees no land, and
@@ -1613,6 +1642,13 @@ class Perception:
             r = view.value("sail", sid)
             if isinstance(r, dict) and str(r.get("state") or "") == "set":
                 p.storm_staysails_set = True
+        square = [
+            r
+            for r in (view.value("sail", sid) for sid, sl in sails.items() if sl.cls == "square")
+            if isinstance(r, dict) and str(r.get("state") or "") == "set"
+        ]
+        p.square_set = bool(square)
+        p.square_none_drawing = bool(square) and all(r["shaking"] or r["aback"] for r in square)
         boat = view.value("boat")
         p.boat_away = bool(isinstance(boat, dict) and boat.get("away"))
         manifest = view.value("manifest")
@@ -2780,6 +2816,8 @@ class Captain(Judgement):
         self._weather_work(p, kinds)
         if state not in ("at anchor", "in port", "in distress"):
             self._head_sails_straining(p, events)
+        if ABACK_RECOVER and state in ABACK_RECOVER_STATES and self._aback_with_no_way(p, kinds):
+            return  # boxing her off: the state's own work waits for her way
         if state == "hove to for weather" and self._business.get("lie_to_storm_lug"):
             # the lugger's storm jib set: she is hove to under it and the taille-vent
             from freesail.ship.parts import SailState
@@ -2821,6 +2859,92 @@ class Captain(Judgement):
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
             self._business.pop("brought_up", None)
+
+    def _aback_with_no_way(self, p: Perception, kinds: set[str]) -> bool:
+        """The recovery when aback with no way (package 88, item 1; package 86's finding, the
+        convoy's stall: the commodore's brig came out of a short-handed tack with no way on
+        while her book shortened sail, her head forty degrees off the wind, every square
+        sail shaking and the spanker drawing, and lay so twenty-five minutes with nothing
+        in his rules to bear her away, until the book's second shortening took in her
+        spanker and she paid off). Luce 1866, ch. XXV, Wind Baffling (OCR lines 28496 to
+        28523): the helm up and the head sheets flattened in serve "if the vessel has
+        headway on"; "if she still comes to against the helm, ... Up mainsail and spanker!
+        ... Brace abox the head yards! ... this will effect your object, by boxing her off;
+        and when the after sails fill, let go and haul as in tacking"; and in chapelling,
+        "when the spanker will take, haul it out" (OCR line 28539).
+
+        With no headway (the course's reading says none), square sail set and none of it
+        drawing, a wind to fill her, no manoeuvre in hand and free of the anchor and the
+        ground, for `aback_recover_minutes` together: the after sail eased first (the
+        driver taken in, `scripts.after_gaff_sails`: the sail that holds her head to the
+        wind, which the hands on deck brail up while the topmen are at a reef aloft); and
+        if she lies so another while, or has no driver, he boxes her off (`box her off`,
+        which takes all hands, waiting its turn behind the hands at a yard). When she has
+        headway again with her square sail drawing, the driver is set again and the leg
+        shaped again (the course resumed). True while the box-off is in hand or waiting."""
+        b = self._business
+        if "ship.boxed_off" in kinds and b.pop("boxing_off", False):
+            b.pop("no_way_since", None)
+            self._course_resumed(b.pop("after_sail_in", None))
+            return False
+        if p.manoeuvre == "boxing off" or any("boxing off" in w for w in p.work_in_hand):
+            return True  # in hand, or waiting its turn behind the hands aloft
+        from freesail.physics.hull import ABACK_URGENT_AWS_KN
+
+        if p.headway or p.manoeuvre != "none" or p.anchor_down or p.aground:
+            b.pop("no_way_since", None)
+            if p.headway and not p.square_none_drawing and "after_sail_in" in b:
+                self._course_resumed(b.pop("after_sail_in"))
+            return False
+        # the while counted from the minute she lay with no way and no square sail drawing;
+        # a topsail at its reef drawing by a breath now and then does not begin it again
+        if "no_way_since" not in b:
+            if not p.square_none_drawing or p.wind_kn < ABACK_URGENT_AWS_KN:
+                return False
+            b["no_way_since"] = p.tick
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if p.tick - int(b["no_way_since"]) < 60.0 * float(th("aback_recover_minutes", 3)):
+            return False
+        b["no_way_since"] = p.tick  # the next step a while after this one
+        why = "aback with no way on"
+        if "after_sail_in" not in b:
+            from freesail.evolutions.scripts import after_gaff_sails
+
+            driver = [sl.id for sl in after_gaff_sails(self.world.ship)]
+            b["after_sail_in"] = driver
+            # the hands wanted for her recovery: the work not begun that waits for hands
+            # (a shortening's reefs in the courses, which want her way to be worth having)
+            # and the work at the driver avasted, so that the driver's brails are manned
+            names = [self._sail_name(sid) for sid in driver]
+            for w in p.work_in_hand:
+                if w.endswith(" (for hands)") or any(w.endswith(f"the {n}") for n in names):
+                    self.give(f"belay {w.removesuffix(' (for hands)')}", why=why)
+            if driver:
+                for sid in driver:
+                    self.give(f"take in the {self._sail_name(sid)}", why=f"{why}: to pay her off")
+                return False
+        e = self.give("box her off", why=why)
+        if e.kind == "order.rejected":
+            return False
+        b["boxing_off"] = True
+        return True
+
+    def _course_resumed(self, after_sail: list[str] | None) -> None:
+        """Recovered from lying aback with no way (`_aback_with_no_way`): the driver he took
+        in set again ("when the spanker will take, haul it out", Luce 1866 ch. XXV), and
+        the leg shaped again on a sailing state's passage."""
+        for sid in after_sail or ():
+            sl = (getattr(self.world.ship, "sails", {}) or {}).get(sid)
+            if sl is not None and not sl.is_set:
+                self.give(f"set the {self._sail_name(sid)}", why="she has way again")
+        if (
+            self.state in ("on passage", "beating", "running for shelter")
+            and self.legs
+            and self.leg_i < len(self.legs)
+            and self.legs[self.leg_i].kind != "out"
+        ):
+            self._shape_leg(why="she has way again")
 
     def _lugger_storm_lug(self) -> bool:
         """A lugger with her storm lug in the sail room or bent (package 58b, item 5): no

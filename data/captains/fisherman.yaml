@@ -34,6 +34,7 @@ thresholds:
   engage_range_cables: {value: 1, source: "none"}
   break_off_nm: {value: 1, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
   break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
+  aback_recover_minutes: {value: 3, source: "as the King's ship's (package 88): Luce 1866 ch. XXV, 'To Box Off'; the minutes judgement"}
   engage_side: {value: lee, source: "none: she never engages (engage_nm nought turns the stimulus off)"}
   # package 71 (item 8): what he does when the enemy passes through the wind's eye and the
   # engaging helm may not follow her through it: `shift` the engaged battery and keep his

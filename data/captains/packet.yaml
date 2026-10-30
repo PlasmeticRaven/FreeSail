@@ -83,6 +83,7 @@ thresholds:
   # or after she has missed stays within the hour, and tacks regardless with the land to
   # leeward within `tack_regardless_nm` (freesail/orders/navigation.py `put her about`).
   wear_wind_kn: {value: 30, source: "the starter book's shorten-sail line, where the strain truths bite; Luce 1884 ch. XXIV, 'To Wear Ship' in a gale when she will not stay; judgement on the figure"}
+  aback_recover_minutes: {value: 3, source: "as the King's ship's (package 88): Luce 1866 ch. XXV, 'To Box Off'; the minutes judgement"}
   tack_regardless_nm: {value: 2, source: "the planner's danger berth doubled: wearing a ship's length and more to leeward with the land two miles off is the ground she cannot spare; judgement"}
   # Sail after the gale (item 5): the wind under `sail_again_kn` for `sail_again_minutes`
   # and sail is made again whatever his state (Luce 1884 ch. XXIX p. 479, 'After the gale

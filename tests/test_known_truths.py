@@ -8876,8 +8876,11 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     read by the rules captain with no model seated, signals her a straggler (No. 20, the
     ships astern to make more sail) when she has been out of her station ten minutes, and
     she regains it; after two hours every ship is within a cable of her station and holds
-    it. At seed 7: the signal ordered at 2760, up at 2866, answered at 3000; the Friendship
-    back in her station at 6420 (`squadron.in_station`; 5280 before package 84's step 6, when
+    it. At seed 7: the signal ordered at 2040, up at 2182, answered at 2340; the Friendship
+    back in her station at 6060 (package 88, item 1: the commodore's brig recovered from
+    lying aback with no way after her tack, truth 7-340, where she lay so from 10:20 to 10:47
+    and the convoy with her: 2760, 2866, 3000 and 6420 before, the same with the law's switch
+    off on the final tree); (`squadron.in_station`; 5280 before package 84's step 6, when
     the privateer's World, on a clock of her own, never saw the private signal flying and made
     no answer; on the one clock she bluffs a reply, is judged an enemy, and the commodore
     closes the convoy round him first); at 7200 and after, every ship
@@ -8905,7 +8908,9 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     back = [e for e in w.log if e.kind == "squadron.in_station" and "Friendship" in e.text]
     assert ordered and made and answered and back, (ordered, made, answered, back)
     when = (ordered[0].tick, made[0].tick, answered[0].tick, back[0].tick)
-    assert when == (2760, 2866, 3000, 6420), when  # 5280 before 84's step 6 (the one clock)
+    # package 88 (the recovery when aback, `captains.ABACK_RECOVER`): (2760, 2866, 3000, 6420)
+    # before and with the switch off; 5280 for the last before 84's step 6 (the one clock)
+    assert when == (2040, 2182, 2340, 6060), when
     worst = 0.0
     for _ in range(6):
         w.run(600)
@@ -12821,3 +12826,38 @@ def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
     w.run(2)
     assert w.captain.aside
     assert w.submit("captain: carry on").kind == "captain.carry_on" and not w.captain.aside
+
+
+# ---------------------------------------------------------------------------
+# Package 88: the captain's pass of M7 (truths 7-340 onward)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxes_her_off(
+    monkeypatch,
+):
+    """Package 88, item 1 (package 86's finding, the convoy's stall): the commodore's brig in
+    the owner's convoy comes out of a short-handed tack at 1594 with no way on while her book
+    shortens sail, her head forty degrees off the wind, every square sail shaking and the
+    spanker drawing. With no headway, square sail set and none drawing, no manoeuvre in
+    hand, for the doctrine's three minutes (`aback_recover_minutes`, judgement), her rules
+    captain recovers her as Luce 1866 ch. XXV has it: the work waiting for hands avasted and
+    the spanker taken in at 1800, boxed off at 1980 and boxed off by 2110, the spanker set
+    again and the leg shaped when she has way (2160); at 2400 she makes four knots. With
+    the law's switch off (`captains.ABACK_RECOVER`) she lies so until the book's second
+    shortening takes in her spanker at 2671 (86's record): at 2400 still no way, no box-off."""
+    from freesail.world import captains as C
+
+    w = _scenario_world(CONVOY_SIX)
+    w.run(2400)
+    said = [e for e in w.log if e.kind == "order.accepted" and "aback with no way on" in e.text]
+    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1800], said
+    assert [e.tick for e in said if "boxing her off" in e.text] == [1980], said
+    assert [e.tick for e in w.log if e.kind == "ship.boxed_off"] == [2110]
+    assert any(e.tick == 2160 and "setting the spanker" in e.text for e in w.log)
+    assert units.ms_to_knots(w.ship.dyn.u) >= 3.0, w.ship.dyn.u
+    monkeypatch.setattr(C, "ABACK_RECOVER", False)
+    old = _scenario_world(CONVOY_SIX)
+    old.run(2400)
+    assert not [e for e in old.log if e.kind == "ship.boxed_off" or "aback with no way" in e.text]
+    assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
