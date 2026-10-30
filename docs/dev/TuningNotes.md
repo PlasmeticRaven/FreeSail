@@ -13628,3 +13628,74 @@ weighs (Beachy Head 18.99 to **18.73**, past truth 7-280's "a foot and a quarter
 Norie's twenty; Shoreham 17.87 to 16.91, Moore's judged 18 to 17; the Downs 19.47 to 19.39;
 Newhaven, Dieppe and the Havre unchanged). (b) is the better water, at the cost of a
 block's truth re-measured; the lead's to rule.
+
+### The truths (7-310 to 7-314, behaviours)
+
+- **7-310**: the Isla del Rey is an island to the lookout (land by day and by night close
+  aboard, called by its name, never "a danger"; stood into by its extent over the tiles'
+  water) and ground to the keel, a cable and a half south clear; the pilot's line and the
+  master's dangers name it (item 1).
+- **7-311**: a road's bottom in the lead's note as an anchorage's (item 2).
+- **7-312**: a cable either side of 1 W from 49.1 to 50.6 N and of 48 N in the Iroise, the
+  tide within a tenth of a foot through a day of springs (at most 0.045 ft; 89's rule 4.3
+  to 7.3 ft at 1 W, 1.4 to 1.6 in the Iroise) (item 3).
+- **7-313**: Spithead's high waters within the hour of Portsmouth's gauge (within four
+  minutes; the eleven's four hours and a half out), its spring range the gauges' water,
+  the eleven's a mile west of 1 W at 50.6 N to the bit (item 4, taken).
+- **7-314**: over channel-west and channel-mid outside the Solent's region the tide is the
+  eleven's to the bit, a cable outside the region's south and west bounds as everywhere;
+  the recorded passages themselves the proof (below).
+
+Re-measured, old beside new, each with its reason in its words: **7-303** (the kind follows
+the recast), **7-282** (a mile east of 1 W within the band), **7-283** (the grid's three
+positions in the Solent's region), **7-312** (its 50.9 N in the Solent's region, item 4).
+Recast to the gauges' `block:` as 89 recast the held gauges' tests, every data assertion
+kept: `test_tide.py`'s Channel east's gauges (the two serve `solent`), Biscay north's
+count north of 42 N (the file has no `held_gauges:` now), the blocks' gauges' count (73 to
+75) and their blocks' names (with `solent`).
+
+### Found on the way (package 94)
+
+- **The brief's island with `extent_m` alone** would have made Belle Isle and seven other
+  islands the grid holds discs of ground over their roads: `grid_lacks` (item 1).
+- **The brief's file list, and what else was touched, said so**: `freesail/world/lookout.py`
+  (the lookout's "standing into" by an islet's extent, item 1); `data/tides/
+  establishments.yaml` (Concarneau's judged rise by item 3's water, the Solent's four by
+  item 4's, the 37j rule that `test_tide.py` holds); `tools/build_charts.py`
+  (`TIDE_REGIONS`, written into the manifest so that a rebuild keeps the tide region: 93
+  rebuilds regions beside this, and the lead's merge of both wants the tool to carry it).
+  No tile, coast or index file of any region touched.
+- **A taper by distance reaches across land**: Concarneau's gauge, 7.6 miles from 48 N
+  over Brittany, reads its water at 0.85 of its weight (five degrees of M2). A taper by
+  water would want the chart in the tide; said, not mended.
+- **The seam between the Solent's region and the Channel east** at 1 W north of 50.62 N,
+  a step of three feet and a half off Chichester; two ways measured and not taken, the
+  lead's (item 4).
+- **The western Solent and the Needles** lie within the band of the region's south bound
+  and read between the eleven's and the gauges' (the Needles' M2 at 205 degrees, Yarmouth's
+  257, against Portsmouth's 327): the Needles channel opens on the Channel there; a finding.
+- **The log's "in 13 fathoms"** where it says "twelve fathoms" in words (`fathoms_words`):
+  not this package's.
+- **No road feature** exists in any region (79d's and the earlier blocks' roads are
+  anchorages): item 2 moves nothing today.
+
+### The suite, as run (package 94)
+
+On this session's container (four cores, nothing beside it); `ruff check .` and `ruff
+format --check .` clean at every commit; the trunk brought in at each item's boundary
+(`9b07813`, 85's item 7, at item 2's; nothing new at 3's and 4's). **The proof, first and
+last** (`proof.sh` in the session's scratchpad: the eleven by node id, the gate selection,
+the captain's trials, `--slow -n 4`): on a clean worktree of the head `21a25e7` first, on
+item 3's tree, and on the final tree `a124454` last, **identical**: the eleven passed (the
+frigate's passage of gate 5b and its pace, the schooner's with her octant and her pilot,
+the merchant passage and its deep-sea cast, the naval cruise and its stranger, truths 72,
+77 and 78), every pinned digest, line count and tick held; `-k "gate_5b or gate_5c"`, the
+one test selected, passed; the captain's trials five passed, the gale with sea room its
+expected failure, the lee-shore trial's container digest `7fad0ce7e46ba366` against the
+pin `ed48ca3d61e52f20` the one failure, the same on all three trees. **The slow tier of
+the files touched** (`--slow -m slow -n 4 tests/test_chart.py tests/test_tide.py
+tests/test_ports.py tests/test_scenarios.py`): 10 passed. **The truths 7-270 to 7-314**
+with `--slow -n 4`: 40 passed. **The fast tier**, once on the final tree (`python -m pytest
+-n auto -q -p no:cacheprovider`, 379 slow tests left out): one failure, the pictures' known
+flake ("the chart is blank (std 8.0)" under the tier's load), which passes alone on this
+tree. The whole slow tier not run (the lead's, in the cloud at the merge).
