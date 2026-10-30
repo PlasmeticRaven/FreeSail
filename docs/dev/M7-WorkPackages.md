@@ -56,7 +56,7 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 9 merged 2026-10-28/29** (steps 1 and 2 at `d9dba1f`, steps 3 to 9 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 10 merged 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 10 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; after 84's last step; 87 follows it |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Opus (the owner, 2026-10-29; Fable before) | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief after 85's pass over the orders, the primer and the docs is merged (the owner, 2026-10-29), and after 77; the brief fixes the pattern on the gunner and the four follow it |
@@ -738,6 +738,36 @@ line `assert any(...) or True` asserts nothing and should assert the held statio
 `_person_anywhere` matches a surname across the whole registry and takes the first, which
 two Mr Popes on two hulls would confuse (the name whole first, the surname only when one
 person bears it). Nothing pinned moved.
+
+### Package 84, step 10, as merged (2026-10-30)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `5cc45f6` (one commit on the
+trunk's `6f8c708`, brought in at the boundary before the step's final fast tier; merged here
+over 79c's block, clean; 17 files, 422 lines added and 53 removed, of them `core/world.py`
+100 and `test_crews.py` 87); ruff clean; the sibling's fast tier whole 3,946 passed with the
+parity table's own entry mended after and the pictures' known flake the other failure, its
+slow tier of the known truths, the trials and the touched files 185 of 194 passed with eight
+left out by their marks and the lee-shore trial's container digest the one failure as at
+every step, its pace within step 8's spread; the lead's run of the touched files and the
+gate selection (202 passed, none failed); **the whole suite on the merged tree in the cloud
+(run 14, the figures below).** **The step:** the drivers follow a hull. The World's default
+hull is the followed one, the player's own until `follow "X"` names another, and with it
+every per-ship name of the World's, the drivers' state, the browser's snapshot and chart,
+the console's prompt and the log the drivers show; the player's hull stands apart as
+`World.players`, the sea hers, her vessel on it brought up from her hull, the save the
+game's with her current, and she is awake always and never counted against the cap; a
+`follow` is a driver's line, journaled and replayed, refused in words for a ship not on the
+sea or without a captain of her own; the walks over the hulls each once; `World.offices`
+beside the hulls as the room for milestone 8's station of the world; a world order given
+under a purview carries `by`, is checked by a hook the director and the bare order pass
+whole, and is replayed with it. **Found and mended, two:** the pace rule's walk listed the
+player's stations twice since step 7; and the first follow put the player's hull to sleep
+and the save wrote the followed hull's seed, scenario and ship at its top, so a replay
+rebuilt the brig's world. **Taken another way:** a world with no followed hull is 82's, its
+words standing ready; whether the director's door follows the drivers or stays with the
+player's ship is 82's question, noted; no office built. The parity table lists `follow` as
+the owner's by design, as the clock's commands are. The step 9 tidies are booked in its
+notes for step 11. Nothing pinned moved.
 
 ### Package 79c as merged (2026-10-29)
 
