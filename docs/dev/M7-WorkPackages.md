@@ -2456,7 +2456,14 @@ intent binds.
    the as-merged records (84's eleven steps, 86, 73, the suites' figures, what 88 is booked to
    mend) and anything the draft missed, and the owner reads the whole before the playtest.
    Runs after 84's last step is merged; the draft's engine half may be begun by the lead
-   before that.
+   before that. **The lead plays at this gate (the owner's word, 2026-10-30):** the captain's
+   station first, blind, through the door as any model, with the primer and the readings
+   alone and the owner or a fresh model as director, in one of the gate's passages; then the
+   director's seat in the one-world scenario with the owner at the captain's station,
+   pulling 84's levers (`follow`, an `aboard` order on another hull, a cutter's letter to
+   her, `read_log(ship=)`). The draft's scenarios leave room for both; the lead's seats go
+   through the door under the consent brief as it stands, and the transcripts stay in the
+   record, with the lead saying where knowledge of the engine leaked into a decision.
 8. **The documentation whole (the owner, 2026-10-29: "might as well go all the way").** The
    same pass over `docs/` as items 1 and 2 make over the primer and the library: every
    document read for completeness and refinement against the code as it stands after 84
