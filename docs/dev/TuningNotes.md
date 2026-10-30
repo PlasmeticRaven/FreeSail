@@ -13703,3 +13703,42 @@ miles" at tick 277,500 for 277,440 (a minute later, off the mouth of the harbour
 harbour's fill now water and the land so much farther); every other line the same, her
 anchoring at the mouth among them; the digest `6320afb76b044a01` for `8bcb18bb603cb7c6`.
 Not a gate's, not pinned.
+
+### The region `gulf-of-lion`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region gulf-of-lion
+--reuse-world`: the checks as printed (114 of 114 features, ids unique, no override, the
+fetch box covering the tiles, "0 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.18 to 6.83 m" (within the bounds 0.42 to 0.75 m, Marseille's, Toulon's
+and Sète's gauges with Port-Vendres', Nice's and Monaco's; the 6.83 in the tiles' strip south
+of 40.56 N east of 4.5 E, outside every block, as before). **The shore's sweep 105,638 cells
+in 288 places** (by the control 3,760 in 151): the Camargue's lagoons and marshes (3,600,
+3,346, 2,692, 2,554, 2,517, 2,338, 2,315 about 43.43 to 43.53 N, 4.42 to 4.62 E, the
+Vaccarès and the étangs about it) and the étang de Thau (2,727 about 43.38 N, 3.58 E): the
+low marsh and the lagoons at the sea's level, which the old raise of five to seven metres
+made dry land; water, as they are.
+
+**The harbours the grid lacks are water again**, level 3's cells from above the datum to
+below by harbour: Hyères 64,354 (the salt pans and the lagoon of the Pesquiers on Giens'
+tombolo, 43.05 to 43.07 N, 6.13 to 6.14 E, +4.9 m before, -1.5 now), Toulon 21,175 (the
+inner road, the darse and the Mourillon, 43.08 to 43.12 N, 5.89 to 5.92 E, +3.3 before,
+-3.1 now), Marseille 14,590 (the old port and the Joliette's shore, 43.24 to 43.32 N, 5.36 to
+5.37 E), Villefranche 2,726.
+
+| | Old (79d, 3.70 to 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 120 tiles, 24.59 MB | 120 tiles, 24.53 MB |
+| level 3 | 32 tiles, 3.29 MB | 32 tiles, 3.30 MB |
+| coast | 254 pieces, 5,960 points, 143,404 bytes | 424 pieces, 7,614 points, 195,212 bytes (the lagoons' shores) |
+| tiles changed | | 113 of level 2, all 32 of level 3 |
+| cells changed | | 8,281,052 at level 2, 3,267,884 at level 3, the largest 6.50 m |
+| above the datum to below | | 115,257 at level 2, 102,845 at level 3 |
+| below the datum to above | | none |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-304
+with `--slow -n 4`, 15 passed (7-295 the Gulf's winter row, 7-296 Toulon's roads from
+Hyères', among them). The scenario `agincourt-sound.yaml` is sailed once the three regions
+of 79d are rebuilt (below).
