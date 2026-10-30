@@ -437,6 +437,7 @@ DANGER_AHEAD_STATES = frozenset(
     {"on passage", "beating", "keeping station", "in company", "running for shelter"}
 )
 DANGER_AHEAD_AGAIN_S = 600
+BOW_POINTS = 4  # on the bow: within four points of her head
 
 
 def plain_cables(m: float) -> str:
@@ -2974,25 +2975,28 @@ class Captain(Judgement):
         return True
 
     def _danger_ahead_by_chart(self, p: Perception) -> bool:
-        """The land or a danger ahead by the chart, with the land out of sight (package 88,
-        item 2; 57's station gale and the lee-shore trial under item 1: beating for her
-        station off Ushant in the dark, the land out of sight from the masthead, the frigate
-        stood on at seven knots onto the Four, a rock the chart in his hands has, with no
-        call of the lookout's and nothing of his reading the chart ahead). By night or in
-        thick weather the master's chart is the lookout (Falconer 1780, LEE-SHORE: "the
-        greatest danger to which a ship can be exposed" being the land unseen; the pilot's
-        warning of 37h, `chart.dangers_ahead`, read here by account and not from the
-        truth): with no land in sight, on a sailing state out of pilot water and with no
-        manoeuvre in hand, the land on her course, or a charted danger within two cables of
-        it with too little water for her, within `danger_ahead_nm` by the chart at the
-        account (and nearer than the leg's own mark), puts her about: tacked where a wear
-        would cost the ground (`navigation.no_room_to_wear`), else as the choice reads.
-        Once in `DANGER_AHEAD_AGAIN_S`. True when she is put about now."""
+        """The land or a danger ahead (package 88, item 2; 57's station gale and the
+        lee-shore trial under item 1: beating for her station off Ushant at night the
+        frigate stood on at seven knots onto the Four, the lookout reporting the land close
+        aboard on her bow at five cables and the chart in his hands having the rock, with
+        nothing of his rules answering either: 'the offing' a `when` rule long true, the
+        beating book with no 'land ahead'). The period's word is clawing off, "the act of
+        beating, or turning, to windward from a lee-shore, so as to acquire a sufficient
+        distance from it, to escape the dangers of shipwreck" (Falconer 1780, CLAWING, OCR
+        line 5576). On a sailing state out of pilot water with no manoeuvre in hand and way
+        on her: the lookout's nearest land on her bow (within `BOW_POINTS` of her head)
+        within `danger_ahead_nm`, by any light; or, with no land in sight, the land on her
+        course or a charted danger within two cables of it with too little water for her
+        within the same distance by the chart at his account (the pilot's warning of 37h,
+        `chart.dangers_ahead`, read by account and not from the truth), and nearer than the
+        leg's own mark: he puts her about, tacked where a wear would cost the ground
+        (`navigation.no_room_to_wear`), else as the choice reads. Once in
+        `DANGER_AHEAD_AGAIN_S`. True when she is put about now."""
         from freesail.api.readings import AHEAD_ABEAM_M
         from freesail.world.geo import destination as dest
 
         b = self._business
-        if p.land_in_sight or p.manoeuvre != "none" or not p.headway or p.anchor_down:
+        if p.manoeuvre != "none" or not p.headway or p.anchor_down:
             return False
         if p.aground or p.pilot_aboard or p.pilot_conn or self._inner_leg():
             return False
@@ -3018,9 +3022,26 @@ class Captain(Judgement):
             if to_mark is not None and to_mark * units.NAUTICAL_MILE <= reach:
                 return False  # she is making for it
         what = ""
+        # the lookout's first, by any light: the land on her bow (within `BOW_POINTS` of her
+        # head) within the distance (the lee-shore trial: "the land close aboard on the
+        # starboard bow, bearing SW, distant five cables", her head SW, 'the offing' a
+        # `when` rule true since the gale and the beating book with no 'land ahead')
+        near = world.readings.value("nearest_land")
+        if isinstance(near, dict) and near.get("metres") is not None and near.get("bearing"):
+            try:
+                brg = units.rad_to_deg(units.parse_course(str(near["bearing"])))
+            except (ValueError, units.CourseError):
+                brg = None
+            off = (
+                abs(units.rad_to_deg(units.wrap_pi(math.radians(brg - p.heading_deg))))
+                if brg is not None
+                else 180.0
+            )
+            if off <= BOW_POINTS * 11.25 and float(near["metres"]) <= reach:
+                what = f"{near.get('words') or 'the land on her bow'}"
         step = units.CABLE
         k = 1
-        while k * step <= reach:
+        while not what and not p.land_in_sight and k * step <= reach:
             depth = chart.depth_at(dest(here, p.heading_deg, k * step))
             if depth is not None and depth <= 0.0:
                 what = f"the land ahead by the chart, {plain_cables(k * step)}"
@@ -3029,8 +3050,12 @@ class Captain(Judgement):
             k += 1
         hull = getattr(world.ship, "hull", None)
         draught = float(hull.spec.draught_m) if hull is not None else 2.0
-        found = chart.dangers_ahead(
-            here, p.heading_deg, reach, AHEAD_ABEAM_M, tide_m=0.0, wants_m=draught + 1.0
+        found = (
+            []
+            if what or p.land_in_sight
+            else chart.dangers_ahead(
+                here, p.heading_deg, reach, AHEAD_ABEAM_M, tide_m=0.0, wants_m=draught + 1.0
+            )
         )
         if found:
             f, along, _off, _side = min(found, key=lambda t: t[1])
@@ -3038,7 +3063,8 @@ class Captain(Judgement):
         if not what:
             return False
         b["danger_ahead_tick"] = p.tick
-        e = self.give("put her about", why=f"{what}, the land out of sight")
+        by = "" if p.land_in_sight else ", the land out of sight"
+        e = self.give("put her about", why=f"{what}{by}")
         return e.kind != "order.rejected"
 
     def _course_resumed(self, after_sail: list[str] | None) -> None:
