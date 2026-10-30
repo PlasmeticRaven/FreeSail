@@ -313,7 +313,7 @@ masts: invariant here, since the masts are measured from it); and in the viewer 
 | Her lower masts' `height_m` (main) | 23.68 m | 21.41 m |
 | The deck wind's eye | 2.9 m above the water; the frigate-36's 3.3 m on the same rule | 5.2 m, where her officers stood |
 | The frigate helpers' fixed heights "above the deck" (the mizen staysail's foot 6 ft 6 in, `:1275-1287`; the lower studding-sail booms 1.0 m) | land about her quarterdeck as on the frigate (her quarterdeck 7 ft 5 in above the datum, the frigate's 6 ft 11 in) | land 7 ft 5 in higher, so the module sets them in its frame |
-| The bowsprit drawn from the datum | 2.3 m below the stem head, until the viewer roots it from the profile (§12.3) | where it stood |
+| The bowsprit drawn from the datum | 2.3 m below the stem head, until the viewer roots it from the profile (§12.3; done at B5.3, 2026-10-29) | where it stood |
 | The generic hull before the profile is drawn | a low side, about right | as high-sided as the 64: wrong until the profile is drawn |
 
 **Proposed: (a).** The razee's arrangement is the frigate-36's own: a continuous gun deck with a

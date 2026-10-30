@@ -1007,7 +1007,8 @@ which show the sections and the body under the water that a broadside cannot.
   the mast's rake line, the head unchanged.
 - **The bowsprit** (:528-544): with a profile the heel is drawn at the stem head (or the rail at
   its x, if lower), the tip at `deck + height_m` as now. This removes D18 (a)'s one visible cost
-  on the razee (Indf §12.3).
+  on the razee (Indf §12.3). *Since B5.3 (the lead's ruling of 2026-10-29):* the whole spar
+  stands from the stem head at the file's length up to its end's height (Ext §6.2, as built).
 - `fullRigFrame` (:1383-1414) already holds the hull's points; nothing else in the rig or the
   physics changes.
 - **The lifts of every yard** (proposed after the owner's question, 2026-10-28; Decisions, "The
@@ -1046,7 +1047,7 @@ Galleries and lights follow §5.0 principle 9.
 **Tests** (`tests/test_view_geometry.py`, Node): the side's top through every `rail_m` point
 within a millimetre; the transom's top at the taffrail; each deck at its points; a lower mast's
 foot on the drawn deck and its head unmoved; the bowsprit's heel at the stem head and its tip
-unmoved; a graph with no profile drawing today's figures point for point; every file drawing a
+unmoved (since B5.3, its length up to its end's height, the old end beside the new); a graph with no profile drawing today's figures point for point; every file drawing a
 closed side with no NaN. Standing: the fixed frame across states (:181-203, :620-658), the
 cutter's hull ends (:445-478), a yard at its hoist (:630), the lowered lug (:778-781).
 

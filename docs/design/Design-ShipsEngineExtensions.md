@@ -452,6 +452,28 @@ places 1 and 3, the stagger fed from them):
 Place 2's addition (the sprit yards among the head yards) changes no classing field; it puts
 them in the head swing.
 
+**As built (B3.2, 2026-10-29).**
+- **The head field** counts the head yards on the masts. `head_and_after_yards` returns the
+  sprit yards in its head list, so read whole it gives 6 head yards on the fixture, not the
+  frigate's 4. The tests (`tests/test_bowsprit_yards.py`, the moved `tests/test_lateen.py`)
+  count 4 on the masts and 8 after, with the two sprit yards asserted beside them, and every
+  other field as filed. B1's truth 7-189 ("her classing as the frigate's row") reads it the
+  same way.
+- **"Square the yards"** and every order that names a file group ("the yards", "the head
+  yards") brace only the yards the file lists in that group. §4.1's contract lists the sprit
+  yards in "spritsails" and "all sail" alone, so these orders leave them; they are braced by
+  name, by "brace sharp up" and by "trim sails". Whether the 64's and the 74's files list them
+  in "yards" and "head yards" too is a file choice for B1 and B7, with no engine change; for
+  the lead.
+- **The heave-to's line** lists the light sails clewed up with commas when one of them is under
+  the bowsprit ("Clewed up the fore topgallant, the spritsail and the sprit topsail."); every
+  other ship keeps its words as before.
+- **Shortening sail** takes the sprit sails in first, outermost first, and never reefs them
+  (`orders/storm.bowsprit_sail_lines`). The order between the two is judgement: Lever gives
+  none.
+- **The helm's mark** reads the predicate once a tick, held in the tick's `_Drawing` with the
+  sail's curve (B3.1's precedent).
+
 ### 4.3 Handling
 
 - **Tacking.** At "let go and haul" the yards under the bowsprit swing with the head yards
@@ -802,6 +824,31 @@ a yard under the bowsprit, so no existing ship draws differently.
   the fore mast at deck height, not abreast the clew forward of the stem (1316-1322): I30's
   sheave in the side.
 
+**As built (B5.3, 2026-10-29), with the lead's ruling of the same day.**
+- **The bowsprit stands from the stem head.** With a profile, its heel at the stem head (or the
+  rail there, if lower) as B5.1 had it, and the whole spar at the file's length up to its end's
+  height above the datum; the jib-boom from its end, as before. The file serves no steeve, so
+  the drawing takes the one that carries the length from the stem head to the end's height:
+  32.8° on the 64 against her module's 27°, because the module roots the spar at the
+  knighthead's cap, 1.24 m above the profile's stem head (Indf §3.5 item 9). Her end is drawn
+  0.19 m short of the module's (1.97 m at B5.1). Without a profile, nothing changes.
+- **What follows for the 64 and the razee** (B1's stage B): laying the file's bowsprit root on
+  the stem head, where 1407F draws it, makes the drawn steeve her 27° with no viewer change.
+  Until then the fore staysail's tack, drawn from its corners, stands about 0.6 m clear of
+  the drawn bowsprit (0.04 m at B5.1).
+- **The draw order and the frame.** A yard under the bowsprit and its sail are sorted at their
+  own middle, not carried forward by the rake correction. The frame reaches such a yard's
+  swing every way (16 points about its slings), so the view does not rescale as it is braced.
+- **Judgements:** the spritsail's sheets to the side a metre abaft the fore mast at the deck
+  datum; the braces to the fore mast's head less a metre, 0.3 m to their own side; the lifts to
+  the head of the spar each yard hangs on. A yard filed with no `x_m` (served as 0.0) is drawn
+  at its spar's x.
+- **Risk 9 measured** on the 64's stood spars at the fixture's stations: the yards' heights
+  differ by 4.4 m against a slant of 8.9 m, so Steel's 103 m² sprit topsail cut by the
+  heights' trapezoid would be drawn at about 58 m². Before her file joins the area test, either
+  the cut places the yards so that the trapezoid holds the area, or `squareCut` takes the gap
+  along the slant for a yard under the bowsprit (B1 and B5, at her stage B).
+
 ### 6.3 The settee
 
 - **`lugHoisted`** (355-358): for a settee, hoisted unless `yard_lowered`, so the yard is on deck
@@ -1085,6 +1132,13 @@ The bilander's heave-to (D4(a)) is a test, not a truth: no source says how a bil
   alternated (Eng §2.7's first-world artifact). The floors stand: `BUILD_MACHINE_FLOOR` 500
   (`tests/test_known_truths.py:2143-2162`), `CREWED_FLOOR_TICKS_S` 60 (`world/crews.py:88-91`).
   The pace tests are the lead's on the build machine.
+- **Measured after B3.2 (2026-10-29), on the owner's machine**, 90eb601 against the tree, three
+  alternated pairs, ticks a second: the frigate alone 481/477/474 against 475/469/489; crewed
+  with 1 ship 262/242/241 against 227/237/241, 3 ships 164/148/147 against 141/147/148, 6 ships
+  64/65/65 against 62/64/65, 12 ships 37/37/38 against 36/37/37. `compute_sail_forces` about
+  472 µs a call against 476-487. Within the runs' noise; the predicate cost about 0.5% a tick
+  before it was held once a tick, a quarter of the calls since. Below the floors on both
+  trees, as this machine always is: the build machine's figures are the lead's.
 - Every new field has a class default, as package 37m's script fields have
   (`scripts.py:962-970`), so an old checkpoint loads.
 
@@ -1274,6 +1328,16 @@ Three drafts were judged: reuse first, fidelity first, and risk and test first.
    puts the fore-and-aft sails to larboard until then. Not this package's.
 8. (B3.1) `set_lateen` checks no boom. The driver on its boom (§17.3), set by it, gains
    `not wrecked(spar_of_role(sail, boom))` at B3.5, with its case in `tests/test_driver.py`.
+9. (B3.2) "Brace the spritsail yard aback" answers that the spritsail and sprit topsail are
+   "to the mast" (`orders/verbs.py:802-806`), though no mast carries them. Outside §4.2's nine
+   places; for the lead.
+10. (B3.2) Nothing refuses a yard under the bowsprit filed without `x_m`: it defaults to 0.0,
+    and place 9 puts its windage amidships. §4.1's contract and B1's helper give it; a refusal
+    in `schema.py` is stage 0's, if wanted.
+11. (B5.3) Older than this package: the frame's four directions let the view rescale between
+    tacks at the diagonal facings, through the swing of booms, gaffs and the ringtail boom, on
+    nine of the ten files (worst 2.4-5.0 m of bounds; the same on 90eb601's and the tree's
+    `projection.js`). The yards under the bowsprit take sixteen points; the rest is B5's, later.
 
 ---
 
