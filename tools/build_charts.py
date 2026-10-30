@@ -290,6 +290,11 @@ REGIONS: dict[str, dict[str, Any]] = {
             "aix-basque-roads": {"south": 45.97, "north": 46.08, "west": -1.32, "east": -1.08},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # package 93: GEBCO's fill raised to the chart's datum by the world's mean level, the
+        # block's own gauges' (3.06 to 4.23 m within the bounds); built without it by 39b,
+        # beside 39a, its marshes behind the dykes read as ground that dries and flooded at
+        # high water springs (docs/dev/ChartBlocks.md, "GEBCO's fill")
+        "fill_to_chart_datum": True,
     },
     # package 39c: Biscay south and Galicia, abutting biscay-north at 45.9 N exactly and
     # the Portuguese block at 42.0 N. The western bound is moved from the brief's 9.0 W to

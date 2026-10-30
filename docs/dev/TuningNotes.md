@@ -13470,3 +13470,39 @@ and the 89 truths among them). **The scenario** `spithead.yaml`, 28 hours with
 byte for byte**, 1,241 lines, digest `eef946bdabaf39cf`, anchored at Spithead at 06:08 on
 the 21st (79b's record on the build machine, 1,275 lines, `f60626aa5d4f6388`, is another
 machine's and an older tide's): her water is EMODnet's, and the fill is the land's.
+
+### The region `biscay-north`
+
+The recipe takes `fill_to_chart_datum` (above). The control first: the head's tool on
+today's fetch gives every tile's arrays the committed ones' (the 92 files differ in their
+bytes alone, 39b's tiles written before `save_tile` dated their entries by the clock), the
+coast byte for byte. `python tools/build_charts.py --region biscay-north --reuse-world`:
+the checks as printed (100 of 100 features within the bounds and in the references' form,
+ids unique, the one override's datum stated, the fetch box covering the tiles, "5 kept");
+"GEBCO's fill raised to the chart's datum by the world's mean level, 3.06 to 6.35 m" (3.06
+to 4.23 within the bounds, the higher at the grid's northern edge in channel-west's water).
+**The shore's sweep 3,808 cells in 133 places**, where 39b's without the raise found 34,053
+in 267: the largest now the Brière and the Loire's marshes above Saint-Nazaire (587, 306,
+182, 179 about 47.28 to 47.33 N, 2.08 to 2.18 W), the Grande Brière's west (302 and 211
+about 47.28 to 47.33 N, 2.48 W) and the Gulf of Morbihan's and the Étel's heads (83, 70,
+70, 76): water, closed from the sea or the rivers' own.
+
+| | Old (39b, no raise) | New (the block's water) |
+|---|---|---|
+| level 2 | 55 tiles, 8.92 MB | 55 tiles, 9.12 MB |
+| level 3 | 37 tiles, 2.47 MB | 37 tiles, 2.43 MB |
+| coast | 1,966 pieces, 13,966 points, 516,071 bytes | 830 pieces, 9,607 points, 291,556 bytes |
+| tiles changed (arrays) | | 48 of level 2, 36 of level 3 |
+| cells changed | | 4,958,596 at level 2, 4,627,381 at level 3, the largest 6.10 m |
+| below the datum to above | | 62,393 at level 2, 178,554 at level 3 |
+| above the datum to below | | none |
+
+The coast lost the marshes' and lakes' inner shores the old tiles drew at the datum (the
+Brière, Grand-Lieu, the Marais poitevin and Breton among them), 1,136 pieces. `git status`
+after the build: the region's 92 tiles, its coast, the manifest's entry and fetch records,
+the recipe; no other region's tile, coast or index, the index and every port file and mark
+untouched. **The block's tests**: the six files fast 203 passed, slow 11 passed; truths
+7-260 to 7-269 with `--slow -n 4` (79a's, Rochefort's and Lorient's among them), 10 passed;
+45c's pilot off Aix (`test_ports.py`, 89's step 4d) among the fast, passed. **The scenario**
+`biscay-north.yaml`, 9 hours with `--reckoning`, on the head's tree and this one: **the same
+log byte for byte**, 348 lines, digest `28c449dbbda73eb1`.
