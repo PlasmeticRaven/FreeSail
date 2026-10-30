@@ -68,6 +68,7 @@ from freesail.orders.errors import OrderError
 from freesail.ship.graph import Ship
 from freesail.ship.loader import load_spec
 from freesail.ship.parts import SailState
+from freesail.world.orders import CHANNELS as WORLD_CHANNELS
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIMER = ROOT / "docs" / "primer"
@@ -450,13 +451,21 @@ def test_instant_runner_applies_end_states():
 # Package 33c: every form in the forms tables of chapters 10 and 11 parses
 # ---------------------------------------------------------------------------
 
-# The tables of forms, by chapter and the heading they stand under.
+# The tables of forms, by chapter and the headings they stand under (every chapter that has
+# one: the grammar whole, checked against the vocabulary from the primer's side).
 FORM_TABLES = {
-    "10-the-reckoning.md": "## Every form, in a table",
-    "11-the-starting-book.md": "## The dialect's forms, in a table",
-    "14-the-port.md": "## The forms, in a table",  # package 35
-    "15-other-sail.md": "## The forms, in a table",  # package 36
-    "16-the-officer-of-the-watch.md": "## The forms, in a table",  # package 37
+    "10-the-reckoning.md": ("## Every form, in a table",),
+    "11-the-starting-book.md": ("## The dialect's forms, in a table", "## The events, whole"),
+    "12-the-longitude.md": ("## Every form the longitude's orders take",),
+    "13-the-tide-and-the-anchor.md": ("## The forms, in a table",),
+    "14-the-port.md": ("## The forms, in a table",),
+    "15-other-sail.md": ("## The forms, in a table",),
+    "16-the-officer-of-the-watch.md": ("## The forms, in a table",),
+    "17-the-captain.md": ("## The forms, in a table",),
+    "19-the-wardroom.md": ("## The forms, in a table",),
+    "20-the-director.md": ("## The forms, in a table",),
+    "23-colours-and-signals.md": ("## The forms, in a table",),
+    "24-the-squadron.md": ("## The forms, in a table",),
 }
 TICK = "`"
 
@@ -478,15 +487,87 @@ def table_forms(chapter: str, heading: str) -> list[str]:
     return forms
 
 
+# The forms of the tables that are not the ship's to take: the driver's and the doors'
+# flags, a model's tool, the seat's own sentence, the scenario file's keys, a question to a
+# person nobody holds (the director's, answered only with one seated). Each is a sentence
+# of its chapter's prose, never a line the ship reads.
+NOT_THE_SHIPS = frozenset(
+    {
+        "ask the cook what is for dinner",
+        "brief",
+        "budget",
+        "models",
+        "seats",
+        "seats_in_voyage",
+        "seats_on_the_players_ship",
+        "stand by, asleep below until called",
+        "stand by until noon, or a fix, or the true wind exceeds 30 knots",
+        "stand_by",
+        "the director's log",
+        "the truth",
+        "two stories",
+        "two stories 40",
+        "world_order",
+    }
+)
+
+
+def is_the_ships(form: str) -> bool:
+    """Whether a table's form is an order the ship reads: not a door's flag (`--seat`), a
+    placeholder (`<words>`, `...`), a tool call (`chart(span)`), the director's own
+    sentences (`director: brief`), a scenario file's line (`intent:`), or the list above."""
+    if form.startswith("--") or "<" in form or "..." in form or "(" in form:
+        return False
+    if form.endswith(":"):
+        return False  # a scenario file's key (`ships:`)
+    if form.startswith(("director:", "intent:", "world:")):
+        return False
+    return form not in NOT_THE_SHIPS
+
+
 STANDING_HEADS = ("when ", "at ", "every ", "if ")
-FORMS = [(ch, f) for ch, heading in FORM_TABLES.items() for f in table_forms(ch, heading)]
+EVERY_FORM = [
+    (ch, f) for ch, headings in FORM_TABLES.items() for h in headings for f in table_forms(ch, h)
+]
+FORMS = [(ch, f) for ch, f in EVERY_FORM if is_the_ships(f)]
+WORLD_FORMS = [(ch, f) for ch, f in FORMS if f.split(":")[0] in WORLD_CHANNELS]
+FORMS = [(ch, f) for ch, f in FORMS if (ch, f) not in WORLD_FORMS]
 
 
 def test_the_forms_tables_are_there_and_large_enough():
     by_chapter = {ch: [f for c, f in FORMS if c == ch] for ch in FORM_TABLES}
     assert len(by_chapter["10-the-reckoning.md"]) >= 90
-    assert len(by_chapter["11-the-starting-book.md"]) >= 60
-    assert sum(1 for _, f in FORMS if f.startswith(STANDING_HEADS)) >= 80
+    assert len(by_chapter["11-the-starting-book.md"]) >= 240  # the events whole among them
+    assert sum(1 for _, f in FORMS if f.startswith(STANDING_HEADS)) >= 260
+    assert len(WORLD_FORMS) >= 20
+    # what the rule leaves out is a door's or the director's, never a form that looks like
+    # the ship's; the list of the rest is exact, so a form added to a table is judged
+    left_out = {f for ch, f in EVERY_FORM if not is_the_ships(f)}
+    assert NOT_THE_SHIPS <= left_out, NOT_THE_SHIPS - left_out
+
+
+def test_every_event_of_the_registry_is_in_the_events_table():
+    """Chapter 11's table of events whole names every event the book's `at` takes, and
+    nothing the registry has not got (the test that keeps the book and the game one)."""
+    from freesail.api import readings as R
+
+    forms = table_forms("11-the-starting-book.md", "## The events, whole")
+    events = {f.removeprefix("at ") for f in forms}
+    assert all(f.startswith("at ") for f in forms)
+    assert events == set(R.EVENTS), events ^ set(R.EVENTS)
+
+
+@pytest.mark.parametrize("chapter,form", WORLD_FORMS, ids=[f"{c[:2]}: {f}" for c, f in WORLD_FORMS])
+def test_every_world_order_form_in_the_tables_parses_to_its_channel(chapter: str, form: str):
+    """A world order's form in a chapter's table (the director's, chapter 20's and 24's)
+    parses to a channel the world knows; the ship refuses it at her prompt, in words."""
+    from freesail.world import orders as WO
+
+    parsed = WO.parse(form)
+    assert parsed.channel in WO.CHANNELS, (chapter, form, parsed)
+    ship = make_ship("frigate", "plain-sail", "starboard")
+    with pytest.raises(OrderError, match="an order to the world"):
+        orders.handle(ship, form)
 
 
 @pytest.mark.parametrize("chapter,form", FORMS, ids=[f"{c[:2]}: {f}" for c, f in FORMS])

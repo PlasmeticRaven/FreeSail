@@ -128,6 +128,9 @@ KINDS: dict[str, str] = {
     "distance": "a distance in miles: exceeds, is over, is under, is below 20 miles",
     "ground": "the ground the lead brings up: is sand, is mud, is not rock",
     "person": "a person's place: is on deck, is below",
+    # a question answered in words (the people, the pilot, the port, the prices...): read at
+    # the prompt or by the readings tool, never compared in a standing order
+    "query": "a question answered in the log, in words: read, never compared",
     "well": "the water in the well by the last sounding: read, not yet compared",
     "absent": "not a reading the ship has yet",
 }
@@ -1037,7 +1040,16 @@ REGISTRY.add(
         description="the apparent wind's speed",
     )
 )
-REGISTRY.add(Reading("heading", ("the heading",), "compass", "", _heading))
+REGISTRY.add(
+    Reading(
+        "heading",
+        ("the heading",),
+        "compass",
+        "",
+        _heading,
+        description="her head by the compass",
+    )
+)
 REGISTRY.add(
     Reading(
         "course",
@@ -1049,7 +1061,16 @@ REGISTRY.add(
         none_words=_no_way_words,
     )
 )
-REGISTRY.add(Reading("speed", ("the speed",), "speed", "knots", _speed))
+REGISTRY.add(
+    Reading(
+        "speed",
+        ("the speed",),
+        "speed",
+        "knots",
+        _speed,
+        description="her speed through the water by the log, in knots",
+    )
+)
 REGISTRY.add(
     Reading(
         "leeway",
@@ -1061,10 +1082,46 @@ REGISTRY.add(
         none_words=_no_way_words,
     )
 )
-REGISTRY.add(Reading("heel", ("the heel",), "angle", "degrees", _heel))
-REGISTRY.add(Reading("helm", ("the helm",), "angle", "degrees", _helm))
-REGISTRY.add(Reading("watch", ("the watch",), "watch", "", _watch))
-REGISTRY.add(Reading("time", ("the time",), "bells", "", _bells))
+REGISTRY.add(
+    Reading(
+        "heel",
+        ("the heel",),
+        "angle",
+        "degrees",
+        _heel,
+        description="her heel in degrees, to larboard or to starboard",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "helm",
+        ("the helm",),
+        "angle",
+        "degrees",
+        _helm,
+        description="the helm's angle in degrees, weather or lee",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "watch",
+        ("the watch",),
+        "watch",
+        "",
+        _watch,
+        description="the watch now kept, by its name",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "time",
+        ("the time",),
+        "bells",
+        "",
+        _bells,
+        description="the ship's time: the watch and the bells",
+    )
+)
 REGISTRY.add(
     Reading(
         "daylight",
@@ -1097,8 +1154,26 @@ REGISTRY.add(
         description="the worst strain ratio aboard, or a part's",
     )
 )
-REGISTRY.add(Reading("hands_on_deck", ("the hands on deck",), "hands", "", _hands_on_deck))
-REGISTRY.add(Reading("watch_below", ("the watch below",), "hands", "", _watch_below))
+REGISTRY.add(
+    Reading(
+        "hands_on_deck",
+        ("the hands on deck",),
+        "hands",
+        "",
+        _hands_on_deck,
+        description="the hands on deck now, their number and how fresh they are",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "watch_below",
+        ("the watch below",),
+        "hands",
+        "",
+        _watch_below,
+        description="the watch below, their number and how rested",
+    )
+)
 
 
 def _well(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -1387,7 +1462,7 @@ REGISTRY.add(
         "",
         _master,
         description="the master: his name, his place and what occupies him; and the "
-        "master's station, when a model or the player holds it (package 41)",
+        "master's station, when a model or the player holds it",
         none_words=_no_reckoning_words,
     )
 )
@@ -1511,7 +1586,7 @@ REGISTRY.add(
     Reading(
         "work_in_hand",
         ("the work in hand", "the work"),
-        "ground",
+        "query",
         "",
         _work_in_hand,
         description="the work in hand: what the hands are doing, and what waits for hands "
@@ -1920,7 +1995,7 @@ REGISTRY.add(
     Reading(
         "ahead",
         ("ahead", "what lies ahead", "what is ahead"),
-        "ground",
+        "query",
         "",
         _ahead,
         description="what lies on her course within the next glass at her speed, from her "
@@ -2073,7 +2148,7 @@ REGISTRY.add(
     Reading(
         "anchor",
         ("the anchor",),
-        "ground",
+        "query",
         "",
         _anchor,
         description="the anchor: down (riding by which, to the flood or the ebb, the cable "
@@ -2097,7 +2172,7 @@ REGISTRY.add(
     Reading(
         "ground_tackle",
         ("the ground tackle",),
-        "ground",
+        "query",
         "",
         _ground_tackle,
         description="the anchors and their cables, each with its weight and state",
@@ -2112,7 +2187,7 @@ REGISTRY.add(
         "fathoms",
         _draught,
         description="the water she draws, from her file: 'she draws fifteen feet of water, "
-        "two fathoms and a half' (package 37k)",
+        "two fathoms and a half'",
     )
 )
 
@@ -2368,7 +2443,7 @@ REGISTRY.add(
     Reading(
         "people",
         ("the people",),
-        "ground",
+        "query",
         "",
         _people,
         description="the named people aboard, each by name and role with his place and state",
@@ -2391,7 +2466,7 @@ REGISTRY.add(
     Reading(
         "places",
         ("the places",),
-        "ground",
+        "query",
         "",
         _places,
         description="the places aboard, each a name and a description",
@@ -2402,7 +2477,7 @@ REGISTRY.add(
     Reading(
         "pilot",
         ("the pilot",),
-        "ground",
+        "query",
         "",
         _pilot,
         description="the pilot aboard: his name and port, and when the tide serves by his word",
@@ -2413,7 +2488,7 @@ REGISTRY.add(
     Reading(
         "port",
         ("the port",),
-        "ground",
+        "query",
         "",
         _port,
         description="the port she is in or near: its stance to her, the pilot, the cutter and "
@@ -2425,7 +2500,7 @@ REGISTRY.add(
     Reading(
         "boat",
         ("the boat",),
-        "ground",
+        "query",
         "",
         _boat,
         description="the ship's boat: alongside, or away on its errand and where",
@@ -2436,7 +2511,7 @@ REGISTRY.add(
     Reading(
         "boats",
         ("the boats",),
-        "ground",
+        "query",
         "",
         _boats,
         description="the boats she carries, each with its length, oars and crew",
@@ -2447,7 +2522,7 @@ REGISTRY.add(
     Reading(
         "prices",
         ("the prices",),
-        "ground",
+        "query",
         "",
         _prices,
         description="the prices at the port she lies in, as the purser last brought them off",
@@ -2458,7 +2533,7 @@ REGISTRY.add(
     Reading(
         "manifest",
         ("the manifest",),
-        "ground",
+        "query",
         "",
         _manifest,
         description="the hold: the cargo in it by tons and the room left",
@@ -2469,7 +2544,7 @@ REGISTRY.add(
     Reading(
         "purse",
         ("the purse",),
-        "ground",
+        "query",
         "",
         _purse,
         description="the money aboard, in pounds",
@@ -2480,7 +2555,7 @@ REGISTRY.add(
     Reading(
         "stores",
         ("the stores",),
-        "ground",
+        "query",
         "",
         _stores,
         description="the purser's stores: water by the ton, provisions by the day, and for "
@@ -2492,7 +2567,7 @@ REGISTRY.add(
     Reading(
         "epitome",
         ("the epitome",),
-        "ground",
+        "query",
         "",
         _epitome,
         description="the epitome's table of the establishments: high water at full and change "
@@ -2952,7 +3027,7 @@ REGISTRY.add(
     Reading(
         "officer_of_the_watch",
         ("the officer of the watch", "who has the deck"),
-        "ground",
+        "query",
         "",
         _officer_of_the_watch,
         description="who has the deck: the officer of the watch by name and rank, since "
@@ -3019,7 +3094,7 @@ REGISTRY.add(
     Reading(
         "captain",
         ("the captain", "who commands"),
-        "ground",
+        "query",
         "",
         _captain_reading,
         description="who commands: the captain's station and who holds it, the book's "
@@ -3085,7 +3160,7 @@ REGISTRY.add(
     Reading(
         "lookout",
         ("the lookout", "who is at the masthead"),
-        "ground",
+        "query",
         "",
         _lookout_station,
         description="the lookout's station: who is at the masthead, what is in sight by "
@@ -3129,7 +3204,7 @@ REGISTRY.add(
     Reading(
         "stations",
         ("the stations",),
-        "ground",
+        "query",
         "",
         _stations,
         description="the ship's stations as the world binds them: each with the person "
@@ -3283,7 +3358,7 @@ def describe_value(reading: Reading, value: Any) -> str:
         return fathoms_words(value)
     if kind in ("position", "distance", "person", "well", "state"):
         return str(value["words"])
-    if kind == "ground":
+    if kind in ("ground", "query"):
         return str(value.get("said") or value["words"])
     if isinstance(value, float):
         return f"{value:g}"

@@ -76,8 +76,12 @@ Within four cables a ship is spoken by the trumpet, and the answer is a line hea
 ```
 hail her
 hail the brig: what ship is that?
+hail the brig what ship is that?
 say to the brig: heave to, I am sending a boat
+hail Nancy, whence come you?
 ```
+
+The sail is named by her rig (`the brig`, `the fore topsail schooner`), by her name when it is known (`Nancy`, `the Nancy`), or as `her` for the sail engaged or the nearest; the colon after her is optional, and what follows is said as written. `hail <words>` with no sail named is the lookout's hail of the deck (chapter 19).
 
 ```
 Hailed the brig by the trumpet: 'What ship is that?'. The brig answers: 'The Nancy of Guernsey, from Guernsey for Falmouth, a cargo of salt.'
@@ -112,7 +116,7 @@ the lights
 | `answer the signal` / `repeat the signal` / `haul down the signal` | the answering pendant; the last signal read made again; the hoists down |
 | `hoist the lights` / `hoist the top lights` / `show no lights` | the lights by night |
 | `keep the fog signals` / `cease the fog signals` | the bell, the gun or the drum in fog |
-| `hail her` / `hail the <sail>: <words>` / `say to the <sail>: <words>` | the trumpet within four cables |
+| `hail her` / `hail the <sail>: <words>` / `hail the <sail> <words>` / `say to the <sail>: <words>` / `hail <name> <words>` | the trumpet within four cables; the colon optional, the sail by her rig, her name or `her` |
 | `the colours`, `the signals`, `the private signal`, `the lights` | the readings |
 
 Every signal of every book is listed in `the signal book` of the library, with its number, its meaning and its source; the hoists made up in the period's form rather than read from a book are marked so in the files, under `data/signals/`.

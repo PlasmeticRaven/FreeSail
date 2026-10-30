@@ -420,6 +420,7 @@ _HOW = {
     "state": ("a state", "by its words: 'is struck', 'is cast loose', 'is not engaged'"),
     "person": ("a person", "by his place: 'is on deck', 'is below'"),
     "well": ("the well", "by nothing yet: it is read ('sound the well'), not compared"),
+    "query": ("a question", "by nothing: it is read at the prompt, not compared"),
     "tendency": (
         "the glass",
         "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast, "
@@ -698,6 +699,14 @@ def _parse_comparison(
     if all(c.kind == "well" for c in cands):
         # the well is read, not compared, until milestone 7's pumps (taking on water) give it a rule
         raise OrderError(WELL_NOT_COMPARED)
+    if all(c.kind == "query" for c in cands):
+        # a question answered in words (the people, the pilot, the port) is read, never
+        # compared: a condition wants a reading with a figure or a state
+        raise OrderError(
+            f"'{match.phrase}' is read, not compared in a standing order: ask it at the "
+            "prompt, or with the readings tool; a condition wants a reading with a figure or "
+            "a state (the grammar's readings say which)."
+        )
     stop = next((k for k in range(i, len(tokens)) if tokens[k] in _STOP), len(tokens))
     tail = tokens[i:stop]
     tail_words = " ".join(tail)

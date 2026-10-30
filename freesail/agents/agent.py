@@ -2115,6 +2115,28 @@ def ordinal_words(n: int) -> str:
 # stand_by's "this ends your turn" read to the model as two rules that contradicted).
 TURN_ENDS_WORDS = "A turn ends when you reply with no tool call, or at once when you stand by."
 
+# The person's own (the owner's third note of the playtests of 70 to 72: the briefs and
+# the tools' words never told a model it may move about the ship, eat, drink, say and say
+# to, go ashore). Every station with authority is a person aboard, and the judge allows
+# these whatever the station's domain (`tools.judge`: the reach verbs, the deck's
+# conversation, the needs and the free lines); the brief says so once, after the
+# station's own words, so that no model has to find them by refusal.
+YOUR_PERSON_WORDS = (
+    "Your person. You are a person aboard as well as a station, and these are yours "
+    "whatever your station may order, each given with submit_order like any order: move "
+    "about the ship ('go below', 'come on deck', 'go aloft', 'go to the galley'; 'the "
+    "places' lists where you may go), and in port go ashore and come aboard ('go ashore', "
+    "'come aboard', 'hire a waterman'; 'the places ashore' lists the port's); eat, drink "
+    "and sleep ('eat', 'drink', 'sleep'; 'how am I' says how you are, and when you last "
+    "did each); read what is before you ('read the letter'; the papers and the books are "
+    "in the library) and handle things ('give', 'take', 'put', 'show', 'open', 'hide', "
+    "'throw'); speak where you stand ('say <words>', heard by whoever is there), to a "
+    "station or a person ('say to the master <words>', 'tell the mate <words>', 'ask the "
+    "lookout what she is'), and to a sail within four cables ('hail the brig: what ship is "
+    "that?', the colon optional). The grammar's parts 'the order language' and 'the voice' "
+    "(library(topic='grammar')) have every form."
+)
+
 # The weather's events, each in a few words (package 31c; playtest 11's finding 3): the
 # ones the log says by a line of their own and the ones that are the readings' changes
 # (`readings.EVENTS`), in the brief's list and the tool's description alike.
@@ -2374,7 +2396,10 @@ class Brief:
             ),
         }
         head = tuple(BriefItem(name, items[name]) for name in HEAD_ORDER)
-        return cls(head, station.brief)
+        brief = station.brief
+        if station.has_authority and station.authority is not Authority.DIRECTOR:
+            brief = f"{brief.rstrip()}\n\n{YOUR_PERSON_WORDS}"
+        return cls(head, brief)
 
 
 def _flatten(d: dict[str, Any], prefix: str = "") -> list[tuple[str, str]]:

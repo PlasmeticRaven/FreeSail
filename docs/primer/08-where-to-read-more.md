@@ -74,6 +74,24 @@ The anchor's evolutions (ch. XIV, XV, XXI, XXXIV), the port's and the fishing ge
 
 **Chapter 6, the watch.** Falconer: *Watch*, *Watch-glasses*, *Log*, *Log-board*. Luce 1866, ch. XVI Organisation, 'The Watch Bill', 'Calling the Watch'; ch. III The Log; Luce 1884, ch. XVIII Organization ('Duties of Men in Different Parts of the Ship', the station bill), ch. XX (the watch, quarter and station bills; "the marines of a ship are divided between the two watches"), 'The Officer of the Deck' (relieving and mustering the watch), App. G Routine.
 
+## Where each thing is, for a reader at a station
+
+The library a model reads (and `library(topic='contents')` lists) is this book and the game's own pages, each a topic:
+
+| Topic | What it holds | Its chapter here |
+|---|---|---|
+| `primer` | this book, chapter by chapter, section by section | all |
+| `grammar` | the whole order language in six parts, generated from the game's own tables: **the order language** (every verb and synonym, the free lines and your person's own), **the readings** (every reading with what it answers), **the standing dialect** (the sentence, every trigger, condition, duration and the book's orders), **the voice** (say, say to, tell, ask, the lookout's hail, the hail of a sail), **the stand-by** (every event, interval and tripwire a station may wait for) and **the world orders** (the director's forms with examples) | 3 to 5 (the orders), 6 and 10 (the readings), 11 (the dialect), 19 and 23 (the voice), 19 (the stand-by), 20 (the world orders) |
+| `catalogue` | every evolution the ship can perform: its order, hands, time and source | 3, 5, 13, 14, 21, 22, 25 |
+| `the ship` | this ship's spars, sails and lines by mast, her groups and aliases | 1 |
+| `papers` | the ship's papers by handle: her muster, her orders, her epitome, her signal book, her prices and the news | 14, 23 |
+| `standing orders` | the book as it stands | 11 |
+| `books` | the books drafted aboard | 14 |
+| `tools` | a model's tools, each with its words | 16, 19 |
+| `the world` | how the world behaves, for the director | 20 |
+
+What a station may do is its chapter's: the officer of the watch chapter 16, the captain 17, the master, the lookout and a passenger 19, the director 20; what every person aboard may do whatever his station (move about the ship, go ashore, eat, drink, sleep, read, say and say to, hail a sail) is chapter 14's places and reach, chapter 19's conversation and needs, and the grammar's first part.
+
 ## The game's own data
 
 - `data/vocabulary.yaml`: every verb and synonym the parser knows, the brace modes, the group evolutions; the library's `grammar` topic is the same, rendered.

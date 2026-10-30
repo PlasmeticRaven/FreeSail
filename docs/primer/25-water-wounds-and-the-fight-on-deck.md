@@ -16,7 +16,8 @@ the hatches in a heavy sea.
 
     the well           the carpenter's feet: "a foot of water in the well, and gaining;
                        the pumps gaining on it"
-    the water          the tons, and every source by name with its rate
+    the water in the ship  the tons, and every source by name with its rate (also `the
+                       water aboard`, `the water in her`)
     the leaks          the shot holes with their places, the seams, the ground
     the pumps          manned or not, by whom, the rate, when they were spelled
 
@@ -27,13 +28,15 @@ hour each with four men at the brakes and her two hand pumps fifteen each with t
 cutter has the hand pumps alone. `man the pumps` takes the hands from the pool as a standing
 work (in action, from the trimmers by the fighting book's priority), the keeper spells them
 every half hour (`spell the pumps` sooner), and they suck when the well is dry, kept by
-spells while a leak runs. Where the pumps lose, the log says so ("the pumps losing: the well
+spells while a leak runs; `secure the pumps` stands their crews down (refused when nobody
+is at them). Where the pumps lose, the log says so ("the pumps losing: the well
 gains ten tons an hour on them"), and the water takes her stiffness before it takes her: a
 foot of free water across the hold is a third of a cutter's metacentric height, and she
 rolls deeper and heels further for it. At three fifths of the water that founders her the
 log says she is settling; at half her displacement she founders, held where she lies, her
 sails furled, the game's ship lost. `batten down the hatches` (ten minutes) stops the sea
-she ships in a gale from going below.
+she ships in a gale from going below, and `open the hatches` (ten minutes) takes the battens
+off again; each is refused when the hatches are so already.
 
 ## The carpenter's and the boatswain's work
 
@@ -118,11 +121,13 @@ them to their muskets, and the carronades go short by them.
     marines, fire by volley     within musket shot (a hundred yards) of a near deck: a
     marines, fire at will       volley every twenty seconds, or each man at his own rate
     marines, hold your fire     the muskets grounded; back to the carronades
-    marines to the tops         the kit's share aloft as marksmen; `to the gangways` down
+    marines to the tops         the kit's share aloft as marksmen; `marines to the gangways`
+                                brings them down again
     serve out the small arms    five minutes with the gunner's party: cutlasses, pikes,
                                 pistols and tomahawks to the boarders, the muskets of the
                                 stand of arms to the small-arms men
-    small arms, fire at will    the small-arms men's muskets within musket shot
+    small arms, fire at will    the small-arms men's muskets within musket shot;
+    small arms, hold your fire  grounded again
 
 The hits fall on the men exposed on the other deck, the quarterdeck's officers and helmsmen
 two in five (history's lesson), and her people fire back by their own book. Her log says

@@ -95,7 +95,7 @@ A party too small for the work is refused at once, with the numbers, since waiti
 
 ## Relieving the watch
 
-`relieve the watch` changes the watch early: the other watch takes the deck until the clock's next watch change gives it back to the bill. It is for when all hands have upset the turn, or a watch has been kept long at hard work.
+`relieve the watch` changes the watch early: the other watch takes the deck until the clock's next watch change gives it back to the bill. It is for when all hands have upset the turn, or a watch has been kept long at hard work. `call the watch` (`call the watch below`, `call the larboard watch`, `turn up the starboard watch`) turns the watch below up without changing the deck: a third of them at once and the rest over the minutes, as a watch sent to a piece of work comes, up until piped down; a watch that has the deck already, or all hands up, is answered so and nothing changes.
 
 ```orders frigate
 relieve the watch
@@ -175,7 +175,7 @@ This book uses `tick` throughout so that its logs are exact. At the console `go`
 
 ## Asking a reading
 
-Every reading the instruments show may be asked at the prompt, in the console and the browser alike: type its words, alone or after `what is` or `ask the master`, or a sail's name for its state, and the answer is a routine line of the log in the very words the instruments and a model's `readings` give, never journaled and changing nothing aboard. Chapter 10 has the reckoning's in a table; the rest are the weather's (chapter 9) and the ship's own.
+Every reading the instruments show may be asked at the prompt, in the console and the browser alike: type its words, alone or after `what is` or `ask the master`, or a sail's name for its state, and the answer is a routine line of the log in the very words the instruments and a model's `readings` give, never journaled and changing nothing aboard. Chapter 10 has the reckoning's in a table; the rest are the weather's (chapter 9) and the ship's own, and the library's grammar lists every reading with what it answers (its second part, `the readings`).
 
 ```orders frigate plain-sail
 the true wind

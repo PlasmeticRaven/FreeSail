@@ -1854,7 +1854,10 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     assert tools.size_words(tools.tokens(three)) == "about 11,280 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
     # package 58a: a fourth part, the world orders (3 parts before)
-    assert f"{tools.size_words(tools.tokens(grammar))} whole, in 4 parts" in contents
+    # six parts: the order language, the readings, the standing dialect, the voice, the
+    # stand-by and the world orders (4 before the readings, the voice and the stand-by
+    # were given parts of their own)
+    assert f"{tools.size_words(tools.tokens(grammar))} whole, in 6 parts" in contents
     ship = lib(world, topic="the ship", section="all").split("\n\n", 1)[1]
     assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
     tool_page = lib(world, topic="tools")

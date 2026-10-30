@@ -129,6 +129,28 @@ The orders after `then` are read whole when the standing order is given, every o
 
 The book's orders: `standing orders` lists the book, each order with who gave it and its state (standing, belayed, held, fired how often and when last); `show standing order "x"`; `belay standing order "x"` keeps it idle in the book; `resume standing order "x"`; `belay all standing orders`; `strike standing order "x"` (or `cancel`, `remove`) takes it out; and `read the standing orders from <file>` gives every order in a file of them.
 
+## The events, whole
+
+Every event the book's `at` takes, by family; each is also a word a station may stand by for (chapter 19). The game's own tests give each to the frigate as a standing order and fail if one is not taken, and fail again if the game gains an event this table has not got.
+
+| Event | Family |
+|---|---|
+| `at sunset`, `at sunrise`, `at one bell`, `at two bells`, `at three bells`, `at four bells`, `at five bells`, `at six bells`, `at seven bells`, `at eight bells`, `at the change of the watch`, `at noon` | The sun and the clock |
+| `at a strain warning`, `at a sail shaking`, `at her sails lifting`, `at a spar carrying away`, `at a sail blown out`, `at all hands called`, `at the watch piped down`, `at a standing order countermanded` | The sails, the spars and the hands |
+| `at a squall`, `at a wind shift`, `at the glass falling fast`, `at the glass turning`, `at the sea getting up`, `at a change in the sky` | The weather |
+| `at hove to`, `at filled away`, `at tacked`, `at wore`, `at the course shaped`, `at steady on the course` | The manoeuvres and the helm |
+| `at a sighting`, `at a sail sighted`, `at sail ho`, `at a landfall`, `at a danger sighted`, `at a bearing steady and closing`, `at land ahead`, `at land close ahead`, `at a sail made out`, `at a stranger's colours made out`, `at a sail lost`, `at a sail within hail`, `at a light seen` | The lookout |
+| `at a sounding`, `at a fix`, `at a lunar`, `at a longitude by chronometer`, `at the chronometer run down`, `at the variation observed`, `at the turn of the tide by the reckoning` | The reckoning |
+| `at the anchor let go`, `at brought up`, `at the anchor aweigh`, `at the anchor weighed`, `at under way`, `at got under way`, `at the anchor dragging`, `at the cable parted`, `at aground`, `at the ground taken`, `at afloat`, `at the turn of the tide`, `at the turn to the flood`, `at the turn to the ebb`, `at moored`, `at unmoored`, `at the kedge laid` | The anchor and the tide |
+| `at the pilot aboard`, `at the pilot refused`, `at the pilot off`, `at the pilot's warning`, `at the pilot's boat gone`, `at the pilot asks for his boat`, `at the pilot's hail`, `at the pilot asks to be put off`, `at the boat away`, `at the boat alongside`, `at a message`, `at a letter`, `at the hands entered`, `at the yard's stores aboard`, `at the cargo aboard` | The port |
+| `at the deck given`, `at the deck taken`, `at a handover`, `at a hail from the masthead`, `at a word on deck` | The stations |
+| `at quarters`, `at the beat to quarters`, `at cleared for action`, `at the guns cast loose`, `at the guns secured`, `at she opens fire`, `at the enemy opens fire`, `at a warning shot`, `at a shot across the bows`, `at a broadside fired`, `at the guns fired`, `at a shot strikes`, `at a hit`, `at a man killed`, `at a hand hurt`, `at a gun dismounted`, `at a spar shot away`, `at the helm shot away`, `at the magazine empty`, `at the butcher's bill`, `at musketry`, `at the marines' fire`, `at grappled`, `at the grapnels cast off`, `at the boarders away`, `at boarded`, `at the fight on deck`, `at a round of the fight`, `at the deck carried`, `at the boarders repulsed`, `at repel boarders`, `at her colours come down`, `at the enemy strikes`, `at she strikes`, `at the colours struck`, `at an officer killed`, `at the command passes` | The action |
+| `at her colours change`, `at she hoists her colours`, `at she hauls down her colours`, `at our colours changed`, `at a signal made`, `at a signal seen`, `at a signal read`, `at a signal answered`, `at the commodore makes a signal`, `at a gun heard`, `at the private signal made`, `at the private signal answered`, `at the private signal right`, `at the private signal wrong`, `at hailed`, `at a hail`, `at a hail answered`, `at a sail spoken` | The colours, the signals and the hail |
+| `at a ship out of her station`, `at a straggler`, `at a ship regains her station`, `at out of station`, `at in station`, `at a ship lost to the convoy`, `at a ship cut out`, `at a ship parts company`, `at a division detached`, `at the division recalled` | The squadron and the convoy |
+| `at the well rising`, `at the pumps gaining`, `at the pumps losing`, `at the pumps suck`, `at the leak stopped`, `at a shot hole plugged`, `at she is settling`, `at she founders`, `at the ship founders`, `at the hatches battened` | The water and the pumps |
+| `at a man taken ill`, `at a man dead`, `at a death`, `at the burial`, `at the morning report`, `at the surgeon's report`, `at a man collapsed` | The people's health |
+| `at the gunner filling`, `at the cartridges filled`, `at the powder all filled`, `at the hoy alongside`, `at the powder stowed`, `at the hoy turned back`, `at the mark over the side`, `at the mark struck`, `at the mark lost`, `at the mark lost to sight`, `at the mark in sight again`, `at the exercise`, `at beyond the allowance` | The practice and the powder |
+
 ## Sources
 
 The starter's reasons are its file's comments, with their sources in full (`data/standing_orders/starter.orders`): Luce 1866, ch. XXIV and XXXII; Luce 1884, ch. XXV, XXVII and XXIX; the strain tables for the thresholds.

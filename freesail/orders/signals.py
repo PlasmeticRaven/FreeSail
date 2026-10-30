@@ -22,7 +22,8 @@
     keep the fog signals            the bell at anchor, the gun or the drum under way, in fog
     cease the fog signals
     hail her / hail the brig        the speaking trumpet within hail: the standard hail, or
-    hail the Nancy: what ship is    the words given, answered by her body (`world.hail`)
+    hail the Nancy: what ship is    the words given, answered by her body (`world.hail`);
+    hail the brig what ship is that the colon optional, the sail told from the words
       that?
     say to the brig: heave to
 
@@ -157,12 +158,14 @@ _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
         re.compile(r"^(?:cease|stop|belay)\s+(?:the\s+)?(?:fog signals?|bell)$"),
     ),
 )
-_HAIL = re.compile(
-    r"^hail\s+(?P<who>her|him|them|the\s+[^:,]+?|[A-Z][\w'-]+)(?:\s*[:,]\s*(?P<words>.+))?$"
-)
-_SAY_TO = re.compile(
-    r"^say to\s+(?P<who>her|him|them|the\s+[^:,]+?|[A-Z][\w'-]+)\s*[:,]\s*(?P<words>.+)$"
-)
+# The addressee of a hail: 'her', a name, or 'the <sail>'; the words after a colon or a
+# comma, or after a space with no colon (the colon optional: 'hail the brig what ship is
+# that'), the sail's words then told from the words said by `hail_parts`.
+_HAIL = re.compile(r"^hail\s+(?P<rest>(?:her|him|them|the\s|[A-Z]).*)$")
+_SAY_TO = re.compile(r"^say to\s+(?P<rest>(?:her|him|them|the\s|[A-Z]).*)$")
+# The words after 'the' that address the deck or a station, never a sail: a hail of these
+# is the lookout's hail of the deck or a station sentence (`orders.stations`).
+_NOT_A_SAIL = ("deck", "masthead", "lookout", "watcher", "master", "captain", "officer", "boat")
 _SAIL_WORDS = (
     "her",
     "him",
@@ -206,16 +209,55 @@ def recognises(text: str, ship: Any = None) -> str | None:
                 continue
             return verb
     m = _HAIL.match(s) or _SAY_TO.match(s)
-    if m is not None and _names_a_sail(ship, m.group("who")):
+    if m is not None and hail_parts(ship, m) is not None:
         return "hail"
     return None
+
+
+def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
+    """(the sail's words, the words to say) from a hail's or a 'say to' match, or None
+    when the line hails no sail (the lookout's 'hail sail ho', 'say to the watcher').
+    With a colon or a comma the sail is what stands before the first of them, when that
+    names a sail ('hail the brig: what ship is that?', 'say to her, heave to'); without
+    one, or when it does not, the sail is the shortest head of the line that names a sail
+    in sight ('the brig', 'the fore topsail schooner', 'her') and the rest is said to her
+    ('hail the brig what ship is that', 'say to the Nancy heave to, I am sending a
+    boat'). A name without 'the' ('hail Nancy what ship is that') is a sail only when a
+    sail of that name is on the sea, so that the lookout's 'hail Sail ho' stays his."""
+    rest = m.group("rest").strip()
+    cut = re.match(r"^(?P<who>[^:,]+?)\s*[:,]\s*(?P<words>.*)$", rest)
+    if cut is not None and _names_a_sail(ship, cut.group("who")):
+        return cut.group("who"), cut.group("words")
+    tokens = rest.split()
+    low = tokens[0].lower()
+    if low in ("her", "him", "them"):
+        return tokens[0], " ".join(tokens[1:]).strip(" ,:")
+    if low != "the":
+        name = tokens[0].rstrip(",:")
+        return (name, " ".join(tokens[1:]).strip(" ,:")) if _found_on_the_sea(ship, name) else None
+    for n in range(2, len(tokens) + 1):
+        head = " ".join(tokens[:n]).rstrip(",:")
+        if _names_a_sail(ship, head):
+            return head, " ".join(tokens[n:]).strip(" ,:")
+    return None
+
+
+def _found_on_the_sea(ship: Any, name: str) -> bool:
+    world = world_of(ship) if ship is not None else None
+    sea = getattr(world, "vessels", None) if world is not None else None
+    if sea is None:
+        return False
+    try:
+        return sea.find(name.strip()) is not None
+    except Exception:  # noqa: BLE001 - a view with no finder
+        return False
 
 
 def _names_a_sail(ship: Any, who: str) -> bool:
     w = " ".join(str(who or "").lower().split())
     if w.startswith("the "):
         w = w[4:]
-    if w in ("deck", "masthead", "lookout", "watcher", "master", "captain", "officer", "boat"):
+    if w.split(" ")[0] in _NOT_A_SAIL:
         return False
     if w.split()[-1] in _SAIL_WORDS or w in _SAIL_WORDS:
         return True
@@ -344,7 +386,8 @@ def execute(ship: Any, order: Order) -> Result:
         from freesail.world import hail as H
 
         m = _HAIL.match(raw) or _SAY_TO.match(raw)
-        return H.hail_order(world, m.group("who"), m.group("words") or "")
+        who, words = hail_parts(ship, m) or (m.group("rest"), "")
+        return H.hail_order(world, who, words)
     raise OrderError(f"'{order.text}' is no signal order the ship knows.")
 
 
