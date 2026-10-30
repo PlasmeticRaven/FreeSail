@@ -1433,16 +1433,19 @@ FILL_LEVEL_CELL_DEG = 0.05
 
 
 def mean_level_grid(box: dict[str, float]) -> Grid:
-    """Mean sea level above the chart's datum over a box, as the world's tide has it
+    """Mean sea level above the chart's datum over a box, as the eleven gauges give it
     (`data/tides/constituents.yaml`: each gauge's `mean_level_m`, blended by the inverse
     square of the distance over the gauges within `interpolation.reach_nm`, the nearest
     alone beyond them, a gauge no nearer than 100 m; `freesail/world/tide.py`), on a grid
-    of FILL_LEVEL_CELL_DEG. GEBCO's heights are about mean sea level and the regions'
-    levels about LAT: where GEBCO fills a region's cells (the land, mostly), its height
-    plus this is the height above the datum the world's tide is reckoned from, so that
-    a low shore stands as high above the world's high water as it does above the sea's
-    (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
-    behind the town read as drying ground and was covered at high water)."""
+    of FILL_LEVEL_CELL_DEG. The world's tide outside the blocks; within a block the world
+    blends the block's own gauges too since package 89, and this keeps the eleven's level
+    the tiles were raised by (docs/dev/ChartBlocks.md, "GEBCO's fill"). GEBCO's heights
+    are about mean sea level and the regions' levels about LAT: where GEBCO fills a
+    region's cells (the land, mostly), its height plus this is the height above the datum
+    the world's tide is reckoned from, so that a low shore stands as high above the
+    world's high water as it does above the sea's (package 39a: at St Malo, whose mean
+    level is 6.8 m above the datum, the low land behind the town read as drying ground
+    and was covered at high water)."""
     doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
     interp = doc.get("interpolation") or {}
     power = float(interp.get("power", 2))
@@ -1454,6 +1457,10 @@ def mean_level_grid(box: dict[str, float]) -> Grid:
             float(g["mean_level_m"]),
         )
         for g in doc["gauges"]
+        # the eleven alone (package 89): a block's gauge serves its own block's water in
+        # the world's tide, and the tiles were raised by the eleven's level, which this
+        # keeps, so that a rebuild moves no tile by the rule
+        if not g.get("block")
     ]
     cell = FILL_LEVEL_CELL_DEG
     south = math.floor(box["south"] / cell) * cell - cell

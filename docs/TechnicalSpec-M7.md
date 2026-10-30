@@ -1040,6 +1040,16 @@ Naples); the five Italian and Sardinian nations as data; a port's nation by date
 annexation of June 1805); the Gulf's and the Tyrrhenian's weather boxes from the
 Admiralty's printed tables of Marseille and Naples; the scenario `agincourt-sound.yaml`. As
 built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 79d".
+**As built: the held gauges' water (package 89, 2026-10-30).** The finding every block since
+39a carried: the world's tide blended every gauge within 400 miles, so a block's gauges were
+held out of it and its water read the Channel's eleven (Newhaven's spring range 3.9 feet for
+the gauge's 19.5, the Balearics Saint-Malo's). A block's gauge now has its `block:`, a region
+of the chart's manifest, and serves the positions within that region's bounds and no other;
+the eleven serve everywhere, so no position outside a block reads anything new
+(`freesail/world/tide.py`, `Tide.gauges_at`; `data/tides/constituents.yaml`). The master's
+judged rises over the blocks follow the same water (`data/tides/establishments.yaml`).
+Nothing a reading says changes in its form. Rule, cases and figures in
+`docs/dev/ChartBlocks.md` item 6 and `docs/dev/TuningNotes.md`, "Package 89".
 
 ---
 

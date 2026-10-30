@@ -191,18 +191,23 @@ def test_the_islands_ports_are_portuguese_neutral_and_stand_on_their_own_positio
     assert all(neutral.dealings.stance(neutral.ports.ports[p]) == "neutral" for p in ISLANDS_PORTS)
 
 
-def test_the_islands_gauges_are_read_and_held_and_norie_gives_their_hours(tide=None):
-    """TICON's five gauges of the islands in the eleven's form, held (no mean level was
-    read: null, not invented); Norie's Table XLI of 1805 gives Funchal 12h 4m and 7 feet,
-    Angra Bay 11h 45m and 8, Fayal Road 2h 20m and 4 1/2 (read from the page images)."""
+def test_the_islands_gauges_are_read_and_serve_the_islands_and_norie_gives_their_hours(tide=None):
+    """TICON's five gauges of the islands in the eleven's form (no mean level was read:
+    null, not invented), held until package 89 and since then serving their own blocks
+    (`block: madeira`, `block: azores`) and no other water; Norie's Table XLI of 1805 gives
+    Funchal 12h 4m and 7 feet, Angra Bay 11h 45m and 8, Fayal Road 2h 20m and 4 1/2 (read
+    from the page images)."""
     doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
-    held = {g["id"]: g for g in doc["held_gauges"] if g["lon_deg"] < -15.0}
+    held = {g["id"]: g for g in doc["gauges"] if g["lon_deg"] < -15.0}
     assert list(held) == ["funchal", "ponta-delgada", "angra", "horta", "santa-cruz-das-flores"]
     for g in held.values():
         assert g["mean_level_m"] is None and g["record"].startswith("GESLA-2, UHSLC")
         for name in ("M2", "S2", "N2"):
             assert 0.05 < g[name]["amplitude_m"] < 0.8 and 25.0 < g[name]["phase_deg"] < 90.0
-    assert len(doc["gauges"]) == 11 and not set(held) & {g["id"] for g in doc["gauges"]}
+    assert held["funchal"]["block"] == "madeira"
+    assert all(held[g]["block"] == "azores" for g in list(held)[1:])
+    eleven = [g for g in doc["gauges"] if "block" not in g]
+    assert len(eleven) == 11 and not set(held) & {g["id"] for g in eleven}
     # the springs' range at Funchal by its constants is Norie's seven feet
     springs_ft = (
         2.0 * (held["funchal"]["M2"]["amplitude_m"] + held["funchal"]["S2"]["amplitude_m"]) / 0.3048

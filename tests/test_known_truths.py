@@ -11346,6 +11346,131 @@ def test_truth_7_279_the_frigate_sails_from_the_downs_to_spithead_by_her_short_b
 
 
 # ---------------------------------------------------------------------------
+# Package 89: the held gauges' water (truths 7-280 to 7-284): a block's gauge serves the
+# positions within its own block's bounds and no other; the eleven serve everywhere
+# ---------------------------------------------------------------------------
+
+
+def _the_eleven_alone(streams=None):
+    """The world's tide as it was before package 89 everywhere: the eleven gauges alone
+    (with the streams' areas when given)."""
+    import freesail.world.tide as T
+
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    eleven = [g for g in doc["gauges"] if "block" not in g]
+    return T.Tide({**doc, "gauges": eleven}, streams or {"areas": []})
+
+
+def _spring_range_ft(tide, pos) -> float:
+    _, consts = tide.constants_at(pos)
+    return units.m_to_feet(2.0 * (consts["M2"][0] + consts["S2"][0]))
+
+
+def test_truth_7_280_newhaven_dieppe_and_beachy_head_have_their_own_spring_range():
+    """The brief's item 5: the world's spring range at Newhaven and Dieppe within a foot of
+    the gauge's own (19.5 and 27 feet, where the eleven's blend gave 3.9 and 5.3), and at
+    Beachy Head, which has no gauge, a foot short of Norie 1805's twenty (the blend gave
+    4.8): 18.99 feet, Newhaven's water seven miles off, which misses the brief's "within a
+    foot" by a hundredth of a foot (said so for the lead in docs/dev/TuningNotes.md,
+    package 89, and held here at the figure, not widened)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauges = {g["id"]: g for g in doc["gauges"]}
+    eleven = _the_eleven_alone()
+    for gid in ("newhaven", "dieppe"):
+        g = gauges[gid]
+        at = Position(g["lat_deg"], g["lon_deg"])
+        own = units.m_to_feet(2.0 * (g["M2"]["amplitude_m"] + g["S2"]["amplitude_m"]))
+        assert abs(_spring_range_ft(tide, at) - own) < 1.0, gid
+        assert _spring_range_ft(eleven, at) < 6.0, gid  # what the blend had
+    beachy = T.Epitome.load("norie").by_name("Beachy Head")
+    assert beachy.spring_rise_ft == 20.0 and not beachy.rise_judgement
+    assert abs(_spring_range_ft(tide, beachy.position) - 19.0) < 0.05
+    assert _spring_range_ft(eleven, beachy.position) < 6.0
+
+
+def test_truth_7_281_vigo_and_cadiz_have_their_gauges_spring_range():
+    """The brief's item 5: the world's spring range at Vigo and at Cadiz within a foot of
+    their gauges' own, where the nearest of the eleven alone gave Le Conquet's eighteen
+    feet (both beyond the reach of every one of them, far)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauges = {g["id"]: g for g in doc["gauges"]}
+    eleven = _the_eleven_alone()
+    for gid in ("vigo", "cadiz"):
+        g = gauges[gid]
+        at = Position(g["lat_deg"], g["lon_deg"])
+        own = units.m_to_feet(2.0 * (g["M2"]["amplitude_m"] + g["S2"]["amplitude_m"]))
+        assert abs(_spring_range_ft(tide, at) - own) < 1.0, gid
+        assert not tide.constants_about(at)[3], gid  # near its own gauge, not far
+        assert eleven.constants_about(at)[3] and _spring_range_ft(eleven, at) > 17.0, gid
+
+
+def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_the_blocks():
+    """The brief's item 5: a position a mile west of 1 W in `channel-mid` reads the same
+    tide to the centimetre as before the package (the eleven alone), its height and stream
+    hour by hour through a day of springs; a position a mile east, in `channel-east`,
+    reads the block's (its gauges in the blend, the spring range other by feet)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone()
+    mile_deg = 1.0 / 60.0 / math.cos(math.radians(50.6))
+    west, east = Position(50.6, -1.0 - mile_deg), Position(50.6, -1.0 + mile_deg)
+    assert tide.blocks_at(west) == frozenset() and tide.blocks_at(east) == {"channel-east"}
+    before = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    for h in range(25):
+        when = datetime(1805, 6, 12) + timedelta(hours=h)
+        now, then = tide.at(west, when), before.at(west, when)
+        assert abs(now.height_m - then.height_m) < 0.01
+        assert abs(now.stream_kn - then.stream_kn) < 0.01 and now.area_id == then.area_id
+        assert now == then  # to the bit, not only to the centimetre
+    assert tide.constants_about(west) == eleven.constants_about(west)
+    assert abs(_spring_range_ft(tide, east) - _spring_range_ft(eleven, east)) > 1.0
+    assert tide.constants_at(east) != eleven.constants_at(east)
+
+
+def test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge():
+    """The brief's item 5: the pace of the tide's blend is unchanged within the measure.
+    Outside every block the gauges blended are the eleven, the same list (no gauge more to
+    weigh), and the work of a fresh cell is the eleven's and the bounds' test, within a
+    quarter of the eleven's alone (the best of five runs over three hundred fresh cells of
+    the Channel west each); a cell once worked is a lookup, as before."""
+    import time
+
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone()
+    assert tide.gauges_at(Position(49.9, -5.2)) is tide.gauges
+
+    def fresh(t) -> float:
+        best = math.inf
+        for _ in range(5):
+            t._about_cache = {}
+            t0 = time.perf_counter()
+            for i in range(300):
+                t.constants_about(Position(49.0 + 0.011 * (i % 30), -6.5 + 0.011 * (i // 30)))
+            best = min(best, time.perf_counter() - t0)
+        return best
+
+    now, then = fresh(tide), fresh(eleven)
+    assert now < 1.25 * then, (now, then)
+    t0 = time.perf_counter()
+    for _ in range(10_000):
+        tide.constants_about(Position(49.9, -5.2))
+    assert (time.perf_counter() - t0) / 10_000 < 20e-6  # a lookup
+
+
+# ---------------------------------------------------------------------------
 # Package 79c: the Mediterranean west, the Strait to Cartagena, the Balearics and Barbary
 # to Algiers, two regions by the lead's ruling (truths 7-285 to 7-294)
 # ---------------------------------------------------------------------------
@@ -11618,8 +11743,9 @@ def test_truth_7_293_the_masters_tide_in_the_block_is_the_pilots_foot_and_malaga
     """The brief's item 5: the master's epitome (Norie's table, a ship of war's) gives
     Málaga high water at XII on the days of full and change and three feet (Purdy 1826,
     p. 12), and every other place of the block a foot (the pilots: Smyth, Tofiño, Bérard),
-    not the far gauge's range the world's tide has over the block while its gauges are held;
-    off Port Mahon his nearest place is Port Mahon."""
+    not the far gauge's range the world's tide had over the block while its gauges were held
+    (since package 89 the gauges' own inches); off Port Mahon his nearest place is Port
+    Mahon."""
     import freesail.world.tide as T
     from freesail.world.geo import Position
 
@@ -11632,7 +11758,7 @@ def test_truth_7_293_the_masters_tide_in_the_block_is_the_pilots_foot_and_malaga
         assert place.spring_rise_ft == 1.0 and not place.rise_judgement, name
     assert norie.nearest(Position(*MAHON_MOUTH))[0].name == "Port Mahon"
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    held = {g["id"]: g for g in doc["held_gauges"]}
+    held = {g["id"]: g for g in doc["gauges"] if g.get("block")}
     assert held["malaga"]["mean_level_m"] == 0.43 and held["mahon"]["M2"]["amplitude_m"] < 0.06
 
 
