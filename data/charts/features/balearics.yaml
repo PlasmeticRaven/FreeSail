@@ -559,14 +559,14 @@ features:
   kind: anchorage
   name: the anchorage off the mouth of Port Mahon
   modern: the approach to Port de Maó, off Cap de la Mola
-  lat_deg: 39.862
-  lon_deg: 4.322
+  lat_deg: 39.86
+  lon_deg: 4.317
   height_m: 0
   depth_fathoms: 22.9
   bottom: good quality (Tofiño); fine sand in 17 fathoms (the officer's, Purdy)
   source: 'Tofiño 1787, p. 213: when the wind is so scant and fresh that it will not let a ship enter within the ledges, she may anchor between them, or further out in 20, 25 or 30 brazas, the bottom of good quality; only that outside the ledges there is much sea with the wind fresh at N; Purdy 1826, p. 43 (Tofiño''s, ''18, 23, or 27 fathoms''), and p. 44 (the officer''s berth in 17 fathoms fine sand, Mount Toro on the middle of the entrance, Cape Mola N.E. 3/4 E. magnetic)'
   says: 'Anchored off the mouth of Port Mahon in twenty-five brazas, good ground, to wait a leading wind: a great swell here when it blows from the north.'
-  fix: 'FROM MEMORY, a few cables S of Cape Mola; 25 brazas (22.9 fathoms), the middle of Tofiño''s three; moved a cable and a half to the E N E by package 89 (from 39.860 N 4.317 E), into the charted deep water of the mouth''s approach (37.8 m by the grid, 20 brazas and more), where the frigate''s line from the Aire meets it: on the Balearics'' own tide, with no false seven metres over the mouth, her account missed the old spot''s circle by a hundredth of a mile and she ran on into the mouth''s shallows (truth 7-294)'
+  fix: FROM MEMORY, a few cables S of Cape Mola; 25 brazas (22.9 fathoms), the middle of Tofiño's three
 - id: cape-mola-mahon
   kind: headland
   name: Cape Mola
