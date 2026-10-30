@@ -428,6 +428,12 @@ ABACK_RECOVER_STATES = frozenset(
 )
 
 
+# Hauling off (`Captain._haul_off`, package 88): the bearing away from the enemy turned a
+# point at a time up to this many to either hand to find a line clear of the land (eight
+# points: never nearer the enemy than abeam of her bearing; judgement).
+HAUL_OFF_POINTS = 8
+
+
 def actor_for(state: str) -> str:
     return f"{ACTOR_PREFIX}'{state}'"
 
@@ -4286,6 +4292,24 @@ class Captain(Judgement):
             return
         away = (float(enemy.get("bearing_deg") or 0.0) + 180.0) % 360.0
         point = destination(here, away, 20.0 * units.NAUTICAL_MILE)
+        # the sea kept (package 88, found on item 1: the merchant schooner of the trade trial,
+        # hauling off from the privateer off the Lizard, steered the reciprocal across the land
+        # about Coverack and took the ground at seven knots): the nearest bearing away from
+        # her, a point at a time to either hand up to eight, whose line the planner finds
+        # clear of the shore and the dangers by the chart in his hands; the reciprocal itself
+        # when none is
+        planner = Planner(self.world)
+        for k in range(HAUL_OFF_POINTS + 1):
+            found = None
+            for side in (0,) if k == 0 else (1, -1):
+                brg = (away + side * k * 11.25) % 360.0
+                to = destination(here, brg, 20.0 * units.NAUTICAL_MILE)
+                if planner.clear(here, to):
+                    found = to
+                    break
+            if found is not None:
+                point = found
+                break
         self._business["hauled_off"] = p.tick
         self.give(
             f"shape a course for {plain_position(point)}",
