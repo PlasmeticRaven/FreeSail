@@ -2040,3 +2040,53 @@ waits for it.
     laced to a mast shows its luff bellied forward of the mast once swung (the spanker, every
     gaff sail, the course, the driver). Mending it moves every gaff sail's drawing; for B5,
     later.
+
+### 17.11 Second addendum (2026-10-30, for the lead's approval): the boom rigged out with the driver
+
+**The owner's words.** On the sheet of B5.5 the bare boom stands beside the course (§17.10 item
+10). The owner: "My understanding was that the mizen course did not have a boom, whereas the
+driver did", then "we could implement the driver boom the same way that things like the ringtail
+boom are rigged out, as part of the procedure to set and take in the sail". Offered the shift, or
+set and furl: "With the shift."
+
+**The evidence, plainly thin.** No source says what became of the boom while the mizen drew.
+Steel's p. 49 column gives the 64 and the 74 no driver boom ("0 0"), and he bends the driver "as a
+temporary matter" (§17.1). Lever: "The Spanker is set like a lower Studding Sail" (OCR l. 9904).
+A boom's jaws on the mast stand above the course's tack, across a luff laced to the mast (1.5 m on
+the fixture). So the boom out only while the driver is bent is judgement, the owner's.
+
+**The design.** The engine's own field, `Spar.rigged_out`, on the driver's boom alone. The boom's
+class stays `boom`, so `RIGGED_IN_CLASSES`, `studding_work` and `StuddingSailsIn` never touch it:
+it does not come in for a tack or a wear, and it stays out while the driver is brailed.
+
+| Who | Where | What |
+|---|---|---|
+| Stage 0 | `ship/schema.py`, `_rigged_out` and `validate` | The key is allowed on a `boom` that a lateen cut at the mast names, and refused on any other (a gaff sail's boom is never rigged in). Inert: no file carries it |
+| Stage 0 | `tests/rig_fixtures.py`, `_driver` | The boom filed `rigged_out: false`; with `bent`, true, and the course's canvas in the room (closes §17.10 item 9) |
+| B3 | `evolutions/scripts.py` | One helper, the boom of a sail cut at the mast or None. `ShiftScript`: a phase `rig_out_boom` between `send_up` and `bend` when the new sail has such a boom, and `rig_in_boom` between `unbend` and `send_up` when the old one has. `BendScript`: `send_up`, `rig_out_boom`, `bend`. `UnbendScript`: `unbend`, `lower`, `rig_in_boom`; a wrecked boom is passed over. Bending or shifting to a driver whose boom is carried away is refused in `_wreck_refusal`'s words (closes §17.10 item 6 for the driver; the other sails' gap stands) |
+| B3 | `orders/verbs.py` | "rig out" and "rig in" on that boom are refused in words naming the shift |
+| B5 | `client/projection.js`, `tests/test_view_geometry.py` | The boom rigged in is not drawn, nor its lines, as a spare on the booms is not. Its swing stays in the frame, so the view does not rescale at the shift. This replaces §17.6's "the boom lies amidships"; B5.5's cases move, old beside new (closes §17.10 item 10) |
+| B1, B7 | `mizen_yard.driver()` | Files the boom `rigged_out: false`: the 64's and the 74's bytes only |
+
+**The times.** Each way 120 s (judgement: 45 s for a studding-sail boom, by `SPAR_WORK["boom"]` 2.0
+is 90 s, and more for a spar of 65 ft on tackles). The shift from a drawing course goes from 780 s
+to 900 s, and from a furled one from 570 s to 690 s. The crew is `shift_sail.yaml`'s.
+
+**The physics and the gunnery: nothing.** `freesail/physics/` and `freesail/combat/` read no
+`rigged_out` today (measured), so the stowed boom keeps its windage at its file's place and can be
+hit by a shot, as every studding-sail boom rigged in can. **Plainly:** this is a small untruth for
+a spar on the booms, and accepted, since mending it would need a read in `physics/` for a sail
+"occasionally hoisted".
+
+**Tests and pins.**
+- `tests/test_driver.py`: the boom in at the start and with the driver in the sail room; out before
+  the bend; in after the unbend; the phases of the shift each way, of "bend the driver" and of
+  "unbend the driver"; out through a tack, a wear and hove to; the refusals; the rigged-in boom left
+  by `studding_work`.
+- Truth 7-230's band moves, old beside new: six phases, the whole from 13-16 to 15-19 minutes.
+- None on the eight or on the razee (a gaff sail's boom), and the pickles as they are: no new field.
+
+**The order.** After B1's stage B lands: the stage-0 commit, then one step by the engine's workflow
+(B3 and B5 together, the guard sets and the trace), then B1's regeneration, before the owner's
+testing report. **Not chosen:** the boom out on setting from furled and in on furling, the owner's
+other offer, which needs its own evolution files and moves the library's count.
