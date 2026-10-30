@@ -783,8 +783,10 @@ held, the lee-shore trial's container digest the one failure on both); its touch
 slow tier, the blocks' truths 7-270 to 7-304 and its own 7-280 to 7-284 green, its fast tier
 whole with the pictures' flake the one failure; the lead's run of the tide's, chart's,
 ports', islands' and scenarios' tests with four of its truths, 7-271 and the gate selection
-(186 passed, none failed); **the whole suite on the merged tree in the cloud (run 17, the
-figures below).** **The rule, as built:** a block's gauge serves the positions within its
+(186 passed, none failed); **the whole suite on the merged tree in the cloud (run 17 on
+`39c2fa5`: lint green, 4,330 passed over the six shards, 3 skipped, 11 expected failures,
+none failed, 40 minutes; the pace job, informative, 7 of 10 at 445 to 499 in 296 seconds,
+the slow runner's day as 79b's record reads it).** **The rule, as built:** a block's gauge serves the positions within its
 own block's bounds, a region of the chart's manifest or a list of them, and no other; the
 eleven serve everywhere; within a block the blend is the eleven within reach and the
 block's gauges by the present weighting, the membership the cell's centre's so that the
