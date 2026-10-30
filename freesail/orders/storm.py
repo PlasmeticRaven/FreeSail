@@ -108,11 +108,14 @@ REPLACED_AFT_M = 3.0
 
 
 def _in_its_place(ship: Ship, storm: Sail) -> Sail | None:
-    """A sail bent in the storm sail's place (the ship file's `in_place_of`), or None."""
+    """A sail bent in the storm sail's place (the ship file's `in_place_of`), or None: the
+    bending's own rule (`evolutions.scripts._in_each_others_place`, package 75)."""
+    from freesail.evolutions.scripts import _in_each_others_place
+
     for other in ship.sails.values():
         if other is storm or other.state is SailState.UNBENT:
             continue
-        if storm.in_place_of == other.id or other.in_place_of == storm.id:
+        if _in_each_others_place(storm, other):
             return other
     return None
 

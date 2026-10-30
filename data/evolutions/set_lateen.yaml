@@ -18,6 +18,9 @@ preconditions:
 requires:
   - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
   - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+  # the driver's foot is spread on its boom, which must stand, as set_gaff's
+  # (docs/design/Design-ShipsEngineExtensions.md §16 item 8, §17.2); the course names no boom
+  - {check: "not wrecked(spar_of_role(sail, boom))", reason: "the {sail}'s boom is wrecked"}
 steps:
   - do: clear_away
     duration_s: 60

@@ -3268,7 +3268,9 @@ class SwayUpScript(PhasedScript):
 #                        "shift the spanker for the storm mizzen"
 # A sail bent in place of another (`Sail.in_place_of`: the storm mizzen for the spanker, a
 # schooner's storm trysail for her mainsail, her storm jib for the jib) is bent only when
-# the other is unbent: the one refusal spec 3b §6.4 names.
+# the other is unbent: the one refusal spec 3b §6.4 names. Two sails bent in one place (the
+# 64's driver and her storm mizzen, each in the mizen course's: package 75) are each in the
+# other's, so only one of the three is ever bent.
 
 
 def _sail_named(ship: Ship, value: Any) -> Sail | None:
@@ -3289,7 +3291,15 @@ def _sail_named(ship: Ship, value: Any) -> Sail | None:
 
 
 def _in_each_others_place(a: Sail, b: Sail) -> bool:
-    return a.in_place_of == b.id or b.in_place_of == a.id
+    """Whether two sails hold one place, only one of them bent at a time: one is bent in the
+    other's place, or the two in a third's (package 75; docs/design/Design-ShipsEngineExtensions.md
+    §17.4: "shift the driver for the storm mizzen"). No sail is in its own place, so "shift the
+    storm mizzen for the storm mizzen" is refused as it was."""
+    return (
+        a.in_place_of == b.id
+        or b.in_place_of == a.id
+        or (a is not b and a.in_place_of is not None and a.in_place_of == b.in_place_of)
+    )
 
 
 class _SailWork(PhasedScript):
