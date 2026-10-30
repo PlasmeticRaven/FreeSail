@@ -1763,12 +1763,17 @@ def _person_anywhere(world: Any, name: str) -> Any:
     found = world.people.find(name)
     if found is not None:
         return found
-    key = " ".join(str(name).lower().split()).removeprefix("mr ")
+    key = " ".join(str(name).lower().split())
     registry = getattr(world, "registry", None)
-    for p in registry.persons() if registry is not None else []:
-        if key in (str(p.name).lower(), str(getattr(p, "surname", "")).lower()):
+    everyone = registry.persons() if registry is not None else []
+    # the name whole first; the surname only when one person of the world bears it (the
+    # lead's review of step 9: two Mr Popes on two hulls)
+    for p in everyone:
+        if str(p.name).lower() == key:
             return p
-    return None
+    surname = key.removeprefix("mr ").removeprefix("mister ")
+    by_surname = [p for p in everyone if str(getattr(p, "surname", "")).lower() == surname]
+    return by_surname[0] if len(by_surname) == 1 else None
 
 
 def _comes_aboard_hull(

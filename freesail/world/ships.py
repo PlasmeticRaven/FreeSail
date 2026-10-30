@@ -1958,13 +1958,24 @@ def _player_id() -> str:
     return PLAYER_ID
 
 
-def _lying_to(world: Any) -> bool:
-    """Whether the ship lies to or is heaving to, as the reading `the manoeuvre in hand`
-    says it (`api.readings._manoeuvre`: the evolution runner's work in hand, else the
-    heave-to's record on the ship), read straight and not through the readings view."""
-    from freesail.api.readings import _manoeuvre
+# The evolutions whose work in hand is a heaving to (the reading `the manoeuvre in hand`
+# says "heaving to" for them, `api.readings.MANOEUVRE_WORDS`; package 84, step 11: read
+# here from the ship, the world no reader of the api).
+_HEAVING_TO_EVOLUTIONS = ("heave_to", "lie_a_try")
 
-    return str(_manoeuvre(world, None) or "") in ("hove to", "heaving to")
+
+def _lying_to(world: Any) -> bool:
+    """Whether the ship lies to or is heaving to, by the same rule as the reading `the
+    manoeuvre in hand`: the evolution runner's work in hand first (the first instance not
+    waiting names the manoeuvre), else the heave-to's record on the ship
+    (`ship.extra["hove_to"]`, which filling away clears)."""
+    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
+    runner = extra.get("evolutions")
+    for inst in getattr(runner, "instances", None) or ():
+        evo_id = str(getattr(getattr(inst, "evo", None), "id", "") or "")
+        if evo_id and not getattr(inst, "waiting", False):
+            return evo_id in _HEAVING_TO_EVOLUTIONS
+    return "hove_to" in extra
 
 
 def _sound_of(v: Vessel, nm: float) -> str:

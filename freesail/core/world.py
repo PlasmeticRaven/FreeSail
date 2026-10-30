@@ -494,6 +494,10 @@ class World:
             yield hull
         finally:
             stack.pop()
+            if not stack:
+                # the stack dropped when its last block ends (package 84, step 11: the
+                # thread-local kept an empty list for every World ever made)
+                _CURRENT.stacks.pop(id(self), None)
 
     @property
     def is_followed(self) -> bool:

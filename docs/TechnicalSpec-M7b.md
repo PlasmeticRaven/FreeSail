@@ -876,12 +876,24 @@ the pace rule's centre and the drivers; the package that builds this makes the s
 followed ship rather than a given one, with the player's ship the followed ship by default,
 and measures what moved (nothing pinned should).
 
+**As built in part by package 84 (step 10; `docs/design/Design-OneWorld.md`, the postscript
+"Step 10"):** the followed ship, `world.followed`, with the player's ship the followed by
+default; `follow "X"` a driver's line replayed; the World's names, the snapshot, the chart
+and the prompt reading the followed hull; the words "no ship followed" stand ready for the
+world with no player's ship, which is this package's.
+
 ### 12. The player on another ship, and the replay of a station there (`crews.py`; `core/replay.py`)
 
 `--seat captain --ship <id>` for the player (43 left it): the drivers' centre follows the
 ship the player is aboard, the player seated under the same contract as a model there; and
 a save with a station on another ship replays that station's acts as it replays the
 player's (43's checkpoint carries the other ship whole; the acts are keyed by ship).
+
+**As built in part by package 84 (steps 8 and 9; `docs/design/Design-OneWorld.md`):** a save
+holds every hull's stations (`hulls`), each input and act of a station on another ship names
+her hull and a replay gives them to her by either road; a seat may be at a person aboard any
+hull. The player's own seat on another ship and the drivers following him are this
+package's.
 
 **As built (package 58a; the observed world as a station reads it ahead, and the
 director's lookups).** **`ahead`** is a row of the registry (`readings.ahead_words`): what
@@ -938,6 +950,11 @@ another, which need close attention (focused, below); third the ships not likely
 involved, which need some attention or which the director wants for a reason of its own
 (the truth's snapshot, and their history on request). This section gives it the attention
 and the history:
+
+**As built in part by package 84 (step 9; `docs/design/Design-OneWorld.md`):** the director's
+`read_log(ship=)` reads any hull's log, awake or asleep, by her name; the truth names every
+hull with her purse, cargo and water and the persons ashore at every port. The attention's
+tiers and `focus` are this section's still.
 
 - **Focus.** `focus ship="Palinure"` and `unfocus`: a focused ship's notable lines arrive in
   the director's sample tagged with her name, as an urgent line wakes a watcher, until it

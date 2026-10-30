@@ -10874,14 +10874,15 @@ On the build machine, the rule of 2026-10-28 (the whole suite the lead's in the 
   this machine's newer Chromium a hair under the blank threshold, failing before this
   package as after it (the machine's; nothing of it touched here).
 
-## Package 84, steps 1 and 2: the one-world refactor's first two steps (2026-10-28)
+## Package 84: the one-world refactor, steps 1 to 11 (2026-10-28 to 30)
 
-The first two of the eleven steps of `docs/design/Design-OneWorld.md` §4, built as a sibling
-session in its own container on `claude/pkg-84` off `e7a3ee8` (73 merged; 86 building beside
-on the same head), each step one commit pushed when green; the design note's postscript "As
-built, steps 1 and 2" says what each step built, took another way and found; this section
-is the record of what moved, the counts, the pace and the suites. The physics are not
-touched; no ship file, no consent file, no model identifier.
+The eleven steps of `docs/design/Design-OneWorld.md` §4, built as a sibling session in its
+own container on `claude/pkg-84`, steps 1 and 2 off `e7a3ee8` (73 merged; 86 building beside
+on the same head) and step 3 onward from the head after 86's merge, each step one commit
+pushed when green with the lead's head brought in at its boundary; the design note's
+postscripts "As built, steps 1 to 11" say what each step built, took another way and found;
+this section, step by step, is the record of what moved, the counts, the pace and the suites.
+The physics are not touched; no ship file, no consent file, no model identifier.
 
 ### Step 1: the Hull extracted behind the World's names
 
@@ -12945,3 +12946,65 @@ place: nothing of the Channel moved.
 
 **The scenario** sailed again on the final tree: `agincourt-sound.yaml` at seed 7, 3,837
 lines, digest `7ba2146a323761ee`, the same as before the merge, no ground touched.
+
+### Step 11: the long tail, the words and the records
+
+Built on step 10 as merged (the design note's postscript "Step 11" has the shape). **What
+moved: nothing pinned.** The tidies change no behaviour a recorded passage reads
+(`_lying_to`'s rule is the reading's own, proved by the fast tier whole; `_person_anywhere`'s
+rule narrows a lookup no pinned passage makes). **The count.** `combat/action.py`
+(`target_of`'s one road), `world/ships.py` (`_lying_to`, `_HEAVING_TO_EVOLUTIONS`),
+`world/orders.py` (`_person_anywhere`), `core/world.py` (`as_hull` dropping its stack),
+`world/crews.py` (the head and the awake notice), `world/seats.py` (the head); the docs:
+`docs/agents/Harness.md` §17, `docs/primer/17-the-captain.md`, `docs/TechnicalSpec-M6.md`
+§19 and §20, `docs/TechnicalSpec-M7b.md` §11, §12 and §12b, `docs/TechnicalSpec-M7.md` §21,
+the design note's head and this one; tests: two lines of `test_world_orders.py` made to
+assert what they name.
+
+**The pace, every step beside the study's (the design's 3.2).** The study measured on the
+build machine: the frigate alone 843 ticks a second (truth 51's floor 500 by its margin), a
+crewed ship costing what the frigate costs, a sleeping World a thirty-seventh. This
+container, alone and quiet, step by step (truth 51's frigate alone / the day under systems /
+the gates' day with the region / 7-159's convoy of six at far detail, ticks a second against
+the floor of 500; and truth 88's form, three hulls awake, against the crewed floor of 60):
+step 4 all but 7-159 at 493; step 5 all but 7-159 at 461, three awake 213 to 256; step 6
+495 / 468 for the gates and 7-159 (the day over), three awake 234; step 7 490 / 492 / 475
+(truth 51 over), three awake 233; step 8 (a three-way A/B against the step 7 head the same
+hour, 489/446/451/451 the head, 485/481/431/432 the step) three awake 198; step 9 491 / 458 /
+438 / 402 then 471 / 465 / 423 after the slow set, three awake 214; step 10 468 / 453 for the
+gates and 7-159 (truth 51 and the day over), three awake 221; step 11 below. The spread is
+the container's hour (the same test reads 395 to 475 on one tree in one day) and every
+step's figures lie within the spread of the head before it, so the refactor costs nothing
+the measure sees; the floor of 500 is the build machine's, which this container misses on
+every tree since package 43's measurement (step 4's note). `make_hull` of a brig 0.60 to
+0.78 s (the study's 0.5 to 0.7 on the build machine); a checkpoint with three sleeping hulls
+nineteen bytes over one with the three dropped (step 5).
+
+**What 84 leaves** (the design note's postscript "Step 11" has it in full): for package 82
+the world with no followed hull and its words, the player's seat on another ship with the
+drivers following him, and the director's door's question when another hull is followed;
+for package 85's review of the words, the words recast here and the ones left as they were
+(the far notice, "the player's ship" where "the followed hull" is meant, `CrewedWorld` as
+the builder's name, `world` as every consumer's name for its hull); for the design's own
+open items, the tick's two strict phases, the empty `_NOT_CREWED_STATES` and
+`FAR_ONLY_ROLES`, the business's region and the sleeping hulls' fight as the study
+recommends, and the gauges' water (package 89). Three load-sensitive tests are recorded, not
+mended: truth 7-200 under three workers (step 6's close), the pictures' blank-image check
+(every step, the same figure alone), and the lee-shore trial's digest (this container's,
+every step).
+
+**The suites on the step's tree** (the merged head `90cef2c` with the step; this container,
+three workers). The fast tier whole: **3957 passed, one failed**, the pictures' blank-image
+check (the known flake, its same figure alone); ruff clean.
+**The slow tier** of the known truths, the trials and the touched files (step 10's list; 199
+tests): 190 passed, eight left out by their own marks, one failed, the lee-shore trial's
+digest (`7fad0ce7e46ba366` against `ed48ca3d61e52f20`, this container's figure as at every
+step). **The pace** (alone, load 1.0 right after the slow set): truth 51's frigate alone and
+the day under systems over the floor; the gates' day 453 and 7-159's convoy 453 against the
+floor of 500, within the spread step 8's three-way A/B measured for the step 7 head on this
+machine, so the step costs nothing the measure sees and no A/B was run; `make_hull` of a
+brig 1.06 s at load 1.06 (0.60 to 0.78 at the earlier steps on a quieter machine); truth 88's
+form with three hulls awake 227 ticks a second against the crewed floor of 60 (221 at step
+10). **The package closes here**: eleven steps, each one green commit, the lead's head at
+each boundary; the design note's "As built, steps 1 to 11" is the account, and what 84
+leaves is above.
