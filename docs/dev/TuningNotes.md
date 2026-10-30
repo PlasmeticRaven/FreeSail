@@ -13078,7 +13078,7 @@ its own level (`fill_mean_level_m`, or `mean_level_grid` reading the block's wat
 lead's to order, region by region, with each block's tests run after it. EMODnet's own
 depths, about LAT, are untouched by any of this: what moved is the water over them.
 
-### The blocks' own tests: four fail on the block's own water (STOPPED here, for the lead)
+### The blocks' own tests: four failed on the block's own water (stopped for the lead's ruling; step 4 below)
 
 The recorded passages do not move (below). The blocks' own truths, written while their water
 was the held gauges' wrong tide, were run on this tree (`-k "truth_7_27 or truth_7_28 or
@@ -13122,6 +13122,77 @@ The lead's options as I read them: re-tune 79b's and 79c's books and lines, and 
 off Aix, on the true water (the blocks' work, a follow-up of their own), or rule the four
 re-measured with the old figure beside the new. Every other truth of 7-270 to 7-304 passed,
 and every other test of the fast tier but the pictures' known flake.
+
+### Step 4: the lead's rulings of 2026-10-30, carried out
+
+The lead ruled each of the four mended on the true water or re-measured, none loosened,
+old beside new, the proof the toggle (the head's tree, a clean worktree of `0483a73`,
+against this one, by the same body of measurement); Bournemouth and Portsmouth held;
+Beachy Head's truth amended; the rebuild of the blocks' tiles a package of its own; the
+gap at 40.5 N closed if it moved nothing. One commit each:
+
+- **4c, truth 7-271** (the Strait of Dover's set). The hour's drift on the ebb's strength:
+  the head 2.46 miles to 233.6 degrees, the account 2.02 miles, the error **0.452 mile**
+  (against the bound 0.6); this tree 2.47 miles to 233.6, the account 1.83, the error
+  **0.648 mile** (the ebb's strength ten minutes later, 19:30 for 19:20, the master's hour
+  from his epitome the same). The bound re-measured to **0.8**, the old margin of 0.15 mile
+  kept; the words "within half a mile" amended to eight tenths with the reason.
+- **4e, truth 7-280** (Beachy Head). 18.99 feet against Norie's twenty, "within a foot and a
+  quarter", the brief's "a foot" amended in the truth's words: Norie's twenty is a round
+  figure and the gap a foot and a hundredth.
+- **4d, the pilot off Aix** (`test_ports.py`). The side is the first sounding ahead that,
+  with the tide over it, wants her 5.13 m: at the save's height, 2.3 m (02:00 on the
+  eleven's tide, phase 181 degrees, low water there), the cable ahead (3.2 m at the datum)
+  is covered and the flat's edge two cables ahead (2.5 m) wants it, the channel to
+  starboard 6.8 m against the flat's 3.0: **starboard**. On Aix's own tide 02:00 is the
+  young flood, 3.12 m (phase 246), the first wanting water three cables ahead where the two
+  sides read alike within the margin (2.53 against 2.50) and the tie-break names
+  **larboard**; at the true low water (23:49, 1.87 m) the cable ahead shoals first, alike
+  again (3.75 against 3.54), larboard. Starboard holds for any height between 1.9 and
+  2.6 m. The test's moment pinned at **01:00** on the 27th, where the true water stands
+  2.30 m at her, the height asserted in the test (within 0.1 m of the save's 2.31) and the
+  reason in its words; the pilot says "two cables ahead; the deeper water is to starboard"
+  at 01:00, 01:05 and 01:10 alike.
+- **4b, truth 7-279** (the Downs to Spithead). Read: she came to St Helens later in the night
+  on the Channel east's own tide and let go by the night order ("under 2.5 miles of St
+  Helens road and under 9 fathoms and not day") at 01:28 on the 21st, at 50 41 N 1 00 W,
+  the band's edge, a mile east of the road on the seam; her first cross-bearing fix at
+  daylight (tick 84600) moved the account seven cables to the E by S, and the morning's
+  weigh ("under 2.5 miles of the road") never fired: she lay there all day. No tide waited
+  for in the book's words; the mend is the book's: **the morning's weigh and the course for
+  Spithead look within 3.5 miles**, a band holding every berth the night's order gives and a
+  fix's correction, said in the orders. The truth passes, its words and limits unchanged.
+- **4a, truth 7-294** (Gibraltar to Port Mahon). The ruling's mend, the outer road's spot
+  moved into the mouth's deep water, was made (39.862 N 4.322 E) and **did not cure it,
+  and is reverted** (its revert the next commit): she had not grounded at the spot, which
+  lies in 37 m. Read from her track minute by minute on both trees: the course for the
+  anchorage is shaped once, from a mile and a half off the Aire, six miles and a half out,
+  and nothing shapes it again within seven miles; on this tree the line runs a few cables
+  north-east of the spot, her account's nearest 0.41 mile from it (0.45 from the moved
+  spot), outside the 0.4 at which "at the mouth" lets go, and she ran on north-west into
+  the mouth's shallows (aground at 11:14 on the 17th in 4.39 m, the tide 0.24; with the
+  spot moved, five miles up the coast at 12:03). On the head the same line came within 0.1
+  of the spot by account and she anchored at tick 281388 in 25 1/2 fathoms, with 8.4 m of
+  Saint-Malo's tide over it. **The mend is the book's** (`mahon.orders`): "the course for the
+  mouth", every ten minutes within seven miles of the anchorage and over 0.4 from it, shapes
+  the course for the anchorage again, as a master closing a mark corrects for the set; said
+  in the book. On it she anchors at tick **280420** (77.9 hours; the head's 281388, 78.2
+  hours) in 23 1/2 fathoms at the original spot, 0.08 mile from it by the truth, and rides
+  through the northerly. The spot and the port file stand as 79c had them.
+- **4f, the gap at 40.5 N.** `balearics`' north bound moved to **40.56 N**, its tiles' edge
+  and the Gulf of Lion's south bound, in `data/charts/manifest.yaml` and the recipe: the
+  check gives the same 168 level-2 tiles and "14 kept" before and after, no tile written or
+  moved; the strip between now reads the Balearics' gauges. `test_chart.py`'s pin of the
+  bound follows the data, with the reason; ChartBlocks.md says the seams' rule.
+- **Item 2, Bournemouth and Portsmouth: held** by the ruling (channel-mid's passages pinned
+  on the eleven, nothing west of 1 W new). The options found: (a) held, as now; (b) `block:
+  channel-mid`, which moves the tide over the whole region; (c) a region of their own for
+  the Solent. The seam's step at 1 W off Selsey Bill, 102 degrees of M2 (1.10 m at 191 west
+  of it, 1.00 m at 293 east, Portsmouth's own 1.41 m at 326.7), is a finding; a taper of
+  the weights across a seam band is a later tidy, not this package's.
+- **Item 4, the tiles**: the rebuild of the blocks' tiles on their true water is booked by
+  the lead as its own package after 89 merges; `mean_level_grid` reads the eleven until
+  then, ChartBlocks.md item 6 says so. Faden's '«8' stays unread, a note.
 
 ### The recorded passages: nothing moved
 
