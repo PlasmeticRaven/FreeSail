@@ -57,7 +57,7 @@ on these packages; that is the owner's choice.
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
 | 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **merged whole, steps 1 to 11, 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 11 from the sibling's `claude/pkg-84` after it; the package closed with step 11's record below; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
-| 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; **launched 2026-10-30** (the owner, 84 closed) as a Fable sibling session on `claude/pkg-85`; the owner runs the interim gate it drafts once 85, 93 and 94 are in; 87 follows it |
+| 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; **launched 2026-10-30** (the owner, 84 closed) as a Fable sibling session on `claude/pkg-85`; **merged whole 2026-10-30** at `252df5b` from `c4afb7c` (the record below: items 1 to 8 and the gate's draft, three findings of the lead's review mended); the owner runs the interim gate once 93 is in, the lead's half added first; 87 follows it |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Opus (the owner, 2026-10-29; Fable before) | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief after 85's pass over the orders, the primer and the docs is merged (the owner, 2026-10-29), and after 77; the brief fixes the pattern on the gunner and the four follow it |
 | 88 | Opus (the owner, 2026-10-29; Fable before) | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; to brief, each item with the symptom, the rule as it stands, the rule as it should read and what proves it, the moved pins by bisection (the owner, 2026-10-29) |
@@ -1097,6 +1097,102 @@ taper by distance reaching a gauge across land (a taper by water a design questi
 western Solent and the Needles within the band of the region's south bound; `fathoms_words`
 giving "in 13 fathoms" where the words say twelve (a words tidy); the pictures' flake under
 the fast tier's load; the lee-shore trial's container digest as recorded since 79d.
+
+### Package 85 as merged (2026-10-30)
+
+Merged `--no-ff` from the Fable sibling session's `claude/pkg-85` at `c4afb7c` (eleven
+commits of its own on the trunk, one an item or a few, the trunk brought in at every
+boundary, the mend of the lead's review the last; no conflict, the merge's tree the branch's
+head's; 147 files, 4,051 lines added and 1,259 removed); ruff clean; the builder's fast
+tier whole on its final tree twice (the first run finding eleven failures the per-item runs
+had not, each mended; the second 4,447 passed, none failed, the pictures' test among them),
+the slow tier of the fifteen files of its diff with the checkpoints' and the anchor's and
+the known truths (1,735 passed, 7 expected failures, none failed, every recorded passage's
+digest and pin held); the lead's three runs on the branch (items 1 and 2's fifteen files
+whole; items 3 to 8's twenty-three files with the new truths, which found truth 7b-117's
+date and the old checkpoints' table, the builder's own fast tier finding the same two; and
+the mended head's eighteen files with eight truths), the hail probed by hand on the trunk,
+the first head and the mended one; **the whole suite on the merged tree in the cloud (run
+19, the figures written here when it ends).**
+
+**Item 1, the rule stated once and enforced:** `docs/dev/PrimerRedactions.md` states it (the
+primer and the library's served topics are in-world documents for whoever reads them, at
+any station, in any scenario, on any ship; nothing true of one scenario, one book, one ship,
+one voyage or one stage of the build; no milestone, package, gate, builder, playtest,
+ruling, truth or decision number, spec section, the lead, the owner's rulings, a model's or
+a vendor's name) and `tests/test_in_world.py` enforces it over every primer chapter, every
+brief constant, the tools' words, the library's topics rendered on a King's ship and on a
+hired cutter, every station's brief head and the starter briefs, with an allow-list and its
+reasons (the owner at the door, the sounding lead, seed 7, the shipped scenario files'
+names); every such reference cut from the twenty-five chapters and the README, the
+evolution files' build notes moved below a blank line under `# Build notes (not served by
+the library's catalogue)` (156 cuts, tabled in the record), the captain's brief, the forms'
+notes, the world page, two tools' words and two people files freed; stale lines mended on
+the way (fourteen chapters); chapter 3's size pin 11,370 to 11,280. Noted and left: the
+consent brief's preamble (55's), the playtest folders' names (the record), `BUILD_NAME`
+(the lead's at a gate). **Item 2, categorised, complete, correct:** the grammar topic in
+six parts generated from the game's tables and guarded by `tests/test_grammar_book.py`
+(the order language, the readings with what each answers, the standing dialect, the voice,
+the stand-by, the world orders); the `query` kind for the seventeen readings that are
+questions in words (read, never compared, the standing grammar refusing a condition on one
+in words; the anchor's two rows back to `ground` when the whole fast tier found the
+anchor's standing order compares them); the hail's colon optional (`hail_parts`), the sail
+told from the words by her rig, her name or 'her'; the person's own appended to every
+station brief with authority but the director's (the officer's handover budget 20,500 to
+21,000, then 21,500 with item 5); the primer measured against the vocabulary (23 verbs
+added to their chapters, chapter 11 given the 184 events whole as a table kept equal to the
+registry, every chapter with a forms table run through the ship); chapter 7 re-recorded
+from the game as it stands with a stated cut rule; chapter 8's map of the library. **Item
+3, the date and the war as readings:** `the date` in words, closing every station's line and
+the director's; `the war` what the ship knows and never the world's table (the table she
+sailed with, `Nations.sailed_with`, and every change the news brought, entered in the new
+paper `the news of the war` at the pilot's news with where and when it came); truths 7-240,
+7-241. **Item 4:** the calls before a stand-by answered with their results at the API door
+and the local runner (`Reply.ran`, kept by the harness, carried in the transcript), "not run"
+said only of the calls after it; the action's severities by the flow of the game through the
+log (the firer's minute line notable when a shot struck, the fire opened or a gun was fired
+with no mark, routine when the minute's shot all missed; at quarters the trimmers' yard by
+yard routine, a trim's one line notable); the signal book's page saying whose it is, the
+common book of no nation saying it is no other ship's; truths 7-242, 7-243. **Item 5, the
+ship herself:** `readings.ship_words` (her name, rig and class from her file's era note, her
+service and nation, her fit of guns, her people's number, who commands, the ports of her
+voyage) at the head of every station's situation but the director's, kept across the
+handover fold, and the reading `the ship`; truth 7-244. **Item 6, found on the way:** a
+standing order's name may carry an apostrophe (the closing quote pairs with the opening);
+`hail the lugger` names a sail in sight and never a far one, a wreck in sight no sail;
+`captain: carry on` at the prompt the player's own hand given back; `gybe the mainsail`
+answered that the gybe names no sail; truth 7-245. **Item 8, the documentation whole:**
+every document under `docs/` but the primer's, the consent's, the playtests', the gates'
+and the four left to the lead scanned for paths, symbols and flags the tree lacks and read
+where the scan pointed; mended (spec M7's `data/nations/`, spec M6's primer 17, spec M7b
+§19's stores pointer, the references' count, the repository's README's status and list,
+the Harness's three places); the dated records left as history and said so; left to the
+lead with nothing found to mend by the scan (ChartBlocks.md, Tides.md, DesignProposal.md;
+M7-WorkPackages.md naming unbuilt packages' files); **missing, named for the lead:** an index
+of `docs/` and a reader's page on the one world. **Item 7, the interim gate's draft:**
+`docs/gates/gate-m7-interim.md` in m6c's form, the verdict Pending, what changed since m6c
+from the player's and the reader's side, fifteen items over the two playtests (ten after
+84 with the lead's two seats by the owner's word, five after the first new ship to be made
+exact when her file is in), the open items of the records, the pins moved and why, the
+container floors and the pictures' threshold; the engine's and the world's half the lead's
+to add before the owner runs it, with the chart blocks' attribution in its "what changed"
+list mended then (79b the Channel east, 79c the Mediterranean west and the Balearics, 79d
+the Gulf, the Ligurian sea and the Tyrrhenian; the Strait, Madeira and the Azores 39d to
+39f's). **The lead's review, three findings, all mended on the branch:** the hail's head
+ran past a colon or a comma when the words before it named no sail, so `say to the master:
+the brig has tacked` was refused as a hail of no sail and the lookout's `hail the deck: a
+sail on the bow` got the wrong refusal (the head now stops at the first token ending in a
+colon or a comma, the four lines in the colon test); chapter 20's "fourth part"; the notes'
+line on a shot into the sea. Found by both the lead and the builder's fast tier: truth
+7b-117's pinned date (the cutter scenario's for that world's Monday 10 June) and two
+playtest checkpoints restoring a nations table without `sailed_with` (the rebind step and
+`Papers.__init__` read it with a fallback to the wars as saved). **Pins moved, all of
+structure, old beside new:** chapter 3's size, the grammar's parts 4 to 6, the officer's
+handover budget 20,500 to 21,500, the papers' count 11 to 12, the station line's words (the
+date); no recorded passage's digest moved. **Noted for the lead and booked:** the console's
+`state` at seven lines and the hands' rationing lines at 1x (a words question for the gate);
+the missing `docs/README.md` and the one-world reader's page (the lead's, with the gate's
+half); 87's brief waits on this merge.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -3257,3 +3353,13 @@ as Steel has it, measured and not pinned; the razee under the frigate-36 by 0.09
 15 knots, 7-187's clause reported and not forced; the boom's swing and the sheet to the taffrail
 keyed on the profile, the eight taking it at SW-2's pictures; her long tests' `SLOW_TESTS` entries
 the integrator's at Phase 5.
+
+**2026-10-30, later: package 85 merged on the trunk** (at `252df5b`, the head the record's). The
+in-world rule binds from here: `tests/test_in_world.py` scans the primer, every brief
+constant, the tools' words and the library's topics served on a King's ship and a hired
+cutter (the catalogue's served head of every `data/evolutions/*.yaml` among them) for the
+forbidden words and patterns, with `docs/dev/PrimerRedactions.md` the rule stated once and
+the form of an evolution file's build notes (below a blank line under `# Build notes (not
+served by the library's catalogue)`). The session's lateen six in that form (`536176d`) are
+right for it; the primer's chapter on the ships, when written, goes through the same test,
+and the merge of the ships' branch runs it first.
