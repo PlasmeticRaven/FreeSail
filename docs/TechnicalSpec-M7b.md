@@ -1497,7 +1497,7 @@ channel, and every reading's new key is there only when one is.
 
 ## Part 7b-v: Needs
 
-### 19. Provisions and water (`freesail/crew/`, `freesail/world/stores.py` or where the stores live; `data/ships/*.yaml`)
+### 19. Provisions and water (`freesail/crew/`, `freesail/world/places.py` (`Stores`, where the stores live); `data/ships/*.yaml`)
 
 The crew eat and drink on the schedule as they rest (M3's watches): the ship's provisions
 and water fall by the ration a day (the period's: a pound of biscuit, a pound of salt meat

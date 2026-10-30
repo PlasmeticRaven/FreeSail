@@ -13521,3 +13521,52 @@ under `docs/agents/consent/` or the consent brief touched.
 - **The documents touched on the way** (beside the primer's chapters): the Harness's
   standing-by paragraph, its station-line section (the date, the ship herself), its line on
   the grammar's parts; the records above. The documentation whole is item 8's.
+
+### Item 8: the documentation whole, against the code after 84
+
+- **The pass**: every document under `docs/` but the primer (item 1's), the consent brief
+  and folder (untouched by the brief's rule), the playtests and the gates (records), and
+  the four left to the lead, scanned for every backticked file path, dotted symbol and
+  `--flag` against the tree (the scanner in the record's session; 74 hits), then read
+  where the scanner pointed; the how-to commands' modules imported (`freesail.ui.server`,
+  `freesail.ui.console`, `freesail.agents.local`, `.api`, `.repl`, `freesail`); the
+  Harness's door flags against the doors' and the tools' argparse (every one found, the
+  llama-server's own flags among them), its tool names against `tools.TOOLS`, and its
+  figures against the harness's constants (sixteen orders and thirty-two reads a turn, six
+  tenths for the handover's ask, all as the code has them); the references' README table
+  against the folder (every listed file on disk; the one file not in the table a licence).
+- **Mended**: spec M7's two pointers to `data/nations/` (one file, `data/nations.yaml`);
+  spec M6's `docs/primer/17-lessons.md` (chapter 18 since the wardroom's chapter); spec
+  M7b §19's "`freesail/world/stores.py` or where the stores live" (`world/places.py`,
+  `Stores`); the references' README's count (forty-seven works in sixty files); the
+  repository's README's status (gate 5c passed, where m6c has) and its list of the
+  documents (two specs of eight, the primer's "eight short chapters" of twenty-five); the
+  Harness's standing-by paragraph, station-line section and grammar line (items 3 to 5);
+  the specs' "as built" pointers for 84 stand as the 84 session wrote them, checked by
+  the scan. The words 84 left for this review: "the player's ship" is right wherever it
+  stands in the Harness and the specs (her own hull is meant in each); the far notice's
+  "beyond the cap's reach" (`world/crews.py`) is in-world and left; `CrewedWorld` and
+  `world` are the code's names, not the documents' concern.
+- **History, not mended**: the work-package records and the close-outs (`M3` to `M7b`,
+  `M4-CloseOut`, `M5-CloseOut-5b` and `5c`), the cold review of 2026-09-30 and
+  `LocalSessions.md` name files, flags and tools of their day (`freesail/cli.py`,
+  `docs/Setup.md`, `tests/test_cli.py`, `data/evolutions/trim_fore_and_aft.yaml`,
+  `--casual`, `--dist`, `tests/test_harness.py`, `freesail/world/boats.py`,
+  `tests/test_trim.py`): dated records, read as such; spec M5's `--casual` ("a later
+  option") and `orders.navigation._course_not_laid` (now the `course_not_laid` flag in the
+  helm order's data) and spec M0-M2's event kinds (`sail.taken_in`, `sail.reef_shaken_out`,
+  the evolutions' own, in `data/evolutions/`) are of the same kind and left.
+- **Left to the lead, with what I would have mended**: `docs/dev/ChartBlocks.md`,
+  `docs/references/Tides.md` and `docs/DesignProposal.md` carry no path the tree lacks;
+  nothing found to mend in them by the scan. `docs/dev/M7-WorkPackages.md` names the
+  files of packages not yet built (`docs/design/Build-Ships.md`, `freesail/ship/form.py`,
+  `freesail/world/hull.py`, `freesail/world/prizes.py`, `tools/ships/`, `tests/test_driver.py`,
+  `tests/test_scenarios_75.py`), which are briefs, not stale lines; and `docs/gates/gate-m7-interim.md`,
+  item 7's.
+- **Missing, named for the lead**: an index of `docs/` (no `docs/README.md`: the
+  repository's README now lists the folders, but no page says which spec, design study
+  and record covers which system, and a reader lands on `TechnicalSpec-M7b.md`'s 2,206
+  lines); a page on the one world for a reader at a station (84's design postscripts are
+  the builder's; the primer's chapters 17 and 19 say what a station on another hull may
+  do, and nothing says in one place what a save of many hulls holds, what `follow` shows at
+  the console, or what a hull asleep is to the person aboard her).
