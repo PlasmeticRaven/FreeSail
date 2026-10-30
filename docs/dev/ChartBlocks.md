@@ -148,9 +148,9 @@ region's, its tide and its weather are rows in tables that already reach its wat
    and where no gauge of the blend has a level (the Strait's, the islands') the level is
    the eleven's there, as it was, which is the level the tiles' fill was raised by
    ("GEBCO's fill", below). **The fill raise reads the same water** (`mean_level_grid`,
-   package 93): at each cell the gauges that serve it, the block's own within its bounds
-   and the eleven alone outside every block, so that a block's land stands above its own
-   high water; package 89 kept the eleven's raise until the blocks' tiles were rebuilt on
+   package 93: `Tide.constants_at` at each cell, the block's own within its bounds, the
+   taper and the seams' gauges of package 94, the eleven alone outside every block), so
+   that a block's land stands above its own high water; package 89 kept the eleven's raise until the blocks' tiles were rebuilt on
    it, which package 93 did, region by region (its notes give each region's figures). Each gauge lies within its block's bounds (`test_tide.py`
    holds it), and the bounds are the membership: water between two blocks' bounds that
    no region names reads the eleven alone, so abut a block's bounds on its neighbour's
@@ -359,12 +359,15 @@ Roscoff town patch was the same fault mended by hand). Every block from 39a on s
 Biscay north since package 93 (built without it by 39b, its sweep found 34,053 cells in
 267 places, the marshes behind its dykes flooding at high water springs; with it 3,808 in
 133).
-**The raise is the level of the water that serves each cell** (`mean_level_grid`,
-package 93): at each cell of a grid of 0.05 degrees the gauges that serve it as the tide
-takes them (`Tide.gauges_at`): within a block's bounds the block's own gauges with the
-eleven, their level the blend of those that have one, the eleven's where none has (the
-Strait's, the islands', the Tyrrhenian's, whose gauges' levels are unread); outside every
-block the eleven alone, as every tile there was built. Until package 89 a block's gauges
+**The raise is the world's mean level at each cell** (`mean_level_grid`, package 93):
+at each cell of a grid of 0.05 degrees `Tide.constants_at` itself, one source of truth
+(the lead's ruling after package 94): the gauges that serve the cell (the block's own
+within its bounds with the eleven, and a neighbour's gauge within ten miles of their seam),
+the seam's taper within a block's open edge, the level the blend of the gauges that have
+one, the eleven's where none has (the Strait's, the islands', the Tyrrhenian's, whose
+gauges' levels are unread); outside every block the eleven alone, as every tile there was
+built. The tool reads neither the gauges nor the manifest a second time: a change of the
+tide's rule moves the raise with it, and the blocks it moves want rebuilding. Until package 89 a block's gauges
 were held and the world's level over a block was a far gauge's (Le Conquet's 3.98 m over
 Portugal and the Strait, Saint-Malo's 6.83 over the Balearics), so the blocks' land was
 raised by it: the Mediterranean's six metres and more above its true water, its harbours

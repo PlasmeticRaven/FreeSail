@@ -2164,9 +2164,9 @@ free passage with no marks for a week: the reckoning by the log and the noon sig
 the lunar if the moon serves, the landfall on Porto Santo. It is what the owner asked for.
 
 **As built (package 93, 2026-10-30): the blocks' fill on their own water.** GEBCO's fill
-under every block is raised by the level of the water that serves it (`mean_level_grid`
-reading the gauges that serve each cell, the block's own within its bounds, the eleven
-alone outside every block, as package 89's tide has them): `channel-east`,
+under every block is raised by the world's mean level there (`mean_level_grid` is
+`Tide.constants_at` at each cell: the block's own gauges within its bounds, package 94's
+taper and seams' gauges, the eleven alone outside every block): `channel-east`,
 `biscay-north` (the key taken), `biscay-south` and `portugal` (their fixed
 `fill_mean_level_m` taken out), the Strait's column east of 5 W, `mediterranean-west`,
 `balearics`, `gulf-of-lion`, `ligurian-sea` and `tyrrhenian` rebuilt, the sources fetched

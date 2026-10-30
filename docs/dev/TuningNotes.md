@@ -14452,3 +14452,83 @@ the coast 1,706 pieces, 12,287 points, 451,176 bytes (1,706, 12,285, 451,137). T
 tests: the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to
 7-314, 15 passed. **The scenario** `portugal.yaml`, 30 hours: 671 lines, digest
 `05c7693be1e19a73`, the same on the original head, the branch's head and here.
+
+### The ten regions, as merged before against as built (package 93's final tiles)
+
+Against 79's tiles as merged (`21a25e7`), by `git show` of each tile and its arrays (the
+first rebuild's and the second's figures are in the sections above):
+
+| Region | Level 2: tiles, MB before, after | Tiles changed | Largest | Above the datum to below / below to above | Level 3: MB before, after; changed |
+|---|---|---|---|---|---|
+| channel-east | 57, 7.64, 7.77 | 53 | 1.30 m | 7 / 502 | 5.23, 5.23; 32 (88 / 7,171) |
+| biscay-north | 55, 8.92, 9.13 | 48 | 6.10 | 0 / 62,428 | 2.47, 2.43; 36 (0 / 178,554) |
+| biscay-south | 129, 16.54, 16.90 | 90 | 2.00 | 1 / 1,301 | 2.27, 2.26; 30 (0 / 8,567) |
+| portugal | 68, 14.11, 14.14 | 33 | 2.00 | 293 / 97 | 3.29, 3.26; 42 (3,483 / 0) |
+| strait | 12, 2.45, 2.46 | 2 | 3.60 | 97 / 0 | 1.36, 1.36; 0 |
+| madeira, azores | not rebuilt | | | | |
+| mediterranean-west | 165, 23.99, 24.02 | 157 | 6.60 | 38,252 / 0 | 2.14, 2.16; 30 (23,446 / 0) |
+| balearics | 154, 28.81, 28.59 | 127 | 6.70 | 14,399 / 0 | 1.72, 1.73; 23 (46,628 / 0) |
+| gulf-of-lion | 120, 24.59, 24.53 | 113 | 6.50 | 115,257 / 0 | 3.29, 3.30; 32 (102,845 / 0) |
+| ligurian-sea | 72, 17.10, 17.16 | 70 | 6.40 | 40,810 / 0 | 2.89, 2.89; 30 (119,331 / 0) |
+| tyrrhenian | 158, 35.22, 35.22 | 4 | 1.50 | 12 / 0 | 1.99, 1.99; 0 |
+
+Every region's tile count is as before; the bytes moved by under a quarter of a megabyte
+each, 239.6 MB of level 2 and 34.6 MB of level 3 in the ten. After the second rebuild,
+with the trunk merged, the six regions the world's tide does not move again (the Strait and
+the Mediterranean's five) were built once more from the cache: every tile, coast and index
+byte for byte (the manifest's fetch records alone, discarded). `--check` prints as before
+for all ten. `channel-west` and `channel-mid`: nothing written.
+
+### The proof, the suites and the close (package 93, the final tree)
+
+**The proof on the final tree** (`a67faf7` with the records, this container, four cores,
+nothing beside it), as on the head (`21a25e7`, a clean worktree): the eleven recorded
+passages by node id, `--slow -n 4`, **11 passed** both times, every pinned digest, line
+count and tick held; `-k "gate_5b or gate_5c"`, the one test selected passed both times;
+the captain's trials, `--slow -n 4`, **the same on both trees**: five passed (the merchant
+hauling off from the privateer, the order at the prompt, the player's hand replayed, the
+station's stranger chased, the merchant in thick weather), the gale with sea room its
+expected failure, and the lee-shore trial failing with this container's digest
+`7fad0ce7e46ba366` against the pin `ed48ca3d61e52f20` on both (89's record has it). No
+recorded passage's digest moved: none sails a rebuilt region.
+
+**The suites.** `ruff check` and `ruff format --check` clean. The six chart and tide files
+(`test_chart.py`, `test_ports.py`, `test_tide.py`, `test_scenarios.py`, `test_islands.py`,
+`test_tackle_orders.py`) fast and slow after every region; the blocks' truths with `--slow`
+after every region (7-260 to 7-314 between them, each region's own); truths 7-305 to 7-309
+in the fast tier. **The fast tier**, once on the final tree (`python -m pytest -n auto -q`,
+379 slow tests left out): **one failure**, the pictures' known flake
+(`test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`,
+"the chart is blank (std 8.0)" under the tier's load), which passes alone on this tree.
+The whole slow tier not run (the lead's, in the cloud at the merge).
+
+**The scenarios, last run against the first** (this container): spithead the same as on
+the branch's head (94's tide moved it, 1,241 to 1,231 lines); biscay-north the same
+throughout; biscay-south three moments (the cable at Corunna, one bearing); portugal and
+strait the same throughout; mahon one line (the land about Georgetown a minute later);
+agincourt-sound eight lines, grounding at the same tick as on the head (79d's finding).
+
+### Found on the way (package 93)
+
+- **A far gauge's raise hid the coarse shore.** Where EMODnet stops short of a shore and
+  GEBCO's fifteen seconds smear an island or a harbour's side under mean sea level, the
+  eleven's six metres stood it up; the true water lays it under (Agincourt Sound's islands,
+  kept by `fill_raise: eleven`; the harbours of Mahon, Palma, Ivica, Toulon, Marseille and
+  Leghorn are water again, as they are). A patch read from a period sheet with its datum is
+  the mend: the lead's patch package.
+- **The dyked levels of the Channel east** (Romney Marsh, the Pevensey Levels) lie under
+  high water springs on the tiles as behind their walls in truth; a land patch with a
+  sheet's datum, when read.
+- **The control is the tool's**: the same fetch through the head's tool gave the committed
+  arrays for every region but where package 94's data moved the old rule's own reading
+  (Biscay north's southern row, Biscay south, Portugal's northern row: Aix's gauge across
+  the seam), which says the tiles follow the tide's tables and nothing else.
+- **`channel-mid`'s seam column** (1.23 to 0.80 W, its own tiles) and `channel-west`'s
+  edges now lie under water whose level differs from their raise (up to 0.41 and 1.29 m
+  over a few hundred cells of the grid): not rebuilt by the brief; a rebuild of either with
+  the key and the rule would carry it.
+- **The open sea east of 4.5 E south of 40.56 N** lies in no block, reading Saint-Malo's
+  water by the eleven's nearest alone: the Balearics' tiles reach 4.75 E. A bound for the
+  lead (89 found the like at 40.5 N).
+- **One merge commit of mine** (`dae50ca`) went out with git's default message, without the
+  attribution lines; pushed, not rewritten.
