@@ -2109,7 +2109,9 @@ def test_the_mediterranean_wests_two_regions_pass_their_checks_and_keep_their_se
         assert size < 40e6, (region, size)  # the brief's rule, each region
     medw, bal = manifest["regions"][MEDW], manifest["regions"][BALEARICS]
     assert medw["bounds"] == {"south": 35.0, "north": 40.5, "west": -5.0, "east": 0.05}
-    assert bal["bounds"] == {"south": 35.0, "north": 40.5, "west": 0.05, "east": 4.5}
+    # package 89: the north bound at its tiles' edge, 40.56 N, where the Gulf's begins (it
+    # was 40.5, and the strip between answered to no block's tide); no tile moved
+    assert bal["bounds"] == {"south": 35.0, "north": 40.56, "west": 0.05, "east": 4.5}
     for other in ("strait", MEDW):
         for level in ("2", "3"):
             theirs = {t["name"] for t in manifest["regions"][other]["tiles"].get(level, [])}

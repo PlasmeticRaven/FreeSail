@@ -488,7 +488,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # Algerian coast east of 4.5 E is a later block's.
     "balearics": {
         "title": "The Balearics, and Barbary from Mostaganem to Algiers",
-        "bounds": {"south": 35.0, "north": 40.5, "west": 0.05, "east": 4.5},
+        # package 89: the north bound at the tiles' edge, 40.56 N, where the Gulf of Lion's
+        # begins (40.5 before, the strip between answering to no block's tide; no tile moved)
+        "bounds": {"south": 35.0, "north": 40.56, "west": 0.05, "east": 4.5},
         "fetch": {"south": 34.45, "north": 40.7, "west": -0.5, "east": 4.9},
         "harbours": {
             "palma": {"south": 39.48, "north": 39.59, "west": 2.55, "east": 2.75},
