@@ -50,6 +50,29 @@ constituents:
   S2: {speed_deg_per_h: 30.0000000, name: "the principal solar semidiurnal"}
   N2: {speed_deg_per_h: 28.4397295, name: "the larger lunar elliptic semidiurnal"}
 
+# The interpolation's power: the inverse square of the distance, judgement (a weighted
+# mean that follows the nearest gauge close to it and blends between the shores in
+# mid-Channel; the north Cornish coast, whose tide is the Bristol Channel's, lies outside
+# the game's play and gets the south coast's gauges, which is wrong there by half an hour
+# and a third of the range, and is said so here).
+#
+# THE TABLE OVER A LARGER SEA (package 38; spec M6 §26). The blocks of the voyage to
+# Madeira add gauges here as they are built (from TICON's file, which holds the Iberian
+# and the Madeiran gauges by their coordinates: which of Vigo, Leixões, Cascais, Lagos,
+# Cadiz, Tarifa and Funchal it has is UNVERIFIED here and read when a block is built;
+# each with its record, its mean level above the chart's datum from a stated source and
+# its three constituents), in the same form as the eleven
+# below, whose figures do not move. The interpolation is honest about distance: only the
+# gauges within `reach_nm` of a position are blended, and a position beyond the reach of
+# every gauge takes the nearest alone, which the world marks (`TideState.far`) and the
+# master's words say ("the nearest place in the master's table, two hundred miles off");
+# no blend across a coast. The reach, 400 miles, is more than the farthest point of the
+# Channel's region lies from Dover (about 370), so that every position of the Channel
+# blends the eleven as package 34 pinned it; judgement otherwise.
+interpolation:
+  power: 2
+  reach_nm: 400
+
 gauges:
   - id: st-marys
     name: St Mary's, Scilly
@@ -150,63 +173,6 @@ gauges:
     M2: {amplitude_m: 1.867, phase_deg: 228.3}
     S2: {amplitude_m: 0.695, phase_deg: 272.1}
     N2: {amplitude_m: 0.371, phase_deg: 209.1}
-
-# The interpolation's power: the inverse square of the distance, judgement (a weighted
-# mean that follows the nearest gauge close to it and blends between the shores in
-# mid-Channel; the north Cornish coast, whose tide is the Bristol Channel's, lies outside
-# the game's play and gets the south coast's gauges, which is wrong there by half an hour
-# and a third of the range, and is said so here).
-#
-# THE TABLE OVER A LARGER SEA (package 38; spec M6 §26). The blocks of the voyage to
-# Madeira add gauges here as they are built (from TICON's file, which holds the Iberian
-# and the Madeiran gauges by their coordinates: which of Vigo, Leixões, Cascais, Lagos,
-# Cadiz, Tarifa and Funchal it has is UNVERIFIED here and read when a block is built;
-# each with its record, its mean level above the chart's datum from a stated source and
-# its three constituents), in the same form as the eleven
-# below, whose figures do not move. The interpolation is honest about distance: only the
-# gauges within `reach_nm` of a position are blended, and a position beyond the reach of
-# every gauge takes the nearest alone, which the world marks (`TideState.far`) and the
-# master's words say ("the nearest place in the master's table, two hundred miles off");
-# no blend across a coast. The reach, 400 miles, is more than the farthest point of the
-# Channel's region lies from Dover (about 370), so that every position of the Channel
-# blends the eleven as package 34 pinned it; judgement otherwise.
-interpolation:
-  power: 2
-  reach_nm: 400
-
-# THE CHANNEL EAST'S GAUGES (package 39a), READ AND HELD. TICON.txt was read again
-# (the zip at doi.pangaea.de, fetched 2026-10-09, SHA-256 7055f8ed…6514, 1,621,262 bytes),
-# the block's water searched by coordinates (48.4 to 51 N, 3.8 to 0.7 W): the file has
-# Weymouth, St Helier, Saint-Malo and Cherbourg, which are four of the eleven above and
-# whose figures it gives again to the centimetre and the degree (verified), and two more,
-# Bournemouth and Portsmouth, below. It has no gauge at St Peter Port, Dartmouth or
-# Portland (the brief's "which it has is unverified until read": these it has not).
-# The two are HELD, read by nothing: every position of the Channel blends every gauge
-# within `reach_nm`, so a twelfth gauge, however far, moves the tide at every Channel
-# position by a little, and the recorded passages' digests with it (the eleven "do not
-# move", the brief). Blending them is the lead's decision with a re-measure of the
-# passages, or a reach of a gauge's own (a rule the tide lacks; docs/dev/TuningNotes.md).
-# Their mean levels above the chart's datum are UNVERIFIED (no source read for them).
-held_gauges:
-  - id: bournemouth
-    name: Bournemouth
-    lat_deg: 50.7143
-    lon_deg: -1.8749
-    record: "GESLA-2, BODC, 1996 to 2013"
-    mean_level_m: null  # unverified: no published level read
-    M2: {amplitude_m: 0.413, phase_deg: 273.3}
-    S2: {amplitude_m: 0.184, phase_deg: 292.3}
-    N2: {amplitude_m: 0.107, phase_deg: 247.9}
-  - id: portsmouth
-    name: Portsmouth
-    lat_deg: 50.8026
-    lon_deg: -1.1118
-    record: "GESLA-2, BODC, 1991 to 2014"
-    mean_level_m: null  # unverified: no published level read
-    M2: {amplitude_m: 1.410, phase_deg: 326.7}
-    S2: {amplitude_m: 0.436, phase_deg: 13.4}
-    N2: {amplitude_m: 0.276, phase_deg: 303.9}
-
   # THE GAUGES OF BISCAY NORTH, READ AND HELD (package 39b). TICON's file holds nine gauges
   # of the block, read 2026-10-09 by their coordinates as package 34 read the eleven (the
   # zip at doi.pangaea.de, SHA-256 7055f8ed1a14abf8...6514; Brest and Le Conquet are the
@@ -228,6 +194,7 @@ held_gauges:
   # reason, under the same key).
   - id: concarneau
     name: Concarneau
+    block: biscay-north
     lat_deg: 47.8736
     lon_deg: -3.9072
     record: "GESLA-2, REFMAR, 1999 to 2014"
@@ -237,6 +204,7 @@ held_gauges:
     N2: {amplitude_m: 0.308, phase_deg: 79.2}
   - id: port-tudy
     name: Port-Tudy, Groix
+    block: biscay-north
     lat_deg: 47.6443
     lon_deg: -3.4459
     record: "GESLA-2, REFMAR, 1966 to 2014"
@@ -246,6 +214,7 @@ held_gauges:
     N2: {amplitude_m: 0.311, phase_deg: 78.9}
   - id: le-crouesty
     name: Le Crouesty
+    block: biscay-north
     lat_deg: 47.5427
     lon_deg: -2.8952
     record: "GESLA-2, REFMAR, 1996 to 2014"
@@ -255,6 +224,7 @@ held_gauges:
     N2: {amplitude_m: 0.339, phase_deg: 83.7}
   - id: saint-nazaire
     name: Saint-Nazaire
+    block: biscay-north
     lat_deg: 47.2669
     lon_deg: -2.2016
     record: "GESLA-2, REFMAR, 1957 to 2014"
@@ -264,6 +234,7 @@ held_gauges:
     N2: {amplitude_m: 0.358, phase_deg: 85.7}
   - id: paimboeuf
     name: Paimboeuf
+    block: biscay-north
     lat_deg: 47.2866
     lon_deg: -2.0004
     record: "GESLA-2, REFMAR, 2011 to 2014"
@@ -273,6 +244,7 @@ held_gauges:
     N2: {amplitude_m: 0.374, phase_deg: 94.3}
   - id: saint-gildas
     name: Pointe de Saint-Gildas
+    block: biscay-north
     lat_deg: 47.1404
     lon_deg: -2.2464
     record: "GESLA-2, REFMAR, 1962 to 2014"
@@ -282,6 +254,7 @@ held_gauges:
     N2: {amplitude_m: 0.350, phase_deg: 81.0}
   - id: les-sables-dolonne
     name: Les Sables-d'Olonne
+    block: biscay-north
     lat_deg: 46.4974
     lon_deg: -1.7935
     record: "GESLA-2, REFMAR, 1965 to 2014"
@@ -291,6 +264,7 @@ held_gauges:
     N2: {amplitude_m: 0.325, phase_deg: 77.5}
   - id: la-rochelle-pallice
     name: La Rochelle-Pallice
+    block: biscay-north
     lat_deg: 46.1585
     lon_deg: -1.2206
     record: "GESLA-2, REFMAR, 1941 to 2014"
@@ -300,6 +274,7 @@ held_gauges:
     N2: {amplitude_m: 0.364, phase_deg: 79.6}
   - id: ile-daix
     name: Île d'Aix
+    block: [biscay-north, biscay-south]  # the rule of the seams (package 94, step 5)
     lat_deg: 46.0074
     lon_deg: -1.1743
     record: "GESLA-2, REFMAR, 1973 to 2014"
@@ -332,6 +307,7 @@ held_gauges:
   # Corunna) until the lead gives a gauge its own water.
   - id: le-verdon
     name: Le Verdon-sur-Mer
+    block: biscay-south
     lat_deg: 45.5685
     lon_deg: -1.0616
     record: "GESLA-2, REFMAR, 1959 to 2014"
@@ -341,6 +317,7 @@ held_gauges:
     N2: {amplitude_m: 0.304, phase_deg: 90.3}
   - id: arcachon
     name: Arcachon (Eyrac)
+    block: biscay-south
     lat_deg: 44.6650
     lon_deg: -1.1636
     record: "GESLA-2, REFMAR, 1967 to 2014"
@@ -350,6 +327,7 @@ held_gauges:
     N2: {amplitude_m: 0.264, phase_deg: 103.8}
   - id: boucau-bayonne
     name: Boucau-Bayonne
+    block: biscay-south
     lat_deg: 43.5273
     lon_deg: -1.5148
     record: "GESLA-2, REFMAR, 1967 to 2014"
@@ -359,6 +337,7 @@ held_gauges:
     N2: {amplitude_m: 0.256, phase_deg: 76.8}
   - id: socoa
     name: Socoa (Saint-Jean-de-Luz)
+    block: biscay-south
     lat_deg: 43.3952
     lon_deg: -1.6816
     record: "GESLA-2, REFMAR, 1942 to 2014"
@@ -368,6 +347,7 @@ held_gauges:
     N2: {amplitude_m: 0.280, phase_deg: 72.5}
   - id: bilbao
     name: Bilbao
+    block: biscay-south
     lat_deg: 43.3570
     lon_deg: -3.0500
     record: "GESLA-2, Puertos del Estado, 1992 to 2015"
@@ -377,6 +357,7 @@ held_gauges:
     N2: {amplitude_m: 0.278, phase_deg: 72.8}
   - id: santander
     name: Santander
+    block: biscay-south
     lat_deg: 43.4614
     lon_deg: -3.7908
     record: "GESLA-2, IEO, 1943 to 2010"
@@ -386,6 +367,7 @@ held_gauges:
     N2: {amplitude_m: 0.274, phase_deg: 76.2}
   - id: gijon
     name: Gijón
+    block: biscay-south
     lat_deg: 43.5580
     lon_deg: -5.6980
     record: "GESLA-2, Puertos del Estado, 1995 to 2015"
@@ -395,6 +377,7 @@ held_gauges:
     N2: {amplitude_m: 0.271, phase_deg: 71.5}
   - id: ferrol
     name: Ferrol
+    block: biscay-south
     lat_deg: 43.4630
     lon_deg: -8.3260
     record: "GESLA-2, Puertos del Estado, 2007 to 2015"
@@ -404,6 +387,7 @@ held_gauges:
     N2: {amplitude_m: 0.251, phase_deg: 67.6}
   - id: corunna
     name: A Coruña
+    block: biscay-south
     lat_deg: 43.3667
     lon_deg: -8.4000
     record: "GESLA-2, UHSLC, 1943 to 2012"
@@ -413,6 +397,7 @@ held_gauges:
     N2: {amplitude_m: 0.248, phase_deg: 66.9}
   - id: vilagarcia
     name: Vilagarcía de Arousa
+    block: biscay-south
     lat_deg: 42.6010
     lon_deg: -8.7700
     record: "GESLA-2, Puertos del Estado, 1997 to 2015"
@@ -422,6 +407,7 @@ held_gauges:
     N2: {amplitude_m: 0.241, phase_deg: 61.1}
   - id: vigo
     name: Vigo
+    block: biscay-south
     lat_deg: 42.2380
     lon_deg: -8.7333
     record: "GESLA-2, IEO, 1943 to 2010"
@@ -459,6 +445,7 @@ held_gauges:
   # and twice the range (docs/dev/TuningNotes.md, package 39d).
   - id: cascais
     name: Cascais
+    block: portugal
     lat_deg: 38.6917
     lon_deg: -9.4167
     record: "GESLA-2, UHSLC, 1959 to 2005"
@@ -468,6 +455,7 @@ held_gauges:
     N2: {amplitude_m: 0.213, phase_deg: 47.2}
   - id: lagos
     name: Lagos
+    block: portugal
     lat_deg: 37.0983
     lon_deg: -8.6683
     record: "GESLA-2, UHSLC, 1986 to 2000"
@@ -477,6 +465,7 @@ held_gauges:
     N2: {amplitude_m: 0.216, phase_deg: 41.4}
   - id: huelva
     name: Huelva (Mazagón)
+    block: portugal
     lat_deg: 37.1320
     lon_deg: -6.8340
     record: "GESLA-2, Puertos del Estado, 1996 to 2015"
@@ -486,6 +475,7 @@ held_gauges:
     N2: {amplitude_m: 0.222, phase_deg: 41.4}
   - id: bonanza
     name: Bonanza (the Guadalquivir)
+    block: portugal
     lat_deg: 36.8000
     lon_deg: -6.3400
     record: "GESLA-2, Puertos del Estado, 1992 to 2015"
@@ -495,6 +485,7 @@ held_gauges:
     N2: {amplitude_m: 0.190, phase_deg: 48.0}
   - id: cadiz
     name: Cadiz
+    block: [portugal, strait]  # the rule of the seams (package 94, step 5)
     lat_deg: 36.5333
     lon_deg: -6.2833
     record: "GESLA-2, IEO, 1961 to 2012"
@@ -524,6 +515,7 @@ held_gauges:
   # Funchal by these constants is 1.97 m, Norie's seven feet (data/tides/establishments.yaml).
   - id: funchal
     name: Funchal
+    block: madeira
     lat_deg: 32.6400
     lon_deg: -16.9067
     record: "GESLA-2, UHSLC, 1976 to 2013"
@@ -533,6 +525,7 @@ held_gauges:
     N2: {amplitude_m: 0.152, phase_deg: 30.5}
   - id: ponta-delgada
     name: Ponta Delgada
+    block: azores
     lat_deg: 37.7350
     lon_deg: -25.6717
     record: "GESLA-2, UHSLC, 1978 to 2012"
@@ -542,6 +535,7 @@ held_gauges:
     N2: {amplitude_m: 0.106, phase_deg: 48.3}
   - id: angra
     name: Angra do Heroísmo
+    block: azores
     lat_deg: 38.6500
     lon_deg: -27.2400
     record: "GESLA-2, UHSLC, 1976 to 1983"
@@ -551,6 +545,7 @@ held_gauges:
     N2: {amplitude_m: 0.098, phase_deg: 49.4}
   - id: horta
     name: Horta
+    block: azores
     lat_deg: 38.5333
     lon_deg: -28.6217
     record: "GESLA-2, UHSLC, 1984 to 1986"
@@ -560,6 +555,7 @@ held_gauges:
     N2: {amplitude_m: 0.091, phase_deg: 44.9}
   - id: santa-cruz-das-flores
     name: Santa Cruz das Flores
+    block: azores
     lat_deg: 39.3783
     lon_deg: -31.1683
     record: "GESLA-2, UHSLC, 2006 to 2013"
@@ -590,6 +586,7 @@ held_gauges:
   # The lead's decision with the other blocks' (docs/dev/TuningNotes.md, package 39f).
   - id: ceuta
     name: Ceuta
+    block: strait
     lat_deg: 35.9000
     lon_deg: -5.3167
     record: "GESLA-2, IEO, 1944 to 2012"
@@ -599,6 +596,7 @@ held_gauges:
     N2: {amplitude_m: 0.063, phase_deg: 34.9}
   - id: tarifa
     name: Tarifa
+    block: strait
     lat_deg: 36.0000
     lon_deg: -5.6000
     record: "GESLA-2, IEO, 1944 to 2012"
@@ -608,6 +606,7 @@ held_gauges:
     N2: {amplitude_m: 0.087, phase_deg: 26.9}
   - id: algeciras
     name: Algeciras
+    block: strait
     lat_deg: 36.1167
     lon_deg: -5.4333
     record: "GESLA-2, IEO, 1943 to 2012"
@@ -617,6 +616,7 @@ held_gauges:
     N2: {amplitude_m: 0.066, phase_deg: 33.6}
   - id: gibraltar
     name: Gibraltar
+    block: strait
     lat_deg: 36.1167
     lon_deg: -5.3500
     record: "GESLA-2, UHSLC, 1961 to 2000"
@@ -642,6 +642,7 @@ held_gauges:
   # block is the eleven's blend, in which Dover is the nearest gauge.
   - id: newhaven
     name: Newhaven
+    block: channel-east
     lat_deg: 50.7818
     lon_deg: 0.0570
     record: "GESLA-2, BODC, 1982 to 2014"
@@ -651,6 +652,7 @@ held_gauges:
     N2: {amplitude_m: 0.425, phase_deg: 299.6}
   - id: le-havre
     name: Le Havre
+    block: channel-east
     lat_deg: 49.4819
     lon_deg: 0.1060
     record: "GESLA-2, REFMAR, 1938 to 2014"
@@ -660,6 +662,7 @@ held_gauges:
     N2: {amplitude_m: 0.494, phase_deg: 265.3}
   - id: dieppe
     name: Dieppe
+    block: channel-east
     lat_deg: 49.9292
     lon_deg: 1.0845
     record: "GESLA-2, REFMAR, 1953 to 2014"
@@ -669,6 +672,7 @@ held_gauges:
     N2: {amplitude_m: 0.573, phase_deg: 290.7}
   - id: boulogne
     name: Boulogne
+    block: channel-east
     lat_deg: 50.7274
     lon_deg: 1.5777
     record: "GESLA-2, REFMAR, 1941 to 2014"
@@ -678,6 +682,7 @@ held_gauges:
     N2: {amplitude_m: 0.538, phase_deg: 307.0}
   - id: calais
     name: Calais
+    block: channel-east
     lat_deg: 50.9694
     lon_deg: 1.8677
     record: "GESLA-2, REFMAR, 1941 to 2014"
@@ -687,6 +692,7 @@ held_gauges:
     N2: {amplitude_m: 0.441, phase_deg: 320.1}
   - id: dunkirk
     name: Dunkirk
+    block: channel-east
     lat_deg: 51.0481
     lon_deg: 2.3667
     record: "GESLA-2, REFMAR, 1956 to 2014"
@@ -694,3 +700,422 @@ held_gauges:
     M2: {amplitude_m: 2.146, phase_deg: 352.4}
     S2: {amplitude_m: 0.648, phase_deg: 44.9}
     N2: {amplitude_m: 0.374, phase_deg: 329.1}
+  # THE MEDITERRANEAN WEST'S GAUGES AND THE BALEARICS', READ AND HELD (package 79c, the two
+  # regions `mediterranean-west` and `balearics`). TICON's file read 2026-10-29 by
+  # coordinates over 34.9 to 40.6 N and 5.0 W to 4.6 E (the zip at doi.pangaea.de,
+  # SHA-256 7055f8ed1a14abf8...6514, the same file): Málaga (two records; the IEO's of
+  # 1944 to 2012 taken, Puertos del Estado's of 1992 to 2015 agreeing within 3 mm and two
+  # degrees), Motril, Almería and Melilla for `mediterranean-west`; Ibiza, Formentera
+  # (La Savina), Palma, Alcudia and Mahón for `balearics`. Gandía, Sagunto and Valencia are
+  # in the file and lie north of Cape Palos, a later block's, and are not taken. No gauge
+  # at Cartagena, Oran or Algiers. The mean levels above the chart's datum are VERIFIED,
+  # read 2026-10-29 from Puertos del Estado's REDMAR reports (bancodatos.puertos.es,
+  # informes/globales/GLOB_2_3_<station>.pdf, "Referencias de nivel del mar"): the mean
+  # level (NMM) less the lowest astronomical tide (the reports' "mínima bajamar
+  # astronómica"), both on the gauge's zero, in metres.
+  #
+  # HELD, NOT BLENDED, as every block's are until the lead rules on the gauges' water
+  # (package 89, not merged when this block was built): these lie beyond the reach (400
+  # miles) of every Channel and Biscay north position, so blending them would move no
+  # recorded passage; what they would move is the world's tide over the block, which is
+  # now Le Conquet's alone (the nearest of the eleven, some 900 miles off: an M2 of 2.0 m
+  # where Málaga's is 0.19 and Mahón's 0.05, its mean level 3.98 m above the datum where
+  # these are 0.16 to 0.43). The pilots agree with the gauges: Gibraltar five or six feet
+  # (Michelot 1709, Tofiño 1787), Málaga three (Purdy 1826), Cartagena about sixteen inches
+  # (Smyth 1854), the Balearics one to two feet with gales (Tofiño 1787 pp. 210 and 226), Mahón "no
+  # regular tides" (the Admiralty 1913).
+  - id: malaga
+    name: Málaga
+    block: mediterranean-west
+    lat_deg: 36.7167
+    lon_deg: -4.4167
+    record: "GESLA-2, IEO, 1944 to 2012"
+    mean_level_m: 0.43  # REDMAR 3546 (Málaga 3): NMM 61 cm, LAT 18 cm above the zero
+    M2: {amplitude_m: 0.188, phase_deg: 51.1}
+    S2: {amplitude_m: 0.074, phase_deg: 74.7}
+    N2: {amplitude_m: 0.038, phase_deg: 34.6}
+  - id: motril
+    name: Motril
+    block: mediterranean-west
+    lat_deg: 36.7200
+    lon_deg: -3.5240
+    record: "GESLA-2, Puertos del Estado, 2005 to 2015"
+    mean_level_m: 0.39  # REDMAR 3543 (Motril 2): NMM 58 cm, LAT 19 cm
+    M2: {amplitude_m: 0.155, phase_deg: 48.6}
+    S2: {amplitude_m: 0.060, phase_deg: 74.0}
+    N2: {amplitude_m: 0.032, phase_deg: 32.5}
+  - id: almeria
+    name: Almería
+    block: mediterranean-west
+    lat_deg: 36.8300
+    lon_deg: -2.4780
+    record: "GESLA-2, Puertos del Estado, 2006 to 2015"
+    mean_level_m: 0.29  # REDMAR 3545: NMM 39 cm, LAT 10 cm
+    M2: {amplitude_m: 0.096, phase_deg: 50.1}
+    S2: {amplitude_m: 0.039, phase_deg: 75.4}
+    N2: {amplitude_m: 0.019, phase_deg: 35.2}
+  - id: melilla
+    name: Melilla
+    block: mediterranean-west
+    lat_deg: 35.2910
+    lon_deg: -2.9180
+    record: "GESLA-2, Puertos del Estado, 2007 to 2015"
+    mean_level_m: 0.33  # REDMAR 3510: NMM 32 cm, LAT -1 cm
+    M2: {amplitude_m: 0.127, phase_deg: 66.1}
+    S2: {amplitude_m: 0.048, phase_deg: 87.7}
+    N2: {amplitude_m: 0.026, phase_deg: 52.6}
+  - id: ibiza
+    name: Ibiza
+    block: balearics
+    lat_deg: 38.9111
+    lon_deg: 1.4497
+    record: "GESLA-2, Puertos del Estado, 2003 to 2015"
+    mean_level_m: 0.17  # REDMAR 3856 (Ibiza 2): NMM 37 cm, LAT 20 cm
+    M2: {amplitude_m: 0.017, phase_deg: 215.3}
+    S2: {amplitude_m: 0.006, phase_deg: 233.0}
+    N2: {amplitude_m: 0.004, phase_deg: 201.3}
+  - id: formentera
+    name: Formentera (La Savina)
+    block: balearics
+    lat_deg: 38.7347
+    lon_deg: 1.4189
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.16  # REDMAR 3855: NMM 36 cm, LAT 20 cm
+    M2: {amplitude_m: 0.014, phase_deg: 179.6}
+    S2: {amplitude_m: 0.005, phase_deg: 195.4}
+    N2: {amplitude_m: 0.003, phase_deg: 171.3}
+  - id: palma
+    name: Palma
+    block: balearics
+    lat_deg: 39.5603
+    lon_deg: 2.6375
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.16  # REDMAR 3851: NMM -12 cm, LAT -28 cm
+    M2: {amplitude_m: 0.028, phase_deg: 208.5}
+    S2: {amplitude_m: 0.011, phase_deg: 226.3}
+    N2: {amplitude_m: 0.006, phase_deg: 196.9}
+  - id: alcudia
+    name: Alcudia
+    block: balearics
+    lat_deg: 39.8347
+    lon_deg: 3.1392
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.19  # REDMAR 3853: NMM 42 cm, LAT 23 cm
+    M2: {amplitude_m: 0.047, phase_deg: 218.3}
+    S2: {amplitude_m: 0.018, phase_deg: 238.2}
+    N2: {amplitude_m: 0.010, phase_deg: 206.1}
+  - id: mahon
+    name: Mahón
+    block: balearics
+    lat_deg: 39.8930
+    lon_deg: 4.2706
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.20  # REDMAR 3860: NMM -3 cm, LAT -23 cm
+    M2: {amplitude_m: 0.051, phase_deg: 223.6}
+    S2: {amplitude_m: 0.020, phase_deg: 242.8}
+    N2: {amplitude_m: 0.011, phase_deg: 210.1}
+
+  # THE GAUGES OF THE GULF OF LION'S BLOCK, READ AND HELD (package 79d, the region
+  # `gulf-of-lion`). TICON's file read again 2026-10-29 by its coordinates over the block's
+  # box (40.56 to 44.5 N, 3.0 to 7.73 E; the zip at doi.pangaea.de, SHA-256
+  # 7055f8ed1a14abf8...6514, the same file as every block's): ten stations, one record
+  # each, but Monaco's two (the harbour's long record of 1959 to 2014 taken, its short
+  # record of 1999 to 2010 at 43.7328 N 7.4240 E, M2 0.078 m, left out as the same water).
+  # Each named by the station of SHOM's RAM at its coordinates (the WFS layer
+  # RAM_BDD_WLD_WGS84G_WFS:ram_3857, Licence Ouverte 2.0, read 2026-10-29), whose NM gives
+  # every gauge's (Monaco's among them) `mean_level_m` above the zero: VERIFIED. The water is the Mediterranean's, a tide of inches
+  # (M2 four to ten centimetres, the period's "almost imperceptible": Michelot 1715, Smyth
+  # 1854). HELD, as every block's: the world's tide over the block is the nearest of the
+  # eleven alone (Le Conquet's, beyond the reach of every gauge), two metres of M2 where the
+  # gauges have six centimetres; blended, they lie beyond 400 miles of every Channel and
+  # Biscay position and would move no recorded passage (tests/test_tide.py says so).
+  - id: port-vendres
+    name: Port-Vendres
+    block: gulf-of-lion
+    lat_deg: 42.5199
+    lon_deg: 3.1075
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.52  # SHOM's RAM, Port-Vendres's NM
+    M2: {amplitude_m: 0.056, phase_deg: 217.4}
+    S2: {amplitude_m: 0.019, phase_deg: 237.9}
+    N2: {amplitude_m: 0.012, phase_deg: 207.2}
+  - id: sete
+    name: Cette (Sète)
+    block: gulf-of-lion
+    lat_deg: 43.3976
+    lon_deg: 3.6991
+    record: "GESLA-2, REFMAR, 1956 to 2014"
+    mean_level_m: 0.46  # SHOM's RAM, Port de Sète's NM
+    M2: {amplitude_m: 0.062, phase_deg: 211.6}
+    S2: {amplitude_m: 0.023, phase_deg: 232.7}
+    N2: {amplitude_m: 0.013, phase_deg: 201.2}
+  - id: port-camargue
+    name: Port-Camargue (Le Grau-du-Roi)
+    block: gulf-of-lion
+    lat_deg: 43.5203
+    lon_deg: 4.1264
+    record: "GESLA-2, REFMAR, 2009 to 2012"
+    mean_level_m: 0.53  # SHOM's RAM, Port Camargue's NM
+    M2: {amplitude_m: 0.067, phase_deg: 213.3}
+    S2: {amplitude_m: 0.024, phase_deg: 230.6}
+    N2: {amplitude_m: 0.014, phase_deg: 200.3}
+  - id: fos
+    name: Fos-sur-Mer
+    block: gulf-of-lion
+    lat_deg: 43.4049
+    lon_deg: 4.8929
+    record: "GESLA-2, REFMAR, 2006 to 2014"
+    mean_level_m: 0.49  # SHOM's RAM, Fos-sur-Mer's NM (the station 1.4 km from the gauge)
+    M2: {amplitude_m: 0.068, phase_deg: 215.7}
+    S2: {amplitude_m: 0.025, phase_deg: 233.3}
+    N2: {amplitude_m: 0.014, phase_deg: 204.6}
+  - id: marseille
+    name: Marseille
+    block: gulf-of-lion
+    lat_deg: 43.2788
+    lon_deg: 5.3538
+    record: "GESLA-2, REFMAR, 1985 to 2014"
+    mean_level_m: 0.49  # SHOM's RAM, Marseille (Corniche)'s NM
+    M2: {amplitude_m: 0.066, phase_deg: 219.4}
+    S2: {amplitude_m: 0.024, phase_deg: 237.4}
+    N2: {amplitude_m: 0.014, phase_deg: 208.7}
+  - id: toulon
+    name: Toulon
+    block: gulf-of-lion
+    lat_deg: 43.1172
+    lon_deg: 5.9131
+    record: "GESLA-2, REFMAR, 1960 to 2014"
+    mean_level_m: 0.42  # SHOM's RAM, Toulon's NM
+    M2: {amplitude_m: 0.065, phase_deg: 216.6}
+    S2: {amplitude_m: 0.024, phase_deg: 235.7}
+    N2: {amplitude_m: 0.013, phase_deg: 207.1}
+  - id: port-ferreol
+    name: Port Ferréol (by St Raphael)
+    block: gulf-of-lion
+    lat_deg: 43.3591
+    lon_deg: 6.7176
+    record: "GESLA-2, REFMAR, 2012 to 2014"
+    mean_level_m: 0.50  # SHOM's RAM, Port Ferréol's NM
+    M2: {amplitude_m: 0.074, phase_deg: 219.8}
+    S2: {amplitude_m: 0.028, phase_deg: 238.0}
+    N2: {amplitude_m: 0.015, phase_deg: 207.5}
+  - id: la-figueirette
+    name: La Figueirette (Théoule, the gulf of La Napoule)
+    block: gulf-of-lion
+    lat_deg: 43.4835
+    lon_deg: 6.9349
+    record: "GESLA-2, REFMAR, 2011 to 2014"
+    mean_level_m: 0.51  # SHOM's RAM, La Figueirette's NM
+    M2: {amplitude_m: 0.076, phase_deg: 219.9}
+    S2: {amplitude_m: 0.029, phase_deg: 237.7}
+    N2: {amplitude_m: 0.015, phase_deg: 208.4}
+  - id: nice
+    name: Nice
+    block: gulf-of-lion
+    lat_deg: 43.6955
+    lon_deg: 7.2853
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.54  # SHOM's RAM, Nice's NM
+    M2: {amplitude_m: 0.077, phase_deg: 221.4}
+    S2: {amplitude_m: 0.029, phase_deg: 240.2}
+    N2: {amplitude_m: 0.016, phase_deg: 210.7}
+  - id: monaco
+    name: Monaco
+    block: gulf-of-lion
+    lat_deg: 43.7288
+    lon_deg: 7.4215
+    record: "GESLA-2, REFMAR, 1959 to 2014"
+    mean_level_m: 0.52  # SHOM's RAM, Monaco's NM
+    M2: {amplitude_m: 0.070, phase_deg: 224.6}
+    S2: {amplitude_m: 0.028, phase_deg: 242.0}
+    N2: {amplitude_m: 0.014, phase_deg: 212.9}
+
+  # THE GAUGES OF THE LIGURIAN SEA'S BLOCK, READ AND HELD (package 79d, the region
+  # `ligurian-sea`, the Gulf's east part by the lead's ruling): TICON's file read by its
+  # coordinates over the block's box (41.0 to 44.5 N, 7.74 to 11.0 E), the same file:
+  # six stations, one record each. Named as the Gulf's are; the French gauges' (Centuri,
+  # Ajaccio, Solenzara) `mean_level_m` SHOM's RAM's NM (VERIFIED, read 2026-10-29), the
+  # Italian gauges' (Imperia, Genoa, Leghorn) unread (null). HELD, as the Gulf's: the world's
+  # tide over the block is Le Conquet's alone; blended they would move no recorded passage.
+  - id: imperia
+    name: Imperia (Porto Maurizio)
+    block: ligurian-sea
+    lat_deg: 43.8784
+    lon_deg: 8.0188
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.069, phase_deg: 229.9}
+    S2: {amplitude_m: 0.027, phase_deg: 247.8}
+    N2: {amplitude_m: 0.014, phase_deg: 217.9}
+  - id: genoa
+    name: Genoa
+    block: ligurian-sea
+    lat_deg: 44.4101
+    lon_deg: 8.9253
+    record: "GESLA-2, ISPRA (idromare), 1998 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.085, phase_deg: 222.5}
+    S2: {amplitude_m: 0.031, phase_deg: 241.6}
+    N2: {amplitude_m: 0.017, phase_deg: 212.9}
+  - id: leghorn
+    name: Leghorn (Livorno)
+    block: ligurian-sea
+    lat_deg: 43.5464
+    lon_deg: 10.2989
+    record: "GESLA-2, ISPRA (idromare), 1972 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.042, phase_deg: 216.4}
+    S2: {amplitude_m: 0.016, phase_deg: 233.6}
+    N2: {amplitude_m: 0.008, phase_deg: 206.9}
+  - id: centuri
+    name: Centuri (Cape Corse)
+    block: ligurian-sea
+    lat_deg: 42.9658
+    lon_deg: 9.3498
+    record: "GESLA-2, REFMAR, 2010 to 2014"
+    mean_level_m: 0.48  # SHOM's RAM, Centuri's NM
+    M2: {amplitude_m: 0.085, phase_deg: 223.2}
+    S2: {amplitude_m: 0.034, phase_deg: 241.1}
+    N2: {amplitude_m: 0.017, phase_deg: 211.9}
+  - id: ajaccio
+    name: Ajaccio
+    block: ligurian-sea
+    lat_deg: 41.9228
+    lon_deg: 8.7628
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.47  # SHOM's RAM, Ajaccio's NM
+    M2: {amplitude_m: 0.077, phase_deg: 225.4}
+    S2: {amplitude_m: 0.030, phase_deg: 244.0}
+    N2: {amplitude_m: 0.016, phase_deg: 213.7}
+  - id: solenzara
+    name: Solenzara
+    block: ligurian-sea
+    lat_deg: 41.8569
+    lon_deg: 9.4038
+    record: "GESLA-2, REFMAR, 2012 to 2014"
+    mean_level_m: 0.58  # SHOM's RAM, Solenzara's NM
+    M2: {amplitude_m: 0.104, phase_deg: 227.6}
+    S2: {amplitude_m: 0.038, phase_deg: 250.4}
+    N2: {amplitude_m: 0.022, phase_deg: 212.5}
+
+  # THE GAUGES OF THE TYRRHENIAN'S BLOCK, READ AND HELD (package 79d, the region
+  # `tyrrhenian`): TICON's file read by its coordinates over the block's box (38.5 to
+  # 42.5 N, 8 to 15.5 E, less the Ligurian sea's tiles north of 40.99 N and west of
+  # 11.15 E), the same file: eight stations, one record each, ISPRA's (idromare) series in
+  # GESLA-2; their mean levels unread (null). Ortona is the Adriatic's, on the block's north-
+  # eastern shore, its tide another sea's (the phase opposite the Tyrrhenian's): read and
+  # held with the rest, said so. HELD, as the Gulf's: the world's tide over the block is
+  # Le Conquet's alone; blended they would move no recorded passage.
+  - id: carloforte
+    name: Carloforte (San Pietro)
+    block: tyrrhenian
+    lat_deg: 39.1480
+    lon_deg: 8.3095
+    record: "GESLA-2, ISPRA (idromare), 1988 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.065, phase_deg: 232.5}
+    S2: {amplitude_m: 0.026, phase_deg: 254.3}
+    N2: {amplitude_m: 0.013, phase_deg: 220.8}
+  - id: cagliari
+    name: Cagliari
+    block: tyrrhenian
+    lat_deg: 39.2102
+    lon_deg: 9.1143
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.081, phase_deg: 244.2}
+    S2: {amplitude_m: 0.029, phase_deg: 268.7}
+    N2: {amplitude_m: 0.017, phase_deg: 229.2}
+  - id: porto-torres
+    name: Porto Torres
+    block: tyrrhenian
+    lat_deg: 40.8422
+    lon_deg: 8.4039
+    record: "GESLA-2, ISPRA (idromare), 1985 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.066, phase_deg: 252.3}
+    S2: {amplitude_m: 0.026, phase_deg: 273.2}
+    N2: {amplitude_m: 0.014, phase_deg: 243.3}
+  - id: civita-vecchia
+    name: Civita Vecchia
+    block: tyrrhenian
+    lat_deg: 42.0937
+    lon_deg: 11.7897
+    record: "GESLA-2, ISPRA (idromare), 2000 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.102, phase_deg: 236.0}
+    S2: {amplitude_m: 0.038, phase_deg: 254.2}
+    N2: {amplitude_m: 0.021, phase_deg: 223.5}
+  - id: naples
+    name: Naples
+    block: tyrrhenian
+    lat_deg: 40.8409
+    lon_deg: 14.2693
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.113, phase_deg: 244.4}
+    S2: {amplitude_m: 0.042, phase_deg: 265.6}
+    N2: {amplitude_m: 0.023, phase_deg: 230.6}
+  - id: salerno
+    name: Salerno
+    block: tyrrhenian
+    lat_deg: 40.6722
+    lon_deg: 14.7677
+    record: "GESLA-2, ISPRA (idromare), 1991 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.118, phase_deg: 235.4}
+    S2: {amplitude_m: 0.043, phase_deg: 255.6}
+    N2: {amplitude_m: 0.024, phase_deg: 222.3}
+  - id: palinuro
+    name: Palinuro
+    block: tyrrhenian
+    lat_deg: 40.0315
+    lon_deg: 15.2751
+    record: "GESLA-2, ISPRA (idromare), 1987 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.110, phase_deg: 244.7}
+    S2: {amplitude_m: 0.041, phase_deg: 265.6}
+    N2: {amplitude_m: 0.022, phase_deg: 230.5}
+  - id: ortona
+    name: Ortona (the Adriatic)
+    block: tyrrhenian
+    lat_deg: 42.3560
+    lon_deg: 14.4149
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.066, phase_deg: 68.3}
+    S2: {amplitude_m: 0.047, phase_deg: 77.5}
+    N2: {amplitude_m: 0.010, phase_deg: 65.0}
+
+# THE CHANNEL EAST'S GAUGES (package 39a): BOURNEMOUTH AND PORTSMOUTH, the Solent's
+# (package 94). TICON.txt was read again (the zip at doi.pangaea.de, fetched 2026-10-09,
+# SHA-256 7055f8ed…6514, 1,621,262 bytes), the block's water searched by coordinates (48.4
+# to 51 N, 3.8 to 0.7 W): the file has Weymouth, St Helier, Saint-Malo and Cherbourg, which
+# are four of the eleven above and whose figures it gives again to the centimetre and the
+# degree (verified), and two more, Bournemouth and Portsmouth, below. It has no gauge at St
+# Peter Port, Dartmouth or Portland. The two were HELD, read by nothing, from 39a to 89
+# (they lie in channel-mid, whose water west of 1 W the recorded passages are pinned on);
+# since package 94 they serve the manifest's tide region `solent` (the Solent, Spithead
+# and Poole bay: bounds and no tiles, for the gauges' membership alone), under the seam's
+# taper, and no position outside it. Their mean levels above the chart's datum are
+# UNVERIFIED (no source read for them): the level there is the eleven's, as before.
+  - id: bournemouth
+    name: Bournemouth
+    block: solent
+    lat_deg: 50.7143
+    lon_deg: -1.8749
+    record: "GESLA-2, BODC, 1996 to 2013"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.413, phase_deg: 273.3}
+    S2: {amplitude_m: 0.184, phase_deg: 292.3}
+    N2: {amplitude_m: 0.107, phase_deg: 247.9}
+  - id: portsmouth
+    name: Portsmouth
+    block: [solent, channel-east]  # the rule of the seams (package 94, step 5)
+    lat_deg: 50.8026
+    lon_deg: -1.1118
+    record: "GESLA-2, BODC, 1991 to 2014"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 1.410, phase_deg: 326.7}
+    S2: {amplitude_m: 0.436, phase_deg: 13.4}
+    N2: {amplitude_m: 0.276, phase_deg: 303.9}

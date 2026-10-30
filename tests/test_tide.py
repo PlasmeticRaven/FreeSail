@@ -318,6 +318,28 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
 # The waters whose rates, springs and neaps, are the period's own (package 39a).
 # (package 79b: the Looe, Mackenzie's survey as White 1835 quotes it, three knots and two)
 PERIOD_RATES = {"alderney-race", "the-looe"}
+# package 79c: the Mediterranean west's areas that carry the period's constant current (the
+# Balearic channels' follows the wind and is none), in the file's order
+MED_WEST_CURRENTS = [
+    "cape-palos-offing",
+    "granada-coast",
+    "barbary-inshore-west",
+    "barbary-algiers",
+    "alboran-sea",
+    "med-west-open",
+]
+# package 79d: the Mediterranean blocks' charts, whose areas carry the coasts' constant sets
+# and no tide (`current:` alone), and their areas' ids
+MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian"}
+MEDITERRANEAN_AREAS = (
+    "provence-current",
+    "gulf-of-lion-open",
+    "riviera-current",
+    "bonifacio-strait",
+    "ligurian-sea-open",
+    "roman-coast-current",
+    "tyrrhenian-open",
+)
 
 
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
@@ -423,7 +445,8 @@ def test_the_gauges_within_reach_are_blended_and_beyond_every_gauge_the_nearest_
     """The interpolation is honest about distance: every position of the Channel's
     region blends the eleven gauges as package 34 pinned it (the reach is more than the
     farthest point of the region lies from Dover); off Lisbon, beyond the reach of every
-    gauge, the constants are Brest's alone and the state says it is far."""
+    gauge, the constants are Brest's alone and the state says it is far (package 89: west
+    of Portugal's block, whose own gauges serve Lisbon's water and no farther)."""
     assert tide.reach_m == 400 * units.NAUTICAL_MILE
     for pos in (THE_LIZARD, Position(48.0, -7.0), Position(51.0, -3.0), Position(48.0, -3.0)):
         _, consts, nearest_nm, far = tide.constants_about(pos)
@@ -432,12 +455,13 @@ def test_the_gauges_within_reach_are_blended_and_beyond_every_gauge_the_nearest_
         assert all(bearing_and_distance(pos, g.position)[1] <= tide.reach_m for g in tide.gauges), (
             pos
         )
-    off_lisbon = Position(38.6, -9.4)
+    off_lisbon = Position(38.6, -10.5)  # thirty miles west of the block's bound at 10 W
+    assert not tide.blocks_at(off_lisbon)
     level, consts, nearest_nm, far = tide.constants_about(off_lisbon)
     gauge, distance_nm = tide.nearest_gauge(off_lisbon)
     assert far and gauge.id == "le-conquet"  # the westernmost of the French gauges
     assert 550.0 < nearest_nm == pytest.approx(distance_nm, abs=1.0)
-    assert level == gauge.mean_level_m
+    assert level == pytest.approx(gauge.mean_level_m, abs=1e-9)  # w x level / w, rounded
     for name, (amp, lag) in consts.items():
         assert amp == pytest.approx(gauge.constants[name][0]) and lag == pytest.approx(
             gauge.constants[name][1]
@@ -445,6 +469,9 @@ def test_the_gauges_within_reach_are_blended_and_beyond_every_gauge_the_nearest_
     state = tide.at(off_lisbon, datetime(1805, 6, 12, 12, 0))
     assert state.far and state.gauge_nm == pytest.approx(nearest_nm)
     assert not tide.at(THE_LIZARD, datetime(1805, 6, 12, 12, 0)).far
+    # within the block (package 89) Cascais is near and the place is not far
+    inside = tide.at(Position(38.6, -9.4), datetime(1805, 6, 12, 12, 0))
+    assert not inside.far and inside.gauge_nm < 10.0
 
 
 def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(tide):
@@ -550,15 +577,21 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     """The brief: TICON's gauges of the block read as package 34 read the file, the
     eleven gauges and their figures unmoved. The file has Weymouth, St Helier, Saint-Malo
     and Cherbourg (four of the eleven) and Bournemouth and Portsmouth beside them, which
-    are held, read by nothing (a twelfth gauge would move every Channel position's
-    blend); it has none at St Peter Port, Dartmouth or Portland."""
+    were held, read by nothing (a twelfth gauge would move every Channel position's
+    blend), and since package 94 serve the tide region `solent` alone; it has none at St
+    Peter Port, Dartmouth or Portland."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # the Channel east's two (Biscay north's nine, package 39b, are held beside them;
-    # the Channel's east block's six, package 79b, east of 1 W)
-    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0}
+    # the Channel east's two (the Channel's east block's six, package 79b, east of 1 W)
+    held = {
+        g["id"]: g
+        for g in doc["gauges"]
+        if g.get("block") and g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0
+    }
     assert set(held) == {"bournemouth", "portsmouth"}
+    assert all(_own_block(g) == "solent" for g in held.values())
+    assert "held_gauges" not in doc
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
     assert {"weymouth", "st-helier", "saint-malo", "cherbourg"} <= {g.id for g in tide.gauges}
@@ -575,21 +608,44 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
 # ---------------------------------------------------------------------------
 
 
-def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_the_channel(tide):
-    """TICON's nine gauges of Biscay north are read into `held_gauges:` in the eleven's
-    form, their mean levels SHOM's RAM's; the world blends the eleven alone, since a
-    gauge of the block within the reach would move the Channel's tide (the finding: the
-    engine has no rule yet that keeps a gauge to its own water)."""
+def _blocks_gauges(doc, block):
+    """A block's gauges as the file has them (package 89: `gauges:` entries with their
+    `block:`, after the eleven): those whose own block it is, the first of a list (package
+    94: a list's further blocks are the rule of the seams')."""
+    return [g for g in doc["gauges"] if _own_block(g) == block]
+
+
+def _own_block(g):
+    raw = g.get("block")
+    return raw[0] if isinstance(raw, list) else raw
+
+
+def _naive_blend(doc):
+    """The tide every gauge of the file would give if each served every position: the
+    blend the blocks' gauges were held out of until package 89 (their levels unread taken
+    as Dover's 3.7 for the trial alone, never in the file)."""
+    gauges = [
+        {k: v for k, v in g.items() if k != "block"} | {"mean_level_m": g["mean_level_m"] or 3.7}
+        for g in doc["gauges"]
+    ]
+    return T.Tide({**doc, "gauges": gauges}, {"areas": []})
+
+
+def _the_eleven_alone(doc):
+    """The tide the eleven alone give (the world's before package 89, everywhere)."""
+    return T.Tide({**doc, "gauges": [g for g in doc["gauges"] if "block" not in g]}, {"areas": []})
+
+
+def test_the_blocks_gauges_are_read_and_serve_their_own_water_and_not_the_channels(tide):
+    """TICON's nine gauges of Biscay north, read in the eleven's form, their mean levels
+    SHOM's RAM's; since package 89 `gauges:` entries with `block: biscay-north`, serving
+    the positions within the block's bounds and no other, so that the Channel's tide does
+    not move (blended everywhere they would move Falmouth's, the finding of 39b) and the
+    world's tide over the block is its own gauges'."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # the block's nine, after the Channel east's two (package 39a) under the same key
-    held = [g for g in doc["held_gauges"] if 45.9 <= g["lat_deg"] < 48.0]
-    south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]  # package 39c's
-    # (Portugal and Cadiz's five, package 39d, after them, south of 42 N)
-    north_of_42 = [g for g in doc["held_gauges"] if g["lat_deg"] >= 42.0]
-    # (and the Channel's east block's six, package 79b)
-    assert len(north_of_42) == 2 + 6 + len(held) + len(south)
+    held = _blocks_gauges(doc, "biscay-north")
     assert [g["id"] for g in held] == [
         "concarneau",
         "port-tudy",
@@ -606,20 +662,31 @@ def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_th
         assert g["record"].startswith("GESLA-2, REFMAR") and 3.0 <= g["mean_level_m"] <= 4.0
         for name in ("M2", "S2", "N2"):
             assert 0.2 < g[name]["amplitude_m"] < 2.0 and 70.0 < g[name]["phase_deg"] < 150.0
+    # (north of 42 N and west of 3 E: the Channel east's two of 39a, the Solent's since 94, the
+    # Channel's east block's six of 79b and Biscay south's eleven of 39c beside these)
+    north_of_42 = [
+        g
+        for g in doc["gauges"]
+        if g["lat_deg"] >= 42.0
+        and g["lon_deg"] < 3.0
+        and g["id"] not in {x.id for x in tide.gauges}
+    ]
+    assert len(north_of_42) == 2 + 6 + len(held) + len(_blocks_gauges(doc, "biscay-south"))
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & {g["id"] for g in held}
-    # what blending them would do: the tide at Falmouth moves (and with it every passage)
-    blended = T.Tide({**doc, "gauges": doc["gauges"] + held}, {"areas": []})
+    assert {g.id for g in tide.block_gauges} >= {g["id"] for g in held}
+    # what blending them everywhere would do: the tide at Falmouth moves (and with it
+    # every passage); by the rule it does not
+    eleven = _the_eleven_alone(doc)
     _, here = tide.constants_at(FALMOUTH)
-    _, there = blended.constants_at(FALMOUTH)
+    _, there = _naive_blend(doc).constants_at(FALMOUTH)
     assert abs(here["M2"][1] - there["M2"][1]) > 0.05  # degrees of phase
-    # over the block the world's tide is the eleven's blend, and wrong there: off the Isle
-    # of Aix its M2 lags 160 degrees where the gauge's own is 97.7 (two hours late, the
-    # Channel's later tide of St Malo and Jersey in the blend), and its range is the
-    # Channel's (the finding; the gauges blended would give the gauge's own)
-    _, aix = tide.constants_at(Position(46.0074, -1.1743))
-    assert 150.0 < aix["M2"][1] < 170.0
-    _, own = blended.constants_at(Position(46.0074, -1.1743))
-    assert abs(own["M2"][1] - 97.7) < 1.0
+    assert tide.constants_about(FALMOUTH) == eleven.constants_about(FALMOUTH)
+    # over the block the eleven's blend was wrong: off the Isle of Aix its M2 lagged 160
+    # degrees where the gauge's own is 97.7 (two hours late, the Channel's later tide of
+    # St Malo and Jersey in the blend); the world's is the gauge's own now
+    aix = Position(46.0074, -1.1743)
+    assert 150.0 < eleven.constants_at(aix)[1]["M2"][1] < 170.0
+    assert abs(tide.constants_at(aix)[1]["M2"][1] - 97.7) < 1.0
 
 
 def test_the_blocks_stream_areas_keep_off_the_recorded_passages_other_sail(tide):
@@ -647,16 +714,16 @@ def test_the_blocks_stream_areas_keep_off_the_recorded_passages_other_sail(tide)
 # ---------------------------------------------------------------------------
 
 
-def test_biscay_souths_gauges_are_read_and_held_and_the_worlds_tide_there_is_late(tide):
-    """TICON's eleven gauges of Biscay south and Galicia, four French and seven Spanish,
-    held beside Biscay north's under the same key: the French mean levels SHOM's RAM's,
-    the Spanish unverified (null); the world blends the Channel's eleven alone, so that
-    over the block its tide is the Channel's water and late, at Vigo and much more at
-    Santander (the finding a rule for a gauge's own water would mend)."""
+def test_biscay_souths_gauges_are_read_and_serve_their_block_and_its_tide_is_no_longer_late(tide):
+    """TICON's eleven gauges of Biscay south and Galicia, four French and seven Spanish:
+    the French mean levels SHOM's RAM's, the Spanish unverified (null). While they were
+    held the world blended the Channel's eleven alone, so that over the block its tide was
+    the Channel's water and late, at Vigo and much more at Santander; since package 89
+    they serve the block (`block: biscay-south`) and its tide is theirs."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]
+    south = _blocks_gauges(doc, "biscay-south")
     assert [g["id"] for g in south] == [
         "le-verdon",
         "arcachon",
@@ -680,10 +747,14 @@ def test_biscay_souths_gauges_are_read_and_held_and_the_worlds_tide_there_is_lat
             assert 0.2 < g[name]["amplitude_m"] < 1.6 and 55.0 < g[name]["phase_deg"] < 160.0
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & {g["id"] for g in south}
     held = {g["id"]: g for g in south}
+    eleven = _the_eleven_alone(doc)
     for gid, late_deg in (("vigo", 15.0), ("santander", 45.0)):
         g = held[gid]
-        _, world = tide.constants_at(Position(g["lat_deg"], g["lon_deg"]))
-        assert world["M2"][1] - g["M2"]["phase_deg"] > late_deg, gid
+        at = Position(g["lat_deg"], g["lon_deg"])
+        _, was = eleven.constants_at(at)
+        assert was["M2"][1] - g["M2"]["phase_deg"] > late_deg, gid
+        _, world = tide.constants_at(at)
+        assert abs(world["M2"][1] - g["M2"]["phase_deg"]) < 1.0, gid
 
 
 def test_biscay_souths_stream_areas_are_the_blocks_and_before_the_open_channel(tide):
@@ -718,35 +789,40 @@ def test_biscay_souths_stream_areas_are_the_blocks_and_before_the_open_channel(t
 # ---------------------------------------------------------------------------
 
 
-def test_portugals_gauges_are_read_and_held_and_the_worlds_tide_there_is_le_conquets(tide):
+def test_portugals_gauges_are_read_and_serve_their_block_where_le_conquets_tide_was(tide):
     """TICON's five records of the block (Cascais, Lagos, Huelva, Bonanza, Cadiz; none at
-    Leixões, Lisbon or Setúbal) read into `held_gauges:` in the eleven's form, the mean
-    levels REDMAR's where read and judgement or none where not; held, so the world's tide
-    over the block is still the nearest of the eleven alone, far, which is twice the
-    range and an hour and three-quarters late (the finding)."""
+    Leixões, Lisbon or Setúbal) read in the eleven's form, the mean levels REDMAR's where
+    read and judgement or none where not. While they were held the world's tide over the
+    block was the nearest of the eleven alone, far, twice the range and an hour and
+    three-quarters late (the finding); since package 89 (`block: portugal`) Cascais has
+    its own tide, and no Channel position moves (every one beyond the reach of them all)."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # (the block's box by longitude too: package 39e's islands lie in its latitudes)
-    held = {
-        g["id"]: g
-        for g in doc["held_gauges"]
-        if 36.4 <= g["lat_deg"] <= 42.0 and -10.0 <= g["lon_deg"] <= -6.0
-    }
+    held = {g["id"]: g for g in _blocks_gauges(doc, "portugal")}
     assert list(held) == ["cascais", "lagos", "huelva", "bonanza", "cadiz"]
+    for g in held.values():
+        assert 36.4 <= g["lat_deg"] <= 42.0 and -10.0 <= g["lon_deg"] <= -6.0, g["id"]
     assert (held["huelva"]["mean_level_m"], held["bonanza"]["mean_level_m"]) == (1.96, 1.54)
     assert held["cadiz"]["mean_level_m"] is None  # unverified, not invented
     for g in held.values():
         assert 0.9 < g["M2"]["amplitude_m"] < 1.1 and 55.0 < g["M2"]["phase_deg"] < 65.0
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
-    level, consts, nearest_nm, far = tide.constants_about(Position(38.6917, -9.4167))
-    assert far and nearest_nm > 550.0 and consts["M2"][0] > 2.0  # Le Conquet's
-    # blended, the block's own gauges would give Cascais its own tide and move no Channel
-    # position (every one beyond the reach of them all)
-    with_levels = [g for g in held.values() if g["mean_level_m"] is not None]  # not Cadiz
-    blended = T.Tide({**doc, "gauges": doc["gauges"] + with_levels}, {"areas": []})
-    _, own = blended.constants_at(Position(38.6917, -9.4167))
+    cascais = Position(38.6917, -9.4167)
+    level, consts, nearest_nm, far = _the_eleven_alone(doc).constants_about(cascais)
+    assert far and nearest_nm > 550.0 and consts["M2"][0] > 2.0  # Le Conquet's, as it was
+    level, own, nearest_nm, far = tide.constants_about(cascais)
+    assert not far and nearest_nm < 1.0
     assert own["M2"][0] == pytest.approx(0.996, abs=0.01)
+    assert level == pytest.approx(2.0, abs=0.05)  # Cascais's and Lagos's judgement, 2.0
+    # blended everywhere, these would move no Channel position either (all beyond reach)
+    with_levels = [
+        {k: v for k, v in g.items() if k != "block"}
+        for g in held.values()
+        if g["mean_level_m"] is not None
+    ]
+    eleven = [g for g in doc["gauges"] if "block" not in g]
+    blended = T.Tide({**doc, "gauges": eleven + with_levels}, {"areas": []})
     _, here = tide.constants_at(FALMOUTH)
     _, there = blended.constants_at(FALMOUTH)
     assert here["M2"] == pytest.approx(there["M2"])
@@ -798,10 +874,13 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
     area = tide.area_at(MID_STRAIT)
     assert area.id == "strait-middle" and area.chart == "strait"
     assert (area.current_toward_deg, area.current_kn) == (90.0, 2.0)
-    assert [a.id for a in tide.areas if a.current_kn] == [
+    # (package 79d: the Mediterranean blocks' areas carry the coasts' sets, below)
+    assert [a.id for a in tide.areas if a.current_kn and a.chart not in MEDITERRANEAN] == [
         "strait-middle",
         "strait-east-mouth",
         "strait-west-approach",
+        # package 79c: the Mediterranean west's currents, some 900 miles from the Channel
+        *MED_WEST_CURRENTS,
     ]
     start = datetime(1805, 6, 12, 0, 0)  # springs
     states = [tide.at(MID_STRAIT, start + timedelta(minutes=10 * i)) for i in range(6 * 25)]
@@ -823,7 +902,12 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         for i in range(6 * 25)
     ]
     assert sum(shore_east) / len(shore_east) == pytest.approx(0.0, abs=0.2)
-    assert all(a.current_kn == 0.0 for a in tide.areas if a.chart != "strait")
+    assert all(
+        a.current_kn == 0.0
+        for a in tide.areas
+        if a.chart not in {"strait", *MEDITERRANEAN}  # package 79d
+        and a.id not in MED_WEST_CURRENTS  # package 79c
+    )
 
 
 def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_strait():
@@ -845,6 +929,8 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
         a.current_kn == 0.0
         for a in book.areas
         if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
+        and a.id not in MED_WEST_CURRENTS  # package 79c
+        and not a.id.startswith(MEDITERRANEAN_AREAS)
     )
     sc = Scenario(
         start_time=datetime(1805, 6, 12, 10, 0),
@@ -862,37 +948,45 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
     assert "the current two knots to the E" in allowed["words"]
 
 
-def test_the_straits_gauges_are_read_and_held_and_would_move_no_channel_position(tide):
-    """TICON's file has Ceuta, Tarifa, Algeciras and Gibraltar (none at Tangier); they are
-    held, as the brief has it, so the world's tide over the Strait is Le Conquet's alone
-    (the nearest of the eleven, beyond the reach of every one), marked far: two metres of
-    M2 where Gibraltar's own is 0.31. Unlike Biscay's, they lie beyond the reach of every
-    position of the Channel's and Biscay north's regions, so blending them would move no
-    recorded passage's tide; over the Strait it would give the gauges' own."""
+def test_the_straits_gauges_are_read_and_serve_the_strait_and_move_no_channel_position(tide):
+    """TICON's file has Ceuta, Tarifa, Algeciras and Gibraltar (none at Tangier). While
+    they were held the world's tide over the Strait was Le Conquet's alone (the nearest of
+    the eleven, beyond the reach of every one), marked far: two metres of M2 where
+    Gibraltar's own is 0.31. They lie beyond the reach of every position of the Channel's
+    and Biscay north's regions, so they would move no recorded passage's tide whatever
+    their water; since package 89 (`block: strait`) they serve the Strait, and the world's
+    tide there is theirs. Their mean levels unread, the level there stays the eleven's (Le
+    Conquet's 3.98 m), as it was, not invented."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    held = {
-        g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] < 36.4 and g["lon_deg"] > -7.0
-    }  # the block's
+    held = {g["id"]: g for g in _blocks_gauges(doc, "strait")}
     assert list(held) == ["ceuta", "tarifa", "algeciras", "gibraltar"]
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert not set(held) & {g.id for g in tide.gauges}
     gib = Position(held["gibraltar"]["lat_deg"], held["gibraltar"]["lon_deg"])
-    level, consts, nearest_nm, far = tide.constants_about(gib)
-    assert far and tide.nearest_gauge(gib)[0].id == "le-conquet" and nearest_nm > 700.0
-    assert consts["M2"][0] > 1.9 and held["gibraltar"]["M2"]["amplitude_m"] == 0.307
+    eleven = _the_eleven_alone(doc)
+    was_level, was, was_nm, was_far = eleven.constants_about(gib)
+    assert was_far and eleven.nearest_gauge(gib)[0].id == "le-conquet" and was_nm > 700.0
+    assert was["M2"][0] > 1.9 and held["gibraltar"]["M2"]["amplitude_m"] == 0.307
+    level, own, nearest_nm, far = tide.constants_about(gib)
+    assert not far and tide.nearest_gauge(gib)[0].id == "gibraltar" and nearest_nm < 1.0
+    assert abs(own["M2"][0] - 0.307) < 0.02
+    assert level == was_level == pytest.approx(3.98)  # the eleven's, the gauges' unread
     for g in held.values():
         here = Position(g["lat_deg"], g["lon_deg"])
         for corner in (Position(48.0, -7.0), Position(45.9, -0.9), Position(45.9, -5.0)):
             assert bearing_and_distance(here, corner)[1] > tide.reach_m
-    # (their mean levels unread: nought for the blend's arithmetic, which the M2 test ignores)
-    added = [{**g, "mean_level_m": 0.0} for g in held.values()]
-    blended = T.Tide({**doc, "gauges": doc["gauges"] + added}, {"areas": []})
+    # (their mean levels unread: nought for the trial's arithmetic, which the M2 test
+    # ignores) blended everywhere, they would change no Channel or Biscay north position
+    added = [
+        {**{k: v for k, v in g.items() if k != "block"}, "mean_level_m": 0.0} for g in held.values()
+    ]
+    trial = T.Tide(
+        {**doc, "gauges": [g for g in doc["gauges"] if "block" not in g] + added}, {"areas": []}
+    )
     for pos in (FALMOUTH, THE_LIZARD, Position(48.0, -7.0), Position(46.0, -1.2)):
-        assert blended.constants_at(pos)[1] == tide.constants_at(pos)[1]
-    _, own = blended.constants_at(gib)
-    assert abs(own["M2"][0] - 0.307) < 0.02
+        assert trial.constants_at(pos)[1] == eleven.constants_at(pos)[1]
 
 
 def test_torbay_is_its_own_water_with_next_to_no_stream(tide):
@@ -918,17 +1012,18 @@ def test_torbay_is_its_own_water_with_next_to_no_stream(tide):
 # ---------------------------------------------------------------------------
 
 
-def test_the_east_blocks_six_gauges_are_held_and_blending_them_would_move_the_channel(tide):
+def test_the_east_blocks_six_gauges_serve_the_block_and_move_no_channel_position(tide):
     """TICON's gauges of the block (Newhaven, Le Havre, Dieppe, Boulogne, Calais, Dunkirk;
-    Dover among the eleven) read into `held_gauges:` after the last, the French mean levels
-    SHOM's RAM's and Newhaven's unverified; held, because every one is within the reach of
-    every Channel position and would move Falmouth's tide and every recorded passage. What
-    holding them costs: the world's tide over the block is the eleven's blend, whose range
-    at Newhaven and Dieppe is a fifth of the gauges' own."""
+    Dover among the eleven), the French mean levels SHOM's RAM's and Newhaven's unverified.
+    Every one is within the reach of every Channel position and, blended everywhere, would
+    move Falmouth's tide and every recorded passage, so they were held, and the world's
+    tide over the block was the eleven's blend, whose range at Newhaven and Dieppe was a
+    fifth of the gauges' own. Since package 89 (`block: channel-east`) they serve the
+    block's water and no other: Falmouth's tide is the eleven's, the block's its own."""
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    held = [g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] > -1.0]
+    held = _blocks_gauges(doc, "channel-east")
     assert [g["id"] for g in held] == [
         "newhaven",
         "le-havre",
@@ -941,17 +1036,25 @@ def test_the_east_blocks_six_gauges_are_held_and_blending_them_would_move_the_ch
     assert all(3.0 < g["mean_level_m"] < 5.5 for g in held[1:])
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & {g["id"] for g in held}
     # Newhaven's level unread: Dover's taken for the trial blend alone (never in the file)
-    trial = [{**g, "mean_level_m": g["mean_level_m"] or 3.7} for g in held]
-    blended = T.Tide({**doc, "gauges": doc["gauges"] + trial}, {"areas": []})
+    trial = [
+        {**{k: v for k, v in g.items() if k != "block"}, "mean_level_m": g["mean_level_m"] or 3.7}
+        for g in held
+    ]
+    eleven_doc = [g for g in doc["gauges"] if "block" not in g]
+    blended = T.Tide({**doc, "gauges": eleven_doc + trial}, {"areas": []})
+    eleven = _the_eleven_alone(doc)
     _, here = tide.constants_at(FALMOUTH)
     _, there = blended.constants_at(FALMOUTH)
-    assert here["M2"] != there["M2"]  # blending them would move the recorded passages
+    assert here["M2"] != there["M2"]  # blended everywhere they would move the passages
+    assert tide.constants_about(FALMOUTH) == eleven.constants_about(FALMOUTH)  # they do not
     for g in (held[0], held[2]):  # Newhaven and Dieppe
         at = Position(g["lat_deg"], g["lon_deg"])
-        _, world = tide.constants_at(at)
         gauge_range = 2.0 * (g["M2"]["amplitude_m"] + g["S2"]["amplitude_m"])
+        _, was = eleven.constants_at(at)
+        assert 2.0 * (was["M2"][0] + was["S2"][0]) < 0.5 * gauge_range, g["id"]
+        _, world = tide.constants_at(at)
         world_range = 2.0 * (world["M2"][0] + world["S2"][0])
-        assert world_range < 0.5 * gauge_range, (g["id"], world_range, gauge_range)
+        assert world_range == pytest.approx(gauge_range, abs=0.05), (g["id"], world_range)
 
 
 def test_the_east_blocks_waters_answer_from_their_own_areas_before_the_open_channels():
@@ -978,3 +1081,158 @@ def test_the_east_blocks_waters_answer_from_their_own_areas_before_the_open_chan
     for a in book.areas:
         if a.id in {"spithead-road", "the-looe", "channel-east-open"}:
             assert min(lon for _, lon in a.polygon) > -1.3
+
+
+# ---------------------------------------------------------------------------
+# Package 89: the held gauges' water
+# ---------------------------------------------------------------------------
+
+
+def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does_not(tide):
+    """Item 2: the blocks' gauges are `gauges:` entries each with its `block:`, a region
+    of the chart's manifest, the eleven with none; the loader refuses a `block:` that
+    names no region, a block the manifest does not name, and a gauge with no block and no
+    mean level (a block's gauge that lost its block would serve every position). The
+    figures are the eleven's form, unmoved; Newhaven's mean level stays null. Each gauge
+    lies within its own block's bounds."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    bounds = T.region_bounds()
+    blocks = [g for g in doc["gauges"] if "block" in g]
+    assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 75
+    for g in blocks:
+        # its own block first (a list's further blocks are the rule of the seams': below)
+        own = g["block"][0] if isinstance(g["block"], list) else g["block"]
+        s, n, w, e = bounds[own]
+        assert s <= g["lat_deg"] <= n and w <= g["lon_deg"] <= e, g["id"]
+    assert {
+        b for g in blocks for b in (g["block"] if isinstance(g["block"], list) else [g["block"]])
+    } == {
+        "biscay-north",
+        "biscay-south",
+        "portugal",
+        "madeira",
+        "azores",
+        "strait",
+        "channel-east",
+        "mediterranean-west",
+        "balearics",
+        "gulf-of-lion",
+        "ligurian-sea",
+        "tyrrhenian",
+        "solent",  # package 94: a tide region of the manifest, bounds and no tiles
+    }
+    newhaven = next(g for g in blocks if g["id"] == "newhaven")
+    assert newhaven["mean_level_m"] is None
+    assert next(g for g in tide.block_gauges if g.id == "newhaven").mean_level_m is None
+    eleven = [g for g in doc["gauges"] if "block" not in g]
+    dieppe = next(g for g in blocks if g["id"] == "dieppe")
+    for bad, words in (
+        ({**dieppe, "block": None}, "names no region"),
+        ({**dieppe, "block": []}, "names no region"),
+        ({**dieppe, "block": "the-thames"}, "does not name"),
+        ({k: v for k, v in newhaven.items() if k != "block"}, "no mean level and no block"),
+    ):
+        with pytest.raises(ValueError, match=words):
+            T.Tide({**doc, "gauges": eleven + [bad]}, {"areas": []})
+    # a block that became two or three may be named as a list of its regions
+    both = T.Tide(
+        {**doc, "gauges": eleven + [{**dieppe, "block": ["channel-east", "channel-mid"]}]},
+        {"areas": []},
+    )
+    assert both.block_gauges[0].blocks == ("channel-east", "channel-mid")
+
+
+def test_the_fill_is_raised_by_the_elevens_level_as_the_tiles_were_built():
+    """`tools/build_charts.py`'s `mean_level_grid`, which raises GEBCO's fill to the
+    chart's datum, reads the eleven alone as it did when every tile was built, so that a
+    rebuild moves no tile by the rule; the world's own mean level over a block is now its
+    gauges' where they have one (over the Channel's east block a metre above the raise at
+    Dieppe), which docs/dev/TuningNotes.md, package 89, says for the rebuild the lead
+    orders."""
+    import importlib.util
+    import sys
+    from pathlib import Path
+
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "build_charts", root / "tools" / "build_charts.py"
+    )
+    tool = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = tool
+    spec.loader.exec_module(tool)
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    eleven = T.Tide(
+        {**doc, "gauges": [g for g in doc["gauges"] if "block" not in g]}, {"areas": []}
+    )
+    tide = T.load_tide()
+    box = {"south": 49.0, "north": 51.5, "west": -1.0, "east": 2.5}
+    grid = tool.mean_level_grid(box)
+    cell = tool.FILL_LEVEL_CELL_DEG
+    for lat, lon in ((49.93, 1.08), (50.78, 0.06), (51.0, 2.0), (49.5, -0.5)):
+        r = int((lat - (math.floor(box["south"] / cell) * cell - cell)) / cell)
+        c = int((lon - (math.floor(box["west"] / cell) * cell - cell)) / cell)
+        centre = Position(
+            math.floor(box["south"] / cell) * cell - cell + (r + 0.5) * cell,
+            math.floor(box["west"] / cell) * cell - cell + (c + 0.5) * cell,
+        )
+        assert float(grid.values[r, c]) == pytest.approx(eleven.constants_at(centre)[0], abs=0.01)
+    dieppe = Position(49.9292, 1.0845)
+    assert tide.constants_at(dieppe)[0] - eleven.constants_at(dieppe)[0] > 0.9
+
+
+def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(tide):
+    """Package 94, step 5 (the lead's ruling of 2026-10-30): a gauge serves its own block,
+    and also a block whose seam with its own lies within the taper's band
+    (`SEAM_BAND_NM`, ten miles) of the gauge, since the water a cable either side of a seam
+    is the near gauge's and no other's; a gauge beyond the band of a seam serves its own
+    block alone. Today the rule catches three: Portsmouth's (4.2 miles from 1 W, the
+    Solent's and the Channel east's), the Isle of Aix's (6.4 from 45.9 N, Biscay north's
+    and south's) and Cadiz's (8.0 from 36.4 N, Portugal's and the Strait's); Bournemouth,
+    Gibraltar (17 miles from 5 W) and every other gauge their own block's alone."""
+    bounds = T.region_bounds()
+
+    def seams(a: str, b: str) -> list[tuple[str, float, float, float]]:
+        s1, n1, w1, e1 = bounds[a]
+        s2, n2, w2, e2 = bounds[b]
+        out = []
+        for x in {w1, e1} & {w2, e2}:
+            if min(n1, n2) > max(s1, s2):
+                out.append(("lon", x, max(s1, s2), min(n1, n2)))
+        for y in {s1, n1} & {s2, n2}:
+            if min(e1, e2) > max(w1, w2):
+                out.append(("lat", y, max(w1, w2), min(e1, e2)))
+        return out
+
+    def miles(p: Position, seam: tuple[str, float, float, float]) -> float:
+        axis, at, lo, hi = seam
+        lon_nm = 60.0 * math.cos(math.radians(p.lat_deg))
+        if axis == "lat":
+            return math.hypot(
+                (p.lat_deg - at) * 60.0, (p.lon_deg - min(max(p.lon_deg, lo), hi)) * lon_nm
+            )
+        return math.hypot(
+            (p.lon_deg - at) * lon_nm, (p.lat_deg - min(max(p.lat_deg, lo), hi)) * 60.0
+        )
+
+    names = sorted({b for g in tide.block_gauges for b in g.blocks})
+    caught = {}
+    for g in tide.block_gauges:
+        own = g.blocks[0]
+        near = {
+            b
+            for b in names
+            if b != own and any(miles(g.position, sm) <= T.SEAM_BAND_NM for sm in seams(own, b))
+        }
+        assert set(g.blocks[1:]) == near, (g.id, g.blocks, near)
+        if near:
+            caught[g.id] = g.blocks
+    assert caught == {
+        "portsmouth": ("solent", "channel-east"),
+        "ile-daix": ("biscay-north", "biscay-south"),
+        "cadiz": ("portugal", "strait"),
+    }

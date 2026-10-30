@@ -1,0 +1,1379 @@
+# The features of the Gulf of Lion's block (package 79d, the region `gulf-of-lion`;
+# docs/dev/ChartBlocks.md): Cape Creus and the Roussillon, the Languedoc shore and the
+# mouths of the Rhone, Marseille, Toulon and its roads, where the French fleet lay in 1803
+# to 1805 under Nelson's watch, the Hyeres islands and their road, and Provence and the
+# Riviera to Nice, Villefranche, Monaco and Ventimiglia, west of 7.73 E. East of it, from
+# San Remo and Genoa to Leghorn, Elba, Corsica and the Maddalena, is the region
+# `ligurian-sea` (features/ligurian-sea.yaml; the Gulf split at the column edge 7.73 E by
+# the lead's ruling on the package's first step). The form and the rules are
+# channel-west.yaml's (its head). The sources, in the references'
+# form (docs/references/README.md; the texts under docs/references/pilots/, package 79c's
+# research pass, its report in docs/dev/TuningNotes.md, "Package 79c"):
+#
+#   Michelot 1709   Le Portulan de la mer Mediterranee (Marseille): the French coast, the
+#                   Riviera and Italy; the fanals of the period. Before the period and in
+#                   use through it.
+#   Michelot 1715   The Mediterranean Pilot (the English of the same): the Gulf of Lyons,
+#                   Provence, Genoa, Leghorn, Elba.
+#   Purdy 1826      The New Sailing Directions for the Mediterranean Sea: sections IV to
+#                   VIII, with Captain Smith's remarks of 1818 on the French coast, Captain
+#                   Ryves's survey of the Maddalena of 1802 and Mr Atkinson's of 1804.
+#   Norie 1831      New Piloting Directions for the Mediterranean Sea.
+#   Purdy 1840      The New Sailing Directory for the Strait of Gibraltar and the Western
+#                   Division: its 'Pharonology' dates the lights first lit after 1805.
+#   Lamberti 1844   Portolano del mare Mediterraneo (Michelot in Italian with the lights).
+#   Derrotero 1849  Derrotero de las costas de Europa y Africa en el Mediterraneo, desde el
+#                   cabo de Creus: the spine, in Spanish; its translator's notes date the
+#                   lights of the 1830s and 1840s.
+#   Smyth 1854      The Mediterranean: the table of positions, the heights.
+#   Admiralty 1916  The Mediterranean Pilot, vol. II (the French coast): MODERN, for the
+#                   heights, depths and banks only, never for 1805's works or lights.
+#   James 1837      The Naval History of Great Britain, vol. 3 (docs/references/james/):
+#                   Nelson's station off Cape Sicie (p. 177); Porquerolles and the Grande
+#                   Passe in June 1804 (p. 238).
+#
+# Where a page could not be read with confidence from an OCR's running heads the line of
+# the OCR text is cited instead ("OCR l. 4821").
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from), first placed from the modern chart and the pilots' bearings, then checked against
+# this block's tiles by the rule of channel-west.yaml's head (a scratch script outside the
+# repository: a land mark to the nearest land within 800 m, a light to land or a shoal head
+# within 400 m, an anchorage to water of half the pilot's depth within 800 m, a danger to
+# the nearest shoal head within 400 m); a move is said in `fix`, and the few moved farther
+# by the builder's reading say so. **Islets the grid lacks** (EMODnet's sixteenth of a
+# minute reads water over them: Planier, the Fourmigues of Giens, Grand Ribaud, Bagaud and
+# the Fourmigue of Golfe Juan) are given as rocks of their height and an extent of
+# their size (ChartBlocks.md, "An isle the grid lacks"), so that a ship cannot sail
+# through them; dangers the grid does not hold (the Regas, the Veyrun, the Cassidaigne,
+# the Esquillade) are left at the pilots' positions and say so. Heights are above the sea
+# for the horizon: Cape Sicie's chapel, Mount Faron and Coudon over Toulon, the Esterel and
+# the Maritime Alps are the great marks of this coast.
+#
+# The lights: a light's `lit` has `from` and `until`, so that 1805 sees what 1805 had. In
+# 1805: the fanals of Cette, Port-Vendres and Marseille (Fort St Jean), each `from` the
+# earliest record read (Michelot 1709 and 1715), no pilot giving the year each was first
+# lit. Not yet in 1805: Cape Bearn and Mount Agde (1836, the Derrotero's notes), Camarat
+# (1831), Porquerolles and the Titan (1837), La Garoupe (1 July 1837, Purdy 1840); their
+# exact years, where no text dates them, UNVERIFIED and said so, the texts bracketing them
+# after 1805 (Purdy 1826 and Norie 1831 name none, Purdy 1840 lists them). Planier's tower,
+# lit by 1818 (Captain Smith in Purdy 1826) and unlit in Michelot 1715, has no `lit`: no
+# source dates it between. `range_nm` is the period lamp's, from the pilot's leagues or
+# JUDGEMENT.
+#
+# Not here: west of 3 E (the Canigou, Roses) is a later block's; east of 7.73 E the
+# region `ligurian-sea`'s. The block reaches south to 40.56 N, where `balearics` (package
+# 79c) ends, the open sea between Minorca and the Gulf with no mark in it.
+
+region: gulf-of-lion
+features:
+  # ---------------------------------------------------------------------------
+  # Cape Creus, the Roussillon and Languedoc, the mouths of the Rhone and Marseille (the harbour patch marseille)
+  # ---------------------------------------------------------------------------
+
+  - id: cape-creus
+    kind: headland
+    name: Cape de Creux
+    modern: Cap de Creus
+    lat_deg: 42.3189
+    lon_deg: 3.3198
+    height_m: 80
+    fix: 'moved 190 m west to the grid''s land: the point and its islet read as water; moved 15 m to the grid''s land (the first placing read 3 m of water)'
+    source: 'Michelot 1715, OCR l. 2946: ''it is the outermost part of the coast, and the beginning of the Gulf of Lyons'', the island at its foot gives perfect knowledge of it, the currents set very swiftly to the SW; Purdy 1826, OCR l. 684 (the table of positions): Cape de Creus, lat. 42 19 35; Norie 1831, OCR l. 3443 to 3518: Cape de Creux and its tower, the two islands off it; height JUDGEMENT from the modern chart (the cape''s ridge behind the point)'
+    says: 'Cape de Creux, the easternmost point of Spain and the beginning of the Gulf of Lyons, a rugged high cape with a little island at its foot; the current sets hard to the south-west about it.'
+
+  - id: cape-bear
+    kind: headland
+    name: Cape Bearn
+    modern: Cap Béar
+    lat_deg: 42.5145
+    lon_deg: 3.1365
+    height_m: 220
+    source: 'Michelot 1715, p. 35: Cape d''Esbiere (Bearn) is a large point which stretches out the most of any upon the coast, and near it a very low rock above water; when you cannot reach Port Vendre you may anchor to the westward of it over against a sandy shore; Derrotero 1849, OCR l. 267 to 270: cabo Bearn of middling height, rough and broken, its points low, a hummock on it and further in on a bare mountain the Tower of the Devil (torre del Diablo); height the mountain over the cape, 220 m, at which the light of 1836 stands (OCR l. 271)'
+    says: 'Cape Bearn, a rough broken headland of middling height running far out, the high bare ridge behind it with an old tower; Port Vendre lies close within it to the westward.'
+
+  - id: cape-bear-light
+    kind: light
+    name: the light on Mount Bearn
+    modern: 'the first Cap Béar light (1836), on the height above Port-Vendres'
+    lat_deg: 42.514
+    lon_deg: 3.124
+    height_m: 220
+    lit:
+      from: 1836
+      until: null
+      range_nm: 21
+      character: a fixed light
+    source: 'Derrotero 1849, OCR l. 270 to 274: in 1836 a fixed light was built on cape Bearn, 220 m (720 ft) above the sea, 800 m SE of the entrance of Port Vendre, seen 7 leagues; Purdy 1840, Pharonology, p. iii: a fixed light on Mount Bearn about 875 yards to the S.E. of the entrance of Port Vendres, of the first class, 722 feet above the sea, seen seven leagues; range from the seven leagues'
+    says: 'The light on Mount Bearn above Port Vendre, a fixed light very high, seen seven leagues: not lit in 1805, first shown in 1836.'
+
+  - id: port-vendres-light
+    kind: light
+    name: the light-house of Port Vendre
+    modern: 'Fort du Fanal, Port-Vendres'
+    lat_deg: 42.5196
+    lon_deg: 3.1099
+    height_m: 33
+    lit:
+      from: 1715
+      until: null
+      range_nm: 9
+      character: a fixed light
+    fix: moved 280 m south-west to the grid's land on the north point of the entrance
+    source: 'Michelot 1715, p. 35: on the starboard side going in there is a small fort with some guns in it, and in the middle of the fort a small square tower which serves for a light-house (Michelot 1709, p. 53: ''une petite tour quarree qu''on apelle le Fanal''): the date is the earliest that names it lit, the first year not in the sources; Purdy 1826, p. 49: on the north side is a small fort in which is a square light-house; Derrotero 1849, OCR l. 277 to 281: the farola on the right-hand point, ringed by a star-shaped battery, a fixed light 33 m high seen 3 leagues; Norie 1831, OCR l. 28820: a fixed light in the Fort du Fanal, 108 feet, seen 4 leagues; range JUDGEMENT for the period lamp, three leagues'
+    says: 'The little square light-tower in the fort on the north point of Port Vendre''s entrance, a fixed light seen some three leagues; keep it close aboard to starboard going in.'
+
+  - id: port-vendres
+    kind: anchorage
+    name: Port Vendre
+    modern: 'Port-Vendres, the avant-port'
+    lat_deg: 42.5212
+    lon_deg: 3.1125
+    height_m: 0
+    depth_fathoms: 5
+    bottom: sand and mud; grass and mud within
+    source: 'Purdy 1826, p. 49: the entrance between the light-house point and the great rock in 9 fathoms; the best anchorage in 3 or 4 fathoms off a stone redoubt on the larboard side; good water behind a fortification at the bottom of the port; Michelot 1715, p. 35: in four, three and two fathom water, the ground grass and mud; exposed to the NE and ENE; Derrotero 1849, OCR l. 318 to 321 and 399 to 402: the avant-port within the farola and the great rock in 40 to 60 feet, sand and mud, the bottom everywhere sand and mud so that a ship grounding takes little hurt; depth JUDGEMENT within the grid''s water at the entrance'
+    says: 'Port Vendre, a small deep cove under the mountains and the only port of this coast for a ship of any size: in five fathoms within the entrance, sand and mud, moored head and stern against the north-easters.'
+
+  - id: collioure
+    kind: town
+    name: Collioure
+    modern: Collioure
+    lat_deg: 42.5255
+    lon_deg: 3.0835
+    height_m: 20
+    source: 'Purdy 1826, p. 49: nearly a league to the north-westward of Port Vendre, the town at the foot of a rising ground with Fort Miradou, a castle on a point of rocks, an islet with a chapel off the north point, and farther inland the Fort of St. Elme on a hill which defends both Port Vendre and Collioure; frequented by small craft only, exposed to East and N.E. winds; Michelot 1715, pp. 35 and 36: the small fort of St. Elme with a tower seen a great way off; Derrotero 1849, OCR l. 420 to 446: the walled town, the islet with its hermitage, sand in 24 to 32 feet'
+    says: 'Collioure, a little walled town in a bay with a castle on its rocks and a chapel on an islet, Fort St. Elme high on the hill above it; fit for small craft only, and open to the east.'
+
+  - id: mount-st-loup
+    kind: hill
+    name: Mount Agde
+    modern: 'Mont Saint-Loup, Cap d''Agde'
+    lat_deg: 43.294
+    lon_deg: 3.505
+    height_m: 113
+    source: 'Michelot 1715, p. 37: Mount Agde, about half a league up in the country opposite the mole, which you see a pretty way off appearing in a round figure and like an island, two houses almost at the top; Purdy 1826, p. 50: Cette known by a round mountain over the town, resembling that of Agde, which at a distance appears like an island; Derrotero 1849, OCR l. 597 to 599: monte de Agde, high enough, from afar like a sugar-loaf a little rounded with two houses on the summit; height from the modern chart'
+    says: 'Mount Agde, a round hill standing alone over the low shore like an island, two houses near the top: the mark for Fort Brescou and the river of Agde.'
+
+  - id: mount-agde-light
+    kind: light
+    name: the light of Mount Agde
+    modern: the former light on Mont Saint-Loup
+    lat_deg: 43.294
+    lon_deg: 3.505
+    height_m: 126
+    lit:
+      from: 1836
+      until: null
+      range_nm: 27
+      character: 'a revolving light, eclipsed once a minute'
+    source: 'Derrotero 1849, OCR l. 590 to 596: on Mount Saint-Loup, better known to seamen as Mount Agde, a revolving light with eclipses was placed in 1836, 126 m (387 ft) above the sea, seen 9 leagues; Purdy 1840, Pharonology, pp. iii to iv: a tower and light of the first class on the Mont d''Agde or St. Loup, a flash once a minute, 413 feet, the flashes seen nine leagues off; range from the nine leagues'
+    says: 'The light on Mount Agde, a great revolving light seen nine leagues: not lit in 1805, first shown in 1836.'
+
+  - id: fort-brescou
+    kind: castle
+    name: Fort Brescou
+    modern: Fort de Brescou
+    lat_deg: 43.2628
+    lon_deg: 3.5019
+    height_m: 15
+    fix: 'moved 150 m south-west to the middle of the grid''s land: the islet is a few cells wide'
+    source: 'Purdy 1826, p. 50: the fort of Brescou stands on a flat rock surrounded by the sea at 5 or 6 cables'' length from the shore; half-way between the mole-head and the fort a sunken rock of only 4 feet, and several rocks a full cable''s length without the fort; Michelot 1715, p. 37: a small fort with four bastions on a flat rock; you may anchor at a cable''s distance between Fort Brescou and the shore in three fathom and a half, the ground ooze and grass, sheltered from the SW sea by the chain of rocks; height JUDGEMENT (the fort on its rock)'
+    says: 'Fort Brescou, a little four-bastioned fort on a flat rock half a league off Mount Agde; small vessels lie within it in three fathom and a half, ooze and grass, but give the rocks about it a berth.'
+
+  - id: mount-st-clair
+    kind: hill
+    name: Mount Cette
+    modern: 'Mont Saint-Clair, Sète'
+    lat_deg: 43.3965
+    lon_deg: 3.6805
+    height_m: 175
+    source: 'Michelot 1715, p. 37: Mount Cette appears almost like Mount Agde from the offing, but from the eastward like the awning of a galley, and like an island which way soever you see it; on the top an hermitage with some old ruins of fortifications and reddish spots; Purdy 1826, p. 50: a round mountain over the town, resembling that of Agde, which at a distance appears like an island; on the top an old hermitage; Derrotero 1849, OCR l. 660 to 666: from the east long and flat-topped, the hermitage of Santa Clara and a fortified barrack like white spots; height from the modern chart'
+    says: 'Mount Cette, a long round hill alone between the sea and the great pond, the hermitage of St. Clair on its top; from the offing it shows like an island.'
+
+  - id: cette-light
+    kind: light
+    name: the light of Cette
+    modern: 'Fort Saint-Louis, Sète, the môle Saint-Louis'
+    lat_deg: 43.3967
+    lon_deg: 3.7
+    height_m: 25
+    lit:
+      from: 1709
+      until: null
+      range_nm: 9
+      character: a fixed light
+    fix: moved 30 m north to the grid's land on the mole; moved 15 m to the grid's land or shoal head
+    source: 'Michelot 1709, p. 57: at the end of the mole a battery and a tower in the middle on which is a fanal lit in the evening for knowing the place by night (''un fanal qu''on allume le soir''): the date is the earliest the sources show it lit, the first year not in them; Michelot 1715, p. 37: a tower on the middle of the mole, on the top of which is a lanthorn lighted every night; Purdy 1826, p. 50: a mole about 280 fathoms with a battery and a light-tower on its end; Derrotero 1849, OCR l. 716 to 721: the battery of St. Louis about the light, fixed, 25 m, seen 10 miles; Norie 1831, OCR l. 28832: fixed, 84 feet, seen 4 leagues; range JUDGEMENT for the period lamp, three leagues'
+    says: 'The light on the mole of Cette, a fixed light lit every night; pass within half a ship''s length of the mole-head going in, for the deep water is there.'
+
+  - id: aigues-mortes
+    kind: town
+    name: Aigues-Mortes
+    modern: Aigues-Mortes
+    lat_deg: 43.568
+    lon_deg: 4.191
+    height_m: 30
+    source: 'Purdy 1826, p. 50: the town of Aigues-mortes (pronounced eg-mort) on the low land upon the edge of a salt-pond, 25 miles from Cette; several shoal banks hereabout which render anchoring dangerous with southerly winds; p. 51: many vessels carried by the current into the bight of Aigues-mortes and wrecked; Michelot 1715, p. 38: the town about a league from the shore, though formerly the sea reached its walls; in the gulf you may anchor in four, five and six fathom sheltered from the E and ESE; height the town''s great tower (the Tour de Constance) from the modern chart'
+    says: 'Aigues-Mortes, the old walled town behind the salt-ponds a league from the sea, its great round tower over the marsh; keep a good offing from the bight, where the current sets ships ashore with southerly winds.'
+
+  - id: tour-du-tampan
+    kind: tower
+    name: the Tower of Tampan
+    modern: 'the Tour du Tampan (Saint-Genest), Camargue (gone)'
+    lat_deg: 43.37
+    lon_deg: 4.645
+    height_m: 20
+    fix: 'the tower is gone: placed from Smyth''s table (the Tanpan, lat. 43 21 37, corrected by the 0.004 degrees his St. Louis tower lies south of its site) and the Derrotero''s bearing of the Camargue light, 2 miles S.E. by S. of St. Genest; uncertain by half a mile'
+    source: 'Michelot 1715, p. 39: about 4 or 5 miles north from the Point of Tignes a large square tower called the Tower of Tampan, standing on low ground, on the top a sort of sentry-box which at a distance looks like the sail of a ship; seen a great deal sooner than the land, one of the marks to know the low point by; Derrotero 1849, OCR l. 957 to 962: on the tongue ending the Camargue to the south an old tower called by the country people the tower of Tumpan and of St. Genest by the charts; Smyth 1854, OCR l. 25514 (the table of positions): Rhone Delta, Tanpan douane; height JUDGEMENT'
+    says: 'The Tower of Tampan, a great square tower on the low Camargue with a watch-box on its top like a sail, seen before the land: the mark for the Point of Tignes and the mouths of the Rhone.'
+
+  - id: tour-st-louis
+    kind: tower
+    name: the Tower of St. Louis
+    modern: 'Tour Saint-Louis, Port-Saint-Louis-du-Rhône'
+    lat_deg: 43.3866
+    lon_deg: 4.8048
+    height_m: 20
+    source: 'Purdy 1826, p. 51: the chief entrance of the Rhone may be found by the tower of St. Louis, which stands on the north bank of the river and may be seen much sooner than the land about it; the sands at the entrance often shift and no stranger can enter without a pilot; Derrotero 1849, OCR l. 967 to 969: the river runs straight 4 miles to the tower of St. Louis, where it divides into three branches; Smyth 1854, OCR l. 25513: Rhone Delta, S. Louis tower; Modern chart: the tower built in 1737; height JUDGEMENT'
+    says: 'The Tower of St. Louis on the north bank at the great mouth of the Rhone, seen long before the low land; the bar shifts, and none should go in without a pilot.'
+
+  - id: tour-de-bouc
+    kind: castle
+    name: the Tower of Bouc
+    modern: 'Fort de Bouc, Port-de-Bouc'
+    lat_deg: 43.398
+    lon_deg: 4.9838
+    height_m: 30
+    fix: 'moved 230 m north-west to the grid''s land: the fort''s islet reads as water'
+    source: 'Purdy 1826, p. 51: on the south side of the mouth of Bouc harbour is a fortress with a square tower called the Tower of Bouc, which, being composed of white stone, may be seen a great way off; Michelot 1715, p. 40: a fortress with a square tower in the middle of white stone, seen a great way off, on the low point of an island separated from the main by a small rivulet; Derrotero 1849, OCR l. 1046 to 1052; Norie 1831, OCR l. 28845: a light shown from the tower of the fort, 98 feet (in 1831; the year it was first shown not found, so no light is entered); height from Norie''s elevation'
+    says: 'The Tower of Bouc, a white square tower in a fort on the south point of the entrance to Martigues, seen a great way off over the low shore.'
+
+  - id: bouc-harbour
+    kind: anchorage
+    name: the Harbour of Bouc
+    modern: 'Port-de-Bouc, the anse within the entrance'
+    lat_deg: 43.402
+    lon_deg: 4.99
+    height_m: 0
+    depth_fathoms: 3
+    bottom: mud and grass
+    source: 'Purdy 1826, p. 51: the harbour appears large but is very shallow except in the middle, from 4 to 2 1/2 fathoms on mud and grass; the mouth about 150 fathoms broad; within the entrance the ledge le Foucard with 5 or 6 feet; p. 52: anchor with Languette Point bearing west; Michelot 1715, p. 40: the best anchorage to the ENE of the low point Languette, 13 and 14 foot water, the ground mud and grass; open to the SW; Derrotero 1849, OCR l. 1074 to 1076: 15 or 16 feet, weed and mud'
+    says: 'The harbour of Bouc within the white tower, three fathoms on mud and grass with Languette Point bearing west; mind the Foucard ledge within the north point.'
+
+  - id: cape-couronne
+    kind: headland
+    name: Cape Couronne
+    modern: Cap Couronne
+    lat_deg: 43.3268
+    lon_deg: 5.0535
+    height_m: 25
+    source: 'Purdy 1826, p. 52: Cape Couronne, nearly 5 miles S. by E. from the Tower of Bouc, is smooth and low; the Bay of Marseille between it and Cape Croisette, the one low and the other high; Michelot 1715, p. 41: you know Cape Couronne by its being a smooth low point, the free-stone of Marseilles is fetched from hence; Derrotero 1849, OCR l. 1104 to 1106: a low point, even and well out, the western end of the bay of Marseille; height JUDGEMENT from the grid'
+    says: 'Cape Couronne, a smooth low point, the western horn of the Bay of Marseilles; give it a mile for the Regas off it.'
+
+  - id: the-regas
+    kind: ledge
+    name: the Regas
+    modern: 'the Régas shoal, off Cap Couronne'
+    lat_deg: 43.3165
+    lon_deg: 5.042
+    height_m: 0
+    dries_m: -1.7
+    extent_m: 300
+    fix: 'placed by the pilots'' bearing and distance, a mile S.W. of the cape between Purdy''s S.S.W. and Michelot''s W.S.W.: the grid does not resolve the ledge; the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 52: the Regas, a ledge of rocks and sand with 5 or 6 feet over it, lies at the distance of a mile S.S.W. from the cape, and between this and the land are two other shoals with less water; Michelot 1715, p. 41: WSW from the point of Cape Couronne a ledge of rocks and sand under water called Regas, about a mile from the land, with only 5 or 6 foot water, so that the sea breaks there in blowing weather; Derrotero 1849, OCR l. 1107 to 1110: the Regas, very dangerous, breaking almost continually, 5 to 6 feet'
+    says: 'The Regas, a ledge of rock and sand a mile off Cape Couronne with but five or six feet on it, breaking in any wind; pass without it.'
+
+  - id: planier
+    kind: island
+    name: Planier
+    modern: Île du Planier
+    lat_deg: 43.199
+    lon_deg: 5.23
+    height_m: 10
+    extent_m: 200
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
+    source: 'Michelot 1715, p. 43: a small island called Planier, because it is very plain and low, upon which there is an uninhabited tower which only serves to let you know it; do not come near it to the SW, SE and East for rocks stretching about a mile; p. 41: a small flat island lying a great way out with a tower upon it, called the Tower of Planier; Purdy 1826, p. 52: the Isle of Planier, almost level with the water, but having a white tower on it which may be seen afar off; p. 54 (Mr. Smith, master of the Ganymede, 1818): a light is exhibited by night on the white tower, seen 3 or 4 leagues (the year it was first lit not found in the sources, so no light is entered); height JUDGEMENT for the low island and its tower'
+    says: 'Planier, a low flat island far out in the mouth of the bay with a white tower on it, seen before the island; foul with rocks a mile to the south-east and south-west.'
+
+  - id: the-veyrun
+    kind: rock
+    name: the Veyrun
+    modern: 'the Veyron shoal, east of Planier'
+    lat_deg: 43.1906
+    lon_deg: 5.248
+    height_m: 0
+    dries_m: -4.6
+    extent_m: 200
+    fix: 'placed by the pilots'' bearing and distance, a mile E.S.E. of Planier: the grid does not resolve the shoal; the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 52: a shoal of rocks called the Veyrun, having a depth of only 15 feet, lies S.E. 1/2 E. nearly a mile from Planier, the only danger hereabout; p. 54 (Mr. Smith, 1818): the Veyrun, a reef of rocks with 15 feet of water upon them, one mile E.S.E. from Planier; Derrotero 1849, OCR l. 1333 to 1339: the Vaire-un, a mile E. 1/4 S.E. of the tower, 1 and 2 brazas, the sea breaking on it in bad weather'
+    says: 'The Veyrun, a reef with fifteen feet on it a mile east-south-east of Planier, breaking in bad weather: give Planier a mile and a half in a great ship.'
+
+  - id: ratonneau
+    kind: island
+    name: Ratoneau
+    modern: 'Île Ratonneau, the Frioul'
+    lat_deg: 43.2805
+    lon_deg: 5.308
+    height_m: 74
+    fix: 'on the grid''s land, 400 m south of the island''s middle: the grid keeps only the islands'' eastern ends'
+    source: 'Michelot 1715, p. 42: the island of Ratonneau next to Chateau d''If to the NW, about 900 fathom distant; on its NE point a battery of great guns with fortifications and a square tower in the middle; off its west end a great rock above water called Tiboulen; Purdy 1826, p. 52: the fortified isles Ratoneau and Chateau d''If, both within two miles of the port of Marseille; Derrotero 1849, OCR l. 1368 to 1373: long from E to W, high in its middle, the castle of St. Estevan on its summit; height from the modern chart'
+    says: 'Ratoneau, the northern of the isles of Marseilles, high in the middle with its castle on the top and a battery on its north-east point.'
+
+  - id: pomegues
+    kind: island
+    name: 'Pomegue, or St. John'
+    modern: 'Île Pomègues, the Frioul'
+    lat_deg: 43.275
+    lon_deg: 5.306
+    height_m: 86
+    fix: 'on the grid''s land at the island''s eastern end, where the tower of St. John stands: the grid keeps no more of it'
+    source: 'Michelot 1715, p. 42: the island of St. John, commonly called Pomegue, to the southward of Ratonneau about 120 fathom distant; upon the NE point a large round tower with fortifications, and upon the highest place of the island the tower of St. John; Purdy 1826, p. 52: the N.E. end of Pomegue or St. Jean, which has a round tower and some fortifications, and upon the highest part the tower of St. Jean; Smyth 1854, OCR l. 25532: Pomegue I., tour S. Jean (latitude 43 16 25 in the column that follows); height from the modern chart'
+    says: 'Pomegue, the southern of the isles of Marseilles, high and bare to the westward, the tower of St. John on its eastern end.'
+
+  - id: port-of-pomegues
+    kind: anchorage
+    name: the Port of Pomegue
+    modern: 'Port de Pomègues, the Frioul'
+    lat_deg: 43.273
+    lon_deg: 5.303
+    height_m: 0
+    depth_fathoms: 4
+    bottom: mud
+    fix: 'placed in the grid''s water of about its depth, 400 m north-east of the cove: the grid smooths the island''s south shore away'
+    source: 'Purdy 1826, pp. 52 to 53: at Point Pomegue a creek formed by a little island almost contiguous, where vessels from the Levant sometimes perform quarantine, 3 to 6 fathoms on muddy ground, moor head and stern with a good anchor to the eastward; the best anchorage about Ratoneau near the point of Pomegue where the tower stands, 3, 4 and 5 fathoms, muddy bottom; Michelot 1715, p. 42: the Port of Pomegue, a large creek formed by a little island, 3 to 6 fathom water, muddy ground, where ships from the Levant generally perform quarantine; Derrotero 1849, OCR l. 1406 to 1414: the little port of Pomegue, open to the N.E., for the observation and quarantine of ships'
+    says: 'The Port of Pomegue, the quarantine creek behind its little island, four fathoms on mud, moored head and stern with an anchor to the eastward.'
+
+  - id: chateau-d-if
+    kind: castle
+    name: Chateau d'If
+    modern: Château d'If
+    lat_deg: 43.2804
+    lon_deg: 5.3253
+    height_m: 30
+    fix: moved 60 m north to the grid's land on the rock
+    source: 'Purdy 1826, p. 52: the isle Chateau d''If lies about one mile and two thirds W. by S. from the entrance of the port of Marseille; it is fortified on all sides and has three towers; Michelot 1715, p. 42: a great rock fortified on all sides with three great towers in the middle, standing about a donjon; Purdy 1826, p. 54 (Mr. Smith, 1818): castles and fortifications upon Pomegue, Ratoneau and Chateau d''If, in a very bad state of repair; height JUDGEMENT (the rock and its towers)'
+    says: 'Chateau d''If, a square rock wholly taken up by its castle and three towers, a mile and two-thirds off the mouth of Marseilles; bold-to, a cable''s length all round.'
+
+  - id: canoubier
+    kind: rock
+    name: the Canouvier
+    modern: Le Canoubier
+    lat_deg: 43.284
+    lon_deg: 5.339
+    height_m: 0
+    dries_m: -0.3
+    extent_m: 150
+    fix: 'first placed at the Derrotero''s crossing of the line from Chateau d''If to the fanal of Marseille with the line from Point Daume to Cape Croux, then moved 250 m east to the grid''s shoalest head there (8 m): the grid does not resolve the rock; the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 53: between Chateau d''If and the harbour of Marseille two rocks under water, the Sourdara 300 fathoms from the castle with 3 feet and the Canouvier 100 fathoms beyond with one foot; when directly upon the latter the tower of St. Jean on Pomegue appears between two towers of Chateau d''If; the usual and best passage between the point of Daume and Canouvier; Michelot 1715, p. 43: the Shoal of Canoubier, generally but one foot water, the sea breaking on both in any weather; Derrotero 1849, OCR l. 1449 to 1460: the Sourdara and the Canouvier at the crossing of the two lines'
+    says: 'The Canouvier and the Sourdara, two sunken rocks in the passage between Chateau d''If and Point Daume, one foot and three feet on them, the sea breaking over both; pass between them and the point.'
+
+  - id: marseille-light
+    kind: light
+    name: the light-house of Fort St. John
+    modern: 'Fort Saint-Jean, Marseille, the tower of the fanal'
+    lat_deg: 43.2955
+    lon_deg: 5.3634
+    height_m: 27
+    lit:
+      from: 1709
+      until: null
+      range_nm: 9
+      character: a fixed light
+    fix: moved 150 m east to the grid's land at the north point of the harbour's mouth
+    source: 'Michelot 1709, OCR l. 5315 to 5317: on the left a fortress called Fort St. Jean with a high round tower called the Fanal: the date is the earliest the sources name it, the first year not in them; Michelot 1715, p. 44: Fort St. John with a high round tower in it called the Light-house; Purdy 1826, p. 53: on the north side the fort of St. Jean, wherein stands the lighthouse; Fort St. Jean with its high round tower or lighthouse will lead directly to the city; Purdy 1840, Pharonology, p. iv: a fixed light at the foot of the tower of Fort St. Jean, 90 feet; Derrotero 1849, OCR l. 1219 to 1221 and 1276 to 1280: the fanal stood in a high round tower within Fort St. Jean, now given up, a fixed light at its foot seen 9 miles; range JUDGEMENT from the nine miles'
+    says: 'The light-house of Fort St. John, the high round tower on the north side of the harbour''s mouth of Marseilles; keep mid-channel going in for the Mange-Vin rocks off it.'
+
+  - id: notre-dame-de-la-garde
+    kind: castle
+    name: Notre Dame de la Garde
+    modern: 'Notre-Dame de la Garde, Marseille'
+    lat_deg: 43.284
+    lon_deg: 5.3713
+    height_m: 155
+    source: 'Michelot 1715, p. 44: upon a high mountain a fort called Notre Dame de la Garde, from whence they discover the ships out at sea; Purdy 1826, p. 53: near the citadel of St. Nicolas, a little farther back on an eminence, a fort called Notre Dame de la Garde; p. 54 (Mr. Smith, 1818): an old castle on a hill to the southward of the city, commanding the town, in a very ruinous state; Derrotero 1849, OCR l. 1226 to 1228: on a high bare whitish promontory, its telegraph signalling the ships in sight; height from the modern chart (the hill, 149 m, and the chapel)'
+    says: 'Notre Dame de la Garde, the old fort and chapel on the high bare hill south of Marseilles, whence they signal the ships in the offing.'
+
+  - id: marseille-road
+    kind: anchorage
+    name: the road of Marseilles
+    modern: 'the outer anchorage off the Vieux-Port, Marseille'
+    lat_deg: 43.303
+    lon_deg: 5.35
+    height_m: 0
+    depth_fathoms: 15
+    bottom: sand and mud; mud and grass
+    fix: 'placed from Mr. Smith''s marks (the tower of St. Jean S.S.E. to S.E. by S., Chateau d''If S.W.), then 600 m west into water of the pilots'' depth'
+    source: 'Purdy 1826, p. 54 (Mr. Smith, master of H.M.S. Ganymede, 1818): to anchor in the bay before the town bring the lighthouse or tower of St. Jean to bear from S.S.E. to S.E. by S. and the island Chateau d''If S.W. or S.W. by W., in from 18 to 15 fathoms, sand and mud; moor with an open hawse to the W.N.W., the N.W. winds the strongest; Michelot 1715, p. 44: when the easterly winds hinder going in you may anchor without over against the town at about 4 or 500 fathom distance, 12 and 15 fathom, the ground mud and grass, not proper to stay the night; Derrotero 1849, OCR l. 1248 to 1250: moorings outside in 12 to 15 brazas, mud, 4 or 5 cables off the mouth'
+    says: 'The road of Marseilles off the harbour''s mouth, fifteen fathoms on sand and mud with St. John''s tower south-south-east; moor open hawse to the north-west, and go in before night.'
+
+  - id: cape-croisette
+    kind: headland
+    name: Cape Croisette
+    modern: Cap Croisette
+    lat_deg: 43.2147
+    lon_deg: 5.3397
+    height_m: 100
+    fix: moved 250 m north to the grid's land
+    source: 'Purdy 1826, p. 52: the Bay of Marseille between Cape Couronne and Cape Croisette, Cape Croisette being of high land; p. 53: from Point Daume to Cape Croisette about 4 miles; at the point of Cape Croisette, which is low, a high and steep island called De Maire; Michelot 1715, p. 41: Cape Croisette very high, especially from the westward; Derrotero 1849, OCR l. 1299 to 1301: a low point running from high land with a hermitage on its top, the highest part called Collet de Rose; height JUDGEMENT for the high land over the point'
+    says: 'Cape Croisette, the high eastern horn of the Bay of Marseilles, ending in a low point with the great isle of Maire close off it.'
+
+  - id: maire
+    kind: island
+    name: Maire
+    modern: Île Maïre
+    lat_deg: 43.2127
+    lon_deg: 5.3337
+    height_m: 141
+    fix: 'on the grid''s land: the grid joins the island to the cape'
+    source: 'Purdy 1826, p. 53: at the point of Cape Croisette a high and steep island called De Maire, near which at the N.W. a smaller one called Tiboulen; small vessels may pass between them in 7 or 8 fathoms keeping nearest to Tiboulen, for a sunken rock near De Maire; Michelot 1715, p. 44: a large high and steep island called Maire; you cannot pass between Cape Croisette and Maire but in boats; Derrotero 1849, OCR l. 1306 to 1312: an enormous whitish barren rock, very notable from seaward; anchor to the north of it in 5 or 6 brazas; height from the modern chart'
+    says: 'Maire, a great white steep rock of an island close off Cape Croisette, Tiboulen at its north-west end; no passage but for boats between it and the cape.'
+
+  - id: riou
+    kind: island
+    name: Riou
+    modern: Île de Riou
+    lat_deg: 43.1771
+    lon_deg: 5.3854
+    height_m: 191
+    fix: 'moved to the grid''s highest land on the island, 300 m west of its middle'
+    source: 'Purdy 1826, p. 54: the Isle de Riou about three quarters of a mile S.S.E. from Jaire, a mile long from W. to E. and generally steep-to, but a reef stretches from its western end; on the summit a watch-tower; p. 52: to the southward of Cape Croisette the Isle de Riou, of moderate height, nearly two miles from the land, seen early from the westward; Michelot 1715, p. 41: the island of Riou, which is pretty high, about half a league from the land; Smyth 1854, OCR l. 25540: Riou isle, tower; height from the modern chart'
+    says: 'Riou, a high steep island two miles off the shore south-east of Cape Croisette with a watch-tower on its summit; a reef runs off its western end.'
+
+
+  # ---------------------------------------------------------------------------
+  # Cassis and La Ciotat, Cape Sicie, Toulon and its roads (the harbour patch toulon), the Hyeres islands and their road (the harbour patch hyeres), to Cape Camarat
+  # ---------------------------------------------------------------------------
+
+  - id: cassis
+    kind: town
+    name: Cassis
+    modern: Cassis
+    lat_deg: 43.214
+    lon_deg: 5.5375
+    height_m: 10
+    source: 'Purdy 1826, p. 54: at 4 miles to the north-westward of Cape L''Aigle is the little town and Port of Cassis; behind the town is a small castle, and before it a road, in which the depths are from 4 to 6 fathoms; Derrotero 1849, p. 24 (the translator''s note from the Depot of 1843): the port in the innermost part of the bay, the castle of Cassis on a steep point covered with olives south of the town'
+    says: 'The little town and port of Cassis under its castle, with a road before it in four to six fathoms.'
+
+  - id: cassidaigne
+    kind: rock
+    name: la Cassidaigne
+    modern: La Cassidaigne
+    lat_deg: 43.1455
+    lon_deg: 5.5455
+    height_m: 0
+    dries_m: -0.8
+    extent_m: 120
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Michelot 1715, p. 45: five or six miles to the southward of Cassis a rock under water called Cassidaigne, very dangerous, about two miles from Cape Canaille, with only 2 and 3 foot water over it, the sea breaking on it; the mark for being on it, Cape de l''Aigle a very little open of the Isle Verte; Purdy 1826, p. 54: S by W 1/2 W 4 miles from Cassis, a dangerous cluster of sunken rocks with only 2 or 3 feet; Derrotero 1849, pp. 22 to 23: the Casidagne, 2 or 3 feet on its shoalest part, the sea breaking on it at the least wind'
+    says: 'The Cassidaigne, a sunken reef with but two or three feet on it four miles south of Cassis, which breaks in any sea: the Eagle''s Beak just open of the Isle Verte puts you upon it.'
+
+  - id: bec-de-l-aigle
+    kind: headland
+    name: Cape L'Aigle (the Eagle's Beak)
+    modern: 'Cap de l''Aigle, le Bec de l''Aigle'
+    lat_deg: 43.163
+    lon_deg: 5.6015
+    height_m: 155
+    source: 'Michelot 1715, p. 45: Cape de l''Aigle very high and steep on all sides, a reddish rock, the easternmost point of which resembles the head of an eagle; upon the highest part of the mountain stands a chapel of Notre Dame de la Garde; Purdy 1826, p. 54: from Cape Croisette to Cape L''Aigle about 12 miles, the land high with burnt cliffs; Derrotero 1849, p. 22: the Pico del Aguila, a high mount cut sheer from its summit to half its height, like an eagle''s beak, reddish where bare; the height from the modern chart'
+    says: 'Cape L''Aigle, the reddish cliff whose point is like an eagle''s head, the chapel of Notre Dame de la Garde on its height: the west side of the Gulf of Ciotat.'
+
+  - id: ile-verte
+    kind: island
+    name: the Isle Verte (Green Island)
+    modern: Île Verte
+    lat_deg: 43.1634
+    lon_deg: 5.6082
+    height_m: 48
+    fix: moved 718 m to the grid's land (the first placing read 11 m of water)
+    source: 'Michelot 1715, p. 45: about 300 fathom to the eastward of Cape de l''Aigle lies Verte Island, pretty high; Purdy 1826, pp. 54 to 55: the Isle Verte or Green Island, rather more than 300 fathoms long, of moderate height; Derrotero 1849, p. 23: the Isla Verde or de la Ciotat, of middling height, which seems low beside the height of the cape; the height from the modern chart'
+    says: 'The Isle Verte, a small green island three hundred fathoms east of the Eagle''s Beak, the road of Ciotat within it.'
+
+  - id: ile-verte-shoal
+    kind: rock
+    name: the rock between the Isle Verte and Cape L'Aigle
+    modern: Les Canonniers (the shoal of the Île Verte channel)
+    lat_deg: 43.1626
+    lon_deg: 5.6082
+    height_m: 0
+    dries_m: -1.5
+    extent_m: 60
+    fix: 'laid from the pilots'' words (almost mid-way, a little nearer the island), not resolved on the modern chart''s scale; moved 255 m to the grid''s shoal head (3.9 m)'
+    source: 'Michelot 1715, p. 45: almost mid-way a rock under water with only 5 foot water upon it, a little nearer to the island than to Cape de l''Aigle; galleys pass keeping close to the point of the cape, 8 and 10 fathom; Purdy 1826, p. 55: a rocky shoal of only 6 feet, avoided by keeping over towards the cape, where there are 8 and 10 fathoms; Derrotero 1849, p. 23: a rock with only 5 or 6 feet almost mid-channel, a little nearer the island; p. 24 (note): two rocks, the Canonniers'
+    says: 'Between the Isle Verte and the Eagle''s Beak lies a rock with five or six feet on it, nearer the island: keep close under the cape, in eight or ten fathoms.'
+
+  - id: la-ciotat
+    kind: town
+    name: Ciotat
+    modern: La Ciotat
+    lat_deg: 43.1745
+    lon_deg: 5.606
+    height_m: 10
+    source: 'Michelot 1715, p. 45: above a mile to the northward of Cape de l''Aigle the town of Ciotat, where several ships are built; the harbour in form of a horse-shoe, two little moles, a small fort on the starboard point; Purdy 1826, p. 55: the town of Ciotat surrounds the north and west sides of a small but snug harbour, 3 1/2 to 2 fathoms; on the north point a small fort with a lighthouse, and about this point some sunken rocks; Derrotero 1849, p. 23'
+    says: 'Ciotat, a building town about a little horse-shoe harbour with two moles and a small fort on its north point; run in along the mole''s head for the rocks off the fort.'
+
+  - id: ciotat-road
+    kind: anchorage
+    name: the road of Ciotat
+    modern: off the port of La Ciotat
+    lat_deg: 43.1699
+    lon_deg: 5.6126
+    height_m: 0
+    depth_fathoms: 6
+    bottom: sand and weed
+    fix: moved 47 m to water of 6 m (the first placing read 1.4 m)
+    source: 'Michelot 1715, p. 46: you may anchor without the New Mole at 2 or 3 cables'' distance in 4, 5 and 6 fathom, but must not be there in the night-time; Purdy 1826, p. 55: anchoring ground three cables'' length SSE of the mole in 4 to 7 fathoms, not safe at night; Derrotero 1849, p. 24: when the north-wester keeps you out, anchor 2 or 3 cables south of the light in 7 to 10 brazas, sand and weed'
+    says: 'Ships may lie two or three cables south of Ciotat''s mole in five to seven fathoms, sand and weed, but not at night.'
+
+  - id: bandol
+    kind: town
+    name: Bandol
+    modern: Bandol
+    lat_deg: 43.1365
+    lon_deg: 5.753
+    height_m: 10
+    source: 'Michelot 1715, p. 46: the castle of Bandol upon a point of a moderate height, opposite a small island, with a rock above water to the eastward; anchor against a large house on the sea-side in 5, 6 and 7 fathom, mud and grass; Purdy 1826, p. 55: the castle and town of Bandol; anchor opposite a large house near Bandol Castle in 5 to 7 fathoms, mud and weeds; Derrotero 1849, p. 25: the castle square with round towers at its angles; the best berth E-W with the castle and N-S with the east end of the Grille, 5 and 6 brazas, weed'
+    says: 'Bandol and its castle on the point, Bandol isle and the Grille rock off it; small ships anchor within in five to seven fathoms, mud and weed.'
+
+  - id: embiez
+    kind: island
+    name: the Isle des Embiez
+    modern: Île des Embiez
+    lat_deg: 43.079
+    lon_deg: 5.7845
+    height_m: 60
+    source: 'Michelot 1715, p. 46: a peninsula called Embies, on the top of which, almost in the middle, a round tower and some houses beneath it; Purdy 1826, p. 55: the summit of Embiez distinguished by a round tower, some houses beneath; west of it the islet le Rauilon, surrounded by rocks above and under water; Derrotero 1849, p. 26: the great isle of Ambiez, high in the middle, with a fine strong castle; Smyth 1854, OCR l. 25555: ''I. des Embiez, fort'' in the table of positions; the height from the modern chart'
+    says: 'The Isle des Embiez with its round tower on the summit, the south side of Brusc road; give the Rouveau and its rocks to the west a wide berth.'
+
+  - id: brusc-road
+    kind: anchorage
+    name: Brusc road
+    modern: 'Rade du Brusc (Baie de Sanary, north of the Embiez)'
+    lat_deg: 43.088
+    lon_deg: 5.783
+    height_m: 0
+    depth_fathoms: 6
+    bottom: mud and grass
+    source: 'Michelot 1715, p. 46: the best anchoring place in Brusc to the northward of the tower of Embiez, against a small sandy shore with warehouses for tunny, 5 and 6 fathom, mud and grass; the anchors hold so well you are now and then obliged to weigh them; Purdy 1826, p. 55: the same, 5 or 6 fathoms, mud and grass; Derrotero 1849, p. 26: north of the castle of Ambiez in 6 to 9 brazas, the bottom mud and fine sand in the middle, sand and tufts of weed to the sides'
+    says: 'Brusc road, north of the Embiez tower in five or six fathoms, mud and grass, holding so well the anchors must be weighed now and then.'
+
+  - id: cape-sicie
+    kind: headland
+    name: Cape Sicie (la Vieille Garde)
+    modern: Cap Sicié
+    lat_deg: 43.0486
+    lon_deg: 5.8578
+    height_m: 358
+    source: 'Michelot 1715, p. 47: Cape Sicie very high and steep on all sides, upon it a chapel of Our Lady; Purdy 1826, p. 55: Cape Sicie, or la Vieille Garde, a bold and prominent headland; Derrotero 1849, p. 27: a mount round at its summit, with a chapel, cut sheer to the sea and sloping gently inland so that it seems from afar a great island; it is made from 16 to 18 leagues off, almost with Mount Coudon; James 1837, vol. 3, p. 177: ''the station off Cape Sicie had been chosen by the vice-admiral'' (Nelson, 1803), to windward, able to shelter under the Hyeres islands; Smyth 1854, p. 15: ''that well-known headland ... in the sight of our officers and seamen of the blockading fleet for months together'''
+    says: 'Cape Sicie, the high round cape with the chapel on it, seen sixteen or eighteen leagues off like an island: the fleet''s station off Toulon.'
+
+  - id: notre-dame-du-mai
+    kind: church
+    name: the chapel of Notre Dame on Cape Sicie
+    modern: Chapelle Notre-Dame-du-Mai
+    lat_deg: 43.058
+    lon_deg: 5.853
+    height_m: 358
+    source: 'Purdy 1826, p. 55: upon the high land, at three quarters of a mile NW from the extremity of the cape, is the chapel of Notre Dame; Norie 1831, p. 59: the Chapel of Notre Dame upon Cape Sicie, in latitude 43 3'' 6'''' N; Derrotero 1849, p. 27: a chapel on the round summit; the height the summit''s, from the modern chart'
+    says: 'The chapel of Notre Dame on the summit of Cape Sicie, the white mark of the cape from the offing.'
+
+  - id: the-brothers
+    kind: rock
+    name: the Brothers (les Freres)
+    modern: Les Deux Frères
+    lat_deg: 43.0512
+    lon_deg: 5.864
+    height_m: 25
+    fix: moved 190 m to the grid's shoal head (1.0 m)
+    source: 'Michelot 1715, p. 47: near the eastern point of the cape two great rocks above water in form of a sugar-loaf, called the Brothers; pass between the cape and the rocks in mid-channel, 10 and 12 fathom, for a rock under water close to the cape, another a cable and a half east of the Brothers; Purdy 1826, p. 55: two rocks above water, les Freres, a passage between them and the coast with 10 fathoms; Derrotero 1849, p. 27: two enormous, high and pointed crags half a mile east of the point, no passage between them; the height JUDGEMENT from the modern chart'
+    says: 'The Brothers, two sugar-loaf rocks off the east point of Cape Sicie, with ten fathoms inside them; a sunken rock lies a cable and a half east of them.'
+
+  - id: sablettes
+    kind: place
+    name: St Elme's road and the low sands of the Sablettes
+    modern: Plage des Sablettes (the isthmus of Saint-Mandrier)
+    lat_deg: 43.0795
+    lon_deg: 5.89
+    height_m: 3
+    source: 'Purdy 1826, p. 55: between Cape Sicie and Cape Cepet a bay, both extremities very high, in the bottom a sandy beach, St Elme''s Road, where vessels may anchor in case of necessity with off-shore winds; Norie 1831, p. 59: many have mistaken this place for Toulon, because as you pass you see that city and ships at anchor in the road; Derrotero 1849, p. 27: the Sablettes so low that the masts of the ships in the road and the buildings of the town are seen over them; several northern ships taking the gap for the entrance have embayed themselves here'
+    says: 'The low sands of St Elme between Sicie and Cepet, over which the masts in Toulon road are seen: many a stranger has taken it for the entrance and embayed himself.'
+
+  - id: cape-cepet
+    kind: headland
+    name: Cape Cepet (Cape Sepet)
+    modern: Cap Cépet
+    lat_deg: 43.0705
+    lon_deg: 5.944
+    height_m: 120
+    source: 'Michelot 1715, p. 47: six or seven miles NE by E from Cape Sicie lies Cape Sepet, which makes the entrance into the Bay of Thoulon; as it is very high they make signals from thence to warn the town of all ships that come in sight; Purdy 1826, p. 55: Cape Cepet 4 miles nearly East from Cape Sicie, the S.E. end of a peninsula forming the south side of the Great or Outer Road; p. 57 (Smith, 1818): in the war upwards of 100 pieces of cannon mounted about Cape Cepet; Norie 1831, p. 60; Derrotero 1849, p. 28; the height JUDGEMENT from the modern chart'
+    says: 'Cape Cepet, the high signal-cape of the peninsula on the south side of Toulon''s Great Road, all batteries.'
+
+  - id: rascas
+    kind: rock
+    name: le Rascas
+    modern: La Rascasse (off Cap Cépet)
+    lat_deg: 43.0688
+    lon_deg: 5.9462
+    height_m: 0
+    dries_m: -0.3
+    extent_m: 60
+    fix: laid a cable off the southernmost point of the cape by the pilots' words
+    source: 'Michelot 1715, p. 47: at the southermost point of Cape Sepet a rock level with the water, a cable''s distance off the land, where the sea breaks sometimes; Purdy 1826, p. 55: at about a cable''s length from the southernmost point of Cape Cepet a rock, le Rascas, on which the sea generally breaks; p. 56 (Smith): give the south point a berth of two cables; Norie 1831, p. 60: le Rascal; Derrotero 1849, p. 28: the Rasquisse, the outer part of a reef off the point'
+    says: 'The Rascas, a rock awash a cable off the south point of Cape Cepet: give the cape two cables'' berth.'
+
+  - id: st-george-anchorage
+    kind: anchorage
+    name: off St George's hollow
+    modern: 'off the Creux Saint-Georges, Saint-Mandrier'
+    lat_deg: 43.09
+    lon_deg: 5.923
+    height_m: 0
+    depth_fathoms: 10
+    bottom: mud and clay
+    source: 'Michelot 1715, p. 47: opposite St George''s hollow galleys anchor in 8, 10, 12 and 15 fathom, the ground grass and mud; men of war anchor farther out in the Great Road; between Cape Sepet and St George''s Point a large infirmary, the Hospital of St Lewis or St Mandry; Purdy 1826, pp. 55 to 56: off it anchorage in 8 to 15 fathoms on muddy ground, the hospital of St Mandrier; p. 56 (Smith, 1818): the best on the south side abreast of St George''s Cove in 14 to 6 fathoms, mud and clay, good holding ground; moor with an open hawse to the eastward'
+    says: 'The best berth in the Great Road, on the south side abreast of St George''s cove under the hospital of St Mandrier, ten fathoms, mud and clay.'
+
+  - id: toulon-great-road
+    kind: anchorage
+    name: the Great or Outer Road of Toulon
+    modern: Grande Rade de Toulon
+    lat_deg: 43.0935
+    lon_deg: 5.933
+    height_m: 0
+    depth_fathoms: 10
+    bottom: mud and clay (weed within the line from the Great Tower to St Mandrier)
+    source: 'Purdy 1826, p. 56 (Smith, 1818): anchorage all over the Outer or Great Road in from 16 to 6 fathoms, mud and clay bottom, good holding ground; with a beating wind stand from side to side, nothing to bring a ship up; exposed to the ENE; Norie 1831, p. 60: 6 to 15 fathoms, mud and clay; Derrotero 1849, p. 29: the Great Road from the line Cape Brun to Cape Sepet to Balaguier, l''Eguillette and the Great Tower; ships seldom anchor outside the line from the Great Tower to the hospital of St Mandrier, within which 8 to 12 brazas, weedy'
+    says: 'Toulon''s Great Road, from Cape Cepet in to the Great Tower and Eguillette, anchorage all over in six to sixteen fathoms, mud and clay, open only to the east-north-east.'
+
+  - id: fort-balaguier
+    kind: castle
+    name: the Tower of Balaguier
+    modern: Fort Balaguier
+    lat_deg: 43.092
+    lon_deg: 5.9055
+    height_m: 12
+    fix: moved 135 m to the grid's land (the first placing read 4 m of water)
+    source: 'Michelot 1715, p. 47: about half a league NW from St George''s Point a large round tower fenced about and fortified with guns, the Tower of Balaguier; between, a bay with a lazaret where infected ships perform quarantine; Purdy 1826, p. 56: a large round tower on the sea-side, fenced and fortified, called Balaguier; Derrotero 1849, p. 28: a fortified tower surrounded by low batteries'
+    says: 'Balaguier, the great round tower and its batteries on the west side of the Great Road; the lazaret and the quarantine ground lie in the bay south of it.'
+
+  - id: fort-eguillette
+    kind: castle
+    name: the Tower or Fort of Eguillette
+    modern: Fort de l'Éguillette
+    lat_deg: 43.098
+    lon_deg: 5.9085
+    height_m: 8
+    source: 'Michelot 1715, p. 47: about 360 fathom N by W from the Tower of Balaguier another large square tower fenced about with a fausse-braye, the Tower of Eguillete; anchor anywhere between these two towers in 4, 5 and 6 fathom; Purdy 1826, p. 56: about one third of a mile N by W from Balaguier the Tower or Fort of Eguillette; between it and the Great Tower the entrance to the Little Road; Derrotero 1849, p. 29: a very low point with a small fort and low batteries, the north limit of the Great Road'
+    says: 'Eguillette, the square tower on the low point, the west side of the entrance to the Little Road: steer for it until the Brothers come on with Balaguier.'
+
+  - id: grosse-tour
+    kind: tower
+    name: the Great Tower (la Grosse Tour)
+    modern: 'Tour Royale (la Grosse Tour), Pointe de la Mitre'
+    lat_deg: 43.103
+    lon_deg: 5.9276
+    height_m: 20
+    fix: moved 435 m to the grid's land (the first placing read 3 m of water)
+    source: 'Michelot 1715, p. 47: about 650 fathom to the eastward of Eguillete Fort another on the sea-side called the Great Tower, fenced about with a fausse-braye; come not within two cables of it for a long point with very little water; Purdy 1826, p. 56: Grosse, or the Great Tower, well fortified; between it and Eguillette the entrance to the Little Road; Derrotero 1849, p. 29: a great circular tower ringed with low batteries at the foot of a small round hill; Smyth 1854, OCR l. 25561: ''Toulon, la Grosse-tour'' in the table of positions'
+    says: 'The Great Tower, the round fortified tower on the east side of the entrance to the Little Road: give it a full cable and more for the Tasse.'
+
+  - id: tasse
+    kind: shoal
+    name: the Tasse
+    modern: La Tasse (off the Tour Royale)
+    lat_deg: 43.1011
+    lon_deg: 5.9324
+    height_m: 0
+    dries_m: -0.6
+    extent_m: 150
+    fix: 'laid about 130 toises south of the tower by the Derrotero; Purdy''s 1818 note has it stretching W.N.W. from the tower, so the ground is foul round its western face; moved 21 m to the grid''s shoal head (2.0 m)'
+    source: 'Michelot 1715, p. 48: a shoal called the Tasse almost over against the Great Tower on the starboard side, a good cable''s length off, with only one or two foot water; Purdy 1826, p. 56: a flat called the Tasse stretches from the Grosse Tower, not to be approached nearer than a cable''s length; Norie 1831, p. 60: la Tasse with about 2 or 3 feet upon it; Derrotero 1849, p. 29: a rocky shoal, the Tasse, about 130 toises south of the tower, its outer edge marked with white casks'
+    says: 'The Tasse, a rocky flat with a foot or two on it off the Great Tower: keep a cable and more from the tower going into the Little Road.'
+
+  - id: toulon-inner-road-mark
+    kind: transit
+    name: the Brothers on with the Tower of Balaguier
+    modern: the leading line into the Petite Rade clear of the Tasse
+    lat_deg: 43.0985
+    lon_deg: 5.9135
+    marks: [fort-balaguier, the-brothers]
+    bearing_deg: 217
+    source: 'Purdy 1826, p. 56 (Smith, 1818): to sail into the Inner Road, steer for Fort Eguillette until you bring the Two Brothers (near Cape Sicie) on, or a little open to the eastward of, the tower of Balaguier; thus you will avoid the Tasse; then steer for the centre of the city; Norie 1831, p. 60: the same; Derrotero 1849, p. 29: also a good mark to see the Brothers over the Sablettes a little east of Fort Balaguier; the bearing from the modern positions of the two marks'
+    says: 'Going into the Little Road, stand for Eguillette until the Brothers off Cape Sicie come on with, or a little open east of, Balaguier tower; then steer for the middle of the town.'
+
+  - id: toulon-inner-road
+    kind: anchorage
+    name: the Little or Inner Road of Toulon
+    modern: Petite Rade de Toulon
+    lat_deg: 43.112
+    lon_deg: 5.923
+    height_m: 0
+    depth_fathoms: 7
+    bottom: 'soft mud and grass, good holding'
+    source: 'Michelot 1715, p. 48: steer directly with the middle of the town, 8, 7, 5 to 3 fathom, the ground mud and grass; the King''s ships when fitted out anchor in the little road at its eastermost part, called Morillon; Purdy 1826, p. 56: from 8 to 6 fathoms, the ground mud and grass, anchoring anywhere until near the entrance of the harbour, where it shoalens fast; exposed to the WNW; Smith, 1818, p. 56: 8 to 6 fathoms, soft muddy bottom and good holding ground; Derrotero 1849, p. 29: 6, 8 or 9 brazas, weed and mud; never a ship of the line in it without a pilot'
+    says: 'The Little Road before the town of Toulon, six to eight fathoms, soft mud and grass, good holding; where the French fleet lies ready for sea.'
+
+  - id: toulon
+    kind: town
+    name: Toulon
+    modern: Toulon
+    lat_deg: 43.124
+    lon_deg: 5.93
+    height_m: 10
+    source: 'Michelot 1715, p. 47: to the northward of the great tower about a mile and a half stands the town of Thoulon, a considerable place for its incomparable bay, the goodness and beauty of its harbours and basins, and the fleets the King fits out there; Purdy 1826, p. 56: the Harbour and City of Toulon, celebrated for its arsenal and fortifications; the harbour formed of two basins in front of the town, 4 fathoms near each entrance; Norie 1831, p. 60: the city in latitude 43 7'' 10'''' N; Derrotero 1849, p. 29: the town ringed with fine fortifications north of both basins'
+    says: 'Toulon, the great arsenal of the French in this sea, walled and fortified, its two basins before the town shut every night with a chain.'
+
+  - id: toulon-arsenal
+    kind: place
+    name: the arsenal and the basins of Toulon
+    modern: 'Arsenal de Toulon, the Vieille Darse and the Darse Vauban'
+    lat_deg: 43.121
+    lon_deg: 5.918
+    height_m: 10
+    source: 'Purdy 1826, p. 56: in the arsenal every ship of war has its particular store-house; the rope-house of free-stone 320 toises long with three arched walks; the cannon-foundery; the harbour of two basins which communicate, men of war generally lie in one or other, shut up every night with a chain; Norie 1831, p. 60: two ports, the old or commercial and the new or military, capable of containing 30 sail of the line, the arsenal along the new port; Michelot 1715, p. 48: galleys anchor opposite the entrance of the old harbour in 3 and 4 fathom'
+    says: 'The arsenal of Toulon along the new basin, with its storehouses, rope-walk and foundry; the old basin lies before the town to the east.'
+
+  - id: la-seyne
+    kind: town
+    name: Seine (La Seyne)
+    modern: La Seyne-sur-Mer
+    lat_deg: 43.101
+    lon_deg: 5.883
+    height_m: 8
+    source: 'Michelot 1715, p. 48: about four miles to the westward of the town of Thoulon a large bay with a large village called Seine, where middling ships may anchor in mid-channel, very little water near the shore, the ground muddy with long grass; near the town 3, 4 and 5 fathom; Purdy 1826, p. 56: the large village of Seine at the bottom of the Little Road, 3 to 5 fathoms, muddy bottom; Derrotero 1849, p. 30: a small port with yards for merchant ships, a narrow channel for ships drawing 12 to 14 feet'
+    says: 'La Seyne, the building village at the shoal west end of the Little Road; only middling ships, in mid-channel, in three to five fathoms.'
+
+  - id: fort-lamalgue
+    kind: castle
+    name: Fort Lamalgue
+    modern: Fort Lamalgue
+    lat_deg: 43.1118
+    lon_deg: 5.947
+    height_m: 60
+    source: 'Purdy 1826, p. 57: eastward from the Grosse Tower the forts of St Louis, Malgue and Vignettes, which latter is nearly level with the water; Norie 1831, p. 60: the forts of St Louis, la Malgue, Vignettes and le Brun, all calculated to defend the Great Road; Derrotero 1849, p. 29: a little inland the fine citadel called Fort Lamalgue, defending the entrance of the road and the approaches of the town; the height JUDGEMENT'
+    says: 'Fort Lamalgue, the citadel on the height east of the Little Road, commanding the Great Road and the eastern approach.'
+
+  - id: mount-faron
+    kind: hill
+    name: Mount Faron
+    modern: Mont Faron
+    lat_deg: 43.1495
+    lon_deg: 5.943
+    height_m: 584
+    source: 'Smyth 1854, OCR l. 25769 (the table of positions, Toulon''s row): ''M. Faron 1700, Coudon 2150'' feet; Derrotero 1849, p. 30: above the town a chain of high bare mountains, and on the heights west of Mount Coudon the fort of Pharon and its fine cistern; the height from the modern chart (Smyth''s 1700 feet)'
+    says: 'Mount Faron, the bare grey mountain standing over the town of Toulon, its fort on the height.'
+
+  - id: mount-coudon
+    kind: hill
+    name: Mount Coudon
+    modern: Mont Coudon
+    lat_deg: 43.1665
+    lon_deg: 6.003
+    height_m: 702
+    source: 'Derrotero 1849, p. 27: Mount Coudon, cut perpendicular at its summit on the east side and falling steeply that way, made 16 to 18 leagues off with Cape Sicie, is the best mark for these parts and the approaches of Toulon; p. 22: the high lands east of Cape Croisette, Cape Sicie and the mountain of Coudon near Toulon; p. 39: Mount Coudon, Cape Sicie, the castles of the islands, Fort Bregancon, Cape Benat and Cape Roux the marks of the Hyeres; Smyth 1854, OCR l. 25769: Coudon 2150 feet; the height from the modern chart'
+    says: 'Mount Coudon, the high mountain behind Toulon, sheer on its eastern face, seen sixteen or eighteen leagues off: the great mark for Toulon and the Hyeres.'
+
+  - id: fourmigues-giens
+    kind: rock
+    name: the Fornigues of Escampebariou
+    modern: Les Fourmigues (Giens)
+    lat_deg: 43.0425
+    lon_deg: 6.063
+    height_m: 10
+    extent_m: 100
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 57: the Fornigues of Escampebariou, a cluster of rocks above water with some under water near them, a mile and a quarter NW by N from the cape; 26 fathoms close to them; Michelot 1715, p. 48: three or four large rocks above water a mile and a half out off the northward point of Escampe-Bariou; Derrotero 1849, p. 31: two great bare rocks, joined under water by a reef, steep-to outside; between them and the cape you may pass leaving them to port going from the Hyeres to Toulon'
+    says: 'The Fourmigues, bare rocks a mile and a quarter north-west of Cape Escampebariou, with twenty-six fathoms close to them.'
+
+  - id: cape-escampobariou
+    kind: headland
+    name: Cape Escampebariou
+    modern: Pointe de l'Escampobariou (Presqu'île de Giens)
+    lat_deg: 43.0304
+    lon_deg: 6.0958
+    height_m: 60
+    fix: 'moved 866 m to the grid''s land, the west end of the peninsula of Giens (the first placing lay off the point)'
+    source: 'Purdy 1826, p. 57: the S.W. extremity of the Peninsula of Giens, large and very steep to the southward, a house upon it resembling a castle with a small tower; it appears like an island both from east and west for the low sandy land north of it; Michelot 1715, p. 48: the same, with some trees; Derrotero 1849, p. 31: an enormous cliff-cape; do not hug it, the sea runs high and calms or furious gusts off the heights; the peninsula, joined to the main by a long low beach, is often taken for one of the Hyeres; on a height near its middle an old square castle almost ruined; the height JUDGEMENT'
+    says: 'Cape Escampebariou, the steep west end of the peninsula of Giens, which looks an island from the offing; flaws and a great swell off it.'
+
+  - id: grand-ribaud
+    kind: island
+    name: Great Ribaud
+    modern: Grand Ribaud
+    lat_deg: 43.0185
+    lon_deg: 6.144
+    height_m: 40
+    extent_m: 250
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 57: the Ribaud Isles, the greater less than half a mile in extent, a quadrangle, nearly half-way between the capes; the Little Ribaud between it and the main, a channel 200 fathoms broad with 3 or 4 fathoms; p. 58 (Smith, 1818): the Little Pass between Porquerolles on the south and Great Ribaud and Cape Esterel on the north, about a mile wide, 24 to 7 fathoms; Derrotero 1849, p. 33: Ribaud grande, a triangle, its south point Cape Meridional with rocks and a hidden ledge east of them; a battery on its south part; the height JUDGEMENT'
+    says: 'Great Ribaud, the islet off Giens on the north side of the Little Pass; mind the sunken ledge east of its southern point.'
+
+  - id: cape-esterel
+    kind: headland
+    name: Cape Esterel (Point Badine)
+    modern: Pointe de l'Esterel (Presqu'île de Giens)
+    lat_deg: 43.0344
+    lon_deg: 6.162
+    height_m: 20
+    fix: moved 510 m to the grid's land (the first placing read 6 m of water)
+    source: 'Purdy 1826, p. 57: Cape Esterel, the easternmost point of the peninsula of Giens, called also Point Badine; close to it a rock above water; anchor within a cannon-shot to the northward of it in 5 or 6 fathoms on sandy ground with SSW and west winds; Michelot 1715, p. 50: the Point of the Badines; Derrotero 1849, p. 31: a low point running well out east, ending in a rock or islet; the height JUDGEMENT'
+    says: 'Cape Esterel, the low east point of Giens and the west horn of the bay of Hyeres, with a rock off it.'
+
+  - id: hyeres
+    kind: town
+    name: Hyeres
+    modern: Hyères
+    lat_deg: 43.1205
+    lon_deg: 6.1305
+    height_m: 60
+    source: 'Purdy 1826, p. 57: the town of Hyeres stands at two miles from the N.W. shore of the bay, on the S.E. side of a hill, among gardens where oranges, citrons and pomegranates grow in the open air; whence pilgrims for the Holy Land commonly departed; Derrotero 1849, p. 32: seen as an amphitheatre a little inland at the foot of a dark hill with the ruins of an old fortress; the height JUDGEMENT'
+    says: 'The town of Hyeres on its hillside among the orange gardens, two miles back from the bay, an old ruined castle above it.'
+
+  - id: hyeres-road
+    kind: anchorage
+    name: the Road of Hyeres
+    modern: 'Rade d''Hyères (the north side, off the Salins)'
+    lat_deg: 43.095
+    lon_deg: 6.215
+    height_m: 0
+    depth_fathoms: 12
+    bottom: soft mud
+    source: 'Purdy 1826, p. 58 (Smith, 1818): good anchorage in most parts of the bay and room for a number of ships out of gun-shot; the best on the north side in 13 to 10 fathoms, soft muddy bottom, with the salt-houses bearing North and the Isle Bregancon from East to E.S.E., but exposed to the E.S.E. and South winds; p. 57: fine clear ground and regular soundings from 15 to 3 fathoms; p. 58: men of war generally anchor about 3 miles off the warehouse in 10 to 12 fathoms; Norie 1831, p. 61: 12 to 10 fathoms, soft mud; Michelot 1715, p. 50: men of war anchor over against the store-house at a league''s distance; Smyth 1854, p. 16: in August 1811 the blockading fleet lay here three weeks at single anchor; James 1837, vol. 3, p. 238: Nelson''s in-shore division off the Hyeres, June 1804'
+    says: 'The Road of Hyeres, the fleet''s anchorage on the north side in ten to thirteen fathoms, soft mud, the salt-houses north and Bregancon east; open to the east-south-east.'
+
+  - id: bregancon
+    kind: castle
+    name: Bregancon
+    modern: Fort de Brégançon
+    lat_deg: 43.0937
+    lon_deg: 6.322
+    height_m: 35
+    fix: moved 30 m to the grid's land (the first placing read 1 m of water)
+    source: 'Michelot 1715, p. 50: a little round island with an old castle upon it called Breganson; no passing between it and the land but in boats; Purdy 1826, p. 58: a little round island with an old fort upon it, Bregancon; to the north-westward small vessels may anchor in 3, 4 or 5 fathoms; Derrotero 1849, p. 32: a round rock cut sheer on all sides, so near the point it is joined by a bridge, its crest girt by the fort''s walls; Smyth 1854, OCR l. 25566: ''Hyeres bay, fort Bregancon'''
+    says: 'Bregancon, the old fort on a steep round rock under the land west of Cape Benat, the east mark of the road.'
+
+  - id: cape-benat
+    kind: headland
+    name: Cape Benat
+    modern: Cap Bénat
+    lat_deg: 43.087
+    lon_deg: 6.362
+    height_m: 200
+    source: 'Michelot 1715, p. 50: Cape Benat, the extreme end of the Bay of Hieres, very high and steep on all sides, a shoal a cable''s length off; at the eastermost point a large rock above water; Purdy 1826, p. 58: very high and steep on all sides, not to be approached nearer than a quarter of a mile for sunken rocks a cable or more off; an islet near it called Cristau; Derrotero 1849, p. 39: running well out to the S.E., its summit a great round hill, stepping down to a sheer rock with several peaks; the height JUDGEMENT'
+    says: 'Cape Benat, the high steep cape at the east end of the bay of Hyeres, with the Cristau islet off it; keep a quarter of a mile off for its sunken rocks.'
+
+  - id: porquerolles
+    kind: island
+    name: Porquerolles
+    modern: Île de Porquerolles
+    lat_deg: 42.9999
+    lon_deg: 6.2
+    height_m: 142
+    fix: moved 15 m to the grid's land (the first placing read 2 m of water)
+    source: 'Michelot 1715, p. 49: Porquerolle Island, the westermost and most considerable, as well for its fortifications as for being more inhabited; about two leagues long, high in certain places especially at the east end; Purdy 1826, p. 58: about 4 miles in length and 1 mile in breadth; some rocks off its N.W. end; Derrotero 1849, pp. 33 to 35: its south side high and steep; the Grand Langoustier, a fine fortress on the peninsula at its west end; the Medes rocks at its east end like ships under sail; the height from the modern chart'
+    says: 'Porquerolles, the westernmost of the isles of Hyeres, four miles long, its south side high and steep, forts at both ends.'
+
+  - id: porquerolles-castle
+    kind: castle
+    name: the castle of Porquerolles
+    modern: Fort Sainte-Agathe
+    lat_deg: 43.0
+    lon_deg: 6.204
+    height_m: 60
+    source: 'Michelot 1715, p. 49: a small fort in the middle of the island on the north side, with a tower in it; Purdy 1826, p. 58: very good anchorage on its north side, opposite the castle, which is near the middle of the island; James 1837, vol. 3, p. 238: 13 June 1804, the frigates Incorruptible and Sirene and the brig Furet seen at anchor under the castle of Porquerolles; Derrotero 1849, p. 34: on a height the castle and the great fort of Porquerolles; the height JUDGEMENT'
+    says: 'The castle of Porquerolles, the round-towered fort on the height in the middle of the island''s north side.'
+
+  - id: porquerolles-anchorage
+    kind: anchorage
+    name: the anchorage off Porquerolles
+    modern: off the Plage d'Argent and Porquerolles village
+    lat_deg: 43.015
+    lon_deg: 6.204
+    height_m: 0
+    depth_fathoms: 10
+    bottom: grass and sand
+    source: 'Michelot 1715, p. 49: between the two forts a sandy bay where ships and galleys anchor in 6 and 7 fathom, the ground grass and sand, sheltered from all the sea-winds; Norie 1831, p. 61: before the castle in 6, 8 or 10 fathoms; Derrotero 1849, p. 34: great ships a long mile off the beaches in 10 to 15 brazas, about E-W with Great Ribaud and N-S with the great fort; sheltered from S.W. and S.E.; a well of good water in the village'
+    says: 'Ships anchor off the castle of Porquerolles in six to ten fathoms, grass and sand, sheltered from the sea-winds but not from the land.'
+
+  - id: porquerolles-light
+    kind: light
+    name: the light of Porquerolles
+    modern: Phare de Porquerolles (Cap d'Arme)
+    lat_deg: 42.9835
+    lon_deg: 6.2065
+    height_m: 80
+    lit:
+      from: 1837
+      until: null
+      range_nm: 20
+      character: a light varied by a flash once in four minutes (not lit in 1805)
+    source: 'Purdy 1840, ''Additional Information'', p. iv: on the south point of the isle, between Cape d''Arme and Cape Roux, a tower of the first class, intermittent, a flash once every four minutes; Derrotero 1849, p. 34: a light of the first order varied by eclipses every 4 minutes, visible 20 miles; Lamberti 1844, OCR l. 6636: seen at 20 miles; Purdy 1826, p. 58, and Michelot 1715, p. 49, name no light on the island. The year 1837 is UNVERIFIED (the builder''s knowledge of the lighthouse; the sources bound it between 1826 and 1840); the range the Derrotero''s'
+    says: 'The light of Porquerolles on Cape d''Arme, which was not yet built in 1805.'
+
+  - id: sarranier
+    kind: rock
+    name: the Seraniers
+    modern: Les Sarraniers (Grand and Petit Sarranier)
+    lat_deg: 42.9986
+    lon_deg: 6.2445
+    height_m: 15
+    extent_m: 150
+    fix: laid off the S.E. point of Porquerolles by the Derrotero's words; UNVERIFIED within a quarter mile; moved 285 m to the grid's shoal head (1.7 m)
+    source: 'Derrotero 1849, pp. 34 to 35: S.E. of the island''s south-east point two great rocks, the Great Seraniet close to it with no passage inside, and the Little Seraniet, higher, smaller and farther out, with rocks at its south point and an islet at its west; a passage 45 brazas wide with 8 to 10 brazas between them only in extremity; Michelot 1715, p. 49: two others off the southermost point; the height JUDGEMENT'
+    says: 'The Seraniers, two great rocks off the south-east point of Porquerolles on the west side of the Great Pass.'
+
+  - id: bagaud
+    kind: island
+    name: Bagueau
+    modern: Île de Bagaud
+    lat_deg: 43.0115
+    lon_deg: 6.362
+    height_m: 58
+    extent_m: 350
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 58: about 4 miles eastward from the east end of Porquerolles the little island Bagueau; the channel between called the Great Pass, with no less than 20 fathoms in its shoalest part; close to its south end the north-west point of Portcros, leaving the narrow Little Pass of Bagueau; Michelot 1715, p. 49: the Great Passage, through which men of war generally go, between these islands, no danger; Derrotero 1849, p. 35: the Great Pass, 20 to 50 brazas, by which squadrons from the west generally enter; James 1837, vol. 3, p. 238: the Grande-Passe (June 1804); the height JUDGEMENT'
+    says: 'Bagueau, the little high isle off Portcros; the Great Pass between it and Porquerolles is four miles wide and has twenty fathoms and more, the fleet''s way into the road.'
+
+  - id: port-cros
+    kind: island
+    name: Portcros
+    modern: Île de Port-Cros
+    lat_deg: 43.006
+    lon_deg: 6.39
+    height_m: 196
+    source: 'Purdy 1826, p. 58: Portcros about 2 1/2 miles long and 1 1/2 broad, a castle about the middle of its north side; off its south point a small rock above water, La Gabiniere; at its N.E. end the Port of Man and its fort; Michelot 1715, p. 49: the highest of them all, on the NW point at the entrance of the port a small fortress, above it a star-fort with a tower; anchor between it and Bagueau in 15 and 16 fathom, mud and grass; Derrotero 1849, pp. 35 to 36: large ships anchor in 10, 12 or 13 brazas midway between Portcros and Bagueau; the smallest of the three principal isles but the highest; the height from the modern chart'
+    says: 'Portcros, the highest of the isles, its old castle over the little port facing Bagueau, where great ships anchor in twelve fathoms between.'
+
+  - id: gabiniere
+    kind: island
+    name: La Gabiniere
+    modern: La Gabinière
+    lat_deg: 42.9949
+    lon_deg: 6.3985
+    height_m: 50
+    fix: moved 210 m to the grid's land (the first placing read 48 m of water)
+    source: 'Purdy 1826, p. 58: off the south point of Portcros a small rock above water, La Gabiniere; Norie 1831, p. 61: the Gabiniere Rock with deep water all round it; Derrotero 1849, p. 36: an almost round rock 100 toises south of the point, very steep-to all round, with 20 brazas mid-channel between it and the point; the height JUDGEMENT'
+    says: 'The Gabiniere, a steep round rock off the south point of Portcros, with deep water all round it.'
+
+  - id: ile-du-levant
+    kind: island
+    name: 'the Isle du Levant, or Titan'
+    modern: Île du Levant
+    lat_deg: 43.033
+    lon_deg: 6.465
+    height_m: 130
+    source: 'Purdy 1826, p. 58: the Isle du Levant, or Titan, the easternmost, about half a mile from Portcros, 4 1/2 miles long, 5 miles to the south-eastward of Cape Benat, forming with it the eastern channel to the bay, the Passe de Levant; Michelot 1715, p. 50: the last and largest of the Isles of Hieres, not inhabited, no anchoring-places but a few bights to the southward; Derrotero 1849, p. 37: high, long, narrow and sinuous, steep-to except on the east, without an anchorage; the height JUDGEMENT'
+    says: 'The Isle du Levant or Titan, the long high easternmost isle of the Hyeres; the Passe de Levant between it and Cape Benat is the way in from the east.'
+
+  - id: titan-light
+    kind: light
+    name: the Titan light
+    modern: Phare du Titan (Île du Levant)
+    lat_deg: 43.0451
+    lon_deg: 6.5075
+    height_m: 70
+    lit:
+      from: 1837
+      until: null
+      range_nm: 15
+      character: a fixed light (not lit in 1805)
+    fix: moved 584 m to the grid's land at the east end of the isle of Levant
+    source: 'Purdy 1840, ''Additional Information'', p. iv: on the eastern extremity of the island, a fixed light 246 feet above the sea, seen at 5 leagues; Derrotero 1849, p. 37: a fixed light of the third order, 70 metres (230 feet) above the sea, visible 5 leagues; Purdy 1826, p. 58, and Norie 1831, p. 61, name no light on the island. The year 1837 is UNVERIFIED (the builder''s knowledge; the sources bound it between 1831 and 1840); the range the pilots'' five leagues'
+    says: 'The fixed light on the east end of the Titan, which was not yet built in 1805.'
+
+  - id: esquillade
+    kind: rock
+    name: L'Esquillade
+    modern: L'Esquillade (off the Île du Levant)
+    lat_deg: 43.044
+    lon_deg: 6.53
+    height_m: 0
+    dries_m: -0.5
+    extent_m: 150
+    fix: 'laid about a mile east of the east point by the pilots'' words (Purdy: about one mile; the Derrotero: three quarters of a mile beyond the Esquilladon, which is 100 toises off Cape Pauvre Louis); UNVERIFIED within a quarter mile; the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 58: to the eastward of the east point of Titan, about one mile, a rock above water called L''Esquilade, with several sunken rocks near it, to be carefully avoided; Michelot 1715, p. 50: one lies a great way out like a boat, and without it to the eastward rocks under water where the sea breaks in bad weather; Norie 1831, p. 62: the Esquilladon above water like a boat, and outside it the Esquillade, upon which the sea breaks in bad weather; Derrotero 1849, p. 38: the Esquilade, ringed with breakers, very dangerous in thick weather and at night, 4 to 10 brazas about it'
+    says: 'The Esquillade, a breaking rock a mile east of the Titan''s east point, beyond the boat-like Esquilladon: a danger in thick weather and by night.'
+
+  - id: cape-lardier
+    kind: headland
+    name: the south-west point of Cape Taillat's headland
+    modern: Cap Lardier
+    lat_deg: 43.1609
+    lon_deg: 6.6175
+    height_m: 100
+    fix: 'moved 1,045 m to the grid''s land (the first placing lay off the cape)'
+    source: 'Purdy 1826, p. 59: Cape Taillat is the south-eastern extremity of a headland from which the south-western end is nearly two miles distant, a slender bay formed between the two points; Norie 1831, p. 62: two sandy coves between Cavalaire and Cape Taillat, separated by a large point of land, where you may anchor with the wind at E. and N.E. in 15 or 20 fathoms; the period''s ''Cape Lardier'' is the modern Cap Camarat (see that entry); the height JUDGEMENT'
+    says: 'The high south-west point of the land of Taillat, between Cavalaire and Cape Taillat.'
+
+  - id: cape-taillat
+    kind: headland
+    name: Cape Taillat
+    modern: Cap Taillat
+    lat_deg: 43.171
+    lon_deg: 6.6442
+    height_m: 40
+    fix: 'moved 1,045 m to the grid''s land (the first placing lay off the cape)'
+    source: 'Purdy 1826, p. 59: a long point stretching into the sea, of moderate height, with a watch-tower on it, rocks above water close to its east side; at a distance it appears like an island, joined to the high land by a neck of low sand; Norie 1831, p. 62: in latitude 43 9'' 45'''' N, a watch-tower upon it called Camarat; Derrotero 1849, p. 41 (the translator''s note): the old tower named Camarat on the chart of the Var of 1792 stood on Cape Taillat, 3 miles S 27 W of Cape Camarat; Purdy 1840, ''Additional Information'', pp. iv to v: the old tower of Camarat stands on Cape Taillat, three miles S 27 W true from the lighthouse; the height JUDGEMENT'
+    says: 'Cape Taillat, the low point that looks an island, with the old watch-tower of Camarat on it.'
+
+  - id: cape-camarat
+    kind: headland
+    name: Cape Lardier (Cape Camarat)
+    modern: Cap Camarat
+    lat_deg: 43.2001
+    lon_deg: 6.6825
+    height_m: 130
+    fix: moved 309 m to the grid's land (the first placing read 13 m of water)
+    source: 'Purdy 1826, p. 59: Cape Lardier, a large and steep point, 3 3/4 miles NE 3/4 E from Cape Taillat; at its point a little oval islet, without it two rocks like boats, and about three cables east of the outermost a very dangerous sunken rock; Norie 1831, p. 63: Cape Lardier 3 1/2 miles N.E. by E. from Camarat tower, with some rocks before it; Derrotero 1849, p. 41: Cape Camarat or Cape Lardier; the note warns that charts confuse it with Cape Taillat; the height the light''s elevation in the Derrotero'
+    says: 'Cape Lardier, the great steep head north-east of Taillat, with an islet and two boat-like rocks off it and a sunken rock three cables beyond them.'
+
+  - id: camarat-light
+    kind: light
+    name: the light of Cape Lardier (Camarat)
+    modern: Phare de Camarat
+    lat_deg: 43.2005
+    lon_deg: 6.6818
+    height_m: 130
+    lit:
+      from: 1831
+      until: null
+      range_nm: 24
+      character: 'a revolving light, a flash every minute (not lit in 1805)'
+    fix: moved 105 m to the grid's land or shoal head
+    source: 'Purdy 1840, ''Additional Information'', p. iv: Cape Lardier, latitude 43 11'' 50'''', a tower of the first class 66 feet high, intermittent light 427 feet above the sea, the flashes seen 8 or 9 leagues off, an interval of one minute against Planier''s half minute; Derrotero 1849, p. 41: on Cape Camarat or Lardier a revolving light of the first order, eclipses of one minute, 130 metres, visible 27 miles; Purdy 1826, p. 59, names no light here and Norie 1831, p. 62, only the watch-tower. The year 1831 is UNVERIFIED (the builder''s knowledge of the lighthouse; the sources bound it between 1826 and 1840); the range Purdy 1840''s eight leagues'
+    says: 'The revolving light on Cape Lardier, which was not yet built in 1805.'
+
+
+  # ---------------------------------------------------------------------------
+  # St Tropez, Frejus, the Lerins, Antibes, Nice, Villefranche (the harbour patch villefranche), Monaco, Mentone and Ventimiglia
+  # ---------------------------------------------------------------------------
+
+  - id: cape-st-tropez
+    kind: headland
+    name: Cape St. Tropez
+    modern: Cap de Saint-Tropez
+    lat_deg: 43.266
+    lon_deg: 6.6925
+    height_m: 40
+    source: 'Purdy 1826, p. 59: from Cape de la Moutte to the Cape of St. Tropez one mile and a quarter, two projections of the same great head-land; a ledge of rocks above and under water stretching off from Cape St. Tropez, not to be approached nearer than 8 fathoms; Derrotero 1849, p. 53: Cape San Tropez and Cape Alexandre the extremes of the gulf of San Tropez, also called of Grimaud; Admiralty 1916, p. 132: Cap de Saint Tropez, or de la Moutte, the eastern extreme of the peninsula on the south side of the gulf; height JUDGEMENT'
+    says: 'Cape St. Tropez, the south point of the gulf of Grimaud; give the ledge off it a berth and come no nearer than eight fathoms.'
+
+  - id: st-tropez
+    kind: town
+    name: St. Tropez
+    modern: Saint-Tropez
+    lat_deg: 43.2715
+    lon_deg: 6.64
+    height_m: 70
+    source: 'Purdy 1826, p. 59: the small tower of St. Tropez on a low point; a small mole at the town, and a little above the town on a rising ground a fortress with some wind-mills near it; Derrotero 1849, p. 53: the town on a low point commanded by a castle, its small square port open to the N.W., the round tower of the Portalet on the point of the outer mole; Admiralty 1916, p. 134: the large Citadelle de Saint Tropez on the hill of Pointe du Cimetiere, four old windmill towers south-east of it; the height that of the citadel''s hill, JUDGEMENT'
+    says: 'St. Tropez, a little town with its small mole on the south shore of the gulf, the citadel and windmills on the rising ground above it.'
+
+  - id: canoubiers-road
+    kind: anchorage
+    name: the Canoubiers
+    modern: Baie des Canoubiers
+    lat_deg: 43.2755
+    lon_deg: 6.661
+    height_m: 0
+    depth_fathoms: 6
+    bottom: mud and grass or weeds
+    source: 'Purdy 1826, p. 59: east of the tower of St. Tropez a little bay, Canoubiez, in which small vessels may anchor in from 6 to 7 fathoms on mud and grass or weeds, but the N.W. winds blow with great violence; Derrotero 1849, p. 53: the road called los Canoubiers, 6 or 7 brazas, bottom mud and weed, the S.W. wind to be feared'
+    says: 'The Canoubiers, the little bay east of St. Tropez, six or seven fathoms on mud and weeds; no place to lie in a north-wester.'
+
+  - id: frejus
+    kind: town
+    name: Frejus
+    modern: Fréjus
+    lat_deg: 43.433
+    lon_deg: 6.7365
+    height_m: 15
+    source: 'Purdy 1826, pp. 59 to 60: Frejus, an antient town, the Forum Julii of Caesar, a mile from the northern shore of the gulf, seen apparently near the middle of the bay, a little river to the south of it; St. Raphael a mile and three quarters to the eastward; Derrotero 1849, p. 53: the town seen from without, a mile from the shore, the mountain of Argens or Roquebrune to the left of it; Admiralty 1916, p. 137: Frejus on a low plain, the cathedral with a large pointed steeple; height JUDGEMENT'
+    says: 'Frejus, the old Roman town a mile within the beach at the head of its gulf, the cathedral steeple over the plain.'
+
+  - id: frejus-road
+    kind: anchorage
+    name: the road of Frejus
+    modern: 'Golfe de Fréjus, between Fréjus-Plage and Saint-Raphaël'
+    lat_deg: 43.408
+    lon_deg: 6.756
+    height_m: 0
+    depth_fathoms: 9
+    bottom: mud
+    source: 'Purdy 1826, p. 60: between Frejus and St. Raphael, at about a mile from the shore, is anchorage in from 10 to 7 fathoms; Derrotero 1849, p. 53: the gulf open to the S.S.W., S. and S.E., good shelter from the first and second quadrants anchoring off St. Raphael in 11 and 12 brazas, and better between that place and Frejus in 10 or 12 brazas, bottom mud (lama)'
+    says: 'Frejus road, a mile off the beach between Frejus and St. Raphael in nine or ten fathoms, mud; good with the wind off the land, open to the southward.'
+
+  - id: mont-vinaigre
+    kind: hill
+    name: the mountain of the Esterel
+    modern: Mont Vinaigre (Massif de l'Esterel)
+    lat_deg: 43.4847
+    lon_deg: 6.8086
+    height_m: 616
+    source: 'Admiralty 1916, p. 137: to the north-eastward of Frejus the Montagne de l''Esterel with three peaks, Mont Vinaigre the highest, 5 miles from Saint Raphael, 2,021 feet high; Derrotero 1849, p. 54: beyond the gulf of Frejus the high mountains of the capes of Agay and Roux'
+    says: 'The high red mountains of the Esterel behind St. Raphael, their greatest summit two thousand feet, a mark far to seaward.'
+
+  - id: cape-roux
+    kind: headland
+    name: Cape Roux
+    modern: Cap Roux (Pic du Cap Roux)
+    lat_deg: 43.454
+    lon_deg: 6.921
+    height_m: 453
+    fix: 'laid on the mountain''s seaward shoulder between the low point and the summit, the pilots'' ''Cape Roux'' being the mountain'
+    source: 'Purdy 1826, p. 60: Cape Roux, a large mountain, steep on all sides and covered with trees, two miles N.E. by E. 1/2 E. from the Vielle of Agay; reddish spots on it, whence its name, and a bed of rocks about it extending to the N.E. and North; Derrotero 1849, p. 54: a coast of reddish rocks with great clefts, above which rise peaks bare at the summit, called the capes Roux; Admiralty 1916, p. 140: Montagne de Cap Roux, its reddish cliffs against the dark pines, a small tower on its summit 1,486 feet above high water'
+    says: 'Cape Roux, a great steep mountain of reddish rock among the pines of the Esterel, the mark between Agay and the gulf of Napoule.'
+
+  - id: ste-marguerite-fort
+    kind: castle
+    name: the citadel of St. Marguerite
+    modern: 'Fort Royal, Île Sainte-Marguerite'
+    lat_deg: 43.5215
+    lon_deg: 7.0465
+    height_m: 44
+    source: 'Purdy 1826, p. 60: the islands of St. Marguerite and St. Honorat are flat, divided by a channel less than half a mile broad; St. Marguerite twice the size of Honorat and higher on the north side, where is a citadel, notorious as a prison, under the protection of which small vessels anchor in from 9 to 7 fathoms on muddy ground, sheltered from westerly and southerly winds; Derrotero 1849, p. 57: the famous citadel of Santa Margarita on the north point, a regular pentagon, good anchorage north of it close to the land; Admiralty 1916, p. 144: on its north and highest part, 144 feet, a large citadel'
+    says: 'The citadel of St. Marguerite, the state prison on the north side of the larger of the Lerins isles; small craft lie under it in seven to nine fathoms on mud.'
+
+  - id: st-honorat
+    kind: island
+    name: St. Honorat
+    modern: Île Saint-Honorat
+    lat_deg: 43.507
+    lon_deg: 7.0465
+    height_m: 6
+    source: 'Purdy 1826, p. 60: on the south side of St. Honorat near its middle a square tower with some houses; from that point a reef called the Monks (les Moines) extends three quarters of a mile to the southward, and another reef, the Picons, at the eastern end; Admiralty 1916, p. 145: low and flat, an abbey on its south side; Les Moines, islets, rocks and foul ground extending nearly 6 cables southward; height JUDGEMENT'
+    says: 'St. Honorat, the low southern isle of Lerins with the monks'' square tower on its south side; the reef of the Monks runs off it three quarters of a mile to the southward.'
+
+  - id: la-fourmigue-golfe-juan
+    kind: rock
+    name: the Boute of Gourjean
+    modern: Rochers de la Fourmigue (Golfe-Juan)
+    lat_deg: 43.5414
+    lon_deg: 7.0833
+    height_m: 4
+    extent_m: 60
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 61: near the middle of the entrance of the Gourjean a rock above water like a great boat, the Boute of Gourjean; north and south of it rocks nearly level with the water on which the sea sometimes breaks; between it and Marguerite not less than 28 fathoms, the channel used by large ships; Derrotero 1849, p. 59: a low blackish nearly square rock called la Bota; Admiralty 1916, p. 146: the low black Rochers de la Fourmigue, the highest 8 feet, the southern rock with 2 feet water, Basses de la Fourmigue with 2 1/2 to 4 1/2 fathoms extending three-quarters of a mile eastward'
+    says: 'The Boute, a low black rock like a great boat in the mouth of Golfe Juan, with sunken heads north and south of it; large ships pass between it and St. Marguerite.'
+
+  - id: golfe-juan-road
+    kind: anchorage
+    name: Gourjean road
+    modern: 'Golfe-Juan, off the old Tour de la Gabelle'
+    lat_deg: 43.561
+    lon_deg: 7.08
+    height_m: 0
+    depth_fathoms: 6
+    bottom: sand and mud
+    source: 'Purdy 1826, p. 61: having passed the Boute, anchor in the bottom of the bay opposite a great square tower, that of the port, Gabellas, in 5 or 6 fathoms on sand and mud; large ships farther off the tower and nearer the Boute in deeper water; good water near the tower; Derrotero 1849, p. 59: the general anchorage south of the tower of the Gabelas in 10, 8 and 6 brazas, fine sand and weed, the bottom better a little to the east; after Toulon one of the best roads of Provence'
+    says: 'Gourjean road, behind the Boute opposite the square tower of the Gabelle, five to six fathoms on sand and mud, and water from the brook by the tower; south and south-east winds are the worst here.'
+
+  - id: la-garoupe-chapel
+    kind: church
+    name: Notre Dame de la Garoupe
+    modern: 'Chapelle Notre-Dame-de-la-Garoupe, Cap d''Antibes'
+    lat_deg: 43.565
+    lon_deg: 7.1322
+    height_m: 78
+    source: 'Purdy 1826, p. 61: on the summit of the high land between Cape Garoupe and Antibes a square tower and a chapel dedicated to Notre Dame (Our Lady) de Antibes; Derrotero 1849, p. 60: the chapel of Nuestra Senora de Antibes, notable from afar by a square tower beside it, seen over the island of Santa Margarita when coming from the west; Admiralty 1916, p. 148: the hill 250 feet high with the Chapelle de Notre Dame d''Antibes with a square tower'
+    says: 'Our Lady of Antibes, the chapel and square tower on the summit of Cape Garoupe, seen over St. Marguerite from the westward.'
+
+  - id: la-garoupe-light
+    kind: light
+    name: the light of La Garoupe
+    modern: Phare de la Garoupe
+    lat_deg: 43.564
+    lon_deg: 7.1337
+    height_m: 103
+    lit:
+      from: 1837
+      until: null
+      range_nm: 21
+      character: a fixed light of the first class
+    source: 'Purdy 1840, Pharonology, p. v (OCR l. 668): since the 1st of July, 1837, a fixed light of the first class from a new tower on the peninsula of Garoupe, near the chapel of Notre Dame, 332 feet above the sea, visible in fine weather seven leagues (range_nm from these seven leagues); Derrotero 1849, p. 60: on the Garoupe peninsula beside the chapel a fixed light of the first order; Admiralty 1916, p. 148: 338 feet above high water, a white circular tower 88 feet high'
+    says: 'La Garoupe light, fixed, beside the chapel on Cape Antibes; first lit in July 1837, so not lit in 1805.'
+
+  - id: antibes
+    kind: town
+    name: Antibes
+    modern: Antibes (with Fort Carré)
+    lat_deg: 43.5805
+    lon_deg: 7.1275
+    height_m: 25
+    source: 'Purdy 1826, p. 61: Antibes, the easternmost sea-port of France, well fortified, its harbour on the north of the town formed by a mole to the east with a half-moon battery; on the opposite promontory a square fort, Fort Quarre; the entrance only 150 fathoms broad, 15 to 18 feet within and near the mole; a ledge with one foot of water 100 fathoms N.E. of the great bastion; Derrotero 1849, pp. 60 to 61: the square fort, the two high square towers of Antibes, Cape Garoupe and the chapel the marks of the port; height JUDGEMENT (Fort Carre on its rise)'
+    says: 'Antibes, the last fortified port of France, its small mole harbour north of the town under Fort Quarre; keep east of the ledge off the great bastion.'
+
+  - id: nice-castle-hill
+    kind: castle
+    name: the castle of Nice
+    modern: 'Colline du Château, Nice'
+    lat_deg: 43.695
+    lon_deg: 7.281
+    height_m: 94
+    source: 'Purdy 1826, p. 62: on advancing, the town of Nice will be seen on a plain by the sea-side; a citadel on a large point protects all the south side of the town, and to the east of this is the harbour; Derrotero 1849, p. 62: a great bluff cut steep toward the E., uneven at the summit, bearing the remains of an ancient citadel, a great round tower a third of its height up; Admiralty 1916, p. 155: Mont du Chateau, 308 feet high'
+    says: 'The castle hill of Nice, the steep rock between the town and the port with the ruins of its old citadel.'
+
+  - id: nice-port-limpia
+    kind: place
+    name: the port of Nice
+    modern: 'Port Lympia, Nice'
+    lat_deg: 43.6965
+    lon_deg: 7.284
+    height_m: 5
+    fix: 'laid on the port''s western quay: the basin itself is small and the mark is the place, not a berth'
+    source: 'Purdy 1826, p. 62: east of the citadel is the harbour, its entrance to the S.E., between the piers 12 feet of water, no anchorage without; the harbour-master orders boats from every vessel to tow a ship in; Derrotero 1849, p. 62: the port of Nisa east of the great bluff, its entrance to the E., seen only coming from the E. or from Villefranche; 17 and 18 feet at the head of the great mole, 13 to 11 in the port, fit only for vessels of 12 feet or less; Lamberti 1844, p. 121: the port 250 toises long, 17 feet at the mouth, 13 within'
+    says: 'The port of Limpia at Nice, behind the castle hill, a small basin for feluccas and coasters with twelve feet in the entrance; no anchorage without it.'
+
+  - id: mont-alban-fort
+    kind: castle
+    name: the fort of Mont Alban
+    modern: Fort du Mont Alban
+    lat_deg: 43.701
+    lon_deg: 7.299
+    height_m: 220
+    source: 'Purdy 1826, p. 64: Villa Franca may be readily known from the westward by the small square fort of Mont-Alban, which appears above the tower on the western point, and has a wind-mill near it; Michelot 1715, OCR l. 4480: a small square fort above the town called Montalban, on a high point between Nice and Villa Franca, a windmill on its point; Derrotero 1849, p. 63: the fortress of Montalban on a height commanding both Nisa and Villafranca; Admiralty 1916, p. 155: Mont Alban, the northern summit, 722 feet high and surmounted by a fort'
+    says: 'The square fort of Mont Alban on the height between Nice and Villefranche, with its windmill; from the westward it shows over the tower on the western point of the bay.'
+
+  - id: mont-boron
+    kind: hill
+    name: Mount Boron
+    modern: Mont Boron
+    lat_deg: 43.693
+    lon_deg: 7.2955
+    height_m: 183
+    source: 'Admiralty 1916, p. 155: Mont Boron, 3 1/2 cables north-eastward of Cap de Nice, 600 feet high, the southern summit of the peninsula which separates Nice from Villefranche; Derrotero 1849, p. 63: the west point of the bay of Villefranche, thick and little salient, rising to very high hills, some ruined mills on its summit and a battery of reddish colour at its foot'
+    says: 'Mount Boron, the high southern end of the land between Nice and Villefranche, with the old mills on its top.'
+
+  - id: villefranche-citadel
+    kind: castle
+    name: the castle of Villa Franca
+    modern: 'Citadelle Saint-Elme, Villefranche-sur-Mer'
+    lat_deg: 43.702
+    lon_deg: 7.309
+    height_m: 15
+    source: 'Michelot 1715, OCR l. 4478: a stoney castle upon the sea-side, on the larboard hand as you go in; without the castle a lazaretto or sick hospital, and between them a small mole in form of an L; Purdy 1826, p. 65 (Mr. Wm. Smith''s remarks): on the west side of the harbour, between the arsenal and the town, stands a very strong fort; Derrotero 1849, p. 63: the castle on a point of middling height, a fortress of four bastions, left to starboard entering the darse; Admiralty 1916, p. 156: the citadel, a large work, on the shore northward of the mole'
+    says: 'The castle of Villa Franca, the four-bastioned fort on the west shore between the darse and the town.'
+
+  - id: villefranche
+    kind: town
+    name: Villa Franca
+    modern: Villefranche-sur-Mer
+    lat_deg: 43.7042
+    lon_deg: 7.3112
+    height_m: 25
+    source: 'Purdy 1826, p. 64: the town built in form of an amphitheatre at the bottom of the harbour, a small decayed place of some 3000 inhabitants; good water at the town and at a convent above it; Michelot 1715, OCR l. 4475: a small decayed town at the foot of a high mountain in the bottom of a bay two miles deep; Purdy 1826, p. 65 (Smith): the Royal ships of war lie at the arsenal and it is customary to salute; height JUDGEMENT'
+    says: 'Villa Franca, the King of Sardinia''s little decayed town and arsenal, built like an amphitheatre at the head of its deep bay.'
+
+  - id: villefranche-road
+    kind: anchorage
+    name: the road of Villa Franca
+    modern: 'Rade de Villefranche, off the town'
+    lat_deg: 43.704
+    lon_deg: 7.3137
+    height_m: 0
+    depth_fathoms: 10
+    bottom: fine clay; weed and mud
+    fix: moved 15 m to water of 18 m (the first placing read -48.8 m)
+    source: 'Purdy 1826, p. 64: between the two points of the entrance 35 to 40 fathoms; course in N.E. by N.; the usual place of anchoring before the town, to the south-eastward of it, in from 18 to 15 fathoms, moored with a good scope to the southward and a hawser to one of the marble pillars; most exposed to South and S.S.W.; p. 65 (Smith): the best anchorage on the west side near the town, the farther north the better; the bottom of fine clay, the depths 8 and 10 fathoms; the tides never rise more than two or three feet; Derrotero 1849, p. 63: the general anchorage before the town, more than a cable east of its middle, bottom weed and mud (yerbas y lama), the holding excellent; south of the town the depth increases fast to 20 and 24 brazas; Admiralty 1916, p. 157: best anchorage off the town, the citadel and Fort Mont Alban in line'
+    says: 'Villa Franca road, off the town on the west side of the bay, eight to ten fathoms on fine clay, a hawser to the marble pillars; a southerly wind sends in a great swell but scarce strains the cable.'
+
+  - id: villefranche-leading-mark
+    kind: transit
+    name: Montalban fort in one with the castle
+    modern: 'Fort du Mont Alban over the Citadelle, the anchorage''s line'
+    lat_deg: 43.7022
+    lon_deg: 7.315
+    marks: [villefranche-citadel, mont-alban-fort]
+    bearing_deg: 263
+    fix: the bearing is that of the fort beyond the castle from the modern positions (the Derrotero's 'exactly west' is near enough)
+    source: 'Derrotero 1849, p. 64: the fortress of Montalban is seen very well from the road and bears exactly W. of the castle, so that its line can be used to place oneself in one of the anchorages; Admiralty 1916, p. 157: the best anchorage off the town, or with the citadel and Fort Mont Alban in line'
+    says: 'Bring the fort of Montalban in one with the castle, bearing west, and you are on the line of the anchorage off the town.'
+
+  - id: cape-ferrat
+    kind: headland
+    name: Mala-Lingua Point
+    modern: Cap Ferrat (Pointe Malalongue)
+    lat_deg: 43.6783
+    lon_deg: 7.3303
+    height_m: 147
+    fix: moved 433 m to the grid's land (the first placing read 60 m of water)
+    source: 'Purdy 1826, p. 64: on advancing from the eastward you will see the small fort of St. Ospicio and the light-house on Mala-Lingua Point, which stretches far into the sea and in the middle is very high; Michelot 1715, OCR l. 4503: the eastermost point of the bay of Villa Franca, Malalingua, a high point stretching a great way into the sea, its end low, and a little within it to the westward a rock almost level with the water where the sea sometimes breaks; Purdy 1826, p. 64 (Smith): one sunken rock about half a cable to the westward of Point Mala; Admiralty 1916, p. 156: Mont Cauferat, a ridge 482 feet high, half a mile north of Pointe Malalongue'
+    says: 'Mala-Lingua, the long high point on the east side of Villa Franca, low at its end, with a sunken rock half a cable within it to the westward.'
+
+  - id: villefranche-lighthouse
+    kind: tower
+    name: the light-house of Villa Franca
+    modern: Phare du Cap Ferrat (the earlier tower on the same point)
+    lat_deg: 43.6784
+    lon_deg: 7.3284
+    height_m: 70
+    fix: moved 571 m to the grid's land (the first placing read 82 m of water)
+    source: 'Purdy 1826, p. 62: Villa Franca under shelter of a head-land distinguished by a light-house, seen on an elevated situation; p. 64: the light-house at the entrance defended by several formidable batteries; p. 65 (Mr. Wm. Smith''s remarks): the light-house is a high white building on a point lower than the adjacent land, which makes it difficult to be distinguished at any great distance; it appears like a sail when first seen; Derrotero 1849, p. 63: the fanal on a slender square tower so white it is known from far; on 1 January 1839 the old light on Cape Ferrat was replaced by one flashing every 30 seconds, 68 metres above the sea; Purdy 1840, Pharonology, p. v (OCR l. 690): intermittent, 223 feet; NO SOURCE gives the year the old light was first lit (Michelot 1715 describes the point and gives no light), so no lit: entered as the day-mark the pilots describe'
+    says: 'The white light-house tower on Mala-Lingua point, defended by batteries; it looks like a sail at a distance against the high land behind.'
+
+  - id: st-hospice-fort
+    kind: castle
+    name: Fort St. Hospice
+    modern: 'Pointe Saint-Hospice (the old fort''s site, its tower and chapel)'
+    lat_deg: 43.6848
+    lon_deg: 7.3345
+    height_m: 20
+    fix: moved 405 m to the grid's land (the first placing read 19 m of water)
+    source: 'Purdy 1826, p. 65: Fort St. Ospicio about two-thirds of a mile to the eastward of Mala-Lingua Point, on a point of rocks steep on all sides; between Bosc Tower and St. Ospicio a slender bay where vessels may anchor with westerly winds in 13 to 8 fathoms, giving the cape a good berth for rocks a cable''s length off it; Michelot 1715, OCR l. 4508: Fort St. Soupir a long square building with four bastions and a half-moon; Derrotero 1849, p. 64: the fort of San Supir on steep rocks, the bay of San Supir north of it, anchorage in 12 to 14 brazas sheltered from the first quadrant; height JUDGEMENT'
+    says: 'St. Hospice, the old fort on its steep point of rocks east of Mala-Lingua; ships may anchor north of it with a westerly wind, keeping a cable off the rocks.'
+
+  - id: monaco
+    kind: town
+    name: Monaco
+    modern: Monaco-Ville (the Rock)
+    lat_deg: 43.731
+    lon_deg: 7.4215
+    height_m: 60
+    source: 'Purdy 1826, p. 65: the fortified town of Monaco seated on a rocky head-land trending east and west, steep on all sides and nearly inaccessible; a garrison, and at its western end an old castle and a magnificent palace; Michelot 1715, OCR l. 4551: easily known by the whiteness of its walls on a high point; Derrotero 1849, p. 64: Monaco five and a half miles N.E. of the fort of San Supir, walled, on an inaccessible rock; Admiralty 1916, p. 159: Presqu''ile de Monaco, a steep rocky eminence 197 feet high'
+    says: 'Monaco, the Prince''s walled town and palace on its steep rock, white walls a good mark six miles east of Villa Franca.'
+
+  - id: monaco-anchorage
+    kind: anchorage
+    name: the port of Monaco
+    modern: 'Port Hercule, Monaco'
+    lat_deg: 43.7345
+    lon_deg: 7.4243
+    height_m: 0
+    depth_fathoms: 4
+    bottom: mud and weeds
+    fix: moved 120 m to water of 5 m (the first placing read -22.0 m)
+    source: 'Purdy 1826, p. 65: the roadstead or harbour to the northward behind the point; small vessels anchor with the larboard anchor to the N.E. and two fasts to the shore toward the town, in from 3 to 4 fathoms, the ground mud and weeds; 5 and 6 fathoms toward the landing-place but exposed to East and S.E.; in the entrance 10 to 16 fathoms; Derrotero 1849, p. 64: the little port 200 toises long, anchor in its middle in 6 to 8 brazas, sheltered from S.W., W. and N.'
+    says: 'Monaco''s little port behind the rock, three or four fathoms on mud and weeds with fasts to the shore; an easterly wind blows right in.'
+
+  - id: table-of-monaco
+    kind: hill
+    name: the Table of Monaco
+    modern: Mont Agel
+    lat_deg: 43.7695
+    lon_deg: 7.433
+    height_m: 1149
+    source: 'Purdy 1826, p. 65: a high mountain whose summit resembles a platform, called the Table of Monaco, about a league and a half N.E. of the town; another hill a little eastward of Menton like a sugar-loaf, the Needle of Menton; good marks seen a long way off; Derrotero 1849, p. 65: between Monaco and Menton a mountain flat at the summit called by seamen the table of Menton; Admiralty 1916, p. 159: Mont Agel (Table de Monaco), 3,770 feet high, with a flat summit, 2 miles northward of the port'
+    says: 'The Table of Monaco, the great flat-topped mountain behind Monaco, with the sharp Needle of Menton to the east of it: both seen a long way off.'
+
+  - id: menton
+    kind: town
+    name: Menton
+    modern: Menton
+    lat_deg: 43.7755
+    lon_deg: 7.5075
+    height_m: 30
+    source: 'Purdy 1826, p. 65: about a mile E. by N. from Monaco a promontory of moderate height, Cape St. Martin, and three miles farther the small town of Menton facing the sea; between them an irregular sandy shore off which vessels may anchor with off-shore winds; Derrotero 1849, p. 65: the small town of Menton four and a half miles N.E. of Monaco, Cape Martin between, a beach off which one may anchor sheltered from N.W. to W., never with a S.W. wind; height JUDGEMENT'
+    says: 'Menton, the Prince of Monaco''s little town facing the sea beyond Cape St. Martin; anchor off the sandy shore only with the wind off the land.'
+
+  - id: ventimiglia
+    kind: town
+    name: Vintimiglia
+    modern: Ventimiglia
+    lat_deg: 43.7895
+    lon_deg: 7.605
+    height_m: 60
+    source: 'Purdy 1826, p. 66: by the sea-side, three leagues east from Monaco, the town of Vintimiglia at the base of a tract of elevated land; above the town on the west a considerable fortress; on the east the mouth of the River Roya; small vessels may anchor before it in fair weather in from 13 to 10 fathoms, but the ground is bad and there is no shelter from the sea; Derrotero 1849, p. 65: in summer anchor before Vintimiglia in 9 to 12 brazas, a considerable fortress above the town; height JUDGEMENT'
+    says: 'Vintimiglia, the first town of the Genoese Riviera, its fortress on the height above it and the Roya beside it; an open road with bad ground.'
+

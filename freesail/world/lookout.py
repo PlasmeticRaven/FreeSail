@@ -1175,11 +1175,13 @@ class Lookout:
         at the tide's present height along her course and a point on either side. A
         danger is as near as its edge and as wide as it lies (its extent on the chart, a
         cable at the least, as the grounding takes it: a ship strikes a ledge's edge
-        well before she is up with its mark)."""
+        well before she is up with its mark). An island the grid lacks (package 94) is
+        seen as land and stood into as a danger is, by its extent, the tiles having water
+        there."""
         spread = units.points_to_rad(LAND_AHEAD_POINTS)
         best: tuple[float, float, Sighting | None] | None = None
         for s in found:
-            if s.seen_as != "danger":
+            if s.seen_as != "danger" and not getattr(s.feature, "is_ground", False):
                 continue
             extent = max(float(s.feature.extent_m), units.CABLE)
             edge = max(0.0, s.distance_m - extent)
@@ -1191,7 +1193,9 @@ class Lookout:
                 best is None or edge < best[0]
             ):
                 best = (edge, bearing, s)
-        dangers = [s for s in found if s.seen_as == "danger"]
+        dangers = [
+            s for s in found if s.seen_as == "danger" or getattr(s.feature, "is_ground", False)
+        ]
         for off in (0.0, -spread, spread):
             within = reach_m if best is None else min(reach_m, best[0])
             d = self._dry_ground_along(pos, course + off, within, tide_m)

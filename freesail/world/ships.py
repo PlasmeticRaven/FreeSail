@@ -851,7 +851,7 @@ class Vessel:
             keep_station(self, world, dt, wind_from, wind_kn)
             return
         if kind == "to_ship":
-            target = world.position
+            target = self._ship_target(world)
             if target is None:
                 self.plan.pop(0)
                 return
@@ -935,6 +935,17 @@ class Vessel:
         east, north = tide.stream_at(self.position, greenwich_time(world))
         if east or north:
             self.position = self.position.advanced(east * dt, north * dt)
+
+    def _ship_target(self, world: Any) -> Any:
+        """Where 'the ship' of a `to_ship` leg is: the player's own hull (whichever is
+        followed; package 84, step 10), or the hull a letter she carries is for
+        (`Message.to_hull`; package 84, step 9)."""
+        to_hull = str(getattr(self.letter, "to_hull", "") or "") if self.letter is not None else ""
+        hull = (getattr(world, "hulls", None) or {}).get(to_hull) if to_hull else None
+        if hull is not None:
+            return hull.position
+        players = getattr(world, "players", None)
+        return players.position if players is not None else world.position
 
     def _arrived(self, world: Any, leg: tuple[Any, ...]) -> None:
         kind = leg[0]
@@ -1110,18 +1121,18 @@ class Vessel:
 
 @contextmanager
 def players_current(world: Any) -> Iterator[Any]:
-    """The block reads the player's ship: given a World or a hull, the followed hull is made
-    current for it and the World yielded, so that her per-ship names (`ship`, `position`,
-    `dealings`, `readings`) and the properties of her per-ship objects are hers whichever
-    hull was current (package 84, step 6); what was given is yielded as it is when she is
-    current already, on the endless plane and in an old shape."""
+    """The block reads the player's ship: given a World or a hull, the player's own hull
+    (`World.players`, whichever hull is followed or current since step 10) is made current
+    for it and the World yielded, so that her per-ship names (`ship`, `position`,
+    `dealings`, `readings`) and the properties of her per-ship objects are hers (package
+    84, step 6); what was given is yielded as it is when she is current already, on the
+    endless plane and in an old shape."""
     base = world.__dict__.get("world", world) if hasattr(world, "__dict__") else world
-    hulls = getattr(base, "hulls", None)
-    followed = hulls.get(getattr(base, "followed", None)) if hulls else None
-    if followed is None or (base is world and getattr(world, "is_followed", True)):
-        yield world
+    players = base.__dict__.get("_own") if hasattr(base, "__dict__") else None
+    if players is None or getattr(base, "own", None) is players:
+        yield base if players is not None else world
         return
-    with base.as_hull(followed):
+    with base.as_hull(players):
         yield base
 
 
@@ -1650,6 +1661,7 @@ class Vessels:
                 mirror_far(v.crew)  # a sleeping hull follows her far body's move
         lines.extend(self._spoke_lines)
         self._spoke_lines = []
+        self._deliver_to_hulls(world)
         lines.extend(self._promote_and_hail(world))
         if any(v.brain is not None for v in self.vessels) or self.crewed_ids:
             # the crewed promotion by the range and the cap (package 43; `world.crews`),
@@ -1864,6 +1876,39 @@ class Vessels:
         self.vessels = [v for v in self.vessels if not v.done]
         return lines
 
+    def _deliver_to_hulls(self, world: Any) -> None:
+        """A letter carried for another hull comes aboard her within hail (package 84,
+        step 9), the lines hers; the carrier goes home after."""
+        from freesail.core.events import Severity
+
+        hulls = getattr(world, "hulls", None) or {}
+        players = getattr(world, "players", None)
+        for v in self.vessels:
+            letter = v.letter
+            if v.done or letter is None:
+                continue
+            to_hull = str(getattr(letter, "to_hull", "") or "")
+            hull = hulls.get(to_hull) if to_hull else None
+            if hull is None and players is not None and players is not getattr(world, "own", None):
+                hull = players  # the player's letter while another hull is followed (step 10)
+            if hull is None or hull is getattr(world, "own", None) or hull.position is None:
+                continue
+            _, distance = bearing_and_distance(hull.position, v.position)
+            if distance / units.NAUTICAL_MILE > HAIL_NM:
+                continue
+            words = v.what or v.name
+            hull.record(
+                Severity.NOTABLE,
+                "sail.within_hail",
+                f"{_head(words)} is within hail, {v.course_words()}; she has a letter for "
+                "the ship.",
+                data={"id": v.id, "letter": True},
+            )
+            v.letter, v.alongside = None, True
+            for severity, kind, text, data in hull.people.message_aboard(letter):
+                hull.record(severity, kind, text, data=data)
+            v.alongside = False
+
     def _promote_and_hail(self, world: Any) -> list[tuple[Any, ...]]:
         """The level of detail by the distance from the player, and a vessel come within
         hail (a letter she carries comes aboard: the carrier of truth 68)."""
@@ -2014,13 +2059,24 @@ def _player_id() -> str:
     return PLAYER_ID
 
 
-def _lying_to(world: Any) -> bool:
-    """Whether the ship lies to or is heaving to, as the reading `the manoeuvre in hand`
-    says it (`api.readings._manoeuvre`: the evolution runner's work in hand, else the
-    heave-to's record on the ship), read straight and not through the readings view."""
-    from freesail.api.readings import _manoeuvre
+# The evolutions whose work in hand is a heaving to (the reading `the manoeuvre in hand`
+# says "heaving to" for them, `api.readings.MANOEUVRE_WORDS`; package 84, step 11: read
+# here from the ship, the world no reader of the api).
+_HEAVING_TO_EVOLUTIONS = ("heave_to", "lie_a_try")
 
-    return str(_manoeuvre(world, None) or "") in ("hove to", "heaving to")
+
+def _lying_to(world: Any) -> bool:
+    """Whether the ship lies to or is heaving to, by the same rule as the reading `the
+    manoeuvre in hand`: the evolution runner's work in hand first (the first instance not
+    waiting names the manoeuvre), else the heave-to's record on the ship
+    (`ship.extra["hove_to"]`, which filling away clears)."""
+    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
+    runner = extra.get("evolutions")
+    for inst in getattr(runner, "instances", None) or ():
+        evo_id = str(getattr(getattr(inst, "evo", None), "id", "") or "")
+        if evo_id and not getattr(inst, "waiting", False):
+            return evo_id in _HEAVING_TO_EVOLUTIONS
+    return "hove_to" in extra
 
 
 def _sound_of(v: Vessel, nm: float) -> str:

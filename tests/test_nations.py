@@ -35,6 +35,14 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
         "denmark",
         # package 39f: Morocco, for Tangier
         "morocco",
+        # package 79c: the regency of Algiers, for Algiers and Oran
+        "algiers",
+        # package 79d: the King of Sardinia and the Italian states
+        "sardinia",
+        "naples",
+        "etruria",
+        "liguria",
+        "papal-state",
     ]
     assert table.at_war("britain", "france") and table.at_war("france", "britain")
     assert table.at_war("britain", "spain") and table.at_war("britain", "batavian-republic")
@@ -201,6 +209,35 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "boulogne": "france",
         "calais": "france",
         "dunkirk": "france",
+        # the Mediterranean west (package 79c): Spain's, and the regency of Algiers'
+        "malaga": "spain",
+        "almeria": "spain",
+        "cartagena": "spain",
+        "palma": "spain",
+        "port-mahon": "spain",
+        "ivica": "spain",
+        "oran": "algiers",
+        "algiers": "algiers",
+        # the Gulf of Lion's block (package 79d)
+        "toulon": "france",
+        "marseille": "france",
+        "hyeres": "france",
+        "villefranche": "france",
+        # the Ligurian sea's (package 79d): Genoa the table's Ligurian Republic, its file's
+        # first dated entry (France's from June 1805, read by the day)
+        "genoa": "liguria",
+        "leghorn": "etruria",
+        "porto-ferrajo": "france",
+        "bastia": "france",
+        "ajaccio": "france",
+        "san-fiorenzo": "france",
+        "maddalena": "sardinia",
+        # the Tyrrhenian's (package 79d)
+        "cagliari": "sardinia",
+        "alghero": "sardinia",
+        "civita-vecchia": "papal-state",
+        "gaeta": "naples",
+        "naples": "naples",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

@@ -1,0 +1,107 @@
+# FreeSail: Gaeta as a port (package 79d, the Tyrrhenian's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/tyrrhenian.yaml's (the harbour patch gaeta).
+#
+# Sources. Michelot 1709, pp. 112 to 113: the galleys anchor near the town, stern to the
+# walls, on oozy weed; go no farther than half-way of the walls for the rocks under water;
+# ships may anchor before Gaeta but not in the middle of the bay for the depth and no
+# shelter. Purdy 1826, p. 103: the anchorage north and N W of the town in 10 to 12
+# fathoms, spacious; the most troublesome winds N E to E. Derrotero 1849, p. 81.
+#
+# The stance. The fortress of the Kingdom of Naples on its promontory: the King of Naples', neutral by the treaty of 1801 with France until the French occupation of 1806: neutral to a King's ship, to an American and to a Frenchman, open to his own.
+# No period sheet read: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: gaeta
+name: Gaeta
+nation: naples
+source: "Michelot 1709 pp. 112-113; Purdy 1826 p. 103; Derrotero 1849 p. 81"
+datum: unverified   # no period sheet read; no published level read
+
+outer_road:
+  feature: gaeta-road
+  name: the road of Gaeta
+  lat_deg: 41.2206
+  lon_deg: 13.5879
+  depth_fathoms: 11
+anchorage:
+  feature: gaeta-road
+  name: the road of Gaeta
+  lat_deg: 41.2206
+  lon_deg: 13.5879
+  depth_fathoms: 11
+mooring:
+  feature: gaeta-port
+  name: under the walls
+  lat_deg: 41.2178
+  lon_deg: 13.5857
+  depth_fathoms: 5
+shore:
+  feature: gaeta
+  name: the mole of Gaeta
+  lat_deg: 41.2105
+  lon_deg: 13.5800
+
+pilot:
+  station: gaeta-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Gaeta felucca
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Di Ciaccio, Ialongo, Sorrentino, Buonomo, Capobianco, Forte, Rosato, Magliozzi]   # Neapolitan names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 180            # out of the gulf to the southward
+  words:
+    channel: "Round the promontory of the Orlando tower and haul up north of the town; go no farther in than half the length of the walls, for the rocks under water and the shoaling all at once."
+    marks: "The Orlando tower on the summit of the promontory; the cleft of the Trinity mount; the fortress and the town on its point; Monte Circeo far to the north-west."
+    anchorage: "Anchor north of the town in ten to twelve fathoms, oozy ground over mud, spacious and sheltered from the west and south; only the winds from north-east to east trouble it. The galleys lie stern to the walls."
+    tide: "There is no tide to speak of."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: naples, note: "the country's; judgement"}
+    - {good: olive oil, price: 42, origin: naples, note: "the place's own; the country's; judgement"}
+    - {good: salt, price: 10, origin: naples, note: "judgement"}
+    - {good: salt fish, price: 26, origin: naples, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: naples, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 60, origin: naples, note: "brought in; judgement"}
+    - {good: timber, price: 10, origin: naples, note: "brought in; judgement"}
+    - {good: lemons, price: 4.2, origin: naples, note: "the place's own; judgement"}
+    - {good: oranges, price: 4.2, origin: naples, note: "the place's own; the season's; judgement"}
+    - {good: cheese, price: 35, origin: naples, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the fortress's stores and the town's chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "the town's fountains; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the fishermen of the gulf
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [gaeta-road, 41 10 N 13 35 E]
+  from_sea: [41 10 N 13 35 E, gaeta-road]
+  in: [gaeta-road]

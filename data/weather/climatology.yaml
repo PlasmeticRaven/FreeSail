@@ -1280,3 +1280,1523 @@ boxes:
           radius_km: {min: 1200, max: 2000}
           life_h: {min: 120, max: 360}
         check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+  # package 79c: the Mediterranean west, over both of the block's regions (`mediterranean-west`
+  # and `balearics`). No box covered the Mediterranean, and `box_at` gave its water the nearest
+  # Atlantic box's (Portugal's), which is wrong (the Levanter and the Poniente, the Alboran's
+  # easterlies, the Balearics' winter northerlies). The check rows are a printed table's (the
+  # Admiralty's, read from the page images under docs/references/pilots/pages/), the
+  # generator's figures judgement fitted to them; PROVISIONAL as every box beyond the Channel.
+  mediterranean-west:
+    title: "the Mediterranean west, the Strait's east bound to Cape Palos, the Balearics and Barbary to Algiers"
+    bounds: {south: 35.0, north: 40.5, west: -5.0, east: 4.5}
+    provisional: true
+    source: "the check rows the Admiralty's Mediterranean Pilot vol. I, fifth edition (1913), Appendix III, the meteorological tables of Gibraltar, Cartagena, Palma, Port Mahon, Oran and Algiers (pp. 724 to 730, the page images under docs/references/pilots/pages/; modern observations, 4 to 36 years each); the generator's figures judgement fitted to them; package 79c"
+    months:
+      1:
+        name: January
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.07, high_toward_deg: 242}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 93, spread: 30}
+        closest_approach_km: {mean: 95, spread: 794}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1008, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 255, spread: 118}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 29, easterly_pct: 15, southerly_pct: 18, northerly_pct: 28, gust31_days: 5, gust54_days: 0.9}
+      2:
+        name: February
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 228}
+        lows_per_month: 9
+        track_bearing_deg: {mean: 90, spread: 30}
+        closest_approach_km: {mean: -162, spread: 757}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1004, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 314, spread: 106}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 31, easterly_pct: 15, southerly_pct: 19, northerly_pct: 25, gust31_days: 5, gust54_days: 0.8}
+      3:
+        name: March
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.09, high_toward_deg: 205}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 48, spread: 30}
+        closest_approach_km: {mean: 221, spread: 346}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 991, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 306, spread: 69}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 27, easterly_pct: 19, southerly_pct: 18, northerly_pct: 25, gust31_days: 7, gust54_days: 1.1}
+      4:
+        name: April
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.13, high_toward_deg: 218}
+        lows_per_month: 9
+        track_bearing_deg: {mean: 75, spread: 30}
+        closest_approach_km: {mean: -23, spread: 313}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 997, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 275, spread: 114}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 32, easterly_pct: 15, southerly_pct: 22, northerly_pct: 21, gust31_days: 5, gust54_days: 0.8}
+      5:
+        name: May
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.08, high_toward_deg: 215}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 40, spread: 30}
+        closest_approach_km: {mean: -23, spread: 703}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 995, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 48, spread: 123}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 24, easterly_pct: 22, southerly_pct: 20, northerly_pct: 24, gust31_days: 3, gust54_days: 0.5}
+      6:
+        name: June
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.06, high_toward_deg: 263}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 97, spread: 30}
+        closest_approach_km: {mean: 69, spread: 454}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1003, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.94
+          bearing_deg: {mean: 358, spread: 116}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 22, easterly_pct: 23, southerly_pct: 21, northerly_pct: 23, gust31_days: 2, gust54_days: 0.3}
+      7:
+        name: July
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.02, high_toward_deg: 159}
+        lows_per_month: 5
+        track_bearing_deg: {mean: 45, spread: 30}
+        closest_approach_km: {mean: 26, spread: 403}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 991, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 331, spread: 101}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 18, easterly_pct: 29, southerly_pct: 18, northerly_pct: 25, gust31_days: 2, gust54_days: 0.2}
+      8:
+        name: August
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.0, high_toward_deg: 31}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 49, spread: 30}
+        closest_approach_km: {mean: 11, spread: 681}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 994, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 295, spread: 84}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 17, easterly_pct: 27, southerly_pct: 21, northerly_pct: 24, gust31_days: 2, gust54_days: 0.2}
+      9:
+        name: September
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.09, high_toward_deg: 265}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 94, spread: 30}
+        closest_approach_km: {mean: -875, spread: 84}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1006, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 262, spread: 116}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 19, easterly_pct: 28, southerly_pct: 14, northerly_pct: 29, gust31_days: 2, gust54_days: 0.3}
+      10:
+        name: October
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.06, high_toward_deg: 330}
+        lows_per_month: 5
+        track_bearing_deg: {mean: 74, spread: 30}
+        closest_approach_km: {mean: 613, spread: 474}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 994, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 298, spread: 115}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 24, easterly_pct: 22, southerly_pct: 16, northerly_pct: 27, gust31_days: 4, gust54_days: 0.6}
+      11:
+        name: November
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.08, high_toward_deg: 215}
+        lows_per_month: 9
+        track_bearing_deg: {mean: 69, spread: 30}
+        closest_approach_km: {mean: 324, spread: 358}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1004, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 305, spread: 61}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 29, easterly_pct: 17, southerly_pct: 17, northerly_pct: 27, gust31_days: 4, gust54_days: 0.7}
+      12:
+        name: December
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.0, high_toward_deg: 131}
+        lows_per_month: 3
+        track_bearing_deg: {mean: 92, spread: 30}
+        closest_approach_km: {mean: 497, spread: 295}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1002, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 275, spread: 87}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 28, easterly_pct: 16, southerly_pct: 18, northerly_pct: 28, gust31_days: 5, gust54_days: 0.9}
+
+  # package 79d: the Gulf of Lion, Provence, the Riviera, Corsica and the Maddalena, the
+  # regions `gulf-of-lion` and `ligurian-sea` together (40.56 to 44.5 N, 3 to 11 E), the
+  # Gulf's one box as the brief has it. Before it the Mediterranean took the nearest Atlantic
+  # box (`box_at`). Each row's check is a printed table's: Marseille's days of wind by the
+  # eight points and calm (the Admiralty's Mediterranean Pilot, vol. II, 1916, appendix
+  # III, p. 462, page image docs/references/pilots/pages/), its glass the background.
+  # The rest is JUDGEMENT, set by a thousand simulated months (tools/climatology_check.py's
+  # run with this box the default, a scratch harness outside the repository) toward the
+  # table's quarters and toward the period's word for the Gulf's winter: the mistral, the
+  # north-west wind, "prevails throughout the year, and during winter and spring is often
+  # very violent" (Admiralty 1916, p. 8), "the chilly and searching northerly wind called
+  # the mistral ... very impetuous in coming down the valley formed by the Rhone" (Smyth
+  # 1854, p. 245). From November to March the lows are the Gulf of Genoa's, born in the
+  # lee of the Alps and running south-south-east down Italy east of the box, with the high
+  # to the west-north-west: the strong winds blow from west to north (two in three of the
+  # hours over 22 knots), the mistral and the tramontane. What the one track cannot also
+  # give: Marseille's winter easterlies (a third of the days in the table, about a tenth
+  # here), which the lows passing south of the box in the Levant's weather would bring;
+  # a finding for the weather's lows (one track per month), docs/dev/TuningNotes.md.
+  gulf-of-lion:
+    title: "the Gulf of Lion, Provence and the Riviera, Corsica and the Maddalena, with the mistral"
+    bounds: {south: 40.56, north: 44.5, west: 3.0, east: 11.0}
+    provisional: true
+    source: "Marseille's table (Admiralty 1916, vol. II, p. 462) for the quarters and the glass; the mistral's season and quarter Admiralty 1916, pp. 2 and 8 to 9, and Smyth 1854, pp. 244 to 246; the systems judgement, said in each row"
+    months:
+      1:
+        name: January
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 6, E 6, SE 3, S 1, SW 1, W 2, NW 10, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.06 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1018
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 24
+          easterly_pct: 34
+          southerly_pct: 10
+          northerly_pct: 29
+          gust31_days: 10
+          gust54_days: 1.0
+      2:
+        name: February
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 5, E 5, SE 3, S 1, SW 1, W 3, NW 9, calm 0, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.02 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 29
+          easterly_pct: 32
+          southerly_pct: 11
+          northerly_pct: 29
+          gust31_days: 10
+          gust54_days: 1.0
+      3:
+        name: March
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 4, E 4, SE 3, S 1, SW 3, W 4, NW 10, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.93 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1014
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 34
+          easterly_pct: 24
+          southerly_pct: 13
+          northerly_pct: 26
+          gust31_days: 10
+          gust54_days: 1.0
+      4:
+        name: April
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 3, E 3, SE 4, S 2, SW 3, W 5, NW 9, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.89 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1012
+        gradient:
+          hpa_per_100km: 0.15
+          high_toward_deg: 213
+        lows_per_month: 3.0
+        track_bearing_deg:
+          mean: 107
+          spread: 50
+        closest_approach_km:
+          mean: -225
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1003
+          spread: 8
+          floor: 982
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 351
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 37
+          easterly_pct: 22
+          southerly_pct: 18
+          northerly_pct: 20
+          gust31_days: 7
+          gust54_days: 0.4
+      5:
+        name: May
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 3, E 3, SE 3, S 2, SW 4, W 6, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.95 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1014
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 39
+          easterly_pct: 19
+          southerly_pct: 18
+          northerly_pct: 21
+          gust31_days: 5
+          gust54_days: 0.1
+      6:
+        name: June
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 3, E 2, SE 2, S 2, SW 5, W 7, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.98 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 45
+          easterly_pct: 15
+          southerly_pct: 18
+          northerly_pct: 18
+          gust31_days: 5
+          gust54_days: 0.1
+      7:
+        name: July
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 3, E 2, SE 2, S 2, SW 5, W 7, NW 9, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.00 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 45
+          easterly_pct: 15
+          southerly_pct: 18
+          northerly_pct: 19
+          gust31_days: 5
+          gust54_days: 0.1
+      8:
+        name: August
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 4, E 2, SE 2, S 2, SW 5, W 7, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.01 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 44
+          easterly_pct: 16
+          southerly_pct: 18
+          northerly_pct: 19
+          gust31_days: 5
+          gust54_days: 0.1
+      9:
+        name: September
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 5, E 3, SE 3, S 1, SW 4, W 6, NW 7, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.02 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 231
+        lows_per_month: 4.3
+        track_bearing_deg:
+          mean: 109
+          spread: 50
+        closest_approach_km:
+          mean: -214
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1002
+          spread: 8
+          floor: 980
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 351
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 38
+          easterly_pct: 23
+          southerly_pct: 15
+          northerly_pct: 20
+          gust31_days: 7
+          gust54_days: 0.4
+      10:
+        name: October
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 6, E 4, SE 3, S 2, SW 2, W 4, NW 9, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.98 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 231
+        lows_per_month: 4.3
+        track_bearing_deg:
+          mean: 109
+          spread: 50
+        closest_approach_km:
+          mean: -214
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1002
+          spread: 8
+          floor: 980
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 351
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 31
+          easterly_pct: 27
+          southerly_pct: 15
+          northerly_pct: 24
+          gust31_days: 7
+          gust54_days: 0.4
+      11:
+        name: November
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 7, E 5, SE 3, S 1, SW 1, W 3, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.00 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 25
+          easterly_pct: 33
+          southerly_pct: 10
+          northerly_pct: 28
+          gust31_days: 10
+          gust54_days: 1.0
+      12:
+        name: December
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 7, E 5, SE 3, S 0, SW 1, W 2, NW 11, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.99 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 26
+          easterly_pct: 32
+          southerly_pct: 6
+          northerly_pct: 32
+          gust31_days: 10
+          gust54_days: 1.0
+
+  # package 79d: the Tyrrhenian, the region `tyrrhenian`'s bounds (the Gulf's box first where
+  # they overlap, Sardinia's north and the Ligurian sea's south: the mistral reaches there).
+  # Each row's check is Naples' printed table (the Admiralty's Mediterranean Pilot, vol. II,
+  # 1916, appendix III, p. 466, 1866 to 1900, page image docs/references/pilots/pages/): its
+  # days of wind by the eight points, its glass the background, its gale days in the note.
+  # The rest JUDGEMENT, set by a thousand simulated months toward the table's quarters (the
+  # same scratch harness as the Gulf's): the winter's tramontana and greco (north and
+  # north-east) and the summer's libeccio and sea breeze (south-west). What the one track a
+  # month leaves short: the winter's northerlies (37 per cent of January's days at Naples,
+  # about a quarter here) and the summer's southerlies (27 per cent, about a tenth here),
+  # the westerlies a few points over; said in docs/dev/TuningNotes.md.
+  tyrrhenian:
+    title: "the Tyrrhenian, Sardinia to Naples, with the tramontana and the libeccio"
+    bounds: {south: 38.5, north: 42.5, west: 8.0, east: 15.5}
+    provisional: true
+    source: "Naples' table (Admiralty 1916, vol. II, p. 466) for the quarters, the glass and the gale days; the systems judgement, said in each row"
+    months:
+      1:
+        name: January
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 6, NE 8, E 4, SE 1, S 2, SW 4, W 3, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 7 days; the glass Naples'' mean of 30.03 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.14
+          high_toward_deg: 239
+        lows_per_month: 5.8
+        track_bearing_deg:
+          mean: 89
+          spread: 50
+        closest_approach_km:
+          mean: -228
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 352
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 8
+            max: 18
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 21
+          easterly_pct: 27
+          southerly_pct: 15
+          northerly_pct: 37
+          gust31_days: 10
+          gust54_days: 1.0
+      2:
+        name: February
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 4, NE 6, E 4, SE 1, S 2, SW 5, W 3, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 5 days; the glass Naples'' mean of 30.04 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.14
+          high_toward_deg: 239
+        lows_per_month: 5.8
+        track_bearing_deg:
+          mean: 89
+          spread: 50
+        closest_approach_km:
+          mean: -228
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 352
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 8
+            max: 18
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 25
+          easterly_pct: 27
+          southerly_pct: 18
+          northerly_pct: 30
+          gust31_days: 10
+          gust54_days: 1.0
+      3:
+        name: March
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 3, NE 5, E 4, SE 2, S 2, SW 7, W 5, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 4 days; the glass Naples'' mean of 29.92 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1013
+        gradient:
+          hpa_per_100km: 0.14
+          high_toward_deg: 239
+        lows_per_month: 5.8
+        track_bearing_deg:
+          mean: 89
+          spread: 50
+        closest_approach_km:
+          mean: -228
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 352
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 8
+            max: 18
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 32
+          easterly_pct: 24
+          southerly_pct: 21
+          northerly_pct: 23
+          gust31_days: 10
+          gust54_days: 1.0
+      4:
+        name: April
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 3, NE 3, E 4, SE 2, S 3, SW 7, W 5, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 5 days; the glass Naples'' mean of 29.91 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1013
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 238
+        lows_per_month: 3.5
+        track_bearing_deg:
+          mean: 129
+          spread: 50
+        closest_approach_km:
+          mean: -69
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1003
+          spread: 8
+          floor: 982
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 344
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 33
+          easterly_pct: 22
+          southerly_pct: 25
+          northerly_pct: 20
+          gust31_days: 7
+          gust54_days: 0.4
+      5:
+        name: May
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 3, NE 3, E 3, SE 2, S 4, SW 7, W 6, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 4 days; the glass Naples'' mean of 29.95 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1014
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 237
+        lows_per_month: 2.3
+        track_bearing_deg:
+          mean: 107
+          spread: 50
+        closest_approach_km:
+          mean: -166
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 1
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 35
+          easterly_pct: 18
+          southerly_pct: 27
+          northerly_pct: 19
+          gust31_days: 5
+          gust54_days: 0.1
+      6:
+        name: June
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 2, NE 3, E 3, SE 2, S 3, SW 8, W 6, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 3 days; the glass Naples'' mean of 29.98 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 237
+        lows_per_month: 2.3
+        track_bearing_deg:
+          mean: 107
+          spread: 50
+        closest_approach_km:
+          mean: -166
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 1
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 38
+          easterly_pct: 18
+          southerly_pct: 27
+          northerly_pct: 17
+          gust31_days: 5
+          gust54_days: 0.1
+      7:
+        name: July
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 2, NE 3, E 3, SE 2, S 3, SW 9, W 6, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 4 days; the glass Naples'' mean of 29.97 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 237
+        lows_per_month: 2.3
+        track_bearing_deg:
+          mean: 107
+          spread: 50
+        closest_approach_km:
+          mean: -166
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 1
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 39
+          easterly_pct: 18
+          southerly_pct: 27
+          northerly_pct: 16
+          gust31_days: 5
+          gust54_days: 0.1
+      8:
+        name: August
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 2, NE 3, E 3, SE 2, S 3, SW 8, W 7, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 3 days; the glass Naples'' mean of 29.98 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 237
+        lows_per_month: 2.3
+        track_bearing_deg:
+          mean: 107
+          spread: 50
+        closest_approach_km:
+          mean: -166
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 1
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 40
+          easterly_pct: 18
+          southerly_pct: 26
+          northerly_pct: 16
+          gust31_days: 5
+          gust54_days: 0.1
+      9:
+        name: September
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 3, NE 4, E 3, SE 2, S 2, SW 9, W 4, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 4 days; the glass Naples'' mean of 30.02 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 225
+        lows_per_month: 5
+        track_bearing_deg:
+          mean: 113
+          spread: 50
+        closest_approach_km:
+          mean: -285
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1002
+          spread: 8
+          floor: 980
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 8
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 33
+          easterly_pct: 20
+          southerly_pct: 25
+          northerly_pct: 22
+          gust31_days: 7
+          gust54_days: 0.4
+      10:
+        name: October
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 4, NE 5, E 3, SE 3, S 3, SW 6, W 4, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 3 days; the glass Naples'' mean of 30.01 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 225
+        lows_per_month: 5
+        track_bearing_deg:
+          mean: 113
+          spread: 50
+        closest_approach_km:
+          mean: -285
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1002
+          spread: 8
+          floor: 980
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 8
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 27
+          easterly_pct: 23
+          southerly_pct: 24
+          northerly_pct: 26
+          gust31_days: 7
+          gust54_days: 0.4
+      11:
+        name: November
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 6, NE 6, E 4, SE 1, S 2, SW 5, W 3, NW 3, the check''s quarters with each half-point day split between its two quarters; its gales 4 days; the glass Naples'' mean of 30.01 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.14
+          high_toward_deg: 239
+        lows_per_month: 5.8
+        track_bearing_deg:
+          mean: 89
+          spread: 50
+        closest_approach_km:
+          mean: -228
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 352
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 8
+            max: 18
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 23
+          easterly_pct: 25
+          southerly_pct: 17
+          northerly_pct: 35
+          gust31_days: 10
+          gust54_days: 1.0
+      12:
+        name: December
+        note: 'Naples'' days of wind (Admiralty 1916, vol. II, p. 466, 1866 to 1900): N 7, NE 7, E 3, SE 1, S 2, SW 4, W 3, NW 4, the check''s quarters with each half-point day split between its two quarters; its gales 4 days; the glass Naples'' mean of 30.00 inches; the gradient, the lows, the high and the gust days JUDGEMENT, set so that a thousand months come near the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.14
+          high_toward_deg: 239
+        lows_per_month: 5.8
+        track_bearing_deg:
+          mean: 89
+          spread: 50
+        closest_approach_km:
+          mean: -228
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 352
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 8
+            max: 18
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 23
+          easterly_pct: 23
+          southerly_pct: 15
+          northerly_pct: 40
+          gust31_days: 10
+          gust54_days: 1.0

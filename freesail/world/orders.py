@@ -150,8 +150,14 @@ REFUSAL = (
 # deck's conversation and no world order.
 _HEAD = re.compile(
     r"^\s*(?:(weather|ship|message|port|person|captain|mark|seat|unseat|aboard|squadron|convoy)"
-    r"\b\s*(\"[^\"]*\"|[\w-]+)?\s*:|(say)\s+as\s+[^:]+:)",
+    r"\b\s*(\"[^\"]*\"|[\w-]+|the\s+[\w' -]+?)?\s*:|(say)\s+as\s+[^:]+:)",
     re.I,
+)
+# A hull named at an `aboard` order's head (package 84, step 9): `aboard the Raven: ...`,
+# `aboard "Raven": ...`; the followed hull when none is named.
+_ABOARD_HULL = re.compile(
+    r"^\s*aboard\s+(?:\"(?P<quoted>[^\"]+)\"|(?P<bare>the\s+[\w' -]+?))\s*:\s*(?P<body>.*)$",
+    re.I | re.S,
 )
 # The director's reason at the end of an order entered again after a doubt (decision 50):
 # `[reason: the story wants her there]`, peeled off and kept apart.
@@ -167,6 +173,25 @@ class WorldOrder:
     channel: str
     text: str  # the order as given, which is what the journal keeps (the reason peeled off)
     reason: str = ""  # the director's `[reason: ...]`, when the order was entered again
+    by: str = ""  # the purview it is given under (package 84, step 10): "" and the director's whole
+
+
+# The purviews a world order may be given under (package 84, step 10; the design's 2.10):
+# the channels each may use, None for the whole channel; the director's and the bare order
+# pass whole, and an office of M8's would name its own. An unknown purview is refused.
+PURVIEWS: dict[str, frozenset[str] | None] = {"": None, "the director": None, "director": None}
+
+
+def purview_allows(by: str, channel: str) -> str | None:
+    """Why a world order given under the purview `by` may not use `channel`, in words, or
+    None when it may (the hook an office's purview will fill)."""
+    key = " ".join(str(by or "").lower().split())
+    if key not in PURVIEWS:
+        return f"'{by}' is no purview this world knows; the orders stand outside it"
+    allowed = PURVIEWS[key]
+    if allowed is not None and channel not in allowed:
+        return f"a {channel} order is outside the purview of {by}"
+    return None
 
 
 def recognises(text: str) -> bool:
@@ -202,6 +227,9 @@ def parse(text: str) -> WorldOrder:
 def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     """Carry a world order out on the world: (the words for the journal's line, data).
     Raises `WorldOrderError` in words."""
+    outside = purview_allows(order.by, order.channel)
+    if outside:
+        raise WorldOrderError(outside)
     body = order.text
     if order.channel == "weather":
         return _weather(world, body)
@@ -224,11 +252,15 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     if order.channel == "convoy":
         return _convoy(world, body)
     if order.channel == "aboard":
-        held = reach(world, order)
+        # the hull named at the head (package 84, step 9): the thing found, made or moved
+        # aboard her, her purse and her hold, by her own names; the player's when none
+        target, body = _aboard_target(world, body)
+        held = reach(target, WorldOrder(order.channel, body, order.reason))
         if held:
             # the rule of reach for a thing and a held person's money (package 53b)
-            raise WorldOrderError(f"{held}; the stations held now: {held_words(world)}")
-        return _aboard(world, body)
+            raise WorldOrderError(f"{held}; the stations held now: {held_words(target)}")
+        words, data = _aboard(target, body)
+        return _on_hull_words(world, target, words, data)
     held = reach(world, order)
     if held:
         # the rule of reach (package 52): whoever gives the order
@@ -236,6 +268,60 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     if order.channel == "say":
         return _say_as(world, body)
     return _person(world, body)
+
+
+# ---------------------------------------------------------------------------
+# a hull named in a world order (package 84, step 9; the design's 2.8)
+# ---------------------------------------------------------------------------
+
+
+def hull_named(world: Any, words: str, make: bool = True) -> Any:
+    """The hull a world order names: the World itself for the player's ship (her name,
+    'the ship', 'us'); another ship's hull by her name or id (her vessel's `crew`, made in
+    the far shape by `crews.station_world` when she has none and `make`); refused in words
+    for a ship not on the sea or one with no captain of her own to keep a hull."""
+    key = " ".join(str(words).split()).strip('"').lower().removeprefix("the ")
+    own = str(getattr(getattr(world, "ship", None), "name", "") or "").lower()
+    if key in ("ship", "us", "her", "this ship", "our ship") or (own and key == own):
+        return world
+    hulls = getattr(world, "hulls", None) or {}
+    if key in hulls:
+        return hulls[key]
+    vessels = getattr(world, "vessels", None)
+    vessel = vessels.find(words.strip().strip('"')) if vessels is not None else None
+    if vessel is None or vessel.done:
+        names = ", ".join(v.name for v in vessels.active() if v.description) if vessels else ""
+        raise WorldOrderError(
+            f"No ship named {words.strip()!r} is on the sea; the sail: {names or 'none'}"
+        )
+    if vessel.crew is not None:
+        return vessel.crew
+    if not make:
+        raise WorldOrderError(f"{vessel.name} has no hull of her own yet")
+    from freesail.world.crews import station_world
+
+    try:
+        return station_world(world, vessel.id)[1]
+    except ValueError as e:
+        raise WorldOrderError(str(e).rstrip(".")) from None
+
+
+def _aboard_target(world: Any, body: str) -> tuple[Any, str]:
+    """(the hull an `aboard` order is for, the order with the head's name taken out)."""
+    m = _ABOARD_HULL.match(body)
+    if m is None:
+        return world, body
+    name = (m.group("quoted") or m.group("bare") or "").strip()
+    target = hull_named(world, name)
+    return target, f"aboard: {m.group('body').strip()}"
+
+
+def _on_hull_words(world: Any, target: Any, words: str, data: dict[str, Any]) -> Any:
+    """The journal's words for an order carried out aboard another hull: hers named."""
+    if target is world:
+        return words, data
+    name = str(getattr(getattr(target, "ship", None), "name", "") or target.id)
+    return f"aboard the {name}: {words}", data | {"ship": str(target.id)}
 
 
 # ---------------------------------------------------------------------------
@@ -1254,7 +1340,8 @@ _MESSAGE_AT = re.compile(
 )
 _MESSAGE_BY = re.compile(
     r"^message:\s*by\s+(?:a|the)\s+cutter\s+from\s+(?P<port>[\w' -]+?)\s+from\s+"
-    r"(?P<origin>.+?)\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
+    r"(?P<origin>.+?)(?:\s+to\s+(?P<to>the\s+[\w' -]+?|\"[^\"]+\"))?"
+    r"\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
     re.I,
 )
 
@@ -1279,6 +1366,8 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         if port is None:
             raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
         origin = m.group("origin").strip()
+        to_words = (m.groupdict().get("to") or "").strip()
+        target = hull_named(world, to_words) if to_words else world
         spec = {
             "description": "cutter",
             "name": f"the {port.name} cutter",
@@ -1292,12 +1381,16 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         world.vessels.serial += 1
         vessel = vessel_from_spec(world, spec, world.vessels.serial)
         vessel.letter.carried_by = f"the {port.name} cutter"
+        words = f"a cutter sent from {port.name} with a letter from {origin}"
+        data = {"port": port.id, "origin": origin, "id": vessel.id}
+        if target is not world:
+            # a letter to another hull (package 84, step 9): the cutter steers for her body
+            # and the letter comes aboard her within hail (`Vessels.tick`)
+            vessel.letter.to_hull = str(target.id)
+            words += f" for the {getattr(target.ship, 'name', target.id)}"
+            data["ship"] = str(target.id)
         world.vessels.add(vessel)
-        return f"a cutter sent from {port.name} with a letter from {origin}", {
-            "port": port.id,
-            "origin": origin,
-            "id": vessel.id,
-        }
+        return words, data
     raise WorldOrderError(
         "A message order is 'message: at <port> from <origin>: \"<text>\"' or 'message: by a "
         'cutter from <port> from <origin>: "<text>"\'.'
@@ -1375,6 +1468,7 @@ _MAKE = re.compile(r'^person:\s*make\s+"(?P<name>[^"]+)"\s*(?:,\s*(?P<rest>.*?))
 # `... leaves the ship at <port>` (the name quoted, or bare before the verb).
 _MOVE = re.compile(
     r'^person:\s*(?:"(?P<name>[^"]+)"|(?P<bare>.+?))\s+(?P<move>comes\s+aboard'
+    r"(?:\s+(?P<ship>the\s+[\w' -]+?|\"[^\"]+\"))?"
     r"(?:\s+as\s+(?:the\s+|a\s+|an\s+)?(?P<station>.+?))?|goes\s+ashore"
     r"|leaves\s+the\s+ship\s+at\s+(?P<port>.+?))\s*$",
     re.I,
@@ -1505,6 +1599,15 @@ def _a_person(words: str) -> bool:
     return key.startswith(("mr ", "mrs ", "captain ", "capitaine ", "monsieur ", "senhor "))
 
 
+def _ship_words_of(phrase: str) -> str:
+    """The ship's words of a phrase that names one ('aboard the Raven' -> 'the Raven')."""
+    for pat in (_ABOARD_SHIP, _PLACE_OF_SHIP, _SHIPS_PLACE):
+        m = pat.match(phrase)
+        if m is not None:
+            return m.group("ship").strip()
+    return phrase
+
+
 def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]:
     """`person: make "<name>", <the words>`: a person with an outline from the words, among
     the world's people from now on (spec M7b §8; package 52)."""
@@ -1534,13 +1637,18 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         if said is not None:
             own, at = said
             if not own:
-                ship_name = getattr(getattr(world, "ship", None), "name", "") or "this ship"
-                raise WorldOrderError(
-                    f"'{phrase}' names another ship: a person is made aboard the {ship_name} "
-                    "or ashore, and the people of other ships are not kept (her master and "
-                    "people are her own, and no form puts a person aboard her); nothing is "
-                    "made."
-                )
+                # another ship's hull (package 84, step 9): he is made aboard her, of her
+                # company, by her own names; the other phrases as said
+                ship_words = _ship_words_of(phrase)
+                target = hull_named(world, ship_words)
+                others = [
+                    x
+                    for x in [" ".join(y.split()) for y in str(rest).split(",") if y.strip()]
+                    if x != phrase
+                ]
+                rest_hers = ", ".join(others + [f"aboard{', in the ' + at if at else ''}"])
+                words, data = _make_person(target, name, rest_hers)
+                return _on_hull_words(world, target, words, data)
             aboard, place = True, (at or place)
             continue
         m = _ABOARD_AT.match(phrase)
@@ -1643,6 +1751,74 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
     return f"{person.outline_words().rstrip('.')}; made from words, {where}", data
 
 
+def _ship_words_own(world: Any, words: str) -> bool:
+    key = " ".join(str(words).split()).strip('"').lower().removeprefix("the ")
+    own = str(getattr(getattr(world, "ship", None), "name", "") or "").lower()
+    return key in ("ship", "us", "her", "this ship", "our ship") or (bool(own) and key == own)
+
+
+def _person_anywhere(world: Any, name: str) -> Any:
+    """A person by his name among every hull's company (the one registry; package 84,
+    step 9), the World's own asked first."""
+    found = world.people.find(name)
+    if found is not None:
+        return found
+    key = " ".join(str(name).lower().split())
+    registry = getattr(world, "registry", None)
+    everyone = registry.persons() if registry is not None else []
+    # the name whole first; the surname only when one person of the world bears it (the
+    # lead's review of step 9: two Mr Popes on two hulls)
+    for p in everyone:
+        if str(p.name).lower() == key:
+            return p
+    surname = key.removeprefix("mr ").removeprefix("mister ")
+    by_surname = [p for p in everyone if str(getattr(p, "surname", "")).lower() == surname]
+    return by_surname[0] if len(by_surname) == 1 else None
+
+
+def _comes_aboard_hull(
+    world: Any, target: Any, person: Any, station: str | None
+) -> tuple[str, dict[str, Any]]:
+    """A person of any company come aboard another hull (package 84, step 9): his
+    whereabouts hers, her log says so, and a station of hers bound to him when named."""
+    from freesail.world.hearing import own_hull
+
+    hid = own_hull(target)
+    data: dict[str, Any] = {"person": person.name}
+    said = []
+    if not (getattr(person, "aboard", False) and getattr(person, "hull", "") == hid):
+        ports = getattr(world, "dealings", None)
+        came = ports.ports.get(person.port) if (ports is not None and person.port) else None
+        person.aboard = True
+        person.hull = hid
+        person.where = "quarterdeck"
+        whence = f" from {came.name}" if came is not None else ""
+        target.record(
+            Severity.NOTABLE,
+            "person.aboard",
+            f"{person.name} came aboard{whence}.",
+            data={"person": person.name, "from": came.id if came is not None else ""},
+        )
+        said.append(f"{person.name} came aboard{whence}")
+        data["came_aboard"] = True
+    if station:
+        key = _station_key(station)
+        stations = getattr(target, "stations", None)
+        if stations is not None and (stations.aboard(key) or key in stations.kinds()):
+            stations.bind(key, person, quiet=True)
+            person.station = key
+            said.append(f"the {key}'s station bound to him")
+            data["station"] = key
+        else:
+            role = " ".join(station.lower().split())
+            person.role = role
+            said.append(f"borne as {role} (no station of that name aboard)")
+            data["role"] = role
+    if not said:
+        raise WorldOrderError(f"{person.name} is aboard her already.")
+    return "; ".join(said), data
+
+
 def _station_key(words: str) -> str:
     from freesail.agents.agent import station_name
 
@@ -1656,6 +1832,18 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     from freesail.world.places import place_words
 
     name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    ship_words = (m.groupdict().get("ship") or "").strip()
+    if ship_words and _ship_words_own(world, ship_words) is False:
+        # `comes aboard the Raven` (package 84, step 9): aboard her, by her own names
+        target = hull_named(world, ship_words)
+        person = _person_anywhere(world, name)
+        if person is None:
+            raise WorldOrderError(
+                f"Nobody named {name} is among the people; make him first: 'person: make "
+                f'"{name}", ...\'.'
+            )
+        words, data = _comes_aboard_hull(world, target, person, m.group("station"))
+        return _on_hull_words(world, target, words, data)
     person = world.people.find(name)
     if person is None:
         raise WorldOrderError(
@@ -2115,6 +2303,21 @@ def held_stations(world: Any) -> list[tuple[str, str, str]]:
     return out
 
 
+def held_stations_everywhere(world: Any) -> list[tuple[str, str, str]]:
+    """Every hull's held stations as `held_stations` gives them (package 84, step 9): the
+    rule of reach over the hulls, so that a word said as a person of the Raven's held
+    station, or his moving, is refused as the player's ship's would be."""
+    out = list(held_stations(world))
+    for hull in list((getattr(world, "hulls", None) or {}).values()):
+        if hull is getattr(world, "own", None) or hull is world:
+            continue
+        try:
+            out.extend(held_stations(hull))
+        except Exception:  # noqa: BLE001  (a hull with no muster binds nobody)
+            continue
+    return out
+
+
 def held_words(world: Any) -> str:
     """The stations held now in words, for the rule of reach's refusal and the truth."""
     parts = []
@@ -2140,8 +2343,9 @@ def reach(world: Any, order: WorldOrder) -> str | None:
         return _aboard_reach(world, order.text)
     if order.channel not in ("say", "person"):
         return None
-    held = {person: (station, who) for station, person, who in held_stations(world) if person}
-    stations_held = {station: who for station, _person, who in held_stations(world)}
+    everywhere = held_stations_everywhere(world)
+    held = {person: (station, who) for station, person, who in everywhere if person}
+    stations_held = {station: who for station, _person, who in everywhere}
     if order.channel == "say":
         person = say_as_person(world, order.text)
         if isinstance(person, Voice) and person.station in stations_held:

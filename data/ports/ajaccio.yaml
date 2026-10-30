@@ -1,0 +1,107 @@
+# FreeSail: Ajaccio as a port (package 79d, the Gulf of Lion's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch ajaccio).
+#
+# Sources. Michelot 1709, OCR l. 10634: the ordinary anchorage between the town and the
+# Capuchins' convent in 5 to 8 brasses, weedy ooze. Purdy 1826, p. 80: so soon as the
+# citadel bears N by E steer up N E by N for the road and anchor in 10 to 14 fathoms, muddy
+# ground, the citadel's point W S W, or near the bottom of the harbour in 7 to 9. Derrotero
+# 1849, p. 113: the town anchorage three cables north of the citadel, 9 to 12 brazas, weed
+# (summer); the Capuchins' 8 to 13 brazas, sand and mud (winter).
+#
+# The stance. Corsica French since 1768 (FROM MEMORY), the British kingdom of Corsica of 1794 to 1796 ended (FROM MEMORY); in 1805 French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803).
+# No period sheet read: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: ajaccio
+name: Ajaccio
+nation: france
+source: "Michelot 1709 OCR l. 10634; Purdy 1826 p. 80; Derrotero 1849 p. 113"
+datum: unverified   # no period sheet read; SHOM's RAM gives Ajaccio's NM 0.47 m above the zero for a patch
+
+outer_road:
+  feature: ajaccio-road
+  name: Ajaccio Road
+  lat_deg: 41.9215
+  lon_deg: 8.7460
+  depth_fathoms: 12
+anchorage:
+  feature: ajaccio-road
+  name: Ajaccio Road
+  lat_deg: 41.9215
+  lon_deg: 8.7460
+  depth_fathoms: 12
+mooring:
+  name: north of the citadel
+  lat_deg: 41.9195     # the grid's 14.5 m off the town (judgement)
+  lon_deg: 8.7430
+  depth_fathoms: 7
+  bottom: weedy ooze
+shore:
+  feature: ajaccio
+  name: the mole of Ajaccio
+  lat_deg: 41.9196
+  lon_deg: 8.7376
+
+pilot:
+  station: ajaccio-road
+  cruising_nm: 5                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Ajaccio boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Pozzo di Borgo, Peraldi, Bacciochi, Levie, Costa, Pietri, Ornano, Colonna]   # Corsican names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 225            # out of the gulf to the south-westward
+  words:
+    channel: "Come in past the Sanguinaires and the Parata, keeping off the Citadel rock, and so soon as the citadel bears north by east steer up north-east by north for the road."
+    marks: "The Sanguinaires and the high point of the Parata at the gulf's north side; the citadel on its point; the town behind it; the high mountains of the interior over all."
+    anchorage: "Anchor in ten to fourteen fathoms, muddy ground, with the citadel's point west-south-west; or farther up near the bottom of the harbour in seven to nine. In winter the berth off the Capuchins, sand and mud."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 78, origin: france, note: "brought in; the country's; judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 60, origin: france, note: "brought in; judgement"}
+    - {good: timber, price: 5.6, origin: france, note: "the place's own; judgement"}
+    - {good: cheese, price: 24, origin: france, note: "the place's own; judgement"}
+    - {good: cattle, price: 6.3, origin: france, note: "the place's own; the head; judgement"}
+
+dockyard:
+  kind: chandlers                 # the town's chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "the town's fountains; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the gulf's fishermen
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [ajaccio-road, 41 52 N 8 40 E]
+  from_sea: [41 52 N 8 40 E, ajaccio-road]
+  in: [ajaccio-road]

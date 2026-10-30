@@ -1,0 +1,115 @@
+# FreeSail: Algiers as a port (spec M6 §26; package 79c, the Balearics' region with the
+# Barbary coast to Cape Matifu), on package 35's machinery; the marks are the features
+# file's (data/charts/features/balearics.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Muelle y Linterna de Argel', 'Castillo
+# del Emperador', 'Cabo Matifús', pp. 152 to 153: two miles and a half SE of the Point
+# Pescado the mole and lantern of Algiers, the mole fortified with batteries in two tiers and
+# the lantern with three; the city rising from the mole up the side of a hill, white, like a
+# topsail seen from the offing; the Emperor's castle above it; the mole a basin of little
+# water, not enough for great frigates, for small xebecs and lesser craft, some forty of
+# them, not commodiously; a little north of the lantern a shoal awash; Cape Matifu, low with
+# a table hill, the bay's east point; in all the bay a ship may anchor in what water she
+# will, minding her cables, for though the ground is mostly sand there are patches of
+# gravel, loose stones and lost anchors; the winds from east round by north to north-west
+# send in much sea, so that it is best to leave the anchorage when they come on with an ill
+# look, unless anchored near Cape Matifu, where with an easterly there is good shelter.
+# Michelot 1709 and 1715 (the lantern lit every night); Purdy 1826, pp. 324 to 327 (the
+# easterlies of May to September, the westerlies and the 'La-betch' after); Bérard 1837,
+# pp. 93 to 95 (the French works after 1830, not 1805's).
+#
+# The datum: UNVERIFIED. No period sheet is patched at Algiers in this package (Roux's plate
+# 50 and Heather's bay of Algiers, read and not transcribed, CC BY-NC-SA); the chart's
+# depths are EMODnet's at the lowest astronomical tide, the French port of the nineteenth
+# century and the modern one in the grid where 1805 had the Dey's small mole.
+#
+# The stance. Algiers is the Dey's, the regency of Algiers' (the nations table, `algiers`):
+# at peace with Britain by treaty, its differences settled by the fleet's visits (James vol.
+# 3, pp. 235, 333 to 334), neutral to a King's ship as to every flag the table has. The
+# regency's corsairs, the Dey's cruisers and the reis's, are noted here and not modelled
+# (the brief). Prices FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: algiers
+name: Algiers
+nation: algiers
+source: "Tofiño 1787 pp. 152-153 (the mole and lantern, the city, the bay, the ground, the winds); Michelot 1709, 1715 p. 90; Purdy 1826 pp. 324-327; Bérard 1837 pp. 93-95"
+datum: unverified
+
+outer_road:
+  name: the bay of Algiers
+  lat_deg: 36.7900
+  lon_deg: 3.1300
+anchorage:
+  feature: algiers-road
+  name: Algiers road
+  lat_deg: 36.7740
+  lon_deg: 3.1200
+mooring:
+  feature: algiers-road
+  name: in the bay of Algiers, east of the mole
+  lat_deg: 36.7740
+  lon_deg: 3.1200
+  depth_fathoms: 20
+  bottom: sand with patches of gravel and loose stones
+  deep_draught_ft: 22    # judgement
+shore:
+  feature: algiers-mole
+  name: the mole of Algiers
+  lat_deg: 36.7850
+  lon_deg: 3.0690
+
+pilot:
+  station: algiers-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the port captain's boat of Algiers
+    under: oars
+    note: "judgement"
+  names: [Hamida, Ali, Mustafa, Hassan, Murad, Mohammed, Omar, Yahia]   # judgement
+  skill: 0.8
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 30             # out of the bay to the north-north-east (judgement)
+  words:
+    channel: "The bay lies between the Point Pescado and Cape Matifu, ten miles and a half; the mole and its lantern are two miles and a half south-east of the Point Pescado. A little north of the lantern is a shoal awash."
+    marks: "The city white on its hill like a topsail, the mole and the lantern with its three tiers of guns, the Emperor's castle above the city; Cape Matifu low, with a table hill near its end that seems an island from five or six leagues."
+    anchorage: "Anchor anywhere in the bay in what water you will, but look to your cables: though the ground is mostly sand there are patches of gravel, loose stones and lost anchors. With the wind from east round by north to north-west there is much sea: leave the anchorage if it comes on with an ill look, unless you lie near Cape Matifu, where with an easterly there is good shelter. The mole is for small craft only."
+    tide: "There is next to no tide; the sea rises and falls with the wind and the glass."
+
+tide:
+  establishment: Algiers
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 14, origin: algiers, note: "judgement"}
+    - {good: barley, price: 11, origin: algiers, note: "judgement"}
+    - {good: cattle, price: 18, origin: algiers, note: "the fleet's bullocks from the Barbary shore; judgement"}
+    - {good: fresh beef, price: 22, origin: algiers, note: "judgement"}
+    - {good: hides, price: 44, origin: algiers, note: "judgement"}
+    - {good: wool, price: 28, origin: algiers, note: "judgement"}
+    - {good: wax, price: 115, origin: algiers, note: "judgement"}
+    - {good: olive oil, price: 44, origin: algiers, note: "judgement"}
+    - {good: dates, price: 20, origin: algiers, note: "judgement"}
+    - {good: oranges, price: 5, origin: algiers, note: "judgement"}
+    - {good: vegetables, price: 3, origin: algiers, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 70, note: "a spar from the Dey's stores at the Dey's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []

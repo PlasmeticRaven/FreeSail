@@ -1,0 +1,224 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"155,33": [
+"vacca-islet",
+"toro-islet"
+],
+"155,34": [
+"cape-teulada"
+],
+"155,35": [
+"cape-spartivento-sardinia"
+],
+"156,33": [
+"san-pietro-island",
+"carloforte",
+"carloforte-road",
+"sant-antioco-island"
+],
+"156,34": [
+"gulf-of-palmas"
+],
+"156,36": [
+"pula-road",
+"cagliari",
+"cagliari-castle",
+"cagliari-mole",
+"cagliari-road",
+"cagliari-lazaretto",
+"cape-sant-elia"
+],
+"156,38": [
+"cape-carbonara",
+"cavoli-island"
+],
+"157,34": [
+"monte-linas"
+],
+"157,37": [
+"sette-fratelli"
+],
+"157,38": [
+"capo-ferrato"
+],
+"158,34": [
+"monte-arcuentu"
+],
+"159,33": [
+"mal-di-ventre",
+"catalano-rock",
+"cape-san-marco",
+"oristano-road",
+"cape-frasca"
+],
+"159,38": [
+"cape-bellavista"
+],
+"160,33": [
+"cape-mannu"
+],
+"160,38": [
+"cape-monte-santo"
+],
+"160,61": [
+"capo-palinuro"
+],
+"161,33": [
+"cape-marargiu",
+"bosa"
+],
+"161,59": [
+"punta-licosa",
+"isola-licosa",
+"secche-di-licosa"
+],
+"161,60": [
+"paestum"
+],
+"162,32": [
+"cape-caccia",
+"porto-conte",
+"monte-doglia"
+],
+"162,33": [
+"alghero",
+"alghero-road"
+],
+"162,39": [
+"cape-comino"
+],
+"162,55": [
+"ischia",
+"monte-epomeo",
+"ischia-castle",
+"formiche-di-vivara"
+],
+"162,56": [
+"capri",
+"capri-landing"
+],
+"162,57": [
+"castellammare",
+"rovigliano",
+"sorrento",
+"punta-campanella",
+"monte-san-costanzo",
+"li-galli"
+],
+"162,58": [
+"amalfi"
+],
+"162,59": [
+"salerno"
+],
+"163,32": [
+"cape-falcone"
+],
+"163,33": [
+"porto-torres"
+],
+"163,38": [
+"tavolara",
+"cape-coda-cavallo"
+],
+"163,51": [
+"ponza",
+"ponza-road",
+"ponza-sunken-rock",
+"gavi",
+"palmarola"
+],
+"163,52": [
+"zannone",
+"la-botte"
+],
+"163,53": [
+"ventotene",
+"santo-stefano-ventotene"
+],
+"163,56": [
+"capo-miseno",
+"baia-castle",
+"baia-road",
+"pozzuoli",
+"nisida",
+"gaiola-point",
+"secca-della-gaiola",
+"posillipo-point",
+"camaldoli",
+"sant-elmo",
+"castel-dell-ovo",
+"procida"
+],
+"163,57": [
+"castel-nuovo",
+"naples-arsenal",
+"naples",
+"naples-lanterna",
+"naples-road",
+"portici",
+"torre-del-greco",
+"vesuvius"
+],
+"164,52": [
+"monte-circeo",
+"circeo-anchorage"
+],
+"164,54": [
+"trinity-mount",
+"torre-orlando",
+"gaeta",
+"gaeta-light",
+"gaeta-port",
+"gaeta-road"
+],
+"164,55": [
+"garigliano-tower"
+],
+"165,50": [
+"cape-anzo",
+"anzio-mole-light",
+"port-nettuno"
+],
+"165,52": [
+"terracina"
+],
+"166,49": [
+"torre-san-michele"
+],
+"167,48": [
+"fiumicino-tower",
+"fiumicino-light",
+"tiber-road"
+],
+"167,49": [
+"st-peters-dome"
+],
+"168,47": [
+"civita-vecchia",
+"civita-vecchia-castle",
+"civita-vecchia-light",
+"civita-vecchia-port",
+"civita-vecchia-road",
+"marangone-rocks",
+"cape-linaro",
+"santa-marinella"
+],
+"169,44": [
+"monte-argentario",
+"port-ercole",
+"port-ercole-anchorage"
+],
+"169,45": [
+"cape-ansedonia",
+"formica-di-burano"
+],
+"169,46": [
+"montalto"
+],
+"169,47": [
+"corneto"
+]
+}
+}

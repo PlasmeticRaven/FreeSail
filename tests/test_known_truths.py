@@ -10768,7 +10768,9 @@ def test_truth_7_261_every_knob_of_the_regimes_and_the_nations_has_its_source_or
             for entry in block.get(kind) or []:
                 if isinstance(entry, dict) and "source" in entry:
                     naval.append((f"{nid}.{kind}.{entry['port']}", entry["source"]))
-    assert len(nations) == 8 and len(naval) > 50
+    # package 79c: the regency of Algiers the ninth; package 79d: the Italian states and the
+    # King of Sardinia, five more
+    assert len(nations) == 14 and len(naval) > 50
     for where, said in knobs + naval:
         assert said and _SOURCE_FORM.search(said), (where, said)
         if not re.search(r"(James|Nicolas|Niles|Regulations 1806|Falconer 1780) ", said):
@@ -11064,7 +11066,8 @@ def test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_sprin
     south-west by west on the ebb (Faden 1793: the flood N E by E, the ebb S W by W), and
     the master's directions say the same water; a ship lying with no way on through the
     hour of the ebb's strength is carried two miles and more to the south-west by west,
-    and his account, working the directions' stream, goes with her within half a mile."""
+    and his account, working the directions' stream, goes with her within eight tenths of a
+    mile (half a mile on the eleven's water; package 89 below)."""
     import freesail.world.tide as T
     from freesail.world.geo import Position, bearing_and_distance
 
@@ -11103,7 +11106,12 @@ def test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_sprin
     a_toward, a_run = bearing_and_distance(account0, w.navigation.account_now())
     assert abs(((a_toward - 236.25) + 180.0) % 360.0 - 180.0) < 15.0
     _, error = bearing_and_distance(w.position, w.navigation.account_now())
-    assert error / units.NAUTICAL_MILE < 0.6
+    # package 89: the Strait's water the block's own gauges' (Calais, Boulogne, Dunkirk in
+    # the blend beside Dover), the ebb's strength ten minutes later (19:30 for 19:20) and
+    # the master's account of the hour 1.83 miles for 2.02: the error 0.648 miles where it
+    # was 0.452 on the eleven's water against this bound's 0.6; re-measured to 0.8, the
+    # old margin's 0.15 mile kept (the lead's ruling, 2026-10-30)
+    assert error / units.NAUTICAL_MILE < 0.8
 
 
 def test_truth_7_272_the_goodwin_grounds_a_ship_standing_across_it_drawing_more_than_its_water():
@@ -11341,3 +11349,1065 @@ def test_truth_7_279_the_frigate_sails_from_the_downs_to_spithead_by_her_short_b
     assert w.clock.tick <= 27 * 3600
     _, off = bearing_and_distance(w.position, Position(*SPITHEAD))
     assert off < 0.5 * units.NAUTICAL_MILE
+
+
+# ---------------------------------------------------------------------------
+# Package 89: the held gauges' water (truths 7-280 to 7-284): a block's gauge serves the
+# positions within its own block's bounds and no other; the eleven serve everywhere
+# ---------------------------------------------------------------------------
+
+
+def _the_eleven_alone(streams=None):
+    """The world's tide as it was before package 89 everywhere: the eleven gauges alone
+    (with the streams' areas when given)."""
+    import freesail.world.tide as T
+
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    eleven = [g for g in doc["gauges"] if "block" not in g]
+    return T.Tide({**doc, "gauges": eleven}, streams or {"areas": []})
+
+
+def _spring_range_ft(tide, pos) -> float:
+    _, consts = tide.constants_at(pos)
+    return units.m_to_feet(2.0 * (consts["M2"][0] + consts["S2"][0]))
+
+
+def test_truth_7_280_newhaven_dieppe_and_beachy_head_have_their_own_spring_range():
+    """The brief's item 5: the world's spring range at Newhaven and Dieppe within a foot of
+    the gauge's own (19.5 and 27 feet, where the eleven's blend gave 3.9 and 5.3), and at
+    Beachy Head, which has no gauge, within a foot and a quarter of Norie 1805's twenty (the
+    blend gave 4.8): 18.99 feet, Newhaven's water seven miles off. The brief had "within a
+    foot"; the measured gap is a foot and a hundredth, and Norie's twenty is a round
+    figure, so the lead amended it (2026-10-30). Since package 94's rule of the seams
+    (Portsmouth's gauge serving the Channel east within ten miles of 1 W) 18.86 feet, within
+    the words (the lead's ruling of 2026-10-30)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauges = {g["id"]: g for g in doc["gauges"]}
+    eleven = _the_eleven_alone()
+    for gid in ("newhaven", "dieppe"):
+        g = gauges[gid]
+        at = Position(g["lat_deg"], g["lon_deg"])
+        own = units.m_to_feet(2.0 * (g["M2"]["amplitude_m"] + g["S2"]["amplitude_m"]))
+        assert abs(_spring_range_ft(tide, at) - own) < 1.0, gid
+        assert _spring_range_ft(eleven, at) < 6.0, gid  # what the blend had
+    beachy = T.Epitome.load("norie").by_name("Beachy Head")
+    assert beachy.spring_rise_ft == 20.0 and not beachy.rise_judgement
+    assert abs(_spring_range_ft(tide, beachy.position) - 20.0) < 1.25
+    assert _spring_range_ft(eleven, beachy.position) < 6.0
+
+
+def test_truth_7_281_vigo_and_cadiz_have_their_gauges_spring_range():
+    """The brief's item 5: the world's spring range at Vigo and at Cadiz within a foot of
+    their gauges' own, where the nearest of the eleven alone gave Le Conquet's eighteen
+    feet (both beyond the reach of every one of them, far)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauges = {g["id"]: g for g in doc["gauges"]}
+    eleven = _the_eleven_alone()
+    for gid in ("vigo", "cadiz"):
+        g = gauges[gid]
+        at = Position(g["lat_deg"], g["lon_deg"])
+        own = units.m_to_feet(2.0 * (g["M2"]["amplitude_m"] + g["S2"]["amplitude_m"]))
+        assert abs(_spring_range_ft(tide, at) - own) < 1.0, gid
+        assert not tide.constants_about(at)[3], gid  # near its own gauge, not far
+        assert eleven.constants_about(at)[3] and _spring_range_ft(eleven, at) > 17.0, gid
+
+
+def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_the_blocks():
+    """The brief's item 5: a position a mile west of 1 W in `channel-mid` reads the same
+    tide to the centimetre as before the package (the eleven alone), its height and stream
+    hour by hour through a day of springs; a position a mile east, in `channel-east`,
+    reads the block's (its gauges in the blend, the spring range other by feet).
+    Re-measured by package 94's taper: a mile east the block's water is a thirty-sixth
+    part in (the smoothstep of a tenth of the band), its constants other than the eleven's
+    and its spring range within half a foot of theirs (10.07 feet against 10.11; 89's
+    rule gave 8.6 against 10.2); the block's own water whole from the band's ten miles in,
+    eleven miles east the spring range 11.4 feet against the eleven's 9.3, other by feet
+    as the truth had it a mile east. The west position to the bit, as before."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone()
+    mile_deg = 1.0 / 60.0 / math.cos(math.radians(50.6))
+    west, east = Position(50.6, -1.0 - mile_deg), Position(50.6, -1.0 + mile_deg)
+    assert tide.blocks_at(west) == frozenset() and tide.blocks_at(east) == {"channel-east"}
+    before = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    for h in range(25):
+        when = datetime(1805, 6, 12) + timedelta(hours=h)
+        now, then = tide.at(west, when), before.at(west, when)
+        assert abs(now.height_m - then.height_m) < 0.01
+        assert abs(now.stream_kn - then.stream_kn) < 0.01 and now.area_id == then.area_id
+        assert now == then  # to the bit, not only to the centimetre
+    assert tide.constants_about(west) == eleven.constants_about(west)
+    assert abs(_spring_range_ft(tide, east) - _spring_range_ft(eleven, east)) < 0.5
+    assert tide.constants_at(east) != eleven.constants_at(east)
+    beyond = Position(50.6, -1.0 + 11.0 * mile_deg)  # past the taper's band
+    assert tide.taper_at(beyond) == 1.0
+    assert abs(_spring_range_ft(tide, beyond) - _spring_range_ft(eleven, beyond)) > 1.0
+
+
+def test_truth_7_283_the_recorded_passages_water_reads_the_tide_it_read():
+    """The brief's item 5, as a behaviour: every recorded passage (the frigate's and the
+    schooner's of gate 5b, Ushant to Falmouth; the merchant passage and the naval cruise
+    of gate 5c, Falmouth for Brest and Plymouth to the station off Ushant; the schooner
+    on an intent and the fake captain's on the merchant's water) sails the Channel west
+    and its approaches, where no block's gauge serves and the tide is the eleven's to the
+    bit, hour by hour, over the whole of `channel-west` and of `channel-mid` west of 1 W,
+    and the master's rises at every place of his tables there are as they were. The one
+    water of theirs a block reaches is the naval cruise's Diamond's patrol, eight miles
+    about 48 N 4 55 W, whose southern half lies in Biscay north: her stream there is the
+    block's now, and the cruise's digest stands all the same (package 89 ran the eleven
+    passage tests by name, `gate_5b or gate_5c` and the captain's trials before and after
+    the rule, every digest held: docs/dev/TuningNotes.md, package 89)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    root = Path(__file__).resolve().parents[1]
+    for name in (
+        "gate-5b-passage",
+        "gate-5b-passage-schooner",
+        "gate-5b-passage-thick",
+        "merchant-passage",
+        "merchant-intent",
+        "naval-cruise",
+    ):
+        sf = yaml.safe_load((root / "data" / "scenarios" / f"{name}.yaml").read_text("utf-8"))
+        assert sf.get("chart") in (None, "channel", "channel-west", "atlantic-east"), name
+    for lat10 in range(480, 511, 3):
+        for lon10 in range(-70, -10, 3):
+            pos = Position(lat10 / 10.0 + 0.005, lon10 / 10.0 + 0.005)
+            if lon10 > -30 and lat10 < 485:
+                continue  # south of channel-mid, Biscay north's water
+            if lon10 > -23 and 506 < lat10 < 510:
+                # the Solent's water since package 94 (its tide region, 50.62 to 51 N and
+                # 2.2 to 1 W): three positions of the grid, none a recorded passage's
+                assert tide.blocks_at(pos) == {"solent"}, pos
+                continue
+            assert not tide.blocks_at(pos), pos
+            for h in (0, 5, 13, 19):
+                when = datetime(1805, 6, 12) + timedelta(hours=h)
+                assert tide.at(pos, when) == eleven.at(pos, when), (pos, h)
+    for table in ("norie", "moore"):
+        for port in T.Epitome.load(table).ports:
+            p = port.position
+            if p.lat_deg >= 48.0 and p.lon_deg < -1.0 and not tide.blocks_at(p):
+                assert tide.constants_at(p) == eleven.constants_at(p), port.name
+    diamond = Position(48.0 - 4.0 / 60.0, -4.9167)
+    assert tide.blocks_at(diamond) == {"biscay-north"}
+    assert tide.constants_at(diamond) != eleven.constants_at(diamond)
+
+
+def test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge():
+    """The brief's item 5: the pace of the tide's blend is unchanged within the measure.
+    Outside every block the gauges blended are the eleven, the same list (no gauge more to
+    weigh), and the work of a fresh cell is the eleven's and the bounds' test, within a
+    quarter of the eleven's alone (the best of five runs over three hundred fresh cells of
+    the Channel west each); a cell once worked is a lookup, as before."""
+    import time
+
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone()
+    assert tide.gauges_at(Position(49.9, -5.2)) is tide.gauges
+
+    def fresh(t) -> float:
+        best = math.inf
+        for _ in range(5):
+            t._about_cache = {}
+            t0 = time.perf_counter()
+            for i in range(300):
+                t.constants_about(Position(49.0 + 0.011 * (i % 30), -6.5 + 0.011 * (i // 30)))
+            best = min(best, time.perf_counter() - t0)
+        return best
+
+    now, then = fresh(tide), fresh(eleven)
+    assert now < 1.25 * then, (now, then)
+    t0 = time.perf_counter()
+    for _ in range(10_000):
+        tide.constants_about(Position(49.9, -5.2))
+    assert (time.perf_counter() - t0) / 10_000 < 20e-6  # a lookup
+
+
+# ---------------------------------------------------------------------------
+# Package 79c: the Mediterranean west, the Strait to Cartagena, the Balearics and Barbary
+# to Algiers, two regions by the lead's ruling (truths 7-285 to 7-294)
+# ---------------------------------------------------------------------------
+
+MED_PORTS = [
+    "gibraltar",
+    "malaga",
+    "almeria",
+    "cartagena",
+    "ivica",
+    "palma",
+    "port-mahon",
+    "oran",
+    "algiers",
+]
+MED_SPANISH = ["malaga", "almeria", "cartagena", "ivica", "palma", "port-mahon"]
+MAHON_MOUTH = (39.8600, 4.3170)  # features/balearics.yaml's `mahon-outer-road`
+
+
+def _med_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart in the Mediterranean west at seed 7, the block's ports and
+    Gibraltar loaded, a steady breeze (from the west unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 270.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", MED_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_285_off_europa_point_the_sierras_marks_and_the_barbary_shore_are_in_sight():
+    """The brief's item 9: six leagues east of Europa Point by a clear day the masthead
+    raises the marks Tofiño gives for knowing where you are when the Rock is hidden (the
+    top of the Sierra de Marbella, the Picacho de Juana, the Sierra de Mijas: 1787, pp. 31
+    to 32) and, across the water, Ape's Hill over Ceuta on the Barbary shore; by night in
+    1805 no light is in sight there (Europa Point's of 1841 not yet, Málaga's lantern beyond
+    its range)."""
+    from freesail.world.geo import Position
+
+    here = Position(36.05, -4.95)  # six leagues east of Europa Point, in the block's water
+    w = _med_at(here.lat_deg, here.lon_deg, datetime(1805, 6, 14, 12, 0))
+    assert w.chart.region_at(here) == "mediterranean-west"
+    seen = {
+        s.feature.id
+        for s in w.chart.in_sight(here, 30.0, None, "day", datetime(1805, 6, 14, 12, 0))
+    }
+    assert {"sierra-de-marbella", "picacho-de-juanar", "sierra-de-mijas", "apes-hill"} <= seen
+    assert "gibraltar-rock" in seen
+    night = datetime(1805, 6, 14, 23, 30)
+    lights = [
+        s.feature.id
+        for s in w.chart.in_sight(here, 30.0, None, "night", night)
+        if s.feature.kind == "light"
+    ]
+    assert lights == []
+
+
+def test_truth_7_286_bound_east_from_the_strait_she_is_set_east_by_the_current_and_knows_it():
+    """The brief's item 9: off the coast of Granada a ship lying with no way on is carried
+    to the eastward at about a knot (Smyth 1854, p. 161: along the coast of Granada at the
+    rate of one knot an hour eastwards; Tofiño 1787, p. 46: much current to the east), the
+    tide nothing; the master's directions give the same current and his account goes with
+    her within a mile in three hours."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position, bearing_and_distance
+
+    here = Position(36.60, -4.30)
+    said = T.load_directions().area_at(here)
+    assert said.id == "granada-coast" and (said.current_point, said.current_kn) == ("E", 1.0)
+    assert said.spring_kn == 0.0
+    w = _med_at(
+        here.lat_deg,
+        here.lon_deg,
+        datetime(1805, 6, 14, 10, 0),
+        wind_from_deg=0.0,
+        wind_speed_kn=2.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=0.0,
+    )
+    truth0, account0 = w.position, w.navigation.account_now()
+    w.run(3 * 3600)
+    toward, run_m = bearing_and_distance(truth0, w.position)
+    assert 2.4 < run_m / units.NAUTICAL_MILE < 4.0
+    assert abs(((toward - 90.0) + 180.0) % 360.0 - 180.0) < 20.0
+    a_toward, _ = bearing_and_distance(account0, w.navigation.account_now())
+    assert abs(((a_toward - 90.0) + 180.0) % 360.0 - 180.0) < 20.0
+    _, error = bearing_and_distance(w.position, w.navigation.account_now())
+    assert error / units.NAUTICAL_MILE < 1.0
+
+
+def test_truth_7_287_the_freu_grande_is_entered_on_its_marks_and_sets_her_by_the_wind():
+    """The brief's item 9: approaching the Freu Grande between Ivica and Formentera from the
+    westward, she has in sight the tower of the Espalmador she steers for, the tower of the
+    Portas that has been taken for it to the loss of ships on the Trocados, the Vedrá to the
+    westward and the castle of Ivica beyond (Tofiño 1787, pp. 181 to 182); the directions
+    give the channels no constant current, the water following the wind (p. 208)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    here = Position(38.82, 1.30)  # two leagues west of the Freu Grande
+    w = _med_at(here.lat_deg, here.lon_deg, datetime(1805, 6, 15, 12, 0))
+    seen = {
+        s.feature.id
+        for s in w.chart.in_sight(here, 30.0, None, "day", datetime(1805, 6, 15, 12, 0))
+    }
+    assert {"espalmador-tower", "portas-tower", "vedra", "ivica-castle"} <= seen, seen
+    said = T.load_directions().area_at(Position(38.80, 1.43))
+    assert said.id == "balearic-channels" and said.current_kn == 0.0
+    assert w.chart.feature("trocados").kind in ("shoal", "rock", "ledge")
+
+
+def test_truth_7_288_the_mouth_of_port_mahon_holds_a_frigate_at_anchor_in_a_northerly():
+    """The brief's item 9: brought up by the best bower without the ledges at the mouth of
+    Port Mahon in twenty brazas and more, good ground (Tofiño 1787, p. 213: with a scant
+    wind a ship may anchor among the ledges or farther out), a northerly of twenty knots for
+    six hours does not drag her: she lies within her cable's swing, Cape Mola to windward."""
+    from freesail.world.geo import bearing_and_distance
+
+    w = _med_at(
+        *MAHON_MOUTH,
+        datetime(1805, 6, 17, 12, 0),
+        wind_from_deg=0.0,
+        wind_speed_kn=20.0,
+        ship_heading_deg=0.0,
+    )
+    assert 25.0 < w.chart.depth_at(w.position) < 60.0
+    w.submit("let go the best bower")
+    w.run(600)
+    assert any(e.kind == "ship.brought_up" for e in w.log)
+    brought = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log if "drag" in e.kind or "aground" in e.kind]
+    _, moved = bearing_and_distance(brought, w.position)
+    assert moved < 0.2 * units.NAUTICAL_MILE
+    mola, mola_m = bearing_and_distance(w.position, w.chart.feature("cape-mola-mahon").position)
+    assert abs(((mola - 0.0) + 180.0) % 360.0 - 180.0) < 45.0  # to windward
+    assert mola_m / units.NAUTICAL_MILE < 2.0
+
+
+def test_truth_7_289_the_spanish_ports_refuse_a_kings_ship_and_the_regencys_receive_her():
+    """The brief's items 4 and 9: in June 1805 the six Spanish ports of the block are hostile
+    to a King's ship (Spain at war since December 1804), Oran and Algiers neutral to her, the
+    regency at peace with Britain (James vol. 3, pp. 235 and 333 to 334); to an American all
+    eight are neutral; the regency is a nation of data alone, Morocco's form."""
+    w = _med_at(36.6, -3.0, datetime(1805, 6, 14, 10, 0))
+    ports = w.ports.ports
+    stance = {pid: w.dealings.stance(ports[pid]) for pid in MED_SPANISH + ["oran", "algiers"]}
+    assert stance == {
+        **{p: "hostile" for p in MED_SPANISH},
+        "oran": "neutral",
+        "algiers": "neutral",
+    }
+    american = _med_at(
+        36.6, -3.0, datetime(1805, 6, 14, 10, 0), ship=SCHOONER, nation="united-states"
+    )
+    assert {american.dealings.stance(american.ports.ports[p]) for p in stance} == {"neutral"}
+    table = w.nations
+    assert table.get("algiers").adjective == "Algerine" and not table.enemies_of("algiers")
+    assert (
+        ports["cartagena"].dockyard.kind == "yard" and ports["port-mahon"].dockyard.kind == "yard"
+    )
+    assert ports["algiers"].nation == "algiers" and ports["oran"].nation == "algiers"
+
+
+def test_truth_7_290_the_seam_at_5_w_is_crossed_with_the_business_carried():
+    """The brief's item 9: the schooner from a little west of 5 W before a westerly crosses
+    from the Strait's water into the Mediterranean west within the hour; the business
+    follows her and peoples the new region once (the Barbary grain bound from Oran to the
+    Spanish coast), and the depth does not step across the seam."""
+    from freesail.world.geo import Position
+
+    w = _med_at(
+        36.30,
+        -5.10,
+        datetime(1805, 6, 14, 10, 0),
+        ship=SCHOONER,
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=5.0,
+        business="on",
+    )
+    b = w.business
+    assert b.region == "strait" and b.regions_entered == ["strait"]
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer east")
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "mediterranean-west":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 3600, (b.region, w.position)
+    assert b.regions_entered == ["strait", "mediterranean-west"] and len(b.drawn) > before
+    a, c = Position(36.40, -5.002), Position(36.40, -4.998)
+    assert w.chart.region_at(a) == "strait" and w.chart.region_at(c) == "mediterranean-west"
+    assert abs(w.chart.depth_at(a) - w.chart.depth_at(c)) < 6.0
+
+
+def test_truth_7_291_the_seam_between_the_blocks_two_regions_is_crossed_likewise():
+    """The brief's item 9 and the lead's ruling: the block is two regions abutting at 0.05 E;
+    a ship crossing it before a westerly takes the business with her from one into the
+    other, which peoples the Balearics' water once (the grain from Algiers for the islands),
+    and the depth does not step."""
+    from freesail.world.geo import Position
+
+    w = _med_at(
+        37.00,
+        -0.03,
+        datetime(1805, 6, 14, 10, 0),
+        ship=SCHOONER,
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=5.0,
+        business="on",
+    )
+    b = w.business
+    assert b.region == "mediterranean-west"
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer east")
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "balearics":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 3600, (b.region, w.position)
+    assert b.regions_entered == ["mediterranean-west", "balearics"] and len(b.drawn) > before
+    a, c = Position(37.0, 0.048), Position(37.0, 0.052)
+    assert w.chart.region_at(a) == "mediterranean-west" and w.chart.region_at(c) == "balearics"
+    assert abs(w.chart.depth_at(a) - w.chart.depth_at(c)) < 6.0
+
+
+def test_truth_7_292_by_night_in_1805_palma_shows_porto_pis_light_and_mahon_none():
+    """The brief's item 3: off Palma by night in 1805 the lantern of Porto Pí is in sight, lit
+    every night at the hour of the Ánimas (Tofiño 1787, p. 185); at the mouth of Port Mahon
+    there is no light at all (Purdy 1840: no regular light-tower in the Balearics but
+    Palma's), and a ship closing Minorca by night has the land and no light."""
+    from freesail.world.geo import Position
+
+    palma = Position(39.50, 2.62)
+    w = _med_at(palma.lat_deg, palma.lon_deg, datetime(1805, 6, 15, 23, 30))
+    night = datetime(1805, 6, 15, 23, 30)
+    lights = {
+        s.feature.id
+        for s in w.chart.in_sight(palma, 20.0, None, "night", night)
+        if s.feature.kind == "light"
+    }
+    assert lights == {"porto-pi-light"}
+    mahon = Position(*MAHON_MOUTH)
+    lights = {
+        s.feature.id
+        for s in w.chart.in_sight(mahon, 20.0, None, "night", night)
+        if s.feature.kind == "light"
+    }
+    assert lights == set()
+
+
+def test_truth_7_293_the_masters_tide_in_the_block_is_the_pilots_foot_and_malagas_three():
+    """The brief's item 5: the master's epitome (Norie's table, a ship of war's) gives
+    Málaga high water at XII on the days of full and change and three feet (Purdy 1826,
+    p. 12), and every other place of the block a foot (the pilots: Smyth, Tofiño, Bérard),
+    not the far gauge's range the world's tide had over the block while its gauges were held
+    (since package 89 the gauges' own inches); off Port Mahon his nearest place is Port
+    Mahon."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    norie = T.Epitome.load("norie")
+    malaga = norie.by_name("Málaga")
+    assert (malaga.hw_h, malaga.hw_m, malaga.spring_rise_ft) == (12, 0, 3.0)
+    assert not malaga.rise_judgement
+    for name in ("Almería", "Cartagena", "Palma", "Ivica", "Port Mahon", "Oran", "Algiers"):
+        place = norie.by_name(name)
+        assert place.spring_rise_ft == 1.0 and not place.rise_judgement, name
+    assert norie.nearest(Position(*MAHON_MOUTH))[0].name == "Port Mahon"
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    held = {g["id"]: g for g in doc["gauges"] if g.get("block")}
+    assert held["malaga"]["mean_level_m"] == 0.43 and held["mahon"]["M2"]["amplitude_m"] < 0.06
+
+
+def test_truth_7_294_the_frigate_sails_from_gibraltar_to_port_mahon_by_her_short_book():
+    """The brief's item 7: the block's scenario (`mahon.yaml`) sailed at seed 7 by its short
+    book: from Gibraltar road round Europa Point and east past Cape de Gata, the Hormigas,
+    Formentera and Cabrera without touching ground, across the seam at 0.05 E, to the mouth
+    of Port Mahon, where she anchors without the ledges within three days and a quarter (at
+    11:09 on the 17th at seed 7) and lies through the northerly that comes on that night."""
+    from freesail.world.geo import Position, bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "mahon.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    regions = set()
+    for _ in range(98 * 6):  # to seven in the morning of the 18th, through the northerly
+        w.run(600)
+        regions.add(w.chart.region_at(w.position))
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # Gibraltar road at the start, the mouth of Port Mahon
+    assert anchored[1].tick <= 80 * 3600
+    assert {"strait", "mediterranean-west", "balearics"} <= regions
+    _, off = bearing_and_distance(w.position, Position(*MAHON_MOUTH))
+    assert off < 0.6 * units.NAUTICAL_MILE
+    assert not [e for e in w.log if "drag" in e.kind]
+
+
+# ---------------------------------------------------------------------------
+# Package 79d: the Gulf of Lion and the Tyrrhenian (truths 7-295 to 7-304); the Gulf's
+# five (7-295 to 7-299) over the regions `gulf-of-lion` and `ligurian-sea`
+# ---------------------------------------------------------------------------
+
+GULF_PORTS = ["toulon", "marseille", "hyeres", "villefranche"]
+HYERES_ROAD = (43.0950, 6.2150)  # features/gulf-of-lion.yaml's `hyeres-road`
+
+
+def _gulf_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart in the Gulf of Lion at seed 7, the Gulf's ports loaded, a
+    steady breeze (from the north-west, the mistral's quarter, unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 315.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", GULF_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_295_the_gulfs_winter_row_blows_its_gales_from_the_north_west():
+    """The brief's truth (79d): the mistral. The Gulf has a weather box of its own, whose
+    check is Marseille's table (the Admiralty's Mediterranean Pilot, vol. II, 1916, p. 462:
+    the north-west the commonest wind of every winter month); a position in the Gulf takes
+    it, not the nearest Atlantic box. Over Januaries drawn from its row the strong
+    winds (22 knots and more) blow most often from the north-west, and two hours in three
+    from west to north, the mistral and the tramontane; the summer row has a tenth of the
+    winter's strong hours."""
+    import hashlib
+    import random
+
+    from freesail.world import weather as W
+
+    clim = W.load_climatology()
+    box = clim.box_at(43.0, 5.0)
+    assert box.name == "gulf-of-lion" and clim.box_at(43.7, 7.3).name == "gulf-of-lion"
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    note = raw["boxes"]["gulf-of-lion"]["months"][1]["note"]
+    assert "Marseille" in note and "NW 10" in note  # the table's commonest winter wind
+
+    def strong_hours(month: int, months: int = 36) -> dict[str, int]:
+        points = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+        counts = dict.fromkeys(points, 0)
+        for serial in range(months):
+            digest = hashlib.sha256(f"7:weather:{serial}".encode()).digest()
+            stream = random.Random(int.from_bytes(digest[:8], "big"))
+            weather = W.Weather(
+                datetime(1805, month, 1), stream, seed=7000 + serial, climatology=clim, box=box
+            )
+            t = datetime(1805, month, 1)
+            for _ in range(24 * 28):
+                weather.advance(t)
+                d, s = weather.surface_wind_at(0.0, 0.0, t)
+                if units.ms_to_knots(s) >= 22.0:
+                    counts[points[int(((math.degrees(d) + 22.5) % 360.0) // 45.0)]] += 1
+                t += timedelta(hours=1)
+        return counts
+
+    winter = strong_hours(1)
+    total = sum(winter.values())
+    assert total > 0 and max(winter, key=winter.get) == "NW", winter
+    assert (winter["W"] + winter["NW"] + winter["N"]) / total > 0.6, winter
+    summer = strong_hours(7)
+    assert sum(summer.values()) < 0.1 * total, (summer, total)
+
+
+def test_truth_7_296_toulons_roads_are_seen_from_the_road_of_hyeres_and_its_lights_are_later():
+    """The brief's truth (79d): at anchor in the Road of Hyeres, the fleet's shelter in the
+    watch on Toulon (Purdy 1826, p. 58; James vol. 3, p. 177), her masthead has in sight by
+    day the marks of Toulon's roads, Cape Cepet, the Great Tower, Mount Faron and Mount
+    Coudon, and Cape Sicie's chapel beyond, three to five leagues off; the islands' marks
+    her lookout calls first. By night in 1805 no light shows: Porquerolles', the Titan's and
+    Camarat's are of the 1830s and are seen in 1840."""
+    w = _gulf_at(*HYERES_ROAD, datetime(1805, 1, 15, 12, 0))
+    from freesail.world.geo import Position
+
+    road = Position(*HYERES_ROAD)
+    assert w.chart.region_at(road) == "gulf-of-lion" and w.chart.level_at(road) == 3
+    w.run(300)
+    seen = set(_sighted(w))
+    assert {"porquerolles", "bregancon"} & seen, seen
+    eye = 20.0  # her masthead
+    in_sight = {
+        s.feature.id: s.distance_m / units.NAUTICAL_MILE
+        for s in w.chart.in_sight(road, eye, None, "day", datetime(1805, 1, 15, 12, 5))
+    }
+    for mark in ("cape-cepet", "grosse-tour", "mount-faron", "mount-coudon", "notre-dame-du-mai"):
+        assert mark in in_sight and 9.0 < in_sight[mark] < 17.0, (mark, in_sight.get(mark))
+    lights = ("porquerolles-light", "titan-light", "camarat-light")
+    by_night_1805 = {
+        s.feature.id for s in w.chart.in_sight(road, eye, None, "night", datetime(1805, 1, 15, 23))
+    }
+    assert not by_night_1805 & set(lights)
+    by_night_1840 = {
+        s.feature.id for s in w.chart.in_sight(road, eye, None, "night", datetime(1840, 1, 15, 23))
+    }
+    assert set(lights) <= by_night_1840
+
+
+LIGURIAN_PORTS = [
+    "genoa",
+    "leghorn",
+    "porto-ferrajo",
+    "bastia",
+    "ajaccio",
+    "san-fiorenzo",
+    "maddalena",
+]
+AGINCOURT_SOUND = (41.1870, 9.3790)  # features/ligurian-sea.yaml's `agincourt-sound`
+
+
+def test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester():
+    """The brief's truth (79d): Agincourt Sound, where Nelson's squadron anchored on 31
+    October 1803 (James vol. 3, p. 177), 'land-locked' (Purdy 1826, p. 89): from the berth
+    the land lies within two miles in every quarter but the north-east's channel; there is
+    water of eight to thirty metres over some three square kilometres about it, room for a
+    fleet's berths; and the frigate, brought up by the best bower in twelve fathoms on weed
+    in a north-westerly of thirty knots (the north-wester 'blows with great violence'), lies
+    six hours without dragging once brought up."""
+    from freesail.world.geo import Position, bearing_and_distance, destination
+
+    w = _gulf_at(
+        *AGINCOURT_SOUND,
+        datetime(1805, 1, 15, 8, 0),
+        wind_from_deg=315.0,
+        wind_speed_kn=30.0,
+        ship_heading_deg=315.0,
+        ports=LIGURIAN_PORTS,
+    )
+    berth = Position(*AGINCOURT_SOUND)
+    assert w.chart.region_at(berth) == "ligurian-sea" and w.chart.level_at(berth) == 3
+    assert "weed" in w.chart.bottom_near(berth)
+    for bearing in (0, 90, 135, 180, 225, 270, 315):
+        to_land = next(
+            (
+                k * 50.0
+                for k in range(1, 90)
+                if w.chart.depth_at(destination(berth, bearing, k * 50.0)) < 0.0
+            ),
+            None,
+        )
+        assert to_land is not None and to_land < 4000.0, (bearing, to_land)
+    room = sum(
+        1
+        for i in range(-10, 11)
+        for j in range(-10, 11)
+        if 8.0
+        <= (w.chart.depth_at(Position(41.1870 + 0.0015 * i, 9.3790 + 0.002 * j)) or -1.0)
+        <= 30.0
+    )
+    assert room >= 120, room  # of 441 points over 3.5 by 3.4 km
+    w.submit("let go the best bower")
+    w.run(1200)
+    brought = [e for e in w.log if e.kind == "ship.brought_up"]
+    assert brought
+    since = len(w.log)
+    at = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log[since:] if "drag" in e.kind or "aground" in e.kind]
+    assert bearing_and_distance(at, w.position)[1] < 0.2 * units.NAUTICAL_MILE
+    assert w.ports.ports["maddalena"].anchorage.feature_id == "agincourt-sound"
+
+
+def test_truth_7_298_the_strait_of_bonifacio_is_entered_on_its_marks_and_sets_her_east():
+    """The brief's truth (79d): at the strait's west mouth by day her masthead has the
+    strait's marks in sight, Bonifacio on its cliff and Cape Pertusato on the north, Capo
+    Testa and the tower of Longo Sardo on the south, the Maddalena's islands beyond, and
+    Corsica's mountains thirty to sixty miles off; by night in 1805 no light (Pertusato's is
+    of the 1840s, the Derrotero 1849's). Within the strait the world's water sets her east
+    (after the north-westerlies, the Admiralty 1916, p. 13) and the master's directions
+    name the set."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    mouth = Position(41.37, 8.95)
+    w = _gulf_at(mouth.lat_deg, mouth.lon_deg, datetime(1805, 1, 15, 12, 0), ports=LIGURIAN_PORTS)
+    in_sight = {
+        s.feature.id: s.distance_m / units.NAUTICAL_MILE
+        for s in w.chart.in_sight(mouth, 20.0, None, "day", datetime(1805, 1, 15, 12, 5))
+    }
+    for mark in ("bonifacio", "cape-pertusato", "capo-testa", "longo-sardo-tower"):
+        assert mark in in_sight and in_sight[mark] < 15.0, (mark, in_sight.get(mark))
+    assert {"maddalena-island", "monte-cinto"} <= set(in_sight)
+    night = lambda year: {  # noqa: E731
+        s.feature.id
+        for s in w.chart.in_sight(mouth, 20.0, None, "night", datetime(year, 1, 15, 23))
+    }
+    assert "pertusato-light" not in night(1805) and "pertusato-light" in night(1850)
+    inside = Position(41.33, 9.25)
+    state = T.load_tide().at(inside, datetime(1805, 1, 15, 12))
+    assert state.area_id == "bonifacio-strait"
+    assert state.stream_east_ms > 0.0 and abs(state.stream_north_ms) < 1e-6
+    said = T.load_directions().area_at(inside)
+    assert said.id == "bonifacio-strait" and (said.current_point, said.current_kn) == ("E", 0.5)
+
+
+def test_truth_7_299_genoa_is_neutral_before_the_annexation_of_june_1805_and_hostile_after():
+    """The brief's truth (79d): Genoa, 'as much France as Toulon' (James vol. 3, p. 176), is
+    the Ligurian Republic's in the table until the annexation of 4 June 1805 and France's
+    after it (its file's dated nation): a King's ship in Genoa road in May 1805 finds the
+    port neutral and in July hostile; an American neutral in both; a French ship neutral and
+    then open; Leghorn, Etruria's, neutral to her throughout."""
+    road = (44.3880, 8.9150)  # features/ligurian-sea.yaml's `genoa-road`
+    for when, british, french in (
+        (datetime(1805, 5, 20, 12), "neutral", "neutral"),
+        (datetime(1805, 7, 20, 12), "hostile", "open"),
+    ):
+        w = _gulf_at(*road, when, ports=LIGURIAN_PORTS)
+        assert w.dealings.stance(w.ports.ports["genoa"]) == british
+        assert w.dealings.stance(w.ports.ports["leghorn"]) == "neutral"
+        f = _gulf_at(*road, when, ship=SCHOONER, nation="france", ports=LIGURIAN_PORTS)
+        assert f.dealings.stance(f.ports.ports["genoa"]) == french
+        a = _gulf_at(*road, when, ship=SCHOONER, nation="united-states", ports=LIGURIAN_PORTS)
+        assert a.dealings.stance(a.ports.ports["genoa"]) == "neutral"
+
+
+# The Tyrrhenian's five (7-300 to 7-304), the region `tyrrhenian`
+TYRRHENIAN_PORTS = ["cagliari", "alghero", "civita-vecchia", "gaeta", "naples"]
+NAPLES_ROAD = (40.8289, 14.2638)  # features/tyrrhenian.yaml's `naples-road`
+
+
+def test_truth_7_300_the_bay_of_naples_marks_are_seen_from_its_road_and_the_lantern_by_night():
+    """The brief's truth (79d): in the road of Naples, the patch's level 3 on mud and clay
+    (Purdy 1826, p. 110), her masthead has the bay's marks in sight: the lantern on the mole,
+    the Castle dell'Ovo and St Elmo close by, Posilipo and Vesuvius within eight miles,
+    Capri, Ischia and Monte Epomeo at their sixteen or seventeen; by night in 1805 the
+    lantern on the mole is lit (Michelot 1709's survey of 1701 found it so)."""
+    from freesail.world.geo import Position
+
+    road = Position(*NAPLES_ROAD)
+    w = _gulf_at(*NAPLES_ROAD, datetime(1805, 6, 12, 12, 0), ports=TYRRHENIAN_PORTS)
+    assert w.chart.region_at(road) == "tyrrhenian" and w.chart.level_at(road) == 3
+    assert "mud" in w.chart.bottom_near(road)
+    in_sight = {
+        s.feature.id: s.distance_m / units.NAUTICAL_MILE
+        for s in w.chart.in_sight(road, 20.0, None, "day", datetime(1805, 6, 12, 12, 5))
+    }
+    for mark, within in (
+        ("naples-lanterna", 1.0),
+        ("castel-dell-ovo", 1.0),
+        ("sant-elmo", 2.0),
+        ("posillipo-point", 3.0),
+        ("vesuvius", 8.0),
+        ("capri", 18.0),
+        ("ischia", 18.0),
+        ("monte-epomeo", 18.0),
+    ):
+        assert mark in in_sight and in_sight[mark] < within, (mark, in_sight.get(mark))
+    lit = {
+        s.feature.id
+        for s in w.chart.in_sight(road, 20.0, None, "night", datetime(1805, 6, 12, 23, 0))
+    }
+    assert "naples-lanterna" in lit
+
+
+def test_truth_7_301_cagliari_receives_a_kings_ship_as_the_king_of_sardinias_neutral_port():
+    """The brief's truth (79d): Cagliari, the King of Sardinia's at peace with Britain and
+    France, is neutral to a King's ship, to a French ship and to an American and open to a
+    Sardinian; so are the Maddalena, and the Pope's and the King of Naples' ports to the
+    King's ship; the town's water is scarce, sold at the doors, and the fleets send to Pula
+    for it (Smyth 1828, p. 206): the port's own words say so."""
+    road = (39.1937, 9.1035)  # `cagliari-road`
+    ports = TYRRHENIAN_PORTS + ["maddalena"]
+    when = datetime(1805, 3, 1, 12)
+    w = _gulf_at(*road, when, ports=ports)
+    assert {pid: w.dealings.stance(w.ports.ports[pid]) for pid in ports} == dict.fromkeys(
+        ports, "neutral"
+    )
+    for nation, stance in (
+        ("france", "neutral"),
+        ("united-states", "neutral"),
+        ("sardinia", "open"),
+    ):
+        o = _gulf_at(*road, when, ship=SCHOONER, nation=nation, ports=["cagliari"])
+        assert o.dealings.stance(o.ports.ports["cagliari"]) == stance, nation
+    cagliari = w.ports.ports["cagliari"]
+    assert cagliari.anchorage.feature_id == "cagliari-road" and cagliari.nation == "sardinia"
+    assert "Pula" in cagliari.dockyard.items["water"].note
+    assert "Pula" in cagliari.pilot.words["tide"]
+
+
+def test_truth_7_302_a_passage_crosses_the_seam_at_40_99_n_with_the_business_carried():
+    """The brief's truth (79d; truth 7-274's kind): the schooner east of Sardinia, south of
+    the row edge 40.99 N that bounds the Tyrrhenian's tiles from the Ligurian sea's, before a
+    southerly, crosses from `tyrrhenian` into `ligurian-sea` within the hour; the business
+    follows her and peoples the new region once, and the depth does not step across the
+    seam (the two regions' tiles cut from the one grid)."""
+    from freesail.world.geo import Position
+
+    w = _gulf_at(
+        40.93,
+        9.80,
+        datetime(1805, 6, 12, 10, 0),
+        ship=SCHOONER,
+        wind_from_deg=180.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=0.0,
+        ship_speed_kn=5.0,
+        business="on",
+        ports=TYRRHENIAN_PORTS + LIGURIAN_PORTS,
+    )
+    b = w.business
+    assert b.region == "tyrrhenian" and b.regions_entered == ["tyrrhenian"]
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer north")
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "ligurian-sea":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 3600, (b.region, w.position)
+    assert b.regions_entered == ["tyrrhenian", "ligurian-sea"] and len(b.drawn) > before
+    south, north = Position(40.9864, 9.80), Position(40.9869, 9.80)  # either side of the row edge
+    assert w.chart.region_at(Position(41.001, 9.80)) == "ligurian-sea"
+    assert w.chart.region_at(south) == "tyrrhenian"
+    assert abs(w.chart.depth_at(south) - w.chart.depth_at(north)) < 2.0
+
+
+def test_truth_7_303_an_islet_the_grid_lacks_grounds_a_ship_though_the_tiles_read_deep_water():
+    """The build's finding (79d): EMODnet's sixteenth of a minute reads water over islets of
+    some hundreds of metres (Li Galli off the Sorrento shore read forty metres), so the
+    block gives each as a rock of its height and extent (ChartBlocks.md, "An isle the grid
+    lacks"): a frigate's keel over Li Galli touches it though the tile there is deep, and a
+    mile off she is clear. Since package 94 the three rocky islets are an island the grid
+    lacks (`grid_lacks`, by Purdy's and Norie's words), ground to the keel as the rock was."""
+    import math as _m
+
+    from freesail.world.geo import destination
+
+    w = _gulf_at(40.60, 14.40, datetime(1805, 6, 12, 12, 0), ports=TYRRHENIAN_PORTS)
+    galli = w.chart.feature("li-galli")
+    assert galli.kind == "island" and galli.grid_lacks and galli.extent_m >= 300.0
+    assert w.chart.depth_at(galli.position) > 20.0  # the grid's water
+    hit = w.chart.danger_under(galli.position, _m.radians(90.0), 45.0, 5.0)
+    assert hit is not None
+    clear = destination(galli.position, 225.0, units.NAUTICAL_MILE)
+    assert w.chart.danger_under(clear, _m.radians(90.0), 45.0, 5.0) is None
+
+
+def test_truth_7_304_the_tyrrhenians_tide_hour_is_smyths_and_its_weather_naples_table():
+    """The brief's records (79d): the master's epitome in the road of Naples names Naples'
+    own tide-hour (Smyth 1854, p. 178: 11h 20m, with his doubt), the nearest place of his
+    table, as off Toulon it names Toulon's (3h 30m); a position in the Tyrrhenian takes the
+    Tyrrhenian's weather box, whose rows' check is Naples' table with its gale days."""
+    from freesail.world import weather as W
+
+    for road, name in ((NAPLES_ROAD, "Naples"), ((43.0935, 5.9330), "Toulon")):
+        w = _gulf_at(*road, datetime(1805, 6, 12, 12, 0), ports=TYRRHENIAN_PORTS)
+        words = w.navigation.tide_by_almanac()["words"]
+        assert name in words and "may differ by hours" not in words, words
+    clim = W.load_climatology()
+    assert clim.box_at(40.8, 14.2).name == "tyrrhenian"
+    assert (
+        clim.box_at(39.2, 9.1).name == "tyrrhenian"
+        and clim.box_at(43.0, 6.0).name == "gulf-of-lion"
+    )
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    note = raw["boxes"]["tyrrhenian"]["months"][1]["note"]
+    assert "Naples" in note and "gales 7" in note
+
+
+# ---------------------------------------------------------------------------
+# Package 94: the chart's tidies from 79c, 79d and 89 (truths 7-310 to 7-314)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_310_the_isla_del_rey_is_an_island_to_the_lookout_and_ground_to_the_keel():
+    """79c's finding: the Isla del Rey, which the grid smooths into a ridge of nine to
+    eleven metres in Port Mahon, was given as a rock of its height so that nothing sails
+    through it, and the lookout called it "a danger". As an island the grid lacks (package
+    94) the lookout makes it out as the land it is and calls it by its name, by day and by
+    night close aboard, never "a danger"; the keel touches it within its extent as she
+    touched the rock, and a cable and a half south of it, in Tofiño's passage, she is clear;
+    the pilot names it ahead on her line, and the master's chart names it among the
+    dangers."""
+    import math as _m
+
+    from freesail.world.chart import DANGER_KINDS
+    from freesail.world.geo import destination
+    from freesail.world.lookout import Lookout
+
+    when = datetime(1805, 6, 15, 12, 0)
+    w = _med_at(*MAHON_MOUTH, when)
+    rey = w.chart.feature("isla-del-rey")
+    assert rey.kind == "island" and rey.grid_lacks and rey.kind not in DANGER_KINDS
+    assert w.chart.depth_at(rey.position) > 5.0  # the grid's ridge, water
+    # the lookout: land, by its name, not a danger
+    near = destination(rey.position, 270.0, 2.0 * units.CABLE)
+    for daylight in ("day", "night"):
+        seen = {s.feature.id: s for s in w.chart.in_sight(near, 10.0, None, daylight, when)}
+        assert "isla-del-rey" in seen and seen["isla-del-rey"].seen_as == "land", daylight
+    found = w.chart.in_sight(near, 10.0, None, "day", when)
+    words = Lookout.words(next(s for s in found if s.feature is rey), 0.0)
+    assert words.startswith("The Isla del Rey") and "danger" not in words
+    # standing for it from two cables west, the tiles' water clear, the lookout has it
+    # ahead by its extent
+    assert w.chart.depth_at(near) > 5.0
+    hit = Lookout(w.chart)._first_ahead(near, _m.radians(90.0), 600.0, 0.5, found)
+    assert hit is not None and hit[2] is not None and hit[2].feature is rey
+    # the keel
+    hit = w.chart.danger_under(rey.position, _m.radians(270.0), 45.0, 5.0)
+    assert hit is not None and hit.bottom == "the Isla del Rey, or Hospital Island (island)"
+    south = destination(rey.position, 200.0, 1.5 * units.CABLE)
+    assert w.chart.danger_under(south, _m.radians(270.0), 45.0, 5.0) is None
+    # the pilot's line and the master's chart
+    ahead = w.chart.dangers_ahead(near, 90.0, 1500.0, units.CABLE, 0.5, 6.0)
+    assert ahead and ahead[0][0].id == "isla-del-rey"
+    assert "isla-del-rey" in {f.id for f, _b, _d in w.chart.dangers_near(near, 2000.0)}
+
+
+def test_truth_7_311_a_roads_bottom_is_in_the_leads_note_as_an_anchorages_is():
+    """79d's finding: `Chart.bottom_near` read the note of the ground from `anchorage` and
+    `bottom` features alone, so a `road` with its `bottom:` gave none, and 79d gave its
+    roads as anchorages. Since package 94 a road's bottom is read as an anchorage's: the
+    road of Naples as a `road` gives the arming of the lead and the grounding its mud and
+    clay as the anchorage did; a feature of another kind with a `bottom:` gives nothing."""
+    from dataclasses import replace
+
+    from freesail.world.chart import Chart, load_manifest
+    from freesail.world.reckoning import ground_words
+
+    chart = Chart("tyrrhenian", load_manifest())  # its own, not the shared chart
+    road = chart.feature("naples-road")
+    assert road.kind == "anchorage" and road.bottom
+    near = road.position.advanced(300.0, 300.0)
+    assert ground_words(chart, near, 30.0) == road.bottom
+    chart.features[road.id] = replace(road, kind="road")
+    assert chart.bottom_near(near) == road.bottom
+    assert ground_words(chart, near, 30.0) == road.bottom
+    chart.features[road.id] = replace(road, kind="town")
+    assert chart.bottom_near(near) != road.bottom
+
+
+def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_foot():
+    """The brief's item 3: package 89's rule left a step where a block's water meets the
+    water the eleven alone serve, 102 degrees of M2 at 1 W off Selsey Bill (a cable either
+    side of 1 W the heights four to seven and a half feet apart through a day of springs).
+    The block's water now rises from the eleven's alone at its open edge to its own over
+    ten miles inside it (`tide.SEAM_BAND_NM`, the smoothstep of the distance's fraction),
+    so that a cable inside 1 W the tide is within a tenth of a foot of the tide a cable
+    outside, every ten minutes through a day of springs, along the seam from 49.1 to
+    50.6 N; the same across the seam at 48 N in the Iroise, where Biscay north meets the
+    Channel west. The taper is the cell's: a cell's centre gives its weight, so a cell once
+    worked is a lookup as before."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    foot = units.feet_to_m(0.1)
+    pairs = []
+    # (north of 50.62 N the seam at 1 W is the Solent's tide region's with the Channel
+    # east's since package 94's item 4, a seam between two blocks: truth 7-313; with
+    # Portsmouth's gauge serving both by the rule of the seams, step 5, its step at
+    # 50.9 N is 2.09 ft, 3.0 before the rule, and it stays out)
+    for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
+        cable = 0.1 / 60.0 / math.cos(math.radians(lat))
+        pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
+    for lon in (-4.7, -4.9):
+        pairs.append((Position(48.0 - 0.1 / 60.0, lon), Position(48.0 + 0.1 / 60.0, lon)))
+    for inside, outside in pairs:
+        assert tide.blocks_at(inside) and not tide.blocks_at(outside)
+        assert 0.0 < tide.taper_at(inside) < 0.01
+        for m in range(0, 25 * 60, 10):
+            when = datetime(1805, 6, 12) + timedelta(minutes=m)
+            gap = abs(tide.height_at(inside, when) - tide.height_at(outside, when))
+            assert gap < foot, (inside, when, gap)
+    assert 0.5 < tide.taper_at(Position(50.6, -1.0 + 0.2)) < 1.0  # 7.6 miles in
+    assert tide.taper_at(Position(50.6, -1.0 + 0.3)) == 1.0  # 11.4 miles in: whole
+
+
+def test_truth_7_313_spithead_has_portsmouths_tide_within_the_hour():
+    """The brief's item 4: Bournemouth's and Portsmouth's gauges (39a's, held until package
+    94) serve the manifest's tide region `solent` (bounds and no tiles, 50.62 to 51 N and
+    2.2 to 1 W), under the seam's taper. The eleven's blend over the Solent was four hours
+    and a half wrong (39a's finding again in 89's notes): Spithead's high water by it fell
+    at 06:56 and 19:11 on 12 June 1805 where Portsmouth's gauge has 11:33 and 23:49. Now
+    Spithead's high waters are within the hour of the gauge's (within five minutes), its
+    spring range the gauge's water (twelve feet where the eleven gave nine and a half),
+    and a mile west of 1 W at 50.6 N, outside the region, the eleven's to the bit (truth
+    7-282). The seam between the Solent's water and the Channel east's at 1 W north of
+    50.62 N is a seam between two blocks, a step of three feet and a half off Chichester
+    (docs/dev/TuningNotes.md, package 94, for the lead)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    gauge = next(g for g in doc["gauges"] if g["id"] == "portsmouth")
+    # the Solent's own, and the Channel east's by the rule of the seams (step 5)
+    assert gauge["block"] == ["solent", "channel-east"]
+    assert T.region_bounds()["solent"] == (50.62, 51.0, -2.2, -1.0)
+    # the gauge's own tide: Portsmouth alone (a level given for the loader; the hours of
+    # high water do not read it)
+    alone = {k: v for k, v in gauge.items() if k != "block"} | {"mean_level_m": 4.0}
+    own = T.Tide({"constituents": doc["constituents"], "gauges": [alone]}, {"areas": []})
+    eleven = _the_eleven_alone()
+    spithead = Position(50.775, -1.10)
+    assert tide.blocks_at(spithead) == {"solent"} and tide.taper_at(spithead) > 0.95
+    start = datetime(1805, 6, 12)
+    theirs = [w for w, _ in own.high_waters(Position(gauge["lat_deg"], gauge["lon_deg"]), start)]
+    for name, t, within_h in ((None, tide, 1.0), ("the eleven", eleven, None)):
+        ours = [w for w, _ in t.high_waters(spithead, start)]
+        gaps = [min(abs((a - b).total_seconds()) / 3600.0 for b in theirs) for a in ours]
+        if within_h is None:
+            assert min(gaps) > 4.0, (name, gaps)  # the old water, four hours and more out
+        else:
+            assert len(ours) == 2 and max(gaps) < within_h, gaps
+            assert max(gaps) < 5.0 / 60.0
+    assert _spring_range_ft(tide, spithead) > 11.5 and _spring_range_ft(eleven, spithead) < 10.0
+    mile_deg = 1.0 / 60.0 / math.cos(math.radians(50.6))
+    west = Position(50.6, -1.0 - mile_deg)
+    assert not tide.blocks_at(west)
+    assert tide.constants_about(west) == eleven.constants_about(west)
+
+
+def test_truth_7_314_every_recorded_passages_water_is_the_elevens_outside_the_solent():
+    """The brief's item 5: every recorded passage unchanged. The proof is the passages
+    themselves, run by node id on a clean worktree of the head and on the final tree,
+    identical (docs/dev/TuningNotes.md, package 94); as a behaviour: the recorded passages
+    sail the Channel west and its approaches, and over the whole of `channel-west` and of
+    `channel-mid` outside the Solent's tide region (and west of 1 W) the tide is the
+    eleven's to the bit, a cable from the Solent's west and south bounds as everywhere, the
+    taper being the inside of a block's alone; the Solent's water begins at its bounds."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    cable = 0.1 / 60.0
+    places = [Position(50.62 - cable, lon) for lon in (-2.1, -1.6, -1.1)]
+    places += [Position(lat, -2.2 - cable / math.cos(math.radians(lat))) for lat in (50.7, 50.9)]
+    for lat10 in range(485, 511, 5):
+        for lon10 in range(-70, -10, 5):
+            places.append(Position(lat10 / 10.0 + 0.003, lon10 / 10.0 + 0.003))
+    for pos in places:
+        if tide.blocks_at(pos):
+            assert tide.blocks_at(pos) == {"solent"}, pos
+            continue
+        for h in (0, 7, 15):
+            when = datetime(1805, 6, 12) + timedelta(hours=h)
+            assert tide.at(pos, when) == eleven.at(pos, when), (pos, h)
+    inside = Position(50.62 + cable, -1.6)
+    assert tide.blocks_at(inside) == {"solent"} and 0.0 < tide.taper_at(inside) < 0.01

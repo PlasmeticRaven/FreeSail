@@ -1,0 +1,113 @@
+# FreeSail: Leghorn (Livorno) as a port (package 79d, the Gulf of Lion's block; the same
+# form as dunkirk.yaml, on package 35's machinery). The road, the Malora and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch leghorn).
+#
+# Sources. Michelot 1715, p. 63: half a league W N W of the mole the great road, 7, 8 and
+# 10 fathom, muddy ground; the light-tower lit every night. Purdy 1826, pp. 92 to 93: the
+# road with the mole S E by E, sheltered from westerly winds by the Malora bank, mud and
+# sand; the best berth north-westward of the town, the south end of Gorgona just open north
+# of the Malora tower, the light-house S S E 1/2 E, 5 1/2 to 7 fathoms, good holding; six
+# shoal spots of about 4 fathoms in the road. Derrotero 1849, p. 72.
+#
+# The stance. The free port of the Kingdom of Etruria (the Bourbons of Parma under
+# Bonaparte's hand): neutral to a King's ship and to an American, open to its own, and
+# French-leaning ('Tuscany was gradually becoming French', James vol. 3 p. 176). The
+# modern breakwaters are the grid's: the road is laid west of them. No period sheet read:
+# `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: leghorn
+name: Leghorn
+nation: etruria
+source: "Michelot 1715 p. 63; Purdy 1826 pp. 92-93; Derrotero 1849 p. 72; James 1837 vol. 3 p. 176"
+datum: unverified   # no period sheet read; no published level read for the Italian gauge
+
+outer_road:
+  feature: leghorn-road
+  name: Leghorn Road
+  lat_deg: 43.5650
+  lon_deg: 10.2720
+  depth_fathoms: 6
+anchorage:
+  feature: leghorn-road
+  name: Leghorn Road
+  lat_deg: 43.5650
+  lon_deg: 10.2720
+  depth_fathoms: 6
+mooring:
+  name: within the mole
+  lat_deg: 43.5490     # the grid's 6.6 m inside the old mole (judgement)
+  lon_deg: 10.2979
+  depth_fathoms: 3
+  bottom: mud
+shore:
+  feature: leghorn
+  name: the mole of Leghorn
+  lat_deg: 43.5510
+  lon_deg: 10.3090
+
+pilot:
+  station: leghorn-road
+  cruising_nm: 6                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Leghorn pilots' felucca
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Bartolini, Cecchi, Del Corso, Mazzei, Lenzi, Paoli, Fontana, Becherini]   # Tuscan names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 290            # out of the road to the west-north-westward north of the Malora
+  words:
+    channel: "Come in north of the Malora, which breaks the sea from the west and stretches its shoals some miles north and south of its tower; keep the south end of Gorgona just open north of the Malora tower and run for the light-house till it bears south-south-east."
+    marks: "The light-tower on its rock off the mole, lit every night; the Malora's tower on the bank to the west; Gorgona far out; Montenero's sanctuary on the hill south of the town."
+    anchorage: "Anchor north-west of the town in five and a half to seven fathoms, mud and sand, good holding, the light-house south-south-east half east; mind the shoal spots of four fathoms in the road. Open to a heavy swell from the south-west."
+    tide: "There is little tide, a foot at most, and the current along this coast sets north with the southerly winds."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: etruria, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: etruria, note: "the country's; judgement"}
+    - {good: brandy, price: 56, origin: etruria, note: "the place's own; judgement"}
+    - {good: salt, price: 13, origin: etruria, note: "brought in; judgement"}
+    - {good: salt fish, price: 26, origin: etruria, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: etruria, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: etruria, note: "judgement"}
+    - {good: hemp, price: 40, origin: null, note: "judgement"}
+    - {good: timber, price: 10, origin: etruria, note: "brought in; judgement"}
+    - {good: coral, price: 280, origin: etruria, note: "the place's own; worked coral; judgement"}
+    - {good: wheat, price: 18, origin: etruria, note: "the place's own; the quarter's price in sterling; judgement"}
+    - {good: cheese, price: 35, origin: etruria, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the free port's merchants and chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 14}
+    - {item: yard, hours: 8, pounds: 25}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1, note: "the aqueduct's water on the mole; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the free port's seamen of every nation
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [leghorn-road, 43 35 N 10 10 E]
+  from_sea: [43 35 N 10 10 E, leghorn-road]
+  in: [leghorn-road]

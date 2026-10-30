@@ -325,7 +325,19 @@ class Driver:
             out["waiting_for"] = self.held_for()
         # the pace (package 41): the rule, the rate now and the samples open
         out["pace"] = self.pace.state(self.compression)
+        # the hull the drivers follow (package 84, step 10; 82's §11)
+        world = self.world
+        out["followed"] = {
+            "id": str(getattr(world, "followed", "") or ""),
+            "name": world.followed_words if hasattr(world, "followed_words") else "",
+        }
         return out
+
+    def follow(self, words: str) -> None:
+        """`follow <ship>`: the drivers' centre to her hull (package 84, step 10)."""
+        with self.lock:
+            self.world.follow(words)
+            self.emit_snapshot()
 
     def held_for(self) -> str | None:
         """In lockstep, the station whose door has the floor, which the clock waits for."""
@@ -1436,12 +1448,17 @@ def create_app(
                 driver.save(str(value or ""))
             elif action == "ease_on_station":  # the instruments' option (package 33d)
                 driver.set_ease_on_station(switched_on(value))
+            elif action == "follow":  # the drivers follow a hull (package 84, step 10)
+                try:
+                    driver.follow(str(value or ""))
+                except ValueError as e:
+                    raise HTTPException(status_code=404, detail=str(e)) from None
             else:
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        "Say hold, go, speed N, tick N, standing_orders FILE, save PATH or "
-                        "ease_on_station on|off to the driver."
+                        "Say hold, go, speed N, tick N, standing_orders FILE, save PATH, "
+                        "follow SHIP or ease_on_station on|off to the driver."
                     ),
                 )
         except (TypeError, ValueError):

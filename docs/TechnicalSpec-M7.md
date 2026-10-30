@@ -833,7 +833,16 @@ Since step 7 the player's ship is a vessel of the sea like any member (`Vessels.
 retired), a hull at anchor or in port may be awake, and the cap's order is a ship in
 dealings, then a hull with a stationed person, then the nearest. Since step 8 the save holds
 every hull's stations (`hulls`), each input and act of a station on another ship names her
-hull, and a replay gives them to her again by either road.
+hull, and a replay gives them to her again by either road. Since step 9 the director's forms
+name a hull (`aboard the Raven: ...`, a person made or come aboard her, a cutter's letter
+to her), the truth walks every hull and the persons ashore, `read_log(ship=)` reads a hull's
+log, and a seat may be at a person aboard any hull. Since step 10 the drivers follow a hull
+(`follow "X"`, a driver's line replayed; the World's names, the snapshot, the chart and the
+prompt read the followed hull, the player's own until told), the player's own hull is awake
+always and the save the game's, `World.offices` stands empty beside the hulls for M8's
+offices, and a world order may be given under a purview (`by`). Step 11 closed the package
+with its tidies, its words and its records; the design note's "As built, steps 1 to 11" is
+the account.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 
@@ -1014,6 +1023,35 @@ and the French coast from the Seine to the Flemish banks, built by `docs/dev/Cha
 on milestone 6's machinery; as built in spec M6 §26's list, figures in
 `docs/dev/TuningNotes.md`, "Package 79b". (The brief named this section §26; the chart's
 section of this spec is §28, and the pointer is here.)
+
+**As built: the Mediterranean west (package 79c, 2026-10-29).** The block from the Strait's
+east bound at 5 W to Cape Palos and Cartagena, the Balearics, and the Barbary coast from
+Ceuta's east to Algiers, begun with the research pass that serves 79d's basin too (fifteen
+period and later pilots under `docs/references/pilots/`, the Admiralty's meteorological
+tables as page images). Past the brief's 40 MB in one region it was built as two by the
+lead's ruling, `mediterranean-west` (5 W to 0.05 E) and `balearics` (0.05 E to 4.5 E), on
+milestone 6's machinery; the regency of Algiers a nation of data alone; the Mediterranean's
+first weather box from a printed table; as built in spec M6 §26's list, figures in
+`docs/dev/TuningNotes.md`, "Package 79c".
+**As built: the Gulf of Lion and the Tyrrhenian (package 79d, 2026-10-29).** The fourth of
+79's packages, three regions by the lead's ruling on its first step's measure: `gulf-of-lion`
+(the Roussillon and Provence to Nice and Villefranche, its south bound meeting 79c's
+`balearics` at 40.56 N), `ligurian-sea` (Genoa, Leghorn, Elba, Corsica and the Maddalena
+with Agincourt Sound) and `tyrrhenian` (Sardinia, the Roman coast to Gaeta, the bay of
+Naples); the five Italian and Sardinian nations as data; a port's nation by date (Genoa's
+annexation of June 1805); the Gulf's and the Tyrrhenian's weather boxes from the
+Admiralty's printed tables of Marseille and Naples; the scenario `agincourt-sound.yaml`. As
+built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 79d".
+**As built: the held gauges' water (package 89, 2026-10-30).** The finding every block since
+39a carried: the world's tide blended every gauge within 400 miles, so a block's gauges were
+held out of it and its water read the Channel's eleven (Newhaven's spring range 3.9 feet for
+the gauge's 19.5, the Balearics Saint-Malo's). A block's gauge now has its `block:`, a region
+of the chart's manifest, and serves the positions within that region's bounds and no other;
+the eleven serve everywhere, so no position outside a block reads anything new
+(`freesail/world/tide.py`, `Tide.gauges_at`; `data/tides/constituents.yaml`). The master's
+judged rises over the blocks follow the same water (`data/tides/establishments.yaml`).
+Nothing a reading says changes in its form. Rule, cases and figures in
+`docs/dev/ChartBlocks.md` item 6 and `docs/dev/TuningNotes.md`, "Package 89".
 
 ---
 

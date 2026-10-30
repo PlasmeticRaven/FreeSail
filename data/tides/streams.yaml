@@ -104,6 +104,10 @@ book_limits:
   - {south: 35.5, north: 36.4, west: -6.5, east: -5.0}  # the Strait (package 39f)
   - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
   - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
+  - {south: 35.0, north: 40.5, west: -5.0, east: 4.5}  # the Mediterranean west, both regions (package 79c)
+  - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
+  - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
+  - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1055,6 +1059,276 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: the stream up and down the Channel's eastern reach, the rate the world's rounded, strongest at high water as the progressive wave has it in the open Channel (this file's head)"
+  # Package 79c, the Mediterranean west in two regions (`mediterranean-west`, `balearics`):
+  # the tide is a foot or two at most and its stream next to nothing (Michelot 1709: almost
+  # imperceptible past Málaga; Tofiño 1787 pp. 210 and 226: the Balearics rise one or two feet with
+  # the gales), so every area has no tidal stream (Torbay's form, package 43b) and the
+  # period's constant current beside it where a pilot gives one (package 39f's `current:`).
+  # First-match: the coasts' bands before the open sea; the block's open area after them
+  # all. Far from every recorded passage's water (some 900 miles from the Channel's).
+  - id: cape-palos-offing
+    chart: mediterranean-west
+    name: the offing of Cape Palos and the Hormigas
+    polygon: [[37.45, -0.78], [37.80, -0.78], [37.80, -0.40], [37.45, -0.40]]
+    axis_deg: 135
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 135, kn: 1.0}
+    source: "Tofiño 1787, 'Advertencias', p. 79: over Cape Palos the waters almost always run fast to the south-east, and the more so the farther out; Norie 1831, p. 22: at Cape Palos the currents set to the south-eastward and become more rapid as you get from land; Purdy 1826, p. 18: off Cape Palos commonly a current setting to the south-eastward; no tidal stream; the rate JUDGEMENT"
+    book:
+      set: SE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SE, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the current's set the period's own (Tofiño 1787 p. 79, 'para el S E.'); its rate JUDGEMENT; no tidal stream (the set and the hour of a stream that is not, the form's)"
+  - id: granada-coast
+    chart: mediterranean-west
+    name: the coast of Granada, the Strait's east bound to Cape de Gata
+    polygon: [[36.30, -5.00], [36.56, -5.00], [36.68, -4.42], [36.76, -3.60], [36.80, -2.60], [36.92, -2.40], [36.85, -2.10], [36.60, -2.10], [36.55, -2.60], [36.55, -3.60], [36.45, -4.42]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 1.0}
+    source: "Smyth 1854, Part II, 'Currents', p. 161: along the coast of Granada at the rate of one knot an hour eastwards; Tofiño 1787, p. 46: much current to the east about Alboran; the Admiralty's Mediterranean Pilot vol. I (1913), pp. 52 to 53: from the Strait to the meridian of Málaga four to five knots, from Málaga to Cape de Gata one to two (the modern figure, the near shore's less); Purdy 1826, pp. 349 to 350: from Málaga the flood sets along shore westward to Gibraltar (an eddy inshore, not modelled); the rate JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the current's set and rate Smyth 1854's (p. 161), later than the period; Tofiño 1787's 'mucha corriente para el E.' about Alboran (p. 46); no tidal stream"
+  - id: barbary-inshore-west
+    chart: mediterranean-west
+    name: the Barbary shore from Oran toward the Strait, close in
+    polygon: [[35.10, -5.00], [35.28, -5.00], [35.30, -4.30], [35.32, -3.90], [35.42, -2.95], [35.30, -2.40], [35.45, -1.80], [35.82, -0.80], [35.82, -0.55], [35.70, -0.55], [35.25, -1.80], [35.05, -2.40], [35.05, -4.30]]
+    axis_deg: 270
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 270, kn: 0.5}
+    source: "Tofiño 1787, 'Advertencia', p. 155: from Oran toward the Strait close in with the coast the current is for the Strait, and the stronger the nearer to it, while in the middle of the channel its regular course is always to the east; at the Peñon de Velez and Alhucemas a westward set (pp. 57 to 59); Bérard 1837, p. 85, quotes Tofiño; Purdy 1826, p. 323: at Arzeo running to the westward; the rate JUDGEMENT"
+    book:
+      set: W
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: W, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the current's set the period's own (Tofiño 1787 p. 155, 'para el Estrecho'); its rate JUDGEMENT; no tidal stream"
+  - id: barbary-algiers
+    chart: balearics
+    name: the Barbary shore from Arzew to Algiers and Cape Matifu
+    polygon: [[35.75, -0.55], [35.95, -0.55], [36.10, 0.30], [36.62, 2.00], [36.90, 3.00], [36.90, 3.40], [36.70, 3.40], [36.48, 2.00], [35.90, 0.30]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Bérard 1837, ch. IV, pp. 71 to 72: the general current enters by the Strait and runs east along the coasts of Barbary at about half a mile an hour; the Admiralty's Mediterranean Pilot vol. I (1913), pp. 52 to 53: along the African coast about a knot an hour; Norie 1831, p. 356: off Algiers the Tiger found a current setting to the north-westward at a knot and a half (one ship's report, not modelled); the rate Bérard's"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "Bérard 1837 (p. 72), later than the period; Tofiño 1787 (p. 155): in the middle of the channel the regular course always to the east; no tidal stream"
+  - id: alboran-sea
+    chart: mediterranean-west
+    name: the Alboran sea, between Spain and Barbary west of Cape de Gata
+    polygon: [[35.28, -5.00], [36.30, -5.00], [36.45, -4.42], [36.55, -3.60], [36.55, -2.60], [36.60, -2.10], [35.40, -2.10], [35.42, -2.95], [35.32, -3.90], [35.30, -4.30]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 80, kn: 1.5}
+    source: "Purdy 1826, p. 14: near Alboran the current in general sets strongly to the eastward; Tofiño 1787, p. 46: much current to the east about the island; Smyth 1854, p. 161; the Admiralty 1913, pp. 52 to 53 (four to five knots near the Strait, the modern figure); the set a little north of east with the coast, the rate JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 1.5}
+      judgement: [set, rates, hour, current]
+      source: "the current's set the period's own (Tofiño 1787 p. 46; Purdy 1826 p. 14); its rate JUDGEMENT; no tidal stream"
+  - id: balearic-channels
+    chart: balearics
+    name: the Balearic islands and the channels between them and the main
+    polygon: [[38.55, 0.80], [40.20, 0.80], [40.20, 4.50], [38.55, 4.50]]
+    axis_deg: 45
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Tofiño 1787, 'Corrientes', p. 208: in all the Freus and channels between the islands quick currents, which act as a rule in the direction of the reigning winds; among the islands and in the channels the currents follow the wind; Michelot 1715, pp. 16 to 17: off Formentera the currents generally run to the north-east, especially in fine weather; Bérard 1837, p. 72: from France to the Balearics a south-westerly set of a mile an hour, off Minorca south a mile; no constant current taken (the period's word is the wind's), no tidal stream"
+    book:
+      set: NE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "no statement but that the currents follow the wind (Tofiño 1787 p. 208); the set Michelot's of fine weather, the form's; no tidal stream"
+  - id: med-west-open
+    chart: mediterranean-west
+    name: the open sea of the Mediterranean west
+    polygon: [[35.00, -5.00], [40.50, -5.00], [40.50, 4.50], [35.00, 4.50]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Tofiño 1787, p. 155: in the middle of the channel between Spain and Barbary the regular course always to the east; Smyth 1854, p. 161: after Cape Palos the current sets east-south-east, and toward the Balearics north-east; Bérard 1837, p. 71: the general rate half a mile an hour; the set east and the rate JUDGEMENT within them"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the period's own in the middle of the channel (Tofiño 1787 p. 155); the rate Bérard's general half mile, JUDGEMENT; no tidal stream"
+  # package 79d, the Gulf of Lion's block (the region `gulf-of-lion`): the Mediterranean's
+  # water has no tidal stream to speak of ("the tides are of little moment", Smyth 1854,
+  # p. 178), so every area's stream is nought at springs and neaps (Torbay's form, package
+  # 43b) and the water moves by its `current:` alone, the set of the coast the directions
+  # give: westward along Provence ("the current on these coasts generally sets westward
+  # following the contour of the land; thus from Capo delle Mele to Antibes its direction
+  # is about south-west, and thence to Marseille westerly", Admiralty 1916, p. 13); the
+  # Gulf's open water after it, with no constant set (its currents follow the wind, which
+  # the world does not model as a current). The polygons lie in the Mediterranean, far from
+  # every recorded passage's water.
+  - id: provence-current
+    chart: gulf-of-lion
+    name: the coast of Provence, Antibes to Marseille and the Hyeres
+    polygon: [[43.75, 7.05], [43.45, 7.05], [43.15, 6.70], [42.90, 6.40], [42.95, 5.90], [43.05, 5.30], [43.40, 5.30], [43.30, 5.90], [43.30, 6.40], [43.55, 6.70]]
+    axis_deg: 260
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 260, kn: 0.75}
+    source: "Admiralty 1916, p. 13: from Antibes to Marseille the current sets westerly, running at times among the Hyeres islands with great strength; often modified and sometimes reversed by gales, eastward between Marseille and Toulon during and after north-west gales; the rate JUDGEMENT, below the Riviera's knot; no tidal stream (Smyth 1854, p. 178)"
+    book:
+      set: W by S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: W by S, kn: 0.75}
+      judgement: [set, rates, hour, current]
+      source: "the current's sense the Admiralty 1916's (p. 13), the rate JUDGEMENT; no period statement read for the coast of Provence beyond Purdy 1826's warning of the current into the bight of Aigues-Mortes with southerly winds (OCR l. 11825)"
+  - id: gulf-of-lion-open
+    chart: gulf-of-lion
+    name: the Gulf of Lion and the sea off Provence
+    polygon: [[40.56, 3.00], [44.50, 3.00], [44.50, 7.73], [40.56, 7.73]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Admiralty 1916, p. 12: in the Gulf of Lyons the water drawn toward the head of the gulf in fine weather, driven out of it southward at one to two knots by the north-west winds, its currents following the wind; Purdy 1826, OCR l. 11825: with southerly winds the current at times sets strongly to the north and N.W. into the bight of Aigues-Mortes; no constant set and no tidal stream (Smyth 1854, p. 178): the world's water still"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open gulf (Smyth 1854, p. 178; Admiralty 1916, p. 12: its currents follow the wind)"
+  # package 79d, the Ligurian sea's block (the region `ligurian-sea`): as the Gulf's, the
+  # streams nought and the coast's set as `current:` alone: the western Riviera's to the
+  # south-west (from Genoa to Antibes, the polygon reaching west into the Gulf's water to
+  # Antibes, where the Admiralty's set turns west), the strait of Bonifacio's eastward after
+  # the north-westerlies, and the block's open water after them with none.
+  - id: riviera-current
+    chart: ligurian-sea
+    name: the western Riviera, Genoa to Antibes
+    polygon: [[44.55, 8.95], [44.42, 8.95], [44.20, 8.95], [44.00, 8.45], [43.75, 8.10], [43.55, 7.60], [43.45, 7.05], [43.75, 7.05], [43.95, 7.60], [44.15, 8.10], [44.55, 8.40]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 225, kn: 1.0}
+    source: "Admiralty 1916, pp. 12 to 13: in the Gulf of Genoa the currents follow the trend of the shore from east to west, felt one to two miles off, strongest at Capo di Noli, Capo Lena and Capo delle Mele; from Capo delle Mele to Antibes about south-west; their mean rate one knot, at times two with strong northerly winds; Purdy 1826, OCR l. 12989: off Albenga a current generally sets to the S.W.; no tidal stream (Smyth 1854, p. 178); the band's breadth (about fifteen miles) JUDGEMENT"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SW, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the current's sense the period's own (Purdy 1826, OCR l. 12989: off Albenga a current generally sets to the S.W.), its rate the Admiralty 1916's mean (pp. 12 to 13) and JUDGEMENT for 1805; no tide (Smyth 1854, p. 178)"
+  - id: bonifacio-strait
+    chart: ligurian-sea
+    name: the strait of Bonifacio
+    polygon: [[41.20, 8.95], [41.48, 8.95], [41.48, 9.65], [41.20, 9.65]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Admiralty 1916, p. 13: in the strait of Bonifacio the currents follow the direction of the wind at a rate depending on its force, sometimes preceding it by many hours; after north-westerly gales a current of two knots sets eastward through the strait; Purdy 1826, p. 89: the current round Point Liche will run nearly two and a half miles an hour; the constant half knot eastward (the north-westerly the prevailing wind) JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "JUDGEMENT within the period's words (Purdy 1826, p. 89: the strong current about Point Liche) and the Admiralty 1916's (p. 13: the current with the wind, eastward after the north-westerlies)"
+  - id: ligurian-sea-open
+    chart: ligurian-sea
+    name: the Ligurian sea and the sea about Corsica and Elba
+    polygon: [[41.00, 7.74], [44.50, 7.74], [44.50, 11.00], [41.00, 11.00]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Admiralty 1916, p. 13: in the middle of the entrance to the Gulf of Genoa the currents very variable and much affected by the force and direction of the winds; with south-west winds the water rises in the gulf and afterwards a southerly current sets out of it; no constant set and no tidal stream (Smyth 1854, p. 178): the world's water still"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open Ligurian sea (Smyth 1854, p. 178; Admiralty 1916, p. 13: its currents follow the winds)"
+  # package 79d, the Tyrrhenian's block (the region `tyrrhenian`): the streams nought and the
+  # coast's set as `current:` alone, as the Gulf's: from Civita Vecchia to Naples the
+  # current sets most frequently north-eastward near the land (the Admiralty 1916, p. 14),
+  # and the block's open water after it with none (its currents follow the winds).
+  - id: roman-coast-current
+    chart: tyrrhenian
+    name: the Roman coast, Civita Vecchia to Naples
+    polygon: [[42.15, 11.70], [41.85, 12.10], [41.40, 12.70], [41.15, 13.40], [40.85, 13.95], [40.55, 14.30], [40.40, 14.10], [40.70, 13.60], [41.00, 12.90], [41.20, 12.40], [41.65, 11.85], [42.00, 11.45]]
+    axis_deg: 45
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 45, kn: 0.5}
+    source: "Admiralty 1916, p. 14: on the coast between Leghorn and the Strait of Messina the currents very variable, subject to the winds; from Civita Vecchia to Naples however they set most frequently north-eastward near the land, and the mariner must guard against them, particularly in very fine weather; the rate and the band (about twelve miles) JUDGEMENT; no tide (Smyth 1854, p. 178)"
+    book:
+      set: NE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: NE, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the current's sense the Admiralty 1916's (p. 14), the rate JUDGEMENT; no period statement read for the Roman coast's set"
+  - id: tyrrhenian-open
+    chart: tyrrhenian
+    name: the Tyrrhenian sea, Sardinia to Naples
+    polygon: [[38.50, 8.00], [42.50, 8.00], [42.50, 15.50], [38.50, 15.50]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Admiralty 1916, p. 14: the currents very variable, subject to the force and direction of the winds; no constant set and no tidal stream (Smyth 1854, p. 178): the world's water still"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open Tyrrhenian (Smyth 1854, p. 178; Admiralty 1916, p. 14)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

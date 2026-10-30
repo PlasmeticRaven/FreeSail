@@ -19,9 +19,9 @@ captain of another ship and the budget it is held for; package 67 widened it:
   own name (`VOICE_KIND`), its orders struck as a passenger's are (the deck's conversation
   and the readings, no deck and no order of any ship's), its brief his (`voice_station`),
   his words heard where he is, and the director's `say as` for him refused while a model
-  holds him, since the rule of reach reads the held stations. A person aboard another ship
-  has no World of hers to be bound in (package 68 refuses one made there), and is refused
-  in words.
+  holds him, since the rule of reach reads the held stations. A person aboard another
+  ship is of her hull's company (package 84, step 9), and his voice is bound on her hull as
+  a station there is.
 
 **The desk reads the seat** (`match`, `admit`; `agents.remote.Desk.station`): a door for a
 model at a station with a seat held for that model is admitted under the seat's budget, its
@@ -202,10 +202,29 @@ def _resolve(world: Any, who: str) -> dict[str, Any]:
     except Exception:  # noqa: BLE001  (a world with no muster names nobody)
         person = None
     if person is None:
+        # a person of another hull's company (package 84, step 9; 67's refusal lifted): his
+        # voice bound on her
+        from freesail.world.orders import _person_anywhere
+
+        other = _person_anywhere(world, who)
+        if other is not None:
+            hid = str(getattr(other, "hull", "") or getattr(other, "home", "") or "")
+            vessels = getattr(world, "vessels", None)
+            vessel = vessels.get(hid) if vessels is not None else None
+            if vessel is not None and not vessel.done:
+                where = "aboard" if getattr(other, "aboard", True) else "ashore"
+                return {
+                    "ship": vessel.id,
+                    "vessel": vessel,
+                    "station": _voice_name(other),
+                    "person": other.name,
+                    "aboard": where == "aboard",
+                    "what": f"the voice of {other.name} ({vessel.name})",
+                }
         raise _error(
             f"Nobody answers to {who!r}: a seat is at a station ('as captain of <ship>', 'as "
             "officer of the watch') or for a person of the voyage by his name ('as Mr "
-            "Veale'); a person aboard another ship has no World of hers to be seated in."
+            "Veale', of any hull's company)."
         )
     stations = getattr(world, "stations", None)
     if stations is not None:

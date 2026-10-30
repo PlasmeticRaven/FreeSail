@@ -983,3 +983,90 @@ def test_a_station_may_be_seated_on_a_ship_at_anchor_and_she_is_awake_under_the_
     assert crew is b.crew and crew.shape == "full" and b.detail == "crewed"
     w.run(120)
     assert b.crew.shape == "full"  # not demoted for her anchor
+
+
+# -- step 10: the drivers follow a hull --------------------------------------------------------
+
+
+def _frigate_and_the_brig_x_on_the_sea():
+    """The frigate hove to with the brig X put on the sea by world orders and promoted
+    beside her, as the replay and the world-orders tests make her."""
+    w = hove_to_world()
+    w.record_driver("routine", "driver.book", "The book of standing orders begins empty.")
+    e = w.world_order(
+        'ship: a merchant brig "X" of Britain at 49 33 N 5 30 W, bound for Falmouth', "t"
+    )
+    assert e.data["result"] == "done", e.text
+    assert w.world_order('ship "X": intent bound for Falmouth', "t").data["result"] == "done"
+    w.run(61)
+    b = w.vessels.find("X")
+    assert b.crew is not None and b.crew.shape == "full"
+    return w, b, b.crew
+
+
+def test_the_drivers_follow_a_hull_and_the_players_ship_sails_on_as_another():
+    """Package 84, step 10 (82's §11): `follow "X"` moves the drivers' centre to her hull:
+    the World's names read her by default (her position, her ship, her log, her readings),
+    `is_followed` is hers and the shared tick runs for her; the player's ship ticks on as
+    another hull, her vessel on the sea mirrored from her own hull and not from the
+    followed; `follow "the ship"` brings the drivers back; the line is the driver's and a
+    replay gives it again."""
+    from freesail.api import queries
+
+    w, b, hull = _frigate_and_the_brig_x_on_the_sea()
+    players = w.players
+    assert w.followed == "the ship" and w.own is players and w.is_followed
+    assert w.followed_words == w.ship.name
+    e = w.follow("X")
+    assert e.kind == "driver.follow" and e.actor == "driver" and "Following the X" in e.text
+    assert w.followed == b.id and w.own is hull and w.is_followed and hull.is_followed is not False
+    assert w.ship is hull.ship and w.position == hull.position and w.log is hull.log
+    assert w.players is players and w.vessels is players.vessels  # the sea stays hers
+    assert w.followed_words == "X"
+    snap = queries.snapshot(w)
+    assert snap["ship"]["name"] == hull.ship.name == "X"  # the browser draws her
+    before = players.position
+    w.run(120)
+    own = w.vessels.own
+    assert own.crew is players and own.position == players.position != before
+    assert own.position != hull.position and own.name == players.ship.name
+    assert players.clock is w.clock and len(players.log) > 0
+    e = w.follow("the ship")
+    assert w.followed == "the ship" and w.own is players and e.kind == "driver.follow"
+    with pytest.raises(ValueError, match="No ship named"):
+        w.follow("Nobody")
+
+
+def test_a_follow_is_journaled_as_the_drivers_line_and_replays():
+    import json
+
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    w, b, hull = _frigate_and_the_brig_x_on_the_sea()
+    w.follow("X")
+    w.run(300)
+    w.submit("set the royals")  # an order to the followed hull: hers
+    assert any(e.text == "Order: set the royals." for e in hull.log)
+    assert not any(e.text == "Order: set the royals." for e in w.players.log)
+    w.run(300)
+    data = json.loads(json.dumps(w.save()))
+    assert any(e.get("line", {}).get("kind") == "driver.follow" for e in data["inputs"])
+    copy = replay.replay(data, ship_factory)
+    assert copy.followed == b.id and copy.log.digest() == w.log.digest()
+    assert copy.players.log.digest() == w.players.log.digest()
+
+
+def test_the_pace_rules_open_samples_name_every_hulls_station_once():
+    from unittest.mock import MagicMock
+
+    from freesail.agents.harness import all_agents
+
+    w, b, hull = _frigate_and_the_brig_x_on_the_sea()
+    w.agents["captain"] = MagicMock(name="the player's captain")
+    hull.agents["captain"] = MagicMock(name="her captain")
+    names = [name for name, _h, _w in all_agents(w)]
+    assert names == ["captain", "captain of X"]
+    w.follow("X")
+    names = [name for name, _h, _w in all_agents(w)]
+    assert sorted(names) == ["captain", f"captain of {w.players.ship.name}"]

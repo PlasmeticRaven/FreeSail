@@ -1,34 +1,40 @@
-"""The crewed promotion (package 43; spec M6 §19 and §20; M5 §25's seam filled).
+"""The crewed promotion (package 43; spec M6 §19 and §20; M5 §25's seam filled), and the
+hulls of the one world (package 84; `docs/design/Design-OneWorld.md`, its postscripts
+"As built").
 
-Within `CREWED_NM` of the centre (the player's ship) a far-detail vessel with a brain
-becomes **a full part-and-crew ship from her file**: a World of her own (`CrewedWorld`)
-with her hull and rig under the same physics, her company mustered, her stations bound,
-her own account, lookout and book, and her rules-based captain (`captains.Captain`) giving
-his orders through the same channel as the player's, his state folded in from the far
-brain (`brains.FarCaptain.fold_in`). Beyond `CREWED_DEMOTE_NM` she is demoted, her state
-folded back (position, heading, sail set, the brain's state) and the World dropped, or kept
-in the far shape when a station is seated on her (§20, `far_shape`). A hard cap
-(`CREWED_CAP`) holds the number of crewed ships: the nearest first, and a ship in dealings
-with the player (a chase, a hail, within the last glass) before a nearer one that is not;
-the hysteresis of two miles keeps a ship at the edge from flapping between bodies. The
-figures are the measurement's (docs/dev/TuningNotes.md, package 43: a crewed ship costs
-what the player's frigate costs, the physics of her sails four substeps a tick, so a dozen
-at once would halve the owner's sixty times; three keep the whole over twice it on the
-build machine).
+Within `CREWED_NM` of the centre (the followed hull, the player's ship until `follow` names
+another) a far-detail vessel with a brain becomes **a full part-and-crew ship from her
+file**: a `Hull` of the one World (`hulls.Hull`; `make_hull`, `adopt_hull`) with her hull
+and rig under the same physics, her company mustered, her stations bound, her own account,
+lookout, log, streams and book, and her rules-based captain (`captains.Captain`) giving his
+orders through the same channel as the player's, his state folded in from the far brain
+(`brains.FarCaptain.fold_in`). `CrewedWorld` is the builder of a hull's fields and the
+unpickler's name for a checkpoint of before, a World no longer kept. Beyond
+`CREWED_DEMOTE_NM` she is demoted: she sleeps (`demote`), her physics off, her state folded
+back into the far body and the brain, her damage summed into the far body's record, her
+company, stores, parts and log kept whole, her minute `far_tick`'s; near again she wakes
+without being remade (`_to_full`). A hard cap (`CREWED_CAP`) holds the number of hulls
+awake, in the cap's order: a ship in dealings with the player (a chase, a hail, within the
+last glass), then a hull with a stationed person, then the nearest; a hull at anchor or in
+port is awake like any other; the hysteresis of two miles keeps a ship at the edge from
+flapping between bodies; the player's own hull is awake always. The figures are the
+measurement's (docs/dev/TuningNotes.md, package 43 and package 84's steps: a hull awake
+costs what the player's frigate costs, the physics of her sails four substeps a tick; a
+sleeping hull a thirty-seventh of the pace).
 
-**One brain, two bodies**: the promotion changes the body only. The crewed World shares
-the parent's chart, tide table and weather (its wind follows the parent's systems at her
-own place on the parent's plane, `_follow_weather`; the sky and the visibility are the
-parent's at the ship, as the brief wants the same visibility the player's lookout has), and
-sees the other sail and the player's ship through a view of the parent's vessels
-(`CrewView`), so that her lookout hails the player as the player's hails her. Her log is
-her own, and nothing of her promotion is a line of the player's log: the player's lookout
-sees a sail that is the same sail, which is the design point held hardest (spec M6 §4).
+**One brain, two bodies**: the promotion changes the body only. A hull shares the World's
+chart, tide table and weather (her wind follows the systems at her own place on the plane,
+`World._follow_weather` with her current; the sky and the visibility are the followed
+hull's at the ship, as the brief wants the same visibility the player's lookout has), and
+sees the other sail and the player's ship through her view of the sea (`HullView`: the
+sea's vessels but her own body, the player's ship a vessel of the sea among them), so that
+her lookout hails the player as the player's hails her. Her log is her own, and nothing of
+her promotion is a line of the player's log: the player's lookout sees a sail that is the
+same sail, which is the design point held hardest (spec M6 §4).
 
-A vessel within a port's reach, at anchor, in port or running for shelter is not
-promoted, and a crewed vessel that comes to an anchor is demoted: the port's business
-(the pilot, the boat, the market) is the player's ship's machinery and the far brain's
-wait (`brains.IN_PORT_WAIT_S`), not a crewed stranger's, until the world's business (43b).
+The port's business of a sleeping hull (the pilot, the boat, the market, her people's moves
+ashore) runs in her far tick by her own dealings (`Dealings`, package 84's step 4), and the
+world's business is the ports' (43b).
 
 **The director's hand** (spec M7b §3; package 62; `hand`): an order of a ship's own grammar
 given to her captain's station as his own, by the world order `ship "X": order ...`.
@@ -584,10 +590,15 @@ def _crew_ids(world: World) -> tuple[str, ...]:
 def crewed(world: World) -> list[Any]:
     """The vessels at full detail now (a station's World kept in the far shape is not
     one: it costs little and counts nothing against the cap)."""
+    players = getattr(world, "players", None)
     return [
         v
         for v in world.vessels.vessels
-        if v.crew is not None and v.crew.shape == "full" and not v.done and not v.crew.is_followed
+        if v.crew is not None
+        and v.crew.shape == "full"
+        and not v.done
+        and not v.crew.is_followed
+        and v.crew is not players  # the player's own hull is awake always (step 10)
     ]
 
 
@@ -1241,8 +1252,8 @@ def shape_words(crew: CrewedWorld) -> str:
             "station, with no reseat, and the log says so."
         )
     return (
-        f"{v.name} is at full detail beside the player's ship: her hull and rig under the "
-        "physics, her company at their stations, every order of the ship's yours."
+        f"{v.name} is awake, a hull of the one world: her hull and rig under the physics, "
+        "her company at their stations, every order of the ship's yours."
     )
 
 

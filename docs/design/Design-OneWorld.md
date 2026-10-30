@@ -1387,13 +1387,22 @@ Each with the study's recommendation.
    into the hulls as state, and a scenario may raise the cap; a stationed hull in a fight
    is a dealing and takes her place in the cap's order as a dealing ship does today.
 
-## As built, steps 1 and 2 (package 84; 2026-10-28)
+## As built, steps 1 to 11 (package 84; 2026-10-28 to 30)
 
-The first two of part 4's eleven steps, built as a sibling session on `claude/pkg-84` off
+Part 4's eleven steps, built as a sibling session on `claude/pkg-84`, steps 1 and 2 off
 `e7a3ee8` (73 merged; 86, the fold-in of the owner's local work, building beside on the same
-head), each a mergeable commit with the fast tier whole on its tree and the slow tier of the
-files it touched; the measurements and the suites as run are in `docs/dev/TuningNotes.md`
-under "Package 84, steps 1 and 2". Step 3 onward is built from the head after 86's merge.
+head) and step 3 onward from the head after 86's merge, each step one mergeable commit with
+the fast tier whole on its tree and the slow tier of the known truths, the trials and the
+files it touched, the lead's head brought in at each step's boundary; the measurements and
+the suites as run are in `docs/dev/TuningNotes.md` under "Package 84". The postscript of
+each step below says what it built, what it took another way and why, and what it found on
+the way; the lead's as-merged records in `docs/dev/M7-WorkPackages.md` say what the lead
+took differently. **What stands at the end:** one World of hulls (`world.hulls`), the
+player's ship one of them and a vessel of the sea among the others; one clock, one registry
+of persons and things, one journal; the ports the world's and the dealings each hull's; a
+hull awake under the physics or asleep whole with her far body moved by the plan; the save
+and the replay of every hull's stations; the director's reach over the hulls; the drivers
+following a hull; room left for the offices.
 
 ### Step 1: the Hull extracted behind the World's names (`freesail/world/hulls.py`)
 
@@ -1947,3 +1956,170 @@ reads the agents' records, so the doors are not touched. The converter for a che
 with `CrewedWorld`s stands as step 6 left it (`_adopt_old_crews`): the owner's eleven
 saves came as JSON without checkpoints, so the second test the design names waits for his
 folder; the hulls tests' old-shape writer is its proof meanwhile.
+
+### Step 9: the director's reach and the truth over the hulls
+
+Built on step 8 as merged, the lead's head `76eb22c` (package 79b's Channel east block on it)
+brought in at the boundary. **Built.** **The forms with a hull.** An `aboard` order names
+her at its head, `aboard the Raven: ...` or `aboard "Raven": ...` (`_HEAD` widened for the
+article's form; the followed hull when none is named): the thing found, made or moved, her
+purse and her hold, by her own names, the handler run with her façade as its world
+(`orders.hull_named`: the World for the player's ship by her name or "the ship", another
+ship's hull by her name or id, made in the far shape by `crews.station_world` when she has
+none, refused in words for a ship not on the sea or one with no captain of her own to keep a
+hull); her people's report is a line of her log and none of the player's, and the order's own
+line in the player's log names her (`aboard the Raven: ...`, with `ship` in its data). A
+person made `aboard the Raven` is made of her company by her names where package 68 refused
+the words (`_make_person` passes the order to her with the ship's phrase turned to
+`aboard[, in the <place>]`); `person: "X" comes aboard the Raven [as <station>]` moves a
+person of any company into her (his `hull` hers, her log's line, her station bound when
+named: `_comes_aboard_hull`, the person found across the one registry by
+`_person_anywhere`). `message: by a cutter from <port> from <whom> to the Raven: "..."`
+sends the cutter for her: the letter carries `to_hull`, the `to_ship` leg steers for her body
+(`Vessel._ship_target`) and within hail the letter comes aboard her
+(`Vessels._deliver_to_hulls`: the line in her log, her messenger, nothing in the player's).
+`say as` anywhere by spot was step 4's. **The rule of reach over the hulls**
+(`held_stations_everywhere`): a word said as a person of a held station on any hull, or his
+moving, is refused as the player's ship's would be; and the hearing's walk over the stations
+(`hearing.stations_everywhere`) is over `world.hulls`, each once, where a walk over the
+vessels' hulls would have counted the followed hull twice since step 7. **The truth** walks
+the hulls: every hull's row says whether she is awake or asleep and gives her purse, her cargo
+and her water; the persons ashore at every port, of every hull's company, are a list of their
+own (`ashore`); her people, guns and damage as before; the things of every hull as step 2
+left them (one registry). **`read_log(ship=)`**, the director's alone: another hull's log by
+her name, awake or asleep, from its start by default; refused in words at any other station
+and for a ship with no hull. **The seat at a person aboard any hull** (67's refusal lifted):
+`seats._resolve` finds him across the registry and the seat's target is his hull, his voice
+bound on her as `--ship` makes a station there. **The library** gains the hull forms as
+examples (`aboard the Harpy: a cask found stove`, `aboard the Harpy: a cask of brandy, in the
+hold`, `person: make "Mr Gill", ..., aboard the Harpy, in the cabin`, `message: by a cutter
+from Falmouth from the agent to the Harpy: "..."`), each performed by the forms test on its
+sea with the Harpy crewed.
+
+**Taken another way, with the reason.** The design's `message: ... to the Raven` is given
+for the cutter's form alone; a letter left at a port (`message: at <port>`) lies for
+whichever ship's boat comes, as before, since the port's letters are the port's. A `focus`
+tool is not made: `read_log(ship=)` is the reading the design asks for (§12b's ground) and
+the truth names every hull. The rule of reach for the hand (`ship "X": order`) stands as
+package 62 left it. A person made aboard a ship on the sea without a captain of her own is
+refused in her words (no hull to keep him), where package 68's words said "names another
+ship": the test of 68 is restated to the hull's refusal.
+
+### Step 10: the drivers follow a hull; the offices' room
+
+Built on step 9 as merged (the lead's head `6f8c708`). **Built.** **The drivers follow a
+hull.** `World.own`'s default is the followed hull (`hulls[followed]`; the player's own hull
+until `follow` names another, so nothing recorded moves), and with it every per-ship name of
+the World's, the drivers' `state()`, the browser's snapshot and chart, the console's prompt
+and `state`, the log the drivers show and the shared parts of the tick (the clock, the
+world orders, the far bodies, the switch, the ports' jobs) run for her: `is_followed` is
+hers. `World.players` is the player's own hull apart (`hulls[PLAYER_ID]`): the sea stays hers
+(`World.vessels`, `sea_vessels`), her vessel on it (`Vessels.own`) is brought up from her
+hull and not from the followed (`ships.players_current` makes her current), her way and her
+frame are her ship's own to the sets (`squadrons._followed_hull` reads her), the squadrons'
+commander branches read her captain (`_players_captain`), the save is the game's with her
+current (`World.save` under `as_hull(players)`: the seed, the scenario, the ship and the
+stations at the top are hers, every other hull's in `hulls`), and she is awake always: the
+switch leaves her out of its demotions and its count against the cap (`crews.crewed`), while
+`tick_crews` ticks her as any hull when another is followed. **`follow "X"`** (`World.follow`;
+82's §11): the hull by her name (the player's by hers or 'the ship'; another made in the far
+shape when she has none), `followed` set, a driver's line `driver.follow` written in the
+followed hull's log and journaled, which a replay gives again (`replay._give`); the console's
+`follow <ship>` and `state` ("Following the X."), the server's `/api/driver` `follow` and
+`state()["followed"]` with her id and name; refused in words for a ship not on the sea or one
+with no captain of her own. A letter for the player's ship comes aboard her hull whichever is
+followed (`Vessels._deliver_to_hulls`), and a `to_ship` leg steers for her. **The walks over
+the hulls** are each once: `harness.all_agents` names the followed hull's stations under their
+own names and every other hull's as 'captain of <ship>' (the pace rule's open samples), where
+the walk over the vessels' hulls counted the player's twice since step 7. **The offices'
+room** (the design's 2.10): `World.offices` beside `world.hulls`, an empty mapping for a
+station of the world and of no hull (M8's to build); `Stations(world, domain=None)` keeps its
+domain, the hull whose bindings these are (its World today). **The purview hook**:
+`World.world_order(text, source, by="")` journals `by` on the input, `WorldOrder.by` carries
+it, `orders.apply` checks `purview_allows(by, channel)` (the bare order and the director's
+pass whole; an unknown purview is refused in words), and the replay gives `by` again.
+
+**Taken another way, with the reason.** `followed` None with "no ship followed" is not
+reached in 84: every World keeps the player's hull, so `followed` always names one; the
+words stand ready in `World.followed_words` for 82's world with no player's ship. The
+director's door, when another hull is followed, reads the World's names as the drivers do
+(the followed hull's log and readings between ticks), its own harness ticking on the
+player's hull as her station; whether the director should follow the drivers or stay with
+the player's ship is a question for 82, noted. The design's "harness takes a domain" is
+`Harness.world`, the hull it samples, named as such; no office built.
+
+### Step 11: the long tail, the words and the records
+
+Built on step 10 as merged. **Built.** The tidies booked by the lead's reviews and the
+steps' own notes: `combat/action.py`'s `target_of` without the arm the shadow's branch left
+(one road, the mark a vessel of the sea); `ships._lying_to` reads the manoeuvre from the
+ship by the reading's own rule (the first evolution not waiting, else the heave-to's record)
+with no import of the api layer; `orders._person_anywhere` takes the name whole first and
+the surname only when one person of the world bears it; the two test lines that asserted
+nothing assert what they name (the director's read of her log names no line of the
+player's; her captain's station held); `World.as_hull` drops its thread-local stack when
+the last block ends, so the thread-local no longer keeps an empty list for every World ever
+made. The façade's wrapping of the World's methods in the swap stands as it is: the pace
+measured at every step shows nothing the measure sees, and the design's reading (every other
+name of the World's run with the hull current) is the simpler contract. **The words:** the
+awake notice says "awake, a hull of the one world" where it said "beside the player's
+ship"; `crews.py`'s head is the hulls' (the Hull the container, `CrewedWorld` the builder's
+and the unpickler's name, the sleep and the wake, the cap's order); `seats.py`'s head says a
+person aboard another ship is of her hull's company; the Harness doc's §17 carries an "as
+built since package 84" paragraph; the primer's chapter 17 names her own hull of the one
+world; spec M6 §19 and §20 and spec M7b §11, §12 and §12b carry "as built (package 84)"
+pointers to this note, each saying what of its section 84 built and what stays the
+section's own (82's world with no player's ship, the player's seat on another ship, the
+director's attention tiers). **The records:** this head recast as steps 1 to 11; the tuning
+notes' package head likewise, with the pace figures of every step beside the study's (3.2)
+in its step 11 section; the spec's §21 as-built line to step 11.
+
+**Taken another way, with the reason.** The `world` to `hull` rename in a consumer is made
+nowhere: the design allows it only where a step touched a consumer, and every consumer the
+steps touched holds the hull as its `world` by the façade, which is the name every reader
+and every test of theirs knows; a rename would move hundreds of lines for no behaviour.
+
+**What 84 leaves (the lead's ask at the last step).** *For package 82:* the world with no
+player's ship (`ship: none`, `director: observe`), whose `followed` names no hull and whose
+readings answer "no ship followed" (the words stand ready in `World.followed_words`; every
+World of 84 keeps the player's hull, so the branch is not reached); the player's own seat on
+another ship with the drivers following him (`--seat captain --ship`, M7b §12), for which
+step 10's `follow` is the mechanism and step 8's save and replay of the hulls' stations the
+record; and the director's door's question: when another hull is followed, a door's read
+between ticks sees the followed hull's names (its log, its readings), while the director's
+harness ticks on the player's hull as her station; whether the director follows the drivers
+or stays with the player's ship is 82's to decide with the followed ship. *For package 85's
+review of the words:* the words recast here (the awake notice, the crews' and the seats'
+heads, the specs' pointers) and the ones left as they were: the far notice's "beyond the
+cap's reach" and the plan layer's forms (`shape_words`), "the player's ship" in `seats.py`'s
+seat words, `agent.py`'s director's domain and the Harness doc, which is right wherever the
+player's own hull is meant and loose where "the followed hull" is; `CrewedWorld` as the
+builder's and the unpickler's name; `world` as every consumer's name for its hull; the
+tests' `crew` for a vessel's hull (`Vessel.hull` is the field's other name). *For the
+design's own open items:* the two strict phases of the tick (step 6's "taken another way"),
+`_NOT_CREWED_STATES` and `FAR_ONLY_ROLES` kept empty for their one place each, the
+business's region the followed hull's (decision 7), the two sleeping hulls' fight resolved
+asleep (decision 8), and the gauges' water (package 89, the lead's).
+
+**The eleven steps against the brief** (`docs/dev/M7-WorkPackages.md`, "Package 84", items 1
+to 11; each built in its step, the brief's intent binding and the reading advice):
+
+| The brief's item | Built | Taken another way |
+|---|---|---|
+| 1. The Hull behind the World's names | step 1 | none |
+| 2. One registry, the whereabouts, hearing by spot | step 2 | none |
+| 3. The ports split, `Ports` and `Dealings` | step 3 | none |
+| 4. The coarse acts on a sleeping ship; the far brain's port acts | step 4 | the far course by the ports' tracks (the coasting track withdrawn); the Raven asleep from the start |
+| 5. The ship persists: sleep and wake | step 5 | none |
+| 6. The Hull the container; `CrewedWorld` retired | step 6 | the tick's order kept (the two strict phases a refinement); the per-ship methods on the World under the swap |
+| 7. The player's ship a hull among the hulls; the shadow retired | step 7 | `has_glass` by the parent; the squadrons' commander branches stand |
+| 8. The save and the replay of many hulls | step 8 | the doors untouched; the checkpoint converter as step 6 left it |
+| 9. The director's reach and the truth over the hulls | step 9 | a port's letter lies for any boat; no `focus` tool; 68's test to the hull's refusal |
+| 10. The drivers follow a hull; the offices' room | step 10 | "no ship followed" unreached; the director's door 82's question; no office built |
+| 11. The long tail, the words and the records | step 11 | the `world` to `hull` rename made nowhere |
+
+The owner's decisions the brief named: 1 (the whole of 2.5's table, step 4), 3 (the stationed
+hull in the cap's order and `stationed: always`, step 7), 5 (`transact: true`, step 4), 6 (a
+hull at anchor or in port awake, step 7); 2 (every hull keeps her log, since step 5), 4 (the
+leaders' roles M8's: the room left, step 10), 7 and 8 (the business's region and the sleeping
+hulls' fight as the study recommends, untouched).

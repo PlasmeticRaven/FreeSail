@@ -1308,6 +1308,12 @@ centre is the ship the game follows, which is the one the chart draws. The far-d
 that the gate 5c ruling never had, a leg across the coast refused when the scenario loads,
 is built here with the promotion.
 
+**As built since package 84 (2026-10-29; `docs/design/Design-OneWorld.md`, the postscripts
+"As built"):** a promoted ship is a `Hull` of the one World (`world.hulls`), not a World of
+her own; demoted she sleeps whole and wakes without being remade; the cap's order is a ship
+in dealings, then a hull with a stationed person, then the nearest, a hull at anchor or in
+port awake like any other; the player's ship is a vessel of the sea among the others.
+
 **As built (package 43, 2026-10-16; `freesail/world/brains.py`, `crews.py`, `ships.py`; the
 measurement and the figures in `docs/dev/TuningNotes.md`, package 43).** *The measurement
 first.* Twelve fully crewed ships under rules-based captains ticked at once in the Channel
@@ -1487,6 +1493,10 @@ sample says which shape she is in. The crewed promotion brings the full surface 
 beneath the same station with no reseat, and the log says both. One rule for the rules,
 a model and the player, and the same for the player's own ship if it is ever demoted
 (it is not, in this milestone). The director's seating of such a captain is §23.
+
+**As built since package 84 (2026-10-29; `docs/design/Design-OneWorld.md`):** the station's
+World is her hull of the one World, one clock and her own log; the far shape is the
+sleeping hull's; a save holds the station (`hulls`) and a replay gives its orders to her.
 
 **As built (package 43, 2026-10-16; `crews.station_world`, `CrewedWorld.shape`,
 `submit_far`; `remote.Desk` with `ship`; the doors' `--ship`).** `--station captain --ship
@@ -2058,6 +2068,46 @@ the figures are in `docs/dev/TuningNotes.md`.
    Dieppe's own: the lead's decision); eight stream areas, the Looe's rates Mackenzie's;
    Norie 1805's Table XLI for 27 places. The Channel's weather box to 2.5 E. The scenario
    `spithead.yaml`: the frigate from the Downs to Spithead by St Helens for the night.
+   **As built (package 79c, 2026-10-29), the Mediterranean west of milestone 7's line.** Past
+   the brief's 40 MB in one region (57.5 MB), built as two by the lead's ruling:
+   `mediterranean-west`, 35 to 40.5 N and 5 W to 0.05 E, abutting `strait` at 5 W (its
+   column of three kept), 165 level-2 tiles and the patches of Málaga, Almería, Cartagena
+   and Oran, 26.5 MB; and `balearics`, the same rows to 4.5 E, abutting it at 0.05 E (the
+   column of fourteen kept `mediterranean-west`'s), 154 level-2 tiles and the patches of
+   Palma, Port Mahon, Ivica and Algiers, 30.9 MB; every tile written (no corridor east of
+   1 W). 182 marks from Tofiño 1787 with Purdy, Vargas Ponce, Grasset, Michelot, Bérard and
+   Smyth, the lights of 1805 three (Málaga's mole, Porto Pí's, Algiers'), the isles the grid
+   lacks as rocks of their height, Port Mahon placed by hand by Tofiño's plan of its entry;
+   no patch, no sheet having been read with its datum. Eight port files (Málaga, Almería,
+   Cartagena with the King of Spain's arsenal, Palma, Ivica, Port Mahon with its arsenal,
+   Spain's and hostile; Oran and Algiers, the regency's and neutral) and the regency of
+   Algiers a nation of data alone. The tide: nine gauges read and held, their mean levels
+   from REDMAR; seven stream areas with no tidal stream and the period's currents; the
+   epitome's places with the pilots' foot of rise. The weather: the box `mediterranean-west`,
+   its check rows the Admiralty's meteorological tables (1913). The scenario `mahon.yaml`:
+   the frigate from Gibraltar road to the mouth of Port Mahon, anchored without the ledges
+   through a northerly.
+   **As built (package 79d, 2026-10-29), the Gulf of Lion and the Tyrrhenian.** Three
+   regions, the Gulf split at the column edge 7.73 E by the lead when its tiles measured
+   46 MB: `gulf-of-lion` (40.56 to 44.5 N, 3 to 7.73 E; 120 level-2 and 32 level-3 tiles,
+   28.1 MB; Toulon, Marseille, the Hyères road, Villefranche), `ligurian-sea` (41 to 44.5 N,
+   7.74 to 11 E; 72 and 32, 20.6 MB; Genoa, Leghorn, Porto Ferrajo, San Fiorenzo, Ajaccio,
+   Agincourt Sound; Bastia without a patch) and `tyrrhenian` (38.5 to 42.5 N, 8 to 15.5 E;
+   158 and 26, 38.0 MB, its 32 tiles north of 40.99 N and west of 11.15 E the Ligurian
+   sea's; Cagliari, Alghero, Civita Vecchia, Gaeta, Naples, Ponza); every tile written; 377
+   marks from Michelot 1709 and 1715, Purdy 1826, Norie 1831, Purdy 1840, Lamberti 1844, the
+   Derrotero 1849, Smyth 1828 and 1854 and James vol. 3, the islets the grid lacks as rocks,
+   the lights dated so that 1805 sees the fanals of Cette, Port-Vendres, Marseille, Genoa,
+   Leghorn, Civita Vecchia, Anzio and Naples and none of the 1830s and 1840s; no patch, no
+   sheet read with its datum. Sixteen port files (the French coast, Corsica and Elba hostile;
+   Genoa the Ligurian Republic's and then France's by a dated nation; Leghorn, the
+   Maddalena, Cagliari, Alghero, Civita Vecchia, Gaeta and Naples neutral); the nations
+   `sardinia`, `naples`, `etruria`, `liguria` and `papal-state` as data. The tide: 24 TICON
+   gauges read and held; current-only stream areas (the Riviera's and Provence's westward
+   set, Bonifacio's, the Roman coast's); Smyth 1854's tide-hours for Toulon, Spezia and
+   Naples. Two weather boxes, `gulf-of-lion` (Marseille's table, the mistral's lows) and
+   `tyrrhenian` (Naples' table). The scenario `agincourt-sound.yaml`: the frigate from the
+   Maddalena to look into Toulon and back.
    Figures in `docs/dev/TuningNotes.md`.
 
 Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period

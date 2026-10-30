@@ -52,17 +52,22 @@ on these packages; that is the owner's choice.
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
-| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`, beginning with the research pass that serves both; 79d launched once that pass is pushed; none depends on 84 |
+| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 8 merged 2026-10-28/29** (steps 1 and 2 at `d9dba1f`, steps 3 to 8 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
-| 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; after 84's last step; 87 follows it |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **merged whole, steps 1 to 11, 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 11 from the sibling's `claude/pkg-84` after it; the package closed with step 11's record below; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
+| 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; **launched 2026-10-30** (the owner, 84 closed) as a Fable sibling session on `claude/pkg-85`; the owner runs the interim gate it drafts once 85, 93 and 94 are in; 87 follows it |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Opus (the owner, 2026-10-29; Fable before) | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief after 85's pass over the orders, the primer and the docs is merged (the owner, 2026-10-29), and after 77; the brief fixes the pattern on the gunner and the four follow it |
 | 88 | Opus (the owner, 2026-10-29; Fable before) | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; to brief, each item with the symptom, the rule as it stands, the rule as it should read and what proves it, the moved pins by bisection (the owner, 2026-10-29) |
-| 89 | Opus | **The held gauges' water** (79b's finding): a held gauge enters the tide's blend for the positions within its own block's bounds alone, so that the Channel east's six, Biscay's, Portugal's and the islands' gauges give their water its own tide and no position west of 1 W reads anything new; the master's epitome's rises by the same water; the proof that no recorded passage's digest moves | briefed below (2026-10-29), for the owner's approval; independent of 84 |
+| 89 | Opus | **The held gauges' water** (79b's finding): a held gauge enters the tide's blend for the positions within its own block's bounds alone, so that the Channel east's six, Biscay's, Portugal's and the islands' gauges give their water its own tide and no position west of 1 W reads anything new; the master's epitome's rises by the same water; the proof that no recorded passage's digest moves | briefed below (2026-10-29); **approved and launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-89`, with the Mediterranean's held gauges of 79c and 79d now among its cases; **built and stopped for the lead's ruling the same night** (the rule as briefed, 73 gauges given their blocks, no recorded passage moved; four of the blocks' own tests failing on their true water, Bournemouth and Portsmouth held in `channel-mid`, Beachy Head a hundredth over the brief's foot, the tiles' fill on the false mean level): **ruled 2026-10-30, a step 4** (the four re-measured or their data mended old beside new, the two gauges held with the options recorded, 7-280 pinned at the measured figure, the gap at 40.50 N closed if no tile moves) and the fill's rebuild booked as package 93; **merged 2026-10-30** (the record below) |
+| 90 | Opus (the ships session) | **The tartane and the xebec** (the owner, 2026-10-29): the Mediterranean's two lateen hulls on 79c's water, the tartane the third reference vessel of decision 11 (one raking mast, the lateen mainsail, the jibs on the long bowsprit, the small mizen, the boat in tow), the xebec with the lateen on three masts and her sweeps, each as a trader or fisherman and as a corsair or the King's by fits and roles, built to Build-Ships.md §5.0's principles and the ladder of evidence from Roux's and Tofiño's plans and the pilots 79c lays down, with the lateen handling B3.1 gives (worn, not tacked; the yard dipped round the mast); the regency's cruisers as a role with their doctrine; inside milestone 7 | the ships session's next window after 75 closes, on 79c's block; to brief by the session in its plan's form, for the lead's gate |
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull; when the owner likes |
+| 91 | Opus | **The viewer's light and air** (the owner's references of 2026-10-29, decision 57): the ship's own lights warm and distinct at night (the stern lantern, the top lights and the binnacle 71 already hoists, each a glow on the faces near it); the scene's light by the hour and the sky (the sun's altitude and azimuth from `core/moon.py`, the weather's cover and visibility: a gradient sky and sea, the faces tinted by their side to the light, dusk's warmth, night's dark with the lights alone, haze by the visibility); a lively telltale at the masthead and a waving ensign, canned but driven by the apparent wind the physics already gives (direction, a flutter whose rate and amplitude follow the speed), animated between snapshots; all in the present SVG viewer, stylesheet-driven, drawing only, nothing of the world read that the readings do not give | after 81 and 75's hull; when the owner likes; the two reference pictures stay with the owner (another game's work), described in the decision |
+| 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
+| 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93` |
+| 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -611,7 +616,7 @@ failed, the lee-shore trial's container digest and truth 7-143 before the hail's
 alone after it); its pace tests on a worktree at `f99648d` and on the step's tree in turn
 under the container's floor on both, the step costing nothing the measure sees; the lead's
 fast tier of the touched files (seven files, none failed); **the whole suite on the merged
-tree `de36e0a` in the cloud (run 9, 39 minutes): green, every shard and the pace tests
+tree `de36e0a` in the cloud (run 9, 39 minutes; 4,256 passed over the six shards, 3 skipped, 11 expected failures, none failed; the pace tests 10 of 10 in 155 seconds): green, every shard and the pace tests
 passing; the shards' counts to be written in when read.** Step 7 stands merged green, the
 cap's order's retirement of the not-crewed states moving no recorded passage. **The step:**
 the player's ship is a vessel of the sea (`Vessels.own`,
@@ -685,8 +690,8 @@ sibling's fast tier whole 3,920 passed with the pictures' known flake the one fa
 slow tier of the known truths, the trials and the touched files 169 of 178 passed with eight
 left out by their marks and the lee-shore trial's container digest the one failure, its pace
 read in a three-way A/B against the step 7 head on the same hour's machine and within the
-head's own spread; the lead's run of the touched files; **the whole suite on the merged tree
-in the cloud (the figures below).** **The step:** the save and the replay of many hulls. The
+head's own spread; the lead's run of the touched files (with 79b's, 279 passed, none failed); **the whole suite on the merged tree
+in the cloud (run 11 on `76eb22c`, with 79b: lint green, 4,287 passed over the six shards, 3 skipped, 11 expected failures, none failed, 37 minutes; the pace job, informative, 7 of 10 with three under the floor at 452 to 491 ticks a second, read below).** **The step:** the save and the replay of many hulls. The
 hull on each input and act of a station on another ship (`ship`: her id; the followed hull's
 entries read as they did), given to her again by either road (the hull by id, or made in the
 far shape by `station_world` as a seat made her in play); the save's `hulls` block with every
@@ -703,6 +708,277 @@ no station in it, replayed from its journal with the words that say so). **Taken
 way:** the doors untouched, the load's words already naming the stations a save holds; the
 converter for a checkpoint with crewed Worlds as step 6 left it. Nothing pinned moved.
 
+### Package 84, step 9, as merged (2026-10-29)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `6cf65f6` (one commit on the
+trunk's `449a72a`, the lead's `76eb22c` brought in at the boundary before the step's final
+fast tier and the records-only head under the step's changes before the commit; 13 files,
+560 lines added and 42 removed, of them `world/orders.py` 215, `test_world_orders.py` 128);
+ruff clean; the sibling's fast tier whole 3,944 passed and none failed, its slow tier of the
+known truths, the trials and the touched files 182 of 191 passed with eight left out by
+their marks and the lee-shore trial's container digest the one failure as at every step,
+its pace within the spread step 8's A/B measured for the step 7 head on the same machine;
+the lead's run of the touched files and the gate selection (202 passed, none failed);
+**the whole suite on the merged tree in the cloud (run 12 on `6f8c708`: lint green, 4,293
+passed over the six shards, 3 skipped, 11 expected failures, none failed, 34 minutes; the
+pace tests 10 of 10 in 158 seconds, which closes 79b's note on runs 10 and 11).** **The
+step:** the director's reach and the truth over the hulls. An `aboard` order names a hull at
+its head and is carried out aboard her by her own names, her people's report in her log and
+the order's own line in the player's log naming her; a person made aboard another hull is
+of her company where package 68 refused the words, and `comes aboard the X [as <station>]`
+moves a person of any company into her; a cutter's letter addressed to a hull steers for her
+body and comes aboard her within hail; the rule of reach counts every hull's held stations;
+the truth gives every hull's row awake or asleep with her purse, cargo and water and lists
+the persons ashore at every port; `read_log(ship=)` reads a hull's log, the director's
+alone; a seat may be at a person aboard any hull (67's refusal lifted); four hull examples
+in the library performed by the forms test. **Found and mended:** the hearing's walk over
+the stations counted the followed hull's twice since step 7; it walks the hulls each once.
+**Taken another way:** a letter left at a port lies for whichever boat comes; no focus
+tool; the hand's reach as 62 left it; 68's people test restated to the hull's refusal.
+**Two tidies for the builder, booked to step 11 with the others:** the new reach test's
+line `assert any(...) or True` asserts nothing and should assert the held station it names;
+`_person_anywhere` matches a surname across the whole registry and takes the first, which
+two Mr Popes on two hulls would confuse (the name whole first, the surname only when one
+person bears it). Nothing pinned moved.
+
+### Package 84, step 10, as merged (2026-10-30)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `5cc45f6` (one commit on the
+trunk's `6f8c708`, brought in at the boundary before the step's final fast tier; merged here
+over 79c's block, clean; 17 files, 422 lines added and 53 removed, of them `core/world.py`
+100 and `test_crews.py` 87); ruff clean; the sibling's fast tier whole 3,946 passed with the
+parity table's own entry mended after and the pictures' known flake the other failure, its
+slow tier of the known truths, the trials and the touched files 185 of 194 passed with eight
+left out by their marks and the lee-shore trial's container digest the one failure as at
+every step, its pace within step 8's spread; the lead's run of the touched files and the
+gate selection (202 passed, none failed); **the whole suite on the merged tree in the cloud
+(run 14 on `90cef2c`: lint green, 4,312 passed over the six shards, 3 skipped, 11 expected
+failures, none failed, 34 minutes; the pace tests 10 of 10 in 205 seconds).** **The step:** the drivers follow a hull. The World's default
+hull is the followed one, the player's own until `follow "X"` names another, and with it
+every per-ship name of the World's, the drivers' state, the browser's snapshot and chart,
+the console's prompt and the log the drivers show; the player's hull stands apart as
+`World.players`, the sea hers, her vessel on it brought up from her hull, the save the
+game's with her current, and she is awake always and never counted against the cap; a
+`follow` is a driver's line, journaled and replayed, refused in words for a ship not on the
+sea or without a captain of her own; the walks over the hulls each once; `World.offices`
+beside the hulls as the room for milestone 8's station of the world; a world order given
+under a purview carries `by`, is checked by a hook the director and the bare order pass
+whole, and is replayed with it. **Found and mended, two:** the pace rule's walk listed the
+player's stations twice since step 7; and the first follow put the player's hull to sleep
+and the save wrote the followed hull's seed, scenario and ship at its top, so a replay
+rebuilt the brig's world. **Taken another way:** a world with no followed hull is 82's, its
+words standing ready; whether the director's door follows the drivers or stays with the
+player's ship is 82's question, noted; no office built. The parity table lists `follow` as
+the owner's by design, as the clock's commands are. The step 9 tidies are booked in its
+notes for step 11. Nothing pinned moved.
+
+### Package 89 as merged (2026-10-30)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-89` at `2f951aa` (twelve
+commits on the trunk's `0483a73`, step 4 one commit an item by the lead's rulings; merged
+here over 84's close with the tuning notes the one conflict, both kept; 16 files, 1,211
+lines added and 242 removed); ruff clean; the builder's proof the one the brief asked for,
+the eleven recorded passages by node id, the gate selection and the captain's trials run on a
+clean worktree of the head first and on the final tree last and identical (every digest
+held, the lee-shore trial's container digest the one failure on both); its touched files'
+slow tier, the blocks' truths 7-270 to 7-304 and its own 7-280 to 7-284 green, its fast tier
+whole with the pictures' flake the one failure; the lead's run of the tide's, chart's,
+ports', islands' and scenarios' tests with four of its truths, 7-271 and the gate selection
+(186 passed, none failed); **the whole suite on the merged tree in the cloud (run 17 on
+`39c2fa5`: lint green, 4,330 passed over the six shards, 3 skipped, 11 expected failures,
+none failed, 40 minutes; the pace job, informative, 7 of 10 at 445 to 499 in 296 seconds,
+the slow runner's day as 79b's record reads it).** **The rule, as built:** a block's gauge serves the positions within its
+own block's bounds, a region of the chart's manifest or a list of them, and no other; the
+eleven serve everywhere; within a block the blend is the eleven within reach and the
+block's gauges by the present weighting, the membership the cell's centre's so that the
+seam at 1 W falls on a cell edge; a gauge whose mean level was not read gives its constants
+and not its level, and where no gauge of the blend has one the level is the eleven's there,
+not invented; `far` and the nearest gauge are of the gauges that serve the place. The 73
+held gauges of 39b to 39f and 79b to 79d moved into `gauges:` with their `block:`, no
+figure moved (checked by loading both files); the loader refuses a block the manifest does
+not name and a gauge with neither block nor level. **The figures:** Newhaven's spring range
+19.5 feet where the blend gave 3.9, Dieppe 27 for 5.4, Vigo and Cadiz their gauges' own
+where Le Conquet's eighteen had served, Mahón half a foot where Saint-Malo's 33 had; a mile
+west of 1 W the tide to the bit as before (truth 7-282). Twenty-one of the master's judged
+rises re-worked to the blocks' water, old beside new (Lisbon 18 to 9, Cape Trafalgar 18 to
+3, Boulogne 15 to 26, the Somme 5 to 21); no given rise and no hour moved. **The fill raise
+reads the eleven alone**, the level the tiles were raised by, so a rebuild moves no tile by
+the rule; what the rule means for the tiles as they stand is tabled in the notes (the
+Mediterranean's land six metres and more above its true water, the Channel east's high
+water up to 4.4 m above the fill's raise): **package 93**. **Step 4, by the lead's
+rulings:** truth 7-271's bound re-measured 0.6 to 0.8 on the Strait's own water (the error
+0.452 on the head, 0.648 here), the old margin kept; truth 7-280 Beachy Head at 18.99 feet
+within a foot and a quarter of Norie's twenty, the reason in its words; the pilot off Aix
+re-measured on Aix's own tide, the moment pinned at 01:00 and the height asserted with the
+reason; the passage to Spithead's book weighs within three miles and a half of the road
+where the night's anchoring on the seam and a daylight fix had left her outside its old band,
+the truth passing unchanged; the passage to Port Mahon's book shaping the course for the
+mouth again every ten minutes within seven miles, where the course shaped once from off
+the Aire left her account outside the anchoring band and running on into the shallows that
+the false seven metres of tide had covered (the outer road's move, the lead's first ruling,
+tried and reverted: she never grounded at the spot, which lies in 37 m), the spot and the
+port file untouched; `balearics`' north bound at its tiles' edge 40.56 N, no tile moved.
+**Bournemouth and Portsmouth stay held** in `channel-mid`, the options recorded for the
+lead (their block the whole of channel-mid, or a Solent region of their own); the seam at
+1 W a step of 102 degrees of M2 off Selsey, the block's side the nearer the truth and the
+eleven's blend over the Solent wrong by four hours and a half, 39a's finding again: **a
+taper across the seam, or the Solent's own region, a later tidy.** Faden's '«8' for south
+Brittany stays unread, the gauges giving 13 to 15 feet. **One departure from the ruling,
+said plainly and accepted:** the Mahon mend is the book's, not the spot's.
+
+### Package 84, step 11, as merged, and the package closed (2026-10-30)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `32c03d3` (one commit on the
+trunk's `90cef2c`, brought in at the boundary before the step's final fast tier; merged here
+over 79d's block with the tuning notes the one conflict, both kept; 14 files, 284 lines
+added and 81 removed); ruff clean; the sibling's fast tier whole 3,957 passed with the
+pictures' known flake the one failure, its slow tier of the known truths, the trials and the
+touched files 190 of 199 passed with eight left out by their marks and the lee-shore
+trial's container digest the one failure as at every step, its pace within step 8's spread;
+the lead's run of the touched files and the gate selection (147 passed) and of the fight's,
+the lying-to's, the ships' and the staying's tests (128 passed), none failed; **the whole
+suite on the merged tree in the cloud (run 16 on `69dcdcd`: lint green, 4,323 passed over
+the six shards, 3 skipped, 11 expected failures, none failed, 40 minutes; the pace job,
+informative, 6 of 10 at 437 to 494 in 301 seconds, the slow runner's day as 79b's record
+reads it, truth 51's frigate alone among them at 494 for the first time).** **The step:** the long
+tail, the words and the records. The booked tidies made: the fight's mark on one road with
+the shadow's dead arm gone; the lying-to reading taken from the ship by the reading's own
+rule with no import of the api layer into the world; a person found by his name whole and
+by his surname only when one person of the world bears it; the two test lines that
+asserted nothing now assert what they name; the thread-local hull stack dropped when its
+last block ends. The words: the awake notice ("awake, a hull of the one world"), the
+crews' and the seats' heads recast, the Harness document's §17, the primer's chapter 17,
+and specs M6 §19 and §20 and M7b §11, §12 and §12b given "as built since package 84"
+pointers that say what 84 built and what stays each section's own. The records: the
+design note's head recast as "As built, steps 1 to 11" with a table of the eleven steps
+against the brief and the owner's decisions placed, a step 11 postscript, and "What 84
+leaves"; the tuning notes' head likewise with the pace of every step beside the study's
+figures. **Taken another way:** the `world` to `hull` rename is made nowhere, every
+consumer holding its hull as its `world` by the façade; the façade's wrapping of the
+World's methods in the swap stands, the pace of every step showing nothing the measure
+sees. Nothing pinned moved.
+
+**The package, closed.** Eleven steps in three days, each a green commit with the lead's
+head brought in at its boundary, each reviewed and merged in turn, the whole suite green
+in the cloud at every merge; the pins moved by the package three, all at step 6 for the
+one clock and all judged bugs of the two clocks (the station-stranger and trade-stranger
+trials, truth 7-152), old beside new in the notes. **What 84 leaves,** as its record has
+it: for 82, the world with no followed hull and its words (`World.followed_words` stands
+ready, the branch unreached), the player's own seat on another ship with the drivers
+following him (step 10's follow the mechanism, step 8's save and replay the record), and
+the director's door's question when another hull is followed; for 85's review of the
+words, the words recast and the ones left as they were (the far notice, "the player's
+ship" where "the followed hull" is meant, `CrewedWorld` as the builder's name, `world` as
+every consumer's name for its hull, the tests' `crew`); for the design's own open items,
+the tick's two strict phases, the empty `_NOT_CREWED_STATES` and `FAR_ONLY_ROLES`, the
+business's region and the sleeping hulls' fight as the study recommends, and the gauges'
+water (89, running). Three load-sensitive tests recorded and not mended: truth 7-200
+under three workers, the pictures' blank-image check, the lee-shore trial's container
+digest. The 84 session stands by for the review's findings; none is outstanding.
+
+### Package 79d as merged (2026-10-30)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-79d` at `7ceaae7` (the trunk
+merged into it at `9b3deb8` with 79c's block, the shared files kept both sides in order and
+the counts summed; merged here over 84's step 10 with the tuning notes the one conflict,
+both kept; 46 files beside the tiles, 12,843 lines added and 24 removed; 443 tile, coast and
+index files, none of another region's touched); ruff clean; the builder's eleven recorded
+passages by node id to their digests before and after its merge of the trunk, the touched
+files' slow tests 14, truths 7-295 to 7-304 with 7-261 11, its fast tier on the final tree
+with the pictures' known flake the one failure, the three regions rebuilt after the merge
+with no tile of theirs or 79c's changed, the scenario sailed again to the same digest; the
+lead's run of the touched files with five of its truths and the gate selection (268 passed,
+none failed); **the whole suite on the merged tree in the cloud (run 15 on `26af9bf`: lint
+green, 4,323 passed over the six shards, 3 skipped, 11 expected failures, none failed, 60
+minutes, shard 1 alone 53 of them with the Mediterranean's long truths in it; the pace job,
+informative, 7 of 10 at 449 to 488 in 297 seconds, the slow runner's day again as 79b's
+record reads it).** **The block, three regions by the lead's ruling at the builder's report of the
+Gulf at 46.1 MB:** `gulf-of-lion`, 3 to 7.73 E, its south bound moved to the row edge
+40.56 N where `balearics` ends so that the strip between the blocks answers, 120 level-2
+tiles, the patches of Toulon, Marseille, the Hyères road and Villefranche, 28.1 MB;
+`ligurian-sea`, 7.73 to 11 E, 72 level-2 tiles, the patches of Genoa, Leghorn, Porto
+Ferrajo, Bastia, Ajaccio, San Fiorenzo and the Maddalena, 20.6 MB; `tyrrhenian`, 8 to
+15.5 E and 38.5 to 42.5 N, its boundary with the Gulf at the row edge 40.99 N west of
+11.15 E, the patches of Cagliari, Alghero, Civita Vecchia, Gaeta, Naples and Ponza,
+37.8 MB; all after `balearics` in the chart. The marks from the research pass's texts
+(the Derrotero of 1849, Lamberti, Michelot, Purdy, Norie, Smyth), seventeen islets the
+grid lacks given as rocks of their height and extent, the lights dated from the earliest
+text that has them (Porto Ferrajo's and Bastia's `from` 1826, the later ones unverified).
+Sixteen port files (Toulon, Marseille, Hyères and Villefranche French and hostile; Genoa,
+Leghorn, Porto Ferrajo, Bastia, Ajaccio, San Fiorenzo, the Maddalena, Cagliari, Alghero,
+Civita Vecchia, Gaeta and Naples), and `sardinia`, `naples`, `etruria`, `liguria` and the
+Papal state as data in Morocco's form, each relation sourced to James or said from memory;
+**a port's nation by date** (Genoa the Ligurian Republic's until 3 June 1805 and France's
+from the 4th), the smallest change in `world/ports.py`, the loader taking the scenario's
+first day and `Ports.stance` the world's, the other readers named in the notes, a test of
+the form and of Genoa's two dates, no recorded passage moved. The gauges held with
+verified mean levels; the currents of the directions as `current:` with no tidal stream;
+Norie's places; two weather boxes from the Admiralty's tables (Marseille's, Ajaccio's,
+Genoa's, Leghorn's, Naples' and Cagliari's), the Gulf's taking the mistral's lows and saying
+the easterlies it leaves short. `agincourt-sound.yaml` sailed at seed 7 from the Maddalena
+to look into Toulon and back, not pinned. Truths 7-295 to 7-304 as behaviours. No gauge
+of the eleven moved, no recorded passage's digest moved. **The lead's rulings on its
+findings:** (1) the world's tide over the Mediterranean is Le Conquet's alone while the
+gauges are held, two metres of M2 against the gauges' centimetres, and the master's account
+allows a flood in a sea that has none: 89's case, now the strongest, its brief to say so;
+(2) the lights of 1805 dated from the earliest text on file is the rule working, and Porto
+Ferrajo's of 1788 from memory stays a note until a text dates it; (3) a `road` with a
+bottom gives no note of it, the roads being anchorages: a chart tidy booked with the island
+kind and the inland tiles; (4) each port's produce cheap and its wants dear by judgement,
+so that the business draws a trader in the Mediterranean: accepted, said so in the files,
+as 79c's grain was; (5) the weather's one track a month cannot carry two wind regimes in
+one box: a finding for the weather's design, recorded for the lead, not this package's;
+(6) Porto Santo Stefano, Giannutri, Monte Limbara and the Adriatic's shore not given, and
+Sicily, the Lipari islands and Messina a later block, as the notes say.
+
+### Package 79c as merged (2026-10-29)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-79c` at `e17dad4` (the trunk
+merged into it at `fafee99` with the tuning notes the one conflict, both kept; 31 files
+beside the tiles and the pilots' texts, 2,635 lines added and 12 removed; 375 tile, coast and
+index files, none of another region's touched); ruff clean; the builder's eleven recorded
+passages by node id to their digests, the touched files' slow tests 14, truths 7-285 to
+7-294 10, its fast tier on the final tree with two lists of its own extended (the chart's
+regions in `test_geo.py`, truth 7-261's count of the nations now nine) and the pictures'
+known flake the rest; the lead's run of the touched files with the short truths and the gate
+selection (267 passed, none failed); **the whole suite on the merged tree in the cloud
+(run 13 on `159df45`: lint green, 4,308 passed over the six shards, 3 skipped, 11 expected
+failures, none failed, 39 minutes; the pace job, informative, 8 of 10 with the gates' day at
+472 and 7-159's convoy at 456 against the floor of 500, the job 281 seconds against run 12's
+158 on the same ten tests an hour before: the runner's day as runs 10 and 11 were, read in
+79b's record; nothing re-pinned).** **The block, two regions by the lead's ruling at the
+builder's report of 57.5 MB in one:** `mediterranean-west`, 35 to 40.5 N and 5 W to 0.05 E,
+165 level-2 tiles and the patches of Málaga, Almería, Cartagena and Oran with Mers-el-Kebir,
+26.5 MB, three seam tiles the Strait's; `balearics`, 0.05 to 4.5 E, 154 level-2 tiles and
+the patches of Palma, Port Mahon, Ivica and Algiers, 30.9 MB, the fourteen-tile seam column
+`mediterranean-west`'s, its north edge at the row 40.56 N where 79d's Gulf begins; both after
+`strait` in the chart, whose title now names them. 182 marks from Tofiño 1787 and the
+research pass's texts, the lights of 1805 three (Málaga's mole, Porto Pí's, Algiers'; none
+at Mahon by Purdy 1840, the brief's "Mahon's light" withdrawn), the isles the grid lacks as
+rocks, Mahon placed by hand by Tofiño's plan. Eight port files (six Spanish and hostile,
+Cartagena's and Mahon's yards; Oran's and Algiers' the regency's, neutral) and `algiers` in
+Morocco's form, its relations from James where he speaks and from memory where said so.
+Nine TICON gauges held with REDMAR's mean levels verified; seven stream areas, no tidal
+stream, the period's currents (east along Granada and Barbary, west inshore from Oran);
+Norie's table with the pilots' foot of rise. The weather box `mediterranean-west` from the
+Admiralty's tables, every month within five points. `mahon.yaml` sailed at seed 7 from
+Gibraltar road to the mouth of Port Mahon through a northerly, 98 hours, not pinned. Truths
+7-285 to 7-294 as behaviours, five of them in the long list of `conftest.py`. No gauge of
+the eleven moved, no recorded passage's digest moved. **The lead's rulings on its findings:**
+(1) the world's tide over the Balearics is Saint-Malo's while the gauges are held: 89's
+brief now carries the figure, the sharpest case yet; (2) the regency's war with Portugal is
+from memory and rightly not in `wars:`, their ships neutral to each other until a work on
+file gives it; (3) an isle the grid lacks is a rock so that nothing sails through it, and
+the lookout calls it "a danger": **a feature kind for an island with an extent is booked as
+a chart tidy** with the Alboran's inland tiles (`skip_dry_tiles`, on file since 39d, not
+taken) for the next block package or a small one of its own; (4) the apostrophe refusal is
+85's, written into its brief; (5) the Barbary grain (Oran's and Algiers' wheat in the
+Spanish ports' markets, from memory, said so) stands as the judgement that gave the business
+its routes, a source to be cited when one on file speaks; (6) Mahon's harbour patch read
+from Tofiño's plan with its datum, and the modern ports in the grid's land, are the later
+package's with Bellin's plans, as 79b's are. Both regions went into one commit rather than
+two, said in the notes: accepted.
+
 ### Package 79b as merged (2026-10-29)
 
 Merged `--no-ff` from the Opus sibling session's `claude/pkg-79b` at `174d002` (six commits
@@ -713,7 +989,18 @@ README's count of works recounted to thirty-two); ruff clean; the builder's gate
 and the eleven recorded passages passing to their digests, its slow tests of the chart, the
 ports, the tide and the scenarios and truths 7-270 to 7-279 green, its fast tier on the
 final tree with the pictures' known flake the one failure; the lead's run of the touched
-files; **the whole suite on the merged tree in the cloud (the figures below).** **The block:**
+files (with step 8's, 279 passed, none failed); **the whole suite on the merged tree in the cloud (run 11 on
+`76eb22c`: green, the figures in step 8's record above).** **The pace job of runs 10 and 11, read:**
+run 9 on `de36e0a` passed its ten pace tests in 155 seconds; run 10 on `995d515` (79a alone)
+failed two at 458 and 478 in 279 seconds, and run 11 failed three at 452, 463 and 491 in 290
+seconds, the job as a whole near twice as long on the same tests, which is the runner's day
+and not the tree's: an A/B on the lead's machine, the three tests on `de36e0a`, `995d515` and
+`76eb22c` in turn, twice, had `de36e0a` and `76eb22c` pass both rounds and `995d515` fail once
+at 498 and 500 and pass once, every head at the floor's edge with the machine's noise and no
+head below another; the step 8 sibling's own three-way A/B against the step 7 head was within
+the head's spread. The pace job is informative by the workflow's design for this reason;
+nothing is re-pinned, and the next green pace job on a quiet runner closes the note.
+**The block:**
 the region `channel-east` from the Wight to Dunkirk, 49 to 51.5 N and 1 W to 2.5 E,
 abutting `channel-mid` at 1 W exactly; 57 level-2 and 73 level-3 tiles (13 MB: shallow
 water compresses well), six seam tiles kept `channel-mid`'s; eight harbour patches; 137
@@ -741,6 +1028,75 @@ design's eleven: a finding for the magazine's table, booked to 77 with its sourc
 Wharf issuing at Spithead under the Regulations of 1806); (4) the modern ports land in the
 grid where 1805 had water or sand, no sheet read: a later package with Bellin's plans of
 the Havre and Dunkirk; (5) and (6) as the builder has them.
+
+### Package 94 as merged (2026-10-30)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-94` at `6a30975` (six commits
+on the trunk's `9b07813`, one an item, the records, and a step 5 by the lead's rulings; no
+conflict, the merge's tree the branch's head's; 18 files, 1,203 lines added and 135
+removed); ruff clean; the builder's proof the one 89's was (the eleven recorded passages
+by node id, the gate selection and the captain's trials) run on a clean worktree of the
+head first, on item 3's tree and on the final tree last, identical each time (every digest
+held, the lee-shore trial's container digest the one failure on each); its touched files'
+slow tier (10) and truths 7-264 and 7-270 to 7-314 (41) green, its fast tier whole with the
+pictures' flake the one failure, passing alone; the lead's runs of the tide's, chart's,
+islands', ports', lookout's and geo's tests with the moved and the new truths on the head
+before step 5 (175 and 10 passed, none failed) and of the tide's, chart's and ports' tests
+with twelve truths on step 5's (140 and 12 passed, none failed); **the whole suite on the
+merged tree in the cloud (run 18 on `1e3523b`: lint green, 4,337 passed over the six shards,
+3 skipped, 11 expected failures, none failed, 43 minutes; the pace job, informative, 7 of 10
+at 448 to 495 against the floor of 500 in 298 seconds, the slow runner's day as 79b's and
+89's records read it).**
+
+**Item 1, an island the grid lacks, taken another way and accepted:** the brief's island
+with an extent alone would have made Belle Isle and seven other islands the grid holds
+discs of ground over their roads; an islet the grid lacks says so, `grid_lacks: true`
+beside its height and `extent_m` (`chart.Feature.is_ground`, `is_hazard`), ground to the
+keel by its height within its extent as a rock that stands above the water, a hazard on
+the pilot's and the captain's line, land to the lookout by its name and stood into by its
+extent; nineteen islets of 79c's and 79d's recast by their source lines (an isle or an
+islet in the period's words an island, a rock a rock), six rocks kept; the index
+byte-identical, the manifest's counts moved by text (a slip of four duplicated lines, found
+at review, mended at step 5); truth 7-303 recast to the kind, nothing loosened; truth
+7-310. **Item 2:** a road's bottom read as an anchorage's (`BOTTOM_NOTE_KINDS`); no
+feature of kind `road` exists, so nothing moves; truth 7-311. **Item 3, the seam's taper:**
+within ten miles of a block's open edge (charted water no block holds, the eleven within
+reach) the block's water rises from the eleven's alone to its own by the smoothstep, on
+each constituent's amplitude and phase and on the level (mixed as complex numbers the 114
+degrees between the two M2s at 1 W made a false node mid-band, so the mix is the amplitude's
+and the phase's); a seam between two blocks and an edge beyond which nothing is charted are
+no open edge; outside every block the old arithmetic to the bit; the step at 1 W from 4.3
+to 7.6 feet to 0.045, the Iroise's from 1.6 to 0.04; Concarneau's judged rise 13 to 14, the
+taper reaching its gauge across Brittany (a finding, said, not mended); truth 7-282
+re-measured old beside new, 7-312. **Item 4, the Solent:** the manifest's `tide_regions:`
+(bounds and no tiles, for the gauges' membership alone; written by `tools/build_charts.py`
+from `TIDE_REGIONS` so that 93's rebuild keeps it, the one change beyond the brief, said),
+`solent` 50.62 to 51 N and 2.2 to 1 W by judgement from the gauges' places and the Wight's
+shores; Bournemouth and Portsmouth serve it, `held_gauges:` gone, no figure moved;
+Spithead's high waters within four minutes of Portsmouth's gauge where the eleven were four
+hours and a half out; the Solent's judged rises re-worked (Norie's Spithead 10 to 12,
+Moore's Portsmouth 9 to 12, Pool 8 to 5); the Downs to Spithead sailed on each tree, no
+grounding, the truth's limits held; truths 7-313, 7-314, 7-283 re-measured. **Step 5, by
+the lead's rulings:** the Solent's seam with the Channel east at 1 W north of 50.62 N (a
+step of three feet and a half off Chichester, the taper being a block's against the eleven's
+and no seam's) ruled way (a) under **the rule of the seams**: a gauge serves its own block
+and also a block whose seam with its own lies within the taper's band (ten miles) of the
+gauge, the water a cable either side of a seam being the near gauge's and no other's; the
+rule catches three, Portsmouth (4.2 miles from 1 W), the Isle of Aix (6.4 from 45.9 N) and
+Cadiz (8.0 from 36.4 N), each taken, `test_tide.py` holding the rule over every gauge; the
+steps at 1 W 3.4 to 3.6 feet to 1.5 to 1.7, at 45.9 N 3.9 to 0.3; Beachy Head 18.99 to
+18.86, within truth 7-280's words, which stand; three judged rises across the foot (Norie's
+Cape Trafalgar 3 to 5, Moore's Shoreham 18 to 17 and Dungeness 20 to 19); way (b), the
+eight gauges serving both, measured and not taken (Beachy Head 18.73 past the truth's words,
+the block's far gauges weighing at its own places against Norie's figures). **Findings,
+booked by the lead:** the seam at 36.4 N keeps eight feet, which the lead measured as the
+mean level's and not the constituents' (Portugal's 1.63 m against the Strait's 3.98, the
+eleven's there, the Strait's gauges' levels unread; the M2s 1.01 and 0.83 m a cable apart),
+a tide data tidy, the Strait's and the islands' gauges' mean levels read from a source; a
+taper by distance reaching a gauge across land (a taper by water a design question); the
+western Solent and the Needles within the band of the region's south bound; `fathoms_words`
+giving "in 13 fathoms" where the words say twelve (a words tidy); the pictures' flake under
+the fast tier's load; the lee-shore trial's container digest as recorded since 79d.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -1766,7 +2122,7 @@ north's nine, Vigo, Portugal's five, the islands' five, the Channel east's six) 
 read, verified and **held** under `held_gauges:`, the world's tide over their water the
 eleven's blend and wrong: at Newhaven the world's spring range is 3.9 feet for the gauge's
 19.5, at Dieppe 5.3 for 27, at Beachy Head 4.8 for Norie's 20 (79b's tuning notes), over
-Biscay the Channel's tide (39b's), at Cape Trafalgar Le Conquet's eighteen feet (39f's). Read
+Biscay the Channel's tide (39b's), at Cape Trafalgar Le Conquet's eighteen feet (39f's), **and over the Balearics Saint-Malo's, a mean level of 6.83 m and an M2 of 3.7 m where Mahón's is five centimetres (79c's), the block's nine gauges held with their mean levels verified from REDMAR so that the blend gives the Mediterranean its own foot of tide at once; and over the Gulf of Lion and the Tyrrhenian Le Conquet's alone, two metres of M2 against the gauges' five to twelve centimetres, the master's account allowing a flood in a sea that has none to speak of (79d's)**. Read
 `docs/dev/ChartBlocks.md` item 6, `docs/references/Tides.md`, the tide module's head and the
 blocks' tuning notes on their gauges before anything.
 
@@ -1803,6 +2159,104 @@ blocks' tuning notes on their gauges before anything.
 
 The hard rules as every brief has them; `claude/pkg-89`, pushed after each commit; the lead
 merges. No CLAUDE.md is in the repository: the briefs' heads and the records serve.
+
+## Package 93: the blocks' tiles rebuilt on their true water (`tools/build_charts.py` the fill raise by block; `data/charts/tiles/<region>/`, `coast/`, the manifest's tile lists for the regions named; `docs/dev/ChartBlocks.md` "GEBCO's fill" and item 6; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_tide.py`, `test_scenarios.py`, `test_known_truths.py` truths 7-305 to 7-309)
+
+Opus. After 89 (merged). 89's finding, tabled in its notes under "GEBCO's fill": every
+block's tiles had their GEBCO fill raised to the mean level of the eleven's blend, which was
+false over the blocks, so the land of the Mediterranean's five regions stands six metres
+and more above its true water, Portugal's two to four, and the Channel east's high water
+stands up to 4.4 m above the fill's raise. Read `docs/dev/ChartBlocks.md` whole (the fill's
+section, item 6 as 89 rewrote it, the blocks' sections), the recipe form over `REGIONS` in
+`tools/build_charts.py` (`fill_to_chart_datum`, `fill_mean_level_m`, `skip_dry_tiles`),
+`mean_level_grid` as 89 left it (the eleven alone), 89's record and notes, and the blocks'
+own sections of the tuning notes, before anything.
+
+1. **The rule.** The fill is raised by the mean level the world's tide gives the block's
+   water now: `mean_level_grid` reads the gauges that serve each cell (`Tide.gauges_at`),
+   the eleven and the block's own, so that a region's land stands above its own high water
+   as 39a wanted it, and no longer above a far gauge's. Outside every block nothing changes
+   (the eleven alone there, as the raise was): `channel-west` and `channel-mid` are not
+   rebuilt and not touched.
+2. **The regions rebuilt**, each on its own, in this order, the smallest first:
+   `channel-east`; `biscay-north`, `biscay-south`, `portugal`; `strait`, `madeira`,
+   `azores` where the raise differs (89's table has them at nought: rebuild only if the
+   rule moves the raise there, else say so); `mediterranean-west`, `balearics`,
+   `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`. The sources are fetched again through the
+   proxy (the caches were the builders' sessions'); `--skip-fetch` once the fetch is done
+   for the marks. Each region: the build, the checks printed and passing, `git status`
+   showing no change to any tile, coast or index of a region not named, the region's
+   count and bytes said (they may change where cells move from land to water and back),
+   the region's port files and marks untouched, and its block's own tests run before the
+   next region begins. The Alboran's inland tiles (`skip_dry_tiles`, 79c's note) may be
+   taken for `mediterranean-west` at the rebuild if the how-to's rule for Portugal's
+   applies cleanly, said so; else left.
+3. **The proof, first and last:** the eleven recorded passages by node id, `gate_5b` and
+   `gate_5c`, and the captain's trials, run on a clean worktree of the head first and on
+   the final tree last, identical; no recorded passage's digest may move (none sails a
+   rebuilt region; the test says so). The blocks' own scenarios (`spithead.yaml`,
+   `mahon.yaml`, `agincourt-sound.yaml`, and the earlier blocks') sailed again on the
+   rebuilt tiles, their figures old beside new in the notes; the blocks' truths (7-270 to
+   7-304, and the earlier blocks') run with --slow; where one fails on the rebuilt tiles,
+   stop and report with the figures, as 89 did; no truth loosened.
+4. **Truths 7-305 to 7-309:** a low shore of the Channel east (the Dungeness marsh, the
+   Somme's banks) stands above the world's high water springs; Mahon's and Naples' quays
+   stand their true height above their water; a lagoon or harbour the grid has as water
+   covers and dries as its block's tide says and not as the eleven's; the raise outside
+   every block unchanged to the centimetre; the Strait's, the islands' as the rule gives
+   them. 5. **The records:** the tuning notes' section with each region's figures; the
+   how-to's fill section rewritten; spec M6 §26's as-built line.
+
+The hard rules as every brief has them; `claude/pkg-93`, pushed after each region's
+commit; the lead merges whole. Package 94 runs beside it on the tide's seams and the
+features' kinds; the two share the manifest and the tuning notes, which the lead merges;
+94 does not rebuild tiles and 93 does not touch a feature's kind or the tide. No CLAUDE.md
+is in the repository: the briefs' heads and the records serve.
+
+## Package 94: the chart's tidies from 79c, 79d and 89 (`freesail/world/chart.py` the island kind and the road's bottom; `data/charts/features/*.yaml` the islets' kind; `freesail/world/tide.py` the seam's taper and a tide region; `data/charts/manifest.yaml` a tide-only region, if taken; `data/tides/constituents.yaml` Bournemouth's and Portsmouth's `block:`; `docs/dev/ChartBlocks.md`; `docs/references/Tides.md`; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_tide.py`, `test_known_truths.py` truths 7-310 to 7-314)
+
+Opus. Beside 93. The findings the three packages left for a tidy, read in their records
+and notes before anything (79c's "Found on the way", 79d's, 89's sections "Bournemouth and
+Portsmouth" and the seam):
+
+1. **An island with an extent.** An isle the grid lacks is given today as a `rock` of its
+   height so that nothing sails through it, and the lookout calls it "a danger" (the Isla
+   del Rey, 79c; seventeen islets of 79d's three regions). A feature kind `island` with
+   `extent_m` and a height: the chart refuses it as ground as it does a rock, the lookout
+   calls it an island by its name, the pilot's words the same; the features files of 79c
+   and 79d recast for the islets they name as such, each by its source line; the index
+   rebuilt by the how-to's road for a mark changed (`--skip-fetch` on the cache, or the
+   index alone if the builder has a road for it: read `ChartBlocks.md` and say which); no
+   tile moves (93 is rebuilding tiles beside you: touch no tile, and bring the trunk in at
+   each boundary).
+2. **A road with a bottom.** `Chart.bottom_near` reads `anchorage` and `bottom` features;
+   a `road` with a bottom gives no note of it (79d). The road read as the anchorage is, the
+   roads' files unchanged.
+3. **The seam's taper.** 89's rule leaves a step at each block's edge (102 degrees of M2 at
+   1 W off Selsey). Inside a block, the block's gauges' weight in the blend rises from
+   nought at the block's edge to its full over a band (ten miles, judgement, said so), so
+   that a position just inside a block reads nearly the eleven's and the step is gone;
+   **outside the block nothing changes** (truth 7-282's west position to the bit, every
+   recorded passage's digest held: the proof first and last as 89 ran it). The band is the
+   membership's and the cache's: say how the cell cache keys it.
+4. **Bournemouth and Portsmouth.** 89's options: a Solent tide region. If the manifest may
+   carry a region with bounds and no tiles for the gauges' membership alone (a small
+   change in the manifest's reader and `Tide.region_bounds`, said in `ChartBlocks.md`),
+   give the two gauges `block: solent` over the Solent and Spithead (bounds judgement from
+   the gauges' positions and the Wight's shores, said so) under the taper of item 3; the
+   Downs-to-Spithead passage's figures and the Solent's judged rises re-measured old beside
+   new; **if any recorded passage of channel-mid or channel-west would move, stop and
+   report**, the gauges held as they are. 39a's finding (the eleven's blend over the Solent
+   four hours and a half wrong) is the reason; say what the Solent reads after.
+5. **Truths 7-310 to 7-314:** the Isla del Rey an island to the lookout and ground to the
+   keel; a road's bottom in the lead's note; the tide a cable inside 1 W within a tenth of
+   a foot of the tide a cable outside it; Spithead's tide within the hour of Portsmouth's
+   gauge if item 4 is taken (else the truth says the Solent is held, and why); every
+   recorded passage unchanged. 6. **The records** as every package's.
+
+The hard rules as every brief has them; `claude/pkg-94`, pushed after each commit; the
+lead merges whole. No CLAUDE.md is in the repository: the briefs' heads and the records
+serve.
 
 ## Package 82: the boat as a vessel, and the player aboard another ship (`freesail/core/world.py`, `ui/console.py`, `ui/server.py`, the drivers: the followed ship; `freesail/world/crews.py`, `ships.py`, `people.py`, `places.py`, `stations.py`, `seats.py`, `orders.py` a person aboard another ship and the seat that follows him; `freesail/core/replay.py` the station on another ship replayed; `freesail/physics/` an oar force on a hull (new, by the brief's leave); `freesail/evolutions/` the boat's orders and the tow; `data/ships/boat-*.yaml` through `tools/gen_ships.py`; `freesail/world/movement.py`, `ports.py` the boat's errands as they are; `freesail/api/readings.py` the readings following the person; `freesail/agents/harness.py`, `director.py`, `data/director/`; the viewer (`client/`) drawing the boat; `docs/TechnicalSpec-M7b.md` §11, §12, §21k as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7b-113, 7b-114 and the M7 numbers after 73's)
 
@@ -2048,7 +2502,7 @@ intent binds.
    commands; and a reading `the ship` (or `what ship`, `my ship`) answers the same at any
    time, from the ship's own papers and muster, so that no model has to deduce where it
    stands.
-6. **Found on the way, and the records.** Everything else the reading shows (the hail
+6. **Found on the way, and the records.** Everything else the reading shows (79c's finding: a standing order's name with an apostrophe is refused with "After the name say a colon", the grammar's; the hail
    resolving to a far lugger over the wreck in sight, the `captain: carry on` collision with
    the director's form, `gybe the mainsail`'s answer); the record of redactions; the tuning
    notes; the Harness; the suite as run (the fast tier, the slow tier of the touched files,
@@ -2071,7 +2525,14 @@ intent binds.
    the as-merged records (84's eleven steps, 86, 73, the suites' figures, what 88 is booked to
    mend) and anything the draft missed, and the owner reads the whole before the playtest.
    Runs after 84's last step is merged; the draft's engine half may be begun by the lead
-   before that.
+   before that. **The lead plays at this gate (the owner's word, 2026-10-30):** the captain's
+   station first, blind, through the door as any model, with the primer and the readings
+   alone and the owner or a fresh model as director, in one of the gate's passages; then the
+   director's seat in the one-world scenario with the owner at the captain's station,
+   pulling 84's levers (`follow`, an `aboard` order on another hull, a cutter's letter to
+   her, `read_log(ship=)`). The draft's scenarios leave room for both; the lead's seats go
+   through the door under the consent brief as it stands, and the transcripts stay in the
+   record, with the lead saying where knowledge of the engine leaked into a decision.
 8. **The documentation whole (the owner, 2026-10-29: "might as well go all the way").** The
    same pass over `docs/` as items 1 and 2 make over the primer and the library: every
    document read for completeness and refinement against the code as it stands after 84
@@ -2082,7 +2543,7 @@ intent binds.
    interim gate's draft (item 7) comes last, after this pass, so that it reads the
    documents as mended. 87's brief waits for this item's merge.
 
-**Not done here:** the one-world refactor (84), the boat (82); any change to
+**Beside it (2026-10-30):** packages 93 and 94 run on the chart and the tide, and own `docs/dev/ChartBlocks.md`, `docs/references/Tides.md` and their sections of the tuning notes for the while; item 8's pass leaves those three to them and `docs/dev/M7-WorkPackages.md` and `docs/DesignProposal.md` to the lead, naming what it would have mended there in its record. **Not done here:** the one-world refactor (84), the boat (82); any change to
 `docs/agents/consent/` or `docs/agents/ConsentBrief.md` (if the brief's wording offends the
 rule, say so for 55). **The head rules bind** as the briefs before have them.
 
@@ -2668,3 +3129,94 @@ length is booked to 74 as the last note said; §19.2 item 5 (the merchant brig's
 to `merchant-brig.yaml`, the packet's description) is ruled as §8.4 proposes, built by its
 owner before the brig's phrases are next touched. Go on: stage 0H's merge wait is lifted (item
 1), so stage B when B3.5 and its drawing are in.
+
+**2026-10-29, the owner's six sheets of the pilot seen by the lead** (the viewer's sheets of
+the 64 and the razee at the head after `09dde99`: abeam and on the quarter at 135 degrees,
+old beside new, furled and under plain sail; the hull alone beside the frigate-36, one scale
+and normalised; the hull below the water three ways at 10 degrees of heel; astern with the
+razee's short roundhouse under D18 (c); sent to the lead by the owner, not in the branch).
+**The read:** the hull is a two-decker at a glance where the old viewer had a slab, the rig
+the same in old and new and the masts' feet and the bowsprit's heel on the drawn hull, which
+is the principles kept; the quarter view holds, the run aft narrowing as it should; the
+razee one tier fewer with the same lower wales, her short roundhouse the stepped block,
+her stern one row of lights under the roundhouse where the 64 has two and two tiers of
+galleries; the frigate-36 normalised, a box 2.69 times too high with no sheer, the plainest
+case yet for SW-2 directly after the pilot, which is the order. **Rulings:** (1) §19.1 item
+16: **hidden by the sea is the default**, as proposed; *faint* is kept as the viewer's toggle
+for sheets like these, since it shows the body against its waterline when the lines are
+judged; *solid* goes with the shared hull when SW-2 lands. (2) §19.1 item 19 is closed by the
+owner's word in `164027c` (the browser's look decides); at 7.9 px a metre the tumblehome
+reads plainly. (3) The tan strips at the deck levels read as planking bands until 81 draws
+the ports over them: as designed, and the sheets say so; nothing to change. (4) One question
+for the Vanguard photographs, not a fault: the razee's roundhouse is drawn as a plain block
+with no lights in its after bulkhead; whether the model shows lights there is the owner's to
+read, and the file's note should say which way it was judged. (5) **The sheets go into the
+record** with B1's testing report, under `docs/playtests/<date>-pilot-indefatigable/pictures/`
+in the form the playtests' pictures take (the six as PNG, a README naming each by its head
+and what it shows), since they are the sheets §2.6 step 7 promised and the record of the
+hull's first drawing; the Vanguard photographs stay private as the design has them.
+
+**2026-10-29, the next window after 75: the tartane and the xebec (package 90).** The owner's
+word, with the Mediterranean's west block (79c) now building: after the 74 closes 75, the
+session's next ships are the tartane of decision 11 (the third reference vessel, chosen in
+September for how differently she handles) and the xebec, each as a trader or fisherman and
+as a corsair or the King's by fits and roles, on 79c's water, with the regency's cruisers as
+a role; inside milestone 7. The design is the session's, in its plan's form (a design
+document each, the ladder of evidence, the lead's gate before a file), drawn from Roux's and
+Tofiño's plans and the pilots 79c lays under `docs/references/pilots/`; the lateen's
+handling is B3.1's. Nothing of it opens before 75's last window closes. The count the owner
+is aiming at, loosely: **twenty hulls**, fits not counted (eight today, thirteen after 75,
+fifteen after these two); more fits on a hull are welcome, at the cost of research and
+tuning only; the number grows in the content phase as it likes. **After 90, the choosing
+(the owner, 2026-10-29; decision 56):** the armed Indiaman first; then rigs and variations
+the game has not got before another of a rig it has (a snow, a brigantine, a polacre, a
+ship-sloop, the small unrated vessels such as gunboats), with exceptions as the fancy
+strikes; Winfield's lists are now on the owner's shelf as a source, with plans scattered
+through most sections, to be cited by page as James and Steel are. Nothing of this is
+booked yet; the session may name candidates with their sources in its plan when 90's
+design is written, for the owner's choosing.
+
+**2026-10-30, Ext §17.11 approved, the four points ruled, and the in-world rule coming**
+(the session's message on `6fcc35a`; B3.1 with B5.2, B3.2 with B5.3 and B3.5 with B5.5 on
+the branch, each with the fast tier, the guard sets and the seed-7 trace identical; B1's
+stage B running). **§17.11 is approved as written:** the driver's boom out with the shift on
+the engine's own `Spar.rigged_out`, keyed on a `boom` that a lateen cut at the mast names
+and refused on any other, so that nothing moves on the eight or the razee; the phases as
+tabled (120 s each way, the judgement said); nothing in `physics/` or `combat/`, the stowed
+boom's windage and its hit said plainly as the small untruth it is; truth 7-230's band
+13-16 to 15-19 minutes old beside new, the toggle (the key absent against present on the
+fixture) the proof; B5.5's "boom amidships" cases moved old beside new; §17.10's items 6
+(for the driver), 9 and 10 closed by it; the order as proposed (B1's stage B, the stage-0
+commit, one step by the engine's workflow with B3 and B5 together, her regeneration, then
+the owner's testing report). **The four points:** (1) the library's evolution count
+(`tests/test_agents.py`) 98 to 104 for the lateen's six is confirmed, a pin of structure
+moved old beside new in its own commit as 86 moved it, and 108 at the settee the same way;
+(2) `physics/strain.py:631`'s membership (`spar.is_yard or spar.cls == "lateen_yard"`) is
+the log's words and no equation, so it is allowed under the gate, one line in its own
+commit, said in the notes, with a case in the strain's tests on the fixture where the
+carrying-away's words have one: a lateen yard is slung, and "in the slings" is its; (3) as
+built: the sprit yards stay in "spritsails" and "all sail" and out of "yards" and "head
+yards" in the 64's and the 74's files, the spritsail yard being the forecastle's and not the
+braces', and "square the yards" leaving it the period's; whether the harbour stow squares it
+is a later question with the harbour stow; (4) the draught rules: the 64's bowsprit root on
+the stem head as 1407F draws it, at the measured 27°, the end down 1.2 m, old beside new in
+B1's report. **SW-2:** the three Greenwich draughts of Build-Ships §5.9 (ZAZ2587 and ZAZ2559
+the *Amazon* class, ZAZ4491 and ZAZ4492 the *Diligence* class, ZAZ6381 and its fellows the
+*Sherbourne*), marked "to read" until measured, change its sources and not its order,
+accepted. B1 is taken whole at her testing report, as agreed. **Coming toward the branch, to
+build for now rather than mend at the merge:** package 85 (the orders, the primer and the
+library for a model reader) merges onto the trunk in the next hours with a rule and a test:
+the primer and the library's served topics (the catalogue's served head of every
+`data/evolutions/*.yaml`, the grammar, the briefs, the tools' words) are in-world documents
+and carry no reference to a milestone, a package, a spec's section, a truth's or a
+decision's number, a ruling, a gate, a builder, a playtest, the lead or the owner's rulings,
+or a model's or a vendor's name; `tests/test_in_world.py` scans them all and fails naming
+the line. 85 moved every evolution file's build notes below a blank line under a head
+`# Build notes (not served by the library's catalogue)`, where the catalogue's reader stops,
+the served head keeping the evolution, its steps, its sources in the period's books and what
+is judgement. The session's new evolution files (the lateen's six and any after) and the
+primer's chapter on the ships want the same form before the merge, so that the trunk's test
+passes at it: the served head in the period's words with its sources, the package's and the
+Ext's references below the build-notes head. The trunk's head is `1e3523b` (package 94
+merged: the chart's islets, the tide's seam taper and the Solent's region; nothing of the
+ships' files); 85's merge will be noted here when it lands.

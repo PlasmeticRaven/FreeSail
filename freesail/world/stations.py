@@ -74,8 +74,12 @@ class Stations:
     after the World is made, so a station bound by nobody's hand is read from the
     wardroom file when it is asked for, and a binding made by hand stands over it."""
 
-    def __init__(self, world: World) -> None:
+    def __init__(self, world: World, domain: Any = None) -> None:
         self.world = world
+        # the domain the bindings answer for (package 84, step 10; the design's 2.10): the
+        # hull whose stations these are, which is its World (a hull's façade) today; an
+        # office of M8's would name its purview here and no hull
+        self.domain = domain if domain is not None else world
         self._bound: dict[str, Binding] = {}  # made by hand, by station name
         self._unbound: set[str] = set()
 

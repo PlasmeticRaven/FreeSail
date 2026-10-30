@@ -499,6 +499,7 @@ class Message:
     origin: str  # "Brest", "the port admiral"
     to: str = "captain"
     carried_by: str = "the boat"
+    to_hull: str = ""  # the hull it is for when not the player's ship (package 84, step 9)
 
 
 class Registry:

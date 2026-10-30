@@ -703,6 +703,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             "aboard: the fever in the ship",
             "aboard: the first lieutenant is hurt",
             "aboard: the surgeon taken ill",
+            "aboard the Harpy: a cask found stove",
         ),
         "a report of the ship's own people with what it does; with no cause (the table's "
         "conditions), doubted",
@@ -717,6 +718,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             "aboard: a cask of brandy, in the hold",
             "aboard: a letter for the port admiral, on the cabin table",
             "aboard: the packet, in the keeping of Mr Veale",
+            "aboard the Harpy: a cask of brandy, in the hold",
         ),
         "a thing made, or moved when it is known; never into a held person's keeping",
     ),
@@ -760,7 +762,10 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "message.by",
         "message",
         'message: by a cutter from <port> from <whom>: "<words>"',
-        ('message: by a cutter from Plymouth from the port admiral: "Rejoin without delay."',),
+        (
+            'message: by a cutter from Plymouth from the port admiral: "Rejoin without delay."',
+            'message: by a cutter from Falmouth from the agent to the Harpy: "Your cargo waits."',
+        ),
         "a letter sent out to her by a cutter; from a port she is far from, doubted",
     ),
     Form(
@@ -794,6 +799,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         (
             'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
             "captain's father",
+            'person: make "Mr Gill", a merchant of forty, aboard the Harpy, in the cabin',
         ),
         "a person made from words, who stays in the world; aboard another ship, refused",
     ),

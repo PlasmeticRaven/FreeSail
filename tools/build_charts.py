@@ -452,6 +452,128 @@ REGIONS: dict[str, dict[str, Any]] = {
         # blend and not a far gauge's (docs/dev/ChartBlocks.md, "GEBCO's fill")
         "fill_to_chart_datum": True,
     },
+    # package 79c: the Mediterranean's west, the Strait's east bound to Cape Palos and
+    # Cartagena, and Barbary from Ceuta's east to Oran, abutting `strait` (package 39f) at
+    # 5 W exactly and `balearics` (below) at 0.05 E: the block was one region of 57.5 MB,
+    # past the brief's 40, and the lead ruled it two (docs/dev/TuningNotes.md, package 79c,
+    # step 1). The level-2 tiles that meet the bounds span 34.59 to 40.56 N and 5.07 W to
+    # 0.05 E (14 rows, 12 columns); the western column (5.07 to 4.64 W) from 35.44 to
+    # 36.72 N is strait's (the seam rule, `tiles_listed_elsewhere`): computed with the
+    # block, so that the field knows Ceuta's and Gibraltar's shores, and not written. The
+    # eastern column (0.37 W to 0.05 E) meets `balearics`' bounds too and is this
+    # region's, built first. The coast north of Cape Palos (Alicante, Valencia) lies within
+    # the box and is tiles without marks: a later block's.
+    "mediterranean-west": {
+        "title": "The Mediterranean west, the Strait to Cartagena and Barbary to Oran",
+        "bounds": {"south": 35.0, "north": 40.5, "west": -5.0, "east": 0.05},
+        "fetch": {"south": 34.45, "north": 40.7, "west": -5.2, "east": 0.2},
+        "harbours": {
+            "malaga": {"south": 36.62, "north": 36.76, "west": -4.50, "east": -4.33},
+            "almeria": {"south": 36.77, "north": 36.86, "west": -2.52, "east": -2.40},
+            "cartagena": {"south": 37.53, "north": 37.62, "west": -1.05, "east": -0.92},
+            "oran": {"south": 35.69, "north": 35.76, "west": -0.74, "east": -0.60},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, as the Strait's is: the block's
+        # gauges are held, so over the Mediterranean the world's tide is a far gauge's
+        # (docs/dev/ChartBlocks.md, "GEBCO's fill", package 39f), and the land must stand
+        # above that tide's high water
+        "fill_to_chart_datum": True,
+    },
+    # package 79c: the Balearics and the Barbary coast from Oran's east to Algiers and on to
+    # 4.5 E, the block's second region by the lead's ruling, abutting `mediterranean-west`
+    # at 0.05 E. The level-2 tiles that meet the bounds span 34.59 to 40.56 N and 0.37 W to
+    # 4.75 E (14 rows, 12 columns); the western column (0.37 W to 0.05 E) is
+    # mediterranean-west's (the seam rule): computed with the block and not written. The
+    # Algerian coast east of 4.5 E is a later block's.
+    "balearics": {
+        "title": "The Balearics, and Barbary from Mostaganem to Algiers",
+        # package 89: the north bound at the tiles' edge, 40.56 N, where the Gulf of Lion's
+        # begins (40.5 before, the strip between answering to no block's tide; no tile moved)
+        "bounds": {"south": 35.0, "north": 40.56, "west": 0.05, "east": 4.5},
+        "fetch": {"south": 34.45, "north": 40.7, "west": -0.5, "east": 4.9},
+        "harbours": {
+            "palma": {"south": 39.48, "north": 39.59, "west": 2.55, "east": 2.75},
+            "port-mahon": {"south": 39.85, "north": 39.91, "west": 4.24, "east": 4.33},
+            "ivica": {"south": 38.86, "north": 38.93, "west": 1.38, "east": 1.50},
+            "algiers": {"south": 36.75, "north": 36.82, "west": 3.02, "east": 3.12},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # as mediterranean-west's: the world's mean level, the block's gauges held
+        "fill_to_chart_datum": True,
+    },
+    # package 79d: the Gulf of Lion, the Roussillon to Nice and Villefranche (the lead's
+    # ruling on step 1: the Gulf split at the column edge 7.73 E, its east part the region
+    # `ligurian-sea`). The level-2 tiles that meet the bounds span 40.56 to 44.83 N and
+    # 2.61 to 7.73 E (120 tiles, 12 columns by 10 rows). The south bound is the row edge
+    # 40.56 N (the ruling's second item), where `balearics` (package 79c) ends: the two
+    # blocks' tiles meet at that row, so that no open water between them answers nothing
+    # (Mahon to Toulon sails through it). The east bound stops short of the column edge
+    # 7.7333 E so that the column beyond is `ligurian-sea`'s, the seam between the two.
+    "gulf-of-lion": {
+        "title": "The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche",
+        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73},
+        "fetch": {"south": 40.45, "north": 44.95, "west": 2.5, "east": 7.85},
+        "harbours": {
+            "toulon": {"south": 43.02, "north": 43.13, "west": 5.85, "east": 6.05},
+            "marseille": {"south": 43.25, "north": 43.33, "west": 5.27, "east": 5.39},
+            "hyeres": {"south": 42.98, "north": 43.12, "west": 6.12, "east": 6.42},
+            "villefranche": {"south": 43.67, "north": 43.72, "west": 7.28, "east": 7.35},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, as the Strait's: the block's gauges
+        # are held, so the world's tide over it is the nearest far gauge's (the build prints
+        # the figures) and the land must stand above that tide's high water
+        "fill_to_chart_datum": True,
+    },
+    # package 79d: the Ligurian sea and Corsica, Genoa to Leghorn, the Tuscan islands and
+    # Elba, Corsica whole and the Maddalena with Agincourt Sound (the Gulf's east part by
+    # the lead's ruling). The level-2 tiles that meet the bounds span 40.99 to 44.83 N and
+    # 7.73 to 11.15 E (72 tiles, 8 columns by 9 rows); the west column abuts
+    # `gulf-of-lion`'s at 7.73 E. The south row (40.99 to 41.41 N) holds the Maddalena and
+    # Sardinia's north shore; `tyrrhenian`, built after, meets these tiles and keeps them
+    # this block's (the boundary at the row edge 40.99 N west of 11.15 E).
+    "ligurian-sea": {
+        "title": "The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena",
+        "bounds": {"south": 41.0, "north": 44.5, "west": 7.74, "east": 11.0},
+        "fetch": {"south": 40.85, "north": 44.95, "west": 2.5, "east": 11.3},
+        "harbours": {
+            "genoa": {"south": 44.38, "north": 44.43, "west": 8.86, "east": 8.96},
+            "leghorn": {"south": 43.50, "north": 43.60, "west": 10.20, "east": 10.33},
+            "porto-ferrajo": {"south": 42.79, "north": 42.84, "west": 10.29, "east": 10.36},
+            "san-fiorenzo": {"south": 42.66, "north": 42.75, "west": 9.24, "east": 9.33},
+            "ajaccio": {"south": 41.85, "north": 41.94, "west": 8.68, "east": 8.80},
+            "agincourt-sound": {"south": 41.17, "north": 41.27, "west": 9.36, "east": 9.48},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # as gulf-of-lion's (the fetch box the first build's, which covers the tiles whole)
+        "fill_to_chart_datum": True,
+    },
+    # package 79d: the Tyrrhenian, Sardinia south of 40.99 N, the Roman coast from Monte
+    # Argentario by Civita Vecchia and the Tiber to Gaeta and the Pontine islands, the bay of
+    # Naples and south to Cape Palinuro. The level-2 tiles that meet the bounds span 38.43 to
+    # 42.69 N and 7.73 to 15.84 E (190 tiles, 19 columns by 10 rows); the 32 of them north of
+    # the row edge 40.99 N and west of the column edge 11.15 E are `ligurian-sea`'s (the
+    # Maddalena, Corsica's south, Elba and the Tuscan coast), kept so by the seam rule ("32
+    # kept"): the boundary between the two regions. The north-east corner reaches the
+    # Adriatic's shore about Ortona and Pescara, a later block's water in this block's tiles;
+    # the south row (38.43 to 38.85 N) holds the sea north of the Lipari islands, which with
+    # Sicily and the Strait of Messina are a later block.
+    "tyrrhenian": {
+        "title": "The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples",
+        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.5},
+        "fetch": {"south": 38.3, "north": 42.85, "west": 7.6, "east": 16.0},
+        "harbours": {
+            "cagliari": {"south": 39.14, "north": 39.23, "west": 9.05, "east": 9.18},
+            "alghero": {"south": 40.53, "north": 40.62, "west": 8.18, "east": 8.33},
+            "civita-vecchia": {"south": 42.06, "north": 42.11, "west": 11.75, "east": 11.81},
+            "gaeta": {"south": 41.19, "north": 41.24, "west": 13.54, "east": 13.61},
+            "naples": {"south": 40.78, "north": 40.87, "west": 14.17, "east": 14.30},
+            "ponza": {"south": 40.88, "north": 40.93, "west": 12.93, "east": 12.98},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -472,13 +594,33 @@ CORRIDORS: dict[str, dict[str, Any]] = {
     },
 }
 
+# The tide's regions (package 94): bounds and no tiles, for the gauges' membership alone
+# (`freesail/world/tide.py`'s `region_bounds`: a gauge's `block:` names a region of the
+# chart or one of these). The build builds nothing of them and writes them into the
+# manifest whole at every build, so that a region's rebuild keeps them. `solent`: the
+# Solent, Spithead and Poole bay, for Bournemouth's and Portsmouth's gauges (package 39a's,
+# held until package 94), the bounds judgement from the gauges' places and the Wight's
+# shores: from 2.2 W (St Alban's Head's west, Bournemouth twelve miles inside) to 1 W
+# (the Channel east's bound), and from 50.62 N (south of the Wight's north shore and of
+# the Needles, Spithead nine miles inside; north of 50.6 N, where truth 7-282 holds the
+# eleven's water a mile west of 1 W) to 51 N (channel-mid's north bound).
+TIDE_REGIONS: dict[str, dict[str, Any]] = {
+    "solent": {
+        "title": "The Solent, Spithead and Poole bay: a tide region, no tiles",
+        "bounds": {"south": 50.62, "north": 51.0, "west": -2.2, "east": -1.0},
+    },
+}
+
 # The charts (spec M6 §26; package 38): each names the regions it holds, in the order
 # their features are indexed and their coasts drawn, and the corridor under them. A
 # region named here and not yet built is left out of the manifest's chart with a note;
 # a block adds its region here when its tiles are built (docs/dev/ChartBlocks.md).
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
-        "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
+        "title": (
+            "The Channel, Biscay and the Iberian coast to Madeira, the Strait, the "
+            "Mediterranean west and the Balearics, the Gulf of Lion and the Tyrrhenian"
+        ),
         "regions": [
             "channel-west",
             "channel-mid",
@@ -492,6 +634,13 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 39f: the Strait, the voyage's last (its own line, so that the four
             # blocks' additions merge as lines)
             "strait",
+            # package 79c: the Mediterranean west in two regions (the lead's ruling)
+            "mediterranean-west",
+            "balearics",
+            # package 79d: the Gulf of Lion and the Tyrrhenian, the Mediterranean's north
+            "gulf-of-lion",
+            "ligurian-sea",
+            "tyrrhenian",
         ],
         "corridor": "atlantic-corridor",
     },
@@ -1303,16 +1452,19 @@ FILL_LEVEL_CELL_DEG = 0.05
 
 
 def mean_level_grid(box: dict[str, float]) -> Grid:
-    """Mean sea level above the chart's datum over a box, as the world's tide has it
+    """Mean sea level above the chart's datum over a box, as the eleven gauges give it
     (`data/tides/constituents.yaml`: each gauge's `mean_level_m`, blended by the inverse
     square of the distance over the gauges within `interpolation.reach_nm`, the nearest
     alone beyond them, a gauge no nearer than 100 m; `freesail/world/tide.py`), on a grid
-    of FILL_LEVEL_CELL_DEG. GEBCO's heights are about mean sea level and the regions'
-    levels about LAT: where GEBCO fills a region's cells (the land, mostly), its height
-    plus this is the height above the datum the world's tide is reckoned from, so that
-    a low shore stands as high above the world's high water as it does above the sea's
-    (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
-    behind the town read as drying ground and was covered at high water)."""
+    of FILL_LEVEL_CELL_DEG. The world's tide outside the blocks; within a block the world
+    blends the block's own gauges too since package 89, and this keeps the eleven's level
+    the tiles were raised by (docs/dev/ChartBlocks.md, "GEBCO's fill"). GEBCO's heights
+    are about mean sea level and the regions' levels about LAT: where GEBCO fills a
+    region's cells (the land, mostly), its height plus this is the height above the datum
+    the world's tide is reckoned from, so that a low shore stands as high above the
+    world's high water as it does above the sea's (package 39a: at St Malo, whose mean
+    level is 6.8 m above the datum, the low land behind the town read as drying ground
+    and was covered at high water)."""
     doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
     interp = doc.get("interpolation") or {}
     power = float(interp.get("power", 2))
@@ -1324,6 +1476,10 @@ def mean_level_grid(box: dict[str, float]) -> Grid:
             float(g["mean_level_m"]),
         )
         for g in doc["gauges"]
+        # the eleven alone (package 89): a block's gauge serves its own block's water in
+        # the world's tide, and the tiles were raised by the eleven's level, which this
+        # keeps, so that a rebuild moves no tile by the rule
+        if not g.get("block")
     ]
     cell = FILL_LEVEL_CELL_DEG
     south = math.floor(box["south"] / cell) * cell - cell
@@ -2425,6 +2581,8 @@ class Build:
             "regions": regions,
             # the corridor (package 38): level 1 over the voyage's water, committed
             "corridors": corridors,
+            # the tide's regions (package 94): bounds alone, for the gauges' membership
+            "tide_regions": {k: dict(v) for k, v in TIDE_REGIONS.items()},
             # the world and the Atlantic are built by --world and --atlantic on the
             # developer's machine and never committed (spec M5 §10): the manifest says so,
             # lists their tiles only when this build made them, and the runtime reads

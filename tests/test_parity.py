@@ -66,6 +66,9 @@ CONSOLE_COMMANDS = {
     "speed": "by design: the clock is the owner's",
     "time": "by design: the clock is the owner's",
     "tick": "by design: the clock is the owner's",
+    "follow SHIP": "by design: the drivers' centre is the owner's (package 84, step 10; 82's "
+    "§11): the hull the chart, the prompt and the snapshot follow, a driver's line; a "
+    "station reads its own hull and no other",
     "state": "the station's `state` tool, from `World.summary_lines` as the console prints it",
     "muster": "submit_order('muster'), answered from `api.queries.muster_lines` (package 44)",
     "the sail room": "submit_order('the sail room'), the vocabulary's query",

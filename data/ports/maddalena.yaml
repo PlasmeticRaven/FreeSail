@@ -1,0 +1,115 @@
+# FreeSail: the Maddalena and Agincourt Sound as a port (package 79d, the Gulf of Lion's
+# block; the same form as dunkirk.yaml, on package 35's machinery). The sound, the road and
+# the marks are features/gulf-of-lion.yaml's (the harbour patch agincourt-sound).
+#
+# Sources. James 1837, vol. 3, pp. 177 to 178: on 31 October 1803 Nelson's squadron
+# anchored without an accident in Agincourt Sound under the Sardinian shore, after seven
+# days' struggle with gales and currents and a rocky and most intricate passage, 'a noble
+# harbour formed by an indented bay ... defended to the northward by the small islands of
+# St. Estevan, Spargiotou, Magdalena, and Cibrera', which Captain Ryves of the Agincourt
+# had surveyed in 1802. Purdy 1826, pp. 88 to 90: Ryves's and Mr Atkinson's directions;
+# hauling round Point Liche in 15 or 16 fathoms, land-locked; the anchoring-ground extremely
+# good; the north-wester blows with great violence; the water rises and falls about three
+# feet; the watering at the two rocks. Smyth 1828, pp. 247 to 248: the town's anchorage and
+# the Cala Gavetta; the berth to be preferred at the Mezzo Schifo near the Pararau, good
+# for watering, wood cut close by. Derrotero 1849, pp. 150 to 155.
+#
+# The stance. The King of Sardinia's, at peace with Britain and France: neutral to a King's
+# ship and to an American, open to his own; the British fleet's watering and refreshment in
+# 1803 to 1805. No period sheet read: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: maddalena
+name: the Maddalena
+nation: sardinia
+source: "James 1837 vol. 3 pp. 177-178; Purdy 1826 pp. 88-90; Smyth 1828 pp. 247-248; Derrotero 1849 pp. 150-155"
+datum: unverified   # no period sheet read; no published level read
+
+outer_road:
+  feature: maddalena-road
+  name: Maddalena road
+  lat_deg: 41.2041
+  lon_deg: 9.4074
+  depth_fathoms: 15
+anchorage:
+  feature: agincourt-sound
+  name: Agincourt Sound
+  lat_deg: 41.1870
+  lon_deg: 9.3790
+  depth_fathoms: 12
+mooring:
+  name: off the Cala Gavetta
+  lat_deg: 41.2100     # the grid's 5 m before the village (judgement)
+  lon_deg: 9.4040
+  depth_fathoms: 3
+  bottom: weed
+shore:
+  feature: maddalena-village
+  name: the landing at the Cala Gavetta
+  lat_deg: 41.2135
+  lon_deg: 9.4065
+
+pilot:
+  station: maddalena-road
+  cruising_nm: 5                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Maddalena boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Ornano, Millelire, Zonza, Culiolo, Bargone, Susini, Ferracciolo, Volpe]   # the Maddalena's Corsican and Sardinian names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 270            # out by the western passage between the islands and the Sardinian shore
+  words:
+    channel: "From the west, come in between the Barelino isles and Spargi and the Sardinian shore, leaving Spargiotto and the Paganetto rocks on the hand they lie, and haul round Point Liche in fifteen or sixteen fathoms into the sound. From the east, beware the Monks and the reef the Excellent struck in 1804, and come in by Biche island's channel only with a fair wind."
+    marks: "The Magdalena's high rocky island and its village on the Cala Gavetta; St Estevan and its fort; Caprera to the east; the Bear rock on Capo d'Orso over the Sardinian shore; Monte Limbara far inland."
+    anchorage: "In Agincourt Sound the ship lies land-locked in twelve fathoms, the anchoring-ground extremely good; the berth to be preferred is at the Mezzo Schifo, south-west of the town, handy for watering at the Pararau and wood cut close by. The north-wester comes down off the hills with great violence: veer cable."
+    tide: "The water rises and falls about three feet, more with the wind than with the moon; the current round Point Liche runs nearly two miles and a half an hour."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 39, origin: sardinia, note: "brought in; the country's; judgement"}
+    - {good: olive oil, price: 60, origin: sardinia, note: "the country's; judgement"}
+    - {good: salt, price: 10, origin: sardinia, note: "judgement"}
+    - {good: salt fish, price: 26, origin: sardinia, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 29, origin: sardinia, note: "brought in; judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 60, origin: sardinia, note: "brought in; judgement"}
+    - {good: timber, price: 8, origin: sardinia, note: "judgement"}
+    - {good: cattle, price: 6.3, origin: sardinia, note: "the place's own; the head; judgement"}
+    - {good: fresh beef, price: 21, origin: sardinia, note: "the place's own; judgement"}
+    - {good: vegetables, price: 4, origin: sardinia, note: "judgement"}
+    - {good: cheese, price: 24, origin: sardinia, note: "the place's own; judgement"}
+
+dockyard:
+  kind: chandlers                 # no yard: the islanders' boats and what the fleet's victuallers brought
+  items:
+    - {item: topmast, hours: 20, pounds: 55, note: "judgement"}
+    - {item: topgallant_mast, hours: 10, pounds: 18}
+    - {item: yard, hours: 18, pounds: 33}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 28, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "the watering place at the Pararau near the Mezzo Schifo (Smyth 1828, p. 248)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: a few island fishermen; Corsican exiles among them
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [agincourt-sound, maddalena-road, 41 13 N 9 18 E]
+  from_sea: [41 13 N 9 18 E, maddalena-road, agincourt-sound]
+  in: [agincourt-sound]

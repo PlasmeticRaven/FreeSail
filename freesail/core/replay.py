@@ -302,7 +302,11 @@ def _give(world: World, entry: dict[str, Any]) -> None:
         acts_mod.target_of(world, entry).submit(str(entry["order"]), actor=str(entry["actor"]))
         return
     if "world_order" in entry:
-        world.world_order(str(entry["world_order"]), source=str(entry.get("source", "")))
+        world.world_order(
+            str(entry["world_order"]),
+            source=str(entry.get("source", "")),
+            by=str(entry.get("by") or ""),
+        )
         return
     if "director_order" in entry:
         # the player's order at the director's seat (package 50): through the director's
@@ -358,8 +362,12 @@ def _give(world: World, entry: dict[str, Any]) -> None:
                 )
         return
     line = entry["line"]
-    world.record_driver(line["severity"], line["kind"], line["text"], line.get("data"))
     data = line.get("data") or {}
+    if line["kind"] == "driver.follow":
+        # the drivers' centre moved to a hull (package 84, step 10), the line written by it
+        world.follow(str(data.get("ship") or data.get("name") or ""))
+        return
+    world.record_driver(line["severity"], line["kind"], line["text"], data)
     if line["kind"] == "seat.taken":
         # the player seated at a station by a driver (package 40; `agents.seat`): seated
         # again here, before the orders he gave from it

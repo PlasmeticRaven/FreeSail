@@ -913,3 +913,155 @@ def test_a_ship_on_the_land_is_refused_and_one_made_in_harbour_goes_out_by_the_t
     hope = w.vessels.find("Hope")
     marks = [leg[2] for leg in hope.plan]
     assert marks[0] != "Plymouth" and marks[-1] == "Plymouth", marks
+
+
+# ---------------------------------------------------------------------------
+# Package 84, step 9: the director's reach over the hulls
+# ---------------------------------------------------------------------------
+
+
+def _frigate_with_the_brig_x():
+    """The frigate hove to with the brig X put on the sea by world orders and promoted
+    beside her (a hull of her own), as the replay tests make her."""
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    assert (
+        w.world_order(
+            'ship: a merchant brig "X" of Britain at 49 33 N 5 30 W, bound for Falmouth', "t"
+        ).data["result"]
+        == "done"
+    )
+    assert w.world_order('ship "X": intent bound for Falmouth', "t").data["result"] == "done"
+    w.run(61)
+    b = w.vessels.find("X")
+    assert b.crew is not None and b.crew.shape == "full"
+    return w, b, b.crew
+
+
+def test_an_aboard_order_naming_a_hull_is_carried_out_aboard_her_and_said_in_her_log():
+    """`aboard the X: a cask found stove` (and `aboard "X": ...`): the thing found aboard
+    her, her people's report in her log and nothing in the player's; the order's own line
+    in the player's log names her; a ship not on the sea refused in words."""
+    w, b, hull = _frigate_with_the_brig_x()
+    n = len(hull.log)
+    e = w.world_order("aboard the X: a cask found stove", "t")
+    assert e.data["result"] == "done" and e.data.get("ship") == b.id, e.text
+    assert "aboard the X:" in e.text
+    hers = [
+        x for x in list(hull.log)[n:] if x.kind.startswith("aboard") or "cask" in x.text.lower()
+    ]
+    assert hers, [x.text for x in list(hull.log)[n:]]
+    assert not any("cask" in x.text.lower() for x in w.log if x.kind != "world.order")
+    e = w.world_order('aboard "X": a sealed packet, on the cabin table', "t")
+    assert e.data["result"] == "done", e.text
+    from freesail.world import things as TH
+
+    assert any(t.name == "a sealed packet" and t.hull == b.id for t in TH.things_of(w))
+    e = w.world_order("aboard the Nobody: a cask found stove", "t")
+    assert e.data["result"] == "refused" and "No ship named" in e.text
+
+
+def test_a_person_made_aboard_a_hull_is_of_her_company_and_one_comes_aboard_her():
+    w, b, hull = _frigate_with_the_brig_x()
+    e = w.world_order(
+        'person: make "Mr Gill", a merchant of forty, aboard the X, in the cabin', "t"
+    )
+    assert e.data["result"] == "done" and e.data.get("ship") == b.id, e.text
+    gill = hull.people.find("Mr Gill")
+    assert gill is not None and gill.home == b.id and gill.aboard and gill.hull == b.id
+    assert w.people.find("Mr Gill") is None
+    e = w.world_order('person: make "Mr Pope", a passenger of fifty, ashore at Falmouth', "t")
+    assert e.data["result"] == "done", e.text
+    n = len(hull.log)
+    e = w.world_order('person: "Mr Pope" comes aboard the X', "t")
+    assert e.data["result"] == "done" and e.data.get("ship") == b.id, e.text
+    pope = w.people.find("Mr Pope")
+    assert pope.aboard and pope.hull == b.id
+    assert any(x.kind == "person.aboard" and "Mr Pope" in x.text for x in list(hull.log)[n:])
+
+
+def test_a_message_by_a_cutter_to_a_hull_reaches_her_captain_and_not_the_players():
+    w, b, hull = _frigate_with_the_brig_x()
+    e = w.world_order(
+        'message: by a cutter from Falmouth from the agent to the X: "Your cargo waits."', "t"
+    )
+    assert e.data["result"] == "done" and e.data.get("ship") == b.id, e.text
+    cutter = w.vessels.get(e.data["id"])
+    assert cutter.letter is not None and cutter.letter.to_hull == b.id
+    for _ in range(12 * 60):
+        w.run(60)
+        if cutter.letter is None:
+            break
+    assert cutter.letter is None, "the letter never came aboard her"
+    assert any("letter" in x.text.lower() and "came aboard" in x.text.lower() for x in hull.log)
+    assert not any("came aboard by" in x.text.lower() and "letter" in x.text.lower() for x in w.log)
+
+
+def test_the_director_reads_a_hulls_log_by_her_name_and_no_other_station_may():
+    from freesail.agents import tools as T
+
+    w, b, hull = _frigate_with_the_brig_x()
+    out = T.read_log(w, "director", since_tick=0, ship="X")
+    assert out["lines"] and not any(w.ship.name in line.get("text", "") for line in out["lines"])
+    hers = {x.text for x in hull.log}
+    assert all(line["text"] in hers for line in out["lines"])
+    assert "error" in T.read_log(w, "captain", since_tick=0, ship="X")
+    assert "No ship named" in T.read_log(w, "director", since_tick=0, ship="Nobody")["error"]
+
+
+def test_the_truth_walks_the_hulls_purses_and_the_persons_ashore():
+    from freesail.api.readings import director_readings
+
+    w, b, hull = _frigate_with_the_brig_x()
+    assert (
+        w.world_order('person: make "Mr Pope", a passenger of fifty, ashore at Falmouth', "t").data[
+            "result"
+        ]
+        == "done"
+    )
+    truth = director_readings(w)
+    row = next(r for r in truth["ships"] if r["name"] == "X")
+    assert row["hull"] == "awake" and "purse" in row and "cargo" in row
+    assert any("Mr Pope" in line and "Falmouth" in line for line in truth.get("ashore", []))
+
+
+def test_the_rule_of_reach_counts_a_held_station_on_another_hull():
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import captain_of_the_ship
+
+    w, b, hull = _frigate_with_the_brig_x()
+    every = SamplingPolicy.in_lockstep(600, "notable", "urgent")
+    Harness(hull, captain(every, world=hull), captain_of_the_ship([])).start()
+    w.run(61)
+    cap = hull.people.captain
+    held = [(name, person) for name, person, _who in WO.held_stations_everywhere(w)]
+    assert ("captain", cap.name) in held, held  # her captain's station, held by the model
+    e = w.world_order(f'say as {cap.name}: "All well."', "t")
+    assert e.data["result"] == "refused" and "held" in e.text, e.text
+
+
+def test_a_world_order_given_under_a_purview_is_checked_against_it():
+    """Package 84, step 10 (the design's 2.10, the offices' room): a world order given
+    under a purview (`by`) passes whole for the director's and the bare order, and an
+    unknown purview is refused in words; the purview rides the input and a replay gives it
+    again."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as R
+
+    w = world_for()
+    e = w.world_order("port falmouth: price of tin 130", "t", by="the director")
+    assert e.data["result"] == "done", e.text
+    e = w.world_order("port falmouth: price of tin 140", "t", by="the port admiral at Plymouth")
+    assert e.data["result"] == "refused" and "no purview this world knows" in e.text
+    assert (
+        WO.purview_allows("", "ship") is None and WO.purview_allows("director", "weather") is None
+    )
+    assert [i.get("by") for i in w.inputs if "world_order" in i] == [
+        "the director",
+        "the port admiral at Plymouth",
+    ]
+    w.run(60)
+    copy = R.replay(w.save(), ship_factory)
+    assert copy.log.digest() == w.log.digest()
