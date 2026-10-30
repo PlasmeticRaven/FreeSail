@@ -1,0 +1,1016 @@
+# The features of the Balearics, Ivica, Formentera, Majorca with Cabrera and Minorca with
+# Port Mahon, and of the Barbary coast from Arzew to Algiers and Cape Matifu (package 79c,
+# the block's second region, beyond 0.05 E; the first, `mediterranean-west`, west of it):
+# hazards, marks, lights with their dates, places, anchorages and bottom notes, in the
+# period's words, each with its source in the references' form (docs/references/README.md),
+# on the rules of channel-west.yaml's head, read from:
+#
+#   Tofiño 1787     Vicente Tofiño de San Miguel, Derrotero de las costas de España en el
+#                   Mediterráneo y su correspondiente de África (Madrid, Ibarra, 1787;
+#                   docs/references/pilots/tofino-1787-derrotero-costas-espana-mediterraneo-ocr.txt),
+#                   cited by his marginal headings and printed pages. His soundings are brazas
+#                   of two Castilian varas (1.672 m; x 0.914 to fathoms), his feet the pie de
+#                   Burgos (0.279 m), his bearings true, his miles of sixty to the degree, his
+#                   longitudes from Cadiz's meridian.
+#   Purdy 1826      John Purdy, The New Sailing Directions for the Mediterranean Sea (Internet
+#                   Archive newsailingdirec01purdgoog), much of it Tofiño's in English, later
+#                   than the period: where it adds to Tofiño the entry says so.
+#   Purdy 1840      his New Sailing Directory for the Strait and the Western Division, its
+#                   'Pharonology' for the lights' later history.
+#   Smyth 1854      W. H. Smyth, The Mediterranean, the table of positions (Part V).
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart as remembered or from the pilot's bearings,
+# as each entry's `fix` says, then checked against the block's tiles by channel-west.yaml's
+# rule (a headland, island, town, castle, church, tower or hill to the nearest land within
+# 800 m; a light to the nearest land within 400 m; a rock, ledge, shoal or bank to the
+# shoalest head of the tiles within 400 m, never onto the land above two metres; an
+# anchorage to water holding half the pilot's depth within 800 m), by a script kept
+# outside the repository; a move is said in `fix`. Where the first placing missed by more
+# than the rule's reach the mark was moved to the nearest land or water beyond it and the
+# `fix` says so (the mark's place is then the coast's, a cable or two, not the remembered
+# point). An isle the grid lacks (EMODnet's cells some 115 m interpolate across it) is a
+# `rock` of its height with an `extent_m` of its size, so that a ship cannot sail through
+# it (docs/dev/ChartBlocks.md). Heights are above the sea for the horizon; a height not
+# from a pilot is FROM MEMORY or JUDGEMENT as marked.
+#
+# The modern ports are the grid's land or dredged water where 1805 had beach and road
+# (Málaga's, Almería's, Cartagena's Escombreras over its bay, Palma's, Oran's, Algiers'):
+# no period sheet is read with its datum here, so no patch; the port files say
+# `datum: unverified`.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+#   Vargas Ponce 1787  José Vargas Ponce, Descripciones de las islas Pithiusas y Baleares
+#                   (the islands' towns and works); Grasset 1807, Voyage dans les îles
+#                   Baléares et Pithiuses ... 1801 à 1805 (Mahon's lazaretto and hospital);
+#   Bérard 1837     Auguste Bérard, Description nautique des côtes de l'Algérie (the French
+#                   survey of 1831 to 1833: the land and the water, not the French works
+#                   after 1830); Michelot 1709 and 1715 (the Algiers lantern).
+#
+# The lights of 1805: Porto Pí's tower by Palma (a lantern lit every night, Tofiño 1787
+# p. 185; Vargas Ponce 1787 p. 36, the privilege of 1369) and Algiers' mole lantern
+# (Michelot 1709, 'une lanterne qu'on allume le soir'; Michelot 1715 p. 90; Tofiño 1787
+# p. 152 names the lantern). No other light in the region in 1805: Purdy 1840's
+# Pharonology finds 'no regular light-towers' in the Balearics but Palma's; the later
+# lights are not entered. Port Mahon is placed by hand on the tiles by Tofiño's plan of
+# its entry (pp. 211 to 213): its islands, which the grid lacks, are rocks of their
+# height, and his passage between them and the south shore is left open.
+
+region: balearics
+features:
+- id: ivica-castle
+  kind: castle
+  name: the castle of Iviza
+  modern: Dalt Vila, the castle and walled town of Eivissa
+  lat_deg: 38.9067
+  lon_deg: 1.436
+  height_m: 85
+  source: 'Tofiño 1787, ''Derrotero de la isla de Iviza'', p. 159: N 18° 15'' E of the tower of las Portas, 3 miles, the castle of Iviza; p. 160: the west side of the harbour is the land from Punta Ratyada north to a point with a little tower called the Torreón del Mar, and on the height of that land stand the castle and city of Iviza; Purdy 1826, ''Island Iviza'', p. 33: the castle about three miles N 18° 15'' E from the tower of Las Portas'
+  says: The castle and city of Iviza on the height at the west side of the harbour, three miles north-north-east of the tower of las Portas.
+  fix: FROM MEMORY, the castle on the summit of Dalt Vila; the height JUDGEMENT (the hill under the castle)
+- id: ivica-harbour-anchorage
+  kind: anchorage
+  name: the harbour of Iviza
+  modern: Port d'Eivissa, the outer harbour between Dalt Vila and Botafoc
+  lat_deg: 38.9095
+  lon_deg: 1.444
+  height_m: 0
+  depth_fathoms: 6.9
+  bottom: unstated; the best berth in 7 or 8 brazas
+  source: 'Tofiño 1787, ''Entrada en el puerto de Iviza'', pp. 181 to 182: steer for the middle of the mouth, leaving Isla Grosa and Botafuego to starboard and Punta Ratyada and the Isla Negra to port, and in 7 or 8 brazas, which is the best, let go, the best bower to the SW, keeping nearer Isla Plana than the city, so as to give the end of a cable or hawser to it in hard easterly winds; in winter, when the N and NW blow hard, back the NE anchor, for they drag easily; the entry not to be attempted by night without much practice; Purdy 1826, p. 33, the same in English (''7 or 6 1/2 fathoms'')'
+  says: Anchored in the harbour of Iviza in seven brazas, nearer Isla Plana than the town, the best bower to the south-west and a hawser ready for the island.
+  fix: FROM MEMORY, the middle of the mouth between Botafoc and the town; 7 1/2 brazas (6.9 fathoms)
+- id: isla-grosa-ivica
+  kind: island
+  name: the Isla Grossa
+  modern: Illa Grossa (Eivissa harbour, now joined to the Botafoc breakwater)
+  lat_deg: 38.9042
+  lon_deg: 1.4558
+  height_m: 30
+  source: 'Tofiño 1787, p. 159: N 40° E 3 1/2 miles from the tower of las Portas the south end of Isla Grosa, which, or an islet close to its west side called the Botafuego, with Punta Ratyada or the Isla Negra on its east, form the mouth of the harbour of Iviza; Grosa and Plana of some height, separated by a channel of 1/2 braza that fishermen pass in fine weather; p. 182: coming from the east pass between the south point of Isla Grosa and the Dado grande, 3/4 mile, very deep and steep-to; Purdy 1826, p. 33'
+  says: 'The Isla Grossa, the east side of the mouth of Iviza harbour: from the eastward pass between its south point and the great Dado, three-quarters of a mile, deep and clean.'
+  fix: FROM MEMORY; the height JUDGEMENT; moved 35 m to the nearest land of the tiles
+- id: botafoc
+  kind: island
+  name: Botafuego
+  modern: Illa de Botafoc (now under the breakwater and its light)
+  lat_deg: 38.9086
+  lon_deg: 1.4503
+  height_m: 10
+  source: 'Tofiño 1787, p. 159: an islet close to the west side of Isla Grosa called the Botafuego, which with Punta Ratyada forms the mouth of the harbour; up to two brazas in the channel between Botafuego and Isla Grosa; p. 182: abreast of the south point of Isla Grosa stand on to be abreast of Botafuego, and that passed, go for the anchorage; Purdy 1826, p. 33 (''Botafuego'')'
+  says: 'Botafuego, the islet under the west side of the Isla Grossa: when it is passed, bear up for the anchorage of Iviza.'
+  fix: FROM MEMORY; the height JUDGEMENT; moved 202 m to the nearest land of the tiles
+- id: dados-shoal
+  kind: rock
+  name: the shoal between the Dados
+  modern: the rock between Dau Gros and Dau Petit
+  lat_deg: 38.8897
+  lon_deg: 1.4527
+  height_m: 0
+  extent_m: 50
+  dries_m: -1.7
+  source: 'Tofiño 1787, pp. 160 to 161: at a quarter of the distance from the little Dado (the southern) to the great, N 50° W, a shoal with one braza on it where the sea commonly breaks; this and the shoal off the Malvins are the only hidden dangers, the rest of the islets clean and steep-to; p. 182: avoid passing between the two Dados for the shoal between them'
+  says: 'Do not pass between the two Dados: there is a shoal of one braza between them on which the sea commonly breaks.'
+  fix: a quarter of the way from the little Dado to the great by Tofiño's words; 1 braza (1.7 m); FROM MEMORY of the Daus' places, to be checked; moved 382 m to the shoalest head of the tiles within 400 m (-25.9 m against the datum)
+- id: malvins-shoal
+  kind: rock
+  name: the shoal off the great Malvin
+  modern: the rock NW of Es Malví Gros (Eivissa)
+  lat_deg: 38.8847
+  lon_deg: 1.4336
+  height_m: 0
+  extent_m: 50
+  dries_m: -1.7
+  source: 'Tofiño 1787, ''Malvins grande y su baxo'', p. 160: 1 1/2 mile S 5° W of the castle an islet of some size and height called the Malvins grande, with two stones close to its north and a shoal with one braza on it two-thirds of a cable NW by W of its north end; p. 181: a ship may pass west of the Esponja and the Malvins minding only that shoal'
+  says: Off the north end of the great Malvin, two-thirds of a cable to the north-west, a shoal of one braza.
+  fix: two-thirds of a cable NW by W of the islet's north end, the islet placed by Tofiño's bearing from the castle; 1 braza (1.7 m); moved 237 m to the shoalest head of the tiles within 400 m (-8.0 m against the datum)
+- id: tagomago
+  kind: island
+  name: Tagomago
+  modern: Illa de Tagomago
+  lat_deg: 39.0321
+  lon_deg: 1.6426
+  height_m: 114
+  source: 'Tofiño 1787, ''Isla de Tagomago'', p. 163: E 14° N 1 1/2 mile from Cape Campaniche its south end, lying nearly NW by N and SE by S a long mile; of middling height, even from its middle south and lower and uneven north of it; steep-to; p. 164: the channel between it and the coast a mile wide with 15 brazas, a good passage with a steady wind; Purdy 1826, p. 34'
+  says: Tagomago, a steep-to island of middling height a mile and a half off the east point of Iviza; the channel inside it a mile wide with fifteen brazas.
+  fix: FROM MEMORY; the height FROM MEMORY (the island's summit); moved 246 m to the nearest land of the tiles
+- id: conejera-ivica
+  kind: island
+  name: the Conejera
+  modern: Sa Conillera (off Sant Antoni de Portmany)
+  lat_deg: 38.9925
+  lon_deg: 1.2104
+  height_m: 68
+  source: 'Tofiño 1787, ''Conejera grande'', p. 170: an island of middling height, fairly even, lying nearly N and S 1 1/2 mile; a fair anchorage under its SE point; its north end 4 1/3 miles S 61° W of Cape Nono; p. 172: between it and the Isla del Esparto, and between that and the Conejera and the Bledas, passage for fleets; Purdy 1826, p. 35'
+  says: The Conejera, an even island of middling height off Port Magno, with a fair anchorage under its south-east point.
+  fix: FROM MEMORY; the height FROM MEMORY; moved 355 m to the nearest land of the tiles
+- id: portmany-road
+  kind: anchorage
+  name: Port Magno or Port St Antonio
+  modern: Badia de Sant Antoni de Portmany
+  lat_deg: 38.974
+  lon_deg: 1.293
+  height_m: 0
+  depth_fathoms: 6.4
+  bottom: excellent holding ground
+  source: 'Tofiño 1787, ''Puerto de San Antonio'', pp. 168 to 169: in summer good for ships of any number and size, choosing depth and berth as they please, but in winter, for the continual N and NW winds and the sea from that quarter, fit only for small craft, whose holding ground is excellent; the entry has nothing to guard but what is seen: steer for the middle of the mouth, Cape Negrete and Nono in one in 20 brazas, and go in to 6 or 8, letting go where the church bears about ENE; moor NE and SW, the sheet anchor to the SW'
+  says: 'Anchored in Port Magno in seven brazas, the church of St Antonio bearing east-north-east, moored north-east and south-west: a summer road, for the north-westers send in a sea in winter.'
+  fix: FROM MEMORY, the bay's middle west-south-west of the town and church; 7 brazas (6.4 fathoms), the middle of his 6 to 8
+- id: vedra
+  kind: island
+  name: the Bedra
+  modern: Es Vedrà
+  lat_deg: 38.8668
+  lon_deg: 1.2014
+  height_m: 382
+  source: 'Tofiño 1787, ''Isla del Bedrá'', pp. 156 to 157: 3/4 mile long ENE and WSW; its east end so high that it is seen without difficulty 10 to 12 leagues off, and more when not projected on Iviza; its summit parted in two peaks seen apart from N and S; near a mile WSW of Cape Jueu, and half that way the Bedranell, an island of middling height; between them a narrow passage of 20 brazas, better that between the Bedranell and Cape Jueu, of the same depth and three times as wide; Purdy 1826, p. 32'
+  says: 'The Bedra, so high at its east end that it is seen ten or twelve leagues off: the best passage inside it is between the Bedranell and Cape Jueu, twenty brazas.'
+  fix: FROM MEMORY; the height FROM MEMORY (382 m, the modern summit); moved 56 m to the nearest land of the tiles
+- id: mataret
+  kind: rock
+  name: the Mataret
+  modern: the shoal N of Cap Jueu (Eivissa), JUDGEMENT that it is his
+  lat_deg: 38.8794
+  lon_deg: 1.2235
+  height_m: 0
+  extent_m: 50
+  dries_m: -3.3
+  source: 'Tofiño 1787, ''El Mataret, baxo'', p. 170: about half a mile N by W of Cape Jueu, of much care for those passing between the cape and the Bedranell, for having twelve feet of water the sea breaks on it only when it runs high; Purdy 1826, p. 35: ''a shoal of sand, of 11 feet, called the Mataret'''
+  says: 'The Mataret, twelve feet of water half a mile north of Cape Jueu, which breaks only in a high sea: mind it passing inside the Bedranell.'
+  fix: half a mile N by W of Cape Jueu, the cape FROM MEMORY; 12 pies (3.3 m); moved 57 m to the nearest water or drying ground of the tiles (the first placing fell on the land, 8 m)
+- id: cape-falcon-ivica
+  kind: headland
+  name: Cape Falcon
+  modern: Cap des Falcó (Ses Salines d'Eivissa)
+  lat_deg: 38.854
+  lon_deg: 1.387
+  height_m: 140
+  source: 'Tofiño 1787, ''Cabo Falcon'', p. 158: high and cut, sheer only to two-thirds of its height, the rest a point running out lower to a low end; a cable SSW of it two low islets, and one the size of a cask twice as far on its east; between it and Las Portas the great bay of Cueba larga, where the loading-place of the salt pans is that lie north of Cape Falcon, with two cisterns a stone''s throw off (pp. 158 to 159); Purdy 1826, p. 32'
+  says: Cape Falcon, high and sheer, with the salt pans of Iviza and their loading-place in the bay to the east of it.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: portas-tower
+  kind: tower
+  name: the tower of Las Portas
+  modern: Torre de ses Portes (Punta de ses Portes, Eivissa)
+  lat_deg: 38.8121
+  lon_deg: 1.4062
+  height_m: 15
+  source: 'Tofiño 1787, ''Torre y Punta de las Portas'', p. 158: 1 1/2 mile E 1° S of Cape Falcon the tower of las Portas, by the point of that name, which is an islet; the point low, falling from the high ground called the Cuervo Marino, and one of the ends of the Freos between Iviza and Formentera; p. 182: many, wanting knowledge, have taken the tower of the Espalmador for that of las Portas and gone to lose themselves on the Trocados; Purdy 1826, p. 33'
+  says: 'The tower of las Portas, the south point of Iviza and the north side of the Freos: not to be mistaken for the Espalmador''s.'
+  fix: FROM MEMORY; the height JUDGEMENT; moved 75 m to the nearest land of the tiles
+- id: freu-grande
+  kind: bottom
+  name: the Great Freo
+  modern: Freu Gran (between s'Espalmador and Illa des Penjats)
+  lat_deg: 38.802
+  lon_deg: 1.431
+  height_m: 0
+  depth_fathoms: 8.2
+  bottom: rock and stones, the stones of the bottom plainly seen in passing
+  source: 'Tofiño 1787, ''Freo Grande'', p. 180: formed by the south ends of the Isla de los Ahorcados and the great Isla Negra with the land north from the Espalmador tower to the Point and Isle of the Puercos; runs SSE 1/4 S and the contrary a mile, 9 brazas in its middle, shoaling to 6 a cable off Formentera, to 4 a cable off the Ahorcados, and deepening to 13 half a cable off the Isla Negra; the stones of the bottom seen clearly; p. 181: a ship of much burthen from the west must pass the Freo grande, steering for the Espalmador tower and, with it east about 1 1/2 mile, the whole Freo open, keep its middle; Purdy 1826, p. 33 (''the Great Freo'')'
+  says: 'Through the Great Freo in nine brazas, the stones on the bottom plain to be seen: give the south-east point of the Ahorcados a berth, four brazas a cable off it.'
+  fix: FROM MEMORY, the channel's middle; 9 brazas (8.2 fathoms)
+- id: freo-del-medio
+  kind: bottom
+  name: the Middle Freo
+  modern: the channel between Illa des Penjats and Illa Rodona (Freu Petit of the modern chart, JUDGEMENT that it is his)
+  lat_deg: 38.813
+  lon_deg: 1.418
+  height_m: 0
+  depth_fathoms: 3.7
+  bottom: rock (a ledge of 1 1/2 brazas off the east of the Isla Redonda)
+  source: 'Tofiño 1787, ''Freo del medio'', pp. 179 to 180: between the Isla Redonda and the north part of the Ahorcados; for vessels of middling size, for though half a mile wide N 13° W and the contrary it has 4 brazas only in a very short space of its middle, shoaling toward the points; continuing east keep off the east part of the Isla Redonda for a ledge of 1 1/2 brazas, rock, that runs out a cable and a half; the Freo chico, between the islet of Punta de las Portas and the Isla Redonda, passable only by fishing boats for a broken reef across it; p. 182: small craft that have made the Bedra may use it with NW winds'
+  says: 'The Middle Freo, four brazas in a narrow space of its middle: for small craft only, minding the ledge east of the Isla Redonda.'
+  fix: FROM MEMORY, the channel's middle; 4 brazas (3.7 fathoms)
+- id: espalmador-tower
+  kind: tower
+  name: the tower of Espalmador
+  modern: Torre de sa Guardiola (s'Espalmador)
+  lat_deg: 38.7935
+  lon_deg: 1.427
+  height_m: 15
+  source: 'Tofiño 1787, ''Punta del Espalmador'', p. 173: the point of middling height, even, red and sheer, with the tower of that name close by; p. 181: from the west steer for the Espalmador tower and with it east 1 1/2 mile the Freo grande is open; p. 182: many, wanting knowledge, have taken the Espalmador tower for that of las Portas and been lost on the Trocados or near them'
+  says: 'The tower of Espalmador, the mark for the Great Freo: many have taken it for the tower of las Portas and been lost on the Trocados.'
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: trocados
+  kind: shoal
+  name: the Trocados
+  modern: Es Pas (the shallows between s'Espalmador and Formentera)
+  lat_deg: 38.779
+  lon_deg: 1.4325
+  height_m: 0
+  extent_m: 500
+  dries_m: -0.5
+  source: 'Tofiño 1787, ''Trocados'', p. 173: from the Point of the Puercos the coast turns ESE half a mile and then S a long mile, all low and hummocky, to a channel joining the sea of this side with that of the west, passable only by fishing boats and in calm, called the Trocados; p. 182: many have taken the Espalmador tower for that of las Portas and been lost on the Trocados'
+  says: 'The Trocados, a channel south of Espalmador passable only by fishing boats in a calm: here strangers who took the Espalmador tower for las Portas have been lost.'
+  fix: 'FROM MEMORY, the passage between s''Espalmador and Formentera''s north end; the depth unstated: half a metre, JUDGEMENT; moved 40 m to the nearest water or drying ground of the tiles (the first placing fell on the land, 3 m)'
+- id: espardell
+  kind: island
+  name: the Espardel
+  modern: Illa de s'Espardell
+  lat_deg: 38.7966
+  lon_deg: 1.477
+  height_m: 29
+  source: 'Tofiño 1787, ''Isla Espardell'', p. 173: its north end N 67° E of the Espalmador point 2 long miles; its centre from the castle of Iviza S 16° E; of middling height, even, its SE end parted by a short reef, a small islet against its north; p. 174: on its west side a fine anchorage of 11 brazas called the Estancia, fit for all weathers, the best berth with the Point of the Mola of Formentera open south of the Espardel and Tagomago open north of it; Purdy 1826, p. 35'
+  says: The Espardel, a low even island east of the Freos, with the Estancia on its west side, eleven brazas, good in all weathers.
+  fix: FROM MEMORY; the height FROM MEMORY; moved 414 m to the nearest land of the tiles
+- id: espardell-shoal
+  kind: rock
+  name: the shoal between the Espardel and Espalmador
+  modern: Bajo de s'Espardell (the rock W of s'Espardell)
+  lat_deg: 38.7951
+  lon_deg: 1.4546
+  height_m: 0
+  extent_m: 150
+  dries_m: -5.9
+  source: 'Tofiño 1787, p. 174: a mile W of the middle of the Espardel and scant half a mile from the east coast of the Espalmador a shoal of 3 1/2 brazas, rock, to be minded by any vessel of size, of some extent and steep-to, 11 brazas close to it toward the Espardel and 9 toward the coast; about SE 1/4 S of the tower of las Portas and ENE of that of the Espalmador (bearings taken from the boat and uncertain); the fishermen''s marks: the Bedra seen through the gap between the Isle and the Point of the Puercos, and the church of Formentera a little open west of a hillock south of the Trocados; Purdy 1826, p. 36 (''a rocky shoal of three fathoms'')'
+  says: 'A shoal of three brazas and a half, rock, a mile west of the Espardel: the Bedra in the gap of the Puercos and Formentera church just open of the hillock south of the Trocados.'
+  fix: a mile W of the Espardel's middle, by Tofiño's words; 3 1/2 brazas (5.9 m); moved 395 m to the shoalest head of the tiles within 400 m (-31.9 m against the datum)
+- id: mola-formentera
+  kind: headland
+  name: the Mola of Formentera
+  modern: La Mola (Formentera)
+  lat_deg: 38.664
+  lon_deg: 1.583
+  height_m: 192
+  source: 'Tofiño 1787, ''Derrotero de la isla Formentera'', p. 175: from the north point of the Mola the height runs east half a mile, SE 3/4 mile, a mile and a half S to the easternmost-southern part, and two miles W; for the east of the isthmus, the lowest of the island, is the highest of it, to which they give the name of the Mola, all of it sheer, and showing the same figure from wherever it is seen from seaward; Purdy 1826, p. 36'
+  says: The Mola of Formentera, high and sheer all round, the same figure from every side.
+  fix: FROM MEMORY, the east end of the plateau; the height FROM MEMORY (the summit, 192 m)
+- id: cape-berberia
+  kind: headland
+  name: Cape Berberia
+  modern: Cap de Barbaria (Formentera)
+  lat_deg: 38.64
+  lon_deg: 1.389
+  height_m: 75
+  source: 'Tofiño 1787, ''Cabo Berbería'', p. 177: from the tower of the Garovaret NNW 1/4 mile to Cape Berbería, as high and sheer as the rest of the coast, to which, from the Punta de la Anguila, seamen generally give the name of Cape Berbería; Purdy 1826, p. 36'
+  says: Cape Berberia, the high sheer south-west end of Formentera.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: dragonera
+  kind: island
+  name: the Isle Dragonera
+  modern: Sa Dragonera
+  lat_deg: 39.585
+  lon_deg: 2.32
+  height_m: 352
+  source: 'Tofiño 1787, ''Isla Dragonera'', pp. 190 to 191: its SW point N 48° 30'' W 3 long miles from the Mola of Andrache; high enough, lying NE and SW two scant miles; on its summit a tower and another lower; its north side sheer to the sea and from it to the south it falls gently to the sea; between it and Mallorca a freo 2/3 mile wide with two islands and some rocks, the larger San Telmo; pass it with a steady wind, for the high lands give calms, shifting winds and irregular currents; Purdy 1826, p. 38'
+  says: The Dragonera, high and sheer on its north side with a tower on its summit; the freo inside it two-thirds of a mile wide, to be passed with a steady wind.
+  fix: FROM MEMORY, the island's middle; the height FROM MEMORY (the summit, Na Pòpia)
+- id: andratx-harbour
+  kind: anchorage
+  name: the haven of Andrache
+  modern: Port d'Andratx
+  lat_deg: 39.544
+  lon_deg: 2.383
+  height_m: 0
+  depth_fathoms: 4.6
+  bottom: unstated
+  source: 'Tofiño 1787, ''Puerto de Andrache'', p. 190: coasting the Mola of Andrache on its north side the port, its mouth about 3 cables wide with 7 brazas, roomy but inconvenient for large ships, for the depth falls quickly to 5, 3 and 2 1/2; it may shelter two or three of middling size and many small; open to W and SW, which send in much sea, when lie as close to the north shore as may be with a cable ashore; Purdy 1826, p. 38'
+  says: 'The haven of Andrache, seven brazas at its mouth shoaling fast within: room for two or three vessels of middling size, close under the north shore with a cable ashore in a westerly.'
+  fix: FROM MEMORY, within the mouth; 5 brazas (4.6 fathoms)
+- id: cala-figuera-tower
+  kind: tower
+  name: the tower of Cape Cala Figuera
+  modern: Torre de Cala Figuera (Calvià; the light of Cap de Cala Figuera beside it is later)
+  lat_deg: 39.456
+  lon_deg: 2.524
+  height_m: 50
+  source: 'Tofiño 1787, ''Cabo de Cala Figuera'', pp. 187 to 188: much lower than Cape Blanco, but clean and to be approached as close as one wishes; on the highest part of the cape a tower in which after nightfall they make signals with fires of the vessels left in sight; Purdy 1826, p. 37'
+  says: The tower of Cape Cala Figuera, the west point of Palma bay, which makes fire signals by night of the vessels in sight.
+  fix: 'FROM MEMORY; the height JUDGEMENT; not a light: its fires are signals'
+- id: porto-pi-light
+  kind: light
+  name: the lighthouse of Porto Pi
+  modern: Faro de Portopí (Palma)
+  lat_deg: 39.5545
+  lon_deg: 2.6235
+  height_m: 35
+  lit:
+    from: 1369
+    until: null
+    range_nm: 6
+    character: a lantern lit every night at the Ánimas; range JUDGEMENT; ill served in 1787
+  source: 'Tofiño 1787, ''Puerto Pi'', p. 185: for knowledge of Porto Pi note on its SW point the Linterna, lit every night at the hour of the Ánimas, and on the NE point another square tower of nearly the same make, called that of the Pelayres; Vargas Ponce 1787, ''Descripción de la isla de Mallorca'', p. 36: opposite the battery the ancient Faro that watches for vessels and with its lantern must warn them by night of the coast; by a privilege of Don Pedro given at Valencia, 2 December 1369, the lights had the oil samples entering the city, above 4000 pounds a year; now given to a contractor for the winter months only, it is very ill served; Purdy 1826, p. 37: ''the lighthouse, which is lighted every evening'''
+  says: The light of Porto Pi on the south-west point of the cove, lit every night at nightfall.
+  fix: FROM MEMORY, the tower on the cove's SW point; 'from' the privilege's year (the lights at least as old); the height and the range JUDGEMENT (an oil lantern on a tower on a low point)
+- id: porto-pi
+  kind: anchorage
+  name: Port Pi
+  modern: Portopí (Palma)
+  lat_deg: 39.5539
+  lon_deg: 2.6303
+  height_m: 0
+  depth_fathoms: 3.0
+  bottom: good ground
+  source: 'Tofiño 1787, ''Puerto Pi'', p. 185: abreast of the castle of San Carlos the cove of Porto Pi is seen, where with a frigate or less one may anchor in the middle of its mouth, the stream anchor out to the ESE, and lie between the points that form the little port, moored four ways to the rocks of both shores, the hull over 18 or 20 feet, good bottom, sheltered especially from the seas; Vargas Ponce 1787, p. 35: a cove wholly defended from the winds where the sea never comes, holding frigates of the largest size but few; Purdy 1826, p. 37'
+  says: Moored four ways in Port Pi between the two towers, over eighteen feet of water, sheltered from the seas.
+  fix: 'FROM MEMORY, the cove''s mouth; 18 to 20 pies (5.0 to 5.6 m) under the hull: 3.0 fathoms; moved 369 m to the nearest water of the tiles holding half the pilot''s depth (2.7 m)'
+- id: bellver-castle
+  kind: castle
+  name: the castle of Belver
+  modern: Castell de Bellver (Palma)
+  lat_deg: 39.564
+  lon_deg: 2.6198
+  height_m: 112
+  source: 'Tofiño 1787, ''Castillo de Belver'', p. 185: of ancient build with round towers, on the summit of a little hill covered with pines, pleasant to see, about a mile from the sea; the Lazareto in one with it N 69° W gives the anchorage; Purdy 1826, p. 37'
+  says: 'The castle of Belver, round-towered on its pine hill a mile from the sea: the Lazaretto in one with it gives the anchorage of Palma.'
+  fix: FROM MEMORY; the height FROM MEMORY (the hill's summit)
+- id: palma-cathedral
+  kind: church
+  name: the cathedral of Palma
+  modern: La Seu, Catedral de Mallorca
+  lat_deg: 39.5675
+  lon_deg: 2.6483
+  height_m: 60
+  source: 'Tofiño 1787, p. 185: in the men-of-war''s anchorage the Cathedral bears NE 3/4 E; p. 187: the mark for the rocky ground off Capes Regana and Enderrocat is the Cathedral in one with the Collado de Soller, the greatest gap in the range; Purdy 1826, p. 37'
+  says: The cathedral of Palma, bearing north-east three-quarters east from the anchorage before the Lazaretto.
+  fix: FROM MEMORY; the height JUDGEMENT (the building on its rise by the shore)
+- id: palma-road
+  kind: anchorage
+  name: the road of Palma, before the Lazaretto
+  modern: the bay off Palma's western harbour (now within the port)
+  lat_deg: 39.5572
+  lon_deg: 2.6358
+  height_m: 0
+  depth_fathoms: 7.3
+  bottom: sand, good holding; the bay all sand but by Capes Regana and Enderrocat, which is rock
+  source: 'Tofiño 1787, ''Fondeadero para Navios'', p. 185: if not entering Porto Pi go on toward the city till abreast of the Lazareto, where every class may anchor in 10, 8 and 6 1/2 brazas, the least for ships of the line, the Cathedral NE 3/4 E and the Lazareto in one with the castle of Belver N 69° W; from there toward the Lazareto the ordinary berth of frigates, xebecs and smaller, the ground shoaling evenly to 4 1/2 brazas a cable off, all good holding; p. 186: moor NW and SE, for the SW sends in much sea and reigns much in winter, the S also; p. 187: the whole bay 30, 25, 20 brazas sand; Purdy 1826, p. 37 (''in 9, 7, and 6, fathoms, the shallowest water that will suit ships of war'')'
+  says: Anchored in Palma road before the Lazaretto in eight brazas, the cathedral north-east three-quarters east and the Lazaretto in one with Belver; moored north-west and south-east.
+  fix: the meeting of Tofiño's two bearings, from the modern positions of the cathedral and of Belver (computed, flat-earth); 8 brazas (7.3 fathoms), the middle of his three; the shore here is the modern port's, to be checked; moved 251 m to the nearest water of the tiles holding half the pilot's depth (6.7 m)
+- id: cuervo-marino-shoal
+  kind: rock
+  name: the shoal of the Cuervo Marino
+  modern: the shoal off the old shipyard between Portopí and Palma (now within the port works)
+  lat_deg: 39.5583
+  lon_deg: 2.6303
+  height_m: 0
+  extent_m: 100
+  dries_m: -4.2
+  source: 'Tofiño 1787, ''Baxo del Cuervo Marino'', p. 186: between Porto Pi and the Lazareto a cove called the old Astillero; the westernmost little house of its walls in one with the castle of Belber NW 1/4 N, and on that line, SE 1/4 S a cable from the shore, runs out the shoal of the Cuervo Marino, with only 2 1/2 brazas on its outer edge and less toward the land; the only hidden danger hereabout'
+  says: 'The shoal of the Cuervo Marino, a cable off the old shipyard, two and a half brazas on its outer edge: the only hidden danger of Palma road.'
+  fix: a cable off the shore between Porto Pi and the city, on the line from Belver SE 1/4 S, JUDGEMENT; 2 1/2 brazas (4.2 m) its outer edge, shoaler within (the head's depth unstated); moved 212 m to the shoalest head of the tiles within 400 m (+1.9 m against the datum)
+- id: palma-mole
+  kind: place
+  name: the mole of Palma
+  modern: Moll Vell (Palma)
+  lat_deg: 39.5655
+  lon_deg: 2.6435
+  height_m: 3
+  source: 'Tofiño 1787, ''Muelle'', p. 186: a small vessel may go to the city''s Mole; keep on for the city till it is seen and, leaving it to starboard, anchor within it, knowing that at its point there are only 3 brazas, which shoals much going in; Purdy 1826, p. 37 (''2 1/2 fathoms'' at the point)'
+  says: The mole of Palma, for small craft only, three brazas at its head and shoaling within.
+  fix: FROM MEMORY, the old mole's head
+- id: cape-blanco-majorca
+  kind: headland
+  name: Cape Blanco
+  modern: Cap Blanc (Llucmajor)
+  lat_deg: 39.364
+  lon_deg: 2.787
+  height_m: 90
+  source: 'Tofiño 1787, ''Cabo Blanco'', p. 187: of middling height, sheer, white, with a tower on it; deep-to, and the coast that follows may be approached everywhere without fear; Purdy 1826, p. 38'
+  says: Cape Blanco, white and sheer with a tower on it, the east point of Palma bay, deep close to.
+  fix: FROM MEMORY; the height FROM MEMORY
+- id: puig-major
+  kind: hill
+  name: the Puig Mayor
+  modern: Puig Major de Son Torrella
+  lat_deg: 39.807
+  lon_deg: 2.793
+  height_m: 1445
+  source: 'Tofiño 1787, p. 183: of the mountains of the north the highest of the island are those called the Sella de Torrellas and the Puig Mayor; Purdy 1826, p. 37: ''the highest mountains are, however, those on the north side, called the Silla de (Saddle of) Torrellas and the Puig Mayor, or Great Peak'''
+  says: The Puig Mayor, the highest of the mountains of Majorca.
+  fix: FROM MEMORY; the height FROM MEMORY (1445 m)
+- id: cape-salinas
+  kind: headland
+  name: Cape Salinas
+  modern: Cap de ses Salines
+  lat_deg: 39.265
+  lon_deg: 3.054
+  height_m: 15
+  source: 'Tofiño 1787, ''Cabo Salinas'', p. 205: the southernmost of the island; low, much wooded, with a tower on it called Negosta, from which the land falls to a point at the cape itself; from it a shoal runs only half a cable, but at three cables there are 10 brazas; p. 208: the freo between Mallorca and Cabrera, from the Furadade to the cape 5 1/2 miles NE 3° N, 20 and 25 brazas in its middle shoaling to 10 at 3 cables from each side; strong currents, commonly with the wind'
+  says: 'Cape Salinas, low and wooded with the tower of Negosta: a shoal runs half a cable off it, and ten brazas three cables out.'
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: cabrera-harbour
+  kind: anchorage
+  name: the haven of Cabrera
+  modern: Port de Cabrera
+  lat_deg: 39.148
+  lon_deg: 2.932
+  height_m: 0
+  depth_fathoms: 8.2
+  bottom: clean ground
+  source: 'Tofiño 1787, ''Puerto de Cabrera'', pp. 208 to 209: a little SSE of Cape Leveche, which has a cave at the start of the port called the Bishop''s; leaving it to starboard the Punta de la Creveta is seen to port, and within it a little castle on a hill; the mouth a cable wide, 20 to 25 brazas, clean; past the Creveta and the Castellar the fishers'' huts on the beach, off which anchor in 8 or 10 brazas; moor with a cable ashore on the east side or lie on two anchors; open to the N, but the mouth shut in; with a hard NW, whirling squalls off the mountains capable of dismasting any vessel; Purdy 1826, pp. 41 to 42 (''from 9 to 7 fathoms'')'
+  says: 'Anchored in the haven of Cabrera before the fishers'' huts in nine brazas, under the little castle: beware the squalls off the hills in a north-wester.'
+  fix: FROM MEMORY, the harbour's middle before the beach; 9 brazas (8.2 fathoms)
+- id: porto-petro
+  kind: anchorage
+  name: Port Petro
+  modern: Portopetro (Santanyí); Tofiño's 'Puerto Pera'
+  lat_deg: 39.358
+  lon_deg: 3.2129
+  height_m: 0
+  depth_fathoms: 5.0
+  bottom: unstated
+  source: 'Tofiño 1787, ''Puerto Pera'', pp. 204 to 205: a mile and a half SW of Cala Longa, its mouth to the S less than a cable wide, its points clean with 6 brazas close; for a large vessel anchor before the cave on the east shore called Cova Figuera in 5 or 6 brazas, a small one off the cave and no further, for the bottom falls suddenly from 3 brazas to 1; a frigate or xebec moors two ways, a cable to the west shore and anchor to the east; one or two only; known by a square high little castle like a tower on the SW shore within the points, the only one of its make on the coast; dangerous in a gale for its narrow mouth and the backwash; the SE and S the worst winds'
+  says: 'Port Petro, its narrow mouth known by the square tower within the points: room for one or two frigates moored before the Cova Figuera in five or six brazas.'
+  fix: FROM MEMORY, within the mouth short of the cave; 5 1/2 brazas (5.0 fathoms); moved 75 m to the nearest water of the tiles holding half the pilot's depth (4.6 m)
+- id: porto-colom
+  kind: anchorage
+  name: Port Colon
+  modern: Portocolom (Felanitx)
+  lat_deg: 39.4148
+  lon_deg: 3.269
+  height_m: 0
+  depth_fathoms: 2.0
+  bottom: unstated
+  source: 'Tofiño 1787, ''Puerto de Colon'', p. 203: its mouth 70 brazas wide with depth enough, but a cable and a half within it shoals suddenly, so that every vessel drawing 10 to 12 feet must anchor where the SW, S and SE send in much sea; one drawing less may go further west into a deep bay of no more than 9 feet, sheltered from all wind and sea; on the NE point a tower, the only one hereabout, the mark to know it; that point steep-to, 10 brazas close'
+  says: 'Port Colon, known by the tower on its north-east point: fit only for vessels drawing under twelve feet.'
+  fix: FROM MEMORY, a cable and a half within the mouth; the depth there unstated, 2 fathoms JUDGEMENT from his draughts (10 to 12 feet); moved 25 m to the nearest water of the tiles holding half the pilot's depth (1.8 m)
+- id: cape-pera
+  kind: headland
+  name: Cape Pera
+  modern: Cap de Capdepera
+  lat_deg: 39.7168
+  lon_deg: 3.4734
+  height_m: 70
+  source: 'Tofiño 1787, ''Cabo de Pera'', p. 201: two miles SE 1/4 E of the Cabo del Freu; whitish, standing well out, of middling height, flat on its summit where there is a tower, sheer, higher at its end than at its root, so that seen from 6 to 8 leagues to the S it looks an island'
+  says: Cape Pera, the east point of Majorca, flat-topped with a tower, looking an island from six or eight leagues to the south.
+  fix: 'FROM MEMORY; the height JUDGEMENT; moved 933 m to the nearest land of the tiles (beyond the rule''s 800 m: the first placing, from memory, fell in the water)'
+- id: cape-formentor
+  kind: headland
+  name: Cape Formenton
+  modern: Cap de Formentor
+  lat_deg: 39.962
+  lon_deg: 3.213
+  height_m: 190
+  source: 'Tofiño 1787, ''Cabo Formenton'', p. 194: ENE two long miles from Cape Cataluña, the northernmost of the island, standing well out, of middling height, sheer; seen from 8 to 10 leagues the unevenness of its land looks like islands; pp. 194 to 195: between the two capes a mountain pierced through at two-thirds of its height so that the light is seen, called the Nefuradade; p. 195: all the north coast to Formenton very high, sheer and clean, but much to be feared in N and NW winds for the sea and the calms under the high land; Purdy 1826, p. 39'
+  says: 'Cape Formenton, the north point of Majorca, which shows like islands from eight or ten leagues: keep well off this coast in a north-wester.'
+  fix: FROM MEMORY; the height FROM MEMORY (the cape's summit by the modern light)
+- id: pollensa-road
+  kind: anchorage
+  name: the road of Pollenza
+  modern: Badia de Pollença, off Punta de l'Avançada
+  lat_deg: 39.8975
+  lon_deg: 3.104
+  height_m: 0
+  depth_fathoms: 6.4
+  bottom: sand; loose stones and nacres (great mussels that cut cables) about the 4 brazas
+  source: 'Tofiño 1787, ''Bahía de Pollenza'', pp. 196 to 197: good for every class, but if many ships of the line most lie open to the ENE; entering, a point of middling height with a battery to the SW, and on an eminence behind it the castle of Pollenza; 4 brazas close to the point, 7 to 9 a little off; ships of the line anchor about 2 cables W of the point in 6 or 8 brazas sand, a frigate in 4 or 5; about the 4 brazas loose stones and nacres, great mussels that cut cables, so buoy them; the SW blows hard and raises a short sea that keeps the boats from laying out anchors: moor NW and SE; with fresh NW and N winds beware the violent gusts off the mountains, capable of dismasting or oversetting; Purdy 1826, p. 39'
+  says: Anchored in Pollenza road two cables west of the castle point in seven brazas, sand, cables buoyed against the nacres; moored north-west and south-east.
+  fix: FROM MEMORY, 2 cables W of the point; 7 brazas (6.4 fathoms)
+- id: alcudia-road
+  kind: anchorage
+  name: the road of Alcudia
+  modern: Badia d'Alcúdia, between Illa d'Alcanada and Port d'Alcúdia
+  lat_deg: 39.833
+  lon_deg: 3.16
+  height_m: 0
+  depth_fathoms: 6.4
+  bottom: fine gravel (cascajillo), with patches of weed off the tower
+  source: 'Tofiño 1787, ''Bahía de Alcudia'', ''Su Fondeadero'', pp. 198 to 199: with a ship of the line, the Isla Alcaná, the Torre Mayor and its point known, anchor midway between this and that, 3 to 4 cables from the land, in 6 or 8 brazas cascajillo; a frigate abreast of the tower, or N and S with it, in 5 or 6 brazas of the same with patches of weed, mooring NW and SE; small craft between the tower and a little house with its mole on the beach in 2 or 3 brazas, a little further in the bottom failing suddenly to a braza and to a palm; better than Pollenza, its ground cleaner and less gusty, though open to the NE and E; p. 198: the Torre Mayor has artillery, on a little hill; Purdy 1826, p. 40 (''in from 7 to 5 1/2 fathoms, fine gravel'')'
+  says: Anchored in Alcudia road midway between the Alcana and the Great Tower, three cables off, in seven brazas fine gravel; moored north-west and south-east.
+  fix: FROM MEMORY, midway between Illa d'Alcanada and Port d'Alcúdia (the Torre Mayor's point, JUDGEMENT that it stood there) 3 to 4 cables off; 7 brazas (6.4 fathoms)
+- id: alcanada-shoal
+  kind: shoal
+  name: the shoal off the islet Alcana
+  modern: the shoal S and E of Illa d'Alcanada
+  lat_deg: 39.8368
+  lon_deg: 3.1737
+  height_m: 0
+  extent_m: 280
+  dries_m: -5.0
+  source: 'Tofiño 1787, ''Isla Alcaná'', p. 198: half a mile S 43° W of Punta de Torrents, low, near the coast and without passage inside; on its S and E, a cable and a half off, it throws out a flat of sand and stone with little water, only 3 brazas at its end, so do not close it within two cables; Purdy 1826, p. 40 (''2 3/4 fathoms'' on its outer edge)'
+  says: 'The islet Alcana with its shoal of sand and stone a cable and a half to the south and east: do not close it within two cables.'
+  fix: a cable and a half S and E of the islet, FROM MEMORY; 3 brazas (5.0 m) at its end, shoaler within; moved 202 m to the shoalest head of the tiles within 400 m (+2.0 m against the datum)
+- id: mount-toro
+  kind: hill
+  name: Mount Toro
+  modern: El Toro (Es Mercadal)
+  lat_deg: 39.9845
+  lon_deg: 4.1128
+  height_m: 358
+  source: 'Tofiño 1787, p. 211: the island of middling height, even, with only one notable height in its middle, the Montaña del Toro, with a convent of the Virgin on it; p. 225: anchoring on the south coast, the summit of the Toro must be seen clear over the coast''s land, for if hidden the bottom is rock, and so if much shown; Vargas Ponce 1787, p. 122: the mountain the figure of a sugar-loaf, its vast pyramid on a base of many miles; Purdy 1826, p. 42 and p. 44 (''a large hill, near the middle of the island''); Purdy 1826, ''Port Mahon'', p. 44, a British officer''s directions: by bringing Mount Toro to bear N.N.W. 1/2 W. (magnetic) and steering for it, it will lead to the entrance, into which do not attempt to sail without a fair wind; tolerable anchorage in moderate weather with off-shore winds in 17 fathoms fine sand, Mount Toro on the middle of the entrance and Cape Mola N.E. 3/4 E., where ships may lie to wait to go in (the true bearings in Purdy''s brackets illegible in the OCR)'
+  says: 'Mount Toro, the sugar-loaf in the middle of Minorca with the convent on its summit: the great mark of the island; mount Toro bearing north-north-west half west leads into Port Mahon: do not go in without a fair wind.'
+  fix: FROM MEMORY; the height FROM MEMORY (358 m)
+- id: golden-farm
+  kind: mark
+  name: the Golden Farm, or San Antonio
+  modern: Sant Antoni (the Golden Farm), the north shore of Port de Maó
+  lat_deg: 39.8935
+  lon_deg: 4.2735
+  height_m: 40
+  source: 'Purdy 1826, ''Port Mahon'', p. 44, a British officer''s directions: the mark for sailing into or out of Mahon harbour is a large farm-house with a walled garden round it, called San Antonio, or the Golden Farm, just open of the Lazaretto Point, below Quarantine Island, on the N.E. side, bearing N. by W. 1/2 W. (magnetic): it will carry you clear of the rocks that lie off the points of the entrance in 8, 9 or 10 fathoms'
+  says: The Golden Farm, the great farm-house with its walled garden on the north shore of Mahon harbour, the leading mark in.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: mahon-leading-mark
+  kind: transit
+  name: the Golden Farm just open of the Lazaretto Point
+  modern: the leading line through the mouth of Port de Maó
+  lat_deg: 39.865
+  lon_deg: 4.306
+  marks:
+  - mahon-lazaretto
+  - golden-farm
+  bearing_deg: 320
+  source: 'Purdy 1826, ''Port Mahon'', p. 44, a British officer''s directions: the Golden Farm just open of the Lazaretto Point, N. by W. 1/2 W. (magnetic), carries a ship clear of the rocks off the points of the entrance in 8, 9 or 10 fathoms; in a fair-way from off Cape Mola 17 to 14, 12, 9, 8 fathoms; within the north point keep near the middle for the shelving rocks on each side close to the shore'
+  says: Steering in for Mahon with the Golden Farm just open of the Lazaretto point, in nine fathoms, clear of the rocks off the points.
+  fix: 'the position the mouth''s middle, FROM MEMORY; the bearing the officer''s N. by W. 1/2 W. magnetic less Purdy''s variation of 1812, 19° 36'' W (p. 43), 324°, and the line from the mouth to the farm by the modern positions, 319°: 320°, JUDGEMENT (Purdy''s own bracket illegible in the OCR)'
+- id: mahon-outer-road
+  kind: anchorage
+  name: the anchorage off the mouth of Port Mahon
+  modern: the approach to Port de Maó, off Cap de la Mola
+  lat_deg: 39.86
+  lon_deg: 4.317
+  height_m: 0
+  depth_fathoms: 22.9
+  bottom: good quality (Tofiño); fine sand in 17 fathoms (the officer's, Purdy)
+  source: 'Tofiño 1787, p. 213: when the wind is so scant and fresh that it will not let a ship enter within the ledges, she may anchor between them, or further out in 20, 25 or 30 brazas, the bottom of good quality; only that outside the ledges there is much sea with the wind fresh at N; Purdy 1826, p. 43 (Tofiño''s, ''18, 23, or 27 fathoms''), and p. 44 (the officer''s berth in 17 fathoms fine sand, Mount Toro on the middle of the entrance, Cape Mola N.E. 3/4 E. magnetic)'
+  says: 'Anchored off the mouth of Port Mahon in twenty-five brazas, good ground, to wait a leading wind: a great swell here when it blows from the north.'
+  fix: FROM MEMORY, a few cables S of Cape Mola; 25 brazas (22.9 fathoms), the middle of Tofiño's three
+- id: cape-mola-mahon
+  kind: headland
+  name: Cape Mola
+  modern: La Mola de Maó (the peninsula's south point at the harbour's mouth)
+  lat_deg: 39.877
+  lon_deg: 4.3215
+  height_m: 70
+  source: 'Tofiño 1787, ''Cabo de la Mola'', p. 213: the NE part of the harbour''s mouth, of middling height, sheer, with three stones a little off its foot, which are clean and steep-to; on it a tower that signals the vessels in sight on this side of the island, its signals seen from the city in another tower that repeats them, opposite, above the Arsenal; Purdy 1826, pp. 43 to 44 (''distinguished by a signal-tower''; by Smyth, 1812, 39° 52'' 45" N)'
+  says: Cape Mola, the north side of the mouth of Port Mahon, sheer, with its signal tower and three steep-to rocks at its foot.
+  fix: FROM MEMORY, the point at the mouth's north side (the plateau's summit is higher); the height FROM MEMORY; placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals)
+- id: mola-ledge
+  kind: ledge
+  name: the ledge off Mola Point
+  modern: the ledge S of the point of La Mola at the mouth of Port de Maó
+  lat_deg: 39.875
+  lon_deg: 4.3125
+  height_m: 0
+  extent_m: 60
+  dries_m: -1.0
+  source: 'Tofiño 1787, pp. 212 to 213: entering with scant winds, from the NE round by the NW to the SW, mind a ledge that runs S from the point of the Mola nearest the mouth a third of a cable, at which distance there are already 4 brazas, increasing quickly further off; with little sea these three ledges break from their root to their middle, with much sea all over, so that the whole mouth looks one shoal if the points are seen in one; Purdy 1826, p. 43 (''one-third of a cable, where the depth is 3 fathoms''); Grasset 1807, p. 124'
+  says: Mind the ledge off the Mola point, a third of a cable to the south, which breaks in a little sea.
+  fix: 'a third of a cable S of the point, FROM MEMORY; the head''s depth unstated (it breaks at its root in a little sea): 1 m, JUDGEMENT; 4 brazas at its end; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals)'
+- id: philipet-point
+  kind: tower
+  name: Point Philipet and its tower
+  modern: Punta de Sant Felipet, the north side of the mouth of Port de Maó (the tower of Felipet)
+  lat_deg: 39.876
+  lon_deg: 4.306
+  height_m: 15
+  source: 'Tofiño 1787, pp. 211 to 212: to enter with a fair wind steer by the middle of the mouth till past the Punta de Filipet, leaving it to starboard and to port the point where the famous castle of San Felipe stood; Grasset 1807, p. 166: a tower built on the right bank of the port called Phillipet, with a turning gun of great calibre on its top and below a battery at the water''s edge of 4 or 5 pieces, whose fire crosses with the batteries of Saint-Philippe; p. 167, the same; Purdy 1826, p. 43'
+  says: Point Philipet with its tower and water battery, left to starboard going into Mahon.
+  fix: FROM MEMORY, the point on the mouth's north side within Cape Mola; the height JUDGEMENT; placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals)
+- id: philipet-ledge
+  kind: ledge
+  name: the reef off Point Philipet
+  modern: the ledge SE of Punta de Sant Felipet
+  lat_deg: 39.8748
+  lon_deg: 4.3068
+  height_m: 0
+  extent_m: 100
+  dries_m: -1.0
+  source: 'Tofiño 1787, pp. 212 to 213: another ledge runs a little more than half a cable SE of the Punta de Filipet, at which distance there are 4 to 5 brazas; it breaks from its root to its middle in a little sea and all over in much; Purdy 1826, p. 43 (''more than half a cable to the South, where the depth is 3 fathoms'')'
+  says: The reef off Point Philipet, half a cable to the south-east, which breaks in a little sea.
+  fix: 'half a cable SE of the point, FROM MEMORY; the head unstated (it breaks at its root): 1 m, JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals)'
+- id: st-philip-castle
+  kind: castle
+  name: the ruins of the castle of St Philip
+  modern: Castell de Sant Felip (ruins), the south side of the mouth of Port de Maó
+  lat_deg: 39.8685
+  lon_deg: 4.304
+  height_m: 20
+  source: 'Tofiño 1787, p. 212: to port the point where the famous castle of San Felipe stood, among whose ruins some low batteries are still kept; Grasset 1807, pp. 166 to 167: of the old fort''s buildings only some small storehouses in ill state remain, serving as guardhouses; the plan of the court of Spain to leave only batteries to defend the entrance, of 25 pieces of 18 and 24, crossing their fire with the tower and battery of Phillipet; a fine barracks, empty, near the cove of Saint-Etienne; Purdy 1826, p. 43'
+  says: The ruins of St Philip's castle on the south point of the mouth of Mahon, low batteries still among them.
+  fix: FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals)
+- id: st-philip-ledge
+  kind: ledge
+  name: the reef off St Philip's Point
+  modern: the ledge ENE of the point of Sant Felip
+  lat_deg: 39.8697
+  lon_deg: 4.3062
+  height_m: 0
+  extent_m: 100
+  dries_m: -1.0
+  source: 'Tofiño 1787, p. 213: and another that runs from the point of the castle of San Felipe to the ENE as far as the last (a little more than half a cable); it breaks from its root to its middle in a little sea; Purdy 1826, p. 43 (''another reef extends half a cable out to the eastward'')'
+  says: The reef off St Philip's point, half a cable to the east-north-east, which breaks in a little sea.
+  fix: 'half a cable ENE of the point, FROM MEMORY; the head unstated: 1 m, JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals)'
+- id: es-redo-ledge
+  kind: ledge
+  name: the shelf of Es Redo
+  modern: the ledge under the batteries of Sant Felip, within the mouth (Es Redó)
+  lat_deg: 39.8712
+  lon_deg: 4.3022
+  height_m: 0
+  extent_m: 60
+  dries_m: -2.0
+  source: 'Tofiño 1787, p. 213: close to and a little within the middle of the site of the castle of San Felipe, a place called Es Redó, another ledge runs from the land about a third of a cable; it breaks only in a gale from the N or NE, and so is dangerous entering with the wind at SW, when one must hug the wind; Purdy 1826, p. 43 (''nearly opposite to Philipet Point ... nearly one-third of a cable from the shore'')'
+  says: 'The shelf of Es Redo under St Philip''s batteries, a third of a cable off, which breaks only in a northerly gale: mind it beating in with the wind south-west.'
+  fix: 'a third of a cable off the south shore opposite Philipet, FROM MEMORY; its depth unstated (it breaks only in a gale): 2 m, JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals)'
+- id: mahon-lazaretto
+  kind: rock
+  name: the Lazaretto
+  modern: Illa del Llatzeret (then joined to the north shore by a sand neck; the canal of 1900 is later)
+  lat_deg: 39.8752
+  lon_deg: 4.3055
+  height_m: 15
+  extent_m: 100
+  source: 'Tofiño 1787, p. 212: past the points one may close either shore, 5 brazas close to, 12 and 18 in the middle, but the south shore is preferred, passing between it and the island where the Lazareto is; Vargas Ponce 1787, p. 116: below where the castle of San Felipe was, and nearer the coast of Cape Mola, an islet they call of the quarantine or Lazareto, with storehouses fit to keep goods from a suspect place; Grasset 1807, pp. 159 to 160: the lazaret holds the third islet, joined to the land of Minorca by a little tongue of sand almost always covered by the waves, for passengers and goods from places suspected of plague; begun some twenty years ago on a vast plan, in 1804 only a quarter built, yet its storehouses could already take much goods; the English lodged some 3000 men in it for their last Egyptian expedition (1800, the year FROM MEMORY)'
+  says: The Lazaretto on its islet under the north shore within the mouth, its great buildings a quarter finished.
+  fix: 'FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the Lazaretto''s island against the north shore, joined to it by a neck of sand (Grasset 1807); a rock of its height with extent 100 m, the grid lacking it, and Tofiño''s passage between it and the south shore left open'
+- id: quarantine-island
+  kind: rock
+  name: Quarantine Island
+  modern: Illa Plana or Illa de la Quarentena (Port de Maó)
+  lat_deg: 39.8778
+  lon_deg: 4.3025
+  height_m: 5
+  extent_m: 50
+  source: 'Grasset 1807, p. 159: on the second islet the quarantine is built, a building of little size in two storeys, the first of storehouses shut with wooden grilles to air the goods, the second of rooms for passengers; it takes few goods and few persons, and only those with a clean bill; the vessels in quarantine anchor near the islet; Purdy 1826, p. 44, the officer''s: you pass Quarantine Island, the first, on your starboard side (Purdy''s translation of Tofiño, p. 43, puts ''Quarantine Island'' for Tofiño''s island of the Lazareto)'
+  says: Quarantine Island, the little flat islet with its quarantine house, near which vessels with a clean bill ride out their quarantine.
+  fix: 'FROM MEMORY; the identification of Grasset''s second islet with Illa Plana JUDGEMENT; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the small island near the north-east shore; a rock of its height with extent 50 m, the grid lacking it'
+- id: isla-del-rey
+  kind: rock
+  name: the Isla del Rey, or Hospital Island
+  modern: Illa del Rei (Port de Maó)
+  lat_deg: 39.8805
+  lon_deg: 4.2995
+  height_m: 15
+  extent_m: 120
+  source: 'Tofiño 1787, p. 212: reaching Cala Pedrera with a ship of the line or frigate keep nearer the south shore to pass between it and the Islands of the Rey (where the Hospital is) and Redonda, an islet; for though on the north side there is a channel of 5 brazas it is narrow and wants much practice; Vargas Ponce 1787, pp. 116 to 117: the Isla del Rey, so called because Don Alonso III landed on it in 1287, below the English Cove, the widest of the port; 12 acres; the fine Seamen''s Hospital, begun 1773 and finished 1776, for 700 sick; Grasset 1807, pp. 154 to 156: the first of the four islets nearer the right-hand shore entering; Jennings built a naval hospital on it in 1711; the present begun 177- (the year illegible in the OCR), finished 1776, for land and sea troops, three buildings round a fine court; Purdy 1826, p. 43 (''the Isla del Rey, or Bloody Island, on which stands the Naval hospital'')'
+  says: 'The Isla del Rey with the great naval hospital: ships of the line pass south of it, between it and the south shore.'
+  fix: 'FROM MEMORY; the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): the island is the grid''s mid-channel ridge of 9 to 11 m at 39.8805 N, 4.298 to 4.301 E, the deep water (26 m) on its south-west side, Tofiño''s passage between it and the south shore; a rock of its height with extent 120 m'
+- id: rat-island
+  kind: rock
+  name: Rata, or Rat Island
+  modern: Illa de les Rates (Port de Maó; removed in the 20th century)
+  lat_deg: 39.8793
+  lon_deg: 4.301
+  height_m: 3
+  extent_m: 40
+  source: 'Tofiño 1787, p. 212: pass between the south shore and the Islands of the Rey and Redonda, which is an islet, or between it and this; Purdy 1826, p. 43: the Isla del Rey and Rata, or Rat Island, a large rock to the westward of it; you may pass between the two islands, the least depth 4 1/2 fathoms, but the passage is narrow and not for strangers; Grasset 1807, p. 124 (''l''île du Roi, ou de l''Hôpital, et de Redonda qui n''est qu''un petit îlot'')'
+  says: 'Rat Island, the large rock west of the Isla del Rey: the passage between them is narrow, four and a half fathoms, not for strangers.'
+  fix: 'west of the Isla del Rey by Purdy''s words, FROM MEMORY (the islet no longer exists: its site to be read from an older chart); the height JUDGEMENT; placed by hand on the tiles'' harbour by Tofiño 1787''s plan of the entry (pp. 211 to 213), the grid''s inlet and its cross-sections (EMODnet''s cells some 115 m, the harbour''s islands smoothed into shoals): Tofiño''s islotillo Redonda by the Isla del Rey (the draft''s Rat Island, JUDGEMENT that they are one); a rock with extent 40 m'
+- id: isla-del-rey-shoal
+  kind: shoal
+  name: the flat ENE of the Isla del Rey
+  modern: the shoal ENE of Illa del Rei
+  lat_deg: 39.8815
+  lon_deg: 4.3018
+  height_m: 0
+  extent_m: 100
+  dries_m: -6.7
+  source: 'Tofiño 1787, p. 212: besides, ENE of the Isla del Rey there is a flat of 24 feet, on which some ships of the line have touched with the stern for having anchored on its south side with winds from that quarter; Grasset 1807, p. 124: ''un bas fond de vingt-quatre pieds d''eau seulement, sur lequel ont touché des vaisseaux'''
+  says: A flat of twenty-four feet east-north-east of the Isla del Rey, on which ships of the line anchored south of it have touched with the stern.
+  fix: ENE of the island by Tofiño's words, a cable or two off, JUDGEMENT; 24 pies (6.7 m); placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals)
+- id: mahon-arsenal-anchorage
+  kind: anchorage
+  name: the anchorage off the Arsenal
+  modern: Port de Maó, off Illa Pinto and the naval base
+  lat_deg: 39.8895
+  lon_deg: 4.28
+  height_m: 0
+  depth_fathoms: 6.9
+  bottom: good quality
+  source: 'Tofiño 1787, p. 212: past the Isla del Rey and the islet one may go on within, close to either shore at half a cable without fear, till abreast of and on the south side of the island of the Machina de Arbolar, or of the Arsenal that follows it, to which it is joined by a bridge at its NW, where anchor in 7 or 8 brazas of good quality and moor NE and SW; Grasset 1807, p. 124 (the same, mooring ''N.E. et S.O.''); Purdy 1826, p. 43 (''in from 5 to 6 1/2 fathoms, good ground, and moor E.N.E. and W.S.W.''); Vargas Ponce 1787, p. 117: opposite the city the fine Arsenal, before it an almost circular islet, once a useless rock, built up by the English'
+  says: Anchored off the Arsenal of Mahon, south of the masting island, in seven brazas good ground; moored north-east and south-west.
+  fix: FROM MEMORY, south of Illa Pinto; 7 1/2 brazas (6.9 fathoms); placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals); the hand placing then moved 680 m east to the grid's channel holding Tofiño's 7 or 8 brazas (13 to 16 m), still south of the arsenal's island
+- id: georgetown
+  kind: town
+  name: Georgetown, or the Arrabal of St George
+  modern: Es Castell (Villacarlos)
+  lat_deg: 39.877
+  lon_deg: 4.2905
+  height_m: 20
+  source: 'Purdy 1826, ''Port Mahon'', p. 42: at a mile up, on the western side (sic: the south shore), the town of Arrabal or St. George; p. 42, Smyth''s note: the Parade in Georgetown in 39° 52'' 55" N, the College of Cadets removed there from Madrid in 1808; Grasset 1807, p. 166: the inhabitants of the Ravale (the Arrabal) bought the English stores at a low price'
+  says: Georgetown, the Arrabal of St George, on the south shore a mile within the mouth of Port Mahon.
+  fix: FROM MEMORY, the town's square; the height JUDGEMENT; its Spanish name Villacarlos FROM MEMORY, not in these texts
+- id: mahon-town
+  kind: town
+  name: Mahon
+  modern: Maó
+  lat_deg: 39.8885
+  lon_deg: 4.265
+  height_m: 30
+  source: 'Purdy 1826, ''Port Mahon'', p. 42: at a mile and a half more (beyond Georgetown), on the same side, the town of Mahon, the chief commercial place in Minorca, its harbour one of the finest in the Mediterranean, the winter rendezvous of the English fleet blockading Toulon; p. 43: the south side in gardens, orchards and orange-groves, plenty of refreshments for a fleet; tides inconsiderable, a foot or two with the wind; Vargas Ponce 1787, p. 115: the many streets beyond the old walls, the Arrabal Gran to the west and the Arrabaleta to the south'
+  says: The town of Mahon on its height at the head of the harbour, with gardens and orange-groves to refresh a fleet.
+  fix: FROM MEMORY; the height JUDGEMENT (the town on the cliff over the harbour)
+- id: cape-favaritx
+  kind: headland
+  name: Cape Favaritx
+  modern: Cap de Favàritx
+  lat_deg: 39.9954
+  lon_deg: 4.2588
+  height_m: 20
+  source: 'Tofiño 1787, ''Cabo Tavaritx'', p. 215: very low at its end, for seen 3 leagues off it shows three islets; standing out somewhat, the land rising as it leaves the cape''s end; Purdy 1826, p. 45'
+  says: Cape Favaritx, so low at its end that from three leagues it shows as three islets.
+  fix: FROM MEMORY; the height JUDGEMENT; moved 722 m to the nearest land of the tiles
+- id: fornells-mola
+  kind: headland
+  name: Cape Morteret and the Mola of Fornells
+  modern: La Mola de Fornells (the east side of the mouth of Port de Fornells)
+  lat_deg: 40.0628
+  lon_deg: 4.1439
+  height_m: 120
+  source: 'Tofiño 1787, ''Morteret y Mola de Fornells'', p. 217: the coast rising to the Morteret, the start of the Mola of the port of Fornells, a high cape sheer to the sea with a watch-tower on it, the east point of the port; the west point they call Cape Fornells; Purdy 1826, p. 45 (''Cape Morteret is high, very steep towards the water, and has, on its summit, a watch-tower'')'
+  says: Cape Morteret, the high Mola with its watch-tower on the east side of the mouth of Fornells.
+  fix: 'FROM MEMORY; the height JUDGEMENT; moved 816 m to the nearest land of the tiles (beyond the rule''s 800 m: the first placing, from memory, fell in the water)'
+- id: fornells-road
+  kind: anchorage
+  name: the haven of Fornells
+  modern: Port de Fornells, off the town
+  lat_deg: 40.056
+  lon_deg: 4.136
+  height_m: 0
+  depth_fathoms: 9.1
+  bottom: unstated by Tofiño; 'mud and weeds' within cannon-shot of the fort (Purdy)
+  source: 'Tofiño 1787, ''Puerto Fornells'', p. 217: exceedingly sheltered and roomy for every class and number; its mouth narrow but clean with 17 to 20 brazas; nothing to guard against but what is seen, but entering with N to NE winds carry a press of sail through the gusts, now free now scant, abreast of the Mola; ships of the line commonly anchor off the castle on the west shore (as the town is) in 8 to 12 brazas, mooring E and W, for the N is the on-shore wind; Purdy 1826, pp. 45 to 46: the same, and ''you may also anchor within a cannon-shot of the fort, in from 4 to 6 fathoms, on mud and weeds''; 7 fathoms as high as the islands on the eastern side, which side has rocky bottom; several dangerous shoals in the harbour, so that strangers should have a pilot'
+  says: Anchored in Fornells off the castle in ten brazas, moored east and west, landlocked from every wind.
+  fix: FROM MEMORY, off the town and castle; 10 brazas (9.1 fathoms), the middle of his 8 to 12
+- id: cape-cavalleria
+  kind: headland
+  name: Cape Caballeria or Naucelles
+  modern: Cap de Cavalleria
+  lat_deg: 40.0835
+  lon_deg: 4.0935
+  height_m: 90
+  source: 'Tofiño 1787, ''Cabo Caballería, ó de Naucelles'', p. 218: a short way and more N than the Cabo de Levante; standing well out, high and sheer to the sea, but lower toward the S, so that seen from W or E at some distance it looks an island; Purdy 1826, p. 45'
+  says: Cape Caballeria, the north point of Minorca, high and sheer, that looks an island from east or west.
+  fix: FROM MEMORY; the height FROM MEMORY; moved 515 m to the nearest land of the tiles
+- id: ciudadela-road
+  kind: anchorage
+  name: the anchorage off Ciudadella
+  modern: off the mouth of the port of Ciutadella
+  lat_deg: 39.9979
+  lon_deg: 3.8209
+  height_m: 0
+  depth_fathoms: 13.7
+  bottom: good quality throughout; within the haven gravel and sand
+  source: 'Tofiño 1787, ''Puerto de Ciudadela'', p. 221: the port a creek so narrow that a brig in fine weather hardly has room to swing; 7 brazas at the mouth, shoaling to 2 in the middle, all gravel and sand; with W and S winds much sea at the mouth and within, with a surge that works the moorings hard; but for winds of the third quadrant one may anchor outside the port in what water one likes from 20 brazas downward, all of good quality; p. 222: the port known by the City (the capital of the island) and the hermitage of San Nicolás with a battery on the south point, which is to be left to starboard, close, for it is very clean; Purdy 1826, p. 47 (''the chapel of St. Nicolas, having a battery'')'
+  says: 'Anchored off Ciudadella in fifteen brazas, good ground, the chapel of St Nicolas on the haven''s south point: weigh if it comes from the south-west.'
+  fix: FROM MEMORY, a few cables W of the mouth; 15 brazas (13.7 fathoms) within his '20 downward', JUDGEMENT; moved 372 m to the nearest water of the tiles holding half the pilot's depth (12.5 m)
+- id: cape-dartuch
+  kind: headland
+  name: Cape Dartuch
+  modern: Cap d'Artrutx
+  lat_deg: 39.9254
+  lon_deg: 3.8269
+  height_m: 5
+  source: 'Tofiño 1787, ''Cabo Dartuch'', p. 222: the south-westernmost of the island; so low that a man may jump ashore from a boat without difficulty, but steep-to and clean, 18 and 20 brazas two cables off, the same depth all the way to Ciudadela at that distance from the coast; Purdy 1826, p. 47'
+  says: Cape Dartuch, so low a man may step ashore from a boat, but steep-to, eighteen brazas two cables off.
+  fix: FROM MEMORY; the height JUDGEMENT; moved 451 m to the nearest land of the tiles
+- id: isla-del-aire
+  kind: rock
+  name: the Isle Ayre
+  modern: Illa de l'Aire
+  lat_deg: 39.8
+  lon_deg: 4.292
+  height_m: 15
+  extent_m: 300
+  source: 'Tofiño 1787, ''Isla del Ayre'', p. 225: very low on its NW side and higher and sheer to the sea on its SE, where one may lie close almost touching; but the NW side forms the freo, which a ship of much draught must pass by its middle, the greatest depth 7 or 7 1/2 brazas, shoaling toward both shores to 3 brazas at a cable off; the Puntas of Cova de Corps and Algaret make the narrowest part of the channel; Purdy 1826, p. 48 (''nearly a mile from the S.E.'' of Minorca)'
+  says: 'The Isle Ayre, low to the north-west and sheer to the south-east: pass its freo in the middle, seven brazas.'
+  fix: 'FROM MEMORY; the height JUDGEMENT; its light is of 1860 (FROM MEMORY, not in these texts) and so no light entry is made; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 300 m (the island some 600 m long, low, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+- id: mostaganem
+  kind: town
+  name: Mostagan
+  modern: Mostaganem
+  lat_deg: 35.933
+  lon_deg: 0.088
+  height_m: 80
+  source: 'Tofiño 1787, p. 149: from Mazagan to Mostagán 2? miles N 57° E [OCR], the coast forming a little bay; from the anchorage of Arecú to Mostagán low coast with fine-weather anchorages. Purdy 1826, p. 324: the little town of Mostagan or Marzagan, two leagues S of Cape Kulmeta, once a place of some consideration. Bérard 1837, ''Mostaganem'', pp. 164 to 165: on heights half a mile from the sea; its fort white and seen from afar, two white marabouts below it; anchor before the ravine about a mile off in 14 and 15 brasses ooze, only with E winds'
+  says: Mostagan on its heights half a mile from the sea, its white fort and two marabouts the mark; a berth a mile off in fourteen fathoms, ooze, with the wind easterly.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: cape-ivi
+  kind: headland
+  name: Cape Ivi
+  modern: Cap Ivi
+  lat_deg: 36.117
+  lon_deg: 0.223
+  height_m: 30
+  source: 'Tofiño 1787, ''Cabo Yuy'', p. 150: from the cape of Mostagán to Cape Yuy (an even, cut coast of red colour) 5 1/2 miles N 75° E; the cape of the same colour and of middling height. Bérard 1837, ''Cap Ivi'', p. 163: of little height, the hills of the Chelif behind it to 320 metres; hard to know, the coast rounding evenly; close to, two near points with rocks about their ends, each with a knoll, a beach between; a point 4 miles on often taken for it; off the Chelif''s mouth a bank often dry (p. 164)'
+  says: Cape Ivi, red and of middling height, hard to make out; the Chelif's mouth and its bank to the south of it.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: cape-tenes
+  kind: headland
+  name: Cape Tenez
+  modern: Cap Ténès
+  lat_deg: 36.547
+  lon_deg: 1.342
+  height_m: 200
+  source: 'Tofiño 1787, ''Cabo de Tenes'', p. 150: N 70° E of the isle of las Palomas 22 miles, in lat 36° 32'' 1?", high, round, red and steep, with an islet close to its west part and shelter on the S for an E wind; known from seaward by a very high mountain 2 leagues SSW, at whose foot on the W the town of Tenes. Purdy 1826, p. 324: Cape Nakkous or Tenez the most remarkable cape hereabout; the village of Tenez about two leagues S.W.; shelter in the road before the town from southerly, easterly and E.N.E. winds, the best anchorage in 7 to 9 fathoms with a saddle hill about S.S.E. Bérard 1837, ''Cap Ténès'', pp. 159 to 160: a great mass of steep rock 3 miles E to W, high and further out than the rest'
+  says: Cape Tenez, high, round and red, the most remarkable cape hereabout; the road of Tenez south-west of it in seven to nine fathoms, with the saddle hill south-south-east.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: cherchell
+  kind: town
+  name: Sarzel
+  modern: Cherchell
+  lat_deg: 36.609
+  lon_deg: 2.193
+  height_m: 30
+  source: 'Tofiño 1787, pp. 150 to 151: from Cape Tenes to Cape Cercelí 33 miles N 83° E; the cape a mountain of pleasant sight, an islet near it sheltering small craft from W and NW winds. Purdy 1826, p. 324: Zerzahal or Sarzel a little old town and castle at the foot of a mountain. Bérard 1837, ''Scherschel'', pp. 156 to 157: a long low point with a little islet crowned with a fortification, another fort on the point''s height, two white marabouts and the town with its minarets; the little port only for small craft, one brasse in the entrance, two within, shingle'
+  says: Sarzel, a little old town and castle at the foot of its mountain, its fortified islet sheltering small craft only.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: cape-caxine
+  kind: headland
+  name: Cape Caxine
+  modern: Cap Caxine
+  lat_deg: 36.8137
+  lon_deg: 2.954
+  height_m: 50
+  source: 'Tofiño 1787, ''Cabo Caxines'', pp. 151 to 152: cut steep to the sea with two islets at its foot, low, little projecting, red, the colour running some way inland; a watch-tower and a rivulet of good water. Purdy 1826, pp. 324 to 325: with Cape Matifou forms the bay, 4 leagues E and W; off Cape Caxine two rocks above water with a passage between for small vessels; the horizon kept in sight between them leads clear of the rocks near the mole and to the anchorage. Bérard 1837, p. 151: a cliff higher than the rest, yellow and russet, a little conical summit (Djerba) a mile SW'
+  says: 'Cape Caxine, red and steep with a watch-tower and two islets at its foot: keep the horizon open between them to clear the mole''s rocks.'
+  fix: FROM MEMORY; the height JUDGEMENT; moved 150 m to the nearest land of the tiles
+- id: pointe-pescade
+  kind: headland
+  name: Point Pescado
+  modern: Pointe Pescade (Raïs Hamidou)
+  lat_deg: 36.8
+  lon_deg: 2.998
+  height_m: 10
+  source: 'Tofiño 1787, ''Punta del Pescado'', p. 152: E 5° [quarter illegible in the OCR] of Cape Caxines 3 1/2 miles the Punta del Pescado, the west point of the bay of Algiers, a little steep stony knoll, little projecting, black, with a strong battery and a reef near it. Bérard 1837, p. 150: its E part a few metres high with the last batteries defending the bay; two little flat isles to the N, a few feet above the water, kept open by the Pointe des Consuls to clear the rock Mtahem'
+  says: Point Pescado, a black knoll with a strong battery and a reef, the west point of Algier Bay.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: algiers
+  kind: town
+  name: Algier
+  modern: Algiers (the Casbah)
+  lat_deg: 36.786
+  lon_deg: 3.06
+  height_m: 118
+  source: 'Tofiño 1787, p. 152: from the mole the city rises on the slope of a mountain of moderate height, pleasant for its many gardens and country houses, whitewashed like all the city, which from the offing looks a white patch with the likeness of a topsail. Purdy 1826, p. 325: in form of an amphitheatre, the houses of a delicate whiteness one above another; the citadel (Cassaubah), octagonal, on the highest ground within the walls toward the S.W.; two forts on the high hills W. Bérard 1837, p. 93: on a hill of 118 metres, a triangle whose base rests on the shore'
+  says: Algier, white on its hill like a topsail seen from the offing, the citadel on its height.
+  fix: FROM MEMORY (the town's middle); the height Bérard's (the hill)
+- id: algiers-mole
+  kind: place
+  name: the mole of Algier
+  modern: the old harbour (Darse de l'Amirauté), Algiers
+  lat_deg: 36.785
+  lon_deg: 3.069
+  height_m: 5
+  source: 'Tofiño 1787, ''Muelle y Linterna de Argel'', p. 152: the mole closed like a basin, with little depth, not enough for large frigates, only for small xebecs and craft of less draught, of which it may hold about 40 not very commodiously; all the mole fortified with batteries, low and high, of two tiers. Michelot 1715, p. 90: before the town a mole where ships and galleys anchor, shut up with a chain every night, its entrance to the southward. Purdy 1826, p. 325: the mole extends from the continent to a small island on which there is a strong castle; the harbour small, shallow and insecure, its entrance impeded by rocks; p. 326: no landing-place but at the Mole. The French jetties of 1836 on (Bérard 1837, p. 91) are later'
+  says: The mole of Algier, a shallow basin for xebecs and galleys, shut with a chain at night; the only landing is there.
+  fix: FROM MEMORY (the old harbour's middle)
+- id: algiers-lantern
+  kind: light
+  name: the lighthouse of Algier
+  modern: the Phare de l'Amirauté (Peñón), Algiers
+  lat_deg: 36.787
+  lon_deg: 3.071
+  height_m: 30
+  lit:
+    from: 1709
+    until: null
+    range_nm: 6
+    character: a lantern lit every night on the top of the fort at the mole's north end
+  source: 'Michelot 1709, ''Description de la Baye d''Alger'', page head illegible in the OCR: on the top of the great tower by the mole''s north side, with three batteries one above another, a lantern lit at evening, which they call the Fanal; Michelot 1715, p. 90: ''upon the Top of the Fort, there is a Lanthorn which is lighted every Night''. Tofiño 1787, p. 152: ''el Muelle y Linterna de Argel'' in lat 36° 4?'' 36", the lantern with three tiers of batteries (he does not say it is lit). Purdy 1826, pp. 324 and 326: the lighthouse on the mole in lat 36° 48''; the Lighthouse battery of three tiers of guns. The ''from'' is the first record read (Michelot), the lantern older (FROM MEMORY: the tower built on the Peñón after 1544). Bérard 1837, p. 94: the phare 35 metres above the sea, a revolving light of the fourth order seen 5 leagues: the French light of the 1830s, not 1805''s. The range JUDGEMENT (a lantern)'
+  says: The lantern of Algier, lit every night on the fort at the mole's north end, over its three tiers of guns.
+  fix: FROM MEMORY (the modern light on the old islet); the height JUDGEMENT, below Bérard's 35 m of 1837
+- id: algiers-lighthouse-battery
+  kind: castle
+  name: the Lighthouse battery
+  modern: the Peñón fortifications (Bordj el Fanar), Algiers
+  lat_deg: 36.7868
+  lon_deg: 3.0705
+  height_m: 20
+  source: 'Purdy 1826, p. 326 (notes of 1816): the Mole is defended by the Lighthouse battery, mounting three tiers of guns, the lower tier with port-holes and under cover, flanked with fortifications cut out of the solid rock; the S.W. battery of two tiers, the northernmost tier of very heavy metal. Michelot 1715, p. 90: the fort built upon rocks level with the water, another battery of 6 great guns near it level with the water. Tofiño 1787, p. 152'
+  says: The Lighthouse battery at the mole's head, three tiers of heavy guns on the rock.
+  fix: FROM MEMORY, with the light; the height JUDGEMENT
+- id: mtahem
+  kind: rock
+  name: the rock off the lighthouse of Algier
+  modern: Roche Mtahem (Algiers)
+  lat_deg: 36.7926
+  lon_deg: 3.064
+  height_m: 0
+  extent_m: 50
+  dries_m: -0.3
+  source: 'Tofiño 1787, p. 153: about N of the Linterna a short distance a shoal awash (''á flor de agua''). Purdy 1826, p. 325: a few rocks about the mole-head. Bérard 1837, pp. 92 to 93: the rock Mtahem N 20° O of the phare half a mile, with only a foot of water on its top; the sea breaks on it with E winds, hard to see when there is no swell and the winds are W; kept off by the islets of the Pointe Pescade open of the Pointe des Consuls'
+  says: 'The rock a half mile north of the lighthouse of Algier, awash: keep the islets of Point Pescado open of the Consuls'' point.'
+  fix: Bérard's bearing and distance from the phare (the phare FROM MEMORY); his 1 pied (0.3 m); moved 391 m to the shoalest head of the tiles within 400 m (+0.2 m against the datum)
+- id: algefna
+  kind: rock
+  name: the Algefna
+  modern: Roche Algefna (Algiers harbour mouth)
+  lat_deg: 36.7803
+  lon_deg: 3.0701
+  height_m: 0
+  extent_m: 40
+  dries_m: -2.3
+  source: 'Bérard 1837, p. 93: before the opening of the port, a quarter mile off, a rock hidden under 7 feet, known to the seamen of the place as the Algefna, dangerous to vessels coming with fresh E winds to anchor S of the mole; S 33° O of the phare, a little under half a mile. Purdy 1826, p. 325: the harbour''s entrance impeded by rocks'
+  says: The Algefna, seven feet over it, a quarter mile off the mouth of the mole of Algier.
+  fix: Bérard's bearing and distance from the phare (the phare FROM MEMORY); 7 pieds (2.3 m). The name is Bérard's of 1837, the rock natural; moved 378 m to the shoalest head of the tiles within 400 m (+1.6 m against the datum)
+- id: emperors-fort
+  kind: castle
+  name: the Emperor's Fort
+  modern: Fort l'Empereur (Bordj Moulay Hassan), Algiers
+  lat_deg: 36.768
+  lon_deg: 3.047
+  height_m: 200
+  source: 'Tofiño 1787, ''Castillo del Emperador'', p. 152: S of the city a short distance a hill and on its summit the Emperor''s Castle, said built in a night by the Emperor Charles V, which commands all the city and the hill. Michelot 1715, p. 90: upon a rising ground a star-fort with a tower in the middle, called the Emperor''s Fort'
+  says: The Emperor's Fort on its hill south of Algier, commanding the town.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: algiers-road
+  kind: anchorage
+  name: Algier road
+  modern: Baie d'Alger (the anchorage SE of the old harbour)
+  lat_deg: 36.774
+  lon_deg: 3.12
+  height_m: 0
+  depth_fathoms: 23
+  bottom: sandy bottom
+  source: 'Purdy 1826, pp. 325 to 326 (notes of 1816): do not anchor nearer the Mole than a mile and a half, though the bay is clear all over, or they will stop all communication and set guard-boats between you and the shore; the best marks the Northernmost land N.W. by N., the Lighthouse N.W. 1/2 W., the River''s mouth South, Cape Matifou East, in 22 or 24 fathoms, sandy bottom, about 2 1/2 miles from the Mole-head. Michelot 1715, p. 90: the best anchorage ESE of the town within a small half league in 18 and 20 fathoms, oozy ground, a little farther out 25 and 30; open to all the sea winds, NNE, N and NW raise a great sea. Tofiño 1787, p. 153: anchor anywhere in the bay in what water you will; leave it when E by N to NW winds set in with bad looks; in winter a ship anywhere in the bay is near her loss unless with three good cables spliced'
+  says: 'Algier road, two miles and a half from the mole-head in twenty-two or twenty-four fathoms, sand: no nearer than a mile and a half, and put to sea before a northerly gale.'
+  fix: Purdy's 2 1/2 miles from the lighthouse on N.W. 1/2 W. magnetic (about N 72° W true at 21° W variation, JUDGEMENT); the river's mouth falls south of it as he says
+- id: algiers-bottom
+  kind: bottom
+  name: the bottom of Algier Bay
+  modern: Baie d'Alger
+  lat_deg: 36.795
+  lon_deg: 3.14
+  height_m: 0
+  bottom: for the most part sand, with patches of gravel, some loose stones and lost anchors (Tofiño); black clay within the capes (Purdy); ooze (Michelot, Bérard)
+  source: 'Tofiño 1787, p. 153: in all the bay one may anchor in what water one will, taking care to look to the cable, or both if moored, for though most of the bottom is sand there are some patches of gravel and some loose stones or lost anchors. Purdy 1826, p. 325: about 40 fathoms within the line of the two capes, a bottom of black clay, shoaling very gradually to 15 and 10 fathoms near the southern shore; no danger but a few rocks off Cape Matifou, which mostly show, and a few about the mole-head. Bérard 1837, p. 92: 16 to 25 or 30 brasses on a good bottom of ooze a mile to a mile and a half from the coast; use chains, the cables being exposed to lost anchors'
+  says: 'Forty fathoms within the capes, black clay, shoaling gradually to the south shore: sand with patches of gravel and lost anchors that chafe the cables.'
+  fix: the bay's middle within the capes' line; JUDGEMENT
+- id: cape-matifou
+  kind: headland
+  name: Cape Matifou
+  modern: Cap Matifou (Tamentfoust)
+  lat_deg: 36.815
+  lon_deg: 3.238
+  height_m: 40
+  source: 'Tofiño 1787, ''Cabo Matifús'', p. 153: N 85° E of the Punta del Pescado 10 1/2 miles, the east point of the bay of Algiers, low, ringed with rocks, with a table-shaped hillock near its end which, seen 5 or 6 leagues off, looks an island, only the table showing, the low land behind it drowned; a little castle at the cape''s end and some batteries on the beach. Purdy 1826, p. 325: the land E of Cape Matifou covered with sand-hills close to the water, none W of Algier, all iron-bound. Bérard 1837, ''Cap Matifou'', p. 96: of low land 2 miles long, a little flat-topped mount in its E part alike from all quarters; at the W point some rocks a quarter mile off, no danger beyond; the Sandja rocks, 8 to 9 metres, a quarter mile E (p. 97)'
+  says: Cape Matifou, low and ringed with rocks, its table hillock seen like an island five or six leagues off.
+  fix: FROM MEMORY; the height JUDGEMENT (the hillock)
+- id: matifou-castle
+  kind: castle
+  name: the castle of Matifou
+  modern: Bordj Tamentfoust (Fort de Matifou)
+  lat_deg: 36.8072
+  lon_deg: 3.2271
+  height_m: 15
+  source: 'Purdy 1826, p. 326 (notes of 1816): Cape Matifou fortified with a castle about half a mile S of the pitch of the cape, of a sexagon form, three embrazures on each side, with a ditch and drawbridge; about two miles S.S.W. a fort of nine guns on the bay side. Tofiño 1787, p. 153: a little castle at the cape''s end. Bérard 1837, pp. 95 to 96: a fort the Algerines raised to protect ships that came to shelter there'
+  says: The castle of Matifou, six-sided with its ditch and drawbridge, half a mile within the pitch of the cape.
+  fix: FROM MEMORY; the height JUDGEMENT; moved 103 m to the nearest land of the tiles
+- id: matifou-road
+  kind: anchorage
+  name: Matifou road
+  modern: the anchorage W of Cap Matifou (Tamentfoust)
+  lat_deg: 36.803
+  lon_deg: 3.215
+  height_m: 0
+  depth_fathoms: 8
+  bottom: oozy grass
+  source: 'Michelot 1715, p. 90: anchor to the westward of Cape Matifou in 7, 8 and 10 fathoms, the ground oozy grass, within cannon-shot of the shore, sheltered from NE and NNE, quite open to W and NW, which raise a very great swell. Tofiño 1787, p. 153: near Cape Matifús good shelter with the E and a better weighing even when the wind comes NE, but with N and NW very bad even in summer. Bérard 1837, p. 95: a very good anchorage for E and NE winds in 10, 12 and 15 brasses, sand and ooze, by the fort'
+  says: 'Matifou road, west of the cape in seven to ten fathoms, oozy grass: the berth for an easterly wind, none for a north-wester.'
+  fix: within cannon-shot of the shore W of the castle, by Michelot's words; JUDGEMENT
+- id: matifou-bank
+  kind: bank
+  name: the bank off Cape Matifou
+  modern: the rocky bank N of Cap Matifou
+  lat_deg: 36.846
+  lon_deg: 3.2294
+  height_m: 0
+  extent_m: 460
+  dries_m: -9.4
+  source: 'Bérard 1837, ''Cap Matifou'', p. 96: N of the cape 2 miles a rocky shoal with 29 feet on it, about a quarter mile N and S; on its top the W point of the cape bears nearly S and Rassauta shows over it; currents on it to the E at 2 miles at least. Michelot 1715, p. 90: off the end of the point about 2 miles to the NW a ledge of rocks under water where the sea breaks in bad weather, and another very dangerous to the NNW about 2 miles. Purdy 1826, p. 325, note: the cutter Nimble found at three leagues from Cape Matifou in 5 fathoms a bank covered with coral, its direction not expressed (Paris, 1826)'
+  says: The bank two miles north of Cape Matifou, twenty-nine feet over it, where the sea breaks in bad weather.
+  fix: Bérard's 2 miles N of the cape's W point (the cape FROM MEMORY); his 29 pieds (9.4 m); Michelot's ledges NW and NNW not separately placed; moved 395 m to the shoalest head of the tiles within 400 m (-63.7 m against the datum)

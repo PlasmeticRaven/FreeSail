@@ -3663,6 +3663,17 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
         crew = getattr(v, "crew", None)
         if crew is not None and getattr(crew, "shape", "full") == "full":
             d.update(_truth_action(crew))  # package 70: a crewed ship's guns and damage
+        if crew is not None:
+            # a hull's purse, cargo and water, awake or asleep (package 84, step 9)
+            d["hull"] = "awake" if getattr(crew, "awake", True) else "asleep"
+            hp, hh = getattr(crew, "purse", None), getattr(crew, "hold", None)
+            if hp is not None:
+                d["purse"] = hp.words()
+            if hh is not None:
+                d["cargo"] = hh.words()
+            hw = getattr(crew, "water", None)
+            if hw is not None and hasattr(hw, "words"):
+                d["water"] = hw.words()
         ships.append(d)
     out["ships"] = ships
     sets = getattr(world, "squadrons", None)
@@ -3716,6 +3727,23 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             except Exception:  # noqa: BLE001
                 pass
     out["people"] = people
+    # the persons ashore at every port, of every hull's company (package 84, step 9)
+    registry = getattr(world, "registry", None)
+    ashore: list[str] = []
+    port_files = getattr(getattr(world, "ports", None), "ports", None) or {}
+    for p in registry.persons() if registry is not None else []:
+        if not getattr(p, "aboard", True) and str(getattr(p, "where", "") or "") == "shore":
+            pid = str(getattr(p, "port", "") or "")
+            port = str(getattr(port_files.get(pid), "name", "") or pid)
+            at = str(getattr(p, "ashore_at", "") or "")
+            home = str(getattr(p, "home", "") or "")
+            ashore.append(
+                f"{p.name} ({p.role}), ashore at {port}"
+                + (f", at the {at.replace('_', ' ')}" if at else "")
+                + (f", of the {home}" if home and home != "the ship" else "")
+            )
+    if ashore:
+        out["ashore"] = ashore
     # the things and where each is (package 53b), only where there are any
     things = _things_words(world)
     if things:

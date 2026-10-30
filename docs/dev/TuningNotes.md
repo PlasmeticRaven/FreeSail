@@ -11912,6 +11912,375 @@ meets: the Mistral (the wind, through the Admiralty's volumes, Bérard and Smyth
 *fable*, the constellation Gemini (Admiralty 1916, Norie 1831): words of the texts, kept
 verbatim as the Channel's pilots' star names were.
 
+### Step 1: the tiles' count and bytes (stopped at the report, for the lead's ruling)
+
+The recipe (held in the working tree, not committed until the ruling: a recipe in `REGIONS`
+and the chart's list without its tiles is no mergeable state): `mediterranean-west`, bounds
+35.0 to 40.5 N and 5.0 W to 4.5 E as the brief has them, abutting `strait` at 5 W; fetch
+34.45 to 40.7 N, 5.2 W to 4.9 E; eight harbour patches (Málaga, Almería, Cartagena, Palma,
+Port Mahon, Ivica, Oran with Mers-el-Kebir, Algiers); EMODnet over GEBCO; `fill_to_chart_
+datum` by the world's mean level as the Strait's (the block's gauges held, the world's tide
+over it a far gauge's: the build printed "raised ... by the world's mean level, 3.98 to
+6.83 m", Le Conquet's alone, for the lead with item 5). Built once, to fetch and to measure,
+`python tools/build_charts.py --region mediterranean-west --reuse-world`: GEBCO's extract
+18.7 MB in 2 s, EMODnet's `elevation` and `elevation_max` 233 MB each in 20 s, nothing
+refused. The checks as printed passed (licences allowed; "the fetch box covers the tiles
+whole: yes"; "tiles another region lists: 3 kept", the column 5.07 to 4.64 W from 35.44 to
+36.72 N, `strait`'s). `git status` after it: the manifest (this region's entry and the
+sources' fetches) and the block's own new files; nothing of any other region's.
+
+**The count and bytes** (the brief's item 1: past 40 MB the package stops at the report):
+
+| | tiles | MB |
+|---|---|---|
+| level 2 (14 rows by 23 columns, less the 3 seam tiles) | 319 | 52.9 |
+| level 3, the eight harbour patches | 54 | 3.9 |
+| the coast | 1 | 0.7 |
+| **as built** | | **57.5** |
+
+Of the 319 level-2 tiles, **142 are all land** (no cell below the datum: Andalusia's,
+Murcia's and Valencia's interior, the Rif and the Tell; 15.2 MB; 79 of them west of 1 W,
+where the corridor answers, 8.4 MB; 63 east of it, where nothing would, 6.8 MB), and 101
+are open sea more than half a mile from any shore (23.1 MB; 77 beyond ten miles, 17.0 MB).
+The top row (40.13 to 40.56 N, 23 tiles, 3.3 MB) holds no mark the brief asks (Minorca's
+north coast is at 40.09 N; the coast there is Castellón's, a later block's). The deep
+basin compresses badly (the Algerian basin's tiles 125 to 130 KB each, as the Azores'
+open sea was dear).
+
+**The ways I see, with their cost** (level 2 + level 3 + the coast):
+
+1. **Two regions** split at a tile column (e.g. at 0.05 E: `mediterranean-west` from 5 W,
+   the Alboran sea with Málaga, Almería, Cartagena, Melilla and Oran, 165 level-2 tiles,
+   about 26.5 MB; and a second, the Balearics with Algiers to 4.5 E, 154 tiles, about
+   31 MB); each within the rule, every tile written, no hole east of 1 W; the same 57.5 MB
+   committed in two entries. The brief names this way ("or a second region").
+2. **The north bound to 40.13 N** (the row's edge, no mark asks the row above) **and the
+   all-land tiles not written** (`skip_dry_tiles`): 166 level-2 tiles, 35.8 MB, about
+   40.4 MB in all, a hair over the rule; east of 1 W the inland tiles would answer nothing
+   (79b's finding: no corridor there), though no ship's water lies in them.
+3. **The deep water dropped** beyond ten miles of the shore (17 MB): not recommended, since
+   east of 1 W nothing would answer there and the Algiers to Mahon passage crosses it.
+4. **As built**, 57.5 MB, by the lead's leave.
+
+**My recommendation: way 1** (two regions, all tiles written), or way 2 if the bytes
+matter more than the inland hole. Nothing of the tiles, the recipe, the manifest or the
+coast is committed until the ruling; the marks, the ports, the nation, the tide's and the
+weather's rows go on meanwhile in the working tree, and wait with them.
+
+### Steps 1 to 3 as ruled: two regions, the marks, the gauges and the regency
+
+**The lead's ruling** (2026-10-29, `7e9728b`): two regions, every tile written, the
+numbering one package's. `mediterranean-west`, 35.0 to 40.5 N and 5.0 W to 0.05 E, abutting
+`strait` at 5 W; `balearics`, the same rows from 0.05 E to 4.5 E. The column from 0.37 W to
+0.05 E meets both bounds and is `mediterranean-west`'s, built first (the seam rule). Built
+with `--reuse-world`, the second region against the first's manifest, then both again with
+`--skip-fetch` once the marks were written (the tiles byte for byte the same):
+
+```
+Checks for the block mediterranean-west:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 91 of 91 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 91 of 91
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (34.45 to 40.7 N, 5.2 W to 0.2 E)
+  tiles another region lists: 3 kept (level 2: 3, level 3: 0; not written, not listed)
+Checks for the block balearics:
+  features within the bounds: 87 of 87 ...
+  the fetch box covers the tiles whole: yes (34.45 to 40.7 N, 0.5 W to 4.9 E)
+  tiles another region lists: 14 kept (level 2: 14, level 3: 0; not written, not listed)
+```
+
+| region | level 2 | level 3 (patches) | coast | in all |
+|---|---|---|---|---|
+| `mediterranean-west` | 165 tiles, 24.0 MB | 30 tiles, 2.1 MB (Málaga, Almería, Cartagena, Oran) | 0.39 MB | 26.5 MB |
+| `balearics` | 154 tiles, 28.8 MB | 24 tiles, 1.7 MB (Palma, Port Mahon, Ivica, Algiers) | 0.33 MB | 30.9 MB |
+
+GEBCO's fill raised by the world's mean level: 3.98 to 6.83 m over `mediterranean-west`,
+**6.83 m over the whole of `balearics`**: there the nearest of the eleven gauges is
+Saint-Malo's (some 650 miles off), so the world's tide over the Balearics is Saint-Malo's
+(an M2 of 3.7 m and a mean level of 6.83 m where Mahón's M2 is 0.05 m and its level 0.20 m
+above the datum): the held gauges' cost at its sharpest, for the lead with package 89. The
+shore's sweep: 2,190 cells in 155 places (`mediterranean-west`) and 3,243 in 228
+(`balearics`), the largest the modern ports' moles and docks and the lagoons behind the
+shore (the Albufera of Valencia, a later block's water; the Mar Menor behind La Manga),
+left as water. `git status` after every build: the manifest (the two entries, their
+sources' fetches, the chart's line and title, the build hash) and the two regions' new
+files; nothing of any other region's.
+
+**The marks** (178: 91 and 87), drafted from Tofiño 1787 with Purdy 1826, Vargas Ponce
+1787, Grasset 1807, Michelot 1709 and 1715 and Bérard 1837 by three readers working from
+the pages and checked by a script kept outside the repository against the tiles by the
+features files' rule; 49 moved within the rule's reach, 11 beyond it (the first placing,
+from memory, a kilometre out: Vela Blanca's tower, Cape Pera, Fornells' Mola; the
+anchorages of San Pedro, Carboneras, Escombreras and Mers-el-Kebir), each said in its
+`fix`. **Isles the grid lacks**: Alboran (its shoalest within 2 km 14 m under water), the
+Hormiga off Cape Palos, Isla Grosa, the Isla del Aire, and Port Mahon's islands (the
+Lazaretto's, the Quarantine island, the Isla del Rey, Redonda): rocks of their height with
+an extent, 39e's form. **Port Mahon placed by hand** on the tiles' inlet by Tofiño's plan of
+the entry (pp. 211 to 213): Philipet point to starboard and the ruins of St Philip to port
+going in, the three ledges off the Mola, Philipet and St Philip, Es Redó under the castle,
+the passage between the south shore and the islands, the 24-foot flat east-north-east of
+the Isla del Rey, the anchorage south of the arsenal's island in 7 or 8 brazas; the grid
+has the inlet whole at its 115 m and smooths the Isla del Rey into a mid-channel ridge of
+9 to 11 m with 26 m on its south-west side, where Tofiño's passage is. **The lights of
+1805**: Málaga's mole lantern (Tofiño p. 34, used as a leading mark by day; that it was lit
+UNVERIFIED, a mole's linterna in Spanish usage a light), Porto Pí's by Palma (lit every
+night, Tofiño p. 185) and Algiers' (Michelot 1709, 1715): three; none at Cartagena, Cape
+de Gata, Alboran, Cape Palos, Mahon (Purdy 1840: no light-tower in the Balearics but
+Palma's; the brief's "Mahon's" light is not in the period's texts), Melilla or Oran.
+
+**The gauges** (item 5, ahead of its step): nine of TICON's in the block's coast, held
+(package 89 not merged), with their mean levels VERIFIED from Puertos del Estado's REDMAR
+reports (Málaga 0.43, Motril 0.39, Almería 0.29, Melilla 0.33, Ibiza 0.17, Formentera 0.16,
+Palma 0.16, Alcudia 0.19, Mahón 0.20 m above the lowest astronomical tide); none at
+Cartagena, Oran or Algiers; Gandía, Sagunto and Valencia north of Cape Palos left for a
+later block. **The regency** (item 4's nation): `algiers` in `data/nations.yaml` in
+Morocco's form, its relations from James vol. 3 (pp. 168 to 169, 235, 333 to 334) where
+they speak and from memory otherwise, said so; its war with Portugal (from memory) NOT
+entered in `wars:` until a work on file gives it, for the lead; Morocco's relations gain
+it. The tests that list the chart's regions and the nations gain the block's (as 79b's
+did); the Strait's gauge test's "block's" filter bounded at its own east bound (5 W),
+Melilla lying east of it, its assertions unchanged.
+
+### Steps 4 to 6: the ports, the streams and the epitome, the weather's box
+
+**Eight port files** on package 35's machinery, every spot naming a checked mark and
+repeating its position: Málaga, Almería, Cartagena (the King of Spain's arsenal, a yard as
+Ferrol's), Palma, Ivica, Port Mahon (Spain's again since Amiens; its arsenal a yard, the Isla
+del Rey's hospital noted), all Spain's and hostile to a King's ship; Oran with
+Mers-el-Kebir and Algiers, the regency's, neutral to her as to every flag (the Dey's
+corsairs in the files' heads, not modelled). The pilots' words, roads, moorings and marks are
+Tofiño 1787's own pages (Málaga pp. 34 to 36, Almería pp. 47 to 48, Cartagena pp. 76 to 90,
+Palma pp. 184 to 188, Ivica pp. 181 to 182, Mahon pp. 211 to 213, Mers-el-Kebir and Oran
+pp. 147 to 148, Algiers pp. 152 to 153); markets, yards and pools JUDGEMENT as every block's,
+said so line by line; `datum: unverified` in all eight (no sheet read with its datum: the
+plans of Roux and Heather are CC BY-NC-SA and read, not transcribed). No ordnance block (the
+practice-and-resupply design's eleven; `test_ordnance.py`'s count of ports without one
+raised by the eight, as 79b's was). The nations' ports index and `test_ports.py`'s list
+gain the eight; the stance test the Spanish six hostile and the two Algerine neutral.
+
+**The streams** (`data/tides/streams.yaml`): seven areas, none with a tidal stream (Torbay's
+form) and six with the period's constant current: Cape Palos's offing SE 1 kn (Tofiño p. 79,
+Norie, Purdy), the coast of Granada E 1 kn (Smyth 1854 p. 161; Tofiño p. 46), the Barbary
+shore close in from Oran toward the Strait W half a knot (Tofiño p. 155, the period's own
+inshore counter-set), the Barbary shore from Arzew to Algiers E half a knot (Bérard 1837
+pp. 71 to 72), the Alboran sea E 1.5 kn (Purdy p. 14, Tofiño p. 46), the block's open sea
+E half a knot (Tofiño p. 155, Bérard); the Balearic channels none, the currents there
+following the wind (Tofiño p. 208). The block's box appended to `book_limits`. The polygons
+lie some 900 miles from every recorded passage's water. The tide's tests that held only the
+Strait's areas to a current name the block's six beside them.
+
+**The epitome** (Norie's table, a ship of war's): nine places with the period's rises
+(Málaga's three feet and its hour XII Purdy 1826's, p. 12; the rest a foot, Smyth's
+Cartagena and Mahon, Tofiño's Balearics pp. 210 and 226, Bérard's sixteen inches at
+Algiers), their hours each the block's own held gauge's establishment by the tide's rule
+(the nearest held gauge's for Cartagena, Oran and Algiers), JUDGEMENT; the rule gives
+Gibraltar 1h 38m by its own gauge against Tofiño's 1h. Not the world's: over the block the
+world's hour and range are a far gauge's (Málaga's world hour 3h 44m, its range Le
+Conquet's) while the gauges are held. Moore's table has no Mediterranean group and gains
+none.
+
+**The weather** (`data/weather/climatology.yaml`): the box `mediterranean-west` over both
+regions. Its check rows from the Admiralty's tables read from the page images: the days of
+wind from each point at Gibraltar (26 years), Cartagena (4), Palma (11), Oran (21) and Algiers
+(25), each table's totals checked against its months; Port Mahon's wind columns are blank
+and no table is given for Málaga or Toulon. The five blended with Palma and Oran at half
+weight (their bays' sea breezes: Palma's south-westerly days, Oran's north and south),
+a half-point's days split between its quarters, a tenth left for days of no prevailing
+quarter: January W 29, E 15, S 18, N 28; July W 18, E 29, S 18, N 25. The gale days
+(Cartagena, Palma, Mahon) give the strong-gale days at half and the strong-breeze days at
+three times, JUDGEMENT. The generator's figures were fitted to the rows by a scratch search
+outside the repository over simulated months (the tool `climatology_check.py`'s functions,
+the box named), the search held to the Mediterranean's plausible ranges (lows moving east,
+the high from the west round to the north-east), and then hand-mended: at 1,200 months, seed
+7, all twelve within five points of the westerly and easterly shares (January 29.1 and 16.2,
+July 13.6 and 25.9). Some figures are a fit and not a synoptic climatology (summer lows five
+or six a month to give the shares' variety): PROVISIONAL, said in every row. The positions
+at Málaga, Port Mahon and Algiers take the box; the Strait's western door keeps Portugal's.
+
+### Step 7: the scenario, sailed once (`data/scenarios/mahon.yaml`, seed 7)
+
+The frigate at anchor in Gibraltar road at 05:00 on 14 June 1805, the summer's Poniente
+from the west at seventeen knots, backing south-westerly and southerly as she runs east,
+then the Balearics' northerly after she arrives; pinned so that every machine sails the same.
+Her short book (`mahon.orders`): round Europa Point two leagues off, along the coast of
+Granada four leagues off and more to five leagues south of Cape de Gata, to four leagues
+south-east of the Hormigas, south of Formentera and up the channel between the Pityuses and
+Majorca to ten miles south of Cabrera, round the Isla del Aire, and anchor without the
+ledges at the mouth of Port Mahon (Tofiño p. 213); the Spanish port hostile, she does not go
+in under St Philip's ruins (its batteries and guard boats not modelled). She weighed at
+05:27, made Cape de Gata's offing at 02:07 on the 15th and Cape Palos's at 16:49, passed
+south of Cabrera at 20:47 on the 16th, came round the Aire at 09:45 on the 17th and anchored
+at 11:09 in 25 fathoms and a half, brought up at 11:27 with 128 fathoms of cable; the
+northerly came on at 22:00 and rose to eighteen knots, and she lay through it, not
+dragging, Cape Mola to windward; at 07:00 on the 18th her account was on the truth. On the
+coast of Granada the Picacho de Juana, the Sierra de Mijas and Sierra Nevada's peak gave her
+cross-bearing fixes (as Tofiño has the Sierra's marks serve, p. 31), off the Balearics Mount
+Toro and the Puig Major. Ninety-eight hours: 3,157 lines, digest `2daf47f56207a296`
+(`tools/day_log.py data/scenarios/mahon.yaml --hours 98 --reckoning`, this container). Not
+a gate's, not pinned. The first runs, kept for the book: the order named "the bay's mouth"
+was refused (an apostrophe in a standing order's name breaks its parse), so she never
+rounded Europa by her book; making for six miles off Cape de Gata with her account seven
+miles astray after twenty hours without a fix, she stood onto the shoal water west of the
+cape (the offings now five leagues and four, as a master with no fix keeps them); and off
+Minorca the hourly course for Formentera, a hundred and twenty miles astern, was still
+within its reach and wore her back (every hourly course now holds only while the marks
+beyond are far).
+
+### Found on the way (package 79c)
+
+- **The block was past the brief's 40 MB in one region** (57.5 MB: 142 all-land tiles and
+  a deep basin that compresses badly); built as two by the lead's ruling, each under 32 MB.
+- **The world's tide over the Mediterranean is a far gauge's**, Saint-Malo's over the
+  Balearics (6.83 m mean level, an M2 of 3.7 m, where Mahón's is 0.05 m): the held gauges'
+  cost at its sharpest, for the lead with package 89; the block's gauges are read and held,
+  their mean levels VERIFIED from REDMAR, so that 89's blend would give the Mediterranean its
+  own foot of tide at once.
+- **The business peoples no region whose ports' prices are alike**: with the block's first
+  markets the routes' price ratio never reached 1.3 and the business drew nothing in either
+  region; the Barbary grain (Oran's and Algiers' wheat in the Spanish ports' markets, from
+  memory) gave it its routes, the Algerine grain ships the regions' first traders.
+- **A standing order's name with an apostrophe is refused** ("After the name say a colon"):
+  the grammar's, not the block's; said here for package 85's pass over the orders.
+- **The lookout calls an isle the grid lacks "a danger"** (the Isla del Rey, a rock of its
+  height): the kind is a rock so that a ship cannot sail through it; its call as an island
+  wants a kind the chart has not (an island with an extent): for the lead.
+- **The brief's "Mahon's light" is not in the period's texts**: Purdy 1840 finds no light-
+  tower in the Balearics but Palma's, Grasset 1807 and Tofiño name none at Mahon; 1805 sees
+  none (truth 7-292). Málaga's mole lantern is Tofiño's leading mark by day, its lighting in
+  1805 UNVERIFIED; kept a light, said so.
+- **The regency's war with Portugal** (from memory: Algerine corsairs taking Portuguese ships
+  until the peace of 1813) is in the nation's relations and not in `wars:`, no work on file
+  giving it: Portugal's ships and the regency's ports neutral to each other in the table,
+  for the lead.
+- **Mahon's harbour in the grid**: the inlet is right at EMODnet's 115 m, its islands
+  smoothed into shoals; placed by hand by Tofiño's plan; a frigate would want a patch read
+  from Tofiño's plan with its datum to go in (the plan is CC BY-NC-SA on the Archive and was
+  read, not transcribed: a later package's, as Bellin's are).
+- **The modern ports are the grid's land** at Málaga, Almería, Palma, Oran, Algiers and
+  Escombreras (Cartagena's bay east of the mouth reclaimed): the port files' heads say so,
+  the anchorages laid in the period's water outside them.
+- **The committed texts carry period words a sweep for identifiers meets** (the Mistral, the
+  emperor Claudius as 'Claude', Fort Opus, Spanish 'llama', the long s as 'fable', Gemini):
+  kept verbatim, as the research pass's report says.
+
+### The region `mediterranean-west` (the Alboran sea, Málaga to Cartagena, Barbary to Oran)
+
+35.0 to 40.5 N and 5.0 W to 0.05 E (the north bound kept at 40.5 N: the ruling allowed
+40.13 N where no mark lies above, and the tiles are the same either way, the row from 40.13
+to 40.56 N meeting both; kept as the brief has it). **Its seams**: at 5 W with `strait`
+(the column from 5.07 to 4.64 W, 35.44 to 36.72 N, three tiles, the Strait's: "3 kept"); at
+0.05 E with `balearics` (the column from 0.37 W to 0.05 E, fourteen tiles, this region's,
+built first). 165 level-2 tiles of 24.0 MB, the patches of Málaga (12 tiles), Almería (6),
+Cartagena (6) and Oran with Mers-el-Kebir (6), 2.1 MB, the coast 0.39 MB: **26.5 MB**. 95
+marks (Spain from Marbella to Cape Palos and Isla Grosa, the Sierra's marks and Sierra
+Nevada's peak, Alboran, the Barbary coast from Cala Iris to Arzew); the gauges of Málaga,
+Motril, Almería and Melilla held; the stream areas of Cape Palos, the coast of Granada, the
+Barbary shore inshore from Oran, the Alboran sea and the block's open sea; four port files
+(Málaga, Almería, Cartagena, Oran).
+
+### The region `balearics` (the Balearics, Barbary from Mostaganem to Algiers)
+
+35.0 to 40.5 N and 0.05 E to 4.5 E. **Its seams**: at 0.05 E with `mediterranean-west`
+(the column from 0.37 W to 0.05 E, fourteen tiles, that region's: "14 kept"); at **40.56 N
+with 79d's `gulf-of-lion`**, by the lead's ruling of 2026-10-29: this region's tiles end
+at the row edge 40.56 N, and 79d moves the Gulf's south bound to 40.56 N and fills the strip
+of open sea that no tile answered, so the Gulf begins there west of 7.73 E; 79d's west bound
+at 3 E lies inside this region's 4.5 E, the open water between either's by the seam rule;
+nothing of this region's changes. 154 level-2 tiles of 28.8 MB, the patches of Palma (9),
+Port Mahon (3), Ivica (6) and Algiers (6), 1.7 MB, the coast 0.33 MB: **30.9 MB**. 87
+marks (Ivica, the Freus and Formentera, Majorca with Cabrera, Minorca with Port Mahon placed
+by hand, the Barbary coast from Mostaganem to Cape Matifu); the gauges of Ibiza, Formentera,
+Palma, Alcudia and Mahón held; the Balearic channels' area and the Barbary shore to Algiers;
+four port files (Palma, Ivica, Port Mahon, Algiers).
+
+**The order of the work against the ruling.** The ruling (read from the lead's branch when
+it landed) asked each region built, checked and committed in turn, its count and bytes
+reported before its commit. Both regions were built in turn (`mediterranean-west`, then
+`balearics` against its manifest), each one's checks printed and passing, and their counts
+and bytes are in the notes above and in "Steps 1 to 3 as ruled"; but they went into **one**
+commit (`5513042`) with the marks, not two. The history is not rewritten (no rebase); said
+here. **`skip_dry_tiles`** is a key the builder has had since package 39d (Portugal's
+inland tiles); it is not taken here, as the ruling has it: the Alboran's inland tiles east
+of 1 W (63 of the old count, 6.8 MB) are a later tidy for the lead.
+
+### The suite, as run (package 79c)
+
+On this session's own container (four cores), on the tree with the lead's branch merged in
+(`fafee99`, package 84's step 9 among it; the tuning notes the one conflict, both sides
+kept). `python -m ruff check .` and `ruff format --check .` clean; `python
+tools/build_charts.py --check` passes for both regions as printed above.
+
+**The recorded passages of the Channel west**: `python -m pytest tests/test_known_truths.py
+--slow -k "gate_5b or gate_5c"`, as the brief has it, selected one test (the passage for gate
+5b's constants) and it passed to its digest; the eleven tests that read the passages'
+fixtures, by node id (79b's list: the frigate's and the schooner's passages of gate 5b with
+the schooner's octant and pilot, the pace on the passage, the merchant passage with its
+deep-sea cast, the naval cruise with its stranger, truths 72, 77 and 78), `--slow -n 4`:
+**11 passed**, every pinned digest, line count and tick held. With the block's ten port files
+loaded on the Channel's chart by the passages that list no ports, the nine held gauges, the
+seven stream areas, the epitome's places, the regency and the weather box in place, nothing
+of the Channel moved.
+
+**The slow tests of the files touched**: `--slow -m slow -n 4 tests/test_chart.py
+tests/test_ports.py tests/test_tide.py tests/test_weather.py tests/test_nations.py
+tests/test_scenarios.py`, 14 passed; **the block's truths 7-285 to 7-294** with `--slow -n 4`,
+10 passed (7-294, the passage sailed whole to the northerly at the mouth of Port Mahon, 530 s
+alone).
+
+**The fast tier**, once on the final tree (`python -m pytest -n auto -q -p no:cacheprovider`,
+378 slow tests left out): four failed. Two this package's: `test_geo.py::test_the_scenario_
+file_reads_a_chart_beside_a_region_and_a_save_before_it_loads` (the chart's list of regions
+gains the block's two, as the other lists did) and truth 7-261 (package 79a's: its count of
+the nations, eight, now nine with the regency, whose `naval:` source cites James as the rule
+asks); both mended, their files run again with the pictures' (16 passed). Two the pictures'
+known flake under the tier's load, `test_pictures.py`'s chart "blank (std 7.9)" against its
+floor of 8.0 (79b's finding, the default scenario's chart about Falmouth, which this block
+does not reach): both pass alone on this tree. After the run the `balearics` recipe's title
+was mended ("Barbary from Mostaganem", Arzew lying in `mediterranean-west`) and the region
+rebuilt from the cache, no tile changed, the manifest's title line alone; `test_chart.py`
+run again, passed. Not run again whole, as the suites' rule has it.
+
+### Step 9: the director's reach and the truth over the hulls
+
+Built on step 8 as merged, the lead's head `76eb22c` brought in at the boundary (the design
+note's postscript "Step 9" has the shape). **What moved: nothing pinned.** No recorded
+passage names a hull in a world order, and the forms that read as they did read as they did.
+**The count.** `world/orders.py` (`hull_named`, `_aboard_target`, `_on_hull_words`, the head
+for `aboard the X:`, a person made or come aboard another hull, the cutter's letter to a hull,
+`held_stations_everywhere`), `world/ships.py` (`Vessel._ship_target`,
+`Vessels._deliver_to_hulls`), `world/people.py` (`Message.to_hull`), `agents/tools.py`
+(`read_log(ship=)`), `api/readings.py` (the hulls' rows, the persons ashore),
+`world/seats.py` (a person of any hull), `world/hearing.py` (the stations' walk over the
+hulls), `agents/director.py` (four examples); tests: six new in `test_world_orders.py`, the
+people test of package 68 restated (a ship without a captain of her own refuses in the
+hull's words), the forms test performing the new examples on its crewed sea.
+
+**Found on the way.** The hearing's walk over every World's stations
+(`stations_everywhere`) walked the parent and then the vessels' hulls, so since step 7 (the
+player's ship a vessel of the sea, her hull the followed) it counted the followed hull's
+stations twice; it walks `world.hulls` now, each once. Nothing read it twice to a pinned
+line (the hearers of a word are a set of persons), so nothing moved.
+
+**The suites on the step's tree** (the merged head `76eb22c` with the step; this container,
+three workers). The fast tier whole: **3944 passed, none failed** (the pictures' blank-image
+check passed this time); ruff clean.
+
+**For the lead's merge with package 79d** (the lead's note of 2026-10-29, 21:00): the step
+reworks no reader of a port's nation; its one read of one (`_message`'s cutter takes the
+port's nation for her colours) is the line as it was, and the trunk's head `449a72a` (79c's
+and 79d's records) is brought in under the step's changes, records only, before the commit.
+**The slow tier** of the known truths, the trials and the touched files (step 8's list with
+`test_director.py` and `test_seat_hook.py`; 191 tests): 182 passed, eight left out by their
+own marks, one failed, the lee-shore trial's digest (`7fad0ce7e46ba366` against
+`ed48ca3d61e52f20`, this container's figure as at every step). **The pace** (alone, load
+1.0 right after the slow set): truth 51's frigate alone over the floor; the day under
+systems 471, the gates' day 465 and 7-159's convoy 423 against the floor of 500, within the
+spread step 8's three-way A/B measured on this machine for the step 7 head (446 to 489 for
+the first two, 395 to 475 for 7-159), so the step costs nothing the measure sees and no A/B
+was run; `make_hull` of a brig 0.78 s (0.75 at step 8); truth 88's form with three hulls
+awake 214 ticks a second against the crewed floor of 60 (198 at step 8, 233 at step 7).
 
 ## Package 79d: the Gulf of Lion and the Tyrrhenian, Toulon, Corsica, Sardinia, Elba and Naples (2026-10-29)
 

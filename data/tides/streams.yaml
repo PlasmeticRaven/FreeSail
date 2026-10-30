@@ -104,6 +104,7 @@ book_limits:
   - {south: 35.5, north: 36.4, west: -6.5, east: -5.0}  # the Strait (package 39f)
   - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
   - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
+  - {south: 35.0, north: 40.5, west: -5.0, east: 4.5}  # the Mediterranean west, both regions (package 79c)
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
   - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
   - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
@@ -1058,6 +1059,137 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: the stream up and down the Channel's eastern reach, the rate the world's rounded, strongest at high water as the progressive wave has it in the open Channel (this file's head)"
+  # Package 79c, the Mediterranean west in two regions (`mediterranean-west`, `balearics`):
+  # the tide is a foot or two at most and its stream next to nothing (Michelot 1709: almost
+  # imperceptible past Málaga; Tofiño 1787 pp. 210 and 226: the Balearics rise one or two feet with
+  # the gales), so every area has no tidal stream (Torbay's form, package 43b) and the
+  # period's constant current beside it where a pilot gives one (package 39f's `current:`).
+  # First-match: the coasts' bands before the open sea; the block's open area after them
+  # all. Far from every recorded passage's water (some 900 miles from the Channel's).
+  - id: cape-palos-offing
+    chart: mediterranean-west
+    name: the offing of Cape Palos and the Hormigas
+    polygon: [[37.45, -0.78], [37.80, -0.78], [37.80, -0.40], [37.45, -0.40]]
+    axis_deg: 135
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 135, kn: 1.0}
+    source: "Tofiño 1787, 'Advertencias', p. 79: over Cape Palos the waters almost always run fast to the south-east, and the more so the farther out; Norie 1831, p. 22: at Cape Palos the currents set to the south-eastward and become more rapid as you get from land; Purdy 1826, p. 18: off Cape Palos commonly a current setting to the south-eastward; no tidal stream; the rate JUDGEMENT"
+    book:
+      set: SE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SE, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the current's set the period's own (Tofiño 1787 p. 79, 'para el S E.'); its rate JUDGEMENT; no tidal stream (the set and the hour of a stream that is not, the form's)"
+  - id: granada-coast
+    chart: mediterranean-west
+    name: the coast of Granada, the Strait's east bound to Cape de Gata
+    polygon: [[36.30, -5.00], [36.56, -5.00], [36.68, -4.42], [36.76, -3.60], [36.80, -2.60], [36.92, -2.40], [36.85, -2.10], [36.60, -2.10], [36.55, -2.60], [36.55, -3.60], [36.45, -4.42]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 1.0}
+    source: "Smyth 1854, Part II, 'Currents', p. 161: along the coast of Granada at the rate of one knot an hour eastwards; Tofiño 1787, p. 46: much current to the east about Alboran; the Admiralty's Mediterranean Pilot vol. I (1913), pp. 52 to 53: from the Strait to the meridian of Málaga four to five knots, from Málaga to Cape de Gata one to two (the modern figure, the near shore's less); Purdy 1826, pp. 349 to 350: from Málaga the flood sets along shore westward to Gibraltar (an eddy inshore, not modelled); the rate JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the current's set and rate Smyth 1854's (p. 161), later than the period; Tofiño 1787's 'mucha corriente para el E.' about Alboran (p. 46); no tidal stream"
+  - id: barbary-inshore-west
+    chart: mediterranean-west
+    name: the Barbary shore from Oran toward the Strait, close in
+    polygon: [[35.10, -5.00], [35.28, -5.00], [35.30, -4.30], [35.32, -3.90], [35.42, -2.95], [35.30, -2.40], [35.45, -1.80], [35.82, -0.80], [35.82, -0.55], [35.70, -0.55], [35.25, -1.80], [35.05, -2.40], [35.05, -4.30]]
+    axis_deg: 270
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 270, kn: 0.5}
+    source: "Tofiño 1787, 'Advertencia', p. 155: from Oran toward the Strait close in with the coast the current is for the Strait, and the stronger the nearer to it, while in the middle of the channel its regular course is always to the east; at the Peñon de Velez and Alhucemas a westward set (pp. 57 to 59); Bérard 1837, p. 85, quotes Tofiño; Purdy 1826, p. 323: at Arzeo running to the westward; the rate JUDGEMENT"
+    book:
+      set: W
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: W, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the current's set the period's own (Tofiño 1787 p. 155, 'para el Estrecho'); its rate JUDGEMENT; no tidal stream"
+  - id: barbary-algiers
+    chart: balearics
+    name: the Barbary shore from Arzew to Algiers and Cape Matifu
+    polygon: [[35.75, -0.55], [35.95, -0.55], [36.10, 0.30], [36.62, 2.00], [36.90, 3.00], [36.90, 3.40], [36.70, 3.40], [36.48, 2.00], [35.90, 0.30]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Bérard 1837, ch. IV, pp. 71 to 72: the general current enters by the Strait and runs east along the coasts of Barbary at about half a mile an hour; the Admiralty's Mediterranean Pilot vol. I (1913), pp. 52 to 53: along the African coast about a knot an hour; Norie 1831, p. 356: off Algiers the Tiger found a current setting to the north-westward at a knot and a half (one ship's report, not modelled); the rate Bérard's"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "Bérard 1837 (p. 72), later than the period; Tofiño 1787 (p. 155): in the middle of the channel the regular course always to the east; no tidal stream"
+  - id: alboran-sea
+    chart: mediterranean-west
+    name: the Alboran sea, between Spain and Barbary west of Cape de Gata
+    polygon: [[35.28, -5.00], [36.30, -5.00], [36.45, -4.42], [36.55, -3.60], [36.55, -2.60], [36.60, -2.10], [35.40, -2.10], [35.42, -2.95], [35.32, -3.90], [35.30, -4.30]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 80, kn: 1.5}
+    source: "Purdy 1826, p. 14: near Alboran the current in general sets strongly to the eastward; Tofiño 1787, p. 46: much current to the east about the island; Smyth 1854, p. 161; the Admiralty 1913, pp. 52 to 53 (four to five knots near the Strait, the modern figure); the set a little north of east with the coast, the rate JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 1.5}
+      judgement: [set, rates, hour, current]
+      source: "the current's set the period's own (Tofiño 1787 p. 46; Purdy 1826 p. 14); its rate JUDGEMENT; no tidal stream"
+  - id: balearic-channels
+    chart: balearics
+    name: the Balearic islands and the channels between them and the main
+    polygon: [[38.55, 0.80], [40.20, 0.80], [40.20, 4.50], [38.55, 4.50]]
+    axis_deg: 45
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Tofiño 1787, 'Corrientes', p. 208: in all the Freus and channels between the islands quick currents, which act as a rule in the direction of the reigning winds; among the islands and in the channels the currents follow the wind; Michelot 1715, pp. 16 to 17: off Formentera the currents generally run to the north-east, especially in fine weather; Bérard 1837, p. 72: from France to the Balearics a south-westerly set of a mile an hour, off Minorca south a mile; no constant current taken (the period's word is the wind's), no tidal stream"
+    book:
+      set: NE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "no statement but that the currents follow the wind (Tofiño 1787 p. 208); the set Michelot's of fine weather, the form's; no tidal stream"
+  - id: med-west-open
+    chart: mediterranean-west
+    name: the open sea of the Mediterranean west
+    polygon: [[35.00, -5.00], [40.50, -5.00], [40.50, 4.50], [35.00, 4.50]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Tofiño 1787, p. 155: in the middle of the channel between Spain and Barbary the regular course always to the east; Smyth 1854, p. 161: after Cape Palos the current sets east-south-east, and toward the Balearics north-east; Bérard 1837, p. 71: the general rate half a mile an hour; the set east and the rate JUDGEMENT within them"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the period's own in the middle of the channel (Tofiño 1787 p. 155); the rate Bérard's general half mile, JUDGEMENT; no tidal stream"
   # package 79d, the Gulf of Lion's block (the region `gulf-of-lion`): the Mediterranean's
   # water has no tidal stream to speak of ("the tides are of little moment", Smyth 1854,
   # p. 178), so every area's stream is nought at springs and neaps (Torbay's form, package

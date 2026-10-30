@@ -138,7 +138,19 @@ CHANNEL_EAST_PORTS = [
     "poole",
     "portsmouth",
 ]
-# package 79d: the Gulf of Lion's block's four and the Ligurian sea's seven, in their lists
+# package 79c: the Mediterranean west's eight (two regions), in their own list
+MED_WEST_PORTS = [
+    "algiers",
+    "almeria",
+    "cartagena",
+    "ivica",
+    "malaga",
+    "oran",
+    "palma",
+    "port-mahon",
+]
+# package 79d: the Gulf of Lion's block's four, the Ligurian sea's seven and the
+# Tyrrhenian's five, in their lists
 GULF_PORTS = ["hyeres", "marseille", "toulon", "villefranche"]
 LIGURIAN_PORTS = [
     "ajaccio",
@@ -149,7 +161,6 @@ LIGURIAN_PORTS = [
     "porto-ferrajo",
     "san-fiorenzo",
 ]
-# and the Tyrrhenian's five
 TYRRHENIAN_PORTS = ["alghero", "cagliari", "civita-vecchia", "gaeta", "naples"]
 ALL_PORTS = sorted(
     ALL_PORTS
@@ -157,6 +168,7 @@ ALL_PORTS = sorted(
     + ISLANDS_PORTS
     + STRAIT_PORTS
     + CHANNEL_EAST_PORTS
+    + MED_WEST_PORTS
     + GULF_PORTS
     + LIGURIAN_PORTS
     + TYRRHENIAN_PORTS
@@ -326,6 +338,10 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # the Channel's east block (package 79b): the French ports of the invasion coast hostile,
     # the English ones the King's
     french_ports |= {"le-havre", "boulogne", "calais", "dunkirk"}
+    # the Mediterranean west (package 79c): the Spanish ports hostile, the regency of
+    # Algiers' at peace with Britain and neutral to her
+    french_ports |= {"malaga", "almeria", "cartagena", "palma", "port-mahon", "ivica"}
+    neutral_ports |= {"oran", "algiers"}
     # the Gulf of Lion's block (package 79d): the French coast hostile; the Ligurian sea's
     # Corsica and Elba hostile, and Genoa too, France's from the annexation of 4 June 1805
     # (its file's dated nation; this world's day is after it); Leghorn (Etruria's) and the

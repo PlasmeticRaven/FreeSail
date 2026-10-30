@@ -35,6 +35,8 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
         "denmark",
         # package 39f: Morocco, for Tangier
         "morocco",
+        # package 79c: the regency of Algiers, for Algiers and Oran
+        "algiers",
         # package 79d: the King of Sardinia and the Italian states
         "sardinia",
         "naples",
@@ -207,6 +209,15 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "boulogne": "france",
         "calais": "france",
         "dunkirk": "france",
+        # the Mediterranean west (package 79c): Spain's, and the regency of Algiers'
+        "malaga": "spain",
+        "almeria": "spain",
+        "cartagena": "spain",
+        "palma": "spain",
+        "port-mahon": "spain",
+        "ivica": "spain",
+        "oran": "algiers",
+        "algiers": "algiers",
         # the Gulf of Lion's block (package 79d)
         "toulon": "france",
         "marseille": "france",

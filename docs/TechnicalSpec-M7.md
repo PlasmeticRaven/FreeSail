@@ -833,7 +833,10 @@ Since step 7 the player's ship is a vessel of the sea like any member (`Vessels.
 retired), a hull at anchor or in port may be awake, and the cap's order is a ship in
 dealings, then a hull with a stationed person, then the nearest. Since step 8 the save holds
 every hull's stations (`hulls`), each input and act of a station on another ship names her
-hull, and a replay gives them to her again by either road.
+hull, and a replay gives them to her again by either road. Since step 9 the director's forms
+name a hull (`aboard the Raven: ...`, a person made or come aboard her, a cutter's letter
+to her), the truth walks every hull and the persons ashore, `read_log(ship=)` reads a hull's
+log, and a seat may be at a person aboard any hull.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 
@@ -1015,6 +1018,15 @@ on milestone 6's machinery; as built in spec M6 §26's list, figures in
 `docs/dev/TuningNotes.md`, "Package 79b". (The brief named this section §26; the chart's
 section of this spec is §28, and the pointer is here.)
 
+**As built: the Mediterranean west (package 79c, 2026-10-29).** The block from the Strait's
+east bound at 5 W to Cape Palos and Cartagena, the Balearics, and the Barbary coast from
+Ceuta's east to Algiers, begun with the research pass that serves 79d's basin too (fifteen
+period and later pilots under `docs/references/pilots/`, the Admiralty's meteorological
+tables as page images). Past the brief's 40 MB in one region it was built as two by the
+lead's ruling, `mediterranean-west` (5 W to 0.05 E) and `balearics` (0.05 E to 4.5 E), on
+milestone 6's machinery; the regency of Algiers a nation of data alone; the Mediterranean's
+first weather box from a printed table; as built in spec M6 §26's list, figures in
+`docs/dev/TuningNotes.md`, "Package 79c".
 **As built: the Gulf of Lion and the Tyrrhenian (package 79d, 2026-10-29).** The fourth of
 79's packages, three regions by the lead's ruling on its first step's measure: `gulf-of-lion`
 (the Roussillon and Provence to Nice and Villefranche, its south bound meeting 79c's

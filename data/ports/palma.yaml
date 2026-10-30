@@ -1,0 +1,107 @@
+# FreeSail: Palma of Majorca as a port (spec M6 §26; package 79c, the Balearics), on package
+# 35's machinery; the marks are the features file's (data/charts/features/balearics.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Bahía de Palma', 'Puerto Pi', 'Fondeadero
+# para Navios', pp. 184 to 188: the bay between Cape Cala Figuera and Cape Blanco, all clean
+# and deep on its west side; Porto Pí, a little harbour for a frigate moored in four to the
+# rocks of either shore over 18 or 20 feet, with its lantern on the south-west point lit
+# every night at the hour of the Ánimas; the ships of the line anchor off the Lazareto in 10,
+# 8 and 6 1/2 brazas, the Cathedral bearing NE 3/4 E and the Lazareto in one with the castle
+# of Bellver N 69° W; frigates and lesser craft nearer the Lazareto in 4 1/2 brazas, all good
+# holding; moor NW and SE, for the south-west wind sends in much sea and reigns much in
+# winter; the Cuervo Marino, a cable off the old shipyard with 2 1/2 brazas on its outer
+# edge, the only hidden danger of the place; small craft go within the city's mole, three
+# brazas at its head. Vargas Ponce 1787, pp. 23 to 39 (the city); Purdy 1826, pp. 37 to 38.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Palma in this package (Roux's plate 8
+# read and not transcribed, CC BY-NC-SA); the chart's depths are EMODnet's at the lowest
+# astronomical tide, the modern port's moles and docks in the grid over Porto Pí and the
+# Lazareto's shore.
+#
+# The stance. Palma is Spain's: hostile to a King's ship from December 1804, open to a
+# neutral. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: palma
+name: Palma
+nation: spain
+source: "Tofiño 1787 pp. 184-188 (the bay of Palma, Porto Pí, the anchorage off the Lazareto, the Cuervo Marino, the mooring); Vargas Ponce 1787 pp. 23-39; Purdy 1826 pp. 37-38"
+datum: unverified
+
+outer_road:
+  name: the bay of Palma
+  lat_deg: 39.5300
+  lon_deg: 2.6300
+anchorage:
+  feature: palma-road
+  name: Palma road, off the Lazareto
+  lat_deg: 39.5572
+  lon_deg: 2.6358
+mooring:
+  feature: palma-road
+  name: off the Lazareto, moored north-west and south-east
+  lat_deg: 39.5572
+  lon_deg: 2.6358
+  depth_fathoms: 7
+  bottom: sand, good holding
+  deep_draught_ft: 20    # judgement: ten, eight and six and a half brazas for the ships of the line
+shore:
+  feature: palma-mole
+  name: the mole of Palma
+  lat_deg: 39.5655
+  lon_deg: 2.6435
+
+pilot:
+  station: palma-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a llaüt of Palma
+    under: a lateen sail and oars
+    note: "the Majorcan llaüt (judgement)"
+  names: [Oliver, Pons, Salvà, Ferrer, Vidal, Coll, Bonnín, Pujol]   # Majorcan names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 180            # out of the bay to the south (judgement)
+  words:
+    channel: "The bay is clean and deep on its west side: run along it in what water you will and look for the castle of San Carlos above its point; abreast of it Porto Pí opens. The one hidden danger is the Cuervo Marino, a cable off the old shipyard between Porto Pí and the Lazareto, with two brazas and a half on its outer edge."
+    marks: "The lantern of Porto Pí on its south-west point and the square tower of the Pelayres on the other; the castle of Bellver on its wooded hill a mile from the sea; the Cathedral over the city."
+    anchorage: "A ship of the line anchors off the Lazareto in ten, eight or six brazas and a half, the Cathedral north-east three quarters east and the Lazareto in one with Bellver; a frigate nearer the Lazareto in four and a half, all good holding. Moor north-west and south-east: the south-wester sends in much sea and reigns much in winter."
+    tide: "There is no tide here to speak of; the sea rises a foot or two with the gales."
+
+tide:
+  establishment: Palma
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 20, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
+    - {good: olive oil, price: 44, origin: spain, note: "the Majorcan oil, the island's great export; from memory"}
+    - {good: almonds, price: 40, origin: spain, note: "judgement"}
+    - {good: wine, price: 26, origin: spain, note: "judgement"}
+    - {good: brandy, price: 85, origin: spain, note: "judgement"}
+    - {good: oranges, price: 6, origin: spain, note: "the oranges of Sóller; judgement"}
+    - {good: carobs, price: 8, origin: spain, note: "judgement"}
+    - {good: salt, price: 11, origin: spain, note: "judgement"}
+    - {good: fresh beef, price: 26, origin: spain, note: "judgement"}
+    - {good: biscuit, price: 31, origin: spain, note: "judgement"}
+    - {good: vegetables, price: 3, origin: spain, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 52, note: "from the merchants' and the old shipyard's stores; judgement"}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.06, note: "judgement"}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 10, pounds: 1, delay_h: 12}
+
+closed_to: []

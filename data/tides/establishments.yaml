@@ -179,6 +179,26 @@ tables:
       - {name: Fecamp, lat_deg: 49.762, lon_deg: 0.370, hw_h: 10, hw_m: 30, spring_rise_ft: 11, rise_judgement: true, note: "Norie 1805, Table XLI p. 249 (the page image): Fecamp, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held) (Faden 1793 p. 16: the moon in the S S E or N N W makes high tide)"}
       - {name: Havre de Grace, lat_deg: 49.488, lon_deg: 0.105, hw_h: 10, hw_m: 30, spring_rise_ft: 22, note: "Norie 1805, Table XLI p. 250 (the page image): Havre de Grace, 10h 30m, 22 feet; Faden 1793 p. 20: in the spring tides the water rises 20 feet within the harbour"}
       - {name: Honfleur, lat_deg: 49.422, lon_deg: 0.233, hw_h: 10, hw_m: 30, spring_rise_ft: 14, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Honfleur, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
+      # package 79c, the Mediterranean west (both regions): the period's tables have no
+      # Mediterranean row but Gibraltar's (Norie 1805's Table XLI gives the sea's places
+      # their positions only); the rises are the pilots' (a foot or two at most), so the
+      # master's reduction of a cast is near nothing, as the period's was. The hours: Málaga
+      # Purdy's; elsewhere none in the period, so each the block's own held gauge's
+      # establishment by the tide's rule (data/tides/constituents.yaml, TICON's M2), the
+      # nearest held gauge's where the place has none (Cartagena by Almería's, Oran by
+      # Melilla's, Algiers by Palma's): JUDGEMENT, said in each note; the world's own hour
+      # over the block is a far gauge's (Le Conquet's or Saint-Malo's) while they are held.
+      # The gauges' own hours agree with the period where it speaks: Gibraltar's by its
+      # gauge 1h 38m against Tofiño's 1h.
+      - {name: Málaga, lat_deg: 36.716, lon_deg: -4.417, hw_h: 12, hw_m: 0, spring_rise_ft: 3, note: "Purdy 1826, 'Malaga', p. 12: 'The tide flows here at XII h., full and change, and rises about 3 feet'; Smyth 1854, p. 176: the master of the fleet found at Málaga a regular rise and fall, flood at about 12 hours"}
+      - {name: Almería, lat_deg: 36.832, lon_deg: -2.465, hw_h: 1, hw_m: 45, spring_rise_ft: 1, note: "the hour Almería's held gauge's establishment (TICON), JUDGEMENT; the rise JUDGEMENT within the pilots' 'next to no tide' (Michelot 1709: almost imperceptible past Málaga) and the gauge's spring range of 0.27 m"}
+      - {name: Cartagena, lat_deg: 37.593, lon_deg: -0.985, hw_h: 1, hw_m: 50, spring_rise_ft: 1, note: "Smyth 1854, p. 177: at Cartagena the rise and fall about sixteen inches (later than the period); the hour Almería's held gauge's establishment, 85 miles off, JUDGEMENT"}
+      - {name: Palma, lat_deg: 39.557, lon_deg: 2.636, hw_h: 7, hw_m: 20, spring_rise_ft: 1, note: "Tofiño 1787, pp. 210 and 226: in the Balearics the water rises only one or two feet with the tempestuous winds; the hour Palma's held gauge's establishment (TICON), JUDGEMENT, its spring range 0.08 m"}
+      - {name: Ivica, lat_deg: 38.909, lon_deg: 1.444, hw_h: 7, hw_m: 25, spring_rise_ft: 1, note: "Tofiño 1787, pp. 210 and 226 (the Balearics one or two feet with the gales); the hour Ibiza's held gauge's establishment (TICON), JUDGEMENT"}
+      - {name: Port Mahon, lat_deg: 39.889, lon_deg: 4.270, hw_h: 7, hw_m: 55, spring_rise_ft: 1, note: "Smyth 1854, p. 176: the harbour barely affected, the ebbing or flowing a foot or two irregular and more the winds' than the moon's; Tofiño 1787, pp. 210 and 226; the hour Mahón's held gauge's establishment (TICON), JUDGEMENT"}
+      - {name: Melilla, lat_deg: 35.293, lon_deg: -2.935, hw_h: 2, hw_m: 10, spring_rise_ft: 1, note: "Purdy 1826, p. 322: at the Zafarines the tide rises very little; the hour Melilla's held gauge's establishment (TICON), JUDGEMENT"}
+      - {name: Oran, lat_deg: 35.713, lon_deg: -0.642, hw_h: 2, hw_m: 20, spring_rise_ft: 1, note: "no period figure; the rise JUDGEMENT with Melilla's and Algiers'; the hour Melilla's held gauge's establishment, 114 miles off, JUDGEMENT"}
+      - {name: Algiers, lat_deg: 36.786, lon_deg: 3.069, hw_h: 7, hw_m: 20, spring_rise_ft: 1, note: "Bérard 1837, pp. 76 to 77: the tide scale set up in the port of Algiers in 1831 ranged sixteen inches at the most, its rise and fall tied to the wind and the glass; the hour Palma's held gauge's establishment, 168 miles off, JUDGEMENT"}
       # package 79d, the Gulf of Lion's block: the period's tide-hour for the shores of
       # France, Smyth 1854's ("the most exact observations giving only a foot or two of
       # rise ... the tide-hours at Toulon, Spezzia, and Naples ... 3h 30m, 1h 45m and 11h

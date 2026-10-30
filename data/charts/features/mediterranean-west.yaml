@@ -1,0 +1,1101 @@
+# The features of the Mediterranean west, the Strait's east bound (5 W) to Cape Palos and
+# Cartagena with the island of Alboran, and the Barbary coast from Ceuta's east by the
+# Peñon de Velez, Alhucemas, Melilla and the Zafarines to Oran and Mers-el-Kebir (package
+# 79c, the block's first region; the second, `balearics`, beyond 0.05 E): hazards, marks,
+# lights with their dates, places, anchorages and bottom notes, in the period's words,
+# each with its source in the references' form (docs/references/README.md), on the rules
+# of channel-west.yaml's head, read from:
+#
+#   Tofiño 1787     Vicente Tofiño de San Miguel, Derrotero de las costas de España en el
+#                   Mediterráneo y su correspondiente de África (Madrid, Ibarra, 1787;
+#                   docs/references/pilots/tofino-1787-derrotero-costas-espana-mediterraneo-ocr.txt),
+#                   cited by his marginal headings and printed pages. His soundings are brazas
+#                   of two Castilian varas (1.672 m; x 0.914 to fathoms), his feet the pie de
+#                   Burgos (0.279 m), his bearings true, his miles of sixty to the degree, his
+#                   longitudes from Cadiz's meridian.
+#   Purdy 1826      John Purdy, The New Sailing Directions for the Mediterranean Sea (Internet
+#                   Archive newsailingdirec01purdgoog), much of it Tofiño's in English, later
+#                   than the period: where it adds to Tofiño the entry says so.
+#   Purdy 1840      his New Sailing Directory for the Strait and the Western Division, its
+#                   'Pharonology' for the lights' later history.
+#   Smyth 1854      W. H. Smyth, The Mediterranean, the table of positions (Part V).
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart as remembered or from the pilot's bearings,
+# as each entry's `fix` says, then checked against the block's tiles by channel-west.yaml's
+# rule (a headland, island, town, castle, church, tower or hill to the nearest land within
+# 800 m; a light to the nearest land within 400 m; a rock, ledge, shoal or bank to the
+# shoalest head of the tiles within 400 m, never onto the land above two metres; an
+# anchorage to water holding half the pilot's depth within 800 m), by a script kept
+# outside the repository; a move is said in `fix`. Where the first placing missed by more
+# than the rule's reach the mark was moved to the nearest land or water beyond it and the
+# `fix` says so (the mark's place is then the coast's, a cable or two, not the remembered
+# point). An isle the grid lacks (EMODnet's cells some 115 m interpolate across it) is a
+# `rock` of its height with an `extent_m` of its size, so that a ship cannot sail through
+# it (docs/dev/ChartBlocks.md). Heights are above the sea for the horizon; a height not
+# from a pilot is FROM MEMORY or JUDGEMENT as marked.
+#
+# The modern ports are the grid's land or dredged water where 1805 had beach and road
+# (Málaga's, Almería's, Cartagena's Escombreras over its bay, Palma's, Oran's, Algiers'):
+# no period sheet is read with its datum here, so no patch; the port files say
+# `datum: unverified`.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+#
+# The lights of 1805: Málaga's mole lantern alone (Tofiño 1787 p. 34, 'la linterna del
+# Muelle'; its first lighting UNVERIFIED before him, taken from 1787). Tofiño names no
+# light at Cartagena, Cape de Gata, Alboran, Cape Palos, Melilla or Oran; Mers-el-Kebir's
+# 'linterna' is a tower of the castle (Tofiño p. 147), its light only planned in 1837
+# (Bérard 1837, pp. 172 to 173). The later lights (Cape de Gata's, Alboran's, Cape Palos's,
+# Mers-el-Kebir's) are not entered: no year for them is read here, and 1805 has none.
+# Estepona (5.15 W) and Tetuan are the Strait's (`strait`), west of 5 W.
+
+region: mediterranean-west
+features:
+- id: sierra-de-marbella
+  kind: hill
+  name: the top of the Sierra de Marbella
+  modern: La Concha (Sierra Blanca), above Marbella
+  lat_deg: 36.5481
+  lon_deg: -4.9306
+  height_m: 1215
+  source: "Tofiño 1787, 'Sierra de Marbella', p. 31: N 39° W 2 1/2 miles from the castle of San Luis the highest of the Sierra de Marbella, and N 12° W 2 1/2 miles the Picacho de Juana; these two points, as the Sierra de Estepona, may serve in thick weather when the Rock of Gibraltar is not seen, to know where you are and the course to keep off or to find Europa Point"
+  says: "The top of the Sierra de Marbella, the mark to know where you are when the Rock is hidden."
+  fix: "the modern chart's summit of La Concha (FROM MEMORY), within a mile and a quarter of Tofiño's bearing and distance from the castle; the height FROM MEMORY"
+- id: picacho-de-juanar
+  kind: hill
+  name: the Picacho de Juana
+  modern: the Juanar peak, above Marbella and Ojén
+  lat_deg: 36.5649
+  lon_deg: -4.8907
+  height_m: 1180
+  source: "Tofiño 1787, 'Sierra de Marbella', p. 31: N 12° W 2 1/2 miles from the castle of San Luis the Picacho de Juana, a mark with the Sierra de Marbella's top for thick weather"
+  says: "The Picacho de Juana over Marbella, a mark for thick weather."
+  fix: "the modern chart's Juanar (FROM MEMORY), Tofiño's bearing from the castle; his distance falls short, as on these beaches (the head); the height FROM MEMORY"
+- id: sierra-de-mijas
+  kind: hill
+  name: the top of the Sierra de Mijas
+  modern: Pico de Mijas
+  lat_deg: 36.6178
+  lon_deg: -4.6636
+  height_m: 1150
+  source: "Tofiño 1787, 'Sierra de Mijar', p. 32: N 22° W 5 1/2 miles from the castle of the Frangerola the highest point of the Sierra de Mijar, the town of the same name at its foot"
+  says: "The top of the Sierra de Mijas over the Frangerola."
+  fix: "the modern chart's Pico de Mijas (FROM MEMORY), within half a mile of Tofiño's bearing and distance from the castle; the height FROM MEMORY"
+- id: mulhacen
+  kind: hill
+  name: the peak of the Sierra Nevada
+  modern: Mulhacén
+  lat_deg: 37.0533
+  lon_deg: -3.3112
+  height_m: 3479
+  source: "Smyth 1854, Part V, the table of positions, p. 431: 'Cerro de Mula-hacen, 37 8 0 N, 3 28 0 W, 11,370, Peak of Sierra Nevada' (a later survey; the mountain the period's as the modern's)"
+  says: "The peak of the Sierra Nevada, snow on it, seen far out at sea."
+  fix: "the modern chart's summit (FROM MEMORY), five miles from Smyth's latitude; the height the modern 3,479 m (Smyth's 11,370 feet, 3,466 m)"
+- id: marbella
+  kind: town
+  name: Marbella and the castle of St. Luis
+  modern: Marbella
+  lat_deg: 36.5095
+  lon_deg: -4.885
+  height_m: 20
+  source: 'Tofiño 1787, ''Castillo de San Luis y Población de Marbella'', pp. 30 to 31: the castle of San Luis half a cable from the beach, a reef running out about 2 cables to the SE, its nearer rocks uncovered and the farther covered; the town close north of the castle, water plentiful and easy; Purdy 1826, ''Estepona to Malaga'', p. 10'
+  says: Marbella and the castle of St. Luis by the beach, a ledge running two cables to the south-east of it; water plentiful and easy got.
+  fix: the modern chart's position of the old town; height JUDGEMENT
+- id: marbella-road
+  kind: anchorage
+  name: the road of Marbella
+  modern: off Marbella
+  lat_deg: 36.495
+  lon_deg: -4.883
+  height_m: 0
+  depth_fathoms: 18.3
+  bottom: sand
+  source: 'Tofiño 1787, ''Marbella'', p. 31: the traders anchor between the two reefs in 8 brazas sand; a mile to the S of the town any great ship may anchor in 20 brazas sand, sheltered from the sea and land winds; Purdy 1826, p. 10: ''18 fathoms, sand'''
+  says: Marbella road, a mile south of the town in twenty brazas, sand; the traders lie between the two ledges in eight.
+  fix: a mile S of the town by Tofiño's words; 20 brazas (18.3 fathoms)
+- id: calaburras-point
+  kind: headland
+  name: the point of Burra
+  modern: Punta de Calaburras
+  lat_deg: 36.5075
+  lon_deg: -4.6385
+  height_m: 30
+  source: 'Tofiño 1787, ''Cala y Punta de Burra'', p. 32: N 70° E 2 1/2 miles from the tower of Cala Moral, the cove and point of Burra in latitude 36° 30'' 50'''', guarded with rocks that run more than a cable to the SE and E, with a tower on it; Purdy 1826, ''Malaga to Torros'', p. 11'
+  says: The point of Burra with its tower, rocks running a cable off it to the south-east and east.
+  fix: the modern chart's Punta de Calaburras (Tofiño's latitude 36° 30' 50'' agrees within half a mile); height JUDGEMENT
+- id: fuengirola-castle
+  kind: castle
+  name: the castle of Frangerola
+  modern: Castillo Sohail, Fuengirola
+  lat_deg: 36.5335
+  lon_deg: -4.626
+  height_m: 30
+  source: 'Tofiño 1787, ''Castillo de la Frangerola'', p. 32: N 26° 30'' E 1 1/2 miles from the tower of Cala de Burra, on the height of a little hill at whose foot the beach begins; Purdy 1826, p. 11: ''Frangerola Castle is antient, and has five or six small towers'''
+  says: The castle of Frangerola on its little hill, antient, with five or six small towers.
+  fix: the modern chart's position of the castle; height JUDGEMENT
+- id: fuengirola-road
+  kind: anchorage
+  name: the road of Frangerola
+  modern: Ensenada de Fuengirola
+  lat_deg: 36.5378
+  lon_deg: -4.615
+  height_m: 0
+  depth_fathoms: 8.2
+  bottom: not stated by Tofiño ('buen fondeadero'); off a low beach, Purdy
+  source: 'Tofiño 1787, pp. 32 to 33: good anchorage for any class of vessel all along the beach, the usual E of the castle in 8 to 10 brazas under its guns, farther out if no enemy is feared; sheltered from the first quadrant''s winds, to be left with the rest; water in a river a little NE of the castle; Purdy 1826, p. 11: 7 to 9 fathoms off a low beach, or 10 and 12 farther off'
+  says: Frangerola road, east of the castle in eight to ten brazas under its guns; good with the wind off the land, and to be left with any other.
+  fix: east of the castle off the beach; 9 brazas, the middle of Tofiño's 8 to 10 (8.2 fathoms); moved 25 m to the nearest water of the tiles holding half the pilot's depth (7.5 m)
+- id: torre-bermeja-rock
+  kind: rock
+  name: the rock off Torre Bermeja
+  modern: the rock off Torre Bermeja, Benalmádena
+  lat_deg: 36.5907
+  lon_deg: -4.5211
+  height_m: 0
+  extent_m: 60
+  dries_m: -2.5
+  source: 'Tofiño 1787, ''Puntas de Aneal y Perulexo'', p. 33: SE of the point of Perulexo and S 22° W of Torre Bermeja half a mile a shoal on which several have grounded, of stone the length of a ship and with 1 1/2 brazas over it; Purdy 1826, p. 11: ''a sunken rock, about the size of a ship''s hull, with 9 feet over it'''
+  says: 'The rock half a mile south-south-west of Torre Bermeja, the length of a ship, with a braza and a half on it: several have struck there.'
+  fix: Tofiño's bearing and distance from the modern place of Torre Bermeja (FROM MEMORY, by the marina of Benalmádena); 1 1/2 brazas (2.5 m); the extent JUDGEMENT from 'the length of a ship'; moved 372 m to the shoalest head of the tiles within 400 m (+1.7 m against the datum)
+- id: torremolinos-point
+  kind: headland
+  name: the point of Torre Molinos
+  modern: Punta de Torremolinos
+  lat_deg: 36.621
+  lon_deg: -4.499
+  height_m: 15
+  source: 'Tofiño 1787, ''Punta de Torre Molinos'', p. 34: of little height, in latitude 36° 37'' 15''''; on its E side shelter from W and NW winds for any vessel, anchoring commonly in 25 to 28 brazas with the castle on the point bearing W to SW, open to the E wind; Purdy 1826, p. 11'
+  says: The low point of Torre Molinos with its castle; shelter east of it from westerly winds in twenty-five brazas, but open to the Levant.
+  fix: the modern chart's point at the castle; Tofiño's latitude agrees; height JUDGEMENT ('of little height')
+- id: rio-gordo-bank
+  kind: shoal
+  name: the bank of the Rio Gordo
+  modern: the bar of the Guadalhorce
+  lat_deg: 36.6636
+  lon_deg: -4.4439
+  height_m: 0
+  extent_m: 900
+  dries_m: -2.0
+  source: 'Tofiño 1787, ''Málaga y Dirección para ir á su fondeadero y Muelle'', p. 34: midway along the two leagues of beach from Torre Molinos to Málaga the Rio Gordo, of good flow, throws out a point of sand of little depth, running out about a mile; ships from the W pass Torre Molinos at a league and keep Málaga on the larboard bow to go outside it; pp. 34 to 35: else go in 7 brazas, sand, until abreast the river''s point where it is mud; Purdy 1826, p. 11 (footnote, a British officer): it ''runs off very shoal to the distance of 2 1/2 miles: the sea breaks on it in blowing weather; the flood-tide sets directly on it'''
+  says: 'The bank off the Rio Gordo, a point of sand a mile into the sea, which breaks in blowing weather: keep Málaga on the larboard bow, or seven brazas.'
+  fix: 'off the mouth of the Guadalhorce (FROM MEMORY); the river''s mouth has moved since; extent capped at 900 m (Tofiño''s mile, Purdy''s officer''s 2 1/2 miles); the depth over it unstated: 2 m JUDGEMENT; moved 391 m to the shoalest head of the tiles within 400 m (-12.2 m against the datum)'
+- id: malaga
+  kind: town
+  name: Malaga
+  modern: Málaga
+  lat_deg: 36.721
+  lon_deg: -4.419
+  height_m: 130
+  source: 'Tofiño 1787, pp. 34 to 36 (the mole in latitude 36° 43'' 30'''', longitude 1° 52'' E of Cadiz); Purdy 1826, ''Malaga to Torros'', p. 11: may be readily known from sea by an old castle on a hill behind the town with white walls, which are distinguishable at a great distance; nearer, the great church in the middle of the town near the sea-side; about 40,000 inhabitants (Townsend)'
+  says: Malaga at the foot of its mountain, the old castle's white walls on the hill behind and the great church by the sea-side.
+  fix: the modern chart's old town; height that of the castle of Gibralfaro over it, FROM MEMORY
+- id: malaga-mole-light
+  kind: light
+  name: the lantern of the mole of Malaga
+  modern: the mole-head of Málaga (La Farola stands there now)
+  lat_deg: 36.7161
+  lon_deg: -4.4168
+  height_m: 10
+  lit:
+    from: 1787
+    until: null
+    range_nm: 5
+    character: a lantern on the mole-head (the revolving light of six leagues is later)
+  source: 'Tofiño 1787, ''Málaga'', p. 34: to clear the bank, bring the lantern of the mole (''la linterna del Muelle'') in one with the hermitage of San Christobal on a mountain inside the Alcazaba, which leads over 4 1/2 brazas, so that a ship of the line should open them to the E; Purdy 1826, p. 11: ''this port is now distinguished by a light-house, exhibiting an excellent revolving light, which may be distinctly seen at the distance of about six leagues'', and ''the lantern on the Mole bearing N.N.E. will lead clear''; Purdy 1840, Pharonology: ''a light tower on the mole-head ... with salient revolving light, seen at the distance of six leagues''. The ''from'' is the first record here (Tofiño 1787): the lantern''s first lighting UNVERIFIED before it. The revolving light of Purdy 1826 is a later lighthouse, not the light of 1805'
+  says: 'The lantern on the mole-head of Malaga, a small light: in one with the hermitage of St. Christopher it leads clear of the Rio Gordo bank.'
+  fix: the modern mole-head lighthouse's place (FROM MEMORY), taken for the old mole's head; height and range JUDGEMENT (a harbour lantern, five miles); moved 146 m to the nearest land of the tiles
+- id: malaga-road
+  kind: anchorage
+  name: Malaga road
+  modern: the road of Málaga
+  lat_deg: 36.711
+  lon_deg: -4.406
+  height_m: 0
+  depth_fathoms: 10.1
+  bottom: sand in the approach (Tofiño); muddy ground in the road (Purdy)
+  source: 'Tofiño 1787, pp. 35 to 36: who would anchor in the road of Málaga do it E of the meridian of the mole in what brazas he will, for very near it there are eleven, riding at single anchor to make sail if the wind comes E or SE, to weather Torre Molinos or to shelter under the mole; with hard S and SW winds ships of the line should not run for the mole; within it ships moor in four parallel to it; Purdy 1826, p. 11: in the road, about a mile from the mole-head, 8 and 10 fathoms on muddy ground; the officer''s note, p. 12: best anchorage in 11 fathoms, the mole-head NE 1/2 E two-thirds of a mile, sandy bottom'
+  says: Malaga road east of the mole's meridian in eleven brazas at single anchor, ready to slip for Torre Molinos or the mole if the wind comes east or south-east.
+  fix: E of the mole's meridian, near it, by Tofiño; 11 brazas (10.1 fathoms)
+- id: torre-del-mar-road
+  kind: anchorage
+  name: the road of Velez Malaga, called of Torre del Mar
+  modern: off Torre del Mar
+  lat_deg: 36.7319
+  lon_deg: -4.0936
+  height_m: 0
+  depth_fathoms: 11.0
+  bottom: sand and greda (clay)
+  source: 'Tofiño 1787, ''Fondeadero de Torre del Mar'', p. 36: the anchorage of Vélez Málaga called of Torre del Mar fit for every kind of vessel, sheltered from W winds, in 12 brazas sand and greda, with a warp laid out to the SE to cast if the wind comes from there; a fortress called Torre del Mar with few people, the city a league to the N; Purdy 1826, ''Torros to Cape Sacratif'', p. 12: ''11 fathoms, bottom of sand and chalk'''
+  says: Torre del Mar road off the little fort, twelve brazas sand and clay, good with westerly winds; lay a warp out to the south-east.
+  fix: off the fortress of Torre del Mar; 12 brazas (11.0 fathoms); moved 177 m to the nearest water of the tiles holding half the pilot's depth (10.1 m)
+- id: nerja-road
+  kind: anchorage
+  name: the road of Nerja
+  modern: off Nerja
+  lat_deg: 36.7407
+  lon_deg: -3.8746
+  height_m: 0
+  depth_fathoms: 11.9
+  bottom: sand
+  source: 'Tofiño 1787, ''Nerja y su fondeadero'', p. 36: fit for every class of vessel sheltered from W and NW winds, anchoring in 13 brazas sand; open to the E and SE, the worst, so leave a warp to the SE as at Vélez; water plentiful in the fountains of the place but hard to bring down to the beach (p. 37); Purdy 1826, p. 12: 12 fathoms, sand'
+  says: 'Nerja road in thirteen brazas, sand: good with the wind west, but open to the Levant; water plentiful but troublesome to get off.'
+  fix: off the town; 13 brazas (11.9 fathoms); moved 195 m to the nearest water of the tiles holding half the pilot's depth (10.9 m)
+- id: almunecar-road
+  kind: anchorage
+  name: the road of Almuñecar
+  modern: off Almuñécar, east of the Peñones de San Cristóbal
+  lat_deg: 36.7287
+  lon_deg: -3.686
+  height_m: 0
+  depth_fathoms: 8.7
+  bottom: not stated by Tofiño; oaze and sand, Purdy
+  source: 'Tofiño 1787, ''Fondeaderos de Almuñecar'', pp. 38 to 39: the point of San Christobal of high rocks running out 230 toesas, with a beach either side; the E one shelters from westerlies, anchoring in 9 or 10 brazas about 1 1/2 cables from the rocks, ready to weather the point (which is bold) if the wind goes E; the W one only for small craft in 7 brazas; both only for a need, E and SE winds frequent and strong; water easy in the town; Purdy 1826, p. 12: ''on the east of this is anchoring ground, 12 fathoms, oaze and sand'''
+  says: Almuñecar road east of the point of St. Christopher in nine or ten brazas, a road for need only, the Levant being frequent and strong here.
+  fix: a cable and a half E of the point's rocks by Tofiño; 9 1/2 brazas (8.7 fathoms); moved 150 m to the nearest water of the tiles holding half the pilot's depth (8.0 m)
+- id: motril-road
+  kind: anchorage
+  name: the road of Salobreña, under the Peñon
+  modern: off Salobreña and the Peñón
+  lat_deg: 36.733
+  lon_deg: -3.595
+  height_m: 0
+  depth_fathoms: 12.3
+  bottom: lama (mud)
+  source: 'Tofiño 1787, ''Rio de Motril y su Fondeadero'', pp. 39 to 40: the beach of Salobreña is formed by the river of Motril, whose point shelters vessels of all sizes from the Levant; anchor anywhere along the beach, best W of the Peñon (which was once an island) in 9 to 18 brazas mud, whence with the wind W the river''s point may be weathered, with 20 brazas half a mile off it; the SW, on shore, gives no room to cast; a plentiful spring at the Peñon''s N foot by the sea; Purdy 1826, ''Cape Sacratif to Almeria'', p. 13: 8 to 16 fathoms, mud'
+  says: Salobreña road west of the Peñon in nine to eighteen brazas, mud, sheltered from the Levant by the river's point; a spring at the rock's foot.
+  fix: W of the Peñón de Salobreña; 13 1/2 brazas, the middle of Tofiño's 9 to 18 (12.3 fathoms)
+- id: cape-sacratif
+  kind: headland
+  name: Cape Sacratif, or the point of Carchuna
+  modern: Cabo Sacratif
+  lat_deg: 36.6945
+  lon_deg: -3.466
+  height_m: 100
+  source: 'Tofiño 1787, ''Punta Carchuna ó Cabo Sacratif'', p. 40: E 17° S of the river''s point 9 1/2 miles, in latitude 36° 41'', longitude 2° 49'' E of Cadiz; the highest land by the sea on this stretch, broken with gullies, with a tower on it; the cove of El Chucho on its E side with a tower of one gun; no anchorage on the beach from Motril; Purdy 1826, p. 13: ''the highest land of all this coast, rugged and steep'', with a round watch-tower'
+  says: Cape Sacratif, the highest land by the sea hereabout, rugged and steep, a round watch-tower on it.
+  fix: the modern chart's cape (Tofiño's latitude 36° 41' is 0.7 mile S of it); height FROM MEMORY of the modern light's elevation, JUDGEMENT
+- id: adra-road
+  kind: anchorage
+  name: the road of Adra
+  modern: off Adra
+  lat_deg: 36.741
+  lon_deg: -3.017
+  height_m: 0
+  depth_fathoms: 6.9
+  bottom: sticky muds that hold the anchors well (fangos pegajosos)
+  source: 'Tofiño 1787, ''Adra'' and ''Fondeadero'', p. 43: shelter from E round to NW for vessels of all sizes, anchoring anywhere on the beach, nearest the town in 7 to 8 brazas of sticky mud that grips the anchors well, the castle N 1/2 NE about 2 1/2 cables off the beach; the anchorage half a mile NW-SE, made by the river''s floods; from it a ship may make sail with any of the winds it is open to (SE, SW, W); water easy in the town; Purdy 1826, p. 13'
+  says: Adra road in seven or eight brazas of sticky mud, good holding, the castle north by east; a ship may make sail from it with any wind.
+  fix: 2 1/2 cables off the beach with the castle N 1/2 NE; 7 1/2 brazas (6.9 fathoms)
+- id: guardias-viejas
+  kind: castle
+  name: the castle of Guardias Viejas
+  modern: Castillo de Guardias Viejas
+  lat_deg: 36.6987
+  lon_deg: -2.8384
+  height_m: 15
+  source: 'Tofiño 1787, ''Castillo de Guardias Viejas'', p. 44: close to the Punta del Moro, the westernmost and southernmost of the plains of Almería; from it the coast runs low E in a bight 3 3/4 miles long full of stones on which the sea breaks with wind from seaward, the breakers reaching more than two leagues out, but in good weather a mile off the Moro there are 6 brazas, rock, and at a mile and a half any vessel may pass; p. 46: coming from the E by night, steer at least W 1/4 SW to clear these low plains until on the castle''s meridian, for some, steering by the high land to the N, have run aground on moonlit nights; Purdy 1826, p. 14'
+  says: 'The castle of Guardias Viejas at the head of the low plains of Almeria: give the plains a berth by night, for they lie low and foul.'
+  fix: the modern chart's position of the castle; height JUDGEMENT; moved 424 m to the nearest land of the tiles
+- id: roquetas-road
+  kind: anchorage
+  name: the road of Roquetas
+  modern: off Roquetas de Mar
+  lat_deg: 36.7682
+  lon_deg: -2.5916
+  height_m: 0
+  depth_fathoms: 16.5
+  bottom: coarse sand (arena gruesa); mud, sand and mud in places
+  source: 'Tofiño 1787, ''Castillo de las Roquetas, y su Fondeadero'', pp. 46 to 47: anchorage for any vessel sheltered from SW, W and NW once past the castle''s parallel, ordinarily in 18 brazas coarse sand ENE of it about a mile, whence a ship may weather out if the wind comes E; nearer in 7 or 8 more exposed; NE 1/4 E 600 toesas from the castle a rocky patch of 10 brazas to mind for the cables; Purdy 1826, p. 14: 16 fathoms, coarse sand'
+  says: Roquetas road a mile east-north-east of the castle in eighteen brazas, coarse sand; mind the rocky patch of ten brazas for the cables.
+  fix: a mile ENE of the castle of Santa Ana of Roquetas; 18 brazas (16.5 fathoms); moved 361 m to the nearest water of the tiles holding half the pilot's depth (15.1 m)
+- id: almeria
+  kind: town
+  name: Almeria
+  modern: Almería
+  lat_deg: 36.839
+  lon_deg: -2.464
+  height_m: 90
+  source: 'Tofiño 1787, ''Fondeadero, y Ciudad de Almería'', p. 48: at the head of a bight a little more than 3/4 mile deep, in latitude 36° 51'', longitude 3° 45'' E of Cadiz; Purdy 1826, ''Almeria to Cape de Gat'', p. 14: ''once the most commercial city of Spain'', its exports chiefly barilla and lead'
+  says: Almeria at the head of its little bay, under the old castle on the hill; barilla and lead its trade.
+  fix: the modern chart's old town; height that of the Alcazaba, FROM MEMORY
+- id: almeria-road
+  kind: anchorage
+  name: the road of Almeria
+  modern: off Almería
+  lat_deg: 36.825
+  lon_deg: -2.462
+  height_m: 0
+  depth_fathoms: 11.4
+  bottom: sand, strewn with ballast stones
+  source: 'Tofiño 1787, p. 48: the road runs from the Punta del Torrejon to the river''s point 2 miles E 12° S; to lie clear and sheltered from the E wind moor SSW of the bastion of the Santísima Trinidad (the city''s E angle) in 10 to 15 brazas sand 3/4 mile from the beach; more convenient for frigates and xebecs SW and WSW of it in 8 to 10, the smaller in 5 or 6 before the guard-house, with a line ashore; all the best of it sown with ballast stones thrown over by the loading ships, hurtful to the cables; good plentiful water at the city''s fountains; Purdy 1826, pp. 14 to 15'
+  says: Almeria road south-south-west of the Trinity bastion in ten to fifteen brazas, sand; the ground strewn with ballast stones that chafe the cables.
+  fix: 3/4 mile SSW of the old city's E angle by Tofiño; 12 1/2 brazas (11.4 fathoms)
+- id: cape-de-gata
+  kind: headland
+  name: Cape de Gat
+  modern: Cabo de Gata
+  lat_deg: 36.722
+  lon_deg: -2.193
+  height_m: 60
+  source: 'Tofiño 1787, ''Cabo de Gata'', p. 49 (repeated pp. 64 to 65): known by a watch-tower on an eminence called the Testa del Cabo, the easternmost of the gulf of Almería, in latitude 36° 44'' 00'''', longitude 4° 3'' 10'''' E of Cadiz; S 35° E less than 3/4 (OCR unclear) of a mile from the tower the castle of San Francisco de Paula or Corralete on the top of a hill sheer to the sea, with a high islet close to it and many steep-to rocks; much counter-current here that follows only the wind; Purdy 1826, ''Cape de Gat to Aguamarga'', p. 15'
+  says: Cape de Gat, known by the Testa tower, the castle of Corralete on its sheer hill and the high islet beside it; the currents here follow the wind.
+  fix: the modern chart's cape at the lighthouse, where the castle of Corralete stood (FROM MEMORY); Tofiño's latitude 0.7 mile N of it; height JUDGEMENT
+- id: corralete-anchorage
+  kind: anchorage
+  name: the anchorage of the Corralete
+  modern: Playa del Corralete, Cabo de Gata
+  lat_deg: 36.7251
+  lon_deg: -2.2003
+  height_m: 0
+  depth_fathoms: 7.8
+  bottom: clean, of sand and weed (arena y alga)
+  source: 'Tofiño 1787, ''Fondeadero del Corralete'', pp. 49 to 50 (and p. 64): between the castle and the Testa a little beach 2 1/2 cables long, before which is the true anchorage of the Corralete, of little use, sheltering only from the E wind, in 8 or 9 brazas WNW of the castle 2 cables off the beach or farther, the ground clean, sand and weed; open from W by S to SE; if the wind jumps SW fresh do not try to weather the castle''s point, for the current and the marble rock'
+  says: 'The Corralete under Cape de Gat, eight or nine brazas sand and weed: shelter from the Levant only, and with a fresh south-wester do not try to weather the point.'
+  fix: WNW of the cape's castle, 2 cables off the beach, by Tofiño; 8 1/2 brazas (7.8 fathoms); moved 56 m to the nearest water of the tiles holding half the pilot's depth (7.1 m)
+- id: gata-rock
+  kind: rock
+  name: the rock of Cape de Gat
+  modern: the rock off Cabo de Gata (the Laja)
+  lat_deg: 36.7176
+  lon_deg: -2.188
+  height_m: 0
+  extent_m: 50
+  dries_m: -2.8
+  source: 'Tofiño 1787, ''Piedra del Cabo de Gata'', p. 50 (and p. 65): a dangerous rock of white marble with 10 feet over it S 26° E of the castle a little more than a fraction of a mile (OCR unclear); one may pass between it and the coast in 6 and 7 brazas, but it is hazardous with a scant wind for the current and the want of clear marks; the marks: a cattle-house E of the castle on with a tower on the mountain''s top (N-S), and the point by the Sábana blanca on with the summit over Cala Figuera called the Frailes (E-W); Purdy 1826, p. 15: ''a rock of white marble, at half a mile S. 26° E. from the castle, with only 9 feet over it'''
+  says: 'The marble rock half a mile south-south-east of the castle of Cape de Gat, ten feet on it: there is a passage inside, but not with a scant wind.'
+  fix: Purdy's half mile at Tofiño's S 26° E from the modern place of the castle (the lighthouse); 10 pies de Burgos (2.8 m); extent JUDGEMENT; moved 400 m to the shoalest head of the tiles within 400 m (-11.5 m against the datum)
+- id: vela-blanca-tower
+  kind: tower
+  name: the tower of Vela Blanca
+  modern: Torre de Vela Blanca
+  lat_deg: 36.7235
+  lon_deg: -2.1642
+  height_m: 210
+  source: 'Tofiño 1787, ''Monte y Torre de Vela-blanca'', p. 50 (and p. 65): from the castle the coast runs high E to a tower on the peak of a high mountain called Velablanca for a white patch the mountain has toward the sea, which is very visible; Purdy 1826, p. 15: ''so named from a white spot towards the sea, which may be discerned at a considerable distance'''
+  says: The tower of Vela Blanca on its high peak, the white patch under it seen far to seaward.
+  fix: 'the modern chart''s position of the tower; height FROM MEMORY; moved 905 m to the nearest land of the tiles (beyond the rule''s 800 m: the first placing, from memory, fell in the water)'
+- id: genoves-anchorage
+  kind: anchorage
+  name: Port Genoves
+  modern: Ensenada de los Genoveses
+  lat_deg: 36.7448
+  lon_deg: -2.1179
+  height_m: 0
+  depth_fathoms: 5.9
+  bottom: lama y arena (mud and sand)
+  source: 'Tofiño 1787, ''Puerto Genovés'', pp. 51 (and 65 to 66): the W bay of the point of San Joseph, a beach running N-S a little more than half a mile, 3 cables deep within its points; only small craft go in, its greatest water 4 brazas, lying N of the SW point under the Cerro Genovés, sheltered from N by W to S; outside, larger vessels in 6 or 7 brazas NNE of the cerro a cable off, mud and sand; the W wind, fresh, comes down the gullies in hard gusts; open to E and SE'
+  says: Port Genoves, six or seven brazas mud and sand a cable north-north-east of the Cerro Genoves; hard gusts off the hills with a fresh westerly.
+  fix: NNE of the Cerro Genovés, a cable off, by Tofiño; 6 1/2 brazas (5.9 fathoms); moved 103 m to the nearest water of the tiles holding half the pilot's depth (5.4 m)
+- id: san-jose-anchorage
+  kind: anchorage
+  name: the bay of San Joseph
+  modern: Ensenada de San José
+  lat_deg: 36.759
+  lon_deg: -2.104
+  height_m: 0
+  depth_fathoms: 5.9
+  bottom: sand
+  source: 'Tofiño 1787, ''Ensenada de San Joseph'', p. 51 (and p. 66): the castle of San Joseph on a hill of little height over a point making two bays; the E one shelters from the same winds as Port Genovés, anchoring NNE of the castle in 6 or 7 brazas sand; both open to E and SE, with the latter no recourse to make sail; no people but the castle''s, no water but its cistern; Purdy 1826, p. 15: ''a cove, affording anchorage in 6 or 7 fathoms, but exposed to flaws and gusts'''
+  says: San Joseph bay north-north-east of the castle in six or seven brazas, sand; no water but the garrison's cistern, and no getting out with a south-easter.
+  fix: NNE of the castle of San José; 6 1/2 brazas (5.9 fathoms)
+- id: los-frailes
+  kind: hill
+  name: the Friars of Cape de Gat
+  modern: Los Frailes
+  lat_deg: 36.789
+  lon_deg: -2.086
+  height_m: 493
+  source: 'Tofiño 1787, ''Punta de Loma Pelada'', p. 52 (and p. 67): over the point of Loma Pelada two mountains of good height in the form of pyramids called the Frailes del Cabo de Gata, the first land of this coast discovered coming in from the sea; Purdy 1826, p. 15: ''two pyramidal hills, called the Friars of Cape de Gat, and which constitute the first land seen hereabout on coming in from sea'''
+  says: The Friars of Cape de Gat, two pyramidal hills, the first land seen coming in from the sea.
+  fix: the modern chart's summit of Los Frailes, inland of Loma Pelada; height FROM MEMORY
+- id: san-felipe-anchorage
+  kind: anchorage
+  name: the bay of the Escollos (Mahomet Arraez) off the castle of St. Philip
+  modern: off Los Escullos, Castillo de San Felipe
+  lat_deg: 36.804
+  lon_deg: -2.0575
+  height_m: 0
+  depth_fathoms: 11.9
+  bottom: coarse sand (arena gruesa)
+  source: 'Tofiño 1787, ''Fondeadero'', pp. 52 to 53 (and p. 67): in all the bay of the Escollos of Mahomet Araez one may anchor sheltered from W and SW, the great ships commonly E of the castle of San Felipe a fraction of a mile (OCR unclear) in 13 brazas coarse sand, open to SE and S; the small traders lie between the coast and the two Escollos SE of the castle; Purdy 1826, p. 15: 12 fathoms, coarse sand, resorted to in summer only'
+  says: The bay of the Escollos east of the castle of St. Philip in thirteen brazas, coarse sand; a summer road, open to the south-east.
+  fix: E of the castle of San Felipe, the distance JUDGEMENT (OCR unclear); 13 brazas (11.9 fathoms); moved 575 m to the nearest water of the tiles holding half the pilot's depth (10.9 m)
+- id: san-pedro-anchorage
+  kind: anchorage
+  name: the cove of the castle of San Pedro
+  modern: Cala de San Pedro
+  lat_deg: 36.8921
+  lon_deg: -1.9905
+  height_m: 0
+  depth_fathoms: 6.4
+  bottom: sand
+  source: 'Tofiño 1787, ''Castillo de San Pedro'' and ''Su Fondeadero'', pp. 53 to 54 (and p. 68): in latitude 36° 53''; the best anchorage of Cape de Gata, a little cove with good depth; SE of the castle a cable and a half off the E shore 7 brazas sand, sheltered from SW, W, NW, N and E; though open to the SE, the fresher it blows from there outside the more it blows off the land within, only a little swell coming in; small, 400 toesas deep; lie with a line ashore to the NE and the anchor to the SW; a spring at the castle''s foot; Purdy 1826, p. 15: ''the best anchorage about this coast'''
+  says: San Pedro cove, the best anchorage of Cape de Gat, seven brazas sand a cable and a half south-east of the castle, a line ashore to the north-east.
+  fix: 'SE of the castle of San Pedro by Tofiño (Smyth 1854, p. 431, has the castle 36° 53'' 21'''', 1° 59'' 58'''' W); 7 brazas (6.4 fathoms); moved 825 m to the nearest water of the tiles holding half the pilot''s depth (5.9 m; beyond the rule''s 800 m: the first placing, from memory, fell on the land)'
+- id: mesa-de-roldan
+  kind: headland
+  name: the Mesa de Roldan
+  modern: Mesa de Roldán
+  lat_deg: 36.943
+  lon_deg: -1.906
+  height_m: 220
+  source: 'Tofiño 1787, ''Mesa de Roldan'' and ''Punta de la Media Naranja'', p. 54 (and p. 69): the E point of the cove of Agua Amarga a mountain of good height in the figure of a table, on whose plain is a tower of two guns, useless for the height and for standing in the middle of the summit; its most salient part the Media Naranja in latitude 36° 54'' 50'''', longitude 4° 19'' 20'''' E of Cadiz; bold, so a ship may pass close; Purdy 1826, ''Aguamarga to Cope Head'', p. 16: ''a high promontory of table-land'''
+  says: The Mesa de Roldan, a high table-land with a tower in the middle of its summit; bold-to.
+  fix: 'the modern chart''s headland (Tofiño''s latitude as read falls 1.7 miles S of it: OCR or his error); height FROM MEMORY'
+- id: carboneras-road
+  kind: anchorage
+  name: the road of Carbonera
+  modern: off Carboneras
+  lat_deg: 36.9846
+  lon_deg: -1.893
+  height_m: 0
+  depth_fathoms: 23.8
+  bottom: clean, sand
+  source: 'Tofiño 1787, pp. 54 to 55 (and pp. 69 to 70): the castle and village of Carbonera with an anchorage fit for any class and number of vessels, sheltered from W and SW; clean sand anywhere, but ordinarily in 26 brazas SSW of the castle a mile, or as far from the islet, bringing it on with the Torre del Rayo, whence with an E wind one may stand S; with SE no room to cast and it must be ridden out; one brackish well; Purdy 1826, p. 16: 24 fathoms, about a mile S of the castle'
+  says: Carbonera road a mile south-south-west of the castle in twenty-six brazas, clean sand; with a south-easter it must be ridden out.
+  fix: 'a mile SSW of the castle of San Andrés (FROM MEMORY); 26 brazas (23.8 fathoms); moved 801 m to the nearest water of the tiles holding half the pilot''s depth (21.8 m; beyond the rule''s 800 m: the first placing, from memory, fell on the land)'
+- id: carboneras-islet
+  kind: island
+  name: the islet of Carbonera
+  modern: Isla de San Andrés
+  lat_deg: 36.995
+  lon_deg: -1.8888
+  height_m: 15
+  source: 'Tofiño 1787, ''Isleta de la Carbonera'', p. 55 (and p. 70): S 58° E a fraction of a mile (OCR unclear) from the castle an islet making a channel with the beach about 3 cables wide, but no passage, the ground in parts 2 brazas; Purdy 1826, p. 16: nearly half a mile SE of the castle, the channel narrow with not more than two fathoms in places'
+  says: 'The islet of Carbonera south-east of the castle: no passage inside it, two brazas in places.'
+  fix: the modern chart's Isla de San Andrés; height JUDGEMENT; moved 336 m to the nearest land of the tiles
+- id: aguilas-anchorage
+  kind: anchorage
+  name: the port of Las Aguilas
+  modern: Águilas, the western bay under the castle
+  lat_deg: 37.405
+  lon_deg: -1.5754
+  height_m: 0
+  depth_fathoms: 5.5
+  bottom: weed (alga), with patches of stones
+  source: 'Tofiño 1787, ''Puerto de la Águila'', pp. 71 to 72: a bay of 652 toesas E-W and 300 wide with two corners, only for vessels no bigger than a frigate or xebec; the W one sheltered from SW and W in 6 brazas weed about a cable NE of the castle (on the summit of a high hill by the sea); the E one the same depth within a cable of the Punta del Aguilucho, sheltered from E and SE; in both some patches of stones for the cables, and open to the S; brackish well water in the village; Purdy 1826, p. 16: 5 1/2 fathoms, the bottom in some spots foul'
+  says: Las Aguilas, six brazas weed a cable north-east of the castle on its hill; for frigates and less, and mind the stony patches.
+  fix: a cable NE of the castle of San Juan de las Águilas (FROM MEMORY); 6 brazas (5.5 fathoms); moved 50 m to the nearest water of the tiles holding half the pilot's depth (5.0 m)
+- id: cape-cope
+  kind: headland
+  name: Cope Head
+  modern: Cabo Cope (the Cabezo de Cope)
+  lat_deg: 37.428
+  lon_deg: -1.488
+  height_m: 250
+  source: 'Tofiño 1787, ''Cope'', p. 72: nearly 5 miles E 18° N of the castle of Águilas a high mount, the Cabezo de Cope, in latitude 37° 24'' 40'''', longitude 4° 44'' 10'''' E of Cadiz, stretching E 35° N more than a mile, sheer to the sea and steep-to, making two anchorages, Cala de la Bardina on the W (8 brazas sand two cables off the beach) and Cope on the E (sand and weed, 8 or 9 brazas N of the Cerro de la Cruz); p. 73: the tower of Cope of two guns the only defence; Purdy 1826, p. 16'
+  says: Cope Head, a high mount sheer and steep-to, with an anchorage either side of it and the tower of Cope on the plain.
+  fix: the modern chart's Cabo Cope (Tofiño's latitude as read is 1 mile S of it); height FROM MEMORY
+- id: la-subida-anchorage
+  kind: anchorage
+  name: the road of La Subida in the bay of Almazarron
+  modern: off La Azohía, the eastern part of the Bay of Mazarrón
+  lat_deg: 37.557
+  lon_deg: -1.1715
+  height_m: 0
+  depth_fathoms: 7.3
+  bottom: sand, clean
+  source: 'Tofiño 1787, ''La Subida y su fondeadero'', p. 74: the E part of the bay of Almazarrón hilly, on its easternmost point a tower of two guns called of La Subida; a famous shelter from E and even SE winds, anchoring NNW of the tower in 8 brazas sand a quarter mile off, room for many ships of all sizes, the only refuge for those that leave Cartagena westward and meet an E wind; clean; open to W, SW and S, easy in summer, but with the S in winter no room to cast; Purdy 1826, ''Cope Head to Cartagena'', p. 17: ''7 1/2 fathoms, bottom of sand'''
+  says: 'La Subida in Almazarron bay, eight brazas sand a quarter mile north-north-west of the tower: the refuge from the Levant for ships out of Cartagena.'
+  fix: a quarter mile NNW of the tower of La Azohía (Santa Elena), taken for Tofiño's tower of La Subida (JUDGEMENT, from his 'Cabo de la Subida' 2 3/4 miles WNW of Cape Tiñoso); 8 brazas (7.3 fathoms)
+- id: cape-tinoso
+  kind: headland
+  name: Cape Tinnoso
+  modern: Cabo Tiñoso
+  lat_deg: 37.5367
+  lon_deg: -1.1094
+  height_m: 300
+  source: 'Tofiño 1787, ''Cabo Tinoso'', p. 76: ESE 2 3/4 miles from the cape of La Subida, high and scarped like all the coast before it, bearing S 69° 30'' W from Cope Head 19 1/2 miles, in latitude 37° 31''; ''Advertencias'', p. 79: do not close it, for the waters set into the bay of La Subida and the wind falls; Purdy 1826, p. 17'
+  says: 'Cape Tinnoso, high and steep: do not hug it, for the current sets into La Subida and the wind dies under it.'
+  fix: the modern chart's cape (Tofiño's latitude 1.2 miles S of it); height JUDGEMENT; moved 195 m to the nearest land of the tiles
+- id: cabezo-de-roldan
+  kind: hill
+  name: the Cabeço de Roldan
+  modern: Cabezo de Roldán, west of Cartagena
+  lat_deg: 37.5783
+  lon_deg: -1.042
+  height_m: 500
+  source: 'Tofiño 1787, ''Cabezo de Roldan'', p. 76: E of the beach of Portús a higher mount called the Cabezo de Roldan, the first land of this coast discovered coming in from the sea, with an islet a quarter mile before it called of the Palomas, foul about; Purdy 1826, p. 17: ''descried from a greater distance than any other part of this coast'''
+  says: The Cabeço de Roldan, west of Cartagena, the first land seen from the sea; the islet of Palomas under it is foul about.
+  fix: the modern chart's summit (FROM MEMORY); height FROM MEMORY, JUDGEMENT; moved 425 m to the nearest land of the tiles
+- id: cartagena
+  kind: town
+  name: Cartagena
+  modern: Cartagena
+  lat_deg: 37.6
+  lon_deg: -0.986
+  height_m: 70
+  source: 'Tofiño 1787, ''Ciudad de Cartagena y su Puerto'', p. 77: in latitude 37° 35'' 50'''', longitude 5° 16'' 00'''' E of Cadiz, on the N side of the port, the suburb of Santa Lucía to the E; the port about 800 toesas N from its mouth and a little more E-W; Purdy 1826, p. 17: ''one of the best in Spain, being a natural basin, surrounded by hills''; its exports wool and barilla'
+  says: Cartagena at the head of its harbour, a natural basin among hills, the arsenal on the north-west.
+  fix: the modern chart's old town; height JUDGEMENT (the castle hill of the town)
+- id: cartagena-arsenal
+  kind: place
+  name: the Royal Arsenal of Cartagena
+  modern: Arsenal de Cartagena
+  lat_deg: 37.596
+  lon_deg: -0.992
+  height_m: 5
+  source: 'Tofiño 1787, p. 77: the Espalmador grande the ordinary anchorage of the ships of war for its shelter and its nearness to the Arsenal, which is in the NW angle of the port; pp. 82 to 83: the canal of the Espalmador chico leads to the Darsena, 6 to 6 1/2 brazas; Purdy 1826, p. 17: ''the arsenal is spacious, and protected by forty guns towards the water'''
+  says: The King's arsenal in the north-west corner of Cartagena, forty guns to the water.
+  fix: the modern chart's arsenal; height JUDGEMENT
+- id: galeras-castle
+  kind: castle
+  name: the fort of Galeras
+  modern: Castillo de Galeras
+  lat_deg: 37.5925
+  lon_deg: -0.999
+  height_m: 200
+  source: 'Smyth 1854, ''The Author''s Maritime Positions'', p. 431: ''Cartagena, fort Galeras ... 37° 35'' 28'''', 0° 58'' 17'''' W, height 655''; Tofiño 1787 names the hill forts of the entrance (Podadera, Navidad, Santa Florentina, Santa Ana, Trinca Botijas) but not Galeras in the pages read; standing in 1805 FROM MEMORY (built in the 1770s)'
+  says: The fort of Galeras on its hill over the west side of Cartagena, six hundred and fifty feet up.
+  fix: the modern chart's castle (Smyth's position 0.6 mile E of it); Smyth's 655 feet (200 m)
+- id: podadera-fort
+  kind: castle
+  name: the fort of the Podadera
+  modern: Fuerte de la Podadera, Cartagena
+  lat_deg: 37.583
+  lon_deg: -0.99
+  height_m: 50
+  source: 'Tofiño 1787, ''Fuerte de la Podadera'', pp. 76 to 77: the E point of the bay of the Algamecas is the W and S point of the port of Cartagena, of middling height, with a fort on its summit called the Podadera, which gives the point its name; it is clean, 8 brazas close under it; p. 78: with westerlies close the Podadera to half a musket-shot and follow the coast in; Purdy 1826, p. 17'
+  says: 'The Podadera, the western point of Cartagena with its fort atop: clean, and to be closed to half a musket-shot going in.'
+  fix: the modern chart's point; height JUDGEMENT
+- id: navidad-fort
+  kind: castle
+  name: Fort Navidad
+  modern: Fuerte de Navidad, Cartagena
+  lat_deg: 37.5873
+  lon_deg: -0.9845
+  height_m: 15
+  source: 'Tofiño 1787, p. 77: the fort of the Navidad NE of the Podadera on the same face of the point, which with the battery of Santa Florentina opposite makes the narrowest of the entrance, about 325 toesas; Purdy 1826, p. 17: ''little more than one-third of a mile broad'''
+  says: Fort Navidad on the west side of Cartagena's narrows, Santa Florentina opposite, a third of a mile between.
+  fix: the modern chart's Fuerte de Navidad; height JUDGEMENT
+- id: la-losa
+  kind: rock
+  name: the Laxa, or harbour shoal of Cartagena
+  modern: La Losa, Cartagena harbour
+  lat_deg: 37.5878
+  lon_deg: -0.9791
+  height_m: 0
+  extent_m: 15
+  dries_m: -0.6
+  source: 'Tofiño 1787, ''La Laxa y sus Marcas'', pp. 80 to 81: about NE 1/4 N 160 toesas from the point of Navidad a rock shoal called by the people the Losa, with 3 palmos of water over a circumference of 27 brazas and steep-to to 6 1/2; with any fresh wind from seaward the sea breaks on it; on it the Cabildo''s white tower with the clock is on with the tower of the Molinete (San Christobal''s chapel); its cross-mark the N edge of the powder magazine on with the S edge of its guard-house; Purdy 1826, p. 17: ''a small reef, over which the depth is only 2 feet, and steep-to all round'''
+  says: 'The Laxa inside Cartagena''s narrows, three palms on it and steep-to; it breaks with a fresh wind from seaward: open the Cabildo tower of the Molinete.'
+  fix: Tofiño's bearing and distance (312 m) from the modern place of the point of Navidad; 3 palmos (0.6 m); 27 brazas round (about 15 m across); moved 361 m to the shoalest head of the tiles within 400 m (+1.6 m against the datum)
+- id: espalmador-grande
+  kind: anchorage
+  name: the Grand Espalmador, or Great Careenage
+  modern: the Espalmador, Cartagena harbour
+  lat_deg: 37.591
+  lon_deg: -0.9852
+  height_m: 0
+  depth_fathoms: 5.9
+  bottom: lama (mud)
+  source: 'Tofiño 1787, p. 77: N of Fort Navidad within the port the Espalmador grande, a bay 260 toesas wide and 200 deep to the W, 6 to 5 brazas, the ordinary anchorage of the ships of war; p. 81: leave the Laxa a cable to starboard and drop the single anchor half a cable off the shore in 6 1/2 brazas mud, moored NE-SW; p. 82: in winter ships always moor here, but only three ships of the line can swing in it, up to ten moored in four; Purdy 1826, pp. 17 to 18: ''6 fathoms, bottom of mud'''
+  says: 'The Grand Espalmador within Fort Navidad, six and a half brazas mud, moored north-east and south-west: the winter berth of the King''s ships.'
+  fix: half a cable off the W shore N of Navidad by Tofiño; 6 1/2 brazas (5.9 fathoms); moved 200 m to the nearest water of the tiles holding half the pilot's depth (5.4 m)
+- id: escombrera-island
+  kind: island
+  name: the little isle Escombrera
+  modern: Isla de Escombreras
+  lat_deg: 37.5605
+  lon_deg: -0.958
+  height_m: 60
+  source: 'Tofiño 1787, ''Islote de Escombrera'', p. 85: W of the S point of the bay of Escombrera about a cable, lying E 1/4 NE and contrary, 215 toesas long and 60 wide, hilly, a house for a look-out on its summit, in latitude 37° 33'' 3?'''' (OCR), longitude 5° 17'' 3?'''' E of Cadiz; p. 79: ships of any size may enter by the strait between it and the main, 225 toesas wide with 12 brazas in the middle; Purdy 1826, p. 19: ''hilly, and has a watch-tower on its summit'', latitude 37° 33'' 30'''''
+  says: 'The isle Escombrera at the mouth of Cartagena, hilly with a watch-house on top: give its west side a berth for the sunken rock.'
+  fix: the modern chart's island (the modern harbour works join it to the shore); height JUDGEMENT
+- id: escombrera-shoal
+  kind: rock
+  name: the sunken rock off Escombrera
+  modern: the rock W of Isla de Escombreras
+  lat_deg: 37.5602
+  lon_deg: -0.9619
+  height_m: 0
+  extent_m: 15
+  dries_m: -2.3
+  source: 'Tofiño 1787, ''Baxo de Escombrera y sus Marcas'', p. 80: of stone the size of a launch with 11 palmos of water over it and 7 to 9 brazas close by, a little N of W of the islet 200 toesas; with Santa Ana castle on with the NW corner of the Hospital one passes clear; the cross-mark the islet''s S side on with the land of Cabo del Agua; p. 78: from the E pass the islet''s S side at a cable and a half and run WSW until Santa Ana bears N 1/4 E (OCR); Purdy 1826, p. 18 (footnote): ''a rock, having only 10 feet over it, about the size of a ship''s long-boat'''
+  says: 'The rock a little north of west of Escombrera, eleven palms on it and the size of a launch: keep Santa Ana castle on with the Hospital''s north-west corner.'
+  fix: Tofiño's 200 toesas (390 m) a little N of W from the modern island's W end; 11 palmos (2.3 m); extent JUDGEMENT; moved 158 m to the shoalest head of the tiles within 400 m (+1.9 m against the datum)
+- id: escombrera-bay
+  kind: anchorage
+  name: Escombrera Bay
+  modern: Dársena de Escombreras
+  lat_deg: 37.5581
+  lon_deg: -0.9455
+  height_m: 0
+  depth_fathoms: 7.3
+  bottom: sand, with some patches of weed
+  source: 'Tofiño 1787, ''Ensenada de Escombrera'' and ''Su Fondeadero'', pp. 84 to 85: on the SE side of the port of Cartagena, room for squadrons, sheltered from the 1st, 2nd and 4th quadrants; all clean, 15 and 16 brazas sand at the entrance shoaling to 5 or 6 by the middle with some patches of weed; ships commonly anchor close to the S shore before some fishermen''s houses of the almadraba in 8 brazas; a mile deep and as wide at its mouth; Purdy 1826, p. 19: ''the most frequented anchorage is in 7 fathoms, under the south shore, opposite to some fishers'' huts'''
+  says: Escombrera Bay, eight brazas sand under the south shore before the tunny-fishers' huts; room for a squadron.
+  fix: 'under the S shore of the bay (now enclosed by the modern port, FROM MEMORY); 8 brazas (7.3 fathoms); moved 881 m to the nearest water of the tiles holding half the pilot''s depth (6.7 m; beyond the rule''s 800 m: the first placing, from memory, fell on the land)'
+- id: portman-anchorage
+  kind: anchorage
+  name: the little port of Porman
+  modern: Bahía de Portmán (much silted since)
+  lat_deg: 37.5817
+  lon_deg: -0.849
+  height_m: 0
+  depth_fathoms: 7.3
+  bottom: sand
+  source: 'Tofiño 1787, ''Porman'', pp. 85 to 86: E 28° N 4 miles from Cabo del Agua, the anchorage almost round, 500 toesas across and its mouth a little narrower, for vessels of all sizes, sand throughout and 8 and 9 brazas in the middle; the best rather nearer the W shore, NE 5° N of the W point and NW of the E, in 8 brazas, open only to S and SE; a tower of 3 guns on the E point; good for great ships only in summer; water from a spring in the N part; Purdy 1826, p. 19'
+  says: 'Porman, a round little port with eight brazas sand, open only to the south: a summer berth, a tower of three guns on the east point.'
+  fix: the bay's middle toward its W side by Tofiño; the modern bay is filled by mine tailings, so the tile check will move it; 8 brazas (7.3 fathoms); moved 200 m to the nearest water of the tiles holding half the pilot's depth (6.7 m)
+- id: portman-rock
+  kind: rock
+  name: the rock and white ledge of Porman
+  modern: the rock off the E point of Portmán
+  lat_deg: 37.5787
+  lon_deg: -0.8405
+  height_m: 0
+  extent_m: 40
+  dries_m: 0.0
+  source: 'Tofiño 1787, ''Piedra'', p. 86: the E point not to be passed very close, for a cable to the W of it is a rock awash (''á flor de agua''), with 5 brazas in its channel and 12 coarse sand about its outer side; ''the Laxa is white with 14 feet over it, and breaks with winds from seaward''; its marks a cave in the port''s N part on with the Cabeza del Moro, and the tower on with the summit of Cabo Negrete; one may pass between it and the point; Purdy 1826, p. 19: ''a rock, even with the surface of the water, at about a cable''s length from it to the westward'''
+  says: 'The rock a cable west of Porman''s east point, awash and white, breaking with a sea wind: pass outside it, or inside with care.'
+  fix: 'a cable W of the E point (FROM MEMORY); awash by Tofiño''s ''á flor de agua'' and Purdy, though Tofiño''s next words give the white ledge 14 pies (3.9 m): the lead to choose; extent JUDGEMENT; moved 204 m to the nearest water or drying ground of the tiles (the first placing fell on the land, 22 m)'
+- id: cabo-del-agua
+  kind: headland
+  name: Cape del Agua
+  modern: Cabo del Agua
+  lat_deg: 37.5584
+  lon_deg: -0.908
+  height_m: 100
+  source: 'Tofiño 1787, ''Cabo del Agua'', p. 85: from the S point of Escombrera the coast runs high E 1/4 SE about 3 miles to Cabo del Agua, E 5° 30'' S of the islet''s S end; high, scarped, its summit three peaks like a crest; Purdy 1826, p. 19: ''the cape is steep, and its summit is formed into three little peaks'''
+  says: Cape del Agua, steep, its summit three little peaks like a cock's comb.
+  fix: the modern chart's cape (FROM MEMORY); height JUDGEMENT; moved 375 m to the nearest land of the tiles
+- id: cape-palos
+  kind: headland
+  name: Cape Palos
+  modern: Cabo de Palos
+  lat_deg: 37.6314
+  lon_deg: -0.6952
+  height_m: 30
+  source: 'Tofiño 1787, ''Cabo de Palos'', p. 87: of little elevation, with a tower of 3 guns; in latitude 37° 37'' (seconds unreadable in the OCR), longitude 5° 35'' E of Cadiz; for 3 1/2 miles before the cape the coast is foul with rocks close in; on the N a great plain and a shelter from S winds for small craft, very dangerous with the 1st and 2nd quadrants; p. 79: off the cape the waters almost always run quickly SE, faster farther out; Purdy 1826, p. 19: ''not elevated, but has a square watch-tower on it, with three guns'''
+  says: Cape Palos, low, a square watch-tower of three guns on it; the current runs hard to the south-east off it.
+  fix: the modern chart's cape; height JUDGEMENT; moved 680 m to the nearest land of the tiles
+- id: hormiga-grande
+  kind: rock
+  name: the Great Hormiga
+  modern: Isla Hormiga
+  lat_deg: 37.6555
+  lon_deg: -0.6545
+  height_m: 7
+  extent_m: 100
+  source: 'Tofiño 1787, ''Situación de las Hormigas'', p. 87: about 2 miles N 57° 30'' E of the cape''s tower the Hormiga grande, a small flat islet; a little S and W of it, N 58° E of the tower, the Hormiga chica, only a rock; no passage between them for hidden rocks, but one with 5 to 9 brazas for any vessel between the Hormiga chica and the cape, with a large wind and keeping nearer the cape; Purdy 1826, p. 19: ''a flat islet'''
+  says: 'The Great Hormiga, a small flat islet two miles off Cape Palos: no passage between it and the Little; go between the Little Hormiga and the cape, nearer the cape.'
+  fix: 'the modern chart''s Isla Hormiga; Tofiño''s bearing and distance from the tower agree (2.05 miles); height JUDGEMENT; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 100 m (an islet some 200 m across, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+- id: bajo-de-dentro
+  kind: shoal
+  name: the shoal south-west of the Hormiga
+  modern: Bajo de Dentro (Cabo de Palos)
+  lat_deg: 37.6514
+  lon_deg: -0.6683
+  height_m: 0
+  extent_m: 150
+  dries_m: -2.0
+  source: 'Tofiño 1787, p. 87: in the channel between the Hormiga chica and the cape keep farther from the former for a shoal about SW a fraction of a mile (OCR unclear) from the Hormiga; its marks N-S the Torre del Estacio on with a little hillock on the E skirt of the Cabezo Gordo, E-W the cape''s tower by a red scarp farther W; p. 88: it and the other show white (''se ven planquear''); Purdy 1826, p. 19: ''a shoal lies at the distance of about half a mile W.S.W. from the Hormiga'''
+  says: 'The shoal half a mile west-south-west of the Hormiga, which shows white: keep nearer the cape in the passage.'
+  fix: Purdy's half mile WSW of the modern Isla Hormiga; Tofiño gives no depth, 2 m JUDGEMENT; taken for the modern Bajo de Dentro, the tile check to confirm; moved 395 m to the shoalest head of the tiles within 400 m (-43.5 m against the datum)
+- id: bajo-de-fuera
+  kind: shoal
+  name: the outer shoal of the Hormigas
+  modern: Bajo de Fuera (Cabo de Palos)
+  lat_deg: 37.6563
+  lon_deg: -0.6485
+  height_m: 0
+  extent_m: 200
+  dries_m: -2.0
+  source: 'Tofiño 1787, pp. 87 to 88: about NE (fraction unclear) half a mile from the Hormiga grande another shoal, its marks the two Hormigas in one, and the cape''s tower open of the S side of the Junco mayor; great ships have passed between it and the Hormiga; it shows white; Purdy 1826, p. 19: ''at the same distance, E.N.E. 1/2 E. from the Great Hormiga, a similar shoal: this lies with the Hormigas in a line ... It may be known by its white colour'''
+  says: The outer shoal half a mile east-north-east of the Great Hormiga, in a line with the two Hormigas; it shows white.
+  fix: 'Purdy''s half mile ENE 1/2 E of the modern Isla Hormiga (the modern Bajo de Fuera lies, FROM MEMORY, somewhat farther out: the tile check to settle); Tofiño gives no depth, 2 m JUDGEMENT; moved 391 m to the shoalest head of the tiles within 400 m (-20.6 m against the datum)'
+- id: isla-grosa
+  kind: rock
+  name: the Isla Grosa
+  modern: Isla Grosa
+  lat_deg: 37.727
+  lon_deg: -0.7085
+  height_m: 95
+  extent_m: 350
+  source: 'Tofiño 1787, ''Isla Grosa y su Fondeadero'', p. 88: N 8° W of the cape''s tower about 6 1/3 miles (OCR) the Isla Grosa, high, in the figure of a triangle, NNE-SSW 300 toesas long, 1 1/4 miles from the Manga; bold on its SE; a little farallón 300 toesas NE 1/4 E (OCR) with 8 brazas between; Purdy 1826, pp. 19 to 20: ''high ... its appearance is somewhat like a haycock'''
+  says: The Isla Grosa, high and like a haycock, six miles north of Cape Palos off the Manga.
+  fix: 'the modern chart''s island; height FROM MEMORY; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 350 m (the island some 700 m across and 98 m high, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+- id: grosa-anchorage
+  kind: anchorage
+  name: the anchorage of the Isla Grosa
+  modern: the channel W of Isla Grosa
+  lat_deg: 37.727
+  lon_deg: -0.713
+  height_m: 0
+  depth_fathoms: 4.6
+  bottom: alga (weed)
+  source: 'Tofiño 1787, pp. 88 to 89: in the channel between the isle and the Manga its shelter is the anchorage, covered from the Levant; anchor a cable off the isle in 5 brazas weed, fit for frigates or xebecs; the only refuge from the Levant from Cape Palos northward, useful to one embayed who cannot weather the cape for Cartagena; small, no people, and its dangers; Purdy 1826, p. 20: half a cable off the isle in 4 1/2 fathoms, sea-weed'
+  says: 'The road within the Grosa a cable off the isle in five brazas, weed: the only shelter from the Levant north of Cape Palos, for frigates and xebecs.'
+  fix: a cable W of the isle by Tofiño; 5 brazas (4.6 fathoms)
+- id: grosa-losa
+  kind: rock
+  name: the losa north-east of the Grosa
+  modern: the rock NE of Isla Grosa
+  lat_deg: 37.732
+  lon_deg: -0.698
+  height_m: 0
+  extent_m: 30
+  dries_m: -1.7
+  source: 'Tofiño 1787, p. 88: NE of the isle 540 toesas a stone that only a braza of water covers; p. 89: coming from the N outside the isle, abreast the Torre del Estacio, if the farallón comes on with a white hillock on the Manga stand E to avoid the losa of one braza, until the farallón is well open W of the hillock; Purdy 1826, p. 20: at 575 fathoms ENE from the isle'
+  says: 'The losa of one braza north-east of the Grosa: keep the farallon open west of the white hillock on the Manga.'
+  fix: Tofiño's 540 toesas (1,050 m) NE of the modern island's middle; 1 braza (1.7 m); extent JUDGEMENT; moved 285 m to the shoalest head of the tiles within 400 m (-10.1 m against the datum)
+- id: alboran
+  kind: rock
+  name: the isle Alboran
+  modern: Isla de Alborán
+  lat_deg: 35.9395
+  lon_deg: -3.0345
+  height_m: 15
+  extent_m: 300
+  source: 'Tofiño 1787, ''Alboran'', p. 45: 15 leagues S 8 1/2 W (OCR) of the castle of Guardias Viejas, 9 1/2 N 6° 44'' W of Cape Tres Forcas, in latitude 35° 57'' N and longitude 3° 15'' 20'''' E of Cadiz, of middling height, seen 3 1/2 to 4 leagues in clear weather, even, half a mile E-W and half that wide, sheer on the S and less so on the N; off its E end an islet about a fraction of a cable (OCR) away, and breakers at the same distance off all its points; commonly much current to the E about it; Purdy 1826, p. 14 (footnote): ''at about half a cable''s length from the east end is a small islet, and there are breakers all round to nearly the same distance'''
+  says: The isle Alboran, low and even, sheer on its south side, an islet off its east end and breakers half a cable off every point; the current sets strongly east about it.
+  fix: 'the modern chart''s island (Tofiño''s latitude 0.6 mile N of it); height FROM MEMORY; the islet off the E end (Isla de las Nubes) is in this entry; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 300 m (the island 600 m long and 250 across, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+- id: alboran-anchorage
+  kind: anchorage
+  name: the anchorage off the east end of Alboran
+  modern: off the E end of Isla de Alborán
+  lat_deg: 35.9403
+  lon_deg: -3.025
+  height_m: 0
+  depth_fathoms: 25.1
+  bottom: a bank (placer); its ground not stated
+  source: 'Tofiño 1787, ''Alboran'', p. 45: on the E side it has a bank on which one may anchor, and ships have, in 25 to 30 brazas; Purdy 1826, p. 14 (footnote): ''anchoring ground off the east end in from 25 to 30 fathoms'''
+  says: Alboran's anchorage on the bank off its east end in twenty-five to thirty brazas; the current sets east.
+  fix: off the island's E end beyond the islet, JUDGEMENT; 27 1/2 brazas, the middle of Tofiño's 25 to 30 (25.1 fathoms); moved 25 m to the nearest water of the tiles holding half the pilot's depth (23.0 m)
+- id: cala-iris
+  kind: anchorage
+  name: Cala Iris
+  modern: Cala Iris (Cala Iris islet)
+  lat_deg: 35.1539
+  lon_deg: -4.368
+  height_m: 0
+  depth_fathoms: 3
+  bottom: very clean, of fine sand
+  source: 'Tofiño 1787, ''Descripción de la Costa de África'', p. 57: E 2° S of Mostaza 5 miles the isle and cove of Iris, shaped like a horseshoe; on the W a reef running 450 varas NE by N from the land, in places awash even in fine weather; on the E the isle, 330 varas off the coast, the gap between closed by a ridge of stones with 1 1/2 brazas at its deepest; the bottom very clean of fine sand; two ships may lie in it moored with a hawser to the isle and an anchor outside, or four xebecs, in case of necessity'
+  says: 'Cala Iris, a horseshoe cove behind its islet: clean fine sand, room for two ships moored to the isle in case of need.'
+  fix: inside the islet, FROM MEMORY; the depth JUDGEMENT (Tofiño gives none for the cove, 1 1/2 brazas on the ridge to the isle); moved 437 m to the nearest water of the tiles holding half the pilot's depth (2.7 m)
+- id: penon-de-velez
+  kind: island
+  name: the Penon de Velez
+  modern: Peñón de Vélez de la Gomera (Spanish presidio)
+  lat_deg: 35.1725
+  lon_deg: -4.3003
+  height_m: 80
+  source: 'Tofiño 1787, pp. 57 to 58: about E 1/4 NE 6 miles from Cala Iris the presidio of the Peñón de Vélez de la Gomera, an islet larger and higher than Escombrera, all fortified, in lat 35° 11'' 45" and long 2° 2'' 20" (E of Cadiz), half a league SW of the Punta de la Baba, which is high and steep; shelter for small craft moored between the isle called San Antonio and the main. Purdy 1826, § XXI, p. 322: an elevated islet of rock belonging to Spain and surmounted by a fort, 22 leagues from Ceuta Point'
+  says: The Penon de Velez, a high rock all fortified, the Spaniards' presidio, half a league south-west of the Punta de la Baba.
+  fix: FROM MEMORY; Tofiño's latitude 35° 11' 45" agrees within a third of a mile; the height JUDGEMENT ('higher than Escombrera')
+- id: velez-road
+  kind: anchorage
+  name: the anchorage of the Penon de Velez
+  modern: the water west of the Peñón de Vélez de la Gomera
+  lat_deg: 35.1736
+  lon_deg: -4.3056
+  height_m: 0
+  depth_fathoms: 11
+  bottom: not stated (the boats' channel inside, 'fondo limpio')
+  source: 'Tofiño 1787, pp. 57 to 58: one or two ships may anchor in case of necessity, entering by the west, there being room and depth for them; but the need must be most urgent (an order, superior enemies, sinking after a fight); close the eastern coast one or two miles with winds of the first quadrant, then round to the western part of the Peñón passing one or two ship''s breadths off it without fear, for at the first distance there are 12 brazas and at the second 14; fire a gun and boats come out from the place to tow before the westerly current sets the ship to leeward'
+  says: 'The anchorage under the Penon de Velez, only for urgent need: twelve to fourteen brazas a ship''s breadth or two off its western side; fire a gun for the boats to tow.'
+  fix: west of the rock, by Tofiño's words; 12 to 14 brazas (11 to 12.8 fathoms); JUDGEMENT; moved 195 m to the nearest water of the tiles holding half the pilot's depth (10.1 m)
+- id: alhucemas
+  kind: island
+  name: Alhucemas
+  modern: Peñón de Alhucemas (Spanish presidio)
+  lat_deg: 35.2147
+  lon_deg: -3.8893
+  height_m: 27
+  source: 'Tofiño 1787, ''Alhucemas'', p. 59: the presidio on a fortified isle larger than the Peñón, in lat 35° 16'' 30" and long 2° 28'' 50", S 26° E 2 1/2 miles from the Morro Nuevo, five islets between the Morro and the place. Purdy 1826, p. 322: the Peñon de Alhuzema, or Garrison Rock, another Spanish post, before the mouth of the Nocor rivulet'
+  says: Alhucemas, the Spaniards' fortified isle in the bay, two miles and a half south-south-east of the Morro Nuevo.
+  fix: FROM MEMORY (Tofiño's latitude is 1 1/2 miles north of the modern rock); the height JUDGEMENT
+- id: alhucemas-road
+  kind: anchorage
+  name: the anchorage of Alhucemas
+  modern: the water south of the Peñón de Alhucemas
+  lat_deg: 35.2161
+  lon_deg: -3.8904
+  height_m: 0
+  depth_fathoms: 3.5
+  bottom: coarse sand
+  source: 'Tofiño 1787, p. 59: south of the place is the anchorage of the packets and the trade with Spain, where in good weather the King''s xebecs also anchor, in 3 1/2 to 4 brazas coarse sand'
+  says: 'The anchorage south of Alhucemas, for the packets and the King''s xebecs: three and a half to four brazas, coarse sand.'
+  fix: a cable or two south of the rock, by Tofiño's words; 3 1/2 to 4 brazas (3.2 to 3.7 fathoms); moved 419 m to the nearest water of the tiles holding half the pilot's depth (3.2 m)
+- id: alhucemas-bay
+  kind: anchorage
+  name: the bay of Alhucemas
+  modern: Baie d'Al Hoceima
+  lat_deg: 35.215
+  lon_deg: -3.84
+  height_m: 0
+  depth_fathoms: 7
+  bottom: sand, mostly gravel, and loose ooze on the surface, a foot below hard ooze
+  source: 'Tofiño 1787, pp. 59 to 60: between the Morro Nuevo and Cape Quilates the bay a league deep, its shores mountainous on either side and flat in its middle with a fine plain and two rivers; the bottom sand, mostly gravel, loose ooze on the surface and a foot below hard ooze, so the anchors hold well, and the largest ships may ride anywhere with winds off the land, but not with winds from the sea; a ship forced in with winds of the first quadrant should anchor on the bay''s east side in 8 brazas; if she must run ashore, by the presidio, better on its west than its east; with the enemy after her she should keep nearer Cape Quilates, where the wind falls and draws NE, and anchor under the presidio''s guns'
+  says: The bay of Alhucemas, good holding in sand and hard ooze with the wind off the land; with winds of the first quadrant anchor on its east side in eight brazas; no riding it with the sea wind.
+  fix: the bay's east side, by Tofiño's words; 8 brazas (7.3 fathoms); JUDGEMENT
+- id: morro-nuevo
+  kind: headland
+  name: the Morro Nuevo
+  modern: Morro Nuevo (the west point of the bay of Al Hoceima)
+  lat_deg: 35.25
+  lon_deg: -3.917
+  height_m: 150
+  source: 'Tofiño 1787, pp. 59 and 61: E 16° N of the Punta de la Baba 19 miles the Punta de los Frayles, with rocks half a musket shot off, and the Morro Nuevo, the west part of the bay of Alhucemas; the coast between high, steep-to and without beach or anchorage; the Morro high, dark and cut steep to the sea'
+  says: The Morro Nuevo, high, dark and steep to the sea, the west point of the bay of Alhucemas.
+  fix: FROM MEMORY; Tofiño's S 26° E 2 1/2 miles from it to the isle puts it 0.4 mile east of this; the height JUDGEMENT ('alto')
+- id: cape-tres-forcas
+  kind: headland
+  name: Cape Tres Forcas
+  modern: Cap des Trois Fourches (Ras Tarf)
+  lat_deg: 35.4406
+  lon_deg: -2.963
+  height_m: 120
+  source: 'Tofiño 1787, ''Cabo de Tresforcas'', p. 61: in lat 35° 26'' 55", very projecting, of moderate height and peaked (''amogotado''), with a front of 2 miles to the north; from Cape Quilates N 74 1/2° E 35 1/2 miles, the coast between high with many eddies of the current. Purdy 1826, p. 322: the extremity of the great promontory called Cape Tres Forcas or Cape Three Points, above which is a watch-tower; the ground near it foul, several rocks above water near it; you may pass at a gunshot, but there is no anchorage'
+  says: 'Cape Tres Forcas, of moderate height and peaked, with a watch-tower; foul ground and rocks near it, no anchorage: pass it at a gunshot.'
+  fix: FROM MEMORY (the northern point of the promontory); the height JUDGEMENT; moved 50 m to the nearest land of the tiles
+- id: tres-forcas-farallon
+  kind: island
+  name: the great Farallon of Tres Forcas
+  modern: the islet off the east face of Cap des Trois Fourches
+  lat_deg: 35.4271
+  lon_deg: -2.9483
+  height_m: 15
+  source: 'Tofiño 1787, p. 61: S 56° E, not very far from the easternmost of the cape, an islet called the great Farallón, being larger than two others further south; between the two southern farallones, between them and the great one, and between this and the Laxa, any ship may pass in necessity, there being 15 brazas in the channels'
+  says: The great Farallon off Tres Forcas; fifteen brazas between it and the cape, and between the farallones, for a ship in need.
+  fix: 'JUDGEMENT: off the cape''s east face on Tofiño''s bearing, his distance ''not very far'' unstated; UNVERIFIED, for the check; the height JUDGEMENT; moved 316 m to the nearest land of the tiles'
+- id: la-lupiana
+  kind: rock
+  name: the Lupiana
+  modern: the rock NE of the great islet off Cap des Trois Fourches
+  lat_deg: 35.427
+  lon_deg: -2.9482
+  height_m: 0
+  extent_m: 50
+  dries_m: -1.7
+  source: 'Tofiño 1787, p. 61: a hundred varas N 39° E of the great Farallón a ledge called the Lupiana with 6 feet of water; it might make an enemy ground who follows between it and the Farallón'
+  says: The Lupiana, a ledge with six feet on it a hundred varas north-east of the great Farallon off Tres Forcas.
+  fix: Tofiño's bearing and distance (84 m) from the Farallón, whose own place is JUDGEMENT; 6 pies de Burgos (1.7 m); moved 391 m to the shoalest head of the tiles within 400 m (-0.0 m against the datum)
+- id: melilla
+  kind: town
+  name: Melilla
+  modern: Melilla la Vieja (Spanish presidio)
+  lat_deg: 35.2928
+  lon_deg: -2.9333
+  height_m: 30
+  source: 'Tofiño 1787, ''Presidio de Melilla'', p. 62: in lat 35° 18'' 15" south of Cape Tres Forcas; the port south of the place, small, only for little xebecs and galliots. Purdy 1826, p. 322: the town and fortress of Melilla, held by the Spaniards from about the beginning of the fifteenth century, on an islet joined to the main by a bridge, about 2000 inhabitants; a harbour for small vessels within two moles, and a good roadstead without for larger'
+  says: Melilla, the Spaniards' fortress on its rock joined to the main by a bridge; a little harbour for small craft south of the place.
+  fix: FROM MEMORY; Tofiño's latitude agrees within a third of a mile; the height JUDGEMENT
+- id: melilla-road
+  kind: anchorage
+  name: Melilla road
+  modern: the water east of Melilla
+  lat_deg: 35.293
+  lon_deg: -2.895
+  height_m: 0
+  depth_fathoms: 25
+  bottom: not stated
+  source: 'Tofiño 1787, p. 62: the large vessels anchor east of the presidio, half a league to a league off, in 20 to 35 brazas, always ready to make sail at the first sign of a Levanter, with which the currents, thrown back by the front of land that follows Cape Tres Forcas, are apt to set those struggling to weather it to windward [sic: ''sacar á Barlovento'']'
+  says: 'Melilla road, half a league to a league east of the place in twenty to thirty-five brazas: be ready to weigh at the first sign of a Levanter.'
+  fix: two miles east of the place, between Tofiño's half league and league; 20 to 35 brazas (18 to 32 fathoms)
+- id: monte-carama
+  kind: hill
+  name: the Carama
+  modern: Monte Gurugú
+  lat_deg: 35.25
+  lon_deg: -2.99
+  height_m: 890
+  source: 'Tofiño 1787, ''Monte del Caramú'', p. 62: a league SW of Melilla a mountain notable for its greater height than the other land, called the Carama; it serves to know the place and shows whence the wind will come, for it will be west if the clouds gather or stop on the east of the mountain, and the contrary'
+  says: The Carama, the high mountain a league south-west of Melilla, the mark for the place; clouds stopping on its east side foretell a westerly wind.
+  fix: FROM MEMORY (summit and height both); a league SW of the place, as Tofiño has it
+- id: zafarine-west-isle
+  kind: island
+  name: the westernmost Zaffarine
+  modern: Isla del Congreso (Islas Chafarinas)
+  lat_deg: 35.1783
+  lon_deg: -2.4417
+  height_m: 135
+  source: 'Tofiño 1787, ''Islas Chafarinas'', pp. 62 to 63: S 57 1/2° E of Cape Tres Forcas 30 1/2 miles, in lat 35° 11'' 50" and long 3° 51'' 30"; three, the westernmost the highest, the other two lower; about 2 miles from Cape del Agua, the space between clean and even, 8 to 10 brazas. Purdy 1826, p. 323: the westernmost island is the highest and may be seen 8 or 10 leagues off; its top appears like the crown of a hat. Bérard 1837, p. 184: the westernmost 135 metres high'
+  says: The westernmost of the Zaffarines, the highest, its top like the crown of a hat, seen eight or ten leagues off.
+  fix: FROM MEMORY; the height Bérard's
+- id: zafarine-middle-isle
+  kind: island
+  name: the middle Zaffarine
+  modern: Isla de Isabel II (Islas Chafarinas)
+  lat_deg: 35.1805
+  lon_deg: -2.43
+  height_m: 41
+  source: 'Bérard 1837, ''Îles Zafarines'', pp. 184 to 185: the middle isle 41 metres high, almost round; the little channel between it and the easternmost deep and without danger. Purdy 1826, p. 322: on the central isle wells were dug and water found (Bérard, p. 185: no water on any of them). Unsettled in 1805: the Spaniards took the isles in 1848 (FROM MEMORY)'
+  says: The middle Zaffarine, low and round, under whose south side the ships ride.
+  fix: FROM MEMORY; the height Bérard's
+- id: zafarines-anchorage
+  kind: anchorage
+  name: the anchorage of the Zaffarines
+  modern: the water south of Isla de Isabel II
+  lat_deg: 35.1812
+  lon_deg: -2.4355
+  height_m: 0
+  depth_fathoms: 9
+  bottom: sand (Tofiño); stiff clay (Purdy)
+  source: 'Tofiño 1787, p. 63: south of the middle isle good anchorage for all classes of ship and all weathers in 10 brazas sand two cables from it, moored in two N and S with a hawser ashore, where there are stones fit for it; enter and leave by the channel with the coast to the E or to the W. Purdy 1826, pp. 322 to 323 (Capt. Wolseley''s survey): good shelter from northerly, easterly and N.W. winds; the best anchorage off the middle island a cable''s length off in 8 or 9 fathoms, the bottom of stiff clay from which an anchor will hardly ever start, the south point of the easternmost island about E.S.E. and of the westernmost about W. by N.; H.M.S. Trusty anchored a quarter mile W of the eastern isle in 9 fathoms. Bérard 1837, p. 185: S of the middle isle a cable off in 6 or 7 brasses, a hawser ashore and an anchor to the SE, the bottom very good'
+  says: 'The anchorage of the Zaffarines, south of the middle isle in nine or ten fathoms, stiff clay: a good retreat in northerly weather.'
+  fix: two cables south of the middle isle, Tofiño's distance; 10 brazas (9.1 fathoms), Purdy's 8 or 9; moved 725 m to the nearest water of the tiles holding half the pilot's depth (8.2 m)
+- id: zafarines-rock
+  kind: rock
+  name: the rock in the western passage of the Zaffarines
+  modern: the shoal N of Isla de Isabel II, in the passage to Isla del Congreso
+  lat_deg: 35.1835
+  lon_deg: -2.4256
+  height_m: 0
+  extent_m: 60
+  dries_m: -3.0
+  source: 'Tofiño 1787, p. 63: never use the two channels between the isles, though deep, for the western and wider has a shoal almost in the middle of its outer mouth, rather nearer the NE end of the largest than the NW of the middle one; the eastern clean and deep but very narrow. Purdy 1826, p. 322: in the middle of the entrance of the western passage a rock with only 10 feet of water, for which reason ships should never use it. Bérard 1837, p. 184: N 5° E of the middle isle''s north point, a cable and a half off, a rocky shoal with only 12 feet'
+  says: 'The rock in the western passage of the Zaffarines with ten feet on it: never use that passage.'
+  fix: Bérard's bearing and distance from the middle isle's north point (FROM MEMORY); Purdy's 10 feet (3.0 m), Bérard's 12 pieds (3.9 m); moved 395 m to the shoalest head of the tiles within 400 m (+2.0 m against the datum)
+- id: cape-hone
+  kind: headland
+  name: Cape Hone
+  modern: Cap Honaine (Ras Hunayn)
+  lat_deg: 35.195
+  lon_deg: -1.63
+  height_m: 150
+  source: 'Tofiño 1787, pp. 63 and 145: N 76° E 7 miles from Cape Milonia, in lat 35° 10'' 46", high, thick, red and cut steep to the sea; between the two capes the gulf of Frigonía or Ferrara where wheat and wax are loaded. Purdy 1826, p. 323: Cape Hunyham, or Cape Hone, 4 leagues E 3/4 N from the Muluwia. Bérard 1837, ''Le cap Hone'', p. 182: lower than the land inland, yellow cliffs; a square house like a fortress 2 1/2 miles SW of the cape on a little steep peninsula, a village by it, where some Moors place the bounds of the regency and Morocco'
+  says: Cape Hone, high, thick and red, steep to the sea; the square house like a fort two miles and a half south-west of it.
+  fix: FROM MEMORY, 2 1/2 miles NE of Honaine as Bérard has it; the height JUDGEMENT
+- id: habibas
+  kind: island
+  name: the Habibas
+  modern: Îles Habibas
+  lat_deg: 35.725
+  lon_deg: -1.13
+  height_m: 118
+  source: 'Tofiño 1787, ''Isla Avivas'', pp. 146 to 147: the middle of the Avivas a league from the coast or Cape Sigale, two large and a multitude of small, spreading 2 miles E 25° N and the contrary; of the two larger the eastern flat, the other with a very high peak; behind them shelter and anchorage for galliots in all weathers, and a passage between them and the coast for great ships with much practice in necessity. Purdy 1826, p. 323: off Cape Sigale a little rocky islet, Habeeba, two miles from shore, no danger between it and the land but what is visible; good anchorage according to the wind. Bérard 1837, ''Îles Habibas'', p. 176: N 63° O of Cape Sigale 6 miles; the great isle at the SW end, the highest, its S peak 118 metres; no water; foul ground for cables; in fresh W to NNW winds anchor a third of a mile SE of the great isle''s middle in 15 to 17 brasses gravel, before a little creek'
+  says: The Habibas, two islands and many rocks off Cape Sigale, the western with a high peak; a passage inside them, and a berth south-east of the great isle in fifteen fathoms, gravel.
+  fix: FROM MEMORY (the great isle); the height Bérard's
+- id: ile-plane
+  kind: island
+  name: the Hormigas
+  modern: Île Plane (Îles Paloma)
+  lat_deg: 35.7696
+  lon_deg: -0.9033
+  height_m: 10
+  extent_m: 600
+  source: 'Tofiño 1787, ''Cabo Falcón'', p. 147: S 70° W a league from the westernmost of the front of Cape Falcon an islet ringed by many smaller, called the Hormigas; the depth between them and between them and the coast unknown. Bérard 1837, ''Île Plane'', pp. 174 to 175: a low islet less than 4 miles off the middle of the bay W of Cape Falcon, flat-looking, ringed with many separate rocks, chiefly to the W; no danger known about it'
+  says: The Hormigas, a low flat islet ringed with rocks a league west-south-west of Cape Falcon; the soundings about it unknown.
+  fix: FROM MEMORY; Tofiño's league S 70° W of the cape falls 2 1/2 miles short of it, Bérard's 'less than 4 miles' nearer; the height JUDGEMENT ('îlot bas'); moved 158 m to the nearest land of the tiles
+- id: cape-falcon
+  kind: headland
+  name: Cape Falcon
+  modern: Cap Falcon
+  lat_deg: 35.7731
+  lon_deg: -0.796
+  height_m: 30
+  source: 'Tofiño 1787, p. 147: Cape Falcon low and even, a front W to E of about 3/4 league, at whose last end a reef runs about 3 cables to sea, which may be passed close, for there are 10 to 12 brazas close to it; 2 miles SE the beach of Las Aguadas, where the expedition of 1732 from Alicante landed to retake Oran. Purdy 1826, p. 323: Cape Falcon, or Ras al Harshfah; the shore about it foul. Bérard 1837, ''Cap Falcon'', p. 174: low, in two points, the northern and eastern with a knoll higher than the rest which from afar makes it look an island; rocks and islets close about both'
+  says: Cape Falcon, low and even, looking like an island from afar; a reef three cables off its east end, ten brazas close to it.
+  fix: FROM MEMORY; the height JUDGEMENT; moved 125 m to the nearest land of the tiles
+- id: mers-el-kebir-castle
+  kind: castle
+  name: the castle of Marsa Kibbeer
+  modern: Fort de Mers-el-Kébir (Castillo de Almansa)
+  lat_deg: 35.732
+  lon_deg: -0.702
+  height_m: 30
+  source: 'Tofiño 1787, ''Punta de Mazalquivir'', p. 147: S 66° E of the easternmost of Cape Falcon 5 miles the Punta de Mazalquivir and the Castillo de Almansa, at whose end is the Linterna. Bérard 1837, p. 171: the fort of Mers-el-Kébir runs out like a mole to the E and so forms the best shelter on all the coast of Algeria, the only port where great ships stay the winter'
+  says: 'The castle of Marsa Kibbeer on its point, running out like a mole: under it the best shelter on the coast.'
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: mers-el-kebir-linterna
+  kind: tower
+  name: the Linterna of Marsa Kibbeer
+  modern: the lighthouse tower at the end of the Fort de Mers-el-Kébir
+  lat_deg: 35.7317
+  lon_deg: -0.7008
+  height_m: 28
+  source: 'Tofiño 1787, p. 147: the Punta de Mazalquivir and Castillo de Almansa, ''en cuyo extremo está la Linterna'' (at whose end is the Lantern), named as a mark only: he says nothing of its being lit, and Oran and Mazalquivir were given up by Spain in 1792. Bérard 1837, p. 172 to 173: at the fort''s east end the phare, a little square tower painted white, its top only 28 metres above the sea; a light is planned for it; meanwhile the station''s commander has lanterns shown when a ship is seen in the offing at evening. Purdy 1840''s ''new lighthouse'' is later. Not taken as a light of 1805 (JUDGEMENT on Tofiño''s silence and Bérard''s ''on a le projet d''y établir un feu''); had it been lit under Spain the record would conflict, UNVERIFIED'
+  says: The Linterna, the tower at the end of the castle of Marsa Kibbeer; no light shown on it.
+  fix: the fort's east end, FROM MEMORY; the height Bérard's (of the tower of 1837); moved 35 m to the nearest land of the tiles
+- id: mers-el-kebir-road
+  kind: anchorage
+  name: Marsa Kibbeer road
+  modern: Rade de Mers-el-Kébir
+  lat_deg: 35.729
+  lon_deg: -0.6976
+  height_m: 0
+  depth_fathoms: 16
+  bottom: sand and weed
+  source: 'Tofiño 1787, pp. 147 to 148: south of the point the port of the same name, good for all classes of ship, moored NW and SE with the best bower that way, in 20 to 16 brazas sand and weed for ships, less, or with a hawser ashore, for xebecs; the SW wind they call the Polvorista blows very hard, coming down the gorge, so the anchors must be backed for they are apt to drag. Purdy 1826, ''Bay of Oran'', p. 323: Marsa Kibbeer, on the west side a good roadstead capable of holding a large fleet, 12 to 9 fathoms with good ground, sheltered from all winds. Bérard 1837, pp. 171 to 172: commonly anchored so as to shut Point Abuja in with the angle of the fort; with fresh westerly winds anchor after passing the fort''s point close and running 3 cables beyond it, for the bottom deepens fast to the E'
+  says: 'Marsa Kibbeer road under the castle, twenty to sixteen brazas sand and weed: back the anchors against the Polvorista out of the gorge.'
+  fix: 'south of the point, inside the line from Point Abuja to the fort''s angle; 20 to 16 brazas (18 to 15 fathoms), Purdy''s 12 to 9; JUDGEMENT; moved 944 m to the nearest water of the tiles holding half the pilot''s depth (14.6 m; beyond the rule''s 800 m: the first placing, from memory, fell on the land)'
+- id: oran
+  kind: town
+  name: Oran
+  modern: Oran (Wahran)
+  lat_deg: 35.705
+  lon_deg: -0.645
+  height_m: 20
+  source: 'Tofiño 1787, ''Castillo de Santa Cruz'', p. 148: the place at the foot of the castle of Santa Cruz. Purdy 1826, p. 323: on the S.E. side of the bay the remains of the town of Oran or Waharan, nearly destroyed by an earthquake in 1790, then Spain''s, subsequently abandoned. Bérard 1837, ''Oran'', p. 170: between two sandy beaches on the sloping banks of a ravine with an abundant spring; on the left bank the old town of the Spaniards, ruined by the earthquake of 1790'
+  says: Oran, the regency's since the Spaniards left it, on the banks of its ravine under the castle of Santa Cruz.
+  fix: FROM MEMORY; the height JUDGEMENT
+- id: santa-cruz-oran
+  kind: castle
+  name: the castle of Santa Cruz
+  modern: Fort de Santa Cruz, Oran (on the Murdjadjo)
+  lat_deg: 35.709
+  lon_deg: -0.661
+  height_m: 350
+  source: 'Tofiño 1787, p. 148: S 38° E of the Punta de Mazalquivir, on a hillock, the castle of Santa Cruz of Oran, in lat 35° 44'' and 5° 36'' 36" E of Cadiz; for knowing the place a level mountain W of the castle whose E end they call the Meseta, falling to a saddle between it and the castle. Purdy 1826, p. 323: two elevated mountains surmounted by forts, on the west of Oran, bearing S.W. by S., form an excellent mark for entering. Bérard 1837, p. 171: San Gregorio and Santa Cruz, the higher, impregnable, seen far at sea; its rocky knoll makes with the end of the ridge from the W a very remarkable notch (''embrasure'')'
+  says: 'The castle of Santa Cruz on its peak over Oran, and the notch between it and the Meseta: the mark for the bay.'
+  fix: FROM MEMORY; Tofiño's latitude is 1 1/2 miles north of the modern fort; the height JUDGEMENT
+- id: oran-road
+  kind: anchorage
+  name: Oran road
+  modern: the water before Oran
+  lat_deg: 35.713
+  lon_deg: -0.642
+  height_m: 0
+  depth_fathoms: 5
+  bottom: sand
+  source: 'Tofiño 1787, p. 148: in good weather one may anchor to unload before Oran at a little beach called the Blanquillo. Bérard 1837, p. 170: merchant ships in the fine season anchor before Oran in 8, 6 and 4 brasses, sand, much troubled by the sea with NE winds; sheltered from W and NW by the point of Fort Lamouna'
+  says: Oran road, before the Blanquillo, a fine-weather berth in five or six fathoms, sand; no place for a north-easter.
+  fix: off the town, by Bérard's words; 6 brasses (5.3 fathoms); JUDGEMENT
+- id: mount-san-agustin
+  kind: hill
+  name: the mountain of San Agustin
+  modern: Montagne des Lions (Djebel Kahar)
+  lat_deg: 35.763
+  lon_deg: -0.545
+  height_m: 615
+  source: 'Tofiño 1787, p. 148: east of Oran inland another high mountain, level on its summit, called San Agustín, which also serves to know the land and where one is with respect to Oran. Bérard 1837, ''Montagne des Lions'', pp. 169 to 170: the mountain of the Lions or of Saint-Augustin, remarkable for its form, height and isolation, one of the most useful marks; its summit from the W a table sloping to the S, conical from E of Cape Ferrat; 615 metres'
+  says: The mountain of San Agustin east of Oran, level-topped, the mark for knowing where one is from Oran.
+  fix: FROM MEMORY; the height Bérard's
+- id: point-abuja
+  kind: headland
+  name: Point Abuja
+  modern: Pointe de l'Aiguille (Ras el Aïn)
+  lat_deg: 35.8794
+  lon_deg: -0.4845
+  height_m: 54
+  source: 'Tofiño 1787, ''Punta de Abuja'', p. 148: [the bearing illegible in the OCR] of the Punta de Mazalquivir 15 and a fraction (illegible) miles, in lat 35° 53'' 53"; sharp, but falling short from high broken land, with an islet close to it. Purdy 1826, p. 323: the shore foul about Point Abuja and Cape Ferrat. Bérard 1837, ''Pointe Abuja'', p. 169: a heap of steep rocks, almost bare; a cable and a half N a pyramidal rock about 54 metres high called the Needle by the Europeans and Seba-Pharaon by the Moors, like a ship under sail from afar'
+  says: 'Point Abuja and its Needle, a rock like a ship under sail a cable and a half off: foul ground about it.'
+  fix: FROM MEMORY; the height Bérard's (the Needle); moved 459 m to the nearest land of the tiles
+- id: arzew-island
+  kind: island
+  name: the isle of Arzeo
+  modern: Île d'Arzew
+  lat_deg: 35.8705
+  lon_deg: -0.296
+  height_m: 5
+  extent_m: 300
+  source: 'Tofiño 1787, ''Arecú'', p. 149: in the bay, about 2 1/2 miles SE of Cape Carbon, a low isle with a reef to the N, and S of it two other very little ones. Purdy 1826, p. 323: off the point of Arzeo a small islet; when off it you will see a rock to the S.E. which appears like a boat. Bérard 1837, pp. 168 to 169: give the isle of Arzew a berth for a hidden rock a cable E 33° N of it'
+  says: 'The isle of Arzeo, low, with its reef to the north and a hidden rock a cable east-north-east: give it a berth.'
+  fix: Tofiño's 2 1/2 miles SE of Cape Carbon (Cape Carbon FROM MEMORY); the height JUDGEMENT ('rasa')
+- id: arzew-road
+  kind: anchorage
+  name: Arzeo road
+  modern: Baie d'Arzew (the anchorage S of the Île d'Arzew)
+  lat_deg: 35.862
+  lon_deg: -0.2884
+  height_m: 0
+  depth_fathoms: 7
+  bottom: sand
+  source: 'Tofiño 1787, p. 149: the isles passed at a musket shot, so that they bear NNW, is the true anchorage of the bay in 7, 8 or 9 brazas sand, with nothing to fear but what is seen; smaller craft in 4 brazas weed nearer the western shore with a hawser to a cave, sheltered from all winds; in the bottom of the bay the islet of Tujismes and near it the ruins of the city of Arecú. Purdy 1826, pp. 323 to 324 (an officer''s note of 1817): the best anchorage with the South Rock E.N.E. and the Granary W. by N., 10 to 6 fathoms sandy bottom, 2 or 3 cables from shore; open to E and N.E. winds; not more than 10 or 12 ships can ride in it. Bérard 1837, pp. 166 to 167: an excellent anchorage in all seasons for ordinary merchant ships; great ships outside the line from the fort''s point to the high land of the Chelif in 6, 7 and 8 brasses sand, good in the fine season only'
+  says: 'Arzeo road, the isles bearing north-north-west a musket shot off, seven to nine brazas sand: the best berth on this coast for ten or twelve ships.'
+  fix: a musket shot SSE of the isle, by Tofiño's mark; 7 to 9 brazas (6.4 to 8.2 fathoms); moved 325 m to the nearest water of the tiles holding half the pilot's depth (6.4 m)

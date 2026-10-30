@@ -1,0 +1,142 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"143,0": [
+"mostaganem"
+],
+"144,0": [
+"cape-ivi"
+],
+"146,5": [
+"cape-tenes"
+],
+"146,8": [
+"cherchell"
+],
+"147,11": [
+"cape-caxine",
+"pointe-pescade"
+],
+"147,12": [
+"algiers",
+"algiers-mole",
+"algiers-lantern",
+"algiers-lighthouse-battery",
+"mtahem",
+"algefna",
+"emperors-fort",
+"algiers-road",
+"algiers-bottom",
+"cape-matifou",
+"matifou-castle",
+"matifou-road",
+"matifou-bank"
+],
+"154,5": [
+"cape-berberia"
+],
+"154,6": [
+"mola-formentera"
+],
+"155,4": [
+"conejera-ivica",
+"vedra",
+"mataret"
+],
+"155,5": [
+"ivica-castle",
+"ivica-harbour-anchorage",
+"isla-grosa-ivica",
+"botafoc",
+"dados-shoal",
+"malvins-shoal",
+"portmany-road",
+"cape-falcon-ivica",
+"portas-tower",
+"freu-grande",
+"freo-del-medio",
+"espalmador-tower",
+"trocados",
+"espardell",
+"espardell-shoal"
+],
+"156,11": [
+"cabrera-harbour"
+],
+"156,6": [
+"tagomago"
+],
+"157,10": [
+"cala-figuera-tower"
+],
+"157,11": [
+"cape-blanco-majorca"
+],
+"157,12": [
+"cape-salinas",
+"porto-petro"
+],
+"157,13": [
+"porto-colom"
+],
+"158,10": [
+"porto-pi-light",
+"porto-pi",
+"bellver-castle",
+"palma-cathedral",
+"palma-road",
+"cuervo-marino-shoal",
+"palma-mole"
+],
+"158,13": [
+"cape-pera"
+],
+"158,9": [
+"dragonera",
+"andratx-harbour"
+],
+"159,11": [
+"puig-major"
+],
+"159,12": [
+"cape-formentor",
+"pollensa-road",
+"alcudia-road",
+"alcanada-shoal"
+],
+"159,15": [
+"ciudadela-road",
+"cape-dartuch"
+],
+"159,16": [
+"mount-toro"
+],
+"159,17": [
+"golden-farm",
+"mahon-leading-mark",
+"mahon-outer-road",
+"cape-mola-mahon",
+"mola-ledge",
+"philipet-point",
+"philipet-ledge",
+"st-philip-castle",
+"st-philip-ledge",
+"es-redo-ledge",
+"mahon-lazaretto",
+"quarantine-island",
+"isla-del-rey",
+"rat-island",
+"isla-del-rey-shoal",
+"mahon-arsenal-anchorage",
+"georgetown",
+"mahon-town",
+"cape-favaritx",
+"isla-del-aire"
+],
+"160,16": [
+"fornells-mola",
+"fornells-road",
+"cape-cavalleria"
+]
+}
+}

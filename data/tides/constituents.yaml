@@ -694,6 +694,111 @@ held_gauges:
     M2: {amplitude_m: 2.146, phase_deg: 352.4}
     S2: {amplitude_m: 0.648, phase_deg: 44.9}
     N2: {amplitude_m: 0.374, phase_deg: 329.1}
+  # THE MEDITERRANEAN WEST'S GAUGES AND THE BALEARICS', READ AND HELD (package 79c, the two
+  # regions `mediterranean-west` and `balearics`). TICON's file read 2026-10-29 by
+  # coordinates over 34.9 to 40.6 N and 5.0 W to 4.6 E (the zip at doi.pangaea.de,
+  # SHA-256 7055f8ed1a14abf8...6514, the same file): Málaga (two records; the IEO's of
+  # 1944 to 2012 taken, Puertos del Estado's of 1992 to 2015 agreeing within 3 mm and two
+  # degrees), Motril, Almería and Melilla for `mediterranean-west`; Ibiza, Formentera
+  # (La Savina), Palma, Alcudia and Mahón for `balearics`. Gandía, Sagunto and Valencia are
+  # in the file and lie north of Cape Palos, a later block's, and are not taken. No gauge
+  # at Cartagena, Oran or Algiers. The mean levels above the chart's datum are VERIFIED,
+  # read 2026-10-29 from Puertos del Estado's REDMAR reports (bancodatos.puertos.es,
+  # informes/globales/GLOB_2_3_<station>.pdf, "Referencias de nivel del mar"): the mean
+  # level (NMM) less the lowest astronomical tide (the reports' "mínima bajamar
+  # astronómica"), both on the gauge's zero, in metres.
+  #
+  # HELD, NOT BLENDED, as every block's are until the lead rules on the gauges' water
+  # (package 89, not merged when this block was built): these lie beyond the reach (400
+  # miles) of every Channel and Biscay north position, so blending them would move no
+  # recorded passage; what they would move is the world's tide over the block, which is
+  # now Le Conquet's alone (the nearest of the eleven, some 900 miles off: an M2 of 2.0 m
+  # where Málaga's is 0.19 and Mahón's 0.05, its mean level 3.98 m above the datum where
+  # these are 0.16 to 0.43). The pilots agree with the gauges: Gibraltar five or six feet
+  # (Michelot 1709, Tofiño 1787), Málaga three (Purdy 1826), Cartagena about sixteen inches
+  # (Smyth 1854), the Balearics one to two feet with gales (Tofiño 1787 pp. 210 and 226), Mahón "no
+  # regular tides" (the Admiralty 1913).
+  - id: malaga
+    name: Málaga
+    lat_deg: 36.7167
+    lon_deg: -4.4167
+    record: "GESLA-2, IEO, 1944 to 2012"
+    mean_level_m: 0.43  # REDMAR 3546 (Málaga 3): NMM 61 cm, LAT 18 cm above the zero
+    M2: {amplitude_m: 0.188, phase_deg: 51.1}
+    S2: {amplitude_m: 0.074, phase_deg: 74.7}
+    N2: {amplitude_m: 0.038, phase_deg: 34.6}
+  - id: motril
+    name: Motril
+    lat_deg: 36.7200
+    lon_deg: -3.5240
+    record: "GESLA-2, Puertos del Estado, 2005 to 2015"
+    mean_level_m: 0.39  # REDMAR 3543 (Motril 2): NMM 58 cm, LAT 19 cm
+    M2: {amplitude_m: 0.155, phase_deg: 48.6}
+    S2: {amplitude_m: 0.060, phase_deg: 74.0}
+    N2: {amplitude_m: 0.032, phase_deg: 32.5}
+  - id: almeria
+    name: Almería
+    lat_deg: 36.8300
+    lon_deg: -2.4780
+    record: "GESLA-2, Puertos del Estado, 2006 to 2015"
+    mean_level_m: 0.29  # REDMAR 3545: NMM 39 cm, LAT 10 cm
+    M2: {amplitude_m: 0.096, phase_deg: 50.1}
+    S2: {amplitude_m: 0.039, phase_deg: 75.4}
+    N2: {amplitude_m: 0.019, phase_deg: 35.2}
+  - id: melilla
+    name: Melilla
+    lat_deg: 35.2910
+    lon_deg: -2.9180
+    record: "GESLA-2, Puertos del Estado, 2007 to 2015"
+    mean_level_m: 0.33  # REDMAR 3510: NMM 32 cm, LAT -1 cm
+    M2: {amplitude_m: 0.127, phase_deg: 66.1}
+    S2: {amplitude_m: 0.048, phase_deg: 87.7}
+    N2: {amplitude_m: 0.026, phase_deg: 52.6}
+  - id: ibiza
+    name: Ibiza
+    lat_deg: 38.9111
+    lon_deg: 1.4497
+    record: "GESLA-2, Puertos del Estado, 2003 to 2015"
+    mean_level_m: 0.17  # REDMAR 3856 (Ibiza 2): NMM 37 cm, LAT 20 cm
+    M2: {amplitude_m: 0.017, phase_deg: 215.3}
+    S2: {amplitude_m: 0.006, phase_deg: 233.0}
+    N2: {amplitude_m: 0.004, phase_deg: 201.3}
+  - id: formentera
+    name: Formentera (La Savina)
+    lat_deg: 38.7347
+    lon_deg: 1.4189
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.16  # REDMAR 3855: NMM 36 cm, LAT 20 cm
+    M2: {amplitude_m: 0.014, phase_deg: 179.6}
+    S2: {amplitude_m: 0.005, phase_deg: 195.4}
+    N2: {amplitude_m: 0.003, phase_deg: 171.3}
+  - id: palma
+    name: Palma
+    lat_deg: 39.5603
+    lon_deg: 2.6375
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.16  # REDMAR 3851: NMM -12 cm, LAT -28 cm
+    M2: {amplitude_m: 0.028, phase_deg: 208.5}
+    S2: {amplitude_m: 0.011, phase_deg: 226.3}
+    N2: {amplitude_m: 0.006, phase_deg: 196.9}
+  - id: alcudia
+    name: Alcudia
+    lat_deg: 39.8347
+    lon_deg: 3.1392
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.19  # REDMAR 3853: NMM 42 cm, LAT 23 cm
+    M2: {amplitude_m: 0.047, phase_deg: 218.3}
+    S2: {amplitude_m: 0.018, phase_deg: 238.2}
+    N2: {amplitude_m: 0.010, phase_deg: 206.1}
+  - id: mahon
+    name: Mahón
+    lat_deg: 39.8930
+    lon_deg: 4.2706
+    record: "GESLA-2, Puertos del Estado, 2009 to 2015"
+    mean_level_m: 0.20  # REDMAR 3860: NMM -3 cm, LAT -23 cm
+    M2: {amplitude_m: 0.051, phase_deg: 223.6}
+    S2: {amplitude_m: 0.020, phase_deg: 242.8}
+    N2: {amplitude_m: 0.011, phase_deg: 210.1}
 
   # THE GAUGES OF THE GULF OF LION'S BLOCK, READ AND HELD (package 79d, the region
   # `gulf-of-lion`). TICON's file read again 2026-10-29 by its coordinates over the block's

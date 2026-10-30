@@ -1,0 +1,48 @@
+# FreeSail: the captain's orders for the Mediterranean west, Gibraltar bay to Port Mahon
+# (package 79c). A short book: the frigate's own, the starter book not loaded.
+
+# The departure: with the anchor down in Gibraltar road she weighs at once and stands down
+# the bay to its mouth, then round Europa Point two leagues off (Tofiño 1787 p. 19: the
+# currents very strong with eddies about the point).
+standing order "weigh": at the anchor let go, if the distance to Gibraltar road is under 2 miles then get under way on the starboard tack and steer SSW
+standing order "out of the bay": at under way, if the distance to Gibraltar road is under 2 miles then set plain sail; shape a course for 36 04.8 N 5 23.4 W
+standing order "the mouth of the bay": when the distance to 36 04.8 N 5 23.4 W is under 1 mile then shape a course for 36 03 N 5 18 W
+standing order "off Europa": when the distance to 36 03 N 5 18 W is under 1.5 miles then shape a course for 36 30 N 2 12 W
+
+# Along the coast of Granada with the current to the eastward, four leagues and more off
+# the land and its batteries, to five leagues south of Cape de Gata (Tofiño pp. 28 to 54):
+# a long run without a fix (the first run's fault: her account seven miles astray after
+# twenty hours, she stood onto the shoal water west of the cape making for six miles off).
+standing order "the course for Gata": every hour, if the distance to 36 03 N 5 18 W is over 3 miles and the distance to 36 30 N 2 12 W is over 2 miles and the distance to 36 30 N 2 12 W is under 160 miles and the distance to 37 28 N 0 25 W is over 101 miles then shape a course for 36 30 N 2 12 W
+standing order "off Gata": when the distance to 36 30 N 2 12 W is under 2 miles then shape a course for 37 28 N 0 25 W
+
+# To four leagues south-east of the Hormigas off Cape Palos (Tofiño p. 79: there the water
+# runs fast to the south-east, the faster the farther out), then south of Formentera.
+standing order "the course for Palos": every hour, if the distance to 36 30 N 2 12 W is over 3 miles and the distance to 37 28 N 0 25 W is over 2 miles and the distance to 37 28 N 0 25 W is under 106 miles and the distance to 38 30 N 1 54 E is over 124 miles and the distance to 39 45.6 N 4 25.2 E is over 200 miles then shape a course for 37 28 N 0 25 W
+standing order "off Palos": when the distance to 37 28 N 0 25 W is under 2 miles then shape a course for 38 30 N 1 54 E
+
+# South of Formentera and up the channel between the Pityuses and Majorca to ten miles south
+# of Cabrera, then round the Isla del Aire for the mouth of Port Mahon.
+standing order "the course past Formentera": every hour, if the distance to 37 28 N 0 25 W is over 3 miles and the distance to 38 30 N 1 54 E is over 2 miles and the distance to 38 30 N 1 54 E is under 128 miles and the distance to 38 57 N 2 57 E is over 54 miles and the distance to 39 45.6 N 4 25.2 E is over 100 miles then shape a course for 38 30 N 1 54 E
+standing order "south-east of Formentera": when the distance to 38 30 N 1 54 E is under 2 miles then shape a course for 38 57 N 2 57 E
+standing order "the course for Cabrera": every hour, if the distance to 38 30 N 1 54 E is over 3 miles and the distance to 38 57 N 2 57 E is over 2 miles and the distance to 38 57 N 2 57 E is under 58 miles and the distance to 39 45.6 N 4 25.2 E is over 82 miles then shape a course for 38 57 N 2 57 E
+standing order "south of Cabrera": when the distance to 38 57 N 2 57 E is under 2 miles then shape a course for 39 45.6 N 4 25.2 E
+standing order "the course for the Aire": every hour, if the distance to 38 57 N 2 57 E is over 3 miles and the distance to 39 45.6 N 4 25.2 E is over 1.5 miles and the distance to 39 45.6 N 4 25.2 E is under 86 miles and the distance to the anchorage off the mouth of Port Mahon is over 7 miles then shape a course for 39 45.6 N 4 25.2 E
+
+# The mouth of Port Mahon: with the hostile port before her she does not go in, but anchors
+# without the ledges in twenty brazas and more, good ground (Tofiño p. 213), by day or by
+# night, sounding as she closes the land.
+standing order "south-east of the Aire": when the distance to 39 45.6 N 4 25.2 E is under 1.5 miles then shorten sail; shape a course for the anchorage off the mouth of Port Mahon
+standing order "at the mouth": when the distance to the anchorage off the mouth of Port Mahon is under 0.4 miles then come to an anchor
+standing order "the lead off Mahon": every 10 minutes, if the distance to the anchorage off the mouth of Port Mahon is under 6 miles then heave the lead
+
+# Each hourly course holds only short of the next mark, so that a course is never shaped
+# back for a mark already passed (79b's lesson), and only while the marks beyond are far
+# (the second run's fault: off Minorca the course for Formentera, a hundred and twenty
+# miles astern, was still within its reach and wore her back).
+
+# The yards and the sheets, the bearings.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix

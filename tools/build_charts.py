@@ -452,6 +452,54 @@ REGIONS: dict[str, dict[str, Any]] = {
         # blend and not a far gauge's (docs/dev/ChartBlocks.md, "GEBCO's fill")
         "fill_to_chart_datum": True,
     },
+    # package 79c: the Mediterranean's west, the Strait's east bound to Cape Palos and
+    # Cartagena, and Barbary from Ceuta's east to Oran, abutting `strait` (package 39f) at
+    # 5 W exactly and `balearics` (below) at 0.05 E: the block was one region of 57.5 MB,
+    # past the brief's 40, and the lead ruled it two (docs/dev/TuningNotes.md, package 79c,
+    # step 1). The level-2 tiles that meet the bounds span 34.59 to 40.56 N and 5.07 W to
+    # 0.05 E (14 rows, 12 columns); the western column (5.07 to 4.64 W) from 35.44 to
+    # 36.72 N is strait's (the seam rule, `tiles_listed_elsewhere`): computed with the
+    # block, so that the field knows Ceuta's and Gibraltar's shores, and not written. The
+    # eastern column (0.37 W to 0.05 E) meets `balearics`' bounds too and is this
+    # region's, built first. The coast north of Cape Palos (Alicante, Valencia) lies within
+    # the box and is tiles without marks: a later block's.
+    "mediterranean-west": {
+        "title": "The Mediterranean west, the Strait to Cartagena and Barbary to Oran",
+        "bounds": {"south": 35.0, "north": 40.5, "west": -5.0, "east": 0.05},
+        "fetch": {"south": 34.45, "north": 40.7, "west": -5.2, "east": 0.2},
+        "harbours": {
+            "malaga": {"south": 36.62, "north": 36.76, "west": -4.50, "east": -4.33},
+            "almeria": {"south": 36.77, "north": 36.86, "west": -2.52, "east": -2.40},
+            "cartagena": {"south": 37.53, "north": 37.62, "west": -1.05, "east": -0.92},
+            "oran": {"south": 35.69, "north": 35.76, "west": -0.74, "east": -0.60},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, as the Strait's is: the block's
+        # gauges are held, so over the Mediterranean the world's tide is a far gauge's
+        # (docs/dev/ChartBlocks.md, "GEBCO's fill", package 39f), and the land must stand
+        # above that tide's high water
+        "fill_to_chart_datum": True,
+    },
+    # package 79c: the Balearics and the Barbary coast from Oran's east to Algiers and on to
+    # 4.5 E, the block's second region by the lead's ruling, abutting `mediterranean-west`
+    # at 0.05 E. The level-2 tiles that meet the bounds span 34.59 to 40.56 N and 0.37 W to
+    # 4.75 E (14 rows, 12 columns); the western column (0.37 W to 0.05 E) is
+    # mediterranean-west's (the seam rule): computed with the block and not written. The
+    # Algerian coast east of 4.5 E is a later block's.
+    "balearics": {
+        "title": "The Balearics, and Barbary from Mostaganem to Algiers",
+        "bounds": {"south": 35.0, "north": 40.5, "west": 0.05, "east": 4.5},
+        "fetch": {"south": 34.45, "north": 40.7, "west": -0.5, "east": 4.9},
+        "harbours": {
+            "palma": {"south": 39.48, "north": 39.59, "west": 2.55, "east": 2.75},
+            "port-mahon": {"south": 39.85, "north": 39.91, "west": 4.24, "east": 4.33},
+            "ivica": {"south": 38.86, "north": 38.93, "west": 1.38, "east": 1.50},
+            "algiers": {"south": 36.75, "north": 36.82, "west": 3.02, "east": 3.12},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # as mediterranean-west's: the world's mean level, the block's gauges held
+        "fill_to_chart_datum": True,
+    },
     # package 79d: the Gulf of Lion, the Roussillon to Nice and Villefranche (the lead's
     # ruling on step 1: the Gulf split at the column edge 7.73 E, its east part the region
     # `ligurian-sea`). The level-2 tiles that meet the bounds span 40.56 to 44.83 N and
@@ -550,7 +598,10 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 # a block adds its region here when its tiles are built (docs/dev/ChartBlocks.md).
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
-        "title": "The Channel, Biscay, Iberia, the Strait, the Gulf of Lion and the Tyrrhenian",
+        "title": (
+            "The Channel, Biscay and the Iberian coast to Madeira, the Strait, the "
+            "Mediterranean west and the Balearics, the Gulf of Lion and the Tyrrhenian"
+        ),
         "regions": [
             "channel-west",
             "channel-mid",
@@ -564,6 +615,9 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 39f: the Strait, the voyage's last (its own line, so that the four
             # blocks' additions merge as lines)
             "strait",
+            # package 79c: the Mediterranean west in two regions (the lead's ruling)
+            "mediterranean-west",
+            "balearics",
             # package 79d: the Gulf of Lion and the Tyrrhenian, the Mediterranean's north
             "gulf-of-lion",
             "ligurian-sea",
