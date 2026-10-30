@@ -750,7 +750,11 @@ passages by node id to their digests, the touched files' slow tests 14, truths 7
 regions in `test_geo.py`, truth 7-261's count of the nations now nine) and the pictures'
 known flake the rest; the lead's run of the touched files with the short truths and the gate
 selection (267 passed, none failed); **the whole suite on the merged tree in the cloud
-(run 13, the figures below).** **The block, two regions by the lead's ruling at the
+(run 13 on `159df45`: lint green, 4,308 passed over the six shards, 3 skipped, 11 expected
+failures, none failed, 39 minutes; the pace job, informative, 8 of 10 with the gates' day at
+472 and 7-159's convoy at 456 against the floor of 500, the job 281 seconds against run 12's
+158 on the same ten tests an hour before: the runner's day as runs 10 and 11 were, read in
+79b's record; nothing re-pinned).** **The block, two regions by the lead's ruling at the
 builder's report of 57.5 MB in one:** `mediterranean-west`, 35 to 40.5 N and 5 W to 0.05 E,
 165 level-2 tiles and the patches of Málaga, Almería, Cartagena and Oran with Mers-el-Kebir,
 26.5 MB, three seam tiles the Strait's; `balearics`, 0.05 to 4.5 E, 154 level-2 tiles and
