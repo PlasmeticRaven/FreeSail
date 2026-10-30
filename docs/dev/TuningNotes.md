@@ -14829,3 +14829,109 @@ the Solent's tide region and the seams' rule under the worlds these tests run in
 fast tier whole again, 4,454 passed, none failed; the package's six test files, the
 primer's, the anchor's and the checkpoints' with the truths 7-240 to 7-245, 7b-117 and
 7-150 to 7-159, `--slow -m "not pace" -n 4`: all passed, no pin moved.
+
+## Package 88: the captain's pass of M7 (2026-10-30, building)
+
+Built as a sibling session on `claude/pkg-88` from the lead's head `c168c51`, each item in
+the owner's four parts. The physics is read and not changed; no ship file, no consent file.
+This section is written as the items go; **item 1 stands at the lead's ruling** (below).
+
+### Item 1: the commodore's recovery when aback with no way
+
+*The symptom* (86's finding), reproduced on `c168c51` exactly as 86 had it: the commodore's
+brig-sloop of `convoy-six.yaml` comes out of a short-handed tack at 1594 (10:26:34) with no
+way, her head forty degrees off the north-easterly; every square sail shaking (by its
+reading), the spanker drawing and holding her head up; going astern at half a knot; no
+manoeuvre in hand; "Her sails aback; she had no way on to lose" at 1810; she lies so until
+the book's second shortening takes in her spanker (2671) and pays off at 10:45, the far
+convoy capped at her pace. The helm's own box-off of 37p (`scripts.keep_full_and_by`) never
+comes: `hull.seconds_aback` counts only a net thrust astern with the sails pressed and is
+reset by every sail in the hands' hands and every flicker of the thrust's sign, and her
+sternway is under the in-irons line (`IN_IRONS_KN`, a knot).
+
+*The rule as it stood:* nothing of the rules captain's bears her away when she lies aback
+with no way and no tack in hand; 58b's law fills the far body (`_course_for`), and the
+near captain's standing order 'keep her full' is a `when` rule already true.
+
+*The rule as it reads now* (`Captain._aback_with_no_way`, `captains.ABACK_RECOVER` its
+switch, every role's `aback_recover_minutes`, three, judgement): having had way since the
+anchor or the ground, with no headway now (the course's reading says none), square sail
+set and none of it drawing (the sails' readings), a wind over the physics' light-air line
+(`hull.ABACK_URGENT_AWS_KN`, four knots, read), no manoeuvre in hand, for the doctrine's
+minutes together, he recovers her as the period did: the work waiting for hands avasted
+and the work at the driver with it, **the driver taken in** (the after sail eased: Lever
+1808 p. 79, OCR lines 9711 to 9716, "the Power being taken from the Sails, which are at the
+after extremity of the Ship, effort is given to the Head Sails ... to pay her head off to
+leeward"; Luce 1866 ch. XXV, "Up mainsail and spanker!"); if she lies so another while (or
+has no driver), **boxed off** (`box her off`, Luce 1866 ch. XXV 'To Box Off', OCR lines
+28510 to 28523; the helm and head sheets of 'Coming to against the Helm' serve only "if
+the vessel has headway on"); with headway again and her square sail drawing, the driver
+set again ("when the spanker will take, haul it out", OCR line 28539) and the leg shaped.
+The box-off waits its turn behind hands at a yard (the runner's holds, read and not
+changed: the topmen at a reef are not ordered off the yard). The three minutes: a minute
+more than the helmsman's own box-off when pressed aback (`BOX_OFF_AFTER_S`), so that his
+comes first where it can. Taken another way on the way: the box-off alone at first (it waited
+eight minutes behind the reefs); the spanker's take-in before it (it waited behind the
+sheet trim and lost its hands to the courses' reefs) and the work waiting for hands avasted
+with it; the rule armed only after she has had way (the intent scenario's merchant was
+boxed off at the first measure as her hands got her under way from the anchor: way not yet
+gathered is not way lost).
+
+*What proves it.* The convoy, switch off beside on, on the final code: the commodore dead
+in the water from 10:20 to 10:47 before; now from coming out of stays (10:26) to 10:33, the
+spanker in at 1800, boxed off by 2110, four knots and more by 2400; the convoy keeps way the
+morning through. **Truth 7-152** moves, old beside new in its test: the straggler's signal
+ordered, made and answered and the Friendship back in station at 2760, 2866, 3000 and 6420
+before (and with the switch off), at 2040, 2182, 2340 and 6060 now; the worst ship off
+station in the third hour 161 m before, 144 m now. **Truth 7-153 does not move** (its pins
+are states and bands): the privateer evading at the hour 2.10 nm off before, 1.98 now; at
+three hours 20.35 nm before, 19.87 now. **Truth 7-340** is the law's own, with the switch.
+
+**Found on the way, mended: the haul-off kept the sea.** `Captain._haul_off` steered the
+plain reciprocal of the enemy's bearing for twenty miles whatever lay across it; the
+merchant schooner of the trade trial, meeting the privateer later in the day (below), was
+carried across the land about Coverack and took the ground at 22259 at seven knots, her
+lookout's "Land close ahead, four cables" unanswered (no evading book reads the land). Now
+the bearing away is turned a point at a time up to eight to either hand
+(`HAUL_OFF_POINTS`, judgement: never nearer the enemy than abeam) to a line the planner's
+own test (`Planner.clear`) finds clear of the shore and the dangers; the reciprocal itself
+when none is.
+
+**The recorded passages, by bisection** (the switch toggled on the final code): of the
+captain's trials, the known truths and `test_captains.py` run whole, seven tests moved
+besides 7-152; with the switch off six pass again (the cargo test of `test_captains.py`, the
+intent schooner's two truths, the player's hand's two trials, the trade trial) and the
+seventh is the lee-shore trial's stale pin (below). With the rule armed only after way, the
+merchant intent's passages and the schooner's are unmoved with the switch on. **Two trials
+move with the mend, each where she truly lay aback with sternway:**
+
+- *The trade trial* (`trial-trade-stranger`): before, the merchant schooner is taken aback
+  at 368 (04:06) and lies so with a knot or two of sternway for fifty-four minutes, until
+  she turns to evade the privateer at 3660; the recovery boxes her off at 840 and she
+  makes four knots by 04:16. Her day then falls otherwise: she meets the French brig at
+  14580 (08:03), evades her until 57840 (the brig engaging within her `break_off_nm` of
+  three miles for seven hours, then chasing), and at the twentieth hour is beating for
+  Falmouth: **never aground (with the haul-off mended), but not in port**, where the pinned
+  passage anchors at 51849 and is in port at 51900. 1330 lines, `d5f34f439970cf72` (1247,
+  `02313d83240a11d5` with the switch off).
+- *The lee-shore trial* (`trial-station-lee-shore`): before, she lies aback by spells in
+  the gale's first hours (29 lines of it in the day, the lead's judgement of 58b counted
+  them); the recovery boxes her off at 12514, 15157 and 53408 (the helm's own at 3041 as
+  before), 9 lines aback in the day; hove to again at 32160 (41940), on passage, beating
+  and the station at 38340 to 38400, hove to at 41880, beating from 51540, and **aground at
+  59820**, beating close aboard Ushant in the dark at seven knots and a half ("the land
+  close aboard is no mark of the chart"), the beating captain blind to the land under
+  his lee at night: item 2's family, reached on another track.
+
+**Found on the way, for the lead: the lee-shore trial's digest was stale on the trunk.** On
+`c168c51` itself (a worktree, the package's code absent) the trial gives its pinned states
+and 1,597 lines but the digest `7fad0ce7e46ba366`, not the pin's `ed48ca3d61e52f20`; not
+this package's, and not re-pinned here.
+
+**The question to the lead** (sent with the branch at `item 1 stands`): the recovery is
+right in each passage it moves, and it carries two trials off their pinned days, the
+lee-shore trial into a grounding of item 2's kind and the trade trial out of port at the
+twentieth hour. Proposed: item 1 held open; item 2 built next on top of it (the offing's
+tack and the land at night), and then the two trials measured again; the trade trial's
+pins moved old beside new as a finding if it keeps its intent but the port (or its hours
+or the ruling as the lead gives it).
