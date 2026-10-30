@@ -488,8 +488,6 @@
         return (s.roles || {}).yard === yardId && !!s.cut_at_mast;
       });
     }
-    /** Whether a sail cut at the mast is spread on this boom, bent or not (package 75, B5.5;
-     *  Ext §17.6: the driver's boom). */
     /** A gaff sail filed with its four corners [tack, throat, peak, clew], on a hull drawn from
      *  her profile (package 75, the razee's spanker, her stage B): the run and the rise of its head
      *  and the length of its foot, by which its gaff and its sail are drawn as they are filed, in
@@ -505,10 +503,25 @@
       return { angle: Math.atan2(rise, run), head: Math.hypot(run, rise), foot: Math.abs(c[0][0] - c[3][0]) };
     }
 
+    /** Whether a sail cut at the mast is spread on this boom, bent or not (package 75, B5.5;
+     *  Ext §17.6: the driver's boom). */
     function boomOfCut(sparId) {
       return (sailsBySpar[sparId] || []).some(function (s) {
         return !!s.cut_at_mast && (s.roles || {}).boom === sparId;
       });
+    }
+    /** Whether the boom of a sail cut at the mast is rigged in, on the booms with the driver
+     *  below: served `rigged_out` false, the snapshot's, else the graph's (package 75; Ext
+     *  §17.11, the owner's: the boom out only while the driver is bent, which replaces §17.6's
+     *  "the boom lies amidships"). It is not drawn, nor its sheet, as a spare on the booms is
+     *  not. It is still placed, so that its swing stays in the fixed frame (`fullRigFrame`) and
+     *  the view does not rescale at the shift. A served true, and every other boom, stands as
+     *  it stood: a gaff sail's boom is never rigged in, and the schema refuses it the key. */
+    function boomRiggedIn(sparId) {
+      var spec = sparSpecs[sparId];
+      if (!spec || spec.class !== "boom" || !boomOfCut(sparId)) return false;
+      var s = snapSpars[sparId];
+      return (s && s.rigged_out != null ? s.rigged_out : spec.rigged_out) === false;
     }
     /** Whether a studding sail boom is rigged out: the snapshot's state (spec 3b §7), else
      *  the ship file's (booms start rigged in), else out while a sail on it is not stowed. */
@@ -521,8 +534,9 @@
     }
     /** The sheet angle of the sail using this gaff or boom, if any: a gaff or sprit sail's, or
      *  a lateen cut at the mast that is not unbent (package 75, B5.5; Ext §17.6: the driver on
-     *  its boom). With the driver in the sail room its boom lies amidships, as a boom with no
-     *  sail does. */
+     *  its boom). With the driver in the sail room its boom has no angle: rigged in it is not
+     *  drawn (`boomRiggedIn`, Ext §17.11), and it lies amidships only for the time it stands out
+     *  with the sail below, from its own phase to the bend and from the unbend to its own phase. */
     function sheetAngleOf(sparId) {
       var list = sailsBySpar[sparId] || [];
       for (var i = 0; i < list.length; i++) {
@@ -844,7 +858,9 @@
           r.dir = bDir;
           // package 75 (B5.5; Ext §17.6): a driver's boom reaches far beyond the taffrail, and
           // swung to the quarter past the frame's four directions: its swing is reached every
-          // way, so that the view does not rescale as it is sheeted or as the driver is shifted.
+          // way, so that the view does not rescale as it is sheeted or as the driver is shifted:
+          // rigged in as well as out, for it is placed here either way and only its figure goes
+          // (`boomRiggedIn`, Ext §17.11).
           // So does the razee's spanker boom, as long, 7.4 m past the four directions seen on the
           // quarter (measured): every boom on a hull drawn from her profile (her stage B)
           if (boomOfCut(id) || profile) r.everyWay = true;
@@ -1032,6 +1048,7 @@
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
       if (sentDown(r)) return;
+      if (boomRiggedIn(s.id)) return; // on the booms, as a spare is (Ext §17.11)
       var fig = {
         kind: "spar",
         id: s.id,
@@ -1454,8 +1471,16 @@
         var cornersG = [throat, peak, clew, tackPt];
         var fig = sailFigure(spec, dyn, cornersG, normalG, Bm || M, luff);
         fig.mastId = M.id;
+        // her spanker's foot is laced along its boom, which clears her taffrail by a centimetre
+        // (the lead's ruling of 2026-10-30): no sag below it, and furled it lies on the boom. By
+        // the rule for the rest the foot hung 0.62 m under the boom and the bundle 0.35 m, through
+        // her taffrail (the razee, measured)
+        if (cutG && DRAWING[dyn.state]) fig.path[3][0] = add(fig.path[3][0], v(0, 0, 2 * FOOT_SAG * luff));
         if (dyn.state === "furled") {
-          fig.path = Bm ? bundle(Bm.a, Bm.b, 0.3 + 0.02 * (Bm.spec.length_m || 0)) : bundle(v(M.x, 0.15, footZ), v(M.x, 0.15, throat[2]), 0.5);
+          var bundleT = 0.3 + 0.02 * (Bm ? Bm.spec.length_m || 0 : 0);
+          fig.path = cutG
+            ? [[Bm.a], [add(lerp(Bm.a, Bm.b, 0.5), v(0, 0, bundleT)), Bm.b], [lerp(Bm.a, Bm.b, 0.5), Bm.a]]
+            : Bm ? bundle(Bm.a, Bm.b, bundleT) : bundle(v(M.x, 0.15, footZ), v(M.x, 0.15, throat[2]), 0.5);
         } else if (dyn.state === "in_the_gear") {
           // brailed in to the mast: a narrow gathered shape along the luff
           var brailW = 0.25;
@@ -1683,8 +1708,11 @@
           // in with the sail in the gear) to the taffrail on the centreline, where its horse is
           // (Steel 1794 vol. I p. 208). The driver's (B5.5; Ext §17.6) is rove through its
           // boom's end, its tackle to the taffrail: drawn from the boom's end, set or in the
-          // gear, and not furled, as every sheet
+          // gear, and not furled, as every sheet. With its boom rigged in there is no end to reeve
+          // it through (Ext §17.11), which is only the driver bent in the wreck of a boom carried
+          // away on the booms: the engine rigs it out before the bend
           var BmS = spars[(sheetSpec.roles || {}).boom];
+          if (BmS && boomRiggedIn(BmS.id)) return;
           pts = [BmS && BmS.dir ? BmS.b : sf.clewAt || sf.corners[2], taffrail(hull)];
         } else if ((sf.cls === "lug" || sf.cls === "lateen") && sheetSpec.corners_m) {
           // package 57: a lug's sheet from its clew aft to the lee side, and a whole lateen's
@@ -1783,7 +1811,8 @@
    *  seen on the bow: its swing is reached every way, by sixteen points about its slings whose
    *  figure's sides touch the circle its arms sweep, at the height of its slings and of the
    *  foot of a sail hanging from it. So is a driver's boom about its jaws
-   *  (B5.5): it reaches far beyond the taffrail, and sheeted to the quarter its end reaches
+   *  (B5.5), rigged in or out (Ext §17.11, so that the shift does not rescale the view): it
+   *  reaches far beyond the taffrail, and sheeted to the quarter its end reaches
    *  past the four directions seen on the quarter; and every boom on a hull drawn from her
    *  profile (the razee's spanker's, her stage B). */
   function fullRigFrame(graph, spars, hull) {

@@ -37,11 +37,15 @@ fields the projection reads always run.
   the file has it, the jib-boom from its end.
 - Package 75 (B5.5, Ext §17.6), on the fixture `frigate_with_driver()`: the driver of the 64 and
   the 74 cut at the mast, its throat and peak swung about the mast, its tack at the boom's jaws
-  and its clew along the boom, the boom swung by its sheet and amidships while it is in the sail
-  room; its head along the mizen yard's line and on along Steel's driver yard; brailed to the
-  mast and furled along its head; its sheet from the boom's end to the taffrail; the yard laid
-  on the course's corners whichever sail is bent, through the engine's shift and back; the frame
-  holding the boom's swing beyond the taffrail across states.
+  and its clew along the boom, the boom swung by its sheet; its head along the mizen yard's line
+  and on along Steel's driver yard; brailed to the mast and furled along its head; its sheet from
+  the boom's end to the taffrail; the yard laid on the course's corners whichever sail is bent,
+  through the engine's shift and back; the frame holding the boom's swing beyond the taffrail
+  across states.
+- Package 75 (Ext §17.11, which replaces §17.6's "the boom lies amidships"): the driver's boom
+  rigged in, on the booms with the driver below, not drawn, nor its sheet, as a spare on the booms
+  is not; its swing kept in the frame, so that the view does not rescale at the shift; with it
+  out, or with no key on its file, everything as B5.5 drew it; through the game's own routes.
 - Package 75 (the 64's stage B): each of those cases run on her own files as well as the fixture
   where it applies, the mizen's and the driver's on `sixty-four.yaml`, the yards under the
   bowsprit's on both; the sprit topsail, whose yards stand far apart fore and aft, drawn to its
@@ -59,6 +63,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+import yaml
 from rig_fixtures import (
     DRIVER_YARD_M,
     SPREAD,
@@ -76,7 +81,7 @@ from rig_fixtures import (
 
 from freesail import orders
 from freesail.api import queries
-from freesail.api.session import make_ship, make_world
+from freesail.api.session import attach_systems, make_ship, make_world
 from freesail.core.world import Scenario
 from freesail.evolutions import Runner
 from freesail.evolutions.trim import set_sheet_angle
@@ -3301,15 +3306,34 @@ DRIVER_BOOM = "mizzen.boom"
 GEAR_DEPTH = 0.35  # client/projection.js: IN_GEAR_DEPTH
 
 
-def driver_ship(rig: str, bent: bool):
-    """`frigate_with_driver(bent)`, or the file `rig`: the driver bent in the course's place, the
-    course in the sail room, or as she is filed with the driver in the sail room."""
+def driver_doc(rig: str, rigged_out: bool | None = False) -> dict:
+    """The fixture's document with the driver in the sail room, or the file `rig`'s, its boom
+    filing `rigged_out`, or no key at all with None. False is what `mizen_yard.driver()` files
+    (Ext §17.11, B1's regeneration), given here so that a case on her own file reads the same
+    before that regeneration and after it."""
     if rig == FIXTURE:
+        doc = frigate_with_driver_doc()
+    else:
+        doc = yaml.safe_load((ROOT / rig).read_text(encoding="utf-8"))
+    boom = next(s for s in doc["spars"] if s["id"] == DRIVER_BOOM)
+    boom.pop("rigged_out", None)
+    if rigged_out is not None:
+        boom["rigged_out"] = rigged_out
+    return doc
+
+
+def driver_ship(rig: str, bent: bool, key: bool = True):
+    """`frigate_with_driver(bent)`, or the file `rig`: the driver bent in the course's place with
+    the boom rigged out, the course in the sail room, or as she is filed with the driver in the
+    sail room and the boom rigged in. `key` false: the boom files no `rigged_out`, and stands out
+    all the voyage (Ext §17.11's toggle)."""
+    if rig == FIXTURE and key:
         return frigate_with_driver(bent)
-    ship = make_ship(rig)
+    ship = attach_systems(ship_from_dict(driver_doc(rig, False if key else None), rig))
     if bent:
         ship.sails[MIZEN_COURSE].state = SailState.UNBENT
         ship.sails[DRIVER].state = SailState.FURLED
+        ship.spars[DRIVER_BOOM].rigged_out = True
     return ship
 
 
@@ -3319,11 +3343,12 @@ def driver_by_the_wind(
     state: SailState = SailState.SET,
     bent: bool = True,
     rig: str = FIXTURE,
+    key: bool = True,
 ) -> dict:
-    """`driver_ship(rig, bent)` under plain sail on `tack`, her after sail in `state` and sheeted
-    `sheet_deg` off the centreline: the driver bent in the course's place, or the course with the
-    driver in the sail room. The graph and snapshot."""
-    ship = driver_ship(rig, bent)
+    """`driver_ship(rig, bent, key)` under plain sail on `tack`, her after sail in `state` and
+    sheeted `sheet_deg` off the centreline: the driver bent in the course's place, or the course
+    with the driver in the sail room. The graph and snapshot."""
+    ship = driver_ship(rig, bent, key)
     for sid in ship.groups["plain sail"]:
         if ship.sails[sid].state is not SailState.UNBENT:
             ship.sails[sid].state = SailState.SET
@@ -3334,8 +3359,9 @@ def driver_by_the_wind(
     return ship_state(ship, awa=awa, tack=tack)
 
 
-# The mizen yard, the boom, the two after sails, the driver yard and the lines of the yard and
-# the two sails, as drawn: `DRIVER_FIGURES` of one state, `DRIVER_STATES` of each of several.
+# The mizen yard, the boom, the two after sails, the driver yard and the lines of the yard, the
+# boom and the two sails, as drawn: `DRIVER_FIGURES` of one state, `DRIVER_STATES` of each of
+# several. `jaws` and `boomEnd` are where the boom is placed, drawn or not; `boom` its figures.
 DRIVER_DRAWN = """
     function drawn(g) {
       const sk = P.buildSkeleton(g.graph, g.snap);
@@ -3346,11 +3372,13 @@ DRIVER_DRAWN = """
       };
       return {
         heel: y.a, peak: y.b, truss: y.truss, jaws: b.a, boomEnd: b.b,
+        boom: sk.figures.filter(f => f.kind === 'spar' && f.id === 'mizzen.boom')
+          .map(f => ({state: f.state, pts: f.pts})),
         driver: sail('mizzen.driver'), course: sail('mizzen.course'),
         driverYards: sk.figures.filter(f => f.cls === 'driver_yard')
           .map(f => ({kind: f.kind, id: f.id, of: f.of, pts: f.pts})),
         lines: sk.figures.filter(f => f.kind === 'line' &&
-          ['mizzen.yard', 'mizzen.course', 'mizzen.driver'].includes(f.of))
+          ['mizzen.yard', 'mizzen.boom', 'mizzen.course', 'mizzen.driver'].includes(f.of))
           .map(f => ({id: f.id, cls: f.cls, pts: f.pts})),
       };
     }
@@ -3540,11 +3568,15 @@ def test_the_yard_lies_on_the_courses_line_whichever_sail_is_bent(tmp_path, tack
 
 @needs_node
 @pytest.mark.parametrize("rig", MIZEN_RIGS)
-def test_the_boom_lies_amidships_with_the_driver_in_the_sail_room(tmp_path, rig):
-    """Ext §17.6: `sheetAngleOf` takes a lateen cut at the mast that is not unbent. With the
-    driver in the sail room the boom lies amidships, level at its jaws, whatever the course's
-    sheet, as a boom with no sail does, and nothing of the driver is drawn; with the driver
-    bent it lies to the driver's sheet's side by its angle, set or furled."""
+def test_the_boom_rigged_in_is_not_drawn_with_the_driver_in_the_sail_room(tmp_path, rig):
+    """Ext §17.11, which replaces §17.6's "the boom lies amidships" and closes §17.10 item 10.
+    With the driver in the sail room the boom is rigged in: there is no figure of it, nor of its
+    sheet, whatever the course's sheet, as a spare on the booms is not drawn, and nothing of the
+    driver. **Old beside new**, the course set with the driver in the sail room: old (B5.5, this
+    case as `test_the_boom_lies_amidships_...`), a spar drawn level from its jaws, amidships,
+    19.9 m aft, its jaws 1.5 m up the course's laced luff on the fixture; new, no spar. It is still
+    placed there, which is how its swing stays in the frame. With the driver bent it is drawn as
+    B5.5 drew it, to the driver's sheet's side by its angle, set or furled (`sheetAngleOf`)."""
     states = {
         "room": driver_by_the_wind("larboard", 45.0, bent=False, rig=rig),
         "set": driver_by_the_wind("larboard", 45.0, rig=rig),
@@ -3555,10 +3587,12 @@ def test_the_boom_lies_amidships_with_the_driver_in_the_sail_room(tmp_path, rig)
     length = boom["length_m"]
     room = got["room"]
     assert math.degrees(_sheet_of(states["room"], MIZEN_COURSE)) == pytest.approx(45.0)
+    assert boom["rigged_out"] is False and room["boom"] == []
     assert room["boomEnd"] == pytest.approx([room["jaws"][0] - length, 0.0, room["jaws"][2]])
     assert room["course"]["state"] == "set" and room["driver"] is None
     assert not room["driverYards"]
-    assert not [ln for ln in room["lines"] if ln["id"].startswith(DRIVER)]
+    assert not [ln for ln in room["lines"] if ln["id"].startswith((DRIVER, DRIVER_BOOM))]
+    assert [ln["cls"] for ln in room["lines"] if ln["id"].startswith(MIZEN_COURSE)] == ["sheet"]
     for name in ("set", "furled"):
         sheet = _sheet_of(states[name], DRIVER)
         assert math.degrees(sheet) == pytest.approx(45.0)
@@ -3567,6 +3601,139 @@ def test_the_boom_lies_amidships_with_the_driver_in_the_sail_room(tmp_path, rig)
         # on the larboard tack the sheet's side is to starboard
         want = [jaws[0] - length * math.cos(sheet), length * math.sin(sheet), jaws[2]]
         assert end == pytest.approx(want), name
+        (figure,) = got[name]["boom"]
+        assert figure["pts"] == [pytest.approx(jaws), pytest.approx(end)], name
+
+
+@needs_node
+@pytest.mark.parametrize("rig", MIZEN_RIGS)
+def test_a_drivers_boom_with_no_key_on_its_file_stands_as_b5_5_drew_it(tmp_path, rig):
+    """Ext §17.11's toggle, "no file moves until it carries it". A driver's boom whose file does
+    not say `rigged_out` is served true all the voyage, and is drawn as B5.5 drew it: amidships,
+    level at its jaws, whatever the course's sheet, with the driver in the sail room (the figure
+    the case above moved). With the driver bent, nothing of the whole drawing differs between no
+    key and the boom rigged out: everything, its frame too, equal to the last figure."""
+    room = driver_by_the_wind("larboard", 45.0, bent=False, rig=rig, key=False)
+    states = {"room": room}
+    for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED):
+        for key in (True, False):
+            states[f"{state.value}-{key}"] = driver_by_the_wind(
+                "larboard", 45.0, state, rig=rig, key=key
+            )
+    body = (
+        DRIVER_DRAWN
+        + """
+        const whole = g => {
+          const sk = P.buildSkeleton(g.graph, g.snap);
+          return JSON.stringify({figures: sk.figures, frame: sk.frame});
+        };
+        const each = {};
+        Object.keys(d).forEach(k => { each[k] = {drawn: drawn(d[k]), whole: whole(d[k])}; });
+        return each;
+    """
+    )
+    got = run_js(tmp_path, states, body)
+    _file, boom, _deck = _driver_file(room["graph"])
+    assert boom["rigged_out"] is True
+    drawn = got["room"]["drawn"]
+    jaws = drawn["jaws"]
+    (figure,) = drawn["boom"]
+    assert figure["pts"] == [
+        pytest.approx(jaws),
+        pytest.approx([jaws[0] - boom["length_m"], 0.0, jaws[2]]),
+    ]
+    assert drawn["course"]["state"] == "set" and drawn["driver"] is None
+    for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED):
+        assert got[f"{state.value}-True"]["whole"] == got[f"{state.value}-False"]["whole"], state
+
+
+@needs_node
+@pytest.mark.parametrize("path", EVERY_SHIP)
+def test_only_a_drivers_boom_goes_from_the_drawing_when_it_is_rigged_in(tmp_path, path):
+    """The rule's key, every file: `rigged_out` false on a boom that a lateen cut at the mast
+    names. Every boom of every file is served rigged in, as no file can say of a gaff sail's (the
+    schema refuses it). A gaff sail's boom is drawn where it was, the whole drawing equal to the
+    last figure; only a driver's goes, the 64's alone of the ten, and every other spar, a studding
+    sail boom rigged in among them, keeps its figure."""
+    served = ship_state(make_ship(path))
+    rigged_in = json.loads(json.dumps(served))
+    booms = {s["id"] for s in served["graph"]["spars"] if s["class"] == "boom"}
+    for s in rigged_in["graph"]["spars"] + rigged_in["snap"]["spars"]:
+        if s["id"] in booms:
+            s["rigged_out"] = False
+    body = """
+        const out = {};
+        Object.keys(d).forEach(k => {
+          const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+          out[k] = {
+            spars: sk.figures.filter(f => f.kind === 'spar').map(f => f.id),
+            whole: JSON.stringify({figures: sk.figures, frame: sk.frame}),
+          };
+        });
+        return out;
+    """
+    got = run_js(tmp_path, {"served": served, "rigged_in": rigged_in}, body)
+    every = {s["id"] for s in served["graph"]["spars"]}
+    of_a_cut = {
+        s["roles"]["boom"]
+        for s in served["graph"]["sails"]
+        if s.get("cut_at_mast") and "boom" in s["roles"]
+    }
+    assert set(got["rigged_in"]["spars"]) == every - of_a_cut
+    assert of_a_cut == ({DRIVER_BOOM} if path == SIXTY_FOUR else set())
+    if not of_a_cut:
+        assert got["rigged_in"]["whole"] == got["served"]["whole"]
+
+
+@needs_node
+def test_the_boom_rigged_in_is_read_from_the_state_then_from_the_graph(tmp_path):
+    """Served `rigged_out`, the snapshot's before the graph's, and the graph's in a static
+    drawing with no snapshot (`buildSkeleton(graph, null)`), each both ways. A bent driver on a
+    boom rigged in, which only a boom carried away on the booms in its own phase leaves
+    (test_driver.py, `test_a_boom_carried_away_in_its_own_phase_is_passed_over`): the sail is drawn,
+    its foot where the boom is placed, with no boom and no sheet, for it has no end to be rove
+    through; a sheet from a spar not drawn would stand in the air. A wreck of the boom follows the
+    same rule, drawn out and not drawn in; cleared, not drawn either way, as every wreck. Only a
+    served false takes it away: a graph and a state that say nothing of it, as no door of the game
+    does, leave it standing."""
+    out = driver_by_the_wind("larboard", 30.0, rig=FIXTURE)
+    room = driver_by_the_wind("larboard", 30.0, bent=False, rig=FIXTURE)
+
+    def served(data: dict, rigged_out: bool, state: str = "sound") -> dict:
+        data = json.loads(json.dumps(data))
+        spar = next(s for s in data["snap"]["spars"] if s["id"] == DRIVER_BOOM)
+        spar["rigged_out"], spar["state"] = rigged_out, state
+        return data
+
+    unsaid = json.loads(json.dumps(room))
+    for spar in unsaid["graph"]["spars"] + unsaid["snap"]["spars"]:
+        if spar["id"] == DRIVER_BOOM:
+            del spar["rigged_out"]
+    states = {
+        "bent, in": served(out, False),
+        "room, out": served(room, True),
+        "wreck, out": served(out, True, "wrecked"),
+        "wreck, in": served(out, False, "wrecked"),
+        "cleared, out": served(out, True, "cleared"),
+        "out": out,
+        "static, out": {"graph": out["graph"], "snap": None},
+        "static, in": {"graph": room["graph"], "snap": None},
+        "unsaid": unsaid,
+    }
+    got = run_js(tmp_path, states, DRIVER_STATES)
+
+    def sheets(name: str) -> list:
+        return [ln for ln in got[name]["lines"] if ln["id"] == f"{DRIVER}.sheet"]
+
+    assert got["bent, in"]["boom"] == [] and sheets("bent, in") == []
+    assert got["bent, in"]["driver"]["state"] == "set"
+    assert got["bent, in"]["driver"]["corners"] == got["out"]["driver"]["corners"]
+    assert len(got["out"]["boom"]) == 1 and len(sheets("out")) == 1
+    assert len(got["room, out"]["boom"]) == 1 and got["room, out"]["driver"] is None
+    assert [f["state"] for f in got["wreck, out"]["boom"]] == ["wrecked"]
+    assert got["wreck, in"]["boom"] == [] and got["cleared, out"]["boom"] == []
+    assert len(got["static, out"]["boom"]) == 1 and got["static, in"]["boom"] == []
+    assert len(got["unsaid"]["boom"]) == 1
 
 
 @needs_node
@@ -3741,18 +3908,20 @@ def test_the_razees_spanker_sheet_leads_from_its_boom_to_her_own_taffrail(
     assert bare["sheets"] == [[pytest.approx(end), pytest.approx(lead)]]
 
 
-HEAD_ROOM_M = 6.0 * 0.3048  # the clew check's (Bel §1.5; the lead's note of 2026-10-29), as filed
+HEAD_ROOM_M = 6.0 * 0.3048  # the 64's driver boom's (Bel §1.5, §4.6; the lead's note of 2026-10-29)
 
 
 @needs_node
 @pytest.mark.parametrize("path", PROFILED)
 def test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks(tmp_path, path):
-    """The clew check (Bel §1.5) and the razee's jaws (the lead's note of 2026-10-29) as they are
-    drawn, the after sail at no sheet, in the fore-and-aft plane. The boom, level from its jaws,
-    stands a head room over her drawn decks and clear over her rail as far aft as she goes: the
-    razee's 1.84 m and 0.70 m, the 64's 2.26 m and 1.59 m (old, the razee's 0.20 m and 1.33 m
-    under them). The 64's course stands its head room over her roundhouse deck at its clew, and
-    no lower than 1.6 m with the drawn sag of its foot."""
+    """The clew check (Bel §1.5) and the lead's rulings of 2026-10-30 as they are drawn, the after
+    sail at no sheet, in the fore-and-aft plane. The boom, level from its jaws, stands clear over
+    her drawn decks and her rail as far aft as she goes. Old beside new: the 64's 2.26 m and 1.59 m
+    to 1.83 m (6 ft, the head room still set by it) and 1.16 m; the razee's 1.84 m and 0.70 m to
+    1.15 m and 0.01 m, literally the least that clears her taffrail (at stage A, 0.20 m and 1.33 m
+    under them). The 64's course, Steel's words read from the deck its mast stands through, stands
+    1.84 to 1.14 m over her roundhouse deck at its clew, and no lower than 1.6 to 0.9 m with the
+    drawn sag of its foot."""
     ship = make_ship(path)
     for sid in ship.groups["plain sail"]:
         ship.sails[sid].state = SailState.SET
@@ -3776,15 +3945,90 @@ def test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks(tmp_path,
     taffrail = profile.rail_m[0][0]
     assert end[0] < taffrail < jaws[0]  # she carries it out beyond her stern
     stations = [taffrail + 0.25 * i for i in range(int((jaws[0] - taffrail) / 0.25) + 1)]
-    assert min(jaws[2] - deck_at(profile, x) for x in stations) >= HEAD_ROOM_M - 1e-2
-    assert min(jaws[2] - interp(profile.rail_m, x) for x in stations) >= 0.5
+    over_deck, over_rail = {RAZEE: (1.15, 0.01)}.get(path, (HEAD_ROOM_M, 1.16))
+    assert min(jaws[2] - deck_at(profile, x) for x in stations) >= over_deck - 1e-2
+    assert min(jaws[2] - interp(profile.rail_m, x) for x in stations) >= over_rail - 5e-3
     if got["course"]:
         clew = got["course"]["corners"][2]
-        assert clew[2] - deck_at(profile, clew[0]) >= HEAD_ROOM_M - 1e-2
+        assert clew[2] - deck_at(profile, clew[0]) == pytest.approx(1.14, abs=0.02)
         over = [p[2] - deck_at(profile, p[0]) for p in got["course"]["path"]]
-        assert min(over) >= 1.6
+        assert min(over) >= 0.9
     else:
         assert path == RAZEE  # she carries a spanker
+
+
+@needs_node
+@pytest.mark.parametrize(
+    "state, sheet_deg",
+    [
+        ("as she starts", 0.0),
+        ("furled", 25.0),
+        ("in_the_gear", 25.0),
+        ("set", 0.0),
+        ("set", 18.0),
+        ("set", 30.0),
+    ],
+)
+def test_the_razees_spanker_stands_clear_of_the_taffrail_its_boom_clears(
+    tmp_path, state, sheet_deg
+):
+    """The lead's ruling of 2026-10-30 as it is drawn: the boom literally the least that clears her
+    taffrail, so its sail must not be drawn through it. Her spanker's foot is laced along its boom,
+    with no sag below it, and furled it lies on the boom. Old beside new: the set foot's lowest 6.54
+    m above the datum (0.62 m under the boom, by a square sail's sag) and the furled bundle's 6.81 m
+    (0.35 m under it), against her taffrail's 7.15 m, to 7.16 m, the boom's. Its head and its leech
+    are unmoved, and every other sail: `cutG` is hers alone among the ten."""
+    ship = make_ship(RAZEE)
+    if state != "as she starts":
+        for sid in ship.groups["plain sail"]:
+            ship.sails[sid].state = SailState.SET
+        ship.sails["mizzen.spanker"].state = SailState[state.upper()]
+        ship.sails["mizzen.spanker"].sheet_angle = math.radians(sheet_deg)
+    got = run_js(
+        tmp_path,
+        ship_state(ship),
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const f = sk.figures.find(x => x.kind === 'sail' && x.id === 'mizzen.spanker');
+        const b = sk.spars['mizzen.boom'];
+        return {state: f.state, boom: b.a[2], path: P.flattenPath(f.path)};
+        """,
+    )
+    assert got["state"] == ("furled" if state == "as she starts" else state)
+    assert got["boom"] == pytest.approx(7.16, abs=0.01)
+    lowest = min(point[2] for point in got["path"])
+    assert lowest >= ship.hull.spec.profile.rail_m[0][1]
+    assert lowest == pytest.approx(got["boom"], abs=1e-6)
+
+
+@needs_node
+@pytest.mark.parametrize("path", [p for p in EVERY_SHIP if p not in (LUGGER, *PROFILED)])
+def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(tmp_path, path):
+    """The razee's spanker alone is drawn laced along its boom (`gaffCutOn`, which asks for a
+    profile). On the seven files with a gaff sail on a boom the set foot still sags under the boom
+    (measured 0.50-0.88 m) and the furled bundle hangs under it (0.26-0.33 m), as at `af9f13d`: her
+    mend moves no figure of theirs."""
+    bands = {SailState.SET: (0.4, 1.0), SailState.FURLED: (0.2, 0.4)}
+    for state, (least, most) in bands.items():
+        ship = make_ship(path)
+        for sail in ship.sails.values():
+            if sail.cls == "gaff":
+                sail.state = state
+        got = run_js(
+            tmp_path,
+            ship_state(ship),
+            """
+            const sk = P.buildSkeleton(d.graph, d.snap);
+            return d.graph.sails.filter(s => s.class === 'gaff' && (s.roles || {}).boom).map(s => {
+              const f = sk.figures.find(x => x.kind === 'sail' && x.id === s.id);
+              const lowest = Math.min(...P.flattenPath(f.path).map(p => p[2]));
+              return sk.spars[s.roles.boom].a[2] - lowest;
+            });
+            """,
+        )
+        assert got, path
+        for under in got:
+            assert least <= under <= most, (path, state)
 
 
 @needs_node
@@ -3794,7 +4038,9 @@ def test_the_razees_spanker_is_drawn_on_its_files_cut(tmp_path):
     its head and foot along the gaff and the boom, which it does not fill; the area the file's.
     Old beside new, by the fixed rule: the gaff at 35 degrees and the whole of both spars, the peak
     (-27.10, 24.60) to (-25.53, 24.69), the clew's x -36.48 to -34.50, 215 to 191 m2 against the
-    filed 191 (the owner's measure, Steel's 202 for a 38: drawn +6.5% to -5.5%, filed -5.4%)."""
+    filed 191 (the owner's measure, Steel's 202 for a 38: drawn +6.5% to -5.5%, filed -5.4%); on the
+    boom at her taffrail (the lead's ruling of 2026-10-30) the clew's x -34.47, the area 200 m2
+    filed and drawn, -1%."""
     ship = make_ship(RAZEE)
     for sid in ship.groups["plain sail"]:
         ship.sails[sid].state = SailState.SET
@@ -3968,7 +4214,8 @@ def test_the_frame_holds_the_drivers_boom_beyond_the_taffrail_across_states(
     the yard's truss, so every point of the yard, the boom, the two after sails, the driver yard
     and their lines lies within the frame alone, upright or heeled; and the view's scale is the
     same on either tack, at any sheet, set, in the gear or furled, with the driver bent or in
-    the sail room. The frame reaches aft to the boom's end, beyond the taffrail."""
+    the sail room, its boom rigged in and not drawn (Ext §17.11). The frame reaches aft to the
+    boom's end, beyond the taffrail."""
     states = {
         f"{tack}-{sheet}-{state.value}-{'driver' if bent else 'course'}": driver_by_the_wind(
             tack, sheet, state, bent, rig
@@ -4027,36 +4274,36 @@ def test_the_frame_holds_the_drivers_boom_beyond_the_taffrail_across_states(
                 assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
 
 
-@needs_node
-@pytest.mark.parametrize("rig", MIZEN_RIGS)
-def test_the_yard_stays_on_the_courses_line_as_the_mizen_is_shifted_for_the_driver_and_back(
-    tmp_path, rig
-):
-    """Ext §17.6, through the engine's own shift (B3.5, `shift_sail`): with the course set and
-    sheeted, "shift the mizen for the driver" and then "shift the driver for the mizen" are run
-    to their ends on a bare ship, and she is drawn at each change of the two sails' states and
-    sheets (nine: the course set, brailed, both unbent, the driver furled, set, brailed, both
-    unbent, the course furled, set). Throughout, the yard is slung at the same truss, and its
-    heel and peak lie as far from the mast and as high along it as with the course set: it
-    swings with the sheet of the sail bent on it and never runs out to the driver's peak. Only
-    a bent sail is drawn, never both; the boom lies amidships until the driver is bent, and
-    after by the driver's sheet (on a bare ship the shift leaves it at no angle)."""
+def shifted_for_the_driver_and_back(rig: str) -> dict[str, dict]:
+    """Through the engine's own shift (B3.5, `shift_sail`; Ext §17.11), with the course set and
+    sheeted: "shift the mizen for the driver" and then "shift the driver for the mizen", run to
+    their ends on a bare ship. The graph and snapshot at each change of the two sails' states and
+    sheets and of the boom's being rigged out, eleven, in their order: the course set, brailed,
+    both unbent; the boom out; the driver furled, set, brailed, both unbent; the boom in; the
+    course furled, set. (Nine before the boom went with the driver, Ext §17.11.)"""
     ship = driver_ship(rig, bent=False)
     runner = Runner(ship)
     awa = math.radians(-30.0)  # on the larboard bow, as test_driver.py's bare ship
     ship.dyn.apparent_wind_angle, ship.dyn.apparent_wind_speed = awa, 6.0
     light_airs = Wind(WindParams.from_nautical(0.0, 3.0, 0.0, 0.0), random.Random(0))
     course, driver = ship.sails[MIZEN_COURSE], ship.sails[DRIVER]
+    boom = ship.spars[DRIVER_BOOM]
     course.state = SailState.SET
     set_sheet_angle(ship, course, math.radians(30.0))
     states: dict[str, dict] = {}
     seen: list[tuple] = []
 
     def draw_if_changed() -> None:
-        key = (course.state.value, driver.state.value, course.sheet_angle, driver.sheet_angle)
+        key = (
+            course.state.value,
+            driver.state.value,
+            boom.rigged_out,
+            course.sheet_angle,
+            driver.sheet_angle,
+        )
         if not seen or key != seen[-1]:
             seen.append(key)
-            states[f"{len(states)} {key[:2]}"] = ship_state(ship, awa=awa, tack="larboard")
+            states[f"{len(states)} {key[:3]}"] = ship_state(ship, awa=awa, tack="larboard")
 
     draw_if_changed()
     for text in ("shift the mizen for the driver", "shift the driver for the mizen"):
@@ -4069,7 +4316,25 @@ def test_the_yard_stays_on_the_courses_line_as_the_mizen_is_shifted_for_the_driv
             draw_if_changed()
         assert not runner.in_progress(), text
     assert course.state is SailState.SET and driver.state is SailState.UNBENT
-    assert len(states) == 9, list(states)
+    assert boom.rigged_out is False
+    assert len(states) == 11, list(states)
+    return states
+
+
+@needs_node
+@pytest.mark.parametrize("rig", MIZEN_RIGS)
+def test_the_yard_stays_on_the_courses_line_as_the_mizen_is_shifted_for_the_driver_and_back(
+    tmp_path, rig
+):
+    """Ext §17.6, through the engine's own shift (`shifted_for_the_driver_and_back`). Throughout,
+    the yard is slung at the same truss, and its heel and peak lie as far from the mast and as high
+    along it as with the course set: it swings with the sheet of the sail bent on it and never runs
+    out to the driver's peak. Only a bent sail is drawn, never both. The boom (Ext §17.11, old
+    beside new): old, drawn in all nine states, amidships until the driver is bent; new, drawn only
+    while it is rigged out, from its own phase before the bend to its own phase after the unbend,
+    amidships until the driver is bent, and after by the driver's sheet (on a bare ship the shift
+    leaves it at no angle); placed there in every state."""
+    states = shifted_for_the_driver_and_back(rig)
     got = run_js(tmp_path, states, DRIVER_STATES)
     graph = next(iter(states.values()))["graph"]
     origin, axis = _mast_line(graph)
@@ -4095,9 +4360,66 @@ def test_the_yard_stays_on_the_courses_line_as_the_mizen_is_shifted_for_the_driv
         jaws = drawn["jaws"]
         want = [jaws[0] - boom["length_m"] * math.cos(swing), boom["length_m"] * math.sin(swing)]
         assert drawn["boomEnd"][:2] == pytest.approx(want, abs=1e-9), name
+        out = next(s for s in states[name]["snap"]["spars"] if s["id"] == DRIVER_BOOM)
+        assert [f["pts"] for f in drawn["boom"]] == (
+            [[pytest.approx(jaws), pytest.approx(drawn["boomEnd"])]] if out["rigged_out"] else []
+        ), name
     # the course bent, then neither while the driver is swayed up, then the driver, and back
     assert seen_bent == {(MIZEN_COURSE,), (), (DRIVER,)}
     assert any(d["driver"] and d["driver"]["state"] == "set" for d in got.values())
+    # out from the fourth state to the eighth: bare, furled, set, brailed and bare again
+    assert [bool(d["boom"]) for d in got.values()] == [False] * 3 + [True] * 5 + [False] * 3
+
+
+# The view's frame and bounds in each of `d`'s states, at five facings and every heel, and how
+# far aft the frame reaches.
+SHIFT_FRAMES = f"""
+    const out = {{}};
+    Object.keys(d).forEach(k => {{
+      const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+      const views = [];
+      [0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, 5 * Math.PI / 4].forEach(f => {{
+        {json.dumps(HEELS)}.forEach(h => {{
+          const proj = P.makeProjector(f, h);
+          const fr = sk.frame.map(proj);
+          const xs = fr.map(p => p.x), ys = fr.map(p => p.y);
+          views.push({{frame: {{minX: Math.min(...xs), maxX: Math.max(...xs),
+                                minY: Math.min(...ys), maxY: Math.max(...ys)}},
+                       bounds: P.project(sk, f, h).bounds}});
+        }});
+      }});
+      const b = sk.spars['mizzen.boom'];
+      out[k] = {{views: views, aft: Math.min(...sk.frame.map(p => p[0])),
+                 boomEnd: b.a[0] - b.spec.length_m}};
+    }});
+    return out;
+"""
+
+
+def _frames_are_one(got: dict) -> None:
+    """Every state's frame and bounds equal the first's, at every facing and heel, and the frame
+    reaches aft to the boom's end."""
+    first = got[next(iter(got))]["views"]
+    for name, drawn in got.items():
+        assert drawn["aft"] <= drawn["boomEnd"] + 1e-9, name
+        for view, same in zip(drawn["views"], first, strict=True):
+            for k in ("minX", "maxX", "minY", "maxY"):
+                assert view["frame"][k] == pytest.approx(same["frame"][k], abs=1e-6), (name, k)
+                assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
+
+
+@needs_node
+@pytest.mark.parametrize("rig", MIZEN_RIGS)
+def test_the_frame_is_equal_across_the_shift_and_back(tmp_path, rig):
+    """Ext §17.11: the boom's swing stays in the fixed frame rigged in as rigged out, so the view
+    does not rescale at the shift. In all eleven states of the engine's own shift and back, the boom
+    drawn in five of them, the frame and the view's bounds are equal at five facings and every heel,
+    and the frame reaches aft to the boom's end, beyond the taffrail."""
+    states = shifted_for_the_driver_and_back(rig)
+    got = run_js(tmp_path, states, SHIFT_FRAMES)
+    _frames_are_one(got)
+    graph = next(iter(states.values()))["graph"]
+    assert got[next(iter(got))]["aft"] < taffrail_of(graph)[0]
 
 
 @needs_node
@@ -4121,6 +4443,7 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
     if rig != FIXTURE:  # she is filed with the course bent: the shift's end, as the fixture's doc
         world.ship.sails[MIZEN_COURSE].state = SailState.UNBENT
         world.ship.sails[DRIVER].state = SailState.FURLED
+        world.ship.spars[DRIVER_BOOM].rigged_out = True  # out with it (Ext §17.11)
     world.tick()  # her tack and her sails' states are read at a tick
     driver = world.ship.sails[DRIVER]
     with TestClient(create_app(Driver(world))) as client:
@@ -4140,6 +4463,7 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
     assert furled["driver"]["state"] == "furled" and furled["course"] is None
     assert furled["peak"] == pytest.approx(course_peak, abs=1e-9)
     assert furled["heel"][1] == pytest.approx(0.0) and furled["boomEnd"][1] == pytest.approx(0.0)
+    assert len(furled["boom"]) == 1
     throat, peak = furled["driver"]["corners"][:2]
     assert max(_off_the_segment(p, throat, peak) for p in furled["driver"]["path"]) <= 0.35 + 1e-6
     (yard,) = furled["driverYards"]
@@ -4155,3 +4479,87 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
         pytest.approx(set_["boomEnd"]),
         pytest.approx(taffrail_of(start["graph"]), abs=1e-9),
     ]
+
+
+@needs_node
+def test_the_boom_goes_out_and_comes_in_with_the_driver_through_the_games_own_routes(tmp_path):
+    """Ext §17.11 through the game's own doors, on the fixture as the game loads her: `/api/order`
+    for the orders, `/api/driver` for the clock, `/api/ship` and `/api/state` for what is drawn. As
+    she starts the boom is served rigged in by both, and not drawn. "Shift the mizen for the
+    driver": the boom is served out, and drawn amidships, before the driver is bent; then the driver
+    on it, furled. "Set the driver": its sheet from the boom's end. "Shift the driver for the
+    mizen": the driver down, then the boom served in and gone from the drawing before the course
+    goes up. The view's frame and bounds are one through all of it."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.ui.server import Driver, create_app
+
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=10.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=240.0,
+        ship_speed_kn=4.0,
+    )
+    world = make_world(7, write_ship(frigate_with_driver_doc(), tmp_path), scenario)
+    states: dict[str, dict] = {}
+    seen: list[tuple] = []
+
+    with TestClient(create_app(Driver(world))) as client:
+
+        def look() -> None:
+            """The two doors the page reads, kept at each change of what they serve of the rig."""
+            snap = client.get("/api/state").json()
+            sails = {s["id"]: s["state"] for s in snap["sails"]}
+            spars = {s["id"]: s["rigged_out"] for s in snap["spars"]}
+            key = (sails[MIZEN_COURSE], sails[DRIVER], spars[DRIVER_BOOM])
+            if not seen or key != seen[-1]:
+                seen.append(key)
+                graph = client.get("/api/ship").json()
+                states[f"{len(states)} {key}"] = {"graph": graph, "snap": snap}
+
+        def do(text: str, done) -> None:
+            """The order by its door, and the clock by its door until `done` of what is served."""
+            assert client.post("/api/order", json={"text": text}).json()["kind"] == "order.accepted"
+            for _ in range(200):
+                tick = client.post("/api/driver", json={"action": "tick", "value": 20})
+                assert tick.status_code == 200
+                look()
+                if done(seen[-1]):
+                    return
+            raise AssertionError(f"{text}: {seen}")
+
+        client.post("/api/driver", json={"action": "tick", "value": 1})
+        look()
+        do("shift the mizen for the driver", lambda key: key[1] == "furled")
+        do("set the driver", lambda key: key[1] == "set")
+        do("shift the driver for the mizen", lambda key: key[0] == "set")
+
+    start = next(iter(states.values()))
+    assert seen[0][1:] == ("unbent", False)
+    boom_served = next(s for s in start["graph"]["spars"] if s["id"] == DRIVER_BOOM)
+    assert boom_served["rigged_out"] is False
+    got = run_js(tmp_path, states, DRIVER_STATES)
+    # (course, driver, boom out), each in turn as the doors served it, the boom's figure beside it
+    drawn = [got[name] for name in states]
+    assert [bool(d["boom"]) for d in drawn] == [key[2] for key in seen]
+    assert [d["driver"] is not None for d in drawn] == [key[1] != "unbent" for key in seen]
+    # out before the driver is bent, and it lies amidships then
+    bare_and_out = seen.index(("unbent", "unbent", True))
+    (figure,) = drawn[bare_and_out]["boom"]
+    assert figure["pts"][1][1] == pytest.approx(0.0)
+    assert seen.index(("unbent", "furled", True)) == bare_and_out + 1
+    # in after the driver is down, and before the course goes up
+    bare_and_in = len(seen) - 1 - seen[::-1].index(("unbent", "unbent", False))
+    assert seen[bare_and_in - 1] == ("unbent", "unbent", True)
+    assert seen[bare_and_in + 1][0] != "unbent"
+    assert drawn[bare_and_in]["boom"] == [] and seen[-1][2] is False
+    # set: its sheet from the boom's end; the course back at the end: its own sheet, no boom
+    (set_, end) = (drawn[seen.index(("unbent", "set", True))], drawn[-1])
+    (sheet,) = [ln["pts"] for ln in set_["lines"] if ln["id"] == f"{DRIVER}.sheet"]
+    assert sheet[0] == pytest.approx(set_["boomEnd"])
+    assert end["course"]["state"] == "set" and end["boom"] == [] and end["driver"] is None
+    assert not [ln for ln in end["lines"] if ln["id"].startswith(DRIVER)]
+    _frames_are_one(run_js(tmp_path, states, SHIFT_FRAMES))
