@@ -13278,3 +13278,19 @@ no:cacheprovider`, 379 slow tests left out, 25 minutes): two failed,
 ("the chart is blank (std 7.9)", the known flake under the tier's load; passes alone on
 this tree) and the pilot off Aix (above; passes on the head, fails here alone). The whole
 slow tier not run (the lead's in the cloud).
+
+### The suite on the final tree (package 89, after step 4)
+
+On `f73bffd`, this session's container (four cores, nothing beside it); ruff check and
+format clean. **The eleven recorded passages** by node id, `--slow -n 4`: 11 passed, every
+pinned digest, line count and tick held (10 min 52 s). **`-k "gate_5b or gate_5c"`**: the one
+test selected passed. **The captain's trials**: as on the head, five passed, the gale with
+sea room its expected failure, the lee-shore trial's container digest `7fad0ce7e46ba366`
+the one failure, the same on the head. **The slow tier of the files touched**
+(`tests/test_tide.py`, `test_chart.py`, `test_scenarios.py`, `test_islands.py`,
+`test_ports.py`, `--slow -m slow -n 4`): 10 passed. **The blocks' truths 7-270 to 7-304**
+with `--slow -n 4`, the package's 7-280 to 7-284 and the mended 7-271, 7-279 and 7-294 among
+them: 35 passed. **The fast tier**, once (379 slow tests left out, 25 minutes): one failure,
+the pictures' known flake ("the chart is blank (std 8.0)" under the tier's load), which
+passes alone on this tree; the pilot off Aix passes. The whole slow tier not run (the
+lead's in the cloud at the merge).
