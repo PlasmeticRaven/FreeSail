@@ -195,16 +195,18 @@ SOURCES: dict[str, dict[str, Any]] = {
 #   fill_to_chart_datum
 #              (package 39a; optional, false where absent, as channel-west's recipe is)
 #              GEBCO's fill under EMODnet, the land mostly, raised from mean sea level to
-#              the chart's datum by the world's mean level (`mean_level_grid`); a block
+#              the chart's datum by the world's mean level (`mean_level_grid`: since
+#              package 93 the level the world's tide gives each cell, the block's own
+#              gauges within its bounds, the eleven alone outside every block); a block
 #              on a coast of large tides sets it, or its low land floods at high water
 #   fill_mean_level_m
 #              (package 39d; optional) with `fill_to_chart_datum`, the raise is this one
 #              figure, the block's own mean level above its chart datum from its own
-#              sources, instead of the world's blend: where the block's gauges are held
-#              (docs/dev/ChartBlocks.md) the world's mean level is a far gauge's (over
-#              Portugal Le Conquet's 3.98 to 4.38 m, against the coast's 2.0), and a raise
-#              by it turned GEBCO's estuaries that EMODnet lacks (the Guadalquivir to
-#              Bonanza, the Odiel, the Arade) into ground above low water
+#              sources, instead of the world's blend: made while the block's gauges were
+#              held (docs/dev/ChartBlocks.md), when the world's mean level over a block was
+#              a far gauge's (over Portugal Le Conquet's 3.98 to 4.38 m, against the
+#              coast's 2.0); since package 89 the world's tide is the block's own, and no
+#              recipe sets it (package 93 took it out of Biscay south's and Portugal's)
 #   skip_dry_tiles
 #              (package 39d; optional, false where absent) a level-2 tile with no cell at
 #              or below the chart's datum (all land: the interior of Portugal and Spain)
@@ -1435,58 +1437,93 @@ FILL_LEVEL_CELL_DEG = 0.05
 
 
 def mean_level_grid(box: dict[str, float]) -> Grid:
-    """Mean sea level above the chart's datum over a box, as the eleven gauges give it
-    (`data/tides/constituents.yaml`: each gauge's `mean_level_m`, blended by the inverse
-    square of the distance over the gauges within `interpolation.reach_nm`, the nearest
-    alone beyond them, a gauge no nearer than 100 m; `freesail/world/tide.py`), on a grid
-    of FILL_LEVEL_CELL_DEG. The world's tide outside the blocks; within a block the world
-    blends the block's own gauges too since package 89, and this keeps the eleven's level
-    the tiles were raised by (docs/dev/ChartBlocks.md, "GEBCO's fill"). GEBCO's heights
-    are about mean sea level and the regions' levels about LAT: where GEBCO fills a
-    region's cells (the land, mostly), its height plus this is the height above the datum
-    the world's tide is reckoned from, so that a low shore stands as high above the
-    world's high water as it does above the sea's (package 39a: at St Malo, whose mean
-    level is 6.8 m above the datum, the low land behind the town read as drying ground
-    and was covered at high water)."""
+    """Mean sea level above the chart's datum over a box, as the world's tide gives it
+    (`data/tides/constituents.yaml`, `freesail/world/tide.py`), on a grid of
+    FILL_LEVEL_CELL_DEG: at each cell's centre the gauges that serve it (`Tide.gauges_at`,
+    package 89: the eleven everywhere, and within a block's bounds, the regions' bounds of
+    the chart's manifest, the block's own gauges after them), blended by the inverse square
+    of the distance over those within `interpolation.reach_nm`, the nearest alone beyond
+    them, a gauge no nearer than 100 m; the level of the gauges of the blend that have one,
+    by the same weights, and where none has one (the Strait's, the islands') the eleven's
+    there, as the world's tide takes it. Outside every block the eleven alone, the
+    arithmetic as it was to the bit (package 93: the fill raised by the block's own water,
+    where package 89 had kept the eleven's). GEBCO's heights are about mean sea level and
+    the regions' levels about LAT: where GEBCO fills a region's cells (the land, mostly),
+    its height plus this is the height above the datum the world's tide is reckoned from,
+    so that a low shore stands as high above the world's high water as it does above the
+    sea's (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
+    behind the town read as drying ground and was covered at high water)."""
     doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
     interp = doc.get("interpolation") or {}
     power = float(interp.get("power", 2))
     reach = float(interp.get("reach_nm", 400.0)) * 1852.0
-    gauges = [
-        (
-            math.radians(float(g["lat_deg"])),
-            math.radians(float(g["lon_deg"])),
-            float(g["mean_level_m"]),
+    # (lat, lon in radians, the mean level or None, the blocks the gauge serves): the
+    # eleven first and the blocks' gauges after them, in the file's order, as the tide
+    # takes them
+    gauges = []
+    for g in doc["gauges"]:
+        raw = g.get("block")
+        blocks = (
+            tuple(str(b) for b in (raw if isinstance(raw, list) else [raw]) if b) if raw else ()
         )
-        for g in doc["gauges"]
-        # the eleven alone (package 89): a block's gauge serves its own block's water in
-        # the world's tide, and the tiles were raised by the eleven's level, which this
-        # keeps, so that a rebuild moves no tile by the rule
-        if not g.get("block")
-    ]
+        level = g.get("mean_level_m")
+        gauges.append(
+            (
+                math.radians(float(g["lat_deg"])),
+                math.radians(float(g["lon_deg"])),
+                None if level is None else float(level),
+                blocks,
+            )
+        )
+    eleven = [x for x in gauges if not x[3]]
+    held = [x for x in gauges if x[3]]
+    bounds = {
+        str(name): tuple(float(r["bounds"][k]) for k in ("south", "north", "west", "east"))
+        for name, r in (_last_manifest().get("regions") or {}).items()
+        if r.get("bounds")
+    }
     cell = FILL_LEVEL_CELL_DEG
     south = math.floor(box["south"] / cell) * cell - cell
     west = math.floor(box["west"] / cell) * cell - cell
     rows = int(math.ceil((box["north"] - south) / cell)) + 2
     cols = int(math.ceil((box["east"] - west) / cell)) + 2
     radius = 1852.0 * 60.0 * 180.0 / math.pi  # the game's sphere (freesail.world.geo)
+
+    def distance(la: float, lo: float, gla: float, glo: float) -> float:
+        h = (
+            math.sin((gla - la) / 2) ** 2
+            + math.cos(la) * math.cos(gla) * math.sin((glo - lo) / 2) ** 2
+        )
+        return 2.0 * radius * math.asin(math.sqrt(min(1.0, h)))
+
+    def blend(found: list[tuple[float, float | None]]) -> float | None:
+        # (distance, level) of the gauges that serve the cell: those within the reach, or
+        # the nearest alone; the level of those that have one, None when none has
+        within = [x for x in found if x[0] <= reach] or [min(found, key=lambda x: x[0])]
+        levelled = [(d, lv) for d, lv in within if lv is not None]
+        if not levelled:
+            return None
+        weights = [1.0 / max(d, 100.0) ** power for d, _ in levelled]
+        return sum(w * lv for w, (_, lv) in zip(weights, levelled, strict=True)) / sum(weights)
+
     values = np.zeros((rows, cols), dtype=np.float32)
     for r in range(rows):
-        la = math.radians(south + (r + 0.5) * cell)
+        la_deg = south + (r + 0.5) * cell
+        la = math.radians(la_deg)
         for c in range(cols):
-            lo = math.radians(west + (c + 0.5) * cell)
-            found = []
-            for gla, glo, level in gauges:
-                h = (
-                    math.sin((gla - la) / 2) ** 2
-                    + math.cos(la) * math.cos(gla) * math.sin((glo - lo) / 2) ** 2
-                )
-                found.append((2.0 * radius * math.asin(math.sqrt(min(1.0, h))), level))
-            within = [x for x in found if x[0] <= reach] or [min(found)]
-            weights = [1.0 / max(d, 100.0) ** power for d, _ in within]
-            values[r, c] = sum(w * lv for w, (_, lv) in zip(weights, within, strict=True)) / sum(
-                weights
-            )
+            lo_deg = west + (c + 0.5) * cell
+            lo = math.radians(lo_deg)
+            found = [(distance(la, lo, gla, glo), lv) for gla, glo, lv, _ in eleven]
+            within_eleven = blend(found)
+            blocks = {
+                b for b, (s, n, w, e) in bounds.items() if s <= la_deg <= n and w <= lo_deg <= e
+            }
+            served = [x for x in held if blocks.intersection(x[3])]
+            if not served:
+                values[r, c] = within_eleven
+                continue
+            level = blend(found + [(distance(la, lo, gla, glo), lv) for gla, glo, lv, _ in served])
+            values[r, c] = within_eleven if level is None else level
     return Grid(south, west, cell, values)
 
 

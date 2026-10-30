@@ -1128,13 +1128,14 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     assert both.block_gauges[0].blocks == ("channel-east", "channel-mid")
 
 
-def test_the_fill_is_raised_by_the_elevens_level_as_the_tiles_were_built():
+def test_the_fill_is_raised_by_the_level_the_worlds_tide_gives_each_cell():
     """`tools/build_charts.py`'s `mean_level_grid`, which raises GEBCO's fill to the
-    chart's datum, reads the eleven alone as it did when every tile was built, so that a
-    rebuild moves no tile by the rule; the world's own mean level over a block is now its
-    gauges' where they have one (over the Channel's east block a metre above the raise at
-    Dieppe), which docs/dev/TuningNotes.md, package 89, says for the rebuild the lead
-    orders."""
+    chart's datum, reads the gauges that serve each cell (`Tide.gauges_at`, package 93):
+    within a block the block's own water, as the world's tide gives it (over the Channel's
+    east block a metre above the eleven's at Dieppe, at Mahón its own 0.20 m where the
+    eleven gave Saint-Malo's 6.83), where no gauge of the blend has a level (the Strait's)
+    the eleven's as the tide takes it, and outside every block the eleven alone, the raise
+    unchanged (package 89 had kept the eleven's everywhere until the tiles were rebuilt)."""
     import importlib.util
     import sys
     from pathlib import Path
@@ -1153,16 +1154,37 @@ def test_the_fill_is_raised_by_the_elevens_level_as_the_tiles_were_built():
         {**doc, "gauges": [g for g in doc["gauges"] if "block" not in g]}, {"areas": []}
     )
     tide = T.load_tide()
-    box = {"south": 49.0, "north": 51.5, "west": -1.0, "east": 2.5}
-    grid = tool.mean_level_grid(box)
     cell = tool.FILL_LEVEL_CELL_DEG
-    for lat, lon in ((49.93, 1.08), (50.78, 0.06), (51.0, 2.0), (49.5, -0.5)):
-        r = int((lat - (math.floor(box["south"] / cell) * cell - cell)) / cell)
-        c = int((lon - (math.floor(box["west"] / cell) * cell - cell)) / cell)
-        centre = Position(
-            math.floor(box["south"] / cell) * cell - cell + (r + 0.5) * cell,
-            math.floor(box["west"] / cell) * cell - cell + (c + 0.5) * cell,
-        )
-        assert float(grid.values[r, c]) == pytest.approx(eleven.constants_at(centre)[0], abs=0.01)
-    dieppe = Position(49.9292, 1.0845)
-    assert tide.constants_at(dieppe)[0] - eleven.constants_at(dieppe)[0] > 0.9
+
+    def cells(box):
+        grid = tool.mean_level_grid(box)
+        rows, cols = grid.values.shape
+        for r in range(rows):
+            for c in range(cols):
+                centre = Position(grid.south + (r + 0.5) * cell, grid.west + (c + 0.5) * cell)
+                yield centre, float(grid.values[r, c])
+
+    # the Channel's east block, its gauges' water; Dieppe's cell a metre over the eleven's
+    for centre, level in cells({"south": 49.85, "north": 50.0, "west": 1.0, "east": 1.15}):
+        assert level == pytest.approx(tide.constants_at(centre)[0], abs=1e-4)
+        if tide.blocks_at(centre):
+            assert level - eleven.constants_at(centre)[0] > 0.9
+    # Mahón's water (balearics), its gauges' level and not Saint-Malo's
+    for centre, level in cells({"south": 39.8, "north": 39.95, "west": 4.2, "east": 4.35}):
+        assert tide.blocks_at(centre) == {"balearics"}
+        assert level == pytest.approx(tide.constants_at(centre)[0], abs=1e-4)
+        assert level < 0.3 < 6.0 < eleven.constants_at(centre)[0]
+    # the Strait: its gauges' levels unread, the eleven's level there, as the world's
+    for centre, level in cells({"south": 35.9, "north": 36.05, "west": -5.6, "east": -5.45}):
+        assert tide.blocks_at(centre) == {"strait"}
+        assert level == pytest.approx(eleven.constants_at(centre)[0], abs=1e-4)
+        assert level == pytest.approx(tide.constants_at(centre)[0], abs=1e-4)
+    # outside every block (the Channel west, off the Lizard and Ushant): the eleven alone,
+    # the raise every tile there was built by, unchanged
+    for box in (
+        {"south": 49.8, "north": 49.95, "west": -5.3, "east": -5.15},
+        {"south": 48.3, "north": 48.45, "west": -5.2, "east": -5.05},
+    ):
+        for centre, level in cells(box):
+            assert not tide.blocks_at(centre)
+            assert level == pytest.approx(eleven.constants_at(centre)[0], abs=1e-4)

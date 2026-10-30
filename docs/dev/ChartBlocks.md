@@ -143,12 +143,11 @@ region's, its tide and its weather are rows in tables that already reach its wat
    stays null and is said unverified: it gives the blend its constants and not its level,
    and where no gauge of the blend has a level (the Strait's, the islands') the level is
    the eleven's there, as it was, which is the level the tiles' fill was raised by
-   ("GEBCO's fill", below). **The fill raise reads the eleven alone** (`mean_level_grid`)
-   until the package that rebuilds the blocks' tiles on their own water (the lead's,
-   booked after 89): within a block the world's sea now stands other than the land was
-   raised against (in the Mediterranean six metres and more lower, in the Channel east's
-   high water up to four higher), and a block built before that package keeps the
-   eleven's raise so that its tiles match the others'. Each gauge lies within its block's bounds (`test_tide.py`
+   ("GEBCO's fill", below). **The fill raise reads the same water** (`mean_level_grid`,
+   package 93): at each cell the gauges that serve it, the block's own within its bounds
+   and the eleven alone outside every block, so that a block's land stands above its own
+   high water; package 89 kept the eleven's raise until the blocks' tiles were rebuilt on
+   it, which package 93 did, region by region (its notes give each region's figures). Each gauge lies within its block's bounds (`test_tide.py`
    holds it), and the bounds are the membership: water between two blocks' bounds that
    no region names reads the eleven alone, so abut a block's bounds on its neighbour's
    (the tiles' edge is not the bounds: `balearics` ended at 40.5 N under tiles to 40.56
