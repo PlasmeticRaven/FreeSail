@@ -2873,15 +2873,17 @@ class Captain(Judgement):
         and when the after sails fill, let go and haul as in tacking"; and in chapelling,
         "when the spanker will take, haul it out" (OCR line 28539).
 
-        With no headway (the course's reading says none), square sail set and none of it
-        drawing, a wind to fill her, no manoeuvre in hand and free of the anchor and the
-        ground, for `aback_recover_minutes` together: the after sail eased first (the
-        driver taken in, `scripts.after_gaff_sails`: the sail that holds her head to the
-        wind, which the hands on deck brail up while the topmen are at a reef aloft); and
-        if she lies so another while, or has no driver, he boxes her off (`box her off`,
-        which takes all hands, waiting its turn behind the hands at a yard). When she has
-        headway again with her square sail drawing, the driver is set again and the leg
-        shaped again (the course resumed). True while the box-off is in hand or waiting."""
+        Having had way since the anchor or the ground (way lost, not way not yet gathered:
+        the merchant of the intent scenario, boxed off at the first measure as her hands got
+        her under way), with no headway now (the course's reading says none), square sail
+        set and none of it drawing, a wind to fill her and no manoeuvre in hand, for
+        `aback_recover_minutes` together: the after sail eased first (the driver taken in,
+        `scripts.after_gaff_sails`: the sail that holds her head to the wind, which the
+        hands on deck brail up while the topmen are at a reef aloft); and if she lies so
+        another while, or has no driver, he boxes her off (`box her off`, which takes all
+        hands, waiting its turn behind the hands at a yard). When she has headway again with
+        her square sail drawing, the driver is set again and the leg shaped again (the
+        course resumed). True while the box-off is in hand or waiting."""
         b = self._business
         if "ship.boxed_off" in kinds and b.pop("boxing_off", False):
             b.pop("no_way_since", None)
@@ -2891,7 +2893,11 @@ class Captain(Judgement):
             return True  # in hand, or waiting its turn behind the hands aloft
         from freesail.physics.hull import ABACK_URGENT_AWS_KN
 
-        if p.headway or p.manoeuvre != "none" or p.anchor_down or p.aground:
+        if p.anchor_down or p.aground or p.anchoring:
+            b.pop("had_way", None)  # from the anchor or the ground she gathers way first
+        elif p.headway:
+            b["had_way"] = True
+        if p.headway or p.manoeuvre != "none" or not b.get("had_way"):
             b.pop("no_way_since", None)
             if p.headway and not p.square_none_drawing and "after_sail_in" in b:
                 self._course_resumed(b.pop("after_sail_in"))
