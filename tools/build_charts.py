@@ -188,23 +188,29 @@ SOURCES: dict[str, dict[str, Any]] = {
 #   fetch      the EMODnet subset fetched: the bounds widened so that the tiles that meet
 #              them are covered whole (a quarter of a degree about is enough)
 #   harbours   the level-3 harbour patches (C §5.2: 15' x 15' each), as tile groups, each
-#              a box; a port file's road or an override's sheet names one
+#              a box; a port file's road or an override's sheet names one. A patch whose
+#              land the grid smears (EMODnet silent over its shores, GEBCO's fill under
+#              mean sea level there) may take `fill_raise: eleven` (package 93): within its
+#              box GEBCO's fill keeps the eleven's raise until a sheet is read with its
+#              datum, said in the recipe's comment; Agincourt Sound the one case
 #   sources    the ids of `SOURCES` the region's tiles are cut from, in the order they are
 #              laid (the first for the depth and the coast, the next under it where the
 #              first has nothing); each must carry a licence in `ALLOWED_LICENCES`
 #   fill_to_chart_datum
 #              (package 39a; optional, false where absent, as channel-west's recipe is)
 #              GEBCO's fill under EMODnet, the land mostly, raised from mean sea level to
-#              the chart's datum by the world's mean level (`mean_level_grid`); a block
+#              the chart's datum by the world's mean level (`mean_level_grid`: since
+#              package 93 the level the world's tide gives each cell, the block's own
+#              gauges within its bounds, the eleven alone outside every block); a block
 #              on a coast of large tides sets it, or its low land floods at high water
 #   fill_mean_level_m
 #              (package 39d; optional) with `fill_to_chart_datum`, the raise is this one
 #              figure, the block's own mean level above its chart datum from its own
-#              sources, instead of the world's blend: where the block's gauges are held
-#              (docs/dev/ChartBlocks.md) the world's mean level is a far gauge's (over
-#              Portugal Le Conquet's 3.98 to 4.38 m, against the coast's 2.0), and a raise
-#              by it turned GEBCO's estuaries that EMODnet lacks (the Guadalquivir to
-#              Bonanza, the Odiel, the Arade) into ground above low water
+#              sources, instead of the world's blend: made while the block's gauges were
+#              held (docs/dev/ChartBlocks.md), when the world's mean level over a block was
+#              a far gauge's (over Portugal Le Conquet's 3.98 to 4.38 m, against the
+#              coast's 2.0); since package 89 the world's tide is the block's own, and no
+#              recipe sets it (package 93 took it out of Biscay south's and Portugal's)
 #   skip_dry_tiles
 #              (package 39d; optional, false where absent) a level-2 tile with no cell at
 #              or below the chart's datum (all land: the interior of Portugal and Spain)
@@ -288,6 +294,11 @@ REGIONS: dict[str, dict[str, Any]] = {
             "aix-basque-roads": {"south": 45.97, "north": 46.08, "west": -1.32, "east": -1.08},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # package 93: GEBCO's fill raised to the chart's datum by the world's mean level, the
+        # block's own gauges' (3.06 to 4.23 m within the bounds); built without it by 39b,
+        # beside 39a, its marshes behind the dykes read as ground that dries and flooded at
+        # high water springs (docs/dev/ChartBlocks.md, "GEBCO's fill")
+        "fill_to_chart_datum": True,
     },
     # package 39c: Biscay south and Galicia, abutting biscay-north at 45.9 N exactly and
     # the Portuguese block at 42.0 N. The western bound is moved from the brief's 9.0 W to
@@ -311,13 +322,13 @@ REGIONS: dict[str, dict[str, Any]] = {
             "bayona": {"south": 42.10, "north": 42.14, "west": -8.88, "east": -8.82},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
-        # GEBCO's fill raised to the chart's datum by the coast's own mean level, 2.5 m:
-        # SHOM's RAM gives NM 2.48 at Arcachon, 2.53 at Boucau-Bayonne and 2.51 at
-        # Saint-Jean-de-Luz (3.33 at Le Verdon); the Spanish coast's not read, the same
-        # taken (judgement). Not the world's, which over the block is the Channel's blend,
-        # 3.9 to 6.8 m, while the block's gauges are held
+        # GEBCO's fill raised to the chart's datum by the world's mean level, the block's
+        # own gauges' since package 89 (2.48 to 3.88 m within the bounds: SHOM's RAM's NM
+        # 2.48 at Arcachon, 2.53 at Boucau-Bayonne, 3.33 at Le Verdon; the Spanish gauges'
+        # levels unread, the eleven's in the blend over Galicia). Package 39c's one figure,
+        # `fill_mean_level_m: 2.5`, was made while the gauges were held and the world's
+        # level the Channel's blend; package 93 took it out for the rule
         "fill_to_chart_datum": True,
-        "fill_mean_level_m": 2.5,
         # the box takes in Castile, León and the Landes: their dry tiles are the corridor's
         "skip_dry_tiles": True,
     },
@@ -344,13 +355,13 @@ REGIONS: dict[str, dict[str, Any]] = {
             "cadiz-bay": {"south": 36.45, "north": 36.64, "west": -6.40, "east": -6.18},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
-        # GEBCO's fill raised to the chart's datum by the coast's own mean level, 2.0 m
-        # above the Zero Hidrográfico offshore (the Instituto Hidrográfico's surface,
-        # EPSG 10393) and 1.96 m above LAT at Huelva (REDMAR); not by the world's,
-        # which over the block is Le Conquet's 3.98 to 4.38 m while the block's gauges
-        # are held (docs/dev/TuningNotes.md, package 39d)
+        # GEBCO's fill raised to the chart's datum by the world's mean level, the block's
+        # own gauges' since package 89 (1.54 to 2.36 m within the bounds: Cascais 2.00,
+        # Huelva 1.96 above LAT). Package 39d's one figure, `fill_mean_level_m: 2.0` (the
+        # Instituto Hidrográfico's Zero Hidrográfico, EPSG 10393), was made while the
+        # gauges were held and the world's level Le Conquet's 3.98 to 4.38 m; package 93
+        # took it out for the rule (docs/dev/TuningNotes.md, packages 39d and 93)
         "fill_to_chart_datum": True,
-        "fill_mean_level_m": 2.0,
         # half the block's level-2 tiles are the land of Portugal and Spain, with no water
         # in them: not written (the corridor answers there; the brief's 18 MB a region)
         "skip_dry_tiles": True,
@@ -543,7 +554,20 @@ REGIONS: dict[str, dict[str, Any]] = {
             "porto-ferrajo": {"south": 42.79, "north": 42.84, "west": 10.29, "east": 10.36},
             "san-fiorenzo": {"south": 42.66, "north": 42.75, "west": 9.24, "east": 9.33},
             "ajaccio": {"south": 41.85, "north": 41.94, "west": 8.68, "east": 8.80},
-            "agincourt-sound": {"south": 41.17, "north": 41.27, "west": 9.36, "east": 9.48},
+            # package 93, the lead's ruling of 2026-10-30: EMODnet has no sounding over the
+            # shores of the islands about the Sound, and GEBCO's fifteen seconds smear them
+            # three to six metres under mean sea level; the eleven's raise (6.83 m) stood
+            # them up as land, the block's own water (0.53 m) lays them under and opens a
+            # harbour the real islands close. The patch keeps the eleven's raise within its
+            # box until a sheet is read with its datum (Ryves's survey of 1802 as the
+            # Admiralty engraved it, Smyth's of the 1820s, or the Derrotero's plan)
+            "agincourt-sound": {
+                "south": 41.17,
+                "north": 41.27,
+                "west": 9.36,
+                "east": 9.48,
+                "fill_raise": "eleven",
+            },
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
         # as gulf-of-lion's (the fetch box the first build's, which covers the tiles whole)
@@ -1451,59 +1475,44 @@ TIDES_CONSTITUENTS = ROOT / "data" / "tides" / "constituents.yaml"
 FILL_LEVEL_CELL_DEG = 0.05
 
 
-def mean_level_grid(box: dict[str, float]) -> Grid:
-    """Mean sea level above the chart's datum over a box, as the eleven gauges give it
-    (`data/tides/constituents.yaml`: each gauge's `mean_level_m`, blended by the inverse
-    square of the distance over the gauges within `interpolation.reach_nm`, the nearest
-    alone beyond them, a gauge no nearer than 100 m; `freesail/world/tide.py`), on a grid
-    of FILL_LEVEL_CELL_DEG. The world's tide outside the blocks; within a block the world
-    blends the block's own gauges too since package 89, and this keeps the eleven's level
-    the tiles were raised by (docs/dev/ChartBlocks.md, "GEBCO's fill"). GEBCO's heights
-    are about mean sea level and the regions' levels about LAT: where GEBCO fills a
-    region's cells (the land, mostly), its height plus this is the height above the datum
-    the world's tide is reckoned from, so that a low shore stands as high above the
-    world's high water as it does above the sea's (package 39a: at St Malo, whose mean
-    level is 6.8 m above the datum, the low land behind the town read as drying ground
-    and was covered at high water)."""
-    doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
-    interp = doc.get("interpolation") or {}
-    power = float(interp.get("power", 2))
-    reach = float(interp.get("reach_nm", 400.0)) * 1852.0
-    gauges = [
-        (
-            math.radians(float(g["lat_deg"])),
-            math.radians(float(g["lon_deg"])),
-            float(g["mean_level_m"]),
+def mean_level_grid(box: dict[str, float], eleven_only: bool = False) -> Grid:
+    """Mean sea level above the chart's datum over a box, as the world's tide gives it, on a
+    grid of FILL_LEVEL_CELL_DEG: at each cell's centre `Tide.constants_at`
+    (`freesail/world/tide.py`) itself, **one source of truth** (package 93, the lead's
+    ruling): the gauges that serve the cell (package 89's membership by the regions'
+    bounds, 94's rule of the seams), the seam's taper within a block's open edge (94), the
+    level the blend of the gauges that have one, the eleven's where none has; outside
+    every block the eleven alone, as every tile there was built. Nothing here reads the
+    manifest or the gauges a second time. GEBCO's heights are about mean sea level and the
+    regions' levels about LAT: where GEBCO fills a region's cells (the land, mostly), its
+    height plus this is the height above the datum the world's tide is reckoned from, so
+    that a low shore stands as high above the world's high water as it does above the
+    sea's (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
+    behind the town read as drying ground and was covered at high water). With
+    `eleven_only` the world's tide with the eleven alone, the raise every tile was built by
+    before package 93 (a harbour patch's `fill_raise: eleven`, below `REGIONS`)."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from freesail.world import tide as world_tide
+    from freesail.world.geo import Position
+
+    if eleven_only:
+        doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
+        tide = world_tide.Tide(
+            {**doc, "gauges": [g for g in doc["gauges"] if not g.get("block")]}, {"areas": []}
         )
-        for g in doc["gauges"]
-        # the eleven alone (package 89): a block's gauge serves its own block's water in
-        # the world's tide, and the tiles were raised by the eleven's level, which this
-        # keeps, so that a rebuild moves no tile by the rule
-        if not g.get("block")
-    ]
+    else:
+        tide = world_tide.load_tide(TIDES_CONSTITUENTS)
     cell = FILL_LEVEL_CELL_DEG
     south = math.floor(box["south"] / cell) * cell - cell
     west = math.floor(box["west"] / cell) * cell - cell
     rows = int(math.ceil((box["north"] - south) / cell)) + 2
     cols = int(math.ceil((box["east"] - west) / cell)) + 2
-    radius = 1852.0 * 60.0 * 180.0 / math.pi  # the game's sphere (freesail.world.geo)
     values = np.zeros((rows, cols), dtype=np.float32)
     for r in range(rows):
-        la = math.radians(south + (r + 0.5) * cell)
+        lat = south + (r + 0.5) * cell
         for c in range(cols):
-            lo = math.radians(west + (c + 0.5) * cell)
-            found = []
-            for gla, glo, level in gauges:
-                h = (
-                    math.sin((gla - la) / 2) ** 2
-                    + math.cos(la) * math.cos(gla) * math.sin((glo - lo) / 2) ** 2
-                )
-                found.append((2.0 * radius * math.asin(math.sqrt(min(1.0, h))), level))
-            within = [x for x in found if x[0] <= reach] or [min(found)]
-            weights = [1.0 / max(d, 100.0) ** power for d, _ in within]
-            values[r, c] = sum(w * lv for w, (_, lv) in zip(weights, within, strict=True)) / sum(
-                weights
-            )
+            values[r, c] = tide.constants_at(Position(lat, west + (c + 0.5) * cell))[0]
     return Grid(south, west, cell, values)
 
 
@@ -1805,6 +1814,19 @@ class Build:
                 f"{float(fill_level.values.min()):.2f} to {float(fill_level.values.max()):.2f} m"
             )
         out["fill_to_chart_datum"] = bool(fill_level is not None)
+        # a harbour patch whose land the grid smears keeps the eleven's raise until a sheet
+        # is read (`fill_raise: eleven`, package 93): its cells as they were built
+        kept_fill: list[tuple[dict[str, float], Grid]] = []
+        if fill_level is not None:
+            eleven = None
+            for hname, hb in recipe["harbours"].items():
+                if hb.get("fill_raise") == "eleven":
+                    eleven = eleven or mean_level_grid(fb, eleven_only=True)
+                    kept_fill.append((hb, eleven))
+                    self.log(
+                        f"  harbour patch {hname}: GEBCO's fill raised by the eleven's mean "
+                        "level within its box (fill_raise: eleven, until a sheet is read)"
+                    )
         if recipe.get("skip_dry_tiles"):
             out["skip_dry_tiles"] = True
         out["tiles"]["2"] = self._build_level(
@@ -1818,6 +1840,7 @@ class Build:
             region,
             taken=taken,
             fill_level=fill_level,
+            kept_fill=kept_fill,
             skip_dry=bool(recipe.get("skip_dry_tiles")),
         )
         level3: list[dict[str, Any]] = []
@@ -1835,6 +1858,7 @@ class Build:
                 harbour=hname,
                 taken=taken,
                 fill_level=fill_level,
+                kept_fill=kept_fill,
             )
         out["tiles"]["3"] = level3
         # the coast
@@ -1876,6 +1900,7 @@ class Build:
         harbour: str | None = None,
         taken: frozenset[str] | set[str] = frozenset(),
         fill_level: Grid | None = None,
+        kept_fill: list[tuple[dict[str, float], Grid]] | None = None,
         skip_dry: bool = False,
     ) -> list[dict[str, Any]]:
         """The tiles of one level over the region or a harbour patch: EMODnet sampled,
@@ -1904,7 +1929,14 @@ class Build:
         # was drying ground, covered at high water); a recipe with `fill_to_chart_datum`
         # raises it by the world's mean level there (`mean_level_grid`)
         if fill_level is not None:
-            under = under + fill_level.sample(lats, lons)
+            raise_m = fill_level.sample(lats, lons)
+            for box, grid in kept_fill or []:
+                # within a `fill_raise: eleven` patch's box, by the cell's centre
+                inside = ((lats >= box["south"]) & (lats <= box["north"]))[:, None] & (
+                    (lons >= box["west"]) & (lons <= box["east"])
+                )[None, :]
+                raise_m = np.where(inside, grid.sample(lats, lons), raise_m)
+            under = under + raise_m
         unknown = np.isnan(elev)
         elev = np.where(unknown, under, elev)
         if coast_lines is not None:

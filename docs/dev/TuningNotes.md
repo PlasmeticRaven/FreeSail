@@ -13357,6 +13357,745 @@ the pictures' known flake ("the chart is blank (std 8.0)" under the tier's load)
 passes alone on this tree; the pilot off Aix passes. The whole slow tier not run (the
 lead's in the cloud at the merge).
 
+## Package 93: the blocks' tiles rebuilt on their true water (2026-10-30)
+
+89's finding (its table "GEBCO's fill"): every block's tiles had their GEBCO fill raised by
+the eleven's mean level, false over the blocks once 89 gave them their own water. **The
+rule, as built** (item 1, its own commit before any region): `mean_level_grid`
+(`tools/build_charts.py`) reads at each cell of its grid the gauges that serve it, as
+`Tide.gauges_at` does: within a block's bounds (the manifest's) the block's own gauges
+after the eleven, the level the blend of those of them that have one by the blend's own
+weights, the eleven's where none has (the Strait's, the islands'); outside every block the
+eleven alone, the arithmetic as it was to the bit (the same gauges, in the same order,
+summed the same way). Matched against the world's tide (`Tide.constants_at` at each cell's
+centre) over every region's bounds: the largest difference 2.4e-7 m. The test that held the
+fill to the eleven (`test_tide.py`) is the rule's test now
+(`test_the_fill_is_raised_by_the_level_the_worlds_tide_gives_each_cell`: the Channel east's
+cells the world's within 1e-4 m and a metre over the eleven's at Dieppe, Mahón's its own
+0.20 m, the Strait's the eleven's, the Channel west's the eleven's alone).
+
+**The raise, old against new, over each region's fetch box** (the tiles' whole extent, the
+grid of 0.05 degrees; "old" is the raise the committed tiles carry, the recipe's
+`fill_mean_level_m` where it had one and nought where it had no `fill_to_chart_datum`):
+
+| Region | Old raise | New raise | New less old | Cells moved |
+|---|---|---|---|---|
+| channel-west (not rebuilt, no key) | none | (1.20 to 6.23) | | |
+| channel-mid (not rebuilt) | 1.20 to 6.83 | 1.20 to 6.83 | -0.06 to +0.46 | 379 of 4,221 |
+| biscay-north | none (no key) | 3.06 to 6.35 | +3.06 to +6.35 | all |
+| biscay-south | 2.50 | 1.89 to 6.83 | -0.61 to +4.33 | 16,008 of 16,016 |
+| portugal | 2.00 | 1.54 to 4.06 | -0.46 to +2.06 | 11,627 of 11,844 |
+| madeira | 3.98 | 3.98 | 0 | 0 of 2,499 |
+| azores | 3.20 to 3.98 | 3.20 to 3.98 | 0 | 0 of 12,852 |
+| strait | 3.98 | 0.37 to 3.98 | -3.61 to 0 | 564 of 1,600 |
+| channel-east | 1.48 to 6.83 | 1.48 to 6.83 | -0.52 to +1.26 | 3,490 of 6,868 |
+| mediterranean-west | 3.98 to 6.83 | 0.17 to 6.83 | -6.66 to 0 | 11,665 of 14,208 |
+| balearics | 6.83 | 0.16 to 6.83 | -6.67 to 0 | 11,399 of 14,208 |
+| gulf-of-lion | 3.70 to 6.83 | 0.18 to 6.83 | -6.65 to 0 | 7,908 of 10,230 |
+| ligurian-sea | 3.70 to 6.83 | 0.42 to 6.83 | -6.41 to 0 | 11,580 of 15,300 |
+| tyrrhenian | 3.70 to 6.83 | 0.47 to 6.83 | -6.36 to 0 | 2,775 of 16,340 |
+
+So **madeira and azores are not rebuilt** (the rule moves no cell of their raise: their
+gauges' levels are unread and the world's level there is the eleven's, as it was); the
+Strait moves only in its tile column east of 5 W, which lies in `mediterranean-west`'s
+bounds; the 6.83 m left in the Mediterranean regions' maxima are their tiles' cells outside
+every block (south of 35 N, east of 4.5 E south of 40.56 N), where the eleven's nearest
+alone is Saint-Malo's, as before. **Biscay north takes `fill_to_chart_datum`** (39b built
+it without, and ChartBlocks.md said it "wants a rebuild with it"; the brief names it among
+the regions), and **Biscay south and Portugal lose `fill_mean_level_m`** (2.5 and 2.0, the
+coasts' own figures made while the gauges were held): their world's level now is their own
+gauges' (within the bounds 2.48 to 3.88 and 1.54 to 2.36 m).
+
+**A finding, not touched:** `channel-mid`'s seam column (1.23 to 0.80 W) lies partly within
+`channel-east`'s bounds, where the world's level now differs from the raise its tiles carry
+by up to 0.46 m; the brief keeps `channel-mid` untouched.
+
+**The sources, fetched again** through the proxy for the ten regions to rebuild (GEBCO's
+queue and EMODnet's ERDDAP, 30 files, 1.9 GB; no host refused). Each file's bytes are the
+builders' to the byte count; the hashes differ (GEBCO's zip dates its entries, ERDDAP's
+netCDF its history), so **a control** was run first: `channel-east` rebuilt by the head's
+own tool (a clean worktree of `21a25e7`) from today's fetch, `--skip-fetch`: every tile,
+the coast and the index byte for byte the committed ones, the manifest's fetch records
+alone changed. What moves in the regions below is the rule's and nothing else.
+
+**The proof on the head** (a clean worktree of `21a25e7`, before anything was written; this
+container, four cores): the eleven recorded passages by node id, `--slow -n 4`, 11 passed;
+`-k "gate_5b or gate_5c"`, the one test selected passed; the captain's trials, the
+lee-shore trial failing with `7fad0ce7e46ba366` against the pin `ed48ca3d61e52f20`, this
+container's known difference as 89's record has it. The proof on the final tree is below.
+
+### The region `channel-east`
+
+`python tools/build_charts.py --region channel-east --reuse-world`: the checks as printed
+(137 of 137 features within the bounds and in the references' form, ids unique, no
+override, the fetch box covering the tiles, "6 kept" as before); "GEBCO's fill raised to the
+chart's datum by the world's mean level, 1.48 to 6.83 m" (the grid's whole range, the
+eleven's 6.83 at its far corner as before). The shore's sweep **3,513 cells in 79 places**
+(79b's 3,807 in 82): the largest the Seine's estuary above the Havre (242 and 174 about
+49.43 to 49.48 N, 0.38 to 0.43 E; 79b's 313 and 212), the Thames's marshes north of the
+bounds (202, 179, 142, 124), the Havre's modern port (181; 302) and Dunkerque's Port Ouest
+(168; 159): water, as 79b said.
+
+| | Old (79b, the eleven's raise) | New (the block's water) |
+|---|---|---|
+| level 2 | 57 tiles, 7.64 MB | 57 tiles, 7.77 MB |
+| level 3 | 72 tiles, 5.23 MB | 72 tiles, 5.23 MB |
+| coast | 620 pieces, 5,670 points, 182,912 bytes | 619 pieces, 5,635 points, 182,125 bytes |
+| tiles changed | | 53 of level 2, 32 of level 3 |
+| cells changed | | 6,957,134 at level 2, 4,099,398 at level 3, the largest 1.30 m |
+| below the datum to above | | 502 at level 2, 7,171 at level 3 |
+| above the datum to below | | 7 at level 2, 88 at level 3 |
+
+`git status` after the build: the region's 85 tiles, its coast and the manifest (its entry's
+bytes, its three fetch records, the build's date and hash); no tile, coast or index of any
+other region, the index and every port file and mark untouched (the features unchanged, the
+index written the same).
+
+**The low shores against the world's high water springs** (625 points over each box, the
+elevation less the mean level + M2 + S2 there, old tiles beside new): Romney Marsh (50.95 to
+51.03 N, 0.78 to 0.98 E) median -1.31 to -0.98 m, 54 to 87 points above; the Dungeness
+foreland -0.56 to -0.19, 176 to 282; Pevensey Levels -1.65 to -1.16, 163 to 190; the Somme's
+banks +1.24 to +1.54, 415 to 456. The raise lifts the land by the block's level less the
+eleven's (+0.33 m at Romney, +0.73 at the Somme); the marsh lay under high water springs on
+the eleven's water as well (their HWS there 6.24 m, the block's 6.95): GEBCO has Romney
+Marsh some two metres above mean sea level, and the true marsh lies under high water
+springs behind the Dymchurch Wall, a dyked level the tiles cannot hold at 15 seconds.
+Truth 7-305's wording is asked of the lead (below).
+
+**The block's tests** on the rebuilt tiles: `tests/test_chart.py`, `test_ports.py`,
+`test_tide.py`, `test_scenarios.py`, `test_islands.py`, `test_tackle_orders.py`, fast 203
+passed, slow 11 passed; truths 7-270 to 7-289 with `--slow -n 4`, 20 passed (7-271, 7-279
+and the 89 truths among them). **The scenario** `spithead.yaml`, 28 hours with
+`--reckoning`, sailed on the head's tree and on this one in this container: **the same log
+byte for byte**, 1,241 lines, digest `eef946bdabaf39cf`, anchored at Spithead at 06:08 on
+the 21st (79b's record on the build machine, 1,275 lines, `f60626aa5d4f6388`, is another
+machine's and an older tide's): her water is EMODnet's, and the fill is the land's.
+
+### The region `biscay-north`
+
+The recipe takes `fill_to_chart_datum` (above). The control first: the head's tool on
+today's fetch gives every tile's arrays the committed ones' (the 92 files differ in their
+bytes alone, 39b's tiles written before `save_tile` dated their entries by the clock), the
+coast byte for byte. `python tools/build_charts.py --region biscay-north --reuse-world`:
+the checks as printed (100 of 100 features within the bounds and in the references' form,
+ids unique, the one override's datum stated, the fetch box covering the tiles, "5 kept");
+"GEBCO's fill raised to the chart's datum by the world's mean level, 3.06 to 6.35 m" (3.06
+to 4.23 within the bounds, the higher at the grid's northern edge in channel-west's water).
+**The shore's sweep 3,808 cells in 133 places**, where 39b's without the raise found 34,053
+in 267: the largest now the Brière and the Loire's marshes above Saint-Nazaire (587, 306,
+182, 179 about 47.28 to 47.33 N, 2.08 to 2.18 W), the Grande Brière's west (302 and 211
+about 47.28 to 47.33 N, 2.48 W) and the Gulf of Morbihan's and the Étel's heads (83, 70,
+70, 76): water, closed from the sea or the rivers' own.
+
+| | Old (39b, no raise) | New (the block's water) |
+|---|---|---|
+| level 2 | 55 tiles, 8.92 MB | 55 tiles, 9.12 MB |
+| level 3 | 37 tiles, 2.47 MB | 37 tiles, 2.43 MB |
+| coast | 1,966 pieces, 13,966 points, 516,071 bytes | 830 pieces, 9,607 points, 291,556 bytes |
+| tiles changed (arrays) | | 48 of level 2, 36 of level 3 |
+| cells changed | | 4,958,596 at level 2, 4,627,381 at level 3, the largest 6.10 m |
+| below the datum to above | | 62,393 at level 2, 178,554 at level 3 |
+| above the datum to below | | none |
+
+The coast lost the marshes' and lakes' inner shores the old tiles drew at the datum (the
+Brière, Grand-Lieu, the Marais poitevin and Breton among them), 1,136 pieces. `git status`
+after the build: the region's 92 tiles, its coast, the manifest's entry and fetch records,
+the recipe; no other region's tile, coast or index, the index and every port file and mark
+untouched. **The block's tests**: the six files fast 203 passed, slow 11 passed; truths
+7-260 to 7-269 with `--slow -n 4` (79a's, Rochefort's and Lorient's among them), 10 passed;
+45c's pilot off Aix (`test_ports.py`, 89's step 4d) among the fast, passed. **The scenario**
+`biscay-north.yaml`, 9 hours with `--reckoning`, on the head's tree and this one: **the same
+log byte for byte**, 348 lines, digest `28c449dbbda73eb1`.
+
+### The region `biscay-south`
+
+The recipe loses `fill_mean_level_m: 2.5` (above). The control: the head's tool on today's
+fetch gives the committed tiles byte for byte (39c's were written by `save_tile`). `python
+tools/build_charts.py --region biscay-south --reuse-world`: the checks as printed (136 of
+136 features, ids unique, no override, the fetch box covering the tiles, "12 kept");
+"GEBCO's fill raised to the chart's datum by the world's mean level, 1.89 to 6.83 m"
+(within the bounds 2.48 to 3.88: the French coast its gauges' 2.48 to 3.33, Galicia's and
+the Cantabrian coast's the eleven's blended with them, the Spanish gauges' levels unread;
+the 6.83 in the interior of Spain south of 42 N and east of 6 W, outside every block, a dry
+tile not written); 59 dry tiles not written, as before. **The shore's sweep 5,058 cells in
+305 places** (the old raise's, by the control, 5,675 in 310): the largest the marshes of
+Santoña (177; 168), the ría of Arousa's head (139; 160), the Ulla's at Padrón (89 and 82;
+100) and the Arcachon basin's shores (89, 84, 80): water.
+
+| | Old (39c, 2.5 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 129 tiles, 16.54 MB | 129 tiles, 16.89 MB |
+| level 3 | 30 tiles, 2.27 MB | 30 tiles, 2.26 MB |
+| coast | 878 pieces, 12,917 points, 363,313 bytes | 884 pieces, 13,098 points, 367,692 bytes |
+| tiles changed | | 90 of level 2, all 30 of level 3 |
+| cells changed | | 4,567,212 at level 2, 4,245,383 at level 3, the largest 2.00 m |
+| below the datum to above | | 1,152 at level 2, 7,690 at level 3 |
+| above the datum to below | | 1 at level 2 |
+
+`git status` after the build: the region's 120 changed tiles, its coast, the manifest's
+entry (`fill_mean_level_m` gone from it) and fetch records, the recipe; no other region's
+tile, coast or index, the index and every port file and mark untouched. **One test recast**:
+`test_chart.py::test_biscay_south_abuts_its_neighbours_lists_none_of_their_tiles_and_skips_the_dry`
+asserted the manifest's `fill_mean_level_m == 2.5`; it now asserts the key gone from the
+entry and the recipe and the raise at Arcachon its gauge's 2.48 m within 2 cm, every other
+assertion kept. **The block's tests**: the six files fast 203 passed after the recast (one
+failed before it, the above), slow 11 passed; truths 7-260 to 7-269, 10 passed. **The
+scenario** `biscay-south.yaml`, 30 hours: **the same log byte for byte**, 880 lines, digest
+`922f024f1d07d067`.
+
+### The region `portugal`
+
+The recipe loses `fill_mean_level_m: 2.0` (above). The control: the head's tool on today's
+fetch gives every tile's arrays the committed ones' (116 files differ in their bytes alone,
+39d's written before `save_tile`), the coast byte for byte. `python tools/build_charts.py
+--region portugal --reuse-world`: the checks as printed (139 of 139 features, ids unique,
+Cadiz's override's datum stated, the fetch box covering the tiles, "0 kept"); "GEBCO's fill
+raised to the chart's datum by the world's mean level, 1.54 to 4.06 m" (within the bounds
+1.54 to 2.36: Cascais' 2.00, Huelva's 1.96, the lowest about Cadiz and the Guadalquivir; the
+4.06 west of 10 W and in Spain's interior, outside every block); 72 dry tiles not written, as
+before. **The shore's sweep 7,383 cells in 226 places** (the old raise's, by the control,
+6,125 in 212): the level a little under 39d's 2.0 about Huelva and Cadiz, a little over it
+in the north; the largest the Ria de Aveiro's lagoon (464, 316, 260, 224 about 40.68 to
+40.78 N, 8.68 to 8.72 W; 256 before), the Odiel's and the Tinto's marshes at Huelva (312;
+311), the Arade's and the Alvor's (259; 258), the Mondego's at Figueira (248) and the
+Guadalquivir's at Bonanza (224): the estuaries 39d's figure was made for, a little more of
+them water, as their gauges' water says.
+
+| | Old (39d, 2.0 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 68 tiles, 14.11 MB | 68 tiles, 14.14 MB |
+| level 3 | 48 tiles, 3.29 MB | 48 tiles, 3.26 MB |
+| coast | 1,890 pieces, 12,577 points, 479,263 bytes | 1,706 pieces, 12,285 points, 451,137 bytes |
+| tiles changed (arrays) | | 33 of level 2, 42 of level 3 |
+| cells changed | | 2,165,404 at level 2, 2,621,586 at level 3, the largest 2.00 m |
+| below the datum to above | | 92 at level 2 |
+| above the datum to below | | 293 at level 2, 3,483 at level 3 (the bay of Cadiz's and the Tagus's fill, 1.54 to 1.96 m raise against 2.0) |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records, the recipe; no other region's tile, coast or index, the index and every port file
+and mark untouched. **One test recast**, as Biscay south's:
+`test_chart.py::test_portugal_is_a_region_of_its_own_tiles_with_the_dry_land_left_to_the_corridor` asserted the manifest's
+`fill_mean_level_m == 2.0`; it now asserts the key gone and the raise at Huelva its gauge's
+1.96 m within 2 cm, every other assertion kept. **The block's tests**: the six files fast
+203 passed, slow 11 passed (`test_islands.py`'s Portugal tests among them); truths 7-260 to
+7-269 (7-264, Cadiz watched, among them), 10 passed. **The scenario** `portugal.yaml`, 30
+hours: **the same log byte for byte**, 671 lines, digest `05c7693be1e19a73`.
+
+### The regions `madeira` and `azores`: not rebuilt
+
+The rule moves no cell of their raise (the table above: 0 of 2,499 and 0 of 12,852 over
+their fetch boxes): their gauges' levels are unread, so the world's level over the islands
+is the eleven's there (Le Conquet's 3.98 m, 3.20 over the Azores' west where the blend
+reaches), as it was and as the tiles were raised by. Their tiles, coasts and indexes are
+untouched. The day their gauges' levels are read, the rule moves them and the regions are
+rebuilt.
+
+### The region `strait`
+
+The recipe unchanged (the world's level, as 39f's comment has it). The control: the head's
+tool on today's fetch gives the committed tiles byte for byte. `python tools/build_charts.py
+--region strait --reuse-world`: the checks as printed (100 of 100 features, ids unique,
+the override's datum stated, the fetch box covering the tiles, "2 kept"); "GEBCO's fill
+raised to the chart's datum by the world's mean level, 0.37 to 3.98 m": within the Strait's
+own bounds 3.98 as before (its gauges' levels unread, the eleven's), and 0.37 to 0.43 in its
+tile column east of 5 W, which lies in `mediterranean-west`'s bounds and reads that block's
+gauges' water. **Two level-2 tiles moved** (`2/129120_-18240` and `2/130656_-18240`, the
+column from 5.07 W, Ceuta's east and the coast of Spain from Gibraltar's bay east to
+Estepona): 126,335 cells changed, the largest 3.60 m, **97 cells from above the datum to
+below** (the shore's fill the old raise lifted 3.6 m out of a sea whose high water is now a
+foot above its mean), none the other way; no level-3 tile moved (the harbours lie west of
+5 W). The shore's sweep 1,847 cells in 74 places (by the control 1,553 in 67), the largest
+about Cadiz's bay (97 and 88 about 36.52 to 36.58 N, 6.23 to 6.28 W, in `portugal`'s two
+kept tiles, computed with the block and not written, which read Portugal's water now) and
+Gibraltar's bay and the Moroccan shore as before (88, 81, 78, 77).
+
+| | Old | New |
+|---|---|---|
+| level 2 | 12 tiles, 2.45 MB | 12 tiles, 2.46 MB |
+| level 3 | 14 tiles, 1.36 MB | 14 tiles, 1.36 MB (unchanged) |
+| coast | 160 pieces, 2,131 points, 61,805 bytes | 160 pieces, 2,091 points, 61,010 bytes |
+
+`git status` after the build: the two tiles, the coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-269 and 7-290
+to 7-299 with `--slow -n 4` (7-294, Gibraltar to Port Mahon whole, among them), 11 passed.
+**The scenario** `strait.yaml`, 10 hours: **the same log byte for byte**, 588 lines, digest
+`c9459f107afdfe79`.
+
+### The region `mediterranean-west`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. **The Alboran's inland tiles are left written**: the
+how-to's rule for Portugal's (`skip_dry_tiles`) does not apply cleanly, since east of 1 W no
+corridor lies under the regions and a dry tile unwritten leaves a query there nothing at all
+(ChartBlocks.md, "Not beyond the corridor"); 79c's note stands. `python
+tools/build_charts.py --region mediterranean-west --reuse-world`: the checks as printed (95
+of 95 features, ids unique, no override, the fetch box covering the tiles, "3 kept");
+"GEBCO's fill raised to the chart's datum by the world's mean level, 0.17 to 6.83 m"
+(within the bounds 0.29 to 0.43 m, the block's gauges' Málaga, Motril, Almería and
+Melilla; the 6.83 in the tiles south of 35 N, Morocco's and Algeria's interior outside
+every block, the eleven's nearest alone as before). **The shore's sweep 33,549 cells in
+293 places** (the old raise's, by the control, 2,190 in 155): with the fill no longer
+lifted six metres out of the sea, GEBCO's low ground below mean sea level reads as water
+again, the largest the Albufera of Valencia and its marshes (3,228, 2,963, 2,475, 2,119,
+1,618, 1,368, 1,047 about 39.23 to 39.38 N, 0.28 to 0.38 W, a later block's coast in this
+block's tiles) and the Sebkha of Oran (1,150 about 35.73 N, 0.12 W, the salt lake south of
+the town): water, a lagoon and a salt lake, as they are.
+
+| | Old (79c, 3.98 to 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 165 tiles, 23.99 MB | 165 tiles, 24.02 MB |
+| level 3 | 30 tiles, 2.14 MB | 30 tiles, 2.16 MB |
+| coast | 1,363 pieces, 11,428 points, 392,355 bytes | 1,250 pieces, 10,818 points, 366,564 bytes |
+| tiles changed | | 157 of level 2, all 30 of level 3 |
+| cells changed | | 26,870,887 at level 2, 3,917,826 at level 3, the largest 6.60 m |
+| above the datum to below | | 38,252 at level 2, 23,446 at level 3 |
+| below the datum to above | | none |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-280 to 7-299
+with `--slow -n 4` (7-285 to 7-294, the block's, among them, 7-294 Gibraltar to Port Mahon
+whole), 20 passed. **The scenario** `mahon.yaml`, 98 hours, on the head's tree and this one
+(`balearics` not yet rebuilt; sailed again after it, below): **the same log byte for
+byte**, 3,190 lines, digest `8bcb18bb603cb7c6`.
+
+### The region `balearics`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region balearics
+--reuse-world`: the checks as printed (87 of 87 features, ids unique, no override, the
+fetch box covering the tiles, "14 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.16 to 6.83 m" (within the bounds 0.16 to 0.24 m, the block's five
+gauges; the 6.83 south of 35 N and east of 4.5 E, outside every block, the eleven's nearest
+alone, Saint-Malo's, as before). **The shore's sweep 31,176 cells in 360 places** (by the
+control 3,243 in 228): the Albufera of Valencia again (in `mediterranean-west`'s kept
+column, computed with the block and not written), the Sebkha of Oran, and S'Albufera of
+Majorca at Alcúdia (1,129 about 39.78 N, 3.08 E): water, as they are.
+
+**The harbours the grid lacks are water again.** EMODnet has no sounding inside Port Mahon,
+Palma's port or Ivica's harbour, and GEBCO fills them three metres or so below mean sea
+level; raised by Saint-Malo's 6.83 m they stood as land three metres above the datum.
+Level 3's cells from above the datum to below, by harbour: Palma 17,583, Ivica 16,004 (the
+harbour, 38.91 N 1.44 E, and the salt pans south of the town, 38.86 N 1.36 E), Algiers
+6,915, **Port Mahon 6,126** (the inner harbour, 39.87 to 39.89 N, 4.27 to 4.31 E, its
+median +3.3 m before and -3.3 m now).
+
+| | Old (79c, 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 154 tiles, 28.81 MB | 154 tiles, 28.59 MB |
+| level 3 | 24 tiles, 1.72 MB | 24 tiles, 1.73 MB |
+| coast | 1,126 pieces, 10,369 points, 332,416 bytes | 1,146 pieces, 10,191 points, 331,430 bytes |
+| tiles changed | | 127 of level 2, 23 of level 3 |
+| cells changed | | 11,496,326 at level 2, 3,262,225 at level 3, the largest 6.70 m |
+| above the datum to below | | 14,399 at level 2, 46,628 at level 3 |
+| below the datum to above | | none |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-280 to 7-299
+with `--slow -n 4`, 20 passed (7-288, the frigate at anchor in the mouth of Port Mahon in a
+northerly, 7-292, Palma's and Mahon's lights, and 7-294, Gibraltar to Port Mahon whole,
+among them). **The scenario** `mahon.yaml`, 98 hours, on the head's tree and on this one
+with both its regions rebuilt: 3,190 lines both; **one line moved**, the lookout's "The land
+about Georgetown, or the Arrabal of St George on the larboard bow, bearing NW, distant three
+miles" at tick 277,500 for 277,440 (a minute later, off the mouth of the harbour, the
+harbour's fill now water and the land so much farther); every other line the same, her
+anchoring at the mouth among them; the digest `6320afb76b044a01` for `8bcb18bb603cb7c6`.
+Not a gate's, not pinned.
+
+### The region `gulf-of-lion`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region gulf-of-lion
+--reuse-world`: the checks as printed (114 of 114 features, ids unique, no override, the
+fetch box covering the tiles, "0 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.18 to 6.83 m" (within the bounds 0.42 to 0.75 m, the block's ten gauges
+from Port-Vendres to Monaco, 0.42 to 0.54 m, blended with the eleven where they reach; the 6.83 in the tiles' strip south
+of 40.56 N east of 4.5 E, outside every block, as before). **The shore's sweep 105,638 cells
+in 288 places** (by the control 3,760 in 151): the Camargue's lagoons and marshes (3,600,
+3,346, 2,692, 2,554, 2,517, 2,338, 2,315 about 43.43 to 43.53 N, 4.42 to 4.62 E, the
+Vaccarès and the étangs about it) and the étang de Thau (2,727 about 43.38 N, 3.58 E): the
+low marsh and the lagoons at the sea's level, which the old raise of five to seven metres
+made dry land; water, as they are.
+
+**The harbours the grid lacks are water again**, level 3's cells from above the datum to
+below by harbour: Hyères 64,354 (the salt pans and the lagoon of the Pesquiers on Giens'
+tombolo, 43.05 to 43.07 N, 6.13 to 6.14 E, +4.9 m before, -1.5 now), Toulon 21,175 (the
+inner road, the darse and the Mourillon, 43.08 to 43.12 N, 5.89 to 5.92 E, +3.3 before,
+-3.1 now), Marseille 14,590 (the old port and the Joliette's shore, 43.24 to 43.32 N, 5.36 to
+5.37 E), Villefranche 2,726.
+
+| | Old (79d, 3.70 to 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 120 tiles, 24.59 MB | 120 tiles, 24.53 MB |
+| level 3 | 32 tiles, 3.29 MB | 32 tiles, 3.30 MB |
+| coast | 254 pieces, 5,960 points, 143,404 bytes | 424 pieces, 7,614 points, 195,212 bytes (the lagoons' shores) |
+| tiles changed | | 113 of level 2, all 32 of level 3 |
+| cells changed | | 8,281,052 at level 2, 3,267,884 at level 3, the largest 6.50 m |
+| above the datum to below | | 115,257 at level 2, 102,845 at level 3 |
+| below the datum to above | | none |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-304
+with `--slow -n 4`, 15 passed (7-295 the Gulf's winter row, 7-296 Toulon's roads from
+Hyères', among them). The scenario `agincourt-sound.yaml` is sailed once the three regions
+of 79d are rebuilt (below).
+
+### The region `ligurian-sea`: built, and **stopped for the lead's ruling** (truth 7-297 fails on the rebuilt tiles)
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region ligurian-sea
+--reuse-world`: the checks as printed (140 of 140 features, ids unique, no override, the
+fetch box covering the tiles, "0 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.42 to 6.83 m" (within the bounds the blend of the block's three gauges
+with a level, Centuri 0.48, Ajaccio 0.47 and Solenzara 0.58, Imperia's, Genoa's and
+Leghorn's unread, with the eleven where they reach; the 6.83 where a cell lies in no
+block). **The shore's
+sweep 34,144 cells in 353 places** (by the control 6,987 in 268): the Arno's plain and the
+lake of Massaciuccoli by Pisa (2,207, 2,122, 1,580, 1,428, 1,374, 1,262 about 43.62 to 43.88
+N, 10.28 to 10.43 E), the Grosseto marshes (1,319 about 42.78 N, 10.93 E) and the étang de
+Biguglia (1,144 about 42.62 N, 9.47 E).
+
+| | Old (79d, 3.70 to 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 72 tiles, 17.10 MB | 72 tiles, 17.16 MB |
+| level 3 | 32 tiles, 2.89 MB | 32 tiles, 2.89 MB |
+| coast | 1,565 pieces, 12,552 points, 431,014 bytes | 1,608 pieces, 13,182 points, 449,010 bytes |
+| tiles changed | | 70 of level 2, 30 of level 3 |
+| cells changed | | 4,575,308 at level 2, 4,032,648 at level 3, the largest 6.40 m |
+| above the datum to below | | 41,525 at level 2, 145,827 at level 3 |
+| below the datum to above | | none |
+
+Level 3's cells from above the datum to below, by harbour: Leghorn 56,754 (the port and the
+Darsena, +2.2 m before, -1.0 now), **Agincourt Sound 44,265**, San Fiorenzo 15,475, Ajaccio
+14,324, Genoa 6,915, Porto Ferrajo 4,033. `git status` after the build: the region's tiles,
+its coast, the manifest's entry and fetch records; nothing of any other region, the index
+and every port file and mark untouched.
+
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-304
+with `--slow -n 4`: **14 passed, 7-297 failed** (twice, the same).
+
+**7-297, Agincourt Sound holds a fleet in a north-wester (79d).** The truth asks that from
+the berth (41.1870 N, 9.3790 E) the chart has land within 4,000 m on each of seven bearings
+(the north-east's channel left out), 120 points of 441 with 8 to 30 m about it, and the
+frigate brought up and riding six hours. The distance to the first cell under the datum
+(`depth_at < 0`), by bearing, old tiles beside new (this container, both trees):
+
+| Bearing | 0 | 45 (not asked) | 90 | 135 | 180 | 225 | 270 | 315 |
+|---|---|---|---|---|---|---|---|---|
+| Old | 3,850 m | 4,050 | 2,900 | 1,250 | 500 | 600 | 900 | 1,500 |
+| New | none within 9,950 m | 4,100 | **6,500** | 1,250 | 700 | 750 | 950 | 1,650 |
+
+The room 135 points old, **148 new** (holds); the berth's depth 11.7 m old, 18.0 m new (a
+fill cell itself). So the bearings north and east fail. The cause: EMODnet has no sounding
+over the shores of the islands about the Sound, and GEBCO's fifteen seconds smear them,
+reading their cells some three to six metres below mean sea level; raised by Saint-Malo's
+6.83 m (the eleven's nearest, while the gauges were held) they stood as land, and on the
+block's own water (0.53 m at the berth, M2 8 cm) they are water. Within five kilometres of
+the berth 13,398 level-3 cells went from above the datum (median +3.1 m) to below (median
+-3.2 m, the deepest -6.2). The islands' shores that closed the Sound to the north and east
+were the false raise's, not the grid's. The anchoring part of the truth (six hours in a
+north-wester) is not reached; nothing is loosened, re-pinned or marked.
+
+**The scenario** `agincourt-sound.yaml`, 100 hours, on the head's tree and on this one
+(`gulf-of-lion` rebuilt, `tyrrhenian` not): the head's 4,012 lines, digest
+`4434a8a16c6a4fda`; this tree's 3,829, digest `c276a70d729670ef`; they part at tick 0 (the
+lookout's land about the watering place at the Pararau three cables off, not two). **On
+both trees she takes the ground** at about 23 14:28 (tick 250,034 on the head at six knots,
+250,114 here at a knot and a half, "two fathoms and a half of water by the chart, and she
+draws 15 feet"), and on the head she lies aground on her beam ends that evening: a finding
+of the scenario as it stands on the head in this container (79d's record, on the build
+machine, 3,837 lines and `7ba2146a323761ee`), not of this package. Not a gate's, not pinned.
+
+**For the lead** (the options as I read them): (a) the islands about the Sound given their
+land the grid lacks, by a period sheet read with its datum (a land patch, `overrides/`, as
+79d's "An isle the grid lacks" and ChartBlocks.md's rule: no sheet is read here, and I draw
+none); (b) the islands as features of kind island with an extent, which package 94 is
+building beside this one (the lookout and the grounding, but not `depth_at`, which the
+truth reads); (c) the fill's raise kept at the eleven's for the cells of a harbour patch
+the grid lacks until a sheet is read (a recipe rule, not the brief's); (d) the truth
+re-measured on the true water, old beside new, which would be loosening it and is not mine
+to do. **The package stops here**: `tyrrhenian` is not rebuilt, and the proof on the final
+tree, truths 7-305 to 7-309 and the records wait on the ruling.
+
+### The region `ligurian-sea` rebuilt again by the lead's ruling on 7-297: Agincourt Sound keeps the eleven's raise
+
+**The ruling (2026-10-30):** the Sound is land-locked in truth (Purdy 1826's word, Ryves's
+survey of 1802); the islands' shores that closed it on the old tiles were the false raise's,
+and the truth is not to be re-measured on tiles that open a harbour the real islands close
+(option (d) refused); a sheet read with its datum (option (a)) is the patch package's,
+booked by the lead with Mahon's plan and Bellin's; package 94's island kind (b) is not for
+islands of kilometres; so (c), bounded and said. **As built:** the harbour patch
+`agincourt-sound` in the recipe takes `fill_raise: eleven`, its comment naming the cause and
+the sheets wanted; `build_region` samples the eleven's grid (`mean_level_grid(fetch,
+eleven_only=True)`, the arithmetic 79d's build used) for every cell of either level whose
+centre lies within the patch's box, and the block's water everywhere else; the form's
+comment above `REGIONS`, ChartBlocks.md ("A harbour patch whose land the grid smears keeps
+the eleven's raise until a sheet is read") and the head of `data/ports/maddalena.yaml`
+(beside its `datum: unverified`, a comment, no key the machinery reads) say so. **Checked
+cell for cell:** within the box every level-2 cell (17,280) and every level-3 cell
+(622,080) has the elevation of 79d's tiles (`21a25e7`).
+
+The build: the checks as before, the log's new line "harbour patch agincourt-sound: GEBCO's
+fill raised by the eleven's mean level within its box"; the shore's sweep 34,204 cells in
+353 places (the largest as above). Against 79d's tiles: level 2, 72 tiles, 17.10 to 17.16
+MB, 70 changed, 4,567,040 cells, the largest 6.40 m, 40,810 from above the datum to below;
+level 3, 32 tiles, 2.89 MB, 30 changed, 3,735,722 cells, 119,331 from above the datum to
+below (Agincourt Sound's patch none now); the coast 1,565 pieces, 12,552 points, 431,014
+bytes before, **1,613, 13,254, 450,953** now. 7-297's measures on this tree are 79d's to the
+metre: to land by bearing 3,850, 4,050, 2,900, 1,250, 500, 600, 900 and 1,500 m (0 to 315
+degrees), the room 135, the berth 11.7 m (the stopped build's 18.0, none north within 9,950
+m and 6,500 east, the 13,398 cells, are above).
+
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-304
+with `--slow -n 4`, **15 passed**, 7-297 among them, its words and figures unmoved. **The
+scenario** `agincourt-sound.yaml`, 100 hours (`gulf-of-lion` and this region rebuilt,
+`tyrrhenian` not): 4,012 lines both, digest `10dfe615a065d28d` for the head's
+`4434a8a16c6a4fda`; **eight lines moved**: a sounding at tick 1,288 west of the box (sixteen
+fathoms by the deep for twelve and a half), the lookout's land about Porquerolles and about
+Bonifacio a minute later and Port-Cros's called once more (the Gulf's and this block's
+shores outside the box, on their own water), and on the way home the course shaped at tick
+247,715 "passes the shore under Point Liche within four cables" for "the shore under Spargi
+within three" (Spargi lies west of the patch's box, its shore on the block's water), the
+lookout's "Land ahead ... a mile" at 247,860 not called. **She takes the ground at tick
+250,034 on both trees**, as before: 79d's scenario finding, recorded by the lead for a
+scenario tidy.
+
+### The region `tyrrhenian`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region tyrrhenian
+--reuse-world`: the checks as printed (123 of 123 features, ids unique, no override, the
+fetch box covering the tiles, "32 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.47 to 6.83 m". **The block's eight gauges have no level read**
+(Carloforte, Cagliari, Porto Torres, Civita Vecchia, Naples, Salerno, Palinuro, Ortona), so
+its water's level is the eleven's everywhere but where its bounds overlap `ligurian-sea`'s
+(41 to 42.5 N, 8 to 11 E, whose tiles are `ligurian-sea`'s): **four level-2 tiles moved**,
+the row from 40.56 N under Sardinia's north from 8.16 to 9.87 E (`2/146016_29376`,
+`_30912`, `_32448`, `_33984`), whose northern cells take a share, by the fill grid's
+bilinear sample, of the Ligurian sea's water just north of 40.99 N: 11,930 cells, the
+largest 1.50 m, 12 from above the datum to below; no level-3 tile moved (Cagliari's,
+Alghero's, Civita Vecchia's, Gaeta's, Naples' and Ponza's patches as they were). The shore's
+sweep 22,345 cells in 442 places (by the control 15,200 in 416; the difference the Ligurian
+sea's kept tiles about Biguglia, computed with the block). Level 2 158 tiles, 35.22 MB as
+before; level 3 26 tiles, 1.99 MB; the coast 2,480 pieces, 16,017 points, 611,624 bytes
+before, 2,480, 16,015, 611,590 now.
+
+`git status` after the build: the four tiles, the coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-309
+with `--slow -n 4`, 20 passed (7-300 Naples' marks and 7-301 Cagliari among them, and this
+package's 7-305 to 7-309, written beside). **The scenario** `agincourt-sound.yaml` sailed
+again on the whole rebuilt Mediterranean: the same log as before this region, byte for byte
+(4,012 lines, `10dfe615a065d28d`).
+
+### The truths (7-305 to 7-309)
+
+- **7-305**, the Channel east's low shore against its own high water. The brief's line ("a
+  low shore of the Channel east, the Dungeness marsh, the Somme's banks, stands above the
+  world's high water springs") is **the lead's wording, amended at the measurement** (the
+  ruling of 2026-10-30, option (a)): the Somme's banks (50.15 to 50.25 N, 1.55 to 1.68 E,
+  625 points) median 1.54 m above high water springs, 456 points above (old tiles 1.24 and
+  415); Dungeness's shingle point (50.915 N, 0.93 to 0.97 E) above it at every point; the
+  raise at Romney Marsh the block's mean level to the centimetre, 0.35 m over the eleven's
+  at the grid's cell; and **Romney Marsh and the Pevensey Levels below high water springs**
+  as their true levels lie behind the Dymchurch Wall and the Pevensey walls: Romney median
+  -0.98 m, 87 of 625 points above (old -1.31, 54), the Dungeness foreland's box -0.19 and
+  282 (old -0.56, 176), Pevensey -1.16 and 190 (old -1.65, 163); on the eleven's own water
+  the marsh lay under as well (its HWS 6.24 m there, the block's 6.95). A finding for a land
+  patch when a sheet with its datum is read; nothing invented, no patch drawn.
+- **7-306**, Mahón's and Naples' quays. Mahón's raise is its gauge's 0.20 m (Saint-Malo's
+  6.83 before); within 600 m of the quay 214 of 288 points land, their median 23.5 m above
+  the mean level (27.1 on the old tiles, the false raise's 6.6 m in it), all but two above
+  high water springs. Naples' gauges' levels are unread: its water and its raise are the
+  eleven's, 3.70 m, the quay's ground as it was (279 points land, median 17.6 m).
+- **7-307**, a bay and a harbour by their own block's tide. On 12 June 1805 the bay of the
+  Somme's tide runs from 1.96 to 7.32 m above the datum by the block's water (3.26 to 4.53
+  by the eleven's); of the bay's points (50.17 to 50.26 N, 1.50 to 1.66 E, at 0.004
+  degrees) 193 stand between the block's low and high water and above the eleven's high
+  water: they cover and dry on the block's tide and never covered on the eleven's (the
+  truth asks 150). Port Mahon's inner harbour (39.885 N, 4.29 E), +3.4 m on 79c's tiles,
+  is water at every hour by Mahón's tide, three metres and more.
+- **7-308**, outside every block the raise is the eleven's, over the Channel west, the
+  ocean off Portugal and the Bay's mouth (to 5 mm asserted; the arithmetic is the same to
+  the bit); channel-west's recipe and manifest entry still without the key.
+- **7-309**, the Strait, Madeira and the Azores: the raise there the eleven's and the
+  world's both (their gauges' levels unread; Le Conquet's 3.98 m over the Strait), the
+  Strait's column east of 5 W the Mediterranean west's 0.37 to 0.43; Agincourt Sound's
+  `fill_raise: eleven`, the eleven's level at its berth six metres and more over the
+  block's.
+
+Each is in the fast tier (under three seconds); with the block's truths, 7-290 to 7-309,
+20 passed on the final Mediterranean.
+
+### The raise reads the world's tide itself (the lead's ruling after 94's merge, way (b))
+
+After package 94's merge (the seam's taper within ten miles of a block's open edge, worked
+on the level too, and a gauge serving a neighbour's block whose seam lies within ten miles
+of it) the world's level differed from `mean_level_grid` as first built (89's membership
+by the bounds, no taper) over four of the rebuilt regions; the lead ruled one source of
+truth: **`mean_level_grid` is `Tide.constants_at` at each cell's centre**, the eleven's
+alone through a Tide of the eleven for a patch's `fill_raise: eleven`; nothing in the tool
+reads the manifest or the gauges a second time. The raise, new less as first rebuilt, over
+each fetch box:
+
+| Region | New less as first rebuilt | Cells over 5 mm | Rebuilt again |
+|---|---|---|---|
+| channel-west (no key, not rebuilt) | 0 to +1.29 m | 171 of 7,227 | no |
+| channel-mid (not rebuilt) | -0.41 to +0.05 | 164 of 4,221 | no |
+| channel-east | -0.41 to +0.05 | 164 of 6,868 | yes |
+| biscay-north | 0 to +1.30 | 464 of 5,244 | yes |
+| biscay-south | 0 to +3.87 | 972 of 16,016 | yes |
+| portugal | 0 to +1.80 | 52 of 11,844 | yes |
+| madeira, azores, strait, the five Mediterranean | 0 | 0 | no |
+
+The cells that move are the bands within ten miles of the blocks' open edges and of the
+seams the gauges now serve across, most of them inland (Spain's interior at the open 42 N
+edge, Brittany's by 48 N, the Solent's seam at 1 W); in the Mediterranean the eleven are
+far and there is no taper. Each of the four rebuilt again by the same road: the control
+(the branch's head tool, a worktree of `b962e4e`, on the same fetch: the committed tiles
+byte for byte), the build, the checks as before, the figures against the first rebuild,
+the block's tests, the scenario.
+
+**`channel-east`, second rebuild.** The checks as before ("6 kept"); the raise 1.48 to
+6.83 m as printed; the sweep 3,513 cells in 79 places, the coast 619 pieces and 5,635
+points, both as the first rebuild. Against the first rebuild: **3 level-2 tiles and 1
+level-3 tile moved, 696 and 32 cells, each by the tiles' one step of 0.1 m**, none across
+the datum (the -0.41 m lies in channel-mid's seam column, computed and not written).
+The block's tests: the six files fast 205 passed, slow 11 passed; truths 7-270 to 7-289 and
+7-310 to 7-314 with `--slow -n 4`, 25 passed. **Spithead's passage**, 28 hours: 1,231
+lines, digest `be74adec4acf8792`, on the branch's head (94's tide in it, the first
+rebuild's tiles) and on these tiles alike, byte for byte: the second rebuild moves nothing
+of it. Package 94's Solent tide moved it from the 1,241 lines and `eef946bdabaf39cf` above
+(94's notes have the Downs to Spithead's figures).
+
+**`biscay-north`, second rebuild.** The control on the merged tree does not reproduce the
+committed tiles, and says why: 94 made the Isle of Aix's gauge serve `biscay-south` too
+(the rule of the seams), so even the first rule now reads it over the block's southern row
+of tiles, which lies in Biscay south's bounds (2 level-2 tiles, 108,650 cells, up to
+0.6 m, and the coast). The build: the checks as before ("5 kept"); "raised ... 3.09 to
+6.35 m"; the sweep 3,772 cells in 133 places (3,808 at the first rebuild); the coast 833
+pieces, 9,619 points, 292,157 bytes (830, 9,607, 291,556). Against the first rebuild:
+**8 level-2 tiles moved**, 654,421 cells, the largest 1.30 m, 35 from below the datum to
+above, none the other way; no level-3 tile. The tiles are the block's edges: the southern
+row from 45.68 N (1.65 and 1.23 W, Aix's seam with Biscay south), the northern row from
+47.81 N (2.93 to 1.23 W, the open edge where no block holds the water between 48 N and
+channel-mid's 48.5 N) and one at the open west edge (47.39 N, 5.07 W). The block's tests:
+the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to 7-314,
+15 passed. **The scenario** `biscay-north.yaml`, 9 hours: 348 lines, digest
+`28c449dbbda73eb1`, the same on the first rebuild's head, on the branch's head and here.
+
+**`biscay-south`, second rebuild.** The control on the merged tree differs from the
+committed tiles by 94's rule of the seams alone (the Isle of Aix's gauge serving the block
+now: 38 level-2 and 28 level-3 tiles, up to 0.3 m, the coast). The build: the checks as
+before ("12 kept", 59 dry tiles not written); "raised ... 1.89 to 6.83 m"; the sweep 4,967
+cells in 305 places (5,058); the coast 885 pieces, 13,123 points, 368,304 bytes (884,
+13,098, 367,692). Against the first rebuild: **38 level-2 tiles and 28 level-3 tiles
+moved**, 2,739,100 and 2,616,125 cells, the largest 0.90 m at level 2 and 0.30 at level 3,
+149 and 877 from below the datum to above, none the other way: Aix's level in the blend
+over the whole block, and the taper's band at the open 42 N edge east of 6 W, Spain's
+interior (the 3.87 m of the table lies in tiles all land, not written). The block's tests:
+the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to 7-314, 15
+passed. **The scenario** `biscay-south.yaml`, 30 hours: 894 lines both on the branch's head
+(`0aa8d30dbe67660b`; package 94's tide moved it from 880 lines and `922f024f1d07d067`) and
+here (`d7d819e4439f6b19`); **three moments moved**: at Corunna she veers thirty-one fathoms
+for thirty-two (the depth at the berth a step shallower), brought up the same, and one
+cross-bearing fix reads the castle of San Antón WSW for W by S, the fix the same.
+
+**`portugal`, second rebuild.** The control on the merged tree and the new rule give the
+same tiles: **2 level-2 tiles moved** (the northern row from 41.84 N, 9.33 to 8.48 W, the
+Minho's mouth and the Galician shore south of it, which lie in Biscay south's bounds and
+read the Isle of Aix's level in its blend since 94's rule of the seams), 93,621 cells, the
+largest 0.30 m, 5 from below the datum to above; no level-3 tile. The taper's band at the
+open edges (the 1.80 m of the table) lies in tiles all land, not written. The checks as
+before ("0 kept", 72 dry tiles not written); the sweep 7,381 cells in 226 places (7,383);
+the coast 1,706 pieces, 12,287 points, 451,176 bytes (1,706, 12,285, 451,137). The block's
+tests: the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to
+7-314, 15 passed. **The scenario** `portugal.yaml`, 30 hours: 671 lines, digest
+`05c7693be1e19a73`, the same on the original head, the branch's head and here.
+
+### The ten regions, as merged before against as built (package 93's final tiles)
+
+Against 79's tiles as merged (`21a25e7`), by `git show` of each tile and its arrays (the
+first rebuild's and the second's figures are in the sections above):
+
+| Region | Level 2: tiles, MB before, after | Tiles changed | Largest | Above the datum to below / below to above | Level 3: MB before, after; changed |
+|---|---|---|---|---|---|
+| channel-east | 57, 7.64, 7.77 | 53 | 1.30 m | 7 / 502 | 5.23, 5.23; 32 (88 / 7,171) |
+| biscay-north | 55, 8.92, 9.13 | 48 | 6.10 | 0 / 62,428 | 2.47, 2.43; 36 (0 / 178,554) |
+| biscay-south | 129, 16.54, 16.90 | 90 | 2.00 | 1 / 1,301 | 2.27, 2.26; 30 (0 / 8,567) |
+| portugal | 68, 14.11, 14.14 | 33 | 2.00 | 293 / 97 | 3.29, 3.26; 42 (3,483 / 0) |
+| strait | 12, 2.45, 2.46 | 2 | 3.60 | 97 / 0 | 1.36, 1.36; 0 |
+| madeira, azores | not rebuilt | | | | |
+| mediterranean-west | 165, 23.99, 24.02 | 157 | 6.60 | 38,252 / 0 | 2.14, 2.16; 30 (23,446 / 0) |
+| balearics | 154, 28.81, 28.59 | 127 | 6.70 | 14,399 / 0 | 1.72, 1.73; 23 (46,628 / 0) |
+| gulf-of-lion | 120, 24.59, 24.53 | 113 | 6.50 | 115,257 / 0 | 3.29, 3.30; 32 (102,845 / 0) |
+| ligurian-sea | 72, 17.10, 17.16 | 70 | 6.40 | 40,810 / 0 | 2.89, 2.89; 30 (119,331 / 0) |
+| tyrrhenian | 158, 35.22, 35.22 | 4 | 1.50 | 12 / 0 | 1.99, 1.99; 0 |
+
+Every region's tile count is as before; the bytes moved by under a quarter of a megabyte
+each, 179.92 MB of level 2 and 26.61 MB of level 3 in the ten (179.37 and 26.65 before). After the second rebuild,
+with the trunk merged, the six regions the world's tide does not move again (the Strait and
+the Mediterranean's five) were built once more from the cache: every tile, coast and index
+byte for byte (the manifest's fetch records alone, discarded). `--check` prints as before
+for all ten. `channel-west` and `channel-mid`: nothing written.
+
+### The proof, the suites and the close (package 93, the final tree)
+
+**The proof on the final tree** (`a67faf7` with the records, this container, four cores,
+nothing beside it), as on the head (`21a25e7`, a clean worktree): the eleven recorded
+passages by node id, `--slow -n 4`, **11 passed** both times, every pinned digest, line
+count and tick held; `-k "gate_5b or gate_5c"`, the one test selected passed both times;
+the captain's trials, `--slow -n 4`, **the same on both trees**: five passed (the merchant
+hauling off from the privateer, the order at the prompt, the player's hand replayed, the
+station's stranger chased, the merchant in thick weather), the gale with sea room its
+expected failure, and the lee-shore trial failing with this container's digest
+`7fad0ce7e46ba366` against the pin `ed48ca3d61e52f20` on both (89's record has it). No
+recorded passage's digest moved: none sails a rebuilt region.
+
+**The suites.** `ruff check` and `ruff format --check` clean. The six chart and tide files
+(`test_chart.py`, `test_ports.py`, `test_tide.py`, `test_scenarios.py`, `test_islands.py`,
+`test_tackle_orders.py`) fast and slow after every region; the blocks' truths with `--slow`
+after every region (7-260 to 7-314 between them, each region's own); truths 7-305 to 7-309
+in the fast tier. **The fast tier**, once on the final tree (`python -m pytest -n auto -q`,
+379 slow tests left out): **one failure**, the pictures' known flake
+(`test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`,
+"the chart is blank (std 8.0)" under the tier's load), which passes alone on this tree.
+The whole slow tier not run (the lead's, in the cloud at the merge).
+
+**The scenarios, last run against the first** (this container): spithead the same as on
+the branch's head (94's tide moved it, 1,241 to 1,231 lines); biscay-north the same
+throughout; biscay-south three moments (the cable at Corunna, one bearing); portugal and
+strait the same throughout; mahon one line (the land about Georgetown a minute later);
+agincourt-sound eight lines, grounding at the same tick as on the head (79d's finding).
+
+### Found on the way (package 93)
+
+- **A far gauge's raise hid the coarse shore.** Where EMODnet stops short of a shore and
+  GEBCO's fifteen seconds smear an island or a harbour's side under mean sea level, the
+  eleven's six metres stood it up; the true water lays it under (Agincourt Sound's islands,
+  kept by `fill_raise: eleven`; the harbours of Mahon, Palma, Ivica, Toulon, Marseille and
+  Leghorn are water again, as they are). A patch read from a period sheet with its datum is
+  the mend: the lead's patch package.
+- **The dyked levels of the Channel east** (Romney Marsh, the Pevensey Levels) lie under
+  high water springs on the tiles as behind their walls in truth; a land patch with a
+  sheet's datum, when read.
+- **The control is the tool's**: the same fetch through the head's tool gave the committed
+  arrays for every region but where package 94's data moved the old rule's own reading
+  (Biscay north's southern row, Biscay south, Portugal's northern row: Aix's gauge across
+  the seam), which says the tiles follow the tide's tables and nothing else.
+- **`channel-mid`'s seam column** (1.23 to 0.80 W, its own tiles) and `channel-west`'s
+  edges now lie under water whose level differs from their raise (up to 0.41 and 1.29 m
+  over a few hundred cells of the grid): not rebuilt by the brief; a rebuild of either with
+  the key and the rule would carry it.
+- **The open sea east of 4.5 E south of 40.56 N** lies in no block, reading Saint-Malo's
+  water by the eleven's nearest alone: the Balearics' tiles reach 4.75 E. A bound for the
+  lead (89 found the like at 40.5 N).
+- **One merge commit of mine** (`dae50ca`) went out with git's default message, without the
+  attribution lines; pushed, not rewritten.
+
 ## Package 94: the chart's tidies from 79c, 79d and 89 (2026-10-30)
 
 Four tidies the three packages left, each its own commit in the brief's order, the trunk

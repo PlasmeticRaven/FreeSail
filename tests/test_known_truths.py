@@ -12232,6 +12232,253 @@ def test_truth_7_304_the_tyrrhenians_tide_hour_is_smyths_and_its_weather_naples_
 
 
 # ---------------------------------------------------------------------------
+# Package 93: the blocks' tiles rebuilt on their true water (truths 7-305 to 7-309)
+# ---------------------------------------------------------------------------
+
+
+def _chart_tool():
+    """`tools/build_charts.py` as a module (its `mean_level_grid`, the fill's raise)."""
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "build_charts", root / "tools" / "build_charts.py"
+    )
+    tool = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = tool
+    spec.loader.exec_module(tool)
+    return tool
+
+
+def _eleven_tide():
+    """The world's tide with the eleven alone, as it was before package 89."""
+    from freesail.world import tide as T
+
+    doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
+    return T.Tide({**doc, "gauges": [g for g in doc["gauges"] if "block" not in g]}, {"areas": []})
+
+
+def _grid_at(grid, lat: float, lon: float) -> float:
+    """The raise at a position: the value of the fill grid's cell that holds it, worked at
+    the cell's centre (`_grid_centre`)."""
+    return float(
+        grid.values[int((lat - grid.south) / grid.cell), int((lon - grid.west) / grid.cell)]
+    )
+
+
+def _grid_centre(grid, lat: float, lon: float):
+    """The centre of the fill grid's cell that holds a position, where its raise is worked."""
+    from freesail.world.geo import Position
+
+    r = int((lat - grid.south) / grid.cell)
+    c = int((lon - grid.west) / grid.cell)
+    return Position(grid.south + (r + 0.5) * grid.cell, grid.west + (c + 0.5) * grid.cell)
+
+
+def _hws(tide, pos) -> float:
+    """The world's high water springs at a position: the mean level and M2 and S2."""
+    level, consts = tide.constants_at(pos)
+    return level + consts["M2"][0] + consts["S2"][0]
+
+
+def test_truth_7_305_the_channel_easts_low_shore_against_its_own_high_water():
+    """The brief's truth (93), the lead's wording amended at the measurement (the ruling of
+    2026-10-30): on the rebuilt tiles the Somme's banks and Dungeness's shingle foreland
+    stand above the world's high water springs; the raise at Romney Marsh is the block's
+    mean level, the eleven's and 0.35 m more at the grid's cell, to the centimetre; and
+    Romney Marsh and the Pevensey Levels lie below high water springs on the tiles, as they
+    lie behind the
+    Dymchurch Wall and the Pevensey sea walls in truth: dyked levels, which GEBCO's fifteen
+    seconds cannot hold (a finding, for a land patch when a sheet with its datum is read;
+    the medians were 1.3 and 1.7 m under on the old tiles, 1.0 and 1.2 now)."""
+    import numpy as np
+
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_tide
+
+    chart, tide, eleven = load_chart("atlantic-east"), load_tide(), _eleven_tide()
+
+    def over(s, n, w, e):
+        rows = []
+        for la in np.linspace(s, n, 25):
+            for lo in np.linspace(w, e, 25):
+                p = Position(float(la), float(lo))
+                z = chart.elevation_at(p)
+                if z is not None and z > 0.0:
+                    rows.append(z - _hws(tide, p))
+        return np.array(rows)
+
+    somme = over(50.15, 50.25, 1.55, 1.68)
+    assert np.median(somme) > 1.0 and (somme > 0.0).mean() > 2 / 3, np.median(somme)
+    # the ness's shingle point, Dungeness's light upon it (50.915 N, 0.93 to 0.97 E)
+    for lon in (0.93, 0.94, 0.95, 0.96, 0.97):
+        p = Position(50.915, lon)
+        assert chart.elevation_at(p) > _hws(tide, p), lon
+    romney = Position(50.99, 0.88)
+    grid = _chart_tool().mean_level_grid({"south": 50.9, "north": 51.1, "west": 0.8, "east": 1.0})
+    raised = _grid_at(grid, romney.lat_deg, romney.lon_deg)
+    centre = _grid_centre(grid, romney.lat_deg, romney.lon_deg)
+    assert raised == pytest.approx(tide.constants_at(centre)[0], abs=0.01)
+    assert raised - eleven.constants_at(centre)[0] == pytest.approx(0.35, abs=0.01)
+    for box in ((50.95, 51.03, 0.78, 0.98), (50.80, 50.85, 0.28, 0.38)):  # Romney, Pevensey
+        assert np.median(over(*box)) < -0.5
+
+
+def test_truth_7_306_mahons_and_naples_quays_stand_their_height_above_their_own_water():
+    """The brief's truth (93): Port Mahon's fill is raised by Mahón's own water (0.20 m above
+    the datum, the gauge's; Saint-Malo's 6.83 before), so the town on its cliff stands its
+    own height above the harbour: of the points within 600 m of the quay, 210 and more are
+    land, their median height above the mean level between 15 and 35 m, and every land
+    point but two above high water springs. Naples' gauges' levels are unread, so its water
+    is the eleven's (3.70 m) and the raise is too, as the rule gives it and the tiles were
+    built: the quay's ground the same height above the same water, unmoved."""
+    import numpy as np
+
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position, destination
+    from freesail.world.tide import load_tide
+
+    chart, tide, eleven = load_chart("atlantic-east"), load_tide(), _eleven_tide()
+    tool = _chart_tool()
+    for name, quay, own in (
+        ("mahon", Position(39.8885, 4.2640), 0.20),
+        ("naples", Position(40.8380, 14.2530), None),
+    ):
+        level = tide.constants_at(quay)[0]
+        if own is not None:
+            assert level == pytest.approx(own, abs=0.01)
+        else:
+            assert level == pytest.approx(eleven.constants_at(quay)[0], abs=1e-6)
+        grid = tool.mean_level_grid(
+            {
+                "south": quay.lat_deg - 0.1,
+                "north": quay.lat_deg + 0.1,
+                "west": quay.lon_deg - 0.1,
+                "east": quay.lon_deg + 0.1,
+            }
+        )
+        centre = _grid_centre(grid, quay.lat_deg, quay.lon_deg)
+        assert _grid_at(grid, quay.lat_deg, quay.lon_deg) == pytest.approx(
+            tide.constants_at(centre)[0], abs=0.01
+        )
+        land = []
+        for r in range(50, 601, 50):
+            for b in range(0, 360, 15):
+                q = destination(quay, float(b), float(r))
+                z = chart.elevation_at(q)
+                if z is not None and z > 0.0:
+                    land.append((z - level, z > _hws(tide, q)))
+        heights = np.array([h for h, _ in land])
+        if name == "mahon":
+            assert len(land) >= 210, len(land)
+            assert 15.0 < float(np.median(heights)) < 35.0
+            assert sum(not above for _, above in land) <= 2
+        else:
+            assert len(land) >= 270 and 10.0 < float(np.median(heights)) < 30.0
+
+
+def test_truth_7_307_a_bay_and_a_harbour_cover_and_dry_by_their_own_blocks_tide():
+    """The brief's truth (93): the sands of the bay of the Somme cover and dry by the Channel
+    east's own tide on a day of springs (low water about 2 m and high about 7.3 m above the
+    datum there), and of the bay's points some 190 stand between the block's low and high
+    water and above the eleven's high water (4.5 m): they cover on the block's tide and
+    would never cover on the eleven's. Port Mahon's inner harbour, which GEBCO's fill under
+    Saint-Malo's raise stood three metres above the datum, is water at every hour of the day
+    by Mahón's own tide, three metres and more of it."""
+    import numpy as np
+
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_tide
+
+    chart, tide, eleven = load_chart("atlantic-east"), load_tide(), _eleven_tide()
+    day = datetime(1805, 6, 12)
+    hours = [day + timedelta(minutes=10 * i) for i in range(145)]
+    bay = Position(50.21, 1.58)
+    own = [tide.height_at(bay, t) for t in hours]
+    far = [eleven.height_at(bay, t) for t in hours]
+    assert min(own) < 2.5 and max(own) > 7.0 and max(far) < 5.0
+    between = 0
+    for la in np.arange(50.17, 50.26, 0.004):
+        for lo in np.arange(1.50, 1.66, 0.004):
+            z = chart.elevation_at(Position(float(la), float(lo)))
+            if z is not None and min(own) < z < max(own) and z > max(far):
+                between += 1
+    assert between >= 150, between
+    inner = Position(39.8850, 4.2900)
+    assert chart.region_at(inner) == "balearics" and chart.level_at(inner) == 3
+    assert chart.depth_at(inner) > 3.0
+    assert all(chart.depth_at(inner) + tide.height_at(inner, t) > 3.0 for t in hours)
+
+
+def test_truth_7_308_the_raise_outside_every_block_is_unchanged_to_the_centimetre():
+    """The brief's truth (93): outside every block the fill's raise is the eleven's alone, as
+    every tile there was built by (the Channel west, the Western Approaches, the ocean west
+    of Portugal's 10 W), to the centimetre and in fact to the bit; and channel-west's
+    recipe still has no raise and channel-mid's tiles are not rebuilt (the manifest's
+    entries say so)."""
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_tide
+
+    tool, tide, eleven = _chart_tool(), load_tide(), _eleven_tide()
+    for box in (
+        {"south": 49.0, "north": 50.6, "west": -7.0, "east": -4.0},  # channel-west
+        {"south": 38.0, "north": 40.0, "west": -12.5, "east": -10.5},  # off Portugal
+        {"south": 46.5, "north": 47.5, "west": -8.0, "east": -6.0},  # the Bay's mouth
+    ):
+        grid = tool.mean_level_grid(box)
+        rows, cols = grid.values.shape
+        for r in range(0, rows, 3):
+            for c in range(0, cols, 3):
+                p = Position(grid.south + (r + 0.5) * grid.cell, grid.west + (c + 0.5) * grid.cell)
+                if tide.blocks_at(p):
+                    continue
+                assert float(grid.values[r, c]) == pytest.approx(
+                    eleven.constants_at(p)[0], abs=0.005
+                )
+    assert not tool.REGIONS["channel-west"].get("fill_to_chart_datum")
+    manifest = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data/charts/manifest.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert "fill_to_chart_datum" not in manifest["regions"]["channel-west"]
+
+
+def test_truth_7_309_the_strait_and_the_islands_raise_as_the_rule_gives_them():
+    """The brief's truth (93): over the Strait, Madeira and the Azores the gauges' levels are
+    unread, so the world's level and the raise are the eleven's there (Le Conquet's 3.98 m
+    over the Strait and Madeira), as the tiles were built and not rebuilt (Madeira's and the
+    Azores'); the Strait's tile column east of 5 W lies in the Mediterranean west's bounds
+    and takes that block's water, 0.37 to 0.43 m; Agincourt Sound's patch keeps the eleven's
+    raise until a sheet is read (`fill_raise: eleven`, the lead's ruling on 7-297)."""
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_tide
+
+    tool, tide, eleven = _chart_tool(), load_tide(), _eleven_tide()
+    for block, (lat, lon) in (
+        ("strait", (36.0, -5.6)),
+        ("madeira", (32.65, -16.9)),
+        ("azores", (38.65, -27.2)),
+    ):
+        p = Position(lat, lon)
+        assert block in tide.blocks_at(p) or block in ("madeira", "azores")
+        grid = tool.mean_level_grid(
+            {"south": lat - 0.1, "north": lat + 0.1, "west": lon - 0.1, "east": lon + 0.1}
+        )
+        centre = _grid_centre(grid, lat, lon)
+        assert _grid_at(grid, lat, lon) == pytest.approx(eleven.constants_at(centre)[0], abs=0.01)
+        assert _grid_at(grid, lat, lon) == pytest.approx(tide.constants_at(centre)[0], abs=0.01)
+    assert eleven.constants_at(Position(36.0, -5.6))[0] == pytest.approx(3.98, abs=0.01)
+    east = tool.mean_level_grid({"south": 35.9, "north": 36.2, "west": -4.95, "east": -4.7})
+    assert 0.3 < float(east.values.min()) <= float(east.values.max()) < 0.5
+    sound = tool.REGIONS["ligurian-sea"]["harbours"]["agincourt-sound"]
+    assert sound["fill_raise"] == "eleven"
+    berth = Position(41.1870, 9.3790)
+    assert eleven.constants_at(berth)[0] - tide.constants_at(berth)[0] > 6.0
+
+
 # Package 94: the chart's tidies from 79c, 79d and 89 (truths 7-310 to 7-314)
 # ---------------------------------------------------------------------------
 

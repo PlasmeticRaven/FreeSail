@@ -23,6 +23,12 @@ name: the Maddalena
 nation: sardinia
 source: "James 1837 vol. 3 pp. 177-178; Purdy 1826 pp. 88-90; Smyth 1828 pp. 247-248; Derrotero 1849 pp. 150-155"
 datum: unverified   # no period sheet read; no published level read
+# Package 93 (the lead's ruling of 2026-10-30): the harbour patch agincourt-sound keeps the
+# eleven's raise of GEBCO's fill within its box (`fill_raise: eleven` in tools/build_charts.py)
+# until a sheet is read with its datum (Ryves's survey of 1802 as the Admiralty engraved it,
+# Smyth's, or the Derrotero's plan): EMODnet has no sounding over the islands' shores, GEBCO's
+# fifteen seconds smear them under mean sea level, and the block's own water would lay them
+# under and open the Sound the islands close.
 
 outer_road:
   feature: maddalena-road

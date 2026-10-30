@@ -2163,6 +2163,18 @@ The voyage itself, Falmouth to Funchal, is a course for the regatta (§21) and t
 free passage with no marks for a week: the reckoning by the log and the noon sight alone,
 the lunar if the moon serves, the landfall on Porto Santo. It is what the owner asked for.
 
+**As built (package 93, 2026-10-30): the blocks' fill on their own water.** GEBCO's fill
+under every block is raised by the world's mean level there (`mean_level_grid` is
+`Tide.constants_at` at each cell: the block's own gauges within its bounds, package 94's
+taper and seams' gauges, the eleven alone outside every block): `channel-east`,
+`biscay-north` (the key taken), `biscay-south` and `portugal` (their fixed
+`fill_mean_level_m` taken out), the Strait's column east of 5 W, `mediterranean-west`,
+`balearics`, `gulf-of-lion`, `ligurian-sea` and `tyrrhenian` rebuilt, the sources fetched
+again; Madeira and the Azores unmoved by the rule and not rebuilt; Agincourt Sound's patch
+keeping the eleven's raise until a sheet is read (`fill_raise: eleven`). No recorded
+passage moved; the blocks' scenarios sailed again, their figures in
+`docs/dev/TuningNotes.md`, package 93; truths 7-305 to 7-309.
+
 ---
 
 ## 27. Performance
