@@ -84,6 +84,10 @@ class Nations:
     as_of: date | None = None
     # the wars declared and the peaces made in play, in order: (what, a, b, when)
     news: list[tuple[str, str, str, str]] = field(default_factory=list)
+    # the table as the ship sailed with it: the file's wars when the world was made, the
+    # knowledge she carries until the news moves it (`sailed_with_words`; the reading
+    # `the war` and the paper `the news of the war` open with it)
+    sailed_with: list[dict[str, Any]] = field(default_factory=list)
 
     # -- reading ----------------------------------------------------------------------
 
@@ -221,6 +225,35 @@ class Nations:
                 parts.append(f"peace made between {first} and {second}")
         return "; ".join(parts) if parts else "every nation at peace"
 
+    def table_words(self, wars: list[dict[str, Any]] | None = None) -> str:
+        """A table of wars in words, every war once and the rest at peace: 'Britain at war
+        with France, Spain and the Batavian Republic; the United States, Portugal and
+        Denmark at peace with all'. The table as it stands when `wars` is None."""
+        table = self.wars if wars is None else wars
+        enemies: dict[str, list[str]] = {}
+        for w in table:
+            a, b = w["between"]
+            enemies.setdefault(a, []).append(b)
+            enemies.setdefault(b, []).append(a)
+        parts: list[str] = []
+        said: set[frozenset[str]] = set()
+        for nid, n in self.nations.items():
+            foes = [e for e in sorted(enemies.get(nid, ())) if e in self.nations]
+            pairs = [e for e in foes if frozenset((nid, e)) not in said]
+            if not pairs:
+                continue
+            said.update(frozenset((nid, e)) for e in pairs)
+            parts.append(f"{n.name} at war with {_and([self.nations[e].name for e in pairs])}")
+        at_peace = [n.name for nid, n in self.nations.items() if nid not in enemies]
+        if at_peace:
+            parts.append(f"{_and(at_peace)} at peace with all")
+        return "; ".join(parts) if parts else "every nation at peace"
+
+    def sailed_with_words(self) -> str:
+        """The table the ship sailed with, in words, dated as the file dates it."""
+        when = f" ({self.as_of.day} {self.as_of:%B %Y})" if self.as_of else ""
+        return f"The nations as she sailed{when}: {self.table_words(self.sailed_with)}."
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "wars": [
@@ -281,6 +314,7 @@ def load_nations(path: str | Path = NATIONS_PATH) -> Nations:
         allies=[(a, b) for a, b in allies],
         port_nations=ports,
         as_of=as_of if isinstance(as_of, date) else None,
+        sailed_with=[dict(w) for w in wars],
     )
 
 

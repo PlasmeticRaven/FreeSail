@@ -7013,9 +7013,10 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
         assert list(sample.to_dict())[0] == "you"
         return sample.you
 
+    # the line closes with the date (the owner's fourth note of the playtests of 70 to 72)
     assert line() == (
         "You: the captain, on the quarterdeck, since 10:00; the deck yours; on your feet "
-        "since 10:00."
+        "since 10:00; Wednesday 12 June 1805."
     )
     h.deliver(reply("", call("submit_order", text="go ashore")))
     h.deliver(reply("", call("stand_by", until="a glass")))
@@ -7027,7 +7028,8 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
     # stand-by being thirty minutes ("...; on your feet since 10:00." before)
     assert line() == (
         f"You: the captain, ashore at Falmouth, on the quay, since {at}; the deck yours; on "
-        "your feet since 10:00; 30 minutes of the ship's time since your last reply."
+        "your feet since 10:00; Wednesday 12 June 1805; 30 minutes of the ship's time since "
+        "your last reply."
     )
     _until(world, lambda: not world.dealings.boat.away)  # the boat home, to be sent for him
     h.deliver(reply("", call("submit_order", text="come aboard")))
@@ -12210,3 +12212,53 @@ def test_truth_7_304_the_tyrrhenians_tide_hour_is_smyths_and_its_weather_naples_
     raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
     note = raw["boxes"]["tyrrhenian"]["months"][1]["note"]
     assert "Naples" in note and "gales 7" in note
+
+
+# ---------------------------------------------------------------------------
+# Package 85: the orders, the primer and the library for a model reader
+# ---------------------------------------------------------------------------
+
+
+def _package_85_cutter() -> World:
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    here = Path(__file__).resolve().parents[1]
+    sf = load_scenario(here / "data" / "scenarios" / "dispatches-falmouth.yaml")
+    return make_scenario_world(sf, seed=7)
+
+
+def test_truth_7_240_the_date_is_told_in_words_in_every_line_and_on_request():
+    """The owner's fourth note of the playtests of 70 to 72 (a model deducing the date from
+    the log's stamps, and confused): the date is a reading in words, `the date`, and the
+    last words of every station's line and the director's, changing with the day and
+    riding no sample between."""
+    from freesail.api import readings as R
+
+    w = _package_85_cutter()
+    assert w.submit("the date").text == "The date: Wednesday 12 June 1805."
+    assert R.station_line(w, None).endswith("; Wednesday 12 June 1805.")
+    assert R.director_line(w).endswith("; Wednesday 12 June 1805.")
+    w.run(19 * 3600 + 1)
+    assert w.readings.get("date")["words"] == "Thursday 13 June 1805"
+
+
+def test_truth_7_241_the_war_is_what_the_ship_knows_and_the_news_is_entered_in_her_papers():
+    """The owner's fifth note (a model reasoning the war's state from a primer's pilot
+    example): `the war` is the nations' table she sailed with and every change the news
+    brought her, each entered in the paper `the news of the war` with where and when it
+    came, never the world's table as it stands."""
+    w = _package_85_cutter()
+    sailed = w.nations.sailed_with_words()
+    assert w.submit("the war").text == (
+        f"The war: {sailed} No news of the war has reached her since she sailed."
+    )
+    assert w.nations.make_peace("britain", "spain")
+    assert "No news of the war" in w.submit("who is at war").text
+    assert w.papers.news_heard("the pilot off Falmouth") == [
+        "The news of the war written up by the captain: by the pilot off Falmouth, peace made "
+        "between Britain and Spain."
+    ]
+    said = w.submit("the war").text
+    assert "by the pilot off Falmouth: peace made between Britain and Spain." in said
+    assert "As she knows it now: Britain at war with the Batavian Republic and France;" in said
+    assert "peace made between Britain and Spain" in w.papers.page("the news of the war").lines[-2]

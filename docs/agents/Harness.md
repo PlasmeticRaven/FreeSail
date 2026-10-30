@@ -585,10 +585,10 @@ A place is part of a person's state and of what he can do there, not a simulatio
 
 The dispatches test (`docs/playtests/2026-10-18-dispatches-director-test/`) found a captain who could not tell where he stood, lost three orders to his own stand-by, and was woken with nothing to read; and a director who could not read the truth while it stood by. Package 66 mends those (spec M7b §5 and §14, "as built (package 66)").
 
-**The line.** Every sample of a seated person opens with one line of his own, before everything else in it (the sample's `you`, first in its data; the REPL and the MCP bridge print it under the sample's head): who he is, where he is and since when, whose the deck is, and his state in the needs' words when they have any:
+**The line.** Every sample of a seated person opens with one line of his own, before everything else in it (the sample's `you`, first in its data; the REPL and the MCP bridge print it under the sample's head): who he is, where he is and since when, whose the deck is, his state in the needs' words when they have any, and the date (package 85: in words, so that it is known and never deduced from the log's stamps; the reading `the date` gives it on request):
 
 ```
-You: the captain, ashore at Falmouth, at the market, since 10:38; the deck yours; on your feet since 10:00.
+You: the captain, ashore at Falmouth, at the market, since 10:38; the deck yours; on your feet since 10:00; Wednesday 12 June 1805.
 ```
 
 The deck is *yours*, another's by name (*the deck Mr Pearce's*), *the captain's*, *the captain's book's* (a model at the captain's station without it) or *nobody's*. The director's line says the director's: *You: the director, above the game; the day's budget 3 of 48 samples and 1 of 48 acts used; the clock waits on you and the captain* (every station whose open sample holds the clock at 1x). `how am I` answers with the same line, then the hours since the person ate, drank and slept. The line is the sample's and never the log's, so no recorded passage moves.

@@ -1122,6 +1122,37 @@ REGISTRY.add(
         description="the ship's time: the watch and the bells",
     )
 )
+
+
+def date_words(t: Any) -> str:
+    """'Wednesday 12 June 1805': the date in words, as the station's line and the reading
+    give it."""
+    return f"{t:%A} {t.day} {t:%B} {t.year}"
+
+
+def _date(world: Any, _: str | None) -> dict[str, Any]:
+    """The date, in words and in figures, with the ship's time: a thing a station is told
+    and never left to deduce from the log's stamps."""
+    t = world.clock.ship_time
+    # the date alone, so that the row changes once a day and rides no sample as a changed
+    # reading between; the ship's time is 'the time'
+    return {"words": date_words(t), "date": t.strftime("%Y-%m-%d"), "weekday": t.strftime("%A")}
+
+
+# The date as a reading (the owner's fourth note of the playtests of 70 to 72: the date
+# was deduced, and confused): its words open every sample's first line too
+# (`station_line`), so that no station has to ask.
+REGISTRY.add(
+    Reading(
+        "date",
+        ("the date", "the day", "today", "what day is it", "the date and the time"),
+        "query",
+        "",
+        _date,
+        description="the date in words, the day of the week, the day, the month and the "
+        "year ('Wednesday 12 June 1805'); the ship's time is 'the time'",
+    )
+)
 REGISTRY.add(
     Reading(
         "daylight",
@@ -2439,6 +2470,34 @@ def _stranger_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
     return lookout.stranger(world, float(world.ship.heading), own)
 
 
+def _war(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The war as the ship knows it (the owner's fifth note): the nations' table she sailed
+    with, and every change the news has brought her since, each with where and when it
+    came (`Papers.war_news`), never the world's table as it stands."""
+    nations = getattr(world, "nations", None)
+    papers = getattr(world, "papers", None)
+    if nations is None or papers is None:
+        return None
+    lines = papers.war_lines()
+    return {
+        "words": " ".join(ln.strip() for ln in lines),
+        "sailed_with": nations.sailed_with_words(),
+        "news": [dict(n) for n in papers.war_news],
+    }
+
+
+REGISTRY.add(
+    Reading(
+        "war",
+        ("the war", "the war's state", "who is at war", "the news of the war"),
+        "query",
+        "",
+        _war,
+        description="the war as the ship knows it: the nations' table she sailed with, and "
+        "every change the news has brought her since, each with where and when it came; "
+        "never the world's own table",
+    )
+)
 REGISTRY.add(
     Reading(
         "people",
@@ -3546,6 +3605,9 @@ def station_line(
     state = _line_state(world, person)
     if state:
         tail.append(state)
+    # the date, last (the owner's fourth note): in every sample's first line, so that it is
+    # known and never deduced from the log's stamps
+    tail.append(date_words(world.clock.ship_time))
     return f"{LINE_HEAD}{head}; {'; '.join(tail)}."
 
 
@@ -3563,7 +3625,8 @@ def director_line(world: Any) -> str:
     waits = "you" + (f" and the {', the '.join(others)}" if others else "")
     return (
         f"{LINE_HEAD}the director, above the game; the day's budget {b.samples} of {s} "
-        f"samples and {b.acts} of {a} acts used; the clock waits on {waits}."
+        f"samples and {b.acts} of {a} acts used; the clock waits on {waits}; "
+        f"{date_words(world.clock.ship_time)}."
     )
 
 

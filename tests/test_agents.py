@@ -1878,7 +1878,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # the ship's papers are a topic beside the ship (package 35), listed with their handles;
     # practice and resupply (package 86's fold-in): the gunner's account the eleventh (10
     # before it; 73 added none)
-    assert "  papers: the ship's papers, 11 aboard" in contents and "the manifest" in contents
+    assert "  papers: the ship's papers, 12 aboard" in contents and "the manifest" in contents
 
 
 def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number():
