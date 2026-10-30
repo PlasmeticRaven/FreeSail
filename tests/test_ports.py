@@ -1613,8 +1613,19 @@ def test_the_pilots_deeper_water_is_the_channels_named_from_the_ships_head():
     to larboard" where the entrance lay to starboard): the side of a shoal ahead is the
     channel's, read a mile either side of it and not two cables, and named from the
     ship's head as a pilot speaks. At the owner's place (the save's position as this build
-    replays it, at low water) the deeper water is the road of Aix's, to starboard."""
-    w = _conn_from(OFF_AIX, "rochefort", "biscay-north", datetime(1805, 9, 27, 2, 0), 119.0)
+    replays it) the deeper water is the road of Aix's, to starboard.
+
+    The side is the water's at the height of the tide (package 89): the pilot reads the
+    first sounding ahead that, with the tide over it, wants her 5.13 m. With 2.3 m over the
+    datum (the save's height, low water at 02:00 on the eleven's tide; on Aix's own tide,
+    the block's gauge, 01:00 on the young flood, low water at 23:49) the cable ahead (3.2 m
+    at the datum) is covered and the first wanting water is two cables ahead (2.3 m), the
+    flat's edge, the channel to starboard 6.4 m against the flat's 3.0 to larboard. Between
+    1.9 and 2.6 m of tide it is so; at lower water the cable ahead shoals first and at
+    higher the third, where the two sides read alike within the margin and the tie-break
+    names larboard (at 02:00 on the true water, 3.1 m: "three cables ahead; larboard")."""
+    w = _conn_from(OFF_AIX, "rochefort", "biscay-north", datetime(1805, 9, 27, 1, 0), 119.0)
+    assert w.tide_height_m == pytest.approx(2.31, abs=0.1)  # the save's height of water
     w.submit("steer 119")
     for _ in range(4):
         w.run(60)
@@ -1622,6 +1633,7 @@ def test_the_pilots_deeper_water_is_the_channels_named_from_the_ships_head():
             break
     warned = events(w, "port.pilot_warns")
     assert warned and warned[0].text.endswith("the deeper water is to starboard."), warned
+    assert "two cables ahead" in warned[0].text
 
 
 def test_a_hail_never_asks_a_ship_at_anchor_to_shorten_sail():
