@@ -1,0 +1,49 @@
+# Set a lateen sail: a mizen course cut at the mast, its head laced to the mizen yard abaft
+# the mast and its luff to the mast, or a driver bent in its place with its foot on the boom.
+# Cast off the gaskets and clear away the brails, or let go the brails if it is brailed up in
+# the gear, then haul out the sheet and haul down the tack, which sets it: "haul the mizen
+# out" (Steel 1794 vol. II p. 316). There is no hoist: the yard stands slung at its truss,
+# held by its lifts (Lavery, I32). The sheet is trimmed to the point of sail, 18 to 85 degrees
+# for a sail cut at the mast and 8 to 85 for a whole lateen. Times as for setting a gaff sail
+# (judgement). It is not set on a wrecked boom.
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6, and §16 item 8, §17.2 for the
+# boom's check. The angle is `wanted_sheet`'s, by the class whose trim the sail takes.
+id: set_lateen
+verb: set
+applies_to: {class: lateen}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+  # not sheeted on a parted sheet nor set with its yard's jeers parted (package 31b)
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+  # the driver's foot is spread on its boom, which must stand, as set_gaff's
+  # (docs/design/Design-ShipsEngineExtensions.md §16 item 8, §17.2); the course names no boom
+  - {check: "not wrecked(spar_of_role(sail, boom))", reason: "the {sail}'s boom is wrecked"}
+steps:
+  - do: clear_away
+    duration_s: 60
+    if: sail.state == furled
+    sets: {sail.state: loosed}
+    log: "Cast off the gaskets and cleared away the brails of the {sail}."
+  - do: let_go_brails
+    instead_of: clear_away
+    duration_s: 15
+    if: sail.state == in_the_gear
+    sets: {sail.state: loosed}
+    log: "Let go the brails of the {sail}."
+  - do: haul_out
+    duration_s: 30
+    sets: {sail.state: set, sail.sheet_angle: "wanted_sheet(sail)"}
+on_start: {log: "Hands to the {sail} sheet and tack."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard man the after sail's gear and the topmen of its mast loose it on its
+# yard (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', as
+# set_gaff's); set_gaff's ten (judgement).
+crew: {hands: 10, rating: ordinary, stations: [afterguard, topmen]}
+source: "Steel 1794 vol. II p. 316 (\"haul the mizen out\"); Lavery, I32; set_gaff's times (judgement)"

@@ -153,7 +153,12 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
     """The doctrine a far-detail vessel's captain sails by, by her description and her
     intent (package 43: "a doctrine by nation and role"): a frigate is a King's ship; a
     brig-sloop is a cruiser, and so is a cutter on a station; a letter or the mail is the
-    packet's; a merchant brig, a schooner or a cutter in trade is the merchant's."""
+    packet's; a merchant brig, a schooner or a cutter in trade is the merchant's. A role
+    her scenario gave her (`Vessel.role`, package 75) comes first, whatever the rest say;
+    the sixty-four, the razee and the seventy-four are King's ships as the frigate is."""
+    own = str(getattr(vessel, "role", "") or "")
+    if own:
+        return own  # package 75 (docs/design/Build-Ships.md §8.1): her scenario's `role:`
     key = str(getattr(vessel, "description", "") or "")
     kind = intent.kind if intent is not None else ""
     if kind == "fish":
@@ -167,8 +172,8 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
         # sailed by the cruiser's doctrine (`role_for` had the row, this function had not),
         # and left her convoy to investigate every stranger
         return "commodore"
-    if key == "frigate":
-        return "kings-ship"
+    if key in ("frigate", "sixty-four", "razee", "seventy-four"):
+        return "kings-ship"  # package 75: the new men of war's descriptions with the frigate
     if key == "brig-sloop":
         return "cruiser"
     if key == "cutter" and kind == "station":
@@ -774,6 +779,12 @@ class FarCaptain(Judgement):
         captain.intent_words = self.intent_words
         captain.error = ""  # her World read a free intent's words, and refused them
         captain.role = self.role
+        own = str(getattr(self.vessel, "role", "") or "")
+        if own:
+            # package 75 (Build-Ships.md §8.1): her scenario's role, which her captain takes
+            # again when his intent is changed (`Captain.set_intent`); unset without one, so
+            # that his checkpoint is as before
+            captain.scenario_role = own
         captain.doctrine = self.doctrine
         captain.trend = self.trend
         captain._wind_log = list(self._wind_log)

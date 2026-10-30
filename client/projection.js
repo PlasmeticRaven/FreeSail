@@ -22,7 +22,8 @@
  * Conventions the skeleton relies on (from the ship files, spec section 6):
  *   spar.height_m   above the deck at midships; for a bowsprit-family spar,
  *                   the height of its outer end
- *   spar.x_m        root spars only; a child spar stands at its parent's x
+ *   spar.x_m        root spars only; a child spar stands at its parent's x, but
+ *                   a yard under the bowsprit or the jib-boom at its own (package 75)
  *   brace_angle     radians from square, positive = starboard yardarm forward
  *   sheet_angle     radians from the centreline, unsigned; the sail lies to lee
  *   heel            radians, positive = heeled to starboard
@@ -113,6 +114,68 @@
   var YARD_BEFORE_MAST_OF_BEAM = 0.05;
   var LUG_LEE_OF_MAST_OF_BEAM = 0.03;
   var ON_DECK_M = 0.6;
+  // Package 75 (B5.3; docs/design/Design-ShipsEngineExtensions.md §6.2). A yard under the
+  // bowsprit or the jib-boom (the spritsail yard, the sprit-topsail yard) stands at its own
+  // station, where its file has it. Its braces lead to the fore stay and up to the fore top,
+  // drawn to the fore mast's head less a metre; the spritsail's sheets lead aft along the side
+  // to a sheave abaft the foremost fore shroud (Lavery I30), drawn to the side at the deck this
+  // far abaft the fore mast (judgement).
+  var SPRIT_SHEET_ABAFT_M = 1.0;
+  var FORE_TOP_BELOW_HEAD_M = 1.0;
+  // Package 75 (B5.1; docs/design/Build-Ships.md §6): a hull whose file gives a profile
+  // (`hull.profile`, §5.1: x forward of midships, z above her waterline) is drawn from it, as
+  // herself. Each side is drawn in strips, one polygon between each two neighbouring stations,
+  // so that the views ahead and astern are filled (one polygon a side left about 40% of the
+  // hull unfilled dead ahead, measured in the hull design's scratch); the seams are not drawn,
+  // and an outline strokes the rail, the stem, the low edge and the stern. The stations are the
+  // rail's and the half-breadths' x's with a grid of sixteen between the taffrail and the stem
+  // head, and the points where the stern's and the stem's lines come up out of the cut.
+  var CUT_Z_M = -0.8; // the side's low edge, below the water (today's cut, judgement)
+  var CUT_SHARE = 0.92; // of the water's half-breadth there, without a midship section (today's)
+  var STATION_GRID = 16;
+  var DECK_SHARE = 0.95; // a deck at this share of the rail's half-breadth: inside the bulwark (judgement)
+  // A deck lies inside the side, but a strip of the side near the ends is tall, and its middle
+  // can sort behind a deck it hides (the 64's counter seen on the quarter, by 3 cm, measured):
+  // each deck strip is sorted this much farther than its middle (judgement).
+  var DECK_BEHIND_M = 0.5;
+  // Each deck's strake of ports drawn as a band, from the sill up the port's depth: optional,
+  // kept only if the owner's screenshot check keeps it (§6). No port is drawn: they are 81's.
+  var PORT_BANDS = true;
+  // Package 75 (B5.6; Build-Ships.md §6, the form's drawing): where the graph serves the hull as
+  // drawn (`hull.stations`, freesail/ship/form.py's rule), the strips stand on those stations and
+  // go down to the drawn depth D(x) = max(0.8 m, the water's half-breadth there x tan 20 deg), no
+  // deeper than the hull: so no cut edge rises out of the water below 20 degrees of heel (the
+  // flat cut does at 8.5 degrees on the frigate, measured in the hull design's scratch).
+  var UNDERWATER_HEEL_DEG = 20; // judgement
+  // The hull below the waterline, drawn as the owner chooses on the sheets (§19.1 item 16):
+  // "hidden" by the sea, as in life, so that only what heel lifts out of it shows (proposed);
+  // "faint", seen through the sea; or "solid", a band as the hull was drawn before. `project`
+  // takes another in its options; a hull with no profile is drawn as before whatever it says.
+  var UNDERWATER = "hidden";
+  var UNDERWATER_WAYS = { hidden: 1, faint: 1, solid: 1 };
+  // A quarter gallery is a plain box on each quarter (§5.0 principle 9), standing out from the
+  // side by this much (judgement: about 2 ft 6 in; no source the files hold gives it).
+  var GALLERY_OUT_M = 0.75;
+  // A stern light is a plain dark mark in its bay, this share of the bay's breadth across the
+  // band (judgement: the rest are the pilasters and mullions between). No opening is drawn.
+  var LIGHT_SHARE = 0.6;
+  // The plain shape on the knee of the head (`form.head`), at its top: a figure this share of the
+  // head's height above the water tall and half that deep, a scroll a third of it across, a
+  // billet half of it tall and a quarter deep (judgement; carving is later work).
+  var FIGURE_SHARE = 0.3;
+  // The knee of the head has breadth, its half-siding this much each side of the middle line
+  // (judgement: about a 64's stem's, unread), so that seen ahead or astern it is a strip, not a
+  // hairline; the figure on it stands as broad as it is deep, a scroll or a billet as the knee.
+  var HEAD_SIDING_M = 0.2;
+  // Where a deck ends with another running on under it, a bulkhead closes the space between
+  // them (`deckEndFigures`): not within this of the rail's ends, and only where the deck below
+  // runs on this far each way (judgement), its face drawn through this many heights of the side.
+  var DECK_END_CLEAR_M = 0.5;
+  var DECK_END_LEVELS = 6;
+  // A served station's lowest point lies on the stern's or the stem's line within this (the
+  // stations are served to the millimetre).
+  var ON_LINE_M = 0.002;
+  var ROUND_UP_SAMPLES = 8; // points along each half of a transom's rounded foot
 
   // -- vectors ----------------------------------------------------------------
 
@@ -273,6 +336,7 @@
   function buildSkeleton(graph, snapshot) {
     var hull = graph.hull;
     var deck = hull.deck_height_m || 1.5;
+    var profile = drawnProfile(hull); // package 75: her side, decks and stem, where the file gives them
     var snapSpars = indexBy(snapshot && snapshot.spars, "id");
     var snapSails = indexBy(snapshot && snapshot.sails, "id");
     var snapLines = indexBy(snapshot && snapshot.lines, "id");
@@ -389,6 +453,76 @@
         onDeck: down,
       };
     }
+    /** Package 75 (B5.2; docs/design/Design-ShipsEngineExtensions.md §6.1): a lateen cut at
+     *  the mast (the 64's and the 74's mizen course), its corners [tack, throat, peak, clew]
+     *  swung whole about its mast's raked line, where its luff is laced, by the sheet's angle
+     *  to the sheet's side, as a gaff is (`sheetDirection`); `inPlane`, not swung, as the file
+     *  has it (the fixed frame's rig). The yard's truss is on the mast at the throat's height.
+     *  `mastAt(id)` places a mast. Returns {pts, truss, aft, normal, mast}, aft the swung
+     *  direction of the ship's stern, or null for any other sail. `swungBy`, another sail
+     *  whose sheet swings these corners (B5.5; Ext §17.6: the mizen yard laid on the course's
+     *  corners and swung by the driver's sheet while the driver is bent). */
+    function mastCut(spec, mastAt, inPlane, swungBy) {
+      if (!spec || !spec.cut_at_mast || !spec.corners_m || spec.corners_m.length !== 4) return null;
+      var M = mastAt((spec.roles || {}).mast);
+      if (!M || !M.xAt) return null;
+      var tz = deck + spec.corners_m[1][1];
+      var truss = v(M.xAt(tz), 0, tz);
+      var axis = norm(v(M.xAt(tz + 1) - M.xAt(tz), 0, 1)); // up the mast's raked line
+      var lee = tack === "larboard" ? 1 : -1; // as `sheetDirection`: to starboard on the larboard tack
+      var turn = inPlane ? 0 : -lee * Math.abs(sailDyn(swungBy || spec).sheet_angle || 0);
+      var c = Math.cos(turn), s = Math.sin(turn);
+      function swing(p) {
+        // about the axis through the truss, by `turn` (Rodrigues)
+        return add(add(mul(p, c), mul(cross(axis, p), s)), mul(axis, dot(axis, p) * (1 - c)));
+      }
+      var pts = spec.corners_m.map(function (q) {
+        return add(truss, swing(sub(v(q[0], 0, deck + q[1]), truss)));
+      });
+      return { pts: pts, truss: truss, aft: swing(v(-1, 0, 0)), normal: swing(v(0, 1, 0)), mast: M };
+    }
+    /** The sails cut at the mast whose yard this is, bent or not, in the file's order (package
+     *  75, B5.5; Ext §17.6): the mizen course, and the driver where she carries one. */
+    function cutAtMastOn(yardId) {
+      return (sailsBySpar[yardId] || []).filter(function (s) {
+        return (s.roles || {}).yard === yardId && !!s.cut_at_mast;
+      });
+    }
+    /** A gaff sail filed with its four corners [tack, throat, peak, clew], on a hull drawn from
+     *  her profile (package 75, the razee's spanker, her stage B): the run and the rise of its head
+     *  and the length of its foot, by which its gaff and its sail are drawn as they are filed, in
+     *  place of the fixed peak (GAFF_PEAK_ANGLE) and the whole of its spars; or null. */
+    function gaffCutOn(gaffId) {
+      if (!profile) return null;
+      var sail = (sailsBySpar[gaffId] || []).filter(function (s) {
+        return s.class === "gaff" && s.corners_m && s.corners_m.length === 4;
+      })[0];
+      if (!sail) return null;
+      var c = sail.corners_m;
+      var run = c[1][0] - c[2][0], rise = c[2][1] - c[1][1];
+      return { angle: Math.atan2(rise, run), head: Math.hypot(run, rise), foot: Math.abs(c[0][0] - c[3][0]) };
+    }
+
+    /** Whether a sail cut at the mast is spread on this boom, bent or not (package 75, B5.5;
+     *  Ext §17.6: the driver's boom). */
+    function boomOfCut(sparId) {
+      return (sailsBySpar[sparId] || []).some(function (s) {
+        return !!s.cut_at_mast && (s.roles || {}).boom === sparId;
+      });
+    }
+    /** Whether the boom of a sail cut at the mast is rigged in, on the booms with the driver
+     *  below: served `rigged_out` false, the snapshot's, else the graph's (package 75; Ext
+     *  §17.11, the owner's: the boom out only while the driver is bent, which replaces §17.6's
+     *  "the boom lies amidships"). It is not drawn, nor its sheet, as a spare on the booms is
+     *  not. It is still placed, so that its swing stays in the fixed frame (`fullRigFrame`) and
+     *  the view does not rescale at the shift. A served true, and every other boom, stands as
+     *  it stood: a gaff sail's boom is never rigged in, and the schema refuses it the key. */
+    function boomRiggedIn(sparId) {
+      var spec = sparSpecs[sparId];
+      if (!spec || spec.class !== "boom" || !boomOfCut(sparId)) return false;
+      var s = snapSpars[sparId];
+      return (s && s.rigged_out != null ? s.rigged_out : spec.rigged_out) === false;
+    }
     /** Whether a studding sail boom is rigged out: the snapshot's state (spec 3b §7), else
      *  the ship file's (booms start rigged in), else out while a sail on it is not stowed. */
     function riggedOut(spec) {
@@ -398,11 +532,16 @@
       var sail = (sailsBySpar[spec.id] || [])[0];
       return sail ? !FURLED_ISH[sailDyn(sail).state] : true;
     }
-    /** The sheet angle of the sail using this gaff or boom, if any. */
+    /** The sheet angle of the sail using this gaff or boom, if any: a gaff or sprit sail's, or
+     *  a lateen cut at the mast that is not unbent (package 75, B5.5; Ext §17.6: the driver on
+     *  its boom). With the driver in the sail room its boom has no angle: rigged in it is not
+     *  drawn (`boomRiggedIn`, Ext §17.11), and it lies amidships only for the time it stands out
+     *  with the sail below, from its own phase to the bend and from the unbend to its own phase. */
     function sheetAngleOf(sparId) {
       var list = sailsBySpar[sparId] || [];
       for (var i = 0; i < list.length; i++) {
         if (list[i].class === "gaff" || list[i].class === "sprit") return sailDyn(list[i]).sheet_angle;
+        if (list[i].cut_at_mast && sailDyn(list[i]).state !== "unbent") return sailDyn(list[i]).sheet_angle;
       }
       return 0;
     }
@@ -446,6 +585,11 @@
     })();
     function isUpperMast(spec) {
       return !!(spec && MAST_CLASSES[spec.class] && spec.parent);
+    }
+    /** A yard crossed under the bowsprit or the jib-boom (package 75, B5.3; Ext §6.2): a spar
+     *  of class `yard` whose chain roots at a bowsprit, as `Ship.under_bowsprit` has it. */
+    function underBowsprit(spec) {
+      return !!(spec && spec.class === "yard" && (sparSpecs[chainTop(spec)] || {}).class === "bowsprit");
     }
     /** A topsail over a bare yard the ship file does not carry (the schooner's fore yard,
      *  "a bare spread yard for the topsail's foot; it is not a part here", gen_ships.py):
@@ -504,7 +648,11 @@
           r.rake = spec.rake || 0;
           var slope = -Math.tan(r.rake);
           r.xAt = function (z) { return (spec.x_m || 0) + slope * (z - deck); };
-          r.a = v(r.x, 0, deck);
+          // package 75 (B5.1): with a profile, the foot on the uppermost deck where the rake
+          // line meets it (`deckAt`), the head where the file has it
+          var footZ = profile ? footOnDeck(profile, r.xAt) : null;
+          if (footZ === null) footZ = deck;
+          r.a = v(r.xAt(footZ), 0, footZ);
           r.b = v(r.xAt(deck + H), 0, deck + H);
           r.head = r.b;
           r.foot = r.a;
@@ -529,7 +677,18 @@
           r.x = spec.x_m || 0;
           r.a = v(r.x, 0, deck);
           var dz = Math.min(H, L * 0.95);
-          r.b = v(r.x + Math.sqrt(Math.max(L * L - dz * dz, 0)), 0, deck + dz);
+          // package 75 (B5.1, B5.3; Indf §12.3; the lead's ruling of 2026-10-29): with a
+          // profile, the heel at the stem head, or the rail there if that is lower, and the
+          // whole spar from there, its length rising to its end's height as the file has it,
+          // so that the yards under it hang from a bowsprit that stands where the file has
+          // it; the jib-boom roots at its end. B5.1 drew the heel there and left the end where
+          // a heel on the datum put it, short of the file's length
+          var heel = profile ? stemHead(profile) : null;
+          if (heel) {
+            r.a = v(heel[0], 0, heel[1]);
+            dz = Math.min(Math.max(deck + H - heel[1], 0), L * 0.95);
+          }
+          r.b = v(r.a[0] + Math.sqrt(Math.max(L * L - dz * dz, 0)), 0, r.a[2] + dz);
           r.tip = r.b;
         } else if (HEAD_CLASSES[spec.class]) {
           var rootP = parent && parent.tip ? parent.tip : v(hull.length_waterline_m / 2, 0, deck);
@@ -539,9 +698,59 @@
           r.a = rootP;
           r.b = v(rootP[0] + Math.sqrt(Math.max(L * L - dz2 * dz2, 0)), 0, rootP[2] + dz2);
           r.tip = r.b;
-        } else if (where && spec.class === "lug_yard" && lugCut(sailOnYard(id), resolve)) {
+        } else if (spec.class === "lateen_yard" && mastCut(sailOnYard(id), resolve)) {
+          // package 75 (B5.2; Ext §6.1): the mizen yard of a course cut at the mast, slung at
+          // its truss on the mast at the throat's height, its after part along the sail's head
+          // to the peak, swung with the sail to the sheet's side; its bare fore part on the
+          // same line forward of the mast by the rest of its length, so that it lies to
+          // windward as the after part lies to leeward. Aloft in every state: it is not
+          // lowered to set, take in or furl its sail. The frame takes it in the file's plane
+          // and reaches its swing about the truss (`fullRigFrame`: `pivot` and `reach`) at the
+          // heights of the yard's ends and the sail's foot (`heights`), so that the swung peak
+          // and clew stay inside it when she heels.
+          // B5.5 (Ext §17.6): the yard's line is the course's, the sail cut at the mast with no
+          // boom, bent or not, swung by the sheet of the sail bent on the yard; so the yard does
+          // not move when the driver is shifted for the course. The frame reaches each sail cut
+          // at the mast on it, bent or not: the driver's peak on its driver yard, and its foot
+          // at the boom's height
+          var bentOn = sailOnYard(id);
+          var cuts = cutAtMastOn(id);
+          var lineBy = cuts.filter(function (s) {
+            return !(s.roles || {}).boom;
+          })[0] || bentOn;
+          var mc = mastCut(lineBy, resolve, !where, bentOn) || mastCut(bentOn, resolve, !where);
+          var truss = mc.truss, peakY = mc.pts[2];
+          var headL = len(sub(peakY, truss));
+          var fore = Math.max((spec.length_m || headL) - headL, 0);
+          r.x = truss[0];
+          r.arm = norm(sub(peakY, truss));
+          r.a = sub(truss, mul(r.arm, fore)); // the heel, forward of the mast and to windward
+          r.b = peakY;
+          r.centre = lerp(r.a, r.b, 0.5);
+          r.half = (spec.length_m || headL) / 2;
+          r.normal = mc.normal;
+          r.brace = 0;
+          r.hoist = 1;
+          r.truss = truss;
+          r.cutAtMast = true;
+          r.pivot = truss;
+          r.reach = Math.max(headL, fore);
+          r.heights = [r.a[2], r.b[2], mc.pts[0][2], mc.pts[3][2]]; // heel, peak, tack, clew
+          cuts.forEach(function (s) {
+            var other = s === lineBy ? null : mastCut(s, resolve, true);
+            if (!other) return;
+            r.reach = Math.max(r.reach, len(sub(other.pts[2], truss)));
+            r.heights.push(other.pts[2][2], other.pts[0][2], other.pts[3][2]); // peak, tack, clew
+          });
+        } else if (
+          where &&
+          (spec.class === "lug_yard" || spec.class === "lateen_yard") &&
+          lugCut(sailOnYard(id), resolve)
+        ) {
           // package 57: a lug's yard from its cut, slung a third from its fore end on its
-          // side of the mast, or on deck while its lug is lowered or sent down
+          // side of the mast, or on deck while its lug is lowered or sent down; and so a whole
+          // lateen's yard with its cut (package 75, B5.2; Ext §6.1), as a standing sail on its
+          // lee side, until the package that builds a whole lateen draws it as its own
           var lc = lugCut(sailOnYard(id), resolve);
           var lsp = sailOnYard(id);
           var throatP = lc.pts[1], peakP = lc.pts[2];
@@ -562,7 +771,10 @@
           var lowerM = resolve(chainTop(spec));
           var Ld = spec.length_m || 0;
           r.x = lowerM ? lowerM.x : spec.x_m || 0;
-          r.centre = v(r.x, 0.25 * beamM, deck + ON_DECK_M);
+          // on the drawn deck at the mast where a profile gives one (package 75: a datum
+          // above the waist, as the razee's under D18 (c), would float it over her rail)
+          var onDeck = profile ? deckAt(profile, r.x) : null;
+          r.centre = v(r.x, 0.25 * beamM, (onDeck === null ? deck : onDeck) + ON_DECK_M);
           r.arm = [1, 0, 0];
           r.half = Ld / 2;
           r.a = sub(r.centre, mul(r.arm, r.half));
@@ -603,6 +815,19 @@
             z = lowered + r.hoist * (hoisted - lowered);
           }
           r.x = parent ? (parent.xAt ? parent.xAt(z) : parent.x) : spec.x_m || 0;
+          // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom at its own
+          // station (its file's `x_m`; its spar's x where a file gives none), not at its spar's
+          // heel, where the trial's spritsail hung with its foot under the water (Eng §5); it
+          // neither hoists nor is slung before a mast
+          if (underBowsprit(spec)) {
+            r.x = spec.x_m || r.x;
+            r.everyWay = true; // the frame reaches its swing every way (`fullRigFrame`)
+            // and at the foot of the sail hanging from it, as well as at its slings, so that the
+            // foot stays inside the frame when she heels: on the razee, with no sprit-topsail
+            // yard above it, the spritsail set and braced passed the frame by 2 cm (measured)
+            var hangs = yardBelowId[id] ? null : squareSailOn(id);
+            if (hangs) r.heights = [z, z - hangs.area_m2 / Math.max(HEAD_SPREAD * L, 1)];
+          }
           // package 57: a square yard is slung before its mast (YARD_BEFORE_MAST_OF_BEAM)
           if (spec.class === "yard" && parent && MAST_CLASSES[parent.cls]) r.x += yardBefore;
           r.centre = v(r.x, 0, z);
@@ -621,7 +846,9 @@
           r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
           var gDir = sheetDirection(sheetAngleOf(id), tack);
           r.a = v(r.x, 0, deck + H); // the throat, at the mast
-          r.b = add(r.a, add(mul(gDir, L * Math.cos(GAFF_PEAK_ANGLE)), v(0, 0, L * Math.sin(GAFF_PEAK_ANGLE))));
+          var gCut = gaffCutOn(id);
+          var gPeak = gCut ? gCut.angle : GAFF_PEAK_ANGLE;
+          r.b = add(r.a, add(mul(gDir, L * Math.cos(gPeak)), v(0, 0, L * Math.sin(gPeak))));
           r.dir = gDir;
         } else if (spec.class === "boom") {
           r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
@@ -629,6 +856,14 @@
           r.a = v(r.x, 0, deck + H);
           r.b = add(r.a, mul(bDir, L));
           r.dir = bDir;
+          // package 75 (B5.5; Ext §17.6): a driver's boom reaches far beyond the taffrail, and
+          // swung to the quarter past the frame's four directions: its swing is reached every
+          // way, so that the view does not rescale as it is sheeted or as the driver is shifted:
+          // rigged in as well as out, for it is placed here either way and only its figure goes
+          // (`boomRiggedIn`, Ext §17.11).
+          // So does the razee's spanker boom, as long, 7.4 m past the four directions seen on the
+          // quarter (measured): every boom on a hull drawn from her profile (her stage B)
+          if (boomOfCut(id) || profile) r.everyWay = true;
         } else if (spec.class === "sprit") {
           r.x = parent ? parent.x : spec.x_m || 0;
           var sDir = sheetDirection(sheetAngleOf(id), tack);
@@ -651,6 +886,7 @@
             r.normal = cross(parent.dir, [0, 0, 1]);
             r.pivot = parent.a; // it swings with the boom about the mast
             r.reach = len(sub(parent.b, parent.a)) + L;
+            if (parent.everyWay) r.everyWay = true; // and is reached as its boom is
           } else {
             var ss = sideSign(spec.side);
             var yard = parent && parent.arm ? parent : null;
@@ -799,10 +1035,20 @@
     }
     var lineOf = indexBy(graph.lines, "id");
 
+    /** Where a sheet from forward of the fore mast ends on side `sign`: at the deck, a little
+     *  abaft that mast (SPRIT_SHEET_ABAFT_M), half the beam out, or on a hull drawn from her
+     *  profile on her drawn side there, which is narrower so far forward (package 75, her
+     *  stage B: on the 64 the beam's half stood 1.5 m outboard of her side). */
+    function foreSheetLead(sign) {
+      var x = lowerMasts[0].x - SPRIT_SHEET_ABAFT_M;
+      return v(x, sign * (profile ? drawnSideAt(hull)(x, deck) : beam / 2), deck);
+    }
+
     var figures = [];
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
       if (sentDown(r)) return;
+      if (boomRiggedIn(s.id)) return; // on the booms, as a spare is (Ext §17.11)
       var fig = {
         kind: "spar",
         id: s.id,
@@ -816,9 +1062,56 @@
       if (r.hoist !== undefined) fig.hoist = r.hoist; // a yard: 1 at its hoist, 0 lowered
       if (r.flyingDown) fig.state = "sent_down_flying"; // package 57: on deck with its sail
       if (s.class === "yard" && !r.onDeck) fig.brace = r.brace || 0; // package 57: said in its title
-      if (YARD_CLASSES[s.class] && r.parent && !r.onDeck) {
+      // package 75 (B5.3): a yard under the bowsprit or the jib-boom hangs from no mast, and is
+      // sorted at its own middle; that correction would move it half its spar's run forward
+      if (YARD_CLASSES[s.class] && r.parent && !r.onDeck && !underBowsprit(s)) {
         fig.mastId = r.parent.id; // the painter's correction for the mast's rake (package 57)
         fig.centre = r.centre;
+      }
+      // package 75 (the 64's stage B): a jib-boom with a yard hung under it is sorted at its
+      // heel: the sprit topsail stands forward of the spar all the way up to that yard, and sorted
+      // at the spar's middle the spar was drawn over the sail from ahead, ending in its cloth
+      if (s.class === "jib_boom" && graph.spars.some(function (y) { return y.parent === s.id && underBowsprit(y); })) {
+        fig.sortAt = r.a;
+      }
+      // package 75 (the 64's stage B): the mizen yard reaches far fore and aft of its mast, its
+      // after part up to 8.3 m abaft the mizzen topsail, so as one figure it stood on the wrong
+      // side of that sail either way: from astern the topsail hid the part that carries the
+      // course's head, and from the bow that part crossed the topsail. It is cut at its truss
+      // into two pieces, each sorted at its own middle, as a lower mast's foot is below
+      if (r.cutAtMast) {
+        var foreOfYard = {};
+        Object.keys(fig).forEach(function (key) {
+          foreOfYard[key] = fig[key];
+        });
+        foreOfYard.pts = [r.a, r.truss];
+        foreOfYard.piece = "fore";
+        delete foreOfYard.mastId;
+        delete foreOfYard.centre;
+        foreOfYard.sortAt = lerp(r.a, r.truss, 0.5);
+        figures.push(foreOfYard);
+        fig.pts = [r.truss, r.b];
+        delete fig.mastId;
+        delete fig.centre;
+        fig.sortAt = lerp(r.truss, r.b, 0.5);
+      }
+      // package 75 (B5.6): with a profile, a lower mast's foot, from the deck it stands on up to
+      // the top of the side there, is a piece of its own sorted at its own middle, so that the
+      // near side is drawn over it however the ship heels (one figure, sorted at the middle of
+      // the mast, came nearer than the near side heeled 20 degrees toward the viewer); the rest
+      // is sorted at the whole mast's middle, as the mast was
+      var side = profile && MAST_CLASSES[s.class] && !r.parent ? lineAt(profile.rail_m, r.a[0]) : null;
+      if (side !== null && side > r.a[2] + 1e-6 && side < r.b[2] - 1e-6) {
+        var cut = v(r.xAt(side), 0, side);
+        var foot = {};
+        Object.keys(fig).forEach(function (key) {
+          foot[key] = fig[key];
+        });
+        foot.pts = [r.a, cut];
+        foot.piece = "foot";
+        figures.push(foot);
+        fig.pts = [cut, r.b];
+        fig.sortAt = lerp(r.a, r.b, 0.5);
       }
       figures.push(fig);
     });
@@ -986,22 +1279,25 @@
      *  now; and the depth it is reckoned by for its belly and its festoons, its own between
      *  the yards at their hoists, less the reefs. A sail with no yard below hangs from its
      *  yard as deep as its area over its breadth, less the reefs (a course's reef bands are
-     *  at its head: its foot rises). */
+     *  at its head: its foot rises). A sprit topsail, between two yards under the bowsprit
+     *  (package 75, the 64's stage B; Ext §6.2, risk 9): its depth is the slant between the
+     *  yards, along which the sail lies, not the heights between them. */
     function squareCut(spec, dyn, Y) {
       var L = Y.half * 2;
       var belowId = yardBelowId[Y.id];
       var B = belowId ? spars[belowId] : null;
       var gap = belowId ? (Y.spec.height_m || 0) - (sparSpecs[belowId].height_m || 0) : 0;
       if (B && B.arm && !sentDown(B) && gap > 0.5) {
+        var along = underBowsprit(Y.spec) ? len(sub(Y.centre, B.centre)) : gap;
         var foot = CLEW_SPREAD * B.half * 2;
-        var head = Math.min(Math.max((2 * spec.area_m2) / gap - foot, 0.5 * L), L);
+        var head = Math.min(Math.max((2 * spec.area_m2) / along - foot, 0.5 * L), L);
         // the clews at the yard below's arms; where that yard is lowered further than the
         // sail reaches (a topgallant set over a topsail on the cap), at the sail's own depth
         var reach = Y.centre[2] - gap * reefFraction(spec, dyn);
         var fc = B.centre[2] >= reach - 0.05 ? B.centre : v(B.centre[0], B.centre[1], reach);
         return {
           corners: [sub(Y.centre, mul(Y.arm, head / 2)), add(Y.centre, mul(Y.arm, head / 2)), add(fc, mul(B.arm, foot / 2)), sub(fc, mul(B.arm, foot / 2))],
-          depth: gap * reefFraction(spec, dyn),
+          depth: along * reefFraction(spec, dyn),
           head: head,
           foot: foot,
         };
@@ -1040,7 +1336,61 @@
         return sp ? sentDown(sp) : false;
       });
       if (onDeck) return; // sent down with its spar
-      if (cls === "square" || cls === "lug" || cls === "lateen") {
+      if (cls === "lateen" && spec.cut_at_mast) {
+        // package 75 (B5.2; Ext §6.1): the mizen course cut at the mast, on its corners swung
+        // about the mast (`mastCut`), its luff on the mast and its head along its yard. The
+        // reef raises the foot as a gaff sail's does: the tack up the mast and the clew with
+        // it. Brailed up in the gear, it is gathered to the mast and up under the yard;
+        // furled, a bundle along the yard's after part, aloft (Falconer 1780, YARD).
+        // B5.5 (Ext §17.6): the driver, cut at the mast and spread on its boom, in the same
+        // way: its throat and peak on its corners swung about the mast, the head straight
+        // along the yard's line and on beyond the yard's peak; its tack at the boom's jaws and
+        // its clew along the boom at the file's foot, the boom swung by its sheet as a gaff
+        // sail's is; no reef (Steel names none in the driver). Brailed in the gear as the
+        // course is; furled, a bundle along its head, the yard's after part and the driver yard
+        var mcs = mastCut(spec, function (mid) {
+          return spars[mid];
+        });
+        if (!mcs) return;
+        var mp = mcs.pts; // tack, throat, peak, clew
+        var rfc = reefFraction(spec, dyn);
+        var tackC = lerp(mp[0], mp[1], 1 - rfc);
+        var clewC = add(mp[3], v(0, 0, tackC[2] - mp[0][2]));
+        var BmC = roles.boom ? spars[roles.boom] : null;
+        if (BmC && BmC.dir) {
+          tackC = BmC.a;
+          clewC = add(BmC.a, mul(BmC.dir, Math.min(len(sub(mp[3], mp[0])), len(sub(BmC.b, BmC.a)))));
+        }
+        var luffC = len(sub(mp[1], tackC));
+        var cfig = sailFigure(spec, dyn, [mp[1], mp[2], clewC, tackC], mcs.normal, spars[roles.yard] || mcs.mast, luffC);
+        cfig.mastId = mcs.mast.id;
+        cfig.clewAt = clewC; // where its sheet is drawn from
+        // its luff is laced to the mast (Falconer 1780; Ext §3.4), so it does not belly as a leech
+        // does: drawn it stood a metre off the mast (the 64's course and driver, measured)
+        if (cfig.path.length === 5) cfig.path[4] = [lerp(tackC, mp[1], 0.5), mp[1]];
+        // Steel's driver yard, which "expands the head of the driver without the peek of the
+        // gaff" (Steel 1794 vol. I, OCR l. 20863), is not filed as a spar: it goes aloft with
+        // the sail and comes down with it. Beyond the mizen yard's peak the head is drawn on
+        // it, a spar line drawn with the sail; its inner part lies along the mizen yard and is
+        // drawn as it
+        var Yc = spars[roles.yard];
+        var driverYard = null;
+        if (BmC && Yc && Yc.cutAtMast && len(sub(mp[2], Yc.truss)) > len(sub(Yc.b, Yc.truss))) {
+          driverYard = { kind: "spar", id: spec.id, cls: "driver_yard", of: spec.id, state: "sound", pts: [Yc.b, mp[2]], busy: !!busy[spec.id], mastId: mcs.mast.id, centre: lerp(Yc.b, mp[2], 0.5) };
+        }
+        if (dyn.state === "furled") {
+          cfig.path = bundle(mp[1], mp[2], 0.35);
+        } else if (dyn.state === "in_the_gear") {
+          var upC = lerp(mp[1], mp[0], IN_GEAR_DEPTH); // the foot hauled up the mast
+          var underC = lerp(mp[1], mp[2], IN_GEAR_DEPTH); // and the leech in under the yard
+          cfig.path = [[mp[1]], [lerp(mp[1], underC, 0.5), underC], [add(lerp(underC, upC, 0.5), mul(mcs.aft, 0.8)), upC], [lerp(upC, mp[1], 0.5), mp[1]]];
+          // the clew brailed in with the foot and the leech: on the bundle's after side, the
+          // middle of the curve between them, not where it stood with the sail set
+          cfig.clewAt = add(lerp(underC, upC, 0.5), mul(mcs.aft, 0.4));
+        }
+        figures.push(cfig);
+        if (driverYard) figures.push(driverYard);
+      } else if (cls === "square" || cls === "lug" || cls === "lateen") {
         var Y = spars[roles.yard];
         if (!Y || !Y.arm) return;
         var corners, depth;
@@ -1049,8 +1399,9 @@
           var cut = squareCut(spec, dyn, Y);
           corners = cut.corners;
           depth = cut.depth;
-        } else if (cls === "lug" && spec.corners_m) {
-          // package 57: a lug from its cut, on its side of the mast (`lugCut`)
+        } else if ((cls === "lug" || cls === "lateen") && spec.corners_m) {
+          // package 57: a lug from its cut, on its side of the mast (`lugCut`); and a whole
+          // lateen with its cut (package 75, B5.2; Ext §6.1), as a standing lug on its lee side
           var lcut = lugCut(spec, function (mid) {
             return spars[mid];
           });
@@ -1082,7 +1433,9 @@
           return;
         }
         var sqFig = sailFigure(spec, dyn, corners, Y.normal, Y, depth);
-        sqFig.mastId = Y.parent ? Y.parent.id : null;
+        // sorted against its mast; a sail under the bowsprit or the jib-boom at its own centre
+        // (package 75, B5.3)
+        sqFig.mastId = Y.parent && !underBowsprit(Y.spec) ? Y.parent.id : null;
         figures.push(sqFig);
       } else if (cls === "gaff" || cls === "sprit") {
         var M = spars[roles.mast];
@@ -1096,7 +1449,16 @@
         var raise = luff * (1 - reefFraction(spec, dyn));
         var tackPt = v(M.x, 0, footZ + raise);
         var clew;
-        if (Bm) {
+        var cutG = Bm && Bm.dir && cls === "gaff" ? gaffCutOn(roles.gaff) : null;
+        if (cutG) {
+          // her spanker on its file's cut: its head and foot the file's along the gaff and the
+          // boom, which it does not fill, its tack at the jaws. By the fixed rule it was drawn 215
+          // m2 against the filed 191, its peak 1.6 m farther aft (the razee, measured)
+          var gaffL = len(sub(G.b, G.a));
+          peak = lerp(G.a, G.b, Math.min(cutG.head / gaffL, 1));
+          tackPt = add(Bm.a, v(0, 0, raise));
+          clew = add(add(Bm.a, mul(Bm.dir, Math.min(cutG.foot, len(sub(Bm.b, Bm.a))))), v(0, 0, raise));
+        } else if (Bm) {
           clew = add(Bm.b, v(0, 0, raise));
         } else {
           // loose-footed: the clew from the area, in the plane of the sail
@@ -1109,8 +1471,16 @@
         var cornersG = [throat, peak, clew, tackPt];
         var fig = sailFigure(spec, dyn, cornersG, normalG, Bm || M, luff);
         fig.mastId = M.id;
+        // her spanker's foot is laced along its boom, which clears her taffrail by a centimetre
+        // (the lead's ruling of 2026-10-30): no sag below it, and furled it lies on the boom. By
+        // the rule for the rest the foot hung 0.62 m under the boom and the bundle 0.35 m, through
+        // her taffrail (the razee, measured)
+        if (cutG && DRAWING[dyn.state]) fig.path[3][0] = add(fig.path[3][0], v(0, 0, 2 * FOOT_SAG * luff));
         if (dyn.state === "furled") {
-          fig.path = Bm ? bundle(Bm.a, Bm.b, 0.3 + 0.02 * (Bm.spec.length_m || 0)) : bundle(v(M.x, 0.15, footZ), v(M.x, 0.15, throat[2]), 0.5);
+          var bundleT = 0.3 + 0.02 * (Bm ? Bm.spec.length_m || 0 : 0);
+          fig.path = cutG
+            ? [[Bm.a], [add(lerp(Bm.a, Bm.b, 0.5), v(0, 0, bundleT)), Bm.b], [lerp(Bm.a, Bm.b, 0.5), Bm.a]]
+            : Bm ? bundle(Bm.a, Bm.b, bundleT) : bundle(v(M.x, 0.15, footZ), v(M.x, 0.15, throat[2]), 0.5);
         } else if (dyn.state === "in_the_gear") {
           // brailed in to the mast: a narrow gathered shape along the luff
           var brailW = 0.25;
@@ -1298,17 +1668,56 @@
         var from = ss > 0 ? Y.b : Y.a;
         var m = mastAftOf(Y.x);
         var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : v(Y.x - Y.half * 0.8, (ss * beam) / 2, deck);
+        if (underBowsprit(Y.spec) && lowerMasts.length) {
+          // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom is braced
+          // up to the fore top (Lavery I30), not level aft
+          var foreM = lowerMasts[0];
+          var topZ = foreM.head[2] - FORE_TOP_BELOW_HEAD_M;
+          to = v(foreM.xAt ? foreM.xAt(topZ) : foreM.x, ss * 0.3, topZ);
+        }
         if (state === "parted") to = add(from, v(-1.5, 0, -2.5));
         figures.push({ kind: "line", id: ln.id, cls: "brace", of: ln.of, state: state, pts: [from, to], busy: !!busy[ln.of] });
+      } else if (ln.class === "lift") {
+        // package 75 (B5.1; the owner's answer, Build-Ships.md §19.1 item 7): faint, from the
+        // yard's arm on its side up to the head of the mast it hangs on. A spar with no arms
+        // (a gaff) has none drawn. The mizen yard of a course cut at the mast (B5.2; Ext §6.1)
+        // is held up by its after part, where the sail hangs: its lifts from about the middle
+        // of that part, the starboard one a twentieth of it nearer the peak and the larboard
+        // one a twentieth nearer the mast, so that the pair are not drawn one over the other;
+        // the derrick (its lift with no side) from two-thirds along it toward the peak,
+        // "between the slings and the peak" (Steel 1794 vol. I p. 207; judgement)
+        // A yard under the bowsprit or the jib-boom (B5.3; Ext §6.2) is lifted as every yard is,
+        // up to the head of the spar it hangs on: that spar's end.
+        var Yl = spars[ln.of];
+        var liftedFrom = Yl && Yl.parent ? Yl.parent.head || (underBowsprit(Yl.spec) ? Yl.parent.tip : null) : null;
+        if (!Yl || !Yl.arm || sentDown(Yl) || Yl.onDeck || !liftedFrom) return;
+        var arm = sideSign(ln.side) > 0 ? Yl.b : Yl.a;
+        if (Yl.cutAtMast) {
+          arm = lerp(Yl.truss, Yl.b, ln.side ? 0.5 + 0.05 * sideSign(ln.side) : 2 / 3);
+        }
+        var up = state === "parted" ? add(arm, v(0, 0, -2.5)) : liftedFrom;
+        figures.push({ kind: "line", id: ln.id, cls: "lift", of: ln.of, state: state, pts: [arm, up], busy: !!busy[ln.of] });
       } else if (ln.class === "sheet") {
         var sf = sailFigById[ln.of];
         if (!sf || sf.state === "furled" || !sf.corners) return;
         if (sf.state === "goose_winged" && ln.side === (tack === "starboard" ? "larboard" : "starboard")) return; // the lee clew is up
         var pts;
         var sheetSpec = sailSpecs[ln.of] || {};
-        if (sf.cls === "lug" && sheetSpec.corners_m) {
-          // package 57: a lug's sheet from its clew aft to the lee side; a lug topsail's is
-          // at its lower lug's peak, where its clew is, and is not drawn
+        if (sheetSpec.cut_at_mast) {
+          // package 75 (B5.2; Ext §6.1): the mizen course's one sheet, from its clew (brailed
+          // in with the sail in the gear) to the taffrail on the centreline, where its horse is
+          // (Steel 1794 vol. I p. 208). The driver's (B5.5; Ext §17.6) is rove through its
+          // boom's end, its tackle to the taffrail: drawn from the boom's end, set or in the
+          // gear, and not furled, as every sheet. With its boom rigged in there is no end to reeve
+          // it through (Ext §17.11), which is only the driver bent in the wreck of a boom carried
+          // away on the booms: the engine rigs it out before the bend
+          var BmS = spars[(sheetSpec.roles || {}).boom];
+          if (BmS && boomRiggedIn(BmS.id)) return;
+          pts = [BmS && BmS.dir ? BmS.b : sf.clewAt || sf.corners[2], taffrail(hull)];
+        } else if ((sf.cls === "lug" || sf.cls === "lateen") && sheetSpec.corners_m) {
+          // package 57: a lug's sheet from its clew aft to the lee side, and a whole lateen's
+          // drawn as a lug (package 75); a lug topsail's is at its lower lug's peak, where its
+          // clew is, and is not drawn
           if (sheetSpec.sheeted_to) return;
           var lc2 = sf.corners[2];
           var lugLeeSide = lc2[1] >= 0 ? 1 : -1;
@@ -1319,11 +1728,28 @@
           var clew = s2 > 0 ? sf.corners[2] : sf.corners[3];
           var below = Yy ? yardBelow(Yy) : null;
           var lead = below ? (s2 > 0 ? below.b : below.a) : v(clew[0], (s2 * beam) / 2, deck);
+          if (!below && Yy && underBowsprit(Yy.spec) && lowerMasts.length) {
+            // package 75 (B5.3; Ext §6.2): the spritsail's sheets aft to the side abaft the
+            // fore mast, at the deck (Lavery I30), not abreast the clew forward of the stem; the
+            // sprit topsail's go to the spritsail yard's arms, as every topsail's to the yard below
+            lead = foreSheetLead(s2);
+          }
           pts = [clew, lead];
         } else {
           var clew2 = sf.corners[2];
           var lee = sideSign(ln.side || (tack === "starboard" ? "larboard" : "starboard"));
           pts = [clew2, v(clew2[0] - 2, (lee * beam) / 2, deck)];
+          // package 75 (her stage B): on a hull drawn from her profile the sheet of a sail forward
+          // of the fore mast, whose rule above stopped abreast the knee of the head, in the air,
+          // leads aft to her drawn side abaft the fore mast, as the spritsail's does
+          if (profile && lowerMasts.length && sheetSpec.x_m > lowerMasts[0].x) pts = [clew2, foreSheetLead(lee)];
+          // package 75 (the razee, her stage B): on a hull drawn from her profile the sheet of a
+          // sail on a boom swung about the mast (her spanker's, her ringtail's) is drawn from its
+          // clew to the taffrail on the centreline, as the driver's is (Ext §17.6), not to the
+          // side abaft the clew: that boom overhangs her stern by 9 m, and that lead stood 11 m
+          // abaft her, in the air. It is rove at the boom's end, as the driver's is
+          var boomS = spars[(sheetSpec.roles || {}).boom];
+          if (profile && boomS && boomS.dir) pts = [sheetSpec.class === "gaff" ? boomS.b : clew2, taffrail(hull)];
         }
         if (state === "parted") pts = [pts[0], add(pts[0], v(-1, 0, -2))];
         figures.push({ kind: "line", id: ln.id, cls: "sheet", of: ln.of, state: state, pts: pts, busy: !!busy[ln.of] });
@@ -1378,11 +1804,24 @@
 
   /** The full rig's reach, for the view's fixed scale (spec M3 §9 item 14): every spar in
    *  the ship file, aloft whatever its state now, with each swinging spar's reach about its
-   *  pivot in all four horizontal directions, so that no brace or sheet angle and no spar
-   *  sent down changes it; and the hull. */
+   *  pivot in all four horizontal directions (at each height its swing reaches from, for the
+   *  mizen yard of a course cut at the mast: package 75), so that no brace or sheet angle
+   *  and no spar sent down changes it; and the hull. A yard under the bowsprit (package 75,
+   *  B5.3) stands foremost of the rig, where braced its arm reaches past the four directions
+   *  seen on the bow: its swing is reached every way, by sixteen points about its slings whose
+   *  figure's sides touch the circle its arms sweep, at the height of its slings and of the
+   *  foot of a sail hanging from it. So is a driver's boom about its jaws
+   *  (B5.5), rigged in or out (Ext §17.11, so that the shift does not rescale the view): it
+   *  reaches far beyond the taffrail, and sheeted to the quarter its end reaches
+   *  past the four directions seen on the quarter; and every boom on a hull drawn from her
+   *  profile (the razee's spanker's, her stage B). */
   function fullRigFrame(graph, spars, hull) {
     var pts = [];
     var dirs = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];
+    var everyWay = [];
+    for (var k = 0; k < 16; k++) {
+      everyWay.push(mul([Math.cos((k * Math.PI) / 8), Math.sin((k * Math.PI) / 8), 0], 1 / Math.cos(Math.PI / 16)));
+    }
     graph.spars.forEach(function (s) {
       var r = spars[s.id];
       if (!r) return;
@@ -1391,7 +1830,9 @@
       if (!SWINGING[s.class]) return;
       var pivot, reach;
       if (r.pivot) {
-        pivot = r.pivot; // a studding sail boom: out beyond its yardarm, however braced
+        // a studding sail boom: out beyond its yardarm, however braced; the mizen yard of a
+        // course cut at the mast about its truss (package 75)
+        pivot = r.pivot;
         reach = r.reach;
       } else if (r.centre) {
         pivot = r.centre; // a yard about its slings
@@ -1400,8 +1841,12 @@
         pivot = r.a; // a gaff, boom or sprit about its mast
         reach = len(sub(r.b, r.a));
       }
-      dirs.forEach(function (d) {
-        pts.push(add(pivot, mul(d, reach)));
+      // at the pivot's height, or at each height a swing reaches from (the mizen yard's)
+      (r.heights || [pivot[2]]).forEach(function (z) {
+        var at = v(pivot[0], pivot[1], z);
+        (r.everyWay ? everyWay : dirs).forEach(function (d) {
+          pts.push(add(at, mul(d, reach)));
+        });
       });
     });
     hullFigures(hull).forEach(function (f) {
@@ -1412,8 +1857,13 @@
 
   /** The hull as a lens-shaped deck with sheer and two side faces down to just
    *  below the waterline (the sea covers the rest). From length, beam,
-   *  freeboard and a sheer that rises toward the bow. */
+   *  freeboard and a sheer that rises toward the bow. A hull whose file gives a
+   *  profile is drawn from it instead (package 75): on the stations the graph serves
+   *  (`formHullFigures`, B5.6), or on B5.1's from the profile where it serves none
+   *  (`profileHullFigures`). */
   function hullFigures(hull) {
+    if (servedStations(hull)) return formHullFigures(hull);
+    if (drawnProfile(hull)) return profileHullFigures(hull);
     var L = hull.length_waterline_m;
     var B = hull.beam_m;
     var F = hull.deck_height_m || 1.5;
@@ -1442,6 +1892,1342 @@
       { kind: "hull", part: "side", side: "larboard", pts: larbFace },
       { kind: "hull", part: "transom", pts: transom },
     ];
+  }
+
+  // -- the hull from her profile (package 75, B5.1) --------------------------------------
+
+  /** The hull's profile where the file gives one the drawing can stand on (`rail_m` and
+   *  `breadth_m`, which §5.2 requires of every profile), else null. */
+  function drawnProfile(hull) {
+    var p = hull && hull.profile;
+    return p && p.rail_m && p.rail_m.length && p.breadth_m && p.breadth_m.length ? p : null;
+  }
+
+  /** The value at `x` of a line of [x, value, ...] points, x increasing: straight between two
+   *  points, held at the first and the last beyond them (freesail/ship/profile.py's `interp`).
+   *  `k` picks which of a point's numbers is the value: its second by default. */
+  function lineAt(points, x, k) {
+    k = k || 1;
+    var n = points.length;
+    if (x <= points[0][0]) return points[0][k];
+    if (x >= points[n - 1][0]) return points[n - 1][k];
+    for (var i = 1; i < n; i++) {
+      if (x <= points[i][0]) {
+        var p = points[i - 1], q = points[i];
+        return p[k] + ((q[k] - p[k]) * (x - p[0])) / (q[0] - p[0]);
+      }
+    }
+    return points[n - 1][k];
+  }
+
+  /** Where a line of [x, z] points, z rising (the stem's or the stern's), stands at height z:
+   *  its x, held beyond its ends. */
+  function xAtHeight(line, z) {
+    var n = line.length;
+    if (z <= line[0][1]) return line[0][0];
+    if (z >= line[n - 1][1]) return line[n - 1][0];
+    for (var i = 1; i < n; i++) {
+      if (z <= line[i][1]) {
+        var p = line[i - 1], q = line[i];
+        return q[1] === p[1] ? p[0] : p[0] + ((q[0] - p[0]) * (z - p[1])) / (q[1] - p[1]);
+      }
+    }
+    return line[n - 1][0];
+  }
+
+  /** The lowest height, not below `floor`, at which such a line stands at `x`; null where it
+   *  never does. */
+  function heightAtX(line, x, floor) {
+    for (var i = 1; i < line.length; i++) {
+      var p = line[i - 1], q = line[i];
+      if ((p[0] - x) * (q[0] - x) > 0) continue;
+      var z = q[0] === p[0] ? Math.max(p[1], floor) : p[1] + ((q[1] - p[1]) * (x - p[0])) / (q[0] - p[0]);
+      if (z >= floor - 1e-9 && z <= Math.max(p[1], q[1]) + 1e-9) return Math.max(z, floor);
+    }
+    return null;
+  }
+
+  /** The uppermost deck at `x` (freesail/ship/profile.py's `deck_at`): of the decks whose
+   *  extent holds x, the highest there; beyond every deck's extent, the nearest deck's end,
+   *  held; null, a profile that gives no decks. */
+  function deckAt(profile, x) {
+    var decks = profile.decks_m || {};
+    var words = Object.keys(decks);
+    if (!words.length) return null;
+    var best = null;
+    words.forEach(function (w) {
+      var pts = decks[w];
+      if (pts[0][0] <= x && x <= pts[pts.length - 1][0]) {
+        var z = lineAt(pts, x);
+        if (best === null || z > best) best = z;
+      }
+    });
+    if (best !== null) return best;
+    function gap(pts) {
+      return x < pts[0][0] ? pts[0][0] - x : x - pts[pts.length - 1][0];
+    }
+    var nearest = Infinity;
+    words.forEach(function (w) {
+      nearest = Math.min(nearest, gap(decks[w]));
+    });
+    words.forEach(function (w) {
+      if (gap(decks[w]) !== nearest) return;
+      var z = lineAt(decks[w], x);
+      if (best === null || z > best) best = z;
+    });
+    return best;
+  }
+
+  /** A lower mast's foot on the drawn deck: the height at which its rake line (`xAt`) meets
+   *  the uppermost deck there; null without decks. */
+  function footOnDeck(profile, xAt) {
+    var z = deckAt(profile, xAt(0));
+    if (z === null) return null;
+    for (var k = 0; k < 3; k++) z = deckAt(profile, xAt(z)); // the rake moves it a hair
+    return z;
+  }
+
+  /** The taffrail on the centreline, where a sheet led to the stern is drawn to (package 75,
+   *  B5.2; Ext §6.1): the rail's after end where the file gives a profile, else the stern of
+   *  the hull `hullFigures` draws without one (0.52 of her length abaft midships, at its
+   *  sheer there). */
+  function taffrail(hull) {
+    var p = drawnProfile(hull);
+    if (p) return v(p.rail_m[0][0], 0, p.rail_m[0][1]);
+    var L = hull.length_waterline_m;
+    return v(-L / 2 - 0.02 * L, 0, (hull.deck_height_m || 1.5) * 1.02);
+  }
+
+  /** The stem head, the top of the stem's fore edge (`stem_m`'s last point; the rail's last
+   *  without a stem), as [x, z]: lowered to the rail at its x where that is lower (§6), where
+   *  the bowsprit's heel is drawn. */
+  function stemHead(profile) {
+    var stem = profile.stem_m && profile.stem_m.length ? profile.stem_m : null;
+    var rail = profile.rail_m;
+    var head = stem ? stem[stem.length - 1] : rail[rail.length - 1];
+    return [head[0], Math.min(head[1], lineAt(rail, head[0]))];
+  }
+
+  /**
+   * The hull as her profile draws it (B5.1, §6): the stations aft to forward, each {x, pts},
+   * its points [z, half-breadth] from its low edge up to the top of the side. Pure; the
+   * served `hull.stations` (form.py's rule) take its place at B5.6.
+   *
+   * - The top of the side is `rail_m`; forward of it, where the rail ends abaft the stem head
+   *   (a beakhead bulkhead), the head rule, straight from the rail's end to the stem head.
+   * - The low edge is the cut, CUT_Z_M below the water, but abaft the post and forward of the
+   *   stem, where it is the stern's and the stem's lines, so that the side closes along them:
+   *   the stem on the middle line up to the stem head, the post on it up to the counter's
+   *   knuckle (`form.stern.knuckle_z_m`; the water where the file gives none, form.py's
+   *   default), and above the knuckle the transom's edge.
+   * - The half-breadths are `breadth_m`'s at the water and at the rail, the water's run in to
+   *   nothing at the post and the stem, the rail's to nothing at the stem head and held aft
+   *   (the transom). Below the water the midship section (`section_m`) is scaled by the
+   *   water's half-breadth against its own at the water (judgement); without one, the side
+   *   runs straight to CUT_SHARE of it at the cut.
+   * - Above the water, where the side tumbles home, the section's upper shape is fitted between
+   *   the water's and the rail's half-breadths, its height stretched to the station's top; where
+   *   it flares toward the bow the side runs straight from one to the other, and abaft
+   *   midships it reaches the rail's at the knuckle and stands at it above (judgement: scaled by
+   *   the water's half-breadth alone, as §6 has it, the counter and the bow's upper works were
+   *   pinched to a sliver, the 64's counter 0.26 m from the middle line under a rail 3.51 m out).
+   *   Abaft the post, above the knuckle, the counter stands at the rail's half-breadth
+   *   (judgement: the transom's own half-breadths are B5.6's).
+   */
+  function profileHull(profile) {
+    var rail = profile.rail_m;
+    var br = profile.breadth_m;
+    var stem = profile.stem_m && profile.stem_m.length > 1 ? profile.stem_m : null;
+    var stern = profile.stern_m && profile.stern_m.length > 1 ? profile.stern_m : null;
+    var sec = profile.section_m && profile.section_m.length > 1 ? profile.section_m : null;
+    var sternForm = (profile.form || {}).stern || {};
+    var taffrail = rail[0];
+    var railEnd = rail[rail.length - 1];
+    var head = stem ? stem[stem.length - 1] : railEnd;
+    var headRule = head[0] > railEnd[0] + 1e-6;
+    var xAft = taffrail[0];
+    var xFore = Math.max(head[0], railEnd[0]);
+    var postCut = stern ? xAtHeight(stern, CUT_Z_M) : -Infinity;
+    var postWater = stern ? xAtHeight(stern, 0) : -Infinity;
+    var stemCut = stem ? xAtHeight(stem, CUT_Z_M) : Infinity;
+    var stemWater = stem ? xAtHeight(stem, 0) : Infinity;
+    var knuckle = sternForm.knuckle_z_m != null ? sternForm.knuckle_z_m : stern ? 0 : CUT_Z_M;
+    var b0 = br[0], b1 = br[br.length - 1];
+
+    function topAt(x) {
+      if (headRule && x > railEnd[0]) return railEnd[1] + ((head[1] - railEnd[1]) * (x - railEnd[0])) / (head[0] - railEnd[0]);
+      return lineAt(rail, x);
+    }
+    /** The low edge, and the line it is on: "cut", "post", "transom" or "stem". */
+    function lowAt(x) {
+      var z = null, on = "cut";
+      if (stern && x < postCut) {
+        z = heightAtX(stern, x, CUT_Z_M);
+        on = z !== null && z >= knuckle - 1e-9 ? "transom" : "post";
+      } else if (stem && x > stemCut) {
+        z = heightAtX(stem, x, CUT_Z_M);
+        on = "stem";
+      } else {
+        z = CUT_Z_M;
+      }
+      return { z: z === null ? Infinity : z, on: on };
+    }
+    function waterHB(x) {
+      if (stern && x < b0[0]) return x <= postWater ? 0 : (b0[1] * (x - postWater)) / (b0[0] - postWater);
+      if (stem && x > b1[0]) return x >= stemWater ? 0 : (b1[1] * (stemWater - x)) / (stemWater - b1[0]);
+      return lineAt(br, x, 1);
+    }
+    function railHB(x) {
+      if (stem && x > b1[0]) return x >= xFore ? 0 : (b1[2] * (xFore - x)) / (xFore - b1[0]);
+      return lineAt(br, x, 2);
+    }
+    // the section's upper shape, from the water to the top of the side at midships
+    var s0 = sec ? lineAt(sec, 0) : 0;
+    var zRef = sec ? Math.min(Math.max(topAt(0), 0.1), sec[sec.length - 1][0]) : 0;
+    var sRef = sec ? lineAt(sec, zRef) : 0;
+    var shaped = !!sec && s0 > 0 && Math.abs(sRef - s0) > 1e-6;
+    function sideHB(z, top, w, r, counter) {
+      if (z < 0) return sec && s0 > 0 ? (lineAt(sec, z) * w) / s0 : w * (1 - ((1 - CUT_SHARE) * z) / CUT_Z_M);
+      var t = top > 1e-6 ? Math.min(z / top, 1) : 1;
+      if (shaped && r < w) return w + ((r - w) * (lineAt(sec, t * zRef) - s0)) / (sRef - s0);
+      if (counter) return w + (r - w) * Math.min(z / knuckle, 1);
+      return w + (r - w) * t;
+    }
+
+    function station(x) {
+      var top = topAt(x);
+      var low = lowAt(x);
+      var z0 = Math.min(low.z, top);
+      var w = waterHB(x), r = railHB(x);
+      // abaft midships, where the side flares out to the counter, it reaches the rail's
+      // half-breadth at the knuckle, the counter's foot, and stands at it above (judgement)
+      var counter = x < 0 && r > w && knuckle > 0 && knuckle < top;
+      var zs = [z0, top];
+      if (z0 < 0 && top > 0) zs.push(0);
+      if (counter) zs.push(knuckle);
+      if (sec) {
+        sec.forEach(function (p) {
+          if (p[0] < 0) zs.push(p[0]);
+          else if (p[0] > 0 && p[0] < zRef && shaped && r < w) zs.push((p[0] * top) / zRef);
+        });
+      }
+      zs = zs
+        .filter(function (z) {
+          return z >= z0 && z <= top;
+        })
+        .sort(function (a, b) {
+          return a - b;
+        })
+        .filter(function (z, i, all) {
+          return i === 0 || z - all[i - 1] > 1e-6;
+        });
+      var pts = zs.map(function (z) {
+        if (low.on === "transom") return [z, r]; // the counter, at the rail's half-breadth
+        return [z, sideHB(z, top, w, r, counter)];
+      });
+      if (low.on === "post" || low.on === "stem") pts[0][1] = 0; // on the middle line
+      // at the knuckle the counter's underside closes in to the post: the station there
+      // starts on the middle line, for the strip forward of it (`post`)
+      var post = low.on === "transom" && Math.abs(z0 - knuckle) < 1e-6 && z0 < top;
+      if (post) pts.unshift([z0, 0]);
+      return { x: x, pts: pts, on: z0 < top ? low.on : "end", post: post };
+    }
+
+    var xs = [];
+    rail.forEach(function (p) {
+      xs.push(p[0]);
+    });
+    br.forEach(function (p) {
+      xs.push(p[0]);
+    });
+    for (var k = 0; k <= STATION_GRID; k++) xs.push(xAft + ((xFore - xAft) * k) / STATION_GRID);
+    [stern, stem].forEach(function (line) {
+      (line || []).forEach(function (p) {
+        if (p[1] > CUT_Z_M) xs.push(p[0]);
+      });
+    });
+    if (stern) xs.push(postCut, postWater, xAtHeight(stern, knuckle));
+    if (stem) xs.push(stemCut, stemWater);
+    xs = xs
+      .filter(function (x) {
+        return x >= xAft - 1e-9 && x <= xFore + 1e-9;
+      })
+      .sort(function (a, b) {
+        return a - b;
+      })
+      .filter(function (x, i, all) {
+        return i === 0 || x - all[i - 1] > 1e-4;
+      });
+    return {
+      stations: xs.map(station),
+      station: station,
+      knuckle: knuckle,
+      railEnd: railEnd,
+      head: head,
+      headRule: headRule,
+      railHB: railHB,
+    };
+  }
+
+  /** A station's points on the side: at the knuckle, without its point on the post. */
+  function sidePts(st) {
+    return st.post ? st.pts.slice(1) : st.pts;
+  }
+
+  /** A station's half-breadth at height z on the side, straight between its points, held
+   *  beyond them. */
+  function hbOnStation(st, z) {
+    var pts = sidePts(st);
+    if (z <= pts[0][0]) return pts[0][1];
+    for (var i = 1; i < pts.length; i++) {
+      if (z <= pts[i][0]) {
+        var p = pts[i - 1], q = pts[i];
+        return q[0] === p[0] ? q[1] : p[1] + ((q[1] - p[1]) * (z - p[0])) / (q[0] - p[0]);
+      }
+    }
+    return pts[pts.length - 1][1];
+  }
+
+  /** Whether a deck's ports are cut in the side, so that its strake is drawn as a band: each
+   *  port's middle below the rail at its x. Not where the guns fire over the rail, as the 64's
+   *  forecastle and roundhouse carronades do, their middles 0.3 m above it; a port cut in the
+   *  side may reach the rail (the 64's foremost quarterdeck port, 2 cm over it), and its band
+   *  is held to the top of the side. */
+  function portsInSide(profile, ports, size) {
+    return ports.every(function (p) {
+      return p[1] + size[1] / 2 <= lineAt(profile.rail_m, p[0]);
+    });
+  }
+
+  /** The normal of a face of four points, away from the middle line on its side (`sign`, +1 the
+   *  starboard), or up where `sign` is 0: taken across its diagonals, so that a face cut to a
+   *  triangle keeps it. A figure carrying it as `outward` is seen only from that side of its
+   *  face (`project`): a wale or band on the outside of the side, not through the far bulwark
+   *  seen from inboard; a deck from above. */
+  function faceOut(pts, sign) {
+    var n = cross(sub(pts[2], pts[0]), sub(pts[3], pts[1]));
+    var along = sign ? sign * n[1] : n[2];
+    return along < 0 ? mul(n, -1) : n;
+  }
+
+  /**
+   * The faces across the ship where a deck ends with another running on under it (`part:
+   * bulkhead`, B5.6): the 64's roundhouse front, her quarterdeck's breast and her forecastle's
+   * after end, the razee's breast and forecastle. Each stands at the deck's end, from the deck
+   * below there up to the top of the side, between the drawn side's half-breadths at its
+   * heights (`hbAt`), sorted at its middle: so that the decks beyond it, and the space under the
+   * higher deck, are not seen through where a two-decker has a bulkhead or a breastwork
+   * (judgement: no opening drawn; derived from `decks_m` and `rail_m` alone). A deck's end within
+   * DECK_END_CLEAR_M of the rail's ends, or with no deck running on under it by as much each way,
+   * has none.
+   */
+  function deckEndFigures(profile, topAt, hbAt) {
+    var decks = profile.decks_m || {};
+    var words = Object.keys(decks);
+    var rail = profile.rail_m;
+    var xAft = rail[0][0], xFore = rail[rail.length - 1][0];
+    var figs = [];
+    words.forEach(function (word) {
+      var pts = decks[word];
+      [pts[0][0], pts[pts.length - 1][0]].forEach(function (x) {
+        if (x - xAft < DECK_END_CLEAR_M || xFore - x < DECK_END_CLEAR_M) return;
+        var z = lineAt(pts, x);
+        var below = null;
+        words.forEach(function (other) {
+          var q = decks[other];
+          if (q[0][0] > x - DECK_END_CLEAR_M || q[q.length - 1][0] < x + DECK_END_CLEAR_M) return;
+          var zq = lineAt(q, x);
+          if (zq < z && (below === null || zq > below)) below = zq;
+        });
+        var top = topAt(x);
+        if (below === null || !(top - below > 1e-6)) return;
+        var side = [];
+        for (var k = 0; k <= DECK_END_LEVELS; k++) {
+          var zk = below + ((top - below) * k) / DECK_END_LEVELS;
+          side.push(v(x, hbAt(x, zk), zk));
+        }
+        var face = side.concat(
+          side
+            .slice()
+            .reverse()
+            .map(function (p) {
+              return v(p[0], -p[1], p[2]);
+            })
+        );
+        figs.push({ kind: "hull", part: "bulkhead", deck: word, pts: face, sortAt: centroid(face) });
+      });
+    });
+    return figs;
+  }
+
+  var PROFILE_HULLS = typeof WeakMap === "function" ? new WeakMap() : null; // drawn once a profile
+
+  /**
+   * The hull's figures from her profile (B5.1, §6), in SHIP COORDINATES as `hullFigures`, each
+   * long line cut at the stations so that the painter sorts it piece by piece:
+   * - `deck` strips (class `strip`), each deck of `decks_m` at its own heights and over its
+   *   extent, at DECK_SHARE of the rail's half-breadth (or of the side's at the deck's height,
+   *   where the side flares below the rail), the lowest first, each sorted DECK_BEHIND_M
+   *   farther than its middle and seen only from above (`outward`);
+   * - `bottom` strips across the cut, between the two sides' low edges;
+   * - `side` strips, one polygon a side between each two neighbouring stations from the low
+   *   edge to the top of the side, each sorted at its middle (`sortAt`); on each, a hair nearer
+   *   (the same point, later), the main `wale` and the `band` of each deck's ports, each seen
+   *   only from outboard (`outward`), and the `outline` along its top and its low edge (the cut, the stem, the post, the transom's
+   *   edge), stroked with no fill. One outline a side, sorted at one depth, is painted over by
+   *   its own near strips, or paints the far rail over the near side seen on the bow;
+   * - `transom` strips across the stern, up its line from the counter's knuckle to the
+   *   taffrail, with the outline across the knuckle and the taffrail;
+   * - the `bulkhead`, where the rail ends abaft the stem head: the face across the bow between
+   *   the two sides' tops along the head rule, so that the bow is not hollow seen from ahead;
+   *   and one across the ship where a deck ends with another running on under it
+   *   (`deckEndFigures`).
+   */
+  function profileHullFigures(hull) {
+    var profile = drawnProfile(hull);
+    var kept = PROFILE_HULLS && PROFILE_HULLS.get(profile);
+    if (kept) return kept;
+    var H = profileHull(profile);
+    var st = H.stations;
+    var figs = [];
+    function at(s, sign, p) {
+      return v(s.x, sign * p[1], p[0]);
+    }
+    function low(s) {
+      return s.pts[0];
+    }
+    function top(s) {
+      return s.pts[s.pts.length - 1];
+    }
+    /** A band between two lines of height along a strip, on the drawn side: `zl(x)` and `zu(x)`
+     *  over [x0, x1], cut to the side's low edge and top; null where nothing is left. */
+    function band(a, b, sign, x0, x1, zl, zu) {
+      var xa = Math.max(a.x, x0), xb = Math.min(b.x, x1);
+      if (xb - xa < 1e-6) return null;
+      function edge(x, upper) {
+        var t = b.x > a.x ? (x - a.x) / (b.x - a.x) : 0;
+        var lo = low(a)[0] + (low(b)[0] - low(a)[0]) * t;
+        var hi = top(a)[0] + (top(b)[0] - top(a)[0]) * t;
+        var z = Math.min(Math.max(upper ? zu(x) : zl(x), lo), hi);
+        var hb = hbOnStation(a, z) + (hbOnStation(b, z) - hbOnStation(a, z)) * t;
+        return v(x, sign * hb, z);
+      }
+      var pts = [edge(xa, false), edge(xb, false), edge(xb, true), edge(xa, true)];
+      return pts[3][2] - pts[0][2] > 1e-6 || pts[2][2] - pts[1][2] > 1e-6 ? pts : null;
+    }
+    var wales = profile.wales_m && profile.wales_m.length ? profile.wales_m : null;
+    // a deck's band where its ports are cut in the side (`portsInSide`): not where the guns fire
+    // over it (the 64's forecastle and roundhouse carronades)
+    var portRuns = [];
+    if (PORT_BANDS) {
+      Object.keys(profile.ports_m || {}).forEach(function (word) {
+        var ports = profile.ports_m[word];
+        var size = (profile.port_size_m || {})[word];
+        if (!ports || !ports.length || !size) return;
+        if (portsInSide(profile, ports, size)) portRuns.push({ deck: word, ports: ports, x0: ports[0][0] - size[0] / 2, x1: ports[ports.length - 1][0] + size[0] / 2, depth: size[1] });
+      });
+    }
+
+    // the decks first, the lowest first: at the same depth a higher deck is drawn over a lower
+    // one, and the side over a deck (dead ahead or astern a deck and the strip beside it tie)
+    var decks = profile.decks_m || {};
+    Object.keys(decks)
+      .map(function (word) {
+        var pts = decks[word];
+        var mean = 0;
+        pts.forEach(function (p) {
+          mean += p[1] / pts.length;
+        });
+        return { word: word, pts: pts, mean: mean };
+      })
+      .sort(function (p, q) {
+        return p.mean - q.mean;
+      })
+      .forEach(function (d) {
+        var d0 = d.pts[0][0], d1 = d.pts[d.pts.length - 1][0];
+        function edge(x, sign) {
+          // inside the rail, and inside the side at its own height where the side flares
+          // below the rail toward the ends
+          var z = lineAt(d.pts, x);
+          var hb = Math.min(H.railHB(x), hbOnStation(H.station(x), z));
+          return v(x, sign * DECK_SHARE * hb, z);
+        }
+        for (var j = 0; j + 1 < st.length; j++) {
+          var xa = Math.max(st[j].x, d0), xb = Math.min(st[j + 1].x, d1);
+          if (xb - xa < 1e-6) continue;
+          var plank = [edge(xa, 1), edge(xb, 1), edge(xb, -1), edge(xa, -1)];
+          figs.push({ kind: "hull", part: "deck", cls: "strip", deck: d.word, pts: plank, sortBias: DECK_BEHIND_M, outward: faceOut(plank, 0) });
+        }
+      });
+
+    // the bottom across the cut, between the two sides' low edges, so that a hull heeled away
+    // from the viewer does not show her low decks through it (the drawn depth is B5.6's)
+    for (var c = 0; c + 1 < st.length; c++) {
+      var ca = low(st[c]), cb = low(st[c + 1]);
+      if (ca[0] > CUT_Z_M + 1e-9 || cb[0] > CUT_Z_M + 1e-9) continue;
+      var floor = [at(st[c], 1, ca), at(st[c + 1], 1, cb), at(st[c + 1], -1, cb), at(st[c], -1, ca)];
+      figs.push({ kind: "hull", part: "bottom", cls: "strip", pts: floor });
+    }
+
+    for (var i = 0; i + 1 < st.length; i++) {
+      var a = st[i], b = st[i + 1];
+      var bPts = sidePts(b); // the strip abaft the knuckle's station stands on the side
+      [1, -1].forEach(function (sign) {
+        var side = sign > 0 ? "starboard" : "larboard";
+        var la = at(a, sign, low(a)), ta = at(a, sign, top(a)), lb = at(b, sign, bPts[0]), tb = at(b, sign, top(b));
+        var mid = centroid([la, ta, tb, lb]);
+        var pts = a.pts
+          .map(function (p) {
+            return at(a, sign, p);
+          })
+          .concat(
+            bPts
+              .slice()
+              .reverse()
+              .map(function (p) {
+                return at(b, sign, p);
+              })
+          );
+        figs.push({ kind: "hull", part: "side", side: side, cls: "strip", pts: pts, sortAt: mid });
+        if (wales) {
+          var w = band(a, b, sign, wales[0][0], wales[wales.length - 1][0], function (x) {
+            return lineAt(wales, x, 1);
+          }, function (x) {
+            return lineAt(wales, x, 2);
+          });
+          if (w) figs.push({ kind: "hull", part: "wale", side: side, cls: "strip", pts: w, sortAt: mid, outward: faceOut(w, sign) });
+        }
+        portRuns.forEach(function (run) {
+          var sill = function (x) {
+            return lineAt(run.ports, x, 1);
+          };
+          var p = band(a, b, sign, run.x0, run.x1, sill, function (x) {
+            return sill(x) + run.depth;
+          });
+          if (p) figs.push({ kind: "hull", part: "band", side: side, cls: "strip", deck: run.deck, pts: p, sortAt: mid, outward: faceOut(p, sign) });
+        });
+        figs.push({ kind: "hull", part: "outline", side: side, pts: [ta, tb], sortAt: mid });
+        figs.push({ kind: "hull", part: "outline", side: side, pts: [la, lb], sortAt: mid });
+        // at the knuckle, from the post out to the transom's edge
+        if (a.post) figs.push({ kind: "hull", part: "outline", side: side, pts: [la, at(a, sign, a.pts[1])], sortAt: mid });
+        // the ends' own edges: the stern's or the bow's where a station stands upright there
+        [[i === 0, a], [i + 2 === st.length, b]].forEach(function (end) {
+          if (!end[0] || sidePts(end[1]).length < 2) return;
+          figs.push({
+            kind: "hull",
+            part: "outline",
+            side: side,
+            pts: sidePts(end[1]).map(function (p) {
+              return at(end[1], sign, p);
+            }),
+            sortAt: mid,
+          });
+        });
+      });
+    }
+
+    // the transom: up the stern's line from the knuckle to the taffrail, on the sides' after
+    // edges (the stations whose low edge is the transom's), or the aftmost station's
+    var aft = st.filter(function (s) {
+      return s.on === "transom";
+    });
+    var edgeAft = aft.length
+      ? aft
+          .map(function (s) {
+            return at(s, 1, sidePts(s)[0]);
+          })
+          .reverse()
+      : st[0].pts
+          .filter(function (p) {
+            return p[0] >= H.knuckle - 1e-9;
+          })
+          .map(function (p) {
+            return at(st[0], 1, p);
+          });
+    var stern0 = st[0];
+    var taff = at(stern0, 1, top(stern0));
+    if (!edgeAft.length || len(sub(edgeAft[edgeAft.length - 1], taff)) > 1e-9) edgeAft.push(taff);
+    // in strips across the stern too, each sorted at its own middle on the stern's line, so that
+    // the decks inside are drawn behind it seen from astern
+    function across(p) {
+      return v(p[0], -p[1], p[2]);
+    }
+    for (var e = 0; e + 1 < edgeAft.length; e++) {
+      var p0 = edgeAft[e], p1 = edgeAft[e + 1];
+      var face = [p0, p1, across(p1), across(p0)];
+      var middle = centroid(face);
+      figs.push({ kind: "hull", part: "transom", cls: "strip", pts: face, sortAt: middle });
+      if (e === 0) figs.push({ kind: "hull", part: "outline", pts: [p0, across(p0)], sortAt: middle }); // the knuckle
+      if (e + 2 === edgeAft.length) figs.push({ kind: "hull", part: "outline", pts: [p1, across(p1)], sortAt: middle }); // the taffrail
+    }
+
+    // where a deck ends with another running on under it, the face across the ship between them
+    figs.push.apply(
+      figs,
+      deckEndFigures(
+        profile,
+        function (x) {
+          return top(H.station(x))[0];
+        },
+        function (x, z) {
+          return hbOnStation(H.station(x), z);
+        }
+      )
+    );
+
+    // a profile with no stem ends forward in an upright station: its face closes the bow
+    var foremost = st[st.length - 1];
+    if (foremost.pts.length > 1) {
+      var bow = foremost.pts.map(function (p) {
+        return at(foremost, 1, p);
+      });
+      figs.push({ kind: "hull", part: "bulkhead", pts: bow.concat(bow.slice().reverse().map(across)) });
+    }
+    // the head rule's face across the bow, from the rail's end to the stem head
+    if (H.headRule) {
+      var fore = st.filter(function (s) {
+        return s.x >= H.railEnd[0] - 1e-9;
+      });
+      var cap = fore.map(function (s) {
+        return at(s, 1, top(s));
+      });
+      if (cap.length > 1) {
+        figs.push({
+          kind: "hull",
+          part: "bulkhead",
+          pts: cap.concat(
+            cap
+              .slice()
+              .reverse()
+              .map(function (p) {
+                return v(p[0], -p[1], p[2]);
+              })
+          ),
+        });
+      }
+    }
+    figs.forEach(function (f) {
+      f.sea = true; // below the water as the owner chooses (UNDERWATER)
+    });
+    if (PROFILE_HULLS) PROFILE_HULLS.set(profile, figs);
+    return figs;
+  }
+
+  // -- the hull's form as served (package 75, B5.6) ----------------------------------------
+
+  /** The hull as drawn, served by /api/ship for a file with a profile (`hull.stations`, stage
+   *  0H: freesail/ship/form.py's stations, the stern's closure first and the stem's last, each
+   *  station its [x, z, hb] from its lowest point up to the top of the side), else null. */
+  function servedStations(hull) {
+    var st = hull && hull.stations;
+    return drawnProfile(hull) && st && st.length >= 3 ? st : null;
+  }
+
+  /** The last of a station's points at or below height z, its index; -1 below its lowest. */
+  function belowOn(pts, z) {
+    for (var i = pts.length - 1; i >= 0; i--) if (pts[i][1] <= z) return i;
+    return -1;
+  }
+
+  /** A station's point at height z, [x, z, hb] (x moves up a closure): straight between its
+   *  points, held at its lowest and its highest; where two points stand at one height (a
+   *  transom's foot), the upper from that height up (form.py's `_hb_on`). */
+  function pointOn(pts, z) {
+    var n = pts.length;
+    if (z <= pts[0][1]) return [pts[0][0], z, pts[0][2]];
+    if (z >= pts[n - 1][1]) return [pts[n - 1][0], z, pts[n - 1][2]];
+    var i = belowOn(pts, z);
+    var p = pts[i], q = pts[i + 1];
+    if (q[1] <= p[1]) return [p[0], z, p[2]];
+    var t = (z - p[1]) / (q[1] - p[1]);
+    return [p[0] + (q[0] - p[0]) * t, z, p[2] + (q[2] - p[2]) * t];
+  }
+
+  function samePoint(p, q) {
+    return Math.abs(p[0] - q[0]) < 1e-9 && Math.abs(p[1] - q[1]) < 1e-9 && Math.abs(p[2] - q[2]) < 1e-9;
+  }
+
+  /**
+   * The served stations as the viewer draws them (B5.6, §6), aft to forward, each {pts, x, cut,
+   * low, top}: its points [x, z, hb] low to high, cut at the drawn depth D = max(0.8 m, its
+   * half-breadth at the water x tan UNDERWATER_HEEL_DEG) where it goes deeper, and kept whole
+   * where it does not (no deeper than the hull). The first and the last are the stern's and the
+   * stem's closures, whose x follows their line up (x null); the others stand at one x each.
+   *
+   * The low line runs aft to forward round the hull's lower edge: down the stern's line from
+   * the taffrail to its cut, along the bottom through the stations that reach the cut, and up
+   * the stem's line to the stem head. A station over the counter or along the bow (form.py's
+   * end stations, at the rail's points beyond the others) stands on it where the stern's or the
+   * stem's line crosses its x; each station's `pos` is its lowest point's place on it. Between
+   * two stations the side's low edge is the low line between their places.
+   *
+   * Also: `hbAt(x, z)`, the drawn side's half-breadth (form.py's rule: straight at each height
+   * from station to station and on to the stern's and the stem's lines, nothing outside them
+   * or above the top of the side); `topAt(x)` and `lowAt(x)`, the side's top and low edge.
+   */
+  function formHull(hull) {
+    var tanHeel = Math.tan((UNDERWATER_HEEL_DEG * Math.PI) / 180);
+    var served = servedStations(hull);
+    var all = served.map(function (pts, i) {
+      var top = pts[pts.length - 1];
+      var water = pts[0][1] < 0 && top[1] > 0 ? pointOn(pts, 0)[2] : 0;
+      var floor = -Math.max(-CUT_Z_M, water * tanHeel);
+      var cut = pts[0][1] < floor - 1e-9;
+      var kept = pts;
+      if (cut) {
+        kept = [pointOn(pts, floor)];
+        pts.forEach(function (p) {
+          if (p[1] > floor + 1e-9) kept.push(p);
+        });
+      }
+      var end = i === 0 || i === served.length - 1;
+      return { pts: kept, x: end ? null : pts[0][0], cut: cut, low: kept[0], top: kept[kept.length - 1], depth: -floor };
+    });
+    var aft = all[0], fore = all[all.length - 1];
+    var mid = all.slice(1, -1).filter(function (s) {
+      return s.top[1] - s.low[1] > 1e-6;
+    });
+    var S = [aft].concat(mid, [fore]);
+
+    /** The segment of a closure's line on which a point stands (its index), or -1. */
+    function segmentOn(line, p) {
+      for (var i = 0; i + 1 < line.length; i++) {
+        var a = line[i], b = line[i + 1];
+        if (p[1] < Math.min(a[1], b[1]) - 1e-9 || p[1] > Math.max(a[1], b[1]) + 1e-9) continue;
+        var x = b[1] > a[1] ? a[0] + ((b[0] - a[0]) * (p[1] - a[1])) / (b[1] - a[1]) : a[0];
+        if (Math.abs(x - p[0]) <= ON_LINE_M) return i;
+      }
+      return -1;
+    }
+    var onAft = {}, onFore = {};
+    mid.forEach(function (s) {
+      if (s.cut) return;
+      var j = segmentOn(aft.pts, s.low);
+      if (j >= 0) {
+        s.on = "aft";
+        (onAft[j] = onAft[j] || []).push(s);
+        return;
+      }
+      j = segmentOn(fore.pts, s.low);
+      if (j >= 0) {
+        s.on = "fore";
+        (onFore[j] = onFore[j] || []).push(s);
+      }
+    });
+    var L = [];
+    function place(s) {
+      if (L.length && samePoint(L[L.length - 1], s.low)) s.pos = L.length - 1;
+      else {
+        s.pos = L.length;
+        L.push(s.low);
+      }
+    }
+    function pushLine(p) {
+      if (!L.length || !samePoint(L[L.length - 1], p)) L.push(p);
+    }
+    // down the stern's line, the stations over the counter in their places on it
+    for (var k = aft.pts.length - 1; k >= 0; k--) {
+      pushLine(aft.pts[k]);
+      if (k > 0) {
+        (onAft[k - 1] || [])
+          .sort(function (p, q) {
+            return q.low[1] - p.low[1];
+          })
+          .forEach(place);
+      }
+    }
+    var bottomFrom = L.length - 1;
+    mid.forEach(function (s) {
+      if (!s.on) place(s);
+    });
+    var bottomTo = L.length;
+    // up the stem's line, the stations along the bow in their places on it
+    for (k = 0; k < fore.pts.length; k++) {
+      pushLine(fore.pts[k]);
+      (onFore[k] || [])
+        .sort(function (p, q) {
+          return p.low[1] - q.low[1];
+        })
+        .forEach(place);
+    }
+    aft.pos = 0;
+    fore.pos = L.length - 1;
+
+    var tops = S.map(function (s) {
+      return [s.top[0], s.top[1]];
+    });
+    function topAt(x) {
+      return lineAt(tops, x);
+    }
+    function lowAt(x) {
+      var best = Infinity;
+      for (var i = 1; i < L.length; i++) {
+        var p = L[i - 1], q = L[i];
+        if ((p[0] - x) * (q[0] - x) > 0) continue;
+        var z = q[0] === p[0] ? Math.min(p[1], q[1]) : p[1] + ((q[1] - p[1]) * (x - p[0])) / (q[0] - p[0]);
+        best = Math.min(best, z);
+      }
+      return best;
+    }
+    function hbAt(x, z) {
+      if (z > topAt(x) + 1e-6 || z < lowAt(x) - 1e-6) return 0;
+      // the side at height z, aft to forward: the stern's line, each station that stands there
+      // (held at its top where the top of the side rises between it and the next), the stem's
+      var line = [];
+      function add(s, closure) {
+        if (z < s.low[1] - 1e-9 || (closure && z > s.top[1] + 1e-9)) return;
+        var p = pointOn(s.pts, Math.min(z, s.top[1]));
+        var px = closure ? p[0] : s.x;
+        if (!line.length || px > line[line.length - 1][0] + 1e-9) line.push([px, p[2]]);
+      }
+      add(aft, true);
+      mid.forEach(function (s) {
+        add(s, false);
+      });
+      add(fore, true);
+      if (!line.length || x < line[0][0] - 1e-9 || x > line[line.length - 1][0] + 1e-9) return 0;
+      return lineAt(line, x);
+    }
+    return { stations: S, aft: aft, fore: fore, mid: mid, low: L, bottom: [bottomFrom, bottomTo], hbAt: hbAt, topAt: topAt, lowAt: lowAt };
+  }
+
+  var FORM_HULLS = typeof WeakMap === "function" ? new WeakMap() : null; // drawn once a graph
+  var DRAWN_SIDES = typeof WeakMap === "function" ? new WeakMap() : null; // reckoned once a profile
+
+  /** Her drawn side's half-breadth, (x, z) => metres, on a hull drawn from its profile. */
+  function drawnSideAt(hull) {
+    var profile = drawnProfile(hull);
+    var kept = DRAWN_SIDES && DRAWN_SIDES.get(profile);
+    if (kept) return kept;
+    var hb;
+    if (servedStations(hull)) {
+      hb = formHull(hull).hbAt;
+    } else {
+      var H = profileHull(profile);
+      hb = function (x, z) {
+        return hbOnStation(H.station(x), z);
+      };
+    }
+    if (DRAWN_SIDES) DRAWN_SIDES.set(profile, hb);
+    return hb;
+  }
+
+  /**
+   * The hull's figures on the served stations (B5.6, §6), in SHIP COORDINATES as `hullFigures`,
+   * each marked `sea` (drawn below the water as UNDERWATER has it):
+   * - `side` strips, one polygon a side between each two neighbouring stations, from the low
+   *   line to the top of the side, each sorted at its middle; on each, a hair nearer (its middle,
+   *   later), the main `wale`, the channel wale (`wale`, class `channel`) and the `band` of
+   *   each deck's ports, each seen only from outboard (`outward`, so not on the far bulwark's
+   *   inside seen over the near side); and the `outline` along its top and its stretch of the low
+   *   line;
+   * - `bottom` strips across the low line where it runs along the bottom;
+   * - `deck` strips, each deck at DECK_SHARE of the drawn side's half-breadth at its height, each
+   *   seen only from above;
+   * - a `bulkhead` across the ship where a deck ends with another running on under it
+   *   (`deckEndFigures`);
+   * - the stern by `form.stern.type`: square or raked, the `transom` from its knuckle at its
+   *   edges, its foot rounded up by `round_up_m` to the middle line, up the stern's line to the
+   *   taffrail at `transom_hb_m`; round, none, the strips closing to the middle line;
+   * - each band of `lights_m`, n plain dark marks (`light`) spread within its half-breadth across
+   *   the transom or the drawn face of a round stern; no opening (the ports are package 81's);
+   * - each tier of `galleries_m`, a plain box (`gallery`) on each quarter at its extent and
+   *   heights, standing GALLERY_OUT_M out from the side;
+   * - `head`: the knee between `head_m` and the stem, HEAD_SIDING_M each side of the middle line,
+   *   from the drawn depth to the head's top and back to the stem head, with a plain shape (class
+   *   `figure`, `scroll` or `billet`) at its top as `form.head` says;
+   * - the `bulkhead` across the bow under the head rule, where the rail ends abaft the stem head.
+   */
+  function formHullFigures(hull) {
+    var served = servedStations(hull);
+    var kept = FORM_HULLS && FORM_HULLS.get(served);
+    if (kept) return kept;
+    var profile = drawnProfile(hull);
+    var H = formHull(hull);
+    var S = H.stations, L = H.low;
+    var figs = [];
+    function at(p, sign) {
+      return v(p[0], sign * p[2], p[1]);
+    }
+    function across(p) {
+      return v(p[0], -p[1], p[2]);
+    }
+    function between(lo, hi, z) {
+      return Math.min(Math.max(z, lo), hi);
+    }
+
+    // the decks first, the lowest first: at the same depth a higher deck is drawn over a lower
+    // one, and the side over a deck
+    var decks = profile.decks_m || {};
+    Object.keys(decks)
+      .map(function (word) {
+        var pts = decks[word];
+        var mean = 0;
+        pts.forEach(function (p) {
+          mean += p[1] / pts.length;
+        });
+        return { word: word, pts: pts, mean: mean };
+      })
+      .sort(function (p, q) {
+        return p.mean - q.mean;
+      })
+      .forEach(function (d) {
+        var d0 = d.pts[0][0], d1 = d.pts[d.pts.length - 1][0];
+        var xs = d.pts.map(function (p) {
+          return p[0];
+        });
+        H.mid.forEach(function (s) {
+          if (s.x > d0 && s.x < d1) xs.push(s.x);
+        });
+        xs.sort(function (a, b) {
+          return a - b;
+        });
+        function edge(x, sign) {
+          var z = lineAt(d.pts, x);
+          return v(x, sign * DECK_SHARE * H.hbAt(x, z), z);
+        }
+        for (var j = 0; j + 1 < xs.length; j++) {
+          var xa = xs[j], xb = xs[j + 1];
+          if (xb - xa < 1e-6) continue;
+          var plank = [edge(xa, 1), edge(xb, 1), edge(xb, -1), edge(xa, -1)];
+          figs.push({ kind: "hull", part: "deck", cls: "strip", deck: d.word, pts: plank, sortBias: DECK_BEHIND_M, outward: faceOut(plank, 0) });
+        }
+      });
+
+    // the bottom along the low line where it runs from the stern's cut to the stem's
+    for (var c = H.bottom[0]; c < H.bottom[1]; c++) {
+      var ca = L[c], cb = L[c + 1];
+      figs.push({ kind: "hull", part: "bottom", cls: "strip", pts: [at(ca, 1), at(cb, 1), at(cb, -1), at(ca, -1)] });
+    }
+
+    // the bands on the side: the main wale, the channel wale, and each deck's strake of ports
+    // where they are cut in the side below the rail (not where the guns fire over it)
+    var bands = [];
+    [["wales_m", ""], ["channel_wales_m", "channel"]].forEach(function (w) {
+      var line = profile[w[0]];
+      if (!line || !line.length) return;
+      bands.push({
+        part: "wale",
+        cls: w[1] ? "strip " + w[1] : "strip",
+        x0: line[0][0],
+        x1: line[line.length - 1][0],
+        zl: function (x) {
+          return lineAt(line, x, 1);
+        },
+        zu: function (x) {
+          return lineAt(line, x, 2);
+        },
+      });
+    });
+    if (PORT_BANDS) {
+      Object.keys(profile.ports_m || {}).forEach(function (word) {
+        var ports = profile.ports_m[word];
+        var size = (profile.port_size_m || {})[word];
+        if (!ports || !ports.length || !size || !portsInSide(profile, ports, size)) return;
+        bands.push({
+          part: "band",
+          cls: "strip",
+          deck: word,
+          x0: ports[0][0] - size[0] / 2,
+          x1: ports[ports.length - 1][0] + size[0] / 2,
+          zl: function (x) {
+            return lineAt(ports, x, 1);
+          },
+          zu: function (x) {
+            return lineAt(ports, x, 1) + size[1];
+          },
+        });
+      });
+    }
+    /** A band over one strip, [xa, xb] cut to its extent and, beside a closure, to where the
+     *  stern's or the stem's line stands at its heights; its edges on the drawn side, within
+     *  the side's low edge and top. Null where nothing is left. */
+    function bandOn(A, B, sign, b) {
+      var xa = Math.max(A === H.aft ? -Infinity : A.x, b.x0);
+      var xb = Math.min(B === H.fore ? Infinity : B.x, b.x1);
+      if (A === H.aft) xa = Math.max(xa, pointOn(A.pts, b.zl(xa))[0], pointOn(A.pts, b.zu(xa))[0]);
+      if (B === H.fore) xb = Math.min(xb, pointOn(B.pts, b.zl(xb))[0], pointOn(B.pts, b.zu(xb))[0]);
+      if (xb - xa < 1e-6) return null;
+      function edge(x, upper) {
+        var z = between(H.lowAt(x), H.topAt(x), upper ? b.zu(x) : b.zl(x));
+        return v(x, sign * H.hbAt(x, z), z);
+      }
+      var pts = [edge(xa, false), edge(xb, false), edge(xb, true), edge(xa, true)];
+      return pts[3][2] - pts[0][2] > 1e-6 || pts[2][2] - pts[1][2] > 1e-6 ? pts : null;
+    }
+
+    // the side, strip by strip: up the after station, down the forward one, and back along the
+    // low line between their places on it (the stern's or the stem's line beside a closure)
+    var stripOf = { starboard: [], larboard: [] };
+    for (var i = 0; i + 1 < S.length; i++) {
+      var A = S[i], B = S[i + 1];
+      if (A === H.aft && B === H.fore) continue;
+      var ring = [];
+      var k;
+      if (A === H.aft) {
+        for (k = B.pos; k >= 0; k--) ring.push(L[k]);
+        for (k = B.pts.length - 1; k >= 1; k--) ring.push(B.pts[k]);
+      } else {
+        A.pts.forEach(function (p) {
+          ring.push(p);
+        });
+        if (B === H.fore) for (k = L.length - 1; k > A.pos; k--) ring.push(L[k]);
+        else {
+          for (k = B.pts.length - 1; k >= 0; k--) ring.push(B.pts[k]);
+          for (k = B.pos - 1; k > A.pos; k--) ring.push(L[k]);
+        }
+      }
+      var lowPath = L.slice(A.pos, B.pos + 1);
+      [1, -1].forEach(function (sign) {
+        var side = sign > 0 ? "starboard" : "larboard";
+        var pts = ring.map(function (p) {
+          return at(p, sign);
+        });
+        var mid = centroid(pts);
+        var strip = { kind: "hull", part: "side", side: side, cls: "strip", pts: pts, sortAt: mid };
+        figs.push(strip);
+        stripOf[side].push({ A: A, B: B, fig: strip });
+        bands.forEach(function (b) {
+          var p = bandOn(A, B, sign, b);
+          if (p) figs.push({ kind: "hull", part: b.part, side: side, cls: b.cls, deck: b.deck, pts: p, sortAt: mid, outward: faceOut(p, sign) });
+        });
+        figs.push({ kind: "hull", part: "outline", side: side, pts: [at(A.top, sign), at(B.top, sign)], sortAt: mid });
+        figs.push({
+          kind: "hull",
+          part: "outline",
+          side: side,
+          pts: lowPath.map(function (p) {
+            return at(p, sign);
+          }),
+          sortAt: mid,
+        });
+      });
+    }
+
+    var stern = (profile.form || {}).stern || null;
+    var face = stern && stern.type !== "round" && stern.transom_hb_m ? transomFigures(H.aft, stern) : null;
+    if (face) figs.push.apply(figs, face.figs);
+    if (stern) figs.push.apply(figs, lightFigures(H, stern, face, stripOf));
+    if (stern) figs.push.apply(figs, galleryFigures(H, stern));
+    figs.push.apply(figs, headFigures(H, profile));
+    figs.push.apply(figs, deckEndFigures(profile, H.topAt, H.hbAt));
+
+    // the head rule's face across the bow, from the rail's end to the stem head, so that the bow
+    // is not hollow seen from ahead (B5.1's bulkhead)
+    var railEnd = profile.rail_m[profile.rail_m.length - 1];
+    if (H.fore.top[0] > railEnd[0] + 1e-6) {
+      var cap = S.filter(function (s) {
+        return s.top[0] >= railEnd[0] - 1e-9;
+      }).map(function (s) {
+        return at(s.top, 1);
+      });
+      if (cap.length > 1) figs.push({ kind: "hull", part: "bulkhead", pts: cap.concat(cap.slice().reverse().map(across)) });
+    }
+    figs.forEach(function (f) {
+      f.sea = true;
+    });
+    if (FORM_HULLS) FORM_HULLS.set(served, figs);
+    return figs;
+  }
+
+  /**
+   * A square or raked stern's transom (B5.6): the face across the stern between the two sides'
+   * edges on the stern's line, from its foot to the taffrail, in strips at the line's points
+   * and at each band of lights' heights, each sorted at its middle. Its foot at its edges is the
+   * knuckle (`knuckle_z_m`), where the served stern's line closes to the transom's half-breadth
+   * (`transom_hb_m`'s second); from there it is rounded up `round_up_m` to the middle line, as a
+   * beam rounds up (the 64's wing transom, 4 in higher at the middle line than at its ends, on
+   * her body plan), an arch on the stern's line at its heights. Under the arch, the tuck, the
+   * planking's end below the wing transom, is drawn as the side (class `tuck`), so that the
+   * stern is not open there. Its top the taffrail across `transom_hb_m`'s first. The outline
+   * along its foot and across its top. Returns {figs, strips (each {z0, z1, fig}), on (the edge
+   * at a height)}, or null.
+   */
+  function transomFigures(aft, stern) {
+    var pts = aft.pts;
+    var first = -1;
+    for (var i = 0; i < pts.length; i++) {
+      if (pts[i][2] > 1e-9) {
+        first = i;
+        break;
+      }
+    }
+    if (first < 0) return null;
+    var edge = pts.slice(first); // the transom's edge, its foot up to the taffrail
+    var zk = edge[0][1], top = edge[edge.length - 1][1];
+    if (top - zk < 1e-6) return null;
+    var rise = Math.min(Math.max(stern.round_up_m || 0, 0), top - zk);
+    function on(z) {
+      return pointOn(edge, z);
+    }
+    var lights = (stern.lights_m || []).map(function (b) {
+      return [b[0], b[1]];
+    });
+    var inside = function (z) {
+      return lights.some(function (b) {
+        return z > b[0] + 1e-9 && z < b[1] - 1e-9;
+      });
+    };
+    // the levels above the arch's crown: the lowest strip runs from the arch up to the first
+    var crown = zk + rise;
+    var zs = [zk, top];
+    edge.forEach(function (p) {
+      if (p[1] > crown && p[1] < top && !inside(p[1])) zs.push(p[1]);
+    });
+    lights.forEach(function (b) {
+      b.forEach(function (z) {
+        if (z > crown && z < top) zs.push(z);
+      });
+    });
+    zs = zs
+      .sort(function (a, b) {
+        return a - b;
+      })
+      .filter(function (z, j, all) {
+        return j === 0 || z - all[j - 1] > 1e-6;
+      });
+    var figs = [], strips = [];
+    function corner(z, sign) {
+      var p = on(z);
+      return v(p[0], sign * p[2], z);
+    }
+    // the foot, an arch from the knuckle at the edges up to its crown at the middle line
+    var half = on(zk)[2];
+    var foot = [];
+    for (var j = -ROUND_UP_SAMPLES; j <= ROUND_UP_SAMPLES; j++) {
+      var t = j / ROUND_UP_SAMPLES;
+      var z = zk + rise * (1 - t * t);
+      foot.push(v(on(z)[0], half * t, z));
+    }
+    for (var e = 0; e + 1 < zs.length; e++) {
+      var lower = e === 0 && rise > 1e-6 ? foot : [corner(zs[e], -1), corner(zs[e], 1)];
+      var quad = lower.concat([corner(zs[e + 1], 1), corner(zs[e + 1], -1)]);
+      var middle = centroid([corner(zs[e], -1), corner(zs[e], 1), corner(zs[e + 1], 1), corner(zs[e + 1], -1)]);
+      var strip = { kind: "hull", part: "transom", cls: "strip", pts: quad, sortAt: middle };
+      figs.push(strip);
+      strips.push({ z0: zs[e], z1: zs[e + 1], fig: strip });
+      // under the arch, the tuck, sorted with the strip above it
+      if (e === 0 && rise > 1e-6) figs.push({ kind: "hull", part: "transom", cls: "strip tuck", pts: foot, sortAt: middle });
+    }
+    var low = strips[0].fig.sortAt, high = strips[strips.length - 1].fig.sortAt;
+    figs.push({ kind: "hull", part: "outline", pts: foot, sortAt: low }); // the knuckle
+    figs.push({ kind: "hull", part: "outline", pts: [corner(top, -1), corner(top, 1)], sortAt: high }); // the taffrail
+    return { figs: figs, strips: strips, on: on };
+  }
+
+  /**
+   * Each band of `lights_m` (B5.6; §5.0 principle 9): n plain dark marks across the stern's face
+   * in n even bays within ±hb, each LIGHT_SHARE of its bay across, from the band's low z to its
+   * high: on the transom (on its strip there, and sorted with it), cut to the transom's foot and
+   * top, or on the drawn face of a round stern (the side at that half-breadth and height, sorted
+   * with the side's strip there).
+   */
+  function lightFigures(H, stern, face, stripOf) {
+    var figs = [];
+    (stern.lights_m || []).forEach(function (band, b) {
+      var zl = band[0], zh = band[1], n = Math.round(band[2]), hb = band[3];
+      if (face) {
+        // on the transom and nowhere above or below it: the razee's band, filed above her
+        // taffrail (her short roundhouse not yet in her profile), is cut to it
+        zl = Math.max(zl, face.strips[0].z0);
+        zh = Math.min(zh, face.strips[face.strips.length - 1].z1);
+      }
+      if (!(n >= 1) || !(hb > 0) || !(zh > zl + 1e-6)) return;
+      var bay = (2 * hb) / n;
+      var host = null;
+      if (face) {
+        var zm = 0.5 * (zl + zh);
+        face.strips.forEach(function (s) {
+          if (zm >= s.z0 - 1e-9 && zm <= s.z1 + 1e-9 && !host) host = s.fig;
+        });
+        if (!host) host = face.strips[zm < face.strips[0].z0 ? 0 : face.strips.length - 1].fig;
+      }
+      var xl = face ? face.on(zl)[0] : 0, xh = face ? face.on(zh)[0] : 0;
+      for (var i = 0; i < n; i++) {
+        var yc = -hb + bay * (i + 0.5);
+        var y0 = yc - (LIGHT_SHARE * bay) / 2, y1 = yc + (LIGHT_SHARE * bay) / 2;
+        // each seen only from abaft its face (`outward`): aft and down the transom's rake, or
+        // out round a round stern
+        var mark = { kind: "hull", part: "light", band: b };
+        if (face) {
+          mark.pts = [v(xl, y0, zl), v(xl, y1, zl), v(xh, y1, zh), v(xh, y0, zh)];
+          mark.sortAt = host.sortAt;
+          mark.outward = v(-1, 0, (xh - xl) / (zh - zl));
+        } else {
+          mark.pts = [roundFace(H, y0, zl), roundFace(H, y1, zl), roundFace(H, y1, zh), roundFace(H, y0, zh)];
+          if (mark.pts.indexOf(null) >= 0) continue;
+          mark.sortAt = roundHost(stripOf, yc, centroid(mark.pts));
+          mark.outward = v(-1, yc / hb, 0);
+        }
+        figs.push(mark);
+      }
+    });
+    return figs;
+  }
+
+  /** On a round stern, the drawn side's point at half-breadth |y| and height z, nearest the
+   *  stern: where the side, straight at that height from the stern's line forward station by
+   *  station, first reaches |y|; null where it never does. */
+  function roundFace(H, y, z) {
+    var want = Math.abs(y);
+    var prev = null;
+    var line = [H.aft].concat(H.mid);
+    for (var i = 0; i < line.length; i++) {
+      var s = line[i];
+      if (z < s.low[1] - 1e-9 || z > s.top[1] + 1e-9) continue;
+      var p = pointOn(s.pts, z);
+      var here = [s.x === null ? p[0] : s.x, p[2]];
+      if (prev && here[1] >= want && prev[1] <= want) {
+        var t = here[1] > prev[1] ? (want - prev[1]) / (here[1] - prev[1]) : 0;
+        return v(prev[0] + (here[0] - prev[0]) * t, y, z);
+      }
+      if (!prev && here[1] >= want) return v(here[0], y, z);
+      prev = here;
+    }
+    return null;
+  }
+
+  /** The side strip a mark on a round stern lies on (its side by y, its strip by x), whose sort
+   *  point it takes; its own middle where there is none. */
+  function roundHost(stripOf, y, mid) {
+    var list = stripOf[y >= 0 ? "starboard" : "larboard"];
+    for (var i = 0; i < list.length; i++) {
+      var A = list[i].A, B = list[i].B;
+      var x0 = A.x === null ? -Infinity : A.x, x1 = B.x === null ? Infinity : B.x;
+      if (mid[0] >= x0 && mid[0] <= x1) return list[i].fig.sortAt;
+    }
+    return mid;
+  }
+
+  /**
+   * Each tier of `galleries_m` (B5.6; §5.0 principle 9): a plain box on each quarter at its
+   * extent [x_aft, x_fore] and heights [z_low, z_high], its inner edges on the drawn side, its
+   * outer face GALLERY_OUT_M beyond the side's widest there; five faces a side, each sorted at
+   * its own middle. No opening. A gallery hangs on the side: a tier is cut to the top of the side
+   * over its extent and to the stern's line at its heights (the razee's, filed above and abaft
+   * her taffrail, her short roundhouse not yet in her profile).
+   */
+  function galleryFigures(H, stern) {
+    var figs = [];
+    /** The side's half-breadth at x, at z or at the top of the side where z stands above it; the
+     *  stern's line's at z abaft it. */
+    function inner(x, z) {
+      var hb = H.hbAt(x, Math.min(Math.max(z, H.lowAt(x)), H.topAt(x)));
+      return hb > 0 ? hb : pointOn(H.aft.pts, z)[2];
+    }
+    (stern.galleries_m || []).forEach(function (tier, t) {
+      var x0 = tier[0], x1 = tier[1], zl = tier[2], zh = tier[3];
+      var tops = [x0, x1];
+      H.mid.forEach(function (s) {
+        if (s.x > x0 && s.x < x1) tops.push(s.x);
+      });
+      zh = Math.min.apply(null, [zh].concat(tops.map(H.topAt)));
+      x0 = Math.max(x0, pointOn(H.aft.pts, zl)[0], pointOn(H.aft.pts, zh)[0]);
+      if (!(x1 - x0 > 1e-6) || !(zh - zl > 1e-6)) return;
+      var yi = { al: inner(x0, zl), ah: inner(x0, zh), fl: inner(x1, zl), fh: inner(x1, zh) };
+      var out = Math.max(yi.al, yi.ah, yi.fl, yi.fh, inner(0.5 * (x0 + x1), 0.5 * (zl + zh))) + GALLERY_OUT_M;
+      [1, -1].forEach(function (sign) {
+        var side = sign > 0 ? "starboard" : "larboard";
+        var faces = [
+          [v(x0, out, zl), v(x1, out, zl), v(x1, out, zh), v(x0, out, zh)], // outboard
+          [v(x0, yi.al, zl), v(x0, out, zl), v(x0, out, zh), v(x0, yi.ah, zh)], // aft
+          [v(x1, yi.fl, zl), v(x1, out, zl), v(x1, out, zh), v(x1, yi.fh, zh)], // forward
+          [v(x0, yi.ah, zh), v(x1, yi.fh, zh), v(x1, out, zh), v(x0, out, zh)], // its top
+          [v(x0, yi.al, zl), v(x1, yi.fl, zl), v(x1, out, zl), v(x0, out, zl)], // its foot
+        ];
+        faces.forEach(function (f) {
+          var pts = f.map(function (p) {
+            return v(p[0], sign * p[1], p[2]);
+          });
+          figs.push({ kind: "hull", part: "gallery", side: side, tier: t, pts: pts, sortAt: centroid(pts) });
+        });
+      });
+    });
+    return figs;
+  }
+
+  /**
+   * The head (B5.6): the knee of the head between its fore edge (`head_m`) and the stem
+   * (`stem_m`), from the drawn depth there (or where the knee leaves the stem, if higher) up the
+   * knee to its top, straight back to the stem head and down the stem, a block HEAD_SIDING_M each
+   * side of the middle line: its two sides, each seen only from its own side, and its fore edge
+   * in strips (class `strip`) up the knee, and along its top back to the stem head where nothing
+   * stands on it. At its top, its front on the knee, a plain shape for what `form.head` stands
+   * there (FIGURE_SHARE): an upright oval for a figure, as broad across the ship as it is deep,
+   * a round for a scroll and a block for a billet, each as broad as the knee; each drawn as its
+   * two sides and its face across the ship at its middle, and the knee's fore edge stopping at
+   * its foot. Seen ahead or astern, the head is a strip with the shape at its top.
+   */
+  function headFigures(H, profile) {
+    var knee = profile.head_m, stem = profile.stem_m;
+    if (!knee || knee.length < 2 || !stem || stem.length < 2) return [];
+    var floor = Math.max(-H.fore.depth, knee[0][1]);
+    /** A line of [x, z] points, z rising, from `floor` up. */
+    function cutLine(line) {
+      var out = [[xAtHeight(line, floor), floor]];
+      line.forEach(function (p) {
+        if (p[1] > floor + 1e-9) out.push(p);
+      });
+      return out;
+    }
+    var front = cutLine(knee), back = cutLine(stem);
+    if (front.length < 2 || back.length < 1) return [];
+    var figs = [];
+    /** A shape of [x, z] points (along the ship) or [y, z] (across it at x) as figures: its two
+     *  sides at ±half, each seen from its own side, or its face across the ship. */
+    function sides(outline, half, cls) {
+      [1, -1].forEach(function (sign) {
+        var pts = outline.map(function (p) {
+          return v(p[0], sign * half, p[1]);
+        });
+        var f = { kind: "hull", part: "head", side: sign > 0 ? "starboard" : "larboard", pts: pts, sortAt: centroid(pts), outward: v(0, sign, 0) };
+        if (cls) f.cls = cls;
+        figs.push(f);
+      });
+    }
+    sides(front.concat(back.slice().reverse()), HEAD_SIDING_M, null);
+    var word = (profile.form || {}).head;
+    var topZ = knee[knee.length - 1][1];
+    var tall = FIGURE_SHARE * topZ;
+    var shaped = tall > 0 && (word === "figure" || word === "scroll" || word === "billet");
+    var foot = topZ; // where the knee's fore edge stops: under the shape, or at its top
+    if (shaped) {
+      var w = word === "figure" ? tall / 2 : word === "scroll" ? tall / 3 : tall / 4;
+      var h = word === "figure" ? tall : word === "scroll" ? tall / 3 : tall / 2;
+      var half = word === "figure" ? w / 2 : HEAD_SIDING_M;
+      var zc = topZ - h / 2;
+      var xc = xAtHeight(knee, zc) - w / 2;
+      foot = topZ - h;
+      var along = [], across = [];
+      if (word === "billet") {
+        along = [[xc - w / 2, foot], [xc + w / 2, foot], [xc + w / 2, topZ], [xc - w / 2, topZ]];
+        across = [[-half, foot], [half, foot], [half, topZ], [-half, topZ]];
+      } else {
+        for (var j = 0; j < 16; j++) {
+          var a = (2 * Math.PI * j) / 16;
+          along.push([xc + (w / 2) * Math.cos(a), zc + (h / 2) * Math.sin(a)]);
+          across.push([half * Math.cos(a), zc + (h / 2) * Math.sin(a)]);
+        }
+      }
+      sides(along, half, word);
+      var face = across.map(function (p) {
+        return v(xc, p[0], p[1]);
+      });
+      figs.push({ kind: "hull", part: "head", cls: word, pts: face, sortAt: centroid(face) });
+    }
+    // the knee's fore edge, across the ship, up to the shape's foot or along the top to the stem
+    // head
+    var edge = front.filter(function (p) {
+      return p[1] <= foot + 1e-9;
+    });
+    if (shaped && edge[edge.length - 1][1] < foot - 1e-9) edge.push([xAtHeight(knee, foot), foot]);
+    if (!shaped) edge.push(back[back.length - 1]);
+    for (var k = 0; k + 1 < edge.length; k++) {
+      var p = edge[k], q = edge[k + 1];
+      var strip = [v(p[0], -HEAD_SIDING_M, p[1]), v(q[0], -HEAD_SIDING_M, q[1]), v(q[0], HEAD_SIDING_M, q[1]), v(p[0], HEAD_SIDING_M, p[1])];
+      figs.push({ kind: "hull", part: "head", cls: "strip", pts: strip, sortAt: centroid(strip) });
+    }
+    return figs;
   }
 
   // -- projection --------------------------------------------------------------------
@@ -1476,13 +3262,96 @@
     return points.length ? s / points.length : 0;
   }
 
+  /** A projected polygon cut at the sea line (screen y = 0): the part above it (`below` false)
+   *  or under it (true), as one polygon of three points or more; null where none is left. */
+  function clipAtSea(pts, below) {
+    function keep(p) {
+      return below ? p.y >= 0 : p.y <= 0;
+    }
+    function cross(p, q) {
+      var t = p.y / (p.y - q.y);
+      return { x: p.x + (q.x - p.x) * t, y: 0, depth: p.depth + (q.depth - p.depth) * t };
+    }
+    var out = [];
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i], q = pts[(i + 1) % pts.length];
+      if (keep(p)) out.push(p);
+      if (keep(p) !== keep(q) && p.y !== q.y) out.push(cross(p, q));
+    }
+    return out.length >= 3 ? out : null;
+  }
+
+  /** A projected line cut at the sea line: its runs above it (`below` false) or under it. */
+  function runsAtSea(pts, below) {
+    function keep(p) {
+      return below ? p.y >= 0 : p.y <= 0;
+    }
+    var runs = [], run = [];
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i], q = pts[i + 1];
+      if (keep(p)) run.push(p);
+      if (q && keep(p) !== keep(q) && p.y !== q.y) {
+        var t = p.y / (p.y - q.y);
+        var c = { x: p.x + (q.x - p.x) * t, y: 0, depth: p.depth + (q.depth - p.depth) * t };
+        run.push(c);
+        if (!keep(q)) {
+          if (run.length > 1) runs.push(run);
+          run = [];
+        }
+      }
+    }
+    if (run.length > 1) runs.push(run);
+    return runs;
+  }
+
+  /** A hull figure as the sea leaves it (B5.6, UNDERWATER): above the sea line as drawn; under
+   *  it, nothing ("hidden"), or the part there marked `under` ("faint"). Each piece keeps the
+   *  figure's depth, so that the painter's order does not change. */
+  function atSea(g, way) {
+    var under = false, over = false;
+    g.pts.forEach(function (p) {
+      if (p.y > 0) under = true;
+      if (p.y < 0) over = true;
+    });
+    if (!under) return [g];
+    var line = g.part === "outline";
+    var pieces = [];
+    function piece(pts, below) {
+      var h = {};
+      Object.keys(g).forEach(function (key) {
+        h[key] = g[key];
+      });
+      h.pts = pts;
+      if (below) h.under = true;
+      pieces.push(h);
+    }
+    [false, true].forEach(function (below) {
+      if (below && way !== "faint") return;
+      if (!below && !over) return;
+      if (line) {
+        runsAtSea(g.pts, below).forEach(function (run) {
+          piece(run, below);
+        });
+      } else {
+        var pts = clipAtSea(g.pts, below);
+        if (pts) piece(pts, below);
+      }
+    });
+    return pieces;
+  }
+
   /**
    * Project a skeleton. Returns {figures, bounds} where each figure has 2D
    * points (screen x right, y down, sea line at y = 0) and a depth; figures
-   * are sorted far to near.
+   * are sorted far to near. `options.underwater` names how a hull drawn from her
+   * profile is drawn below the water: "hidden", "faint" or "solid" (UNDERWATER by
+   * default; package 75, B5.6). The bounds hold the whole drawn hull whichever it is.
    */
-  function project(skeleton, facing, heel) {
+  function project(skeleton, facing, heel, options) {
     var proj = makeProjector(facing, heel);
+    var way = (options && options.underwater) || UNDERWATER;
+    if (!UNDERWATER_WAYS[way]) throw new Error("the hull below the water is drawn hidden, faint or solid, not '" + way + "'");
+    var toViewer = [Math.cos(facing), Math.sin(facing), 0];
     var out = [];
     var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     function note(p) {
@@ -1506,12 +3375,20 @@
         all = g.pts;
       }
       all.forEach(note);
+      // package 75 (B5.6): a figure on one face of the hull (a stern light, a wale or a band on
+      // the outside of the side, a deck's top, a side of the head) is seen only from that face's
+      // side, and not edge on (within rounding: dead astern, sin(pi) leaves a hair)
+      if (f.outward && dot(norm(heelPoint(f.outward, heel || 0)), toViewer) <= 1e-9) return;
       // a sail stands where its centre is along the view axis (spec M0-M2 §12 item 9),
       // not where the mean of its outline's control points happens to fall
       // package 57: a sail or a yard by its point against its mast (`sortAt`)
       var at = f.sortAt || (f.kind === "sail" ? f.centre : null);
       g.depth = at ? proj(at).depth : meanDepth(all);
-      out.push(g);
+      // package 75: a figure inside another (a deck within the side) sorts this much farther
+      if (f.sortBias) g.depth += f.sortBias;
+      // package 75 (B5.6): a hull drawn from her profile, below the water as `way` has it
+      if (f.sea && g.pts && way !== "solid") out.push.apply(out, atSea(g, way));
+      else out.push(g);
     });
     // The fixed scale (spec M3 §9 item 14): the frame of the full rig, every spar as the
     // ship file has it aloft and swung as far as it swings, so that spars sent down leave
@@ -1575,6 +3452,10 @@
     sheetDirection: sheetDirection,
     windVector: windVector,
     hullFigures: hullFigures,
+    profileHull: profileHull,
+    profileHullFigures: profileHullFigures,
+    formHull: formHull,
+    formHullFigures: formHullFigures,
     gooseWingCorners: gooseWingCorners,
     gooseWingOf: gooseWingOf,
     gooseWingTriangle: gooseWingTriangle,
@@ -1593,6 +3474,16 @@
       YARD_BEFORE_MAST_OF_BEAM: YARD_BEFORE_MAST_OF_BEAM,
       LUG_LEE_OF_MAST_OF_BEAM: LUG_LEE_OF_MAST_OF_BEAM,
       ON_DECK_M: ON_DECK_M,
+      CUT_Z_M: CUT_Z_M,
+      CUT_SHARE: CUT_SHARE,
+      DECK_SHARE: DECK_SHARE,
+      UNDERWATER_HEEL_DEG: UNDERWATER_HEEL_DEG,
+      UNDERWATER: UNDERWATER,
+      GALLERY_OUT_M: GALLERY_OUT_M,
+      LIGHT_SHARE: LIGHT_SHARE,
+      FIGURE_SHARE: FIGURE_SHARE,
+      HEAD_SIDING_M: HEAD_SIDING_M,
+      DECK_END_CLEAR_M: DECK_END_CLEAR_M,
     },
   };
 });

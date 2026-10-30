@@ -24,8 +24,10 @@ from freesail.core.world import World
 from freesail.crew import bill
 from freesail.crew.model import Crew, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
+from freesail.ship.form import stations as drawn_stations
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, Sail, SailState, Spar, booms, sail_room
+from freesail.ship.schema import PROFILE_KEYS, STERN_KEYS, HullForm, HullProfile
 
 
 def weather_block(world: World) -> dict[str, Any]:
@@ -275,6 +277,8 @@ def snapshot(world: World) -> dict[str, Any]:
             "shivering": s.shivering,  # a studding sail too near the wind (spec 3b §7)
             "sheet_angle": s.sheet_angle,
             "lug_side": _lug_side(ship, s),  # package 57: a lug drawn on its side of the mast
+            # package 75: a settee's yard lowered on deck to be dipped, only while it is
+            **_only_when_true(s, "yard_lowered"),
         }
         for s in ship.sails.values()
     ]
@@ -286,7 +290,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "condition": s.condition,
             "strain_ratio": r.value("strain", s.id),
             "brace_angle": s.brace_angle,
-            "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
+            "rigged_out": s.rigged_out,  # studding sail booms, a driver's boom; true for the rest
         }
         for s in ship.spars.values()
     ]
@@ -326,12 +330,14 @@ def _spar_entry(s: Spar) -> dict[str, Any]:
         "brace_limit": s.brace_limit,
         "rake": s.rake,
         "rating_kn": s.rating_kn,
-        "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
+        "rigged_out": s.rigged_out,  # studding sail booms, a driver's boom; true for the rest
     }
 
 
 def _sail_entry(s: Sail) -> dict[str, Any]:
-    cls = SAIL_CLASSES.get(s.cls)
+    # the reef factor by `Sail.curve_class` (package 75: the gaff's for a lateen cut at the
+    # mast, as the physics will take it from the engine's lateen step; else its own class)
+    cls = SAIL_CLASSES.get(s.curve_class)
     return {
         "id": s.id,
         "class": s.cls,
@@ -350,7 +356,16 @@ def _sail_entry(s: Sail) -> dict[str, Any]:
         "flying": s.flying,
         "sheeted_to": s.sheeted_to,
         "corners_m": _corners_of(s),
+        # package 75: a settee and a lateen cut at the mast, each only where the file says
+        **_only_when_true(s, "settee", "cut_at_mast"),
     }
+
+
+def _only_when_true(s: Sail, *keys: str) -> dict[str, bool]:
+    """Package 75's keys on a sail (docs/design/Design-ShipsEngineExtensions.md §6.4), each
+    served as true where it holds and left out where it does not, so that the graph and the
+    snapshot of a ship without them are as before them."""
+    return {key: True for key in keys if getattr(s, key, False)}
 
 
 def _corners_of(s: Sail) -> list[list[float]] | None:
@@ -377,27 +392,88 @@ def _line_entry(ln: Line) -> dict[str, Any]:
     }
 
 
+def _profile_entry(p: HullProfile) -> dict[str, Any]:
+    """The hull's profile as her file gives it (package 75; docs/design/Build-Ships.md §5.1,
+    §6), in plain lists in `PROFILE_KEYS`' order: each line a list of points, `decks_m`,
+    `ports_m` and `port_size_m` mappings by deck word; from stage 0H the shape keys, the
+    `form` and the `marks` as mappings in the file's form (§5.1). A line the file does not
+    give is left out, as it is out of the file."""
+    out: dict[str, Any] = {}
+    for key in PROFILE_KEYS:
+        value = getattr(p, key)
+        if not value:
+            continue
+        if key in ("decks_m", "ports_m"):
+            out[key] = {word: [list(pt) for pt in pts] for word, pts in value}
+        elif key == "port_size_m":
+            out[key] = {word: list(size) for word, size in value}
+        elif key == "form":
+            out[key] = _form_entry(value)
+        elif key == "marks":
+            out[key] = dict(value)
+        else:
+            out[key] = [list(pt) for pt in value]
+    return out
+
+
+def _form_entry(form: HullForm) -> dict[str, Any]:
+    """The profile's `form` as her file gives it (stage 0H; Build-Ships.md §5.1): the fullness,
+    the stern by its keys in the file's order and the head's word, each only where given."""
+    out: dict[str, Any] = {}
+    if form.fullness is not None:
+        out["fullness"] = list(form.fullness)
+    if form.stern is not None:
+        stern: dict[str, Any] = {}
+        for key in STERN_KEYS:
+            value = getattr(form.stern, key)
+            if value is None or value == ():
+                continue
+            if key in ("galleries_m", "lights_m"):
+                stern[key] = [list(pt) for pt in value]
+            elif key == "transom_hb_m":
+                stern[key] = list(value)
+            else:
+                stern[key] = value
+        out["stern"] = stern
+    if form.head is not None:
+        out["head"] = form.head
+    return out
+
+
+def _station_entry(station: tuple[tuple[float, float, float], ...]) -> list[list[float]]:
+    """A drawn station (`freesail.ship.form`) as plain lists of [x, z, hb], to the millimetre."""
+    return [[round(c, 3) + 0.0 for c in pt] for pt in station]  # + 0.0: never a "-0.0"
+
+
 def ship_graph(ship: Ship) -> dict[str, Any]:
     """Everything a drawing needs to build the ship once: parts, dimensions, roles.
 
     Spars carry their class, `x_m` (root spars only; a child spar stands at its
     parent's x), `height_m`, `length_m`, parent, side and brace angle. Sails
     carry class, roles, area, state, reefs, sheet angle and centre height.
-    The hull carries its principal dimensions. SI throughout.
+    The hull carries its principal dimensions, and its profile where the file gives one
+    (package 75: the side, the decks and the ports; absent otherwise), with the hull as drawn
+    from it (stage 0H: `stations`, `freesail.ship.form`'s, the ends' closures first and last,
+    each station's [x, z, hb] from its lowest point up to the rail). SI throughout.
     """
     h = ship.hull.spec
+    hull: dict[str, Any] = {
+        "length_waterline_m": h.length_waterline_m,
+        "beam_m": h.beam_m,
+        "draught_m": h.draught_m,
+        "deck_height_m": h.deck_height_m,
+        "displacement_kg": h.displacement_kg,
+        "gm_m": h.gm_m,
+        "clr_x_m": h.clr_x_m,
+    }
+    profile = getattr(h, "profile", None)
+    if profile is not None:
+        hull["profile"] = _profile_entry(profile)
+        hull["stations"] = [_station_entry(s) for s in drawn_stations(h)]
     return {
         "name": ship.name,
         "rig": ship.spec.rig,
-        "hull": {
-            "length_waterline_m": h.length_waterline_m,
-            "beam_m": h.beam_m,
-            "draught_m": h.draught_m,
-            "deck_height_m": h.deck_height_m,
-            "displacement_kg": h.displacement_kg,
-            "gm_m": h.gm_m,
-            "clr_x_m": h.clr_x_m,
-        },
+        "hull": hull,
         "spars": [_spar_entry(s) for s in ship.spars.values()],
         "sails": [_sail_entry(s) for s in ship.sails.values()],
         "lines": [_line_entry(ln) for ln in ship.lines.values()],
