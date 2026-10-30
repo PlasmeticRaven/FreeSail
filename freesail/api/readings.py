@@ -2180,7 +2180,7 @@ REGISTRY.add(
     Reading(
         "anchor",
         ("the anchor",),
-        "query",
+        "ground",
         "",
         _anchor,
         description="the anchor: down (riding by which, to the flood or the ebb, the cable "
@@ -2204,7 +2204,7 @@ REGISTRY.add(
     Reading(
         "ground_tackle",
         ("the ground tackle",),
-        "query",
+        "ground",
         "",
         _ground_tackle,
         description="the anchors and their cables, each with its weight and state",

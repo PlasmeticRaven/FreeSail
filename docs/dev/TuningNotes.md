@@ -13398,11 +13398,16 @@ under `docs/agents/consent/` or the consent brief touched.
   say to, tell, ask, the lookout's hail, the hail of a sail, the answer, the captain's
   station sentences), **the stand-by** (every event, interval and tripwire) and the world
   orders. The contents line and the library's pin follow (4 parts to 6).
-- **The `query` kind.** Nineteen readings that are questions in words (the people, the
+- **The `query` kind.** Seventeen readings that are questions in words (the people, the
   pilot, the port, the prices, who commands, the stations...) were registered under kind
   `ground`, and the grammar page described each as "the ground the lead brings up":
   `KINDS["query"]`, read and never compared, the standing grammar refusing a condition on
   one in words that say to ask it (`'the pilot' is read, not compared in a standing order`).
+  Nineteen at first: the anchor's two rows (`anchor`, `ground_tackle`) went back to
+  `ground` when the whole fast tier on the final tree ran `test_anchor.py`'s standing
+  order `when the anchor is dragging`, which compares the anchor's words and did not fire
+  on a query (the test's parity row says the dialect reads them; the per-item runs of the
+  touched files had not covered it).
 - **The hail's colon is optional** (`orders/signals.py`, `hail_parts`): `hail the brig what
   ship is that?`, `say to the Nancy heave to, I am sending a boat`, `hail her what ship is
   that`; the sail told from the words by her rig, her name or 'her' (the shortest head of
@@ -13521,6 +13526,36 @@ under `docs/agents/consent/` or the consent brief touched.
 - **The documents touched on the way** (beside the primer's chapters): the Harness's
   standing-by paragraph, its station-line section (the date, the ship herself), its line on
   the grammar's parts; the records above. The documentation whole is item 8's.
+
+### Item 7: the interim gate, drafted last
+
+- **`docs/gates/gate-m7-interim.md`**, in gate m6c's form (the verdict Pending; what the
+  gate claims; what changed since m6c from the player's side, package by package, 70 to 73,
+  86, 84's eleven steps, 79a to 79d, 89 and 85, and from the reader's side; what you need
+  and the setup; the items; the report; what it does not do). Not a full gate: no build
+  cut, nothing closed. The items are two playtests' worth: ten after 84 (a station on the
+  far ship of `tender.yaml`, the tender's day followed at the console, two crewed
+  strangers signalling and fighting on the one clock, a save of many hulls replayed, the
+  pace with hulls asleep, the Mediterranean and the Channel east sailed, the ship and the
+  date and the war read, the voice's one grammar, and the lead's two seats by the owner's
+  word of 2026-10-30: the captain's station blind through the door under the consent brief
+  as it stands, and the director's seat in the one world pulling 84's levers, the
+  transcripts in the record with where knowledge of the engine leaked) and five after the
+  first new ship (her fits as the 64 and the razee, her mizen course and driver, her gun
+  decks and the lee ports by 70's rule with 75's sills, the pictures, a scenario of 1796),
+  to be made exact when her file is in. The open items are the records' own, each with
+  where it stands: the owner's debrief of 70 to 72 (the convoy's stall, 86's cause and
+  88's mend; the boat between ships, 82's; the colours' flicker, 88's; the viewer's, 81's),
+  the model officer's five points (four mended by 85 or 86, the second in part), the
+  owner's notes 7 to 12, the tuning notes' open lines (the frigate's quarterdeck against
+  Winfield, the Roscoff station's findings, Bournemouth and Portsmouth, 85's own), the
+  three pins 84 moved for the one clock and 85's pins of structure, the container floors
+  and the pictures' threshold, and what 84 leaves for 82. The engine's and the world's
+  half is the lead's to add; the lead's seats are left room in the scenarios named.
+- **Checked against the records while drafting**: 70 shuts a lee port whose sill is
+  within a foot of the water (the draft first had the ports left open for 75: wrong, and
+  mended before the commit); the stall's cause is 86's and its mend 88's, not 85's; "what
+  84 leaves" is in 84's as-merged record, not the design study.
 
 ### Item 8: the documentation whole, against the code after 84
 

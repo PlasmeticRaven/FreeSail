@@ -890,11 +890,11 @@ def test_an_old_papers_catalogue_is_mended_on_a_miss_and_keeps_no_mark_of_it(tmp
     assert len(old.pages()) == 10
     n = len(w.log)
     assert old.page("the gunner's account").source == "magazine"
-    assert len(old.catalogue) == 11 and len(old.pages()) == 11
+    assert len(old.catalogue) == 12 and len(old.pages()) == 12
     assert len(w.log) == n
     with pytest.raises(KeyError, match="no paper aboard answers to 'the logbook'"):
         old.page("the logbook")
-    assert len(old.catalogue) == 11
+    assert len(old.catalogue) == 12
     # a miss in a game of this build, and then a later build with one more paper
     assert w.papers.find("the log of the hold") is None
     assert set(vars(w.papers)) == state == set(vars(old))
@@ -913,7 +913,7 @@ def test_an_old_papers_catalogue_is_mended_on_a_miss_and_keeps_no_mark_of_it(tmp
     monkeypatch.setattr(PL, "PAPERS_PATH", later)
     for papers in (w.papers, old):
         assert papers.find("the carpenter's book")["words"] == "a paper of a later build"
-        assert len(papers.catalogue) == 12
+        assert len(papers.catalogue) == 13
 
 
 def test_a_catalogue_from_another_file_is_mended_from_its_own_file_not_the_projects(tmp_path):
@@ -937,7 +937,7 @@ def test_a_catalogue_from_another_file_is_mended_from_its_own_file_not_the_proje
         catalogue=[dict(p) for p in w.papers.catalogue[:10]],
     )
     assert old.page("the gunner's account").source == "magazine"
-    assert len(old.catalogue) == 11
+    assert len(old.catalogue) == 12
 
 
 def test_the_gunners_account_is_kept_by_the_boatswain_in_the_cutter():

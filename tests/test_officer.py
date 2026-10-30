@@ -918,15 +918,17 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     # events' words in the stand-by sentence and the practice row (12,052 at the seat on the
     # merged tree, over the fraction of 20,000; on the owner's tree before 73, 11,214 and
     # 19,000 for 18,500): five hundred more, 20,500 (20,000 before it); the person's own
-    # words in every station brief (12,313 at the seat): five hundred more, 21,000
-    h.budget_tokens = 21000
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 21000
+    # words in every station brief (12,313 at the seat): five hundred more, 21,000;
+    # package 85: the ship herself at the head of every station's situation (12,885 at
+    # the seat): five hundred more, 21,500
+    h.budget_tokens = 21500
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 21500
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 21,000 tokens this door gives you" in ask  # 20,500 before the person's words
+    assert "of the 21,500 tokens this door gives you" in ask  # 21,000 before the ship's words
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"

@@ -251,7 +251,8 @@ class Nations:
 
     def sailed_with_words(self) -> str:
         """The table the ship sailed with, in words, dated as the file dates it."""
-        when = f" ({self.as_of.day} {self.as_of:%B %Y})" if self.as_of else ""
+        as_of = getattr(self, "as_of", None)
+        when = f" ({as_of.day} {as_of:%B %Y})" if as_of else ""
         return f"The nations as she sailed{when}: {self.table_words(self.sailed_with)}."
 
     def to_dict(self) -> dict[str, Any]:

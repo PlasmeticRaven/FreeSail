@@ -7016,7 +7016,7 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
     # the line closes with the date (the owner's fourth note of the playtests of 70 to 72)
     assert line() == (
         "You: the captain, on the quarterdeck, since 10:00; the deck yours; on your feet "
-        "since 10:00; Wednesday 12 June 1805."
+        "since 10:00; Monday 10 June 1805."
     )
     h.deliver(reply("", call("submit_order", text="go ashore")))
     h.deliver(reply("", call("stand_by", until="a glass")))
@@ -7028,7 +7028,7 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
     # stand-by being thirty minutes ("...; on your feet since 10:00." before)
     assert line() == (
         f"You: the captain, ashore at Falmouth, on the quay, since {at}; the deck yours; on "
-        "your feet since 10:00; Wednesday 12 June 1805; 30 minutes of the ship's time since "
+        "your feet since 10:00; Monday 10 June 1805; 30 minutes of the ship's time since "
         "your last reply."
     )
     _until(world, lambda: not world.dealings.boat.away)  # the boat home, to be sent for him
