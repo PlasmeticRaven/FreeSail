@@ -793,6 +793,26 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     first career package's brief (package 92, after 85's review); the building itself
     milestone 8's.
 
+59. **The player reads by his place as a model does; a scenario key for testing.** Owner,
+    2026-10-30, on package 65's brief. For the purposes of actual play the player seated as
+    a person (the console's captain, a `--seat`) follows the same rule of the place's
+    knowledge as the models, to avoid the confusion of two views of one world; the owner's
+    eye is the director's station and `follow`; a scenario key (`knowledge: all`, the
+    design's name for it) turns the rule off for testing. Package 65 builds it so.
+
+60. **A reply's prose is the person's own note, never a word in the world.** Owner,
+    2026-10-30, from his last play: a model answering in a plain reply rather than a `say`
+    reveals too much (the player saw its out-of-character words as speech), made it
+    interact less with the world once it knew, and let it fail to notice that it must say a
+    thing for the thing to be heard, since nothing obliged it. The rule to build (package
+    65, with the place's knowledge): the free text of a reply is a note of the station's
+    own, written in its journal and read by the director's log and the owner's eye (`show
+    the <station>'s journal`), never a line of the play log and heard by nobody; a thing is
+    heard only when said (`say`, `say to`, `hail`, `answer` to a question put); the brief
+    says so once in plain words, and the harness's notice when a reply with prose alone
+    leaves an answer owed names the tool. Package 41's rule that the prose was the deck's
+    conversation is retired by it, its tests moved old beside new.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

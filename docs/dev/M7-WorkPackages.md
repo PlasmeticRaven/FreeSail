@@ -47,7 +47,7 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design, to launch when 82's item 3 (the person's movement between hulls) is merged |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
@@ -68,6 +68,7 @@ on these packages; that is the owner's choice.
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
 | 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93`; **merged whole 2026-10-30** at `d9465d9` from `7e6b9f1` (the record below): ten regions rebuilt on the world's own tide, the raise one source of truth with the tide, Agincourt Sound keeping the eleven's raise until a sheet is read, truths 7-305 to 7-309 |
 | 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
+| 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -1929,10 +1930,11 @@ ship's length is 0.0 and `combat/shot.py:167` floors her size at 0.5 whatever sh
 mend is one read, and it moves the far fight's pins: re-measure them where moved, old
 beside new, the cause this line.
 
-### The refresh after 84, 85 and 82's design (the lead, 2026-10-30; launches when 82's item 3 is merged)
+### The refresh after 84, 85 and 82's design (the lead, 2026-10-30; held by the owner to run after 82 and 65 both)
 
 The brief above stands as the intent; this refresh says what the one world and 82's design
-give it, so that the builder designs on them and not beside them. **Fable, in steps merged in
+give it, so that the builder designs on them and not beside them; **it runs after 65 as well**
+(the owner, 2026-10-30), the captive's places then 65's rule applied and not a design of 74's. **Fable, in steps merged in
 parts as 84 and 82 are**, the design note first and reported at its boundary; the trunk
 brought in at every boundary (82's later steps, 88 and 75 run beside it). **Truths 7-350 to
 7-369** (82's are 7-320 to 7-339, 88's 7-340 to 7-349).
@@ -2470,6 +2472,130 @@ Portsmouth" and the seam):
 The hard rules as every brief has them; `claude/pkg-94`, pushed after each commit; the
 lead merges whole. No CLAUDE.md is in the repository: the briefs' heads and the records
 serve.
+
+## Package 65: the place's knowledge (`freesail/agents/harness.py` the sample by place; `freesail/api/readings.py` a place on every row and `none_words` for a reading not to be had where the asker stands; `freesail/world/places.py`, `people.py`, `movement.py` the places' knowledge and the work's room; `freesail/core/events.py` or the log's lines a kind's "where it is heard"; `freesail/agents/tools.py` the papers' places and the drill; `freesail/agents/agent.py`, `director.py` the briefs' words; `docs/TechnicalSpec-M7b.md` §14 as built; `docs/agents/Harness.md`; the primer's chapters 14 and 19; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-370 to 7-389)
+
+Fable (the owner, 2026-10-30: scoped to cover the edge cases wherever possible, an Opus
+follow-up filling in from the testing's feedback and probing); **launches when 82 is whole**,
+so that it builds on 82's whereabouts (a person's place the whole truth of where he is,
+across hulls and in the boat) and on 85's words; 74 reads its design note for the captive's
+places. The ground: decision 47 dropped locational knowledge as an overcomplication; the
+dispatches test brought it back by the captain's own account (everything reached him in the
+sample wherever he stood, so moving bought nothing and cost an order; ashore in Plymouth
+market he had the ship's heading, leeway, sails and the frigate's bearing from three miles
+off); the owner's ruling of 2026-10-19 (a place carries at least what can reasonably be
+perceived from it, by action and by what is there) and the lead's provisional design in spec
+M7b §14 "Brought back and forward"; 66's earshot (a word heard where it is said), 66's and
+85's always-present line, 84's one registry of persons and things with a whereabouts, 82's
+`where am I` and the visitor's reach. **What is already so:** between hulls the knowledge is
+strict (a hull's log is hers, another's reaches a person by sight, signal, hail or report, and
+the director alone reads every hull); within a hull and ashore it is not (the whole log and
+every reading reach a person in the cabin, below asleep, or in the market). **Generously
+scoped as the M7 packages are:** the brief binds the intent and names the ground, the builder
+designs, takes an item another way with its reason, grows a part where the work shows it
+should, and says what it left and why; no day count. **The design note first** (`docs/design/`,
+in 83's shape: the table of places against what reaches a person in each, the edge cases
+each decided, what was rejected), reported at its boundary for the lead's reading before the
+harness is touched. **Truths 7-370 to 7-389.** Each item an intent with the lead's reading;
+the intent binds.
+
+1. **The rule, stated once: a sample carries what the person's place allows.** The harness
+   keeps the rule, not the model: the readings in a sample are the ones to be had where he
+   stands, the log's lines the ones he would hear or see from there, and a reading asked
+   for elsewhere (the `readings` tool, `what is the depth` at the prompt) is answered with
+   where it is to be had ("the lead is cast on deck; the chart is in the cabin") and not with
+   the figure. **The table of places** (the design note's heart, each row decided and said
+   why): the quarterdeck and the deck (the deck's readings, the log as it is spoken, the
+   lookout's hails, the deck's conversation, the sail in sight as the deck sees it); the
+   masthead (the lookout's horizon and his glass, the deck by hail); the cabin and the
+   gunroom (the chart, the papers and the slate, the deck by report and by what is felt:
+   the heel, the motion, the sounds of sail work, all hands, a gun, the bell; the readings
+   of the deck not his until he goes up or is told); below in a berth, asleep (nothing until
+   called or woken: the call, all hands, a gun, the ship striking); the hold, the magazine,
+   the sail room, the sick berth (what is there and the motion); ashore, at each place of the
+   port (the ship by sight from the quay or the point where she is in sight, by report, by
+   boat or by letter; nothing of her readings); in the boat away (the boat's readings, the
+   ship by sight, 82's); a visitor aboard another hull (that hull's place by this table,
+   82's reach). **The log's lines by where they are heard:** each kind of line carries where
+   it is perceptible (the deck's work on deck; a report made to the captain where he is; the
+   bell, a gun, all hands and the ship striking everywhere aboard; a word where it is said,
+   66's rule as it stands), with the design's default for a kind not listed, so that a new
+   kind of line is placed by its author or falls to the default and never leaks by accident.
+   **And the other half of the same rule (decision 60): a reply's prose is the person's own
+   note, never a word in the world.** Today the free text of a reply is said aloud where the
+   station stands (`agent.note` through `say_aboard`, package 41's deck conversation), so
+   a model's out-of-character words reach the player as speech and nothing obliges it to
+   `say`; the free text becomes a note in the station's journal, read by the director's
+   log and the owner's eye (`show the <station>'s journal`) and heard by nobody, a thing
+   heard only when said (`say`, `say to`, `hail`, `answer` to a question put); the brief
+   and the tools' words say so once, the harness's notice when prose alone leaves an answer
+   owed names the tool, and the tests of 41's rule move old beside new with the reason.
+2. **Report, the messenger and the call.** What a person below is told: the officer of the
+   watch reports to the captain by the rules of the period (a sail sighted, a change of
+   wind, the land, a strange sail's colours, the ship in danger: the captain is called), the
+   report a line in the captain's sample where he is, made by the rules' officer or by a
+   model at that station through `say to the captain` (the harness telling a model officer
+   the duty in his brief); `call the captain`, `call all hands`, `call the watch` as orders
+   with their answers; a person asleep below woken by the call, by all hands, by a gun, by
+   the ship striking and by nothing else, the stand-by's "urgent event" read by the place
+   (an urgent line a sleeping man cannot perceive does not wake him; the call does); a
+   tripwire of the ship's state judged for a station that cannot see it fires as the call it
+   would be in truth (the officer sends for him) and says so, so that no model is woken by a
+   depth it could not know.
+3. **Books and papers in their places.** The chart, the epitome, the almanac and the ship's
+   papers in the cabin; the master's slate in the gunroom or with him on deck; the book of
+   standing orders on deck and in the cabin; the log book where it is kept; the primer and
+   the catalogue anywhere (the player's reference, not the ship's); a book read where it is
+   not is a walk first, said so ("the epitome is in the cabin: go below to read it"); the
+   library tool answers by the same rule; the pictures by their place (`chart` in the cabin
+   or at the binnacle's chart as the design decides, `ship_view` from the deck or the boat).
+4. **The drill, extended.** Before the station brief, after the three calls of today, the
+   walk: go below, eat, drink, read a book from the library where it is kept, come on deck,
+   each answered and the line changing, so that a model has seen the places and felt the rule
+   before the game; the drill in-world under 85's rule.
+5. **Work in its place.** Each kind of work is done where it is done, the same for the
+   rules' person and for a model or the player at the station: the master's day's work and
+   his sights' working in the gunroom (and on deck for the sight itself), the captain's
+   writing (his book, a letter, his standing orders) in the cabin, the sailmaker's in the
+   sail room, the carpenter's below at the damage, the purser's at the hold, the surgeon's in
+   the cockpit; `People.occupy` and `TRADE_PLACES` made the one road; where a station
+   holder's work and the rules' person's differ today, the design lists them and makes them
+   one; the place's knowledge follows the work (the master below at his slate hears the deck
+   by report).
+6. **The edge cases, each decided in the design note and tested:** the handover fold keeping
+   the person's place; a station reseated after a sleep and a wake (84) at its place; a
+   station on a hull asleep (the far shape's readings are the plan's, the place rule the
+   same); the boat away with the player in her and the ship's lines reaching her only by
+   sight and hail; the visitor aboard another hull and the captive confined below (74's,
+   the places the design gives him: the hold's or the cabin's by his parole); the director,
+   who sees all and is untouched, and the director's `say as` for a person where he is; the
+   replay (the rule is a read of the world and changes no input, so no digest moves: the
+   proof); the pace (the filter's cost measured under 84's pace rule); the stations' briefs
+   saying the rule once (85's in-world words); and **the player at the prompt, ruled (decision 59):** the player
+   seated as a person (the console's captain, a `--seat`) reads by his place as a model
+   does, the owner's eye the director's station and `follow`, with a scenario key
+   (`knowledge: all`) that turns the rule off for testing, said in the design and the primer.
+7. **Truths and records.** 7-370 onward: a captain in the cabin whose sample carries no
+   deck reading and whose officer's report of a sail reaches him there; a captain ashore at
+   Plymouth with nothing of the ship but the boat's report; a sleeping station woken by the
+   call and not by a notable line; a reading asked where it is not to be had answered with
+   where; a book read after the walk; the master's day's work in the gunroom by the rules'
+   master and by a model alike; the handover fold keeping the place; the boat away; the
+   replay to the same digest; spec M7b §14 "as built" (the provisional design replaced by the
+   rule as built); the Harness; the primer's chapters 14 and 19 (and 16's duties where the
+   report is), in-world under 85's rule and through `tests/test_in_world.py`; the director's
+   library; the design note's postscripts; the tuning notes; the suites by the rule (the fast
+   tier whole on the final tree of each step, the slow tier of the touched files and the
+   known truths, the pace tests alone and last; the whole suite the lead's in the cloud).
+
+**The Opus follow-up, booked (65b):** after the owner's testing and a round of probing (a
+model at each station walked through the places with a list of what it should and should
+not know, the gaps written down), the places' table filled in where the testing shows a
+leak or a silence, and the words tuned; briefed from the findings, not before them. **Not
+built here:** 74's captive beyond his places; 82's boat; the harbour's view (64). **The head
+rules bind** as the briefs before have them, with 85's in-world rule and 84's three pin rules;
+nothing under `docs/agents/consent/` or the consent brief touched (a station that reads by
+its place has less than the brief describes, no more; if a wording offends, say so for 55).
 
 ## Package 88: the captain's pass of M7 (`freesail/world/captains.py`, `brains.py` and `data/captains/*.yaml` the rules captain's doctrine and its sources; `freesail/world/squadrons.py` and `orders/station.py` only where the near station law reads; `freesail/world/signals.py` and `data/captains/privateer.yaml`, `hail.yaml` the colours held; `docs/TechnicalSpec-M7.md` §4, §21, §22 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_captain_trials.py`, `test_squadrons.py`, `test_signals.py`, `test_known_truths.py` truths 7-340 to 7-349)
 
