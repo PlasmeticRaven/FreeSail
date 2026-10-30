@@ -44,8 +44,10 @@ datum: unverified
 outer_road:
   feature: mahon-outer-road
   name: off the mouth of Port Mahon
-  lat_deg: 39.8600
-  lon_deg: 4.3170
+  # package 89: moved with the feature a cable and a half E N E (from 39.8600 N
+  # 4.3170 E) into the mouth's charted deep water, 20 brazas and more (the feature's note)
+  lat_deg: 39.8620
+  lon_deg: 4.3220
 anchorage:
   feature: mahon-arsenal-anchorage
   name: Port Mahon, south of the arsenal's island

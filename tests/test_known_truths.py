@@ -11541,7 +11541,7 @@ MED_PORTS = [
     "algiers",
 ]
 MED_SPANISH = ["malaga", "almeria", "cartagena", "ivica", "palma", "port-mahon"]
-MAHON_MOUTH = (39.8600, 4.3170)  # features/balearics.yaml's `mahon-outer-road`
+MAHON_MOUTH = (39.8620, 4.3220)  # features/balearics.yaml's `mahon-outer-road` (package 89)
 
 
 def _med_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
