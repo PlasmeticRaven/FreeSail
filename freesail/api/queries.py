@@ -290,7 +290,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "condition": s.condition,
             "strain_ratio": r.value("strain", s.id),
             "brace_angle": s.brace_angle,
-            "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
+            "rigged_out": s.rigged_out,  # studding sail booms, a driver's boom; true for the rest
         }
         for s in ship.spars.values()
     ]
@@ -330,7 +330,7 @@ def _spar_entry(s: Spar) -> dict[str, Any]:
         "brace_limit": s.brace_limit,
         "rake": s.rake,
         "rating_kn": s.rating_kn,
-        "rigged_out": s.rigged_out,  # studding sail booms (spec 3b §7); true for the rest
+        "rigged_out": s.rigged_out,  # studding sail booms, a driver's boom; true for the rest
     }
 
 

@@ -3290,6 +3290,12 @@ def _sail_named(ship: Ship, value: Any) -> Sail | None:
     return None
 
 
+# The driver's boom rigged out with the sail or in with it, each way (package 75; Ext §17.11):
+# judgement. 45 s for a studding-sail boom, by `SPAR_WORK["boom"]` 2.0 is 90 s, and more for a
+# spar of 65 ft on tackles. In the DEFAULTS of the three scripts below; the crew is the evolution's.
+DRIVER_BOOM_S = 120.0
+
+
 def _in_each_others_place(a: Sail, b: Sail) -> bool:
     """Whether two sails hold one place, only one of them bent at a time: one is bent in the
     other's place, or the two in a third's (package 75; docs/design/Design-ShipsEngineExtensions.md
@@ -3300,6 +3306,23 @@ def _in_each_others_place(a: Sail, b: Sail) -> bool:
         or b.in_place_of == a.id
         or (a is not b and a.in_place_of is not None and a.in_place_of == b.in_place_of)
     )
+
+
+def driver_boom(ship: Ship, sail: Sail) -> Spar | None:
+    """The boom of a sail cut at the mast, rigged out with the sail and in with it, or None
+    (package 75; docs/design/Design-ShipsEngineExtensions.md §17.11, the owner's: the driver's
+    boom out only while the driver is bent). Its class stays `boom`, so `RIGGED_IN_CLASSES`,
+    `studding_work` and `StuddingSailsIn` never touch it: it does not come in for a tack or a
+    wear, and it stays out while the driver is brailed. A boom whose file does not say
+    `rigged_out` stands out all the voyage, and gives None: every sail is worked as it was
+    before the key, which is what keeps the key inert until a ship's file carries it."""
+    if not sail.cut_at_mast:
+        return None
+    boom = ship.spar_of_role(sail, "boom")
+    if boom is None:
+        return None
+    filed = next((s for s in ship.spec.spars if s.id == boom.id), None)
+    return boom if filed is not None and filed.rigged_out is not None else None
 
 
 class _SailWork(PhasedScript):
@@ -3339,26 +3362,29 @@ class _SailWork(PhasedScript):
             return f"The {self._name()}'s yard or mast is wrecked or sent down."
         return None
 
-    def _wreck_refusal(self, root: Spar) -> str | None:
-        """Why this sail cannot be worked while a spar it needs is carried away, or None
-        when it can (a wrecked sail unbent where it hangs: package 30b)."""
+    def _wreck_refusal(self, root: Spar, sail: Sail | None = None) -> str | None:
+        """Why this sail cannot be worked while a spar it needs is carried away, or None when
+        it can (a wrecked sail unbent where it hangs: package 30b). `sail`: the sail a shift
+        would bend in this one's place, which lies in the sail room and hangs in no wreck."""
         from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
-        ship, sail = self.ship, self.sail
+        ship, in_the_room = self.ship, sail is not None
+        sail = sail if in_the_room else self.sail
         spar = part_name(ship, root.id)
+        name = self._name(sail)
         if not root.sent_down:  # the wreck still hangs
             if root.cls in OVER_THE_SIDE_CLASSES:
-                return f"The {self._name()} went over the side with the {spar}; cut away the wreck."
+                return f"The {name} went over the side with the {spar}; cut away the wreck."
             if self.WORKS_IN_A_WRECK:
                 return None  # cut out of the wreck where it hangs and sent down
-            if sail.wrecked:
+            if sail.wrecked and not in_the_room:
                 return (
-                    f"The {self._name()} hangs in the wreck of the {spar}; cut away the wreck, "
+                    f"The {name} hangs in the wreck of the {spar}; cut away the wreck, "
                     f"then shift the {spar} for a spare."
                 )
             return (
                 f"The wreck of the {spar} still hangs aloft; cut it away and shift the {spar} "
-                f"for a spare before the {self._name()} can be bent."
+                f"for a spare before the {name} can be bent."
             )
         gone = gone_spar(ship, sail)
         what = part_name(ship, gone.id) if gone is not None else spar
@@ -3434,6 +3460,25 @@ class _SailWork(PhasedScript):
             spare.condition if spare is not None else 100.0,
         )
 
+    def _rig_boom(self, sail: Sail, out: bool) -> None:
+        """The boom of a sail cut at the mast rigged out or in as its phase ends (Ext §17.11);
+        one carried away meanwhile is passed over, and its spare lands rigged in."""
+        boom = driver_boom(self.ship, sail)
+        if boom is None or boom.wrecked:
+            return
+        boom.rigged_out = out
+        self.note(f"Rigged {'out' if out else 'in'} the {self._name(boom)}.")
+
+    def belayed(self) -> None:
+        """Belayed with the sail below, its boom does not stand out over no sail (Ext §17.11's
+        rule): the hands bring it in, in the belay's own time, as the wreck's clearing brings it
+        in. Left out, no order at sea could: "rig in" names the bending, for which the canvas
+        drawn at `send_up` is no longer in the room. A boom carried away is passed over."""
+        for sail in (self.sail, self.target):
+            boom = driver_boom(self.ship, sail) if sail is not None else None
+            if boom is not None and not boom.wrecked and sail.state is SailState.UNBENT:
+                boom.rigged_out = False
+
     def _spare_words(self) -> str:
         """'No. 1 canvas, new' for the sail chosen."""
         if self.spare is None or self.target is None:
@@ -3469,10 +3514,12 @@ class UnbendScript(_SailWork):
     unbend sail': "Trice up! Lay out and unbend! ... Ease away! Lower
     together!"). Phases ``unbend`` (aloft: cast off the robands and head
     earings) and ``lower`` (on deck: lower it down by the buntlines and stow
-    it). A sound sail goes back to the sail room with its canvas number and
-    condition; a blown-out one is condemned and does not."""
+    it), and for a driver ``rig_in_boom`` after them (Ext §17.11), a boom
+    carried away being passed over. A sound sail goes back to the sail room with
+    its canvas number and condition; a blown-out one is condemned and does not."""
 
-    DEFAULTS = {"unbend": 180.0, "lower": 90.0}
+    # rig_in_boom: `DRIVER_BOOM_S`, 120 s, judgement (Ext §17.11).
+    DEFAULTS = {"unbend": 180.0, "lower": 90.0, "rig_in_boom": DRIVER_BOOM_S}
     WORKS_IN_A_WRECK = True
     from_wreck = False  # set as the work begins: the sail hung in a wreck
 
@@ -3492,10 +3539,14 @@ class UnbendScript(_SailWork):
 
     def begin(self, words: dict[str, Any]) -> None:
         self.from_wreck = self.sail.wrecked
-        self.start_phases(["unbend", "lower"])
+        boom = driver_boom(self.ship, self.sail)
+        rig_in = boom is not None and not boom.wrecked
+        self.start_phases(["unbend", "lower", "rig_in_boom"] if rig_in else ["unbend", "lower"])
 
     def end_phase(self, name: str) -> None:
-        if name == "lower":
+        if name == "rig_in_boom":
+            self._rig_boom(self.sail, False)
+        elif name == "lower":
             sound = self.sail.state is not SailState.BLOWN_OUT
             self.sail.state = SailState.UNBENT
             self.sail.reefs = 0
@@ -3516,12 +3567,14 @@ class BendScript(_SailWork):
     """Bend a sail from the sail room to a bare yard, gaff or stay (Luce 1884, ch.
     XX 'Bending sail': "Sway aloft! ... Haul out! Lay out! And bring to!").
     Phases ``send_up`` (on deck: rouse the sail up from the sail room and sway
-    it aloft) and ``bend`` (aloft: haul out the head, pass the robands and head
-    earings, bend the gear). The sail bent is the best of its kind in the room
-    or the one the order names, and brings its canvas number and condition to
-    the part. It is left furled, to be set by order."""
+    it aloft), for a driver ``rig_out_boom`` (Ext §17.11), and ``bend`` (aloft:
+    haul out the head, pass the robands and head earings, bend the gear). The sail
+    bent is the best of its kind in the room or the one the order names, and brings
+    its canvas number and condition to the part. It is left furled, to be set by
+    order."""
 
-    DEFAULTS = {"send_up": 120.0, "bend": 240.0}
+    # rig_out_boom: `DRIVER_BOOM_S`, 120 s, judgement (Ext §17.11).
+    DEFAULTS = {"send_up": 120.0, "bend": 240.0, "rig_out_boom": DRIVER_BOOM_S}
 
     def check(self, words: dict[str, Any]) -> str | None:
         reason = self._find(words)
@@ -3542,7 +3595,8 @@ class BendScript(_SailWork):
         return self._choose(self.sail)
 
     def begin(self, words: dict[str, Any]) -> None:
-        self.start_phases(["send_up", "bend"])
+        rig_out = driver_boom(self.ship, self.sail) is not None
+        self.start_phases(["send_up", "rig_out_boom", "bend"] if rig_out else ["send_up", "bend"])
 
     def end_phase(self, name: str) -> None:
         if name == "send_up":
@@ -3551,6 +3605,8 @@ class BendScript(_SailWork):
                     f"Roused up the {self._name()} from the sail room ({self._spare_words()}) "
                     f"and swayed it aloft."
                 )
+        elif name == "rig_out_boom":
+            self._rig_boom(self.sail, True)
         elif name == "bend":
             self._bend_spare()
 
@@ -3568,7 +3624,11 @@ class ShiftScript(_SailWork):
     down to the sail room, unless it is in rags, and the new one up), ``bend``
     (aloft) and ``set`` (only when the old sail was drawing; a furled or
     hauled-up sail is shifted where it hangs and the new one left furled, as
-    the port drill has it). The new sail is the best of the kind in the room,
+    the port drill has it). A driver's boom goes with its sail (Ext §17.11):
+    ``rig_in_boom`` between ``unbend`` and ``send_up`` when the old sail has one,
+    ``rig_out_boom`` between ``send_up`` and ``bend`` when the new one has, and
+    neither when a driver is shifted for another on the one boom, which stays
+    out. The new sail is the best of the kind in the room,
     or the one the order names: a number, the heavy one, or another sail bent
     in this one's place ("shift the spanker for the storm mizzen", Luce 1884
     ch. XXVII: "the storm mizzen is a substitute for the spanker"). Gate 4a's
@@ -3579,7 +3639,16 @@ class ShiftScript(_SailWork):
     # 105 s (a course clewed up and hauled up); 90 s is the gaff sail's, taken as the
     # middle. set: the set evolutions' hoist or sheet-home-and-hoist steps, 75 s to
     # 150 s; 120 s. Both judgement from data/evolutions/take_in_*.yaml, set_*.yaml.
-    DEFAULTS = {"take_in": 90.0, "unbend": 180.0, "send_up": 150.0, "bend": 240.0, "set": 120.0}
+    # rig_out_boom, rig_in_boom: `DRIVER_BOOM_S`, 120 s each way, judgement (Ext §17.11).
+    DEFAULTS = {
+        "take_in": 90.0,
+        "unbend": 180.0,
+        "send_up": 150.0,
+        "bend": 240.0,
+        "set": 120.0,
+        "rig_out_boom": DRIVER_BOOM_S,
+        "rig_in_boom": DRIVER_BOOM_S,
+    }
 
     def check(self, words: dict[str, Any]) -> str | None:
         reason = self._find(words)
@@ -3608,12 +3677,26 @@ class ShiftScript(_SailWork):
                     f"The {self._name(rival)} is bent in the {self._name(target)}'s place; "
                     f"unbend it first."
                 )
+        # the driver's foot is spread on its boom and its head on the yard, whichever sail it is
+        # shifted from: the storm mizzen hangs on the mast alone, so `_find` asks neither (Ext
+        # §17.11; §17.10 item 6 for the driver)
+        if driver_boom(self.ship, target) is not None:
+            gone = gone_spar(self.ship, target)
+            if gone is not None:
+                return self._wreck_refusal(wreck_root(self.ship, gone), target)
         self.target = target
         return self._choose(target)
 
     def begin(self, words: dict[str, Any]) -> None:
         drawing = getattr(self, "was_drawing", False)
         phases = ["unbend", "send_up", "bend"]
+        boom_in = driver_boom(self.ship, self.sail)
+        boom_out = driver_boom(self.ship, self.target)
+        if boom_in is not boom_out:
+            if boom_in is not None:
+                phases.insert(1, "rig_in_boom")
+            if boom_out is not None:
+                phases.insert(phases.index("bend"), "rig_out_boom")
         if drawing:
             phases = ["take_in", *phases, "set"]
         self.start_phases(phases)
@@ -3650,6 +3733,10 @@ class ShiftScript(_SailWork):
                 # the old sail is sound: it goes down to the sail room for the sailmaker
                 self._stow(self.sail)
             self.note(f"Swayed aloft the {self._name(self.target)} ({self._spare_words()}).")
+        elif name == "rig_in_boom":
+            self._rig_boom(self.sail, False)
+        elif name == "rig_out_boom":
+            self._rig_boom(self.target, True)
         elif name == "bend":
             self._bend_spare()
 
@@ -3936,6 +4023,9 @@ class ClearWreckScript(PhasedScript):
                 s.reefs = 0
                 s.wrecked = False
                 s.load_kn = 0.0
+                boom = driver_boom(ship, s)
+                if boom is not None and not boom.wrecked:
+                    boom.rigged_out = False  # in with its sail, the hands at it (Ext §17.11)
                 if whole:
                     room = parts.sail_room(ship)
                     spare = parts.SpareSail(kind=s.id, canvas_no=s.canvas_no, condition=s.condition)
@@ -3959,6 +4049,11 @@ class ClearWreckScript(PhasedScript):
                 sp.load_kn = 0.0
                 if sp.cls in parts.RIGGED_IN_CLASSES:
                     sp.rigged_out = False
+            # a driver in the sail room all along, its boom hit on the booms (Ext §17.11): whole,
+            # with no `sails` phase to say so. A frigate's ringtail is as it was, for the lead.
+            for s in self.stowed:
+                if driver_boom(ship, s) is not None:
+                    s.wrecked = False
             if name == "cut_adrift":
                 for s in self.sails:
                     s.state = SailState.UNBENT
@@ -4115,6 +4210,8 @@ class ShiftSparScript(PhasedScript):
             spar.brace_angle = 0.0
             if spar.cls in parts.RIGGED_IN_CLASSES:
                 spar.rigged_out = False  # landed in its irons, rigged in, ready to rig out
+            elif any(driver_boom(ship, s) is spar for s in ship.sails_using(spar)):
+                spar.rigged_out = False  # on the booms: its wreck left the driver below
             if spar.cls in MAST_CLASSES:
                 done = f"Swayed aloft and fidded the new {name_}"
             elif spar.cls in YARD_LIKE_CLASSES:

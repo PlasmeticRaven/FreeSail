@@ -42,7 +42,7 @@ from freesail import units
 from freesail.crew.model import number_words
 from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
-from freesail.evolutions.runner import PartyTooSmall
+from freesail.evolutions.runner import PartyTooSmall, part_name
 from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
@@ -2590,6 +2590,31 @@ def _points_words(points: float) -> str:
 # ---------------------------------------------------------------------------
 
 
+def _boom_goes_with_its_sail(ship: Ship, part: Any) -> str | None:
+    """Why a driver's boom is not rigged out or in by order, naming the shift that does it
+    (package 75; docs/design/Design-ShipsEngineExtensions.md §17.11), or None for any other
+    part. With nothing bent in the driver's place, the bending does the shift's work."""
+    if not isinstance(part, Spar):
+        return None
+    driver = next((s for s in ship.sails_using(part) if scripts.driver_boom(ship, s) is part), None)
+    if driver is None:
+        return None
+    name = part_name(ship, driver.id)
+    if driver.state is SailState.UNBENT:
+        do = f"bend the {name}"
+        holder = storm._in_its_place(ship, driver)
+        if holder is not None:
+            do = f"shift the {part_name(ship, holder.id)} for the {name}"
+    else:
+        do = f"unbend the {name}"
+        if driver.in_place_of is not None:
+            do = f"shift the {name} for the {part_name(ship, driver.in_place_of)}"
+    return (
+        f"The {part_name(ship, part.id)} goes out and comes in with the {name}, not by itself; "
+        f"{do}."
+    )
+
+
 def _boom_evolution(
     ship: Ship,
     order: Order,
@@ -2619,6 +2644,9 @@ def _boom_evolution(
         elif isinstance(part, Sail) and part.cls == "studding":
             boom = ship.spar_of_role(part, "boom")
         if boom is None:
+            with_its_sail = _boom_goes_with_its_sail(ship, part)
+            if with_its_sail is not None:
+                raise OrderError(with_its_sail)
             raise errors.wrong_kind(
                 verb,
                 resolve.display_name(ship, pid),
