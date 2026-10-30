@@ -918,10 +918,10 @@ Rungs as §5.0 gives them. "To read" means R or T until it is read. A stand-in k
 
 | Hull | Body and side | Stern and head | Next source |
 |---|---|---|---|
-| frigate-36 | S† Steel's 36 (bodies p. 9; the folios): the breadths, the main breadth, and the sections from the diagonals, scaled to *Amazon*; drawn about 5.4 m deep against her file's 4.6 m | square, two counters, 20 ft 9 in at the top-timber line (Folio LI) S†; one gallery tier T, placed by Steel's method; lights T, plain; figure, its reach R (Folio I less LI) | *Amazon*'s own lines (not reached); Steel's 38 (bodies p. 8) |
-| brig | S† the *Raven*'s contract (Steel 1805 pp. lix-lxv) at midships; `g.midship_section`, T (a man-of-war's sharper floor); along the length T (the default rule); drag T, inferred from *Harpy*'s as-built draughts (Winfield p. 256) | square, plain, 16 ft 9 in (p. lix) S†; scroll head (p. lxv) S†; no galleries or lights | Steel's sloop of 18 guns (bodies p. 15) |
+| frigate-36 | S† Steel's 36 (bodies p. 9; the folios): the breadths, the main breadth, and the sections from the diagonals, scaled to *Amazon*; drawn about 5.4 m deep against her file's 4.6 m | square, two counters, 20 ft 9 in at the top-timber line (Folio LI) S†; one gallery tier T, placed by Steel's method; lights T, plain; figure, its reach R (Folio I less LI) | to read: the class's lines, ZAZ2559 (*Amazon*'s copy) and ZAZ2587 (*Emerald*'s) (§5.9); Steel's 36 and 38 (bodies pp. 8-9) as checks |
+| brig | S† the *Raven*'s contract (Steel 1805 pp. lix-lxv) at midships; `g.midship_section`, T (a man-of-war's sharper floor); along the length T (the default rule); drag T, inferred from *Harpy*'s as-built draughts (Winfield p. 256) | square, plain, 16 ft 9 in (p. lix) S†; scroll head (p. lxv) S†; no galleries or lights | to read: the class's sheer draught ZAZ4491, with *Diligence*'s ZAZ4320 and *Hound*'s ZAZ4262 as checks, and the inboard plans ZAZ4492 (§5.9); Steel's sloop of 18 guns (bodies p. 15) as a check |
 | merchant-brig | the brig's: one class in two roles (§5.0 principle 10; §19.1 item 14) | the brig's, except where they specifically differ in details | as the brig |
-| cutter | S† Steel's 273-ton cutter (bodies p. 18), sections from the diagonals, scaled to 85 tons; drawn about 2.1 m deep against her file's 2.6 m, with her file's 2 ft of drag | square counter, 10 ft 9 in (Folio LI) S†; no head | *Sherbourne*'s own draught |
+| cutter | S† Steel's 273-ton cutter (bodies p. 18), sections from the diagonals, scaled to 85 tons; drawn about 2.1 m deep against her file's 2.6 m, with her file's 2 ft of drag | square counter, 10 ft 9 in (Folio LI) S†; no head | to read: her own lines, ZAZ6381, with the deck ZAZ6382, the as-built CHN0102 and CHN0224, and the stern CHN0103 (§5.9) |
 | lugger | S above the water (ZAZ6306: stepped rail, plan); under the water T (no body plan; Chapelle 1930's "great deadrise" of a French lugger, OCR l. 508) | round at the rail S; no counter, no head S | Chapelle 1930 fig. 1 (p. 7), *Le Coureur*'s lines (the vessel of ZAZ6170 by name and date, inference); ZAZ4734-4736 |
 | smack | S† Chapman Pl. LIX No. 3: the water, the main breadth and the rail by station, the midship section; under the water between, S† Steel's coasting sloop of 60 tons (bodies p. 27, read: `pages-steel-1805-bodies.md` §3.3, §5.4) through `g.from_steel_table`, the plate's section ruling at midships | raked, rounded, 0.78 m S†; no head | none named: both sources are read |
 | topsail-schooner | S† *Lynx* (Chapelle 1930 fig. 17): sections from the LWL, WL2, WL3, sill line and rail by station | raked about 45°, 2.25 m S†; small knee S† | Steel's schooner of 133 tons (p. 25) and *Flying Fish* (Chapelle pp. 48-49), as checks on the class |
@@ -973,9 +973,84 @@ any other is cited by link and credit only, never copied.
   at each side, a decorated taffrail above them, the name on the counter, a quarter gallery of
   three lights: her cabin under the short roundhouse that ZAZ2371's note gives her, now in her
   profile.
+- **the cutter:** Vanguard Models' kit of H.M. cutter *Sherbourne* 1763, a profile from its
+  manual and two photographs of the built model (the owner, 2026-10-29; in copyright: kept
+  privately in owner-notes, never copied). A square transom, flat and raked; a full, round bow;
+  a black wale; four ports a side with small sweep ports between; the bowsprit beside the stem,
+  not on it. The makers name no source in the pages reached; by eye the kit agrees with
+  ZAZ6381 (§5.9).
 
 Wanted from the owner where they turn up: bow-on and stern-on views, and hulls out of the water,
 which show the sections and the body under the water that a broadside cannot.
+
+### 5.9 The existing hulls' own draughts (found 2026-10-29)
+
+The owner sent the first of each; the session's checks found the rest at Royal Museums
+Greenwich (RMG). Under principle 3 none holds a rung until it is read: each stays "to read" in
+§5.7 until SW-2 measures it into a pages note in the form of `pages-zaz6306.md`. They are
+cached outside the repository under `D:/Projects/FreeSail/reference-cache/` (`emerald-j5297/`,
+`diligence-j4420/`, `sherbourne-1763/`). RMG credits every sheet "© Crown copyright. National
+Maritime Museum, Greenwich, London" and licenses its images only through RMG Images, so, as
+ZAZ6306, each is read and cited, never copied into the repository, whatever Commons's tag.
+
+**frigate-36: the *Amazon* class of 1795, Rule's design** (Winfield p. 143).
+- **ZAZ2587** (RMG object 82378; Commons "EMERALD 1795 RMG J5297"): the lines, with body plan,
+  sheer and half-breadth, 1:48 by its scale bar. It is the contract draught for two frigates to
+  be built on the Thames, signed by Rule and approved on 29 May 1794, with a note of copies to
+  Wells at Rotherhithe for *Amazon* and to Pitcher at Northfleet for *Emerald*. The curator's
+  stamp files it under *Emerald*.
+- **ZAZ2559** (object 82350): *Amazon*'s own copy for Wells, with the same dimension table and
+  body plan. Each ship's set also holds her frames (ZAZ2560, ZAZ2588), inboard profile (ZAZ2561,
+  ZAZ2589) and decks (ZAZ2562-2565, ZAZ2590-2593).
+- **Resolution:** 1280 px only, about 5.4 px to the foot. The sheer, the half-breadths and the
+  waterlines' heights read to about 0.2-0.4 ft, enough for her sections from the waterlines by
+  station, as the 64's were built; the body plan itself is too crowded to read. The two copies
+  check each other. A sharper scan would be licensed from RMG Images; the drawing does not
+  need it (judgement).
+- **Against her file**, recorded, not moved (principle 8): the class's 143 ft 0 in, 119 ft 6 in,
+  38 ft 2 in, 13 ft 6 in and 925 87/94 tons are within 1% of the file's (*Amazon* as built).
+  Read roughly, the top waterline is about 140-142 ft long against the file's 137 ft, and
+  stands about 16-17 ft above the keel against her 15-ft mean draught; no line is marked as
+  the load line.
+
+**brig and merchant brig: the *Diligence* class, Henslow's design, approved 22 April 1795**
+(Winfield pp. 255-256).
+- **ZAZ4491** (object 84282; Commons "... RMG J4419", 16,158 × 5,644 px): the class's sheer
+  draught, April 1795, stamped *Harpy*. Body plan with the stern board, waterlines and
+  diagonals; sheer with the scroll head; half-breadth; 95 ft 0 in, 75 ft 2½ in, 28 ft 0 in
+  extreme (27 ft 6 in moulded), 12 ft 0 in, 313 59/94 tons. The S source for her body.
+- **ZAZ4492** (object 84283; Commons "... RMG J4420", 11,684 × 8,626 px; the owner's): the
+  inboard profile and the upper and lower decks, Navy Office 1 May 1795, stamped *Harpy*, with
+  *Harpy*'s masts moved in green in January 1799 at her captain's request. No lines: it gives
+  the rail and sheer, the decks, ten ports a side with sweep ports between, the masts and the
+  breadths at both decks, at about 101 px to the foot.
+- **Checks:** *Diligence*'s own sheer draught ZAZ4320 and *Hound*'s ZAZ4262 (both on Commons at
+  full size), with their inboard and frame sheets; the sheer draught of the eight, ZAZ4626 (RMG
+  only); the class's contract ADT0015 and *Diligence*'s ADT0029 (manuscript, not read).
+- **Against her file**, to record, not move: ten ports a side, where her description says
+  "sixteen ports a side" (a word for her generator at SW-2); the fore mast at about +9.6 m (+9.4
+  after *Harpy*'s change) against +8.9 m; the deck and sill heights against the file's 1.5 m
+  and 2.1 m, unsettled until the keel's datum and the load line are read. Her drag stays
+  Winfield's draughts of water (7 ft 3 in / 10 ft 10 in), not a drawing, until ZAZ4491 is read.
+
+**cutter: *Sherbourne*, 1763, Slade's design**, built at Woolwich on the lines of the purchased
+cutter *Pitt*.
+- **ZAZ6381** (object 86172; RMG only, 1280 px, about 15.6 px to the foot): "Sherbourn Cutter",
+  June 1763, 1:48. Body plan with sixteen sections, three waterlines and diagonals; sheer with
+  the inboard works; half-breadth; 54 ft 6 in, 44 ft 7 in, 19 ft 0 in, 85 tons; the deck raised
+  3 in by letter of 21 June 1763. Measurable to about 2-3 in. Her S source.
+- **With it:** ZAZ6382 (86173), the hold and deck; CHN0102 and CHN0224 (387185, 387187), as
+  built, launched 3 December 1763, with a table of masts and yards (1024-px previews only);
+  CHN0103 (387188), the square-tuck stern and transom at 1:24, the stern's source; ZAZ6343
+  (86134), *Pitt*'s lines, the kin.
+- **Against her file**, rough reads to record, not move: the top waterline about 52-53 ft
+  against 50 ft; drag about 2.5-3 ft against 2 ft; four ports a side against three guns a side;
+  the mast about 7-8 ft before the middle against 4.9 ft; a square tuck with a flat transom
+  raked about 45°, some 11-13 ft across, against the stand-in's 10 ft 9 in counter. No head, as
+  §5.7 has it.
+
+**Still without their own:** the bilander (Chapman's proportions and a trader's body) and the
+lugger's body under the water (§5.7).
 
 ## 6. The viewer draws the profile (B5)
 
