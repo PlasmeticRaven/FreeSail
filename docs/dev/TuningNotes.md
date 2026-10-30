@@ -13605,3 +13605,21 @@ under `docs/agents/consent/` or the consent brief touched.
   the builder's; the primer's chapters 17 and 19 say what a station on another hull may
   do, and nothing says in one place what a save of many hulls holds, what `follow` shows at
   the console, or what a hull asleep is to the person aboard her).
+
+### The suites on the final tree (package 85)
+
+On `4241ad1`'s tree (this session's container, four cores, nothing beside it); `ruff
+check .` and `ruff format --check .` clean. **The fast tier**, whole, twice (`python -m
+pytest -n auto -q -p no:cacheprovider`, 379 slow tests left out, 25 minutes each): the
+first run on the tree before item 7's commit found eleven failures the per-item runs of
+the touched files had not (the anchor's standing order and its parity row, the two
+playtest saves and the 37d save at `nations.sailed_with`, truth 7b-117's date, the
+officer's budget, the papers' count and order at the server and in the ordnance's
+catalogue tests, and the pictures' known flake "the chart is blank (std 7.9)" under the
+tier's load), each mended as item 7's commit says; the second run, on the mended tree,
+4,447 passed, none failed, the pictures' test among them. **The slow tier of the files
+touched and the known truths** (`--slow -m "not pace" -n 4` over the fifteen test files
+of the package's diff with `test_anchor.py` and `test_checkpoint.py`, 41 minutes): 1,735
+passed, 7 expected failures (the rulings'), none failed; every recorded passage's digest
+and pin held. The pace tests and the whole slow tier not run (the lead's in the cloud at
+the merge).
