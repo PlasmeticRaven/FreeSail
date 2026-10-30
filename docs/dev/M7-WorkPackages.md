@@ -3865,3 +3865,36 @@ the form of an evolution file's build notes (below a blank line under `# Build n
 served by the library's catalogue)`). The session's lateen six in that form (`536176d`) are
 right for it; the primer's chapter on the ships, when written, goes through the same test,
 and the merge of the ships' branch runs it first.
+
+**2026-10-30, later: the Indefatigable's report read at `bb60222`; her merge under way; the
+hull step cleared to measure, the landing held.** The lead cannot reach the session's bridge
+from the cloud (its message was refused on the way, as the trigger was), so this is the
+answer. **The merge:** do not bring the trunk in; the lead merges from `bb60222` as it stands.
+The trunk moved since `58c51ac` (package 82's step 1, the person's movement between hulls, at
+`cfcf092`; 85 and 93 are in it too, which the branch lacks), and the trial merge is clean. The
+order run: 85's in-world test and the grammar book on the merged tree first (the served heads
+and the tools' words meet 85's rule for the first time), then the whole fast tier, then the
+cloud; the plain cases of any failure of words mended at the merge and said in the record.
+After the merge, bring the trunk in before the hull step's landing. **The four departures,
+accepted as reported:** (1) rule (3) narrowed to a spar with yards under it, the lugger's
+21.8 kN standing, hers for SW-2; (2) the ratings as the named rating reads them, 168.6,
+168.5 and 27.0 kN; (3) the three lines through `driver_boom` and the two behaviours with them,
+in Ext §17.11's as-built note; (4) the razee's `clr_x_m` +4.5 for the owner's test, +4.4's
+figures beside it. The older gaps found (a belayed shift losing the canvas drawn, the
+ringtail's `wrecked` after its boom's wreck is cleared, a boom hit while rigged in not drawn,
+the served heads naming no boom phase) are booked and are not this merge's. **The hull step
+(the owner's leave of tonight, "as long as you clear it with the lead"):** cleared to start the
+three streams' measuring now, frigate-36 (ZAZ2587, ZAZ2559), the brigs (ZAZ4491, ZAZ4492) and
+the cutter (ZAZ6381 and its fellows), each in its own worktree with its own pages note in
+`pages-zaz6306.md`'s form, cross-checked as hers was, and its own small module under
+`tools/ships/` called from one place in `gen_ships.py`, so that no two writers meet; each
+stream its own small tests, the fast tier once at the end, one suite at a time. **The rule
+stands: the eight move in bytes once** (`Build-Ships.md` §5.6, §19). Measure and build the
+three now, hold the landing, and put the other three to the owner when they are back; if the
+owner then rules three now and the rest later, land three. Serial at the end as proposed: the
+pair check, one regeneration, one commit of bytes, B5's pictures old beside new, the owner's
+sheets, the port triples reported before L2; nothing in `physics/` or `combat/` and nothing in
+the eight's behaviour before the landing, by §5.6; every rung by §5.0. **One ask:** in the hull
+step's record, name the three captain's trials that fail on the owner's machine with or
+without the work, with their figures on a clean archive, once, so that the owner's machine's
+difference from the build machine is written where the next reader looks.
