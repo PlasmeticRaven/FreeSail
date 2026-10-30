@@ -13890,3 +13890,42 @@ with `--slow -n 4`, 20 passed (7-300 Naples' marks and 7-301 Cagliari among them
 package's 7-305 to 7-309, written beside). **The scenario** `agincourt-sound.yaml` sailed
 again on the whole rebuilt Mediterranean: the same log as before this region, byte for byte
 (4,012 lines, `10dfe615a065d28d`).
+
+### The truths (7-305 to 7-309)
+
+- **7-305**, the Channel east's low shore against its own high water. The brief's line ("a
+  low shore of the Channel east, the Dungeness marsh, the Somme's banks, stands above the
+  world's high water springs") is **the lead's wording, amended at the measurement** (the
+  ruling of 2026-10-30, option (a)): the Somme's banks (50.15 to 50.25 N, 1.55 to 1.68 E,
+  625 points) median 1.54 m above high water springs, 456 points above (old tiles 1.24 and
+  415); Dungeness's shingle point (50.915 N, 0.93 to 0.97 E) above it at every point; the
+  raise at Romney Marsh the block's mean level to the centimetre, 0.35 m over the eleven's
+  at the grid's cell; and **Romney Marsh and the Pevensey Levels below high water springs**
+  as their true levels lie behind the Dymchurch Wall and the Pevensey walls: Romney median
+  -0.98 m, 87 of 625 points above (old -1.31, 54), the Dungeness foreland's box -0.19 and
+  282 (old -0.56, 176), Pevensey -1.16 and 190 (old -1.65, 163); on the eleven's own water
+  the marsh lay under as well (its HWS 6.24 m there, the block's 6.95). A finding for a land
+  patch when a sheet with its datum is read; nothing invented, no patch drawn.
+- **7-306**, Mahón's and Naples' quays. Mahón's raise is its gauge's 0.20 m (Saint-Malo's
+  6.83 before); within 600 m of the quay 214 of 288 points land, their median 23.5 m above
+  the mean level (27.1 on the old tiles, the false raise's 6.6 m in it), all but two above
+  high water springs. Naples' gauges' levels are unread: its water and its raise are the
+  eleven's, 3.70 m, the quay's ground as it was (279 points land, median 17.6 m).
+- **7-307**, a bay and a harbour by their own block's tide. On 12 June 1805 the bay of the
+  Somme's tide runs from 1.96 to 7.32 m above the datum by the block's water (3.26 to 4.53
+  by the eleven's); of the bay's points (50.17 to 50.26 N, 1.50 to 1.66 E, at 0.004
+  degrees) 193 stand between the block's low and high water and above the eleven's high
+  water: they cover and dry on the block's tide and never covered on the eleven's (the
+  truth asks 150). Port Mahon's inner harbour (39.885 N, 4.29 E), +3.4 m on 79c's tiles,
+  is water at every hour by Mahón's tide, three metres and more.
+- **7-308**, outside every block the raise is the eleven's, over the Channel west, the
+  ocean off Portugal and the Bay's mouth (to 5 mm asserted; the arithmetic is the same to
+  the bit); channel-west's recipe and manifest entry still without the key.
+- **7-309**, the Strait, Madeira and the Azores: the raise there the eleven's and the
+  world's both (their gauges' levels unread; Le Conquet's 3.98 m over the Strait), the
+  Strait's column east of 5 W the Mediterranean west's 0.37 to 0.43; Agincourt Sound's
+  `fill_raise: eleven`, the eleven's level at its berth six metres and more over the
+  block's.
+
+Each is in the fast tier (under three seconds); with the block's truths, 7-290 to 7-309,
+20 passed on the final Mediterranean.
