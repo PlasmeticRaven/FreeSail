@@ -14059,4 +14059,8 @@ touched and the known truths** (`--slow -m "not pace" -n 4` over the fifteen tes
 of the package's diff with `test_anchor.py` and `test_checkpoint.py`, 41 minutes): 1,735
 passed, 7 expected failures (the rulings'), none failed; every recorded passage's digest
 and pin held. The pace tests and the whole slow tier not run (the lead's in the cloud at
-the merge).
+the merge). **After the merge of the lead's branch at package 94** (the chart's tidies,
+the Solent's tide region and the seams' rule under the worlds these tests run in): the
+fast tier whole again, 4,454 passed, none failed; the package's six test files, the
+primer's, the anchor's and the checkpoints' with the truths 7-240 to 7-245, 7b-117 and
+7-150 to 7-159, `--slow -m "not pace" -n 4`: all passed, no pin moved.
