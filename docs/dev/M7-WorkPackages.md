@@ -3220,3 +3220,40 @@ passes at it: the served head in the period's words with its sources, the packag
 Ext's references below the build-notes head. The trunk's head is `1e3523b` (package 94
 merged: the chart's islets, the tide's seam taper and the Solent's region; nothing of the
 ships' files); 85's merge will be noted here when it lands.
+
+**2026-10-30, later: B1's stage B read, three figures ruled, the regeneration with §17.11 approved**
+(the session's message on `ee408a4` and `f43614f`, with the trunk's `51f093d` merged at `abceec2`,
+the slings line `0c26526` and the lateen six in the in-world form `536176d`; before the last two
+the fast tier 4,620 passed, 2 skipped, the three known trials the only guard-set failures, the
+eight byte-identical and drawing identically; her section in the tuning notes with every moved
+figure old beside new). **The three, each the session's pick taken, into the one regeneration
+with §17.11:** (1) **the 64's course tack at 8.73 m above the water**, Steel's "within 6 or 7
+feet of the deck" read as 6 ft 6 in from the roundhouse deck, the deck the mast stands through
+there, the clew 1.14 m clear at the side (more than the 74's margin), the driver then 203 m²
+against Steel's 198.5; the note of 2026-10-29 that read two ways ("the head room goes first")
+is the lead's, and 8.73 m is its meaning: Steel's words first, the head room where his words
+leave room; `clr_x_m` and her truths measured again on it as the notes say. (2) **The razee's
+spanker boom at literally the least that clears her taffrail, the spanker 200 m²** against
+Steel's 202 for a 38; the owner's 218 cannot stand with the boom clear of the taffrail, which the
+session tells the owner plainly with the figures (218 to 191 at 6 ft of head room, 200 clear of
+the taffrail alone, 195 at 5 ft); within the owner's 8 per cent. (3) **`rate_spars` keeps the
+larger of a bowsprit's or jib-boom's named rating and the rating the sails carried through it
+give**, a generator's rule said in its comment: a spar's rating by the sails whose chains pass
+through it is a proxy for its scantlings, and the proxy may not shrink when a smaller sail is
+hung on the spar (the 64's bowsprit 171 to 100.6 kN by the sprit sails, back to 171; the razee's
+170 to 47.2, back to 170; the jib-booms the same); no sail chain passes through those spars on
+the eight, so their bytes hold, which the regeneration shows. **The order approved:** the
+stage-0 commit, one step for §17.11 (B3 and B5 together, the guard sets and the toggle), these
+three in her regeneration, `clr_x_m` and her truths measured again, then the owner's testing
+report and the sheets into `docs/playtests/`. **For the eye, left to the owner's test as the
+session proposes, two with a question for the report:** the 64 missing stays from 60° off in 15
+knots by the yards under the bowsprit, staying from 62.5°, "full and by" six points (say in the
+report what the 74 does at 60°, when she comes); her staying in 246 to 262 s against truth 10's
+285-s floor for the frigate (a two-decker quicker in stays than a 36 is a thing to look at in
+the test: the report says what sets it, the yards under the bowsprit or her lines); the aback
+from rest at `clr_x_m` +4.8 from 17 knots, no truth asking past 15; −0.91° of helm at six points;
+the driver's tack at 479 s against the course's 252 with six minutes' griping, a fair-weather sail
+as Steel has it, measured and not pinned; the razee under the frigate-36 by 0.09 to 0.23 knots in
+15 knots, 7-187's clause reported and not forced; the boom's swing and the sheet to the taffrail
+keyed on the profile, the eight taking it at SW-2's pictures; her long tests' `SLOW_TESTS` entries
+the integrator's at Phase 5.
