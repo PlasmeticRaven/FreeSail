@@ -851,10 +851,15 @@ class BoatState:
     # takes off from the quay, by id; plain class defaults, so a checkpoint from before loads
     landing: tuple[str, ...] = ()
     fetching: tuple[str, ...] = ()
+    # package 82: the hull she is sent to at sea (`Dealings.send_boat_to`), "" for the shore
+    to_hull: str = ""
+    to_name: str = ""
 
     def words(self) -> str:
         if not self.away:
             return f"{self.boat_name} at the booms"
+        if self.errand == "to_ship":
+            return f"{self.boat_name} away to the {self.to_name or 'ship'}, {self.phase}"
         return f"{self.boat_name} away {_errand_words(self.errand)}, {self.phase}"
 
 
@@ -1250,6 +1255,7 @@ def _errand_words(errand: str) -> str:
         "recruits": "for the hands entered",
         "landing": "to land a person who stays ashore",
         "fetch": "to bring a person off from the quay",
+        "to_ship": "to another ship",  # package 82: a person put aboard her, or fetched
     }.get(errand, errand)
 
 

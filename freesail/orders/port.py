@@ -129,6 +129,77 @@ def _tons_and_good(rest: str, verb: str) -> tuple[float, str]:
     return n, good
 
 
+_TO_SHIP = re.compile(
+    r"^(?:(?P<with>with\s+(?:the\s+)?)?(?P<before>.*?)\s+)?(?:to|aboard|alongside)\s+"
+    r"(?:the\s+)?(?P<ship>[\w' -]+?)(?:\s+with\s+(?P<carry>.+?))?(?:\s+for\s+(?P<fetch>.+?))?\s*$",
+    re.I,
+)
+
+
+def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], list[Any]] | None:
+    """`send the boat to the <ship> [with <persons>] [for <persons>]` (package 82): the
+    hull named, the persons of this company she carries and the persons of hers she is
+    sent for; None when the words name no ship on the sea (the shore's errands then)."""
+    from freesail.world.movement import hull_of
+    from freesail.world.orders import WorldOrderError, hull_named
+
+    text = " ".join(f"{phrase} {rest}".split())
+    for lead in ("send the boat ashore", "send a boat ashore", "send the boat", "send a boat"):
+        if text.lower().startswith(lead):
+            text = text[len(lead) :].strip()
+            break
+    m = _TO_SHIP.match(text)
+    if m is None or not m.group("ship"):
+        return None
+    name = m.group("ship").strip()
+    low = name.lower()
+    if low in ("shore", "quay", "port", "yard", "market") or low.startswith(("shore ", "quay ")):
+        return None
+    try:
+        target = hull_named(world, name)
+    except WorldOrderError:
+        return None
+    if target is world or target is getattr(world, "own", None):
+        raise OrderError("The boat is sent to another ship, not to her own.")
+    if not isinstance(target, type(getattr(world, "own", None))):
+        target = hull_of(world, getattr(target, "id", None)) or target
+    carrying: list[Any] = []
+    fetching: list[Any] = []
+    before = (m.group("before") or "").strip() if m.group("with") else ""
+    for words in (before, m.group("carry") or ""):
+        for who in _names(words):
+            p = world.people.find(who)
+            if p is None:
+                raise OrderError(
+                    f"Nobody aboard answers to '{who}'; the boat is not sent. The people: "
+                    f"{', '.join(x.name for x in world.people.all if x.aboard)}."
+                )
+            if p not in carrying:
+                carrying.append(p)
+    her_people = getattr(target, "people", None)
+    for who in _names(m.group("fetch") or ""):
+        p = her_people.find(who) if her_people is not None else None
+        if p is None and her_people is not None and hasattr(her_people, "find_aboard"):
+            p = her_people.find_aboard(who)
+        if p is None:
+            raise OrderError(
+                f"Nobody aboard the {getattr(getattr(target, 'ship', None), 'name', 'other ship')} "
+                f"answers to '{who}'; the boat is not sent."
+            )
+        if p not in fetching:
+            fetching.append(p)
+    return target, carrying, fetching
+
+
+def _names(words: str) -> list[str]:
+    out: list[str] = []
+    for name in re.split(r"\s*,\s*|\s+and\s+", " ".join(str(words).split()).strip(" .")):
+        name = name.strip()
+        if name:
+            out.append(name)
+    return out
+
+
 def execute(ship: Any, order: Order) -> Result:
     """Carry out a port order. The verb is the vocabulary's key."""
     verb = order.verb
@@ -168,6 +239,17 @@ def execute(ship: Any, order: Order) -> Result:
             if phrase.endswith(" " + lead):
                 words = f"{lead} {rest}"
                 break
+        to_ship = _boat_to_ship(world_of(ship), phrase, rest)
+        if to_ship is not None:
+            # package 82: the boat to another ship lying within a boat's pull, with the
+            # persons named and for the persons named
+            target, carrying, fetching = to_ship
+            text, data = ports.send_boat_to(target, carrying, fetching)
+            return (
+                "evolution.started",
+                text,
+                {"verb": verb, "level": 1, "subjects": ["the boat"]} | data,
+            )
         text, data = ports.send_boat(words)
         return (
             "evolution.started",

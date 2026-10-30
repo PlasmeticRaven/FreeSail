@@ -206,7 +206,13 @@ class Stations:
         if key in self._bound:
             who = self._bound[key].person
             people = getattr(self.world, "people", None)
-            return people.find(who) if (who and people is not None) else None
+            if not who or people is None:
+                return None
+            # a visitor's station (package 82): a person in her who is not of her company,
+            # by his name whole, before the company's own reading of the words (which
+            # takes 'Captain Pope' for her own captain by his role)
+            found = people.find_aboard(who) if hasattr(people, "find_aboard") else None
+            return found if found is not None else people.find(who)
         if key in self._world_kinds():
             return None
         return self._file_holder(key)
@@ -260,7 +266,12 @@ class Stations:
         if person:
             who = str(getattr(person, "name", person))
             people = getattr(self.world, "people", None)
-            if people is not None and people.find(who) is None:
+            if (
+                people is not None
+                and people.find(who) is None
+                and (not hasattr(people, "find_aboard") or people.find_aboard(who) is None)
+            ):
+                # of her company, or in her now as a visitor (package 82)
                 raise ValueError(f"{who} is not one of the ship's company; nobody by that name.")
         if not quiet:
             self._input("bind", key, person=who, kind=kind)

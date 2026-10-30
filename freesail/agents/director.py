@@ -806,14 +806,17 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
     Form(
         "person.move",
         "person",
-        'person: "<name>" <comes aboard[ as <station>] | goes ashore | leaves the ship at <port>>',
+        'person: "<name>" <comes aboard[ the <ship>][ as <station>] | goes ashore | goes '
+        "aboard the <ship> by the boat | leaves the ship at <port>>",
         (
             'person: "Mr Fox" comes aboard as master',
             'person: "Mr Fox" goes ashore',
             'person: "Mr Fox" leaves the ship at Falmouth',
+            'person: "Mr Veale" goes aboard the Medusa by the boat',
         ),
         "a person moved, or bound to a station; where no boat could carry him, doubted; a "
-        "held station's person, refused",
+        "held station's person, refused; aboard another ship by his ship's boat, where she "
+        "lies within a boat's pull, his station following him as a visitor's",
     ),
     Form(
         "ship.orders_of",

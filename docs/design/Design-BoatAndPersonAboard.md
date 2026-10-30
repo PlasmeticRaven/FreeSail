@@ -693,3 +693,28 @@ the step's final run; never the whole slow tier.
 3. The boat's log folded into the ship's at the hoist-in as `boat.log` lines (§5.3), or kept
    apart in the save as a hull's log under her name: the fold is simpler and the save has
    no block for a hull gone from the sea; the design folds.
+
+## As built (the postscripts, step by step)
+
+### Step 1: the person's movement between hulls (§2; 2026-10-30)
+
+**Built as designed**, the one function `movement.put_aboard` and the harness that goes with
+its person (`Harness.move_to`, `Harness.seated_on`), the visitor's voice and the home station
+standing bound, the boat between hulls as two jobs of the port's kind on an awake hull as on
+a sleeping one, the visitor's `come aboard` by the host's boat, the director's `goes aboard
+the <ship> by the boat` doubted beyond a boat's pull, the boarders' officer on the deck won,
+the captive's stand-down, `where am I` and the station line; truths 7-324, 7-325 and 7-333.
+The figures and the suites are in `docs/dev/TuningNotes.md`, "Package 82", step 1.
+
+**Taken another way, with the reason.** §2 has every harness of the game walk `all_agents`
+by hull; the save's grouping wanted the hulls' harnesses with their hulls, so
+`harness.harnesses_of(world)` gives (hull, harness) pairs and `all_agents` stands as it was.
+The player's own seat (`PlayerSeat`, `--seat officer`) does not yet follow its person between
+hulls: the player at the prompt is the followed hull's captain and no object, and his seat
+on another ship is step 3's, which gives the seat the same `move_to`. §2's "the boat alongside
+another ship ... within the hail's reach doubled" is a mile (`movement.BOAT_BETWEEN_NM`), a
+round figure a boat's crew pulls in a quarter of an hour.
+
+**Found on the way** is in the tuning notes (the keeper's denial of a job-based errand, the
+readings cache against a per-asker row, the holder by name whole, the person ids of two
+companies).

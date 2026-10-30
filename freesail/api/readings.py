@@ -211,6 +211,10 @@ class Reading:
     # the words for a value of None that the reading gives on purpose (the course with
     # no way on), read over the World; None: `describe_value`'s "not to be had"
     none_words: Callable[[Any], str | None] | None = None
+    # a reading whose answer is the asker's (`where am I`, package 82): read afresh at each
+    # asking (never from the view's cache) and left out of the readings tool's dict, which
+    # has no asker (the station line says where its person is)
+    per_asker: bool = False
 
     @property
     def is_absent(self) -> bool:
@@ -302,6 +306,8 @@ class ReadingsView:
             row = self._registry.get(id)
             if row.getter is None:
                 self._cache[key] = None
+            elif row.per_asker:
+                return row.getter(self._world, param)  # the asker's, never cached
             else:
                 self._cache[key] = row.getter(self._world, param)
         return self._cache[key]
@@ -317,7 +323,11 @@ class ReadingsView:
 
     def as_dict(self) -> dict[str, Any]:
         """Every non-parametric reading's value, by id, in registration order."""
-        return {r.id: self.value(r.id) for r in self._registry if r.parametric is None}
+        return {
+            r.id: self.value(r.id)
+            for r in self._registry
+            if r.parametric is None and not r.per_asker
+        }
 
     def words(self, id: str, param: str | None = None) -> str:
         """A reading in words, as an agent reads it (`reading_words`)."""
@@ -2475,6 +2485,21 @@ def _no_port_words(world: Any) -> str | None:
     )
 
 
+def _where_am_i(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`where am I` (package 82): the asker's whereabouts by his own words, the asker the
+    order's actor (`movement.person_of_actor`), the captain for anyone else: aboard his
+    own ship and his place, in the boat, ashore at his port's place, or aboard another
+    ship as a visitor."""
+    from freesail.world.movement import person_of_actor, where_am_i
+
+    extra = getattr(getattr(world, "ship", None), "extra", None)
+    actor = (extra or {}).get("order_actor") if isinstance(extra, dict) else None
+    person = person_of_actor(world, actor or "captain")
+    if person is None:
+        return None
+    return {"words": where_am_i(world, person), "ship": str(getattr(person, "hull", "") or "")}
+
+
 def _boat(world: Any, _: str | None) -> dict[str, Any] | None:
     ports = getattr(world, "dealings", None)
     return ports.boat_reading() if ports is not None else None
@@ -2682,6 +2707,19 @@ REGISTRY.add(
         description="the port she is in or near: its stance to her, the pilot, the cutter and "
         "the boat",
         none_words=_no_port_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "where_am_i",
+        ("where am i",),
+        "query",
+        "",
+        _where_am_i,
+        description="where you are: aboard and your place, in the boat, ashore at the port's "
+        "place, or aboard another ship as a visitor",
+        none_words=_no_people_words,
+        per_asker=True,
     )
 )
 REGISTRY.add(
@@ -3623,6 +3661,17 @@ def _line_who(world: Any, station: str | None, person: Any) -> str:
     if station in (None, "captain"):
         return "the captain"
     name = str(getattr(person, "name", "") or "")
+    hid = str(getattr(getattr(world, "own", None), "id", "") or "")
+    home = str(getattr(person, "home", "") or "") if person is not None else ""
+    if name and home and hid and home != hid and getattr(person, "hull", None) == hid:
+        # a visitor in this hull (package 82): his own ship and his standing in it named
+        from freesail.world.movement import hull_name, hull_of
+
+        own = hull_of(world, home)
+        whose = f" of the {hull_name(own)}" if own is not None else ""
+        role = str(getattr(person, "role", "") or "")
+        rank = f"{role}{whose}" if role else f"a person{whose}"
+        return f"{name}, {rank}, aboard the {hull_name(getattr(world, 'own', world))} as a visitor"
     return f"{name}, the {station}" if name else f"the {station}"
 
 
