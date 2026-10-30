@@ -840,7 +840,9 @@ log, and a seat may be at a person aboard any hull. Since step 10 the drivers fo
 (`follow "X"`, a driver's line replayed; the World's names, the snapshot, the chart and the
 prompt read the followed hull, the player's own until told), the player's own hull is awake
 always and the save the game's, `World.offices` stands empty beside the hulls for M8's
-offices, and a world order may be given under a purview (`by`).
+offices, and a world order may be given under a purview (`by`). Step 11 closed the package
+with its tidies, its words and its records; the design note's "As built, steps 1 to 11" is
+the account.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

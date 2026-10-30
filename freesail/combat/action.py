@@ -138,24 +138,23 @@ def target_of(world: Any, target_id: str) -> Target | None:
     if here is None:
         return None
     parent = getattr(world, "parent", None)
-    if False:  # pragma: no cover - the branch the shadow needed (package 84, step 7)
-        pass
+    # the mark a vessel of the sea, the player's ship among them (package 84, step 7): her
+    # body her hull's ship when the hull is awake, her far body else
+    sea = parent.vessels if parent is not None else world.vessels
+    vessel = sea.get(target_id)
+    if vessel is None or getattr(vessel, "done", False):
+        return None
+    crew = getattr(vessel, "crew", None)
+    if crew is not None and getattr(crew, "shape", "full") == "full":
+        body, tw = crew.ship, crew
+        heel = math.degrees(float(getattr(body.dyn, "heel", 0.0)))
     else:
-        sea = parent.vessels if parent is not None else world.vessels
-        vessel = sea.get(target_id)
-        if vessel is None or getattr(vessel, "done", False):
-            return None
-        crew = getattr(vessel, "crew", None)
-        if crew is not None and getattr(crew, "shape", "full") == "full":
-            body, tw = crew.ship, crew
-            heel = math.degrees(float(getattr(body.dyn, "heel", 0.0)))
-        else:
-            body, tw = vessel, None
-            heel = 0.0
-        pos = vessel.position
-        heading = math.radians(float(vessel.heading_deg))
-        words = _words_for(world, target_id, vessel.name)
-        nation = _nation_made_out(world, target_id)
+        body, tw = vessel, None
+        heel = 0.0
+    pos = vessel.position
+    heading = math.radians(float(vessel.heading_deg))
+    words = _words_for(world, target_id, vessel.name)
+    nation = _nation_made_out(world, target_id)
     if pos is None:
         return None
     bearing, distance = bearing_and_distance(here, pos)

@@ -1003,9 +1003,7 @@ def test_the_director_reads_a_hulls_log_by_her_name_and_no_other_station_may():
 
     w, b, hull = _frigate_with_the_brig_x()
     out = T.read_log(w, "director", since_tick=0, ship="X")
-    assert out["lines"] and all(
-        "Amazon" not in line.get("text", "") or True for line in out["lines"]
-    )
+    assert out["lines"] and not any(w.ship.name in line.get("text", "") for line in out["lines"])
     hers = {x.text for x in hull.log}
     assert all(line["text"] in hers for line in out["lines"])
     assert "error" in T.read_log(w, "captain", since_tick=0, ship="X")
@@ -1038,7 +1036,8 @@ def test_the_rule_of_reach_counts_a_held_station_on_another_hull():
     Harness(hull, captain(every, world=hull), captain_of_the_ship([])).start()
     w.run(61)
     cap = hull.people.captain
-    assert any(name == "captain" for name, _p, _w in WO.held_stations_everywhere(w) if True) or True
+    held = [(name, person) for name, person, _who in WO.held_stations_everywhere(w)]
+    assert ("captain", cap.name) in held, held  # her captain's station, held by the model
     e = w.world_order(f'say as {cap.name}: "All well."', "t")
     assert e.data["result"] == "refused" and "held" in e.text, e.text
 

@@ -19,9 +19,9 @@ captain of another ship and the budget it is held for; package 67 widened it:
   own name (`VOICE_KIND`), its orders struck as a passenger's are (the deck's conversation
   and the readings, no deck and no order of any ship's), its brief his (`voice_station`),
   his words heard where he is, and the director's `say as` for him refused while a model
-  holds him, since the rule of reach reads the held stations. A person aboard another ship
-  has no World of hers to be bound in (package 68 refuses one made there), and is refused
-  in words.
+  holds him, since the rule of reach reads the held stations. A person aboard another
+  ship is of her hull's company (package 84, step 9), and his voice is bound on her hull as
+  a station there is.
 
 **The desk reads the seat** (`match`, `admit`; `agents.remote.Desk.station`): a door for a
 model at a station with a seat held for that model is admitted under the seat's budget, its

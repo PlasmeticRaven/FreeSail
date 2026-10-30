@@ -1308,6 +1308,12 @@ centre is the ship the game follows, which is the one the chart draws. The far-d
 that the gate 5c ruling never had, a leg across the coast refused when the scenario loads,
 is built here with the promotion.
 
+**As built since package 84 (2026-10-29; `docs/design/Design-OneWorld.md`, the postscripts
+"As built"):** a promoted ship is a `Hull` of the one World (`world.hulls`), not a World of
+her own; demoted she sleeps whole and wakes without being remade; the cap's order is a ship
+in dealings, then a hull with a stationed person, then the nearest, a hull at anchor or in
+port awake like any other; the player's ship is a vessel of the sea among the others.
+
 **As built (package 43, 2026-10-16; `freesail/world/brains.py`, `crews.py`, `ships.py`; the
 measurement and the figures in `docs/dev/TuningNotes.md`, package 43).** *The measurement
 first.* Twelve fully crewed ships under rules-based captains ticked at once in the Channel
@@ -1487,6 +1493,10 @@ sample says which shape she is in. The crewed promotion brings the full surface 
 beneath the same station with no reseat, and the log says both. One rule for the rules,
 a model and the player, and the same for the player's own ship if it is ever demoted
 (it is not, in this milestone). The director's seating of such a captain is §23.
+
+**As built since package 84 (2026-10-29; `docs/design/Design-OneWorld.md`):** the station's
+World is her hull of the one World, one clock and her own log; the far shape is the
+sleeping hull's; a save holds the station (`hulls`) and a replay gives its orders to her.
 
 **As built (package 43, 2026-10-16; `crews.station_world`, `CrewedWorld.shape`,
 `submit_far`; `remote.Desk` with `ship`; the doors' `--ship`).** `--station captain --ship
