@@ -1267,6 +1267,11 @@ proposes Steel's driver boomsail, which the owner chose (2026-10-28; its §17.9 
    her stage B:* her driver boom's jaws, 6 ft 6 in above her quarterdeck, now run under her
    roundhouse; raising them clear moves her spanker and her sailing figures, for the owner and
    the lead.
+   *Her roundhouse's after face (the lead's question of 2026-10-29; answered by the owner,
+   2026-10-30): plain, no lights.* "I looked again at the model, and at a painting I found of
+   Indefatigable fighting Virginie ... both seem to agree that the roundhouse had no lights ...
+   I think we can keep it plain." Judged from pictures, for the eye (`Build-Ships.md` §5.8), since
+   ZAZ2371 draws no lights there at the resolution read; her file's note says so at her stage B.
 2. **D25 (owner):** the razee's scenario among (a)-(d) (§11.2); what is common is built now.
 3. **The razee's default fit (owner):** "as razeed 1795" by the brief, or "as carried 1796", the
    guns of every action read (§5.1); it also settles §11.1's second way.

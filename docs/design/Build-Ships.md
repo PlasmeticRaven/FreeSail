@@ -973,6 +973,15 @@ any other is cited by link and credit only, never copied.
   at each side, a decorated taffrail above them, the name on the counter, a quarter gallery of
   three lights: her cabin under the short roundhouse that ZAZ2371's note gives her, now in her
   profile.
+- **the razee, in the action:** "Capture of La Virginie by HMS Indefatigable by Moonlight, April
+  21, 1796", oil, The Mariners' Museum 1980.0040.000001 (Commons, public domain; the owner,
+  2026-10-30). Unsigned: the museum captions it Nicholas Pocock, 1797, after Sotheby's
+  attribution of 1979, and its page records that Greenwich's Keeper of Paintings favoured an
+  early Thomas Luny, so the hand and the date are not sure. *Indefatigable* is on the left, her
+  stern and quarter gallery lit, dark and a little unclear: one band of lights, none above it.
+  With it, C. Sheppard's print, published 1 June 1797 (Commons, public domain; small and crude):
+  one band of lights under a carved taffrail. Together with the model these are why her
+  roundhouse's after face is drawn plain (Indf §17 item 1).
 - **the cutter:** Vanguard Models' kit of H.M. cutter *Sherbourne* 1763, a profile from its
   manual and two photographs of the built model (the owner, 2026-10-29; in copyright: kept
   privately in owner-notes, never copied). A square transom, flat and raked; a full, round bow;
