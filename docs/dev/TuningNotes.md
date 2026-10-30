@@ -14407,3 +14407,19 @@ lines, digest `be74adec4acf8792`, on the branch's head (94's tide in it, the fir
 rebuild's tiles) and on these tiles alike, byte for byte: the second rebuild moves nothing
 of it. Package 94's Solent tide moved it from the 1,241 lines and `eef946bdabaf39cf` above
 (94's notes have the Downs to Spithead's figures).
+
+**`biscay-north`, second rebuild.** The control on the merged tree does not reproduce the
+committed tiles, and says why: 94 made the Isle of Aix's gauge serve `biscay-south` too
+(the rule of the seams), so even the first rule now reads it over the block's southern row
+of tiles, which lies in Biscay south's bounds (2 level-2 tiles, 108,650 cells, up to
+0.6 m, and the coast). The build: the checks as before ("5 kept"); "raised ... 3.09 to
+6.35 m"; the sweep 3,772 cells in 133 places (3,808 at the first rebuild); the coast 833
+pieces, 9,619 points, 292,157 bytes (830, 9,607, 291,556). Against the first rebuild:
+**8 level-2 tiles moved**, 654,421 cells, the largest 1.30 m, 35 from below the datum to
+above, none the other way; no level-3 tile. The tiles are the block's edges: the southern
+row from 45.68 N (1.65 and 1.23 W, Aix's seam with Biscay south), the northern row from
+47.81 N (2.93 to 1.23 W, the open edge where no block holds the water between 48 N and
+channel-mid's 48.5 N) and one at the open west edge (47.39 N, 5.07 W). The block's tests:
+the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to 7-314,
+15 passed. **The scenario** `biscay-north.yaml`, 9 hours: 348 lines, digest
+`28c449dbbda73eb1`, the same on the first rebuild's head, on the branch's head and here.
