@@ -21,7 +21,11 @@ SHOM's RAM (the French gauges, Licence Ouverte 2.0) and Puertos del Estado's RED
 (the Spanish, where read), each named in the file; a level not read is null and said
 unverified. Each gauge's `block:` names the chart region it serves (package 89): the eleven
 serve every position, a block's gauge only the positions within its region's bounds, so
-that a block's figures move no other water. Bournemouth and Portsmouth (39a's, in
+that a block's figures move no other water. Within ten miles of a block's edge where it
+meets charted water the eleven alone serve (1 W off the Wight, 48 N in the Iroise), the
+block's water rises from the eleven's to its own, each constituent's amplitude and phase
+by the smoothstep of the distance's fraction of the band (package 94; judgement), so that
+no step stands at the seam. Bournemouth and Portsmouth (39a's, in
 `channel-mid`) stay under `held_gauges:`, read by nothing, for the lead's ruling.
 
 The streams (`data/tides/streams.yaml`) are rates and directions by area, each entry with

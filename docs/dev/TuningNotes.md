@@ -13439,3 +13439,106 @@ the brief has it. ChartBlocks.md's 79d bullet and item 5 say a road's bottom cou
 **7-311**: on a chart of its own (not the shared one), Naples' road as an `anchorage`
 gives the arming of the lead its "mud and clay, fine sand"; recast in memory as a `road`
 it gives the same; as a `town` the note is not that.
+
+### Item 3: the seam's taper
+
+**The rule, as built** (`freesail/world/tide.py`). Within a block, the block's water rises
+from the eleven's alone at the block's **open edge** to its own whole over a band of
+**ten miles** inside it (`SEAM_BAND_NM`, **judgement**: a few hours of a ship's run, so
+that the tide she rides changes as she sails and never between one minute and the next,
+and narrow enough that the blocks' ports and gauges lie in their own water whole, all but
+those tabled below). The weight is the **smoothstep** 3x² − 2x³ of the distance's
+fraction of the band (judgement: no step in the water nor in its gradient at either side
+of the band; `Tide.taper_at`). The two waters are mixed **on each constituent's amplitude
+and on its phase**, the shorter way round, and on the level, by the weight (`_taper`);
+mixed as complex numbers first, the 114 degrees between the eleven's M2 and the block's a
+few miles inside 1 W made a false node, the spring range dipping to 5.9 feet five miles in
+between 10.1 and 11.2 on either side, so the mix is the amplitude's and the phase's.
+**Outside every block nothing changes**: the arithmetic there is the old one to the bit
+(the blend factored into `Tide._blend` with its operations in the same order; truth
+7-282's west position and 7-283's grid equal to the eleven's alone with `==`), and
+beyond the band inside a block 89's water to the bit (a weight of one mixes nothing).
+
+**The open edge** (`Tide.open_edges`, `_open_edges`): the stretches of the blocks' bounds
+whose far side is **charted water no block holds** (a region's bounds or the corridor's,
+`charted_bounds()`: the manifest's regions and corridors), each box's edge less what
+another block holds beyond it and kept where a charted box does. So a seam between two
+blocks (the Mediterranean west's at 0.05 E, the Strait's at 5 W, Biscay north's and south's
+at 45.9 N) is no open edge, its two blocks' waters meeting as 89 left them; an edge beyond
+which nothing is charted (the Channel east's at 2.5 E and 51.5 N, the Mediterranean's
+blocks' every edge but the corridor's) is none either: no ship sails there. The open edges
+are 1 W from 49 to 51 N (the Channel east against channel-mid), 48 N from 5 W to 1 W
+(Biscay north against the Channel west and the corridor), Biscay north's 5 W and Biscay
+south's 9.33 W and 45.9 N (the corridor's ocean), and Portugal's, the Strait's, Madeira's,
+the Azores' and the Mediterranean west's corridor sides. **Where the eleven are beyond
+their reach** (`far`: Portugal's ocean edge, the Strait's, the islands', the Alboran's
+south edge west of 1 W) a far gauge's guess is no water to taper toward, and the block's
+own stands to its edge (the mix is skipped there). **First cut, taken back:** every edge of
+every block, land and unreached ocean included, put Genoa's gauge 5.4 miles from its
+block's north bound (the Apennines), Port-Vendres' 4.8 from its west bound, Dunkirk's 5
+from 2.5 E, and would have drawn them toward Le Conquet's far tide or Dover's; the edges
+are kept to charted water and the mix to the eleven's reach.
+
+**The cell cache** keys the taper by the cell, as it keys the membership: the weight is
+the cell's centre's, so a cell's constants are one value however it is first asked, and
+the cache's key (the cell's indices) is unchanged; a cell is worked once and is a lookup
+after, as before (7-284 holds the pace of a fresh cell outside every block and the
+lookup). Within the band a fresh cell works the blend twice (the block's and the
+eleven's); beyond it once. A Tide pickled before the package has no open edges (the class
+default) and no taper.
+
+**The step, before and after** (the heights a cable either side of the seam, every ten
+minutes through the day of springs of 12 June 1805, the greatest gap):
+
+| Seam | 89's rule | With the taper |
+|---|---|---|
+| 1 W, 49.1 to 50.9 N | 4.25 to 7.56 ft (2.3 m at 50.9 N) | 0.04 to 0.045 ft |
+| 48 N at 4 42 W (the Iroise) | 1.64 ft | 0.043 ft |
+| 48 N at 4 54 W | 1.38 ft | 0.040 ft |
+
+At 50.6 N east of 1 W (the world's spring range, feet; the eleven's alone beside it):
+
+| Miles in | 1 | 2 | 3 | 5 | 8 | 10 | 11 | 15 |
+|---|---|---|---|---|---|---|---|---|
+| The weight | 0.028 | 0.104 | 0.216 | 0.5 | 0.896 | 1 | 1 | 1 |
+| With the taper | 10.07 | 9.91 | 9.82 | 9.76 | 10.48 | 11.15 | 11.38 | 12.71 |
+| The eleven's | 10.11 | 10.05 | 10.01 | 9.85 | 9.60 | 9.41 | 9.34 | 8.84 |
+
+**What lies within a band**, of the blocks' gauges and the master's places (the distance
+from the nearest open edge; the eleven not far):
+
+| Place | Miles | The weight | M2 by 89's water | M2 now | Spring range, feet |
+|---|---|---|---|---|---|
+| Concarneau's gauge (biscay-north) | 7.6 from 48 N, across Brittany's land | 0.853 | 1.481 m at 99.0 (the gauge's own) | 1.558 m at 104.1 | 13.25 to 13.92 |
+| Selsey Bill (Norie's, a given rise of 16) | 8.1 from 1 W | 0.901 | 1.292 m at 306.9 | 1.261 m at 296.9 | 11.07 to 10.87 |
+| the Owers (Norie's, given 15) | 11.8 | 1.0 | as before | | |
+
+Concarneau's is the one cost: the bound at 48 N runs over Brittany there, and the taper,
+a distance and not a passage by water, reaches the gauge across the land; its own water is
+five degrees of M2 (ten minutes) and eight centimetres off its gauge's. Said, not mended
+(a taper by water would want the chart in the tide; the gauge stays seven miles and a half
+from the bound). **The master's judged rise at Concarneau** (Norie's table, Faden giving
+no rise there: the 37j rule, the world's spring range to the foot) re-worked, old beside
+new: **13 to 14 feet** (13.26 by 89's water, 13.92 now), in `establishments.yaml` with the
+reason; no other judged rise moved (every place of both tables checked: Concarneau the one
+whose range moved by more than a hundredth of a foot), no given rise and no hour moved.
+
+**The truths.** **7-282** re-measured on the taper, old beside new: the west position to
+the bit as before; a mile east the block's water at a thirty-sixth of its weight, its
+constants other than the eleven's and its spring range within half a foot of theirs
+(10.07 against 10.11 feet; 89's rule gave 8.6 against 10.2, "other by feet"), and eleven
+miles east, past the band, the block's own whole (11.38 against 9.34, other by feet as
+the truth had it a mile east). **7-312**: a cable either side of 1 W at six latitudes from
+49.1 to 50.9 N and of 48 N in the Iroise, every ten minutes through a day of springs, the
+heights within a tenth of a foot (at most 0.045); the weight a cable in under a hundredth,
+at 7.6 miles in between a half and one, at 11.4 miles whole.
+
+**Run on this item's tree** (this session's container, four cores, nothing beside it): the
+proof as 89 ran it, the eleven recorded passages by node id, `-k "gate_5b or gate_5c"`
+and the captain's trials, **identical to the head's** (a clean worktree of `21a25e7` run
+first): 11 passed; the one test selected passed; the trials five passed, the gale with
+sea room its expected failure, the lee-shore trial's container digest `7fad0ce7e46ba366`
+against the pin `ed48ca3d61e52f20` the one failure on both trees (79d's, 84's and 89's
+records have it). The naval cruise's Diamond patrols across 48 N within the Iroise's band:
+her stream there is the taper's now, and the cruise's digests stand. `test_tide.py` and
+`test_islands.py` whole; the truths 7-270 to 7-312 with `--slow`, 38 passed.

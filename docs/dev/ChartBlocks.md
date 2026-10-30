@@ -164,7 +164,20 @@ region's, its tide and its weather are rows in tables that already reach its wat
    whose water west of 1 W the rule keeps the eleven's; they stay under `held_gauges:`,
    read by nothing, by the lead's ruling of 2026-10-30 (channel-mid's passages are pinned
    on the eleven; the options and the seam's step at 1 W in docs/dev/TuningNotes.md,
-   package 89; a taper of the weights across a seam band is a later tidy).
+   package 89). **The seam's taper** (package 94): where a block's bounds meet charted
+   water no block holds (a region's or the corridor's: 1 W where channel-mid meets
+   channel-east, 48 N where Biscay north meets the Channel west, Biscay's and Portugal's
+   ocean edges; not a seam between two blocks, and not an edge beyond which nothing is
+   charted), the block's water rises over `SEAM_BAND_NM` (ten miles, judgement) inside it
+   from the eleven's alone to its own, each constituent's amplitude and phase and the
+   level by the smoothstep of the distance's fraction (`Tide.taper_at`, `open_edges`);
+   where the eleven are beyond their reach (Portugal's and the islands' ocean edges, the
+   Strait's) there is no honest water to taper toward and the block's own stands to its
+   edge. Outside every block nothing changes. A block's gauge or port within the band of
+   an open edge reads the taper's water, not its gauge's own whole: keep the ports and the
+   gauges a block is tested by ten miles inside an open edge, or say which are not
+   (package 94 tabled them: Concarneau's gauge 7.6 miles from 48 N across Brittany's land,
+   Selsey Bill and the Owers within the band of 1 W).
    The stream areas in `data/tides/streams.yaml`, each with `chart: <region>` (and,
    for an area with no polygon, `bounds:`) and its `book:` in the period's form
    (`tests/test_tide.py` holds every statement to it: the set to a point, the springs to

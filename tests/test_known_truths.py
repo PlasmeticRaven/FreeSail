@@ -11422,7 +11422,13 @@ def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_th
     """The brief's item 5: a position a mile west of 1 W in `channel-mid` reads the same
     tide to the centimetre as before the package (the eleven alone), its height and stream
     hour by hour through a day of springs; a position a mile east, in `channel-east`,
-    reads the block's (its gauges in the blend, the spring range other by feet)."""
+    reads the block's (its gauges in the blend, the spring range other by feet).
+    Re-measured by package 94's taper: a mile east the block's water is a thirty-sixth
+    part in (the smoothstep of a tenth of the band), its constants other than the eleven's
+    and its spring range within half a foot of theirs (10.07 feet against 10.11; 89's
+    rule gave 8.6 against 10.2); the block's own water whole from the band's ten miles in,
+    eleven miles east the spring range 11.4 feet against the eleven's 9.3, other by feet
+    as the truth had it a mile east. The west position to the bit, as before."""
     import freesail.world.tide as T
     from freesail.world.geo import Position
 
@@ -11439,8 +11445,11 @@ def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_th
         assert abs(now.stream_kn - then.stream_kn) < 0.01 and now.area_id == then.area_id
         assert now == then  # to the bit, not only to the centimetre
     assert tide.constants_about(west) == eleven.constants_about(west)
-    assert abs(_spring_range_ft(tide, east) - _spring_range_ft(eleven, east)) > 1.0
+    assert abs(_spring_range_ft(tide, east) - _spring_range_ft(eleven, east)) < 0.5
     assert tide.constants_at(east) != eleven.constants_at(east)
+    beyond = Position(50.6, -1.0 + 11.0 * mile_deg)  # past the taper's band
+    assert tide.taper_at(beyond) == 1.0
+    assert abs(_spring_range_ft(tide, beyond) - _spring_range_ft(eleven, beyond)) > 1.0
 
 
 def test_truth_7_283_the_recorded_passages_water_reads_the_tide_it_read():
@@ -12283,3 +12292,36 @@ def test_truth_7_311_a_roads_bottom_is_in_the_leads_note_as_an_anchorages_is():
     assert ground_words(chart, near, 30.0) == road.bottom
     chart.features[road.id] = replace(road, kind="town")
     assert chart.bottom_near(near) != road.bottom
+
+
+def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_foot():
+    """The brief's item 3: package 89's rule left a step where a block's water meets the
+    water the eleven alone serve, 102 degrees of M2 at 1 W off Selsey Bill (a cable either
+    side of 1 W the heights four to seven and a half feet apart through a day of springs).
+    The block's water now rises from the eleven's alone at its open edge to its own over
+    ten miles inside it (`tide.SEAM_BAND_NM`, the smoothstep of the distance's fraction),
+    so that a cable inside 1 W the tide is within a tenth of a foot of the tide a cable
+    outside, every ten minutes through a day of springs, along the seam from 49.1 to
+    50.9 N; the same across the seam at 48 N in the Iroise, where Biscay north meets the
+    Channel west. The taper is the cell's: a cell's centre gives its weight, so a cell once
+    worked is a lookup as before."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    foot = units.feet_to_m(0.1)
+    pairs = []
+    for lat in (49.1, 49.5, 50.0, 50.3, 50.6, 50.9):
+        cable = 0.1 / 60.0 / math.cos(math.radians(lat))
+        pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
+    for lon in (-4.7, -4.9):
+        pairs.append((Position(48.0 - 0.1 / 60.0, lon), Position(48.0 + 0.1 / 60.0, lon)))
+    for inside, outside in pairs:
+        assert tide.blocks_at(inside) and not tide.blocks_at(outside)
+        assert 0.0 < tide.taper_at(inside) < 0.01
+        for m in range(0, 25 * 60, 10):
+            when = datetime(1805, 6, 12) + timedelta(minutes=m)
+            gap = abs(tide.height_at(inside, when) - tide.height_at(outside, when))
+            assert gap < foot, (inside, when, gap)
+    assert 0.5 < tide.taper_at(Position(50.6, -1.0 + 0.2)) < 1.0  # 7.6 miles in
+    assert tide.taper_at(Position(50.6, -1.0 + 0.3)) == 1.0  # 11.4 miles in: whole
