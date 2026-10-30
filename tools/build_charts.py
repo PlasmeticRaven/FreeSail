@@ -1476,95 +1476,43 @@ FILL_LEVEL_CELL_DEG = 0.05
 
 
 def mean_level_grid(box: dict[str, float], eleven_only: bool = False) -> Grid:
-    """Mean sea level above the chart's datum over a box, as the world's tide gives it
-    (`data/tides/constituents.yaml`, `freesail/world/tide.py`), on a grid of
-    FILL_LEVEL_CELL_DEG: at each cell's centre the gauges that serve it (`Tide.gauges_at`,
-    package 89: the eleven everywhere, and within a block's bounds, the regions' bounds of
-    the chart's manifest, the block's own gauges after them), blended by the inverse square
-    of the distance over those within `interpolation.reach_nm`, the nearest alone beyond
-    them, a gauge no nearer than 100 m; the level of the gauges of the blend that have one,
-    by the same weights, and where none has one (the Strait's, the islands') the eleven's
-    there, as the world's tide takes it. Outside every block the eleven alone, the
-    arithmetic as it was to the bit (package 93: the fill raised by the block's own water,
-    where package 89 had kept the eleven's). GEBCO's heights are about mean sea level and
-    the regions' levels about LAT: where GEBCO fills a region's cells (the land, mostly),
-    its height plus this is the height above the datum the world's tide is reckoned from,
-    so that a low shore stands as high above the world's high water as it does above the
+    """Mean sea level above the chart's datum over a box, as the world's tide gives it, on a
+    grid of FILL_LEVEL_CELL_DEG: at each cell's centre `Tide.constants_at`
+    (`freesail/world/tide.py`) itself, **one source of truth** (package 93, the lead's
+    ruling): the gauges that serve the cell (package 89's membership by the regions'
+    bounds, 94's rule of the seams), the seam's taper within a block's open edge (94), the
+    level the blend of the gauges that have one, the eleven's where none has; outside
+    every block the eleven alone, as every tile there was built. Nothing here reads the
+    manifest or the gauges a second time. GEBCO's heights are about mean sea level and the
+    regions' levels about LAT: where GEBCO fills a region's cells (the land, mostly), its
+    height plus this is the height above the datum the world's tide is reckoned from, so
+    that a low shore stands as high above the world's high water as it does above the
     sea's (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
     behind the town read as drying ground and was covered at high water). With
-    `eleven_only` the eleven alone everywhere, the raise every tile was built by before
-    package 93 (a harbour patch's `fill_raise: eleven`, below `REGIONS`)."""
-    doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
-    interp = doc.get("interpolation") or {}
-    power = float(interp.get("power", 2))
-    reach = float(interp.get("reach_nm", 400.0)) * 1852.0
-    # (lat, lon in radians, the mean level or None, the blocks the gauge serves): the
-    # eleven first and the blocks' gauges after them, in the file's order, as the tide
-    # takes them
-    gauges = []
-    for g in doc["gauges"]:
-        raw = g.get("block")
-        blocks = (
-            tuple(str(b) for b in (raw if isinstance(raw, list) else [raw]) if b) if raw else ()
+    `eleven_only` the world's tide with the eleven alone, the raise every tile was built by
+    before package 93 (a harbour patch's `fill_raise: eleven`, below `REGIONS`)."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from freesail.world import tide as world_tide
+    from freesail.world.geo import Position
+
+    if eleven_only:
+        doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
+        tide = world_tide.Tide(
+            {**doc, "gauges": [g for g in doc["gauges"] if not g.get("block")]}, {"areas": []}
         )
-        level = g.get("mean_level_m")
-        gauges.append(
-            (
-                math.radians(float(g["lat_deg"])),
-                math.radians(float(g["lon_deg"])),
-                None if level is None else float(level),
-                blocks,
-            )
-        )
-    eleven = [x for x in gauges if not x[3]]
-    held = [] if eleven_only else [x for x in gauges if x[3]]
-    bounds = {
-        str(name): tuple(float(r["bounds"][k]) for k in ("south", "north", "west", "east"))
-        for name, r in (_last_manifest().get("regions") or {}).items()
-        if r.get("bounds")
-    }
+    else:
+        tide = world_tide.load_tide(TIDES_CONSTITUENTS)
     cell = FILL_LEVEL_CELL_DEG
     south = math.floor(box["south"] / cell) * cell - cell
     west = math.floor(box["west"] / cell) * cell - cell
     rows = int(math.ceil((box["north"] - south) / cell)) + 2
     cols = int(math.ceil((box["east"] - west) / cell)) + 2
-    radius = 1852.0 * 60.0 * 180.0 / math.pi  # the game's sphere (freesail.world.geo)
-
-    def distance(la: float, lo: float, gla: float, glo: float) -> float:
-        h = (
-            math.sin((gla - la) / 2) ** 2
-            + math.cos(la) * math.cos(gla) * math.sin((glo - lo) / 2) ** 2
-        )
-        return 2.0 * radius * math.asin(math.sqrt(min(1.0, h)))
-
-    def blend(found: list[tuple[float, float | None]]) -> float | None:
-        # (distance, level) of the gauges that serve the cell: those within the reach, or
-        # the nearest alone; the level of those that have one, None when none has
-        within = [x for x in found if x[0] <= reach] or [min(found, key=lambda x: x[0])]
-        levelled = [(d, lv) for d, lv in within if lv is not None]
-        if not levelled:
-            return None
-        weights = [1.0 / max(d, 100.0) ** power for d, _ in levelled]
-        return sum(w * lv for w, (_, lv) in zip(weights, levelled, strict=True)) / sum(weights)
-
     values = np.zeros((rows, cols), dtype=np.float32)
     for r in range(rows):
-        la_deg = south + (r + 0.5) * cell
-        la = math.radians(la_deg)
+        lat = south + (r + 0.5) * cell
         for c in range(cols):
-            lo_deg = west + (c + 0.5) * cell
-            lo = math.radians(lo_deg)
-            found = [(distance(la, lo, gla, glo), lv) for gla, glo, lv, _ in eleven]
-            within_eleven = blend(found)
-            blocks = {
-                b for b, (s, n, w, e) in bounds.items() if s <= la_deg <= n and w <= lo_deg <= e
-            }
-            served = [x for x in held if blocks.intersection(x[3])]
-            if not served:
-                values[r, c] = within_eleven
-                continue
-            level = blend(found + [(distance(la, lo, gla, glo), lv) for gla, glo, lv, _ in served])
-            values[r, c] = within_eleven if level is None else level
+            values[r, c] = tide.constants_at(Position(lat, west + (c + 0.5) * cell))[0]
     return Grid(south, west, cell, values)
 
 

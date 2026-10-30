@@ -14366,3 +14366,44 @@ column). **The slow tier of the files touched** (`test_chart`, `test_tide`, `tes
 `test_scenarios`, `test_islands`): 10 passed. **The truths** 7-264 (Cadiz's water) and
 7-270 to 7-314 with `--slow`: 41 passed. **The fast tier** once: the pictures' known flake
 the one failure ("std 8.0" under the load), passing alone on this tree.
+
+### The raise reads the world's tide itself (the lead's ruling after 94's merge, way (b))
+
+After package 94's merge (the seam's taper within ten miles of a block's open edge, worked
+on the level too, and a gauge serving a neighbour's block whose seam lies within ten miles
+of it) the world's level differed from `mean_level_grid` as first built (89's membership
+by the bounds, no taper) over four of the rebuilt regions; the lead ruled one source of
+truth: **`mean_level_grid` is `Tide.constants_at` at each cell's centre**, the eleven's
+alone through a Tide of the eleven for a patch's `fill_raise: eleven`; nothing in the tool
+reads the manifest or the gauges a second time. The raise, new less as first rebuilt, over
+each fetch box:
+
+| Region | New less as first rebuilt | Cells over 5 mm | Rebuilt again |
+|---|---|---|---|
+| channel-west (no key, not rebuilt) | 0 to +1.29 m | 171 of 7,227 | no |
+| channel-mid (not rebuilt) | -0.41 to +0.05 | 164 of 4,221 | no |
+| channel-east | -0.41 to +0.05 | 164 of 6,868 | yes |
+| biscay-north | 0 to +1.30 | 464 of 5,244 | yes |
+| biscay-south | 0 to +3.87 | 972 of 16,016 | yes |
+| portugal | 0 to +1.80 | 52 of 11,844 | yes |
+| madeira, azores, strait, the five Mediterranean | 0 | 0 | no |
+
+The cells that move are the bands within ten miles of the blocks' open edges and of the
+seams the gauges now serve across, most of them inland (Spain's interior at the open 42 N
+edge, Brittany's by 48 N, the Solent's seam at 1 W); in the Mediterranean the eleven are
+far and there is no taper. Each of the four rebuilt again by the same road: the control
+(the branch's head tool, a worktree of `b962e4e`, on the same fetch: the committed tiles
+byte for byte), the build, the checks as before, the figures against the first rebuild,
+the block's tests, the scenario.
+
+**`channel-east`, second rebuild.** The checks as before ("6 kept"); the raise 1.48 to
+6.83 m as printed; the sweep 3,513 cells in 79 places, the coast 619 pieces and 5,635
+points, both as the first rebuild. Against the first rebuild: **3 level-2 tiles and 1
+level-3 tile moved, 696 and 32 cells, each by the tiles' one step of 0.1 m**, none across
+the datum (the -0.41 m lies in channel-mid's seam column, computed and not written).
+The block's tests: the six files fast 205 passed, slow 11 passed; truths 7-270 to 7-289 and
+7-310 to 7-314 with `--slow -n 4`, 25 passed. **Spithead's passage**, 28 hours: 1,231
+lines, digest `be74adec4acf8792`, on the branch's head (94's tide in it, the first
+rebuild's tiles) and on these tiles alike, byte for byte: the second rebuild moves nothing
+of it. Package 94's Solent tide moved it from the 1,241 lines and `eef946bdabaf39cf` above
+(94's notes have the Downs to Spithead's figures).
