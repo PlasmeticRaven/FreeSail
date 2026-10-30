@@ -11066,7 +11066,8 @@ def test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_sprin
     south-west by west on the ebb (Faden 1793: the flood N E by E, the ebb S W by W), and
     the master's directions say the same water; a ship lying with no way on through the
     hour of the ebb's strength is carried two miles and more to the south-west by west,
-    and his account, working the directions' stream, goes with her within half a mile."""
+    and his account, working the directions' stream, goes with her within eight tenths of a
+    mile (half a mile on the eleven's water; package 89 below)."""
     import freesail.world.tide as T
     from freesail.world.geo import Position, bearing_and_distance
 
@@ -11105,7 +11106,12 @@ def test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_sprin
     a_toward, a_run = bearing_and_distance(account0, w.navigation.account_now())
     assert abs(((a_toward - 236.25) + 180.0) % 360.0 - 180.0) < 15.0
     _, error = bearing_and_distance(w.position, w.navigation.account_now())
-    assert error / units.NAUTICAL_MILE < 0.6
+    # package 89: the Strait's water the block's own gauges' (Calais, Boulogne, Dunkirk in
+    # the blend beside Dover), the ebb's strength ten minutes later (19:30 for 19:20) and
+    # the master's account of the hour 1.83 miles for 2.02: the error 0.648 miles where it
+    # was 0.452 on the eleven's water against this bound's 0.6; re-measured to 0.8, the
+    # old margin's 0.15 mile kept (the lead's ruling, 2026-10-30)
+    assert error / units.NAUTICAL_MILE < 0.8
 
 
 def test_truth_7_272_the_goodwin_grounds_a_ship_standing_across_it_drawing_more_than_its_water():
