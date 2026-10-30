@@ -1275,8 +1275,9 @@ builder's fast tier whole on the final tree (4,473 passed, none failed, 29 minut
 tier of the eighteen touched files and the known truths (1,752 passed, 7 expected failures,
 the rulings', none failed, 45 minutes); the lead's run of the between-hulls, officer, in-world
 and the step's truths' tests on the head (180 passed) and the lead's probes (below); **the
-whole suite on the merged tree in the cloud dispatched at the merge (run 21 on `cfcf092`+;
-its figures written here when it is in).**
+whole suite on the merged tree in the cloud (run 21 on `432ddb4`: lint green, 4,828 passed
+over the six shards, 3 skipped, 11 expected failures, none failed, 42 minutes, the count up
+from run 20's 4,814 by the step's tests; the pace job 10 of 10 in 257 seconds).**
 
 **What was built** (`docs/design/Design-BoatAndPersonAboard.md` §2 and its postscript;
 `docs/dev/TuningNotes.md` "Package 82", step 1): `movement.put_aboard`, the one function for
