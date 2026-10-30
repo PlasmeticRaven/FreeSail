@@ -14473,7 +14473,7 @@ first rebuild's and the second's figures are in the sections above):
 | tyrrhenian | 158, 35.22, 35.22 | 4 | 1.50 | 12 / 0 | 1.99, 1.99; 0 |
 
 Every region's tile count is as before; the bytes moved by under a quarter of a megabyte
-each, 239.6 MB of level 2 and 34.6 MB of level 3 in the ten. After the second rebuild,
+each, 179.92 MB of level 2 and 26.61 MB of level 3 in the ten (179.37 and 26.65 before). After the second rebuild,
 with the trunk merged, the six regions the world's tide does not move again (the Strait and
 the Mediterranean's five) were built once more from the cache: every tile, coast and index
 byte for byte (the manifest's fetch records alone, discarded). `--check` prints as before
