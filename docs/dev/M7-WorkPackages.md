@@ -54,7 +54,7 @@ on these packages; that is the owner's choice.
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
-| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard; **re-briefed 2026-10-30 (below, after 84 and 85), approved and launched the same day** as a Fable sibling session on `claude/pkg-82`; the boat to the ships session's principles; 74 starts on its item 3 |
+| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard; **re-briefed 2026-10-30 (below, after 84 and 85), approved and launched the same day** as a Fable sibling session on `claude/pkg-82`; the boat to the ships session's principles; 74 starts on its item 3; **step 1 (item 3, the person's movement between hulls) merged 2026-10-30** (below, "Package 82, step 1, as merged"), step 2 building |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
 | 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **merged whole, steps 1 to 11, 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 11 from the sibling's `claude/pkg-84` after it; the package closed with step 11's record below; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; **launched 2026-10-30** (the owner, 84 closed) as a Fable sibling session on `claude/pkg-85`; **merged whole 2026-10-30** at `252df5b` from `c4afb7c` (the record below: items 1 to 8 and the gate's draft, three findings of the lead's review mended); the owner runs the interim gate once 93 is in, the lead's half added first; 87 follows it |
@@ -1264,6 +1264,64 @@ the eleven's nearest alone, the Balearics' tiles reaching 4.75 E (a bound to mov
 89's like finding at 40.5 N); a far gauge's raise hiding the coarse shore wherever EMODnet
 stops short (the patch package's); one merge commit of the builder's (`dae50ca`) without
 the attribution lines, pushed and not rewritten.
+
+### Package 82, step 1, as merged (2026-10-30)
+
+Merged `--no-ff` from the Fable sibling session's `claude/pkg-82` at `a4577b3` (the design
+note first, approved with the lead's rulings on its three questions; then step 1, the
+re-brief's item 3 reported first as briefed, with the trunk's `58c51ac` brought in at the
+boundary; the merge clean, the trunk's head an ancestor of the branch); ruff clean; the
+builder's fast tier whole on the final tree (4,473 passed, none failed, 29 minutes), the slow
+tier of the eighteen touched files and the known truths (1,752 passed, 7 expected failures,
+the rulings', none failed, 45 minutes); the lead's run of the between-hulls, officer, in-world
+and the step's truths' tests on the head (180 passed) and the lead's probes (below); **the
+whole suite on the merged tree in the cloud dispatched at the merge (run 21 on `cfcf092`+;
+its figures written here when it is in).**
+
+**What was built** (`docs/design/Design-BoatAndPersonAboard.md` §2 and its postscript;
+`docs/dev/TuningNotes.md` "Package 82", step 1): `movement.put_aboard`, the one function for
+every change of a person's hull, by the boat alongside another ship, by boarding, by capture
+or by the director's word; a model's station goes with its person (`Harness.move_to`): in a
+hull not his own he holds a **visitor's voice**, a station of the passenger's kind under his
+name with a passenger's reach and a brief and a domain of its own (`VISITOR_DOMAIN`, the
+refusal naming what he has and has not, of her deck and of his own ship's from there), his
+own station standing bound to him at home until he comes back, when it is his again with its
+whole surface; a captive put aboard a captor is stood down with the reason (the handover's
+rule, 74's hook). The roads: `send the boat to the <ship> [with <persons>] [for <persons>]`
+from an awake or a sleeping hull as two jobs of the port's kind within a boat's pull
+(`BOAT_BETWEEN_NM`, a mile, judgement); a visitor's `come aboard` by the host's boat; the
+director's `person: "X" goes aboard the <ship> by the boat`, doubted beyond the pull and
+performed on the director's word; 84's `comes aboard the <ship>` through the one function;
+the deck won, the first lieutenant who leads the boarders standing on her deck with his
+station following. `where am I` as a per-asker query (read afresh at each asking, out of the
+readings tool's dict), the station line's visitor. The save groups a harness by the hull of
+its first seating (`Harness.seated_on`) and carries the station of his seating while he
+visits, so that a replay by the transcript seats him at home and the replayed moves carry
+him on. **Truths 7-324, 7-325, 7-333.** The player's own seat does not yet follow its person
+between hulls: step 3's.
+
+**The lead's review, two findings mended on the branch before the merge.** (1) A save taken in
+the middle of a visit did not replay by the transcript road, the owner's road: the harness
+saved its visitor's voice as its station under its home hull, so the replay seated a
+passenger's voice on his own ship and his orders had no deck to be given from (the acts road
+was whole; the builder's test saved only after he was home). Mended: the save carries the
+station of his seating; a test saves on the brig, in the host's boat on the way home and at
+home, and replays each by both roads to the same digests of both logs. (2) A player's
+`send the boat to the <ship>` refused for the distance left a far body promoted to a hull:
+mended, the hull made only when the boat goes, the distance measured by her far body first.
+The lead's probes of both on the mended head: the mid-visit save the same by both roads, the
+copy's harness visiting on the copy's own hull; the refused order leaving no hull.
+
+**What moved: nothing pinned but the officer's handover budget** (21,500 to 22,000, old beside
+new in `tests/test_officer.py`, the visitor's words in the officer's brief); `Dealings._boat_kept`
+leaves a boat on the to-ship errand alone (the kedge's false denial is step 5's).
+
+**Found on the way, booked:** a person's ids are his company's, so the boat's lists of ids
+are resolved among the registry's persons (step 4's boat as a hull resolves by the person);
+the player's own seat on another ship (step 3). **Next:** step 2, the observer's hull (item 1:
+`ship: none`, `director: observe`; truths 7-320, 7-321, 7-334), the builder going on without
+a report until the package is built or blocked; 74's prize and captive on this step's
+function, held after 82 and 65 both.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
