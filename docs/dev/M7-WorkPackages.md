@@ -1043,7 +1043,10 @@ pictures' flake the one failure, passing alone; the lead's runs of the tide's, c
 islands', ports', lookout's and geo's tests with the moved and the new truths on the head
 before step 5 (175 and 10 passed, none failed) and of the tide's, chart's and ports' tests
 with twelve truths on step 5's (140 and 12 passed, none failed); **the whole suite on the
-merged tree in the cloud (run 18, the figures written here when it ends).**
+merged tree in the cloud (run 18 on `1e3523b`: lint green, 4,337 passed over the six shards,
+3 skipped, 11 expected failures, none failed, 43 minutes; the pace job, informative, 7 of 10
+at 448 to 495 against the floor of 500 in 298 seconds, the slow runner's day as 79b's and
+89's records read it).**
 
 **Item 1, an island the grid lacks, taken another way and accepted:** the brief's island
 with an extent alone would have made Belle Isle and seven other islands the grid holds
