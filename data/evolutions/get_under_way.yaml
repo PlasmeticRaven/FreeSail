@@ -1,10 +1,8 @@
-# Get under way (spec M5 §23; package 35; the owner, 2026-10-02: `weigh` alone leaves her
-# with the anchor up and no sail set, and `get under way` is Luce's whole sequence). The
-# evolution as Luce 1866, ch. XXI Getting Under Way, 'To get under way and stand out on a
-# wind' (pp. 393 to 396 of the 1877 printing), gives it: "Pass and lash the messenger;
-# get up the nippers and capstan bars; rig the fish, and reeve the cat and fish
-# purchases; send the ready-men aloft to get the sails ready for loosing; ... call, All
-# hands up anchor! bring to on the cable, and unbitt; man the bars, Heave around! and
+# Get under way. The evolution as Luce 1866, ch. XXI Getting Under Way, 'To get under way
+# and stand out on a wind' (pp. 393 to 396 of the 1877 printing), gives it: "Pass and lash
+# the messenger; get up the nippers and capstan bars; rig the fish, and reeve the cat and
+# fish purchases; send the ready-men aloft to get the sails ready for loosing; ... call,
+# All hands up anchor! bring to on the cable, and unbitt; man the bars, Heave around! and
 # heave in the cable to a short stay. ... The cable being in to a short stay, Pawl the
 # capstan! stopper the cable well, and unship the bars. Stations for loosing sail! Lay
 # aloft sail-loosers! and when the men are aloft and ready, Lay out and Loose! Man the
@@ -19,12 +17,11 @@
 # Let go the downhauls, hoist away! Put the helm a-lee for stern-board, at the same time,
 # heave the anchor up to the bows; and as soon as it is high enough, Avast heaving! Pawl
 # the capstan! stopper the cable; cat and fish the anchor. When she has fallen off
-# sufficiently, Right the helm! Brace around the head yards, and set the spanker. Trim
-# the yards and stand out to sea, making sail as required." And of the tide (p. 393):
-# "When about to get under way (the ship being tide rode and the wind aft), the
-# comparative strength of wind and tide must be well considered ... it is equally bad
-# management when the anchor is hove up and the ship is drifted by the tide without
-# steerage way."
+# sufficiently, Right the helm! Brace around the head yards, and set the spanker. Trim the
+# yards and stand out to sea, making sail as required." And of the tide (p. 393): "When
+# about to get under way (the ship being tide rode and the wind aft), the comparative
+# strength of wind and tide must be well considered ... it is equally bad management when
+# the anchor is hove up and the ship is drifted by the tide without steerage way."
 #
 # The script (freesail/evolutions/scripts.py, GetUnderWayScript) does it in phases:
 #   rig_capstan   the messenger passed, the bars shipped (as heave_short), unless she is
@@ -32,38 +29,33 @@
 #   heave_short   the cable in to a short stay
 #   loose         the topsails loosed, sheeted home and hoisted (a fore-and-after's
 #                 mainsail set, as Luce has it set "before starting the anchor" where
-#                 there is not room to go astern); the after yards braced up for the
-#                 tack to cast on and the head yards abox
+#                 there is not room to go astern); the after yards braced up for the tack
+#                 to cast on and the head yards abox
 #   heave         the cable hove up and down
 #   break_out     the anchor broken out: aweigh; the jib hoisted; the helm a-lee for the
 #                 stern-board
 #   cast          the head yards kept abox till her head has paid off; then the helm
 #                 righted, the head yards braced round, the spanker set, the course
 #                 steered; meanwhile the anchor hove up, catted and fished
-# Parameters: `tack`, the tack to cast on (the pilot's, else the one her head falls off
-# to from the wind); `course_deg`, the course to steer when she has cast (the pilot's
-# course out of the road; none: full and by on the tack). The sails she gets under way
-# under are the topsails and the jib on a square rig, the mainsail and the jib on a
-# fore-and-after; the captain makes more sail as he pleases.
-# Package 37f (the review of gate 5c's playtests, 5.8, "Getting under way"): the
-# fore-and-aft cast, and no cast said at a timeout. A vessel whose yards are all on one
-# mast (the schooner, the cutter) is got under way as Luce's schooner is (1884, ch.
-# XXXIV, 'Getting under way.--Schooners': "To cast to starboard, heave up the anchor,
-# putting the helm a starboard, main boom steadied over to starboard ... hoist the
-# staysail, or staysail and jib, with the port sheets aft. When she has paid off
-# sufficiently to starboard, 'Draw' the head sheets, right the helm, and trim the fore
-# and main sheets"): her mainsail hoisted with its boom steadied over to the side she
-# is to cast toward (cast_boom_deg), which sheers her for the tack while the anchor
-# still holds her; her topsail hoisted with its yard square and laid abox only when
-# the anchor is aweigh (abox_s); her jib hoisted then with its sheet to windward; her
-# helm tended from the first heave. In the playtests her mainsail was set flat aft for
-# the tack and her jib to leeward, all three of a schooner's casts ran to the timeout,
-# and each was logged "She has paid off". For every rig now: at cast_timeout_s she is
-# taken as she lies. Paid off cast_enough_points on the tack wanted, she has cast, and
-# the line says how far; as far on the other, the line says "She would not cast on the
-# larboard tack: she has paid off on the starboard" and she is got under way on that
-# tack; hanging nearer the wind than that she is given till cast_give_up_s, and the
-# evolution then fails in words, the anchor aweigh.
+# Parameters: `tack`, the tack to cast on (the pilot's, else the one her head falls off to
+# from the wind); `course_deg`, the course to steer when she has cast (the pilot's course
+# out of the road; none: full and by on the tack). The sails she gets under way under are
+# the topsails and the jib on a square rig, the mainsail and the jib on a fore-and-after;
+# the captain makes more sail as he pleases. A vessel whose yards are all on one mast (the
+# schooner, the cutter) is got under way as Luce's schooner is (1884, ch. XXXIV, 'Getting
+# under way.--Schooners': "To cast to starboard, heave up the anchor, putting the helm a
+# starboard, main boom steadied over to starboard ... hoist the staysail, or staysail and
+# jib, with the port sheets aft. When she has paid off sufficiently to starboard, 'Draw'
+# the head sheets, right the helm, and trim the fore and main sheets"): her mainsail
+# hoisted with its boom steadied over to the side she is to cast toward (cast_boom_deg),
+# which sheers her for the tack while the anchor still holds her; her topsail hoisted with
+# its yard square and laid abox only when the anchor is aweigh (abox_s); her jib hoisted
+# then with its sheet to windward; her helm tended from the first heave. For every rig
+# now: at cast_timeout_s she is taken as she lies. Paid off cast_enough_points on the tack
+# wanted, she has cast, and the line says how far; as far on the other, the line says "She
+# would not cast on the larboard tack: she has paid off on the starboard" and she is got
+# under way on that tack; hanging nearer the wind than that she is given till
+# cast_give_up_s, and the evolution then fails in words, the anchor aweigh.
 id: get_under_way
 verb: get_under_way
 applies_to: {class: ship}

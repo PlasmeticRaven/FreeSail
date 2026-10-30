@@ -1395,8 +1395,14 @@ TOOLS: dict[str, Tool] = {
             "thing, or his general authority). A standing order is given in your own rank. "
             "To avoid an immediate danger an officer with the deck may, on its own word, put "
             "the helm over, heave to or let go an anchor: give that order with danger set to "
-            "the danger in your words, and the log says that you did and why. Returns the "
-            "log line the order made.",
+            "the danger in your words, and the log says that you did and why. Your "
+            "person's own acts are orders too, and no station is refused them: moving "
+            "about the ship ('go below', 'come on deck', 'go to the galley'), going ashore "
+            "and coming aboard in port, eating, drinking and sleeping, reading what is "
+            "before you, saying ('say <words>', 'say to the master <words>', 'ask the "
+            "lookout ...') and hailing a sail within four cables ('hail the brig: what ship "
+            "is that?'); the grammar's parts 'the order language' and 'the voice' have "
+            "them. Returns the log line the order made.",
             {
                 "text": "string: the order",
                 "danger": "string, optional: the immediate danger this order is to avoid, "
@@ -1592,7 +1598,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "world_order",
-            "The director's hand (spec M7b §3): an order to the world, not to any ship, in "
+            "The director's hand: an order to the world, not to any ship, in "
             "the channel's words ('weather: ...', 'ship: ...', 'ship \"X\": intent ...', "
             "'aboard: ...', 'message: ...', 'port <id>: ...', 'mark: ...', 'person: make "
             "\"<name>\", ...', 'person: \"<name>\" comes aboard as <station>', 'say as "
@@ -1620,7 +1626,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "truth",
-            "The truth, the director's alone (spec M7b §2): every ship's true position, "
+            "The truth, the director's alone: every ship's true position, "
             "heading, speed, sail and state with her captain's intent, the weather as it is "
             "at the player's ship and as the systems will make it for the next watch, the "
             "tide, the people aboard every crewed ship and their states, the markets' "
@@ -2230,18 +2236,131 @@ def _split_lines(lines: list[str], marks: list[tuple[str, str]]) -> list[tuple[s
     return out
 
 
+# The grammar's parts, in the order the page gives them.
+GRAMMAR_PARTS_WORDS = (
+    "the grammar: the order language, the readings, the standing dialect, the voice, the "
+    "stand-by and the world orders"
+)
+
+
+def _readings_lines(vocab: Any) -> list[str]:
+    """The readings, each with what it answers, from the registry (every row the game
+    has, so the page is complete by construction): the asking forms, the rows, the
+    aliases the vocabulary adds, and the rows the ship has not got."""
+    out = [
+        "The readings: a question to the instruments, the master, the people or the papers, "
+        "answered in the log in the instruments' own words, never journaled and changing "
+        "nothing aboard. Each is asked by its words alone ('the true wind'), after one of "
+        + ", ".join(f"'{a}'" for a in vocab.asking)
+        + " ('what is the true wind', 'ask the master the reckoning'), or by the readings "
+        "tool, which carries every one at once. A sail by name ('the fore topsail') gives "
+        "its state, a spar or a line its strain. Each reading, and what it answers:"
+    ]
+    for row in R.REGISTRY:
+        if row.is_absent:
+            continue
+        words = ", ".join(f"'{w}'" for w in row.words)
+        what = row.description or R.KINDS[row.kind]
+        out.append(f"  {words}: {what}")
+    aliases = [
+        f"'{alias}' is '{phrase}'"
+        for alias, phrase in (vocab.reading_aliases or {}).items()
+        if phrase != alias
+    ]
+    if aliases:
+        out.append("  Also taken, each for the reading named: " + "; ".join(aliases) + ".")
+    absent = [
+        f"'{row.words[0]}' ({row.absent.rstrip('.')})"
+        for row in R.REGISTRY
+        if row.is_absent and row.absent
+    ]
+    if absent:
+        out.append(
+            "  Not yet in the ship, named so that each is refused in words: "
+            + "; ".join(absent)
+            + "."
+        )
+    out.append(
+        "  A reading with a figure or a state is compared in a standing order's condition "
+        "(the standing dialect below says how each is compared); one that is a question in "
+        "words (the people, the pilot, the port, the prices, who commands) is read and never "
+        "compared."
+    )
+    return out
+
+
+def _voice_lines() -> list[str]:
+    """The voice in one grammar: what is said aboard and across the water, by whom."""
+    return [
+        "The voice: words said aboard and across the water, each a line in the log under "
+        "the speaker's name with where he stands, heard by whoever is in that place (the "
+        "quarterdeck, the cabin, the masthead, a place ashore). Every stationed person has "
+        "these, whatever his station's domain:",
+        "  say <words>: said where you stand, heard by whoever stands there ('say we shall "
+        "have a blow')",
+        "  say to the <station> <words> (also: tell the <station> <words>): a word to a "
+        "station by its name or its person's ('tell the master mind the glass', 'say to "
+        "Mr Harvey ...', 'say to the master: the brig has tacked'); no answer is owed. To "
+        "a person nobody holds the word goes to the director, who may answer in his voice",
+        "  ask the <station> <question>: a question to a station, its answer back to you "
+        "in the log; you are told when none comes within the station's patience ('ask the "
+        "lookout what she is')",
+        "  hail <words> (also: hail the deck <words>): the lookout's hail from the masthead, "
+        "heard on deck and waking an officer who stands by ('hail sail ho, two points on the "
+        "larboard bow'); from any other place, 'say' the words",
+        "  hail the <sail> <words> (also: hail the <sail>: <words>, hail her <words>, say to "
+        "the <sail> <words>, hail <name> ...): the speaking trumpet to a sail within four "
+        "cables, the colon optional ('hail the brig what ship is that?', 'say to the Nancy: "
+        "heave to, I am sending a boat'); 'hail her' alone gives the standard hail of your "
+        "service. Her captain answers by his table, by a model at his station, or by the "
+        "player; beyond four cables the hail is refused with the distance",
+        "  answer <words>: the answer to a question put to your station (a model answers "
+        "with the answer tool)",
+        "The station sentences the captain gives, the player's own at the prompt: 'stand "
+        "down the <station>', 'resume the <station>', \"show the <station>'s journal\", "
+        "'you have the deck' and 'I have the deck' to the officer of the watch, 'you may "
+        "<order>' and 'you may not <order>' to a station named before the comma. A standing "
+        "order may tell or ask a station too, after 'then'.",
+    ]
+
+
+def _stand_by_lines() -> list[str]:
+    """The stand-by's words, for a model at a station: the events, the intervals, the
+    tripwires of the ship's own state."""
+    from freesail.agents.tripwires import TRIPWIRE_WORDS
+
+    intervals = ", ".join(f"'{w}'" for w in R.INTERVALS)
+    tripwires = ", ".join(f"'{w}'" for w in TRIPWIRE_WORDS)
+    return [
+        "The stand-by (stand_by(until), a model's; 'stand by until <words>' at the player's "
+        "seat): you are not sampled until what you name comes, and any one of several joined "
+        "with 'or' wakes you, the sample naming which:",
+        f"  an event, in the standing dialect's words: {STAND_BY_EVENTS}",
+        f"  an interval: {intervals}, or a number of minutes ('5 minutes', 'ten minutes')",
+        "  'a notable event' or 'an urgent event': the next line of that severity in the log",
+        f"  a condition of the dialect ('the true wind exceeds 30 knots', 'the depth is under "
+        "8 fathoms'), or a tripwire of the ship's own state, judged by her readings and never "
+        f"by prose: {tripwires}",
+        "An urgent line wakes you whatever you stand by for; a hail from the masthead wakes "
+        "a station with the deck; the notable lines logged while you stood by come with the "
+        "sample that wakes you.",
+    ]
+
+
 @functools.lru_cache(maxsize=1)
 def _grammar_topic() -> Topic:
     from freesail.orders.vocabulary import load_vocabulary
 
     vocab = load_vocabulary()
+    generated = set(vocab.readings)  # the readings' asking forms: the readings part has them
     order = [
         "The order language: one line, a verb and what it acts on, as a captain would say "
         "it: 'set the fore topsail', 'brace sharp up on the starboard tack', 'steer "
-        "south-west by west', 'reef the topsails, one reef'. The verbs and their synonyms:"
+        "south-west by west', 'reef the topsails, one reef'. The verbs and their synonyms "
+        "(the readings are the next part, the standing dialect and the voice after it):"
     ]
     for name, spec in vocab.verbs.items():
-        if spec.level == "driver" or spec.object == "standing":
+        if spec.level == "driver" or spec.object == "standing" or name in generated:
             continue  # the standing dialect's sentences are below, with their grammar
         syn = f" (also: {', '.join(spec.synonyms)})" if spec.synonyms else ""
         order.append(f"  {name}{syn}")
@@ -2250,6 +2369,13 @@ def _grammar_topic() -> Topic:
         "is 'belay that', the last order whose work is in hand or waiting; said of work it "
         "belays that work, named as the log names it ('belay reefing the mainsail'), as it "
         "was ordered, by its kind ('belay the reef') or by its sail ('belay the mainsail')."
+    )
+    order.append(
+        "Your person's own, at any station, whatever its domain: moving about the ship ('go "
+        "below', 'come on deck', 'go aloft', 'go to the galley'; 'the places' lists where), "
+        "going ashore and coming aboard when she is in port ('go ashore', 'come aboard', "
+        "'hire a waterman'; 'the places ashore' lists the port's), eating, drinking and "
+        "sleeping ('eat', 'drink', 'sleep'; 'how am I' says how you are), and the free lines."
     )
     order.append(
         "Free lines (a person's own, at any station): "
@@ -2263,14 +2389,16 @@ def _grammar_topic() -> Topic:
         "of the ship's changed\". A thing handed to a person a model or the player holds "
         "lies before him for his own hand."
     )
+    readings = _readings_lines(vocab)
     dialect = standing_dialect_lines(vocab)
-    station = [
-        "The station sentences the captain uses: 'ask the watcher <question>', 'tell the "
-        "watcher <words>' (also: say to the watcher; no answer is owed), 'stand down the "
-        "watcher', 'resume the watcher', \"show the watcher's journal\". A standing order may "
-        "tell or ask too, after 'then'."
-    ]
-    whole = "\n".join([*order, "", *dialect, "", *station])
+    voice = _voice_lines()
+    stand_by = _stand_by_lines()
+    from freesail.agents.director import forms_words
+
+    world_orders = forms_words()
+    whole = "\n".join(
+        [*order, "", *readings, "", *dialect, "", *voice, "", *stand_by, "", *world_orders]
+    )
     parts = _split_lines(
         dialect,
         [
@@ -2283,32 +2411,29 @@ def _grammar_topic() -> Topic:
     )
     sections = [
         Section("1", "the order language", "\n".join(order), "\n".join(order), by_line=True),
+        Section("2", "the readings", "\n".join(readings), "\n".join(readings), by_line=True),
         Section(
-            "2", "the standing dialect", "\n".join(dialect), "\n".join(parts[0][1]), by_line=True
+            "3", "the standing dialect", "\n".join(dialect), "\n".join(parts[0][1]), by_line=True
         ),
     ]
     for k, (heading, chunk) in enumerate(parts[1:], 1):
         text = "\n".join(chunk)
-        sections.append(Section(f"2.{k}", heading, text, text, by_line=True))
+        sections.append(Section(f"3.{k}", heading, text, text, by_line=True))
+    sections.append(Section("4", "the voice", "\n".join(voice), "\n".join(voice), by_line=True))
     sections.append(
-        Section("3", "the station sentences", "\n".join(station), "\n".join(station), by_line=True)
+        Section("5", "the stand-by", "\n".join(stand_by), "\n".join(stand_by), by_line=True)
     )
-    # the world orders (package 58a; the cold review of 2026-10-22, R-42: a complete
-    # director's grammar with verified examples), from the forms' own table
-    from freesail.agents.director import forms_words
-
-    world_orders = forms_words()
+    # the world orders, from the forms' own table (a complete director's grammar with
+    # verified examples)
     sections.append(
         Section(
-            "4", "the world orders", "\n".join(world_orders), "\n".join(world_orders), by_line=True
+            "6", "the world orders", "\n".join(world_orders), "\n".join(world_orders), by_line=True
         )
     )
-    whole = "\n".join([whole, "", *world_orders])
     return Topic(
         "grammar",
         "the grammar",
-        "the grammar: the order language, the standing dialect, the station sentences and "
-        "the world orders",
+        GRAMMAR_PARTS_WORDS,
         whole,
         tuple(sections),
     )
@@ -2679,8 +2804,7 @@ def _contents(world: World) -> str:
     )
     gram = _grammar_topic()
     lines.append(
-        "  grammar: the order language, the standing dialect, the station sentences and the "
-        "world orders: "
+        f"  {GRAMMAR_PARTS_WORDS.replace('the grammar: ', 'grammar: ')}: "
         f"{size_words(tokens(gram.whole))} whole, in "
         f"{sum(1 for s in gram.sections if s.level == 1)} parts"
     )
@@ -2745,11 +2869,20 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
     events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
     later = ", ".join(w for w, s in R.EVENTS.items() if s.absent)
     readings = []
+    questions = []
     for row in R.REGISTRY:
         if row.is_absent:
             continue
         words = " or ".join(f"'{w}'" for w in row.words)
+        if row.kind == "query":
+            questions.append(f"'{row.words[0]}'")
+            continue
         readings.append(f"    {words}: {R.KINDS[row.kind]}")
+    readings.append(
+        "    Read and never compared, being questions answered in words: "
+        + ", ".join(questions)
+        + "."
+    )
     absent = ", ".join(f"'{row.words[0]}'" for row in R.REGISTRY if row.is_absent)
     out = [
         "The standing dialect: standing orders, which the captain gives like any order and "

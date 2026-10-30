@@ -676,6 +676,19 @@ class Papers:
         # start, until a keeper writes it)
         self.entries: dict[str, tuple[int, str]] = {}
         self._stamp_at_start: str | None = None
+        # the news of the war as the ship has heard it: the table she knows (the one she
+        # sailed with, moved by each piece of news) and every change the news brought, with
+        # where and when it came (`news_heard`; the paper `the news of the war`, the reading
+        # `the war`)
+        nations = getattr(world, "nations", None)
+        # a `Nations` unpickled from a checkpoint before package 85 has no `sailed_with`
+        # (a dataclass default is not an old object's): the table she sailed with is then
+        # her wars as saved
+        sailed = getattr(nations, "sailed_with", None) if nations is not None else None
+        if sailed is None and nations is not None:
+            sailed = nations.wars
+        self.known_wars: list[dict[str, Any]] = [dict(w) for w in sailed] if sailed else []
+        self.war_news: list[dict[str, Any]] = []
 
     # -- entries -------------------------------------------------------------------
 
@@ -691,6 +704,49 @@ class Papers:
         head = key[:1].upper() + key[1:]
         keeper = self._keeper(paper["keeper"])
         return f"{head} written up by the {keeper}: {why}."
+
+    # -- the news of the war --------------------------------------------------------
+
+    def news_heard(self, how: str) -> list[str]:
+        """The news of the war brought to the ship by `how` ('the pilot off Falmouth', 'the
+        boat from the quay at Plymouth'): the world's table against the one she knows, each
+        war declared or peace made since entered in the paper with where and when it came,
+        the paper written up; the log's lines, one a change (none when nothing changed)."""
+        nations = getattr(self.world, "nations", None)
+        if nations is None:
+            return []
+        before = {frozenset(w["between"]) for w in self.known_wars}
+        now = {frozenset(w["between"]) for w in nations.wars}
+        lines: list[str] = []
+        for pair in sorted(before ^ now, key=sorted):
+            a, b = sorted(pair)
+            first, second = nations.nations[a].name, nations.nations[b].name
+            text = (
+                f"war declared between {first} and {second}"
+                if pair in now
+                else f"peace made between {first} and {second}"
+            )
+            self.war_news.append(
+                {"tick": self.world.clock.tick, "when": self._stamp(), "how": how, "text": text}
+            )
+            lines.append(self.write("the news of the war", f"by {how}, {text}"))
+        self.known_wars = [dict(w) for w in nations.wars]
+        return lines
+
+    def war_lines(self) -> list[str]:
+        """The war as the ship knows it, for the paper and the reading: the table she
+        sailed with, and the news since, each with where and when it came."""
+        nations = getattr(self.world, "nations", None)
+        if nations is None:
+            return ["No table of the nations aboard."]
+        lines = [nations.sailed_with_words()]
+        if not self.war_news:
+            lines.append("No news of the war has reached her since she sailed.")
+            return lines
+        lines.append("The news since, as it came:")
+        lines.extend(f"  {n['when']}, by {n['how']}: {n['text']}." for n in self.war_news)
+        lines.append(f"As she knows it now: {nations.table_words(self.known_wars)}.")
+        return lines
 
     def _keeper(self, keeper: str) -> str:
         """The keeper who holds a paper in this ship: the mate keeps the purser's papers
@@ -826,6 +882,8 @@ class Papers:
                     words += f"; springs rise {port.spring_rise_ft:g} feet"
                 lines.append(words + ".")
             return lines, keeper
+        if source == "war":
+            return self.war_lines(), keeper
         if source == "prices":
             ports = getattr(world, "dealings", None)
             if ports is None or not ports.price_lists:
@@ -860,10 +918,26 @@ class Papers:
             from freesail.world.signals import books_for
 
             books = books_for(world)
+            if books.root == "basic":
+                # the common book of no nation: whose it is not, said first (the model
+                # officer's fifth point: a generic list taken for the ship's own)
+                head = (
+                    "The common signal book, in the period's general form and no nation's own: "
+                    "this ship's nation keeps no book of her own in the game, so hers is this "
+                    "one, and no other ship's numbers are to be read from it; "
+                )
+            else:
+                nation = getattr(world, "nations", None)
+                name = (
+                    nation.get(books.nation).name
+                    if nation is not None and books.nation in nation.nations
+                    else books.nation
+                )
+                head = f"The {name} signal books, this ship's own by her service ({books.system}): "
             lines = [
-                f"The {books.nation} signal books ({books.system}): the day signals by number, "
-                "the night and fog signals, the convoy's instructions; a signal is made by its "
-                "meaning ('make the signal to tack in succession')."
+                head + "the day signals by number, the night and fog signals, the convoy's "
+                "instructions; a signal is made by its meaning ('make the signal to tack in "
+                "succession')."
             ]
             lines.extend(
                 f"  No. {e.number}: {e.meaning}" + (f" ({e.original})" if e.original else "")

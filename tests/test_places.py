@@ -156,6 +156,7 @@ def test_every_paper_is_a_thing_with_a_keeper_and_a_place_and_the_stores_own_wor
         "the establishment of ground tackle",
         "the epitome's table of the establishments",
         "the price list",
+        "the news of the war",  # the owner's fifth note (package 85): the war as the ship knows it
         "the private signals",  # package 71
         "the signal book",
         "the gunner's account",  # practice and resupply (between packages 72 and 73)
@@ -189,7 +190,9 @@ def test_every_paper_is_a_thing_with_a_keeper_and_a_place_and_the_stores_own_wor
     private = w.papers.page("the private signals")
     assert private.keeper == "captain" and private.lines[0].startswith("No private signals aboard")
     book = w.papers.page("the signal book")
-    assert book.lines[0].startswith("The britain signal books (well-built)")
+    assert book.lines[0].startswith(
+        "The Britain signal books, this ship's own by her service (well-built)"
+    )
     assert "  No. 16: Engage the enemy more closely" in book.lines
 
 
@@ -209,7 +212,7 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
     listing = tools.library(w, "watcher", "papers")
     # eleven since practice and resupply (the owner's, folded in by package 86): the
     # gunner's account (10 before it)
-    assert listing.startswith("the ship's papers: 11 papers aboard, each by handle")
+    assert listing.startswith("the ship's papers: 12 papers aboard, each by handle")
     assert "  2. the manifest, about" in listing
     page = tools.library(w, "watcher", "papers", section="manifest")
     assert page.title == "the ship's papers, the manifest"
@@ -230,7 +233,7 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
     assert "[the ship's papers, the epitome" in found
     # listed in the contents beside the ship, with its handles
     contents = tools.library(w, "watcher", "contents")
-    assert "  papers: the ship's papers, 11 aboard" in contents  # 10 before package 86
+    assert "  papers: the ship's papers, 12 aboard" in contents  # 10 before package 86
     # the pane's route serves the same lines (tests/test_server.py has the route itself)
     from freesail.ui.server import ship_papers
 

@@ -66,7 +66,7 @@ haul down the main topmast staysail
 # rejected: take in the royals
 ```
 
-The last is refused with "Nothing done: the fore royal is already sent down; the main royal is already sent down; the mizzen royal is already sent down." A royal is set flying (chapter 1; package 57): `set the royals` sways each yard up from the deck with the sail bent and hoists it, a couple of minutes' work for a few hands on deck, and `take in the royals` lowers the yard and sends it down whole, so that a royal is never furled aloft and there is no furling it after (`furl the royals` takes in any that are set). The lugger's lug topsails are set flying in the same way (chapter 2).
+The last is refused with "Nothing done: the fore royal is already sent down; the main royal is already sent down; the mizzen royal is already sent down." A royal is set flying (chapter 1): `set the royals` sways each yard up from the deck with the sail bent and hoists it, a couple of minutes' work for a few hands on deck, and `take in the royals` lowers the yard and sends it down whole, so that a royal is never furled aloft and there is no furling it after (`furl the royals` takes in any that are set). The lugger's lug topsails are set flying in the same way (chapter 2).
 
 The period words for taking in are particular to the sail, and the parser keeps them so (Luce 1866, ch. XXIII, 'To take in a Course', 'To take in a Topsail', 'The Spanker': "Up mainsail and spanker!"). A course is **hauled up** by its clew garnets and buntlines; a topsail or a light sail is **clewed up**; a spanker is **brailed up**; a jib is **hauled down**; a studding sail is taken in. `take in`, `douse` and `hand` suit any sail. Use the wrong word and the ship corrects you: "A gaff sail is brailed up, not clewed up; say 'brail up the mizzen spanker' or 'take in the mizzen spanker'."
 
@@ -223,7 +223,7 @@ Two booms gone in three minutes; borne away to nine points again, the three stil
 
 ## The ringtail, the save-alls and the water sail
 
-Three more light sails for a fair wind and smooth water, each in the sail room until wanted and each a studding sail to the physics, with the same stall and the same boom (Luce 1884, ch. XXIII: "a ring-tail, which sets abaft the spanker; a save-all, under the lower studding-sail boom"; `docs/references/RigGeometryNotes.md` §8):
+Three more light sails for a fair wind and smooth water, each in the sail room until wanted and each a studding sail to the physics, with the same stall and the same boom (Luce 1884, ch. XXIII: "a ring-tail, which sets abaft the spanker; a save-all, under the lower studding-sail boom"):
 
 - the frigate's **ringtail**, a narrow sail bordering the spanker's after leech, its head on a short yard hoisted to the gaff end and its foot hauled out on a **ringtail boom** run out on the driver boom (Kipping: it "sets like a topmast studding sail, outside of the after-leech of the main-trysail"); No. 5 canvas;
 - the frigate's two **save-alls**, one under each fore lower studding sail boom, No. 7;
@@ -281,7 +281,7 @@ Eleven minutes in a 15-knot breeze. The old royal was sound, so it went down to 
 
 ## Canvas and its condition
 
-Sailcloth was woven in numbers, No. 1 the heaviest and strongest, No. 8 or 9 the lightest, and each sail was made of the number its work wanted. Luce's table of a frigate's suit (1884, ch. X, p. 171) makes the courses, topsails and spanker of No. 2 and every storm sail of No. 1; Steel (1794) and Kipping (1847) give the navy's older numbers for the lighter sails, which the frigate's file follows (`docs/references/RigGeometryNotes.md` §4). Every sail in the ship files has its number, and the strength of the cloth follows Luce's Appendix E, which tested an inch strip of each: No. 1 bore 470 lb, No. 2 420, a No. 8 royal little more than half of that (`docs/references/Tables.md`).
+Sailcloth was woven in numbers, No. 1 the heaviest and strongest, No. 8 or 9 the lightest, and each sail was made of the number its work wanted. Luce's table of a frigate's suit (1884, ch. X, p. 171) makes the courses, topsails and spanker of No. 2 and every storm sail of No. 1; Steel (1794) and Kipping (1847) give the navy's older numbers for the lighter sails, which the frigate's file follows. Every sail in the ship files has its number, and the strength of the cloth follows Luce's Appendix E, which tested an inch strip of each: No. 1 bore 470 lb, No. 2 420, a No. 8 royal little more than half of that (`docs/references/Tables.md`).
 
 | The frigate's sails | Canvas |
 |---|---|
@@ -293,9 +293,9 @@ Sailcloth was woven in numbers, No. 1 the heaviest and strongest, No. 8 or 9 the
 | studding sails (topgallant No. 7) | No. 6 |
 | storm canvas | No. 1 |
 
-Canvas wears. A sail set and drawing wears slowly, three times as fast when it is aback or shaking, and not at all furled or in the sail room. Worn cloth bears less: a sail at half its condition bears seventy per cent of what it bore new, and it is baggier, so it lies less close to the wind. Nothing in the ship repairs canvas yet (the sailmaker's mending comes with milestone 8), so the only remedies are the old ones: shift a worn sail for a better one, and keep the best canvas for a blow. The words for a sail's condition are *new*, *sound*, *worn*, *much worn* and *worn out*.
+Canvas wears. A sail set and drawing wears slowly, three times as fast when it is aback or shaking, and not at all furled or in the sail room. Worn cloth bears less: a sail at half its condition bears seventy per cent of what it bore new, and it is baggier, so it lies less close to the wind. Nothing in the ship repairs canvas yet (the sailmaker's mending is not in the game), so the only remedies are the old ones: shift a worn sail for a better one, and keep the best canvas for a blow. The words for a sail's condition are *new*, *sound*, *worn*, *much worn* and *worn out*.
 
-What that means in a gale: in the 35-knot gale of gate M2, all sail made and braced up, a new royal holds until its yard and mast carry away; a royal of half its condition blows out of its bolt-ropes first, and the spar is saved for a new sail (`docs/dev/TuningNotes.md`, truth 27). The console cannot yet bend a worn sail by order: canvas wears by the hour, and a scenario is too short to wear it.
+What that means in a gale: in a 35-knot gale, all sail made and braced up, a new royal holds until its yard and mast carry away; a royal of half its condition blows out of its bolt-ropes first, and the spar is saved for a new sail. The console cannot yet bend a worn sail by order: canvas wears by the hour, and a scenario is too short to wear it.
 
 ## The sail room
 
@@ -351,7 +351,7 @@ The refusal: "The fore storm staysail is unbent; there is no sail on the yard. B
 * Morning watch (04:42)  Bent the fore storm staysail (No. 1 canvas, new) and furled it; 20 spare sails left in the sail room.
 ```
 
-Luce's ship lies to in a gale "under close-reefed main topsail, fore storm staysail, and probably single reefed trysail" (Luce 1884, ch. XXIX In a Gale), and that is what `lie a-try` does once the main topsail is set, close-reefed as the weather wants (chapter 5): the other square sails and the jibs are taken in, the staysails stand, and she comes up to about four points with the helm a little a-lee. In a steady 45-knot storm with the topgallant masts sent down and the storm staysails set, nothing carries away in an hour, though the storm staysails stand at nine tenths of what their cloth will bear and the console's gusts blow them out of their bolt-ropes (the owner is judging that too). **What the game does not yet do** is let her lie quietly: she goes astern at four knots and more where a ship of the period drifted bodily to leeward at a knot or two, a question for the physics that the owner is judging (`docs/dev/TuningNotes.md`, truth 28).
+Luce's ship lies to in a gale "under close-reefed main topsail, fore storm staysail, and probably single reefed trysail" (Luce 1884, ch. XXIX In a Gale), and that is what `lie a-try` does once the main topsail is set, close-reefed as the weather wants (chapter 5): the other square sails and the jibs are taken in, the staysails stand, and she comes up to about four points with the helm a little a-lee. In a steady 45-knot storm with the topgallant masts sent down and the storm staysails set, nothing carries away in an hour, though the storm staysails stand at nine tenths of what their cloth will bear and a gust may blow them out of their bolt-ropes. Lying to so she comes up and falls off and drifts bodily to leeward at a knot and a half to two, as chapter 9 has it.
 
 ## Light spars in a blow
 
@@ -403,7 +403,7 @@ the spare spars
 # rejected: send down the fore topgallant mast
 ```
 
-With nothing carried away every one of these is refused in words: "The fore topsail yard stands sound; there is no wreck to cut away.", "There is no wreck aboard to clear: every spar stands and no sail hangs in rags.", "The fore topmast is sound; only a spar carried away is shifted for a spare." The schooner of the tenth playtest, in 19 knots with a boom gone:
+With nothing carried away every one of these is refused in words: "The fore topsail yard stands sound; there is no wreck to cut away.", "There is no wreck aboard to clear: every spar stands and no sail hangs in rags.", "The fore topmast is sound; only a spar carried away is shifted for a spare." The schooner in 19 knots with a boom gone:
 
 ```
 ! Morning watch (04:00)  Larboard fore topmast studdingsail boom carried away; the larboard fore topmast studdingsail hanging to leeward.

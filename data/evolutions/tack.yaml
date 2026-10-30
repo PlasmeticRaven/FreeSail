@@ -1,26 +1,23 @@
-# Tack ship (spec §8.5, scripted). The script in freesail/evolutions/scripts.py
-# gives the helm, the braces and the sheets their orders on a timeline and watches the
-# ship's head against the wind:
-#   "Helm's a-lee"        the helm is ordered twelve points round, through the wind; the
-#                         head sheets let fly, the spanker (or main) sheet hauled aft
-#   "Mainsail haul"       within a point of the wind, the after yards swing (brace_s)
-#   "Let go and haul"     head through the wind, the head yards swing (brace_s); the head
-#                         sheets drawn on the new tack
+# Tack ship. The script in freesail/evolutions/scripts.py gives the helm, the braces and
+# the sheets their orders on a timeline and watches the ship's head against the wind:
+#   "Helm's a-lee" the helm is ordered twelve points round, through the wind; the head
+#   sheets let fly, the spanker (or main) sheet hauled aft
+#   "Mainsail haul" within a point of the wind, the after yards swing (brace_s)
+#   "Let go and haul" head through the wind, the head yards swing (brace_s); the head
+#   sheets drawn on the new tack
 #   steady on the new close-hauled course, the sheets trimmed: ship.tacked.
-# Package 32e (spec M5 open item 12): the miss-stays rule reads the vessel. Her way is
-# gone when she makes less than way_gone_fraction of her speed at "helm's a-lee" or
-# fewer than way_gone_lengths_per_min of her lengths a minute, whichever is the more.
-# Way gone with her head more than a point off the wind is a plain miss; within a point
-# she hangs in stays and is given Luce's recovery (the helm kept a-lee and shifted with
-# sternway, the head yards aback, the head sheets held to windward, the boom hauled over
-# to windward), and only when she has fallen back two points on the old tack, or hung
+# Her way is gone when she makes less than way_gone_fraction of her speed at "helm's
+# a-lee" or fewer than way_gone_lengths_per_min of her lengths a minute, whichever is the
+# more. Way gone with her head more than a point off the wind is a plain miss; within a
+# point she hangs in stays and is given Luce's recovery (the helm kept a-lee and shifted
+# with sternway, the head yards aback, the head sheets held to windward, the boom hauled
+# over to windward), and only when she has fallen back two points on the old tack, or hung
 # stays_timeout_s from the moment her way went, has she missed stays. Missed stays: the
 # yards are squared as a brace with hands and time (brace_s), the head sheets flattened
-# in, the spanker sheet eased off and the helm put up as an order.
-# A frigate in a working breeze takes five to ten minutes from "ready about" to steady
-# on the new tack; a topsail schooner about two and a half, a cutter a minute and a
-# half, a brig as the frigate (docs/dev/TuningNotes.md, package 32e); the turn itself is
-# the physics' to make.
+# in, the spanker sheet eased off and the helm put up as an order. A frigate in a working
+# breeze takes five to ten minutes from "ready about" to steady on the new tack; a topsail
+# schooner about two and a half, a cutter a minute and a half, a brig as the frigate; the
+# turn itself is the physics' to make.
 id: tack
 verb: tack
 applies_to: {class: ship}

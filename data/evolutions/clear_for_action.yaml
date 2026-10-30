@@ -1,15 +1,15 @@
-# Clear for action (spec M7 §8, §8a; package 70; scripted, ClearForActionScript in
-# evolutions/action_scripts.py). The cabin bulkheads down and the furniture struck below,
-# the galley fire out, the decks wetted and sanded with the match tubs and the shot
-# garlands filled, the boats hoisted out to tow astern; and then the drum beats to
-# quarters and every man goes to his station by the quarter bill (the ship's file,
-# `crew.quarter_bill`; `freesail/crew/quarters.py`). From the beat the hands are under the
-# quarter bill until `secure the guns` or `pipe down` put them back under the watch bill.
+# Clear for action (scripted, ClearForActionScript in evolutions/action_scripts.py). The
+# cabin bulkheads down and the furniture struck below, the galley fire out, the decks
+# wetted and sanded with the match tubs and the shot garlands filled, the boats hoisted
+# out to tow astern; and then the drum beats to quarters and every man goes to his station
+# by the quarter bill (the ship's file, `crew.quarter_bill`; `freesail/crew/quarters.py`).
+# From the beat the hands are under the quarter bill until `secure the guns` or `pipe
+# down` put them back under the watch bill.
 #
-# The frigate's quarter of an hour and the cutter's five minutes (spec M7 §8) by her
-# length between the two, the phases' shares of it in the script (judgement; the logs of
-# 1805 give "cleared for action" ten to twenty minutes after the drum in a frigate). The
-# beat itself a minute and a half. Ordered cleared already, only the drum beats.
+# The frigate's quarter of an hour and the cutter's five minutes by her length between the
+# two, the phases' shares of it in the script (judgement; the logs of 1805 give "cleared
+# for action" ten to twenty minutes after the drum in a frigate). The beat itself a minute
+# and a half. Ordered cleared already, only the drum beats.
 id: clear_for_action
 verb: clear_for_action
 applies_to: {class: ship}
@@ -25,4 +25,4 @@ on_fail: {log: "Could not clear for action: {reason}", kind: evolution.failed, s
 crew: {hands: all, rating: ordinary, stations: [all hands]}
 # the drum stops the sail work in hand, which holds and resumes after (as a manoeuvre does)
 belays: true
-source: "spec M7 §8 (a frigate's quarter of an hour, a cutter's five minutes); Luce 1884, ch. XX 'Clear Ship for Action'; Douglas 1820, part II, the preparations for action; the captains' logs of 1805 for the interval between the drum and 'cleared'"
+source: "a frigate's quarter of an hour and a cutter's five minutes, judgement; Luce 1884, ch. XX 'Clear Ship for Action'; Douglas 1820, part II, the preparations for action; the captains' logs of 1805 for the interval between the drum and 'cleared'"

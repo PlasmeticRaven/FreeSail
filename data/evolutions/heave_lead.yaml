@@ -1,16 +1,16 @@
-# Heave the hand lead (spec M5 §13, §15; package 33a). "Soundings, to ascertain the depth
-# of water on entering or leaving a port, or in any case where there is supposed to be
-# less than twenty fathoms of water, are taken by the hand lead, a quartermaster or
-# forecastle-man being stationed in the main chains for the purpose; the lead weighing
-# from seven to fourteen pounds, and the line being from twenty to thirty fathoms in
-# length" (Luce 1884, ch. I 'The Lead'); the line marked at 2, 3, 5, 7, 10, 13, 15 and 17
-# with leather and rags "so that the marks can be told by feel at night" (Lever 1808,
-# 'The Hand-Lead'; Falconer 1780, 'Sounding'). Taken with way on, the leadsman heaving
-# forward and getting the depth as the vessel passes with the line nearly up and down,
-# and calling it: "By the mark seven", "By the deep nine", "And a half seven" (Luce).
-# The World reads the depth and the ground when this completes and says the leadsman's
-# line itself (`world.reckoning.LEAD_HOVE_KIND`); a depth beyond the line is "No bottom
-# at twenty fathoms", for which the deep-sea lead is wanted (heave_deep_sea_lead.yaml).
+# Heave the hand lead. "Soundings, to ascertain the depth of water on entering or leaving
+# a port, or in any case where there is supposed to be less than twenty fathoms of water,
+# are taken by the hand lead, a quartermaster or forecastle-man being stationed in the
+# main chains for the purpose; the lead weighing from seven to fourteen pounds, and the
+# line being from twenty to thirty fathoms in length" (Luce 1884, ch. I 'The Lead'); the
+# line marked at 2, 3, 5, 7, 10, 13, 15 and 17 with leather and rags "so that the marks
+# can be told by feel at night" (Lever 1808, 'The Hand-Lead'; Falconer 1780, 'Sounding').
+# Taken with way on, the leadsman heaving forward and getting the depth as the vessel
+# passes with the line nearly up and down, and calling it: "By the mark seven", "By the
+# deep nine", "And a half seven" (Luce). The World reads the depth and the ground when
+# this completes and says the leadsman's line itself (`world.reckoning.LEAD_HOVE_KIND`); a
+# depth beyond the line is "No bottom at twenty fathoms", for which the deep-sea lead is
+# wanted (heave_deep_sea_lead.yaml).
 #
 # The subject is `her` (see heave_log.yaml): the leadsman in the chains does not hold
 # the ship against a manoeuvre.

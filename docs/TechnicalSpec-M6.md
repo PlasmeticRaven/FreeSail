@@ -615,7 +615,7 @@ course to the point and the degree, each distance to the tenth of a mile, her wa
 quarter knot, and the tide and drift as miles toward a point; they do not give the
 account the slate works to, which is the working.
 
-### 6. The lessons in the primer (`docs/primer/17-lessons.md` new; Opus)
+### 6. The lessons in the primer (`docs/primer/18-lessons.md` new; Opus)
 
 The officer of game 9, asked whether a command would interest it, named what it would want
 to have done first: "a few more landfalls on my own reckoning", "taken her in and out of a

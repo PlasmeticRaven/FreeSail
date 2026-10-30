@@ -1,11 +1,11 @@
-# Batten down the hatches, or take the battens off (spec M7 §13; package 73; scripted,
-# BattenDownScript in evolutions/repair_scripts.py). "The hatches should be battened down"
-# in preparing for a gale (Luce 1884, ch. XXIX 'Preparing for a Gale'; Falconer 1780,
-# BATTENS: "to batten down the hatches ... to fasten the tarpaulings over them with
-# battens, in order to prevent the water from getting below"). Battened, the sea she ships
-# in a heavy sea comes no further than the deck (`freesail/world/water.py`: the sea's
-# source stops) and the hands below are kept below; `open the hatches` takes them off
-# (params.open). One phase, `battens`.
+# Batten down the hatches, or take the battens off (scripted, BattenDownScript in
+# evolutions/repair_scripts.py). "The hatches should be battened down" in preparing for a
+# gale (Luce 1884, ch. XXIX 'Preparing for a Gale'; Falconer 1780, BATTENS: "to batten
+# down the hatches ... to fasten the tarpaulings over them with battens, in order to
+# prevent the water from getting below"). Battened, the sea she ships in a heavy sea comes
+# no further than the deck (`freesail/world/water.py`: the sea's source stops) and the
+# hands below are kept below; `open the hatches` takes them off (params.open). One phase,
+# `battens`.
 id: batten_down
 verb: batten_down
 applies_to: {class: ship}

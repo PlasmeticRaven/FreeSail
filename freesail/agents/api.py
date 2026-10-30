@@ -589,6 +589,7 @@ class ApiModel:
         out: list[dict[str, Any]] = []
         ids: list[str] = []
         calls: tuple[ToolCall, ...] = ()
+        ran: tuple[dict[str, Any], ...] = ()
 
         def user(*blocks: dict[str, Any]) -> None:
             if out and out[-1]["role"] == "user":
@@ -597,9 +598,15 @@ class ApiModel:
                 out.append({"role": "user", "content": list(blocks)})
 
         def answer_the_ids() -> None:
-            # a turn that ended on a stand-by has no results; every call is answered
+            # a turn that ended on a stand-by has no results turn; every call is answered:
+            # the calls before the stand-by with the results they returned (the harness
+            # keeps them on the turn, `Reply.ran`), the stand-by with its words, and only
+            # the calls after it with "not run"
             nonlocal ids
-            for cid, c in zip(ids, calls, strict=False):
+            for k, (cid, c) in enumerate(zip(ids, calls, strict=False)):
+                if k < len(ran):
+                    user(self._result_block(cid, ran[k]))
+                    continue
                 words = (
                     f"Standing by: this ended your turn ({TURN_ENDS_WORDS[0].lower()}"
                     f"{TURN_ENDS_WORDS[1:-1]}), and what follows is the sample that ended "
@@ -620,6 +627,7 @@ class ApiModel:
                 r: Reply = t.content
                 blocks = self._content_of(r, i)
                 calls = r.calls
+                ran = r.ran
                 ids = [b["id"] for b in blocks if b["type"] == "tool_use"]
                 if not out or out[-1]["role"] != "user":
                     # the API's turns alternate from a user's (a model turn after the brief

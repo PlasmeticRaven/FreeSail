@@ -1,6 +1,6 @@
 # 23. Colours, the private signal, a hail, a signal made and read
 
-The voice between ships, in the player's words (package 71; spec M7 §1 to §6). Before a gun is fired a captain of 1805 knew whom he had to deal with by three means and no more: the colours she showed, the private signal of the month, and the hail within the trumpet's reach; and he worked his consorts and his convoy by the signal book. The game has each as a thing of the ship's state, seen by the lookout at the range the thing carries, and nothing is refused for being unwise: a shot under false colours is a pirate's act, and the log says so.
+The voice between ships, in the player's words. Before a gun is fired a captain of 1805 knew whom he had to deal with by three means and no more: the colours she showed, the private signal of the month, and the hail within the trumpet's reach; and he worked his consorts and his convoy by the signal book. The game has each as a thing of the ship's state, seen by the lookout at the range the thing carries, and nothing is refused for being unwise: a shot under false colours is a pirate's act, and the log says so.
 
 ## The colours
 
@@ -44,7 +44,7 @@ A King's ship's rules captain makes it to every strange sail within the flags' r
 
 ## A signal made and read
 
-The books are the nation's (`the signal book` in the library: Britain's from Howe's of 1790 and the Admiralty's of 1799 with Popham's dictionary of 1803; the French smaller; every other nation the basic system every navy had), and a signal is made by its meaning, never by a number you must know:
+The books are the nation's (`the signal book` among the ship's papers, `library(topic='papers', section='the signal book')`, which says whose it is: this ship's own by her service; Britain's from Howe's of 1790 and the Admiralty's of 1799 with Popham's dictionary of 1803; the French smaller; every other nation the common book every navy had, whose page says it is no nation's own and no other ship's numbers are to be read from it), and a signal is made by its meaning, never by a number you must know:
 
 ```orders cutter
 make the signal to tack in succession
@@ -76,14 +76,18 @@ Within four cables a ship is spoken by the trumpet, and the answer is a line hea
 ```
 hail her
 hail the brig: what ship is that?
+hail the brig what ship is that?
 say to the brig: heave to, I am sending a boat
+hail Nancy, whence come you?
 ```
+
+The sail is named by her rig (`the brig`, `the fore topsail schooner`), by her name when it is known (`Nancy`, `the Nancy`), or as `her` for the sail engaged or the nearest; the colon after her is optional, and what follows is said as written. `hail <words>` with no sail named is the lookout's hail of the deck (chapter 19).
 
 ```
 Hailed the brig by the trumpet: 'What ship is that?'. The brig answers: 'The Nancy of Guernsey, from Guernsey for Falmouth, a cargo of salt.'
 ```
 
-Beyond four cables the hail is refused with the distance. A rules captain answers by the table in the period's form, by his role and his nation: a King's ship names herself ("His Majesty's cutter Sherbourne. And what ship is that?") and heaves to for nobody; a merchantman answers what ship, whence, whither, her cargo and the news, and heaves to for a King's ship not at war with her; a privateer under false colours lies under the flag she shows, with a name and a port of that nation; a model at her captain's station hears your words and answers in his own. A rules captain who comes within hail of you hails you first ("She hails: 'What ship is that?'"), and `say to her: His Majesty's cutter Sherbourne` is read for your nation by his table. Two rules captains within hail of one another exchange the standard questions once, written to the log in the lookout's hearing.
+Beyond four cables the hail is refused with the distance. A rig word (`the lugger`, `the brig`) names a sail the lookout has in sight, never one beyond his sight on the world's sea; a sail's name reaches her wherever she is, and is refused for the distance; and a mark in sight that answers to the words (a wreck, a hulk riding to a sea-anchor) is said to be no sail, since nobody is aboard her to speak. A rules captain answers by the table in the period's form, by his role and his nation: a King's ship names herself ("His Majesty's cutter Sherbourne. And what ship is that?") and heaves to for nobody; a merchantman answers what ship, whence, whither, her cargo and the news, and heaves to for a King's ship not at war with her; a privateer under false colours lies under the flag she shows, with a name and a port of that nation; a model at her captain's station hears your words and answers in his own. A rules captain who comes within hail of you hails you first ("She hails: 'What ship is that?'"), and `say to her: His Majesty's cutter Sherbourne` is read for your nation by his table. Two rules captains within hail of one another exchange the standard questions once, written to the log in the lookout's hearing.
 
 ## The lights and the bell
 
@@ -112,7 +116,7 @@ the lights
 | `answer the signal` / `repeat the signal` / `haul down the signal` | the answering pendant; the last signal read made again; the hoists down |
 | `hoist the lights` / `hoist the top lights` / `show no lights` | the lights by night |
 | `keep the fog signals` / `cease the fog signals` | the bell, the gun or the drum in fog |
-| `hail her` / `hail the <sail>: <words>` / `say to the <sail>: <words>` | the trumpet within four cables |
+| `hail her` / `hail the <sail>: <words>` / `hail the <sail> <words>` / `say to the <sail>: <words>` / `hail <name> <words>` | the trumpet within four cables; the colon optional, the sail by her rig, her name or `her` |
 | `the colours`, `the signals`, `the private signal`, `the lights` | the readings |
 
-Every signal of every book is listed in `the signal book` of the library, with its number, its meaning and its source; the hoists the builder made in the period's form rather than read from the books are marked so in the files, under `data/signals/`.
+Every signal of your ship's book is listed in `the signal book` of her papers, with its number, its meaning and its source; the hoists made up in the period's form rather than read from a book are marked so in the files, under `data/signals/`.

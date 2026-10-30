@@ -1,14 +1,19 @@
-# Let go an anchor (spec M5 §18; package 34): the anchor let go where she is, whatever
-# her way, the cable veered to the scope the depth wants, nothing done to the sails. The
-# bare order of Luce's sequence ("Stand clear of the cable! Stream the buoy! Let go the
-# starboard anchor!", 1866 ch. XXXIV p. 569), given on its own when there is no time for
-# the rest: a second anchor let go when the first drags ("If you break adrift from one
-# anchor, it is best to let go two at the same time", p. 568; "let go the lee bower", p.
-# 574), or an anchor let go with way on her, which Luce allows "while there is headway on,
-# and pay out roundly ... the chance of damaging the copper and snapping the chain" (p.
-# 568): the physics takes the snatch when the cable comes taut (physics/anchor.py), and a
-# cable that parts is the captain's lesson.
+# Let go an anchor: the anchor let go where she is, whatever her way, the cable veered to
+# the scope the depth wants, nothing done to the sails. The bare order of Luce's sequence
+# ("Stand clear of the cable! Stream the buoy! Let go the starboard anchor!", 1866 ch.
+# XXXIV p. 569), given on its own when there is no time for the rest: a second anchor let
+# go when the first drags ("If you break adrift from one anchor, it is best to let go two
+# at the same time", p. 568; "let go the lee bower", p. 574), or an anchor let go with way
+# on her, which Luce allows "while there is headway on, and pay out roundly ... the chance
+# of damaging the copper and snapping the chain" (p. 568): the physics takes the snatch
+# when the cable comes taut (physics/anchor.py), and a cable that parts is the captain's
+# lesson.
 #
+# Parameters: `anchor` (the best bower, the small bower, the sheet, the stream, the kedge,
+# the second anchor: the one not down); `fathoms` (the scope to veer to; the depth's
+# rule when not said).
+
+# Build notes (not served by the library's catalogue):
 # Package 37f (the review of gate 5c's playtests, 5.8; the owner's ruling of 2026-10-07):
 # it says its scope as the order is given, and takes one. Its first line is what it will
 # do, "Let go the best bower in 26 fathoms; veering to a hundred and thirty fathoms, five
@@ -20,10 +25,6 @@
 # here at low water by the master's own tide is less than her draught (scripts.py,
 # `_anchoring_warnings`). The record that she is hove to is cleared and the helm righted
 # as it goes, and the World says "Brought up" when she is (core/world.py).
-#
-# Parameters: `anchor` (the best bower, the small bower, the sheet, the stream, the kedge,
-# the second anchor: the one not down); `fathoms` (the scope to veer to; the depth's
-# rule when not said).
 id: let_go_anchor
 verb: let_go_anchor
 applies_to: {class: ship}

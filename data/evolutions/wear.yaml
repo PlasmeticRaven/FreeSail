@@ -1,9 +1,8 @@
-# Wear ship (spec §8.5, scripted). The helm is put up and she is run off
-# before the wind, the after yards braced in as she falls off and the head
-# yards squared once the wind is abaft the beam; with the wind aft the helm
-# is ordered to the new close-hauled course and all yards braced sharp up as
-# she comes to. The yards follow the wind at brace_rate_deg_s. Six to twelve
-# minutes for a frigate is the truth to hit; the time is the physics' to make.
+# Wear ship. The helm is put up and she is run off before the wind, the after yards braced
+# in as she falls off and the head yards squared once the wind is abaft the beam; with the
+# wind aft the helm is ordered to the new close-hauled course and all yards braced sharp
+# up as she comes to. The yards follow the wind at brace_rate_deg_s. Six to twelve minutes
+# for a frigate is the truth to hit; the time is the physics' to make.
 id: wear
 verb: wear
 applies_to: {class: ship}

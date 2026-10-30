@@ -1,14 +1,14 @@
-# Reef the running bowsprit (package 32b; spec M5 §23): a cutter's bowsprit runs in and
-# out on the deck through the gammoning iron and is fidded at its reefs, the fid-holes
-# in its heel. Reefed, it is run in to bring the jib's tack inboard for heavy weather,
-# when the smaller jib or the storm jib sets on the traveller in the full jib's place;
-# rigged out to its full length for the full jib (rig_out_bowsprit.yaml). Steel 1794
-# vol. I names the gear: the HEEL-ROPE, "to haul out the bowsprits of cutters, &c.",
-# and cutters' bowsprits "lie nearly in an horizontal direction"; Lever 1808 the
-# traveller the jib's tack rides on. The spar is the ship file's `running` bowsprit,
-# whose `housed_length_m` is its outboard length reefed and `length_m` its full length;
-# `rigged_out` says which it stands at, and the runner's ramp moves the length between
-# them (no engine change: the file's flag and two numbers, and this step's ramp).
+# Reef the running bowsprit: a cutter's bowsprit runs in and out on the deck through the
+# gammoning iron and is fidded at its reefs, the fid-holes in its heel. Reefed, it is run
+# in to bring the jib's tack inboard for heavy weather, when the smaller jib or the storm
+# jib sets on the traveller in the full jib's place; rigged out to its full length for the
+# full jib (rig_out_bowsprit.yaml). Steel 1794 vol. I names the gear: the HEEL-ROPE, "to
+# haul out the bowsprits of cutters, &c.", and cutters' bowsprits "lie nearly in an
+# horizontal direction"; Lever 1808 the traveller the jib's tack rides on. The spar is the
+# ship file's `running` bowsprit, whose `housed_length_m` is its outboard length reefed
+# and `length_m` its full length; `rigged_out` says which it stands at, and the runner's
+# ramp moves the length between them (no engine change: the file's flag and two numbers,
+# and this step's ramp).
 #
 # Refused unless the bowsprit runs (a ship's is gammoned fast to the stem), and until
 # every sail whose tack rides it (the ship file's `halyard_spar` link: the jib) is

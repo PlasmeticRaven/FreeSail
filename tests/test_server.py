@@ -541,6 +541,7 @@ def test_the_ship_papers_are_the_librarys_papers_topic_and_nothing_waits(client,
         "the establishment of ground tackle",
         "the epitome's table of the establishments",
         "the price list",
+        "the news of the war",  # package 85
         "the private signals",  # package 71
         "the signal book",
         "the gunner's account",  # practice and resupply (between packages 72 and 73)

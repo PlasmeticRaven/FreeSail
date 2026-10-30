@@ -1,16 +1,13 @@
-# Shift a sail (scripted, ShiftScript in scripts.py): unbend the old one and
-# bend another in its place, the one repair of milestone 8 brought forward
-# because it is the heaviest crew work the ship does and it lets a gale's
-# blown-out sails be made good. The sail bent is the best of the kind in the
-# sail room, or the one the order names (spec 3b §6.3: params `canvas_no`,
-# `heavy`, or `for` another sail bent in this one's place, "shift the spanker
-# for the storm mizzen"); it is refused with none left. A sound old sail goes
-# down to the sail room with its canvas and condition, the rags of a blown-out
-# one do not. A drawing sail is taken in first and the new one set in its
-# place when the work is done (gate 4a's ruling, 2026-09-27: shifting a sail
-# is the whole of taking it in and replacing it; Luce's 'To shift a topsail
-# (by the wind, under all plain sail)' opens "Clew up!" and 'To shift a jib'
-# "Haul the sail down"); a blown-out, furled or hauled-up sail is shifted
+# Shift a sail (scripted, ShiftScript in scripts.py): unbend the old one and bend another
+# in its place, the heaviest crew work the ship does, which lets a gale's blown-out sails
+# be made good. The sail bent is the best of the kind in the sail room, or the one the
+# order names (params `canvas_no`, `heavy`, or `for` another sail bent in this one's
+# place, "shift the spanker for the storm mizzen"); it is refused with none left. A sound
+# old sail goes down to the sail room with its canvas and condition, the rags of a
+# blown-out one do not. A drawing sail is taken in first and the new one set in its place
+# when the work is done (shifting a sail is the whole of taking it in and replacing it;
+# Luce's 'To shift a topsail (by the wind, under all plain sail)' opens "Clew up!" and 'To
+# shift a jib' "Haul the sail down"); a blown-out, furled or hauled-up sail is shifted
 # where it hangs and the new one left furled, as in the port drill.
 #
 # Luce's 'To shift a topsail' ("Clew up! ... Lay out! Furl and unbend! ...

@@ -10,7 +10,7 @@ grep -n "TACKING EXPEDITIOUSLY" docs/references/lever/lever-1827-young-sea-offic
 grep -n "^CLOSE-HAULED" docs/references/falconer/falconer-1780-universal-dictionary-of-the-marine-ocr.txt
 ```
 
-Luce 1866's table of contents (about line 260 of the file) lists the sub-topics of every chapter, which is the quickest way in; `docs/references/LuceChapterMap.md` maps his chapters to the game's systems and the milestones that use them.
+Luce 1866's table of contents (about line 260 of the file) lists the sub-topics of every chapter, which is the quickest way in; `docs/references/LuceChapterMap.md` maps his chapters to the game's systems.
 
 ## The evolutions and their sources
 
@@ -39,7 +39,7 @@ Every file in `data/evolutions/` ends with a `source:` line. Read the passage an
 | `heave_to` | `heave to` | Luce 1866, ch. XXVI Emergencies, 'To heave to' (mizzen topsail aback), 'To heave to with the fore topsail to the mast' |
 | `fill_away` | `fill away` | Luce 1866, ch. XXVI, 'To fill away, after lying to with the main topsail to the mast' |
 
-Milestone 3 brought the catalogue to thirty-nine, most of it from Luce 1884:
+The rest of the handling, most of it from Luce 1884:
 
 | Evolution | Order | Source |
 |---|---|---|
@@ -58,7 +58,7 @@ Milestone 3 brought the catalogue to thirty-nine, most of it from Luce 1884:
 
 The crew orders are not evolutions: `call all hands`, `pipe down` and `relieve the watch` reach the watch routine at once (Luce 1884, ch. XVIII Organization and ch. XX; the watch, quarter and station bills), and `muster` is the console's reading of the watch bill.
 
-The evolutions not yet written, with where they will come from (`docs/references/LuceChapterMap.md`, "Suggested first forty evolutions"): club-hauling (Luce 1866, ch. XXIV, 'Club Hauling'), boxing off and chapelling (ch. XXV Wind Baffling), anchoring and weighing (ch. XIV, XV, XXI, XXXIV), parting rigging and losing masts (ch. XXX, XXXI).
+The anchor's evolutions (ch. XIV, XV, XXI, XXXIV), the port's and the fishing gear's, the action's and the repairs' are cited in the chapters that work them (13, 14, 21, 22 and 25), and the library's catalogue gives every evolution with its source. Not yet written: club-hauling (Luce 1866, ch. XXIV, 'Club Hauling') and chapelling (ch. XXV Wind Baffling).
 
 ## The words, by chapter of this book
 
@@ -74,10 +74,27 @@ The evolutions not yet written, with where they will come from (`docs/references
 
 **Chapter 6, the watch.** Falconer: *Watch*, *Watch-glasses*, *Log*, *Log-board*. Luce 1866, ch. XVI Organisation, 'The Watch Bill', 'Calling the Watch'; ch. III The Log; Luce 1884, ch. XVIII Organization ('Duties of Men in Different Parts of the Ship', the station bill), ch. XX (the watch, quarter and station bills; "the marines of a ship are divided between the two watches"), 'The Officer of the Deck' (relieving and mustering the watch), App. G Routine.
 
-## The game's own documents
+## Where each thing is, for a reader at a station
 
-- `docs/DesignProposal.md` §2 (the control ladder), §4 (Orders), §6.2 (this primer's place).
-- `docs/TechnicalSpec-M0-M2.md` §4 (units, compass, bells), §8 (the grammar and verb table, the evolution file format), §9 (the console).
-- `data/vocabulary.yaml`: every verb and synonym the parser knows, the brace modes, the group evolutions.
-- `data/ships/*.yaml`: every noun.
-- `docs/gates/gate-m1.md`: the checklist the owner ran, from which chapter 7 is drawn.
+The library a model reads (and `library(topic='contents')` lists) is this book and the game's own pages, each a topic:
+
+| Topic | What it holds | Its chapter here |
+|---|---|---|
+| `primer` | this book, chapter by chapter, section by section | all |
+| `grammar` | the whole order language in six parts, generated from the game's own tables: **the order language** (every verb and synonym, the free lines and your person's own), **the readings** (every reading with what it answers), **the standing dialect** (the sentence, every trigger, condition, duration and the book's orders), **the voice** (say, say to, tell, ask, the lookout's hail, the hail of a sail), **the stand-by** (every event, interval and tripwire a station may wait for) and **the world orders** (the director's forms with examples) | 3 to 5 (the orders), 6 and 10 (the readings), 11 (the dialect), 19 and 23 (the voice), 19 (the stand-by), 20 (the world orders) |
+| `catalogue` | every evolution the ship can perform: its order, hands, time and source | 3, 5, 13, 14, 21, 22, 25 |
+| `the ship` | this ship's spars, sails and lines by mast, her groups and aliases | 1 |
+| `papers` | the ship's papers by handle: her muster, her orders, her epitome, her signal book, her prices and the news | 14, 23 |
+| `standing orders` | the book as it stands | 11 |
+| `books` | the books drafted aboard | 14 |
+| `tools` | a model's tools, each with its words | 16, 19 |
+| `the world` | how the world behaves, for the director | 20 |
+
+What a station may do is its chapter's: the officer of the watch chapter 16, the captain 17, the master, the lookout and a passenger 19, the director 20; what every person aboard may do whatever his station (move about the ship, go ashore, eat, drink, sleep, read, say and say to, hail a sail) is chapter 14's places and reach, chapter 19's conversation and needs, and the grammar's first part.
+
+## The game's own data
+
+- `data/vocabulary.yaml`: every verb and synonym the parser knows, the brace modes, the group evolutions; the library's `grammar` topic is the same, rendered.
+- `data/ships/*.yaml`: every noun of each ship, with the source beside each figure; the library's `the ship` topic lists the one you are aboard.
+- `data/evolutions/*.yaml`: each evolution's steps, hands and times, its source at its head; the library's `catalogue` topic is the same, rendered.
+- `docs/agents/Harness.md`: how a model is connected to a station, for whoever runs the game.

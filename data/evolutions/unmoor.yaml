@@ -1,12 +1,11 @@
-# Unmoor (spec M5 §23; package 35): from a moor with two anchors to single anchor,
-# ready to weigh. Luce 1866, ch. XXXIV, 'Unmooring' (p. 578 of the 1877 printing): "In
-# unmooring, pick up the lee anchor first; otherwise you may foul other ships or your own
-# anchor", and of a foul hawse "the anchor having the most cable should be picked up
-# first. If the upper anchor was picked up first, it would hook the cable of the under
-# one." The lee anchor is hove up as any anchor is weighed (weigh_anchor.yaml: up and
-# down, aweigh, hove up, catted and fished), the other cable veered meanwhile to the
-# riding scope the depth wants, so that she rides to the weather anchor at single anchor
-# when it is done.
+# Unmoor: from a moor with two anchors to single anchor, ready to weigh. Luce 1866, ch.
+# XXXIV, 'Unmooring' (p. 578 of the 1877 printing): "In unmooring, pick up the lee anchor
+# first; otherwise you may foul other ships or your own anchor", and of a foul hawse "the
+# anchor having the most cable should be picked up first. If the upper anchor was picked
+# up first, it would hook the cable of the under one." The lee anchor is hove up as any
+# anchor is weighed (weigh_anchor.yaml: up and down, aweigh, hove up, catted and fished),
+# the other cable veered meanwhile to the riding scope the depth wants, so that she rides
+# to the weather anchor at single anchor when it is done.
 #
 # The script (freesail/evolutions/scripts.py, UnmoorScript):
 #   rig_capstan   the messenger passed on the lee cable

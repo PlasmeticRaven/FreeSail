@@ -1,11 +1,11 @@
-# Set up the standing rigging shot away or parted (spec M7 §14; package 73; scripted,
-# SetUpRiggingScript in evolutions/repair_scripts.py). The shrouds, the backstays and the
-# stays are not rove but set up: "the shrouds are set up with lanyards through the
-# dead-eyes" (Lever 1808, 'Setting up the Shrouds'; 'Rigging the Lower Masts'); a shroud
-# shot away is knotted or a new one got over the masthead and set up again with deadeyes
-# and lanyards. Every parted standing line in turn (or the one named, `params.line_words`),
-# a phase a line, its time by its class; each new line takes its fathoms from the
-# boatswain's store (`crew.stores.cordage_fathoms`) and stands sound at the file's rating.
+# Set up the standing rigging shot away or parted (scripted, SetUpRiggingScript in
+# evolutions/repair_scripts.py). The shrouds, the backstays and the stays are not rove but
+# set up: "the shrouds are set up with lanyards through the dead-eyes" (Lever 1808,
+# 'Setting up the Shrouds'; 'Rigging the Lower Masts'); a shroud shot away is knotted or a
+# new one got over the masthead and set up again with deadeyes and lanyards. Every parted
+# standing line in turn (or the one named, `params.line_words`), a phase a line, its time
+# by its class; each new line takes its fathoms from the boatswain's store
+# (`crew.stores.cordage_fathoms`) and stands sound at the file's rating.
 id: set_up_rigging
 verb: set_up
 applies_to: {class: ship}

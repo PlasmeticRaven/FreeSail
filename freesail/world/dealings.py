@@ -848,6 +848,14 @@ class Dealings:
             self._record(
                 Severity.ROUTINE, "port.news", f"The pilot's news: {news}", {"port": port.id}
             )
+            # what his news changed of the war the ship knows is entered in her papers, as
+            # a price is (the owner's fifth note)
+            papers = getattr(world, "papers", None)
+            if papers is not None:
+                for line in papers.news_heard(f"the pilot off {port.name}"):
+                    self._record(
+                        Severity.NOTABLE, "paper.written", line, {"paper": "the news of the war"}
+                    )
         for letter in list(port.letters):
             letter.carried_by = f"the pilot {port.pilot.craft}"
             for severity, kind, text, data in world.people.message_aboard(letter):

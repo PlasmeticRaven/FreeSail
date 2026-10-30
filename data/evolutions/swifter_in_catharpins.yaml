@@ -1,13 +1,12 @@
-# Swifter in the catharpins on one lower mast (milestone 3b, spec 3b §3). A spar
-# is lashed across the lower shrouds on each side some six feet below the futtock
-# staves, a block lashed round each shroud and the spar, and the swifter rove
-# through the blocks from side to side and led across the deck; it is "bowsed
-# tight till the shrouds come into the length of the catharpin legs, which are
-# seized at each end, round the futtock-stave and shroud" (Steel 1794, vol. I,
-# 'Futtock staves'; Lever 1808, fig. 182). The shrouds drawn in, the lower yard
-# braces sharper before its lee yardarm fouls them ("to afford room to brace the
-# yards sharp", Steel, CATHARPINS), and the mast is the less well stayed
-# athwartships until they are eased.
+# Swifter in the catharpins on one lower mast. A spar is lashed across the lower shrouds
+# on each side some six feet below the futtock staves, a block lashed round each shroud
+# and the spar, and the swifter rove through the blocks from side to side and led across
+# the deck; it is "bowsed tight till the shrouds come into the length of the catharpin
+# legs, which are seized at each end, round the futtock-stave and shroud" (Steel 1794,
+# vol. I, 'Futtock staves'; Lever 1808, fig. 182). The shrouds drawn in, the lower yard
+# braces sharper before its lee yardarm fouls them ("to afford room to brace the yards
+# sharp", Steel, CATHARPINS), and the mast is the less well stayed athwartships until they
+# are eased.
 #
 # The subject is the lower mast; the order gives one of these for each mast
 # (`swifter in the catharpins on the main`, or every lower mast). The last step
@@ -18,8 +17,7 @@
 # Parameter, from the order: `gain`, what the lower yard gains, in words, with the
 # semicolon that joins it ("; the main yard will brace four degrees sharper").
 #
-# The steps' times are judgement: about twenty minutes a mast (spec 3b §3); no
-# period timing found.
+# The steps' times are judgement: about twenty minutes a mast; no period timing found.
 id: swifter_in_catharpins
 verb: swifter_in_the_catharpins_on
 applies_to: {class: mast}

@@ -1,13 +1,16 @@
-# Veer cable (spec M5 §18; package 34): more cable given to the anchor she rides by.
-# "When the wind is so violent as to bring the anchors home, and make the vessel drive,
-# the cable is veered away; and, in veering away, the turns of the stopper laniards are
-# slackened, and a portion of the cable suffered to go out of the hawse, to let the
-# vessel further astern of her anchor; in which situation she bears less strain on the
-# flukes, and is less liable to drag the anchor; for, the more cable is out, the flukes
-# become deeper buried, and the ship rides in greater safety" (Steel 1794 vol. II, p. 292,
-# 'Of coming to anchor'). Luce's first answer to an anchor dragging ("veer more cable",
-# the World's line, physics/anchor.py).
+# Veer cable: more cable given to the anchor she rides by. "When the wind is so violent as
+# to bring the anchors home, and make the vessel drive, the cable is veered away; and, in
+# veering away, the turns of the stopper laniards are slackened, and a portion of the
+# cable suffered to go out of the hawse, to let the vessel further astern of her anchor;
+# in which situation she bears less strain on the flukes, and is less liable to drag the
+# anchor; for, the more cable is out, the flukes become deeper buried, and the ship rides
+# in greater safety" (Steel 1794 vol. II, p. 292, 'Of coming to anchor'). Luce's first
+# answer to an anchor dragging ("veer more cable", the World's line, physics/anchor.py).
 #
+# Parameters: `fathoms` (how many more to veer, or with `to` true the scope to veer to);
+# `anchor`; a bare "veer cable" veers a third as much again (judgement).
+
+# Build notes (not served by the library's catalogue):
 # Package 37f (the review of gate 5c's playtests, 5.8 and 10.4): the cable veered is
 # the anchor's that the order names (parameter `anchor`; the one she rides by when it
 # names none), and "to" is kept wherever the name stands: "veer to 80 fathoms", "veer
@@ -17,9 +20,6 @@
 # bower to 80 fathoms` veered eighty more. An anchor that is not down is refused by name,
 # with the one she rides by; a "to" less than what is out is refused, as before, with the
 # order that does it ("heave in to 60 fathoms").
-#
-# Parameters: `fathoms` (how many more to veer, or with `to` true the scope to veer to);
-# `anchor`; a bare "veer cable" veers a third as much again (judgement).
 id: veer_cable
 verb: veer_cable
 applies_to: {class: ship}

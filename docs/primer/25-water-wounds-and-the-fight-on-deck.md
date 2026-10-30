@@ -2,9 +2,8 @@
 
 Chapter 22 fought the guns. This chapter is what the guns do to a ship and her people, and
 the two fights that are not the guns': the fight against the water, and the fight on deck.
-It is package 73's (spec M7 §11, §11a, §13 to §17; the design in
-`docs/design/Design-WaterAndHealth.md`), and everything in it is a state of the ship or the
-muster that the readings give and the log says, never a figure set.
+Everything in it is a state of the ship or the muster that the readings give and the log
+says, never a figure set.
 
 ## The well
 
@@ -17,7 +16,8 @@ the hatches in a heavy sea.
 
     the well           the carpenter's feet: "a foot of water in the well, and gaining;
                        the pumps gaining on it"
-    the water          the tons, and every source by name with its rate
+    the water in the ship  the tons, and every source by name with its rate (also `the
+                       water aboard`, `the water in her`)
     the leaks          the shot holes with their places, the seams, the ground
     the pumps          manned or not, by whom, the rate, when they were spelled
 
@@ -28,13 +28,15 @@ hour each with four men at the brakes and her two hand pumps fifteen each with t
 cutter has the hand pumps alone. `man the pumps` takes the hands from the pool as a standing
 work (in action, from the trimmers by the fighting book's priority), the keeper spells them
 every half hour (`spell the pumps` sooner), and they suck when the well is dry, kept by
-spells while a leak runs. Where the pumps lose, the log says so ("the pumps losing: the well
+spells while a leak runs; `secure the pumps` stands their crews down (refused when nobody
+is at them). Where the pumps lose, the log says so ("the pumps losing: the well
 gains ten tons an hour on them"), and the water takes her stiffness before it takes her: a
 foot of free water across the hold is a third of a cutter's metacentric height, and she
 rolls deeper and heels further for it. At three fifths of the water that founders her the
 log says she is settling; at half her displacement she founders, held where she lies, her
 sails furled, the game's ship lost. `batten down the hatches` (ten minutes) stops the sea
-she ships in a gale from going below.
+she ships in a gale from going below, and `open the hatches` (ten minutes) takes the battens
+off again; each is refused when the hatches are so already.
 
 ## The carpenter's and the boatswain's work
 
@@ -119,11 +121,13 @@ them to their muskets, and the carronades go short by them.
     marines, fire by volley     within musket shot (a hundred yards) of a near deck: a
     marines, fire at will       volley every twenty seconds, or each man at his own rate
     marines, hold your fire     the muskets grounded; back to the carronades
-    marines to the tops         the kit's share aloft as marksmen; `to the gangways` down
+    marines to the tops         the kit's share aloft as marksmen; `marines to the gangways`
+                                brings them down again
     serve out the small arms    five minutes with the gunner's party: cutlasses, pikes,
                                 pistols and tomahawks to the boarders, the muskets of the
                                 stand of arms to the small-arms men
-    small arms, fire at will    the small-arms men's muskets within musket shot
+    small arms, fire at will    the small-arms men's muskets within musket shot;
+    small arms, hold your fire  grounded again
 
 The hits fall on the men exposed on the other deck, the quarterdeck's officers and helmsmen
 two in five (history's lesson), and her people fire back by their own book. Her log says
@@ -145,7 +149,7 @@ The crossing costs the boarders her marines' volley and whatever guns bear on th
 is a round a minute, each side's strength its men by their arms (served out or not, the
 bayonet) and their temper and their cover, each side losing by the other's strength. The deck
 is carried when the defenders' strength falls under half the boarders' or their temper
-breaks: her colours come down by your boarders' hand, and the prize is the next milestone's.
+breaks: her colours come down by your boarders' hand, and the prize is not yet in the game.
 The boarders are repulsed the other way, or after a quarter of an hour contested; they cast
 off, and the hands' temper pays for it. A hundred boarders against a frigate's whole company
 awake on deck are driven back in a round; against her at quarters, her gun crews at the guns,
@@ -161,4 +165,4 @@ station bill's boarders and small-arms men) and ch. XXXI; Steel 1794 and the Reg
 the carpenter's and the gunner's duties; Turnbull 1806 and Trotter's Medicina Nautica for the
 surgeon's order of work and the sick lists; Hughes, Firepower, for the musket's volley and
 its chance; James, Naval History, for the actions' returns. Every figure is in the files with
-its source or marked judgement, and `docs/dev/TuningNotes.md` (package 73) has the measures.
+its source or marked judgement.

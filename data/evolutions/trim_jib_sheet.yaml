@@ -1,10 +1,10 @@
-# Trim a jib-headed sail's sheet (package 32e, spec M5 open item 13): the forecastlemen
-# haul the lee sheet aft to the length the wanted angle needs and belay it, letting the
-# weather sheet go; a sheet let fly is taken up and hauled as part of it, and a sheet held
-# to windward is let draw unless the side says to keep it. The sheet holds the trim: the
-# sail's angle is read from the sheet's length through the clew's travel about the tack
-# (freesail/evolutions/trim.py). "Trim aft the head sheets" (Luce 1866, ch. XXIV,
-# 'Tacking'); "Draw jib!" (Luce 1884, ch. XXIV, 'Missing Stays').
+# Trim a jib-headed sail's sheet: the forecastlemen haul the lee sheet aft to the length
+# the wanted angle needs and belay it, letting the weather sheet go; a sheet let fly is
+# taken up and hauled as part of it, and a sheet held to windward is let draw unless the
+# side says to keep it. The sheet holds the trim: the sail's angle is read from the
+# sheet's length through the clew's travel about the tack (freesail/evolutions/trim.py).
+# "Trim aft the head sheets" (Luce 1866, ch. XXIV, 'Tacking'); "Draw jib!" (Luce 1884, ch.
+# XXIV, 'Missing Stays').
 #
 # Parameters:
 #   angle_deg   the angle off the centreline wanted; null: the trim for the apparent

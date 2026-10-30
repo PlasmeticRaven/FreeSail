@@ -1,21 +1,14 @@
-# Bend a sail to a bare yard, gaff or stay (scripted, BendScript in scripts.py):
-# a sail is roused up from the sail room, swayed aloft and bent. Milestone 3b
-# (spec 3b §6.3): the sail room holds sails, each made for one sail of the ship
-# with its canvas number and condition (the ship file's `crew.stores.sails`, or
-# for a file with only a count that many made-up sails for any yard). The best
-# of the kind is bent, or the one the order names (params `canvas_no`, `heavy`),
-# and brings its canvas and condition to the part. With none left the order is
-# refused; so is bending a sail in the place of another still bent (the storm
-# mizzen while the spanker is bent, spec 3b §6.4). The new sail is left furled,
-# to be set by order.
+# Bend a sail to a bare yard, gaff or stay (scripted, BendScript in scripts.py): a sail is
+# roused up from the sail room, swayed aloft and bent. The best of the kind is bent, or
+# the one the order names (params `canvas_no`, `heavy`), and brings its canvas and
+# condition to the part. With none left the order is refused; so is bending a sail in the
+# place of another still bent. The new sail is left furled, to be set by order.
 #
-# Luce's sequence (sail-burtons and buntlines manned, "Sway aloft! ... Haul
-# out! Lay out! And bring to!", robands and head earings passed, the gear
-# bent) is two phases here:
+# Luce's sequence (sail-burtons and buntlines manned, "Sway aloft! ... Haul out! Lay out!
+# And bring to!", robands and head earings passed, the gear bent) is two phases here:
 #   send_up  on deck: roused up from the sail room and swayed aloft
 #   bend     aloft: hauled out along the yard and bent, the gear shifted to it
-# Any sail class (milestone 3b: storm canvas and the occasional sails are
-# jib-headed, gaff and studding-class sails that start in the sail room).
+# Any sail class.
 id: bend_sail
 verb: bend
 applies_to: {class: sail}

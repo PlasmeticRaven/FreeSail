@@ -1,38 +1,33 @@
-# Heave to (scripted): the courses are hauled up, the driver (spanker) brailed up and
-# the light sails forward of the backed mast clewed up (Luce: "settle down the
-# top-gallant sails"); the yards on the mast carrying the most square sail are braced
-# aback over brace_s while the others stay full, and the helm is put a-lee. On a frigate
-# that is the main topsail to the mast. A vessel whose yards are all on one mast (a
-# topsail schooner, a cutter) is hove to the fore-and-after's way as well (package 32e;
-# Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat aft the main sheet, putting the helm
-# down, and haul the staysail sheet to windward"): her main sheet flat aft, her innermost
-# head sail's sheet held to windward (the sail aback by its sheet, the physics of package
-# 32e), her topsail to the mast if it is set, and her mainsail kept, being her driving
+# Heave to (scripted): the courses are hauled up, the driver (spanker) brailed up and the
+# light sails forward of the backed mast clewed up (Luce: "settle down the top-gallant
+# sails"); the yards on the mast carrying the most square sail are braced aback over
+# brace_s while the others stay full, and the helm is put a-lee. On a frigate that is the
+# main topsail to the mast. A vessel whose yards are all on one mast (a topsail schooner,
+# a cutter) is hove to the fore-and-after's way as well (Luce 1884, ch. XXXIV, 'To Heave
+# to': "Haul flat aft the main sheet, putting the helm down, and haul the staysail sheet
+# to windward"): her main sheet flat aft, her innermost head sail's sheet held to
+# windward, her topsail to the mast if it is set, and her mainsail kept, being her driving
 # sail.
 #
-# Her way is taken off first (package 37f). The helm is not lashed a-lee: it is tended
-# from the first, eased and righted as she comes up, so that the way she carries does
-# not take her head through the wind (in the playtest the brig did so from seven knots
-# inside a minute, the helm fixed at helm_deg). "Hove to" is logged when she lies on her
-# tack between near_points and far_points from the wind, with less than way_off_kn of
-# way and her head quiet for lie_s; or at way_off_timeout_s if she is on her tack with
-# the wind before the beam. The backed yards and the tack are then remembered in
-# ship.extra["hove_to"], the record that she is hove to. Way off means headway: with
-# sternway she is hove to as she lies, drifting, and the line says how fast she goes
-# astern (package 37p, the captains' trials: in a gale she gathered four knots astern
-# under the backed topsail and the evolution waited for her way to come off, failing at
-# the end of its time and leaving her aback).
+# Her way is taken off first. The helm is not lashed a-lee: it is tended from the first,
+# eased and righted as she comes up, so that the way she carries does not take her head
+# through the wind. "Hove to" is logged when she lies on her tack between near_points and
+# far_points from the wind, with less than way_off_kn of way and her head quiet for lie_s;
+# or at way_off_timeout_s if she is on her tack with the wind before the beam. The backed
+# yards and the tack are then remembered in ship.extra["hove_to"], the record that she is
+# hove to. Way off means headway: with sternway she is hove to as she lies, drifting, and
+# the line says how fast she goes astern.
 #
 # She is kept there. While the record stands the watch on deck tends the helm and the
-# spanker and jib sheets, without an order and with one routine line a watch, to hold
-# her head between near_points and far_points from the wind on the tack she hove to on
-# (Luce 1866, ch. XXVI: "regulate by easing off, or hauling aft, the spanker and jib
-# sheets"); it costs the watch keep_hands hands. If she is forced round all the same (a
-# shift of many points, a squall) one urgent line says so and the record follows what
-# she is doing: lying on the other tack with a topsail to the mast she is hove to on it;
-# with nothing aback and gathering way she is hove to no longer. The record is cleared
-# by fill away, and by an anchor let go, the anchor aweigh, a tack or a wear, and the
-# ground. The frigate lies five to six points off the wind at about a knot (truth 12).
+# spanker and jib sheets, without an order and with one routine line a watch, to hold her
+# head between near_points and far_points from the wind on the tack she hove to on (Luce
+# 1866, ch. XXVI: "regulate by easing off, or hauling aft, the spanker and jib sheets");
+# it costs the watch keep_hands hands. If she is forced round all the same (a shift of
+# many points, a squall) one urgent line says so and the record follows what she is doing:
+# lying on the other tack with a topsail to the mast she is hove to on it; with nothing
+# aback and gathering way she is hove to no longer. The record is cleared by fill away,
+# and by an anchor let go, the anchor aweigh, a tack or a wear, and the ground. The
+# frigate lies five to six points off the wind at about a knot.
 #
 # Parameter `tack` (starboard or larboard): the tack to heave to on. She must
 # already be on it; otherwise tack or wear first.

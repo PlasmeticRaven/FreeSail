@@ -578,7 +578,7 @@ def register() -> None:
             "",
             _parted_lines,
             description="every parted line by name: the running rigging to be rove, the "
-            "standing to be set up, the lines gone with a spar; 'none' (package 73)",
+            "standing to be set up, the lines gone with a spar; 'none'",
         )
     )
     R.REGISTRY.add(

@@ -568,6 +568,18 @@ def _rebind(world: World, _seen: set[int] | None = None) -> None:
         # a hull's lookout reads the shared chart (package 84, step 6: a hull is rebound
         # as a World was, its chart and systems the World's)
         world.lookout.chart = world.chart
+    nations = getattr(world, "nations", None)
+    if nations is not None and getattr(nations, "sailed_with", None) is None:
+        # a checkpoint from before package 85: the table the ship sailed with is the
+        # file's, as a game begun under this build has it, and her papers hold no news
+        # of the war yet (the reading `the war`, the paper `the news of the war`)
+        from freesail.world.nations import load_nations
+
+        nations.sailed_with = [dict(w) for w in load_nations().wars]
+    papers = getattr(world, "papers", None)
+    if papers is not None and getattr(papers, "known_wars", None) is None:
+        papers.known_wars = [dict(w) for w in nations.wars] if nations is not None else []
+        papers.war_news = []
     ship = world.ship
     if getattr(ship, "extra", None) is not None and "evolutions" in ship.extra:
         from freesail.api.session import rebind_hooks

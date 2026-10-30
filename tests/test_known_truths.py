@@ -7013,9 +7013,10 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
         assert list(sample.to_dict())[0] == "you"
         return sample.you
 
+    # the line closes with the date (the owner's fourth note of the playtests of 70 to 72)
     assert line() == (
         "You: the captain, on the quarterdeck, since 10:00; the deck yours; on your feet "
-        "since 10:00."
+        "since 10:00; Monday 10 June 1805."
     )
     h.deliver(reply("", call("submit_order", text="go ashore")))
     h.deliver(reply("", call("stand_by", until="a glass")))
@@ -7027,7 +7028,8 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
     # stand-by being thirty minutes ("...; on your feet since 10:00." before)
     assert line() == (
         f"You: the captain, ashore at Falmouth, on the quay, since {at}; the deck yours; on "
-        "your feet since 10:00; 30 minutes of the ship's time since your last reply."
+        "your feet since 10:00; Monday 10 June 1805; 30 minutes of the ship's time since "
+        "your last reply."
     )
     _until(world, lambda: not world.dealings.boat.away)  # the boat home, to be sent for him
     h.deliver(reply("", call("submit_order", text="come aboard")))
@@ -12411,3 +12413,164 @@ def test_truth_7_314_every_recorded_passages_water_is_the_elevens_outside_the_so
             assert tide.at(pos, when) == eleven.at(pos, when), (pos, h)
     inside = Position(50.62 + cable, -1.6)
     assert tide.blocks_at(inside) == {"solent"} and 0.0 < tide.taper_at(inside) < 0.01
+
+
+# Package 85: the orders, the primer and the library for a model reader
+# ---------------------------------------------------------------------------
+
+
+def _package_85_cutter() -> World:
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    here = Path(__file__).resolve().parents[1]
+    sf = load_scenario(here / "data" / "scenarios" / "dispatches-falmouth.yaml")
+    return make_scenario_world(sf, seed=7)
+
+
+def test_truth_7_240_the_date_is_told_in_words_in_every_line_and_on_request():
+    """The owner's fourth note of the playtests of 70 to 72 (a model deducing the date from
+    the log's stamps, and confused): the date is a reading in words, `the date`, and the
+    last words of every station's line and the director's, changing with the day and
+    riding no sample between."""
+    from freesail.api import readings as R
+
+    w = _package_85_cutter()
+    assert w.submit("the date").text == "The date: Wednesday 12 June 1805."
+    assert R.station_line(w, None).endswith("; Wednesday 12 June 1805.")
+    assert R.director_line(w).endswith("; Wednesday 12 June 1805.")
+    w.run(19 * 3600 + 1)
+    assert w.readings.get("date")["words"] == "Thursday 13 June 1805"
+
+
+def test_truth_7_241_the_war_is_what_the_ship_knows_and_the_news_is_entered_in_her_papers():
+    """The owner's fifth note (a model reasoning the war's state from a primer's pilot
+    example): `the war` is the nations' table she sailed with and every change the news
+    brought her, each entered in the paper `the news of the war` with where and when it
+    came, never the world's table as it stands."""
+    w = _package_85_cutter()
+    sailed = w.nations.sailed_with_words()
+    assert w.submit("the war").text == (
+        f"The war: {sailed} No news of the war has reached her since she sailed."
+    )
+    assert w.nations.make_peace("britain", "spain")
+    assert "No news of the war" in w.submit("who is at war").text
+    assert w.papers.news_heard("the pilot off Falmouth") == [
+        "The news of the war written up by the captain: by the pilot off Falmouth, peace made "
+        "between Britain and Spain."
+    ]
+    said = w.submit("the war").text
+    assert "by the pilot off Falmouth: peace made between Britain and Spain." in said
+    assert "As she knows it now: Britain at war with the Batavian Republic and France;" in said
+    assert "peace made between Britain and Spain" in w.papers.page("the news of the war").lines[-2]
+
+
+def test_truth_7_242_the_calls_before_a_stand_by_are_answered_with_their_results():
+    """The model officer's first point: an order given before the stand-by in the same
+    reply ran, and the door told it "not run". The harness keeps the results of the calls
+    that ran on the turn (`Reply.ran`), the doors answer them with those, and say "not
+    run" only of the calls after the stand-by."""
+    from freesail.agents.model import MODEL
+    from tests.test_agents import call, point_world, reply, stationed
+    from tests.test_local_runner import A_GLASS_S, llama, model_for
+
+    world = point_world()
+    h, _fake, _ = stationed(
+        world,
+        [
+            reply(
+                "",
+                call("journal", note="steady"),
+                call("stand_by", until="a glass"),
+                call("readings"),
+            ),
+            "Awake.",
+        ],
+    )
+    assert h.agent.standing_by
+    turn = next(t for t in reversed(h.turns) if t.role == MODEL)
+    assert [r["name"] for r in turn.content.ran] == ["journal"]
+    world.run(A_GLASS_S)
+    answers = [x["content"] for x in model_for(llama([])).messages(h.turns) if x["role"] == "tool"]
+    assert answers[0] == "Noted in the journal."
+    assert answers[1].startswith("Standing by: this ended your turn")
+    assert answers[2] == "Not run: a stand-by earlier in the reply ended your turn."
+
+
+def test_truth_7_243_in_action_a_notable_event_is_a_hit_a_strike_or_a_change_of_state():
+    """The model officer's fourth point, with the owner's "the flow of the game through the
+    log" as the measure: the firer's minute line is notable when a shot struck her or the
+    fire opened, routine when the minute's shot all missed; a shot that struck us is
+    notable, urgent when it killed or carried away a spar; at quarters the trimmers' yard by
+    yard is routine. So a stand-by on 'a notable event' is not woken by every discharge."""
+    w, v, enemy, battery = _two_cutters_at_pistol_shot()
+    w.submit("fire as they bear")
+    w.run(600)
+    fired = [e for e in w.log if e.kind == "action.fired"]
+    assert fired and fired[0].severity is Severity.NOTABLE
+    assert all(
+        e.severity
+        is (Severity.NOTABLE if (e.data.get("struck") or e is fired[0]) else Severity.ROUTINE)
+        for e in fired
+    )
+    assert all(
+        e.severity in (Severity.NOTABLE, Severity.URGENT)
+        for e in enemy.log
+        if e.kind == "action.hit"
+    )
+
+
+def test_truth_7_244_every_station_is_told_her_ship_and_the_ship_reading_says_the_same():
+    """The owner's word of 2026-10-27: models at a station were almost never told what
+    ship they were on. Every station's brief opens its situation with the ship (her name,
+    rig and class, service and nation, fit of guns, people's number, who commands, the
+    ports of her voyage), and `the ship` reads the same at any time."""
+    from freesail.agents import agent, tools
+    from freesail.agents.agent import Brief
+    from freesail.api import readings as R
+
+    w = _package_85_cutter()
+    words = R.ship_words(w)
+    assert words.startswith(
+        "The ship: Sherbourne, an armed cutter; a merchantman of Britain. Her guns: 6 "
+        "12-pounder carronades. Her people: 30 souls by the muster. Commanding: Mr Bowen, "
+    )
+    assert words.endswith("The ports of her voyage: Falmouth and Plymouth.")
+    assert words in w.submit("what ship").text and words in w.submit("the ship").text
+    for which in ("watcher", "officer", "master", "lookout", "passenger", "captain"):
+        brief = Brief.build(
+            getattr(agent, which)(world=w),
+            "a play session",
+            ["(the log is empty)"],
+            {},
+            tools.tool_names(),
+            ship=words,
+        )
+        assert next(i.text for i in brief.head if i.name == "situation").startswith(words)
+
+
+def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
+    """Package 85's reading of the orders: a standing order's name may carry an apostrophe;
+    `hail the lugger` names a sail in sight and never a far one, a wreck in sight being no
+    sail; `captain: carry on` at the prompt is the player's own hand given back; `gybe the
+    mainsail` is answered that the gybe names no sail."""
+    from freesail import orders
+    from freesail.orders.errors import OrderError
+    from tests.test_primer import make_ship
+
+    ship = make_ship("frigate", "plain-sail", "starboard")
+    bays = 'standing order "the bay\'s mouth": every glass then trim sails'
+    kind, log, _ = orders.handle(ship, bays)
+    assert kind == "standing.given" and "'the bay's mouth'" in log
+    schooner = make_ship("schooner", "plain-sail", "starboard")
+    try:
+        orders.handle(schooner, "gybe the mainsail")
+    except OrderError as e:
+        assert "takes no sail after it" in str(e)
+    else:
+        raise AssertionError("taken")
+    w = _package_85_cutter()
+    w.run(900)
+    w.submit("steer east")
+    w.run(2)
+    assert w.captain.aside
+    assert w.submit("captain: carry on").kind == "captain.carry_on" and not w.captain.aside

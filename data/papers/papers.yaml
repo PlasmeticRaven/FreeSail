@@ -60,6 +60,14 @@ papers:
     place: cabin
     source: prices
     words: the prices at the last port the boat was ashore in, as the purser brought them off
+  # the news of the war (the owner's fifth note): what the ship knows of the war is the
+  # table she sailed with and every change the news brought her, entered here as a price
+  # is, with where and when it came; the reading `the war` gives the same page
+  - handle: the news of the war
+    keeper: captain
+    place: cabin
+    source: war
+    words: the nations' table the ship sailed with, and every war declared or peace made that the news has since brought her, with where and when it came
   # package 71 (spec M7 §2, §3): the private signals under seal in the captain's keeping (the
   # Regulations and Instructions 1806: issued to the King's ships, weighted to sink, destroyed
   # on capture), and the signal book of the nation's service

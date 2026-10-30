@@ -1600,7 +1600,7 @@ CAPTAIN_BRIEF = (
     "given a command, with the officer's own reckoning among them: 'the officer's "
     "reckoning' reads his beside the master's, and 'set the reckoning to' adopts it if "
     "you will. The colours, the signals and the hail are yours by the same orders the "
-    "player has (primer 23; package 71): 'hoist the colours', 'hoist false colours' (the "
+    "player has (primer 23): 'hoist the colours', 'hoist false colours' (the "
     "ruse the law allowed until the first shot, and a pirate's act after it), 'show the "
     "private signal' and 'answer the private signal' (the King's ships' table, in the "
     "cabin as 'the private signal'), 'make the signal to tack in succession' and the "
@@ -1608,7 +1608,7 @@ CAPTAIN_BRIEF = (
     "'hail the brig: what ship is that?' and 'say to her: heave to' within four cables; "
     "a signal read and a hail heard come to you as lines of the log, the hail under "
     "'heard' in your sample, and 'the colours', 'the signals' and 'the private signal' "
-    "are readings. In company (primer 24; package 72) 'the squadron' (or 'the convoy') "
+    "are readings. In company (primer 24) 'the squadron' (or 'the convoy') "
     "reads the set you command or sail in, every ship in her order of sailing and whether "
     "she is in her station, and 'the station' your own; a commodore works his ships by "
     "the signals ('make the signal to tack in succession', 'make the signal: close round "
@@ -2115,6 +2115,28 @@ def ordinal_words(n: int) -> str:
 # stand_by's "this ends your turn" read to the model as two rules that contradicted).
 TURN_ENDS_WORDS = "A turn ends when you reply with no tool call, or at once when you stand by."
 
+# The person's own (the owner's third note of the playtests of 70 to 72: the briefs and
+# the tools' words never told a model it may move about the ship, eat, drink, say and say
+# to, go ashore). Every station with authority is a person aboard, and the judge allows
+# these whatever the station's domain (`tools.judge`: the reach verbs, the deck's
+# conversation, the needs and the free lines); the brief says so once, after the
+# station's own words, so that no model has to find them by refusal.
+YOUR_PERSON_WORDS = (
+    "Your person. You are a person aboard as well as a station, and these are yours "
+    "whatever your station may order, each given with submit_order like any order: move "
+    "about the ship ('go below', 'come on deck', 'go aloft', 'go to the galley'; 'the "
+    "places' lists where you may go), and in port go ashore and come aboard ('go ashore', "
+    "'come aboard', 'hire a waterman'; 'the places ashore' lists the port's); eat, drink "
+    "and sleep ('eat', 'drink', 'sleep'; 'how am I' says how you are, and when you last "
+    "did each); read what is before you ('read the letter'; the papers and the books are "
+    "in the library) and handle things ('give', 'take', 'put', 'show', 'open', 'hide', "
+    "'throw'); speak where you stand ('say <words>', heard by whoever is there), to a "
+    "station or a person ('say to the master <words>', 'tell the mate <words>', 'ask the "
+    "lookout what she is'), and to a sail within four cables ('hail the brig: what ship is "
+    "that?', the colon optional). The grammar's parts 'the order language' and 'the voice' "
+    "(library(topic='grammar')) have every form."
+)
+
 # The weather's events, each in a few words (package 31c; playtest 11's finding 3): the
 # ones the log says by a line of their own and the ones that are the readings' changes
 # (`readings.EVENTS`), in the brief's list and the tool's description alike.
@@ -2259,6 +2281,7 @@ class Brief:
         general: str = "",
         journal: str = "",
         voyage: str = "",
+        ship: str = "",
     ) -> Brief:
         """The head from the station and the situation, then the station brief. The
         caller (the harness) reads the log and the readings through the tools, so the
@@ -2367,14 +2390,20 @@ class Brief:
             ),
             "authority": authority,
             "situation": (
-                (f"{voyage.strip()}\n\n" if voyage.strip() else "")
+                # the ship herself first, at every station (the owner's word of 2026-10-27:
+                # a model was almost never told what ship it was on): `readings.ship_words`
+                (f"{ship.strip()}\n\n" if ship.strip() else "")
+                + (f"{voyage.strip()}\n\n" if voyage.strip() else "")
                 + (f"{journal.strip()}\n\n" if journal.strip() else "")
                 + f"The last {len(log_lines)} lines of the log:\n{log_text}\n\n"
                 f"The readings now:\n{readings_lines}"
             ),
         }
         head = tuple(BriefItem(name, items[name]) for name in HEAD_ORDER)
-        return cls(head, station.brief)
+        brief = station.brief
+        if station.has_authority and station.authority is not Authority.DIRECTOR:
+            brief = f"{brief.rstrip()}\n\n{YOUR_PERSON_WORDS}"
+        return cls(head, brief)
 
 
 def _flatten(d: dict[str, Any], prefix: str = "") -> list[tuple[str, str]]:

@@ -1318,7 +1318,7 @@ def test_the_line_opens_every_sample_with_the_place_the_deck_and_the_state():
     first = next(t.content for t in h.turns if t.role == "data")
     assert list(first)[0] == "you"
     assert first["you"].startswith("You: the captain, on the quarterdeck, since 10:00; the deck ")
-    assert first["you"].endswith("on your feet since 10:00.")
+    assert first["you"].endswith("on your feet since 10:00; Wednesday 12 June 1805.")
     w.run(2 * EVERY)
     lines = [t.content["you"] for t in h.turns if t.role == "data" and "you" in t.content]
     assert any(ln.startswith("You: the captain, in the cabin, since 10:") for ln in lines), lines
@@ -1327,7 +1327,7 @@ def test_the_line_opens_every_sample_with_the_place_the_deck_and_the_state():
     d.run(1)
     said = next(t.content["you"] for t in dh.turns if t.role == "data" and "you" in t.content)
     assert said.startswith("You: the director, above the game; the day's budget 1 of ")
-    assert said.endswith("acts used; the clock waits on you.")
+    assert said.endswith("acts used; the clock waits on you; Wednesday 12 June 1805.")
     o = world_at(49.5, -5.5)
     oh = seat_officer(o, [call("stand_by", until="a glass")])
     o.run(1)

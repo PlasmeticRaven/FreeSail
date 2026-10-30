@@ -1,6 +1,5 @@
-# Furl a gaff sail: brail it up or lower it if it is still drawing, then pass
-# the gaskets along the gaff or the boom. Not in the required list for M2,
-# but the verb table's `furl` needs a `furl_<class>` for every class.
+# Furl a gaff sail: brail it up or lower it if it is still drawing, then pass the gaskets
+# along the gaff or the boom.
 id: furl_gaff
 verb: furl
 applies_to: {class: gaff}

@@ -70,7 +70,7 @@ nothing in the plan named it; M7b's play found no voice between ships (R-17) and
 with no good options but to run (R-54: colours, a bluff, a fort). Everything here is
 useful before a gun is fired, and the convoy's and the squadron's work needs no powder.
 
-### 1. Colours (`freesail/world/ships.py`, `nations.py`; `data/nations/*.yaml`; the far and near bodies)
+### 1. Colours (`freesail/world/ships.py`, `nations.py`; `data/nations.yaml`; the far and near bodies)
 
 A ship's colours are state: **shown** (which ensign), **none**, **false** (another nation's,
 a ruse the law allowed until the first shot), **struck** (hauled down in surrender), and the
@@ -844,7 +844,7 @@ offices, and a world order may be given under a purview (`by`). Step 11 closed t
 with its tidies, its words and its records; the design note's "As built, steps 1 to 11" is
 the account.
 
-### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
+### 22. The regimes (`data/captains/`, `data/nations.yaml`, `business.py`)
 
 A ship of a nation is **in port, in ordinary, on station, on passage, in convoy or escorting,
 on blockade, in chase**, each a doctrine of a few rules: a blockade keeps an inshore squadron

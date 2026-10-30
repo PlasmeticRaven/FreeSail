@@ -1,9 +1,9 @@
-# Reef a lug sail (package 43b): lower the yard a reef's depth, haul down the reef tackle
-# at the tack and the earing at the clew, tie the points along the foot, and hoist again.
-# The lugger's sails were reefed along the foot (Holdsworth 1874 pp. 104 to 105, the
-# Yarmouth luggers; Fincham 1843 p. 59: "two sets of sails, large and small"), and in a
-# blow the main lug was shifted for the taille-vent (Forfait p. 52: `shift the main lug`
-# bends the taille-vent in its place). Times judgement.
+# Reef a lug sail: lower the yard a reef's depth, haul down the reef tackle at the tack
+# and the earing at the clew, tie the points along the foot, and hoist again. The lugger's
+# sails were reefed along the foot (Holdsworth 1874 pp. 104 to 105, the Yarmouth luggers;
+# Fincham 1843 p. 59: "two sets of sails, large and small"), and in a blow the main lug
+# was shifted for the taille-vent (Forfait p. 52: `shift the main lug` bends the
+# taille-vent in its place). Times judgement.
 id: reef_lug
 verb: reef
 applies_to: {class: lug}

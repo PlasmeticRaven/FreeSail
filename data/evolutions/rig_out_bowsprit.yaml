@@ -1,9 +1,9 @@
-# Rig out the running bowsprit (package 32b; spec M5 §23): the reverse of reefing it
-# (reef_bowsprit.yaml). The fid is drawn, the bowsprit hauled out through the gammoning
-# iron to its full length by the heel-rope and fidded there, the bobstay and shrouds set
-# up, and the traveller run out to the end for the full jib. The ship file's `running`
-# bowsprit gives its full outboard `length_m` and its reefed `housed_length_m`; this
-# step's ramp moves it out and `rigged_out` says it is out.
+# Rig out the running bowsprit: the reverse of reefing it (reef_bowsprit.yaml). The fid is
+# drawn, the bowsprit hauled out through the gammoning iron to its full length by the
+# heel-rope and fidded there, the bobstay and shrouds set up, and the traveller run out to
+# the end for the full jib. The ship file's `running` bowsprit gives its full outboard
+# `length_m` and its reefed `housed_length_m`; this step's ramp moves it out and
+# `rigged_out` says it is out.
 #
 # Refused unless the bowsprit runs and is reefed, and until any sail whose tack rides it
 # (the `halyard_spar` link) is down. Time and hands judgement, as reefing's.

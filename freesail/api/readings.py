@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import functools
 import math
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -128,6 +129,9 @@ KINDS: dict[str, str] = {
     "distance": "a distance in miles: exceeds, is over, is under, is below 20 miles",
     "ground": "the ground the lead brings up: is sand, is mud, is not rock",
     "person": "a person's place: is on deck, is below",
+    # a question answered in words (the people, the pilot, the port, the prices...): read at
+    # the prompt or by the readings tool, never compared in a standing order
+    "query": "a question answered in the log, in words: read, never compared",
     "well": "the water in the well by the last sounding: read, not yet compared",
     "absent": "not a reading the ship has yet",
 }
@@ -1037,7 +1041,16 @@ REGISTRY.add(
         description="the apparent wind's speed",
     )
 )
-REGISTRY.add(Reading("heading", ("the heading",), "compass", "", _heading))
+REGISTRY.add(
+    Reading(
+        "heading",
+        ("the heading",),
+        "compass",
+        "",
+        _heading,
+        description="her head by the compass",
+    )
+)
 REGISTRY.add(
     Reading(
         "course",
@@ -1049,7 +1062,16 @@ REGISTRY.add(
         none_words=_no_way_words,
     )
 )
-REGISTRY.add(Reading("speed", ("the speed",), "speed", "knots", _speed))
+REGISTRY.add(
+    Reading(
+        "speed",
+        ("the speed",),
+        "speed",
+        "knots",
+        _speed,
+        description="her speed through the water by the log, in knots",
+    )
+)
 REGISTRY.add(
     Reading(
         "leeway",
@@ -1061,10 +1083,77 @@ REGISTRY.add(
         none_words=_no_way_words,
     )
 )
-REGISTRY.add(Reading("heel", ("the heel",), "angle", "degrees", _heel))
-REGISTRY.add(Reading("helm", ("the helm",), "angle", "degrees", _helm))
-REGISTRY.add(Reading("watch", ("the watch",), "watch", "", _watch))
-REGISTRY.add(Reading("time", ("the time",), "bells", "", _bells))
+REGISTRY.add(
+    Reading(
+        "heel",
+        ("the heel",),
+        "angle",
+        "degrees",
+        _heel,
+        description="her heel in degrees, to larboard or to starboard",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "helm",
+        ("the helm",),
+        "angle",
+        "degrees",
+        _helm,
+        description="the helm's angle in degrees, weather or lee",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "watch",
+        ("the watch",),
+        "watch",
+        "",
+        _watch,
+        description="the watch now kept, by its name",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "time",
+        ("the time",),
+        "bells",
+        "",
+        _bells,
+        description="the ship's time: the watch and the bells",
+    )
+)
+
+
+def date_words(t: Any) -> str:
+    """'Wednesday 12 June 1805': the date in words, as the station's line and the reading
+    give it."""
+    return f"{t:%A} {t.day} {t:%B} {t.year}"
+
+
+def _date(world: Any, _: str | None) -> dict[str, Any]:
+    """The date, in words and in figures, with the ship's time: a thing a station is told
+    and never left to deduce from the log's stamps."""
+    t = world.clock.ship_time
+    # the date alone, so that the row changes once a day and rides no sample as a changed
+    # reading between; the ship's time is 'the time'
+    return {"words": date_words(t), "date": t.strftime("%Y-%m-%d"), "weekday": t.strftime("%A")}
+
+
+# The date as a reading (the owner's fourth note of the playtests of 70 to 72: the date
+# was deduced, and confused): its words open every sample's first line too
+# (`station_line`), so that no station has to ask.
+REGISTRY.add(
+    Reading(
+        "date",
+        ("the date", "the day", "today", "what day is it", "the date and the time"),
+        "query",
+        "",
+        _date,
+        description="the date in words, the day of the week, the day, the month and the "
+        "year ('Wednesday 12 June 1805'); the ship's time is 'the time'",
+    )
+)
 REGISTRY.add(
     Reading(
         "daylight",
@@ -1097,8 +1186,26 @@ REGISTRY.add(
         description="the worst strain ratio aboard, or a part's",
     )
 )
-REGISTRY.add(Reading("hands_on_deck", ("the hands on deck",), "hands", "", _hands_on_deck))
-REGISTRY.add(Reading("watch_below", ("the watch below",), "hands", "", _watch_below))
+REGISTRY.add(
+    Reading(
+        "hands_on_deck",
+        ("the hands on deck",),
+        "hands",
+        "",
+        _hands_on_deck,
+        description="the hands on deck now, their number and how fresh they are",
+    )
+)
+REGISTRY.add(
+    Reading(
+        "watch_below",
+        ("the watch below",),
+        "hands",
+        "",
+        _watch_below,
+        description="the watch below, their number and how rested",
+    )
+)
 
 
 def _well(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -1387,7 +1494,7 @@ REGISTRY.add(
         "",
         _master,
         description="the master: his name, his place and what occupies him; and the "
-        "master's station, when a model or the player holds it (package 41)",
+        "master's station, when a model or the player holds it",
         none_words=_no_reckoning_words,
     )
 )
@@ -1511,7 +1618,7 @@ REGISTRY.add(
     Reading(
         "work_in_hand",
         ("the work in hand", "the work"),
-        "ground",
+        "query",
         "",
         _work_in_hand,
         description="the work in hand: what the hands are doing, and what waits for hands "
@@ -1920,7 +2027,7 @@ REGISTRY.add(
     Reading(
         "ahead",
         ("ahead", "what lies ahead", "what is ahead"),
-        "ground",
+        "query",
         "",
         _ahead,
         description="what lies on her course within the next glass at her speed, from her "
@@ -2112,7 +2219,7 @@ REGISTRY.add(
         "fathoms",
         _draught,
         description="the water she draws, from her file: 'she draws fifteen feet of water, "
-        "two fathoms and a half' (package 37k)",
+        "two fathoms and a half'",
     )
 )
 
@@ -2129,6 +2236,134 @@ NO_PEOPLE_WORDS = "no people are kept: the ship is not in a world"
 NO_PILOT_WORDS = "no pilot aboard"
 NO_PORT_WORDS = "no port within the pilot's cruising ground"
 NO_HOLD_WORDS = "no hold is kept: the ship's file gives her no room for a cargo"
+
+
+def ship_class_words(spec: Any, name: str = "") -> str:
+    """Her rig and class in words from her file's era note: 'a 36-gun 18-pounder frigate
+    of the Amazon class, ship-rigged', 'H.M. armed cutter', 'H.M. brig-sloop of the
+    Diligence class'; the note's first clause before its parenthesis or colon, her name
+    taken out of it where the note names her, and the rig by the file's word where the
+    clause does not say it. A hull sailing under another name than her file's (a far
+    ship made from the frigate's or the brig's lines) keeps the file's class and loses
+    the file's ship's name."""
+    note = str(getattr(spec, "era_notes", "") or "").strip()
+    head = re.split(r"[(:]", note, maxsplit=1)[0].strip().rstrip(",;") if note else ""
+    file_name = str(getattr(spec, "name", "") or "")
+    if head and file_name:
+        # 'H.M. brig-sloop Harpy of the Diligence class' -> 'H.M. brig-sloop of the
+        # Diligence class'; 'A 36-gun ... frigate of the Amazon class' keeps the class
+        head = re.sub(rf"(?<!the ){re.escape(file_name)}\b,?\s*", "", head)
+        head = re.sub(r"^L'\s*,?\s*", "", head).strip(" ,")
+        head = re.sub(r"\s+", " ", head)
+    rig = str(getattr(spec, "rig", "") or "").replace("-", " ")
+    if not head:
+        return f"a {rig}" if rig else "a ship"
+    if head[:1].isupper() and not head.startswith("H.M."):
+        head = head[:1].lower() + head[1:]
+    if head.startswith("the "):
+        head = "a " + head[4:]
+    rigged = f", {rig}-rigged" if rig and rig.split()[-1] not in head.lower() else ""
+    return f"{head}{rigged}"
+
+
+def ship_words(world: Any) -> str:
+    """**The ship herself, said plainly** (the owner's word of 2026-10-27: a model at a
+    station was almost never told what ship it was on): her name, her rig and class, her
+    service and nation, her fit of guns, her people's number, who commands, and the ports
+    of her scenario; from her file, her papers and her muster, the same words in every
+    station's brief and in the reading `the ship`."""
+    ship = getattr(world, "ship", None)
+    if ship is None:
+        return "No ship."
+    name = str(getattr(ship, "name", "") or "the ship")
+    spec = getattr(ship, "spec", None)
+    cls = ship_class_words(spec, name) if spec is not None else "a ship"
+    ports = getattr(world, "dealings", None)
+    nations = getattr(world, "nations", None)
+    nation_id = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
+    nation = ""
+    if nation_id:
+        try:
+            nation = nations.get(nation_id).name if nations is not None else nation_id
+        except KeyError:
+            nation = nation_id.replace("-", " ")
+    captain = getattr(world, "captain", None)
+    role = str(getattr(captain, "role", "") or "")
+    from freesail.world.captains import _is_kings_ship
+
+    kings = role in ("kings-ship", "commodore", "cruiser") or (not role and _is_kings_ship(world))
+    escort = ", the convoy's escort" if role == "commodore" else ""
+    if kings:
+        service = "a King's ship" if nation in ("", "Britain") else f"a ship of the {nation} navy"
+    else:
+        service = {
+            "privateer": "a privateer",
+            "packet": "a packet",
+            "fisherman": "a fisherman",
+        }.get(role, "a merchantman")
+        if cls.startswith("H.M. "):
+            # the hull's lines are a King's vessel's (the file's history); she is not
+            cls = cls[5:]
+            cls = ("an " if cls[:1].lower() in "aeiou" else "a ") + cls
+    of = f" of {nation}" if nation and not service.startswith("a ship of the") else ""
+    parts = [f"The ship: {name}, {cls}; {service}{of}{escort}."]
+    guns = _guns_fit_words(world)
+    parts.append(f"Her guns: {guns}." if guns else "She carries no guns.")
+    crew = (getattr(ship, "extra", None) or {}).get("crew")
+    if crew is not None and getattr(crew, "complement", 0):
+        parts.append(f"Her people: {crew.complement} souls by the muster.")
+    who = _commands_words(world)
+    if who:
+        parts.append(who)
+    sc = getattr(world, "scenario", None)
+    names = []
+    if ports is not None and getattr(sc, "ports", None):
+        for pid in sc.ports:
+            port = ports.ports.get(pid) if hasattr(ports, "ports") else None
+            names.append(port.name if port is not None else str(pid))
+    if names:
+        parts.append(f"The ports of her voyage: {_and_words(names)}.")
+    return " ".join(parts)
+
+
+def _guns_fit_words(world: Any) -> str:
+    """Her fit of guns: '26 long 18-pounders, 10 32-pounder carronades, 4 long 9-pounders'
+    (the guns reading's own words for the kinds)."""
+    guns = list((getattr(world.ship, "guns", None) or {}).values())
+    if not guns:
+        return ""
+    from freesail.api.action_readings import _kinds_words
+
+    return str(_kinds_words(guns)).strip().rstrip(".")
+
+
+def _commands_words(world: Any) -> str:
+    """Who commands, from the muster and the stations: 'Commanding: Captain Bowen, by the
+    scenario's book; nobody at the captain's station; the deck the player's.'"""
+    value = _captain_reading(world, None)
+    if not value:
+        return ""
+    words = str(value.get("words") or "").strip().rstrip(".")
+    return f"Commanding: {words}." if words else ""
+
+
+def _and_words(names: list[str]) -> str:
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + " and " + names[-1]
+
+
+REGISTRY.add(
+    Reading(
+        "ship",
+        ("the ship", "what ship", "my ship", "this ship", "what ship is this"),
+        "query",
+        "",
+        lambda world, _p: {"words": ship_words(world)},
+        description="the ship herself: her name, her rig and class, her service and nation, "
+        "her fit of guns, her people's number, who commands, the ports of her voyage",
+    )
+)
 
 
 def _people(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -2364,11 +2599,39 @@ def _stranger_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
     return lookout.stranger(world, float(world.ship.heading), own)
 
 
+def _war(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The war as the ship knows it (the owner's fifth note): the nations' table she sailed
+    with, and every change the news has brought her since, each with where and when it
+    came (`Papers.war_news`), never the world's table as it stands."""
+    nations = getattr(world, "nations", None)
+    papers = getattr(world, "papers", None)
+    if nations is None or papers is None:
+        return None
+    lines = papers.war_lines()
+    return {
+        "words": " ".join(ln.strip() for ln in lines),
+        "sailed_with": nations.sailed_with_words(),
+        "news": [dict(n) for n in papers.war_news],
+    }
+
+
+REGISTRY.add(
+    Reading(
+        "war",
+        ("the war", "the war's state", "who is at war", "the news of the war"),
+        "query",
+        "",
+        _war,
+        description="the war as the ship knows it: the nations' table she sailed with, and "
+        "every change the news has brought her since, each with where and when it came; "
+        "never the world's own table",
+    )
+)
 REGISTRY.add(
     Reading(
         "people",
         ("the people",),
-        "ground",
+        "query",
         "",
         _people,
         description="the named people aboard, each by name and role with his place and state",
@@ -2391,7 +2654,7 @@ REGISTRY.add(
     Reading(
         "places",
         ("the places",),
-        "ground",
+        "query",
         "",
         _places,
         description="the places aboard, each a name and a description",
@@ -2402,7 +2665,7 @@ REGISTRY.add(
     Reading(
         "pilot",
         ("the pilot",),
-        "ground",
+        "query",
         "",
         _pilot,
         description="the pilot aboard: his name and port, and when the tide serves by his word",
@@ -2413,7 +2676,7 @@ REGISTRY.add(
     Reading(
         "port",
         ("the port",),
-        "ground",
+        "query",
         "",
         _port,
         description="the port she is in or near: its stance to her, the pilot, the cutter and "
@@ -2425,7 +2688,7 @@ REGISTRY.add(
     Reading(
         "boat",
         ("the boat",),
-        "ground",
+        "query",
         "",
         _boat,
         description="the ship's boat: alongside, or away on its errand and where",
@@ -2436,7 +2699,7 @@ REGISTRY.add(
     Reading(
         "boats",
         ("the boats",),
-        "ground",
+        "query",
         "",
         _boats,
         description="the boats she carries, each with its length, oars and crew",
@@ -2447,7 +2710,7 @@ REGISTRY.add(
     Reading(
         "prices",
         ("the prices",),
-        "ground",
+        "query",
         "",
         _prices,
         description="the prices at the port she lies in, as the purser last brought them off",
@@ -2458,7 +2721,7 @@ REGISTRY.add(
     Reading(
         "manifest",
         ("the manifest",),
-        "ground",
+        "query",
         "",
         _manifest,
         description="the hold: the cargo in it by tons and the room left",
@@ -2469,7 +2732,7 @@ REGISTRY.add(
     Reading(
         "purse",
         ("the purse",),
-        "ground",
+        "query",
         "",
         _purse,
         description="the money aboard, in pounds",
@@ -2480,7 +2743,7 @@ REGISTRY.add(
     Reading(
         "stores",
         ("the stores",),
-        "ground",
+        "query",
         "",
         _stores,
         description="the purser's stores: water by the ton, provisions by the day, and for "
@@ -2492,7 +2755,7 @@ REGISTRY.add(
     Reading(
         "epitome",
         ("the epitome",),
-        "ground",
+        "query",
         "",
         _epitome,
         description="the epitome's table of the establishments: high water at full and change "
@@ -2952,7 +3215,7 @@ REGISTRY.add(
     Reading(
         "officer_of_the_watch",
         ("the officer of the watch", "who has the deck"),
-        "ground",
+        "query",
         "",
         _officer_of_the_watch,
         description="who has the deck: the officer of the watch by name and rank, since "
@@ -3019,7 +3282,7 @@ REGISTRY.add(
     Reading(
         "captain",
         ("the captain", "who commands"),
-        "ground",
+        "query",
         "",
         _captain_reading,
         description="who commands: the captain's station and who holds it, the book's "
@@ -3085,7 +3348,7 @@ REGISTRY.add(
     Reading(
         "lookout",
         ("the lookout", "who is at the masthead"),
-        "ground",
+        "query",
         "",
         _lookout_station,
         description="the lookout's station: who is at the masthead, what is in sight by "
@@ -3129,7 +3392,7 @@ REGISTRY.add(
     Reading(
         "stations",
         ("the stations",),
-        "ground",
+        "query",
         "",
         _stations,
         description="the ship's stations as the world binds them: each with the person "
@@ -3283,7 +3546,7 @@ def describe_value(reading: Reading, value: Any) -> str:
         return fathoms_words(value)
     if kind in ("position", "distance", "person", "well", "state"):
         return str(value["words"])
-    if kind == "ground":
+    if kind in ("ground", "query"):
         return str(value.get("said") or value["words"])
     if isinstance(value, float):
         return f"{value:g}"
@@ -3471,6 +3734,9 @@ def station_line(
     state = _line_state(world, person)
     if state:
         tail.append(state)
+    # the date, last (the owner's fourth note): in every sample's first line, so that it is
+    # known and never deduced from the log's stamps
+    tail.append(date_words(world.clock.ship_time))
     return f"{LINE_HEAD}{head}; {'; '.join(tail)}."
 
 
@@ -3488,7 +3754,8 @@ def director_line(world: Any) -> str:
     waits = "you" + (f" and the {', the '.join(others)}" if others else "")
     return (
         f"{LINE_HEAD}the director, above the game; the day's budget {b.samples} of {s} "
-        f"samples and {b.acts} of {a} acts used; the clock waits on {waits}."
+        f"samples and {b.acts} of {a} acts used; the clock waits on {waits}; "
+        f"{date_words(world.clock.ship_time)}."
     )
 
 

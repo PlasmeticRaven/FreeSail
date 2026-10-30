@@ -1,18 +1,19 @@
-# Heave in cable at the capstan (scripted; package 37f): so much of it ("heave in twenty
-# fathoms"), or to a scope ("heave in to eighty fathoms"), on the anchor named or the one
-# she rides by. The messenger is passed and the bars shipped (rig_capstan_s), and the
-# cable comes in at the capstan's rate; the ship is hove up toward her anchor as it does,
-# and the anchor is not said to drag meanwhile. It is `heave short` with a figure:
-# `heave short` itself takes none and heaves in to a short stay, a cable and a half the
-# depth. Never to less than the depth of water, which is the cable up and down and the
-# anchor breaking out: that is `weigh`, and the refusal says so.
-#
-# The review of gate 5c's playtests, 5.8 and 10.4: `heave in 70 fathoms` ran as `heave
-# short` and a hundred and sixty-three fathoms came in; the officer of game 9, with too
-# much cable out in a narrow berth, had no order to shorten it to a figure.
+# Heave in cable at the capstan (scripted): so much of it ("heave in twenty fathoms"), or
+# to a scope ("heave in to eighty fathoms"), on the anchor named or the one she rides by.
+# The messenger is passed and the bars shipped (rig_capstan_s), and the cable comes in at
+# the capstan's rate; the ship is hove up toward her anchor as it does, and the anchor is
+# not said to drag meanwhile. It is `heave short` with a figure: `heave short` itself
+# takes none and heaves in to a short stay, a cable and a half the depth. Never to less
+# than the depth of water, which is the cable up and down and the anchor breaking out:
+# that is `weigh`, and the refusal says so.
 #
 # Parameters: `fathoms` (the number said), `to` (true for "heave in to <n> fathoms"),
 # `anchor` (the anchor named, else the one she rides by).
+
+# Build notes (not served by the library's catalogue):
+# The review of gate 5c's playtests, 5.8 and 10.4: `heave in 70 fathoms` ran as `heave
+# short` and a hundred and sixty-three fathoms came in; the officer of game 9, with too
+# much cable out in a narrow berth, had no order to shorten it to a figure.
 id: heave_in
 verb: heave_in
 applies_to: {class: ship}

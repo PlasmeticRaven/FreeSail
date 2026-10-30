@@ -1,6 +1,5 @@
-# Furl (stow) a jib-headed sail: haul it down if it is still up, then lay out
-# on the boom or stay and stow it. Not required for M2 but completes the
-# `furl_<class>` set.
+# Furl (stow) a jib-headed sail: haul it down if it is still up, then lay out on the boom
+# or stay and stow it.
 id: furl_jibheaded
 verb: furl
 applies_to: {class: jibheaded}

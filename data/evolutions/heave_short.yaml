@@ -1,14 +1,15 @@
-# Heave short (spec M5 §18; package 34): the cable hove in at the capstan to a short
-# stay, the ship over her anchor nearly, ready to weigh. "Pass and lash the messenger;
-# get up the nippers and capstan bars; ... ship and swifter the bars; call, All hands up
-# anchor! bring to on the cable, and unbitt; man the bars, Heave around! and heave in
-# the cable to a short stay. ... the navigator orders, Avast heaving! ... The cable being
-# in to a short stay, Pawl the capstan! stopper the cable well, and unship the bars"
-# (Luce 1866, ch. XXI Getting Under Way, 'To get under way and stand out on a wind'),
-# "the old rule for a short stay was, that the cable should be in a line with the fore
-# topmast stay" (the same, the note). The hands walk the capstan round at the messenger
-# and the nippers (Lever 1808, 'Weighing the Anchor'); the rate is judgement.
-#
+# Heave short: the cable hove in at the capstan to a short stay, the ship over her anchor
+# nearly, ready to weigh. "Pass and lash the messenger; get up the nippers and capstan
+# bars; ... ship and swifter the bars; call, All hands up anchor! bring to on the cable,
+# and unbitt; man the bars, Heave around! and heave in the cable to a short stay. ... the
+# navigator orders, Avast heaving! ... The cable being in to a short stay, Pawl the
+# capstan! stopper the cable well, and unship the bars" (Luce 1866, ch. XXI Getting Under
+# Way, 'To get under way and stand out on a wind'), "the old rule for a short stay was,
+# that the cable should be in a line with the fore topmast stay" (the same, the note). The
+# hands walk the capstan round at the messenger and the nippers (Lever 1808, 'Weighing the
+# Anchor'); the rate is judgement.
+
+# Build notes (not served by the library's catalogue):
 # Package 37f: the anchor named is the anchor hove short (parameter `anchor`; the one
 # she rides by when none is named); moored, the other cable is veered as this one comes
 # in, and the line says so. It takes no number: a number after it is answered with

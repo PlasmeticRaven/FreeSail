@@ -425,3 +425,62 @@ def test_a_crewed_ship_under_the_directors_hand_or_standing_aside_is_still_answe
     # the player's own ship, her rules captain standing aside: the hail waits for him
     w.captain.aside = True
     assert H.model_holds_her(w)
+
+
+# -- the hail's colon optional ---------------------------------------------------------------
+
+
+def test_the_hail_names_the_sail_with_or_without_the_colon():
+    """The voice in one grammar: `hail the brig what ship is that?` and `say to the Nancy
+    heave to, I am sending a boat` are the hail of chapter 23 with the colon left out,
+    the sail told from the words by her rig, her name or 'her'; with the colon the sail
+    is what stands before it as before. The lookout's hail of the deck ('hail sail ho',
+    'hail the deck sail ho') and a word to a station ('say to the watcher all is well')
+    are not hails of a sail, a capitalised 'Sail ho' included."""
+    from tests.test_brains import put
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    put(
+        w,
+        "merchant brig",
+        "france",
+        "49 30.2 N 5 30 W",
+        "bound for Brest",
+        intent="bound for Brest",
+        name="Nancy",
+    )
+    w.run(61)
+    for words, said in (
+        ("hail the brig: what ship is that?", "what ship is that?"),
+        ("hail the brig what ship is that?", "what ship is that?"),
+        ("hail the merchant brig whence come you", "whence come you"),
+        ("hail her what ship is that", "what ship is that"),
+        ("say to her, heave to", "heave to"),
+        ("say to the brig heave to", "heave to"),
+        ("say to the Nancy heave to, I am sending a boat", "heave to, I am sending a boat"),
+        ("hail Nancy what ship is that", "what ship is that"),
+    ):
+        e = w.submit(words)
+        assert e.kind == "hail.answered", (words, e.text)
+        assert f"by the trumpet: '{said}'" in e.text, (words, e.text)
+    assert w.submit("hail the brig").text.startswith(
+        "Hailed a merchant brig by the trumpet: 'What ship is that?'"
+    )
+    for words in ("hail the deck sail ho", "hail Sail ho, two points on the bow"):
+        e = w.submit(words)
+        assert e.kind == "order.rejected" and "A hail is the lookout's" in e.text, words
+    assert w.submit("say to the watcher all is well").kind == "agent.told"
+    e = w.submit("hail the cutter what ship")
+    assert e.kind == "order.rejected" and "Nothing in sight answers to 'the cutter'" in e.text
+    # the head never crosses a colon or a comma (the lead's finding at the review of
+    # items 1 and 2): a word to a station that names a sail after the colon is the
+    # station's, and the lookout's hail of the deck that names one is his
+    for words in ("say to the master: the brig has tacked", "say to the lookout: watch the brig"):
+        assert w.submit(words).kind == "agent.told", words
+    for words in (
+        "hail the deck: a sail two points on the bow",
+        "hail the deck: the brig is bearing away",
+    ):
+        e = w.submit(words)
+        assert e.kind == "order.rejected" and "A hail is the lookout's" in e.text, words
