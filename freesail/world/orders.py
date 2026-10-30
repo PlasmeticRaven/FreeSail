@@ -1470,6 +1470,7 @@ _MOVE = re.compile(
     r'^person:\s*(?:"(?P<name>[^"]+)"|(?P<bare>.+?))\s+(?P<move>comes\s+aboard'
     r"(?:\s+(?P<ship>the\s+[\w' -]+?|\"[^\"]+\"))?"
     r"(?:\s+as\s+(?:the\s+|a\s+|an\s+)?(?P<station>.+?))?|goes\s+ashore"
+    r"|goes\s+aboard\s+(?P<to>the\s+[\w' -]+?|\"[^\"]+\")(?:\s+by\s+the\s+boat)?"
     r"|leaves\s+the\s+ship\s+at\s+(?P<port>.+?))\s*$",
     re.I,
 )
@@ -1776,12 +1777,58 @@ def _person_anywhere(world: Any, name: str) -> Any:
     return by_surname[0] if len(by_surname) == 1 else None
 
 
+def _goes_aboard_by_the_boat(world: Any, name: str, to_words: str) -> tuple[str, dict[str, Any]]:
+    """`person: "<name>" goes aboard the <ship> by the boat` (package 82; the design's
+    §2): a person of any hull's company put aboard another by his ship's boat, the boat's
+    errand (`Dealings.send_boat_to`) as his captain would send it; refused in words for a
+    person ashore or in a boat, for a held station's person (the rule of reach) and where
+    the two hulls are beyond a boat's pull of each other."""
+    from freesail.orders.errors import OrderError
+    from freesail.world.movement import hull_name, hull_of
+
+    person = _person_anywhere(world, name)
+    if person is None:
+        raise WorldOrderError(
+            f"Nobody named {name} is among the people; make him first: 'person: make "
+            f'"{name}", ...\'.'
+        )
+    target = hull_named(world, to_words)
+    if target is world:
+        target = world.players
+    here = hull_of(world, getattr(person, "hull", None))
+    if here is None:
+        from freesail.world.places import place_words
+
+        raise WorldOrderError(
+            f"{person.name} is {place_words(getattr(person, 'where', 'shore'))}: a person "
+            "goes aboard another ship by the boat from the ship he is in ('comes aboard' "
+            "brings him off the shore)"
+        )
+    if str(target.id) == str(here.id):
+        raise WorldOrderError(f"{person.name} is aboard the {hull_name(target)} already")
+    for st, who, holder in held_stations_everywhere(world):
+        if who == person.name:
+            raise WorldOrderError(
+                f"{person.name} holds the {st}'s station ({holder}); the director moves no held "
+                "person: his holder goes aboard by his own word"
+            )
+    dealings = getattr(here, "dealings", None)
+    if dealings is None:
+        raise WorldOrderError(f"the {hull_name(here)} has no boat to send")
+    try:
+        text, data = dealings.send_boat_to(target, [person], [], by_the_director=True)
+    except OrderError as e:
+        raise WorldOrderError(str(e).rstrip(".")) from None
+    return text.rstrip("."), {"person": person.name, "ship": str(target.id)} | data
+
+
 def _comes_aboard_hull(
     world: Any, target: Any, person: Any, station: str | None
 ) -> tuple[str, dict[str, Any]]:
     """A person of any company come aboard another hull (package 84, step 9): his
     whereabouts hers, her log says so, and a station of hers bound to him when named."""
     from freesail.world.hearing import own_hull
+    from freesail.world.movement import put_aboard
 
     hid = own_hull(target)
     data: dict[str, Any] = {"person": person.name}
@@ -1789,16 +1836,23 @@ def _comes_aboard_hull(
     if not (getattr(person, "aboard", False) and getattr(person, "hull", "") == hid):
         ports = getattr(world, "dealings", None)
         came = ports.ports.get(person.port) if (ports is not None and person.port) else None
-        person.aboard = True
-        person.hull = hid
-        person.where = "quarterdeck"
-        whence = f" from {came.name}" if came is not None else ""
-        target.record(
-            Severity.NOTABLE,
-            "person.aboard",
-            f"{person.name} came aboard{whence}.",
-            data={"person": person.name, "from": came.id if came is not None else ""},
-        )
+        if came is not None and not getattr(person, "aboard", False):
+            # from the shore: the port he was at, said (the words of package 84's step 9)
+            person.hull = hid
+            person.where = "quarterdeck"
+            person.port = None
+            person.ashore_at = ""
+            whence = f" from {came.name}"
+            target.record(
+                Severity.NOTABLE,
+                "person.aboard",
+                f"{person.name} came aboard{whence}.",
+                data={"person": person.name, "from": came.id},
+            )
+        else:
+            # from another hull or a boat (package 82): the one road, his station following
+            _k, text, _d = put_aboard(world, person, target, "quarterdeck", by="the director")
+            whence = text.removeprefix(f"{person.name} came aboard").rstrip(".")
         said.append(f"{person.name} came aboard{whence}")
         data["came_aboard"] = True
     if station:
@@ -1832,6 +1886,8 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     from freesail.world.places import place_words
 
     name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    if m.groupdict().get("to"):
+        return _goes_aboard_by_the_boat(world, name, m.group("to"))
     ship_words = (m.groupdict().get("ship") or "").strip()
     if ship_words and _ship_words_own(world, ship_words) is False:
         # `comes aboard the Raven` (package 84, step 9): aboard her, by her own names
@@ -3833,11 +3889,37 @@ def _doubt_person(world: Any, body: str) -> str | None:
     if m is None:
         return None
     name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
-    person = world.people.find(name)
+    person = _person_anywhere(world, name)
     ports = getattr(world, "dealings", None)
     if person is None or ports is None or getattr(world, "position", None) is None:
         return None
     move = " ".join(m.group("move").lower().split())
+    if move.startswith("goes aboard"):
+        # package 82: a person put aboard another ship by his ship's boat, doubted where the
+        # two lie beyond a boat's pull of each other (`movement.BOAT_BETWEEN_NM`)
+        from freesail.world.geo import bearing_and_distance
+        from freesail.world.movement import BOAT_BETWEEN_NM, hull_name, hull_of
+
+        try:
+            target = hull_named(world, m.group("to") or "", make=False)
+        except WorldOrderError:
+            # a ship with no hull yet: her far body's place
+            vessels = getattr(world, "vessels", None)
+            target = vessels.find((m.group("to") or "").strip('"')) if vessels else None
+            if target is None or target.done:
+                return None
+        here = hull_of(world, getattr(person, "hull", None))
+        if target is world or here is None or getattr(target, "position", None) is None:
+            return None
+        if here.position is None or target is here:
+            return None
+        nm = bearing_and_distance(here.position, target.position)[1] / units.NAUTICAL_MILE
+        if nm > BOAT_BETWEEN_NM:
+            return (
+                f"the {hull_name(target)} is {nm:.1f} miles from the {hull_name(here)}: a boat "
+                f"is not sent so far between two ships ({BOAT_BETWEEN_NM:g} mile at the most)"
+            )
+        return None
     if move.startswith("comes aboard"):
         if person.aboard:
             return None

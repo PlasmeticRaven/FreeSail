@@ -12821,3 +12821,55 @@ def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
     w.run(2)
     assert w.captain.aside
     assert w.submit("captain: carry on").kind == "captain.carry_on" and not w.captain.aside
+
+
+# ---------------------------------------------------------------------------
+# Package 82: the boat as a hull of the one world, and the person aboard another ship
+# (docs/design/Design-BoatAndPersonAboard.md). Truths 7-320 to 7-339, numbered after 93's
+# and 94's; 7-324, 7-325 and 7-333 are step 1's (the person's movement between hulls).
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_324_a_person_moved_between_hulls_by_the_boat_replays_by_both_roads_the_same():
+    """A stationed person sent aboard another hull by his ship's boat is a visitor there,
+    his station with him as his voice and his own standing bound to him at home; he comes
+    home in her boat and has his station again; the save holds his harness under the hull
+    of its seating, and a replay by the transcript and by the acts gives both logs the same
+    digests, with his station on his own hull at the end."""
+    from tests.test_between_hulls import (
+        test_the_moves_replay_by_both_roads_to_the_same_digests_with_the_harness_seated_at_home,
+    )
+
+    test_the_moves_replay_by_both_roads_to_the_same_digests_with_the_harness_seated_at_home()
+
+
+def test_truth_7_325_the_boarders_officer_stands_on_the_deck_won_and_a_captive_stands_down():
+    """The boarders' movement by the deck won (73's `action.carried`): the first lieutenant
+    who led them stands on her deck, his station following him as a visitor's; and the hook
+    package 74 calls for the captive, a person put aboard the captor with his station
+    standing down by the handover's rule."""
+    from tests.test_between_hulls import (
+        test_a_captive_put_aboard_the_captor_stands_his_station_down_by_the_handovers_rule,
+        test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him,
+    )
+
+    test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him()
+    test_a_captive_put_aboard_the_captor_stands_his_station_down_by_the_handovers_rule()
+
+
+def test_truth_7_333_where_am_i_and_the_station_line_answer_the_hull_the_person_is_in():
+    """`where am I` answers the asker's whereabouts by his own words (aboard his ship and
+    his place; in the boat; ashore at the port's place; aboard another ship as a visitor,
+    hers named), the station line says the same of a visitor, and the director's `person:
+    "X" goes aboard the <ship> by the boat` performs within a boat's pull and is doubted
+    beyond it."""
+    from tests.test_between_hulls import (
+        test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_it_far_off,
+    )
+
+    w = _package_85_cutter()
+    said = w.submit("where am i").text
+    assert "aboard the Sherbourne, on the quarterdeck" in said
+    w.submit("go below")
+    assert "in the cabin" in w.submit("where am i").text
+    test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_it_far_off()

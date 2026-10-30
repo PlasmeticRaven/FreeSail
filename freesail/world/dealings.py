@@ -2633,6 +2633,10 @@ class Dealings:
 
     def _apply_job(self, job: Job) -> None:
         world = self.world
+        if job.kind == "boat_to":
+            # the boat at another hull and back (package 82): no port's job
+            self._boat_to_job(job)
+            return
         port = self.ports.get(job.port_id)
         if port is None:
             return
@@ -2977,6 +2981,8 @@ class Dealings:
         booms again, whoever was to go in her is on deck, and the log says so. A boat
         already away is not belayed (`orders.work`), so that she cannot vanish from the
         water; were she found so, she is brought alongside as on her return."""
+        if self.boat.errand == "to_ship":
+            return  # the boat at another hull (package 82): the port's jobs keep her
         runner = self.world.ship.extra.get("evolutions")
         if runner is None:
             return
@@ -3174,6 +3180,198 @@ class Dealings:
                     )
         self.boat = BoatState(boat_name=name, boat_id=self.boat.boat_id)
         return lines
+
+    # -- the boat between hulls (package 82; the design's §2) ------------------------------
+
+    def send_boat_to(
+        self,
+        target: Any,
+        carrying: list[Any],
+        fetching: list[Any],
+        by_the_director: bool = False,
+    ) -> tuple[str, dict[str, Any]]:
+        """`send the boat to the <ship> [with <persons>] [for <persons>]`: the boat away
+        to another hull lying within a boat's pull (`movement.BOAT_BETWEEN_NM`), the
+        persons she carries put aboard her when she is alongside and the persons she is
+        sent for stepping into her there, back alongside and hoisted in; two jobs of the
+        port's kind at the boat's pace (`Job(kind="boat_to")`), on an awake hull as on a
+        sleeping one, since a boat's pull between two ships wants no hands' evolution to
+        show. Refused in words with no boat, the boat away, the other hull beyond the
+        reach, or nobody to carry or fetch."""
+        from freesail.orders.errors import OrderError
+        from freesail.world.movement import BOAT_BETWEEN_NM, hull_name
+
+        world = self.world
+        boat = self.boat_spec()
+        if boat is None:
+            raise OrderError("She carries no boat: the ship's file lists none.")
+        if self.boat.away:
+            raise OrderError(f"{boat.name[:1].upper()}{boat.name[1:]} is away already.")
+        if target is None or getattr(target, "position", None) is None or world.position is None:
+            raise OrderError("The other ship is not on this sea within a boat's pull.")
+        her = hull_name(target)
+        if str(getattr(target, "id", "")) == str(self.hull_id):
+            raise OrderError("The boat is sent to another ship, not to her own.")
+        metres = bearing_and_distance(world.position, target.position)[1]
+        nm = metres / units.NAUTICAL_MILE
+        if nm > BOAT_BETWEEN_NM and not by_the_director:
+            # the director's word carries the doubt (`orders.doubt`) and performs: the
+            # boat's pull takes the time the distance gives
+            raise OrderError(
+                f"The {her} is {distance_words(metres)} off, beyond a boat's pull "
+                f"({BOAT_BETWEEN_NM:g} mile); close her first."
+            )
+        if not carrying and not fetching:
+            raise OrderError(
+                f"Send the boat to the {her} with whom, or for whom? Say 'send the boat to the "
+                f"{her} with Mr Pope', or '... for Mr Pope'."
+            )
+        for person in carrying:
+            if not person.aboard or str(person.hull) != str(self.hull_id):
+                raise OrderError(f"{person.name} is {world.people.state_words(person)}.")
+            if person.occupied:
+                raise OrderError(f"{person.name} is at the {person.task}.")
+        for person in fetching:
+            if str(getattr(person, "hull", "") or "") != str(target.id):
+                raise OrderError(f"{person.name} is not aboard the {her}.")
+        now = int(world.clock.tick)
+        pull_s = int(metres / units.knots_to_ms(BOAT_PACE_KN))
+        alongside_at = now + BOAT_HOIST_OUT_S + pull_s
+        back_at = alongside_at + 300 + pull_s + BOAT_HOIST_IN_S  # five minutes alongside her
+        for person in carrying:
+            person.hull = None
+            person.where = "boat"
+        self.boat = BoatState(
+            away=True,
+            boat_id=boat.id,
+            boat_name=boat.name,
+            errand="to_ship",
+            port_id="",
+            phase=f"pulling for the {her}",
+            since_tick=now,
+            people=[p.id for p in carrying],
+            landing=tuple(p.id for p in carrying),
+            fetching=tuple(p.id for p in fetching),
+            to_hull=str(target.id),
+            to_name=her,
+        )
+        self.jobs.append(
+            Job(
+                alongside_at,
+                "boat_to",
+                "",
+                {"stage": "alongside", "hull": str(target.id)},
+                hull=self.hull_id,
+            )
+        )
+        self.jobs.append(
+            Job(
+                back_at, "boat_to", "", {"stage": "back", "hull": str(target.id)}, hull=self.hull_id
+            )
+        )
+        head = f"{boat.name[:1].upper()}{boat.name[1:]}"
+        who = ""
+        if carrying:
+            who = f" with {_and([p.name for p in carrying])}"
+        for_whom = f", for {_and([p.name for p in fetching])}" if fetching else ""
+        minutes = max(1, round((back_at - now) / 60))
+        text = (
+            f"{head} away for the {her}{who}{for_whom}; alongside her in some "
+            f"{max(1, round((alongside_at - now) / 60))} minutes, back in some {minutes}."
+        )
+        self._record(
+            Severity.NOTABLE,
+            "boat.away",
+            text,
+            {"ship": str(target.id), "errand": "to_ship", "people": [p.id for p in carrying]},
+        )
+        return text, {"to": str(target.id), "back_at": back_at}
+
+    def _boat_to_job(self, job: Job) -> None:
+        """The boat's two stages at another hull (`send_boat_to`): alongside her, the
+        persons carried put aboard her (`movement.put_aboard`, their stations following)
+        and the persons fetched stepping into the boat; back, the boat alongside her own
+        ship and hoisted in, whoever is in her aboard again."""
+        from freesail.world.movement import hull_name, hull_of, put_aboard
+
+        world = self.world
+        registry = getattr(world, "registry", None)
+        if not self.boat.away or self.boat.errand != "to_ship":
+            return
+        target = hull_of(world, job.payload.get("hull"))
+        name = self.boat.boat_name
+        head = f"{name[:1].upper()}{name[1:]}"
+        persons = {p.id: p for p in (registry.persons() if registry is not None else [])}
+        stage = job.payload.get("stage")
+        if stage == "alongside":
+            if target is None:
+                self._record(
+                    Severity.NOTABLE,
+                    "boat.returning",
+                    f"{head} found no ship where the {self.boat.to_name} lay; she pulls back.",
+                    {"ship": str(job.payload.get("hull") or "")},
+                )
+                self.boat.phase = "pulling back to the ship"
+                return
+            her = hull_name(target)
+            self.boat.phase = f"alongside the {her}"
+            self._record(
+                Severity.ROUTINE,
+                "boat.ashore",
+                f"{head} alongside the {her}.",
+                {"ship": str(target.id)},
+            )
+            for pid in self.boat.landing:
+                p = persons.get(pid)
+                if p is None:
+                    continue
+                self.boat.people = [x for x in self.boat.people if x != pid]
+                put_aboard(world, p, target, "quarterdeck", by=f"the {hull_name(world.own)}'s boat")
+            self.boat.landing = ()
+            for pid in self.boat.fetching:
+                p = persons.get(pid)
+                if p is None or str(getattr(p, "hull", "") or "") != str(target.id):
+                    continue
+                p.hull = None
+                p.where = "boat"
+                p.port = None
+                self.boat.people = [*self.boat.people, pid]
+                target.record(
+                    Severity.ROUTINE,
+                    "person.moved",
+                    f"{p.name} went down into the {hull_name(world.own)}'s boat.",
+                    data={"person": p.to_dict(), "ship": str(self.hull_id)},
+                )
+            self.boat.fetching = ()
+            self.boat.phase = "pulling back to the ship"
+            return
+        if stage == "back":
+            lines: list[tuple[Severity, str, str, dict[str, Any]]] = [
+                (
+                    Severity.NOTABLE,
+                    "boat.alongside",
+                    f"{head} alongside from the {self.boat.to_name or 'other ship'} and "
+                    "hoisted in.",
+                    {"ship": str(self.boat.to_hull), "errand": "to_ship"},
+                )
+            ]
+            own = world.own
+            for pid in list(self.boat.people):
+                p = persons.get(pid)
+                if p is None:
+                    continue
+                put_aboard(world, p, own, "deck", by="the boat", said=False)
+                lines.append(
+                    (
+                        Severity.ROUTINE,
+                        "person.came",
+                        f"{p.name} came aboard from the boat.",
+                        p.to_dict(),
+                    )
+                )
+            self.boat = BoatState(boat_name=name, boat_id=self.boat.boat_id)
+            for severity, kind, text, data in lines:
+                self._record(severity, kind, text, data)
 
     def boat_reading(self) -> dict[str, Any]:
         boat = self.boat_spec()

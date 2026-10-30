@@ -14829,3 +14829,113 @@ the Solent's tide region and the seams' rule under the worlds these tests run in
 fast tier whole again, 4,454 passed, none failed; the package's six test files, the
 primer's, the anchor's and the checkpoints' with the truths 7-240 to 7-245, 7b-117 and
 7-150 to 7-159, `--slow -m "not pace" -n 4`: all passed, no pin moved.
+
+## Package 82: the boat as a hull of the one world, and the person aboard another ship (2026-10-30)
+
+The brief and the re-brief in `docs/dev/M7-WorkPackages.md` ("Package 82" and "The re-brief
+after 84 and 85"); the design in `docs/design/Design-BoatAndPersonAboard.md`, written and
+reported before anything was built, with a postscript for each step as it is built. Built as
+a sibling session in its own container on `claude/pkg-82`, off the lead's `c168c51`, each step
+a mergeable state with the fast tier whole on its final tree, the slow tier of the touched
+files and the known truths (`--slow -m "not pace" -n 4`), the lead's head brought in at the
+boundary before the step's final run; the whole slow tier the lead's in the cloud at each
+merge. The physics are not touched but for the oar force the brief allows (step 4); no
+consent file; no ship file but through the generator (step 4's own commit).
+
+### Step 1: the person's movement between hulls (the re-brief's item 3; the design's §2)
+
+**What was built.** `movement.put_aboard(world, person, hull, place, seat=, why=, by=)`, the
+one function for every change of a person's hull: his whereabouts hers, his place in her,
+nothing of the shore; a harness bound to him goes with him (`Harness.move_to`: taken out of
+the hull's `agents` it was in, entered in hers under the station he holds in her, her log read
+from its end so that his first sample there carries nothing of her past, the model's
+conversation unbroken; `seat="stands down"` stands it down with the reason instead, the
+handover's rule for a captive); in a hull not his own his station is his **voice** (package
+67's passenger kind under his name, bound quietly: `movement.visiting_station`), with a
+passenger's reach and none of her deck's orders, and his own station on his home hull stands
+bound to him (`Stations.holder` names him; the deck nobody's or the book's) until he comes
+home, when his harness is his own station's again and the voice is unbound. `Stations.holder`
+and `bind` find a visitor by his name whole among the persons in the hull
+(`People.find_aboard`) before the company's own reading of the words. **The roads into it:**
+`send the boat to the <ship> [with <persons>] [for <persons>]` from an awake or a sleeping
+hull (`Dealings.send_boat_to`: two jobs of the port's kind at the boat's pace, alongside her
+and back, the persons carried put aboard her and the persons fetched stepping into the boat;
+within `movement.BOAT_BETWEEN_NM`, a mile, judgement); a visitor's `come aboard`, which sends
+the hull's boat home with him; the director's `person: "X" comes aboard the <ship>` (84's,
+now through the one function) and the new `person: "X" goes aboard the <ship> by the boat`,
+doubted beyond a boat's pull and performed on the director's word whatever the distance; the
+deck won (`boarding._end("carried")`): the first lieutenant who leads the boarders
+(`boarding.boarders_officer`) stands on her deck with his station following him. **The
+replay:** every move is a consequence of an input or a job, so a replay makes it at the same
+tick; the acts carry the hull the harness is in at the act (84's rule); the harness keeps the
+hull of its first seating (`Harness.seated_on`, in its save record) and the save groups the
+harnesses by it (`World._agents_seated_on`, the top block and `hulls`), so that a replay by
+the transcript seats each where it began and the replayed moves carry it on. **The readings:**
+`where am I` (a query of the registry, read afresh at each asking and never from the view's
+cache, left out of the readings tool's dict: `Reading.per_asker`), the station line's "who"
+for a visitor ("Captain Pope, commander of the X, aboard the Amazon as a visitor"); `the
+ship` is the hull he is in by the view's own rule.
+
+**What moved: nothing pinned.** No recorded passage moves a person between hulls; the one
+place a pinned passage touches is `Dealings._boat_kept`, which now leaves a boat on the
+to-ship errand alone (its jobs keep her), and the readings view, whose cache is unchanged for
+every row but the new one. The proof is the suites below.
+
+**Found on the way.**
+- `Dealings._boat_kept` denies a boat whose work is not a `send_boat` evolution ("was not
+  sent away") once a minute: it did so to the to-ship errand, which is the port's jobs with
+  no evolution, exactly as it does to the kedge's lay-out (the brief's "false denial", step
+  5's); the to-ship errand is guarded here, the kedge's mend is step 5's and will take the
+  guard with it.
+- The readings view caches every row per tick, and the harness's sample reads every row
+  (`as_dict`): a reading whose answer is the asker's was answered for the captain at the
+  prompt and then served from the cache to a visitor's query. `Reading.per_asker` reads such
+  a row afresh and keeps it out of the dict.
+- `Stations.holder` for a binding by name read the company's `find`, which takes 'Captain
+  Pope' for the hull's own captain by his role: a visitor's voice resolved to his host. The
+  visitor by his name whole first.
+- 84's `person: "X" comes aboard the <ship>` set the whereabouts itself; it goes through
+  `put_aboard` now, its words kept (the port he came from named where he came from the shore).
+- A person's ids are his company's (`commander`, `captain`): the boat's lists of ids are
+  resolved among the registry's persons, which two hulls' captains would confuse; step 4's
+  boat as a hull resolves them by the person and not the id.
+
+**Decisions.** The seat as the design's §2 decides it (the person the world's, the station a
+hull's, the harness the person's); the player's own seat (`PlayerSeat`) does not move with
+his person yet: it is step 3's (the player's seat on another ship), said in the design's
+postscript. The boarders' officer is the first lieutenant (the captain stays with his ship),
+else a lieutenant or the mate, else nobody; the quarter bill names no boarders' officer and
+none is added to the files.
+
+**The lead's two findings on the step as first pushed (`2b163d4`), both mended.** (1) A
+save taken while his person was a visitor carried the voice (the passenger's kind under his
+name) as his station and was grouped under his own hull, so the owner's road, the transcript,
+seated a passenger on the brig at his stationed tick and his `send the boat ...` had no deck
+to be given from; the acts road was right. `Harness.save` carries the station of his seating
+(his own, kept in `_home` while he visits), and a test saves mid-visit, in the host's boat on
+the way home and at home, replaying each by both roads to the same digests of both logs with
+the copy's harness visiting where the play's was. (2) The player's `send the boat to the
+<ship>` named a far body beyond a boat's pull and was refused in words, yet left her promoted
+to a hull (`hull_named` with `make=True` before the distance was read): the order reads her
+hull with `make=False`, measures her far body's distance and refuses before any hull is
+made, making her one only as the boat goes; the director's road makes her as 84's `comes
+aboard the <ship>` does. The visitor's reach is said in words at the lead's ask
+(`agent.VISITOR_DOMAIN`'s refusal, "a visitor aboard another ship gives no order of her deck,
+and none of his own ship's from there (hail her, make a signal or send a letter; 'come
+aboard' takes him home)", and `movement.VISITOR_BRIEF` in the consent brief's voice), and in
+the Harness document's §17. The officer's handover budget moved 21,500 to 22,000 (the fast
+tier found it: the conversation at the seat 12,926 tokens against 12,885 under 85, for the
+reading and the errand in the brief's words), old beside new in `tests/test_officer.py`.
+
+**The truths:** 7-324 (the move by the boat and the replay by both roads), 7-325 (the deck won
+and the captive's stand-down), 7-333 (`where am I`, the station line, the director's form).
+
+**The suites on the step's final tree** (`d9257a2`, the lead's `58c51ac` merged): the fast
+tier whole, `python -m pytest -n 4`, 4,473 passed, none failed (28:58 on four cores); the slow
+tier of the touched files and the known truths (`tests/test_between_hulls.py`, `test_places`,
+`test_world_orders`, `test_director`, `test_grammar_book`, `test_primer`, `test_replay`,
+`test_crews`, `test_hulls`, `test_fight`, `test_people`, `test_in_world`, `test_agents`,
+`test_agent_api`, `test_seat_hook`, `test_officer`, `test_harness_instruments`,
+`test_known_truths`; `--slow -m "not pace" -n 4`), 1,752 passed, 7 expected failures (the
+rulings'), none failed (45:16); ruff clean. No pace test is touched by the step; they run
+last, with item 7.

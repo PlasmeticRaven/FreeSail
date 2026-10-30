@@ -40,6 +40,7 @@ from the harness and not part of the game.
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -824,6 +825,31 @@ PASSENGER_DOMAIN = Domain(
     kept_back=(),
     danger=frozenset(),
     deck=False,
+)
+
+# A visitor's domain (package 82; `docs/design/Design-BoatAndPersonAboard.md` §2): a person
+# of one ship's company aboard another, his station gone with him as his voice there: the
+# passenger's reach in the ship he is in, and the refusal saying what he has and has not,
+# of her deck and of his own ship's from there.
+VISITOR_DOMAIN_WORDS = (
+    "You are aboard another ship as a visitor, your station gone with you from your own: you "
+    "have a passenger's reach here and no more. You read every reading and every query of the "
+    "ship you are in ('where am I' says where you stand), speak and ask by the deck's "
+    "conversation ('say <words>', 'ask the <station> ...', 'tell the <station> ...'), give and "
+    "take what lies before you, keep your journal, and leave. You give no order of her deck, "
+    "and none of your own ship's from here: hail her, make a signal or send a letter; 'come "
+    "aboard' sends this ship's boat to take you home where your ship lies within a boat's "
+    "pull, and your own station is yours again with its whole surface when you are aboard "
+    "her. There is no deck at this station and nothing gives or takes one."
+)
+_VISITOR = (
+    "a visitor aboard another ship gives no order of her deck, and none of his own ship's "
+    "from there (hail her, make a signal or send a letter; 'come aboard' takes him home)"
+)
+VISITOR_DOMAIN = dataclasses.replace(
+    PASSENGER_DOMAIN,
+    refused=tuple((key, _VISITOR) for key, _why in PASSENGER_DOMAIN.refused),
+    words=VISITOR_DOMAIN_WORDS,
 )
 
 # The director's domain (spec M7b §2; package 50): no order of any ship, not even the

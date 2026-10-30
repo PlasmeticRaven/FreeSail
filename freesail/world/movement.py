@@ -74,8 +74,15 @@ __all__ = [
     "market_way",
     "person_of_actor",
     "places_ashore",
+    "put_aboard",
+    "where_am_i",
     "within_hail",
 ]
+
+# A boat's pull between two ships at sea (package 82; the design's §2): the hail's reach
+# doubled and a little, a mile; a boat is not sent across the sea (judgement). The port's
+# reach (`orders.BOAT_REACH_NM`, six miles) is the shore's and the lighter's.
+BOAT_BETWEEN_NM = 1.0
 
 # The people's verbs that move the giver (`data/vocabulary.yaml`, object `person`).
 MOVE_VERBS: tuple[str, ...] = (
@@ -571,9 +578,242 @@ def come_aboard(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     """`come aboard`: the boat sent for him from the ship lying at his port."""
     ports = getattr(world, "dealings", None)
     if person.aboard:
+        home_id = str(getattr(person, "home", "") or "")
+        if home_id and str(getattr(person, "hull", "") or "") != home_id:
+            # a visitor in another hull (package 82): her boat takes him home, where his
+            # own ship lies within a boat's pull; else the words say the way
+            home = hull_of(world, home_id)
+            if home is None:
+                raise OrderError(
+                    f"You are aboard the {hull_name(hull_of(world, person.hull))}; your own "
+                    "ship has no hull on this sea to go back to."
+                )
+            if ports is None:
+                raise OrderError("There is no boat here to take you back to your ship.")
+            text, data = ports.send_boat_to(home, [person], [])
+            return (
+                "evolution.started",
+                text,
+                {"ship": home.id, "errand": "to_ship", "people": [person.id]} | data,
+            )
         raise OrderError(f"You are aboard already, {place_words(person.where)}.")
     if person.where != "shore":
         raise OrderError(f"You are {place_words(person.where)}; the boat brings you aboard.")
     if ports is None or not ports.ports:
         raise OrderError("There is no ship's boat to send for you.")
     return ports.fetch_person(person)
+
+
+# ---------------------------------------------------------------------------
+# A person moved between hulls (package 82; `docs/design/Design-BoatAndPersonAboard.md` §2)
+# ---------------------------------------------------------------------------
+
+
+def hull_of(world: Any, hull_id: str | None) -> Any:
+    """A hull of the one world by her id, or None (ashore, in a boat, a hull not made)."""
+    if not hull_id:
+        return None
+    hulls = getattr(world, "hulls", None) or {}
+    return hulls.get(str(hull_id))
+
+
+def hull_name(hull: Any) -> str:
+    return str(getattr(getattr(hull, "ship", None), "name", "") or getattr(hull, "id", "") or "")
+
+
+def harness_of(world: Any, person: Any) -> tuple[Any, Any] | None:
+    """(the hull it is in, the harness) of the station a person holds through a door, on
+    any hull of the game (package 82: a harness lives where its person is); None when no
+    model holds him."""
+    from freesail.agents.harness import harnesses_of
+
+    name = str(getattr(person, "name", "") or "")
+    for hull, h in harnesses_of(world):
+        if getattr(h.agent, "released", False):
+            continue
+        if str(getattr(h.station, "person", "") or "") == name:
+            return hull, h
+        stations = getattr(hull, "stations", None)
+        try:
+            holder = stations.holder(h.station.name) if stations is not None else None
+        except Exception:  # noqa: BLE001  (a people's build that cannot run binds nobody)
+            holder = None
+        if holder is person:
+            return hull, h
+    return None
+
+
+def visiting_station(hull: Any, person: Any, policy: Any = None) -> Any:
+    """The station a visitor holds in a hull not his own (the design's §2): his voice, a
+    station of the passenger's kind under his name (package 67's), bound to him quietly
+    for as long as he is in her; he reads her deck as a passenger reads it and gives none
+    of her orders."""
+    import dataclasses
+
+    from freesail.agents.agent import VISITOR_DOMAIN
+    from freesail.world.seats import VOICE_ACTOR, VOICE_KIND, _voice_name, voice_station
+
+    name = _voice_name(person)
+    stations = hull.stations
+    if stations.holder(name) is not person:
+        stations.bind(name, person, kind=VOICE_KIND, quiet=True, actor=VOICE_ACTOR)
+    station = voice_station(hull, name, policy)
+    home = hull_of(hull.world, getattr(person, "home", ""))
+    role = str(getattr(person, "role", "") or "a person")
+    brief = VISITOR_BRIEF.format(
+        person=person.name,
+        role=role,
+        home=hull_name(home) if home is not None else "your own ship",
+        hull=hull_name(hull),
+    )
+    return dataclasses.replace(station, brief=brief, domain=VISITOR_DOMAIN)
+
+
+# A visitor's brief (package 82): what a model whose person is aboard another ship has and
+# has not there, in the consent brief's voice; the station's kind is the passenger's.
+VISITOR_BRIEF = (
+    "You are {person}, {role} of the {home}, aboard the {hull} as a visitor: your station has "
+    "gone with you from your own ship, and here you have a passenger's reach and no more. You "
+    "read every reading and every query of the {hull} ('where am I' says where you stand), "
+    "speak and ask by the deck's conversation, give and take what lies before you, keep your "
+    "journal, stand by until an event or a bell, and leave. You give no order of her deck, and "
+    "none of the {home}'s from here: hail her, make a signal or send a letter. Your own station "
+    "on the {home} stands bound to you meanwhile; 'come aboard' sends the {hull}'s boat to take "
+    "you home where the {home} lies within a boat's pull, and your station is yours again with "
+    "its whole surface when you are aboard her. There is no deck at this station.\n\n"
+    "Two ways to stop, which are not one another:\n"
+    "- Stand down: stand_down(note). The game is saved, your note is journaled, and the "
+    "station is released.\n"
+    "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "Candour: say what you see and what you do; an order refused is a refusal in words."
+)
+
+
+def _unbind_visit(hull: Any, person: Any, why: str) -> None:
+    """A visitor's voice unbound from the hull he left (its harness taken out first, so
+    that the unbinding stands nobody down)."""
+    from freesail.world.seats import VOICE_KIND, _voice_name
+
+    name = _voice_name(person)
+    stations = getattr(hull, "stations", None)
+    if stations is None or not stations.aboard(name) or stations.kind_of(name) != VOICE_KIND:
+        return
+    agents = getattr(hull, "agents", None)
+    if isinstance(agents, dict) and name in agents:
+        return  # a model holds the voice by a seat of its own: not this move's to end
+    stations.unbind(name, why=why, quiet=True)
+
+
+def put_aboard(
+    world: Any,
+    person: Any,
+    hull: Any,
+    place: str = "quarterdeck",
+    *,
+    seat: str = "follows",
+    why: str = "",
+    by: str = "",
+    said: bool = True,
+) -> tuple[str, str, dict[str, Any]]:
+    """**One function for every change of a person's hull** (package 82; the design's §2):
+    by the boat alongside another ship, by boarding (the deck won), by capture (74's
+    captive) or by the director's word. His whereabouts hers (`Person.hull`, his place in
+    her, nothing of the shore); a station he holds through a door goes with him (`seat`
+    "follows": the harness carried into her as his voice there, or as his own station
+    again when she is his home; "stands down": stood down with `why`, the handover's rule,
+    for a captive); his own station on his home hull stands bound to him meanwhile. Said
+    in her log (notable, `person.aboard`, with the hull he came from) and in the log of the
+    hull he left (routine, `person.moved`) when `said`. Returns the arrival's (kind, text,
+    data)."""
+    from freesail.core.events import Severity
+
+    hid = str(getattr(hull, "id", "") or "")
+    was = hull_of(world, getattr(person, "hull", None))
+    was_where = str(getattr(person, "where", "") or "")
+    if was is hull:
+        return "person.aboard", f"{person.name} is aboard the {hull_name(hull)} already.", {}
+    whence = ""
+    if was is not None:
+        whence = f" from the {hull_name(was)}"
+    elif was_where in ("boat", "cutter"):
+        home = hull_of(world, getattr(person, "home", ""))
+        whence = f" from the {hull_name(home)}'s boat" if home is not None else " from the boat"
+    elif was_where == "shore":
+        whence = " from the shore"
+    person.hull = hid
+    person.where = place
+    person.port = None
+    person.ashore_at = ""
+    held = harness_of(world, person)
+    if held is not None:
+        from_hull, h = held
+        if seat == "stands down":
+            h.stand_down(why or f"put aboard the {hull_name(hull)}", by=by or "the handover")
+        else:
+            home_id = str(getattr(person, "home", "") or "")
+            if hid == home_id and h.visiting:
+                # home again: his own station his, the voice he held unbound where he was
+                own_id, own_station = h._home
+                h.move_to(hull, own_station, None)
+                if from_hull is not None and str(getattr(from_hull, "id", "")) != own_id:
+                    _unbind_visit(
+                        from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
+                    )
+            elif hid != home_id:
+                # a visitor: his voice in her, his own station kept for his return
+                home = h._home or (str(getattr(from_hull, "id", "") or ""), h.station)
+                station = visiting_station(hull, person, h.policy)
+                h.move_to(hull, station, home)
+                if from_hull is not None and str(getattr(from_hull, "id", "")) != home[0]:
+                    _unbind_visit(
+                        from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
+                    )
+    data = {
+        "person": person.name,
+        "ship": hid,
+        "from": str(getattr(was, "id", "") or ""),
+        "by": by,
+    }
+    text = f"{person.name} came aboard{whence}."
+    if said:
+        left = was
+        if left is None and was_where in ("boat", "cutter"):
+            left = hull_of(world, getattr(person, "home", ""))  # from his ship's boat
+        if left is not None and left is not hull:
+            left.record(
+                Severity.ROUTINE,
+                PERSON_MOVED,
+                f"{person.name} went aboard the {hull_name(hull)}.",
+                data={"person": person.to_dict(), "ship": hid},
+            )
+        hull.record(Severity.NOTABLE, "person.aboard", text, data=data)
+    return "person.aboard", text, data
+
+
+def where_am_i(world: Any, person: Any) -> str:
+    """Where a person is, for the reading `where am I` (package 82): aboard his own hull
+    and his place; aboard another as a visitor, hers named; in a boat; ashore at his port's
+    place."""
+    if person is None:
+        return "nobody is named at your station, and nobody is anywhere"
+    if not getattr(person, "aboard", True):
+        if person.where == "shore":
+            return ashore_words(world, person)
+        home = hull_of(world, getattr(person, "home", ""))
+        whose = f"the {hull_name(home)}'s " if home is not None else "the "
+        return f"in {whose}boat" if person.where == "boat" else place_words(person.where)
+    here = hull_of(world, getattr(person, "hull", None))
+    people = getattr(here, "people", None) if here is not None else getattr(world, "people", None)
+    try:
+        place = people.effective_place(person) if people is not None else person.where
+    except Exception:  # noqa: BLE001  (a world whose people cannot be read)
+        place = getattr(person, "where", "")
+    words = place_words(place) if place else "aboard"
+    home_id = str(getattr(person, "home", "") or "")
+    if here is not None and home_id and str(here.id) != home_id:
+        home = hull_of(world, home_id)
+        of = f", of the {hull_name(home)}" if home is not None else ""
+        return f"aboard the {hull_name(here)}, {words}, a visitor{of}"
+    if here is not None:
+        return f"aboard the {hull_name(here)}, {words}"
+    return words

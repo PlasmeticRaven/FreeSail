@@ -668,6 +668,14 @@ class Harness:
     driven = False
     _acts_last: dict[str, Any] | None = None
     _acts_complete = False
+    # Package 82 (`docs/design/Design-BoatAndPersonAboard.md` §2): the harness is the
+    # person's and goes with him into the hull he goes into (`move_to`). `seated_on` is the
+    # id of the hull it was first seated on, by which a save groups it and a replay by the
+    # transcript seats it there before the replayed moves carry it on; `_home` is his own
+    # station and its hull while he is a visitor in another (None at home). Class defaults,
+    # so that a checkpoint from before loads with them.
+    seated_on: str | None = None
+    _home: tuple[str, Any] | None = None
 
     def __init__(
         self,
@@ -777,7 +785,43 @@ class Harness:
         self.budget_tokens: int | None = None
         self._handover_asked_at = 0
         self._handover_pending: str | None = None
+        self.seated_on = hull_id_of(world)
         world.agents[station.name] = self
+
+    # -- the harness follows its person between hulls (package 82) -------------------------
+
+    @property
+    def visiting(self) -> bool:
+        """Whether its person is in a hull not his station's own (a visitor's voice there,
+        his own station standing bound to him at home)."""
+        return self._home is not None
+
+    def move_to(self, hull: Any, station: Station, home: tuple[str, Any] | None) -> None:
+        """The harness carried into `hull` with its person (package 82, the design's §2):
+        taken out of the hull's `agents` it was in and entered in `hull`'s under
+        `station`'s name, `hull` its world from here (its samples hers, its acts carrying
+        her id), its journal the person's as it was (`journal_of` finds it by him), and its
+        reading of the log begun at her log's end, so that the first sample there carries
+        nothing of her past. `home` is (the hull's id, the station) he came from while he
+        visits, None when he is home again; the model's conversation goes on unbroken."""
+        old = self.world
+        agents = getattr(old, "agents", None)
+        if isinstance(agents, dict) and agents.get(self.station.name) is self:
+            del agents[self.station.name]
+        self.world = hull
+        self.station = station
+        self.agent.station = station
+        self._home = home
+        hull.agents[station.name] = self
+        self.journal = journal_of(hull, station.name)
+        log = hull.log
+        self._seen_log = self._sample_seen = len(log)
+        self._latest = self._horizon = (len(log), {})
+        self._wait_from = (len(log), hull.clock.stamp())
+        self._rollup = RollupView()
+        self._told = None  # the first sample there carries every reading of hers
+        self._place_since = None
+        self._own_lines = ()
 
     # -- properties --------------------------------------------------------------------
 
@@ -4467,8 +4511,14 @@ class Harness:
 
     def save(self) -> dict[str, Any]:
         a = self.agent
+        # the station of his seating (package 82): while his person is a visitor in another
+        # hull the harness holds the visitor's voice there, and the save carries his own
+        # station at home, so that a replay seats him there and the replayed moves carry him
+        # on (the lead's finding on step 1: a save taken mid-visit seated a passenger's voice
+        # on his own ship and his orders had no deck to be given from)
+        station = self._home[1] if self._home is not None else self.station
         return {
-            "station": self.station.save(),
+            "station": station.save(),
             "session_kind": a.session_kind,
             "door_note": self.door_note,
             "stationed_tick": a.stationed_tick,
@@ -4498,6 +4548,9 @@ class Harness:
             # package 42: whether every act of the station is in the save's `station_acts`,
             # from before it started, so that another build replays it by them
             "acts": bool(self._acts_complete),
+            # package 82: the hull it was first seated on, by which the save groups it and
+            # a replay seats it there before the replayed moves carry it on
+            "seated_on": self.seated_on,
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -4621,6 +4674,7 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
         h.stand_by_ends_turn = bool(record.get("stand_by_ends_turn", model is not None))
         h.budget_tokens = record.get("budget_tokens") or None
         h.reserve_tokens = record.get("reserve_tokens") or None
+        h.seated_on = str(record.get("seated_on") or hull_id_of(world))
         if h.due_to_start():
             h.start()
         out.append(h)
@@ -4965,6 +5019,26 @@ def deliver_answer(
         # the player's seat keeps the answer with what he was told
         held.agent.told.append(said)
         held.note(said, kind="agent.told")
+
+
+def hull_id_of(world: Any) -> str:
+    """The id of the hull a harness's world is (the World's own, or a hull's façade); ""
+    for a stub with none (package 82)."""
+    return str(getattr(getattr(world, "own", None), "id", "") or "")
+
+
+def harnesses_of(world: Any) -> list[tuple[Any, Any]]:
+    """Every harness of the game as (its hull, the harness), the hulls in their order
+    (package 82: a harness lives in the hull its person is in, which may not be the hull it
+    was seated on)."""
+    out: list[tuple[Any, Any]] = []
+    hulls = list((getattr(world, "hulls", None) or {}).values())
+    if not hulls:
+        return [(world, h) for h in (getattr(world, "agents", None) or {}).values()]
+    for hull in hulls:
+        for h in (hull.__dict__.get("agents") or {}).values():
+            out.append((hull, h))
+    return out
 
 
 def all_agents(world: Any) -> list[tuple[str, Any, Any]]:
