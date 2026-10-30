@@ -11437,6 +11437,54 @@ def test_truth_7_282_a_mile_west_of_1_w_the_tide_is_as_before_and_a_mile_east_th
     assert tide.constants_at(east) != eleven.constants_at(east)
 
 
+def test_truth_7_283_the_recorded_passages_water_reads_the_tide_it_read():
+    """The brief's item 5, as a behaviour: every recorded passage (the frigate's and the
+    schooner's of gate 5b, Ushant to Falmouth; the merchant passage and the naval cruise
+    of gate 5c, Falmouth for Brest and Plymouth to the station off Ushant; the schooner
+    on an intent and the fake captain's on the merchant's water) sails the Channel west
+    and its approaches, where no block's gauge serves and the tide is the eleven's to the
+    bit, hour by hour, over the whole of `channel-west` and of `channel-mid` west of 1 W,
+    and the master's rises at every place of his tables there are as they were. The one
+    water of theirs a block reaches is the naval cruise's Diamond's patrol, eight miles
+    about 48 N 4 55 W, whose southern half lies in Biscay north: her stream there is the
+    block's now, and the cruise's digest stands all the same (package 89 ran the eleven
+    passage tests by name, `gate_5b or gate_5c` and the captain's trials before and after
+    the rule, every digest held: docs/dev/TuningNotes.md, package 89)."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    eleven = _the_eleven_alone(yaml.safe_load(T.STREAMS_PATH.read_text(encoding="utf-8")))
+    root = Path(__file__).resolve().parents[1]
+    for name in (
+        "gate-5b-passage",
+        "gate-5b-passage-schooner",
+        "gate-5b-passage-thick",
+        "merchant-passage",
+        "merchant-intent",
+        "naval-cruise",
+    ):
+        sf = yaml.safe_load((root / "data" / "scenarios" / f"{name}.yaml").read_text("utf-8"))
+        assert sf.get("chart") in (None, "channel", "channel-west", "atlantic-east"), name
+    for lat10 in range(480, 511, 3):
+        for lon10 in range(-70, -10, 3):
+            pos = Position(lat10 / 10.0 + 0.005, lon10 / 10.0 + 0.005)
+            if lon10 > -30 and lat10 < 485:
+                continue  # south of channel-mid, Biscay north's water
+            assert not tide.blocks_at(pos), pos
+            for h in (0, 5, 13, 19):
+                when = datetime(1805, 6, 12) + timedelta(hours=h)
+                assert tide.at(pos, when) == eleven.at(pos, when), (pos, h)
+    for table in ("norie", "moore"):
+        for port in T.Epitome.load(table).ports:
+            p = port.position
+            if p.lat_deg >= 48.0 and p.lon_deg < -1.0 and not tide.blocks_at(p):
+                assert tide.constants_at(p) == eleven.constants_at(p), port.name
+    diamond = Position(48.0 - 4.0 / 60.0, -4.9167)
+    assert tide.blocks_at(diamond) == {"biscay-north"}
+    assert tide.constants_at(diamond) != eleven.constants_at(diamond)
+
+
 def test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge():
     """The brief's item 5: the pace of the tide's blend is unchanged within the measure.
     Outside every block the gauges blended are the eleven, the same list (no gauge more to
