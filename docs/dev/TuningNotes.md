@@ -14834,7 +14834,7 @@ primer's, the anchor's and the checkpoints' with the truths 7-240 to 7-245, 7b-1
 
 Built as a sibling session on `claude/pkg-88` from the lead's head `c168c51`, each item in
 the owner's four parts. The physics is read and not changed; no ship file, no consent file.
-This section is written as the items go; **item 1 stands at the lead's ruling** (below).
+This section is written as the items go; items 1 and 2 under the lead's ruling of 2026-10-30 (below).
 
 ### Item 1: the commodore's recovery when aback with no way
 
@@ -14928,10 +14928,101 @@ move with the mend, each where she truly lay aback with sternway:**
 and 1,597 lines but the digest `7fad0ce7e46ba366`, not the pin's `ed48ca3d61e52f20`; not
 this package's, and not re-pinned here.
 
-**The question to the lead** (sent with the branch at `item 1 stands`): the recovery is
-right in each passage it moves, and it carries two trials off their pinned days, the
-lee-shore trial into a grounding of item 2's kind and the trade trial out of port at the
-twentieth hour. Proposed: item 1 held open; item 2 built next on top of it (the offing's
-tack and the land at night), and then the two trials measured again; the trade trial's
-pins moved old beside new as a finding if it keeps its intent but the port (or its hours
-or the ruling as the lead gives it).
+**The question to the lead, and the ruling** (2026-10-30, at `fbff23c`): item 1 held open and
+item 2 built on top of it, the two trials measured again after it; the trade trial's pins
+moved old beside new if she keeps her intent; the lee-shore trial's "never aground" never
+moves; the stale digest not re-pinned (a digest is the build machine's figure; the lead
+measures the trunk's in the cloud). **The French brig's seven hours, answered (the lead's
+point 2): the captain's rules, mended here.** She enters `engaging` at her `engage_nm` (a
+mile); the schooner being the weaker mark, `_engaging` renews a chase course every three
+minutes and never closes her (the schooner is the faster); the action's only end was
+`break_off_nm` (three miles for ten minutes together), and her `chase_stale_hours` (three
+hours without a mile gained) was read only in `chasing`. Now the chase's log is kept in
+`engaging` while the mark is beyond `engage_nm` (never within it: a broadside at two
+cables for three hours is no stale chase), and `engaging` has the `chase stale` row in the
+roles that chase (the commodore, the cruiser, the King's ship, the privateer);
+`captains.ENGAGING_CHASE_STALE` the switch. In the trade trial she gives the chase up at
+34200 unfired (evading to 57840 with the switch off).
+
+### Item 2: the offing's tack among islands with no room to wear
+
+*The symptom*, read on `c168c51` (the trial an expected failure since 57): the frigate
+beating for her station off Ushant in the westerly gale, 1014 lines, aground at 42394
+stern first among the islands of the Molène passage. 'The offing' puts her about at 37320
+with Molène three miles under her lee and `put_about_choice` wears her (no head sail set,
+the topsails close-reefed, 35 knots): 0.41 nm lost to leeward in thirteen minutes, not the
+fatal decision. The fatal one is the leg's course law at 38760 ("NNW lies too near the wind
+to be laid; she has not way enough to stay, and is worn round"), with the land two miles
+on her lee quarter and 40 to 67 degrees of leeway; the wear begins at 39855, fails at 40756
+("she would not come round"), and she sets down on the islands. The old tack-regardless
+rule read the lookout's land within 67.5 degrees of dead to leeward only: at 41700, the land
+five cables on her lee quarter (SSE, 68.5 degrees off), it still chose to wear. Under item 1
+the lee-shore trial took a second road to the same fault: beating at night after the gale
+she stood on at five knots and a half onto the Four (61021), "the land close aboard on the
+starboard bow, bearing SW, distant five cables" by the lookout, her account four and a half
+miles out, 'the offing' a `when` rule true since the gale and the beating book with no
+'land ahead'.
+
+*The rule as it stood:* the offing's and the leg's choice of tack or wear by the sail and
+the wind, the room under her lee read only as the lookout's land in a narrow sector; nothing
+of the rules captain's reading the land on her bow or the chart ahead at night.
+
+*The rule as it reads now:*
+
+- **The room a wear takes** (`navigation.no_room_to_wear`, `WEAR_ROOM` the switch): the land
+  or a charted danger within `tack_regardless_nm` (the doctrine's two miles, now read from
+  the captain's file as the comment always said; its source "the planner's danger berth
+  doubled: wearing a ship's length and more to leeward with the land two miles off is the
+  ground she cannot spare") anywhere in the lee half, by the lookout's nearest land, the
+  coast by the chart at the account and the charted dangers by account. Lever 1808 p. 79
+  (OCR line 9707): wearing, "whilst she is receding from the wind, she is forced rapidly
+  through the water, and making all her way to leeward". With no room, `put her about`
+  tacks ("where wearing would lose the ground"), and a course shaped (never the helm's own
+  order) that would be worn round for want of way to stay keeps her full and by on her tack
+  to claw off; a course held for way is judged again by the same law when she has it.
+- **The land or a danger ahead** (`Captain._danger_ahead_by_chart`, `DANGER_AHEAD` the
+  switch, every role's `danger_ahead_nm`, a mile and a half, judgement): on a sailing state
+  out of pilot water with no manoeuvre in hand and way on her, the lookout's nearest land on
+  her bow (within four points of her head) within the distance by any light; or with no land
+  in sight the land on her course or a charted danger within two cables of it with too
+  little water for her, by the chart at the account (`chart.dangers_ahead`, 37h's pilot's
+  warning, read by account), and nearer than the leg's own mark: he puts her about, tacked
+  where a wear would cost the ground. Falconer 1780, CLAWING (OCR line 5576): "the act of
+  beating, or turning, to windward from a lee-shore, so as to acquire a sufficient distance
+  from it, to escape the dangers of shipwreck". Heaving to till light is not built: with the
+  room law and the land ahead answered no trial wanted it; booked as found.
+
+*What proves it.* **The station gale's expected failure lifted**: never aground in the
+twenty hours; hove to 15060, on passage 28560 and keeping station 28680 (30780, beating
+31560 before), hove to 41880, beating from 50580; 1722 lines (1014 on `c168c51`). Tacked at
+6721 and 7321 in the forenoon with Ushant two miles under her lee where she was worn, the
+day falls otherwise from there; filled away for the lee shore in 42 knots at 28560 she lies
+aback by turns for two hours (70 lines of it in the day, 23 before), 58b's gale book's
+ground (the lee-shore trial's own filled-away hour after the gale is the same), **found,
+for the lead**: the docstring's "aback eleven minutes in the twenty hours" no longer holds
+and says so. **The lee-shore trial never aground** (states moved old beside new, 1561
+lines). **Truth 7-341**, among the Molène islands: two miles west of Molène in a westerly of
+34 knots the land a mile on her starboard bow, `put her about` tacks her and the other tack's
+course she has not the way to stay for keeps her full and by; the switch off, worn both.
+
+**By bisection on the final code** (each switch off alone; all four off give every old
+figure: the lee shore 1597 lines, the gale aground 42394, the trade trial 1247 and
+`02313d83240a11d5`, in port 51900):
+
+| switch off | lee shore | station gale | trade |
+|---|---|---|---|
+| none (the final code) | never aground, 1561 | never aground, 1722 | on passage at hour 20, 1594 |
+| `ABACK_RECOVER` | never aground, 1654 | never aground, 1687 | in port 55680, 1444 |
+| `WEAR_ROOM` | never aground, 1660 | **aground 50989** | as final |
+| `DANGER_AHEAD` | **aground on the Four 61021** | 1719 | as final |
+| `ENGAGING_CHASE_STALE` | as final | as final | evading to 57840, 1330 |
+
+So the room law saves the gale, the land ahead saves the lee shore, the recovery and the
+haul-off (no switch: the mend of a fault) move the trade trial's day and the stale chase
+gives her evasion its end. The station-stranger trial is unmoved by all of it (788 lines,
+its pinned digest).
+
+**The trade trial, re-pinned by the ruling**: never aground, never taken, unfired; at the
+twentieth hour on passage for Falmouth, eleven miles off by account (in port at 51900
+before): what the recovery (no longer fifty-four minutes aback at the start) and the longer
+evasion (met at 08:03, not 05:01) cost her. Her other figures old beside new in the test.
