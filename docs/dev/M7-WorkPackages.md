@@ -66,7 +66,7 @@ on these packages; that is the owner's choice.
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull; when the owner likes |
 | 91 | Opus | **The viewer's light and air** (the owner's references of 2026-10-29, decision 57): the ship's own lights warm and distinct at night (the stern lantern, the top lights and the binnacle 71 already hoists, each a glow on the faces near it); the scene's light by the hour and the sky (the sun's altitude and azimuth from `core/moon.py`, the weather's cover and visibility: a gradient sky and sea, the faces tinted by their side to the light, dusk's warmth, night's dark with the lights alone, haze by the visibility); a lively telltale at the masthead and a waving ensign, canned but driven by the apparent wind the physics already gives (direction, a flutter whose rate and amplitude follow the speed), animated between snapshots; all in the present SVG viewer, stylesheet-driven, drawing only, nothing of the world read that the readings do not give | after 81 and 75's hull; when the owner likes; the two reference pictures stay with the owner (another game's work), described in the decision |
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
-| 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93` |
+| 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93`; **merged whole 2026-10-30** at `d9465d9` from `7e6b9f1` (the record below): ten regions rebuilt on the world's own tide, the raise one source of truth with the tide, Agincourt Sound keeping the eleven's raise until a sheet is read, truths 7-305 to 7-309 |
 | 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -1193,6 +1193,70 @@ date); no recorded passage's digest moved. **Noted for the lead and booked:** th
 `state` at seven lines and the hands' rationing lines at 1x (a words question for the gate);
 the missing `docs/README.md` and the one-world reader's page (the lead's, with the gate's
 half); 87's brief waits on this merge.
+
+### Package 93 as merged (2026-10-30)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-93` at `7e6b9f1` (the rule,
+then one commit a region rebuilt, the Atlantic four twice, the trunk brought in at each
+boundary with 94's merge among them; merged here over 85's close with the tuning notes the
+one conflict, both kept; 1,011 tile and coast files and nine others, the manifest's tile
+records among them); ruff clean; the builder's proof the one 89's and 94's was (the eleven
+recorded passages by node id, the gate selection and the captain's trials) on a clean
+worktree of the head first and on the final tree last, identical (every digest held, the
+lee-shore trial's container digest the one failure on both); the six chart and tide files
+fast and slow after every region, the blocks' truths 7-260 to 7-314 with `--slow` after
+every region, its fast tier whole with the pictures' flake the one failure, passing alone;
+the lead's run of the chart's, tide's, islands', ports', scenarios' and geo's tests with
+eleven truths on the head (176 and 11 passed, none failed; and of the in-world, tide, chart and grammar tests with eight truths on the merged tree (203 and 8 passed)); **the whole suite on the merged tree in the cloud (run
+20, the figures written here when it ends).**
+
+**The rule, as built:** GEBCO's fill under every block is raised to the chart's datum by the
+world's mean level at each cell, `mean_level_grid` being `Tide.constants_at` itself (one
+source of truth, the lead's ruling after 94's merge, way (b) of the builder's two: 89's
+membership by the regions' bounds, 94's taper and rule of the seams come through it and
+never by a second reading of the manifest; the eleven alone outside every block, the raise
+every tile there was built by); `fill_mean_level_m` taken out of Biscay south's and
+Portugal's recipes (39c's 2.5 and 39d's 2.0, made while the gauges were held), Biscay north
+taking `fill_to_chart_datum` for the first time; a control before each rebuild (the head's
+own tool on today's fetch) giving the committed arrays, so that what moved is the rule's
+alone. **The ten regions** (channel-east, biscay-north, biscay-south, portugal, strait east
+of 5 W, mediterranean-west, balearics, gulf-of-lion, ligurian-sea, tyrrhenian), each tiles
+count as before, the bytes moved by under a quarter of a megabyte each (179.92 MB of level 2
+and 26.61 of level 3 in the ten against 179.37 and 26.65), the figures old beside new region
+by region in the notes; madeira and azores not rebuilt (the rule moves no cell of their
+raise); the Mediterranean's harbours EMODnet lacks water again where Saint-Malo's 6.83 m
+had made them land (Port Mahon's inner harbour, Palma, Ivica, Toulon's inner road,
+Marseille, Leghorn's Darsena, the Camargue, Thau and the Albufera); the Channel east's
+dyked levels (Romney Marsh, the Pevensey Levels) under high water springs as behind their
+walls in truth. **The block scenarios** sailed to the same log byte for byte on the head and
+the rebuilt tiles but where the notes say (biscay-south three moments at Corunna, a fathom
+of cable and a bearing; mahon one line, the land about Georgetown a minute later;
+agincourt-sound eight lines, its grounding at the same tick as on the head, 79d's scenario
+finding); no recorded passage moved, none sailing a rebuilt region. **Two rulings on the
+way:** truth 7-305 by option (a), the brief's wording the lead's and amended at the
+measurement (the Somme's banks and Dungeness's shingle above the world's high water
+springs; the raise at Romney Marsh the block's level less the eleven's; the marsh and the
+Levels below, as behind the Dymchurch Wall in truth, a finding with the figures for a land
+patch when a sheet is read); and **truth 7-297 on the rebuilt Ligurian sea** (Agincourt
+Sound open to the north and east on the block's own water, the islands' shores that closed
+it having been the false raise's and not the grid's: EMODnet silent over them, GEBCO's
+fifteen seconds smearing them three to six metres under mean sea level): not re-measured
+on tiles that open a harbour the real islands close, no sheet read and none drawn, (c)
+taken bounded and said: the harbour patch `agincourt-sound` keeps the eleven's raise
+within its box (`fill_raise: eleven`, the recipe's comment, ChartBlocks.md's rule, the port
+file's head), every cell of both levels within it equal to 79d's (17,280 and 622,080
+cells), the truth and the scenario unmoved, a land patch from a period sheet with its
+datum (Ryves's survey of 1802, Smyth's, or the Derrotero's plan) booked to the patch
+package with Mahon's plan and Bellin's. **Truths 7-305 to 7-309** written and passing.
+**Findings, booked by the lead:** `channel-mid`'s seam column and `channel-west`'s edges lie
+under water whose level now differs from their raise by up to 0.41 and 1.29 m over a few
+hundred cells (not rebuilt by the brief; a rebuild of either with the key and the rule
+would carry it, with the recorded passages re-measured, a decision for the owner); the
+open sea east of 4.5 E south of 40.56 N lies in no block and reads Saint-Malo's water by
+the eleven's nearest alone, the Balearics' tiles reaching 4.75 E (a bound to move, with
+89's like finding at 40.5 N); a far gauge's raise hiding the coarse shore wherever EMODnet
+stops short (the patch package's); one merge commit of the builder's (`dae50ca`) without
+the attribution lines, pushed and not rewritten.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
