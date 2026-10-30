@@ -206,6 +206,7 @@ main {
 .ship-view .spar.yard, .ship-view .spar.lug_yard, .ship-view .spar.lateen_yard { stroke-width: 1.9px; }
 .ship-view .spar.gaff, .ship-view .spar.boom, .ship-view .spar.sprit { stroke-width: 1.7px; }
 .ship-view .spar.studdingsail_boom { stroke-width: 1px; }
+.ship-view .spar.driver_yard { stroke-width: 1.2px; } /* package 75 (B5.5): Steel's driver yard, a light spar drawn with the driver */
 .ship-view .spar.wrecked { stroke: var(--spar-wrecked); stroke-dasharray: 5 4; }
 .ship-view .spar.sent_down { stroke-dasharray: 2 4; opacity: 0.5; }
 .ship-view .spar.sent_down_flying { opacity: 0.7; } /* package 57: a flying sail's yard on deck */

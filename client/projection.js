@@ -459,8 +459,10 @@
      *  to the sheet's side, as a gaff is (`sheetDirection`); `inPlane`, not swung, as the file
      *  has it (the fixed frame's rig). The yard's truss is on the mast at the throat's height.
      *  `mastAt(id)` places a mast. Returns {pts, truss, aft, normal, mast}, aft the swung
-     *  direction of the ship's stern, or null for any other sail. */
-    function mastCut(spec, mastAt, inPlane) {
+     *  direction of the ship's stern, or null for any other sail. `swungBy`, another sail
+     *  whose sheet swings these corners (B5.5; Ext §17.6: the mizen yard laid on the course's
+     *  corners and swung by the driver's sheet while the driver is bent). */
+    function mastCut(spec, mastAt, inPlane, swungBy) {
       if (!spec || !spec.cut_at_mast || !spec.corners_m || spec.corners_m.length !== 4) return null;
       var M = mastAt((spec.roles || {}).mast);
       if (!M || !M.xAt) return null;
@@ -468,7 +470,7 @@
       var truss = v(M.xAt(tz), 0, tz);
       var axis = norm(v(M.xAt(tz + 1) - M.xAt(tz), 0, 1)); // up the mast's raked line
       var lee = tack === "larboard" ? 1 : -1; // as `sheetDirection`: to starboard on the larboard tack
-      var turn = inPlane ? 0 : -lee * Math.abs(sailDyn(spec).sheet_angle || 0);
+      var turn = inPlane ? 0 : -lee * Math.abs(sailDyn(swungBy || spec).sheet_angle || 0);
       var c = Math.cos(turn), s = Math.sin(turn);
       function swing(p) {
         // about the axis through the truss, by `turn` (Rodrigues)
@@ -479,6 +481,20 @@
       });
       return { pts: pts, truss: truss, aft: swing(v(-1, 0, 0)), normal: swing(v(0, 1, 0)), mast: M };
     }
+    /** The sails cut at the mast whose yard this is, bent or not, in the file's order (package
+     *  75, B5.5; Ext §17.6): the mizen course, and the driver where she carries one. */
+    function cutAtMastOn(yardId) {
+      return (sailsBySpar[yardId] || []).filter(function (s) {
+        return (s.roles || {}).yard === yardId && !!s.cut_at_mast;
+      });
+    }
+    /** Whether a sail cut at the mast is spread on this boom, bent or not (package 75, B5.5;
+     *  Ext §17.6: the driver's boom). */
+    function boomOfCut(sparId) {
+      return (sailsBySpar[sparId] || []).some(function (s) {
+        return !!s.cut_at_mast && (s.roles || {}).boom === sparId;
+      });
+    }
     /** Whether a studding sail boom is rigged out: the snapshot's state (spec 3b §7), else
      *  the ship file's (booms start rigged in), else out while a sail on it is not stowed. */
     function riggedOut(spec) {
@@ -488,11 +504,15 @@
       var sail = (sailsBySpar[spec.id] || [])[0];
       return sail ? !FURLED_ISH[sailDyn(sail).state] : true;
     }
-    /** The sheet angle of the sail using this gaff or boom, if any. */
+    /** The sheet angle of the sail using this gaff or boom, if any: a gaff or sprit sail's, or
+     *  a lateen cut at the mast that is not unbent (package 75, B5.5; Ext §17.6: the driver on
+     *  its boom). With the driver in the sail room its boom lies amidships, as a boom with no
+     *  sail does. */
     function sheetAngleOf(sparId) {
       var list = sailsBySpar[sparId] || [];
       for (var i = 0; i < list.length; i++) {
         if (list[i].class === "gaff" || list[i].class === "sprit") return sailDyn(list[i]).sheet_angle;
+        if (list[i].cut_at_mast && sailDyn(list[i]).state !== "unbent") return sailDyn(list[i]).sheet_angle;
       }
       return 0;
     }
@@ -658,8 +678,18 @@
           // lowered to set, take in or furl its sail. The frame takes it in the file's plane
           // and reaches its swing about the truss (`fullRigFrame`: `pivot` and `reach`) at the
           // heights of the yard's ends and the sail's foot (`heights`), so that the swung peak
-          // and clew stay inside it when she heels
-          var mc = mastCut(sailOnYard(id), resolve, !where);
+          // and clew stay inside it when she heels.
+          // B5.5 (Ext §17.6): the yard's line is the course's, the sail cut at the mast with no
+          // boom, bent or not, swung by the sheet of the sail bent on the yard; so the yard does
+          // not move when the driver is shifted for the course. The frame reaches each sail cut
+          // at the mast on it, bent or not: the driver's peak on its driver yard, and its foot
+          // at the boom's height
+          var bentOn = sailOnYard(id);
+          var cuts = cutAtMastOn(id);
+          var lineBy = cuts.filter(function (s) {
+            return !(s.roles || {}).boom;
+          })[0] || bentOn;
+          var mc = mastCut(lineBy, resolve, !where, bentOn) || mastCut(bentOn, resolve, !where);
           var truss = mc.truss, peakY = mc.pts[2];
           var headL = len(sub(peakY, truss));
           var fore = Math.max((spec.length_m || headL) - headL, 0);
@@ -677,6 +707,12 @@
           r.pivot = truss;
           r.reach = Math.max(headL, fore);
           r.heights = [r.a[2], r.b[2], mc.pts[0][2], mc.pts[3][2]]; // heel, peak, tack, clew
+          cuts.forEach(function (s) {
+            var other = s === lineBy ? null : mastCut(s, resolve, true);
+            if (!other) return;
+            r.reach = Math.max(r.reach, len(sub(other.pts[2], truss)));
+            r.heights.push(other.pts[2][2], other.pts[0][2], other.pts[3][2]); // peak, tack, clew
+          });
         } else if (
           where &&
           (spec.class === "lug_yard" || spec.class === "lateen_yard") &&
@@ -784,6 +820,10 @@
           r.a = v(r.x, 0, deck + H);
           r.b = add(r.a, mul(bDir, L));
           r.dir = bDir;
+          // package 75 (B5.5; Ext §17.6): a driver's boom reaches far beyond the taffrail, and
+          // swung to the quarter past the frame's four directions: its swing is reached every
+          // way, so that the view does not rescale as it is sheeted or as the driver is shifted
+          if (boomOfCut(id)) r.everyWay = true;
         } else if (spec.class === "sprit") {
           r.x = parent ? parent.x : spec.x_m || 0;
           var sDir = sheetDirection(sheetAngleOf(id), tack);
@@ -1220,7 +1260,13 @@
         // about the mast (`mastCut`), its luff on the mast and its head along its yard. The
         // reef raises the foot as a gaff sail's does: the tack up the mast and the clew with
         // it. Brailed up in the gear, it is gathered to the mast and up under the yard;
-        // furled, a bundle along the yard's after part, aloft (Falconer 1780, YARD)
+        // furled, a bundle along the yard's after part, aloft (Falconer 1780, YARD).
+        // B5.5 (Ext §17.6): the driver, cut at the mast and spread on its boom, in the same
+        // way: its throat and peak on its corners swung about the mast, the head straight
+        // along the yard's line and on beyond the yard's peak; its tack at the boom's jaws and
+        // its clew along the boom at the file's foot, the boom swung by its sheet as a gaff
+        // sail's is; no reef (Steel names none in the driver). Brailed in the gear as the
+        // course is; furled, a bundle along its head, the yard's after part and the driver yard
         var mcs = mastCut(spec, function (mid) {
           return spars[mid];
         });
@@ -1229,10 +1275,25 @@
         var rfc = reefFraction(spec, dyn);
         var tackC = lerp(mp[0], mp[1], 1 - rfc);
         var clewC = add(mp[3], v(0, 0, tackC[2] - mp[0][2]));
+        var BmC = roles.boom ? spars[roles.boom] : null;
+        if (BmC && BmC.dir) {
+          tackC = BmC.a;
+          clewC = add(BmC.a, mul(BmC.dir, Math.min(len(sub(mp[3], mp[0])), len(sub(BmC.b, BmC.a)))));
+        }
         var luffC = len(sub(mp[1], tackC));
         var cfig = sailFigure(spec, dyn, [mp[1], mp[2], clewC, tackC], mcs.normal, spars[roles.yard] || mcs.mast, luffC);
         cfig.mastId = mcs.mast.id;
         cfig.clewAt = clewC; // where its sheet is drawn from
+        // Steel's driver yard, which "expands the head of the driver without the peek of the
+        // gaff" (Steel 1794 vol. I, OCR l. 20863), is not filed as a spar: it goes aloft with
+        // the sail and comes down with it. Beyond the mizen yard's peak the head is drawn on
+        // it, a spar line drawn with the sail; its inner part lies along the mizen yard and is
+        // drawn as it
+        var Yc = spars[roles.yard];
+        var driverYard = null;
+        if (BmC && Yc && Yc.cutAtMast && len(sub(mp[2], Yc.truss)) > len(sub(Yc.b, Yc.truss))) {
+          driverYard = { kind: "spar", id: spec.id, cls: "driver_yard", of: spec.id, state: "sound", pts: [Yc.b, mp[2]], busy: !!busy[spec.id], mastId: mcs.mast.id, centre: lerp(Yc.b, mp[2], 0.5) };
+        }
         if (dyn.state === "furled") {
           cfig.path = bundle(mp[1], mp[2], 0.35);
         } else if (dyn.state === "in_the_gear") {
@@ -1244,6 +1305,7 @@
           cfig.clewAt = add(lerp(underC, upC, 0.5), mul(mcs.aft, 0.4));
         }
         figures.push(cfig);
+        if (driverYard) figures.push(driverYard);
       } else if (cls === "square" || cls === "lug" || cls === "lateen") {
         var Y = spars[roles.yard];
         if (!Y || !Y.arm) return;
@@ -1543,8 +1605,11 @@
         if (sheetSpec.cut_at_mast) {
           // package 75 (B5.2; Ext §6.1): the mizen course's one sheet, from its clew (brailed
           // in with the sail in the gear) to the taffrail on the centreline, where its horse is
-          // (Steel 1794 vol. I p. 208)
-          pts = [sf.clewAt || sf.corners[2], taffrail(hull)];
+          // (Steel 1794 vol. I p. 208). The driver's (B5.5; Ext §17.6) is rove through its
+          // boom's end, its tackle to the taffrail: drawn from the boom's end, set or in the
+          // gear, and not furled, as every sheet
+          var BmS = spars[(sheetSpec.roles || {}).boom];
+          pts = [BmS && BmS.dir ? BmS.b : sf.clewAt || sf.corners[2], taffrail(hull)];
         } else if ((sf.cls === "lug" || sf.cls === "lateen") && sheetSpec.corners_m) {
           // package 57: a lug's sheet from its clew aft to the lee side, and a whole lateen's
           // drawn as a lug (package 75); a lug topsail's is at its lower lug's peak, where its
@@ -1629,7 +1694,9 @@
    *  and no spar sent down changes it; and the hull. A yard under the bowsprit (package 75,
    *  B5.3) stands foremost of the rig, where braced its arm reaches past the four directions
    *  seen on the bow: its swing is reached every way, by sixteen points about its slings whose
-   *  figure's sides touch the circle its arms sweep. */
+   *  figure's sides touch the circle its arms sweep. So is a driver's boom about its jaws
+   *  (B5.5): it reaches far beyond the taffrail, and sheeted to the quarter its end reaches
+   *  past the four directions seen on the quarter. */
   function fullRigFrame(graph, spars, hull) {
     var pts = [];
     var dirs = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];
