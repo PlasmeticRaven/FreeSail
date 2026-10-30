@@ -114,6 +114,21 @@ def main(which: str = "all", ships: list[int] | None = None, profile: bool = Fal
                 else ("the default cap" if cap is None else f"a cap of {cap}")
             )
             measure([sq], f"the convoy of six and the privateer, {label}")
+    if which in ("all", "observer"):
+        # package 82 (item 1; truth 7-334): the world with no ship of the player's, the
+        # Channel observed from a view with the business on and three ships under their
+        # captains, against the frigate alone above; the observer's hull is a point ship's
+        sf4 = load_scenario("data/scenarios/the-channel-observed.yaml")
+        observed = make_scenario_world(sf4)
+        begin(observed, sf4)
+        measure([observed], "the Channel observed, no ship followed (three brains, the business)")
+        observed.follow("Medusa")
+        observed.run(120)  # the switch's minute: she is woken under the cap
+        measure([observed], "the Channel observed, following the Medusa (a frigate awake)")
+        hers = make_scenario_world(sf4, ship="data/ships/frigate-36.yaml")
+        begin(hers, sf4)
+        hers.submit("set plain sail")
+        measure([hers], "the same Channel with the frigate given at the view (the player's)")
     if which in ("all", "crewed"):
         ns = ships or [1, 3, 6, 12]
         crews = [crewed(sf, i, *s) for i, s in enumerate(SHIPS)]
@@ -136,7 +151,7 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    choices = ["all", "alone", "far", "crewed", "squadrons"]
+    choices = ["all", "alone", "far", "crewed", "squadrons", "observer"]
     ap.add_argument("which", nargs="?", default="all", choices=choices)
     ap.add_argument("--ships", type=int, nargs="+", help="how many crewed ships, each a measure")
     ap.add_argument("--profile", action="store_true", help="profile three crewed ships' ticks")

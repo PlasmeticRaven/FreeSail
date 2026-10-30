@@ -738,3 +738,39 @@ and a mid-visit save replays by both roads); and the player's `send the boat to 
 refused beyond a boat's pull left a far body promoted to a hull (the distance is read before
 any hull is made). The visitor's reach is said in the refusal's words and in the Harness
 document's §17, at the lead's ask.
+
+
+### Step 2: the world with no followed hull (§3; 2026-10-30)
+
+**Built as designed**: `ship: none` and `director: observe` in the loader with the
+refusals, the observer's hull as `hulls[PLAYER_ID]` with `followed` None, no vessel of hers
+on the sea, her orders refused in words, the ship's readings answering "no ship followed"
+through one set of the world's rows (`readings.WORLD_ROWS`) in place of a `none_words` on
+each, the world orders standing with `aboard:` unnamed and `captain:` refused, the centre
+the view moved by `look at` and `follow`, `follow nobody` giving it back, the drivers at
+the director's, the snapshot with no ship, the truth opening with the view; truths 7-320,
+7-321 and 7-334. The figures and the suites are in `docs/dev/TuningNotes.md`, "Package 82",
+step 2.
+
+**Taken another way, with the reason.** §3 has the view's lookout look from a height of
+eye of nought; a man standing in a boat sees from two metres (`OBSERVER_HEIGHT_OF_EYE_M`),
+and nought would see nothing but what stands above the horizon's edge, so two it is. §3
+has the console's prompt say "the director"; the console's prompt is `> ` for every seat
+and the seat's own line says where the player sits, so nothing of the prompt changed. §3
+has the readings answer through the registry's `none_words` on the observer; one set of the
+world's rows does it for every row at once, and a row of a ship's added later is the
+observer's "no ship followed" by default, which a per-row `none_words` would have missed.
+The observer's `captain` is a `Captain` of a point ship with no intent (he judges nothing)
+rather than None, since a dozen readers take `world.captain` as an object; the `captain:`
+order is refused at the channel instead.
+
+**The cost as measured on the step's tree** (truth 7-334; the tuning notes' table): the
+frigate alone 668 ticks a second, the Channel observed with the business on 444, the same
+Channel with the frigate at the view 271, following the Medusa 191. §3's figure for the
+observer's hull stands (a point ship's tick); the observed Channel's cost beyond §3's 6,448
+is the business's brains reading the chart's tiles, the same in a frigate's world, named
+for the lead in the tuning notes and no part of this package.
+
+**Found on the way** is in the tuning notes (the far tick's sky, the crews' tick of the
+own hull through her shadow, the reckoning lines, the truth's own block, the far goal's
+words, the hull's parent and `is_followed` with none followed, the business's tiles).

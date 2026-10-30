@@ -295,6 +295,7 @@ def _crew_scenario(parent: World, vessel: Any) -> Scenario:
         intent=str(vessel.intent_words or ""),
         books=[],
         fit=(getattr(vessel, "fit", "") or None),  # her own fit of guns, not the player's
+        observed=False,  # a crew's hull is never the observer's (package 82, item 1)
     )
     sc.latitude_deg = vessel.position.lat_deg
     # package 72: the sets are the parent's; her own World has none (its ships are not in it)
@@ -466,7 +467,8 @@ def far_tick(hull: Any) -> None:
     hull.wind_record.add(hull.wind.effective_speed, hull.wind.direction_from)
     clock = world.clock
     if clock.ship_time.second == 0:
-        hull.conditions = world.hulls[world.followed].conditions
+        # the followed hull's sky, or the observer's view's with none followed (82)
+        hull.conditions = (world.hulls.get(world.followed) or world.players).conditions
         if hull.navigation is not None:
             hull.navigation.reckoning.set_position(v.position, clock.tick, sigma_nm=0.25)
         if hull.lookout is not None:

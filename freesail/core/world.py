@@ -254,6 +254,13 @@ class Scenario:
     # scenario file turns the summed field's soft clamp on; off when not said, so that no
     # recorded passage moves until the owner has judged it. Left out of the dict when off.
     weather_bound: bool = False
+    # Package 82 (item 1; the design's §3): a world with no ship of the player's (`ship:
+    # none` or `director: observe` in the file). The World's own hull is then the
+    # observer's, a hull of no ship (a point ship at the scenario's position, moved by
+    # `look at`), with no hull followed until `follow "<ship>"` names one; the business and
+    # the other ships run under their captains and the drivers open at the director's.
+    # Left out of the dict when off, so that every save before it reads as it did.
+    observed: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -279,6 +286,8 @@ class Scenario:
             d.pop("things", None)
         if not d.get("fit"):
             d.pop("fit", None)
+        if not d.get("observed"):
+            d.pop("observed", None)
         return d
 
     @classmethod
@@ -315,6 +324,11 @@ RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 # A person's own needs (package 54: `eat`, `drink`, `sleep`, `how am I`) are answered to
 # him the same way: the needs show only to the person stationed, never in the log.
 UNLOGGED_KINDS = frozenset({"query.slate", "director.answer", "needs.answer"})
+
+# The observer's refusal (package 82, item 1): an order at the hull of no ship.
+NO_SHIP_FOLLOWED = (
+    "No ship followed: follow one ('follow \"Palinure\"') or give the world an order ('world: ...')"
+)
 
 # The motion's words must hold this long before the log says they changed (spec M5 §4;
 # judgement: five minutes, so a roll hovering about "rolling" and "rolling easily" is
@@ -532,6 +546,21 @@ class World:
         (a `ValueError`) for a ship not on the sea or one with no captain of her own."""
         from freesail.world.orders import WorldOrderError, hull_named
 
+        key = " ".join(str(words).split()).strip('"').lower()
+        if key in ("nobody", "none", "no ship", "no one", "unfollow", "the view"):
+            # the observer's world (package 82, item 1): the view given back
+            if not self.observed:
+                raise ValueError(
+                    f"No ship named {words!r} is on the sea; the player's ship is followed by "
+                    "her name or 'the ship' (an observed world alone has nobody to follow)"
+                )
+            self.followed = None
+            return self.record_driver(
+                "routine",
+                "driver.follow",
+                f"Following no ship: {self.view_words}.",
+                {"ship": None, "name": "nobody"},
+            )
         try:
             hull = hull_named(self, words)
         except WorldOrderError as e:
@@ -556,6 +585,87 @@ class World:
             return "no ship followed"
         return str(getattr(getattr(hull, "ship", None), "name", "") or hull.id)
 
+    @property
+    def followed_line(self) -> str:
+        """The drivers' line for the hull followed: 'Following the X.' or, in an observed
+        world with none, where the observer's view is (package 82, item 1)."""
+        if self.hulls.get(self.followed) is None:
+            return f"No ship followed: {self.view_words}."
+        return f"Following the {self.followed_words}."
+
+    @property
+    def observed(self) -> bool:
+        """Whether this is a world with no ship of the player's (package 82, item 1;
+        `Scenario.observed`): the World's own hull is the observer's."""
+        from freesail.world.hulls import is_observer
+
+        return is_observer(self.__dict__["_own"])
+
+    @property
+    def is_observer(self) -> bool:
+        """Whether the current hull is the observer's: the hull of no ship an observed
+        world keeps as its own (package 82, item 1). Her orders are refused in words, her
+        readings of the ship answer 'no ship followed', her point is the view."""
+        from freesail.world.hulls import is_observer
+
+        return is_observer(self.own)
+
+    @property
+    def view_words(self) -> str:
+        """Where the observer's view is, in words ('the observer's view at 49° 40' N,
+        5° 20' W'; 'on the plane' with no position)."""
+        from freesail.world.geo import format_position
+
+        own = self.__dict__["_own"]
+        pos = own.__dict__.get("_position")
+        where = format_position(pos) if pos is not None else "on the plane"
+        return f"the observer's view at {where}"
+
+    def look_at(self, words: str) -> Event:
+        """`look at <position or place>` (package 82, item 1): the observer's view moved
+        to a position ('49 50 N 5 30 W') or a feature of the chart by its name ('the
+        Lizard'); a driver's line, journaled and replayed as `follow` is. Refused in
+        words (a `ValueError`) in a world with a ship of the player's (her view is hers),
+        while a hull is followed ('follow nobody' first), on the plane, and for a place
+        the chart has not got."""
+        from freesail.world.geo import format_position, parse_position
+
+        if not self.observed:
+            raise ValueError(
+                "The view is the ship's: there is a ship of the player's in this world "
+                "(an observed world, 'ship: none', looks where it is told)"
+            )
+        if self.hulls.get(self.followed) is not None:
+            raise ValueError(
+                f"The view is the {self.followed_words}'s while she is followed: "
+                "'follow nobody' first"
+            )
+        own = self.__dict__["_own"]
+        if own.__dict__.get("_position") is None:
+            raise ValueError("The view is on the plane: no position to look at")
+        text = " ".join(str(words).split()).strip().strip('"')
+        try:
+            pos = parse_position(text)
+            what = format_position(pos)
+        except ValueError:
+            chart = self.chart
+            feature = chart.find_feature(text) if chart is not None else None
+            if feature is None:
+                raise ValueError(
+                    f"No place named {text!r} on the chart: say a position (49 50 N 5 30 W) "
+                    "or a feature's name"
+                ) from None
+            pos = feature.position
+            what = f"{feature.name} ({format_position(pos)})"
+        own.__dict__["_position"] = pos
+        own.__dict__["_geo_last"] = (own.ship.x, own.ship.y)
+        return self.record_driver(
+            "routine",
+            "driver.look_at",
+            f"Looking at {what}.",
+            {"words": text, "lat_deg": pos.lat_deg, "lon_deg": pos.lon_deg},
+        )
+
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # The Hull (package 84, step 1; `freesail.world.hulls`): what this World keeps of
         # one ship, behind the World's names. Made first and empty; every per-ship
@@ -573,7 +683,7 @@ class World:
         # World's own first; `followed` the hull the drivers and the cap centre on, whose
         # fields the World's names read when no other hull is current (`as_hull`)
         self.hulls: dict[str, Any] = {self.own.id: self.own}
-        self.followed: str = self.own.id
+        self.followed: str | None = self.own.id
         # the offices' room (package 84, step 10; the design's 2.10): a station of the world
         # and of no hull, M8's to build; an empty mapping beside the hulls so that an office
         # may be added without touching them
@@ -590,6 +700,10 @@ class World:
         self.played_under = [build_stamp()]
         self.seed = int(seed)
         self.scenario = scenario or Scenario()
+        if self.scenario.observed:
+            # the observer's world (package 82, item 1): no hull followed until `follow`
+            # names one; the World's names read the observer's hull meanwhile
+            self.followed = None
         # the one clock (package 84, step 6): a hull's builder (`crews.CrewedWorld`) sets the
         # World's clock before this runs, so that every tick her making stores is the game's
         self.clock = self.__dict__.get("clock") or Clock(self.scenario.start_time)
@@ -971,7 +1085,11 @@ class World:
             "world.start",
             f"{self.scenario.name}. Wind {self.wind.describe()}, "
             f"{units.describe_wind_strength(self.wind.effective_speed)}. "
-            f"Heading {units.format_heading(self.ship.heading)}.",
+            + (
+                f"No ship followed: {self.view_words}."
+                if self.scenario.observed
+                else f"Heading {units.format_heading(self.ship.heading)}."
+            ),
         )
         if self.lookout is not None:
             # the lookout's first look, at the start (spec M5 §12): what is in sight is a
@@ -1376,7 +1494,9 @@ class World:
     def _tick_geo(self) -> None:
         """The tick's run in metres turned to latitude and longitude (C §5.1), at the end
         of the tick; nothing on the plane."""
-        if self._position is None:
+        if self._position is None or self.is_observer:
+            # the observer's view (package 82, item 1) is moved by `look at` alone, not
+            # by the tide's stream nor the scenario's set
             return
         x, y = self.ship_x, self.ship_y
         lx, ly = self._geo_last
@@ -1855,6 +1975,9 @@ class World:
             needs.heard_order(actor)
         try:
             try:
+                if self.is_observer:
+                    # the observer's hull (package 82, item 1): no ship to give it to
+                    raise OrderError(NO_SHIP_FOLLOWED)
                 kind, log_text, data = self.ship.handle_order(text)
             finally:
                 if isinstance(extra, dict):
@@ -2328,6 +2451,8 @@ class World:
         from freesail.api import queries
 
         ship_lines = list(self.ship.summary_lines())
+        if self.is_observer:
+            ship_lines = [f"No ship followed: {self.view_words}."]
         if hasattr(self.ship, "sails"):
             ship_lines = [
                 queries.sail_set_line(self.ship) if ln.startswith("Sail set:") else ln
@@ -2533,7 +2658,8 @@ def _parent_get(self: Any) -> Any:
     if own is None:
         return None
     current = self.own
-    return None if current is own else self.hulls.get(self.followed)
+    # the followed hull's façade, or the World's own (the observer's, package 82) with none
+    return None if current is own else (self.hulls.get(self.followed) or own)
 
 
 def _parent_set(self: Any, parent: Any) -> None:

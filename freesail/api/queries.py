@@ -140,6 +140,24 @@ def reckoning_block(world: World) -> dict[str, Any] | None:
     nav = getattr(world, "navigation", None)
     if nav is None:
         return None
+    if getattr(world, "is_observer", False):
+        # the observer's view (package 82, item 1): the chart is drawn about the view's
+        # own place, which is the truth and no account; nothing of a reckoning's
+        pos = world.position
+        return {
+            "lat_deg": round(pos.lat_deg, 5),
+            "lon_deg": round(pos.lon_deg, 5),
+            "words": getattr(world, "view_words", "the observer's view"),
+            "uncertainty": "",
+            "ellipse": None,
+            "track": [],
+            "noons": [],
+            "bearings": [],
+            "soundings": [],
+            "run_since_noon_nm": 0.0,
+            "course_made_good_deg": None,
+            "view": True,
+        }
     block = nav.to_dict()
     reading = world.readings["reckoning"]
     if reading is not None:
@@ -153,8 +171,8 @@ def reckoning_lines(world: World) -> list[str]:
     """The console's `state` lines for the reckoning (spec M5 §15): the position by
     account with the master's doubt, and the last cast; nothing on the plane."""
     r = world.readings
-    if getattr(world, "navigation", None) is None:
-        return []
+    if getattr(world, "navigation", None) is None or r["reckoning_uncertainty"] is None:
+        return []  # nothing on the plane, nothing at the observer's view (package 82)
     where = r.words("reckoning")
     out = [f"{where[:1].upper()}{where[1:]}. {r['reckoning_uncertainty']['words']}"]
     if r["depth"] is not None:
@@ -218,10 +236,14 @@ def snapshot(world: World) -> dict[str, Any]:
     # On the sphere the ship's plane metres from the start are the truth's track, and the
     # chart is drawn about the reckoning; they leave the snapshot with the position.
     on_the_sphere = getattr(world, "position", None) is not None
+    if getattr(world, "is_observer", False):
+        # the observer's world with no hull followed (package 82, item 1): the page draws
+        # the chart's view with no ship on it until one is followed
+        out["observer"] = True
     if not isinstance(ship, Ship):
         st = ship.state()
         out["ship"] = {
-            "name": st.get("name", "point"),
+            "name": "no ship followed" if out.get("observer") else st.get("name", "point"),
             "x": None if on_the_sphere else st.get("x", 0.0),
             "y": None if on_the_sphere else st.get("y", 0.0),
             "heading": r["heading"],

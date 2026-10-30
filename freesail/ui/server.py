@@ -158,6 +158,7 @@ from freesail.ui.console import (
     give_director_word,
     live_world_order,
     loaded_words,
+    player_seat_for,
     read_standing_orders,
     read_standing_orders_path,
     start_world,
@@ -327,8 +328,9 @@ class Driver:
         out["pace"] = self.pace.state(self.compression)
         # the hull the drivers follow (package 84, step 10; 82's §11)
         world = self.world
+        followed = getattr(world, "followed", None)
         out["followed"] = {
-            "id": str(getattr(world, "followed", "") or ""),
+            "id": str(followed) if followed else None,  # None: no ship followed (82)
             "name": world.followed_words if hasattr(world, "followed_words") else "",
         }
         return out
@@ -337,6 +339,12 @@ class Driver:
         """`follow <ship>`: the drivers' centre to her hull (package 84, step 10)."""
         with self.lock:
             self.world.follow(words)
+            self.emit_snapshot()
+
+    def look_at(self, words: str) -> None:
+        """`look at <where>`: the observer's view moved (package 82, item 1)."""
+        with self.lock:
+            self.world.look_at(words)
             self.emit_snapshot()
 
     def held_for(self) -> str | None:
@@ -1453,12 +1461,17 @@ def create_app(
                     driver.follow(str(value or ""))
                 except ValueError as e:
                     raise HTTPException(status_code=404, detail=str(e)) from None
+            elif action == "look_at":  # the observer's view moved (package 82, item 1)
+                try:
+                    driver.look_at(str(value or ""))
+                except ValueError as e:
+                    raise HTTPException(status_code=404, detail=str(e)) from None
             else:
                 raise HTTPException(
                     status_code=400,
                     detail=(
                         "Say hold, go, speed N, tick N, standing_orders FILE, save PATH, "
-                        "follow SHIP or ease_on_station on|off to the driver."
+                        "follow SHIP, look_at WHERE or ease_on_station on|off to the driver."
                     ),
                 )
         except (TypeError, ValueError):
@@ -1682,8 +1695,8 @@ def prepare_game(args: argparse.Namespace, say: Callable[[str], None] = print) -
             say(line)
     # the player's seat: the flag's, else the scenario file's (`stations:`, package 59);
     # `--seat captain` is the captain's prompt, his own, and no seat
-    seat = args.seat or (scenario_file.player_seat if scenario_file is not None else None)
-    if seat and " ".join(str(seat).lower().split()) != "captain":
+    seat = player_seat_for(world, args.seat, scenario_file)
+    if seat:
         from freesail.agents.seat import seat_player
 
         seat_player(world, seat, door="browser")

@@ -84,6 +84,10 @@
   function onSnapshot(snap) {
     state.snapshot = snap;
     if (snap.driver) state.driver = snap.driver;
+    if (!state.ship && snap.ship) {
+      // a world with no ship of the player's (package 82): the name says what is followed
+      $("ship-name").textContent = snap.observer ? "no ship followed (the observer's view)" : snap.ship.name;
+    }
     root.Instruments.render(snap);
     seaMap.record(snap);
     seaMap.draw(snap);
@@ -121,8 +125,11 @@
       var data = JSON.parse(msg.data);
       if (data.type === "hello") {
         state.ship = data.ship;
-        document.title = "FreeSail · " + (data.ship ? data.ship.name : "point ship");
-        $("ship-name").textContent = data.ship ? data.ship.name + " (" + data.ship.rig + ")" : "point ship";
+        var observer = data.snapshot && data.snapshot.observer; // no ship followed (package 82)
+        document.title = "FreeSail · " + (data.ship ? data.ship.name : observer ? "no ship followed" : "point ship");
+        $("ship-name").textContent = data.ship
+          ? data.ship.name + " (" + data.ship.rig + ")"
+          : observer ? "no ship followed (the observer's view)" : "point ship";
         log.clear();
         seaMap.setMarks(data.marks || []); // the player's pencil, kept with the game (37n)
         state.driver = data.snapshot.driver || state.driver;
