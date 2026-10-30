@@ -463,8 +463,9 @@ them in the head swing.
   yards") brace only the yards the file lists in that group. §4.1's contract lists the sprit
   yards in "spritsails" and "all sail" alone, so these orders leave them; they are braced by
   name, by "brace sharp up" and by "trim sails". Whether the 64's and the 74's files list them
-  in "yards" and "head yards" too is a file choice for B1 and B7, with no engine change; for
-  the lead.
+  in "yards" and "head yards" too was a file choice for B1 and B7. *Ruled by the lead
+  (2026-10-30): as built, out of those groups, the spritsail yard being the forecastle's and not
+  the braces'; whether the harbour stow squares it is a later question.*
 - **The heave-to's line** lists the light sails clewed up with commas when one of them is under
   the bowsprit ("Clewed up the fore topgallant, the spritsail and the sprit topsail."); every
   other ship keeps its words as before.
@@ -1321,8 +1322,9 @@ Three drafts were judged: reuse first, fidelity first, and risk and test first.
    to change silently.
 6. (B3.1) `physics/strain.py:631` says a yard carried away "in the slings" only for `is_yard`.
    The lateen yard, out of `is_yard` now (§3.3), carries away without the words, though it is
-   slung. No existing file has a lateen yard. For the lead under the gate: a membership
-   (`spar.is_yard or spar.cls == "lateen_yard"`), or accepted as it stands.
+   slung. No existing file has a lateen yard. *Ruled by the lead (2026-10-30): the membership
+   (`spar.is_yard or spar.cls == "lateen_yard"`), the log's words and no equation; done, in its own
+   commit, with a case in `tests/test_strain.py`.*
 7. (B3.1) At tick 0 the served `ship.tack` is "starboard" whatever the wind: `ShipDynamics.tack`
    reads the apparent wind, which is 0 until the first tick. A page drawing the first snapshot
    puts the fore-and-aft sails to larboard until then. Not this package's.
@@ -2027,8 +2029,8 @@ waits for it.
    (the driver at 18°, the storm mizzen at 15°), until "trim sails"; and its take-in says
    "clewed up" where the period's word for a lateen or gaff sail is "brailed up". Mending
    either moves the frigate's words; for the lead.
-8. (B3.5) `set_lateen.yaml`'s served header describes only the course; with the boom check it
-   should name the driver too. Outside B3's leave on that file; for the lead.
+8. (B3.5) `set_lateen.yaml`'s served header described only the course; it names the driver now,
+   with the six lateen files' move to the in-world form (the lead's note of 2026-10-30).
 9. (B3.5) The bent variant of `frigate_with_driver()` files the course in the sail room but
    stows no course canvas there, so "shift the driver for the mizen" is refused on it. Stage
    0's fixture: stow the course's canvas when `bent`.
