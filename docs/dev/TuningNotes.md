@@ -13862,3 +13862,31 @@ within three" (Spargi lies west of the patch's box, its shore on the block's wat
 lookout's "Land ahead ... a mile" at 247,860 not called. **She takes the ground at tick
 250,034 on both trees**, as before: 79d's scenario finding, recorded by the lead for a
 scenario tidy.
+
+### The region `tyrrhenian`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region tyrrhenian
+--reuse-world`: the checks as printed (123 of 123 features, ids unique, no override, the
+fetch box covering the tiles, "32 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.47 to 6.83 m". **The block's eight gauges have no level read**
+(Carloforte, Cagliari, Porto Torres, Civita Vecchia, Naples, Salerno, Palinuro, Ortona), so
+its water's level is the eleven's everywhere but where its bounds overlap `ligurian-sea`'s
+(41 to 42.5 N, 8 to 11 E, whose tiles are `ligurian-sea`'s): **four level-2 tiles moved**,
+the row from 40.56 N under Sardinia's north from 8.16 to 9.87 E (`2/146016_29376`,
+`_30912`, `_32448`, `_33984`), whose northern cells take a share, by the fill grid's
+bilinear sample, of the Ligurian sea's water just north of 40.99 N: 11,930 cells, the
+largest 1.50 m, 12 from above the datum to below; no level-3 tile moved (Cagliari's,
+Alghero's, Civita Vecchia's, Gaeta's, Naples' and Ponza's patches as they were). The shore's
+sweep 22,345 cells in 442 places (by the control 15,200 in 416; the difference the Ligurian
+sea's kept tiles about Biguglia, computed with the block). Level 2 158 tiles, 35.22 MB as
+before; level 3 26 tiles, 1.99 MB; the coast 2,480 pieces, 16,017 points, 611,624 bytes
+before, 2,480, 16,015, 611,590 now.
+
+`git status` after the build: the four tiles, the coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-309
+with `--slow -n 4`, 20 passed (7-300 Naples' marks and 7-301 Cagliari among them, and this
+package's 7-305 to 7-309, written beside). **The scenario** `agincourt-sound.yaml` sailed
+again on the whole rebuilt Mediterranean: the same log as before this region, byte for byte
+(4,012 lines, `10dfe615a065d28d`).
