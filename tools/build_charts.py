@@ -188,7 +188,11 @@ SOURCES: dict[str, dict[str, Any]] = {
 #   fetch      the EMODnet subset fetched: the bounds widened so that the tiles that meet
 #              them are covered whole (a quarter of a degree about is enough)
 #   harbours   the level-3 harbour patches (C §5.2: 15' x 15' each), as tile groups, each
-#              a box; a port file's road or an override's sheet names one
+#              a box; a port file's road or an override's sheet names one. A patch whose
+#              land the grid smears (EMODnet silent over its shores, GEBCO's fill under
+#              mean sea level there) may take `fill_raise: eleven` (package 93): within its
+#              box GEBCO's fill keeps the eleven's raise until a sheet is read with its
+#              datum, said in the recipe's comment; Agincourt Sound the one case
 #   sources    the ids of `SOURCES` the region's tiles are cut from, in the order they are
 #              laid (the first for the depth and the coast, the next under it where the
 #              first has nothing); each must carry a licence in `ALLOWED_LICENCES`
@@ -550,7 +554,20 @@ REGIONS: dict[str, dict[str, Any]] = {
             "porto-ferrajo": {"south": 42.79, "north": 42.84, "west": 10.29, "east": 10.36},
             "san-fiorenzo": {"south": 42.66, "north": 42.75, "west": 9.24, "east": 9.33},
             "ajaccio": {"south": 41.85, "north": 41.94, "west": 8.68, "east": 8.80},
-            "agincourt-sound": {"south": 41.17, "north": 41.27, "west": 9.36, "east": 9.48},
+            # package 93, the lead's ruling of 2026-10-30: EMODnet has no sounding over the
+            # shores of the islands about the Sound, and GEBCO's fifteen seconds smear them
+            # three to six metres under mean sea level; the eleven's raise (6.83 m) stood
+            # them up as land, the block's own water (0.53 m) lays them under and opens a
+            # harbour the real islands close. The patch keeps the eleven's raise within its
+            # box until a sheet is read with its datum (Ryves's survey of 1802 as the
+            # Admiralty engraved it, Smyth's of the 1820s, or the Derrotero's plan)
+            "agincourt-sound": {
+                "south": 41.17,
+                "north": 41.27,
+                "west": 9.36,
+                "east": 9.48,
+                "fill_raise": "eleven",
+            },
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
         # as gulf-of-lion's (the fetch box the first build's, which covers the tiles whole)
@@ -1441,7 +1458,7 @@ TIDES_CONSTITUENTS = ROOT / "data" / "tides" / "constituents.yaml"
 FILL_LEVEL_CELL_DEG = 0.05
 
 
-def mean_level_grid(box: dict[str, float]) -> Grid:
+def mean_level_grid(box: dict[str, float], eleven_only: bool = False) -> Grid:
     """Mean sea level above the chart's datum over a box, as the world's tide gives it
     (`data/tides/constituents.yaml`, `freesail/world/tide.py`), on a grid of
     FILL_LEVEL_CELL_DEG: at each cell's centre the gauges that serve it (`Tide.gauges_at`,
@@ -1457,7 +1474,9 @@ def mean_level_grid(box: dict[str, float]) -> Grid:
     its height plus this is the height above the datum the world's tide is reckoned from,
     so that a low shore stands as high above the world's high water as it does above the
     sea's (package 39a: at St Malo, whose mean level is 6.8 m above the datum, the low land
-    behind the town read as drying ground and was covered at high water)."""
+    behind the town read as drying ground and was covered at high water). With
+    `eleven_only` the eleven alone everywhere, the raise every tile was built by before
+    package 93 (a harbour patch's `fill_raise: eleven`, below `REGIONS`)."""
     doc = yaml.safe_load(TIDES_CONSTITUENTS.read_text(encoding="utf-8"))
     interp = doc.get("interpolation") or {}
     power = float(interp.get("power", 2))
@@ -1481,7 +1500,7 @@ def mean_level_grid(box: dict[str, float]) -> Grid:
             )
         )
     eleven = [x for x in gauges if not x[3]]
-    held = [x for x in gauges if x[3]]
+    held = [] if eleven_only else [x for x in gauges if x[3]]
     bounds = {
         str(name): tuple(float(r["bounds"][k]) for k in ("south", "north", "west", "east"))
         for name, r in (_last_manifest().get("regions") or {}).items()
@@ -1830,6 +1849,19 @@ class Build:
                 f"{float(fill_level.values.min()):.2f} to {float(fill_level.values.max()):.2f} m"
             )
         out["fill_to_chart_datum"] = bool(fill_level is not None)
+        # a harbour patch whose land the grid smears keeps the eleven's raise until a sheet
+        # is read (`fill_raise: eleven`, package 93): its cells as they were built
+        kept_fill: list[tuple[dict[str, float], Grid]] = []
+        if fill_level is not None:
+            eleven = None
+            for hname, hb in recipe["harbours"].items():
+                if hb.get("fill_raise") == "eleven":
+                    eleven = eleven or mean_level_grid(fb, eleven_only=True)
+                    kept_fill.append((hb, eleven))
+                    self.log(
+                        f"  harbour patch {hname}: GEBCO's fill raised by the eleven's mean "
+                        "level within its box (fill_raise: eleven, until a sheet is read)"
+                    )
         if recipe.get("skip_dry_tiles"):
             out["skip_dry_tiles"] = True
         out["tiles"]["2"] = self._build_level(
@@ -1843,6 +1875,7 @@ class Build:
             region,
             taken=taken,
             fill_level=fill_level,
+            kept_fill=kept_fill,
             skip_dry=bool(recipe.get("skip_dry_tiles")),
         )
         level3: list[dict[str, Any]] = []
@@ -1860,6 +1893,7 @@ class Build:
                 harbour=hname,
                 taken=taken,
                 fill_level=fill_level,
+                kept_fill=kept_fill,
             )
         out["tiles"]["3"] = level3
         # the coast
@@ -1901,6 +1935,7 @@ class Build:
         harbour: str | None = None,
         taken: frozenset[str] | set[str] = frozenset(),
         fill_level: Grid | None = None,
+        kept_fill: list[tuple[dict[str, float], Grid]] | None = None,
         skip_dry: bool = False,
     ) -> list[dict[str, Any]]:
         """The tiles of one level over the region or a harbour patch: EMODnet sampled,
@@ -1929,7 +1964,14 @@ class Build:
         # was drying ground, covered at high water); a recipe with `fill_to_chart_datum`
         # raises it by the world's mean level there (`mean_level_grid`)
         if fill_level is not None:
-            under = under + fill_level.sample(lats, lons)
+            raise_m = fill_level.sample(lats, lons)
+            for box, grid in kept_fill or []:
+                # within a `fill_raise: eleven` patch's box, by the cell's centre
+                inside = ((lats >= box["south"]) & (lats <= box["north"]))[:, None] & (
+                    (lons >= box["west"]) & (lons <= box["east"])
+                )[None, :]
+                raise_m = np.where(inside, grid.sample(lats, lons), raise_m)
+            under = under + raise_m
         unknown = np.isnan(elev)
         elev = np.where(unknown, under, elev)
         if coast_lines is not None:

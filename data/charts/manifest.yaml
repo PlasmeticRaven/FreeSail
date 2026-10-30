@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-30'
 tool: tools/build_charts.py
-build_hash: e4c85fd1efb20fa3
+build_hash: 7af709eddceb9a5e
 levels:
   '0':
     cell_sec: 150.0
@@ -8919,12 +8919,12 @@ regions:
         south_sec: 147552
         west_sec: 33984
         min_depth_m: 0.0
-        bytes: 269581
+        bytes: 269463
       - name: '147552_35520'
         south_sec: 147552
         west_sec: 35520
         min_depth_m: 127.2
-        bytes: 295649
+        bytes: 295550
       - name: '147552_37056'
         south_sec: 147552
         west_sec: 37056
@@ -8959,12 +8959,12 @@ regions:
         south_sec: 149088
         west_sec: 33984
         min_depth_m: 62.0
-        bytes: 281046
+        bytes: 281120
       - name: '149088_35520'
         south_sec: 149088
         west_sec: 35520
         min_depth_m: 526.6
-        bytes: 295890
+        bytes: 295695
       - name: '149088_37056'
         south_sec: 149088
         west_sec: 37056
@@ -9416,37 +9416,37 @@ regions:
         south_sec: 148064
         west_sec: 33472
         min_depth_m: 0.0
-        bytes: 66261
+        bytes: 66594
         harbour: agincourt-sound
       - name: '148064_33728'
         south_sec: 148064
         west_sec: 33728
         min_depth_m: 0.0
-        bytes: 92055
+        bytes: 91258
         harbour: agincourt-sound
       - name: '148064_33984'
         south_sec: 148064
         west_sec: 33984
         min_depth_m: 0.0
-        bytes: 114972
+        bytes: 114270
         harbour: agincourt-sound
       - name: '148320_33472'
         south_sec: 148320
         west_sec: 33472
         min_depth_m: 0.0
-        bytes: 112404
+        bytes: 112565
         harbour: agincourt-sound
       - name: '148320_33728'
         south_sec: 148320
         west_sec: 33728
         min_depth_m: 0.0
-        bytes: 109517
+        bytes: 107830
         harbour: agincourt-sound
       - name: '148320_33984'
         south_sec: 148320
         west_sec: 33984
         min_depth_m: 0.0
-        bytes: 104980
+        bytes: 103627
         harbour: agincourt-sound
     coast: coast/ligurian-sea.geojson
     features: features/ligurian-sea.yaml
@@ -9483,6 +9483,7 @@ regions:
         north: 41.27
         west: 9.36
         east: 9.48
+        fill_raise: eleven
     fill_to_chart_datum: true
     feature_count: 140
     features_by_kind:

@@ -13819,3 +13819,46 @@ the grid lacks until a sheet is read (a recipe rule, not the brief's); (d) the t
 re-measured on the true water, old beside new, which would be loosening it and is not mine
 to do. **The package stops here**: `tyrrhenian` is not rebuilt, and the proof on the final
 tree, truths 7-305 to 7-309 and the records wait on the ruling.
+
+### The region `ligurian-sea` rebuilt again by the lead's ruling on 7-297: Agincourt Sound keeps the eleven's raise
+
+**The ruling (2026-10-30):** the Sound is land-locked in truth (Purdy 1826's word, Ryves's
+survey of 1802); the islands' shores that closed it on the old tiles were the false raise's,
+and the truth is not to be re-measured on tiles that open a harbour the real islands close
+(option (d) refused); a sheet read with its datum (option (a)) is the patch package's,
+booked by the lead with Mahon's plan and Bellin's; package 94's island kind (b) is not for
+islands of kilometres; so (c), bounded and said. **As built:** the harbour patch
+`agincourt-sound` in the recipe takes `fill_raise: eleven`, its comment naming the cause and
+the sheets wanted; `build_region` samples the eleven's grid (`mean_level_grid(fetch,
+eleven_only=True)`, the arithmetic 79d's build used) for every cell of either level whose
+centre lies within the patch's box, and the block's water everywhere else; the form's
+comment above `REGIONS`, ChartBlocks.md ("A harbour patch whose land the grid smears keeps
+the eleven's raise until a sheet is read") and the head of `data/ports/maddalena.yaml`
+(beside its `datum: unverified`, a comment, no key the machinery reads) say so. **Checked
+cell for cell:** within the box every level-2 cell (17,280) and every level-3 cell
+(622,080) has the elevation of 79d's tiles (`21a25e7`).
+
+The build: the checks as before, the log's new line "harbour patch agincourt-sound: GEBCO's
+fill raised by the eleven's mean level within its box"; the shore's sweep 34,204 cells in
+353 places (the largest as above). Against 79d's tiles: level 2, 72 tiles, 17.10 to 17.16
+MB, 70 changed, 4,567,040 cells, the largest 6.40 m, 40,810 from above the datum to below;
+level 3, 32 tiles, 2.89 MB, 30 changed, 3,735,722 cells, 119,331 from above the datum to
+below (Agincourt Sound's patch none now); the coast 1,565 pieces, 12,552 points, 431,014
+bytes before, **1,613, 13,254, 450,953** now. 7-297's measures on this tree are 79d's to the
+metre: to land by bearing 3,850, 4,050, 2,900, 1,250, 500, 600, 900 and 1,500 m (0 to 315
+degrees), the room 135, the berth 11.7 m (the stopped build's 18.0, none north within 9,950
+m and 6,500 east, the 13,398 cells, are above).
+
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-304
+with `--slow -n 4`, **15 passed**, 7-297 among them, its words and figures unmoved. **The
+scenario** `agincourt-sound.yaml`, 100 hours (`gulf-of-lion` and this region rebuilt,
+`tyrrhenian` not): 4,012 lines both, digest `10dfe615a065d28d` for the head's
+`4434a8a16c6a4fda`; **eight lines moved**: a sounding at tick 1,288 west of the box (sixteen
+fathoms by the deep for twelve and a half), the lookout's land about Porquerolles and about
+Bonifacio a minute later and Port-Cros's called once more (the Gulf's and this block's
+shores outside the box, on their own water), and on the way home the course shaped at tick
+247,715 "passes the shore under Point Liche within four cables" for "the shore under Spargi
+within three" (Spargi lies west of the patch's box, its shore on the block's water), the
+lookout's "Land ahead ... a mile" at 247,860 not called. **She takes the ground at tick
+250,034 on both trees**, as before: 79d's scenario finding, recorded by the lead for a
+scenario tidy.

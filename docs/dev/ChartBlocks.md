@@ -290,6 +290,15 @@ block's features give such an isle as a `rock` of its height and an `extent_m` o
 size, so that a ship cannot sail through it; a land patch is better, where a sheet can
 be read with its datum.
 
+**A harbour patch whose land the grid smears keeps the eleven's raise until a sheet is
+read, said so** (package 93, the lead's ruling): where EMODnet has no sounding over a
+harbour's shores and GEBCO's fifteen seconds smear them some metres under mean sea level,
+the block's own water lays them under and opens a harbour the real land closes; the patch
+takes `fill_raise: eleven` in its recipe box, its comment naming the cause and the sheet
+wanted, and its port file's head says so beside `datum: unverified`. Within the box the
+cells are as they were built on the eleven's raise, outside it the block's water. Agincourt
+Sound is the one case (the islands about it; Ryves's survey of 1802 the sheet wanted).
+
 **GEBCO's fill.** Where EMODnet has no value (the land, mostly, and some harbours and
 lagoons it does not survey) the tiles take GEBCO's height, which is about mean sea level,
 while the levels are about LAT. Read against LAT that height is low by mean sea level's
