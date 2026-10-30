@@ -12828,3 +12828,79 @@ across the seam), 7-303 (Li Galli, an islet the grid reads as forty metres of wa
 frigate's keel as a rock, and a mile off she is clear) and 7-304 (the master's tide-hour in
 the road of Naples is Smyth's Naples, off Toulon Smyth's Toulon; the Tyrrhenian's box is
 Naples' table with its gale days).
+
+### Found on the way (package 79d)
+
+- **The rule against 40 MB bites in deep water**, as at the Azores and in 79c's basin: the
+  Gulf as briefed measured 46.1 MB, split by the lead at the column edge 7.73 E; a bound
+  that stops short of one edge and a neighbour's that starts just past it share no tile.
+- **The gap between two blocks' bounds** (79c's tiles to 40.56 N, the Gulf's from 40.99 N)
+  left 26 miles of open sea with no chart east of 1 W; the Gulf's south bound moved to
+  79c's row edge (the lead's ruling).
+- **Seventeen islets the grid lacks** across the three regions, given as rocks of their
+  height and extent; ChartBlocks.md's section on these blocks names them.
+- **A `road` with a bottom gives no note of the bottom** (`Chart.bottom_near` reads
+  `anchorage` and `bottom` features); the roads are anchorages.
+- **The business drew no trader in the Mediterranean** while the sixteen ports priced their
+  goods from one table (no route cleared the least ratio of 1.3); each port now has its own
+  produce cheap and its wants dear, judgement.
+- **The weather's one track of lows a month** cannot give the Gulf both the mistral's lows
+  (east of it) and the Levant's (south of it), nor Naples both the tramontana and the
+  libeccio: the boxes take the mistral's and the westerlies' and say what they leave short.
+- **A port's nation by date** (the lead's ruling 3), small and generic in `world/ports.py`;
+  the other readers of a port's nation read the scenario's first day's entry (named in
+  step 3's section, for 84's later steps).
+- **The world's tide over the Mediterranean** is Le Conquet's alone while the gauges are
+  held (two metres of M2 against the gauges' five to twelve centimetres), and the master's
+  account allows "the flood" in a sea that has none to speak of: the strongest case yet for
+  package 89's gauges' water. The fill raise follows it (3.7 to 6.8 m).
+- **Lights for the lead**: Porto Ferrajo's on Fort Stella and Bastia's mole fire `from`
+  1826, the earliest record read (the builder's memory has Porto Ferrajo's of 1788);
+  Planier's tower with no `lit` (unlit in 1715, lit by 1818); the lights' years of the
+  1830s and 1840s UNVERIFIED where no text dates them, the texts bracketing them after 1805.
+- **Not given**: Porto Santo Stefano and Giannutri (in the Ligurian sea's tiles east of its
+  bounds), Monte Limbara (south of 40.99 N, out of the Maddalena's file), the Adriatic's
+  shore in the Tyrrhenian's north-east tiles; Sicily, the Lipari islands and Messina a later
+  block.
+- **No source fetched beyond 79c's pass**: the period texts are the pass's, read on this
+  checkout; EMODnet's and GEBCO's extracts are recorded in the manifest as every block's;
+  TICON's zip (the same file, SHA-256 7055f8ed…6514) and SHOM's RAM (Licence Ouverte 2.0)
+  were read from the build's cache as the blocks before read them, not committed; no host
+  refused anything.
+- **The lead's merge of 79c** (159df45) brought in at the step boundary: the shared files
+  kept both sides in order, the counts summed; truth 7-261's count of the nations (nine
+  with Algiers, fourteen with this package's five) and `test_geo`'s list of regions, which
+  this package had not extended before the merge, now hold all of them.
+
+### The suite, as run (package 79d)
+
+On this session's own container (four cores), on the final tree after the merge of the
+lead's branch (`9b3deb8`). `python -m ruff check .` and `python -m ruff format --check .`
+clean; `python tools/build_charts.py --check` for each of the three regions passes as
+printed above, and after the merge the three regions rebuilt with `--skip-fetch` changed
+no tile of theirs or of 79c's (`git status`).
+
+**The fast tier**, once (`python -m pytest -n auto -q -p no:cacheprovider`, 379 slow tests
+left out): one failure, `test_pictures.py::test_the_api_door_shows_the_model_the_chart_and_the_ships_view_and_the_stub_says_what_it_saw`,
+"the chart is blank (std 8.0)" at 7.97 against its floor of 8.0 under the tier's load, the
+known flake (79a's and 79b's records); it passes alone on this tree.
+
+**The slow tests of the files touched**: `--slow -m slow -n 4 tests/test_chart.py
+tests/test_ports.py tests/test_tide.py tests/test_weather.py tests/test_nations.py
+tests/test_scenarios.py`, 14 passed. **The package's truths** 7-295 to 7-304 with
+`--slow`, and truth 7-261 (the nations' knobs) beside them: 11 passed.
+
+**The recorded passages of the Channel west**: `python -m pytest tests/test_known_truths.py
+--slow -k "gate_5b or gate_5c"`, as the brief has it, selected one test (the passage for
+gate 5b's own constants), passed to its digest; and the eleven tests that read the
+passages' fixtures, by node id, `--slow -n 4` (the frigate's and the schooner's passages of
+gate 5b with the schooner's octant and pilot, the merchant passage with its deep-sea
+cast, the naval cruise with its stranger, truths 72, 77 and 78, and the pace on the
+passage): 11 passed, every pinned digest, line count and tick held, the pace floor among
+them. Run before the merge as well, with the same result. With the sixteen port files
+loaded on the Channel's chart by the passages that list no ports, the held gauges, the
+stream areas and the directions' boxes, the epitome's places and the two weather boxes in
+place: nothing of the Channel moved.
+
+**The scenario** sailed again on the final tree: `agincourt-sound.yaml` at seed 7, 3,837
+lines, digest `7ba2146a323761ee`, the same as before the merge, no ground touched.
