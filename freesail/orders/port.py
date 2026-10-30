@@ -155,10 +155,29 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
     low = name.lower()
     if low in ("shore", "quay", "port", "yard", "market") or low.startswith(("shore ", "quay ")):
         return None
+    # the hull named, made only when the boat goes (the lead's finding on step 1: a refused
+    # order left a far body promoted for nothing): a ship with no hull yet is measured by
+    # her far body and refused beyond a boat's pull before any hull is made
     try:
-        target = hull_named(world, name)
-    except WorldOrderError:
-        return None
+        target = hull_named(world, name, make=False)
+    except WorldOrderError as e:
+        if "no hull of her own yet" not in str(e):
+            return None
+        from freesail import units
+        from freesail.world.geo import bearing_and_distance, distance_words
+        from freesail.world.movement import BOAT_BETWEEN_NM
+
+        vessel = world.vessels.find(name.strip('"'))
+        here = getattr(world, "position", None)
+        if vessel is None or here is None:
+            return None
+        metres = bearing_and_distance(here, vessel.position)[1]
+        if metres / units.NAUTICAL_MILE > BOAT_BETWEEN_NM:
+            raise OrderError(
+                f"The {vessel.name} is {distance_words(metres)} off, beyond a boat's pull "
+                f"({BOAT_BETWEEN_NM:g} mile); close her first."
+            ) from None
+        target = hull_named(world, name)  # within reach: her hull made as the boat goes
     if target is world or target is getattr(world, "own", None):
         raise OrderError("The boat is sent to another ship, not to her own.")
     if not isinstance(target, type(getattr(world, "own", None))):

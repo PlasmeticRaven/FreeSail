@@ -14907,5 +14907,25 @@ postscript. The boarders' officer is the first lieutenant (the captain stays wit
 else a lieutenant or the mate, else nobody; the quarter bill names no boarders' officer and
 none is added to the files.
 
+**The lead's two findings on the step as first pushed (`2b163d4`), both mended.** (1) A
+save taken while his person was a visitor carried the voice (the passenger's kind under his
+name) as his station and was grouped under his own hull, so the owner's road, the transcript,
+seated a passenger on the brig at his stationed tick and his `send the boat ...` had no deck
+to be given from; the acts road was right. `Harness.save` carries the station of his seating
+(his own, kept in `_home` while he visits), and a test saves mid-visit, in the host's boat on
+the way home and at home, replaying each by both roads to the same digests of both logs with
+the copy's harness visiting where the play's was. (2) The player's `send the boat to the
+<ship>` named a far body beyond a boat's pull and was refused in words, yet left her promoted
+to a hull (`hull_named` with `make=True` before the distance was read): the order reads her
+hull with `make=False`, measures her far body's distance and refuses before any hull is
+made, making her one only as the boat goes; the director's road makes her as 84's `comes
+aboard the <ship>` does. The visitor's reach is said in words at the lead's ask
+(`agent.VISITOR_DOMAIN`'s refusal, "a visitor aboard another ship gives no order of her deck,
+and none of his own ship's from there (hail her, make a signal or send a letter; 'come
+aboard' takes him home)", and `movement.VISITOR_BRIEF` in the consent brief's voice), and in
+the Harness document's §17. The officer's handover budget moved 21,500 to 22,000 (the fast
+tier found it: the conversation at the seat 12,926 tokens against 12,885 under 85, for the
+reading and the errand in the brief's words), old beside new in `tests/test_officer.py`.
+
 **The truths:** 7-324 (the move by the boat and the replay by both roads), 7-325 (the deck won
 and the captive's stand-down), 7-333 (`where am I`, the station line, the director's form).

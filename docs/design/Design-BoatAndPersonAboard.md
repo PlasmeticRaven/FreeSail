@@ -730,3 +730,11 @@ round figure a boat's crew pulls in a quarter of an hour.
 **Found on the way** is in the tuning notes (the keeper's denial of a job-based errand, the
 readings cache against a per-asker row, the holder by name whole, the person ids of two
 companies).
+
+**The lead's two findings on the step as first pushed, both mended before the merge:** the
+save of a visiting person carried his voice as his station, so the transcript road seated a
+passenger at home (the save now carries the station of his seating, kept while he visits,
+and a mid-visit save replays by both roads); and the player's `send the boat to the <ship>`
+refused beyond a boat's pull left a far body promoted to a hull (the distance is read before
+any hull is made). The visitor's reach is said in the refusal's words and in the Harness
+document's §17, at the lead's ask.

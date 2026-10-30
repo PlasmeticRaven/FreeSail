@@ -4511,8 +4511,14 @@ class Harness:
 
     def save(self) -> dict[str, Any]:
         a = self.agent
+        # the station of his seating (package 82): while his person is a visitor in another
+        # hull the harness holds the visitor's voice there, and the save carries his own
+        # station at home, so that a replay seats him there and the replayed moves carry him
+        # on (the lead's finding on step 1: a save taken mid-visit seated a passenger's voice
+        # on his own ship and his orders had no deck to be given from)
+        station = self._home[1] if self._home is not None else self.station
         return {
-            "station": self.station.save(),
+            "station": station.save(),
             "session_kind": a.session_kind,
             "door_note": self.door_note,
             "stationed_tick": a.stationed_tick,

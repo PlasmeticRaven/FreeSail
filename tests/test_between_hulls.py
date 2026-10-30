@@ -233,3 +233,71 @@ def test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_
     far.run(60)
     doubt = WO.doubt(far, WO.parse('person: "Mr Veale" goes aboard the Far by the boat'))
     assert doubt is not None and "not sent so far" in doubt
+
+
+def _until_visiting():
+    """The brig's captain aboard the frigate as a visitor, his orders given there."""
+    w, b, hull = _brig_alongside()
+    stage, act = _stages(w.ship.name)
+    h = _seat(hull, act)
+    captain = hull.people.captain
+    _run_until(w, lambda: captain.hull == w.own.id and stage["n"] >= 2, 1.5)
+    assert h.visiting and h.world is w.own
+    return w, b, hull, h, captain, stage
+
+
+def _replays_alike(w, b, hull):
+    data = json.loads(json.dumps(w.save()))
+    assert data["agents"] == [] and [blk["id"] for blk in data["hulls"]] == [b.id]
+    record = data["hulls"][0]["agents"][0]
+    assert record["seated_on"] == b.id and record["station"]["name"] == "captain"
+    out = {}
+    for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+        copy = replay.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == w.log.digest(), road
+        assert copy.hulls[b.id].log.digest() == hull.log.digest(), road
+        out[road] = copy
+    return out
+
+
+def test_a_save_taken_mid_visit_replays_by_both_roads_with_the_harness_visiting():
+    """The lead's finding on step 1: a save taken while his person is a visitor carried the
+    voice as his station and was grouped under his own hull, so the transcript road seated a
+    passenger on the brig and his orders had no deck. The save carries the station of his
+    seating; both roads give both logs the same digests, the copy's harness visiting on the
+    copy's own hull; and a save taken while he is in the host's boat on the way home, the
+    harness still on the host, replays the same."""
+    w, b, hull, h, captain, stage = _until_visiting()
+    voice = _voice_name(captain)
+    for road, copy in _replays_alike(w, b, hull).items():
+        ch = copy.agents.get(voice)
+        assert ch is not None and ch.visiting and ch.world is copy.own, road
+        assert "captain" not in copy.hulls[b.id].agents, road
+        assert copy.hulls[b.id].stations.holder("captain").name == captain.name, road
+    # in the host's boat on the way home: his whereabouts a boat's, the harness on the host
+    _run_until(w, lambda: captain.hull is None and captain.where == "boat" and h.visiting, 1.0)
+    assert h.world is w.own
+    for road, copy in _replays_alike(w, b, hull).items():
+        assert copy.agents.get(voice) is not None and copy.agents[voice].visiting, road
+    # and home: the harness his own station's again on his hull
+    _run_until(w, lambda: captain.hull == b.id and not h.visiting, 1.0)
+    for road, copy in _replays_alike(w, b, hull).items():
+        assert copy.hulls[b.id].agents["captain"].world is copy.hulls[b.id], road
+        assert not copy.hulls[b.id].agents["captain"].visiting, road
+
+
+def test_a_boat_refused_beyond_the_pull_leaves_no_hull_made_for_nothing():
+    """The lead's second finding: the player's `send the boat to the <ship>` named a far body
+    beyond a boat's pull, was refused in words, and left her promoted to a hull. Refused by
+    her far body's distance, she keeps no hull; within reach her hull is made as the boat
+    goes."""
+    w = hove_to_world()
+    w.world_order('ship: a merchant brig "Far" of Britain at 49 45 N 5 30 W, bound for Falmouth')
+    w.world_order('ship "Far": intent bound for Falmouth')
+    w.run(60)
+    far = w.vessels.find("Far")
+    assert far.crew is None
+    e = w.submit("send the boat to the Far with the master")
+    assert e.kind == "order.rejected" and "beyond a boat's pull" in e.text, e.text
+    assert far.crew is None and far.id not in w.hulls
+    assert w.people.find("the master").aboard and not w.dealings.boat.away
