@@ -12945,3 +12945,265 @@ place: nothing of the Channel moved.
 
 **The scenario** sailed again on the final tree: `agincourt-sound.yaml` at seed 7, 3,837
 lines, digest `7ba2146a323761ee`, the same as before the merge, no ground touched.
+
+
+## Package 89: the held gauges' water (2026-10-30)
+
+The finding every chart block since 39a carried, and 79b, 79c and 79d made pressing: the
+world's tide blended every gauge within `reach_nm` (400 miles) of a position, so a block's
+gauge entered the blend at Falmouth and moved every recorded passage, and the blocks' gauges
+were held. **The rule, as built:** a block's gauge serves the positions within its own
+block's bounds (the region of `data/charts/manifest.yaml` its `block:` names, or a list of
+them) and no position outside them; the eleven serve everywhere as before. Within a block
+the blend is the eleven within reach and the block's gauges, by the present weighting;
+outside every block the eleven alone (`Tide.gauges_at`, `Tide.blocks_at`,
+`freesail/world/tide.py`). Independent of 84 and 75; nothing of either touched.
+
+### What was built
+
+- **The membership** is the cell's centre's, as the blend is (`CONSTANTS_CELL_DEG`, the
+  shared cache keyed by the cell): every region's bounds are whole hundredths of a degree,
+  so a cell is wholly within a block or wholly outside it, and the seam at 1 W falls on a
+  cell edge. A position within two regions' bounds (the Ligurian sea's and the
+  Tyrrhenian's overlap, 41 to 42.5 N and 8 to 11 E) takes both blocks' gauges.
+- **The level.** A block's gauge whose mean level was not read (Newhaven, the Spanish of
+  Biscay south, Cadiz, the Strait's four, the islands' five, the Italian gauges) gives the
+  blend its constants and not its level; the level is the blend of the gauges that have
+  one, by the same weights. Where no gauge of the blend has one (the Strait, Madeira, the
+  Azores, the south of the Tyrrhenian) the level is the eleven's there, as it was: Le
+  Conquet's 3.98 m, not invented. Outside every block the arithmetic is the old one to the
+  bit (the level's weights are the blend's own; truth 7-282 holds the states equal).
+- **`far`** and the nearest gauge's miles (`TideState.far`, `gauge_nm`, `nearest_gauge`)
+  are of the gauges that serve the place: off Cascais, Gibraltar or Mahón the place is no
+  longer far; west of Portugal's 10 W it is, as before.
+- **The data** (`data/tides/constituents.yaml`): the 73 held gauges of 39b to 39f and 79b
+  to 79d are `gauges:` entries after the eleven, each with its `block:` (one region each,
+  as each block's own comment assigned it: 79c's four to `mediterranean-west` and five to
+  `balearics`; Ajaccio and Solenzara to `ligurian-sea`, within the Tyrrhenian's bounds
+  too; Ortona, the Adriatic's gauge on the Tyrrhenian block's north-eastern shore, to
+  `tyrrhenian` as 79d held it). The `interpolation:` key moved above `gauges:` so that the
+  list runs on; **no figure moved**: every gauge's entry less its `block:` is the same as
+  before (checked by loading both files). The loader refuses a `block:` that names no
+  region, a region the manifest does not name, and a gauge with neither a block nor a
+  level; each gauge lies within its block's bounds (`test_tide.py`).
+- **The epitome** (`data/tides/establishments.yaml`): the 37j rule's judged rises over the
+  blocks are the blocks' water now (below); Norie's and Moore's given rises not moved, no
+  hour moved.
+- **The words**: `docs/dev/ChartBlocks.md` item 6 rewritten for the rule (the gauges in
+  `gauges:` with their block, the block's test that no recorded passage moves, a passage
+  whose water reaches the block said, never re-pinned); `docs/references/Tides.md`;
+  `docs/TechnicalSpec-M7.md` §28 as built; the module's head. Nothing a reading says
+  changes in its form.
+
+### Bournemouth and Portsmouth: held, for the lead's ruling (a question)
+
+Package 39a's two gauges lie in `channel-mid` (1.87 W and 1.11 W), not in `channel-east`,
+which begins at 1 W. By the rule as written they would serve every position of
+`channel-mid` (3 W to 1 W: Lyme bay's east, Portland, the Wight, the Channel Islands and the
+Cotentin), which the brief's own truth refuses ("no position in channel-west or west of 1 W
+in channel-mid reads anything new"; 7-282). Both mean levels are unread (null). **They stay
+under `held_gauges:`, read by nothing, as before**, and the brief's truth holds. The lead's
+choice: (a) leave them held; (b) `block: channel-mid`, which moves the tide over the whole
+of channel-mid (the recorded passages sail west of 3 W and would not see it, by the same
+membership; not measured by a run here) and lifts 7-282's west position; (c) a block of
+their own (a region for the Solent, which the manifest does not have). Meanwhile the seam
+at 1 W is a step: at 50.6 N the eleven's M2 a mile west of it is 1.10 m at 191 degrees,
+the block's a mile east 1.00 m at 293 degrees (102 degrees, three and a half hours of the
+tide's clock, off Selsey Bill; the spring range 10.2 feet against 8.6). Portsmouth's own
+M2 is 1.41 m at 326.7 degrees: the block's side is the nearer the truth, and the eleven's
+blend over the Solent and Spithead is wrong by four and a half hours (the finding of 39a
+again; option (b) or (c) would mend it, and Spithead's judged rise with it).
+
+### The figures, before and after (the world's spring range, 2(M2 + S2), at the place)
+
+| Place | Before (the eleven) | After (the block's water) | The gauge's or the period's own |
+|---|---|---|---|
+| Newhaven (gauge) | 3.9 ft, M2 0.45 m at 269 degrees | 19.5 ft, M2 2.25 m at 321 | the gauge 19.5 ft; Norie 20 |
+| Dieppe (gauge) | 5.4 ft | 27.0 ft | the gauge 27.0 ft; Norie 18 |
+| Beachy Head (no gauge) | 4.8 ft | 18.99 ft | Norie 20 (**a foot short by a hundredth of a foot**, below) |
+| Vigo (gauge) | 18.1 ft, far, Le Conquet's | 9.7 ft, M2 1.09 m at 77 | the gauge's own (within a centimetre) |
+| Cadiz (gauge) | 18.1 ft, far | 9.2 ft, M2 1.03 m at 57 | the gauge's own; Tofiño's ten |
+| Isle of Aix (gauge) | 16.5 ft, M2 at 160 (two hours late) | 15.9 ft, M2 at 97.7 | the gauge's 97.7 |
+| Gibraltar (gauge) | 18.1 ft, far, level 3.98 m | 2.8 ft, level 3.98 m (the eleven's: the gauges' unread) | Tofiño's five or six feet |
+| Funchal (gauge) | 18.1 ft, far | 6.5 ft | Norie 7 |
+| Mahón (gauge) | 33.5 ft, far, Saint-Malo's, level 6.83 m | 0.5 ft, level 0.20 m | the gauge's; "no regular tides" |
+| Falmouth, a mile west of 1 W, the whole of channel-west | unchanged, to the bit | | |
+
+### The master's judged rises that moved (item 3; the 37j rule, the world's range to the foot)
+
+Norie's table: the Penmarks 17 to 14 feet, Concarneau 18 to 13, Port Louis 18 to 13, Point
+Mehan 19 to 15, Noirmoustier 18 to 15 (Biscay north); Arcasson 15 to 12 (Biscay south);
+Lisbon 18 to 9, San Lucar 18 to 8 (Portugal); Cape Trafalgar 18 to 3 (the Strait); Hastings
+11 to 18, Ramsgate 18 to 19, Boulogne 15 to 26, Gris Nez 17 to 23, the Somme 5 to 21,
+Fecamp 11 to 19, Honfleur 14 to 22 (the Channel east). Moore's: Shoreham 5 to 18,
+Dungeness 17 to 20, the North Foreland 18 to 19, Calais 16 to 21, Dunkirk 12 to 18. Folkestone
+(19.50 by the new water, 19 kept) and the Downs and Dover in Moore's (19.47 and 19.44, 19
+kept) are within the foot and not moved. No place west of 1 W or in channel-west moved;
+no given rise and no hour moved. **Biscay north's south coast**: Faden 1793's rise for the
+south coast of Bretagne is illegible in the OCR ('«8') and 39b read it eighteen by the
+Channel's blend; the block's own gauges give 13 to 15 feet, so the OCR's figure is unread
+still (the modern ranges at Concarneau and Port-Tudy are about 4.5 m, fifteen feet): a page
+image of Faden p. 92 would settle it.
+
+### GEBCO's fill: the raise does not move; what the rule means for the tiles as they are
+
+`tools/build_charts.py`'s `mean_level_grid` read every gauge of `gauges:`; it now reads the
+eleven alone (`if not g.get("block")`), the level every tile was raised by, so a rebuild of
+any region moves no tile by the rule (`test_tide.py`'s
+`test_the_fill_is_raised_by_the_elevens_level_as_the_tiles_were_built`). **The tiles were
+not rebuilt and do not move.** What the rule means for them as they stand: within a block
+the world's water is now the block's, and the land the fill raised by the eleven's level
+stands against a different sea. Over nine cells of each block's bounds, the world's mean
+level less the raise, and the world's high water springs less the old:
+
+| Block | Mean level less the raise | HWS new less old |
+|---|---|---|
+| channel-east | -0.47 to +1.09 m | -1.16 to +4.42 m |
+| biscay-north | -1.45 to -0.35 | -2.73 to -0.59 |
+| biscay-south | -2.57 to -0.33 | -4.07 to -1.15 |
+| portugal | -2.42 to -1.98 | -3.88 to -3.37 |
+| strait, madeira, azores | 0.00 (the gauges' levels unread) | -1.7 to -2.3 |
+| mediterranean-west | -6.50 to -3.56 | -11.44 to -6.06 |
+| balearics | -6.67 to -6.63 | -11.76 to -11.68 |
+| gulf-of-lion | -6.39 to -4.90 | -11.41 to -8.44 |
+| ligurian-sea | -6.36 to -3.18 | -11.36 to -6.03 |
+| tyrrhenian | -6.35 to 0.00 | -11.35 to -2.81 |
+
+In the Channel east the high water now stands up to four metres higher over land raised by
+the eleven's level (the marshes behind a low shore may cover at springs, as Biscay north's
+did, 39a's fault in the other sense); elsewhere the sea stands lower, and in the
+Mediterranean six metres and more lower against the fill, whose shallows (a lagoon, a
+harbour EMODnet lacks) now read as ground that never covers. A rebuild of each block with
+its own level (`fill_mean_level_m`, or `mean_level_grid` reading the block's water) is the
+lead's to order, region by region, with each block's tests run after it. EMODnet's own
+depths, about LAT, are untouched by any of this: what moved is the water over them.
+
+### The blocks' own tests: four fail on the block's own water (STOPPED here, for the lead)
+
+The recorded passages do not move (below). The blocks' own truths, written while their water
+was the held gauges' wrong tide, were run on this tree (`-k "truth_7_27 or truth_7_28 or
+truth_7_29 or truth_7_30"`, `--slow -n 4`): **three failed**, and one test of 45c's in the fast tier, each where the block's real
+tide changes what the old tide allowed. **None is loosened, re-pinned or marked; the package
+stops here for the lead's ruling** (the brief is silent on the blocks' own truths; its rule
+"do not re-pin" and the hard rule against a test weakened are taken to cover them):
+
+1. **7-294, Gibraltar to Port Mahon (79c).** She takes the ground at the mouth of Port
+   Mahon at 11:14 on the 17th (`ship.aground`, tick 281678, five knots, "two fathoms and a
+   half of water by the chart, and she draws 15 feet", the tide 0.24 m above the datum
+   falling), five minutes after the time 79c recorded for her anchoring there (11:09). The
+   world's water there was Saint-Malo's while the gauges were held (mean level 6.83 m, M2
+   3.68 m) and is Mahón's own now (0.20 m, M2 0.05 m): the 79c book's line into the mouth
+   crossed a sounding of 4.39 m that the false seven metres covered. A question of the
+   mouth's patch (Tofiño's plan, its datum) or of the book's line, 79c's water; not this
+   package's to mend.
+2. **7-279, the Downs to Spithead (79b).** She anchors at 01:28 on the 21st at 50 41 N
+   1 00 W, on the seam east of St Helens, in nine fathoms and a half, and has not weighed
+   for Spithead by the twenty-eighth hour (two anchorings of the three; she was at
+   Spithead within 27 hours on the eleven's water). St Helens and Spithead read the same
+   tide as before (west of 1 W); the Downs, the Strait and the Looe read the block's (the
+   Downs' M2 2.26 m at 333 degrees for 2.20 at 332, the level 3.81 for 3.70), so she comes
+   to the Wight later in the night. Not traced further.
+3. **7-271, the Strait of Dover's set (79b).** The hour's drift on the ebb's strength runs
+   south-west by west over two miles, as the truth wants; the master's account, working
+   the directions' stream, ends 0.65 miles from her (1,200 m) against the truth's 0.6 (the
+   world's stream in the Strait follows the block's tide now, its strength and its hour a
+   little other than the directions').
+
+4. **`test_ports.py::test_the_pilots_deeper_water_is_the_channels_named_from_the_ships_head`
+   (45c's, off the Isle of Aix in `biscay-north`, at low water).** The pilot warns of
+   "shoal water, two fathoms and a half, three cables ahead; the deeper water is to
+   larboard", where the test (the owner's schooner, the road of Aix's water) wants
+   starboard. At Aix the world's tide was the Channel's blend (M2 at 160 degrees, two hours
+   late) and is the gauge's own now (97.7), so "low water" at the save's hour is another
+   height and the channel's side read a mile either side differs. Passes on the head, fails
+   here, alone and in the tier.
+
+The lead's options as I read them: re-tune 79b's and 79c's books and lines, and 45c's place
+off Aix, on the true water (the blocks' work, a follow-up of their own), or rule the four
+re-measured with the old figure beside the new. Every other truth of 7-270 to 7-304 passed,
+and every other test of the fast tier but the pictures' known flake.
+
+### The recorded passages: nothing moved
+
+Run first on the head (`0483a73`, a clean worktree of it, the package's tree not yet
+written) and last on this tree, the same tests by node id, `--slow -n 4`: the eleven (the
+frigate's passage of gate 5b with its pace, the schooner's with her octant and her pilot,
+the merchant passage with its deep-sea cast, the naval cruise with its stranger, truths 72,
+77 and 78): **11 passed both times**, 11 minutes each; `-k "gate_5b or gate_5c"`, one test
+selected (the passage for gate 5b's constants), passed both times; the captain's trials,
+`tests/test_captain_trials.py --slow -n 4`: the same both times, the station's stranger, the
+trade's stranger and thick weather and the two hands passing, the gale with sea room its
+expected failure, and the lee-shore trial **failing on both trees with the same digest**,
+`7fad0ce7e46ba366` against the pin `ed48ca3d61e52f20`: this container's known difference,
+as 79d's and 84's records have it. **The naval cruise's Diamond** patrols eight miles about
+48 N 4 55 W, and the half south of 48 N lies within `biscay-north`: her stream there is the
+block's now (up to 0.75 knots and metres between the two at a sampled hour), and the
+cruise's digests stood all the same. Truth 7-283 holds the rest as a behaviour.
+
+### Found on the way (package 89)
+
+- **Beachy Head is a foot short.** The world's spring range there is 18.99 feet against
+  Norie's 20, Newhaven's gauge seven miles off giving it; the brief's "within a foot" is
+  missed by a hundredth of a foot. Truth 7-280 holds the figure (19.0 within 0.05) and says
+  so, rather than a wider bound. The gauge's own at Newhaven is 19.5, Norie's there 20.
+- **The seams with no region.** The membership is the bounds, and water between two
+  blocks' bounds that no region names reads the eleven alone: the strip 40.50 to 40.56 N
+  between `balearics` (its bounds end at 40.5, its tiles at 40.56) and `gulf-of-lion`, and
+  the water 7.73 to 8.0 E south of 41 N west of Sardinia (between `gulf-of-lion`,
+  `ligurian-sea` and `tyrrhenian`), and the hundredth of a degree between 7.73 and 7.74 E,
+  read Le Conquet's two metres of M2 in the middle of the Mediterranean. A ship crossing
+  from the Balearics to Toulon meets a tide of three or four miles' width there. Mended by
+  the regions' bounds (79c's north bound to 40.56, as its tiles), the lead's; or by a
+  gauge's `block:` naming both neighbours.
+- **The step at 1 W** (Bournemouth and Portsmouth, above): three and a half hours of the
+  tide's clock off Selsey Bill.
+- **Ortona**, the Adriatic's gauge, serves the Tyrrhenian block as 79d held it: its phase is
+  the other sea's, and at Gaeta, 75 miles off, it weighs a sixth of Naples' gauge, a
+  centimetre or so of tide. Said, not changed.
+- **The manifest is read by the tide** (`region_bounds`, once a process, by libyaml where
+  the machine has it: 0.27 s to load the tide with it).
+
+### The truths (7-280 to 7-284, behaviours)
+
+- **7-280**: the world's spring range at Newhaven and Dieppe within a foot of the gauge's own
+  (19.5 and 27.0 feet; the blend had under six), at Beachy Head 18.99 feet against Norie's
+  twenty (above).
+- **7-281**: at Vigo and Cadiz within a foot of their gauges' own, not far (the eleven gave
+  Le Conquet's eighteen feet, far).
+- **7-282**: a mile west of 1 W at 50.6 N the tide's state hour by hour through a day of
+  springs equal to the eleven's alone, to the bit (height, stream, area); a mile east the
+  block's (the spring range other by 1.5 feet).
+- **7-283**: the recorded passages' water reads the tide it read (above).
+- **7-284**: outside every block the gauges blended are the eleven's very list; a fresh
+  cell's work within a quarter of the eleven's alone (the best of five over 300 cells); a
+  cell worked once a lookup under 20 microseconds.
+
+### The tests recast (the held gauges' tests, to the rule)
+
+The tests that asserted a gauge held (`test_tide.py`: Biscay north's, Biscay south's,
+Portugal's, the Strait's, the Channel east's six; `test_islands.py`'s islands; truth
+7-293's read of Mahón's gauge) read the gauges by their `block:` now. Every data assertion
+is kept (the ids in order, the records, the levels, the amplitudes and phases in their
+ranges); each "held, the world's tide is the far gauge's" became the old water measured by
+the eleven alone and the new water asserted the gauge's own (to a degree of M2's phase, a
+centimetre of amplitude, or 0.05 m of range), and each "blending them would move Falmouth"
+is kept as the naive blend's and joined by "the rule does not". The off-Lisbon test of the
+far rule moved thirty miles west, outside Portugal's 10 W (the old place is the block's
+water now), its level held to 1e-9 rather than to the bit, since a new distance's weight
+rounds the level so. New in `test_tide.py`: the loader's refusals and the gauges within
+their blocks; the fill raised by the eleven's level.
+
+### The suite, as run (package 89)
+
+On this session's own container (four cores, nothing beside it). `python -m ruff check .`
+and `ruff format --check .` clean. The recorded passages, the gate's selection and the
+captain's trials before and after, as above. **The slow tier of the files touched**
+(`--slow -m slow -n 4 tests/test_tide.py tests/test_chart.py tests/test_scenarios.py
+tests/test_islands.py`): 3 passed. **The truths 7-280 to 7-284** with `--slow`: 5 passed.
+**The blocks' truths** 7-270 to 7-304 with `--slow -n 4`: three failed (above), the rest
+passed. **The fast tier**, once on this tree (`python -m pytest -n auto -q -p
+no:cacheprovider`, 379 slow tests left out, 25 minutes): two failed,
+`test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`
+("the chart is blank (std 7.9)", the known flake under the tier's load; passes alone on
+this tree) and the pilot off Aix (above; passes on the head, fails here alone). The whole
+slow tier not run (the lead's in the cloud).
