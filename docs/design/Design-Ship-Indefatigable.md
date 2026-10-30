@@ -1271,7 +1271,7 @@ proposes Steel's driver boomsail, which the owner chose (2026-10-28; its §17.9 
    2026-10-30): plain, no lights.* "I looked again at the model, and at a painting I found of
    Indefatigable fighting Virginie ... both seem to agree that the roundhouse had no lights ...
    I think we can keep it plain." Judged from pictures, for the eye (`Build-Ships.md` §5.8), since
-   ZAZ2371 draws no lights there at the resolution read; her file's note says so at her stage B.
+   ZAZ2371 is a side elevation and cannot show that face; her file's note says so at her stage B.
 2. **D25 (owner):** the razee's scenario among (a)-(d) (§11.2); what is common is built now.
 3. **The razee's default fit (owner):** "as razeed 1795" by the brief, or "as carried 1796", the
    guns of every action read (§5.1); it also settles §11.1's second way.
