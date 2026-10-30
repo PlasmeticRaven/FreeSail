@@ -37,9 +37,10 @@ course cut at the mast on her whole mizen yard and Steel's driver in the sail ro
 (`tools/ships/spritsail_yards.py`; `BOWSPRIT_YARDS`), the 64's two and the razee's spritsail
 yard; the bowsprit rooted on the stem head at her 27 degrees, the jib-boom and the stays' leads
 following; her topgallants and royals by Steel's long pole-heads (pp. 16, 42), both files, the
-razee's upper masts being the 64's; and the clew check: the 64's course and driver's boom clear of
-her roundhouse deck and the razee's spanker boom clear of her short roundhouse, each by the head
-room (`HEAD_ROOM_FT`).
+razee's upper masts being the 64's; and the clew check, as the lead ruled it on 2026-10-30: the
+64's course by Steel's words from the deck its mast stands through (`MIZEN_TACK_ABOVE_DECK_FT`), its
+driver's boom clear of her roundhouse deck by the head room (`HEAD_ROOM_FT`), and the razee's
+spanker boom at the least that clears her taffrail (`spanker_cut`).
 
 **Her notes (the lead's notes of 2026-10-29, item 2).** The files' notes carry sources, departures
 and judgements. A figure a rule computes from the file's own keys (a drawn displacement, a port's
@@ -664,18 +665,19 @@ STEEL_BETWEEN_64 = {
 # at the foot, its fore (mast) leech 9 1/4 yards and its after leech 17 1/4.
 STEEL_MIZEN_COURSE_64 = (14.5, 15.5, 9.25, 17.25)
 # Its fore leech "is attached to the mizen-mast within 6 or 7 feet of the deck" (Steel 1794
-# vol. I, 'Mizen-course', OCR l. 11441-11442, read (OCR)): its tack 6 ft 6 in above her
-# quarterdeck, the mean. Indf §4.4 judged 3 ft (the truss 11.6 m above her datum); Steel's text
-# gives 6 or 7 ft, so 6 ft 6 in was built at stage A, the truss 12.7 m above the datum, and the
-# clew check raises it (`mizen_course_cut`).
+# vol. I, 'Mizen-course', OCR l. 11441-11442, read (OCR)): its tack 6 ft 6 in, the mean, above the
+# deck the mast stands through there, her roundhouse deck (the lead's ruling of 2026-10-30: Steel's
+# words first, the head room only where they leave room; `mizen_course_cut`). Indf §4.4 judged 3 ft
+# (the truss 11.6 m above her datum); stage A read the deck as her quarterdeck, the truss 12.7 m
+# above the datum, the foot then ending under her roundhouse deck; the first of stage B raised it
+# by the head room below, until the ruling. Steel's words read, not a head room.
 MIZEN_TACK_ABOVE_DECK_FT = 6.5
 # The head room over her roundhouse deck (the clew check: Bel §1.5, §4.5-§4.6, §17.2 item 13; the
-# lead's notes of 2026-10-29, item 2): what the mizen course's foot, the 64's driver boom and the
-# razee's spanker boom must stand above it by, feet: 6 ft, the 74's (Bel §4.6, judgement: room for
-# the deck's people and its carronades' crews to work beneath), going first, to 5 ft, only where
-# a check breaks; past that, a report with the figures and no file. On a boom it is Bel §4.6's; on
-# a loose foot it is judgement, Bel §1.5 asking a clew only to clear the deck, and the other
-# readings are measured in TuningNotes for the lead.
+# lead's notes of 2026-10-29, item 2): what the 64's driver boom must stand above it by, feet: 6
+# ft, the 74's (Bel §4.6, judgement: room for the deck's people and its carronades' crews to work
+# beneath), going first, to 5 ft, only where a check breaks; past that, a report with the figures
+# and no file. The mizen course's loose foot and the razee's spanker boom no longer read it (the
+# lead's rulings of 2026-10-30).
 HEAD_ROOM_FT = (6.0, 5.0)
 # The mizen yard's lines in Steel's list for a 64 (Steel 1794 vol. II, '64 Gun Ship, 1369 Tons',
 # OCR, read here and not on the page image), inches: the derrick (l. 24857, 4 | 36 | Double 14),
@@ -1270,13 +1272,15 @@ RAZEE_GAFF_FT = 5.0 / 8.0 * RAZEE_BOOM_FT
 # The spanker cut by the frigate-36's rule (gen_ships.frigate(): its head 0.9 of the gaff, its
 # foot 0.9 of the boom, the gaff peaked 40 degrees; judgement there): the throat 3 ft below the
 # mizen's hounds (the frigate's gaff). The boom's jaws: stage A's 6 ft 6 in above her quarterdeck,
-# where the 64's mizen course had its tack (Steel's mizen course "within 6 or 7 feet of the deck"),
-# cleared her taffrail as filed before her roundhouse was measured, then ran through her cabin
-# under its deck; at stage B they are raised clear of it by the least that clears (the lead's
-# notes of 2026-10-29, item 2; `spanker_cut`), the head room `HEAD_ROOM_FT` going first. Indf §4.5's
-# hoist of 43.7 ft (about 240 m2) had the jaws about 1 ft above the deck, as the frigate's boom;
-# at 6 ft 6 in it was 38.3 ft and 218 m2, which the owner kept (2026-10-29: "meant 218"; Indf §17),
-# within 8% of Steel's driver for a 38 (202 m2): that 8% the check the raised cut must hold.
+# where the 64's mizen course then had its tack (Steel's mizen course "within 6 or 7 feet of the
+# deck"), cleared her taffrail as filed before her roundhouse was measured, then ran through her
+# cabin under its deck and under her taffrail as measured; they stand now at literally the least
+# that clears her taffrail (the lead's ruling of 2026-10-30; `spanker_cut`), which clears her
+# roundhouse too. Indf §4.5's hoist of 43.7 ft (about 240 m2) had the jaws about 1 ft above the
+# deck, as the frigate's boom; at 6 ft 6 in it was 38.3 ft and 218 m2, which the owner kept
+# (2026-10-29: "meant 218"; Indf §17), within 8% of Steel's driver for a 38 (202 m2): that 8% the
+# check the raised cut must hold. By the same rule 218 m2 cannot stand with the boom clear of her
+# taffrail (TuningNotes has the figures).
 SPANKER_HEAD_OF_GAFF = 0.9
 SPANKER_FOOT_OF_BOOM = 0.9
 SPANKER_PEAK_DEG = 40.0
@@ -1516,7 +1520,12 @@ def the_upper_works(p):
             "Both stand under her taffrail and her roundhouse's deck, where her cabin is "
             "(`check_derivation`). Was, before her roundhouse "
             "was measured (2026-10-29): both above her taffrail as filed, the tier's after end "
-            "abaft it, and the viewer drew them cut to her side and her transom.",
+            "abaft it, and the viewer drew them cut to her side and her transom. "
+            "Her roundhouse's after face is drawn plain, no lights in it: "
+            "judged for the eye from the built model's photographs and from a painting and a print "
+            "of the Virginie action (Build-Ships.md §5.8), ZAZ2371 being a side elevation that "
+            "cannot show that face (the lead's question of 2026-10-29; the owner's answer of "
+            "2026-10-30, Indf §17 item 1).",
             "marks": "Each line's rung (Build-Ships.md §5.0 principles 3 and 4): sourced, "
             "measured on her own draughts (the 64's ZAZ1407, ZAZ1280, ZAZ1953; hers ZAZ2371, "
             "ZAZ2375) at her own line; judged, a judgement at its weakest point, which the line's "
@@ -1652,7 +1661,7 @@ def her_hull(p):
         "0.58-0.64 m abaft the middle of the load line (Ind §2.3.6), with the frigate-36's tuned "
         "lead of 9.6% of her load line ahead of it (Indf §2.1; judgement), tuned against the "
         "helm's truths (6 and 17; Indf §9, §16 item 6). Forward of that at stage B, her spanker "
-        "cut smaller on its boom raised clear of her roundhouse having taken her helm away, to "
+        "cut smaller on its boom raised clear of her taffrail having taken her helm away, to "
         "stand it near the frigate-36's (judgement; the truths held at the start). Measured, old "
         "beside new, in docs/dev/TuningNotes.md, and held by her tests.",
         "lateral_area_m2": "Below her line with the band, the rudder left out, as the frigate's "
@@ -2813,66 +2822,63 @@ def mizen_course_cut(p, gm, mast_x_m, rake_deg, frame):
     """The 64's mizen course cut at the mast (`mizen_yard.course`; Ext §3.4) from Steel's table
     IV: its tack on the mast, its throat a fore leech above at the yard's truss, its head along
     the yard aft and up to the peak, its foot level aft to the clew; (x, z above her water) in
-    metres, with its area and centre. Its tack is Steel's, 6 ft 6 in above her quarterdeck,
-    unless her roundhouse deck under the foot then stands within the head room of it (the clew
-    check: Bel §1.5; the lead's notes of 2026-10-29, item 2): then raised until the foot clears
-    it by `HEAD_ROOM_FT`'s first figure, the head room going to its second only where a check
-    breaks (the cut's own and the driver's, `mizen_driver_cut`)."""
+    metres, with its area and centre. Its tack is Steel's words read from the deck the mast stands
+    through there: 6 ft 6 in above her roundhouse deck at the mast (the lead's ruling of 2026-10-30;
+    `MIZEN_TACK_ABOVE_DECK_FT`), to the centimetre above. Raises `ValueError` where the foot would
+    not then clear that deck at the side (the clew check: Bel §1.5), or the driver cannot be cut on
+    it (`mizen_driver_cut`)."""
     x_ft = p.masts["mizzen"]["x_ft"]
-    deck = p.z_m(interp(p.decks["quarterdeck"], x_ft), x_ft)
-    steel_tack = deck + MIZEN_TACK_ABOVE_DECK_FT * FT
-    yard = STEEL_64["mizen_yard"] * FT
-    steel = STEEL_MIZEN_COURSE_64
-
-    def cut(tack_z):
-        return mizen_yard.course(
-            mast_x=mast_x_m,
-            rake_deg=rake_deg,
-            frame_z=frame,
-            tack_z=tack_z,
-            steel=steel,
-            yard_length_m=yard,
-        )
-
-    first = cut(steel_tack)
-    tack, _throat, _peak, clew = first["corners"]
-    tried = []
-    for room_ft in HEAD_ROOM_FT:
-        room = room_ft * FT
-        under = under_the_run(p, p.decks.get("roundhouse"), clew[0], tack[0], room)
-        tack_z = max([steel_tack] + [z + r for _x, z, r in under])
-        if tack_z > steel_tack:
-            tack_z = math.ceil(tack_z * 100.0 - 1e-9) / 100.0
-        try:
-            crs = cut(tack_z)
-            if DRIVER and MIZEN_COURSE == "gated":
-                mizen_driver_cut(p, crs, mast_x_m, rake_deg, frame)
-        except ValueError as e:
-            tried.append(f"{room_ft:g} ft: {e}")
-            continue
-        clear = min(tack_z - z for _x, z, _r in under) if under else None
-        steel_clear = min(steel_tack - z for _x, z, _r in under) if under else None
-        return {
-            "corners": crs["corners"],
-            "area": round(crs["area"]),
-            "x": round(crs["x"], 1),
-            "centre": round(crs["centre"], 1),
-            "deck": deck,
-            "head_m": crs["head"],
-            "run": crs["run"],
-            "rise": crs["rise"],
-            "foot": crs["foot"],
-            "cut": crs,
-            "steel_tack": steel_tack,
-            "head_room_ft": room_ft if tack_z > steel_tack else None,
-            "clear": clear,
-            "steel_clear": steel_clear,
-        }
-    raise ValueError(
-        "the 64's mizen course cannot be cut clear of her roundhouse deck within the head room "
-        "the lead allows (the clew check: Bel §1.5; the lead's notes of 2026-10-29): "
-        + "; ".join(tried)
+    quarterdeck = p.z_m(interp(p.decks["quarterdeck"], x_ft), x_ft)
+    deck = p.z_m(interp(p.decks["roundhouse"], x_ft), x_ft)
+    tack_z = math.ceil((deck + MIZEN_TACK_ABOVE_DECK_FT * FT) * 100.0 - 1e-9) / 100.0
+    crs = mizen_yard.course(
+        mast_x=mast_x_m,
+        rake_deg=rake_deg,
+        frame_z=frame,
+        tack_z=tack_z,
+        steel=STEEL_MIZEN_COURSE_64,
+        yard_length_m=STEEL_64["mizen_yard"] * FT,
     )
+
+    def over_the_deck(sail):
+        """What its level foot stands over her roundhouse deck, at the least, over its run."""
+        tack, _throat, _peak, clew = sail["corners"]
+        under = under_the_run(p, p.decks["roundhouse"], clew[0], tack[0], 0.0)
+        return min(tack[1] - z for _x, z, _r in under)
+
+    clear = over_the_deck(crs)
+    if clear <= 0.0:
+        raise ValueError(
+            f"the 64's mizen course's foot stands {clear:.2f} m over her roundhouse deck at the "
+            "side: its clew must clear it (the clew check: Bel §1.5)."
+        )
+    if DRIVER and MIZEN_COURSE == "gated":
+        mizen_driver_cut(p, crs, mast_x_m, rake_deg, frame)
+    # stage A's reading, her quarterdeck, for the report
+    old_tack = quarterdeck + MIZEN_TACK_ABOVE_DECK_FT * FT
+    old_cut = mizen_yard.course(
+        mast_x=mast_x_m,
+        rake_deg=rake_deg,
+        frame_z=frame,
+        tack_z=old_tack,
+        steel=STEEL_MIZEN_COURSE_64,
+        yard_length_m=STEEL_64["mizen_yard"] * FT,
+    )
+    return {
+        "corners": crs["corners"],
+        "area": round(crs["area"]),
+        "x": round(crs["x"], 1),
+        "centre": round(crs["centre"], 1),
+        "deck": deck,
+        "head_m": crs["head"],
+        "run": crs["run"],
+        "rise": crs["rise"],
+        "foot": crs["foot"],
+        "cut": crs,
+        "old_tack": old_tack,
+        "clear": clear,
+        "old_clear": over_the_deck(old_cut),
+    }
 
 
 def mizen_driver_cut(p, crs, mast_x_m, rake_deg, frame):
@@ -2956,7 +2962,6 @@ def mizen_course(b, p, mz, rope_scale):
         "of braces and bowlines at its heel, its sail trimmed by the sheet (Ext §3.3; Falconer "
         "1780, VANGS and BRACE).",
     )
-    head_room = mz["head_room_ft"]
     sail = b.sail(
         "mizzen.course",
         "lateen",
@@ -2976,21 +2981,15 @@ def mizen_course(b, p, mz, rope_scale):
         "foot, its fore leech 9 1/4 yards and its after leech 17 1/4; Ind §5), 22 1/2 in a "
         "cloth, its luff laced to the mast, its head along the yard to the peak, its foot level "
         "and loose (tools/ships/mizen_yard.py); corners [tack, throat, peak, clew]. "
-        + (
-            f"Its tack raised on the mast until its foot stands {head_room:g} ft over her "
-            "roundhouse deck at the side (the clew check: Bel §1.5; the lead's notes of "
-            f"2026-10-29, the head room first, to 5 ft), {head_room:g} ft being the 74's boom's "
-            "figure (Bel §4.6) taken for the foot: judgement, Bel §4.5's own course standing "
-            "nearer its poop. Plainly: above Steel's 'within 6 or 7 "
-            "feet of the deck' (OCR l. 11441-11442), her roundhouse standing over her "
-            "quarterdeck at the mizen; stage A cut it 6 ft 6 in above her quarterdeck, and its "
-            "foot ended under the roundhouse deck. "
-            if head_room is not None
-            else "Its tack 6 ft 6 in above her quarterdeck (Steel: 'within 6 or 7 feet of the "
-            "deck', OCR l. 11441-11442), its foot clear of her roundhouse deck. "
-        )
-        + "One reef band a fifth up its mast leech (Steel, OCR l. 11448)."
-        + g.canvas_note(canvas),
+        "Its tack 6 ft 6 in above her roundhouse deck at the mast: Steel's words read, 'within 6 "
+        "or 7 feet of the deck' (OCR l. 11441-11442), the mean, the deck being the deck the mast "
+        "stands through there (the lead's ruling of 2026-10-30), and not a head room; so read its "
+        "foot clears that deck at the side, the deck rising aft (the clew check: Bel §1.5). "
+        "Plainly: stage A read the deck as her quarterdeck, and the foot ended under her "
+        "roundhouse deck; Steel's mizen staysail, the same measure, names the quarter-deck (OCR "
+        "l. 12311-12312), and Steel says nothing of a roundhouse at the mizen, so the deck is the "
+        "ruling's reading, judgement. "
+        "One reef band a fifth up its mast leech (Steel, OCR l. 11448)." + g.canvas_note(canvas),
     )
     # the lines of Ext §3.4: the derrick, the vang pendants and the bowlines at Steel's sizes for
     # a 64 (vol. II, '64 Gun Ship', legible in part: OCR l. 24857-24865), the jeers, whose size
@@ -3069,9 +3068,13 @@ def mizen_driver(b, p, d):
         length_m=g.ft(RAZEE_BOOM_FT),
         height_m=above_datum(p, round(jaws - p.frame_z, 2)),
         horse_m=round(0.5 * p.hull["beam_m"], 1),
+        rigged_out=d["boom"]["rigged_out"],
         rating_kn=g.design_kn(load, g.DESIGN_WIND_KN["gaff"]),
         note=f"driver boom {fmt_ft(RAZEE_BOOM_FT)}, the main topsail yard's length (Steel 1794 "
         "vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; Ext §17.2). "
+        "Rigged in on the booms while the driver is in the sail room, and out with the sail only "
+        "while it is bent, in the shift, the bend and the unbend (the owner's, judgement: Ext "
+        "§17.11; no source says what became of it while the course drew). "
         "Plainly: Steel's p. 49 column gives the 64 '0 0', and the Lancaster's boom of 1797 is "
         "the only 64's on record (Ext §17.1). Level, its jaws on the mast at the least height "
         f"that gives it {d['head_room_ft']:g} ft of head room over her roundhouse deck at the "
@@ -3222,11 +3225,11 @@ def spanker_cut(p, gm, mast_x_m, rake_deg, frame):
     tack at the boom's jaws, its throat at the gaff's jaws under the mizen's hounds, its head 0.9
     of the gaff peaked 40 degrees, its foot 0.9 of the boom along it; (x, z above her water) in
     metres, with its area and centre; `gm` and the mast's x above and at her frame
-    (`Particulars.frame_z`). The boom lies level, its jaws raised from stage A's 6 ft 6 in above
-    her quarterdeck by the least that clears her short roundhouse by the head room (the clew
-    check: Bel §1.5, §4.6; the lead's notes of 2026-10-29, item 2) and her taffrail, the spanker
-    cut by the rule on them; the head room going first (`HEAD_ROOM_FT`) if the sail would then
-    fall outside 8% of Steel's driver for a 38, as the owner settled it (Indf §17)."""
+    (`Particulars.frame_z`). The boom lies level, its jaws at literally the least that clears her
+    taffrail as filed, a centimetre above it (the lead's ruling of 2026-10-30), raised from stage
+    A's 6 ft 6 in above her quarterdeck, the spanker cut by the rule on them. Raises `ValueError`
+    where that boom would not clear her short roundhouse's deck (the clew check: Bel §1.5) or the
+    sail would fall outside 8% of Steel's driver for a 38, as the owner settled it (Indf §17)."""
     x_ft = p.masts["mizzen"]["x_ft"]
     deck = p.z_m(p.deck_k_ft(x_ft), x_ft)
     filed = deck + SPANKER_BOOM_ABOVE_DECK_FT * FT
@@ -3252,40 +3255,37 @@ def spanker_cut(p, gm, mast_x_m, rake_deg, frame):
         area, cx, cz = g._quad_area_centroid(corners)
         return corners, area, cx, cz, clew
 
-    tried = []
-    for room_ft in HEAD_ROOM_FT:
-        room = room_ft * FT
-        under = under_the_run(
-            p, p.decks.get("roundhouse"), on_mast(filed) - boom, on_mast(filed), room
+    # the file keeps her taffrail to the centimetre, and a boom level with it does not clear it
+    boom_z = round(round(taffrail, 2) + 0.01, 2)
+    under = under_the_run(p, p.decks["roundhouse"], on_mast(boom_z) - boom, on_mast(boom_z), 0.0)
+    clear = min(boom_z - z for _x, z, _r in under)
+    if clear <= 0.0:
+        raise ValueError(
+            f"the razee's spanker boom at her taffrail stands {clear:.2f} m over her short "
+            "roundhouse's deck: it must clear it (the clew check: Bel §1.5)."
         )
-        boom_z = max([filed, taffrail] + [z + r for _x, z, r in under])
-        boom_z = math.ceil(boom_z * 100.0 - 1e-9) / 100.0
-        corners, area, cx, cz, clew = cut(boom_z)
-        if abs(area / STEEL_DRIVER_38_M2 - 1.0) > SPANKER_BAND_OF_38:
-            tried.append(f"{room_ft:g} ft: {area:.0f} m2")
-            continue
-        return {
-            "corners": corners,
-            "area": round(area),
-            "x": round(cx, 1),
-            "centre": round(cz, 1),
-            "deck": deck,
-            "boom_z": boom_z,
-            "throat_z": throat_z,
-            "leech": peak[1] - boom_z,
-            "clew_x": clew[0],
-            "filed_z": filed,
-            "filed_area": round(cut(filed)[1]),
-            "head_room_ft": room_ft,
-            "clear": min(boom_z - z for _x, z, _r in under) if under else None,
-            "taffrail": taffrail,
-            "overhang_ft": (x_m(taff_x) - (on_mast(boom_z) - boom)) / FT,
-        }
-    raise ValueError(
-        "the razee's spanker cannot keep within 8% of Steel's driver for a 38 "
-        f"({STEEL_DRIVER_38_M2:g} m2) with its boom clear of her roundhouse by the head room the "
-        "lead allows (the lead's notes of 2026-10-29): " + "; ".join(tried)
-    )
+    corners, area, cx, cz, clew = cut(boom_z)
+    if abs(area / STEEL_DRIVER_38_M2 - 1.0) > SPANKER_BAND_OF_38:
+        raise ValueError(
+            f"the razee's spanker is {area:.0f} m2 on its boom at her taffrail, outside 8% of "
+            f"Steel's driver for a 38 ({STEEL_DRIVER_38_M2:g} m2; the owner, Indf §17)."
+        )
+    return {
+        "corners": corners,
+        "area": round(area),
+        "x": round(cx, 1),
+        "centre": round(cz, 1),
+        "deck": deck,
+        "boom_z": boom_z,
+        "throat_z": throat_z,
+        "leech": peak[1] - boom_z,
+        "clew_x": clew[0],
+        "filed_z": filed,
+        "filed_area": round(cut(filed)[1]),
+        "clear": clear,
+        "taffrail": taffrail,
+        "overhang_ft": (x_m(taff_x) - (on_mast(boom_z) - boom)) / FT,
+    }
 
 
 def spanker(b, p, sp, rope_scale):
@@ -3319,13 +3319,13 @@ def spanker(b, p, sp, rope_scale):
         note=f"driver boom {fmt_ft(RAZEE_BOOM_FT)}, the main topsail yard's length (Steel 1794 "
         "vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; D20 (a)), "
         "overhanging her taffrail, long (Ind §3.3 reckoned it against her taffrail as then "
-        "filed; no source objects). Level, its jaws "
-        f"raised by the least that gives it {sp['head_room_ft']:g} ft of head room over her short "
-        "roundhouse's deck (ZAZ2371, the warrant of December 1794: Ind §2.2; the clew check, Bel "
-        "§1.5, §4.6; the lead's notes of 2026-10-29), clear over her taffrail. Plainly: stage A "
-        "laid it 6 ft 6 in above her quarterdeck, where the 64's mizen course had its tack "
-        "(Steel's 'within 6 or 7 feet of the deck', judgement for the boom), before her roundhouse "
-        "was measured, and it ran through the cabin under the deck, so her spanker is cut "
+        "filed; no source objects). Level, its jaws at literally the least that clears her "
+        "taffrail (the lead's ruling of 2026-10-30), which clears her short roundhouse's deck "
+        "(ZAZ2371, the warrant of December 1794: Ind §2.2; the clew check, Bel §1.5) by less than "
+        "a man's height, a boom her people stoop under. Plainly: stage A laid it 6 ft 6 in above "
+        "her quarterdeck, where the 64's mizen course then had its tack (Steel's 'within 6 or 7 "
+        "feet of the deck', judgement for the boom), before her roundhouse was measured, and it "
+        "ran through the cabin under the deck and under her taffrail, so her spanker is cut "
         "smaller on it than the 218 m2 the owner kept (the sail's note). horse_m " + g.HORSE_NOTE,
     )
     sail = b.sail(
@@ -3347,10 +3347,11 @@ def spanker(b, p, sp, rope_scale):
         "table IV (read on the page image, Indf §3.5 item 6) gives the 44 a gaff mizen course of "
         "about 88 m2 and a driver of 157, the 38 105 and 202, the 64's driver 198; the "
         "frigate-36's spanker is 167. The owner settled it by this rule at 218 m2, within 8% of "
-        "the 38's driver (2026-10-29; Indf §17); with the boom's jaws raised clear of her "
-        "roundhouse the same rule cuts it smaller, kept within that 8% (the lead's notes of "
-        "2026-10-29). Two reef bands, as the frigate-36's (Steel's mizen course has one)."
-        + g.canvas_note(canvas),
+        "the 38's driver (2026-10-29; Indf §17), on the boom as stage A filed it; with the boom's "
+        "jaws clear of her taffrail the same rule cannot keep 218, and cuts it near the 38's own "
+        "figure, the most that a boom clear of her taffrail allows (the lead's ruling of "
+        "2026-10-30), kept within that 8%. Two reef bands, as the frigate-36's (Steel's mizen "
+        "course has one)." + g.canvas_note(canvas),
     )
     for lid, cls, of, size, parts in (
         ("mizzen.gaff.throat_halyard", "throat_halyard", gaff, 4.5, 3),
@@ -5040,10 +5041,10 @@ def her_report() -> str:
         out.append(
             "sixty-four: mizen course: tack "
             f"{mz['corners'][0][1]:.2f} m above her water, "
-            f"{(mz['corners'][0][1] - mz['deck']) / FT:.1f} ft above her quarterdeck (Steel's "
-            f"{mz['steel_tack']:.2f} m would stand {mz['steel_clear']:.2f} m over her roundhouse "
-            f"deck at the side at its worst); the foot {mz['clear']:.2f} m over it now; "
-            f"{mz['area']} m2, centre {mz['centre']} m."
+            f"{(mz['corners'][0][1] - mz['deck']) / FT:.1f} ft above her roundhouse deck at the "
+            f"mast, Steel's words read (from her quarterdeck, stage A's, {mz['old_tack']:.2f} m, "
+            f"its foot {mz['old_clear']:.2f} m over that deck at the side); the foot "
+            f"{mz['clear']:.2f} m over it now; {mz['area']} m2, centre {mz['centre']} m."
         )
     d = r.get("driver")
     if d:
@@ -5074,7 +5075,7 @@ def her_report() -> str:
         out.append(
             f"razee: spanker boom: jaws {sp['boom_z']:.2f} m, raised "
             f"{sp['boom_z'] - sp['filed_z']:.2f} m from {sp['filed_z']:.2f} m, "
-            f"{sp['head_room_ft']:g} ft over her roundhouse deck ({sp['clear']:.2f} m), "
+            f"{sp['clear']:.2f} m over her roundhouse deck, "
             f"{sp['boom_z'] - sp['taffrail']:.2f} m over her taffrail, its end "
             f"{sp['overhang_ft']:.1f} ft beyond it; spanker {sp['area']} m2 "
             f"(was {sp['filed_area']}), {sp['area'] / STEEL_DRIVER_38_M2 - 1.0:+.1%} of Steel's "

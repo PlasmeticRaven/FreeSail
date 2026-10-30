@@ -1426,6 +1426,25 @@ class Builder:
                 spar["rating_kn"] = max(value, 1.0)
                 names = ", ".join(s[0] for s in sails)
                 how = f"Rating: {names} in {rating.wind_kn:.0f} kn -> {spar['rating_kn']:g} kN."
+                # a spar's rating by the sails whose chains pass through it is a proxy for its
+                # scantlings, and the proxy may not shrink when a smaller sail is hung on the
+                # spar: a bowsprit or a jib-boom with yards crossed under it keeps the larger of
+                # its named rating, from the headsails that load the stays' masts instead, and
+                # the sails' (package 75, the lead's ruling of 2026-10-30, on the yards under the
+                # 64's and the razee's bowsprit). No yard is crossed under those spars on the
+                # eight files. Three of them chain a jib through a running bowsprit, and a jib is
+                # no such sail: on the cutter and the smack the sails named are that jib, so
+                # nothing shrinks; the lugger's flying jib keeps its 21.8 kN against the 37.4 named.
+                if (
+                    cls in ("bowsprit", "jib_boom")
+                    and float(rating) > spar["rating_kn"]
+                    and all(ship.under_bowsprit(s[0]) for s in sails)
+                ):
+                    spar["rating_kn"] = float(rating)
+                    how = (
+                        f"Rating: the sails named in the script in {rating.wind_kn:.0f} kn -> "
+                        f"{spar['rating_kn']:g} kN, kept over {names}, the smaller load."
+                    )
             else:
                 # the engine hangs no sail's chain on this spar (a bare yard, a boom, the
                 # bowsprit and jib-booms, whose headsails load the stays' masts instead):

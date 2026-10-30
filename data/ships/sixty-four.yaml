@@ -279,7 +279,7 @@ spars:
   x_m: -16.33
   rake_deg: 2.15
   height_m: 19.7
-  rating_kn: 323.8
+  rating_kn: 323.2
 # mizzen topmast 43 ft 6 in (Steel p. 49), its hoist above the lower cap the length less the lower mast head, its head 4 ft 3 in by Steel's rule. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.topmast_staysail in 40 kn.
 - id: mizzen.topmast
   class: topmast
@@ -335,30 +335,31 @@ spars:
   class: lateen_yard
   'on': mizzen.mast
   length_m: 23.5
-  height_m: 14.67
-  rating_kn: 41.3
-# driver boom 65 ft 4 in, the main topsail yard's length (Steel 1794 vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; Ext §17.2). Plainly: Steel's p. 49 column gives the 64 '0 0', and the Lancaster's boom of 1797 is the only 64's on record (Ext §17.1). Level, its jaws on the mast at the least height that gives it 6 ft of head room over her roundhouse deck at the side (the clew check: Bel §1.5, §4.6; the lead's notes of 2026-10-29, the head room first, to 5 ft), and the least that also keeps the driver's after leech within Steel's band, two to four yards deeper than the course's (Steel 1794 vol. I, DRIVER BOOMSAIL; Ext §17.2), clear over her taffrail. Ext §17.2's 2.4 m above her quarterdeck, taken before her roundhouse was measured, laid it level with the roundhouse deck at the stern. Steel's topping lifts and guy pendants (OCR l. 23103-23121) are not filed as lines, as the frigate files none on her spanker boom. horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn (the engine's graph loads nothing on it).
+  height_m: 13.97
+  rating_kn: 40.9
+# driver boom 65 ft 4 in, the main topsail yard's length (Steel 1794 vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; Ext §17.2). Rigged in on the booms while the driver is in the sail room, and out with the sail only while it is bent, in the shift, the bend and the unbend (the owner's, judgement: Ext §17.11; no source says what became of it while the course drew). Plainly: Steel's p. 49 column gives the 64 '0 0', and the Lancaster's boom of 1797 is the only 64's on record (Ext §17.1). Level, its jaws on the mast at the least height that gives it 6 ft of head room over her roundhouse deck at the side (the clew check: Bel §1.5, §4.6; the lead's notes of 2026-10-29, the head room first, to 5 ft), clear over her taffrail. Ext §17.2's 2.4 m above her quarterdeck, taken before her roundhouse was measured, laid it level with the roundhouse deck at the stern. Steel's topping lifts and guy pendants (OCR l. 23103-23121) are not filed as lines, as the frigate files none on her spanker boom. horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn (the engine's graph loads nothing on it).
 - id: mizzen.boom
   class: boom
   'on': mizzen.mast
   length_m: 19.9
-  height_m: 6.9
+  height_m: 6.47
   horse_m: 6.8
-  rating_kn: 83.8
-# bowsprit 60 ft 4 in (Steel p. 49, the 64), steeved 27 deg (measured, Ind §3.1), rooted on the stem head, where ZAZ1407 draws it lying and the viewer draws its heel (Indf §3.5 item 9; Ext §6.2 as built): x_m its root, length_m its part outboard of the stem head from its heel measured just before the fore mast on ZAZ1280 (±1 ft; Luce's third inboard would give 40.2 ft), height_m its end above the datum. Stage A rooted it at the near knighthead's cap (moved at stage B, the headsails' tacks and the stays' leads with it). The spritsail yard slung under it and the sprit-topsail yard under the jib-boom (D8 (b); Ext §4.1; tools/ships/spritsail_yards.py). Rating: spritsail, sprit_topsail in 55 kn.
+  rigged_out: false
+  rating_kn: 81.6
+# bowsprit 60 ft 4 in (Steel p. 49, the 64), steeved 27 deg (measured, Ind §3.1), rooted on the stem head, where ZAZ1407 draws it lying and the viewer draws its heel (Indf §3.5 item 9; Ext §6.2 as built): x_m its root, length_m its part outboard of the stem head from its heel measured just before the fore mast on ZAZ1280 (±1 ft; Luce's third inboard would give 40.2 ft), height_m its end above the datum. Stage A rooted it at the near knighthead's cap (moved at stage B, the headsails' tacks and the stays' leads with it). The spritsail yard slung under it and the sprit-topsail yard under the jib-boom (D8 (b); Ext §4.1; tools/ships/spritsail_yards.py). Rating: the sails named in the script in 55 kn, kept over spritsail, sprit_topsail, the smaller load.
 - id: bowsprit
   class: bowsprit
   x_m: 25.15
   length_m: 13.5
   height_m: 7.8
-  rating_kn: 100.6
-# jib-boom 43 ft 9 in (Steel p. 49), 7/12 of it outboard along the bowsprit's steeve (Luce, the frigate's rule; judgement). No flying jib-boom: Steel's 64 has none, Steel's 'flying jib boom' rule being this boom's (Ind §3.1, judgement). Rating: sprit_topsail in 30 kn.
+  rating_kn: 168.6
+# jib-boom 43 ft 9 in (Steel p. 49), 7/12 of it outboard along the bowsprit's steeve (Luce, the frigate's rule; judgement). No flying jib-boom: Steel's 64 has none, Steel's 'flying jib boom' rule being this boom's (Ind §3.1, judgement). Rating: the sails named in the script in 30 kn, kept over sprit_topsail, the smaller load.
 - id: jib_boom
   class: jib_boom
   'on': bowsprit
   length_m: 7.8
   height_m: 11.3
-  rating_kn: 16.1
+  rating_kn: 27.0
 # spritsail yard 57 ft 6 in by 12 1/8 in (Steel p. 49, the 64), slung under the bowsprit near the cap (Steel 1794 vol. I pp. 196-197: its slings over the bowsprit, its halyards from the cap; Lavery 1985 I30), 0.85 of the way out its outboard part and 0.8 m under its line (judgement, both); no halyard, it hanging in slings (Ext §4.1); x_m and height_m its slings (Ext §4.1); braces 30 deg from square, from the yard's arms to the fore top and the fore stay (Steel 1794 vol. I pp. 196-197; Lavery 1985 I30; judgement, as the engine's fixture: no lead was measured to stop her sooner); kept out of the file's yard groups, braced by name, by 'brace sharp up' and 'trim sails' (Ext §4.2 as built). Rating: spritsail in 40 kn.
 - id: spritsail.yard
   class: yard
@@ -581,7 +582,7 @@ sails:
   centre_height_m: 39.5
   canvas_no: 8
   cloth_rating_kn: 5.1
-# mizen course, a lateen cut at the mast (D9 (c) as revised, Bel §13.5; Ext §3.4), the four-sided loose-footed sail the owner rules, on the gaff's curve and trim in the physics (Ext §3.1): Steel's table IV, the 64 (14 1/2 cloths at the head, 15 1/2 at the foot, its fore leech 9 1/4 yards and its after leech 17 1/4; Ind §5), 22 1/2 in a cloth, its luff laced to the mast, its head along the yard to the peak, its foot level and loose (tools/ships/mizen_yard.py); corners [tack, throat, peak, clew]. Its tack raised on the mast until its foot stands 6 ft over her roundhouse deck at the side (the clew check: Bel §1.5; the lead's notes of 2026-10-29, the head room first, to 5 ft), 6 ft being the 74's boom's figure (Bel §4.6) taken for the foot: judgement, Bel §4.5's own course standing nearer its poop. Plainly: above Steel's 'within 6 or 7 feet of the deck' (OCR l. 11441-11442), her roundhouse standing over her quarterdeck at the mizen; stage A cut it 6 ft 6 in above her quarterdeck, and its foot ended under the roundhouse deck. One reef band a fifth up its mast leech (Steel, OCR l. 11448). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
+# mizen course, a lateen cut at the mast (D9 (c) as revised, Bel §13.5; Ext §3.4), the four-sided loose-footed sail the owner rules, on the gaff's curve and trim in the physics (Ext §3.1): Steel's table IV, the 64 (14 1/2 cloths at the head, 15 1/2 at the foot, its fore leech 9 1/4 yards and its after leech 17 1/4; Ind §5), 22 1/2 in a cloth, its luff laced to the mast, its head along the yard to the peak, its foot level and loose (tools/ships/mizen_yard.py); corners [tack, throat, peak, clew]. Its tack 6 ft 6 in above her roundhouse deck at the mast: Steel's words read, 'within 6 or 7 feet of the deck' (OCR l. 11441-11442), the mean, the deck being the deck the mast stands through there (the lead's ruling of 2026-10-30), and not a head room; so read its foot clears that deck at the side, the deck rising aft (the clew check: Bel §1.5). Plainly: stage A read the deck as her quarterdeck, and the foot ended under her roundhouse deck; Steel's mizen staysail, the same measure, names the quarter-deck (OCR l. 12311-12312), and Steel says nothing of a roundhouse at the mizen, so the deck is the ruling's reading, judgement. One reef band a fifth up its mast leech (Steel, OCR l. 11448). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: mizzen.course
   class: lateen
   yard: mizzen.yard
@@ -589,12 +590,12 @@ sails:
   cut_at_mast: true
   area_m2: 104
   reef_bands: 1
-  x_m: -21.5
-  centre_height_m: 15.6
+  x_m: -21.4
+  centre_height_m: 14.9
   canvas_no: 2
   cloth_rating_kn: 33.3
-  corners_m: [[-16.56, 6.21], [-16.88, 14.67], [-25.17, 21.98], [-25.42, 6.21]]
-# Steel's driver boomsail (Steel 1794 vol. I, DRIVER BOOMSAIL, OCR l. 13816-13843; Ext §17; the owner's choice of 2026-10-28), 'occasionally hoisted ... in light fair winds': a lateen cut at the mast on the mizen yard and its boom, in the sail room, bent in the mizen course's place by the shift of the one for the other (Ext §17.3: the period bent it beside the course and brailed the course; one after sail bent is the game's choice). Steel's table IV, the 64: 22 1/2 cloths at the head and 29 at the foot, its fore leech 9 1/2 yards and its after leech 20 (Ind §5), 22 1/2 in a cloth; its throat the course's, its tack at the boom's jaws, its head along the mizen yard's line and on past the yard's peak on Steel's driver yard (the fore topgallant yard's 34 ft 6 in, p. 40; not filed, it went aloft with the sail: Ext §17.2), its foot along the boom; corners [tack, throat, peak, clew]. Its fore leech short of Steel's, the jaws set by the after leech's band over the boom's head room (the boom's note): Steel's four figures do not hang together on the course's yard (Ext §17.2). No reef band: Steel names none. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Driver': No. 5 or 6 (OCR l. 13819), the first taken); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
+  corners_m: [[-16.54, 5.51], [-16.85, 13.97], [-25.14, 21.28], [-25.4, 5.51]]
+# Steel's driver boomsail (Steel 1794 vol. I, DRIVER BOOMSAIL, OCR l. 13816-13843; Ext §17; the owner's choice of 2026-10-28), 'occasionally hoisted ... in light fair winds': a lateen cut at the mast on the mizen yard and its boom, in the sail room, bent in the mizen course's place by the shift of the one for the other (Ext §17.3: the period bent it beside the course and brailed the course; one after sail bent is the game's choice). Steel's table IV, the 64: 22 1/2 cloths at the head and 29 at the foot, its fore leech 9 1/2 yards and its after leech 20 (Ind §5), 22 1/2 in a cloth; its throat the course's, its tack at the boom's jaws, its head along the mizen yard's line and on past the yard's peak on Steel's driver yard (the fore topgallant yard's 34 ft 6 in, p. 40; not filed, it went aloft with the sail: Ext §17.2), its foot along the boom; corners [tack, throat, peak, clew]. Its fore leech short of Steel's, the jaws set by the boom's head room (the boom's note): Steel's four figures do not hang together on the course's yard (Ext §17.2). No reef band: Steel names none. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Driver': No. 5 or 6 (OCR l. 13819), the first taken); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
 - id: mizzen.driver
   class: lateen
   yard: mizzen.yard
@@ -603,13 +604,13 @@ sails:
   cut_at_mast: true
   bent: false
   in_place_of: mizzen.course
-  area_m2: 207
+  area_m2: 203
   reef_bands: 0
   x_m: -25.2
-  centre_height_m: 17.1
+  centre_height_m: 16.5
   canvas_no: 5
-  cloth_rating_kn: 50.5
-  corners_m: [[-16.59, 6.9], [-16.88, 14.67], [-29.74, 26.02], [-33.16, 6.9]]
+  cloth_rating_kn: 49.5
+  corners_m: [[-16.57, 6.47], [-16.85, 13.97], [-29.71, 25.32], [-33.15, 6.47]]
 # fore staysail, a triangle (Steel's table IV, the 64: 19 cloths in the foot, 11.5 yards in the leech; Ind §5): its tack at its stay's foot, its luff up the stay, foot and leech square at the clew (judgement on Steel's figures); corners [tack, peak, clew]. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore staysail': No. 1 to 3, the middle taken (Ind §5)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: fore.staysail
   class: jibheaded

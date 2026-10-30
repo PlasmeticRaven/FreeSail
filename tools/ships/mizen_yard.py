@@ -241,7 +241,9 @@ def driver(
     abaft and above the yard's peak by no more than two-thirds of the driver yard; the four
     corners' area within a tenth of Steel's rule, and the after leech within Steel's band; the
     boom clear. Returns the corners, the area, centre and Steel's area, the leeches, the boom
-    (jaws, length, end) and the driver yard's reach beyond the mizen yard's peak."""
+    (jaws, length, end, and `rigged_out` false: the sail starts in the sail room, and the boom
+    is out only while it is bent, Ext §17.11) and the driver yard's reach beyond the mizen yard's
+    peak."""
     tack, throat, peak, clew = corners = driver_corners(
         crs,
         mast_x=mast_x,
@@ -311,5 +313,10 @@ def driver(
         "foot": tack[0] - clew[0],
         "head": math.dist(throat, peak),
         "beyond_yard": beyond,
-        "boom": {"jaws_z": jaws_z, "length_m": boom_length_m, "end_x": end_x},
+        "boom": {
+            "jaws_z": jaws_z,
+            "length_m": boom_length_m,
+            "end_x": end_x,
+            "rigged_out": False,
+        },
     }

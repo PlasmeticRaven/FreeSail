@@ -37,7 +37,7 @@ hull:
   displacement_kg: 1925000.0
   # 5 ft 5 in: judgement within 1.5-1.8 m (Ind §2.3.4): KM measured 7.25 m above K, her KG about 1 ft lower than the 64's for the upper works and the 18- and 9-pounders taken off; no period figure for either was found.
   gm_m: 1.65
-  # The measured centroid of the plane the file counts (hull and band, no rudder), 0.58-0.64 m abaft the middle of the load line (Ind §2.3.6), with the frigate-36's tuned lead of 9.6% of her load line ahead of it (Indf §2.1; judgement), tuned against the helm's truths (6 and 17; Indf §9, §16 item 6). Forward of that at stage B, her spanker cut smaller on its boom raised clear of her roundhouse having taken her helm away, to stand it near the frigate-36's (judgement; the truths held at the start). Measured, old beside new, in docs/dev/TuningNotes.md, and held by her tests.
+  # The measured centroid of the plane the file counts (hull and band, no rudder), 0.58-0.64 m abaft the middle of the load line (Ind §2.3.6), with the frigate-36's tuned lead of 9.6% of her load line ahead of it (Indf §2.1; judgement), tuned against the helm's truths (6 and 17; Indf §9, §16 item 6). Forward of that at stage B, her spanker cut smaller on its boom raised clear of her taffrail having taken her helm away, to stand it near the frigate-36's (judgement; the truths held at the start). Measured, old beside new, in docs/dev/TuningNotes.md, and held by her tests.
   clr_x_m: 4.5
   # Below her line with the band, the rudder left out, as the frigate's (measured, 1407F at 1.45 ft below WL1: 3,050-3,052 sq ft; Ind §2.3.6).
   lateral_area_m2: 283.4
@@ -120,7 +120,7 @@ hull:
     channel_wales_m: [[-21.34, 4.04, 4.77], [-18.29, 3.78, 4.51], [-15.24, 3.55, 4.28], [-12.19, 3.36, 4.09], [-9.14, 3.2, 3.93], [-6.1, 3.07, 3.81], [-3.05, 2.98, 3.71], [-1.71, 2.95, 3.68], [-1.68, 2.95, 3.5], [0.0, 2.92, 3.52], [3.05, 2.9, 3.54], [6.1, 2.91, 3.56], [9.14, 2.96, 3.58], [11.7, 3.03, 3.59], [11.73, 3.03, 3.76], [12.19, 3.04, 3.77], [15.24, 3.15, 3.89], [18.29, 3.3, 4.03], [21.34, 3.5, 4.23], [22.86, 3.65, 4.38], [24.38, 3.82, 4.55]]
     # Her form (Build-Ships.md §5.1): no fullness, the ends under the water drawn through her measured waterlines (sections_m).
     form:
-      # Square: the 64's up to her taffrail (ZAZ2371 draws it kept), the knuckle at the wing transom's ends, its round-up to the middle line and the transom's half-breadth there the 64's (measured on 1407F's body plan; the 64's post on 1407F runs on up to 8.0 ft above WL1, a reading not reconciled with it, open); at her taffrail, stern_m's top, the outline's half-breadth at that height (measured on 1407F's body plan, at her taffrail's height measured on ZAZ2371; judgement that her stern's face there is the 64's, none of her own draughts drawing it). One tier of quarter gallery and one band of five lights, the 64's lower tier, the upper deck's, her cabin's on her quarterdeck under her roundhouse (measured on 1407F; the lights read on ZAZ1953), which ZAZ2371 draws in its place, one tier of three lights, its sill about 4 ft 7 in above her aftmost gun-deck port's top as on 1407F and its ends within half a foot, at about 6 px to the foot: tentative (Build-Ships.md §19.1 item 18). Both stand under her taffrail and her roundhouse's deck, where her cabin is (`check_derivation`). Was, before her roundhouse was measured (2026-10-29): both above her taffrail as filed, the tier's after end abaft it, and the viewer drew them cut to her side and her transom.
+      # Square: the 64's up to her taffrail (ZAZ2371 draws it kept), the knuckle at the wing transom's ends, its round-up to the middle line and the transom's half-breadth there the 64's (measured on 1407F's body plan; the 64's post on 1407F runs on up to 8.0 ft above WL1, a reading not reconciled with it, open); at her taffrail, stern_m's top, the outline's half-breadth at that height (measured on 1407F's body plan, at her taffrail's height measured on ZAZ2371; judgement that her stern's face there is the 64's, none of her own draughts drawing it). One tier of quarter gallery and one band of five lights, the 64's lower tier, the upper deck's, her cabin's on her quarterdeck under her roundhouse (measured on 1407F; the lights read on ZAZ1953), which ZAZ2371 draws in its place, one tier of three lights, its sill about 4 ft 7 in above her aftmost gun-deck port's top as on 1407F and its ends within half a foot, at about 6 px to the foot: tentative (Build-Ships.md §19.1 item 18). Both stand under her taffrail and her roundhouse's deck, where her cabin is (`check_derivation`). Was, before her roundhouse was measured (2026-10-29): both above her taffrail as filed, the tier's after end abaft it, and the viewer drew them cut to her side and her transom. Her roundhouse's after face is drawn plain, no lights in it: judged for the eye from the built model's photographs and from a painting and a print of the Virginie action (Build-Ships.md §5.8), ZAZ2371 being a side elevation that cannot show that face (the lead's question of 2026-10-29; the owner's answer of 2026-10-30, Indf §17 item 1).
       stern:
         type: square
         knuckle_z_m: 2.39
@@ -274,7 +274,7 @@ spars:
   x_m: -16.42
   rake_deg: 2.15
   height_m: 17.62
-  rating_kn: 368.9
+  rating_kn: 373.4
 # mizzen topmast 43 ft 6 in (Steel p. 49), its hoist above the lower cap the length less the lower mast head, its head 4 ft 3 in by Steel's rule. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.topmast_staysail in 40 kn.
 - id: mizzen.topmast
   class: topmast
@@ -331,22 +331,22 @@ spars:
   'on': mizzen.mast
   length_m: 12.4
   height_m: 13.82
-  rating_kn: 74.1
-# driver boom 65 ft 4 in, the main topsail yard's length (Steel 1794 vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; D20 (a)), overhanging her taffrail, long (Ind §3.3 reckoned it against her taffrail as then filed; no source objects). Level, its jaws raised by the least that gives it 6 ft of head room over her short roundhouse's deck (ZAZ2371, the warrant of December 1794: Ind §2.2; the clew check, Bel §1.5, §4.6; the lead's notes of 2026-10-29), clear over her taffrail. Plainly: stage A laid it 6 ft 6 in above her quarterdeck, where the 64's mizen course had its tack (Steel's 'within 6 or 7 feet of the deck', judgement for the boom), before her roundhouse was measured, and it ran through the cabin under the deck, so her spanker is cut smaller on it than the 218 m2 the owner kept (the sail's note). horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn (the engine's graph loads nothing on it).
+  rating_kn: 77.1
+# driver boom 65 ft 4 in, the main topsail yard's length (Steel 1794 vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; D20 (a)), overhanging her taffrail, long (Ind §3.3 reckoned it against her taffrail as then filed; no source objects). Level, its jaws at literally the least that clears her taffrail (the lead's ruling of 2026-10-30), which clears her short roundhouse's deck (ZAZ2371, the warrant of December 1794: Ind §2.2; the clew check, Bel §1.5) by less than a man's height, a boom her people stoop under. Plainly: stage A laid it 6 ft 6 in above her quarterdeck, where the 64's mizen course then had its tack (Steel's 'within 6 or 7 feet of the deck', judgement for the boom), before her roundhouse was measured, and it ran through the cabin under the deck and under her taffrail, so her spanker is cut smaller on it than the 218 m2 the owner kept (the sail's note). horse_m is the horse across the stern for the sheet to travel on (Steel 1794 vol. I, p. 167, HORSE: 'a thick iron rod, fastened at the ends to the inside of the stern of vessels that carry a fore and aft mainsail, for the main sheet to travel on'), half the beam (judgement: the inside breadth of the stern); the sheet's geometry reads it (evolutions/trim.py). Rating: the sails named in the script in 45 kn (the engine's graph loads nothing on it).
 - id: mizzen.boom
   class: boom
   'on': mizzen.mast
   length_m: 19.9
-  height_m: 4.18
+  height_m: 3.49
   horse_m: 6.8
-  rating_kn: 74.1
-# bowsprit 60 ft 4 in (Steel p. 49, the 64), steeved 27 deg (measured, Ind §3.1), rooted on the stem head, where ZAZ1407 draws it lying and the viewer draws its heel (Indf §3.5 item 9; Ext §6.2 as built): x_m its root, length_m its part outboard of the stem head from its heel measured just before the fore mast on ZAZ1280 (±1 ft; Luce's third inboard would give 40.2 ft), height_m its end above the datum. Stage A rooted it at the near knighthead's cap (moved at stage B, the headsails' tacks and the stays' leads with it). The 64's, in its place in the hull (D8 (b) as answered; Indf §1.5 step 7), with the spritsail yard slung under it, an occasional sail out of plain sail, and no sprit-topsail yard (the owner: Indf §4.6, §17 item 5). Rating: spritsail in 55 kn.
+  rating_kn: 77.1
+# bowsprit 60 ft 4 in (Steel p. 49, the 64), steeved 27 deg (measured, Ind §3.1), rooted on the stem head, where ZAZ1407 draws it lying and the viewer draws its heel (Indf §3.5 item 9; Ext §6.2 as built): x_m its root, length_m its part outboard of the stem head from its heel measured just before the fore mast on ZAZ1280 (±1 ft; Luce's third inboard would give 40.2 ft), height_m its end above the datum. Stage A rooted it at the near knighthead's cap (moved at stage B, the headsails' tacks and the stays' leads with it). The 64's, in its place in the hull (D8 (b) as answered; Indf §1.5 step 7), with the spritsail yard slung under it, an occasional sail out of plain sail, and no sprit-topsail yard (the owner: Indf §4.6, §17 item 5). Rating: the sails named in the script in 55 kn, kept over spritsail, the smaller load.
 - id: bowsprit
   class: bowsprit
   x_m: 25.15
   length_m: 13.5
   height_m: 7.82
-  rating_kn: 47.2
+  rating_kn: 168.5
 # jib-boom 43 ft 9 in (Steel p. 49), 7/12 of it outboard along the bowsprit's steeve (Luce, the frigate's rule; judgement). No flying jib-boom: Steel's 64 has none, Steel's 'flying jib boom' rule being this boom's (Ind §3.1, judgement). Rating: the sails named in the script in 30 kn (the engine's graph loads nothing on it).
 - id: jib_boom
   class: jib_boom
@@ -458,8 +458,8 @@ spars:
   class: studdingsail_boom
   'on': mizzen.boom
   length_m: 5.3
-  height_m: 4.18
-  rating_kn: 3.6
+  height_m: 3.49
+  rating_kn: 3.7
   rigged_out: false
 sails:
 # fore course: Steel's table IV, the 64: 36 cloths at the head, 34 at the foot, 12 yards deep, 22 1/2 in a cloth in the sail (Ind §5; ±10%, judgement); 2 reef bands (Steel). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): the working foresail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
@@ -575,19 +575,19 @@ sails:
   centre_height_m: 37.9
   canvas_no: 8
   cloth_rating_kn: 5.1
-# spanker (driver) by the frigate-36's rule on her spars (D20 (a); Indf §4.5): its foot 0.9 of the boom, its head 0.9 of the gaff peaked 40 degrees, its hoist from the boom's jaws to the gaff's (judgement, ±10%); corners [tack, throat, peak, clew]. Steel's table IV (read on the page image, Indf §3.5 item 6) gives the 44 a gaff mizen course of about 88 m2 and a driver of 157, the 38 105 and 202, the 64's driver 198; the frigate-36's spanker is 167. The owner settled it by this rule at 218 m2, within 8% of the 38's driver (2026-10-29; Indf §17); with the boom's jaws raised clear of her roundhouse the same rule cuts it smaller, kept within that 8% (the lead's notes of 2026-10-29). Two reef bands, as the frigate-36's (Steel's mizen course has one). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
+# spanker (driver) by the frigate-36's rule on her spars (D20 (a); Indf §4.5): its foot 0.9 of the boom, its head 0.9 of the gaff peaked 40 degrees, its hoist from the boom's jaws to the gaff's (judgement, ±10%); corners [tack, throat, peak, clew]. Steel's table IV (read on the page image, Indf §3.5 item 6) gives the 44 a gaff mizen course of about 88 m2 and a driver of 157, the 38 105 and 202, the 64's driver 198; the frigate-36's spanker is 167. The owner settled it by this rule at 218 m2, within 8% of the 38's driver (2026-10-29; Indf §17), on the boom as stage A filed it; with the boom's jaws clear of her taffrail the same rule cannot keep 218, and cuts it near the 38's own figure, the most that a boom clear of her taffrail allows (the lead's ruling of 2026-10-30), kept within that 8%. Two reef bands, as the frigate-36's (Steel's mizen course has one). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: mizzen.spanker
   class: gaff
   mast: mizzen.mast
   gaff: mizzen.gaff
   boom: mizzen.boom
-  area_m2: 191
+  area_m2: 200
   reef_bands: 2
   x_m: -24.3
-  centre_height_m: 14.1
+  centre_height_m: 13.7
   canvas_no: 2
-  cloth_rating_kn: 61.1
-  corners_m: [[-16.57, 4.18], [-16.93, 13.83], [-25.52, 21.03], [-34.49, 4.18]]
+  cloth_rating_kn: 64.0
+  corners_m: [[-16.55, 3.49], [-16.93, 13.83], [-25.52, 21.03], [-34.47, 3.49]]
 # fore staysail, a triangle (Steel's table IV, the 64: 19 cloths in the foot, 11.5 yards in the leech; Ind §5): its tack at its stay's foot, its luff up the stay, foot and leech square at the clew (judgement on Steel's figures); corners [tack, peak, clew]. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore staysail': No. 1 to 3, the middle taken (Ind §5)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: fore.staysail
   class: jibheaded
@@ -831,11 +831,11 @@ sails:
 - id: ringtail
   class: studding
   boom: ringtail_boom
-  area_m2: 58
+  area_m2: 60
   x_m: -36.5
-  centre_height_m: 15.4
+  centre_height_m: 15.1
   canvas_no: 5
-  cloth_rating_kn: 14.1
+  cloth_rating_kn: 14.6
   bent: false
 # save-all under the fore lower studding sail boom (Luce 1884): its head along 0.6 of the boom, down from the boom at the fore channel to half a metre off the water (the frigate-36's, judgement); in the sail room. Canvas No. 7 (judgement: no source gives a ship's save-all; Steel 1794 vol. I, Sail-making, 'Sloop's water-sail', No. 7, 'Some ships have a water-sail, similar to a sloop's'); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: fore.save_all.starboard
@@ -1156,12 +1156,12 @@ lines:
   class: clewline
   of: main.course
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.course.clewline.larboard
   class: clewline
   of: main.course
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.course.buntline
   class: buntline
   of: main.course
@@ -1181,22 +1181,22 @@ lines:
   class: bowline
   of: main.course
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.course.bowline.larboard
   class: bowline
   of: main.course
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.course.reef_tackle.starboard
   class: reef_tackle
   of: main.course
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.course.reef_tackle.larboard
   class: reef_tackle
   of: main.course
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.topsail.yard.halyard
   class: halyard
   of: main.topsail.yard
@@ -1205,12 +1205,12 @@ lines:
   class: brace
   of: main.topsail.yard
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.topsail.yard.brace.larboard
   class: brace
   of: main.topsail.yard
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: main.topsail.yard.lift.starboard
   class: lift
   of: main.topsail.yard
@@ -1455,7 +1455,7 @@ lines:
 - id: mizzen.topgallant.yard.halyard
   class: halyard
   of: mizzen.topgallant.yard
-  rating_kn: 9.7
+  rating_kn: 11.7
 - id: mizzen.topgallant.yard.brace.starboard
   class: brace
   of: mizzen.topgallant.yard
@@ -1480,12 +1480,12 @@ lines:
   class: sheet
   of: mizzen.topgallant
   side: starboard
-  rating_kn: 9.7
+  rating_kn: 11.7
 - id: mizzen.topgallant.sheet.larboard
   class: sheet
   of: mizzen.topgallant
   side: larboard
-  rating_kn: 9.7
+  rating_kn: 11.7
 - id: mizzen.topgallant.clewline.starboard
   class: clewline
   of: mizzen.topgallant
@@ -1573,23 +1573,23 @@ lines:
   class: brace
   of: mizzen.crossjack.yard
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: mizzen.crossjack.yard.brace.larboard
   class: brace
   of: mizzen.crossjack.yard
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 # the crossjack's lifts, as a course's (judgement): every yard's lifts are carried, and drawn (the owner's answer, Build-Ships.md §19.1 item 7).
 - id: mizzen.crossjack.yard.lift.starboard
   class: lift
   of: mizzen.crossjack.yard
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: mizzen.crossjack.yard.lift.larboard
   class: lift
   of: mizzen.crossjack.yard
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 31.4
 - id: mizzen.gaff.throat_halyard
   class: throat_halyard
   of: mizzen.gaff
@@ -1597,7 +1597,7 @@ lines:
 - id: mizzen.gaff.peak_halyard
   class: peak_halyard
   of: mizzen.gaff
-  rating_kn: 111.9
+  rating_kn: 125.5
 - id: mizzen.spanker.sheet
   class: sheet
   of: mizzen.spanker
@@ -1631,7 +1631,7 @@ lines:
 - id: bobstay
   class: stay
   of: bowsprit
-  rating_kn: 261.8
+  rating_kn: 272.0
 # the frigate-36's scaled (judgement).
 - id: martingale
   class: stay
