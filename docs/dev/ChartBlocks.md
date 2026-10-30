@@ -352,25 +352,33 @@ while the levels are about LAT. Read against LAT that height is low by mean sea 
 height above LAT: at St Malo, where that is 6.8 m, the low land behind the town and the
 marshes of the Cotentin read as drying ground under three metres, and were covered at
 high water. A recipe with `fill_to_chart_datum: true` raises the fill by the world's own
-mean level there (`mean_level_grid`: the tide table's gauges blended as the tide blends
-them), so that a low shore stands as high above the world's high water as it does above
-the sea's; the sweep's suspects fell from 37,348 cells to 2,772. Channel-west's recipe
-has not the key, so its tiles, if rebuilt, come out as before (the Roscoff town patch
-was the same fault mended by hand). Every block on a coast of large tides sets it.
-Biscay north's recipe (package 39b, built beside 39a) has not the key either: its
-sweep found 34,053 cells in 267 places, the marshes behind its dykes among them, which
-flood at high water springs; the rebuild with the key is the lead's to order.
-**Beyond the reach of every gauge** (Portugal and the Strait, packages 39d and 39f) the
-world's mean level is the nearest gauge's alone (Le Conquet's 3.98 m over the Strait):
-raised by it, the land stands three metres higher than it need and a lagoon or an
-estuary of GEBCO's fill three metres shoaler. The recipe's `fill_mean_level_m` sets the
-block's own mean level above its datum instead (39d's 2.0 m from the Instituto
-Hidrográfico's datum). It is not for every block while the gauges are held: the world's
-tide is still the far gauge's, its high water springs some 7 m above the datum over the
-Strait, and where EMODnet stops short of the shore GEBCO's cells are the shore itself;
-tried at 0.6 m (judgement from the held gauges' amplitudes) the Strait lost Tarifa's
-island and 25 marks of the land to the water, so its recipe keeps the world's level
-(package 39f).
+mean level there, so that a low shore stands as high above the world's high water as it
+does above the sea's (package 39a: the sweep's suspects fell from 37,348 cells to 2,772).
+Channel-west's recipe has not the key, so its tiles, if rebuilt, come out as before (the
+Roscoff town patch was the same fault mended by hand). Every block from 39a on sets it,
+Biscay north since package 93 (built without it by 39b, its sweep found 34,053 cells in
+267 places, the marshes behind its dykes flooding at high water springs; with it 3,808 in
+133).
+**The raise is the level of the water that serves each cell** (`mean_level_grid`,
+package 93): at each cell of a grid of 0.05 degrees the gauges that serve it as the tide
+takes them (`Tide.gauges_at`): within a block's bounds the block's own gauges with the
+eleven, their level the blend of those that have one, the eleven's where none has (the
+Strait's, the islands', the Tyrrhenian's, whose gauges' levels are unread); outside every
+block the eleven alone, as every tile there was built. Until package 89 a block's gauges
+were held and the world's level over a block was a far gauge's (Le Conquet's 3.98 m over
+Portugal and the Strait, Saint-Malo's 6.83 over the Balearics), so the blocks' land was
+raised by it: the Mediterranean's six metres and more above its true water, its harbours
+and lagoons EMODnet lacks (Port Mahon's inner harbour, Toulon's inner road, the Camargue,
+the Albufera) dry land; Portugal's and Biscay south's recipes set their own figures
+instead (`fill_mean_level_m`, 2.0 and 2.5 m), which package 93 took out for the rule.
+Package 93 rebuilt every block whose raise the rule moves, one region a commit with a
+control first (the head's tool on the same fetch giving the committed arrays), its
+notes the figures region by region; Madeira's and the Azores' raise the rule does not
+move, and they were not rebuilt. **Mind the coarse shore**: where EMODnet stops short of
+the shore and GEBCO's fifteen seconds smear an island or a harbour's side under mean sea
+level, a far gauge's raise had stood it up and the true water lays it under (the islands
+about Agincourt Sound; the rule above, "A harbour patch whose land the grid smears");
+measure a block's truths of its shore after a rebuild.
 **EMODnet's `elevation_max` is empty in places** where `elevation` has a value
 (over the Laja of Conil, package 39f): a check of a rock's head against the shoalest
 sounding falls back to the mean grid there.
