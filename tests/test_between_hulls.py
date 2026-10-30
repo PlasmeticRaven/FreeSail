@@ -119,7 +119,7 @@ def _round_trip():
     _run_until(w, lambda: stage["n"] >= 3, 0.5)
     results = " ".join(stage["results"]).lower()
     assert f"aboard the {frigate.lower()}" in results and "a visitor" in results
-    assert "steer west" in results and "a passenger gives no order" in results
+    assert "steer west" in results and "a visitor aboard another ship gives no order" in results
     # his acts there carry the frigate's hull (none for the player's own: the id rule)
     assert any(a["station"] == voice and "ship" not in a for a in w.station_acts)
     # home again by the frigate's boat: his own station his, the voice unbound

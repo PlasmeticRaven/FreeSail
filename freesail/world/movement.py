@@ -648,13 +648,45 @@ def visiting_station(hull: Any, person: Any, policy: Any = None) -> Any:
     station of the passenger's kind under his name (package 67's), bound to him quietly
     for as long as he is in her; he reads her deck as a passenger reads it and gives none
     of her orders."""
+    import dataclasses
+
+    from freesail.agents.agent import VISITOR_DOMAIN
     from freesail.world.seats import VOICE_ACTOR, VOICE_KIND, _voice_name, voice_station
 
     name = _voice_name(person)
     stations = hull.stations
     if stations.holder(name) is not person:
         stations.bind(name, person, kind=VOICE_KIND, quiet=True, actor=VOICE_ACTOR)
-    return voice_station(hull, name, policy)
+    station = voice_station(hull, name, policy)
+    home = hull_of(hull.world, getattr(person, "home", ""))
+    role = str(getattr(person, "role", "") or "a person")
+    brief = VISITOR_BRIEF.format(
+        person=person.name,
+        role=role,
+        home=hull_name(home) if home is not None else "your own ship",
+        hull=hull_name(hull),
+    )
+    return dataclasses.replace(station, brief=brief, domain=VISITOR_DOMAIN)
+
+
+# A visitor's brief (package 82): what a model whose person is aboard another ship has and
+# has not there, in the consent brief's voice; the station's kind is the passenger's.
+VISITOR_BRIEF = (
+    "You are {person}, {role} of the {home}, aboard the {hull} as a visitor: your station has "
+    "gone with you from your own ship, and here you have a passenger's reach and no more. You "
+    "read every reading and every query of the {hull} ('where am I' says where you stand), "
+    "speak and ask by the deck's conversation, give and take what lies before you, keep your "
+    "journal, stand by until an event or a bell, and leave. You give no order of her deck, and "
+    "none of the {home}'s from here: hail her, make a signal or send a letter. Your own station "
+    "on the {home} stands bound to you meanwhile; 'come aboard' sends the {hull}'s boat to take "
+    "you home where the {home} lies within a boat's pull, and your station is yours again with "
+    "its whole surface when you are aboard her. There is no deck at this station.\n\n"
+    "Two ways to stop, which are not one another:\n"
+    "- Stand down: stand_down(note). The game is saved, your note is journaled, and the "
+    "station is released.\n"
+    "- Withdraw: the token, or opt_out, as said above.\n\n"
+    "Candour: say what you see and what you do; an order refused is a refusal in words."
+)
 
 
 def _unbind_visit(hull: Any, person: Any, why: str) -> None:
