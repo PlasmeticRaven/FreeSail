@@ -14929,3 +14929,13 @@ reading and the errand in the brief's words), old beside new in `tests/test_offi
 
 **The truths:** 7-324 (the move by the boat and the replay by both roads), 7-325 (the deck won
 and the captive's stand-down), 7-333 (`where am I`, the station line, the director's form).
+
+**The suites on the step's final tree** (`d9257a2`, the lead's `58c51ac` merged): the fast
+tier whole, `python -m pytest -n 4`, 4,473 passed, none failed (28:58 on four cores); the slow
+tier of the touched files and the known truths (`tests/test_between_hulls.py`, `test_places`,
+`test_world_orders`, `test_director`, `test_grammar_book`, `test_primer`, `test_replay`,
+`test_crews`, `test_hulls`, `test_fight`, `test_people`, `test_in_world`, `test_agents`,
+`test_agent_api`, `test_seat_hook`, `test_officer`, `test_harness_instruments`,
+`test_known_truths`; `--slow -m "not pace" -n 4`), 1,752 passed, 7 expected failures (the
+rulings'), none failed (45:16); ruff clean. No pace test is touched by the step; they run
+last, with item 7.
