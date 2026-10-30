@@ -782,7 +782,10 @@ touched files 190 of 199 passed with eight left out by their marks and the lee-s
 trial's container digest the one failure as at every step, its pace within step 8's spread;
 the lead's run of the touched files and the gate selection (147 passed) and of the fight's,
 the lying-to's, the ships' and the staying's tests (128 passed), none failed; **the whole
-suite on the merged tree in the cloud (run 16, the figures below).** **The step:** the long
+suite on the merged tree in the cloud (run 16 on `69dcdcd`: lint green, 4,323 passed over
+the six shards, 3 skipped, 11 expected failures, none failed, 40 minutes; the pace job,
+informative, 6 of 10 at 437 to 494 in 301 seconds, the slow runner's day as 79b's record
+reads it, truth 51's frigate alone among them at 494 for the first time).** **The step:** the long
 tail, the words and the records. The booked tidies made: the fight's mark on one road with
 the shadow's dead arm gone; the lying-to reading taken from the ship by the reading's own
 rule with no import of the api layer into the world; a person found by his name whole and
