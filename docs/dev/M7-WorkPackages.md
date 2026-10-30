@@ -1112,8 +1112,12 @@ digest and pin held); the lead's three runs on the branch (items 1 and 2's fifte
 whole; items 3 to 8's twenty-three files with the new truths, which found truth 7b-117's
 date and the old checkpoints' table, the builder's own fast tier finding the same two; and
 the mended head's eighteen files with eight truths), the hail probed by hand on the trunk,
-the first head and the mended one; **the whole suite on the merged tree in the cloud (run
-19, the figures written here when it ends).**
+the first head and the mended one; **the whole suite on the merged tree in the cloud: run 19 on `3b76275` was cancelled at
+its half by the workflow's own rule (one run a branch, the newer cancelling the older) when
+run 20 was dispatched on 93's merge twenty minutes later, so the suite on 85's tree is run 20's
+on `0ed9d28`, which holds 85 whole: lint green, 4,814 passed over the six shards, 3 skipped,
+11 expected failures, none failed, 47 minutes; the pace job 10 of 10 in 267 seconds (a quiet
+runner); the builder's own fast tier whole after 94's merge, 4,454 passed, none failed.**
 
 **Item 1, the rule stated once and enforced:** `docs/dev/PrimerRedactions.md` states it (the
 primer and the library's served topics are in-world documents for whoever reads them, at
@@ -1207,8 +1211,10 @@ lee-shore trial's container digest the one failure on both); the six chart and t
 fast and slow after every region, the blocks' truths 7-260 to 7-314 with `--slow` after
 every region, its fast tier whole with the pictures' flake the one failure, passing alone;
 the lead's run of the chart's, tide's, islands', ports', scenarios' and geo's tests with
-eleven truths on the head (176 and 11 passed, none failed; and of the in-world, tide, chart and grammar tests with eight truths on the merged tree (203 and 8 passed)); **the whole suite on the merged tree in the cloud (run
-20, the figures written here when it ends).**
+eleven truths on the head (176 and 11 passed, none failed; and of the in-world, tide, chart and grammar tests with eight truths on the merged tree (203 and 8 passed)); **the whole suite on the merged tree in the cloud (run 20 on `0ed9d28`: lint green, 4,814
+passed over the six shards, 3 skipped, 11 expected failures, none failed, 47 minutes, the
+count up from run 18's 4,337 by 85's and 93's tests; the pace job 10 of 10 in 267 seconds,
+the first quiet runner since run 14).**
 
 **The rule, as built:** GEBCO's fill under every block is raised to the chart's datum by the
 world's mean level at each cell, `mean_level_grid` being `Tide.constants_at` itself (one
