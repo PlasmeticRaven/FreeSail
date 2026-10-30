@@ -13356,3 +13356,73 @@ them: 35 passed. **The fast tier**, once (379 slow tests left out, 25 minutes): 
 the pictures' known flake ("the chart is blank (std 8.0)" under the tier's load), which
 passes alone on this tree; the pilot off Aix passes. The whole slow tier not run (the
 lead's in the cloud at the merge).
+
+## Package 94: the chart's tidies from 79c, 79d and 89 (2026-10-30)
+
+Four tidies the three packages left, each its own commit in the brief's order, the trunk
+brought in at each boundary (package 93 rebuilding the blocks' tiles beside it: no tile,
+coast or index file of any region is touched here). Independent of 93's rebuild: nothing
+here reads a tile's fill.
+
+### Item 1: an island the grid lacks
+
+**The kind, as built.** `island` was a kind already, a mark of the land (`LAND_KINDS`),
+and five islands the grid holds carry an `extent_m` that is the isle's size and read by
+nothing (Belle Isle's 9,000 m, Groix's 3,000, the Glenans', Houat's, the Isle Dieu's in
+Biscay north; the Hormigas of Oran and the isle of Arzeo; Mal di Ventre). Taken so far as
+the brief has it ("an island with `extent_m` grounds"), Belle Isle would have become a disc
+of ground nine kilometres about its centre, over Le Palais and the road. **Taken another
+way, said so:** an island the grid lacks says it, `grid_lacks: true`, beside its height and
+`extent_m` (`chart.Feature.grid_lacks`; the builder's loader takes the key as data). Such
+an island is ground to the keel by its height within its extent, as a rock that stands
+above the water is (`Feature.is_ground`, `head_above_datum_m` its height, never covered;
+`Chart.danger_under`, `dangers_about`), and the grounding says "(island)" where a rock's
+says "(rock)"; it is a hazard on the pilot's line and the captain's chart
+(`Feature.is_hazard`: `line_passes`, `dangers_ahead`, `dangers_near`), so that the pilot's
+warning and keep-off, the captain's planner and the master's dangers read it exactly as
+they read the rock; and the lookout sees it as land (`_seen_as`: "land", by day at its
+horizon and by night close aboard, never "a danger") and calls it by its name ("The Isla
+del Rey bearing ..., distant ..."), the pilot's words already its name. The lookout's
+"standing into" (`Lookout._first_ahead`) takes it by its extent as it takes a danger, the
+tiles having water there (`getattr` on the sighting's feature, a sail's or a cask's having
+none). Nothing in the Channel's water carries the key: the recorded passages read nothing
+new (the proof below).
+
+**The islets recast, each by its source line** (an isle, an islet or an island in the
+period's words an island; a rock in them a rock):
+
+| Region | Recast as islands | Kept rocks, by their words |
+|---|---|---|
+| mediterranean-west | Alboran ("the isle"), the Great Hormiga ("a small flat islet"), Isla Grosa | |
+| balearics | the Isle Ayre, the Lazaretto ("an islet"), Quarantine Island, the Isla del Rey, Rata (Tofiño's "Redonda, an islet"; Purdy's "large rock" between "the two islands") | |
+| gulf-of-lion | Planier ("a small island"), Great Ribaud ("the Ribaud Isles"), Bagaud ("the little island") | the Fourmigues of Giens ("a cluster of rocks above water"), the Boute of Gourjean ("a rock above water like a great boat") |
+| ligurian-sea | Tino ("the Isle Tino"), Palmaiola ("two isles"), the Giraglia ("an islet"), Lavezzi ("the islands"), the Sanguinaires ("the isles") | the Formiche of Grosseto (Purdy's and the file's "three flat rocks") |
+| tyrrhenian | Cavoli ("an oblong isle"), Santo Stefano ("an islet"), Li Galli ("three rocky islets") | the Toro ("Toro rock", "an enormous isolated steep rock"), the Catalano ("a small black rock"), the Botte ("a large rock") |
+
+Nineteen islands, six rocks kept: 79c's eight (its seven named and Redonda, which its
+notes count among Port Mahon's islands) and 79d's eleven of seventeen. Each entry's kind,
+the key and its `fix:` words changed ("an island the grid lacks ... a rock until package
+94"); every other key of every feature is as it was (checked by loading the files before
+and after).
+
+**The index, by the how-to's road for a mark changed** (ChartBlocks.md item 3, the lead's
+road at 39a's and 39b's merges): `build_index` over each of the five features files, no
+build and no fetch. The index holds ids by their cell and no kind, so it came out
+byte-identical for all five and no index file changed; the manifest's `features_by_kind`
+of the five regions edited by text to the files' counts (rock to island: 3, 5, 3, 5, 3),
+`feature_count` unchanged, no other key or region touched; `--check` of each region prints
+its features within the bounds and its seam's kept tiles as before. ChartBlocks.md says
+the road ("a mark whose kind changes and whose place does not") and rewrites "An isle the
+grid lacks".
+
+**The truths.** 7-303 (Li Galli grounds a frigate where the tiles read forty metres) now
+asserts the kind `island` with `grid_lacks` where it asserted `rock`, its grounding and its
+clearance a mile off asserted as before: the kind follows the data's recast, nothing
+loosened. **7-310**: the Isla del Rey is land to the lookout by day and by night two cables
+off, its words its name and never "a danger"; the lookout standing for it from two cables
+west has it ahead by its extent over the tiles' water; the keel touches it ("the Isla del
+Rey, or Hospital Island (island)") and a cable and a half south, in Tofiño's passage, is
+clear; the pilot's line and the master's dangers name it. `test_chart.py`: an islet with
+the key is ground and a hazard, an island without it (Belle Isle) neither; the nineteen
+carry a height and an extent under a kilometre, lie in the five regions, and each grounds
+a ship over its place.

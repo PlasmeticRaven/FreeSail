@@ -416,14 +416,15 @@ features:
     says: 'Cape Carbonara, the eastern horn of the gulf of Cagliari, a cliffy head that looks an island, with a tower on its pinnacle; beware the Derna shoal two miles to the eastward.'
 
   - id: cavoli-island
-    kind: rock
+    kind: island
     name: Cavoli
     modern: Isola dei Cavoli
     lat_deg: 39.087
     lon_deg: 9.532
     height_m: 40
     extent_m: 400
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Smyth 1828, p. 224: a quarter of a mile from the cape lies the ancient Ficaria, an oblong isle about eighty or ninety feet above the sea, now called Cavoli, surmounted by a ruinous turret bearing two guns; Purdy 1826, p. 86: half a league S.E. of the cape the island Cavoli with a watch-tower and several rocks about it; Lamberti 1844, p. 334: between it and the land all sorts of vessels may pass; Admiralty 1913, p. 672: 144 feet, 8 and 9 fathoms between it and the cape (height); the light now on it is later than these texts'
     says: 'Cavoli, an oblong isle with a little gun-tower off Cape Carbonara; there is a fair passage between it and the cape.'
 
@@ -906,14 +907,15 @@ features:
     says: 'Vandotena, two miles long, highest at its west end, the village and Port St Nicholas on its east side; Santo Stefano just east of it.'
 
   - id: santo-stefano-ventotene
-    kind: rock
+    kind: island
     name: the islet St Stefano (by Vandotena)
     modern: Isola di Santo Stefano
     lat_deg: 40.7895
     lon_deg: 13.456
     height_m: 82
     extent_m: 300
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 102: at three-quarters of a mile from the east end of Vandotena an islet named St. Stefano; Norie 1831, p. 100: a rocky islet steep all round, 14, 15, 10 and 8 fathoms between it and the island; Derrotero 1849, p. 167: a small island with a fortress on its summit surrounded by white walls; Smyth 1854, p. 441: Santo Stefano I., redoubt; Admiralty 1916, p. 353: about 4 cables in extent, steep rugged cliffs, its summit 223 feet high'
     says: 'St Stefano, the steep islet three-quarters of a mile east of Vandotena, a redoubt on its top; a clear channel between.'
 
@@ -1316,14 +1318,15 @@ features:
     says: 'A ledge of sunken rocks with but two or three fathoms on it in the passage between Ischia and Vivara: keep over towards the castle of Ischia.'
 
   - id: li-galli
-    kind: rock
+    kind: island
     name: Li Galli
     modern: Li Galli (Gallo Lungo)
     lat_deg: 40.5815
     lon_deg: 14.43
     height_m: 50
     extent_m: 400
-    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    grid_lacks: true
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as an island the grid lacks (`grid_lacks`), its height and an extent of its size (a rock until package 94), so that a ship cannot sail through it'
     source: 'Purdy 1826, p. 113: at 3 1/2 miles eastward of Punta di Montalto three rocky islets called Li Galli, the Syrenusae of the antients; Norie 1831, p. 106: three small islands called Li Galli, Longa and Rotunda, the outermost the largest; Smyth 1854, table of positions, p. 441: Galli rocks, Lungo tower; height JUDGEMENT'
     says: 'Li Galli, the three rocky islets of the Sirens off the south shore of the Sorrento promontory, a tower on the largest.'
 

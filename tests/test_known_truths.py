@@ -12175,14 +12175,15 @@ def test_truth_7_303_an_islet_the_grid_lacks_grounds_a_ship_though_the_tiles_rea
     some hundreds of metres (Li Galli off the Sorrento shore read forty metres), so the
     block gives each as a rock of its height and extent (ChartBlocks.md, "An isle the grid
     lacks"): a frigate's keel over Li Galli touches it though the tile there is deep, and a
-    mile off she is clear."""
+    mile off she is clear. Since package 94 the three rocky islets are an island the grid
+    lacks (`grid_lacks`, by Purdy's and Norie's words), ground to the keel as the rock was."""
     import math as _m
 
     from freesail.world.geo import destination
 
     w = _gulf_at(40.60, 14.40, datetime(1805, 6, 12, 12, 0), ports=TYRRHENIAN_PORTS)
     galli = w.chart.feature("li-galli")
-    assert galli.kind == "rock" and galli.extent_m >= 300.0
+    assert galli.kind == "island" and galli.grid_lacks and galli.extent_m >= 300.0
     assert w.chart.depth_at(galli.position) > 20.0  # the grid's water
     hit = w.chart.danger_under(galli.position, _m.radians(90.0), 45.0, 5.0)
     assert hit is not None
@@ -12210,3 +12211,52 @@ def test_truth_7_304_the_tyrrhenians_tide_hour_is_smyths_and_its_weather_naples_
     raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
     note = raw["boxes"]["tyrrhenian"]["months"][1]["note"]
     assert "Naples" in note and "gales 7" in note
+
+
+# ---------------------------------------------------------------------------
+# Package 94: the chart's tidies from 79c, 79d and 89 (truths 7-310 to 7-314)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_310_the_isla_del_rey_is_an_island_to_the_lookout_and_ground_to_the_keel():
+    """79c's finding: the Isla del Rey, which the grid smooths into a ridge of nine to
+    eleven metres in Port Mahon, was given as a rock of its height so that nothing sails
+    through it, and the lookout called it "a danger". As an island the grid lacks (package
+    94) the lookout makes it out as the land it is and calls it by its name, by day and by
+    night close aboard, never "a danger"; the keel touches it within its extent as she
+    touched the rock, and a cable and a half south of it, in Tofiño's passage, she is clear;
+    the pilot names it ahead on her line, and the master's chart names it among the
+    dangers."""
+    import math as _m
+
+    from freesail.world.chart import DANGER_KINDS
+    from freesail.world.geo import destination
+    from freesail.world.lookout import Lookout
+
+    when = datetime(1805, 6, 15, 12, 0)
+    w = _med_at(*MAHON_MOUTH, when)
+    rey = w.chart.feature("isla-del-rey")
+    assert rey.kind == "island" and rey.grid_lacks and rey.kind not in DANGER_KINDS
+    assert w.chart.depth_at(rey.position) > 5.0  # the grid's ridge, water
+    # the lookout: land, by its name, not a danger
+    near = destination(rey.position, 270.0, 2.0 * units.CABLE)
+    for daylight in ("day", "night"):
+        seen = {s.feature.id: s for s in w.chart.in_sight(near, 10.0, None, daylight, when)}
+        assert "isla-del-rey" in seen and seen["isla-del-rey"].seen_as == "land", daylight
+    found = w.chart.in_sight(near, 10.0, None, "day", when)
+    words = Lookout.words(next(s for s in found if s.feature is rey), 0.0)
+    assert words.startswith("The Isla del Rey") and "danger" not in words
+    # standing for it from two cables west, the tiles' water clear, the lookout has it
+    # ahead by its extent
+    assert w.chart.depth_at(near) > 5.0
+    hit = Lookout(w.chart)._first_ahead(near, _m.radians(90.0), 600.0, 0.5, found)
+    assert hit is not None and hit[2] is not None and hit[2].feature is rey
+    # the keel
+    hit = w.chart.danger_under(rey.position, _m.radians(270.0), 45.0, 5.0)
+    assert hit is not None and hit.bottom == "the Isla del Rey, or Hospital Island (island)"
+    south = destination(rey.position, 200.0, 1.5 * units.CABLE)
+    assert w.chart.danger_under(south, _m.radians(270.0), 45.0, 5.0) is None
+    # the pilot's line and the master's chart
+    ahead = w.chart.dangers_ahead(near, 90.0, 1500.0, units.CABLE, 0.5, 6.0)
+    assert ahead and ahead[0][0].id == "isla-del-rey"
+    assert "isla-del-rey" in {f.id for f, _b, _d in w.chart.dangers_near(near, 2000.0)}

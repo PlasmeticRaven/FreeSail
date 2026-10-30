@@ -71,8 +71,12 @@ region's, its tide and its weather are rows in tables that already reach its wat
    touched). A block's own index is written by its build alone: marks added after the
    first build (the build is best made early, to fetch) are found by id and not by the
    lookout, nor a port's road by its note of the bottom, until the block is built again
-   with `--skip-fetch` (package 39c, whose first tests failed so). When the encyclopaedias
-   refuse the build network for its rate (39b, 39c: every request answered 429), the
+   with `--skip-fetch` (package 39c, whose first tests failed so). **A mark whose kind
+   changes and whose place does not** (package 94, the islets recast as islands) wants no
+   build: the index holds the ids by their cell and no kind, so `build_index` over the
+   features file gives the same bytes (say so, having run it), and the manifest's
+   `features_by_kind` for the region follows the file, edited alone, no tile, coast or
+   other region's entry touched. When the encyclopaedias refuse the build network for its rate (39b, 39c: every request answered 429), the
    lights' years are read from the Lighthouse Directory (R. Rowlett, ibiblio.org/
    lighthouse, a page a country's coast), which gives the year each station was first lit.
    The period's Spanish sources are on the Internet Archive in full: Tofiño's *Derrotero de
@@ -287,9 +291,21 @@ Strait (package 39f, after 39d's merge): its files of the two tiles taken as
 **An isle the grid lacks.** EMODnet's sixteenth of a minute interpolates its soundings
 across an isle a few hundred metres long, so the tiles have water where Santa Clara at St
 Sebastian, Mouro at Santander and the Estelas stand forty metres high (package 39c): the
-block's features give such an isle as a `rock` of its height and an `extent_m` of its
-size, so that a ship cannot sail through it; a land patch is better, where a sheet can
-be read with its datum.
+block's features give such an isle as an **`island` with `grid_lacks: true`**, its
+`height_m` and an `extent_m` of its size (under a kilometre, laid over the isle as a
+danger's is), so that a ship cannot sail through it (package 94; the blocks before gave
+it as a `rock` of its height, and the lookout called it "a danger"). The keel takes it as
+it takes a rock that stands above the water (`Feature.is_ground`, `Chart.danger_under`),
+the pilot and the captain's chart name it on the line as a danger (`Feature.is_hazard`,
+`Chart.line_passes`, `dangers_ahead`, `dangers_near`), the lookout makes it out as land
+and calls it by its name, and stands into it by its extent though the tiles have water
+there. Which kind is the source's: an isle or an islet by the pilot's words is an island,
+a rock above water by his words a rock of its height (79c's and 79d's recast so, each by
+its source line: the Fourmigues of Giens, the Boute of Gourjean, the Formiche of
+Grosseto, the Toro, the Catalano and the Botte of Ponza stay rocks). An island the grid
+holds is the tiles' ground and the feature's mark alone, `grid_lacks` absent, its
+`extent_m` if any the isle's size and read by nothing (Belle Isle's nine kilometres). A
+land patch is better, where a sheet can be read with its datum.
 
 **GEBCO's fill.** Where EMODnet has no value (the land, mostly, and some harbours and
 lagoons it does not survey) the tiles take GEBCO's height, which is about mean sea level,
@@ -492,8 +508,8 @@ Gulf of Lion and Tyrrhenian among them):
   3851, Alcudia 3853, Mahón 3860).
 - **Isles the grid lacks**, again (39e's finding): Alboran, the Hormiga off Cape Palos, Isla
   Grosa, the Isla del Aire and Port Mahon's harbour islands are water in EMODnet's grid;
-  each is a rock of its height with an extent. A harbour's islands so smoothed become shoals
-  in its channel (the Isla del Rey a ridge of 9 to 11 m): place them by the period's plan
+  each a rock of its height with an extent then, an island the grid lacks since package
+  94. A harbour's islands so smoothed become shoals in its channel (the Isla del Rey a ridge of 9 to 11 m): place them by the period's plan
   of the entry and keep the pilot's passage open.
 - **Draft positions from memory miss by a kilometre** on a coast the builder does not know
   well: the features rule moves most within its reach, but render each harbour with its
@@ -593,7 +609,8 @@ where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea
   would be twenty feet.
 - **Islets the grid lacks are many here**: seventeen of the three regions (Planier, Tino,
   the Giraglia, the Lavezzi, the Sanguinaires, Li Galli ...) read as water in EMODnet's
-  sixteenth of a minute; each a rock of its height and extent ("An isle the grid lacks").
+  sixteenth of a minute; each a rock of its height and extent then, eleven of them an
+  island the grid lacks since package 94 ("An isle the grid lacks").
 - **A road with its bottom is a feature of kind `anchorage`**: `Chart.bottom_near` reads the
   note from `anchorage` and `bottom` features only, so a `road` with a `bottom:` leaves a
   port's spots without a note (`test_tackle_orders.py`).

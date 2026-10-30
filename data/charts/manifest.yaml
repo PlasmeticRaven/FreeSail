@@ -7058,12 +7058,13 @@ regions:
       castle: 7
       headland: 14
       hill: 8
-      island: 10
+      island: 13
       light: 1
       place: 1
-      rock: 11
+      rock: 8
       shoal: 3
       tower: 2
+      town: 6
       town: 6
   balearics:
     title: The Balearics, and Barbary from Mostaganem to Algiers
@@ -8027,15 +8028,16 @@ regions:
       church: 1
       headland: 17
       hill: 2
-      island: 7
+      island: 12
       ledge: 4
       light: 2
       mark: 1
       place: 2
-      rock: 12
+      rock: 7
       shoal: 3
       tower: 4
       town: 5
+      transit: 1
       transit: 1
   gulf-of-lion:
     title: The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche
@@ -8875,14 +8877,15 @@ regions:
       church: 2
       headland: 16
       hill: 7
-      island: 11
+      island: 14
       ledge: 1
       light: 9
       place: 3
-      rock: 13
+      rock: 10
       shoal: 1
       tower: 4
       town: 15
+      transit: 2
       transit: 2
   ligurian-sea:
     title: The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena
@@ -9492,14 +9495,15 @@ regions:
       church: 1
       headland: 18
       hill: 9
-      island: 18
+      island: 23
       ledge: 1
       light: 9
       mark: 3
       place: 3
-      rock: 13
+      rock: 8
       shoal: 7
       tower: 7
+      town: 19
       town: 19
   tyrrhenian:
     title: The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples
@@ -10504,12 +10508,12 @@ regions:
       church: 1
       headland: 24
       hill: 10
-      island: 15
+      island: 18
       ledge: 2
       light: 5
       mark: 2
       place: 3
-      rock: 9
+      rock: 6
       tower: 4
       town: 20
 corridors:

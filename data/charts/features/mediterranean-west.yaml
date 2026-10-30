@@ -673,16 +673,17 @@ features:
   says: Cape Palos, low, a square watch-tower of three guns on it; the current runs hard to the south-east off it.
   fix: the modern chart's cape; height JUDGEMENT; moved 680 m to the nearest land of the tiles
 - id: hormiga-grande
-  kind: rock
+  kind: island
   name: the Great Hormiga
   modern: Isla Hormiga
   lat_deg: 37.6555
   lon_deg: -0.6545
   height_m: 7
   extent_m: 100
+  grid_lacks: true
   source: 'Tofiño 1787, ''Situación de las Hormigas'', p. 87: about 2 miles N 57° 30'' E of the cape''s tower the Hormiga grande, a small flat islet; a little S and W of it, N 58° E of the tower, the Hormiga chica, only a rock; no passage between them for hidden rocks, but one with 5 to 9 brazas for any vessel between the Hormiga chica and the cape, with a large wind and keeping nearer the cape; Purdy 1826, p. 19: ''a flat islet'''
   says: 'The Great Hormiga, a small flat islet two miles off Cape Palos: no passage between it and the Little; go between the Little Hormiga and the cape, nearer the cape.'
-  fix: 'the modern chart''s Isla Hormiga; Tofiño''s bearing and distance from the tower agree (2.05 miles); height JUDGEMENT; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 100 m (an islet some 200 m across, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+  fix: 'the modern chart''s Isla Hormiga; Tofiño''s bearing and distance from the tower agree (2.05 miles); height JUDGEMENT; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is given as one the grid lacks (`grid_lacks`; a rock until package 94), its height with an extent_m of 100 m (an islet some 200 m across, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
 - id: bajo-de-dentro
   kind: shoal
   name: the shoal south-west of the Hormiga
@@ -708,16 +709,17 @@ features:
   says: The outer shoal half a mile east-north-east of the Great Hormiga, in a line with the two Hormigas; it shows white.
   fix: 'Purdy''s half mile ENE 1/2 E of the modern Isla Hormiga (the modern Bajo de Fuera lies, FROM MEMORY, somewhat farther out: the tile check to settle); Tofiño gives no depth, 2 m JUDGEMENT; moved 391 m to the shoalest head of the tiles within 400 m (-20.6 m against the datum)'
 - id: isla-grosa
-  kind: rock
+  kind: island
   name: the Isla Grosa
   modern: Isla Grosa
   lat_deg: 37.727
   lon_deg: -0.7085
   height_m: 95
   extent_m: 350
+  grid_lacks: true
   source: 'Tofiño 1787, ''Isla Grosa y su Fondeadero'', p. 88: N 8° W of the cape''s tower about 6 1/3 miles (OCR) the Isla Grosa, high, in the figure of a triangle, NNE-SSW 300 toesas long, 1 1/4 miles from the Manga; bold on its SE; a little farallón 300 toesas NE 1/4 E (OCR) with 8 brazas between; Purdy 1826, pp. 19 to 20: ''high ... its appearance is somewhat like a haycock'''
   says: The Isla Grosa, high and like a haycock, six miles north of Cape Palos off the Manga.
-  fix: 'the modern chart''s island; height FROM MEMORY; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 350 m (the island some 700 m across and 98 m high, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+  fix: 'the modern chart''s island; height FROM MEMORY; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is given as one the grid lacks (`grid_lacks`; a rock until package 94), its height with an extent_m of 350 m (the island some 700 m across and 98 m high, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
 - id: grosa-anchorage
   kind: anchorage
   name: the anchorage of the Isla Grosa
@@ -743,16 +745,17 @@ features:
   says: 'The losa of one braza north-east of the Grosa: keep the farallon open west of the white hillock on the Manga.'
   fix: Tofiño's 540 toesas (1,050 m) NE of the modern island's middle; 1 braza (1.7 m); extent JUDGEMENT; moved 285 m to the shoalest head of the tiles within 400 m (-10.1 m against the datum)
 - id: alboran
-  kind: rock
+  kind: island
   name: the isle Alboran
   modern: Isla de Alborán
   lat_deg: 35.9395
   lon_deg: -3.0345
   height_m: 15
   extent_m: 300
+  grid_lacks: true
   source: 'Tofiño 1787, ''Alboran'', p. 45: 15 leagues S 8 1/2 W (OCR) of the castle of Guardias Viejas, 9 1/2 N 6° 44'' W of Cape Tres Forcas, in latitude 35° 57'' N and longitude 3° 15'' 20'''' E of Cadiz, of middling height, seen 3 1/2 to 4 leagues in clear weather, even, half a mile E-W and half that wide, sheer on the S and less so on the N; off its E end an islet about a fraction of a cable (OCR) away, and breakers at the same distance off all its points; commonly much current to the E about it; Purdy 1826, p. 14 (footnote): ''at about half a cable''s length from the east end is a small islet, and there are breakers all round to nearly the same distance'''
   says: The isle Alboran, low and even, sheer on its south side, an islet off its east end and breakers half a cable off every point; the current sets strongly east about it.
-  fix: 'the modern chart''s island (Tofiño''s latitude 0.6 mile N of it); height FROM MEMORY; the islet off the E end (Isla de las Nubes) is in this entry; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is a rock of its height with an extent_m of 300 m (the island 600 m long and 250 across, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
+  fix: 'the modern chart''s island (Tofiño''s latitude 0.6 mile N of it); height FROM MEMORY; the islet off the E end (Isla de las Nubes) is in this entry; the tiles have no land here (EMODnet''s grid interpolates across it: the shoalest within 2 km under water), so the island is given as one the grid lacks (`grid_lacks`; a rock until package 94), its height with an extent_m of 300 m (the island 600 m long and 250 across, FROM MEMORY), so that a ship cannot sail through it (docs/dev/ChartBlocks.md, ''An isle the grid lacks'')'
 - id: alboran-anchorage
   kind: anchorage
   name: the anchorage off the east end of Alboran
