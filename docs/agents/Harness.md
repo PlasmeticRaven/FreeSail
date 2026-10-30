@@ -585,6 +585,8 @@ A place is part of a person's state and of what he can do there, not a simulatio
 
 The dispatches test (`docs/playtests/2026-10-18-dispatches-director-test/`) found a captain who could not tell where he stood, lost three orders to his own stand-by, and was woken with nothing to read; and a director who could not read the truth while it stood by. Package 66 mends those (spec M7b §5 and §14, "as built (package 66)").
 
+**The ship herself** (package 85; the owner's word of 2026-10-27: models at a station were almost never told what ship they were on). Every station's brief opens its situation with the ship, in the words of `readings.ship_words`: her name, her rig and class, her service and nation, her fit of guns, her people's number, who commands, and the ports of her voyage (*The ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a King's ship of Britain. Her guns: ... Her people: 264 souls by the muster. Commanding: Captain Bowen, ... The ports of her voyage: Falmouth, Plymouth and Brest.*); the handover fold keeps the brief whole with it; a station seated on another hull is told that hull; and the reading `the ship` (`what ship`, `my ship`, `this ship`) gives the same words at any time. The director, above the game, is told no ship.
+
 **The line.** Every sample of a seated person opens with one line of his own, before everything else in it (the sample's `you`, first in its data; the REPL and the MCP bridge print it under the sample's head): who he is, where he is and since when, whose the deck is, his state in the needs' words when they have any, and the date (package 85: in words, so that it is known and never deduced from the log's stamps; the reading `the date` gives it on request):
 
 ```

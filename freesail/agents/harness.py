@@ -1022,6 +1022,7 @@ class Harness:
             general=general,
             journal=self.journal_words(),
             voyage=voyage_words(world) if (self._is_captains or self._is_directors) else "",
+            ship="" if self._is_directors else R.ship_words(world),
         )
         self.turns.append(Turn(OPERATOR, self.brief.text()))
         return self.brief

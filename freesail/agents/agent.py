@@ -2281,6 +2281,7 @@ class Brief:
         general: str = "",
         journal: str = "",
         voyage: str = "",
+        ship: str = "",
     ) -> Brief:
         """The head from the station and the situation, then the station brief. The
         caller (the harness) reads the log and the readings through the tools, so the
@@ -2389,7 +2390,10 @@ class Brief:
             ),
             "authority": authority,
             "situation": (
-                (f"{voyage.strip()}\n\n" if voyage.strip() else "")
+                # the ship herself first, at every station (the owner's word of 2026-10-27:
+                # a model was almost never told what ship it was on): `readings.ship_words`
+                (f"{ship.strip()}\n\n" if ship.strip() else "")
+                + (f"{voyage.strip()}\n\n" if voyage.strip() else "")
                 + (f"{journal.strip()}\n\n" if journal.strip() else "")
                 + f"The last {len(log_lines)} lines of the log:\n{log_text}\n\n"
                 f"The readings now:\n{readings_lines}"

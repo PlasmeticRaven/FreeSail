@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import functools
 import math
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -2235,6 +2236,134 @@ NO_PEOPLE_WORDS = "no people are kept: the ship is not in a world"
 NO_PILOT_WORDS = "no pilot aboard"
 NO_PORT_WORDS = "no port within the pilot's cruising ground"
 NO_HOLD_WORDS = "no hold is kept: the ship's file gives her no room for a cargo"
+
+
+def ship_class_words(spec: Any, name: str = "") -> str:
+    """Her rig and class in words from her file's era note: 'a 36-gun 18-pounder frigate
+    of the Amazon class, ship-rigged', 'H.M. armed cutter', 'H.M. brig-sloop of the
+    Diligence class'; the note's first clause before its parenthesis or colon, her name
+    taken out of it where the note names her, and the rig by the file's word where the
+    clause does not say it. A hull sailing under another name than her file's (a far
+    ship made from the frigate's or the brig's lines) keeps the file's class and loses
+    the file's ship's name."""
+    note = str(getattr(spec, "era_notes", "") or "").strip()
+    head = re.split(r"[(:]", note, maxsplit=1)[0].strip().rstrip(",;") if note else ""
+    file_name = str(getattr(spec, "name", "") or "")
+    if head and file_name:
+        # 'H.M. brig-sloop Harpy of the Diligence class' -> 'H.M. brig-sloop of the
+        # Diligence class'; 'A 36-gun ... frigate of the Amazon class' keeps the class
+        head = re.sub(rf"(?<!the ){re.escape(file_name)}\b,?\s*", "", head)
+        head = re.sub(r"^L'\s*,?\s*", "", head).strip(" ,")
+        head = re.sub(r"\s+", " ", head)
+    rig = str(getattr(spec, "rig", "") or "").replace("-", " ")
+    if not head:
+        return f"a {rig}" if rig else "a ship"
+    if head[:1].isupper() and not head.startswith("H.M."):
+        head = head[:1].lower() + head[1:]
+    if head.startswith("the "):
+        head = "a " + head[4:]
+    rigged = f", {rig}-rigged" if rig and rig.split()[-1] not in head.lower() else ""
+    return f"{head}{rigged}"
+
+
+def ship_words(world: Any) -> str:
+    """**The ship herself, said plainly** (the owner's word of 2026-10-27: a model at a
+    station was almost never told what ship it was on): her name, her rig and class, her
+    service and nation, her fit of guns, her people's number, who commands, and the ports
+    of her scenario; from her file, her papers and her muster, the same words in every
+    station's brief and in the reading `the ship`."""
+    ship = getattr(world, "ship", None)
+    if ship is None:
+        return "No ship."
+    name = str(getattr(ship, "name", "") or "the ship")
+    spec = getattr(ship, "spec", None)
+    cls = ship_class_words(spec, name) if spec is not None else "a ship"
+    ports = getattr(world, "dealings", None)
+    nations = getattr(world, "nations", None)
+    nation_id = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
+    nation = ""
+    if nation_id:
+        try:
+            nation = nations.get(nation_id).name if nations is not None else nation_id
+        except KeyError:
+            nation = nation_id.replace("-", " ")
+    captain = getattr(world, "captain", None)
+    role = str(getattr(captain, "role", "") or "")
+    from freesail.world.captains import _is_kings_ship
+
+    kings = role in ("kings-ship", "commodore", "cruiser") or (not role and _is_kings_ship(world))
+    escort = ", the convoy's escort" if role == "commodore" else ""
+    if kings:
+        service = "a King's ship" if nation in ("", "Britain") else f"a ship of the {nation} navy"
+    else:
+        service = {
+            "privateer": "a privateer",
+            "packet": "a packet",
+            "fisherman": "a fisherman",
+        }.get(role, "a merchantman")
+        if cls.startswith("H.M. "):
+            # the hull's lines are a King's vessel's (the file's history); she is not
+            cls = cls[5:]
+            cls = ("an " if cls[:1].lower() in "aeiou" else "a ") + cls
+    of = f" of {nation}" if nation and not service.startswith("a ship of the") else ""
+    parts = [f"The ship: {name}, {cls}; {service}{of}{escort}."]
+    guns = _guns_fit_words(world)
+    parts.append(f"Her guns: {guns}." if guns else "She carries no guns.")
+    crew = (getattr(ship, "extra", None) or {}).get("crew")
+    if crew is not None and getattr(crew, "complement", 0):
+        parts.append(f"Her people: {crew.complement} souls by the muster.")
+    who = _commands_words(world)
+    if who:
+        parts.append(who)
+    sc = getattr(world, "scenario", None)
+    names = []
+    if ports is not None and getattr(sc, "ports", None):
+        for pid in sc.ports:
+            port = ports.ports.get(pid) if hasattr(ports, "ports") else None
+            names.append(port.name if port is not None else str(pid))
+    if names:
+        parts.append(f"The ports of her voyage: {_and_words(names)}.")
+    return " ".join(parts)
+
+
+def _guns_fit_words(world: Any) -> str:
+    """Her fit of guns: '26 long 18-pounders, 10 32-pounder carronades, 4 long 9-pounders'
+    (the guns reading's own words for the kinds)."""
+    guns = list((getattr(world.ship, "guns", None) or {}).values())
+    if not guns:
+        return ""
+    from freesail.api.action_readings import _kinds_words
+
+    return str(_kinds_words(guns)).strip().rstrip(".")
+
+
+def _commands_words(world: Any) -> str:
+    """Who commands, from the muster and the stations: 'Commanding: Captain Bowen, by the
+    scenario's book; nobody at the captain's station; the deck the player's.'"""
+    value = _captain_reading(world, None)
+    if not value:
+        return ""
+    words = str(value.get("words") or "").strip().rstrip(".")
+    return f"Commanding: {words}." if words else ""
+
+
+def _and_words(names: list[str]) -> str:
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + " and " + names[-1]
+
+
+REGISTRY.add(
+    Reading(
+        "ship",
+        ("the ship", "what ship", "my ship", "this ship", "what ship is this"),
+        "query",
+        "",
+        lambda world, _p: {"words": ship_words(world)},
+        description="the ship herself: her name, her rig and class, her service and nation, "
+        "her fit of guns, her people's number, who commands, the ports of her voyage",
+    )
+)
 
 
 def _people(world: Any, _: str | None) -> dict[str, Any] | None:

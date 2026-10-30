@@ -12317,3 +12317,32 @@ def test_truth_7_243_in_action_a_notable_event_is_a_hit_a_strike_or_a_change_of_
         for e in enemy.log
         if e.kind == "action.hit"
     )
+
+
+def test_truth_7_244_every_station_is_told_her_ship_and_the_ship_reading_says_the_same():
+    """The owner's word of 2026-10-27: models at a station were almost never told what
+    ship they were on. Every station's brief opens its situation with the ship (her name,
+    rig and class, service and nation, fit of guns, people's number, who commands, the
+    ports of her voyage), and `the ship` reads the same at any time."""
+    from freesail.agents import agent, tools
+    from freesail.agents.agent import Brief
+    from freesail.api import readings as R
+
+    w = _package_85_cutter()
+    words = R.ship_words(w)
+    assert words.startswith(
+        "The ship: Sherbourne, an armed cutter; a merchantman of Britain. Her guns: 6 "
+        "12-pounder carronades. Her people: 30 souls by the muster. Commanding: Mr Bowen, "
+    )
+    assert words.endswith("The ports of her voyage: Falmouth and Plymouth.")
+    assert words in w.submit("what ship").text and words in w.submit("the ship").text
+    for which in ("watcher", "officer", "master", "lookout", "passenger", "captain"):
+        brief = Brief.build(
+            getattr(agent, which)(world=w),
+            "a play session",
+            ["(the log is empty)"],
+            {},
+            tools.tool_names(),
+            ship=words,
+        )
+        assert next(i.text for i in brief.head if i.name == "situation").startswith(words)
