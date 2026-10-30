@@ -13542,3 +13542,41 @@ assertion kept. **The block's tests**: the six files fast 203 passed after the r
 failed before it, the above), slow 11 passed; truths 7-260 to 7-269, 10 passed. **The
 scenario** `biscay-south.yaml`, 30 hours: **the same log byte for byte**, 880 lines, digest
 `922f024f1d07d067`.
+
+### The region `portugal`
+
+The recipe loses `fill_mean_level_m: 2.0` (above). The control: the head's tool on today's
+fetch gives every tile's arrays the committed ones' (116 files differ in their bytes alone,
+39d's written before `save_tile`), the coast byte for byte. `python tools/build_charts.py
+--region portugal --reuse-world`: the checks as printed (139 of 139 features, ids unique,
+Cadiz's override's datum stated, the fetch box covering the tiles, "0 kept"); "GEBCO's fill
+raised to the chart's datum by the world's mean level, 1.54 to 4.06 m" (within the bounds
+1.54 to 2.36: Cascais' 2.00, Huelva's 1.96, the lowest about Cadiz and the Guadalquivir; the
+4.06 west of 10 W and in Spain's interior, outside every block); 72 dry tiles not written, as
+before. **The shore's sweep 7,383 cells in 226 places** (the old raise's, by the control,
+6,125 in 212): the level a little under 39d's 2.0 about Huelva and Cadiz, a little over it
+in the north; the largest the Ria de Aveiro's lagoon (464, 316, 260, 224 about 40.68 to
+40.78 N, 8.68 to 8.72 W; 256 before), the Odiel's and the Tinto's marshes at Huelva (312;
+311), the Arade's and the Alvor's (259; 258), the Mondego's at Figueira (248) and the
+Guadalquivir's at Bonanza (224): the estuaries 39d's figure was made for, a little more of
+them water, as their gauges' water says.
+
+| | Old (39d, 2.0 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 68 tiles, 14.11 MB | 68 tiles, 14.14 MB |
+| level 3 | 48 tiles, 3.29 MB | 48 tiles, 3.26 MB |
+| coast | 1,890 pieces, 12,577 points, 479,263 bytes | 1,706 pieces, 12,285 points, 451,137 bytes |
+| tiles changed (arrays) | | 33 of level 2, 42 of level 3 |
+| cells changed | | 2,165,404 at level 2, 2,621,586 at level 3, the largest 2.00 m |
+| below the datum to above | | 92 at level 2 |
+| above the datum to below | | 293 at level 2, 3,483 at level 3 (the bay of Cadiz's and the Tagus's fill, 1.54 to 1.96 m raise against 2.0) |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records, the recipe; no other region's tile, coast or index, the index and every port file
+and mark untouched. **One test recast**, as Biscay south's:
+`test_chart.py::test_portugal_is_a_region_of_its_own_tiles_with_the_dry_land_left_to_the_corridor` asserted the manifest's
+`fill_mean_level_m == 2.0`; it now asserts the key gone and the raise at Huelva its gauge's
+1.96 m within 2 cm, every other assertion kept. **The block's tests**: the six files fast
+203 passed, slow 11 passed (`test_islands.py`'s Portugal tests among them); truths 7-260 to
+7-269 (7-264, Cadiz watched, among them), 10 passed. **The scenario** `portugal.yaml`, 30
+hours: **the same log byte for byte**, 671 lines, digest `05c7693be1e19a73`.

@@ -351,13 +351,13 @@ REGIONS: dict[str, dict[str, Any]] = {
             "cadiz-bay": {"south": 36.45, "north": 36.64, "west": -6.40, "east": -6.18},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
-        # GEBCO's fill raised to the chart's datum by the coast's own mean level, 2.0 m
-        # above the Zero Hidrográfico offshore (the Instituto Hidrográfico's surface,
-        # EPSG 10393) and 1.96 m above LAT at Huelva (REDMAR); not by the world's,
-        # which over the block is Le Conquet's 3.98 to 4.38 m while the block's gauges
-        # are held (docs/dev/TuningNotes.md, package 39d)
+        # GEBCO's fill raised to the chart's datum by the world's mean level, the block's
+        # own gauges' since package 89 (1.54 to 2.36 m within the bounds: Cascais 2.00,
+        # Huelva 1.96 above LAT). Package 39d's one figure, `fill_mean_level_m: 2.0` (the
+        # Instituto Hidrográfico's Zero Hidrográfico, EPSG 10393), was made while the
+        # gauges were held and the world's level Le Conquet's 3.98 to 4.38 m; package 93
+        # took it out for the rule (docs/dev/TuningNotes.md, packages 39d and 93)
         "fill_to_chart_datum": True,
-        "fill_mean_level_m": 2.0,
         # half the block's level-2 tiles are the land of Portugal and Spain, with no water
         # in them: not written (the corridor answers there; the brief's 18 MB a region)
         "skip_dry_tiles": True,
