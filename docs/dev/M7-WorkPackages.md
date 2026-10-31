@@ -3161,6 +3161,10 @@ new ships.
 **Amended the same day:** 65 pauses after step 1 (the Fable allowance at 95 per cent); step
 1 merged on its own, steps 2 to 8 held for the week to turn; the builder told to finish step
 1 and stand by (the lead's one-shot word of 14:30).
+**And again (the same afternoon):** step 1 not merged either; `claude/pkg-65` stands at step
+1 green until the reset and the package is reviewed and merged after it (the lead's
+recommendation: step 1 alone takes the deck from a model below before step 3 gives it back
+by report; the owner is not testing 65 this week; a merge spends the allowance for nothing).
 
 ## Package 88: the captain's pass of M7 (`freesail/world/captains.py`, `brains.py` and `data/captains/*.yaml` the rules captain's doctrine and its sources; `freesail/world/squadrons.py` and `orders/station.py` only where the near station law reads; `freesail/world/signals.py` and `data/captains/privateer.yaml`, `hail.yaml` the colours held; `docs/TechnicalSpec-M7.md` §4, §21, §22 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_captain_trials.py`, `test_squadrons.py`, `test_signals.py`, `test_known_truths.py` truths 7-340 to 7-349)
 
@@ -4471,3 +4475,12 @@ places, the schooners' rake) wait for the later package, the brig's displacement
 order from here:** L2 and L3, then the *Neufchatel* with B3.4 first; the design-record commit
 at B2's window when the session reaches it. Bring the trunk in at each boundary; 82's step 5
 (the tow and the kedge) is building on its branch and touches no ship file.
+
+**2026-10-31, afternoon.** Gwyn's PAG3828 out of the tree (71b8ed7) is read and merges when
+its fast tier is green here (docs and the image only; the next cloud run covers it). The
+owner's word of today: the week pauses on new packages (decision 61); 65 is held on its
+branch at step 1; your lee-port and rig-line step is reviewed and merged when you send it,
+as the owner says you will; the *Neufchatel*'s main topgallant and the generalising of mixed
+rigs are in the owner's hands with you, and the proposal comes to the lead with the step
+that builds it. Nothing new is launched this week.
+

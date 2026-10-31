@@ -823,6 +823,11 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     step 1 (the rule in the harness), which is merged on its own as the design note's
     "each step a mergeable state" allows; steps 2 to 8 wait for the week to turn; the last
     of the allowance goes to the loose ends the owner's testing needs.
+    **And again, the same afternoon (the lead's recommendation, the owner agreeing):** 65's
+    step 1 is not merged either; the branch stands at step 1 green until the reset, and the
+    package is reviewed and merged after it, since step 1 alone takes the deck from a model
+    below before step 3 gives it back by report, and the owner is not testing 65 this week.
+    The ships session's lee-port and rig-line step is reviewed and merged when it is sent.
 
 ### Still open
 
