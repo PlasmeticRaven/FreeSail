@@ -187,7 +187,11 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
     before = (m.group("before") or "").strip() if m.group("with") else ""
     for words in (before, m.group("carry") or ""):
         for who in _names(words):
-            p = world.people.find(who)
+            # a visitor aboard by his name first (package 82, item 2: the seat's person
+            # sent home in the host's boat), then the company's own
+            p = world.people.find_aboard(who) if hasattr(world.people, "find_aboard") else None
+            if p is None:
+                p = world.people.find(who)
             if p is None:
                 raise OrderError(
                     f"Nobody aboard answers to '{who}'; the boat is not sent. The people: "

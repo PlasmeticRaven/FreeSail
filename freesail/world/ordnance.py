@@ -416,6 +416,7 @@ def take_in(world: Any, ask: Ask) -> tuple[str, dict[str, Any]]:
         "cost": cost,
         "words": words,
     }
+    payload["hoy"] = _hoy_off(ports, port, issue, hours)  # package 82: the hoy a vessel
     ports.jobs.append(Job(due, JOB_KIND, port.id, payload))
     room = f" ({'; '.join(cut)})" if cut else ""
     if issue:
@@ -545,6 +546,7 @@ def _alongside(ports: Any, job: Any, port: Any) -> None:
             f"The hoy came off and found her gone from the road; it went back with the {cargo}.",
             data | {"why": "gone"},
         )
+        _hoy_home(ports, job, port)
         return
     now = world.clock.tick
     cost = float(pay.get("cost") or 0.0)
@@ -597,6 +599,60 @@ def _alongside(ports: Any, job: Any, port: Any) -> None:
     )
 
 
+def _hoy_off(ports: Any, port: Any, issue: bool, hours: float) -> str:
+    """The hoy that brings the powder and shot off, a vessel of the sea (package 82, item
+    4; truth 7-328: she comes off by the same road as any boat and the lookout sees her):
+    put on the sea at the port's shore when the demand is made, pulling and sailing for the
+    ship at a hoy's pace so that she is alongside at the job's hour, lying under the ship's
+    lee until the stowing is done, and then gone home. Her body is the smack's file (a
+    sloop-rigged lighter of the Channel; judgement, the nearest hull on file); her id for
+    the job's payload, "" where the world has no sea to put her on."""
+    world = ports.world
+    vessels = getattr(world, "vessels", None)
+    shore = getattr(port, "shore", None)
+    if vessels is None or shore is None or getattr(shore, "position", None) is None:
+        return ""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.ships import Vessel
+
+    here = getattr(world, "position", None)
+    distance_m = bearing_and_distance(shore.position, here)[1] if here is not None else 0.0
+    pace_kn = max(1.0, min(4.0, distance_m / 1852.0 / max(hours, 0.25))) if distance_m else 2.0
+    name = "the Ordnance's hoy" if issue else "the merchants' hoy"
+    vessel = Vessel.boat_of(
+        port.id,
+        {"kind": "a hoy", "name": name, "height_m": 8.0, "pace_kn": round(pace_kn, 2)},
+        id=f"{port.id}-hoy-{int(world.clock.tick)}",
+        ship_file="data/ships/smack.yaml",
+        nation=str(port.nation),
+        position=shore.position,
+        plan=[("to_ship", 60.0)],
+        what="a hoy, deep laden",
+    )
+    try:
+        vessels.add(vessel)
+    except Exception:  # noqa: BLE001  (a sea that takes no hoy: the job runs as before)
+        return ""
+    return str(vessel.id)
+
+
+def _hoy_home(ports: Any, job: Any, port: Any) -> None:
+    """The hoy gone home after her job (package 82): her plan the shore, done there."""
+    world = ports.world
+    hid = str(job.payload.get("hoy") or "")
+    vessels = getattr(world, "vessels", None)
+    if not hid or vessels is None:
+        return
+    v = vessels.get(hid) if hasattr(vessels, "get") else None
+    if v is None or v.done:
+        return
+    shore = getattr(port, "shore", None)
+    if shore is not None and getattr(shore, "position", None) is not None:
+        v.plan = [("to", shore.position, port.name)]
+    else:
+        v.done = True
+
+
 def _stowed(ports: Any, job: Any, port: Any) -> None:
     from freesail import units
     from freesail.ship.parts import magazine
@@ -604,6 +660,7 @@ def _stowed(ports: Any, job: Any, port: Any) -> None:
 
     world = ports.world
     pay = dict(job.payload)
+    _hoy_home(ports, job, port)
     issue = pay.get("how") == ISSUE
     stores = getattr(world, "stores", None)
     lit = stores is not None and getattr(stores, "galley_fire_out", "") == "powder"

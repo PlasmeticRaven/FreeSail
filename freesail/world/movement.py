@@ -463,6 +463,12 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
         place_id = "tops"
     else:
         low = words.lower().removeprefix("the ").strip()
+        if _names_a_boat(world, person, low):
+            # `go to the boat` (package 82, item 4; `world.boats`): the boat manned as a hull
+            # of the world and the person put aboard her, his station following
+            from freesail.world import boats
+
+            return boats.go_to_boat(world, person, low)
         if low in ("deck", "on deck", "upper deck"):
             place_id = _on_deck(person, world)
         elif low in ("below", "my berth", "berth"):
@@ -502,6 +508,21 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
     person.up = place_id in DECK_PLACES or person.up
     text = _moved_line(person, place_id)
     return PERSON_MOVED, text, {"person": person.to_dict(), "place": place_id}
+
+
+def _names_a_boat(world: Any, person: Any, low: str) -> bool:
+    """Whether the words of `go to <the words>` name a boat of his ship's (package 82)."""
+    from freesail.world.boats import BOAT_WORDS
+
+    key = low.removeprefix("my ").removeprefix("her ").strip()
+    if key in BOAT_WORDS:
+        return True
+    here = hull_of(world, getattr(person, "hull", None))
+    spec = getattr(getattr(here, "ship", None), "spec", None) if here is not None else None
+    for b in getattr(spec, "boats", None) or []:
+        if key in (b.name.lower().removeprefix("the "), b.id.lower().replace("_", " ")):
+            return True
+    return False
 
 
 def _go_ashore_place(
@@ -619,6 +640,32 @@ def hull_of(world: Any, hull_id: str | None) -> Any:
 
 def hull_name(hull: Any) -> str:
     return str(getattr(getattr(hull, "ship", None), "name", "") or getattr(hull, "id", "") or "")
+
+
+def is_boat_hull(hull: Any) -> bool:
+    """Whether a hull is a ship's boat manned as a hull (package 82, item 4): her file has oars."""
+    ship = getattr(hull, "ship", None)
+    return getattr(getattr(ship, "spec", None), "oars", None) is not None
+
+
+def seat_of_person(world: Any, person: Any) -> tuple[Any, Any] | None:
+    """(the hull it is on, the player's seat) when the player holds a station through a
+    seat whose person is `person`, on any hull of the game (package 82, item 2); None
+    otherwise."""
+    name = str(getattr(person, "name", "") or "")
+    for hull in list((getattr(world, "hulls", None) or {}).values()):
+        seat = getattr(hull, "player_seat", None)
+        if seat is None or seat.agent.released:
+            continue
+        if str(getattr(seat.station, "person", "") or "") == name:
+            return hull, seat  # his voice, or his own station made for him by name
+        try:
+            holder = hull.stations.holder(seat.station.name)
+        except Exception:  # noqa: BLE001  (a muster that cannot run binds nobody)
+            holder = None
+        if holder is person:
+            return hull, seat
+    return None
 
 
 def harness_of(world: Any, person: Any) -> tuple[Any, Any] | None:
@@ -768,6 +815,28 @@ def put_aboard(
                     _unbind_visit(
                         from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
                     )
+    seated = seat_of_person(world, person)
+    if seated is not None:
+        # the player's seat goes with its person as a harness does (package 82, item 2)
+        from_hull, s = seated
+        if seat == "stands down":
+            s.stand_down_quietly(why or f"put aboard the {hull_name(hull)}")
+        else:
+            home_id = str(getattr(person, "home", "") or "")
+            if hid == home_id and s.visiting:
+                own_id, own_station = s._home
+                s.move_to(hull, own_station, None)
+                if from_hull is not None and str(getattr(from_hull, "id", "")) != own_id:
+                    _unbind_visit(
+                        from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
+                    )
+            elif hid != home_id:
+                home = s._home or (str(getattr(from_hull, "id", "") or ""), s.station)
+                s.move_to(hull, visiting_station(hull, person), home)
+                if from_hull is not None and str(getattr(from_hull, "id", "")) != home[0]:
+                    _unbind_visit(
+                        from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
+                    )
     data = {
         "person": person.name,
         "ship": hid,
@@ -803,6 +872,22 @@ def where_am_i(world: Any, person: Any) -> str:
         whose = f"the {hull_name(home)}'s " if home is not None else "the "
         return f"in {whose}boat" if person.where == "boat" else place_words(person.where)
     here = hull_of(world, getattr(person, "hull", None))
+    if here is not None and is_boat_hull(here):
+        # in a boat manned as a hull (package 82, item 4): hers named, the oars' or the
+        # lug's state, and the coxswain's mark
+        from freesail.physics.oars import oars_of
+
+        oars = oars_of(here.ship)
+        how = oars.words() if oars is not None else "under oars"
+        mark = dict(getattr(oars, "pulling_for", {}) or {})
+        for_words = ""
+        if mark.get("alongside"):
+            for_words = ", pulling for the ship"
+        elif mark.get("quay"):
+            for_words = ", pulling for the quay"
+        elif mark:
+            for_words = f", pulling for {mark.get('name') or 'the mark'}"
+        return f"in {hull_name(here)}, {how}{for_words}"
     people = getattr(here, "people", None) if here is not None else getattr(world, "people", None)
     try:
         place = people.effective_place(person) if people is not None else person.where

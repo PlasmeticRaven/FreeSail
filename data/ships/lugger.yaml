@@ -665,6 +665,7 @@ boats:
   oars: 4
   crew: 5
   tons: 0.1
+  file: data/ships/boat-yawl-16.yaml
 # The fishing gear (package 56, spec M7b §21a): what she carries and no other, each with its source; the evolutions that work it are data/evolutions/shoot_*.yaml and haul_*.yaml, its fishing the grounds' of data/fishing/; see tools/gen_ships.py.
 gear:
 # A fleet of drift nets for the pilchard, the mackerel, the herring and the sardine, shot at sunset over the quarter before the wind and ridden to by night (Holdsworth 1874 pp. 98 to 99, 106 to 111: a herring fleet a mile and a quarter, the pilchard nets of Cornwall 'about the size of those for herrings, but with a smaller mesh'); sixty nets and a thousand fathoms for her size, judgement.

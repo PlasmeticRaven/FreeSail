@@ -3052,6 +3052,7 @@ boats:
   oars: 10
   crew: 11
   tons: 2.1
+  file: data/ships/boat-launch-31.yaml
 # The captain's barge, a little longer than the launch and narrower (Falconer, BARGE: 'longer, slighter, and narrower').
 - id: barge
   kind: barge
@@ -3076,6 +3077,7 @@ boats:
   oars: 8
   crew: 9
   tons: 0.9
+  file: data/ships/boat-cutter-28.yaml
 # The second cutter, 0.9 of the first.
 - id: second_cutter
   kind: cutter

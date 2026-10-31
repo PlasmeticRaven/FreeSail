@@ -112,6 +112,9 @@ DEFAULT_HEIGHT_OF_EYE_M = 30.0
 # player's looks from its view as a boat's crew would, a man standing in a boat; what passes
 # within sight of the view is in its log, and the far sail is read by her own height.
 OBSERVER_HEIGHT_OF_EYE_M = 2.0
+# A boat's lookout (package 82, item 4; the design's §5.3): a man standing in her, his eye
+# this much over her gunwale (`deck_height_m`); nobody goes up a boat's mast.
+BOAT_EYE_OVER_GUNWALE_M = 1.7
 
 # A feature lost and found again within this many minutes is not hailed again
 # (judgement: a headland flickering at the edge of the haze is not a line a minute).
@@ -217,6 +220,8 @@ def height_of_eye(ship: Any) -> float:
     if not spars or hull is None:
         return DEFAULT_HEIGHT_OF_EYE_M
     deck = float(hull.spec.deck_height_m)
+    if getattr(getattr(ship, "spec", None), "oars", None) is not None:
+        return deck + BOAT_EYE_OVER_GUNWALE_M  # a boat: a man standing in her (package 82)
     best = 0.0
     for spar in spars.values():
         if spar.cls not in ("mast", "topmast") or spar.wrecked or spar.sent_down:

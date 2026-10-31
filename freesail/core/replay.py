@@ -192,6 +192,11 @@ def replay(
     def seat_hulls_due() -> None:
         for block in list(pending_hulls):
             records = block.get("agents") or []
+            if not records and str(block.get("id") or "") not in (world.hulls or {}):
+                # a hull with no door's station in the save (the player's seat's journal
+                # and her bindings, package 82, item 2): restored once the replay has made
+                # her, as the switch or a `follow` does at its tick, and not before
+                continue
             due_tick = min((int(r.get("stationed_tick") or 0) for r in records), default=0)
             after = min(
                 (

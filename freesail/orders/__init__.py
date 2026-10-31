@@ -248,6 +248,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import port
 
         return port.execute(ship, order)
+    if vocab.verbs[order.verb].object == "boat":
+        # the boat's oars and mast, and the ship's orders about her boat (package 82, item 4)
+        from freesail.orders import boat
+
+        return boat.execute(ship, order)
     if vocab.verbs[order.verb].object in ("needs", "allowance"):
         # a person's own needs and the people's allowance (spec M7b §19, §20; package 54)
         from freesail.orders import needs
@@ -283,6 +288,10 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import fight
 
         return fight.execute(ship, order)
+    if order.verb == "set" and getattr(getattr(ship, "spec", None), "oars", None) is not None:
+        from freesail.orders import boat
+
+        boat.check_sail_order(ship, order)  # a boat's lug wants her mast stepped (package 82)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

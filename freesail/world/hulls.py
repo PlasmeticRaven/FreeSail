@@ -390,6 +390,12 @@ class Hull:
         with self.world.as_hull(self):
             return self.world.submit(*args, **kw)
 
+    def record_driver(self, *args: Any, **kw: Any) -> Any:
+        """A driver's line in her log (package 82, item 2: the player's seat on another
+        hull writes its lines where it sits), by the World's with this hull current."""
+        with self.world.as_hull(self):
+            return self.world.record_driver(*args, **kw)
+
     @property
     def readings(self) -> Any:
         """The readings registry's view of her now (`World.readings`)."""

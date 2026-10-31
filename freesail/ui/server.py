@@ -134,6 +134,7 @@ from freesail.core.events import (
 from freesail.core.events import rollup as rolled
 from freesail.core.world import UNLOGGED_KINDS, World
 from freesail.ui.console import (
+    ABOARD_HELP,
     ALARM_SPEED,
     FREE_RUNNING_HELP,
     LIVE_WORLD_ORDER_SOURCE,
@@ -147,6 +148,7 @@ from freesail.ui.console import (
     UNTIL_FLAG,
     UNTIL_HELP,
     Pace,
+    aboard_ship,
     book_words,
     check_agents_unattended,
     clamp_compression,
@@ -1634,6 +1636,7 @@ def server_parser(description: str = "FreeSail local server") -> argparse.Argume
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument("--ship", dest="aboard", metavar="NAME", help=ABOARD_HELP)
     ap.add_argument(
         "--crewed-cap",
         type=int,
@@ -1693,8 +1696,10 @@ def prepare_game(args: argparse.Namespace, say: Callable[[str], None] = print) -
     if getattr(args, "director_brief", None):
         for line in give_director_brief(world, args.director_brief, "the player"):
             say(line)
-    # the player's seat: the flag's, else the scenario file's (`stations:`, package 59);
-    # `--seat captain` is the captain's prompt, his own, and no seat
+    # the ship the player is aboard (package 82, item 2), then his seat on her: the flag's,
+    # else the scenario file's (`stations:`, package 59); `--seat captain` is the captain's
+    # prompt, his own, and no seat
+    aboard_ship(world, getattr(args, "aboard", None), say)
     seat = player_seat_for(world, args.seat, scenario_file)
     if seat:
         from freesail.agents.seat import seat_player

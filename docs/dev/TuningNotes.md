@@ -15762,6 +15762,246 @@ files and the known truths, `--slow -m "not pace" -n 4`, 827 passed, 7 expected 
 session's Indefatigable and the view geometry among 223 commits, no conflict): the fast
 tier whole, 5,288 passed, none failed (31:42); the slow tier of the same files and the
 known truths, 827 passed, 7 expected failures, none failed (40:14). Ruff clean. The pace tests: 7-334 alone, above.
+
+### Step 3: the player's seat on another ship, and the director's door (the re-brief's item 2; the design's §4)
+
+**What was built.** `--ship <name>` at both drivers (`console.ABOARD_HELP`; the harbour's game
+through `prepare_game`): `console.aboard_ship(world, name, say)` writes a driver's line in the
+player's own ship's log saying how she is left ("The Amazon is left as she lies, her watch
+kept and her sails as they were; no captain's hand on her (she has no intent to sail by)
+[or: her rules captain sails her by his intent (...)]. The player is aboard the X."), then
+sets the drivers to follow her hull (84's `World.follow`, her hull made in the far shape when
+she has none and woken under the cap as the followed hull); both lines are inputs and replay
+as every driver's line does; refused with the words for a ship not on the sea, one with no
+captain of her own, or an observed world (which has no ship of the player's to leave). His
+prompt is then hers by the one rule: his orders go to the followed hull (`World.submit`
+reads `own`), her rules captain stands aside at his hand (`captain.player_hand`, as on his
+own ship) and `captain: carry on` gives her back; his own hull ticks on as another hull,
+her sails as they were and her captain quiet (no intent) or sailing her by his intent. `--seat
+<station>` with `--ship` is a `PlayerSeat` **on her hull**: `seat.seat_world` gives the
+followed hull's façade when the drivers follow another ship than the player's own, so the
+seat's world, its station's binding, its journal and `player_seat` are hers and stay hers
+when the drivers move on (`follow "the ship"`: the player's own hull has no seat, hers
+keeps it; a second seat is then the own ship's). The Hull forwards `record_driver` as it
+forwards `record` and `submit`, for the seat's lines.
+
+**The seat with its person.** `PlayerSeat.move_to(hull, station, home)` and `visiting`,
+the harness's `move_to` for the seat (the seat taken off the hull it was on, `hull`'s from
+here, his voice there (`movement.visiting_station`, the passenger's kind under his name,
+the visitor's domain) or his own station again at home, the journal his, a note in it);
+`movement.seat_of_person(world, person)` finds a seat by its station's person as
+`harness_of` finds a harness; `put_aboard` moves the seat as it moves a harness (a captive's
+seat stood down quietly). The boat's carrying list finds a visitor by his name first
+(`orders/port._boat_to_ship`, `people.find_aboard` then `find`), so `send the boat to the X
+with Mr Newton` from the host takes the visitor home as `for Mr Newton` fetched him.
+
+**The director's door with another hull followed** (84's open item, decided in the design
+from the one rule): `read_log` without a ship reads the followed hull's log, `aboard:` with
+no name is aboard her, `captain:` and `captain: carry on` are her rules captain's, the
+truth is read from her, each by `World.own` and nothing new; the other hull by her name at
+the head (`aboard the Amazon: ...`). What changed for it: the director's hand on the
+followed ship (`ship "X": order ...`) is refused naming her as such ("X is the followed
+ship, and her captain is held by the player at the prompt ... follow another to hand her
+back to her own captain"); the truth lists the player's own ship among the sail when another
+hull is read as the own (`director_readings` skipped "the player's own vessel" by the sea's
+`own`, which left her out whenever the own block was another's; it now skips the vessel
+whose hull is the one read).
+
+**86's three seams by the hull.** (1) The free intent: `Captain._free` is reached only
+when he `commands`, and he does not where a model holds her captain's station (`seated`) or
+the player at her prompt has given an order (`aside`); no `parent is None` in it, as the
+design wanted, and nothing moved: the test shows a free-intent brig lying to under him until
+the player follows her and gives an order, then lain to no more. (2) `hail.model_holds_her`
+reads the followed hull (`parent` None) and a model at her captain's station as before, and
+the player's own hull with no rules captain at all (`is_players`) as the design's third case,
+by the hull and not by `parent is None` alone. (3) `orders/station._named_or_kind` reads
+`World.players`' vessel (`root.vessels.own`) by her name whichever hull is followed, as it
+did since 84's step 7; a test pins it.
+
+**Found on the way.** (1) A save with the player's seat on another hull carries her hull
+block with his journal and her bindings and no door's station; the replay restored such a
+block at tick 0 (`due_tick` the least `stationed_tick`, none) before the world order that put
+her on the sea, and fell over in `station_world`: a block with no station records is
+restored once the replay has made her (`core.replay.seat_hulls_due`). (2) The seat's person
+in the host's boat has no hull for a passage; `seat_of_person` matched the holder alone and
+missed him at the homecoming, so the seat matches the station's person by name first as
+`harness_of` does. (3) The free-intent brig of 84's helper is held hove to by the director's
+hand in `_brig_alongside`, so his `aside` never comes there (he does not command under the
+hold); the tests of the hand use the unheld helper and the boat's tests the held one.
+
+**What moved: nothing pinned.** No recorded passage uses `--ship`, a seat on another hull or
+the director's door with another hull followed; the truth's listing changes only when the
+own block is another hull's. The proof is the suites below.
+
+**The truths:** 7-322 (the player aboard another ship, her prompt his, his own left as she
+lies, the replay by his acts), 7-323 (the director's door with another hull followed, the
+other by name), 7-326 (the free intent by the hull, the hail's holder, the station by name).
+
+**The suites on the step's tree** (`86afc87`, the lead's `5fbfbb0` merged): the fast tier
+whole, 5,300 passed, none failed (31:53); the slow tier of the sixteen touched files and
+the known truths, `--slow -m "not pace" -n 4`, 649 passed, 7 expected failures, one failed:
+`test_replay`'s fingerprint test, which reads the code tree and was run while step 4's
+files were being written beside it (the fingerprint moved under it); passed alone on the
+still tree. Ruff clean. No pace test touched.
+
+### Step 4: the boat as a hull of the one world (the re-brief's item 4; the design's §5)
+
+**In two commits, as the design asked.** (a) `8becf81`: the five boats' files through the
+generator (`boat-yawl-16`, `boat-cutter-28`, `boat-launch-31`, `boat-launch-25`,
+`boat-cutter-23`: the hull by Luce's rule of breadth and judged depth, draught and
+displacement, one mast stepped at will with a standing lug and its halyard, tack and sheet,
+the oars, a coxswain and the oarsmen at the waist, a grapnel as a kedge, no guns, no hold,
+no boats; each line's rung and source in its note, Steel 1805's Folio LVII named "to read"),
+the schema's `oars:` section (`OarsSpec`: `number`, `thrust_n`, `power_w`, `tiring_h`, the
+one new key for the one new figure) and a boat entry's `file:` key as its last; the eight
+ships regenerated byte-identical but for the `file:` line under each boat the five are the
+class of (`test_generator_reproduces_the_committed_files` the gate). (b) The step's second
+commit: the oar force, the boat manned as a hull, her orders, the boat lost, the hoy as a
+vessel, and truths 7-327, 7-328, 7-329, 7b-114.
+
+**The oar force** (`freesail/physics/oars.py`, read by `integrate._substep` beside the
+cable's pull and the trawl's drag; the brief's one leave to add to the physics, the design's
+§5.2 with its sources): F_oar(u) = min(F_0, P / max(u, u_min)) x stroke x 1 / (1 + hours / T)
+an oar, F_0 50 N, P 60 W, u_min 0.3 m/s, T 4 h (the men's tiring: two thirds at two hours,
+half at four, a third at eight, judgement on towing watch and watch), the stroke 1 at `give
+way`, 0.5 at `easy all`, 0 lying on the oars; the hours count while the oars pull and are
+fresh at each manning. The `Oars` state lives in `ship.extra["oars"]`, made lazily from the
+file's `oars:` by `oars_of`, saved and replayed with the hull's extra. Measured, the frigate's
+launch (31 ft, ten oars, 4.5 t laden) hove to in the Channel world: **3.3 to 3.6 kn fresh**
+under the full stroke, slower with the men an hour and more at the oars, her way coming off
+her by half a knot and more in five minutes with the oars boated (1.27 kn still on her after
+five minutes coasting, the engine's resistance at her displacement: physical, and the test
+asks only that she slows); the cutter's boat (15 ft, four oars) pulls the mile and a quarter
+from Carrick Road to the Falmouth quay in **26 minutes** (about 3 kn made good), and sails
+back under her lug at 2.7 to 2.9 kn on a run in the scenario's breeze, hoisted in at the
+26th minute. The design's figures (3.5 kn the yawl fresh, 3.3 kn the launch) stand within
+the engine's resistance at the files' displacements; nothing of `hull.resistance`, the sail
+model or the helm changed.
+
+**The boat manned as a hull** (`freesail/world/boats.py`). `go to the boat` (also `go to the
+launch`, by her name) with a boat on file: `man_boat` puts a `Vessel.boat_of` on the sea
+(id `<ship hull>:<boat id>`, her name "the X's boat", `pace_kn` 0, seen within
+`BOAT_SEEN_NM`, her file the pattern's, no brain, `sail_state` "under oars", her plan to lie
+to), makes her hull by `crews.make_hull` at her ship's truth a boat's length off the lee
+quarter, awake, her masts `sent_down` (the mast unstepped until `step the mast`), her
+company mustered from her own file (a coxswain and the oarsmen), the hull marked with
+`boat_of`/`boat_id`, the ship's `dealings.boat` a `BoatState` away on the errand "manned"
+with the hull's id and her commander's name; then `put_aboard` with `by="the boat"` puts the
+person in her, his station following as step 1 built, and when he is the player's person
+(the seat's, or the captain with no harness at CAPTAIN), the drivers follow her hull
+(`follow_boat`: `World.follow`, a driver's line). `where am I` answers "in the X's boat, 4
+oars out, giving way together, the men 1.0 hours at the oars, pulling for the quay"; the
+readings are hers (her speed, the wind at her, her ship a sail in sight). `tick_boat` runs
+each tick with her hull current (`World.tick`, for a hull whose spec has oars): the lug's
+sheet tended (below), the coxswain's mark steered for by the truth's bearing (`pull for the
+ship | the quay | <a sail> | <a point> | <a position>`: a ship's hull, a port's quay, a
+vessel, a position, or a heading steered with no mark), alongside her ship within
+`ALONGSIDE_M` (25 m) when told to come alongside, at the quay within `QUAY_M` (200 m) she
+lies on her oars and says so (`boat.at_quay`), and once a minute the sea's state is read
+against her weather (`SWAMP_STATES_SMALL` for a boat under 20 ft: short, heavy, very heavy;
+`SWAMP_STATES_LARGE`: heavy, very heavy). **`come alongside`** under oars gives way for her
+ship and under the lug steers for her; `hoist_in` furls what is set, boats the oars, puts
+her people aboard the ship (her own crew back into the ship's muster with her, the commander
+to his station by the step 1 road), gives the drivers the ship back (`hull.followed` "back
+aboard"), folds her log into the ship's as `boat.log` lines under her name and the hour (the
+notable lines, her orders as accepted, her own `boat.*` and the `person.*` lines; not the
+helm's and the wind's every minute: a five-minute pull gave 40 lines unfiltered and 6
+filtered), marks the vessel done and releases the hull, and the `BoatState` is at the
+booms again. The voyage saves and replays to the same digests of the world's and the
+ship's logs with the boat followed and after (truth 7-327). A boat strikes no bell
+(`World.tick`'s bells skip a hull whose spec has oars); her lookout's eye is 1.7 m over her
+deck (`lookout.BOAT_EYE_OVER_GUNWALE_M`).
+
+**Her orders** (`freesail/orders/boat.py`; the verbs and their synonyms in
+`data/vocabulary.yaml` under the new object kind `boat`, level 1; `orders/__init__` sends
+the kind to the module and asks `boat.check_sail_order` before a `set` on a hull with oars):
+`give way` (`give way together`), `easy all`, `lie on your oars` (`oars`), `boat your oars`
+(`in oars`), `out oars`, `pull for ...`, `step the mast`, `unstep the mast`, `come
+alongside` (`the boat alongside`), and on the ship `cut the boat adrift`. The refusals in
+words: a hull with no oars ("this hull has no oars. In the boat ('go to the boat'), the
+lug, the oars and the helm are hers"), the lug drawing when the men would pull ("take it in
+before the men pull"), the oars out when the lug would be set, the mast down ("The mast is
+unstepped and laid along the thwarts; 'step the mast' first", in the place of the engine's
+words for a mast sent down), the mast up already, no shore within twelve miles, no sail
+answering the name. `set the lug` and `take in the lug` are the engine's on her one lug.
+
+**The boat lost** (`lose_boat`, `cut_adrift`; `BoatState.lost`, `lost_tick`, `lost_words`):
+swamped in a sea above her weather with her people lost (an urgent `boat.lost` line in the
+ship's log, the people marked dead by the registry, the hull released), or cut adrift by
+order from the ship (refused from the boat, with people in her, when she is away on an
+errand or lost already); after it `send the boat` and `go to the boat` are refused ("is
+lost: cut adrift on the 10th; nobody mans her"), the reading says "the boat lost: cut
+adrift on the 10th", the truth's own block carries it, and `demand a boat of the yard`
+(`dealings._demand_boat`: a yard job, item "boat", 48 hours, £25 at the chandler's, judgement)
+puts a new one at the booms. The director's `aboard: the boat stove` form is item 6's.
+
+**The hoy as a vessel** (`ordnance._hoy_off`, deferred to 82 by 86): the hoy that brings the
+powder off is a `Vessel.boat_of` of the port's (id `<port>-hoy-<tick>`, "a hoy, deep laden",
+height 8 m, her plan `to_ship` then home), seen by the lookout and in the truth, her body the
+smack's file (`data/ships/smack.yaml`: a hoy's rig is the smack's near enough for a body that
+never sails under the engine; said here, a file of her own is the ships session's to make
+if one is wanted); the ordnance job's payload names her, and she goes home at the stowing
+or the missing as before.
+
+**Taken another way, with the reason.** (1) `man the boat` is not a verb: the vocabulary has
+it as a synonym of `send the boat` since package 35, and the design's "man the boat with the
+sweeps' orders to follow" is `go to the boat` (a boat manned by nobody who commands her has
+no road yet; the tow (step 5) will man her by `tow her with the boat`). (2) The muster: the
+design has the ship's muster reduced by the boat's crew while she is away; the boat's crew
+are mustered from her own file and the ship's muster is not reduced for them (the evolution
+`send_boat` reduces nothing today either; a cutter of thirty feeling her boat away is a
+change to the muster's reading of the boats, left for the lead's word). (3) `step the mast`
+is at once and not a three-minute evolution: the engine's evolutions run on a hull's
+stations and the boat's hands are her oarsmen; the order's words carry the act (judgement;
+an evolution is a line to add when the boat's hands have evolutions). (4) `tick_boat` runs
+every tick and not once a minute: the lug's sheet (below) wants tending as the apparent wind
+moves, and the cost is a dictionary read a tick for one hull. (5) The cap: the design has a
+manned boat counted as one of the cap's three; the cap orders the vessels with brains
+(`crews.switch`) and the boat has none, so she is awake while she is manned and counts
+nothing, which is the design's intent for a boat whose ship is followed; a boat of a sleeping
+ship's is not made (her ship's people are far). (6) Her account: the design has her
+`Navigation` set to the truth each minute; her hull's account runs as any hull's from her
+ship's position at the manning, and a boat in sight of her ship for an hour drifts no
+reckoning worth the readings' words (the readings in the boat are her truth's speed and
+wind; `where am I` names her mark). (7) The coxswain's helm is the engine's helmsman's law
+(`HelmMode.HEADING` at the mark's bearing), not a hard-over of his own: a hard-over hand was
+written when she would not come round and taken out when the cause was found (below).
+
+**Found on the way.** (1) **The lug's sheet.** Sailed back from the Falmouth quay the boat
+lay at 0.6 to 0.9 kn with the helm at 13 degrees and no swing, the rudder's yaw moment (+18
+N m) balanced by the sail's (-18 N m, 77 N of side force to 7 N of thrust); with the helm
+put hard over (35 degrees) she turned no faster and then gathered sternway. The cause was
+not the helm: nobody tended the lug's sheet in the boat, so she ran with the sheet where
+`set the lug` had belayed it, the lug flat amidships with the wind abaft the beam, aback by
+its sheet (`physics/sails.py`, package 32e: a fore-and-aft sail lies where its sheet holds
+it). `boats._tend_sheet` trims it each tick to the apparent wind with the engine's own
+trimmer (`world.ships._trim_for`, `trim.wanted_sheet_angle`: what `trim sails` does on a
+ship), which is the period's practice of a boat's sheet held in hand and never belayed. With
+the sheet tended she made 2.7 to 2.9 kn on the run and the plain helm law brought her round
+(the probe's trace: heading 88 to 75 in a minute and held on the mark). The ships' crews
+trim at their promotion and at `trim sails`; a boat's sheet in hand is hers alone. (2) The
+boats' rudder in the generator was a ship's fraction of the lateral plane (0.035 m2 for the
+yawl, a dinner plate); set to 0.016 m2 a foot of length (0.26 m2 for a 16-ft boat, a yoke
+rudder a foot and a half by two: judgement, Steel's boats' rudders unmeasured), the five
+files regenerated, the eight unchanged. (3) `Vessel.boat_of` takes `seen_within_nm` and
+`purpose` from its spec and not as keywords (the hoy and the boat pass `seen_nm` in the
+spec). (4) `dealings._names_a_boat` strips "a new / a / the" before and "of the yard / from
+the yard / of / from" after, so `demand a boat of the yard` is the yard's item and not a
+boat's name. (5) `World.run` takes an int: a test's hours in seconds cast. (6) The primer's rule that every verb is named: the boat's verbs are named in chapter 14 (the port) in a paragraph and five rows of its table ahead of step 7's chapter, which will carry them; the ordnance test's pinned payload gained the hoy's id (`hoy`), a built change and not a moved pin. (7) **On the merged tree** (the lead's package 88 brought in), the fast tier whole found fifteen failures, all the boats' files meeting tests written for ships: the view geometry's two tests over every ship file (a bowsprit's head chain and a gaff sail's foot: a boat has neither, and the two are parametrized over the ships less the boats, with the boats' drawing this package's last step), the stores' rule that every ship file names its ration (the boat's crew block now carries the Navy's table through the generator's `ration_entries`, her people her ship's; the five files regenerated, the eight unchanged), the generator hook's count of the generator's own files (eight ships and now five boats: thirteen), the primer's forms table (`set the lug` and `take in the lug` are refused on the frigate by her parts and are the prose's, not the table's), and the places test's `go to the boat` (53's refusal "is not a place to walk to" is now the manning, asserted as such). One rule was added for it: a boat is hoisted out with the ship hove to or at anchor and **refused with way on her** above two knots (`boats.HOIST_OUT_WAY_MS`: "She has 4.2 knots of way on her; heave to or come to an anchor before the boat is hoisted out"; the period's practice, the bound a hove-to ship's forereach, judgement).
+
+**What moved: nothing pinned.** No recorded passage mans a boat, cuts one adrift or buys
+powder with the hoy's body on the sea in a pinned day; the eight ship files differ by their
+`file:` lines alone (the generator's test); the sail model, the hull's resistance and the
+helm law are untouched, the oar force a new term that is zero on every hull without an
+`oars:` section. The proof is the suites below.
+
+**The truths:** 7-327 (manned, pulled, sailed, alongside, folded, replayed), 7-328 (the
+errands as before with nobody in her; the hoy a vessel), 7-329 (lost: swamped, cut adrift;
+sent nowhere, manned by nobody, replaced at the yard), 7b-114 (the cutter's boat ashore at
+Falmouth and back under her lug; the number is 53b's as well in the suite, the brief's
+kept with the boat's words).
+
+
 ## Package 88: the captain's pass of M7 (2026-10-30 to 31)
 
 Built as a sibling session on `claude/pkg-88` from the lead's head `c168c51`, each item in
@@ -16086,3 +16326,10 @@ trials measured so, the table under item 2).
 
 The whole suite on the merged tree is the lead's, in the cloud, at the merge.
 
+
+**The suites on the step's tree** (`3eb9f2c`, the lead's `0b55448` merged, package 88 with it):
+the fast tier whole, 5,353 passed, none failed (32:46); the slow tier of the twenty-nine touched
+files and the known truths, `--slow -m "not pace" -n 4`, 3,032 passed, 7 expected failures,
+none failed (47:13); the pace tests alone and last (`--slow -m pace`, one process), 11 passed,
+none failed (3:51): the oar term in the substep is a dictionary read on every hull and the
+pace floors stand. Ruff clean.

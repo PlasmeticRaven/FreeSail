@@ -854,10 +854,24 @@ class BoatState:
     # package 82: the hull she is sent to at sea (`Dealings.send_boat_to`), "" for the shore
     to_hull: str = ""
     to_name: str = ""
+    # package 82 (item 4; `world.boats`): her hull's id while she is manned as a hull of the
+    # world, and who commands her; "" for the script's boat
+    hull: str = ""
+    commander: str = ""
+    # the boat lost (`world.boats.lose_boat`): the word (swamped, stove, cut adrift), the
+    # tick and the words with the day; "" for a boat she has
+    lost: str = ""
+    lost_tick: int = -1
+    lost_words: str = ""
 
     def words(self) -> str:
+        if self.lost:
+            return f"{self.boat_name} lost: {self.lost_words or self.lost}; a new one is the yard's"
         if not self.away:
             return f"{self.boat_name} at the booms"
+        if self.hull:
+            who = f", {self.commander} in her" if self.commander else ""
+            return f"{self.boat_name} manned and away as a hull of her own{who}"
         if self.errand == "to_ship":
             return f"{self.boat_name} away to the {self.to_name or 'ship'}, {self.phase}"
         return f"{self.boat_name} away {_errand_words(self.errand)}, {self.phase}"

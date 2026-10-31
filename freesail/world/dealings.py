@@ -102,6 +102,16 @@ from freesail.world.ports import (
 __all__ = ["Dealings"]
 
 
+def _names_a_boat(words: str) -> bool:
+    """Whether a yard's demand names a boat ('a boat', 'a new boat', 'the launch'; package 82)."""
+    key = " ".join(str(words).lower().split())
+    for lead in ("a new ", "a ", "the ", "new "):
+        key = key.removeprefix(lead)
+    for tail in (" of the yard", " from the yard", " of", " from"):
+        key = key.removesuffix(tail)
+    return key in ("boat", "launch", "cutter", "yawl", "jolly boat", "gig", "pinnace", "barge")
+
+
 class Dealings:
     """**One hull's dealings with the ports** (package 84, step 3; the design's §2.4):
     the pilot's coming and going and his conn, the cutter sent for her, her boat and its
@@ -2479,6 +2489,43 @@ class Dealings:
 
     # -- the yard and the crew pool ---------------------------------------------------------
 
+    def _demand_boat(self, port: Port) -> tuple[str, dict[str, Any]]:
+        """`demand a boat of the yard`: a new boat for one lost, the yard's job of two days
+        (`boats.NEW_BOAT_HOURS`), at the chandlers' for a price; refused with the boat she
+        has."""
+        from freesail.orders.errors import OrderError
+        from freesail.world import boats as B
+
+        if not self.boat.lost:
+            name = self.boat.boat_name or "the boat"
+            raise OrderError(f"{name[:1].upper()}{name[1:]} is not lost; she wants no new one.")
+        world = self.world
+        kind = port.dockyard.kind
+        cost = 0.0 if kind == "yard" else B.NEW_BOAT_POUNDS
+        now = world.clock.tick
+        if cost > 0:
+            purse: Purse = world.purse
+            if cost > purse.pounds + 1e-9:
+                raise OrderError(
+                    f"A boat costs {pounds_words(cost)} and the purse holds {purse.words()}."
+                )
+            purse.pay(cost, f"a boat from the {kind} at {port.name}", now)
+        self.jobs.append(
+            Job(
+                now + int(B.NEW_BOAT_HOURS * 3600),
+                "yard",
+                port.id,
+                {"item": "boat", "qty": 1.0, "words": "a boat", "cost": cost},
+                hull=self.hull_id,
+            )
+        )
+        how = "by demand on the King's yard" if kind == "yard" else f"for {pounds_words(cost)}"
+        text = (
+            f"Demanded a boat {how} at {port.name}, for {self.boat.boat_name} "
+            f"{self.boat.lost}; she will be alongside in {_hours_words(B.NEW_BOAT_HOURS)}."
+        )
+        return text, {"item": "boat", "cost": cost}
+
     def demand(self, item_words: str, quantity: float | None) -> tuple[str, dict[str, Any]]:
         """`demand a topmast from the yard`, `take in twenty tons of water`, `take in
         provisions for thirty days`, `buy a suit of sails`: the yard's job with its time
@@ -2494,6 +2541,9 @@ class Dealings:
                 f"{port.name} is {self.stance(port)} to her; the yard will not serve her."
             )
         item = port.dockyard.find(item_words)
+        if item is None and _names_a_boat(item_words):
+            # a new boat for one lost (package 82, item 4; `world.boats`): the yard's two days
+            return self._demand_boat(port)
         if item is None:
             names = ", ".join(port.dockyard.items)
             raise OrderError(f"The yard at {port.name} has no {item_words}; it supplies {names}.")
@@ -2678,7 +2728,15 @@ class Dealings:
             ship = world.ship
             from freesail.ship.parts import SpareSail, booms, cordage, sail_room
 
-            if item == "water":
+            if item == "boat":
+                # a new boat for one lost (package 82, item 4): hers again, at the booms
+                name = self.boat.boat_name or "the boat"
+                self.boat = BoatState(boat_name=name, boat_id=self.boat.boat_id)
+                done = (
+                    f"a new {name.removeprefix('the ')} came off from the yard and was hoisted in"
+                )
+                paper = "the boatswain's store book"
+            elif item == "water":
                 world.stores.water_tons += qty
                 done = f"{words} came off from the quay and was started into the ground tier"
                 # watered: the foul casks started and filled sweet, and the days since she
@@ -2818,6 +2876,9 @@ class Dealings:
         boat = self.boat_spec()
         if boat is None:
             raise OrderError("She carries no boat: the ship's file lists none.")
+        if self.boat.lost:
+            head = f"{boat.name[:1].upper()}{boat.name[1:]}"
+            raise OrderError(f"{head} is lost: {self.boat.words()}.")
         if self.boat.away:
             raise OrderError(f"{boat.name[:1].upper()}{boat.name[1:]} is away already.")
         runner = world.ship.extra.get("evolutions")
@@ -2981,8 +3042,8 @@ class Dealings:
         booms again, whoever was to go in her is on deck, and the log says so. A boat
         already away is not belayed (`orders.work`), so that she cannot vanish from the
         water; were she found so, she is brought alongside as on her return."""
-        if self.boat.errand == "to_ship":
-            return  # the boat at another hull (package 82): the port's jobs keep her
+        if self.boat.errand in ("to_ship", "manned"):
+            return  # the boat at another hull or manned as a hull (package 82): not the runner's
         runner = self.world.ship.extra.get("evolutions")
         if runner is None:
             return
@@ -3385,15 +3446,20 @@ class Dealings:
             "errand": self.boat.errand,
             "phase": self.boat.phase,
             "boat": boat.id,
+            "manned": bool(self.boat.hull),  # package 82, item 4
+            "lost": self.boat.lost,
         }
 
     def boats_words(self) -> str:
         boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
         if not boats:
             return "she carries no boats"
-        return ", ".join(
+        words = ", ".join(
             f"{b.name} ({b.length_ft:g} ft, {b.oars} oars, {b.crew} hands)" for b in boats
         )
+        if self.boat.lost or self.boat.hull:
+            words += f"; {self.boat.words()}"  # lost, or manned as a hull (package 82)
+        return words
 
     # -- people in places (package 53; spec M7b §14) ---------------------------------------
 

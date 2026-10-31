@@ -12969,6 +12969,124 @@ def test_truth_7_334_the_observers_world_costs_no_more_than_the_same_world_with_
     assert view >= hers, f"the observer's world {view:.0f} against the frigate's {hers:.0f}"
 
 
+# ---------------------------------------------------------------------------
+# Package 82, item 2 (the design's §4): the player's seat on another ship, the director's door
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_322_the_player_seated_as_captain_of_another_ship_has_her_prompt_and_replays():
+    """The player seated as captain of another ship (`--seat captain --ship Raven`), his own
+    hull brainless and far (left as she lies, said in her log), the drivers following him,
+    his orders hers, her rules captain aside at his hand; the save replays his acts to the
+    same digest of both logs."""
+    from tests.test_aboard_another import (
+        test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies,
+        test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests,
+    )
+
+    test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies()
+    test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests()
+
+
+def test_truth_7_323_the_directors_door_with_another_hull_followed_reads_her_and_the_other():
+    """The director's door with another hull followed: `read_log` without a ship reads the
+    followed hull's, `aboard:` without a name is aboard her, `captain: carry on` gives her
+    captain his hand back; named, the other hull's."""
+    from tests.test_aboard_another import (
+        test_the_directors_door_reads_the_followed_hull_and_the_other_by_name,
+    )
+
+    test_the_directors_door_reads_the_followed_hull_and_the_other_by_name()
+
+
+def test_truth_7_326_the_free_intent_the_hail_and_the_station_by_name_read_the_hull_held():
+    """The free intent by the hull: a free-intent ship lies to under her rules captain until
+    the player follows her and gives an order, or a model is seated at her captain's
+    station; `hail.model_holds_her` by the hull the player or a model holds; the station
+    kept on the player's ship by her name reads `World.players`."""
+    from tests.test_aboard_another import (
+        test_a_free_intent_ship_lies_to_until_the_player_follows_her_and_gives_an_order,
+        test_hail_holds_the_players_own_hull_with_no_rules_captain_and_a_model_held_hull,
+        test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel,
+    )
+
+    test_a_free_intent_ship_lies_to_until_the_player_follows_her_and_gives_an_order()
+    test_hail_holds_the_players_own_hull_with_no_rules_captain_and_a_model_held_hull()
+    test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel()
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 4 (the design's §5): the boat as a hull of the one world
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_327_go_to_the_boat_mans_her_as_a_hull_and_come_alongside_brings_him_home():
+    """`go to the boat` makes her a hull and puts the player in her, the drivers following;
+    `give way` pulls her at three to four knots light fresh and slower as the men tire
+    (`physics/oars.py`, F_0 50 N a man, 60 W, four hours' tiring); `step the mast` and
+    `set the lug` sail her; `come alongside` brings him aboard with the readings the
+    ship's again, the boat's log folded into the ship's; her voyage replays to the same
+    digests."""
+    from tests.test_boat_hull import (
+        test_go_to_the_boat_mans_her_as_a_hull_and_the_drivers_follow_the_player,
+        test_the_boat_pulls_at_three_to_four_knots_fresh_and_slower_as_the_men_tire,
+        test_the_boat_steps_her_mast_sails_under_her_lug_and_comes_alongside_with_her_log_folded,
+        test_the_boats_voyage_replays_to_the_same_digests,
+    )
+
+    test_go_to_the_boat_mans_her_as_a_hull_and_the_drivers_follow_the_player()
+    test_the_boat_pulls_at_three_to_four_knots_fresh_and_slower_as_the_men_tire()
+    test_the_boat_steps_her_mast_sails_under_her_lug_and_comes_alongside_with_her_log_folded()
+    test_the_boats_voyage_replays_to_the_same_digests()
+
+
+def test_truth_7_328_the_boats_errands_run_as_before_with_nobody_in_her_and_the_hoy_is_a_vessel():
+    """The boat's errands run as before with nobody commanding her: `send the boat` makes
+    no hull, `go ashore` lands a person by the script, and the recorded days (truths 48, 49
+    and the pinned days beside them, in this tier) hold their digests with the boat's road
+    untouched; the hoy comes off as a vessel of the sea by the same road (`Vessel.boat_of`)
+    and the lookout sees her."""
+    from tests.test_boat_hull import (
+        test_the_boats_errands_run_as_before_with_nobody_in_her,
+        test_the_hoy_comes_off_as_a_vessel_of_the_sea_and_the_lookout_sees_her,
+    )
+
+    test_the_boats_errands_run_as_before_with_nobody_in_her()
+    test_the_hoy_comes_off_as_a_vessel_of_the_sea_and_the_lookout_sees_her()
+
+
+def test_truth_7_329_the_boat_lost_is_sent_nowhere_manned_by_nobody_and_replaced_at_the_yard():
+    """The boat lost: swamped in a sea above her weather with her people lost (the sea
+    states by her length), cut adrift by order; sent on no errand after, manned by nobody,
+    the reading and the truth say so; replaced at the yard in forty-eight hours for £25.
+    The director's form that stoves her is item 6's (step 6 of the same package)."""
+    from tests.test_boat_hull import (
+        test_a_sea_above_her_weather_swamps_her_by_the_sea_states,
+        test_the_boat_cut_adrift_is_lost_until_the_yard_replaces_her,
+        test_the_boat_swamped_loses_her_people_and_the_ship_says_so,
+    )
+
+    test_a_sea_above_her_weather_swamps_her_by_the_sea_states()
+    test_the_boat_swamped_loses_her_people_and_the_ship_says_so()
+    test_the_boat_cut_adrift_is_lost_until_the_yard_replaces_her()
+
+
+def test_truth_7b_114_the_players_boat_pulls_ashore_at_falmouth_and_sails_back_under_her_lug():
+    """Spec M7b §21k's 7b-114 (the number is 53b's as well; the boat's is the brief's):
+    the player in the cutter's boat pulls ashore at Falmouth from Carrick Road under oars
+    (the quay in under an hour), steps the mast and sails her back under her lug, the
+    coxswain tending the sheet, the readings his in the boat and the ship's again aboard;
+    the boat's errands run as before with nobody in her."""
+    from tests.test_boat_hull import (
+        test_the_boats_errands_run_as_before_with_nobody_in_her,
+        the_cutters_boat_ashore_and_back,
+    )
+
+    the_cutters_boat_ashore_and_back()
+    test_the_boats_errands_run_as_before_with_nobody_in_her()
+
+
+# ---------------------------------------------------------------------------
 # Package 88: the captain's pass of M7 (truths 7-340 onward)
 # ---------------------------------------------------------------------------
 
