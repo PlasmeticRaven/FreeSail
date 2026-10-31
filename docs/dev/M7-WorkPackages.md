@@ -1511,7 +1511,12 @@ can answer all the same (the square sails' states with no headway; the chart ahe
 coast by account or the nearest charted danger lies within the reach, `DANGER_AHEAD_SPAN_NM`
 two miles past it for a danger), no change of behaviour, every pin as it stands; the cloud's
 pace job on the next run decides, and if the four stay under the floor the runner is the
-next reading.
+next reading. **Run 26, after the follow-up: the same four under the floor again** (truth 51
+at 494, the systems' day 481, the gate's day 454, 7-159's convoy 442), on a third runner and
+within a few ticks of runs 24 and 25, which is not a runner's noise but a cost somewhere
+between run 22 (10 of 10 on `11b4863`) and run 24 (`0b55448`): 82's step 2 and 88 are the
+two merges between them, and the lead measures them apart on this machine (below, when
+the figures are in).
 
 **What was built** (the tuning notes "Package 88", items 1 to 4 in the owner's four parts,
 each with its switch and the bisection's table): **(1)** the rules captain recovers her when
@@ -1579,8 +1584,10 @@ substep, a term that is zero on every hull without an `oars:` section: the brief
 leave), the eight ships' files differing by the `file:` line under each boat alone, no
 consent file touched, no model identifier; the lead's run of the boat, aboard-another,
 in-world, primer, grammar, parity, generator and particulars tests with the steps' truths on
-the merged tree, then **the whole fast tier here and the whole suite in the cloud dispatched
-at the push (run 26; its figures written here when it is in).**
+the merged tree, then **the whole fast tier here (whole) and the whole suite in the cloud (run 26 on
+`f5be911`, these steps and 88's close: lint green, 5,713 passed over the six shards, 3
+skipped, 10 expected failures, none failed, 50 minutes; the pace job, informative, 7 of 11,
+the same four under the floor as on runs 24 and 25, measured below under 88's record).**
 
 **Step 3, the player's seat on another ship and the director's door** (the design's §4 and
 its postscript; the tuning notes, step 3): `--ship <name>` at both drivers writes a driver's
