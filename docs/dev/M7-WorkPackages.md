@@ -1500,7 +1500,18 @@ judgement, by the lead's reading). **A follow-up asked of the builder on `claude
 2026-10-31:** profile, mend with no change of behaviour (the chart read ahead only when the
 account puts land or a danger within reach; the sails' states only with no headway), every
 recorded figure again exactly, the pace truths old beside new; merged as 88's close, the
-cloud's pace job the proof.**
+cloud's pace job the proof.** **The follow-up, merged as the close (`f58b0f7`, 2026-10-31):**
+the builder's profile finds no cost of the pass on its machine (the package's own share of
+the crewed captains' judgement under half a per cent, the far captains running none of it;
+two alternating runs of `tools/pace.py squadrons` on the trunk before and after the merge
+spread as wide within a tree as between them, 596 to 648 at far detail), so the lead's
+single runs are read as noise and the cloud's two runs as its runner's (440 to 496 there
+against 620 to 700 in the builder's container); the two dear reads are taken only when they
+can answer all the same (the square sails' states with no headway; the chart ahead when the
+coast by account or the nearest charted danger lies within the reach, `DANGER_AHEAD_SPAN_NM`
+two miles past it for a danger), no change of behaviour, every pin as it stands; the cloud's
+pace job on the next run decides, and if the four stay under the floor the runner is the
+next reading.
 
 **What was built** (the tuning notes "Package 88", items 1 to 4 in the owner's four parts,
 each with its switch and the bisection's table): **(1)** the rules captain recovers her when
