@@ -33,7 +33,7 @@ BOTH = (TOPSAIL, PRIVATEER)
 NOTE = ROOT / "docs" / "design" / "ships-design" / "pages-chapelle-fig17.md"
 FT = 0.3048
 # The commit her files stood at before her hull: the physics keys are compared with it.
-BEFORE = "bb602220"
+BEFORE = "f5be9110"  # the trunk at the landing: bb60222 but for the boats' `file` keys
 # What the shape keys and §5.3 may add or move; everything else of her files stands as it stood.
 STAND_IN = (
     "rail_m", "breadth_m", "keel_m", "stem_m", "stern_m", "section_m", "port_size_m",

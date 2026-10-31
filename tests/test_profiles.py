@@ -725,7 +725,10 @@ def test_the_dump_writes_the_form_as_blocks_and_the_sections_a_station_a_line(ge
 # -- SW-2 with SW-2b.2: the ship files' own lines (§5.6) -----------------------------------------
 
 SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
-SHIP_NAMES = [path.stem for path in SHIP_FILES]
+# The ships' own lines: the ships' boats (package 82, `boat-*.yaml`) have none, their drawing
+# being that package's last step.
+HULL_FILES = [path for path in SHIP_FILES if not path.stem.startswith("boat-")]
+SHIP_NAMES = [path.stem for path in HULL_FILES]
 # The eight files of the packages before 75, whose lines the hull step drew.
 THE_EIGHT = (
     "brig",
@@ -761,7 +764,7 @@ def test_every_file_carries_a_profile_whose_rail_stands_above_its_decks_and_sill
 def test_a_mark_on_every_shape_line_of_every_file():
     """§5.0 principle 4: each line a file gives, each group of its form and each key of its stern
     but the stern's type says in one word where it came from."""
-    for name, path in zip(SHIP_NAMES, SHIP_FILES, strict=True):
+    for name, path in zip(SHIP_NAMES, HULL_FILES, strict=True):
         p = yaml.safe_load(path.read_text(encoding="utf-8"))["hull"]["profile"]
         form = p["form"]
         lines = [k for k in p if k not in ("form", "marks")]

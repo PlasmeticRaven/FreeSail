@@ -114,8 +114,11 @@ MERCHANT_BRIG = "data/ships/merchant-brig.yaml"  # and the rest of the eight (SW
 PRIVATEER = "data/ships/privateer-schooner.yaml"
 SMACK = "data/ships/smack.yaml"
 EVERY_SHIP = sorted(f"data/ships/{p.name}" for p in (ROOT / "data" / "ships").glob("*.yaml"))
-# every file carries a profile since the hull step; a ship landing joins by it
-PROFILED = EVERY_SHIP
+# the ships' boats (package 82, item 4: `boat-*.yaml`, a lug on one mast, no bowsprit and
+# no gaff sail; her drawing is that package's last step)
+BOATS = [p for p in EVERY_SHIP if "/boat-" in p]
+# every ship carries a profile since the hull step; a ship landing joins by it
+PROFILED = [p for p in EVERY_SHIP if p not in BOATS]
 NODE = shutil.which("node")
 needs_node = pytest.mark.skipif(NODE is None, reason="Node is not installed")
 
@@ -1586,6 +1589,9 @@ def test_every_file_draws_a_closed_hull_with_no_nan(tmp_path, path, builder):
         del hull["stations"]
     got = run_js(tmp_path, {"hull": hull}, CLOSED)
     assert got["finite"] and got["fewest"] >= 3
+    if "profile" not in hull:  # a ship's boat, her drawing being package 82's last step
+        assert path in BOATS and got["n"] == 4 and got["parts"] == ["deck", "side", "transom"]
+        return
     drawn = set(got["parts"])
     assert drawn >= {"side", "outline", "deck", "bottom"}
     if builder == "served":
@@ -4533,7 +4539,7 @@ def test_the_razees_spanker_stands_clear_of_the_taffrail_its_boom_clears(
 
 
 @needs_node
-@pytest.mark.parametrize("path", [p for p in EVERY_SHIP if p not in (LUGGER, *PILOT)])
+@pytest.mark.parametrize("path", [p for p in PROFILED if p not in (LUGGER, *PILOT)])
 def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(tmp_path, path):
     """The razee's spanker alone is drawn laced along its boom (`gaffCutOn`, which asks for a
     profile and four filed corners, and no gaff sail of the eight files them). On the seven files

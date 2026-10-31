@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SMACK = ROOT / "data" / "ships" / "smack.yaml"
 NOTE = ROOT / "docs" / "design" / "ships-design" / "pages-chapman-pl59.md"
 # The commit before her lines: the file as it stood, its physics to the figure.
-BEFORE = "bb60222"
+BEFORE = "f5be9110"  # the trunk at the landing: bb60222 but for the boats' `file` keys
 # The hull's keys the physics reads, as they stood at that commit (`physics/hull.py`,
 # `physics/sails.py`, `world/lookout.py`, `api/readings.py`): pinned here as well as against git, so
 # that a clone without that commit still holds them (Build-Ships.md §5.0 principle 8, §5.6).

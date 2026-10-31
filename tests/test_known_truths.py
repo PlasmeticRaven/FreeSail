@@ -7859,8 +7859,12 @@ def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_bei
     The head sail straining at its bolt-ropes is taken in by the captain before it blows
     out (the trial lost its fore topmast staysail at 08:29 before); she is hove to for
     weather and lies a-try under the close-reefed main topsail and the staysails, as the
-    book has it, and in the four hours and more she lies so she is never taken aback, no
-    sail is lost, and she drifts at under two knots on the mean. What she does when she
+    book has it, and in the hours she lies so she is never taken aback, no sail is lost, and
+    she drifts at under two knots on the mean. What ends her lying a-try is the lee-shore
+    line (the land within `lee_shore_nm` to leeward fills her away to claw off), not the
+    gale's end: four hours and more before package 88; three and a half since, tacked and
+    not worn with Ushant two miles under her lee in the forenoon, so that the land closes
+    under her lee the sooner (the lead's ruling of 2026-10-31). What she does when she
     fills away for the station in the gale's tail is the trial's own pin, an expected
     failure until the lead has played it (`tests/test_captain_trials.py`)."""
     from freesail.physics.hull import hull_state
@@ -7884,7 +7888,11 @@ def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_bei
     taken = [e for e in w.log if e.text.endswith("(straining at the bolt-ropes).")]
     assert taken and "taking in the fore topmast staysail" in taken[0].text
     assert not [e for e in w.log if e.kind in ("sail.blown_out", "sail.split")]
-    assert lying >= 4 * 60 and aback == 0
+    # package 88 (item 2, by bisection: `navigation.WEAR_ROOM` off gives 243 minutes again):
+    # tacked and not worn with Ushant two miles under her lee in the forenoon, she reaches
+    # the lee-shore line sooner and is filled away at 28560 (30780): 207 minutes lying a-try,
+    # never aback, 1.83 knots on the mean (243 minutes and 1.81 before; four hours the band)
+    assert lying >= 200 and aback == 0
     assert sum(knots) / len(knots) < 2.0
     assert not [e for e in w.log if e.kind == "ship.aground"]
 
@@ -8876,8 +8884,11 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     read by the rules captain with no model seated, signals her a straggler (No. 20, the
     ships astern to make more sail) when she has been out of her station ten minutes, and
     she regains it; after two hours every ship is within a cable of her station and holds
-    it. At seed 7: the signal ordered at 2760, up at 2866, answered at 3000; the Friendship
-    back in her station at 6420 (`squadron.in_station`; 5280 before package 84's step 6, when
+    it. At seed 7: the signal ordered at 2040, up at 2182, answered at 2340; the Friendship
+    back in her station at 6060 (package 88, item 1: the commodore's brig recovered from
+    lying aback with no way after her tack, truth 7-340, where she lay so from 10:20 to 10:47
+    and the convoy with her: 2760, 2866, 3000 and 6420 before, the same with the law's switch
+    off on the final tree); (`squadron.in_station`; 5280 before package 84's step 6, when
     the privateer's World, on a clock of her own, never saw the private signal flying and made
     no answer; on the one clock she bluffs a reply, is judged an enemy, and the commodore
     closes the convoy round him first); at 7200 and after, every ship
@@ -8905,7 +8916,9 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     back = [e for e in w.log if e.kind == "squadron.in_station" and "Friendship" in e.text]
     assert ordered and made and answered and back, (ordered, made, answered, back)
     when = (ordered[0].tick, made[0].tick, answered[0].tick, back[0].tick)
-    assert when == (2760, 2866, 3000, 6420), when  # 5280 before 84's step 6 (the one clock)
+    # package 88 (the recovery when aback, `captains.ABACK_RECOVER`): (2760, 2866, 3000, 6420)
+    # before and with the switch off; 5280 for the last before 84's step 6 (the one clock)
+    assert when == (2040, 2182, 2340, 6060), when
     worst = 0.0
     for _ in range(6):
         w.run(600)
@@ -12954,3 +12967,249 @@ def test_truth_7_334_the_observers_world_costs_no_more_than_the_same_world_with_
         f"the same Channel with the frigate at the view {hers:.0f}"
     )
     assert view >= hers, f"the observer's world {view:.0f} against the frigate's {hers:.0f}"
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 2 (the design's §4): the player's seat on another ship, the director's door
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_322_the_player_seated_as_captain_of_another_ship_has_her_prompt_and_replays():
+    """The player seated as captain of another ship (`--seat captain --ship Raven`), his own
+    hull brainless and far (left as she lies, said in her log), the drivers following him,
+    his orders hers, her rules captain aside at his hand; the save replays his acts to the
+    same digest of both logs."""
+    from tests.test_aboard_another import (
+        test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies,
+        test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests,
+    )
+
+    test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies()
+    test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests()
+
+
+def test_truth_7_323_the_directors_door_with_another_hull_followed_reads_her_and_the_other():
+    """The director's door with another hull followed: `read_log` without a ship reads the
+    followed hull's, `aboard:` without a name is aboard her, `captain: carry on` gives her
+    captain his hand back; named, the other hull's."""
+    from tests.test_aboard_another import (
+        test_the_directors_door_reads_the_followed_hull_and_the_other_by_name,
+    )
+
+    test_the_directors_door_reads_the_followed_hull_and_the_other_by_name()
+
+
+def test_truth_7_326_the_free_intent_the_hail_and_the_station_by_name_read_the_hull_held():
+    """The free intent by the hull: a free-intent ship lies to under her rules captain until
+    the player follows her and gives an order, or a model is seated at her captain's
+    station; `hail.model_holds_her` by the hull the player or a model holds; the station
+    kept on the player's ship by her name reads `World.players`."""
+    from tests.test_aboard_another import (
+        test_a_free_intent_ship_lies_to_until_the_player_follows_her_and_gives_an_order,
+        test_hail_holds_the_players_own_hull_with_no_rules_captain_and_a_model_held_hull,
+        test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel,
+    )
+
+    test_a_free_intent_ship_lies_to_until_the_player_follows_her_and_gives_an_order()
+    test_hail_holds_the_players_own_hull_with_no_rules_captain_and_a_model_held_hull()
+    test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel()
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 4 (the design's §5): the boat as a hull of the one world
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_327_go_to_the_boat_mans_her_as_a_hull_and_come_alongside_brings_him_home():
+    """`go to the boat` makes her a hull and puts the player in her, the drivers following;
+    `give way` pulls her at three to four knots light fresh and slower as the men tire
+    (`physics/oars.py`, F_0 50 N a man, 60 W, four hours' tiring); `step the mast` and
+    `set the lug` sail her; `come alongside` brings him aboard with the readings the
+    ship's again, the boat's log folded into the ship's; her voyage replays to the same
+    digests."""
+    from tests.test_boat_hull import (
+        test_go_to_the_boat_mans_her_as_a_hull_and_the_drivers_follow_the_player,
+        test_the_boat_pulls_at_three_to_four_knots_fresh_and_slower_as_the_men_tire,
+        test_the_boat_steps_her_mast_sails_under_her_lug_and_comes_alongside_with_her_log_folded,
+        test_the_boats_voyage_replays_to_the_same_digests,
+    )
+
+    test_go_to_the_boat_mans_her_as_a_hull_and_the_drivers_follow_the_player()
+    test_the_boat_pulls_at_three_to_four_knots_fresh_and_slower_as_the_men_tire()
+    test_the_boat_steps_her_mast_sails_under_her_lug_and_comes_alongside_with_her_log_folded()
+    test_the_boats_voyage_replays_to_the_same_digests()
+
+
+def test_truth_7_328_the_boats_errands_run_as_before_with_nobody_in_her_and_the_hoy_is_a_vessel():
+    """The boat's errands run as before with nobody commanding her: `send the boat` makes
+    no hull, `go ashore` lands a person by the script, and the recorded days (truths 48, 49
+    and the pinned days beside them, in this tier) hold their digests with the boat's road
+    untouched; the hoy comes off as a vessel of the sea by the same road (`Vessel.boat_of`)
+    and the lookout sees her."""
+    from tests.test_boat_hull import (
+        test_the_boats_errands_run_as_before_with_nobody_in_her,
+        test_the_hoy_comes_off_as_a_vessel_of_the_sea_and_the_lookout_sees_her,
+    )
+
+    test_the_boats_errands_run_as_before_with_nobody_in_her()
+    test_the_hoy_comes_off_as_a_vessel_of_the_sea_and_the_lookout_sees_her()
+
+
+def test_truth_7_329_the_boat_lost_is_sent_nowhere_manned_by_nobody_and_replaced_at_the_yard():
+    """The boat lost: swamped in a sea above her weather with her people lost (the sea
+    states by her length), cut adrift by order; sent on no errand after, manned by nobody,
+    the reading and the truth say so; replaced at the yard in forty-eight hours for £25.
+    The director's form that stoves her is item 6's (step 6 of the same package)."""
+    from tests.test_boat_hull import (
+        test_a_sea_above_her_weather_swamps_her_by_the_sea_states,
+        test_the_boat_cut_adrift_is_lost_until_the_yard_replaces_her,
+        test_the_boat_swamped_loses_her_people_and_the_ship_says_so,
+    )
+
+    test_a_sea_above_her_weather_swamps_her_by_the_sea_states()
+    test_the_boat_swamped_loses_her_people_and_the_ship_says_so()
+    test_the_boat_cut_adrift_is_lost_until_the_yard_replaces_her()
+
+
+def test_truth_7b_114_the_players_boat_pulls_ashore_at_falmouth_and_sails_back_under_her_lug():
+    """Spec M7b §21k's 7b-114 (the number is 53b's as well; the boat's is the brief's):
+    the player in the cutter's boat pulls ashore at Falmouth from Carrick Road under oars
+    (the quay in under an hour), steps the mast and sails her back under her lug, the
+    coxswain tending the sheet, the readings his in the boat and the ship's again aboard;
+    the boat's errands run as before with nobody in her."""
+    from tests.test_boat_hull import (
+        test_the_boats_errands_run_as_before_with_nobody_in_her,
+        the_cutters_boat_ashore_and_back,
+    )
+
+    the_cutters_boat_ashore_and_back()
+    test_the_boats_errands_run_as_before_with_nobody_in_her()
+
+
+# ---------------------------------------------------------------------------
+# Package 88: the captain's pass of M7 (truths 7-340 onward)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxes_her_off(
+    monkeypatch,
+):
+    """Package 88, item 1 (package 86's finding, the convoy's stall): the commodore's brig in
+    the owner's convoy comes out of a short-handed tack at 1594 with no way on while her book
+    shortens sail, her head forty degrees off the wind, every square sail shaking and the
+    spanker drawing. With no headway, square sail set and none drawing, no manoeuvre in
+    hand, for the doctrine's three minutes (`aback_recover_minutes`, judgement), her rules
+    captain recovers her as Luce 1866 ch. XXV has it: the work waiting for hands avasted and
+    the spanker taken in at 1800, boxed off at 1980 and boxed off by 2110, the spanker set
+    again and the leg shaped when she has way (2160); at 2400 she makes four knots. With
+    the law's switch off (`captains.ABACK_RECOVER`) she lies so until the book's second
+    shortening takes in her spanker at 2671 (86's record): at 2400 still no way, no box-off."""
+    from freesail.world import captains as C
+
+    w = _scenario_world(CONVOY_SIX)
+    w.run(2400)
+    said = [e for e in w.log if e.kind == "order.accepted" and "aback with no way on" in e.text]
+    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1800], said
+    assert [e.tick for e in said if "boxing her off" in e.text] == [1980], said
+    assert [e.tick for e in w.log if e.kind == "ship.boxed_off"] == [2110]
+    assert any(e.tick == 2160 and "setting the spanker" in e.text for e in w.log)
+    assert units.ms_to_knots(w.ship.dyn.u) >= 3.0, w.ship.dyn.u
+    monkeypatch.setattr(C, "ABACK_RECOVER", False)
+    old = _scenario_world(CONVOY_SIX)
+    old.run(2400)
+    assert not [e for e in old.log if e.kind == "ship.boxed_off" or "aback with no way" in e.text]
+    assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
+
+
+def test_truth_7_341_among_the_molene_islands_she_is_tacked_and_never_worn_onto_the_land(
+    monkeypatch,
+):
+    """Package 88, item 2 (57's station gale: the frigate beating for her station off Ushant
+    in a westerly gale was worn round with the land two miles under her lee, would not come
+    round, and set down on the islands of the Molène passage). Two miles west of Molène in a
+    westerly of 34 knots, her head N by W at four knots, the land a mile on her starboard
+    bow: `put her about` tacks her ("where wearing would lose the ground"), where by the wind
+    alone it would wear her; and a course shaped on the other tack that she has not the way
+    to stay for is not worn round but kept full and by on her tack to claw off. The room a
+    wear takes is the doctrine's `tack_regardless_nm` (two miles) over the lee half, by the
+    lookout's nearest land, the coast by the chart at the account and the charted dangers
+    (`navigation.no_room_to_wear`); with the law's switch off (`navigation.WEAR_ROOM`) she
+    is worn as before."""
+    from freesail.orders import navigation as N
+
+    sc = Scenario(
+        start_time=datetime(1805, 1, 12, 22, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=34.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 48.397, "lon_deg": -5.03},
+        region="channel-west",
+        ports=["brest"],
+        nation="britain",
+        ship_heading_deg=350.0,
+        ship_speed_kn=4.0,
+    )
+    w = make_world(SEED, "data/ships/frigate-36.yaml", sc)
+    w.run(120)
+    assert N.no_room_to_wear(w.ship) == "the land a mile under her lee"
+    verb, why = N.put_about_choice(w.ship)
+    assert verb == "tack ship" and "where wearing would lose the ground" in why, why
+    # the other tack's close-hauled course, SSW, with too little way to stay: kept full and by
+    w.ship.dyn.u = w.ship.dyn.speed = units.knots_to_ms(1.5)
+    judged = N.judge_course(w.ship, math.radians(200.0), helm_order=False)
+    assert judged.branch == "full_and_by" and "no room to wear" in judged.words, judged
+    monkeypatch.setattr(N, "WEAR_ROOM", False)
+    assert N.put_about_choice(w.ship)[0] == "wear ship"
+    assert N.judge_course(w.ship, math.radians(200.0), helm_order=False).branch == "wear"
+
+
+def test_truth_7_342_a_privateers_true_colours_once_shown_before_an_enemy_are_held(monkeypatch):
+    """Package 88, item 4 (the owner's debrief of the playtests of 70 to 72: a privateer "switched
+    between French and British colours as we engaged them"). A French privateer schooner
+    cruising off the Lizard closes a British merchant schooner under British colours (her
+    doctrine's `false_colours`), shows her own at the doctrine's range and engages at 420;
+    the action over at 5640 and the same schooner still in sight, she investigates and
+    chases her again under her French colours, held (`signalling.TRUE_COLOURS_HELD`): the
+    law allowed the ruse until the first shot and made a shot under false colours a pirate's
+    act. With the switch off she hoisted the British colours again at 5700 (the flicker)."""
+    from freesail.world import signalling as G
+    from freesail.world import signals as S
+    from tests.test_brains import put
+
+    def colours_run(held: bool) -> list[tuple[int, tuple[str, str, str]]]:
+        monkeypatch.setattr(G, "TRUE_COLOURS_HELD", held)
+        sc = _action_scenario(heading=0.0)
+        w = make_world(SEED, "data/ships/topsail-schooner.yaml", sc)
+        w.submit("set plain sail")
+        w.submit("steer north")
+        pv = put(
+            w,
+            "privateer schooner",
+            "france",
+            "49 49.5 N 5 20 W",
+            "patrolling off the Lizard within 20 miles",
+            intent="cruise for prizes off the Lizard within 20 miles",
+            name="Vautour",
+        )
+        seq: list[tuple[int, tuple[str, str, str]]] = []
+        for _ in range(100):
+            w.run(60)
+            c = S.vessel_locker(pv).colours
+            cap = pv.crew.captain if pv.crew else pv.brain
+            st = (c.state, c.nation, str(getattr(cap, "state", "")))
+            if not seq or seq[-1][1] != st:
+                seq.append((w.clock.tick, st))
+        return seq
+
+    seq = colours_run(True)
+    assert seq[:3] == [
+        (60, ("false", "britain", "investigating a stranger")),
+        (360, ("false", "britain", "chasing")),
+        (420, ("shown", "france", "engaging")),
+    ], seq
+    after = [st for t, st in seq if t >= 420]
+    assert after and all(st[:2] == ("shown", "france") for st in after), seq
+    assert {"investigating a stranger", "chasing"} <= {st[2] for t, st in seq if t > 5640}, seq
+    old = colours_run(False)
+    assert (5700, ("false", "britain", "investigating a stranger")) in old, old

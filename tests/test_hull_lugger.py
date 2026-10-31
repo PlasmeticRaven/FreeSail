@@ -29,7 +29,7 @@ FT = 0.3048
 # The middle of ZAZ6306's two perpendiculars, feet from the after one, and the fore one (§3.2).
 MID_FT, FP_FT = 29.63, 59.26
 # Her file as it stood before the hull step, the commit the step was cut from.
-BEFORE = "bb60222"
+BEFORE = "f5be9110"  # the trunk at the landing: bb60222 but for the boats' `file` keys
 # The factors, the note's §6.2: sections by her moulded 20 ft 0 in over Le Coureur's 21 ft 10¾ in,
 # her own 2 in of plank.
 SECTIONS_FACTOR = 0.9135

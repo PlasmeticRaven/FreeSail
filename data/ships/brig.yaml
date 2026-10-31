@@ -2329,6 +2329,7 @@ boats:
   oars: 8
   crew: 9
   tons: 1.1
+  file: data/ships/boat-launch-25.yaml
 # The cutter, 0.9 of the launch, a sloop's first cutter (Luce's rule).
 - id: cutter
   kind: cutter
@@ -2337,6 +2338,7 @@ boats:
   oars: 6
   crew: 7
   tons: 0.5
+  file: data/ships/boat-cutter-23.yaml
 # The jolly boat at the stern (judgement in the size).
 - id: jolly_boat
   kind: jolly boat
@@ -2345,3 +2347,4 @@ boats:
   oars: 4
   crew: 5
   tons: 0.1
+  file: data/ships/boat-yawl-16.yaml

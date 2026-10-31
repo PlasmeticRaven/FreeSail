@@ -60,6 +60,7 @@ if TYPE_CHECKING:
     from freesail.core.world import World
 
 __all__ = [
+    "seat_world",
     "SEAT_ACTOR_SUFFIX",
     "SEAT_KIND",
     "SEAT_STATIONS",
@@ -142,6 +143,18 @@ def seat_of(world: Any, station: str) -> PlayerSeat | None:
     return seat
 
 
+def seat_world(world: Any) -> Any:
+    """The hull a seat is made on (package 82, item 2; the design's §4): the followed
+    hull's façade when the drivers follow another ship than the player's own (`--seat
+    officer --ship Raven`: a seat on her hull, which stays hers when the drivers move on),
+    else the World as it was given."""
+    if isinstance(getattr(world, "hulls", None), dict):
+        own = world.own
+        if own is not world.players:
+            return own
+    return world
+
+
 class PlayerSeat:
     """The player at a station with authority below the captain's. Quacks as a harness
     does where the game looks a station up (`agent`, `station`, `domain`, `journal`,
@@ -149,7 +162,10 @@ class PlayerSeat:
 
     _deck_was: Any = None  # the harness's field the borrowed methods write
 
+    _home: tuple[str, Any] | None = None  # (the hull's id, his station) while he visits
+
     def __init__(self, world: World, station: str = OFFICER, door: str = "console"):
+        world = seat_world(world)
         name, make = seat_station(world, station)
         held = world.agents.get(name)
         if held is not None and not held.agent.released:
@@ -175,6 +191,46 @@ class PlayerSeat:
         if isinstance(extra, dict):
             extra["player_seat"] = self
         self.note(f"Seated as {seat_words(name, self.door)}.", kind="agent.stationed")
+
+    # -- the seat with its person (package 82, item 2) -----------------------------------
+
+    @property
+    def visiting(self) -> bool:
+        """Whether the seat's person is aboard a hull not his own, the seat his voice there."""
+        return self._home is not None
+
+    def move_to(self, hull: Any, station: Any, home: tuple[str, Any] | None) -> None:
+        """The seat carried into `hull` with its person (package 82, item 2; the harness's
+        `move_to`): taken off the hull it was on, `hull`'s seat from here under `station`
+        (his voice there, or his own station again at home), its journal the person's as
+        it was; `home` is (the hull's id, the station) he came from while he visits, None
+        when he is home again. Said in his journal, as his seating was."""
+        from freesail.world.movement import hull_name
+
+        old = self.world
+        if getattr(old, "player_seat", None) is self:
+            old.player_seat = None
+            extra = getattr(getattr(old, "ship", None), "extra", None)
+            if isinstance(extra, dict) and extra.get("player_seat") is self:
+                extra.pop("player_seat", None)
+        self.world = hull
+        self.station = station
+        self.agent.station = station
+        self._home = home
+        hull.player_seat = self
+        extra = getattr(getattr(hull, "ship", None), "extra", None)
+        if isinstance(extra, dict):
+            extra["player_seat"] = self
+        self.journal = journal_of(hull, station.name)
+        name = hull_name(hull)
+        where = f"a visitor aboard the {name}" if home else f"home in the {name}"
+        self.note(f"Aboard the {name}, {where}: {station.title}.", kind="agent.stationed")
+
+    def stand_down_quietly(self, reason: str) -> None:
+        """The seat released with its person held elsewhere (a captive's; package 82)."""
+        self.agent.state = RELEASED
+        self.agent.released_reason = reason
+        self.note(f"Stood down: {reason}.", kind="agent.released")
 
     # -- what the game looks up on a station -----------------------------------------
 

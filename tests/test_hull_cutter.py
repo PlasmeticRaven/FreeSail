@@ -30,7 +30,7 @@ CUTTER = ROOT / "data" / "ships" / "cutter.yaml"
 NOTE = ROOT / "docs" / "design" / "ships-design" / "pages-zaz6381.md"
 FT = 0.3048
 # The commit whose file this step left its physics alone against (the lead's note of 2026-10-30).
-BASE = "bb60222"
+BASE = "f5be9110"  # the trunk at the landing: bb60222 but for the boats' `file` keys
 # The sheet's four ports, x by ZAZ6381 and ZAZ6382 (the note §5.8).
 SHEET_PORT_X = (-4.75, -2.35, 0.02, 3.58)
 # The file's three guns a side, kept where they stand between those ports (Build-Ships.md §5.3).

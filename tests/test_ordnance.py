@@ -318,6 +318,7 @@ def test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sou
         "shot": {"12": {"round": 149}},
         "cost": 0.0,
         "words": "1 barrel of powder and 149 round shot of 12 pounds",
+        "hoy": f"plymouth-hoy-{e.tick}",  # the hoy a vessel of the sea (package 82, step 4)
     }
     port = w.readings["port"]
     assert port["words"].endswith(

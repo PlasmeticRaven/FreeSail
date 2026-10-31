@@ -108,6 +108,12 @@ people have made out: the colours shown against the wars, the private signal ans
 wrong or not at all, the hail's words, or her own shot (`captain.recognised`, `fired_on`),
 and 70's `action.unrecognised` is the exception. The refusal of the vocabulary is gone.
 
+**As built (package 88, item 4).** Her own colours, once shown before an enemy (at the
+doctrine's `true_colours_cables` or in action), are held for the action and until every enemy
+she showed them to is out of sight (`signalling._true_colours_held`, `privateer.yaml`
+`true_colours_held` with its source): the ruse is not taken up again before the same ship
+(the owner's debrief of 70 to 72, the colours flickering under fire; truth 7-342).
+
 ### 2. The private signal (`data/signals/private/*.yaml`; `freesail/world/signals.py` new; the papers)
 
 The recognition challenge and its reply: a small table per nation per month, issued under
@@ -274,6 +280,10 @@ exchange is written once in the lookout's line (`exchange_words`), both reading 
 nation. The hail is the first order of a search in that the heave-to is demanded and
 answered; the boat and the search are the director's scene and 63's. The hailed ship is
 spoken (`spoken`, both brains' `spoken_ids`).
+
+**As built (package 88).** The hail is not touched (no line of `world/hail.py` or
+`data/captains/hail.yaml` changed): a privateer under false colours lies by the merchant's
+table (`lie: merchant`) as before; the colours held once shown are §1's.
 
 **As fixed (the owner's playtest of 2026-10-27, folded in by package 86).** The table's
 heave-to is worked only when the words demand it ("heave to", "bring to", "sending a boat"
@@ -844,6 +854,20 @@ offices, and a world order may be given under a purview (`by`). Step 11 closed t
 with its tidies, its words and its records; the design note's "As built, steps 1 to 11" is
 the account.
 
+**As built (package 88).** *The commodore's recovery when aback with no way* (86's finding,
+the convoy's stall): a rules captain whose ship has had way and lies with none, square sail
+set and none of it drawing, no manoeuvre in hand, for `aback_recover_minutes` (three,
+judgement), avasts the work waiting for hands, takes in the driver and, if she lies so another
+while, boxes her off (Luce 1866 ch. XXV; Lever 1808 p. 79); the driver set again and the leg
+shaped when she has way (`Captain._aback_with_no_way`; truth 7-340; 7-152's ticks moved).
+*The near station law read against 58b's far one*: both fill a station's course inside the
+close-hauled angle to the nearest course she can lie (`station._course_clamped` and
+`navigation.judge_course` near, `Vessel._course_for` far); they aim differently by design
+(the near law at a point `LEAD_M` ahead of the station along the flag's course, the far leg
+at the station), and the far leg given the near aim cost the far line its station, so they
+are left two (the test with the flag close-hauled and a station to windward of her fetch in
+`tests/test_squadrons.py`; docs/dev/TuningNotes.md, package 88).
+
 ### 22. The regimes (`data/captains/`, `data/nations.yaml`, `business.py`)
 
 A ship of a nation is **in port, in ordinary, on station, on passage, in convoy or escorting,
@@ -941,6 +965,18 @@ in every recorded scenario (7-158); the pace at far detail against the build mac
 and under the cap against the crewed floor (7-159, 7-160). The owner's privateer cuts out
 the straggler only when the escort is beyond the cover distance: with the King's brig in
 company the convoy of six is covered, and that is the doctrine's own answer.
+
+**As built (package 88).** Every role's doctrine gains `aback_recover_minutes` and
+`danger_ahead_nm`, and its `tack_regardless_nm` is read at last: with land or a charted danger
+within it anywhere in the lee half she is tacked and never worn, a course shaped that would
+be worn round for want of way keeps her full and by to claw off, and the land on her bow by
+the lookout, or with no land in sight the land or a danger ahead by the chart at the account,
+puts her about (`navigation.no_room_to_wear`, `Captain._danger_ahead_by_chart`; the station
+gale's expected failure lifted, truth 7-341). A mark engaged and chased beyond `engage_nm` is a
+chase whose staleness gives it up (`engaging` on `chase stale` in the commodore's, the
+cruiser's, the King's ship's and the privateer's files), and the haul-off keeps the sea (a
+point at a time to a line clear of the land). The privateer holds her true colours once shown
+(§1).
 
 ---
 

@@ -865,6 +865,22 @@ class BoatSpec:
     oars: int
     crew: int
     tons: float
+    # package 82 (item 4): her own ship file, by which she is manned as a hull; None, a boat
+    # of the script's errands alone
+    file: str | None = None
+
+
+@dataclass
+class OarsSpec:
+    """The oars a boat pulls (package 82, item 4; the design's §5.2): how many, the pull a
+    man sustains on the blade at no way (`thrust_n`), the power a man delivers at the oar
+    over hours (`power_w`), and the hours at the oars that halve his strength
+    (`tiring_h`). Read by `physics/oars.py` and by nothing else of the physics."""
+
+    number: int
+    thrust_n: float
+    power_w: float
+    tiring_h: float
 
 
 @dataclass
@@ -907,7 +923,12 @@ GEAR_KINDS = ("trawl", "drift nets", "seine", "lines")
 GEAR_KEYS = ("id", "kind", "name", "beam_ft", "length_fathoms", "nets", "hooks")
 
 BOAT_KINDS = ("launch", "long-boat", "barge", "pinnace", "cutter", "yawl", "jolly boat", "punt")
-BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons")
+# `file` (package 82, item 4): the boat's own ship file, by which she is manned as a hull of
+# the world; a boat without one keeps her errands as the script runs them.
+BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons", "file")
+# The `oars:` section (package 82, item 4; docs/design/Design-BoatAndPersonAboard.md §5.2):
+# the one new key for the one new figure, the oar force a boat's hull is driven by.
+OARS_KEYS = ("number", "thrust_n", "power_w", "tiring_h")
 PERSON_ROLE_KEYS = ("role", "station", "rating", "messenger")
 
 
@@ -931,6 +952,7 @@ class ShipSpec:
     gear: list[GearSpec] = field(default_factory=list)  # none: no fishing gear (package 56)
     armament: ArmamentSpec | None = None  # None: no guns, and the gunnery refused in words
     pumps: list[PumpSpec] = field(default_factory=list)  # none: no pumps (package 73)
+    oars: OarsSpec | None = None  # None: no oars; a boat's file has them (package 82)
 
 
 # ---------------------------------------------------------------------------
@@ -1004,6 +1026,7 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
             _parse_armament(data["armament"], source) if data.get("armament") is not None else None
         ),
         pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
+        oars=_parse_oars(data["oars"], source) if data.get("oars") is not None else None,
     )
     validate(spec)
     return spec
@@ -1381,11 +1404,31 @@ def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
                 oars=_count(b.get("oars"), f"{where}'s oars", source),
                 crew=_count(b.get("crew"), f"{where}'s crew", source),
                 tons=_num(b, "tons", where, source),
+                file=_str(b, "file", where, source, required=False) or None,
             )
         )
         if boats[-1].length_ft <= 0.0 or boats[-1].crew <= 0:
             raise ShipFileError(f"{source}: {where} has no length or no crew.")
     return boats
+
+
+def _parse_oars(raw: Any, source: str) -> OarsSpec:
+    """The `oars:` section (package 82, item 4): the number of oars, the pull on the blade
+    at no way, the power at the oar and the hours that halve a man's strength."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: 'oars' is not a mapping.")
+    for key in raw:
+        if key not in OARS_KEYS:
+            raise ShipFileError(f"{source}: the oars have '{key}', which they do not take.")
+    number = _count(raw.get("number"), "the number of oars", source)
+    thrust = _num(raw, "thrust_n", "the oars", source)
+    power = _num(raw, "power_w", "the oars", source)
+    tiring = _num(raw, "tiring_h", "the oars", source)
+    if number <= 0 or thrust <= 0.0 or power <= 0.0 or tiring <= 0.0:
+        raise ShipFileError(
+            f"{source}: the oars want a number, a thrust, a power and hours over nought."
+        )
+    return OarsSpec(number=number, thrust_n=thrust, power_w=power, tiring_h=tiring)
 
 
 def _parse_gear(raw: Any, source: str) -> list[GearSpec]:

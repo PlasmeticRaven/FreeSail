@@ -2373,6 +2373,8 @@ class World:
 
                 enforce_budgets(self)
         bells = self._bells_struck()
+        if bells is not None and getattr(getattr(self.ship, "spec", None), "oars", None):
+            bells = None  # a boat strikes no bell (package 82, item 4)
         if bells is not None:
             self.record(
                 Severity.ROUTINE,
@@ -2390,6 +2392,12 @@ class World:
         captain = getattr(self, "captain", None)
         if captain is not None:
             captain.tick()
+        if getattr(getattr(self.ship, "spec", None), "oars", None) is not None:
+            # a boat manned as a hull (package 82, item 4): the coxswain's hand each tick,
+            # alongside and hoisted in, swamped in a sea above her weather once a minute
+            from freesail.world.boats import tick_boat
+
+            tick_boat(self)
         # the deck passing among the officers of the watch by the bill (spec M7b §17;
         # package 53): on the hour, where two of their stations are held
         when = self.clock.ship_time

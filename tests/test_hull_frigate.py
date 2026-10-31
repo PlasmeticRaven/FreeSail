@@ -39,7 +39,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FRIGATE = "data/ships/frigate-36.yaml"
 NOTE = ROOT / "docs" / "design" / "ships-design" / "pages-zaz2587.md"
 # The commit the hull step's streams work from: her file before her lines.
-BEFORE = "bb60222"
+BEFORE = "f5be9110"  # the trunk at the landing: bb60222 but for the boats' `file` keys
 FT = 0.3048
 PLANK_FT = 4.0 / 12.0
 # The file's figures are to the centimetre, the note's feet to the hundredth (§8).

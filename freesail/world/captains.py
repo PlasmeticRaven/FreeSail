@@ -427,6 +427,58 @@ RELAY_LEAST_S = 1800  # a glass between layings for the stream's change
 RELAY_TURN_LEAST_S = 600  # ten minutes for the tide's turn (a course shaped at the turn holds)
 
 
+# The states a rules captain recovers his ship in when she lies aback with no way (package
+# 88, item 1; `Captain._aback_with_no_way`): every state that sails her, but the action
+# (whose helm is the engaging's), lying to and the ground. `ABACK_RECOVER` is the law's
+# switch, for the bisection of what it moved (the tuning notes, package 88): off, she lies
+# aback with no way until something else pays her off, as before.
+ABACK_RECOVER = True
+ABACK_RECOVER_STATES = frozenset(
+    {
+        "on passage",
+        "beating",
+        "running for shelter",
+        "keeping station",
+        "investigating a stranger",
+        "chasing",
+        "evading",
+        "in company",
+    }
+)
+
+
+# The land or a danger ahead by the chart with the land out of sight (package 88, item 2;
+# `Captain._danger_ahead_by_chart`): the states that sail her on a course of her own, the
+# law's switch for the bisection, and the while before it is judged again after it has put
+# her about (judgement: ten minutes, a tack and the way gathered after it).
+DANGER_AHEAD = True
+DANGER_AHEAD_STATES = frozenset(
+    {"on passage", "beating", "keeping station", "in company", "running for shelter"}
+)
+DANGER_AHEAD_AGAIN_S = 600
+# A mark engaged and chased beyond the engaging distance is a chase whose staleness gives it up
+# (package 88, found on item 1; `Judgement._read_chase`): the law's switch for the bisection.
+ENGAGING_CHASE_STALE = True
+BOW_POINTS = 4  # on the bow: within four points of her head
+# The span past the reach within which the nearest charted danger is tried along her track
+# (`_danger_ahead_by_chart`'s cheap test): the track's two cables abeam and a danger's own
+# extent, generously (judgement: two miles; no charted danger of the Channel's is a mile across).
+DANGER_AHEAD_SPAN_NM = 2.0
+
+
+def plain_cables(m: float) -> str:
+    """A distance in the log's words (`geo.distance_words`)."""
+    from freesail.world.geo import distance_words
+
+    return distance_words(m)
+
+
+# Hauling off (`Captain._haul_off`, package 88): the bearing away from the enemy turned a
+# point at a time up to this many to either hand to find a line clear of the land (eight
+# points: never nearer the enemy than abeam of her bearing; judgement).
+HAUL_OFF_POINTS = 8
+
+
 def actor_for(state: str) -> str:
     return f"{ACTOR_PREFIX}'{state}'"
 
@@ -1514,6 +1566,13 @@ class Perception:
     # package 58b: the depth of water by the chart at the account, in fathoms (None off the
     # chart or on the land)
     chart_fathoms: float | None = None
+    # package 88 (item 1): headway by the course's reading (none with no way on, in stays or
+    # going astern), and whether she has square sail set and none of it drawing (every one
+    # shaking or aback by its reading), for the recovery when aback with no way
+    headway: bool = True
+    work_in_hand: list[str] = field(default_factory=list)  # doing and waiting, in words
+    square_set: bool = False
+    square_none_drawing: bool = False
 
     @classmethod
     def read(cls, world: Any) -> Perception:
@@ -1532,6 +1591,7 @@ class Perception:
         p.heading_deg = units.rad_to_deg(float(heading)) % 360.0 if heading is not None else None
         speed = view.value("speed")
         p.speed_kn = units.ms_to_knots(float(speed)) if speed is not None else 0.0
+        p.headway = view.value("course") is not None
         vis = view.value("visibility")
         if isinstance(vis, dict):
             p.visibility = str(vis.get("words") or "")
@@ -1553,6 +1613,7 @@ class Perception:
             # an anchor being brought to (package 40c): the evolution is work, not a
             # manoeuvre, and she is not under way again while it is in hand
             doing = list(work.get("doing") or []) + list(work.get("waiting") or [])
+            p.work_in_hand = [str(w) for w in doing]
             p.anchoring = any("anchor" in str(w) for w in doing)
         # the nearest shore by his account on the chart in his hands (package 40c, the
         # captain's trials): in thick weather or by night the lookout sees no land, and
@@ -1638,6 +1699,19 @@ class Perception:
             r = view.value("sail", sid)
             if isinstance(r, dict) and str(r.get("state") or "") == "set":
                 p.storm_staysails_set = True
+        if not p.headway:
+            # read only with no way on her, the one case the recovery asks them for (the
+            # pace: every square sail's reading at every judgement of every crewed captain
+            # was the dearer part of the perception; package 88's follow-up)
+            square = [
+                r
+                for r in (
+                    view.value("sail", sid) for sid, sl in sails.items() if sl.cls == "square"
+                )
+                if isinstance(r, dict) and str(r.get("state") or "") == "set"
+            ]
+            p.square_set = bool(square)
+            p.square_none_drawing = bool(square) and all(r["shaking"] or r["aback"] for r in square)
         boat = view.value("boat")
         p.boat_away = bool(isinstance(boat, dict) and boat.get("away"))
         manifest = view.value("manifest")
@@ -1814,7 +1888,18 @@ class Judgement:
         log = getattr(self, "_chase_log", None)
         if log is None:
             log = self._chase_log = []
-        if self.state not in ("investigating a stranger", "chasing") or self._stranger is None:
+        if self.state == "engaging" and self._stranger is not None and ENGAGING_CHASE_STALE:
+            # package 88 (found on item 1, the lead's ruling): a mark engaged and chased
+            # beyond the engaging distance is a chase like any other (the trade trial's
+            # French brig hung two to four miles astern of the faster schooner for seven
+            # hours, engaging and never in gunshot); within it the action is no chase
+            within = self.doctrine.threshold("engage_nm", 1.0) if self.doctrine else 1.0
+            mine = [s for s in p.strangers if s.get("id") == self._stranger]
+            est = mine[0].get("estimate_m") if mine else None
+            if est is None or float(est) <= float(within) * units.NAUTICAL_MILE:
+                log.clear()
+                return
+        elif self.state not in ("investigating a stranger", "chasing") or self._stranger is None:
             log.clear()
             return
         for s in p.strangers:
@@ -2811,6 +2896,10 @@ class Captain(Judgement):
         self._weather_work(p, kinds)
         if state not in ("at anchor", "in port", "in distress"):
             self._head_sails_straining(p, events)
+        if ABACK_RECOVER and state in ABACK_RECOVER_STATES and self._aback_with_no_way(p, kinds):
+            return  # boxing her off: the state's own work waits for her way
+        if DANGER_AHEAD and state in DANGER_AHEAD_STATES and self._danger_ahead_by_chart(p):
+            return  # put about for the land or a danger ahead by the chart
         if state == "hove to for weather" and self._business.get("lie_to_storm_lug"):
             # the lugger's storm jib set: she is hove to under it and the taille-vent
             from freesail.ship.parts import SailState
@@ -2852,6 +2941,200 @@ class Captain(Judgement):
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
             self._business.pop("brought_up", None)
+
+    def _aback_with_no_way(self, p: Perception, kinds: set[str]) -> bool:
+        """The recovery when aback with no way (package 88, item 1; package 86's finding, the
+        convoy's stall: the commodore's brig came out of a short-handed tack with no way on
+        while her book shortened sail, her head forty degrees off the wind, every square
+        sail shaking and the spanker drawing, and lay so twenty-five minutes with nothing
+        in his rules to bear her away, until the book's second shortening took in her
+        spanker and she paid off). Luce 1866, ch. XXV, Wind Baffling (OCR lines 28496 to
+        28523): the helm up and the head sheets flattened in serve "if the vessel has
+        headway on"; "if she still comes to against the helm, ... Up mainsail and spanker!
+        ... Brace abox the head yards! ... this will effect your object, by boxing her off;
+        and when the after sails fill, let go and haul as in tacking"; and in chapelling,
+        "when the spanker will take, haul it out" (OCR line 28539).
+
+        Having had way since the anchor or the ground (way lost, not way not yet gathered:
+        the merchant of the intent scenario, boxed off at the first measure as her hands got
+        her under way), with no headway now (the course's reading says none), square sail
+        set and none of it drawing, a wind to fill her and no manoeuvre in hand, for
+        `aback_recover_minutes` together: the after sail eased first (the driver taken in,
+        `scripts.after_gaff_sails`: the sail that holds her head to the wind, which the
+        hands on deck brail up while the topmen are at a reef aloft); and if she lies so
+        another while, or has no driver, he boxes her off (`box her off`, which takes all
+        hands, waiting its turn behind the hands at a yard). When she has headway again with
+        her square sail drawing, the driver is set again and the leg shaped again (the
+        course resumed). True while the box-off is in hand or waiting."""
+        b = self._business
+        if "ship.boxed_off" in kinds and b.pop("boxing_off", False):
+            b.pop("no_way_since", None)
+            self._course_resumed(b.pop("after_sail_in", None))
+            return False
+        if p.manoeuvre == "boxing off" or any("boxing off" in w for w in p.work_in_hand):
+            return True  # in hand, or waiting its turn behind the hands aloft
+        from freesail.physics.hull import ABACK_URGENT_AWS_KN
+
+        if p.anchor_down or p.aground or p.anchoring:
+            b.pop("had_way", None)  # from the anchor or the ground she gathers way first
+        elif p.headway:
+            b["had_way"] = True
+        if p.headway or p.manoeuvre != "none" or not b.get("had_way"):
+            b.pop("no_way_since", None)
+            if p.headway and not p.square_none_drawing and "after_sail_in" in b:
+                self._course_resumed(b.pop("after_sail_in"))
+            return False
+        # the while counted from the minute she lay with no way and no square sail drawing;
+        # a topsail at its reef drawing by a breath now and then does not begin it again
+        if "no_way_since" not in b:
+            if not p.square_none_drawing or p.wind_kn < ABACK_URGENT_AWS_KN:
+                return False
+            b["no_way_since"] = p.tick
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if p.tick - int(b["no_way_since"]) < 60.0 * float(th("aback_recover_minutes", 3)):
+            return False
+        b["no_way_since"] = p.tick  # the next step a while after this one
+        why = "aback with no way on"
+        if "after_sail_in" not in b:
+            from freesail.evolutions.scripts import after_gaff_sails
+
+            driver = [sl.id for sl in after_gaff_sails(self.world.ship)]
+            b["after_sail_in"] = driver
+            # the hands wanted for her recovery: the work not begun that waits for hands
+            # (a shortening's reefs in the courses, which want her way to be worth having)
+            # and the work at the driver avasted, so that the driver's brails are manned
+            names = [self._sail_name(sid) for sid in driver]
+            for w in p.work_in_hand:
+                if w.endswith(" (for hands)") or any(w.endswith(f"the {n}") for n in names):
+                    self.give(f"belay {w.removesuffix(' (for hands)')}", why=why)
+            if driver:
+                for sid in driver:
+                    self.give(f"take in the {self._sail_name(sid)}", why=f"{why}: to pay her off")
+                return False
+        e = self.give("box her off", why=why)
+        if e.kind == "order.rejected":
+            return False
+        b["boxing_off"] = True
+        return True
+
+    def _danger_ahead_by_chart(self, p: Perception) -> bool:
+        """The land or a danger ahead (package 88, item 2; 57's station gale and the
+        lee-shore trial under item 1: beating for her station off Ushant at night the
+        frigate stood on at seven knots onto the Four, the lookout reporting the land close
+        aboard on her bow at five cables and the chart in his hands having the rock, with
+        nothing of his rules answering either: 'the offing' a `when` rule long true, the
+        beating book with no 'land ahead'). The period's word is clawing off, "the act of
+        beating, or turning, to windward from a lee-shore, so as to acquire a sufficient
+        distance from it, to escape the dangers of shipwreck" (Falconer 1780, CLAWING, OCR
+        line 5576). On a sailing state out of pilot water with no manoeuvre in hand and way
+        on her: the lookout's nearest land on her bow (within `BOW_POINTS` of her head)
+        within `danger_ahead_nm`, by any light; or, with no land in sight, the land on her
+        course or a charted danger within two cables of it with too little water for her
+        within the same distance by the chart at his account (the pilot's warning of 37h,
+        `chart.dangers_ahead`, read by account and not from the truth), and nearer than the
+        leg's own mark: he puts her about, tacked where a wear would cost the ground
+        (`navigation.no_room_to_wear`), else as the choice reads. Once in
+        `DANGER_AHEAD_AGAIN_S`. True when she is put about now."""
+        from freesail.api.readings import AHEAD_ABEAM_M
+        from freesail.world.geo import destination as dest
+
+        b = self._business
+        if p.manoeuvre != "none" or not p.headway or p.anchor_down:
+            return False
+        if p.aground or p.pilot_aboard or p.pilot_conn or self._inner_leg():
+            return False
+        if p.tick - int(b.get("danger_ahead_tick", -(10**9))) < DANGER_AHEAD_AGAIN_S:
+            return False
+        world = self.world
+        nav = getattr(world, "navigation", None)
+        chart = getattr(world, "chart", None)
+        if nav is None or chart is None or p.heading_deg is None:
+            return False
+        try:
+            here = nav.account_now()
+        except Exception:  # noqa: BLE001 - an account not yet kept
+            return False
+        if here is None:
+            return False
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        reach = float(th("danger_ahead_nm", 1.5)) * units.NAUTICAL_MILE
+        leg = self.legs[self.leg_i] if self.legs and self.leg_i < len(self.legs) else None
+        if self.state != "keeping station" and leg is not None:
+            to_mark = self._distance_by_account(leg)
+            if to_mark is not None and to_mark * units.NAUTICAL_MILE <= reach:
+                return False  # she is making for it
+        what = ""
+        # the lookout's first, by any light: the land on her bow (within `BOW_POINTS` of her
+        # head) within the distance (the lee-shore trial: "the land close aboard on the
+        # starboard bow, bearing SW, distant five cables", her head SW, 'the offing' a
+        # `when` rule true since the gale and the beating book with no 'land ahead')
+        near = world.readings.value("nearest_land")
+        if isinstance(near, dict) and near.get("metres") is not None and near.get("bearing"):
+            try:
+                brg = units.rad_to_deg(units.parse_course(str(near["bearing"])))
+            except (ValueError, units.CourseError):
+                brg = None
+            off = (
+                abs(units.rad_to_deg(units.wrap_pi(math.radians(brg - p.heading_deg))))
+                if brg is not None
+                else 180.0
+            )
+            if off <= BOW_POINTS * 11.25 and float(near["metres"]) <= reach:
+                what = f"{near.get('words') or 'the land on her bow'}"
+        # the dear reads of the chart only when the cheap ones put something within reach:
+        # the coast by the account (`coast_by_account_nm`) and the nearest charted danger
+        # (`dangers_nm`, within ten miles), read by the perception at every judgement; no land
+        # can be crossed nearer than the coast, nor a danger met on her track farther than its
+        # distance less the track's two cables and its own extent (`DANGER_AHEAD_SPAN_NM`)
+        reach_nm = reach / units.NAUTICAL_MILE
+        coast_near = p.coast_by_account_nm is not None and p.coast_by_account_nm <= reach_nm
+        danger_near = p.dangers_nm is not None and p.dangers_nm <= reach_nm + DANGER_AHEAD_SPAN_NM
+        if not what and not p.land_in_sight and coast_near:
+            # the chart's coast tried along her course, as the planner tries a line
+            # (`chart.line_shore`: the captain's own paper, the points the account's)
+            shore = chart.line_shore(here, dest(here, p.heading_deg, reach), 0.0)
+            if shore is not None and shore[2]:
+                from freesail.world.geo import bearing_and_distance as bd
+
+                along_m = bd(here, shore[1])[1]
+                what = f"the land ahead by the chart, {plain_cables(max(along_m, units.CABLE))}"
+                reach = along_m
+        hull = getattr(world.ship, "hull", None)
+        draught = float(hull.spec.draught_m) if hull is not None else 2.0
+        found = (
+            []
+            if what or p.land_in_sight or not danger_near
+            else chart.dangers_ahead(
+                here, p.heading_deg, reach, AHEAD_ABEAM_M, tide_m=0.0, wants_m=draught + 1.0
+            )
+        )
+        if found:
+            f, along, _off, _side = min(found, key=lambda t: t[1])
+            what = f"{f.name} ahead by the chart, {plain_cables(max(along, units.CABLE))}"
+        if not what:
+            return False
+        b["danger_ahead_tick"] = p.tick
+        by = "" if p.land_in_sight else ", the land out of sight"
+        e = self.give("put her about", why=f"{what}{by}")
+        return e.kind != "order.rejected"
+
+    def _course_resumed(self, after_sail: list[str] | None) -> None:
+        """Recovered from lying aback with no way (`_aback_with_no_way`): the driver he took
+        in set again ("when the spanker will take, haul it out", Luce 1866 ch. XXV), and
+        the leg shaped again on a sailing state's passage."""
+        for sid in after_sail or ():
+            sl = (getattr(self.world.ship, "sails", {}) or {}).get(sid)
+            if sl is not None and not sl.is_set:
+                self.give(f"set the {self._sail_name(sid)}", why="she has way again")
+        if (
+            self.state in ("on passage", "beating", "running for shelter")
+            and self.legs
+            and self.leg_i < len(self.legs)
+            and self.legs[self.leg_i].kind != "out"
+        ):
+            self._shape_leg(why="she has way again")
 
     def _lugger_storm_lug(self) -> bool:
         """A lugger with her storm lug in the sail room or bent (package 58b, item 5): no
@@ -4187,6 +4470,24 @@ class Captain(Judgement):
             return
         away = (float(enemy.get("bearing_deg") or 0.0) + 180.0) % 360.0
         point = destination(here, away, 20.0 * units.NAUTICAL_MILE)
+        # the sea kept (package 88, found on item 1: the merchant schooner of the trade trial,
+        # hauling off from the privateer off the Lizard, steered the reciprocal across the land
+        # about Coverack and took the ground at seven knots): the nearest bearing away from
+        # her, a point at a time to either hand up to eight, whose line the planner finds
+        # clear of the shore and the dangers by the chart in his hands; the reciprocal itself
+        # when none is
+        planner = Planner(self.world)
+        for k in range(HAUL_OFF_POINTS + 1):
+            found = None
+            for side in (0,) if k == 0 else (1, -1):
+                brg = (away + side * k * 11.25) % 360.0
+                to = destination(here, brg, 20.0 * units.NAUTICAL_MILE)
+                if planner.clear(here, to):
+                    found = to
+                    break
+            if found is not None:
+                point = found
+                break
         self._business["hauled_off"] = p.tick
         self.give(
             f"shape a course for {plain_position(point)}",

@@ -1,6 +1,7 @@
 """The console driver: runs a world, prints the log, reads orders from stdin.
 
     python -m freesail.ui.console [ship] [--seed N] [--time N] [--load SAVE [--until TICK]]
+                                  [--seat STATION] [--ship NAME]
                                   [--scenario FILE] [--standing-orders FILE]
                                   [--watcher fake] [--agents-port N] [--lockstep]
                                   [--consent-records DIR] [--saves DIR] [--seat officer]
@@ -70,6 +71,7 @@ import re
 import sys
 import threading
 import time
+from collections.abc import Callable
 from typing import Any
 
 from freesail import units
@@ -993,8 +995,52 @@ SEAT_HELP = (
     "seat the player at a station below the captain's ('officer'): his orders are judged "
     "by that station's authority and the captain's word (package 40; spec M6 §3); or at the "
     "director's ('director'), above the game, where a bare world order is the director's "
-    "through the channel's doubt and the brief's limits (package 50; spec M7b §2)"
+    "through the channel's doubt and the brief's limits (package 50; spec M7b §2); with "
+    "--ship, a seat on that ship ('--seat captain --ship Raven' is her captain's prompt)"
 )
+ABOARD_HELP = (
+    "the ship the player is aboard, by her name (package 82, item 2): the drivers follow her "
+    "hull from the start, his orders are hers and he is her captain at the prompt (or at "
+    "--seat's station of hers); his own ship is left as she lies, under her rules captain "
+    "by her intent where the scenario gives one; 'follow \"the ship\"' brings him home"
+)
+
+
+def aboard_ship(world: World, name: str | None, say: Callable[[str], None] = print) -> None:
+    """`--ship <name>` at a driver (package 82, item 2; the design's §4): the drivers set
+    to follow her hull (made in the far shape when she has none, woken under the cap as the
+    followed hull), after a driver's line in the player's own ship's log saying how she is
+    left (as she lies, her watch kept and her sails as they were, her rules captain's by
+    his intent where she has one). Both lines replay as every driver's line does. Refused
+    with the words (`SystemExit`) for a ship not on the sea or one with no captain of her
+    own; nothing for an empty name."""
+    if not name:
+        return
+    if getattr(world, "observed", False):
+        raise SystemExit(
+            "--ship names the ship the player is aboard; an observed world ('ship: none') has "
+            "no ship of the player's to leave: use 'follow' at the prompt instead."
+        )
+    captain = getattr(world, "captain", None)
+    by = (
+        f"her rules captain sails her by his intent ({captain.intent.words})"
+        if captain is not None and getattr(captain, "intent", None) is not None
+        else "no captain's hand on her (she has no intent to sail by)"
+    )
+    own = str(getattr(world.ship, "name", "") or "the ship")
+    world.record_driver(
+        "notable",
+        "driver.left",
+        f"The {own} is left as she lies, her watch kept and her sails as they were; {by}. "
+        f"The player is aboard the {name}.",
+        {"ship": name},
+    )
+    try:
+        e = world.follow(name)
+    except ValueError as err:
+        raise SystemExit(f"--ship {name!r}: {err}.") from None
+    say(e.text)
+
 
 # `--until TICK` with `--load` (package 45c): the save replayed to that tick and handed
 # over there, as a save replays by its acts.
@@ -1073,6 +1119,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument("--ship", dest="aboard", metavar="NAME", help=ABOARD_HELP)
     ap.add_argument(
         "--crewed-cap",
         type=int,
@@ -1108,7 +1155,9 @@ def main(argv: list[str] | None = None) -> int:
         world.crewed_settings = crewed_settings_of(
             {"cap": args.crewed_cap, "range_nm": args.crewed_range}, "the flags"
         )
-    # the player's seat: the flag's, else the scenario file's (`stations:`, package 59)
+    # the ship the player is aboard (package 82, item 2), then his seat on her: the flag's,
+    # else the scenario file's (`stations:`, package 59)
+    aboard_ship(world, getattr(args, "aboard", None))
     seat = player_seat_for(world, args.seat, scenario_file)
     if seat:
         seat_player(world, seat, door="console")

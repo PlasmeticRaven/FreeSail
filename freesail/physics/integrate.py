@@ -30,6 +30,7 @@ import math
 from freesail import units
 from freesail.physics import anchor as ground_tackle
 from freesail.physics import hull as hp
+from freesail.physics.oars import oar_thrust, oars_of
 from freesail.physics.sails import compute_sail_forces, hold_rig, release_rig, sails_in_hand
 from freesail.physics.strain import apply_strain
 from freesail.physics.wind import Wind
@@ -87,6 +88,9 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     finally:
         release_rig(ship)
     apply_strain(ship, dt)  # package 9: wear and carrying away, once per tick (spec §7.5)
+    oars = oars_of(ship)
+    if oars is not None:
+        oars.tick(dt)  # the men at the oars tire, or rest (package 82, item 4)
     if st.at_anchor:
         ground_tackle.judge_cables(ship, dt)  # the cable against its rating (package 34)
     _update_readings(ship)
@@ -124,6 +128,12 @@ def _substep(
     tow = ship.extra.get("gear_drag") if isinstance(ship.extra, dict) else None
     if tow:
         drag_u += _rate(-float(tow) * d.u * abs(d.u), d.u)
+
+    # the oars' thrust along her axis (package 82, item 4; `physics/oars.py`): a boat's
+    # hull under oars, nothing for a ship without them or a boat lying on hers
+    oars = oars_of(ship)
+    if oars is not None:
+        thrust_n += oar_thrust(oars, d.u)
 
     # the cable's pull at the hawse (package 34), when an anchor is down
     if st.at_anchor:

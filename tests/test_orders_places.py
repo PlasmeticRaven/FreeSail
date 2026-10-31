@@ -142,7 +142,6 @@ def test_the_captain_goes_where_he_will_aboard_and_the_deck_is_given_from_the_de
     assert w.submit("set the main topsail").kind != "order.rejected"
     for words, why in (
         ("go to the stables", "'stables' is no place aboard"),
-        ("go to the boat", "is not a place to walk to"),
         ("go to the shore", "Say 'go ashore'"),
         ("go to", "Go where?"),
         ("come on deck", "already"),
@@ -150,6 +149,10 @@ def test_the_captain_goes_where_he_will_aboard_and_the_deck_is_given_from_the_de
         ("come aboard", "You are aboard already"),
     ):
         assert why in w.submit(words).text, words
+    # `go to the boat` is the manning of her as a hull of the world (package 82, item 4):
+    # hoisted out and manned with the ship hove to or at anchor, the captain down into her
+    e = w.submit("go to the boat")
+    assert e.kind == "person.aboard" and "hoisted out and manned" in e.text, e.text
 
 
 def test_a_place_ashore_named_aboard_says_go_ashore_first_and_go_alone_runs_the_clock():

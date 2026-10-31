@@ -36,7 +36,7 @@ MERCHANT = "data/ships/merchant-brig.yaml"
 NOTE = ROOT / "docs" / "design" / "ships-design" / "pages-zaz4491.md"
 FT = 0.3048
 # the commit before her lines came: the files as they stood, for the physics' keys
-BEFORE = "bb60222"
+BEFORE = "f5be9110"  # the trunk at the landing: bb60222 but for the boats' `file` keys
 # the note's figures are to the centimetre; a point reads as the note's within rounding
 TO_THE_NOTE_M = 0.005
 # the plank, the difference of the breadths moulded and extreme: the note's §5 tables are moulded
