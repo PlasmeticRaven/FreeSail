@@ -1290,8 +1290,9 @@ measured in `docs/dev/TuningNotes.md`, "The lee ports on the heel alone":
 - **A deck's side counts as shut** from its first port shut until its last has opened, so the log says
   one line and the reading gives the count.
 
-The pace, on this machine: 1.2 to 1.4% alone and 1.3% crewed. The floors are the lead's on the build
-machine.
+The pace, on this machine: 1.2 to 1.4% alone and 1.3% crewed, taken back by `ports._least_dip`, one
+compare a tick while no port can shut, so that neither figure now stands above the noise. The floors are
+the lead's on the build machine.
 
 ### 7.3 The steps and the proof
 

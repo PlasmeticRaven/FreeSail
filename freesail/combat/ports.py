@@ -40,6 +40,7 @@ trials' line counts (the station's lee shore 1,561 to 1,563, its gale 1,722 to 1
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from freesail.combat import shot as S
@@ -72,14 +73,17 @@ def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
     """The battery's ports this tick against the rule (the module's head): the ids of the
     guns whose ports were shut this tick and of those opened, each set once a change of
     state, the battery's `_shut` set to the guns now shut and the log told of a deck's side
-    that has changed. `_shut` is not written while nothing changes, and with no port shut
-    and none told this is all a tick costs: a sine and a compare a port gun."""
+    that has changed. `_shut` is not written while nothing changes. With no port shut and
+    none told, a tick whose dip is short of the battery's least (`_least_dip`) costs one
+    compare; else a sine and a compare a port gun."""
     from freesail.combat.guns import _is_lee  # guns imports this module
 
     was = battery._shut
     heel_deg = firer.heel_deg
     heel = abs(heel_deg)
     roll = roll_in_the_dip(firer)
+    if not was and not battery._ports_told and roll + heel < _least_dip(battery, firer):
+        return _NONE, _NONE
     shut: list[str] = []
     opened: list[str] = []
     for gun in battery.ship.guns.values():
@@ -100,6 +104,26 @@ def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
     if now or battery._ports_told:
         _tell(battery, now, reopened, heel_deg, _is_lee)
     return newly, reopened
+
+
+def _least_dip(battery: Any, firer: Any) -> float:
+    """The least dip that shuts a port of this battery, in degrees, read once and held: no
+    side's dip is above the roll plus the heel, so below this no port can shut and a tick need
+    read no gun. A hair under the rule's own figure, so that it never stands in the rule's way;
+    a class default on the battery, as `_port_breadths` is."""
+    least = battery._least_shut_dip
+    if least is None:
+        least = 90.0
+        for gun in battery.ship.guns.values():
+            if gun.place in PORT_PLACES:
+                above = gun.height_m - S.PORT_SHUT_M
+                half_breadth = _half_breadth(battery, gun, firer)
+                if above <= 0.0:
+                    least = 0.0
+                elif above < half_breadth:
+                    least = min(least, math.degrees(math.asin(above / half_breadth)) - 1e-6)
+        battery._least_shut_dip = least
+    return least
 
 
 def _half_breadth(battery: Any, gun: Any, firer: Any) -> float:

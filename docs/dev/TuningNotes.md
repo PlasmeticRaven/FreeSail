@@ -12960,7 +12960,9 @@ In gusts each comes earlier: the heel's 95th percentile stands about 1.2 times t
 | Alone, both on C:, to rule out the drive | 495, 488, 487, 487, 486, 481 (487.3) | 487, 480, 484, 480, 482, 477 (481.7) | −5.7, −1.2% |
 | `crewed --ships 3`, tree first | 171, 172, 170, 168, 170, 173 (170.7) | 170, 169, 169, 169, 167, 167 (168.5) | −2.2, −1.3% |
 
-A small real cost, §7.2's own "a sine and a compare a port gun a tick": about 24 to 29 microseconds a tick on the frigate's 40 guns. **For the lead:** the floors are the lead's on the build machine, and `alone` reads under 500 here at the base as well. Run 26 had truth 51 at 494 against 500; a further 1.2 to 1.4% would take it to about 488 if the cost carries over. If it matters, an early-out while she heels below the battery's least shut heel with nothing shut would take most of it back: one held figure and one compare, built by nobody and not measured.
+A small real cost, §7.2's own "a sine and a compare a port gun a tick": about 24 to 29 microseconds a tick on the frigate's 40 guns. **For the lead:** the floors are the lead's on the build machine, and `alone` reads under 500 here at the base as well. Run 26 had truth 51 at 494 against 500; a further 1.2 to 1.4% would have taken it to about 488 if the cost carried over.
+
+**Taken back, in its own commit:** `ports._least_dip`, one held figure and one compare. With no port shut and none told, a tick short of the battery's least dip reads no gun: 0.22 microseconds on the frigate at 6° of heel. Its test holds it to the rule, both ways and on either side, on seven files. Base against it, the same alternation: alone, 487, 488, 479, 482, 483, 495 (485.7) against 484, 487, 490, 492, 493, 494 (490.0), +0.9%; `crewed --ships 3`, 176, 172, 170, 175, 167, 172 (172.0) against 168, 171, 170, 172, 173, 171 (170.8), −0.7%. Neither stands above the noise. Past the least dip, or with a port shut, the cost above is paid, as it should be.
 
 ### The three captain's trials, read again
 

@@ -1309,6 +1309,39 @@ def test_the_roll_is_held_at_nought():
     assert gun.id not in battery._shut
 
 
+@pytest.mark.parametrize(
+    "path", [CUTTER, PRIVATEER, BRIG, FRIGATE, SIXTY_FOUR, RAZEE, MERCHANT_BRIG]
+)
+def test_the_one_compare_short_of_the_least_dip_changes_no_port(path):
+    """A tick short of the battery's least dip reads no gun (`ports._least_dip`), for the pace.
+    It stands a hair under the lowest port the rule shuts, and a battery with the compare
+    shuts and opens the same ports as one without it, both ways and on either side."""
+    ship = load_ship(path)
+    battery = Battery(ship)
+    whole = Battery(ship)
+    whole._least_shut_dip = -1.0  # never short of it
+    profile = ship.hull.spec.profile
+    heels = [
+        shut_heel(g.height_m, half_breadth_at_sill(profile, g.deck, g.x_m))
+        for g in ship.guns.values()
+        if g.place in ports.PORT_PLACES
+        and g.height_m - SHUT_M < half_breadth_at_sill(profile, g.deck, g.x_m)
+    ]
+    least = ports._least_dip(battery, firer_at(0.0))
+    assert least < min(heels) < least + 1e-5
+    ports.update(battery, firer_at(least - 0.01))
+    assert not battery._shut
+    ports.update(battery, firer_at(min(heels) + 0.01))
+    assert battery._shut
+    battery._shut = frozenset()
+    battery._ports_told = frozenset()
+    sweep = [h / 4.0 for h in range(0, 161)]
+    for heel in sweep + sweep[::-1] + [-h for h in sweep] + [-h for h in sweep[::-1]]:
+        firer = firer_at(heel)
+        assert ports.update(battery, firer) == ports.update(whole, firer), heel
+        assert battery._shut == whole._shut, heel
+
+
 def test_no_sea_no_roll():
     """A World that keeps no sea reads no roll for the rule to take (§7.1, map-engine §10
     item 4); one that keeps a sea, her own motion."""
@@ -1342,7 +1375,7 @@ def _an_old_ship(w) -> None:
     for gun in w.ship.guns.values():
         gun.deck = None
     battery = battery_of(w.ship)
-    for name in ("_shut", "_port_breadths"):
+    for name in ("_shut", "_port_breadths", "_least_shut_dip"):
         battery.__dict__.pop(name, None)
 
 
