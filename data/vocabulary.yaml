@@ -890,6 +890,54 @@ verbs:
                take up your station, keep station in the line, keep your station in the line]
     object: navigation
     level: 1
+  # The boat manned as a hull of the world (package 82, item 4; `freesail/orders/boat.py`,
+  # `freesail/world/boats.py`): the object `boat` takes the words after the verb as said
+  # (a mark to pull for); each is refused in words on a hull that is no boat. `go to the
+  # boat` is the person's `go to` with the boat's name; the lug is the sail verbs' own.
+  give way:
+    synonyms: [give way together, give way all, pull together, give way men]
+    object: boat
+    level: 1
+  easy all:
+    synonyms: [easy, pull easy, easy all together, easy there]
+    object: boat
+    level: 1
+  lie on your oars:
+    synonyms: [lie on the oars, rest on your oars, lay on your oars, hold water, way enough]
+    object: boat
+    level: 1
+  boat your oars:
+    synonyms: [boat oars, in oars, toss and boat your oars, lay in the oars, lay in your oars,
+               boat the oars]
+    object: boat
+    level: 1
+  out oars:
+    synonyms: [ship the oars, oars out, ship your oars, out oars and lie on them]
+    object: boat
+    level: 1
+  pull for:
+    synonyms: [pull for the, pull to the, pull towards the, pull toward the, pull to,
+               pull towards, pull toward, make for the, make for]
+    object: boat
+    level: 1
+  step the mast:
+    synonyms: [step the boat's mast, up mast, step her mast]
+    object: boat
+    level: 1
+  unstep the mast:
+    synonyms: [strike the mast, lower the mast, unstep her mast, down mast]
+    object: boat
+    level: 1
+  come alongside:
+    synonyms: [come alongside the ship, bring her alongside the ship, the boat alongside,
+               come alongside her, back to the ship]
+    object: boat
+    level: 1
+  cut the boat adrift:
+    synonyms: [cut the boat loose, cast the boat adrift, cut the launch adrift, cut the cutter adrift,
+               let the boat go adrift]
+    object: boat
+    level: 1
   # The port (spec M5 §23; `freesail/orders/port.py`): the object `port` takes the words
   # after the verb as said (a person for the boat, a number of tons and a good, an item
   # of the yard, a number of hands and a rating).

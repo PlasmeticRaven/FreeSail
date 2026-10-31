@@ -3985,6 +3985,10 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
         hold = getattr(world, "hold", None)
         if hold is not None:
             own["cargo"] = hold.words()
+        dealings = getattr(world, "dealings", None)
+        boat_state = getattr(dealings, "boat", None)
+        if boat_state is not None and (boat_state.lost or boat_state.hull or boat_state.away):
+            own["boat"] = boat_state.words()  # package 82: her boat away, manned or lost
         own.update(_truth_action(world))  # package 70: her guns and her damage
         own.update(_truth_signals(world.ship, str(own.get("nation") or ""), world))  # package 71
     ships.append(own)
@@ -4428,6 +4432,8 @@ def _truth_words(d: dict[str, Any]) -> str:
             bits.append(s["goal"])
         if s.get("ahead"):
             bits.append(f"ahead: {s['ahead']}")  # package 58a
+        if s.get("boat"):
+            bits.append(f"the boat: {s['boat']}")  # package 82
         for row in ("guns", "damage", "bill"):  # package 70
             if s.get(row):
                 bits.append(f"{row}: {s[row]}")

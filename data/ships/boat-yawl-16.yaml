@@ -38,12 +38,12 @@ hull:
   hull_speed_kn: 5.4
   # The gunwale 0.58 ft above the water laden (a depth of 1.75 ft less the draught; judgement); a man standing in her looks from 1.7 m over it (freesail/world/lookout.py).
   deck_height_m: 0.18
-  # A yoke's rudder, hung on the transom, put over quickly by the coxswain's yoke lines (judgement).
+  # A yoke's rudder hung on the transom, 0.26 m2 (a boat's rudder is large for her size, about a sixtieth of a square metre to the foot of her length: judgement after the yawl's and the launch's blades), as deep as her depth, put over quickly by the coxswain's yoke lines (judgement).
   rudder:
-    area_m2: 0.04
+    area_m2: 0.26
     max_angle_deg: 35
     rate_deg_s: 20.0
-    span_m: 0.6
+    span_m: 0.53
 spars:
 # one mast of 12 ft above the gunwale, stepped at will in a thwart's clamp and unstepped to pull (Steel 1794 vol. II, the boats' stores table: masts, sails and halyards allowed to the yawl and the cutter), unstayed; judgement on the length (about 0.6 of the boat's). To read: Steel 1805, Folio LVII, 'Dimensions and scantlings of boats' (IA leaves 599 to 602), which gives the pattern's dimensions by length; read, its figures replace the judgement here, and never the game's behaviour. Rating: lug in 25 kn -> 1 kN.
 - id: mast

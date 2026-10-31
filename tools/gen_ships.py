@@ -9281,10 +9281,10 @@ def boat(out_dir, pattern):
             "hull_speed_kn": hull_speed,
             "deck_height_m": gunwale_m,
             "rudder": {
-                "area_m2": round(0.02 * lwl * draught, 2),
+                "area_m2": round(0.016 * L_ft, 2),
                 "max_angle_deg": 35,
                 "rate_deg_s": 20.0,
-                "span_m": round(0.5 * draught + 0.4, 2),
+                "span_m": round(depth_ft * FT, 2),
             },
         },
         {
@@ -9303,8 +9303,10 @@ def boat(out_dir, pattern):
             "deck_height_m": f"The gunwale {depth_ft - draught_ft:.2f} ft above the water laden "
             f"(a depth of {depth_ft:.2f} ft less the draught; judgement); a man standing in her "
             "looks from 1.7 m over it (freesail/world/lookout.py).",
-            "rudder": "A yoke's rudder, hung on the transom, put over quickly by the coxswain's "
-            "yoke lines (judgement).",
+            "rudder": f"A yoke's rudder hung on the transom, {0.016 * L_ft:.2f} m2 (a boat's "
+            "rudder is large for her size, about a sixtieth of a square metre to the foot of "
+            "her length: judgement after the yawl's and the launch's blades), as deep as her "
+            "depth, put over quickly by the coxswain's yoke lines (judgement).",
         },
     )
     # -- the rig: one mast stepped at will, a standing lug ------------------------------
