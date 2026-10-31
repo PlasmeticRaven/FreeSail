@@ -15836,3 +15836,10 @@ own block is another hull's. The proof is the suites below.
 **The truths:** 7-322 (the player aboard another ship, her prompt his, his own left as she
 lies, the replay by his acts), 7-323 (the director's door with another hull followed, the
 other by name), 7-326 (the free intent by the hull, the hail's holder, the station by name).
+
+**The suites on the step's tree** (`86afc87`, the lead's `5fbfbb0` merged): the fast tier
+whole, 5,300 passed, none failed (31:53); the slow tier of the sixteen touched files and
+the known truths, `--slow -m "not pace" -n 4`, 649 passed, 7 expected failures, one failed:
+`test_replay`'s fingerprint test, which reads the code tree and was run while step 4's
+files were being written beside it (the fingerprint moved under it); passed alone on the
+still tree. Ruff clean. No pace test touched.
