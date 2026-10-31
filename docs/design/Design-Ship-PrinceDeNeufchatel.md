@@ -1349,6 +1349,47 @@ Proposed form, for the lead (§17, lead item 1):
 yards the four fore yards; after yards the two main light yards; `yards_to_back` the fore's;
 `after_gaff_sails` none (fewer than two masts with yards).
 
+### 12.2a The owner's proposal of 2026-10-31: a rule in the key's place (for the lead)
+
+**Not yet ruled.** §12.1 item 1 and §12.2 stand as the lead ruled them until the lead rules on this.
+Nothing here is built.
+
+**The owner:** "a square sail on multiple masts of a topsail schooner or other rigs with mixed sail
+types will be important for generalizing the addition of future ships. It will be a bit painful if we
+have to create totally custom implementations on ships that only have slightly different combinations
+of existing sail types." Asked whether this record should propose a rule in place of the key: "Propose
+the rule".
+
+**The rule.** An after mast with yards but no yard on its lower mast itself handles as a fore-and-after's
+mast. `Ship.on_schooner_mast(part)` is true for a spar of class `yard` whose mast is not the foremost that
+carries yards and carries none on the lower mast itself, and for a square sail whose yard is one. It reads
+the parts as filed, wrecked or sent down or not, once a ship, so that a main yard shot away does not turn a
+brig into a schooner in the middle of a fight. The yards under the bowsprit are not counted (`under_bowsprit`).
+
+**Why a rule.** The key is one line in a file and no custom code, but a file that forgets it makes her a
+brig with no word said: the trial's 30 m² main topsail took the topsail schooner's tack from 149 s to 219 s,
+with a "mainsail haul", and she brailed up her mainsail to wear and hove to 68-70° off (D10(b)). And §12.1's
+refusals already demand nearly what the rule says: no lower yard, and not every mast with yards.
+
+**What it changes against §12.1 and §12.2.** No schema key, no `Spar.schooner_mast`, so no stage-0 commit for
+it, and §4.5's `main.mast` line goes; the sail's flip is `MAIN_TOPGALLANT` alone. Places 1 and 3 read the
+predicate as in §12.2 items 3 and 4; items 5, 6, 8 and 9 stand, the two findings to be measured among them, and
+her golden row is the same. The tests gain a second rig in memory, the topsail schooner with a square main
+topsail, because the point is the rule's generality; the guard that no file trips it stays.
+
+**Measured, in memory only, classing and not sailing** (the rule patched into `_masts_with_yards`, the classing
+read through the golden table's gates):
+
+| Rig | Today | With the rule |
+|---|---|---|
+| The ten profiled files | as filed | no row moved: on the brigs and the three-masted ships every yarded mast has a lower yard; the schooners, the cutter and the smack have one yarded mast; the lugger none |
+| The topsail schooner with a main topsail added | square-rigged on two masts | a fore-and-after: head yards the fore's, her main topsail an after yard, the fore's laid aback |
+
+**Read, not run:** her own row (her file does not exist); the bilander and the 74 unmoved, each after mast keeping
+a lower yard; a barque and a barquentine unmoved, no after mast having only high yards. **The limit:** a schooner
+with a lower square-sail yard on her main (Fincham's p. 78, D10(d), not taken) still classes as a brig, under the
+rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the swing at "mainsail haul" above all.
+
 ### 12.3 What the viewer builder (B5) is asked
 
 - Nothing new. Her profile, raked transom, knee and ports are drawn by B5.1's and B5.6's builders as

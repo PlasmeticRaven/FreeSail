@@ -141,7 +141,7 @@ scratch scripts named are not.
 | 31 | The fillers as posts are left to 77 | The shared draft S14; the lead's call (§19.2) |
 | 32 | The merchant brig's description moved to `merchant-brig.yaml`, and a packet description: for the lead before they are built | The shared draft §4.4 |
 | 33 | A scenario's `nations:` block: for the lead; laid in stage 0b if ruled in | The shared draft S13. **Plainly:** `world/scenarios.py` and `core/world.py` are outside the brief's file list |
-| 34 | D10(a)'s key for the *Neufchatel*'s main topgallant: her design reports it to the lead; B3 builds it as a fourth step if the lead agrees | D10; Ext §14 item 12 |
+| 34 | D10(a)'s key for the *Neufchatel*'s main topgallant: her design reports it to the lead; B3 builds it as a fourth step if the lead agrees. *Since (2026-10-31): the owner proposes a rule in the key's place, for the lead (her §12.2a)* | D10; Ext §14 item 12 |
 | 35 | One test suite at a time on the owner's machine | The plan §4; the brief's suites rule |
 | 36 | The hull's shape. The owner's end goal and twelve principles (§5.0). Eight optional shape keys in stage 0H (§3.5, §5.1); the stations computed by `freesail/ship/form.py` and served. B8's helpers in SW-2b.1 right after 0H, before B1's stage B, the eight files' shape in SW-2b.2, each new ship's from her first commit, B1's at stage B. The drawing in B5.1 (strips, the head rule) and B5.6 (§6). The owner's sheets (§6) and the pair check (§5.6). No port triple is written from the drawing. One class in two roles draws as one hull (the brig and the merchant brig; the two schooners) | The owner, 2026-10-28 (the scope as proposed; §19.1 items 14, 15, 17, 20); for the lead's approval (§19.2 item 13) |
 | 37 | The *Indefatigable* whole before any other ship: stage A; B3.1, B3.2, B3.5 and their drawings; stage B, with the hull's form built and drawn first on her two files (the pilot). A testing report to the owner in place of their own test (2026-10-29). Then SW-2 and SW-2b.2 as one step, and the other ships | The owner, 2026-10-28 and 2026-10-29 (§2.6); for the lead (§19.2 items 13, 20) |
@@ -208,7 +208,7 @@ scratch scripts named are not.
 | B5.6 | B5 | the form drawn (§6): the served stations, the sterns, heads, galleries and lights as plain shapes, the channel wales, the drawn depth, the hull below the water as the owner chooses; the owner's sheets | 0H; B1's shape keys (the pilot); SW-2b.2 for the eight | the owner's first test; the owner's check of the hulls | pictures measured |
 | SW-4 | B8 | the sub-types, the roles, the small ships' fits and bills, the privateer's arc (§8, §9) | S0; its `world/ships.py` rows at the boundary after B1's merge, when her window closes | B2, B6 | §16 |
 | SW-2 = L1, SW-2b.2 | B8 | one step: the eight files' profiles and sourced sills (§5.3, §5.4), their shape and marks (§5.7); the pair check; the triple gaps reported; B5 then measures the pictures, old beside new | the owner's test of the pilot (§2.6); SW-2b.1 | SW-5; B5's drawing of the eight | bytes only |
-| **B2** | the *Neufchatel* | her design, stage 0b, her file | B1 whole and merged, and the owner's test (§2.6); SW-4 | B4 | none existing |
+| **B2** | the *Neufchatel* | her design, stage 0b, her file; reported done on a testing report of her own (the owner's direction of 2026-10-29), and the lead merges her | B1 whole and merged on her testing report (§2.6); B3.4 (her §12.2, §12.2a); SW-4's rows, or if they are not in when she is otherwise done, hers go first in her window and SW-4's follow (the lead, her §17 item 3) | B4 | none existing |
 | SW-5 L2, L3 | B8 | the lee port on heel, then with the roll (§7) | SW-2 | B7's port truth | combat pins, bisected |
 | **B4** | the bilander | her design, stage 0d, her file | B2, B3.3 (for her handling truths) | B7 | none existing |
 | **B7** | the *Bellerophon* | her design, stage 0c, her file | B4, SW-1, SW-5 (for her port truth) | — | three assertions (§16) |
@@ -319,6 +319,17 @@ or wait, at the lead's word (§19.2 item 20). The session reports B1 done when s
 (step 7), and the lead merges her as each ship is merged; her window closes with that merge.
 **Plainly:** her window is longer than the lead's order of the ships foresaw; the next ship's
 window opens at her merge.
+
+**The order as the lead confirmed it (the lead's notes, 2026-10-29, item 3), recorded at the
+*Neufchatel*'s window's opening:** B1 merged on her testing report; SW-2 with SW-2b.2 as one step
+after her merge; SW-5 L2 and L3 behind them; then B2, B4 and B7 in that order, each on a testing
+report of her own and merged as each ship is. The owner, 2026-10-30: "once we're through the boom
+workflow, I'd like to look to parallelizing the hull work for bringing the existing ships up to
+date, then moving on to Neufchatel, the bilander, and the 74." The first three are done (B1, d9477c6
+for the hulls, 65c56b8 for L2). The engine's last steps sit inside the rest: B3.4 before her first
+commit, so that her file takes it from that commit (the lead: right after B3.5 and before B3.3);
+B3.3 before the bilander's file reaches the branch; SW-1 before the 74. Bring the lead's head in at
+each boundary.
 
 **Why.** The form and its drawing are proved on the two hulls with the best sources (her own
 draughts, measured) before thirteen files depend on them, and a change the owner asks for on
