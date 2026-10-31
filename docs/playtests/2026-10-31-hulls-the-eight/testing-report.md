@@ -29,7 +29,7 @@ Sheet 01 has all ten at one scale, 05 under sail, 06 stretched so that only the 
 | Hull | Drawn from | Rung | How sure |
 |---|---|---|---|
 | Frigate-36 | Her class's own lines: ZAZ2587, the contract draught, and ZAZ2559, *Amazon*'s copy, with frames and inboard profiles | S | Six sheets at about 5.4 px to the foot: a clean line to 0.05-0.1 ft between sheets, ±0.3-0.4 ft where lines cross and at the ends. No sheet marks the load line, so WL1 is a judgement, ±0.15 ft. The lights and the figure are judged, plain shapes |
-| Brig, merchant brig | Her class's own lines, ZAZ4491 and ZAZ4492, with two sisters as checks | S | The best of the eight: scans of 100 px to the foot, ±0.05 ft. The load line is WL1, the faint ruled one, by the lead's ruling |
+| Brig, merchant brig | Her class's own lines, ZAZ4491 and ZAZ4492, with two sisters as checks | S | The best of the eight: scans of 100 px to the foot, ±0.05 ft. The load line is WL1, by the lead's ruling, with a faint ruled line just above it recorded |
 | Cutter | *Sherbourne*'s own draught, ZAZ6381, with ZAZ6382 and the as-built sheets | S | 15.6 px to the foot, 2-3 in. The load line is judged on measures. The as-built sheets are small previews |
 | Lugger | Above the water, *Éclair* taken off afloat, ZAZ6306. Below it, *Le Coureur* on ZAZ6170, her type, scaled | S above, S† below | Her rail, plan and stem are her own. No body plan of her exists, so the body is another lugger's, scaled by the beams: drawn 2.53 m deep against the file's 2.1 m. Her line at her sheet's length, 18.33 m, is a departure from the scaling rule, said in her note |
 | Smack | Chapman 1768, Pl. LIX No. 3, carried to her file's length and beam; Steel's coasting sloop kept as a check | S† | A type's plate, not her own lines. Her waterline, frames and stern are read off it in Swedish feet, as her note says |
@@ -101,11 +101,10 @@ Later, for your test when the lee ports come (L2): the cutter's sills at 1.00-1.
 - **"Sixteen ports a side"** stays in the brig's description; her sheet has ten. It waits for SW-4, because digests and the primer carry the words.
 - **The lugger's bowsprit** stays at 21.8 kN, where the rule's words give 37.4 kN. It waits for a tuning pass.
 - **Not reached:** the frigate's deck sheets, the cutter's manuscript CHN0105, the brig's contracts. Sharper scans of the 1280-px sheets would be a licence from Greenwich; the drawing does not need them.
-- **The trunk** has not been brought in again; that, and the final fast tier around it, come with the merge.
 
 ## Tests
 
-The whole fast tier before the last mends: 5,750 passed, 1 failed, 2 skipped, 44:38. The failure was the work's: a test that asked the merchant brig's hull to equal the brig's to the byte, which your two-roles ruling makes untrue in her two ports alone; it was mended, the difference pinned. After the mends: the mended files with the slow tests, 1,129 passed; the guard sets 9, 265, 146, 68 and 184 passed; the picture tests in a real browser, 2 passed, thresholds unmoved. **Three captain's trials fail on this machine with or without this work,** the known difference from the build machine, and their figures are in the tuning notes once. One truth's band moved, by the lead's ruling: the brig's lowest sill, from Steel's 1.22-1.52 m to her sheet's 1.555-1.585 m.
+**The whole fast tier on the final tree, merged with the trunk at f5be911: 5,877 passed, 2 skipped, none failed, 46:08.** Before the last mends it was 5,750 passed, 1 failed, 2 skipped, 44:38. The failure was the work's: a test that asked the merchant brig's hull to equal the brig's to the byte, which your two-roles ruling makes untrue in her two ports alone; it was mended, the difference pinned. After the mends: the mended files with the slow tests, 1,129 passed; the guard sets 9, 265, 146, 68 and 184 passed; the picture tests in a real browser, 2 passed, thresholds unmoved. **Three captain's trials fail on this machine with or without this work,** the known difference from the build machine, and their figures are in the tuning notes once. One truth's band moved, by the lead's ruling: the brig's lowest sill, from Steel's 1.22-1.52 m to her sheet's 1.555-1.585 m.
 
 ## The figures
 
