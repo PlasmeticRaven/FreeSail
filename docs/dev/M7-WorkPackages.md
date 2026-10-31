@@ -48,7 +48,7 @@ on these packages; that is the owner's choice.
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time |
-| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged; **B1, the *Indefatigable*, merged 2026-10-30** (below, "Package 75, B1, as merged"); the hull step measuring, its landing held |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged; **B1, the *Indefatigable*, merged 2026-10-30** (below, "Package 75, B1, as merged"); **the hull step, the eight on their own lines, merged 2026-10-31** (below); L2, L3 and the *Neufchatel* next |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
@@ -1641,6 +1641,66 @@ session's to bring to §5.0's rungs when Steel's Folio LVII is read, never by ha
 step 5 (the tow and the kedge's false denial; truth 7b-113's lugger clause to be put to the
 lead with the frigate clause's ruling), step 6 (the director's forms), step 7 (the stations
 and the readings' words; 87 after it).
+
+### Package 75, the hull step (the eight existing ships' own hulls), as merged (2026-10-31)
+
+Merged `--no-ff` from the ships session's `claude/pkg-75` at `d9477c6` (the six streams built
+and reviewed in their worktrees, the owner's word to build the rest too, the lead's ten
+rulings of 2026-10-31 taken, the eight landed as one commit `7dd68f2`, B5's bands and the
+turned guard `3cea266`, the record `3f48c41`, the trunk's `f5be911` merged by the session, the
+report's test line `d9477c6`; the merge a fast-forward in content, made `--no-ff`); ruff and
+the format check clean; the session's fast tier on the final tree 5,877 passed, 2 skipped,
+none failed (46 minutes), the touched files and the guard sets with `--slow`, the pictures in
+a real browser; the lead's checks: the generator reproduces all fifteen ship and boat files
+byte for byte on the landed tree, `freesail/`, the evolutions, the sail classes, the people
+and the captains' files untouched against the trunk, no consent file touched, no model
+identifier; **the whole fast tier here on the landed tree and the whole suite in the cloud
+dispatched at the push (run 27; its figures written here when it is in).**
+
+**What was built** (`docs/dev/TuningNotes.md` "The eight hulls"; `docs/design/Build-Ships.md`
+§5 to §7 and §15; the pages notes `pages-zaz2587.md`, `pages-zaz4491.md`, `pages-zaz6381.md`
+new and `pages-zaz6306.md`, `pages-chapman-pl59.md`, `pages-chapelle-fig17.md` extended; the
+owner's report and 27 sheets under `docs/playtests/2026-10-31-hulls-the-eight/`): each of the
+eight drawn from her own sheets at rung S (the frigate's class draught and *Amazon*'s copy;
+the brig's own lines with two sisters as checks; *Sherbourne*'s own draught for the cutter;
+the *Éclair* taken off afloat above the water with *Le Coureur*'s body below it, S†; Chapman's
+plate for the smack and Chapelle's *Lynx* for the schooners, S†, carried to the files' length
+and beam), by a module each under `tools/ships/` called from one place in the generator;
+nothing in `physics/` or `combat/` and nothing in the eight's behaviour (the check on a clean
+archive: every log line, order's answer, each tick's dynamics as exact floats, the rig every
+thirty ticks, the random streams' final states, the volleys and all ten polars identical; the
+loaded keys that differ are `hull.profile`, the port guns' `height_m` and `deck`, and words).
+The viewer's mends old beside new (the port band following the side within 2 mm, the head
+closed to the stem, the cutter's stem head square across, every boom's swing in the frame and
+its sheet to the taffrail, the painter's order of the closed body). **Truth 7-185**, which had
+no code, drafted in `tests/test_profiles.py` as §15 directs for Phase 5 to move, its bands
+first written there from each sheet and the brig's moved old beside new to the sheet's 5 ft 2
+in (1.555 to 1.585 m) with the source, the one pin the step moves. The one table of every
+figure the sheets disagree with (the brig's displacement −27% first, the frigate's +14% and
+her keel and masts, the cutter's and lugger's masts), recorded and not moved by principle 5;
+the port triples before L2 (the cutter's sills at 1.00 to 1.23 m and her lowest port shut at
+14.5° flagged for the owner's test when L2 comes; no port shut at the heels the game reaches
+today); the three captain's trials named once with their clean-archive figures (the owner's
+machine's digests differ from the build machine's with every state and tick the same).
+
+**The lead's rulings at the merge** (the notes to the ships session below): the eight points
+accepted as reported (7-185 written as a test for Phase 5; the marks as the fixer read
+principle 4, the rung letter each hull's best source; `RIGHTLY_WITHOUT` per part; the boats
+held apart, their drawing 82's; the lugger's 18.33 m by the re-read; the viewer's further
+small mends; `form.py`'s box under a counter booked for a later ship's builder); **the
+viewer step for the rig's lines approved** (the sheets', braces' and tacks' ends read from the
+drawn rail and stem head in place of the old datum and half-beam, the three level bowsprits
+rooted at the sheet's height: no file and no pin moved, pictures old beside new, before L2 or
+beside it; the owner's veto stands if they would rather see it later); **the Greenwich-held
+image already in the repository** (`docs/references/images/bilander-gwyn-c1780-nmm-pag3828.webp`,
+from before this step) put to the owner: the lead's pick is to take the file out of the tree
+with its catalogue reference and link left in the README in its place, unless the owner holds
+a licence for it; the ships session acts on the owner's word.
+
+**Next:** L2 (the lee ports' rule) and L3, then the *Prince de Neufchatel* with B3.4 first, the
+design-record commit at B2's window owed by the session; the later package on the files'
+figures against the sheets, the brig first; 81 (the guns in their ports) and 91 after 75's
+hulls, now that the eight stand on their own lines.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -4255,3 +4315,31 @@ trials named once with their clean-archive figures. The trunk is at `2d512b2` (8
 package 88 (the captain's pass: the captains' files, `captains.py`, `navigation.py`,
 `signalling.py`, the trials' pins) merges next and touches no ship file, so bring the trunk in
 once more before the landing's final fast tier or just after, as suits the worktrees.
+
+**2026-10-31, later: the hull step merged; the eight points and the viewer step ruled.** The
+landing at `d9477c6` is merged on the trunk (the record "Package 75, the hull step, as merged"
+above, with the whole suite's cloud run named there when it is in). The session's own fast
+tier and the lead's checks agree: the generator reproduces all fifteen files, nothing the
+physics reads moved, the clean-archive check is the proof of the eight's behaviour. **The
+eight points:** (1) 7-185 drafted in `tests/test_profiles.py` for Phase 5 to move, its bands
+old beside new with their sources: right. (2) The marks as the fixer read principle 4, the
+narrower set not wanted: a line takes the word of its weakest point, and the rung letter stays
+each hull's best source; §5.7's table says which is which. (3) `RIGHTLY_WITHOUT` per part,
+both ways round: right, a guard and not a loosening. (4) The boats held apart, their drawing
+82's: right; when Steel's Folio LVII is read the five come to §5.0's rungs through the
+generator and never by hand. (5) The lugger at 18.33 m by the re-read: hers; the lead's note
+quoted the first reading. (6) The viewer's further mends: accepted old beside new. (7)
+`form.py`'s `_station_xs` box under a counter: booked for a later ship's builder in the
+record. (8) The Greenwich-held image already in the repository, PAG3828 in
+`docs/references/images/`: put to the owner; the lead's pick is to take the file out of the
+tree, its catalogue number and link left in the README in its place, unless the owner holds a
+licence for it; act on the owner's word and not before. **The viewer step for the rig's
+lines: approved.** The sheets', braces' and tacks' ends read from the drawn rail and the stem
+head in place of the old datum and half the beam, and the three level bowsprits rooted at the
+sheet's height; no file and no pin moved, the pictures old beside new in the record, before L2
+or beside it as suits the worktrees; the owner may veto it when they answer, in which case it
+waits. The file figures (the frigate's boom through her taffrail, the masts off the sheets'
+places, the schooners' rake) wait for the later package, the brig's displacement first. **The
+order from here:** L2 and L3, then the *Neufchatel* with B3.4 first; the design-record commit
+at B2's window when the session reaches it. Bring the trunk in at each boundary; 82's step 5
+(the tow and the kedge) is building on its branch and touches no ship file.
