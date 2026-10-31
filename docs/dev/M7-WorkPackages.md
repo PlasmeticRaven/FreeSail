@@ -1815,7 +1815,10 @@ browser's driver the same. Mended in both (`Console._follow_log`, `Driver._follo
 listener moves to the followed hull's log after each line, each tick and each `follow`, so
 `go to the boat` and `come alongside` move it too), tests beside each
 (`tests/test_console.py`, `tests/test_server.py`); the console, server and observer suites
-green here; the whole suite in the cloud on the push. Found on the way, for the week's turn:
+green here; the whole suite in the cloud on the push (run 29 on `a7440f0`: lint green, 6,264
+passed over the six shards, 11 skipped, 10 expected failures, none failed, 41 minutes; the pace
+job, informative, 7 of 11, the same four truths under the floor as on runs 24 to 27 on a slow
+runner, the matter recorded under 88). Found on the way, for the week's turn:
 the player's own body goes aboard another ship only as a person sent in the boat (the
 captain's, from the prompt: `send the boat to the Raven with Captain Bowen`, after which
 `where am I` answers as a visitor's while the prompt and the readings stay his own ship's
