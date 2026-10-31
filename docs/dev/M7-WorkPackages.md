@@ -1489,7 +1489,18 @@ skipped, 10 expected failures (the station gale's lifted: 11 before), none faile
 minutes. **The pace job (informative) 7 of 11 on runs 24 and 25 alike,** the same four under
 truth 51's floor of 500 ticks a second (truth 51 at 496, the day under the systems 478, the
 gate's day with the region 454, 7-159's convoy at far detail 440; 10 of 10 on runs 20 to
-22 before this merge): a cost of the pass to be measured, below.**
+22 before this merge): a cost of the pass, measured on the lead's machine (four cores, load
+one, single runs of `tools/pace.py` on the tree before the merge and on the trunk after it):
+the frigate alone 488 to 518 and the dozen at far detail 439 to 475 (noise, no cost), the
+convoy of six and the privateer at far detail alone 482 to 414 (a seventh), the default cap
+268 to 263, a cap of twelve 265 to 239; the cost in the far captains' judgement under the
+pass, the station-keepers most (the danger-ahead reading of the chart on every judgement of
+every sailing far captain, and the square sails' states read for the recovery's flags each
+judgement, by the lead's reading). **A follow-up asked of the builder on `claude/pkg-88`,
+2026-10-31:** profile, mend with no change of behaviour (the chart read ahead only when the
+account puts land or a danger within reach; the sails' states only with no headway), every
+recorded figure again exactly, the pace truths old beside new; merged as 88's close, the
+cloud's pace job the proof.**
 
 **What was built** (the tuning notes "Package 88", items 1 to 4 in the owner's four parts,
 each with its switch and the bisection's table): **(1)** the rules captain recovers her when
