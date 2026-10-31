@@ -103,6 +103,9 @@ SIXTY_FOUR = "data/ships/sixty-four.yaml"  # package 75: the two files with a pr
 RAZEE = "data/ships/razee-44.yaml"
 PROFILED = [SIXTY_FOUR, RAZEE]
 EVERY_SHIP = sorted(f"data/ships/{p.name}" for p in (ROOT / "data" / "ships").glob("*.yaml"))
+# the ships' boats (package 82, item 4: `boat-*.yaml`, a lug on one mast, no bowsprit and
+# no gaff sail; her drawing is that package's last step)
+BOATS = [p for p in EVERY_SHIP if "/boat-" in p]
 NODE = shutil.which("node")
 needs_node = pytest.mark.skipif(NODE is None, reason="Node is not installed")
 
@@ -1245,7 +1248,9 @@ def test_the_bowsprit_stands_from_the_stem_head_its_length_up_to_its_ends_height
         assert heel[2] < hz  # her rail at the stem head stands below the stem head
 
 
-WITHOUT_PROFILE = [p for p in EVERY_SHIP if p not in PROFILED] + ["the 64 without her profile"]
+WITHOUT_PROFILE = [p for p in EVERY_SHIP if p not in PROFILED and p not in BOATS] + [
+    "the 64 without her profile"
+]
 
 
 @needs_node
@@ -4002,7 +4007,9 @@ def test_the_razees_spanker_stands_clear_of_the_taffrail_its_boom_clears(
 
 
 @needs_node
-@pytest.mark.parametrize("path", [p for p in EVERY_SHIP if p not in (LUGGER, *PROFILED)])
+@pytest.mark.parametrize(
+    "path", [p for p in EVERY_SHIP if p not in (LUGGER, *PROFILED) and p not in BOATS]
+)
 def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(tmp_path, path):
     """The razee's spanker alone is drawn laced along its boom (`gaffCutOn`, which asks for a
     profile). On the seven files with a gaff sail on a boom the set foot still sags under the boom

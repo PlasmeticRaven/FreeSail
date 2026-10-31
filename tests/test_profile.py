@@ -523,7 +523,9 @@ def test_the_hook_runs_the_four_ships_modules_after_the_eight_each_writing_its_o
     seen = ast.literal_eval(run.stdout.strip())
     committed = sorted(p.name for p in (ROOT / "data" / "ships").glob("*.yaml"))
     eight = sorted(set(committed) - {f for files in MODULE_FILES.values() for f in files})
-    assert len(eight) == 8
+    # the generator's own files: the eight ships and the five boats of the ships' lists
+    # (package 82, item 4: `boat-*.yaml`, written by `__main__` after the eight)
+    assert len(eight) == 13 and sum(1 for f in eight if f.startswith("boat-")) == 5
     assert [name for name, *_ in seen] == list(MODULE_FILES)
     assert seen[0][2] == eight
     for name, aliased, before, after in seen:

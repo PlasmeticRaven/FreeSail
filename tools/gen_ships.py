@@ -9395,6 +9395,10 @@ def boat(out_dir, pattern):
             (("posts", "coxswain"), None, "The coxswain who steers her and commands her crew."),
             (("stores", "water_tons"), 0.05, "A breaker of water (judgement)."),
             (("stores", "provisions_days"), 1, "A day's bread (judgement)."),
+            *ration_entries(
+                "her people are her ship's and eat as they do there, from her breaker and her "
+                "bread bag while they are in her (judgement)"
+            ),
         ]
     )
     # -- a grapnel ----------------------------------------------------------------------

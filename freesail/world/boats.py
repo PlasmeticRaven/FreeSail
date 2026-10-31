@@ -66,6 +66,9 @@ BOAT_WORDS = frozenset(
 # Within this of her ship (metres), the boat is alongside and may be hoisted in: a boat's
 # length and a little (judgement).
 ALONGSIDE_M = 25.0
+# A boat is hoisted out with the ship hove to or at anchor, not under way (the period's
+# practice; the bound a hove-to ship's forereach and drift, judgement): knots in m/s.
+HOIST_OUT_WAY_MS = 2.0 * 0.514444
 # Hoisted out, she lies this far off the ship's lee quarter (metres; judgement: a boat's
 # length clear of the side).
 HOIST_OUT_OFF_M = 15.0
@@ -167,6 +170,12 @@ def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple
         raise OrderError(
             f"{_cap(spec.name)} has no file of her own to be a vessel by: her errands are the "
             "script's ('send the boat ashore', 'send the boat to the <ship>')."
+        )
+    way = abs(float(getattr(ship_hull.ship.dyn, "u", 0.0) or 0.0))
+    if way > HOIST_OUT_WAY_MS:
+        raise OrderError(
+            f"She has {units.ms_to_knots(way):.1f} knots of way on her; heave to or come to an "
+            "anchor before the boat is hoisted out."
         )
     pos = getattr(ship_hull, "position", None)
     if pos is None:
