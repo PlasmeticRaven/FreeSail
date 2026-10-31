@@ -12873,3 +12873,84 @@ def test_truth_7_333_where_am_i_and_the_station_line_answer_the_hull_the_person_
     w.submit("go below")
     assert "in the cabin" in w.submit("where am i").text
     test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_it_far_off()
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 1 (the design's §3): the world with no ship of the player's
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.slow
+def test_truth_7_320_a_world_with_no_followed_hull_runs_a_day_with_the_centre_where_it_looks():
+    """A world with no followed hull (`ship: none`, `director: observe`) runs a day at
+    seed 7 with its business on and a director observing, the centre on the observer's
+    view and then on the hull the observer follows (the Medusa from eight in the
+    evening, woken under the cap as the followed hull); nothing pinned moved (the fast
+    tier and the known truths' slow tier, before and after: docs/dev/TuningNotes.md,
+    package 82, step 2)."""
+    from tests.test_observer import (
+        test_a_day_observed_runs_with_the_business_on_and_the_centre_where_the_observer_looks,
+    )
+
+    test_a_day_observed_runs_with_the_business_on_and_the_centre_where_the_observer_looks()
+
+
+def test_truth_7_321_the_observers_readings_and_orders_say_no_ship_followed_and_follow_moves_it():
+    """The observer's readings answer "no ship followed" in words, the ship's orders are
+    refused in words, the world orders stand, `follow "X"` moves the centre and the cap
+    wakes her, `follow nobody` gives the view back (and `look at` moves it)."""
+    from tests.test_observer import (
+        test_follow_moves_the_centre_and_the_cap_wakes_her_and_follow_nobody_gives_the_view_back,
+        test_look_at_moves_the_view_and_a_save_replays_with_the_view_and_the_followed_hull,
+        test_the_observers_readings_answer_no_ship_followed_and_the_ships_orders_are_refused,
+    )
+
+    test_the_observers_readings_answer_no_ship_followed_and_the_ships_orders_are_refused()
+    test_follow_moves_the_centre_and_the_cap_wakes_her_and_follow_nobody_gives_the_view_back()
+    test_look_at_moves_the_view_and_a_save_replays_with_the_view_and_the_followed_hull()
+
+
+@pytest.mark.pace
+def test_truth_7_334_the_observers_world_costs_no_more_than_the_same_world_with_a_frigate_in_it():
+    """The pace (informative): the observer's world at truth 51's form on the build
+    machine (a thousand ticks to settle, the best of three thousands) against the frigate
+    alone on the station trial and against the same observed Channel with the frigate
+    given on the command line at the view (the player's, the world hers), the figures
+    recorded in docs/dev/TuningNotes.md (package 82, step 2). The observer's hull is a
+    point ship's and costs about a tenth of the frigate's tick (the design's §3: 6,448
+    ticks a second for a point-ship world with three brains, against 687 for the frigate
+    alone); what the observed Channel costs beyond that is its business's brains reading
+    the chart, which a frigate at the view pays as well. Asserted: the observed world is
+    not slower than the same world with the frigate in it."""
+    import time
+
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    def best_of_three(world) -> float:
+        world.run(1000)
+        best = 0.0
+        for _ in range(3):
+            t0 = time.perf_counter()
+            world.run(1000)
+            best = max(best, 1000 / (time.perf_counter() - t0))
+        return best
+
+    sf = load_scenario("data/scenarios/trials/trial-station-stranger.yaml")
+    frigate = make_scenario_world(sf)
+    begin(frigate, sf)
+    alone = best_of_three(frigate)
+    sf2 = load_scenario("data/scenarios/the-channel-observed.yaml")
+    observed = make_scenario_world(sf2)
+    begin(observed, sf2)
+    assert observed.is_observer and observed.followed is None
+    view = best_of_three(observed)
+    with_frigate = make_scenario_world(sf2, ship="data/ships/frigate-36.yaml")
+    begin(with_frigate, sf2)
+    assert not with_frigate.observed
+    with_frigate.submit("set plain sail")
+    hers = best_of_three(with_frigate)
+    print(
+        f"the frigate alone {alone:.0f} ticks a second; the Channel observed {view:.0f}; "
+        f"the same Channel with the frigate at the view {hers:.0f}"
+    )
+    assert view >= hers, f"the observer's world {view:.0f} against the frigate's {hers:.0f}"

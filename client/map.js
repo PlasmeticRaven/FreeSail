@@ -802,7 +802,7 @@
       this.lastTick = tick;
       return;
     }
-    if (tick !== this.lastTick) this.track.push({ tick: tick, x: snap.ship.x, y: snap.ship.y });
+    if (tick !== this.lastTick && !snap.observer) this.track.push({ tick: tick, x: snap.ship.x, y: snap.ship.y });
     this.lastTick = tick;
     var cutoff = tick - TRACK_SECONDS;
     while (this.track.length > 1 && this.track[0].tick < cutoff) this.track.shift();
@@ -1278,11 +1278,20 @@
     this.drawMarks(ctx, snap, frame, toPx, scale, inkColour);
 
     // the hull symbol: a small pointed shape, bow toward the heading, at the reckoned
-    // position on the chart
+    // position on the chart; none in a world with no ship followed (package 82: the
+    // observer's view is a point on the chart, drawn as a small ring)
     var s = toPx(s0[0], s0[1]);
     var size = Math.max(10, Math.min(18, 30 * scale));
     ctx.save();
     ctx.translate(s[0], s[1]);
+    if (snap.observer) {
+      ctx.strokeStyle = inkColour;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    } else {
     ctx.rotate(ship.heading);
     ctx.fillStyle = inkColour;
     ctx.beginPath();
@@ -1300,6 +1309,7 @@
     ctx.lineTo(0, -size * 2.2);
     ctx.stroke();
     ctx.restore();
+    }
 
     // north
     ctx.fillStyle = inkColour;

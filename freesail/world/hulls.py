@@ -44,7 +44,15 @@ from typing import Any
 
 from freesail import units
 
-__all__ = ["PER_SHIP_FIELDS", "SHARED_FIELDS", "Hull", "delegated", "lift_old_state", "own_id"]
+__all__ = [
+    "PER_SHIP_FIELDS",
+    "SHARED_FIELDS",
+    "Hull",
+    "delegated",
+    "is_observer",
+    "lift_old_state",
+    "own_id",
+]
 
 _MISSING = object()
 
@@ -280,7 +288,8 @@ class Hull:
         the World's own would read the current hull; None for the followed hull herself, as a
         World has no parent."""
         world = self.world
-        followed = world.hulls.get(world.followed)
+        # the followed hull, or the World's own (the observer's, package 82) with none
+        followed = world.hulls.get(world.followed) or world.__dict__["_own"]
         return None if followed is self else followed
 
     @property
@@ -293,9 +302,17 @@ class Hull:
         self.awake = str(value) == "full"
 
     @property
+    def is_observer(self) -> bool:
+        """Whether this is the observer's hull, the hull of no ship an observed world keeps
+        as its own (package 82, item 1; `is_observer` below)."""
+        return is_observer(self)
+
+    @property
     def is_followed(self) -> bool:
-        """Whether this is the World's followed hull (the player's ship until step 7)."""
-        return self.world.hulls.get(self.world.followed) is self
+        """Whether this is the World's followed hull (the player's ship until step 7; the
+        World's own, the observer's, with none followed since package 82)."""
+        world = self.world
+        return (world.hulls.get(world.followed) or world.__dict__["_own"]) is self
 
     # -- her own, read from her state -------------------------------------------------
 
@@ -416,3 +433,12 @@ def lift_old_state(world: Any, state: dict[str, Any]) -> dict[str, Any]:
             hull.__dict__[name] = state.pop(name)
     state["_own"] = hull
     return state
+
+
+def is_observer(hull: Any) -> bool:
+    """Whether a hull (or a World read at its current hull) is the observer's: the hull of
+    no ship an observed world keeps as its own (package 82, item 1; `Scenario.observed`).
+    Read from her scenario, which is the game's for the World's own hull and a copy with
+    the flag off for every other (`crews._crew_scenario`)."""
+    scenario = getattr(hull, "scenario", None)
+    return bool(getattr(scenario, "observed", False))

@@ -108,6 +108,10 @@ __all__ = [
 # A lookout with no masthead to climb (the point ship of the early milestones) looks
 # from thirty metres, a frigate's topmast head; judgement.
 DEFAULT_HEIGHT_OF_EYE_M = 30.0
+# The observer's view (package 82, item 1; the design's §3): a world with no ship of the
+# player's looks from its view as a boat's crew would, a man standing in a boat; what passes
+# within sight of the view is in its log, and the far sail is read by her own height.
+OBSERVER_HEIGHT_OF_EYE_M = 2.0
 
 # A feature lost and found again within this many minutes is not hailed again
 # (judgement: a headland flickering at the edge of the haze is not a line a minute).
@@ -423,6 +427,8 @@ class Lookout:
         conditions = getattr(world, "conditions", None)
         visibility_nm = conditions.visibility_nm if conditions is not None else None
         self.height_of_eye_m = height_of_eye(world.ship)
+        if getattr(world, "is_observer", False):
+            self.height_of_eye_m = OBSERVER_HEIGHT_OF_EYE_M  # package 82, item 1
         daylight = world.daylight
         lines: list[tuple[Severity, str, str, dict[str, Any]]] = []
         self.moonlit = False

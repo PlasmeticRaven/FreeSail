@@ -16,10 +16,14 @@ the captain's first orders:
     chart: atlantic-east             # a chart of the manifest's `charts:` outright, or a
                                      # region's name as a chart of that one region (package
                                      # 38's reading, which only a test should want)
-    ship:
-      file: data/ships/frigate-36.yaml
-      heading_deg: 180
-      speed_kn: 0                    # optional, and x_m, y_m
+    ship:                            # or `ship: none` (package 82): a world with no ship of
+      file: data/ships/frigate-36.yaml   # the player's, observed from a view on the chart
+      heading_deg: 180               # (the position above), the business and the other
+      speed_kn: 0                    # ships running under their captains; the drivers open
+                                     # at the director's station, `follow "<ship>"` moves
+                                     # the view to her hull and `look at <where>` moves it;
+                                     # no standing_orders, intent, orders nor a station of
+                                     # the ship's; optional, and x_m, y_m
       glass: true                    # she carries a barometer (spec M5 §5; rare in a small vessel)
       chronometer:                   # the captain's own (spec M5 §14, package 33b); none by default
         {maker: Earnshaw, rated: 1805-05-01, rate_s_per_day: 1.8, drift: seeded}
@@ -69,7 +73,10 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
                                      # keeps her lying to (2026-10-27)
     world_orders:                    # orders to the world by time (§26; freesail.world.orders)
       - {at: 1805-06-12T14:00, order: 'message: at Brest from the Prefect maritime: "..."'}
-    director:                        # the director (spec M6 §23; M7b §4, package 50)
+    director:                        # the director (spec M6 §23; M7b §4, package 50); or
+                                     # `director: observe` (package 82): the world observed
+                                     # with no ship of the player's (`ship: none` implied),
+                                     # the player at the director's station
       brief: quiet-passage           # the player's brief: a starter's name (data/director/
                                      # briefs/), a file, or the mapping itself; the station
                                      # is bound on the World when the game is made
@@ -107,7 +114,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -169,7 +176,13 @@ class ScenarioFile:
             where = format_position(Position.from_dict(self.scenario.position))
             name = self.scenario.chart or self.scenario.region
             chart = f", on the chart of {name}" if name else ""
-            out.append(f"She starts at {where}{chart}.")
+            if self.scenario.observed:
+                out.append(
+                    f"No ship of the player's: the world is observed from {where}{chart} "
+                    "('follow \"<ship>\"' moves the view to her, 'look at <where>' moves it)."
+                )
+            else:
+                out.append(f"She starts at {where}{chart}.")
         if self.script is not None:
             out += ["The weather: " + self.script.lines()[0]]
             out += ["  " + ln for ln in self.script.lines()[1:]]
@@ -323,6 +336,46 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             f"(49 52 N 6 10 W)."
         )
     ship = raw.get("ship") or {}
+    # Package 82 (item 1): `ship: none`, a world with no ship of the player's, observed from
+    # a view on the chart; `director: observe` implies it. Nothing of the ship's then: no
+    # book, no intent, no first orders, no station of hers for the player.
+    observed = False
+    if isinstance(ship, str):
+        if " ".join(ship.lower().split()) not in ("none", "no ship", "nobody"):
+            raise ScenarioError(
+                f"{where}, ship: a mapping (file, heading_deg, ...) or 'none' for a world "
+                f"with no ship of the player's, not {ship!r}."
+            )
+        ship, observed = {}, True
+    grant_raw = raw.get("director")
+    if isinstance(grant_raw, str):
+        if " ".join(grant_raw.lower().split()) != "observe":
+            raise ScenarioError(
+                f"{where}, director: a mapping of models, seats, seats_in_voyage, or "
+                f"'observe' for a world with no ship of the player's, not {grant_raw!r}."
+            )
+        observed = True
+    elif isinstance(grant_raw, dict) and grant_raw.get("observe"):
+        observed = True
+    sc.observed = observed
+    if observed:
+        if ship.get("file"):
+            raise ScenarioError(
+                f"{where}: an observed world ('director: observe') has no ship of the "
+                "player's; take `ship.file` out or the director's 'observe'."
+            )
+        for key in ("standing_orders", "intent", "orders"):
+            if raw.get(key):
+                raise ScenarioError(
+                    f"{where}, {key}: a world with no ship of the player's ('ship: none') "
+                    "carries no standing orders, intent or first orders (there is no ship "
+                    "to give them to); give her ships their intents under `ships:`."
+                )
+        if sc.position is None:
+            raise ScenarioError(
+                f"{where}: a world with no ship of the player's ('ship: none') needs a "
+                "position for the observer's view (49 52 N 6 10 W)."
+            )
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))
     # the fit of guns she carries (spec M7 §7; package 70): a name of her file's fits, or
@@ -669,6 +722,8 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     # Package 43 (spec M6 §23): the owner's grant to the director
     if raw.get("director") is not None:
         grant = raw["director"]
+        if isinstance(grant, str):
+            grant = {"observe": True}  # `director: observe` (package 82), read above
         if not isinstance(grant, dict):
             raise ScenarioError(f"{where}, director: a mapping of models, seats, seats_in_voyage.")
         try:
@@ -677,6 +732,8 @@ def load_scenario(path: str | Path) -> ScenarioFile:
                 "seats": int(grant.get("seats", 1) or 0),
                 "seats_in_voyage": int(grant.get("seats_in_voyage", grant.get("seats", 1)) or 0),
             }
+            if grant.get("observe"):
+                sc.director["observe"] = True
         except (TypeError, ValueError):
             raise ScenarioError(
                 f"{where}, director: seats and seats_in_voyage are numbers."
@@ -692,7 +749,7 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             except (ValueError, OSError) as e:
                 raise ScenarioError(f"{where}, director.brief: {e}") from None
             sc.director["brief"] = brief.to_dict()
-    return ScenarioFile(
+    sf = ScenarioFile(
         path=str(path),
         scenario=sc,
         seed=int(seed) if seed is not None else None,
@@ -701,6 +758,14 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         orders=[str(x) for x in raw.get("orders") or []],
         stations=_stations(raw.get("stations"), where),
     )
+    if sf.scenario.observed:
+        for name in sf.stations:
+            if name != "director":
+                raise ScenarioError(
+                    f"{where}, stations: a world with no ship of the player's ('ship: none') "
+                    f"has no {name}'s station to hold; the director's alone."
+                )
+    return sf
 
 
 # Who may hold a station in a scenario file (package 59): the player's seat, a model's
@@ -744,7 +809,12 @@ def make_scenario_world(sf: ScenarioFile, seed: int | None = None, ship: str | N
     use_seed = seed if seed is not None else sf.seed if sf.seed is not None else DEFAULT_SEED
     ship_file = ship or sf.ship_file
     if ship_file:
-        return make_world(use_seed, ship_file, sf.scenario)
+        sc = sf.scenario
+        if sc.observed:
+            # a ship given on the command line to an observed file (package 82): hers is
+            # the world then, the player's, and nothing is observed
+            sc = replace(sc, observed=False)
+        return make_world(use_seed, ship_file, sc)
     return World(seed=use_seed, scenario=sf.scenario)
 
 

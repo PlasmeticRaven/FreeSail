@@ -221,6 +221,47 @@ class Reading:
         return self.absent is not None
 
 
+# The rows that are the world's and not a ship's (package 82, item 1): what an observer at
+# a view on the chart may read with no hull followed (the wind and the sky and the sea at the
+# view, the day and the hour, what a lookout of the view's sees, the war). Every other row
+# answers None at the observer's hull, in the words NO_SHIP_FOLLOWED_WORDS.
+WORLD_ROWS: frozenset[str] = frozenset(
+    {
+        "true_wind_speed",
+        "true_wind_from",
+        "mean_true_wind_speed",
+        "mean_true_wind_from",
+        "true_wind_against_mean",
+        "watch",
+        "time",
+        "date",
+        "daylight",
+        "sky",
+        "weather",
+        "visibility",
+        "sea",
+        "in_sight",
+        "land",
+        "nearest_land",
+        "dangers",
+        "sail_in_sight",
+        "stranger_in_sight",
+        "strangers",
+        "moon",
+        "war",
+        "pace",
+    }
+)
+NO_SHIP_FOLLOWED_WORDS = "no ship followed"
+
+
+def _observers(world: Any) -> bool:
+    """Whether the readings are read at the observer's hull (package 82, item 1)."""
+    from freesail.world.hulls import is_observer
+
+    return is_observer(world)
+
+
 class Registry:
     """The rows in registration order, looked up by id or by their words."""
 
@@ -305,6 +346,9 @@ class ReadingsView:
         if key not in self._cache:
             row = self._registry.get(id)
             if row.getter is None:
+                self._cache[key] = None
+            elif id not in WORLD_ROWS and _observers(self._world):
+                # the observer's hull (package 82, item 1): no ship to read it of
                 self._cache[key] = None
             elif row.per_asker:
                 return row.getter(self._world, param)  # the asker's, never cached
@@ -3523,10 +3567,13 @@ def reading_words(reading: Reading, value: Any, world: Any = None) -> str:
     """A reading's value in words for an agent: `describe_value`, or, for a value of
     None the reading gives on purpose, its own words (the course and the leeway with no
     way on: `NO_WAY_WORDS`)."""
-    if value is None and reading.none_words is not None and world is not None:
-        words = reading.none_words(world)
-        if words:
-            return words
+    if value is None and world is not None:
+        if reading.id not in WORLD_ROWS and _observers(world):
+            return NO_SHIP_FOLLOWED_WORDS  # package 82, item 1
+        if reading.none_words is not None:
+            words = reading.none_words(world)
+            if words:
+                return words
     return describe_value(reading, value)
 
 
@@ -3896,40 +3943,50 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
     here = getattr(world, "position", None)
     ships: list[dict[str, Any]] = []
     ship = world.ship
-    own: dict[str, Any] = {
-        "name": getattr(ship, "name", "the ship"),
-        "position": format_position(here) if here is not None else "on the plane",
-        "heading": units.format_heading(float(ship.heading)),
-        "speed": f"{_knots_of(world):.1f} knots",
-    }
-    if hasattr(ship, "sails"):
-        from freesail.api.queries import sail_set_line
+    if _observers(world):
+        # the observer's world with no hull followed (package 82, item 1): the view in
+        # place of the player's ship, and every vessel on the sea as it is
+        own: dict[str, Any] = {
+            "name": "no ship followed",
+            "position": format_position(here) if here is not None else "on the plane",
+            "state": "the observer's view; follow a ship by her name to read her as the own",
+        }
+        purse = hold = None
+    else:
+        own = {
+            "name": getattr(ship, "name", "the ship"),
+            "position": format_position(here) if here is not None else "on the plane",
+            "heading": units.format_heading(float(ship.heading)),
+            "speed": f"{_knots_of(world):.1f} knots",
+        }
+        if hasattr(ship, "sails"):
+            from freesail.api.queries import sail_set_line
 
-        own["sail"] = sail_set_line(ship).removeprefix("Sail set: ")
-    own["state"] = _own_state_truth(world)
-    # what lies on her course within the next glass, by the truth (package 58a; the
-    # owner's ruling of 2026-10-23: the director's `ahead` is the truth's)
-    try:
-        dyn = getattr(ship, "dyn", None)
-        speed_ms = float(dyn.speed) if dyn is not None else float(getattr(ship, "speed", 0.0))
-        ahead = ahead_words(world, here, float(ship.heading), speed_ms, by="by the truth")
-    except Exception:  # noqa: BLE001  (never a truth lost to the line ahead)
-        ahead = None
-    if ahead is not None:
-        own["ahead"] = ahead["words"]
-    cap = getattr(world, "captain", None)
-    if cap is not None:
-        own["captain"] = cap.words() if hasattr(cap, "words") else str(cap.state)
-    # the player's purse and cargo (package 52; the open item of 50, the owner's goal of
-    # 2026-10-17, spec §21g): what he has to trade with and what is in his hold
-    purse = getattr(world, "purse", None)
-    if purse is not None:
-        own["purse"] = purse.words()
-    hold = getattr(world, "hold", None)
-    if hold is not None:
-        own["cargo"] = hold.words()
-    own.update(_truth_action(world))  # package 70: her guns and her damage
-    own.update(_truth_signals(world.ship, str(own.get("nation") or ""), world))  # package 71
+            own["sail"] = sail_set_line(ship).removeprefix("Sail set: ")
+        own["state"] = _own_state_truth(world)
+        # what lies on her course within the next glass, by the truth (package 58a; the
+        # owner's ruling of 2026-10-23: the director's `ahead` is the truth's)
+        try:
+            dyn = getattr(ship, "dyn", None)
+            speed_ms = float(dyn.speed) if dyn is not None else float(getattr(ship, "speed", 0.0))
+            ahead = ahead_words(world, here, float(ship.heading), speed_ms, by="by the truth")
+        except Exception:  # noqa: BLE001  (never a truth lost to the line ahead)
+            ahead = None
+        if ahead is not None:
+            own["ahead"] = ahead["words"]
+        cap = getattr(world, "captain", None)
+        if cap is not None:
+            own["captain"] = cap.words() if hasattr(cap, "words") else str(cap.state)
+        # the player's purse and cargo (package 52; the open item of 50, the owner's goal of
+        # 2026-10-17, spec §21g): what he has to trade with and what is in his hold
+        purse = getattr(world, "purse", None)
+        if purse is not None:
+            own["purse"] = purse.words()
+        hold = getattr(world, "hold", None)
+        if hold is not None:
+            own["cargo"] = hold.words()
+        own.update(_truth_action(world))  # package 70: her guns and her damage
+        own.update(_truth_signals(world.ship, str(own.get("nation") or ""), world))  # package 71
     ships.append(own)
     vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
     beyond = 0
@@ -3961,7 +4018,8 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             d["goal"] = v.goal  # a ship sailing by her intent shows the intent (68)
         if here is not None:
             bearing, distance = bearing_and_distance(here, v.position)  # degrees true
-            d["from_the_ship"] = (
+            # from the player's ship, or from the observer's view (package 82, item 1)
+            d["from_the_view" if _observers(world) else "from_the_ship"] = (
                 f"bearing {units.format_heading(units.deg_to_rad(bearing))}, "
                 f"{distance / units.NAUTICAL_MILE:.1f} miles"
             )
@@ -4030,7 +4088,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             ),
         }
     people: dict[str, list[str]] = {}
-    own_people = getattr(world, "people", None)
+    own_people = None if _observers(world) else getattr(world, "people", None)
     if own_people is not None:
         try:
             people[own["name"]] = own_people.describe()
@@ -4346,13 +4404,18 @@ def _truth_words(d: dict[str, Any]) -> str:
         if s.get("what"):
             bits.append(s["what"])
         bits.append(f"at {s['position']}")
-        bits.append(f"heading {s['heading']}, {s['speed']}")
+        if s.get("heading") is not None:
+            bits.append(f"heading {s['heading']}, {s['speed']}")
+        elif s.get("state"):
+            bits.append(s["state"])  # the observer's view (package 82, item 1)
         if s.get("sail"):
             bits.append(f"sail: {s['sail']}")
         if s.get("purse"):
             bits.append(f"the purse {s['purse']}, the hold {s.get('cargo', '')}")
         if s.get("from_the_ship"):
             bits.append(f"from the ship {s['from_the_ship']}")
+        if s.get("from_the_view"):
+            bits.append(f"from the view {s['from_the_view']}")  # package 82, item 1
         if s.get("intent"):
             bits.append(f"intent {s['intent']} ({s.get('state', '')})")
         elif s.get("goal"):

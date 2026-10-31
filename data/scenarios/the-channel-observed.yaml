@@ -1,0 +1,50 @@
+# FreeSail: the Channel observed (spec M7 §11 as built; package 82, item 1). A world with
+# no ship of the player's: the western Channel on a June morning of 1805, seen from a view
+# off the Lizard, the business of the Channel running (the trade, the fishermen, the
+# cruisers) and three ships under their own captains, a French brig-sloop running home to
+# Brest past a King's frigate keeping her station off the Deadman, and a Falmouth brig
+# trading up to Plymouth. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/the-channel-observed.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/the-channel-observed.yaml
+#
+# The drivers open at the director's station (`director: observe`): a bare world order is
+# the director's, `the truth` reads every ship, `follow "Medusa"` moves the view to her hull
+# and her log, her readings and her chart are the drivers' (she is woken under the cap as
+# the followed hull), `follow nobody` gives the view back, `look at 49 50 N 5 30 W` (or
+# `look at the Lizard`) moves it. An order of the ship's at the view is refused in words
+# ("No ship followed"), and the readings of a ship answer the same; the wind, the sky, the
+# sea and the sail in sight are the view's. A ship given on the command line
+# (`--scenario ... data/ships/frigate-36.yaml`) is the player's and the world is hers.
+#
+# The weather is pinned (a westerly of fourteen knots, the sky clear), so that the day at
+# seed 7 is the same on every machine; truths 7-320, 7-321 and 7-334 run it
+# (tests/test_observer.py, tests/test_known_truths.py), and the figures are in
+# docs/dev/TuningNotes.md (package 82).
+
+name: The Channel observed
+seed: 7
+start: 1805-06-12T04:00
+position: {lat_deg: 49.70, lon_deg: -5.20}   # the view, three leagues south of the Lizard
+region: channel-west
+nation: britain
+ship: none
+director: observe
+business: on
+wind:
+  from_deg: 270
+  knots: 14
+  gustiness: 0.0
+  variability: 0.0
+
+ports: [falmouth, plymouth, brest]
+
+ships:
+  - {id: harpy, description: brig-sloop, name: Harpy, nation: france,
+     position: 49 20 N 5 40 W, goal: "bound for Brest", intent: "run home to Brest",
+     colours: shown}
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 55 N 5 05 W, goal: "bound for Plymouth",
+     intent: "trade tin from Falmouth to Plymouth", colours: shown}
+  - {id: medusa, description: frigate, name: Medusa, nation: britain,
+     position: 50 05 N 4 50 W, goal: "patrolling off the Deadman within 8 miles",
+     intent: "keep the station off the Deadman within 8 miles", colours: shown}

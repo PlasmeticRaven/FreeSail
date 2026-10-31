@@ -15626,3 +15626,139 @@ tier of the touched files and the known truths (`tests/test_between_hulls.py`, `
 `test_known_truths`; `--slow -m "not pace" -n 4`), 1,752 passed, 7 expected failures (the
 rulings'), none failed (45:16); ruff clean. No pace test is touched by the step; they run
 last, with item 7.
+
+### Step 2: the world with no followed hull (the re-brief's item 1; the design's §3)
+
+**What was built.** `ship: none` in a scenario file (or `director: observe`, which implies
+it; the mapping form `director: {observe: true, ...}` beside a grant) builds a World whose
+own hull is **the observer's**: a hull of no ship, a `PointShip` at the scenario's position
+kept as `hulls[PLAYER_ID]` so that every id rule of 84's stands, with `Scenario.observed`
+true (saved, so a replay builds the same) and `World.followed` **None** until `follow
+"<ship>"` names a hull. The loader refuses in words what such a world cannot carry: a
+`ship.file` with `director: observe`, `standing_orders:`, `intent:`, `orders:`, any station
+of the ship's for the player under `stations:`, and a position missing; a ship given on the
+command line to an observed file is the player's and the world is hers (`make_scenario_world`
+clears the flag on a copy). One rule carried through: `hulls.is_observer(hull)` reads her
+scenario's flag, which a crew's copy has off (`crews._crew_scenario`), so `World.observed`
+(the own hull's) and `World.is_observer` (the current hull's) and `Hull.is_observer` are one
+read. What the observer's hull does and does not do, as the design's §3 has it:
+
+- **No vessel of hers on the sea**: `Vessels.player_shadow` returns None for an observed
+  world (the far brains see no ship of the player's); the sea has no "the ship" in it.
+- **Her orders refused in words**: `World._submit_awake` raises the stub's `OrderError`
+  with `NO_SHIP_FOLLOWED` ("No ship followed: follow one ('follow \"Palinure\"') or give
+  the world an order ('world: ...')") before any order reaches the point ship, so the
+  refusal is journaled and replayed as every refusal is; `where am I` is refused with the
+  rest (there is nobody at her prompt but the director).
+- **The readings of a ship answer "no ship followed"**: `readings.WORLD_ROWS` names the
+  rows that are the world's (the true and the mean wind, the watch, the time, the date,
+  daylight, the sky, the weather, the visibility, the sea, what is in sight, the land, the
+  nearest land, the dangers, the sail and the strangers in sight, the moon, the war, the
+  pace); every other row gives None at the observer's hull (`ReadingsView.value`) and
+  `reading_words` says `NO_SHIP_FOLLOWED_WORDS` for it, over any row's own `none_words`.
+- **The world orders stand**: the ports', the weather's, the messages', a ship's by her
+  name; `aboard:` with no hull named is refused ("No ship followed: name her ('aboard the
+  Harpy: ...') or follow one"), `captain:` is refused (the followed ship's rules captain's;
+  "give her captain an intent by name"), and the player's ship by 'the ship' or 'us' in any
+  world order is refused ("No ship of the player's: this world is observed"), in
+  `hull_named` and in the hand's `_hand_reach`.
+- **The centre**: `World.position` is the observer's point, moved by `look at <position or
+  feature of the chart>` (`World.look_at`, a driver's line `driver.look_at` journaled in
+  `inputs` and replayed by `core.replay`), never by the tide's stream nor the scenario's
+  set (`_tick_geo` stands still for her); `follow "X"` moves the centre to her hull (made
+  in the far shape beyond the view's range, woken at the switch's next minute as the
+  followed hull, left out of the cap's count as the player's hull is since 84's step 10);
+  `follow nobody` (`none`, `no ship`, `unfollow`, `the view`) gives the view back, a
+  driver's line with `ship: None`; `look at` while a hull is followed is refused ("the view
+  is the Medusa's while she is followed: 'follow nobody' first"); in a world with a ship,
+  `look at` is refused ("The view is the ship's") and `follow nobody` as 84 refused it ("No
+  ship named ...").
+- **The lookout of the view** looks from a boat's height of eye (`lookout.
+  OBSERVER_HEIGHT_OF_EYE_M`, 2 m; the design's "what a boat would see"), so the observer's
+  log says what passes within sight of the view; the far sail is read by her own height.
+- **The drivers open at the director's station** when the world is observed and no seat
+  is named (`console.player_seat_for`, one function for both doors; `--seat captain` is
+  still the captain's prompt and no seat); the console's `state` opens with
+  `World.followed_line` ("No ship followed: the observer's view at 49° 42' N, 5° 12' W." or
+  "Following the Medusa."), `look at WHERE` is a console command and a `look_at` action of
+  the browser's driver; the snapshot carries `observer: true`, its `ship` block named "no
+  ship followed", its `reckoning` block the view's own place (the truth, no ellipse, no
+  track) so that the chart is drawn about the view; the page draws a small ring at the
+  view in place of the hull symbol and no track, and its name line says "no ship followed
+  (the observer's view)". The browser's `state()["followed"]["id"]` is None with none
+  followed (it was "").
+- **The director** is bound on the observer's hull as on the player's; `the truth` opens
+  with the view ("no ship followed; at ...; the observer's view; follow a ship by her name to
+  read her as the own") and gives every ship "from the view bearing ..." in place of "from
+  the ship"; the far tick's sky for a sleeping hull is the followed hull's or, with none,
+  the observer's (`far_tick` read `hulls[followed]` and had None).
+- **The pace rule** reads `open_samples`, which walks the hulls; the observer's has the
+  director's station alone; the cap's count leaves her out as it leaves the player's out.
+
+**What the World's construction assumed of a ship, found on the way.** (1) The far tick's
+`world.hulls[world.followed]` for a sleeping hull's sky (KeyError None). (2) `tick_crews`
+ticked the player's own hull as another hull while a hull was followed, through her shadow
+vessel's `crew`; the observer's has no shadow, so she is not ticked by it, and her captain
+(a `Captain` of a point ship with no intent, who judges nothing) never loads a book. (3)
+The console's reckoning lines read the uncertainty row with no account (`reckoning_lines`
+gives nothing at the view). (4) The director's truth read the own ship's heading and purse
+(`director_readings` has the view's block in their place). (5) The frigate's goal in the
+scenario file had to be one a far captain knows ("patrolling off the Deadman within 8
+miles"; "on her station" is not). (6) `World.parent` and `Hull.parent` (the followed hull's
+façade for the shared code in another hull's tick) and `Hull.is_followed` read
+`hulls.get(followed)` and had None with no hull followed, so the business's first demotion
+of the day (`write_damage`, `crew.parent.clock`) fell over at the observed day's ninth
+hour; each reads the World's own hull in its place. The scenario's `business: on` with the
+pinned wind draws the Channel's trade at seed 7 the same on every machine.
+
+**What moved: nothing pinned.** No recorded scenario has `ship: none`; every World with a
+ship keeps the player's hull as its own with `followed` her id, and `is_observer` is false
+on every hull of it, so each path above is the old path. The proof is the suites below.
+
+**The scenario:** `data/scenarios/the-channel-observed.yaml`, the Channel on 12 June 1805
+from a view three leagues south of the Lizard, the business on, a French brig-sloop running
+home to Brest, a Falmouth brig trading to Plymouth and a King's frigate keeping the station
+off the Deadman, the wind pinned (W 14 knots). `tools/pace.py observer` measures it with no
+hull followed and following the frigate.
+
+**The cost, measured** (truth 51's form, a thousand ticks to settle and the best of three
+thousands, this container with the load under one, `tools/pace.py observer` and truth
+7-334):
+
+| the world | ticks a second |
+|---|---|
+| the frigate alone on the station trial (`tools/pace.py alone`) | 668 |
+| the Channel observed, no ship followed (three ships under brains, the business on, nothing awake under the cap) | 444 |
+| the same Channel with the frigate given on the command line at the view (the player's, the world hers) | 271 |
+| the Channel observed, following the Medusa (a frigate awake as the followed hull) | 191 |
+
+The observer's hull costs what the design's §3 measured (a point ship's tick, a tenth of
+the frigate's: the observed Channel runs at 444 against 271 with a frigate in it, the
+difference the frigate's tick); what the observed Channel costs beyond the design's 6,448
+for a point-ship world with three brains and no business is **the business's brains reading
+the chart**: a profile of a thousand ticks puts 3.8 of 4.4 seconds in `brains.perceive_vessel`
+through `captains._lee_land_nm` and `chart.line_shore`, with `chart.load` called 440 times
+(the tiles read from disk again and again: two dozen ships spread over the whole Channel
+touch more tiles than the tile cache holds, and each eviction is a `numpy` read of a
+compressed tile). That is the business's cost in any world, a frigate's or the observer's,
+and no part of this package; named here for the lead (a larger tile cache, or a lee-land
+distance kept per brain for a minute, would give the observed Channel most of the 6,448
+back). Following a hull costs what she costs awake, which the cap pays for already; the
+truth asserts only that the observed world is not slower than the same world with the
+frigate in it.
+
+**The truths:** 7-320 (a day at seed 7 with the business on and a director observing, the
+centre on the view and then on the Medusa from eight in the evening; slow), 7-321 (the
+readings' words, the refusals, the world orders, `follow`, `follow nobody`, `look at`, the
+save replayed), 7-334 (the pace, informative, `pace`, the table above).
+
+**The suites on the step's tree.** Before the lead's merge (`186931c`): the fast tier
+whole, 4,488 passed, 2 failed, both no fault of the step's code: `test_parity`'s list of
+the console's commands had not got `look at WHERE` (added, the owner's by design), and
+`test_pictures`' chart picture under four workers at a standard deviation of 7.9 against
+the test's 8.0 (passed alone, twice; load-sensitive); the slow tier of the eighteen touched
+files and the known truths, `--slow -m "not pace" -n 4`, 827 passed, 7 expected failures
+(the rulings'), none failed (42:51). After the lead's head merged (`ffbaab3`, the ships
+session's Indefatigable and the view geometry among 223 commits, no conflict): the fast
+tier whole, 5,288 passed, none failed (31:42); the slow tier of the same files and the
+known truths, 827 passed, 7 expected failures, none failed (40:14). Ruff clean. The pace tests: 7-334 alone, above.

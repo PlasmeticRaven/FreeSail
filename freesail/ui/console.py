@@ -28,7 +28,10 @@ Driver commands (not ship orders, not journaled):
     tick N          advance N ticks, then hold
     state           print a summary of the ship and the weather
     follow SHIP     the drivers follow her hull: her readings, her log, her chart (the
-                    player's ship by her name or 'the ship' to come back)
+                    player's ship by her name or 'the ship' to come back; in a world with
+                    no ship of the player's, `follow nobody` gives the view back)
+    look at WHERE   in a world with no ship of the player's (ship: none): the observer's
+                    view moved to a position (49 50 N 5 30 W) or a place of the chart
     muster          muster the crew: the watch bill, station by station
     the sail room   what the sail room holds: each sail, its canvas and condition
     the booms       the spare spars aboard, by class (also `the spare spars`)
@@ -595,8 +598,15 @@ class Console:
                 self._print(e.text)
             except ValueError as err:
                 self._print(str(err).rstrip(".") + ".")
+        elif cmd == "look" and args[:1] == ["at"]:
+            # the observer's view moved (package 82, item 1): a driver's line
+            try:
+                e = self.world.look_at(" ".join(args[1:]))
+                self._print(e.text)
+            except ValueError as err:
+                self._print(str(err).rstrip(".") + ".")
         elif cmd == "state":
-            self._print(f"Following the {self.world.followed_words}.")
+            self._print(self.world.followed_line)
             for s in self.world.summary_lines():
                 self._print(s)
             if self.desk is not None:
@@ -962,6 +972,20 @@ def start_world(args: argparse.Namespace) -> tuple[World, Any]:
 # The seed without a scenario or `--seed` (the drivers' default since M0).
 DEFAULT_SEED = 1805
 
+
+def player_seat_for(world: World, flag: str | None, scenario_file: Any) -> str | None:
+    """The station a driver seats the player at: the flag's, else the scenario file's
+    (`stations: {officer: player}`, package 59), else the director's in a world with no
+    ship of the player's (package 82, item 1: `ship: none` opens at the director's); None
+    for the captain's prompt, which is his own and no seat."""
+    seat = flag or (scenario_file.player_seat if scenario_file is not None else None)
+    if not seat and getattr(world, "observed", False):
+        seat = "director"
+    if seat and " ".join(str(seat).lower().split()) != "captain":
+        return str(seat)
+    return None
+
+
 # Every door that loads or replays a save takes this flag (package 37d): a save of another
 # build that holds a station's transcript is replayed only when it is given.
 REPLAY_ANYWAY_FLAG = "--replay-anyway"
@@ -1085,8 +1109,8 @@ def main(argv: list[str] | None = None) -> int:
             {"cap": args.crewed_cap, "range_nm": args.crewed_range}, "the flags"
         )
     # the player's seat: the flag's, else the scenario file's (`stations:`, package 59)
-    seat = args.seat or (scenario_file.player_seat if scenario_file is not None else None)
-    if seat and " ".join(str(seat).lower().split()) != "captain":  # the captain's is his own
+    seat = player_seat_for(world, args.seat, scenario_file)
+    if seat:
         seat_player(world, seat, door="console")
 
     console = Console(

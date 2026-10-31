@@ -367,6 +367,10 @@ def _give(world: World, entry: dict[str, Any]) -> None:
         # the drivers' centre moved to a hull (package 84, step 10), the line written by it
         world.follow(str(data.get("ship") or data.get("name") or ""))
         return
+    if line["kind"] == "driver.look_at":
+        # the observer's view moved (package 82, item 1), the line written by it
+        world.look_at(str(data.get("words") or ""))
+        return
     world.record_driver(line["severity"], line["kind"], line["text"], data)
     if line["kind"] == "seat.taken":
         # the player seated at a station by a driver (package 40; `agents.seat`): seated

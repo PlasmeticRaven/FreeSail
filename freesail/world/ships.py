@@ -1709,7 +1709,9 @@ class Vessels:
 
         with players_current(world) as world:
             pos = getattr(world, "position", None)
-            if pos is None:
+            if pos is None or getattr(world, "is_observer", False):
+                # none on the plane; none in an observed world (package 82, item 1): the
+                # observer's hull is no ship on the sea, and no brain sees her
                 return None
             ship = world.ship
             s = self.__dict__.get("own")

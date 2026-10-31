@@ -96,6 +96,7 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
+from freesail.world.hulls import is_observer
 
 __all__ = [
     "CHANNELS",
@@ -281,8 +282,16 @@ def hull_named(world: Any, words: str, make: bool = True) -> Any:
     the far shape by `crews.station_world` when she has none and `make`); refused in words
     for a ship not on the sea or one with no captain of her own to keep a hull."""
     key = " ".join(str(words).split()).strip('"').lower().removeprefix("the ")
-    own = str(getattr(getattr(world, "ship", None), "name", "") or "").lower()
+    players = getattr(world, "players", world)
+    observed = is_observer(players)
+    own = "" if observed else str(getattr(getattr(world, "ship", None), "name", "") or "").lower()
     if key in ("ship", "us", "her", "this ship", "our ship") or (own and key == own):
+        if observed:
+            # an observed world (package 82, item 1) has no ship of the player's
+            raise WorldOrderError(
+                "No ship of the player's: this world is observed ('ship: none'); name a ship "
+                "by her own name"
+            )
         return world
     hulls = getattr(world, "hulls", None) or {}
     if key in hulls:
@@ -310,6 +319,12 @@ def _aboard_target(world: Any, body: str) -> tuple[Any, str]:
     """(the hull an `aboard` order is for, the order with the head's name taken out)."""
     m = _ABOARD_HULL.match(body)
     if m is None:
+        if is_observer(world):
+            # the observer's world with no hull followed (package 82, item 1)
+            raise WorldOrderError(
+                "No ship followed: name her ('aboard the Harpy: ...') or follow one "
+                "('follow \"Harpy\"')"
+            )
         return world, body
     name = (m.group("quoted") or m.group("bare") or "").strip()
     target = hull_named(world, name)
@@ -338,6 +353,13 @@ def _captain(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     cannot be read."""
     m = _CAPTAIN.match(body)
     captain = getattr(world, "captain", None)
+    if is_observer(world):
+        # the observer's world with no hull followed (package 82, item 1)
+        raise WorldOrderError(
+            "No ship followed: a captain order is the followed ship's rules-based captain's; "
+            "follow one ('follow \"Harpy\"') or give her captain an intent by name "
+            "('ship \"Harpy\": intent <words>')"
+        )
     if m is None or captain is None:
         raise WorldOrderError(
             "A captain order is 'captain: intent <the intent in words>' or 'captain: carry on'."
@@ -1284,6 +1306,12 @@ def _hand_reach(world: Any, name: str) -> str | None:
     if _players_ship(world, name):
         from freesail.agents.agent import CAPTAIN
 
+        if is_observer(getattr(world, "players", world)):
+            # an observed world (package 82, item 1) has no ship of the player's
+            return (
+                "No ship of the player's: this world is observed ('ship: none'); name a ship "
+                "by her own name"
+            )
         who = next((w for st, _p, w in held_stations(world) if st == CAPTAIN), "the player")
         return (
             f"{name} is the player's own ship, and her captain is held by {who}: the director "
