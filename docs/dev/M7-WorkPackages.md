@@ -1732,7 +1732,12 @@ the integrator beside the oar force (the brief's one leave: the towing boat's ne
 the stem as the cable's pull is read at the hawse), no consent file touched, no model
 identifier; the lead's run of the tow, boat, director, view-geometry, in-world, primer and
 log-lines tests on the merged tree, then **the whole fast tier here and the whole suite in the
-cloud dispatched at the push (run 28; its figures written here when it is in).**
+cloud dispatched at the push (run 28 on `b896c4c`: lint green, 6,262 passed over the six
+shards, 11 skipped, 10 expected failures, none failed, 42 minutes, the count up from run 27's
+6,231 by the boats' and the tow's suites; the pace job, informative, 11 of 11 in 212 seconds,
+the four pace truths that sat under the cloud's floor on runs 24 to 27 all passing this run,
+which reads as the cloud's noise the bisection under 88 found and not as a cost moved by 82:
+the matter stays recorded under 88 and re-read each run).**
 
 **Step 5, towing by the boat and the kedge's false denial** (the design's §6 and its
 postscript; the tuning notes, step 5): `tow her with the boat [to <the point or bearing>]`
@@ -3149,6 +3154,18 @@ the kinds' test as the guard; `say_aboard` retired and the director's own prose 
 §9's refusals and §3.1's named flaw (the weather over a port read from the followed hull's
 view) left for 65b. Merged one step at a time, the whole suite in the cloud at each.
 
+**The owner's word of 2026-10-31 (decision 61):** after 65 is done, no new package for the
+week (74 held, and 87, 81, 91 and 65b with it); the lead tells the owner when the trunk is
+up to date and green for his testing; the owner tells the ships session to pause before the
+new ships.
+**Amended the same day:** 65 pauses after step 1 (the Fable allowance at 95 per cent); step
+1 merged on its own, steps 2 to 8 held for the week to turn; the builder told to finish step
+1 and stand by (the lead's one-shot word of 14:30).
+**And again (the same afternoon):** step 1 not merged either; `claude/pkg-65` stands at step
+1 green until the reset and the package is reviewed and merged after it (the lead's
+recommendation: step 1 alone takes the deck from a model below before step 3 gives it back
+by report; the owner is not testing 65 this week; a merge spends the allowance for nothing).
+
 ## Package 88: the captain's pass of M7 (`freesail/world/captains.py`, `brains.py` and `data/captains/*.yaml` the rules captain's doctrine and its sources; `freesail/world/squadrons.py` and `orders/station.py` only where the near station law reads; `freesail/world/signals.py` and `data/captains/privateer.yaml`, `hail.yaml` the colours held; `docs/TechnicalSpec-M7.md` §4, §21, §22 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_captain_trials.py`, `test_squadrons.py`, `test_signals.py`, `test_known_truths.py` truths 7-340 to 7-349)
 
 Opus (the owner, 2026-10-29); after 84, beside 82, the two touching little in common (82
@@ -4458,3 +4475,14 @@ places, the schooners' rake) wait for the later package, the brig's displacement
 order from here:** L2 and L3, then the *Neufchatel* with B3.4 first; the design-record commit
 at B2's window when the session reaches it. Bring the trunk in at each boundary; 82's step 5
 (the tow and the kedge) is building on its branch and touches no ship file.
+
+**2026-10-31, afternoon.** Gwyn's PAG3828 out of the tree (71b8ed7) is read and merged
+(the fast tier on the trial tree 5,909 passed; one browser test of the MCP bridge timed out
+on a slow machine and passed alone after; docs and the image only, the next cloud run covers
+it). The
+owner's word of today: the week pauses on new packages (decision 61); 65 is held on its
+branch at step 1; your lee-port and rig-line step is reviewed and merged when you send it,
+as the owner says you will; the *Neufchatel*'s main topgallant and the generalising of mixed
+rigs are in the owner's hands with you, and the proposal comes to the lead with the step
+that builds it. Nothing new is launched this week.
+

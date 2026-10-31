@@ -984,7 +984,7 @@ any other is cited by link and credit only, never copied.
   replica: her fittings and rig may depart from 1812.
 - **Held** (`docs/references/images/`): the lugger's Baugean "Chasse Marée au plus près"; the
   smack's and an English lugger's Cooke etchings of 1829; the cutter's "Nimble" aquatint; the
-  bilander's Gwyn drawing c. 1780 (with her stern) and the PSF line drawing; the tartane's
+  bilander's PSF line drawing (Gwyn's of c. 1780, PAG3828, is cited there and not held: the owner, 2026-10-31); the tartane's
   Roux-school watercolour.
 - **the razee:** Vanguard Models' kit of HMS *Indefatigable* 1794, photographs of the built
   model's stern and quarter (the owner, 2026-10-29; a modern model, in copyright: kept privately

@@ -812,6 +812,22 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     says so once in plain words, and the harness's notice when a reply with prose alone
     leaves an answer owed names the tool. Package 41's rule that the prose was the deck's
     conversation is retired by it, its tests moved old beside new.
+61. **A pause on new packages after 65, for the week; the owner tests.** Owner,
+    2026-10-31: once package 65 is done, no new package is launched (74 waits, and the
+    other held packages with it), the account's usage being near its limit for the week;
+    the lead tells the owner when the trunk on GitHub is up to date and green for him to
+    download and test. The owner tells the ships session himself to pause before the new
+    ships (the *Neufchatel*, the bilander and 74's). Work in hand finishes: 65's steps, each
+    reviewed and merged with the suite, and the ships session's reports already made.
+    **Amended the same day:** with the Fable allowance at 95 per cent, 65 pauses after its
+    step 1 (the rule in the harness), which is merged on its own as the design note's
+    "each step a mergeable state" allows; steps 2 to 8 wait for the week to turn; the last
+    of the allowance goes to the loose ends the owner's testing needs.
+    **And again, the same afternoon (the lead's recommendation, the owner agreeing):** 65's
+    step 1 is not merged either; the branch stands at step 1 green until the reset, and the
+    package is reviewed and merged after it, since step 1 alone takes the deck from a model
+    below before step 3 gives it back by report, and the owner is not testing 65 this week.
+    The ships session's lee-port and rig-line step is reviewed and merged when it is sent.
 
 ### Still open
 

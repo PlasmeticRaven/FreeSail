@@ -101,9 +101,10 @@ with `lescallier-1791-tome2-pl-XVII-fig7-zoom-grid-measured.jpg`;
 `roeding-vol2-col581-lugger-segel-bilander-IA-leaf0300-crop.jpg`; the Steel crops of pp. 41,
 136 and 220; the Lloyd's keys and the row crops in `lloyds-rows\`.
 
-**Held pictures** (`docs/references/images/`): `bilander-gwyn-c1780-nmm-pag3828.webp`, the
-same image as the RMG large image; `bilander-line-drawing-psf.webp`, a modern textbook
+**Held pictures** (`docs/references/images/`): `bilander-line-drawing-psf.webp`, a modern textbook
 drawing (Pearson Scott Foresman), not period evidence (judgement).
+Gwyn's PAG3828 was held there too until the owner's word of 2026-10-31; it is cited there now, and
+kept privately (`owner-notes/bilander/rmg/`).
 
 **Not reached**: HathiTrust (bot check), Gallica (403; so Bonnefoux and Pâris, Pâris's
 *Souvenirs* and Baugean's plates there), the Google Books API (quota), DigitaltMuseum (403;
