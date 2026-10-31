@@ -286,9 +286,9 @@ def follow_boat(world: Any, hull: Any, person: Any) -> None:
     recorded as a routine line `hull.followed` of the ship's log and never as a driver's
     input, so that a replay of the order moves it the same; the console's and the browser's
     `follow` stand for the owner's own choice."""
-    if getattr(world, "followed", None) == hull.id:
+    if getattr(_root(world), "followed", None) == hull.id:
         return
-    world.followed = str(hull.id)
+    _root(world).followed = str(hull.id)
     with world.as_hull(hull):
         world.record(
             Severity.ROUTINE,
@@ -695,9 +695,9 @@ def hoist_in(world: Any, hull: Any) -> str:
     home_ids = {str(getattr(p, "home", "") or "") for p in people}
     commander = next((p for p in people if str(getattr(p, "home", "")) != str(hull.id)), None)
     # the drivers back to the ship before anyone moves, so that the lines land where they did
-    was_followed = getattr(world, "followed", None) == hull.id
+    was_followed = getattr(_root(world), "followed", None) == hull.id
     if was_followed:
-        world.followed = str(ship_hull.id)
+        _root(world).followed = str(ship_hull.id)
     for p in people:
         if str(getattr(p, "home", "") or "") == str(hull.id):
             continue  # her own crew go back into the ship's muster with her
@@ -771,8 +771,8 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
             p.hull = None
             p.where = "lost"
             lost.append(p.name)
-        if getattr(world, "followed", None) == hull.id:
-            world.followed = str(ship_hull.id)
+        if getattr(_root(world), "followed", None) == hull.id:
+            _root(world).followed = str(ship_hull.id)
         hull.record(
             Severity.URGENT,
             "boat.lost",
@@ -834,6 +834,17 @@ def cut_adrift(world: Any, ship_hull: Any) -> str:
 
 def hull_name_of(hull: Any) -> str:
     return str(getattr(getattr(hull, "ship", None), "name", "") or getattr(hull, "id", "") or "")
+
+
+def _root(world: Any) -> Any:
+    """The one World behind a hull's façade (`hulls.Hull.world`): the drivers' `followed`
+    is the World's and not a façade's attribute (a boat's order comes through her hull's
+    façade, `orders.prompt.world_of`)."""
+    from freesail.world.hulls import Hull
+
+    while isinstance(world, Hull):
+        world = world.world
+    return world
 
 
 def _oars(hull: Any) -> Any:

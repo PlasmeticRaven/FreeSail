@@ -13274,3 +13274,29 @@ def test_truth_7b_113_the_lugger_towed_clear_of_the_lavandiere_and_the_frigate_b
     tiring = [e for e in w.log if e.kind == "boat.tiring"]
     assert len(tiring) >= 3 and "her way is falling" in tiring[0].text
     the_frigates_head_brought_round_by_her_launch()
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 6 (the design's §7): the stations, the director and the readings
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_332_the_directors_new_forms_perform_in_the_dry_run_and_in_play_and_the_boats():
+    """The director's new forms (`follow "X"` as a driver's line through the channel, a
+    person put aboard another ship by the boat (step 1), the boat stove, swamped or gone
+    adrift by the `aboard:` table) perform on the copy in the dry run and in play; the
+    reading `the followed ship` and the events of the boat; the truth shows a manned boat
+    as a vessel with her ship, who is in her and what she is under."""
+    from tests.test_boat_director import (
+        test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea,
+        test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so,
+        test_the_events_registry_has_the_boats_events_and_a_standing_order_takes_them,
+        test_the_followed_ship_reading_names_the_drivers_centre_the_boat_and_the_view,
+        test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her,
+    )
+
+    test_the_followed_ship_reading_names_the_drivers_centre_the_boat_and_the_view()
+    test_the_events_registry_has_the_boats_events_and_a_standing_order_takes_them()
+    test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so()
+    test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea()
+    test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her()

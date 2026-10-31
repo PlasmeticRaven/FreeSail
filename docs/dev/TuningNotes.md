@@ -16418,3 +16418,74 @@ evolution as `evo`.
 which no recorded passage has at full detail (the hoy and the pilots' boats have no hull);
 the kedge's keeper changes only while a kedge is laid out, which no pinned day does; the tow
 is new. The truths: 7-330, 7-331, 7b-113 (the number is the dispatches' as well in the suite).
+
+### Step 6: the stations, the director and the readings (the re-brief's item 6; the design's §7)
+
+**The readings.** `the followed ship` (`the followed hull`) is a row of the registry
+(`readings.followed`, a world row read in an observed world too): "the Amazon, the player's
+ship"; "the Medusa; the player's own ship the Amazon left as she lies"; in the boat "the
+Amazon's launch, a boat of the Amazon's manned as a hull; the Amazon astern of the drivers";
+"no ship followed; the observer's view at 49° 40' N, 5° 20' W". `the boat`, `the boats` and
+`where am I` were step 4's and step 1's and stand (the boat manned, towing, lost; each boat
+with her file; the hull the person is in).
+
+**The events** (`readings.EVENTS`, the standing dialect's `at` and the stand-by's word
+alike; the primer's chapter 11 table kept equal to the registry by 85's test): `the boat
+manned` (`boat.manned`), `the boat lost` (`boat.lost`), `the tow begun` (`boat.towing`),
+`the tow ended` (`boat.tow_ended`), and `aboard another ship` (`person.aboard` with another
+hull in its data: a person come aboard by the boat or from another hull; the design's
+`aboard the <ship>` with a slot is a grammar the events have not got, so the event is the
+coming aboard and the ship is in the line). `the boat away` and `the boat alongside` stand.
+
+**The director's forms.** `follow "<ship>"` and `follow nobody` are a channel of the world
+orders (`world/orders.py` `CHANNELS` "follow", the one head without a colon, `_follow` through
+`World.follow`), so that the forms' test holds (every form a channel, every example parsed
+to it) and a scenario's world order may move the drivers at a tick; at the director's seat
+`direct` takes it before the budget as a driver's line (no act spent, journaled
+`director.follow`, the World's `driver.follow` line as the console's), and the dry run says
+what it would do without moving them. `person: "X" goes aboard the <ship> by the boat` and
+the hand (`ship "X": order send the boat to ...`) were step 1's and 84's. **The boat lost by
+the `aboard:` table** (`data/director/aboard.yaml`: `the boat stove` and `the boat swamped`,
+each doubted on a smooth sea and performed with a reason; `the boat gone adrift`, her
+painter parted, never doubted; the effect `boat_lost` through `world.boats.lose_boat`, with
+her people if any are in her; `_lacks_boat` answers a ship with no boat or one lost already
+"the game has no way"). The dry run performs each on the copy as every `aboard:` form does.
+
+**The truth** shows a manned boat as a vessel (`director_readings`, `_truth_boat`): her row
+in the sail's walk carries `boat_of` (her ship), `in_her` (who is in her), `under` (oars,
+her lug, neither) and `towing` (her ship when the line is on her); in words "the Amazon's
+boat, a hull of the world, under oars; in her: Captain Bowen". A boat at the booms, away by
+the script or lost is a word in her ship's row (step 4's `boat`).
+
+**The harness.** `crews.shape_words` for a boat's hull: "the Amazon's launch, a hull of the
+one world under your oars: her oars, her lug and her helm yours (...), the readings hers,
+her ship a sail in sight"; `readings.ship_words` for a station in a boat (`_boat_words`):
+"The Amazon's launch: a ship's boat of the Amazon's, a hull of the one world, about 31
+feet, 10 oars and a standing lug; her coxswain at the yoke lines and her oarsmen her
+company ..." in the place of a ship's class words. The samples follow the person's hull by
+step 1's seat and step 3's `seat_world`.
+
+**Taken another way, with the reason.** (1) `aboard another ship` for the design's `aboard
+the <ship>`: the events are words without slots, and the ship is the line's. (2) `follow`
+as a channel and not a bare driver's line: the forms are tested as channels, and the
+scenario gains the form for nothing; the act is not counted at the director's seat all the
+same (the design's "a driver's line ... source the director" kept in `direct`). (3) The
+reading `the followed ship` in the boat names her as a boat and her ship astern of the
+drivers, rather than "the player's own ship left as she lies", which is the words for
+another ship.
+
+**Found on the way.** (1) **The drivers were not given the ship back at the hoisting in** when
+`come alongside` was given from the boat's prompt: the order reaches `hoist_in` through
+her hull's façade (`orders.prompt.world_of` is the standing runtime's world, the hull's), and
+`world.followed = ...` wrote a façade attribute and not the World's; `World.own` fell back
+to the player's hull (step 1's fallback for a followed hull gone), which is why step 4's
+tests saw the ship as own and never the stale `followed`. `boats._root` unwraps the façade
+to the one World for every write and read of `followed` (`follow_boat`, `hoist_in`,
+`lose_boat`); the reading `the followed ship` unwraps it the same way. (2) The observer's
+readings answer None for a row not of the world's (step 2): `followed` is listed among
+`WORLD_ROWS`. (3) A doubted `aboard:` order is doubted once on the record before its reason
+counts (58a's rule): the test enters the stove boat twice.
+
+**What moved: nothing pinned.** The events and the reading are new rows; the channel is a
+new head no recorded passage uses; the truth's row gains keys for a vessel no pinned day
+has. The truth: 7-332.

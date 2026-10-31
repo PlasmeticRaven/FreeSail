@@ -847,3 +847,22 @@ hours (1.16 kn fresh, 0.8 at four hours); the truth carries the physics' figures
 spec's words quoted, and the tuning notes cost the smaller `F_0` for the lead. **Found on
 the way**, the one that matters: a manned boat not followed by the drivers slept at the first
 switch (no brain, no range), which step 4's tests never saw; mended in `crews.crewed`.
+
+
+### Step 6: the stations, the director and the readings (§7; 2026-10-31)
+
+**Built as designed**: the reading `the followed ship`; the events `the boat manned`, `the
+boat lost`, `the tow begun`, `the tow ended` and `aboard another ship`; the director's
+`follow "X"` and `follow nobody` (a driver's line at the seat, no act; a channel of the world
+orders for the forms' test and the scenario), the boat stove, swamped or gone adrift by the
+`aboard:` table through `lose_boat`, the dry run knowing each; the truth showing a manned boat
+as a vessel with her ship, who is in her, what she is under and whom she tows; the harness's
+shape and ship words for a boat; truth 7-332. The details and the suites are in
+`docs/dev/TuningNotes.md`, "Package 82", step 6.
+
+**Taken another way, with the reason.** `aboard the <ship>` as an event is `aboard another
+ship` (the events have no slots); `follow` is a channel as well as a driver's line (the
+forms are tested as channels). **Found on the way**, the one that matters: `come alongside`
+from the boat's prompt left the drivers' `followed` on the boat's hull after the hoisting in
+(a write on the hull's façade, not the World), hidden by the fallback to the player's hull;
+mended in `boats._root`, and the reading `the followed ship` would have shown it.
