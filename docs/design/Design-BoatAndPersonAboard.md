@@ -774,3 +774,27 @@ for the lead in the tuning notes and no part of this package.
 **Found on the way** is in the tuning notes (the far tick's sky, the crews' tick of the
 own hull through her shadow, the reckoning lines, the truth's own block, the far goal's
 words, the hull's parent and `is_followed` with none followed, the business's tiles).
+
+
+### Step 3: the player's seat on another ship, and the director's door (§4; 2026-10-31)
+
+**Built as designed**: `--seat captain --ship <name>` at both drivers with the player's own
+hull left as she lies and said so in her log, the drivers following him, his prompt hers,
+her rules captain aside at his hand and back at `carry on`; `--seat <station> --ship` a
+`PlayerSeat` on her hull, which goes with its person between hulls as the harness does
+(`PlayerSeat.move_to`, the step 1 postscript's promise); the director's door reading the
+followed hull by the one rule with the other named at the head; 86's three seams by the
+hull; truths 7-322, 7-323 and 7-326. The figures and the suites are in
+`docs/dev/TuningNotes.md`, "Package 82", step 3.
+
+**Taken another way, with the reason.** §4 has the free intent's seam and the station by
+name reworked; both read by the hull already (the captain judges only when he commands, and
+the station reads `World.players`' vessel), so a test pins each and no code moved there. §4
+has a door for her captain's station refused by the rule of reach while the player is at her
+prompt "as it is on his own ship": on his own ship a model's door at the captain's station is
+admitted (the player's prompt then stands aside, 84's rule), so the followed hull's is
+admitted the same way through `station_world`, and nothing was built for it. The words of
+the hand's refusal name the followed ship as such.
+
+**Found on the way** is in the tuning notes (the replay of a hull block with no door's
+station, the seat's person in the boat, the held helper).

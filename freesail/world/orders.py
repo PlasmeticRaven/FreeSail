@@ -1313,6 +1313,14 @@ def _hand_reach(world: Any, name: str) -> str | None:
                 "by her own name"
             )
         who = next((w for st, _p, w in held_stations(world) if st == CAPTAIN), "the player")
+        players = getattr(world, "players", None)
+        if players is not None and getattr(world, "own", None) is not players:
+            # the followed ship, whose prompt is the player's (package 82, item 2)
+            return (
+                f"{name} is the followed ship, and her captain is held by {who}: the "
+                "director moves no sail of hers and gives no order of hers (follow another "
+                "to hand her back to her own captain)"
+            )
         return (
             f"{name} is the player's own ship, and her captain is held by {who}: the director "
             "moves no sail of hers and gives no order of hers"

@@ -348,7 +348,11 @@ def model_holds_her(other_world: Any) -> bool:
     answers for her: the player's own ship with no rules captain commanding, or a seat at
     her captain's station."""
     captain = getattr(other_world, "captain", None)
+    # the followed hull (`parent` None), whose prompt is the player's (package 84, step
+    # 10; 82's §4: by the hull the player holds, which is the followed one)
     player = getattr(other_world, "parent", None) is None
+    base = getattr(other_world, "world", other_world)
+    is_players = other_world is getattr(base, "players", None)
     # `Captain.commands` is a property (the playtest of 2026-10-27: called as a method, the
     # TypeError was swallowed, and the player's ship answered every hail by table). The
     # player's ship alone (package 86's fold-in, the review's finding): a crewed ship whose
@@ -356,7 +360,7 @@ def model_holds_her(other_world: Any) -> bool:
     # before, for nobody else would answer her hail
     if player and captain is not None and not getattr(captain, "commands", True):
         return True
-    if captain is None and player:
+    if captain is None and (player or is_players):
         return True  # the player's ship with no rules captain at all
     stations = getattr(other_world, "stations", None)
     try:

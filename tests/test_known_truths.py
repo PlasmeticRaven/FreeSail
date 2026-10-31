@@ -12954,3 +12954,49 @@ def test_truth_7_334_the_observers_world_costs_no_more_than_the_same_world_with_
         f"the same Channel with the frigate at the view {hers:.0f}"
     )
     assert view >= hers, f"the observer's world {view:.0f} against the frigate's {hers:.0f}"
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 2 (the design's §4): the player's seat on another ship, the director's door
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_322_the_player_seated_as_captain_of_another_ship_has_her_prompt_and_replays():
+    """The player seated as captain of another ship (`--seat captain --ship Raven`), his own
+    hull brainless and far (left as she lies, said in her log), the drivers following him,
+    his orders hers, her rules captain aside at his hand; the save replays his acts to the
+    same digest of both logs."""
+    from tests.test_aboard_another import (
+        test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies,
+        test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests,
+    )
+
+    test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies()
+    test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests()
+
+
+def test_truth_7_323_the_directors_door_with_another_hull_followed_reads_her_and_the_other():
+    """The director's door with another hull followed: `read_log` without a ship reads the
+    followed hull's, `aboard:` without a name is aboard her, `captain: carry on` gives her
+    captain his hand back; named, the other hull's."""
+    from tests.test_aboard_another import (
+        test_the_directors_door_reads_the_followed_hull_and_the_other_by_name,
+    )
+
+    test_the_directors_door_reads_the_followed_hull_and_the_other_by_name()
+
+
+def test_truth_7_326_the_free_intent_the_hail_and_the_station_by_name_read_the_hull_held():
+    """The free intent by the hull: a free-intent ship lies to under her rules captain until
+    the player follows her and gives an order, or a model is seated at her captain's
+    station; `hail.model_holds_her` by the hull the player or a model holds; the station
+    kept on the player's ship by her name reads `World.players`."""
+    from tests.test_aboard_another import (
+        test_a_free_intent_ship_lies_to_until_the_player_follows_her_and_gives_an_order,
+        test_hail_holds_the_players_own_hull_with_no_rules_captain_and_a_model_held_hull,
+        test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel,
+    )
+
+    test_a_free_intent_ship_lies_to_until_the_player_follows_her_and_gives_an_order()
+    test_hail_holds_the_players_own_hull_with_no_rules_captain_and_a_model_held_hull()
+    test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel()

@@ -15762,3 +15762,77 @@ files and the known truths, `--slow -m "not pace" -n 4`, 827 passed, 7 expected 
 session's Indefatigable and the view geometry among 223 commits, no conflict): the fast
 tier whole, 5,288 passed, none failed (31:42); the slow tier of the same files and the
 known truths, 827 passed, 7 expected failures, none failed (40:14). Ruff clean. The pace tests: 7-334 alone, above.
+
+### Step 3: the player's seat on another ship, and the director's door (the re-brief's item 2; the design's §4)
+
+**What was built.** `--ship <name>` at both drivers (`console.ABOARD_HELP`; the harbour's game
+through `prepare_game`): `console.aboard_ship(world, name, say)` writes a driver's line in the
+player's own ship's log saying how she is left ("The Amazon is left as she lies, her watch
+kept and her sails as they were; no captain's hand on her (she has no intent to sail by)
+[or: her rules captain sails her by his intent (...)]. The player is aboard the X."), then
+sets the drivers to follow her hull (84's `World.follow`, her hull made in the far shape when
+she has none and woken under the cap as the followed hull); both lines are inputs and replay
+as every driver's line does; refused with the words for a ship not on the sea, one with no
+captain of her own, or an observed world (which has no ship of the player's to leave). His
+prompt is then hers by the one rule: his orders go to the followed hull (`World.submit`
+reads `own`), her rules captain stands aside at his hand (`captain.player_hand`, as on his
+own ship) and `captain: carry on` gives her back; his own hull ticks on as another hull,
+her sails as they were and her captain quiet (no intent) or sailing her by his intent. `--seat
+<station>` with `--ship` is a `PlayerSeat` **on her hull**: `seat.seat_world` gives the
+followed hull's façade when the drivers follow another ship than the player's own, so the
+seat's world, its station's binding, its journal and `player_seat` are hers and stay hers
+when the drivers move on (`follow "the ship"`: the player's own hull has no seat, hers
+keeps it; a second seat is then the own ship's). The Hull forwards `record_driver` as it
+forwards `record` and `submit`, for the seat's lines.
+
+**The seat with its person.** `PlayerSeat.move_to(hull, station, home)` and `visiting`,
+the harness's `move_to` for the seat (the seat taken off the hull it was on, `hull`'s from
+here, his voice there (`movement.visiting_station`, the passenger's kind under his name,
+the visitor's domain) or his own station again at home, the journal his, a note in it);
+`movement.seat_of_person(world, person)` finds a seat by its station's person as
+`harness_of` finds a harness; `put_aboard` moves the seat as it moves a harness (a captive's
+seat stood down quietly). The boat's carrying list finds a visitor by his name first
+(`orders/port._boat_to_ship`, `people.find_aboard` then `find`), so `send the boat to the X
+with Mr Newton` from the host takes the visitor home as `for Mr Newton` fetched him.
+
+**The director's door with another hull followed** (84's open item, decided in the design
+from the one rule): `read_log` without a ship reads the followed hull's log, `aboard:` with
+no name is aboard her, `captain:` and `captain: carry on` are her rules captain's, the
+truth is read from her, each by `World.own` and nothing new; the other hull by her name at
+the head (`aboard the Amazon: ...`). What changed for it: the director's hand on the
+followed ship (`ship "X": order ...`) is refused naming her as such ("X is the followed
+ship, and her captain is held by the player at the prompt ... follow another to hand her
+back to her own captain"); the truth lists the player's own ship among the sail when another
+hull is read as the own (`director_readings` skipped "the player's own vessel" by the sea's
+`own`, which left her out whenever the own block was another's; it now skips the vessel
+whose hull is the one read).
+
+**86's three seams by the hull.** (1) The free intent: `Captain._free` is reached only
+when he `commands`, and he does not where a model holds her captain's station (`seated`) or
+the player at her prompt has given an order (`aside`); no `parent is None` in it, as the
+design wanted, and nothing moved: the test shows a free-intent brig lying to under him until
+the player follows her and gives an order, then lain to no more. (2) `hail.model_holds_her`
+reads the followed hull (`parent` None) and a model at her captain's station as before, and
+the player's own hull with no rules captain at all (`is_players`) as the design's third case,
+by the hull and not by `parent is None` alone. (3) `orders/station._named_or_kind` reads
+`World.players`' vessel (`root.vessels.own`) by her name whichever hull is followed, as it
+did since 84's step 7; a test pins it.
+
+**Found on the way.** (1) A save with the player's seat on another hull carries her hull
+block with his journal and her bindings and no door's station; the replay restored such a
+block at tick 0 (`due_tick` the least `stationed_tick`, none) before the world order that put
+her on the sea, and fell over in `station_world`: a block with no station records is
+restored once the replay has made her (`core.replay.seat_hulls_due`). (2) The seat's person
+in the host's boat has no hull for a passage; `seat_of_person` matched the holder alone and
+missed him at the homecoming, so the seat matches the station's person by name first as
+`harness_of` does. (3) The free-intent brig of 84's helper is held hove to by the director's
+hand in `_brig_alongside`, so his `aside` never comes there (he does not command under the
+hold); the tests of the hand use the unheld helper and the boat's tests the held one.
+
+**What moved: nothing pinned.** No recorded passage uses `--ship`, a seat on another hull or
+the director's door with another hull followed; the truth's listing changes only when the
+own block is another hull's. The proof is the suites below.
+
+**The truths:** 7-322 (the player aboard another ship, her prompt his, his own left as she
+lies, the replay by his acts), 7-323 (the director's door with another hull followed, the
+other by name), 7-326 (the free intent by the hull, the hail's holder, the station by name).

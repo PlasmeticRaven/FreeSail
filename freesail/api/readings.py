@@ -4000,8 +4000,14 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             else:
                 beyond += 1
         vessels = near
+    current = getattr(world, "own", None)
+    players = getattr(world, "players", None)
     for v in vessels:
-        if v.done or v is getattr(world.vessels, "own", None):
+        if v.done:
+            continue
+        if getattr(v, "crew", None) is current and current is not None:
+            continue  # the hull read as the own above: the followed one (package 82, item 2)
+        if v is getattr(world.vessels, "own", None) and (current is None or current is players):
             continue  # the player's own vessel is `own` above (package 84, step 7)
         d: dict[str, Any] = {
             "name": v.name,

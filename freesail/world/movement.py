@@ -621,6 +621,26 @@ def hull_name(hull: Any) -> str:
     return str(getattr(getattr(hull, "ship", None), "name", "") or getattr(hull, "id", "") or "")
 
 
+def seat_of_person(world: Any, person: Any) -> tuple[Any, Any] | None:
+    """(the hull it is on, the player's seat) when the player holds a station through a
+    seat whose person is `person`, on any hull of the game (package 82, item 2); None
+    otherwise."""
+    name = str(getattr(person, "name", "") or "")
+    for hull in list((getattr(world, "hulls", None) or {}).values()):
+        seat = getattr(hull, "player_seat", None)
+        if seat is None or seat.agent.released:
+            continue
+        if str(getattr(seat.station, "person", "") or "") == name:
+            return hull, seat  # his voice, or his own station made for him by name
+        try:
+            holder = hull.stations.holder(seat.station.name)
+        except Exception:  # noqa: BLE001  (a muster that cannot run binds nobody)
+            holder = None
+        if holder is person:
+            return hull, seat
+    return None
+
+
 def harness_of(world: Any, person: Any) -> tuple[Any, Any] | None:
     """(the hull it is in, the harness) of the station a person holds through a door, on
     any hull of the game (package 82: a harness lives where its person is); None when no
@@ -764,6 +784,28 @@ def put_aboard(
                 home = h._home or (str(getattr(from_hull, "id", "") or ""), h.station)
                 station = visiting_station(hull, person, h.policy)
                 h.move_to(hull, station, home)
+                if from_hull is not None and str(getattr(from_hull, "id", "")) != home[0]:
+                    _unbind_visit(
+                        from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
+                    )
+    seated = seat_of_person(world, person)
+    if seated is not None:
+        # the player's seat goes with its person as a harness does (package 82, item 2)
+        from_hull, s = seated
+        if seat == "stands down":
+            s.stand_down_quietly(why or f"put aboard the {hull_name(hull)}")
+        else:
+            home_id = str(getattr(person, "home", "") or "")
+            if hid == home_id and s.visiting:
+                own_id, own_station = s._home
+                s.move_to(hull, own_station, None)
+                if from_hull is not None and str(getattr(from_hull, "id", "")) != own_id:
+                    _unbind_visit(
+                        from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
+                    )
+            elif hid != home_id:
+                home = s._home or (str(getattr(from_hull, "id", "") or ""), s.station)
+                s.move_to(hull, visiting_station(hull, person), home)
                 if from_hull is not None and str(getattr(from_hull, "id", "")) != home[0]:
                     _unbind_visit(
                         from_hull, person, f"{person.name} went aboard the {hull_name(hull)}"
