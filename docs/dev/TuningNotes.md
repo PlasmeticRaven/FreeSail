@@ -16000,3 +16000,329 @@ errands as before with nobody in her; the hoy a vessel), 7-329 (lost: swamped, c
 sent nowhere, manned by nobody, replaced at the yard), 7b-114 (the cutter's boat ashore at
 Falmouth and back under her lug; the number is 53b's as well in the suite, the brief's
 kept with the boat's words).
+
+
+## Package 88: the captain's pass of M7 (2026-10-30 to 31)
+
+Built as a sibling session on `claude/pkg-88` from the lead's head `c168c51`, each item in
+the owner's four parts. The physics is read and not changed; no ship file, no consent file.
+Items 1 to 4 in the owner's four parts, each item's commits a mergeable state, the lead's branch brought in at item 2's boundary (packages 75 and 82, no pin of this package's moved by them) and again at the close (up to date); the lead's rulings on items 1 and 2 below.
+
+### Item 1: the commodore's recovery when aback with no way
+
+*The symptom* (86's finding), reproduced on `c168c51` exactly as 86 had it: the commodore's
+brig-sloop of `convoy-six.yaml` comes out of a short-handed tack at 1594 (10:26:34) with no
+way, her head forty degrees off the north-easterly; every square sail shaking (by its
+reading), the spanker drawing and holding her head up; going astern at half a knot; no
+manoeuvre in hand; "Her sails aback; she had no way on to lose" at 1810; she lies so until
+the book's second shortening takes in her spanker (2671) and pays off at 10:45, the far
+convoy capped at her pace. The helm's own box-off of 37p (`scripts.keep_full_and_by`) never
+comes: `hull.seconds_aback` counts only a net thrust astern with the sails pressed and is
+reset by every sail in the hands' hands and every flicker of the thrust's sign, and her
+sternway is under the in-irons line (`IN_IRONS_KN`, a knot).
+
+*The rule as it stood:* nothing of the rules captain's bears her away when she lies aback
+with no way and no tack in hand; 58b's law fills the far body (`_course_for`), and the
+near captain's standing order 'keep her full' is a `when` rule already true.
+
+*The rule as it reads now* (`Captain._aback_with_no_way`, `captains.ABACK_RECOVER` its
+switch, every role's `aback_recover_minutes`, three, judgement): having had way since the
+anchor or the ground, with no headway now (the course's reading says none), square sail
+set and none of it drawing (the sails' readings), a wind over the physics' light-air line
+(`hull.ABACK_URGENT_AWS_KN`, four knots, read), no manoeuvre in hand, for the doctrine's
+minutes together, he recovers her as the period did: the work waiting for hands avasted
+and the work at the driver with it, **the driver taken in** (the after sail eased: Lever
+1808 p. 79, OCR lines 9711 to 9716, "the Power being taken from the Sails, which are at the
+after extremity of the Ship, effort is given to the Head Sails ... to pay her head off to
+leeward"; Luce 1866 ch. XXV, "Up mainsail and spanker!"); if she lies so another while (or
+has no driver), **boxed off** (`box her off`, Luce 1866 ch. XXV 'To Box Off', OCR lines
+28510 to 28523; the helm and head sheets of 'Coming to against the Helm' serve only "if
+the vessel has headway on"); with headway again and her square sail drawing, the driver
+set again ("when the spanker will take, haul it out", OCR line 28539) and the leg shaped.
+The box-off waits its turn behind hands at a yard (the runner's holds, read and not
+changed: the topmen at a reef are not ordered off the yard). The three minutes: a minute
+more than the helmsman's own box-off when pressed aback (`BOX_OFF_AFTER_S`), so that his
+comes first where it can. Taken another way on the way: the box-off alone at first (it waited
+eight minutes behind the reefs); the spanker's take-in before it (it waited behind the
+sheet trim and lost its hands to the courses' reefs) and the work waiting for hands avasted
+with it; the rule armed only after she has had way (the intent scenario's merchant was
+boxed off at the first measure as her hands got her under way from the anchor: way not yet
+gathered is not way lost).
+
+*What proves it.* The convoy, switch off beside on, on the final code: the commodore dead
+in the water from 10:20 to 10:47 before; now from coming out of stays (10:26) to 10:33, the
+spanker in at 1800, boxed off by 2110, four knots and more by 2400; the convoy keeps way the
+morning through. **Truth 7-152** moves, old beside new in its test: the straggler's signal
+ordered, made and answered and the Friendship back in station at 2760, 2866, 3000 and 6420
+before (and with the switch off), at 2040, 2182, 2340 and 6060 now; the worst ship off
+station in the third hour 161 m before, 144 m now. **Truth 7-153 does not move** (its pins
+are states and bands): the privateer evading at the hour 2.10 nm off before, 1.98 now; at
+three hours 20.35 nm before, 19.87 now. **Truth 7-340** is the law's own, with the switch.
+
+**Found on the way, mended: the haul-off kept the sea.** `Captain._haul_off` steered the
+plain reciprocal of the enemy's bearing for twenty miles whatever lay across it; the
+merchant schooner of the trade trial, meeting the privateer later in the day (below), was
+carried across the land about Coverack and took the ground at 22259 at seven knots, her
+lookout's "Land close ahead, four cables" unanswered (no evading book reads the land). Now
+the bearing away is turned a point at a time up to eight to either hand
+(`HAUL_OFF_POINTS`, judgement: never nearer the enemy than abeam) to a line the planner's
+own test (`Planner.clear`) finds clear of the shore and the dangers; the reciprocal itself
+when none is.
+
+**The recorded passages, by bisection** (the switch toggled on the final code): of the
+captain's trials, the known truths and `test_captains.py` run whole, seven tests moved
+besides 7-152; with the switch off six pass again (the cargo test of `test_captains.py`, the
+intent schooner's two truths, the player's hand's two trials, the trade trial) and the
+seventh is the lee-shore trial's stale pin (below). With the rule armed only after way, the
+merchant intent's passages and the schooner's are unmoved with the switch on. **Two trials
+move with the mend, each where she truly lay aback with sternway:**
+
+- *The trade trial* (`trial-trade-stranger`): before, the merchant schooner is taken aback
+  at 368 (04:06) and lies so with a knot or two of sternway for fifty-four minutes, until
+  she turns to evade the privateer at 3660; the recovery boxes her off at 840 and she
+  makes four knots by 04:16. Her day then falls otherwise: she meets the French brig at
+  14580 (08:03), evades her until 57840 (the brig engaging within her `break_off_nm` of
+  three miles for seven hours, then chasing), and at the twentieth hour is beating for
+  Falmouth: **never aground (with the haul-off mended), but not in port**, where the pinned
+  passage anchors at 51849 and is in port at 51900. 1330 lines, `d5f34f439970cf72` (1247,
+  `02313d83240a11d5` with the switch off).
+- *The lee-shore trial* (`trial-station-lee-shore`): before, she lies aback by spells in
+  the gale's first hours (29 lines of it in the day, the lead's judgement of 58b counted
+  them); the recovery boxes her off at 12514, 15157 and 53408 (the helm's own at 3041 as
+  before), 9 lines aback in the day; hove to again at 32160 (41940), on passage, beating
+  and the station at 38340 to 38400, hove to at 41880, beating from 51540, and **aground at
+  59820**, beating close aboard Ushant in the dark at seven knots and a half ("the land
+  close aboard is no mark of the chart"), the beating captain blind to the land under
+  his lee at night: item 2's family, reached on another track.
+
+**Found on the way, for the lead: the lee-shore trial's digest was stale on the trunk.** On
+`c168c51` itself (a worktree, the package's code absent) the trial gives its pinned states
+and 1,597 lines but the digest `7fad0ce7e46ba366`, not the pin's `ed48ca3d61e52f20`; not
+this package's, and not re-pinned here.
+
+**The question to the lead, and the ruling** (2026-10-30, at `fbff23c`): item 1 held open and
+item 2 built on top of it, the two trials measured again after it; the trade trial's pins
+moved old beside new if she keeps her intent; the lee-shore trial's "never aground" never
+moves; the stale digest not re-pinned (a digest is the build machine's figure; the lead
+measures the trunk's in the cloud). **The French brig's seven hours, answered (the lead's
+point 2): the captain's rules, mended here.** She enters `engaging` at her `engage_nm` (a
+mile); the schooner being the weaker mark, `_engaging` renews a chase course every three
+minutes and never closes her (the schooner is the faster); the action's only end was
+`break_off_nm` (three miles for ten minutes together), and her `chase_stale_hours` (three
+hours without a mile gained) was read only in `chasing`. Now the chase's log is kept in
+`engaging` while the mark is beyond `engage_nm` (never within it: a broadside at two
+cables for three hours is no stale chase), and `engaging` has the `chase stale` row in the
+roles that chase (the commodore, the cruiser, the King's ship, the privateer);
+`captains.ENGAGING_CHASE_STALE` the switch. In the trade trial she gives the chase up at
+34200 unfired (evading to 57840 with the switch off).
+
+### Item 2: the offing's tack among islands with no room to wear
+
+*The symptom*, read on `c168c51` (the trial an expected failure since 57): the frigate
+beating for her station off Ushant in the westerly gale, 1014 lines, aground at 42394
+stern first among the islands of the Molène passage. 'The offing' puts her about at 37320
+with Molène three miles under her lee and `put_about_choice` wears her (no head sail set,
+the topsails close-reefed, 35 knots): 0.41 nm lost to leeward in thirteen minutes, not the
+fatal decision. The fatal one is the leg's course law at 38760 ("NNW lies too near the wind
+to be laid; she has not way enough to stay, and is worn round"), with the land two miles
+on her lee quarter and 40 to 67 degrees of leeway; the wear begins at 39855, fails at 40756
+("she would not come round"), and she sets down on the islands. The old tack-regardless
+rule read the lookout's land within 67.5 degrees of dead to leeward only: at 41700, the land
+five cables on her lee quarter (SSE, 68.5 degrees off), it still chose to wear. Under item 1
+the lee-shore trial took a second road to the same fault: beating at night after the gale
+she stood on at five knots and a half onto the Four (61021), "the land close aboard on the
+starboard bow, bearing SW, distant five cables" by the lookout, her account four and a half
+miles out, 'the offing' a `when` rule true since the gale and the beating book with no
+'land ahead'.
+
+*The rule as it stood:* the offing's and the leg's choice of tack or wear by the sail and
+the wind, the room under her lee read only as the lookout's land in a narrow sector; nothing
+of the rules captain's reading the land on her bow or the chart ahead at night.
+
+*The rule as it reads now:*
+
+- **The room a wear takes** (`navigation.no_room_to_wear`, `WEAR_ROOM` the switch): the land
+  or a charted danger within `tack_regardless_nm` (the doctrine's two miles, now read from
+  the captain's file as the comment always said; its source "the planner's danger berth
+  doubled: wearing a ship's length and more to leeward with the land two miles off is the
+  ground she cannot spare") anywhere in the lee half, by the lookout's nearest land, the
+  coast by the chart at the account and the charted dangers by account. Lever 1808 p. 79
+  (OCR line 9707): wearing, "whilst she is receding from the wind, she is forced rapidly
+  through the water, and making all her way to leeward". With no room, `put her about`
+  tacks ("where wearing would lose the ground"), and a course shaped (never the helm's own
+  order) that would be worn round for want of way to stay keeps her full and by on her tack
+  to claw off; a course held for way is judged again by the same law when she has it.
+- **The land or a danger ahead** (`Captain._danger_ahead_by_chart`, `DANGER_AHEAD` the
+  switch, every role's `danger_ahead_nm`, a mile and a half, judgement): on a sailing state
+  out of pilot water with no manoeuvre in hand and way on her, the lookout's nearest land on
+  her bow (within four points of her head) within the distance by any light; or with no land
+  in sight the land on her course or a charted danger within two cables of it with too
+  little water for her, by the chart at the account (`chart.dangers_ahead`, 37h's pilot's
+  warning, read by account), and nearer than the leg's own mark: he puts her about, tacked
+  where a wear would cost the ground. Falconer 1780, CLAWING (OCR line 5576): "the act of
+  beating, or turning, to windward from a lee-shore, so as to acquire a sufficient distance
+  from it, to escape the dangers of shipwreck". Heaving to till light is not built: with the
+  room law and the land ahead answered no trial wanted it; booked as found.
+
+*What proves it.* **The station gale's expected failure lifted**: never aground in the
+twenty hours; hove to 15060, on passage 28560 and keeping station 28680 (30780, beating
+31560 before), hove to 41880, beating from 50580; 1722 lines (1014 on `c168c51`). Tacked at
+6721 and 7321 in the forenoon with Ushant two miles under her lee where she was worn, the
+day falls otherwise from there; filled away for the lee shore in 42 knots at 28560 she lies
+aback by turns for two hours (70 lines of it in the day, 23 before), 58b's gale book's
+ground (the lee-shore trial's own filled-away hour after the gale is the same), **found,
+for the lead**: the docstring's "aback eleven minutes in the twenty hours" no longer holds
+and says so. **The lee-shore trial never aground** (states moved old beside new, 1561
+lines). **Truth 7-341**, among the Molène islands: two miles west of Molène in a westerly of
+34 knots the land a mile on her starboard bow, `put her about` tacks her and the other tack's
+course she has not the way to stay for keeps her full and by; the switch off, worn both.
+
+**By bisection on the final code** (each switch off alone; all four off give every old
+figure: the lee shore 1597 lines, the gale aground 42394, the trade trial 1247 and
+`02313d83240a11d5`, in port 51900):
+
+| switch off | lee shore | station gale | trade |
+|---|---|---|---|
+| none (the final code) | never aground, 1561 | never aground, 1722 | on passage at hour 20, 1594 |
+| `ABACK_RECOVER` | never aground, 1654 | never aground, 1687 | in port 55680, 1444 |
+| `WEAR_ROOM` | never aground, 1660 | **aground 50989** | as final |
+| `DANGER_AHEAD` | **aground on the Four 61021** | 1719 | as final |
+| `ENGAGING_CHASE_STALE` | as final | as final | evading to 57840, 1330 |
+
+So the room law saves the gale, the land ahead saves the lee shore, the recovery and the
+haul-off (no switch: the mend of a fault) move the trade trial's day and the stale chase
+gives her evasion its end. The station-stranger trial is unmoved by all of it (788 lines,
+its pinned digest).
+
+**The trade trial, re-pinned by the ruling**: never aground, never taken, unfired; at the
+twentieth hour on passage for Falmouth, eleven miles off by account (in port at 51900
+before): what the recovery (no longer fifty-four minutes aback at the start) and the longer
+evasion (met at 08:03, not 05:01) cost her. Her other figures old beside new in the test.
+
+**The lead's rulings on item 2 (2026-10-31):** truth 7b-129's band accepted old beside new,
+its docstring saying what ends her lying a-try (the lee-shore line, not the gale's end); the
+lee shore's digest pinned at this package's figure with the trunk's and the stale one beside
+it, decided at the merge in the cloud; the wardroom door's evasion hour (3700 to 14700)
+accepted. **The station gale's two hours aback by turns, booked for the gale book (58b's
+family)** as the lead asked, with the figures: filled away for the lee shore in 42 knots at
+28560 under the close-reefed topsails and the storm staysails, she lies aback by turns until
+about 37000 (70 lines of it in the day, 23 on `c168c51`), her way swinging from -2.6 to +6.3
+knots within minutes in the heavy sea, the topsails filling and backing by turns. **Item 1's
+recovery does not act there:** it is armed (she has had way) and its while begins again and
+again, but never runs its three minutes, each minute with headway beginning it anew; she is
+not lying aback with no way but aback by turns with way between, and there is no driver set
+(only the topsails and the storm staysails), so its first step would be the box-off; nothing
+waits behind hands at a yard. The full-and-by helm under close-reefed topsails in that sea is
+the gale book's ground, not this package's.
+
+### Item 3: 72's near station law read against 58b's
+
+*The symptom:* 86's reading of the stall first suspected the near `keep station` of shaping
+a course inside the close-hauled angle with no bear-away to fill; the stall was the
+commodore's own (item 1), but the near law had not been read for it.
+
+*The rule as it stands, read:* **the two bodies agree in the filling.** The near law
+(`orders/station.py`) out of station clamps the course for the station to the close-hauled
+course on the tack that points nearer (`_course_clamped`, "as near the wind as she will
+lie"); in station it gives the flag's course to `navigation.judge_course`, which keeps her full
+and by on her tack for a course inside her angle (the "too near the wind to be laid" row of
+the primer's chapter 2). The far body's station leg (`squadrons.keep_station`) fills by 58b's
+`Vessel._course_for`, the beating angle on the tack that points nearer, held until she can
+lay it. Neither steers a ship inside her angle.
+
+**Where they differ, and why they are left two.** They aim differently: the near law at a
+point `LEAD_M` (three cables) ahead of the station along the flag's course, so that a ship a
+cable off closes at some twenty degrees and does not chase the point across the line; the
+far leg at the station itself. For a station to windward of her fetch with the flag
+close-hauled the two can fill her on opposite tacks (the near on the flag's, the far away from
+her), so that a member crewed or uncrewed at the range might go about at the promotion.
+Taken another way, twice, and undone: (1) the far leg given the near aim whenever astern of her
+station moved six tests (the squadron's line at far detail 230 m off its station against the
+185 of truth 7-155's band, the blockade's, the convoy's succession, truths 7-152, 7-153 and
+7-340); (2) given it only where the station's bearing lies inside her close-hauled angle, it
+still moved three: truth 7-152 (the Friendship back in station at 6660 against 6060), truth
+7-340 (the spanker in at 1860 against 1800, the far members' stations moving the commodore's
+book) and the convoy's succession, whose far line ahead was no longer within half a cable
+after two hours (a follower's station in the wake of the ship ahead lies inside her angle
+whenever she is a little off it, and aimed ahead of it she never settles). The far leg's
+bare bearing is the better law for a far station; the near law's lead serves the near helm.
+**The far leg is as it was** (the file restored to the trunk's); the opposite tack at a
+promotion is **found, for the lead**, with these figures. *What proves it:* the squadron's
+truths 7-152 to 7-155 as they stand (passed on the final code); the test in
+`tests/test_squadrons.py` with the flag close-hauled and a crewed brig ordered two cables to
+windward of her: the near law gives the close-hauled course at her angle, full and by, and the
+far law fills any bearing inside its beating angle to the beating angle on either side.
+
+### Item 4: the colours held once shown before an enemy
+
+*The symptom* (the owner's debrief of 70 to 72): a privateer under British colours did not
+answer the private signal, showed French colours within two cables, and "switched between
+French and British colours as we engaged them". **Reproduced:** a French privateer schooner
+cruising off the Lizard closes a British merchant schooner under British colours
+(investigating at 60, chasing at 360), shows her own and engages at 420; the action over at
+5640 and the schooner still in sight, she investigates her again at 5700 and **hoists the
+British colours again**. Not in the encounter scenario: there the privateer cutter evades the
+frigate under false colours and never shows her own.
+
+*The rule as it stood:* `signalling._colours_by_doctrine` hoisted the principal enemy's
+colours whenever she was investigating or chasing with her own flying, each minute it ran.
+
+*The rule as it reads now* (`_true_colours_held`, `signalling.TRUE_COLOURS_HELD` the switch,
+`privateer.yaml` `true_colours_held` with its source): once her own colours have flown before
+an enemy (shown at `true_colours_cables`, or in action), they are held for the action and
+until every enemy she showed them to is out of sight; the ruse is not taken up again before
+the same ship. The source in the file: the law allowed the ruse until the first shot and made
+the shot under false colours a pirate's act (the file's `false_colours`; truth 7-149); a ship
+that has shown her own colours and fought under them has no ruse left to keep; judgement.
+
+*What proves it:* **truth 7-342** with the switch (held through 5700 and the second chase;
+off, British again at 5700); the encounter's and the first action's truths 7-133 to 7-151 and
+the squadron's to 7-159 as they stand (passed on the final code); the hail untouched (`lie:
+merchant` as before, no line of `world/hail.py` or `hail.yaml` changed).
+
+### Found on the way
+
+- **The lee-shore trial's digest stale on the trunk** (`7fad0ce7e46ba366` against the pinned
+  `ed48ca3d61e52f20` on `c168c51`): the lead's, at the merge (ruled).
+- **The station gale's aback by turns after the gale**: the gale book's (above).
+- **The opposite tack at a station's promotion** (item 3): left two by measure, for the lead.
+- **Heaving to till light** (item 2's brief): not built; with the room law and the land ahead
+  answered no trial wanted it.
+- **The merchant brig full and by 103 degrees off the wind** for some minutes after a station
+  order in the item 3 probe (her yards as they stood): the helm's, seen in a probe only, not
+  measured.
+- **`tack_regardless_nm`** in every captain's file was never read before this package (the
+  navigation's own two miles stood); now read, the same figure, so nothing moved by it alone.
+- **This container lacked the server extra** (`fastapi`): the fast tier's import failures were
+  the machine's; installed, they pass.
+
+### The suites, as run (the final code, this container's four cores)
+
+The switches of the package, each its law's for the bisection, all on: `captains.ABACK_RECOVER`,
+`captains.DANGER_AHEAD`, `captains.ENGAGING_CHASE_STALE`, `navigation.WEAR_ROOM`,
+`signalling.TRUE_COLOURS_HELD`; all off give every recorded passage's old figure (the three
+trials measured so, the table under item 2).
+
+- `ruff check .` and `ruff format --check .`: clean.
+- **The slow tier of the touched files with the captain's trials and the known truths whole**
+  (`tests/test_captain_trials.py`, `test_known_truths.py`, `test_captains.py`,
+  `test_squadrons.py`, `test_signals.py`, `test_wardroom_doors.py`, `test_crews.py`,
+  `test_brains.py`; `--slow -m "not pace" -n 4`): all passed, the expected failures the files'
+  own (the station gale's no longer among them).
+- **The fast tier whole** (`-n auto`): all passed but two, each passing alone after: the
+  pictures' MCP bridge "the chart is blank" under the tier's load (passes alone twice on this
+  tree, and alone on `c168c51`; the machine's, as 86 recorded), and
+  `test_log_lines.py`'s distance-to-the-land refusal, whose standing orders are named by the
+  condition's string hash modulo a thousand (`t{abs(hash(cond)) % 1000}`), the hash salted per
+  process, so that two of its conditions collided in that run ("a standing order 't223' in the
+  book already"; passes three runs out of three after): **found, not this package's file, for
+  the lead** (a flaky name; the test's own to mend). Before it, the first fast tier on item 2's
+  code had sixteen failures and four import errors, every one this container's missing
+  `fastapi` but the seated officer's evasion hour (above); with the server extra installed they
+  pass.
+- **The primer's in-world guard and the primer's tests** (`test_in_world.py`,
+  `test_primer.py`) after chapters 2, 5 and 17 were brought to the laws as built: passed.
+- **The pace tests alone and last** (`--slow -m pace`, the touched files, serially): passed.
+
+The whole suite on the merged tree is the lead's, in the cloud, at the merge.
+
