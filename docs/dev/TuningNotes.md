@@ -16326,3 +16326,10 @@ trials measured so, the table under item 2).
 
 The whole suite on the merged tree is the lead's, in the cloud, at the merge.
 
+
+**The suites on the step's tree** (`3eb9f2c`, the lead's `0b55448` merged, package 88 with it):
+the fast tier whole, 5,353 passed, none failed (32:46); the slow tier of the twenty-nine touched
+files and the known truths, `--slow -m "not pace" -n 4`, 3,032 passed, 7 expected failures,
+none failed (47:13); the pace tests alone and last (`--slow -m pace`, one process), 11 passed,
+none failed (3:51): the oar term in the substep is a dictionary read on every hull and the
+pace floors stand. Ruff clean.
