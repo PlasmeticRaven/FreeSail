@@ -310,7 +310,17 @@ def test_a_merchant_brig_free_sails_a_merchant_brigs_own_file():
     assert doc["hold"]["capacity_tons"] > 100
     with open("data/ships/brig.yaml", encoding="utf-8") as f:
         harpy = yaml.safe_load(f)
-    assert doc["hull"] == harpy["hull"] and doc["spars"] == harpy["spars"]
+
+    def but_ports(d):
+        profile = {k: v for k, v in d["hull"]["profile"].items() if k != "ports_m"}
+        return {**d["hull"], "profile": profile}
+
+    # OLD BESIDE NEW (the hull step's landing). Old: her whole hull the brig's. New: all of it but
+    # the profile's ports: one class in two roles, alike "except where they specifically differ in
+    # details" (Build-Ships.md §5.0 principle 10), her own two guns' ports at her guns' x, since no
+    # gun's x moves (§5.3; the lead's note of 2026-10-31, point 5). What differs is pinned as built
+    # by tests/test_hull_brig.py::test_one_hull_in_two_roles_alike_but_her_own_two_guns_ports.
+    assert but_ports(doc) == but_ports(harpy) and doc["spars"] == harpy["spars"]
     world = make_scenario_world(sf)
     begin(world, sf)
     roles = [p.role for p in world.people.all]

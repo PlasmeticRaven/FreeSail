@@ -17,23 +17,35 @@ file changes with them (the two-way byte test, `tests/test_ship_particulars.py`)
   section points, scaled by §5.0 principle 7; on Steel's 36 it gives the pages note's figures;
 - `Builder.dump` writes the form's mappings as blocks and `sections_m` one station to a line.
 
-Every hull here is built in the test; a ship file is written only into `tmp_path`.
+Every hull in those tests is built in the test; a ship file is written only into `tmp_path`.
+
+From SW-2 and SW-2b.2 (§5.6, §15), at the end, the ship files themselves: every file's rail above
+its decks and sills and a mark on every shape line; each port triple's gap to the drawn side at its
+sill and the drawn displacement and depth beside the filed ones, reported; the pair check, with
+`SAME_HULL_BY_INTENT`; and truth 7-185, drafted here as §15 has it, its bands old beside new.
 """
 
 from __future__ import annotations
 
 import copy
+import functools
 import importlib.util
 import inspect
+import itertools
 import math
+import subprocess
+import sys
+from dataclasses import replace
 from pathlib import Path
 
+import numpy as np
 import pytest
 import yaml
 
+from freesail.combat.ports import PORT_PLACES
 from freesail.ship import form as drawn
-from freesail.ship.loader import load_ship, spec_from_dict
-from freesail.ship.profile import interp
+from freesail.ship.loader import load_ship, load_spec, spec_from_dict
+from freesail.ship.profile import interp, ports_of, rail_at
 from freesail.ship.schema import PROFILE_KEYS, HullForm, HullStern
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -708,3 +720,377 @@ def test_the_dump_writes_the_form_as_blocks_and_the_sections_a_station_a_line(ge
     assert "  # The filed displacement.\n" in text and "The hull as drawn" not in text
     assert yaml.safe_load(text)["hull"]["profile"] == hull["profile"]
     assert load_ship(path).spec.hull.profile == _spec(hull).profile
+
+
+# -- SW-2 with SW-2b.2: the ship files' own lines (§5.6) -----------------------------------------
+
+SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
+SHIP_NAMES = [path.stem for path in SHIP_FILES]
+# The eight files of the packages before 75, whose lines the hull step drew.
+THE_EIGHT = (
+    "brig",
+    "cutter",
+    "frigate-36",
+    "lugger",
+    "merchant-brig",
+    "privateer-schooner",
+    "smack",
+    "topsail-schooner",
+)
+
+
+@functools.cache
+def _ship_spec(name: str):
+    return load_spec(ROOT / "data" / "ships" / f"{name}.yaml")
+
+
+def test_every_file_carries_a_profile_whose_rail_stands_above_its_decks_and_sills():
+    for name in SHIP_NAMES:
+        p = _ship_spec(name).hull.profile
+        assert p is not None, name
+        for word, points in p.decks_m:
+            for x, z in points:
+                # abaft or forward of the rail's points the side closes to the stern or the stem
+                if p.rail_m[0][0] <= x <= p.rail_m[-1][0]:
+                    assert z <= rail_at(p, x), (name, word, x)
+        for word, triples in p.ports_m:
+            for x, sill, _hb in triples:
+                assert interp(dict(p.decks_m)[word], x) <= sill < rail_at(p, x), (name, word, x)
+
+
+def test_a_mark_on_every_shape_line_of_every_file():
+    """§5.0 principle 4: each line a file gives, each group of its form and each key of its stern
+    but the stern's type says in one word where it came from."""
+    for name, path in zip(SHIP_NAMES, SHIP_FILES, strict=True):
+        p = yaml.safe_load(path.read_text(encoding="utf-8"))["hull"]["profile"]
+        form = p["form"]
+        lines = [k for k in p if k not in ("form", "marks")]
+        groups = [f"form.{k}" for k in form]
+        stern = [f"form.stern.{k}" for k in form.get("stern", {}) if k != "type"]
+        marks = p["marks"]
+        assert [k for k in lines + groups + stern if k not in marks] == [], name
+        assert set(marks.values()) <= {"sourced", "stand-in", "rule", "judged"}, name
+
+
+# The triples each file's sources measured, as her module's `measured` names them to `g.hull_form`
+# (deck, x's): the other triples stand at the guns' own x and are reported.
+MEASURED_TRIPLES = {
+    "cutter": ("upper", (-4.75, -2.35, 0.02, 3.58)),  # the sheet's four ports
+    "privateer-schooner": ("upper", (-10.86, -2.08, 4.81)),  # the plate's three with no gun in them
+    "topsail-schooner": ("upper", (-10.86, -2.08, 4.81)),
+}
+
+
+def test_each_port_triples_gap_to_the_drawn_side_is_reported_and_a_measured_one_held(capsys):
+    """§5.6, §5.3: the drawn side's half-breadth at each sill less the triple's, reported for the
+    eight and asserted within `form.PORT_GAP_M` for a measured triple; no triple is ever moved to
+    the drawing (§5.0 principle 8). The lugger and the smack have none, their sheets drawing no
+    port and their guns none (§5.4, §5.7)."""
+    gaps = {}
+    for name in THE_EIGHT:
+        hull = _ship_spec(name).hull
+        gaps[name] = {
+            (word, x): drawn.half_breadth_at(hull, x, sill) - hb
+            for word, triples in hull.profile.ports_m
+            for x, sill, hb in triples
+        }
+    with capsys.disabled():
+        print("\nthe port triples' gaps to the drawn side, m, deck by deck, aft to forward:")
+        for name, by_port in gaps.items():
+            print(f"  {name}: " + (", ".join(f"{g:+.2f}" for g in by_port.values()) or "no port"))
+    assert not gaps["lugger"] and not gaps["smack"]
+    assert all(gaps[name] for name in THE_EIGHT if name not in ("lugger", "smack"))
+    for name, (deck, xs) in MEASURED_TRIPLES.items():
+        held = [g for (w, x), g in gaps[name].items() if w == deck and x in xs]
+        assert len(held) == len(xs) and max(abs(g) for g in held) <= drawn.PORT_GAP_M, name
+
+
+def test_the_drawn_displacement_and_depth_stand_beside_the_filed_ones(capsys):
+    """§5.6, §5.0 principle 8: reported and never moved. A drawn displacement more than 15% off the
+    filed one says so: the two brigs' at -27% and the smack's at -18%, which the lead's note of
+    2026-10-31 has reported past the line."""
+    past = set()
+    with capsys.disabled():
+        print("\nthe hulls as drawn, beside the files:")
+        for name in SHIP_NAMES:
+            hull = _ship_spec(name).hull
+            displacement, depth = drawn.check(hull)[:2]
+            print(f"  {name}: {displacement}; {depth}")
+            assert f"against the filed {hull.displacement_kg / 1000.0:.0f} t" in displacement
+            assert f"against the file's draught of {hull.draught_m:g} m" in depth
+            if "more than 15% off: recorded, not moved" in displacement:
+                past.add(name)
+    assert past == {"brig", "merchant-brig", "smack"}
+
+
+# -- the pair check (§5.6) -----------------------------------------------------------------------
+
+# Two files may draw alike only as one class in two roles, with the owner's reason (§5.0 principle
+# 10; the owner, 2026-10-28). The pair check fails any other pair.
+SAME_HULL_BY_INTENT = {
+    frozenset(("brig", "merchant-brig")): (
+        "Keep her like the brig, for the purposes of hulls that currently are shared between navy "
+        "and merchant roles, we shall consider them one class in two purposes, so the hull may "
+        "stay the same between the roles for current examples."
+    ),
+    frozenset(("topsail-schooner", "privateer-schooner")): (
+        "Alike for now, same reasoning as the brig, they are one class in two roles, so they would "
+        "look alike except for where they specifically differ in details."
+    ),
+}
+PAIR_BOX_PX = 100.0
+# Judgement, re-set after the owner's first sheet, old beside new (§5.6).
+PAIR_APART_PX = 4.0
+
+
+def _ring(outline) -> np.ndarray:
+    """An outline as a closed ring of points, `form.outline` having normalised it."""
+    return np.array([*outline, outline[0]], dtype=float)
+
+
+def _thin(ring: np.ndarray) -> np.ndarray:
+    """The ring in pixels with a point dropped where it stands within half a pixel of the last kept,
+    the end kept: an end-on outline runs to hundreds of points a few hundredths apart, and half a
+    pixel is nothing beside `PAIR_APART_PX` (measured: every pair's figure as at a tenth of one,
+    within 0.01 px, in little more than half the time)."""
+    kept = [ring[0]]
+    for point in ring[1:-1]:
+        if np.hypot(*(point - kept[-1])) >= 0.5:
+            kept.append(point)
+    kept.append(ring[-1])
+    return np.array(kept)
+
+
+def _dense(ring: np.ndarray) -> np.ndarray:
+    """The ring's points, and more along each edge so that none is over a pixel from the next."""
+    out = [ring[:1]]
+    for a, b in zip(ring[:-1], ring[1:], strict=True):
+        steps = max(1, math.ceil(float(np.hypot(*(b - a)))))
+        out.append(a + (b - a) * (np.arange(1, steps + 1) / steps)[:, None])
+    return np.vstack(out)
+
+
+def _farthest_from(points: np.ndarray, ring: np.ndarray) -> float:
+    """The farthest any of the points stands from the nearest edge of the ring."""
+    a, edge = ring[:-1], ring[1:] - ring[:-1]
+    lengths = np.maximum((edge * edge).sum(axis=1), 1e-12)
+    from_a = points[:, None, :] - a[None, :, :]
+    along = np.clip((from_a * edge[None, :, :]).sum(axis=2) / lengths[None, :], 0.0, 1.0)
+    off = from_a - along[:, :, None] * edge[None, :, :]
+    return float(np.hypot(off[:, :, 0], off[:, :, 1]).min(axis=1).max())
+
+
+def _px_apart(one, other) -> float:
+    """The Hausdorff distance between two outlines, in pixels, the pair drawn in one 100-px box:
+    their joint extent filling it each way."""
+    a, b = _ring(one), _ring(other)
+    low = np.minimum(a.min(axis=0), b.min(axis=0))
+    high = np.maximum(a.max(axis=0), b.max(axis=0))
+    scale = PAIR_BOX_PX / np.maximum(high - low, 1e-12)
+    a, b = _thin((a - low) * scale), _thin((b - low) * scale)
+    return max(_farthest_from(_dense(a), b), _farthest_from(_dense(b), a))
+
+
+def _own(hull, view: str) -> np.ndarray:
+    """The hull's outline in one view on her own drawn figures, as §5.6 words it ("normalised to one
+    length, beam, freeboard and draught"): `form.outline` divides by her filed length, beam and
+    draught, and an S hull is drawn at her sheet's, not those (§5.0 principles 5 and 8). So the
+    along by her drawn water line, its middle at nought; the across by her widest half-breadth; the
+    depth by her deepest point. The freeboard is `form.outline`'s, her own drawn top already."""
+    stations = drawn.stations(hull)
+    ends = [
+        float(np.interp(0.0, [p[1] for p in s], [p[0] for p in s]))
+        for s in (stations[0], stations[-1])
+    ]
+    widest = max(p[2] for s in stations for p in s)
+    deepest = -min(p[1] for s in stations for p in s)
+    ring = np.array(drawn.outline(hull, view), dtype=float)
+    if view == "abeam":
+        across = (ring[:, 0] * hull.length_waterline_m - 0.5 * sum(ends)) / (ends[1] - ends[0])
+    else:
+        across = ring[:, 0] * 0.5 * hull.beam_m / widest
+    up = np.where(ring[:, 1] < 0.0, ring[:, 1] * hull.draught_m / deepest, ring[:, 1])
+    return np.column_stack([across, up])
+
+
+def _rings(hull) -> list[np.ndarray]:
+    return [_own(hull, view) for view in drawn.VIEWS]
+
+
+def _apart(rings_one, rings_other) -> list[float]:
+    return [_px_apart(a, b) for a, b in zip(rings_one, rings_other, strict=True)]
+
+
+def _views_apart(one, other) -> list[float]:
+    return _apart(_rings(one), _rings(other))
+
+
+def test_the_pair_check_reads_a_hull_by_its_lines_and_not_its_size():
+    """One shape at two sizes stands nothing apart, every view being normalised to one length,
+    beam, freeboard and draught on her own drawn figures (`_own`), and so does one drawing under
+    another file's filed figures, which is §5.0 principle 10's silent sharing; another stem and a
+    fuller section do not."""
+    lines = {
+        "rail_m": RAIL,
+        "breadth_m": BREADTH,
+        **{f"{k}_m": PARTS[k] for k in ("keel", "stem", "stern", "section")},
+    }
+    figures = {
+        "length_waterline_m": 40.0,
+        "beam_m": 10.0,
+        "draught_m": 4.5,
+        "displacement_kg": 900000.0,
+        "gm_m": 1.2,
+    }
+
+    def spec(profile, **hull):
+        return _spec({**figures, **hull, "profile": profile})
+
+    def scaled(k_x, k_y, k_up, k_down):
+        def up(z):
+            return z * (k_up if z >= 0.0 else k_down)
+
+        return {
+            "rail_m": [[x * k_x, up(z)] for x, z in lines["rail_m"]],
+            "breadth_m": [[x * k_x, w * k_y, r * k_y] for x, w, r in lines["breadth_m"]],
+            "keel_m": [[x * k_x, up(z)] for x, z in lines["keel_m"]],
+            "stem_m": [[x * k_x, up(z)] for x, z in lines["stem_m"]],
+            "stern_m": [[x * k_x, up(z)] for x, z in lines["stern_m"]],
+            "section_m": [[up(z), hb * k_y] for z, hb in lines["section_m"]],
+        }
+
+    plain = spec(lines)
+    larger = spec(
+        scaled(1.5, 1.2, 1.25, 0.8),
+        length_waterline_m=60.0,
+        beam_m=12.0,
+        draught_m=3.6,
+    )
+    assert max(_views_apart(plain, larger)) < 0.01
+    assert max(_views_apart(plain, plain)) < 1e-9
+    # the same lines, not scaled, under another file's figures (the stations' grid moving with her
+    # filed length, under a pixel): on the filed figures this stood far apart and passed
+    filed_otherwise = spec(lines, length_waterline_m=31.0, beam_m=7.5, draught_m=3.0)
+    assert max(_views_apart(plain, filed_otherwise)) < PAIR_APART_PX / 2.0
+    raked = copy.deepcopy(lines)
+    raked["stem_m"] = [[17.0, -4.4], [18.0, -1.0], [18.5, 0.0], [24.0, 5.0]]
+    assert _views_apart(plain, spec(raked))[0] >= PAIR_APART_PX
+    fuller = copy.deepcopy(lines)
+    fuller["section_m"] = [
+        [-4.2, 3.0],
+        [-3.0, 4.6],
+        [-1.5, 4.9],
+        [0.0, 5.0],
+        [1.0, 5.1],
+        [4.0, 4.6],
+    ]
+    assert max(_views_apart(plain, spec(fuller))) >= PAIR_APART_PX
+
+
+def test_the_pair_check_fails_one_drawing_under_two_files_figures():
+    """§5.0 principle 10: the cutter's profile given point for point to the smack, her filed figures
+    kept, is one drawing, and the check must see it. On the filed figures (`form.outline` alone) it
+    stood 14.84, 12.93 and 14.69 px apart and passed (the landing's review, by this mutation)."""
+    cutter = _ship_spec("cutter").hull
+    copied = replace(_ship_spec("smack").hull, profile=cutter.profile)
+    assert max(_views_apart(cutter, copied)) < PAIR_APART_PX / 2.0
+
+
+def test_the_pair_check_every_two_files_differ_or_stand_as_one_class_in_two_roles(capsys):
+    """§5.6, §5.0 principles 1 and 10: every two files' outlines abeam, ahead and astern, in one
+    100-px box, differ by `PAIR_APART_PX` or more in at least one view, or the pair stands in
+    `SAME_HULL_BY_INTENT` with the owner's reason. Before the hull step every pair was 0 px
+    apart; at its landing the closest pair outside the list, the cutter and the smack, stands 5.5,
+    4.5 and 6.0 px apart (8.4, 4.4 and 6.2 by the filed figures, as first measured)."""
+    rings = {name: _rings(_ship_spec(name).hull) for name in SHIP_NAMES}
+    apart = {
+        frozenset(pair): _apart(rings[pair[0]], rings[pair[1]])
+        for pair in itertools.combinations(SHIP_NAMES, 2)
+    }
+    with capsys.disabled():
+        print("\nthe pair check, px apart abeam, ahead and astern, the closest pairs:")
+        for pair, px in sorted(apart.items(), key=lambda item: max(item[1]))[:6]:
+            print(f"  {' and '.join(sorted(pair))}: " + ", ".join(f"{v:.1f}" for v in px))
+    alike = {pair for pair, px in apart.items() if max(px) < PAIR_APART_PX}
+    assert alike <= set(SAME_HULL_BY_INTENT), sorted(map(sorted, alike - set(SAME_HULL_BY_INTENT)))
+    for pair, reason in SAME_HULL_BY_INTENT.items():
+        assert pair <= set(SHIP_NAMES), pair
+        assert "one class" in reason, pair
+
+
+# -- truth 7-185 (§15), drafted here for Phase 5 to move ------------------------------------------
+
+FT = 0.3048
+# Each file's lowest sill in its source's band, metres (§5.4, §15; §5.0 principles 5 and 12: her own
+# sheet decides over a rule). The lugger and the smack have no port, so no sill (§5.4, §5.7).
+LOWEST_SILL_BANDS = {
+    # The class's draughts, ZAZ2587 and five sheets more: port 7, 7.19 ft above WL1, ±0.05 ft, and
+    # ±0.15 ft for WL1 (pages-zaz2587.md §7.1). Steel's 36's 2.34 m (Folio I), §5.4's first figure,
+    # stands above it, recorded beside it and not ruled on (the lead's note of 2026-10-31, point 6).
+    "frigate-36": ((7.19 - 0.20) * FT, (7.19 + 0.20) * FT),
+    # OLD BESIDE NEW, the one pin this step moves (the lead's note of 2026-10-31, point 4). Old:
+    # Steel 1805 p. 124's four to five feet for "sloops, cutters, &c." (OCR l. 8268-8271), 1.22-1.52
+    # m, rung R, §5.4 as first written. New: 5 ft 2 in ±0.05 ft above WL1, port 5 of ZAZ4491, rung
+    # S, 1.555 to 1.585 m (pages-zaz4491.md §5.7, §7), her sill 0.05 m over the old band.
+    "brig": ((5.15 - 0.05) * FT, (5.15 + 0.05) * FT),
+    "merchant-brig": ((5.15 - 0.05) * FT, (5.15 + 0.05) * FT),
+    # Her own draught, as built: 1 ft 3 in over the deck (ZAZ6381's note), 3.32 ft above the line at
+    # the sheet's port 2 on CHN0224, ±0.09 ft (pages-zaz6381.md §5.8). Steel's 1.22-1.52 m, §5.4's
+    # first figure, stands above it, flagged for the owner when L2 comes (the same note, point 7).
+    "cutter": ((3.32 - 0.09) * FT, (3.32 + 0.09) * FT),
+    # The plate's own lowest, port 3, 3 ft 1 in, measured 3.11 ft ±0.05 (the lead's note, point 3;
+    # pages-chapelle-fig17.md §5.4, §6.2), Steel's schooner's figure; Spider's 3 ft 5 in of 1835,
+    # §5.4's first figure, recorded beside it.
+    "privateer-schooner": ((3.11 - 0.05) * FT, (3.11 + 0.05) * FT),
+    "topsail-schooner": ((3.11 - 0.05) * FT, (3.11 + 0.05) * FT),
+    # ZAZ1407's 5.02 ft above WL1 and the razee by her rise (truth 7-186).
+    "sixty-four": (1.53 - 0.03, 1.53 + 0.03),
+    "razee-44": (1.98 - 0.03, 1.98 + 0.03),
+}
+
+
+def test_truth_7_185_the_generator_writes_every_file_and_every_port_gun_stands_on_its_port(
+    tmp_path,
+):
+    """The brief's item 6, §15, on no world and no seed: the generator run into a scratch directory
+    (the owner's machine, 2026-10-31). The generated set equals the committed set and each file is
+    equal, compared as text. Every port gun of every fit of every file names its deck and stands on
+    a triple of that deck within 0.01 m, its (x_m, height_m) to the triple's x and sill. Each file's
+    lowest sill in its source's band (`LOWEST_SILL_BANDS`, the brig's old beside new): measured
+    2.19, 1.57, 1.57, 1.00, 0.95, 0.95, 1.53 and 1.98 m. A new ship's sill is her own truth's until
+    Phase 5 re-runs this with every file (§15)."""
+    out = tmp_path / "ships"
+    subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "gen_ships.py"), str(out)],
+        check=True,
+        cwd=ROOT,
+        capture_output=True,
+    )
+    assert sorted(p.name for p in out.iterdir()) == sorted(p.name for p in SHIP_FILES)
+    for path in SHIP_FILES:
+        made = (out / path.name).read_text(encoding="utf-8")
+        assert made == path.read_text(encoding="utf-8"), path.name
+    guns_seen = 0
+    for name in SHIP_NAMES:
+        spec = _ship_spec(name)
+        p = spec.hull.profile
+        fits = spec.armament.fits if spec.armament is not None else {}
+        for fit_name, fit in fits.items():
+            for gun in fit.guns:
+                if gun.place not in PORT_PLACES:
+                    continue
+                guns_seen += 1
+                assert gun.deck, (name, gun.id)
+                on = [
+                    t
+                    for t in ports_of(p, gun.deck)
+                    if abs(t[0] - gun.x_m) <= 0.01 and abs(t[1] - gun.height_m) <= 0.01
+                ]
+                assert on, (name, fit_name, gun.id, gun.deck, gun.x_m, gun.height_m)
+    assert guns_seen > 100
+    for name, (low, high) in LOWEST_SILL_BANDS.items():
+        p = _ship_spec(name).hull.profile
+        lowest = min(sill for _word, triples in p.ports_m for _x, sill, _hb in triples)
+        assert low <= lowest <= high, (name, lowest)
+    for name in ("lugger", "smack"):
+        assert not _ship_spec(name).hull.profile.ports_m, name

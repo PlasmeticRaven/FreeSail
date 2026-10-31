@@ -6,17 +6,16 @@ side's ports as lines of points, x forward of midships and z above the file's wa
 schema refuses in words what §5.2 refuses, and `freesail/ship/profile.py` reads it, straight
 between points and held at the ends. A gun names its `deck`, a deck word, and where the
 profile gives ports a gun with a port names a deck that has them. A file's armament may
-default to `unarmed`, whose fit is None. No file of the eight carries any of these, so each
-is inert until a ship's builder writes it, and a gun's, a gun spec's and the hull spec's
-pickles are as before while they hold no deck or profile. A pivot gun names its own arc,
-refused without one after the side; the one pivot on file, the privateer schooner's, gives it
-already.
+default to `unarmed`, whose fit is None. A document that carries none of these, built here in
+the test, loads as it always did, and a gun's, a gun spec's and the hull spec's pickles are as
+before while they hold no deck or profile. A pivot gun names its own arc, refused without one
+after the side; the one pivot on file, the privateer schooner's, gives it already.
 
 The generator (items 1 to 9) runs the four ships' modules after the eight, each a stub
 writing nothing, with `gen_ships` the running script; its `hull_profile` writes the
 profile in the schema's form to the centimetre and refuses at generation what the load
 would; its `dump` sets each line of the profile on one line with its notes; and its gun
-helpers take a deck and the centimetre, the eight files' guns keeping their bytes.
+helpers take a deck and the centimetre.
 
 The gun deck's, the readings' and the world's hooks (items 17 to 25): the lee ports' update
 shuts nothing and a gun in `Battery._shut` neither works nor fires; their two events are
@@ -339,7 +338,7 @@ def test_a_gun_and_a_hull_are_pickled_as_before_while_the_new_keys_hold_their_de
     """The checkpoint (the owner's rule for stage 0): a `Gun`, its `GunSpec` and the
     `HullSpec` leave `deck` and `profile` out of their pickled state while None, and read the
     class's None back; a deck or a profile given is kept."""
-    ship = load_ship(BRIG)
+    ship = ship_from_dict(_doc(None, [_gun("gun.1.starboard")]), "p.yaml")  # with neither
     plain = (
         (ship.guns["gun.1.starboard"], "deck"),
         (ship.spec.armament.fit().guns[0], "deck"),
@@ -508,8 +507,8 @@ MODULE_FILES = {
 
 
 def test_the_hook_runs_the_four_ships_modules_after_the_eight_each_writing_its_own(tmp_path):
-    """Build-Ships.md §3.1 items 1, 2 and 28: the generator writes the eight files unchanged,
-    then imports each module in the lead's order (the Indefatigable, the Prince de Neufchatel,
+    """Build-Ships.md §3.1 items 1, 2 and 28: the generator writes the eight files, then imports
+    each module in the lead's order (the Indefatigable, the Prince de Neufchatel,
     the bilander, the 74) after `gen_ships` is made the running script; each build adds its
     own files and no other (§4.1), a stub none."""
     out = tmp_path / "ships"
@@ -737,8 +736,8 @@ def test_the_lee_ports_events_are_registered_and_said_nowhere_yet():
 
 
 def test_the_ship_graph_serves_the_profile_where_the_file_gives_one():
-    plain = ship_graph(load_ship(BRIG))["hull"]
-    assert "profile" not in plain  # the eight files' graphs as before
+    plain = ship_graph(ship_from_dict(_doc(), "p.yaml"))["hull"]
+    assert "profile" not in plain  # a document with none: its graph as before
     served = ship_graph(ship_from_dict(_doc(PROFILE), "p.yaml"))["hull"]["profile"]
     assert served == PROFILE and list(served) == list(PROFILE)
     assert json.loads(json.dumps(served)) == served  # plain lists, as the file's
