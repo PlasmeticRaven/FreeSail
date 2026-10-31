@@ -106,9 +106,11 @@ def senses_of_place(place_id: str) -> frozenset[str]:
     if p == "shore":
         return frozenset({ASHORE})
     if p in ("boat", "cutter"):
-        # the script's boat and the pilot's cutter (a person off the ship, in no hull of
-        # his own: 82's boat is a hull and reads as a deck)
-        return frozenset({"boat"})
+        # the script's boat on her errand and the pilot's cutter alongside (a person off the
+        # ship, in no hull of his own: 82's manned boat is a hull and reads as a deck): within
+        # a boat's pull of her he sees what her deck does and hears her bell across the water
+        # (judgement); nothing of what every man in the hull feels (the heel, the motion)
+        return frozenset({DECK, p})
     return frozenset({ABOARD, DECK})
 
 
@@ -187,7 +189,7 @@ def senses_of(world: Any, person: Any) -> Senses:
         return Senses(senses_of_place(place), spot, place, person)
     if spot and spot[0] == "ashore":
         return Senses(frozenset({ASHORE}), spot, "", person)
-    return Senses(frozenset({"boat"}), spot, "", person)
+    return Senses(senses_of_place(spot[0] if spot else "boat"), spot, "", person)
 
 
 def station_senses(world: Any, station: str, person: Any = None) -> Senses:

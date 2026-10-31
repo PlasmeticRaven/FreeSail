@@ -399,6 +399,7 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 53: the boat's errands ashore and back at anchor in Carrick Road, and a
         # watch of three officers with the deck passing by the bill (truths 7b-100 to 102)
         "test_known_truths.py::test_truth_7b_100_a_person_who_goes_below_is_below_and_his_deck_order_refused_until_up",
+        "test_known_truths.py::test_truth_7b_100_old_the_officer_with_the_deck_went_below_and_kept_it",
         "test_known_truths.py::test_truth_7b_101_the_player_ashore_buys_at_the_market_in_person_and_aboard_by_the_boat",
         "test_known_truths.py::test_truth_7b_102_a_drafted_manifest_trades_in_one_errand_and_a_posted_sheet_stands",
         "test_orders_places.py::test_the_deck_passes_among_the_officers_at_the_change_of_the_watch_by_the_bill",

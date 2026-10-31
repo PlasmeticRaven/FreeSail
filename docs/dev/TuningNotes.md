@@ -17050,8 +17050,23 @@ senses were cached by the tick the same measure read 496 against 532: the stand-
 each new line asked for the person's spot afresh each time, a people lookup a line; cached by
 (the tick, the orders, the log's length) it is read once a tick.
 
-**What moved: nothing pinned.** No recorded passage moves a person below or ashore
-(`data/scenarios/*.orders`, the fixtures' saves: none has `go below`), the deck reads every row
-as before, and the filter writes nothing; the samples are not in any digest. The tests that
-moved: none of 53's (an officer without the deck goes below as he did; the refusal is for the
-deck held), none of 41's (step 2's).
+**What moved: nothing pinned; two truths moved to the rule, old beside new.** No recorded
+passage moves a person below or ashore (`data/scenarios/*.orders`, the fixtures' saves: none
+has `go below`), the deck reads every row as before, and the filter writes nothing; the
+samples are not in any digest. The slow tier found the two tests that read by the old rule:
+**truth 7b-100** (53's: the officer of the watch took the deck into the gunroom, "with the
+deck, in the gunroom") is kept as it was, a strict expected failure with the lead's ruling as
+its reason (`test_truth_7b_100_old_...`), and read anew beside it: the officer with the deck
+is refused `go below` in words naming `hand_over`, hands the deck over, goes below off watch
+and is refused the royals, comes up, is given the deck and sets them; the captain's half and
+the replay by both roads as before. **Truth 7-200** (74's tender): the fake skipper landed at
+Plymouth waited for `the boat alongside` in his sample, the boat alongside his ship in the
+Sound, which a man on the quay does not see; he acts on his own landing (`person.ashore`, the
+quay's line) instead, the rest of the truth as it was. Found by it: a person in the script's
+boat on her errand (the place `boat`, no hull of his own) had no senses at all and missed
+`the boat alongside` on his way back aboard; within a boat's pull of her he has her deck's
+senses (judgement: he sees her sails handled and hears her bell across the water), nothing of
+what every man in the hull feels. 53's test of the officer below without the deck stands; 41's
+tests are step 2's. The pace truth 7-159 read 496 ticks a second under the pace run and 500 is
+its floor; alone again it passed (the frigate alone on the trunk's tree measured 485 in this
+container, so the floor is the build machine's and the container reads about at it).
