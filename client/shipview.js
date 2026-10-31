@@ -64,7 +64,7 @@
         var hcls = "hull " + f.part + (f.side ? " " + f.side : "") + (f.cls ? " " + f.cls : "") + (f.under ? " under" : "");
         node = el(f.part === "outline" ? "polyline" : "polygon", { class: hcls, points: polygonPoints(f.pts) }, rig);
         var what = HULL_WORDS[f.part] || f.part;
-        if (f.part === "head" && f.cls && f.cls !== "strip") what = "the " + f.cls + " on the head";
+        if (f.part === "head" && f.cls && f.cls.indexOf("strip") < 0) what = "the " + f.cls + " on the head";
         if (f.part === "wale" && f.cls && f.cls.indexOf("channel") >= 0) what = "channel wale";
         if (f.part === "transom" && f.cls && f.cls.indexOf("tuck") >= 0) what = "tuck";
         title(node, "hull " + what + (f.side ? " (" + f.side + " side)" : "") + (f.under ? ", below the water" : ""));

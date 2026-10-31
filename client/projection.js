@@ -1814,7 +1814,7 @@
    *  (B5.5), rigged in or out (Ext §17.11, so that the shift does not rescale the view): it
    *  reaches far beyond the taffrail, and sheeted to the quarter its end reaches
    *  past the four directions seen on the quarter; and every boom on a hull drawn from her
-   *  profile (the razee's spanker's, her stage B). */
+   *  profile (the razee's spanker's, her stage B; the eight's since the hull step). */
   function fullRigFrame(graph, spars, hull) {
     var pts = [];
     var dirs = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];
@@ -1988,12 +1988,16 @@
   }
 
   /** The taffrail on the centreline, where a sheet led to the stern is drawn to (package 75,
-   *  B5.2; Ext §6.1): the rail's after end where the file gives a profile, else the stern of
-   *  the hull `hullFigures` draws without one (0.52 of her length abaft midships, at its
-   *  sheer there). */
+   *  B5.2; Ext §6.1): where the file gives a profile the stern's line's top, the top of the drawn
+   *  transom, or the rail's after end with no stern's line (the same point but on the cutter,
+   *  whose rail ends 0.28 m forward of her taffrail), else the stern of the hull `hullFigures`
+   *  draws without one (0.52 of her length abaft midships, at its sheer there). */
   function taffrail(hull) {
     var p = drawnProfile(hull);
-    if (p) return v(p.rail_m[0][0], 0, p.rail_m[0][1]);
+    if (p) {
+      var top = p.stern_m && p.stern_m.length ? p.stern_m[p.stern_m.length - 1] : p.rail_m[0];
+      return v(top[0], 0, top[1]);
+    }
     var L = hull.length_waterline_m;
     return v(-L / 2 - 0.02 * L, 0, (hull.deck_height_m || 1.5) * 1.02);
   }
@@ -2199,13 +2203,18 @@
     });
   }
 
-  /** The normal of a face of four points, away from the middle line on its side (`sign`, +1 the
-   *  starboard), or up where `sign` is 0: taken across its diagonals, so that a face cut to a
-   *  triangle keeps it. A figure carrying it as `outward` is seen only from that side of its
-   *  face (`project`): a wale or band on the outside of the side, not through the far bulwark
-   *  seen from inboard; a deck from above. */
+  /** The normal of a face of three points or more, away from the middle line on its side
+   *  (`sign`, +1 the starboard), or up where `sign` is 0: its area vector, so that a face cut to
+   *  a triangle keeps it and a band following the side's stations, of more points and not flat,
+   *  is judged by the whole of itself; on four points it is the cross of the diagonals. A figure
+   *  carrying it as `outward` is seen only from that side of its face (`project`): a wale or band
+   *  on the outside of the side, not through the far bulwark seen from inboard; a deck from
+   *  above. */
   function faceOut(pts, sign) {
-    var n = cross(sub(pts[2], pts[0]), sub(pts[3], pts[1]));
+    var n = v(0, 0, 0);
+    for (var i = 1; i + 1 < pts.length; i++) {
+      n = add(n, cross(sub(pts[i], pts[0]), sub(pts[i + 1], pts[0])));
+    }
     var along = sign ? sign * n[1] : n[2];
     return along < 0 ? mul(n, -1) : n;
   }
@@ -2217,7 +2226,9 @@
    * below there up to the top of the side, between the drawn side's half-breadths at its
    * heights (`hbAt`), sorted at its middle: so that the decks beyond it, and the space under the
    * higher deck, are not seen through where a two-decker has a bulkhead or a breastwork
-   * (judgement: no opening drawn; derived from `decks_m` and `rail_m` alone). A deck's end within
+   * (judgement: no opening drawn; derived from `decks_m` and `rail_m` alone). Each is seen only
+   * from the open side, abaft a deck's after end and forward of its fore end: from the other it
+   * stands under the deck it closes, and would be painted over it. A deck's end within
    * DECK_END_CLEAR_M of the rail's ends, or with no deck running on under it by as much each way,
    * has none.
    */
@@ -2254,7 +2265,7 @@
               return v(p[0], -p[1], p[2]);
             })
         );
-        figs.push({ kind: "hull", part: "bulkhead", deck: word, pts: face, sortAt: centroid(face) });
+        figs.push({ kind: "hull", part: "bulkhead", deck: word, pts: face, sortAt: centroid(face), outward: v(x === pts[0][0] ? -1 : 1, 0, 0) });
       });
     });
     return figs;
@@ -2840,20 +2851,48 @@
       });
     }
     /** A band over one strip, [xa, xb] cut to its extent and, beside a closure, to where the
-     *  stern's or the stem's line stands at its heights; its edges on the drawn side, within
-     *  the side's low edge and top. Null where nothing is left. */
+     *  stern's or the stem's line stands at its heights; its two ends on the drawn side, within
+     *  the side's low edge and top, each following the side from the band's lower height to its
+     *  upper through every height the strip's two stations have a point at. A straight chord
+     *  between the two heights ran inside the side's curve, and from ahead and astern the side
+     *  showed past it strip by strip, a comb along the band. Null where nothing is left. */
     function bandOn(A, B, sign, b) {
       var xa = Math.max(A === H.aft ? -Infinity : A.x, b.x0);
       var xb = Math.min(B === H.fore ? Infinity : B.x, b.x1);
       if (A === H.aft) xa = Math.max(xa, pointOn(A.pts, b.zl(xa))[0], pointOn(A.pts, b.zu(xa))[0]);
       if (B === H.fore) xb = Math.min(xb, pointOn(B.pts, b.zl(xb))[0], pointOn(B.pts, b.zu(xb))[0]);
       if (xb - xa < 1e-6) return null;
-      function edge(x, upper) {
-        var z = between(H.lowAt(x), H.topAt(x), upper ? b.zu(x) : b.zl(x));
+      var levels = A.pts.concat(B.pts)
+        .map(function (p) {
+          return p[1];
+        })
+        .sort(function (p, q) {
+          return p - q;
+        });
+      /** The heights an end at x runs through, the band's lower to its upper. */
+      function heights(x) {
+        var z0 = between(H.lowAt(x), H.topAt(x), b.zl(x));
+        var z1 = between(H.lowAt(x), H.topAt(x), b.zu(x));
+        var zs = [z0];
+        levels.forEach(function (z) {
+          if (z > zs[zs.length - 1] + 1e-6 && z < z1 - 1e-6) zs.push(z);
+        });
+        zs.push(z1);
+        return zs;
+      }
+      function onSide(x, z) {
         return v(x, sign * H.hbAt(x, z), z);
       }
-      var pts = [edge(xa, false), edge(xb, false), edge(xb, true), edge(xa, true)];
-      return pts[3][2] - pts[0][2] > 1e-6 || pts[2][2] - pts[1][2] > 1e-6 ? pts : null;
+      var aft = heights(xa), fore = heights(xb);
+      if (!(aft[aft.length - 1] - aft[0] > 1e-6 || fore[fore.length - 1] - fore[0] > 1e-6)) return null;
+      var pts = [onSide(xa, aft[0])];
+      fore.forEach(function (z) {
+        pts.push(onSide(xb, z));
+      });
+      aft.slice(1).reverse().forEach(function (z) {
+        pts.push(onSide(xa, z));
+      });
+      return pts;
     }
 
     // the side, strip by strip: up the after station, down the forward one, and back along the
@@ -2884,7 +2923,12 @@
           return at(p, sign);
         });
         var mid = centroid(pts);
-        var strip = { kind: "hull", part: "side", side: side, cls: "strip", pts: pts, sortAt: mid };
+        // `faces`: seen from inside, it goes first (`project`), by the part of it above the water,
+        // the run's turn under it not counting. A closing strip, twisted, has no one way.
+        var above = pts.filter(function (p) {
+          return p[2] >= 0;
+        });
+        var strip = { kind: "hull", part: "side", side: side, cls: "strip", pts: pts, sortAt: mid, faces: A === H.aft || B === H.fore ? null : faceOut(above.length >= 3 ? above : pts, sign) };
         figs.push(strip);
         stripOf[side].push({ A: A, B: B, fig: strip });
         bands.forEach(function (b) {
@@ -3003,7 +3047,7 @@
       var lower = e === 0 && rise > 1e-6 ? foot : [corner(zs[e], -1), corner(zs[e], 1)];
       var quad = lower.concat([corner(zs[e + 1], 1), corner(zs[e + 1], -1)]);
       var middle = centroid([corner(zs[e], -1), corner(zs[e], 1), corner(zs[e + 1], 1), corner(zs[e + 1], -1)]);
-      var strip = { kind: "hull", part: "transom", cls: "strip", pts: quad, sortAt: middle };
+      var strip = { kind: "hull", part: "transom", cls: "strip", pts: quad, sortAt: middle, faces: v(-1, 0, 0) };
       figs.push(strip);
       strips.push({ z0: zs[e], z1: zs[e + 1], fig: strip });
       // under the arch, the tuck, sorted with the strip above it
@@ -3147,21 +3191,27 @@
   }
 
   /**
-   * The head (B5.6): the knee of the head between its fore edge (`head_m`) and the stem
-   * (`stem_m`), from the drawn depth there (or where the knee leaves the stem, if higher) up the
-   * knee to its top, straight back to the stem head and down the stem, a block HEAD_SIDING_M each
-   * side of the middle line: its two sides, each seen only from its own side, and its fore edge
-   * in strips (class `strip`) up the knee, and along its top back to the stem head where nothing
-   * stands on it. At its top, its front on the knee, a plain shape for what `form.head` stands
+   * The head (B5.6): the knee of the head between its fore edge (`head_m`, and `stem_m` under it
+   * where the knee leaves the stem above the water, so that the block does not start in the air)
+   * and the stem (`stem_m`), from the foot of the stem's closure (the drawn depth, or where the low
+   * line reaches the stem above it) up the knee to its top, straight back to the stem head and
+   * down the stem, a block HEAD_SIDING_M each side of the middle line: its two sides, each seen
+   * only from its own side, and its fore edge in strips (class `strip`) up the knee, and along its
+   * top back to the stem head where nothing stands on it. At its top, its front on the knee, a plain shape for what `form.head` stands
    * there (FIGURE_SHARE): an upright oval for a figure, as broad across the ship as it is deep,
    * a round for a scroll and a block for a billet, each as broad as the knee; each drawn as its
    * two sides and its face across the ship at its middle, and the knee's fore edge stopping at
-   * its foot. Seen ahead or astern, the head is a strip with the shape at its top.
+   * its foot. Seen ahead or astern, the head is a strip with the shape at its top. A knee whose
+   * top stands below the stem head (the schooners', under the bowsprit) goes back level from its
+   * top to the stem at that height and stops there: the straight line to the stem head filled a
+   * wedge no sheet has. The block's back along the stem, across the ship (class `strip back`),
+   * closes it: its sides stand off the stem by HEAD_SIDING_M, and seen from abaft the beam the sky
+   * showed between them and the stem.
    */
   function headFigures(H, profile) {
     var knee = profile.head_m, stem = profile.stem_m;
     if (!knee || knee.length < 2 || !stem || stem.length < 2) return [];
-    var floor = Math.max(-H.fore.depth, knee[0][1]);
+    var floor = H.fore.low[1];
     /** A line of [x, z] points, z rising, from `floor` up. */
     function cutLine(line) {
       var out = [[xAtHeight(line, floor), floor]];
@@ -3170,17 +3220,32 @@
       });
       return out;
     }
-    var front = cutLine(knee), back = cutLine(stem);
+    var under = stem.filter(function (p) {
+      return p[1] < knee[0][1] - 1e-9;
+    });
+    var front = cutLine(under.concat(knee)), back = cutLine(stem);
     if (front.length < 2 || back.length < 1) return [];
+    var kneeTop = knee[knee.length - 1][1];
+    if (kneeTop < back[back.length - 1][1] - 1e-9) {
+      back = back
+        .filter(function (p) {
+          return p[1] < kneeTop - 1e-9;
+        })
+        .concat([[xAtHeight(stem, kneeTop), kneeTop]]);
+    }
     var figs = [];
     /** A shape of [x, z] points (along the ship) or [y, z] (across it at x) as figures: its two
-     *  sides at ±half, each seen from its own side, or its face across the ship. */
+     *  sides at ±half, each seen from its own side, or its face across the ship. The first drawn,
+     *  the plate, sorts at its own middle; what stands on it sorts with it and so paints straight
+     *  after it, wherever the two middles lie along the view. */
+    var plateAt = {};
     function sides(outline, half, cls) {
       [1, -1].forEach(function (sign) {
         var pts = outline.map(function (p) {
           return v(p[0], sign * half, p[1]);
         });
-        var f = { kind: "hull", part: "head", side: sign > 0 ? "starboard" : "larboard", pts: pts, sortAt: centroid(pts), outward: v(0, sign, 0) };
+        if (!plateAt[sign]) plateAt[sign] = centroid(pts);
+        var f = { kind: "hull", part: "head", side: sign > 0 ? "starboard" : "larboard", pts: pts, sortAt: plateAt[sign], outward: v(0, sign, 0) };
         if (cls) f.cls = cls;
         figs.push(f);
       });
@@ -3226,6 +3291,12 @@
       var p = edge[k], q = edge[k + 1];
       var strip = [v(p[0], -HEAD_SIDING_M, p[1]), v(q[0], -HEAD_SIDING_M, q[1]), v(q[0], HEAD_SIDING_M, q[1]), v(p[0], HEAD_SIDING_M, p[1])];
       figs.push({ kind: "hull", part: "head", cls: "strip", pts: strip, sortAt: centroid(strip) });
+    }
+    // its back along the stem, across the ship
+    for (var m = 0; m + 1 < back.length; m++) {
+      var c = back[m], e = back[m + 1];
+      var closing = [v(c[0], -HEAD_SIDING_M, c[1]), v(e[0], -HEAD_SIDING_M, e[1]), v(e[0], HEAD_SIDING_M, e[1]), v(c[0], HEAD_SIDING_M, c[1])];
+      figs.push({ kind: "hull", part: "head", cls: "strip back", pts: closing, sortAt: centroid(closing) });
     }
     return figs;
   }
@@ -3340,6 +3411,15 @@
     return pieces;
   }
 
+  /** A figure's middle in ship coordinates: of its points, or of a path's segments' ends. */
+  function shipMiddle(f) {
+    var pts = f.pts || f.path.map(function (seg) {
+      return seg[seg.length - 1];
+    });
+    var sum = pts.reduce(add, v(0, 0, 0));
+    return mul(sum, 1 / pts.length);
+  }
+
   /**
    * Project a skeleton. Returns {figures, bounds} where each figure has 2D
    * points (screen x right, y down, sea line at y = 0) and a depth; figures
@@ -3386,6 +3466,16 @@
       g.depth = at ? proj(at).depth : meanDepth(all);
       // package 75: a figure inside another (a deck within the side) sorts this much farther
       if (f.sortBias) g.depth += f.sortBias;
+      // the hull step's landing (the lead's point 10): the depth of a figure's middle cannot order
+      // a closed body's faces, so a face seen from inside goes first and the stern, seen from
+      // abaft, last (`sortFigures`, which reads where each figure stands in the ship)
+      g.at = at || shipMiddle(f);
+      if (f.faces && dot(norm(heelPoint(f.faces, heel || 0)), toViewer) <= -HULL_INSIDE_BY) {
+        g.layer = HULL_INSIDE;
+        g.faces = f.faces;
+      }
+      else if (f.part === "gallery" && (f.side === "starboard" ? 1 : -1) * toViewer[1] < 0 && toViewer[0] > HULL_ABAFT) g.layer = HULL_INSIDE;
+      else if (((f.part === "transom" && f.cls) || f.part === "light") && toViewer[0] < HULL_ABAFT) g.layer = HULL_STERN;
       // package 75 (B5.6): a hull drawn from her profile, below the water as `way` has it
       if (f.sea && g.pts && way !== "solid") out.push.apply(out, atSea(g, way));
       else out.push(g);
@@ -3402,11 +3492,26 @@
   /** Painter's order, far first (spec M0-M2 §12 item 9). Depths within DEPTH_TIE of each
    *  other are a tie: then hull before rig, lines, sails before their spars, and among
    *  sails by class (SAIL_CLASS_RANK). The sort is stable, so the ship file's order
-   *  settles what is left. */
+   *  settles what is left.
+   *
+   *  Then a hull drawn from her profile, by `layer` (the hull step's landing). `HULL_INSIDE` first
+   *  of all: she is a closed body, so what stands in her cannot lie behind a face seen from inside,
+   *  and that face can cover nothing of hers: without this her far side's strips, each sorted at
+   *  its own middle, cut across the deck's far edge when she is seen near end on. Only a rig figure
+   *  standing beyond that face's plane, outside her (a lug or a spanker abaft her stern), lies
+   *  behind it, and it stays before it as the depths have it. `HULL_STERN` at the end of the hull's
+   *  figures, so that the side's after strips do not nibble the transom seen from abaft, but before
+   *  a rig figure abaft it. Everything else keeps its order, the rig against the rest of the hull
+   *  among it. */
   var DEPTH_TIE = 1e-3; // metres
   var KIND_RANK = { hull: 0, line: 1, sail: 2, spar: 3 };
+  var HULL_INSIDE = 1, HULL_STERN = 2;
+  // Judgement, measured against a depth buffer on all ten files: a strip nearly edge on, the cosine
+  // under this, stays at its depth, its upper and lower parts lying each way; and the stern takes
+  // its layer from about 120 degrees off the bow, nearer the beam the quarter standing before it.
+  var HULL_INSIDE_BY = 0.2, HULL_ABAFT = -0.5;
   function sortFigures(figs) {
-    return figs
+    var sorted = figs
       .map(function (f, i) {
         return { f: f, i: i };
       })
@@ -3424,6 +3529,41 @@
       .map(function (e) {
         return e.f;
       });
+    function inLayer(layer) {
+      return sorted.filter(function (f) {
+        return f.layer === layer;
+      });
+    }
+    var inside = inLayer(HULL_INSIDE), stern = inLayer(HULL_STERN);
+    if (!inside.length && !stern.length) return sorted;
+    var rest = sorted.filter(function (f) {
+      return !f.layer;
+    });
+    var end = rest.length;
+    while (end > 0 && rest[end - 1].kind !== "hull") end--;
+    if (stern.length) {
+      var foremost = Math.max.apply(null, stern.map(function (f) { return f.at[0]; }));
+      for (var r = 0; r < end; r++) {
+        if (rest[r].kind !== "hull" && rest[r].at[0] < foremost && rest[r].depth < stern[stern.length - 1].depth) end = r;
+      }
+    }
+    var order = rest.slice(0, end).concat(stern, rest.slice(end));
+    var held = order.map(function () { return []; });
+    held.push([]);
+    inside.forEach(function (face) {
+      var after = 0;
+      for (var i = 0; face.faces && i < order.length; i++) {
+        var o = order[i];
+        if (o.kind !== "hull" && o.depth > face.depth && dot(sub(o.at, face.at), face.faces) > 0) after = i + 1;
+      }
+      held[after].push(face);
+    });
+    var out = [];
+    order.forEach(function (f, i) {
+      out.push.apply(out, held[i]);
+      out.push(f);
+    });
+    return out.concat(held[order.length]);
   }
 
   /** SVG path data from a projected path ([[P], [C, P], ...]). */
@@ -3456,6 +3596,7 @@
     profileHullFigures: profileHullFigures,
     formHull: formHull,
     formHullFigures: formHullFigures,
+    faceOut: faceOut,
     gooseWingCorners: gooseWingCorners,
     gooseWingOf: gooseWingOf,
     gooseWingTriangle: gooseWingTriangle,
