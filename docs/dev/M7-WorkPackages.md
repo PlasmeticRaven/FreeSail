@@ -4476,8 +4476,10 @@ order from here:** L2 and L3, then the *Neufchatel* with B3.4 first; the design-
 at B2's window when the session reaches it. Bring the trunk in at each boundary; 82's step 5
 (the tow and the kedge) is building on its branch and touches no ship file.
 
-**2026-10-31, afternoon.** Gwyn's PAG3828 out of the tree (71b8ed7) is read and merges when
-its fast tier is green here (docs and the image only; the next cloud run covers it). The
+**2026-10-31, afternoon.** Gwyn's PAG3828 out of the tree (71b8ed7) is read and merged
+(the fast tier on the trial tree 5,909 passed; one browser test of the MCP bridge timed out
+on a slow machine and passed alone after; docs and the image only, the next cloud run covers
+it). The
 owner's word of today: the week pauses on new packages (decision 61); 65 is held on its
 branch at step 1; your lee-port and rig-line step is reviewed and merged when you send it,
 as the owner says you will; the *Neufchatel*'s main topgallant and the generalising of mixed
