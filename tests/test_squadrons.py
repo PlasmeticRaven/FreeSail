@@ -693,3 +693,54 @@ def test_the_seasonal_bound_holds_the_glass_under_the_ceiling_and_the_wind_with_
     assert not off.systems.bound and on.systems.bound
     # the switch is the scenario's word and leaves the dict alone when off
     assert "weather_bound" not in off.scenario.to_dict() and on.scenario.to_dict()["weather_bound"]
+
+
+def test_a_station_to_windward_of_her_fetch_is_filled_to_the_close_hauled_course_as_the_far_law():
+    """Package 88, item 3 (72's near station law read against 58b's far one; 86's reading of
+    the convoy's stall first suspected the near `keep station` of shaping a course inside the
+    close-hauled angle). The flag close-hauled (the player's cutter full and by in a westerly)
+    and a crewed merchant brig ordered to keep station two cables to windward of her, beyond
+    anything she can fetch: the near law (`station._course_clamped`) gives the close-hauled
+    course "as near the wind as she will lie" and keeps her full and by, never a course
+    inside the angle, as the far body's law (`ships.Vessel._course_for`, 58b) fills any
+    bearing inside its beating angle to the beating angle. The two agree in the filling; they
+    aim differently by design (the near law at a point `LEAD_M` ahead of the station along
+    the flag's course, the far leg at the station), and making the far leg take the near aim
+    cost the far line its station (docs/dev/TuningNotes.md, package 88)."""
+    import math
+
+    from freesail.evolutions.scripts import close_hauled_true_angle
+
+    w = world_at(
+        49.5, -5.5, ship="data/ships/cutter.yaml", ship_heading_deg=330.0, ship_speed_kn=5.0
+    )
+    w.submit("set plain sail")
+    w.submit("keep her full and by")
+    b = put(
+        w,
+        "merchant brig",
+        "britain",
+        "49 29.9 N 5 30.2 W",
+        "in company with the ship",
+        "bound for Falmouth",
+        name="Nancy",
+    )
+    w.run(121)
+    crew = b.crew
+    assert crew is not None
+    e = crew.submit("keep station two cables to windward of the ship")
+    assert e.kind == "station.kept" and "as near the wind as she will lie" in e.text, e.text
+    held = crew.ship.extra["station"]
+    wind_from = 270.0
+    closest = units.rad_to_deg(close_hauled_true_angle(crew.ship))
+    off = units.rad_to_deg(units.wrap_pi(math.radians(held["course"] - wind_from)))
+    assert abs(abs(off) - closest) < 1.0, (held["course"], closest)
+    assert crew.ship.dyn.helm_mode.name == "FULL_AND_BY"
+    # the far law for a bearing inside her angle: filled to her beating angle, never inside
+    beat = b.polar.beat_deg(14.0)
+    for bearing in (wind_from - 20.0, wind_from + 20.0, float(e.data["bearing_deg"])):
+        b.tack = 0.0
+        far = b._course_for(bearing % 360.0, wind_from, 14.0)
+        far_off = units.rad_to_deg(units.wrap_pi(math.radians(far - wind_from)))
+        assert abs(abs(far_off) - beat) < 1e-6, (bearing, far, beat)
+    assert bearing_and_distance(w.position, b.position)[1] < 3.0 * units.CABLE

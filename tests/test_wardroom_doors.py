@@ -658,7 +658,10 @@ def test_the_rules_based_captain_gives_a_seated_officer_the_deck_and_takes_it_ba
         given and given[0].data["deck"] == "given" and given[0].actor.startswith("captain's rule")
     )
     assert "by his rule, on passage; his standing orders stand over it" in given[0].text
-    world.run(3700 - world.clock.tick)
+    # package 88: the trade trial's schooner is recovered from lying aback at the start and
+    # meets the brig at 14580, not 3660 (`captains.ABACK_RECOVER`; the deck taken there, and
+    # given again when the brig gives the chase up at 34200): 3700 before
+    world.run(14700 - world.clock.tick)
     assert cap.state == "evading"
     taken = [e for e in world.log if e.kind == "agent.deck" and e.data.get("by") == "rule"]
     assert taken[-1].data["deck"] == "taken" and not oh.agent.deck

@@ -84,6 +84,8 @@ thresholds:
   # or after she has missed stays within the hour, and tacks regardless with the land to
   # leeward within `tack_regardless_nm` (freesail/orders/navigation.py `put her about`).
   wear_wind_kn: {value: 30, source: "the starter book's shorten-sail line, where the strain truths bite; Luce 1884 ch. XXIV, 'To Wear Ship' in a gale when she will not stay; judgement on the figure"}
+  aback_recover_minutes: {value: 3, source: "as the King's ship's (package 88): Luce 1866 ch. XXV, 'To Box Off'; the minutes judgement"}
+  danger_ahead_nm: {value: 1.5, source: "as the King's ship's (package 88): Falconer 1780, CLAWING; the distance judgement"}
   tack_regardless_nm: {value: 2, source: "the planner's danger berth doubled: wearing a ship's length and more to leeward with the land two miles off is the ground she cannot spare; judgement"}
   # Sail after the gale (item 5): the wind under `sail_again_kn` for `sail_again_minutes`
   # and sail is made again whatever his state (Luce 1884 ch. XXIX p. 479, 'After the gale
@@ -235,6 +237,9 @@ transitions:
   - {from: chasing, on: stranger lost, to: on passage}
   - {from: chasing, on: stranger spoken, to: on passage}
   - {from: chasing, on: chase stale, to: on passage}
+  # package 88 (found on item 1): a mark engaged beyond the engaging distance and not
+  # gained on in `chase_stale_hours` is a stale chase, given up as one
+  - {from: engaging, on: chase stale, to: on passage}
   - {from: at anchor, on: under way, to: on passage}
   # package 45 (item 3b): at anchor within the port's reach she is in port, and does her
   # business from the road by the boat; the wind to go farther in is waited for only at a

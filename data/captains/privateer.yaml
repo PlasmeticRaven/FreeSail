@@ -57,6 +57,10 @@ thresholds:
   # tell either way; some tried it).
   false_colours: {value: true, source: "the Channel privateers' habit of closing under British or neutral colours (the prize courts' records and the trade's complaints, from memory); the law allowed the ruse until the first shot"}
   true_colours_cables: {value: 4, source: "her own colours shown within hail's distance of the chase, before a shot (judgement after the record: the ensign run up as the gun was fired)"}
+  # package 88 (item 4; the owner's debrief of 70 to 72, the colours flickering under fire):
+  # her own colours once shown before an enemy are held for the action and until every enemy
+  # she showed them to is out of sight (freesail/world/signalling.py `_true_colours_held`)
+  true_colours_held: {value: true, source: "the law allowed the ruse until the first shot and made the shot under false colours a pirate's act (this file's false_colours; truth 7-149); a ship that has shown her own colours to an enemy and fought under them has no ruse left to keep, and hoisting the enemy's again before the same ship would be the pirate's act the law forbade; judgement"}
   bluff_private_signal: {value: true, source: "a guessed reply to the private signal rather than silence, which some privateers tried on a King's cruiser (from memory; judgement)"}
   investigate_nm: {value: 10, source: "as the cruiser's: a sail within ten miles is closed and made out"}
   chase_stale_hours: {value: 3, source: "as the cruiser's: a watch of chasing without a mile gained is given up"}
@@ -98,6 +102,8 @@ thresholds:
   # or after she has missed stays within the hour, and tacks regardless with the land to
   # leeward within `tack_regardless_nm` (freesail/orders/navigation.py `put her about`).
   wear_wind_kn: {value: 30, source: "the starter book's shorten-sail line, where the strain truths bite; Luce 1884 ch. XXIV, 'To Wear Ship' in a gale when she will not stay; judgement on the figure"}
+  aback_recover_minutes: {value: 3, source: "as the King's ship's (package 88): Luce 1866 ch. XXV, 'To Box Off'; the minutes judgement"}
+  danger_ahead_nm: {value: 1.5, source: "as the King's ship's (package 88): Falconer 1780, CLAWING; the distance judgement"}
   tack_regardless_nm: {value: 2, source: "the planner's danger berth doubled: wearing a ship's length and more to leeward with the land two miles off is the ground she cannot spare; judgement"}
   # Sail after the gale (item 5): the wind under `sail_again_kn` for `sail_again_minutes`
   # and sail is made again whatever his state (Luce 1884 ch. XXIX p. 479, 'After the gale
@@ -263,6 +269,9 @@ transitions:
   - {from: chasing, on: stranger spoken, to: on passage}
   - {from: chasing, on: stranger lost, to: on passage}
   - {from: chasing, on: chase stale, to: on passage}
+  # package 88 (found on item 1): a mark engaged beyond the engaging distance and not
+  # gained on in `chase_stale_hours` is a stale chase, given up as one
+  - {from: engaging, on: chase stale, to: on passage}
   - {from: investigating a stranger, on: chase stale, to: on passage}
   # package 70 (spec M7 §10): into the action and out of it
   - {from: keeping station, on: overmatched, to: evading}
