@@ -253,7 +253,8 @@ TRIAL_STATION_LEE_SHORE_STATES = [
 # 7fad0ce7e46ba366, its pinned ed48ca3d61e52f20 stale before this package (the lead to
 # measure the trunk's figure in the cloud: a digest is the build machine's)
 TRIAL_STATION_LEE_SHORE_LINES = 1561  # package 88 (1597 at 58b, judged 2026-10-24; 57: 1669)
-TRIAL_STATION_LEE_SHORE_DIGEST = "6e88e97cbdffac7b"  # 88 (ed48ca3d61e52f20 at 58b, stale)
+TRIAL_STATION_LEE_SHORE_DIGEST = "6e88e97cbdffac7b"  # 88, the builder's container; the cloud
+# 1ecbc08a61efb132 on the merged tree (ed48ca3d61e52f20 at 58b, stale); not asserted, see the test
 
 
 @pytest.fixture(scope="module")
@@ -272,7 +273,11 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
     assert states(w) == TRIAL_STATION_LEE_SHORE_STATES
     assert not [e for e in w.log if e.kind == "ship.aground"]
     assert len(w.log) == TRIAL_STATION_LEE_SHORE_LINES
-    assert w.log.digest()[:16] == TRIAL_STATION_LEE_SHORE_DIGEST
+    # the digest is not asserted (the lead at package 88's merge, 2026-10-31): a digest is
+    # the machine's, and this trial's differs by machine with the states and the line count
+    # the same (the cloud 1ecbc08a61efb132, the builder's container 6e88e97cbdffac7b);
+    # the states, the grounding and the lines are the pins
+    assert len(w.log.digest()) >= 16  # the digest is read, for the figure in a failure's log
 
 
 # -- the merchant on her passage ----------------------------------------------------------

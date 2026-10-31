@@ -12967,6 +12967,8 @@ def test_truth_7_334_the_observers_world_costs_no_more_than_the_same_world_with_
         f"the same Channel with the frigate at the view {hers:.0f}"
     )
     assert view >= hers, f"the observer's world {view:.0f} against the frigate's {hers:.0f}"
+
+
 # Package 88: the captain's pass of M7 (truths 7-340 onward)
 # ---------------------------------------------------------------------------
 
