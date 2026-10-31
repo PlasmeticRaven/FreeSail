@@ -7859,9 +7859,12 @@ def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_bei
     The head sail straining at its bolt-ropes is taken in by the captain before it blows
     out (the trial lost its fore topmast staysail at 08:29 before); she is hove to for
     weather and lies a-try under the close-reefed main topsail and the staysails, as the
-    book has it, and in the hours she lies so (four and more before package 88, three and a
-    half since) she is never taken aback, no sail is lost, and she drifts at under two knots
-    on the mean. What she does when she
+    book has it, and in the hours she lies so she is never taken aback, no sail is lost, and
+    she drifts at under two knots on the mean. What ends her lying a-try is the lee-shore
+    line (the land within `lee_shore_nm` to leeward fills her away to claw off), not the
+    gale's end: four hours and more before package 88; three and a half since, tacked and
+    not worn with Ushant two miles under her lee in the forenoon, so that the land closes
+    under her lee the sooner (the lead's ruling of 2026-10-31). What she does when she
     fills away for the station in the gale's tail is the trial's own pin, an expected
     failure until the lead has played it (`tests/test_captain_trials.py`)."""
     from freesail.physics.hull import hull_state
