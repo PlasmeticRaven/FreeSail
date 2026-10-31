@@ -16419,6 +16419,14 @@ which no recorded passage has at full detail (the hoy and the pilots' boats have
 the kedge's keeper changes only while a kedge is laid out, which no pinned day does; the tow
 is new. The truths: 7-330, 7-331, 7b-113 (the number is the dispatches' as well in the suite).
 
+**The suites on the step's tree** (`b4c9ec2`, the lead's `e012db5` merged, package 88's pace
+record with it): the fast tier whole, 5,364 passed, one failed (50:01, slowed by the
+builder's own runs beside it): `test_log_lines`' forms test, a name collision from the
+string hash seeded per process (two conditions fell on one name), passed alone three times
+and mended by index in step 7; the slow tier of the thirty-one touched files and the known
+truths, `--slow -m "not pace" -n 4`, 3,054 passed, 7 expected failures, none failed (60:13);
+the pace tests alone and last, 11 passed, none failed (3:48). Ruff clean.
+
 ### Step 6: the stations, the director and the readings (the re-brief's item 6; the design's §7)
 
 **The readings.** `the followed ship` (`the followed hull`) is a row of the registry
