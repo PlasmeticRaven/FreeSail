@@ -792,7 +792,8 @@ That the drawn side passes within 0.05 m of a port triple is the generator's che
   Swivels and pivots take `rail_at(profile, x)`. A new ship's module reassigns or passes the
   port's own x and sill (Indf §5.2).
 - **`PORT_SILL_M`** (:3615, judgement) then has no caller among the eight. It stays only if a
-  new ship's builder uses it for a deck the sources leave open, and says so.
+  new ship's builder uses it for a deck the sources leave open, and says so. None does, so the hull
+  step's landing took it out of the generator (it was 0.6 m).
 
 **The shape (B8: SW-2b.1 the helpers, SW-2b.2 the eight files; each ship's builder for hers, through the helpers).**
 - **`g.hull_form(hull, notes, *, form, marks, measured=())`** takes the ship's hull mapping (her profile in it, her displacement and draught beside it) and her notes, and adds `form` and `marks` to the profile: metres to the centimetre, counts whole, words kept. It cannot go through `_centimetres`, which makes counts floats. `measured` names the port triples a new ship measured.
@@ -831,35 +832,40 @@ Over the whole body its mean error is 0.28-0.53 m, and its largest 0.81-1.68 m. 
 
 | File | Rail and decks | Stem, stern, wale, half-breadths | Sill | Still to read |
 |---|---|---|---|---|
-| frigate-36 (*Amazon*) | Steel 1805, the bodies of "the frigate of 36 guns and 877 tons" (OCR `docs/references/steel/steel-1805-naval-architecture-1822-printing-ocr.txt:27071-27170`, garbled); Steel's rules for the top-timber and load lines (`:15178-15187`) | Folio I's 36 (read); Winfield 1793-1817 p. 143's draughts; Steel: the wale's lower edge a few inches above the load line (`:15190-15193`) | **Folio I: 7 ft 8 in above the water at midships, 2.34 m**, at a load draught of 17 ft 4 in / 18 ft 4 in (read, page image) | Steel's bodies table for the 36 from its page image. **Plainly:** Steel's 36, not *Amazon*'s own lines (not reached) |
-| brig, merchant-brig (*Harpy*'s hull) | the *Raven* brig's contract of 1804 (Steel 1805 pp. lix ff., OCR `:44331-44390`): waist, deck ends, height of breadth, moulded breadths; scaled from 100 ft to 95 ft (judgement) | the same; Winfield's draughts | the *Raven*'s sills 16 in above the deck; Steel p. 124, "sloops, cutters, &c." four to five feet above the water (`:8268-8271`): **1.22-1.52 m against the file's 2.1** | the load line the *Raven*'s figures stand on |
-| topsail-schooner, privateer-schooner (*Lynx*'s draught) | Chapelle 1930 fig. 17, the *Musquidobit* draught (held scan, p. 82) | the same | Spider's 3 ft 5 in above the water, 10 in above the deck (Chapelle pp. 166-167; the file's own, `gen_ships.py:4152-4155`) | the plate's sheer and stations, measured |
-| cutter (*Sherbourne*) | Steel 1805, "a cutter, on a new construction, of 273 tons" (the page image; the OCR at `:27779-27841` misreads 278: `ships-design/pages-steel-1805-bodies.md`), scaled (judgement) | Fincham 1843 p. 67 (the file's own); Steel's rule | Steel p. 124's four to five feet; the file's 1.5 m within it | the bodies table's page image |
-| lugger (*Éclair*) | RMG ZAZ6306, the gun lugger taken off afloat, 2 July 1795 (catalogue: `VesselReferences-2026-10.md:85`) | the same | the same; Steel p. 124 failing it | the 1280-px image, measured (`ships-design/pages-zaz6306.md`; Crown copyright, never copied) |
-| smack (*Culloden*) | Chapman 1768 Pl. LIX No. 3; Steel 1805's coasting sloop of 60 tons (OCR `:28504-`), scaled | the same | no guns by default (§9.1) | Chapman's plate |
+| frigate-36 (*Amazon*) | the class's own lines, ZAZ2587 and ZAZ2559, with ZAZ2588, ZAZ2560, ZAZ2589 and ZAZ2561 (`pages-zaz2587.md`). First written: Steel 1805, the bodies of "the frigate of 36 guns and 877 tons" (OCR `docs/references/steel/steel-1805-naval-architecture-1822-printing-ocr.txt:27071-27170`, garbled); Steel's rules for the top-timber and load lines (`:15178-15187`) | the same. First written: Folio I's 36 (read); Winfield 1793-1817 p. 143's draughts; Steel: the wale's lower edge a few inches above the load line (`:15190-15193`) | **the class's draughts, ZAZ2587: the lowest 7.19 ft above WL1, ± 0.05 ft, 2.19 m** (`pages-zaz2587.md` §7.1). First written: Folio I, 7 ft 8 in above the water at midships, 2.34 m, at a load draught of 17 ft 4 in / 18 ft 4 in (read, page image) | read: the load line is WL1, by judgement (`pages-zaz2587.md` §4.2); Steel's 36 is now a check (§9.2 there). First written: Steel's bodies table for the 36 from its page image; *Amazon*'s own lines not reached |
+| brig, merchant-brig (*Harpy*'s hull) | the class's own lines, ZAZ4491 and ZAZ4492 (`pages-zaz4491.md`). First written: the *Raven* brig's contract of 1804 (Steel 1805 pp. lix ff., OCR `:44331-44390`): waist, deck ends, height of breadth, moulded breadths; scaled from 100 ft to 95 ft (judgement) | the same. First written: the *Raven*'s; Winfield's draughts | **the sheet, ZAZ4491: the lowest 5 ft 2 in above WL1, ± 0.05 ft, 1.57 m, against the file's 2.1** (re-sourced by the lead, 2026-10-31; `pages-zaz4491.md` §5.7, §7). First written: the *Raven*'s sills 16 in above the deck; Steel p. 124, "sloops, cutters, &c." four to five feet above the water (`:8268-8271`), 1.22-1.52 m | read: the load line is WL1, the faint ruled line recorded (the lead, 2026-10-31; `pages-zaz4491.md` §4.2) |
+| topsail-schooner, privateer-schooner (*Lynx*'s draught) | Chapelle 1930 fig. 17, the *Musquidobit* draught (held scan, p. 82) | the same | **the plate's own lowest sill, 3 ft 1 in above the water, ± 0.05 ft, 0.95 m** (the lead, 2026-10-31: her own sheet over a later ship's; `pages-chapelle-fig17.md` §5.4, §6.2). First written: Spider's 3 ft 5 in of 1835 above the water, 10 in above the deck (Chapelle pp. 166-167; the file's own, `gen_ships.py:4152-4155`) | read: the plate's sheer and stations, measured |
+| cutter (*Sherbourne*) | her own draught, ZAZ6381, with ZAZ6382, CHN0224, CHN0102 and CHN0103 (`pages-zaz6381.md`). First written: Steel 1805, "a cutter, on a new construction, of 273 tons" (the page image; the OCR at `:27779-27841` misreads 278: `ships-design/pages-steel-1805-bodies.md`), scaled (judgement) | the same. First written: Fincham 1843 p. 67 (the file's own); Steel's rule | **her own draught: 1 ft 3 in over the deck, 3.32 ft above the line, ± 0.09 ft, 1.00 m** (`pages-zaz6381.md` §5.8). First written: Steel p. 124's four to five feet; the file's 1.5 m within it | CHN0105, the manuscript, not read (`pages-zaz6381.md` §8). First written: the bodies table's page image |
+| lugger (*Éclair*) | RMG ZAZ6306, the gun lugger taken off afloat, 2 July 1795 (catalogue: `VesselReferences-2026-10.md:85`) | the same | none: no port on her sheet, her three guns over the rail (the lead's point 5, 2026-10-31; `pages-zaz6306.md` §6.4). First written: the same; Steel p. 124 failing it | read: the 1280-px image, measured (`ships-design/pages-zaz6306.md`; Crown copyright, never copied) |
+| smack (*Culloden*) | Chapman 1768 Pl. LIX No. 3, scaled; Steel 1805's coasting sloop of 60 tons (OCR `:28504-`) kept as a check (the lead, 2026-10-31) | the same | no guns by default (§9.1) | none: both are read (`pages-chapman-pl59.md`). First written: Chapman's plate |
 
 Where a point is not yet measured it is written as judgement in its note, never left out
-silently. **Plainly, for the lead:** the frigate's file draws 15 ft mean (judgement,
-`gen_ships.py:1525`) against Steel's 36's 17 ft 10 in mean (Folio I); the profile takes Steel's
-freeboard at the file's line, and her draught is recorded, not moved, since it moves every
-sailing pin she has.
+silently. **Plainly, for the lead:** the frigate's file draws 15 ft mean (judgement) against her
+class's sheet's 18 ft 6 in to K at the middle (`pages-zaz2587.md` §9.1; first written, against
+Steel's 36's 17 ft 10 in mean, Folio I); the profile takes the sheet's heights above WL1 (first
+written, Steel's freeboard at the file's line), and her draught is recorded, not moved, since it
+moves every sailing pin she has. Every such figure, on every hull, stands in one table in
+`docs/dev/TuningNotes.md`, "The eight hulls".
 
 **Measured here** (`shut.py`, heel alone, half the beam, `PORT_SHUT_M` 0.3048 m,
-`combat/shot.py:116-120`):
+`combat/shot.py:116-120`; each triple by §7.1's own rule, on its own half-breadth, in the same
+section of the tuning notes):
 
-| File | Sill now | Shut now | Sourced sill | Shut then |
+| File | Sill before the hull step | Shut before it | Sourced sill | Shut then |
 |---|---|---|---|---|
-| frigate-36, upper deck | 2.4 m | 21.0° | 2.34 m | 20.4° |
-| frigate-36, quarterdeck and forecastle | 4.5 m | 45.8° | the deck + the port's sill (to read) | — |
-| brig, merchant-brig | 2.1 m | 24.7° | 1.22-1.52 m | 12.3-16.4° |
-| cutter | 1.5 m | 24.3° | 1.5 m | 24.3° |
-| privateer-schooner | 1.0 m | 11.0° | 1.04 m | 11.6° |
+| frigate-36, upper deck | 2.4 m | 21.0° | 2.19 m (first written 2.34 m) | 18.8° (first written 20.4°) |
+| frigate-36, quarterdeck and forecastle | 4.5 m | 45.8° | 3.97 m at her lowest triple (first written: the deck + the port's sill, to read) | 38.8° (first written —) |
+| brig, merchant-brig | 2.1 m | 24.7° | 1.57 m (first written 1.22-1.52 m) | 17.1° (first written 12.3-16.4°) |
+| cutter | 1.5 m | 24.3° | 1.00 m (first written 1.5 m) | 13.9° (first written 24.3°) |
+| privateer-schooner | 1.0 m | 11.0° | 0.95 m (first written 1.04 m) | 10.2° (first written 11.6°) |
 | the razee, lowest (Indf §3.4) | — | — | 1.98 m | 14.5° (on 6.67 m at the sill) |
 | the 64, lowest (Indf §3.4) | — | — | 1.53 m | 10.6° (on 6.67 m) |
 
 The side's half-breadth at the sill, narrower than half the beam, raises each figure a little.
-The brig's sill is the largest move among the existing files; where in Steel's band it lands
-is B8's measure of the *Raven*'s figures.
+The brig's sill is the largest move among the existing files, 0.53 m against the cutter's 0.50 m.
+It lands on the sheet's 5 ft 2 in, 0.05 m above Steel's band, and the sheet decides (the lead,
+2026-10-31). The cutter's shut heel moves most, 10.4° against the brig's 7.6°, and it is flagged for
+the owner's test when L2 comes (the lead's point 7).
 
 ### 5.5 D18, proposed: (a) for every file; the razee (c), the owner's choice
 
@@ -905,32 +911,45 @@ frigate-36's convention, and both files and the tuning notes would say so.
   - a mark on every shape line;
   - each port triple's gap to the drawn side at its sill, reported for the eight and asserted within 0.05 m for a new ship's measured triple;
   - the drawn displacement and depth beside the filed ones, reported;
-  - **the pair check:** every two files' outlines abeam, ahead and astern, normalised to one length, beam, freeboard and draught and drawn in a 100-px box, differ by 4 px or more (Hausdorff) in at least one view, or the pair stands in `SAME_HULL_BY_INTENT` as one class in two roles, with the owner's reason (§5.0 principle 10). It holds the brig with the merchant brig and the topsail schooner with the privateer schooner. Today every pair is 0 px apart. The 4 px is judgement, re-set after the owner's first sheet, old beside new.
+  - **the pair check:** every two files' outlines abeam, ahead and astern, normalised to one length, beam, freeboard and draught and drawn in a 100-px box, differ by 4 px or more (Hausdorff) in at least one view, or the pair stands in `SAME_HULL_BY_INTENT` as one class in two roles, with the owner's reason (§5.0 principle 10). It holds the brig with the merchant brig and the topsail schooner with the privateer schooner. Each hull is normalised on her own drawn figures, since an S hull is drawn at her sheet's and not her file's; `form.outline` divides by the filed ones, which counted a file's disagreement with its sheet as a difference of lines and passed one drawing under two files' figures. Before the hull step every pair was 0 px apart; at its landing the closest pair outside the list, the cutter and the smack, stands 6.0 px apart (8.4 on the filed figures, as first measured), and the next, the brig and the schooners, 6.5. The 4 px is judgement, re-set after the owner's first sheet, old beside new.
 - **Order** (§2.6):
   - B1 writes her two profiles from her first commit, through the same helper (stage A).
   - After the lead's approval of the hull's design (§19.2 item 13): stage 0H (§3.5), then SW-2b.1's merge; then B1's shape keys with her stage B (Indf §3.5 item 8), drawn by B5.6. This is the pilot, held for the owner's first test.
-  - After the owner's test: SW-2 and SW-2b.2 as one step, so that the eight move in bytes once, with `section_m` where the pages notes give it (`pages-steel-1805-bodies.md` §5.4 for the frigate and the cutter; `pages-chapman-pl59.md` §4.7; `pages-chapelle-fig17.md` §5.6), before SW-5 L2.
+  - After the owner's test: SW-2 and SW-2b.2 as one step, so that the eight move in bytes once, with `section_m` where the pages notes give it (`pages-zaz2587.md` §6.2 for the frigate and `pages-zaz6381.md` §5.7, §6 for the cutter, first written `pages-steel-1805-bodies.md` §5.4 for both; `pages-chapman-pl59.md` §4.10, first written §4.7; `pages-chapelle-fig17.md` §5.6), before SW-5 L2.
   - B2, B4 and B7 write their shape keys from their first commits.
 
 ### 5.7 The shape, hull by hull
 
-Rungs as §5.0 gives them. "To read" means R or T until it is read. A stand-in keeps its angles; its drawn depth is recorded beside the file's draught (§5.0 principle 7).
+Rungs as §5.0 gives them. "To read" means R or T until it is read. A stand-in keeps its angles; its drawn depth is recorded beside the file's draught (§5.0 principle 7). Since the hull step's landing (2026-10-31) a row's letter is the rung of her best source, the old beside it as "first written"; the file's `marks` take each line's weakest point (principle 4) and stand in the table under this one.
 
 | Hull | Body and side | Stern and head | Next source |
 |---|---|---|---|
-| frigate-36 | S† Steel's 36 (bodies p. 9; the folios): the breadths, the main breadth, and the sections from the diagonals, scaled to *Amazon*; drawn about 5.4 m deep against her file's 4.6 m | square, two counters, 20 ft 9 in at the top-timber line (Folio LI) S†; one gallery tier T, placed by Steel's method; lights T, plain; figure, its reach R (Folio I less LI) | to read: the class's lines, ZAZ2559 (*Amazon*'s copy) and ZAZ2587 (*Emerald*'s) (§5.9); Steel's 36 and 38 (bodies pp. 8-9) as checks |
-| brig | S† the *Raven*'s contract (Steel 1805 pp. lix-lxv) at midships; `g.midship_section`, T (a man-of-war's sharper floor); along the length T (the default rule); drag T, inferred from *Harpy*'s as-built draughts (Winfield p. 256) | square, plain, 16 ft 9 in (p. lix) S†; scroll head (p. lxv) S†; no galleries or lights | to read: the class's sheer draught ZAZ4491, with *Diligence*'s ZAZ4320 and *Hound*'s ZAZ4262 as checks, and the inboard plans ZAZ4492 (§5.9); Steel's sloop of 18 guns (bodies p. 15) as a check |
-| merchant-brig | the brig's: one class in two roles (§5.0 principle 10; §19.1 item 14) | the brig's, except where they specifically differ in details | as the brig |
-| cutter | S† Steel's 273-ton cutter (bodies p. 18), sections from the diagonals, scaled to 85 tons; drawn about 2.1 m deep against her file's 2.6 m, with her file's 2 ft of drag | square counter, 10 ft 9 in (Folio LI) S†; no head | to read: her own lines, ZAZ6381, with the deck ZAZ6382, the as-built CHN0102 and CHN0224, and the stern CHN0103 (§5.9) |
-| lugger | S above the water (ZAZ6306: stepped rail, plan); under the water T (no body plan; Chapelle 1930's "great deadrise" of a French lugger, OCR l. 508) | round at the rail S; no counter, no head S | Chapelle 1930 fig. 1 (p. 7), *Le Coureur*'s lines (the vessel of ZAZ6170 by name and date, inference); ZAZ4734-4736 |
-| smack | S† Chapman Pl. LIX No. 3: the water, the main breadth and the rail by station, the midship section; under the water between, S† Steel's coasting sloop of 60 tons (bodies p. 27, read: `pages-steel-1805-bodies.md` §3.3, §5.4) through `g.from_steel_table`, the plate's section ruling at midships | raked, rounded, 0.78 m S†; no head | none named: both sources are read |
-| topsail-schooner | S† *Lynx* (Chapelle 1930 fig. 17): sections from the LWL, WL2, WL3, sill line and rail by station | raked about 45°, 2.25 m S†; small knee S† | Steel's schooner of 133 tons (p. 25) and *Flying Fish* (Chapelle pp. 48-49), as checks on the class |
+| frigate-36 | S the class's own lines, ZAZ2587 and ZAZ2559 with frames and inboard profiles (`pages-zaz2587.md`), at the sheet's length, 43.74 m at WL1 and 5.64 m to K at the middle beside the file's 41.8 m and 4.6 m, recorded, not moved (the lead, 2026-10-31). First written S† Steel's 36 (bodies p. 9; the folios), scaled to *Amazon*, drawn about 5.4 m deep; now a check (`pages-zaz2587.md` §9.2) | square, two counters, 20 ft 5 in moulded at the taffrail S (first written 20 ft 9 in, Folio LI, S†); one gallery tier S (first written T); lights T, plain; figure T, the knee's reach S (first written R) | the deck sheets, unfetched (`pages-zaz2587.md` §10); Steel's 36 and 38 (bodies pp. 8-9) as checks |
+| brig | S the class's own lines, ZAZ4491 and ZAZ4492 (`pages-zaz4491.md`), ZAZ4320 and ZAZ4262 as checks, the sheet's length and drag recorded, not moved (the lead, 2026-10-31). First written S† the *Raven*'s contract (Steel 1805 pp. lix-lxv) at midships, T along the length | square, tuck, counter, raked transom, plain S (first written 16 ft 9 in, p. lix, S†); scroll head S (first written p. lxv, S†); no galleries or lights | ZAZ4626 and the contracts, not reached (`pages-zaz4491.md` §8); Steel's sloop of 18 guns (bodies p. 15) as a check |
+| merchant-brig | the brig's: one class in two roles (§5.0 principle 10; §19.1 item 14). Her `ports_m` alone differ, her own guns' two ports at x ±4.0 (`SAME_HULL_BY_INTENT`; the lead's point 5) | the brig's, except where they specifically differ in details | as the brig |
+| cutter | S her own lines, ZAZ6381 with ZAZ6382, CHN0224, CHN0102 and CHN0103 (`pages-zaz6381.md`), the sheet's length and drag recorded, not moved (the lead, 2026-10-31). First written S† Steel's 273-ton cutter (bodies p. 18), scaled to 85 tons, drawn about 2.1 m deep | square tuck that rounds aft, flat counter, flat transom raked about 20° to the line S (first written square counter, 10 ft 9 in, Folio LI, S†); no head S, the stem head a box above the rail | CHN0105, the manuscript, not read (`pages-zaz6381.md` §8) |
+| lugger | S above the water (ZAZ6306: stepped rail, plan); under the water S† (no body plan of her: *Le Coureur* on ZAZ6170, her type, at principle 7's one factor, drawn 2.53 m deep; Chapelle 1930's "great deadrise" of a French lugger, OCR l. 508, measured on her; first written T: the lead, 2026-10-31, `pages-zaz6306.md` §13). Her line at her sheet's length, a departure from principle 7's last sentence (0.793 by its words) | round at the rail S; no counter, no head S | read: Chapelle 1930 fig. 1 (p. 7), *Le Coureur*'s lines (the vessel of ZAZ6170 by name and date, inference); ZAZ4734-4736 (`pages-zaz6306.md` §11, §12) |
+| smack | S† Chapman Pl. LIX No. 3: the water, the main breadth and the rail by station, the midship section, and its own nine frames under the water and above it (the lead, 2026-10-31: sourced points over the rule; `pages-chapman-pl59.md` §4.10, §5.2), drawn 38 t against her file's 46 t, −18%, reported past the line. First written under the water, now a check: Steel's coasting sloop of 60 tons (bodies p. 27, read: `pages-steel-1805-bodies.md` §3.3, §5.4) through `g.from_steel_table`, 53 t, +15% | raked, rounded, 0.78 m S†; no head | none named: both sources are read |
+| topsail-schooner | S† *Lynx* (Chapelle 1930 fig. 17): sections from the LWL, WL2, WL3, sill line and rail by station | raked about 38° from the upright, the face from the transom's lower corner to the taffrail (first written about 45°, the chord from the taffrail to the post's head, which crosses the foot's band and is no drawn line: the lead, 2026-10-31; `pages-chapelle-fig17.md` §5.9), 2.25 m S†; small knee S† | Steel's schooner of 133 tons (p. 25) and *Flying Fish* (Chapelle pp. 48-49), as checks on the class |
 | privateer-schooner | the topsail schooner's: one class in two roles (§5.0 principle 10; §19.1 item 15) | as above, except where they specifically differ in details | as above |
-| the 64 | S: 17 stations; WL1-WL5 by station (Ind §2.3.2); the midship section; the channel wale; the main breadth to read (B1, stage B) | square, two gallery tiers at measured positions, transom to read (B1, stage B); the knee of the head in `head_m` S (1407F, at stage B); figure T | Steel's 64 Folio LI (cached) as a check |
+| the 64 | S: 17 stations; WL1-WL5 by station (Ind §2.3.2); the midship section; the channel wale; the main breadth S, read at her stage B (first written: to read) | square, two gallery tiers at measured positions, transom S, read at her stage B (first written: to read); the knee of the head in `head_m` S (1407F, at stage B); figure T | Steel's 64 Folio LI (cached) as a check |
 | razee | S: the 64's, +0.44 m; her decks and open waist (ZAZ2375); main and channel wales (ZAZ2371) | one gallery tier and a short roundhouse, to read and tentative (ZAZ2371 viewed at low resolution); the year, §19.1 item 18 | ZAZ2371 measured |
 | *Neufchatel* | S: three waterlines by station; the dead-flat section (Neuf §2.4) | square, about 17 ft S; knee to read, T meanwhile; counter, wale and transom face to read (B2) | ZAZ6177 |
 | bilander | S† Chapman No. 5's proportions; a trader's body R/T; Gwyn's raised quarterdeck S (Bil §2.3) | round, three windows on its face (Gwyn) S; figure with rails S | Steel's brig collier (p. 26) or brigantine (p. 16) |
 | the 74 | S: WL1-WL5 by station (Research-74 §3.2.3); the midship section (§3.2.4); main and channel wales | square; two gallery tiers, 8.5 ft abaft to 3.7 ft before AP at 14.5-17.7 and 21.7-24.6 ft above WL1 (§3.3) S; the stern face to read, T meanwhile; figure T | Steel's 74 Folio LI (cached); Lavery 1985 pp. 54-57 by page, if the owner photographs them (§19.1 item 17) |
+
+**The marks as the files carry them** (the hull step's landing, read from the files; principle 4: a line takes the word of its weakest point, and its note names where that is). The 64 and the razee stand beside them. No line of the ten is marked `rule`.
+
+| File | `sourced` | `stand-in` | `judged` |
+|---|---|---|---|
+| frigate-36 | stem, stern, section, head's line, main breadth; the stern and its knuckle, transom, round-up and gallery keys | | rail, breadth, keel, wales, decks, ports, port size, sections, floor, rabbet; the lights; the head's word |
+| brig, merchant-brig | rail, breadth, stem, stern, wales, section, port size, head's line, main breadth, sections; the stern and its keys; the head's word | | keel, decks, ports, rabbet |
+| cutter | rail, breadth, stem, stern, section, port size, main breadth, sections; the stern, its transom and round-up; the head's word | | keel, wales, decks, ports, channel wale, floor, rabbet; the knuckle |
+| lugger | rail; the stern; the head's word | section, rabbet | breadth, keel, stem, stern, wales, decks, main breadth, sections |
+| smack | | keel; the stern, its knuckle and round-up; the head's word | rail, breadth, stem, stern, wales, section, decks, main breadth, sections, channel wale, floor, rabbet; the transom |
+| topsail-schooner, privateer-schooner | | keel, port size; the stern and its keys; the head's word | rail, breadth, stem, stern, section, decks, ports, head's line, main breadth, sections, rabbet |
+| the 64 | rail, breadth, keel, stem, stern, section, head's line, main breadth, sections, channel wale; the stern and all its keys | | wales, decks, ports, port size; the head's word |
+| razee | keel, stern, section, main breadth, sections, channel wale; the stern, its knuckle and round-up | | rail, breadth, stem, wales, decks, ports, port size, head's line; the transom, galleries and lights; the head's word |
 
 ### 5.8 Pictures for the eye
 
@@ -1002,6 +1021,12 @@ cached outside the repository under `D:/Projects/FreeSail/reference-cache/` (`em
 Maritime Museum, Greenwich, London" and licenses its images only through RMG Images, so, as
 ZAZ6306, each is read and cited, never copied into the repository, whatever Commons's tag.
 
+**Now read, all three (the hull step's landing, 2026-10-31).** Each stands in §5.7 at rung S with
+its pages note: `pages-zaz2587.md`, `pages-zaz4491.md`, `pages-zaz6381.md`. The rough reads below
+are kept as first written, each with what it came to under "Now read". Nothing in any of them moved
+a figure the physics or the gunnery reads; every disagreement is in one table in
+`docs/dev/TuningNotes.md`, "The eight hulls".
+
 **frigate-36: the *Amazon* class of 1795, Rule's design** (Winfield p. 143).
 - **ZAZ2587** (RMG object 82378; Commons "EMERALD 1795 RMG J5297"): the lines, with body plan,
   sheer and half-breadth, 1:48 by its scale bar. It is the contract draught for two frigates to
@@ -1021,6 +1046,11 @@ ZAZ6306, each is read and cited, never copied into the repository, whatever Comm
   Read roughly, the top waterline is about 140-142 ft long against the file's 137 ft, and
   stands about 16-17 ft above the keel against her 15-ft mean draught; no line is marked as
   the load line.
+- **Now read** (`pages-zaz2587.md` §4, §9.1): the load line is WL1, by judgement, none being marked:
+  143.5 ft rabbet to rabbet against the rough 140-142, and 18 ft 6 in to K at the middle against the
+  rough 16-17 (WL1's height stands against the top line's, ±0.15 ft). The body plan, called too
+  crowded above, gave the midship section and the topsides after all (§6.2, §6.3). The same note has
+  the masts, the ports and the frames' checks.
 
 **brig and merchant brig: the *Diligence* class, Henslow's design, approved 22 April 1795**
 (Winfield pp. 255-256).
@@ -1041,6 +1071,13 @@ ZAZ6306, each is read and cited, never copied into the repository, whatever Comm
   after *Harpy*'s change) against +8.9 m; the deck and sill heights against the file's 1.5 m
   and 2.1 m, unsettled until the keel's datum and the load line are read. Her drag stays
   Winfield's draughts of water (7 ft 3 in / 10 ft 10 in), not a drawing, until ZAZ4491 is read.
+- **Now read** (`pages-zaz4491.md` §4, §5.7, §5.9, §7): the load line is WL1, the faint ruled line
+  recorded (the lead, 2026-10-31); the fore mast +9.62 m, +9.37 m in green after *Harpy*'s change,
+  against the rough +9.6 and +9.4; the deck at side 1.16 m at the middle and the plank at the middle
+  line 1.38 m against the file's 1.5 m; the lowest sill 5 ft 2 in, 1.57 m, against the file's 2.1 m;
+  the drag 3.11 ft in the 95 ft against the file's 2 ft, Winfield's two draughts lying near WL2. The
+  word "sixteen ports a side" is no longer SW-2's: the lead left it for SW-4, since digests and the
+  primer carry it (point 8). So the file's 2 ft, its fore mast and its 413 t stand, recorded.
 
 **cutter: *Sherbourne*, 1763, Slade's design**, built at Woolwich on the lines of the purchased
 cutter *Pitt*.
@@ -1057,9 +1094,14 @@ cutter *Pitt*.
   the mast about 7-8 ft before the middle against 4.9 ft; a square tuck with a flat transom
   raked about 45°, some 11-13 ft across, against the stand-in's 10 ft 9 in counter. No head, as
   §5.7 has it.
+- **Now read** (`pages-zaz6381.md` §5, §7): the top waterline 54 ft 1½ in against the rough 52-53 ft;
+  the drag 3 ft 0 in against 2.5-3 ft; the mast 8 ft 8 in before the middle against 7-8 ft; four
+  ports a side as read; the transom 11 ft 1 in at the taffrail to 12 ft 10 in at the wing transom
+  against 11-13 ft. The rake is the one rough read that did not hold: about 20° to the line, not 45°.
 
 **Still without their own:** the bilander (Chapman's proportions and a trader's body) and the
-lugger's body under the water (§5.7).
+lugger's body under the water, stood in for since the landing by *Le Coureur* on ZAZ6170, her type,
+S† (§5.7; `pages-zaz6306.md` §11, §13).
 
 ## 6. The viewer draws the profile (B5)
 
@@ -1119,6 +1161,8 @@ the settee; the settee's sheet to the profile's taffrail.
 - **`part: head`:** the plate on the centreline between `head_m` and the stem, with a plain shape at its top for `figure`, `scroll` or `billet`;
 - **`channel_wales_m`:** drawn as the main wale is;
 - **the decks:** at 0.95 of the drawn side's half-breadth at their height;
+- **the painter's order (the hull step's landing, the lead's point 10):** a closed body's faces cannot be ordered by the depth of each one's middle, so a face seen from inside goes before every other figure, by a margin at edge on, and it can cover nothing of hers and nothing in her, but for a rig figure beyond its plane, outside her, which stays behind it; the stern, seen from abaft about 120° off the bow, goes after the rest of the hull; a deck's end is seen only from its open side; what stands on the head sorts with its plate and paints straight after it. All else keeps the depth's order, rig against hull among it. First written: each sorted at its own middle, which hid the figure behind the plate abaft the beam, cut the deck's far edge in a saw-tooth near end on, laid the frigate's forecastle bulkhead across her forecastle deck, and nibbled the transom's corners (measured against a depth buffer; the margins are judgement);
+- **the other mends of the hull step's landing (the lead's point 10), old beside new; none moved a served figure and each is measured in the tuning notes, "The eight hulls":** a `band` follows the drawn side between its two heights through every height its strip's stations have a point at (first written, a chord from sill to sill, which stood up to 0.61 m off her side); the `head` has a back strip across the block to the stem, its foot at the foot of the stem's closure, not at −0.8 m, and a plate that leaves the stem level at the knee's top (first written, straight to the stem head, a wedge no sheet has); the sheet led to the stern goes to the top of the stern's line (first written, the rail's after end: only the cutter's differ, 0.28 m);
 - **the drawn depth:** the strips go down to D(x) = max(0.8 m, the water's half-breadth × tan 20°), no deeper than the keel.
   - `UNDERWATER_HEEL_DEG = 20` (judgement) is named at the top of `projection.js`.
   - So no cut edge rises out of the water below 20° of heel. Today's flat cut does at 8.5° on the frigate (measured in the session's scratch);
@@ -1227,8 +1271,10 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
 - **What the measures say:** the most heel while firing in the first action was 2.7° (the
   cutter) and 6.2° (the *Renard*), and on the gate's whole day the frigate's 4.0° (Bel §6.1
   P6, observed): below every new
-  shut heel but the privateer's 11.6° and perhaps the brig's 12-16°. The movers, if any, are
-  expected in the privateer's and the brig's actions, and under L3 in a sea (judgement).
+  shut heel, the lowest the privateer's 10.2° and the cutter's 13.9° (first written: but the
+  privateer's 11.6° and perhaps the brig's 12-16°). The movers, if any, are
+  expected in the privateer's and the cutter's actions (first written the privateer's and the
+  brig's), and under L3 in a sea (judgement).
 - **For each moved pin** the tuning notes give the old figure beside the new, the reason, and
   **the bisection**: the commit that moves it (L2 or L3); then, within L2, the same run with the
   gate on and the file's old heights (a scratch copy, never committed), which separates "the
@@ -1642,16 +1688,18 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | B5 | the drawing; the pictures' standard deviation and dark fraction (thresholds expected to stand) | old beside new in the notes; screenshots |
 | 0H | nothing: no file carries a shape key; the served graph gains `hull.stations`, which nothing draws until B5.6 | the byte test, the guard, the fast tier |
 | SW-2b.1 | nothing: helpers only, no file written | the byte test |
-| SW-2 with SW-2b.2 | the eight files' bytes (profile, heights, `deck`, the shape keys and marks); no behaviour; the eight's pictures (B5 measures them) | the suite unmoved; old beside new |
-| B5.6 | the drawing; the pictures' standard deviation and dark fraction (thresholds expected to stand) | old beside new in the notes; the owner's sheets |
-| SW-1 | the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
-| SW-4 | the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
-| SW-5 L2 | actions heeled past their new shut heels (the privateer's 11.6°, the brig's 12.3-16.4°) | old beside new, the reason, the bisection of §7.3 |
+| SW-2 with SW-2b.2 | the eight files' bytes (profile, port guns' `height_m` and `deck`, the shape keys and marks; three keys of text, the brig's and the cutter's era notes and the letter of marque's source); no behaviour: every log line, tick and dynamic of the eight identical, all ten polars byte-identical. **Pins moved, as landed:** truth 7-185's brig band, the one pin the lead moved, drafted in `tests/test_profiles.py` for Phase 5, 1.22-1.52 m to 1.555-1.585 m (the lead's point 4); `tests/test_scenarios.py`'s `test_a_merchant_brig_free_sails_a_merchant_brigs_own_file` compares her hull but for `profile.ports_m`, which the lead's point 5 makes differ, the difference pinned by `tests/test_hull_brig.py`. The shared tests that named a shipped file as having no profile now build one in the test (`tests/test_profile.py`, `test_hull_form.py`, `test_ship_particulars.py`) | old beside new in the tuning notes, "The eight hulls"; the trace on a clean archive |
+| B5.6 | the drawing; the pictures' standard deviation and dark fraction (thresholds stood, unmoved). **The hull step's mends, as landed** (the lead's point 10): the band on the drawn side, the head's back strip, foot and wedge, the taffrail by the stern's line, the painter's order (§6); `tests/test_view_geometry.py`'s tables and `RIGHTLY_WITHOUT` | old beside new in the tuning notes, "The eight hulls"; the owner's sheets, `docs/playtests/2026-10-31-hulls-the-eight/` |
+| SW-1 | the hull step's standing comparisons against its base commit, which take the whole document or each fit's keys, to rebase old beside new: `tests/test_hull_frigate.py` and `tests/test_hull_brig.py`'s `test_no_figure_the_physics_or_the_gunnery_reads_moved`, `tests/test_hull_cutter.py`'s `test_a_diff_of_her_physics_keys_against_git_shows_none`, `tests/test_hull_schooner.py`'s `test_no_figure_the_physics_reads_moved`; the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
+| SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
+| SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4) | old beside new, the reason, the bisection of §7.3 |
 | SW-5 L3 | actions in a sea, on the player's ship | the bisection L2 → L3 |
 | The caches | none (the results unchanged) | the pace measured |
 
 **None of the existing ships' sailing passages moves:** no hull figure, spar or sail of an
-existing file changes in this package.
+existing file changes in this package. The lugger's tuning pass, if the lead's point 9's bowsprit
+comes to it, rebases `tests/test_hull_lugger.py`'s `test_a_diff_of_her_files_physics_keys_against_git_shows_none`,
+which holds her spars.
 
 ### 16.2 Checkpoints and replays (old saves must load)
 
@@ -1751,7 +1799,8 @@ from item 3; 16 and 19 open, for the owner to decide on the sheets (below).
 7. **The engine's judgement figures** (Ext §14 items 5-9): "furl the mizen" furls it aloft; the
    settee's dip when the head yards' swing ends; its times and hands; the spritsails out of
    "plain sail" and taken in first; lifts drawn on a lateen yard only.
-8. **The brig's sill** falls from 2.1 m to Steel's sloop band, 1.22-1.52 m (§5.4).
+8. **The brig's sill** falls from 2.1 m to Steel's sloop band, 1.22-1.52 m (§5.4). (Since, the
+   sheet's 1.57 m, 0.05 m over that band: the lead, 2026-10-31.)
 9. **The swivel's charge** halves, 4 oz to 2 oz, by the table's half-pounder (§10).
 10. **The weather side's ports** under a roll beyond the heel, and the six-inch reopening margin
     (§7.1).
