@@ -17062,7 +17062,10 @@ and is refused the royals, comes up, is given the deck and sets them; the captai
 the replay by both roads as before. **Truth 7-200** (74's tender): the fake skipper landed at
 Plymouth waited for `the boat alongside` in his sample, the boat alongside his ship in the
 Sound, which a man on the quay does not see; he acts on his own landing (`person.ashore`, the
-quay's line) instead, the rest of the truth as it was. Found by it: a person in the script's
+quay's line) instead, and, since from the counting house he does not see the boat pulling back
+to the ship either, his `come aboard` finds her away ("The boat is away; wait for her at the
+quay") and he asks again at his next sample, as a man ashore would; the rest of the truth as it
+was. Found by it: a person in the script's
 boat on her errand (the place `boat`, no hull of his own) had no senses at all and missed
 `the boat alongside` on his way back aboard; within a boat's pull of her he has her deck's
 senses (judgement: he sees her sails handled and hears her bell across the water), nothing of

@@ -10621,13 +10621,19 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
                 return Reply(
                     calls=(call("submit_order", text=f"shape a course for {port} via the Start"),)
                 )
+            if "wait for her at the quay" in said:
+                # package 65: ashore he does not see the boat pulling back to the ship, so
+                # his `come aboard` may find her away; he asks again at his next sample
+                stage["again"] = "come aboard"
             return Reply()
         log = last.get("log") or []
         kinds = {str(e.get("kind")) for e in log}
         text = " ".join(str(e.get("text", "")) for e in log).lower()
         heard = " ".join(str(x) for x in (last.get("heard") or [])).lower()
         s, orders = stage["n"], []
-        if s == 0:
+        if stage.get("again"):
+            orders, stage["again"] = [stage["again"]], None
+        elif s == 0:
             orders, s = ["come to an anchor"], 1
         elif s == 1 and "signal.read" in kinds and "plymouth" in text:
             orders, s = ["answer the signal", "weigh", "shape a course for Plymouth"], 2
