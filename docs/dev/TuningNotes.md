@@ -15751,3 +15751,14 @@ frigate in it.
 centre on the view and then on the Medusa from eight in the evening; slow), 7-321 (the
 readings' words, the refusals, the world orders, `follow`, `follow nobody`, `look at`, the
 save replayed), 7-334 (the pace, informative, `pace`, the table above).
+
+**The suites on the step's tree.** Before the lead's merge (`186931c`): the fast tier
+whole, 4,488 passed, 2 failed, both no fault of the step's code: `test_parity`'s list of
+the console's commands had not got `look at WHERE` (added, the owner's by design), and
+`test_pictures`' chart picture under four workers at a standard deviation of 7.9 against
+the test's 8.0 (passed alone, twice; load-sensitive); the slow tier of the eighteen touched
+files and the known truths, `--slow -m "not pace" -n 4`, 827 passed, 7 expected failures
+(the rulings'), none failed (42:51). After the lead's head merged (`ffbaab3`, the ships
+session's Indefatigable and the view geometry among 223 commits, no conflict): the fast
+tier whole, 5,288 passed, none failed (31:42); the slow tier of the same files and the
+known truths, 827 passed, 7 expected failures, none failed (40:14). Ruff clean. The pace tests: 7-334 alone, above.
