@@ -1410,8 +1410,12 @@ failures not the step's, the parity list and the pictures' flake, then 5,288 pas
 failed, 32 minutes), the slow tier of the eighteen touched files and the known truths (827
 passed, 7 expected failures, the rulings'); the lead's run of the observer, parity, grammar,
 in-world, primer, scenarios, console and server tests with the step's truths on the merged
-tree (green), and **the whole fast tier on the merged tree here, then the whole suite in the
-cloud dispatched at the push (run 23; its figures written here when it is in).**
+tree (green), and **the whole fast tier on the merged tree here (whole), and the whole suite in the
+cloud: run 23 on `2d512b2` was cancelled by the workflow's concurrency rule when run 24 was
+dispatched on package 88's merge above it, and run 25 on `e587ba7` (this step, 88 and the
+merge's two mends) stands for it: lint green, 5,650 passed over the six shards, 3 skipped,
+10 expected failures, none failed, 60 minutes; the pace job, informative, 7 of 11 (below,
+under 88's record).**
 
 **What was built** (`docs/design/Design-BoatAndPersonAboard.md` §3 and its postscript; the
 tuning notes "Package 82", step 2): `ship: none` in a scenario file, or `director: observe`
@@ -1474,8 +1478,29 @@ files with the captain's trials and the known truths whole, the pace tests alone
 and the fast tier whole (two failures passing alone after: the pictures' flake under load and
 `test_log_lines`' standing-order names by a salted hash, booked); the lead's checks: no
 physics file, ship file or consent file touched, no model identifier; **the whole fast tier
-on the merged tree here, then the whole suite in the cloud dispatched at the push (run 24;
-its figures and the lee-shore trial's digest written here when it is in).**
+on the merged tree here (whole but the pictures' flake, passing alone), and the whole suite
+in the cloud: run 24 on `0b55448` found two things of the merge's own, mended at `e587ba7`
+(the format check on the known truths after the merge's resolution, two blank lines; and
+the lee-shore trial's digest, `1ecbc08a61efb132` in the cloud against the builder's
+`6e88e97cbdffac7b` with the states and the line count the same, so the assertion is a
+comment naming each machine's figure and the states, the grounding and the lines are the
+pins, as ruled); run 25 on `e587ba7`: lint green, 5,650 passed over the six shards, 3
+skipped, 10 expected failures (the station gale's lifted: 11 before), none failed, 60
+minutes. **The pace job (informative) 7 of 11 on runs 24 and 25 alike,** the same four under
+truth 51's floor of 500 ticks a second (truth 51 at 496, the day under the systems 478, the
+gate's day with the region 454, 7-159's convoy at far detail 440; 10 of 10 on runs 20 to
+22 before this merge): a cost of the pass, measured on the lead's machine (four cores, load
+one, single runs of `tools/pace.py` on the tree before the merge and on the trunk after it):
+the frigate alone 488 to 518 and the dozen at far detail 439 to 475 (noise, no cost), the
+convoy of six and the privateer at far detail alone 482 to 414 (a seventh), the default cap
+268 to 263, a cap of twelve 265 to 239; the cost in the far captains' judgement under the
+pass, the station-keepers most (the danger-ahead reading of the chart on every judgement of
+every sailing far captain, and the square sails' states read for the recovery's flags each
+judgement, by the lead's reading). **A follow-up asked of the builder on `claude/pkg-88`,
+2026-10-31:** profile, mend with no change of behaviour (the chart read ahead only when the
+account puts land or a danger within reach; the sails' states only with no headway), every
+recorded figure again exactly, the pace truths old beside new; merged as 88's close, the
+cloud's pace job the proof.**
 
 **What was built** (the tuning notes "Package 88", items 1 to 4 in the owner's four parts,
 each with its switch and the bisection's table): **(1)** the rules captain recovers her when
