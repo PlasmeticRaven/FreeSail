@@ -531,13 +531,17 @@ def test_the_distance_to_the_land_is_refused_at_entry_with_the_forms_that_serve(
     assert "'the nearest land'" in why and "'the land is in sight'" in why
     assert w.standing.book.get("triangulate") is None
     # the forms it names are taken
-    for cond in (
-        "the nearest land is under 2 miles",
-        "the land is in sight",
-        "the distance to the Lizard is under 12 miles",
-        "the distance to 48 20 N 4 36 W is under 12 miles",
+    for i, cond in enumerate(
+        (
+            "the nearest land is under 2 miles",
+            "the land is in sight",
+            "the distance to the Lizard is under 12 miles",
+            "the distance to 48 20 N 4 36 W is under 12 miles",
+        )
     ):
-        name = f"t{abs(hash(cond)) % 1000}"
+        # by index, not by `hash(cond) % 1000`: the string hash is seeded per process and
+        # two conditions fell on one name in a run of the fast tier (package 82's record)
+        name = f"t{i}"
         e = w.submit(f'standing order "{name}": every glass, if {cond} then take a fix')
         assert e.kind == "standing.given", (cond, e.text)
 

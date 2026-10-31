@@ -882,6 +882,23 @@ default; `follow "X"` a driver's line replayed; the World's names, the snapshot,
 and the prompt reading the followed hull; the words "no ship followed" stand ready for the
 world with no player's ship, which is this package's.
 
+**As built (package 82, item 1; `docs/design/Design-BoatAndPersonAboard.md` §3, the
+postscript "Step 2").** `ship: none` or `director: observe` (or `director: {observe: true}`)
+makes an observed scenario (`Scenario.observed`): the World's own hull is the observer's,
+a view on the chart with a position and no ship (`World.observed`, `is_observer`,
+`view_words`; `hulls.is_observer`), `followed` None until `follow "<name>"`; the business,
+the ships under their captains, the weather and the tides run as given; the readings of
+the sea and the sky answer and every row that assumes a hull answers "no ship followed" in
+words (`readings.WORLD_ROWS`, `NO_SHIP_FOLLOWED_WORDS`), the ship's orders are refused in
+words and the world orders stand; `follow "<name>"` wakes her under the cap as the followed
+hull and `follow nobody` gives the view back; `look at <position | a chart feature>` moves
+the view (a driver's line replayed); the console and the browser open at the director's
+station, the snapshot says `observer` and the page draws the view with no ship and no track;
+the pace rule, the promotion, the chart and the lookout bear a world with none. The cost
+was measured and nothing pinned moved (the tuning notes, "Package 82", step 2; the
+observed world's pace against the same Channel with a frigate given, truth 7-334). The
+reading `the followed ship` (item 6) names the drivers' centre or the view.
+
 ### 12. The player on another ship, and the replay of a station there (`crews.py`; `core/replay.py`)
 
 `--seat captain --ship <id>` for the player (43 left it): the drivers' centre follows the
@@ -894,6 +911,21 @@ holds every hull's stations (`hulls`), each input and act of a station on anothe
 her hull and a replay gives them to her by either road; a seat may be at a person aboard any
 hull. The player's own seat on another ship and the drivers following him are this
 package's.
+
+**As built (package 82, items 2 and 3; `docs/design/Design-BoatAndPersonAboard.md` §2,
+§4, the postscripts "Step 1" and "Step 3").** `--seat captain --ship <name>` at both drivers:
+the player's own ship left as she lies and said so in her log, the drivers following him,
+her prompt his with her rules captain aside at his hand and back at `captain: carry on`;
+`--seat <station> --ship` a `PlayerSeat` on her hull (`seat.seat_world`), which goes with its
+person between hulls as a harness does (`PlayerSeat.move_to`); the director's door with
+another hull followed reads her by the one rule (`read_log`, `aboard:` without a name,
+`captain:`) with the other named at the head. A person moves between hulls by the boat
+(`send the boat to the <ship> with <name>`, the director's `person: "<name>" goes aboard the
+<ship> by the boat`), by the deck won (the boarders' officer) and by the captor's handover
+(the hook package 74 takes), his station following him as a visitor's voice and standing
+bound to him at home (`movement.put_aboard`, `visiting_station`); a save keeps the harness
+under the hull of its seating and a replay by the transcript and by the acts gives both
+logs the same digests (truths 7-322 to 7-326, 7-333).
 
 **As built (package 58a; the observed world as a station reads it ahead, and the
 director's lookups).** **`ahead`** is a row of the registry (`readings.ahead_words`): what
@@ -2013,6 +2045,51 @@ her readings his while he is in her, the ship's again when he comes aboard; the 
 (ashore, the kedge, the tow, the pilot) done by her as before when nobody is in her;
 the viewer drawing her under oars or sail; the account following the boat as a vessel's.
 After 51, which gives the player a seat on another vessel.
+
+**As built (package 82, items 4 to 6; `docs/design/Design-BoatAndPersonAboard.md` §5 to §7
+and the postscripts "Step 4" to "Step 6"; `docs/dev/TuningNotes.md`, "Package 82").** Five
+boats' files through the generator (`boat-yawl-16`, `boat-cutter-28`, `boat-launch-31`,
+`boat-launch-25`, `boat-cutter-23`: Luce's rule of breadth, judged depth, draught and
+displacement, one mast stepped at will with a standing lug, the oars in a new `oars:`
+section, a coxswain and the oarsmen; each line's rung and source in its note, Steel 1805's
+Folio LVII named to read), the eight ships' `boats:` entries pointing at them by `file:` and
+no other byte moved. **The oar force** (`physics/oars.py`, read by the integrator's substep
+beside the cable's pull): F_oar(u) = min(F_0, P / max(u, u_min)) x stroke x 1 / (1 + hours /
+T) an oar, F_0 50 N, P 60 W, u_min 0.3 m/s, T 4 h (judgement, fitted to the period's
+behaviours and written so; the sources give no figure for a man's power at an oar). **The
+boat manned as a hull** when she is commanded (`world/boats.py`): `go to the boat` with the
+ship hove to or at anchor puts a `Vessel.boat_of` on the sea with her hull from her file at
+the lee quarter, her company from her file, the person in her with his station and the
+drivers following him; her orders through the vocabulary (`give way`, `easy all`, `lie on
+your oars`, `boat your oars`, `out oars`, `pull for <the ship | the quay | a sail | a point |
+a position>`, `step the mast`, `unstep the mast`, `come alongside`; `set the lug` and `take
+in the lug` the engine's) with the period's refusals; the coxswain's hand each tick (the mark
+steered for as it bears, the lug's sheet tended to the apparent wind as a boat's sheet is
+held in hand); alongside within a boat's length she is hoisted in with her people aboard
+and her log folded into the ship's as `boat.log` lines; measured, the frigate's launch 3.3
+to 3.6 kn fresh under ten oars and the cutter's boat to the Falmouth quay in 26 minutes and
+back under her lug at 2.7 to 2.9 kn. The errands run as before with nobody in her; the hoy
+comes off as a vessel by the same road. **The boat lost** (swamped in a sea above her
+weather, cut adrift by order, stove or swamped or gone adrift by the director's `aboard:`
+table) is sent on no errand and manned by nobody until `demand a boat of the yard` (48
+hours, £25). **The tow** (`tow her with the boat [to <the point or bearing>]`): the boat
+manned on the tow-line a line's length ahead, the coupling kinematic, the force her oars'
+net pull at the ship's speed read by the integrator at the stem with the cable's lever, the
+ship's head brought round first with the helmsman following the boat, the men tiring with
+the hourly words, `the boat alongside` ending it, refused in a sea the boat cannot work in,
+at anchor and aground; measured, the cutter 1.15 to 1.19 kn fresh and 0.83 at four hours,
+the frigate under her launch 0.78 kn fresh and 0.57 at four (so the frigate's clause above
+reads "her head brought round in a calm by her launch, and her way under a knot and falling
+as the men tire", the physics' figure standing; the lugger of 7b-113 at about a knot fresh,
+"half a knot" being no figure F_0 50 N gives in a boat's crew's hours, put to the owner in
+the tuning notes with the smaller F_0 costed). **The kedge's false denial** mended: the
+boat's keeper reads every evolution that holds her by the scripts' `holds()`. **The
+readings, the events and the director** (item 6): `the followed ship`; the events `the boat
+manned`, `the boat lost`, `the tow begun`, `the tow ended`, `aboard another ship`; `follow
+"X"` a channel of the world orders and a driver's line at the director's seat; the truth
+showing a manned boat as a vessel with her ship, who is in her, what she is under and whom
+she tows. Truths 7-320 to 7-334 and 7b-113, 7b-114 (the numbers 7b-113 and 7b-114 are also
+other packages' in the suite; the boat's are the brief's, named as such).
 
 ### 21l. Truths for 7b-x
 

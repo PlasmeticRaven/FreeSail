@@ -1016,7 +1016,12 @@ def world_page() -> tuple[tuple[str, str], ...]:
         "in his name where he is, heard by the stations within earshot and journaled as his; "
         "the hand in her own log as her captain's, and in the play log only what the lookout "
         "sees of her. A world order the owner gives at the prompt ('world: ...') is the "
-        "same, never doubted."
+        "same, never doubted. A ship's boat with a file of her own is a vessel of the sea "
+        "while she is manned (`go to the boat`, the tow): her hull from her file, her oars "
+        "a force on it by the hands at them and their hours, her lug stepped at will; the "
+        "truth shows her with her ship, who is in her, what she is under and whom she tows; "
+        '`aboard: the boat stove | swamped | gone adrift` loses her, and `follow "<ship>"` '
+        "moves the drivers (a driver's line, no act)."
     )
     doubt = (
         "The channel's doubt, in figures: a ship or a mark put inside the lookout's horizon in "

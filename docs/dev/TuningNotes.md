@@ -16489,3 +16489,56 @@ counts (58a's rule): the test enters the stove boat twice.
 **What moved: nothing pinned.** The events and the reading are new rows; the channel is a
 new head no recorded passage uses; the truth's row gains keys for a vessel no pinned day
 has. The truth: 7-332.
+
+### Step 7: the records, and the boat's drawing (the re-brief's item 7; the design's §5.4 and §8)
+
+**The records.** Spec M7b §11, §12 and §21k carry "as built" paragraphs (the observed world;
+the player's seat on another ship and the person's movement between hulls; the boat as a
+hull, the oar force, the tow, the kedge's keeper, the readings and the director's forms, with
+the figures measured and the two 7b truths' words as built); `docs/agents/Harness.md` gains
+§17b (the player's own seat on another ship; the readings following the person into a visit
+and into the boat, the boat's words at a station, the events, the director's forms); the
+primer gains chapter 26, "The boat, and going aboard another ship" (in-world under the
+primer's rule, run through the in-world test and the forms' tests: the boat's orders are
+hers and not the frigate's at sea, so its blocks are plain and not `orders` blocks the test
+types at the frigate), listed in the README and in the primer tests' chapter list; the
+director's library page names the boat as a vessel, the loss by the `aboard:` table and
+`follow`; the tuning notes are this section and the six before it; the design note's
+postscripts "Step 1" to "Step 7". The forms tables of chapter 20 carry no `follow` row (the
+tables' test parses each row as a world order at the frigate's prompt and expects the
+captain's refusal, which `follow "the ship"` gives too, but the prose names it and the
+registry's test is content).
+
+**The boat's drawing** (`tools/gen_ships.py` `boat_profile`; the design's §5.4 with B5's road
+on the trunk: `hull_profile` and `hull_form` as the 64's and the razee's use them). Each
+boat's file carries her shape keys by rule from her length, breadth, draught and freeboard,
+every line `judged` and said so in its note, nothing of them read by the physics: the gunwale
+with a boat's sheer rising forward (a quarter of the freeboard and 12 cm at the stem head, an
+eighth and 5 cm at the taffrail; judgement after Steel's boats' sheer), the half-breadths at
+the water and the gunwale by five stations (the side flared, the water's half-breadth 0.86
+of the gunwale's amidships and less toward the ends), the keel from the post's heel to the
+forefoot rising to 0.6 of the draught, the stem raked a little, the post to a transom's
+knuckle at 0.35 of the draught and the taffrail, a rubbing strake under the gunwale as her
+one wale, her floor boards over the keel filed as her one deck (an open boat has no deck; the
+platform is what a man stands on; the viewer draws a deck inside the side and the drawing's
+test wants one), a midship section with a rising floor and a round bilge, and the form a
+square transom (Steel 1805 p. 181: the yawl, the cutter and the launch square-sterned; the
+pinnace and the barge sharp, and not filed) with no head. `form.check` draws each and records
+the drawn displacement beside the filed: the 16-ft yawl 12% under, the 28-ft cutter 13% over,
+the 31-ft launch 12% over, the 25-ft launch and the 23-ft cutter within 1%; each within the
+record's share (15%), the filed figures standing (§5.0 principle 8: nothing is moved to the
+drawing). The eight ships' files are untouched by it (the generator's test). **The oars**:
+the snapshot carries a boat's `oars` block (number, out, manned, stroke, hours) from
+`physics/oars.py`, the only reader beside the tests, and the viewer's skeleton draws one line
+an oar from the thwarts while they are out (`client/projection.js`: the loom inboard of the
+gunwale, the blade in the water under the stroke, lifted along the side lying on the oars,
+2.6 m outboard, judgement for a 12 to 16 ft oar; laid in, none is drawn), as spar figures of
+class `oar`, so the ship view's rendering and its titles serve them unchanged. The served
+hull's drawing test asks every profiled hull for a gallery, a stern light and a head, which a
+boat has not by her form; the clause is the ships' alone, said so in the test.
+
+**Found on the way.** (1) The fast tier's one failure on step 5's tree was a name collision in
+`test_log_lines` (`t{hash(cond) % 1000}` for four conditions, the string hash seeded per
+process: two fell on "t917"); the test passed alone three times and names by index now.
+(2) The generator's hook test reads the generator's stdout as a literal: the boats' drawing
+reports go to stderr as the 64's do.

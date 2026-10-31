@@ -866,3 +866,18 @@ forms are tested as channels). **Found on the way**, the one that matters: `come
 from the boat's prompt left the drivers' `followed` on the boat's hull after the hoisting in
 (a write on the hull's façade, not the World), hidden by the fallback to the player's hull;
 mended in `boats._root`, and the reading `the followed ship` would have shown it.
+
+
+### Step 7: the records, and the boat's drawing (§5.4, §8; 2026-10-31)
+
+**Built as designed**: the spec's §11, §12 and §21k "as built", the Harness's §17b, the
+primer's chapter 26 (in-world), the director's library, the tuning notes and these
+postscripts; and last, in a commit of its own, the boat's drawing by §5.4's road, B5's helpers
+being on the trunk: her shape keys by rule from her principal dimensions, every line judged,
+the form a square transom with no head, the drawn displacement within the record's share of
+the filed, and her oars drawn from the thwarts from the snapshot's `oars` block. **Taken
+another way**: a boat has no deck, and her floor boards are filed as her one deck for the
+drawing's sake (said in the file's note); the primer's boat blocks are plain, the boat's
+orders being hers. The truths 7-320 to 7-334, 7b-113 and 7b-114 stand in the suite as the
+brief numbered them (the two 7b numbers shared with other packages' truths, which the
+tests' names say).
