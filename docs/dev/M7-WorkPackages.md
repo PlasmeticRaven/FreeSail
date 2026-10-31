@@ -1515,8 +1515,16 @@ next reading. **Run 26, after the follow-up: the same four under the floor again
 at 494, the systems' day 481, the gate's day 454, 7-159's convoy 442), on a third runner and
 within a few ticks of runs 24 and 25, which is not a runner's noise but a cost somewhere
 between run 22 (10 of 10 on `11b4863`) and run 24 (`0b55448`): 82's step 2 and 88 are the
-two merges between them, and the lead measures them apart on this machine (below, when
-the figures are in).
+two merges between them, and the lead measured them apart on this machine: `tools/pace.py`
+on `11b4863` (run 22's tree), `2d512b2` (82's step 2 in) and `f5be911` (88 in), the frigate
+alone twice each (513 and 318; 451 and 461; 518 and 545) and the convoy at far detail once
+each (443; 415; 478), the machine's load falling from two to one through the series: the
+spread within a tree is wider than any gap between trees, and the newest tree is the
+fastest, so **no cost is found in the code on any machine but the cloud's**, where the drop
+is coincident in time (from run 24's dispatch at 03:39 on 2026-10-31) and not in code. The
+pace job stays informative and is read on each run; if the four stay under the floor for a
+week, the floor is re-measured on the build machine (the owner's) and the runner's family
+noted; nothing of 82's or 88's is to be moved for it.
 
 **What was built** (the tuning notes "Package 88", items 1 to 4 in the owner's four parts,
 each with its switch and the bisection's table): **(1)** the rules captain recovers her when
