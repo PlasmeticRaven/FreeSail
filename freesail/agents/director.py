@@ -909,6 +909,16 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "its consent record, the grant or the budget, refused",
     ),
     Form(
+        "follow",
+        "follow",
+        'follow "<ship>" | follow nobody',
+        ('follow "the ship"',),
+        "the drivers' centre moved to the ship named, the player's by her name or 'the "
+        "ship', another's by her name (her hull made and woken under the cap); 'follow "
+        "nobody' gives an observed world its view back; a driver's line, not a world order, "
+        "costing no act",
+    ),
+    Form(
         "unseat", "unseat", "unseat: <ship>[, <a note>]", ("unseat: <ship>",), "the seat stood down"
     ),
 )
@@ -1006,7 +1016,12 @@ def world_page() -> tuple[tuple[str, str], ...]:
         "in his name where he is, heard by the stations within earshot and journaled as his; "
         "the hand in her own log as her captain's, and in the play log only what the lookout "
         "sees of her. A world order the owner gives at the prompt ('world: ...') is the "
-        "same, never doubted."
+        "same, never doubted. A ship's boat with a file of her own is a vessel of the sea "
+        "while she is manned (`go to the boat`, the tow): her hull from her file, her oars "
+        "a force on it by the hands at them and their hours, her lug stepped at will; the "
+        "truth shows her with her ship, who is in her, what she is under and whom she tows; "
+        '`aboard: the boat stove | swamped | gone adrift` loses her, and `follow "<ship>"` '
+        "moves the drivers (a driver's line, no act)."
     )
     doubt = (
         "The channel's doubt, in figures: a ship or a mark put inside the lookout's horizon in "
@@ -1733,6 +1748,18 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         # order, no act, nothing in the play log
         return answer_player(world, to_player, by=by or SOURCE)
     log = log_of(world)
+    followed = _follow_words(text)
+    if followed is not None:
+        # `follow "X"` at the director's seat (package 82, item 6): the drivers' centre
+        # moved as the console moves it, a driver's line journaled with the director as its
+        # source, no world order and no act
+        try:
+            e = world.follow(followed, source=by or SOURCE)
+        except ValueError as err:
+            log.append(world, f"Refused: {text} ({err})", kind="director.refused", by=by)
+            return f"Refused: {err}."
+        log.append(world, e.text, kind="director.follow", by=by)
+        return e.text
     renew(world)
     b = budget_of(world)
     brief = brief_of(world)
@@ -1861,6 +1888,15 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
 DRY_RUN_HEAD = "Dry run, nothing performed and no act spent:"
 
 
+_FOLLOW = re.compile(r"^\s*follow\s+(?P<who>\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$", re.I)
+
+
+def _follow_words(text: str) -> str | None:
+    """The ship named by a `follow "X"` line, or None for any other text."""
+    m = _FOLLOW.match(text)
+    return m.group("who") if m else None
+
+
 def dry_run(world: Any, text: str) -> str:
     """**The dry run** (package 58a; the cold review of 2026-10-22, R-42, the lugger
     director's ask that would make "the most difference"): what a world order would do,
@@ -1872,6 +1908,28 @@ def dry_run(world: Any, text: str) -> str:
     the record (`_doubt_shown`): entered, the order is doubted there, and then entered
     again with its [reason: ...] it is performed."""
     text = " ".join(str(text).split())
+    followed = _follow_words(text)
+    if followed is not None:
+        # `follow` (package 82, item 6): read on the world as the drivers would, nothing moved
+        from freesail.world.orders import WorldOrderError, hull_named
+
+        key = followed.strip('"').lower()
+        if key in ("nobody", "none", "no ship", "no one", "unfollow", "the view"):
+            if getattr(world, "observed", False):
+                return f"{DRY_RUN_HEAD} the drivers would follow no ship: {world.view_words}."
+            return (
+                f"{DRY_RUN_HEAD} it would be refused: an observed world alone has nobody to "
+                "follow; the player's ship is followed by her name or 'the ship'."
+            )
+        try:
+            hull = hull_named(world, followed)
+        except WorldOrderError as e:
+            return f"{DRY_RUN_HEAD} it would be refused: {str(e).rstrip('.')}."
+        name = str(getattr(getattr(hull, "ship", None), "name", "") or hull.id)
+        return (
+            f"{DRY_RUN_HEAD} it would be performed as a driver's line, no act spent: the "
+            f"drivers would follow the {name}, her readings, her log and her chart theirs."
+        )
     brief = brief_of(world)
     acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
     bare, reason = world_orders.split_reason(text)

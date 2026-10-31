@@ -824,3 +824,60 @@ ran aback by her own sheet and no helm would bring her round; `boats._tend_sheet
 hand, by the engine's own trimmer. The boats' rudder in the generator was made a boat's
 (judgement, named) and the files regenerated. The director's `aboard: the boat stove` form
 is step 6's.
+
+
+### Step 5: towing by the boat, and the kedge's false denial (§6; 2026-10-31)
+
+**Built as designed**: `tow her with the boat [to <the point or bearing>]` with the boat manned
+as a hull on the tow-line, the kinematic coupling (her station a line's length ahead on the
+bearing, her way the ship's), the force her oars' net pull at the ship's speed read by the
+integrator at the stem with the cable's lever, the head brought round first, the men tiring
+with the hourly words, `the boat alongside` ending it, the refusals in a sea, at anchor and
+aground; the kedge's keeper reading every script that holds the boat; truths 7-330, 7-331 and
+7b-113. The figures are §5.2's within a tenth of a knot (the cutter 1.15 to 1.19 kn fresh and
+0.83 at four hours; the frigate 0.78 fresh and 0.57 at four) and are in
+`docs/dev/TuningNotes.md`, "Package 82", step 5.
+
+**Taken another way, with the reason.** The ship's helmsman is given the tow's bearing (§6
+had "the rudder answers as the water passes it", which it does, against the heading the
+helm was holding: the frigate's head came round and went back); the tow-line is twenty
+fathoms, not "a line's length" unnamed; the tow ends of itself at an anchor or the ground.
+**7b-113's "half a knot"** for the lugger is not a figure `F_0` 50 N gives in a boat's crew's
+hours (1.16 kn fresh, 0.8 at four hours); the truth carries the physics' figures with the
+spec's words quoted, and the tuning notes cost the smaller `F_0` for the lead. **Found on
+the way**, the one that matters: a manned boat not followed by the drivers slept at the first
+switch (no brain, no range), which step 4's tests never saw; mended in `crews.crewed`.
+
+
+### Step 6: the stations, the director and the readings (§7; 2026-10-31)
+
+**Built as designed**: the reading `the followed ship`; the events `the boat manned`, `the
+boat lost`, `the tow begun`, `the tow ended` and `aboard another ship`; the director's
+`follow "X"` and `follow nobody` (a driver's line at the seat, no act; a channel of the world
+orders for the forms' test and the scenario), the boat stove, swamped or gone adrift by the
+`aboard:` table through `lose_boat`, the dry run knowing each; the truth showing a manned boat
+as a vessel with her ship, who is in her, what she is under and whom she tows; the harness's
+shape and ship words for a boat; truth 7-332. The details and the suites are in
+`docs/dev/TuningNotes.md`, "Package 82", step 6.
+
+**Taken another way, with the reason.** `aboard the <ship>` as an event is `aboard another
+ship` (the events have no slots); `follow` is a channel as well as a driver's line (the
+forms are tested as channels). **Found on the way**, the one that matters: `come alongside`
+from the boat's prompt left the drivers' `followed` on the boat's hull after the hoisting in
+(a write on the hull's façade, not the World), hidden by the fallback to the player's hull;
+mended in `boats._root`, and the reading `the followed ship` would have shown it.
+
+
+### Step 7: the records, and the boat's drawing (§5.4, §8; 2026-10-31)
+
+**Built as designed**: the spec's §11, §12 and §21k "as built", the Harness's §17b, the
+primer's chapter 26 (in-world), the director's library, the tuning notes and these
+postscripts; and last, in a commit of its own, the boat's drawing by §5.4's road, B5's helpers
+being on the trunk: her shape keys by rule from her principal dimensions, every line judged,
+the form a square transom with no head, the drawn displacement within the record's share of
+the filed, and her oars drawn from the thwarts from the snapshot's `oars` block. **Taken
+another way**: a boat has no deck, and her floor boards are filed as her one deck for the
+drawing's sake (said in the file's note); the primer's boat blocks are plain, the boat's
+orders being hers. The truths 7-320 to 7-334, 7b-113 and 7b-114 stand in the suite as the
+brief numbered them (the two 7b numbers shared with other packages' truths, which the
+tests' names say).

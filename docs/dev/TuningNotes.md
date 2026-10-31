@@ -16335,6 +16335,270 @@ sent nowhere, manned by nobody, replaced at the yard), 7b-114 (the cutter's boat
 Falmouth and back under her lug; the number is 53b's as well in the suite, the brief's
 kept with the boat's words).
 
+**The suites on the step's tree** (`3eb9f2c`, the lead's `0b55448` merged, package 88 with it):
+the fast tier whole, 5,353 passed, none failed (32:46); the slow tier of the twenty-nine touched
+files and the known truths, `--slow -m "not pace" -n 4`, 3,032 passed, 7 expected failures,
+none failed (47:13); the pace tests alone and last (`--slow -m pace`, one process), 11 passed,
+none failed (3:51): the oar term in the substep is a dictionary read on every hull and the
+pace floors stand. Ruff clean.
+
+
+### Step 5: towing by the boat, and the kedge's false denial (the re-brief's item 5; the design's §6)
+
+**The tow** (`world/boats.py`: `tow_with_boat`, `end_tow`, `_tow_station`, `_tow_tick`;
+`orders/boat.py` the ship's verbs; `data/vocabulary.yaml` `tow her with the boat` with its
+synonyms, object `boat`). `tow her with the boat [to <the point or bearing>]` from the ship
+(`tow her with the launch` by her name; ahead when no bearing is said, as the kedge is laid
+ahead): the boat manned and made a hull by step 4's `man_boat` (so refused with no boat, a
+boat without a file, away, manned or lost), her oars out and giving way, the `BoatState` on the
+errand "towing" ("the boat ahead on the tow-line, towing ahead to the NE"), the ship's
+helmsman given the tow's bearing (the period's practice: the helm put over to help her head
+round and steered after the boat; `steer` afterwards if you will). **The coupling is
+kinematic**, as the design has it: each tick the boat's hull is set a line's length ahead of
+the ship's stem on the bearing (`TOW_LINE_M` 36 m, twenty fathoms of hawser out, judgement:
+her oars clear of the bow and the line not sagging to the water at a knot), her heading the
+bearing, her way the ship's along the line, no sway and no swing; and the force on the ship
+is her oars' net pull at the ship's speed, `oar_thrust(u_ship) - R_boat(u_ship)`, clamped at
+nothing (a boat pulls no ship astern), written to `ship.extra["tow"]` and read by the
+integrator's substep at the stem as the cable's pull is read at the hawse (a thrust and a
+side force along the line, the yaw moment with the hawse's lever, `anchor.HAWSE_FRACTION`;
+`physics/integrate.py`, the brief's one leave). The men tire by the oars' `f(hours)` and the
+ship's log says so once an hour (`boat.tiring`: "The boat's people are tiring, 2 hours at
+the oars; her way is falling"). **`the boat alongside`** (the vocabulary's synonym of `come
+alongside`, taken on the ship as the ship's order) ends it: the line cast off (`boat.tow_ended`),
+the boat hoisted in by step 4's road, the ship's way left to die; on a ship whose boat is
+manned by a person it recalls her (`come_alongside` on her hull). The tow ends of itself,
+with the words, when the ship comes to an anchor or takes the ground. **Refused** in a sea
+the boat cannot work in (the sea's state in her swamping set: short, heavy or very heavy for a
+boat under twenty feet, heavy or very heavy for a launch; "cannot work in this sea (a rough
+sea...)"), at anchor ("weigh first, and the boat can tow her"), aground ("the tide floats
+her or the kedge hauls her off; the boat cannot"), and for a bearing that is none.
+
+**Measured** (the probe, a calm at seed 7, the men fresh at the start; `docs/design` §5.2's
+estimates beside): the cutter under her 16-ft boat's four oars pulls 200 N fresh: her head
+from north to the north-east in two minutes, **0.86 kn at five minutes, 1.15 at ten, 1.19 at
+twenty** (the design's "about a knot"), 1.11 kn at an hour (the pull 170 N), 1.01 at two
+hours (142 N), **0.83 at four hours (106 N)**; the frigate under her launch's ten oars, 496 N
+fresh: her head from north to east in ten minutes (the design's "two points in a few
+minutes"), **0.66 kn at twenty minutes, 0.78 at an hour** (the design's 0.8), 0.70 at two
+hours, **0.57 at four** (the design's "half a knot after four hours"); the lugger under four
+oars 1.13 kn at ten minutes, 1.16 at twenty, 1.08 at an hour and 0.8 after four. Nothing of
+the hull's resistance moved; the figures are the files' displacements against the oars'.
+
+**7b-113's lugger clause, put to the lead.** The spec's "towed clear at half a knot" is not a
+figure F_0 50 N an oar gives in any hour a boat's crew can pull: the lugger makes 1.16 kn
+fresh and 0.8 after four hours, half a knot at twelve. The truth asserts the physics' figures
+(about a knot fresh, 0.6 to 0.95 after four hours, falling, the hourly words said) and
+says so in its docstring, by the lead's ruling on the frigate's clause that the physics'
+figure stands. The lesser by a smaller `F_0`, costed: `F_0` 25 N an oar gives the lugger and
+the cutter about 0.6 kn fresh (the brief's "half a knot" in its first hour) and the
+frigate's launch 0.4 kn; the boat herself under oars is untouched by it below `P/F_0` (2.4
+m/s, 4.7 kn, above her speeds), so only the tow moves. One line of `tools/gen_ships.py`
+(`OAR_THRUST_N`) and the five files regenerated, if the owner wants the words rather than
+the figure.
+
+**The kedge's false denial** (`Dealings._boat_kept`; spec M7b §21k's one fault): the keeper
+denied the boat "was not sent away laying out the kedge" at the first minute of the lay-out
+(the kedge script's `BoatState` says "hoisting out" for its first five minutes and the keeper
+knew the `send_boat` evolution alone), reset the state, and the kedge went on with the boat
+"at the booms" in the reading. The keeper now reads every evolution that holds the boat by the
+scripts' `holds()` word for her (`send_boat`'s and now `LayOutKedgeScript.holds`, the ship and
+"the boat"), through the runner's instances' scripts; the test runs the lay-out to `ship.kedged`
+with the boat read away at fourteen minutes and more and no `boat.stood_down` line. The
+runner's hold on "the boat" also serializes a `send the boat` behind the kedge's work, which
+`check` refused already.
+
+**Found on the way.** (1) **A manned boat's hull slept after a minute** when she was not the
+followed hull: `crews.switch`'s demotion loop read every vessel at full detail, and a boat
+with no brain has no range (`far_nm` infinite: "beyond"), so she was demoted to the far
+shape at the first switch, her physics off and her oars' hours frozen at a minute, the tow's
+pull written once and read for ever (the cutter held 1.09 kn for four hours with the men
+never tiring). Step 4's tests had the boat followed (the World's own tick) and never saw it.
+`crews.crewed` now leaves a ship's boat out (`Vessel.boat`): she is awake while she is
+manned, never demoted by the range, and counts nothing against the cap, which is what step
+4's note claimed and now holds; a stationed person's boat with the drivers on the ship ticks
+as well. (2) The ship's helmsman held her first heading against the tow (the frigate's head
+went to 79 degrees and came back to 28 under her own rudder at 0.6 kn); the tow gives the
+helm the bearing. (3) `World.sea` is None without `sea: true` in the scenario; the sea-state
+refusal's test says so. (4) The runner's instances carry the script as `script`, the
+evolution as `evo`.
+
+**What moved: nothing pinned.** `crews.crewed` changes only for a vessel with `boat` set,
+which no recorded passage has at full detail (the hoy and the pilots' boats have no hull);
+the kedge's keeper changes only while a kedge is laid out, which no pinned day does; the tow
+is new. The truths: 7-330, 7-331, 7b-113 (the number is the dispatches' as well in the suite).
+
+**The suites on the step's tree** (`b4c9ec2`, the lead's `e012db5` merged, package 88's pace
+record with it): the fast tier whole, 5,364 passed, one failed (50:01, slowed by the
+builder's own runs beside it): `test_log_lines`' forms test, a name collision from the
+string hash seeded per process (two conditions fell on one name), passed alone three times
+and mended by index in step 7; the slow tier of the thirty-one touched files and the known
+truths, `--slow -m "not pace" -n 4`, 3,054 passed, 7 expected failures, none failed (60:13);
+the pace tests alone and last, 11 passed, none failed (3:48). Ruff clean.
+
+### Step 6: the stations, the director and the readings (the re-brief's item 6; the design's §7)
+
+**The readings.** `the followed ship` (`the followed hull`) is a row of the registry
+(`readings.followed`, a world row read in an observed world too): "the Amazon, the player's
+ship"; "the Medusa; the player's own ship the Amazon left as she lies"; in the boat "the
+Amazon's launch, a boat of the Amazon's manned as a hull; the Amazon astern of the drivers";
+"no ship followed; the observer's view at 49° 40' N, 5° 20' W". `the boat`, `the boats` and
+`where am I` were step 4's and step 1's and stand (the boat manned, towing, lost; each boat
+with her file; the hull the person is in).
+
+**The events** (`readings.EVENTS`, the standing dialect's `at` and the stand-by's word
+alike; the primer's chapter 11 table kept equal to the registry by 85's test): `the boat
+manned` (`boat.manned`), `the boat lost` (`boat.lost`), `the tow begun` (`boat.towing`),
+`the tow ended` (`boat.tow_ended`), and `aboard another ship` (`person.aboard` with another
+hull in its data: a person come aboard by the boat or from another hull; the design's
+`aboard the <ship>` with a slot is a grammar the events have not got, so the event is the
+coming aboard and the ship is in the line). `the boat away` and `the boat alongside` stand.
+
+**The director's forms.** `follow "<ship>"` and `follow nobody` are a channel of the world
+orders (`world/orders.py` `CHANNELS` "follow", the one head without a colon, `_follow` through
+`World.follow`), so that the forms' test holds (every form a channel, every example parsed
+to it) and a scenario's world order may move the drivers at a tick; at the director's seat
+`direct` takes it before the budget as a driver's line (no act spent, journaled
+`director.follow`, the World's `driver.follow` line as the console's), and the dry run says
+what it would do without moving them. `person: "X" goes aboard the <ship> by the boat` and
+the hand (`ship "X": order send the boat to ...`) were step 1's and 84's. **The boat lost by
+the `aboard:` table** (`data/director/aboard.yaml`: `the boat stove` and `the boat swamped`,
+each doubted on a smooth sea and performed with a reason; `the boat gone adrift`, her
+painter parted, never doubted; the effect `boat_lost` through `world.boats.lose_boat`, with
+her people if any are in her; `_lacks_boat` answers a ship with no boat or one lost already
+"the game has no way"). The dry run performs each on the copy as every `aboard:` form does.
+
+**The truth** shows a manned boat as a vessel (`director_readings`, `_truth_boat`): her row
+in the sail's walk carries `boat_of` (her ship), `in_her` (who is in her), `under` (oars,
+her lug, neither) and `towing` (her ship when the line is on her); in words "the Amazon's
+boat, a hull of the world, under oars; in her: Captain Bowen". A boat at the booms, away by
+the script or lost is a word in her ship's row (step 4's `boat`).
+
+**The harness.** `crews.shape_words` for a boat's hull: "the Amazon's launch, a hull of the
+one world under your oars: her oars, her lug and her helm yours (...), the readings hers,
+her ship a sail in sight"; `readings.ship_words` for a station in a boat (`_boat_words`):
+"The Amazon's launch: a ship's boat of the Amazon's, a hull of the one world, about 31
+feet, 10 oars and a standing lug; her coxswain at the yoke lines and her oarsmen her
+company ..." in the place of a ship's class words. The samples follow the person's hull by
+step 1's seat and step 3's `seat_world`.
+
+**Taken another way, with the reason.** (1) `aboard another ship` for the design's `aboard
+the <ship>`: the events are words without slots, and the ship is the line's. (2) `follow`
+as a channel and not a bare driver's line: the forms are tested as channels, and the
+scenario gains the form for nothing; the act is not counted at the director's seat all the
+same (the design's "a driver's line ... source the director" kept in `direct`). (3) The
+reading `the followed ship` in the boat names her as a boat and her ship astern of the
+drivers, rather than "the player's own ship left as she lies", which is the words for
+another ship.
+
+**Found on the way.** (1) **The drivers were not given the ship back at the hoisting in** when
+`come alongside` was given from the boat's prompt: the order reaches `hoist_in` through
+her hull's façade (`orders.prompt.world_of` is the standing runtime's world, the hull's), and
+`world.followed = ...` wrote a façade attribute and not the World's; `World.own` fell back
+to the player's hull (step 1's fallback for a followed hull gone), which is why step 4's
+tests saw the ship as own and never the stale `followed`. `boats._root` unwraps the façade
+to the one World for every write and read of `followed` (`follow_boat`, `hoist_in`,
+`lose_boat`); the reading `the followed ship` unwraps it the same way. (2) The observer's
+readings answer None for a row not of the world's (step 2): `followed` is listed among
+`WORLD_ROWS`. (3) A doubted `aboard:` order is doubted once on the record before its reason
+counts (58a's rule): the test enters the stove boat twice.
+
+**What moved: nothing pinned.** The events and the reading are new rows; the channel is a
+new head no recorded passage uses; the truth's row gains keys for a vessel no pinned day
+has. The truth: 7-332.
+
+### Step 7: the records, and the boat's drawing (the re-brief's item 7; the design's §5.4 and §8)
+
+**The records.** Spec M7b §11, §12 and §21k carry "as built" paragraphs (the observed world;
+the player's seat on another ship and the person's movement between hulls; the boat as a
+hull, the oar force, the tow, the kedge's keeper, the readings and the director's forms, with
+the figures measured and the two 7b truths' words as built); `docs/agents/Harness.md` gains
+§17b (the player's own seat on another ship; the readings following the person into a visit
+and into the boat, the boat's words at a station, the events, the director's forms); the
+primer gains chapter 26, "The boat, and going aboard another ship" (in-world under the
+primer's rule, run through the in-world test and the forms' tests: the boat's orders are
+hers and not the frigate's at sea, so its blocks are plain and not `orders` blocks the test
+types at the frigate), listed in the README and in the primer tests' chapter list; the
+director's library page names the boat as a vessel, the loss by the `aboard:` table and
+`follow`; the tuning notes are this section and the six before it; the design note's
+postscripts "Step 1" to "Step 7". The forms tables of chapter 20 carry no `follow` row (the
+tables' test parses each row as a world order at the frigate's prompt and expects the
+captain's refusal, which `follow "the ship"` gives too, but the prose names it and the
+registry's test is content).
+
+**The boat's drawing** (`tools/gen_ships.py` `boat_profile`; the design's §5.4 with B5's road
+on the trunk: `hull_profile` and `hull_form` as the 64's and the razee's use them). Each
+boat's file carries her shape keys by rule from her length, breadth, draught and freeboard,
+every line `judged` and said so in its note, nothing of them read by the physics: the gunwale
+with a boat's sheer rising forward (a quarter of the freeboard and 12 cm at the stem head, an
+eighth and 5 cm at the taffrail; judgement after Steel's boats' sheer), the half-breadths at
+the water and the gunwale by five stations (the side flared, the water's half-breadth 0.86
+of the gunwale's amidships and less toward the ends), the keel from the post's heel to the
+forefoot rising to 0.6 of the draught, the stem raked a little, the post to a transom's
+knuckle at 0.35 of the draught and the taffrail, a rubbing strake under the gunwale as her
+one wale, her floor boards over the keel filed as her one deck (an open boat has no deck; the
+platform is what a man stands on; the viewer draws a deck inside the side and the drawing's
+test wants one), a midship section with a rising floor and a round bilge, and the form a
+square transom (Steel 1805 p. 181: the yawl, the cutter and the launch square-sterned; the
+pinnace and the barge sharp, and not filed) with no head. `form.check` draws each and records
+the drawn displacement beside the filed: the 16-ft yawl 12% under, the 28-ft cutter 13% over,
+the 31-ft launch 12% over, the 25-ft launch and the 23-ft cutter within 1%; each within the
+record's share (15%), the filed figures standing (§5.0 principle 8: nothing is moved to the
+drawing). The eight ships' files are untouched by it (the generator's test). **The oars**:
+the snapshot carries a boat's `oars` block (number, out, manned, stroke, hours) from
+`physics/oars.py`, the only reader beside the tests, and the viewer's skeleton draws one line
+an oar from the thwarts while they are out (`client/projection.js`: the loom inboard of the
+gunwale, the blade in the water under the stroke, lifted along the side lying on the oars,
+2.6 m outboard, judgement for a 12 to 16 ft oar; laid in, none is drawn), as spar figures of
+class `oar`, so the ship view's rendering and its titles serve them unchanged. The served
+hull's drawing test asks every profiled hull for a gallery, a stern light and a head, which a
+boat has not by her form; the clause is the ships' alone, said so in the test.
+
+**Found on the way.** (1) The fast tier's one failure on step 5's tree was a name collision in
+`test_log_lines` (`t{hash(cond) % 1000}` for four conditions, the string hash seeded per
+process: two fell on "t917"); the test passed alone three times and names by index now.
+(2) The generator's hook test reads the generator's stdout as a literal: the boats' drawing
+reports go to stderr as the 64's do.
+
+
+**The suites on the package's final tree** (`30b23b2`: steps 6 and 7 and the boat's drawing
+on step 5's tree, the lead's `f5be911` merged, package 88's close with it). The fast tier
+whole on the merged tree, 5,383 passed, one failed (33:16): the aboard table's count pinned
+at thirty-one in `test_aboard_found` (the boat's three things make thirty-four; the pin is
+the table's, moved as the director's own test's was); the slow tier of the thirty-six touched
+files and the known truths, `--slow -m "not pace" -n 4`, 3,371 passed, 7 expected failures,
+none failed (50:27); the pace tests alone and last, 11 passed, none failed (3:53); and the
+fast tier whole again on the final tree with the pin moved, 5,384 passed, none failed
+(33:37). Ruff clean. Steps 6 and 7 and the drawing were suited together on one tree, said
+here rather than three times over.
+
+**The package, closed.** The seven items of the re-brief are built in seven steps and the
+drawing's commit, each with its notes above and its postscript in the design note; the
+truths 7-320 to 7-334 and the boat's 7b-113 and 7b-114 stand; nothing pinned moved; the
+physics changed by the oar force alone, with its source and its judgement written; the ship
+files through the generator, the eight regenerated byte-identical but for their boats'
+`file:` lines; no consent file touched. Open for the lead and the owner: the lugger clause of
+7b-113 (the physics' figure against the spec's words; `F_0` costed in step 5), the muster
+not reduced for the boat's crew (step 4), the business's tile loads (step 2), and the
+flaky names of `test_log_lines` mended by index (step 7). **The lead's two rulings at the
+merge of steps 3 and 4** (the lead's note of 2026-10-31, read after the package closed) are
+booked and not built here: the ship's muster is to be reduced by the boat's crew while she
+is manned (a follow-up: the hands the boat takes come off the ship's stations as `send_boat`
+should take them, and go back at the hoisting in; `world/boats.py` has the manning and the
+hoisting in to hang it on), and the five boat files are the ships session's to bring to the
+ladder's rungs when Steel's Folio LVII is read (the boats' profile by rule in
+`tools/gen_ships.py`, step 7, is theirs to regenerate at that merge with the eight).
+
+
+**The trunk's hull step brought in after the close** (`8a421b2`: the lead's `5ff9586`,
+package 75's eight hulls with their profiles). The one conflict was the view tests' table of
+the parts a hull rightly lacks, which gains the boats (no gallery, no stern light, no head, no
+port band; a square transom and a rubbing strake for the wale); the merged generator
+reproduces all fifteen files byte for byte. On the merged tree the fast tier whole, 5,910
+passed, none failed (34:49); the slow tier of the drawing's and the boat's seven files, 839
+passed, none failed (3:05); the known truths' slow tier and the pace tests not run again here
+(the merge touched no physics and no truth; the lead's cloud run on the merge is the whole).
+
 
 ## Package 88: the captain's pass of M7 (2026-10-30 to 31)
 
@@ -16660,13 +16924,6 @@ trials measured so, the table under item 2).
 
 The whole suite on the merged tree is the lead's, in the cloud, at the merge.
 
-
-**The suites on the step's tree** (`3eb9f2c`, the lead's `0b55448` merged, package 88 with it):
-the fast tier whole, 5,353 passed, none failed (32:46); the slow tier of the twenty-nine touched
-files and the known truths, `--slow -m "not pace" -n 4`, 3,032 passed, 7 expected failures,
-none failed (47:13); the pace tests alone and last (`--slow -m pace`, one process), 11 passed,
-none failed (3:51): the oar term in the substep is a dictionary read on every hull and the
-pace floors stand. Ruff clean.
 ### The pace at the merge: the lead's finding and the follow-up (2026-10-31)
 
 *The finding* (the lead, at the merge): the cloud's pace job, serial and informative, 10 of 10

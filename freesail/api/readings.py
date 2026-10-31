@@ -227,6 +227,7 @@ class Reading:
 # answers None at the observer's hull, in the words NO_SHIP_FOLLOWED_WORDS.
 WORLD_ROWS: frozenset[str] = frozenset(
     {
+        "followed",  # package 82, item 6: the followed ship, or none and the view
         "true_wind_speed",
         "true_wind_from",
         "mean_true_wind_speed",
@@ -2293,6 +2294,28 @@ NO_PORT_WORDS = "no port within the pilot's cruising ground"
 NO_HOLD_WORDS = "no hold is kept: the ship's file gives her no room for a cargo"
 
 
+def _boat_words(world: Any, ship: Any, spec: Any) -> str:
+    """A station in a ship's boat manned as a hull (package 82, item 6): the boat and her
+    ship named, her oars and her sail, as `ship_words` names a ship."""
+    from freesail.world import boats as B
+
+    name = str(getattr(ship, "name", "") or "the boat")
+    length_m = float(getattr(getattr(spec, "hull", None), "length_waterline_m", 0.0) or 0.0)
+    oars = int(getattr(spec.oars, "number", 0) or 0)
+    sails = ", ".join(sorted({str(getattr(s, "cls", "")) for s in ship.sails.values()} - {""}))
+    hull = getattr(world, "own", None)
+    ship_hull = B.ship_of(world, hull) if hull is not None else None
+    of = f" of the {B.hull_name_of(ship_hull)}'s" if ship_hull is not None else ""
+    head = name[:1].upper() + name[1:]
+    rig = f" and a standing {sails}" if sails else ""
+    return (
+        f"{head}: a ship's boat{of}, a hull of the one world, about {length_m / 0.3048:.0f} "
+        f"feet, {oars} oars{rig}; her coxswain at the yoke lines and her oarsmen her company. "
+        "Her orders are the boat's (give way, easy all, lie on your oars, pull for a mark, "
+        "step the mast and set the lug, come alongside); the readings are hers."
+    )
+
+
 def ship_class_words(spec: Any, name: str = "") -> str:
     """Her rig and class in words from her file's era note: 'a 36-gun 18-pounder frigate
     of the Amazon class, ship-rigged', 'H.M. armed cutter', 'H.M. brig-sloop of the
@@ -2332,6 +2355,8 @@ def ship_words(world: Any) -> str:
         return "No ship."
     name = str(getattr(ship, "name", "") or "the ship")
     spec = getattr(ship, "spec", None)
+    if getattr(spec, "oars", None) is not None:
+        return _boat_words(world, ship, spec)
     cls = ship_class_words(spec, name) if spec is not None else "a ship"
     ports = getattr(world, "dealings", None)
     nations = getattr(world, "nations", None)
@@ -2548,6 +2573,37 @@ def _where_am_i(world: Any, _: str | None) -> dict[str, Any] | None:
 def _boat(world: Any, _: str | None) -> dict[str, Any] | None:
     ports = getattr(world, "dealings", None)
     return ports.boat_reading() if ports is not None else None
+
+
+def _followed(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the followed ship` (package 82, item 6): the drivers' centre by name, with the
+    player's own ship named when another is followed; "no ship followed" and where the
+    observer's view is in an observed world."""
+    from freesail.world.hulls import Hull
+
+    root = world
+    while isinstance(root, Hull):
+        root = root.world
+    hulls = getattr(root, "hulls", None) or {}
+    followed = getattr(root, "followed", None)
+    hull = hulls.get(followed) if followed is not None else None
+    players = getattr(root, "players", None)
+    if hull is None:
+        view = root.view_words if getattr(root, "observed", False) else "no ship of the player's"
+        return {"words": f"no ship followed; {view}", "ship": None, "observer": True}
+    name = str(getattr(getattr(hull, "ship", None), "name", "") or hull.id)
+    from freesail.world import boats as B
+
+    if players is None or hull is players:
+        words = f"the {name}, the player's ship"
+    elif B.is_boat(hull):
+        ship_hull = B.ship_of(root, hull)
+        of = B.hull_name_of(ship_hull) if ship_hull is not None else "her ship"
+        words = f"{name}, a boat of the {of}'s manned as a hull; the {of} astern of the drivers"
+    else:
+        own = str(getattr(getattr(players, "ship", None), "name", "") or players.id)
+        words = f"the {name}; the player's own ship the {own} left as she lies"
+    return {"words": words, "ship": str(hull.id), "name": name, "observer": False}
 
 
 def _boats(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -2776,6 +2832,17 @@ REGISTRY.add(
         _boat,
         description="the ship's boat: alongside, or away on its errand and where",
         none_words=_no_people_words,
+    )
+)
+REGISTRY.add(
+    Reading(
+        "followed",
+        ("the followed ship", "the followed hull"),
+        "query",
+        "",
+        _followed,
+        description="the ship the drivers follow, by name; 'no ship followed' and where the "
+        "observer's view is in a world with no ship of the player's",
     )
 )
 REGISTRY.add(
@@ -3086,6 +3153,19 @@ _event(EventSpec("the pilot's boat gone", "port.pilot_gone"))
 _event(EventSpec("the pilot asks for his boat", "port.pilot_boat"))
 _event(EventSpec("the boat away", "boat.away"))
 _event(EventSpec("the boat alongside", "boat.alongside"))
+# Package 82 (item 6): the boat manned as a hull, lost, the tow, and a person come aboard
+# another ship (his own hull's line and hers)
+_event(EventSpec("the boat manned", "boat.manned"))
+_event(EventSpec("the boat lost", "boat.lost"))
+_event(EventSpec("the tow begun", "boat.towing"))
+_event(EventSpec("the tow ended", "boat.tow_ended"))
+_event(
+    EventSpec(
+        "aboard another ship",
+        "person.aboard",
+        test=lambda d: bool(d.get("ship")) and bool(d.get("from") or d.get("by") == "the boat"),
+    )
+)
 _event(EventSpec("a message", "message.received"))
 _event(EventSpec("a letter", "message.received"))
 _event(EventSpec("moored", "ship.moored"))
@@ -4043,6 +4123,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
         d.update(_truth_signals(v, str(v.nation), world))  # package 71: her true colours
         if getattr(v, "squadron", ""):
             d["squadron"] = v.squadron  # package 72: the set she is a member of
+        d.update(_truth_boat(world, v))  # package 82: a manned boat as a vessel
         if getattr(v, "regime", ""):
             d["regime"] = v.regime  # package 72: in ordinary, and the rest
         crew = getattr(v, "crew", None)
@@ -4407,6 +4488,39 @@ def _truth_action(world: Any) -> dict[str, Any]:
     return out
 
 
+def _truth_boat(world: Any, v: Any) -> dict[str, Any]:
+    """A ship's boat manned as a hull of the one world (package 82, item 6): her ship
+    named, who is in her, under oars or her lug, towing whom."""
+    hull = getattr(v, "crew", None)
+    if not getattr(v, "boat", False) or hull is None:
+        return {}
+    from freesail.ship.parts import SailState
+    from freesail.world import boats as B
+
+    out: dict[str, Any] = {}
+    ship_hull = B.ship_of(world, hull)
+    if ship_hull is not None:
+        out["boat_of"] = B.hull_name_of(ship_hull)
+        tow = (getattr(ship_hull.ship, "extra", None) or {}).get("tow")
+        if isinstance(tow, dict) and str(tow.get("boat", "")) == str(hull.id):
+            out["towing"] = B.hull_name_of(ship_hull)
+    try:
+        names = [p.name for p in world.registry.aboard(hull.id)]
+    except Exception:  # noqa: BLE001  (a world with no registry)
+        names = []
+    if names:
+        out["in_her"] = ", ".join(names)
+    from freesail.physics.oars import oars_of
+
+    oars = oars_of(hull.ship)
+    lug = any(
+        getattr(s, "cls", "") == "lug" and s.state == SailState.SET
+        for s in hull.ship.sails.values()
+    )
+    out["under"] = "her lug" if lug else ("oars" if oars is not None and oars.out else "neither")
+    return out
+
+
 def _truth_words(d: dict[str, Any]) -> str:
     parts = []
     for s in d.get("ships") or []:
@@ -4434,6 +4548,12 @@ def _truth_words(d: dict[str, Any]) -> str:
             bits.append(f"ahead: {s['ahead']}")  # package 58a
         if s.get("boat"):
             bits.append(f"the boat: {s['boat']}")  # package 82
+        if s.get("boat_of"):  # package 82, item 6: a manned boat as a vessel
+            bits.append(f"the {s['boat_of']}'s boat, a hull of the world, under {s.get('under')}")
+            if s.get("in_her"):
+                bits.append(f"in her: {s['in_her']}")
+            if s.get("towing"):
+                bits.append(f"towing the {s['towing']}")
         for row in ("guns", "damage", "bill"):  # package 70
             if s.get(row):
                 bits.append(f"{row}: {s[row]}")

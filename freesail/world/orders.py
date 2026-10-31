@@ -137,6 +137,9 @@ CHANNELS = (
     # package 72 (spec M7 §21): the squadrons and the convoys as sets
     "squadron",
     "convoy",
+    # package 82 (item 6): the drivers' centre moved by the director, `follow "X"` (a
+    # driver's line through the channel, no colon in its head)
+    "follow",
 )
 
 # The captain's grammar refuses a world order in these words (truth 71).
@@ -151,9 +154,11 @@ REFUSAL = (
 # deck's conversation and no world order.
 _HEAD = re.compile(
     r"^\s*(?:(weather|ship|message|port|person|captain|mark|seat|unseat|aboard|squadron|convoy)"
-    r"\b\s*(\"[^\"]*\"|[\w-]+|the\s+[\w' -]+?)?\s*:|(say)\s+as\s+[^:]+:)",
+    r"\b\s*(\"[^\"]*\"|[\w-]+|the\s+[\w' -]+?)?\s*:|(say)\s+as\s+[^:]+:"
+    r"|(follow)\s+(?:\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$)",
     re.I,
 )
+_FOLLOW_BODY = re.compile(r"^\s*follow\s+(?P<who>\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$", re.I)
 # A hull named at an `aboard` order's head (package 84, step 9): `aboard the Raven: ...`,
 # `aboard "Raven": ...`; the followed hull when none is named.
 _ABOARD_HULL = re.compile(
@@ -195,6 +200,20 @@ def purview_allows(by: str, channel: str) -> str | None:
     return None
 
 
+def _follow(world: Any, body: str, by: str = "") -> tuple[str, dict[str, Any]]:
+    """`follow "<ship>"` and `follow nobody` (package 82, item 6): the drivers' centre
+    moved as the console moves it (`World.follow`: a driver's line, journaled and replayed),
+    the source the director's."""
+    m = _FOLLOW_BODY.match(body)
+    if m is None:
+        raise WorldOrderError("Say 'follow \"<ship>\"' or 'follow nobody'")
+    try:
+        e = world.follow(m.group("who"), source=by or "the director")
+    except ValueError as err:
+        raise WorldOrderError(str(err)) from None
+    return e.text.rstrip("."), {"ship": (e.data or {}).get("ship")}
+
+
 def recognises(text: str) -> bool:
     """Whether a line is a world order's: a channel's word and a colon, or the words
     'world order' (the captain's grammar refuses either; `orders.handle`)."""
@@ -222,7 +241,7 @@ def parse(text: str) -> WorldOrder:
             f"'{text}' is no world order: say weather:, ship:, message:, port <id>:, person:, "
             "captain:, mark:, aboard:, seat:, unseat:, squadron:, convoy: or say as <person>:."
         )
-    return WorldOrder((m.group(1) or m.group(3)).lower(), text, reason)
+    return WorldOrder((m.group(1) or m.group(3) or m.group(4)).lower(), text, reason)
 
 
 def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
@@ -232,6 +251,8 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     if outside:
         raise WorldOrderError(outside)
     body = order.text
+    if order.channel == "follow":
+        return _follow(world, body, order.by)
     if order.channel == "weather":
         return _weather(world, body)
     if order.channel == "ship":
@@ -3407,6 +3428,23 @@ def _fx_cartridges_damp(world, thing, target, name, value, data) -> str:
     return f"{lost} cartridges damp and struck off the gunner's count"
 
 
+def _fx_boat_lost(world, thing, target, name, value, data) -> str:
+    """The boat lost by the director's word (`world.boats.lose_boat`): stove, swamped or
+    gone adrift, with her people if any are in her; sent on no errand and manned by nobody
+    until the yard replaces her."""
+    from freesail.world.boats import lose_boat
+
+    how = str(value or "stove")
+    words = {
+        "stove": "stove against the side",
+        "swamped": "swamped alongside",
+        "cut adrift": "gone adrift, her painter parted",
+    }.get(how, how)
+    text = lose_boat(world, world.own, how, words)
+    data.update({"boat_lost": how})
+    return text
+
+
 _ABOARD_EFFECTS: dict[str, Any] = {
     "gun_dismounted": _fx_gun_dismounted,
     "cartridges_damp": _fx_cartridges_damp,
@@ -3433,7 +3471,20 @@ _ABOARD_EFFECTS: dict[str, Any] = {
     "sick_share": _fx_sick_share,
     "person_hurt": _fx_person_hurt,
     "surgeon_sick": _fx_surgeon_sick,
+    # package 82 (item 6): the boat stove, swamped or gone adrift by the director's word
+    "boat_lost": _fx_boat_lost,
 }
+
+
+def _lacks_boat(world: Any) -> str | None:
+    dealings = getattr(world, "dealings", None)
+    boats = getattr(getattr(world.ship, "spec", None), "boats", None) or []
+    if dealings is None or not boats:
+        return "she carries no boat"
+    state = dealings.boat
+    if state.lost:
+        return f"the boat is lost already ({state.lost_words})"
+    return None
 
 
 def _lacks_stores(world: Any) -> str | None:
@@ -3504,6 +3555,7 @@ _ABOARD_LACKS: dict[str, Any] = {
     "chronometer_stopped": _lacks_chronometer,
     "glass_broken": _lacks_glass,
     "well_pumped": _lacks_hull,
+    "boat_lost": _lacks_boat,  # package 82, item 6
 }
 # The keys the table's things may use: the effects and `report_only`.
 ABOARD_EFFECT_KEYS = frozenset(_ABOARD_EFFECTS) | {"report_only"}

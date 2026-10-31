@@ -13213,3 +13213,90 @@ def test_truth_7_342_a_privateers_true_colours_once_shown_before_an_enemy_are_he
     assert {"investigating a stranger", "chasing"} <= {st[2] for t, st in seq if t > 5640}, seq
     old = colours_run(False)
     assert (5700, ("false", "britain", "investigating a stranger")) in old, old
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 5 (the design's §6): towing by the boat, and the kedge's false denial
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_330_the_cutter_becalmed_is_towed_at_about_a_knot_by_her_boat_and_the_men_tire():
+    """The tow: the cutter becalmed is towed at about a knot fresh by her boat ahead on the
+    tow-line (measured 1.15 to 1.19 kn through the water under four oars, F_0 50 N an oar),
+    falling as the men tire (1.0 kn at two hours, 0.83 at four), her head brought round
+    first (to the bearing within ten minutes, the helmsman following the boat); `the boat
+    alongside` ends it; refused in a sea the boat cannot work in, at anchor and aground."""
+    from tests.test_tow import (
+        test_the_cutter_becalmed_is_towed_at_about_a_knot_fresh_her_head_brought_round_first,
+        test_the_tow_is_refused_in_a_sea_the_boat_cannot_work_in_at_anchor_and_aground,
+    )
+
+    test_the_cutter_becalmed_is_towed_at_about_a_knot_fresh_her_head_brought_round_first()
+    test_the_tow_is_refused_in_a_sea_the_boat_cannot_work_in_at_anchor_and_aground()
+
+
+def test_truth_7_331_lay_out_a_kedge_runs_to_its_end_with_the_boat_said_away_and_no_denial():
+    """The kedge's false denial mended (spec M7b §21k's one fault from the owner's test):
+    `lay out a kedge` runs to its end with the boat said away through the hoisting out, the
+    slinging, the pull out and back, and no "was not sent away" line; the boat's keeper
+    reads every evolution that holds her by the scripts' `holds()` word."""
+    from tests.test_tow import (
+        test_lay_out_a_kedge_runs_to_its_end_with_the_boat_said_away_and_no_denial,
+    )
+
+    test_lay_out_a_kedge_runs_to_its_end_with_the_boat_said_away_and_no_denial()
+
+
+def test_truth_7b_113_the_lugger_towed_clear_of_the_lavandiere_and_the_frigate_brought_round():
+    """Spec M7b §21k's 7b-113 (the number is the dispatches' as well in the suite; the
+    boat's is the brief's), as the design's §6 reads it: the lugger becalmed with the ebb
+    setting her toward the Lavandière is towed clear to the north by her boat, about a knot
+    through the water fresh and falling as the men tire (the spec's "half a knot" is not
+    what F_0 50 N an oar gives in the hours a boat's crew can pull: 0.8 kn after four hours
+    at the oars; the figure the physics give stands by the lead's ruling on the frigate's
+    clause, and the smaller F_0 that would give half a knot is costed in the tuning notes);
+    the frigate's head brought round in a calm by her launch and her way under a knot
+    (0.78 kn fresh, 0.57 after four hours), falling as the men tire."""
+    from freesail.world import boats as B
+    from tests.test_tow import (
+        _kn,
+        the_frigates_head_brought_round_by_her_launch,
+        the_lugger_towed_clear_of_the_lavandiere,
+    )
+
+    w = the_lugger_towed_clear_of_the_lavandiere()
+    fresh = _kn(w)
+    w.run(3 * 3600)
+    tired = _kn(w)
+    boat = B.towing_hull(w, w.players)
+    assert boat is not None and 3.9 <= boat.ship.extra["oars"].hours <= 4.1
+    assert 0.6 <= tired <= 0.95 and tired < fresh - 0.15, (fresh, tired)
+    tiring = [e for e in w.log if e.kind == "boat.tiring"]
+    assert len(tiring) >= 3 and "her way is falling" in tiring[0].text
+    the_frigates_head_brought_round_by_her_launch()
+
+
+# ---------------------------------------------------------------------------
+# Package 82, item 6 (the design's §7): the stations, the director and the readings
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_332_the_directors_new_forms_perform_in_the_dry_run_and_in_play_and_the_boats():
+    """The director's new forms (`follow "X"` as a driver's line through the channel, a
+    person put aboard another ship by the boat (step 1), the boat stove, swamped or gone
+    adrift by the `aboard:` table) perform on the copy in the dry run and in play; the
+    reading `the followed ship` and the events of the boat; the truth shows a manned boat
+    as a vessel with her ship, who is in her and what she is under."""
+    from tests.test_boat_director import (
+        test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea,
+        test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so,
+        test_the_events_registry_has_the_boats_events_and_a_standing_order_takes_them,
+        test_the_followed_ship_reading_names_the_drivers_centre_the_boat_and_the_view,
+        test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her,
+    )
+
+    test_the_followed_ship_reading_names_the_drivers_centre_the_boat_and_the_view()
+    test_the_events_registry_has_the_boats_events_and_a_standing_order_takes_them()
+    test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so()
+    test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea()
+    test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her()

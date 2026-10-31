@@ -135,6 +135,19 @@ def _substep(
     if oars is not None:
         thrust_n += oar_thrust(oars, d.u)
 
+    # the tow-line at the stem (package 82, item 5; `world/boats.py`): the towing boat's net
+    # pull along the line, written each tick by her hull, read here as the cable's pull is
+    # read at the hawse: a thrust, a side force and a yaw moment with the bow's lever
+    tow_line = ship.extra.get("tow") if isinstance(ship.extra, dict) else None
+    if isinstance(tow_line, dict):
+        pull = float(tow_line.get("force_n", 0.0) or 0.0)
+        if pull > 0.0:
+            rel = float(tow_line.get("bearing_rad", d.heading)) - d.heading
+            tow_stb = pull * math.sin(rel)
+            thrust_n += pull * math.cos(rel)
+            side_n += tow_stb
+            yaw_moment_nm += tow_stb * ground_tackle.HAWSE_FRACTION * hull.length
+
     # the cable's pull at the hawse (package 34), when an anchor is down
     if st.at_anchor:
         cable_fwd, cable_stb, cable_yaw = ground_tackle.cable_forces(ship, st.water, h)

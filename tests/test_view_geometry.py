@@ -1541,13 +1541,15 @@ CLOSED = """
 # the smack" with the lugger read beside them). No transom on the lugger's round stern; no wale on
 # the schooners' plate; no ports cut in the side, so no band, on the lugger and the smack.
 NO_GALLERY_OR_LIGHT = {BRIG, MERCHANT_BRIG, CUTTER, LUGGER, SMACK, SCHOONER, PRIVATEER}
+# a ship's boat (package 82: her drawing by rule) has no gallery, no stern light, no head
+# and no ports, a square transom and a rubbing strake for her wale
 RIGHTLY_WITHOUT = {
-    "gallery": NO_GALLERY_OR_LIGHT,
-    "light": NO_GALLERY_OR_LIGHT,
-    "head": {CUTTER, LUGGER, SMACK},
+    "gallery": NO_GALLERY_OR_LIGHT | set(BOATS),
+    "light": NO_GALLERY_OR_LIGHT | set(BOATS),
+    "head": {CUTTER, LUGGER, SMACK} | set(BOATS),
     "transom": {LUGGER},
     "wale": {SCHOONER, PRIVATEER},
-    "band": {LUGGER, SMACK},
+    "band": {LUGGER, SMACK} | set(BOATS),
 }
 GALLERIED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["gallery"]]
 LIT = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["light"]]

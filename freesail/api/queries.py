@@ -23,6 +23,7 @@ from freesail.api import readings
 from freesail.core.world import World
 from freesail.crew import bill
 from freesail.crew.model import Crew, Station, Watch
+from freesail.physics.oars import oars_of
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.form import stations as drawn_stations
 from freesail.ship.graph import Ship
@@ -285,6 +286,15 @@ def snapshot(world: World) -> dict[str, Any]:
     }
     out["wind"]["apparent_angle"] = r["apparent_wind_angle"]
     out["wind"]["apparent_speed"] = r["apparent_wind_speed"]
+    oars = oars_of(ship)  # package 82: a boat's oars, drawn from her thwarts by the view
+    if oars is not None:
+        out["oars"] = {
+            "number": int(oars.number),
+            "out": bool(oars.out),
+            "manned": int(oars.manned),
+            "stroke": float(oars.stroke),
+            "hours": round(float(oars.hours), 2),
+        }
     out["sails"] = [
         {
             "id": s.id,

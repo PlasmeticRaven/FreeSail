@@ -442,6 +442,38 @@ did. The consent brief describes both kinds a visitor passes between, and the pa
 a station may change without the question being put again, so no new question follows a
 visit.
 
+## 17b. The seat on another ship, the boat, and the readings following the person (package 82)
+
+**The player's own seat on another ship.** `--seat captain --ship <name>` at the console and
+the browser (and `--seat <station> --ship <name>`): the player's own ship is left as she lies,
+her watch kept and her sails as they were, under her rules captain where the scenario gives
+her an intent and with no captain's hand on her otherwise, said so in her log; the drivers
+follow the ship he is aboard, her prompt is his (her rules captain standing aside at his
+hand and taking her back at `captain: carry on`), and `follow "the ship"` brings him home.
+The seat is the same contract as a model's there: the consent record read as the seat's
+brief reads it, the consent step not put again. A world with no ship of the player's at all
+(`ship: none`, `director: observe`) opens at the director's station with the readings of
+the sea and the sky; `follow "<name>"` takes the drivers to any ship on the sea and
+`follow nobody` gives the view back.
+
+**The readings follow the person.** A station's samples are the hull its person is in from
+the next tick: his own ship, the ship he visits (section 17's visitor), or the boat. In the
+boat (`go to the boat`, with the ship hove to or at anchor; or sent in her by the tow), his
+station's world is her hull: `the ship` says "the Amazon's launch: a ship's boat of the
+Amazon's, a hull of the one world, about 31 feet, 10 oars and a standing lug; her coxswain
+at the yoke lines and her oarsmen her company", the shape notice says her orders are his
+(`give way`, `easy all`, `lie on your oars`, `pull for <a mark>`, `step the mast` and `set
+the lug`, `come alongside`), the readings are hers (her way, the wind at her gunwale, what a
+man standing in a boat sees, her ship a sail in sight), and `where am I` says "in the
+Amazon's launch, 10 oars out, giving way together, the men 0.5 hours at the oars". Alongside,
+hoisted in, the station is the ship's again and the boat's log is kept in the ship's under
+her name. The reading `the followed ship` says which hull the drivers' readings are; a
+station standing by wakes at `the boat manned`, `the boat lost`, `the tow begun`, `the tow
+ended` and `aboard another ship` as at any event. The director's forms reach the boat:
+`person: "<name>" goes aboard the <ship> by the boat`, `follow "<ship>"` (a driver's line at
+the seat, costing no act), `aboard: the boat stove | swamped | gone adrift`, and the truth
+shows a manned boat as a vessel with her ship, who is in her and whom she tows.
+
 ## 18. The regatta: a course sailed by an agent, and scored (package 44)
 
 The regatta (spec M6 §21) sails a fixed course at a fixed seed under one agent at a time and scores the run: the elapsed time from the gun to the finish line, with the damage, the groundings, the crew's fatigue and the purse beside it. It is your tool for judging the physics and the documentation against the models, and the first competitive mode. One command runs a course; there is no game to start first, since the regatta hosts the game itself and the door runs beside it.
