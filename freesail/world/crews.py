@@ -601,6 +601,10 @@ def crewed(world: World) -> list[Any]:
         and not v.done
         and not v.crew.is_followed
         and v.crew is not players  # the player's own hull is awake always (step 10)
+        # a ship's boat manned as a hull (package 82, items 4 and 5): awake while she is
+        # manned, a dealing of her ship's, never demoted by the range (she has no brain and
+        # no far shape to sleep in) and counting nothing against the cap
+        and not getattr(v, "boat", False)
     ]
 
 

@@ -824,3 +824,26 @@ ran aback by her own sheet and no helm would bring her round; `boats._tend_sheet
 hand, by the engine's own trimmer. The boats' rudder in the generator was made a boat's
 (judgement, named) and the files regenerated. The director's `aboard: the boat stove` form
 is step 6's.
+
+
+### Step 5: towing by the boat, and the kedge's false denial (§6; 2026-10-31)
+
+**Built as designed**: `tow her with the boat [to <the point or bearing>]` with the boat manned
+as a hull on the tow-line, the kinematic coupling (her station a line's length ahead on the
+bearing, her way the ship's), the force her oars' net pull at the ship's speed read by the
+integrator at the stem with the cable's lever, the head brought round first, the men tiring
+with the hourly words, `the boat alongside` ending it, the refusals in a sea, at anchor and
+aground; the kedge's keeper reading every script that holds the boat; truths 7-330, 7-331 and
+7b-113. The figures are §5.2's within a tenth of a knot (the cutter 1.15 to 1.19 kn fresh and
+0.83 at four hours; the frigate 0.78 fresh and 0.57 at four) and are in
+`docs/dev/TuningNotes.md`, "Package 82", step 5.
+
+**Taken another way, with the reason.** The ship's helmsman is given the tow's bearing (§6
+had "the rudder answers as the water passes it", which it does, against the heading the
+helm was holding: the frigate's head came round and went back); the tow-line is twenty
+fathoms, not "a line's length" unnamed; the tow ends of itself at an anchor or the ground.
+**7b-113's "half a knot"** for the lugger is not a figure `F_0` 50 N gives in a boat's crew's
+hours (1.16 kn fresh, 0.8 at four hours); the truth carries the physics' figures with the
+spec's words quoted, and the tuning notes cost the smaller `F_0` for the lead. **Found on
+the way**, the one that matters: a manned boat not followed by the drivers slept at the first
+switch (no brain, no range), which step 4's tests never saw; mended in `crews.crewed`.

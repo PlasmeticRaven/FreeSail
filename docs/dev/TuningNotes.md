@@ -16333,3 +16333,88 @@ files and the known truths, `--slow -m "not pace" -n 4`, 3,032 passed, 7 expecte
 none failed (47:13); the pace tests alone and last (`--slow -m pace`, one process), 11 passed,
 none failed (3:51): the oar term in the substep is a dictionary read on every hull and the
 pace floors stand. Ruff clean.
+
+### Step 5: towing by the boat, and the kedge's false denial (the re-brief's item 5; the design's §6)
+
+**The tow** (`world/boats.py`: `tow_with_boat`, `end_tow`, `_tow_station`, `_tow_tick`;
+`orders/boat.py` the ship's verbs; `data/vocabulary.yaml` `tow her with the boat` with its
+synonyms, object `boat`). `tow her with the boat [to <the point or bearing>]` from the ship
+(`tow her with the launch` by her name; ahead when no bearing is said, as the kedge is laid
+ahead): the boat manned and made a hull by step 4's `man_boat` (so refused with no boat, a
+boat without a file, away, manned or lost), her oars out and giving way, the `BoatState` on the
+errand "towing" ("the boat ahead on the tow-line, towing ahead to the NE"), the ship's
+helmsman given the tow's bearing (the period's practice: the helm put over to help her head
+round and steered after the boat; `steer` afterwards if you will). **The coupling is
+kinematic**, as the design has it: each tick the boat's hull is set a line's length ahead of
+the ship's stem on the bearing (`TOW_LINE_M` 36 m, twenty fathoms of hawser out, judgement:
+her oars clear of the bow and the line not sagging to the water at a knot), her heading the
+bearing, her way the ship's along the line, no sway and no swing; and the force on the ship
+is her oars' net pull at the ship's speed, `oar_thrust(u_ship) - R_boat(u_ship)`, clamped at
+nothing (a boat pulls no ship astern), written to `ship.extra["tow"]` and read by the
+integrator's substep at the stem as the cable's pull is read at the hawse (a thrust and a
+side force along the line, the yaw moment with the hawse's lever, `anchor.HAWSE_FRACTION`;
+`physics/integrate.py`, the brief's one leave). The men tire by the oars' `f(hours)` and the
+ship's log says so once an hour (`boat.tiring`: "The boat's people are tiring, 2 hours at
+the oars; her way is falling"). **`the boat alongside`** (the vocabulary's synonym of `come
+alongside`, taken on the ship as the ship's order) ends it: the line cast off (`boat.tow_ended`),
+the boat hoisted in by step 4's road, the ship's way left to die; on a ship whose boat is
+manned by a person it recalls her (`come_alongside` on her hull). The tow ends of itself,
+with the words, when the ship comes to an anchor or takes the ground. **Refused** in a sea
+the boat cannot work in (the sea's state in her swamping set: short, heavy or very heavy for a
+boat under twenty feet, heavy or very heavy for a launch; "cannot work in this sea (a rough
+sea...)"), at anchor ("weigh first, and the boat can tow her"), aground ("the tide floats
+her or the kedge hauls her off; the boat cannot"), and for a bearing that is none.
+
+**Measured** (the probe, a calm at seed 7, the men fresh at the start; `docs/design` §5.2's
+estimates beside): the cutter under her 16-ft boat's four oars pulls 200 N fresh: her head
+from north to the north-east in two minutes, **0.86 kn at five minutes, 1.15 at ten, 1.19 at
+twenty** (the design's "about a knot"), 1.11 kn at an hour (the pull 170 N), 1.01 at two
+hours (142 N), **0.83 at four hours (106 N)**; the frigate under her launch's ten oars, 496 N
+fresh: her head from north to east in ten minutes (the design's "two points in a few
+minutes"), **0.66 kn at twenty minutes, 0.78 at an hour** (the design's 0.8), 0.70 at two
+hours, **0.57 at four** (the design's "half a knot after four hours"); the lugger under four
+oars 1.13 kn at ten minutes, 1.16 at twenty, 1.08 at an hour and 0.8 after four. Nothing of
+the hull's resistance moved; the figures are the files' displacements against the oars'.
+
+**7b-113's lugger clause, put to the lead.** The spec's "towed clear at half a knot" is not a
+figure F_0 50 N an oar gives in any hour a boat's crew can pull: the lugger makes 1.16 kn
+fresh and 0.8 after four hours, half a knot at twelve. The truth asserts the physics' figures
+(about a knot fresh, 0.6 to 0.95 after four hours, falling, the hourly words said) and
+says so in its docstring, by the lead's ruling on the frigate's clause that the physics'
+figure stands. The lesser by a smaller `F_0`, costed: `F_0` 25 N an oar gives the lugger and
+the cutter about 0.6 kn fresh (the brief's "half a knot" in its first hour) and the
+frigate's launch 0.4 kn; the boat herself under oars is untouched by it below `P/F_0` (2.4
+m/s, 4.7 kn, above her speeds), so only the tow moves. One line of `tools/gen_ships.py`
+(`OAR_THRUST_N`) and the five files regenerated, if the owner wants the words rather than
+the figure.
+
+**The kedge's false denial** (`Dealings._boat_kept`; spec M7b §21k's one fault): the keeper
+denied the boat "was not sent away laying out the kedge" at the first minute of the lay-out
+(the kedge script's `BoatState` says "hoisting out" for its first five minutes and the keeper
+knew the `send_boat` evolution alone), reset the state, and the kedge went on with the boat
+"at the booms" in the reading. The keeper now reads every evolution that holds the boat by the
+scripts' `holds()` word for her (`send_boat`'s and now `LayOutKedgeScript.holds`, the ship and
+"the boat"), through the runner's instances' scripts; the test runs the lay-out to `ship.kedged`
+with the boat read away at fourteen minutes and more and no `boat.stood_down` line. The
+runner's hold on "the boat" also serializes a `send the boat` behind the kedge's work, which
+`check` refused already.
+
+**Found on the way.** (1) **A manned boat's hull slept after a minute** when she was not the
+followed hull: `crews.switch`'s demotion loop read every vessel at full detail, and a boat
+with no brain has no range (`far_nm` infinite: "beyond"), so she was demoted to the far
+shape at the first switch, her physics off and her oars' hours frozen at a minute, the tow's
+pull written once and read for ever (the cutter held 1.09 kn for four hours with the men
+never tiring). Step 4's tests had the boat followed (the World's own tick) and never saw it.
+`crews.crewed` now leaves a ship's boat out (`Vessel.boat`): she is awake while she is
+manned, never demoted by the range, and counts nothing against the cap, which is what step
+4's note claimed and now holds; a stationed person's boat with the drivers on the ship ticks
+as well. (2) The ship's helmsman held her first heading against the tow (the frigate's head
+went to 79 degrees and came back to 28 under her own rudder at 0.6 kn); the tow gives the
+helm the bearing. (3) `World.sea` is None without `sea: true` in the scenario; the sea-state
+refusal's test says so. (4) The runner's instances carry the script as `script`, the
+evolution as `evo`.
+
+**What moved: nothing pinned.** `crews.crewed` changes only for a vessel with `boat` set,
+which no recorded passage has at full detail (the hoy and the pilots' boats have no hull);
+the kedge's keeper changes only while a kedge is laid out, which no pinned day does; the tow
+is new. The truths: 7-330, 7-331, 7b-113 (the number is the dispatches' as well in the suite).

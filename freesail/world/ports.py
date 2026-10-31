@@ -869,6 +869,8 @@ class BoatState:
             return f"{self.boat_name} lost: {self.lost_words or self.lost}; a new one is the yard's"
         if not self.away:
             return f"{self.boat_name} at the booms"
+        if self.hull and self.errand == "towing":
+            return f"{self.boat_name} ahead on the tow-line, {self.phase}"
         if self.hull:
             who = f", {self.commander} in her" if self.commander else ""
             return f"{self.boat_name} manned and away as a hull of her own{who}"
