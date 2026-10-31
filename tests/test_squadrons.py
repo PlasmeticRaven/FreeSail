@@ -693,3 +693,61 @@ def test_the_seasonal_bound_holds_the_glass_under_the_ceiling_and_the_wind_with_
     assert not off.systems.bound and on.systems.bound
     # the switch is the scenario's word and leaves the dict alone when off
     assert "weather_bound" not in off.scenario.to_dict() and on.scenario.to_dict()["weather_bound"]
+
+
+def test_a_station_to_windward_of_her_fetch_is_filled_to_the_close_hauled_course_as_the_far_law():
+    """Package 88, item 3 (72's near station law read against 58b's far one; 86's reading of
+    the convoy's stall first suspected the near `keep station` of shaping a course inside the
+    close-hauled angle). The flag close-hauled (the player's cutter full and by in a westerly)
+    and a crewed merchant brig ordered to keep station two cables to windward of her, beyond
+    anything she can fetch: the near law (`station._course_clamped`) gives the close-hauled
+    course on the tack that points nearer the station, "as near the wind as she will lie",
+    and keeps her full and by, never a course inside the angle; the far body's law
+    (`ships.Vessel._course_for`, 58b) for the same bearing chooses the same tack by the wind.
+    The far leg aimed at the bare station before package 88 and filled her on the other tack
+    (away from her flag); it takes the near law's aim now (`squadrons.FAR_STATION_LEAD`). In
+    station a flag's course inside her angle is judged by `navigation.judge_course`, which
+    keeps her full and by on her tack (docs/dev/TuningNotes.md, package 88)."""
+    import math
+
+    from freesail.evolutions.scripts import close_hauled_true_angle
+    from freesail.world.geo import bearing_and_distance
+    from tests.test_brains import put, world_at
+
+    w = world_at(
+        49.5, -5.5, ship="data/ships/cutter.yaml", ship_heading_deg=330.0, ship_speed_kn=5.0
+    )
+    w.submit("set plain sail")
+    w.submit("keep her full and by")
+    b = put(
+        w,
+        "merchant brig",
+        "britain",
+        "49 29.9 N 5 30.2 W",
+        "in company with the ship",
+        "bound for Falmouth",
+        name="Nancy",
+    )
+    w.run(121)
+    crew = b.crew
+    assert crew is not None
+    e = crew.submit("keep station two cables to windward of the ship")
+    assert e.kind == "station.kept" and "as near the wind as she will lie" in e.text, e.text
+    held = crew.ship.extra["station"]
+    wind_from = 270.0
+    closest = units.rad_to_deg(close_hauled_true_angle(crew.ship))
+    off = units.rad_to_deg(units.wrap_pi(math.radians(held["course"] - wind_from)))
+    assert abs(abs(off) - closest) < 1.0, (held["course"], closest)
+    assert crew.ship.dyn.helm_mode.name == "FULL_AND_BY"
+    # the far law for the same aim (the station two cables to windward of the flag and the
+    # lead along her course, `squadrons.keep_station` since package 88): the same tack
+    from freesail.orders.station import LEAD_M
+
+    data = e.data
+    station = destination(b.position, float(data["bearing_deg"]), float(data["distance_m"]))
+    lead = destination(station, units.rad_to_deg(w.ship.heading) % 360.0, LEAD_M)
+    b.tack = 0.0
+    far = b._course_for(bearing_and_distance(b.position, lead)[0], wind_from, 14.0)
+    far_off = units.rad_to_deg(units.wrap_pi(math.radians(far - wind_from)))
+    assert (far_off > 0) == (off > 0), (far, held["course"])
+    assert bearing_and_distance(w.position, b.position)[1] < 3.0 * units.CABLE
