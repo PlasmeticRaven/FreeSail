@@ -180,6 +180,21 @@ class Ship:
             chain = self._chain_memo[key]
         return chain[-1] if chain else None
 
+    def under_bowsprit(self, part: str | Part) -> bool:
+        """A yard crossed under the bowsprit or the jib-boom (the spritsail yard, the
+        sprit-topsail yard: Steel 1794 vol. I pp. 196-197; Lavery I27-I30), or the square
+        sail bent to one (package 75; docs/design/Design-ShipsEngineExtensions.md §4.2): a
+        spar of class `yard` whose chain roots at a bowsprit. Not a jib, whose chain roots
+        there too: the rule names the yards and their square sails alone. Read through
+        `mast_of`'s memo, at the nine places of §4.2 (the engine's bowsprit step, B3.2)."""
+        p: Part | None = self._part(part)
+        if isinstance(p, Sail):
+            p = self.yard_of(p) if p.cls == "square" else None
+        if not isinstance(p, Spar) or p.cls != "yard":
+            return False
+        root = self.mast_of(p)
+        return root is not None and root.cls == "bowsprit"
+
     # -- queries: lines -------------------------------------------------------
 
     def lines_of(self, part: str | Part, cls: str | None = None) -> list[Line]:

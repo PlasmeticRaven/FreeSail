@@ -292,8 +292,27 @@ SIZE_RANK: dict[str, int] = {
     "cutter": 1,
     "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
     "smack": 0,  # a fishing smack of thirty-five tons is nobody's match
+    # package 75's ships (docs/design/Build-Ships.md §3.1 item 24; their files and rows
+    # come with each ship): the razee a heavy frigate, rated a 44 (James vol. 3 p. 311;
+    # docs/design/Design-Ship-Indefatigable.md §8); the sixty-four and the seventy-four,
+    # third rates of the line (Falconer, RATES), a class above every frigate; the Prince de
+    # Neufchatel a brig's (D15(a)); the bilander the cutter's (D16(a))
+    "razee": 3,
+    "sixty-four": 4,
+    "seventy-four": 4,
+    "hermaphrodite brig": 2,
+    "bilander": 1,
 }
+# Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
+# razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
+# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
 _SIZE_WORDS: tuple[tuple[str, int], ...] = (
+    ("razee", 3),
+    ("sixty-four", 4),
+    ("seventy-four", 4),
+    ("ship of the line", 4),
+    ("two-decker", 4),
+    ("bilander", 1),
     ("frigate", 3),
     ("a ship", 3),
     ("brig", 2),
@@ -911,10 +930,16 @@ def load_doctrine(role: str) -> Doctrine:
     return _doctrine(str(path))
 
 
-def role_for(world: Any, intent: Intent | None) -> str:
+def role_for(world: Any, intent: Intent | None, given: str = "") -> str:
     """The role a ship's captain plays by her and her intent: a King's ship on station
     or bound for one is `kings-ship`; a letter carried is the packet's; a convoy's
-    commodore is named by the intent; the rest trade."""
+    commodore is named by the intent; the rest trade. `given`, the role a scenario gave the
+    far vessel a crewed ship's World is made from (`ships.Vessel.role`, package 75), comes
+    first, as it does for her far brain (`brains.role_of_vessel`); the far brain carries it
+    to her captain at the promotion (`Captain.scenario_role`), so that nothing here reads
+    the crewed World's own vessel, which the Hull does not keep."""
+    if given:
+        return given
     if intent is not None and intent.kind == "station":
         return "privateer" if intent.prizes else "kings-ship"
     if intent is not None and intent.kind == "letter":
@@ -2108,6 +2133,12 @@ class Captain(Judgement):
     her, with the scenario's book or his intent; the state machine, the plan and the
     doctrine; and the stand-in for a model at the captain's station."""
 
+    # package 75 (docs/design/Build-Ships.md §8.1): the role a scenario gave the far vessel
+    # whose crewed World is his (`ships.Vessel.role`), carried in by her far brain at the
+    # promotion (`brains.FarCaptain.fold_in`) and taken first when his intent is changed;
+    # "" for none, the player's captain, and a checkpoint from before
+    scenario_role: str = ""
+
     def __init__(self, world: Any, intent: str | None = None, books: tuple[str, ...] = ()):
         self.world = world
         self.intent_words = intent or ""
@@ -2249,7 +2280,7 @@ class Captain(Judgement):
         self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
         if not (self.intent.kind == FREE and self.role):
-            self.role = role_for(self.world, self.intent)
+            self.role = role_for(self.world, self.intent, self.scenario_role)
         self.doctrine = load_doctrine(self.role)
         self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
         self._business = {}

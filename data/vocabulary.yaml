@@ -1767,15 +1767,18 @@ evolutions:
     flying: take_in_flying  # package 57: lowered and sent down whole
   furl:
     square: furl_square
+    lateen: furl_lateen  # package 75: furled on its yard aloft (Falconer 1780, YARD)
   reef:
     square: reef_square
     gaff: reef_gaff
     bowsprit: reef_bowsprit  # package 32b: a cutter's running bowsprit, run in to its reef
     lug: reef_lug  # package 43b
+    lateen: reef_lateen  # package 75
   shake out:
     square: shake_out_square
     gaff: shake_out_gaff
     lug: shake_out_lug  # package 43b
+    lateen: shake_out_lateen  # package 75
   # package 43b: a dipping lug shifted round its mast to the lee side
   dip:
     lug: dip_lug
@@ -1798,18 +1801,21 @@ evolutions:
     jibheaded: bend_sail
     studding: bend_sail
     lug: bend_sail  # package 43b: the lugger's lugs and the taille-vent
+    lateen: bend_sail  # package 75: the mizen course of the 64 and the 74
   unbend:
     square: unbend_sail
     gaff: unbend_sail
     jibheaded: unbend_sail
     studding: unbend_sail
     lug: unbend_sail  # package 43b: the lugger's lugs and the taille-vent
+    lateen: unbend_sail  # package 75
   shift:
     square: shift_sail
     gaff: shift_sail
     jibheaded: shift_sail
     studding: shift_sail
     lug: shift_sail  # package 43b: the lugger's lugs and the taille-vent
+    lateen: shift_sail  # package 75
     spar: shift_spar  # package 30b: any spar carried away, for a spare of its class
   cut away: clear_wreck
   send down: clear_wreck
@@ -1855,7 +1861,7 @@ evolutions:
     gaff: trim_gaff_sheet
     jibheaded: trim_jib_sheet
     lug: trim_lug_sheet  # package 43b
-    lateen: trim_gaff_sheet
+    lateen: trim_lateen_sheet  # package 75: its sheet, the yard having vangs, not braces
     sprit: trim_gaff_sheet
 
 refusals:
@@ -1882,7 +1888,9 @@ take_in_words:
   jibheaded: [haul down, lower]
   studding: [take in, haul down, lower]
   lug: [lower]
-  lateen: [lower]
+  # package 75: brailed up to its yard, the mast and the yard standing (Steel 1794 vol. II
+  # p. 37); a whole lateen is clewed up "comme les autres voiles" (Lescallier 1791 p. 379)
+  lateen: [brail up, brail in, clew up, haul up, lower]
   sprit: [lower]
 
 # ---------------------------------------------------------------------------

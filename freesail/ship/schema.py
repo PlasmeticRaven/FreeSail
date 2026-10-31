@@ -54,12 +54,47 @@ it is taken in, never reefed aloft: the lugger's lug topsails, the royals of 179
 `sheeted_to`, a lug topsail's lower lug, to whose yard its clew is sheeted; and
 `corners_m`, the sail's corners as it is cut, for the drawing (a lug's tack, throat, peak
 and clew; a staysail's tack, nock, peak and clew, or tack, peak and clew for a triangle).
+
+Package 75 (the new ships; docs/design/Build-Ships.md §3.1, §5) adds the hull's `profile:`, the
+side, the decks and the ports in the fore-and-aft plane (a `HullProfile`, read through
+`freesail.ship.profile`; strict, so a misspelt key inside it is refused rather than lost); a
+gun's `deck`, one of `DECK_WORDS`; and the fit `unarmed`, a ship of the file with no guns
+(`ArmamentSpec.fit` gives None). No file of the eight carries any of them, so each is inert
+until a ship's builder writes it. A pivot gun's own `arc_deg` is now required: the one pivot
+on file, the privateer schooner's long Tom, gives it already.
+
+Package 75's stage 0E (docs/design/Design-ShipsEngineExtensions.md §8) adds the engine
+extensions' three keys: a sail's `settee: true`, the bilander's main, a dipping lug set and
+clewed up as a square sail (§5.1-§5.2); a sail's `cut_at_mast: true`, the 64's and the 74's
+mizen course, a lateen with its fore part cut away and its luff laced to the mast (§3.1); and a
+lower mast's `heave_to_aback: true`, the one mast whose yards are laid aback to heave to
+(§5.7). Unknown keys are dropped silently, so each is a field here, refused in words where it
+cannot stand. No file of the eight carries any of them. Beyond the refusals here, only
+`Sail.curve_class`, the runner's `class: settee` and the served graph and snapshot read them,
+none of which differs for a ship without them, until the engine's steps build their behaviour.
+The driver (Ext §17.4) adds one allowance: a lateen cut at the mast may name a `boom`, its foot
+spread on it as Steel's driver boomsail's is; a whole lateen naming one is refused in words.
+That boom alone of its class may file `rigged_out` (Ext §17.11): it goes out with the sail and
+in with it, and a gaff sail's boom is never rigged in, so the key is refused on any other.
+
+Package 75's stage 0H (docs/design/Build-Ships.md §3.5, §5.1, §5.2) adds the hull's shape to the
+profile, drawn only: the knee of the head (`head_m`), the main breadth by station
+(`breadth_line_m`), sourced section points (`sections_m`), the channel wale, the floor and the
+rabbet (the last two kept as data, not drawn), the `form` beside them (the ends' fullness under
+water, the stern and the head: a `HullForm`) and each line's one-word `marks`. `freesail.ship.form`
+turns them into the drawn hull; nothing the physics, the guns or the lee ports read is taken from
+them (§5.0 principle 8). No file of the eight carries any of them, and a profile pickles as
+before while it holds none.
 """
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
+
+# the profile's readers (package 75): pure, and importing this module only for its types
+from freesail.ship.profile import interp, rail_at
 
 # ---------------------------------------------------------------------------
 # Part classes
@@ -112,7 +147,9 @@ SAIL_OPTIONAL_ROLES: dict[str, dict[str, frozenset[str]]] = {
         "halyard_spar": frozenset(),
     },
     "lug": {"mast": frozenset({"mast", "topmast"})},
-    "lateen": {"mast": frozenset({"mast"})},
+    # a lateen cut at the mast may spread its foot on a boom: the driver of the 64 and the 74,
+    # Steel's driver boomsail (package 75; Ext §17.2, §17.4), refused on a whole lateen (validate)
+    "lateen": {"mast": frozenset({"mast"}), "boom": frozenset({"boom"})},
     "studding": {"yard": frozenset({"yard"})},
 }
 
@@ -211,7 +248,12 @@ GUN_KEYS = (
     "crew",
     "weight_cwt",
     "arc_deg",
+    "deck",  # package 75: the deck it stands on, one of DECK_WORDS
 )
+# A ship of a file that carries no guns (package 75; docs/design/Build-Ships.md §8.1): the
+# word a scenario or a description gives for her fit, and a file may give as its default;
+# `ArmamentSpec.fit` gives None for it, as for a file with no armament.
+UNARMED = "unarmed"
 FIT_KEYS = (
     "source",
     "guns",
@@ -228,6 +270,53 @@ ARMAMENT_KEYS = ("default", "fits")
 # men and boarders; and (practice and resupply) the men of the powder who fill cartridges.
 QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling")
 PRIORITIES = ("sail before guns", "guns before sail")
+
+# The hull's profile (package 75; docs/design/Build-Ships.md §5.1): the side, the decks and the
+# ports in the fore-and-aft plane, x forward of midships and z above the file's waterline (the
+# load line its sill source states), metres, for the drawing and the lee ports' rule (§6, §7).
+# The deck words are shared with a gun's `deck` and the 74's bill by deck; a frigate's, a
+# sloop's and a cutter's single gun deck is `upper`, and so is the razee's (ZAZ2374's title;
+# Winfield 1793-1817 p. 99: docs/design/Design-Ship-Indefatigable.md §3.1).
+DECK_WORDS = ("lower", "middle", "upper", "quarterdeck", "forecastle", "roundhouse")
+# The profile's keys in the order the generator writes them (`gen_ships.hull_profile`): the
+# rail and the half-breadths required, the rest optional.
+PROFILE_KEYS = (
+    "rail_m",  # [x, z]: the top of the side, taffrail to stem head
+    "breadth_m",  # [x, hb_water, hb_rail]: the half-breadths at the water and the rail
+    "keel_m",  # [x, z]: K, the post's heel to the forefoot
+    "stem_m",  # [x, z]: the stem's fore edge, low to high
+    "stern_m",  # [x, z]: the post, the counter, the taffrail, low to high
+    "wales_m",  # [x, z_lower, z_upper]: the main wale
+    "section_m",  # [z, half_breadth]: the midship section, plank on
+    "decks_m",  # {deck: [[x, z], ...]}: each deck at side, over its extent
+    "ports_m",  # {deck: [[x, sill_z, half_breadth], ...]}: one side's ports, by deck
+    "port_size_m",  # {deck: [width, depth]}
+    # The shape keys (stage 0H; Build-Ships.md §3.5, §5.1), every one optional and drawn only:
+    # read by `freesail.ship.form`, the server and the generator's checks, never by the physics,
+    # the guns or the lee ports (§5.0 principle 8).
+    "head_m",  # [x, z]: the knee of the head's fore edge, from where it leaves the stem to its top
+    "breadth_line_m",  # [x, z, hb]: the main breadth by station (Steel's upper height of breadth)
+    "sections_m",  # [x, z, hb]: sourced section points, station by station, each low to high
+    "channel_wales_m",  # [x, z_lower, z_upper]: the channel wale
+    "floor_m",  # [x, z, hb]: reserved, the rising line and the floor's half-breadth (not drawn)
+    "rabbet_m",  # [x, z, half_siding]: reserved, the keel's rabbet (not drawn)
+    "form",  # {fullness, stern, head}: the ends under water, the stern and the head (`HullForm`)
+    "marks",  # {line: word}: each line's rung of evidence, one of MARK_WORDS
+)
+# The keys stage 0H added, left out of a profile's pickle while it holds none of them.
+SHAPE_KEYS = PROFILE_KEYS[PROFILE_KEYS.index("head_m") :]
+# The form's words (stage 0H; Build-Ships.md §5.1, §5.2): its sub-keys; the stern's keys, in the
+# order the generator writes them, and its types; the head's words, what stands on the knee; and
+# the ladder of evidence's one word a line (§5.0 principles 3 and 4): sourced (S), stand-in (S†),
+# rule (R) and judged (T).
+FORM_KEYS = ("fullness", "stern", "head")
+STERN_KEYS = ("type", "knuckle_z_m", "transom_hb_m", "round_up_m", "galleries_m", "lights_m")
+STERN_TYPES = ("square", "raked", "round")
+HEAD_WORDS = ("none", "knee", "scroll", "billet", "figure")
+MARK_WORDS = ("sourced", "stand-in", "rule", "judged")
+# A gun placed so has a port, and stands on one of the profile's port decks where it gives
+# them; a pivot and a rail gun fire over the rail (`combat.ports.PORT_PLACES`).
+_PORT_GUN_PLACES = ("broadside", "bow", "stern")
 
 # Default load ratings (kN) by class, used with a warning when a file omits one.
 DEFAULT_SPAR_RATING_KN: dict[str, float] = {
@@ -341,6 +430,77 @@ class RudderSpec:
     span_m: float | None = None
 
 
+@dataclass(frozen=True)
+class HullStern:
+    """The stern as the profile's `form` gives it (stage 0H; docs/design/Build-Ships.md §5.1),
+    drawn only: its type (`STERN_TYPES`); the knuckle, the transom's foot, metres above the
+    waterline; the transom's half-breadths at the taffrail and at the knuckle (a square or raked
+    stern's; a round stern has no transom); the transom's round up; each tier of galleries
+    [x_aft, x_fore, z_low, z_high], drawn on both quarters; and each band of lights
+    [z_low, z_high, n, hb], n lights across the stern's face within ±hb. None or empty where the
+    file gives none."""
+
+    type: str
+    knuckle_z_m: float | None = None
+    transom_hb_m: tuple[float, float] | None = None
+    round_up_m: float | None = None
+    galleries_m: tuple[tuple[float, float, float, float], ...] = ()
+    lights_m: tuple[tuple[float, float, int, float], ...] = ()
+
+
+@dataclass(frozen=True)
+class HullForm:
+    """The hull's form beside its points (stage 0H; docs/design/Build-Ships.md §5.1), drawn
+    only: the fullness of the ends under water, (run, entry), 1 the default rule, above 1 fuller
+    and below 1 finer (`freesail.ship.form`); the stern (`HullStern`); and what stands on the knee
+    of the head (`HEAD_WORDS`). Each None where the file gives none."""
+
+    fullness: tuple[float, float] | None = None
+    stern: HullStern | None = None
+    head: str | None = None
+
+
+@dataclass(frozen=True)
+class HullProfile:
+    """The hull's profile as the file gives it (package 75; docs/design/Build-Ships.md §5.1):
+    x forward of midships, z above the file's waterline, metres; each line a tuple of points
+    in the file's order, and each by-deck line a tuple of (deck word, its points). Read
+    through `freesail.ship.profile`, which interpolates it, and its shape (stage 0H) through
+    `freesail.ship.form`, which draws it."""
+
+    rail_m: tuple[tuple[float, float], ...]
+    breadth_m: tuple[tuple[float, float, float], ...]
+    keel_m: tuple[tuple[float, float], ...] = ()
+    stem_m: tuple[tuple[float, float], ...] = ()
+    stern_m: tuple[tuple[float, float], ...] = ()
+    wales_m: tuple[tuple[float, float, float], ...] = ()
+    section_m: tuple[tuple[float, float], ...] = ()
+    decks_m: tuple[tuple[str, tuple[tuple[float, float], ...]], ...] = ()
+    ports_m: tuple[tuple[str, tuple[tuple[float, float, float], ...]], ...] = ()
+    port_size_m: tuple[tuple[str, tuple[float, float]], ...] = ()
+    # Stage 0H (Build-Ships.md §3.5, §5.1): the shape keys, drawn only (SHAPE_KEYS). Plain class
+    # defaults, left out of the pickle while empty (`__getstate__`), so that a profile pickled
+    # before them loads and reads the defaults; the marks are (line, word) pairs in the file's
+    # order.
+    head_m: tuple[tuple[float, float], ...] = ()
+    breadth_line_m: tuple[tuple[float, float, float], ...] = ()
+    sections_m: tuple[tuple[float, float, float], ...] = ()
+    channel_wales_m: tuple[tuple[float, float, float], ...] = ()
+    floor_m: tuple[tuple[float, float, float], ...] = ()
+    rabbet_m: tuple[tuple[float, float, float], ...] = ()
+    form: HullForm | None = None
+    marks: tuple[tuple[str, str], ...] = ()
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the shape keys only where the file gives them (stage
+        0H), so that a profile without them is pickled as before them."""
+        state = dict(self.__dict__)
+        for key in SHAPE_KEYS:
+            if not state.get(key):
+                state.pop(key, None)
+        return state
+
+
 @dataclass
 class HullSpec:
     length_waterline_m: float
@@ -353,6 +513,17 @@ class HullSpec:
     hull_speed_kn: float | None = None
     deck_height_m: float = 1.5
     rudder: RudderSpec = field(default_factory=RudderSpec)
+    # Package 75: the hull's profile (`HullProfile`); None, a file that gives none (the eight
+    # until the shared work writes theirs), drawn and gunned as before.
+    profile: HullProfile | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the profile only where the file gives one (package
+        75), so that a hull without one is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("profile") is None:
+            state.pop("profile", None)
+        return state
 
 
 @dataclass
@@ -382,6 +553,19 @@ class SparSpec:
     # at the ends to the inside of the stern of vessels that carry a fore and aft mainsail,
     # for the main sheet to travel on"); the sheet's geometry reads it (evolutions/trim.py).
     horse_m: float | None = None
+    # Package 75 (docs/design/Design-ShipsEngineExtensions.md §5.7): the lower mast whose
+    # yards are laid aback to heave to, where the file names one (the bilander's main: her
+    # main topsail goes to the mast, D4(a)); None, the mast of the most square sail, as
+    # before. A lower mast's key, and one mast's at most (`validate`).
+    heave_to_aback: bool | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `heave_to_aback` only where the file gives it
+        (package 75), so that a spar without it is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("heave_to_aback") is None:
+            state.pop("heave_to_aback", None)
+        return state
 
     @property
     def parent(self) -> str | None:
@@ -422,6 +606,28 @@ class SailSpec:
     # it is four-sided, [tack, peak, clew] when it is a triangle. None: drawn by its class's
     # rule from its spars and its area.
     corners_m: list[tuple[float, float]] | None = None
+    # Package 75 (docs/design/Design-ShipsEngineExtensions.md §5.1-§5.2): a settee, the
+    # bilander's main, a four-cornered sail on a yard hung obliquely and peaked over the stern
+    # (Falconer 1780, BILANDER), set and clewed up as a square sail and dipped round the mast
+    # as a lug (Lescallier p. 390; D1(a)). A dipping lug with this key, which routes it to its
+    # own evolutions: it names its mast and gives its [tack, throat, peak, clew], and is never
+    # set flying or sheeted to another sail.
+    settee: bool = False
+    # Package 75 (Ext §3.1): a lateen mizen course cut at the mast, the 64's and the 74's: its
+    # head laced to the yard abaft the mast, its luff to the mast, its foot loose, the yard
+    # running on forward with no sail there (Lavery I31-I32). Handled and drawn as a sail on
+    # a yard; its curve and trim are the gaff's (`Sail.curve_class`). It names its mast and
+    # gives its [tack, throat, peak, clew].
+    cut_at_mast: bool = False
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `settee` and `cut_at_mast` only where the file sets
+        them (package 75), so that a sail without them is pickled as before them."""
+        state = dict(self.__dict__)
+        for key in ("settee", "cut_at_mast"):
+            if not state.get(key):
+                state.pop(key, None)
+        return state
 
 
 @dataclass
@@ -544,7 +750,9 @@ class GunSpec:
     dismount's). A pivot gun's `arc_deg` is the arc it fires through over either side, from
     and to so many degrees off the bow (PROVISIONAL, the owner's pivot gun folded in by
     package 86: each pivot's arc its own ship's, as `docs/design/Proposal-PivotGun.md` §3
-    proposes; None, `combat.guns`' default arc)."""
+    proposes; since package 75 a pivot must give one, and any other gun has None). Its
+    `deck` (package 75) is the deck it stands on, one of `DECK_WORDS`; None, a file that does
+    not say (read by nothing yet: the lee ports and the 74's bill by deck will)."""
 
     id: str
     kind: str
@@ -557,6 +765,15 @@ class GunSpec:
     crew: int
     weight_cwt: float
     arc_deg: tuple[float, float] | None = None
+    deck: str | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, its deck only where the file names one (package
+        75), so that a gun without one is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("deck") is None:
+            state.pop("deck", None)
+        return state
 
 
 @dataclass
@@ -582,13 +799,18 @@ class FitSpec:
 @dataclass
 class ArmamentSpec:
     """The ship's armament: the fits she may carry, and the default the scenario takes
-    when it names none."""
+    when it names none. The default may be `UNARMED` (package 75), a file whose ship
+    sails with no guns unless a scenario names a fit."""
 
     default: str
     fits: dict[str, FitSpec]
 
-    def fit(self, name: str | None = None) -> FitSpec:
+    def fit(self, name: str | None = None) -> FitSpec | None:
+        """The fit named, else the default; None for `UNARMED`, named or by default (package
+        75: she carries no guns, as a ship whose file lists no armament)."""
         key = str(name or self.default)
+        if key == UNARMED:
+            return None
         if key not in self.fits:
             known = ", ".join(sorted(self.fits))
             raise ShipFileError(f"She carries no fit named '{key}'; her fits are {known}.")
@@ -835,12 +1057,18 @@ def _parse_armament(raw: Any, source: str) -> ArmamentSpec:
         raise ShipFileError(f"{source}: the armament names no fits.")
     fits: dict[str, FitSpec] = {}
     for name, f in raw_fits.items():
+        if str(name) == UNARMED:
+            # the word is the fit of no guns (package 75): a fit so named could never be had
+            raise ShipFileError(
+                f"{source}: the armament names a fit '{UNARMED}', the word for no guns; "
+                "give the fit another name."
+            )
         fits[str(name)] = _parse_fit(str(name), f, source)
     default = str(raw.get("default") or next(iter(fits)))
-    if default not in fits:
+    if default not in fits and default != UNARMED:
         raise ShipFileError(
             f"{source}: the armament's default fit '{default}' is none of its fits "
-            f"({', '.join(fits)})."
+            f"({', '.join(fits)}) and not '{UNARMED}'."
         )
     return ArmamentSpec(default=default, fits=fits)
 
@@ -1015,6 +1243,14 @@ def _parse_gun(g: Any, i: int, where: str, source: str) -> GunSpec:
     if crew < 1:
         raise ShipFileError(f"{source}: {at} has no crew; a gun wants a man at the least.")
     arc = _pivot_arc(g.get("arc_deg"), place, at, source)
+    if place == "pivot" and arc is None:
+        # package 75 (Build-Ships.md §3.1 item 13): each pivot's arc is its own ship's, from
+        # her rig (§9.2); refused after the side, so a pivot with a side hears of that first
+        raise ShipFileError(
+            f"{source}: {at} is a pivot gun and gives no arc_deg; a pivot fires through its "
+            "own arc, [from, to] degrees off the bow, reckoned from its ship's rig."
+        )
+    deck = g.get("deck")
     return GunSpec(
         id=gid,
         kind=kind,
@@ -1027,6 +1263,7 @@ def _parse_gun(g: Any, i: int, where: str, source: str) -> GunSpec:
         crew=crew,
         weight_cwt=float(_num(g, "weight_cwt", at, source, required=False) or 0.0),
         arc_deg=arc,
+        deck=str(deck) if deck is not None else None,  # its word checked in validate()
     )
 
 
@@ -1264,7 +1501,415 @@ def _parse_hull(h: Any, source: str) -> HullSpec:
         hull_speed_kn=_num(h, "hull_speed_kn", where, source, required=False),
         deck_height_m=_num(h, "deck_height_m", where, source, required=False) or 1.5,
         rudder=rudder,
+        profile=_parse_profile(h["profile"], source) if h.get("profile") is not None else None,
     )
+
+
+# The lines of the hull's profile (package 75; Build-Ships.md §5.1, §5.2), by key: the numbers
+# in a point, its words in a refusal, the number that must increase from point to point
+# (None: none must) and the numbers that are half-breadths, each more than nothing. The
+# by-deck keys' lines are `decks_m`'s and `ports_m`'s.
+_PROFILE_LINES: dict[str, tuple[int, str, int | None, tuple[int, ...]]] = {
+    "rail_m": (2, "x, z", 0, ()),
+    "breadth_m": (3, "x, hb_water, hb_rail", 0, (1, 2)),
+    "keel_m": (2, "x, z", 0, ()),
+    "stem_m": (2, "x, z", 1, ()),
+    "stern_m": (2, "x, z", 1, ()),
+    "wales_m": (3, "x, z_lower, z_upper", 0, ()),
+    "section_m": (2, "z, half_breadth", None, (1,)),
+    "decks_m": (2, "x, z", 0, ()),
+    "ports_m": (3, "x, sill_z, half_breadth", 0, (2,)),
+    # the shape keys' points (stage 0H; Build-Ships.md §5.1, §5.2): `sections_m` runs station by
+    # station, its x never decreasing and its z rising within a station (`_profile_sections`)
+    "head_m": (2, "x, z", 1, ()),
+    "breadth_line_m": (3, "x, z, hb", 0, (2,)),
+    "sections_m": (3, "x, z, hb", None, (2,)),
+    "channel_wales_m": (3, "x, z_lower, z_upper", 0, ()),
+    "floor_m": (3, "x, z, hb", 0, (2,)),
+    "rabbet_m": (3, "x, z, half_siding", 0, (2,)),
+}
+_PROFILE_BY_DECK = ("decks_m", "ports_m", "port_size_m")
+# four: a tier of galleries and a band of lights (stage 0H)
+_NUMBER_WORDS = {2: "two", 3: "three", 4: "four"}
+# A deck read at the rail's own height is at it and not above it, whatever the last bit of an
+# interpolation says.
+_PROFILE_EPS_M = 1e-9
+
+
+def _deck_name(word: str) -> str:
+    """A deck word as a refusal says it: the upper deck, but the quarterdeck, the forecastle
+    and the roundhouse by their own names."""
+    return f"{word} deck" if word in ("lower", "middle", "upper") else word
+
+
+def _parse_profile(raw: Any, source: str) -> HullProfile:
+    """The hull's `profile:` (package 75; Build-Ships.md §5.1), **strict**: a key it does not
+    take is refused, as a gun's is, where an unknown hull key outside it is passed over. The
+    refusals are §5.2's. That each port gun stands on a triple of its deck is the generator's
+    assertion and a test, not a refusal: a hand-written file may carry guns between ports."""
+    where = "the hull's profile"
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: {where} is not a mapping.")
+    for key in raw:
+        if key not in PROFILE_KEYS:
+            raise ShipFileError(
+                f"{source}: {where} has '{key}', which it does not take; its keys are "
+                f"{', '.join(PROFILE_KEYS)}."
+            )
+    if raw.get("rail_m") is None or raw.get("breadth_m") is None:
+        raise ShipFileError(
+            f"{source}: {where} wants rail_m and breadth_m, the top of the side and the "
+            "half-breadths along it."
+        )
+    lines = {
+        key: _profile_line(raw[key], key, key, source)
+        for key in PROFILE_KEYS
+        if key in _PROFILE_LINES and key not in _PROFILE_BY_DECK and raw.get(key) is not None
+    }
+    if "sections_m" in lines:
+        _profile_sections(lines["sections_m"], source)
+    decks = _profile_by_deck(raw.get("decks_m"), "decks_m", None, source)
+    deck_lines = dict(decks)
+    ports = _profile_by_deck(raw.get("ports_m"), "ports_m", deck_lines, source)
+    sizes = _profile_by_deck(raw.get("port_size_m"), "port_size_m", deck_lines, source)
+    form = (
+        _parse_form(raw["form"], lines.get("stern_m", ()), source)
+        if raw.get("form") is not None
+        else None
+    )
+    marks = _parse_marks(raw.get("marks"), raw, form, source)
+    profile = HullProfile(
+        rail_m=lines["rail_m"],
+        breadth_m=lines["breadth_m"],
+        keel_m=lines.get("keel_m", ()),
+        stem_m=lines.get("stem_m", ()),
+        stern_m=lines.get("stern_m", ()),
+        wales_m=lines.get("wales_m", ()),
+        section_m=lines.get("section_m", ()),
+        decks_m=decks,
+        ports_m=ports,
+        port_size_m=sizes,
+        head_m=lines.get("head_m", ()),
+        breadth_line_m=lines.get("breadth_line_m", ()),
+        sections_m=lines.get("sections_m", ()),
+        channel_wales_m=lines.get("channel_wales_m", ()),
+        floor_m=lines.get("floor_m", ()),
+        rabbet_m=lines.get("rabbet_m", ()),
+        form=form,
+        marks=marks,
+    )
+    for word, pts in decks:
+        for x, z in pts:
+            rail = rail_at(profile, x)
+            if z > rail + _PROFILE_EPS_M:
+                raise ShipFileError(
+                    f"{source}: the profile's {_deck_name(word)} stands {z:g} m above the water "
+                    f"at x {x:g}, above the rail ({rail:.2f} m there)."
+                )
+    for word, triples in ports:
+        for x, sill, _half_breadth in triples:
+            rail = rail_at(profile, x)
+            if sill >= rail:
+                raise ShipFileError(
+                    f"{source}: the profile's port on the {_deck_name(word)} at x {x:g} has its "
+                    f"sill at {sill:g} m, at or above the rail ({rail:.2f} m there)."
+                )
+            floor = interp(deck_lines[word], x)
+            if sill < floor - _PROFILE_EPS_M:
+                raise ShipFileError(
+                    f"{source}: the profile's port on the {_deck_name(word)} at x {x:g} has its "
+                    f"sill at {sill:g} m, below its deck ({floor:.2f} m there)."
+                )
+    return profile
+
+
+def _profile_point(p: Any, n: int, shape: str, what: str, source: str) -> tuple[float, ...]:
+    """One point of a profile's line: `n` numbers, each finite."""
+    if (
+        not isinstance(p, list | tuple)
+        or len(p) != n
+        or not all(
+            isinstance(c, int | float) and not isinstance(c, bool) and math.isfinite(c) for c in p
+        )
+    ):
+        raise ShipFileError(
+            f"{source}: the profile's {what} has {p!r}, which is not {_NUMBER_WORDS[n]} "
+            f"numbers [{shape}]."
+        )
+    return tuple(float(c) for c in p)
+
+
+def _profile_line(raw: Any, key: str, what: str, source: str) -> tuple[tuple[float, ...], ...]:
+    """A line of the profile by its key's shape (`_PROFILE_LINES`): one or more points, the
+    increasing number increasing and each half-breadth more than nothing."""
+    n, shape, rising, breadths = _PROFILE_LINES[key]
+    if not isinstance(raw, list) or not raw:
+        raise ShipFileError(
+            f"{source}: the profile's {what} is not a list of [{shape}] points; give one or more."
+        )
+    pts = tuple(_profile_point(p, n, shape, what, source) for p in raw)
+    if rising is not None:
+        axis, way = ("x", "aft to forward") if rising == 0 else ("z", "low to high")
+        for a, b in zip(pts, pts[1:], strict=False):
+            if not b[rising] > a[rising]:
+                raise ShipFileError(
+                    f"{source}: the profile's {what} goes from {axis} {a[rising]:g} to "
+                    f"{b[rising]:g}; its points run {way}, each {axis} greater than the last."
+                )
+    names = shape.split(", ")
+    for p in pts:
+        for i in breadths:
+            if not p[i] > 0.0:
+                word = "half-siding" if names[i] == "half_siding" else "half-breadth"
+                raise ShipFileError(
+                    f"{source}: the profile's {what} has a {word} of {p[i]:g} m at "
+                    f"{list(p)!r}; a {word} is more than nothing."
+                )
+    return pts
+
+
+def _profile_sections(pts: tuple[tuple[float, ...], ...], source: str) -> None:
+    """`sections_m` station by station (stage 0H; Build-Ships.md §5.2): its x never decreasing,
+    its z rising within a station (the points of one x), and each station two points or more."""
+    what = "the profile's sections_m"
+    for a, b in zip(pts, pts[1:], strict=False):
+        if b[0] < a[0]:
+            raise ShipFileError(
+                f"{source}: {what} goes from x {a[0]:g} to {b[0]:g}; its stations run aft to "
+                "forward, each x at or forward of the last."
+            )
+        if b[0] == a[0] and not b[1] > a[1]:
+            raise ShipFileError(
+                f"{source}: {what} goes from z {a[1]:g} to {b[1]:g} in its station at x "
+                f"{a[0]:g}; a station's points run low to high, each z greater than the last."
+            )
+    counts: dict[float, int] = {}
+    for p in pts:
+        counts[p[0]] = counts.get(p[0], 0) + 1
+    for x, n in counts.items():
+        if n < 2:
+            raise ShipFileError(
+                f"{source}: {what} gives one point at x {x:g}; a station gives two or more, "
+                "low to high."
+            )
+
+
+def _form_number(v: Any, what: str, source: str) -> float:
+    """One number of the profile's form, finite."""
+    if isinstance(v, bool) or not isinstance(v, int | float) or not math.isfinite(v):
+        raise ShipFileError(f"{source}: the profile's {what} is {v!r}, which is not a number.")
+    return float(v)
+
+
+def _parse_form(raw: Any, stern_line: tuple[tuple[float, ...], ...], source: str) -> HullForm:
+    """The profile's `form:` (stage 0H; Build-Ships.md §5.1), strict as the profile is: the
+    fullness of the ends under water, the stern, drawn along `stern_m`, and the head's word.
+    The refusals are §5.2's."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: the profile's form is not a mapping.")
+    for key in raw:
+        if key not in FORM_KEYS:
+            raise ShipFileError(
+                f"{source}: the profile's form has '{key}', which it does not take; its keys "
+                f"are {', '.join(FORM_KEYS)}."
+            )
+    fullness = None
+    if raw.get("fullness") is not None:
+        run, entry = _profile_point(raw["fullness"], 2, "run, entry", "form.fullness", source)
+        for f in (run, entry):
+            if not f > 0.0:
+                raise ShipFileError(
+                    f"{source}: the profile's form.fullness has {f:g}; a fullness is more than "
+                    "nothing, 1 the default rule, above it fuller and below it finer."
+                )
+        fullness = (run, entry)
+    stern = None
+    if raw.get("stern") is not None:
+        stern = _parse_stern(raw["stern"], stern_line, source)
+    head = raw.get("head")
+    if head is not None and head not in HEAD_WORDS:
+        raise ShipFileError(
+            f"{source}: the profile's form.head is {head!r}; what stands on the head is "
+            f"{', '.join(HEAD_WORDS[:-1])} or {HEAD_WORDS[-1]}."
+        )
+    return HullForm(fullness=fullness, stern=stern, head=head)
+
+
+def _parse_stern(raw: Any, stern_line: tuple[tuple[float, ...], ...], source: str) -> HullStern:
+    """The form's `stern:` (stage 0H; Build-Ships.md §5.1, §5.2): its type, the knuckle below
+    the taffrail, the transom's half-breadths on a square or raked stern and none on a round
+    one, and its galleries and lights by position."""
+    where = "the profile's form.stern"
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: {where} is not a mapping.")
+    for key in raw:
+        if key not in STERN_KEYS:
+            raise ShipFileError(
+                f"{source}: {where} has '{key}', which it does not take; its keys are "
+                f"{', '.join(STERN_KEYS)}."
+            )
+    kind = raw.get("type")
+    if kind not in STERN_TYPES:
+        raise ShipFileError(
+            f"{source}: {where} has the type {kind!r}; a stern is square, raked or round."
+        )
+    if not stern_line:
+        raise ShipFileError(
+            f"{source}: the profile's form gives a stern and the profile no stern_m; the stern "
+            "is drawn along stern_m, the post, the counter and the taffrail."
+        )
+    knuckle = None
+    if raw.get("knuckle_z_m") is not None:
+        knuckle = _form_number(raw["knuckle_z_m"], "form.stern.knuckle_z_m", source)
+        taffrail = stern_line[-1][1]
+        if knuckle >= taffrail:
+            raise ShipFileError(
+                f"{source}: {where} has its knuckle at {knuckle:g} m, at or above the taffrail "
+                f"({taffrail:g} m, stern_m's top); the knuckle is the transom's foot."
+            )
+    transom = None
+    if kind == "round":
+        if raw.get("transom_hb_m") is not None:
+            raise ShipFileError(
+                f"{source}: {where} is round and gives transom_hb_m; a round stern has no transom."
+            )
+    elif raw.get("transom_hb_m") is None:
+        raise ShipFileError(
+            f"{source}: {where} is {kind} and gives no transom_hb_m; a {kind} stern gives its "
+            "transom's half-breadths [at the taffrail, at the knuckle]."
+        )
+    else:
+        what = "form.stern.transom_hb_m"
+        top, foot = _profile_point(
+            raw["transom_hb_m"], 2, "at the taffrail, at the knuckle", what, source
+        )
+        for hb in (top, foot):
+            if not hb > 0.0:
+                raise ShipFileError(
+                    f"{source}: the profile's {what} has a half-breadth of {hb:g} m; a "
+                    "half-breadth is more than nothing."
+                )
+        transom = (top, foot)
+    round_up = None
+    if raw.get("round_up_m") is not None:
+        round_up = _form_number(raw["round_up_m"], "form.stern.round_up_m", source)
+    galleries: list[tuple[float, float, float, float]] = []
+    for p in _form_list(raw.get("galleries_m"), "galleries_m", source):
+        x_aft, x_fore, z_low, z_high = _profile_point(
+            p, 4, "x_aft, x_fore, z_low, z_high", "form.stern.galleries_m", source
+        )
+        if not (x_aft < x_fore and z_low < z_high):
+            raise ShipFileError(
+                f"{source}: {where}.galleries_m has the tier {p!r}; a tier's aft x is below its "
+                "fore x and its low z below its high z."
+            )
+        galleries.append((x_aft, x_fore, z_low, z_high))
+    lights: list[tuple[float, float, int, float]] = []
+    for p in _form_list(raw.get("lights_m"), "lights_m", source):
+        z_low, z_high, n, hb = _profile_point(
+            p, 4, "z_low, z_high, n, hb", "form.stern.lights_m", source
+        )
+        if not z_low < z_high:
+            raise ShipFileError(
+                f"{source}: {where}.lights_m has the band {p!r}; a band's low z is below its "
+                "high z."
+            )
+        if not (n >= 1 and n == int(n)):
+            raise ShipFileError(
+                f"{source}: {where}.lights_m has the band {p!r}, of {n:g} lights; a band is a "
+                "whole number of lights, one or more."
+            )
+        if not hb > 0.0:
+            raise ShipFileError(
+                f"{source}: {where}.lights_m has the band {p!r}, within a half-breadth of "
+                f"{hb:g} m; a half-breadth is more than nothing."
+            )
+        lights.append((z_low, z_high, int(n), hb))
+    return HullStern(
+        type=kind,
+        knuckle_z_m=knuckle,
+        transom_hb_m=transom,
+        round_up_m=round_up,
+        galleries_m=tuple(galleries),
+        lights_m=tuple(lights),
+    )
+
+
+def _form_list(raw: Any, key: str, source: str) -> list[Any]:
+    """A list of the stern's (its galleries' tiers, its bands of lights); none where the file
+    gives none."""
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: the profile's form.stern.{key} is not a list.")
+    return raw
+
+
+def _parse_marks(
+    raw: Any, profile: dict[str, Any], form: HullForm | None, source: str
+) -> tuple[tuple[str, str], ...]:
+    """The profile's `marks:` (stage 0H; Build-Ships.md §5.0 principle 4, §5.2): each line's
+    rung of evidence in one word, keyed by a line the profile gives, a `form.<group>` it gives
+    or a `form.stern.<key>` it gives; (line, word) pairs in the file's order."""
+    if raw is None:
+        return ()
+    if not isinstance(raw, dict):
+        raise ShipFileError(
+            f"{source}: the profile's marks is not a mapping of its lines to their words."
+        )
+    known = [k for k in PROFILE_KEYS if k not in ("form", "marks") and profile.get(k) is not None]
+    if form is not None:
+        given = profile["form"]
+        known += [f"form.{group}" for group in FORM_KEYS if given.get(group) is not None]
+        if form.stern is not None:
+            stern = given["stern"]
+            known += [f"form.stern.{k}" for k in STERN_KEYS if stern.get(k) is not None]
+    out: list[tuple[str, str]] = []
+    for key, word in raw.items():
+        key = str(key)
+        if key not in known:
+            raise ShipFileError(
+                f"{source}: the profile's marks has '{key}', which is not a line, a form.<group> "
+                f"or a form.stern.<key> the profile gives; it may mark {', '.join(known)}."
+            )
+        if word not in MARK_WORDS:
+            raise ShipFileError(
+                f"{source}: the profile's marks has {key} {word!r}; a line is marked "
+                f"{', '.join(MARK_WORDS[:-1])} or {MARK_WORDS[-1]}."
+            )
+        out.append((key, word))
+    return tuple(out)
+
+
+def _profile_by_deck(
+    raw: Any, key: str, decks: dict[str, Any] | None, source: str
+) -> tuple[tuple[str, Any], ...]:
+    """A by-deck key of the profile (`decks_m`, `ports_m`, `port_size_m`): each deck a word of
+    `DECK_WORDS` and, but in `decks_m` itself, a deck `decks_m` gives; its line (or its port's
+    width and depth) in the file's order."""
+    if raw is None:
+        return ()
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: the profile's {key} is not a mapping by deck.")
+    out: list[tuple[str, Any]] = []
+    for word, v in raw.items():
+        word = str(word)
+        if word not in DECK_WORDS:
+            raise ShipFileError(
+                f"{source}: the profile's {key} names the deck '{word}'; a deck is one of "
+                f"{', '.join(DECK_WORDS)}."
+            )
+        if decks is not None and word not in decks:
+            raise ShipFileError(
+                f"{source}: the profile's {key} gives the {_deck_name(word)}, which its decks_m "
+                "does not."
+            )
+        what = f"{key}.{word}"
+        if key == "port_size_m":
+            out.append((word, _profile_point(v, 2, "width, depth", what, source)))
+        else:
+            out.append((word, _profile_line(v, key, what, source)))
+    return tuple(out)
 
 
 def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
@@ -1298,12 +1943,15 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
         running=running,
         housed_length_m=_housed_length(s, cls, where, source, running=bool(running)),
         horse_m=_num(s, "horse_m", where, source, required=False),
+        heave_to_aback=_heave_to_aback(s, where, source),
     )
 
 
 def _rigged_out(s: dict, cls: str, where: str, source: str, running: bool = False) -> bool | None:
     """A studding sail boom's starting state (spec 3b §7), if the file gives one; a running
-    bowsprit's too (package 32b: out to its full length, or reefed)."""
+    bowsprit's too (package 32b: out to its full length, or reefed); and the boom of a lateen
+    cut at the mast (package 75, Ext §17.11: out only while the driver is bent), which
+    `validate` checks once the sails are read: a boom of any other sail is refused there."""
     value = s.get("rigged_out")
     if value is None:
         return None
@@ -1312,10 +1960,10 @@ def _rigged_out(s: dict, cls: str, where: str, source: str, running: bool = Fals
             f"{source}: {where} has rigged_out = {value!r}; say true (run out along its yard) "
             "or false (rigged in)."
         )
-    if cls != "studdingsail_boom" and not running:
+    if cls not in ("studdingsail_boom", "boom") and not running:
         raise ShipFileError(
             f"{source}: {where} is a {cls.replace('_', ' ')}; only a studding sail boom or a "
-            "running bowsprit is rigged out or in."
+            "running bowsprit is rigged out or in, and a driver's boom with its sail."
         )
     return value
 
@@ -1357,6 +2005,20 @@ def _housed_length(s: dict, cls: str, where: str, source: str, running: bool) ->
         raise ShipFileError(
             f"{source}: {where} has housed_length_m = {value:g}; a reefed bowsprit is shorter "
             f"than its full outboard length_m ({full!r}) and longer than nothing."
+        )
+    return value
+
+
+def _heave_to_aback(s: dict, where: str, source: str) -> bool | None:
+    """Whether this is the mast whose yards are laid aback to heave to (package 75), if the
+    file says; `validate` refuses it off a lower mast and on a second one."""
+    value = s.get("heave_to_aback")
+    if value is None:
+        return None
+    if not isinstance(value, bool):
+        raise ShipFileError(
+            f"{source}: {where} has heave_to_aback = {value!r}; say true (her yards on this "
+            "mast are laid aback to heave to) or leave it out."
         )
     return value
 
@@ -1403,6 +2065,8 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         raise ShipFileError(
             f"{source}: {where} is a {cls} sail; only a lug topsail is sheeted to another sail."
         )
+    settee = _settee(s, cls, roles, where, source, dipping, flying, sheeted_to)
+    cut_at_mast = _cut_at_mast(s, cls, roles, where, source)
     return SailSpec(
         id=sid,
         cls=cls,
@@ -1420,7 +2084,83 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         flying=flying,
         sheeted_to=sheeted_to,
         corners_m=_corners(s.get("corners_m"), where, source),
+        settee=settee,
+        cut_at_mast=cut_at_mast,
     )
+
+
+def _settee(
+    s: dict,
+    cls: str,
+    roles: dict[str, str],
+    where: str,
+    source: str,
+    dipping: bool,
+    flying: bool,
+    sheeted_to: str | None,
+) -> bool:
+    """Whether the sail is a settee (package 75; docs/design/Design-ShipsEngineExtensions.md
+    §5.1-§5.2): a dipping lug that names its mast and gives its four corners, never set
+    flying and never sheeted to another sail."""
+    value = s.get("settee", False)
+    if not isinstance(value, bool):
+        raise ShipFileError(f"{source}: {where} has settee = {value!r}; say true or false.")
+    if not value:
+        return False
+    if cls != "lug":
+        raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is a settee.")
+    if not dipping:
+        raise ShipFileError(
+            f"{source}: {where} is a settee and is not dipping; a settee is a dipping lug "
+            "(say dipping: true)."
+        )
+    if "mast" not in roles:
+        raise ShipFileError(
+            f"{source}: {where} is a settee and names no 'mast'; a settee names the mast it is "
+            "dipped round."
+        )
+    corners = _corners(s.get("corners_m"), where, source)
+    if corners is None or len(corners) != 4:
+        raise ShipFileError(
+            f"{source}: {where} is a settee and does not give four corners_m; a settee gives its "
+            "tack, throat, peak and clew."
+        )
+    if sheeted_to is not None:
+        raise ShipFileError(
+            f"{source}: {where} is a settee sheeted to '{sheeted_to}'; a settee's sheet leads "
+            "aft to the taffrail, not to another sail."
+        )
+    if flying:
+        raise ShipFileError(
+            f"{source}: {where} is a settee set flying; a settee is set and furled on its yard "
+            "aloft, never sent down whole."
+        )
+    return True
+
+
+def _cut_at_mast(s: dict, cls: str, roles: dict[str, str], where: str, source: str) -> bool:
+    """Whether the sail is a lateen cut at the mast (package 75;
+    docs/design/Design-ShipsEngineExtensions.md §3.1): a lateen that names the mast its luff
+    is laced to and gives its four corners."""
+    value = s.get("cut_at_mast", False)
+    if not isinstance(value, bool):
+        raise ShipFileError(f"{source}: {where} has cut_at_mast = {value!r}; say true or false.")
+    if not value:
+        return False
+    if cls != "lateen":
+        raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lateen is cut at the mast.")
+    if "mast" not in roles:
+        raise ShipFileError(
+            f"{source}: {where} is cut at the mast and names no 'mast'; it names the mast its "
+            "luff is laced to."
+        )
+    corners = _corners(s.get("corners_m"), where, source)
+    if corners is None or len(corners) != 4:
+        raise ShipFileError(
+            f"{source}: {where} is cut at the mast and does not give four corners_m; it gives "
+            "its tack, throat, peak and clew."
+        )
+    return True
 
 
 def _corners(v: Any, where: str, source: str) -> list[tuple[float, float]] | None:
@@ -1531,6 +2271,11 @@ def validate(spec: ShipSpec) -> None:
                     f"{src}: spar '{s.id}' has rake_deg = {s.rake_deg:g}; a mast rakes between "
                     f"-30 (forward) and 30 (aft) degrees."
                 )
+        if s.heave_to_aback is not None and s.cls != "mast":
+            raise ShipFileError(
+                f"{src}: spar '{s.id}' is a {s.cls.replace('_', ' ')}; only a lower mast takes "
+                "'heave_to_aback', its yards laid aback to heave to."
+            )
         if s.rating_kn is None:
             s.rating_kn = DEFAULT_SPAR_RATING_KN[s.cls]
             missing_ratings.setdefault(("spar", s.cls, s.rating_kn), []).append(s.id)
@@ -1543,6 +2288,13 @@ def validate(spec: ShipSpec) -> None:
                 raise ShipFileError(f"{src}: spar '{s.id}' stands on itself through {path}.")
             chain.append(cur.id)
             cur = spars.get(cur.parent) if cur.parent else None
+    # the mast laid aback to heave to (package 75): one at most
+    aback = [s.id for s in spec.spars if s.heave_to_aback]
+    if len(aback) > 1:
+        raise ShipFileError(
+            f"{src}: spar '{aback[1]}' is laid aback to heave to as well as '{aback[0]}'; she "
+            "heaves to with one mast's yards laid aback, so name one mast."
+        )
 
     # sails: class requirements, roles exist and are the right kind
     for sl in spec.sails:
@@ -1564,6 +2316,12 @@ def validate(spec: ShipSpec) -> None:
                 raise ShipFileError(
                     f"{src}: sail '{sl.id}' is class '{sl.cls}' and does not take a '{role}'."
                 )
+        # the driver's boom (package 75; Ext §17.4): on a lateen cut at the mast alone
+        if sl.cls == "lateen" and "boom" in sl.roles and not sl.cut_at_mast:
+            raise ShipFileError(
+                f"{src}: sail '{sl.id}' is a whole lateen and names a boom; only a lateen cut at "
+                "the mast (a driver) is spread on a boom."
+            )
         if sl.cls == "studding" and sl.side is None:
             boom = spars.get(sl.roles.get("boom", ""))
             if boom is None or not (
@@ -1588,6 +2346,15 @@ def validate(spec: ShipSpec) -> None:
             raise ShipFileError(
                 f"{src}: sail '{sl.id}' is jib-headed but names neither a 'stay' to hank to "
                 f"nor a 'mast' to hoist on."
+            )
+    # the driver's boom, out with the sail and in with it (package 75; Ext §17.11)
+    drivers_booms = {sl.roles.get("boom") for sl in spec.sails if sl.cut_at_mast}
+    for s in spec.spars:
+        if s.cls == "boom" and s.rigged_out is not None and s.id not in drivers_booms:
+            raise ShipFileError(
+                f"{src}: spar '{s.id}' has rigged_out, but no lateen cut at the mast names it as "
+                "its boom; a gaff sail's boom is never rigged in, and only a driver's goes out "
+                "and in with its sail."
             )
 
     # lines: target exists and is a permitted kind
@@ -1646,7 +2413,10 @@ def validate(spec: ShipSpec) -> None:
             )
 
     # the armament (package 70): a gun's id is a part's, unique against the rig's and within
-    # its fit; a broadside number is one gun a side
+    # its fit; a broadside number is one gun a side. A gun's deck (package 75) is a deck word,
+    # and where the hull's profile gives ports, a gun with a port names a deck that has them.
+    profile = spec.hull.profile
+    port_decks = [word for word, _triples in profile.ports_m] if profile is not None else []
     if spec.armament is not None:
         for fit in spec.armament.fits.values():
             ids: set[str] = set()
@@ -1661,6 +2431,22 @@ def validate(spec: ShipSpec) -> None:
                         f"{src}: the fit '{fit.name}' lists the gun '{g.id}' twice."
                     )
                 ids.add(g.id)
+                if g.deck is not None and g.deck not in DECK_WORDS:
+                    raise ShipFileError(
+                        f"{src}: the gun '{g.id}' of the fit '{fit.name}' stands on the "
+                        f"'{g.deck}' deck; a deck is one of {', '.join(DECK_WORDS)}."
+                    )
+                if (
+                    g.deck is not None
+                    and port_decks
+                    and g.place in _PORT_GUN_PLACES
+                    and g.deck not in port_decks
+                ):
+                    raise ShipFileError(
+                        f"{src}: the gun '{g.id}' of the fit '{fit.name}' is a {g.place} gun "
+                        f"on the {_deck_name(g.deck)}, where the hull's profile gives no ports "
+                        f"(the decks with ports: {', '.join(port_decks)})."
+                    )
                 if g.place == "broadside":
                     key = (int(g.number or 0), str(g.side))
                     if key in pairs:

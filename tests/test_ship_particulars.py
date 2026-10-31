@@ -553,6 +553,9 @@ def test_period_names_resolve(path, phrases):
 
 
 def test_generator_reproduces_the_committed_files(tmp_path):
+    """Both ways (package 75; docs/design/Build-Ships.md §3.1 item 26): every file the
+    generator writes is a committed ship file and equal to it, and every committed ship file
+    is one it writes, so that a new ship's files are compared with no list here to edit."""
     out = tmp_path / "ships"
     subprocess.run(
         [sys.executable, str(ROOT / "tools" / "gen_ships.py"), str(out)],
@@ -560,7 +563,15 @@ def test_generator_reproduces_the_committed_files(tmp_path):
         cwd=ROOT,
         capture_output=True,
     )
-    for committed in (
+    ships = ROOT / "data" / "ships"
+    made = sorted(p.name for p in out.iterdir())
+    committed = sorted(p.name for p in ships.glob("*.yaml"))
+    assert made == committed, (
+        f"tools/gen_ships.py writes {sorted(set(made) - set(committed))}, not committed, and "
+        f"does not write {sorted(set(committed) - set(made))}, committed"
+    )
+    # the eight files of the packages before 75 among them
+    for path in (
         FRIGATE,
         SCHOONER,
         PRIVATEER_SCHOONER,
@@ -570,14 +581,14 @@ def test_generator_reproduces_the_committed_files(tmp_path):
         LUGGER,
         SMACK,
     ):
-        made = out / committed.name
-        assert made.exists()
+        assert path.name in made
+    for name in made:
         # Compare as text so that a Windows checkout with CRLF endings
         # (or a generator run there) is not a difference.
         # read both as UTF-8: Windows would otherwise read them in cp1252 (gate 3b, owner)
-        assert made.read_text(encoding="utf-8") == committed.read_text(encoding="utf-8"), (
-            f"{committed.name} differs from what tools/gen_ships.py writes; "
-            "edit the generator and rerun it"
+        text = (ships / name).read_text(encoding="utf-8")
+        assert (out / name).read_text(encoding="utf-8") == text, (
+            f"{name} differs from what tools/gen_ships.py writes; edit the generator and rerun it"
         )
 
 

@@ -628,7 +628,8 @@ def _wreck_spar(
     sails = [d.id for d in dependents if isinstance(d, Sail) and d.state in ALOFT_STATES]
     spars = [d.id for d in dependents if isinstance(d, Spar)]
     name = _name(ship, spar.id)
-    where = " in the slings" if spar.is_yard else ""
+    # a lateen yard is slung too, though it is no yard of the braces' orders (package 75)
+    where = " in the slings" if spar.is_yard or spar.cls == "lateen_yard" else ""
     if sails and spars:
         what = f"the {_names(ship, sails)}, with the {_names(ship, spars)},"
     elif sails or spars:

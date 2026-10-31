@@ -47,6 +47,7 @@ from enum import StrEnum
 from typing import Any
 
 from freesail import units
+from freesail.combat import ports
 from freesail.combat import shot as S
 from freesail.crew import hands as H
 from freesail.crew.model import number_words
@@ -132,11 +133,12 @@ ARC_SWIVEL_DEG = 100.0
 # ruling of the day reasoned from her rig, the fore topmast backstays at about 55 to 60
 # degrees from the pivot, the main shrouds at about 140 to 150;
 # docs/design/Proposal-PivotGun.md §3, which proposes each pivot's arcs from its own ship).
-# The two figures below are only the default for a pivot whose file names no arc (package
-# 75 gives each new pivot its own). It is trained round by its crew with the handspikes
-# and the training tackles: half a circle in a minute with its full crew, slower
-# short-handed (judgement); within five degrees of the mark the slide's play and the
-# handspikes point it, and it bears.
+# Since package 75 a pivot whose file names no arc is refused at the load (`schema._parse_gun`),
+# so the two figures below are kept only for a gun pickled before package 86, which has no
+# arc of its own (the lead's ruling, 2026-10-28: an old checkpoint's pivot still bears where
+# it did). It is trained round by its crew with the handspikes and the training tackles:
+# half a circle in a minute with its full crew, slower short-handed (judgement); within five
+# degrees of the mark the slide's play and the handspikes point it, and it bears.
 ARC_PIVOT_FROM_DEG = 60.0
 ARC_PIVOT_TO_DEG = 140.0
 PIVOT_TRAIN_DEG_S = 3.0
@@ -146,7 +148,7 @@ PIVOT_ON_DEG = 5.0
 def pivot_arc(gun: Any) -> tuple[float, float]:
     """The arc a pivot gun fires through over either side, degrees off the bow: its own
     (`Gun.arc_deg`, from its ship file), else the default (`ARC_PIVOT_FROM_DEG`,
-    `ARC_PIVOT_TO_DEG`)."""
+    `ARC_PIVOT_TO_DEG`), which since package 75 only a gun pickled before package 86 takes."""
     arc = getattr(gun, "arc_deg", None)
     if arc is None:
         return (ARC_PIVOT_FROM_DEG, ARC_PIVOT_TO_DEG)
@@ -279,6 +281,10 @@ class Battery:
     _said_filling: set[tuple[str, float]] | None = None  # (kind, pounder) told the gunner fills
     _said_out: set[tuple[str, float]] | None = None  # (kind, pounder) told the magazine is out
     # `_said_no_powder` (float keys) stays, unread: an old pickle's is inert
+    # the lee ports (package 75; docs/design/Build-Ships.md §7): the ids of the guns whose
+    # ports are shut, the sea at their sills, set by `ports.update` at the head of the tick
+    # and left out of the work and the fire; a class default, empty until the rule is built
+    _shut: frozenset[str] = frozenset()
 
     def __init__(self, ship: Any) -> None:
         self.ship = ship
@@ -330,7 +336,10 @@ class Battery:
 
     def wants_work(self, gun: Gun) -> bool:
         """Whether the gun has a phase to work: not yet loaded, run out (when wanted) and
-        primed; an exercised gun always (its cycle begins again as it ends)."""
+        primed; an exercised gun always (its cycle begins again as it ends). A gun whose
+        port is shut (`_shut`, package 75) has none."""
+        if gun.id in self._shut:
+            return False
         if self.exercise is not None and self.exercised(gun):
             return True
         if not gun.loaded:
@@ -453,8 +462,13 @@ class Battery:
         tick: int,
         resolve: Any,
     ) -> None:
-        """One tick: each crew's work on its guns, then the guns that fire. `resolve` is
+        """One tick: the ports shut or opened against the sea at their sills (`ports.update`,
+        package 75), each crew's work on its guns, then the guns that fire. `resolve` is
         `hits.resolve_shot`, given each shot that goes."""
+        # the lee ports first, so that a gun whose port shuts this tick neither works nor
+        # fires in it (Build-Ships.md §7.2); the changes it gives are the log's, once the
+        # rule is built, and stage 0's hook shuts nothing
+        ports.update(self, firer)
         ship = self.ship
         mag = magazine(ship)
         crews: dict[str, list[Gun]] = {}
@@ -784,10 +798,11 @@ class Battery:
         relative = (
             units.wrap_pi(target.bearing_rad - firer.heading_rad) if target is not None else None
         )
-        # the single guns and the gun to leeward: by name, once each, at whatever bears
+        # the single guns and the gun to leeward: by name, once each, at whatever bears; a
+        # gun whose port is shut does not fire (package 75)
         for gid in list(self.single):
             g = ship.guns.get(gid)
-            if g is None or not self.ready(g):
+            if g is None or gid in self._shut or not self.ready(g):
                 continue
             self.single.remove(gid)
             self._discharge(g, quarters, firer, target, relative, rng, tick, resolve)
@@ -799,11 +814,13 @@ class Battery:
             self.word = None
             return
         # a gun captain fires at what his gun can throw to: a mark beyond its random range
-        # is not fired at (Douglas 1820 on the waste of powder at long shot; judgement)
+        # is not fired at (Douglas 1820 on the waste of powder at long shot; judgement); a
+        # gun whose port is shut, not at all (package 75)
         ready = [
             g
             for g in ship.guns.values()
-            if self.ready(g)
+            if g.id not in self._shut
+            and self.ready(g)
             and self.bears(g, relative)
             and self._side_fires(g)
             and target.range_m <= S.ballistics_of(g.kind, g.pounder).random_m

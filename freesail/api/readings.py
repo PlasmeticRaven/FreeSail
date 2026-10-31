@@ -928,7 +928,8 @@ def sail_reading(ship: Any, sail: Sail) -> dict[str, Any]:
         if sail.shivering:
             shaking = True
         else:
-            cls = sails_mod.SAIL_CLASSES.get(sail.cls)
+            # the luff of the class whose curve drives the sail (package 75: `curve_class`)
+            cls = sails_mod.SAIL_CLASSES.get(sail.curve_class)
             if cls is not None:
                 luff = sails_mod._chord_angle(ship, sail) + cls.luff_angle + baggy_luff(sail)
                 if sails_mod.hauled_weather_bowline(ship, sail) is not None:

@@ -48,7 +48,7 @@ on these packages; that is the owner's choice.
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time |
-| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged; **B1, the *Indefatigable*, merged 2026-10-30** (below, "Package 75, B1, as merged"); the hull step measuring, its landing held |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
@@ -1275,8 +1275,9 @@ builder's fast tier whole on the final tree (4,473 passed, none failed, 29 minut
 tier of the eighteen touched files and the known truths (1,752 passed, 7 expected failures,
 the rulings', none failed, 45 minutes); the lead's run of the between-hulls, officer, in-world
 and the step's truths' tests on the head (180 passed) and the lead's probes (below); **the
-whole suite on the merged tree in the cloud dispatched at the merge (run 21 on `cfcf092`+;
-its figures written here when it is in).**
+whole suite on the merged tree in the cloud (run 21 on `432ddb4`: lint green, 4,828 passed
+over the six shards, 3 skipped, 11 expected failures, none failed, 42 minutes, the count up
+from run 20's 4,814 by the step's tests; the pace job 10 of 10 in 257 seconds).**
 
 **What was built** (`docs/design/Design-BoatAndPersonAboard.md` §2 and its postscript;
 `docs/dev/TuningNotes.md` "Package 82", step 1): `movement.put_aboard`, the one function for
@@ -1322,6 +1323,78 @@ the player's own seat on another ship (step 3). **Next:** step 2, the observer's
 `ship: none`, `director: observe`; truths 7-320, 7-321, 7-334), the builder going on without
 a report until the package is built or blocked; 74's prize and captive on this step's
 function, held after 82 and 65 both.
+
+### Package 75, B1 (the *Indefatigable*), as merged (2026-10-30)
+
+Merged `--no-ff` from the ships session's `claude/pkg-75` at `bb60222` (the owner's own
+session: stage A, stage B, the hull's shape keys and drawing, Ext §17.11's stage 0, B3 and B5,
+her regeneration with the three figures the lead ruled, the record, and her second testing
+report with the sheets; taken whole at the report, as the lead's notes to the session had it,
+the owner away and the session left to proceed); the merge automatic over 85, 93 and 82's
+step 1, which the branch lacked; ruff clean; the lead's checks on the merged tree: the
+generator reproduces all ten ship files byte for byte (`tools/gen_ships.py` to a scratch
+directory, `cmp` against `data/ships/`), the eight other ships unmoved against the trunk, the
+physics' diff the stage-B extensions reviewed before (the yards under the bowsprit on no
+mast, `Sail.curve_class` for a lateen cut at the mast, the slings' words) and nothing else,
+no consent file touched, no model identifier in any file; 85's in-world test green on her
+served heads and the tools' words the first time they met it; the grammar book, the primer,
+the particulars and the profile tests green after the mend below; **the whole fast tier on
+the merged tree here (whole but the pictures' flake under four workers, the MCP bridge's
+images, passing alone as at 93's merge) and the whole suite in the cloud dispatched at the
+push (run 22; its figures written here when it is in).**
+
+**What was built** (`docs/playtests/2026-10-30-pilot-indefatigable/testing-report.md`, the
+tuning notes "Package 75", `docs/design/Design-Ship-Indefatigable.md` and the research,
+build and shared-design notes beside it): the 64 of 1784 (`sixty-four.yaml`) and the razee of
+1795 (`razee-44.yaml`), written by `tools/ships/indefatigable.py` through the generator, on
+the hull of the first report, with the whole rig tuned: the 64's lateen mizen yard with a
+104 m² course cut at the mast and no boom, Steel's driver of 203 m² on its 65-ft boom bent by
+"shift the mizen for the driver" (the boom out with the shift and in with it: Ext §17.11),
+Steel's long pole-heads on both (the main truck 47.2 to 51.7 m), the spritsail and
+sprit-topsail yards on the 64 and the spritsail yard on the razee, the bowsprit on the stem
+head at 27°, the razee's spanker of 200 m² with the boom clear of her taffrail by a
+centimetre (218 could not stand clear: the lead's ruling), her stern plain above the lights.
+In 15 kn on the beam the 64 makes 7.55 kn at 4.9° of heel with light weather helm, tacks in
+244 to 266 s and wears in 497; the razee 7.86 kn at 4.3°, tacks in 427 to 484 s, her best in
+25 kn 11.64 kn (the *Virginie* chase's 11.2 met); the razee faster than the 64 at every angle
+(truth 7-187, pinned) and under the frigate-36 by 0.10 to 0.22 kn close-hauled and running
+large in 15 kn (reported, not forced, as the owner left it); the driver faster in light fair
+winds and poor close-hauled (a fair-weather sail, as Steel has it; measured, not pinned). The
+question answered plainly for the owner: a two-decker quicker in stays than a 36 is her small
+after sail against her lead, not the yards under the bowsprit (which cost her a degree of
+staying: she misses from 60° and 60.5° off in 15 kn and stays from 61°) and not her lines
+alone; every hull at its own lead with 104 m² aft tacks in about the same time. **Her truths**
+(`tests/test_indefatigable.py --slow`, 68): 6, 9, 10, 11, 12, 17 and 7-187 to 7-189, 7-230 in
+their forms, old beside new in the notes; the eight's pins untouched.
+
+**The four departures from the lead's words, accepted as reported:** rule (3) of the slings'
+ruling narrowed to a spar with yards under it (the lugger's bowsprit stays at 21.8 kN, the same
+shrinking on another ground, SW-2's); the bowsprits' ratings 168.6, 168.5 and 27.0 kN as the
+named rating reads the headsails lowered; three lines beyond §17.11's table through
+`driver_boom` and two behaviours with them, in Ext §17.11's as-built note; the razee's
+`clr_x_m` +4.5 kept for the owner's test, +4.4's figures beside it (quicker in stays, farther
+from stage A at six points and 60°).
+
+**Mended at the merge (the lead):** the branch registers two events for the lee ports as
+*absent* (`the lee ports shut`, `the lee ports opened`: the sentence the book refuses them by
+until the rule is built, stage 0's hook laid in `combat/ports.py`), the first absent events
+the registry has had; 85's book tests, written when none was, held the registry's every event
+to the primer's table and the grammar page, and the table's every form to be taken. An absent
+event is now treated as an absent reading is: the grammar page names it in its "later, when
+the world has them" list, quoted and with its sentence, and the primer's table is of the
+events the book takes and none it refuses (`agents/tools.py`, `tests/test_grammar_book.py`,
+`tests/test_primer.py`; the tests tightened by one assertion, none loosened).
+
+**Found by the session, booked and not this merge's:** a shift or bend belayed after
+`send_up` loses the canvas drawn, on any sail (the 64 can lose her driver for the voyage); the
+frigate's ringtail keeps `wrecked` after its boom's wreck is cleared; a boom hit while rigged
+in is not drawn though its refusal says the wreck "still hangs aloft"; `shift_sail`,
+`bend_sail` and `unbend_sail`'s served heads name no boom phase; her long tests' `SLOW_TESTS`
+entries wait on Phase 5; three captain's trials fail on the owner's machine with or without
+the work (the build machine's difference; to be named in the hull step's record). **Next
+(the notes to the session, below):** the hull step, three streams measuring the frigate-36,
+the brigs and the cutter now, the landing held for one byte move of all eight; 81 and 91 after
+75 complete; the owner's own sail in her when they are back.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 

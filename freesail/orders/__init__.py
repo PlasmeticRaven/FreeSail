@@ -371,8 +371,9 @@ def _group_evolution(
         from freesail.orders import storm
 
         # package 57: a topsail set flying (the lugger's lug topsails) is never reefed; it
-        # is taken in whole as the wind rises, before the reef of the others
-        lines = storm.flying_topsail_lines(ship) + lines
+        # is taken in whole as the wind rises, before the reef of the others; and package
+        # 75: the spritsail and the sprit topsail are taken in first, as it freshens
+        lines = storm.bowsprit_sail_lines(ship) + storm.flying_topsail_lines(ship) + lines
         lines += storm.shorten_sail_lines(ship, storm.true_wind_kn(ship))
     for line in lines:
         try:

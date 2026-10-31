@@ -580,6 +580,8 @@ class Runner:
             return  # any sail: bending, unbending and shifting (package 19)
         if wanted == "flying" and isinstance(subject, Sail) and subject.flying:
             return  # a sail set flying, of whatever cut (package 57)
+        if wanted == "settee" and isinstance(subject, Sail) and subject.settee:
+            return  # a settee, the bilander's main (package 75)
         if wanted == "spar" and isinstance(subject, Spar):
             return  # any spar: shifting one for a spare (package 30b)
         if wanted == "part" and isinstance(subject, Sail | Spar):
@@ -657,6 +659,18 @@ class Runner:
             side = getattr(sail, "lug_side", None)
             return bool(getattr(sail, "dipping", False)) and side not in (None, lee_side())
 
+        def wanted_sheet(sail: Any) -> float:
+            # the sheet's angle the sail wants at the apparent wind, by its `curve_class`
+            # (package 75; docs/design/Design-ShipsEngineExtensions.md §3.6, §5.2-§5.3): a
+            # lateen cut at the mast is set to the gaff's 18-85 degrees, a settee to the lug's
+            # 8-85
+            cls = getattr(sail, "curve_class", None)
+            if cls not in yard_trim.TRIM_RANGE:
+                raise expr.ExpressionError(
+                    f"'{getattr(sail, 'id', sail)}' is not a sail trimmed by its sheet."
+                )
+            return yard_trim.wanted_sheet_angle(cls, ship.dyn.apparent_wind_angle)
+
         functions = {
             "yard_of": ship.yard_of,
             "sail_of": ship.sail_of,
@@ -683,6 +697,7 @@ class Runner:
             "any_set": any_set,
             "lee_side": lee_side,
             "against_the_mast": against_the_mast,
+            "wanted_sheet": wanted_sheet,
         }
         return expr.Env(names, functions)
 

@@ -188,7 +188,11 @@ def _story(vessel: Any, tick: int, words: str) -> None:
 # ---------------------------------------------------------------------------
 
 _MAN_OF_WAR_ROLES = frozenset({"kings-ship", "cruiser", "commodore"})
-_MAN_OF_WAR_DESCRIPTIONS = frozenset({"frigate", "brig-sloop"})
+# the descriptions of the men of war (package 75 adds the new ships' rows, keyed before
+# their files come: docs/design/Build-Ships.md §3.1 item 25)
+_MAN_OF_WAR_DESCRIPTIONS = frozenset(
+    {"frigate", "brig-sloop", "sixty-four", "razee", "seventy-four"}
+)
 
 
 def _blockade_station_of(world: Any, port: Any) -> tuple[Any, float] | None:
