@@ -1542,6 +1542,9 @@ class Harness:
     # moves by an order, and a job's move writes a line): the stand-by's scan of each new
     # line a tick asks for them many times (package 65; the pace)
     _senses_held: tuple[tuple[int, int, int], knowledge.Senses] | None = None
+    # the lines slept through (package 65; `__init__` sets it): a class default so that a
+    # harness restored from a checkpoint written before the package has it
+    _slept: tuple[int, int] | None = None
 
     def _danger_in(self, lines: list[Event]) -> Event | None:
         """A notable line by anyone but the agent that speaks of danger (`readings.
