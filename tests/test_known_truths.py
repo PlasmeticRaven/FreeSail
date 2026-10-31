@@ -10756,11 +10756,13 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     for words in ("counting house", "mr gill", "packet", "lugger", "barbican"):
         assert words not in own, words
     # every order of the fake's was taken but the two the land guard refused, answered by
-    # the way by marks
+    # the way by marks, and his `come aboard` asked while the boat was still pulling back to
+    # the ship (package 65: ashore he does not see her), asked again until she was home
     refused = [e for e in crew.log if e.kind == "order.rejected" and e.actor == "the captain"]
-    assert len(refused) == 2 and all("give the way by marks" in e.text for e in refused), [
-        e.text for e in refused
-    ]
+    guard = [e for e in refused if "give the way by marks" in e.text]
+    away = [e for e in refused if "The boat is away; wait for her at the quay" in e.text]
+    assert len(guard) == 2 and len(guard) + len(away) == len(refused), [e.text for e in refused]
+    assert away and all("come aboard" in e.text for e in away)
     assert stage["orders"][0] == "come to an anchor" and stage["orders"][-1] == "hail the frigate"
     assert fake.calls > 6
     h.release("the test is done") if hasattr(h, "release") else None
