@@ -1661,11 +1661,6 @@ def far_captures(world: Any) -> list[tuple[Any, ...]]:
     return lines
 
 
-# The far station leg's aim (package 88, item 3): the near law's point ahead of the station
-# along the guide's course; the law's switch for the bisection of what it moved.
-FAR_STATION_LEAD = True
-
-
 def keep_station(vessel: Any, world: Any, dt: float, wind_from: float, wind_kn: float) -> None:
     """The `station` leg of a member's far body (`Vessel.tick`): within the tolerance she
     goes with the guide's way on his course; astern of her station she steers for it under
@@ -1714,29 +1709,7 @@ def keep_station(vessel: Any, world: Any, dt: float, wind_from: float, wind_kn: 
         course = guide_course
         speed_kn = max(0.0, units.ms_to_knots(guide_ms) - DROP_BACK_KN)
     else:
-        aim = bearing
-        beat = vessel.polar.beat_deg(wind_kn) if vessel.pace_override_kn is None else 0.0
-        inside = abs(units.rad_to_deg(units.wrap_pi(math.radians(bearing - wind_from)))) < beat
-        if (
-            FAR_STATION_LEAD
-            and inside
-            and guide_ms > 0.05
-            and distance <= sq.separated_nm * units.NAUTICAL_MILE
-        ):
-            # package 88, item 3: a station that lies inside her close-hauled angle (to
-            # windward of her fetch) is worked up to by the near law's aim (`orders.station`:
-            # a point `LEAD_M` ahead of the station along the guide's course), so that both
-            # bodies fill her on the guide's tack and a member promoted or demoted keeps it
-            # (the bare bearing filled her on the other); a station she can lay is steered
-            # for as before
-            from freesail.orders.station import LEAD_M
-
-            lead_at = at.advanced(
-                LEAD_M * math.sin(math.radians(guide_course)),
-                LEAD_M * math.cos(math.radians(guide_course)),
-            )
-            aim = bearing_and_distance(vessel.position, lead_at)[0]
-        course = vessel._course_for(aim, wind_from, wind_kn)
+        course = vessel._course_for(bearing, wind_from, wind_kn)
         speed_kn = vessel.pace_kn(course, wind_from, wind_kn)
     vessel.heading_deg = course
     vessel.speed_kn = speed_kn
