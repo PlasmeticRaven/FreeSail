@@ -235,19 +235,25 @@ def order_by(e: Any, world: Any = None) -> str:
 STAND_BY_EVENTS = ", ".join(f"'{w}'" for w, spec in R.EVENTS.items() if not spec.absent)
 
 
-def readings_words(world: World) -> dict[str, Any]:
+def readings_words(world: World, senses: Any = None) -> dict[str, Any]:
     """Every reading the registry has, in words (`readings.reading_words`), by id, plus
     each sail's state under `sails` by the sail's ordinary name. This is what the
-    `readings` tool returns and what every sample carries."""
+    `readings` tool returns and what every sample carries. With `senses` (package 65,
+    `world.knowledge.Senses`), the rows to be had where the person stands and no other,
+    the sails among them only on deck and aloft."""
+    from freesail.world import knowledge
+
     view = world.readings
     out: dict[str, Any] = {}
     for row in R.REGISTRY:
         if row.is_absent or row.parametric is not None or row.kind in R.DRIVER_KINDS:
             continue  # the driver's own rows (the pace) are read, never carried (41)
+        if senses is not None and not knowledge.reading_here(row, senses):
+            continue
         out[row.id] = view.words(row.id)
     ship = world.ship
     sails = getattr(ship, "sails", None)
-    if sails:
+    if sails and (senses is None or knowledge.reading_here(R.REGISTRY.get("sail"), senses)):
         from freesail.orders.resolve import display_name
 
         row = R.REGISTRY.get("sail")
@@ -417,9 +423,49 @@ def _last_sampled(world: World, station: str) -> int:
 
 
 def readings(world: World, station: str) -> dict[str, Any]:
+    """Every reading to be had where the station's person stands (package 65), and under
+    `not_here` each row that is not, with where it is to be had, so that a model reads at
+    once what a walk would buy it; everything, for the director and on deck."""
+    from freesail.world import knowledge
+
     out = {"stamp": world.clock.stamp()}
-    out.update(readings_words(world))
+    senses = _senses_of(world, station)
+    out.update(readings_words(world, senses))
+    if not senses.everything:
+        not_here = {
+            row.id: knowledge.where_words(row)
+            for row in R.REGISTRY
+            if not row.is_absent
+            and row.parametric is None
+            and row.kind not in R.DRIVER_KINDS
+            and not row.per_asker
+            and not knowledge.reading_here(row, senses)
+        }
+        if not_here:
+            out["not_here"] = not_here
+            out["where_you_are"] = senses.words()
     return out
+
+
+def _senses_of(world: World, station: str) -> Any:
+    """The senses of the station's person (package 65): the harness's, the seat's, else by
+    the station's own place."""
+    from freesail.world import knowledge
+
+    try:
+        held = _holder(world, station)
+    except KeyError:  # a station nobody holds through a door: by its own place
+        held = None
+    if held is not None and hasattr(held, "senses"):
+        return held.senses()
+    person = None
+    stations = getattr(world, "stations", None)
+    if stations is not None:
+        try:
+            person = stations.holder(station)
+        except Exception:  # noqa: BLE001  (a people's build that cannot run binds nobody)
+            person = None
+    return knowledge.station_senses(world, station, person)
 
 
 def state(world: World, station: str) -> str:

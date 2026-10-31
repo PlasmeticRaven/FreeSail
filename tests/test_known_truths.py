@@ -13300,3 +13300,107 @@ def test_truth_7_332_the_directors_new_forms_perform_in_the_dry_run_and_in_play_
     test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so()
     test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea()
     test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her()
+
+
+# ---------------------------------------------------------------------------
+# Package 65: the place's knowledge (truths 7-370 onward; `docs/design/Design-PlaceKnowledge.md`).
+# A sample carries what the person's place allows (decision 59; the owner's ruling of
+# 2026-10-19). Step 1's truths are here; 7-370 is completed by step 3 (the officer's report).
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks():
+    """A captain in the cabin: his sample carries no deck reading (no wind, no speed, no
+    sail, no sail in sight) and says in one line where they are to be had; the glass, the
+    tell-tale compass's heading and the chart's rows are his; the bell reaches him and the
+    lookout's sighting does not; the sail work overhead a sound and not a figure. The
+    officer's report of a sail sighted reaching him there is step 3's clause."""
+    from tests.test_knowledge import test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks
+
+    test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+
+
+def test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where():
+    """At the prompt (`what is the depth` from the cabin), by the `readings` tool
+    (`not_here`) and in the sample's line, a reading not to be had where the asker stands is
+    answered with where it is to be had, never the figure; the same reading from the deck
+    gives the figure; the book and the rules read the ship as before."""
+    from tests.test_knowledge import (
+        test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks,
+        test_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where,
+    )
+
+    test_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where()
+    test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+
+
+def test_truth_7_376_the_handover_fold_keeps_the_place():
+    """A handover note written in the cabin folds the conversation into a turn whose readings
+    are the cabin's, whole (58a's rule), and the brief's head says the rule once."""
+    from tests.test_knowledge import test_the_handover_fold_keeps_the_place
+
+    test_the_handover_fold_keeps_the_place()
+
+
+def test_truth_7_380_every_kind_the_code_writes_is_placed_and_the_hulls_sounds_reach_below():
+    """The lines' reach: every kind the code writes is in the table or falls to the deck by
+    design (the lead's guard); the bell, a gun and all hands reach the hold; the sail work
+    reaches the cabin as a sound and not the gunroom; a sleeper is woken by a gun and not by
+    the bell; the readings' places are the design's table."""
+    from tests.test_knowledge import (
+        test_every_kind_the_code_writes_is_placed_or_falls_to_the_deck_by_design,
+        test_the_reach_of_the_hulls_sounds_the_deck_and_the_record,
+        test_the_senses_of_each_place_and_the_readings_places,
+    )
+
+    test_every_kind_the_code_writes_is_placed_or_falls_to_the_deck_by_design()
+    test_the_reach_of_the_hulls_sounds_the_deck_and_the_record()
+    test_the_senses_of_each_place_and_the_readings_places()
+
+
+def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail():
+    """The lookout's sample carries the horizon's rows and the heading, no log, no lead, no
+    glass; the quarterdeck's `say` does not reach it, `say to the lookout` does, and the sail
+    work aloft does."""
+    from tests.test_knowledge import test_the_lookouts_station_reads_the_horizon_and_no_instrument
+
+    test_the_lookouts_station_reads_the_horizon_and_no_instrument()
+
+
+def test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place(tmp_path):
+    """A station in the cabin restored from a checkpoint samples the cabin's; a station on a
+    hull that sleeps in the far shape and wakes reads by its person's place in her
+    throughout."""
+    from tests.test_knowledge import (
+        test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place,
+        test_a_station_restored_from_a_checkpoint_keeps_its_place_and_its_senses,
+    )
+
+    test_a_station_restored_from_a_checkpoint_keeps_its_place_and_its_senses(tmp_path)
+    test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place()
+
+
+@pytest.mark.pace
+def test_truth_7_386_the_filters_cost_with_three_stations_seated_is_within_a_fifth():
+    """The pace (informative): the frigate under plain sail with three fakes seated, in truth
+    51's form, `knowledge: place` against `knowledge: all` on the same tree; the figures in
+    docs/dev/TuningNotes.md (package 65, step 1). Asserted within a band: the rule costs
+    under a fifth of the pace (measured a wash: the senses are read once a tick)."""
+    from tests.test_knowledge import test_the_filters_cost_measured_with_three_stations_seated
+
+    test_the_filters_cost_measured_with_three_stations_seated()
+
+
+def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
+    """A captain in the cabin standing by for `speed under 20 knots` is woken with 'Mr Pearce
+    sends down to you' before the words, the log being hove on deck; a tripwire the cabin can
+    judge (the depth by the chart) and the same stand-by on deck wake as 58a's. The call's
+    line in the log is step 3's clause. Also the lead's ruling: an officer with the deck does
+    not go below."""
+    from tests.test_knowledge import (
+        test_a_tripwire_judged_below_wakes_as_the_officers_call,
+        test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft,
+    )
+
+    test_a_tripwire_judged_below_wakes_as_the_officers_call()
+    test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()

@@ -681,6 +681,59 @@ merges in parts; 3 wants 1; 5 and 6 want 1; 8 wants everything.
 6. **`go below` refused with the deck** (§12), a change to 53's reach; or left as it is with
    the officer blind below.
 
+**The lead's rulings on the six (2026-10-31, the note read whole and approved as the
+package's design):** (1) the tell-tale compass given, in the cabin alone: `heading` is the
+deck's, the tops' and the cabin's; the gunroom's rows are the slate's and the chart's without
+it (the officers below know the course steered from the slate and the log board, not her head
+this minute). (2) The sounds of sail work reach the cabin as kinds, not every line whole: an
+evolution's lines (`evolution.*`) as written, since any seaman below knows a tack from a wear
+by the feel and the sounds; the sail and yard lines (`sail.*`, `yard.*`) as the sound and not
+the figure, by one function `knowledge.as_heard(event, senses)` ("sail handled overhead", "the
+hands at the braces"), the kind kept so that the roll-up and the stand-by count the line, and
+which sail, set or taken in, not his until told or until he comes up; a line whose data names
+no sail or yard passes as written; truth 7-380's cabin clause pins the sound's text and the
+kind both. (3) Prose alone where an answer is owed is counted, the journal line and the
+nudge's words naming what happened ("words written into the journal and nothing said in the
+world, where an answer was owed; {n} in a row") and never "an empty reply"; the notice naming
+the tools in every such sample; a note-only reply at a plain glass uncounted. (4) The chart on
+the quarterdeck beside the cabin and the gunroom: agreed. (5) The drill's walk built whole
+behind one switch, `DRILL_WALK`, off on the trunk: the drill a model meets stays the three
+things the consent brief describes until package 55 re-briefs (a model whose yes is on record
+for a drill of three things is not asked eight before the brief says eight); truth 7-381 runs
+with the switch on; the consent record's `drill` field says which drill ran ("passed", "passed,
+with the walk"); the sentence 55 will need goes in step 7's postscript. (6) `go below` with the
+deck refused in words naming `hand_over`, `go to <a place below>` the same, `go aloft` allowed
+(the deck is kept from the tops, in sight of it; judgement); 53's test moves old beside new.
+**Three readings:** the reach's default the deck and a reading's default the deck are right,
+and the kinds' test is the guard the lead wants, its list generated from the code where it can
+be; `say_aboard` retired and the prose a note are right, the director's `notes` the owner's
+window, and the free text of a reply at the director's own station is the director's note too,
+in its journal; §9's refusals and §3.1's named flaw (the weather over a port read from the
+followed hull's view) are accepted as named and left for 65b.
+
 ## As built (the postscripts, step by step)
 
-(Written as each step is built.)
+### Step 1: the rule in the harness (§2, §4, §5, §11's key; 2026-10-31)
+
+**Built as designed**: `freesail/world/knowledge.py` with the senses, the kinds' reach (the
+deck the default, every kind the code writes placed by its kind or its family, the test's
+list generated from the code) and the readings' places (`Reading.where`, `where_words`, 82
+rows placed by hand); the harness's sample by place (the log by reach, a line slept through
+with a sleeper's senses, the sail work a sound in the cabin by the lead's ruling, the readings
+by place with `readings_elsewhere`), `_reaches` extended from the words to every kind, the
+brief head and the fold by senses, the tripwire below as the officer's words; the `readings`
+tool's `not_here`; the prompt's query answered with where; `knowledge: all`; `go below` with
+the deck refused (ruling 6); the briefs' sentence; truths 7-370 (in part), 7-373, 7-376,
+7-380, 7-383, 7-385, 7-386, 7-387 (in part). The figures and the suites are in
+`docs/dev/TuningNotes.md`, "Package 65", step 1.
+
+**Taken another way, with the reason.** The deck reads every row (the glass and the purser's
+books the deck's as well as the cabin's: read at each watch, asked of the purser), so that
+the pinned deck samples stand and `readings_elsewhere` is absent on deck; §3's table reads
+"the glass none" for the deck and is corrected by this. The fold keeps 37g's brief whole and
+carries the cabin's rows in the folded turn, not a rebuilt head. The depth tripwire reads the
+chart, which the cabin has, so it wakes a captain below as 58a's; the call's words come for a
+tripwire of the deck's rows alone. `message.aboard` is the deck's (the gangway).
+
+**Found on the way** is in the tuning notes (the head's leak at the seating, the danger
+wake unheard, the `readings` tool at a station nobody holds).

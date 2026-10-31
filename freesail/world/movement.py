@@ -431,6 +431,33 @@ def _duty_allows(world: Any, person: Any, place_id: str) -> str | None:
     return None
 
 
+def _deck_kept(world: Any, person: Any, place_id: str) -> str | None:
+    """Why a man with the deck does not go below (package 65; the lead's ruling of
+    2026-10-31: the period's officer of the watch did not leave the deck, and a man with the
+    deck is not blind below), or None: the place is not below, he has not the deck, or the
+    deck is the captain's by right (he goes below as he always did, the deck the officer's
+    or the book's). Aloft is allowed: the deck is kept from the tops, in sight of it."""
+    place = PLACES.get(place_id)
+    if place is None or not place.below:
+        return None
+    held = harness_of(world, person) or seat_of_person(world, person)
+    if held is None:
+        return None
+    holder = held[1]
+    agent = getattr(holder, "agent", None)
+    if agent is None or not getattr(agent, "has_deck", False):
+        return None
+    domain = getattr(getattr(holder, "station", None), "domain", None)
+    if domain is not None and getattr(domain, "is_captains", False):
+        return None
+    name = str(getattr(getattr(holder, "station", None), "name", "") or "the officer")
+    return (
+        f"You have the deck: it is not left for {place.name}. Hand it over first "
+        f"(hand_over), or the captain takes it ('I have the deck'); the {name} with the deck "
+        "keeps the deck."
+    )
+
+
 def _moved_line(person: Any, place_id: str) -> str:
     if place_id in DECK_PLACES:
         return f"{person.name} came on deck" + (
@@ -500,6 +527,9 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
                 )
             place_id = found.id
     why = _duty_allows(world, person, place_id)
+    if why is not None:
+        raise OrderError(why)
+    why = _deck_kept(world, person, place_id)
     if why is not None:
         raise OrderError(why)
     if person.where == place_id or (place_id in DECK_PLACES and person.where == place_id):

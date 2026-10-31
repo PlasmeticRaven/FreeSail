@@ -100,6 +100,17 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
 # on the build machine with three other suites running beside them (2026-10-01).
 SLOW_TESTS: frozenset[str] = frozenset(
     {
+        # package 65 (the place's knowledge): the fakes seated and sent below, the hull slept
+        "test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
+        "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
+        "test_knowledge.py::test_the_handover_fold_keeps_the_place",
+        "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",
+        "test_knowledge.py::test_knowledge_all_turns_the_rule_off",
+        "test_known_truths.py::test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
+        "test_known_truths.py::test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where",
+        "test_known_truths.py::test_truth_7_376_the_handover_fold_keeps_the_place",
+        "test_known_truths.py::test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail",
+        "test_known_truths.py::test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place",
         # package 67: the seat's door as the harbour's subprocess on a live server, a long
         # seat through the API door, and the seat's forms over a day's minutes
         "test_known_truths.py::test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_stands_it_down",

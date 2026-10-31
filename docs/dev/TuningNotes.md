@@ -16970,3 +16970,88 @@ before, 632 and 620 after; the default cap 390 and 374 before, 377 and 380 after
 twelve 390 and 383 before, 378 and 380 after. **The cloud's pace job is the proof**, as the
 lead says: this machine cannot see the cost the cloud saw, and the cloud's runner sits nearer
 the floor (its 440 to 496 against this container's 620 to 700).
+
+## Package 65: the place's knowledge (2026-10-31)
+
+The brief in `docs/dev/M7-WorkPackages.md` ("Package 65"); the design in
+`docs/design/Design-PlaceKnowledge.md`, written and reported before anything was built, the
+lead's rulings on its six questions recorded in it, a postscript for each step as it is built.
+Built as a sibling session in its own container on `claude/pkg-65`, off the trunk's `b896c4c`
+(82 closed whole), each step a mergeable state with the fast tier whole on its final tree, the
+slow tier of the touched files and the known truths (`--slow -m "not pace" -n 4`), the pace
+tests alone and last, the trunk brought in at the boundary before the step's final run; the
+whole suite the lead's in the cloud at each merge. The physics are not touched; no consent
+file; no ship file.
+
+### Step 1: the rule in the harness (the design's §2, §4, §5 and §11's key)
+
+**What was built.** `freesail/world/knowledge.py` new, the three functions of §2 as data and
+reads: a person's **senses** from his spot (66's `hearing.spot_of`, and whether he is asleep by
+his needs or the bill), the open deck's, the masthead's, the cabin's, the gunroom's, a room's
+below, the shore's, a sleeper's, the director's everything; a **reach** class on every kind of
+log line, by the kind (`REACH`, 130 kinds) or by its family (`FAMILIES`, 80 families), **the
+deck the default** for a kind nobody placed, a line's data (`place`, `to`, `heard_by`) read
+first; the cabin hearing the sail and yard work overhead as a sound (`as_heard`: "Sail handled
+overhead.", "The hands at the braces.", the kind kept, the lead's ruling), an evolution's lines
+as written; a **place** on every row of the readings registry (`Reading.where`, the deck by
+default, and `where_words`: "the lead is cast on deck"), 82 rows placed by hand in
+`api/readings.py` and the four readings modules, the rest the deck's. In the harness
+(`agents/harness.py`): `Harness.senses()` (cached by the tick, the orders and the log's length:
+the stand-by's scan asks for it many times a tick), the sample's log by reach with the lines
+slept through read with a sleeper's senses (`_slept`), the sample's readings by place with one
+line for the rest (`Sample.readings_elsewhere`, `knowledge.elsewhere_words`), `_reaches`
+extended from 66's words to every kind (so the stand-by's wake, the danger's wake, the
+severity's sample and the notable digest carry only what reached him), the brief head and the
+handover fold by senses, a tripwire judged for a station that cannot read its rows where it
+stands fired as the officer's call ("Mr Pearce sends down to you: speed under 20 knots";
+`Tripwire.rows`, `Condition.rows`). The `readings` tool's `not_here` and `where_you_are`; the
+prompt's query answered with where (`orders/prompt.py` `_elsewhere`: "The depth: the lead is
+cast on deck; you are in the cabin.", a `query.reading` line whose data says `elsewhere`); the
+scenario key `knowledge: all` (`Scenario.knowledge`, the loader's check); `go below` and `go to
+<a place below>` refused to a station with the deck below the captain's
+(`movement._deck_kept`, naming `hand_over`; `go aloft` allowed); one sentence in every brief's
+head (`agent.PLACE_KNOWLEDGE_WORDS`). Tests: `tests/test_knowledge.py` (the kinds' guard, the
+senses and the places, the cabin, the prompt, the fold, the key, the masthead, the deck kept,
+the tripwire's call, the checkpoint, the hull asleep, the pace), truths 7-370 (in part), 7-373,
+7-376, 7-380, 7-383, 7-385, 7-386 and 7-387 (in part).
+
+**Taken another way, with the reason.** (1) The design's table (§3) had the glass the
+cabin's alone and the purser's books the cabin's and the hold's, so that the deck had no glass;
+built, every row has the deck among its places (the glass is read at each watch and entered on
+the log board, and the purse and the stores are asked of the purser on deck as every pinned
+passage asks them), so that **the deck reads every row as it did** and the sample's
+`readings_elsewhere` line is absent on deck, as §5 promised; the cabin's distinction is what the
+cabin has, not what the deck lacks. (2) The design's §12 had the handover fold rebuild the
+brief head; 37g's fold keeps the brief whole and puts the readings as they stood in the folded
+turn (58a: the first sample after a fold is whole), so it is that turn that carries the cabin's
+rows, and the head's "readings now" and "last lines" are by senses at the seating. (3) The
+tripwire's `depth under <n> fathoms` reads the chart's depth as well as the lead's (58a), and
+the chart is the cabin's: so a captain below is woken by it as 58a's, and the call's words come
+for a tripwire whose every row is the deck's (the speed, the wind, a sail within so many
+cables). (4) `message.aboard` (a letter come aboard by the boat) is the deck's, the gangway
+being on deck; the door and the reading are the captain's.
+
+**Found on the way.** (a) The brief head leaked the whole readings and the whole log to a
+station seated below (`resend_brief` read `tools.read_log` and `readings_words` without a
+person); found while placing the fold, mended with it. (b) The stand-by's danger wake
+(`_danger_in`, 37g) read no hearing at all: a captain in the cabin was woken by "her sails
+lifting" before the filter reached it; gated by `_reaches` with the rest. (c) The `readings`
+tool at a station nobody holds through a door (the watcher in `test_agents`) raised a
+`KeyError` through `_holder`; caught, the station's own place serves. (d) `readings_words`
+carries the per-asker rows (`where am I`) with no asker, as it did before this package; left as
+it was.
+
+**The pace.** Truth 51's form in this container (four cores, the load under 0.5): the frigate
+alone on the station trial **485 ticks a second** on the design note's tree (the trunk's
+`b896c4c`); with three fakes seated and standing by a glass (the captain's, the officer's and
+the lookout's stations), `knowledge: place` **563** against `knowledge: all` **484** (truth
+7-386's measurement on the step's tree: a wash, the difference the machine's noise). Before the
+senses were cached by the tick the same measure read 496 against 532: the stand-by's scan of
+each new line asked for the person's spot afresh each time, a people lookup a line; cached by
+(the tick, the orders, the log's length) it is read once a tick.
+
+**What moved: nothing pinned.** No recorded passage moves a person below or ashore
+(`data/scenarios/*.orders`, the fixtures' saves: none has `go below`), the deck reads every row
+as before, and the filter writes nothing; the samples are not in any digest. The tests that
+moved: none of 53's (an officer without the deck goes below as he did; the refusal is for the
+deck held), none of 41's (step 2's).

@@ -145,6 +145,20 @@ _PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 
 
+# The rows each tripwire reads (package 65; `agents.harness._as_the_officers_call`): the
+# lead's depth and the chart's, the log's speed, the true wind, the chart about her account,
+# the lookout's strangers, her way by the log and the compass.
+_ROWS: dict[str, tuple[str, ...]] = {
+    "depth": ("depth", "depth_of_water"),
+    "speed_under": ("speed",),
+    "speed_over": ("speed",),
+    "wind": ("true_wind_speed",),
+    "point": ("dangers",),
+    "sail": ("strangers",),
+    "settled": ("speed", "heading"),
+}
+
+
 def _number(words: str) -> float:
     w = words.strip()
     if w in _NUMBERS:
@@ -188,6 +202,12 @@ class Tripwire:
     text: str
     kind: str
     n: float
+
+    @property
+    def rows(self) -> tuple[str, ...]:
+        """The readings' rows the tripwire is judged by (package 65: a station that cannot
+        read them where its person stands is woken as by the officer's call)."""
+        return _ROWS.get(self.kind, ())
 
     def _dialect(self, ship: Any) -> list[Any]:
         from freesail.standing.grammar import parse_condition

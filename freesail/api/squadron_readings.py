@@ -198,6 +198,7 @@ def register() -> None:
             "formation, every member in her order of sailing and whether she is in her "
             "station, the stragglers, the divisions detached; 'the ship is in no squadron'",
             none_words=_no_set_words,
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -210,6 +211,7 @@ def register() -> None:
             description="the convoy the ship is commodore of or sails in: the merchantmen in "
             "their order with the stragglers; 'the ship is in no squadron'",
             none_words=_no_set_words,
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -221,6 +223,7 @@ def register() -> None:
             _order_of_sailing,
             description="the set's formation and its interval, and the order of sailing",
             none_words=_no_set_words,
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -235,6 +238,7 @@ def register() -> None:
             none_words=lambda world: (
                 "no station is kept: the ship is in no squadron and none has been ordered"
             ),
+            where=("deck", "aloft"),
         )
     )
     ev = R.EventSpec

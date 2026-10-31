@@ -205,6 +205,7 @@ from freesail.api import readings as R
 from freesail.core import acts
 from freesail.core.events import Event, Rollup, RollupView, Severity, for_the_record
 from freesail.orders.errors import OrderError
+from freesail.world import knowledge
 
 if TYPE_CHECKING:
     from freesail.core.world import World
@@ -749,6 +750,9 @@ class Harness:
         # where the present wait began (the log's length and the stamp): the stand-by's
         # start, or the end of the last sample, for the stand-by digest and `interim`
         self._wait_from: tuple[int, str] = (len(world.log), world.clock.stamp())
+        # the lines slept through (package 65): the log's indices a stand-by asleep spanned,
+        # read with a sleeper's senses by the sample that wakes him, then let go
+        self._slept: tuple[int, int] | None = None
         # who is at the station, for the save and the drivers (set by the agent API)
         self.model_name = ""
         self.door = ""
@@ -1020,11 +1024,18 @@ class Harness:
         self._told = None  # ...so its first sample carries every reading (package 31c)
         self._told_keys = None  # and every sail in sight (package 58a)
         world = self.world
+        # the last lines of the log that reach the station's person where he stands, and
+        # the readings he has there (package 65: the head leaked the whole to a station
+        # below, at the seating and at a handover fold)
+        senses = self.senses()
+        reached = [
+            e
+            for e in world.log
+            if not for_the_record(e) and (senses.everything or self._reaches(e))
+        ]
         lines = [
             f"{d['stamp']}  {d['text']}"
-            for d in tools.read_log(world, self.station.name, since_tick=0)["lines"][
-                -BRIEF_LOG_LINES:
-            ]
+            for d in (tools.log_line(e, world) for e in reached[-BRIEF_LOG_LINES:])
         ]
         night_orders: list[str] | None = None
         deck = ""
@@ -1057,7 +1068,7 @@ class Harness:
             self.station,
             self.agent.session_kind,
             lines,
-            tools.readings_words(world),
+            tools.readings_words(world, senses),
             self.tool_names,
             door_note=self._door_note_with_budget(),
             night_orders=night_orders,
@@ -1435,8 +1446,10 @@ class Harness:
                 cond, memory = watches[i]
                 if cond.holds(self.world.readings, memory):
                     # a tripwire says what it found (package 58a: the point of interest
-                    # named, the speed she settled at)
+                    # named, the speed she settled at); judged for a station that cannot
+                    # read it where it stands, it fires as the officer's call (package 65)
                     woke = part.words + str(memory.get("said") or "")
+                    woke = self._as_the_officers_call(cond, woke)
             else:
                 found = self._matched_in(part, new)
                 if found is not None:
@@ -1450,6 +1463,23 @@ class Harness:
             # has not come, and says so (package 37g, item 4)
             return f"{sb.bound}, and {sb.words} has not come"
         return None
+
+    def _as_the_officers_call(self, cond: Any, woke: str) -> str:
+        """A tripwire's wake for a station whose person cannot read the rows it is judged by
+        where he stands (package 65; the night orders of the period: 'call me if ...'): the
+        officer of the watch sends down to him, and the words say so."""
+        rows = tuple(getattr(cond, "rows", ()) or ())
+        if not rows:
+            return woke
+        senses = self.senses()
+        if senses.everything or any(
+            knowledge.reading_here(R.REGISTRY.get(r), senses) for r in rows if r in R.REGISTRY
+        ):
+            return woke
+        from freesail.agents.agent import OFFICER, station_holder
+
+        who = station_holder(self.world, OFFICER, ("the officer of the watch", "officer"))[0]
+        return f"{who} sends down to you: {woke}"
 
     def _urgent_in(self, lines: list[Event]) -> Event | None:
         """An urgent line by anyone but the agent: it wakes a stand-by whatever it was for,
@@ -1470,20 +1500,48 @@ class Harness:
         reaches it only when it was said within its hearing (named among the line's
         hearers, or within earshot of where it is) or to it; the ship's own lines reach it
         from her log; the director hears everything."""
-        if self._is_directors or e.kind not in WORD_KINDS:
+        if self._is_directors or self.conversation:
             return True
+        senses = self.senses()
+        if e.kind not in WORD_KINDS:
+            # every other kind by its reach (package 65; `world.knowledge`): the deck's on
+            # deck, the hull's sounds everywhere aboard, a report to the person it is for
+            return knowledge.reaches(self.world, senses, e)
         data = e.data or {}
         if e.kind == "agent.note" and "heard_by" not in data:
-            return True  # a station's line that is no word said in a place
+            return not senses.asleep  # a station's line that is no word said in a place
         name = self.station.name
-        if name in (data.get("heard_by") or ()):
-            return True
         addressee = str(data.get("to") if e.kind == "agent.said" else data.get("station") or "")
         if e.kind in WORDS_BETWEEN_PEOPLE and addressee == name:
+            return True
+        if senses.asleep:
+            return False  # a sleeper is woken by a word to him, and by nothing overheard (65)
+        if name in (data.get("heard_by") or ()):
             return True
         if "heard_by" in data:
             return False  # its hearers are named, and this station is not among them
         return self._heard_between(e)
+
+    def senses(self) -> knowledge.Senses:
+        """What the station's person perceives where he is now (package 65; the place's
+        knowledge, `world.knowledge.Senses`): his place's senses, a sleeper's, everything
+        for the director and under `knowledge: all`. Read afresh at each call (the person
+        moves by his own orders between looks); the lookups are the people's."""
+        if self._is_directors or self.conversation:
+            return knowledge.EVERYTHING
+        world = self.world
+        key = (int(world.clock.tick), len(getattr(world, "journal", ()) or ()), len(world.log))
+        held = self._senses_held
+        if held is not None and held[0] == key:
+            return held[1]
+        senses = knowledge.station_senses(world, self.station.name, self._line_person())
+        self._senses_held = (key, senses)
+        return senses
+
+    # the senses as last read, keyed by the tick, the orders and the log's length (a person
+    # moves by an order, and a job's move writes a line): the stand-by's scan of each new
+    # line a tick asks for them many times (package 65; the pace)
+    _senses_held: tuple[tuple[int, int, int], knowledge.Senses] | None = None
 
     def _danger_in(self, lines: list[Event]) -> Event | None:
         """A notable line by anyone but the agent that speaks of danger (`readings.
@@ -1493,8 +1551,8 @@ class Harness:
         for e in lines:
             if e.actor == self.actor or e.severity.rank < Severity.NOTABLE.rank:
                 continue
-            if R.speaks_of_danger(e.kind, e.data) is not None:
-                return e
+            if R.speaks_of_danger(e.kind, e.data) is not None and self._reaches(e):
+                return e  # and only where it reached him (package 65)
         return None
 
     def _matched_in(self, sb: StandBy, lines: list[Event]) -> tuple[str, Event] | None:
@@ -1597,7 +1655,7 @@ class Harness:
                 holds = cond.holds(world.readings, memory)
                 kept[i] = (cond, memory)
                 if holds and due is None:
-                    due = f"{part.words}, which holds now"
+                    due = self._as_the_officers_call(cond, f"{part.words}, which holds now")
                 continue
             if out_of_turn and part.severity is not None:
                 continue
@@ -1643,6 +1701,7 @@ class Harness:
             if world.log[i].actor != self.actor
             and world.log[i].severity is Severity.NOTABLE
             and not for_the_record(world.log[i])  # decision 46, as the sample's log has it
+            and self._reaches(world.log[i])  # and only what reached him (package 65)
         ]
 
     def _stood_by_digest(self, reason: str = "") -> dict[str, Any] | None:
@@ -1695,6 +1754,9 @@ class Harness:
     def _resume_from_stand_by(self, reason: str) -> None:
         a = self.agent
         if a.stand_by is not None and a.stand_by.words in (ASLEEP_BELOW, ASLEEP_WHERE):
+            # package 65: what he slept through is read with a sleeper's senses by the
+            # sample that wakes him (nothing but what woke him)
+            self._slept = (self._wait_from[0], len(self.world.log))
             # package 54: called, or rested; he wakes, and goes back where he turned in from
             person, keeper = self._person_and_needs()
             if person is not None and keeper is not None:
@@ -1727,9 +1789,26 @@ class Harness:
         # holds it (spec M4 open item 8)
         compression = getattr(world, "compression", 1.0)
         kept: list[Event | Rollup] = []
-        for e in events:
-            if e.actor != mine and not for_the_record(e):
-                kept.extend(self._rollup.feed(e, compression))
+        # the place's knowledge (package 65): the lines that reach the person where he
+        # stands, a line slept through with a sleeper's senses, the sail work overhead a
+        # sound in the cabin (`knowledge.as_heard`); the roll-up fed with those alone
+        senses = self.senses()
+        slept, self._slept = self._slept, None
+        asleep = knowledge.Senses(
+            frozenset({knowledge.ASLEEP}), senses.spot, senses.place, senses.person, asleep=True
+        )
+        first = self._sample_seen - len(events)
+        for i, e in enumerate(events):
+            if e.actor == mine or for_the_record(e):
+                continue
+            at = first + i
+            with_senses = asleep if (slept is not None and slept[0] <= at < slept[1]) else senses
+            if not self._reaches_with(e, with_senses):
+                continue
+            heard = knowledge.as_heard(e, with_senses)
+            if heard is not None:
+                e = dataclasses.replace(e, text=heard)
+            kept.extend(self._rollup.feed(e, compression))
         # the captain's own lines are never left out (package 37g, item 9; the review's
         # 5.4: his helm orders and his changes to the book reached a waking officer only
         # as a count): his orders since the last sample are listed, each with who gave it
@@ -1749,13 +1828,14 @@ class Harness:
             reason=reason,
             log=lines,
             log_omitted=omitted,
-            readings=self._sample_readings(world),
+            readings=self._sample_readings(world, senses),
             question=a.question,
             notices=list(a.notices),
             word=a.word,
             heard=list(getattr(a, "heard", None) or []) or None,
             needs=self._needs_showing(),
             you=self.line(),
+            readings_elsewhere=self._readings_elsewhere(world, senses),
         )
         a.notices = []
         a.word = None  # carried once; no answer is owed (package 29, `tell`)
@@ -1765,16 +1845,45 @@ class Harness:
         return sample
 
     @staticmethod
-    def _sample_readings(world: Any) -> dict[str, Any]:
-        """The sample's readings: every row the `readings` tool gives, less the action's
-        rows while nothing is afoot (package 70: not at quarters, undamaged, nobody hurt,
-        no mark engaged, the colours flying), so the samples do not grow for a fight that
-        is not happening; a row's first appearance is itself the delta."""
+    def _sample_readings(world: Any, senses: knowledge.Senses | None = None) -> dict[str, Any]:
+        """The sample's readings: every row the `readings` tool gives that is to be had
+        where the station's person stands (package 65; `world.knowledge.reading_here`),
+        less the action's rows while nothing is afoot (package 70: not at quarters,
+        undamaged, nobody hurt, no mark engaged, the colours flying), so the samples do not
+        grow for a fight that is not happening; a row's first appearance is itself the
+        delta, and so is its coming back when he comes on deck."""
         from freesail.api.action_readings import idle_rows
 
-        full = tools.readings_words(world)
+        full = tools.readings_words(world, senses)
         idle = idle_rows(world)
         return {k: v for k, v in full.items() if k not in idle}
+
+    def _reaches_with(self, e: Event, senses: knowledge.Senses) -> bool:
+        """`_reaches` with the senses given (a line slept through is read with a sleeper's)."""
+        if senses is self.senses() or not senses.asleep:
+            return self._reaches(e)
+        if e.kind not in WORD_KINDS:
+            return knowledge.reaches(self.world, senses, e)
+        data = e.data or {}
+        addressee = str(data.get("to") if e.kind == "agent.said" else data.get("station") or "")
+        return e.kind in WORDS_BETWEEN_PEOPLE and addressee == self.station.name
+
+    @staticmethod
+    def _readings_elsewhere(world: Any, senses: knowledge.Senses) -> str | None:
+        """The sample's line for the rows not to be had where he stands (package 65): which,
+        and where each is to be had; None on deck, where every row is his."""
+        if senses.everything:
+            return None
+        rows = [
+            r
+            for r in R.REGISTRY
+            if not r.is_absent
+            and r.parametric is None
+            and r.kind not in R.DRIVER_KINDS
+            and not r.per_asker
+            and not knowledge.reading_here(r, senses)
+        ]
+        return knowledge.elsewhere_words(rows, senses)
 
     def _as_told(self, content: dict[str, Any]) -> dict[str, Any]:
         """A sample's data turn as the model is sent it (package 31c): the first of a
@@ -3619,7 +3728,7 @@ class Harness:
                 "reason": "the handover note",
                 "handover": note,
                 "folded": HANDOVER_FOLDED,
-                "readings": dict(self._told or tools.readings_words(self.world)),
+                "readings": dict(self._told or tools.readings_words(self.world, self.senses())),
             },
         )
         self.turns = [*self.turns[: start + 1], folded, *kept]

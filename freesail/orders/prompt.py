@@ -85,6 +85,9 @@ def _with_words(ship: Any, phrase: str, said: str, raw: str) -> Result:
             f"{head[:1].upper()}{head[1:]} whom? Name a person by his role or his name."
         )
     world, view = _view(ship)
+    elsewhere = _elsewhere(ship, world, f"{head} {words}", [row])
+    if elsewhere is not None:
+        return elsewhere
     value = view.value(row.id, words)
     if value is None and head == "where is":
         # a mark of the chart (package 37l; game 10, `where is ushant`): in sight by the
@@ -111,6 +114,33 @@ def _with_words(ship: Any, phrase: str, said: str, raw: str) -> Result:
     )
 
 
+def _elsewhere(ship: Any, world: Any, phrase: str, rows: list[Any]) -> Result | None:
+    """A reading asked by a person it is not to be had by where he stands (package 65; the
+    place's knowledge): the answer says where it is to be had and not the figure ("The
+    depth: to be had on deck (the lead is cast on deck); you are in the cabin."). None when
+    any of the rows is his there, when nobody in particular asks (a standing order's
+    `when`, the rules captain, a call with no actor), or under `knowledge: all`."""
+    from freesail.world import knowledge
+    from freesail.world.movement import _mustered, person_of_actor
+
+    if world is None or not _mustered(world) or knowledge.all_known(world):
+        return None
+    actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+    person = person_of_actor(world, actor)
+    if person is None:
+        return None
+    senses = knowledge.senses_of(world, person)
+    if senses.everything or any(knowledge.reading_here(r, senses) for r in rows):
+        return None
+    where = knowledge.where_words(rows[0])
+    words = f"{where}; you are {senses.words()}"
+    return (
+        KIND,
+        _sentence(phrase, words),
+        {"reading": [r.id for r in rows], "elsewhere": True, "words": phrase},
+    )
+
+
 def _phrase(ship: Any, phrase: str) -> Result:
     rows = R.REGISTRY.by_words(phrase)
     present = [r for r in rows if not r.is_absent]
@@ -118,7 +148,10 @@ def _phrase(ship: Any, phrase: str) -> Result:
         sentence = rows[0].absent or f"The ship has no reading '{phrase}' yet."
         lowered = sentence[:1].lower() + sentence[1:]
         return KIND, _sentence(phrase, lowered), {"reading": [r.id for r in rows], "absent": True}
-    _, view = _view(ship)
+    world, view = _view(ship)
+    elsewhere = _elsewhere(ship, world, phrase, present)
+    if elsewhere is not None:
+        return elsewhere
     said: list[str] = []
     for row in present:
         w = view.words(row.id)
@@ -137,6 +170,9 @@ def _bearing_of(ship: Any, phrase: str, mark: str, raw: str) -> Result:
     if not said.strip():
         raise OrderError("The bearing of what? Name a mark in sight, or say the land or the light.")
     world, view = _view(ship)
+    elsewhere = _elsewhere(ship, world, f"the bearing of {said}", [row])
+    if elsewhere is not None:
+        return elsewhere
     nav = getattr(world, "navigation", None)
     name = said
     if nav is not None and getattr(world, "lookout", None) is not None:
