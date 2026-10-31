@@ -3158,6 +3158,9 @@ view) left for 65b. Merged one step at a time, the whole suite in the cloud at e
 week (74 held, and 87, 81, 91 and 65b with it); the lead tells the owner when the trunk is
 up to date and green for his testing; the owner tells the ships session to pause before the
 new ships.
+**Amended the same day:** 65 pauses after step 1 (the Fable allowance at 95 per cent); step
+1 merged on its own, steps 2 to 8 held for the week to turn; the builder told to finish step
+1 and stand by (the lead's one-shot word of 14:30).
 
 ## Package 88: the captain's pass of M7 (`freesail/world/captains.py`, `brains.py` and `data/captains/*.yaml` the rules captain's doctrine and its sources; `freesail/world/squadrons.py` and `orders/station.py` only where the near station law reads; `freesail/world/signals.py` and `data/captains/privateer.yaml`, `hail.yaml` the colours held; `docs/TechnicalSpec-M7.md` §4, §21, §22 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_captain_trials.py`, `test_squadrons.py`, `test_signals.py`, `test_known_truths.py` truths 7-340 to 7-349)
 

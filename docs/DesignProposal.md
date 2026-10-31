@@ -819,6 +819,10 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     download and test. The owner tells the ships session himself to pause before the new
     ships (the *Neufchatel*, the bilander and 74's). Work in hand finishes: 65's steps, each
     reviewed and merged with the suite, and the ships session's reports already made.
+    **Amended the same day:** with the Fable allowance at 95 per cent, 65 pauses after its
+    step 1 (the rule in the harness), which is merged on its own as the design note's
+    "each step a mergeable state" allows; steps 2 to 8 wait for the week to turn; the last
+    of the allowance goes to the loose ends the owner's testing needs.
 
 ### Still open
 
