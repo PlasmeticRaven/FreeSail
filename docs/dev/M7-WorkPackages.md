@@ -4038,3 +4038,41 @@ the eight's behaviour before the landing, by §5.6; every rung by §5.0. **One a
 step's record, name the three captain's trials that fail on the owner's machine with or
 without the work, with their figures on a clean archive, once, so that the owner's machine's
 difference from the build machine is written where the next reader looks.
+
+**2026-10-31, the hull step's ten points ruled; the landing may start.** The six streams
+built and reviewed, the owner's word to build the rest too, all eight to land as one commit:
+the picks stand on every point but where this note says, and nothing the physics or the
+gunnery reads moves (§5.6). **(1) The smack's body:** the plate's own frames over Steel's
+60-ton sloop, sourced points over the rule; the −18% reported past the line; §5.7's row
+amended. **(2) The lugger's depth:** the one factor of principle 7 (2.53 m), the length on the
+line from the *Éclair*'s own sheet (18.39 m), the departure from principle 7's last sentence
+said in the note with the 0.793 figure beside it, §5.7's row T to S† under the water; the
+hold's floor line is a depth of hold and no draught, and is not the measure. **(3) The
+schooners' sill datum:** the plate's 3 ft 1 in over Spider's 3 ft 5 in of 1835, her own sheet
+over a later ship's; §5.7's "about 45°" to about 38° with the chord named. **(4) The brig's
+load line:** WL1, the faint ruled line recorded; §5.4's band re-sourced to the sheet (5 ft
+2 in ± 0.05 ft) and **truth 7-185's band moved old beside new with the source**, the one pin
+this step moves, said in the record. **(5) Guns and ports:** as built; no gun's x moves, the
+triples at the guns' places marked `judged`, the sheet's own ports kept in each module for
+package 81 (whose food this is: the frigate's guns up to 4.8 ft off the sheet's ports, the
+cutter's three guns a side between her four ports). **(6) The S hulls at the sheet's length,
+recorded and not moved,** by principle 5, principle 8 holding: one table in the record of
+every figure the sheets now disagree with (the frigate's 1,448 t against 1,270, her keel and
+fore mast; the brig's 303 t against 413, her drag and fore mast; the cutter's water-line, drag
+and mast 1.13 m from the sheet's place), for the owner and a later package on the files'
+figures against the sheets; the brig's −27% is the one to look at first when that package
+comes. **(7) The port triples before L2:** recorded as measured; L2's thresholds are judged
+against them when L2 is built and not before; the cutter's sills at 1.00 to 1.23 m and her
+lowest port shut at 14.5° are flagged for the owner's test when L2 comes (a cutter's low
+freeboard may well be the truth of it). **(8)** "Sixteen ports a side" left for SW-4 (digests
+and the primer carry the word). **(9)** The lugger's bowsprit at 21.8 kN left and reported,
+a tuning pass's. **(10) The viewer's mends in the landing,** old beside new; the view-geometry
+case that demanded gallery, light and head parts of every profiled file is not loosened but
+turned: it asserts the exact set of files that rightly have none (the cutter, the smack) and
+demands the parts of every other, so that it stays a guard. **The landing as ruled:** the pair
+check and `SAME_HULL_BY_INTENT`, one regeneration, one commit of bytes, the fast tier, B5's
+pictures old beside new, the owner's sheets, the port triples before L2, the three captain's
+trials named once with their clean-archive figures. The trunk is at `2d512b2` (82's step 2);
+package 88 (the captain's pass: the captains' files, `captains.py`, `navigation.py`,
+`signalling.py`, the trials' pins) merges next and touches no ship file, so bring the trunk in
+once more before the landing's final fast tier or just after, as suits the worktrees.
