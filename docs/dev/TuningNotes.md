@@ -16086,3 +16086,50 @@ trials measured so, the table under item 2).
 
 The whole suite on the merged tree is the lead's, in the cloud, at the merge.
 
+
+### The pace at the merge: the lead's finding and the follow-up (2026-10-31)
+
+*The finding* (the lead, at the merge): the cloud's pace job, serial and informative, 10 of 10
+on runs 20 to 22 before the merge and 7 of 11 on runs 24 and 25 after it, the same four under
+truth 51's floor of 500 (truth 51 at 496, the day under the systems 478, the gate's day with the
+region 454, truth 7-159's convoy at far detail 440); on the lead's machine the convoy of six
+and the privateer at far detail 482 to 414, the default cap 268 to 263, a cap of twelve 265 to
+239, the frigate alone and the dozen at far detail noise.
+
+*Measured on this container* (four cores, load about one, `tools/pace.py squadrons`, the
+trunk before the merge `291683d^1` against `e012db5`, two runs each, alternating, ticks a
+second): far detail alone 627 and 596 before, 610 and 648 after; the default cap 393 and 361
+before, 354 and 386 after; a cap of twelve 396 and 367 before, 386 and 364 after. The spread
+between two runs of one tree is as wide as any difference between the trees: **no cost found
+here.** Nor by the passage: the convoy at far detail with the package's switches all on, the
+recovery alone off, and all off, 663, 666 and 671 (and 667, 663, 651 again), the trunk 661
+and 624.
+
+*Where the time goes* (cProfile, the convoy at far detail, two thousand ticks after the first
+twenty-six minutes): the player's brig's sail forces and their rig (half the tick), the far
+members' station legs and the tide's area lookup for their streams (a third); the commodore's
+captain judges thirty-four times and is not among the forty-five dearest calls. A far captain
+(`FarCaptain`) runs none of this package's judgement: `Captain._work` is the crewed body's. In
+the cap-of-twelve row (three thousand ticks, every member crewed) the crewed captains' whole
+judgement is 3.2 per cent of the time; this package's own share is `_aback_with_no_way` 0.4
+per cent, `_danger_ahead_by_chart` under a hundredth of a second for its 47 calls, the room law
+and the colours' hold nothing; the 5,894 calls of `chart.line_shore` are other readers' (the
+lookout's and the planner's), the same before and after.
+
+*Mended all the same, with no change of behaviour* (the lead's two readings of the code, each
+true of a dear read that could be cheap): the square sails' readings are read by the
+perception only when she has no headway, the one case the recovery asks them for; and the land
+ahead by the chart (`chart.line_shore`, `chart.dangers_ahead`) is tried only when the coast by
+the account or the nearest charted danger, both read by the perception at every judgement
+already, lies within the reach (and `DANGER_AHEAD_SPAN_NM`, two miles, past it for a danger's
+track and extent). **Every pin as it stands**: the captain's trials (states, lines, digests),
+truths 7-130 to 7-159, 7-340 to 7-342 and 7b-129, the captain's, the wardroom's, the
+squadrons' and the signals' tests, all passed on the mended code.
+
+*The pace tests on this machine, before the mend (`e012db5`) and after (`bba6d02`), two runs
+each, alternating*: truth 51 and truth 7-159 passed on both trees both times; `tools/pace.py`
+the frigate alone 680 and 676 before, 699 and 685 after; the convoy at far detail 622 and 621
+before, 632 and 620 after; the default cap 390 and 374 before, 377 and 380 after; a cap of
+twelve 390 and 383 before, 378 and 380 after. **The cloud's pace job is the proof**, as the
+lead says: this machine cannot see the cost the cloud saw, and the cloud's runner sits nearer
+the floor (its 440 to 496 against this container's 620 to 700).
