@@ -1732,7 +1732,12 @@ the integrator beside the oar force (the brief's one leave: the towing boat's ne
 the stem as the cable's pull is read at the hawse), no consent file touched, no model
 identifier; the lead's run of the tow, boat, director, view-geometry, in-world, primer and
 log-lines tests on the merged tree, then **the whole fast tier here and the whole suite in the
-cloud dispatched at the push (run 28; its figures written here when it is in).**
+cloud dispatched at the push (run 28 on `b896c4c`: lint green, 6,262 passed over the six
+shards, 11 skipped, 10 expected failures, none failed, 42 minutes, the count up from run 27's
+6,231 by the boats' and the tow's suites; the pace job, informative, 11 of 11 in 212 seconds,
+the four pace truths that sat under the cloud's floor on runs 24 to 27 all passing this run,
+which reads as the cloud's noise the bisection under 88 found and not as a cost moved by 82:
+the matter stays recorded under 88 and re-read each run).**
 
 **Step 5, towing by the boat and the kedge's false denial** (the design's §6 and its
 postscript; the tuning notes, step 5): `tow her with the boat [to <the point or bearing>]`
