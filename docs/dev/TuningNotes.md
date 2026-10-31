@@ -15823,3 +15823,100 @@ its pinned digest).
 twentieth hour on passage for Falmouth, eleven miles off by account (in port at 51900
 before): what the recovery (no longer fifty-four minutes aback at the start) and the longer
 evasion (met at 08:03, not 05:01) cost her. Her other figures old beside new in the test.
+
+**The lead's rulings on item 2 (2026-10-31):** truth 7b-129's band accepted old beside new,
+its docstring saying what ends her lying a-try (the lee-shore line, not the gale's end); the
+lee shore's digest pinned at this package's figure with the trunk's and the stale one beside
+it, decided at the merge in the cloud; the wardroom door's evasion hour (3700 to 14700)
+accepted. **The station gale's two hours aback by turns, booked for the gale book (58b's
+family)** as the lead asked, with the figures: filled away for the lee shore in 42 knots at
+28560 under the close-reefed topsails and the storm staysails, she lies aback by turns until
+about 37000 (70 lines of it in the day, 23 on `c168c51`), her way swinging from -2.6 to +6.3
+knots within minutes in the heavy sea, the topsails filling and backing by turns. **Item 1's
+recovery does not act there:** it is armed (she has had way) and its while begins again and
+again, but never runs its three minutes, each minute with headway beginning it anew; she is
+not lying aback with no way but aback by turns with way between, and there is no driver set
+(only the topsails and the storm staysails), so its first step would be the box-off; nothing
+waits behind hands at a yard. The full-and-by helm under close-reefed topsails in that sea is
+the gale book's ground, not this package's.
+
+### Item 3: 72's near station law read against 58b's
+
+*The symptom:* 86's reading of the stall first suspected the near `keep station` of shaping
+a course inside the close-hauled angle with no bear-away to fill; the stall was the
+commodore's own (item 1), but the near law had not been read for it.
+
+*The rule as it stands, read:* **the two bodies agree in the filling.** The near law
+(`orders/station.py`) out of station clamps the course for the station to the close-hauled
+course on the tack that points nearer (`_course_clamped`, "as near the wind as she will
+lie"); in station it gives the flag's course to `navigation.judge_course`, which keeps her full
+and by on her tack for a course inside her angle (the "too near the wind to be laid" row of
+the primer's chapter 2). The far body's station leg (`squadrons.keep_station`) fills by 58b's
+`Vessel._course_for`, the beating angle on the tack that points nearer, held until she can
+lay it. Neither steers a ship inside her angle.
+
+**Where they differ, and why they are left two.** They aim differently: the near law at a
+point `LEAD_M` (three cables) ahead of the station along the flag's course, so that a ship a
+cable off closes at some twenty degrees and does not chase the point across the line; the
+far leg at the station itself. For a station to windward of her fetch with the flag
+close-hauled the two can fill her on opposite tacks (the near on the flag's, the far away from
+her), so that a member crewed or uncrewed at the range might go about at the promotion.
+Taken another way, twice, and undone: (1) the far leg given the near aim whenever astern of her
+station moved six tests (the squadron's line at far detail 230 m off its station against the
+185 of truth 7-155's band, the blockade's, the convoy's succession, truths 7-152, 7-153 and
+7-340); (2) given it only where the station's bearing lies inside her close-hauled angle, it
+still moved three: truth 7-152 (the Friendship back in station at 6660 against 6060), truth
+7-340 (the spanker in at 1860 against 1800, the far members' stations moving the commodore's
+book) and the convoy's succession, whose far line ahead was no longer within half a cable
+after two hours (a follower's station in the wake of the ship ahead lies inside her angle
+whenever she is a little off it, and aimed ahead of it she never settles). The far leg's
+bare bearing is the better law for a far station; the near law's lead serves the near helm.
+**The far leg is as it was** (the file restored to the trunk's); the opposite tack at a
+promotion is **found, for the lead**, with these figures. *What proves it:* the squadron's
+truths 7-152 to 7-155 as they stand (passed on the final code); the test in
+`tests/test_squadrons.py` with the flag close-hauled and a crewed brig ordered two cables to
+windward of her: the near law gives the close-hauled course at her angle, full and by, and the
+far law fills any bearing inside its beating angle to the beating angle on either side.
+
+### Item 4: the colours held once shown before an enemy
+
+*The symptom* (the owner's debrief of 70 to 72): a privateer under British colours did not
+answer the private signal, showed French colours within two cables, and "switched between
+French and British colours as we engaged them". **Reproduced:** a French privateer schooner
+cruising off the Lizard closes a British merchant schooner under British colours
+(investigating at 60, chasing at 360), shows her own and engages at 420; the action over at
+5640 and the schooner still in sight, she investigates her again at 5700 and **hoists the
+British colours again**. Not in the encounter scenario: there the privateer cutter evades the
+frigate under false colours and never shows her own.
+
+*The rule as it stood:* `signalling._colours_by_doctrine` hoisted the principal enemy's
+colours whenever she was investigating or chasing with her own flying, each minute it ran.
+
+*The rule as it reads now* (`_true_colours_held`, `signalling.TRUE_COLOURS_HELD` the switch,
+`privateer.yaml` `true_colours_held` with its source): once her own colours have flown before
+an enemy (shown at `true_colours_cables`, or in action), they are held for the action and
+until every enemy she showed them to is out of sight; the ruse is not taken up again before
+the same ship. The source in the file: the law allowed the ruse until the first shot and made
+the shot under false colours a pirate's act (the file's `false_colours`; truth 7-149); a ship
+that has shown her own colours and fought under them has no ruse left to keep; judgement.
+
+*What proves it:* **truth 7-342** with the switch (held through 5700 and the second chase;
+off, British again at 5700); the encounter's and the first action's truths 7-133 to 7-151 and
+the squadron's to 7-159 as they stand (passed on the final code); the hail untouched (`lie:
+merchant` as before, no line of `world/hail.py` or `hail.yaml` changed).
+
+### Found on the way
+
+- **The lee-shore trial's digest stale on the trunk** (`7fad0ce7e46ba366` against the pinned
+  `ed48ca3d61e52f20` on `c168c51`): the lead's, at the merge (ruled).
+- **The station gale's aback by turns after the gale**: the gale book's (above).
+- **The opposite tack at a station's promotion** (item 3): left two by measure, for the lead.
+- **Heaving to till light** (item 2's brief): not built; with the room law and the land ahead
+  answered no trial wanted it.
+- **The merchant brig full and by 103 degrees off the wind** for some minutes after a station
+  order in the item 3 probe (her yards as they stood): the helm's, seen in a probe only, not
+  measured.
+- **`tack_regardless_nm`** in every captain's file was never read before this package (the
+  navigation's own two miles stood); now read, the same figure, so nothing moved by it alone.
+- **This container lacked the server extra** (`fastapi`): the fast tier's import failures were
+  the machine's; installed, they pass.
