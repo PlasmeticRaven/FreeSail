@@ -8,6 +8,9 @@
 # 408 to 409, Steel 1794 vol. I, LUGGER. Units: metres, m2, kg, kN. Comments mark
 # judgements. Package 43b (spec M6 §19; the proposal's §4.4): the lug and its dip are
 # the engine's additions, as the running bowsprit was the cutter's.
+# Her drawn hull, the profile: her own sheet, RMG ZAZ6306, and Le Coureur's under the
+# water (docs/design/ships-design/pages-zaz6306.md; tools/ships/hull_lugger.py), drawn
+# only.
 ship:
   name: Éclair
   rig: lugger
@@ -48,6 +51,62 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 5.0
     span_m: 2.5
+  # Her lines (Build-Ships.md §5; docs/design/ships-design/pages-zaz6306.md, the note): x forward of the middle of ZAZ6306's two perpendiculars, z above its green line, taken as the file's waterline and recorded beside it, not moved; metres, plank on. Above the water her own sheet (S), but for the curve of the side up to her main breadth (T, the note's §6.2); under it Le Coureur on ZAZ6170, her type (judgement; S†, the note's §13), lengths by 0.868, sections by 0.9135, her own 2 in of plank. A departure from §5.0 principle 7's last sentence: her line is drawn at her sheet's length, not the file's, so that her own rail, plan and stem stand (the note's §13.4). No port: her sheet draws none, and her three guns are taken to fire over the rail (judgement, the note's §6.4).
+  profile:
+    # The top of her side from the taffrail to the stem head, with its two steps at 15.07 and 43.04 ft from the after perpendicular (measured on ZAZ6306, ±0.05 ft: the note's §5.2; each step given 0.01 m apart).
+    rail_m: [[-9.45, 2.84], [-9.03, 2.74], [-8.27, 2.6], [-7.51, 2.48], [-6.74, 2.39], [-5.98, 2.31], [-5.22, 2.24], [-4.44, 2.18], [-4.43, 1.62], [-3.7, 1.59], [-2.93, 1.55], [-2.17, 1.52], [-1.41, 1.5], [-0.65, 1.49], [0.0, 1.5], [0.88, 1.52], [1.64, 1.53], [2.4, 1.57], [3.16, 1.61], [3.92, 1.66], [4.09, 1.69], [4.1, 1.94], [4.69, 1.98], [5.45, 2.05], [6.21, 2.14], [6.97, 2.25], [7.73, 2.39], [8.5, 2.6], [9.03, 2.83]]
+    # By station. At the rail, the outline of ZAZ6306's plan (measured, ±0.03 ft, the note's §5.2; judgement that it is the side at the deck). At the water, Le Coureur's at the factors (S†, the note's §11.4), the three figures aft of x -8.75 and the two at +8.97 and +8.99 closing the line to her post and stem (T: Le Coureur's water ends square on her tuck, and she is round). Her plan is fuller than Le Coureur's at both ends, so her side flares from the water to the rail there, which no sheet of her confirms (the note's §13.3).
+    breadth_m: [[-9.02, 0.12, 0.27], [-8.95, 0.22, 0.54], [-8.84, 0.39, 0.81], [-8.69, 0.58, 1.09], [-8.43, 0.89, 1.36], [-8.24, 1.12, 1.63], [-7.51, 1.69, 2.21], [-6.74, 2.04, 2.55], [-5.98, 2.3, 2.73], [-5.22, 2.5, 2.83], [-4.46, 2.65, 2.89], [-2.93, 2.88, 2.96], [-1.41, 3.0, 2.98], [0.0, 3.06, 2.98], [1.64, 2.99, 2.97], [3.16, 2.83, 2.98], [4.69, 2.51, 2.97], [5.45, 2.21, 2.9], [6.21, 1.88, 2.77], [6.97, 1.36, 2.49], [7.73, 0.84, 2.07], [8.26, 0.49, 1.63], [8.5, 0.37, 1.36], [8.69, 0.27, 1.09], [8.85, 0.19, 0.81], [8.97, 0.15, 0.54], [8.99, 0.14, 0.27]]
+    # The keel's lower edge, the post's heel to the forefoot: Le Coureur's at the factors (S†, ZAZ6170's body plan, the note's §11.6), its two ends where her own dashed post and forefoot, carried on, meet it (T). Her body is not turned from Le Coureur's drag to the green line's (judgement, the note's §6.2). Her file's draught stands; to read: the scantling document held with ZAZ6306, not scanned (the note's §8).
+    keel_m: [[-8.49, -2.98], [-4.24, -2.77], [0.27, -2.53], [2.64, -2.4], [4.52, -2.3], [6.11, -2.22], [6.86, -2.18]]
+    # The stem's fore edge, low to high: its foot her dashed forefoot carried on to the stand-in's keel (T); the dashed forefoot (measured on ZAZ6306, tentative); above the water measured, tentative above 7.9 ft on a faint line; its head at the perpendicular (the note's §5.3, §6.1).
+    stem_m: [[6.86, -2.18], [8.06, -1.79], [8.37, -1.69], [8.64, -1.52], [8.83, -1.32], [9.01, -1.1], [9.14, -0.83], [9.3, 0.0], [9.34, 0.42], [9.37, 1.07], [9.37, 1.83], [9.36, 2.42], [9.34, 2.91], [9.04, 2.92]]
+    # The post's after edge, low to high: its heel carried on to the stand-in's keel (T); at the sheet's scale strip, dashed; at the water; the taffrail (measured on ZAZ6306, the note's §4, §5.3). No counter.
+    stern_m: [[-8.49, -2.98], [-8.66, -2.11], [-9.03, 0.0], [-9.45, 2.84]]
+    # The band between her lines B and C, the only band on her side, above her deck (its heights measured on ZAZ6306, ±0.1 ft, the note's §5.1). That it stands for the main wale is judgement (T). Her sheet is an inboard profile and blank below the deck, which does not show she had no wale there; none is given her, Le Coureur's at the factors standing across her deck at side (the note's §6.1).
+    wales_m: [[-9.14, 1.88, 2.07], [-8.27, 1.63, 1.87], [-5.98, 1.34, 1.58], [-2.93, 1.12, 1.36], [0.0, 1.07, 1.32], [3.16, 1.2, 1.43], [6.21, 1.47, 1.7], [7.73, 1.72, 1.95], [8.01, 1.75, 1.99]]
+    # The midship section: below 0.30 m Le Coureur's station 6 at the factors, the mean of its two halves on ZAZ6170's body plan (S†, the note's §11.4), so Chapelle 1930's 'great deadrise' (OCR l. 508) is measured on her type; above it her own rail (S, the note's §5.2).
+    section_m: [[-2.53, 0.1], [-2.22, 0.15], [-2.0, 0.5], [-1.8, 0.95], [-1.6, 1.44], [-1.4, 1.88], [-1.2, 2.23], [-1.0, 2.49], [-0.8, 2.69], [-0.6, 2.83], [-0.4, 2.94], [-0.2, 3.02], [0.0, 3.07], [0.2, 3.1], [0.3, 3.1], [1.5, 2.98]]
+    # The deck at side: line D2 of ZAZ6306 (measured, ±0.1 ft, the note's §5.1), over the length it can be traced; judgement that it is the deck at side or the plank's underside, within an inch either way. The file's deck height stands, recorded beside it (the note's §7).
+    decks_m:
+      upper: [[-8.27, 1.17], [-7.51, 1.12], [-6.74, 1.07], [-5.98, 0.99], [-5.22, 0.94], [-4.46, 0.89], [-3.7, 0.83], [-2.93, 0.79], [-2.17, 0.78], [-1.41, 0.76], [-0.65, 0.75], [0.0, 0.74], [0.88, 0.75], [1.64, 0.76], [2.4, 0.78], [3.16, 0.81], [3.92, 0.84], [4.69, 0.89], [5.45, 0.97], [6.21, 1.08], [6.97, 1.14], [7.73, 1.21], [8.5, 1.28]]
+    # The main breadth by station: its height Le Coureur's at the factors (S†, the note's §11.4); its half-breadth her own plan's outline with a tumblehome fading from the difference between the caption's 20 ft 4 in and the plan's 19 ft 7 in (judgement, the note's §6.3).
+    breadth_line_m: [[-8.23, 0.96, 1.7], [-7.43, 1.01, 2.33], [-6.62, 0.91, 2.68], [-5.57, 0.74, 2.89], [-4.24, 0.74, 3.01], [-2.36, 0.5, 3.08], [0.27, 0.4, 3.09], [2.64, 0.62, 3.09], [4.52, 0.77, 3.08], [6.11, 1.29, 2.89], [7.43, 1.5, 2.32], [8.25, 1.77, 1.7]]
+    # Le Coureur's numbered stations 12 to 1, read from ZAZ6170's body plan (measured, the note's §11.4) at the factors with her plank on: her type's body, not hers, no sheet of her having a body plan (S†). Above the water the same curves moved to meet her own main breadth, her plan being fuller at the ends and narrower at station 12 (T, the note's §6.2). Chapelle 1930 p. 7 and ZAZ4734 are its checks (the note's §11.9, §13.2); stations 12 and 1 the least sure.
+    sections_m: [[-8.23, -0.6, 0.18], [-8.23, -0.4, 0.38], [-8.23, -0.2, 0.73], [-8.23, 0.0, 1.13], [-8.23, 0.2, 1.41], [-8.23, 0.4, 1.59], [-8.23, 0.6, 1.68], [-8.23, 0.8, 1.7],
+                 [-7.43, -1.25, 0.19], [-7.43, -1.0, 0.28], [-7.43, -0.8, 0.34], [-7.43, -0.6, 0.56], [-7.43, -0.4, 0.92], [-7.43, -0.2, 1.4], [-7.43, 0.0, 1.75], [-7.43, 0.2, 1.96], [-7.43, 0.4, 2.11], [-7.43, 0.6, 2.22], [-7.43, 0.8, 2.29],
+                 [-6.62, -1.5, 0.28], [-6.62, -1.25, 0.39], [-6.62, -1.0, 0.51], [-6.62, -0.8, 0.75], [-6.62, -0.6, 1.11], [-6.62, -0.4, 1.54], [-6.62, -0.2, 1.88], [-6.62, 0.0, 2.09], [-6.62, 0.2, 2.28], [-6.62, 0.4, 2.44], [-6.62, 0.6, 2.55], [-6.62, 0.8, 2.64],
+                 [-5.57, -2.25, 0.15], [-5.57, -2.0, 0.26], [-5.57, -1.75, 0.35], [-5.57, -1.5, 0.5], [-5.57, -1.25, 0.7], [-5.57, -1.0, 1.04], [-5.57, -0.8, 1.41], [-5.57, -0.6, 1.8], [-5.57, -0.4, 2.09], [-5.57, -0.2, 2.29], [-5.57, 0.0, 2.42], [-5.57, 0.2, 2.58], [-5.57, 0.4, 2.71], [-5.57, 0.6, 2.82],
+                 [-4.24, -2.0, 0.35], [-4.24, -1.75, 0.55], [-4.24, -1.5, 0.85], [-4.24, -1.25, 1.24], [-4.24, -1.0, 1.73], [-4.24, -0.8, 2.05], [-4.24, -0.6, 2.31], [-4.24, -0.4, 2.5], [-4.24, -0.2, 2.62], [-4.24, 0.0, 2.7], [-4.24, 0.2, 2.81], [-4.24, 0.4, 2.89], [-4.24, 0.6, 2.96],
+                 [-2.36, -2.0, 0.48], [-2.36, -1.75, 0.86], [-2.36, -1.5, 1.4], [-2.36, -1.25, 1.89], [-2.36, -1.0, 2.29], [-2.36, -0.8, 2.52], [-2.36, -0.6, 2.71], [-2.36, -0.4, 2.81], [-2.36, -0.2, 2.9], [-2.36, 0.0, 2.96], [-2.36, 0.2, 3.01], [-2.36, 0.4, 3.06],
+                 [0.27, -2.0, 0.5], [0.27, -1.75, 1.07], [0.27, -1.5, 1.67], [0.27, -1.25, 2.15], [0.27, -1.0, 2.49], [0.27, -0.8, 2.69], [0.27, -0.6, 2.83], [0.27, -0.4, 2.94], [0.27, -0.2, 3.02], [0.27, 0.0, 3.07], [0.27, 0.2, 3.09],
+                 [2.64, -1.75, 0.68], [2.64, -1.5, 1.2], [2.64, -1.25, 1.72], [2.64, -1.0, 2.14], [2.64, -0.8, 2.4], [2.64, -0.6, 2.59], [2.64, -0.4, 2.74], [2.64, -0.2, 2.84], [2.64, 0.0, 2.93], [2.64, 0.2, 3.0], [2.64, 0.4, 3.05],
+                 [4.52, -1.5, 0.65], [4.52, -1.25, 1.04], [4.52, -1.0, 1.48], [4.52, -0.8, 1.81], [4.52, -0.6, 2.07], [4.52, -0.4, 2.29], [4.52, -0.2, 2.45], [4.52, 0.0, 2.57], [4.52, 0.2, 2.74], [4.52, 0.4, 2.87], [4.52, 0.6, 2.99],
+                 [6.11, -1.5, 0.32], [6.11, -1.25, 0.53], [6.11, -1.0, 0.79], [6.11, -0.8, 1.02], [6.11, -0.6, 1.27], [6.11, -0.4, 1.53], [6.11, -0.2, 1.76], [6.11, 0.0, 1.95], [6.11, 0.2, 2.17], [6.11, 0.4, 2.36], [6.11, 0.6, 2.52], [6.11, 0.8, 2.65], [6.11, 1.0, 2.75],
+                 [7.43, -1.5, 0.18], [7.43, -1.25, 0.27], [7.43, -1.0, 0.37], [7.43, -0.8, 0.48], [7.43, -0.6, 0.59], [7.43, -0.4, 0.74], [7.43, -0.2, 0.88], [7.43, 0.0, 1.04], [7.43, 0.2, 1.29], [7.43, 0.4, 1.52], [7.43, 0.6, 1.73], [7.43, 0.8, 1.92], [7.43, 1.0, 2.06], [7.43, 1.25, 2.21],
+                 [8.25, -1.0, 0.17], [8.25, -0.8, 0.23], [8.25, -0.6, 0.28], [8.25, -0.4, 0.35], [8.25, -0.2, 0.41], [8.25, 0.0, 0.5], [8.25, 0.2, 0.64], [8.25, 0.4, 0.79], [8.25, 0.6, 0.95], [8.25, 0.8, 1.1], [8.25, 1.0, 1.26], [8.25, 1.25, 1.44], [8.25, 1.5, 1.58]]
+    # Not drawn. Its two after points her post's dashed fore edge (tentative); the rest Le Coureur's on ZAZ6170 at the factors, the half-siding hers at the factor (S†, the note's §6.2).
+    rabbet_m: [[-8.69, 0.0, 0.1], [-8.19, -2.1, 0.1], [-8.02, -2.67, 0.1], [-6.62, -2.59, 0.1], [-5.57, -2.53, 0.1], [-4.24, -2.46, 0.1], [-2.36, -2.36, 0.1], [0.27, -2.22, 0.1], [2.64, -2.1, 0.1], [4.52, -2.0, 0.1], [6.11, -1.91, 0.1], [7.43, -1.84, 0.1], [8.03, -1.6, 0.1], [8.36, -1.34, 0.1], [8.54, -1.09, 0.1], [8.66, -0.84, 0.1], [8.75, -0.59, 0.1], [8.84, -0.34, 0.1], [8.91, 0.0, 0.1]]
+    # As ZAZ6306 draws her (the note's §5.2, §5.3, §6.3): round at the rail with no counter, transom, galleries or lights, and a plain stem head with no knee. Le Coureur's square tuck is not hers.
+    form:
+      stern:
+        type: round
+      head: none
+    # Each line by its weakest point (Build-Ships.md §5.0 principle 4); where along the hull each stands is in its note.
+    marks:
+      rail_m: sourced
+      breadth_m: judged
+      keel_m: judged
+      stem_m: judged
+      stern_m: judged
+      wales_m: judged
+      section_m: stand-in
+      decks_m: judged
+      breadth_line_m: judged
+      sections_m: judged
+      rabbet_m: stand-in
+      form.stern: sourced
+      form.head: sourced
 spars:
 # the fore mast 56 ft heel to head, 2.759 of the breadth (Forfait 1788 Table VII p. 75, the 60-pied lougre), 49 ft above the deck; the heel 3.5 ft below the water-line (0.17 B, Fincham 1843 p. 61); stationed 21.6 ft before the middle (Forfait); raking 1.6 deg (0.33 in to the foot, Forfait). A few shrouds a side with runners (BASTAQUE, Willaumez 1831), the lee ones slacked to trim the lug (Forfait p. 53). Provisional (truth 9), see gen_ships.py. Forfait's check (Table VII, 60 pieds): the working canvas 472 m2 against 4.037 L x B = 452 m2 on her length and breadth; its centre 0.000 L before the middle against his 0.024 L abaft. Rating: fore.lug, fore.topsail, jib in 55 kn -> 89.5 kN.
 - id: fore.mast

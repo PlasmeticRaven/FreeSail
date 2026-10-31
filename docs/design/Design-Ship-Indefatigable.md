@@ -435,13 +435,14 @@ out silently.
 | The razee, lowest | 1.98 m | **14.5°** | 14.3° |
 | The razee, end ports | 2.30 m | 17.4° | 17.1° |
 | The 64's upper deck, midships | 3.63 m | 35.8° | 29.4° |
-| The frigate-36's gun deck, for comparison | 2.40 m (deck + `PORT_SILL_M`, judgement) | | 21.0° (map §3.3) |
+| The frigate-36's gun deck, for comparison | 2.19 m at her lowest, her class's sheet, ZAZ2587, since the hull step's landing (first written 2.40 m, deck + `PORT_SILL_M`, judgement) | 19.7° | 18.8° (first written 21.0°, map §3.3) |
 
 Rounding the 64's lowest sill to 1.5 m would shut it at 10.32° (measured here). Under the owner's
 rule the roll's amplitude adds to the heel. The 64's lower tier shuts where the *Bellona*'s
 does on her own reported sill (10.6°, Bel §13.1 answer 5): a coincidence of two ships' figures,
 not a source for either. **Plainly:** the razee's main battery, on measured sills, shuts at a
-lower heel than the frigate-36's on judged ones; and the Gazette has her fighting her main deck
+lower heel than the frigate-36's, on the frigate's own sheet's since the hull step's landing (first
+written, on judged ones); and the Gazette has her fighting her main deck
 in a high sea with "the People on the Main Deck up to their Middles in Water" (Gazette 13972; Ind
 §7.1 item 8), which the rule with the roll will often forbid. D12 (b) stands; her truths do not
 pin that night.
