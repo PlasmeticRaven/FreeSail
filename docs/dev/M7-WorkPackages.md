@@ -1662,8 +1662,11 @@ none failed (46 minutes), the touched files and the guard sets with `--slow`, th
 a real browser; the lead's checks: the generator reproduces all fifteen ship and boat files
 byte for byte on the landed tree, `freesail/`, the evolutions, the sail classes, the people
 and the captains' files untouched against the trunk, no consent file touched, no model
-identifier; **the whole fast tier here on the landed tree and the whole suite in the cloud
-dispatched at the push (run 27; its figures written here when it is in).**
+identifier; **the whole fast tier here on the landed tree (whole) and the whole suite in the cloud
+(run 27 on `cfe48a5`: lint green, 6,231 passed over the six shards, 11 skipped, 10 expected
+failures, none failed, 42 minutes, the count up from run 26's 5,713 by the hulls' suites; the
+pace job, informative, 8 of 11, truth 51 at the floor again and three under it as the runs
+before, the matter recorded under 88).**
 
 **What was built** (`docs/dev/TuningNotes.md` "The eight hulls"; `docs/design/Build-Ships.md`
 §5 to §7 and §15; the pages notes `pages-zaz2587.md`, `pages-zaz4491.md`, `pages-zaz6381.md`
