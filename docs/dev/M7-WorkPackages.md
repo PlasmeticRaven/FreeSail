@@ -3154,6 +3154,11 @@ the kinds' test as the guard; `say_aboard` retired and the director's own prose 
 §9's refusals and §3.1's named flaw (the weather over a port read from the followed hull's
 view) left for 65b. Merged one step at a time, the whole suite in the cloud at each.
 
+**The owner's word of 2026-10-31 (decision 61):** after 65 is done, no new package for the
+week (74 held, and 87, 81, 91 and 65b with it); the lead tells the owner when the trunk is
+up to date and green for his testing; the owner tells the ships session to pause before the
+new ships.
+
 ## Package 88: the captain's pass of M7 (`freesail/world/captains.py`, `brains.py` and `data/captains/*.yaml` the rules captain's doctrine and its sources; `freesail/world/squadrons.py` and `orders/station.py` only where the near station law reads; `freesail/world/signals.py` and `data/captains/privateer.yaml`, `hail.yaml` the colours held; `docs/TechnicalSpec-M7.md` §4, §21, §22 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_captain_trials.py`, `test_squadrons.py`, `test_signals.py`, `test_known_truths.py` truths 7-340 to 7-349)
 
 Opus (the owner, 2026-10-29); after 84, beside 82, the two touching little in common (82
