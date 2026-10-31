@@ -812,6 +812,13 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     says so once in plain words, and the harness's notice when a reply with prose alone
     leaves an answer owed names the tool. Package 41's rule that the prose was the deck's
     conversation is retired by it, its tests moved old beside new.
+61. **A pause on new packages after 65, for the week; the owner tests.** Owner,
+    2026-10-31: once package 65 is done, no new package is launched (74 waits, and the
+    other held packages with it), the account's usage being near its limit for the week;
+    the lead tells the owner when the trunk on GitHub is up to date and green for him to
+    download and test. The owner tells the ships session himself to pause before the new
+    ships (the *Neufchatel*, the bilander and 74's). Work in hand finishes: 65's steps, each
+    reviewed and merged with the suite, and the ships session's reports already made.
 
 ### Still open
 
