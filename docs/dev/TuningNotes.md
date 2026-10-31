@@ -15627,11 +15627,11 @@ tier of the touched files and the known truths (`tests/test_between_hulls.py`, `
 rulings'), none failed (45:16); ruff clean. No pace test is touched by the step; they run
 last, with item 7.
 
-## Package 88: the captain's pass of M7 (2026-10-30, building)
+## Package 88: the captain's pass of M7 (2026-10-30 to 31)
 
 Built as a sibling session on `claude/pkg-88` from the lead's head `c168c51`, each item in
 the owner's four parts. The physics is read and not changed; no ship file, no consent file.
-This section is written as the items go; items 1 and 2 under the lead's ruling of 2026-10-30 (below).
+Items 1 to 4 in the owner's four parts, each item's commits a mergeable state, the lead's branch brought in at item 2's boundary (packages 75 and 82, no pin of this package's moved by them) and again at the close (up to date); the lead's rulings on items 1 and 2 below.
 
 ### Item 1: the commodore's recovery when aback with no way
 
@@ -15920,3 +15920,34 @@ merchant` as before, no line of `world/hail.py` or `hail.yaml` changed).
   navigation's own two miles stood); now read, the same figure, so nothing moved by it alone.
 - **This container lacked the server extra** (`fastapi`): the fast tier's import failures were
   the machine's; installed, they pass.
+
+### The suites, as run (the final code, this container's four cores)
+
+The switches of the package, each its law's for the bisection, all on: `captains.ABACK_RECOVER`,
+`captains.DANGER_AHEAD`, `captains.ENGAGING_CHASE_STALE`, `navigation.WEAR_ROOM`,
+`signalling.TRUE_COLOURS_HELD`; all off give every recorded passage's old figure (the three
+trials measured so, the table under item 2).
+
+- `ruff check .` and `ruff format --check .`: clean.
+- **The slow tier of the touched files with the captain's trials and the known truths whole**
+  (`tests/test_captain_trials.py`, `test_known_truths.py`, `test_captains.py`,
+  `test_squadrons.py`, `test_signals.py`, `test_wardroom_doors.py`, `test_crews.py`,
+  `test_brains.py`; `--slow -m "not pace" -n 4`): all passed, the expected failures the files'
+  own (the station gale's no longer among them).
+- **The fast tier whole** (`-n auto`): all passed but two, each passing alone after: the
+  pictures' MCP bridge "the chart is blank" under the tier's load (passes alone twice on this
+  tree, and alone on `c168c51`; the machine's, as 86 recorded), and
+  `test_log_lines.py`'s distance-to-the-land refusal, whose standing orders are named by the
+  condition's string hash modulo a thousand (`t{abs(hash(cond)) % 1000}`), the hash salted per
+  process, so that two of its conditions collided in that run ("a standing order 't223' in the
+  book already"; passes three runs out of three after): **found, not this package's file, for
+  the lead** (a flaky name; the test's own to mend). Before it, the first fast tier on item 2's
+  code had sixteen failures and four import errors, every one this container's missing
+  `fastapi` but the seated officer's evasion hour (above); with the server extra installed they
+  pass.
+- **The primer's in-world guard and the primer's tests** (`test_in_world.py`,
+  `test_primer.py`) after chapters 2, 5 and 17 were brought to the laws as built: passed.
+- **The pace tests alone and last** (`--slow -m pace`, the touched files, serially): passed.
+
+The whole suite on the merged tree is the lead's, in the cloud, at the merge.
+
