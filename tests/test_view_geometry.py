@@ -1492,7 +1492,8 @@ def test_every_file_draws_a_closed_hull_with_no_nan(tmp_path, path, builder):
         assert got["n"] == 4 and got["parts"] == ["deck", "side", "transom"]
         return
     assert set(got["parts"]) >= {"side", "outline", "deck", "transom", "wale", "bottom"}
-    if builder == "served":
+    if builder == "served" and path not in BOATS:
+        # a ship's boat (package 82) has no gallery, no stern light and no head by her form
         assert set(got["parts"]) >= {"gallery", "light", "head"}
     for side, loop in got["loops"].items():
         assert loop["vertices"] > 20, side

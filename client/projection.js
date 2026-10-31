@@ -179,6 +179,7 @@
 
   // -- vectors ----------------------------------------------------------------
 
+  var OAR_OUTBOARD_M = 2.6; // an oar's reach outboard of the gunwale, a 12 to 16 ft oar (judgement)
   function v(x, y, z) {
     return [x, y, z];
   }
@@ -1799,6 +1800,26 @@
 
     figures.push.apply(figures, hullFigures(hull));
 
+    // Package 82: a boat's oars, drawn from her thwarts while they are out (the snapshot's
+    // `oars` block): one line an oar, the loom inboard of the gunwale, the blade in the water
+    // under the stroke and lifted along the side lying on the oars; laid in, none is drawn.
+    var oars = snapshot && snapshot.oars;
+    if (oars && oars.out && oars.number > 0) {
+      var perSide = Math.ceil(oars.number / 2);
+      var span = (hull.length_waterline_m || 8) * 0.55;
+      var pulling = oars.manned > 0 && oars.stroke > 0;
+      for (var oi = 0; oi < oars.number; oi++) {
+        var oarSide = oi % 2 === 0 ? 1 : -1;
+        var slot = Math.floor(oi / 2);
+        var ox = perSide > 1 ? span * (0.5 - slot / (perSide - 1)) : 0;
+        var hb = profile ? drawnSideAt(hull)(ox, deck) : beam / 2;
+        var loom = v(ox, oarSide * (hb - 0.25), deck + 0.05);
+        var blade = pulling
+          ? v(ox - 0.6, oarSide * (hb + OAR_OUTBOARD_M), -0.25)
+          : v(ox, oarSide * (hb + OAR_OUTBOARD_M), deck + 0.15);
+        figures.push({ kind: "spar", id: "oar." + (oi + 1), cls: "oar", state: pulling ? "pulling" : "lying_on", side: oarSide > 0 ? "starboard" : "larboard", pts: [loom, blade], busy: false });
+      }
+    }
     return { figures: figures, hull: hull, spars: spars, stays: stayFoot, frame: fullRigFrame(graph, home, hull) };
   }
 

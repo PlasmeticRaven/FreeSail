@@ -9249,6 +9249,126 @@ BOAT_CANVAS = (
 )
 
 
+def boat_profile(hull, lwl, beam, draught, gunwale):
+    """The boat's drawing (package 82, the design's §5.4; Build-Ships.md §5.1): her shape keys
+    by rule from her length, breadth, draught and freeboard, every line judgement and marked
+    so, through `hull_profile` and `hull_form` as the ships' are; nothing of them is read by the
+    physics (§5.0 principle 8). An open boat: her sheer rising to the stem head (Steel 1805,
+    the boats' sheer "about a fifth of the depth at the stem"; judgement), a transom stern
+    (the square stern of the yawl, the cutter and the launch: Steel 1805 p. 181; the pinnace
+    and the barge are the sharp-sterned ones, not filed), no head, her side flared a little,
+    her floor rising. Returns the notes for each line, keyed as the ships' profile notes are."""
+    half = 0.5 * beam
+    x_aft, x_fore = -0.5 * lwl, 0.5 * lwl
+    rise_fore, rise_aft = 0.25 * gunwale + 0.12, 0.12 * gunwale + 0.05  # the sheer, judgement
+
+    def rail_z(x):
+        t = x / x_fore  # -1 at the transom, +1 at the stem head
+        return round(gunwale + (rise_fore * t * t if t > 0 else rise_aft * t * t), 2)
+
+    def hb_rail(x):
+        t = abs(x) / x_fore
+        return round(half * (1.0 - 0.72 * t * t), 2)
+
+    rail = [[round(x, 2), rail_z(x)] for x in (x_aft, 0.5 * x_aft, 0.0, 0.5 * x_fore, x_fore)]
+    breadth = []
+    for x in (0.94 * x_aft, 0.5 * x_aft, 0.0, 0.5 * x_fore, 0.9 * x_fore):
+        hr = hb_rail(x)
+        hw = round(max(0.05, hr * (0.86 - 0.3 * abs(x) / x_fore)), 2)  # flared: the water in
+        breadth.append([round(x, 2), hw, hr])
+    keel = [[round(0.96 * x_aft, 2), -draught], [round(0.9 * x_fore, 2), round(-0.6 * draught, 2)]]
+    stem = [[round(0.9 * x_fore, 2), round(-0.6 * draught, 2)], [round(x_fore, 2), rail_z(x_fore)]]
+    knuckle_z = round(-0.35 * draught, 2)
+    stern = [
+        [round(0.96 * x_aft, 2), -draught],
+        [round(0.98 * x_aft, 2), knuckle_z],
+        [round(x_aft, 2), rail_z(x_aft)],
+    ]
+    section = [
+        [-draught, round(0.08 * half, 2)],
+        [round(-0.6 * draught, 2), round(0.62 * half, 2)],
+        [round(-0.25 * draught, 2), round(0.9 * half, 2)],
+        [0.0, round(0.9 * half, 2)],
+        [gunwale, half],
+    ]
+    # the rubbing strake under the gunwale, her one wale; her floor boards, over the keel from
+    # the after thwart to the bow, filed as her one deck for the drawing (the viewer draws a
+    # deck inside the side; a boat's is her platform of bottom boards: judgement)
+    wales = [
+        [round(x, 2), round(rail_z(x) - 0.14, 2), round(rail_z(x) - 0.08, 2)]
+        for x in (0.9 * x_aft, 0.0, 0.85 * x_fore)
+    ]
+    floor_z = round(-0.45 * draught, 2)
+    decks = {"upper": [[round(0.9 * x_aft, 2), floor_z], [round(0.75 * x_fore, 2), floor_z]]}
+    hull["profile"] = hull_profile(
+        rail,
+        breadth,
+        keel=keel,
+        stem=stem,
+        stern=stern,
+        wales=wales,
+        section=section,
+        decks=decks,
+    )
+    form = {
+        "fullness": [1.0, 1.0],
+        "stern": {
+            "type": "square",
+            "knuckle_z_m": knuckle_z,
+            "transom_hb_m": [round(0.4 * half, 2), round(0.3 * half, 2)],
+        },
+        "head": "none",
+    }
+    marks = {
+        "rail_m": "judged",
+        "breadth_m": "judged",
+        "keel_m": "judged",
+        "stem_m": "judged",
+        "stern_m": "judged",
+        "wales_m": "judged",
+        "section_m": "judged",
+        "decks_m": "judged",
+        "form.fullness": "rule",
+        "form.stern": "judged",
+        "form.head": "rule",
+    }
+    report = []
+    hull_form(hull, form=form, marks=marks, measured=(), report=report)
+    for line in report:
+        print(f"boat {lwl / FT:.0f} ft: {line}", file=sys.stderr)
+    judged = (
+        "judgement by rule from her length, breadth, draught and freeboard (no boat's lines are "
+        "on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics."
+    )
+    return {
+        "profile": (
+            "Her drawing (Build-Ships.md 5.1): x forward of the middle of her load line, z above "
+            "her water laden, metres; every line " + judged
+        ),
+        "profile.rail_m": "The gunwale, taffrail to stem head, with a boat's sheer rising "
+        "forward (Steel 1805, the boats' sheer; the figure judgement): " + judged,
+        "profile.breadth_m": "The half-breadths at the water and the gunwale by station, the "
+        "side flared a little as an open boat's is: " + judged,
+        "profile.keel_m": "The keel from the post's heel to the forefoot, rising forward: "
+        + judged,
+        "profile.stem_m": "The stem's fore edge, raked a little, to the stem head: " + judged,
+        "profile.stern_m": "The post to the transom's knuckle and the taffrail: " + judged,
+        "profile.wales_m": "The rubbing strake under the gunwale, her one wale: " + judged,
+        "profile.section_m": "The midship section, a rising floor and a round bilge, plank on: "
+        + judged,
+        "profile.decks_m": "Her floor boards over the keel, from the after thwart to the bow, "
+        "filed as her one deck for the drawing (an open boat has no deck; the platform is "
+        "what a man stands on): " + judged,
+        "profile.form.fullness": "The default rule (1, 1).",
+        "profile.form.stern": "A square transom (Steel 1805 p. 181: the yawl, the cutter and "
+        "the launch square-sterned; the pinnace and the barge sharp, and not filed): "
+        "its knuckle and half-breadths judgement.",
+        "profile.form.head": "No head on a boat (rule).",
+        "profile.marks": "Every line judged by rule from her principal dimensions, the form's "
+        "fullness and head by rule.",
+    }
+
+
 def boat(out_dir, pattern):
     """One boat's file from a `BOAT_PATTERNS` row: her hull from the length by Luce's rule of
     breadth (a quarter of the length) and the judged depth, draught and displacement; one
@@ -9262,6 +9382,24 @@ def boat(out_dir, pattern):
     lwl, beam, draught = ft(L_ft), ft(B_ft), ft(draught_ft)
     gunwale_m = round((depth_ft - draught_ft) * FT, 2)
     hull_speed = round(1.34 * math.sqrt(L_ft), 1)
+    hull_keys = {
+        "length_waterline_m": lwl,
+        "beam_m": beam,
+        "draught_m": draught,
+        "displacement_kg": disp,
+        "gm_m": 0.5,
+        "clr_x_m": 0.0,
+        "lateral_area_m2": round(lwl * draught * 0.85, 2),
+        "hull_speed_kn": hull_speed,
+        "deck_height_m": gunwale_m,
+        "rudder": {
+            "area_m2": round(0.016 * L_ft, 2),
+            "max_angle_deg": 35,
+            "rate_deg_s": 20.0,
+            "span_m": round(depth_ft * FT, 2),
+        },
+    }
+    profile_notes = boat_profile(hull_keys, lwl, beam, draught, gunwale_m)
     b = Builder(
         "the boat",
         "boat",
@@ -9270,24 +9408,9 @@ def boat(out_dir, pattern):
         "world when she is commanded and the script's boat on her errands otherwise; her name "
         f"is her ship's ('the Raven's boat') when she is manned. Sources: {src} "
         f"{BOAT_FILE_NOTE} Built by tools/gen_ships.py; edit the script and rerun.",
+        hull_keys,
         {
-            "length_waterline_m": lwl,
-            "beam_m": beam,
-            "draught_m": draught,
-            "displacement_kg": disp,
-            "gm_m": 0.5,
-            "clr_x_m": 0.0,
-            "lateral_area_m2": round(lwl * draught * 0.85, 2),
-            "hull_speed_kn": hull_speed,
-            "deck_height_m": gunwale_m,
-            "rudder": {
-                "area_m2": round(0.016 * L_ft, 2),
-                "max_angle_deg": 35,
-                "rate_deg_s": 20.0,
-                "span_m": round(depth_ft * FT, 2),
-            },
-        },
-        {
+            **profile_notes,
             "length_waterline_m": f"{L_ft:.0f} ft, the boat's length (the pattern's; judgement "
             "from the ships' boats lists, which Luce's rule sizes).",
             "beam_m": f"{B_ft:.2f} ft, a quarter of the length (Luce 1866, 'Boats': a named "
