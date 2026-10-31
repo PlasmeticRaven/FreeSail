@@ -12462,6 +12462,340 @@ marked (†) and now print in the generator's report.
   staysail 225 and 226 m², leech 20.6 m, bunt 10.2 and 10.4 m, foot 14.6 m.
 
 
+## The eight hulls (package 75, SW-2 with SW-2b.2) (2026-10-31)
+
+The hull step: `frigate-36`, `brig`, `merchant-brig`, `cutter`, `lugger`, `smack`, `topsail-schooner` and `privateer-schooner` each drawn from her own sheets, on `docs/design/Build-Ships.md` §5 and §6 and the lead's note of 2026-10-31, "the hull step's ten points ruled". **Old is the tree at 30413223; new is the working tree as it goes to the one commit.** Measured at seed 7 on the owner's machine. Nothing in `freesail/physics/` or `freesail/combat/` moved, and no gun's calibre, `x_m` or number, no hull figure, spar, sail or rating moved in any file (§5.0 principle 8). The owner's sheets and report are in `docs/playtests/2026-10-31-hulls-the-eight/`; the sources by page are in the six pages notes, `docs/design/ships-design/pages-zaz2587.md`, `pages-zaz4491.md`, `pages-zaz6381.md`, `pages-zaz6306.md`, `pages-chapman-pl59.md` and `pages-chapelle-fig17.md`.
+
+### Every figure the sheets now disagree with: recorded, not moved
+
+By the lead's point 6 and principle 5, the S hulls are drawn at the sheet's length with the file's figures left alone. This is the one table, for the owner and a later package on the files' figures against the sheets. The hull's and the spars' figures in it are read by the physics, so moving one moves pins. **The brig's −27% is the one to look at first when that package comes.** "Drawn" is `freesail/ship/form.py` on the file as landed; a depth so drawn is at her greatest section, not at her keel.
+
+| Hull | Figure | The file | The sheets | Off by |
+|---|---|---|---|---|
+| **brig, merchant brig** | **`displacement_kg`** | **413 t (block judgement)** | **303 t drawn to WL1; 302 to 307 t by the stations; about 184 t at WL2** | **−27%: look here first** |
+| brig, merchant brig | `length_waterline_m` | 26.8 m (88 ft, judgement) | WL1 28.00 m moulded (91.86 ft); 29.02 m post to knee | +1.20 m |
+| brig, merchant brig | `beam_m` | 8.6 m | 8.53 m extreme, 8.38 m moulded | −0.07 m |
+| brig, merchant brig | `draught_m` | 3.5 m (mean, judgement) | 3.43 m WL1 to K at the middle (9.69 and 12.80 ft at the ends); drawn 2.87 m at the greatest section | −0.07 m |
+| brig, merchant brig | drag | 2 ft (judgement) | 3.11 ft in the 95 ft; Winfield p. 256's 7 ft 3 in and 10 ft 10 in lie near WL2 | +1.11 ft |
+| brig, merchant brig | `deck_height_m` | 1.5 m | the plank at the middle line 1.38 m; the deck at side 1.16 m | |
+| brig, merchant brig | fore mast `x_m`, `rake_deg` | +8.9 m, 1.2° | **+9.62 m**, 2.46° to WL1; in green, 1799, +9.37 m | 0.72 m abaft |
+| brig, merchant brig | main mast `x_m`, `rake_deg` | −3.9 m, 4.0° | −3.96 m, 3.03° to WL1; in green −4.07 m | 0.06 m |
+| brig, merchant brig | bowsprit `x_m`, `height_m` | 13.4 m, 4.5 m | root at the stem head +15.10 m, 3.44 m; 15.7° to WL1 | |
+| brig, merchant brig | rudder | blade 12 ft by 3 ft | 17.9 ft up the post, 2.5 to 3.8 ft broad | |
+| brig | guns' `x_m` | ±1.3, ±3.9, ±6.5, ±9.1; chase +12.0 | ports at −8.98, −6.41, −3.84, −1.28, +1.29, +3.90, +6.46, +9.00; port 10 +11.57 | 0.00 to 0.12 m; chase gun 0.43 m |
+| merchant brig | her four long 6s' `x_m` | ±4.0 | ports 4 and 7, −3.84 and +3.90 | 0.16, 0.10 m |
+| brig | `what` | "a brig-sloop of war, sixteen ports a side" | ten a side (read) | below; SW-4's |
+| frigate-36 | `displacement_kg` | 1,270 t (Cb 0.55) | 1,448 t drawn | +14% |
+| frigate-36 | `length_waterline_m` | 41.8 m (137 ft, judgement) | 43.74 m rabbet to rabbet at WL1; 44.35 m outside post and stem; 45.23 m post to knee | +1.94 m |
+| frigate-36 | `beam_m` | 11.7 m (*Amazon* as built) | 11.63 m extreme, the design's table | −0.07 m, no fault of the design |
+| frigate-36 | `draught_m`, her keel | 4.6 m (15 ft mean, judgement) | K 5.64 m (18 ft 6 in) at the middle, 5.86 m aft, 5.42 m forward; main keel 5.47 m; drawn 5.05 m at the greatest section | +1.04 m |
+| frigate-36 | trim | 13 ft forward, 17 ft aft (the file's note) | K 0.44 m (1.44 ft) down aft | |
+| frigate-36 | `lateral_area_m2` | 160 m² | about 242 m², K to WL1, no rudder (±3%) | +51% |
+| frigate-36 | `deck_height_m` | 1.8 m | 1.72 m at the middle line, 1.55 m at side | |
+| frigate-36 | `rudder` | 6.0 m², span 4.6 m | about 6.8 m², 5.67 m deep (±10%) | |
+| frigate-36 | fore mast `x_m`, `rake_deg` | +14.0 m, 1.5° | **+16.59 m**, none to 0.1° to K | 2.59 m abaft |
+| frigate-36 | main mast `x_m`, `rake_deg` | −2.0 m, 2.5° | −2.87 m, 0.8° to K | 0.87 m forward |
+| frigate-36 | mizzen mast `x_m`, `rake_deg` | −16.0 m, 4.5° | −15.38 m, 2.2° to K | 0.62 m abaft |
+| frigate-36 | bowsprit | `x_m` +21.0; its end 7.8 m above the water | crosses the stem at about +22.6, its axis 4.17 m above WL1, 19.5° to K; the outer end not drawn | |
+| frigate-36 | upper-deck guns' `x_m` | 13 a side, 2.75 m apart, −16.5 to +16.5 | 13 a side, 2.97 m apart, −18.57 to +17.34, 3.33 m across the main mast | up to 4.8 ft off the nearest port |
+| frigate-36 | quarterdeck's guns | 8 × 32-pounder carronades, 2 long 9s, −7.0 to −17.5 and −4.5: **INCORRECT by the owner's ruling, kept** (§11; Winfield p. 143) | 6 ports a side, −21.49 to −6.35, sills 4.08 to 4.51 m; the table's 8 × 9-pounders | no calibre or number touched |
+| frigate-36 | forecastle's guns | 2 long 9s at +17.5, 2 carronades at +14.0 | no port drawn; the rail 4.13 and 4.30 m there | |
+| cutter | `length_waterline_m` | 15.2 m (50 ft, judgement) | 16.50 m WL1 rabbet to rabbet (54 ft 1½ in); 17.09 m over all at the line | +1.30 m |
+| cutter | drag | 2 ft (Fincham p. 67) | 3 ft 0 in over the perpendiculars, 3.12° to the keel | +1 ft |
+| cutter | `draught_m` | 2.6 m | 2.67 m at the middle to the keel's lower edge; 10.0 ft at AP, 7.3 ft forward; drawn 2.29 m at the greatest section | +0.07 m |
+| cutter | `displacement_kg` | 106 t | 105 t drawn, 109 t by the sections | −1% |
+| cutter | `deck_height_m` | 0.9 m | 0.66 m at the middle, the deck's top, as built | |
+| cutter | mast `x_m`, `rake_deg` | +1.5 m (Fincham), 5.2° | **+2.63 m** (8 ft 8 in before the middle), 6.93° to the line | 1.13 m abaft |
+| cutter | bowsprit `height_m` | 1.2 m, near level | 1.01 m above the deck at the stem; 5.07° to the line | |
+| cutter | spars, feet | mast 61, boom 47, gaff 30, square-sail yard 46, topsail yard 32, bowsprit 43 | 66 ft 10 in, 51 ft 3 in, 30 ft, 43 ft 7 in, 33 ft 9 in, 47 ft (CHN0224, tentative at 1024 px) | |
+| cutter | keel | "44 ft 3 in" in the generator | 44 ft 7 in for tonnage on all three sheets | |
+| cutter | guns' `x_m` | three a side, −3.5, −0.5, +2.5 | four ports a side, −4.75, −2.35, +0.02, +3.58, four sweep ports between; six carriage guns (Charnock) | three guns between her four ports |
+| cutter | swivels | eight | ten (Charnock) | |
+| cutter | `rudder` | 1.2 m², span 2.7 m | about 1.9 m², 10 ft deep | |
+| lugger | `length_waterline_m` | 16.8 m (55 ft, judgement) | 18.33 m post to stem on the drawn line (60.14 ft, the re-read; the lead's note quotes the first reading's 18.39 m); 18.06 m between perpendiculars | +1.53 m |
+| lugger | `beam_m` | 6.2 m | 5.97 m outside at the rail; the extreme breadth is not drawn | |
+| lugger | `draught_m` | 2.1 m | not given; at least 2.1 m aft and 1.8 m at the forefoot. The stand-in draws 2.53 m (principle 7's one factor), 2.98 m at the heel, 2.18 m at the forefoot | drawn +0.43 m; the hold's floor line is no draught (point 2) |
+| lugger | trim | 3.1° by the draught's note | the green line 1.05° to the page; the stand-in's keel 3.0° | |
+| lugger | `displacement_kg` | 101 t | 101 t drawn, partly coincidence; 95 t moulded | +0% |
+| lugger | `deck_height_m` | 1.0 m | 0.86 m at the middle line; 0.74 m at side | |
+| lugger | fore mast `x_m`, `rake_deg` | +6.6 m (Forfait), 1.6° | **+7.90 m** (the plan's hole), 2.8° to the line | 1.30 m abaft |
+| lugger | main mast `x_m`, `rake_deg` | −0.7 m (Forfait), 4.8° | −1.34 m, 8.6° to the line | 0.64 m forward |
+| lugger | mizen mast `x_m` | −8.7 m (Forfait) | not drawn | |
+| lugger | bowsprit | height agrees: 1.5 m above the deck | 1.47 to 1.51 m; 5.5° to the page | see the rig below |
+| lugger | the lugs' feet, `corners_m` | 1.9 m above the water | the raised rail 2.18 to 2.84 m abaft −4.44, 1.94 to 2.83 m before +4.10 | see the rig below |
+| lugger | gun fit, "gun lugger 1795" | three guns, calibre unread | three 18-pounders (read, probable); no port | |
+| smack | `displacement_kg` | 46 t (Cb judgement) | 38 t on the plate's frames at her length and beam; first built on Steel's sloop, 53 t, +15% | **−18%, past the line, ruled (point 1)** |
+| smack | `length_waterline_m` | 12.2 m | 11.46 m on the plate's LWL, drawn at her length by 1.0646 | stand-in, carried to her figures |
+| smack | `beam_m` | 4.3 m | 4.06 m moulded, drawn at her beam by 1.0591 | |
+| smack | `draught_m` | 1.9 m (2.13 m aft, 1.68 m forward) | 1.79 m mean at her beam; the keel 2.05, 1.78 and 1.53 m; drawn 1.45 m at the greatest section | |
+| smack | `deck_height_m` | 0.75 m | the after deck 0.78 to 0.82 m; the fore deck 0.96 to 1.00 m | |
+| smack | bowsprit `x_m`, heel | +6.4 m; heel +3.84 m | the stem head +6.15 m; the post +4.09 m, notched at 2.37 m | see the rig below |
+| both schooners | `displacement_kg` | 211 t | 198 t drawn | −6% |
+| both schooners | `length_waterline_m` | 25.9 m (85 ft, judgement) | 26.84 m rabbet to rabbet; 27.71 m post to stem | stand-in, carried by k_L |
+| both schooners | `draught_m` | 3.3 m | 3.28 m mean of the heel's 3.91 m and the forefoot's 2.65 m; drawn 3.10 m at the greatest section | |
+| both schooners | `deck_height_m` | 0.9 m | 0.96 m at the middle line; 0.82 m at side | |
+| both schooners | fore mast `x_m` | +7.8 m | +8.26 m on the plate, +7.97 m by k_L | 0.17 m abaft by k_L |
+| both schooners | main mast `x_m` | −2.6 m | −2.60 m on the plate, −2.51 m by k_L | 0.09 m by k_L |
+| both schooners | the masts' `rake_deg` | 11.3° and 11.3° (Chapelle's 1 in 5) | 17.2° and 13.6° to the water; 13.5° and 9.9° to the keel | 5.9° and 2.3° |
+| privateer | letter of marque's long 6s' `x_m` | +8.4, 0.0, −8.4 | ports 2, 4, 6 at −7.20, +0.97, +8.80 | |
+| privateer | long tom fit's carronades' `x_m` | +10.5, −7.5 | port 7 at +11.82, port 2 at −7.20 | |
+| both schooners | bowsprit | `length_m` 3.6 m, its end 3.0 m above the deck | its edges 9.2° and 10.5° to the water, its heel inboard; about 2 m beyond the knee on the plate | see the rig below |
+| both schooners | `rudder` | 2.0 m², span 3.4 m | the blade 3.9 m deep, 0.45 to 0.9 m wide (tentative) | |
+
+### The port triples before L2
+
+Recorded as measured. **The lead's word (point 7): L2's thresholds are judged against these when L2 is built and not before. The cutter's sills at 1.00 to 1.23 m and her lowest port shut at 14.5° are flagged for the owner's test when L2 comes; a cutter's low freeboard may well be the truth of it.** Nothing reads a gun's height until then (`combat/ports.py` is stage 0's hook; `Battery._shut` stayed empty on every tick of the trace).
+
+The rule is §7.1's, on heel alone: shut when the sill less the half-breadth × sin(heel) falls to `PORT_SHUT_M`, 0.3048 m (`combat/shot.py`, `lee_port_shut`, checked against that function at each figure). The half-breadth is the triple's own. The gap is the triple's half-breadth less the drawn side at its sill, reported and never moved (§5.0 principle 8): a triple in a new ship's `measured` raises over 0.05 m; the brig's at x +6.5 stands at 0.051 m, reported. Per point 5 no gun's x moved, so a triple at a gun's place is the sheet's sill line and side at that x, marked `judged`, and the sheet's own ports stay in each module (`SHEET_PORTS`, `SHEET_PORTS_M`, `PORTS`) for package 81. The lugger and the smack have no port. The merchant brig's triples are the brig's but for two, her own guns' at x −4.0 (sill 1.60, half-breadth 4.12, gap +0.028, shut at 18.3°) and +4.0 (1.62, 4.21, +0.009, 18.2°); only those two hold guns, the rest are the class's ports. The topsail schooner carries the triples and no gun.
+
+| File | Deck | x (m) | Sill (m) | Half-breadth at the sill (m) | Gap to the drawn side (m) | Shut at | On half the beam | What stands there |
+|---|---|---|---|---|---|---|---|---|
+| frigate-36 | upper | -16.50 | 2.51 | 4.84 | -0.000 | 27.1° | 22.1° | gun |
+| frigate-36 | upper | -13.80 | 2.42 | 5.13 | -0.006 | 24.4° | 21.2° | gun |
+| frigate-36 | upper | -11.00 | 2.35 | 5.30 | -0.009 | 22.7° | 20.5° | gun |
+| frigate-36 | upper | -8.20 | 2.28 | 5.44 | -0.006 | 21.3° | 19.7° | gun |
+| frigate-36 | upper | -5.50 | 2.24 | 5.52 | +0.001 | 20.5° | 19.3° | gun |
+| frigate-36 | upper | -2.80 | 2.21 | 5.57 | -0.012 | 20.0° | 19.0° | gun |
+| frigate-36 | upper | +0.00 | 2.19 | 5.60 | +0.002 | 19.7° | 18.8° | gun |
+| frigate-36 | upper | +2.80 | 2.20 | 5.60 | -0.002 | 19.8° | 18.9° | gun |
+| frigate-36 | upper | +5.50 | 2.23 | 5.60 | -0.003 | 20.1° | 19.2° | gun |
+| frigate-36 | upper | +8.20 | 2.28 | 5.57 | -0.001 | 20.8° | 19.7° | gun |
+| frigate-36 | upper | +11.00 | 2.34 | 5.48 | +0.004 | 21.8° | 20.4° | gun |
+| frigate-36 | upper | +13.80 | 2.42 | 5.31 | +0.004 | 23.5° | 21.2° | gun |
+| frigate-36 | upper | +16.50 | 2.51 | 4.83 | +0.001 | 27.2° | 22.1° | gun |
+| frigate-36 | quarterdeck | -17.50 | 4.28 | 4.52 | -0.021 | 61.6° | 42.8° | gun |
+| frigate-36 | quarterdeck | -14.00 | 4.15 | 4.95 | -0.014 | 51.0° | 41.1° | gun |
+| frigate-36 | quarterdeck | -10.50 | 4.05 | 5.21 | -0.013 | 46.0° | 39.8° | gun |
+| frigate-36 | quarterdeck | -7.00 | 3.97 | 5.37 | -0.007 | 43.0° | 38.8° | gun |
+| frigate-36 | quarterdeck | -4.50 | 4.11 | 5.42 | +0.001 | 44.6° | 40.6° | gun |
+| frigate-36 | forecastle | +14.00 | 4.08 | 5.08 | -0.008 | 48.0° | 40.2° | gun |
+| frigate-36 | forecastle | +17.50 | 4.25 | 4.56 | +0.005 | 59.9° | 42.4° | gun |
+| brig | upper | -11.55 | 1.89 | 3.40 | +0.024 | 27.8° | 21.6° | port 1, no gun |
+| brig | upper | -9.10 | 1.77 | 3.71 | +0.021 | 23.3° | 19.9° | gun |
+| brig | upper | -6.50 | 1.66 | 3.96 | +0.028 | 20.0° | 18.4° | gun |
+| brig | upper | -3.90 | 1.60 | 4.13 | +0.033 | 18.3° | 17.5° | gun |
+| brig | upper | -1.30 | 1.57 | 4.21 | +0.022 | 17.5° | 17.1° | gun |
+| brig | upper | +1.30 | 1.58 | 4.25 | +0.030 | 17.5° | 17.3° | gun |
+| brig | upper | +3.90 | 1.62 | 4.21 | +0.007 | 18.2° | 17.8° | gun |
+| brig | upper | +6.50 | 1.70 | 4.14 | +0.051 | 19.7° | 18.9° | gun |
+| brig | upper | +9.10 | 1.84 | 3.80 | +0.033 | 23.8° | 20.9° | gun |
+| brig | upper | +12.00 | 2.02 | 2.87 | +0.021 | 36.7° | 23.5° | chase gun |
+| cutter | upper | -4.75 | 1.01 | 2.56 | -0.004 | 16.0° | 14.1° | the sheet's port, no gun |
+| cutter | upper | -3.50 | 1.00 | 2.69 | +0.003 | 15.0° | 13.9° | gun, both fits |
+| cutter | upper | -2.35 | 1.00 | 2.77 | +0.000 | 14.5° | 13.9° | the sheet's port, no gun |
+| cutter | upper | -0.50 | 1.03 | 2.85 | +0.004 | 14.7° | 14.5° | gun, both fits |
+| cutter | upper | +0.02 | 1.04 | 2.86 | -0.001 | 14.9° | 14.7° | the sheet's port, no gun |
+| cutter | upper | +2.50 | 1.15 | 2.85 | -0.001 | 17.3° | 16.9° | gun, both fits |
+| cutter | upper | +3.58 | 1.23 | 2.79 | -0.004 | 19.4° | 18.6° | the sheet's port, no gun |
+| both schooners | upper | -10.86 | 1.19 | 2.79 | -0.008 | 18.5° | 14.0° | the plate's port 1, no gun |
+| both schooners | upper | -8.40 | 1.07 | 3.06 | +0.006 | 14.5° | 12.1° | letter of marque's gun |
+| both schooners | upper | -7.50 | 1.04 | 3.14 | +0.007 | 13.5° | 11.6° | long tom fit's gun |
+| both schooners | upper | -2.08 | 0.95 | 3.51 | +0.004 | 10.6° | 10.2° | the plate's port 3, no gun |
+| both schooners | upper | +0.00 | 0.96 | 3.61 | +0.004 | 10.5° | 10.3° | letter of marque's gun |
+| both schooners | upper | +4.81 | 1.11 | 3.56 | +0.001 | 13.1° | 12.7° | the plate's port 5, no gun |
+| both schooners | upper | +8.40 | 1.30 | 3.06 | +0.016 | 19.0° | 15.8° | letter of marque's gun |
+| both schooners | upper | +10.50 | 1.44 | 2.29 | -0.008 | 29.7° | 18.1° | long tom fit's gun |
+
+**The lowest shut heels, old beside new** (old, the file's height on half its beam; new, the triple's own half-breadth):
+
+| File | Old | New, her lowest triple | New, her lowest with a gun in it |
+|---|---|---|---|
+| frigate-36, upper deck | 2.40 m, 21.0° | 2.19 m, 19.7° | the same |
+| frigate-36, quarterdeck | 4.50 m, 45.8° | 3.97 m, 43.0° | the same |
+| brig | 2.10 m, 24.7° | 1.57 m, 17.5° | the same |
+| merchant brig | 2.10 m, 24.7° | 1.57 m, 17.5° | 1.62 m, 18.2° |
+| cutter | 1.50 m, 24.3° | 1.00 m, 14.5° | 1.03 m, 14.7° (1.00 m, 15.0° at x −3.5) |
+| both schooners | 1.00 m, 11.0° | 0.96 m, 10.5° (the lowest sill, 0.95 m, 10.6°, a port with no gun) | letter of marque 0.96 m, 10.5°; long tom fit 1.04 m, 13.5° |
+
+**Against the heels the game reaches** (the check on a clean archive, both trees alike): a broadside on the lee side at a mark a cable to larboard heels the frigate 2.65°, the brig 3.44°, the merchant brig 1.24°, the cutter 5.84° and the privateer 8.52°; by the rule's arithmetic no port is shut at those heels on either tree. The privateer's 8.52° against her 10.5° is the closest, and the first place L2 may move a pin (§7.3).
+
+### Truth 7-185's band: the one pin this step moves
+
+Truth 7-185 had no code at the base; it is drafted in `tests/test_profiles.py`, as §15 directs, for Phase 5 to move into `tests/test_known_truths.py`. The lead's point 4 moves the brig's band, the sheet deciding over the rule (§5.0 principle 12).
+
+| File | Old band, its source | New band, its source | Lowest sill as filed |
+|---|---|---|---|
+| **brig, merchant brig** | **1.22 to 1.52 m: Steel 1805 p. 124's four to five feet for "sloops, cutters, &c." (OCR l. 8268-8271), rung R, §5.4 as first written** | **5 ft 2 in ± 0.05 ft above WL1, 1.555 to 1.585 m: ZAZ4491's port 5, rung S (`pages-zaz4491.md` §5.7, §7)** | **1.57 m** |
+| frigate-36 | first written here | 7.19 ft ± 0.20 ft above WL1, 2.13 to 2.25 m (`pages-zaz2587.md` §7.1). Steel's 36's 2.34 m stands above it, recorded, not ruled on | 2.19 m |
+| cutter | first written here | 3.32 ft ± 0.09 ft above the line, 0.985 to 1.039 m (`pages-zaz6381.md` §5.8). Steel's 1.22-1.52 m stands above it, flagged | 1.00 m |
+| both schooners | first written here | 3.11 ft ± 0.05 ft, 0.933 to 0.963 m, the plate's own lowest (`pages-chapelle-fig17.md` §5.4, §6.2). *Spider*'s 3 ft 5 in of 1835 recorded beside it (point 3) | 0.95 m |
+| the 64; the razee | first written here, as truth 7-186 has them | 1.50 to 1.56 m; 1.95 to 2.01 m (ZAZ1407's 5.02 ft and the razee's rise) | 1.53 m; 1.98 m |
+
+### The three captain's trials
+
+Named once, here, as the lead asked, so that the owner's machine's difference from the build machine is written where the next reader looks. All three are in `tests/test_captain_trials.py` and fail on this machine **with or without the work**: the same asserts and figures on a clean archive of 30413223 (3 failed, 3 passed, 1 expected failure in 300.28 s) and on the tree, and the whole logs of all five trials, data included, byte-identical between the two. In each, every state and tick the test pins holds; only the digest differs, and in the merchant's trial two lines as well. One machine cannot show which lines differ from the build machine's, so the cause of the difference is not established here.
+
+| Test | The trial | Fails on | On a clean archive here | The pin |
+|---|---|---|---|---|
+| `test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it` | trial-station-lee-shore | the digest (line 258) | digest eb06bd7b36cbeff8; 1,597 lines; all 11 states equal to the pins; hove to at 10249, 15590, 42450; never aground; ends keeping station | ed48ca3d61e52f20; 1,597 |
+| `test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_wind` | trial-trade-stranger | the line count (line 368) | 1,249 lines; digest 21f03494d5bb62ae; all 8 states equal; anchored 51849, as pinned; one wait, 25 haulings off, fired at at 17362; never aground; in port | 1,247 lines; 02313d83240a11d5 |
+| `test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits` | trial-trade-thick | the digest (line 418) | digest df5f02eb6e6ce68a; 426 lines; all 4 states equal; anchored 12850, as pinned; never aground; in port | cfa538b19cb0d2fe; 426 |
+
+Beside them, trial-station-stranger holds its pins here (788 lines, d56963daf49d566a), and trial-station-gale stays the expected failure (1,014 lines against 909, aground 42394 and 44380). Package 88, the captain's pass, holds these pins and merges next (the lead's note).
+
+### Left and reported
+
+- **The lugger's bowsprit at 21.8 kN** (the lead's point 9): left, a tuning pass's. It is the flying jib alone, whose chain runs through it, in 55 kn. Rule (3)'s words, the larger of the rating named in the script (both jibs in 55 kn) and the sails', give 37.4 kN, +15.6 kN (measured: her file built into scratch; `pages-zaz6306.md` §7). A figure the physics reads, not moved. If the pass comes to it, `tests/test_hull_lugger.py`'s `test_a_diff_of_her_files_physics_keys_against_git_shows_none` is rebased with it.
+- **"Sixteen ports a side"** (the lead's point 8): left for SW-4. ZAZ4491 has ten a side (read). The word stands in the brig's `what` and in `freesail/world/ships.py`'s `DESCRIPTIONS`, a captain's docstring, a test's literal and the served primer, and `tests/test_captain_trials.py`'s `TRIAL_STATION_STRANGER_DIGEST` holds it through the lookout's words (`pages-zaz4491.md` §7, read, not run), so mending it moves all of those at once with no behaviour meant.
+
+### What did not move: the check on a clean archive
+
+The clean archive of 30413223 against the tree: **every log line, order's answer, each tick's dynamics as exact floats, the rig every 30 ticks, end ticks, random streams' final states, volleys and guns' counts identical**, and all ten polars byte-identical (`polar_of` and the sailed sweep in 15 kn at 14 angles). Regenerating gives all ten files byte for byte; `sixty-four.yaml` and `razee-44.yaml` equal the base; `git diff 30413223 -- freesail data/evolutions data/sail_classes.yaml data/people` is empty. The loaded keys that differ on the eight: `hull.profile`; port guns' `height_m` (frigate 40, brig 18, merchant brig 4, cutter 20, privateer 19) and `deck`; and text only, `ship.era_notes` on the brig and the cutter, the letter of marque fit's `source`.
+
+| The voyage at seed 7, 5,100 ticks, both trees alike | Lines | Tacked | Wore | Hove to |
+|---|---|---|---|---|
+| frigate-36 | 201 | 1653 | 3208 | 4421 |
+| brig | 255 | 1605 | 3174 | 4380 |
+| merchant brig | 247 | 3799 | 4305 | 4875 |
+| cutter | 201 | 1306 | 3164 | 4346 |
+| lugger | 138 | 1380 | 2871 | 4286 |
+| topsail schooner | 178 | 1345 | 3177 | 4354 |
+| privateer schooner | 178 | 1345 | 3177 | 4354 |
+| smack | 206 | refused at 1249, "she is not close-hauled"; 1721 from 315° full and by | 3203 | 4472 |
+
+**The one test the work moved.** `tests/test_scenarios.py`'s `test_a_merchant_brig_free_sails_a_merchant_brigs_own_file` compared her hull with the brig's whole. Old: `doc["hull"] == harpy["hull"]`. New: all of the hull but `profile.ports_m`, in which the two differ by her own guns' ports, pinned by `tests/test_hull_brig.py`. No ship byte moved for it. The fast tier before that mend: 5,750 passed, 1 failed (that test), 2 skipped, 44:38. `SLOW_TESTS` was not moved; the pair check ran 3 s alone and 4.8 s on four workers after the mend, under the 5 s threshold.
+
+**Loading** (scratch timing, no test): `load_ship` on the eight is slower with a profile, the frigate 85 to 121 ms, the smack 34 to 66 ms; `ship_graph` about 0.1 to 1.7 ms.
+
+**The pictures** (`tests/test_pictures.py`, the frigate's ship view, thresholds `BLANK_STD` 8.0 and `DARK_FRACTION` 0.001 unmoved; old is a clean archive, new the tree; 960 × 720):
+
+| | Old std, dark | New std, dark |
+|---|---|---|
+| Through the API door | 41.42, 2.73% | 44.25, 3.27% |
+| Through the bridge | 41.52, 2.76% | 44.33, 3.29% |
+
+The same measures on the client's own drawing abeam, furled, then under plain sail (scratch, not a test):
+
+| File | Old furled | New furled | Old plain | New plain |
+|---|---|---|---|---|
+| frigate-36 | 41.3, 2.73% | 44.4, 3.38% | 41.0, 2.60% | 43.8, 3.20% |
+| brig | 44.5, 3.43% | 45.5, 3.28% | 44.1, 3.28% | 44.9, 3.10% |
+| merchant brig | 44.5, 3.43% | 45.5, 3.28% | 43.9, 3.28% | 44.8, 3.11% |
+| cutter | 41.2, 2.72% | 43.0, 2.60% | 40.8, 2.67% | 41.9, 2.30% |
+| lugger | 42.7, 3.25% | 44.5, 3.42% | 40.9, 2.81% | 40.0, 1.90% |
+| smack | 49.9, 4.21% | 51.8, 4.30% | 49.6, 4.21% | 50.9, 3.86% |
+| both schooners | 41.6, 2.75% | 40.8, 2.16% | 40.2, 2.52% | 37.7, 1.30% |
+
+### The viewer's mends in the landing, old beside new
+
+The lead's point 10. `client/projection.js` and `client/shipview.js`; no served figure moved but the cutter's stem head below. `tests/test_view_geometry.py` passed 616 at the first pass and about 100 more after the review; each mend was shown to fail its guard when undone (24 of 25 in a scratch copy; the 25th the generator itself refused).
+
+| What | Old | New | Why |
+|---|---|---|---|
+| A port band's chord, worst off the drawn side | frigate 0.613 m, razee 0.109, brigs 0.101, 64 0.095, cutter 0.030, smack 0.017, schooners 0.009, lugger 0.005 | within 2 mm on all ten | the band now follows the side through every height its strip's stations have a point at |
+| Sky between the head's block and the stem, largest | 64 0.092 m² at 105°; schooners 0.089 at 135°; frigate 0.037; brigs 0.026; razee 0.023 | none | a back strip across the block |
+| The knee's foot depth | −0.8 m on every file | the foot of the stem's closure: brigs −0.44, frigate −0.52, schooners −0.22, 64 and razee −0.8 | it stood under the low line |
+| The schooners' head plate | from the knee's top straight to the stem head, a wedge 0.85 m high; its foot starting in the air at +0.52 m, a step 0.4 m across | level back to the stem at 1.82 m; the foot on down the stem | no sheet has them |
+| The sheet to the taffrail, the cutter | (−9.23, 1.83), her rail's after end | (−9.51, 1.95), the stern's line's top | the same point on the other nine |
+| Boom frame, how far the bounds moved with sheet and tack | schooners 6.97 m, frigate 5.59, brigs 4.92, cutter 4.25, smack 3.13 | 0, but the smack's frame top, 0.09 m at heel 0.3 rad (her gaff, recorded) | the every-way frame, keyed on a profile (Ext §17.11's), the eight taking it here |
+| The boom sail's sheet end, x at 18°, larboard | frigate −30.93, brigs −22.00, cutter −14.43, smack −10.43, schooners −22.11 | the taffrail on the centre line, −25.27, −16.47, −9.51, −7.09, −15.32 | keyed on a profile, the eight taking it here |
+| The figure and scroll hidden behind the head's plate, worst | frigate 0.87 m², 64 1.21, razee 1.36 | 0.04, 0.05, 0.13 | a shape sorts with its plate |
+| Deck hidden by far strips, near end on | a saw-tooth edge; summed across views, smack 2.9 m², frigate 80 | 0.01 m² or less at facing 165 up to heel 0.175; summed, smack 0.7, frigate 21. Still seen, recorded: the schooners' 0.38 m² at facing 30 and 0.3 rad, unchanged | a face seen from inside goes first, margin 0.2 |
+| The frigate's forecastle bulkhead over her deck | 1.60 m²; 64 3.13; razee 3.80 | nil | seen only from its open side |
+| The transom nibbled at its corners from abaft | frigate 1.03 m², 64 3.41 | 0.13, 0.78 | the stern takes its layer abaft about 120° |
+| The cutter's stem head | a pointed fin | square across at its after edge: `rail_m` ends (8.33, 2.44), (8.34, 2.81); `breadth_m` adds (8.33, 0.11, 0.11) (`pages-zaz6381.md` §5.5). Her served stations move with it; no gun, spar or filed figure | read against the note |
+| Sum of the hull and sails against a depth buffer, four sailed states, eight files, 24 facings | 659.4 m² | 579.8 m² | the painter's order as built; the review's prototype measured 646.2 |
+
+Not mended, for the owner's eye or a later builder: the far quarter gallery proud of the hull by up to 1.10 m on the frigate, 1.27 on the 64 and 1.21 on the razee at facings 150 to 172 (the plain box's 0.75 m on a quarter wider than the transom); a pale streak of deck under the schooners' transom at facing 150, heel 0.147, which no sort order cures; `form.py`'s `_station_xs`, which with a breadth line abaft the post stands stations abaft the stern's line at the water (a box under the counter), for a later ship's builder.
+
+### Where the existing rig no longer sits right on the new hull
+
+The owner, on the streams' sheets: "the only things I see right off the bat aren't from you but from how the already existing rigging doesn't fully match visually with your new work". Measured here on the final tree, hull by hull, from the figures the game's own viewer draws (`buildSkeleton` in `client/projection.js`) on the states the game's own world serves, plain sail in 15 knots at seed 7. **Moved by nobody now.** Each row says whether it comes from a file figure the physics reads (**F**: for the later package, with the table above) or from the viewer's own rule (**V**: drawing alone, no pin reads it, and nothing that sails). The ring numbers are those on the close sheets in `docs/playtests/2026-10-31-hulls-the-eight/pictures/`.
+
+**The one cause under most of it.** The old hull's rail stood at the file's datum, `deck_height_m`. So the viewer's rule for where a line comes down, half the file's beam out at the datum, put every sheet and brace on the old rail exactly. The new rail has risen and the deck has gone below the datum, so the same ends now stand part-way down the side or off it. They were never wrong against the old drawing.
+
+| At the middle, m above the water | frigate-36 | brigs | cutter | lugger | smack | schooners |
+|---|---|---|---|---|---|---|
+| Old rail, the datum | 1.80 | 1.50 | 0.92 | 1.00 | 0.76 | 0.90 |
+| New rail | 3.50 | 2.54 | 1.58 | 1.50 | 1.44 | 1.87 |
+| New deck at side | 1.55 | 1.15 | 0.66 | 0.74 | 1.00 | 0.82 |
+
+**What the viewer does not draw at all (V, on every hull):** no shroud, backstay, chain, deadeye or channel, and no bare stay. The files carry the lines (the frigate's graph has 6 shrouds, 6 backstays and 16 stays), and the physics reads them; the drawing has only braces, lifts, sheets and hauled bowlines, and a stay shows only as the luff of a sail hanked to it. So nothing stands against a drawn channel today, and the drawn `channel_wales_m` on the cutter and the smack are plain bands. **For whoever draws them:** the sheets' channels stand to the sheets' masts, not the files'. On the frigate the fore channel is about +9.2 to +16.5 m (102 to 126 ft from AP, read, ±1 ft), ending abreast the sheet's mast with the file's mast 2.5 m abaft that end, and the main is about −11.5 to −3.0 m with the file's mast 1.0 m forward of its fore end. On the cutter the four deadeyes stand +0.66 to +2.76 m, ending at the sheet's mast with the file's mast 1.24 m abaft that. On the schooners' plate the fore channel is +5.26 to +8.45 m and the main −5.18 to −2.54 m. The brig's fore and main channels stand at the plank-sheer, the lugger's along her band, the smack's 0.5 to 5.6 ft before the middle with three deadeyes.
+
+**What sits right, on every hull:** each lower mast's foot on her drawn deck and its head unmoved; yards, topsail sheets, lifts and the braces that lead to the next mast aft, all up in the rig; the sheet of a boom sail to the taffrail; a jib or flying jib tacked at the bowsprit's or jib-boom's end. The bowsprit from the stem head is far nearer the sheets than it was: old 32.7° on the frigate, 32.0° on the brigs, 56.4° on the schooners.
+
+**frigate-36**
+
+| Ring | What | Measured | From |
+|---|---|---|---|
+| 5, 4 | Masts off the sheet's places | fore 2.59 m abaft, main 0.87 m forward, mizzen 0.62 m abaft; rakes 1.5°, 2.5°, 4.5° against none, 0.8°, 2.2° to K. So the main stands in the waist, on the upper deck at 1.55 m, 0.44 m forward of the quarterdeck's break, where the sheet has her through the quarterdeck | **F** `x_m`, `rake_deg` |
+| 7 | The bowsprit's rise | 16.86° from the stem head (22.66, 4.58) to the file's end at 7.80 m; the sheet's 19.5° to K, its axis crossing the stem at 4.17 m. Jib-boom 13.77°, flying jib-boom 10.29°. None of it inboard of the stem | **F** the end's `height_m`; **V** the heel |
+| 3 | The spanker's boom through her stern | at 4.20 m: 1.83 m under her taffrail on the centre line, 0.10 m under the quarterdeck at x −24.59, 4.32 m past the taffrail. Swung out under plain sail its foot runs 1.18 m under the rail from x −16 to −21.7 and comes out through the quarter | **F** the boom's `height_m` 2.4 (the 64's and razee's were raised at her stage B, hers not) |
+| 1 | Mizzen yards' braces | end at (−21.0 to −23.6, ±5.85, 1.80): under the counter, in the air, 3.5 to 3.7 m below the rail and 1.9 to 2.3 m outboard of it | **V** `:1670`, half the beam at the datum, with no mast aft to lead to |
+| 2 | Courses' sheets | end at half the beam, the datum: 1.74 to 3.18 m under the rail, 0.14 to 0.51 m off the side | **V** `:1730` |
+| 9 | The fore course's weather sheet | ends 0.23 m forward of the stem head and 5.85 m out, in the air, the yard braced sharp | **V** `:1730` |
+| 6 | Jib and fore topmast staysail sheets | on her drawn side at x +13.0, at the datum, 2.29 m under the rail, down at the port band | **V** `:1044` |
+| 8 | Fore lower studding-sail booms | at 2.80 m, 1.33 m under the rail where they start, on the yard's line, in the air off the side; from ahead a thin line past the bow | **F** `height_m` 1.0; **V** on the yard's line |
+| | The fore stay's foot | at (20.90, 1.80), half the file's length and the datum: inside her, 2.29 m under the forecastle deck, 1.76 m abaft the stem head. Seen only as the fore storm staysail's tack, at 2.59 m, through the forecastle | **V** `:1013`, on **F** `length_waterline_m` |
+| | Sails not in plain sail | the mizzen staysail's foot 1.31 m under the rail (file `corners_m`); the storm mizzen's 1.17 m; the mizzen storm staysail's 2.54 m; the save-all's 3.47 to 3.96 m | **F** and **V** by sail |
+
+**brig and merchant brig** (one hull, one rig; the merchant brig's sheet ends differ only with her sail)
+
+| Ring | What | Measured | From |
+|---|---|---|---|
+| 4 | Masts off the sheet's places | fore 0.72 m abaft, 1.2° against 2.46° to WL1; main 0.06 m, 4.0° against 3.03° | **F** |
+| 6 | The bowsprit's rise | 17.53° from the stem head (15.10, 3.44), the sheet's own root, to the file's end at 6.00 m; the sheet's 15.7°. Jib-boom 19.03°, flying jib-boom 12.02°: the jib-boom rises steeper than the spar it stands on | **F** `height_m`; **V** the heel |
+| 3 | The boom through her transom | at 3.30 m: 0.38 m under her taffrail on the centre line, 4.36 m past it; 1.63 m clear of the deck | **F** `height_m` 1.8 |
+| 1 | Main yards' braces | end at (−8.5 to −10.65, ±4.30, 1.50): 1.31 to 1.46 m under the rail and 0.53 to 0.77 m off the side at that height. No mast aft to lead to, so from astern they stop in the air | **V** `:1670` |
+| 2 | Courses' sheets | 1.07 to 1.46 m under the rail, 0.07 to 0.77 m off the side | **V** `:1730` |
+| 8 | The fore course's weather sheet | ends 0.17 m forward of the stem head, 4.30 m out | **V** `:1730` |
+| 5 | Jib sheets | on her drawn side at x +7.9, 1.35 m under the rail | **V** `:1044` |
+| 7 | Fore lower studding-sail booms | at 2.50 m, 0.33 to 0.57 m under the rail where they start | **F** `height_m` 1.0; **V** |
+| | The fore stay's foot | at (13.40, 1.50): 0.23 m under her deck, 1.70 m abaft the stem head; seen only as the storm staysail's tack, 1.33 m under the rail | **V** `:1013` |
+
+**cutter**
+
+| Ring | What | Measured | From |
+|---|---|---|---|
+| 2 | The mast off the sheet's place | 1.13 m abaft; 5.2° against 6.93° to the line | **F** |
+| 3 | The bowsprit's rise | level, from the top of her stem head at 2.81 m; the file's end, 2.10 m, is below that, so the viewer gives it no rise and draws the end 0.71 m high. The sheet: its centre 2.42 m at the stem head, 5.07° to the line, and perhaps beside the stem. Old 7.18° from the datum | **F** `height_m`; **V** the heel, on the stem head box mended at this landing |
+| 4 | The fore staysail's foot | its tack at (7.30, 1.54), 0.71 m under the rail; the foot runs under the rail back to x +3.31 and shows as a pale tab at the rail on the lee side | **V** `:1013` |
+| 5 | Staysail and jib sheets | on her drawn side at x +0.5, 0.69 m under the rail | **V** `:1044` |
+| 1 | Braces of her yards | end at (−2.65 to −5.26, ±2.90, 0.90): 0.62 to 0.65 m under the rail, 0.14 to 0.38 m off the side | **V** `:1670` |
+
+Her boom clears her taffrail by 0.45 m: it sits right.
+
+**lugger**
+
+| Ring | What | Measured | From |
+|---|---|---|---|
+| | Masts off the sheet's places | fore 1.30 m abaft, main 0.64 m forward; 1.6° against 2.8°, 4.8° against 8.6° to the line; the mizen on no sheet | **F** |
+| 4 | The mizen's foot | at x −8.73, abaft her deck's end at −8.27, drawn at that deck's end's height, 1.17 m; drawn over her near side heeled 20° or more | **V** `footOnDeck` |
+| 6 | The bowsprit's rise | level at 2.83 m, the rail at the stem; the file's end, 2.50 m, is below it, drawn 0.33 m high. The sheet: 5.5° to the page. Old 9.59° | **F** `height_m`; **V** the heel |
+| 5 | The fore lug's foot under her raised rail | at 1.90 m: 0.67 m under the rail at the bow, from x +4.7 to +8.39; a pale sliver of it shows at the stem from the lee bow | **F** `corners_m` |
+| 1 | The main lug's foot | 0.41 m under the raised after rail, x −4.56 to −5.98 | **F** `corners_m` |
+| | The mizen lug's tack | (−8.65, 1.90), 0.77 m under the rail | **F** `corners_m` |
+| 7 | The jib's tack | (8.31, 1.60): inside her bow, 0.95 m under the rail, not out on the bowsprit; its stay is filed on the lower fore mast, so it lands at the stem. The flying jib is tacked at the bowsprit's end | **V** `:1013` |
+| 2 | The mizen lug's sheet | ends at (−13.67, 3.10, 1.00) on the lee side, 4.22 m abaft her taffrail, in the air. No outrigger is filed | **V** `:1724`, on **F** the clew |
+| 3 | The main lug's sheet | ends 0.03 m abaft the taffrail, 3.10 m out, where her round stern is narrow | **V** `:1724` |
+| | The fore lug's and jib's sheets | the fore lug's 0.52 m under the rail, 0.07 m off the side; the jib's on the side at x +5.6, 1.07 m under the rail | **V** |
+| 8 | The lowered lugs (furled) | along the deck at 1.60 m: the mizen yard comes out through her stern, 1.24 m under the taffrail, its end 4.91 m past it | **V** deck + `ON_DECK_M`, on **F** `corners_m` |
+
+**smack**
+
+| Ring | What | Measured | From |
+|---|---|---|---|
+| | The mast | +1.8 m, within the chains' 1.7 to 2.2 m: it sits right | |
+| 3 | The bowsprit's rise | level at 2.60 m, the top of her stem head; the file's end, 1.75 m, is below it, drawn 0.85 m high. The plate's post is notched at 2.37 m at her size. Old 9.13° | **F** `height_m`; **V** the heel |
+| 2 | Staysail and jib tacks | (5.90, 1.31), both landing at the stem: 1.29 m under the rail; the feet run under the rail back to x +4.6 and show over her side to leeward. Under the rail on old and new alike, and now over the side | **V** `:1013` |
+| 5 | Their sheets | on her drawn side at x +0.8, 0.73 m under the rail and 0.28 m under her fore deck | **V** `:1044` |
+| 4 | The boom | at 1.95 m: 0.11 m under her taffrail on the centre line; 0.86 m clear of her deck | **F** `height_m` 1.2 |
+| 1 | Her yards' braces | end at (−1.64 to −2.25, ±2.15, 0.75), 0.66 to 0.68 m under the rail, 0.11 to 0.17 m off the side; faint | **V** `:1670` |
+
+**topsail schooner and privateer schooner** (one hull, one rig)
+
+| Ring | What | Measured | From |
+|---|---|---|---|
+| 7 | The masts | fore 0.17 m abaft by k_L, main 0.09 m; both 11.3° against the plate's 17.2° and 13.6° to the water, the one figure of hers the eye can read at once | **F** `rake_deg`, `x_m` |
+| 4 | The bowsprit's rise, and its elbow | 19.98° from the stem head (14.34, 2.67) over the file's short 3.6 m to its end at 3.90 m, then the jib-boom at 7.87°: a kink at x +17.72. The plate's bowsprit is one spar at 9.2° to 10.5°, its heel inboard. Old 56.44° | **F** `height_m`, `length_m`; **V** the heel |
+| 3 | The boom | at 2.40 m: 0.02 m under her taffrail on the centre line, 5.68 m past it; so it lies on the transom's top from astern | **F** `height_m` 1.5 |
+| 5 | Staysail and jib tacks | (12.59, 1.65), landing at x 12.95 and the datum, 1.39 m abaft the stem head: 0.86 m under the rail; the feet run under the rail back to x +5.4 and show as a pale tab on the lee side | **V** `:1013` |
+| 6 | Their sheets | on her drawn side at x +6.8, 1.20 m under the rail, 0.08 m under her deck | **V** `:1044` |
+| 1 | The fore sail's two sheets | end at (−4.44, ±3.65, 0.90), 0.99 m under the rail and 0.26 m off the side | **V** `:1741` |
+| 2 | The fore topsail's sheets | end at half the beam, the datum: the lee at x −0.55, 0.06 m off the side; the weather at x +9.95, 1.15 m off it, 1.40 m under the rail, the yard braced sharp | **V** `:1730` |
+
+**What the two kinds come to.** Every V row is one small viewer rule, three of them in all: the line's end at half the beam and the datum (`:1670`, `:1724`, `:1730`, `:1741`), the sheet at the datum on the drawn side (`:1044`), and the stay's foot at half the file's length and the datum (`:1013`). Reading the drawn rail and the stem head in place of those would mend the most of what the owner sees, moving no pin and no file; it is not done here. The F rows are a boom each on the frigate, the brigs, the smack and the schooners, the masts, the bowsprits' heights and the lugs' feet, and they go with the table above when a later package takes the files' figures against the sheets.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

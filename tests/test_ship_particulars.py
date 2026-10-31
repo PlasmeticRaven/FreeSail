@@ -230,7 +230,7 @@ def test_schooner_hull_is_lynx_of_1812(schooner):
     assert 0.8 <= h.gm_m <= 1.3
     assert 10.5 <= h.hull_speed_kn <= 12.5
     assert -1.5 <= h.clr_x_m <= 1.0
-    assert h.deck_height_m < 1.3  # a low-sided vessel: port sills 3 ft 5 in above water
+    assert h.deck_height_m < 1.3  # a low-sided vessel: port sills 3 ft 1 in above water (her plate)
 
 
 def test_schooner_sail_plan_follows_fincham(schooner):

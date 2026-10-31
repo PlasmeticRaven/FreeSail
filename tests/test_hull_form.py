@@ -7,8 +7,7 @@ stern and the head) and each line's one-word `marks`. The schema refuses in word
 refuses. `freesail/ship/form.py` draws the hull from them by §5.3's rule: the side passes through
 every given point within a millimetre and its ends close to the stem and the stern; a profile
 without `section_m` or shape keys is drawn as §6's three points a station, as the viewer drew it
-before; `/api/ship` serves the drawn stations where the file has a profile. No file of the eight
-carries a shape key (the two-way byte test, `tests/test_ship_particulars.py`), a profile without
+before; `/api/ship` serves the drawn stations where the file has a profile. A profile without
 them pickles as before them, and nothing but the schema, the form, the server and the tools
 reads them (the guard): the drawing never changes how a ship sails or fights (§5.0 principle 8).
 
@@ -554,7 +553,7 @@ def test_a_given_point_the_drawing_cannot_reach_is_named_by_check():
 
 def test_the_drawn_hull_wants_a_profile():
     with pytest.raises(ValueError, match="no profile has no drawn form"):
-        form.stations(load_ship("data/ships/brig.yaml").spec.hull)
+        form.stations(spec_from_dict(_doc(), "p.yaml").hull)
 
 
 def test_on_the_transoms_line_the_side_is_the_transoms():
@@ -911,7 +910,7 @@ def test_nothing_but_the_schema_the_form_and_the_server_reads_the_shape_keys():
 def test_the_ship_graph_serves_the_shape_and_the_drawn_stations_where_the_file_has_a_profile():
     """`_profile_entry` serves the shape keys, the form and the marks as the file gives them,
     each only where given; `hull.stations` is the drawn hull to the millimetre where the file
-    has a profile, and no file of the eight has one."""
+    has a profile, and a document with none is served neither."""
     ship = ship_from_dict(_doc(PROFILE), "p.yaml")
     hull = ship_graph(ship)["hull"]
     assert hull["profile"] == PROFILE and list(hull["profile"]) == list(PROFILE)
@@ -925,9 +924,8 @@ def test_the_ship_graph_serves_the_shape_and_the_drawn_stations_where_the_file_h
     lean["form"] = {"head": "knee"}
     served = ship_graph(ship_from_dict(_doc(lean), "p.yaml"))["hull"]["profile"]
     assert served == lean
-    for name in ("brig", "frigate-36", "lugger"):
-        hull = ship_graph(load_ship(f"data/ships/{name}.yaml"))["hull"]
-        assert "profile" not in hull and "stations" not in hull
+    plain = ship_graph(ship_from_dict(_doc(), "p.yaml"))["hull"]
+    assert "profile" not in plain and "stations" not in plain
     assert ship_graph(load_ship("data/ships/sixty-four.yaml"))["hull"]["stations"]
 
 
