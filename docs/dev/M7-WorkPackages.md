@@ -54,7 +54,7 @@ on these packages; that is the owner's choice.
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
-| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard; **re-briefed 2026-10-30 (below, after 84 and 85), approved and launched the same day** as a Fable sibling session on `claude/pkg-82`; the boat to the ships session's principles; 74 starts on its item 3; **step 1 (item 3, the person's movement between hulls) merged 2026-10-30** (below, "Package 82, step 1, as merged"); **step 2 (item 1, the world with no followed hull) merged 2026-10-31** (below, "Package 82, step 2, as merged"); **steps 3 and 4 (the player's seat on another ship; the boat as a hull) merged 2026-10-31** (below); step 5 building |
+| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard; **re-briefed 2026-10-30 (below, after 84 and 85), approved and launched the same day** as a Fable sibling session on `claude/pkg-82`; the boat to the ships session's principles; 74 starts on its item 3; **step 1 (item 3, the person's movement between hulls) merged 2026-10-30** (below, "Package 82, step 1, as merged"); **step 2 (item 1, the world with no followed hull) merged 2026-10-31** (below, "Package 82, step 2, as merged"); **steps 3 and 4 (the player's seat on another ship; the boat as a hull) merged 2026-10-31** (below); **steps 5 to 7 and the boat's drawing merged 2026-10-31, the package closed** (below) |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
 | 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **merged whole, steps 1 to 11, 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 11 from the sibling's `claude/pkg-84` after it; the package closed with step 11's record below; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; **launched 2026-10-30** (the owner, 84 closed) as a Fable sibling session on `claude/pkg-85`; **merged whole 2026-10-30** at `252df5b` from `c4afb7c` (the record below: items 1 to 8 and the gate's draft, three findings of the lead's review mended); the owner runs the interim gate once 93 is in, the lead's half added first; 87 follows it |
@@ -1712,6 +1712,89 @@ a licence for it; the ships session acts on the owner's word.
 design-record commit at B2's window owed by the session; the later package on the files'
 figures against the sheets, the brig first; 81 (the guns in their ports) and 91 after 75's
 hulls, now that the eight stand on their own lines.
+
+### Package 82, steps 5 to 7 and the drawing, as merged; the package closed (2026-10-31)
+
+Merged `--no-ff` from the Fable sibling session's `claude/pkg-82` at `73756af` (step 5, step 6,
+step 7 and the boat's drawing in its own commit, the aboard table's count in its own test, the
+records of the close and the lead's two rulings booked at `065384d`; the trunk's hull step
+brought in by the builder after the close at `8a421b2`, the view tests' table of the parts a hull
+rightly lacks gaining the boats, which now carry a profile by rule and have no gallery, light,
+head or port band by their form: the one conflict, the builder's resolution taken over the
+lead's trial one, which said the same by a clause); ruff and the format check clean; the
+builder's fast tier whole on the package's final tree (5,384 passed, none failed) and again on
+the tree with the hull step in (5,910 passed, none failed), the slow tier of the thirty-six
+touched files and the known truths (3,371 passed, 7 expected failures), the pace tests alone
+(11 passed); the lead's checks on the merged tree:
+the generator reproduces all fifteen files byte for byte (the eight ships' with the hull
+step's profiles, the five boats' with theirs), the physics' diff the tow's thirteen lines in
+the integrator beside the oar force (the brief's one leave: the towing boat's net pull read at
+the stem as the cable's pull is read at the hawse), no consent file touched, no model
+identifier; the lead's run of the tow, boat, director, view-geometry, in-world, primer and
+log-lines tests on the merged tree, then **the whole fast tier here and the whole suite in the
+cloud dispatched at the push (run 28; its figures written here when it is in).**
+
+**Step 5, towing by the boat and the kedge's false denial** (the design's §6 and its
+postscript; the tuning notes, step 5): `tow her with the boat [to <the point or bearing>]`
+from the ship, the boat manned and made a hull by step 4's road, her oars out and giving
+way, the ship's helmsman given the tow's bearing; the coupling kinematic (the boat a line's
+length ahead on the bearing, twenty fathoms, her way the ship's) and the force her oars' net
+pull at the ship's speed, clamped at nothing, read by the integrator at the stem; the men
+tiring by the oars' hours with the ship's log saying so once an hour; `the boat alongside`
+ending it, the tow ending of itself at an anchor or the ground; refused in a sea the boat
+cannot work in, at anchor and aground. Measured: the cutter under her four-oared boat 1.15 to
+1.19 kn fresh and 0.83 at four hours, her head round in two minutes; the frigate under her
+launch's ten oars 0.78 kn fresh, her head from north to east in ten minutes, 0.57 at four
+hours (the lead's ruling on the frigate clause standing: the physics' figure); the lugger
+1.16 kn fresh. **The kedge's false denial** (spec M7b §21k's one fault) mended: the boat's
+keeper reads every evolution that holds her through the scripts' `holds()`, so the lay-out
+is no longer denied at its first minute. Found on the way, the one that matters: a manned
+boat not followed by the drivers slept at the first switch for want of a brain, which step 4's
+followed-boat tests never saw; mended in `crews.crewed`. **Truths 7-330, 7-331, 7b-113.**
+
+**7b-113's lugger clause, ruled:** the spec's "towed clear at half a knot" is not a figure
+F_0 50 N an oar gives in any hour a boat's crew can pull (the lugger makes 1.16 kn fresh and
+0.8 after four hours, half a knot at twelve); **the physics' figure stands**, as the lead ruled
+for the frigate's clause, the truth asserting the physics' figures with the spec's words
+quoted in its docstring; the lesser is costed in the notes for the owner (F_0 25 N an oar
+gives the lugger and the cutter about 0.6 kn fresh and the frigate's launch 0.4 kn, one
+generator constant and the five files regenerated), and is the owner's to ask for if they
+want the words rather than the figure.
+
+**Step 6, the stations, the director and the readings** (§7; the tuning notes, step 6): the
+reading `the followed ship` (a world row, read in an observed world too); the events `the boat
+manned`, `the boat lost`, `the tow begun`, `the tow ended` and `aboard another ship` (the
+primer's table kept equal to the registry by 85's test); the director's `follow "X"` and
+`follow nobody` as a channel of the world orders and a driver's line at the seat costing no
+act, the dry run saying what it would do; the boat stove, swamped or gone adrift by the
+`aboard:` table through `lose_boat`; the truth showing a manned boat as a vessel with her
+ship, who is in her, what she is under and whom she tows; the harness's shape and ship words
+for a boat. Found on the way: `come alongside` from the boat's prompt had left the drivers'
+`followed` on the boat's hull (a write through her façade, hidden by the fallback to the
+player's hull), mended in `boats._root`. **Truth 7-332.**
+
+**Step 7, the records and the boat's drawing** (§5.4 and §8): spec M7b §11, §12 and §21k "as
+built", Harness §17b, the primer's chapter 26 "The boat, and going aboard another ship"
+(in-world), the director's library; the boat's drawing by §5.4's road with B5's helpers,
+each boat's shape keys by rule from her principal dimensions, every line judged and said so,
+a square transom and no head, the drawn displacement within the record's share of the filed
+(the yawl 12% under, the 28-ft cutter 13% over, the 31-ft launch 12% over, the two others
+within 1%), the eight ships' files untouched; the snapshot's `oars` block and the viewer
+drawing her oars from the thwarts while they are out. `test_log_lines`' standing-order names
+by index (88's booked finding mended on the way).
+
+**What moved: nothing pinned** but the aboard table's count (31 to 34 by the boat's three
+things, in the director's and the aboard-found tests). **The package, closed:** the seven
+items of the re-brief built; truths 7-320 to 7-334 and the boat's 7b-113 and 7b-114 stand
+(the two 7b numbers shared with other packages' truths, the tests' names saying so); the
+physics changed by the oar force and the tow's reading of it alone; the ship files through
+the generator; no consent file touched. **Open, booked:** the ship's muster reduced by the
+boat's crew while she is manned (a follow-up, hung on the manning and the hoisting in); the
+business's tile loads (step 2's finding, with the observer's cost); the five boat files to
+the ladder's rungs when Steel's Folio LVII is read (the ships session's, regenerated with
+the eight); the frigate's quarterdeck guns and the files' figures against the sheets (the
+later package). **Next:** 65 (the place's knowledge, Fable) launched on this merge as the
+owner ordered; 74 after 65; 87 (the stations' work) after 82's stations.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
