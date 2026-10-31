@@ -472,7 +472,8 @@ class Console:
     # -- log printing --------------------------------------------------------
 
     def _attach(self) -> None:
-        self.world.log.subscribe(self._on_event)
+        self._log = self.world.log
+        self._log.subscribe(self._on_event)
         self.world.compression = self.compression
         # the player's own needs (package 54): told to him at the prompt, never logged
         needs = getattr(self.world, "needs", None)
@@ -484,8 +485,19 @@ class Console:
 
         director_mod.listen(self.world, self._on_channel)
 
+    def _follow_log(self) -> None:
+        """The log the console prints is the followed hull's (package 84, step 10; 82's
+        §11): `follow`, `go to the boat` and `come alongside` move it, and the listener
+        moves with it, else the player's orders, refusals and answers go unseen (the
+        owner's finding of 2026-10-31: a visit by boat and a `follow` printed nothing)."""
+        log = self.world.log
+        if log is not self._log:
+            self._log.unsubscribe(self._on_event)
+            log.subscribe(self._on_event)
+            self._log = log
+
     def _detach(self) -> None:
-        self.world.log.unsubscribe(self._on_event)
+        self._log.unsubscribe(self._on_event)
         needs = getattr(self.world, "needs", None)
         if needs is not None:
             needs.unlisten(self._on_need)
@@ -556,6 +568,14 @@ class Console:
     # -- commands ------------------------------------------------------------
 
     def handle_line(self, line: str) -> bool:
+        """One line at the prompt (`_handle_line`), and the log listened to moved to the
+        hull the line left followed (`_follow_log`)."""
+        try:
+            return self._handle_line(line)
+        finally:
+            self._follow_log()
+
+    def _handle_line(self, line: str) -> bool:
         """Handle one line of input. Returns False when the console should exit."""
         line = line.strip()
         if not line:
@@ -804,6 +824,7 @@ class Console:
             if self.held_for() is not None:
                 return k
             self.world.tick()
+            self._follow_log()
             if self._alarm is not None:
                 self._ease()
                 return k + 1

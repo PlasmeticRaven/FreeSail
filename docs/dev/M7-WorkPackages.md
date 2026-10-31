@@ -1801,6 +1801,28 @@ the eight); the frigate's quarterdeck guns and the files' figures against the sh
 later package). **Next:** 65 (the place's knowledge, Fable) launched on this merge as the
 owner ordered; 74 after 65; 87 (the stations' work) after 82's stations.
 
+### The owner's testing week: loose ends mended by the lead (2026-10-31 onward)
+
+**The followed hull's log at the drivers (2026-10-31).** The owner, testing 82's visit by
+boat, saw nothing of his order in the log, neither refusal nor acceptance. Reproduced at
+the console: `send the boat to the Raven with Mr Pearce` works from the prompt (the launch
+away, the person aboard her in twenty-five minutes, `where am I` "aboard the Raven, on the
+quarterdeck, a visitor, of the Amazon"), but after `follow "Raven"` every order and query
+went to her hull and its lines to her log while the console went on listening to the hull it
+was attached to at the start (`World.log` is the followed hull's by `_PER_SHIP_FIELDS`, the
+listener was on the object), so an order, a refusal or an answer printed nothing; the
+browser's driver the same. Mended in both (`Console._follow_log`, `Driver._follow_log`: the
+listener moves to the followed hull's log after each line, each tick and each `follow`, so
+`go to the boat` and `come alongside` move it too), tests beside each
+(`tests/test_console.py`, `tests/test_server.py`); the console, server and observer suites
+green here; the whole suite in the cloud on the push. Found on the way, for the week's turn:
+the player's own body goes aboard another ship only as a person sent in the boat (the
+captain's, from the prompt: `send the boat to the Raven with Captain Bowen`, after which
+`where am I` answers as a visitor's while the prompt and the readings stay his own ship's
+until `follow "Raven"`), or by `--seat captain --ship <name>` at the start; from his own
+manned boat (`go to the launch`, `pull for the Raven`) there is no order to go aboard her
+(`come alongside` is to his own ship): booked as 82's first follow-up.
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later

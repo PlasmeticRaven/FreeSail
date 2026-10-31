@@ -791,3 +791,18 @@ def test_the_client_has_the_charts_tools(client):
     script = client.get("/client/map.js").text
     for needle in ("drawRose", "drawMarks", "bearingsShown", "BEARING_FULL_S", "BEARING_DROP_S"):
         assert needle in script, needle
+
+
+def test_the_driver_sends_the_followed_hulls_lines_to_the_pages_after_follow():
+    """The console's finding of 2026-10-31 at the browser's driver: the pages' log is
+    the followed hull's, so an order given after `follow` reaches them."""
+    from tests.test_observer import observed_world
+
+    w, _ = observed_world()
+    d = Driver(w)
+    got: list[dict] = []
+    d._listeners.append(got.append)
+    d.follow("Medusa")
+    d.submit("set the royals")
+    texts = [m["event"]["text"] for m in got if m.get("type") == "event"]
+    assert "Order: set the royals." in texts
