@@ -157,9 +157,10 @@ def test_the_drivers_load_takes_the_checkpoint(saved, tmp_path):
 # 602,100; `CHANGES-m5c-c.md` says what each is), and a third of package 37d's own
 # making (`THE_37D_SAVE`, below). The two playtest saves hold a model's transcript and
 # journal and the owner's typed lines, and whether they go into the repository is the
-# owner's to say: their tests skip, saying so, when the files are not there. A change
-# that breaks one of these is mended with a class default or a step in
-# `core.replay._rebind`, never by changing a fixture.
+# owner's to say: their tests skip, saying so, when the files are not there. Beside them a
+# bare checkpoint of a cutter with her guns cast loose, written before package 75's stage 0
+# (`tests/test_lee_ports.py`). A change that breaks one of these is mended with a class
+# default or a step in `core.replay._rebind`, never by changing a fixture.
 
 FIXTURE_SAVES = Path(__file__).resolve().parent / "fixtures" / "saves"
 PLAYTEST_SAVES = {

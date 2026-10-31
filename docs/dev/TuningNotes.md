@@ -12796,6 +12796,197 @@ Her boom clears her taffrail by 0.45 m: it sits right.
 
 **What the two kinds come to.** Every V row is one small viewer rule, three of them in all: the line's end at half the beam and the datum (`:1670`, `:1724`, `:1730`, `:1741`), the sheet at the datum on the drawn side (`:1044`), and the stay's foot at half the file's length and the datum (`:1013`). Reading the drawn rail and the stem head in place of those would mend the most of what the owner sees, moving no pin and no file; it is not done here. The F rows are a boom each on the frigate, the brigs, the smack and the schooners, the masts, the bowsprits' heights and the lugs' feet, and they go with the table above when a later package takes the files' figures against the sheets.
 
+## The lee ports on the heel alone (package 75, L2) (2026-10-31)
+
+`combat/ports.py` fills stage 0's hook on `docs/design/Build-Ships.md` §7.1 and §7.2: each port gun's state against the rule's two lines, on the heel alone, the roll held at nought (§7.3). A gun whose port shuts is run in and keeps its charge, its loading goes on to primed, and it fires nothing; a gun named behind it, or the word for a broadside all behind them, is dropped with a line; a division all behind them holds no turn; the guns' reading says "ports shut (three to starboard)"; the log says `guns.ports_shut` and `guns.ports_opened` once a change of state a deck and side. **Old is the tree at cfe48a53; new is the working tree as it goes to the one commit.** Measured at seed 7 on the owner's machine. Nothing in `freesail/physics/`, `combat/far.py` or `combat/action.py` moved. **L3 is one line:** `ports.roll_in_the_dip` returns 0.0, and L3 makes it `float(firer.roll_deg)`; tried on this tree, that change fails `test_the_roll_is_held_at_nought` and nothing else in `tests/test_lee_ports.py` or `tests/test_profile.py`.
+
+### What roll a crewed ship reads
+
+**Nought, everywhere, today.** §7.1's words were written before package 84's later steps and still stand in substance; only the line number has moved (`_crew_scenario` is at `world/crews.py:263`, its `sea=False` at :284). The Hull keeps `sea` and `motion` (`world/hulls.py`, `PER_SHIP_FIELDS`), but a crewed ship is still built with none, so `action._firer` gives her a roll of 0.0 and a sea height of 0.0. Measured: in `merchant-cutter.yaml` the player's ship rolled 8.28° while the crewed hulls had no sea and no motion; with the first action and the encounter forced to `sea=True` the player's ships rolled 9.63° and 2.00°, and the crewed *Renard* and *Two Brothers* read `world.motion` None and roll 0.0. The player's ship reads her own `world.motion` only where her World keeps a sea; the first action, the encounter and the convoy keep none, so she reads nought there too. L3 will therefore reach the player's ship in a World that keeps a sea, and nobody else until 84 gives each hull hers.
+
+### The pins moved, old beside new, with the bisection
+
+**No truth, action or trial moved. Two pins moved, both stage 0's own hook tests, and both are the gate's and not the sourced sill's.**
+
+| Pin | Old | New | Reason |
+|---|---|---|---|
+| `tests/test_profile.py`: `test_the_lee_ports_update_shuts_nothing_and_a_shut_gun_neither_works_nor_fires`, now `test_the_lee_ports_update_shuts_nothing_upright_and_a_shut_gun_goes_unfired` | a shut gun with no charge has no work; a named shut gun waits, `single == [gun.id]`, fired 0 | it wants loading; it is dropped, `single == []`, fired 0 | §7.2: the loading goes on; a gun asked for by name is dropped with a line |
+| `tests/test_profile.py`: `test_the_lee_ports_events_are_registered_and_said_nowhere_yet`, now `test_the_lee_ports_events_are_registered_and_said_by_the_rule` | both events absent; a standing order at one refused, "Nothing shuts the lee ports yet"; named only in `practice_readings.py` | taken; offered in the brief and the stand-by tool; named in `practice_readings.py` and `ports.py` | the rule is built; stage 0's own text says its builder drops the absent |
+
+`test_primer` holds the book's table equal to the taken events, so chapter 11 gains the two events, as the first pin's second half requires; `api/practice_readings.py` loses `LEE_PORTS_ABSENT`, a false sentence from L2 on. Neither file is in §7.2's list; both follow from the rule's being built.
+
+**The bisection (§7.3).** The commit is L2: both old pins pass on a clean archive of cfe48a53, where the candidates gave 370 passed. Within L2, a scratch copy with each gun's `height_m` put back to f5be9110's and every other byte kept (101 guns in five files: the brig, the cutter, the frigate, the merchant brig and the privateer; the razee and the 64 did not move in the hull step, and the lugger, the smack and the topsail schooner carry no gun), never committed. Both old pins fail at the same asserts on both sills, and both new ones pass on both. The whole candidate run with the gate on and the old heights: 473 passed, 18 failed. All 126 truths and all of pivot, practice, magazine and ordnance passed, so **no existing pin moves under either sill**, and §7.3's question has no existing mover to answer. Seventeen of the 18 are `test_lee_ports`' own, written against the sourced sills; the eighteenth compares the copy's files with the generator's bytes, an artefact of the copy. That run predates the review's mends below, which touch only a shut gun's word, turn and drill; the candidates on the final tree moved nothing further, so nothing new was left to separate.
+
+**What the sourced sill carries, with no pin to show it:**
+
+| Her lowest gun | On the old height | On the sourced sill |
+|---|---|---|
+| Cutter | 24.8° | 14.7° |
+| Brig | 25.0° | 17.5° |
+| Merchant brig | 25.2° | 18.2° |
+| Frigate, upper deck | 22.0° | 19.7° |
+| Frigate, quarterdeck | 50.7° | 43.0° |
+| Privateer, letter of marque | 11.1° | 10.5° |
+| Privateer, long tom | 12.8° | 13.5° (the one that rises) |
+
+Truth 7-184's cutter shuts ports on the sourced sills and none on the old heights; truth 7-154's *Amazon* shuts from 19.7° on the sourced sills and from 22.9° on the old heights. Both have their guns secured, and neither pin reads it.
+
+**Why §16.1's expected movers did not move.** No candidate reaches the gate with her guns cast loose. The most heel cast loose in any of them is 6.32° (the *Renard*, first action), and 2.66° for the *Sherbourne*; the lowest shut heel in any armed file is 10.5°. Two candidates outside `test_lee_ports` shut a port at all, both with the guns secured, so no line is said and no pin moves: 7-154, the *Amazon*, heel 19.7° up to 27.0°, 59 reopenings; 7-184, the *Sherbourne*, 14.75° up to 18.44°, 8 reopenings.
+
+| Figure, base and tree alike | |
+|---|---|
+| First action | first shot at tick 781, strike at 6180, rounds 208 and 165, most heel while firing 2.66° and 6.16°, no port shut |
+| Encounter, two hours | no shot; most heel 5.98°, 9.93°, 1.34° |
+| Whole logs, equal line for line on this machine | first action 3 h, 472 lines; encounter 2 h, 229 lines; trial-station-lee-shore 20 h, 1,561 lines; no port line in any |
+
+**The review's mends, before any of this reached the trunk, so moving no shipped pin.** Each is pinned in `tests/test_lee_ports.py`; each mend of the code was undone on a scratch copy and its pin failed.
+
+| What | As first built | As landed |
+|---|---|---|
+| Fire by divisions with one division all behind shut ports | the turn stayed on it, so the other's open guns stood ready and silent as long as she heeled, with no line. 30 minutes, cutter's carronades at 16°: 1 round against 34 as they bear; long guns 1 against 37; long tom 1 against 67; brig at 23.5° 1 against 23; merchant brig at 18.25° 0 against 25 | the turn passes a division all shut, and no other: 34, 37, 67, 23, 25, equal to as they bear. One gun of it open, the turn waits on that gun as on any gun loading, as before |
+| The word for a broadside all behind shut ports | stood as long as she heeled, then answered unbidden by the first gun to run out, alone. Cutter, holding fire, 18°: word still standing after 10 minutes; upright, No. 3 fired once, Nos. 1 and 2 ready and silent | dropped with "The larboard broadside's ports are shut; the sea is at their sills." as a gun named is; a gun of it open keeps it standing. `tests/test_lee_ports.py`'s own `test_the_word_for_a_broadside_stands_behind_shut_ports_until_they_open` became `test_the_word_for_a_broadside_all_behind_shut_ports_is_dropped_with_its_line` |
+| A round loaded behind a shut port, in the drill | timed as sponge to point, though neither run out nor pointed: a cutter's carronade's best of 65 s became 54 s, and the `practice` reading serves that mean and best | not timed; cycles and best unmoved |
+| A chaser of no side (the schema allows one; no file has one; L3's roll would shut it) | "ports shut (one to None)"; "lee" or "weather" by chance | "one on the centre line"; "The upper-deck ports are shut", no side's word; `lee` None in the line's data |
+| The kept saves' test | read `if battery is not None`, and none of the three has a gun, so it pinned nothing of the rule | a real checkpoint added, `tests/fixtures/saves/pre-75-cutter-guns-cast-loose.checkpoint`, written by c5140483, the commit before stage 0: no profile, no deck even as an attribute, 1.5 m on half her 5.8 m, shut at 24.34°; the rule runs on it and it goes round the disk |
+
+### When she loses her lee guns: heel reached against shut heel
+
+Steady heel at her worst angle in the wind, no gusts, no reefs, no captain, no sea, degrees (a sample of the rows measured twice, the same to 0.05°). "Reached" is the wind at which that heel comes to her lowest gun's shut heel, past 25 kn by V². "All sail" is what `make all sail` sets, which leaves the studdingsails unset in every ship that has them and the spritsails in the razee and the 64 (the frigate sets 22 of her 32).
+
+| Ship | Her guns shut at | Plain sail, 10 / 15 / 20 / 25 kn | All sail, 10 / 15 / 20 / 25 kn | Reached, plain / all |
+|---|---|---|---|---|
+| Cutter, both fits | 14.7, 15.0, 17.3 | 2.7, 5.9, 10.1, 15.4 | 4.2, 9.5, 16.3, 23.6 | 24.5 / 19.0 kn |
+| Privateer, long tom | 13.5, 29.7 (the pivot and swivels never) | 4.2, 9.2, 16.0, 22.9 | 5.4, 11.7, 19.4, 27.0 | 18.4 / 16.4 kn |
+| Privateer, letter of marque | 10.5, 14.5, 19.0 (swivels never) | the same | the same | 16.1 / 14.2 kn |
+| Brig | 17.5 up to 23.8; chaser 36.7 | 3.1, 7.0, 12.3, 18.9 | 4.8, 10.9, 18.4, 26.9 | 24.0 / 19.4 kn |
+| Merchant brig | 18.2, 18.3 | 2.7, 5.9, 10.1, 15.2 | 4.8, 10.9, 18.4, 26.9 | about 27 / about 20 kn |
+| Frigate-36 | upper 19.7 to 27.2; quarterdeck 43 up; forecastle 48 up | 2.4, 5.5, 9.6, 14.7 | 3.7, 8.3, 14.6, 21.5 | about 29 / 23.8 kn |
+| 64 | lower 10.6 to 18.7; upper 34.7 up | 2.2, 4.9, 8.6, 13.2 | 3.2, 7.2, 12.6, 18.4 | 22.3 / 18.3 kn |
+| Razee | upper 14.5 to 24.2; quarterdeck 42 up; forecastle 43.8 up | 1.9, 4.3, 7.5, 11.6 | 2.8, 6.3, 11.0, 16.3 | about 28 / 23.4 kn |
+| Topsail schooner | no gun; lowest port 10.5 | as the privateer | as the privateer | none |
+| Lugger | no port | 7.7, 15.9, 25.0, 34.0 | 8.2, 16.8, 26.2, 35.1 | none |
+| Smack | no port | 2.1, 3.4, 5.7, 8.8 | 2.5, 5.6, 9.7, 14.9 | none |
+
+**In gusts** (an hour at her worst angle under the World's default wind; gusts peak at about 1.36 times the mean, so heel peaks at about 1.8 times steady and its 95th percentile is about 1.2 times). Share of the hour with any port shut, a share left out being nil:
+
+| Ship | Plain sail | All sail |
+|---|---|---|
+| Cutter | 20 kn 7%, 25 kn 100% | 15 kn 3%, 20 kn 100% |
+| Privateer, long tom | 15 kn 4%, 20 kn 100% | 15 kn 59%, 20 kn 100% |
+| Privateer, letter of marque | 15 kn 60%, 20 kn 100% | 15 kn 100% |
+| Brig | 20 kn 2%, 25 kn 86% | 15 kn 1%, 20 kn 84%, 25 kn 100% |
+| Frigate-36 | 25 kn 3% | 20 kn 3%, 25 kn 88% |
+| 64 | 20 kn 26%, 25 kn 100% | 15 kn 1%, 20 kn 100% |
+| Razee | 25 kn 4% | 20 kn 4%, 25 kn 84% |
+
+The merchant brig's share was not measured fully dressed; her heel at the 95th percentile and the peak: plain 20 kn 13.3° and 18.4°, 25 kn 20.2° and 27.7°; all sail 15 kn 11.7° and 16.1°, 20 kn 19.8° and 26.9°. At most six changes of state in the hour on any ship, three shuts and three opens: no flicker in a real gust (counted with the line said on passage too, before the gate). The reopening band is about 3.1° on the cutter's lowest gun, 2.1° on the brig's, 1.6° on the frigate's, 1.3° on the 64's lower deck.
+
+**Against the triples, the lead's question: no threshold looks wrong.** All 45 of the notes' rows and the merchant brig's two agree with §7.1's arithmetic within 0.05°, each pinned; the 64's and the razee's lowest are pinned deck by deck. In words: under plain sail to 15 kn nobody loses a gun for long but the letter of marque, whose midship gun at 10.5° lies between her 9.2° steady and her 16.3° peak. At 20 kn plain the long tom has lost her after carronade outright, the letter of marque two of her three and the third in the gusts, the 64's lower deck comes and goes, and the cutter and the brig lose ports only in gusts. At 25 kn plain the cutter, the brig, the schooners and the 64's lower deck have lost theirs; the frigate and the razee lose them only in gusts. Under all sail the low-sided ships lose guns from about 15 to 20 kn. The long tom's two carronades a side shut 16° apart, because x +10.5 stands high and narrow (half-breadth 2.29 m): true to the triple, and she always keeps her forward carronade and her pivot to leeward. Research-74's merchant brig at 2.3 to 2.8° in 20 kn is a ship half dressed: her few hands take 45 to 58 minutes to set plain sail, and fully dressed she heels 10.1°.
+
+### The quoin before the port
+
+The port is not the first thing to silence a lee gun. `Battery._discharge` lays the gun for the range with the quoin answering the heel only so far, and a shot that reaches under 95% of the range is "short". This is existing gunnery, moved by nothing here, and it decides what the owner will see. The lee heel from which each gun's shot falls short, by that arithmetic:
+
+| Gun | Half a cable | 1 cable | 2 cables | 3 cables |
+|---|---|---|---|---|
+| 12-pounder carronade (cutter, long tom) | 14.7 | 12.1 | 8.5 | 4.7 |
+| 32-pounder carronade (brig, frigate) | 15.5 | 13.6 | 10.4 | 7.8 |
+| 42-pounder carronade (razee) | 15.6 | 13.9 | 10.8 | 8.4 |
+| Long 3 (cutter) | 13.1 | 11.2 | 8.9 | 7.0 |
+| Long 6 (letter of marque, brig's chaser, merchant brig) | 13.4 | 11.8 | 9.5 | 8.1 |
+| Long 18 (frigate, 64's upper deck) | 13.8 | 12.5 | 10.0 | 9.1 |
+| Long 24 (64's lower deck, razee) | 13.8 | 12.6 | 10.2 | 9.3 |
+
+Played by the real orders, steady wind, ten minutes' fire at a mark to leeward, in the first action's waters, where the tide adds a little heel (the cutter's 18 kn plain reads 8.3° in still water, under her short heel, and 5 of 23 struck):
+
+| Ship | Sail and wind | Mark | Heel | Ports shut | Fire |
+|---|---|---|---|---|---|
+| Cutter, carronades | plain, 15 kn | 2 cables | 6.9° | none | 25 fired, 6 struck, none short |
+| | plain, 18 kn | 2 cables | 9.5° | none | 23 fired, all short |
+| | all sail, 15 kn | 2 cables | 10.9° | none | 23 fired, all short |
+| | plain, 20 kn | 1 cable | 11.3° | none | 20 fired, 8 struck, none short |
+| | plain, 22 kn | 1 cable | 13.4° | none | 20 fired, all short |
+| | all sail, 18 kn | 1 cable | 15.1° | two | 5 fired, all short |
+| | all sail, 20 kn | 1 cable | 18.1° | three | none fired |
+| | plain, 25 kn | 1 cable | 16.6° | three | none fired |
+| Cutter, long guns | plain, 18 kn | 2 cables | 9.5° | none | 25 fired, all short |
+| Brig | plain, 20 kn | 2 cables | 13.7° | none | 39 fired, all short |
+| | plain, 25 kn | 1 cable | 20.5° | six | 8 fired, all short |
+| Frigate-36 | plain, 25 kn | 2 cables | 16.0° | none | 75 fired, all short |
+
+### For the owner's test: the cutter
+
+The lead flagged her sills, 1.00 to 1.23 m, her lowest gun's port shut at 14.7° (her lowest port 14.5°, with no gun in it). The owner's first word: a cutter should expect her guns unusable from heel fairly easily. By the table and the quoin her lee carronades go in three steps:
+
+| What stops them | From heel | Plain sail | All sail |
+|---|---|---|---|
+| Shot falls short at 2 cables | 8.5° | about 18 kn | about 14 kn |
+| Shot falls short at 1 cable | 12.1° | about 22 kn | about 17 kn |
+| First port shut (the third at 17.3°) | 14.7° | 24.5 kn | 19 kn |
+
+In gusts each comes earlier: the heel's 95th percentile stands about 1.2 times the steady figure. The sills stand as drawn. **To test it:** plain sail in 18 kn, or all sail in 15 kn, with a mark two cables to leeward; then all sail in 20 kn with a mark to leeward. Is that "fairly easily"? Against all three figures, the pick is to let it stand.
+
+### Judgements, for the lead to rule
+
+- **The log's gate, which §7.2 does not say.** A line is said only while a gun of that deck's side is cast loose (at the shutting, or at the casting loose with the port shut already); `_shut` and the reading go on with the guns secured. Said on passage as well, the line moved the captain's trials' line counts (the station's lee shore 1,561 to 1,563, its gale 1,722 to 1,724), where §7.3 and §16.1 expect only actions to move. The consequence: `at the lee ports shut` does not fire on passage with the guns secured, and chapter 11 now says so. **The pick is to keep it and amend §7.2.** To drop it: `fighting = shut` in `ports._tell`, those two counts old beside new, and `test_the_line_is_the_guns_and_no_passage_hears_it` moves.
+- A deck's side counts as shut from its first port shut until its last has opened, so at 20° the frigate's line says the lee upper-deck ports are shut when 3 of 13 are; gun by gun would have said up to 13 lines. The reading gives the count.
+- The kind `guns.port_shut`, for a gun or word dropped, is kept apart from `guns.ports_shut` so that it does not wake a stand-by on the ports. Severity notable on all three. An exercised gun behind a shut port stands idle in dumb show. A shot across her bows goes with its gun only when no named gun is left.
+- The rule uses sill less half-breadth times sine and drops the cosine, as §7.1 binds it. A port truly turned about the waterline shuts a little sooner: cutter 14.7° to 14.1°, brig 17.5° to 16.5°, frigate 19.7° to 18.5°, schooner 10.5° to 10.2°, 64 10.6° to 10.3°.
+
+### Left, and for whom
+
+**For the ships session, with the commit:**
+- `docs/primer/22-an-action.md` line 62 said "no lee port is shut by the heel yet", which L2 makes false and the library serves. It is not in this step's files, and it wants replacing with the commit.
+- `docs/design/Build-Ships.md`, the amendments: §7.1's stale `crews.py:312-330` and the crewed roll above; §7.2's gate and the word and the division's turn; §7.3 and §16.1's first-written heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°, now 10.5°, 14.7°, 17.5°, 19.7°).
+- Stale comments outside the files: `ship/parts.py:552` and `ship/schema.py:755` ("read by nothing yet"); `docs/agents/Harness.md`'s events list lacks the two new events.
+
+**For the lead, in `orders/` and the captains' files, which L2 was not to touch; each measured:**
+- `orders/gunnery._fire` answers `fire` behind shut ports "no gun of it is loaded and run out yet; the word stands until one bears". They are loaded and were run in by the sea, and the next tick now drops the word. The reply wants the ports' words when a gun of the side is shut.
+- `orders/gunnery._engage` and `_engage_mark` answer an engage to a shut side as if it will fire. Cutter, her heel 20°: "Engage the mark one cable on the larboard beam: the larboard battery, the guns to fire as they bear", then five minutes with no round and no line, the ports' line having been said once, before. The answer wants the count of ports shut.
+- `orders/gunnery._a_gun_for_a_signal` falls to the first lee gun whether its port is shut or not: "A gun to leeward: No. 1 larboard gun fires as soon as it is ready (the signal of amity)", then two ticks later "The No. 1 larboard gun's port is shut; the sea is at its sill", and no gun fired. So too the gun with a distress hoist (`orders/signals.py`). It wants an open gun of the side, or a refusal; never a gun to windward, the signal of defiance.
+- **The rules captains read nothing of this.** `engage_side: weather` puts the mark to leeward, on the guns that shut, and `shorten_sail_kn` is 30 (the commodore 28). Two cutters, plain sail, steady 28 kn, two hours: the *Renard* had every gun of the engaged side shut for 1,847 of 3,522 ticks with the mark in reach, longest 420 s, her sails unchanged; at the base she struck at tick 4,980, and on the tree she has not by 7,200. That move is L2's own, and no pin is at that wind. `at the lee ports shut then shorten sail` as a row in the engaging book changed nothing: the *Renard* still 1,097 of 2,596 ticks, her sails unchanged. Direct orders at quarters, 25 kn plain, heel and ports shut ten minutes after: the cutter's `shorten sail` or `reef the topsails` 15.0° to 13.9°, two still shut, `ease the sheets` 13.4°, two still shut, `take in the topsail` 10.4°, none; the brig's `shorten sail` 18.9° to 15.8°, four to two, `reef the topsails` 17.5°, four, `close reef the topsails` 14.7°, none. A row in the engaging books wants an order for each file.
+- A division all dismounted holds the turn at the base as well, and `Battery._fire`'s ready list does not read `serves`, so a dismounted gun loaded and run out fires its last round. Existing, not touched; the turn's mend here is for shut ports alone.
+- The brig's sills stand on WL1, which the sheet makes 303 t, while her heel comes from the file's 413 t. If the later package mends the −27%, her wind to shut falls from about 24.0 to about 20.6 kn under plain sail and 19.4 to about 16.6 kn under all sail (judgement: moment against displacement, GM held).
+- The lugger heels the most: 15.9° in 15 kn and 34.0° in 25 kn under plain sail, peaks over 50° in gusts. No port reads it today; it will matter if SW-4 gives her guns, and it wants the tuning pass.
+- At 25 kn under all sail, royals or topgallants carry away in the frigate, the razee and the 64, and a royal in the brig and the merchant brig; the schooners lose a main topmast in the gust hour; the razee also loses a topgallant yard under plain sail in gusts.
+
+### The pace
+
+`tools/pace.py`, ticks a second, base against tree, one process a run, strictly alternated, the machine's load mostly under 25%. Measured before the review's mends, which add nothing while no port is shut.
+
+| Measure | Base | Tree | Mean difference |
+|---|---|---|---|
+| Alone, base on C:, tree on D: | 477, 479, 483, 489, 485, 477 (481.7) | 475, 478, 473, 475, 472, 477 (475.0) | −6.7, −1.4% |
+| Alone, both on C:, to rule out the drive | 495, 488, 487, 487, 486, 481 (487.3) | 487, 480, 484, 480, 482, 477 (481.7) | −5.7, −1.2% |
+| `crewed --ships 3`, tree first | 171, 172, 170, 168, 170, 173 (170.7) | 170, 169, 169, 169, 167, 167 (168.5) | −2.2, −1.3% |
+
+A small real cost, §7.2's own "a sine and a compare a port gun a tick": about 24 to 29 microseconds a tick on the frigate's 40 guns. **For the lead:** the floors are the lead's on the build machine, and `alone` reads under 500 here at the base as well. Run 26 had truth 51 at 494 against 500; a further 1.2 to 1.4% would take it to about 488 if the cost carries over. If it matters, an early-out while she heels below the battery's least shut heel with nothing shut would take most of it back: one held figure and one compare, built by nobody and not measured.
+
+### The three captain's trials, read again
+
+"The three captain's trials" under the eight hulls was written before package 88 merged and no longer names the right three. On this machine, on a clean archive of cfe48a53 and on the tree alike, with identical figures: **3 failed, 4 passed.**
+
+| Test | The trial | Fails on | Here | The pin |
+|---|---|---|---|---|
+| `test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits` | trial-trade-thick | the digest only (line 452); states and 426 lines hold | df5f02eb6e6ce68a | cfa538b19cb0d2fe |
+| `test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_wind` | trial-trade-stranger | the digest only (line 403); 1,594 lines hold; the never-aground assert after it not reached here at either tree | 3dedbdf737c368b8 | bf059c3211b7cc9c |
+| `test_in_a_gale_with_sea_room_she_heaves_to_and_claws_off_a_lee_shore_by_turns` | trial-station-gale | the digest only (line 201); states, never aground and 1,722 lines hold | 8df0ab2beba93320 | 04f2fcd0fe9023a4 |
+
+The lee shore, named in the old section, now passes: the lead took its digest assert out at 88's merge (1,561 lines hold; digest here 8f2e1783e6d13312, read and not asserted). The station's gale, the old section's expected failure, is pinned by 88 and fails here on the digest alone. Digests are the machine's own; the lines and states are what hold.
+
+### The suite, as run
+
+All with `py -m pytest`, at seed 7 on the owner's machine, on the final tree; ruff check and format clean; no two suites together.
+
+- **The candidates,** `--slow -m "not pace" -n 4`: `test_known_truths` 126 (truths 7-133 to 7-342 and 7b-114, less the pace truths 7-138, 7-151, 7-159, 7-160 and 7-334; they take in 7-161 to 7-171 and the privateer schooner's), `test_pivot_gun` 9, `test_practice` 25, `test_practice_lookout` 7, `test_practice_orders` 47, `test_magazine` 29, `test_ordnance` 24, `test_profile` 103, `test_lee_ports` 145: **515 passed in 10:35.** A clean archive of cfe48a53, without `test_lee_ports`: 370 passed. Compared by junit, test by test, no test changed outcome.
+- **The mended files and what reads them,** `--slow -n 4`: `test_lee_ports`, `test_profile`, `test_primer`, `test_grammar_book`, `test_in_world`, `test_checkpoint`: 1,377 passed.
+- **The captain's trials,** `--slow`: 3 failed, 4 passed, the same messages as the clean archive's.
+- **The fast tier,** `-n 4`, whole, after the last mend: **6,024 passed, 2 skipped in 32:13** (the two in `test_pictures`, this machine having no browser). No worker died, and four workers did not show the "Windows fatal exception" and the hang at 99% that eight did twice in the build; that cause is not found.
+- **Whole logs,** the first action, the encounter and the station's lee shore: line for line and digest for digest the clean archive's.
+- **Undone on a scratch copy** (`test_lee_ports` and `test_profile`, one mutant at a time): 28 breaks of the rule and its mends, 26 seen. Of the two others one guarded nothing and was taken out; the other is `_cycle_done`'s timing of a gun with its port open, the base's own line, which no test here or in `test_practice*` reads, and it stands as it was.
+
+**Not run:** the rest of the slow tier, in which six gate pins fail on this machine at the base and on the first tree with the same figures (gate 5b's schooner, 767 lines for 766; the merchant passage's constants, [16200, 96480] for [16200, 96540]; gate 6a's schooner; truth 77's digest; truths 78 and 79, [57, 100918]), and the pace tests, which are the lead's on the build machine.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

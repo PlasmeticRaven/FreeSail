@@ -752,7 +752,7 @@ class GunSpec:
     package 86: each pivot's arc its own ship's, as `docs/design/Proposal-PivotGun.md` §3
     proposes; since package 75 a pivot must give one, and any other gun has None). Its
     `deck` (package 75) is the deck it stands on, one of `DECK_WORDS`; None, a file that does
-    not say (read by nothing yet: the lee ports and the 74's bill by deck will)."""
+    not say (read by the lee ports' rule, and the 74's bill by deck will)."""
 
     id: str
     kind: str

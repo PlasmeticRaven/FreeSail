@@ -7,7 +7,8 @@ The rows, each a state in words the dialect compares by `is <words>` and `is not
 
     the guns          the battery: cast loose or secured, how many loaded, run out and
                       primed, the side engaged, the charge, the aim and the firing's
-                      doctrine, the guns dismounted ('is cast loose', 'is not engaged')
+                      doctrine, the guns dismounted, the ports shut ('is cast loose', 'is
+                      not engaged', 'is ports shut')
     the damage        what the carpenter and the boatswain report: the spars and lines
                       shot away, the sails holed, the shot holes and where, the helm
                       ('is none', 'is not none')
@@ -183,6 +184,9 @@ def _guns(world: Any, _: str | None) -> dict[str, Any] | None:
     if dismounted:
         names = _and([g.name for g in dismounted])
         parts.append(f"{number_words(len(dismounted))} dismounted ({names})")
+    shut = battery._shut  # the lee ports (package 75; a class default, empty until one shuts)
+    if shut:
+        parts.append(_ports_shut_words(ship, shut))
     value = {
         "words": "; ".join(parts),
         "count": len(serving),
@@ -200,7 +204,23 @@ def _guns(world: Any, _: str | None) -> dict[str, Any] | None:
     }
     if exercise:
         value["exercise"] = exercise  # only while it is set, so the data is as it was
+    if shut:
+        value["ports_shut"] = sorted(shut)  # likewise
     return value
+
+
+def _ports_shut_words(ship: Any, shut: frozenset[str]) -> str:
+    """'ports shut (three to starboard)': the words the reading is compared by, 'ports shut',
+    and how many she has shut on each side, or on the centre line for a chaser of no side
+    (Build-Ships.md §7.2)."""
+    counts: dict[str, int] = {}
+    for gid in shut:
+        gun = ship.guns.get(gid)
+        if gun is not None:
+            where = f"to {gun.side}" if gun.side else "on the centre line"
+            counts[where] = counts.get(where, 0) + 1
+    said = [f"{number_words(n)} {where}" for where, n in sorted(counts.items())]
+    return f"ports shut ({_and(said)})"
 
 
 def _kinds_words(guns: list[Any]) -> str:
@@ -549,7 +569,7 @@ def register() -> None:
             _guns,
             description="the battery: cast loose or secured, how many loaded, run out and "
             "primed, the side engaged and at whom, the charge, the aim, the firing's "
-            "doctrine, the guns dismounted",
+            "doctrine, the guns dismounted, the ports shut by the sea at their sills",
             none_words=_no_guns_words,
         )
     )

@@ -1240,6 +1240,15 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
   side, whose dip is the roll less the heel. On today's files it needs a roll 20° beyond the
   heel, so it moves nothing; it is said for the lead.
 
+*Since L2 (2026-10-31), as built and measured:* `shot.lee_port_shut` is called, by `ports.update`.
+`_crew_scenario` now stands at `world/crews.py:263`, its `sea=False` unconditional, so a crewed ship
+reads a roll of nought everywhere today: the cutter of `merchant-cutter.yaml` rolled 8.28° while the
+crewed hulls round her had no sea and no motion. The player's ship reads her own roll only where her
+World keeps a sea; the first action, the encounter and the convoy keep none. So L3 reaches the player's
+ship in a World that keeps a sea, and nobody else until 84 mends it. The rule drops the cosine, as
+above; a port truly turned about the waterline shuts a little sooner (the cutter 14.1° for 14.7°, the
+frigate 18.5° for 19.7°): left as this section binds it, for the lead.
+
 ### 7.2 The wiring (B8 fills stage 0's hooks)
 
 - `ports.update(battery, firer)`, once a tick at the head of `Battery.tick`: each port gun's
@@ -1255,6 +1264,23 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
   is 74's.
 - **Pace:** a sine and a compare a port gun a tick; truth 51 and the crewed floor are measured
   after L2.
+
+*Since L2 (2026-10-31), as built:* three things this section does not say, for the lead to rule, each
+measured in `docs/dev/TuningNotes.md`, "The lee ports on the heel alone":
+- **The log's gate.** A line is said only while a gun of that deck's side is cast loose, at the shutting
+  or at the casting loose with the port shut already; `_shut` and the reading go on with the guns
+  secured. Said on passage as well, it moved the station's lee shore from 1,561 lines to 1,563 and her
+  gale from 1,722 to 1,724, where §7.3 and §16.1 expect only actions to move. So `at the lee ports
+  shut` does not fire on passage with the guns secured, and chapter 11 of the primer says so.
+- **A shut port silences its own gun and no other.** A division all behind shut ports passes its turn
+  (the turn held, 30 minutes by divisions gave the cutter 1 round for 34 as they bear); the word for a
+  broadside all behind them is dropped with a line, as a gun named is; a gun that loads behind a port is
+  not timed for the drill.
+- **A deck's side counts as shut** from its first port shut until its last has opened, so the log says
+  one line and the reading gives the count.
+
+The pace, on this machine: 1.2 to 1.4% alone and 1.3% crewed. The floors are the lead's on the build
+machine.
 
 ### 7.3 The steps and the proof
 
@@ -1279,6 +1305,15 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
   **the bisection**: the commit that moves it (L2 or L3); then, within L2, the same run with the
   gate on and the file's old heights (a scratch copy, never committed), which separates "the
   gate" from "the sourced sill".
+
+*Since L2 (2026-10-31), as measured:* the lowest shut heels on the drawn hulls are the letter of marque's
+10.5°, the 64's lower deck's 10.6°, the long tom's 13.5°, the razee's 14.5°, the cutter's 14.7°, the brig's
+17.5°, the merchant brig's 18.2° and the frigate's 19.7°. No truth, action or trial moved at L2: no
+candidate reaches the gate with her guns cast loose, the most heel cast loose among them being the *Renard*'s
+6.32°. Two pins moved, stage 0's own hook tests, and both are the gate's and not the sourced sill's. The
+quoin silences a lee gun before its port does: the cutter's carronades fall short at two cables from 8.5°,
+about 18 kn under plain sail, against her first port at 14.7°, 24.5 kn (the tuning notes, "The quoin before
+the port").
 
 ## 8. The sub-types as fits and roles (B8, SW-4)
 
@@ -1692,7 +1727,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | B5.6 | the drawing; the pictures' standard deviation and dark fraction (thresholds stood, unmoved). **The hull step's mends, as landed** (the lead's point 10): the band on the drawn side, the head's back strip, foot and wedge, the taffrail by the stern's line, the painter's order (§6); `tests/test_view_geometry.py`'s tables and `RIGHTLY_WITHOUT` | old beside new in the tuning notes, "The eight hulls"; the owner's sheets, `docs/playtests/2026-10-31-hulls-the-eight/` |
 | SW-1 | the hull step's standing comparisons against its base commit, which take the whole document or each fit's keys, to rebase old beside new: `tests/test_hull_frigate.py` and `tests/test_hull_brig.py`'s `test_no_figure_the_physics_or_the_gunnery_reads_moved`, `tests/test_hull_cutter.py`'s `test_a_diff_of_her_physics_keys_against_git_shows_none`, `tests/test_hull_schooner.py`'s `test_no_figure_the_physics_reads_moved`; the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
 | SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
-| SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4) | old beside new, the reason, the bisection of §7.3 |
+| SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4; on the drawn hulls 10.5°, 14.7°, 17.5° and 19.7°, §7.3). *As built, no action moved; stage 0's two hook tests did* | old beside new, the reason, the bisection of §7.3 |
 | SW-5 L3 | actions in a sea, on the player's ship | the bisection L2 → L3 |
 | The caches | none (the results unchanged) | the pace measured |
 

@@ -282,9 +282,14 @@ class Battery:
     _said_out: set[tuple[str, float]] | None = None  # (kind, pounder) told the magazine is out
     # `_said_no_powder` (float keys) stays, unread: an old pickle's is inert
     # the lee ports (package 75; docs/design/Build-Ships.md §7): the ids of the guns whose
-    # ports are shut, the sea at their sills, set by `ports.update` at the head of the tick
-    # and left out of the work and the fire; a class default, empty until the rule is built
+    # ports are shut, the sea at their sills, set by `ports.update` at the head of the tick;
+    # each is run in and fires nothing, and its loading goes on. The side's half-breadth at
+    # each port gun's sill, held once a gun (`ports._half_breadth`), and the decks' sides the
+    # log has told shut (`ports._tell`). Class defaults, written to the instance only when
+    # they have something to hold, so that a battery pickled before them loads
     _shut: frozenset[str] = frozenset()
+    _port_breadths: dict[str, float | None] | None = None
+    _ports_told: frozenset[tuple[str, str]] = frozenset()
 
     def __init__(self, ship: Any) -> None:
         self.ship = ship
@@ -337,14 +342,15 @@ class Battery:
     def wants_work(self, gun: Gun) -> bool:
         """Whether the gun has a phase to work: not yet loaded, run out (when wanted) and
         primed; an exercised gun always (its cycle begins again as it ends). A gun whose
-        port is shut (`_shut`, package 75) has none."""
-        if gun.id in self._shut:
-            return False
+        port is shut (`_shut`, package 75; Build-Ships.md §7.2) is not wanted run out, and
+        its loading goes on; in dumb show it stands idle, for the round it would go through
+        is the running out and the pointing (judgement)."""
+        shut = gun.id in self._shut
         if self.exercise is not None and self.exercised(gun):
-            return True
+            return not shut
         if not gun.loaded:
             return True
-        if self.run_out_wanted and not gun.run_out and gun.kind != "swivel":
+        if self.run_out_wanted and not gun.run_out and gun.kind != "swivel" and not shut:
             return True
         return not gun.primed
 
@@ -465,11 +471,12 @@ class Battery:
         """One tick: the ports shut or opened against the sea at their sills (`ports.update`,
         package 75), each crew's work on its guns, then the guns that fire. `resolve` is
         `hits.resolve_shot`, given each shot that goes."""
-        # the lee ports first, so that a gun whose port shuts this tick neither works nor
-        # fires in it (Build-Ships.md §7.2); the changes it gives are the log's, once the
-        # rule is built, and stage 0's hook shuts nothing
-        ports.update(self, firer)
+        # the lee ports first, so that a gun whose port shuts this tick is run in and fires
+        # nothing in it (Build-Ships.md §7.2); `update` tells the log
+        shut, _opened = ports.update(self, firer)
         ship = self.ship
+        for gid in shut:
+            self._housed(ship.guns[gid])
         mag = magazine(ship)
         crews: dict[str, list[Gun]] = {}
         for g in ship.guns.values():
@@ -490,6 +497,15 @@ class Battery:
                 self._work(g, dt / factor, mag, tick)
         self._train_pivots(dt, quarters, firer, target)
         self._fire(quarters, firer, target, rng, tick, resolve, mag)
+
+    def _housed(self, gun: Gun) -> None:
+        """A gun whose port has shut: run in, the lid lowered on it housed (judgement,
+        Build-Ships.md §7.2), and a running out or a pointing in hand given over; it keeps
+        its charge and its priming, and a loading in hand goes on (`_work`)."""
+        gun.run_out = False
+        svc = self.services[gun.id]
+        if not svc.idle and self._phases(gun)[svc.phase][0] in ("run out", "point"):
+            svc.phase = -1
 
     def _train_pivots(self, dt: float, quarters: Any, firer: Firer, target: Target | None) -> None:
         """A pivot gun cast loose is trained round toward the mark the shorter way, at its
@@ -598,11 +614,13 @@ class Battery:
                 svc.phase = next(i for i, (name, _) in enumerate(phases) if name == start)
                 svc.began_tick = None
             elif gun.loaded:
-                # begin where the gun stands: loaded wants running out and priming only
+                # begin where the gun stands: loaded wants running out and priming only, and
+                # behind a shut port priming alone
+                out = not gun.run_out and gun.kind != "swivel" and gun.id not in self._shut
                 svc.phase = next(
                     i
                     for i, (name, _) in enumerate(phases)
-                    if name == ("run out" if not gun.run_out and gun.kind != "swivel" else "prime")
+                    if name == ("run out" if out else "prime")
                 )
                 svc.began_tick = None
             else:
@@ -671,13 +689,18 @@ class Battery:
             if svc.phase >= len(phases):
                 self._cycle_done(gun, svc, tick, dumb)
                 break
-            # a phase the gun's state has no need of is passed over
+            # a phase the gun's state has no need of is passed over; behind a shut port the
+            # running out and the pointing, so that its round ends primed and housed
+            housed = gun.id in self._shut
             while svc.phase < len(phases):
                 nxt = phases[svc.phase][0]
-                if nxt == "run out" and (gun.run_out or not self.run_out_wanted):
+                if nxt == "run out" and (gun.run_out or not self.run_out_wanted or housed):
                     svc.phase += 1
                     continue
                 if nxt == "prime" and gun.primed:
+                    svc.phase += 1
+                    continue
+                if nxt == "point" and housed:
                     svc.phase += 1
                     continue
                 break
@@ -731,9 +754,14 @@ class Battery:
 
     def _cycle_done(self, gun: Gun, svc: Service, tick: int, dumb: bool) -> None:
         """A gun's phases done (the point worked through: a loaded gun in dumb show, run out
-        and pointed with its charge kept): in dumb show the round counted."""
+        and pointed with its charge kept): in dumb show the round counted. A round ended primed
+        behind a shut port was neither run out nor pointed: the drill's "from sponge to point"
+        does not time it (package 75)."""
         if svc.began_tick is not None:
-            self._timed(gun, svc, tick)
+            if gun.id in self._shut:
+                svc.began_tick = None
+            else:
+                self._timed(gun, svc, tick)
         svc.phase = -1
         if dumb:
             self._dumb_round(gun, svc, None)
@@ -799,10 +827,16 @@ class Battery:
             units.wrap_pi(target.bearing_rad - firer.heading_rad) if target is not None else None
         )
         # the single guns and the gun to leeward: by name, once each, at whatever bears; a
-        # gun whose port is shut does not fire (package 75)
+        # gun whose port is shut does not fire, and its order is dropped with a line (package
+        # 75; Build-Ships.md §7.2)
         for gid in list(self.single):
             g = ship.guns.get(gid)
-            if g is None or gid in self._shut or not self.ready(g):
+            if g is None:
+                continue
+            if gid in self._shut:
+                self._drop_named(g)
+                continue
+            if not self.ready(g):
                 continue
             self.single.remove(gid)
             self._discharge(g, quarters, firer, target, relative, rng, tick, resolve)
@@ -813,6 +847,8 @@ class Battery:
         if target is None or relative is None:
             self.word = None
             return
+        if self.word is not None and self._shut:
+            self._drop_word_behind_ports(relative, target)
         # a gun captain fires at what his gun can throw to: a mark beyond its random range
         # is not fired at (Douglas 1820 on the waste of powder at long shot; judgement); a
         # gun whose port is shut, not at all (package 75)
@@ -839,10 +875,74 @@ class Battery:
             for g in ready:
                 self._discharge(g, quarters, firer, target, relative, rng, tick, resolve)
         elif self.mode is FireMode.BY_DIVISIONS:
+            if self._shut:
+                self._pass_a_division_behind_ports(relative, target)
             division = [g for g in ready if (g.x_m >= 0.0) == (self.division_turn == "forward")]
             if division:
                 self._broadside(division, quarters, firer, target, relative, rng, tick, resolve)
                 self.division_turn = "after" if self.division_turn == "forward" else "forward"
+
+    def _behind_ports(self, guns: list[Gun], relative: float, target: Target) -> bool:
+        """Whether these guns are silent by their ports alone: some of them would fire at the
+        mark when ready (they serve, bear, are of a side that fires and can throw to it), and
+        every one of those is behind a shut port."""
+        would_fire = [
+            g
+            for g in guns
+            if g.serves
+            and self.bears(g, relative)
+            and self._side_fires(g)
+            and target.range_m <= S.ballistics_of(g.kind, g.pounder).random_m
+        ]
+        return bool(would_fire) and all(g.id in self._shut for g in would_fire)
+
+    def _pass_a_division_behind_ports(self, relative: float, target: Target) -> None:
+        """Fire by divisions: a division all behind shut ports holds no turn, or the other's
+        open guns would stand ready and silent as long as she heels. One gun of it open, the
+        turn waits on that gun as it waits on any gun loading."""
+        forward = self.division_turn == "forward"
+        division = [g for g in self.ship.guns.values() if (g.x_m >= 0.0) == forward]
+        if self._behind_ports(division, relative, target):
+            self.division_turn = "after" if forward else "forward"
+
+    def _drop_word_behind_ports(self, relative: float, target: Target) -> None:
+        """The word for a broadside every gun of which is behind a shut port: dropped with the
+        deck's line, as a gun named is (`_drop_named`), or it would stand as long as she heels
+        and be answered, unbidden, by the first gun to run out again. A gun of it open keeps
+        the word standing, and answers it."""
+        side = self.word
+        guns = [
+            g
+            for g in self.ship.guns.values()
+            if side == "both" or g.side == side or g.place != "broadside"
+        ]
+        if not self._behind_ports(guns, relative, target):
+            return
+        self.word = None
+        what = "broadside" if side == "both" else f"{side} broadside"
+        self.ship.note(
+            "notable",
+            "guns.port_shut",
+            f"The {what}'s ports are shut; the sea is at their sills.",
+            min(g.id for g in guns if g.id in self._shut),
+            {"side": side},
+        )
+
+    def _drop_named(self, gun: Gun) -> None:
+        """A gun named to fire whose port is shut: the order dropped, with the deck's line
+        ("The No. 3 larboard gun's port is shut; the sea is at its sill."). A shot across her
+        bows that goes with it goes when no named gun is left to carry it, or the next gun
+        fired would take the word for a signal and strike nothing."""
+        self.single.remove(gun.id)
+        if not self.single:
+            self.across_bows = False
+        self.ship.note(
+            "notable",
+            "guns.port_shut",
+            f"The {gun.name.removeprefix('the ')}'s port is shut; the sea is at its sill.",
+            gun.id,
+            {"gun": gun.id, "side": gun.side, "deck": gun.deck},
+        )
 
     def _side_fires(self, gun: Gun) -> bool:
         if gun.place != "broadside":
