@@ -16590,6 +16590,16 @@ ladder's rungs when Steel's Folio LVII is read (the boats' profile by rule in
 `tools/gen_ships.py`, step 7, is theirs to regenerate at that merge with the eight).
 
 
+**The trunk's hull step brought in after the close** (`8a421b2`: the lead's `5ff9586`,
+package 75's eight hulls with their profiles). The one conflict was the view tests' table of
+the parts a hull rightly lacks, which gains the boats (no gallery, no stern light, no head, no
+port band; a square transom and a rubbing strake for the wale); the merged generator
+reproduces all fifteen files byte for byte. On the merged tree the fast tier whole, 5,910
+passed, none failed (34:49); the slow tier of the drawing's and the boat's seven files, 839
+passed, none failed (3:05); the known truths' slow tier and the pace tests not run again here
+(the merge touched no physics and no truth; the lead's cloud run on the merge is the whole).
+
+
 ## Package 88: the captain's pass of M7 (2026-10-30 to 31)
 
 Built as a sibling session on `claude/pkg-88` from the lead's head `c168c51`, each item in
