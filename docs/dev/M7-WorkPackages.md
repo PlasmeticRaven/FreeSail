@@ -1340,8 +1340,10 @@ no consent file touched, no model identifier in any file; 85's in-world test gre
 served heads and the tools' words the first time they met it; the grammar book, the primer,
 the particulars and the profile tests green after the mend below; **the whole fast tier on
 the merged tree here (whole but the pictures' flake under four workers, the MCP bridge's
-images, passing alone as at 93's merge) and the whole suite in the cloud dispatched at the
-push (run 22; its figures written here when it is in).**
+images, passing alone as at 93's merge) and the whole suite in the cloud (run 22 on `11b4863`:
+lint green, 5,626 passed over the six shards, 3 skipped, 11 expected failures, none failed,
+41 minutes, the count up from run 21's 4,828 by her suites; the pace job 10 of 10 in 162
+seconds).**
 
 **What was built** (`docs/playtests/2026-10-30-pilot-indefatigable/testing-report.md`, the
 tuning notes "Package 75", `docs/design/Design-Ship-Indefatigable.md` and the research,
