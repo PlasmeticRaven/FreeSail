@@ -460,6 +460,10 @@ DANGER_AHEAD_AGAIN_S = 600
 # (package 88, found on item 1; `Judgement._read_chase`): the law's switch for the bisection.
 ENGAGING_CHASE_STALE = True
 BOW_POINTS = 4  # on the bow: within four points of her head
+# The span past the reach within which the nearest charted danger is tried along her track
+# (`_danger_ahead_by_chart`'s cheap test): the track's two cables abeam and a danger's own
+# extent, generously (judgement: two miles; no charted danger of the Channel's is a mile across).
+DANGER_AHEAD_SPAN_NM = 2.0
 
 
 def plain_cables(m: float) -> str:
@@ -1695,13 +1699,19 @@ class Perception:
             r = view.value("sail", sid)
             if isinstance(r, dict) and str(r.get("state") or "") == "set":
                 p.storm_staysails_set = True
-        square = [
-            r
-            for r in (view.value("sail", sid) for sid, sl in sails.items() if sl.cls == "square")
-            if isinstance(r, dict) and str(r.get("state") or "") == "set"
-        ]
-        p.square_set = bool(square)
-        p.square_none_drawing = bool(square) and all(r["shaking"] or r["aback"] for r in square)
+        if not p.headway:
+            # read only with no way on her, the one case the recovery asks them for (the
+            # pace: every square sail's reading at every judgement of every crewed captain
+            # was the dearer part of the perception; package 88's follow-up)
+            square = [
+                r
+                for r in (
+                    view.value("sail", sid) for sid, sl in sails.items() if sl.cls == "square"
+                )
+                if isinstance(r, dict) and str(r.get("state") or "") == "set"
+            ]
+            p.square_set = bool(square)
+            p.square_none_drawing = bool(square) and all(r["shaking"] or r["aback"] for r in square)
         boat = view.value("boat")
         p.boat_away = bool(isinstance(boat, dict) and boat.get("away"))
         manifest = view.value("manifest")
@@ -3073,7 +3083,15 @@ class Captain(Judgement):
             )
             if off <= BOW_POINTS * 11.25 and float(near["metres"]) <= reach:
                 what = f"{near.get('words') or 'the land on her bow'}"
-        if not what and not p.land_in_sight:
+        # the dear reads of the chart only when the cheap ones put something within reach:
+        # the coast by the account (`coast_by_account_nm`) and the nearest charted danger
+        # (`dangers_nm`, within ten miles), read by the perception at every judgement; no land
+        # can be crossed nearer than the coast, nor a danger met on her track farther than its
+        # distance less the track's two cables and its own extent (`DANGER_AHEAD_SPAN_NM`)
+        reach_nm = reach / units.NAUTICAL_MILE
+        coast_near = p.coast_by_account_nm is not None and p.coast_by_account_nm <= reach_nm
+        danger_near = p.dangers_nm is not None and p.dangers_nm <= reach_nm + DANGER_AHEAD_SPAN_NM
+        if not what and not p.land_in_sight and coast_near:
             # the chart's coast tried along her course, as the planner tries a line
             # (`chart.line_shore`: the captain's own paper, the points the account's)
             shore = chart.line_shore(here, dest(here, p.heading_deg, reach), 0.0)
@@ -3087,7 +3105,7 @@ class Captain(Judgement):
         draught = float(hull.spec.draught_m) if hull is not None else 2.0
         found = (
             []
-            if what or p.land_in_sight
+            if what or p.land_in_sight or not danger_near
             else chart.dangers_ahead(
                 here, p.heading_deg, reach, AHEAD_ABEAM_M, tide_m=0.0, wants_m=draught + 1.0
             )
