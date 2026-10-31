@@ -17073,3 +17073,20 @@ what every man in the hull feels. 53's test of the officer below without the dec
 tests are step 2's. The pace truth 7-159 read 496 ticks a second under the pace run and 500 is
 its floor; alone again it passed (the frigate alone on the trunk's tree measured 485 in this
 container, so the floor is the build machine's and the container reads about at it).
+
+**The suites on the step's final tree** (`1bb8933`, the trunk's `d4e6701` merged; this
+container's four cores): the fast tier whole, `python -m pytest -n 4 -q -p no:cacheprovider`,
+5,927 passed, none failed (397 slow tests left out); the slow tier of the touched files and the
+known truths (`tests/test_knowledge.py`, `test_agents`, `test_harness_instruments`,
+`test_officer`, `test_people`, `test_orders_places`, `test_readings`, `test_scenarios`,
+`test_places`, `test_between_hulls`, `test_in_world`, `test_checkpoint`, `test_replay`,
+`test_crews`, `test_wardroom_doors`, `test_world_orders`, `test_director`, `test_known_truths`;
+`--slow -m "not pace" -n 4`), 841 passed, 8 expected failures (the rulings', truth 7b-100's old
+reading among them), none failed; the pace tests alone and last (`--slow -m pace`), every one
+passed, the figures: the frigate alone 530 ticks a second, truth 7-386's three stations seated
+593 under the rule against 615 with it off (and 556 against 568 in the known truths' run of the
+same measure), the Channel observed 310 and with the frigate at the view 209; ruff check and
+ruff format --check clean. The whole suite is the lead's in the cloud at the merge. A first
+run of the fast tier on the step's tree found three checkpoint tests failing (a harness
+restored from a save written before the package lacked the slept span: a class default
+mended it) and the slow tier the two truths above; both runs are in the commits' messages.
