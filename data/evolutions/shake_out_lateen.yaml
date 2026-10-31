@@ -1,0 +1,32 @@
+# Shake a reef out of a lateen sail: ease the sheet and brail the sail in, cast off the points
+# along the reef band, and haul it out again. The yard is not lowered, so there is no settling
+# of halyards and no hoist: the sail is brailed in and hauled out, 30 seconds each, and the
+# points cast off in 90 (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6.
+id: shake_out_lateen
+verb: shake_out
+applies_to: {class: lateen}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; set it before shaking out a reef."}
+  - {check: sail.reefs > 0, reason: "The {sail} has no reef in it."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: brail_in
+    duration_s: 30
+  - do: shake_out
+    duration_s: 90
+    sets: {sail.reefs: "max(sail.reefs - params.reefs, 0)"}
+    log: "Cast off the reef points of the {sail}."
+  - do: haul_out
+    duration_s: 30
+on_start: {log: "Hands to shake a reef out of the {sail}."}
+on_complete: {log: "Shook the reef out of the {sail}; now {state}.", kind: sail.reef_shaken_out, severity: notable}
+on_fail: {log: "Could not shake out the reef in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard work the after sail (Luce 1884, ch. XVIII Organization, 'Duties of Men
+# in Different Parts of the Ship', as shake_out_gaff's); ten ordinary (judgement).
+crew: {hands: 10, rating: ordinary, stations: [afterguard]}
+source: "Steel's sail table, the mizen's one reef band; the times are judgement"

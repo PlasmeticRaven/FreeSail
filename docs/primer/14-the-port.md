@@ -423,6 +423,8 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 |---|---|---|
 | `the people` | `who is aboard`, `the officers` | each person by name and role, with his place and state |
 | `where is the master` | `where is the carpenter`, `where is the pilot` | one person's place and state; refused in words for a name not aboard |
+| `where am I` | | where you are: aboard and your place, in the boat, ashore at the port's place, or aboard another ship as a visitor |
+| `send the boat to the Medusa with Mr Veale` | `send the boat to the Medusa for Mr Veale` | the boat to another ship lying within a boat's pull (a mile): whoever is named goes aboard her, or steps into the boat there to come back; a person who goes keeps his station, as a visitor's voice in her, and has it again when he comes home |
 | `send for the master` | `pass the word for the carpenter`, `call the surgeon` | the messenger goes; he comes to where the captain is a minute later |
 | `go below` | `go to the cabin` | the captain to his cabin; anyone else to his berth below |
 | `come on deck` | `come up`, `go on deck` | to the quarterdeck (the deck for the boatswain and the idlers' chiefs) |

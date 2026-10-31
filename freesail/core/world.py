@@ -2388,8 +2388,10 @@ class World:
             # reader; a replay re-enters them from the journal
             "standing_orders": self.standing.book.save(),
             # the agents (spec M4 §11): each station, its policy, its transcript (the
-            # model's replies, which a replay plays back) and its journal
-            "agents": [agent.save() for agent in self.agents.values()],
+            # model's replies, which a replay plays back) and its journal; since package
+            # 82 a harness may be in another hull than the one it was seated on (its person
+            # a visitor there), and the save groups it by the hull of its seating
+            "agents": [agent.save() for agent in self._agents_seated_on(self.own.id)],
             "agent_journals": {name: j.save() for name, j in self.agent_journals.items()},
             # the world orders applied, with their ticks and sources, for the reader (spec
             # M5 §26, package 36); a replay applies the scenario's again from the scenario
@@ -2414,13 +2416,27 @@ class World:
             "hulls": self._hull_blocks(),
         }
 
+    def _agents_seated_on(self, hull_id: str) -> list[Any]:
+        """The harnesses first seated on the hull (package 82: a harness lives where its
+        person is, and a save keeps it under the hull of its seating, so that a replay by
+        the transcript seats it there before the replayed moves carry it on); a harness
+        from before the field is the hull's it is in."""
+        from freesail.agents.harness import harnesses_of
+
+        out = []
+        for hull, h in harnesses_of(self):
+            seated = getattr(h, "seated_on", None) or str(getattr(hull, "id", "") or "")
+            if seated == str(hull_id):
+                out.append(h)
+        return out
+
     def _hull_blocks(self) -> list[dict[str, Any]]:
         own = self.__dict__.get("_own")
         out: list[dict[str, Any]] = []
         for hid, hull in list((self.__dict__.get("hulls") or {}).items()):
             if hull is own:
                 continue
-            agents = hull.__dict__.get("agents") or {}
+            agents = self._agents_seated_on(str(hid))
             journals = hull.__dict__.get("agent_journals") or {}
             if not agents and not journals:
                 continue
@@ -2429,7 +2445,7 @@ class World:
             out.append(
                 {
                     "id": str(hid),
-                    "agents": [agent.save() for agent in agents.values()],
+                    "agents": [agent.save() for agent in agents],
                     "agent_journals": {name: j.save() for name, j in journals.items()},
                     "standing_orders": standing.book.save() if standing is not None else {},
                     "stations": stations.to_dict() if stations is not None else {},

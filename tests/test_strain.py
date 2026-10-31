@@ -25,6 +25,7 @@ from freesail.physics.wind import Wind, WindParams
 from freesail.ship.loader import load_ship, ship_from_dict
 from freesail.ship.parts import LineState, Sail, SailState
 from freesail.ship.stub import OrderError
+from tests.rig_fixtures import frigate_with_mizen_yard
 from tests.test_ship_loader import MINIMAL
 
 FRIGATE = "data/ships/frigate-36.yaml"
@@ -533,6 +534,18 @@ def test_carried_away_yard_names_its_sail():
         "Main royal yard carried away in the slings; the main royal hanging to leeward."
     )
     assert ship.sails["main.royal"].wrecked and ship.sails["main.royal"].is_set is False
+
+
+def test_a_lateen_yard_carries_away_in_the_slings():
+    # package 75: out of `is_yard`, it has vangs in place of braces, but it is slung (Steel 1794
+    # vol. I p. 207: the derrick "between the slings and the" peak), and *Orion*'s mizen yard
+    # was "shot in two in the slings" (James vol. 1 p. 154)
+    ship = frigate_with_mizen_yard()
+    yard = ship.spars["mizzen.yard"]
+    yard.condition = 0.0
+    load(yard, 1.1)
+    assert not yard.is_yard
+    assert "carried away in the slings" in texts(tick(ship, 1))[-1]
 
 
 def test_sail_blows_out_over_one_point_eight_of_its_cloth():

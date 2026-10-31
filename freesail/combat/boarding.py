@@ -572,6 +572,7 @@ def _end(f: Fight, how: str, why: str) -> None:
         )
         if dw is not None:
             action.strike(dw, by_rule=False, words="carried by boarding")
+            _officer_on_her_deck(f, aw, dw)
         else:
             f.defender.extra["struck"] = tick
         return
@@ -598,6 +599,62 @@ def _end(f: Fight, how: str, why: str) -> None:
             f"{number_words(f.lost_attack)} of theirs).",
             data={"lost_attack": f.lost_attack, "lost_defence": f.lost_defence, "how": how},
         )
+
+
+def boarders_officer(world: Any) -> Any:
+    """The officer who leads the boarders (package 82; the design's §2): the first
+    lieutenant by the period's practice (the captain stays with his ship), a person of the
+    company aboard and whole, who does not have the deck; None when she has none."""
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    try:
+        captain = people.captain
+    except Exception:  # noqa: BLE001  (a world with no muster)
+        captain = None
+    for role in ("first lieutenant", "lieutenant", "mate"):
+        for p in people.by_role(role):
+            if p is captain or getattr(p, "dead", False) or not getattr(p, "aboard", True):
+                continue
+            if getattr(p, "sick", False):
+                continue
+            return p
+    return None
+
+
+def _officer_on_her_deck(f: Fight, aw: Any, dw: Any) -> None:
+    """The deck won: the boarders' officer stands on her deck (`movement.put_aboard`, his
+    station following him as a visitor's: the design's §2, the boarders a party of one hull
+    on the deck of another); the prize crew and the captive are 74's on the same function."""
+    from freesail.world.movement import hull_of, put_aboard
+
+    officer = boarders_officer(aw)
+    if officer is None:
+        return
+    target = hull_of(aw.world, getattr(dw, "id", None)) if hasattr(aw, "world") else None
+    if target is None:
+        target = dw if hasattr(dw, "id") and hasattr(dw, "record") else None
+    if target is None:
+        return
+    who = _words_in(aw, f.defender_id, "the enemy")
+    aw.record(
+        Severity.NOTABLE,
+        "person.moved",
+        f"{officer.name} leads the boarders on to {who}'s deck and has it.",
+        data={"person": officer.to_dict(), "ship": str(getattr(target, "id", ""))},
+    )
+    put_aboard(aw.world, officer, target, "quarterdeck", by="the boarders", said=False)
+    target.record(
+        Severity.NOTABLE,
+        "person.aboard",
+        f"{officer.name} of the enemy stands on the quarterdeck with the boarders.",
+        data={
+            "person": officer.name,
+            "ship": str(target.id),
+            "from": str(aw.id),
+            "by": "the boarders",
+        },
+    )
 
 
 def repel(world: Any) -> str:

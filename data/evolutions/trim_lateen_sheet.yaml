@@ -1,0 +1,43 @@
+# Trim a lateen sail's sheet: the mizen yard has vangs in place of braces (Falconer 1780,
+# VANGS and BRACE) and is not braced, so the sail is trimmed by its one sheet, led to the horse
+# at the taffrail (Steel 1794 vol. I p. 208; Lavery, I32). The afterguard work the sheet to the
+# length the wanted angle needs, hauling in or easing off, and belay it; a sheet let fly is
+# taken up and hauled as part of it. "Trim aft the head sheets", "haul aft the spanker sheet as
+# the sail lifts" (Luce 1866, ch. XXIV, 'Tacking'). The sheet holds the trim: the sail's angle
+# is read from the sheet's length, through the boom's geometry where it has a boom.
+#
+# Parameters:
+#   angle_deg   the angle off the centreline wanted; null: the trim for the apparent
+#               wind (the class's best angle of attack)
+#   side        weather, lee or null (lee): the side the sail is held on
+#
+# The time is the sail's size: seconds_per_m2 times the area, between min_s and max_s.
+# Judgement: no period timing for a sheet found.
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6. The same script and times as
+# trim_gaff_sheet.yaml (package 32e, spec M5 open item 13); the angle wanted is by the class
+# whose trim the sail takes (`Sail.curve_class`: the gaff's for a sail cut at the mast), and
+# the geometry is freesail/evolutions/trim.py's. This evolution is the one way the trim is
+# worked with hands and time, by `trim the <sail>`, by `trim sails` and `trim the sheets`, by
+# the standing book's tending routine and by the manoeuvres.
+id: trim_lateen_sheet
+verb: trim
+applies_to: {class: lateen}
+script: trim_sheet
+params: {angle_deg: null, side: null}
+preconditions:
+  - {check: "sail.state == set", reason: "The {sail} is {state}; there is no sail to trim."}
+  - {check: "not wrecked(sheets_of(sail))", reason: "{parted}"}
+timing:
+  seconds_per_m2: 0.4   # the 64's mizen course (about 104 m2) 42 s
+  min_s: 20
+  max_s: 120
+on_start: {log: "Man the {sail} sheet.", kind: evolution.started, severity: routine}
+on_complete: {log: "Trimmed the {sail} sheet; the {sail} {angle_words}.", kind: sail.trimmed, severity: routine}
+on_fail: {log: "Could not trim the {sail} sheet: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard man the spanker and main sheets (Luce 1884, ch. XVIII Organization,
+# 'Duties of Men in Different Parts of the Ship'); six hands to a purchase (judgement: a
+# party, not a watch).
+crew: {hands: 6, rating: ordinary, stations: [afterguard]}
+source: "Steel 1794 vol. I p. 208 (the mizen's sheet and its horse at the taffrail); Falconer 1780, VANGS and BRACE; trim_gaff_sheet's times (judgement)"

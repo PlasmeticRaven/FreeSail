@@ -466,6 +466,8 @@ def _far_weight(vessel: Any) -> float:
     if spec.armament is None:
         return 0.0
     fit = spec.armament.fit(getattr(vessel, "fit", "") or None)
+    if fit is None:
+        return 0.0  # her fit "unarmed" (package 75): no guns, as a file with no armament
     return sum(g.pounder for g in fit.guns if g.side == "starboard" or g.place != "broadside")
 
 

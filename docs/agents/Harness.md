@@ -421,6 +421,27 @@ Without the prefix the order is refused as it always was (the captain plays the 
 
 **As built since package 84 (the one-world refactor; `docs/design/Design-OneWorld.md`, its postscripts "As built").** Her World is her hull of the one world (`hulls.Hull`): one clock, her own log, streams and view of the sail, her systems and this station holding the hull as their world; sailed beyond the range she sleeps (her physics off, her state whole) and wakes without being remade, the station keeping across both; a save holds her stations (`hulls`) and a replay gives her orders to her again by either road; the drivers may follow her (`follow "<her name>"`); the director's forms name her (`aboard the <name>: ...`, a person made or come aboard her, a cutter's letter to her), the truth walks every hull and `read_log(ship=)` reads her log; a seat may be at a person aboard her.
 
+**As built since package 82 (the boat as a hull and the person aboard another ship;
+`docs/design/Design-BoatAndPersonAboard.md` §2).** A station goes with its person. When the
+person a model holds goes into another ship (sent in his ship's boat by `send the boat to the
+<ship> with <name>`, put aboard by the director's `person: "<name>" goes aboard the <ship> by
+the boat`, carried over as the boarders' officer when a deck is won, or put aboard a captor),
+his station is not stood down: the same conversation goes on, and its samples are the ship
+he is in from the next tick. In that ship he is **a visitor**: his station there is his own
+name's, of the passenger's kind, with a passenger's reach and no more (the readings of the
+ship he is in, the conversation by spot, his journal, a free line, `where am I`, which says
+"aboard the <ship>, on the quarterdeck, a visitor, of the <his ship>"); he gives none of her
+deck's orders, and none of his own ship's from there (the words say so: hail her, make a
+signal or send a letter). His own station on his ship stands bound to him meanwhile (her deck
+is nobody's or the book's), and when he comes back aboard, by `come aboard` (her boat takes
+him home where his ship lies within a boat's pull), his station is his again with its whole
+surface. A captive put aboard a captor is stood down with the reason instead (the handover's
+rule, the game saved and the journal kept); that is package 74's. The save keeps the harness
+under the hull it was first seated on, and a replay seats it there and moves it as the play
+did. The consent brief describes both kinds a visitor passes between, and the particulars of
+a station may change without the question being put again, so no new question follows a
+visit.
+
 ## 18. The regatta: a course sailed by an agent, and scored (package 44)
 
 The regatta (spec M6 §21) sails a fixed course at a fixed seed under one agent at a time and scores the run: the elapsed time from the gun to the finish line, with the damage, the groundings, the crew's fatigue and the purse beside it. It is your tool for judging the physics and the documentation against the models, and the first competitive mode. One command runs a course; there is no game to start first, since the regatta hosts the game itself and the door runs beside it.

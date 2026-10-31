@@ -177,7 +177,10 @@ def test_every_world_order_form_is_named_in_the_primer(primer):
 def test_the_primer_names_every_event_and_every_tripwire(primer):
     """The standing dialect's events and the stand-by's tripwires are each named, so a
     reader can find what wakes a station without the library."""
-    missing = [w for w in R.EVENTS if not _named(primer, w)]
+    # an absent event (the world has not got it yet; the book refuses it with its
+    # sentence) is the grammar page's "later" list's, as an absent reading is, and
+    # not the primer's, which names what wakes a station
+    missing = [w for w, s in R.EVENTS.items() if not s.absent and not _named(primer, w)]
     assert not missing, f"events the primer never names: {missing}"
     missing = [w for w in TRIPWIRE_WORDS if not _named(primer, w.split(" <n>")[0])]
     assert not missing, f"tripwires the primer never names: {missing}"

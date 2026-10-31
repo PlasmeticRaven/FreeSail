@@ -1041,6 +1041,21 @@ class People:
                 return p
         return None
 
+    def find_aboard(self, words: str) -> Person | None:
+        """A person in this hull now who is not of her company (package 82: a visitor come
+        aboard by the boat, by boarding or by capture), by his name or his surname; None
+        for nobody. The company's own are `find`'s."""
+        key = _words(words)
+        if not key:
+            return None
+        bare = key.removeprefix("mr ").removeprefix("mister ")
+        for p in self.registry.aboard(self.hull_id):
+            if p.home == self.hull_id:
+                continue
+            if _words(p.name) == key or _words(p.name) == bare or _words(p.surname) == bare:
+                return p
+        return None
+
     def of_the_company(self, words: str, draw: bool = True) -> Person | None:
         """A person of the ship's company by the words (spec M7b §9; package 52): one of
         the people (`find`), or a man of the muster by his trade whom the named few do not

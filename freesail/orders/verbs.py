@@ -42,7 +42,7 @@ from freesail import units
 from freesail.crew.model import number_words
 from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
-from freesail.evolutions.runner import PartyTooSmall
+from freesail.evolutions.runner import PartyTooSmall, part_name
 from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
@@ -1107,9 +1107,13 @@ def _trim(
             wants[yard.id] = want
         # on a wind: the lowest yard of every mast wants to go sharper than it can (package
         # 37p: the lowest of each mast, so that a fore-and-after whose yards begin at the
-        # topsail is judged by it, where before only a course yard was read)
+        # topsail is judged by it, where before only a course yard was read); not by a
+        # yard under the bowsprit, which no mast carries (package 75;
+        # docs/design/Design-ShipsEngineExtensions.md §4.2)
         lowest: dict[str, Spar] = {}
         for yard in rig:
+            if ship.under_bowsprit(yard):
+                continue
             mast = ship.mast_of(yard)
             key = mast.id if mast is not None else yard.id
             if key not in lowest or _level_rank(ship, yard) < _level_rank(ship, lowest[key]):
@@ -1215,7 +1219,7 @@ def _trim(
             extra_s = {**extra_s, "log_group": new_group()}
         for sail in candidates:
             name = resolve.the(ship, sail.id)
-            wanted = yard_trim.wanted_sheet_angle(sail.cls, awa_signed)
+            wanted = yard_trim.wanted_sheet_angle(sail.curve_class, awa_signed)
             reading = yard_trim.read_sheet(ship, sail)
             if (
                 not reading.free
@@ -1362,6 +1366,10 @@ def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list
         part = ship.parts[pid]
         name = resolve.the(ship, pid)
         if isinstance(part, Spar):
+            if part.cls == "lateen_yard":
+                # called a yard but not braced (package 75): refused in the brace orders'
+                # words, its sail trimmed with its sheet and vangs (`_yard_for` raises)
+                _yard_for(ship, pid)
             if not part.is_yard:
                 raise OrderError(
                     f"{name[0].upper()}{name[1:]} is not a yard; trim a sail or a yard."
@@ -1558,7 +1566,9 @@ def _yard_for(ship: Ship, pid: str) -> Spar:
         if part.is_yard:
             return part
         sail = ship.sail_of(part)
-        how = " it is trimmed with its sheet and vangs" if part.cls in ("gaff", "boom") else ""
+        # a lateen yard has vangs in place of braces (package 75; Falconer 1780, VANGS)
+        vangs = part.cls in ("gaff", "boom", "lateen_yard")
+        how = " it is trimmed with its sheet and vangs" if vangs else ""
         hint = f"; the {sail.cls} sail on it is not braced;{how}" if sail else f";{how}"
         hint = hint.rstrip(";")
         raise OrderError(f"The {name} is a {part.cls.replace('_', ' ')}, not a yard{hint}.")
@@ -1913,7 +1923,7 @@ def _draw(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             failed.append(f"{name} has no sheet")
             continue
         reading = yard_trim.read_sheet(ship, part)
-        wanted = yard_trim.wanted_sheet_angle(part.cls, ship.dyn.apparent_wind_angle)
+        wanted = yard_trim.wanted_sheet_angle(part.curve_class, ship.dyn.apparent_wind_angle)
         if (
             not reading.free
             and not reading.held_to_windward
@@ -2580,6 +2590,31 @@ def _points_words(points: float) -> str:
 # ---------------------------------------------------------------------------
 
 
+def _boom_goes_with_its_sail(ship: Ship, part: Any) -> str | None:
+    """Why a driver's boom is not rigged out or in by order, naming the shift that does it
+    (package 75; docs/design/Design-ShipsEngineExtensions.md §17.11), or None for any other
+    part. With nothing bent in the driver's place, the bending does the shift's work."""
+    if not isinstance(part, Spar):
+        return None
+    driver = next((s for s in ship.sails_using(part) if scripts.driver_boom(ship, s) is part), None)
+    if driver is None:
+        return None
+    name = part_name(ship, driver.id)
+    if driver.state is SailState.UNBENT:
+        do = f"bend the {name}"
+        holder = storm._in_its_place(ship, driver)
+        if holder is not None:
+            do = f"shift the {part_name(ship, holder.id)} for the {name}"
+    else:
+        do = f"unbend the {name}"
+        if driver.in_place_of is not None:
+            do = f"shift the {name} for the {part_name(ship, driver.in_place_of)}"
+    return (
+        f"The {part_name(ship, part.id)} goes out and comes in with the {name}, not by itself; "
+        f"{do}."
+    )
+
+
 def _boom_evolution(
     ship: Ship,
     order: Order,
@@ -2609,6 +2644,9 @@ def _boom_evolution(
         elif isinstance(part, Sail) and part.cls == "studding":
             boom = ship.spar_of_role(part, "boom")
         if boom is None:
+            with_its_sail = _boom_goes_with_its_sail(ship, part)
+            if with_its_sail is not None:
+                raise OrderError(with_its_sail)
             raise errors.wrong_kind(
                 verb,
                 resolve.display_name(ship, pid),

@@ -554,7 +554,11 @@ def test_every_event_of_the_registry_is_in_the_events_table():
     forms = table_forms("11-the-starting-book.md", "## The events, whole")
     events = {f.removeprefix("at ") for f in forms}
     assert all(f.startswith("at ") for f in forms)
-    assert events == set(R.EVENTS), events ^ set(R.EVENTS)
+    taken = {w for w, s in R.EVENTS.items() if not s.absent}
+    assert events == taken, events ^ taken
+    # an absent event (registered with the sentence the book refuses it by, until the
+    # world has it) is not a form the book takes, and the table is of those alone
+    assert not events & {w for w, s in R.EVENTS.items() if s.absent}
 
 
 @pytest.mark.parametrize("chapter,form", WORLD_FORMS, ids=[f"{c[:2]}: {f}" for c, f in WORLD_FORMS])

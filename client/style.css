@@ -17,6 +17,12 @@
   --hull-far: #3a2f26;
   --deck: #b9a37e;
   --transom: #5a4a3b;
+  --wale: #2a221b;
+  --band: #8f7550;
+  --light: #221e1a;
+  --figure: #a58a5e;
+  --under: #58686d;
+  --under-line: #4b5a5f;
   --spar: #3b3128;
   --spar-wrecked: #8c7f72;
   --canvas: #ece5d3;
@@ -156,6 +162,38 @@ main {
 .ship-view .hull.side { fill: var(--hull); }
 .ship-view .hull.deck { fill: var(--deck); }
 .ship-view .hull.transom { fill: var(--transom); }
+/* package 75: a hull drawn from her profile. Its strips are ruled in their own fill, so that the
+   seams between them do not show (left unstroked, each polygon's anti-aliased edge leaves a
+   hairline of what lies behind). A wale or a band is ruled twice as wide: the next strip's rule
+   crosses the end of this strip's band, and the next band's rule covers it again. The outline
+   strokes the side's edges and fills nothing. */
+.ship-view .hull.strip { stroke-width: 0.8px; }
+.ship-view .hull.side.strip { stroke: var(--hull); }
+.ship-view .hull.bottom { fill: var(--hull); stroke: var(--hull); }
+.ship-view .hull.deck.strip { stroke: var(--deck); }
+.ship-view .hull.transom.strip { stroke: var(--transom); }
+.ship-view .hull.wale { fill: var(--wale); stroke: var(--wale); stroke-width: 1.6px; }
+.ship-view .hull.band { fill: var(--band); stroke: var(--band); stroke-width: 1.6px; }
+.ship-view .hull.bulkhead { fill: var(--transom); }
+.ship-view .hull.outline { fill: none; stroke: var(--hull-far); stroke-width: 1px; }
+/* B5.6, the form's drawing: the channel wale as the main wale; the quarter galleries as plain boxes
+   edged like the hull; the stern lights as plain dark marks (no opening: the ports are package
+   81's); the knee of the head as the side, its fore edge in strips with their seams not shown,
+   and the figure, scroll or billet on it as a plain buff shape; the tuck under a transom's
+   rounded foot as the side. Below the water, where the view draws it faint, every part one
+   colour, the hull seen through the sea. */
+.ship-view .hull.wale.channel { fill: var(--wale); stroke: var(--wale); }
+.ship-view .hull.gallery { fill: var(--transom); stroke: var(--hull-far); }
+.ship-view .hull.light { fill: var(--light); stroke: var(--light); stroke-width: 0.5px; }
+.ship-view .hull.head { fill: var(--hull); stroke: var(--hull-far); }
+.ship-view .hull.head.strip { stroke: var(--hull); }
+.ship-view .hull.head.figure,
+.ship-view .hull.head.scroll,
+.ship-view .hull.head.billet { fill: var(--figure); stroke: var(--hull-far); }
+.ship-view .hull.transom.tuck { fill: var(--hull); stroke: var(--hull); }
+.ship-view .hull.under,
+.ship-view .hull.under.strip { fill: var(--under); stroke: var(--under); }
+.ship-view .hull.outline.under { fill: none; stroke: var(--under-line); }
 
 .ship-view .spar { stroke: var(--spar); stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .ship-view .spar.mast { stroke-width: 3.2px; }
@@ -168,6 +206,7 @@ main {
 .ship-view .spar.yard, .ship-view .spar.lug_yard, .ship-view .spar.lateen_yard { stroke-width: 1.9px; }
 .ship-view .spar.gaff, .ship-view .spar.boom, .ship-view .spar.sprit { stroke-width: 1.7px; }
 .ship-view .spar.studdingsail_boom { stroke-width: 1px; }
+.ship-view .spar.driver_yard { stroke-width: 1.2px; } /* package 75 (B5.5): Steel's driver yard, a light spar drawn with the driver */
 .ship-view .spar.wrecked { stroke: var(--spar-wrecked); stroke-dasharray: 5 4; }
 .ship-view .spar.sent_down { stroke-dasharray: 2 4; opacity: 0.5; }
 .ship-view .spar.sent_down_flying { opacity: 0.7; } /* package 57: a flying sail's yard on deck */

@@ -2867,7 +2867,9 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
 
     vocab = vocab or load_vocabulary()
     events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
-    later = ", ".join(w for w, s in R.EVENTS.items() if s.absent)
+    # the events the world has not got yet (an absent event, as a reading may be absent),
+    # quoted so that a reader finds the words, with the sentence the book says for each
+    later = ", ".join(f"'{w}' ({s.absent})" for w, s in R.EVENTS.items() if s.absent)
     readings = []
     questions = []
     for row in R.REGISTRY:

@@ -1,0 +1,37 @@
+# Reef a lateen sail: ease the sheet and brail the sail in, tie the points along the reef
+# band, which runs parallel to the foot a fifth of the mast leech up (Steel's one band in the
+# mizen), and haul it out again. The yard is not lowered, so there is no settling of halyards
+# and no hoist: the sail is brailed in and hauled out, 30 seconds each, and the points tied in
+# 120 (judgement). `params.reefs` is how many reefs to take at once (default one).
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6; Steel's band by
+# docs/design/Research-74-2026-10.md §5.6.
+id: reef_lateen
+verb: reef
+applies_to: {class: lateen}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; it must be set to be reefed."}
+  - {check: sail.reef_bands > 0, reason: "The {sail} has no reef bands."}
+  - {check: sail.reefs < sail.reef_bands, reason: "The {sail} is close reefed already.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: brail_in
+    duration_s: 30
+    log: "Eased the {sail} sheet and brailed it in."
+  - do: reef
+    duration_s: 120
+    sets: {sail.reefs: "min(sail.reefs + params.reefs, sail.reef_bands)"}
+    log: "Tied the points along the reef band of the {sail}."
+  - do: haul_out
+    duration_s: 30
+on_start: {log: "Hands to reef the {sail}."}
+on_complete: {log: "Reefed the {sail}; now {state}.", kind: sail.reefed, severity: notable}
+on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard "bend, unbend, loose, reef, furl" the after sail (Luce 1884, ch. XVIII
+# Organization, 'Duties of Men in Different Parts of the Ship', as reef_gaff's); reef_gaff's
+# ten able (judgement).
+crew: {hands: 10, rating: able, stations: [afterguard]}
+source: "Steel's sail table, the mizen's one reef band; the times are judgement"

@@ -1,0 +1,27 @@
+# Take in a lateen sail: ease the sheet and tack and brail it up to the mast and the yard,
+# where it hangs in the gear, not stowed. A ship's mizen has brails at the peak, the middle,
+# the throat and the foot (Steel 1794 vol. II p. 37); the yard is not lowered. A whole lateen
+# is clewed up "comme les autres voiles" (Lescallier 1791 p. 379), the same work here. Time as
+# for taking in a gaff sail (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6.
+id: take_in_lateen
+verb: take_in
+applies_to: {class: lateen}
+preconditions:
+  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: brail_up
+    duration_s: 90
+    sets: {sail.state: in_the_gear}
+on_start: {log: "Hands to the {sail} brails."}
+on_complete: {log: "Took in the {sail}; brailed up to its yard.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard man the after sail's brails (Luce 1884, ch. XVIII Organization,
+# 'Duties of Men in Different Parts of the Ship', as take_in_gaff's); take_in_gaff's eight
+# (judgement).
+crew: {hands: 8, rating: ordinary, stations: [afterguard]}
+source: "Steel 1794 vol. II p. 37 (the mizen's brails); Lescallier 1791 p. 379; take_in_gaff's time (judgement)"
