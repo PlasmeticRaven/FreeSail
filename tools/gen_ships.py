@@ -1118,6 +1118,7 @@ class Builder:
         self.tackle_notes: dict[tuple[str, ...], str] = {}
         self.hold_note: str = ""
         self.boat_notes: dict[tuple[str, ...], str] = {}
+        self.oars_note: str = ""
 
     def spar(self, id, cls, note=None, **kw):
         d = {"id": id, "class": cls}
@@ -1236,10 +1237,15 @@ class Builder:
 
     def boats(self, note, entries):
         """The `boats:` list (package 35, spec M5 §23) from (id, kind, name, length_ft,
-        oars, crew, tons, note) entries, the note above each boat's line and `note` above
-        the section."""
-        self.doc["boats"] = [
-            {
+        oars, crew, tons, note[, file]) entries, the note above each boat's line and `note`
+        above the section; `file` (package 82, item 4), the boat's own ship file by which
+        she is manned as a hull, written as the last key of her mapping where an entry
+        gives one."""
+        self.doc["boats"] = []
+        self.boat_notes = {("section",): note}
+        for entry in entries:
+            bid, kind, name, length, oars, crew, tons, text = entry[:8]
+            boat = {
                 "id": bid,
                 "kind": kind,
                 "name": name,
@@ -1248,12 +1254,22 @@ class Builder:
                 "crew": crew,
                 "tons": tons,
             }
-            for bid, kind, name, length, oars, crew, tons, _ in entries
-        ]
-        self.boat_notes = {("section",): note}
-        for bid, _, _, _, _, _, _, text in entries:
+            if len(entry) > 8 and entry[8]:
+                boat["file"] = entry[8]
+            self.doc["boats"].append(boat)
             if text:
                 self.boat_notes[("boats", bid)] = text
+
+    def oars(self, note, number, thrust_n, power_w, tiring_h):
+        """The `oars:` section (package 82, item 4; the design's §5.2): a boat's oars and
+        the three figures of the oar force, `note` above the section."""
+        self.doc["oars"] = {
+            "number": number,
+            "thrust_n": thrust_n,
+            "power_w": power_w,
+            "tiring_h": tiring_h,
+        }
+        self.oars_note = note
 
     def pumps(self, note, entries):
         """The `pumps:` list (package 73, spec M7 §13) from (id, kind, name, tons_per_hour,
@@ -1569,6 +1585,8 @@ class Builder:
             # the hold and the boats (package 35), noted as the ground tackle is
             if line.startswith("hold:") and self.hold_note:
                 out.append("# " + self.hold_note)
+            if line.startswith("oars:") and self.oars_note:
+                out.append("# " + self.oars_note)
             if line.startswith("boats:"):
                 in_boats = True
                 note = self.boat_notes.get(("section",))
@@ -3027,6 +3045,7 @@ def frigate(out_dir="data/ships"):
                     "The launch, 2.6 root(143 ft) = 31 ft; the stream anchor is sent in her "
                     "(Steel 1794 vol. I: 'sent in the long-boat'), and the water comes off in "
                     "her in gang casks (Luce 1866, 'Boats').",
+                    "data/ships/boat-launch-31.yaml",
                 ),
                 (
                     "barge",
@@ -3049,6 +3068,7 @@ def frigate(out_dir="data/ships"):
                     "the first cutter",
                     0.9,
                     "The first cutter, 0.9 of the launch (Luce's rule).",
+                    "data/ships/boat-cutter-28.yaml",
                 ),
                 (
                     "second_cutter",
@@ -3955,13 +3975,16 @@ def boat_entries(length_ft, ship_of_war, allowance):
     if not ship_of_war:
         launch *= SMALL_VESSEL_BOAT_FACTOR
     out = []
-    for bid, kind, name, of_launch, text in allowance:
+    for entry in allowance:
+        bid, kind, name, of_launch, text = entry[:5]
+        file = entry[5] if len(entry) > 5 else None  # package 82: her own file, where she has one
         length = round(launch * of_launch)
         breadth = length * BOAT_BREADTH_OF_LENGTH
         oars = max(2, int(length / BOAT_FEET_PER_OAR) // 2 * 2)
         weight_lb = breadth * breadth * length * BOAT_WEIGHT_FACTORS.get(kind, BOAT_WEIGHT_DEFAULT)
         tons = round(max(0.1, weight_lb / LB_PER_TON), 1)
-        out.append((bid, kind, name, float(length), oars, oars + 1, tons, text))
+        row = (bid, kind, name, float(length), oars, oars + 1, tons, text)
+        out.append(row + (file,) if file else row)
     return out
 
 
@@ -6192,6 +6215,7 @@ def cutter(out_dir="data/ships"):
                     1.0,
                     "The cutter's boat, a yawl of four oars (Falconer, YAWL), on the deck "
                     "amidships.",
+                    "data/ships/boat-yawl-16.yaml",
                 ),
                 (
                     "punt",
@@ -7194,6 +7218,7 @@ def brig(out_dir="data/ships", merchant=False):
                     "the launch",
                     1.0,
                     "The launch, 2.6 root(95 ft) = 25 ft (Luce's rule).",
+                    "data/ships/boat-launch-25.yaml",
                 ),
                 (
                     "cutter",
@@ -7201,6 +7226,7 @@ def brig(out_dir="data/ships", merchant=False):
                     "the cutter",
                     0.9,
                     "The cutter, 0.9 of the launch, a sloop's first cutter (Luce's rule).",
+                    "data/ships/boat-cutter-23.yaml",
                 ),
                 (
                     "jolly_boat",
@@ -7208,6 +7234,7 @@ def brig(out_dir="data/ships", merchant=False):
                     "the jolly boat",
                     JOLLY_BOAT_OF_LAUNCH,
                     "The jolly boat at the stern (judgement in the size).",
+                    "data/ships/boat-yawl-16.yaml",
                 ),
             ],
         ),
@@ -7293,6 +7320,7 @@ def merchant_brig(b, out_dir, burthen, gundeck_ft):
                     "the jolly boat",
                     JOLLY_BOAT_OF_LAUNCH,
                     "The jolly boat at the stern (judgement in the size).",
+                    "data/ships/boat-yawl-16.yaml",
                 ),
             ],
         ),
@@ -8196,7 +8224,14 @@ def lugger(out_dir="data/ships"):
             lod_ft,
             False,
             [
-                ("boat", "yawl", "the boat", 1.0, "The lugger's boat, a yawl (judgement)."),
+                (
+                    "boat",
+                    "yawl",
+                    "the boat",
+                    1.0,
+                    "The lugger's boat, a yawl (judgement).",
+                    "data/ships/boat-yawl-16.yaml",
+                ),
             ],
         ),
     )
@@ -9082,6 +9117,332 @@ def smack_crew(b):
     )
 
 
+# ---------------------------------------------------------------------------------------
+# The boats as ships (package 82, item 4; docs/design/Design-BoatAndPersonAboard.md §5.1):
+# five patterns of boat the game sends away as a vessel, each a file of her own by which she
+# is manned as a hull of the world, the ships' `boats:` lists pointing at them with `file:`.
+# The ladder is honest: no boat's lines are on file and no period plan of a boat is read;
+# Luce's rule of breadth is a named period rule and the rest is judgement that names what it
+# differs from, each line marked so in its note. Steel 1805's Folio LVII ("Dimensions and
+# scantlings of boats", IA leaves 599 to 602; the OCR at l. 43444 is garbled) is the better
+# source and is named in every file as "to read": read, its figures replace the judgement in
+# the file and the drawing, never the game's behaviour (the ships session's principle 12),
+# since nothing the oars or the sail read is taken from the shape.
+# ---------------------------------------------------------------------------------------
+
+# The oar force's three figures (the design's §5.2; `freesail/physics/oars.py`), the same in
+# every boat's file: a man's pull on the blade at no way, his power at the oar over hours,
+# and the hours at the oars that halve his strength. Judgement, fitted to the brief's words
+# (three to four knots light under four oars, a knot and a half towing, the men tiring by
+# the hour); the period's books give no figure for a man's power at an oar (Falconer 1780,
+# OAR; Steel 1805 p. 181).
+OAR_THRUST_N = 50.0
+OAR_POWER_W = 60.0
+OAR_TIRING_H = 4.0
+OARS_NOTE = (
+    "The oars (package 82; the design's §5.2): the thrust of one oar is min(thrust_n, "
+    "power_w / way) x the stroke x the men's tiring, 1 / (1 + hours / tiring_h); thrust_n a "
+    "man's pull on the blade at no way, power_w his power at the oar over hours, tiring_h the "
+    "hours that halve his strength. Judgement, fitted to the brief's words (three to four knots "
+    "light under four oars, a knot and a half towing, the men tiring by the hour); the oar a "
+    "lever of the second class striking the water (Falconer 1780, OAR), which gives no figure. "
+    "Read by freesail/physics/oars.py and by nothing else."
+)
+BOAT_FILE_NOTE = (
+    "To read: Steel 1805, Folio LVII, 'Dimensions and scantlings of boats' (IA leaves 599 to "
+    "602), which gives the pattern's dimensions by length; read, its figures replace the "
+    "judgement here, and never the game's behaviour."
+)
+# The patterns: (file stem, the kind, the words, the length in feet, the depth in feet, the
+# draught laden in feet, the displacement laden in kg, the oars, the mast above the gunwale in
+# feet, the lug in square feet, which boats of the eight she is the class of, her sources).
+BOAT_PATTERNS = (
+    (
+        "boat-yawl-16",
+        "yawl",
+        "a 16-ft four-oared boat with a standing lug stepped at will",
+        16.0,
+        1.75,
+        1.17,
+        1000.0,
+        4,
+        12.0,
+        60.0,
+        "the lugger's boat (16 ft), the brig's jolly boat (16 ft) and the cutter's boat (15 ft: "
+        "the difference of a foot is recorded in the cutter's note and never moved)",
+        "Falconer 1780, YAWL ('a wherry or small ship's boat, usually rowed by four or six "
+        "oars'); Steel 1805 p. 181 (OCR l. 11336 to 11380: the yawl 'less than the pinnace', "
+        "the boats 'constructed for rowing or sailing'); Steel 1794 vol. II, the boats' stores "
+        "table (the YAWL or CUTTER column: masts, sails and halyards allowed, OCR l. 20713, "
+        "21856, 22936); Luce 1866, 'Boats'.",
+    ),
+    (
+        "boat-cutter-28",
+        "cutter",
+        "the frigate's first cutter, an eight-oared boat with a lug",
+        28.0,
+        2.75,
+        1.5,
+        2900.0,
+        8,
+        17.0,
+        160.0,
+        "the frigate's first cutter (28 ft); her second cutter (25 ft) is the same pattern "
+        "smaller and is recorded so, no file",
+        "Steel 1805 p. 181 ('ships' cutters ... shorter, broader, and deeper, in proportion ... "
+        "clincher built, and constructed for sailing or rowing'); Luce 1866 'Boats' (the first "
+        "cutter 0.9 of the launch); the frigate's file (Luce's rule, 0.9 x 31).",
+    ),
+    (
+        "boat-launch-31",
+        "launch",
+        "the frigate's launch, a ten-oared boat with a lug, fit to weigh an anchor",
+        31.0,
+        3.25,
+        1.83,
+        4500.0,
+        10,
+        19.0,
+        250.0,
+        "the frigate's launch (31 ft)",
+        "Steel 1805 p. 181 ('the launch ... longer, more flat in its bottom, and lower ... "
+        "better calculated for rowing and approaching a flat shore'; 'fit to weigh an "
+        "anchor'); Steel 1794 vol. I ('sent in the long-boat', the stream anchor, OCR l. "
+        "5739); Luce 1866 'Boats' (2.6 root(L)); the water she brings off in gang casks is her "
+        "load (Luce's weight rule for the launch herself, 2.5 lb x B^2 x L, gives about 2.1 "
+        "tons).",
+    ),
+    (
+        "boat-launch-25",
+        "launch",
+        "the brig's launch, an eight-oared boat with a lug",
+        25.0,
+        2.75,
+        1.5,
+        2700.0,
+        8,
+        16.0,
+        160.0,
+        "the brig's launch (25 ft); the merchant brig's long-boat (20 ft) and the schooners' "
+        "long-boats (20 ft) are the pattern smaller and recorded so, no file",
+        "as the frigate's launch; the brig's file (Luce's rule, 2.6 root(95)).",
+    ),
+    (
+        "boat-cutter-23",
+        "cutter",
+        "the brig's cutter, a six-oared boat with a lug",
+        23.0,
+        2.33,
+        1.25,
+        1900.0,
+        6,
+        14.0,
+        110.0,
+        "the brig's cutter (23 ft)",
+        "as the frigate's cutter; the brig's file.",
+    ),
+)
+BOAT_CANVAS = (
+    8,
+    "No. 8 canvas, the lightest Steel's sail-maker uses for small boats' sails "
+    "(judgement after Steel 1794 vol. I, the canvas numbers)",
+)
+
+
+def boat(out_dir, pattern):
+    """One boat's file from a `BOAT_PATTERNS` row: her hull from the length by Luce's rule of
+    breadth (a quarter of the length) and the judged depth, draught and displacement; one
+    mast stepped at will with a standing lug and its halyard, tack and sheet; her oars (the
+    `oars:` section); a coxswain and the oarsmen; a grapnel, filed as the smallest anchor the
+    schema knows; no guns, no hold, no boats."""
+    stem, kind, words, L_ft, depth_ft, draught_ft, disp, oars, mast_ft, lug_ft2, of_the, src = (
+        pattern
+    )
+    B_ft = L_ft * BOAT_BREADTH_OF_LENGTH
+    lwl, beam, draught = ft(L_ft), ft(B_ft), ft(draught_ft)
+    gunwale_m = round((depth_ft - draught_ft) * FT, 2)
+    hull_speed = round(1.34 * math.sqrt(L_ft), 1)
+    b = Builder(
+        "the boat",
+        "boat",
+        f"{words[:1].upper()}{words[1:]}: the pattern of {of_the}. A boat of the ships' files "
+        "(package 82; docs/design/Design-BoatAndPersonAboard.md §5), manned as a hull of the "
+        "world when she is commanded and the script's boat on her errands otherwise; her name "
+        f"is her ship's ('the Raven's boat') when she is manned. Sources: {src} "
+        f"{BOAT_FILE_NOTE} Built by tools/gen_ships.py; edit the script and rerun.",
+        {
+            "length_waterline_m": lwl,
+            "beam_m": beam,
+            "draught_m": draught,
+            "displacement_kg": disp,
+            "gm_m": 0.5,
+            "clr_x_m": 0.0,
+            "lateral_area_m2": round(lwl * draught * 0.85, 2),
+            "hull_speed_kn": hull_speed,
+            "deck_height_m": gunwale_m,
+            "rudder": {
+                "area_m2": round(0.02 * lwl * draught, 2),
+                "max_angle_deg": 35,
+                "rate_deg_s": 20.0,
+                "span_m": round(0.5 * draught + 0.4, 2),
+            },
+        },
+        {
+            "length_waterline_m": f"{L_ft:.0f} ft, the boat's length (the pattern's; judgement "
+            "from the ships' boats lists, which Luce's rule sizes).",
+            "beam_m": f"{B_ft:.2f} ft, a quarter of the length (Luce 1866, 'Boats': a named "
+            "period rule).",
+            "draught_m": f"{draught_ft:.2f} ft laden (judgement: to read, Steel 1805 Folio LVII).",
+            "displacement_kg": f"{disp:,.0f} kg laden: the boat herself by Luce's weight rule "
+            "and her men and their gear the rest (judgement).",
+            "gm_m": "0.5 m, a boat's (judgement: an open boat is tender under sail and stiff "
+            "with her men sat low).",
+            "clr_x_m": "Amidships (judgement).",
+            "lateral_area_m2": "LWL x draught x 0.85, the small vessels' rule.",
+            "hull_speed_kn": f"1.34 sqrt({L_ft:.0f} ft).",
+            "deck_height_m": f"The gunwale {depth_ft - draught_ft:.2f} ft above the water laden "
+            f"(a depth of {depth_ft:.2f} ft less the draught; judgement); a man standing in her "
+            "looks from 1.7 m over it (freesail/world/lookout.py).",
+            "rudder": "A yoke's rudder, hung on the transom, put over quickly by the coxswain's "
+            "yoke lines (judgement).",
+        },
+    )
+    # -- the rig: one mast stepped at will, a standing lug ------------------------------
+    yard_ft = round(0.9 * mast_ft, 1)
+    lug_m2 = round(lug_ft2 * FT * FT, 1)
+    mast_x = round(0.25 * lwl, 1)  # a quarter of the length before the middle (judgement)
+    sling_ft = mast_ft - 0.8
+    tack = (mast_x / FT + 0.5, 1.5)
+    throat = (mast_x / FT + yard_ft / 3.0 * 0.5, sling_ft - yard_ft / 3.0 * 0.85)
+    peak = (mast_x / FT - 2.0 * yard_ft / 3.0 * 0.5, sling_ft + 2.0 * yard_ft / 3.0 * 0.85)
+    clew = (mast_x / FT - 0.9 * yard_ft, 2.0)
+    _area, cx, cz = _quad_area_centroid([tack, throat, peak, clew])
+    centre_h = round(gunwale_m + cz * FT, 1)
+    dw = 25.0  # the wind the rig is rated to carry its whole lug in (judgement: a boat reefs early)
+    mast = b.spar(
+        "mast",
+        "mast",
+        x_m=mast_x,
+        height_m=ft(mast_ft),
+        rating_kn=design_kn([(lug_m2, centre_h, "lug")], dw),
+        note=f"one mast of {mast_ft:.0f} ft above the gunwale, stepped at will in a thwart's "
+        "clamp and unstepped to pull (Steel 1794 vol. II, the boats' stores table: masts, sails "
+        "and halyards allowed to the yawl and the cutter), unstayed; judgement on the length "
+        f"(about 0.6 of the boat's). {BOAT_FILE_NOTE}",
+    )
+    yard = b.spar(
+        "lug_yard",
+        "lug_yard",
+        on=mast,
+        length_m=ft(yard_ft),
+        height_m=ft(sling_ft),
+        rating_kn=design_kn([(lug_m2, centre_h, "lug")], dw),
+        note=f"the lug's yard {yard_ft:.0f} ft, 0.9 of the mast, slung at a third and peaked "
+        "(judgement after the luggers' practice, Forfait 1788 p. 53).",
+    )
+    sail = b.sail(
+        "lug",
+        "lug",
+        yard=yard,
+        mast=mast,
+        area_m2=lug_m2,
+        reef_bands=1,
+        x_m=round(cx * FT, 1),
+        centre_height_m=centre_h,
+        canvas_no=BOAT_CANVAS[0],
+        cloth_rating_kn=cloth(lug_m2, BOAT_CANVAS[0]),
+        corners_m=[[round(px * FT, 1), round(pz * FT, 1)] for px, pz in (tack, throat, peak, clew)],
+        note=f"a standing lug of {lug_ft2:.0f} sq ft ({lug_m2} m2), tacked at the mast and "
+        "not dipped, one reef-band (judgement after the yawl's and cutter's columns of Steel "
+        f"1794's boats' stores); {BOAT_CANVAS[1]}.",
+    )
+    b.line(
+        "lug_yard.halyard",
+        "halyard",
+        yard,
+        rating=rope_kn(1.5),
+        note="the halyard, 1.5 in (judgement).",
+    )
+    b.line("lug.tack", "tack", sail, rating=rope_kn(1.25))
+    b.line(
+        "lug.sheet",
+        "sheet",
+        sail,
+        rating=rope_kn(1.25),
+        note="the sheet, 1.25 in, in hand (judgement).",
+    )
+    # -- the oars ------------------------------------------------------------------------
+    b.oars(OARS_NOTE, oars, OAR_THRUST_N, OAR_POWER_W, OAR_TIRING_H)
+    # -- her people: the coxswain and the oarsmen -----------------------------------------
+    b.crew(
+        [
+            (
+                ("complement",),
+                oars + 1,
+                f"A coxswain and {oars} oarsmen, one to an oar (the ships' boats lists: a crew "
+                "of the oars and one).",
+            ),
+            (("names",), "english", "Her men are her ship's: the english list."),
+            (
+                ("stations", "waisters"),
+                oars,
+                "The oarsmen, filed at the waist's station, the nearest word the schema has for "
+                "men on the thwarts (judgement).",
+            ),
+            (("ratings", "able"), 1.0, "A boat's crew are picked men: all able (judgement)."),
+            (("posts", "coxswain"), None, "The coxswain who steers her and commands her crew."),
+            (("stores", "water_tons"), 0.05, "A breaker of water (judgement)."),
+            (("stores", "provisions_days"), 1, "A day's bread (judgement)."),
+        ]
+    )
+    # -- a grapnel ----------------------------------------------------------------------
+    b.ground_tackle(
+        "A grapnel on a line (judgement): the one anchor a boat carries, filed as a kedge, the "
+        "smallest anchor the schema knows.",
+        [
+            (
+                "grapnel",
+                "kedge",
+                "the grapnel",
+                round(1.0 * L_ft, 0),
+                20.0,
+                1.5,
+                rope_kn(1.5),
+                f"A grapnel of about {L_ft:.0f} lb on 20 fathoms of 1.5-in line (judgement).",
+            )
+        ],
+    )
+    b.dump(
+        os.path.join(out_dir, f"{stem}.yaml"),
+        f"# {words[:1].upper()}{words[1:]} (package 82, item 4): the pattern of {of_the}.\n"
+        "# Generated by tools/gen_ships.py; edit that script and rerun, do not edit this file.\n"
+        "# Breadth by Luce 1866's rule, a quarter of the length; the rest judgement that names\n"
+        "# what it differs from, each line marked in its note; to read, Steel 1805 Folio LVII.\n"
+        "# Units: metres, m2, kg, kN. Comments mark judgements. The oars' three figures and\n"
+        "# the oar force: docs/design/Design-BoatAndPersonAboard.md §5.2.\n",
+    )
+
+
+def boat_yawl_16(out_dir="data/ships"):
+    boat(out_dir, BOAT_PATTERNS[0])
+
+
+def boat_cutter_28(out_dir="data/ships"):
+    boat(out_dir, BOAT_PATTERNS[1])
+
+
+def boat_launch_31(out_dir="data/ships"):
+    boat(out_dir, BOAT_PATTERNS[2])
+
+
+def boat_launch_25(out_dir="data/ships"):
+    boat(out_dir, BOAT_PATTERNS[3])
+
+
+def boat_cutter_23(out_dir="data/ships"):
+    boat(out_dir, BOAT_PATTERNS[4])
+
+
 # Package 75 (docs/design/Build-Ships.md §3.1 items 1 and 2; Design-Ship-Indefatigable.md
 # §1.2): the new ships are built by their own modules under tools/ships/, run after the eight
 # above in the order they are built (the lead's ruling of 2026-10-28, in
@@ -9106,6 +9467,12 @@ if __name__ == "__main__":
     brig(out, merchant=True)
     lugger(out)
     smack(out)
+    # the boats (package 82, item 4), after the eight whose lists point at them
+    boat_yawl_16(out)
+    boat_cutter_28(out)
+    boat_launch_31(out)
+    boat_launch_25(out)
+    boat_cutter_23(out)
     # the per-ship modules, each `build(out_dir)`: `ships` is tools/ships/, this script's own
     # directory being on the path when it runs (the repository root, put before it, has none)
     sys.modules.setdefault("gen_ships", sys.modules[__name__])
