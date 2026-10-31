@@ -3128,6 +3128,27 @@ rules bind** as the briefs before have them, with 85's in-world rule and 84's th
 nothing under `docs/agents/consent/` or the consent brief touched (a station that reads by
 its place has less than the brief describes, no more; if a wording offends, say so for 55).
 
+**The lead's rulings on the design note (2026-10-31; `docs/design/Design-PlaceKnowledge.md` at
+1f365e2 on `claude/pkg-65`, read whole and approved as the package's design).** On its six
+open points: (1) the tell-tale compass given, in the cabin alone (Falconer hangs it over the
+captain's cot); the gunroom has the slate's course and not her head. (2) The sounds of sail
+work reach the cabin as the kinds of §4's `heard aft`, but the evolution's lines whole and the
+sail and yard lines as the sound and not the figure (`knowledge.as_heard`: "sail handled
+overhead", "the hands at the braces"; which sail is not his until told). (3) Prose alone
+where an answer was owed is counted as the design has it, the count judging the world; the
+journal line and the nudge name what happened (words in the journal, nothing said) and not
+"an empty reply", and the notice naming the tools goes in every such sample. (4) The chart on
+the quarterdeck at the binnacle, with the cabin and the gunroom. (5) The drill's walk built
+whole behind one switch, `DRILL_WALK`, off on the trunk until 55 re-briefs: a model whose yes
+is on record for the brief's three things is not asked eight before the brief says eight;
+the test runs it on, the record says which drill ran, and the sentence 55 will need is
+written in step 7's postscript. (6) `go below` and `go to` a place below refused to a
+station with the deck, in words naming `hand_over`; `go aloft` allowed; 53's test moved old
+beside new. Read and taken besides: the deck as the reach's and the readings' default with
+the kinds' test as the guard; `say_aboard` retired and the director's own prose a note too;
+§9's refusals and §3.1's named flaw (the weather over a port read from the followed hull's
+view) left for 65b. Merged one step at a time, the whole suite in the cloud at each.
+
 ## Package 88: the captain's pass of M7 (`freesail/world/captains.py`, `brains.py` and `data/captains/*.yaml` the rules captain's doctrine and its sources; `freesail/world/squadrons.py` and `orders/station.py` only where the near station law reads; `freesail/world/signals.py` and `data/captains/privateer.yaml`, `hail.yaml` the colours held; `docs/TechnicalSpec-M7.md` §4, §21, §22 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_captain_trials.py`, `test_squadrons.py`, `test_signals.py`, `test_known_truths.py` truths 7-340 to 7-349)
 
 Opus (the owner, 2026-10-29); after 84, beside 82, the two touching little in common (82
