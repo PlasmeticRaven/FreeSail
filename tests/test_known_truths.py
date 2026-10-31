@@ -12964,3 +12964,54 @@ def test_truth_7_341_among_the_molene_islands_she_is_tacked_and_never_worn_onto_
     monkeypatch.setattr(N, "WEAR_ROOM", False)
     assert N.put_about_choice(w.ship)[0] == "wear ship"
     assert N.judge_course(w.ship, math.radians(200.0), helm_order=False).branch == "wear"
+
+
+def test_truth_7_342_a_privateers_true_colours_once_shown_before_an_enemy_are_held(monkeypatch):
+    """Package 88, item 4 (the owner's debrief of the playtests of 70 to 72: a privateer "switched
+    between French and British colours as we engaged them"). A French privateer schooner
+    cruising off the Lizard closes a British merchant schooner under British colours (her
+    doctrine's `false_colours`), shows her own at the doctrine's range and engages at 420;
+    the action over at 5640 and the same schooner still in sight, she investigates and
+    chases her again under her French colours, held (`signalling.TRUE_COLOURS_HELD`): the
+    law allowed the ruse until the first shot and made a shot under false colours a pirate's
+    act. With the switch off she hoisted the British colours again at 5700 (the flicker)."""
+    from freesail.world import signalling as G
+    from freesail.world import signals as S
+    from tests.test_brains import put
+
+    def colours_run(held: bool) -> list[tuple[int, tuple[str, str, str]]]:
+        monkeypatch.setattr(G, "TRUE_COLOURS_HELD", held)
+        sc = _action_scenario(heading=0.0)
+        w = make_world(SEED, "data/ships/topsail-schooner.yaml", sc)
+        w.submit("set plain sail")
+        w.submit("steer north")
+        pv = put(
+            w,
+            "privateer schooner",
+            "france",
+            "49 49.5 N 5 20 W",
+            "patrolling off the Lizard within 20 miles",
+            intent="cruise for prizes off the Lizard within 20 miles",
+            name="Vautour",
+        )
+        seq: list[tuple[int, tuple[str, str, str]]] = []
+        for _ in range(100):
+            w.run(60)
+            c = S.vessel_locker(pv).colours
+            cap = pv.crew.captain if pv.crew else pv.brain
+            st = (c.state, c.nation, str(getattr(cap, "state", "")))
+            if not seq or seq[-1][1] != st:
+                seq.append((w.clock.tick, st))
+        return seq
+
+    seq = colours_run(True)
+    assert seq[:3] == [
+        (60, ("false", "britain", "investigating a stranger")),
+        (360, ("false", "britain", "chasing")),
+        (420, ("shown", "france", "engaging")),
+    ], seq
+    after = [st for t, st in seq if t >= 420]
+    assert after and all(st[:2] == ("shown", "france") for st in after), seq
+    assert {"investigating a stranger", "chasing"} <= {st[2] for t, st in seq if t > 5640}, seq
+    old = colours_run(False)
+    assert (5700, ("false", "britain", "investigating a stranger")) in old, old

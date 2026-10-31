@@ -57,6 +57,10 @@ thresholds:
   # tell either way; some tried it).
   false_colours: {value: true, source: "the Channel privateers' habit of closing under British or neutral colours (the prize courts' records and the trade's complaints, from memory); the law allowed the ruse until the first shot"}
   true_colours_cables: {value: 4, source: "her own colours shown within hail's distance of the chase, before a shot (judgement after the record: the ensign run up as the gun was fired)"}
+  # package 88 (item 4; the owner's debrief of 70 to 72, the colours flickering under fire):
+  # her own colours once shown before an enemy are held for the action and until every enemy
+  # she showed them to is out of sight (freesail/world/signalling.py `_true_colours_held`)
+  true_colours_held: {value: true, source: "the law allowed the ruse until the first shot and made the shot under false colours a pirate's act (this file's false_colours; truth 7-149); a ship that has shown her own colours to an enemy and fought under them has no ruse left to keep, and hoisting the enemy's again before the same ship would be the pirate's act the law forbade; judgement"}
   bluff_private_signal: {value: true, source: "a guessed reply to the private signal rather than silence, which some privateers tried on a King's cruiser (from memory; judgement)"}
   investigate_nm: {value: 10, source: "as the cruiser's: a sail within ten miles is closed and made out"}
   chase_stale_hours: {value: 3, source: "as the cruiser's: a watch of chasing without a mile gained is given up"}

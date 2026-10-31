@@ -27,6 +27,9 @@ __all__ = ["far_minute", "near_minute", "recognise", "verdict_of"]
 # off, no challenge is made and no colours are shifted by doctrine.
 CHALLENGES = True
 DOCTRINE_COLOURS = True
+# Package 88, item 4: the true colours held once shown before an enemy (`_true_colours_held`);
+# the law's switch, for the bisection of what it moved.
+TRUE_COLOURS_HELD = True
 
 # The states in which a King's captain challenges a stranger (not in action, not struck).
 CHALLENGE_STATES = frozenset(
@@ -693,10 +696,12 @@ def _colours_by_doctrine(cap: Any, locker: S.Locker, p: Any, tick: int, near: bo
     c = locker.colours
     own_nation = _own_nation(cap)
     nations = _nations(cap)
+    held = _true_colours_held(cap, p, state, c, own_nation)
     if (
         state in ("investigating a stranger", "chasing")
         and c.state == "shown"
         and c.nation == own_nation
+        and not held
     ):
         enemies = nations.enemies_of(own_nation) if nations is not None else []
         if not enemies:
@@ -733,6 +738,49 @@ def _colours_by_doctrine(cap: Any, locker: S.Locker, p: Any, tick: int, near: bo
         else:
             S.set_colours(c, nations, "shown", own_nation, tick)
             _story(cap.vessel, tick, f"hoisted her true colours, {c.words(nations)}")
+        _hold_true_colours(cap, p, mark)
+
+
+def _hold_true_colours(cap: Any, p: Any, mark: Any = None) -> None:
+    """Her true colours shown before these strangers (`_true_colours_held`): the mark she
+    showed them to, and every enemy in sight when she is in action."""
+    b = getattr(cap, "_business", None)
+    if b is None:
+        return
+    before = set(b.get("true_colours_before") or ())
+    if mark is not None:
+        before.add(str(mark))
+    if getattr(cap, "state", None) == "engaging":
+        before |= {str(s.get("id")) for s in p.strangers if s.get("id") and cap._is_enemy(s)}
+    if before:
+        b["true_colours_before"] = sorted(before)
+
+
+def _true_colours_held(cap: Any, p: Any, state: Any, c: Any, own_nation: str) -> bool:
+    """The colours held once shown before an enemy (package 88, item 4; the owner's debrief
+    of the playtests of 70 to 72: a privateer that showed her French colours at the signal to
+    show her true colours "switched between French and British colours as we engaged them",
+    her doctrine re-hoisting the principal's at each minute she was investigating or chasing
+    again). The law allowed the ruse until the first shot and made the shot under false
+    colours a pirate's act (71's doctrine, `false_colours`'s source; truth 7-149); once her own
+    colours have flown before an enemy, at the doctrine's range or in action, they are held for
+    the action and until every enemy she showed them to is out of sight
+    (`TRUE_COLOURS_HELD` the switch). True while they are held."""
+    d = getattr(cap, "doctrine", None)
+    if not TRUE_COLOURS_HELD or (d is not None and not d.threshold("true_colours_held", True)):
+        return False
+    b = getattr(cap, "_business", None)
+    if b is None:
+        return False
+    if state == "engaging" and c.state == "shown" and c.nation == own_nation:
+        _hold_true_colours(cap, p)
+    before = set(b.get("true_colours_before") or ())
+    if not before:
+        return False
+    if any(str(s.get("id")) in before for s in p.strangers):
+        return True
+    b.pop("true_colours_before", None)  # every one she showed them to out of sight
+    return False
 
 
 def _cap(words: str) -> str:

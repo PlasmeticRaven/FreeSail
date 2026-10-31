@@ -197,6 +197,7 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_straggler",
         "test_known_truths.py::test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort_at_two_miles",
         "test_known_truths.py::test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxes_her_off",
+        "test_known_truths.py::test_truth_7_342_a_privateers_true_colours_once_shown_before_an_enemy_are_held",
         "test_known_truths.py::test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_after_the_gale",
         "test_known_truths.py::test_truth_7_155_the_squadron_keeps_its_line_at_far_detail_and_through_the_promotion",
         "test_known_truths.py::test_truth_7_156_the_succession_is_by_the_wake_each_ship_putting_about_at_the_turning_point",
