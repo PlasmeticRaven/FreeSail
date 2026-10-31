@@ -34,8 +34,8 @@ her), the viewer builder (B5) and the lead. Nothing here is built.
    only. None of their books is needed for her. The held images there
    (`owner-notes/bilander/rmg/`: Gwyn's 1560-px image and the note's grid crops, Chapman's IA
    leaf 0141) are read for figures; the images never enter the repository.
-7. Pictures for the eye: Gwyn's PAG3828 (`docs/references/images/
-   bilander-gwyn-c1780-nmm-pag3828.webp`, public domain by age) and the modern PSF line drawing
+7. Pictures for the eye: Gwyn's PAG3828 (cited in `docs/references/images/README.md`, held
+   privately in `owner-notes/bilander/rmg/`) and the modern PSF line drawing
    (`bilander-line-drawing-psf.webp`), which gives no figure. **Plainly:** Gwyn's drawing is also
    the owner's named source for her (the brief item 3; D5, D6 (e), D7, D14), so its measured
    ratios are used as figures, each marked, at Chapman's scale.
