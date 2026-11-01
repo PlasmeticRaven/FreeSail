@@ -1826,6 +1826,49 @@ until `follow "Raven"`), or by `--seat captain --ship <name>` at the start; from
 manned boat (`go to the launch`, `pull for the Raven`) there is no order to go aboard her
 (`come alongside` is to his own ship): booked as 82's first follow-up.
 
+**The owner's notes of 2026-11-01 (four points, from the saves `indefatigable-and-schooner-test-2`,
+`m7-indefatigable-and-raven-mid-channel` and `boat-between-ships-test`; the lead's reading
+against the code, nothing built):**
+
+1. *Says and hails from the other vessel's models not shown to the player, even at the same
+   place ashore.* Confirmed in the code: a station's `say` (`orders/stations.py` `_say`)
+   delivers the word to `_stations_held(world)`, the speaker's own hull's stations and the
+   player's seat there, although 66 and 84 gave `hearing.stations_everywhere` and
+   `people_hearing` for every hull; and the line is written in the speaker's hull's log alone,
+   which the player's console and browser never show. **For 65** (steps 2 and 4, after the
+   reset): the hearers of a word are every hull's stations within hearing (`within_hearing`
+   across hulls: ashore at the same place of the same port, aboard the same hull for a
+   visitor, a hail within hail between hulls), the word written as heard into each hearing
+   hull's log (so the player's log carries what his people heard and the replay stays a
+   function of the inputs), and the drivers show it; truth 7-389 (free) takes it.
+2. *The player not clearly bound to a single person; travel between ships and `follow`
+   unintuitive.* Part of it was the followed-hull log bug, mended at a7440f0. The rest is
+   decision 59's spirit carried through: **for 65's step 4**, the player is one person (his
+   ship's captain by default, or the seat's person), the prompt and the play log are that
+   person's (what reaches him where he is), he moves between ships as a person moves (in the
+   boat, the prompt following his body), and `follow` is the owner's eye, a driver's command
+   for observing and never the player's road; the primer's chapters 14, 19 and 26 and the
+   browser's page say so in one sentence. The missing road, the player going aboard another
+   ship from his own manned boat (`go to the launch`, `pull for the Raven`, then aboard her),
+   is 82's first follow-up and is taken with step 4. Put to the owner as decision 62.
+3. *The browser's play log and prompt as a single person's.* The same: 65's step 4.
+4. *A model's station not retained when its person moved ship (a new station "the Mr Hill"
+   made and a separate model seated).* On the trunk the harness does move with the person:
+   probed here with a fake at the Raven's officer's station sent aboard the Amazon by her
+   captain's `send the boat to the Amazon with Mr Newton`: the same harness, model and door
+   stood at the visitor's station on the Amazon, the Raven's station emptied. What breaks is
+   the agent API's desk (`agents/remote.py`), whose seats are keyed by station name and ship:
+   the moved station reads as "mr newton of the Amazon", the remote client's seat loses its
+   harness, the new station reads as unseated, and a fresh model is seated at it (the
+   director's seats or the door). Two things **for 82's follow-up, not 65**: the desk's seat
+   follows the harness (keyed by the harness, not the name and the ship), and the visitor
+   keeps his own station's name as the primer's chapter 26 promises ("officer of the watch,
+   of the Raven, aboard the Amazon"), not a station named for the man.
+
+**Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
+rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
+the testing build and the trunk do not diverge and the saves replay on the trunk.
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
