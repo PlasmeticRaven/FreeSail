@@ -1864,6 +1864,21 @@ against the code, nothing built):**
    follows the harness (keyed by the harness, not the name and the ship), and the visitor
    keeps his own station's name as the primer's chapter 26 promises ("officer of the watch,
    of the Raven, aboard the Amazon"), not a station named for the man.
+   **The owner's account, 2026-11-01 (the API door):** the moment Mr Hill came aboard, the
+   Opus door that held the owner's own officer became "the Mr Hill" in its same session (and
+   said so), and `stand down the Mr Hill` stood down both him and the officer: the desk had
+   the one door covering both stations, the newest by recency. So the desk resolves a door's
+   station by recency and not by a seat of its own; the follow-up keys each door to its
+   harness.
+5. *The glass and making out a sail are unwieldy* (the owner, 2026-11-01): `the glass on`
+   and `make out` give the nearest sail, or at best the nearest of the named kind, and the
+   wanted sail is hard to name. The rule to build (a loose end for the week's turn, the
+   lookout's words in `api/queries.py` and the sail-naming of `world/hail.py`): the most
+   specific naming wins, read from the words the lookout himself used: the kind, the quarter
+   ("on the larboard quarter"), the bearing ("bearing NE by N") and the distance ("distant a
+   mile"), each narrowing the pool; where ambiguity remains, the closer; a name once known
+   ("the Raven") over all. The same resolver for the hail's addressee, `make out`, `the
+   glass on`, `bearing of` and `pull for`, so that one way of naming a sail serves everywhere.
 
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
