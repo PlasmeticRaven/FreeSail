@@ -44,6 +44,10 @@
   // Drawing constants: judgements that stand in for data the files do not carry.
   var GAFF_PEAK_ANGLE = (35 * Math.PI) / 180; // a gaff peaks about this much above the horizontal
   var LOOSE_FOOT_HEIGHT_M = 1.5; // foot of a loose-footed gaff sail above the deck
+  // A boom on a hull drawn from her profile is topped up by its lifts this much above the level,
+  // to clear her taffrail (judgement, the owner's of 2026-11-05: "a couple of degrees more vertical
+  // to properly clear the stern"); its trim by the lifts waits for the handling of the sails
+  var BOOM_STEEVE = (3 * Math.PI) / 180;
   var JIB_LUFF_FRACTION = 0.7; // a jib's head stops this far up its stay
   var JIB_TACK_FRACTION = 0.04; // and its tack this far up from the stay's foot (`stemTackFraction` on a drawn stem head)
   var BELLY = 0.12; // belly of a drawing sail, as a fraction of its shorter side
@@ -866,6 +870,11 @@
         } else if (spec.class === "boom") {
           r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
           var bDir = sheetDirection(sheetAngleOf(id), tack);
+          // on a hull drawn from her profile the boom is topped up by its lifts (BOOM_STEEVE),
+          // and its sail's foot, its sheet and a ringtail boom follow its line; with no
+          // profile it lies level, as before
+          var bUp = profile ? BOOM_STEEVE : 0;
+          if (bUp) bDir = add(mul(bDir, Math.cos(bUp)), v(0, 0, Math.sin(bUp)));
           r.a = v(r.x, 0, deck + H);
           r.b = add(r.a, mul(bDir, L));
           r.dir = bDir;
