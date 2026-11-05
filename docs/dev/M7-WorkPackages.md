@@ -3692,8 +3692,23 @@ the lead"). Three findings, each pinned to its mechanism, each an item:
    the owner's save (as data; the lead holds it), find how the names resolved across hulls
    (84's one registry; `orders/port.py` `_boat_to_ship`, `dealings.send_boat_to`'s hull
    check) and why the far hulls' people passed it; scope the names to the giver's hull and
-   refuse a person of another ship in words. Truth 7-394's number is shared; take 7-389 if
-   65 leaves it, else say so to the lead.
+   refuse a person of another ship in words. Truth 7-401 (the lead, 2026-11-05: 7-389 is
+   65's; 82b's are 7-390 to 7-394, 7-400 and 7-401).
+
+**The lead's rulings on the design note (2026-11-05; `docs/design/Design-DoorAndVisitor.md`
+at 8c1a94c):** the note approved whole: the breaks are the roads that go by name and ship
+(`remote.seat_key` as ship/station, `seat.world` fixed at the stationing, the listing's
+naming, the save's want of an identity; the desk's seat itself kept its harness in the
+builder's live probe). The design taken: `Harness.ident` carried in the save and derived for
+a save from before, the seats keyed by it, a stationing resolved by the harness's home
+station, the visitor named "<his station>, of the <ship>, aboard the <host>",
+`model_holds_her` read for any shape, a held hull ranked with the dealings and held over the
+cap up to two (both halves of item 4: the far plan's danger check as well), the boat's names
+scoped to the giver's hull. The owner's saves stay with the lead (door identifiers and
+transcripts); the facts for the fixtures given in words. The touches outside 82b's files
+approved as listed (the harness's ident in the constructor, the save and the listing;
+`_station_in`'s comma rule; the cap's rank in `crews.py`; item 5 in `port.py` and
+`dealings.py`), each small.
 
 **The design note first** (`docs/design/Design-DoorAndVisitor.md`, short): the seat's
 identity and its place in the save, the visitor's name in every listing and reading, the
