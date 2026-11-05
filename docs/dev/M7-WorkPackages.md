@@ -1914,9 +1914,16 @@ conditions, which he set wide ("the deck given, or a message, or a wind shift, o
 made out, or ..."); the captain's 60: 38 by "a word from the captain", which were the
 master's and the officer's words to him (23 and 8) and in seven cases his own last word.
 For 65: the reach rule (a wake carries a line he perceived, by his place) is the cure for a
-crowded deck, and two checks for step 2: the wake's words name the speaker rightly (a word
-*to* the captain is not "a word from the captain"), and a station is never woken by its own
-word. For the briefs (65's step 2 as well): stand by for the few things that matter, and
+crowded deck, and two mends for step 2, pinned in the code: (a) the wake's reason for a
+word addressed to a station is the fixed string `A_WORD` ("a word from the captain",
+`agents/harness.py`, package 29's constant from when only the player's captain spoke),
+whoever spoke: the reason names the speaker and the kind (a word, a question, from whom);
+(b) the owner's observation, borne out by seven of the captain's sixty wakes following his
+own last word: a station woken by its own line. `_heard_between` excludes the station's own
+actor, so the road is the addressed word (`a.word`, set by `tell`, `say to` and the words
+kept for an unheld station, `orders/stations.py` line 954's "kept for whoever takes the
+station"): reproduce with a station that tells or says to a station nobody holds, and with
+one that names itself, and make a station's own word never its wake. For the briefs (65's step 2 as well): stand by for the few things that matter, and
 let the rest come with the next sample.
 
 **For mulling, not for building (the owner, 2026-11-05): the shape of conversation.** In
