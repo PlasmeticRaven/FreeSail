@@ -17133,3 +17133,97 @@ ruff format --check clean. The whole suite is the lead's in the cloud at the mer
 run of the fast tier on the step's tree found three checkpoint tests failing (a harness
 restored from a save written before the package lacked the slept span: a class default
 mended it) and the slow tier the two truths above; both runs are in the commits' messages.
+
+### Step 2: a reply's prose is the person's own note (the design's §6, decision 60; the lead's word of 2026-11-05)
+
+**What was built.** In the harness (`agents/harness.py`): `_say` writes a station's prose
+in its journal under the model's mark (`PROSE_KIND`, the journal kind `agent.note`; the
+entry prints "(note) ..." beside the journal tool's own notes) and in the director's log by
+the station (`director.log_of(world).append(..., by=station)`), and in no log of the play:
+no station and no player hears it; `own_word` (the doors' `say(text)` while the game has the
+floor) is the same note; the director's words stay its log's thought, a plain conversation's
+its stub log's `agent.note` line, which the consent step reads. The director's sample carries
+the stations' notes since its last sample under `Sample.notes` ("<stamp>  the master: ..."),
+read from its log by its length at the last sample (`_notes_seen`, set at the start and at a
+restore to the log's end). The count of empty replies (29c) judges what happened in the
+world: a reply with a call ends it; an empty reply where an answer was owed counts as before;
+prose alone there counts in its own words ("Words written into the journal and nothing said
+in the world, where an answer was owed (a question); two in a row."), the next sample
+carries `NOTE_NOT_HEARD` naming `answer`, `say`, `say to` and `hail`, and the nudge after
+three is `NUDGE_NOTED` (how many of them were prose kept in `AgentState.empty_noted`); prose
+at a plain glass is a note, neither counted nor ending the count. `agent.note` left
+`WORD_KINDS` and `_reaches`; the browser's `STATION_SPEAKS` is now (`agent.spoke`,
+`agent.said`, `agent.hail`); the roll-up's "spoke" phrase for `agent.note` is gone (the kind
+reads as its name, for an old save); `say_aboard` is retired. The briefs: the lookout's loses
+"or say the words" (its hail is `hail`), the watcher's says its words are its note read by
+the owner and the director (it cannot `say`: its authority refuses every order), every
+brief's head (`PLACE_KNOWLEDGE_WORDS`) carries decision 60's sibling from the brig case study
+("A word to a person is no order of the ship: telling the boatswain to brace the yards braces
+nothing; the readings say what is in hand") and the owner's counsel ("Stand by for the few
+things that matter, and let the rest come with the next sample"); the MCP door's `say` tool
+says "Write a note in your journal" and answers "Noted in your journal, under your mark".
+
+**The lead's additions.** (1) `say` across hulls (`orders/stations.py` `_say`): the hearers
+are every hull's stations within hearing (`hearing.stations_everywhere`, `within_hearing`:
+aboard the same hull within earshot, which a visitor's voice there is; ashore at the same
+place of the same port; in the same boat), a hail over her own deck alone; the speaker's
+hull's line carries its own hearers in `heard_by` as before, and the line is written as heard
+into each other hearing hull's log (`hull.record`) with that hull's hearers in `heard_by`
+and `said_from` naming the speaker's hull, so her people's samples carry it from her own log
+and her stand-bys wake on it as on any word. (2) The wake's reason names the speaker and the
+kind: `AgentState.word_reason` and `question_reason` (class defaults for a checkpoint from
+before), `Harness.add_word(words, reason)` at every road a word takes ("a word from the
+master (Mr Pascoe)", "a word from the captain (by standing order 'sea')", "an answer from
+the lookout", "no answer from the gunner", "the deck, given by the captain", "the words kept
+for the station while nobody held it", "a word for the director"), `put_question`'s "a
+question from the officer of the watch (Mr Pearce)"; several waiting are joined ("a question
+from the captain; a word from the captain"); the resumed line says the same ("[captain] A
+word from the master (Mr Hart); the captain is sampled again"); `A_WORD` stays the captain's
+own and the default. (3) A station is never woken by its own word: `tell` and `say to` naming
+the speaker's own station are refused ("The officer of the watch tells itself nothing; tell
+another station") at the grammar (`handle`) and at `put_word`; a word to a station nobody
+holds is kept there and wakes the speaker not at all; the "no answer came" word for a person
+asked (52) now names him as its reason, which is the likeliest of the brig's seven wakes
+"by his own last word" (the captain's own questions to the unheld warrant officers coming
+back to him under "a word from the captain"). Tests: `tests/test_knowledge.py` (the prose a
+note and the say heard, the wake's reason, never woken by its own word, the say across
+hulls), `tests/test_agents.py` (the count's rule, old beside new), truths 7-379 and 7-389;
+forty-four assertions in ten test files that read a station's prose from the play log read
+it from the journal (`notes(...)` helpers), and the roll-up's own-words test speaks by
+`answer` since the watcher cannot `say`.
+
+**Taken another way, with the reason.** (1) The design's count had "a sample with words or
+a call ends the count and the matter"; built, a call ends it and prose does not, at a plain
+glass as where an answer was owed: the count judges what happened in the world, and prose is
+nothing there. The old reading (`test_an_empty_reply_at_an_urgent_event_counts_and_words_end_
+the_count`) is kept as a strict expected failure with decision 60 as its reason, the new
+beside it. (2) The watcher's brief said "say in a line or two what a sailor would notice";
+the watcher cannot `say` (`tools.judge`: no authority to give orders), so it says "note in a
+line or two", the owner and the director its readers, the captain's `ask` the road to its
+voice; whether the watcher should be given `say` as the passenger has is the lead's to say.
+(3) The remote door's answer to a model that speaks while the game has the floor ("Your words
+are in the log under your mark", `agents/remote.py` line 980) is 82b's file and stands
+unchanged, the test that pins it with it; the sentence is now untrue and wants "in your
+journal" when 82b's work is in (said to the lead). (4) The kinds' guard test still finds
+`agent.note` among the code's string literals (the journal kind and the conversation's stub
+line) and `knowledge.REACH` keeps its row, harmless.
+
+**Found on the way.** (a) **A hull façade read from inside another hull's order answers for
+the current hull.** `hearing.station_spot(hull, name)` read `hull.stations.holder(name)`:
+the façade's `stations` property runs with that hull current and returns an object whose
+later reads (`holder`) run against the World's current hull, which inside the brig's `say`
+is the brig; so the frigate's captain ashore read as aboard the brig's quarterdeck and heard
+nothing. `hearing.station_spot_on(hull, name)` reads a hearer's spot within its own hull's
+block (`world.as_hull(hull)`); `_say` uses it. 84's other readers of another hull's stations
+from inside an order may have the same latent fault; said to the lead. (b) **An unanswered
+question is sampled again every tick** (29c's rule as it stood: the question is before him
+until `answer`): a model that answers a question in prose is asked again at the next tick,
+with the notice, and three such bring the nudge within three ticks; so it was for an empty
+reply before this step. Not changed; recorded. (c) The first run of the touched files hung
+in `tests/test_rollup.py`'s rewritten own-words test: a looping fake that always returned a
+call never ended its turn and the worker was killed for memory; the fake alternates the call
+and an empty reply.
+
+**The pace.** The filter's cost is step 1's (nothing of this step is on the tick's path but
+`add_word`'s string join at a word and the director's read of its log at its sample); the
+pace tests are run as the rule asks and their figures are below.
