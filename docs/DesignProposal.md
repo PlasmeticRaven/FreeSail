@@ -837,6 +837,15 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     seats him as her captain's person. Built in package 65's step 4 with the road from his
     own manned boat aboard another ship; the primer's chapters 14, 19 and 26 and the
     browser's page say it in one sentence.
+    **The owner's clarification, the same day:** what matters is the line between what the
+    player sees and does in a normal session and the "out of the game" elements (the driver's
+    commands, the world orders, the director's eye), which edge cases may need but which must
+    neither overlap with nor factor into normal play. Two overlaps seen: the driver's `go`
+    beside the orders `go ashore` and `go below` (a driver's word never shadows an order of
+    the game, and an order of the game is never read as the driver's); and the expectation
+    that the player gives `follow` by hand when he goes to another ship, which the browser
+    refuses as an order and which should be automatic (the prompt follows his person by
+    itself). Both are 65's step 4.
 
 ### Still open
 
