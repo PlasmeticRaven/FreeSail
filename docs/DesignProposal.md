@@ -828,6 +828,40 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     package is reviewed and merged after it, since step 1 alone takes the deck from a model
     below before step 3 gives it back by report, and the owner is not testing 65 this week.
     The ships session's lee-port and rig-line step is reviewed and merged when it is sent.
+62. **The player is one person; `follow` is the owner's eye.** Owner, 2026-11-05, on the
+    lead's proposal from the testing of 2026-10-31 (notes 2 and 3): the player is one person,
+    his ship's captain by default or the seat's person; the prompt and the play log are that
+    person's, what reaches him where he is; he moves between ships as a person moves, in the
+    boat, the prompt following his body; `follow` is the owner's eye, a driver's command for
+    observing, never the player's road; a game started with `--seat captain --ship <name>`
+    seats him as her captain's person. Built in package 65's step 4 with the road from his
+    own manned boat aboard another ship; the primer's chapters 14, 19 and 26 and the
+    browser's page say it in one sentence.
+    **The owner's clarification, the same day:** what matters is the line between what the
+    player sees and does in a normal session and the "out of the game" elements (the driver's
+    commands, the world orders, the director's eye), which edge cases may need but which must
+    neither overlap with nor factor into normal play. Two overlaps seen: the driver's `go`
+    beside the orders `go ashore` and `go below` (a driver's word never shadows an order of
+    the game, and an order of the game is never read as the driver's); and the expectation
+    that the player gives `follow` by hand when he goes to another ship, which the browser
+    refuses as an order and which should be automatic (the prompt follows his person by
+    itself). Both are 65's step 4.
+63. **The command devolves; a told order is the captain's word.** Owner, 2026-11-05, on the
+    lead's proposal from the two case studies of that day (the *Chevalier*'s captain wounded
+    and giving the deck in words to an officer no door held; the brig's officer refused for
+    what the captain had told him to do). Two states of one phrase: `you have the deck` with
+    the captain aboard and able is the watch, as built (the ordinary work of a watch, the
+    stated dangers on the officer's own word, the rest by the captain's word); when the
+    captain is rendered unavailable, by choice (ashore, in the boat, aboard another ship) or
+    by force (wounded below, dead, a captive), the command devolves on the senior officer,
+    preferring a held station (a model's or the player's) over the rules' persons, who then
+    holds the captain's authority whole with the captain's standing orders as his guide,
+    said in the log ("the command devolves on Mr Ryan, the captain below wounded"), and
+    gives it back when the captain gives an order again. And an order the captain tells a
+    station to carry out is the captain's word for that thing, logged as given by the
+    station at the captain's word; the told officer is never refused for what he was told to
+    do. Built in package 65's step 3 with the captain's whereabouts and the officer's duty
+    to report.
 
 ### Still open
 

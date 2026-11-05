@@ -17090,3 +17090,47 @@ ruff format --check clean. The whole suite is the lead's in the cloud at the mer
 run of the fast tier on the step's tree found three checkpoint tests failing (a harness
 restored from a save written before the package lacked the slept span: a class default
 mended it) and the slow tier the two truths above; both runs are in the commits' messages.
+
+## The hail as typed and as answered: the nine passages that moved in the cloud (2026-11-05)
+
+The hotfix of `b1447bc` (the hail in any capitals, a sail by `a` with her rig or rate, the rates
+and rigs as sail words, a station's hail that names no sail refused, a sail that hailed this
+deck hailable back, a whole line in quotes) was red in the whole suite's run 30: nine pinned
+passages moved (gate 5B's schooner, 767 lines for 766; gate 5C's merchant, the pilot aboard at
+96480 for 96540, and truth 77's digest `5422360d086bdf82` for `6abbbff4d7fa1a57`; gate 6A's
+intent brought up at 111239 for 111238; truths 78 and 79, the anchorings [57, 100918] for
+[57, 100616, 115547]; the merchant in thick weather, 424 lines for 426; the gale with sea
+room, the digest `c2bfe1797ee44f3e` for `04f2fcd0fe9023a4`; the merchant from a privateer,
+1593 lines for 1594).
+
+**None of the nine is the hotfix's.** On the build machine (Ubuntu 24.04, glibc 2.39, CPython
+3.11.18, numpy 2.4.6) every one of them stands at its pin on the hotfix's tree:
+
+- the merchant in thick weather, alone: 426 lines, digest `cfa538b19cb0d2fe`, on the hotfix
+  and on the trunk `5b7e719`, the two logs equal line for line; not one order of the passage
+  reaches the hail's grammar (`hail_parts`, `hail._addressee`, `_has_hailed_us`,
+  `_the_lookout_speaks` and `stations._say` traced: no call), and no order line is in quotes;
+- the merchant passage, alone, 36 hours: 3100 lines, digest `6abbbff4d7fa1a57`, anchored at
+  [57, 100616, 115547], on both trees, the logs equal;
+- the cloud's shard 0 of 6 whole (`FREESAIL_SHARD=0/6`, `-n 4 --dist loadgroup --slow -m "not
+  pace"`, the server's packages installed as the workflow installs them): 1058 passed, 2
+  xfailed, the thick weather and the gale among them;
+- the fast tier whole on the hotfix: 5,920 passed, 2 skipped, exit 0;
+- the slow tier of `test_known_truths.py` and `test_captain_trials.py` whole (`--slow -m "not
+  pace" -n 4`): 273 passed, 7 xfailed, exit 0, all nine passages among them.
+
+So there was nothing to bisect: with each of the five changes in or out, the passages are the
+trunk's. **What moved is the cloud's machine.** Run 29 (green, on `a7440f0`, whose `freesail/`,
+`data/` and `tests/` are `5b7e719`'s) ran on the runner image `ubuntu-24.04` 20261025.353;
+run 30, twelve hours later, on `ubuntu-26.04` 20261025.179: `ubuntu-latest` had moved to
+26.04 between the two (glibc 2.43 in place of 2.39). The Python (3.11.17 from the tool cache)
+and every wheel (numpy 2.4.6 and the rest) were the same in both runs. The world's
+trigonometry is the standard library's `math`, which is the system's libm, and a last-place
+difference there is enough to move a long passage by a line or a minute: the same kind of
+cause as package 69's five cross-platform pins. The pins stand as they are; they are the
+24.04 machine's.
+
+Not proven here: the build machine may not run another C library's code, so the passages
+were not sailed under glibc 2.43. The proof is the lead's to choose: the whole suite on the
+trunk `5b7e719` on the new image (red in the same nine if this is so), or the workflow's
+`runs-on` pinned to `ubuntu-24.04` (green on the hotfix if this is so).

@@ -59,3 +59,25 @@ def test_rollup_at_high_compression():
     assert "1 bell" not in text  # rolled up, not printed
     assert "= Morning watch (04:00-05:00)" in text
     assert "routine entries." in text
+
+
+def test_the_console_prints_the_followed_hulls_log_after_follow():
+    """The owner's finding of 2026-10-31: after `follow "<ship>"` the orders went to her
+    hull and their lines to her log, and the console went on printing the hull it was
+    attached to, so an order, a refusal or an answer showed nothing. The listener moves
+    with the followed hull (`Console._follow_log`), and back."""
+    from tests.test_observer import observed_world
+
+    w, _ = observed_world()
+    out = io.StringIO()
+    con = Console(w, out=out)
+    assert con.handle_line('follow "Medusa"')
+    mark = out.tell()
+    assert con.handle_line("set the royals")
+    assert "Order: set the royals." in out.getvalue()[mark:]
+    assert con.handle_line("follow nobody")
+    assert w.followed is None
+    mark = out.tell()
+    con.handle_line("tick 1")
+    assert con.handle_line("set the royals")  # the observer's refusal, printed as before
+    assert "No ship followed" in out.getvalue()[mark:]

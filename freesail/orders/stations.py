@@ -149,6 +149,12 @@ _SAY = re.compile(r"^say\s+(?!to\s+(?:the\s+)?)(?P<q>.+)$")
 _HAIL = re.compile(
     r"^hail\s+(?:the\s+deck\s+)?(?!(?:the\s+)?pilot|for\s+a\s+pilot|pilots\b)(?P<q>.+)$"
 )
+# A `hail` that reached the stations names no sail (`orders.signals` takes those first).
+HAIL_NAMES_NO_SAIL = (
+    "A hail is the lookout's, from the masthead, unless it names a sail ('hail her: <words>', "
+    "'hail the <sail>: <words>', 'hail <her name>: <words>'); on the quarterdeck say the words "
+    "with 'say <words>', or tell a station with 'tell the <station> ...'."
+)
 
 # The station verbs a standing order may give (package 31c): a word and a question. The
 # rest are the captain's own acts on a station, never a routine's.
@@ -506,10 +512,7 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
     speaker = _station_speaking(ship)
     if speaker is None:
         if verb == "hail":
-            raise OrderError(
-                "A hail is the lookout's, from the masthead; on the quarterdeck say the "
-                "words with 'say <words>', or tell a station with 'tell the <station> ...'."
-            )
+            raise OrderError(HAIL_NAMES_NO_SAIL)
         station, who = CAPTAIN, "the captain"
         place = place_of(world, CAPTAIN)
         where = place_words(place)
@@ -524,6 +527,12 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
         )
         stations = getattr(world, "stations", None)
         is_hail = (stations.kind_of(station) if stations is not None else station) == LOOKOUT
+        if verb == "hail" and not is_hail:
+            # the hail of a sail the words do not name, refused and not said on his own deck
+            # (the owner's second test, 2026-10-31: the Raven's captain answered three hails
+            # with 'hail the sixty-four: ...', each a remark on her quarterdeck, 'heard by'
+            # her own people, and none of them reached the ship that hailed her)
+            raise OrderError(HAIL_NAMES_NO_SAIL)
         kind = "agent.hail" if is_hail else "agent.spoke"
     if is_hail:
         where = "from the masthead" if place == "masthead" else f"a hail, {where}"

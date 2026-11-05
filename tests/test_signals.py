@@ -484,3 +484,127 @@ def test_the_hail_names_the_sail_with_or_without_the_colon():
     ):
         e = w.submit(words)
         assert e.kind == "order.rejected" and "A hail is the lookout's" in e.text, words
+
+
+# -- the hail as it is typed, and answered (the owner's second test, 2026-10-31) ----------------
+
+
+def test_the_hail_is_read_in_any_capitals_by_her_rate_and_with_her_article():
+    """`Hail the schooner` was refused as the lookout's eleven times while `hail the schooner`
+    was taken, `hail a topsail schooner` was refused though the log calls her so, and the line
+    in quotes too. The verb in any capitals, the sail by her rate as well as her rig, and by
+    'a'; the lookout's own words stay his, whatever is in sight."""
+    from freesail.agents.seat import seat_player
+    from tests.test_brains import put
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    put(
+        w,
+        "merchant brig",
+        "france",
+        "49 30.2 N 5 30 W",
+        "bound for Brest",
+        intent="bound for Brest",
+        name="Nancy",
+    )
+    w.run(61)
+    for words in (
+        "Hail the brig: whence come you",
+        "Hail the brig whence come you",
+        "HAIL HER whence come you",
+        "Say to her, whence come you",
+        "Say to the Nancy whence come you",
+        "hail a merchant brig: whence come you",
+        "hail a merchant brig whence come you",
+        '"hail the brig: whence come you"',
+    ):
+        e = w.submit(words)
+        assert e.kind == "hail.answered", (words, e.text)
+        assert "by the trumpet: 'whence come you'" in e.text, (words, e.text)
+    # no sail named: the lookout's, as before, and the refusal says how a sail is hailed
+    for words in ("Hail Sail ho, two points on the bow", "hail a sail two points on the bow"):
+        e = w.submit(words)
+        assert e.kind == "order.rejected" and "A hail is the lookout's" in e.text, words
+        assert "'hail the <sail>: <words>'" in e.text, words
+    e = w.submit("hail a cutter what ship")
+    assert e.kind == "order.rejected" and "Nothing in sight answers to 'a cutter'" in e.text
+    # a brig in sight, and the lookout's report of one is his report
+    seat = seat_player(w, "lookout", door="browser")
+    e = seat.route("hail a brig two points on the lee bow")
+    assert e.kind == "agent.hail", e.text
+    w.submit("stand down the lookout")
+    # by her rate: the words the other deck hears her called
+    w2 = hove_to_world()
+    put(
+        w2,
+        "sixty-four",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        name="Ardent",
+    )
+    w2.run(61)
+    e = w2.submit("hail the sixty-four: what ship is that?")
+    assert e.kind == "hail.answered", e.text
+    e = w2.submit("hail the seventy-four: what ship is that?")
+    assert e.kind == "order.rejected" and "Nothing in sight answers to" in e.text
+
+
+def test_a_captains_answer_to_a_hail_reaches_the_ship_that_hailed_her():
+    """The Raven's captain answered `hail the sixty-four: ...` three times; each was a remark
+    on her own quarterdeck, 'heard by' her own people, and none reached the player's log. His
+    first try, `hail the ship: ...`, was refused because her masthead had not yet reported the
+    ship that had just hailed her. A sail that has hailed this deck is hailed back whether the
+    masthead has her or not, and a station's hail that names no sail is refused, not said."""
+    from freesail.agents import Fake, Harness, SamplingPolicy
+    from freesail.agents.agent import captain as captain_station
+    from freesail.agents.model import Reply
+    from tests.test_brains import put
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "in company with the ship",
+        intent="patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    w.run(61)
+    crew = raven.crew
+    assert crew is not None and crew.shape == "full"
+    policy = SamplingPolicy.in_lockstep(3600)
+    Harness(crew, captain_station(policy, 3600, world=crew), Fake([Reply()], loop=True)).start()
+
+    def said_from_her(words: str):
+        before, hers = len(w.log), len(crew.log)
+        with w.as_hull(crew):
+            e = crew.submit(words, actor="the captain")
+        return e, list(w.log)[before:], list(crew.log)[hers:]
+
+    assert w.submit("hail the cutter: what ship is that?").kind == "hail.made"
+    assert crew.ship.extra["hail_pending"]["from"] == str(w.own.id)
+    # her masthead has not reported us: the hail is answered all the same
+    crew.lookout._sails_seen.clear()
+    for words, said in (
+        ("hail the ship: Aye aye, sir", "Aye aye, sir"),
+        ("hail her: We follow directly", "We follow directly"),
+        ("hail the frigate: At your service", "At your service"),
+    ):
+        e, mine, hers = said_from_her(words)
+        assert e.kind == "hail.made", (words, e.text)
+        assert [x.kind for x in mine] == ["hail.heard"], (words, [x.text for x in mine])
+        assert f"hails us: '{said}'" in mine[0].text
+        assert "agent.spoke" not in {x.kind for x in hers}, words
+    # a hail that names no sail is told so, and nothing is said on her deck or heard on ours
+    e, mine, hers = said_from_her("hail the moon: Aye aye, sir")
+    assert e.kind == "order.rejected" and "'hail the <sail>: <words>'" in e.text, e.text
+    assert mine == [] and "agent.spoke" not in {x.kind for x in hers}
+    # beyond hail, the hailer is not to be answered by a shout
+    far = w.vessels.player_shadow(w)
+    assert crew.ship.extra["hail_pending"]["from"] == str(far.id)
+    assert H._has_hailed_us(crew, far, 1.0) and not H._has_hailed_us(crew, far, 2000.0)
