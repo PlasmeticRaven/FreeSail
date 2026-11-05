@@ -1953,7 +1953,16 @@ lead's proofs: run 31, the trunk as it stood on the unpinned workflow (red in th
 if so), and the workflow's Linux runner pinned to ubuntu-24.04 from this merge, the run on
 the merged trunk after it (green if so). The builder found on the way that `hail._addressee`
 takes the distance to every candidate on every hail (a cost, not a change). The pace job's
-three floors under on run 30: the runner's speed.
+three floors under on run 30: the runner's speed. Run 31 (the trunk at ce9071f, no hotfix
+aboard, the workflow still on ubuntu-latest, 21:18 to 22:18 UTC): lint green, all six shards
+red, pace green; the failures the same nine and no other (shard 0 the two captain trials,
+the thick-weather merchant 424 lines for 426 and the lee-shore digest c2bfe179 for 04f2fcd0;
+shard 1 truths 78 and 79 and the merchant at seed 7, 96480 for 96540; shard 2 gate 5B's
+schooner, 767 lines for 766; shard 3 the anchorings [57, 100918] for [57, 100616, 115547];
+shard 4 gate 6A's intent, brought up at 111239 for 111238; shard 5 truth 77's digest
+5422360d for 6abbbff4), the first proof made: the image moves the pins, the hotfix moved
+none. Run 32 (the trunk at 36d30c4, the runner pinned): the second proof, its figures
+below when it completes.
 
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
