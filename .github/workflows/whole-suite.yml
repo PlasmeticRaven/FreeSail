@@ -13,6 +13,11 @@ name: whole suite
 #   - the lint once.
 # Linux by default (the recorded passages are pinned on Linux); Windows as well when
 # asked, for the owner's platform (package 69 has the five cross-platform pins).
+# The Linux runner is pinned to ubuntu-24.04 (the lead, 2026-11-05): the floating image
+# moved to 26.04 between runs 29 and 30 and nine recorded passages moved with it (a
+# last-place difference in the system's libm: docs/dev/TuningNotes.md, "The hail as typed
+# and as answered: the nine passages that moved in the cloud"); the pins are the 24.04
+# machine's, and the image moves only when the lead moves it and re-measures.
 
 on:
   workflow_dispatch:
@@ -32,7 +37,7 @@ env:
 jobs:
   lint:
     name: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -48,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ inputs.windows && fromJSON('["ubuntu-latest", "windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
+        os: ${{ inputs.windows && fromJSON('["ubuntu-24.04", "windows-latest"]') || fromJSON('["ubuntu-24.04"]') }}
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
     env:
@@ -77,7 +82,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ inputs.windows && fromJSON('["ubuntu-latest", "windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
+        os: ${{ inputs.windows && fromJSON('["ubuntu-24.04", "windows-latest"]') || fromJSON('["ubuntu-24.04"]') }}
     runs-on: ${{ matrix.os }}
     env:
       PYTHONUTF8: "1"

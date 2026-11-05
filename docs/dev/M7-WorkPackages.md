@@ -1940,6 +1940,21 @@ a "while you spoke" fold for the words that arrived during a long turn; and an a
 rule beside the place rule (a man at the braces does not hear the quarterdeck). The gain of
 each measured against the fully crewed brig's figures before anything is built.
 
+**The hotfix merged (2026-11-05, the hail as typed and as answered, b1447bc with the
+builder's 0b50156 and 25c634b):** the nine pinned passages red in cloud run 30 were not the
+hotfix's: on the 24.04 machine every one stands at its pin on the hotfix's tree (the thick
+weather trial and the merchant passage alone, line for line equal to the trunk's; the cloud's
+shard 0 whole; the slow tier of the truths and the trials, 273 passed), and no order of those
+passages reaches the hail's grammar. What moved was the cloud's runner image: ubuntu-latest
+went from 24.04 to 26.04 between runs 29 and 30 (glibc 2.43 for 2.39; the same Python and
+wheels), and a last-place difference in the system's libm moves a long passage by a line or
+a minute, package 69's kind of cause. The builder could not sail under the new library; the
+lead's proofs: run 31, the trunk as it stood on the unpinned workflow (red in the same nine
+if so), and the workflow's Linux runner pinned to ubuntu-24.04 from this merge, the run on
+the merged trunk after it (green if so). The builder found on the way that `hail._addressee`
+takes the distance to every candidate on every hail (a cost, not a change). The pace job's
+three floors under on run 30: the runner's speed.
+
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
 the testing build and the trunk do not diverge and the saves replay on the trunk.
