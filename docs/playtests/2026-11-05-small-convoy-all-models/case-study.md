@@ -80,7 +80,8 @@ lessons booked below.
 6. **The wound of a station's person is not his body's.** "My body says fed, watered and
    rested" with a ball through it; sleep refused him in the cockpit; the surgeon's report
    never a wake. The bill's wounded (73) and the needs (54) do not meet for a person who is
-   a station. Booked as a loose end for a later package: the wounded captain.
+   a station. Booked for package 87, the warrant officers' stations: the wounded captain and
+  the surgeon's order of treatment (the owner, 2026-11-05).
 7. **The prize is not in the game**, and the model found it so honestly. The owner's
    scenario stops at the colours struck. Package 74 (the prize, the captive, possession) is
    the next Fable package after 65, as planned.
