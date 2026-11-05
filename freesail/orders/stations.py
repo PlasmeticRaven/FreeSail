@@ -485,15 +485,28 @@ def _station_speaking(ship: Any) -> dict[str, str] | None:
 
 def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
     """`say <words>` and the lookout's `hail <words>` (package 41): the words a line in
-    the log with where the speaker stood, heard by every station in the same place
-    (the player at the prompt is where the captain is: the quarterdeck, or the cabin
-    when he has gone below); a hail from the masthead is heard on deck. From a station
-    the line is the station's own kind (`agent.hail` for the lookout, which wakes a
-    station with the deck that stands by; `agent.spoke` otherwise); from the player, the
-    captain's `agent.spoke`."""
+    the log with where the speaker stood, heard by every station within hearing (the
+    player at the prompt is where the captain is: the quarterdeck, or the cabin when he
+    has gone below); a hail from the masthead is heard on deck. From a station the line
+    is the station's own kind (`agent.hail` for the lookout, which wakes a station with
+    the deck that stands by; `agent.spoke` otherwise); from the player, the captain's
+    `agent.spoke`. Since package 65 (step 2; the lead's word of 2026-11-05) the hearers
+    are every hull's stations within hearing (`hearing.stations_everywhere`,
+    `within_hearing`: aboard the same hull within earshot, which a visitor's voice there
+    is; ashore at the same place of the same port; in the same boat), and the line is
+    written as heard into each hearing hull's log too, with that hull's hearers named."""
     from freesail.agents.agent import CAPTAIN, LOOKOUT, place_of
-    from freesail.agents.harness import _stations_held
+    from freesail.agents.harness import holder_of
+    from freesail.core.events import Severity
     from freesail.orders.prompt import world_of
+    from freesail.world.hearing import (
+        own_hull,
+        spot_words,
+        station_spot,
+        station_spot_on,
+        stations_everywhere,
+        within_hearing,
+    )
     from freesail.world.places import place_words
 
     norm = " ".join(text.split())
@@ -536,29 +549,30 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
         kind = "agent.hail" if is_hail else "agent.spoke"
     if is_hail:
         where = "from the masthead" if place == "masthead" else f"a hail, {where}"
-    heard_at = {"quarterdeck", "deck"} if is_hail else {place}
-    hearers = []
-    ashore = None
+    said_at = station_spot(world, station)
     if place == "shore":
         # ashore (package 66): heard at the same place of the same port, not anywhere
         # ashore (the captain at the market does not hear the counting house)
-        from freesail.world.hearing import spot_words, station_spot
-
-        ashore = station_spot(world, station)
-        where = spot_words(world, ashore)  # 'ashore at Plymouth, at the counting house'
-    for other in _stations_held(world):
-        if other.station.name == station:
+        where = spot_words(world, said_at)  # 'ashore at Plymouth, at the counting house'
+    here = own_hull(world)
+    line = f"{who[:1].upper()}{who[1:]}, {where}: {words}"
+    hearers: list[str] = []  # this hull's
+    elsewhere: dict[Any, list[str]] = {}  # each other hearing hull's, by the hull
+    me = holder_of(world, station)
+    for hull, other in stations_everywhere(world):
+        same_hull = own_hull(hull) == here
+        if other is me or (me is None and same_hull and other.station.name == station):
             continue
-        if ashore is not None:
-            from freesail.world.hearing import station_spot, within_hearing
-
-            if within_hearing(ashore, station_spot(world, other.station.name)):
-                other.hear(f"{who[:1].upper()}{who[1:]}, {where}: {words}")
-                hearers.append(other.station.name)
+        at = station_spot_on(hull, other.station.name)  # read in its own hull's block
+        if is_hail:
+            # a hail from the masthead carries over her own deck, and no further
+            hears = at[0] == "aboard" and at[1] == here and at[2] in ("quarterdeck", "deck")
+        else:
+            hears = within_hearing(said_at, at)
+        if not hears:
             continue
-        if place_of(world, other.station.name) in heard_at:
-            other.hear(f"{who[:1].upper()}{who[1:]}, {where}: {words}")
-            hearers.append(other.station.name)
+        other.hear(line)
+        (hearers if same_hull else elsewhere.setdefault(hull, [])).append(other.station.name)
     data = {
         "station": station,
         "words": words,
@@ -571,7 +585,16 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
         # a hail, and a station's word on deck, are notable (a station with authority
         # speaks notably, package 37g); the player's own say is routine, as his orders
         data["notable"] = True
-    return kind, f"{who[:1].upper()}{who[1:]}, {where}: {words}", data
+    for hull, names in elsewhere.items():
+        # the word as heard aboard another ship, in her log, for her people's samples
+        hull.record(
+            Severity.NOTABLE if data.get("notable") else Severity.ROUTINE,
+            kind,
+            line,
+            actor=str((getattr(ship, "extra", None) or {}).get("order_actor") or "the captain"),
+            data={**data, "heard_by": names, "said_from": here},
+        )
+    return kind, line, data
 
 
 def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
@@ -636,6 +659,9 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         )
     if verb == "tell":
         station, words = _split_ask(text, ship, verb="tell")
+        if speaker is not None and speaker["station"] == station:
+            # a station's own word is never its wake (package 65, step 2)
+            raise OrderError(f"The {station} tells itself nothing; tell another station.")
         if not by and _player_captain(ship, station, agents, seat):
             return _to_the_player_captain(station, words, speaker)
         held = _held(agents, station, seat)

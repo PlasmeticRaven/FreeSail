@@ -174,7 +174,8 @@ Listener = Callable[[dict[str, Any]], None]
 # The log kinds of a station speaking (`World.AGENT_LOG_KINDS`): its narration and its
 # answer to a question. With `--ease-on-station` either eases the clock, as its turn
 # opening does (package 33d; playtest 12, the owner's note 3).
-STATION_SPEAKS = ("agent.note", "agent.said")
+# a station speaking in the world (decision 60: a reply's prose is a note, no line)
+STATION_SPEAKS = ("agent.spoke", "agent.said", "agent.hail")
 
 
 def snapshot_interval(compression: float) -> int:

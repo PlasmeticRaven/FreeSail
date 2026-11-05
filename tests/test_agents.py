@@ -128,6 +128,15 @@ def lines(world: World, kind: str) -> list[str]:
     return [e.text for e in world.log if e.kind == kind]
 
 
+def notes(world: World, station: str = "watcher") -> list[str]:
+    """A station's reply prose as decision 60 keeps it (package 65, step 2): the notes in
+    its journal (kind `agent.note`), heard by nobody in the world."""
+    from freesail.agents.journal import journal_seen
+
+    book = journal_seen(world, station)
+    return [e.text for e in (book.entries if book is not None else []) if e.kind == "agent.note"]
+
+
 def data_turns(fake: Fake) -> list[dict[str, Any]]:
     """Every data turn the fake was ever shown, in order, without repeats."""
     seen: list[dict[str, Any]] = []
@@ -563,7 +572,7 @@ def test_truth_42_a_watcher_that_answers_an_ask_is_heard_in_the_log():
     assert world.journal[-1] == (600, "captain", "ask the watcher how the sails are drawing")
     # the question travelled as data
     q = [d for d in data_turns(fake) if d.get("question")]
-    assert q and q[0]["reason"] == "a question"
+    assert q and q[0]["reason"] == "a question from the captain"
 
 
 def test_an_ask_to_nobody_or_with_no_question_is_refused_in_words():
@@ -627,7 +636,7 @@ def test_truth_43_a_model_that_answers_the_nudge_by_standing_by_is_not_stopped()
     assert not h.agent.standing_by and not h.agent.paused and not h.agent.released
     assert "agent.paused" not in kinds(world) and "agent.stopped" not in kinds(world)
     assert saves == []
-    assert "[watcher] Back." in lines(world, "agent.note")
+    assert "Back." in notes(world)
 
 
 def test_truth_43_repeating_after_the_nudge_pauses_with_the_human_asked_then_stands_down():
@@ -799,7 +808,7 @@ def test_truth_44_stand_by_until_eight_bells_suspends_sampling_until_eight_bells
     assert world.clock.tick == A_WATCH_S and fake.calls == calls + 1
     assert data_turns(fake)[-1]["reason"] == "eight bells"
     assert lines(world, "agent.resumed") == ["[watcher] Eight bells; the watcher is sampled again."]
-    assert "[watcher] Up." in lines(world, "agent.note")
+    assert "Up." in notes(world)
     assert not h.agent.standing_by
     # and the periodic sampling goes on from there
     world.run(EVERY)
@@ -948,7 +957,7 @@ def test_the_models_own_word_ends_a_stand_by_and_replays(tmp_path):
     assert not h.agent.standing_by and h.open_sample is not None
     assert h.open_sample.reason == "its own word"
     assert h.open_sample.stood_by["notable"] == 1
-    assert "[watcher] All hands are up; the booms want watching." in lines(world, "agent.note")
+    assert "All hands are up; the booms want watching." in notes(world)
     assert lines(world, "agent.resumed")[-1] == (
         "[watcher] The watcher ends its stand-by (until a glass) at its own word; it is "
         "sampled again."
@@ -1000,7 +1009,7 @@ def test_a_save_from_before_the_rule_replays_by_the_old_one():
     h.stand_by_ends_turn = False  # the rule before package 28c
     h.start()
     world.run(A_GLASS_S + 60)
-    assert "[watcher] Up." in lines(world, "agent.note")
+    assert "Up." in notes(world)
     data = json.loads(json.dumps(world.save()))
     assert data["agents"][0].pop("stand_by_ends_turn") is False
     copy = replay.replay(data, ship_factory)
@@ -1194,7 +1203,7 @@ def test_restore_gives_a_loaded_game_its_watcher_back_and_a_live_model_can_conti
     restored.model = Fake(["Four."])
     fresh.run(1)
     assert restored.open_sample is None
-    assert "[watcher] Four." in lines(fresh, "agent.note")
+    assert "Four." in notes(fresh)
 
 
 # ---------------------------------------------------------------------------
@@ -1237,9 +1246,11 @@ def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
     folded = [t.content for t in since_reply if t.content.get("folded")]
     assert since_reply[0].content["reason"] == "the start" and len(folded) >= 2
     assert all(d["folded"] == harness_mod.FOLDED_WORDS for d in folded)
-    assert folded[-1]["reason"] == "a question" and folded[-1]["question"] == "how she goes"
+    assert folded[-1]["reason"] == "a question from the captain"
+    assert folded[-1]["question"] == "how she goes"
     o = h.open_sample
-    assert o.reason.startswith("the start; then ") and o.reason.endswith("; then a question")
+    assert o.reason.startswith("the start; then ")
+    assert o.reason.endswith("; then a question from the captain")
     assert "the interval" in o.reason or "the glass" in o.reason
     assert o.tick == EVERY and o.readings == sample_rows(world)
     assert o.question == "how she goes"
@@ -1610,8 +1621,9 @@ def test_the_narrator_says_a_line_from_the_readings_and_answers_an_ask():
     world.run(600)
     h = Harness(world, watcher(SamplingPolicy.in_lockstep(A_GLASS_S)), narrator())
     h.start()
-    note = lines(world, "agent.note")[-1]
-    assert note.startswith("[watcher] Wind from N, 15 knots; heading S (180°); making")
+    note = notes(world)[-1]
+    assert note.startswith("Wind from N, 15 knots; heading S (180°); making")
+    assert not lines(world, "agent.note")  # the prose is a note, no line of the play (60)
     world.submit("ask the watcher how the sails are drawing")
     said = lines(world, "agent.said")[-1]
     assert said.startswith("[watcher] You asked how the sails are drawing. ")
@@ -1635,7 +1647,10 @@ def test_the_console_stations_the_scripted_watcher_and_prints_its_lines(tmp_path
     con.handle_line("state")
     con.handle_line("stand down the watcher")
     text = out.getvalue()
-    assert "[watcher] Wind from N" in text
+    # the narrator's prose is its note, in its journal and not in the log the console prints
+    # (decision 60); its answer to the ask is said, and printed
+    assert "[watcher] Wind from N" not in text
+    assert any(e.text.startswith("Wind from N") for e in h.journal.entries if e.kind == "agent.note")
     assert "* Morning watch, 1 bell (04:30)  [watcher] You asked how the sails are drawing." in text
     assert "The watcher: stationed." in text
     assert "The watcher stood down by the captain" in text
@@ -1720,8 +1735,8 @@ def test_the_repl_model_prints_the_brief_once_and_each_sample_and_reads_replies(
         "a glass." in text
     )
     assert "Replies are typed as text" in h.brief.head[2].text
-    assert "[watcher] Watching." in lines(world, "agent.note")
-    assert "[watcher] Awake." in lines(world, "agent.note")
+    assert "Watching." in notes(world)
+    assert "Awake." in notes(world)
 
 
 def test_the_repl_turn_mode_drives_a_game_one_process_at_a_time(tmp_path):
@@ -1761,7 +1776,7 @@ def test_the_repl_turn_mode_drives_a_game_one_process_at_a_time(tmp_path):
     # the whole game replays from its file, agent and all
     copy = replay.replay(data)
     assert copy.agents["watcher"].agent.released
-    assert "[watcher] The wind is fair." in lines(copy, "agent.note")
+    assert "The wind is fair." in notes(copy)
 
 
 def test_at_the_repl_a_book_is_read_by_its_handle_and_shelving_says_the_reader_keeps_it(tmp_path):
@@ -2295,7 +2310,7 @@ def test_answer_and_say_run_past_the_tool_budget():
     assert results[n]["result"].startswith(f"Not run: this turn's {n} reads and notes are made")
     assert results[n + 1]["result"] == "Heard."
     assert [e.text for e in h.journal.entries if e.kind == "note"] == []  # not run
-    assert "[watcher] Reading first." in lines(world, "agent.note")
+    assert "Reading first." in notes(world)
 
 
 THOUGHT = (
@@ -2327,7 +2342,7 @@ def test_a_leaked_thought_is_journaled_as_a_fault_and_not_said():
     notices = data_turns(fake)[-1]["notices"]
     assert notices == [harness_mod.THOUGHT_NOTICE.format(tag="<thought")]
     assert "nothing of it was said" in notices[0]
-    assert lines(world, "agent.note") == ["[watcher] All well."]
+    assert notes(world) == ["All well."]
 
 
 @pytest.mark.parametrize(
@@ -2344,7 +2359,7 @@ def test_a_leaked_thought_is_journaled_as_a_fault_and_not_said():
 def test_the_thought_tag_alone_decides(text, said):
     world = point_world()
     h, fake, _ = stationed(world, [text])
-    assert bool(lines(world, "agent.note")) is said
+    assert bool(notes(world)) is said
     assert any(e.kind == "agent.fault" for e in h.journal.entries) is not said
 
 
@@ -2384,7 +2399,14 @@ def test_empty_replies_where_an_answer_is_owed_bring_the_nudge_then_the_pause():
     assert saves == []
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="decision 60 (package 65, step 2): a reply's prose is a note written into the "
+    "journal and nothing said in the world; it no longer ends the empty count, a call does",
+)
 def test_an_empty_reply_at_an_urgent_event_counts_and_words_end_the_count():
+    """The rule before decision 60, kept as it was for the record: a reply of words alone
+    ended the count of empty replies."""
     world = point_world()
     h, fake, _ = stationed(world, ["Watching.", "", "", "Aye, she is taken aback."])
     world.record(Severity.URGENT, "ship.aback", "Taken aback.")
@@ -2396,6 +2418,50 @@ def test_an_empty_reply_at_an_urgent_event_counts_and_words_end_the_count():
     assert h.agent.empty_count == 1
     world.run(EVERY)  # words end it
     assert h.agent.empty_count == 0 and "agent.nudged" not in kinds(world)
+
+
+def test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_while_prose_does_not():
+    """Decision 60 (package 65, step 2): the count judges what happened in the world. An
+    empty reply where an answer was owed counts as before; a reply of prose alone there is
+    words written into the journal and nothing said, counted in those words and never as
+    "an empty reply", with the notice naming the tools in the next sample; prose at a plain
+    glass is a note, neither counted nor ending the count; a call ends it."""
+    world = point_world()
+    h, fake, _ = stationed(
+        world,
+        [
+            "Watching.",
+            "",
+            "I see she is taken aback.",
+            "",
+            "A quiet glass.",
+            reply("", call("readings")),
+        ],
+    )
+    world.record(Severity.URGENT, "ship.aback", "Taken aback.")
+    world.run(1)  # the events policy samples on the urgent line; the reply is empty
+    assert h.agent.empty_count == 1 and h.agent.empty_noted == 0
+    (entry,) = [e for e in h.journal.entries if e.kind == "agent.empty_reply"]
+    assert entry.text == "An empty reply where an answer was owed (an urgent event); one in a row."
+    world.record(Severity.URGENT, "ship.aback", "Taken aback again.")
+    world.run(1)  # prose alone where an answer was owed: counted, in its own words
+    assert h.agent.empty_count == 2 and h.agent.empty_noted == 1
+    entries = [e.text for e in h.journal.entries if e.kind == "agent.empty_reply"]
+    assert entries[-1] == (
+        "Words written into the journal and nothing said in the world, where an answer was "
+        "owed (an urgent event); two in a row."
+    )
+    assert "I see she is taken aback." in notes(world) and not lines(world, "agent.note")
+    world.run(EVERY)  # the next sample carries the notice naming the tools; its reply is empty
+    notices = [n for d in data_turns(fake) if d.get("notices") for n in d["notices"]]
+    assert notices[-1] == harness_mod.NOTE_NOT_HEARD.format(owed="an urgent event")
+    assert "answer(text) answers a question put to you" in notices[-1]
+    assert h.agent.empty_count == 2  # a plain glass, empty: neither counted nor ending it
+    world.run(EVERY)  # prose at a plain glass: a note, uncounted, and the count stands
+    assert h.agent.empty_count == 2 and "A quiet glass." in notes(world)
+    world.run(EVERY)  # a call ends it, whatever it is: a read is a thing done
+    assert h.agent.empty_count == 0 and h.agent.empty_noted == 0
+    assert "agent.nudged" not in kinds(world)
 
 
 # ---------------------------------------------------------------------------

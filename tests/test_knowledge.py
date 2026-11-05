@@ -49,10 +49,11 @@ def world_at(where=OFF_THE_LIZARD, start=datetime(1805, 6, 10, 10, 0), **kw):
     return w
 
 
-def seated(w, script, make=captain, every=600, **kw) -> Harness:
+def seated(w, script, make=captain, every=600, loop=False, **kw) -> Harness:
     st = make(SamplingPolicy.in_lockstep(every, "notable", "urgent"), world=w, **kw)
     stand = reply("", call("stand_by", until="a glass"))
-    h = Harness(w, st, Fake(script, when_done=stand), save=lambda _w, _why: None)
+    fake = Fake(script, loop=True) if loop else Fake(script, when_done=stand)
+    h = Harness(w, st, fake, save=lambda _w, _why: None)
     h.model_name, h.door = "the fake", "runner"
     h.start()
     return h
@@ -493,3 +494,247 @@ def test_the_filters_cost_measured_with_three_stations_seated():
     # the band is wide for the machine's noise (the two measures a minute apart differ by a
     # tenth either way on four cores); the figures are the record
     assert ruled >= 0.7 * free, (ruled, free)
+
+
+# ---------------------------------------------------------------------------
+# A reply's prose is the person's own note (§6, decision 60; step 2)
+# ---------------------------------------------------------------------------
+
+
+def _prose_notes(h: Harness) -> list[Any]:
+    return [e for e in h.journal.entries if e.kind == "agent.note"]
+
+
+def test_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard():
+    """Decision 60 (truth 7-379): a reply's prose is written in the station's journal under
+    the model's mark and in the director's log by the station, in no log of the play, and
+    no station hears it; a `say` is heard (66); prose alone where an answer was owed is
+    counted as words written into the journal and nothing said, and the next sample carries
+    the notice naming the tools; the director's sample carries the stations' notes."""
+    from freesail.agents import director as D
+    from freesail.agents import harness as harness_mod
+    from tests.test_director import seat_director
+
+    w = world_at()
+    stand = reply("", call("stand_by", until="a glass"))
+    director = seat_director(w, [stand])
+    cap_script = {"n": 0}
+
+    def captains_part(last, turns):
+        # his first reply prose; a question answered in prose once, then with the tool
+        cap_script["n"] += 1
+        if cap_script["n"] == 1:
+            return reply("The glass is steady; I shall keep her so.")
+        if last.get("question") and cap_script["n"] == 2:
+            return reply("I think not.")
+        if last.get("question"):
+            return reply("", call("answer", text="Shorten sail, Mr Pearce."))
+        return stand
+
+    cap = seated(w, [captains_part], loop=True)
+    off_script = {"n": 0}
+
+    def officers_part(last, turns):
+        off_script["n"] += 1
+        if off_script["n"] == 1:
+            return reply("", call("submit_order", text="say the wind is backing, sir"))
+        if off_script["n"] == 2:
+            return reply("", call("submit_order", text="ask the captain whether to shorten sail"))
+        return stand
+
+    off = seated(w, [officers_part], make=officer, loop=True)
+    w.run(1)
+    # the captain's prose: his note, under his mark, and the director's log's, by him
+    note = _prose_notes(cap)[0]
+    assert note.text == "The glass is steady; I shall keep her so." and note.by == "the fake"
+    assert note.line().endswith("(note) The glass is steady; I shall keep her so.")
+    logged = [e for e in D.log_of(w).entries if e.kind == "agent.note"]
+    assert logged[0].by == "captain"
+    assert logged[0].text == "The glass is steady; I shall keep her so."
+    assert not any(e.kind == "agent.note" for e in w.log)
+    # the officer on the same quarterdeck heard nothing of it; the captain hears the say
+    assert not [s for s in samples(off) if s.get("heard")]
+    spoke = [e for e in w.log if e.kind == "agent.spoke"]
+    assert spoke and "the wind is backing, sir" in spoke[0].text
+    assert spoke[0].data["heard_by"] == ["captain"]
+    w.run(600)
+    heard = [s["heard"] for s in samples(cap) if s.get("heard")]
+    assert heard and "on the quarterdeck: the wind is backing, sir" in heard[0][0]
+    # the officer's question: the captain's reply of prose alone leaves it owed, counted in
+    # its own words and never as "an empty reply"; the next sample names the tools; the
+    # question stands until answered (29c), and the answer with the tool ends the count
+    w.run(600)
+    asked = [s for s in samples(cap) if s.get("question")]
+    assert asked and asked[0]["question"].endswith("asks: whether to shorten sail")
+    (counted,) = [e for e in cap.journal.entries if e.kind == "agent.empty_reply"]
+    assert counted.text == (
+        "Words written into the journal and nothing said in the world, where an answer was "
+        "owed (a question); one in a row."
+    )
+    assert "I think not." in [e.text for e in _prose_notes(cap)]
+    notices = [n for s in samples(cap) if s.get("notices") for n in s["notices"]]
+    assert harness_mod.NOTE_NOT_HEARD.format(owed="a question") in notices
+    said = [e for e in w.log if e.kind == "agent.said"]
+    assert said and said[0].text.endswith("Shorten sail, Mr Pearce.")
+    assert cap.agent.empty_count == 0 and cap.agent.empty_noted == 0
+    # the director's sample carries the stations' notes since its last, and no one else's
+    noted = [s["notes"] for s in samples(director) if s.get("notes")]
+    assert noted and noted[0][0].endswith("the captain: The glass is steady; I shall keep her so.")
+    assert (
+        all("I think not." in n for s in noted[1:] for n in s if "captain" in n) or len(noted) == 1
+    )
+    assert not [s for s in samples(cap) if s.get("notes")]
+    # the words the harness says of it
+    assert "Your reply's prose is your own note" in PLACE_KNOWLEDGE_WORDS
+    assert "A word to a person is no order of the ship" in PLACE_KNOWLEDGE_WORDS
+
+
+def test_the_wakes_reason_names_the_speaker_and_the_kind():
+    """The owner's point of 2026-11-05 (the fully crewed brig): a station woken by a word
+    was told "a word from the captain" whoever spoke. The reason names the speaker and the
+    kind: a word, a question or an answer from whom; the prompt's own tell is the captain's
+    (`A_WORD`); a word kept for a station nobody held names itself; the log's line says the
+    same."""
+    from freesail.agents.agent import master
+    from freesail.agents.harness import A_WORD
+
+    w = world_at()
+    stand = reply("", call("stand_by", until="a glass"))
+
+    def captains_part(last, turns):
+        if last.get("question"):
+            return reply("", call("answer", text="Shorten sail, Mr Pearce."))
+        return stand
+
+    cap = seated(w, [captains_part], loop=True)
+    stage = {"n": 0}
+    orders = [
+        "tell the captain the wind is backing",
+        "ask the captain whether to shorten sail",
+        "tell the master mind the glass",
+    ]
+
+    def officers_part(last, turns):
+        # one order a sample, a stand-by between: the word, the question, the word kept
+        stage["n"] += 1
+        if stage["n"] % 2 == 1 and stage["n"] // 2 < len(orders):
+            return reply("", call("submit_order", text=orders[stage["n"] // 2]))
+        return stand
+
+    off = seated(w, [officers_part], make=officer, loop=True)
+    who = off.who_words  # 'the officer of the watch (Mr ...)'
+    w.run(1200)
+    told = [s for s in samples(cap) if s.get("word")]
+    assert told and told[0]["reason"] == f"a word from {who}"
+    assert told[0]["word"].endswith("to you: the wind is backing")
+    resumed = [e.text for e in w.log if e.kind == "agent.resumed"]
+    assert f"[captain] A word from {who}; the captain is sampled again." in resumed
+    asked = [s for s in samples(cap) if s.get("question")]
+    assert asked and asked[0]["reason"] == f"a question from {who}"
+    assert asked[0]["question"].endswith("to shorten sail")
+    answered = [s for s in samples(off) if s.get("word")]
+    assert answered and answered[0]["reason"] == f"an answer from {cap.who_words}"
+    assert answered[0]["word"].endswith("Shorten sail, Mr Pearce.")
+    # the prompt's own word is the captain's, as it always was
+    w.submit("tell the officer of the watch keep her so")
+    w.run(2)
+    s = samples(off)[-1]
+    assert s["reason"] == A_WORD == "a word from the captain" and s["word"] == "keep her so"
+    # the officer's word to the master, whom nobody held, waits in the master's journal and
+    # is passed to whoever takes the station, the reason naming its keeping
+    kept = [e for e in w.log if e.kind == "agent.told" and e.data.get("kept")]
+    assert kept and kept[0].data["speaker"] == "officer of the watch"
+    m = seated(w, [stand], make=master)
+    s = samples(m)[0]
+    assert s["reason"] == "the start"
+    assert s["word"].endswith("kept for whoever takes the station: mind the glass")
+    assert m.agent.word is None and m.agent.word_reason == ""
+
+
+def test_a_station_is_never_woken_by_its_own_word():
+    """The owner's observation of 2026-11-05: seven of the brig's captain's sixty wakes
+    followed his own last word. A station's word to itself (`tell`, `say to`) is refused in
+    words; its word to a station nobody holds is kept there and wakes the speaker not at
+    all; a question put to a person nobody holds while a director sits comes back, when no
+    answer came in a glass, as "no answer from <him>" and never as the speaker's own word."""
+    from freesail.agents import harness as harness_mod
+    from tests.test_director import seat_director
+
+    w = world_at()
+    seat_director(w, [reply("", call("stand_by", until="a glass"))])
+    stand = reply("", call("stand_by", until="a glass"))
+    off = seated(
+        w,
+        [
+            reply(
+                "",
+                call("submit_order", text="tell the officer of the watch keep her so"),
+                call("submit_order", text="say to the officer of the watch all well"),
+                call("submit_order", text="tell the master mind the glass"),
+                call("submit_order", text="ask the gunner whether the guns are secured"),
+            ),
+            stand,
+            stand,
+            stand,
+        ],
+        make=officer,
+    )
+    w.run(1)
+    refused = [r for r in results(off, "submit_order") if "tells itself nothing" in str(r)]
+    assert len(refused) == 2, results(off, "submit_order")
+    assert off.agent.word is None and off.agent.word_reason == ""
+    kept = [e for e in w.log if e.kind == "agent.told" and e.data.get("kept")]
+    assert kept and kept[0].data["station"] == "master"
+    # nothing of his own wakes him: his stand-by holds through the glass but for the answer
+    # that did not come, which names the gunner
+    asked = [e for e in w.log if e.kind == "agent.asked"]
+    assert asked and "gunner" in asked[-1].text
+    w.run(harness_mod.PERSON_ANSWER_BOUND_S + 5)
+    reasons = [s["reason"] for s in samples(off)[1:]]
+    assert not any("officer of the watch" in r for r in reasons), reasons
+    woke = [s for s in samples(off) if s.get("word") and "No answer came from" in s["word"]]
+    assert woke and woke[0]["reason"].startswith("no answer from ")
+    assert "officer" not in woke[0]["reason"]
+
+
+def test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard():
+    """Truth 7-389 (the lead's word of 2026-11-05): a station's `say` reaches every hull's
+    stations within hearing: ashore at the same place of the same port, whichever ship
+    brought each; the line is written as heard into each hearing hull's log with that
+    hull's hearers named, and nothing reaches a quarterdeck three miles off."""
+    from freesail.agents.agent import master
+    from tests.test_people import _world_with_a_crewed_brig
+
+    w, b = _world_with_a_crewed_brig()
+    crew = b.crew
+    # the player's captain and the brig's master both ashore at Falmouth, at the counting
+    # house, their whereabouts written as the boat would write them (package 84, step 2)
+    for person in (w.people.captain, crew.people.find("the master")):
+        person.aboard, person.where, person.port, person.ashore_at = (
+            False,
+            "shore",
+            "falmouth",
+            "counting_house",
+        )
+    stand = reply("", call("stand_by", until="a glass"))
+    cap = seated(w, [stand])
+    greet = reply("", call("submit_order", text="say good day to you all"))
+    seated(crew, [greet, stand], make=master)
+    w.run(2)
+    said = [e for e in crew.log if e.kind == "agent.spoke"]
+    assert said and "ashore at Falmouth, at the counting house: good day to you all" in said[0].text
+    assert said[0].data["heard_by"] == []  # nobody of the brig's was there
+    heard = [e for e in w.log if e.kind == "agent.spoke" and "good day to you all" in e.text]
+    assert heard and heard[0].data["heard_by"] == ["captain"]
+    assert heard[0].data["said_from"] == b.id and heard[0].text == said[0].text
+    w.run(1800)  # overheard, not addressed: the words ride his next sample (41's rule)
+    s = samples(cap)[-1]
+    assert s.get("heard") and s["heard"][0].endswith("at the counting house: good day to you all")
+    # aboard, three miles apart, a word on one quarterdeck reaches no station of the other
+    for person in (w.people.captain, crew.people.find("the master")):
+        person.aboard, person.where, person.port, person.ashore_at = True, "quarterdeck", "", ""
+    n = len(w.log)
+    e = crew.submit("say the glass is falling", actor="the master")
+    assert e.kind == "agent.spoke" and e.data["heard_by"] == []
+    assert not [e for e in list(w.log)[n:] if e.kind == "agent.spoke"]
+    assert [e for e in crew.log if e.kind == "agent.spoke" and "glass is falling" in e.text]

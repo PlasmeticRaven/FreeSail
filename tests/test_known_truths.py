@@ -13511,3 +13511,40 @@ def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
 
     test_a_tripwire_judged_below_wakes_as_the_officers_call()
     test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
+
+
+def test_truth_7_379_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard():
+    """Decision 60 (package 65, step 2): a reply's prose is journaled under the station's
+    mark and in the director's log, in no log of the play, heard by no station; `say` is
+    heard (66); prose alone where an answer was owed carries the notice naming the tools
+    and counts as words written into the journal and nothing said; the director's sample
+    carries the stations' notes. The count's own rule: an empty reply where an answer was
+    owed counts, prose there counts in its own words, prose at a plain glass is uncounted,
+    and a call ends the count."""
+    from tests.test_agents import (
+        test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_while_prose_does_not,
+    )
+    from tests.test_knowledge import (
+        test_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard,
+    )
+
+    test_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard()
+    test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_while_prose_does_not()
+
+
+def test_truth_7_389_a_say_reaches_every_hull_within_hearing_and_a_wake_names_its_speaker():
+    """The lead's word of 2026-11-05 for 65's step 2 (the fully crewed brig): a station's
+    `say` reaches every hull's stations within hearing (ashore at the same place of the same
+    port, aboard the same hull for a visitor), written as heard into each hearing hull's log
+    with that hull's hearers named; the wake's reason names the speaker and the kind (a word,
+    a question or an answer from whom; the prompt's own the captain's); and a station is
+    never woken by its own word."""
+    from tests.test_knowledge import (
+        test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard,
+        test_a_station_is_never_woken_by_its_own_word,
+        test_the_wakes_reason_names_the_speaker_and_the_kind,
+    )
+
+    test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard()
+    test_the_wakes_reason_names_the_speaker_and_the_kind()
+    test_a_station_is_never_woken_by_its_own_word()

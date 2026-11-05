@@ -430,7 +430,7 @@ def _phrases(by_kind: dict[str, list[Event]]) -> list[str]:
     for kind in [k for k in by_kind if k.startswith("agent.")]:
         events = take(kind)
         station = events[0].actor.removeprefix("the ") or "station"
-        what = "spoke" if kind == "agent.note" else kind.removeprefix("agent.").replace("_", " ")
+        what = kind.removeprefix("agent.").replace("_", " ")
         out.append(f"the {station} {what} {_times(len(events))}")
     if "ship.leeway" in by_kind:
         out.append(_lower_first(take("ship.leeway")[-1].text.rstrip(".")))
