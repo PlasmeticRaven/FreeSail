@@ -1569,13 +1569,15 @@ CLOSED = """
 # the smack" with the lugger read beside them). No transom on the lugger's round stern; no wale on
 # the schooners' plate; no ports cut in the side, so no band, on the lugger and the smack.
 NO_GALLERY_OR_LIGHT = {BRIG, MERCHANT_BRIG, CUTTER, LUGGER, SMACK, SCHOONER, PRIVATEER}
+# a ship's boat (package 82: her drawing by rule) has no gallery, no stern light, no head
+# and no ports, a square transom and a rubbing strake for her wale
 RIGHTLY_WITHOUT = {
-    "gallery": NO_GALLERY_OR_LIGHT,
-    "light": NO_GALLERY_OR_LIGHT,
-    "head": {CUTTER, LUGGER, SMACK},
+    "gallery": NO_GALLERY_OR_LIGHT | set(BOATS),
+    "light": NO_GALLERY_OR_LIGHT | set(BOATS),
+    "head": {CUTTER, LUGGER, SMACK} | set(BOATS),
     "transom": {LUGGER},
     "wale": {SCHOONER, PRIVATEER},
-    "band": {LUGGER, SMACK},
+    "band": {LUGGER, SMACK} | set(BOATS),
 }
 GALLERIED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["gallery"]]
 LIT = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["light"]]
@@ -5742,6 +5744,8 @@ LINES_ON_THE_RAIL = {
 LINES_ON_THE_RAIL[RAZEE] = LINES_ON_THE_RAIL[SIXTY_FOUR]
 LINES_ON_THE_RAIL[MERCHANT_BRIG] = LINES_ON_THE_RAIL[BRIG]
 LINES_ON_THE_RAIL[PRIVATEER] = LINES_ON_THE_RAIL[SCHOONER]
+# a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
+LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
 # The sails each file hanks to a stay led to the stem, and cuts by the viewer's rule: the 64's and
 # the razee's are cut from their files' corners, their tacks on the bowsprit's collar.
 STEM_TACKED = {
@@ -5858,7 +5862,7 @@ def assert_every_end_is_on_the_rail_or_up_in_the_rig(got: dict, graph: dict) -> 
 
 
 @needs_node
-@pytest.mark.parametrize("path", PROFILED)
+@pytest.mark.parametrize("path", [*PROFILED, *BOATS])
 @pytest.mark.parametrize("tack", ["starboard", "larboard"])
 def test_each_line_that_comes_down_ends_on_her_drawn_rail(tmp_path, path, tack):
     """The rings marked V on the close sheets: a brace of a yard with no mast abaft it, the sheet
@@ -6080,12 +6084,14 @@ AS_BEFORE = [*BOATS, *WITHOUT_PROFILE]
 
 
 @needs_node
-@pytest.mark.parametrize("case", AS_BEFORE)
+@pytest.mark.parametrize("case", WITHOUT_PROFILE)
 @pytest.mark.parametrize("tack", ["starboard", "larboard"])
 def test_with_no_profile_the_lines_come_down_as_before(tmp_path, case, tack):
-    """A graph with no profile, the boats' and any other: each line that comes down ends half the
-    beam out at the datum, where the hull it is drawn on has its rail, with no x held; a stay led
-    to the stem lands at half her length or her bowsprit's heel, at the datum."""
+    """A graph with no profile: each line that comes down ends half the beam out at the datum,
+    where the hull it is drawn on has its rail, with no x held; a stay led to the stem lands at half
+    her length or her bowsprit's heel, at the datum. The boats were here until package 82 drew each
+    from her own profile; their lug's sheet now ends on her gunwale with the rest
+    (`test_each_line_that_comes_down_ends_on_her_drawn_rail`)."""
     data = fully_dressed(case.removesuffix(BARE), tack)
     if case.endswith(BARE):
         without_profile(data)
@@ -6100,10 +6106,6 @@ def test_with_no_profile_the_lines_come_down_as_before(tmp_path, case, tack):
         x = lead_x(line, graph, got, on_a_profile=False)
         end = [line["pts"][1][0], abs(line["pts"][1][1]), line["pts"][1][2]]
         assert end == pytest.approx([x, hull["beam_m"] / 2.0, hull["deck_height_m"]]), line["id"]
-    if case in BOATS:
-        assert came_down == {"lug.sheet"}
-        assert not got["stays"]
-        return
     assert LINES_ON_THE_RAIL[case.removesuffix(BARE)] <= came_down
     (bowsprit,) = [s for s in graph["spars"] if s["class"] == "bowsprit"]
     stem_x = min(hull["length_waterline_m"] / 2.0, bowsprit["x_m"])

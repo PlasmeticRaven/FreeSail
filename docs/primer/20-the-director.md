@@ -27,6 +27,8 @@ The director's tool is the world-order channel (chapter 15 and `docs/agents/Harn
 - **a letter**: `message: at Brest from the agent: "..."` left at the port for the pilot to bring, `message: by a cutter from Plymouth from the port admiral: "..."` sent out to find her;
 - **a port's stance or a price**: `port brest: closed to Britain`, `port falmouth: price of tin 130`;
 - **a point of interest**: `mark: a wreck, her masts showing above the water at 49 58 N 5 16 W`;
+- **the boat lost** (the same table): `aboard: the boat stove`, `aboard: the boat swamped` (each doubted on a smooth sea), `aboard: the boat gone adrift` (her painter parted): the boat lost with whoever is in her, sent on no errand and manned by nobody until the ship demands a new one of the yard;
+- **the drivers' centre**: `follow "the Medusa"` moves the drivers (the readings, the log, the chart) to her hull, made and woken if she sleeps; `follow "the ship"` brings them home; `follow nobody` gives a world with no ship of the player's its view back. A driver's line and no world order: it costs no act. The reading `the followed ship` says where they are;
 - **a person named**: `person: supercargo "Mr Pentreath" aboard in the cabin`, `person: agent "Mr Fox" ashore at Brest`;
 - **a person made from words, moved, or bound to a station**: `person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Falmouth, who knew the captain's father`, `person: "Mr Fox" comes aboard as master`, `person: "Mr Fox" goes ashore`, `person: "Mr Fox" leaves the ship at Brest`;
 - **words in the mouth of a person nobody holds**: `say as the cook: "Pease and pork, sir."`, `say as Mr Fox: "I knew your father, sir."`;

@@ -128,6 +128,7 @@ def register() -> None:
             _colours,
             description="the ship's own colours: shown and whose, false (another nation's), "
             "none, struck, or the ensign union down",
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -139,6 +140,7 @@ def register() -> None:
             _signals,
             description="the hoists flying and the signals seen and read this glass, with "
             "their meanings where the book is ours; 'none'",
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -150,6 +152,8 @@ def register() -> None:
             _private,
             description="this month's private signal, the challenge and the reply by day, and "
             "the last stranger's answer; 'none aboard' in a ship that carries no table",
+            where=("deck", "cabin"),
+            where_words="the private signals are in the cabin, and the deck sees what is shown",
         )
     )
     R.REGISTRY.add(
@@ -160,6 +164,7 @@ def register() -> None:
             "",
             _lights,
             description="the lights she shows by night: none, a stern lantern, the top lights",
+            where=("deck", "aloft"),
         )
     )
     ev = R.EventSpec

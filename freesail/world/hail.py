@@ -159,8 +159,10 @@ def _addressee(world: Any, who_words: str) -> Any:
     if sea is None:
         return None
     w = " ".join(str(who_words or "").lower().split())
-    if w.startswith("the "):
-        w = w[4:]
+    for article in ("the ", "an ", "a "):
+        if w.startswith(article):
+            w = w[len(article) :]
+            break
     own = _own_id(world)  # her own body is on the sea (package 84, step 7) and no addressee
     candidates = [
         v
@@ -181,7 +183,11 @@ def _addressee(world: Any, who_words: str) -> Any:
     # and only a name reaches beyond them; a mark in sight that answers to the words (a
     # wreck, a hulk) is said to be no sail
     seen = getattr(getattr(world, "lookout", None), "_sails_seen", None) or {}
-    pool = [v for v in candidates if f"sail:{v.id}" in seen or v.id in seen]
+    pool = [
+        v
+        for v in candidates
+        if f"sail:{v.id}" in seen or v.id in seen or _has_hailed_us(world, v, near(v))
+    ]
     if w in ("her", "him", "them", "stranger", "sail", "chase", "enemy", "vessel", "ship"):
         battery = (getattr(world.ship, "extra", None) or {}).get("battery")
         target = getattr(battery, "target", None) if battery is not None else None
@@ -206,6 +212,19 @@ def _addressee(world: Any, who_words: str) -> Any:
         )
     found = sea.find(who_words.strip()) if hasattr(sea, "find") else None
     return found if found is not None and str(found.id) != own else None
+
+
+def _has_hailed_us(world: Any, vessel: Any, distance: float) -> bool:
+    """Whether the sail has hailed this deck and lies within hail yet: her voice has
+    reached it, whether or not the masthead has reported her (the owner's second test,
+    2026-10-31: a model at the Raven's captain's station, hailed by 'the ship', answered
+    `hail the ship` three ticks later and was told nothing in sight answered to it)."""
+    from freesail.world.ships import HAIL_NM
+
+    pending = (getattr(world.ship, "extra", None) or {}).get("hail_pending") or {}
+    if str(pending.get("from") or "") != str(vessel.id):
+        return False
+    return distance <= HAIL_NM * units.NAUTICAL_MILE
 
 
 def _mark_in_sight(world: Any, words: str) -> str | None:

@@ -158,41 +158,49 @@ _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
         re.compile(r"^(?:cease|stop|belay)\s+(?:the\s+)?(?:fog signals?|bell)$"),
     ),
 )
-# The addressee of a hail: 'her', a name, or 'the <sail>'; the words after a colon or a
-# comma, or after a space with no colon (the colon optional: 'hail the brig what ship is
-# that'), the sail's words then told from the words said by `hail_parts`.
-_HAIL = re.compile(r"^hail\s+(?P<rest>(?:her|him|them|the\s|[A-Z]).*)$")
-_SAY_TO = re.compile(r"^say to\s+(?P<rest>(?:her|him|them|the\s|[A-Z]).*)$")
+# The addressee of a hail: 'her', a name, 'the <sail>' or 'a <sail>'; the words after a colon
+# or a comma, or after a space with no colon (the colon optional: 'hail the brig what ship
+# is that'), the sail's words then told from the words said by `hail_parts`. The verb in any
+# capitals (the owner's second test, 2026-10-31: 'Hail the schooner' was refused as the
+# lookout's eleven times, and 'hail the schooner' taken); the addressee's capital still
+# tells a name from the lookout's words.
+_ADDRESSEE = r"(?P<rest>(?:her|him|them|the\s|an?\s|[A-Z]).*)"
+_HAIL = re.compile(rf"^(?i:hail)\s+{_ADDRESSEE}$")
+_SAY_TO = re.compile(rf"^(?i:say\s+to)\s+{_ADDRESSEE}$")
 # The words after 'the' that address the deck or a station, never a sail: a hail of these
 # is the lookout's hail of the deck or a station sentence (`orders.stations`).
 _NOT_A_SAIL = ("deck", "masthead", "lookout", "watcher", "master", "captain", "officer", "boat")
+# The words that stand for whichever sail is meant, and so name none after 'a': 'hail a sail
+# two points on the bow' is the lookout's.
+_ANY_SAIL = ("her", "him", "them", "stranger", "sail", "chase", "enemy", "ship", "vessel", "boat")
 _SAIL_WORDS = (
-    "her",
-    "him",
-    "them",
-    "stranger",
-    "sail",
-    "chase",
-    "enemy",
+    *_ANY_SAIL,
     "brig",
     "cutter",
     "frigate",
-    "ship",
     "schooner",
     "lugger",
     "smack",
     "sloop",
     "privateer",
     "merchantman",
-    "vessel",
-    "boat",
     "stranger's",
+    # the rates and the rigs the lookout calls a ship by (`world.ships.DESCRIPTIONS`): the
+    # hail is heard as 'A sixty-four, within hail, hails us', and is answered in those words
+    "sixty-four",
+    "seventy-four",
+    "razee",
+    "brig-sloop",
+    "chasse-maree",
+    "chasse-marée",
 )
 
 
 def _norm(text: str) -> str:
     s = " ".join(str(text).split()).strip().rstrip(".!")
     s = s.replace("’", "'")
+    if len(s) > 1 and s[0] == s[-1] and s[0] in "\"'":
+        s = s[1:-1].strip().rstrip(".!")  # the whole line in quotes, as the grammar reads it
     return s
 
 
@@ -224,18 +232,23 @@ def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
     ('hail the brig what ship is that', 'say to the Nancy heave to, I am sending a
     boat'). A name without 'the' ('hail Nancy what ship is that') is a sail only when a
     sail of that name is on the sea, so that the lookout's 'hail Sail ho' stays his. The
+    sail by 'a' ('hail a topsail schooner: ho there', as the log calls her) wants her rig
+    or her rate, and is never the lookout's own report ('hail a brig on the lee bow'). The
     head never crosses a colon or a comma: 'say to the master: the brig has tacked' and
     'hail the deck: the brig is bearing away' hail no sail (the master's word, the
     lookout's hail), whatever sail the words after the mark name."""
     rest = m.group("rest").strip()
-    cut = re.match(r"^(?P<who>[^:,]+?)\s*[:,]\s*(?P<words>.*)$", rest)
-    if cut is not None and _names_a_sail(ship, cut.group("who")):
-        return cut.group("who"), cut.group("words")
     tokens = rest.split()
     low = tokens[0].lower()
+    by_rig = low in ("a", "an")
+    if by_rig and _the_lookout_speaks(ship):
+        return None
+    cut = re.match(r"^(?P<who>[^:,]+?)\s*[:,]\s*(?P<words>.*)$", rest)
+    if cut is not None and _names_a_sail(ship, cut.group("who"), by_rig):
+        return cut.group("who"), cut.group("words")
     if low in ("her", "him", "them"):
         return tokens[0], " ".join(tokens[1:]).strip(" ,:")
-    if low != "the":
+    if low != "the" and not by_rig:
         name = tokens[0].rstrip(",:")
         return (name, " ".join(tokens[1:]).strip(" ,:")) if _found_on_the_sea(ship, name) else None
     # the heads stop at the first token that ends in a colon or a comma
@@ -246,9 +259,22 @@ def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
             break
     for n in range(2, last + 1):
         head = " ".join(tokens[:n]).rstrip(",:")
-        if _names_a_sail(ship, head):
+        if _names_a_sail(ship, head, by_rig):
             return head, " ".join(tokens[n:]).strip(" ,:")
     return None
+
+
+def _the_lookout_speaks(ship: Any) -> bool:
+    """Whether the order is the lookout's, by its actor (a model or the player at his
+    station)."""
+    from freesail.agents.agent import LOOKOUT
+
+    actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "")
+    world = world_of(ship) if ship is not None else None
+    stations = getattr(world, "stations", None) if world is not None else None
+    if stations is None or not actor.startswith("the "):
+        return False
+    return stations.kind_of(actor.split(" (", 1)[0].removeprefix("the ")) == LOOKOUT
 
 
 def _found_on_the_sea(ship: Any, name: str) -> bool:
@@ -262,12 +288,16 @@ def _found_on_the_sea(ship: Any, name: str) -> bool:
         return False
 
 
-def _names_a_sail(ship: Any, who: str) -> bool:
+def _names_a_sail(ship: Any, who: str, by_rig: bool = False) -> bool:
     w = " ".join(str(who or "").lower().split())
-    if w.startswith("the "):
-        w = w[4:]
-    if w.split(" ")[0] in _NOT_A_SAIL:
+    for article in ("the ", "an ", "a "):
+        if w.startswith(article):
+            w = w[len(article) :]
+            break
+    if not w or w.split(" ")[0] in _NOT_A_SAIL:
         return False
+    if by_rig:
+        return w.split()[-1] in _SAIL_WORDS and w.split()[-1] not in _ANY_SAIL
     if w.split()[-1] in _SAIL_WORDS or w in _SAIL_WORDS:
         return True
     world = world_of(ship) if ship is not None else None

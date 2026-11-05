@@ -601,6 +601,10 @@ def crewed(world: World) -> list[Any]:
         and not v.done
         and not v.crew.is_followed
         and v.crew is not players  # the player's own hull is awake always (step 10)
+        # a ship's boat manned as a hull (package 82, items 4 and 5): awake while she is
+        # manned, a dealing of her ship's, never demoted by the range (she has no brain and
+        # no far shape to sleep in) and counting nothing against the cap
+        and not getattr(v, "boat", False)
     ]
 
 
@@ -1241,6 +1245,13 @@ def shape_words(crew: CrewedWorld) -> str:
     """The notice a station on another ship is given of her shape (spec M6 §20: the
     sample says which)."""
     v = crew.vessel
+    if getattr(v, "boat", False):
+        # a ship's boat manned as a hull (package 82, item 6)
+        return (
+            f"{v.name}, a hull of the one world under your oars: her oars, her lug and her "
+            "helm yours (give way, easy all, lie on your oars, pull for a mark, step the mast "
+            "and set the lug, come alongside), the readings hers, her ship a sail in sight."
+        )
     if crew.shape == "far":
         return (
             f"{v.name}'s hull sleeps (she is at far detail, beyond the cap's reach): her body "

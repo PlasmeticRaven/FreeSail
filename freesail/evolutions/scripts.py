@@ -7779,9 +7779,14 @@ class UnmoorScript(_AnchorScript):
 
 
 class LayOutKedgeScript(_AnchorScript):
-    """A kedge carried out by the boat and let go (data/evolutions/lay_out_kedge.yaml)."""
+    """A kedge carried out by the boat and let go (data/evolutions/lay_out_kedge.yaml).
+    Holds the ship and the boat (package 82, item 5: the boat's keeper reads the scripts
+    that hold her, so that the kedge's boat is not denied while she is out)."""
 
     holds_subject = True
+
+    def holds(self) -> set[str]:
+        return {self.ship.name, "the boat"}
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)

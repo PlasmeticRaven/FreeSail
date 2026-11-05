@@ -583,6 +583,8 @@ def register() -> None:
             description="the damage as her people report it: spars carried away, lines "
             "parted, sails holed, shot holes and where against the waterline, guns "
             "dismounted, the helm; 'none'",
+            where=("deck", "hold"),
+            where_words="the carpenter reports the damage to the deck",
         )
     )
     R.REGISTRY.add(
@@ -610,6 +612,7 @@ def register() -> None:
             _bill,
             description="the butcher's bill: the killed and the wounded of the complement, "
             "and the hands' temper (steady, firm, shaken, wavering)",
+            where=("aboard",),
         )
     )
     R.REGISTRY.add(
@@ -622,6 +625,8 @@ def register() -> None:
             description="the magazine as the gunner counts it: filled cartridges by gun, the "
             "powder below and the shot",
             none_words=_no_guns_words,
+            where=("deck", "magazine"),
+            where_words="the magazine is below; the gunner reports its state to the deck",
         )
     )
     R.REGISTRY.add(
@@ -635,6 +640,7 @@ def register() -> None:
             "his estimate and where she bears; 'struck' when her colours are down; 'none "
             "engaged'",
             none_words=_no_guns_words,
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -647,6 +653,7 @@ def register() -> None:
             description="the range of the mark engaged by the lookout's estimate (a distance: "
             "'is under 3 cables', 'exceeds half a mile')",
             none_words=_no_mark_words,
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -657,6 +664,7 @@ def register() -> None:
             "",
             _colours,
             description="the ship's own colours: flying, or struck",
+            where=("deck", "aloft"),
         )
     )
     R.REGISTRY.add(
@@ -669,6 +677,7 @@ def register() -> None:
             description="the quarter bill as beaten: each division and each gun's crew; "
             "'not at quarters'",
             none_words=_no_guns_words,
+            where=("aboard",),
         )
     )
     # the events (spec §2's `at`; package 70)

@@ -373,6 +373,12 @@ class Condition:
     def readings(self) -> list[str]:
         return list(dict.fromkeys(c.reading for c in self.clauses))
 
+    @property
+    def rows(self) -> tuple[str, ...]:
+        """The registry's rows the condition reads (package 65: a stand-by's condition a
+        station cannot read where its person stands wakes it as the officer's call)."""
+        return tuple(self.readings())
+
 
 @dataclass
 class EventCondition(Condition):

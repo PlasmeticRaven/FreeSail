@@ -323,3 +323,28 @@ things:
     plausible_when: {well_above: 0, pumps_cannot: true}
     doubt: "the well is dry already, or she has pumps and hands to pump her out herself ('man the pumps' is the captain's order, and the pumps gain or lose by their rates)"
     harm: none
+  # Package 82 (item 6): the boat lost by the director's word (`world/boats.py`,
+  # `lose_boat`): stove, swamped, or gone adrift; her people lost with her if any are in
+  # her; sent on no errand and manned by nobody until `demand a boat of the yard`.
+  - id: boat_stove
+    words: ["the boat found stove", "the boat stove", "the boat is found stove", "the boat stove in", "the boat found stove in"]
+    source: Falconer 1780, STAVE ("to break in the planks of a boat"); a boat at the booms or towing astern stove by a sea
+    report: "The carpenter reports the boat stove in: her planks broken at the bilge, past his mending."
+    effect: {boat_lost: stove}
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "she lies easy on a smooth sea: nothing has stove the boat"
+    harm: none
+  - id: boat_swamped
+    words: ["the boat swamped", "the boat found swamped", "the boat is swamped", "the boat swamped alongside"]
+    source: Luce 1866, 'Boats' (a boat swamped alongside in a sea); the sea states a boat cannot live in
+    report: "The boat swamped alongside and sunk at her painter; whoever was in her is lost."
+    effect: {boat_lost: swamped}
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm", "slight", "a slight sea"]}
+    doubt: "the sea is too slight to swamp a boat alongside"
+    harm: none
+  - id: boat_adrift
+    words: ["the boat cut adrift", "the boat gone adrift", "the boat adrift", "the boat found gone", "the boat's painter parted", "the painter parted"]
+    source: Luce 1866, 'Boats' (the painter); a boat towing astern lost in the night
+    report: "The boat is gone: her painter parted in the night and she went adrift astern."
+    effect: {boat_lost: cut adrift}
+    harm: none

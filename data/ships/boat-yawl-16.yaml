@@ -44,6 +44,48 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 20.0
     span_m: 0.53
+  # Her drawing (Build-Ships.md 5.1): x forward of the middle of her load line, z above her water laden, metres; every line judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+  profile:
+    # The gunwale, taffrail to stem head, with a boat's sheer rising forward (Steel 1805, the boats' sheer; the figure judgement): judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    rail_m: [[-2.45, 0.25], [-1.23, 0.2], [0.0, 0.18], [1.23, 0.22], [2.45, 0.34]]
+    # The half-breadths at the water and the gunwale by station, the side flared a little as an open boat's is: judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    breadth_m: [[-2.3, 0.13, 0.22], [-1.23, 0.35, 0.49], [0.0, 0.52, 0.6], [1.23, 0.35, 0.49], [2.21, 0.15, 0.25]]
+    # The keel from the post's heel to the forefoot, rising forward: judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    keel_m: [[-2.35, -0.4], [2.21, -0.24]]
+    # The stem's fore edge, raked a little, to the stem head: judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    stem_m: [[2.21, -0.24], [2.45, 0.34]]
+    # The post to the transom's knuckle and the taffrail: judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    stern_m: [[-2.35, -0.4], [-2.4, -0.14], [-2.45, 0.25]]
+    # The rubbing strake under the gunwale, her one wale: judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    wales_m: [[-2.21, 0.1, 0.16], [0.0, 0.04, 0.1], [2.08, 0.16, 0.22]]
+    # The midship section, a rising floor and a round bilge, plank on: judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    section_m: [[-0.4, 0.05], [-0.24, 0.37], [-0.1, 0.54], [0.0, 0.54], [0.18, 0.6]]
+    # Her floor boards over the keel, from the after thwart to the bow, filed as her one deck for the drawing (an open boat has no deck; the platform is what a man stands on): judgement by rule from her length, breadth, draught and freeboard (no boat's lines are on file: to read, Steel 1805 Folio LVII); drawn only, read by nothing of the physics.
+    decks_m:
+      upper: [[-2.21, -0.18], [1.84, -0.18]]
+    form:
+      # The default rule (1, 1).
+      fullness: [1.0, 1.0]
+      # A square transom (Steel 1805 p. 181: the yawl, the cutter and the launch square-sterned; the pinnace and the barge sharp, and not filed): its knuckle and half-breadths judgement.
+      stern:
+        type: square
+        knuckle_z_m: -0.14
+        transom_hb_m: [0.24, 0.18]
+      # No head on a boat (rule).
+      head: none
+    # Every line judged by rule from her principal dimensions, the form's fullness and head by rule.
+    marks:
+      rail_m: judged
+      breadth_m: judged
+      keel_m: judged
+      stem_m: judged
+      stern_m: judged
+      wales_m: judged
+      section_m: judged
+      decks_m: judged
+      form.fullness: rule
+      form.stern: judged
+      form.head: rule
 spars:
 # one mast of 12 ft above the gunwale, stepped at will in a thwart's clamp and unstepped to pull (Steel 1794 vol. II, the boats' stores table: masts, sails and halyards allowed to the yawl and the cutter), unstayed; judgement on the length (about 0.6 of the boat's). To read: Steel 1805, Folio LVII, 'Dimensions and scantlings of boats' (IA leaves 599 to 602), which gives the pattern's dimensions by length; read, its figures replace the judgement here, and never the game's behaviour. Rating: lug in 25 kn -> 1 kN.
 - id: mast

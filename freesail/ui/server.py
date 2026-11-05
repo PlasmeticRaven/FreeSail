@@ -241,7 +241,8 @@ class Driver:
         # called by the clock every period, running or not (package 67: the harbour starts
         # and stops the director's seats' doors)
         self._tenders: list[Callable[[], None]] = []
-        self.world.log.subscribe(self._on_event)
+        self._log = self.world.log
+        self._log.subscribe(self._on_event)
         # the channel between the player and the director (package 67): its lines to the
         # pages' pane, never the play log
         from freesail.agents import director as director_mod
@@ -341,13 +342,26 @@ class Driver:
         """`follow <ship>`: the drivers' centre to her hull (package 84, step 10)."""
         with self.lock:
             self.world.follow(words)
+            self._follow_log()
             self.emit_snapshot()
 
     def look_at(self, words: str) -> None:
         """`look at <where>`: the observer's view moved (package 82, item 1)."""
         with self.lock:
             self.world.look_at(words)
+            self._follow_log()
             self.emit_snapshot()
+
+    def _follow_log(self) -> None:
+        """The log the pages show is the followed hull's (package 84, step 10; 82's §11):
+        `follow`, `go to the boat` and `come alongside` move it, and the listener moves
+        with it, else the player's orders, refusals and answers never reach the pages (the
+        owner's finding of 2026-10-31, at the console first)."""
+        log = self.world.log
+        if log is not self._log:
+            self._log.unsubscribe(self._on_event)
+            log.subscribe(self._on_event)
+            self._log = log
 
     def held_for(self) -> str | None:
         """In lockstep, the station whose door has the floor, which the clock waits for."""
@@ -547,6 +561,7 @@ class Driver:
                 e = seat.route(text)
             else:
                 e = self.world.submit(text)
+            self._follow_log()  # `go to the boat` moves the followed hull with the order
             if e is not None and e.kind in UNLOGGED_KINDS:
                 # an answer for the player who asked and not a line of the log (package
                 # 40b: the master's slate): sent to the pages as a line is, kept nowhere
@@ -693,6 +708,7 @@ class Driver:
             if self.held_for() is not None:
                 break  # lockstep: the World waits for the door that has the floor
             self.world.tick()
+            self._follow_log()
             self._ticks_since_snapshot += 1
             if self._alarm is not None:
                 self._station_heard()  # the alarm's easing says it; a station's is past
@@ -759,8 +775,8 @@ class Driver:
         with self.lock:
             self.running = False
             old = self.world
-            if self._on_event in old.log._subscribers:
-                old.log.unsubscribe(self._on_event)
+            if self._on_event in self._log._subscribers:
+                self._log.unsubscribe(self._on_event)
             old_needs = getattr(old, "needs", None)
             if old_needs is not None:
                 old_needs.unlisten(self._on_need)
@@ -780,7 +796,8 @@ class Driver:
             self._ticks_since_snapshot = 0
             self.compression = clamp_compression(compression)
             world.compression = self.compression
-            world.log.subscribe(self._on_event)
+            self._log = world.log
+            self._log.subscribe(self._on_event)
             self._samples_seen = self._samples_now()
             needs = getattr(world, "needs", None)
             if needs is not None:

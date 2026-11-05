@@ -3042,13 +3042,18 @@ class Dealings:
         booms again, whoever was to go in her is on deck, and the log says so. A boat
         already away is not belayed (`orders.work`), so that she cannot vanish from the
         water; were she found so, she is brought alongside as on her return."""
-        if self.boat.errand in ("to_ship", "manned"):
-            return  # the boat at another hull or manned as a hull (package 82): not the runner's
+        if self.boat.errand in ("to_ship", "manned", "towing"):
+            return  # the boat at another hull, manned or towing (package 82): not the runner's
         runner = self.world.ship.extra.get("evolutions")
         if runner is None:
             return
-        if any(i.evo.id == "send_boat" for i in getattr(runner, "instances", [])):
-            return
+        # every evolution that holds the boat (`send_boat`, the lay-out of a kedge: the
+        # scripts' `holds()` word for her), not the one (package 82, item 5: the false denial
+        # "was not sent away" said while the kedge's boat was out, spec M7b §21k)
+        for i in getattr(runner, "instances", []):
+            script = getattr(i, "script", None)
+            if i.evo.id == "send_boat" or (script is not None and "the boat" in script.holds()):
+                return
         name = self.boat.boat_name
         head = f"{name[:1].upper()}{name[1:]}"
         port = self.ports.get(self.boat.port_id)

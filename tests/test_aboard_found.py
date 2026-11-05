@@ -45,7 +45,9 @@ def test_every_thing_of_the_table_is_read_and_each_form_finds_its_own_thing():
     """The table loads with known keys only; each form, its slot filled by a name the
     frigate has, finds its own thing and no other."""
     table = WO.aboard_table()
-    assert len(table) == 31  # package 70: the guns' two; package 73: the people's health, five
+    # package 70: the guns' two; package 73: the people's health, five; package 82: the boat's
+    # three (stove, swamped, gone adrift)
+    assert len(table) == 34
     assert set(WO._PLAUSIBLE) == WO.ABOARD_PLAUSIBLE_KEYS
     w = world_at(49.5, -5.5)
     w.hold.stow("tin", 10.0)

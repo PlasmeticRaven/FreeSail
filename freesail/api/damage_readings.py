@@ -306,6 +306,8 @@ def register() -> None:
             description="the sick list by name: the wounded and the sick with each man's "
             "hurt, the men at light duty, the dead to be buried; 'none'",
             none_words=_no_muster_words,
+            where=("deck", "cabin", "sick_berth", "cockpit"),
+            where_words="the surgeon's report: the cabin, the sick berth, the cockpit and the deck",
         )
     )
     R.REGISTRY.add(
@@ -318,6 +320,8 @@ def register() -> None:
             description="the wounded by name with each wound, light or dangerous, and how "
             "many wait for the surgeon; 'none'",
             none_words=_no_muster_words,
+            where=("deck", "cabin", "sick_berth", "cockpit"),
+            where_words="the surgeon's report: the cabin, the sick berth, the cockpit and the deck",
         )
     )
     R.REGISTRY.add(
@@ -330,6 +334,8 @@ def register() -> None:
             description="the surgeon: borne or not, where he is, at work on the wounded or "
             "idle, how many wait, his mates",
             none_words=_no_muster_words,
+            where=("deck", "cabin", "sick_berth", "cockpit"),
+            where_words="the surgeon's report: the cabin, the sick berth, the cockpit and the deck",
         )
     )
     R.REGISTRY.add(
@@ -342,6 +348,7 @@ def register() -> None:
             description="the pumps: their kinds, manned by so many hands and lifting so many "
             "tons an hour, or not manned ('is manned', 'is not manned')",
             none_words=_no_hull_words,
+            where=("aboard",),
         )
     )
     R.REGISTRY.add(
@@ -355,6 +362,8 @@ def register() -> None:
             "holes unplugged, the ground's leak, a seam started, the seams working in the "
             "sea, the sea over open hatches; 'none'",
             none_words=_no_hull_words,
+            where=("deck", "hold"),
+            where_words="the carpenter's, below at the leak and reported to the deck",
         )
     )
     R.REGISTRY.add(
@@ -378,6 +387,8 @@ def register() -> None:
             description="the water in the ship in tons, the gain an hour and the pumps' lift; "
             "'dry'; 'foundered'",
             none_words=_no_hull_words,
+            where=("deck", "cabin", "hold"),
+            where_words="the water is in the hold, its account in the purser's books in the cabin",
         )
     )
     ev = R.EventSpec

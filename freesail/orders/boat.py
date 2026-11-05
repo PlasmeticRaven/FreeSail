@@ -11,8 +11,11 @@ for it and keeps steering as it bears, the helm set each minute by the truth's b
 mast down and the oars cannot be pulled with the lug drawing, which is the period's practice
 and the words of the refusals), `come alongside` (she pulls for her ship and, within a boat's
 length, is hoisted in). The lug itself is the engine's: `set the lug`, `take in the lug`.
-On the ship: `cut the boat adrift`. Each is refused in words on a hull that is no boat, or
-about a boat she has not got. The thrust the oars give is `physics/oars.py`'s.
+On the ship: `cut the boat adrift`, `tow her with the boat [to <the point or bearing>]` (item
+5: the boat manned for the tow and pulling ahead on the line, `world.boats.tow_with_boat`),
+and `the boat alongside` to end a tow or recall a manned boat. Each is refused in words on a
+hull that is no boat, or about a boat she has not got. The thrust the oars give is
+`physics/oars.py`'s.
 """
 
 from __future__ import annotations
@@ -44,7 +47,7 @@ BOAT_VERBS = frozenset(
         "come alongside",
     }
 )
-SHIP_VERBS = frozenset({"cut the boat adrift"})
+SHIP_VERBS = frozenset({"cut the boat adrift", "tow her with the boat"})
 
 _POSITION = re.compile(r"\d+\s*\d*\s*[NS]\b.*\d+\s*\d*\s*[EW]\b", re.I)
 
@@ -59,6 +62,9 @@ def execute(ship: Any, order: Order) -> Result:
     if verb in SHIP_VERBS:
         return _ship_order(world, verb, rest)
     oars = oars_of(ship)
+    if oars is None and verb == "come alongside":
+        # from the ship: the tow ended and the boat hoisted in, or a manned boat recalled
+        return _ship_order(world, verb, rest)
     if oars is None:
         raise OrderError(
             f"'{order.verb_phrase}' is the boat's order: this hull has no oars. In the boat "
@@ -248,12 +254,26 @@ def _lug_drawing(ship: Any) -> bool:
 def _ship_order(world: Any, verb: str, rest: str) -> Result:
     from freesail.world import boats
 
+    hull = world.own
     if verb == "cut the boat adrift":
-        hull = world.own
         if boats.is_boat(hull):
             raise OrderError("You are in the boat; she is cut adrift from the ship, not from her.")
         text = boats.cut_adrift(world, hull)
         return "boat.lost", text, {"how": "cut adrift"}
+    if verb == "tow her with the boat":
+        if boats.is_boat(hull):
+            raise OrderError("You are in the boat; the tow is ordered from the ship.")
+        text = boats.tow_with_boat(world, hull, rest)
+        return "boat.towing", text, {"bearing": rest or "ahead"}
+    if verb == "come alongside":
+        if boats.towing_hull(world, hull) is not None:
+            text = boats.end_tow(world, hull)
+            return "boat.alongside", text, {"tow": True}
+        manned = boats.manned_hull(world, hull)
+        if manned is None:
+            raise OrderError("No boat of hers is away as a vessel to bring alongside.")
+        text = boats.come_alongside(world, manned)
+        return "boat.alongside", f"The boat recalled: {text[:1].lower()}{text[1:]}", {}
     raise OrderError(f"'{verb}' is no order about the boat.")
 
 

@@ -261,6 +261,11 @@ class Scenario:
     # the other ships run under their captains and the drivers open at the director's.
     # Left out of the dict when off, so that every save before it reads as it did.
     observed: bool = False
+    # The place's knowledge (package 65; decision 59): "place", the rule (a sample carries
+    # what the person's place allows, and the player reads by his place as a model does);
+    # "all", the rule off for testing (everyone reads everything, as before the package). A
+    # save from before loads with the rule on.
+    knowledge: str = "place"
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -288,6 +293,8 @@ class Scenario:
             d.pop("fit", None)
         if not d.get("observed"):
             d.pop("observed", None)
+        if d.get("knowledge", "place") == "place":
+            d.pop("knowledge", None)
         return d
 
     @classmethod

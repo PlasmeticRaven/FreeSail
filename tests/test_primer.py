@@ -106,6 +106,7 @@ CHAPTERS = [
     "18-lessons.md",  # package 40b
     "20-the-director.md",  # package 50: the world orders refused at the prompt
     "23-colours-and-signals.md",  # package 71: the colours, the signals, the lights
+    "26-the-boat.md",  # package 82: the boat as a hull, the person aboard another ship
 ]
 
 DRIVER_COMMANDS = frozenset(

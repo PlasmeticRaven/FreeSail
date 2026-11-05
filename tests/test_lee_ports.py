@@ -1179,10 +1179,11 @@ def test_the_half_breadth_is_read_once_a_gun(monkeypatch):
 
 
 def test_a_boat_with_a_gun_falls_back_to_half_the_beam():
-    """No deck and no profile, a boat's: the gun's own height and half the beam the firer
-    gives (`action._firer`: the beam over two). Her file's beam is 2.4 m."""
+    """A gun with no deck, in a boat: the gun's own height and half the beam the firer gives
+    (`action._firer`: the beam over two). Her file's beam is 2.4 m. Package 82 drew each boat from
+    a profile of her own, so the fallback here is the gun's want of a deck, not the hull's."""
     spec = load_spec(LAUNCH)
-    assert spec.hull.profile is None and spec.hull.beam_m == 2.4
+    assert spec.hull.profile is not None and spec.hull.beam_m == 2.4
     half = spec.hull.beam_m / 2.0
     sill = 0.60
     battery = the_battery_of_one(LAUNCH, a_gun(1.0, sill, deck=None, place="bow"))

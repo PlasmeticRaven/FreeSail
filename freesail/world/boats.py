@@ -30,11 +30,13 @@ nobody until the yard's job at a port replaces her (`demand a boat of the yard`,
 from __future__ import annotations
 
 import math
+import re
 from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
+from freesail.physics.oars import FULL as FULL_STROKE
 from freesail.world.geo import distance_words
 
 __all__ = [
@@ -284,9 +286,9 @@ def follow_boat(world: Any, hull: Any, person: Any) -> None:
     recorded as a routine line `hull.followed` of the ship's log and never as a driver's
     input, so that a replay of the order moves it the same; the console's and the browser's
     `follow` stand for the owner's own choice."""
-    if getattr(world, "followed", None) == hull.id:
+    if getattr(_root(world), "followed", None) == hull.id:
         return
-    world.followed = str(hull.id)
+    _root(world).followed = str(hull.id)
     with world.as_hull(hull):
         world.record(
             Severity.ROUTINE,
@@ -299,6 +301,197 @@ def follow_boat(world: Any, hull: Any, person: Any) -> None:
 # ---------------------------------------------------------------------------
 # her tick: the coxswain's mark, alongside, swamped
 # ---------------------------------------------------------------------------
+
+
+# The tow (package 82, item 5; the design's §6): the tow-line's length, the boat ahead of
+# the ship's stem on the bearing (a hawser's bight to her stern-sheets, Luce 1866 'Boats',
+# 'Towing'; the length judgement: twenty fathoms of hawser out, so that her oars clear the
+# ship's bow and the line does not sag to the water at a knot), and the lever the line's
+# pull acts on at the stem, the cable's at the hawse (`physics/anchor.HAWSE_FRACTION`).
+TOW_LINE_M = 36.0
+TOW_ERRAND = "towing"
+
+
+def tow_with_boat(world: Any, ship_hull: Any, rest: str = "") -> str:
+    """`tow her with the boat [to <the point or bearing>]` from the ship, in a calm or an air
+    too light to steer by: the boat manned and made a hull of the world (`man_boat`) with the
+    tow-line, her oars out and giving way, holding her station a line's length ahead on the
+    bearing (ahead when none is said, as the kedge is laid ahead); the force on the ship is
+    the boat's oars' net pull at the ship's speed, read by the integrator at her stem
+    (`ship.extra["tow"]`, `physics/integrate.py`). Refused in a sea the boat cannot work in
+    (the same bound as her swamping), with no boat, with the boat away or lost, and when
+    the ship is at anchor or aground."""
+    low = " ".join(rest.lower().split()).removeprefix("to the ").removeprefix("to ").strip(" .")
+    heading = float(getattr(ship_hull.ship, "heading", 0.0) or 0.0)
+    bearing = heading
+    said = "ahead"
+    if low and low not in ("ahead", "right ahead", "straight ahead"):
+        point = units.parse_compass_point(low)
+        if point is None:
+            m = re.fullmatch(r"(\d{1,3})(?:\s*degrees)?(?:\s*true)?", low)
+            if m is None:
+                raise OrderError(
+                    f"'{rest}' is not a bearing to tow her on; say 'tow her with the boat to "
+                    "the NE', a bearing in degrees, or nothing for right ahead."
+                )
+            point = math.radians(float(m.group(1)) % 360.0)
+        bearing = float(point)
+        said = f"to the {units.format_heading(bearing)}"
+    if getattr(ship_hull, "at_anchor", False):
+        raise OrderError("She is at anchor; weigh first, and the boat can tow her.")
+    if _aground(ship_hull):
+        raise OrderError(
+            "She is aground: the tide floats her or the kedge hauls her off; the boat cannot."
+        )
+    sea = getattr(world, "sea", None)
+    spec = boat_named(ship_hull, "")
+    if sea is not None and spec is not None and getattr(spec, "file", None):
+        try:
+            state = str(sea.reading().state)
+            sea_words = str(sea.reading().words)
+        except Exception:  # noqa: BLE001  (a sea that cannot be read stops no tow)
+            state, sea_words = "", ""
+        length_ft = float(getattr(spec, "length_ft", 16.0) or 16.0)
+        states = SWAMP_STATES_SMALL if length_ft < SMALL_BOAT_FT else SWAMP_STATES_LARGE
+        if state in states:
+            raise OrderError(
+                f"{_cap(spec.name)} cannot work in this sea ({sea_words}); wait for it to go down."
+            )
+    hull, _text = man_boat(world, ship_hull, "", by="for the tow")
+    oars = _oars(hull)
+    oars.out, oars.manned, oars.stroke = True, oars.number, FULL_STROKE
+    oars.pulling_for = {
+        "tow": str(ship_hull.id),
+        "bearing_rad": bearing,
+        "said_h": 0,
+    }
+    state = ship_hull.dealings.boat
+    state.errand = TOW_ERRAND
+    state.phase = f"towing ahead {said}"
+    ship_hull.ship.extra["tow"] = {"boat": str(hull.id), "force_n": 0.0, "bearing_rad": bearing}
+    # the helmsman follows the boat (the period's practice: the helm put over to help her
+    # head round and then steered after the tow); `steer` afterwards if you will
+    from freesail.ship.parts import HelmMode
+
+    dyn = ship_hull.ship.dyn
+    dyn.target_heading = units.wrap_2pi(bearing)
+    if hasattr(dyn, "helm_mode"):
+        dyn.helm_mode = HelmMode.HEADING
+    _tow_station(hull, ship_hull, bearing)
+    n = int(oars.number)
+    text = (
+        f"{_cap(spec.name)} hoisted out and manned for the tow, the hawser's bight to her "
+        f"stern-sheets; she pulls {said} with {n} oars, and the ship's head will follow her."
+    )
+    ship_hull.record(
+        Severity.NOTABLE,
+        "boat.towing",
+        text,
+        data={
+            "boat": spec.id,
+            "hull": str(hull.id),
+            "oars": n,
+            "bearing_deg": round(math.degrees(bearing) % 360.0, 1),
+        },
+    )
+    hull.record(
+        Severity.NOTABLE,
+        "boat.towing",
+        f"The tow-line made fast; giving way {said}, the {hull_name_of(ship_hull)} astern on "
+        "the line.",
+        data={"ship": str(ship_hull.id)},
+    )
+    return text
+
+
+def _aground(hull: Any) -> bool:
+    """Whether she is aground (`world.ground`, kept in `ship.extra["aground"]`)."""
+    extra = getattr(hull.ship, "extra", None) or {}
+    return bool(extra.get("aground")) or bool(getattr(hull, "_aground", False))
+
+
+def towing_hull(world: Any, ship_hull: Any) -> Any:
+    """The boat's hull towing this ship, or None."""
+    tow = (getattr(ship_hull.ship, "extra", None) or {}).get("tow")
+    if not isinstance(tow, dict):
+        return None
+    return (getattr(world, "hulls", None) or {}).get(str(tow.get("boat", "")))
+
+
+def end_tow(world: Any, ship_hull: Any, why: str = "the line cast off") -> str:
+    """The tow ended: the line cast off, the boat hoisted in by `hoist_in`'s road, the ship's
+    way left to die."""
+    hull = towing_hull(world, ship_hull)
+    extra = getattr(ship_hull.ship, "extra", None)
+    if isinstance(extra, dict):
+        extra.pop("tow", None)
+    if hull is None:
+        raise OrderError("No boat of hers is towing.")
+    oars = _oars(hull)
+    if oars is not None:
+        oars.pulling_for = {}
+    ship_hull.record(
+        Severity.NOTABLE,
+        "boat.tow_ended",
+        f"The tow ended, {why}; {hull_name_of(hull)} drops alongside. Her way is left to die.",
+        data={"hull": str(hull.id)},
+    )
+    return hoist_in(world, hull)
+
+
+def _tow_station(hull: Any, ship_hull: Any, bearing: float) -> None:
+    """The boat's place on the line: a line's length ahead of the ship's stem on the
+    bearing, her heading the bearing, her way the ship's (the two are one body on the
+    line: the coupling is kinematic, stable and costing nothing)."""
+    ship = ship_hull.ship
+    pos = getattr(ship_hull, "position", None)
+    if pos is None:
+        return
+    stem = 0.5 * float(ship.hull.length)
+    heading = float(ship.dyn.heading)
+    dx = stem * math.sin(heading) + TOW_LINE_M * math.sin(bearing)
+    dy = stem * math.cos(heading) + TOW_LINE_M * math.cos(bearing)
+    dyn = hull.ship.dyn
+    hull.__dict__["_position"] = pos.advanced(dx, dy)
+    hull.__dict__["_geo_last"] = (float(dyn.x), float(dyn.y))
+    dyn.heading = units.wrap_2pi(bearing)
+    dyn.target_heading = dyn.heading
+    dyn.u = max(0.0, float(ship.dyn.u) * math.cos(bearing - heading))
+    dyn.speed = dyn.u
+    dyn.v = 0.0
+    dyn.r = 0.0
+    dyn.rudder = 0.0
+
+
+def _tow_tick(world: Any, hull: Any, ship_hull: Any, oars: Any, mark: dict[str, Any]) -> None:
+    """Each tick of the towing boat: the net pull at the ship's speed written for the
+    integrator, her station kept, the men's tiring said once an hour."""
+    from freesail.physics import hull as hp
+    from freesail.physics.oars import oar_thrust
+
+    if ship_hull is None:
+        oars.pulling_for = {}
+        return
+    if getattr(ship_hull, "at_anchor", False) or _aground(ship_hull):
+        why = "she is at anchor" if getattr(ship_hull, "at_anchor", False) else "she is aground"
+        end_tow(world, ship_hull, why)
+        return
+    bearing = float(mark.get("bearing_rad", float(ship_hull.ship.dyn.heading)))
+    u = max(0.0, float(ship_hull.ship.dyn.u))
+    pull = max(0.0, oar_thrust(oars, u) - hp.resistance(hull.ship.hull, u))
+    ship_hull.ship.extra["tow"] = {"boat": str(hull.id), "force_n": pull, "bearing_rad": bearing}
+    _tow_station(hull, ship_hull, bearing)
+    whole = int(oars.hours)
+    if whole >= 1 and whole > int(mark.get("said_h", 0) or 0):
+        mark["said_h"] = whole
+        oars.pulling_for = mark
+        ship_hull.record(
+            Severity.NOTABLE,
+            "boat.tiring",
+            f"The boat's people are tiring, {whole} hour{'s' if whole > 1 else ''} at the oars; "
+            "her way is falling.",
+            data={"hours": round(float(oars.hours), 2), "pull_n": round(pull)},
+        )
 
 
 def tick_boat(world: Any) -> None:
@@ -326,6 +519,9 @@ def tick_boat(world: Any) -> None:
     _tend_sheet(hull)
     mark = dict(oars.pulling_for or {})
     if not mark:
+        return
+    if mark.get("tow"):
+        _tow_tick(world, hull, ship_hull, oars, mark)
         return
     target, name = _mark_position(world, hull, mark)
     if target is None:
@@ -499,9 +695,9 @@ def hoist_in(world: Any, hull: Any) -> str:
     home_ids = {str(getattr(p, "home", "") or "") for p in people}
     commander = next((p for p in people if str(getattr(p, "home", "")) != str(hull.id)), None)
     # the drivers back to the ship before anyone moves, so that the lines land where they did
-    was_followed = getattr(world, "followed", None) == hull.id
+    was_followed = getattr(_root(world), "followed", None) == hull.id
     if was_followed:
-        world.followed = str(ship_hull.id)
+        _root(world).followed = str(ship_hull.id)
     for p in people:
         if str(getattr(p, "home", "") or "") == str(hull.id):
             continue  # her own crew go back into the ship's muster with her
@@ -575,8 +771,8 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
             p.hull = None
             p.where = "lost"
             lost.append(p.name)
-        if getattr(world, "followed", None) == hull.id:
-            world.followed = str(ship_hull.id)
+        if getattr(_root(world), "followed", None) == hull.id:
+            _root(world).followed = str(ship_hull.id)
         hull.record(
             Severity.URGENT,
             "boat.lost",
@@ -638,6 +834,17 @@ def cut_adrift(world: Any, ship_hull: Any) -> str:
 
 def hull_name_of(hull: Any) -> str:
     return str(getattr(getattr(hull, "ship", None), "name", "") or getattr(hull, "id", "") or "")
+
+
+def _root(world: Any) -> Any:
+    """The one World behind a hull's façade (`hulls.Hull.world`): the drivers' `followed`
+    is the World's and not a façade's attribute (a boat's order comes through her hull's
+    façade, `orders.prompt.world_of`)."""
+    from freesail.world.hulls import Hull
+
+    while isinstance(world, Hull):
+        world = world.world
+    return world
 
 
 def _oars(hull: Any) -> Any:
