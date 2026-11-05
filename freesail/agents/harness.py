@@ -5095,7 +5095,7 @@ def visitor_words(world: Any, h: Any, host: str) -> str | None:
     ship and his host ('officer of the watch, of the Raven, aboard the Amazon'); None for a
     harness at home."""
     home = getattr(h, "_home", None)
-    if home is None:
+    if not isinstance(home, tuple):
         return None
     hid, station = home
     hulls = getattr(world, "hulls", None) or {}
