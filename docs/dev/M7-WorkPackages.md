@@ -1906,6 +1906,33 @@ word for it; the deck given when the captain leaves it is the command), the rest
 lookout's hail read as `hail the pilot`), 65's step 1 (a far body's lines in the ship's log)
 and 65's step 2 (a word to a person is no order of the ship, in the briefs).
 
+**The wakes in the fully crewed brig (the owner's point of 2026-11-05, which strengthens 65):**
+in four hours and a half the officer of the watch was woken 130 times (28 an hour), the
+master 68, the captain 60, the director 24, the lookout 16. The officer's wakes: 27 by a
+word from the captain (most of them told to him, rightly), the rest by his own stand-by
+conditions, which he set wide ("the deck given, or a message, or a wind shift, or a sail
+made out, or ..."); the captain's 60: 38 by "a word from the captain", which were the
+master's and the officer's words to him (23 and 8) and in seven cases his own last word.
+For 65: the reach rule (a wake carries a line he perceived, by his place) is the cure for a
+crowded deck, and two checks for step 2: the wake's words name the speaker rightly (a word
+*to* the captain is not "a word from the captain"), and a station is never woken by its own
+word. For the briefs (65's step 2 as well): stand by for the few things that matter, and
+let the rest come with the next sample.
+
+**For mulling, not for building (the owner, 2026-11-05): the shape of conversation.** In
+life speech is not turn-based: a man speaks, acts and listens at once. The lead's take: the
+world is already not turn-based (it ticks on between every station's turns, and a reply
+may speak, order and stand by in one turn, which is speaking and acting at once); what is
+turn-based is the listening, since a word reaches a station only at its next sample or
+wake. The costs are the wake policy (every addressed word a wake, every overheard word a
+wait: 41's rule, which 65's reach rule refines) and the floor (the pace rule holds the
+ship at 1x while a sample is open, so six doors on one deck crawl). Roads worth mulling,
+none taken: words within a short span of ship time folded into one sample per hearer
+rather than one wake each (a conversation read as a stream at the station's own cadence);
+a "while you spoke" fold for the words that arrived during a long turn; and an attention
+rule beside the place rule (a man at the braces does not hear the quarterdeck). The gain of
+each measured against the fully crewed brig's figures before anything is built.
+
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
 the testing build and the trunk do not diverge and the saves replay on the trunk.
