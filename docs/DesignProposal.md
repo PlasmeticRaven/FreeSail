@@ -828,6 +828,15 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     package is reviewed and merged after it, since step 1 alone takes the deck from a model
     below before step 3 gives it back by report, and the owner is not testing 65 this week.
     The ships session's lee-port and rig-line step is reviewed and merged when it is sent.
+62. **The player is one person; `follow` is the owner's eye.** Owner, 2026-11-05, on the
+    lead's proposal from the testing of 2026-10-31 (notes 2 and 3): the player is one person,
+    his ship's captain by default or the seat's person; the prompt and the play log are that
+    person's, what reaches him where he is; he moves between ships as a person moves, in the
+    boat, the prompt following his body; `follow` is the owner's eye, a driver's command for
+    observing, never the player's road; a game started with `--seat captain --ship <name>`
+    seats him as her captain's person. Built in package 65's step 4 with the road from his
+    own manned boat aboard another ship; the primer's chapters 14, 19 and 26 and the
+    browser's page say it in one sentence.
 
 ### Still open
 

@@ -68,6 +68,8 @@ on these packages; that is the owner's choice.
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
 | 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93`; **merged whole 2026-10-30** at `d9465d9` from `7e6b9f1` (the record below): ten regions rebuilt on the world's own tide, the raise one source of truth with the tide, Agincourt Sound keeping the eleven's raise until a sheet is read, truths 7-305 to 7-309 |
 | 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
+| 82b | Opus | **The door follows its harness, the visitor's name, the far hull's hail** (the owner's testing of 2026-10-31 to 11-05: the Mr Hill and Captain Owen cases, the hails between model captains answered by the table): the agent API's desk keyed to the harness and not to a station's name and ship (`agents/remote.py` `Desk.seats`, `Seat`), so a model's door follows its person between hulls and `stand down` stands down one station; the visitor keeps his own station's name ("officer of the watch, of the Raven, aboard the Amazon") as the primer promises (`world/movement.py` `visiting_station`, `world/seats.py`); a hail of a hull in the far shape whose captain a model holds is his to answer, never the table's (`world/hail.py` `deliver`, `model_holds_her`); truths 7-390 to 7-394 | launched 2026-11-05 on the hotfix's merge, beside 65 | | |
+| 95 | Opus | **The sail by her name** (the owner, 2026-10-31 and 11-05): one resolver for a sail named in words (the kind, the quarter, the bearing, the distance, each narrowing the pool; the closer on remaining ambiguity; a name once known over all), serving `the glass on`, `make out`, the hail's addressee, `bearing of` and `pull for` (`world/lookout.py` `glass_on`, `make_out`; `world/hail.py` `_addressee`; `orders/boat.py`); a sail made out and identified named in the readings (`strangers`, `in_sight`, `sail_in_sight`) by her name while she is in sight, and her identification lost when she is lost sight of until she is closed and made out again; truths 7-395 to 7-399 | after 82b (both touch `hail.py`) | | |
 | 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule; **launched 2026-10-31 on 82's whole merge** as a Fable sibling session on `claude/pkg-65` (session_01XooV47SeuYqmTZ8W1Rzyoo), the design note first |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -1880,6 +1882,16 @@ against the code, nothing built):**
    ("the Raven") over all. The same resolver for the hail's addressee, `make out`, `the
    glass on`, `bearing of` and `pull for`, so that one way of naming a sail serves everywhere.
 
+**The week's turn (the owner, 2026-11-05):** the reset in, the owner's new playtests read
+(seven saves: the brig off Falmouth fully crewed, brig against brig, the sixty-four and the
+Raven at dusk, three small convoy encounters and one with every captain a model) and his
+notes 5 to 7 (the identified sail named in the readings; the Chevalier's captain's door
+holding the Lynx's captain's station; the hails between model captains answered by the
+table). The owner's word: the hotfix's moved pins bisected on Opus and the hotfix brought in
+(session_01XooV47b8tcPVMMRaCtvurE, launched 19:11, branch `claude/hail-pins`); 65 resumed
+on the hotfix's merge (the same `_say` is touched by both); 82b briefed and launched beside
+65 on the same merge; 95 after 82b. Decision 62 taken.
+
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
 the testing build and the trunk do not diverge and the saves replay on the trunk.
@@ -3564,6 +3576,78 @@ followed hull's streams unprefixed and the other hulls seeded as today; the tick
 phases; the player's vessel last) with them: a pin that moves is proven by bisection and
 restored by the order, never re-pinned for the order's sake; nothing of 75's files touched
 (the generator's change the smallest that serves, named in the notes).
+
+## Package 82b: the door follows its harness, the visitor's name, the far hull's hail (`freesail/agents/remote.py` the desk's seats keyed to the harness; `freesail/world/movement.py` `visiting_station` and `freesail/world/seats.py` the visitor's station name; `freesail/world/hail.py` `deliver` and `model_holds_her` for a far hull; `docs/agents/Harness.md`; the primer's chapter 26 where its words need bringing up; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-390 to 7-394)
+
+Opus (the owner, 2026-11-05, from his testing of 2026-10-31 to 11-05: the saves under his notes
+of 2026-11-01 and 11-05, read by the lead under "The owner's testing week: loose ends mended by
+the lead"). Three findings, each pinned to its mechanism, each an item:
+
+1. **The door follows its harness.** On the trunk a harness (model, door, journal) moves with
+   its person between hulls (`Harness.move_to`; probed by the lead on 2026-11-01). What breaks
+   is the agent API's desk (`agents/remote.py`): its seats are keyed by station name and ship,
+   so a station that becomes "mr newton of the Amazon" loses its door's seat, the new station
+   reads as unseated, and the owner's door that held his own officer answered for "the Mr
+   Hill" in its same session; `stand down the Mr Hill` stood down both (one door covering two
+   stations, the newest by recency). In the all-models convoy, four model captains, each a
+   "captain" station on a different hull through one door, ended with the Chevalier's captain
+   a visitor aboard the Lynx and his door holding Mr Folger's station too. The rule: a seat is
+   keyed to its harness (an identity of its own, carried in the save), never to a name and a
+   ship; a door's station is the harness it was seated at, wherever that harness's person
+   goes; `stand down <station>` stands down that harness alone; the desk's listing names each
+   station with its ship. Truths 7-390 (the moved station keeps its door and its model through
+   the move and the save) and 7-391 (two "captain" stations on two hulls through one door,
+   each answered by its own harness; a stand-down of one leaves the other).
+2. **The visitor keeps his own station's name.** The primer's chapter 26 promises "he keeps
+   his own station's name and voice"; the code makes a station named for the man
+   (`visiting_station`, `VISITOR_DOMAIN`: "captain owen", "mr newton"). The visitor's station
+   is named "officer of the watch, of the Raven, aboard the Amazon" (his station, his ship,
+   his host), its voice and its journal his own, the passenger's reach as 82 built it; the
+   host's own "officer of the watch" untouched. Truth 7-392.
+3. **A far hull's hail is her captain's model's to answer.** `hail.deliver` answers by table
+   whenever the hailed hull is not in the full shape, though a model may hold her captain's
+   station on her far shape (`model_holds_her` is read only for a full hull): the owner's
+   model captains at far detail each reported the rules' answer and never the other's. The
+   rule: where a model holds her captain, the words go to his sample and he answers, in the
+   far shape as in the full (the far shape's sampling as 84 left it), and the table answers
+   only for a ship nobody holds; the hailer's own log says "she has not yet answered" until
+   he does, as a hail at sea does. Truth 7-393; truth 7-394 the replay of a passage with a
+   hail between two model-held hulls at far detail by both roads.
+
+**The design note first** (`docs/design/Design-DoorAndVisitor.md`, short): the seat's
+identity and its place in the save, the visitor's name in every listing and reading, the
+far hull's sample for the hail; reported to the lead before the harness or the desk is
+touched. **Beside it:** package 65 resumes on Fable at the same time; 65 owns
+`agents/harness.py`'s sample and `_reaches`, `orders/stations.py` `_say`, the console's and
+the browser's views and `world/knowledge.py`; 82b owns `agents/remote.py`, `world/seats.py`,
+`movement.py`'s visitor naming and `world/hail.py`'s answer path; where 82b must touch a file
+65 owns, it says so to the lead first and keeps the touch small. **The suites:** the fast
+tier whole on the final tree of each item, the slow tier of the touched files and the known
+truths, the pace tests alone and last, ruff check and format; the trunk brought in at each
+boundary. **The head rules bind** as the briefs before have them (no model identifier in a
+repository file; nothing under `docs/agents/consent/` or the consent brief; no test skipped
+or weakened; pins moved only where moved, old beside new, proven; 85's in-world rule; ship
+files through `tools/gen_ships.py` alone).
+
+## Package 95: the sail by her name (`freesail/world/lookout.py` `glass_on`, `make_out`, `strangers`; `freesail/world/hail.py` `_addressee`; `freesail/orders/boat.py` `pull for`; `freesail/api/readings.py` the `strangers`, `in_sight` and `sail_in_sight` rows; `freesail/api/queries.py`; the primer's chapters 15 and 23; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-395 to 7-399)
+
+Opus (the owner, 2026-10-31 and 2026-11-05). **The finding:** `the glass on` and `make out`
+give the nearest sail, or at best the nearest of the named kind, and the wanted sail is hard
+to name; a sail once made out is not named in the readings, so two schooners read alike.
+**The rule to build:** one resolver for a sail named in words, used by every order and
+reading that takes a sail: the most specific naming wins, read from the words the lookout
+himself used for her (the kind, "on the larboard quarter", "bearing NE by N", "distant a
+mile", each narrowing the pool), the closer sail where ambiguity remains, and a name once
+known ("the Raven") over all; `make out the sail on the larboard quarter, bearing NE by N,
+distant a mile` resolves to her, and so do `the glass on`, `hail the`, `bearing of` and
+`pull for`. A sail made out and identified (her colours, her name by hail, the private
+signal answered) is named in the readings by her name while she stays in sight, and her
+identification is lost when she is lost sight of, until she is closed and made out again
+(the lookout's memory of her as the period's: a sail lost in the night is a stranger at
+dawn). Truths 7-395 (the resolver's narrowing, four cases), 7-396 (ambiguity to the closer),
+7-397 (a name over all), 7-398 (the identified sail named in the rows and forgotten when
+lost), 7-399 (the recorded passages unmoved: every pinned passage names its sails as before).
+**After 82b**, since both touch `world/hail.py`. **The suites and the head rules** as 82b's.
 
 ## Package 83: the one-world study (`docs/design/Design-OneWorld.md` new; a draft brief for package 84 in this file; throwaway measurements in the scratchpad only; no code in the repository)
 
