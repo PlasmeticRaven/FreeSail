@@ -16995,7 +16995,9 @@ room, the digest `c2bfe1797ee44f3e` for `04f2fcd0fe9023a4`; the merchant from a 
 - the cloud's shard 0 of 6 whole (`FREESAIL_SHARD=0/6`, `-n 4 --dist loadgroup --slow -m "not
   pace"`, the server's packages installed as the workflow installs them): 1058 passed, 2
   xfailed, the thick weather and the gale among them;
-- the fast tier whole on the hotfix: 5,920 passed, 2 skipped, exit 0.
+- the fast tier whole on the hotfix: 5,920 passed, 2 skipped, exit 0;
+- the slow tier of `test_known_truths.py` and `test_captain_trials.py` whole (`--slow -m "not
+  pace" -n 4`): 273 passed, 7 xfailed, exit 0, all nine passages among them.
 
 So there was nothing to bisect: with each of the five changes in or out, the passages are the
 trunk's. **What moved is the cloud's machine.** Run 29 (green, on `a7440f0`, whose `freesail/`,
