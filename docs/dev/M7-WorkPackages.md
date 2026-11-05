@@ -1898,6 +1898,14 @@ action, what held, nine lessons each sent to its package: 95, 82b items 3 to 5, 
 step 4, and one booked: the wounded captain, whose body the needs read as rested with a ball
 through it).
 
+**The second case study (2026-11-05):** the brig off Falmouth with every station a
+different model, `docs/playtests/2026-11-05-brig-off-falmouth-fully-crewed/case-study.md`:
+a crew of five models worked as a crew with the director keeping the world; five lessons,
+the first put to the owner as decision 63 (an order told through a station is the captain's
+word for it; the deck given when the captain leaves it is the command), the rest to 95 (the
+lookout's hail read as `hail the pilot`), 65's step 1 (a far body's lines in the ship's log)
+and 65's step 2 (a word to a person is no order of the ship, in the briefs).
+
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
 the testing build and the trunk do not diverge and the saves replay on the trunk.
