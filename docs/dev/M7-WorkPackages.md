@@ -1961,8 +1961,12 @@ shard 1 truths 78 and 79 and the merchant at seed 7, 96480 for 96540; shard 2 ga
 schooner, 767 lines for 766; shard 3 the anchorings [57, 100918] for [57, 100616, 115547];
 shard 4 gate 6A's intent, brought up at 111239 for 111238; shard 5 truth 77's digest
 5422360d for 6abbbff4), the first proof made: the image moves the pins, the hotfix moved
-none. Run 32 (the trunk at 36d30c4, the runner pinned): the second proof, its figures
-below when it completes.
+none. Run 32 (the trunk at 36d30c4, the hotfix aboard, the runner pinned to ubuntu-24.04,
+22:18 to 23:01 UTC): lint green, all six shards green, 6,266 passed, 11 skipped, 10
+expected failures (run 29's 6,264 and the hotfix's two tests); the pace job 7 of 11, the
+four floors under at 423 to 486 against 500, the runner's speed as on run 30. The second
+proof made: the nine pins stand on the 24.04 machine with the hotfix in, and the trunk is
+green again in the cloud. The image moves only when the lead moves it and re-measures.
 
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
