@@ -544,7 +544,7 @@ Off ZAZ6381 at §3's scale, centres ±0.05 ft, its sills ±0.05 ft. ZAZ6382 cros
 | `deck_height_m` | 0.9 (3 ft, judgement) | 0.66 m (2 ft 2 in) at mid, the deck's top at the middle line, as built (measured) |
 | Keel | "44 ft 3 in" (`tools/gen_ships.py`, a fifth less than the deck) | 44 ft 7 in for tonnage on all three sheets (read); Charnock's 42 ft 0 in |
 | `main.mast` `x_m`, `rake_deg` | 1.5 (4.9 ft before the middle, Fincham); 5.2 | +2.63 (8 ft 8 in before mid); 3.7 to the page, 6.9 to the line (measured) |
-| `bowsprit` `height_m`, near horizontal | 1.2 | 1.01 m above the deck at the stem; steeved 1.8° to the page, 5.1° to the line (measured) |
+| `bowsprit` `height_m`, near horizontal | 1.2 | 1.01 m above the deck at the stem; steeved 1.8° to the page, 5.1° to the line (measured). Drawn level from the rail at the stem, 2.44 m, against the sheet's 2.42 m (the viewer step; old 2.81 m, the top of the stem head); its end 0.34 m above the file's, old 0.71 m. |
 | Spars | mast 61 ft, boom 47, gaff 30, square-sail yard 46, topsail yard 32, bowsprit 43 | 66 ft 10 in to the pole head, boom 51 ft 3 in, gaff 30 ft, spread yard 43 ft 7 in, cross-jack yard 36 ft, topsail yard 33 ft 9 in, bowsprit 47 ft (read, tentative, §2.3), the mast head 13 within the pole head (tentative) |
 | Guns' `height_m`, until this step | 1.5 (Steel's band, judgement) | sills 1.00 to 1.23 m as built, 0.86 to 1.11 as drawn; deck top + 1 ft 3 in at the guns' own x: 1.00, 1.03, 1.15 m, which the file now carries (`Build-Ships.md` §5.3: nothing reads a gun's height until L2) |
 | Guns' `x_m` | three a side, -3.5, -0.5, 2.5 | four ports a side, -4.75, -2.35, +0.02, +3.58, with four sweep ports (measured); six carriage guns (Charnock, read), so three a side stands, on four ports |
