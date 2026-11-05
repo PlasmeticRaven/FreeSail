@@ -846,6 +846,22 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     that the player gives `follow` by hand when he goes to another ship, which the browser
     refuses as an order and which should be automatic (the prompt follows his person by
     itself). Both are 65's step 4.
+63. **The command devolves; a told order is the captain's word.** Owner, 2026-11-05, on the
+    lead's proposal from the two case studies of that day (the *Chevalier*'s captain wounded
+    and giving the deck in words to an officer no door held; the brig's officer refused for
+    what the captain had told him to do). Two states of one phrase: `you have the deck` with
+    the captain aboard and able is the watch, as built (the ordinary work of a watch, the
+    stated dangers on the officer's own word, the rest by the captain's word); when the
+    captain is rendered unavailable, by choice (ashore, in the boat, aboard another ship) or
+    by force (wounded below, dead, a captive), the command devolves on the senior officer,
+    preferring a held station (a model's or the player's) over the rules' persons, who then
+    holds the captain's authority whole with the captain's standing orders as his guide,
+    said in the log ("the command devolves on Mr Ryan, the captain below wounded"), and
+    gives it back when the captain gives an order again. And an order the captain tells a
+    station to carry out is the captain's word for that thing, logged as given by the
+    station at the captain's word; the told officer is never refused for what he was told to
+    do. Built in package 65's step 3 with the captain's whereabouts and the officer's duty
+    to report.
 
 ### Still open
 
