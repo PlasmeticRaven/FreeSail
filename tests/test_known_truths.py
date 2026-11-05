@@ -13300,3 +13300,46 @@ def test_truth_7_332_the_directors_new_forms_perform_in_the_dry_run_and_in_play_
     test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so()
     test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea()
     test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 1 (`docs/design/Design-DoorAndVisitor.md` §2): the door follows its harness
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save():
+    """A station held through the agent API whose person goes aboard another ship in his own
+    boat keeps its door, its model and its identity (`Harness.ident`, the hull it was seated
+    on and its station) through the move, a stationing again by its own name, and a save and
+    a load by both roads: one harness, one seat, nothing made at his own station, and the
+    desk's listing naming him by his station, his ship and his host."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_door_follows import (
+        test_the_moved_station_keeps_its_door_its_model_and_its_identity,
+        test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load,
+    )
+
+    test_the_moved_station_keeps_its_door_its_model_and_its_identity(Path(tempfile.mkdtemp()))
+    test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load(
+        Path(tempfile.mkdtemp())
+    )
+
+
+def test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness():
+    """Two "captain" stations of two hulls, each through a door of the same model; one
+    captain goes aboard the other's ship. Each door is answered by its own harness (the
+    host's captain's harness is never carried into the visitor's station: the owner's
+    "one door covering two stations, the newest by recency"), and a stand-down by the
+    visitor's name stands his harness down and leaves the other stationed."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_door_follows import (
+        test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down,
+    )
+
+    test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down(
+        Path(tempfile.mkdtemp())
+    )

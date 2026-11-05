@@ -432,6 +432,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_294_the_frigate_sails_from_gibraltar_to_port_mahon_by_her_short_book",
         # package 79d: Agincourt Sound's six hours in a north-wester (20 s alone, 2026-10-29)
         "test_known_truths.py::test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester",
+        # package 82b: the door that follows its harness, a brig brought within a boat's pull
+        # and her captain sent aboard the frigate (6 to 16 s alone, 2026-11-05)
+        "test_door_follows.py::test_the_moved_station_keeps_its_door_its_model_and_its_identity",
+        "test_door_follows.py::test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load",
+        "test_door_follows.py::test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down",
+        "test_known_truths.py::test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save",
+        "test_known_truths.py::test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness",
     }
 )
 

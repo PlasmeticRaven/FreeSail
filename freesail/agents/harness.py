@@ -676,6 +676,11 @@ class Harness:
     # so that a checkpoint from before loads with them.
     seated_on: str | None = None
     _home: tuple[str, Any] | None = None
+    # Package 82b (`docs/design/Design-DoorAndVisitor.md` §2): the harness's identity, made
+    # once when it is made and never changed by a move, a reseat or a take-over: the hull it
+    # was first seated on and its station there, '#2' on where another harness of the game
+    # bears it already. The desk's seats are keyed by it, and the save carries it.
+    ident: str | None = None
 
     def __init__(
         self,
@@ -786,6 +791,7 @@ class Harness:
         self._handover_asked_at = 0
         self._handover_pending: str | None = None
         self.seated_on = hull_id_of(world)
+        self.ident = new_ident(world, self.seated_on, station.name)
         world.agents[station.name] = self
 
     # -- the harness follows its person between hulls (package 82) -------------------------
@@ -4551,6 +4557,8 @@ class Harness:
             # package 82: the hull it was first seated on, by which the save groups it and
             # a replay seats it there before the replayed moves carry it on
             "seated_on": self.seated_on,
+            # package 82b: its identity, by which the desk's seat follows it
+            "ident": self.ident,
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -4675,6 +4683,8 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
         h.budget_tokens = record.get("budget_tokens") or None
         h.reserve_tokens = record.get("reserve_tokens") or None
         h.seated_on = str(record.get("seated_on") or hull_id_of(world))
+        if record.get("ident"):
+            h.ident = str(record["ident"])  # a save from before derives it as it was made
         if h.due_to_start():
             h.start()
         out.append(h)
@@ -5027,6 +5037,21 @@ def hull_id_of(world: Any) -> str:
     return str(getattr(getattr(world, "own", None), "id", "") or "")
 
 
+def new_ident(world: Any, seated_on: str | None, station: str) -> str:
+    """A new harness's identity (package 82b): '<the hull it is seated on>/<its station>',
+    with '#2', '#3' on where a harness of the game bears it already (a second seating at a
+    home station while its first holder is away). Made in the order the harnesses are made,
+    so a replay by either road makes the same."""
+    base = f"{seated_on or 'own'}/{station}"
+    taken = {str(getattr(h, "ident", "") or "") for _hull, h in harnesses_of(world)}
+    if base not in taken:
+        return base
+    n = 2
+    while f"{base}#{n}" in taken:
+        n += 1
+    return f"{base}#{n}"
+
+
 def harnesses_of(world: Any) -> list[tuple[Any, Any]]:
     """Every harness of the game as (its hull, the harness), the hulls in their order
     (package 82: a harness lives in the hull its person is in, which may not be the hull it
@@ -5058,8 +5083,25 @@ def all_agents(world: Any) -> list[tuple[str, Any, Any]]:
     for hull in hulls:
         her = str(getattr(getattr(hull, "ship", None), "name", "") or hull.id)
         for name, h in (hull.__dict__.get("agents") or {}).items():
-            out.append((name if hull is followed else f"{name} of {her}", h, hull))
+            words = visitor_words(world, h, her)
+            if words is None:
+                words = name if hull is followed else f"{name} of {her}"
+            out.append((words, h, hull))
     return out
+
+
+def visitor_words(world: Any, h: Any, host: str) -> str | None:
+    """A visitor's station for the drivers and the desk (package 82b): his own station, his
+    ship and his host ('officer of the watch, of the Raven, aboard the Amazon'); None for a
+    harness at home."""
+    home = getattr(h, "_home", None)
+    if home is None:
+        return None
+    hid, station = home
+    hulls = getattr(world, "hulls", None) or {}
+    ship = hulls.get(hid)
+    of = str(getattr(getattr(ship, "ship", None), "name", "") or hid)
+    return f"{getattr(station, 'name', station)}, of the {of}, aboard the {host}"
 
 
 def open_samples(world: Any) -> list[dict[str, Any]]:
