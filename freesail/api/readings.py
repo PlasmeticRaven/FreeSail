@@ -215,6 +215,13 @@ class Reading:
     # asking (never from the view's cache) and left out of the readings tool's dict, which
     # has no asker (the station line says where its person is)
     per_asker: bool = False
+    # where the reading is to be had (package 65; `world.knowledge`): the senses it is read
+    # by, the deck's by default (the ship's instruments are on deck, and a row an author does
+    # not place is refused below and ashore rather than leaking there); `aboard` for a row
+    # every man awake in the hull has (the heel, the bells), `ashore` for the world's and the
+    # port's. `where_words` says where it is ("the lead is cast on deck"), else the places.
+    where: tuple[str, ...] = ("deck",)
+    where_words: str = ""
 
     @property
     def is_absent(self) -> bool:
@@ -1033,6 +1040,7 @@ REGISTRY.add(
         "knots",
         _true_wind_speed,
         description="the true wind's speed at ten metres, gusts included",
+        where=("deck", "aloft", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1043,6 +1051,7 @@ REGISTRY.add(
         "points",
         _true_wind_from,
         description="where the true wind comes from",
+        where=("deck", "aloft", "ashore"),
     )
 )
 # The mean wind (package 29b, playtest 7's finding 4), beside the instant's: a watcher
@@ -1055,6 +1064,7 @@ REGISTRY.add(
         "knots",
         _mean_wind_speed,
         description="the true wind's speed over the last ten minutes, gusts and lulls in it",
+        where=("deck", "aloft", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1065,6 +1075,7 @@ REGISTRY.add(
         "points",
         _mean_wind_from,
         description="where the true wind has come from over the last ten minutes",
+        where=("deck", "aloft", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1075,6 +1086,7 @@ REGISTRY.add(
         "",
         _against_mean,
         description="the true wind now against its ten-minute mean: a gust, the mean, a lull",
+        where=("deck", "aloft", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1105,6 +1117,8 @@ REGISTRY.add(
         "",
         _heading,
         description="her head by the compass",
+        where=("deck", "aloft", "cabin"),
+        where_words="the compass is at the binnacle on deck, and the tell-tale in the cabin",
     )
 )
 REGISTRY.add(
@@ -1126,6 +1140,8 @@ REGISTRY.add(
         "knots",
         _speed,
         description="her speed through the water by the log, in knots",
+        where=("deck",),
+        where_words="the log is hove on deck",
     )
 )
 REGISTRY.add(
@@ -1147,6 +1163,7 @@ REGISTRY.add(
         "degrees",
         _heel,
         description="her heel in degrees, to larboard or to starboard",
+        where=("aboard",),
     )
 )
 REGISTRY.add(
@@ -1167,6 +1184,7 @@ REGISTRY.add(
         "",
         _watch,
         description="the watch now kept, by its name",
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1177,6 +1195,7 @@ REGISTRY.add(
         "",
         _bells,
         description="the ship's time: the watch and the bells",
+        where=("aboard", "ashore"),
     )
 )
 
@@ -1208,6 +1227,7 @@ REGISTRY.add(
         _date,
         description="the date in words, the day of the week, the day, the month and the "
         "year ('Wednesday 12 June 1805'); the ship's time is 'the time'",
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1218,6 +1238,7 @@ REGISTRY.add(
         "",
         _daylight,
         description="day, twilight or night, from the sun at the ship's latitude",
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1229,6 +1250,7 @@ REGISTRY.add(
         _sail,
         parametric="sail",
         description="a sail's state: set, shaking, aback, furled, blown out",
+        where=("deck", "aloft"),
     )
 )
 REGISTRY.add(
@@ -1240,6 +1262,7 @@ REGISTRY.add(
         _strain,
         parametric="part",
         description="the worst strain ratio aboard, or a part's",
+        where=("deck", "aloft"),
     )
 )
 REGISTRY.add(
@@ -1300,6 +1323,8 @@ REGISTRY.add(
         description="the water in the well by the carpenter's last sounding, in feet and "
         "inches ('sound the well' has him sound it)",
         none_words=_no_sounding_words,
+        where=("deck", "hold"),
+        where_words="the well is sounded below and reported to the deck",
     )
 )
 # The weather's readings (spec M5 §5, package 30). `the glass` is two rows behind one
@@ -1315,6 +1340,8 @@ REGISTRY.add(
         _glass,
         description="the glass in inches to the hundredth, with the ship's own reading noise",
         none_words=_no_glass_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the glass hangs in the cabin and is read at each watch",
     )
 )
 REGISTRY.add(
@@ -1326,6 +1353,8 @@ REGISTRY.add(
         _tendency,
         description="the glass's change over three hours and one hour, in the period's words",
         none_words=_no_glass_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the glass hangs in the cabin and is read at each watch",
     )
 )
 REGISTRY.add(
@@ -1337,6 +1366,7 @@ REGISTRY.add(
         _sky,
         description="the sky in Beaufort's words, with the signs Luce lists",
         none_words=_no_weather_words,
+        where=("deck", "aloft", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1348,6 +1378,7 @@ REGISTRY.add(
         _weather,
         description="the weather: fine, rain, drizzle, passing showers, squally, thunder, fog",
         none_words=_no_weather_words,
+        where=("deck", "aloft", "ashore"),
     )
 )
 REGISTRY.add(
@@ -1359,6 +1390,7 @@ REGISTRY.add(
         _visibility,
         description="how far a sail can be seen: the horizon, a few miles, a mile, a cable",
         none_words=_no_weather_words,
+        where=("deck", "aloft", "ashore"),
     )
 )
 # The sea and the motion (spec M5 §4, package 31): the period's words with a state word
@@ -1386,6 +1418,7 @@ REGISTRY.add(
         description="how she moves in it: easy, rolling, rolling heavily, pitching into it, "
         "labouring heavily",
         none_words=_no_sea_words,
+        where=("aboard",),
     )
 )
 # The chart's readings (spec M5 §11, §12; package 32): the lookout's sightings, the land,
@@ -1400,6 +1433,7 @@ REGISTRY.add(
         _in_sight,
         description="what the lookout has in sight, by compass bearing and estimated distance",
         none_words=_no_chart_words,
+        where=("deck", "aloft"),
     )
 )
 REGISTRY.add(
@@ -1411,6 +1445,7 @@ REGISTRY.add(
         _land,
         description="whether any land, mark or light is in sight, and the nearest",
         none_words=_no_chart_words,
+        where=("deck", "aloft"),
     )
 )
 # The shore itself (package 37d; the review of gate 5c's playtests, 5.1: off any named
@@ -1428,6 +1463,7 @@ REGISTRY.add(
         "the coast's name; 'no land within a league', or by night or in thick weather 'none "
         "seen within' as far as he can see, and land beyond that not to be told",
         none_words=_no_nearest_land_words,
+        where=("deck", "aloft"),
     )
 )
 REGISTRY.add(
@@ -1447,6 +1483,8 @@ REGISTRY.add(
         "fathoms; never a cast (that is `the depth`). In a standing order's condition it "
         "reads the last cast of the lead, and the chart only when the book says 'by the chart'",
         none_words=_no_chart_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the chart is in the cabin and the gunroom, and at the binnacle on deck",
     )
 )
 # The reckoning's readings (spec M5 §15; package 33a): the captain's account, never the
@@ -1462,6 +1500,8 @@ REGISTRY.add(
         description="the position by account, and the tide the master allows in it: "
         "'49° 52' N, 6° 10' W by account; the tide allowed: ...'",
         none_words=_no_reckoning_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or on deck with him, and the cabin's chart",
     )
 )
 REGISTRY.add(
@@ -1473,6 +1513,8 @@ REGISTRY.add(
         _reckoning_uncertainty,
         description="how far the master would not trust the reckoning, in his words",
         none_words=_no_reckoning_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or on deck with him, and the cabin's chart",
     )
 )
 REGISTRY.add(
@@ -1484,6 +1526,8 @@ REGISTRY.add(
         _depth,
         description="the depth by the last cast of the lead, in fathoms",
         none_words=_no_cast_words,
+        where=("deck",),
+        where_words="the lead is cast on deck",
     )
 )
 REGISTRY.add(
@@ -1518,6 +1562,8 @@ REGISTRY.add(
         _run_since_noon,
         description="the distance run since noon, by account; none before the first noon",
         none_words=_no_noon_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1529,6 +1575,8 @@ REGISTRY.add(
         _course_made_good,
         description="the course made good since noon, by account",
         none_words=_no_noon_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1540,6 +1588,8 @@ REGISTRY.add(
         _latitude_by_observation,
         description="today's latitude by the noon sight",
         none_words=_no_sight_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1552,6 +1602,7 @@ REGISTRY.add(
         description="the master: his name, his place and what occupies him; and the "
         "master's station, when a model or the player holds it",
         none_words=_no_reckoning_words,
+        where=("aboard",),
     )
 )
 # Package 40b: the officer of the watch's own reckoning beside the master's (spec M6 §5).
@@ -1565,6 +1616,8 @@ REGISTRY.add(
         description="the officer of the watch's own reckoning, run on by the log-board, and "
         "where it lies from the master's account; none until he gives one",
         none_words=_no_officers_reckoning_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the officer's own slate, kept with the master's",
     )
 )
 # `a sail in sight` was registered absent here from milestone 4 to package 34; package 35
@@ -1849,6 +1902,8 @@ REGISTRY.add(
         description="the chronometer: its time at Greenwich, the days since rated, its "
         "winding; the master's trust in miles of longitude",
         none_words=_no_chronometer_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the chronometer is in the cabin, and its comparison on the master's slate",
     )
 )
 REGISTRY.add(
@@ -1861,6 +1916,8 @@ REGISTRY.add(
         description="today's longitude by the time sight, with the days since rated and "
         "the master's trust",
         none_words=_no_time_sight_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1872,6 +1929,8 @@ REGISTRY.add(
         _longitude_by_lunar,
         description="the last longitude by lunar, with its date and the master's trust",
         none_words=_no_lunar_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1889,6 +1948,8 @@ REGISTRY.add(
         description="the chronometer against the last lunar: gaining or losing on its rate, "
         "in seconds of time and miles of longitude",
         none_words=_no_chronometer_error_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1900,6 +1961,8 @@ REGISTRY.add(
         _moon,
         description="the moon: its age and phase, up or not, in distance of a body or not",
         none_words=_no_reckoning_words,
+        where=("deck", "aloft", "cabin", "gunroom"),
+        where_words="the almanac is in the cabin and the gunroom, and the sky over the deck",
     )
 )
 REGISTRY.add(
@@ -1912,6 +1975,8 @@ REGISTRY.add(
         description="the variation the master allows, by the chart or by observation, "
         "with its date",
         none_words=_no_reckoning_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the master's slate, in the gunroom or with him on deck",
     )
 )
 REGISTRY.add(
@@ -1925,6 +1990,8 @@ REGISTRY.add(
         description="the bearing by compass from the account to any charted feature, in "
         "sight or not",
         none_words=_not_charted_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the chart is in the cabin and the gunroom, and at the binnacle on deck",
     )
 )
 REGISTRY.add(
@@ -1937,6 +2004,8 @@ REGISTRY.add(
         parametric="mark",
         description="the distance from the account to any charted feature, by account",
         none_words=_not_charted_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the chart is in the cabin and the gunroom, and at the binnacle on deck",
     )
 )
 REGISTRY.add(
@@ -1949,6 +2018,8 @@ REGISTRY.add(
         description="the charted dangers within ten miles of the account, the nearest first, "
         "by name, bearing and distance; the nearest's distance is the number",
         none_words=_no_dangers_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the chart is in the cabin and the gunroom, and at the binnacle on deck",
     )
 )
 
@@ -2230,6 +2301,8 @@ REGISTRY.add(
         description="high water today at the nearest place of the master's table, by the "
         "establishment and the moon's age (the master's tide, never the world's)",
         none_words=_no_reckoning_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the epitome and the almanac are in the cabin and the gunroom",
     )
 )
 REGISTRY.add(
@@ -2276,6 +2349,8 @@ REGISTRY.add(
         _draught,
         description="the water she draws, from her file: 'she draws fifteen feet of water, "
         "two fathoms and a half'",
+        where=("deck", "cabin", "gunroom"),
+        where_words="the ship's papers, in the cabin",
     )
 )
 
@@ -2442,6 +2517,7 @@ REGISTRY.add(
         lambda world, _p: {"words": ship_words(world)},
         description="the ship herself: her name, her rig and class, her service and nation, "
         "her fit of guns, her people's number, who commands, the ports of her voyage",
+        where=("aboard", "ashore"),
     )
 )
 
@@ -2751,6 +2827,7 @@ REGISTRY.add(
         description="the war as the ship knows it: the nations' table she sailed with, and "
         "every change the news has brought her since, each with where and when it came; "
         "never the world's own table",
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -2762,6 +2839,7 @@ REGISTRY.add(
         _people,
         description="the named people aboard, each by name and role with his place and state",
         none_words=_no_people_words,
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -2774,6 +2852,7 @@ REGISTRY.add(
         parametric="person",
         description="a person by his role or his name: his place and state (is on deck, is below)",
         none_words=_no_people_words,
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -2785,6 +2864,7 @@ REGISTRY.add(
         _places,
         description="the places aboard, each a name and a description",
         none_words=_no_people_words,
+        where=("aboard", "ashore"),
     )
 )
 REGISTRY.add(
@@ -2808,6 +2888,7 @@ REGISTRY.add(
         description="the port she is in or near: its stance to her, the pilot, the cutter and "
         "the boat",
         none_words=_no_port_words,
+        where=("deck", "cabin", "ashore"),
     )
 )
 REGISTRY.add(
@@ -2821,6 +2902,7 @@ REGISTRY.add(
         "place, or aboard another ship as a visitor",
         none_words=_no_people_words,
         per_asker=True,
+        where=("aboard", "ashore", "asleep", "boat"),
     )
 )
 REGISTRY.add(
@@ -2843,6 +2925,7 @@ REGISTRY.add(
         _followed,
         description="the ship the drivers follow, by name; 'no ship followed' and where the "
         "observer's view is in a world with no ship of the player's",
+        where=("aboard", "ashore", "asleep", "boat"),
     )
 )
 REGISTRY.add(
@@ -2865,6 +2948,8 @@ REGISTRY.add(
         _prices,
         description="the prices at the port she lies in, as the purser last brought them off",
         none_words=_no_prices_words,
+        where=("deck", "cabin", "ashore"),
+        where_words="the price list is in the cabin; the prices are read at the market in person",
     )
 )
 REGISTRY.add(
@@ -2876,6 +2961,8 @@ REGISTRY.add(
         _manifest,
         description="the hold: the cargo in it by tons and the room left",
         none_words=_no_hold_words,
+        where=("deck", "cabin", "hold"),
+        where_words="the manifest is in the hold with the purser, and his books in the cabin",
     )
 )
 REGISTRY.add(
@@ -2887,6 +2974,8 @@ REGISTRY.add(
         _purse,
         description="the money aboard, in pounds",
         none_words=_no_people_words,
+        where=("deck", "cabin"),
+        where_words="the purse and the purser's books are in the cabin",
     )
 )
 REGISTRY.add(
@@ -2899,6 +2988,8 @@ REGISTRY.add(
         description="the purser's stores: water by the ton, provisions by the day, and for "
         "how long at the allowance she is at",
         none_words=_no_people_words,
+        where=("deck", "cabin", "hold"),
+        where_words="the stores are in the hold, and the purser's books in the cabin",
     )
 )
 REGISTRY.add(
@@ -2911,6 +3002,8 @@ REGISTRY.add(
         description="the epitome's table of the establishments: high water at full and change "
         "by port",
         none_words=_no_reckoning_words,
+        where=("deck", "cabin", "gunroom"),
+        where_words="the epitome is in the cabin and the gunroom",
     )
 )
 REGISTRY.add(
@@ -2922,6 +3015,7 @@ REGISTRY.add(
         _sail_in_sight,
         description="other sail in sight: in sight or not, each with the lookout's words",
         none_words=_no_chart_words,
+        where=("deck", "aloft"),
     )
 )
 REGISTRY.add(
@@ -2934,6 +3028,7 @@ REGISTRY.add(
         description="a sail in sight not known for the ship's own nation: every sail until "
         "her colours are made out, and one under none or another nation's after",
         none_words=_no_chart_words,
+        where=("deck", "aloft"),
     )
 )
 REGISTRY.add(
@@ -2946,6 +3041,7 @@ REGISTRY.add(
         description="every sail in sight: her bearing, her distance by estimation and what "
         "has been made out of her (her rig, her course, her colours or none)",
         none_words=_no_chart_words,
+        where=("deck", "aloft"),
     )
 )
 
@@ -3384,6 +3480,7 @@ REGISTRY.add(
         description="who has the deck: the officer of the watch by name and rank, since "
         "when, what the captain told him and what his word allows",
         none_words=_no_officer_words,
+        where=("aboard",),
     )
 )
 
@@ -3451,6 +3548,8 @@ REGISTRY.add(
         description="who commands: the captain's station and who holds it, the book's "
         "name and whose the deck is; the rules-based captain's intent and state when he "
         "sails her",
+        where=("deck", "cabin"),
+        where_words="the book of standing orders is on the quarterdeck and in the cabin",
     )
 )
 # the events a station with authority wakes on, and the book may act on: the deck given
@@ -3517,6 +3616,7 @@ REGISTRY.add(
         description="the lookout's station: who is at the masthead, what is in sight by "
         "the last look, and his last hail",
         none_words=lambda world: NO_CHART_WORDS,
+        where=("deck", "aloft"),
     )
 )
 
@@ -3560,6 +3660,7 @@ REGISTRY.add(
         _stations,
         description="the ship's stations as the world binds them: each with the person "
         "who holds it and who is seated at it now",
+        where=("aboard", "ashore"),
     )
 )
 

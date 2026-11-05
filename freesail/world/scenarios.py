@@ -358,6 +358,17 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     elif isinstance(grant_raw, dict) and grant_raw.get("observe"):
         observed = True
     sc.observed = observed
+    # the place's knowledge (package 65; decision 59): `knowledge: all` turns the rule off
+    # for testing; the rule is on otherwise
+    knowledge = raw.get("knowledge")
+    if knowledge is not None:
+        key = " ".join(str(knowledge).lower().split())
+        if key not in ("place", "all"):
+            raise ScenarioError(
+                f"{where}, knowledge: 'place' (a person reads what his place allows, the "
+                f"rule) or 'all' (the rule off, for testing), not {knowledge!r}."
+            )
+        sc.knowledge = key
     if observed:
         if ship.get("file"):
             raise ScenarioError(

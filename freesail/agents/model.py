@@ -165,11 +165,16 @@ class Sample:
     # is, where and since when, whose the deck is, his state; first in the sample, before
     # the log ("You: the captain, on the quarterdeck, since 10:00; the deck yours; ...")
     you: str | None = None
+    # the readings not to be had where the station's person stands (package 65; the
+    # place's knowledge): one line saying which and where they are; absent on deck
+    readings_elsewhere: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         if not d.get("you"):
             d.pop("you", None)
+        if not d.get("readings_elsewhere"):
+            d.pop("readings_elsewhere", None)
         if d.get("stood_by") is None:
             d.pop("stood_by", None)
         if d.get("word") is None:
