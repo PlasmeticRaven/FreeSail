@@ -558,7 +558,7 @@ def run_door(
     seat = None
     while time.monotonic() < end and thread.is_alive():
         with driver.lock:
-            seat = desk.seats.get("captain")
+            seat = desk.seat_at("captain")  # by its address (package 82b)
             if seat is not None and seat.harness is not None:
                 break
         time.sleep(0.02)
