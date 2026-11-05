@@ -1892,6 +1892,12 @@ table). The owner's word: the hotfix's moved pins bisected on Opus and the hotfi
 on the hotfix's merge (the same `_say` is touched by both); 82b briefed and launched beside
 65 on the same merge; 95 after 82b. Decision 62 taken.
 
+**The case study (2026-11-05):** the all-models convoy encounter read whole and written up
+in `docs/playtests/2026-11-05-small-convoy-all-models/case-study.md` (the course of the
+action, what held, nine lessons each sent to its package: 95, 82b items 3 to 5, 74, 65's
+step 4, and one booked: the wounded captain, whose body the needs read as rested with a ball
+through it).
+
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
 the testing build and the trunk do not diverge and the saves replay on the trunk.
@@ -3613,6 +3619,24 @@ the lead"). Three findings, each pinned to its mechanism, each an item:
    only for a ship nobody holds; the hailer's own log says "she has not yet answered" until
    he does, as a hail at sea does. Truth 7-393; truth 7-394 the replay of a passage with a
    hail between two model-held hulls at far detail by both roads.
+4. **A model-held hull is not half blind at far detail** (the case study of 2026-11-05,
+   `docs/playtests/2026-11-05-small-convoy-all-models/case-study.md`, lesson 2): the glass
+   was refused the *Chevalier*'s captain while her hull slept, and the *Renard*'s captain
+   stood by for an hour while the plan carried her to within a cable of the Stags. The rule:
+   a hull whose captain's station a model holds counts awake under the cap while that door
+   is live (the cap's three made four or five for the held hulls, measured in the pace
+   notes), or, where the cap must hold, the far shape's plan keeps her off the dangers as
+   the rules captain does (88's danger ahead by the chart) and samples her captain as the
+   full shape does. Truth 7-394 takes the plan's danger; the pace of a convoy with four held
+   hulls measured informatively.
+5. **The boat's names are the giver's hull's** (the same case study, lesson 4): the player's
+   `send the boat to Lynx with the captain and Mr Pearce and ...` carried Captain Owen and
+   sixteen of the *Chevalier*'s and the *Renard*'s people aboard the *Lynx*. Reproduce from
+   the owner's save (as data; the lead holds it), find how the names resolved across hulls
+   (84's one registry; `orders/port.py` `_boat_to_ship`, `dealings.send_boat_to`'s hull
+   check) and why the far hulls' people passed it; scope the names to the giver's hull and
+   refuse a person of another ship in words. Truth 7-394's number is shared; take 7-389 if
+   65 leaves it, else say so to the lead.
 
 **The design note first** (`docs/design/Design-DoorAndVisitor.md`, short): the seat's
 identity and its place in the save, the visitor's name in every listing and reading, the
