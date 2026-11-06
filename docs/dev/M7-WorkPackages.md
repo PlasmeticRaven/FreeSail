@@ -2623,8 +2623,10 @@ two halves, 728 passed 8 xfailed and 2,413 passed 1 xfailed, exit 0; the pace 12
 7-159 at 495 against 500 under the run and passing twice alone (the container at the floor;
 nothing of the step on the tick's path); the knowledge filter's place 557 against `all` 530;
 ruff and format clean. **The lead's merge:** the trial on f414ed1 clean and lint-clean; the
-fast tier whole on it green, exit 0, every test passed; the whole suite in the cloud dispatched after run 42, the
-figures to follow. Step 6 (work in its place, §9; truths 7-375 and 7-388) builds on.
+fast tier whole on it green, exit 0, every test passed; the whole suite in the cloud run 43 on 1cb432b (20:21 to 21:28
+UTC): lint green, all six shards green, 6,759 passed, 11 skipped, 12 expected failures; the pace job 9 of 13, the four
+floors under at 373 to 438 ticks a second against 500 (the runner's speed; informative). Step 6 (work in its place, §9;
+truths 7-375 and 7-388) builds on.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
