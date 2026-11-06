@@ -17354,3 +17354,13 @@ and, for a mustered ship, a read of the log's tail for the lines of the tick bef
 the minute before (the lines of one tick each; the log is appended in tick order), and the
 captain's place; the devolution's check is the cached state and a few reads of the captain's
 person; the pace tests are run as the rule asks and their figures are below.
+
+**The suites on the step's final tree** (a287290, the trunk at 2326d27 merged in; this
+container, four workers): the fast tier whole 5938 passed, 1 xfailed, in 42 min 28 s; the slow
+tier of the twenty-six touched files and the known truths 2972 passed, 9 xfailed, in 1 h 3 min
+26 s; the pace tests alone and last 13 passed in 5 min 12 s, their figures: three stations
+seated, the knowledge filter's place 564 ticks a second against `all` 551 (a second run 573
+against 592; the filter's cost is within the run's noise, as at steps 1 and 2); the frigate
+alone 557 ticks a second, the Channel observed 348, the same Channel with the frigate at the
+view 221 (step 2's tree gave 568/556, 554/346/230 and 559/576 on the step's first final tree).
+`ruff check` and `ruff format --check` clean on the whole tree.
