@@ -113,6 +113,11 @@ def hail_order(world: Any, who_words: str, words: str) -> tuple[str, str, dict[s
 
     vessel = _addressee(world, who_words)
     if vessel is None:
+        # the strangers' words given, as the lookout's refusal gives them (package 97's tidy:
+        # the words promised a list and gave none)
+        lookout = getattr(world, "lookout", None)
+        if lookout is not None:
+            raise OrderError(lookout.sail_refusal(who_words, float(world.ship.heading), world))
         raise OrderError(f"Nothing in sight answers to '{who_words}'; the strangers are listed.")
     here = getattr(world, "position", None)
     if here is None:

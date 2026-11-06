@@ -1994,7 +1994,8 @@ def test_the_ports_are_the_worlds_and_a_hulls_dealings_are_hers():
 
     w = at_anchor_in(CARRICK_ROAD, ship=SCHOONER, heading=250.0, cargo={"purse_pounds": 500.0})
     assert isinstance(w.ports, Ports) and isinstance(w.dealings, Dealings)
-    assert w.ports.world is w and w.dealings.world is w and w.own.dealings is w.dealings
+    # the world's ports hold the World; her dealings her hull (package 97; was the World)
+    assert w.ports.world is w and w.dealings.world is w.own and w.own.dealings is w.dealings
     assert w.own.ports is w.ports and w.dealings.ports is w.ports.ports
     falmouth = w.ports.find("Falmouth")
     assert w.dealings.find("Falmouth") is falmouth

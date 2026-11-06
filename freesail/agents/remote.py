@@ -114,6 +114,7 @@ from freesail.agents.model import (
     Turn,
     served_tokens_of,
 )
+from freesail.world.hulls import world_of
 
 if TYPE_CHECKING:
     from freesail.core.world import World
@@ -1280,7 +1281,9 @@ class Desk:
             if (
                 seat.phase == STATION
                 and h is not None
-                and (seat.hull is world or getattr(seat.hull, "parent", None) is world)
+                # a seat of this game's, the World's own hull's or another's (package 97:
+                # a seat holds its hull, the player's own too)
+                and world_of(seat.hull) is world
                 and isinstance(h.model, RemoteModel)
                 and h.floor == "model"
             ):
@@ -1318,9 +1321,7 @@ class Desk:
         for seat in self.seats.values():
             if seat.phase == STATION or (not seat.ship and seat.station in world.agents):
                 continue
-            if seat.world is not None and not (
-                seat.world is world or getattr(seat.world, "parent", None) is world
-            ):
+            if seat.world is not None and world_of(seat.world) is not world:
                 continue
             if seat.phase == CONSENT and seat.conv is not None:
                 waiting = seat.conv.waiting

@@ -1104,6 +1104,12 @@ class World:
             # reading from tick 0, and a landfall at the start is a line like any other
             for severity, kind, text, data in self.lookout.look(self.own):
                 self.record(severity, kind, text, data=data)
+        # her systems bound to her own hull, not to the World (package 97; `hulls.
+        # bind_to_hull`): built above with the World, they read her fields through it, and
+        # so read the running hull's when another hull's block reaches them (82b's holder)
+        from freesail.world.hulls import bind_to_hull
+
+        bind_to_hull(self.__dict__["_own"], self)
 
     # -- the checkpoint (package 84, step 1) -----------------------------------------
 
@@ -1127,6 +1133,10 @@ class World:
         sea = self.__dict__["_own"].__dict__.get("vessels")
         if sea is not None and not hasattr(sea, "hull") and not hasattr(sea, "crew"):
             sea.player_shadow(self)
+        # a checkpoint of before package 97: her systems held the World (`__init__`)
+        from freesail.world.hulls import bind_to_hull
+
+        bind_to_hull(self.__dict__["_own"], self)
 
     def _adopt_old_crews(self) -> None:
         """A checkpoint written before the Hull was the container (package 84, step 6): a
@@ -1910,9 +1920,11 @@ class World:
 
         key = (self.clock.tick, len(self.log))
         if self._readings_key != key:
-            # another hull's view reads her façade (package 84, step 6): a view is read
-            # after the block that made it, when the World's names are the followed hull's
-            self._readings_view = REGISTRY.at(self if self.is_followed else self.own)
+            # every hull's view reads her façade (package 84, step 6, for another hull's;
+            # package 97 for the followed hull's, whose view over the World read the running
+            # hull's fields when it was read inside another hull's block): a view is read
+            # after the block that made it, whichever hull is current then
+            self._readings_view = REGISTRY.at(self.own)
             self._readings_key = key
         return self._readings_view
 
@@ -2339,7 +2351,7 @@ class World:
             # a checkpoint from before package 73: the keeper made now
             from freesail.world.water import Water
 
-            water = self.water = Water(self)
+            water = self.water = Water(self.own)  # hers, whichever is current (97)
         water.tick()
         if self.navigation is not None:
             # the reckoning (spec M5 §13, package 33a): the traverse board, the hourly
@@ -2442,13 +2454,13 @@ class World:
             # a checkpoint from before package 54: the keeper made now
             from freesail.world.needs import NeedsKeeper
 
-            needs = self.needs = NeedsKeeper(self)
+            needs = self.needs = NeedsKeeper(self.own)  # hers (97)
         needs.tick()
         health = getattr(self, "health", None)
         if health is None:
             from freesail.crew.health import Health
 
-            health = self.health = Health(self)
+            health = self.health = Health(self.own)  # hers (97)
         health.tick()
 
     # -- queries -------------------------------------------------------------

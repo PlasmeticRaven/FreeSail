@@ -316,6 +316,9 @@ def make_hull(world: World, vessel: Any) -> Any:
     her stations, her captain with the brain's intent), then adopted into the one World
     (`adopt_hull`), the building World discarded. Measured 0.5 to 0.7 s on the build
     machine; made once per ship, since step 5 keeps her asleep."""
+    from freesail.world.hulls import world_of
+
+    world = world_of(world)  # the one World, whatever handle asks (package 97)
     temp = CrewedWorld(world, vessel)
     return adopt_hull(world, vessel, temp)
 
@@ -328,6 +331,9 @@ def adopt_hull(world: World, vessel: Any, temp: Any) -> Any:
     `Dealings`, `Navigation`, the standing runtime, the captain, the harnesses: each reads
     the hull as its world from here, the shared things through its properties and the
     World's methods with her current); registered in `world.hulls` and on the vessel."""
+    from freesail.world.hulls import world_of
+
+    world = world_of(world)  # a hull is kept in the World itself, never in another hull
     hull = temp.__dict__["_own"]
     hull.world = world
     hull.id = str(vessel.id)
@@ -350,73 +356,12 @@ def adopt_hull(world: World, vessel: Any, temp: Any) -> Any:
 
 
 def _rebind_world(hull: Any, temp: Any) -> None:
-    """Every reference to the building World in the hull's own graph (her systems' `world`,
-    the ship's `extra`, the harnesses, the view) made the hull, and every reference to its
-    clock (the watch bill's, the routine's, the runner's) the World's one clock. The walk
-    stays within hers: the shared things (the chart, the registry, the ports, the nations,
-    the tide, the systems, the sea's vessels, the parent World) are not entered."""
-    world = hull.world
-    swap = {id(temp): hull}
-    temp_clock = temp.__dict__.get("clock")
-    if temp_clock is not None and temp_clock is not world.clock:
-        swap[id(temp_clock)] = world.clock
-    skip = {
-        id(world),
-        id(temp),
-        id(world.clock),
-        id(getattr(world, "chart", None)),
-        id(getattr(world, "registry", None)),
-        id(getattr(world, "ports", None)),
-        id(getattr(world, "nations", None)),
-        id(getattr(world, "tide", None)),
-        id(getattr(world, "systems", None)),
-        id(getattr(world, "weather", None)),
-        id(getattr(world, "squadrons", None)),
-        id(getattr(world, "business", None)),
-        id(world.sea_vessels),
-        id(getattr(world, "hulls", None)),
-    }
-    seen: set[int] = set()
-    stack: list[Any] = [hull]
-    while stack:
-        obj = stack.pop()
-        oid = id(obj)
-        if oid in seen or oid in skip:
-            continue
-        seen.add(oid)
-        if isinstance(obj, dict):
-            for k, v in list(obj.items()):
-                if id(v) in swap:
-                    obj[k] = swap[id(v)]
-                elif _walkable(v):
-                    stack.append(v)
-            continue
-        if isinstance(obj, (list, tuple, set, frozenset)):
-            if isinstance(obj, list):
-                for i, v in enumerate(obj):
-                    if id(v) in swap:
-                        obj[i] = swap[id(v)]
-                    elif _walkable(v):
-                        stack.append(v)
-            else:
-                for v in obj:
-                    if _walkable(v):
-                        stack.append(v)
-            continue
-        d = getattr(obj, "__dict__", None)
-        if d is None:
-            continue
-        for k, v in list(d.items()):
-            if id(v) in swap:
-                d[k] = swap[id(v)]
-            elif _walkable(v):
-                stack.append(v)
+    """Every reference to the building World in the hull's own graph made the hull, and
+    its clock the World's one clock (`hulls.bind_to_hull`, where the walk lives since
+    package 97: the World's own hull is bound by the same walk at her making)."""
+    from freesail.world.hulls import bind_to_hull
 
-
-def _walkable(v: Any) -> bool:
-    return isinstance(v, (dict, list, tuple, set, frozenset)) or (
-        hasattr(v, "__dict__") and not isinstance(v, type) and not callable(v)
-    )
+    bind_to_hull(hull, temp)
 
 
 def mirror_far(hull: Any) -> None:

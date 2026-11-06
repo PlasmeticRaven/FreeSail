@@ -74,7 +74,7 @@ def test_a_world_loaded_from_the_checkpoint_carries_on_to_the_replays_digest(sav
     assert loaded.clock.tick == SAVE_AT and loaded.log.digest() == digest_at_save
     assert loaded.chart is not None and loaded.lookout.chart is loaded.chart
     assert loaded.ship.stepper is not None and loaded.ship.order_handler is not None
-    assert loaded.navigation.world is loaded
+    assert loaded.navigation.world is loaded.own  # her hull, bound at the load (97; was the World)
     assert "watcher" in loaded.agents and isinstance(
         loaded.agents["watcher"].model, fake_mod.Transcript
     )

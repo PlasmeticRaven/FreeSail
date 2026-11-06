@@ -192,6 +192,9 @@ _PAINTERS: weakref.WeakKeyDictionary[Any, Painter] = weakref.WeakKeyDictionary()
 def set_painter(world: Any, painter: Painter | None) -> None:
     """The driver's painter for its World (the browser's server); None takes it away. Kept
     beside the World and not on it, so that a save or a checkpoint never holds it."""
+    from freesail.world.hulls import world_of
+
+    world = world_of(world)  # the World's, read through any handle of it (package 97)
     if painter is None:
         _PAINTERS.pop(world, None)
     else:
@@ -199,7 +202,9 @@ def set_painter(world: Any, painter: Painter | None) -> None:
 
 
 def painter_of(world: Any) -> Painter | None:
-    return _PAINTERS.get(world)
+    from freesail.world.hulls import world_of
+
+    return _PAINTERS.get(world_of(world))
 
 
 def facing_of(words: str) -> tuple[float | None, str]:

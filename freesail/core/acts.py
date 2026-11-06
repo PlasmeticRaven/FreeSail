@@ -142,6 +142,19 @@ def target_of(world: Any, entry: dict[str, Any]) -> Any:
     return station_world(world, ship)[1]
 
 
+def act_target_of(world: Any, entry: dict[str, Any]) -> Any:
+    """The world an act is given to again (`give`): as `target_of`, but an act keyed "" is
+    the player's own hull's (`hull_id_of`), not the followed hull's as an input's is
+    (`World.submit` names a hull only when she is not followed), so it is given to her by
+    her own handle when another hull is current or followed (package 97: under `follow` it
+    landed on the followed hull); the World itself otherwise, as in every recorded passage."""
+    if not str(entry.get("ship") or ""):
+        players = getattr(world, "players", None)
+        if players is not None and getattr(world, "own", None) is not players:
+            return players
+    return target_of(world, entry)
+
+
 def _entry(world: Any, station: str, kind: str, payload: Any) -> None:
     entry = {
         "tick": world.clock.tick,
@@ -371,7 +384,7 @@ def give(world: Any, entry: dict[str, Any], build: Callable[[Any, dict[str, Any]
     """One act again, as the replay reaches it. `build(world, seated)` makes a station from
     its `seated` entry on the world the act names (`harness.driven_station`)."""
     station = str(entry.get("station") or "")
-    world = target_of(world, entry)  # the hull the act is hers (package 84, step 8)
+    world = act_target_of(world, entry)  # the hull the act is hers (package 84, step 8)
     if "seated" in entry:
         h = world.agents.get(station)
         if h is None:
