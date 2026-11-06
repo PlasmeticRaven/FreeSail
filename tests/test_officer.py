@@ -932,12 +932,11 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     # package 85: the ship herself at the head of every station's situation (12,885 at
     # the seat): five hundred more, 21,500; package 82: `where am I` among the readings and
     # the boat's errand to another ship in the brief's words (12,926 at the seat): five
-    # hundred more, 22,000
-    # package 65's step 2 (the sibling sentence and the stand-by's words in every brief) with
-    # package 75's lee-port words in the readings, together on the merged tree (13,200 at the
-    # seat, exactly the fraction of 22,000): five hundred more, 22,500; package 65's step 3
-    # (the officer's duty to report, the call and the command devolved in the brief's words)
-    # raised the same figure on its own tree (13,301 at the seat) and the two meet here
+    # hundred more, 22,000; package 65's step 2 (the sibling sentence and the stand-by's words
+    # in every brief) with package 75's lee-port words in the readings, together on the merged
+    # tree (13,200 at the seat, exactly the fraction of 22,000): five hundred more, 22,500;
+    # package 65, step 3: the officer's duty to report, the call and the command devolved in
+    # the brief's words (13,301 at the seat): five hundred more, 22,500
     h.budget_tokens = 22500
     assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 22500
     while h.revision == 0:

@@ -192,7 +192,15 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
             p = world.people.find_aboard(who) if hasattr(world.people, "find_aboard") else None
             if p is None:
                 p = world.people.find(who)
-            if p is None:
+            if p is None or not _of_this_hull(world, p):
+                # the names are this hull's company's and her visitors' (package 82b, item 5):
+                # a person of another ship is refused in words, and the boat not sent
+                other = p or _of_another_ship(world, who)
+                if other is not None:
+                    raise OrderError(
+                        f"{other.name} is of the {_ship_of(world, other)}, not of this ship; "
+                        "the boat is not sent."
+                    )
                 raise OrderError(
                     f"Nobody aboard answers to '{who}'; the boat is not sent. The people: "
                     f"{', '.join(x.name for x in world.people.all if x.aboard)}."
@@ -212,6 +220,41 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
         if p not in fetching:
             fetching.append(p)
     return target, carrying, fetching
+
+
+def _of_this_hull(world: Any, person: Any) -> bool:
+    """Whether a person is of the giving hull: of her company, or in her now (a visitor)."""
+    hid = str(getattr(getattr(world, "own", None), "id", "") or "")
+    return hid in (str(getattr(person, "home", "") or ""), str(getattr(person, "hull", "") or ""))
+
+
+def _of_another_ship(world: Any, who: str) -> Any:
+    """A person of another hull's company the words name by his name (not by a role, which
+    every ship has), or None."""
+    people = getattr(world, "people", None)
+    find = getattr(people, "find_anywhere", None)
+    if find is None:
+        return None
+    try:
+        p = find(who)
+    except Exception:  # noqa: BLE001  (a muster that cannot run names nobody)
+        return None
+    if p is None or _of_this_hull(world, p):
+        return None
+    key = " ".join(str(who).lower().split()).removeprefix("the ")
+    names = {str(p.name).lower(), str(getattr(p, "surname", "") or "").lower()}
+    bare = key.removeprefix("mr ").removeprefix("mister ")
+    return p if key in names or bare in names else None
+
+
+def _ship_of(world: Any, person: Any) -> str:
+    from freesail.world.movement import hull_name, hull_of
+
+    home = getattr(person, "home", "")
+    hull = hull_of(world, home) or hull_of(world, getattr(person, "hull", ""))
+    if hull is not None:
+        return hull_name(hull)
+    return "another ship"
 
 
 def _names(words: str) -> list[str]:
