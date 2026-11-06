@@ -102,11 +102,19 @@ SLOW_TESTS: frozenset[str] = frozenset(
     {
         # package 65 (the place's knowledge): the fakes seated and sent below, the hull slept
         "test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
+        # package 65, step 3: the reports, the call, the command devolved, the boat's report
+        "test_knowledge.py::test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck",
+        "test_knowledge.py::test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night",
+        "test_knowledge.py::test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do",
+        "test_knowledge.py::test_the_command_devolves_on_the_held_officer_while_the_captain_is_away",
+        "test_knowledge.py::test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship",
+        "test_known_truths.py::test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
+        "test_known_truths.py::test_truth_7_371_a_captain_ashore_has_nothing_of_the_ship_but_the_boats_report",
+        "test_known_truths.py::test_truth_7_372_a_sleeping_station_is_woken_by_the_call_and_not_by_a_notable_line",
         "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
         "test_knowledge.py::test_the_handover_fold_keeps_the_place",
         "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",
         "test_knowledge.py::test_knowledge_all_turns_the_rule_off",
-        "test_known_truths.py::test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
         "test_known_truths.py::test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where",
         "test_known_truths.py::test_truth_7_376_the_handover_fold_keeps_the_place",
         "test_known_truths.py::test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail",

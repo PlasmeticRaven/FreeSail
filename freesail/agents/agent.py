@@ -547,6 +547,8 @@ OFFICER_DOMAIN = Domain(
             "heave the deep sea lead",
             "make her out",
             "ask the pilot",
+            # the call for the captain below (package 65, step 3; the design's §7)
+            "call the captain",
             # bearings and fixes (package 37g, item 16; the gate's ruling 1: Falconer's
             # lieutenant "superintending the navigation"); a sight, a course shaped and
             # the reckoning set stay the master's for the captain
@@ -1371,10 +1373,16 @@ OFFICER_BRIEF = (
     "when he resumes you. Three orders in a watch on your own word to avoid a danger "
     "bring a word from the harness and no more.\n\n"
     "The captain may ask you a question (answer it with the answer tool, plainly, from "
-    "the readings and the log) or tell you something; call him with a word in the log "
-    "when a thing is his to decide, as a lieutenant of 1806 informed the captain of every "
-    "strange sail and every shift of wind; what you say is notable in the log, with the "
-    "deck or without. When the harness asks for it, and when you give the deck back "
+    "the readings and the log) or tell you something; an order he tells you to carry out "
+    "is his word for it, never refused. Report to the captain what the Regulations gave "
+    "the lieutenant to report (a strange sail, a shift of wind, the land): 'say to the "
+    "captain ...' reaches him below; 'call the captain: <why>' when the ship is in danger "
+    "or by night, which wakes him. When he cannot command (ashore, in the boat, wounded "
+    "below) the command devolves on the senior officer, you with the deck: the log says "
+    "so, his authority is yours with his standing orders as your guide, until he gives an "
+    "order again. What you say is notable in the log, with the deck or without. When the "
+    "harness asks for it, and when you give "
+    "the deck back "
     "(hand_over) or stand down (stand_down), write the handover note in the officer's "
     "voice: what happened, what was ordered, what you noticed, what you are watching for; "
     "it is journaled and said in the log, and whoever takes the deck or the station next "
@@ -2638,6 +2646,9 @@ class AgentState:
     # of the empty replies in a row, how many were words written into the journal and
     # nothing said in the world (decision 60), for the nudge's words
     empty_noted: int = 0
+    # the officer told once, the captain gone below while he has the deck, that the duty
+    # to report is his (package 65, step 3); said again when the captain goes below again
+    report_duty_told: bool = False
 
     @property
     def released(self) -> bool:

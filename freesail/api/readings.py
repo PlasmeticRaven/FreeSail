@@ -3121,6 +3121,11 @@ _event(EventSpec("her sails lifting", "ship.lifting"))  # package 37k
 _event(EventSpec("a spar carrying away", "spar.carried_away"))
 _event(EventSpec("a sail blown out", "sail.blown_out"))
 _event(EventSpec("all hands called", "crew.all_hands"))
+# the officer's report and call to the captain below, the boat's report at the quay
+# (package 65, step 3)
+_event(EventSpec("a report", "report.made"))
+_event(EventSpec("the captain called", "report.called"))
+_event(EventSpec("the boat's report", "report.boat"))
 _event(EventSpec("the watch piped down", "crew.piped_down"))
 # a squall (spec M5 §3): the wind's own event in unstable air, logged by name
 _event(EventSpec("a squall", "weather.squall"))

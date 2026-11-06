@@ -788,6 +788,14 @@ verbs:
   # The people (spec M5 §22; `freesail/orders/people.py`): the object `person` takes the
   # words after the verb as said (a role or a surname). "Pass the word for" is the
   # period's call about the decks; "send for" the captain's to his cabin.
+  # The officer of the watch's call for the captain below or asleep (package 65, step 3;
+  # the design's §7): `call the captain`, `call the captain: land close ahead`, a line in
+  # the log that reaches him wherever he is aboard and wakes him; from the captain himself
+  # refused in words (`freesail/world/reports.py`).
+  call the captain:
+    synonyms: [send for the captain, pass the word for the captain, call the captain to the deck]
+    object: person
+    level: 1
   send for:
     synonyms: [pass the word for, send aft for, send for the, pass the word for the, summon,
                call the carpenter, call the master, call the surgeon, call the boatswain,
