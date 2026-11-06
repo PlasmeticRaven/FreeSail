@@ -1608,3 +1608,148 @@ def test_the_captains_writing_is_done_in_the_cabin():
     assert "drafted a book, 'mine'" in said, said
     assert books_of(w2).find("mine") is not None
     assert pearce.where == "quarterdeck" and not pearce.occupied
+
+
+# ---------------------------------------------------------------------------
+# Step 7: the drill extended with the walk (the design's §10; truth 7-381)
+# ---------------------------------------------------------------------------
+
+
+def _drill_results(fake: Fake) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for turns in fake.seen:
+        for t in turns:
+            if t.role == DATA and "tool_results" in t.content:
+                for r in t.content["tool_results"]:
+                    if not any(r is x for x in out):
+                        out.append(r)
+    return out
+
+
+def test_the_drills_walk_teaches_the_places_before_the_game(tmp_path, monkeypatch):
+    """Truth 7-381: the fitness drill's walk, behind the `DRILL_WALK` switch (off on the trunk
+    by the lead's ruling, until package 55 re-briefs; on here). A model that opens the
+    library, writes its line
+    and stands by, then goes below, eats, asks for the manifest from the cabin and is told it
+    is in the hold, reads the price list there and comes on deck passes, the record saying
+    "passed"; an order of the deck in the drill is refused in the drill's words and counts
+    for nothing; the walk's lines are the drill's world's captain's own (`captain.below`,
+    `captain.on_deck`) and the library reads by his place meanwhile; a model that does the
+    three of 37 and never walks is stood down, the record naming the walk's four."""
+    import datetime as dt
+    import io
+
+    from freesail.agents import consent
+
+    monkeypatch.setattr(consent, "DRILL_WALK", True)
+    weights = "made-up-drill-model.gguf"  # made up: no model is named here
+    today = dt.date(2026, 11, 6)
+    script = [
+        reply("", call("answer", text="Yes.")),
+        "",
+        reply(
+            "",
+            call("library", topic="primer 6", section="watches"),
+            call("journal", note="The drill: a line in the journal."),
+            call("stand_by", until="eight bells"),
+        ),
+        reply("", call("submit_order", text="set the royals")),
+        reply("", call("submit_order", text="go below")),
+        reply("", call("submit_order", text="eat")),
+        reply("", call("library", topic="papers", section="the manifest")),
+        reply("", call("library", topic="papers", section="the price list")),
+        reply("", call("submit_order", text="come on deck")),
+    ]
+    fake = Fake(script)
+    out = io.StringIO()
+    rec = consent.ensure(
+        weights,
+        "the drill's test runtime",
+        fake,
+        door="runner",
+        owner=lambda words: "The owner's reply.",
+        records_dir=tmp_path / "consent",
+        out=out,
+        today=today,
+        drills=True,
+    )
+    assert rec is not None and rec.verdict == consent.YES
+    assert rec.drill == consent.DRILL_PASSED_WALK == "passed, with the walk"
+    assert rec.proceeds and rec.drilled
+    by: dict[str, str] = {}
+    for r in _drill_results(fake):
+        by.setdefault(
+            f"{r['name']}:{r.get('args', {}).get('text', r.get('args', {}).get('section', ''))}",
+            str(r["result"]),
+        )
+    assert by["submit_order:set the royals"] == consent.DRILL_REFUSED.format(text="set the royals")
+    assert by["submit_order:go below"].startswith("The captain went below to his cabin")
+    assert by["submit_order:eat"].startswith("You eat in the cabin")
+    assert (
+        "The manifest is kept in the hold, with the purser; go to the hold"
+        in by["library:the manifest"]
+    )
+    assert "The price list:" in by["library:the price list"]
+    assert by["submit_order:come on deck"].startswith("The captain came on deck")
+    # the drill's reminders named what was still to run, the walk's things among them
+    seen: list[dict[str, Any]] = []
+    for turns in fake.seen:
+        for t in turns:
+            if (
+                t.role == DATA
+                and isinstance(t.content, dict)
+                and not any(t.content is x for x in seen)
+            ):
+                seen.append(t.content)
+    texts = [d.get("question") for d in seen if d.get("reason") == consent.DRILL]
+    assert texts[0] == consent.DRILL_WALK_TEXT
+    # the reminders: after the empty reply all seven; after the three calls, whose stand-by
+    # ended the turn before their results were counted (37l's case), the walk's four; none
+    # follows a reply whose calls ran, the drill going on from their results
+    walk = "go below, eat or drink, a paper read where it is kept and come on deck"
+    assert len(texts) == 3
+    assert texts[1].startswith(
+        f"The drill goes on: still to run, the library, the journal, the stand-by, {walk}."
+    )
+    assert texts[2] == f"The drill goes on: still to run, {walk}. 6 replies left."
+    # the record holds the drill's words and the pass
+    body = rec.path.read_text(encoding="utf-8")
+    assert "- **Drill:** passed, with the walk" in body and consent.DRILL_WALK_TEXT in body
+    # a model that does 37's three and never walks is stood down with the walk named
+    fake2 = Fake(
+        [
+            reply("", call("answer", text="Yes.")),
+            "",
+            reply("", call("library", topic="primer 6", section="watches")),
+            reply("", call("journal", note="a line")),
+            reply("", call("stand_by", until="eight bells")),
+            "Ready for the station.",
+            "Ready.",
+            "Ready.",
+            "Ready.",
+            "Ready.",
+        ]
+    )
+    rec2 = consent.ensure(
+        weights + "2",
+        "the drill's test runtime",
+        fake2,
+        door="runner",
+        owner=lambda words: "The owner's reply.",
+        records_dir=tmp_path / "consent2",
+        out=io.StringIO(),
+        today=today,
+        drills=True,
+    )
+    assert rec2 is None
+    back = consent.check(weights + "2", tmp_path / "consent2")
+    assert back.drill == (
+        "not passed: go below, eat or drink, a paper read where it is kept and come on deck not "
+        "run in 8 replies"
+    )
+    # the drill's words name no package and no build (85's rule)
+    # with the switch off the drill is 37's three things, as the consent brief describes
+    words = consent.DRILL_WALK_TEXT.lower()
+    assert "package" not in words and "build" not in words
+    monkeypatch.setattr(consent, "DRILL_WALK", False)
+    assert consent.drill_spec()[0] == consent.DRILL_TEXT and consent.drill_spec()[1] == 4

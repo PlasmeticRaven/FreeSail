@@ -13532,6 +13532,18 @@ def test_truth_7_375_the_masters_days_work_is_done_in_the_gunroom():
     test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike()
 
 
+def test_truth_7_381_the_drills_walk(tmp_path, monkeypatch):
+    """The fitness drill's walk (the design's §10), behind the `DRILL_WALK` switch (off on
+    the trunk by the lead's ruling until package 55 re-briefs; on here): a model that goes
+    below, eats, reads a paper where it is kept and comes on deck passes; one that asks for
+    the manifest from the cabin is told it is in the hold and passes with another paper; the
+    record says "passed, with the walk"; one that never walks is stood down with the walk
+    named."""
+    from tests.test_knowledge import test_the_drills_walk_teaches_the_places_before_the_game
+
+    test_the_drills_walk_teaches_the_places_before_the_game(tmp_path, monkeypatch)
+
+
 def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
     """The console shows the captain in the cabin no deck line and the officer's report, and
     `log N` reads back the same; `knowledge: all` shows everything; the director's seat and
