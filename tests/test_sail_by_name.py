@@ -426,17 +426,34 @@ def test_a_consort_is_named_by_her_pendant_and_a_friend_by_the_private_signal():
 
 
 def test_a_sail_named_reaches_the_next_sample_of_a_station_standing_by():
-    """The harness carries the sail rows when a sail is named, as when she came, went or
-    was made out further: a captain standing by a glass with a brig six miles off, made out
-    no further, gets no strangers' list in his next sample; her name learnt, the one after
-    carries the list with her name."""
+    """From the model's side: a captain's station held by a fake standing by a glass, a
+    brig lying to within hail, made out to her colours. With nothing changed his next sample
+    carries no strangers' row; the brig hailed and answering with her name, the sample after
+    carries the row again with her name; lost sight of and closed again, the row comes once
+    more, nameless, a stranger until she is spoken again."""
     from tests.test_known_truths import _captain_standing_by_a_glass, _samples
 
-    w, h = _captain_standing_by_a_glass("49 48 N 5 28 W", "bound from Falmouth for Penzance")
+    w, h = _captain_standing_by_a_glass("49 48.25 N 5 36 W", "bound for the Lizard")
+    brig = next(v for v in w.vessels.active() if v.name == "Two Brothers")
+    brig.plan = [("lie_to", math.inf)]
     w.run(1800 + 5)
-    assert "strangers" not in _samples(h)[1]["readings"]
-    fid = next(f for f in w.lookout._sails_seen)
-    w.lookout._sail_ident = {fid: {"name": "Two Brothers", "how": "by hail", "tick": 0}}
+    n = len(_samples(h))
+    assert "strangers" not in _samples(h)[-1]["readings"]
+    brig.position = destination(w.position, 0.0, 0.2 * 1852.0)  # kept within hail
+    e = w.submit("hail the brig: what ship is that?")
+    assert e.kind == "hail.answered" and "Two Brothers" in e.data["answer"], e.text
     w.run(1800)
-    told = _samples(h)[2]["readings"].get("strangers")
-    assert told and told.startswith("the Two Brothers, a sail"), told
+    later = _samples(h)[n:]
+    told = [s["readings"].get("strangers") for s in later if "strangers" in s["readings"]]
+    assert told and told[0].startswith("the Two Brothers, a "), told
+    # lost sight of, and closed again: the row once more, and nameless
+    brig.position = destination(w.position, 0.0, 30 * 1852.0)
+    w.run(1800)
+    brig.position = destination(w.position, 0.0, 0.25 * 1852.0)
+    m = len(_samples(h))
+    w.run(1800)
+    again = [
+        s["readings"].get("strangers") for s in _samples(h)[m:] if "strangers" in s["readings"]
+    ]
+    assert again and "Two Brothers" not in again[-1], again
+    assert again[-1].startswith("a brig") or again[-1].startswith("a merchant brig"), again
