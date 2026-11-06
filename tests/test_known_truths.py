@@ -13582,3 +13582,33 @@ def test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_offic
         Path(tempfile.mkdtemp())
     )
     test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go(Path(tempfile.mkdtemp()))
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 3 (`docs/design/Design-DoorAndVisitor.md` §4): a far hull's hail
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits():
+    """Two hulls at far detail, a fake at each captain's station; the brig's captain hails
+    the cutter. The cutter's log hears it and her captain's sample carries it; nothing
+    answers by table on either side; the brig's log says she has not yet answered; the
+    cutter's captain answers with his own hail and the brig's log carries his words. A ship
+    nobody holds, far as she is, is answered by table as before."""
+    from tests.test_far_hail import (
+        test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer,
+        test_a_ship_nobody_holds_is_answered_by_table_far_or_full,
+    )
+
+    test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer()
+    test_a_ship_nobody_holds_is_answered_by_table_far_or_full()
+
+
+def test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads():
+    """The passage of 7-393, saved after the answer, replays by the transcripts and by the
+    acts to the game's log and each hull's log alike, the answer heard in the brig's."""
+    from tests.test_far_hail import (
+        test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs,
+    )
+
+    test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs()

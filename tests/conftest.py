@@ -454,6 +454,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 82b, item 2: the visitor's name (7.6 s alone, 2026-11-06)
         "test_visitor_name.py::test_the_visitor_is_named_by_his_station_his_ship_and_hers",
         "test_known_truths.py::test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers",
+        # package 82b, item 3: a far hull's hail, two hulls asleep with a fake at each
+        # captain's station (8 to 12 s alone, 2026-11-06)
+        "test_far_hail.py::test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer",
+        "test_far_hail.py::test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs",
+        "test_known_truths.py::test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits",
+        "test_known_truths.py::test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads",
     }
 )
 

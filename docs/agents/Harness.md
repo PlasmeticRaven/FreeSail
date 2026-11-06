@@ -459,6 +459,11 @@ host's own officer of the watch keeps her name and is answered by her own harnes
 the visitor's words begin with. The name is the station's key, lower-case as every station's
 name is.
 
+A hail of a ship whose captain a model holds goes to that model whatever her hull's shape
+(package 82b, item 3): a hull asleep at far detail hears it in her log as an awake one does,
+her captain's sample carries it, and he answers with his own `hail`; the table answers only a
+ship nobody holds, and meanwhile the hailer's log says she has not yet answered.
+
 ## 17b. The seat on another ship, the boat, and the readings following the person (package 82)
 
 **The player's own seat on another ship.** `--seat captain --ship <name>` at the console and
