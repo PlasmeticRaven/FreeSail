@@ -136,6 +136,13 @@ _TO_SHIP = re.compile(
 )
 
 
+_TO_SHIP_FIRST = re.compile(
+    r"^(?P<with>)(?P<before>)(?:to|aboard|alongside)\s+"
+    r"(?:the\s+)?(?P<ship>[\w' -]+?)(?:\s+with\s+(?P<carry>.+?))?(?:\s+for\s+(?P<fetch>.+?))?\s*$",
+    re.I,
+)
+
+
 def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], list[Any]] | None:
     """`send the boat to the <ship> [with <persons>] [for <persons>]` (package 82): the
     hull named, the persons of this company she carries and the persons of hers she is
@@ -148,7 +155,11 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
         if text.lower().startswith(lead):
             text = text[len(lead) :].strip()
             break
-    m = _TO_SHIP.match(text)
+    # the words that begin with 'to' name the ship from the first of them ('to the brig
+    # abeam to starboard with the master'; package 95: the lookout's words for her)
+    from freesail.world import lookout
+
+    m = (_TO_SHIP_FIRST.match(text) if lookout.SAIL_BY_NAME else None) or _TO_SHIP.match(text)
     if m is None or not m.group("ship"):
         return None
     name = m.group("ship").strip()
@@ -168,6 +179,10 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
         from freesail.world.movement import BOAT_BETWEEN_NM
 
         vessel = world.vessels.find(name.strip('"'))
+        if vessel is None:
+            from freesail.world.lookout import vessel_in_sight
+
+            vessel = vessel_in_sight(world, name)  # a sail in sight by the lookout's words
         here = getattr(world, "position", None)
         if vessel is None or here is None:
             return None
@@ -177,7 +192,7 @@ def _boat_to_ship(world: Any, phrase: str, rest: str) -> tuple[Any, list[Any], l
                 f"The {vessel.name} is {distance_words(metres)} off, beyond a boat's pull "
                 f"({BOAT_BETWEEN_NM:g} mile); close her first."
             ) from None
-        target = hull_named(world, name)  # within reach: her hull made as the boat goes
+        target = hull_named(world, vessel.id)  # within reach: her hull made as the boat goes
     if target is world or target is getattr(world, "own", None):
         raise OrderError("The boat is sent to another ship, not to her own.")
     if not isinstance(target, type(getattr(world, "own", None))):

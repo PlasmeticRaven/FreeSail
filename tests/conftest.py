@@ -474,6 +474,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_boat_names.py::test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay",
         "test_boat_names.py::test_a_person_of_another_ship_named_in_the_order_is_refused_in_words",
         "test_known_truths.py::test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_refused",
+        # package 95: the recorded passages played with the resolver on and off (58 s alone),
+        # the narrowing's cases together (9 s) and the lookout's seated hail (6 s), 2026-11-06
+        "test_known_truths.py::test_truth_7_399_the_recorded_passages_name_their_sails_as_before",
+        "test_known_truths.py::test_truth_7_395_the_resolver_narrows_by_the_kind_the_quarter_the_bearing_and_the_distance",
+        "test_sail_by_name.py::test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb",
     }
 )
 

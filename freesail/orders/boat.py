@@ -204,10 +204,15 @@ def _pull_for(world: Any, ship: Any, oars: Any, rest: str) -> Result:
             name = f"the {boats.hull_name_of(other)}"
         else:
             v = world.vessels.find(rest)
+            if v is None:
+                # a sail in sight as the lookout names her (package 95): 'pull for the brig on
+                # the larboard quarter', 'pull for the sail bearing NE'
+                v = sail_in_sight(world, rest)
             if v is None or v.done:
                 raise OrderError(
                     f"No sail or shore answers to {rest!r}; say 'the ship', 'the quay', a sail "
-                    "by her name, a point or a position."
+                    "by her name or as the lookout names her ('the brig on the larboard "
+                    "quarter'), a point or a position."
                 )
             mark = {"vessel": str(v.id), "name": v.name}
             name = v.name
@@ -218,6 +223,20 @@ def _pull_for(world: Any, ship: Any, oars: Any, rest: str) -> Result:
     oars.out, oars.manned, oars.stroke = True, oars.number, FULL
     boats.tick_boat(world)  # the first turn of the helm at once
     return "boat.oars", f"Pull for {name}: the oars out, giving way together.", _data(oars)
+
+
+def sail_in_sight(world: Any, words: str) -> Any:
+    """The vessel a sail in sight is, named as the lookout names her
+    (`Lookout.sail_named`), or None: the boat's own lookout where she keeps one, else her
+    ship's."""
+    from freesail.world import boats
+    from freesail.world.lookout import vessel_in_sight
+
+    for w in (world, boats.ship_of(world, getattr(world, "own", None))):
+        v = vessel_in_sight(w, words, getattr(world, "vessels", None)) if w is not None else None
+        if v is not None:
+            return v
+    return None
 
 
 def _mast(ship: Any, up: bool) -> Result:

@@ -17721,3 +17721,52 @@ quiet. Four held hulls cost about a third of the pace either way. Five awake cos
 worth over the cap, as package 43's measure has it (a crewed hull costs what the frigate costs),
 and stays above `CREWED_FLOOR_TICKS_S` (60) here; the owner's machine is about half the build
 machine's figure.
+
+## Package 95: the sail by her name (2026-11-06)
+
+`docs/design/Design-SailByName.md` holds the design; these are its judgements and what was
+measured.
+
+**The allowances** (`world/lookout.py`, judgement: the lookout's own rounding and a minute's
+swing between his words and the order). **`BEARING_SLACK_DEG`**, a point and a half
+(16.875 degrees): he says a bearing to the nearest point (half a point's rounding) and the
+sail's bearing draws by a point or so in the minute between his look and the order at close
+range. **`DISTANCE_SLACK = 2.0`**, half to twice the distance said, judged against his own
+estimate (`judged_m`) and not the truth: his estimate is a sixth out either way at the most
+(package 37d) and is said to the cable, the mile or the league, so "a mile" stands for
+anything from about eight cables to a mile and a half. **`QUARTER_SLACK_POINTS = 1.0`**, a
+point either way of `relative_words`' sectors (ahead under one point, the bow to six, abeam to
+ten, the quarter to fifteen, astern beyond): a sail on the edge of the bow when he spoke may
+be abeam by the order. The closer sail, where more than one answers, is by the true distance,
+as every resolver of the trunk had it.
+
+**What was taken another way.** The resolver is reached only where the trunk's own words found
+nothing (`Lookout.find`'s generic words, its rig words and the chart's names first; the hail's
+pronouns, its names on the sea and its kinds first; `pull for`'s hulls and `Vessels.find`
+first), so every naming that resolved before resolves to the same sail; and `Lookout.find`
+takes it only when its caller hands the world (`make her out`, `the glass on`, `give chase`,
+`the bearing of`), so the rules captain's own `chase the <rig>` (`captains._chase_order`, which
+asks `find` whether the lookout knows the rig) is as it was: had it reached the resolver, a rig
+of two words made out ("privateer schooner") would have turned his "give chase" into "chase the
+privateer schooner" and moved the recorded passages. The boat's `_TO_SHIP` read "to the brig
+abeam to starboard with the master" at its last "to", so the words that begin with one are
+read from the first (`_TO_SHIP_FIRST`). The brig off Falmouth's lesson 2 was not the grammar's:
+`orders/stations.py`'s `_HAIL` refused every hail that began with "the pilot", so the lookout's
+"hail The pilot's cutter is out of sight" fell to the port's `hail the pilot cutter`; the
+lookahead now holds the pilot's own words and nothing after them (every use in the books and
+the tests is bare), and `orders/signals.hail_parts` reads the lookout's every `hail` as his
+hail of the deck (the masthead trumpets no ship), where only his "hail a <rig> ..." was before.
+
+**The proof by toggle (truth 7-399).** `lookout.SAIL_BY_NAME`, off, makes every order and
+reading name a sail as before (the resolver, the hail's head of clauses, the boat's first
+"to", `make her out`'s joined kind and the refusal's strangers). The encounter (45 minutes),
+the convoy (40) and the first action (60), played by their rules captains with it on and off:
+the counts of the log's lines by kind and the words of every line that names a sail (the
+lookout's, the hail's, the signals', the chase's helm, the orders given and refused) the same.
+No pin was re-measured; no draw is made by the resolver.
+
+**Found on the way.** `the strangers`' item `id` is the vessel's id, which the scenarios write
+as her name: a client reading the row learns a stranger's name before the deck does. Left as it
+is (the viewer's chart and gunnery read it); the lead books it to package 96. Chapter 15 of the
+primer said "the boat sent to her and the prize are not yet in the game", which 82 made untrue
+for the boat: it now sends the boat to chapter 26.
