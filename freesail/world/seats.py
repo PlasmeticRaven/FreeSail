@@ -696,7 +696,8 @@ def _log(world: Any, text: str) -> None:
     """A line in the director's log (`director.seat`), never the play log."""
     from freesail.agents import director as director_mod
 
-    director_mod.log_of(world).append(world, text, kind="director.seat")
+    # on the director's own hull, the player's, whichever is followed (package 97)
+    director_mod.log_of(world).append(director_mod.director_hull(world), text, kind="director.seat")
 
 
 # ---------------------------------------------------------------------------

@@ -481,16 +481,16 @@ def set_brief(
             {"tick": world.clock.tick, "director_brief": resolved.to_dict(), "source": source}
         )
     world.director_brief = resolved
-    stations = getattr(world, "stations", None)
+    stations = getattr(director_hull(world), "stations", None)
     if stations is not None and not stations.aboard(DIRECTOR):
         stations.bind(DIRECTOR, "", kind=DIRECTOR, quiet=True)
     log_of(world).append(
-        world,
+        director_hull(world),
         f"The brief given by {source}: {resolved.name} (limits: {resolved.limits_words()}; "
         f"{resolved.samples_a_day} samples and {resolved.acts_a_day} acts a day).",
         kind="director.brief",
     )
-    held = (getattr(world, "agents", None) or {}).get(DIRECTOR)
+    held = (getattr(director_hull(world), "agents", None) or {}).get(DIRECTOR)
     if held is not None and not held.agent.released:
         held.agent.notices.append(
             f"The player's brief was given anew by {source}: {resolved.name}. Its limits: "
@@ -511,7 +511,7 @@ def _lift_hold(world: Any, brief: DirectorBrief) -> None:
     if b.samples < brief.samples_a_day and b.acts < brief.acts_a_day:
         b.held_until, b.held_why = None, ""
         log_of(world).append(
-            world,
+            director_hull(world),
             f"The hold is lifted by the new brief: {b.samples} of {brief.samples_a_day} "
             f"samples and {b.acts} of {brief.acts_a_day} acts used today.",
             kind="director.budget",
@@ -1369,7 +1369,7 @@ def renew(world: Any) -> str | None:
     s = brief.samples_a_day if brief is not None else DEFAULT_SAMPLES_A_DAY
     a = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
     words = f"The day's budget is renewed ({today}): {s} samples and {a} acts."
-    log_of(world).append(world, words, kind="director.budget")
+    log_of(world).append(director_hull(world), words, kind="director.budget")
     return words
 
 
@@ -1392,7 +1392,7 @@ def _hold(world: Any, why: str) -> str:
         "%Y-%m-%d %H:%M"
     )
     words = f"{why}; the director stands by until the next day ({until})."
-    log_of(world).append(world, words, kind="director.budget")
+    log_of(world).append(director_hull(world), words, kind="director.budget")
     return words
 
 
@@ -1429,9 +1429,19 @@ def budget_words(world: Any) -> str:
 # ---------------------------------------------------------------------------
 
 
+def director_hull(world: Any) -> Any:
+    """The hull the director's station is kept on, the player's own (`World.players`), read
+    by her own handle whichever hull is current or followed (package 97: under `follow` the
+    World's names read the followed hull, and the director's log, its station and its
+    holder are the game's one, on hers); the World itself where it has no hulls."""
+    players = getattr(world, "players", None)
+    return players if players is not None else world
+
+
 def log_of(world: Any) -> Journal:
-    """The director's log: the station's journal, bound to no person (`journal_of`)."""
-    return journal_of(world, DIRECTOR)
+    """The director's log: the station's journal, bound to no person (`journal_of`), kept
+    on the player's own hull (`director_hull`)."""
+    return journal_of(director_hull(world), DIRECTOR)
 
 
 def log_lines(world: Any) -> list[str]:
@@ -1471,8 +1481,8 @@ def reveal(world: Any, by: str = "the player") -> list[str]:
 def noticed_reveal(world: Any, event: Any) -> None:
     """A `director.revealed` line met (made or replayed): the log's entry and the
     director's notice (`World.record` calls it, so a replay says it the same)."""
-    log_of(world).append(world, str(event.text), kind=REVEALED_KIND)
-    held_now = (getattr(world, "agents", None) or {}).get(DIRECTOR)
+    log_of(world).append(director_hull(world), str(event.text), kind=REVEALED_KIND)
+    held_now = (getattr(director_hull(world), "agents", None) or {}).get(DIRECTOR)
     if held_now is not None and not held_now.agent.released:
         held_now.agent.notices.append(
             f"{event.text} He has read every act and its reason to this moment."
@@ -1570,7 +1580,9 @@ def player_word(world: Any, words: str, by: str = "the player", quiet: bool = Fa
         inputs = getattr(world, "inputs", None)
         if inputs is not None:
             inputs.append({"tick": world.clock.tick, "player_word": words, "by": by})
-    log_of(world).append(world, f"{PLAYER_WORD_HEAD} {words}", kind=PLAYER_WORD_KIND, by=by)
+    log_of(world).append(
+        director_hull(world), f"{PLAYER_WORD_HEAD} {words}", kind=PLAYER_WORD_KIND, by=by
+    )
     held_now = seated(world)
     if held_now is not None:
         _tell_director(
@@ -1607,7 +1619,10 @@ def answer_player(world: Any, words: str, by: str = "the director") -> str:
     if not words:
         return "An answer to the player wants some words after 'answer the player:'."
     log_of(world).append(
-        world, f"To the player, apart from the game: {words}", kind=ANSWERED_KIND, by=by
+        director_hull(world),
+        f"To the player, apart from the game: {words}",
+        kind=ANSWERED_KIND,
+        by=by,
     )
     _channel_line(world, "the director", words)
     return (
@@ -1708,7 +1723,7 @@ def _no_way(world: Any, text: str, reason: str, why: str, by: str) -> str:
     log = log_of(world)
     if reason:
         log.append(
-            world,
+            director_hull(world),
             f"Attempted, not performed (the game has no way to do it as said): {text}; the "
             f"game's words: {why}; the reason: {reason}",
             kind="director.attempted",
@@ -1716,7 +1731,7 @@ def _no_way(world: Any, text: str, reason: str, why: str, by: str) -> str:
         )
         return ATTEMPTED_WORDS.format(why=why)
     log.append(
-        world,
+        director_hull(world),
         f"Not performed (the game has no way to do it as said): {text} ({why})",
         kind="director.unperformed",
         by=by,
@@ -1756,9 +1771,11 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         try:
             e = world.follow(followed, source=by or SOURCE)
         except ValueError as err:
-            log.append(world, f"Refused: {text} ({err})", kind="director.refused", by=by)
+            log.append(
+                director_hull(world), f"Refused: {text} ({err})", kind="director.refused", by=by
+            )
             return f"Refused: {err}."
-        log.append(world, e.text, kind="director.follow", by=by)
+        log.append(director_hull(world), e.text, kind="director.follow", by=by)
         return e.text
     renew(world)
     b = budget_of(world)
@@ -1780,7 +1797,7 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         # a seat for a model the harbour's settings cannot call (package 67): refused in
         # words before the World, the settings' model named to the director alone
         log.append(
-            world,
+            director_hull(world),
             f"Refused (the settings call no model by that name): {order.text}",
             kind="director.refused",
             by=by,
@@ -1794,7 +1811,9 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
             f"The day's budget of {acts_allowed} acts is spent: nothing more is performed "
             "until the next day of the ship's time. The order was not given."
         )
-        log.append(world, f"Over the budget: {order.text}", kind="director.refused", by=by)
+        log.append(
+            director_hull(world), f"Over the budget: {order.text}", kind="director.refused", by=by
+        )
         if b.held_until is None:
             _hold(world, f"The day's budget of {acts_allowed} acts is spent")
         return words
@@ -1803,7 +1822,7 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         # the rule of reach (spec M7b §9; package 52): a refusal in words, the stations held
         # named, so that the director knows whom it may speak as
         log.append(
-            world,
+            director_hull(world),
             f"Refused by the rule of reach: {order.text} ({reach_why})",
             kind="director.refused",
             by=by,
@@ -1823,7 +1842,7 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         why = brief.limit_of(world, order)
         if why:
             log.append(
-                world,
+                director_hull(world),
                 f"Refused by the brief: {order.text} ({why})",
                 kind="director.refused",
                 by=by,
@@ -1843,7 +1862,7 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         order = dataclasses.replace(order, reason="")
     if doubted and not order.reason:
         log.append(
-            world,
+            director_hull(world),
             f"Doubted: {order.text} ({doubted}); not performed",
             kind="director.doubted",
             by=by,
@@ -1865,14 +1884,16 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         b.acts += 1
     if order.reason:
         log.append(
-            world,
+            director_hull(world),
             f"Entered again with a reason: {order.text}; the doubt: {doubted or 'none'}; the "
             f"reason: {order.reason}; performed: {done}",
             kind="director.reentered",
             by=by,
         )
     else:
-        log.append(world, f"Given: {order.text}; {done}", kind="director.order", by=by)
+        log.append(
+            director_hull(world), f"Given: {order.text}; {done}", kind="director.order", by=by
+        )
     tail = ""
     if b.acts >= acts_allowed and not free:
         tail = " " + _hold(world, f"The day's budget of {acts_allowed} acts is spent")
@@ -2026,7 +2047,7 @@ def seated(world: Any) -> Any:
     """The director's station held now (a model's harness or the player's seat), or None."""
     from freesail.agents.harness import holder_of
 
-    return holder_of(world, DIRECTOR)
+    return holder_of(director_hull(world), DIRECTOR)
 
 
 def questions_of(world: Any) -> list[dict[str, Any]]:
@@ -2141,7 +2162,9 @@ def ask_unheld(
         )
         person_journal(world, person).append(world, f"Asked by {asker}: {question}?", HEARD_KIND)
         log_of(world).append(
-            world, f"Asked of {who} ({where}) by {asker}: {question}?", kind="director.asked"
+            director_hull(world),
+            f"Asked of {who} ({where}) by {asker}: {question}?",
+            kind="director.asked",
         )
         data["question"] = question
         return "agent.asked", f"{head}, {asker_at}, asks {who} ({where}): {question}?", data
@@ -2154,7 +2177,9 @@ def ask_unheld(
     )
     if journal:  # a word to an unheld station is kept in its journal already (37l)
         person_journal(world, person).append(world, f"Told by {asker}: {words}", HEARD_KIND)
-    log_of(world).append(world, f"Told {who} ({where}) by {asker}: {words}", kind="director.asked")
+    log_of(world).append(
+        director_hull(world), f"Told {who} ({where}) by {asker}: {words}", kind="director.asked"
+    )
     data["words"] = words
     return "agent.told", f"{head}, {asker_at}, to {who} ({where}): {words}", data
 

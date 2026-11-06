@@ -147,11 +147,11 @@ def seat_world(world: Any) -> Any:
     """The hull a seat is made on (package 82, item 2; the design's §4): the followed
     hull's façade when the drivers follow another ship than the player's own (`--seat
     officer --ship Raven`: a seat on her hull, which stays hers when the drivers move on),
-    else the World as it was given."""
+    and the player's own hull's façade otherwise (package 97: a seat holding the World read
+    the running hull's fields from inside another hull's block, and the followed hull's
+    under `follow`); a World without hulls as it was given."""
     if isinstance(getattr(world, "hulls", None), dict):
-        own = world.own
-        if own is not world.players:
-            return own
+        return world.own
     return world
 
 

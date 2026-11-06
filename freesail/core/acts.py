@@ -132,7 +132,13 @@ def target_of(world: Any, entry: dict[str, Any]) -> Any:
     so in play), else the World itself (the followed hull)."""
     ship = str(entry.get("ship") or "")
     if not ship:
-        return world
+        # the player's own hull's ("" by `hull_id_of`), given to her by her own handle when
+        # another hull is current or followed (package 97: under `follow` the World's names
+        # read the followed hull, and her act would land there); the World itself otherwise
+        players = getattr(world, "players", None)
+        if players is None or getattr(world, "own", None) is players:
+            return world
+        return players
     hulls = getattr(world, "hulls", None) or {}
     hull = hulls.get(ship)
     if hull is not None:
