@@ -118,6 +118,10 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_knowledge.py::test_the_player_goes_aboard_another_ship_in_his_own_boat_and_the_prompt_follows_him",
         "test_known_truths.py::test_truth_7_382_the_player_at_the_prompt_reads_by_his_place",
         "test_known_truths.py::test_truth_7_420_the_command_devolves_on_the_held_officer_and_is_given_back",
+        # package 65, step 6: a model master through the noon's day's work (eighty minutes of
+        # the ship's time with a station seated; 13 s under load)
+        "test_knowledge.py::test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike",
+        "test_known_truths.py::test_truth_7_375_the_masters_days_work_is_done_in_the_gunroom",
         "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
         "test_knowledge.py::test_the_handover_fold_keeps_the_place",
         "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",
