@@ -97,6 +97,13 @@ CREWED_DEMOTE_NM = 6.0
 # the sixty times the owner plays at, on the build machine, half the figure measured.
 CREWED_CAP = 3
 CREWED_FLOOR_TICKS_S = 60.0
+# A hull whose captain a model holds through a door is held over the cap (package 82b,
+# item 4; `Design-DoorAndVisitor.md` §5): ranked with the dealings, and up to this many such
+# hulls left out of the cap's count, so that a model at a captain's station within the range
+# is not put to sleep to make room for the rules' ships (judgement, from the owner's "four or
+# five" sail in company; the pace of a convoy with four held hulls in docs/dev/TuningNotes.md).
+# A cap of nought (`crewed: {cap: 0}`, nobody promoted) has no allowance over it.
+HELD_OVER_CAP = 2
 # A dealing with the player (a chase, a hail) counts for a glass (judgement).
 DEALING_S = 1800
 # The doubt of a crewed vessel's own account at her promotion: half a mile (judgement:
@@ -822,6 +829,21 @@ def _stationed(vessel: Any) -> bool:
     return bool(getattr(hull, "agents", None)) if hull is not None else False
 
 
+def model_held(vessel: Any) -> bool:
+    """Whether a model holds her captain's station through a door (package 82b, item 4): a
+    harness at `captain` on her hull, started and not released, with its door (the door is
+    carried in the save, so that a replay, whose model is the transcript's, ranks her alike);
+    the player's seat and a harness driven by no door (a test's) are stationed, not held."""
+    from freesail.agents.agent import CAPTAIN
+    from freesail.agents.harness import Harness
+
+    hull = getattr(vessel, "crew", None)
+    h = (getattr(hull, "agents", None) or {}).get(CAPTAIN) if hull is not None else None
+    if not isinstance(h, Harness) or not h.started or h.agent.released:
+        return False
+    return bool(getattr(h, "door", ""))
+
+
 def switch(world: World) -> None:
     """The crewed promotion by the distance from the centre, once a minute: demoted
     beyond `CREWED_DEMOTE_NM`; promoted within `CREWED_NM` up to the cap in the cap's order
@@ -831,6 +853,7 @@ def switch(world: World) -> None:
     full. A hull at anchor or in port is awake like any other (the owner's decision 6), and
     a stationed hull is never demoted by the range under `crewed: {stationed: always}`."""
     release_done(world)
+    far_dangers(world)
     centre = world.position
     if centre is None:
         return
@@ -849,8 +872,19 @@ def switch(world: World) -> None:
         return _dealing(world, v) or (always and _stationed(v))
 
     def rank(v: Any) -> int:
-        # the cap's order: dealings first, then a stationed hull, then the rest
-        return 0 if _dealing(world, v) else (1 if _stationed(v) else 2)
+        # the cap's order: dealings and a hull a model holds first (package 82b), then a
+        # stationed hull, then the rest
+        if _dealing(world, v) or model_held(v):
+            return 0
+        return 1 if _stationed(v) else 2
+
+    # a cap of nought is a scenario's word that nobody is promoted (the tender's day, truth
+    # 7-200, sails her asleep by intent): no allowance is made over it
+    over = HELD_OVER_CAP if cap > 0 else 0
+
+    def counted(held: list[Any]) -> int:
+        # the cap's count, up to `HELD_OVER_CAP` hulls a model holds left out (package 82b)
+        return len(held) - min(over, sum(1 for c in held if model_held(c)))
 
     # demotions
     for v in list(crewed(world)):
@@ -870,7 +904,7 @@ def switch(world: World) -> None:
     wanted.sort(key=lambda v: (rank(v), far_nm[v.id]))
     for v in wanted:
         held = crewed(world)
-        if len(held) < cap:
+        if counted([*held, v]) <= cap:  # a hull a model holds, over the cap by the allowance
             promote(world, v)
             continue
         if rank(v) == 2:
@@ -882,6 +916,104 @@ def switch(world: World) -> None:
         farthest = max(lower, key=lambda c: far_nm.get(c.id, 0.0))
         demote(world, farthest)
         promote(world, v)
+
+
+def far_dangers(world: Any) -> None:
+    """A hull a model holds, asleep at far detail, is not half blind (package 82b, item 4;
+    `Design-DoorAndVisitor.md` §5): where the cap holds her asleep, her plan keeps her off
+    the land and the charted dangers as her rules captain does awake. The leg she stands
+    on is tried by the chart as package 88's rule tries it (`Captain._danger_ahead_by_chart`:
+    the chart's coast along her head, `Chart.line_shore`, and the charted dangers on her
+    track with too little water for her, `Chart.dangers_ahead`, within the doctrine's
+    `danger_ahead_nm` and nearer than the leg's own mark, once in `DANGER_AHEAD_AGAIN_S`);
+    one that stands into danger is put about by the plan's own order (`far_perform`), said
+    in her log as an urgent line, which wakes her captain's station as on a full hull."""
+    from freesail.world.captains import DANGER_AHEAD, DANGER_AHEAD_AGAIN_S
+
+    chart = getattr(world, "chart", None)
+    vessels = getattr(world, "vessels", None)
+    if not DANGER_AHEAD or chart is None or vessels is None:
+        return
+    tick = int(world.clock.tick)
+    for v in list(vessels.vessels):
+        hull = getattr(v, "crew", None)
+        if v.done or hull is None or getattr(hull, "shape", "") != "far" or not model_held(v):
+            continue
+        extra = getattr(hull.ship, "extra", None)
+        if not isinstance(extra, dict):
+            continue
+        if tick - int(extra.get("far_danger_tick", -(10**9))) < DANGER_AHEAD_AGAIN_S:
+            continue
+        what = _far_danger_ahead(hull, v, chart)
+        if not what:
+            continue
+        from freesail.world.signals import far_perform
+
+        extra["far_danger_tick"] = tick
+        did = far_perform(world, v, "put her about")
+        hull.record(
+            Severity.URGENT,
+            "plan.danger",
+            f"{what[:1].upper()}{what[1:]}: the plan puts her about; she {did} (the far "
+            "shape's order: the hull sleeps, and her captain is called).",
+            data={"ship": v.id, "what": what, "did": did},
+        )
+
+
+def _pilot_water(hull: Any, plan: list[Any]) -> bool:
+    """Whether the far plan's leg in hand is a port's own track in (`Captain._inner_leg`'s
+    pilot water, read on the far body's plan, which keeps the marks' places and not their
+    kinds): the plan ends at that port's anchor and the leg's mark is one of its `from_sea`
+    marks after the first, its `in` marks or its anchorage, the charted way in, which the far
+    body sails mark to mark with no account to set her off it (found on truth 7-200: the
+    Raven put about by her land ahead between the Sound's mark and Cawsand Bay, and never
+    reached Plymouth)."""
+    last = plan[-1]
+    dealings = getattr(hull, "dealings", None)
+    if last[0] != "anchor" or not last[1] or dealings is None:
+        return False
+    port = (getattr(dealings, "ports", None) or {}).get(last[1])
+    if port is None:
+        return False
+    # the sea's end of the track (its first `from_sea` mark) is where she joins it from the
+    # open sea, a leg the check still judges
+    marks = [*dealings._track_marks(port, "from_sea")[1:], *dealings._track_marks(port, "in")]
+    inner = [m[1] for m in marks] + [port.anchorage.position]
+    mark = plan[0][1]
+    return any(bearing_and_distance(mark, m)[1] <= units.CABLE for m in inner)
+
+
+def _far_danger_ahead(hull: Any, v: Any, chart: Any) -> str:
+    """The land or a charted danger on the far body's head within the doctrine's reach, in
+    the log's words; "" for none (88's test, on the plan's leg: her place and her head)."""
+    from freesail.api.readings import AHEAD_ABEAM_M
+    from freesail.world.captains import plain_cables
+    from freesail.world.geo import destination
+
+    plan = list(getattr(v, "plan", None) or [])
+    if not plan or plan[0][0] in ("lie_to", "anchor") or float(v.speed_kn or 0.0) <= 0.0:
+        return ""
+    doctrine = getattr(getattr(hull, "captain", None), "doctrine", None)
+    th = doctrine.threshold if doctrine is not None else (lambda k, d=None: d)
+    reach = float(th("danger_ahead_nm", 1.5)) * units.NAUTICAL_MILE
+    here, head = v.position, float(v.heading_deg)
+    leg = plan[0]
+    if leg[0] == "to" and len(leg) > 1 and isinstance(leg[1], Position):
+        if bearing_and_distance(here, leg[1])[1] <= reach:
+            return ""  # she is making for it
+        if _pilot_water(hull, plan):
+            return ""  # a port's inner track, where the awake captain does not judge either
+    shore = chart.line_shore(here, destination(here, head, reach), 0.0)
+    if shore is not None and shore[2]:
+        along = bearing_and_distance(here, shore[1])[1]
+        return f"the land ahead by the chart, {plain_cables(max(along, units.CABLE))}"
+    body = getattr(getattr(hull, "ship", None), "hull", None)
+    draught = float(body.spec.draught_m) if body is not None else 2.0
+    found = chart.dangers_ahead(here, head, reach, AHEAD_ABEAM_M, tide_m=0.0, wants_m=draught + 1)
+    if not found:
+        return ""
+    f, along, _off, _side = min(found, key=lambda t: t[1])
+    return f"{f.name} ahead by the chart, {plain_cables(max(along, units.CABLE))}"
 
 
 # ---------------------------------------------------------------------------

@@ -455,6 +455,25 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_door_follows.py::test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down",
         "test_known_truths.py::test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save",
         "test_known_truths.py::test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness",
+        # package 82b, item 2: the visitor's name (7.6 s alone, 2026-11-06)
+        "test_visitor_name.py::test_the_visitor_is_named_by_his_station_his_ship_and_hers",
+        "test_known_truths.py::test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers",
+        # package 82b, item 3: a far hull's hail, two hulls asleep with a fake at each
+        # captain's station (8 to 12 s alone, 2026-11-06)
+        "test_far_hail.py::test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer",
+        "test_far_hail.py::test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs",
+        "test_known_truths.py::test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits",
+        "test_known_truths.py::test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads",
+        # package 82b, item 4: the hulls a model holds over the cap, and the far plan's danger
+        # (4 to 14 s alone, 2026-11-06)
+        "test_held_hulls.py::test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance",
+        "test_held_hulls.py::test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was",
+        "test_known_truths.py::test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks",
+        # package 82b, item 5: the boat's names, three hulls beside the frigate (5 to 17 s alone,
+        # 2026-11-06)
+        "test_boat_names.py::test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay",
+        "test_boat_names.py::test_a_person_of_another_ship_named_in_the_order_is_refused_in_words",
+        "test_known_truths.py::test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_refused",
     }
 )
 

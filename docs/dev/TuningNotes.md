@@ -17689,3 +17689,35 @@ the frigate at the view 230; ruff check and ruff format --check clean. The first
 the step's tree, before the mending above, failed five tests of the fast tier and five of the
 slow (item (d) to (g) above); both runs are in the commits' messages. The whole suite is the
 lead's in the cloud at the merge.
+
+## Package 82b: the hulls a model holds, over the cap (2026-11-06)
+
+**`crews.HELD_OVER_CAP = 2`** (judgement, `docs/design/Design-DoorAndVisitor.md` §5; the
+owner's convoy of the testing week: "four or five" sail in company, four of them held by
+models). A hull whose captain's station a model holds through a door (`crews.model_held`: a
+harness at `captain`, started, not released, with its door, which the save carries) ranks with
+the dealings in the cap's order, and up to two such hulls are left out of the cap's count: the
+three of `CREWED_CAP` and two held beside them, five awake beside the player's. Past the
+allowance a held hull takes the farthest unheld hull's place, as a stationed one does under
+the cap. A cap of nought (`crewed: {cap: 0}`, data/scenarios/tender.yaml) has no allowance:
+the scenario's word is that nobody is promoted, and truth 7-200 sails the Raven asleep with a
+model at her captain's station. The range and its hysteresis are unchanged: a held hull beyond six miles sleeps, and
+her plan's danger check (`crews.far_dangers`, 88's chart test on the far body's leg) keeps her
+off the land and the rocks while she does.
+
+**The pace of a convoy, informatively** (no pace truth moved or added; this container's four
+cores, `tests/test_held_hulls.py`'s `_sail` and `_seat`: six merchant brigs hove to in a line
+one to three miles from the frigate, the fakes' samples every hour, 900 ticks after two
+minutes' settling, two runs each):
+
+| held hulls | awake beside the player's | ticks a second |
+|---|---|---|
+| none | 3 (the cap) | 165, 167 (under load); 167, 171 (quiet) |
+| four | 5 (the cap and the allowance) | 108, 102 (under load); 113, 110 (quiet) |
+
+The first pair of each row was measured while the fast tier ran beside it (load 4.9 on four
+cores); the second on the merged tree (the trunk at 2b59ea4 brought in) with the machine
+quiet. Four held hulls cost about a third of the pace either way. Five awake costs about two crewed hulls'
+worth over the cap, as package 43's measure has it (a crewed hull costs what the frigate costs),
+and stays above `CREWED_FLOOR_TICKS_S` (60) here; the owner's machine is about half the build
+machine's figure.

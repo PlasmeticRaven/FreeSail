@@ -13593,3 +13593,106 @@ def test_truth_7_389_a_say_reaches_every_hull_within_hearing_and_a_wake_names_it
     test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard()
     test_the_wakes_reason_names_the_speaker_and_the_kind()
     test_a_station_is_never_woken_by_its_own_word()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 2 (`docs/design/Design-DoorAndVisitor.md` §3): the visitor's name
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers():
+    """A station whose person goes aboard another ship is named there "officer of the
+    watch, of the X, aboard the <host>": in the host's stations, the desk's listing,
+    `where am I` and the log's mark. He is addressed by that name with its commas or
+    without, by "the officer of the watch of the X" and by his person's name; the host's own
+    officer of the watch is unchanged and answered by her own harness; home again, his own
+    station is his and the visitor's name is let go."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_visitor_name import (
+        test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go,
+        test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own,
+        test_the_visitor_is_named_by_his_station_his_ship_and_hers,
+    )
+
+    test_the_visitor_is_named_by_his_station_his_ship_and_hers(Path(tempfile.mkdtemp()))
+    test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own(
+        Path(tempfile.mkdtemp())
+    )
+    test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go(Path(tempfile.mkdtemp()))
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 3 (`docs/design/Design-DoorAndVisitor.md` §4): a far hull's hail
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits():
+    """Two hulls at far detail, a fake at each captain's station; the brig's captain hails
+    the cutter. The cutter's log hears it and her captain's sample carries it; nothing
+    answers by table on either side; the brig's log says she has not yet answered; the
+    cutter's captain answers with his own hail and the brig's log carries his words. A ship
+    nobody holds, far as she is, is answered by table as before."""
+    from tests.test_far_hail import (
+        test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer,
+        test_a_ship_nobody_holds_is_answered_by_table_far_or_full,
+    )
+
+    test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer()
+    test_a_ship_nobody_holds_is_answered_by_table_far_or_full()
+
+
+def test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads():
+    """The passage of 7-393, saved after the answer, replays by the transcripts and by the
+    acts to the game's log and each hull's log alike, the answer heard in the brig's."""
+    from tests.test_far_hail import (
+        test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs,
+    )
+
+    test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 4 (`docs/design/Design-DoorAndVisitor.md` §5): not half blind at far detail
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks():
+    """Six brigs within the range, the cap's three awake: a model at a fourth's and a fifth's
+    captain's station holds each over the cap (`HELD_OVER_CAP`, two) and nobody sleeps for
+    them; a sixth takes the farthest unheld hull's place. A held brig asleep twenty-nine
+    miles off, steered for the Wolf, is put about by her plan's own order at a mile and a
+    half (88's chart test on her leg), the line urgent in her log and in her captain's
+    sample; a brig whose harness has no door keeps the far plan as it was."""
+    from tests.test_held_hulls import (
+        test_a_far_held_hull_standing_for_a_rock_is_put_about_and_her_captain_called,
+        test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was,
+        test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance,
+    )
+
+    test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance()
+    test_a_far_held_hull_standing_for_a_rock_is_put_about_and_her_captain_called()
+    test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 5 (`docs/design/Design-DoorAndVisitor.md` §6): the boat's names
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_refused():
+    """Three hulls beside the frigate, two asleep, their companies with men of the frigate's
+    posts (a person's id is his post's): the frigate's master, boatswain and gunner sent to
+    the Lynx in her boat are landed there, and the Lynx's master fetched comes back in her,
+    the sleeping brigs' men of those posts in their own ships throughout (the owner's
+    sixteen names, landed as the far brigs' people). A person of another ship named in the
+    order is refused in words ("... is of the Chevalier, not of this ship; the boat is not
+    sent") and the boat stays."""
+    from tests.test_boat_names import (
+        test_a_person_of_another_ship_named_in_the_order_is_refused_in_words,
+        test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay,
+    )
+
+    test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay()
+    test_a_person_of_another_ship_named_in_the_order_is_refused_in_words()

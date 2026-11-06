@@ -23,7 +23,7 @@ from freesail.agents.model import Reply
 from freesail.api.session import ship_factory
 from freesail.core import replay
 from freesail.world import movement as M
-from freesail.world.seats import VOICE_KIND, _voice_name
+from freesail.world.seats import VOICE_KIND
 from tests.test_crews import hove_to_world
 
 
@@ -98,7 +98,9 @@ def _round_trip():
     stage, act = _stages(frigate)
     h = _seat(hull, act)
     captain = hull.people.captain
-    voice = _voice_name(captain)
+    # his voice there named by his own station, his ship and hers (package 82b, item 2)
+    voice = M.visitor_name(w, captain, w.own, "captain")
+    assert voice == f"captain, of the x, aboard the {frigate.lower()}"
     assert h.seated_on == b.id and not h.visiting
     # the boat away for the frigate with him: a job of the port's kind at the boat's pace
     _run_until(w, lambda: hull.dealings.boat.away, 0.5)
@@ -200,7 +202,8 @@ def test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him
             break
     assert f is not None and f.over == "carried"
     assert lieutenant.hull == v.id and lieutenant.home == w.own.id
-    assert h.visiting and h.world is enemy and enemy.agents[_voice_name(lieutenant)] is h
+    voice = M.visitor_name(w, lieutenant, enemy, "officer of the watch")  # package 82b
+    assert h.visiting and h.world is enemy and enemy.agents[voice] is h
     assert any(e.kind == "person.moved" and "leads the boarders" in e.text for e in w.log)
     assert any(e.kind == "person.aboard" and "with the boarders" in e.text for e in enemy.log)
     assert "a visitor" in M.where_am_i(w, lieutenant)
@@ -268,7 +271,7 @@ def test_a_save_taken_mid_visit_replays_by_both_roads_with_the_harness_visiting(
     copy's own hull; and a save taken while he is in the host's boat on the way home, the
     harness still on the host, replays the same."""
     w, b, hull, h, captain, stage = _until_visiting()
-    voice = _voice_name(captain)
+    voice = M.visitor_name(w, captain, w.own, "captain")  # package 82b, item 2
     for road, copy in _replays_alike(w, b, hull).items():
         ch = copy.agents.get(voice)
         assert ch is not None and ch.visiting and ch.world is copy.own, road
