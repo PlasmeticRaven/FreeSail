@@ -2299,8 +2299,10 @@ passed, 9 expected failures; the pace alone 13 passed (the frigate alone 557; th
 seated 564 under the filter against 551 with `all`). **The lead's merge:** the trial on 82b's
 items 2 to 5 met the trunk in `docs/dev/TuningNotes.md`'s tail (both sides kept) and
 `tests/test_officer.py`'s budget (kept once at 22,500 with both reasons); lint clean; the fast
-tier whole on the combined tree green (exit 0); the whole suite in the cloud dispatched after
-run 36, the figures to follow. Step 4 (the player at the prompt by his place, decision 59;
+tier whole on the combined tree green (exit 0); the whole suite in the cloud run 37 on 6423975
+(09:52 to 10:43 UTC): lint green, all six shards green, 6,679 passed, 11 skipped, 12 expected
+failures; the pace job 13 of 13, every floor held (the first such run since the runner was
+pinned). Step 4 (the player at the prompt by his place, decision 59;
 decision 62's one person and the boat road; the drivers' commands against the grammar) goes on;
 95's step 1 puts a few lines in `orders/stations.py`'s `recognises` beside it.
 
