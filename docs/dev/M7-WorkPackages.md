@@ -53,7 +53,7 @@ on these packages; that is the owner's choice.
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time |
-| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged; **B1, the *Indefatigable*, merged 2026-10-30** (below, "Package 75, B1, as merged"); **the hull step, the eight on their own lines, merged 2026-10-31** (below); L2, L3 and the *Neufchatel* next |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
@@ -2119,8 +2119,60 @@ expected failure, none failed; the slow tier of the 22 touched files and the kno
 946 passed, 9 expected failures; the pace alone 13 passed (the frigate alone 569; truth
 7-386's three stations 615 under the rule against 617 off; the Channel observed 347). **The
 lead's merge:** ruff and format clean on the combined tree; the fast tier whole on it exit 1 on one test alone, test_pictures' MCP chart contrast (std 7.97 against the 8.0 floor under four workers; passed alone after, as on both builders' machines and on the trunk: the container's browser margin, no floor moved), every other test passed;
-the whole suite in the cloud dispatched, the figures to follow. Step 3 (the reports, the messenger and the call; the
+the whole suite in the cloud: **run 34 on 2b59ea4** (03:20 to 04:02 UTC, 2026-11-06, the two merges together), lint green, all six shards green, 6,298 passed, 11 skipped, 12 expected failures (run 33's 6,287 and 11, plus 82b's and the step's tests and the old count test kept strict), the pace job 9 of 13 (the four floors under at 452 to 495 against 500, the runner's speed as on the runs before). Step 3 (the reports, the messenger and the call; the
 sleeper's wake; decision 63) goes on.
+
+### Package 75, the lee-port step (L2 and L3), the rig lines and the booms, as merged (2026-11-06)
+
+Merged `claude/pkg-75` at e88df44 (8c30c8a, `--no-ff`; the commits since the hull step
+d9477c6: 65c56b8 SW-5 L2 the lee ports by the heel, the owner's rule; 46926bd the record and
+the *Neufchatel*'s §12.2a, a rule in the key's place; 148af85 L2's pace cost taken back by
+`ports._least_dip`; bd5566c the viewer step for the rig lines' ends; 06019a4 the booms topped
+up 3° on the drawn hulls; 1238bed the lead's head brought in; e88df44 SW-5 L3 the roll's
+amplitude in the dip, reviewed twice and mended), sent after the owner's review as the week's
+one report. **Built as Build-Ships.md §7 and the lead's rulings have it:** the dip the heel
+toward the gun's side plus the roll's amplitude (`Firer.roll_deg`, the player's ship's own
+where her World keeps a sea; a crewed ship's nought until 84 gives each hull her sea), the
+other side the roll less the heel, a chaser on the centre line the roll alone; the sill
+lowered against `shot.PORT_SHUT_M`, opened again six inches clear; a gun whose port shuts run
+in and housed with its charge kept and its loading going on, its running out and pointing
+given over, the drill not timing a round behind a shut port; a shut port silencing its own gun
+and no other (a gun named dropped with a line, the word for a broadside all behind shut ports
+dropped, a division all behind them passing its turn); a deck's side one line from its first
+port shut to its last opened, said only while a gun of it is cast loose, so that no sailing
+passage's log moves; the `guns` reading counting the shut ports; the viewer's sheets, braces
+and tacks ending on her drawn rail and the stem head (`sideEnd`, `railAtStem`,
+`stemTackFraction`, `sortFar`), the booms 3° above the level from their jaws (`BOOM_STEEVE`),
+the boats' lug sheet on the drawn rail, `drawnSideAt` restored for 82's oars. **What the roll
+does** (the tuning notes, "The lee ports with the roll"): with the sea on her beam the cutter
+loses her lee ports at about 12.6 kn against 24.5 on the heel alone, the frigate at about 20.9
+against 29; the small ships' weather ports shut in bands of wind (the cutter's at 17.5 to 20
+kn); three scripted actions put an enemy before the player in a sea (the blockade's sortie,
+her frigate rolling 22° with 11 of 20 lee ports shut). **The flicker, measured and ruled:**
+six inches of sill is 1.6° of heel at the frigate's lowest port and 3.1° at the cutter's, less
+than a gust swings her, so an hour engaged in gusts with the sea on the beam gave the frigate at
+21 kn 46 changes of port over 13 guns (the shortest 6 s apart), the brig at 17 kn 24, the 64 at
+17.5 kn 43, the log saying two lines or none; the lead's ruling (the notes to the ships session,
+the same day): the dwell `PORT_HOLD_S = 60` before a shut port reopens, in a commit of its own
+with L2's reopening-band pins old beside new, and not a heel margin; the owner may veto; the
+whole is gate 7's judgement item J1, ruled finally after the gate's testing. **The checks on
+the builder's side:** no truth, action or trial moved (546 candidates passed on the tree, 525 at
+the base, no outcome changed); the captain's trials 3 failed and 4 passed on both, the owner's
+machine's three digest failures as at L2; the four whole logs identical before and after; the
+fast tier 6,272 passed; the fifteen ship files regenerate byte for byte; the ports, profile,
+primer, grammar-book, in-world and practice suites with `--slow` 1,424 passed after the last
+mend; truth 7-190 drafted for Phase 5. **Rulings at the merge:** §12.2a's rule approved for
+B3.4 (an after mast with yards and no lower yard handles as a fore-and-after's), B6 out to a
+supplemental package, the four things left in the gunnery's files booked to 77. **The lead's
+merge:** the trial on 2b59ea4 clean; the fast tier whole on it red in three tests and green
+otherwise: the officer's handover test at exactly its fraction (13,200 tokens at the seat
+against 0.6 × 22,000: 65's step 2's sentences and 75's port words together), its budget raised
+to 22,500 by its own convention with its two pins (3478abf); and the two picture-contrast tests
+reading "the chart is blank (std 7.9)" against 8.0, which the trunk's tree and the merged tree
+both read above and below on this machine alone and under load (four runs alternating, all
+green after; the tuning notes name four such readings since October): the floor set at 4.0,
+twice a blank frame's and half the chart's own figure, old beside new in the test's comment
+(the same commit). The whole suite in the cloud: **run 35 on ae3c22d** (04:34 to 05:40 UTC), lint green, all six shards green, 6,647 passed, 11 skipped, 12 expected failures (run 34's 6,298 and 12, plus the step's 349 tests: the lee ports' and the view geometry's), the pace job 9 of 13 (the four floors under at 434 to 491 against 500, the runner's speed as on the runs before; the ports' compare a tick within it).
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -5103,3 +5155,22 @@ the ports' line; the two served words for the weather side (`the weather ports s
 reading the ports (`engage_side` weather, `_a_gun_for_a_signal` and the distress gun taking
 an open port); and the weather port the roll shut opening exactly upright said the lee's.
 Written into 77's brief at the merge.
+
+**2026-11-06, later: the lee-port step merged at 8c30c8a.** The fast tier on the merged tree
+was green but for two things, both the lead's at the merge (3478abf): the officer's handover
+test at exactly its fraction, 65's step 2's sentences and your port words together, its budget
+raised by its convention; and the pictures' blank floor, which the machine's noise straddled on
+the trunk and on your tree alike, set at 4.0 from the chart's own 8.0. Nothing of yours moved.
+The whole suite runs in the cloud; bring the trunk in at your next boundary (82b's item 1 and
+65's step 2 are on it since this morning: the harness's `ident`, the say across hulls, a
+reply's prose the person's own note). Build the dwell as ruled above, then B3.4.
+
+**2026-11-06, night: the owner's word for the ships session's night.** The dwell is in on
+your side; the owner has you work on through the night and foresees no blocker that wants
+their attention for 75 to finish as planned; you keep in touch with the lead as you work
+and hold for the lead on any judgement call; the lead reviews and merges each step as it
+comes, through the night, by the same road (the trial merge, the fast tier, the whole suite
+in the cloud, the record). The lead's own night: 82b's items 2 to 5 merged when reported,
+then package 95 launched (the sail by her name, on `world/hail.py`'s `_addressee` beside
+your files, nothing of the ships'), then 97; 65's step 3 merged when reported; 74 launched
+when 65 closes.

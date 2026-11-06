@@ -58,6 +58,19 @@ fields the projection reads always run.
   the taffrail, old beside new; and the painter's order of her closed body, what stands on the head
   after its plate, a face seen from inside first, the stern seen from abaft last, a bulkhead only
   from its open side.
+- Package 75 (the viewer step for the rig's lines, the lead's ruling of 2026-10-31): on all ten,
+  each sheet and brace that comes down to the side ends on her drawn rail, a line past the stem or
+  abaft her stern at the stem head or the taffrail, each read from the stations the server serves;
+  a stay led to the stem lands on the stem head, a head sail on it is tacked there, and its foot
+  stands clear of the rail; a sheet that comes across her is drawn at its far end's depth;
+  the cutter's, the lugger's and the smack's level bowsprits rooted at the rail at the stem, beside
+  their sheets' heights; a graph with no profile, the boats among them, as before; the frame
+  unmoved across states, and no figure with no number.
+- Package 75 (the owner's word of 2026-11-05): every boom on a hull drawn from her profile topped
+  up BOOM_STEEVE_DEG above the level from its jaws, its sail's foot along it, so that it clears her
+  taffrail on all but the frigate-36, whose file hangs its jaws too low; the razee's spanker's and
+  the driver's clews on its line at their files' feet, off their filed corners, recorded; a graph
+  with no profile, its boom level as before.
 """
 
 from __future__ import annotations
@@ -1237,9 +1250,9 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
 # from the stem head, degrees (hers, 27: Indf §3.5 item 9). The eight's measured at the hull step's
 # landing: no spar of theirs moved in the file, the heel moved to the stem head (the frigate's
 # 30.339 -> 33.283, 16.86 degrees where the 36's bowsprit had stood from its `x_m` on the datum).
-# The cutter's, the lugger's and the smack's lie level at the rail, their ends' filed heights under
-# it (2.10 against 2.48 m, 2.50 against 2.83 m, 1.75 against 2.60 m); the smack's end falls 0.17 m
-# short of the old one for it.
+# The cutter's, the lugger's and the smack's lie level, their ends' filed heights under the stem
+# head (2.10 against 2.81 m, 2.50 against 2.83 m, 1.75 against 2.60 m), rooted at the rail at the
+# stem (`LEVEL_ROOT_M`); the smack's end falls 0.17 m short of the old one for it.
 BOWSPRIT_DRAWN = {
     SIXTY_FOUR: (1.004, 27.05),
     RAZEE: (0.941, 27.77),
@@ -1252,12 +1265,26 @@ BOWSPRIT_DRAWN = {
     SCHOONER: (2.833, 19.98),
     PRIVATEER: (2.833, 19.98),
 }
+# The three whose files' ends give no rise from the stem head (the viewer step for the rig's lines,
+# the lead's ruling of 2026-10-31: "rooted at the sheet's height"), metres above her water-line: the
+# root as drawn, at the rail at the stem; as it was, at the top of the stem head; and the sheet's.
+# The files carry no key for a root, so the rule is the drawn hull's: the cutter's and the smack's
+# rails stop under a stem head standing above them, their last point that box's top, and the lugger
+# has none. The cutter's sheet gives the spar's centre across the stem head (`pages-zaz6381.md`
+# §5.9); the lugger's its upper edge (`pages-zaz6306.md` §5.3); the smack's plate draws no bowsprit,
+# and its figure is the notch in the post, a judgement (`pages-chapman-pl59.md`, the ledger).
+LEVEL_ROOT_M = {
+    CUTTER: (2.44, 2.81, 2.42),
+    LUGGER: (2.83, 2.83, 2.79),
+    SMACK: (2.22, 2.60, 2.37),
+}
 
 
 @needs_node
 @pytest.mark.parametrize("path", PROFILED)
 def test_the_bowsprit_stands_from_the_stem_head_its_length_up_to_its_ends_height(tmp_path, path):
-    """Indf §12.3: the heel at the stem head, or the rail there if that is lower (the razee's).
+    """Indf §12.3: the heel at the stem head, or the rail there if that is lower (the razee's), or,
+    a spar whose end's height gives no rise from there, at the rail at the stem (`LEVEL_ROOT_M`).
     B5.3 (the lead's ruling of 2026-10-29, Ext §6.2): the whole spar from there, as long as the
     file has it, up to its end's height above the datum, so that the yards under it hang from a
     bowsprit that stands where the file has it; the jib-boom from its end, as before.
@@ -1277,7 +1304,8 @@ def test_the_bowsprit_stands_from_the_stem_head_its_length_up_to_its_ends_height
     (bowsprit,) = [s for s in graph["spars"] if s["class"] == "bowsprit"]
     heel, tip = got["bowsprit"]
     hx, hz = profile["stem_m"][-1]
-    assert heel == pytest.approx([hx, 0.0, min(hz, interp(profile["rail_m"], hx))], abs=0.001)
+    root = LEVEL_ROOT_M[path][0] if path in LEVEL_ROOT_M else min(hz, interp(profile["rail_m"], hx))
+    assert heel == pytest.approx([hx, 0.0, root], abs=0.001)
     length, height = bowsprit["length_m"], bowsprit["height_m"]
     assert math.dist(heel, tip) == pytest.approx(length)
     assert tip[1] == 0.0 and tip[2] == pytest.approx(max(deck + height, heel[2]))
@@ -2692,6 +2720,24 @@ def taffrail_of(graph: dict) -> list:
     return [-0.52 * hull["length_waterline_m"], 0.0, 1.02 * hull["deck_height_m"]]
 
 
+def rail_tops(hull: dict) -> list:
+    """The top of her drawn side, [x, z, half-breadth] aft to forward, read from the stations the
+    server serves: the stern's closure's top, the top of each station with any height, and the
+    stem's closure's, the outline stroked straight between them."""
+    stations = hull["stations"]
+    inner = [st for st in stations[1:-1] if st[-1][1] - st[0][1] > 1e-6]
+    return [st[-1] for st in [stations[0], *inner, stations[-1]]]
+
+
+def rail_end(hull: dict, x: float, sign: float) -> list:
+    """Where a line that comes down abreast `x` on side `sign` ends (`client/projection.js`'s
+    `sideEnd`): on her drawn rail there, x held between the taffrail and the stem head."""
+    tops = rail_tops(hull)
+    held = min(max(x, tops[0][0]), tops[-1][0])
+    half = interp([(t[0], t[2]) for t in tops], held)
+    return [held, sign * half, interp([(t[0], t[1]) for t in tops], held)]
+
+
 def mizen_by_the_wind(
     tack: str,
     sheet_deg: float = 30.0,
@@ -3461,7 +3507,7 @@ def test_the_braces_lead_up_to_the_fore_top_the_sheets_aft_and_the_lifts_to_the_
     """Ext §6.2: the braces of a yard under the bowsprit or the jib-boom lead from its arms up to
     the fore top, the fore mast's head less a metre on its raked line, a little to their own
     side, not level aft (Lavery I30). The spritsail's sheets lead from its clews aft along the
-    side to the deck a metre abaft the fore mast (I30's sheave in the side), not abreast the
+    side a metre abaft the fore mast (I30's sheave in the side), not abreast the
     clew forward of the stem; the sprit topsail's to the spritsail yard's arms, as every
     topsail's to the yard below. Their lifts, as every yard's, from the arms up to the head of
     the spar each hangs on: the bowsprit's end and the jib-boom's. The guys are not drawn."""
@@ -3486,13 +3532,13 @@ def test_the_braces_lead_up_to_the_fore_top_the_sheets_aft_and_the_lifts_to_the_
     ss = got["sails"]["spritsail"]["corners"]
     for side, s in (("starboard", 1.0), ("larboard", -1.0)):
         sheet = lines[f"spritsail.sheet.{side}"]
-        # to half the beam, or on a hull drawn from her profile to her drawn side there, which is
-        # narrower so far forward (the 64's 6.77 m stood 1.5 m outboard of it)
+        # to half the beam at the datum, or on a hull drawn from her profile to her drawn rail
+        # there, which is narrower so far forward (the 64's 6.77 m stood 1.5 m outboard of it) and
+        # higher (her datum stood 2.50 m under it, the razee's 1.50 m)
         x = got["foreX"] - 1.0
-        out = beam / 2.0
+        lead = [x, s * beam / 2.0, deck]
         if rig != FIXTURE:
-            out = form.half_breadth_at(make_ship(rig).hull.spec, x, deck)
-        lead = [x, s * out, deck]
+            lead = rail_end(data["graph"]["hull"], x, s)
         assert sheet == [pytest.approx(ss[2] if s > 0 else ss[3]), pytest.approx(lead, abs=1e-3)]
         if "sprit_topsail" in sails:
             st = got["sails"]["sprit_topsail"]["corners"]
@@ -3728,6 +3774,28 @@ def test_the_yards_under_the_bowsprit_as_the_game_serves_them(tmp_path, rig):
 DRIVER = "mizzen.driver"
 DRIVER_BOOM = "mizzen.boom"
 GEAR_DEPTH = 0.35  # client/projection.js: IN_GEAR_DEPTH
+# client/projection.js: BOOM_STEEVE. Every boom on a hull drawn from her profile is topped up this
+# much above the level from its jaws (the owner's word of 2026-11-05), a drawing rule: no file
+# moves and the physics reads none of it. A graph with no profile lays it level, as before.
+BOOM_STEEVE_DEG = 3.0
+# The driver's clew, on that boom's line at the file's foot from the jaws, stands this far above the
+# file's clew corner at no sheet, metres: its foot 16.57 m on the fixture, 16.58 m on the 64, times
+# the steeve's sine (measured 0.867 and 0.868); 0.02-0.03 m forward of it. The drawing departs from
+# the file there, recorded, not hidden: its tack, throat and peak stay the file's.
+DRIVER_CLEW_RISE_M = 0.87
+
+
+def boom_end(jaws: list, length: float, swing: float = 0.0, lee: float = 1.0) -> list:
+    """Where a boom `length` long ends on a hull drawn from her profile (or a point that far along
+    it): from its jaws, swung `swing` off the centreline aft to the side `lee` (+1 starboard), and
+    topped up BOOM_STEEVE_DEG above the level."""
+    up = math.radians(BOOM_STEEVE_DEG)
+    run = length * math.cos(up)
+    return [
+        jaws[0] - run * math.cos(swing),
+        jaws[1] + lee * run * math.sin(swing),
+        jaws[2] + length * math.sin(up),
+    ]
 
 
 def driver_doc(rig: str, rigged_out: bool | None = False) -> dict:
@@ -3857,9 +3925,12 @@ def test_the_driver_is_swung_about_the_mast_its_foot_along_its_boom(tmp_path, ta
     """Ext §17.6: the driver in §6.1's branch for a sail cut at the mast, with its boom. Its
     throat and peak are swung whole about the mast by the sheet's angle to the sheet's side,
     each as far from the mast and from the other as the file has them. The boom is swung about
-    its jaws on the mast, level, to the same side by the same angle (`sheetAngleOf` takes the
-    driver bent). The tack is at the boom's jaws, within 0.1 m of the file's tack on the mast,
-    and the clew along the boom at the file's foot from the jaws, to leeward."""
+    its jaws on the mast, topped up BOOM_STEEVE_DEG above the level, to the same side by the same
+    angle (`sheetAngleOf` takes the driver bent). The tack is at the boom's jaws, within 0.1 m of
+    the file's tack on the mast, and the clew along the boom at the file's foot from the jaws, to
+    leeward. Old beside new, the boom topped up (the owner's word of 2026-11-05): its end level
+    with its jaws, 6.34 m above the fixture's water-line and 9.69 m above the 64's, to 1.04 m above
+    them, 7.38 m and 10.73 m; the clew with it, 6.34 m to 7.21 m and 9.69 m to 10.56 m."""
     data = driver_by_the_wind(tack, rig=rig)
     got = run_js(tmp_path, data, DRIVER_FIGURES)
     file, boom, deck = _driver_file(data["graph"])
@@ -3878,9 +3949,7 @@ def test_the_driver_is_swung_about_the_mast_its_foot_along_its_boom(tmp_path, ta
     jaws_x = origin[0] + axis[0] / axis[2] * (jaws_z - deck)
     length = boom["length_m"]
     assert got["jaws"] == [pytest.approx(jaws_x), 0.0, pytest.approx(jaws_z)]
-    assert got["boomEnd"] == pytest.approx(
-        [jaws_x - length * math.cos(sheet), lee * length * math.sin(sheet), jaws_z]
-    )
+    assert got["boomEnd"] == pytest.approx(boom_end([jaws_x, 0.0, jaws_z], length, sheet, lee))
     assert tack_pt == pytest.approx(got["jaws"]) and math.dist(tack_pt, file[0]) <= 0.1
     assert _off_the_segment(clew, got["jaws"], got["boomEnd"]) == pytest.approx(0.0, abs=1e-9)
     assert math.dist(clew, tack_pt) == pytest.approx(math.dist(file[0], file[3]), abs=1e-6)
@@ -3890,18 +3959,27 @@ def test_the_driver_is_swung_about_the_mast_its_foot_along_its_boom(tmp_path, ta
 @needs_node
 @pytest.mark.parametrize("rig", MIZEN_RIGS)
 def test_the_driver_unswung_lies_on_its_files_corners_and_takes_no_reef(tmp_path, rig):
-    """With its sheet at no angle the driver lies in the fore-and-aft plane on the file's four
-    corners: the throat and the peak to the millimetre, and the tack and the clew, taken from
-    the boom, within 0.1 m (Ext §17.6, §17.2's cut). No reef is drawn: a reef in the snapshot,
-    which the engine never gives the driver (Steel names no band in it), moves nothing."""
+    """With its sheet at no angle the driver lies in the fore-and-aft plane on the file's
+    corners: the throat and the peak to the millimetre, and the tack, taken from the boom's jaws,
+    within 0.1 m (Ext §17.6, §17.2's cut). Its clew, taken from the boom, lies on the boom's line
+    at the file's foot from the jaws, which the steeve lifts off the file's corner by
+    `DRIVER_CLEW_RISE_M`. Old beside new, the boom topped up (the owner's word of 2026-11-05): the
+    clew on the file's corner within 0.1 m (drawn 3 mm off it) to 0.87 m above it and 0.02-0.03 m
+    forward, on both rigs; the drawing departs from the file there, recorded. No reef is drawn: a
+    reef in the snapshot, which the engine never gives the driver (Steel names no band in it),
+    moves nothing."""
     data = driver_by_the_wind("larboard", rig=rig)
     snap = next(s for s in data["snap"]["sails"] if s["id"] == DRIVER)
     snap["sheet_angle"] = 0.0
     got = run_js(tmp_path, data, DRIVER_FIGURES)
     file, _boom, _deck = _driver_file(data["graph"])
     drawn = [got["driver"]["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
-    for i, (p, q) in enumerate(zip(drawn, file, strict=True)):
+    for i, (p, q) in enumerate(zip(drawn[:3], file[:3], strict=True)):
         assert math.dist(p, q) <= (1e-3 if i in (1, 2) else 0.1), i
+    clew, filed = drawn[3], file[3]
+    assert clew == pytest.approx(boom_end(got["jaws"], math.dist(file[0], filed)), abs=1e-9)
+    assert clew[2] - filed[2] == pytest.approx(DRIVER_CLEW_RISE_M, abs=0.005)
+    assert clew[0] - filed[0] == pytest.approx(0.02, abs=0.01) and clew[1] == filed[1] == 0.0
     snap["reefs"] = 1
     assert run_js(tmp_path, data, DRIVER_FIGURES)["driver"] == got["driver"]
 
@@ -4000,7 +4078,10 @@ def test_the_boom_rigged_in_is_not_drawn_with_the_driver_in_the_sail_room(tmp_pa
     case as `test_the_boom_lies_amidships_...`), a spar drawn level from its jaws, amidships,
     19.9 m aft, its jaws 1.5 m up the course's laced luff on the fixture; new, no spar. It is still
     placed there, which is how its swing stays in the frame. With the driver bent it is drawn as
-    B5.5 drew it, to the driver's sheet's side by its angle, set or furled (`sheetAngleOf`)."""
+    B5.5 drew it, to the driver's sheet's side by its angle, set or furled (`sheetAngleOf`), and
+    topped up BOOM_STEEVE_DEG as every boom on a hull drawn from her profile. Old beside new, the
+    boom topped up (the owner's word of 2026-11-05), placed and drawn alike: its end level with its
+    jaws, to 1.04 m above them, 6.34 to 7.38 m on the fixture and 9.69 to 10.73 m on the 64."""
     states = {
         "room": driver_by_the_wind("larboard", 45.0, bent=False, rig=rig),
         "set": driver_by_the_wind("larboard", 45.0, rig=rig),
@@ -4012,7 +4093,7 @@ def test_the_boom_rigged_in_is_not_drawn_with_the_driver_in_the_sail_room(tmp_pa
     room = got["room"]
     assert math.degrees(_sheet_of(states["room"], MIZEN_COURSE)) == pytest.approx(45.0)
     assert boom["rigged_out"] is False and room["boom"] == []
-    assert room["boomEnd"] == pytest.approx([room["jaws"][0] - length, 0.0, room["jaws"][2]])
+    assert room["boomEnd"] == pytest.approx(boom_end(room["jaws"], length))
     assert room["course"]["state"] == "set" and room["driver"] is None
     assert not room["driverYards"]
     assert not [ln for ln in room["lines"] if ln["id"].startswith((DRIVER, DRIVER_BOOM))]
@@ -4023,8 +4104,7 @@ def test_the_boom_rigged_in_is_not_drawn_with_the_driver_in_the_sail_room(tmp_pa
         jaws, end = got[name]["jaws"], got[name]["boomEnd"]
         assert jaws == pytest.approx(room["jaws"])
         # on the larboard tack the sheet's side is to starboard
-        want = [jaws[0] - length * math.cos(sheet), length * math.sin(sheet), jaws[2]]
-        assert end == pytest.approx(want), name
+        assert end == pytest.approx(boom_end(jaws, length, sheet)), name
         (figure,) = got[name]["boom"]
         assert figure["pts"] == [pytest.approx(jaws), pytest.approx(end)], name
 
@@ -4033,10 +4113,12 @@ def test_the_boom_rigged_in_is_not_drawn_with_the_driver_in_the_sail_room(tmp_pa
 @pytest.mark.parametrize("rig", MIZEN_RIGS)
 def test_a_drivers_boom_with_no_key_on_its_file_stands_as_b5_5_drew_it(tmp_path, rig):
     """Ext §17.11's toggle, "no file moves until it carries it". A driver's boom whose file does
-    not say `rigged_out` is served true all the voyage, and is drawn as B5.5 drew it: amidships,
-    level at its jaws, whatever the course's sheet, with the driver in the sail room (the figure
-    the case above moved). With the driver bent, nothing of the whole drawing differs between no
-    key and the boom rigged out: everything, its frame too, equal to the last figure."""
+    not say `rigged_out` is served true all the voyage, and is drawn as B5.5 drew it: amidships
+    from its jaws, whatever the course's sheet, with the driver in the sail room (the figure the
+    case above moved); topped up BOOM_STEEVE_DEG from them as every boom on a hull drawn from her
+    profile (old beside new, the owner's word of 2026-11-05: level at its jaws, to its end 1.04 m
+    above them). With the driver bent, nothing of the whole drawing differs between no key and the
+    boom rigged out: everything, its frame too, equal to the last figure."""
     room = driver_by_the_wind("larboard", 45.0, bent=False, rig=rig, key=False)
     states = {"room": room}
     for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED):
@@ -4062,10 +4144,7 @@ def test_a_drivers_boom_with_no_key_on_its_file_stands_as_b5_5_drew_it(tmp_path,
     drawn = got["room"]["drawn"]
     jaws = drawn["jaws"]
     (figure,) = drawn["boom"]
-    assert figure["pts"] == [
-        pytest.approx(jaws),
-        pytest.approx([jaws[0] - boom["length_m"], 0.0, jaws[2]]),
-    ]
+    assert figure["pts"] == [pytest.approx(jaws), pytest.approx(boom_end(jaws, boom["length_m"]))]
     assert drawn["course"]["state"] == "set" and drawn["driver"] is None
     for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED):
         assert got[f"{state.value}-True"]["whole"] == got[f"{state.value}-False"]["whole"], state
@@ -4430,13 +4509,17 @@ def test_her_boom_sails_sheet_leads_from_its_boom_to_her_own_taffrail(
 
 
 HEAD_ROOM_M = 6.0 * 0.3048  # the 64's driver boom's (Bel §1.5, §4.6; the lead's note of 2026-10-29)
-# Each file's boom, level from its jaws, from them to her taffrail: its least over her drawn decks
-# and over her rail, metres. The eight's are measured at the hull step's landing and recorded, not
-# ruled: no spar moves in it (Build-Ships.md §5.6, §5.0 principle 8). Under the rail, a negative:
-# the frigate's boom runs 0.10 m under her quarterdeck and 1.83 m under her taffrail, the brigs'
-# 0.38 m under theirs, the smack's 0.11 m, the schooners' 0.02 m; a rig's heights against the drawn
-# lines are a later package's, for the owner's eye first.
-BOOM_CLEAR_M = {
+# Each file's boom from its jaws to her taffrail: its least over her drawn decks and over her rail,
+# metres, as it was drawn level at its jaws' height (`BOOM_CLEAR_LEVEL_M`, old) and as it is drawn
+# topped up BOOM_STEEVE_DEG, along its line (`BOOM_CLEAR_M`, new; the owner's word of 2026-11-05).
+# The eight's are measured at the hull step's landing and recorded, not ruled: no spar moves in it
+# (Build-Ships.md §5.6, §5.0 principle 8), and the 64's jaws stand where her file puts them, for
+# 6 ft of head room under the level line (HEAD_ROOM_M). Under the rail, a negative: level, the
+# frigate's boom ran 0.10 m under her quarterdeck and 1.83 m under her taffrail, the brigs' 0.38 m
+# under theirs, the smack's 0.11 m, the schooners' 0.02 m; topped up, the frigate's alone, 1.35 m
+# under her taffrail (her file's jaws, a later package's figure), clearing her quarterdeck by
+# 0.26 m. A rig's heights against the drawn lines are a later package's, for the owner's eye first.
+BOOM_CLEAR_LEVEL_M = {
     SIXTY_FOUR: (HEAD_ROOM_M, 1.16),
     RAZEE: (1.15, 0.01),
     FRIGATE: (-0.10, -1.83),
@@ -4447,19 +4530,36 @@ BOOM_CLEAR_M = {
     SCHOONER: (1.25, -0.02),
     PRIVATEER: (1.25, -0.02),
 }
+BOOM_CLEAR_M = {
+    SIXTY_FOUR: (2.41, 1.78),
+    RAZEE: (1.28, 0.58),
+    FRIGATE: (0.26, -1.35),
+    BRIG: (2.12, 0.27),
+    MERCHANT_BRIG: (2.12, 0.27),
+    CUTTER: (1.70, 0.78),
+    SMACK: (0.87, 0.35),
+    SCHOONER: (1.58, 0.53),
+    PRIVATEER: (1.58, 0.53),
+}
 
 
 @needs_node
 @pytest.mark.parametrize("path", list(BOOM_CLEAR_M))
 def test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks(tmp_path, path):
     """The clew check (Bel §1.5) and the lead's rulings of 2026-10-30 as they are drawn, the after
-    sail at no sheet, in the fore-and-aft plane. The boom, level from its jaws, stands over her
-    drawn decks and her rail as far aft as she goes, by `BOOM_CLEAR_M`. Old beside new: the 64's
-    2.26 m and 1.59 m to 1.83 m (6 ft, the head room still set by it) and 1.16 m; the razee's 1.84 m
-    and 0.70 m to 1.15 m and 0.01 m, literally the least that clears her taffrail (at stage A, 0.20
-    m and 1.33 m under them). The 64's course, Steel's words read from the deck its mast stands
-    through, stands 1.84 to 1.14 m over her roundhouse deck at its clew, and no lower than 1.6 to
-    0.9 m with the drawn sag of its foot."""
+    sail at no sheet, in the fore-and-aft plane. The boom, topped up BOOM_STEEVE_DEG from its jaws,
+    stands over her drawn decks and her rail as far aft as she goes, by `BOOM_CLEAR_M` measured
+    along its line; the level line from its jaws by `BOOM_CLEAR_LEVEL_M`, as before, for no jaws
+    moved. Old beside new: the 64's 2.26 m and 1.59 m to 1.83 m (6 ft, the head room still set by
+    it) and 1.16 m; the razee's 1.84 m and 0.70 m to 1.15 m and 0.01 m, literally the least that
+    clears her taffrail (at stage A, 0.20 m and 1.33 m under them). Old beside new again, the boom
+    topped up (the owner's word of 2026-11-05), level to along its line: the 64's 1.83 and 1.16 m
+    to 2.41 and 1.78 m; the razee's 1.15 and 0.01 m to 1.28 and 0.58 m; the frigate's -0.10 and
+    -1.83 m to 0.26 and -1.35 m; the brigs' 1.63 and -0.38 m to 2.12 and 0.27 m; the cutter's 1.68
+    and 0.57 m to 1.70 and 0.78 m; the smack's 0.87 and -0.11 m to 0.87 and 0.35 m; the schooners'
+    1.25 and -0.02 m to 1.58 and 0.53 m. The 64's course, Steel's words read from the deck its mast
+    stands through, stands 1.84 to 1.14 m over her roundhouse deck at its clew, and no lower than
+    1.6 to 0.9 m with the drawn sag of its foot."""
     ship = make_ship(path)
     for sid in ship.groups["plain sail"]:
         ship.sails[sid].state = SailState.SET
@@ -4480,13 +4580,23 @@ def test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks(tmp_path,
     )
     profile = ship.hull.spec.profile
     jaws, end = got["a"], got["b"]
-    assert jaws[1:] == [0.0, end[2]] and end[1] == pytest.approx(0.0, abs=1e-9)
+    assert jaws[1] == 0.0 and end[1] == pytest.approx(0.0, abs=1e-9)
+    run = jaws[0] - end[0]
+    assert math.degrees(math.atan2(end[2] - jaws[2], run)) == pytest.approx(BOOM_STEEVE_DEG)
     taffrail = profile.rail_m[0][0]
     assert end[0] < taffrail < jaws[0]  # she carries it out beyond her stern
     stations = [taffrail + 0.25 * i for i in range(int((jaws[0] - taffrail) / 0.25) + 1)]
-    over_deck, over_rail = BOOM_CLEAR_M[path]
-    assert min(jaws[2] - deck_at(profile, x) for x in stations) >= over_deck - 1e-2
-    assert min(jaws[2] - interp(profile.rail_m, x) for x in stations) >= over_rail - 5e-3
+
+    def along(x: float) -> float:
+        """The boom's height over `x`, on its line."""
+        return jaws[2] + (jaws[0] - x) * (end[2] - jaws[2]) / run
+
+    for height, (over_deck, over_rail) in (
+        (lambda _x: jaws[2], BOOM_CLEAR_LEVEL_M[path]),
+        (along, BOOM_CLEAR_M[path]),
+    ):
+        assert min(height(x) - deck_at(profile, x) for x in stations) >= over_deck - 1e-2
+        assert min(height(x) - interp(profile.rail_m, x) for x in stations) >= over_rail - 5e-3
     if got["course"]:
         clew = got["course"]["corners"][2]
         assert clew[2] - deck_at(profile, clew[0]) == pytest.approx(1.14, abs=0.02)
@@ -4545,9 +4655,13 @@ def test_the_razees_spanker_stands_clear_of_the_taffrail_its_boom_clears(
 def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(tmp_path, path):
     """The razee's spanker alone is drawn laced along its boom (`gaffCutOn`, which asks for a
     profile and four filed corners, and no gaff sail of the eight files them). On the seven files
-    with a gaff sail on a boom the set foot still sags under the boom (measured 0.50-0.88 m) and
+    with a gaff sail on a boom the set foot still sags under the boom (measured 0.50-0.87 m) and
     the furled bundle hangs under it (0.26-0.33 m), as at `af9f13d`, on their own lines as before
-    them: her mend moves no figure of theirs."""
+    them: her mend moves no figure of theirs. Each is measured under the boom's line, the deepest
+    of the drawn outline below it. Old beside new, the boom topped up BOOM_STEEVE_DEG (the owner's
+    word of 2026-11-05), the clew with its end: measured under the jaws' height, as the level boom
+    was, 0.50-0.88 m and 0.26-0.33 m; under its line, which now rises aft, 0.50-0.87 m and
+    0.26-0.33 m (under the jaws' height they would now read 0.26-0.47 m and 0.03-0.05 m)."""
     bands = {SailState.SET: (0.4, 1.0), SailState.FURLED: (0.2, 0.4)}
     for state, (least, most) in bands.items():
         ship = make_ship(path)
@@ -4561,8 +4675,14 @@ def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(t
             const sk = P.buildSkeleton(d.graph, d.snap);
             return d.graph.sails.filter(s => s.class === 'gaff' && (s.roles || {}).boom).map(s => {
               const f = sk.figures.find(x => x.kind === 'sail' && x.id === s.id);
-              const lowest = Math.min(...P.flattenPath(f.path).map(p => p[2]));
-              return sk.spars[s.roles.boom].a[2] - lowest;
+              const b = sk.spars[s.roles.boom];
+              const hx = b.b[0] - b.a[0], hy = b.b[1] - b.a[1], run = Math.hypot(hx, hy);
+              const rise = (b.b[2] - b.a[2]) / run;
+              // how far each point of the outline lies under the boom's line at its run along it
+              return Math.max(...P.flattenPath(f.path).map(p => {
+                const at = ((p[0] - b.a[0]) * hx + (p[1] - b.a[1]) * hy) / run;
+                return b.a[2] + at * rise - p[2];
+              }));
             });
             """,
         )
@@ -4574,13 +4694,17 @@ def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(t
 @needs_node
 def test_the_razees_spanker_is_drawn_on_its_files_cut(tmp_path):
     """Her gaff sail with its four corners filed, on a hull drawn from her profile: at no sheet its
-    tack, throat, peak and clew on the file's, within the rounding, its gaff at the file's peak and
-    its head and foot along the gaff and the boom, which it does not fill; the area the file's.
-    Old beside new, by the fixed rule: the gaff at 35 degrees and the whole of both spars, the peak
-    (-27.10, 24.60) to (-25.53, 24.69), the clew's x -36.48 to -34.50, 215 to 191 m2 against the
-    filed 191 (the owner's measure, Steel's 202 for a 38: drawn +6.5% to -5.5%, filed -5.4%); on the
-    boom at her taffrail (the lead's ruling of 2026-10-30) the clew's x -34.47, the area 200 m2
-    filed and drawn, -1%."""
+    tack, throat and peak on the file's, within the rounding, its gaff at the file's peak and its
+    head and foot along the gaff and the boom, which it does not fill; its clew on the boom's line
+    at the file's foot from the jaws (17.92 m, the run of the filed foot). Old beside new, by the
+    fixed rule: the gaff at 35 degrees and the whole of both spars, the peak (-27.10, 24.60) to
+    (-25.53, 24.69), the clew's x -36.48 to -34.50, 215 to 191 m2 against the filed 191 (the owner's
+    measure, Steel's 202 for a 38: drawn +6.5% to -5.5%, filed -5.4%); on the boom at her taffrail
+    (the lead's ruling of 2026-10-30) the clew's x -34.47, the area 200 m2 filed and drawn, -1%.
+    Old beside new, the boom topped up BOOM_STEEVE_DEG (the owner's word of 2026-11-05): the clew on
+    the file's corner, (-34.47, 7.16), to 0.94 m above it and 0.02 m forward, (-34.45, 8.10); the
+    drawn area 200.0 to 195.6 m2 against the filed 200 (-2.2%). The drawing departs from the file
+    there, recorded, not hidden; its tack, throat and peak stay the file's."""
     ship = make_ship(RAZEE)
     for sid in ship.groups["plain sail"]:
         ship.sails[sid].state = SailState.SET
@@ -4604,9 +4728,13 @@ def test_the_razees_spanker_is_drawn_on_its_files_cut(tmp_path):
         (drawn_tack, tack),
         (drawn_throat, throat),
         (drawn_peak, peak),
-        (drawn_clew, clew),
     ):
         assert drawn == pytest.approx(filed, abs=0.03)
+    (gaff_a, gaff_b), (boom_a, boom_b) = got["gaff"], got["boom"]
+    foot = abs(tack[0] - clew[0])
+    assert drawn_clew == pytest.approx(boom_end(boom_a, foot), abs=1e-9)
+    assert drawn_clew[2] - clew[2] == pytest.approx(0.94, abs=0.005)  # off the file's corner
+    assert drawn_clew[0] - clew[0] == pytest.approx(0.02, abs=0.01)
     drawn = [(p[0], p[2]) for p in got["corners"]]
     area = 0.5 * abs(
         sum(
@@ -4614,13 +4742,105 @@ def test_the_razees_spanker_is_drawn_on_its_files_cut(tmp_path):
             for (x1, z1), (x2, z2) in zip(drawn, drawn[1:] + drawn[:1], strict=True)
         )
     )
-    assert area == pytest.approx(spanker.area_m2, abs=0.5)
-    (gaff_a, gaff_b), (boom_a, boom_b) = got["gaff"], got["boom"]
+    assert spanker.area_m2 == 200.0
+    assert area == pytest.approx(195.6, abs=0.1)
     assert math.dist(gaff_a, gaff_b) > math.dist(gaff_a, drawn_peak)
     run, rise = gaff_a[0] - gaff_b[0], gaff_b[2] - gaff_a[2]
     assert math.degrees(math.atan2(rise, run)) == pytest.approx(40.0, abs=0.5)
     assert math.dist(boom_a, boom_b) > math.dist(boom_a, drawn_clew)
     assert drawn_tack == pytest.approx(boom_a)
+
+
+# The owner's word of 2026-11-05: "the angle of the boom relative to the mast, vertically, on ships
+# like the brig and razee. It should probably be a couple of degrees more vertical to properly clear
+# the stern of the vessel". Each file's boom where it passes her taffrail's x, its sail set and its
+# sheet hauled flat (to the gaff's floor, 18 degrees; the 64's driver bent and set), the wind on her
+# larboard quarter: its height over the taffrail (`taffrail_of`), metres, old (level, at its jaws'
+# height) beside new (topped up BOOM_STEEVE_DEG). It passes 2.9 to 4.0 m to leeward of her
+# centreline there, over her quarter.
+BOOM_OVER_TAFFRAIL_M = {
+    BRIG: (-0.38, 0.31),
+    MERCHANT_BRIG: (-0.38, 0.31),
+    RAZEE: (0.01, 0.61),
+    SCHOONER: (-0.02, 0.66),
+    PRIVATEER: (-0.02, 0.66),
+    SMACK: (-0.11, 0.38),
+    CUTTER: (0.45, 1.05),
+    SIXTY_FOUR: (1.16, 1.81),
+    FRIGATE: (-1.83, -1.33),
+}
+# The frigate-36's boom still stands under her taffrail, topped up: her file hangs its jaws 2.4 m
+# over her datum, 4.20 m above her water-line against her taffrail's 6.03 m, a file figure for a
+# later package (the tuning notes, "Where the existing rig no longer sits right on the new hull",
+# her row 3), which the drawing does not hide.
+UNDER_HER_TAFFRAIL = {FRIGATE: "her file's boom's jaws, height_m 2.4: a later package's figure"}
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail(tmp_path, path):
+    """The owner's word of 2026-11-05, a drawing rule: on a hull drawn from her profile every boom
+    stands BOOM_STEEVE_DEG above the level from its jaws, swung by its sheet, its figure drawn
+    so, its length the file's; no file moves and the physics reads none of it. Where it passes her
+    taffrail, its sail set and its sheet hauled flat, it clears her taffrail by
+    `BOOM_OVER_TAFFRAIL_M` on the brigs, the razee, the schooners, the smack, the cutter and the 64,
+    within 2 cm; drawn level it stood at its jaws' height there, the old figure. The frigate-36's
+    still stands under hers, her file's figure (`UNDER_HER_TAFFRAIL`). The lugger carries no boom.
+    The same state with no profile lays every boom level, as before."""
+    sail = DRIVER if path == SIXTY_FOUR else BOOM_SAIL.get(path)
+    ship = driver_ship(path, bent=True) if path == SIXTY_FOUR else make_ship(path)
+    for sid in ship.groups["plain sail"]:
+        if ship.sails[sid].state is not SailState.UNBENT:
+            ship.sails[sid].state = SailState.SET
+    if sail:
+        ship.sails[sail].state = SailState.SET
+        assert math.degrees(set_sheet_angle(ship, ship.sails[sail], 0.0)) == pytest.approx(18.0)
+    data = ship_state(ship, awa=math.radians(-150.0), tack="larboard")
+    booms = {s["id"]: s for s in data["graph"]["spars"] if s["class"] == "boom"}
+    if not sail:
+        assert path == LUGGER and not booms
+        return
+    bare = without_profile(json.loads(json.dumps(data)))
+    got = run_js(
+        tmp_path,
+        {"drawn": data, "bare": bare, "booms": list(booms)},
+        """
+        const each = g => {
+          const sk = P.buildSkeleton(g.graph, g.snap);
+          const out = {};
+          d.booms.forEach(id => {
+            out[id] = {a: sk.spars[id].a, b: sk.spars[id].b,
+                       figures: sk.figures.filter(f => f.kind === 'spar' && f.id === id)
+                         .map(f => f.pts)};
+          });
+          return out;
+        };
+        return {drawn: each(d.drawn), bare: each(d.bare)};
+        """,
+    )
+    for bid, spec in booms.items():
+        a, b = got["drawn"][bid]["a"], got["drawn"][bid]["b"]
+        run = math.hypot(b[0] - a[0], b[1] - a[1])
+        assert math.degrees(math.atan2(b[2] - a[2], run)) == pytest.approx(BOOM_STEEVE_DEG), bid
+        assert math.dist(a, b) == pytest.approx(spec["length_m"]), bid
+        assert got["drawn"][bid]["figures"] == [[pytest.approx(a), pytest.approx(b)]], bid
+        bare_a, bare_b = got["bare"][bid]["a"], got["bare"][bid]["b"]
+        assert bare_b[2] == pytest.approx(bare_a[2], abs=1e-12), bid  # level, with no profile
+        assert bare_a[2] == pytest.approx(a[2], abs=1e-12), bid  # from the same jaws' height
+        assert math.dist(bare_a, bare_b) == pytest.approx(spec["length_m"]), bid
+    boom = next(s for s in data["graph"]["sails"] if s["id"] == sail)["roles"]["boom"]
+    a, b = got["drawn"][boom]["a"], got["drawn"][boom]["b"]
+    taffrail = taffrail_of(data["graph"])
+    t = (taffrail[0] - a[0]) / (b[0] - a[0])
+    assert 0.0 < t < 1.0  # it passes over her stern
+    over = a[2] + t * (b[2] - a[2]) - taffrail[2]
+    old, new = BOOM_OVER_TAFFRAIL_M[path]
+    assert a[2] - taffrail[2] == pytest.approx(old, abs=0.02)  # level, at its jaws' height
+    assert over == pytest.approx(new, abs=0.02)
+    if path in UNDER_HER_TAFFRAIL:
+        assert over < 0.0, UNDER_HER_TAFFRAIL[path]
+    else:
+        assert over > 0.0, path
 
 
 # The least the storm mizzen's foot stands over the deck under it, metres: over 0.1 on the 64 and
@@ -4714,10 +4934,10 @@ def test_a_luff_laced_to_the_mast_lies_on_the_mast(tmp_path, sail, sheet_deg):
 @pytest.mark.parametrize("tack", ["starboard", "larboard"])
 def test_her_headsails_sheets_lead_to_her_drawn_side_abaft_the_fore_mast(tmp_path, path, tack):
     """Every jib-headed sail forward of her foremost mast has its sheet from its clew aft to her
-    drawn side a metre abaft that mast, at the deck, as the spritsail's. The rule a hull with no
-    profile keeps, two metres abaft the clew and half the beam out, stops abreast the knee of the
-    head on the 64's hull (the jib's, at x 29.10 m, y 6.77 m), in the air where she has no
-    breadth."""
+    drawn rail a metre abaft that mast, as the spritsail's (old, her drawn side at the datum, 0.69
+    to 2.50 m under the rail). The rule a hull with no profile keeps, two metres abaft the clew and
+    half the beam out, stops abreast the knee of the head on the 64's hull (the jib's, at x 29.10
+    m, y 6.77 m), in the air where she has no breadth."""
     ship = make_ship(path)
     for sid in ship.groups["plain sail"]:
         ship.sails[sid].state = SailState.SET
@@ -4744,17 +4964,18 @@ def test_her_headsails_sheets_lead_to_her_drawn_side_abaft_the_fore_mast(tmp_pat
           .filter(f => f.kind === 'line' && f.cls === 'sheet').map(f => [f.of, f.pts])};
         """,
     )
-    deck = data["graph"]["hull"]["deck_height_m"]
+    hull = data["graph"]["hull"]
     x = got["foreX"] - 1.0
-    out = form.half_breadth_at(ship.hull.spec, x, deck)
-    assert 0.0 < out < data["graph"]["hull"]["beam_m"] / 2.0
+    _, out, rail = rail_end(hull, x, 1.0)
+    assert 0.0 < out < hull["beam_m"] / 2.0
+    assert rail > hull["deck_height_m"]
     head = [ln for ln in got["lines"] if ln[0] in heads]
     assert {ln[0] for ln in head} == heads
     for sid, (clew, lead) in head:
         assert clew == pytest.approx(got["of"][sid][2]), sid
         assert lead[0] == pytest.approx(x), sid
         assert abs(lead[1]) == pytest.approx(out, abs=1e-3), sid
-        assert lead[2] == pytest.approx(deck), sid
+        assert lead[2] == pytest.approx(rail, abs=1e-3), sid
 
 
 @needs_node
@@ -4888,7 +5109,10 @@ def test_the_yard_stays_on_the_courses_line_as_the_mizen_is_shifted_for_the_driv
     beside new): old, drawn in all nine states, amidships until the driver is bent; new, drawn only
     while it is rigged out, from its own phase before the bend to its own phase after the unbend,
     amidships until the driver is bent, and after by the driver's sheet (on a bare ship the shift
-    leaves it at no angle); placed there in every state."""
+    leaves it at no angle); placed there in every state, topped up BOOM_STEEVE_DEG from its jaws.
+    Old beside new, the boom topped up (the owner's word of 2026-11-05): its end level with its
+    jaws in every state, to 1.04 m above them in every state, its run aft 19.91 m to 19.88 m on the
+    fixture and 19.90 m to 19.87 m on the 64."""
     states = shifted_for_the_driver_and_back(rig)
     got = run_js(tmp_path, states, DRIVER_STATES)
     graph = next(iter(states.values()))["graph"]
@@ -4913,8 +5137,8 @@ def test_the_yard_stays_on_the_courses_line_as_the_mizen_is_shifted_for_the_driv
             assert place(drawn[end]) == pytest.approx(place(first[end]), abs=1e-9), (name, end)
         swing = abs(sails[DRIVER]["sheet_angle"]) if DRIVER in bent else 0.0
         jaws = drawn["jaws"]
-        want = [jaws[0] - boom["length_m"] * math.cos(swing), boom["length_m"] * math.sin(swing)]
-        assert drawn["boomEnd"][:2] == pytest.approx(want, abs=1e-9), name
+        want = boom_end(jaws, boom["length_m"], swing)
+        assert drawn["boomEnd"] == pytest.approx(want, abs=1e-9), name
         out = next(s for s in states[name]["snap"]["spars"] if s["id"] == DRIVER_BOOM)
         assert [f["pts"] for f in drawn["boom"]] == (
             [[pytest.approx(jaws), pytest.approx(drawn["boomEnd"])]] if out["rigged_out"] else []
@@ -5431,3 +5655,625 @@ def test_the_hovers_words_on_the_head_name_no_strip(tmp_path):
     assert on_the_head
     assert not [t for t in titles if "strip" in t]
     assert any("the scroll on the head" in t for t in on_the_head)
+
+
+# ---------------------------------------------------------------------------
+# Package 75, the viewer step for the rig's lines (the lead's ruling of 2026-10-31; the rows marked
+# V in docs/dev/TuningNotes.md, "Where the existing rig no longer sits right on the new hull"): the
+# sheets', the braces' and the tacks' ends read from the drawn rail and the stem head in place of
+# the old datum and half the beam. Nothing here moves a file: the old hull's rail stood at the
+# datum, so the old ends lay on it, and the hull step raised the rail from under them.
+# ---------------------------------------------------------------------------
+
+
+RAIL_BAND_M = 0.005  # a line's end on the drawn rail, each way
+JIB_TACK_FRACTION = 0.04  # projection.js's: a tack this far up its stay from the stay's foot
+# The height a head sail's tack comes to on a stay landing on the stem head, m: her stem head's top,
+# or the rail's where it stands higher (the brigs' 3.64, the frigate's 4.62), 2 cm over it
+# (projection.js's STEM_TACK_CLEAR_M, so that the foot's line is not stroked along the rail's).
+STEM_TACK_Z_M = {
+    FRIGATE: 4.64,
+    BRIG: 3.66,
+    MERCHANT_BRIG: 3.66,
+    CUTTER: 2.83,
+    LUGGER: 2.94,
+    SMACK: 2.76,
+    SCHOONER: 2.69,
+    PRIVATEER: 2.69,
+}
+
+
+def both_sides(*names: str) -> set[str]:
+    return {f"{name}.{side}" for name in names for side in ("starboard", "larboard")}
+
+
+# Each file's lines that come down to her side (the rings V on the close sheets): the braces of the
+# yards with no mast abaft them, the sheets of the sails with no yard below them, and the head
+# sails' sheets, under all plain sail and every head sail.
+LINES_ON_THE_RAIL = {
+    FRIGATE: both_sides(
+        "mizzen.topsail.yard.brace",
+        "mizzen.topgallant.yard.brace",
+        "mizzen.crossjack.yard.brace",
+        "fore.course.sheet",
+        "main.course.sheet",
+        "fore.topmast_staysail.sheet",
+        "jib.sheet",
+        "flying_jib.sheet",
+    ),
+    SIXTY_FOUR: both_sides(
+        "mizzen.topsail.yard.brace",
+        "mizzen.topgallant.yard.brace",
+        "mizzen.crossjack.yard.brace",
+        "fore.course.sheet",
+        "main.course.sheet",
+        "fore.staysail.sheet",
+        "fore.topmast_staysail.sheet",
+        "jib.sheet",
+    ),
+    BRIG: both_sides(
+        "main.yard.brace",
+        "main.topsail.yard.brace",
+        "main.topgallant.yard.brace",
+        "fore.course.sheet",
+        "main.course.sheet",
+        "fore.topmast_staysail.sheet",
+        "jib.sheet",
+        "flying_jib.sheet",
+    ),
+    CUTTER: both_sides(
+        "square_sail.yard.brace",
+        "topsail.yard.brace",
+        "topgallant.yard.brace",
+        "fore.staysail.sheet",
+        "jib.sheet",
+    ),
+    LUGGER: {"fore.lug.sheet", "main.lug.sheet", "mizen.lug.sheet"}
+    | both_sides("jib.sheet", "flying_jib.sheet"),
+    SMACK: both_sides(
+        "square_sail.yard.brace", "topsail.yard.brace", "fore.staysail.sheet", "jib.sheet"
+    ),
+    SCHOONER: both_sides(
+        "fore.topsail.sheet",
+        "fore.sail.sheet",
+        "fore.staysail.sheet",
+        "jib.sheet",
+        "flying_jib.sheet",
+    ),
+}
+LINES_ON_THE_RAIL[RAZEE] = LINES_ON_THE_RAIL[SIXTY_FOUR]
+LINES_ON_THE_RAIL[MERCHANT_BRIG] = LINES_ON_THE_RAIL[BRIG]
+LINES_ON_THE_RAIL[PRIVATEER] = LINES_ON_THE_RAIL[SCHOONER]
+# a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
+LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
+# The sails each file hanks to a stay led to the stem, and cuts by the viewer's rule: the 64's and
+# the razee's are cut from their files' corners, their tacks on the bowsprit's collar.
+STEM_TACKED = {
+    FRIGATE: {"fore.storm_staysail"},
+    SIXTY_FOUR: set(),
+    RAZEE: set(),
+    BRIG: {"fore.storm_staysail"},
+    MERCHANT_BRIG: {"fore.storm_staysail"},
+    CUTTER: {"fore.staysail"},
+    LUGGER: {"jib", "storm_jib"},
+    SMACK: {"fore.staysail", "jib", "storm_jib"},
+    SCHOONER: {"fore.staysail", "jib", "storm_jib"},
+    PRIVATEER: {"fore.staysail", "jib", "storm_jib"},
+}
+LINE_ENDS = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const spars = {};
+    Object.keys(sk.spars).forEach(id => {
+      const r = sk.spars[id];
+      spars[id] = {x: r.x, half: r.half, a: r.a, b: r.b};
+    });
+    const sails = {};
+    sk.figures.filter(f => f.kind === 'sail').forEach(f => {
+      const spec = d.graph.sails.find(s => s.id === f.id);
+      sails[f.id] = {corners: f.corners, stay: f.stay, cut: !!(spec && spec.corners_m)};
+    });
+    const comesDown = f => f.kind === 'line' && (f.cls === 'brace' || f.cls === 'sheet');
+    return {spars: spars, sails: sails, stays: sk.stays,
+            foreX: Math.max(...d.graph.spars.filter(s => s.class === 'mast')
+                                            .map(s => sk.spars[s.id].x)),
+            lines: sk.figures.filter(comesDown)
+                             .map(f => ({id: f.id, cls: f.cls, of: f.of, pts: f.pts}))};
+"""
+
+
+def fully_dressed(path: str, tack: str = "larboard", extra: tuple = ()) -> dict:
+    """The file under all her plain sail and every head sail she has bent (a boat, her lug), and
+    `extra` by id, her yards braced sharp up on `tack`, the weather arm forward: the graph and
+    snapshot."""
+    ship = make_ship(path)
+    for sid in ship.groups.get("plain sail", list(ship.sails)):
+        ship.sails[sid].state = SailState.SET
+    masts = [s.x_m for s in ship.spars.values() if s.cls == "mast"]
+    for sail in ship.sails.values():
+        if sail.cls == "jibheaded" and sail.x_m > max(masts) and sail.state is not SailState.UNBENT:
+            sail.state = SailState.SET
+    for sid in extra:
+        ship.sails[sid].state = SailState.SET
+    sign = 1.0 if tack == "starboard" else -1.0
+    for spar in ship.spars.values():
+        if spar.is_yard:
+            spar.brace_angle = sign * spar.brace_limit
+    return ship_state(ship, awa=math.radians(60.0) * sign, tack=tack)
+
+
+def where_it_ends(line: dict, graph: dict, spars: dict) -> str:
+    """Where a brace's or a sheet's end stands: on her drawn rail; at the taffrail on the centreline
+    (a boom sail's); up in the rig, on a mast abaft its yard (a brace's, 0.3 m to its own side) or
+    on the arm of the yard below (a topsail's sheet); or elsewhere: on a hull drawn from her
+    profile, in the air."""
+    end = line["pts"][1]
+    hull = graph["hull"]
+    if hull.get("profile"):
+        here = rail_end(hull, end[0], 1.0 if end[1] >= 0 else -1.0)
+        if end == pytest.approx(here, abs=RAIL_BAND_M):
+            return "rail"
+    if end == pytest.approx(taffrail_of(graph), abs=RAIL_BAND_M):
+        return "taffrail"
+    if line["cls"] == "brace" and abs(end[1]) == pytest.approx(0.3, abs=1e-9):
+        return "mast"
+    for spar in spars.values():
+        if spar.get("half") and end in (pytest.approx(spar["a"]), pytest.approx(spar["b"])):
+            return "yard"
+    return "elsewhere"
+
+
+def lead_x(line: dict, graph: dict, got: dict, on_a_profile: bool = True) -> float:
+    """The x abreast which a line comes down: a brace's, four-fifths of its yard's half abaft the
+    slings; a square sail's sheet, its clew's; a lug's a metre abaft it, any other two; and on a
+    hull drawn from her profile a head sail's, a metre abaft the fore mast."""
+    if line["cls"] == "brace":
+        yard = got["spars"][line["of"]]
+        return yard["x"] - 0.8 * yard["half"]
+    sail = next(s for s in graph["sails"] if s["id"] == line["of"])
+    clew_x = line["pts"][0][0]
+    if sail["class"] == "square":
+        return clew_x
+    if sail["class"] == "lug":
+        return clew_x - 1.0
+    if on_a_profile and sail["class"] == "jibheaded" and sail["x_m"] > got["foreX"]:
+        return got["foreX"] - 1.0
+    return clew_x - 2.0
+
+
+def side_of(line: dict) -> float:
+    """A line's side by its name; a lug's one sheet, its clew's."""
+    if line["id"].endswith(".starboard"):
+        return 1.0
+    if line["id"].endswith(".larboard"):
+        return -1.0
+    return 1.0 if line["pts"][0][1] >= 0 else -1.0
+
+
+def assert_every_end_is_on_the_rail_or_up_in_the_rig(got: dict, graph: dict) -> set[str]:
+    places = {ln["id"]: where_it_ends(ln, graph, got["spars"]) for ln in got["lines"]}
+    in_the_air = [i for i, place in places.items() if place == "elsewhere"]
+    assert not in_the_air, in_the_air
+    on_the_rail = {i for i, place in places.items() if place == "rail"}
+    for line in got["lines"]:
+        if line["id"] in on_the_rail:
+            want = rail_end(graph["hull"], lead_x(line, graph, got), side_of(line))
+            assert line["pts"][1] == pytest.approx(want, abs=RAIL_BAND_M), line["id"]
+    return on_the_rail
+
+
+@needs_node
+@pytest.mark.parametrize("path", [*PROFILED, *BOATS])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_each_line_that_comes_down_ends_on_her_drawn_rail(tmp_path, path, tack):
+    """The rings marked V on the close sheets: a brace of a yard with no mast abaft it, the sheet
+    of a sail with no yard below it and a head sail's sheet each end on her drawn rail on their own
+    side, at the rail's height and half-breadth there, read from the served stations. Old, half the
+    beam at the datum, the old hull's rail: up to 4.52 m under the new rail, and on the frigate the
+    mizzen yards' braces under her counter, in the air 1.9 to 2.3 m outboard of the rail. Every
+    other line stays where it was, up in the rig or at the taffrail, and none ends in the air:
+    braces leading to the next mast, topsails' sheets to the yard below, boom sails' to the
+    taffrail. The set of lines on the rail is each file's, exactly."""
+    data = fully_dressed(path, tack)
+    got = run_js(tmp_path, data, LINE_ENDS)
+    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"])
+    assert on_the_rail == LINES_ON_THE_RAIL[path]
+
+
+@needs_node
+@pytest.mark.parametrize("path", [CUTTER, SMACK])
+def test_a_square_sail_with_no_yard_below_sheets_to_the_rail_on_the_small_rigs(tmp_path, path):
+    """The same rule on a square sail not in plain sail: the cutter's and the smack's, whose sheets
+    come down abreast their clews."""
+    data = fully_dressed(path, extra=("square_sail",))
+    got = run_js(tmp_path, data, LINE_ENDS)
+    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"])
+    assert on_the_rail == LINES_ON_THE_RAIL[path] | both_sides("square_sail.sheet")
+
+
+@needs_node
+@pytest.mark.parametrize("path", [FRIGATE, SIXTY_FOUR, RAZEE, BRIG, MERCHANT_BRIG])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_fore_courses_weather_sheet_comes_to_the_stem_head_not_past_it(tmp_path, path, tack):
+    """Ring 9 (the brig's 8): braced sharp the fore course's weather clew stands forward of the stem
+    head, and its sheet ended abreast it half the beam out, 5.85 m off the frigate's stem in the
+    air. It comes to the stem head. Its lee sheet stays on the rail abreast its clew."""
+    data = fully_dressed(path, tack)
+    hull = data["graph"]["hull"]
+    got = run_js(tmp_path, data, LINE_ENDS)
+    lines = {ln["id"]: ln["pts"] for ln in got["lines"]}
+    hx, hz = hull["profile"]["stem_m"][-1]
+    clew, end = lines[f"fore.course.sheet.{tack}"]
+    assert clew[0] > hx
+    assert end == pytest.approx([hx, 0.0, hz], abs=RAIL_BAND_M)
+    lee, sign = ("starboard", 1.0) if tack == "larboard" else ("larboard", -1.0)
+    clew, end = lines[f"fore.course.sheet.{lee}"]
+    assert clew[0] < hx
+    assert end == pytest.approx(rail_end(hull, clew[0], sign), abs=RAIL_BAND_M)
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_mizen_lugs_sheet_comes_to_her_taffrail_not_past_it(tmp_path, tack):
+    """Ring 2 of the lugger: her mizen lug's clew stands far abaft her stern, no outrigger being
+    filed, and its sheet ended a metre abaft that, half the beam out, 4.22 m past her taffrail in
+    the air. It comes to the taffrail, where her round stern closes to the middle line."""
+    data = fully_dressed(LUGGER, tack)
+    got = run_js(tmp_path, data, LINE_ENDS)
+    clew, end = next(ln["pts"] for ln in got["lines"] if ln["id"] == "mizen.lug.sheet")
+    taffrail = taffrail_of(data["graph"])
+    assert clew[0] < taffrail[0]
+    assert end == pytest.approx(taffrail, abs=RAIL_BAND_M)
+
+
+def off_her_side(point: list, rail: list) -> float:
+    """How far `point` stands from the top of her side, [x, z] aft to forward, seen abeam."""
+
+    def from_segment(p: tuple, q: tuple) -> float:
+        dx, dz = q[0] - p[0], q[1] - p[1]
+        along = ((point[0] - p[0]) * dx + (point[2] - p[1]) * dz) / max(dx * dx + dz * dz, 1e-12)
+        along = min(max(along, 0.0), 1.0)
+        return math.hypot(point[0] - p[0] - along * dx, point[2] - p[1] - along * dz)
+
+    return min(from_segment(p, q) for p, q in zip(rail, rail[1:], strict=False))
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_stay_to_the_stem_lands_on_the_stem_head_and_its_sails_foot_stands_over_the_rail(
+    tmp_path, path, tack
+):
+    """The cutter's ring 4, the lugger's 7, the smack's 2, the schooners' 5: a stay led to the stem
+    landed at half the file's length and the datum, inside her, so that a head sail's tack was 0.71
+    to 1.90 m under the rail and its foot, running level aft, showed over the side to leeward as a
+    pale tab. It lands on the stem head, the rail there if that is lower, and the tack comes to the
+    stem head with it: on the stay, the least above its foot that keeps the foot over the side, so
+    that no part of the foot over her lies under the rail and the tack is on her, within 5 cm of the
+    top of her side. At 4% up such a stay, the rule every other stay keeps, it stood 0.53 to 0.79 m
+    off her stem head in the air, with no stay drawn below it. The 64's and the razee's are cut from
+    their files' corners, and stand where they did."""
+    ship = make_ship(path)
+    for sid in STEM_TACKED[path]:
+        ship.sails[sid].state = SailState.SET
+    sign = 1.0 if tack == "starboard" else -1.0
+    data = ship_state(ship, awa=math.radians(60.0) * sign, tack=tack)
+    graph = data["graph"]
+    got = run_js(tmp_path, data, LINE_ENDS)
+    profile = graph["hull"]["profile"]
+    hx, hz = profile["stem_m"][-1]
+    head = [hx, 0.0, min(hz, interp(profile["rail_m"], hx))]
+    fore = max((s for s in graph["spars"] if s["class"] == "mast"), key=lambda s: s["x_m"])
+    stays = [ln["id"] for ln in graph["lines"] if ln["class"] == "stay" and ln["of"] == fore["id"]]
+    assert stays
+    for stay in stays:
+        assert got["stays"][stay]["foot"] == pytest.approx(head, abs=1e-9), stay
+    tops = rail_tops(graph["hull"])
+    rail = [(t[0], t[1]) for t in tops]
+    for sid in STEM_TACKED[path]:
+        tack_at, _, clew = got["sails"][sid]["corners"]
+        stay = got["stays"][got["sails"][sid]["stay"]]
+        up = [p - q for p, q in zip(stay["head"], stay["foot"], strict=True)]
+        fraction = (tack_at[2] - head[2]) / up[2]
+        assert 0.0 <= fraction < JIB_TACK_FRACTION, sid
+        assert tack_at == pytest.approx([f + fraction * u for f, u in zip(head, up, strict=True)])
+        assert tack_at[2] == pytest.approx(STEM_TACK_Z_M[path], abs=0.005), sid
+        assert off_her_side(tack_at, rail) <= 0.05, sid
+        for k in range(41):
+            x = tack_at[0] + (clew[0] - tack_at[0]) * k / 40.0
+            z = tack_at[2] + (clew[2] - tack_at[2]) * k / 40.0
+            if tops[0][0] <= x <= tops[-1][0]:
+                assert z > interp(rail, x), (sid, x, z)
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_a_level_bowsprit_is_rooted_at_the_rail_at_the_stem_beside_its_sheets_height(
+    tmp_path, path
+):
+    """The lead's words: the three level bowsprits "rooted at the sheet's height". The files give no
+    key for a root and none is added, so the rule is the drawn hull's: where the file's end gives no
+    rise from the stem head the spar lies level from the rail at the stem, under the stem head's box
+    where the rail ends in one. The cutter's 2.81 m comes to 2.44 against her sheet's 2.42, the
+    smack's 2.60 to 2.22 against the 2.37 of her post's notch; the lugger's 2.83 stands against her
+    sheet's 2.79, where it was, having no box. Each lies level, as they did: their ends' rises are
+    their files', a figure the physics reads, for the later package. Every other file's stands from
+    the stem head, its rise its own."""
+    graph = graph_of(path)
+    got = run_js(tmp_path, {"graph": graph}, SPARS_DRAWN)
+    profile, deck = graph["hull"]["profile"], graph["hull"]["deck_height_m"]
+    (bowsprit,) = [s for s in graph["spars"] if s["class"] == "bowsprit"]
+    heel, tip = got["bowsprit"]
+    hx, hz = profile["stem_m"][-1]
+    stem_head = min(hz, interp(profile["rail_m"], hx))
+    assert (deck + bowsprit["height_m"] <= stem_head) == (path in LEVEL_ROOT_M)
+    if path not in LEVEL_ROOT_M:
+        assert heel[2] == pytest.approx(stem_head, abs=0.001)
+        assert tip[2] > heel[2]
+        return
+    root, old_root, sheet = LEVEL_ROOT_M[path]
+    assert stem_head == pytest.approx(old_root, abs=0.001)
+    assert heel == pytest.approx([hx, 0.0, root], abs=0.001)
+    assert tip[2] == pytest.approx(root, abs=0.001)  # level
+    assert deck + bowsprit["height_m"] < root  # the file's end, under it
+    assert abs(root - sheet) <= 0.15
+
+
+def sheeted_off(data: dict) -> dict:
+    """The sails set, sheeted off as the world has them by the wind at 60 degrees (the smack's
+    head sails about 50 degrees, her main sail 70), for a state with no world behind it."""
+    for sail in data["snap"]["sails"]:
+        if sail["state"] == "set":
+            sail["sheet_angle"] = math.radians(70.0 if sail["id"] == "main.sail" else 50.0)
+    return data
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_sheet_that_comes_across_her_is_drawn_at_the_depth_of_its_far_end(tmp_path, path, tack):
+    """A weather sheet runs from the lee clew across her to the weather rail. Its end at the datum
+    hid it under the rail; on the rail it shows, and at its middle's depth it was painted over a
+    sail its clew stands behind and stopped in the middle of the cloth (the smack's jib's and
+    staysail's over her main sail, abaft the weather beam). It takes the depth of its far end, from
+    every side; a line on one side keeps its middle's."""
+    got = run_js(
+        tmp_path,
+        sheeted_off(fully_dressed(path, tack)),
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const out = [];
+        [0, 45, 90, 135, 180, 225, 270, 315].forEach(deg => {
+          P.project(sk, deg * Math.PI / 180, 0.1).figures.forEach(g => {
+            if (g.kind === 'line' && g.cls === 'sheet') {
+              out.push({id: g.id, depth: g.depth, ends: g.pts.map(p => p.depth)});
+            }
+          });
+        });
+        return {out: out, across: sk.figures.filter(f => f.kind === 'line' && f.cls === 'sheet' &&
+                                                          f.pts[0][1] * f.pts[1][1] < 0)
+                                            .map(f => f.id),
+                flagged: sk.figures.filter(f => f.sortFar).map(f => f.id)};
+        """,
+    )
+    assert got["across"]
+    assert sorted(got["flagged"]) == sorted(got["across"])
+    for line in got["out"]:
+        want = max(line["ends"]) if line["id"] in got["across"] else sum(line["ends"]) / 2.0
+        assert line["depth"] == pytest.approx(want), line["id"]
+
+
+@needs_node
+@pytest.mark.parametrize("facing", [210, 225, 240])
+def test_the_smacks_weather_sheets_go_behind_her_main_sail_abaft_the_weather_beam(tmp_path, facing):
+    """The picture that showed it: on the weather quarter her head sails' clews stand behind her
+    main sail, and their weather sheets go behind it, not over the cloth."""
+    got = run_js(
+        tmp_path,
+        sheeted_off(fully_dressed(SMACK, "larboard")),
+        f"""
+        const scene = P.project(P.buildSkeleton(d.graph, d.snap), {facing} * Math.PI / 180, 0.03);
+        return scene.figures.map(g => g.kind + ' ' + g.id);
+        """,
+    )
+    main_sail = got.index("sail main.sail")
+    assert got.index("line jib.sheet.larboard") < main_sail
+    assert got.index("line fore.staysail.sheet.larboard") < main_sail
+
+
+AS_BEFORE = [*BOATS, *WITHOUT_PROFILE]
+
+
+@needs_node
+@pytest.mark.parametrize("case", WITHOUT_PROFILE)
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_with_no_profile_the_lines_come_down_as_before(tmp_path, case, tack):
+    """A graph with no profile: each line that comes down ends half the beam out at the datum,
+    where the hull it is drawn on has its rail, with no x held; a stay led to the stem lands at half
+    her length or her bowsprit's heel, at the datum. The boats were here until package 82 drew each
+    from her own profile; their lug's sheet now ends on her gunwale with the rest
+    (`test_each_line_that_comes_down_ends_on_her_drawn_rail`)."""
+    data = fully_dressed(case.removesuffix(BARE), tack)
+    if case.endswith(BARE):
+        without_profile(data)
+    graph, hull = data["graph"], data["graph"]["hull"]
+    got = run_js(tmp_path, data, LINE_ENDS)
+    assert got["lines"]
+    came_down = set()
+    for line in got["lines"]:
+        if where_it_ends(line, graph, got["spars"]) != "elsewhere":
+            continue
+        came_down.add(line["id"])
+        x = lead_x(line, graph, got, on_a_profile=False)
+        end = [line["pts"][1][0], abs(line["pts"][1][1]), line["pts"][1][2]]
+        assert end == pytest.approx([x, hull["beam_m"] / 2.0, hull["deck_height_m"]]), line["id"]
+    assert LINES_ON_THE_RAIL[case.removesuffix(BARE)] <= came_down
+    (bowsprit,) = [s for s in graph["spars"] if s["class"] == "bowsprit"]
+    stem_x = min(hull["length_waterline_m"] / 2.0, bowsprit["x_m"])
+    fore = max((s for s in graph["spars"] if s["class"] == "mast"), key=lambda s: s["x_m"])
+    for line in graph["lines"]:
+        if line["class"] == "stay" and line["of"] == fore["id"]:
+            stay = got["stays"][line["id"]]
+            assert stay["foot"] == pytest.approx([stem_x, 0.0, hull["deck_height_m"]]), line["id"]
+            for sail in got["sails"].values():
+                if sail.get("stay") == line["id"] and not sail["cut"]:
+                    want = [
+                        f + (h - f) * JIB_TACK_FRACTION
+                        for f, h in zip(stay["foot"], stay["head"], strict=True)
+                    ]
+                    assert sail["corners"][0] == pytest.approx(want), line["id"]
+
+
+@needs_node
+@pytest.mark.parametrize("case", AS_BEFORE)
+def test_with_no_profile_a_sheet_across_her_keeps_its_middles_depth(tmp_path, case):
+    """Under the datum's rule a graph with no profile draws as it did: a weather sheet there ends
+    on the hull it is drawn on, and takes no depth but its middle's."""
+    data = sheeted_off(fully_dressed(case.removesuffix(BARE), "larboard"))
+    if case.endswith(BARE):
+        without_profile(data)
+    got = run_js(
+        tmp_path,
+        data,
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        return {across: sk.figures.filter(f => f.kind === 'line' && f.cls === 'sheet' &&
+                                                f.pts[0][1] * f.pts[1][1] < 0).map(f => f.id),
+                flagged: sk.figures.filter(f => f.sortFar).map(f => f.id)};
+        """,
+    )
+    assert bool(got["across"]) == (case in WITHOUT_PROFILE)
+    assert not got["flagged"]
+
+
+@needs_node
+@pytest.mark.parametrize("path", PILOT)
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_with_no_stations_served_a_line_ends_on_the_rail_her_profile_draws(tmp_path, path, tack):
+    """Where the graph serves no stations the drawn rail is the profile's own (`profileHull`)."""
+    data = fully_dressed(path, tack)
+    del data["graph"]["hull"]["stations"]
+    got = run_js(
+        tmp_path,
+        data,
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const H = P.profileHull(d.graph.hull.profile);
+        return sk.figures.filter(f => f.kind === 'line' && f.cls === 'sheet' &&
+                                      f.id.startsWith('main.course')).map(f => {
+          const pts = H.station(f.pts[1][0]).pts;
+          return {end: f.pts[1], top: pts[pts.length - 1]};
+        });
+        """,
+    )
+    assert len(got) == 2
+    for line in got:
+        assert line["end"][2] == pytest.approx(line["top"][0], abs=1e-9)
+        assert abs(line["end"][1]) == pytest.approx(line["top"][1], abs=1e-9)
+        assert line["top"][1] > 0.0
+
+
+@needs_node
+@pytest.mark.parametrize("path", [CUTTER, SMACK, BRIG])
+def test_with_no_stations_served_a_head_sail_is_tacked_on_the_stem_head_as_before(tmp_path, path):
+    """Where the graph serves no stations the tack comes to the same place on the rail her profile
+    draws, within a millimetre of where the stations put it."""
+    data = fully_dressed(path, extra=tuple(STEM_TACKED[path] - {"storm_jib"}))
+    served = run_js(tmp_path, data, LINE_ENDS)
+    del data["graph"]["hull"]["stations"]
+    bare = run_js(tmp_path, data, LINE_ENDS)
+    for sid in STEM_TACKED[path] - {"storm_jib"}:
+        at = served["sails"][sid]["corners"][0]
+        assert bare["sails"][sid]["corners"][0] == pytest.approx(at, abs=0.001), sid
+        assert at[2] == pytest.approx(STEM_TACK_Z_M[path], abs=0.005), sid
+
+
+FRAME_AND_NUMBERS = """
+    const FACINGS = [0, 30, 90, 150, 270];
+    const out = {notNumbers: [], frames: {}, linesOut: [], over: []};
+    Object.keys(d).forEach(state => {
+      const sk = P.buildSkeleton(d[state].graph, d[state].snap);
+      const walk = (f, v) => {
+        if (Array.isArray(v)) v.forEach(u => walk(f, u));
+        else if (typeof v === 'number' && !Number.isFinite(v)) {
+          out.notNumbers.push(state + ' ' + f.id);
+        }
+      };
+      sk.figures.forEach(f => { walk(f, f.pts); walk(f, f.path); walk(f, f.corners); });
+      FACINGS.forEach(deg => {
+        const f = deg * Math.PI / 180;
+        const scene = P.project(sk, f, 0);
+        const frame = P.project({figures: [], frame: sk.frame}, f, 0).bounds;
+        (out.frames[deg] = out.frames[deg] || []).push(frame);
+        scene.figures.forEach(g => (g.pts || []).forEach(p => {
+          if (!Number.isFinite(p.x + p.y)) out.notNumbers.push(state + ' ' + g.id);
+          if (g.kind === 'line' && (p.x < frame.minX - 1e-6 || p.x > frame.maxX + 1e-6 ||
+                                    p.y < frame.minY - 1e-6 || p.y > frame.maxY + 1e-6)) {
+            out.linesOut.push(g.id);
+          }
+        }));
+        ['minX', 'maxX', 'minY', 'maxY'].forEach(k => {
+          if (Math.abs(scene.bounds[k] - frame[k]) > 1e-6) {
+            out.over.push(state + ' ' + deg + ' ' + k);
+          }
+        });
+      });
+    });
+    return out;
+"""
+# Whose lugs, drawn from their corners, stand over the frame with their yards (the lugger's by 0.82
+# m, the boats' by 1.33 to 2.11 m at the peak), as they did before this step: every other file's
+# figures lie within it. What moved was the lugger's mizen sheet, 2.48 m over it on the quarter.
+OVER_THE_FRAME = {LUGGER, *BOATS}
+
+
+@needs_node
+@pytest.mark.parametrize("path", [*PROFILED, *BOATS])
+def test_the_frame_is_unmoved_across_states_and_no_figure_lacks_a_number(tmp_path, path):
+    """The fixed scale (spec M3 §9 item 14), on the ten and the boats, on the one graph the page
+    reads: the frame's bounds are the same as she starts and dressed on either tack, every line
+    that comes down ends within them, and on all but `OVER_THE_FRAME` every figure does; and no
+    figure has a number that is not one, in the skeleton or projected. The facings are those the
+    frame holds by its four directions: on the quarter at 45 degrees a yard braced to its limit
+    reaches past them, by 0.44 m on the brigs, 4.65 on the 64 and 6.17 on the razee, as before."""
+    graph = graph_of(path)
+    states = {
+        "as she starts": ship_state(make_ship(path)),
+        "larboard": fully_dressed(path, "larboard"),
+        "starboard": fully_dressed(path, "starboard"),
+    }
+    for state in states.values():
+        state["graph"] = graph
+    got = run_js(tmp_path, states, FRAME_AND_NUMBERS)
+    assert not got["notNumbers"], sorted(set(got["notNumbers"]))[:8]
+    for frames in got["frames"].values():
+        for frame in frames:
+            assert frame == pytest.approx(frames[0], abs=1e-9)
+    assert not set(got["linesOut"]) & LINES_ON_THE_RAIL.get(path, set())
+    if path in OVER_THE_FRAME:
+        assert got["over"]
+    else:
+        assert not got["over"], got["over"][:8]
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
+    """Through the game's own doors (`/api/ship`, `/api/state`), a tick on: the served stations
+    and the state's yards and sails, and each brace and sheet on the rail or up in the rig."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.ui.server import Driver, create_app
+
+    scenario = Scenario(wind_from_deg=0.0, wind_speed_kn=15.0, ship_heading_deg=90.0)
+    world = make_world(7, path, scenario)
+    for sid in world.ship.groups["plain sail"]:
+        world.ship.sails[sid].state = SailState.SET
+    world.tick()
+    with TestClient(create_app(Driver(world))) as client:
+        data = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
+    assert data["snap"]["ship"]["tack"] == "larboard"
+    got = run_js(tmp_path, data, LINE_ENDS)
+    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"])
+    assert on_the_rail
+    assert on_the_rail <= LINES_ON_THE_RAIL[path]

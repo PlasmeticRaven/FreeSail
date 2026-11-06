@@ -44,8 +44,12 @@
   // Drawing constants: judgements that stand in for data the files do not carry.
   var GAFF_PEAK_ANGLE = (35 * Math.PI) / 180; // a gaff peaks about this much above the horizontal
   var LOOSE_FOOT_HEIGHT_M = 1.5; // foot of a loose-footed gaff sail above the deck
+  // A boom on a hull drawn from her profile is topped up by its lifts this much above the level,
+  // to clear her taffrail (judgement, the owner's of 2026-11-05: "a couple of degrees more vertical
+  // to properly clear the stern"); its trim by the lifts waits for the handling of the sails
+  var BOOM_STEEVE = (3 * Math.PI) / 180;
   var JIB_LUFF_FRACTION = 0.7; // a jib's head stops this far up its stay
-  var JIB_TACK_FRACTION = 0.04; // and its tack this far up from the stay's foot
+  var JIB_TACK_FRACTION = 0.04; // and its tack this far up from the stay's foot (`stemTackFraction` on a drawn stem head)
   var BELLY = 0.12; // belly of a drawing sail, as a fraction of its shorter side
   var FOOT_SAG = 0.06; // sag of a square sail's foot, fraction of its depth
   var IN_GEAR_DEPTH = 0.35; // a sail in the gear hangs this fraction of its depth
@@ -118,7 +122,7 @@
   // bowsprit or the jib-boom (the spritsail yard, the sprit-topsail yard) stands at its own
   // station, where its file has it. Its braces lead to the fore stay and up to the fore top,
   // drawn to the fore mast's head less a metre; the spritsail's sheets lead aft along the side
-  // to a sheave abaft the foremost fore shroud (Lavery I30), drawn to the side at the deck this
+  // to a sheave abaft the foremost fore shroud (Lavery I30), drawn to the side (`sideEnd`) this
   // far abaft the fore mast (judgement).
   var SPRIT_SHEET_ABAFT_M = 1.0;
   var FORE_TOP_BELOW_HEAD_M = 1.0;
@@ -176,6 +180,14 @@
   // stations are served to the millimetre).
   var ON_LINE_M = 0.002;
   var ROUND_UP_SAMPLES = 8; // points along each half of a transom's rounded foot
+  // Package 75, the viewer step for the rig's lines (the lead's ruling of 2026-10-31): a rail that
+  // ends in a step this short fore and aft (the cutter's 1 cm, the smack's) stops under a stem head
+  // standing above it, its last point that box's top (`railAtStem`).
+  var RAIL_STEP_M = 0.05;
+  // The same ruling: a head sail's tack on a stay landing on the stem head stands this far over the
+  // highest of the drawn side its foot runs above (`stemTackFraction`; judgement, a hair, so that
+  // the foot's line is not stroked along the rail's).
+  var STEM_TACK_CLEAR_M = 0.02;
 
   // -- vectors ----------------------------------------------------------------
 
@@ -683,9 +695,14 @@
           // whole spar from there, its length rising to its end's height as the file has it,
           // so that the yards under it hang from a bowsprit that stands where the file has
           // it; the jib-boom roots at its end. B5.1 drew the heel there and left the end where
-          // a heel on the datum put it, short of the file's length
+          // a heel on the datum put it, short of the file's length. A file's end no higher than
+          // the stem head gives no rise from it (the cutter's, the lugger's, the smack's): that
+          // spar lies level, and is rooted at the rail at the stem (`railAtStem`), what the drawn
+          // hull has nearest the height their sheets give a bowsprit there; the files carry no key
+          // for it, and their end's height, a figure the physics reads, stays as it is
           var heel = profile ? stemHead(profile) : null;
           if (heel) {
+            if (deck + H <= heel[1]) heel = [heel[0], Math.min(heel[1], railAtStem(profile))];
             r.a = v(heel[0], 0, heel[1]);
             dz = Math.min(Math.max(deck + H - heel[1], 0), L * 0.95);
           }
@@ -854,6 +871,11 @@
         } else if (spec.class === "boom") {
           r.x = parent ? (parent.xAt ? parent.xAt(deck + H) : parent.x) : spec.x_m || 0;
           var bDir = sheetDirection(sheetAngleOf(id), tack);
+          // on a hull drawn from her profile the boom is topped up by its lifts (BOOM_STEEVE),
+          // and its sail's foot, its sheet and a ringtail boom follow its line; with no
+          // profile it lies level, as before
+          var bUp = profile ? BOOM_STEEVE : 0;
+          if (bUp) bDir = add(mul(bDir, Math.cos(bUp)), v(0, 0, Math.sin(bUp)));
           r.a = v(r.x, 0, deck + H);
           r.b = add(r.a, mul(bDir, L));
           r.dir = bDir;
@@ -944,6 +966,15 @@
       }); // innermost first
     var stemX = hull.length_waterline_m / 2;
     if (headRig.length) stemX = Math.min(stemX, headRig[0].a[0]);
+    // Where a line led to the stem lands: half the file's length and the datum, or on a hull drawn
+    // from her profile the drawn stem head (the lead's ruling of 2026-10-31). Half her length and
+    // the datum stand inside her since the hull step, so that a head sail's tack on such a stay was
+    // under the rail and its foot, running level aft, showed through the side as a pale tab.
+    var stemFoot = v(stemX, 0, deck);
+    if (profile) {
+      var stemTop = stemHead(profile);
+      stemFoot = v(stemTop[0], 0, stemTop[1]);
+    }
 
     function lowerMastOf(spar) {
       var cur = spar;
@@ -1011,14 +1042,27 @@
         var outer = headRig.map(function (h) {
           return h.tip;
         });
-        land = level === 0 || !outer.length ? v(stemX, 0, deck) : outer[Math.min(level - 1, outer.length - 1)];
+        land = level === 0 || !outer.length ? stemFoot : outer[Math.min(level - 1, outer.length - 1)];
       } else {
         var ahead = lowerMasts[idx - 1];
         var tops = mastChainTops(ahead); // lowest first
         land = level === 0 || !tops.length ? ahead.foot : tops[Math.min(level - 1, tops.length - 1)];
       }
       stayFoot[ln.id] = { head: sp.head, foot: land };
+      if (profile && land === stemFoot) stayFoot[ln.id].onStem = true;
     });
+
+    /** How far up a stay landing on the stem head its sail's tack stands: on the stem head, or
+     *  where the side stands higher than that within reach of the foot, running level aft, the
+     *  least that keeps it over the side (the brig's rail 0.20 m over her stem head, the smack's
+     *  box 0.14 m over the rail's end, the lugger's cap 0.09 m). So the tack arrives at the stem
+     *  head (the lead's ruling of 2026-10-31), neither standing off it in the air, as
+     *  JIB_TACK_FRACTION's 4% of such a stay would, 0.53 to 0.79 m, nor lying under the rail. */
+    function stemTackFraction(F, up, luffFraction) {
+      var reach = Math.max(0.9 * luffFraction * len(up), 2); // the longest `b` allows it
+      var over = drawnRailAt(hull).highestBetween(F[0] - reach, F[0]) + STEM_TACK_CLEAR_M - F[2];
+      return Math.max(over, 0) / Math.max(up[2], 0.1);
+    }
 
     // -- sails -------------------------------------------------------------------
 
@@ -1036,13 +1080,23 @@
     }
     var lineOf = indexBy(graph.lines, "id");
 
-    /** Where a sheet from forward of the fore mast ends on side `sign`: at the deck, a little
-     *  abaft that mast (SPRIT_SHEET_ABAFT_M), half the beam out, or on a hull drawn from her
-     *  profile on her drawn side there, which is narrower so far forward (package 75, her
-     *  stage B: on the 64 the beam's half stood 1.5 m outboard of her side). */
+    /** Where a sheet or a brace that comes down to the side ends, on side `sign`, abreast `x`.
+     *  On a hull drawn from her profile, her drawn rail there: its height and the side's
+     *  half-breadth at that height, `x` held between the taffrail and the stem head, so that a
+     *  clew braced past the stem brings its line to the stem head and one abaft her stern to the
+     *  taffrail, not to the air beyond them (the lead's ruling of 2026-10-31). With no profile,
+     *  half the beam at the datum: where the old hull's rail stood, so that those ends lay on it,
+     *  and the rule every line of the eight stood on until the hull step raised their rails. */
+    function sideEnd(sign, x) {
+      if (!profile) return v(x, (sign * beam) / 2, deck);
+      var rail = drawnRailAt(hull)(x);
+      return v(rail.x, sign * rail.hb, rail.z);
+    }
+
+    /** Where a sheet from forward of the fore mast ends on side `sign`: on the side, a little
+     *  abaft that mast (SPRIT_SHEET_ABAFT_M). */
     function foreSheetLead(sign) {
-      var x = lowerMasts[0].x - SPRIT_SHEET_ABAFT_M;
-      return v(x, sign * (profile ? drawnSideAt(hull)(x, deck) : beam / 2), deck);
+      return sideEnd(sign, lowerMasts[0].x - SPRIT_SHEET_ABAFT_M);
     }
 
     var figures = [];
@@ -1531,7 +1585,7 @@
           var S = stay.head, F = stay.foot;
           var up = sub(S, F);
           var f = JIB_LUFF_FRACTION * reefFraction(spec, dyn);
-          tackJ = add(F, mul(up, JIB_TACK_FRACTION));
+          tackJ = add(F, mul(up, stay.onStem ? stemTackFraction(F, up, f) : JIB_TACK_FRACTION));
           head = add(F, mul(up, f));
           var luffLen = len(sub(head, tackJ));
           var horiz = len(v(up[0], up[1], 0));
@@ -1668,7 +1722,7 @@
         var ss = sideSign(ln.side);
         var from = ss > 0 ? Y.b : Y.a;
         var m = mastAftOf(Y.x);
-        var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : v(Y.x - Y.half * 0.8, (ss * beam) / 2, deck);
+        var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : sideEnd(ss, Y.x - Y.half * 0.8);
         if (underBowsprit(Y.spec) && lowerMasts.length) {
           // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom is braced
           // up to the fore top (Lavery I30), not level aft
@@ -1722,16 +1776,16 @@
           if (sheetSpec.sheeted_to) return;
           var lc2 = sf.corners[2];
           var lugLeeSide = lc2[1] >= 0 ? 1 : -1;
-          pts = [lc2, v(lc2[0] - 1, (lugLeeSide * beam) / 2, deck)];
+          pts = [lc2, sideEnd(lugLeeSide, lc2[0] - 1)];
         } else if (sf.corners.length === 4 && (sf.cls === "square" || sf.cls === "lug" || sf.cls === "lateen")) {
           var s2 = sideSign(ln.side);
           var Yy = spars[((sailSpecs[ln.of] || {}).roles || {}).yard];
           var clew = s2 > 0 ? sf.corners[2] : sf.corners[3];
           var below = Yy ? yardBelow(Yy) : null;
-          var lead = below ? (s2 > 0 ? below.b : below.a) : v(clew[0], (s2 * beam) / 2, deck);
+          var lead = below ? (s2 > 0 ? below.b : below.a) : sideEnd(s2, clew[0]);
           if (!below && Yy && underBowsprit(Yy.spec) && lowerMasts.length) {
             // package 75 (B5.3; Ext §6.2): the spritsail's sheets aft to the side abaft the
-            // fore mast, at the deck (Lavery I30), not abreast the clew forward of the stem; the
+            // fore mast (Lavery I30), not abreast the clew forward of the stem; the
             // sprit topsail's go to the spritsail yard's arms, as every topsail's to the yard below
             lead = foreSheetLead(s2);
           }
@@ -1739,7 +1793,7 @@
         } else {
           var clew2 = sf.corners[2];
           var lee = sideSign(ln.side || (tack === "starboard" ? "larboard" : "starboard"));
-          pts = [clew2, v(clew2[0] - 2, (lee * beam) / 2, deck)];
+          pts = [clew2, sideEnd(lee, clew2[0] - 2)];
           // package 75 (her stage B): on a hull drawn from her profile the sheet of a sail forward
           // of the fore mast, whose rule above stopped abreast the knee of the head, in the air,
           // leads aft to her drawn side abaft the fore mast, as the spritsail's does
@@ -1753,7 +1807,13 @@
           if (profile && boomS && boomS.dir) pts = [sheetSpec.class === "gaff" ? boomS.b : clew2, taffrail(hull)];
         }
         if (state === "parted") pts = [pts[0], add(pts[0], v(-1, 0, -2))];
-        figures.push({ kind: "line", id: ln.id, cls: "sheet", of: ln.of, state: state, pts: pts, busy: !!busy[ln.of] });
+        var sheetFig = { kind: "line", id: ln.id, cls: "sheet", of: ln.of, state: state, pts: pts, busy: !!busy[ln.of] };
+        // the same ruling: a weather sheet comes across her from the lee clew to the weather rail,
+        // over the rail now and no longer hidden under it, and passes the sails between by the mast;
+        // drawn at one depth it goes behind whatever stands nearer than its far end (`sortFar`),
+        // not over a sail its clew is behind, where it stopped in the middle of the cloth
+        if (profile && pts[0][1] * pts[1][1] < 0) sheetFig.sortFar = true;
+        figures.push(sheetFig);
       } else if (ln.class === "bowline") {
         // hauled out (spec 3b §4): a faint line from the middle of the leech forward, to
         // the mast ahead or, from the foremast, to the head rig (spec 3b §8)
@@ -1779,7 +1839,7 @@
         var z = Math.min(p[2] - 1, best.head[2] - 1);
         return v(best.xAt ? best.xAt(z) : best.x, 0, z);
       }
-      return headRig.length ? headRig[0].b : v(stemX, 0, deck);
+      return headRig.length ? headRig[0].b : stemFoot;
     }
 
     // Package 57 (the owner's note 5): the painter sets a sail or a yard against its mast
@@ -2025,12 +2085,20 @@
 
   /** The stem head, the top of the stem's fore edge (`stem_m`'s last point; the rail's last
    *  without a stem), as [x, z]: lowered to the rail at its x where that is lower (§6), where
-   *  the bowsprit's heel is drawn. */
+   *  the bowsprit's heel is drawn and a stay led to the stem lands. */
   function stemHead(profile) {
     var stem = profile.stem_m && profile.stem_m.length ? profile.stem_m : null;
     var rail = profile.rail_m;
     var head = stem ? stem[stem.length - 1] : rail[rail.length - 1];
     return [head[0], Math.min(head[1], lineAt(rail, head[0]))];
+  }
+
+  /** The height of the rail at the stem: at its fore end, or, where it ends in a step
+   *  (RAIL_STEP_M) up a stem head standing above it, at that step's foot. */
+  function railAtStem(profile) {
+    var rail = profile.rail_m, n = rail.length;
+    var end = rail[n - 1], before = n > 1 ? rail[n - 2] : end;
+    return end[0] - before[0] <= RAIL_STEP_M && before[1] < end[1] ? before[1] : end[1];
   }
 
   /**
@@ -2724,9 +2792,11 @@
   }
 
   var FORM_HULLS = typeof WeakMap === "function" ? new WeakMap() : null; // drawn once a graph
+  var DRAWN_RAILS = typeof WeakMap === "function" ? new WeakMap() : null; // reckoned once a profile
   var DRAWN_SIDES = typeof WeakMap === "function" ? new WeakMap() : null; // reckoned once a profile
 
-  /** Her drawn side's half-breadth, (x, z) => metres, on a hull drawn from its profile. */
+  /** Her drawn side's half-breadth, (x, z) => metres, on a hull drawn from its profile: read by a
+   *  boat's oars at her gunwale (package 82), the rig's lines having their own rail (`drawnRailAt`). */
   function drawnSideAt(hull) {
     var profile = drawnProfile(hull);
     var kept = DRAWN_SIDES && DRAWN_SIDES.get(profile);
@@ -2742,6 +2812,42 @@
     }
     if (DRAWN_SIDES) DRAWN_SIDES.set(profile, hb);
     return hb;
+  }
+
+  /** Her drawn rail, (x) => {x, z, hb}, on a hull drawn from its profile: the top of the side at
+   *  x, as the outline strokes it, straight from station to station, and its half-breadth, x held
+   *  between the side's after end, the taffrail, and its fore end, the stem head. On the served
+   *  stations, or the profile's own where the graph serves none. */
+  function drawnRailAt(hull) {
+    var profile = drawnProfile(hull);
+    var kept = DRAWN_RAILS && DRAWN_RAILS.get(profile);
+    if (kept) return kept;
+    var tops; // [x, z, hb] aft to forward
+    if (servedStations(hull)) {
+      tops = formHull(hull).stations.map(function (s) {
+        return s.top;
+      });
+    } else {
+      tops = profileHull(profile).stations.map(function (st) {
+        var pts = sidePts(st);
+        var top = pts[pts.length - 1];
+        return [st.x, top[0], top[1]];
+      });
+    }
+    function at(x) {
+      var held = Math.min(Math.max(x, tops[0][0]), tops[tops.length - 1][0]);
+      return { x: held, z: lineAt(tops, held, 1), hb: lineAt(tops, held, 2) };
+    }
+    /** The rail's highest from x0 to x1: straight between stations, so at a station or an end. */
+    at.highestBetween = function (x0, x1) {
+      var top = Math.max(lineAt(tops, x0, 1), lineAt(tops, x1, 1));
+      tops.forEach(function (t) {
+        if (t[0] > x0 && t[0] < x1 && t[1] > top) top = t[1];
+      });
+      return top;
+    };
+    if (DRAWN_RAILS) DRAWN_RAILS.set(profile, at);
+    return at;
   }
 
   /**
@@ -3354,6 +3460,16 @@
     return points.length ? s / points.length : 0;
   }
 
+  /** The depth of the farthest of `points` from the viewer. */
+  function farDepth(points) {
+    return Math.max.apply(
+      null,
+      points.map(function (p) {
+        return p.depth;
+      })
+    );
+  }
+
   /** A projected polygon cut at the sea line (screen y = 0): the part above it (`below` false)
    *  or under it (true), as one polygon of three points or more; null where none is left. */
   function clipAtSea(pts, below) {
@@ -3484,7 +3600,7 @@
       // not where the mean of its outline's control points happens to fall
       // package 57: a sail or a yard by its point against its mast (`sortAt`)
       var at = f.sortAt || (f.kind === "sail" ? f.centre : null);
-      g.depth = at ? proj(at).depth : meanDepth(all);
+      g.depth = at ? proj(at).depth : f.sortFar ? farDepth(all) : meanDepth(all);
       // package 75: a figure inside another (a deck within the side) sorts this much farther
       if (f.sortBias) g.depth += f.sortBias;
       // the hull step's landing (the lead's point 10): the depth of a figure's middle cannot order

@@ -1144,16 +1144,15 @@ what the brief says and whom the game will seat, not the door.
   retaking; the director's court martial.
 - The sub-gates may pass separately (decision 49: iterative); a sub-gate's report is the
   gate document's chapter.
-- **Judgement decisions the gate rules on after testing and tuning** (the owner,
-  2026-11-06): figures built on judgement in the records are not final until the gate's
-  playtests have handled them; each is a gate item with its figure, its measure and the
-  owner's ruling. The first: **the lee ports and the roll** (package 75's L2 and L3,
+- **A reminder for the gate's testing, not a codified list** (the owner, 2026-11-06): a
+  figure built on judgement is ruled finally only after some testing and tuning, and the
+  gate document carries the ones the owner wants not forgotten. The first: **the lee
+  ports and the roll** (package 75's L2 and L3,
   Build-Ships.md §7): the sill's foot and the six inches of reopening, the roll's amplitude
   in the dip and the weather side shutting in a seaway, the dwell `PORT_HOLD_S = 60` ruled
   for the flicker in gusts, the line said only with the guns cast loose, and what the player
   sees and feels of it in an action on a reach in a fresh breeze and in a seaway; ruled
   finally by the owner on the gate's playtest, the figures tuned there, old beside new.
-  Others are added to this list as the records name them.
 
 ## 31. Packages (outline; the allocation, numbered after M7b's; redrawn on the owner's note 11)
 

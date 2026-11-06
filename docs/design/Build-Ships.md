@@ -141,7 +141,7 @@ scratch scripts named are not.
 | 31 | The fillers as posts are left to 77 | The shared draft S14; the lead's call (§19.2) |
 | 32 | The merchant brig's description moved to `merchant-brig.yaml`, and a packet description: for the lead before they are built | The shared draft §4.4 |
 | 33 | A scenario's `nations:` block: for the lead; laid in stage 0b if ruled in | The shared draft S13. **Plainly:** `world/scenarios.py` and `core/world.py` are outside the brief's file list |
-| 34 | D10(a)'s key for the *Neufchatel*'s main topgallant: her design reports it to the lead; B3 builds it as a fourth step if the lead agrees | D10; Ext §14 item 12 |
+| 34 | D10(a)'s key for the *Neufchatel*'s main topgallant: her design reports it to the lead; B3 builds it as a fourth step if the lead agrees. *Since (2026-10-31): the owner proposes a rule in the key's place, for the lead (her §12.2a)* | D10; Ext §14 item 12 |
 | 35 | One test suite at a time on the owner's machine | The plan §4; the brief's suites rule |
 | 36 | The hull's shape. The owner's end goal and twelve principles (§5.0). Eight optional shape keys in stage 0H (§3.5, §5.1); the stations computed by `freesail/ship/form.py` and served. B8's helpers in SW-2b.1 right after 0H, before B1's stage B, the eight files' shape in SW-2b.2, each new ship's from her first commit, B1's at stage B. The drawing in B5.1 (strips, the head rule) and B5.6 (§6). The owner's sheets (§6) and the pair check (§5.6). No port triple is written from the drawing. One class in two roles draws as one hull (the brig and the merchant brig; the two schooners) | The owner, 2026-10-28 (the scope as proposed; §19.1 items 14, 15, 17, 20); for the lead's approval (§19.2 item 13) |
 | 37 | The *Indefatigable* whole before any other ship: stage A; B3.1, B3.2, B3.5 and their drawings; stage B, with the hull's form built and drawn first on her two files (the pilot). A testing report to the owner in place of their own test (2026-10-29). Then SW-2 and SW-2b.2 as one step, and the other ships | The owner, 2026-10-28 and 2026-10-29 (§2.6); for the lead (§19.2 items 13, 20) |
@@ -208,7 +208,7 @@ scratch scripts named are not.
 | B5.6 | B5 | the form drawn (§6): the served stations, the sterns, heads, galleries and lights as plain shapes, the channel wales, the drawn depth, the hull below the water as the owner chooses; the owner's sheets | 0H; B1's shape keys (the pilot); SW-2b.2 for the eight | the owner's first test; the owner's check of the hulls | pictures measured |
 | SW-4 | B8 | the sub-types, the roles, the small ships' fits and bills, the privateer's arc (§8, §9) | S0; its `world/ships.py` rows at the boundary after B1's merge, when her window closes | B2, B6 | §16 |
 | SW-2 = L1, SW-2b.2 | B8 | one step: the eight files' profiles and sourced sills (§5.3, §5.4), their shape and marks (§5.7); the pair check; the triple gaps reported; B5 then measures the pictures, old beside new | the owner's test of the pilot (§2.6); SW-2b.1 | SW-5; B5's drawing of the eight | bytes only |
-| **B2** | the *Neufchatel* | her design, stage 0b, her file | B1 whole and merged, and the owner's test (§2.6); SW-4 | B4 | none existing |
+| **B2** | the *Neufchatel* | her design, stage 0b, her file; reported done on a testing report of her own (the owner's direction of 2026-10-29), and the lead merges her | B1 whole and merged on her testing report (§2.6); B3.4 (her §12.2, §12.2a); SW-4's rows, or if they are not in when she is otherwise done, hers go first in her window and SW-4's follow (the lead, her §17 item 3) | B4 | none existing |
 | SW-5 L2, L3 | B8 | the lee port on heel, then with the roll (§7) | SW-2 | B7's port truth | combat pins, bisected |
 | **B4** | the bilander | her design, stage 0d, her file | B2, B3.3 (for her handling truths) | B7 | none existing |
 | **B7** | the *Bellerophon* | her design, stage 0c, her file | B4, SW-1, SW-5 (for her port truth) | — | three assertions (§16) |
@@ -319,6 +319,17 @@ or wait, at the lead's word (§19.2 item 20). The session reports B1 done when s
 (step 7), and the lead merges her as each ship is merged; her window closes with that merge.
 **Plainly:** her window is longer than the lead's order of the ships foresaw; the next ship's
 window opens at her merge.
+
+**The order as the lead confirmed it (the lead's notes, 2026-10-29, item 3), recorded at the
+*Neufchatel*'s window's opening:** B1 merged on her testing report; SW-2 with SW-2b.2 as one step
+after her merge; SW-5 L2 and L3 behind them; then B2, B4 and B7 in that order, each on a testing
+report of her own and merged as each ship is. The owner, 2026-10-30: "once we're through the boom
+workflow, I'd like to look to parallelizing the hull work for bringing the existing ships up to
+date, then moving on to Neufchatel, the bilander, and the 74." The first three are done (B1, d9477c6
+for the hulls, 65c56b8 for L2). The engine's last steps sit inside the rest: B3.4 before her first
+commit, so that her file takes it from that commit (the lead: right after B3.5 and before B3.3);
+B3.3 before the bilander's file reaches the branch; SW-1 before the 74. Bring the lead's head in at
+each boundary.
 
 **Why.** The form and its drawing are proved on the two hulls with the best sources (her own
 draughts, measured) before thirteen files depend on them, and a change the owner asks for on
@@ -1135,6 +1146,7 @@ S† (§5.7; `pages-zaz6306.md` §11, §13).
   its x, if lower), the tip at `deck + height_m` as now. This removes D18 (a)'s one visible cost
   on the razee (Indf §12.3). *Since B5.3 (the lead's ruling of 2026-10-29):* the whole spar
   stands from the stem head at the file's length up to its end's height (Ext §6.2, as built).
+*Since the viewer step for the rig's lines (the lead's ruling of 2026-10-31):* where the file's end is no higher than the stem head (the cutter's, the lugger's, the smack's) the spar lies level from the rail at the stem, at the foot of a stem head's box where the rail ends in one (`railAtStem`). Old, from the stem head's top: cutter 2.81 to 2.44 m against her draught's 2.42, smack 2.60 to 2.22 m against her plate's notch 2.37, lugger 2.83 m unmoved against 2.79. The draught's height exactly needs a file key, which nothing here adds.
 - `fullRigFrame` (:1383-1414) already holds the hull's points; nothing else in the rig or the
   physics changes.
 - **The lifts of every yard** (proposed after the owner's question, 2026-10-28; Decisions, "The
@@ -1163,6 +1175,8 @@ the settee; the settee's sheet to the profile's taffrail.
 - **the decks:** at 0.95 of the drawn side's half-breadth at their height;
 - **the painter's order (the hull step's landing, the lead's point 10):** a closed body's faces cannot be ordered by the depth of each one's middle, so a face seen from inside goes before every other figure, by a margin at edge on, and it can cover nothing of hers and nothing in her, but for a rig figure beyond its plane, outside her, which stays behind it; the stern, seen from abaft about 120° off the bow, goes after the rest of the hull; a deck's end is seen only from its open side; what stands on the head sorts with its plate and paints straight after it. All else keeps the depth's order, rig against hull among it. First written: each sorted at its own middle, which hid the figure behind the plate abaft the beam, cut the deck's far edge in a saw-tooth near end on, laid the frigate's forecastle bulkhead across her forecastle deck, and nibbled the transom's corners (measured against a depth buffer; the margins are judgement);
 - **the other mends of the hull step's landing (the lead's point 10), old beside new; none moved a served figure and each is measured in the tuning notes, "The eight hulls":** a `band` follows the drawn side between its two heights through every height its strip's stations have a point at (first written, a chord from sill to sill, which stood up to 0.61 m off her side); the `head` has a back strip across the block to the stem, its foot at the foot of the stem's closure, not at −0.8 m, and a plate that leaves the stem level at the knee's top (first written, straight to the stem head, a wedge no sheet has); the sheet led to the stern goes to the top of the stern's line (first written, the rail's after end: only the cutter's differ, 0.28 m);
+- **the rig's lines on the drawn hull (the viewer step, the lead's ruling of 2026-10-31, the owner's yes of 2026-11-05), old beside new; no file and no served figure moved, and a graph with no profile draws as before:** a sheet or a brace that comes down to the side ends on her drawn rail, its height and half-breadth at that x read from the served stations, x held between the taffrail and the stem head (`sideEnd`; first written half the beam at the old datum, where the old hull's rail stood); a stay led to the stem lands on the stem head (first written half the file's length at the datum, inside her), and a head sail on it is tacked there, the least above the stay's foot that keeps its foot over the side, 2 cm clear, judgement (`stemTackFraction`; every other stay keeps JIB_TACK_FRACTION's 4%); a sheet that comes across her from the lee clew to the weather rail is painted at its far end's depth, not its middle's, which laid it over a sail its clew stands behind (`sortFar`). Measured in the tuning notes, "Where the existing rig no longer sits right on the new hull";
+*Since the booms topped up (the owner's word of 2026-11-05):* every boom on a hull drawn from her profile is drawn 3° above the level from its jaws (`BOOM_STEEVE`, judgement), its sail's foot, its sheet and a ringtail boom along it, and a graph with no profile lays it level as before; no file moves and the physics reads none of it. It now clears her taffrail on every hull but the frigate-36, whose file hangs its jaws too low (F, a later package's). The razee's spanker's and the 64's driver's clews, at their files' foot along it, stand 0.94 and 0.87 m above their filed corners: the drawing departs from the files there, recorded in the tuning notes, "Where the existing rig no longer sits right on the new hull", "The booms topped up"; the boom's real trim by its lifts waits for the handling of the sails.
 - **the drawn depth:** the strips go down to D(x) = max(0.8 m, the water's half-breadth × tan 20°), no deeper than the keel.
   - `UNDERWATER_HEEL_DEG = 20` (judgement) is named at the top of `projection.js`.
   - So no cut edge rises out of the water below 20° of heel. Today's flat cut does at 8.5° on the frigate (measured in the session's scratch);
@@ -1240,6 +1254,44 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
   side, whose dip is the roll less the heel. On today's files it needs a roll 20° beyond the
   heel, so it moves nothing; it is said for the lead.
 
+*Since L2 (2026-10-31), as built and measured:* `shot.lee_port_shut` is called, by `ports.update`.
+`_crew_scenario` now stands at `world/crews.py:263`, its `sea=False` unconditional, so a crewed ship
+reads a roll of nought everywhere today: the cutter of `merchant-cutter.yaml` rolled 8.28° while the
+crewed hulls round her had no sea and no motion. The player's ship reads her own roll only where her
+World keeps a sea; the first action, the encounter and the convoy keep none. So L3 reaches the player's
+ship in a World that keeps a sea, and nobody else until 84 mends it. The rule drops the cosine, as
+above; a port truly turned about the waterline shuts a little sooner (the cutter 14.1° for 14.7°, the
+frigate 18.5° for 19.7°): left as this section binds it, for the lead.
+
+*Since L3 (2026-11-05), as built and measured:* `ports.roll_in_the_dip` returns `float(firer.roll_deg)`,
+and nothing else of the rule moved. The roll is the amplitude this section asks: `Motion.roll_deg`, the
+degrees she rolls to each side, relaxed toward what the sea gives on her heading with a time constant of
+90 s (`physics/motion.py`, `MOTION_TIME_CONSTANT_S` and `Motion.tick`), never signed and never the angle
+of the moment, given the battery by `action._firer` (`combat/action.py:214-227`). A crewed ship still reads
+nought at this head (`_crew_scenario` at `world/crews.py:263`, `sea=False` at :284): in `merchant-cutter.yaml`
+after ten minutes the player's cutter rolled 7.82° and her two crewed hulls had no sea, no motion and a
+roll of 0.0. Of the 46 shipped scenarios 36 keep a sea and 24 of those arm the player's ship (the frigate
+in 20, the cutter in 3, the merchant brig in 1); the first action, the encounter, the two convoys, the
+squadron, the leak and the exercise keep none. **The weather side does move**, against "a roll 20° beyond
+the heel" above: the small ships roll far more than they heel in a seaway, the cutter 17-23° on the beam
+at 15-20 kn, so her weather ports shut in a band of wind: in the sea a scenario opens on, at 17.5 to 20 kn,
+on the beam at about 17.5 alone (at 18 kn steady, heel 9.5° and roll 22.9°, they stand open) and with the
+sea abaft her beam to 20, at 2-8° of heel; at 12.5 to 17.5 kn in a sea fully risen; none from 22.5 kn in
+either, where her heel outweighs the roll. The privateer's shut with the sea on her quarter and not on the
+beam, the long tom's at 20 to 27.5 kn (17.5 to 22.5 fully risen) and the letter of marque's at 20 to 30
+(15 to 27.5 fully risen, and then on the beam as well at 17.5); the merchant brig's at 25 to 27.5 (22.5 to
+25), on the beam at 27.5 alone; and in a sea fully risen the brig's at 22.5 kn with the sea on her quarter, and the 64's and
+the razee's at 25 to 30 with the sea on her bow or quarter, never on the beam. Measured in the tuning
+notes, "The lee ports with the roll".
+
+*Since L3's reviews (2026-11-05):* **a port of no side** (a chaser on the centre line; no file carries one)
+takes the roll alone, for no heel is toward it: under the one line it took the weather side's arithmetic,
+the roll less the heel, so that a roll shut it upright and heeling her either way opened it. At L2, with no
+roll, both give nought. At this head the lines cited above stand at: `_is_lee` `combat/guns.py:1151-1159`;
+the roll `combat/action.py:220` and the half-beam :223 (`_firer` at :214-227); `ship.extra["motion"]`
+`core/world.py:890`; `PER_SHIP_FIELDS` `world/hulls.py:62`; `_crew_scenario` `world/crews.py:263`,
+`sea=False` at :284. `PORT_SHUT_M` and `lee_port_shut` stand where cited.
+
 ### 7.2 The wiring (B8 fills stage 0's hooks)
 
 - `ports.update(battery, firer)`, once a tick at the head of `Battery.tick`: each port gun's
@@ -1255,6 +1307,47 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
   is 74's.
 - **Pace:** a sine and a compare a port gun a tick; truth 51 and the crewed floor are measured
   after L2.
+
+*Since L2 (2026-10-31), as built:* three things this section does not say, for the lead to rule, each
+measured in `docs/dev/TuningNotes.md`, "The lee ports on the heel alone":
+- **The log's gate.** A line is said only while a gun of that deck's side is cast loose, at the shutting
+  or at the casting loose with the port shut already; `_shut` and the reading go on with the guns
+  secured. Said on passage as well, it moved the station's lee shore from 1,561 lines to 1,563 and her
+  gale from 1,722 to 1,724, where §7.3 and §16.1 expect only actions to move. So `at the lee ports
+  shut` does not fire on passage with the guns secured, and chapter 11 of the primer says so.
+- **A shut port silences its own gun and no other.** A division all behind shut ports passes its turn
+  (the turn held, 30 minutes by divisions gave the cutter 1 round for 34 as they bear); the word for a
+  broadside all behind them is dropped with a line, as a gun named is; a gun that loads behind a port is
+  not timed for the drill.
+- **A deck's side counts as shut** from its first port shut until its last has opened, so the log says
+  one line and the reading gives the count.
+
+The pace, on this machine: 1.2 to 1.4% alone and 1.3% crewed, taken back by `ports._least_dip`, one
+compare a tick while no port can shut, so that neither figure now stands above the noise. The floors are
+the lead's on the build machine.
+
+*Since L3 (2026-11-05), for the lead:* three things of the wiring the roll brings out, each reproduced and
+measured in `docs/dev/TuningNotes.md`, "The lee ports with the roll": the first left (§7.1's own figure),
+the second mended at L3's commit (package 75's own words), the third left (outside its files):
+- **The ports work gun by gun in gusts.** `PORT_REOPEN_M`'s six inches is 1.6° of heel at the frigate's
+  lowest port and 3.1° at the cutter's, less than a gust swings her, and the roll lowers her shut heel into the band
+  the gusts sweep: an hour engaged in gusts with the sea on her beam gave the frigate at 21 kn 46 changes
+  of port over 13 guns, the shortest 6 s (none at L2), the brig at 17 kn 24, the 64 at 17.5 kn 43 (12 at
+  L2), while the log said two lines or none, a deck's side being one line from its first port shut to its
+  last opened. A dwell (a port held shut a minute) or a margin in heel would steady them; either changes
+  §7.1's figure.
+- **The words `the lee ports shut` and `the lee ports opened`** (`api/practice_readings.py:329-330`) went by
+  the line's kind alone, so they answered the weather side's line as well, which L2 never said, and a book
+  written to them acted on the wrong side. Mended at the commit: a test on the line's `lee`
+  (`d.get("lee") is not False`), so the weather's line answers neither. Two words for the weather's line
+  are proposed, not added (new served words, the lead's).
+- **The replies** of `engage` and `fire` behind a side all shut (L2's items) come now with little heel and
+  with both sides shut at once: "the guns to fire as they bear" and nothing fired, and "no gun of it is
+  loaded and run out yet" two seconds before the port's own line.
+
+The pace since L3: the roll's read in the one compare, and §7.2's own cost wherever the roll keeps a port
+shut, 1.8% of the frigate's tick in the station's gale; the reviews' test of a gun's side adds 0.1 to 0.3
+microseconds a tick to the loop it guards.
 
 ### 7.3 The steps and the proof
 
@@ -1279,6 +1372,37 @@ rail: `docs/design/Proposal-PivotGun.md` §4.4):
   **the bisection**: the commit that moves it (L2 or L3); then, within L2, the same run with the
   gate on and the file's old heights (a scratch copy, never committed), which separates "the
   gate" from "the sourced sill".
+
+*Since L2 (2026-10-31), as measured:* the lowest shut heels on the drawn hulls are the letter of marque's
+10.5°, the 64's lower deck's 10.6°, the long tom's 13.5°, the razee's 14.5°, the cutter's 14.7°, the brig's
+17.5°, the merchant brig's 18.2° and the frigate's 19.7°. No truth, action or trial moved at L2: no
+candidate reaches the gate with her guns cast loose, the most heel cast loose among them being the *Renard*'s
+6.32°. Two pins moved, stage 0's own hook tests, and both are the gate's and not the sourced sill's. The
+quoin silences a lee gun before its port does: the cutter's carronades fall short at two cables from 8.5°,
+about 18 kn under plain sail, against her first port at 14.7°, 24.5 kn (the tuning notes, "The quoin before
+the port").
+
+*Since L3 (2026-11-05), as measured:* no truth, action or trial moved. The candidates as L2 widened them
+(truths 7-133 to 7-342 and 7b-114 less the pace truths, now 129 with package 82's three, and the pivot,
+practice, magazine, ordnance, profile and lee-port files): 525 passed on a clean archive of 1238bedf, 545
+on the tree at the build and 546 on the final tree after the reviews (their line of 7-190 that its rows
+are every armed file), no test changing its outcome; the captain's trials 3 failed and 4 passed on both with the
+same digests; the whole logs of the first action, the encounter and the station's lee shore and gale the
+same line for line and digest for digest, the frigate's ports shut by the roll for most of both trials'
+twenty hours with her guns secured, so that the gate says nothing. Two pins moved, L2's own
+`test_the_roll_is_held_at_nought` and, with the reviews' mend of the word upright (a port shut with no heel
+said by its side's name), the last line of L2's chaser test; the bisection is the commit itself, L2 against
+L3. No scripted action keeps a sea, so the expected movers have no pin; but the blockade's evening (the
+*Hortense*'s sortie at 22:00 into the gale's 5 m sea, the frigate rolling 22.5° with 11 of her 20 lee port
+guns shut by the rule), the naval cruise (the *Palinure*) and the station-stranger trial put an enemy before
+the player's frigate in a World that keeps one, where only she rolls, and no pin plays them. Measured
+instead, the roll is the bigger half of the dip for the small ships: with her side to the sea a scenario
+opens on, the cutter's lee ports shut at about 12.6 kn under plain sail (24.5 on the heel alone) and her
+weather ports at 17.5 to 20 kn (on the beam at about 17.5 alone), the privateer's at 12
+to 13 kn, the brig's, the merchant brig's and the 64's at 17 to 18, the razee's at 19.5 and the frigate's
+at 21 (about 29). The quoin's figures do not move (it reads the heel), but in a seaway the port comes
+before it: the cutter at 15 kn has her lee battery shut with her shot still carrying two cables, and fires
+her weather battery as before (the tuning notes, "The lee ports with the roll").
 
 ## 8. The sub-types as fits and roles (B8, SW-4)
 
@@ -1692,8 +1816,8 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | B5.6 | the drawing; the pictures' standard deviation and dark fraction (thresholds stood, unmoved). **The hull step's mends, as landed** (the lead's point 10): the band on the drawn side, the head's back strip, foot and wedge, the taffrail by the stern's line, the painter's order (§6); `tests/test_view_geometry.py`'s tables and `RIGHTLY_WITHOUT` | old beside new in the tuning notes, "The eight hulls"; the owner's sheets, `docs/playtests/2026-10-31-hulls-the-eight/` |
 | SW-1 | the hull step's standing comparisons against its base commit, which take the whole document or each fit's keys, to rebase old beside new: `tests/test_hull_frigate.py` and `tests/test_hull_brig.py`'s `test_no_figure_the_physics_or_the_gunnery_reads_moved`, `tests/test_hull_cutter.py`'s `test_a_diff_of_her_physics_keys_against_git_shows_none`, `tests/test_hull_schooner.py`'s `test_no_figure_the_physics_reads_moved`; the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
 | SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
-| SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4) | old beside new, the reason, the bisection of §7.3 |
-| SW-5 L3 | actions in a sea, on the player's ship | the bisection L2 → L3 |
+| SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4; on the drawn hulls 10.5°, 14.7°, 17.5° and 19.7°, §7.3). *As built, no action moved; stage 0's two hook tests did* | old beside new, the reason, the bisection of §7.3 |
+| SW-5 L3 | actions in a sea, on the player's ship. *As built, no action, truth or trial moved: no scripted action keeps a sea, and the three shipped Worlds that put an enemy before her in one (the blockade's evening, the naval cruise, the station-stranger trial) have no pin that plays it. Two pins moved, in `tests/test_lee_ports.py`: L2's `test_the_roll_is_held_at_nought`, now `test_the_roll_is_read_and_shuts_both_sides_by_itself`, and the last line of L2's chaser test (a port shut upright said by its side's name, the reviews' mend); truth 7-190 drafted in that file for Phase 5* | the bisection L2 → L3, the commit itself; the candidates by junit, test by test; the whole logs and the captain's trials the base's |
 | The caches | none (the results unchanged) | the pace measured |
 
 **None of the existing ships' sailing passages moves:** no hull figure, spar or sail of an

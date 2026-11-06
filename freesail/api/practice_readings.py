@@ -23,11 +23,10 @@ filled` (`guns.filled`), `the powder all filled` (`guns.powder_out`), `the hoy a
 and `the mark in sight again` (`practice.mark_sight`, by its `seen`), `the exercise`
 (`practice.exercise`), `beyond the allowance` (`practice.beyond_allowance`). Package 75's lee
 ports (docs/design/Build-Ships.md §3.1 item 19, §7.2) add `the lee ports shut`
-(`guns.ports_shut`) and `the lee ports opened` (`guns.ports_opened`), registered here beside
-the guns' other lines and never said until the lee ports' rule is built (`combat/ports.py`).
-Until then each is registered absent (`LEE_PORTS_ABSENT`): left out of the events the brief
-and a stand-by offer, and a stand-by or an `at` for one refused with that sentence, as it was
-refused before they were registered; the rule's builder drops the `absent`.
+(`guns.ports_shut`) and `the lee ports opened` (`guns.ports_opened`), by the line's `lee`: the
+lee's line, or a port's of no side or one shut upright, and never the weather's, which the
+roll can bring since L3 (§7.2); registered here beside the guns' other lines and said by the
+lee ports' rule (`combat/ports.py`).
 
 The drill's counts are the battery's (`guns.Drill`, kept per gun and never read for pace or
 aim: the owner's ruling that practice improves no skill); the reading only says them.
@@ -47,9 +46,6 @@ from freesail.ship.parts import gun_words
 __all__ = ["PRACTICE_ROWS", "idle_practice_rows", "practice_value", "register"]
 
 PRACTICE_ROWS: tuple[str, ...] = ("practice",)
-# The lee ports' two events while nothing raises them (package 75; Build-Ships.md §3.1 item
-# 19): absent, so that stage 0 offers a stand-by or an `at` nothing that never comes.
-LEE_PORTS_ABSENT = "Nothing shuts the lee ports yet; their shutting and opening come later."
 
 
 def idle_practice_rows(world: Any) -> set[str]:
@@ -331,8 +327,8 @@ def register() -> None:
         ev("the exercise", "practice.exercise"),
         ev("beyond the allowance", "practice.beyond_allowance"),
         # package 75 (Build-Ships.md §7.2): the lee ports, once a change of state a deck and
-        # side; absent, and never emitted, until the rule is built
-        ev("the lee ports shut", "guns.ports_shut", absent=LEE_PORTS_ABSENT),
-        ev("the lee ports opened", "guns.ports_opened", absent=LEE_PORTS_ABSENT),
+        # side; the weather side's line (`lee` False) answers neither
+        ev("the lee ports shut", "guns.ports_shut", lambda d: d.get("lee") is not False),
+        ev("the lee ports opened", "guns.ports_opened", lambda d: d.get("lee") is not False),
     ):
         R.EVENTS[spec.words] = spec

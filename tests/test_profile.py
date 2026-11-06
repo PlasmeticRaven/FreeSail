@@ -675,10 +675,11 @@ def test_the_rating_pass_knows_the_lateen(gen):
 # -- the gun deck's hooks (items 17 to 19) -------------------------------------------------
 
 
-def test_the_lee_ports_update_shuts_nothing_and_a_shut_gun_neither_works_nor_fires():
-    """Build-Ships.md §3.1 items 17 and 18: `ports.update` gives two empty sets and leaves the
-    battery's `_shut` its class default, empty; a gun put in it by hand has no work, and a
-    gun named to fire waits behind its port until it is opened."""
+def test_the_lee_ports_update_shuts_nothing_upright_and_a_shut_gun_goes_unfired():
+    """Build-Ships.md §3.1 items 17 and 18, as L2 fills them (§7.2; the rule's own cases are
+    `tests/test_lee_ports.py`'s): upright `ports.update` gives two empty sets and leaves the
+    battery's `_shut` its class default, empty; a gun put in it by hand goes on loading, and
+    a gun named to fire is dropped with its line where stage 0 had it wait behind its port."""
     assert ports.PORT_PLACES == ("broadside", "bow", "stern") == _PORT_GUN_PLACES
     assert ports.PORT_REOPEN_M == 0.15
     ship = load_ship(BRIG)
@@ -697,41 +698,42 @@ def test_the_lee_ports_update_shuts_nothing_and_a_shut_gun_neither_works_nor_fir
     gun = ship.guns["gun.1.starboard"]
     assert battery.wants_work(gun)  # empty, it wants loading
     battery._shut = frozenset({gun.id})
-    assert not battery.wants_work(gun)
+    assert battery.wants_work(gun)  # behind a shut port the loading goes on
     gun.loaded, gun.primed, gun.run_out = Charge.ROUND, True, True
     battery.single = [gun.id]
     battery._fire(None, firer, None, None, 0, None, None)
-    assert battery.single == [gun.id] and gun.fired == 0
+    assert battery.single == [] and gun.fired == 0
     battery._shut = frozenset()
+    battery.single = [gun.id]
     battery._fire(None, firer, None, None, 0, None, None)
     assert battery.single == [] and gun.fired == 1
 
 
-def test_the_lee_ports_events_are_registered_and_said_nowhere_yet():
-    """Item 19: the two events for `at` and a stand-by, never emitted until the rule is
-    built (no module records either kind), and absent till then: the brief and the
-    stand-by tool offer neither, and a standing order at one is refused in its words."""
+def test_the_lee_ports_events_are_registered_and_said_by_the_rule():
+    """Item 19, as L2 fills it: the two events for `at` and a stand-by, said by the rule alone
+    (`combat/ports.py`), and no longer absent: the brief and the stand-by tool offer both, and
+    a standing order at one is taken, where stage 0 refused it in words."""
     from freesail.agents.agent import STAND_BY_WORDS
     from freesail.agents.tools import STAND_BY_EVENTS
-    from freesail.api.practice_readings import LEE_PORTS_ABSENT
-    from freesail.orders.errors import OrderError
     from freesail.standing.grammar import parse_standing
 
     assert EVENTS["the lee ports shut"].kind == "guns.ports_shut"
     assert EVENTS["the lee ports opened"].kind == "guns.ports_opened"
     for words in ("the lee ports shut", "the lee ports opened"):
-        assert EVENTS[words].absent == LEE_PORTS_ABSENT
-        assert words not in STAND_BY_EVENTS and words not in STAND_BY_WORDS
-    with pytest.raises(OrderError, match="Nothing shuts the lee ports yet"):
-        parse_standing(
-            load_ship(BRIG), 'standing order "ports": at the lee ports shut then beat to quarters'
-        )
+        assert not EVENTS[words].absent
+        assert words in STAND_BY_EVENTS and words in STAND_BY_WORDS
+        # the lee's line, a port's of no side or one shut upright; never the weather's (L3)
+        test = EVENTS[words].test
+        assert test({"lee": True}) and test({"lee": None}) and not test({"lee": False})
+    parse_standing(
+        load_ship(BRIG), 'standing order "ports": at the lee ports shut then beat to quarters'
+    )
     named = [
         p.name
         for p in sorted((ROOT / "freesail").rglob("*.py"))
         if '"guns.ports_' in p.read_text(encoding="utf-8")
     ]
-    assert named == ["practice_readings.py"]
+    assert named == ["practice_readings.py", "ports.py"]  # api/ and combat/
 
 
 # -- the readings' hooks (items 20 and 21) -------------------------------------------------
