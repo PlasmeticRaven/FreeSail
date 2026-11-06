@@ -4225,14 +4225,21 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # point past dead astern to the larboard quarter with her yards braced for the starboard
 # tack, and the deck says so once ("brace them round when you will"), the book's trim
 # bracing them at 75791 as before: one line more, every tick the same
-GATE_5C_MERCHANT_LINES = 3100  # package 58b (3099 at 68, riding; 3098 at 56, 3080 at 57)
+# package 65, step 3 (the place's knowledge, §7): the mate reports to the master below, and
+# sends for him; the master is below at his sights at 26100 when a sail is sighted off the
+# Lizard (the report at 26160, the sail lost at 26700), and below at the noon's day's work in
+# the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
+# closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
+# thing): seven lines more, every tick the same (the lines are said and nothing moves)
+GATE_5C_MERCHANT_LINES = 3107  # 65 step 3 (3100 at 58b, 3099 at 68, 3098 at 56, 3080 at 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
 # package 68, riding: 902be35aeeac7b54
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_5C_MERCHANT_DIGEST = "6abbbff4d7fa1a57"  # package 58b, the stern (902be35aeeac7b54)
+# package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
+GATE_5C_MERCHANT_DIGEST = "6436eb06a665f379"  # package 65, step 3 (6abbbff4d7fa1a57 at 58b)
 
 
 def _people(world) -> list[dict]:
@@ -4681,7 +4688,9 @@ GATE_6A_INTENT_BROUGHT_UP_TICK = 111238
 GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111300
 # package 58b: not sold in the 36 hours (119400 at 68, 124320 at 43b, 119820 at 45c)
 GATE_6A_INTENT_SOLD_TICK = None
-GATE_6A_INTENT_LINES = 2078  # package 58b (2160 at 68, riding; 1698 at 56, 1684 at 43b)
+# package 65, step 3: the boat away for the prices at 111619 is reported to the master below
+# a minute later (one line more, every tick the same)
+GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
@@ -4690,7 +4699,7 @@ GATE_6A_INTENT_LINES = 2078  # package 58b (2160 at 68, riding; 1698 at 56, 1684
 # package 68, riding: 8eead2f4521f2a61 (90061f779b7db484 before)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave b498761052da0862; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_INTENT_DIGEST = "585c52675f10e590"  # package 58b
+GATE_6A_INTENT_DIGEST = "8744d3e56cfc9508"  # package 65, step 3 (585c52675f10e590 at 58b)
 
 
 @pytest.fixture(scope="module")
@@ -4874,7 +4883,8 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # package 58b: the merchant passage's stern line (3112 lines before; item 3's by bisection)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_FAKE_CAPTAIN_DIGEST = "dfaa7ab3bdd70295"  # package 65, step 2 (1c9a985bfd5dce0f at 58b)
+# package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "7076e667c2bc41e3"  # package 65, step 3 (1c9a985bfd5dce0f at 58b)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -13422,11 +13432,40 @@ def test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
     """A captain in the cabin: his sample carries no deck reading (no wind, no speed, no
     sail, no sail in sight) and says in one line where they are to be had; the glass, the
     tell-tale compass's heading and the chart's rows are his; the bell reaches him and the
-    lookout's sighting does not; the sail work overhead a sound and not a figure. The
-    officer's report of a sail sighted reaching him there is step 3's clause."""
-    from tests.test_knowledge import test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks
+    lookout's sighting does not; the sail work overhead a sound and not a figure; and the
+    rules' officer's report of what the deck saw reaches him there a minute after the line,
+    the line itself not (package 65, step 3), a captain on deck getting no report."""
+    from tests.test_knowledge import (
+        test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks,
+        test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck,
+    )
 
     test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+    test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck()
+
+
+def test_truth_7_371_a_captain_ashore_has_nothing_of_the_ship_but_the_boats_report():
+    """A captain ashore at the port: nothing of the ship in his sample (the deck's lines
+    none) but the boat's report when her manned boat comes to the quay (`report.boat`: her
+    state, whose the deck is, all well), which reaches the quay of that port."""
+    from tests.test_knowledge import (
+        test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship,
+    )
+
+    test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship()
+
+
+def test_truth_7_372_a_sleeping_station_is_woken_by_the_call_and_not_by_a_notable_line():
+    """A sleeping station is woken by the call (`report.called`, the officer's `call the
+    captain`) and not by a notable line of the deck nor by the bell; woken by all hands; the
+    captain is called for a danger once for a thing, and for everything by night."""
+    from tests.test_knowledge import (
+        test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do,
+        test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night,
+    )
+
+    test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do()
+    test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night()
 
 
 def test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where():
@@ -13503,15 +13542,17 @@ def test_truth_7_386_the_filters_cost_with_three_stations_seated_is_within_a_fif
 def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
     """A captain in the cabin standing by for `speed under 20 knots` is woken with 'Mr Pearce
     sends down to you' before the words, the log being hove on deck; a tripwire the cabin can
-    judge (the depth by the chart) and the same stand-by on deck wake as 58a's. The call's
-    line in the log is step 3's clause. Also the lead's ruling: an officer with the deck does
-    not go below."""
+    judge (the depth by the chart) and the same stand-by on deck wake as 58a's; the call is
+    a line of the log (`report.called`, package 65, step 3), before the wake's. Also the
+    lead's ruling: an officer with the deck does not go below."""
     from tests.test_knowledge import (
         test_a_tripwire_judged_below_wakes_as_the_officers_call,
         test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft,
+        test_the_tripwires_call_is_a_line_in_the_log,
     )
 
     test_a_tripwire_judged_below_wakes_as_the_officers_call()
+    test_the_tripwires_call_is_a_line_in_the_log()
     test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
 
 

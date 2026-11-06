@@ -671,6 +671,11 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
             # a station sentence from the captain's station (package 40), or the deck's
             # conversation from any (package 41): the words as said, not a gerund of them
             said = f"By the {station}: {text}"
+        elif how == TOLD:
+            # at the captain's word (decision 63): logged as given by the station at it
+            said = f"By the {station}, at the captain's word: {said_as_done(world.ship, text)}"
+        elif how == COMMAND:
+            said = f"By the {station}, in command: {said_as_done(world.ship, text)}"
         else:
             said = f"By the {station}: {said_as_done(world.ship, text)}"
     e = world.submit(text, actor=f"the {station}", said=said)
@@ -735,6 +740,9 @@ HAND_OVER_BY_TOOL = (
 # word for a named thing, by his general authority, or by the officer's own word to avoid
 # an immediate danger.
 DOMAIN, GRANT, GENERAL, DANGER = "the domain", "a named grant", "the general authority", "danger"
+# decision 63 (package 65, step 3): the command devolved on the station, and an order the
+# captain told the station to carry out, which is his word for that thing
+COMMAND, TOLD = "the command devolved", "the captain's word, told"
 
 # What a refusal of an order the way out of danger would open ends with (package 37g, item
 # 19): the refusal had quoted the exception since package 37, and there was no route.
@@ -808,8 +816,13 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     bare = standing.bare_book_sentence(ship, text)
     if verb is not None or bare is not None:
         return text, _book_check(world, station, bare or text, vocab), ""
+    from freesail.world import reports
+
+    commands = reports.in_command(world, station)  # decision 63: the command devolved
     sentence = stations.recognises(text, ship)
     if sentence is not None:
+        if commands and sentence not in stations.CONVERSATION_VERBS:
+            return text, "", COMMAND
         if domain.is_captains:
             # the captain's station addresses the stations as the player does (package
             # 40): the deck given and taken, the grants, tell and ask, stand down and
@@ -853,6 +866,13 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     if why is None:
         return text, "", DOMAIN
     agent = harness.agent
+    if commands:
+        # the command devolved on the station (decision 63): the captain's authority whole
+        return text, "", COMMAND
+    if reports.told_covers(ship, getattr(agent, "told", ()), text, order, vocab):
+        # an order the captain told the station to carry out is his word for it (decision
+        # 63): never refused for what he was told to do
+        return text, "", TOLD
     # 1. a named grant
     granted = _granted(world, harness, order, spec, vocab)
     if granted is True:
@@ -941,6 +961,31 @@ def own_order(world: World, text: str) -> bool:
         return False
     spec = vocab.verbs.get(order.verb)
     return spec is not None and spec.object in ("free", "needs")
+
+
+def told_order(world: World, station: str, text: str) -> bool:
+    """Whether an order is one the captain told the station to carry out (decision 63;
+    package 65, step 3): his word for that thing, given with the deck or without, and the
+    told officer is never refused for it."""
+    from freesail.world import reports
+
+    harness = (getattr(world, "agents", None) or {}).get(station)
+    if harness is None:
+        seat = getattr(world, "player_seat", None)
+        if seat is None or seat.station.name != station:
+            return False
+        harness = seat
+    told = getattr(harness.agent, "told", None) or ()
+    if not told:
+        return False
+    try:
+        from freesail.orders import grammar as imperative
+
+        vocab = load_vocabulary()
+        order = imperative.parse(world.ship, text, vocab)
+    except Exception:  # noqa: BLE001  (words the grammar refuses, or a point ship)
+        order, vocab = None, None
+    return reports.told_covers(world.ship, told, text, order, vocab)
 
 
 def reach_order(world: World, text: str) -> bool:
@@ -1800,6 +1845,7 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
             or conversation_order(world, str(args.get("text", "")))
             or reach_order(world, str(args.get("text", "")))
             or own_order(world, str(args.get("text", "")))
+            or told_order(world, station, str(args.get("text", "")))
         )
     )
     if (

@@ -1498,6 +1498,19 @@ class Harness:
         urgent = self._urgent_in(new)
         if urgent is not None:
             return f"an urgent event: {urgent.text}"
+        called = self._called_in(new)
+        if called is not None:
+            # the officer of the watch sends for him (package 65, step 3; `report.called`):
+            # it ends any stand-by of the station it reaches, a sleeper's too
+            return f"sent for: {called.text}"
+        if sb.words in (ASLEEP_BELOW, ASLEEP_WHERE):
+            # a sleeper is woken by what wakes a sleeper (`knowledge.WAKES`: all hands, a
+            # gun, the ship striking, the call) whatever its severity, and by nothing else
+            # of the deck's (truth 7-372); an urgent line of the deck's business he cannot
+            # perceive does not reach him (`_urgent_in` above reads his senses)
+            woke = self._wakes_in(new)
+            if woke is not None:
+                return f"woken: {woke.text}"
         if self.agent.has_deck:
             # a station with the deck is woken by a notable line that speaks of danger
             # (package 37g, item 4)
@@ -1552,7 +1565,46 @@ class Harness:
         from freesail.agents.agent import OFFICER, station_holder
 
         who = station_holder(self.world, OFFICER, ("the officer of the watch", "officer"))[0]
+        # the call's line in the log (package 65, step 3; truth 7-387): the officer sends
+        # down to him, as the night orders of the period had it ('call me if ...')
+        self.world.record(
+            Severity.NOTABLE,
+            "report.called",
+            f"{who} sends down to the {self.station.name}: {woke}.",
+            data={
+                "to": str(getattr(self.station, "person", "") or self.station.name),
+                "why": woke,
+                "of": "a stand-by's condition",
+                "by": who,
+            },
+        )
         return f"{who} sends down to you: {woke}"
+
+    def _called_in(self, lines: list[Event]) -> Event | None:
+        """A call for the person (`report.called`, package 65, step 3) that reaches this
+        station: the officer of the watch sends for the captain below or asleep."""
+        return next(
+            (
+                e
+                for e in lines
+                if e.kind == "report.called" and e.actor != self.actor and self._reaches(e)
+            ),
+            None,
+        )
+
+    def _wakes_in(self, lines: list[Event]) -> Event | None:
+        """A line of the kinds that wake a sleeper (`knowledge.WAKES`) by anyone but the
+        agent, where it reached him (package 65, step 3; truth 7-372)."""
+        return next(
+            (
+                e
+                for e in lines
+                if e.actor != self.actor
+                and knowledge.reach_of(e.kind) == "wakes"
+                and self._reaches(e)
+            ),
+            None,
+        )
 
     def _urgent_in(self, lines: list[Event]) -> Event | None:
         """An urgent line by anyone but the agent: it wakes a stand-by whatever it was for,
@@ -2266,6 +2318,7 @@ class Harness:
             self._shape_told = shape
             self.agent.notices.append(shape_words(self.world))
         self._commander_notice()
+        self._report_duty_notice()
         if self.station.name != MASTER or self.conversation:
             return
         nav = getattr(self.world, "navigation", None)
@@ -2275,6 +2328,42 @@ class Harness:
             # the working marked told is the navigation's, journaled as the station's act
             # so that a replay by the acts marks it too (package 42)
             acts.record(self.world, self.station.name, "working_told", True)
+
+    def _report_duty_notice(self) -> None:
+        """An officer of the watch's kind with the deck, told once when the captain goes
+        below that the duty to report is his (package 65, step 3; the design's §7): the
+        rules' officer makes no report while a model or the player holds the station."""
+        a = self.agent
+        if self.conversation or self._is_directors or not a.has_deck:
+            return
+        domain = self.domain
+        if domain is None or domain.is_captains or not getattr(domain, "deck", True):
+            return
+        from freesail.agents.agent import OFFICER
+
+        stations = getattr(self.world, "stations", None)
+        try:
+            kind = stations.kind_of(self.station.name) if stations is not None else None
+        except Exception:  # noqa: BLE001  (a world whose stations cannot be read)
+            kind = None
+        if (kind or self.station.name) != OFFICER:
+            return
+        from freesail.world import reports
+
+        below = reports.captain_below(self.world)
+        told = bool(getattr(a, "report_duty_told", False))
+        if below is None:
+            if told:
+                a.report_duty_told = False  # on deck again: said again the next time
+            return
+        if told:
+            return
+        a.report_duty_told = True
+        a.notices.append(
+            "The captain is below; the Regulations give you his strange sails and his "
+            "shifts of wind to report: 'say to the captain ...', or 'call the captain: "
+            "<why>' when the ship is in danger or by night, which wakes him."
+        )
 
     def _commander_notice(self) -> None:
         """A station below the captain's told in its session kind who commands (package
@@ -4623,6 +4712,9 @@ class Harness:
                 f"{_cap(speaker['words'])}, {speaker['place']}, to the {self.station.name}: {words}"
             )
         self.add_word(words, f"a word from {officer}" + (f" (by {by})" if by else ""))
+        # the captain's word kept (decision 63; package 65, step 3): an order he tells the
+        # station to carry out is his word for that thing (`reports.told_covers`)
+        a.told.append(words)
         if by:
             return f"By {by}: {officer} to the {self.station.name}: {words}"
         return f"The captain to the {self.station.name}: {words}"
