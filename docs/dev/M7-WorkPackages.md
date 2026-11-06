@@ -4834,8 +4834,24 @@ tree as `docs/references/images/corvette-diana-1809-plano-bvmdefensa.jpg` (the o
 same day: the library distributes the digital copy under CC BY 4.0 on the condition that the
 source is named, "Fuente: Archivo Histórico de la Armada Juan Sebastián de Elcano /
 Biblioteca Virtual de Defensa"; the provenance and the condition in the images README). Her
-particulars on the sheet are in the Spanish navy's units (Burgos feet), to be reconciled
-with Winfield's English feet in her design document before any file. The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
+particulars on the sheet are in the navy's units (pies de Burgos, 0.2786 m), and so are
+Winfield's feet for every Spanish row (his metres prove it: 124 ft is 34.55 m at that foot),
+so her design document reads both in metres and never as English feet. The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
 is yours to propose; the lead's view is the tartane first as the reference vessel and the
 smallest, the three-decker last as the largest departure. Nothing of it opens before 75's
 last window closes, and nothing this week (decision 61).
+
+**2026-11-06, later: Winfield's passages for 90 set down.** The owner sent the passages of
+*Spanish Warships in the Age of Sail* on the five (the tartanas, pp. 1249 to 1252; the
+polacres, pp. 1083 to 1084; the xebecs in Spanish service with the Artillery Regulation of
+1752's batteries, pp. 1134 to 1136; the *Purísima Concepción* class whole with her service,
+pp. 406 to 410; the *Diana*, p. 930) with three of its pictures. The facts are in
+`docs/design/VesselReferences-2026-11-Spanish.md` in the lead's words, cited by page; the
+book's text is copyright and is not in the tree, and the three pictures are cited and not
+held (Monleón's polacre and xebec, the Greenwich draught of *San José*). Two things of the
+lead's reading for your design documents: Winfield's feet for Spanish ships are **pies de
+Burgos** (his metres prove it), so the game's constants come from his metres; and the
+polacre's pole masts (no tops, the yards lowered to hand the square sails) are a handling
+the generator does not yet say, to be said in her document with the mixed-rig generalising.
+**The owner's offer:** further passages of Winfield are sourced on request; ask the lead by
+title and class and the lead asks the owner.
