@@ -4818,9 +4818,21 @@ generator what no hull yet has: three gun decks, a first rate's complement and h
 the great ship's handling. The design is yours in your plan's form as before (a design
 document each, the ladder of evidence, the lead's gate before a file); the sources Roux's and
 Tofiño's plans, Winfield where he reaches, and the Spanish sources you find, cited by page;
-the *Diana*'s identity (which navy built her, when taken, her force in 1809) is to be settled
-by the evidence in her design document before her file, since the name was borne by several.
-The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
+the *Diana* is settled by the owner (2026-11-06): the Danish frigate *Diana* built in 1804,
+taken at Cartagena with the declaration of war and kept by the Spanish navy to 1832, Winfield,
+*Spanish Warships* (the owner's edition, p. 930): 124 ft by 32 ft 6 in by 16 ft (34.55 by
+9.06 by 4.46 m), 335 tons, 167 men; twenty 24-pounder carronades as captured, twenty
+30-pounder carronades as first rearmed, and by 31.10.1817 twelve 12-pounders, eight
+30-pounder carronades and four 3-pounder obuses; so her fits are three, dated. Her plan is
+the Spanish navy's own, "Plano de la Corbeta de Guerra la Diana, del porte de 20 carronadas
+de á 30, mandada por el Teniente de Navío de la Real Armada D. José de Julián por los años de
+1809 y 1810", a sheer with the body plan and the half-breadth and a table of her particulars,
+in the Ministry of Defence's virtual library (Biblioteca Virtual de Defensa, record 1037832,
+https://bibliotecavirtual.defensa.gob.es/BVMDefensa/es/consulta/registro.do?id=1037832), the
+same library 79c's pilots came from: a §5.0 rung-A source for her lines. The file itself is
+not in the tree (the Greenwich rule of 2026-10-31: the record and the link stand in its place
+until the owner says the library's terms allow it, and then it goes in with its provenance
+in `docs/references/images/README.md`). The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
 is yours to propose; the lead's view is the tartane first as the reference vessel and the
 smallest, the three-decker last as the largest departure. Nothing of it opens before 75's
 last window closes, and nothing this week (decision 61).
