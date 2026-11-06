@@ -2526,8 +2526,9 @@ at 387, the Raven at full detail at 1,266, the naval cruise at 318) replayed on 
 game's ship factory and checkpointed there, their systems holding the World as every checkpoint before
 this package; read on the trial tree, every hull's systems bound to her, the guard's walk clean, and the
 log's digest after two minutes' ticking the same as the trunk's for each of the six (the saves stay with
-the lead, as always); the whole suite in the cloud
-dispatched after run 40, the figures to follow. **Package 97 is closed.**
+the lead, as always); the whole suite in the cloud run 41 on 8542e49 (18:22 to 19:07 UTC): lint green, all six shards green,
+6,713 passed, 11 skipped, 12 expected failures; the pace job 9 of 13, the four floors under at 430 to 492 ticks a
+second against 500 (the runner's speed; informative). **Package 97 is closed.**
 
 ### Package 75, the hold (SW-5) and B3.4 (the schooner's mast), as merged (2026-11-06)
 
