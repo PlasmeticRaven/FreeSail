@@ -122,6 +122,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # the ship's time with a station seated; 13 s under load)
         "test_knowledge.py::test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike",
         "test_known_truths.py::test_truth_7_375_the_masters_days_work_is_done_in_the_gunroom",
+        # package 65, step 8: the replay by both roads of a two-hull passage with a fake captain
+        # (83 s under load), the boat away with the player (7 s)
+        "test_knowledge.py::test_a_passage_with_a_captain_below_reported_to_called_and_writing_replays_by_both_roads",
+        "test_known_truths.py::test_truth_7_378_the_replay_to_the_same_digest_by_both_roads",
+        "test_knowledge.py::test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone",
+        "test_known_truths.py::test_truth_7_377_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone",
         "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
         "test_knowledge.py::test_the_handover_fold_keeps_the_place",
         "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",

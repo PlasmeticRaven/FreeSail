@@ -967,7 +967,7 @@ def world_page() -> tuple[tuple[str, str], ...]:
     """**How the world behaves** (package 58a; the lugger director's fourth ask, "how
     systems combine, how crews are drawn, what log line each order leaves"): the
     director's library page, written from the code, every figure in it read from the
-    constant the code uses (`tests/test_director.py` checks them), in four sections."""
+    constant the code uses (`tests/test_director.py` checks them), in six sections."""
     from freesail.world import crews
     from freesail.world import orders as wo
     from freesail.world import weather as wx
@@ -1086,12 +1086,32 @@ def world_page() -> tuple[tuple[str, str], ...]:
         f"{bd.REPULSE_COST:g}. A far vessel's people are not hit by musketry or boarded: the near "
         "fight wants her crewed."
     )
+    knowledge = (
+        "A person perceives what his place allows, and a station's sample carries that and no "
+        "more: on the open deck the deck's readings and the deck's lines; aloft the horizon and "
+        "the heading, the deck by hail; in the cabin the glass, the tell-tale compass, the chart "
+        "and the reckoning, the sounds of the deck's work and the reports sent down; in the "
+        "gunroom the slate and the chart; in a room below what is kept there; asleep nothing "
+        "until woken (the call, all hands, a gun, the ship striking, a spar gone, a word to him); "
+        "ashore nothing of the ship but the boat's report at the quay and a letter. The bell, the "
+        "pipes, the drum, a gun, the ship striking and a spar carried away reach every man awake "
+        "aboard. A reading asked where it is not to be had is answered with where; the ship's "
+        "papers, her book of standing orders and the books drafted are read where they are kept "
+        "(the keeper carrying his paper while he is at it), the log book on the quarterdeck, in "
+        "the cabin and the gunroom, the chart there and at the binnacle. The rules' officer of "
+        "the watch reports to a captain below and calls him for a danger, an urgent line or, by "
+        "night, anything reportable; the command devolves on the held officer when the captain "
+        "is away. A reply's prose is the station's own note, heard by nobody. You see everything, "
+        "every hull, as before; your `say as` is heard where the person stands; the scenario's "
+        "`knowledge: all` turns the rule off for the stations."
+    )
     return (
         ("the weather systems", weather),
         ("ships put on the sea, and their companies", ships),
         ("what each order logs, and to whom", logs),
         ("the doubt's figures", doubt),
         ("the water, the wounded and the fight on deck", bodies),
+        ("what a person knows where he stands", knowledge),
     )
 
 

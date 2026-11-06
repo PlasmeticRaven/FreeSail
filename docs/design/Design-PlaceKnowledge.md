@@ -1037,3 +1037,41 @@ results, as 37l has it; the test pins the three reminders of its script.
 
 **Found on the way** is in the tuning notes (the `@dataclass` decorator and a helper's placing; the
 developer's empty turn counted as the drill's first reply).
+
+### Step 8: the edge cases' truths and the records (§12, §13, §14; 2026-11-06)
+
+**Built as designed**: truth 7-377 (the boat away with the player: his senses the boat's deck's,
+every row his and nothing greyed; the ship's standing order sets her royals while he is away and
+the lines are in her log and not in the boat's; her lookout's line in the boat's log is the ship
+seen; a word said on her deck within hearing written in the boat's log as heard), truth 7-378
+(the frigate with the brig X in sight at night and a fake captain who goes below, is reported to
+and called, comes on deck and drafts a book, saved at the half and at the end, replayed by its
+transcript and by its acts to the same digests of both hulls' logs), truth 7-384 (a visitor put in
+another hull's cabin reads her glass, her tell-tale's heading, her chart's rows and her log and
+chart, none of her deck and not her view; a person put in her hold reads the hold's, her manifest
+there, none of her deck, her log not to be had; the confinement itself is package 74's,
+`Person.confined_to`, nothing of it built here). The records: spec M7b §14's provisional list
+replaced by the rule as built; `docs/agents/Harness.md` §21h (the place's knowledge, for a
+model's reader) and §21's words; the primer's chapters 14 (what reaches a person in each place),
+16 (the duty to report and the call, the command devolved, the told order) and 19 (every sample
+carries what the place allows; the library where the ship's own are kept), in-world under 85's
+rule; the director's library page gains a section, "what a person knows where he stands"; the
+tuning notes. Every truth of 7-370 to 7-389, 7-420 and 7-421 has its test.
+
+**Taken another way, with the reason.** (1) Truth 7-377's "by sight and hail": the ship's own
+lookout line in the boat's log is the sight (the boat's lookout has her as a sail in sight), and
+the hail is a word said on her deck heard across the water (`say as the first lieutenant`), since
+a hail order from her deck wants a giver aboard her and her captain is in the boat; the test
+asserts the word only while the boat lies within four cables. (2) Truth 7-378 is run with the
+brig X in sight at night so that the sighting lines are reports and calls both, deterministic
+from the seed; the digest compared is of both hulls' logs, as 84's tests compare them. (3) The
+captive's reading is tested by his place alone, the confinement being 74's hook. (4) The
+visitor's `say` at the prompt said as "the captain" (step 4's finding c; the lead's ruling: mine
+in step 8 if a seat of the visitor's voice and no wider): mended narrower than a seat. `orders.stations._say`
+reads `knowledge.players_visitor` when the prompt's words are the captain's own: the line is then in
+his name and from his spot ("Captain Bowen, a visitor of the Amazon, in the cabin: good day to you"),
+and the ship's own captain's station is not skipped as the speaker, so a model at her captain's
+hears him; no seat is made and nothing else of 82's voice is touched. The hearers were right
+already (step 4's `hearing.station_spot` read his spot).
+
+**Found on the way** is in the tuning notes.

@@ -1906,3 +1906,13 @@ def test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places():
         )
     # at home the frigate's people are where they were; her captain reads his own deck
     assert K.players_senses(w).spot == ("aboard", w.players.id, "quarterdeck")
+    # the player himself aboard her as a visitor (decision 62): his `say` at the prompt is
+    # his own, in his name and from his spot, and not her captain's (step 4's finding c)
+    bowen = w.people.captain  # the frigate's, before the drivers follow him into the X
+    kind, text, _ = movement.put_aboard(w, bowen, hull, place="cabin")
+    assert kind == "person.aboard" and w.followed == hull.id
+    assert K.players_visitor(w) is bowen and w.people.captain is not bowen  # hers now
+    e = w.submit("say good day to you")
+    assert e.kind == "agent.spoke", e.text
+    assert e.text == f"{bowen.name}, a visitor of the Amazon, in the cabin: good day to you"
+    assert e.data["where"] == "in the cabin"

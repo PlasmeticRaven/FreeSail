@@ -18166,6 +18166,30 @@ world's clock stands at the scenario's start (04:00), so the walker eats "the fi
 **The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
 asks and their figures are below.
 
+### Step 8: the edge cases' truths and the records (the design's §12 to §14; 2026-11-06)
+
+**What was built** is in the design note's postscript ("As built", step 8): truths 7-377, 7-378
+and 7-384; the visitor's `say` at the prompt in his own name; the records (spec M7b §14 as built,
+`docs/agents/Harness.md` §21h, the primer's chapters 14, 16 and 19, the director's library page).
+
+**Judgements.** (1) Truth 7-378's passage is the frigate hove to with the brig X in sight at
+night (22:00), so that her sighting lines are reports and calls both and the captain's going
+below, the reports, the call, his coming up and his book are all in two hours of the ship's time;
+the save at the half and at the end both replay by both roads. (2) The boat's "by sight" is the
+boat's own lookout's line on the ship, and "by hail" a word said on her deck heard across the
+water; the ship's standing order sets her royals while the player is away, which is how her deck
+does its business with nobody at her prompt. (3) The visitor's voice: the line's name and the
+speaker's skipping, and no seat; the lead books a seat of the visitor's voice if one is wanted.
+
+**Found on the way.** (a) Under `follow` of another hull `world.people` is hers (97's binding):
+a test that wants the player's own captain after the drivers follow him keeps the person by hand.
+(b) The primer's in-world test reads "gate" as a build's word: the officer's chapter says "carried
+out as his own would be" where the design says the deck's gate. (c) Truth 7-378's passage runs 83 s under load and the boat's 7 s: both and their truths are in
+the slow tier (`tests/conftest.py`); the visitor's 5 s is not.
+
+**The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
+asks and their figures are below.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was
