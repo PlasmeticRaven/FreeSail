@@ -117,6 +117,7 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_knowledge.py::test_the_browsers_log_and_snapshot_are_the_players_persons",
         "test_knowledge.py::test_the_player_goes_aboard_another_ship_in_his_own_boat_and_the_prompt_follows_him",
         "test_known_truths.py::test_truth_7_382_the_player_at_the_prompt_reads_by_his_place",
+        "test_known_truths.py::test_truth_7_420_the_command_devolves_on_the_held_officer_and_is_given_back",
         "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
         "test_knowledge.py::test_the_handover_fold_keeps_the_place",
         "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",

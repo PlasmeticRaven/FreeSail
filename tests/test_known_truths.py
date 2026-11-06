@@ -13754,3 +13754,33 @@ def test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_
 
     test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay()
     test_a_person_of_another_ship_named_in_the_order_is_refused_in_words()
+
+
+# ---------------------------------------------------------------------------
+# Package 65, step 3, decision 63 (the lead's numbering at step 4's boundary): the command
+# devolved, and the told order the captain's word
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_420_the_command_devolves_on_the_held_officer_and_is_given_back():
+    """Decision 63: when the captain is unavailable (ashore, in the boat, aboard another
+    ship, wounded or sick below, a captive) the command devolves on the senior officer, a
+    held station first, said in the log (`ship.command_devolved`), his authority the captain's
+    whole with the standing orders as his guide (his orders logged "in command"), and given
+    back (`ship.command_resumed`) when the captain is available again and has given an order
+    (`freesail/world/reports.py`; the design's §7 postscript)."""
+    from tests.test_knowledge import (
+        test_the_command_devolves_on_the_held_officer_while_the_captain_is_away,
+    )
+
+    test_the_command_devolves_on_the_held_officer_while_the_captain_is_away()
+
+
+def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
+    """Decision 63: an order the captain tells a station to carry out is the captain's word
+    for that thing, logged as given by the station at the captain's word ("By the officer of
+    the watch, at the captain's word: ..."), never refused for his domain, with the deck or
+    without (`reports.told_covers`; `tools.judge` gives `TOLD`)."""
+    from tests.test_knowledge import test_a_told_order_is_the_captains_word_and_never_refused
+
+    test_a_told_order_is_the_captains_word_and_never_refused()
