@@ -30,9 +30,13 @@ across the Mediterranean under other flags but found little favour in Spain: sev
 are known in the Spanish navy's service, three bought or chartered from French builders and
 two from a private builder in Spain. For the game: the Spanish navy's tartana is a role
 (coastguard, reconnaissance) on a trader's hull, and the trader's and fisherman's fits come
-first; a French-built hull is in keeping with the record. The square topsail over the lateen
-is a fit to be read against the Roux-school watercolour (`docs/references/images/`), which
-shows none.
+first; a French-built hull is in keeping with the record. The square topsail over the
+lateen is in the Roux-school watercolour too (`docs/references/images/`; the owner's
+correction of 2026-11-06 to the lead's first reading), so the two sources agree: **the
+tartane's rig is a lateen mainsail with a square topsail above it on the mainmast, a lateen
+on the small mizen, and one or two headsails on the long bowsprit**, the count of headsails
+by judgement from the sources together and the hull's proportions (the watercolour shows
+two).
 
 ## 2. The polacre (Winfield pp. 1083 to 1084)
 
