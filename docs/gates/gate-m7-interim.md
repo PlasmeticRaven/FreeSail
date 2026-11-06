@@ -85,8 +85,7 @@ beside new. Not a codified list: the owner's word.
   plus the roll's amplitude on the lee side and the roll less the heel on the weather side,
   so the small ships' weather ports shut in bands of wind in a seaway (the cutter's at 17.5
   to 20 kn on the beam); the dwell of a minute before a shut port reopens, ruled by the lead
-  for the flicker in gusts (the frigate at 21 kn gave 46 changes of port in an hour without
-  it); the deck's side said once, and only with her guns cast loose. *Test:* an action on a
+  for the flicker in gusts (the frigate at 21 kn gave 46 changes of port in an hour with it and without; what it removes is the quick reopening, seven changes within a minute, six to sixty-three seconds apart, to none); the deck's side said once, and only with her guns cast loose. *Test:* an action on a
   reach in a fresh breeze and one in a seaway with the sea on the beam, in the frigate and in
   the cutter; `the guns` and the log through the hour; the gun's silence behind its shut port
   and the broadside's and the division's words. *Judge:* whether the ports shut and open as a

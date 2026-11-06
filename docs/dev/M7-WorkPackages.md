@@ -5478,3 +5478,35 @@ in the cloud, the record). The lead's own night: 82b's items 2 to 5 merged when 
 then package 95 launched (the sail by her name, on `world/hail.py`'s `_addressee` beside
 your files, nothing of the ships'), then 97; 65's step 3 merged when reported; 74 launched
 when 65 closes.
+
+**2026-11-06, 18:00 UTC: the hold and B3.4 received; the four rulings.** Your send of the hold
+(42a995b) and B3.4 (1c02517) is read: both as ruled and as approved, the hold's figures and the
+L2 pins old beside new accepted, `on_schooner_mast` at places 1 and 3 only, read once a ship
+from the parts as filed and held beside her, accepted. The lead merges 1c02517 after package
+97's merge (97 binds the player's own hull's systems to her Hull; it touches nothing of the
+ships'); the trunk then carries 65's step 4 and 97, and you bring it in at your next boundary.
+The gate's J1 is corrected: the frigate's 46 changes of port in the hour stand with the hold as
+without it; what the hold removes is the quick reopening (the seven changes within a minute,
+six to sixty-three seconds, to none), and the hour's count is the gusts' and lulls' own, which
+the owner judges at the gate. The four rulings, each its own small step after SW-4, each
+measured before it is built, the moved logs old beside new with the reason: **(1) place 2's
+timing, yes, after Luce 1884 p. 417:** the after yards hauled with the wind ahead or a point on
+the bow, before the head yards, the short after swing; never swung with the head yards. Trial
+A's 149 s stays as it is (she has no yards at place 2's after list but her own); say the new
+figures for trial B and the main topgallant beside the old (219 s, 232 s). **(2) the word, yes,
+by Luce:** "Main-topsail haul!" for every ship whose main course is not set (none bent, or
+hauled up), "Rise tacks and sheets. Mainsail haul." kept for a main course set; the moved
+logs old beside new; 85's in-world rule holds as always. **(3) place 2 with no mast carrying
+yards, yes, as after yards:** with every fore yard shot away the schooner-mast's yards are her
+after yards (they are abaft her fore and are swung as after yards while she had a working fore
+yard; nothing changes in their handling but that they are no longer left standing); the pin
+you set as it stands moves old beside new. **(4) `orders/storm.py`, yes, and granted to the
+ships session for this** (nobody else touches it): keep the courses' reef at the topsails'
+second reef for any rig with topsails (Luce 1884 p. 476; Cobb p. 95, the closely reefed
+mainsail and the double-reefed foresail), and gate only the after take-ins on square-rigging;
+measured on trial A, the cutter, the smack and the four whole logs, every moved pin old beside
+new. Your three records for B2 and package 90 are noted (the Neufchatel's main topgallant and
+"shorten sail", the two classing limits, the polacre's lateen mizen and pole masts); the
+lead carries the classing limits and the polacre's note into package 90's brief. Run on to
+SW-4 and B2 as the owner gave leave, taking these as they come, and send the one final report
+for 75 when it is whole.
