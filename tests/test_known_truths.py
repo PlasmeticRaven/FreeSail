@@ -13766,6 +13766,27 @@ def test_truth_7_397_a_name_over_all():
     test_a_name_over_all_against_a_nearer_sail_of_the_same_kind_and_bearing()
 
 
+def test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost():
+    """Two brig-sloops of war read alike until one answers the hail with her name: then
+    `the strangers`, `what is in sight` and `a sail in sight` name her ("the Raven, a
+    brig-sloop of war ..."), the other still a brig-sloop of war; lost sight of, her name
+    goes with her, and closed and made out again she is a stranger until spoken. A liar is
+    known by the name she gives; a consort by her pendant once her colours are made out; a
+    friend by the private signal answered right; a stranger's colours give her nation, not
+    her name; and a sail named reaches a station's next sample of deltas."""
+    from tests.test_sail_by_name import (
+        test_a_consort_is_named_by_her_pendant_and_a_friend_by_the_private_signal,
+        test_a_liar_is_named_by_the_name_she_gives,
+        test_a_sail_hailed_and_answered_is_named_in_the_rows_and_forgotten_when_lost,
+        test_a_sail_named_reaches_the_next_sample_of_a_station_standing_by,
+    )
+
+    test_a_sail_hailed_and_answered_is_named_in_the_rows_and_forgotten_when_lost()
+    test_a_liar_is_named_by_the_name_she_gives()
+    test_a_consort_is_named_by_her_pendant_and_a_friend_by_the_private_signal()
+    test_a_sail_named_reaches_the_next_sample_of_a_station_standing_by()
+
+
 def test_truth_7_399_the_recorded_passages_name_their_sails_as_before():
     """The proof by toggle: the encounter, the convoy and the first action played by their
     rules captains with the resolver on and off give the same count of lines by kind and the

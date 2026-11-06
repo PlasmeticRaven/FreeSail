@@ -494,6 +494,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_399_the_recorded_passages_name_their_sails_as_before",
         "test_known_truths.py::test_truth_7_395_the_resolver_narrows_by_the_kind_the_quarter_the_bearing_and_the_distance",
         "test_sail_by_name.py::test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb",
+        # package 95, step 2: the identified sail's four cases together (11 s alone)
+        "test_known_truths.py::test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost",
     }
 )
 

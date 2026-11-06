@@ -2098,7 +2098,12 @@ class Harness:
             if isinstance(strangers, dict):
                 sails = tuple(
                     sorted(
-                        (str(i.get("id")), int(i.get("made_out") or 0), str(i.get("nation")))
+                        (
+                            str(i.get("id")),
+                            int(i.get("made_out") or 0),
+                            str(i.get("nation")),
+                            str(i.get("name")),  # her name learnt (package 95)
+                        )
                         for i in strangers.get("items") or []
                     )
                 )

@@ -17913,3 +17913,19 @@ as her name: a client reading the row learns a stranger's name before the deck d
 is (the viewer's chart and gunnery read it); the lead books it to package 96. Chapter 15 of the
 primer said "the boat sent to her and the prize are not yet in the game", which 82 made untrue
 for the boat: it now sends the boat to chapter 26.
+
+**Step 2: her name, kept while in sight** (`Lookout._identify`, once a look). The lookout
+reads the deck's log since the last look (`LOOK_WINDOW_S`, the minute) for a hail that names
+her: our hail's answer (`hail.answered`, not her own deck's) and her hail of us (`hail.heard`),
+the name her own or a liar's from the hail table's `lies`; the private signal answered right
+(the deck's captain's `recognised` by "the private signal", or the locker's challenge judged
+`right`, the locker read where it is and never made); a consort's colours made out (level 2:
+under our orders, or of our squadron). Her colours alone on a stranger name her nation and not
+her name. The name (`_sail_ident`, made on the first identification so that a passage with
+none carries nothing new) goes where `_sail_said` goes when she is lost sight of. The rows:
+`the strangers`' item `name` (None until known) and its `words` led by it; `what is in sight`
+and `a sail in sight` the same in their sail lines. `known` is untouched (the rules captain's
+`_chase_order` reads it). The resolver's names take hers (truth 7-397's road), so `make out the
+Raven` finds the liar who called herself so. The proof by toggle (7-399) covers it: off, nothing
+is identified. The harness's sail rows carry the name in their delta key, so a sail named by
+hail reaches a model's next sample.

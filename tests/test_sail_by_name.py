@@ -337,3 +337,123 @@ def recorded_passages_name_their_sails_as_before() -> None:
         assert on_counts == off_counts, path
         assert on_named == off_named, path
         assert sum(1 for t in on_named if " lookout." in t) >= 1, path
+
+
+# ---------------------------------------------------------------------------
+# Truth 7-398: the identified sail named in the rows, and forgotten when lost
+# ---------------------------------------------------------------------------
+
+
+def _item(world, vid: str) -> dict:
+    return next(i for i in world.readings["strangers"]["items"] if i["id"] == vid)
+
+
+def _move(world, vid: str, bearing: float, nm: float) -> None:
+    v = world.vessels.get(vid)
+    v.position = destination(world.position, bearing, nm * 1852.0)
+
+
+def test_a_sail_hailed_and_answered_is_named_in_the_rows_and_forgotten_when_lost():
+    """The Raven and the Swift read alike ("a brig-sloop of war") until the Raven answers
+    the hail with her name: then `the strangers`, `what is in sight` and `a sail in sight`
+    name her, the Swift still a brig-sloop of war, and the strangers' item carries her
+    name. Lost sight of, her name goes with her; closed and made out again, she is a
+    brig-sloop of war until she is spoken again. The lookout's lines are his as before."""
+    world = sails_about()
+    raven, swift = _item(world, "raven"), _item(world, "swift")
+    assert raven["name"] is None and swift["name"] is None
+    assert raven["words"].startswith("a brig-sloop of war")
+    assert swift["words"].startswith("a brig-sloop of war")
+    e = world.submit("hail the brig bearing NE distant two cables: what ship is that?")
+    assert e.kind == "hail.answered" and "Raven" in e.data["answer"], e.text
+    world.run(60)  # the next look
+    raven, swift = _item(world, "raven"), _item(world, "swift")
+    assert raven["name"] == "Raven" and raven["words"].startswith("the Raven, a brig-sloop of war")
+    assert swift["name"] is None and swift["words"].startswith("a brig-sloop of war")
+    assert "Sail ho! The Raven, a brig-sloop of war" in world.readings["in_sight"]["words"]
+    near = world.readings["sail_in_sight"]
+    assert any(i["words"].startswith("the Raven, ") for i in near["items"])
+    # her name is the deck's to name her by now
+    assert _id_of(world, world.submit("make out the Raven")) == "raven"
+    # the lookout's own lines are as they were: no name in them
+    assert not [x for x in world.log if x.kind.startswith("lookout.") and "Raven" in x.text]
+    # lost sight of: twenty-five miles off, beyond the horizon
+    _move(world, "raven", 45.0, 25.0)
+    world.run(60)
+    assert "raven" not in {i["id"] for i in world.readings["strangers"]["items"]}
+    lost = [x for x in world.log if x.kind == "lookout.sail_lost"]
+    assert lost and lost[-1].data["id"] == "raven"
+    # closed again and made out: a stranger, her name not known until she is spoken
+    _move(world, "raven", 45.0, 0.36)
+    world.run(120)
+    raven = _item(world, "raven")
+    assert raven["made_out"] >= 2 and raven["name"] is None
+    assert raven["words"].startswith("a brig-sloop of war"), raven["words"]
+
+
+def test_a_liar_is_named_by_the_name_she_gives():
+    """A French privateer cutter under British colours answers the hail with a lie: the
+    deck knows her by the name she gives, not her own."""
+    from tests.test_known_truths import _frigate_and_a_cutter_under_false_colours
+
+    w, v = _frigate_and_a_cutter_under_false_colours(cables=2.0)
+    w.run(60)
+    said = w.submit("hail her")
+    assert said.kind == "hail.answered", said.text
+    w.run(60)
+    item = _item(w, v.id)
+    assert item["name"] and item["name"] != "Renard" and item["name"] in said.data["answer"]
+    assert item["words"].startswith(f"the {item['name']}, ")
+
+
+def test_a_consort_is_named_by_her_pendant_and_a_friend_by_the_private_signal():
+    """A sail under our orders is named once her colours are made out; a sail that answered
+    the private signal right is named as a friend; a stranger whose colours alone are made
+    out keeps her nation and not her name."""
+    world = sails_about(settle_s=1)
+    own = world.vessel.id if getattr(world, "vessel", None) is not None else "the ship"
+    world.vessels.get("swift").under_orders_of = own
+    world.run(120)
+    assert _item(world, "swift")["name"] == "Swift"
+    nancy = _item(world, "nancy")
+    assert nancy["nation"] == "britain" and nancy["name"] is None
+    from freesail.world.signals import locker_of
+
+    locker_of(world.ship).challenges["nancy"] = {"tick": 0, "verdict": "right"}
+    world.run(60)
+    assert _item(world, "nancy")["name"] == "Nancy"
+    assert _item(world, "raven")["name"] is None  # the French brig: her colours, no name
+
+
+def test_a_sail_named_reaches_the_next_sample_of_a_station_standing_by():
+    """From the model's side: a captain's station held by a fake standing by a glass, a
+    brig lying to within hail, made out to her colours. With nothing changed his next sample
+    carries no strangers' row; the brig hailed and answering with her name, the sample after
+    carries the row again with her name; lost sight of and closed again, the row comes once
+    more, nameless, a stranger until she is spoken again."""
+    from tests.test_known_truths import _captain_standing_by_a_glass, _samples
+
+    w, h = _captain_standing_by_a_glass("49 48.25 N 5 36 W", "bound for the Lizard")
+    brig = next(v for v in w.vessels.active() if v.name == "Two Brothers")
+    brig.plan = [("lie_to", math.inf)]
+    w.run(1800 + 5)
+    n = len(_samples(h))
+    assert "strangers" not in _samples(h)[-1]["readings"]
+    brig.position = destination(w.position, 0.0, 0.2 * 1852.0)  # kept within hail
+    e = w.submit("hail the brig: what ship is that?")
+    assert e.kind == "hail.answered" and "Two Brothers" in e.data["answer"], e.text
+    w.run(1800)
+    later = _samples(h)[n:]
+    told = [s["readings"].get("strangers") for s in later if "strangers" in s["readings"]]
+    assert told and told[0].startswith("the Two Brothers, a "), told
+    # lost sight of, and closed again: the row once more, and nameless
+    brig.position = destination(w.position, 0.0, 30 * 1852.0)
+    w.run(1800)
+    brig.position = destination(w.position, 0.0, 0.25 * 1852.0)
+    m = len(_samples(h))
+    w.run(1800)
+    again = [
+        s["readings"].get("strangers") for s in _samples(h)[m:] if "strangers" in s["readings"]
+    ]
+    assert again and "Two Brothers" not in again[-1], again
+    assert again[-1].startswith("a brig") or again[-1].startswith("a merchant brig"), again
