@@ -733,6 +733,17 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     **Winfield's lists are now a source on the owner's shelf** (basic particulars for every
     class, with plans scattered through most sections), so a candidate seldom lacks at least
     a sourced row; the ships session cites him by page as it does James and Steel.
+    **Amended 2026-11-06 (owner):** package 90 is widened from the two lateen hulls to a
+    **Spanish and Mediterranean package of five**, from the smallest up: the tartane; a
+    polacre (a lateen on a forward-raked foremast and on the mizen, square sail on the main);
+    the xebec (a lateen on all three masts, sweeps optional); the twenty-gun corvette *Diana*,
+    the Danish frigate of 1804 taken at Cartagena on the declaration of war and kept to
+    1832 (Winfield, *Spanish Warships*, p. 930 in the owner's edition; her plan of 1809 to
+    1810 in the Biblioteca Virtual de Defensa, record 1037832); and the *Purísima Concepción* class
+    three-decker of the Spanish navy, the game's first three-decked ship. The count: thirteen
+    after 75, eighteen after 90. The polacre moves out of the later choosing's list into 90.
+    The three-decker is the first true test of the generator's size limit, which the owner
+    thinks a fair one; the class changes only if a better-sourced one is argued for.
 
 57. **The viewer's light and air: three references for a later viewer package.** Owner,
     2026-10-29, sending two pictures of vessels they made in an unrelated game (a cutter
