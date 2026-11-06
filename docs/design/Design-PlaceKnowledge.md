@@ -780,4 +780,8 @@ stand unchanged; the MCP door's are changed ("Noted in your journal, under your 
 
 **Found on the way** is in the tuning notes (a hull façade read from another hull's order
 answers for the current hull; the unanswered question re-sampled each tick, 29c's rule as it
-stood).
+stood; the step's first full run of the suites: the player's seat borrows the harness's deck
+and grants and lacked `add_word`; a station on another hull wrote her note's copy into her
+hull's director's log, which the director never reads, now the game's one on the player's
+hull with that hull current; truth 78's pin moved by the fake captain's "I have the command."
+leaving the log, re-measured old beside new).

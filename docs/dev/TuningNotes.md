@@ -17222,7 +17222,31 @@ with the notice, and three such bring the nudge within three ticks; so it was fo
 reply before this step. Not changed; recorded. (c) The first run of the touched files hung
 in `tests/test_rollup.py`'s rewritten own-words test: a looping fake that always returned a
 call never ended its turn and the worker was killed for memory; the fake alternates the call
-and an empty reply.
+and an empty reply. (d) **The step's first full run of the suites** (fast tier whole, slow
+tier of the touched files and the known truths) found five and five: the player's seat
+(`agents/seat.py` `PlayerSeat`) borrows the harness's `give_deck`, `take_deck` and the grants
+and had no `add_word`, so `you have the deck` to a seated player raised (three of
+`test_captain.py`); borrowed with the rest. (e) **A station on another hull wrote her note's
+copy into her hull's director's log**: `_say` used `log_of(self.world)`, and the journals are
+a hull's own (`agent_journals` is per hull, package 84), so the director seated on the
+player's ship never read it and her act was recorded under the station `director` on her hull
+(`test_replay.py`'s fake captain of another ship: "her acts are all hers" failed). Now the
+copy goes to the game's one director's log, the player's own hull's (`world.players`) with
+that hull current, so the act is the game's (no `ship`) and replays into the same log. The
+director's own writes (`thought`, the budget's lines, `director.seat`) still go through
+`log_of(world)` with whatever hull is current; under `follow` of another hull they would land
+in hers (pre-existing, not changed; said to the lead). (f) **The pins that moved**: three slow
+tests pinned the old words and reasons (`test_mcp_server`'s "Said, under your mark." is "Noted
+in your journal, under your mark."; `test_agent_api`'s "a question" is "a question from the
+captain" at three places); truth 78 (`GATE_6A_FAKE_CAPTAIN_LINES`, `_DIGEST`): the fake
+captain's "I have the command." at tick 0 was an `agent.note` line of the log and is his
+journal's note now, so the harness's lines about the station are five (stationed, the deck
+given, the deck to the book, nudged, paused) where they were six: 3,113 lines → 3,112,
+`1c9a985bfd5dce0f` → `dfaa7ab3bdd70295`, measured on the passage directly and every other
+assertion of the truth the same (his six orders at their ticks, the book's log line for line,
+the tin sold at the same tick). (g) `test_pictures.py`'s chart-not-blank test failed once in
+the fast tier under four workers (standard deviation 7.97 against the floor of 8.0) and
+passed alone and in the re-run; not of this step, noted for the lead.
 
 **The pace.** The filter's cost is step 1's (nothing of this step is on the tick's path but
 `add_word`'s string join at a word and the director's read of its log at its sample); the

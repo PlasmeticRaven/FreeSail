@@ -2549,9 +2549,18 @@ class Harness:
         from freesail.agents import director as director_mod
 
         self.journal.append(self.world, text, kind=PROSE_KIND, by=self.model_name)
-        director_mod.log_of(self.world).append(
-            self.world, text, kind=PROSE_KIND, by=self.station.name
-        )
+        # the director's log is the game's one, kept on the player's own hull where the
+        # director sits; a station on another hull writes her note there with that hull
+        # current, so the entry's act is the game's and replays into the same log
+        # (test_replay's fake captain of another ship: her acts are all hers)
+        world = self.world
+        players = getattr(world, "players", None)
+        root = getattr(players, "world", None)
+        if players is None or root is None:
+            director_mod.log_of(world).append(world, text, kind=PROSE_KIND, by=self.station.name)
+        else:
+            with root.as_hull(players):
+                director_mod.log_of(root).append(root, text, kind=PROSE_KIND, by=self.station.name)
         self._sample_noted = True
 
     def _over_budget(self, c: ToolCall) -> str | None:

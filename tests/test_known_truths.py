@@ -4861,7 +4861,9 @@ GATE_6A_FAKE_CAPTAIN_ORDERS = [  # three readings asked, a question, `pipe down`
 GATE_6A_FAKE_CAPTAIN_ORDER_TICKS = [57, 323, 396, 600, 1200, 1800]  # one a sample, under his mark
 GATE_6A_FAKE_CAPTAIN_DECK_TO_BOOK_TICK = 5400  # an hour after his last order: the deck to his book
 GATE_6A_FAKE_CAPTAIN_PAUSED_TICK = 9000  # twice the patience: paused, the owner asked
-GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's 6
+GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's 5
+# package 65, step 2 (decision 60): his "I have the command." is his journal's note and no
+# line of the log (13 lines before, the harness's 6; 3113 lines, digest 1c9a985bfd5dce0f)
 # the merge of 37p with 41 and 42 (2026-10-10): his "I have the command." to an empty
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
@@ -4872,7 +4874,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # package 58b: the merchant passage's stern line (3112 lines before; item 3's by bisection)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_FAKE_CAPTAIN_DIGEST = "1c9a985bfd5dce0f"  # package 58b (1f8de8b49c7d5b5a at 68)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "dfaa7ab3bdd70295"  # package 65, step 2 (1c9a985bfd5dce0f at 58b)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

@@ -428,7 +428,7 @@ def test_a_scripted_passage_of_three_glasses_with_the_clock_turned_by_the_game(t
     for k in range(3):
         first, second = out[2 + k].split("\n")[:2]
         assert first == f"Your turn is open: sample at {STAMPS[k]} (the glass)."
-        assert second == "Said, under your mark."
+        assert second == "Noted in your journal, under your mark."  # decision 60
         assert "reason: the glass" in out[2 + k]
 
 

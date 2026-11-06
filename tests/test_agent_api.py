@@ -181,7 +181,8 @@ def test_a_whole_session_through_the_routes(tmp_path):
     # the captain asks, from the order box: the question opens a turn at once
     assert g.order("ask the watcher how she goes")["kind"] == "agent.asked"
     a = g.turns(wait=1)
-    assert reasons(a) == ["a question"] and a["turns"][0]["content"]["question"] == "how she goes"
+    assert reasons(a) == ["a question from the captain"]
+    assert a["turns"][0]["content"]["question"] == "how she goes"
     a = g.reply("", ("answer", {"text": "Easily, under all plain sail."}))
     assert results(a) == ["Heard."]
     assert g.lines("agent.said") == ["[watcher] Easily, under all plain sail."]
@@ -496,10 +497,11 @@ def test_what_happens_while_the_model_holds_the_floor_is_folded_into_its_turn(tm
     g.order("ask the watcher how the sails are drawing")
     a = g.turns()
     assert all(t["content"].get("folded") for t in a["turns"])
-    assert "the glass" in reasons(a) and "a question" in reasons(a)
+    assert "the glass" in reasons(a) and "a question from the captain" in reasons(a)
     assert any("Set" in ln["text"] for t in a["turns"] for ln in t["content"]["log"])
     merged = g.harness.open_sample
-    assert merged.reason.startswith("the start; then ") and merged.reason.endswith("a question")
+    assert merged.reason.startswith("the start; then ")
+    assert merged.reason.endswith("a question from the captain")
     assert merged.question == "how the sails are drawing" and merged.tick == A_GLASS_S
     # the World did not wait: the glass ran with the model's turn open
     assert g.world.clock.tick == A_GLASS_S
