@@ -17279,7 +17279,9 @@ harness at `captain`, started, not released, with its door, which the save carri
 the dealings in the cap's order, and up to two such hulls are left out of the cap's count: the
 three of `CREWED_CAP` and two held beside them, five awake beside the player's. Past the
 allowance a held hull takes the farthest unheld hull's place, as a stationed one does under
-the cap. The range and its hysteresis are unchanged: a held hull beyond six miles sleeps, and
+the cap. A cap of nought (`crewed: {cap: 0}`, data/scenarios/tender.yaml) has no allowance:
+the scenario's word is that nobody is promoted, and truth 7-200 sails the Raven asleep with a
+model at her captain's station. The range and its hysteresis are unchanged: a held hull beyond six miles sleeps, and
 her plan's danger check (`crews.far_dangers`, 88's chart test on the far body's leg) keeps her
 off the land and the rocks while she does.
 

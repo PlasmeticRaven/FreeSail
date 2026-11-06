@@ -102,6 +102,7 @@ CREWED_FLOOR_TICKS_S = 60.0
 # hulls left out of the cap's count, so that a model at a captain's station within the range
 # is not put to sleep to make room for the rules' ships (judgement, from the owner's "four or
 # five" sail in company; the pace of a convoy with four held hulls in docs/dev/TuningNotes.md).
+# A cap of nought (`crewed: {cap: 0}`, nobody promoted) has no allowance over it.
 HELD_OVER_CAP = 2
 # A dealing with the player (a chase, a hail) counts for a glass (judgement).
 DEALING_S = 1800
@@ -877,9 +878,13 @@ def switch(world: World) -> None:
             return 0
         return 1 if _stationed(v) else 2
 
+    # a cap of nought is a scenario's word that nobody is promoted (the tender's day, truth
+    # 7-200, sails her asleep by intent): no allowance is made over it
+    over = HELD_OVER_CAP if cap > 0 else 0
+
     def counted(held: list[Any]) -> int:
         # the cap's count, up to `HELD_OVER_CAP` hulls a model holds left out (package 82b)
-        return len(held) - min(HELD_OVER_CAP, sum(1 for c in held if model_held(c)))
+        return len(held) - min(over, sum(1 for c in held if model_held(c)))
 
     # demotions
     for v in list(crewed(world)):

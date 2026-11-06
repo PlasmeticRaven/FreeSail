@@ -12,7 +12,6 @@ hull; the identities are made up and the consent records go to a temporary direc
 
 from __future__ import annotations
 
-from freesail.agents.harness import say_aboard
 from freesail.world import movement as M
 from tests.test_between_hulls import _brig_alongside
 from tests.test_door_follows import WEIGHTS, _desk
@@ -50,9 +49,13 @@ def test_the_visitor_is_named_by_his_station_his_ship_and_hers(tmp_path):
     assert rows[h_far.ident] == words and rows[h_own.ident] == OOW
     # where am I: aboard her, a visitor, standing at his own station's name
     assert M.where_am_i(w, person).endswith(f"a visitor, of the X, standing as the {words}")
-    # the log's mark of his words
-    e = say_aboard(w, name, person.name, "A fine ship.")
-    assert e.text == f"[{name}] A fine ship." and e.data["station"] == name
+    # the mark of his words: his prose is his note, in the director's log under his
+    # station's name (package 65's road, decision 60)
+    from freesail.agents import director as director_mod
+
+    h_far._say("A fine ship.")
+    e = director_mod.log_of(w).entries[-1]
+    assert e.text == "A fine ship." and e.by == name
 
 
 def test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own(tmp_path):

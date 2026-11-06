@@ -466,7 +466,8 @@ ship nobody holds, and meanwhile the hailer's log says she has not yet answered.
 
 A hull whose captain a model holds through a door is held over the cap (package 82b, item 4):
 she ranks with the ships in dealings, and up to two such hulls are awake beside the cap's three
-(`crews.HELD_OVER_CAP`). Asleep beyond the range, her plan keeps her off the land and the
+(`crews.HELD_OVER_CAP`); a cap of nought (`crewed: {cap: 0}`, the tender's day) is a scenario's
+word that nobody is promoted, and no allowance is made over it. Asleep beyond the range, her plan keeps her off the land and the
 charted rocks by the chart test her rules captain uses awake: a leg that stands into danger is
 put about by the plan's own order, and the urgent line in her log calls her captain.
 
