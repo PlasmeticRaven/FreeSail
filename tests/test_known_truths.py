@@ -13506,6 +13506,23 @@ def test_truth_7_380_every_kind_the_code_writes_is_placed_and_the_hulls_sounds_r
     test_the_senses_of_each_place_and_the_readings_places()
 
 
+def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
+    """The console shows the captain in the cabin no deck line and the officer's report, and
+    `log N` reads back the same; `knowledge: all` shows everything; the director's seat and
+    `follow` of another hull show everything of her (the owner's eye); the browser's log, its
+    reach-back and its snapshot's `knowledge` are the player's person's (decision 59; the
+    design's §11)."""
+    from tests.test_knowledge import (
+        test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye,
+        test_the_browsers_log_and_snapshot_are_the_players_persons,
+        test_the_console_shows_the_captain_what_reaches_him_where_he_is,
+    )
+
+    test_the_console_shows_the_captain_what_reaches_him_where_he_is()
+    test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye()
+    test_the_browsers_log_and_snapshot_are_the_players_persons()
+
+
 def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail():
     """The lookout's sample carries the horizon's rows and the heading, no log, no lead, no
     glass; the quarterdeck's `say` does not reach it, `say to the lookout` does, and the sail
@@ -13828,3 +13845,33 @@ def test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_
 
     test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay()
     test_a_person_of_another_ship_named_in_the_order_is_refused_in_words()
+
+
+# ---------------------------------------------------------------------------
+# Package 65, step 3, decision 63 (the lead's numbering at step 4's boundary): the command
+# devolved, and the told order the captain's word
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_420_the_command_devolves_on_the_held_officer_and_is_given_back():
+    """Decision 63: when the captain is unavailable (ashore, in the boat, aboard another
+    ship, wounded or sick below, a captive) the command devolves on the senior officer, a
+    held station first, said in the log (`ship.command_devolved`), his authority the captain's
+    whole with the standing orders as his guide (his orders logged "in command"), and given
+    back (`ship.command_resumed`) when the captain is available again and has given an order
+    (`freesail/world/reports.py`; the design's §7 postscript)."""
+    from tests.test_knowledge import (
+        test_the_command_devolves_on_the_held_officer_while_the_captain_is_away,
+    )
+
+    test_the_command_devolves_on_the_held_officer_while_the_captain_is_away()
+
+
+def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
+    """Decision 63: an order the captain tells a station to carry out is the captain's word
+    for that thing, logged as given by the station at the captain's word ("By the officer of
+    the watch, at the captain's word: ..."), never refused for his domain, with the deck or
+    without (`reports.told_covers`; `tools.judge` gives `TOLD`)."""
+    from tests.test_knowledge import test_a_told_order_is_the_captains_word_and_never_refused
+
+    test_a_told_order_is_the_captains_word_and_never_refused()

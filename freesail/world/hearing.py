@@ -95,6 +95,10 @@ def station_spot(world: Any, station: str) -> Spot:
         except Exception:  # noqa: BLE001  (a people's build that cannot run binds nobody)
             person = None
     if person is None and station == CAPTAIN:
+        from freesail.world import knowledge
+
+        person = knowledge.players_visitor(world)  # the player aboard her as a visitor (62)
+    if person is None and station == CAPTAIN:
         people = getattr(world, "people", None)
         try:
             person = people.captain if people is not None else None

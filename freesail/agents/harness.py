@@ -442,13 +442,13 @@ NO_PERSON_ANSWER_WORDS = (
 # gate m6a-2): a word told, a question put, an answer, a person's words. Heard by a
 # station within earshot of the speaker, each counts as "a word on deck" for its stand-by.
 # A free line (package 53b, `free.line`) is heard so too, by the stations it names.
-WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke", "free.line")
+WORDS_BETWEEN_PEOPLE = knowledge.WORDS_BETWEEN_PEOPLE
 # The lines that are words said in a place (package 66): a word wakes or samples a station
 # only when it reached it (said within its hearing, or to it); the ship's own lines reach
 # every station from her log, and the director hears everything. A reply's prose is no
 # word said (decision 60; package 65, step 2): it is the person's own note, in his journal
 # and the director's log, and no line of the play log carries it.
-WORD_KINDS = (*WORDS_BETWEEN_PEOPLE, "agent.spoke")
+WORD_KINDS = knowledge.WORD_KINDS
 WORD_ON_DECK = "a word on deck"  # the event's words (`readings.EVENTS`)
 # The journal's kind for a reply's prose (decision 60): the model's own words, apart from
 # the journal tool's notes ("note") and the harness's lines.
@@ -2027,15 +2027,7 @@ class Harness:
         and where each is to be had; None on deck, where every row is his."""
         if senses.everything:
             return None
-        rows = [
-            r
-            for r in R.REGISTRY
-            if not r.is_absent
-            and r.parametric is None
-            and r.kind not in R.DRIVER_KINDS
-            and not r.per_asker
-            and not knowledge.reading_here(r, senses)
-        ]
+        rows = knowledge.rows_elsewhere(senses)
         return knowledge.elsewhere_words(rows, senses)
 
     def _as_told(self, content: dict[str, Any]) -> dict[str, Any]:

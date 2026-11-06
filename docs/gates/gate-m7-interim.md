@@ -95,6 +95,17 @@ beside new. Not a codified list: the owner's word.
   shutting reads true, and what the lines say; tune the foot, the six inches, the minute
   and the roll's share, old beside new, and rule.
 
+- [ ] **J2. A ship hove to forereaches** (package 65, step 4, found on the way, 2026-11-06;
+  the hulls' tests' world). The figures: the frigate hove to makes near three knots (1.5 m/s)
+  and the launch three and a half fresh, so a boat pulled home from a mile off closes at half a
+  knot and the return is three hours; a boat lying on her oars alongside a ship hove to fell a
+  cable astern in minutes (hence made fast). *Test:* the frigate and the cutter hove to in a
+  moderate and a fresh breeze, `the log` through a glass, the leeway and the headway read; a
+  boat lowered and lying on her oars beside her. *Judge:* whether a ship hove to should
+  forereach so (the period's figures: a knot or two of headway with the leeway, by the sail
+  backed and the helm), and whether the boat's pull home should take so long; the engine's
+  equations read, not changed, before any figure moves; a judgement call for the owner.
+
 ## Open items found in the records
 
 - **The owner's debrief of 70 to 72** (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/debrief.md`): the convoy's stall on `full and by` with no orders (reproduced and its cause named by 86, the commodore's own brig-sloop, not the near station order the study suspected; the mend 88's, moving truths 7-152 and 7-153); a model captain of another ship unable to go ashore before 84 (84's step 4, to be seen in item 1); going between ships by the boat (82's heart, not built); the colours flickering between false and true under fire (71's privateer doctrine; 88's, the colours held once shown before an enemy, 85 not having taken it); the viewer's ports, guns, smoke, signals and flags (81's order of work); the enemy's view (a design question for 81).

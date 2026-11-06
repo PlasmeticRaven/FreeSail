@@ -197,6 +197,27 @@ def _sail_state(s: Sail) -> str:
     return "wrecked" if s.wrecked else s.state.value
 
 
+def knowledge_block(world: World) -> dict[str, Any]:
+    """The player's knowledge where he stands (package 65, step 4; decision 59; the
+    design's §11): `place` (his place in words, or "everything" for the owner's eye and
+    under `knowledge: all`), `hidden` (the readings rows not to be had there, each with
+    the words for where it is), `words` (the one sentence the sample says for them)."""
+    from freesail.world import knowledge
+
+    senses = knowledge.players_senses(world)
+    if senses.everything:
+        return {"place": "everything", "everything": True, "hidden": [], "words": ""}
+    rows = knowledge.rows_elsewhere(senses)
+    return {
+        "place": senses.words(),
+        "everything": False,
+        # the deck's: the sails, the yards and the work in hand, seen on deck and aloft
+        "deck": senses.has(knowledge.DECK) or senses.has(knowledge.ALOFT),
+        "hidden": [{"id": r.id, "where": knowledge.where_words(r)} for r in rows],
+        "words": knowledge.elsewhere_words(rows, senses) or "",
+    }
+
+
 def snapshot(world: World) -> dict[str, Any]:
     """The state a view redraws from. SI units; see spec §9.4.
 
@@ -235,6 +256,9 @@ def snapshot(world: World) -> dict[str, Any]:
         # is not in the snapshot: it is in the save and the tests only
         # (`world.reckoning.Navigation.to_dict`).
         "reckoning": reckoning_block(world),
+        # what the player's person has where he stands (package 65, step 4; decision 59):
+        # the rows not to be had there, each with where it is, for the instruments pane
+        "knowledge": knowledge_block(world),
     }
     # On the sphere the ship's plane metres from the start are the truth's track, and the
     # chart is drawn about the reckoning; they leave the snapshot with the position.
