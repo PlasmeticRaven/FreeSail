@@ -488,10 +488,17 @@ def working_yards(ship: Ship) -> list[Spar]:
 def _masts_with_yards(ship: Ship) -> list[Spar]:
     """The masts that carry braced yards: never the bowsprit, though the spritsail yard and
     the sprit-topsail yard are crossed under it (`Ship.under_bowsprit`; package 75,
-    docs/design/Design-ShipsEngineExtensions.md §4.2)."""
+    docs/design/Design-ShipsEngineExtensions.md §4.2); nor a schooner's mast, an after mast
+    whose yards are all above its lower mast (`Ship.on_schooner_mast`; package 75, B3.4, the
+    lead's ruling on docs/design/Design-Ship-PrinceDeNeufchatel.md §12.2a: "an after mast with
+    yards and no yard on its lower mast handles as a fore-and-after's mast"). So the
+    hermaphrodite brig, a brig's fore and a schooner's main (Cobb 1841 vol. I p. 38), and a
+    topsail schooner with a square main topsail have the fore alone, and are handled as
+    fore-and-afters; their main's yards are still braced (`working_yards`) and are her after
+    yards (`head_and_after_yards`) while her fore keeps a working yard."""
     masts: list[Spar] = []
     for y in working_yards(ship):
-        if ship.under_bowsprit(y):
+        if ship.under_bowsprit(y) or ship.on_schooner_mast(y):
             continue
         m = ship.mast_of(y)
         if m is not None and m not in masts:
@@ -504,7 +511,13 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
     yards) and the after yards (all the rest). A ship whose yards are all on
     one mast, like a topsail schooner, has head yards only. The yards under the
     bowsprit are head yards, swung with the fore yards and never with the after
-    yards (package 75; Ext §4.2, §4.3)."""
+    yards (package 75; Ext §4.2, §4.3). A schooner's main with yards above its lower
+    mast (`Ship.on_schooner_mast`, package 75, B3.4) is no mast that carries yards here,
+    but its yards are among the rest: they are her after yards, swung at "mainsail haul"
+    and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5), while her fore
+    keeps a working yard. With every fore yard shot away no mast carries yards here, and
+    her main's yards are in neither list, so that the tack and the wear leave them as they
+    stand (reported to the lead at B3.4)."""
     masts = _masts_with_yards(ship)
     if not masts:
         return [], []
@@ -517,7 +530,8 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
 
 def after_square_yards(ship: Ship) -> list[Spar]:
     """The yards on the aftermost mast that carries yards (the mizzen on a
-    frigate, the fore on a topsail schooner)."""
+    frigate, the fore on a topsail schooner, with or without yards on her main above
+    its lower mast: `_masts_with_yards`, package 75, B3.4)."""
     masts = _masts_with_yards(ship)
     if not masts:
         return []
@@ -529,7 +543,8 @@ def yards_to_back(ship: Ship) -> list[Spar]:
     """The yards laid aback to heave to: those on the mast carrying the most
     square sail (Luce 1866 ch. XXVI: "the main topsail to the mast"). On a
     ship-rigged vessel that is the main; on a topsail schooner the fore, being
-    the only mast with yards."""
+    the only mast with yards, and so too with yards on her main above its lower mast,
+    which count for no mast with yards (`Ship.on_schooner_mast`, package 75, B3.4)."""
     masts = _masts_with_yards(ship)
     if not masts:
         return []
@@ -592,7 +607,9 @@ def after_gaff_sails(ship: Ship) -> list:
     # 10); a vessel whose yards are all on one mast, the schooner's fore or the cutter's
     # one mast, keeps her gaff sail, which is her driving sail. Package 75: the 64's and
     # the 74's mizen course, a lateen cut at the mast, is her driver as a spanker is
-    # (`drives_aft`).
+    # (`drives_aft`); and a schooner with yards on her main above its lower mast (the
+    # hermaphrodite's main topgallant, a main topsail) keeps her mainsail too, that main
+    # being no mast with yards here (`Ship.on_schooner_mast`, B3.4).
     with_yards = _masts_with_yards(ship)
     if len(with_yards) < 2:
         return []
@@ -2219,7 +2236,10 @@ class HeaveToScript(Script):
         """A vessel whose yards are all on one mast (a topsail schooner, a cutter): hove to
         the fore-and-after's way (package 32e; Luce 1884, ch. XXXIV, 'To Heave to':
         "Haul flat aft the main sheet, putting the helm down, and haul the staysail sheet
-        to windward"), with her topsail to the mast as well if it is set."""
+        to windward"), with her topsail to the mast as well if it is set. Yards on a
+        schooner's main above its lower mast count for no mast with yards (package 75, B3.4,
+        `Ship.on_schooner_mast`): she is hove to so with her fore topsail to the mast, and her
+        main's yards are braced up full with the rest."""
         return len(_masts_with_yards(self.ship)) < 2
 
     def _backed_name(self) -> str:
@@ -6918,7 +6938,9 @@ def _topsails(ship: Ship) -> list[Sail]:
 
 def _boom_mainsails(ship: Ship) -> list[Sail]:
     """A fore-and-after's gaff sails on a boom (the mainsail she gets under way under),
-    set or not; nothing on a ship with yards on two masts (her spanker is set last)."""
+    set or not; nothing on a ship with yards on two masts (her spanker is set last). Yards
+    on a schooner's main above its lower mast make no second mast (`_masts_with_yards`;
+    package 75, B3.4): she gets under way under her mainsail as a schooner."""
     if len(_masts_with_yards(ship)) >= 2:
         return []
     return [
@@ -7015,12 +7037,14 @@ class GetUnderWayScript(_AnchorScript):
     catted and fished as she pays off.
 
     Package 37f (the review of gate 5c's playtests, 5.8, "Getting under way"): a vessel
-    whose yards are all on one mast casts as a fore-and-after does, her jib's sheet held
-    to windward, her mainsail's eased till she has cast, and her helm tended (a-lee
-    while she drops astern, up when she has headway); and "paid off" is never said on a
-    timeout: at cast_timeout_s she is taken as she lies, on the tack wanted, on the
-    other (which the line says, and she is got under way on it), or hanging head to
-    wind, when she is given till cast_give_up_s and the evolution then fails in words.
+    whose yards are all on one mast (yards on a schooner's main above its lower mast not
+    counted: `_masts_with_yards`, package 75, B3.4) casts as a fore-and-after does, her
+    jib's sheet held to windward, her mainsail's eased till she has cast, and her helm
+    tended (a-lee while she drops astern, up when she has headway); and "paid off" is
+    never said on a timeout: at cast_timeout_s she is taken as she lies, on the tack
+    wanted, on the other (which the line says, and she is got under way on it), or
+    hanging head to wind, when she is given till cast_give_up_s and the evolution then
+    fails in words.
 
     Package 68 (the cold review of 2026-10-22, R-45: the Éclair was got under way with a
     square-rigger's words, no lug set, and stood under the jib alone a cable off
@@ -7528,7 +7552,8 @@ class GetUnderWayScript(_AnchorScript):
 def after_gaff_sails_all(ship: Ship) -> list[Sail]:
     """The driver, set or not: the gaff sail on the aftermost of two or more masts with
     yards (a ship's spanker, a brig's main), or the mizen course cut at the mast (package
-    75, `drives_aft`); nothing on a fore-and-after."""
+    75, `drives_aft`); nothing on a fore-and-after, a schooner with yards on her main above
+    its lower mast among them (`_masts_with_yards`, B3.4)."""
     with_yards = _masts_with_yards(ship)
     if len(with_yards) < 2:
         return []

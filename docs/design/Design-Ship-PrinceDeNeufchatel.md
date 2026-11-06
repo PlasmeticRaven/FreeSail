@@ -1245,7 +1245,12 @@ Indf §11.2's. The scenario file itself is B6's, on `first-action.yaml`'s shape.
 At the opening of her window, after the fresh merge of the lead's head (Build §2.1, §3.3), the
 stage-0 agent lays, each item checked by an agent that did not write it (Build §3.4):
 
-1. **D10(a)'s key in the schema** (`freesail/ship/schema.py`, the stage-0 agent's for the whole
+1. *Superseded by the lead's ruling of 2026-11-06 on §12.2a (`docs/dev/M7-WorkPackages.md`,
+   "§12.2a, ruled now"): no schema key, no `Spar.schooner_mast`, no fixture loading with a key
+   and no stage-0 commit for it. The rule in its place is B3.4's, built (§12.2a, "As built and
+   measured at B3.4"). The item is kept as it was proposed:*
+
+   **D10(a)'s key in the schema** (`freesail/ship/schema.py`, the stage-0 agent's for the whole
    package: Build §4.1), on the pattern stage 0E laid for `heave_to_aback`:
    - `SparSpec.schooner_mast: bool | None = None` beside `heave_to_aback` (`schema.py:471`), left out
      of the checkpoint's state while None (the pattern at `:474-478`);
@@ -1298,19 +1303,27 @@ byte test, `tests/test_ship_particulars.py:555-`); the golden classing table
 (`tests/test_rig_classing.py`); the key's three refusals in words and the fixture loading; every
 pickle byte-identical; every existing scenario loading and round-tripping as before (no `nations:`
 block in any); the fast tier green; the diff read for any reach beyond its list, any `world.ship` or
-`CrewedWorld` read the Hull does not keep, any model or vendor name.
+`CrewedWorld` read the Hull does not keep, any model or vendor name. *The key's refusals and its
+fixture loading: superseded with item 1 by the lead's ruling of 2026-11-06 (no key); the fixture
+loads with no key, in B3.4's load list (§12.2a, "As built and measured at B3.4").*
 
 ### 12.2 What B3.4 gives her (the engine's fourth step; the lead's item 7)
 
 The lead's ruling: "D10(a)'s key for the *Neufchatel*'s main topgallant: yes, built by B3 as its
 fourth step beside `under_bowsprit` at places 1 and 3 of §4.2, inert until her file uses it."
-Proposed form, for the lead (§17, lead item 1):
-1. **The runtime field** `Spar.schooner_mast: bool = False` (`ship/parts.py`, beside
-   `heave_to_aback` at `:219`), copied from the spec (beside `:256`) and left out of the pickle while
-   false (the pattern at `:222-226`).
-2. **The predicate** `Ship.on_schooner_mast(part) -> bool` (`ship/graph.py`, beside `under_bowsprit`
-   at `:183`): true for a spar of class `yard` whose `mast_of` carries `schooner_mast`, and for a
-   square sail whose yard is one; a dict lookup on the chain memo.
+Proposed form, for the lead (§17, lead item 1). *Items 1 and 2 are superseded by the lead's ruling
+of 2026-11-06 on §12.2a (no key and no runtime field; the predicate is the rule's, built at B3.4 as
+§12.2a's "As built and measured at B3.4" gives it); items 3 to 9 stand, items 3 and 4 reading the
+rule's predicate, and items 7 and 8's "with the key" reading "with the rule", "as trial B without
+it" as trial B before the rule, and "the pickle without the field" as the pickle of a rig that has
+read the rule. Kept as proposed:*
+1. *(Superseded: no field.)* **The runtime field** `Spar.schooner_mast: bool = False`
+   (`ship/parts.py`, beside `heave_to_aback` at `:219`), copied from the spec (beside `:256`) and left
+   out of the pickle while false (the pattern at `:222-226`).
+2. *(Superseded: the rule's predicate, read from the parts as filed and held beside the ship, not on
+   the chain memo.)* **The predicate** `Ship.on_schooner_mast(part) -> bool` (`ship/graph.py`,
+   beside `under_bowsprit` at `:183`): true for a spar of class `yard` whose `mast_of` carries
+   `schooner_mast`, and for a square sail whose yard is one; a dict lookup on the chain memo.
 3. **Place 1, `_masts_with_yards`** (`evolutions/scripts.py:472-478`): a yard on a schooner's mast
    does not make its mast one with yards. So her head yards are the fore's, and
    `after_square_yards` (`:494-501`), `yards_to_back` (`:504-523`), `yards_to_back_set`,
@@ -1345,14 +1358,24 @@ Proposed form, for the lead (§17, lead item 1):
 9. **The guard set** at the step (Build §14.2) and the pace: the predicate runs in manoeuvres and once
    into the cached `_square_rigged`, nothing a tick.
 
-**Her golden row** (§14) at `"keyed"`: `_masts_with_yards` the fore alone; not square-rigged; head
-yards the four fore yards; after yards the two main light yards; `yards_to_back` the fore's;
-`after_gaff_sails` none (fewer than two masts with yards).
+**Her golden row** (§14) after B3.4 (the stage her module calls `"keyed"`, now with no key: the
+main's two light yards and the topgallant filed, the rule classing them): `_masts_with_yards` the
+fore alone; not square-rigged; head yards the four fore yards; after yards the two main light yards;
+`yards_to_back` the fore's; `after_gaff_sails` none (fewer than two masts with yards). *It stands as
+B3.4 built the rule: the topsail schooner with her main topgallant in memory classes so through the
+same gates, with the schooner's three fore yards for her four (`tests/test_schooner_mast.py`).*
 
 ### 12.2a The owner's proposal of 2026-10-31: a rule in the key's place (for the lead)
 
-**Not yet ruled.** §12.1 item 1 and §12.2 stand as the lead ruled them until the lead rules on this.
-Nothing here is built.
+**Ruled by the lead, 2026-11-06** (`docs/dev/M7-WorkPackages.md`, "§12.2a, ruled now: the rule in the
+key's place, approved"): "An after mast with yards and no yard on its lower mast handles as a
+fore-and-after's mast; `Ship.on_schooner_mast(part)` read from the parts as filed, once a ship, the
+yards under the bowsprit not counted"; the tartane classes as the cutter does, the polacre as one
+square mast with a lower yard between two lateens, no key; the limit stands and is recorded; built
+with B3.4, the topsail schooner with a square main topsail the second rig in memory, the guard that no
+file trips it; the swing at "mainsail haul" B3.4's measure. **Built at B3.4** (below, "As built and
+measured at B3.4"). *As first written, before the ruling: "Not yet ruled. §12.1 item 1 and §12.2 stand
+as the lead ruled them until the lead rules on this. Nothing here is built."*
 
 **The owner:** "a square sail on multiple masts of a topsail schooner or other rigs with mixed sail
 types will be important for generalizing the addition of future ships. It will be a bit painful if we
@@ -1389,6 +1412,91 @@ read through the golden table's gates):
 a lower yard; a barque and a barquentine unmoved, no after mast having only high yards. **The limit:** a schooner
 with a lower square-sail yard on her main (Fincham's p. 78, D10(d), not taken) still classes as a brig, under the
 rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the swing at "mainsail haul" above all.
+
+**As built and measured at B3.4 (2026-11-06).**
+- **The predicate** (`ship/graph.py`, beside `under_bowsprit`): true for a spar of class `yard` whose
+  lower mast is not the foremost lower mast carrying a braced yard and carries no braced yard on
+  itself, and for a square sail whose yard is one; the yards under the bowsprit count for nothing,
+  neither as such a yard nor as making the bowsprit the foremost. Read from every spar as filed,
+  wrecked or sent down or not, found once a ship and held beside her (a weak map in `graph.py`, not her
+  own state): the checkpoint pickles the ship's `__dict__`, so a memo in her would put a key in every
+  save; the lower masts are found by the spars' parents, not through `mast_of`'s pickled memo. Every
+  pickle and checkpoint is as it was (tested). **Judgement:** a lug's yard and a lateen yard are no
+  braced yard (`Spar.is_yard`), so neither makes a mast one with yards nor stands as its lower yard.
+- **Read at places 1 and 3 alone** (`_masts_with_yards` skips such yards; `_square_rigged` counts
+  none); `working_yards`, place 2, `light_sails_forward_of`, trim and "shorten sail" and the physics
+  untouched (§12.2 items 5 and 6). No committed file trips it (the guard on the fifteen files, the
+  boats among them), so no row of the golden table moved, nor the razee's and the 64's.
+- **The classing in memory**, through the golden table's gates, old beside new:
+
+| Rig (`tests/rig_fixtures.py`) | Before the rule | With the rule |
+|---|---|---|
+| Trial A, the topsail schooner with a fore course | a fore-and-after: the fore alone; head the fore yard, topsail and topgallant yards; the fore backed; not square-rigged; no driver; she gets under way under her mainsail | the same, every gate |
+| With the main topgallant on two light yards (her §4.5, hung on the schooner's main) | square-rigged on two masts; after yards the two light yards; the fore backed; the mainsail her driver, brailed up; no boom mainsail | a fore-and-after: the fore alone; head the three fore yards; after the two light yards; the fore backed; not square-rigged; no driver; the mainsail hers to get under way under |
+| Trial B, with a 30 m² main topsail | square-rigged; after the main topsail yard; the mainsail her driver | as the main topgallant's, the main topsail yard her one after yard |
+| The tartane (the cutter rigged so, a probe) | the main her one mast with yards (the topsail yard; the lateen yard none); not square-rigged | the same: as the cutter |
+| The polacre (the brig rigged so, a probe) | the main her one mast with yards (the main and main topsail yards), her lateens none; not square-rigged; no driver | the same |
+
+- **The measures** (§12.2 item 8; seed 7, 15 kn, settled 2,400 s as Eng §3.3's trials; the tuning
+  notes, "The schooner's mast"). Trial A on this tree is the research's to the second: tacked in 149 s,
+  wore in 449 s, hove to 50° off at 2.65 kn. Trial B before the rule is the research's too (219 s with
+  "Rise tacks and sheets. Mainsail haul."; "Up helm; brail up the mainsail"; 68° off at 2.74 kn, 70° at
+  1.83). With the rule: **the tack 219 s** (trial B) and **232 s** (the main topgallant set), the rule
+  moving nothing in it (place 2 is left, so the main's yards swing at "mainsail haul" as before);
+  **the wear 453 and 465 s**, "Up helm; brace in the after yards", the mainsail kept; **hove to 49.7°
+  and 49.8° off at 2.4 kn** at +150 and +300 s, the fore-and-after's way ("Hauled flat aft the
+  mainsail sheet; the fore staysail sheet to windward; braced the fore topsail aback; helm a-lee"), the
+  main's yards braced up full; **got under way** on the starboard tack under her topsails, mainsail
+  and jib as a schooner, where before the rule trial B's line said "set the spanker" and the main
+  topgallant's would not cast on the tack wanted.
+- **The swing at "mainsail haul"** on a schooner's main: "Rise tacks and sheets. Mainsail haul." 32 s
+  after helm's a-lee, the main's yards swung over 59 s while her head was through the wind and the fore
+  yards held aback, "Let go and haul." at 91 s (trial A's at 38 s); she lost her way to 0.6 kn and fell
+  back 12° before the fore yards came round. She tacks 70 s slower than trial A's 149 (47%), and 83 s
+  with the main topgallant (56%). Measured in the process only, not built: with the main's yards left
+  unswung the tack is 222 s and 242 s (the main topsail aback on the new tack); swung with the head
+  yards at "let go and haul", 155 s and 166 s, so that the separate swing costs 64 s and 66 s of it
+  (43% and 44%), the rest the main's own canvas. The 59 s is the engine's `brace_s` (45 s) by the
+  weather and the hands, whatever the yards: the brig's swing at "mainsail haul" takes 58 s on this
+  tree, the frigate's 56 s. Luce has the after yards hauled about a point on the bow, the wind on
+  their weather leeches forcing them round "smartly", before the head yards are swung (1884 p. 417):
+  a short swing of light after yards before the head yards, not with them.
+- **The gale** (sailed at the reviews: 15 kn rising to 44 kn, "shorten sail" at six winds, "lie
+  a-try"): place 3 takes the two rigs into the gale's reduction as fore-and-afters, which keeps the
+  mainsail, as the rule meant, and no longer reefs the course at the topsails' second reef, which it
+  did not mean (before the rule both reefed it once; with it the 105 m² course stood whole to lie
+  a-try). With the rule both lay a-try 35° to 46° off at 2.5 kn, the mainsail whole; before it both
+  took in the mainsail at lie a-try and ran off before the wind at 9 kn. No line of "shorten sail"
+  reefs a fore-and-after's mainsail, where item 4 has her "reefed mainsail" and Cobb p. 95 a closely
+  reefed mainsail and a double-reefed foresail; and it never takes in the main topgallant, rule or
+  none (her groups, §4.5 and §4.8).
+- **With every fore yard shot away**, the rule reading her as filed, no mast carries yards at place 1
+  and her main's yards are in neither of place 2's lists, so the tack and the wear leave them: trial B
+  tacks in 289 s (197 s before the rule, when they were her head yards), the main topgallant's rig in
+  350 s (224 s).
+- **Hove to, the main topgallant stays set** abaft the backed fore (the heave-to clews up the light
+  sails forward of the backed yards only). It lies her 0.1° closer (49.8° against 49.9° with it furled)
+  and forereaching 0.05 kn less (2.44 against 2.49 kn): within truth 12's band of angle, 45° to 65°;
+  the speed is the fore-and-after's way, above truth 12's 1.6 kn with the topgallant or without it, as
+  trial A's 2.65 kn is.
+- **Reported to the lead, no place added** (§12.2 item 8's three triggers): the swing costs more than a
+  tenth on trial A's tack (it fired); the topgallant does not move the heave-to beyond truth 12's band
+  (it did not); the words "Rise tacks and sheets. Mainsail haul." on a schooner's main, whose mainsail
+  is her gaff sail and which carries no course (it fired, on the source: Luce 1884 p. 417, the order to
+  haul the after yards when the mainsail, the main course, is not set is "MAIN-TOPSAIL HAUL!"). Beside
+  them, found at the reviews and reported with them: the gale's reduction and the fore yards shot away
+  (above). The figures are in the report of B3.4 and the tuning notes.
+- **Left:** the limits stand under the rule and are recorded: Fincham's lower square-sail yard on the
+  main, and a pole main with a square topsail yard filed on the lower mast itself (as the smack files
+  hers), each classing as a brig; the polacre's pole masts for her own document; the polacre's lateen
+  mizen kept hove to as a fore-and-after's (no driver with one mast with yards) and the whole lateens
+  hauled aft at helm's a-lee by nothing (`boom_sails` takes a lateen cut at the mast alone) for
+  package 90; the swing, the word, the gale's reduction (`orders/storm.py`) and the fore yards shot away
+  (place 2) for the lead; for the lead or B2, the words that name one topsail or one topsail yard
+  where more are braced or hoisted; for B2 when her file is written, this document's own mentions of
+  the key outside §12 (decision 13, §0's stage, §4.1, §4.5's `main.mast` line, §4.8, §13's road, §14
+  and §17 item 1), and her main topgallant's groups (§4.5, §4.8), which "shorten sail" never reaches
+  ("royals" would take it in with the third line of that list).
 
 ### 12.3 What the viewer builder (B5) is asked
 

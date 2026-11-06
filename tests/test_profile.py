@@ -693,7 +693,7 @@ def test_the_lee_ports_update_shuts_nothing_upright_and_a_shut_gun_goes_unfired(
         heading_rad=0.0,
         position=None,
     )
-    assert ports.update(battery, firer) == (frozenset(), frozenset())
+    assert ports.update(battery, firer, 0) == (frozenset(), frozenset())
     assert battery._shut == frozenset() and "_shut" not in battery.__dict__
     gun = ship.guns["gun.1.starboard"]
     assert battery.wants_work(gun)  # empty, it wants loading

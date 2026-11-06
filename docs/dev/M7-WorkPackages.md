@@ -53,7 +53,7 @@ on these packages; that is the owner's choice.
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time |
-| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package; the hold (SW-5) and B3.4 merged 2026-11-06 (f414ed1); SW-4 and B2 in hand to one final report |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
@@ -2526,8 +2526,54 @@ at 387, the Raven at full detail at 1,266, the naval cruise at 318) replayed on 
 game's ship factory and checkpointed there, their systems holding the World as every checkpoint before
 this package; read on the trial tree, every hull's systems bound to her, the guard's walk clean, and the
 log's digest after two minutes' ticking the same as the trunk's for each of the six (the saves stay with
-the lead, as always); the whole suite in the cloud
-dispatched after run 40, the figures to follow. **Package 97 is closed.**
+the lead, as always); the whole suite in the cloud run 41 on 8542e49 (18:22 to 19:07 UTC): lint green, all six shards green,
+6,713 passed, 11 skipped, 12 expected failures; the pace job 9 of 13, the four floors under at 430 to 492 ticks a
+second against 500 (the runner's speed; informative). **Package 97 is closed.**
+
+### Package 75, the hold (SW-5) and B3.4 (the schooner's mast), as merged (2026-11-06)
+
+Merged `claude/pkg-75` at 1c02517 (f414ed1, `--no-ff`; the hold 42a995b, the trunk brought in
+at e6cf033 and 5dd7d67, B3.4 1c02517), on top of 97 and 65's step 4. **The hold, as the lead
+ruled on the lee-port step** (`combat/ports.py` `PORT_HOLD_S = 60`, its own commit): a port shut
+at once when the sea comes within the foot of its sill, and opened again only when the sill
+stands six inches clear and the sea has kept from it a full minute, the hold counting from the
+last tick the sea was at the sill, so a held port the sea reaches again starts its hold afresh
+(`Battery._sea_at_sill`, a class default so a battery pickled before it loads; a port shut in an
+older save counts from the first tick it is read); `ports.update` takes the tick from
+`Battery.tick`. The hour in gusts: no port reopens within a minute (the frigate's seven quick
+changes, six to sixty-three seconds apart, to none), the hour's changes standing at 46, 24 and
+43, the gusts and lulls lasting minutes; about a round an hour and 0.9 to 2.4 percent more
+port-seconds shut. L2's reopening-band pins moved old beside new, the reason at each (the
+tuning notes' "The lee ports held a minute"); candidates 550 passed with no outcome changed;
+the gate's J1 corrected by the lead (the 46 stands with the hold as without it). **B3.4 by
+§12.2a's rule as approved** (`ship/graph.py` `Ship.on_schooner_mast`): a braced yard on an
+after mast that carries no braced yard on its lower mast handles as a fore-and-after's mast,
+read at places 1 and 3 only (`evolutions.scripts._masts_with_yards`, `physics.sails.
+_square_rigged`), found once a ship from the parts as filed (wrecked or sent down or not, so a
+brig whose main yard is shot away stays a brig) and held in a weak map beside the ship so no
+pickle or checkpoint moves; no schema key, no Spar field; the yards under the bowsprit count for
+nothing, a lug's or a lateen's yard is no braced yard (the tartane classes as the cutter, the
+polacre's square main alone her mast with yards). No committed file trips it (all fifteen
+guarded; the golden table and the razee's and the 64's rows unmoved); five rigs in memory (trial
+A, the main topgallant, trial B, a tartane and a polacre probe). Trial A re-measured gives the
+research's 149 s, 449 s, 50.2° off exactly; with the rule, trial B and the main topgallant heave
+to about 50° off (68° to 90° without), wear keeping the mainsail, and in a gale lie a-try 35° to
+46° off where without the rule they ran off at 178°. Candidates 3,973 passed, no outcome
+changed; whole logs identical; the fast tier 6,319. The record in the tuning notes ("The
+schooner's mast"), the *Neufchatel*'s §12.1 to §12.2a, Build-Ships §16.1, Ext §14 item 12.
+**Four rulings asked and given** (the notes to the ships session, 18:00), each a small step
+after SW-4, measured before built, the moved logs old beside new: place 2's timing after Luce
+1884 p. 417 (the after yards hauled with the wind a point on the bow, before the head yards);
+the word "Main-topsail haul!" for any ship whose main course is not set; the schooner-mast's
+yards as after yards when no mast carries yards (every fore yard shot away); `orders/storm.py`
+keeping the courses' reef at the topsails' second reef for any rig with topsails, the after
+take-ins alone gated on square-rigging (the file granted to the ships session). **Recorded for
+B2 and package 90:** "shorten sail" never takes in the *Neufchatel*'s main topgallant (B2 mends
+her file); the two classing limits and the polacre's lateen mizen and pole masts (90's row).
+**The lead's merge:** the trial on 7e479b7 (the trunk with 97) clean and lint-clean; the fast
+tier whole on it green, exit 0, every test passed; the whole suite in the cloud dispatched after run 41, the figures
+to follow. The ships session runs on to SW-4 and B2 by the owner's leave, to one final report
+for 75.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -5573,3 +5619,13 @@ new. Your three records for B2 and package 90 are noted (the Neufchatel's main t
 lead carries the classing limits and the polacre's note into package 90's brief. Run on to
 SW-4 and B2 as the owner gave leave, taking these as they come, and send the one final report
 for 75 when it is whole.
+
+**2026-11-06, 19:05 UTC: the hold and B3.4 merged at f414ed1.** The trial on the trunk with
+package 97 in was clean and lint-clean, the lead's fast tier whole on it green (exit 0); the
+record is "### Package 75, the hold (SW-5) and B3.4 (the schooner's mast), as merged"; the whole
+suite runs in the cloud after run 41. Bring the trunk in at your next boundary: it carries 65's
+step 4 (the player's one person, the prompt following his body into the boat and aboard
+another ship; `go to the boat` from another ship's deck takes a visitor off in his own boat),
+package 97 (the player's own hull's systems bound to her Hull at her making; nothing of the
+ships' files) and, next after this, 65's step 5 (the library by the reader's place). Your four
+rulings stand as written above; the owner is awake and has your send.

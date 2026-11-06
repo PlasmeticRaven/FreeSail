@@ -865,13 +865,25 @@ def _square_rigged(ship: Ship) -> bool:
     helm steers full and by the highest square sail set. A fore-and-after with a square
     topsail on one mast (the topsail schooner, the cutter) sails by her fore-and-aft
     canvas with the topsail shaking, and keeps the mean of her sails (package 4). The
-    yards under the bowsprit stand on no mast (package 75, `Ship.under_bowsprit`)."""
+    yards under the bowsprit stand on no mast (package 75, `Ship.under_bowsprit`); nor do
+    a schooner's mast's, an after mast with yards and none on its lower mast (package 75,
+    B3.4, `Ship.on_schooner_mast`; the lead's ruling on
+    docs/design/Design-Ship-PrinceDeNeufchatel.md §12.2a), so that a schooner with yards on
+    her main above it (the hermaphrodite's main topgallant, a main topsail) steers as a
+    fore-and-after, and the gale's reduction (`orders.storm._after_sail_lines`) takes her as
+    a fore-and-after: it keeps her mainsail, whole, and no longer reefs her course at the
+    topsails' second reef, where the *Neufchatel* on 28 December had a closely reefed
+    mainsail and a double-reefed foresail (Cobb p. 95, her §12.2 item 4; reported to the
+    lead at B3.4)."""
     rigged = ship.extra.get("sails.square_rigged")
     if not isinstance(rigged, bool):
         masts = {
             ship.mast_of(sp).id
             for sp in ship.spars.values()
-            if sp.is_yard and ship.mast_of(sp) is not None and not ship.under_bowsprit(sp)
+            if sp.is_yard
+            and ship.mast_of(sp) is not None
+            and not ship.under_bowsprit(sp)
+            and not ship.on_schooner_mast(sp)
         }
         rigged = len(masts) >= 2
         ship.extra["sails.square_rigged"] = rigged

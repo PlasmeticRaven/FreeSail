@@ -1264,6 +1264,13 @@ files take it to 108.
 12. **D10(a)'s key** for the *Neufchatel*'s main topgallant ("yards the handling ignores") would
     sit beside `under_bowsprit` at places 1 and 3 of §4.2; it is her design's. *Since (2026-10-31):
     the owner proposes a rule in the key's place, at the same two places, for the lead (her §12.2a).*
+    *Ruled by the lead (2026-11-06, `docs/dev/M7-WorkPackages.md`, "§12.2a, ruled now"): the rule,
+    no key. Built at B3.4: `Ship.on_schooner_mast(part)` (`ship/graph.py`, beside
+    `under_bowsprit`), true for a braced yard on an after mast that carries none on its lower mast
+    and is not the foremost with yards, and for its square sail, read from the parts as filed once
+    a ship, the yards under the bowsprit counted for nothing; read at places 1 and 3 alone, every
+    other place as it was. No committed file trips it; the measures are the tuning notes', "The
+    schooner's mast".*
 13. **The tartane's full lateen**, dipped or changed by *muder*, and its curve, in a later
     package (§3.7).
 14. **D18 and D25** stay open; nothing here depends on them.
