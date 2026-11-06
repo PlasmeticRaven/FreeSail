@@ -69,6 +69,14 @@ def execute(ship: Any, order: Order) -> Result:
     verb = order.verb
     rest = (order.object or "").strip()
     world, people = _people(ship)
+    if verb == "call the captain":
+        # the officer's call for the captain below (package 65, step 3): the line that
+        # reaches him and wakes him; refused from the captain himself
+        from freesail.world import reports
+
+        actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "captain")
+        kind, text, data = reports.call_the_captain(world, actor, rest)
+        return kind, text, {"verb": verb, "level": 1} | data
     if verb == "send for":
         who = rest
         phrase = order.verb_phrase

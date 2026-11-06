@@ -335,6 +335,9 @@ REACH: dict[str, str] = {
     "report.made": "person",
     "report.called": "wakes",
     "report.boat": "port",
+    # the command devolved and resumed (decision 63; package 65, step 3): every man aboard
+    "ship.command_devolved": "aboard",
+    "ship.command_resumed": "aboard",
 }
 
 # ...and by family, for every kind of a family not named above.

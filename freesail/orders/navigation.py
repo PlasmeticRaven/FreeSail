@@ -878,6 +878,24 @@ def _world_with_lookout(ship: Any) -> Any:
     return world
 
 
+def _sail_and_rest(verb_phrase: str, rest: str) -> str | None:
+    """The sail a `make her out` names: the words after the verb, with the verb's own kind
+    joined before them when they are the lookout's clauses ('make out the brig on the
+    larboard quarter' is the brig and the quarter; package 95); the words alone when they
+    name her otherwise, as before."""
+    from freesail.world import lookout
+
+    kind = _sail_named(verb_phrase)
+    if not rest:
+        return kind
+    if kind is None or not lookout.SAIL_BY_NAME:
+        return rest
+    said = lookout.read_sail_words(rest)
+    if said is not None and not said.name:
+        return f"the {kind} {rest}"  # the clauses alone after the verb: the verb's kind with them
+    return rest
+
+
 def _sail_named(verb_phrase: str) -> str | None:
     """Which sail a phrase names of itself: 'make out the brig' names the brig; 'make her
     out' names none (the nearest)."""
@@ -1625,7 +1643,7 @@ def execute(ship: Any, order: Order) -> Result:
     # other sail (spec M5 §25; package 36): the glass aloft, and the chase
     if verb == "make her out":
         world = _world_with_lookout(ship)
-        which = rest or _sail_named(order.verb_phrase)
+        which = _sail_and_rest(order.verb_phrase, rest)
         text, data = world.lookout.make_out(world, which)
         return "lookout.made_out", text, {"verb": verb, "level": 1} | data
     if verb == "keep station":
@@ -1636,14 +1654,14 @@ def execute(ship: Any, order: Order) -> Result:
         return station.execute(ship, order)
     if verb == "give chase":
         world = _world_with_lookout(ship)
-        which = rest or _sail_named(order.verb_phrase)
+        which = _sail_and_rest(order.verb_phrase, rest)
         lookout = world.lookout
         sails = [s for s in lookout.sightings if s.seen_as == "sail"]
         if not sails:
             raise OrderError("No sail in sight to chase.")
-        sighting = lookout.find(which) if which else None
+        sighting = lookout.find(which, world) if which else None
         if which and sighting is None:
-            raise OrderError(f"Nothing in sight answers to {which!r}; the strangers are listed.")
+            raise OrderError(lookout.sail_refusal(which, float(world.ship.heading), world))
         if sighting is None:
             # the chase in hand is kept while she is in sight and a stranger (a second sail
             # nearer does not take the helm from her); else the nearest stranger; else the

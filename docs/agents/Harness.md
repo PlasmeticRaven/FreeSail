@@ -427,10 +427,12 @@ person a model holds goes into another ship (sent in his ship's boat by `send th
 <ship> with <name>`, put aboard by the director's `person: "<name>" goes aboard the <ship> by
 the boat`, carried over as the boarders' officer when a deck is won, or put aboard a captor),
 his station is not stood down: the same conversation goes on, and its samples are the ship
-he is in from the next tick. In that ship he is **a visitor**: his station there is his own
-name's, of the passenger's kind, with a passenger's reach and no more (the readings of the
+he is in from the next tick. In that ship he is **a visitor**: his station there is named by
+his own station, his ship and hers ("officer of the watch, of the Raven, aboard the Amazon",
+package 82b), of the passenger's kind, with a passenger's reach and no more (the readings of the
 ship he is in, the conversation by spot, his journal, a free line, `where am I`, which says
-"aboard the <ship>, on the quarterdeck, a visitor, of the <his ship>"); he gives none of her
+"aboard the <ship>, on the quarterdeck, a visitor, of the <his ship>, standing as the <his
+station>, of the <his ship>, aboard the <ship>"); he gives none of her
 deck's orders, and none of his own ship's from there (the words say so: hail her, make a
 signal or send a letter). His own station on his ship stands bound to him meanwhile (her deck
 is nobody's or the book's), and when he comes back aboard, by `come aboard` (her boat takes
@@ -441,6 +443,35 @@ under the hull it was first seated on, and a replay seats it there and moves it 
 did. The consent brief describes both kinds a visitor passes between, and the particulars of
 a station may change without the question being put again, so no new question follows a
 visit.
+
+**As built since package 82b (`docs/design/Design-DoorAndVisitor.md` §2 and §3).** The
+door follows its harness: a door's seat at the desk is keyed to its harness's identity
+(`Harness.ident`, "<the hull first seated on>/<the station>", carried in the save), not to a
+station's name and a ship. A door that stations again by its own name and ship after its
+person has gone into another ship (a door restarted, or a door after a load) takes up the
+same harness where it is now, and no fresh station is made on the ship he left; two doors at
+two ships' captains are each answered by their own harness, and a stand-down of one leaves the
+other. The desk's listing names a visitor by his own station, his ship and his host, with the
+identity beside it. In the host's sentences the visitor is addressed by his station's whole
+name, with its commas or without ("tell the officer of the watch, of the Raven, aboard the
+Amazon to ..."), by "the officer of the watch of the Raven", or by his person's name; the
+host's own officer of the watch keeps her name and is answered by her own harness, whatever
+the visitor's words begin with. The name is the station's key, lower-case as every station's
+name is.
+
+A hail of a ship whose captain a model holds goes to that model whatever her hull's shape
+(package 82b, item 3): a hull asleep at far detail hears it in her log as an awake one does,
+her captain's sample carries it, and he answers with his own `hail`; the table answers only a
+ship nobody holds, and meanwhile the hailer's log says she has not yet answered.
+
+A hull whose captain a model holds through a door is held over the cap (package 82b, item 4):
+she ranks with the ships in dealings, and up to two such hulls are awake beside the cap's three
+(`crews.HELD_OVER_CAP`); a cap of nought (`crewed: {cap: 0}`, the tender's day) is a scenario's
+word that nobody is promoted, and no allowance is made over it. Asleep beyond the range, her plan keeps her off the land and the
+charted rocks by the chart test her rules captain uses awake: a leg that stands into danger is
+put about by the plan's own order, and the urgent line in her log calls her captain. On a port's own
+track in (its `from_sea` marks after the first, its `in` marks and its anchorage) the check is
+not made, as the awake captain makes none in pilot water.
 
 ## 17b. The seat on another ship, the boat, and the readings following the person (package 82)
 
@@ -662,7 +693,7 @@ The deck is *yours*, another's by name (*the deck Mr Pearce's*), *the captain's*
 
 The cold review of 2026-10-22 (`docs/playtests/2026-10-18-to-22-owner-playtests-and-review/`, R-26, R-31, R-04, R-39, R-42, and the stations' own accounts in its §7) found the samples heavy and repeated (one director's waits and samples came to 1.3 million characters in four hours, for 25 acts), the log's routine noise waking stations by the hundred, and the director learning the world orders by refusal. A model sees samples and never the curve between them; "whatever guards against it has to live in the instruments" (the lugger officer). Spec M7b §5 and §12, "as built (package 58a)".
 
-**The deltas.** A sample after the first carries what changed since the model's last reply, and nothing it has read already: the log lines since, the readings that changed (as since package 31c), **the sails in one line only when a sail's state changed**, **the sail in sight** (`strangers`, `sail_in_sight`, `stranger_in_sight`) **only when a sail came, went or was made out further**, not each time her bearing moved; the lookout's row only when who is at the masthead or his last hail changed; the officer's row not again for a word of the captain's that the sample's `word` carries, and that word's own log line not beside it. The stand-by's notable lines are counted in the waking sample (*While you stood by ...: 2 notable lines logged, in the log below.*) and found in its log, no longer listed twice. Every sample of deltas closes with **one line of what stands as before**, so that a model reading the deltas alone has a cheap cure for forgetting (the owner's caution of 2026-10-23):
+**The deltas.** A sample after the first carries what changed since the model's last reply, and nothing it has read already: the log lines since, the readings that changed (as since package 31c), **the sails in one line only when a sail's state changed**, **the sail in sight** (`strangers`, `sail_in_sight`, `stranger_in_sight`) **only when a sail came, went, was made out further or was named** (her name learnt by the hail, the private signal or a consort's colours, and lost with her; `docs/design/Design-SailByName.md`), not each time her bearing moved; the lookout's row only when who is at the masthead or his last hail changed; the officer's row not again for a word of the captain's that the sample's `word` carries, and that word's own log line not beside it. The stand-by's notable lines are counted in the waking sample (*While you stood by ...: 2 notable lines logged, in the log below.*) and found in its log, no longer listed twice. Every sample of deltas closes with **one line of what stands as before**, so that a model reading the deltas alone has a cheap cure for forgetting (the owner's caution of 2026-10-23):
 
 ```
 As before: the sails, two sail in sight, the book; the other readings as last told (readings gives every row).

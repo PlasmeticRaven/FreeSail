@@ -146,8 +146,13 @@ _HAND_OVER = re.compile(r"^hand over the deck\s*$")
 # the deck's conversation (package 41): `say <words>` (not `say to the <station>`, which
 # is `tell`), and the lookout's `hail <words>` (`hail the deck <words>`)
 _SAY = re.compile(r"^say\s+(?!to\s+(?:the\s+)?)(?P<q>.+)$")
+# The port's `hail the pilot` is the pilot's words and nothing after them; a hail that runs
+# on ("hail The pilot's cutter is out of sight to the westward") is the lookout's report
+# (package 95; the brig off Falmouth's lesson 2: it was read as `hail the pilot`).
 _HAIL = re.compile(
-    r"^hail\s+(?:the\s+deck\s+)?(?!(?:the\s+)?pilot|for\s+a\s+pilot|pilots\b)(?P<q>.+)$"
+    r"^hail\s+(?:the\s+deck\s+)?"
+    r"(?!(?:the\s+)?pilot(?:'s)?(?:\s+(?:boat|cutter|gig))?$|(?:the\s+)?pilots$|for\s+a\s+pilot$)"
+    r"(?P<q>.+)$"
 )
 # A `hail` that reached the stations names no sail (`orders.signals` takes those first).
 HAIL_NAMES_NO_SAIL = (
@@ -215,6 +220,8 @@ def _person_station(who: str, ship: Any) -> tuple[str, int] | None:
         head = " ".join(words[:n])
         try:
             person = people.find(head)
+            if person is None and hasattr(people, "find_aboard"):
+                person = people.find_aboard(head)  # a visitor, his voice bound to him (82b)
         except Exception:
             person = None
         if person is None:
@@ -226,10 +233,36 @@ def _person_station(who: str, ship: Any) -> tuple[str, int] | None:
     return None
 
 
+def _visitor_in(who: str, ship: Any) -> tuple[str, int] | None:
+    """A visitor's station addressed by its words (package 82b, item 2): "the officer of the
+    watch, of the Raven, aboard the Amazon", with its commas or without, or "the officer of
+    the watch of the Raven"; and how many words name it. Read before the rest, so that the
+    host's own "officer of the watch" is never the prefix that takes his words."""
+    from freesail.world.movement import visitor_forms
+
+    best: tuple[str, int] | None = None
+    for name in _known(ship):
+        for form in visitor_forms(name):
+            if (who == form or who.startswith(form + " ")) and (
+                best is None or len(form.split()) > best[1]
+            ):
+                best = (name, len(form.split()))
+    return best
+
+
 def _station_in(who: str, ship: Any) -> str | None:
     who = " ".join(who.split())
+    visitor = _visitor_in(who, ship)
+    if visitor is not None:
+        return visitor[0]
+    person = None
     for name in _known(ship):
         if who == name or who.startswith(name + " "):
+            # a person's name that runs past the station's ("captain Pope" of the brig,
+            # aboard as a visitor: package 82b) is his station's, not the host's captain's
+            person = _person_station(who, ship) if person is None else person
+            if person is not None and person[1] > len(name.split()):
+                return person[0]
             return name
     for alias, name in STATION_ALIASES.items():
         # 'the officer' for the officer of the watch (package 37); 'the deck' only in
@@ -245,6 +278,9 @@ def _alias_words(who: str, ship: Any = None) -> int:
     its person's name or role (package 41); the longest of them (package 68: "captain
     Bowen, land ho" names the captain in two words, not in one, and the cut kept "Bowen,")."""
     who = " ".join(who.split())
+    visitor = _visitor_in(who, ship) if ship is not None else None
+    if visitor is not None:
+        return visitor[1]
     found = _person_station(who, ship) if ship is not None else None
     person = found[1] if found is not None else 0
     for name in sorted(_known(ship) if ship is not None else STATION_NAMES, key=lambda n: -len(n)):

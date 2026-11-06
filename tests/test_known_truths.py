@@ -4225,14 +4225,21 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # point past dead astern to the larboard quarter with her yards braced for the starboard
 # tack, and the deck says so once ("brace them round when you will"), the book's trim
 # bracing them at 75791 as before: one line more, every tick the same
-GATE_5C_MERCHANT_LINES = 3100  # package 58b (3099 at 68, riding; 3098 at 56, 3080 at 57)
+# package 65, step 3 (the place's knowledge, §7): the mate reports to the master below, and
+# sends for him; the master is below at his sights at 26100 when a sail is sighted off the
+# Lizard (the report at 26160, the sail lost at 26700), and below at the noon's day's work in
+# the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
+# closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
+# thing): seven lines more, every tick the same (the lines are said and nothing moves)
+GATE_5C_MERCHANT_LINES = 3107  # 65 step 3 (3100 at 58b, 3099 at 68, 3098 at 56, 3080 at 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
 # package 68, riding: 902be35aeeac7b54
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_5C_MERCHANT_DIGEST = "6abbbff4d7fa1a57"  # package 58b, the stern (902be35aeeac7b54)
+# package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
+GATE_5C_MERCHANT_DIGEST = "6436eb06a665f379"  # package 65, step 3 (6abbbff4d7fa1a57 at 58b)
 
 
 def _people(world) -> list[dict]:
@@ -4681,7 +4688,9 @@ GATE_6A_INTENT_BROUGHT_UP_TICK = 111238
 GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111300
 # package 58b: not sold in the 36 hours (119400 at 68, 124320 at 43b, 119820 at 45c)
 GATE_6A_INTENT_SOLD_TICK = None
-GATE_6A_INTENT_LINES = 2078  # package 58b (2160 at 68, riding; 1698 at 56, 1684 at 43b)
+# package 65, step 3: the boat away for the prices at 111619 is reported to the master below
+# a minute later (one line more, every tick the same)
+GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
@@ -4690,7 +4699,7 @@ GATE_6A_INTENT_LINES = 2078  # package 58b (2160 at 68, riding; 1698 at 56, 1684
 # package 68, riding: 8eead2f4521f2a61 (90061f779b7db484 before)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave b498761052da0862; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_INTENT_DIGEST = "585c52675f10e590"  # package 58b
+GATE_6A_INTENT_DIGEST = "8744d3e56cfc9508"  # package 65, step 3 (585c52675f10e590 at 58b)
 
 
 @pytest.fixture(scope="module")
@@ -4874,7 +4883,8 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # package 58b: the merchant passage's stern line (3112 lines before; item 3's by bisection)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_FAKE_CAPTAIN_DIGEST = "dfaa7ab3bdd70295"  # package 65, step 2 (1c9a985bfd5dce0f at 58b)
+# package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "7076e667c2bc41e3"  # package 65, step 3 (1c9a985bfd5dce0f at 58b)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -13422,11 +13432,40 @@ def test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
     """A captain in the cabin: his sample carries no deck reading (no wind, no speed, no
     sail, no sail in sight) and says in one line where they are to be had; the glass, the
     tell-tale compass's heading and the chart's rows are his; the bell reaches him and the
-    lookout's sighting does not; the sail work overhead a sound and not a figure. The
-    officer's report of a sail sighted reaching him there is step 3's clause."""
-    from tests.test_knowledge import test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks
+    lookout's sighting does not; the sail work overhead a sound and not a figure; and the
+    rules' officer's report of what the deck saw reaches him there a minute after the line,
+    the line itself not (package 65, step 3), a captain on deck getting no report."""
+    from tests.test_knowledge import (
+        test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks,
+        test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck,
+    )
 
     test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+    test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck()
+
+
+def test_truth_7_371_a_captain_ashore_has_nothing_of_the_ship_but_the_boats_report():
+    """A captain ashore at the port: nothing of the ship in his sample (the deck's lines
+    none) but the boat's report when her manned boat comes to the quay (`report.boat`: her
+    state, whose the deck is, all well), which reaches the quay of that port."""
+    from tests.test_knowledge import (
+        test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship,
+    )
+
+    test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship()
+
+
+def test_truth_7_372_a_sleeping_station_is_woken_by_the_call_and_not_by_a_notable_line():
+    """A sleeping station is woken by the call (`report.called`, the officer's `call the
+    captain`) and not by a notable line of the deck nor by the bell; woken by all hands; the
+    captain is called for a danger once for a thing, and for everything by night."""
+    from tests.test_knowledge import (
+        test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do,
+        test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night,
+    )
+
+    test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do()
+    test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night()
 
 
 def test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where():
@@ -13503,15 +13542,17 @@ def test_truth_7_386_the_filters_cost_with_three_stations_seated_is_within_a_fif
 def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
     """A captain in the cabin standing by for `speed under 20 knots` is woken with 'Mr Pearce
     sends down to you' before the words, the log being hove on deck; a tripwire the cabin can
-    judge (the depth by the chart) and the same stand-by on deck wake as 58a's. The call's
-    line in the log is step 3's clause. Also the lead's ruling: an officer with the deck does
-    not go below."""
+    judge (the depth by the chart) and the same stand-by on deck wake as 58a's; the call is
+    a line of the log (`report.called`, package 65, step 3), before the wake's. Also the
+    lead's ruling: an officer with the deck does not go below."""
     from tests.test_knowledge import (
         test_a_tripwire_judged_below_wakes_as_the_officers_call,
         test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft,
+        test_the_tripwires_call_is_a_line_in_the_log,
     )
 
     test_a_tripwire_judged_below_wakes_as_the_officers_call()
+    test_the_tripwires_call_is_a_line_in_the_log()
     test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
 
 
@@ -13593,3 +13634,197 @@ def test_truth_7_389_a_say_reaches_every_hull_within_hearing_and_a_wake_names_it
     test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard()
     test_the_wakes_reason_names_the_speaker_and_the_kind()
     test_a_station_is_never_woken_by_its_own_word()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 2 (`docs/design/Design-DoorAndVisitor.md` §3): the visitor's name
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers():
+    """A station whose person goes aboard another ship is named there "officer of the
+    watch, of the X, aboard the <host>": in the host's stations, the desk's listing,
+    `where am I` and the log's mark. He is addressed by that name with its commas or
+    without, by "the officer of the watch of the X" and by his person's name; the host's own
+    officer of the watch is unchanged and answered by her own harness; home again, his own
+    station is his and the visitor's name is let go."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_visitor_name import (
+        test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go,
+        test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own,
+        test_the_visitor_is_named_by_his_station_his_ship_and_hers,
+    )
+
+    test_the_visitor_is_named_by_his_station_his_ship_and_hers(Path(tempfile.mkdtemp()))
+    test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own(
+        Path(tempfile.mkdtemp())
+    )
+    test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go(Path(tempfile.mkdtemp()))
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 3 (`docs/design/Design-DoorAndVisitor.md` §4): a far hull's hail
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits():
+    """Two hulls at far detail, a fake at each captain's station; the brig's captain hails
+    the cutter. The cutter's log hears it and her captain's sample carries it; nothing
+    answers by table on either side; the brig's log says she has not yet answered; the
+    cutter's captain answers with his own hail and the brig's log carries his words. A ship
+    nobody holds, far as she is, is answered by table as before."""
+    from tests.test_far_hail import (
+        test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer,
+        test_a_ship_nobody_holds_is_answered_by_table_far_or_full,
+    )
+
+    test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer()
+    test_a_ship_nobody_holds_is_answered_by_table_far_or_full()
+
+
+def test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads():
+    """The passage of 7-393, saved after the answer, replays by the transcripts and by the
+    acts to the game's log and each hull's log alike, the answer heard in the brig's."""
+    from tests.test_far_hail import (
+        test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs,
+    )
+
+    test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs()
+
+
+# ---------------------------------------------------------------------------
+# Package 95 (`docs/design/Design-SailByName.md`): the sail by her name
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_395_the_resolver_narrows_by_the_kind_the_quarter_the_bearing_and_the_distance():
+    """Four cases, each picking a sail the nearest-of-kind rule would not, by the words the
+    lookout himself uses: the kind by the words made out of her ('the brig-sloop', 'the
+    merchant brig'); the kind and the quarter ('the brig on the starboard bow', the farther
+    of two alike, by make out and by the hail with its colon or without); the quarter and
+    the bearing with no kind said (make out and the bearing of); the bearing and the
+    distance ('the sail bearing NE distant two miles', by the glass, make out and the
+    chase). The boat by the same words: `send the boat to the brig bearing E`, `pull for the
+    brig bearing W`, and the refusal at sea naming the form."""
+    from tests.test_sail_by_name import (
+        test_the_bearing_and_the_distance_pick_the_far_sail_on_the_same_bearing,
+        test_the_boat_is_sent_to_a_sail_named_as_the_lookout_names_her_and_the_refusal_says_how,
+        test_the_kind_and_the_quarter_pick_the_farther_of_two_alike,
+        test_the_kind_by_the_words_made_out_picks_her_over_a_nearer_sail,
+        test_the_lookouts_line_is_read_back_into_its_clauses_commas_or_none,
+        test_the_manned_boat_pulls_for_the_sail_by_the_lookouts_words,
+        test_the_quarter_and_the_bearing_name_a_sail_with_no_kind_said,
+    )
+
+    test_the_lookouts_line_is_read_back_into_its_clauses_commas_or_none()
+    test_the_kind_by_the_words_made_out_picks_her_over_a_nearer_sail()
+    test_the_kind_and_the_quarter_pick_the_farther_of_two_alike()
+    test_the_quarter_and_the_bearing_name_a_sail_with_no_kind_said()
+    test_the_bearing_and_the_distance_pick_the_far_sail_on_the_same_bearing()
+    test_the_boat_is_sent_to_a_sail_named_as_the_lookout_names_her_and_the_refusal_says_how()
+    test_the_manned_boat_pulls_for_the_sail_by_the_lookouts_words()
+
+
+def test_truth_7_396_ambiguity_goes_to_the_closer_and_words_that_leave_none_are_refused():
+    """Two brig-sloops answering 'the brig-sloop bearing NE' alike: the closer. A clause that
+    leaves no sail ('the brig right astern') is refused with the strangers' own words, so
+    that the asker can name her as the lookout does."""
+    from tests.test_sail_by_name import (
+        test_two_sails_answering_alike_give_the_closer_and_none_is_refused_with_the_strangers,
+    )
+
+    test_two_sails_answering_alike_give_the_closer_and_none_is_refused_with_the_strangers()
+
+
+def test_truth_7_397_a_name_over_all():
+    """The Wasp by her name, two miles off on the bearing of the nearer Raven of her kind:
+    the glass, make out and the bearing of take her, though the words after her name would
+    give the Raven."""
+    from tests.test_sail_by_name import (
+        test_a_name_over_all_against_a_nearer_sail_of_the_same_kind_and_bearing,
+    )
+
+    test_a_name_over_all_against_a_nearer_sail_of_the_same_kind_and_bearing()
+
+
+def test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost():
+    """Two brig-sloops of war read alike until one answers the hail with her name: then
+    `the strangers`, `what is in sight` and `a sail in sight` name her ("the Raven, a
+    brig-sloop of war ..."), the other still a brig-sloop of war; lost sight of, her name
+    goes with her, and closed and made out again she is a stranger until spoken. A liar is
+    known by the name she gives; a consort by her pendant once her colours are made out; a
+    friend by the private signal answered right; a stranger's colours give her nation, not
+    her name; and a sail named reaches a station's next sample of deltas."""
+    from tests.test_sail_by_name import (
+        test_a_consort_is_named_by_her_pendant_and_a_friend_by_the_private_signal,
+        test_a_liar_is_named_by_the_name_she_gives,
+        test_a_sail_hailed_and_answered_is_named_in_the_rows_and_forgotten_when_lost,
+        test_a_sail_named_reaches_the_next_sample_of_a_station_standing_by,
+    )
+
+    test_a_sail_hailed_and_answered_is_named_in_the_rows_and_forgotten_when_lost()
+    test_a_liar_is_named_by_the_name_she_gives()
+    test_a_consort_is_named_by_her_pendant_and_a_friend_by_the_private_signal()
+    test_a_sail_named_reaches_the_next_sample_of_a_station_standing_by()
+
+
+def test_truth_7_399_the_recorded_passages_name_their_sails_as_before():
+    """The proof by toggle: the encounter, the convoy and the first action played by their
+    rules captains with the resolver on and off give the same count of lines by kind and the
+    same words in every line that names a sail (the lookout's, the hail's, the signals', the
+    chase's helm, the orders given and refused); and the lookout's hail of the pilot's
+    cutter is his hail from the masthead, the port's `hail the pilot` kept whole."""
+    from tests.test_sail_by_name import (
+        recorded_passages_name_their_sails_as_before,
+        test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb,
+    )
+
+    recorded_passages_name_their_sails_as_before()
+    test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 4 (`docs/design/Design-DoorAndVisitor.md` §5): not half blind at far detail
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks():
+    """Six brigs within the range, the cap's three awake: a model at a fourth's and a fifth's
+    captain's station holds each over the cap (`HELD_OVER_CAP`, two) and nobody sleeps for
+    them; a sixth takes the farthest unheld hull's place. A held brig asleep twenty-nine
+    miles off, steered for the Wolf, is put about by her plan's own order at a mile and a
+    half (88's chart test on her leg), the line urgent in her log and in her captain's
+    sample; a brig whose harness has no door keeps the far plan as it was."""
+    from tests.test_held_hulls import (
+        test_a_far_held_hull_standing_for_a_rock_is_put_about_and_her_captain_called,
+        test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was,
+        test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance,
+    )
+
+    test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance()
+    test_a_far_held_hull_standing_for_a_rock_is_put_about_and_her_captain_called()
+    test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 5 (`docs/design/Design-DoorAndVisitor.md` §6): the boat's names
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_refused():
+    """Three hulls beside the frigate, two asleep, their companies with men of the frigate's
+    posts (a person's id is his post's): the frigate's master, boatswain and gunner sent to
+    the Lynx in her boat are landed there, and the Lynx's master fetched comes back in her,
+    the sleeping brigs' men of those posts in their own ships throughout (the owner's
+    sixteen names, landed as the far brigs' people). A person of another ship named in the
+    order is refused in words ("... is of the Chevalier, not of this ship; the boat is not
+    sent") and the boat stays."""
+    from tests.test_boat_names import (
+        test_a_person_of_another_ship_named_in_the_order_is_refused_in_words,
+        test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay,
+    )
+
+    test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay()
+    test_a_person_of_another_ship_named_in_the_order_is_refused_in_words()

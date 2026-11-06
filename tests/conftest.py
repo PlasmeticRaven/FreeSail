@@ -102,11 +102,19 @@ SLOW_TESTS: frozenset[str] = frozenset(
     {
         # package 65 (the place's knowledge): the fakes seated and sent below, the hull slept
         "test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
+        # package 65, step 3: the reports, the call, the command devolved, the boat's report
+        "test_knowledge.py::test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck",
+        "test_knowledge.py::test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night",
+        "test_knowledge.py::test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do",
+        "test_knowledge.py::test_the_command_devolves_on_the_held_officer_while_the_captain_is_away",
+        "test_knowledge.py::test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship",
+        "test_known_truths.py::test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
+        "test_known_truths.py::test_truth_7_371_a_captain_ashore_has_nothing_of_the_ship_but_the_boats_report",
+        "test_known_truths.py::test_truth_7_372_a_sleeping_station_is_woken_by_the_call_and_not_by_a_notable_line",
         "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
         "test_knowledge.py::test_the_handover_fold_keeps_the_place",
         "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",
         "test_knowledge.py::test_knowledge_all_turns_the_rule_off",
-        "test_known_truths.py::test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
         "test_known_truths.py::test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where",
         "test_known_truths.py::test_truth_7_376_the_handover_fold_keeps_the_place",
         "test_known_truths.py::test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail",
@@ -455,6 +463,32 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_door_follows.py::test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down",
         "test_known_truths.py::test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save",
         "test_known_truths.py::test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness",
+        # package 82b, item 2: the visitor's name (7.6 s alone, 2026-11-06)
+        "test_visitor_name.py::test_the_visitor_is_named_by_his_station_his_ship_and_hers",
+        "test_known_truths.py::test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers",
+        # package 82b, item 3: a far hull's hail, two hulls asleep with a fake at each
+        # captain's station (8 to 12 s alone, 2026-11-06)
+        "test_far_hail.py::test_a_far_hulls_hail_goes_to_her_captains_model_and_his_answer_to_the_hailer",
+        "test_far_hail.py::test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs",
+        "test_known_truths.py::test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits",
+        "test_known_truths.py::test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads",
+        # package 82b, item 4: the hulls a model holds over the cap, and the far plan's danger
+        # (4 to 14 s alone, 2026-11-06)
+        "test_held_hulls.py::test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance",
+        "test_held_hulls.py::test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was",
+        "test_known_truths.py::test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks",
+        # package 82b, item 5: the boat's names, three hulls beside the frigate (5 to 17 s alone,
+        # 2026-11-06)
+        "test_boat_names.py::test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay",
+        "test_boat_names.py::test_a_person_of_another_ship_named_in_the_order_is_refused_in_words",
+        "test_known_truths.py::test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_refused",
+        # package 95: the recorded passages played with the resolver on and off (58 s alone),
+        # the narrowing's cases together (9 s) and the lookout's seated hail (6 s), 2026-11-06
+        "test_known_truths.py::test_truth_7_399_the_recorded_passages_name_their_sails_as_before",
+        "test_known_truths.py::test_truth_7_395_the_resolver_narrows_by_the_kind_the_quarter_the_bearing_and_the_distance",
+        "test_sail_by_name.py::test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb",
+        # package 95, step 2: the identified sail's four cases together (11 s alone)
+        "test_known_truths.py::test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost",
     }
 )
 

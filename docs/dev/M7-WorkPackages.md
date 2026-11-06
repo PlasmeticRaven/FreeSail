@@ -73,11 +73,11 @@ on these packages; that is the owner's choice.
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
 | 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93`; **merged whole 2026-10-30** at `d9465d9` from `7e6b9f1` (the record below): ten regions rebuilt on the world's own tide, the raise one source of truth with the tide, Agincourt Sound keeping the eleven's raise until a sheet is read, truths 7-305 to 7-309 |
 | 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
-| 82b | Opus | **The door follows its harness, the visitor's name, the far hull's hail** (the owner's testing of 2026-10-31 to 11-05: the Mr Hill and Captain Owen cases, the hails between model captains answered by the table): the agent API's desk keyed to the harness and not to a station's name and ship (`agents/remote.py` `Desk.seats`, `Seat`), so a model's door follows its person between hulls and `stand down` stands down one station; the visitor keeps his own station's name ("officer of the watch, of the Raven, aboard the Amazon") as the primer promises (`world/movement.py` `visiting_station`, `world/seats.py`); a hail of a hull in the far shape whose captain a model holds is his to answer, never the table's (`world/hail.py` `deliver`, `model_holds_her`); truths 7-390 to 7-394 | launched 2026-11-05 on the hotfix's merge, beside 65 (session_01XooV4BCBsF3TQSAwxBrxmy) | | item 1 merged 2026-11-06 (07c06a0); items 2 to 5 on the branch, to report |
-| 95 | Opus | **The sail by her name** (the owner, 2026-10-31 and 11-05): one resolver for a sail named in words (the kind, the quarter, the bearing, the distance, each narrowing the pool; the closer on remaining ambiguity; a name once known over all), serving `the glass on`, `make out`, the hail's addressee, `bearing of` and `pull for` (`world/lookout.py` `glass_on`, `make_out`; `world/hail.py` `_addressee`; `orders/boat.py`); a sail made out and identified named in the readings (`strangers`, `in_sight`, `sail_in_sight`) by her name while she is in sight, and her identification lost when she is lost sight of until she is closed and made out again; truths 7-395 to 7-399 | after 82b (both touch `hail.py`) | | |
-| 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule; **launched 2026-10-31; step 1 closed on its branch 10-31 and held unmerged through the week's pause; steps 1 and 2 merged (eb147e7 on 2026-11-05, 5288665 on 11-06); on step 3 on 2026-11-05 with decisions 62 and 63 and the hearing across hulls added on 82's whole merge** as a Fable sibling session on `claude/pkg-65` (session_01XooV47SeuYqmTZ8W1Rzyoo), the design note first |
+| 82b | Opus | **The door follows its harness, the visitor's name, the far hull's hail** (the owner's testing of 2026-10-31 to 11-05: the Mr Hill and Captain Owen cases, the hails between model captains answered by the table): the agent API's desk keyed to the harness and not to a station's name and ship (`agents/remote.py` `Desk.seats`, `Seat`), so a model's door follows its person between hulls and `stand down` stands down one station; the visitor keeps his own station's name ("officer of the watch, of the Raven, aboard the Amazon") as the primer promises (`world/movement.py` `visiting_station`, `world/seats.py`); a hail of a hull in the far shape whose captain a model holds is his to answer, never the table's (`world/hail.py` `deliver`, `model_holds_her`); truths 7-390 to 7-394 | launched 2026-11-05 on the hotfix's merge, beside 65 (session_01XooV4BCBsF3TQSAwxBrxmy); **closed**: items 1 to 5 merged 2026-11-06 (07c06a0, f207fd8); the replay's seating order and the shared person ids booked to 97, the lower-cased served lines to 65's step 8 |
+| 95 | Opus | **The sail by her name** (the owner, 2026-10-31 and 11-05): one resolver for a sail named in words (the kind, the quarter, the bearing, the distance, each narrowing the pool; the closer on remaining ambiguity; a name once known over all), serving `the glass on`, `make out`, the hail's addressee, `bearing of` and `pull for` (`world/lookout.py` `glass_on`, `make_out`; `world/hail.py` `_addressee`; `orders/boat.py`); a sail made out and identified named in the readings (`strangers`, `in_sight`, `sail_in_sight`) by her name while she is in sight, and her identification lost when she is lost sight of until she is closed and made out again; truths 7-395 to 7-399 | after 82b (both touch `hail.py`); **launched 2026-11-06 08:25 UTC** (session_01XooV4BQyodA4Vf5ABnBgby, claude/pkg-95, from the trunk at 0d1127f with 82b closed): the design note approved; step 1 merged (d65b2e3); step 2 merged (9936e12); **closed** 2026-11-06 |
+| 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule; **launched 2026-10-31; step 1 closed on its branch 10-31 and held unmerged through the week's pause; steps 1 to 3 merged (eb147e7 on 2026-11-05, 5288665 and 0855551 on 11-06); on step 4 on 2026-11-05 with decisions 62 and 63 and the hearing across hulls added on 82's whole merge** as a Fable sibling session on `claude/pkg-65` (session_01XooV47SeuYqmTZ8W1Rzyoo), the design note first |
 | 96 | Fable | **The harbour and the ship's configuration** (the owner, 2026-11-06, in place of M7b's package 64, struck): a design package first, on two layers. (1) **The ship's configuration as a thing of its own**: one description of any hull's whole setup (her class file and fit, her role, her nation and its parameters, her stations and who holds each with its door, her people by name, her papers and private signal, her crew's number and quality, her books, her intent and her squadron) with defaults by role and nation, that the scenario maker, the director's `ship` order in live play and the business all build from, so that any hull is set up as wanted without nasty surprises. (2) **The harbour presenting every configuration the game has**: the doors and stations, the settings and flags, the scenario's settings with the full configuration of the player's ship and, at choice, of every other ship (the squadrons, the papers, the private signal explained, each ship's role, fit and crew), so that direct file editing is never necessary. The design document with the lead's gate, then the build in steps; M7b's harbour points of 2026-10-18 as facts | booked (the owner, 2026-11-06: "it may come after 74, I simply wanted it booked"); to brief when its turn comes in the Fable queue, after 65 and 74 |
-| 97 | Opus | **The hull façade's readers audited** (the lead, 2026-11-06, from two builders' findings of the same day): 84's per-hull delegation (`World.own`, `as_hull`, `PER_SHIP_FIELDS`) answers for the hull whose block is running, so an object of one hull that reads `world.people`, `world.stations` or `log_of(world)` from inside another hull's block reads the wrong hull's: 82b found the player's hull's `Stations.holder` (her `Stations` is built with the World itself) reading the running block's people, so a named station on her matched another hull's captain moving; 65 found `station_spot` read from inside another hull's order (mended for `_say` with `station_spot_on`) and the director's own writes (`thought`, the budget lines, `director.seat`) landing in the followed hull's log under `follow`. The package: every reader of a per-hull field through a World handle audited and listed; each either bound to its own hull at construction (the Stations' and People's hull, not the World) or read in its own hull's block; a test per finding (the holder under another hull's block, the director's writes under `follow`, a façade read from inside another hull's order) and one guard that walks the readers; no pin moved (the faults are latent in the recorded passages, which run one hull's block at a time) | booked; a small Opus package after this week, after 82b and 95; to brief |
+| 97 | Opus | **The hull façade's readers audited** (the lead, 2026-11-06, from two builders' findings of the same day): 84's per-hull delegation (`World.own`, `as_hull`, `PER_SHIP_FIELDS`) answers for the hull whose block is running, so an object of one hull that reads `world.people`, `world.stations` or `log_of(world)` from inside another hull's block reads the wrong hull's: 82b found the player's hull's `Stations.holder` (her `Stations` is built with the World itself) reading the running block's people, so a named station on her matched another hull's captain moving; 65 found `station_spot` read from inside another hull's order (mended for `_say` with `station_spot_on`) and the director's own writes (`thought`, the budget lines, `director.seat`) landing in the followed hull's log under `follow`. The package: every reader of a per-hull field through a World handle audited and listed; each either bound to its own hull at construction (the Stations' and People's hull, not the World) or read in its own hull's block; a test per finding (the holder under another hull's block, the director's writes under `follow`, a façade read from inside another hull's order) and one guard that walks the readers; no pin moved (the faults are latent in the recorded passages, which run one hull's block at a time); one tidy rides with it, found by 95's builder: `hail_order`'s refusal in `world/hail.py` ("the strangers are listed") to give the strangers' words as `Lookout.sail_refusal` does; truths 7-422 to 7-425 | after 82b and 95; **launched 2026-11-06 12:40 UTC** (session_01XooV4AUe3L3SVNNGyD3K6i, claude/pkg-97, from the trunk at 9936e12 with 95 closed): the design note first (the audit's list), then the mends; the design note (c299be0, `docs/design/Design-FacadeReaders.md`: one cause, the player's own hull never walked at construction; eighteen readers listed; two roads; a guard) approved 13:04, one step; the one line in 65's `agents/harness.py` (a harness binds the hull whose agents it enters) granted; left by ruling: the shared person ids (96's), the replay's seating order of two hulls in one tick (a loose end beside truth 7-394, not a façade reader), the sea's one visibility under follow (noted for M8); 14:16: one fight's outcome moved by the binding and bisected (the Amazon's Health, holding the World, killed the Medusa's man of the boarder's post; the branch kills her own first lieutenant at tick 530): the branch right, the test's story kept under a chosen seed with the reason written, a new pin of the default draw beside it; who leads on when the boarders' officer falls booked to 74 |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -2172,7 +2172,235 @@ reading "the chart is blank (std 7.9)" against 8.0, which the trunk's tree and t
 both read above and below on this machine alone and under load (four runs alternating, all
 green after; the tuning notes name four such readings since October): the floor set at 4.0,
 twice a blank frame's and half the chart's own figure, old beside new in the test's comment
-(the same commit). The whole suite in the cloud dispatched, the figures to follow.
+(the same commit). The whole suite in the cloud: **run 35 on ae3c22d** (04:34 to 05:40 UTC), lint green, all six shards green, 6,647 passed, 11 skipped, 12 expected failures (run 34's 6,298 and 12, plus the step's 349 tests: the lee ports' and the view geometry's), the pace job 9 of 13 (the four floors under at 434 to 491 against 500, the runner's speed as on the runs before; the ports' compare a tick within it).
+
+### Package 82b, items 2 to 5 (the visitor's name, the far hull's hail, the held hull, the boat's names), as merged (2026-11-06); the package closed
+
+Merged `claude/pkg-82b` at f406717 (f207fd8, `--no-ff`; the item commits 340b890, d4e294d,
+7d15b93, e7317f7, the trunk's 2b59ea4 brought in at 9615f1b, two mends b68d1de and c7ebb90,
+the pace figures f406717). **Item 2, the visitor's name (truth 7-392):** aboard another ship
+he is "officer of the watch, of the Raven, aboard the Amazon" (`movement.visitor_words`,
+`visitor_name`, `visitor_forms`; `visiting_station` names the voice by them, `put_aboard`
+passes his home station, `_unbind_visit` the name he was bound under; `where am I` adds
+", standing as the ..."); `orders/stations.py` `_station_in` tries the visitor's forms first
+(the approved comma rule, proven by toggle: without it the host's "officer of the watch" took
+his words), and beyond the list, accepted: a person's name that runs past a station's prefix
+wins ("stand down the captain Pope" stands down the visitor, not the host's captain),
+`_alias_words` tries the visitor's forms first, `_person_station` falls back to
+`find_aboard`. A blemish ruled a tidy for 65's step 8 (the words): the served lines read the
+lower-cased key ("the officer of the watch, of the x, aboard the amazon") where the desk's
+listing and `where am I` carry the ships' own case. **Item 3, a far hull's hail (truths 7-393,
+7-394):** `hail.deliver` asks her hull whatever its shape where a model holds her captain
+(`crews.model_held`), the table answering only a ship nobody holds; the hailer's pending
+words "She has not yet answered."; proven by toggle; 7-394 replays a hail between two
+model-held far hulls by both roads. Found, not 82b's, booked to 97: on the transcript road
+harnesses on two hulls seated in the same tick are seated again in hull order, not play order
+(`core/replay.py`); 7-394 staggers its seatings by a minute. **Item 4, the held hull (truth
+7-400):** `HELD_OVER_CAP = 2`, `model_held` (a harness at captain, started, not released,
+with its door, so a replay ranks her alike); in `switch` a held hull ranks with the dealings
+and up to the allowance of held hulls is left out of the cap's count; `far_dangers` at the top
+of `switch` tries the far body's leg by 88's chart test (`line_shore`, `dangers_ahead`, the
+doctrine's `danger_ahead_nm`), puts her about by `far_perform` and writes an urgent
+`plan.danger` line that wakes her captain, once in `DANGER_AHEAD_AGAIN_S`. Two mends beyond
+the approved lines, found by truth 7-200 on the merged tree and accepted: a cap of nought
+(`crewed: {cap: 0}`, nobody promoted: the tender's day) has no allowance over it; and the
+check is not made on a port's own track in (`_pilot_water`: the plan ends at the port's
+anchor and the leg's mark is one of its `from_sea` marks after the first, its `in` marks or
+its anchorage, read on `dealings._track_marks`; the first `from_sea` mark, where she joins
+from the open sea, is still judged), as the awake captain makes none in pilot water; toggled
+both ways. The convoy's pace, informative (the tuning notes, "Package 82b"): six brigs, none
+held and three awake 167 to 171 ticks a second quiet; four held and five awake 110 to 113;
+a third of the pace and well above `CREWED_FLOOR_TICKS_S`. **Item 5, the boat's names (truth
+7-401):** the root cause, person ids are post-based and shared across hulls, so
+`dealings._boat_to_job`'s id map over every hull landed the last-registered hull's men of the
+same posts (the Renard's master, boatswain and gunner aboard the Lynx, the frigate's three
+left in the boat); `in_boat(pid)` prefers the giver's hull then the boat's destination,
+`aboard_her(pid)` the destination's own, for landing, fetching and the way back; `port.py`
+`_boat_to_ship` refuses a person of another ship in words ("X is of the Raven, not of this
+ship; the boat is not sent."); proven by toggle. The shared ids are booked to 97 with the
+façade's readers (and are a fact for 96's configuration of a ship). **The builder's suites
+on f406717:** ruff and format clean; the fast tier whole exit 0 (5,933 passed, 1 expected
+failure); the slow tier of 22 touched and related files exit 0 (654 passed, 8 expected
+failures); the pace alone 12 of 13, truth 7-159 at 497 against 500 and toggled against the
+trunk alternating (the branch 504, 480, 504; the trunk 494, 473, 502), the container's margin,
+no pin moved. **The lead's merge:** the trial on 48ebefc (the trunk with 75's lee-port step)
+clean and lint-clean; the fast tier whole on it green, exit 0, every test passed; the whole suite in the cloud
+run 36 on 0d1127f (08:24 to 09:17 UTC): lint green, all six shards green, 6,663 passed, 11 skipped,
+12 expected failures; the pace job 9 of 13, the four floors under at 446 to 489 ticks a second against
+500 (the runner's speed, as on every run; informative). Package 82b is closed; package 95 launched
+on this merge.
+
+### Package 65, step 3 (the reports, the call and the command devolved), as merged (2026-11-06)
+
+Merged `claude/pkg-65` at c6efc0c (0855551, `--no-ff`; the step's code at bb23b8b with the
+trunk's 2326d27 brought in at ecc93ff, then 7de98cc the boat's report read in the ship's own
+block, 39545b0 the call's words, a287290 the three pins re-measured, c6efc0c the figures), on
+top of 82b's items 2 to 5. **Built as the design's §7 and decision 63:** `freesail/world/
+reports.py` (new), ticked after the routine and before the stations: the rules' officer of
+the watch reports to the captain below a minute after each reportable line of the deck (the
+messenger's minute; the lookout's sighting, made out, sail lost, land ahead, closing; the
+wind's shift; a signal seen or read; a hail heard or answered; the pilot's hail; the boat
+alongside or away), `report.made` with the reach `person`, when the captain is in the hull,
+awake, not where he sees the deck, and no model or player holds a station of the officer's
+kind (they have the duty, and the brief says it); a danger line, an urgent line of the deck's
+business and by night every reportable line make a call at once, `report.called` with the
+reach `wakes`, once for a thing until the captain comes on deck or an hour passes; `call the
+captain [: <why>]` the officer's order (refused from the captain, "there is no sending for
+yourself", and when he is on deck; `send for the captain` a synonym); the boat's report
+(`report.boat`, reach `port`) when her boat manned as a hull comes to the quay where a person
+of her company is ashore. In the harness: a `report.called` that reaches a station ends its
+stand-by ("sent for: ..."); a sleeping stand-by is ended by any `wakes`-class line that
+reaches him and by nothing else of the deck's; the tripwire's call below writes its line
+before the wake; the officer's kind with the deck is told once, when the captain goes below,
+that the duty is his. **Decision 63:** `command_state` read from the log (the last
+`ship.command_devolved` not followed by `ship.command_resumed`), cached by the log's length
+so a checkpoint and a replay read the same; the command devolves on a held station of the
+officer's kind first, else the senior rules' person by the health module's order, when the
+captain is ashore, in the boat, aboard another ship, wounded or sick below, or a captive;
+`tools.judge` gives `COMMAND` for every order of the station in command ("By the officer of
+the watch, in command: ..."), and the command is given back when the captain is available
+again and has given an order (the orders' journal). **A told order is the captain's word:**
+`Harness.put_word` keeps the captain's words in `agent.told`; `told_covers` says whether a
+station's order is one it was told; `tools.judge` gives `TOLD` ("By the officer of the watch,
+at the captain's word: ...") and the told order passes the deck's gate. The reach table, the
+stand-by events ("a report", "the captain called", "the boat's report"), the primer's chapters
+11 and 14. **Tests:** eight in `tests/test_knowledge.py`; truths 7-370 whole, 7-371, 7-372,
+7-387 whole; decision 63's two tests allotted **truths 7-420 and 7-421** (numbered at step
+4's boundary). **Taken another way, accepted:** the call and the report read from the log and
+not a list kept aside; a danger call once for a thing; a captain asleep by day not reported to;
+the seniority the health module's order; the command given back on an order given while
+available again (an order typed from the shore does not take it back). **Found on the way:**
+the masthead's hail is a danger line but the stations' own kinds make no call (the sighting's
+line is the report); "the quay at the quay at Falmouth" mended to the port's name; the boat
+hull's unmustered people (the boat's branch first); a devolution cache in `ship.extra` had
+changed four readings rows on a point ship (truth 43's repeat detector): a weak-keyed
+dictionary by hull now, nothing of it saved; a station's person's needs are the company's
+until the harness takes them in hand; `come aboard` from the shore refused while the boat is
+away; the officer's brief grew by four hundred characters (`test_officer`'s budget raised to
+22,500 by the convention, the same figure the lead set at 75's merge, kept once with both
+reasons at this merge); **(i) booked, not 65's:** the rules' master called does not come up
+(the call is a line; a model or the player at the captain's station is woken by it, but the
+rules' master at his day's work below stays at it, so the mate sends five times in twenty
+minutes in the Goulet while the book sails her): the people's and the reckoning's mirror, a
+later package. **What moved, with the proof:** three pinned passages, by the new report lines
+alone, old beside new in the pins' comments: the merchant passage (the master below at his
+sights when a sail is sighted off the Lizard, and below at the noon's day's work in the
+Goulet, where the Mingan is sighted a danger, her sails lift, the Mingan closes, the land is
+ahead and the pilot warns: two reports, five calls) 3,100 to 3,107 lines, 6abbbff4d7fa1a57 to
+6436eb06a665f379, every other figure of the passage the same (the anchored ticks, the
+soundings, the account; truth 78's `_not_the_stations` equal to the base); the fake captain's
+passage the same seven, 3,112 to 3,119, dfaa7ab3bdd70295 to 7076e667c2bc41e3 (its formula
+unchanged); the schooner on an intent, her boat away for the prices reported to the master
+below, 2,078 to 2,079, 585c52675f10e590 to 8744d3e56cfc9508; the cruise unchanged (her captain
+on deck throughout); the call's words doubled where the line names the danger mended before
+the pins were taken. **The builder's suites on a287290:** the fast tier whole 5,938 passed, 1
+expected failure; the slow tier of the twenty-six touched files and the known truths 2,972
+passed, 9 expected failures; the pace alone 13 passed (the frigate alone 557; three stations
+seated 564 under the filter against 551 with `all`). **The lead's merge:** the trial on 82b's
+items 2 to 5 met the trunk in `docs/dev/TuningNotes.md`'s tail (both sides kept) and
+`tests/test_officer.py`'s budget (kept once at 22,500 with both reasons); lint clean; the fast
+tier whole on the combined tree green (exit 0); the whole suite in the cloud run 37 on 6423975
+(09:52 to 10:43 UTC): lint green, all six shards green, 6,679 passed, 11 skipped, 12 expected
+failures; the pace job 13 of 13, every floor held (the first such run since the runner was
+pinned). Step 4 (the player at the prompt by his place, decision 59;
+decision 62's one person and the boat road; the drivers' commands against the grammar) goes on;
+95's step 1 puts a few lines in `orders/stations.py`'s `recognises` beside it.
+
+### Package 95, step 1 (one resolver for a sail named in words), as merged (2026-11-06)
+
+Merged `claude/pkg-95` at cc4e373 (d65b2e3, `--no-ff`; the design note 5216f29, the step
+662ab8b, the trunk's ef3b5af brought in at 35de09a, 058821c the captain's `hail the pilot`
+pinned beside the lookout's hail of the pilot's cutter, cc4e373 the primer's chapter 15), on
+top of 65's step 3. **Built as the design note (`docs/design/Design-SailByName.md`):**
+`Lookout.sail_named` in `world/lookout.py` reads the lookout's own line backwards
+(`read_sail_words`: the kind, "on the <side> bow/quarter", "abeam to <side>", "right
+ahead/astern", "bearing <point>", "distant <d>" or "<d> off", commas or none, any order); a
+name the deck knows over all (her name, her id, and the hook for step 2's given name); the
+kind by every word made out of her (a lone rig word by 36's substring rule); the quarter
+widened a point, the bearing within a point and a half, the distance half to twice the
+lookout's own judged estimate (`BEARING_SLACK_DEG`, `DISTANCE_SLACK`, `QUARTER_SLACK_POINTS`,
+their reasons in the tuning notes); the closer by true distance where more than one answers.
+It serves `make her out` (the verb's kind joined to its clauses), `the glass on`, `give
+chase`, `the bearing of`, the hail (`_addressee` after its own names and kinds; the hail's
+head extends over the clauses, so "hail the brig on the starboard bow what ship is that"
+hails her), `pull for` and `send the boat to the <ship>` (`vessel_in_sight`; `hull_named` the
+same); `dealings.send_boat`'s refusal at sea names the form when a sail lies within a boat's
+pull; words that leave no sail are refused with the strangers' own words. **Taken another way,
+accepted:** the resolver is reached only where the trunk's own words found nothing, and
+`Lookout.find` takes it only when its caller hands the world, so the rules captain's own
+`chase the <rig>` reads the lookout as before (had it reached the resolver, "privateer
+schooner" made out would have moved the recorded passages); the stations touch is not the
+speaker check the lead's ruling named (the order is judged in `agents/tools.py` before its
+actor is set, so a lookout check there sees no speaker; proven by the seated fake lookout) but
+`_HAIL`'s lookahead holding the pilot's bare words only, and `signals.hail_parts` reading the
+lookout's every `hail` as his hail of the deck; the boat's `_TO_SHIP` read "to the brig abeam
+to starboard with the master" at its last "to", so words that begin with one are read from the
+first (`_TO_SHIP_FIRST`). Nothing in `vocabulary.yaml`, `grammar.py` or `_say`. **Truths 7-395
+to 7-397 and 7-399** (`tests/test_sail_by_name.py`, called from the known truths): the
+narrowing's four cases, the closer and the refusal, a name over all, and the proof by toggle
+(`lookout.SAIL_BY_NAME` off: the encounter 45 minutes, the convoy 40 and the first action 60
+by their rules captains give the same counts of lines by kind and the same words in every line
+naming a sail) with the pilot pin. States and counts asserted, no digest; no pin re-measured,
+none moved; the slow marks in `conftest.SLOW_TESTS` (7-399 at 58 s, 7-395 at 9 s, the seated
+hail at 6 s). 7-398 is step 2's. **The books:** chapter 15 gains "Naming a sail" and sends the
+boat to chapter 26; chapter 23 the hail by the lookout's words and the lookout's every hail
+his; the tuning notes the section. **Found on the way, already booked:** `the strangers`' item
+`id` is the vessel's id, which the scenarios write as her name (package 96's brief). **The
+builder's suites:** the fast tier whole exit 0; the slow tier of the touched files and the
+known truths exit 0 (190 run, the xfails as on the trunk); the pace alone 13 of 13 (none near
+its floor; the container 5 to 10 percent under the build machine); ruff and format clean.
+**The lead's merge:** the trial on 6423975 met only in the tuning notes (both sections kept),
+lint-clean; the fast tier whole on it green, exit 0, every test passed (426 slow left out); the whole suite in the cloud run 38 on
+b78477d (11:10 to 12:07 UTC): lint green, all six shards green, 6,694 passed, 11 skipped, 12
+expected failures; the pace job 9 of 13, the four floors under at 423 to 489 ticks a second
+against 500 (the runner's speed; informative). Step 2 (the identification named in the readings and lost with
+the sight of her; truth 7-398) builds on; its one touch in 65's `agents/harness.py`, the sail
+rows' delta key (id, made_out, nation) gaining the name so that a model holding a station is
+sent the row again when the deck learns her name, was asked for at 10:26 and approved (it wakes
+nothing; pinned from the model's side in 7-398; 65's builder told at each merge). 97 launches
+when 95 closes.
+
+### Package 95, step 2 (the identified sail named in the rows, and forgotten when lost), as merged; the package closed (2026-11-06)
+
+Merged `claude/pkg-95` at 39be8e9 (9936e12, `--no-ff`; the step's code at 846f0f1 and 9af67aa,
+the trunk's c7b13f4 brought in at f7e2f3f and b78477d at 39be8e9), on top of step 1.
+**Built as the design note:** `Lookout._identify`, once a look, keeps a sail's name once the
+deck has it, while she is in sight: by hail, read from the deck's log since the last look
+(`LOOK_WINDOW_S`, the minute; our hail's answer and her hail of us, her own name or a liar's
+from the hail table's lies, the deck's knowledge and not the truth); by the private signal
+answered right (the deck captain's recognition or the locker's challenge judged right, the
+locker read where it lies and never made); by a consort's colours made out (under our orders,
+or of our squadron). A stranger's colours give her nation, never her name. `_sail_ident` is
+made on the first identification and popped where `_sail_said` is popped when she is lost
+sight of: a stranger at dawn. The rows: `the strangers`' item `name` (None until known) and
+its words led by it ("the Raven, a brig-sloop of war abeam to starboard, ..."), `what is in
+sight` ("Sail ho! The Raven, ...") and `a sail in sight` the same; `known` and the lookout's
+own event lines untouched; her name is the resolver's too. **The one touch in 65's file**
+(`agents/harness.py`, approved 10:27): the sail rows' delta key per item is (id, made_out,
+nation, name), so the strangers row is re-sent once when the deck learns her name or loses
+it with her, and wakes nothing; proven by toggle (the member out, the model's-side test
+fails). **Truth 7-398** (`tests/test_sail_by_name.py`, called from the known truths): the
+Raven and the Swift alike until the Raven answers the hail named by the lookout's words, then
+named in the three rows and the Swift not; `make out the Raven` by her name; no name in the
+lookout's lines; lost at twenty-five miles and closed again, nameless; the liar named by the
+name she gives; the consort under our orders by her colours; the Nancy by the private signal
+judged right; the French brig's colours, no name; and from the model's side, a fake captain
+standing by a glass gets the strangers row again with her name after the hail and nameless
+after she is lost and closed again. States and counts asserted, no digest; no pin re-measured,
+none moved; 7-399's toggle covers the identification (off, nothing is identified); the slow
+mark in `conftest.SLOW_TESTS` (11 s). **The books:** chapter 15 (a sail a stranger until named,
+the three roads, the name lost with her), chapter 23 (a sail that answers with her name is
+named by it), `docs/agents/Harness.md`'s deltas sentence, the tuning notes' step 2 paragraph.
+**Found on the way, booked to 97:** `hail_order`'s own refusal in `world/hail.py` ("...; the
+strangers are listed.") still promises a list it does not give, outside `_addressee`; the
+lookout's refusals now give the strangers' words. **The builder's suites** (code as at
+9af67aa): the fast tier whole exit 0 (427 slow left out); the slow tier of the touched files
+and the known truths exit 0 (208 passed, 9 xfailed as on the trunk); the pace 13 of 13; ruff
+and format clean. **The lead's merge:** the trial on b78477d clean and lint-clean; the fast tier
+whole on it green, exit 0, every test passed (427 slow left out); the whole suite in the cloud run 39 on eabf20f (12:44 to 13:54 UTC): lint green, all six shards green, 6,699 passed,
+11 skipped, 12 expected failures; the pace job 12 of 13, truth 7-159 at 479 ticks a second against 500 (the
+runner's speed; informative). **Package 95 is closed**; 97 launches on this merge (the hull façade's readers audited;
+Opus, small), with the hail refusal's words added to its brief.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -2886,6 +3114,12 @@ brought in at every boundary (82's later steps, 88 and 75 run beside it). **Trut
 **The head rules bind** as the brief above has them, and 84's three pin rules and 85's
 in-world rule with them; nothing under `docs/agents/consent/` or in the consent brief touched;
 nothing of 75's files touched.
+
+**From package 97 (the lead, 2026-11-06):** when the boarders' officer falls in the round, nobody leads on to the
+deck won today (`combat/boarding.py` `boarders_officer` finds none among the first lieutenant, a lieutenant
+and a mate); 97 pins that outcome under the fight's default draw. The prize crew's function is 74's on the
+same road, so 74 settles who leads on when he falls (the senior standing of the party, by the period's
+practice: a lieutenant, a mate, the senior midshipman) and moves the pin accordingly, old beside new.
 
 ## Package 79a: the regimes filled out and sourced (`data/regimes.yaml`, `data/nations.yaml` `naval:`; `freesail/world/regimes.py`, `freesail/world/business.py` the commission drawn; `data/weather/` only if Iberia's drift is taken; `docs/TechnicalSpec-M7.md` §22 as built; `docs/dev/TuningNotes.md`; `tests/test_business.py`, `test_nations.py`, `test_known_truths.py` truths 7-260 to 7-269)
 
@@ -3998,7 +4232,13 @@ director's grant shown) are facts for this brief, each still true. The owner's t
 2026-11-01 and 11-05 (the testing-week section above; the case studies in `docs/playtests/`)
 holds the nasty surprises: a door restationed as "the Mr Hill" (82b mends the road, 96 says
 the configuration), a ship with no station briefed for a model, a scenario whose squadrons
-could not be set but by the file.
+could not be set but by the file. Two facts from the builders of 2026-11-06 for the
+configuration's identities: a person's id is his post's and so shared by every hull's company
+(82b's item 5 found the boat landing another hull's men of the same posts; the lead booked the
+ids to 97 with the façade's readers), and a vessel's id is what the scenarios write as her
+name, so the strangers' row's `id` tells a client her name before the deck has it (95's
+finding; the id left as it is, the viewer's handle): the configuration gives every person and
+every hull an id apart from the name, and the name is the deck's to learn.
 
 **The design document, first, for the lead's gate** (`docs/design/Design-Configuration.md`, in
 83's shape): (1) the configuration of a ship as one described thing, its fields and their
@@ -5164,3 +5404,13 @@ the trunk and on your tree alike, set at 4.0 from the chart's own 8.0. Nothing o
 The whole suite runs in the cloud; bring the trunk in at your next boundary (82b's item 1 and
 65's step 2 are on it since this morning: the harness's `ident`, the say across hulls, a
 reply's prose the person's own note). Build the dwell as ruled above, then B3.4.
+
+**2026-11-06, night: the owner's word for the ships session's night.** The dwell is in on
+your side; the owner has you work on through the night and foresees no blocker that wants
+their attention for 75 to finish as planned; you keep in touch with the lead as you work
+and hold for the lead on any judgement call; the lead reviews and merges each step as it
+comes, through the night, by the same road (the trial merge, the fast tier, the whole suite
+in the cloud, the record). The lead's own night: 82b's items 2 to 5 merged when reported,
+then package 95 launched (the sail by her name, on `world/hail.py`'s `_addressee` beside
+your files, nothing of the ships'), then 97; 65's step 3 merged when reported; 74 launched
+when 65 closes.

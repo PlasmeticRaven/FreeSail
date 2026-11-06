@@ -17848,3 +17848,194 @@ the frigate at the view 230; ruff check and ruff format --check clean. The first
 the step's tree, before the mending above, failed five tests of the fast tier and five of the
 slow (item (d) to (g) above); both runs are in the commits' messages. The whole suite is the
 lead's in the cloud at the merge.
+
+## Package 82b: the hulls a model holds, over the cap (2026-11-06)
+
+**`crews.HELD_OVER_CAP = 2`** (judgement, `docs/design/Design-DoorAndVisitor.md` §5; the
+owner's convoy of the testing week: "four or five" sail in company, four of them held by
+models). A hull whose captain's station a model holds through a door (`crews.model_held`: a
+harness at `captain`, started, not released, with its door, which the save carries) ranks with
+the dealings in the cap's order, and up to two such hulls are left out of the cap's count: the
+three of `CREWED_CAP` and two held beside them, five awake beside the player's. Past the
+allowance a held hull takes the farthest unheld hull's place, as a stationed one does under
+the cap. A cap of nought (`crewed: {cap: 0}`, data/scenarios/tender.yaml) has no allowance:
+the scenario's word is that nobody is promoted, and truth 7-200 sails the Raven asleep with a
+model at her captain's station. The range and its hysteresis are unchanged: a held hull beyond six miles sleeps, and
+her plan's danger check (`crews.far_dangers`, 88's chart test on the far body's leg) keeps her
+off the land and the rocks while she does.
+
+**The pace of a convoy, informatively** (no pace truth moved or added; this container's four
+cores, `tests/test_held_hulls.py`'s `_sail` and `_seat`: six merchant brigs hove to in a line
+one to three miles from the frigate, the fakes' samples every hour, 900 ticks after two
+minutes' settling, two runs each):
+
+| held hulls | awake beside the player's | ticks a second |
+|---|---|---|
+| none | 3 (the cap) | 165, 167 (under load); 167, 171 (quiet) |
+| four | 5 (the cap and the allowance) | 108, 102 (under load); 113, 110 (quiet) |
+
+The first pair of each row was measured while the fast tier ran beside it (load 4.9 on four
+cores); the second on the merged tree (the trunk at 2b59ea4 brought in) with the machine
+quiet. Four held hulls cost about a third of the pace either way. Five awake costs about two crewed hulls'
+worth over the cap, as package 43's measure has it (a crewed hull costs what the frigate costs),
+and stays above `CREWED_FLOOR_TICKS_S` (60) here; the owner's machine is about half the build
+machine's figure.
+### Step 3: report, the messenger and the call; the sleeper's wake; the command devolved (the design's §7; decision 63; 2026-11-06)
+
+**What was built.** `freesail/world/reports.py` (new), ticked by `World.tick` after the
+routine and before the stations: the rules' officer of the watch's report to the captain
+below (`report.made`, notable, a minute after the line, "Mr Pearce sent down to the captain,
+in the cabin: a sail sighted, two points on the larboard bow.", data `to`, `place`, `of`,
+`text`, `by`), for the reportable kinds (`REPORTABLE`: the lookout's sighting, made out, sail
+lost, land ahead, closing; the wind's shift; a signal seen or read; a hail heard or answered
+by the other ship; the pilot's hail; the boat alongside or away), each in the officer's
+words; the call (`report.called`, notable, at once for the lines of the tick before, "Mr
+Pearce sends for the captain: taken aback: ...") for a danger line, an urgent line of the
+deck's business, and every reportable line by night (`world.daylight == "night"`), once for
+a kind until the captain comes on deck or an hour passes (`_called_lately`, read from the
+log); nothing while a model or the player holds a station of the officer's kind
+(`watches.held_officers`), nothing for a captain on deck, ashore or in the boat; the boat's
+report (`report.boat`) in the ship's log when her manned boat comes to the quay of a port
+where a person of her company is ashore, the coxswain's words from `_own_state_truth`,
+whose the deck is and "all well" or the last urgent line of the hour. The orders: `call the
+captain [: <why>]` (the vocabulary's verb, `object: person`; `orders/people.py` hands it to
+`reports.call_the_captain`; the officer's domain names it; refused from the captain, "there
+is no calling for yourself", and when he is on deck, "he sees it"). The harness: a
+`report.called` that reaches a station ends its stand-by ("sent for: ..."); a sleeping
+stand-by is ended by any `wakes`-class line that reaches him whatever its severity
+(`_wakes_in`; all hands is notable), and by nothing else of the deck's; the tripwire's call
+below writes its `report.called` line before the wake; the officer of the watch's kind with
+the deck is told once, when the captain goes below, that the duty is his
+(`_report_duty_notice`, `AgentState.report_duty_told`, said again after he comes up and
+goes below again); the brief's sentence (85's rule). The reach: `ship.command_devolved` and
+`ship.command_resumed` aboard; the stand-by events "a report", "the captain called", "the
+boat's report". Decision 63: `command_state` (from the log, cached by its length),
+`in_command`, the devolution on the held station (the deck given, a notice, a journal line)
+or the senior rules' person; `tools.judge` returns `COMMAND` for every order of a station in
+command and `TOLD` for an order the captain told it (`told_covers`: the told words hold the
+order's, or a clause parses to the same verb and object), the order's line "By the officer
+of the watch, in command: ..." or ", at the captain's word: ..."; a told order passes the
+deck's gate (`told_order`); `Harness.put_word` keeps the captain's words in `agent.told`
+(the seat kept them already). Tests: eight in `tests/test_knowledge.py`, truths 7-370 whole,
+7-371, 7-372, 7-387 whole in `tests/test_known_truths.py`; five of the eight and three
+truths in the slow tier (37, 14, 12, 9 and 8 s alone).
+
+**Taken another way, with the reason** is in the design note's postscript (the call and the
+report read from the log, not a list kept aside; a danger call once for a thing; a sleeper
+not reported to by day; the seniority the health module's; the command back on an order
+given while available; decision 63 without a truth number).
+
+**Found on the way.** (a) **The masthead's hail is a danger line** (`DANGER_LINES` has
+`agent.hail`, 37g's, for the officer with the deck): read by the call's rule it would have
+sent for the captain at every hail; the stations' own kinds (`agent.*`) make no call, the
+sighting's own line being the report. (b) **The port's shore is named "the quay at
+Falmouth"** (`Port.shore.name`), so the first boat's report read "came in to the quay at the
+quay at Falmouth"; the port's own name is used. (c) **A boat hull's people are unmustered**
+(the oars' crew), so the muster check that keeps the reports off a ship nobody has moved in
+kept the boat's report off too; the boat's branch comes first. (d) **The first smoke run
+called the captain every four minutes** for the frigate's sails lifting (the yards not
+trimmed for the course after `set plain sail`) and doubled the words ("her sails lifting: her
+sails lifting, ..."); hence the once-for-a-thing rule and the line's own words. (e) **The
+needs of a station's person are the company's until the harness takes them in hand** (a
+minute after the seating): a fake told to turn in at its first sample is "rested" and does
+not; the tests tire him after the minute. (f) **`come aboard` from the shore is refused
+while the boat that landed him is away** ("wait for her at the quay"): the devolution's test
+waits for her. (g) **Three pinned passages moved, by the new lines alone.** The merchant
+passage's master is below at his sights when a sail is sighted off the Lizard (26100; the
+mate's report at 26160, the sail lost at 26700) and below at the noon's day's work in the
+Goulet (111661 to 112801), where the Mingan is sighted a danger, her sails lift, the Mingan
+closes, the land is ahead and the pilot warns: two reports and five calls, seven lines more
+(3100 to 3107, every tick the same, the stations' lines aside the fake captain's passage the
+same seven more, 3112 to 3119); the schooner on an intent has her boat away for the prices
+reported to the master below (2078 to 2079). The first replay showed the call's words doubled
+where the line names the danger already ("a danger sighted: ..., a danger", "the pilot's
+warning: the pilot warns ..."): the line's own words are used when a stem is shared, and the
+boat's report drops its "the boat:" when the line names her. The pins are re-measured with
+the old figures beside them. (h) **For the lead: the rules master, called, does not come
+up.** The call is a line; a model or the player at the captain's station is woken by it, but
+the rules' master working his day's work below (`reckoning.Master.occupy`) stays at it until
+it is done, so the mate sends five times in twenty minutes in the Goulet while the book
+sails her. Whether the rules' captain drops his work for a call is the people's and the
+reckoning's business (the mirror's place), not widened here; the design's §7 says the call
+"reaches him wherever he is aboard and wakes him asleep", which it does for a station.
+
+**The pace.** Nothing of this step runs on the tick's path but `reports.tick`: a muster check
+and, for a mustered ship, a read of the log's tail for the lines of the tick before and of
+the minute before (the lines of one tick each; the log is appended in tick order), and the
+captain's place; the devolution's check is the cached state and a few reads of the captain's
+person; the pace tests are run as the rule asks and their figures are below.
+
+**The suites on the step's final tree** (a287290, the trunk at 2326d27 merged in; this
+container, four workers): the fast tier whole 5938 passed, 1 xfailed, in 42 min 28 s; the slow
+tier of the twenty-six touched files and the known truths 2972 passed, 9 xfailed, in 1 h 3 min
+26 s; the pace tests alone and last 13 passed in 5 min 12 s, their figures: three stations
+seated, the knowledge filter's place 564 ticks a second against `all` 551 (a second run 573
+against 592; the filter's cost is within the run's noise, as at steps 1 and 2); the frigate
+alone 557 ticks a second, the Channel observed 348, the same Channel with the frigate at the
+view 221 (step 2's tree gave 568/556, 554/346/230 and 559/576 on the step's first final tree).
+`ruff check` and `ruff format --check` clean on the whole tree.
+
+## Package 95: the sail by her name (2026-11-06)
+
+`docs/design/Design-SailByName.md` holds the design; these are its judgements and what was
+measured.
+
+**The allowances** (`world/lookout.py`, judgement: the lookout's own rounding and a minute's
+swing between his words and the order). **`BEARING_SLACK_DEG`**, a point and a half
+(16.875 degrees): he says a bearing to the nearest point (half a point's rounding) and the
+sail's bearing draws by a point or so in the minute between his look and the order at close
+range. **`DISTANCE_SLACK = 2.0`**, half to twice the distance said, judged against his own
+estimate (`judged_m`) and not the truth: his estimate is a sixth out either way at the most
+(package 37d) and is said to the cable, the mile or the league, so "a mile" stands for
+anything from about eight cables to a mile and a half. **`QUARTER_SLACK_POINTS = 1.0`**, a
+point either way of `relative_words`' sectors (ahead under one point, the bow to six, abeam to
+ten, the quarter to fifteen, astern beyond): a sail on the edge of the bow when he spoke may
+be abeam by the order. The closer sail, where more than one answers, is by the true distance,
+as every resolver of the trunk had it.
+
+**What was taken another way.** The resolver is reached only where the trunk's own words found
+nothing (`Lookout.find`'s generic words, its rig words and the chart's names first; the hail's
+pronouns, its names on the sea and its kinds first; `pull for`'s hulls and `Vessels.find`
+first), so every naming that resolved before resolves to the same sail; and `Lookout.find`
+takes it only when its caller hands the world (`make her out`, `the glass on`, `give chase`,
+`the bearing of`), so the rules captain's own `chase the <rig>` (`captains._chase_order`, which
+asks `find` whether the lookout knows the rig) is as it was: had it reached the resolver, a rig
+of two words made out ("privateer schooner") would have turned his "give chase" into "chase the
+privateer schooner" and moved the recorded passages. The boat's `_TO_SHIP` read "to the brig
+abeam to starboard with the master" at its last "to", so the words that begin with one are
+read from the first (`_TO_SHIP_FIRST`). The brig off Falmouth's lesson 2 was not the grammar's:
+`orders/stations.py`'s `_HAIL` refused every hail that began with "the pilot", so the lookout's
+"hail The pilot's cutter is out of sight" fell to the port's `hail the pilot cutter`; the
+lookahead now holds the pilot's own words and nothing after them (every use in the books and
+the tests is bare), and `orders/signals.hail_parts` reads the lookout's every `hail` as his
+hail of the deck (the masthead trumpets no ship), where only his "hail a <rig> ..." was before.
+
+**The proof by toggle (truth 7-399).** `lookout.SAIL_BY_NAME`, off, makes every order and
+reading name a sail as before (the resolver, the hail's head of clauses, the boat's first
+"to", `make her out`'s joined kind and the refusal's strangers). The encounter (45 minutes),
+the convoy (40) and the first action (60), played by their rules captains with it on and off:
+the counts of the log's lines by kind and the words of every line that names a sail (the
+lookout's, the hail's, the signals', the chase's helm, the orders given and refused) the same.
+No pin was re-measured; no draw is made by the resolver.
+
+**Found on the way.** `the strangers`' item `id` is the vessel's id, which the scenarios write
+as her name: a client reading the row learns a stranger's name before the deck does. Left as it
+is (the viewer's chart and gunnery read it); the lead books it to package 96. Chapter 15 of the
+primer said "the boat sent to her and the prize are not yet in the game", which 82 made untrue
+for the boat: it now sends the boat to chapter 26.
+
+**Step 2: her name, kept while in sight** (`Lookout._identify`, once a look). The lookout
+reads the deck's log since the last look (`LOOK_WINDOW_S`, the minute) for a hail that names
+her: our hail's answer (`hail.answered`, not her own deck's) and her hail of us (`hail.heard`),
+the name her own or a liar's from the hail table's `lies`; the private signal answered right
+(the deck's captain's `recognised` by "the private signal", or the locker's challenge judged
+`right`, the locker read where it is and never made); a consort's colours made out (level 2:
+under our orders, or of our squadron). Her colours alone on a stranger name her nation and not
+her name. The name (`_sail_ident`, made on the first identification so that a passage with
+none carries nothing new) goes where `_sail_said` goes when she is lost sight of. The rows:
+`the strangers`' item `name` (None until known) and its `words` led by it; `what is in sight`
+and `a sail in sight` the same in their sail lines. `known` is untouched (the rules captain's
+`_chase_order` reads it). The resolver's names take hers (truth 7-397's road), so `make out the
+Raven` finds the liar who called herself so. The proof by toggle (7-399) covers it: off, nothing
+is identified. The harness's sail rows carry the name in their delta key, so a sail named by
+hail reaches a model's next sample.

@@ -72,11 +72,12 @@ Scenarios as 75 ships them (a scenario of 1796 among them); the items are the br
 - [ ] **14. The pictures.** `ship_view` from two facings and `chart` at each span, through a door with the page open. *Her two decks of ports drawn; the picture put back only by the model's hand.*
 - [ ] **15. A scenario of 1796.** Her year's wars (the nations' table as of 1796 in `the war`), her service and her station as the scenario gives them. *The war the ship sailed with is 1796's, not 1805's, and the pilot's news fits it.*
 
-## Judgement decisions for the gate's testing (the owner, 2026-11-06)
+## Reminders for the gate's testing (the owner, 2026-11-06)
 
-Figures built on judgement are ruled finally by the owner after the gate's testing and tuning,
-not at the merge; each is an item here with its figure and its measure, and the ruling goes
-into the record with the figures tuned, old beside new.
+A figure built on judgement is ruled finally by the owner after some testing and tuning, not
+at the merge; the owner's reminders of the ones not to be forgotten are items here, each with
+its figure and its measure, the ruling going into the record with the figures tuned, old
+beside new. Not a codified list: the owner's word.
 
 - [ ] **J1. The lee ports and the roll** (package 75, L2 and L3; Build-Ships.md §7;
   `combat/ports.py`). The figures: a port shut when its sill is within a foot of the water
@@ -93,6 +94,17 @@ into the record with the figures tuned, old beside new.
   long (a port kept shut a minute after the sea has left it), whether the weather side's
   shutting reads true, and what the lines say; tune the foot, the six inches, the minute
   and the roll's share, old beside new, and rule.
+
+- [ ] **J2. A ship hove to forereaches** (package 65, step 4, found on the way, 2026-11-06;
+  the hulls' tests' world). The figures: the frigate hove to makes near three knots (1.5 m/s)
+  and the launch three and a half fresh, so a boat pulled home from a mile off closes at half a
+  knot and the return is three hours; a boat lying on her oars alongside a ship hove to fell a
+  cable astern in minutes (hence made fast). *Test:* the frigate and the cutter hove to in a
+  moderate and a fresh breeze, `the log` through a glass, the leeway and the headway read; a
+  boat lowered and lying on her oars beside her. *Judge:* whether a ship hove to should
+  forereach so (the period's figures: a knot or two of headway with the leeway, by the sail
+  backed and the helm), and whether the boat's pull home should take so long; the engine's
+  equations read, not changed, before any figure moves; a judgement call for the owner.
 
 ## Open items found in the records
 

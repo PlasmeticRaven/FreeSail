@@ -143,8 +143,7 @@ def hail_order(world: Any, who_words: str, words: str) -> tuple[str, str, dict[s
     if answer is None:
         return (
             "hail.made",
-            text + ". She has a captain of her own to answer; his words will be heard when he "
-            "gives them.",
+            text + ". She has not yet answered.",
             {"id": vessel.id, "words": said, "level": 1, "answered": False},
         )
     return (
@@ -204,6 +203,14 @@ def _addressee(world: Any, who_words: str) -> Any:
         by_kind = [v for v in pool if w in str(v.what or "").lower() or w in v.kind.lower()]
     if by_kind:
         return min(by_kind, key=near)
+    # the sail as the lookout names her (package 95): her quarter, her bearing, her distance
+    # and the words made out of her, among the sails in sight
+    lookout = getattr(world, "lookout", None)
+    seen_sail = lookout.sail_named(who_words, world) if hasattr(lookout, "sail_named") else None
+    if seen_sail is not None:
+        for v in candidates:
+            if str(v.id) == str(seen_sail.feature.modern):
+                return v
     mark = _mark_in_sight(world, w)
     if mark is not None:
         raise OrderError(
@@ -290,12 +297,16 @@ def _own_id(world: Any) -> str:
 def deliver(world: Any, vessel: Any, said: str, tick: int) -> str | None:
     """The hail heard on the other ship, and her answer: by table when the rules have
     her, None when a model holds her captain (the words go to his sample and he answers
-    with `say to`)."""
+    with `say to`). Her hull is asked whatever its shape (package 82b, item 3): a far hull
+    a model holds hears the hail in her log as a full one does, and the table answers only
+    a ship nobody holds."""
     hailer = _own_id(world)
     hailer_words = _hailer_words(world, vessel)
     heard = f"{_cap(hailer_words)}, within hail, hails us: '{said}'"
     crew = getattr(vessel, "crew", None)
-    other_world = crew if crew is not None and getattr(crew, "shape", "") == "full" else None
+    full = crew is not None and getattr(crew, "shape", "") == "full"
+    held = crew is not None and not full and model_holds_her(crew)
+    other_world = crew if (full or held) else None
     if other_world is not None:
         other_world.record(
             Severity.URGENT,

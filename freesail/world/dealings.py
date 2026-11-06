@@ -2963,7 +2963,9 @@ class Dealings:
                     f"She is under way; bring her to an anchor in "
                     f"{_possessive(found[0].name)} roads before the boat goes ashore."
                 )
-            raise OrderError("She is not in port; there is no shore within a boat's pull.")
+            raise OrderError(
+                "She is not in port; there is no shore within a boat's pull." + _ship_form(world)
+            )
         if self.stance(port) == "hostile":
             raise OrderError(f"{port.name} is hostile to her; a boat sent in would be taken.")
         low = words.lower()
@@ -3367,7 +3369,27 @@ class Dealings:
         target = hull_of(world, job.payload.get("hull"))
         name = self.boat.boat_name
         head = f"{name[:1].upper()}{name[1:]}"
-        persons = {p.id: p for p in (registry.persons() if registry is not None else [])}
+        everyone = list(registry.persons() if registry is not None else [])
+        to_hull = str(job.payload.get("hull") or self.boat.to_hull or "")
+
+        def in_boat(pid: str) -> Any:
+            # a person in this boat by his id, which is his post's and so shared by every
+            # hull's company (package 82b, item 5: the owner's sixteen names, landed as the
+            # far brigs' people of the same posts by an id map over every hull): one in a
+            # boat, of her own company first, then of the ship she went to
+            found = [p for p in everyone if p.id == pid and p.hull is None and p.where == "boat"]
+            for home in (str(self.hull_id), to_hull):
+                mine = [p for p in found if str(getattr(p, "home", "") or "") == home]
+                if mine:
+                    return mine[0]
+            return found[0] if found else None
+
+        def aboard_her(pid: str) -> Any:
+            # a person fetched: aboard the ship she went to, of that ship's company first
+            found = [p for p in everyone if p.id == pid and str(p.hull or "") == to_hull]
+            hers = [p for p in found if str(getattr(p, "home", "") or "") == to_hull]
+            return (hers or found or [None])[0]
+
         stage = job.payload.get("stage")
         if stage == "alongside":
             if target is None:
@@ -3388,14 +3410,14 @@ class Dealings:
                 {"ship": str(target.id)},
             )
             for pid in self.boat.landing:
-                p = persons.get(pid)
+                p = in_boat(pid)
                 if p is None:
                     continue
                 self.boat.people = [x for x in self.boat.people if x != pid]
                 put_aboard(world, p, target, "quarterdeck", by=f"the {hull_name(world.own)}'s boat")
             self.boat.landing = ()
             for pid in self.boat.fetching:
-                p = persons.get(pid)
+                p = aboard_her(pid)
                 if p is None or str(getattr(p, "hull", "") or "") != str(target.id):
                     continue
                 p.hull = None
@@ -3423,7 +3445,7 @@ class Dealings:
             ]
             own = world.own
             for pid in list(self.boat.people):
-                p = persons.get(pid)
+                p = in_boat(pid)
                 if p is None:
                     continue
                 put_aboard(world, p, own, "deck", by="the boat", said=False)
@@ -3817,3 +3839,23 @@ class Dealings:
         if due is not None:
             data["due_tick"] = due
         return text, data
+
+
+def _ship_form(world: Any) -> str:
+    """At sea, with a sail in sight within a boat's pull, the form that sends the boat to
+    her (package 95, the case study's lesson 3: the refusal sent the captains to port
+    instead of to the form that would have worked); '' with none."""
+    from freesail.world import lookout as L
+    from freesail.world.movement import BOAT_BETWEEN_NM
+
+    if not L.SAIL_BY_NAME:
+        return ""
+    lookout = getattr(world, "lookout", None)
+    reach = BOAT_BETWEEN_NM * units.NAUTICAL_MILE
+    for s in getattr(lookout, "sightings", None) or []:
+        if getattr(s, "seen_as", "") == "sail" and s.distance_m <= reach:
+            return (
+                " A sail in sight within a boat's pull is reached by 'send the boat to the "
+                "<ship> with <persons>', the ship by her name or as the lookout names her."
+            )
+    return ""

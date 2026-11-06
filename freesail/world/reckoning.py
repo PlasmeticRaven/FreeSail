@@ -5521,7 +5521,7 @@ class Navigation:
         lookout = self.world.lookout
         if lookout is None or not name:
             return None
-        found = lookout.find(name)
+        found = lookout.find(name, self.world)  # a sail by the lookout's words (package 95)
         if found is None:
             return None
         heading = float(self.world.ship.heading)

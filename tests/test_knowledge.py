@@ -738,3 +738,380 @@ def test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard():
     assert e.kind == "agent.spoke" and e.data["heard_by"] == []
     assert not [e for e in list(w.log)[n:] if e.kind == "agent.spoke"]
     assert [e for e in crew.log if e.kind == "agent.spoke" and "glass is falling" in e.text]
+
+
+# ---------------------------------------------------------------------------
+# Step 3: report, the messenger and the call; the sleeper's wake; the command devolved
+# (the design's §7; decision 63; truths 7-370 whole, 7-371, 7-372, 7-387 whole)
+# ---------------------------------------------------------------------------
+
+
+def _officer_seated(w, script=None, loop=True) -> Harness:
+    stand = reply("", call("stand_by", until="a glass"))
+    fake = Fake(script or [stand], loop=True) if loop else Fake(script, when_done=stand)
+    h = Harness(w, officer(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=w), fake)
+    h.model_name, h.door = "the fake officer", "runner"
+    h.start()
+    return h
+
+
+def test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck():
+    """Truth 7-370 whole: the rules' officer of the watch sends down to the captain in the
+    cabin each reportable line of the deck a minute after it (the messenger's minute), the
+    report a notable line for him (`report.made`, reach `person`) in his sample there, the
+    deck's line itself not; a captain on deck gets no report; a model at the officer's
+    station makes the rules' officer silent (the duty is the model's, the brief says it)."""
+    from freesail.world import reports
+
+    w, h = the_captain_in_the_cabin()
+    w.run(7200)
+    made = [e for e in w.log if e.kind == reports.REPORT_MADE]
+    assert made, [e.kind for e in w.log if e.kind.startswith("report.")]
+    pearce = w.stations.holder("officer of the watch")
+    for e in made:
+        assert e.text.startswith(f"{pearce.name} sent down to the captain, in the cabin: "), e.text
+        assert e.data["to"] == w.people.captain.name and e.data["of"] in reports.REPORTABLE
+        # the line it reports fell a minute before, of the kind the report names
+        sources = [
+            x for x in w.log if x.tick == e.tick - reports.MESSENGER_S and x.kind == e.data["of"]
+        ]
+        assert sources, (e.text, e.data)
+    below = [s for s in samples(h) if "in the cabin" in str(s.get("you"))]
+    kinds = {ln["kind"] for s in below for ln in s["log"]}
+    assert reports.REPORT_MADE in kinds
+    assert not kinds & {"lookout.sighting", "lookout.made_out", "agent.hail"}
+    # on deck no report is made: he sees it
+    w2 = world_at()
+    w2.run(7200)
+    assert not [e for e in w2.log if e.kind.startswith("report.")]
+    # a model at the officer's station: the rules' officer reports nothing
+    w3 = world_at()
+    _officer_seated(w3)
+    w3.submit("you have the deck")
+    w3.submit("go below")
+    w3.run(7200)
+    assert not [e for e in w3.log if e.kind == reports.REPORT_MADE]
+
+
+def test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night():
+    """The design's §7: a danger line (her sails lifting, taken aback) with the captain
+    below makes a call, not a report, said once for a thing until he comes on deck; by
+    night every reportable line is a call; the words are the officer's."""
+    from freesail.world import reports
+
+    w, h = the_captain_in_the_cabin()
+    w.run(7200)
+    called = [e for e in w.log if e.kind == reports.REPORT_CALLED]
+    assert called, [e.kind for e in w.log if e.kind.startswith("report.")]
+    pearce = w.stations.holder("officer of the watch")
+    for e in called:
+        assert e.text.startswith(f"{pearce.name} sends for the captain: "), e.text
+        assert e.data["to"] == w.people.captain.name
+        assert e.text.count("lifting") <= 1 and e.text.count("aback") <= 1, e.text
+    # once for a thing: no second call of one kind within the hour while he is below
+    kinds = [e.data["of"] for e in called]
+    for kind in set(kinds):
+        ticks = [e.tick for e in called if e.data["of"] == kind]
+        assert all(b - a >= 3600 for a, b in zip(ticks, ticks[1:], strict=False)), (kind, ticks)
+    # the call ends his stand-by: he is sent for
+    woke = [e.text for e in w.log if e.kind == "agent.resumed" and "sent for:" in e.text.lower()]
+    assert woke, [e.text for e in w.log if e.kind == "agent.resumed"][:3]
+    # the words by day and by night, judged on the lines themselves
+    ev = Event(
+        tick=1,
+        ship_time=datetime(1805, 6, 10, 10, 0),
+        severity=Severity.NOTABLE,
+        kind="lookout.sighting",
+        text="Sail ho! A sail two points on the larboard bow.",
+        actor="sim",
+        data={"seen_as": "sail", "relative": "two points on the larboard bow"},
+    )
+
+    class Day:
+        daylight = "day"
+
+    class Night:
+        daylight = "night"
+
+    what = reports._what(ev)
+    assert what == "a sail sighted, two points on the larboard bow"
+    assert reports._why_called(Day(), ev, what) is None
+    assert reports._why_called(Night(), ev, what) == what
+    aback = Event(
+        tick=1,
+        ship_time=datetime(1805, 6, 10, 10, 0),
+        severity=Severity.NOTABLE,
+        kind="ship.aback",
+        text="Taken aback: the sails pressed against the masts.",
+        actor="sim",
+        data={},
+    )
+    assert (
+        reports._why_called(Day(), aback, None)
+        == "taken aback: the sails pressed against the masts"
+    )
+    hail = Event(
+        tick=1,
+        ship_time=datetime(1805, 6, 10, 10, 0),
+        severity=Severity.NOTABLE,
+        kind="agent.hail",
+        text="[lookout] Sail ho!",
+        actor="the lookout",
+        data={},
+    )
+    assert reports._why_called(Night(), hail, None) is None  # the sighting's own report
+
+
+def test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do():
+    """Truth 7-372 and the design's §7: `call the captain [: <why>]` is the officer of the
+    watch's order (his domain names it; the master's does not), refused from the captain
+    himself and when the captain is on deck; its line (`report.called`) wakes a captain
+    asleep below, whom the bell and a notable line of the deck did not; an officer asleep
+    below is woken by all hands and not by the bell."""
+    from tests.test_people import _behind
+
+    w = world_at()
+    _officer_seated(w)
+    w.submit("you have the deck")
+    # the captain's station: a fake that turns in below (tired by hand)
+    sleep = reply("", call("stand_by", until="asleep below until called"))
+    ch = seated(w, [reply("", call("stand_by", until="a glass")), sleep])
+    cap = w.people.captain
+    w.run(60)
+    assert cap.needs.by_hand  # a station's person: his needs his own, not the company's
+    _behind(w, cap.needs, awake=30)
+    w.run(1800)  # the glass, or the first wake before it: his second reply turns him in
+    assert cap.needs.asleep == "below" and cap.where == "cabin", (cap.needs.asleep, cap.where)
+    assert ch.agent.standing_by
+    e = w.submit("call the captain")
+    assert e.kind == "order.rejected" and "there is no sending for yourself" in e.text
+    # a notable line of the deck and the bell do not wake him
+    before = len(w.log)
+    w.submit("set the royals", actor="the officer of the watch")
+    w.run(1800)
+    assert any(x.kind == "clock.bell" for x in list(w.log)[before:])
+    assert ch.agent.standing_by and cap.needs.asleep == "below"
+    # the master may not call him; the officer may, and the call wakes him
+    master_result = tools.call(w, "master", "submit_order", {"text": "call the captain"})
+    assert "may not" in str(master_result) or "has no authority" in str(master_result), (
+        master_result
+    )
+    result = tools.call(
+        w, "officer of the watch", "submit_order", {"text": "call the captain: a sail to windward"}
+    )
+    assert "sends for the captain: a sail to windward" in str(result), result
+    called = [x for x in w.log if x.kind == "report.called"]
+    assert (
+        called
+        and called[-1].data["why"] == "a sail to windward"
+        and called[-1].actor == "the officer of the watch"
+    )
+    w.run(2)
+    assert not cap.needs.asleep and cap.where == "quarterdeck"  # back where he turned in from
+    woke = [x.text for x in w.log if x.kind == "agent.resumed"][-1]
+    assert "sent for:" in woke.lower() and "a sail to windward" in woke, woke
+    # on deck again he sees it: the call is refused in words
+    w.submit("come on deck")
+    result = tools.call(w, "officer of the watch", "submit_order", {"text": "call the captain"})
+    assert "he sees it" in str(result), result
+    # an officer asleep below: the bell does not wake him, all hands does
+    w2 = world_at()
+    oh2 = _officer_seated(w2, [reply("", call("stand_by", until="a glass")), sleep], loop=False)
+    w2.run(60)
+    pearce = w2.stations.holder("officer of the watch")
+    assert pearce.needs.by_hand
+    _behind(w2, pearce.needs, awake=30)
+    w2.run(1800)  # the glass: his second reply turns him in
+    assert pearce.needs.asleep == "below" and oh2.agent.standing_by, pearce.needs.asleep
+    before = len(w2.log)
+    w2.run(1800)
+    assert any(x.kind == "clock.bell" for x in list(w2.log)[before:]) and oh2.agent.standing_by
+    e = w2.submit("call all hands")
+    assert e.kind != "order.rejected", e.text
+    w2.run(2)
+    assert not pearce.needs.asleep
+    woke2 = [x.text for x in w2.log if x.kind == "agent.resumed"][-1]
+    assert "woken:" in woke2.lower() and "hands" in woke2.lower(), woke2
+
+
+def test_the_tripwires_call_is_a_line_in_the_log():
+    """Truth 7-387 whole: the tripwire judged for a captain below fires as the officer's call
+    and the log says so (`report.called`, 'Mr Pearce sends down to the captain: speed under
+    20 knots'), before the station's wake line; on deck no such line."""
+    w = world_at()
+    script = [
+        reply("", call("submit_order", text="go below")),
+        reply("", call("stand_by", until="speed under 20 knots")),
+        reply("", call("stand_by", until="a glass")),
+    ]
+    seated(w, script)
+    w.run(130)
+    called = [e for e in w.log if e.kind == "report.called"]
+    assert called, [e.kind for e in w.log][-10:]
+    pearce = w.stations.holder("officer of the watch")
+    head = f"{pearce.name} sends down to the captain: speed under 20 knots"
+    assert called[0].text.startswith(head), called[0].text
+    assert called[0].data["why"].startswith("speed under 20 knots")
+    resumed = [e for e in w.log if e.kind == "agent.resumed"]
+    assert resumed and resumed[0].tick >= called[0].tick
+    assert list(w.log).index(called[0]) < list(w.log).index(resumed[0])
+    w2 = world_at()
+    seated(w2, [reply("", call("stand_by", until="speed under 20 knots"))])
+    w2.run(130)
+    assert not [e for e in w2.log if e.kind == "report.called"]
+
+
+def test_the_command_devolves_on_the_held_officer_while_the_captain_is_away():
+    """Decision 63: `you have the deck` with the captain aboard is the watch; the captain in
+    the boat for the shore, the command devolves on the officer who holds the station (his
+    deck, a notice, the log's line), who holds the captain's authority whole (a manoeuvre
+    is his to order, logged as given in command); landed and brought back, the captain has
+    the command again when he gives an order, and the officer's authority is his own."""
+    from tests.test_ports import CARRICK_ROAD, at_anchor_in
+
+    w = at_anchor_in(CARRICK_ROAD)
+    oh = _officer_seated(w)
+    w.run(60)
+    assert tools.judge(w, "officer of the watch", "tack ship")[1]  # his own authority refuses
+    e = w.submit("go ashore")
+    assert e.kind != "order.rejected", e.text
+    w.run(2)
+    dev = [x for x in w.log if x.kind == "ship.command_devolved"]
+    assert (
+        len(dev) == 1
+        and dev[0].text == "The command devolves on Mr Pearce, the captain in the boat."
+    )
+    assert dev[0].data["station"] == "officer of the watch"
+    assert oh.agent.deck
+    w.run(600)
+    notice = [
+        n for s in samples(oh) for n in s.get("notices", []) if "command has devolved on you" in n
+    ]
+    assert notice, [s.get("notices") for s in samples(oh)][-2:]
+    assert tools.judge(w, "officer of the watch", "tack ship") == (
+        "tack ship",
+        "",
+        "the command devolved",
+    )
+    result = tools.call(w, "officer of the watch", "submit_order", {"text": "call all hands"})
+    assert "may not" not in str(result), result
+    mine = [x for x in w.log if x.actor == "the officer of the watch"]
+    his = [x.text for x in mine if "in command" in x.text]
+    assert his and his[-1].startswith("By the officer of the watch, in command:"), his
+    # the player's own typed order from the shore does not take it back: he is away
+    cap = w.people.captain
+    for _ in range(60):
+        w.run(60)
+        if cap.where == "shore":
+            break
+    assert not cap.aboard and cap.where == "shore"
+    assert [x for x in w.log if x.kind == "ship.command_resumed"] == []
+    for _ in range(90):  # the boat back at the ship before she fetches him
+        if not w.dealings.boat.away:
+            break
+        w.run(60)
+    e = w.submit("come aboard")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(90):
+        w.run(60)
+        if cap.aboard:
+            break
+    assert cap.aboard
+    w.run(2)
+    resumed = [x for x in w.log if x.kind == "ship.command_resumed"]
+    assert len(resumed) == 1 and resumed[0].text.startswith("The captain has the command again")
+    assert tools.judge(w, "officer of the watch", "tack ship")[2] != "the command devolved"
+    assert len([x for x in w.log if x.kind == "ship.command_devolved"]) == 1
+
+
+def test_a_told_order_is_the_captains_word_and_never_refused():
+    """Decision 63: an order the captain tells a station to carry out is his word for that
+    thing: the officer told to tack ship tacks her, the log saying it was given at the
+    captain's word, without the deck too; a manoeuvre he was not told stays refused."""
+    w = world_at()
+    oh = _officer_seated(w)
+    w.run(60)
+    assert tools.judge(w, "officer of the watch", "tack ship")[1]
+    e = w.submit("tell the officer to tack ship")
+    assert e.kind == "agent.told"
+    assert oh.agent.told[-1] == "tack ship"  # the grammar drops the 'to'
+    assert tools.judge(w, "officer of the watch", "tack ship") == (
+        "tack ship",
+        "",
+        "the captain's word, told",
+    )
+    assert tools.judge(w, "officer of the watch", "wear ship")[1]
+    assert tools.told_order(w, "officer of the watch", "tack ship")
+    result = tools.call(w, "officer of the watch", "submit_order", {"text": "tack ship"})
+    assert "has not the deck" not in str(result), result
+    mine = [x for x in w.log if x.actor == "the officer of the watch" and "tack" in x.text.lower()]
+    assert mine and "By the officer of the watch, at the captain's word:" in mine[-1].text, [
+        x.text for x in mine
+    ]
+    result = tools.call(w, "officer of the watch", "submit_order", {"text": "wear ship"})
+    assert "may not wear ship" in str(result) or "has not the deck" in str(result), result
+    w.submit("you have the deck")
+    result = tools.call(w, "officer of the watch", "submit_order", {"text": "wear ship"})
+    assert "may not wear ship" in str(result), result
+
+
+def test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship():
+    """Truth 7-371: a captain ashore at the port has nothing of the ship in his sample (the
+    readings answer that nothing of the ship is to be read ashore, the deck's lines none)
+    but the boat's report when her manned boat comes to the quay (`report.boat`, reach
+    `port`): her state, whose the deck is, all well."""
+    from freesail.world import boats as B
+    from tests.test_ports import CARRICK_ROAD, at_anchor_in
+
+    w = at_anchor_in(CARRICK_ROAD)
+    frigate = w.players
+    cap = seated(w, [reply("", call("readings")), reply("", call("stand_by", until="a glass"))])
+    w.run(60)
+    person = w.people.captain
+    person.aboard, person.where, person.port, person.ashore_at = False, "shore", "falmouth", "quay"
+    w.run(1801)
+    ashore = [s for s in samples(cap) if "ashore" in str(s.get("you"))]
+    assert ashore, [s.get("you") for s in samples(cap)]
+    assert not {ln["kind"] for s in ashore for ln in s["log"]} & {
+        "sail.set",
+        "clock.bell",
+        "helm.order",
+    }
+    pearce = w.stations.holder("officer of the watch")
+    e = w.submit("go to the launch", actor="the officer of the watch")
+    assert e.kind == "person.aboard", e.text
+    boat = w.hulls[f"{frigate.id}:launch"]
+    assert B.is_boat(boat) and pearce.hull == boat.id
+    e = boat.submit("pull for the quay", actor="the officer of the watch")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(60):
+        w.run(60)
+        if any(x.kind == "boat.at_quay" for x in boat.log):
+            break
+    assert any(x.kind == "boat.at_quay" for x in boat.log)
+    w.run(2)
+    report = [x for x in frigate.log if x.kind == "report.boat"]
+    assert len(report) == 1, [x.kind for x in list(frigate.log)[-5:]]
+    assert report[0].text.startswith(
+        "The boat came in to the quay at Falmouth; the coxswain reports: the ship at anchor"
+    )
+    assert report[0].data["port"] == "falmouth" and person.name in report[0].data["to"]
+    w.run(1801)
+    kinds = [ln["kind"] for s in samples(cap) for ln in s["log"]]
+    assert "report.boat" in kinds
+
+
+def test_the_officers_brief_says_the_duty_and_the_kinds_are_placed():
+    from freesail.agents.agent import OFFICER_BRIEF
+
+    assert (
+        "Report to the captain what the Regulations gave the lieutenant to report" in OFFICER_BRIEF
+    )
+    assert "'call the captain: <why>'" in OFFICER_BRIEF
+    assert "the command devolves on the senior officer" in OFFICER_BRIEF
+    assert K.REACH["report.made"] == "person" and K.REACH["report.called"] == "wakes"
+    assert K.REACH["report.boat"] == "port" and K.REACH["ship.command_devolved"] == "aboard"
+    assert (
+        R.EVENTS["a report"].kind == "report.made"
+        and R.EVENTS["the captain called"].kind == "report.called"
+    )

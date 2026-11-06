@@ -2363,6 +2363,13 @@ class World:
                 else:
                     severity, kind, text, subject, data = note
                     self.record(severity, kind, text, subject=subject, data=data)
+        # the officer of the watch's reports and calls to the captain below, the boat's
+        # report at the quay and the command devolved (package 65, step 3; decision 63):
+        # after the lookout and the routine, before the stations, so that a report is in
+        # the tick the stations sample
+        from freesail.world import reports
+
+        reports.tick(self)
         if self.clock.ship_time.second == 0:
             # the needs once a minute (package 54): the meals' fall of the stores, which
             # writes nothing unless one runs out, and the people's needs, told to the
