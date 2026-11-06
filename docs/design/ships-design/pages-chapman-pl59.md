@@ -1196,7 +1196,7 @@ file's 1.9 m (§6).
 | `deck_height_m` at her beam | 0.75 | the after deck 0.78 to 0.82 m at side; the fore deck 0.96 to 1.00 m amidships, drawn |
 | `main.mast` `x_m` | +1.8 | not drawn; the chains put it at 1.6 to 2.1 m on the plate, 1.7 to 2.2 m at her length (§4.15) |
 | `bowsprit` `x_m`, heel | +6.4; heel +3.84 | the stem head +6.15 at her length; the post of §4.8 +4.09 (§4.15) |
-| `bowsprit` `height_m` | 1.0 above the datum, its end 1.75 m above the water | the viewer roots its heel at the stem head (`Build-Ships.md` §6), 2.60 m up at the rail's stop, and the spar runs level from there, its end drawn 0.85 m above the file's; the post of §4.8 is notched at 2.37 m at her size, so a spar about that height is what the plate shows (judgement). Drawn only |
+| `bowsprit` `height_m` | 1.0 above the datum, its end 1.75 m above the water | the viewer roots its heel at the rail at the stem (`Build-Ships.md` §6), 2.22 m up, old at the top of the stem head, 2.60 m, and the spar runs level from there, its end drawn 0.47 m above the file's, old 0.85 m; the post of §4.8 is notched at 2.37 m at her size, so a spar about that height is what the plate shows (judgement), and the drawn heel stands 0.15 m under it, a closer root needing a file key. Drawn only |
 | The head sails' tack, in `sails` | 1.31 m above the water at x 5.9 | under the rail there, 2.2 m; drawn so on old and new alike, and now over the side at the bow. Recorded, not moved |
 
 The plate's vessel is about 5 to 6% shorter and narrower than the file's, and draws 11% less

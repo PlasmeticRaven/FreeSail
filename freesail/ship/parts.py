@@ -549,8 +549,8 @@ class Gun(Part):
     # pivot's file must give one)
     arc_deg: tuple[float, float] | None = None
     # the deck it stands on, one of `schema.DECK_WORDS` (package 75; None, a file that does
-    # not say, and a gun pickled before it): read by nothing yet, the lee ports' rule and the
-    # 74's bill by deck will
+    # not say, and a gun pickled before it): read by the lee ports' rule, and the 74's bill by
+    # deck will
     deck: str | None = None
 
     def __getstate__(self) -> dict[str, Any]:

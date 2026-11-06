@@ -708,7 +708,12 @@ crew; the guns go on short-handed").
 the action's events by their words: `she opens fire`, `a warning shot`, `a shot strikes`,
 `a man killed`, `a gun dismounted`, `a spar shot away`, `her colours come down`, `the enemy
 strikes`, `the colours struck`, `at quarters`, `cleared for action`, `the guns cast loose`,
-`the magazine empty`; the same words serve a standing order's `at`.
+`the magazine empty`, `the lee ports shut`, `the lee ports opened`; the same words serve a
+standing order's `at`. The two ports' words go by the log's line for a deck and side, the
+lee's alone (or a port's on the centre line, or one shut while she is upright): since the roll
+(package 75, L3) the weather's ports can shut as well, by the roll less the heel, and their
+line answers neither word, standing in the log and in `the guns` (`ports shut`, by side).
+They are silent while the guns are secured (package 75).
 
 **The cost of thinking against the cycle.** The station's line closes with the ship's time
 since the model's last reply (package 58a). Against the cycle's figures (truth 7-135: a

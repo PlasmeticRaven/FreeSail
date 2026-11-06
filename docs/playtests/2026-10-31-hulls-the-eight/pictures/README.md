@@ -51,3 +51,18 @@ New file on the new viewer only. Each sheet has six cells; a ring marks a place 
 | `42-lugger-rig-close.png` | 1 the main lug's foot under the raised after rail (F). 2 the mizen lug's sheet ending 4.22 m past her stern, in the air (V on F). 3 the main lug's sheet (V). 4 the mizen mast's foot, abaft her deck's end (V). 5 the fore lug's foot under the raised bow rail (F). 6 the bowsprit level from the rail at the stem (F and V). 7 the jib's tack inside her bow (V). 8 the lowered mizen yard through her stern, furled (V on F) |
 | `52-smack-rig-close.png` | 1 the yards' braces' ends, faint (V). 2 the staysail and jib tacks under the rail at the stem (V). 3 the bowsprit level from the top of her stem head (F and V). 4 the boom under her taffrail (F). 5 the head sails' sheets' end (V) |
 | `62-topsail-schooner-rig-close.png` | 1 the fore sail's two sheets' ends (V). 2 the fore topsail's sheets' ends (V). 3 the boom at her taffrail (F). 4 the bowsprit at about 20° and its elbow at the jib-boom (F and V). 5 the staysail and jib tacks under the rail (V). 6 their sheets' end (V). 7 the fore mast's rake (F) |
+
+## The viewer step for the rig's lines, old beside new
+
+The game's own page, served by the game's own server, every ship at seed 7, plain sail, braced sharp up, 3,600 ticks on. **Old** is the viewer at cfe48a53, **new** the viewer step, on the same file. Each sheet has her whole abeam to leeward, then close abeam to leeward and to windward, on the lee quarter, right ahead and right astern, each row at one scale. No Greenwich image and no picture of the owner's is on any sheet, nor any crop of one. The sky and the sea are carried across each cell; nothing of the ship is touched.
+
+| Sheet | What it shows |
+|---|---|
+| `13-frigate-36-rig-old-new.png` | Courses' sheets and mizzen braces on her rail, the fore course's weather sheet at the stem head, head sails' sheets on the rail |
+| `23-brig-rig-old-new.png` | The same on the brig, who stands for the merchant brig |
+| `33-cutter-rig-old-new.png` | The fore staysail tacked on the stem head, its pale tab gone; the bowsprit level at 2.44 m; braces and sheets on her rail |
+| `43-lugger-rig-old-new.png` | The jib tacked on her stem; the mizen sheet at the taffrail; the lugs' sheets on her rail; the bowsprit unmoved |
+| `53-smack-rig-old-new.png` | Staysail and jib tacked on the stem head; the bowsprit level at 2.22 m; braces and sheets on her rail |
+| `63-topsail-schooner-rig-old-new.png` | Staysail and jib tacked at the stem head; sheets on her rail; she stands for the privateer |
+| `73-sixty-four-rig-old-new.png` | Mizzen braces and courses' sheets on her rail; the fore weather sheet at the stem head; head sails unmoved |
+| `83-razee-44-rig-old-new.png` | The same on the razee |

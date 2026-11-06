@@ -1262,7 +1262,8 @@ files take it to 108.
 11. **The truths' share**: three numbers for the settee (D46(d) with rule 3), and the 64's offered
     to the Indefatigable's (§10.3).
 12. **D10(a)'s key** for the *Neufchatel*'s main topgallant ("yards the handling ignores") would
-    sit beside `under_bowsprit` at places 1 and 3 of §4.2; it is her design's.
+    sit beside `under_bowsprit` at places 1 and 3 of §4.2; it is her design's. *Since (2026-10-31):
+    the owner proposes a rule in the key's place, at the same two places, for the lead (her §12.2a).*
 13. **The tartane's full lateen**, dipped or changed by *muder*, and its curve, in a later
     package (§3.7).
 14. **D18 and D25** stay open; nothing here depends on them.
