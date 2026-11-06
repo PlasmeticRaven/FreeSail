@@ -17880,3 +17880,65 @@ and `a sail in sight` the same in their sail lines. `known` is untouched (the ru
 Raven` finds the liar who called herself so. The proof by toggle (7-399) covers it: off, nothing
 is identified. The harness's sail rows carry the name in their delta key, so a sail named by
 hail reaches a model's next sample.
+
+## Package 97: the hull façade's readers audited (2026-11-06)
+
+The audit and its evidence are `docs/design/Design-FacadeReaders.md` (§2, eighteen readers; the
+lead approved it as written). **The one cause:** 84's World keeps a ship's fields on her Hull and
+reads them at the hull whose block is running, and a crewed ship's systems are rebound to her
+Hull when she is adopted (`crews._rebind_world`), but the player's own hull was never walked:
+her People, Stations, Papers, Dealings, Navigation, Ground, needs, water, health, standing
+runtime and Captain were built with the World and read the running hull's fields from inside
+another hull's block, and the followed hull's under `follow`. On the trunk, inside the brig X's
+block, her `stations.holder("master")` was X's Mr Hart for her Mr Harvey (82b's finding), and
+each of her systems read X's ship.
+
+**Bound to its own hull at construction.** The walk is `hulls.bind_to_hull(hull, building)`,
+used by `adopt_hull` as before and now at the end of `World.__init__` and `World.__setstate__`
+(a checkpoint of before), her own `hull.world` kept; the keepers made at a tick for an old
+checkpoint (`Water`, `NeedsKeeper`, `Health`) on `self.own`; the player's seat on `world.own`
+(`seat.seat_world`); a harness on the hull whose `agents` it enters (`agents/harness.py`, the
+lead's grant, below).
+
+**Read in its own hull's block.** Every hull's readings view is made over her Hull (the followed
+hull's was over the World and was read after its block); the director's journal, station and
+holder by `director.director_hull(world)`, the player's own hull's handle, and its twenty appends
+and the seats' `director.seat` line given that handle so the act is keyed `""`; `acts.target_of`
+gives an act keyed `""` to `world.players` when another hull is current or followed (the World
+itself otherwise, as in every recorded passage).
+
+**The harness, 65's file (under its own heading, as the lead asked).** Two lines, where one was
+granted: `Harness.__init__` binds `world.own` (a Hull kept as given), and `_station_notices` gives
+the other ship's shape notice not on the player's own ship. The second is the one reader the
+binding moved: the harness told a station on another ship by its world's `shape`, which every
+Hull has, and with the first line alone every sample on the player's ship carried "X is awake, a
+hull of the one world..." (the first fast tier failed by the hundred; the line was reverted at
+f6fefb9 and taken again with its guard).
+
+**Found on the way: the World's own state set through a system's handle.** A plain attribute of
+the World's (neither a hull's field nor a shared one the Hull exposes) set through a Hull lands
+on the Hull, and a table keyed by the World misses a Hull: so once the player's systems held her
+Hull, `ask the cook` kept its question on the Hull and the director never saw it, the painter
+was not found for a station's `chart`, and the channel's listeners missed the director's
+answers. `hulls.world_of(handle)` gives the World: the unheld questions, the books, the person
+journals' first making, the seats' count, the painter, the director's listeners and seat doors.
+A crewed hull's systems had the same hazard before this package, unmet by any test.
+
+**The hail's tidy (truth 7-425).** `hail_order`'s refusal for words that name no sail in sight
+said "the strangers are listed" and listed none; it is `Lookout.sail_refusal`'s, the strangers'
+words given ("Nothing in sight answers to 'the frigate right astern'; the strangers: a brig right
+ahead, bearing N, distant three miles: ..."), the old words kept where she has no lookout.
+
+**Left by ruling.** The shared post-based person ids and the strangers' id as her name (package
+96's); the replay's seating order of two hulls in one tick (a loose end beside truth 7-394);
+`Vessels.strangers_of` judging the far captains' sight "within the player's visibility" by the
+followed hull's sky, the sea's one visibility since 84's step 10, for M8's weather at each body.
+The drivers (`Console`, `Driver`) read the followed hull by design.
+
+**Tests.** `tests/test_facade_readers.py`: truths 7-422 (her stations, people and every system
+read her inside the brig's block), 7-423 (the director's brief, budget and seat lines on her hull
+under `follow`, its station bound there, `target_of`), 7-424 (inside an order of the brig's, the
+frigate's spots by the plain `station_spot`, her holder, water and reckoning hers), 7-425; and the
+guard, walking every hull's own graph through a brief, a seated captain, `follow` and back, and a
+checkpoint's round trip, failing by path on any reference to the World but the two the sea keeps
+(a `HullView`'s `game`; her far body's brain). No pin moved.
