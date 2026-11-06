@@ -2350,8 +2350,10 @@ builder's suites:** the fast tier whole exit 0; the slow tier of the touched fil
 known truths exit 0 (190 run, the xfails as on the trunk); the pace alone 13 of 13 (none near
 its floor; the container 5 to 10 percent under the build machine); ruff and format clean.
 **The lead's merge:** the trial on 6423975 met only in the tuning notes (both sections kept),
-lint-clean; the fast tier whole on it green, exit 0, every test passed (426 slow left out); the whole suite in the cloud dispatched after
-run 37, the figures to follow. Step 2 (the identification named in the readings and lost with
+lint-clean; the fast tier whole on it green, exit 0, every test passed (426 slow left out); the whole suite in the cloud run 38 on
+b78477d (11:10 to 12:07 UTC): lint green, all six shards green, 6,694 passed, 11 skipped, 12
+expected failures; the pace job 9 of 13, the four floors under at 423 to 489 ticks a second
+against 500 (the runner's speed; informative). Step 2 (the identification named in the readings and lost with
 the sight of her; truth 7-398) builds on; its one touch in 65's `agents/harness.py`, the sail
 rows' delta key (id, made_out, nation) gaining the name so that a model holding a station is
 sent the row again when the deck learns her name, was asked for at 10:26 and approved (it wakes
