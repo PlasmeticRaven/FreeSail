@@ -17927,6 +17927,25 @@ name "the deck" after "in"), 35's words and a pin of 35's tests; not touched.
 **The pace.** Nothing of this step runs on the tick's path: the keeper's rule is a few reads at
 a library call. The pace tests are run as the rule asks and their figures are below.
 
+**The suites on the step's final tree (c6b2031 the step's code with the trunk at dde02cb merged;
+137720f adds the trunk's records since, three commits of docs alone).** Fast tier whole:
+6312 passed, 1 xfailed, 45 min 31 s (exit 0). Slow tier of the thirty-nine touched files and
+the known truths (`--slow -m "not pace" -n 4`), in two halves under the two-hour limit: the
+first (the known truths, the knowledge, the hulls, the boats, the replay, the checkpoint, the
+people, the ports, the places, the war's date, the director, the consent, the wardroom's doors)
+728 passed, 8 xfailed, 1 h 4 min 54 s; the second (the agents, the primer, the grammar book,
+the in-world words, the orders, the console, the server, the observer, the doors, the names,
+the sail by name, the parity, the pictures, the map view) 2413 passed, 1 xfailed, 16 min 54 s;
+both exit 0. Pace tests alone and last (`--slow -m pace -rP`): 12 passed and one failed,
+5 min 23 s: truth 7-159 (the convoy of six at far detail holding truth 51's floor of 500)
+read 495 ticks a second under the pace run, as it read 496 at step 1; alone again it passed
+twice (the floor is the build machine's, and this container reads about at it; nothing of
+this step runs on the tick's path). The others: three stations seated, the knowledge
+filter's place 557 ticks a second against `all` 530 (truth 7-386's run 532 against 555: the
+filter's cost within the noise, as at steps 1 to 4); the frigate alone 524, the Channel
+observed 326, the same Channel with the frigate at the view 209. ruff check and ruff format
+--check clean.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was
