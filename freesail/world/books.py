@@ -332,6 +332,7 @@ def _draft(
         raise OrderError(f"The book '{title}' wants some lines after the colon.")
     kind, kept = read_kind(ship, lines)
     mark, rank = _who(ship, world)
+    _in_the_cabin(ship, world)
     stamp = _stamp(world)
     book = Book(title, kind, kept, mark, rank, world.clock.tick, stamp)
     books.items.append(book)
@@ -342,6 +343,37 @@ def _draft(
         f"{'s' if n != 1 else ''}, in the library with his mark."
     )
     return "book.drafted", text, {"title": title, "kind": kind, "mark": mark, "lines": list(kept)}
+
+
+def _in_the_cabin(ship: Any, world: Any) -> None:
+    """The captain's writing is done in the cabin (package 65, step 6; the design's §9): a
+    captain drafting from the deck goes below to his cabin first (one `captain.below` line,
+    as his own `go below` writes it) and is occupied `writing` for `WRITING_MINUTES`; he
+    stays until he comes on deck, and his writing is his own to leave by his own move.
+    Another drafter (an officer at his station) writes where he stands; a captain ashore or
+    in the boat, or at a task already, writes where he is."""
+    from freesail.core.events import Severity
+    from freesail.world.movement import person_of_actor
+    from freesail.world.people import WRITING, WRITING_MINUTES
+
+    people = getattr(world, "people", None)
+    if people is None:
+        return
+    actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "captain")
+    person = person_of_actor(world, actor)
+    captain = people.captain
+    if person is None or person is not captain or not captain.aboard or captain.occupied:
+        return
+    if captain.where != "cabin":
+        text, data = people.captain_moves(below=True)
+        world.record(
+            Severity.ROUTINE,
+            "captain.below",
+            text,
+            actor=actor,
+            data={"verb": "draft a book", "level": 1} | data,
+        )
+    people.occupy(captain, "cabin", world.clock.tick + WRITING_MINUTES * 60, WRITING)
 
 
 def _by_rank(line: str, rank: str) -> str:

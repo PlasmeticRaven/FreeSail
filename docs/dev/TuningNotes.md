@@ -18105,6 +18105,36 @@ filter's cost within the noise, as at steps 1 to 4); the frigate alone 524, the 
 observed 326, the same Channel with the frigate at the view 209. ruff check and ruff format
 --check clean.
 
+### Step 6: work in its place (the design's §9; 2026-11-06)
+
+**What was built** is in the design note's postscript ("As built", step 6): `People.occupy`
+the one road, with the room; the master's day's work in the gunroom proved for a model at his
+station; the captain's writing in the cabin; truths 7-375 and 7-388.
+
+**Judgements.** (1) The writing's five minutes (`people.WRITING_MINUTES`): a sheet of night
+orders or a note is a few lines in his hand; the master's day's work is thirty, a time sight's
+working twenty. (2) The writing is the captain's own to leave by his own move (the postscript's
+item 1), unlike the master's working: so the step 5 test that drafts a book on the quarterdeck
+and walks to the hold at once stands as written, the walk freeing him. (3) The mirror's
+"below" for a man below already is the room he is in (the schooner's master who commands and
+went below to his cabin works his day's work there, as 53 had it), else his berth.
+
+**Found on the way.** (a) The reckoning's rows (the account, its uncertainty, the run since
+noon, the course made good, the latitude by observation, the tide by the almanac: twelve rows)
+were the gunroom's already by step 1's placing (`where=("deck", "cabin", "gunroom")`), and the
+master's mirror read as the gunroom since 53: a model master sampled below at 11:59 to 12:29
+in the test world reads them and nothing of the deck, with no change of code; what the step
+changes for him is that a room given to `People.occupy` is kept. (b) `People.occupy` with a
+mirrored person set the mirror's "on deck"/"below" and never the person's own place, so
+`occupy(master, "cabin", …)` read as the gunroom; the room is kept now. (c) The log's order
+at a draft from the deck is `captain.below`, `order.accepted`, `book.drafted`: the handler's
+own line first, the submit's after, as 82's and step 4's second lines are. (d) The frigate's
+master takes his noon sight at 11:44 and goes below at 11:59 in the knowledge tests' world
+(the longitude's noon), on deck again at 12:29.
+
+**The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
+asks and their figures are below.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was

@@ -1474,3 +1474,137 @@ def test_the_keeper_carries_his_paper_while_he_is_at_it():
     assert w.people.occupy(purser, "deck", w.clock.tick + 600, "the slops issued") is None
     assert K.paper_place(w, books) == ("hold", "with the purser")
     w.people.free(purser)
+
+
+# ---------------------------------------------------------------------------
+# Step 6: work in its place (the design's §9; truths 7-375, 7-388)
+# ---------------------------------------------------------------------------
+
+
+def test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike():
+    """Truth 7-375: the master's noon sight is taken on the quarterdeck and his day's work
+    done in the gunroom, the rules' master and a model at his station alike: occupied there,
+    the model's sample is the gunroom's (the slate's rows, no deck reading, the line saying
+    where the rest are), the deck reaching him by what is felt (the bell, the watch
+    relieved); the people say where he is; he comes on deck when the work is done, by the
+    reckoning's own line. `People.occupy` keeps the room for a mirrored person too, and
+    takes the mirror's words."""
+    from freesail.agents.agent import master as master_station
+
+    w = world_at(start=datetime(1805, 6, 10, 11, 30))
+    stand = reply("", call("stand_by", until="a glass"))
+    h = seated(w, [stand], make=master_station, every=300, loop=True)
+    m = w.people.find("the master")
+    assert m.mirror is not None and m.where == "quarterdeck"
+    w.run(80 * 60)  # the sight from 11:44, the day's work below from 11:59 to 12:29
+    places = [e.text for e in w.log if e.kind == "master.place"]
+    assert places == [f"{m.name} came on deck, the day's work done."]
+    on_deck = [s for s in samples(h) if "on the quarterdeck" in str(s.get("you"))]
+    below = [s for s in samples(h) if "in the gunroom" in str(s.get("you"))]
+    assert on_deck and below, [s.get("you") for s in samples(h)]
+    s = below[-1]
+    assert "since 11:59" in str(s["you"])
+    rows = set(s["readings"])
+    assert rows >= {"reckoning", "reckoning_uncertainty", "run_since_noon", "course_made_good"}
+    assert not rows & {"speed", "true_wind_speed", "sails", "sail_in_sight", "helm", "depth"}
+    assert s["readings_elsewhere"].startswith("Not to be had in the gunroom:")
+    assert "(to be had on deck)" in s["readings_elsewhere"]
+    kinds = {ln["kind"] for s_ in below for ln in s_["log"]}
+    assert "clock.bell" in kinds
+    assert not kinds & {"lookout.sighting", "helm.order", "sail.set", "sail.handled"}
+    # on deck again after the work, by the reckoning's line, the deck's rows his
+    assert m.where == "quarterdeck" and not m.occupied
+    assert "speed" in samples(h)[-1]["readings"] or "readings_elsewhere" not in samples(h)[-1]
+    # the one road: a room given is kept for the mirrored master too, and the mirror's own
+    # words are taken and mapped
+    until = w.clock.tick + 600
+    assert w.people.occupy(m, "cabin", until, "lunar") is None
+    assert m.where == "cabin" and m.mirror.place == "below"
+    assert w.people.state_words(m) == "at the lunar, in the cabin"
+    w.run(600)
+    assert m.where == "quarterdeck"
+    assert w.people.occupy(m, "below", w.clock.tick + 600, "day's work") is None
+    assert m.where == "gunroom"
+    w.run(600)
+    assert w.people.occupy(m, "on deck", w.clock.tick + 600, "sight") is None
+    assert m.where == "quarterdeck" and m.occupied
+    w.run(600)
+    captain = w.people.captain
+    assert w.people.occupy(captain, "below", w.clock.tick + 600, "a letter") is None
+    assert captain.where == "cabin" and captain.occupied
+    w.people.free(captain)
+    assert captain.where == "cabin"  # left where the work was: a man does not walk back
+
+
+def test_the_captains_writing_is_done_in_the_cabin():
+    """Truth 7-388: `draft a book` from the quarterdeck takes the captain below (one
+    `captain.below` line, as his own `go below` writes it) and occupies him writing for five
+    minutes; a seated captain's sample while writing is the cabin's; he stays until he comes
+    on deck; his writing is his own to leave by his own move; a second book in the cabin
+    moves him nowhere; an officer drafting at his station writes where he stands."""
+    from freesail.world.people import WRITING, WRITING_MINUTES
+
+    w = world_at()
+    captain = w.people.captain
+    assert captain.where == "quarterdeck"
+    n = len(w.log)
+    e = w.submit(
+        'draft a book "night orders": standing order "lead": every glass then heave the lead'
+    )
+    assert e.kind == "book.drafted"
+    kinds = [x.kind for x in list(w.log)[n:]]
+    assert kinds == ["captain.below", "order.accepted", "book.drafted"]
+    below = [x for x in list(w.log)[n:] if x.kind == "captain.below"][0]
+    assert (
+        below.text == "The captain went below to his cabin; the deck is the officer of the watch's."
+    )
+    assert below.data["verb"] == "draft a book" and below.data["place"] == "cabin"
+    assert captain.where == "cabin" and captain.occupied and captain.task == WRITING
+    assert w.people.state_words(captain) == "at the writing, in the cabin"
+    assert w.submit("where am I").text.endswith("aboard the Amazon, in the cabin.")
+    # the deck's orders are refused from there as from any going below
+    e = w.submit("set the royals")
+    assert e.kind == "order.rejected" and "go on deck" in e.text
+    # the writing done, he is in the cabin still
+    w.run(WRITING_MINUTES * 60 + 1)
+    assert not captain.occupied and captain.where == "cabin"
+    # a second book in the cabin: no going below, occupied again
+    n = len(w.log)
+    w.submit('draft a book "cargo": buy 2 tons of tin')
+    assert [x.kind for x in list(w.log)[n:]] == ["order.accepted", "book.drafted"]
+    assert captain.occupied
+    # his writing is his own to leave: `come on deck` and a walk free him of it
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    assert not captain.occupied and captain.where == "quarterdeck"
+    w.submit('draft a book "note": all well.')
+    assert captain.where == "cabin" and captain.occupied
+    assert w.submit("go to the hold").kind == "person.moved"
+    assert not captain.occupied and captain.where == "hold"
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    # a seated captain drafting through his harness: his sample is the cabin's after
+    script = [
+        reply(
+            "",
+            call(
+                "submit_order",
+                text='draft a book "orders": "deep": every glass then heave the lead',
+            ),
+        ),
+        reply("", call("stand_by", until="a glass")),
+    ]
+    w2 = world_at()
+    h = seated(w2, script)
+    w2.run(700)  # the writing done at five minutes; the sample at ten finds him below still
+    assert w2.people.captain.where == "cabin" and not w2.people.captain.occupied
+    assert any("in the cabin" in str(s.get("you")) for s in samples(h))
+    # an officer at his station writes where he stands
+    from freesail.world.books import books_of
+
+    seated(w2, [reply("", call("stand_by", until="a glass"))], make=officer)
+    pearce = w2.stations.holder("officer of the watch")
+    said = tools.call(
+        w2, "officer of the watch", "submit_order", {"text": 'draft a book "mine": all well.'}
+    )
+    assert "drafted a book, 'mine'" in said, said
+    assert books_of(w2).find("mine") is not None
+    assert pearce.where == "quarterdeck" and not pearce.occupied
