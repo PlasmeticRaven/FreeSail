@@ -51,6 +51,7 @@ __all__ = [
     "bind_to_hull",
     "delegated",
     "is_observer",
+    "world_of",
     "lift_old_state",
     "own_id",
 ]
@@ -187,6 +188,20 @@ def delegated(target: str, name: str) -> property:
         delattr(getattr(self, target), name)
 
     return property(fget, fset, fdel, doc=f"the {target}'s `{name}`")
+
+
+def world_of(handle: Any) -> Any:
+    """The World a handle is of: a Hull's World, a World itself (package 97). The game's own
+    state that is neither a hull's field nor a shared field the Hull exposes (`unheld_
+    questions`, `books`, `person_journals`, the seats' count) is set on the World by it, for
+    a plain attribute set through a Hull lands on the Hull, which a system bound to her
+    since this package holds as its `world`."""
+    from freesail.core.world import World
+
+    if isinstance(handle, World):
+        return handle
+    world = getattr(handle, "__dict__", {}).get("world")
+    return world if isinstance(world, World) else handle
 
 
 def own_id() -> str:

@@ -240,8 +240,9 @@ def test_the_guard_no_hulls_system_holds_the_world_whatever_is_followed_or_saved
     either, through `follow` and back, and after a checkpoint's round trip. A new system
     built with the World (`X(self)` in `World.__init__`, or a reader kept on one) fails here
     by its path."""
-    import pickle
+    import io
 
+    from freesail.core import replay
     from tests.test_director import seat_captain
 
     w, _b, x = _frigate_and_the_brig_x_on_the_sea()
@@ -253,6 +254,7 @@ def test_the_guard_no_hulls_system_holds_the_world_whatever_is_followed_or_saved
     w.run(61)
     for hull in w.hulls.values():
         assert world_handles(hull, w) == [], hull
-    w2 = pickle.loads(pickle.dumps(w))
+    # the checkpoint's own road (`core.replay`: its pickler leaves the harnesses' doors out)
+    w2 = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(w))).load()
     for hull in w2.hulls.values():
         assert world_handles(hull, w2) == [], hull

@@ -86,6 +86,7 @@ from freesail.agents.agent import (
 from freesail.agents.journal import Journal, journal_of
 from freesail.core.events import Severity, for_the_record
 from freesail.world import orders as world_orders
+from freesail.world.hulls import world_of  # the World's tables, by any handle (97)
 
 __all__ = [
     "BRIEFS_DIR",
@@ -1530,20 +1531,20 @@ _LISTENERS: weakref.WeakKeyDictionary[Any, list[Callable[[dict[str, Any]], None]
 def listen(world: Any, fn: Callable[[dict[str, Any]], None]) -> None:
     """A driver hears the channel's lines of this World (`{"from", "text", "stamp",
     "tick"}`), the player's words and the director's answers, apart from the play log."""
-    found = _LISTENERS.setdefault(world, [])
+    found = _LISTENERS.setdefault(world_of(world), [])
     if fn not in found:
         found.append(fn)
 
 
 def unlisten(world: Any, fn: Callable[[dict[str, Any]], None]) -> None:
-    found = _LISTENERS.get(world)
+    found = _LISTENERS.get(world_of(world))
     if found and fn in found:
         found.remove(fn)
 
 
 def _channel_line(world: Any, who: str, words: str) -> dict[str, Any]:
     line = {"from": who, "text": words, "stamp": world.clock.stamp(), "tick": world.clock.tick}
-    for fn in list(_LISTENERS.get(world) or []):
+    for fn in list(_LISTENERS.get(world_of(world)) or []):
         fn(dict(line))
     return line
 
@@ -1657,13 +1658,13 @@ _SEAT_MODEL = re.compile(r"^seat:\s*(?P<model>.+?)\s+as\s+", re.I)
 def set_seat_doors(world: Any, doors: Any) -> None:
     """The harbour that starts the seats' doors for this World (None takes it away)."""
     if doors is None:
-        _SEAT_DOORS.pop(world, None)
+        _SEAT_DOORS.pop(world_of(world), None)
     else:
-        _SEAT_DOORS[world] = doors
+        _SEAT_DOORS[world_of(world)] = doors
 
 
 def seat_doors_of(world: Any) -> Any:
-    return _SEAT_DOORS.get(world)
+    return _SEAT_DOORS.get(world_of(world))
 
 
 def uncallable_seat(world: Any, text: str) -> str | None:
@@ -1672,7 +1673,7 @@ def uncallable_seat(world: Any, text: str) -> str | None:
     no seat, or where no harbour is beside the World. Checked before the order reaches the
     World, so that the play log, the save and a replay never depend on the settings, and
     the settings' model's name reaches no log."""
-    doors = _SEAT_DOORS.get(world)
+    doors = _SEAT_DOORS.get(world_of(world))
     m = _SEAT_MODEL.match(" ".join(str(text).split()))
     if doors is None or m is None:
         return None
@@ -2053,6 +2054,9 @@ def seated(world: Any) -> Any:
 def questions_of(world: Any) -> list[dict[str, Any]]:
     """The questions put to people nobody holds that wait for the director's answer, kept on
     the World (a checkpoint from before has none)."""
+    from freesail.world.hulls import world_of
+
+    world = world_of(world)  # the game's, set on the World whatever handle reads it (97)
     found = getattr(world, "unheld_questions", None)
     if found is None:
         found = []
@@ -2209,5 +2213,7 @@ def answer_questions(world: Any, person: Any, words: str, where: str) -> int:
                 str(q["question"]),
                 words,
             )
-    world.unheld_questions = kept
+    from freesail.world.hulls import world_of
+
+    world_of(world).unheld_questions = kept
     return answered

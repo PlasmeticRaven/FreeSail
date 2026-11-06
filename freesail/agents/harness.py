@@ -735,7 +735,7 @@ class Harness:
                 f"The station of the {station.name} is {other.agent.words()}; a game has "
                 f"one harness to a station.{again}"
             )
-        self.world = world
+        self.world = world.own if isinstance(getattr(world, "hulls", None), dict) else world
         self.station = station
         self.model = model
         self.save_fn = save
@@ -2312,6 +2312,8 @@ class Harness:
         and on another ship (package 43; spec M6 §20) her shape, told at the start and
         whenever it changes across the switch."""
         shape = getattr(self.world, "shape", None)
+        if getattr(self.world, "players", None) is self.world:
+            shape = None  # the player's own ship is not another ship
         if shape is not None and shape != self._shape_told and not self.conversation:
             from freesail.world.crews import shape_words
 
