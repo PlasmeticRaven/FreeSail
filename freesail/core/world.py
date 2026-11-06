@@ -344,11 +344,12 @@ MOTION_WORDS_HOLD_S = 300
 
 # The log kinds an agent's harness writes (spec M4 §11, §12), listed in one place. Every
 # one is written by `freesail.agents.harness` (or by a tool it runs) with the actor
-# "the <station>", and the text of a note or an answer opens with the station's mark,
-# "[watcher] ...", inline in the log (owner's ruling).
+# "the <station>", and the text of an answer opens with the station's mark, "[watcher]
+# ...", inline in the log (owner's ruling). The free text of a reply was `agent.note`, the
+# watcher's narration, until decision 60 (package 65, step 2): it is the person's own note
+# in his journal and the director's log now, and no line of the play.
 AGENT_LOG_KINDS: tuple[str, ...] = (
     "agent.stationed",  # an agent took a station; its policy in words
-    "agent.note",  # the free text of a reply: the watcher's narration, routine
     "agent.hail",  # the lookout's words, a hail from the masthead (package 41), notable
     "agent.spoke",  # the player's `say` on the quarterdeck (an order, journaled; 41)
     "agent.said",  # an `answer` to an `ask`, notable

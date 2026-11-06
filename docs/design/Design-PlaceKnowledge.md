@@ -564,7 +564,9 @@ method.
   of the watch sends down to you" and a `report.called` line; on deck the wake is as 58a's.
 - **7-388** the captain's writing in the cabin: `draft a book` from the quarterdeck takes him
   below and occupies him; his sample while writing is the cabin's; `come on deck` after.
-- **7-389** left free for what the build finds.
+- **7-389** (taken by the lead's word of 2026-11-05, step 2) a station's `say` reaches every
+  hull's stations within hearing and is written as heard into each hearing hull's log; the
+  wake's reason names the speaker and the kind; a station is never woken by its own word.
 
 ## 15. The order of the steps, each a mergeable state
 
@@ -737,3 +739,49 @@ tripwire of the deck's rows alone. `message.aboard` is the deck's (the gangway).
 
 **Found on the way** is in the tuning notes (the head's leak at the seating, the danger
 wake unheard, the `readings` tool at a station nobody holds).
+
+### Step 2: a reply's prose is the person's own note (§6, decision 60; the lead's additions of 2026-11-05)
+
+**Built as designed**: `Harness._say` writes a station's prose in its journal under the model's
+mark (`PROSE_KIND`, `agent.note` as a journal kind) and in the director's log by the station,
+and in no log of the play; `own_word` the same road; the director's words its log's as before,
+a plain conversation's its stub log's (the consent step reads them there). The director's
+sample carries the stations' notes since its last under `notes`. Prose alone where an answer
+was owed counts with the empty replies, journaled as "words written into the journal and
+nothing said in the world, where an answer was owed" and never as "an empty reply", the next
+sample carrying `NOTE_NOT_HEARD` (the tools named), the nudge in its own words (`NUDGE_NOTED`);
+prose at a plain glass is a note, uncounted; a call ends the count. `agent.note` left
+`WORD_KINDS`, the browser's `STATION_SPEAKS` (now `agent.spoke`, `agent.said`, `agent.hail`)
+and the roll-up's "spoke"; `say_aboard` retired; the lookout's brief lost "or say the words";
+the watcher's brief says his words are his note; every brief's head carries the sibling
+sentence (a word to a person is no order of the ship; the readings say what is in hand) and
+the stand-by's counsel (the few things that matter). **The lead's additions**: `say` reaches
+every hull's stations within hearing (`orders/stations.py` `_say` over
+`hearing.stations_everywhere` and `within_hearing`, a hail over her own deck alone), the line
+written as heard into each hearing hull's log with that hull's hearers in `heard_by` and
+`said_from` naming the speaker's hull; the wake's reason names the speaker and the kind
+(`AgentState.word_reason`, `question_reason`; `Harness.add_word(words, reason)` at every road
+a word takes: a `tell`, a standing order's, the deck given or taken, a grant, an answer, no
+answer from a person asked, the words kept for an unheld station; the question's at
+`put_question`; both joined when both wait); a station is never woken by its own word (`tell`
+and `say to` itself refused in words at the grammar and at `put_word`). Truths 7-379 and
+7-389; the old empty-count test kept as a strict expected failure naming decision 60.
+
+**Taken another way, with the reason.** (1) The count's reset: the design had "a sample with
+words or a call ends the count"; built, a call ends it and prose does not, at a plain glass as
+where an answer was owed, since the count judges what happened in the world and prose is
+nothing there (the test's old reading is the expected failure). (2) The watcher cannot `say`
+(its authority refuses every order, `say` among them), so its brief says its words are its
+note, read by the owner and the director, and the captain hears it when he asks; the design's
+"say in a line or two" is "note in a line or two". Whether the watcher should have `say` as
+the passenger has is the lead's. (3) The remote door's words to a model that speaks out of
+turn ("Your words are in the log under your mark", `agents/remote.py`) are 82b's file and
+stand unchanged; the MCP door's are changed ("Noted in your journal, under your mark").
+
+**Found on the way** is in the tuning notes (a hull façade read from another hull's order
+answers for the current hull; the unanswered question re-sampled each tick, 29c's rule as it
+stood; the step's first full run of the suites: the player's seat borrows the harness's deck
+and grants and lacked `add_word`; a station on another hull wrote her note's copy into her
+hull's director's log, which the director never reads, now the game's one on the player's
+hull with that hull current; truth 78's pin moved by the fake captain's "I have the command."
+leaving the log, re-measured old beside new).

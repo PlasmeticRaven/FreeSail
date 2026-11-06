@@ -4861,7 +4861,9 @@ GATE_6A_FAKE_CAPTAIN_ORDERS = [  # three readings asked, a question, `pipe down`
 GATE_6A_FAKE_CAPTAIN_ORDER_TICKS = [57, 323, 396, 600, 1200, 1800]  # one a sample, under his mark
 GATE_6A_FAKE_CAPTAIN_DECK_TO_BOOK_TICK = 5400  # an hour after his last order: the deck to his book
 GATE_6A_FAKE_CAPTAIN_PAUSED_TICK = 9000  # twice the patience: paused, the owner asked
-GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's 6
+GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's 5
+# package 65, step 2 (decision 60): his "I have the command." is his journal's note and no
+# line of the log (13 lines before, the harness's 6; 3113 lines, digest 1c9a985bfd5dce0f)
 # the merge of 37p with 41 and 42 (2026-10-10): his "I have the command." to an empty
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
@@ -4872,7 +4874,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # package 58b: the merchant passage's stern line (3112 lines before; item 3's by bisection)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_FAKE_CAPTAIN_DIGEST = "1c9a985bfd5dce0f"  # package 58b (1f8de8b49c7d5b5a at 68)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "dfaa7ab3bdd70295"  # package 65, step 2 (1c9a985bfd5dce0f at 58b)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -13511,3 +13513,83 @@ def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
 
     test_a_tripwire_judged_below_wakes_as_the_officers_call()
     test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 1 (`docs/design/Design-DoorAndVisitor.md` §2): the door follows its harness
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save():
+    """A station held through the agent API whose person goes aboard another ship in his own
+    boat keeps its door, its model and its identity (`Harness.ident`, the hull it was seated
+    on and its station) through the move, a stationing again by its own name, and a save and
+    a load by both roads: one harness, one seat, nothing made at his own station, and the
+    desk's listing naming him by his station, his ship and his host."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_door_follows import (
+        test_the_moved_station_keeps_its_door_its_model_and_its_identity,
+        test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load,
+    )
+
+    test_the_moved_station_keeps_its_door_its_model_and_its_identity(Path(tempfile.mkdtemp()))
+    test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load(
+        Path(tempfile.mkdtemp())
+    )
+
+
+def test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness():
+    """Two "captain" stations of two hulls, each through a door of the same model; one
+    captain goes aboard the other's ship. Each door is answered by its own harness (the
+    host's captain's harness is never carried into the visitor's station: the owner's
+    "one door covering two stations, the newest by recency"), and a stand-down by the
+    visitor's name stands his harness down and leaves the other stationed."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_door_follows import (
+        test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down,
+    )
+
+    test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down(
+        Path(tempfile.mkdtemp())
+    )
+
+
+def test_truth_7_379_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard():
+    """Decision 60 (package 65, step 2): a reply's prose is journaled under the station's
+    mark and in the director's log, in no log of the play, heard by no station; `say` is
+    heard (66); prose alone where an answer was owed carries the notice naming the tools
+    and counts as words written into the journal and nothing said; the director's sample
+    carries the stations' notes. The count's own rule: an empty reply where an answer was
+    owed counts, prose there counts in its own words, prose at a plain glass is uncounted,
+    and a call ends the count."""
+    from tests.test_agents import (
+        test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_while_prose_does_not,
+    )
+    from tests.test_knowledge import (
+        test_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard,
+    )
+
+    test_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard()
+    test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_while_prose_does_not()
+
+
+def test_truth_7_389_a_say_reaches_every_hull_within_hearing_and_a_wake_names_its_speaker():
+    """The lead's word of 2026-11-05 for 65's step 2 (the fully crewed brig): a station's
+    `say` reaches every hull's stations within hearing (ashore at the same place of the same
+    port, aboard the same hull for a visitor), written as heard into each hearing hull's log
+    with that hull's hearers named; the wake's reason names the speaker and the kind (a word,
+    a question or an answer from whom; the prompt's own the captain's); and a station is
+    never woken by its own word."""
+    from tests.test_knowledge import (
+        test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard,
+        test_a_station_is_never_woken_by_its_own_word,
+        test_the_wakes_reason_names_the_speaker_and_the_kind,
+    )
+
+    test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard()
+    test_the_wakes_reason_names_the_speaker_and_the_kind()
+    test_a_station_is_never_woken_by_its_own_word()

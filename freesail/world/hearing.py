@@ -108,6 +108,19 @@ def station_spot(world: Any, station: str) -> Spot:
     return ("aboard", own_hull(world), "quarterdeck" if place == "deck" else place)
 
 
+def station_spot_on(hull: Any, station: str) -> Spot:
+    """`station_spot` read with `hull` current (package 65, step 2): a Hull's façade read
+    from inside another hull's order (`world.as_hull(the speaker's)`) answers its people and
+    stations for the current hull, not its own, so a hearer's spot is read in its own hull's
+    block; a World without hulls is read as it is."""
+    world = getattr(hull, "world", None)
+    as_hull = getattr(world, "as_hull", None)
+    if world is not None and callable(as_hull) and hull is not world:
+        with as_hull(hull):
+            return station_spot(hull, station)
+    return station_spot(hull, station)
+
+
 def within_hearing(said: Spot, other: Spot) -> bool:
     """Whether a word said at `said` is heard at `other`: aboard the same hull within
     earshot of the place, ashore at the same place of the same port, in a boat in the

@@ -113,6 +113,15 @@ def lines(world: World, kind: str) -> list[str]:
     return [e.text for e in world.log if e.kind == kind]
 
 
+def notes(world: World, station: str = OFFICER) -> list[str]:
+    """A station's reply prose as decision 60 keeps it (package 65, step 2): the notes in
+    its journal (kind `agent.note`), heard by nobody in the world."""
+    from freesail.agents.journal import journal_seen
+
+    book = journal_seen(world, station)
+    return [e.text for e in (book.entries if book is not None else []) if e.kind == "agent.note"]
+
+
 def data_turns(fake: Fake) -> list[dict[str, Any]]:
     seen: list[dict[str, Any]] = []
     for turns in fake.seen:
@@ -233,7 +242,8 @@ def test_you_have_the_deck_gives_it_and_i_have_the_deck_takes_it_and_no_more():
     assert sample["notices"][1] == (
         "The captain's word allows nothing beyond your domain at present."
     )
-    assert h.journal.entries[-1].kind == "agent.deck"
+    # the deck's entry, then the reply's prose as a note (decision 60)
+    assert [e.kind for e in h.journal.entries[-2:]] == ["agent.deck", "agent.note"]
     e = world.submit("you have the deck")
     assert e.kind == "order.rejected" and "has the deck already" in e.text
     e = world.submit("who has the deck")
@@ -804,7 +814,7 @@ def test_a_stand_by_with_the_deck_wants_an_event_or_a_bell_and_the_book_holds_th
     world.record(Severity.URGENT, "test.urgent", "The fore topmast carried away.")
     world.run(1)
     assert not h.agent.standing_by
-    assert "[officer of the watch] Awake." in lines(world, "agent.note")
+    assert "Awake." in notes(world)
     # without the deck the watcher's rule holds: an hour is taken
     world2 = point_world()
     h2, _, _ = seated(world2, [reply("", call("stand_by", until="an hour"))], deck=False)
@@ -863,7 +873,7 @@ def test_hand_over_gives_the_deck_back_with_the_note_and_the_officer_stays():
     # off watch he is sampled as he was before the deck, and the deck is given again: the
     # sample that gives it carries his last note whole and one line of the journal's size
     world.run(EVERY)
-    assert "[officer of the watch] Off watch, sir." in lines(world, "agent.note")
+    assert "Off watch, sir." in notes(world)
     world.submit("you have the deck")
     world.run(1)
     notices = data_turns(fake)[-1]["notices"]
@@ -923,14 +933,17 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     # the seat): five hundred more, 21,500; package 82: `where am I` among the readings and
     # the boat's errand to another ship in the brief's words (12,926 at the seat): five
     # hundred more, 22,000
-    h.budget_tokens = 22000
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 22000
+    # package 65's step 2 (the sibling sentence and the stand-by's words in every brief) with
+    # package 75's lee-port words in the readings, together on the merged tree (13,200 at the
+    # seat, exactly the fraction of 22,000): five hundred more, 22,500
+    h.budget_tokens = 22500
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 22500
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 22,000 tokens this door gives you" in ask  # 21,500 before package 82
+    assert "of the 22,500 tokens this door gives you" in ask  # 22,000 before 65 and 75 met
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"
@@ -1035,8 +1048,9 @@ def test_a_released_station_is_seated_again_by_the_same_identity_and_replays(tmp
         "The officer of the watch takes the station again: the second seating; it had left "
         "the game, giving no reason."
     )
-    assert h.journal.entries[-1].text.startswith("Seated again, the second seating")
-    assert "[officer of the watch] Back, sir." in lines(world, "agent.note")
+    harness_entries = [e for e in h.journal.entries if e.kind != "agent.note"]
+    assert harness_entries[-1].text.startswith("Seated again, the second seating")
+    assert "Back, sir." in notes(world)
     world.run(EVERY)
     assert lines(world, "agent.refused")[-1].startswith("The officer of the watch has not the deck")
     world.submit("you have the deck")
@@ -2398,7 +2412,7 @@ def test_the_decks_events_wake_a_stand_by_and_fire_a_standing_order():
     world.run(1)
     # taken back: the captain's word wakes the stand-by, and the officer stays seated
     assert not h.agent.released and not h.agent.standing_by and not h.agent.has_deck
-    assert "[officer of the watch] Awake." in lines(world, "agent.note")
+    assert "Awake." in notes(world)
     assert data_turns(fake)[-1]["word"] == "I have the deck."
 
 
@@ -2644,7 +2658,7 @@ def test_a_stand_by_with_the_deck_is_broken_by_danger_refused_what_cannot_end_an
         "[officer of the watch] A notable event that speaks of danger: Fog came down; the "
         "officer of the watch is sampled again."
     )
-    assert "[officer of the watch] Awake at the fog." in lines(world, "agent.note")
+    assert "Awake at the fog." in notes(world)
     # bound: the sighting never comes, and the wait ends at eight bells, saying so
     world.run(EVERY)
     assert h.agent.standing_by and h.agent.stand_by.words == "a sighting"
@@ -2655,7 +2669,7 @@ def test_a_stand_by_with_the_deck_is_broken_by_danger_refused_what_cannot_end_an
         "[officer of the watch] Eight bells, and a sighting has not come; the officer of the "
         "watch is sampled again."
     ]
-    assert "[officer of the watch] Awake at eight bells." in lines(world, "agent.note")
+    assert "Awake at eight bells." in notes(world)
     # the list of what speaks of danger is data beside the events
     spoken = {d.words for d in R.DANGER_LINES}
     assert spoken == {
@@ -3029,8 +3043,8 @@ def test_whose_order_it_was_where_the_officer_is_and_what_he_says():
     world.submit("you may call all hands")
     world.submit("you may set the reckoning to")
     world.run(EVERY)
-    (said,) = [e for e in world.log if e.kind == "agent.note"]
-    assert said.severity is Severity.NOTABLE and said.text.endswith("Land on the lee bow, sir.")
+    # his prose is his own note, in his journal and in no log of the play (decision 60)
+    assert "Land on the lee bow, sir." in notes(world) and not lines(world, "agent.note")
     world.run(EVERY)  # the hands have turned out by now
     assert [e.text for e in world.log if e.kind == "crew.all_hands"] == [
         "All hands! (by the officer of the watch's order)"
@@ -3047,15 +3061,16 @@ def test_whose_order_it_was_where_the_officer_is_and_what_he_says():
         "All hands! (by the captain's order)"
     )
     assert "All hands called by the captain's order." in world.summary_lines()
-    # off watch his words are notable too
+    # off watch his own word is a note too, and nothing in the play log
     world.submit("I have the deck")
     h.own_word("The glass is falling fast, sir.")
-    assert [e.severity for e in world.log if e.kind == "agent.note"][-1] is Severity.NOTABLE
-    # a watcher's words are routine, as they were
+    assert notes(world)[-1] == "The glass is falling fast, sir."
+    assert not lines(world, "agent.note")
+    # a watcher's prose is the same note, under its own mark
     world2 = point_world()
     h2 = Harness(world2, watcher(SamplingPolicy.in_lockstep(EVERY)), Fake(["Quiet."]))
     h2.start()
-    assert [e.severity for e in world2.log if e.kind == "agent.note"] == [Severity.ROUTINE]
+    assert notes(world2, "watcher") == ["Quiet."] and not lines(world2, "agent.note")
 
 
 # ---------------------------------------------------------------------------

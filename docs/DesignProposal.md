@@ -577,7 +577,7 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 
 ### Closed after v0.2 review
 
-11. **Second reference rig.** Topsail schooner, confirmed. **Revised 2026-09-26 (owner):** the third vessel is to be a very small single-masted one, a Mediterranean **tartane** (a lateen mainsail on one raking mast, one or two jibs on a long bowsprit, and often a small mizzen right aft; the owner's reference is a Roux-school watercolour of one under sail with a boat in tow), chosen for how differently it handles from anything square-rigged. Then a **bilander** (two masts; the fore square-rigged; the main carrying a trapezoidal lateen or settee mainsail on a long yard slung to the mainmast, with square topsails above it; the owner's references are an eighteenth-century watercolour titled "A Bilander" and a line drawing of one), which exercises a lateen and square sails on one hull together. The cutter stays on the list after them. All of them belong to the milestone that builds the vessel library and its method (milestone 8, or earlier if the generator's rig rules mature first); nothing in milestone 3b depends on them. The reference images are in `docs/references/images/` with their provenance (a Roux-school watercolour of a tartane; the Pearson Scott Foresman line drawing of a bilander; Edward Gwyn's c. 1780 drawing of a British bilander, National Maritime Museum PAG3828).
+11. **Second reference rig.** Topsail schooner, confirmed. **Revised 2026-09-26 (owner):** the third vessel is to be a very small single-masted one, a Mediterranean **tartane** (a lateen mainsail on one raking mast with a square topsail above it, one or two jibs on a long bowsprit, and often a small lateen mizzen right aft; the owner's reference is a Roux-school watercolour of one under sail with a boat in tow, which shows the topsail, as does Monleón's print of a Spanish tartana; the rig settled so on 2026-11-06 with package 90), chosen for how differently it handles from anything square-rigged. Then a **bilander** (two masts; the fore square-rigged; the main carrying a trapezoidal lateen or settee mainsail on a long yard slung to the mainmast, with square topsails above it; the owner's references are an eighteenth-century watercolour titled "A Bilander" and a line drawing of one), which exercises a lateen and square sails on one hull together. The cutter stays on the list after them. All of them belong to the milestone that builds the vessel library and its method (milestone 8, or earlier if the generator's rig rules mature first); nothing in milestone 3b depends on them. The reference images are in `docs/references/images/` with their provenance (a Roux-school watercolour of a tartane; the Pearson Scott Foresman line drawing of a bilander; Edward Gwyn's c. 1780 drawing of a British bilander, National Maritime Museum PAG3828).
 12. **The language's name.** Orders.
 13. **Next document.** The M0 to M2 technical specification: `docs/TechnicalSpec-M0-M2.md`.
 
@@ -733,6 +733,17 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     **Winfield's lists are now a source on the owner's shelf** (basic particulars for every
     class, with plans scattered through most sections), so a candidate seldom lacks at least
     a sourced row; the ships session cites him by page as it does James and Steel.
+    **Amended 2026-11-06 (owner):** package 90 is widened from the two lateen hulls to a
+    **Spanish and Mediterranean package of five**, from the smallest up: the tartane; a
+    polacre (a lateen on a forward-raked foremast and on the mizen, square sail on the main);
+    the xebec (a lateen on all three masts, sweeps optional); the twenty-gun corvette *Diana*,
+    the Danish frigate of 1804 taken at Cartagena on the declaration of war and kept to
+    1832 (Winfield, *Spanish Warships*, p. 930 in the owner's edition; her plan of 1809 to
+    1810 in the Biblioteca Virtual de Defensa, record 1037832); and the *Purísima Concepción* class
+    three-decker of the Spanish navy, the game's first three-decked ship. The count: thirteen
+    after 75, eighteen after 90. The polacre moves out of the later choosing's list into 90.
+    The three-decker is the first true test of the generator's size limit, which the owner
+    thinks a fair one; the class changes only if a better-sourced one is argued for.
 
 57. **The viewer's light and air: three references for a later viewer package.** Owner,
     2026-10-29, sending two pictures of vessels they made in an unrelated game (a cutter
@@ -862,6 +873,32 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     station at the captain's word; the told officer is never refused for what he was told to
     do. Built in package 65's step 3 with the captain's whereabouts and the officer's duty
     to report.
+
+64. **Spain and the Mediterranean in every nation-specific extension.** Owner, 2026-11-06,
+    with package 90 widened to the Spanish and Mediterranean ships (decision 56 amended).
+    Any extension of milestone 7 that is specific to a nation (the signal books, the naval
+    and squadron doctrines, the fighting habits, the regimes, the colours and the hail's
+    forms, any nation-keyed table to come) includes Spain and the relevant Mediterranean
+    factions where it can: the regency of Algiers and the Barbary states, Naples, Sardinia
+    and the Italian states, Portugal on the Atlantic side. A builder writes Spain's row with
+    its source or says in the tuning notes what was looked for and not found and leaves the
+    row at the basic foundation; never British-and-French only in silence. The rule is in
+    spec M7 §28; the sources begin with Winfield's *Spanish Warships* on the owner's shelf
+    and Tofiño's *Derroteros*.
+
+65. **The harbour's second pass struck; the harbour and the ship's configuration.** Owner,
+    2026-11-06. M7b's package 64 (the harbour's second pass, noted 2026-10-18 and never
+    briefed) is struck. In its place a Fable design package, 96: the configuration of any
+    ship made a thing of its own (her class and fit, role, nation and its parameters, her
+    stations and their doors, her people, papers and private signal, her crew, her books,
+    her intent and squadron, with defaults by role and nation), which the scenario maker, the
+    director in live play and the business all build from without nasty surprises; and the
+    harbour presenting every configuration the game has (the doors and stations, the
+    settings, the scenario's settings with the full configuration of the player's ship and,
+    at choice, of every other ship: the squadrons, the papers, the private signal, each
+    ship's role, fit and crew), so that no setting needs a file edited by hand. A design
+    document for the lead's gate first, then the build in steps. Booked in
+    `docs/dev/M7-WorkPackages.md`.
 
 ### Still open
 

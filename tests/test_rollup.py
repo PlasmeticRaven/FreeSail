@@ -14,9 +14,9 @@ from datetime import datetime, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
-from freesail.agents import Fake, Harness, SamplingPolicy, Station
+from freesail.agents import Fake, Harness, SamplingPolicy, Station, call, reply
 from freesail.agents.agent import WATCHER_BRIEF, Authority
-from freesail.agents.model import DATA
+from freesail.agents.model import DATA, Reply
 from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.events import (
@@ -125,7 +125,7 @@ def test_the_words_come_from_the_kinds_and_counts():
                 actor="standing order 'night routine'",
             ),
             ev(8, "standing.held", "...", actor="standing order 'morning sail'"),
-            ev(9, "agent.note", "[watcher] All quiet.", actor="the watcher"),
+            ev(9, "agent.spoke", "The watcher, on deck: all quiet.", actor="the watcher"),
             ev(10, "ship.leeway", "Leeway 4° to larboard."),
             ev(11, "something.else", "A line no rule names."),
         ]
@@ -447,8 +447,11 @@ def test_a_stations_own_words_are_never_rolled_up():
     """The owner, package 29b (playtest 7): at speed a watcher's `say` went into the hour's
     roll-up instead of showing at once. A line whose actor is a station is kept as it is,
     like the captain's own, whatever the station (taken from the stations as they are
-    defined, not a list here). At 300x, a fake watcher speaks in an otherwise routine hour:
-    its line is shown at once, in its place, and the hour's count leaves it out."""
+    defined, not a list here). At 300x, a fake watcher is asked each glass and answers in an
+    otherwise routine hour: its lines are shown at once, in their place, and the hour's
+    count leaves them out. (Since decision 60 a reply's prose is a note in the journal and
+    no line of the play; the station's lines in the log are what it says in the world: an
+    answer, a `say`, a hail.)"""
     from freesail.core.events import STATION_ACTORS, kept
 
     world = World(seed=7, scenario=Scenario(gustiness=0.0, variability=0.0))
@@ -460,18 +463,24 @@ def test_a_stations_own_words_are_never_rolled_up():
         14400,
         WATCHER_BRIEF,
     )
-    h = Harness(world, st, Fake(["The wind holds steady from the west."] * 4), save=None)
+    answer = reply("", call("answer", text="The wind holds steady from the west."))
+    h = Harness(world, st, Fake([answer, Reply()], loop=True), save=None)
     h.start()
-    world.run(3 * 3600)
-    said = [e for e in world.log if e.kind == "agent.note"]
-    assert said and all(e.severity is Severity.ROUTINE and e.actor == "the watcher" for e in said)
+    for _ in range(6):
+        world.run(1800)
+        world.submit("ask the watcher how the wind holds")
+        world.run(1)
+    world.run(3 * 3600 - 6 * 1801)
+    said = [e for e in world.log if e.kind == "agent.said"]
+    assert said and all(e.actor == "the watcher" for e in said)
+    assert not [e for e in world.log if e.kind == "agent.note"]
     assert "the watcher" in STATION_ACTORS and all(kept(e) for e in said)
     shown = rollup(world.log.all(), 300, so_far=True)
     lines = [x for x in shown if isinstance(x, Event)]
     rolls = [x for x in shown if isinstance(x, Rollup)]
     assert all(e in lines for e in said)
     assert rolls and sum(r.count for r in rolls) + len(lines) == len(world.log)
-    assert not any("spoke" in r.text for r in rolls)
+    assert not any("the watcher said" in r.text for r in rolls)
     # a station defined later (an officer) is kept the same way, with nothing added here
     Station("second lieutenant", Authority.NONE, SamplingPolicy.periodic(1800), 14400, "x")
     assert "the second lieutenant" in STATION_ACTORS

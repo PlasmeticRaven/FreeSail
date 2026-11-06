@@ -36,6 +36,14 @@ ENDPOINT = "http://127.0.0.1:8080"
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def notes(world: World, station: str = "watcher") -> list[str]:
+    """A station's reply prose as decision 60 keeps it: the notes in its journal."""
+    from freesail.agents.journal import journal_seen
+
+    book = journal_seen(world, station)
+    return [e.text for e in (book.entries if book is not None else []) if e.kind == "agent.note"]
+
+
 def point_world(seed: int = 7) -> World:
     return World(seed=seed, scenario=Scenario(gustiness=0.0, variability=0.0))
 
@@ -204,7 +212,7 @@ def test_the_request_carries_the_brief_the_samples_and_the_tools_and_nothing_els
     request = server.requests[-1]
     assert request.url.path == "/v1/chat/completions" and request.method == "POST"
     assert "authorization" not in {k.lower() for k in request.headers}
-    assert "[watcher] All quiet." in [e.text for e in world.log if e.kind == "agent.note"]
+    assert "All quiet." in notes(world)  # a note in the journal, no line of the play (60)
 
 
 def test_the_reply_is_parsed_with_its_tool_calls_and_raw_holds_every_word():
@@ -249,7 +257,7 @@ def test_a_tool_call_round_trip_through_the_harness():
     )
     assert "true_wind_speed" in json.loads(second[3]["content"])
     assert second[4]["content"] == "The watcher has no authority to give orders."
-    assert "[watcher] The wind is steady." in [e.text for e in world.log if e.kind == "agent.note"]
+    assert "The wind is steady." in notes(world)
     assert "agent.refused" in [e.kind for e in world.log]
 
 
@@ -376,6 +384,10 @@ class Game:
     def lines(self, kind: str) -> list[str]:
         return [e.text for e in self.world.log if e.kind == kind]
 
+    def notes(self) -> list[str]:
+        """The station's reply prose, a note in its journal (decision 60)."""
+        return [e.text for e in self.harness.journal.entries if e.kind == "agent.note"]
+
 
 def run_runner(game: Game, server: Server, argv: list[str], inp: str = "") -> dict[str, Any]:
     """Start the runner in a thread against the game and the fake model server."""
@@ -427,7 +439,7 @@ def test_the_runner_asks_consent_through_the_game_then_keeps_watch_for_a_few_gla
         inp="Your own record, kept.\n\nThank you; the record is yours to read too.\n\n",
     )
     game.wait_for(game.floor_is_the_games(0))
-    assert game.lines("agent.note") == ["[watcher] A quiet start."]
+    assert game.notes() == ["A quiet start."]
     game.driver.tick(A_GLASS_S)
     game.wait_for(game.floor_is_the_games(1))
     game.driver.tick(A_GLASS_S)
@@ -472,10 +484,10 @@ def test_the_runner_asks_consent_through_the_game_then_keeps_watch_for_a_few_gla
     )
     assert "consent question" not in json.dumps(station_body["messages"])
     assert station_body["seed"] == 11
-    assert game.lines("agent.note") == [
-        "[watcher] A quiet start.",
-        "[watcher] The first glass is turned.",
-        "[watcher] The third glass: all well.",
+    assert game.notes() == [
+        "A quiet start.",
+        "The first glass is turned.",
+        "The third glass: all well.",
     ]
     assert "== Morning watch, 1 bell (04:30): a turn, the glass ==" in text
     assert "model> The third glass: all well." in text
@@ -1008,7 +1020,7 @@ def test_a_reply_cut_off_while_thinking_is_asked_once_more_with_the_reason_said(
         "The model's reply was cut off at the reply limit (4,096 tokens) while it was still "
         "thinking; it is asked once more, with the reason."
     ]
-    assert [e.text for e in world.log if e.kind == "agent.note"] == ["[watcher] All quiet."]
+    assert notes(world) == ["All quiet."]
     assert len(h.transcript) == 1 and m.finish == "stop" and m.cut_off is None
     # Ollama's own form: done_reason, and the thinking in the message
     thought = {"role": "assistant", "content": "", "thinking": "Which way is the tide?"}
@@ -1024,7 +1036,7 @@ def test_a_reply_cut_off_while_thinking_is_asked_once_more_with_the_reason_said(
     Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m).start()
     assert len(olla.bodies) == 2
     assert "while you were still thinking" in olla.bodies[1]["messages"][-1]["content"]
-    assert [e.text for e in world.log if e.kind == "agent.note"] == ["[watcher] Aye."]
+    assert notes(world) == ["Aye."]
     # an unclosed <think> in the content is thinking too; cut and then empty, the turn
     # has no reply
     server = llama([answered(message("<think>The tide turns at"), "length"), message("")])
@@ -1079,10 +1091,10 @@ def test_a_reply_cut_off_twice_ends_the_turn_with_nothing_done_and_the_journal_s
             "off at the reply limit (4,096 tokens) while it was still thinking, and was cut "
             "off again when asked once more; the turn ended with nothing done."
         )
-        assert game.lines("agent.note") == []
+        assert game.notes() == []
     game.driver.tick(A_GLASS_S)
     game.wait_for(game.floor_is_the_games(1))
-    assert game.lines("agent.note") == ["[watcher] Awake now."]
+    assert game.notes() == ["Awake now."]
     with game.driver.lock:
         game.world.submit("stand down the watcher")
     assert finished(got) == L.EXIT_RELEASED

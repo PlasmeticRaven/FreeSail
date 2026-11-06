@@ -64,6 +64,14 @@ def samples(fake: Fake) -> list[dict[str, Any]]:
     return seen
 
 
+def notes(world: World, station: str = "watcher") -> list[str]:
+    """A station's reply prose as decision 60 keeps it: the notes in its journal."""
+    from freesail.agents.journal import journal_seen
+
+    book = journal_seen(world, station)
+    return [e.text for e in (book.entries if book is not None else []) if e.kind == "agent.note"]
+
+
 def test_tell_is_an_order_journaled_and_logged_notable():
     world = point_world()
     h, _ = stationed(world, ["Aye."], loop=True)
@@ -118,7 +126,8 @@ def test_the_word_rides_the_next_sample_under_its_own_key_and_a_text_reply_ends_
     s = samples(fake)[-1]
     assert s["reason"] == A_WORD and s["word"] == WORDS
     assert s["question"] is None
-    assert "[watcher] Noted, Falmouth it is." in [e.text for e in world.log]
+    assert "Noted, Falmouth it is." in notes(world)  # a note, no line of the play (60)
+    assert "[watcher] Noted, Falmouth it is." not in [e.text for e in world.log]
     assert h.open_sample is None and h.agent.word is None and h.agent.question is None
     world.run(EVERY)  # the next sample is the policy's, with no word in it
     later = samples(fake)[-1]
@@ -174,7 +183,8 @@ def test_a_tell_and_an_ask_at_once_ride_one_sample():
     assert len(both) == 1
     assert both[0]["word"] == WORDS
     assert both[0]["question"] == "whether the glass is falling"
-    assert both[0]["reason"] == "a question"
+    # both wait, and the reason names both (package 65, step 2)
+    assert both[0]["reason"] == "a question from the captain; a word from the captain"
     world.run(5)
     assert sum(1 for s in samples(fake) if s.get("word")) == 1, "the word is carried once"
     assert [e.text for e in world.log if e.kind == "agent.said"] == [
@@ -301,7 +311,12 @@ def test_a_standing_order_tells_the_watcher_as_the_captain_would_and_the_log_nam
     fired = [e.text for e in world.log if e.kind == "order.accepted"]
     assert "By standing order 'sea': telling the watcher the sea is getting up." in fired
     s = samples(fake)[-1]
-    assert s["reason"] == A_WORD and s["word"] == "the sea is getting up\nmind the glass"
+    # the reason names each speaker and the standing order that spoke (package 65, step 2)
+    assert s["reason"] == (
+        "a word from the captain (by standing order 'sea'); "
+        "a word from the master (by standing order 'glass')"
+    )
+    assert s["word"] == "the sea is getting up\nmind the glass"
     assert s["question"] is None
     assert world.journal[-2:] == [
         (0, "captain", SEA),
@@ -338,7 +353,7 @@ def test_a_standing_order_asks_and_the_question_is_sampled_once():
         "By standing order 'q': the captain asks the watcher: how the glass stands?"
     ]
     new = samples(fake)[before:]
-    assert [s["reason"] for s in new] == ["a question"], [s["reason"] for s in new]
+    assert [s["reason"] for s in new] == ["a question from the captain (by standing order 'q')"]
     assert new[0]["question"] == "how the glass stands"
     assert [e.text for e in world.log if e.kind == "agent.said"] == ["[watcher] Steady at thirty."]
 

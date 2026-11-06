@@ -168,6 +168,10 @@ class Sample:
     # the readings not to be had where the station's person stands (package 65; the
     # place's knowledge): one line saying which and where they are; absent on deck
     readings_elsewhere: str | None = None
+    # the director's alone (decision 60; package 65, step 2): the stations' notes since its
+    # last sample, each reply's prose a note in the writer's journal and the director's
+    # log, heard by nobody in the world ("<stamp>  the master: <words>"); absent otherwise
+    notes: list[str] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -175,6 +179,8 @@ class Sample:
             d.pop("you", None)
         if not d.get("readings_elsewhere"):
             d.pop("readings_elsewhere", None)
+        if not d.get("notes"):
+            d.pop("notes", None)
         if d.get("stood_by") is None:
             d.pop("stood_by", None)
         if d.get("word") is None:

@@ -111,6 +111,10 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_376_the_handover_fold_keeps_the_place",
         "test_known_truths.py::test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail",
         "test_known_truths.py::test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place",
+        # package 65, step 2: the say across hulls (two hulls, a glass's wait), and the truth
+        # that calls it
+        "test_knowledge.py::test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard",
+        "test_known_truths.py::test_truth_7_389_a_say_reaches_every_hull_within_hearing_and_a_wake_names_its_speaker",
         # package 67: the seat's door as the harbour's subprocess on a live server, a long
         # seat through the API door, and the seat's forms over a day's minutes
         "test_known_truths.py::test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_stands_it_down",
@@ -444,6 +448,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_294_the_frigate_sails_from_gibraltar_to_port_mahon_by_her_short_book",
         # package 79d: Agincourt Sound's six hours in a north-wester (20 s alone, 2026-10-29)
         "test_known_truths.py::test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester",
+        # package 82b: the door that follows its harness, a brig brought within a boat's pull
+        # and her captain sent aboard the frigate (6 to 16 s alone, 2026-11-05)
+        "test_door_follows.py::test_the_moved_station_keeps_its_door_its_model_and_its_identity",
+        "test_door_follows.py::test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load",
+        "test_door_follows.py::test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down",
+        "test_known_truths.py::test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save",
+        "test_known_truths.py::test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness",
     }
 )
 
