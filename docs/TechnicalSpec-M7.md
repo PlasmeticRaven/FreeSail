@@ -179,7 +179,9 @@ As the notes have them, by their own names:
   seed, the night and fog signals, the convoy's), so that any nation of the table may be a
   combatant in a fictional scenario (the Spanish, the Dutch, the Danes, the Americans of
   1812), and a nation's book is built out progressively from that foundation as its sources
-  are found, the data shape the same for all (`data/signals/<nation>/`).
+  are found, the data shape the same for all (`data/signals/<nation>/`). **The Spanish book
+  is built out first after the French** (decision 64, §28: Spain and the Mediterranean in
+  every nation-specific extension).
 
 **A signal is a thing hoisted**: the book, the number, by whom, where and when, answered or
 not, with the hands at the halyards and a minute a hoist (an evolution). **It is read by the
@@ -1051,6 +1053,27 @@ vessels for 1812. The Mediterranean's block is cut when 7-i's scenarios want it,
 chart's own tools as the Channel's and the Bay's were. The signals'
 sources (the 1799 book, Popham 1803, the convoy instructions, du Pavillon) are a research
 item before 7-i is briefed, each book marked verified or made.
+
+**Spain and the Mediterranean in every nation-specific extension (the owner, 2026-11-06;
+decision 64).** With package 90 widened to a Spanish and Mediterranean package of five hulls
+(the tartane, the polacre, the xebec, the corvette *Diana*, the *Purísima Concepción* class
+three-decker; decision 56 amended), **any extension of this milestone that is specific to a
+nation includes Spain and the relevant Mediterranean factions where it can**: the signal
+books of §3 (the Spanish book built out from the basic foundation as its sources are found,
+the private signal's draw as 71 has it), the fighting instructions and the nations' habits
+of §10 and package 74, the regimes and the `naval:` blocks of §22 (Spain's blockades,
+stations and sorties as 79a began them: Ferrol, Cadiz, Cartagena), the squadron's doctrine
+of §21, the colours and the hail's forms of §1 and §4, and any later nation-keyed table.
+The relevant Mediterranean factions are those the chart's blocks and 79c's and 79d's data
+have made nations: the regency of Algiers and the other Barbary states as the xebec's
+enemy (the Spanish jabeque's whole reason, Winfield pp. 1134 to 1136), Naples, Sardinia and
+the Italian states as data, Portugal where the Atlantic coast's blocks reach. "Where it can"
+means: a builder of a nation-keyed table writes Spain's row with its source, or says in the
+tuning notes what was looked for and not found and leaves the row at the basic foundation,
+never silently British-and-French only; the sources for Spain begin with Winfield's
+*Spanish Warships in the Age of Sail* on the owner's shelf (cited by page, the passages
+sourced by the owner on request: `docs/design/VesselReferences-2026-11-Spanish.md`) and
+Tofiño's *Derroteros* already held.
 
 **As built: the Channel's east block (package 79b, 2026-10-29).** Milestone 7's first chart
 block, split from package 79 by the owner (79a the regimes, 79b this block, 79c and 79d the

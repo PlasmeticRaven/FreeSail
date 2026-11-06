@@ -11,7 +11,12 @@ disabled or quarantined; a section in the tuning notes and a report to the lead;
 plays each merged package briefly and files the notes), and this milestone adds its own
 (spec M7's rules 1 to 7: damage is just state; a gun is served by the bill; recognition
 before fire; rules first, models welcome; the far ships fight as the near do, coarsely;
-realism, not pacing; nothing pre-defines a battle's timing).
+realism, not pacing; nothing pre-defines a battle's timing), and from 2026-11-06 decision
+64: **every nation-specific extension includes Spain and the relevant Mediterranean factions
+where it can** (the signal books, the doctrines, the fighting habits, the regimes, the
+nation-keyed tables), a builder writing Spain's row with its source or saying in the tuning
+notes what was looked for and not found (spec M7 §28; the Spanish sources in
+`docs/design/VesselReferences-2026-11-Spanish.md`).
 
 **How the packages are run (the owner, 2026-10-23).** Milestone 7b is frozen open beside
 this milestone (decision 51); its remaining work is wrapped up alongside. **The Fable
