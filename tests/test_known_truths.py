@@ -13506,6 +13506,20 @@ def test_truth_7_380_every_kind_the_code_writes_is_placed_and_the_hulls_sounds_r
     test_the_senses_of_each_place_and_the_readings_places()
 
 
+def test_truth_7_374_a_book_is_read_after_the_walk():
+    """The library refuses the manifest from the quarterdeck with "in the hold" and the
+    walk; after `go to the hold` it serves it; the primer is served anywhere; the log book,
+    the chart, the book of standing orders, the books drafted and the ship's view each where
+    they are kept (the design's §8); the keeper carries his paper while he is at it."""
+    from tests.test_knowledge import (
+        test_the_keeper_carries_his_paper_while_he_is_at_it,
+        test_the_ships_own_are_read_where_they_are_kept_and_the_reference_anywhere,
+    )
+
+    test_the_ships_own_are_read_where_they_are_kept_and_the_reference_anywhere()
+    test_the_keeper_carries_his_paper_while_he_is_at_it()
+
+
 def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
     """The console shows the captain in the cabin no deck line and the officer's report, and
     `log N` reads back the same; `knowledge: all` shows everything; the director's seat and

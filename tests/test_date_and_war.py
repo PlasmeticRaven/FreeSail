@@ -93,7 +93,14 @@ def test_the_war_is_what_the_ship_knows_never_the_worlds_table(cutter):
         "by the pilot off Plymouth, war declared between Britain and Denmark."
     )
     assert len(w.papers.war_news) == 2
-    # the paper in the library says the same, by its handle
+    # the paper in the library says the same, by its handle: read in the cabin, where it is
+    # kept (package 65, step 5; from the deck the library says where it is and the walk)
+    refused = str(tools.library(w, "captain", "papers", section="the news of the war"))
+    assert refused == (
+        "The news of the war is kept in the cabin, with the captain; go to the cabin to read it "
+        "(or ask the captain)."
+    )
+    assert w.submit("go below").kind == "captain.below"
     page = str(tools.library(w, "captain", "papers", section="the news of the war"))
     assert page.startswith("The news of the war: the nations' table the ship sailed with")
     assert "kept by the captain in the cabin" in page

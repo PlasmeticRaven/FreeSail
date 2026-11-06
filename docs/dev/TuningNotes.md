@@ -18042,6 +18042,69 @@ knowledge filter's place 559 ticks a second against `all` 556 (truth 7-386's run
 Channel observed 319, the same Channel with the frigate at the view 213. ruff check and
 ruff format --check clean.
 
+### Step 5: books, papers and pictures in their places (the design's §8; 2026-11-06)
+
+**What was built** is in the design note's postscript ("As built", step 5): the library by the
+reader's senses, the ship's own where they are kept and the reference anywhere, the log book,
+the chart and the ship's view by place, the keeper's rule, the browser's pane by the player's
+person; truth 7-374.
+
+**Judgements.** (1) The books drafted go with the book of standing orders (the quarterdeck and
+the cabin) and not to the cabin alone: the owner's ruling of 2026-10-16 (read from anywhere)
+and the two tests that read 'night orders' and 'cargo' at the officer's station on the
+quarterdeck stand; for the lead's ruling. (2) One sentence for everyone for a cabin paper ("go
+to the cabin to read it (or ask the captain)"): the pane's page and a station's are compared
+section by section by the server's test, and the first draft's "it is his to show you" for a
+man who is not the captain made them differ. (3) The search of the whole library from a place
+below reads the reference and the papers there, and says what it left out in one sentence
+rather than searching the whole and hiding the hits: a hit's place would have said where the
+paper is, and a man who cannot read the manifest should not learn its tonnage from a search.
+(4) The listing of the papers names every paper (so a model knows what the ship keeps) and
+says which are to be had here and where the rest are; the whole bundle serves what is here
+and names the rest. (5) `knowledge.place_here` reads a place's own senses less `aboard`
+against the reader's, so the open deck's three are one place and the rooms each their own; a
+man in a boat alongside (the script's boat and the pilot's cutter, whose senses carry the
+deck's for what they see of her) reads no paper of hers.
+
+**Found on the way.** (a) `_section_page` reopens a section by its number where the words asked
+hold an apostrophe (`section="boatswain's store"` reopens as `section='4'`), 33d's choice so
+that the reopen call is quotable; the test asks by `boatswain`. (b) The test of package 35's
+parity (`tests/test_places.py`, the papers served by handle to every station the same) pinned
+the manifest served from the quarterdeck to the watcher, the lookout and the captain alike;
+it is moved to the rule (the deck's paper the same page at every station on deck, the hold's
+the same refusal at every station elsewhere, the manifest served in the hold and by the pane
+there), old beside new in its words. (c) The server's test of the pane (`tests/test_server.py`)
+pinned the sail room's lines served from the quarterdeck; it reads them in the sail room now,
+and the pane's `here`/`where` on deck. (d) The war's news test (`tests/test_date_and_war.py`)
+read the paper from the captain on deck; it reads it in the cabin now, the deck's refusal
+asserted first. (e) The frigate's purser lives in the gunroom (his outline's place) and keeps
+his books in the hold: the keeper's rule puts the books with him only while he is at them, so
+the manifest and the purser's books are in the hold whoever is in the gunroom. (f) The
+`_papers_topic` says "kept by the boatswain in the deck" for the deck's papers (the place's
+name "the deck" after "in"), 35's words and a pin of 35's tests; not touched.
+
+**The pace.** Nothing of this step runs on the tick's path: the keeper's rule is a few reads at
+a library call. The pace tests are run as the rule asks and their figures are below.
+
+**The suites on the step's final tree (c6b2031 the step's code with the trunk at dde02cb merged;
+137720f adds the trunk's records since, three commits of docs alone).** Fast tier whole:
+6312 passed, 1 xfailed, 45 min 31 s (exit 0). Slow tier of the thirty-nine touched files and
+the known truths (`--slow -m "not pace" -n 4`), in two halves under the two-hour limit: the
+first (the known truths, the knowledge, the hulls, the boats, the replay, the checkpoint, the
+people, the ports, the places, the war's date, the director, the consent, the wardroom's doors)
+728 passed, 8 xfailed, 1 h 4 min 54 s; the second (the agents, the primer, the grammar book,
+the in-world words, the orders, the console, the server, the observer, the doors, the names,
+the sail by name, the parity, the pictures, the map view) 2413 passed, 1 xfailed, 16 min 54 s;
+both exit 0. Pace tests alone and last (`--slow -m pace -rP`): 12 passed and one failed,
+5 min 23 s: truth 7-159 (the convoy of six at far detail holding truth 51's floor of 500)
+read 495 ticks a second under the pace run, as it read 496 at step 1; alone again it passed
+twice (the floor is the build machine's, and this container reads about at it; nothing of
+this step runs on the tick's path). The others: three stations seated, the knowledge
+filter's place 557 ticks a second against `all` 530 (truth 7-386's run 532 against 555: the
+filter's cost within the noise, as at steps 1 to 4); the frigate alone 524, the Channel
+observed 326, the same Channel with the frigate at the view 209. ruff check and ruff format
+--check clean.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was
