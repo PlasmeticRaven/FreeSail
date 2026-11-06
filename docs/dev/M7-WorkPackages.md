@@ -2014,7 +2014,11 @@ the slow tier of the eighteen touched files and the known truths 841 passed, 8 e
 failures; the pace tests all passed; the lead's trial merge on the trunk's 36d30c4 (the
 tuning notes' conflict with the hotfix builder's section resolved keeping both, in order),
 ruff check and format clean, the fast tier whole green (exit 0); the whole suite in the
-cloud on the pinned runner dispatched after the hotfix's own proof run. Steps 2 to 8 go on
+cloud on the pinned runner after the hotfix's own proof run: **run 33 on 43823f6** (23:26 to
+00:30 UTC, 2026-11-05 to 06), lint green, all six shards green, 6,287 passed, 11 skipped, 11
+expected failures (run 32's 6,266 and 10, plus step 1's tests and 7b-100's old reading as
+the eleventh), the pace job 9 of 13 (the four floors under at 444 to 499 against 500, the
+runner's speed as on runs 30 and 32; the frigate alone 499, a hair under). Steps 2 to 8 go on
 from the resumption of 2026-11-05 with decisions 62 and 63 and the hearing across hulls
 added to the brief.
 
