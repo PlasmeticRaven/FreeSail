@@ -18135,6 +18135,28 @@ master takes his noon sight at 11:44 and goes below at 11:59 in the knowledge te
 **The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
 asks and their figures are below.
 
+**The suites on the step's final tree (d6e52a7: the step's code at 0df145f with the trunk at
+8542e49 merged, carrying package 97; the commit after adds this paragraph alone).** Fast tier
+whole: 6322 passed, 1 xfailed, 45 min 16 s (exit 0), run in a worktree pinned at the head. A
+first run in the working tree read one red, the replay's rules fingerprint: step 7's edits to
+the consent and harness files landed under it while it ran (the fingerprint is read from the
+files as they stand), and the test passes alone on both trees; the suites are run in a pinned
+worktree from here on, so that no edit touches a running suite. Slow tier of the forty touched
+files and the known truths (`--slow -m "not pace" -n 4`), in two halves under the two-hour
+limit: the first (the known truths, the knowledge, the hulls, the boats, the replay, the
+checkpoint, the captain, the officer, the people, the health, the ports, the places, the war's
+date, the reckoning, the readers on the hull, the tell, the crews, the director, the consent,
+the wardroom's doors) 812 passed, 8 xfailed, 1 h 14 min 50 s; the second (the agents, the
+primer, the grammar book, the in-world words, the orders, the standing orders, the console,
+the server, the observer, the doors, the names, the sail by name, the parity, the pictures,
+the map view) 2413 passed, 1 xfailed, 16 min 43 s; both exit 0. Pace tests alone and last
+(`--slow -m pace -rP`): 13 passed, 5 min 28 s; three stations seated, the knowledge filter's
+place 532 ticks a second against `all` 535 (truth 7-386's run 543 against 539: the filter's
+cost within the noise, as at steps 1 to 5); the frigate alone 528, the Channel observed 333,
+the same Channel with the frigate at the view 214. The master's test and truth 7-375 were put
+in the slow tier after these figures were taken (at f825749), so the fast tier's figure counts
+them in. ruff check and ruff format --check clean.
+
 ### Step 7: the drill, extended (the design's §10; 2026-11-06)
 
 **What was built** is in the design note's postscript ("As built", step 7): the walk in the
