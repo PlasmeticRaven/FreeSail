@@ -17976,6 +17976,37 @@ master takes his noon sight at 11:44 and goes below at 11:59 in the knowledge te
 **The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
 asks and their figures are below.
 
+### Step 7: the drill, extended (the design's §10; 2026-11-06)
+
+**What was built** is in the design note's postscript ("As built", step 7): the walk in the
+fitness drill (go below, eat or drink, a paper read where it is kept, come on deck), seven things in
+eight replies, the walk's orders alone, the drill's world the frigate at seed 0 and its captain the
+walker; behind `consent.DRILL_WALK`, off on the trunk by the lead's ruling (§17's item 5) until
+package 55 re-briefs; truth 7-381 with the switch on.
+
+**Judgements.** (1) Eight replies for seven things, 37's one-to-spare kept. (2) The drill's world a
+real ship (the frigate, seed 0, a calm, a third of a second to make) when the walk is on, because a
+point world has no cabin and no papers; the consent step is run once a model, so the cost is
+nothing; with the switch off the point world stands. (3) The walker the drill's world's captain, so
+that the drill asks no authority of the consent station and `go below` has a cabin to go to; a drill
+run for a station whose person is not the captain still walks as the captain, which is the drill's
+fiction and not the game's. (4) A deck's order in the drill is refused in the drill's words and
+counts for nothing; a world order the same. (5) The three-thing drill's words are kept to the letter
+with the switch off (the record's "not passed: library and stand_by not run in 4 replies", the
+reminder's "library and journal and stand_by"), so that a record written before this step reads
+the same and 37's tests stand unchanged.
+
+**Found on the way.** (a) The consent module's `Record` is a dataclass; a helper placed between
+its decorator and its `class` line made the decorator a function's (a test's `__mro__` error); the
+helpers sit above the decorator. (b) At the runner's door the developer's empty turn after the
+answer is the fake's first reply in the drill: the drill's first reminder names all seven with seven
+replies left, and the three calls of 37 in one reply leave the walk's four with six; a script of nine
+items passes with no reply to spare, as 37's test of the three-in-one did with four. (c) The drill's
+world's clock stands at the scenario's start (04:00), so the walker eats "the first since 04:00".
+
+**The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
+asks and their figures are below.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was

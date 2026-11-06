@@ -981,3 +981,59 @@ written at the prompt), so nothing of a letter is built.
 **Found on the way** is in the tuning notes (the reckoning's rows are the gunroom's already;
 `People.occupy` dropped the room for a mirrored person; the test of step 5 that drafted a book
 on the deck and walked to the hold at once).
+
+### Step 7: the drill, extended (§10; the lead's ruling of 2026-10-31 on §17's item 5; 2026-11-06)
+
+**Built as designed, behind one switch**: the fitness drill's walk is built whole and kept behind
+`consent.DRILL_WALK`, **off on the trunk** by the lead's ruling: the drill a model meets stays the
+three things the consent brief describes (`DRILL_TEXT`, `DRILL_REPLIES` four, `DRILL_TOOLS` three)
+until package 55 re-briefs, so that a model whose yes is on record for a drill of three things is
+not asked eight before the brief says eight; `drill_spec()` gives the drill as the switch has it.
+With the switch on the drill gains the walk after 37's three: go below (`submit_order(text='go
+below')`), eat or drink there (`submit_order(text='eat')`), read one of the ship's papers where it is
+kept (`library(topic='papers', section='the price list')` from the cabin; the text says the listing
+names which are to be had where he stands), come on deck (`submit_order(text='come on deck')`);
+seven things in up to eight replies (`DRILL_WALK_REPLIES`; 37's judgement of one reply a thing and
+one to spare kept); the drill's tools gain `submit_order` for the walk's four orders alone
+(`DRILL_ORDERS`; any other is refused in the drill's words, `DRILL_REFUSED`: "The drill's orders are
+the walk's alone: 'go below', 'eat' or 'drink', 'come on deck'. '<the order>' waits for the game.");
+the judge (`_drill_done`) counts each of the seven once by its result (`DRILL_WALK_THINGS`: a move
+refused, "you are on the quarterdeck already", is not a move; a paper counts only where it was read,
+one asked for from elsewhere being the refusal in words) and names what is still to run in words
+("still to run, go below, eat or drink, a paper read where it is kept and come on deck"); the
+consent record's `drill` field says which drill ran: "passed" for the three, "passed, with the walk"
+for the seven (`DRILL_PASSED_WALK`; `Record.proceeds` and `drilled` take both). The walk's orders
+are carried out by the drill's world's own captain (`Harness.drill`: in the drill the harness gives
+the walk's four orders through `World.submit` as the captain's and refuses the rest; the
+conversation's senses are his meanwhile, so the library reads by his place), its lines real in that
+world (`captain.below`, `captain.on_deck`, the eating) and in no game's; the station brief follows
+when the seven have run. In-world under 85's rule (the drill's text names no package and no build;
+tested). `docs/agents/ConsentBrief.md` not edited. Truth 7-381 runs with the switch on; 37's drill
+tests stand unchanged with it off.
+
+**The sentence package 55 will need in the consent brief**, for when the switch is turned on: "For a
+station that asks it (the officer of the watch's), a short drill follows a yes, as data in the same
+conversation and before the station brief: open a section of the library, write a line in the
+journal, stand by until a bell, and take a walk about the ship (go below, eat or drink there, read
+one of the ship's papers where it is kept, come on deck); seven things in up to eight replies; a
+model that cannot is thanked and stood down, with a record."
+
+**Taken another way, with the reason.** (1) **The drill's world is a ship and not a point** when
+the walk is on: the consent conversation sailed `World(seed=0)`, a point ship with people and no
+stores, which keeps no papers and has no cabin to go below to; with the switch on the drill's world
+is the frigate at seed 0 in a calm (`DRILL_SHIP`, `make_world`, a third of a second), so the walk has
+rooms and a paper; its lines are the consent conversation's own and never a game's (§10's "the real
+world" read as the drill's world, the only world the consent step has). With the switch off the
+point world stands as it was. (2) **The walker is the drill's world's captain**, not the station's
+person: the consent conversation has no station and no person (`CONSENT_STATION`, authority none),
+so `submit_order` through the tools would be refused for want of authority; `Harness.drill` gives
+the walk's four orders as the captain's at the prompt and refuses every other in the drill's words,
+which is also how "an order of the deck or of the world is refused" is kept without widening the
+consent station's authority. (3) **The paper the text names is the price list in the cabin**, since
+the walker is the captain and `go below` takes him there; §10's "any paper kept where he is" stands
+(the judge counts any paper read where it is kept). (4) **A reminder follows an empty reply or a
+reply a stand-by ended, and no other**: after a reply whose calls ran, the drill goes on from their
+results, as 37l has it; the test pins the three reminders of its script.
+
+**Found on the way** is in the tuning notes (the `@dataclass` decorator and a helper's placing; the
+developer's empty turn counted as the drill's first reply).
