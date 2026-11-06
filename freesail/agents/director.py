@@ -2076,7 +2076,10 @@ def _tell_director(world: Any, text: str) -> None:
         return
     a = held.agent
     if hasattr(held, "_poll"):
-        a.word = f"{a.word}\n{text}" if a.word else text
+        if hasattr(held, "add_word"):
+            held.add_word(text, "a word for the director")
+        else:
+            a.word = f"{a.word}\n{text}" if a.word else text
     else:
         a.told.append(text)
 

@@ -287,6 +287,7 @@ class PlayerSeat:
 
     # the harness's deck and grants, whole (package 37g): the same rules, the same lines
     give_deck = Harness.give_deck
+    add_word = Harness.add_word  # the word and its reason (package 65, step 2)
     take_deck = Harness.take_deck
     allow = Harness.allow
     disallow = Harness.disallow

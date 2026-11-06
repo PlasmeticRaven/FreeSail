@@ -745,8 +745,8 @@ MASTER_DOMAIN = Domain(
 LOOKOUT_DOMAIN_WORDS = (
     "The lookout's station gives no order of the ship but two: 'make her out' (the glass "
     "aloft, which is yours: what she is, her rig and her course as the distance allows) "
-    "and the hail ('hail <words>', or say the words: they go down to the deck as a hail "
-    "from the masthead, heard by whoever is on deck). You read every reading and every "
+    "and the hail ('hail <words>': the words go down to the deck as a hail from the "
+    "masthead, heard by whoever is on deck). You read every reading and every "
     "query ('what is in sight', 'the nearest land', 'the sightings'). Everything else, the "
     "sails, the helm, the course, the anchor, the hands, the reckoning, the book and the "
     "stations' sentences, is refused in words: the deck is not yours to order, only to "
@@ -1273,9 +1273,11 @@ class Station:
 # of stopping beside the withdrawal the head's opt-out item states.
 WATCHER_BRIEF = (
     "You are the watcher. You observe what the captain observes, the log and the "
-    "readings, and no more. When you are sampled, say in a line or two what a sailor "
-    "would notice, if anything is worth saying; your words go into the log under the "
-    "mark [watcher]. Say nothing when nothing has changed, or stand by until a bell or an "
+    "readings, and no more. When you are sampled, note in a line or two what a sailor "
+    "would notice, if anything is worth saying: your reply's prose is your own note, "
+    "written in your journal under your mark and read by the owner and the director, "
+    "heard by nobody aboard; what the deck must hear you say with submit_order('say "
+    "<words>'). Write nothing when nothing has changed, or stand by until a bell or an "
     "event. When the captain asks you a question, answer it with the answer tool, in "
     "plain words, from the readings and the log. You give no orders and you are not "
     "asked to. Candour is welcome: if you think an order or the ship's handling is a "
@@ -1778,10 +1780,11 @@ LOOKOUT_BRIEF = (
     "a sail made out as she nears, a sail lost), and the readings 'in sight', 'the "
     "nearest land' and 'what sail is in sight' say what is in sight now; the lookout "
     "reading says who is at the masthead. Put what is seen into a lookout's words and "
-    "hail the deck with them ('hail sail ho, a sail two points on the larboard bow', or "
-    "say the words): a hail is a line in the log from the masthead, heard by whoever is "
-    "on deck. Hail at once for a danger ahead, the land closing or a sail that nears; "
-    "say nothing when nothing has changed. 'make her out' sends your glass to the sail "
+    "hail the deck with them ('hail sail ho, a sail two points on the larboard bow'): a "
+    "hail is a line in the log from the masthead, heard by whoever is on deck; your "
+    "reply's prose is your own note, heard by nobody. Hail at once for a danger ahead, "
+    "the land closing or a sail that nears; hail nothing when nothing has changed. 'make "
+    "her out' sends your glass to the sail "
     "in sight and answers what the distance allows. You give no other order, and you are "
     "not asked to. A question from the deck comes as the sample's question: answer it "
     "with the answer tool, in a lookout's plain words.\n\n"
@@ -2185,7 +2188,10 @@ PLACE_KNOWLEDGE_WORDS = (
     "ship but what the boat brings; a reading asked where it is not to be had is answered "
     "with where it is (the readings tool lists those under not_here), and 'where am I' says "
     "where you stand. Your reply's prose is your own note, written in your journal and heard "
-    "by nobody; a thing is heard in the world only when said (say, say to, hail, answer)."
+    "by nobody; a thing is heard in the world only when said (say, say to, hail, answer). A "
+    "word to a person is no order of the ship: telling the boatswain to brace the yards "
+    "braces nothing; the readings say what is in hand. Stand by for the few things that "
+    "matter, and let the rest come with the next sample."
 )
 
 STAND_BY_WORDS = (
@@ -2623,6 +2629,15 @@ class AgentState:
     question_text: str = ""  # the question as asked, without the asker's words
     asked: list[tuple[str, str, int]] = field(default_factory=list)
     heard: list[str] = field(default_factory=list)
+    # why the waiting word and question sample the station (package 65, step 2; the
+    # owner's point of 2026-11-05): the speaker and the kind, "a word from the master (Mr
+    # Pascoe)", "an answer from the lookout", "a question from the captain"; "" until one
+    # waits (the harness's `add_word`, `put_question`)
+    word_reason: str = ""
+    question_reason: str = ""
+    # of the empty replies in a row, how many were words written into the journal and
+    # nothing said in the world (decision 60), for the nudge's words
+    empty_noted: int = 0
 
     @property
     def released(self) -> bool:

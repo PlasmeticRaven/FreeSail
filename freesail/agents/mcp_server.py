@@ -221,12 +221,13 @@ RECONNECTED_WORDS = (
 )
 
 SAY_DESCRIPTION = (
-    "Say something into the ship's log under your mark, or nothing (leave text out), and "
-    "hand the floor back: the game runs on to your next turn and this returns it when it "
+    "Write a note in your journal under your mark, or nothing (leave text out), and hand "
+    "the floor back: the game runs on to your next turn and this returns it when it "
     "comes. Through this door the text of the chat is not seen by the game; this is how "
-    "your words reach the log. Said while the game has the floor (standing by, or "
-    "waiting), your words go in the log, end the stand-by at your own word, and open "
-    "your turn."
+    "your words reach your journal, read by the owner and the director and heard by nobody "
+    "aboard (a thing is heard in the world only when said: submit_order('say ...'), "
+    "'hail ...', or answer). Said while the game has the floor (standing by, or waiting), "
+    "your words go in your journal, end the stand-by at your own word, and open your turn."
 )
 SAY_SCHEMA = {
     "type": "object",
@@ -254,7 +255,7 @@ def door_note(wait: float) -> str:
         "Your turn opens at each sampling point (the glass, a notable or urgent event, the "
         "end of a stand-by, or a question or a word from the captain) and stays open until "
         "you hand the floor "
-        "back: say(text) puts your words in the log under your mark and hands it back; "
+        "back: say(text) writes your words in your journal under your mark and hands it back; "
         "stand_by(until) stands by and hands it back. After say or stand_by the call is "
         f"held open until your next turn and returns it, for up to {_seconds_words(wait)}; "
         "the first line of each result says whose turn it is. If no turn has opened by "
@@ -1013,8 +1014,11 @@ class Bridge:
             if a.get("released"):
                 return str(a.get("words") or ""), True
             if a.get("spoke"):
-                mark_words = "" if self.game.name == "director" else ", under your mark,"
-                did = f"Said{mark_words} while the game had the floor. {a.get('words')}"
+                did = (
+                    f"Said while the game had the floor. {a.get('words')}"
+                    if self.game.name == "director"
+                    else f"Noted in your journal while the game had the floor. {a.get('words')}"
+                )
             elif a.get("out_of_turn"):
                 did = (
                     "Nothing said. "
@@ -1028,7 +1032,7 @@ class Bridge:
                     else "Nothing said."
                 )
             else:
-                did = "Said, under your mark." if text else "Nothing said."
+                did = "Noted in your journal, under your mark." if text else "Nothing said."
         else:
             a, new = self._send(Reply(calls=(ToolCall(name, args),), raw=raw))
             if a.get("released"):
