@@ -80,10 +80,9 @@ Every order and reading that takes a sail names her the same way, and the surest
 # rejected: make out the brig on the larboard quarter, bearing NE by N, distant a mile
 # rejected: the glass on the sail bearing NE distant two miles
 # rejected: give chase to the schooner on the starboard bow
-# rejected: the bearing of the brig right astern
 ```
 
-Refused here for the same want, a sail in sight; at sea the same words are taken by `make her out`, `the glass on`, `give chase`, `the bearing of`, the hail (chapter 23), and the boat (`pull for the brig bearing W`, `send the boat to the brig bearing E with the master`, chapter 26). Words that leave no sail are refused with the strangers' own words, so that you can name her as the lookout does: "Nothing in sight answers to 'the brig right astern'; the strangers: a brig-sloop of war on the starboard bow, bearing NE, distant eight cables ..."
+Refused here for the same want, a sail in sight (and `the bearing of the brig right astern`, a reading, answers "not in sight"); at sea the same words are taken by `make her out`, `the glass on`, `give chase`, `the bearing of`, the hail (chapter 23), and the boat (`pull for the brig bearing W`, `send the boat to the brig bearing E with the master`, chapter 26). Words that leave no sail are refused with the strangers' own words, so that you can name her as the lookout does: "Nothing in sight answers to 'the brig right astern'; the strangers: a brig-sloop of war on the starboard bow, bearing NE, distant eight cables ..."
 
 ## What a world order is, and why you cannot give one
 
