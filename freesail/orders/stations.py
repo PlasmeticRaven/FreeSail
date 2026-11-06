@@ -146,8 +146,13 @@ _HAND_OVER = re.compile(r"^hand over the deck\s*$")
 # the deck's conversation (package 41): `say <words>` (not `say to the <station>`, which
 # is `tell`), and the lookout's `hail <words>` (`hail the deck <words>`)
 _SAY = re.compile(r"^say\s+(?!to\s+(?:the\s+)?)(?P<q>.+)$")
+# The port's `hail the pilot` is the pilot's words and nothing after them; a hail that runs
+# on ("hail The pilot's cutter is out of sight to the westward") is the lookout's report
+# (package 95; the brig off Falmouth's lesson 2: it was read as `hail the pilot`).
 _HAIL = re.compile(
-    r"^hail\s+(?:the\s+deck\s+)?(?!(?:the\s+)?pilot|for\s+a\s+pilot|pilots\b)(?P<q>.+)$"
+    r"^hail\s+(?:the\s+deck\s+)?"
+    r"(?!(?:the\s+)?pilot(?:'s)?(?:\s+(?:boat|cutter|gig))?$|(?:the\s+)?pilots$|for\s+a\s+pilot$)"
+    r"(?P<q>.+)$"
 )
 # A `hail` that reached the stations names no sail (`orders.signals` takes those first).
 HAIL_NAMES_NO_SAIL = (

@@ -13695,6 +13695,76 @@ def test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_r
 
 
 # ---------------------------------------------------------------------------
+# Package 95 (`docs/design/Design-SailByName.md`): the sail by her name
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_395_the_resolver_narrows_by_the_kind_the_quarter_the_bearing_and_the_distance():
+    """Four cases, each picking a sail the nearest-of-kind rule would not, by the words the
+    lookout himself uses: the kind by the words made out of her ('the brig-sloop', 'the
+    merchant brig'); the kind and the quarter ('the brig on the starboard bow', the farther
+    of two alike, by make out and by the hail with its colon or without); the quarter and
+    the bearing with no kind said (make out and the bearing of); the bearing and the
+    distance ('the sail bearing NE distant two miles', by the glass, make out and the
+    chase). The boat by the same words: `send the boat to the brig bearing E`, `pull for the
+    brig bearing W`, and the refusal at sea naming the form."""
+    from tests.test_sail_by_name import (
+        test_the_bearing_and_the_distance_pick_the_far_sail_on_the_same_bearing,
+        test_the_boat_is_sent_to_a_sail_named_as_the_lookout_names_her_and_the_refusal_says_how,
+        test_the_kind_and_the_quarter_pick_the_farther_of_two_alike,
+        test_the_kind_by_the_words_made_out_picks_her_over_a_nearer_sail,
+        test_the_lookouts_line_is_read_back_into_its_clauses_commas_or_none,
+        test_the_manned_boat_pulls_for_the_sail_by_the_lookouts_words,
+        test_the_quarter_and_the_bearing_name_a_sail_with_no_kind_said,
+    )
+
+    test_the_lookouts_line_is_read_back_into_its_clauses_commas_or_none()
+    test_the_kind_by_the_words_made_out_picks_her_over_a_nearer_sail()
+    test_the_kind_and_the_quarter_pick_the_farther_of_two_alike()
+    test_the_quarter_and_the_bearing_name_a_sail_with_no_kind_said()
+    test_the_bearing_and_the_distance_pick_the_far_sail_on_the_same_bearing()
+    test_the_boat_is_sent_to_a_sail_named_as_the_lookout_names_her_and_the_refusal_says_how()
+    test_the_manned_boat_pulls_for_the_sail_by_the_lookouts_words()
+
+
+def test_truth_7_396_ambiguity_goes_to_the_closer_and_words_that_leave_none_are_refused():
+    """Two brig-sloops answering 'the brig-sloop bearing NE' alike: the closer. A clause that
+    leaves no sail ('the brig right astern') is refused with the strangers' own words, so
+    that the asker can name her as the lookout does."""
+    from tests.test_sail_by_name import (
+        test_two_sails_answering_alike_give_the_closer_and_none_is_refused_with_the_strangers,
+    )
+
+    test_two_sails_answering_alike_give_the_closer_and_none_is_refused_with_the_strangers()
+
+
+def test_truth_7_397_a_name_over_all():
+    """The Wasp by her name, two miles off on the bearing of the nearer Raven of her kind:
+    the glass, make out and the bearing of take her, though the words after her name would
+    give the Raven."""
+    from tests.test_sail_by_name import (
+        test_a_name_over_all_against_a_nearer_sail_of_the_same_kind_and_bearing,
+    )
+
+    test_a_name_over_all_against_a_nearer_sail_of_the_same_kind_and_bearing()
+
+
+def test_truth_7_399_the_recorded_passages_name_their_sails_as_before():
+    """The proof by toggle: the encounter, the convoy and the first action played by their
+    rules captains with the resolver on and off give the same count of lines by kind and the
+    same words in every line that names a sail (the lookout's, the hail's, the signals', the
+    chase's helm, the orders given and refused); and the lookout's hail of the pilot's
+    cutter is his hail from the masthead, the port's `hail the pilot` kept whole."""
+    from tests.test_sail_by_name import (
+        recorded_passages_name_their_sails_as_before,
+        test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb,
+    )
+
+    recorded_passages_name_their_sails_as_before()
+    test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb()
+
+
+# ---------------------------------------------------------------------------
 # Package 82b, item 4 (`docs/design/Design-DoorAndVisitor.md` §5): not half blind at far detail
 # ---------------------------------------------------------------------------
 

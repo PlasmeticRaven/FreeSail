@@ -55,7 +55,7 @@ The tiers' distances are judgement on the period's day glass at sea.
 
 `make her out` sends a glass aloft for the nearest sail, or for the one you name by what the tops have called her (`make out the brig`, `make out the stranger`), and answers at once with what the distance allows: the glass reaches half as far again as the eye, so a sail at five miles is a brig to the glass and a sail to the eye, and a sail at nine miles is nothing more to either, hull down. The answer is the same line the lookout would give in time, and the event `a stranger's colours made out` fires for the book when it is her colours the glass makes out.
 
-`give chase` (also `chase the stranger`, `chase the brig`) puts the helm for her bearing, which is Luce's rule for a chaser, to keep the chase on the same compass bearing and so attain her in the shortest time (Luce 1884 p. 553). Given again for the same sail, it reads how her bearing has drawn since the last order and leads the course off the bearing by what brings the drift to nothing, worked from the drift, the lookout's estimate of her distance and your own speed and course, as the master would work it on the slate; the line says how far the bearing drew and how far the course is led, and it never puts her head nearer the wind than she lies close-hauled. It is a helm order and no more: the chase runs on at her plan's speed, you make what sail you please, and the book gives the order again every glass and as the tops make out more of her, which is how the naval cruise's book chases its stranger. Within four cables of a vessel the log says she is within hail, with her course and her colours: the hail is chapter 23's and the guns chapter 22's; the boat sent to her and the prize are not yet in the game.
+`give chase` (also `chase the stranger`, `chase the brig`) puts the helm for her bearing, which is Luce's rule for a chaser, to keep the chase on the same compass bearing and so attain her in the shortest time (Luce 1884 p. 553). Given again for the same sail, it reads how her bearing has drawn since the last order and leads the course off the bearing by what brings the drift to nothing, worked from the drift, the lookout's estimate of her distance and your own speed and course, as the master would work it on the slate; the line says how far the bearing drew and how far the course is led, and it never puts her head nearer the wind than she lies close-hauled. It is a helm order and no more: the chase runs on at her plan's speed, you make what sail you please, and the book gives the order again every glass and as the tops make out more of her, which is how the naval cruise's book chases its stranger. Within four cables of a vessel the log says she is within hail, with her course and her colours: the hail is chapter 23's, the guns chapter 22's and the boat sent to her chapter 26's; the prize is not yet in the game.
 
 ```orders frigate plain-sail
 # rejected: make her out
@@ -71,6 +71,18 @@ standing order "her colours": at a stranger's colours made out then give chase
 standing order "lost": at a sail lost then shape a course for Falmouth
 standing order "within hail": at a sail within hail then heave to
 ```
+
+## Naming a sail
+
+Every order and reading that takes a sail names her the same way, and the surest way is the lookout's own words read back to him. Her kind is any of the words the tops and the glass have made out of her so far (`the brig`, `the brig-sloop`, `the merchant brig`, `the French brig`, never more than has been made out: a merchant brig a mile off is "a brig" until the glass has her nearer); after it come, in any order and with commas or none, where she lies from your head (`on the larboard quarter`, `on the starboard bow`, `abeam to starboard`, `right ahead`, `right astern`), her bearing by compass (`bearing NE by N`) and her distance (`distant a mile`, `four cables off`). Each narrows the sails in sight to those that answer it, with the allowance the lookout's own rounding wants: a point either side of the quarter, a point and a half of the bearing, half to twice the distance he judged. Where more than one sail still answers, the nearer is meant. A name the deck knows is surer than any of these and is taken over them: `the Raven` is the Raven, wherever the words after her name would point.
+
+```orders frigate plain-sail
+# rejected: make out the brig on the larboard quarter, bearing NE by N, distant a mile
+# rejected: the glass on the sail bearing NE distant two miles
+# rejected: give chase to the schooner on the starboard bow
+```
+
+Refused here for the same want, a sail in sight (and `the bearing of the brig right astern`, a reading, answers "not in sight"); at sea the same words are taken by `make her out`, `the glass on`, `give chase`, `the bearing of`, the hail (chapter 23), and the boat (`pull for the brig bearing W`, `send the boat to the brig bearing E with the master`, chapter 26). Words that leave no sail are refused with the strangers' own words, so that you can name her as the lookout does: "Nothing in sight answers to 'the brig right astern'; the strangers: a brig-sloop of war on the starboard bow, bearing NE, distant eight cables ..."
 
 ## What a world order is, and why you cannot give one
 

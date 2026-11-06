@@ -241,7 +241,11 @@ def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
     tokens = rest.split()
     low = tokens[0].lower()
     by_rig = low in ("a", "an")
-    if by_rig and _the_lookout_speaks(ship):
+    from freesail.world import lookout
+
+    if _the_lookout_speaks(ship) and (lookout.SAIL_BY_NAME or by_rig):
+        # the lookout hails the deck, never a sail (package 95; the brig off Falmouth's
+        # lesson 2: "hail The pilot's cutter is out of sight" is his report of her)
         return None
     cut = re.match(r"^(?P<who>[^:,]+?)\s*[:,]\s*(?P<words>.*)$", rest)
     if cut is not None and _names_a_sail(ship, cut.group("who"), by_rig):
@@ -260,6 +264,8 @@ def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
     for n in range(2, last + 1):
         head = " ".join(tokens[:n]).rstrip(",:")
         if _names_a_sail(ship, head, by_rig):
+            n = _longest_sail_head(ship, tokens, n, last, by_rig)
+            head = " ".join(tokens[:n]).rstrip(",:")
             return head, " ".join(tokens[n:]).strip(" ,:")
     return None
 
@@ -300,6 +306,8 @@ def _names_a_sail(ship: Any, who: str, by_rig: bool = False) -> bool:
         return w.split()[-1] in _SAIL_WORDS and w.split()[-1] not in _ANY_SAIL
     if w.split()[-1] in _SAIL_WORDS or w in _SAIL_WORDS:
         return True
+    if _sail_with_clauses(w):
+        return True  # 'the brig on the larboard quarter', 'the sail bearing NE' (package 95)
     world = world_of(ship) if ship is not None else None
     sea = getattr(world, "vessels", None) if world is not None else None
     if sea is not None:
@@ -309,6 +317,39 @@ def _names_a_sail(ship: Any, who: str, by_rig: bool = False) -> bool:
         except Exception:  # noqa: BLE001 - a view with no finder
             pass
     return False
+
+
+def _sail_with_clauses(words: str) -> bool:
+    """Whether the words name a sail by her kind and the lookout's clauses (her quarter,
+    her bearing, her distance; package 95): a clause said, and before it a sail's word or
+    none ('the sail on the starboard bow', 'the brig bearing NE by N distant a mile')."""
+    from freesail.world import lookout
+
+    said = lookout.read_sail_words(words) if lookout.SAIL_BY_NAME else None
+    if said is None:
+        return False
+    if said.quarter is None and said.bearing_deg is None and said.distance_m is None:
+        return False
+    head = said.name.split()
+    return not head or head[-1] in _SAIL_WORDS
+
+
+def _longest_sail_head(ship: Any, tokens: list[str], n: int, last: int, by_rig: bool) -> int:
+    """The head of a hail's line that names a sail, from its shortest (`n` words) out to
+    the lookout's clauses after it ('hail the brig on the larboard quarter what ship is
+    that' hails the brig on the larboard quarter; package 95); `n` when no clause
+    follows, as before."""
+    from freesail.world.lookout import read_sail_words
+
+    short = read_sail_words(" ".join(tokens[:n]).rstrip(",:"))
+    for m in range(last, n, -1):
+        head = " ".join(tokens[:m]).rstrip(",:")
+        said = read_sail_words(head)
+        if said is None or short is None or said.name != short.name:
+            continue
+        if _sail_with_clauses(head) and _names_a_sail(ship, head, by_rig):
+            return m
+    return n
 
 
 def _nation_words(ship: Any, words: str) -> str | None:
