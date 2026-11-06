@@ -152,3 +152,34 @@ Nothing in a recorded passage: each mend changes what a reader answers only insi
 hull's block or under `follow`, and the recorded passages run the player's ship followed, one
 hull's block at a time. The proof is the pins unmoved on the final tree (the suites' figures in
 the postscript).
+
+## Postscript: as built (2026-11-06)
+
+Approved by the lead as written; built in one step. What the note did not foresee, each a
+reader the binding itself moved, mended by the same two roads:
+
+- **The World's own state set or keyed through a bound handle.** A plain attribute of the
+  World's set through a Hull lands on the Hull, and a table keyed by the World misses a Hull.
+  `hulls.world_of(handle)` gives the World for: the unheld questions (`director.questions_of`),
+  the books (`books.books_of`), the person journals' first making (`journal.py`), the seats'
+  count (`seats.py`), the painter (`pictures.set_painter`, `painter_of`), the director's channel
+  listeners and seat doors.
+- **A hull kept in a hull.** A boat made through the frigate's bound handle was adopted with the
+  frigate's Hull as her World: `crews.make_hull` and `adopt_hull` take `world_of(world)`.
+- **A block entered through a bound handle.** `boats.follow_boat` wrote `with world.as_hull(boat):
+  world.record(...)`, and a Hull's own `record` makes herself current again: written on the World
+  itself.
+- **Identity.** The desk told its seats by `seat.hull is world or seat.hull.parent is world`:
+  `world_of(seat.hull) is world` (`agents/remote.py`, two places).
+- **Item 18 narrowed.** `acts.target_of` serves the inputs too, for which `""` is the followed
+  hull's (`World.submit` names a hull only when she is not followed); the act's rule is
+  `acts.act_target_of`, used by `give` alone.
+- **Item 13 took two lines of 65's file**, both granted: the binding, and the other ship's shape
+  notice not given on the player's own ship (`_station_notices` told another ship by its world's
+  `shape`, which every Hull has).
+- **A moved outcome, ruled.** The boarders' officer's test passed on the trunk only by the fault
+  (the Amazon's Health, read in the Medusa's block, killed the Medusa's man of the same post for
+  hers): its scene is set by seed 1, and the default seed's outcome is pinned beside it.
+
+Four tests' asserts of the old binding (a system's `world` is the World) read the hull's, each
+with its comment: `test_aboard_another`, `test_hulls`, `test_checkpoint`, `test_ports`.

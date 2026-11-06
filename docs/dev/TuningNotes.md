@@ -17974,8 +17974,8 @@ and the seats' `director.seat` line given that handle so the act is keyed `""`; 
 gives an act keyed `""` to `world.players` when another hull is current or followed (the World
 itself otherwise, as in every recorded passage).
 
-**The harness, 65's file (under its own heading, as the lead asked).** Two lines, where one was
-granted: `Harness.__init__` binds `world.own` (a Hull kept as given), and `_station_notices` gives
+**The harness, 65's file (under its own heading, as the lead asked).** Two lines, both granted
+by the lead (one asked first, the second when the first was found to need it): `Harness.__init__` binds `world.own` (a Hull kept as given), and `_station_notices` gives
 the other ship's shape notice not on the player's own ship. The second is the one reader the
 binding moved: the harness told a station on another ship by its world's `shape`, which every
 Hull has, and with the first line alone every sample on the player's ship carried "X is awake, a
@@ -18009,3 +18009,30 @@ frigate's spots by the plain `station_spot`, her holder, water and reckoning her
 guard, walking every hull's own graph through a brief, a seated captain, `follow` and back, and a
 checkpoint's round trip, failing by path on any reference to the World but the two the sea keeps
 (a `HullView`'s `game`; her far body's brain). No pin moved.
+
+**Found by the suites, mended (the design note's postscript).** A boat made through the frigate's
+bound handle was a hull in a hull (`crews.make_hull`, `adopt_hull` take the World); `boats.
+follow_boat`'s line written on the World with the boat current (a Hull's own `record` makes
+herself current again); the desk's seats told by the World behind their handle (`agents/remote.py`);
+the acts' `""` rule confined to the acts (`acts.act_target_of` in `give`): the first cut gave the
+followed hull's inputs, keyed `""` by `World.submit`, to the player's ship in the replay, and
+the aboard-another replay's digests parted. Four tests' asserts of the old binding (a system's
+`world` is the World) read the hull's, each with its comment.
+
+**A moved outcome, bisected and ruled.** `test_between_hulls`' boarders' officer (and truth
+7-325, which runs it) failed: the Amazon's first lieutenant Mr Pearce is killed by a tomahawk at
+tick 530 and nobody leads on to the deck won. Undoing the binding for one system at a time, Health
+alone restores the trunk's outcome; a trace of `Health.hit` shows why: the round runs in the
+Medusa's block, and on the trunk her boarder s002 struck was named by her Health (holding the
+World) as the Medusa's man of the same post (Mr Newton), so the trunk's fight never killed a man
+of hers. The lead's ruling: the test's scene set by seed (`test_fight._alongside(seed=)`, default
+7 unchanged; seed 1 the first from 1 under which the first lieutenant, Mr Freeman by that muster,
+stands at the deck won), every assertion kept; the default seed's outcome pinned beside it (Mr
+Pearce killed at 530, the deck carried, no officer leads on; who leads then is 74's).
+
+**The pace (informative; the floors are the build machine's).** The pace tests alone on the
+branch: 12 of 13; truth 7-159 (the convoy of six at far detail) read 471 against 500. Toggled
+against the trunk, the measure alternating, four rounds: the branch 457, 502, 503, 518; the trunk
+495, 486, 475, 517: alike, the container's margin (82b's builder read the trunk at 494, 473, 502
+in the same container). The others: three stations seated 502 to 535; the frigate alone 479; the
+Channel observed 283.
