@@ -4051,7 +4051,13 @@ director's grant shown) are facts for this brief, each still true. The owner's t
 2026-11-01 and 11-05 (the testing-week section above; the case studies in `docs/playtests/`)
 holds the nasty surprises: a door restationed as "the Mr Hill" (82b mends the road, 96 says
 the configuration), a ship with no station briefed for a model, a scenario whose squadrons
-could not be set but by the file.
+could not be set but by the file. Two facts from the builders of 2026-11-06 for the
+configuration's identities: a person's id is his post's and so shared by every hull's company
+(82b's item 5 found the boat landing another hull's men of the same posts; the lead booked the
+ids to 97 with the façade's readers), and a vessel's id is what the scenarios write as her
+name, so the strangers' row's `id` tells a client her name before the deck has it (95's
+finding; the id left as it is, the viewer's handle): the configuration gives every person and
+every hull an id apart from the name, and the name is the deck's to learn.
 
 **The design document, first, for the lead's gate** (`docs/design/Design-Configuration.md`, in
 83's shape): (1) the configuration of a ship as one described thing, its fields and their
