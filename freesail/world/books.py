@@ -134,8 +134,10 @@ def books_of(world: Any) -> Books:
     """The World's books, made at the first call (a checkpoint from before has none)."""
     books = getattr(world, "books", None)
     if books is None:
+        from freesail.world.hulls import world_of
+
         books = Books()
-        world.books = books
+        world_of(world).books = books  # the World's, whatever handle made them (97)
     return books
 
 

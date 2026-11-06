@@ -236,7 +236,9 @@ def test_the_players_seat_on_another_ship_is_hers_and_stays_when_the_drivers_mov
     assert w.player_seat is None and hull.player_seat is seat and seat.world is hull
     # a second seat on his own ship is his own ship's (the X's stays hers)
     own_seat = seat_player(w, "officer", door="console")
-    assert own_seat is not seat and own_seat.world is w and w.players.player_seat is own_seat
+    # bound to his own ship's hull (package 97, the design note's item 14; was the World)
+    assert own_seat is not seat and own_seat.world is w.players
+    assert w.players.player_seat is own_seat
 
 
 def test_the_seat_goes_with_its_person_by_the_boat_and_replays():
