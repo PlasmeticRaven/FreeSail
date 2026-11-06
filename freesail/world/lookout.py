@@ -712,6 +712,9 @@ class Lookout:
             if fid not in seen:
                 self._sail_said.pop(fid, None)
                 self._sail_known.pop(fid, None)
+                # her name is lost with her (package 95): a sail lost in the night is a
+                # stranger at dawn, until she is closed and made out again
+                getattr(self, "_sail_ident", {}).pop(fid, None)
                 getattr(self, "_colours_said", {}).pop(fid, None)
                 getattr(self, "_glass_said", {}).pop(fid, None)
                 out.append(
@@ -723,7 +726,67 @@ class Lookout:
                     )
                 )
         self._sails_seen = seen
+        self._identify(world, seen)
         return out
+
+    # -- her name, once the deck has it (package 95) -------------------------------------
+
+    def _identify(self, world: Any, seen: dict[str, str]) -> None:
+        """The deck learns a sail's name, and the lookout keeps it while she is in sight:
+        by a hail (her answer to ours, or her own hail of us, in her words: her own name,
+        or the name a liar gives); by the private signal answered right (a friend, known by
+        her pendant and the list); by her colours made out on a consort (of our squadron, or
+        under our orders), known by her pendant. Her colours alone on a stranger give her
+        nation, never her name."""
+        if not SAIL_BY_NAME or not seen:
+            return
+        tick = int(world.clock.tick)
+        log = getattr(world, "log", None)
+        heard: dict[str, list[str]] = {}
+        if log is not None:
+            # the hails since the last look (a look a minute), newest first
+            for i in range(len(log) - 1, -1, -1):
+                e = log[i]
+                if e.tick < tick - LOOK_WINDOW_S:
+                    break
+                data = e.data or {}
+                if e.kind == "hail.answered" and not data.get("own"):
+                    heard.setdefault(f"sail:{data.get('id')}", []).append(str(data.get("answer")))
+                elif e.kind == "hail.heard":
+                    heard.setdefault(f"sail:{data.get('id')}", []).append(str(data.get("words")))
+        captain = getattr(world, "captain", None)
+        recognised = getattr(captain, "recognised", None) or {}
+        locker = (getattr(world.ship, "extra", None) or {}).get("signals")
+        challenges = getattr(locker, "challenges", None) or {}
+        own = _own_vessel_id(world)
+        for fid in seen:
+            if fid in getattr(self, "_sail_ident", {}):
+                continue
+            sea = getattr(world, "vessels", None)
+            v = sea.get(fid.removeprefix("sail:")) if sea is not None else None
+            if v is None:
+                continue
+            name, how = "", ""
+            for words in heard.get(fid, ()):
+                name = _name_in(words, v)
+                if name:
+                    how = "by hail"
+                    break
+            if not name:
+                rec = recognised.get(v.id) or {}
+                verdict = (challenges.get(v.id) or {}).get("verdict")
+                if rec.get("how") == "the private signal" or verdict == "right":
+                    name, how = str(v.name), "by the private signal"
+            if not name and self._sail_said.get(fid, 0) >= 2 and _consort(world, v, own):
+                name, how = str(v.name), "by her pendant"
+            if name:
+                if not hasattr(self, "_sail_ident"):
+                    self._sail_ident = {}
+                self._sail_ident[fid] = {"name": name, "how": how, "tick": tick}
+
+    def ident_name(self, fid: str) -> str:
+        """The name the deck knows a sail in sight by, '' while she is a stranger."""
+        return str((getattr(self, "_sail_ident", {}).get(fid) or {}).get("name") or "")
 
     def _tidy_signals(self, world: Any) -> None:
         """The ship's own hoists that have flown their time come down of themselves
@@ -1015,8 +1078,13 @@ class Lookout:
                     # which under false colours is the ruse's (package 71)
                     "nation": v.nation_shown if v is not None and level >= 2 else None,
                     "spoken": bool(v is not None and v.spoken),  # within hail at any time
-                    "words": f"{head} {relative}, bearing {point}, distant "
-                    f"{estimate_words(s.judged_m)}{detail}",
+                    # her name once the deck has it, while she is in sight (package 95)
+                    "name": self.ident_name(s.feature.id) or None,
+                    "words": named_words(
+                        self.ident_name(s.feature.id),
+                        f"{head} {relative}, bearing {point}, distant "
+                        f"{estimate_words(s.judged_m)}{detail}",
+                    ),
                 }
             )
         if not items:
@@ -1476,9 +1544,12 @@ class Lookout:
         ordered = sorted(self.sightings, key=lambda s: (_ORDER.get(s.seen_as, 9), s.distance_m))
         items = []
         for s in ordered:
-            items.append(
-                self._data(s, heading_rad) | {"words": self.words(s, heading_rad).rstrip(".")}
-            )
+            words = self.words(s, heading_rad).rstrip(".")
+            name = self.ident_name(s.feature.id) if s.seen_as == "sail" else ""
+            if name:
+                # the sail the deck knows by name, named (package 95)
+                words = "Sail ho! " + _head(named_words(name, words.removeprefix("Sail ho! ")))
+            items.append(self._data(s, heading_rad) | {"words": words})
         dangers = [i for i in items if i["seen_as"] == "danger"]
         rest = [i for i in items if i["seen_as"] != "danger"]
         shown = dangers + rest[: max(0, READING_MAX - len(dangers))]
@@ -1505,6 +1576,7 @@ class Lookout:
             v = self._vessel(world, s) if world is not None else None
             if v is not None and self._sail_said.get(s.feature.id, 0) >= 1:
                 words += f", {v.course_words()}"
+            words = named_words(self.ident_name(s.feature.id), words)  # package 95
             items.append(self._data(s, heading_rad) | {"words": words})
         if not items:
             return {"in_sight": False, "words": "not in sight", "count": 0, "items": []}
@@ -1718,6 +1790,55 @@ def _in_quarter(relative_deg: float, quarter: tuple[str, str | None]) -> bool:
         return False
     # a side said holds off the line ahead and astern, where the sides meet
     return said_side is None or side == said_side or a < k or a > 16.0 - k
+
+
+# The hails a look reads for a sail's name: those since the last look, a minute ago.
+LOOK_WINDOW_S = 60
+
+
+def _own_vessel_id(world: Any) -> str:
+    try:
+        from freesail.world.signals import own_id
+
+        return str(own_id(world))
+    except Exception:  # noqa: BLE001 - a world with no sea
+        return ""
+
+
+def _name_in(words: str, vessel: Any) -> str:
+    """The name a sail gives in her words: her own, or the name a liar of the hail's table
+    gives under the flag she shows; '' when none is said."""
+    low = f" {' '.join(str(words or '').lower().split())} "
+    own = str(getattr(vessel, "name", "") or "").removeprefix("the ").removeprefix("The ")
+    if own and re.search(rf"\b{re.escape(own.lower())}\b", low):
+        return own
+    from freesail.world.hail import _table
+
+    for names in (_table().get("lies") or {}).values():
+        for n in names or ():
+            if re.search(rf"\b{re.escape(str(n).lower())}\b", low):
+                return str(n)
+    return ""
+
+
+def _consort(world: Any, vessel: Any, own: str) -> bool:
+    """Whether the sail is a consort of ours: of our squadron, or under our orders."""
+    if own and str(getattr(vessel, "under_orders_of", "") or "") == own:
+        return True
+    sets = getattr(world, "squadrons", None)
+    if sets is None or not own or not hasattr(sets, "of"):
+        return False
+    ours, hers = sets.of(own), sets.of(str(vessel.id))
+    return ours is not None and ours is hers
+
+
+def named_words(name: str, words: str) -> str:
+    """The lookout's words for a sail, led by her name: 'the Raven, a brig-sloop of war on
+    the starboard bow, ...'."""
+    if not name:
+        return words
+    head = words[:1].lower() + words[1:]
+    return f"the {name}, {head}"
 
 
 def vessel_in_sight(world: Any, words: str, vessels: Any = None) -> Any:

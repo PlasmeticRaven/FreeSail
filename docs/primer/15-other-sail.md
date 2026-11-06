@@ -32,6 +32,8 @@ A ship that shows no colours is said so, and that is all the lookout can say of 
 
 `the strangers` (also `what sail is in sight`) is every sail in sight, nearest first, each by her bearing, her distance by estimation and what has been made out of her so far; `a sail in sight` is the shorter row of chapter 14, in sight or not with the nearest sail's words. The distance by estimation is the lookout's judgement, a sixth out either way as the land's is, drawn once a sighting and held while she makes no way (chapter 12); the chart in the browser draws each sail at that bearing and that distance from the reckoned position, with a bar of doubt along the bearing that grows with the estimate, and the words beside it. Nothing draws where she truly is.
 
+A sail is a stranger in these rows until the deck learns her name: by the hail, in her own words (her answer to yours, or her hail of you; a liar under false colours is known by the name she gives, which is all the deck has), by the private signal answered right (a friend known by her pendant), or, for a consort of your squadron or a ship under your orders, by her colours made out. From then she is named in `the strangers`, `what is in sight` and `a sail in sight` ("the Raven, a brig-sloop of war abeam to starboard, bearing NE, distant two cables ..."), and her item carries `name`, while two of a kind not yet spoken read alike. Her colours alone give her nation and never her name. The name is the lookout's memory of her and the period's: it goes with her when she is lost sight of, and a sail lost in the night is a stranger at dawn, to be closed, made out and spoken again. The lookout's own lines say what he sees and not her name.
+
 ```orders frigate plain-sail
 the strangers
 what sail is in sight
