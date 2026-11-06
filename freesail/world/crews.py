@@ -316,6 +316,9 @@ def make_hull(world: World, vessel: Any) -> Any:
     her stations, her captain with the brain's intent), then adopted into the one World
     (`adopt_hull`), the building World discarded. Measured 0.5 to 0.7 s on the build
     machine; made once per ship, since step 5 keeps her asleep."""
+    from freesail.world.hulls import world_of
+
+    world = world_of(world)  # the one World, whatever handle asks (package 97)
     temp = CrewedWorld(world, vessel)
     return adopt_hull(world, vessel, temp)
 
@@ -328,6 +331,9 @@ def adopt_hull(world: World, vessel: Any, temp: Any) -> Any:
     `Dealings`, `Navigation`, the standing runtime, the captain, the harnesses: each reads
     the hull as its world from here, the shared things through its properties and the
     World's methods with her current); registered in `world.hulls` and on the vessel."""
+    from freesail.world.hulls import world_of
+
+    world = world_of(world)  # a hull is kept in the World itself, never in another hull
     hull = temp.__dict__["_own"]
     hull.world = world
     hull.id = str(vessel.id)

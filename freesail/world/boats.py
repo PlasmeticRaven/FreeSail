@@ -288,9 +288,12 @@ def follow_boat(world: Any, hull: Any, person: Any) -> None:
     `follow` stand for the owner's own choice."""
     if getattr(_root(world), "followed", None) == hull.id:
         return
-    _root(world).followed = str(hull.id)
-    with world.as_hull(hull):
-        world.record(
+    root = _root(world)
+    root.followed = str(hull.id)
+    # on the World itself, the boat current (package 97: a hull's façade given here, the
+    # player's bound systems', makes herself current again in her own `record`)
+    with root.as_hull(hull):
+        root.record(
             Severity.ROUTINE,
             "hull.followed",
             f"The drivers follow {person.name} into {hull_name_of(hull)}: her readings are his.",

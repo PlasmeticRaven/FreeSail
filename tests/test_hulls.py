@@ -230,7 +230,8 @@ def test_a_checkpoint_from_before_the_hull_converts_on_load_and_carries_on_alike
     assert not any(name in loaded.__dict__ for name in hulls.PER_SHIP_FIELDS)
     # the ports parted (step 3): the world's files on `ports`, her dealings on the hull
     assert type(loaded.ports).__name__ == "Ports" and "boat" not in loaded.ports.__dict__
-    assert type(loaded.dealings).__name__ == "Dealings" and loaded.dealings.world is loaded
+    # her dealings bound to her hull at the load (package 97, `hulls.bind_to_hull`; was the World)
+    assert type(loaded.dealings).__name__ == "Dealings" and loaded.dealings.world is loaded.own
     assert loaded.ports.ports is loaded.dealings.ports and loaded.dealings.boat is not None
     assert loaded.own.world is loaded and loaded.own.id == PLAYER_ID
     assert loaded.log.digest() == w.log.digest() and loaded.ship.name == w.ship.name

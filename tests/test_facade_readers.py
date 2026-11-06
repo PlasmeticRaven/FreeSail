@@ -113,10 +113,12 @@ def test_truth_7_423_the_directors_writes_land_on_the_players_hull_under_follow(
     # an act of the player's own hull ("" by `hull_id_of`) is hers under `follow`
     with w.as_hull(f):
         assert acts.hull_id_of(w) == ""
-    assert acts.target_of(w, {"station": D.DIRECTOR}) is f
-    assert acts.target_of(w, {"station": "captain", "ship": x.id}) is x
+    assert acts.act_target_of(w, {"station": D.DIRECTOR}) is f
+    assert acts.act_target_of(w, {"station": "captain", "ship": x.id}) is x
+    # an input keyed "" is the followed hull's, as `World.submit` keys it, and stays so
+    assert acts.target_of(w, {"order": "set the royals"}) is w and w.own is x
     w.follow('"the ship"')
-    assert acts.target_of(w, {"station": D.DIRECTOR}) is w  # the World itself, as before
+    assert acts.act_target_of(w, {"station": D.DIRECTOR}) is w  # the World itself, as before
 
 
 # ---------------------------------------------------------------------------
