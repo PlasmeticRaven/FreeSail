@@ -2225,7 +2225,10 @@ failures); the pace alone 12 of 13, truth 7-159 at 497 against 500 and toggled a
 trunk alternating (the branch 504, 480, 504; the trunk 494, 473, 502), the container's margin,
 no pin moved. **The lead's merge:** the trial on 48ebefc (the trunk with 75's lee-port step)
 clean and lint-clean; the fast tier whole on it green, exit 0, every test passed; the whole suite in the cloud
-dispatched, the figures to follow. Package 82b is closed; package 95 launches on this merge.
+run 36 on 0d1127f (08:24 to 09:17 UTC): lint green, all six shards green, 6,663 passed, 11 skipped,
+12 expected failures; the pace job 9 of 13, the four floors under at 446 to 489 ticks a second against
+500 (the runner's speed, as on every run; informative). Package 82b is closed; package 95 launched
+on this merge.
 
 ### Package 65, step 3 (the reports, the call and the command devolved), as merged (2026-11-06)
 
