@@ -10,6 +10,7 @@ calls `step` and `handle_order` and needs nothing else.
 
 from __future__ import annotations
 
+import weakref
 from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, Any
 
@@ -24,6 +25,14 @@ if TYPE_CHECKING:
 Note = tuple[str, str, str, str | None, dict[str, Any]]  # severity, kind, text, subject, data
 Stepper = Callable[["Ship", float, "Wind"], None]
 OrderHandler = Callable[["Ship", str], tuple[str, str, dict[str, Any]]]
+
+# The yards on a schooner's mast, each ship's (`Ship.on_schooner_mast`; package 75, B3.4), found
+# once a ship from her parts as filed and held here, beside her and not in her: the checkpoint
+# pickles the Ship's own `__dict__` (`core/replay._Pickler`), and `pickle` her `__dict__` too,
+# so a memo kept in her (as `_chain_memo` is) would put a key in every save that had read the
+# rule, and one kept here puts none. A ship read back from a checkpoint finds them again from the
+# same parts, the same yards.
+_SCHOONER_YARDS: weakref.WeakKeyDictionary[Ship, frozenset[str]] = weakref.WeakKeyDictionary()
 
 
 class Ship:
@@ -194,6 +203,76 @@ class Ship:
             return False
         root = self.mast_of(p)
         return root is not None and root.cls == "bowsprit"
+
+    def on_schooner_mast(self, part: str | Part) -> bool:
+        """A braced yard on a schooner's mast, or the square sail bent to one (package 75, B3.4;
+        the lead's ruling of 2026-11-06 on docs/design/Design-Ship-PrinceDeNeufchatel.md §12.2a):
+        "An after mast with yards and no yard on its lower mast handles as a fore-and-after's
+        mast". The *Neufchatel*'s main was "rigged as a schooner" though her foremast was
+        "rigged as a brig" (Cobb 1841 vol. I p. 38, as her decision 13 cites it), and the two light
+        yards of her main topgallant, or a topsail schooner's main topsail, do not make her a
+        brig to the manoeuvres.
+
+        True for a spar of class `yard` whose lower mast (`mast_of`) is not the foremost lower
+        mast carrying a braced yard and carries no braced yard on the lower mast itself (a yard
+        whose parent is that mast), and for a square sail whose yard is one. The yards under the
+        bowsprit (`under_bowsprit`) count for nothing: never such a yard, nor making the
+        bowsprit a mast with yards. Judgement: a lug's yard and a lateen yard have classes of
+        their own and are no braced yard (`Spar.is_yard`), so neither makes a mast one with
+        yards nor stands as its lower yard: a tartane's main, a lateen under a square topsail,
+        is her one mast with yards, as the cutter's is, and a polacre's square main with its
+        lower yard is hers between her two lateens.
+
+        Read from every spar as filed, wrecked or sent down or not, once a ship, and held
+        (`_SCHOONER_YARDS`): a brig whose main yard is shot away and sent down in the middle of a
+        fight stays a brig. Read where the manoeuvres count the masts with yards
+        (`evolutions.scripts._masts_with_yards`, Ext §4.2's place 1) and where the helm and the
+        gale's reduction ask whether she is square-rigged (`physics.sails._square_rigged`, place
+        3), and nowhere else: her main's yards are still braced and trimmed, and swung as after
+        yards while her fore keeps a working yard (with every fore yard shot away no mast
+        carries yards at place 1, and `evolutions.scripts.head_and_after_yards`, place 2, left,
+        puts them in neither list: reported to the lead at B3.4).
+        The limits, recorded: a schooner with a lower square-sail yard on her main (Fincham p. 78,
+        as her design cites it; the *Neufchatel*'s D10(d), not taken) still classes as a brig;
+        and so does one whose main is a pole mast with a square topsail yard filed on the lower
+        mast itself, as the smack's topsail yard is (`data/ships/smack.yaml`, no topmast), that
+        yard standing as its lower yard."""
+        p = self._part(part)
+        if isinstance(p, Sail):
+            yard = p.roles.get("yard") if p.cls == "square" else None
+            return yard is not None and yard in self._schooner_yards()
+        return isinstance(p, Spar) and p.id in self._schooner_yards()
+
+    def _schooner_yards(self) -> frozenset[str]:
+        """The ids of the braced yards on a schooner's mast (`on_schooner_mast`), found once a
+        ship from the parts as filed. Each yard's lower mast is found by its parents, not
+        through `mast_of`, whose memo is pickled with her, so that reading the rule leaves the
+        ship's own state, and so every pickle and checkpoint, as it was."""
+        found = _SCHOONER_YARDS.get(self)
+        if found is not None:
+            return found
+        on: list[tuple[str, Spar]] = []  # each braced yard and its lower mast, in file order
+        masts: dict[str, Spar] = {}  # the lower masts carrying braced yards, first seen first
+        lower: set[str] = set()  # the spars that carry a braced yard on themselves
+        for sp in self.spars.values():
+            if sp.cls != "yard":
+                continue
+            root = sp
+            while root.parent:
+                root = self.spars[root.parent]
+            if root.cls == "bowsprit":
+                continue  # under the bowsprit: counted for nothing
+            on.append((sp.id, root))
+            masts.setdefault(root.id, root)
+            if sp.parent:
+                lower.add(sp.parent)
+        schooner: set[str] = set()
+        if masts:
+            foremost = max(masts.values(), key=lambda m: m.x_m)
+            schooner = {mid for mid in masts if mid != foremost.id and mid not in lower}
+        found = frozenset(yid for yid, root in on if root.id in schooner)
+        _SCHOONER_YARDS[self] = found
+        return found
 
     # -- queries: lines -------------------------------------------------------
 
