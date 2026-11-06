@@ -1021,7 +1021,8 @@ class Desk:
             # turn opens now (recorded, so a replay speaks at the same point)
             was = a.stand_by.words if a.standing_by and a.stand_by is not None else None
             h.door_act("speak", reply.text, "its own word")
-            words = "Your words are in the log under your mark"
+            # (in the journal, not the log, since decision 60: package 65, step 2)
+            words = "Your words are in your journal under your mark"
             if h.station.name == "director":
                 # the director's words are its log's, never the play log's (package 67;
                 # R-21: "in the log under your mark" sent a note for the captain nowhere)

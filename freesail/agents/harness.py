@@ -385,8 +385,12 @@ SAMPLE_ROUTINE_LINES = 40
 
 # Why a sample is taken when the captain tells the station something (`tell the watcher
 # ...`, package 29): the words ride in the sample's `word`, not its `question`, and no
-# answer is owed.
+# answer is owed. Since package 65 (step 2; the owner's point of 2026-11-05, the fully
+# crewed brig) the reason names the speaker and the kind as each word is put
+# (`AgentState.word_reason`: "a word from the master (Mr Pascoe)", "an answer from the
+# lookout", "no answer from the gunner"); this is the captain's own, and the default.
 A_WORD = "a word from the captain"
+A_QUESTION = "a question from the captain"
 
 # The needs' stand-bys (package 54; spec M7b §20): asleep below by the station's own word
 # (the master's suggestion), and asleep where he stood when his fatigue's last step takes
@@ -441,10 +445,21 @@ NO_PERSON_ANSWER_WORDS = (
 WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke", "free.line")
 # The lines that are words said in a place (package 66): a word wakes or samples a station
 # only when it reached it (said within its hearing, or to it); the ship's own lines reach
-# every station from her log, and the director hears everything. `agent.note` is a
-# station's words when its data says where they were said (`say_aboard`).
-WORD_KINDS = (*WORDS_BETWEEN_PEOPLE, "agent.spoke", "agent.note")
+# every station from her log, and the director hears everything. A reply's prose is no
+# word said (decision 60; package 65, step 2): it is the person's own note, in his journal
+# and the director's log, and no line of the play log carries it.
+WORD_KINDS = (*WORDS_BETWEEN_PEOPLE, "agent.spoke")
 WORD_ON_DECK = "a word on deck"  # the event's words (`readings.EVENTS`)
+# The journal's kind for a reply's prose (decision 60): the model's own words, apart from
+# the journal tool's notes ("note") and the harness's lines.
+PROSE_KIND = "agent.note"
+# What the next sample tells a model whose reply was prose alone where an answer was owed
+# (decision 60): nothing happened in the world, and the tools that make a thing heard.
+NOTE_NOT_HEARD = (
+    "Your words went into your journal and nobody heard them: {owed} is before you still. A "
+    "thing is heard only when said: answer(text) answers a question put to you; "
+    "submit_order('say ...'), 'say to the <station> ...' or 'hail ...' says it in the world."
+)
 
 # The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
 NUDGE_REPEAT = (
@@ -510,6 +525,15 @@ HANDOVER_FOLDED = (
 NUDGE_EMPTY = (
     "You have replied with nothing {n} times in a row when a question or an urgent event "
     "was before you. You may answer, stand by until an event, or leave with the token "
+    "{token}."
+)
+# ...and when some of those replies were words written into the journal and nothing said
+# in the world (decision 60; package 65, step 2): the nudge names the road to being heard.
+NUDGE_NOTED = (
+    "You have written words into your journal and said nothing in the world {n} times in a "
+    "row when a question or an urgent event was before you; a thing is heard only when said "
+    "(answer(text) answers a question put to you; submit_order('say ...') or 'hail ...' says "
+    "it in the world). You may answer, stand by until an event, or leave with the token "
     "{token}."
 )
 # What the next sample tells the model of a reply taken as thinking (package 29c).
@@ -734,6 +758,8 @@ class Harness:
         self._open: Sample | None = None  # a sample awaiting its reply
         self._calls_this_sample = 0
         self._sample_had_words = False
+        self._sample_had_calls = False  # a tool call in the sample's turn (decision 60)
+        self._sample_noted = False  # prose written into the journal in the sample's turn
         self._sample_repeated = False
         self._stand_down_requested: tuple[str, str] | None = None
         self._paused_real: float | None = None
@@ -865,12 +891,48 @@ class Harness:
         kept = self.journal.kept_words()
         if not kept:
             return
-        a = self.agent
-        a.word = "\n".join([*([a.word] if a.word else []), *kept])
+        self.add_word("\n".join(kept), "the words kept for the station while nobody held it")
         self.note(
             f"The captain's words kept while nobody held the station passed to it ({len(kept)}).",
             kind=WORD_PASSED_KIND,
         )
+
+    def add_word(self, words: str, reason: str) -> None:
+        """A word for the station's next sample (`Sample.word`; package 29's `tell`): the
+        words under those already waiting, and why the sample is taken, which names the
+        speaker and the kind (package 65, step 2; the owner's point of 2026-11-05: the
+        fully crewed brig's captain was woken sixty times, thirty-eight of them by "a word
+        from the captain" that were the master's and the officer's words to him), several
+        waiting words' reasons joined. A reason is one of "a word from <who>", "an answer
+        from <who>", "no answer from <who>", "the deck", "the words kept ..."."""
+        a = self.agent
+        a.word = f"{a.word}\n{words}" if a.word else words
+        reasons = [r for r in (getattr(a, "word_reason", "") or "").split("; ") if r]
+        if reason and reason not in reasons:
+            reasons.append(reason)
+        a.word_reason = "; ".join(reasons)
+
+    def _word_reason(self) -> str:
+        """Why the waiting word samples the station: as `add_word` named it, else the
+        captain's own (`A_WORD`, the form every reason before package 65 had)."""
+        return str(getattr(self.agent, "word_reason", "") or "") or A_WORD
+
+    def _question_reason(self) -> str:
+        """Why the waiting question samples the station: who asks (`put_question`), else
+        the captain (`A_QUESTION`)."""
+        return str(getattr(self.agent, "question_reason", "") or "") or A_QUESTION
+
+    def _waiting_reason(self) -> str:
+        """Why the station is sampled for what waits for it: the question's reason, the
+        word's, or both joined when both wait ("a question from the master (Mr Hart); a word
+        from the captain")."""
+        a = self.agent
+        parts = []
+        if a.question is not None:
+            parts.append(self._question_reason())
+        if a.word is not None:
+            parts.append(self._word_reason())
+        return "; ".join(parts) or A_WORD
 
     def note(self, text: str, kind: str = "note") -> Any:
         """An entry in the station's journal, marked with whose it is (package 37g: a
@@ -968,6 +1030,10 @@ class Harness:
             )
         self._seen_log = len(world.log)
         self._sample_seen = len(world.log)
+        if self._is_directors:
+            from freesail.agents import director as director_mod
+
+            self._notes_seen = len(director_mod.log_of(world).entries)
         self.resend_brief()
         if not self.conversation:  # a conversation's first turn is what the caller puts
             self._pass_kept_words()
@@ -1178,6 +1244,10 @@ class Harness:
         self._seen_log = self._sample_seen = len(world.log)
         self._latest = self._horizon = (len(world.log), {})
         self._wait_from = (len(world.log), world.clock.stamp())
+        if self._is_directors:
+            from freesail.agents import director as director_mod
+
+            self._notes_seen = len(director_mod.log_of(world).entries)
         self._acts_last = acts.state_of(self)
         self._acts_complete = True
 
@@ -1307,16 +1377,13 @@ class Harness:
             # the human's answer, or the driver's ten real minutes (`check_unattended`)
             return
         if a.standing_by:
-            ended = A_WORD if a.word is not None else self._stand_by_ended(new)
+            ended = self._waiting_reason() if a.word is not None else self._stand_by_ended(new)
             if ended is None:
                 return
             self._resume_from_stand_by(ended)
             return
-        if a.question is not None:
-            self._sample("a question")
-            return
-        if a.word is not None:
-            self._sample(A_WORD)
+        if a.question is not None or a.word is not None:
+            self._sample(self._waiting_reason())
             return
         reason = self._policy_due(new)
         if reason is not None:
@@ -1345,9 +1412,9 @@ class Harness:
             return
         reason = self._policy_due(new)
         if reason is None and a.question is not None and a.question != self._question_sent:
-            reason = "a question"
+            reason = self._waiting_reason()
         if reason is None and a.word is not None:
-            reason = A_WORD
+            reason = self._word_reason()
         if reason is not None:
             self._fold(reason)
 
@@ -1381,15 +1448,15 @@ class Harness:
         a = self.agent
         if self._open is not None:
             if a.question is not None and a.question != self._question_sent and not a.paused:
-                self._fold("a question")
+                self._fold(self._waiting_reason())
             self._poll()  # a replay's reply may be due after this order
             return
         if a.question is None or a.paused:
             return
         if a.standing_by:
-            self._resume_from_stand_by("a question from the captain")
+            self._resume_from_stand_by(self._waiting_reason())
             return
-        self._sample("a question")
+        self._sample(self._waiting_reason())
 
     def _policy_due(self, new: list[Event]) -> str | None:
         p = self.policy
@@ -1514,8 +1581,6 @@ class Harness:
             # deck, the hull's sounds everywhere aboard, a report to the person it is for
             return knowledge.reaches(self.world, senses, e)
         data = e.data or {}
-        if e.kind == "agent.note" and "heard_by" not in data:
-            return not senses.asleep  # a station's line that is no word said in a place
         name = self.station.name
         addressee = str(data.get("to") if e.kind == "agent.said" else data.get("station") or "")
         if e.kind in WORDS_BETWEEN_PEOPLE and addressee == name:
@@ -1551,6 +1616,9 @@ class Harness:
     # the lines slept through (package 65; `__init__` sets it): a class default so that a
     # harness restored from a checkpoint written before the package has it
     _slept: tuple[int, int] | None = None
+    _last_word_reason: str = ""  # the reason of the word the last sample carried
+    _word_in_turn_reason: str = ""  # ...and of the word folded into an open turn
+    _notes_seen: int | None = None  # the director's: its log's length at its last sample
 
     def _danger_in(self, lines: list[Event]) -> Event | None:
         """A notable line by anyone but the agent that speaks of danger (`readings.
@@ -1845,13 +1913,37 @@ class Harness:
             needs=self._needs_showing(),
             you=self.line(),
             readings_elsewhere=self._readings_elsewhere(world, senses),
+            notes=self._stations_notes() if self._is_directors else None,
         )
         a.notices = []
         a.word = None  # carried once; no answer is owed (package 29, `tell`)
+        self._last_word_reason = str(getattr(a, "word_reason", "") or "")
+        a.word_reason = ""
         a.heard = []  # carried once too (package 41, the deck's conversation)
         if not self.conversation:
             self._latest = (self._sample_seen, self._watches())
         return sample
+
+    def _stations_notes(self) -> list[str] | None:
+        """The director's sample's `notes` (decision 60; package 65, step 2): the stations'
+        replies' prose since its last sample, each a note in the writer's journal and in
+        the director's log (`_say`, `PROSE_KIND`, `by` the station), heard by nobody in the
+        world; None while there are none. Read from the director's log by its length at the
+        last sample (`_notes_seen`; a director started or restored begins at the log's end:
+        what was written before it sat, or before the save, is not its to read again)."""
+        from freesail.agents import director as director_mod
+
+        entries = director_mod.log_of(self.world).entries
+        seen = self._notes_seen
+        if seen is None or seen > len(entries):
+            seen = len(entries)
+        notes = [
+            f"{e.stamp}  the {e.by}: {e.text}"
+            for e in entries[seen:]
+            if e.kind == PROSE_KIND and e.by and e.by != self.station.name
+        ]
+        self._notes_seen = len(entries)
+        return notes or None
 
     @staticmethod
     def _sample_readings(world: Any, senses: knowledge.Senses | None = None) -> dict[str, Any]:
@@ -2222,6 +2314,8 @@ class Harness:
         self._calls_this_sample = 0
         self._reads_this_sample = 0
         self._sample_had_words = False
+        self._sample_had_calls = False
+        self._sample_noted = False
         self._sample_repeated = False
         self._sample_contrary = False
         self._word_in_turn = None
@@ -2278,6 +2372,7 @@ class Harness:
             if delta.word is not None:
                 was = self._word_in_turn
                 self._word_in_turn = f"{was}\n{delta.word}" if was else delta.word
+                self._word_in_turn_reason = self._last_word_reason
         # a fold is a sampling point: the turn's two counts begin again at it (package
         # 37g, item 2)
         self._calls_this_sample = 0
@@ -2391,6 +2486,8 @@ class Harness:
             self._say(text)
         if text or reply.calls:
             self._sample_had_words = True
+        if reply.calls:
+            self._sample_had_calls = True
         if stood:
             for b in self._new_books:
                 b.state = UNSEEN  # its result never reached the model
@@ -2427,26 +2524,50 @@ class Harness:
         self._end_sample()
 
     def _say(self, text: str, own_word: bool = False) -> None:
-        """The station's words in the log under its mark. What a station with authority
-        says is notable, with the deck or without, so that its warning reaches a captain
-        who has the con (package 37g, item 10; the report's 8.2); a watcher's is routine,
-        as it was. Since package 41 the words are said in a place aboard (the deck's
-        conversation): the line's data says where, and every other station in the same
-        place hears them in its next sample; the lookout's words are a hail from the
-        masthead (`agent.hail`), heard on deck, which wakes a station with the deck that
-        stands by (`readings.DANGER_LINES`)."""
-        data: dict[str, Any] = {"station": self.station.name}
-        if own_word:
-            data["own_word"] = True
+        """A reply's prose is the person's own note (decision 60; package 65, step 2): it
+        is written in the station's journal under the model's mark (`PROSE_KIND`) and in
+        the director's log, `by` the station, and in no log of the play, so that no station
+        and no player hears it; a thing is heard in the world only when said (`say`, `say
+        to`, `hail` through `submit_order`; `answer` to a question put). Until this step the
+        text went to the log as `agent.note` through package 41's `say_aboard`, said where
+        the station stood and heard by whoever was there, and the owner saw a model's
+        out-of-character words as speech. The director's words are a thought in its own
+        log (spec M7b §6; package 50), or, opening with 'answer the player:', its answer to
+        him apart from the game (67). A plain conversation (the consent step) keeps its
+        words in its stub log as before, where `consent` reads them."""
         if self._is_directors:
-            # the director's words are a thought in its log (spec M7b §6; package 50),
-            # never a line of the play log: no station and not the player hears them; or,
-            # opening with 'answer the player:', its answer to him apart from the game (67)
             from freesail.agents import director as director_mod
 
             director_mod.thought(self.world, text, lambda t: self.note(t, kind="note"))
             return
-        say_aboard(self.world, self.station.name, self.who_words, text, data, self.actor)
+        if self.conversation:
+            data: dict[str, Any] = {"station": self.station.name}
+            if own_word:
+                data["own_word"] = True
+            self.world.record(
+                Severity.ROUTINE,
+                PROSE_KIND,
+                f"[{self.station.name}] {text}",
+                actor=self.actor,
+                data=data,
+            )
+            return
+        from freesail.agents import director as director_mod
+
+        self.journal.append(self.world, text, kind=PROSE_KIND, by=self.model_name)
+        # the director's log is the game's one, kept on the player's own hull where the
+        # director sits; a station on another hull writes her note there with that hull
+        # current, so the entry's act is the game's and replays into the same log
+        # (test_replay's fake captain of another ship: her acts are all hers)
+        world = self.world
+        players = getattr(world, "players", None)
+        root = getattr(players, "world", None)
+        if players is None or root is None:
+            director_mod.log_of(world).append(world, text, kind=PROSE_KIND, by=self.station.name)
+        else:
+            with root.as_hull(players):
+                director_mod.log_of(root).append(root, text, kind=PROSE_KIND, by=self.station.name)
+        self._sample_noted = True
 
     def _over_budget(self, c: ToolCall) -> str | None:
         """Count a call against the turn's budget (package 37g, item 2): None when it
@@ -2493,7 +2614,14 @@ class Harness:
             return
         a = self.agent
         if self._word_in_turn:
-            a.word = f"{self._word_in_turn}\n{a.word}" if a.word else self._word_in_turn
+            words = self._word_in_turn
+            reason = str(getattr(self, "_word_in_turn_reason", "") or "")
+            # the word comes again before whatever waits behind it
+            after, after_reason = a.word, str(getattr(a, "word_reason", "") or "")
+            a.word, a.word_reason = None, ""
+            self.add_word(words, reason)
+            if after:
+                self.add_word(after, after_reason)
         elif a.question is not None and self._stand_by_due is None:
             self._stand_by_due = "a question from the captain, put while the turn was open"
         self._word_in_turn = None
@@ -2809,25 +2937,41 @@ class Harness:
 
     def _count_empty(self, owed: str | None) -> None:
         """The sibling of the same order repeated (package 29c, playtest 9): a sample that
-        owed an answer and was given nothing (no tool call, and no words said) counts, each
+        owed an answer and was given nothing in the world (no tool call) counts, each
         journaled; `WELFARE_REPEAT_N` in a row bring the nudge, and one more after it the
-        pause, as the repeats do. A sample with words or a call ends the count and the
-        matter; an empty reply at a plain glass is silence decided on, and is not counted."""
+        pause, as the repeats do. A sample with a call ends the count and the matter; an
+        empty reply at a plain glass is silence decided on, and is not counted. Since
+        decision 60 (package 65, step 2) a reply of prose alone is words written into the
+        journal and nothing said in the world: where an answer was owed it counts with the
+        empty replies, journaled in those words and never as "an empty reply", and the next
+        sample carries the notice naming the tools (`NOTE_NOT_HEARD`); at a plain glass it
+        is a note, and uncounted. The count is judged by the game, never by the prose."""
         a = self.agent
-        if self._sample_had_words:
+        if self._sample_had_calls:
             a.empty_count = 0
+            a.empty_noted = 0
             if a.nudged_for == "empty":
                 a.nudged_for = None
             return
         if owed is None:
             return
         a.empty_count += 1
-        self.journal.append(
-            self.world,
-            f"An empty reply where an answer was owed ({owed}); "
-            f"{number_words(a.empty_count)} in a row.",
-            kind="agent.empty_reply",
-        )
+        if self._sample_noted:
+            a.empty_noted += 1
+            self.journal.append(
+                self.world,
+                f"Words written into the journal and nothing said in the world, where an "
+                f"answer was owed ({owed}); {number_words(a.empty_count)} in a row.",
+                kind="agent.empty_reply",
+            )
+            a.notices.append(NOTE_NOT_HEARD.format(owed=owed))
+        else:
+            self.journal.append(
+                self.world,
+                f"An empty reply where an answer was owed ({owed}); "
+                f"{number_words(a.empty_count)} in a row.",
+                kind="agent.empty_reply",
+            )
         if a.empty_count >= WELFARE_REPEAT_N:
             self._welfare_fire("empty")
 
@@ -2912,8 +3056,18 @@ class Harness:
             )
             nudge = NUDGE_DANGER.format(n=n, orders=orders, token=OPT_OUT_TOKEN)
         elif pattern == "empty":
-            seen = f"{number_words(a.empty_count)} empty replies in a row where an answer was owed"
-            nudge = NUDGE_EMPTY.format(n=number_words(a.empty_count), token=OPT_OUT_TOKEN)
+            n = number_words(a.empty_count)
+            if getattr(a, "empty_noted", 0):
+                # some or all of them words written into the journal (decision 60)
+                noted = number_words(a.empty_noted)
+                seen = (
+                    f"{n} replies in a row where an answer was owed and nothing was said in the "
+                    f"world ({noted} of them words written into the journal)"
+                )
+                nudge = NUDGE_NOTED.format(n=n, token=OPT_OUT_TOKEN)
+            else:
+                seen = f"{n} empty replies in a row where an answer was owed"
+                nudge = NUDGE_EMPTY.format(n=n, token=OPT_OUT_TOKEN)
         else:
             span = _span_words(self.station.patience_s)
             seen = f"no reply for {span}"
@@ -3369,7 +3523,7 @@ class Harness:
         if journal:
             a.notices.append(journal)
         self.note(f"Took the deck from {by}.", kind="agent.deck")
-        a.word = f"{a.word}\nYou have the deck." if a.word else "You have the deck."
+        self.add_word("You have the deck.", f"the deck, given by {by}")
         who = f"{st.person}, " if st.person else ""
         return (
             f"{who}you have the deck. The {st.name} has the deck; the captain's standing "
@@ -3437,7 +3591,7 @@ class Harness:
         self.note(f"{By} took the deck; I stay at the station, off watch.", kind="agent.deck")
         a.deck = False
         a.deck_tick, a.deck_stamp = None, ""
-        a.word = f"{a.word}\nI have the deck." if a.word else "I have the deck."
+        self.add_word("I have the deck.", f"the deck, taken by {by}")
         a.notices.append(
             f"{By} has taken the deck. You stay at your station, off watch: you read, "
             "speak, answer and keep your journal, and an order you give is refused until "
@@ -3471,7 +3625,7 @@ class Harness:
             kept = tuple(x for x in kept if x.verb != g.verb or x.key)
         a.grants = (*kept, g)
         said = g.said()
-        a.word = f"{a.word}\nYou may {said}." if a.word else f"You may {said}."
+        self.add_word(f"You may {said}.", f"a word from {by}")
         self.note(f"Allowed by {by}: {said}.", kind="agent.deck")
         domain = self.domain
         what = ""
@@ -3502,7 +3656,7 @@ class Harness:
                 )
         a.grants = tuple(g for g in named if g not in gone)
         said = "; ".join(g.said() for g in gone)
-        a.word = f"{a.word}\nYou may not {said}." if a.word else f"You may not {said}."
+        self.add_word(f"You may not {said}.", f"a word from {by}")
         self.note(f"Taken back by {by}: {said}.", kind="agent.deck")
         return f"The {st.name} may not {said}; {by}'s word is taken back."
 
@@ -3531,7 +3685,7 @@ class Harness:
             raise OrderError(f"There is no {st.name} at the station now; {a.released_reason}.")
         a.general = True
         a.general_words = " ".join(str(words).split())
-        a.word = f"{a.word}\nYou may work the ship." if a.word else "You may work the ship."
+        self.add_word("You may work the ship.", f"a word from {by}")
         a.notices.append(a.general_said())
         said = f" ({a.general_words})" if a.general_words else ""
         self.note(f"Given {by}'s general authority to work the ship{said}.", kind="agent.deck")
@@ -3548,8 +3702,7 @@ class Harness:
         if not a.general:
             raise OrderError(f"The {st.name} has not {by}'s general authority to work the ship.")
         a.general, a.general_words = False, ""
-        word = "You may not work the ship."
-        a.word = f"{a.word}\n{word}" if a.word else word
+        self.add_word("You may not work the ship.", f"a word from {by}")
         self.note(f"{by[0].upper()}{by[1:]}'s general authority taken back.", kind="agent.deck")
         still = self.grants()
         named = (
@@ -3829,6 +3982,7 @@ class Harness:
         a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
         a.empty_count = 0
         a.question, a.word = None, None
+        a.word_reason, a.question_reason = "", ""
         a.last_heard_tick = world.clock.tick
         a.last_sample_tick = world.clock.tick
         self._orders = []
@@ -4242,6 +4396,7 @@ class Harness:
         asker = a.question_by
         bare = getattr(a, "question_text", "") or (question or "")
         a.question, a.question_by, a.question_text = None, "", ""
+        a.question_reason = ""
         data: dict[str, Any] = {"question": question, "station": self.station.name}
         if asker:
             data["to"] = asker
@@ -4293,10 +4448,9 @@ class Harness:
                 # a person nobody holds, asked while a director sat (package 52): a glass
                 # for its answer, then the asker is told, by a word that wakes a stand-by
                 if tick - since >= PERSON_ANSWER_BOUND_S:
-                    said = NO_PERSON_ANSWER_WORDS.format(
-                        person=hearer[len(PERSON_ASKED) :], question=question
-                    )
-                    a.word = f"{a.word}\n{said}" if a.word else said
+                    person = hearer[len(PERSON_ASKED) :]
+                    said = NO_PERSON_ANSWER_WORDS.format(person=person, question=question)
+                    self.add_word(said, f"no answer from {person}")
                     continue
                 kept.append((hearer, question, since))
                 continue
@@ -4407,6 +4561,7 @@ class Harness:
             a.question = f"{speaker['words']}, {speaker['place']}, asks: {question}"
             a.question_by = speaker["station"]
             a.question_text = question
+            a.question_reason = f"a question from {speaker['words']}"
             asker = holder_of(self.world, speaker["station"])
             if asker is not None:
                 if getattr(asker.agent, "asked", None) is None:
@@ -4416,6 +4571,7 @@ class Harness:
             return f"{who}, {speaker['place']}, asks the {self.station.name}: {question}?"
         a.question = question
         a.question_by, a.question_text = "", question
+        a.question_reason = f"a question from {officer}" + (f" (by {by})" if by else "")
         if by:
             return f"By {by}: {officer} asks the {self.station.name}: {question}?"
         return f"Asked the {self.station.name}: {question}?"
@@ -4450,12 +4606,18 @@ class Harness:
                 f"{self.station.name}' first."
             )
         if speaker is not None:
+            if speaker["station"] == self.station.name:
+                # a station's own word is never its wake (package 65, step 2; the owner's
+                # observation of 2026-11-05: the brig's captain woken by his own last word)
+                raise OrderError(
+                    f"The {self.station.name} tells itself nothing; tell another station."
+                )
             said = f"{_cap(speaker['words'])}, {speaker['place']}, to you: {words}"
-            a.word = f"{a.word}\n{said}" if a.word else said
+            self.add_word(said, f"a word from {speaker['words']}")
             return (
                 f"{_cap(speaker['words'])}, {speaker['place']}, to the {self.station.name}: {words}"
             )
-        a.word = f"{a.word}\n{words}" if a.word else words
+        self.add_word(words, f"a word from {officer}" + (f" (by {by})" if by else ""))
         if by:
             return f"By {by}: {officer} to the {self.station.name}: {words}"
         return f"The captain to the {self.station.name}: {words}"
@@ -5056,60 +5218,6 @@ def holder_of(world: Any, station: str) -> Any:
     return None
 
 
-def say_aboard(
-    world: Any,
-    station: str,
-    who: str,
-    text: str,
-    data: dict[str, Any] | None = None,
-    actor: str | None = None,
-) -> Any:
-    """Words said in a place aboard (package 41): a line in the log under the speaker's
-    mark with where he stood, and every other station in the same place hears them in
-    its next sample (`Harness.hear`). The lookout's words are a hail from the masthead,
-    kind `agent.hail`, heard on deck (the quarterdeck and the deck both: a hail
-    carries), and notable, so that it wakes a station with the deck that stands by. A
-    station with authority is notable as before; a watcher's words are routine."""
-    from freesail.agents.agent import LOOKOUT, station_name
-    from freesail.core.events import station_actor
-    from freesail.world.places import place_words
-
-    name = station_name(station)
-    held = holder_of(world, name)
-    has_authority = bool(held is not None and getattr(held.station, "has_authority", False))
-    place = place_of(world, name)
-    stations = getattr(world, "stations", None)
-    kind = (stations.kind_of(name) if stations is not None else None) or name
-    hail = kind == LOOKOUT
-    where = place_words(place) if not hail else "from the masthead"
-    line = f"[{name}] {text}"
-    data = dict(data or {})
-    data["station"] = name
-    heard_at = {"quarterdeck", "deck"} if hail else {place}
-    hearers = []
-    for other in _stations_held(world):
-        if other.station.name == name:
-            continue
-        if place_of(world, other.station.name) in heard_at:
-            other.hear(f"{_cap(who)}, {where}: {text}")
-            hearers.append(other.station.name)
-    # where he stood and who heard him are the line's data, whether anybody heard or not
-    # (the owner's ruling of 2026-10-10: the log is the ear, and a say's data does not
-    # depend on who was seated; truth 78's fake captain says 'I have the command.' to an
-    # empty quarterdeck, heard by nobody, and its pin moved with it)
-    data.update({"place": place, "hail": hail, "heard_by": hearers, "where": where})
-    severity = Severity.NOTABLE if (has_authority or hail) else Severity.ROUTINE
-    # the line's words are the station's as they always were ('[watcher] ...'); where
-    # he stood and who heard him are its data, and the kind says a hail
-    return world.record(
-        severity,
-        "agent.hail" if hail else "agent.note",
-        line,
-        actor=actor or station_actor(name),
-        data=data,
-    )
-
-
 def _stations_held(world: Any) -> list[Any]:
     """Every station held now, the harnesses (started: a restored station not yet seated
     by its replay hears nothing, as it heard nothing in play) and the player's seat."""
@@ -5134,7 +5242,10 @@ def deliver_answer(
         return
     a = held.agent
     said = f"{_cap(who)} answers your question ({question}?): {text}"
-    a.word = f"{a.word}\n{said}" if a.word else said
+    if hasattr(held, "add_word"):
+        held.add_word(said, f"an answer from {who}")
+    else:
+        a.word = f"{a.word}\n{said}" if a.word else said
     asked = getattr(a, "asked", None) or []
     a.asked = [x for x in asked if not (x[0] == answerer and x[1] == question)]
     if hasattr(held, "note") and not hasattr(held, "_poll"):

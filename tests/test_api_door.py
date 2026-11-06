@@ -381,10 +381,8 @@ def test_the_door_asks_consent_through_the_game_keeps_watch_and_says_what_it_use
     assert base64.standard_b64decode(image["source"]["data"]) == png(4, 3)
     assert "4 by 3 pixels" in shown["content"][1]["text"]
     assert game.asked and game.asked[0]["view"] == "chart"
-    assert game.lines("agent.note") == [
-        "[watcher] A quiet start.",
-        "[watcher] The chart agrees with the reckoning.",
-    ]
+    assert game.notes() == ["A quiet start.", "The chart agrees with the reckoning."]
+    assert game.lines("agent.note") == []  # the prose is a note, no line of the play (60)
     # the transcript keeps a note that it was shown, never the picture
     h = game.harness
     notes = [n for e in h.transcript for n in e.get("shown", [])]

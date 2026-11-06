@@ -111,6 +111,10 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_376_the_handover_fold_keeps_the_place",
         "test_known_truths.py::test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail",
         "test_known_truths.py::test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place",
+        # package 65, step 2: the say across hulls (two hulls, a glass's wait), and the truth
+        # that calls it
+        "test_knowledge.py::test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard",
+        "test_known_truths.py::test_truth_7_389_a_say_reaches_every_hull_within_hearing_and_a_wake_names_its_speaker",
         # package 67: the seat's door as the harbour's subprocess on a live server, a long
         # seat through the API door, and the seat's forms over a day's minutes
         "test_known_truths.py::test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_stands_it_down",

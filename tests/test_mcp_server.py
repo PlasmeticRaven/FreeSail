@@ -120,6 +120,10 @@ class Game:
     def lines(self, kind: str) -> list[str]:
         return [e.text for e in self.world.log if e.kind == kind]
 
+    def notes(self) -> list[str]:
+        """The station's reply prose, a note in its journal (decision 60)."""
+        return [e.text for e in self.harness.journal.entries if e.kind == "agent.note"]
+
 
 def text(result: Any) -> str:
     return "\n".join(c.text for c in result.content if getattr(c, "text", None) is not None)
@@ -420,11 +424,11 @@ def test_a_scripted_passage_of_three_glasses_with_the_clock_turned_by_the_game(t
 
     out = session(b, script)
     assert g.world.clock.tick == 3 * A_GLASS_S
-    assert g.lines("agent.note") == [f"[watcher] Glass {k}: all well." for k in (1, 2, 3)]
+    assert g.notes() == [f"Glass {k}: all well." for k in (1, 2, 3)]
     for k in range(3):
         first, second = out[2 + k].split("\n")[:2]
         assert first == f"Your turn is open: sample at {STAMPS[k]} (the glass)."
-        assert second == "Said, under your mark."
+        assert second == "Noted in your journal, under your mark."  # decision 60
         assert "reason: the glass" in out[2 + k]
 
 
@@ -444,7 +448,7 @@ def test_a_say_that_waits_in_vain_returns_the_sentence_and_never_hangs(tmp_path)
     said, waited, again = session(b, script)
     lines = said.split("\n")
     assert lines[0] == "The game has the floor; the next sample follows when your turn opens."
-    assert lines[1] == "Said, under your mark."
+    assert lines[1] == "Noted in your journal, under your mark."
     assert lines[3].startswith("Still waiting: this call waited 0 seconds and no turn opened.")
     assert "The game has had the floor since Morning watch, 8 bells (04:00)" in said
     # the ship's time now and the owner's clock (package 68, R-27)
@@ -492,7 +496,8 @@ def test_the_captain_asks_from_the_game_and_the_answer_is_heard(tmp_path):
 
     turn, answer = session(b, script)
     assert turn.startswith(
-        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question).\nNothing said."
+        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question from the "
+        "captain).\nNothing said."
     )
     assert turn.count("The captain asks: how the wind is?") == 1 and "reason: a question" in turn
     assert g.world.clock.tick == 0  # the question came on the same tick
@@ -669,7 +674,10 @@ def test_a_call_the_client_cuts_off_loses_no_turn_and_the_model_sees_it_once(tmp
         "its result reached you, and that result comes first."
     )
     assert "== The result of your call to say, cut off after 0 seconds; it was run ==" in first
-    assert "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question)." in first
+    assert (
+        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question from the "
+        "captain)." in first
+    )
     assert first.count("The captain asks: whether the jib draws?") == 1
     assert first.count("== Sample at") == 1
     assert second == "Heard."
@@ -677,7 +685,7 @@ def test_a_call_the_client_cuts_off_loses_no_turn_and_the_model_sees_it_once(tmp
     assert not h.agent.standing_by  # the stand_by was not run
     said = [e for e in g.world.log if e.kind == "agent.said"]
     assert [e.data["question"] for e in said] == ["whether the jib draws"]
-    assert "[watcher] All quiet." in g.lines("agent.note")  # the cut-off say was run
+    assert "All quiet." in g.notes()  # the cut-off say was run
     calls = [c["name"] for e in h.transcript for c in e.get("reply", {}).get("calls", [])]
     assert "stand_by" not in calls
 
@@ -699,13 +707,13 @@ def test_a_result_cut_off_after_it_was_made_goes_to_the_next_call(tmp_path):
     nxt = b.call("say", {"text": "Still here."}, call_id=cid)
     b.delivered(cid)
     assert nxt.startswith("Your call to say was not run") and lost in nxt
-    assert "[watcher] Still here." not in g.lines("agent.note")
+    assert "Still here." not in g.notes()
     cid = b.begin_call()
     g.advance_when_the_floor_is_the_games(A_GLASS_S, len(g.harness.transcript))
     after = b.call("say", {"text": "Still here."}, call_id=cid)
     b.delivered(cid)
     assert after.startswith("Your turn is open: sample at Morning watch, 2 bells (05:00)")
-    assert "[watcher] Still here." in g.lines("agent.note")
+    assert "Still here." in g.notes()
     assert not b._lost and not b._done
 
 
@@ -749,7 +757,8 @@ def test_a_turn_that_opened_with_no_call_waiting_comes_first_and_the_call_is_not
     g.http.post("/api/order", json={"text": "ask the watcher whether the jib draws"})
     first = b.call("stand_by", {"until": "a glass"})
     assert first.startswith(
-        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question).\n"
+        "Your turn is open: sample at Morning watch, 8 bells (04:00) (a question from the "
+        "captain).\n"
         "Your call to stand_by was not run: this turn opened after your last result, and it "
         "comes first. Read it, then call again."
     )
@@ -787,7 +796,7 @@ def test_what_is_folded_into_the_open_turn_goes_with_the_next_result(tmp_path):
     ) in said
     assert "The captain asks: how she heads?" in said
     assert "Your turn is open" not in said
-    assert "[watcher] Hands are up." in g.lines("agent.note")
+    assert "Hands are up." in g.notes()
 
 
 def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_ends_it(
@@ -829,11 +838,11 @@ def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_e
     )
     assert spoke.startswith(
         "Your turn is open: sample at Morning watch (04:02) (its own word).\n"
-        "Said, under your mark, while the game had the floor. Your words are in the log "
+        "Noted in your journal while the game had the floor. Your words are in your journal "
         "under your mark, and your stand-by (until a glass) ended at your own word"
     )
     assert "While you stood by (since Morning watch, 8 bells (04:00), until a glass): 1 " in spoke
-    assert "[watcher] All hands up: I will watch." in g.lines("agent.note")
+    assert "All hands up: I will watch." in g.notes()
     assert back.startswith("The game has the floor;")
     h = g.harness
     assert h.journal.entries[-1].text == "Ended the stand-by until a glass at my own word."

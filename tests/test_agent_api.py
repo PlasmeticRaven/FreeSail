@@ -111,6 +111,14 @@ class Game:
     def lines(self, kind: str) -> list[str]:
         return [e.text for e in self.world.log if e.kind == kind]
 
+    def notes(self, station: str = "watcher") -> list[str]:
+        """A station's reply prose, a note in its journal (decision 60)."""
+        from freesail.agents.journal import journal_seen
+
+        book = journal_seen(self.world, station)
+        entries = book.entries if book is not None else []
+        return [e.text for e in entries if e.kind == "agent.note"]
+
 
 def yes_on_record(records, identity: str = WEIGHTS) -> consent.Record:
     rec = consent.Record(identity, "a test runtime", "2026-09-26", consent.YES, answer="Yes.")
@@ -163,7 +171,7 @@ def test_a_whole_session_through_the_routes(tmp_path):
     assert results(a) == ["The watcher has no authority to give orders."]
     a = g.reply("All quiet on deck.")
     assert a["floor"] == "game" and roles(a) == ["model"]
-    assert "[watcher] All quiet on deck." in g.lines("agent.note")
+    assert "All quiet on deck." in g.notes()
     # the game runs on its clock; at the glass the model's turn opens
     assert g.turns(wait=0.2)["turns"] == []
     g.driver.tick(A_GLASS_S)
@@ -173,7 +181,8 @@ def test_a_whole_session_through_the_routes(tmp_path):
     # the captain asks, from the order box: the question opens a turn at once
     assert g.order("ask the watcher how she goes")["kind"] == "agent.asked"
     a = g.turns(wait=1)
-    assert reasons(a) == ["a question"] and a["turns"][0]["content"]["question"] == "how she goes"
+    assert reasons(a) == ["a question from the captain"]
+    assert a["turns"][0]["content"]["question"] == "how she goes"
     a = g.reply("", ("answer", {"text": "Easily, under all plain sail."}))
     assert results(a) == ["Heard."]
     assert g.lines("agent.said") == ["[watcher] Easily, under all plain sail."]
@@ -356,7 +365,7 @@ def test_a_call_without_the_seatings_key_is_refused_in_words_and_nothing_is_run(
     # nothing was said, nothing released, and the seated door goes on
     assert len(g.world.log) == before and not g.harness.agent.released
     assert g.reply("Aye.")["floor"] == "game"
-    assert "[watcher] Aye." in g.lines("agent.note")
+    assert "Aye." in g.notes()
     # the key is the door's alone: it is in neither the save nor the transcript
     assert g.key not in json.dumps(g.world.save())
 
@@ -488,10 +497,11 @@ def test_what_happens_while_the_model_holds_the_floor_is_folded_into_its_turn(tm
     g.order("ask the watcher how the sails are drawing")
     a = g.turns()
     assert all(t["content"].get("folded") for t in a["turns"])
-    assert "the glass" in reasons(a) and "a question" in reasons(a)
+    assert "the glass" in reasons(a) and "a question from the captain" in reasons(a)
     assert any("Set" in ln["text"] for t in a["turns"] for ln in t["content"]["log"])
     merged = g.harness.open_sample
-    assert merged.reason.startswith("the start; then ") and merged.reason.endswith("a question")
+    assert merged.reason.startswith("the start; then ")
+    assert merged.reason.endswith("a question from the captain")
     assert merged.question == "how the sails are drawing" and merged.tick == A_GLASS_S
     # the World did not wait: the glass ran with the model's turn open
     assert g.world.clock.tick == A_GLASS_S
@@ -539,8 +549,8 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     # (package 28c), recorded so that a replay speaks at the same point
     a = g.reply("Hello there.")
     assert a["out_of_turn"] and a["spoke"] and a["floor"] == "model"
-    assert "Your words are in the log under your mark" in a["words"]
-    assert "[watcher] Hello there." in g.lines("agent.note")
+    assert "Your words are in your journal under your mark" in a["words"]
+    assert "Hello there." in g.notes()
     assert reasons(a) == ["its own word"] and a["interim"] is None
     assert g.harness.transcript[-1] == {
         "tick": 0,
@@ -682,7 +692,11 @@ def test_the_console_hosts_the_same_routes_and_prints_the_station_in_state(tmp_p
     http.post("/api/agents/watcher/reply", json=said)
     con.handle_line("tick 60")
     assert con.world.clock.tick == 60
-    assert "[watcher] Aye." in out.getvalue()  # the log prints as the console always has
+    # the prose is a note in the watcher's journal, and no line the console prints (60)
+    assert "[watcher] Aye." not in out.getvalue()
+    assert "Aye." in [
+        e.text for e in con.world.agents["watcher"].journal.entries if e.kind == "agent.note"
+    ]
     assert isinstance(con.world.agents["watcher"].model, RemoteModel)
 
 
@@ -714,7 +728,7 @@ def test_a_station_the_game_mans_itself_is_refused_and_a_loaded_games_is_taken_o
     assert roles(a) == ["operator", "data"] and reasons(a) == ["the glass"]
     assert a["turns"][0]["content"].startswith("This is a message from the harness")
     g.reply("Still here.")
-    assert "[watcher] Still here." in g.lines("agent.note")
+    assert "Still here." in g.notes()
     assert isinstance(g.harness.model, RemoteModel)
 
 
@@ -906,8 +920,17 @@ def test_the_voice_of_a_person_nobody_holds_speaks_where_he_is_and_say_as_him_is
     assert "You are the voice of Mr Pentreath, aboard" in brief
     h = g.world.agents["mr pentreath"]
     assert h.station.person == "Mr Pentreath"
-    _reply(g, "Mr Pentreath", a["key"], "The wool is landed dry, I trust.")
-    said = [x for x in g.world.log if x.text == "[mr pentreath] The wool is landed dry, I trust."]
+    # his prose is his note (decision 60); he speaks where he is with `say`
+    _reply(g, "Mr Pentreath", a["key"], "A fine cabin.")
+    assert "A fine cabin." in g.notes("mr pentreath")
+    _reply(
+        g,
+        "Mr Pentreath",
+        a["key"],
+        "",
+        ("submit_order", {"text": "say The wool is landed dry, I trust."}),
+    )
+    said = [x for x in g.world.log if x.kind == "agent.spoke" and "landed dry" in x.text]
     assert said and said[0].data["place"] == "cabin"
     refused = D.direct(g.world, 'say as Mr Pentreath: "Nothing at all."', by="the test")
     assert refused.startswith("Refused, by the rule of reach") and "mr pentreath" in refused

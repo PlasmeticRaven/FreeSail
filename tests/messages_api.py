@@ -439,6 +439,11 @@ class Game:
     def lines(self, kind: str) -> list[str]:
         return [e.text for e in self.world.log if e.kind == kind]
 
+    def notes(self) -> list[str]:
+        """The station's reply prose, a note in its journal (decision 60)."""
+        h = self.harness
+        return [e.text for e in h.journal.entries if e.kind == "agent.note"] if h else []
+
 
 def run_door(game: Game, argv: list[str], environ: dict[str, str], inp: str = "") -> dict[str, Any]:
     """The API door in a thread against the game and the test's server."""
