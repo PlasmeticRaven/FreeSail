@@ -2459,7 +2459,9 @@ the slow tier of the thirty-six touched files and the known truths in two halves
 xfailed and 2,402 passed 1 xfailed, exit 0; the pace 13 of 13 (the knowledge filter's place
 559 against `all` 556; 7-386's 517 against 546, within the noise); ruff and format clean. **The
 lead's merge:** the trial on d3f8fa3 clean and lint-clean; the fast tier whole on it
-green, exit 0, every test passed; the whole suite in the cloud dispatched after run 39, the figures to follow. Step 5
+green, exit 0, every test passed; the whole suite in the cloud run 40 on 1662b54 (16:18 to 17:26 UTC): lint green, all six shards green, 6,707 passed,
+11 skipped, 12 expected failures; the pace job 12 of 13, truth 7-159 at 498 ticks a second against 500 (the
+runner's speed; informative). Step 5
 (books, papers and pictures in their places, §8; truth 7-374) builds on; 97's two lines in
 `agents/harness.py` meet this step's word tuples in the same file at 97's merge, the lead's to
 resolve.
