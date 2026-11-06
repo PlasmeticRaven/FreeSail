@@ -5026,3 +5026,66 @@ same day:** the Roux-school watercolour shows the square topsail over the lateen
 Monleón's print does, so she is rigged with a lateen and a square topsail on the main, a
 lateen on the small mizen, and one or two headsails by judgement from the sources together
 and the hull's implications.
+
+**2026-11-06, the lee-port step (L2 and L3), the rig lines and the booms: read, the merge
+in train, and the lead's take on the whole and on the flicker.** Your report of today
+(claude/pkg-75 at e88df44, sent after the owner's review) is read whole: the ports by the
+heel (L2) and with the roll's amplitude (L3, `roll_in_the_dip` reading `Firer.roll_deg`,
+the other side the roll less the heel, a chaser on the centre line the roll alone); a gun
+whose port shuts run in and housed with its loading going on and its running out and
+pointing given over; a shut port silencing its own gun and no other (the named gun dropped
+with a line, the word for a broadside all behind shut ports dropped, a division all behind
+them passing its turn); the deck's side one line from its first port shut to its last
+opened, said only while a gun of it is cast loose, so that no sailing passage's log moves;
+`_least_dip`'s one compare a tick taking the pace back; the viewer's sheets, braces and
+tacks ending on the drawn rail and the stem head, the booms 3° above the level; the checks
+(no truth, action or trial moved; the four whole logs identical; the fast tier 6,272; the
+fifteen files byte for byte). The trial merge on the trunk's head (2b59ea4: 82b's item 1
+and 65's step 2 merged this morning) is clean and lint-clean, the fast tier runs on it, and
+the merge follows on green with its record. **The whole: approved as built.** The line
+gated by the guns cast loose is the right judgement (a port shut by the routine of the ship
+on passage is no news); the gun housed with its charge kept and the drill not timing a
+round behind a shut port are right; the weather side moving in a seaway is the sea's truth
+and not a fault, and §7's "a roll 20° beyond the heel" is corrected by your measure.
+
+**The flicker: the dwell, as the owner leans, and not the heel margin.** A port's shutting
+is a crew's act when the sea comes in, and its opening is the gun captain's judgement once
+the sea has kept clear a while; the six inches of sill is the physical criterion and stays,
+and the human one is a hold. Build `PORT_HOLD_S = 60` as you describe: each gun's shutting
+tick kept on the battery (a class default, `tick` passed from `Battery.tick`), a port opened
+only once it has been shut that long and its sill is clear of the reopening line, a port
+shut again within the hold starting it afresh; the shutting itself at once, as now (a sea
+that comes in once is enough to shut a lid). Not the 3° margin: it would make the rule's
+reopening a different physical thing from its shutting, and a minute's hold is what a gun
+captain does. Measure the same hour in gusts after it (the frigate at 21 kn, the brig at
+17, the 64 at 17.5) and write the changes beside the 46, 24 and 43; L2's reopening-band
+pins move, old beside new with this ruling as the reason, in a commit of its own, with
+§7.1's figure amended. The owner may veto when they read this; build it unless they do.
+
+**§12.2a, ruled now: the rule in the key's place, approved.** An after mast with yards and
+no yard on its lower mast handles as a fore-and-after's mast; `Ship.on_schooner_mast(part)`
+read from the parts as filed, once a ship, the yards under the bowsprit not counted. The
+owner's reason is the lead's too (a file that forgets a key makes her a brig with no word
+said; the rule is the generality package 90 wants), and your reading of 90's rigs under it
+is right: the tartane classes as the cutter does (a lateen yard is no braced yard), the
+polacre as one square mast with a lower yard between two lateens, no key; the limit
+(Fincham's schooner with a lower square-sail yard on her main) stands under both and is
+recorded. Build it with B3.4 as §12.2a says (the topsail schooner with a square main
+topsail as the second rig in memory, the guard that no file trips it); the swing at
+"mainsail haul" is B3.4's measure, reported with it. The polacre's pole masts stay for her
+own document, as you say.
+
+**B6, the scenarios: out to a supplemental package**, on the owner's word of 2026-11-05 (the
+hulls first, so that the guns in the viewer can begin on every hull at once); booked as the
+ships' scenarios, after Phase 5, in the waves table when 75 closes. **The order from here
+stands as you give it:** B3.4 by §12.2a's rule, SW-4, B2 the *Neufchatel*, B3.3 with B4
+the bilander, SW-1 with B7 the 74, then Phase 5.
+
+**Left for the lead, booked:** the four things in "Left, and for whom" go to package 77
+(the gunnery's and the fight's evolutions, Opus, behind 70 and 73): `engage` with every port
+of a side shut answering what follows, and "fire the broadside" saying the ports before
+the ports' line; the two served words for the weather side (`the weather ports shut`,
+`the weather ports opened`, `lee` False), under 85's in-world rule; the rules captains
+reading the ports (`engage_side` weather, `_a_gun_for_a_signal` and the distress gun taking
+an open port); and the weather port the roll shut opening exactly upright said the lee's.
+Written into 77's brief at the merge.
