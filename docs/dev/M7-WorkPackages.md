@@ -2571,8 +2571,9 @@ take-ins alone gated on square-rigging (the file granted to the ships session). 
 B2 and package 90:** "shorten sail" never takes in the *Neufchatel*'s main topgallant (B2 mends
 her file); the two classing limits and the polacre's lateen mizen and pole masts (90's row).
 **The lead's merge:** the trial on 7e479b7 (the trunk with 97) clean and lint-clean; the fast
-tier whole on it green, exit 0, every test passed; the whole suite in the cloud dispatched after run 41, the figures
-to follow. The ships session runs on to SW-4 and B2 by the owner's leave, to one final report
+tier whole on it green, exit 0, every test passed; the whole suite in the cloud run 42 on 0eb17c7 (19:10 to 20:24 UTC): lint green, all six shards green, 6,756 passed,
+11 skipped, 12 expected failures; the pace job 9 of 13, the four floors under at 429 to 483 ticks a second
+against 500 (the runner's speed; informative). The ships session runs on to SW-4 and B2 by the owner's leave, to one final report
 for 75.
 
 ### Package 65, step 5 (books, papers and pictures in their places), as merged (2026-11-06)
