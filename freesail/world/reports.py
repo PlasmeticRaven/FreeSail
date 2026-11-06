@@ -425,32 +425,36 @@ def _boats_report(world: Any, boat: Any, now: int) -> None:
         ship = B.ship_of(root, boat)
         if ship is None or not port:
             continue
-        people = getattr(ship, "people", None)
-        if people is None:
-            continue
-        try:
-            ashore = [
-                p
-                for p in people.people
-                if not getattr(p, "aboard", True)
-                and str(getattr(p, "where", "") or "") == "shore"
-                and str(getattr(p, "port", "") or "") == port
-            ]
-        except Exception:  # noqa: BLE001
-            ashore = []
-        if not ashore:
-            continue
-        ship.record(
-            Severity.NOTABLE,
-            REPORT_BOAT,
-            f"The boat came in to the quay at {_port_name(root, port)}; the coxswain "
-            f"reports: {_ships_state(ship)}.",
-            data={
-                "port": port,
-                "boat": str(getattr(boat, "id", "") or ""),
-                "to": [p.name for p in ashore],
-            },
-        )
+        # her company, her state and her log read in her own block (the lead's word of
+        # 2026-11-06: a hull's people and stations read from inside another hull's block
+        # answer for the running hull), the boat's tick being the running block
+        with root.as_hull(ship):
+            people = getattr(root, "people", None)
+            if people is None:
+                continue
+            try:
+                ashore = [
+                    p
+                    for p in people.people
+                    if not getattr(p, "aboard", True)
+                    and str(getattr(p, "where", "") or "") == "shore"
+                    and str(getattr(p, "port", "") or "") == port
+                ]
+            except Exception:  # noqa: BLE001
+                ashore = []
+            if not ashore:
+                continue
+            root.record(
+                Severity.NOTABLE,
+                REPORT_BOAT,
+                f"The boat came in to the quay at {_port_name(root, port)}; the coxswain "
+                f"reports: {_ships_state(root)}.",
+                data={
+                    "port": port,
+                    "boat": str(getattr(boat, "id", "") or ""),
+                    "to": [p.name for p in ashore],
+                },
+            )
 
 
 def _port_name(world: Any, port: str) -> str:
