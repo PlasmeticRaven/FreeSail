@@ -98,6 +98,15 @@ _SENIORITY = (
 # ---------------------------------------------------------------------------
 
 
+def _names(words: str, text: str) -> bool:
+    """Whether `text` already says what `words` names: a word of four letters or more of
+    the one shares its stem with a word of the other ("warning" and "warns", "danger" and
+    "a danger", "lifting" and "lifting")."""
+    stems = {w.strip(",.:;'").removesuffix("'s")[:4] for w in words.lower().split()}
+    stems = {w for w in stems if len(w) >= 4}
+    return any(w.strip(",.:;'")[:4] in stems for w in text.lower().split() if len(w) >= 4)
+
+
 def _lower_first(text: str) -> str:
     text = " ".join(str(text or "").split()).rstrip(".")
     return text[:1].lower() + text[1:] if text else text
@@ -166,7 +175,10 @@ def _pilot_hail(e: Any) -> str | None:
 
 
 def _boat(e: Any) -> str | None:
-    return f"the boat: {_lower_first(e.text)}"
+    text = _lower_first(e.text)
+    if any("boat" in w for w in text.split()[:3]):
+        return text  # "the long-boat away for the quay ...": the line names her
+    return f"the boat: {text}"
 
 
 # kind -> the words of the report ("" or None: not reported)
@@ -210,8 +222,8 @@ def _why_called(world: Any, e: Any, what: str | None) -> str | None:
     danger = R.speaks_of_danger(e.kind, e.data)
     if danger is not None:
         text = _lower_first(e.text)
-        head = danger.split()[-1]  # 'dragging', 'aback', 'lifting': the line says it already
-        return text if head in text else f"{danger}: {text}"
+        # 'dragging', 'aback', 'a danger', 'the pilot warns': the line says it already
+        return text if _names(danger, text) else f"{danger}: {text}"
     if e.severity is Severity.URGENT and not e.kind.startswith(_NOT_THE_DECKS):
         return _lower_first(e.text)
     if what is not None and str(getattr(world, "daylight", "") or "") == "night":
