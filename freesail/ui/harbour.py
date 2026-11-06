@@ -884,11 +884,9 @@ class Harbour:
         """A seat's door whose seat is gone: one whose station the game has released ends
         of itself (the door says its station was released) and is given the time to; one
         still waiting (no admission yet, a consent conversation) is stopped."""
-        from freesail.agents.remote import seat_key
-
         desk = self.driver.desk
         with self.driver.lock:
-            seat = desk.seats.get(seat_key(door.station, door.ship)) if desk is not None else None
+            seat = desk.seat_at(door.station, door.ship) if desk is not None else None
             released = bool(seat is not None and seat.released)
         if released:
             with contextlib.suppress(subprocess.TimeoutExpired):
@@ -936,9 +934,9 @@ class Harbour:
         desk = self.driver.desk
         if desk is None:
             return
-        from freesail.agents.remote import DeskError, seat_key
+        from freesail.agents.remote import DeskError
 
-        seat = desk.seats.get(seat_key(door.station, door.ship))
+        seat = desk.seat_at(door.station, door.ship)
         if seat is None or seat.released:
             return
         with contextlib.suppress(DeskError):
