@@ -37,6 +37,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from freesail.world.hulls import is_observer
 from freesail.world.places import PLACES, earshot, place_words
 
 __all__ = [
@@ -55,13 +56,22 @@ __all__ = [
     "ROOMS",
     "Senses",
     "WAKES",
+    "WORDS_BETWEEN_PEOPLE",
+    "WORD_KINDS",
     "all_known",
     "as_heard",
     "elsewhere_words",
+    "hears",
     "is_asleep",
+    "player_hull",
+    "players_person",
+    "players_senses",
+    "players_station",
+    "players_visitor",
     "reach_of",
     "reaches",
     "reading_here",
+    "rows_elsewhere",
     "senses_of",
     "senses_of_place",
     "station_senses",
@@ -707,3 +717,243 @@ def elsewhere_words(rows: list[Any], senses: Senses, named_max: int = 6) -> str 
             listed += f" and {more} more"
         parts.append(f"{listed} ({where})")
     return f"Not to be had {senses.words()}: {'; '.join(parts)}."
+
+
+# -- the player at the prompt (decision 59 and decision 62; the design's §11) ------------
+
+# The lines of words said between people (package 52; spec M7b §15): a word told, a
+# question put, an answer, a person's words, a free line; and a word said in a place
+# (`agent.spoke`, package 66). Their hearing is 66's, which the harness applies to a
+# station (`Harness._reaches`) and `hears` below to the player's person.
+WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke", "free.line")
+WORD_KINDS = (*WORDS_BETWEEN_PEOPLE, "agent.spoke")
+
+# The driver's line that says the player is aboard another ship than his own (`--ship`,
+# package 82, item 2; `ui.console.aboard_ship`): read from his own ship's log, so that a
+# save and a replay read the same.
+PLAYER_LEFT = "driver.left"
+
+
+def _root(world: Any) -> Any:
+    """The one World behind a hull's façade (`hulls.Hull.world`; `World.parent` is the
+    followed hull's façade, not the World)."""
+    from freesail.world.hulls import Hull
+
+    while isinstance(world, Hull):
+        world = world.world
+    return world
+
+
+def player_hull(world: Any) -> Any:
+    """The hull of the ship the player is aboard as her captain: his own, or the one
+    `--ship` named (the last `driver.left` line of his own ship's log, which the replay
+    writes again); None in an observed world, which has no ship of the player's."""
+    root = _root(world)
+    players = getattr(root, "players", None)
+    if players is None or is_observer(players):
+        return None
+    hulls = getattr(root, "hulls", None) or {}
+    log = getattr(players, "log", None)
+    if log is None or not hulls:
+        return players
+    # the scan is from where it left off (the line is written at the start, if at all)
+    held = root.__dict__.get("_player_hull_read") or (0, None)
+    n = len(log)
+    if held[0] != n:
+        found = held[1]
+        for i in range(held[0], n):
+            e = log[i]
+            if e.kind == PLAYER_LEFT:
+                found = str((e.data or {}).get("ship") or "")
+        held = (n, found)
+        root.__dict__["_player_hull_read"] = held
+    name = held[1]
+    if not name:
+        return players
+    key = name.strip().strip('"').lower()
+    for hull in hulls.values():
+        ship_name = str(getattr(getattr(hull, "ship", None), "name", "") or "")
+        if str(hull.id).lower() == key or ship_name.lower() == key:
+            return hull
+    return players
+
+
+def _seat_person(root: Any, seat: Any) -> Any:
+    """The seat's person, read in the seat's hull's block (a façade read from inside another
+    hull's block answers for that hull)."""
+    hull = getattr(seat, "world", root)
+    as_hull = getattr(root, "as_hull", None)
+    try:
+        if callable(as_hull) and hull is not root:
+            with as_hull(hull):
+                return hull.stations.holder(seat.station.name)
+        return root.stations.holder(seat.station.name)
+    except Exception:  # noqa: BLE001  (a people's build that cannot run binds nobody)
+        return None
+
+
+def _seat(world: Any) -> Any:
+    """The player's seat, held (not released), on the world given or its root; None."""
+    for w in (world, _root(world)):
+        seat = getattr(w, "player_seat", None)
+        agent = getattr(seat, "agent", None)
+        if seat is not None and agent is not None and not agent.released:
+            return seat
+    return None
+
+
+def players_station(world: Any) -> str:
+    """The station the player's words are said as: his seat's, else the captain's."""
+    seat = _seat(world)
+    return str(seat.station.name) if seat is not None else "captain"
+
+
+def players_person(world: Any) -> Any:
+    """The player's one person (decision 62): the seat's person when he is seated, else the
+    captain of the ship he is aboard as her captain (`player_hull`), wherever his body is
+    (in the boat, aboard another ship, ashore). None where there is none: an observed world,
+    a seat bound to nobody (the director's), or a model at that captain's station."""
+    root = _root(world)
+    seat = _seat(world)
+    if seat is not None:
+        return _seat_person(root, seat)
+    hull = player_hull(root)
+    if hull is None:
+        return None
+    from freesail.agents.agent import CAPTAIN
+
+    held = (getattr(hull, "agents", None) or {}).get(CAPTAIN)
+    if held is not None and not held.agent.released:
+        return None  # a model holds her captain's station: the owner looks on
+    as_hull = getattr(root, "as_hull", None)
+    try:
+        if callable(as_hull) and hull is not root:
+            with as_hull(hull):
+                return hull.people.captain
+        return root.people.captain
+    except Exception:  # noqa: BLE001  (a world with no muster: the point ship)
+        return None
+
+
+def players_visitor(world: Any) -> Any:
+    """The player's person when he is aboard the current hull as a visitor (decision 62; the
+    road from his own boat aboard another ship): his orders at the prompt are his and not
+    her captain's. None when he is at home, elsewhere, seated, or there is none."""
+    if _seat(world) is not None:
+        return None  # the seat goes with its person already (package 82, item 2)
+    person = players_person(world)
+    if person is None or not getattr(person, "aboard", True):
+        return None
+    from freesail.world.hearing import own_hull
+    from freesail.world.movement import hull_of, is_boat_hull
+
+    here = own_hull(world)
+    hid = str(getattr(person, "hull", "") or "")
+    home = str(getattr(person, "home", "") or "")
+    if not hid or hid != here or not home or home == here:
+        return None
+    hull = hull_of(_root(world), hid)
+    return None if hull is None or is_boat_hull(hull) else person  # his own boat is his
+
+
+def _hull_of_person(root: Any, person: Any) -> str:
+    """The hull the person belongs to now: the one he is in, else (in the boat, ashore) his
+    home's."""
+    hid = getattr(person, "hull", None) if getattr(person, "aboard", True) else None
+    return str(hid or getattr(person, "home", "") or "")
+
+
+def players_senses(world: Any) -> Senses:
+    """What the player perceives at the prompt (decision 59: as a model does, so that there
+    are not two views of one world): his person's senses where he is, read in his hull's
+    block; `EVERYTHING` under `knowledge: all`, with no person of his (an observed world,
+    the director's seat), and under `follow` of a hull he holds no person in, which is the
+    owner's eye (the design's §11)."""
+    root = _root(world)
+    if all_known(root):
+        return EVERYTHING
+    seat = _seat(world)
+    person = players_person(root)
+    hulls = getattr(root, "hulls", None) or {}
+    followed = hulls.get(getattr(root, "followed", None)) or getattr(root, "players", None)
+    followed_id = str(getattr(followed, "id", "") or "")
+    as_hull = getattr(root, "as_hull", None)
+    if seat is not None:
+        from freesail.agents.agent import DIRECTOR
+
+        if person is None and str(seat.station.name) == DIRECTOR:
+            return EVERYTHING
+        hull = getattr(seat, "world", root)  # the seat's hull, or the World as it was given
+        if hull is root:
+            hull = getattr(root, "players", None) or root
+        his = _hull_of_person(root, person) if person is not None else str(hull.id)
+        if hulls and his != followed_id:
+            return EVERYTHING  # the owner's eye on a hull he holds no person in
+        if callable(as_hull) and hull is not root:
+            with as_hull(hull):
+                return station_senses(hull, seat.station.name, person)
+        return station_senses(root, seat.station.name, person)
+    if person is None:
+        return EVERYTHING
+    if hulls and _hull_of_person(root, person) != followed_id:
+        return EVERYTHING  # `follow` of a hull he holds no person in: the owner's eye
+    if callable(as_hull) and followed is not None and followed is not root:
+        with as_hull(followed):
+            return senses_of(followed, person)
+    return senses_of(root, person)
+
+
+def hears(world: Any, senses: Senses, e: Any, station: str = "captain") -> bool:
+    """Whether a line reaches a person at the prompt with these senses (the console's and
+    the browser's play log, decision 59): `reaches` for every kind but the words, and for
+    the words 66's hearing as the harness applies it to a station (`Harness._reaches`): his
+    own, a word to him, one whose hearers name his station, else one said within his
+    hearing; a sleeper hears a word to him and nothing else."""
+    if senses.everything:
+        return True
+    kind = str(getattr(e, "kind", "") or "")
+    if kind not in WORD_KINDS:
+        return reaches(world, senses, e)
+    data = getattr(e, "data", None) or {}
+    speaker = str(data.get("speaker") or data.get("station") or "")
+    addressee = str((data.get("to") if kind == "agent.said" else data.get("station")) or "")
+    if kind == "agent.spoke" and speaker == station:
+        return True  # his own word
+    if kind in WORDS_BETWEEN_PEOPLE and addressee == station:
+        return True
+    if senses.asleep:
+        return False
+    if station in (data.get("heard_by") or ()):
+        return True
+    if "heard_by" in data:
+        return False  # its hearers are named, and he is not among them
+    from freesail.world.hearing import own_hull, within_hearing
+
+    hull = str(data.get("said_from") or own_hull(world))
+    place = str(data.get("place") or data.get("where") or "quarterdeck")
+    if data.get("hail"):
+        said: tuple[str, ...] = ("aboard", hull, "quarterdeck")
+    elif place in PLACES and PLACES[place].aboard:
+        said = ("aboard", hull, place)
+    else:
+        return bool(senses.spot) and senses.spot[0] == "ashore"  # a word said ashore
+    return within_hearing(said, senses.spot)
+
+
+def rows_elsewhere(senses: Senses) -> list[Any]:
+    """The rows of the readings registry not to be had by these senses (the sample's and
+    the snapshot's "not to be had here"): the rows a person is asked, the driver's, the
+    parametric and the absent left out."""
+    from freesail.api import readings as R
+
+    if senses.everything:
+        return []
+    return [
+        r
+        for r in R.REGISTRY
+        if not r.is_absent
+        and r.parametric is None
+        and r.kind not in R.DRIVER_KINDS
+        and not r.per_asker
+        and not reading_here(r, senses)
+    ]

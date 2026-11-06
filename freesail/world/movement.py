@@ -45,6 +45,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
 from freesail.world.places import (
     DEFAULT_ASHORE,
@@ -173,6 +174,13 @@ def person_of_actor(world: Any, actor: str | None) -> Any:
     if people is None or not actor:
         return None
     if actor == "captain":
+        from freesail.world import knowledge
+
+        visitor = knowledge.players_visitor(world)
+        if visitor is not None:
+            # the player aboard another ship as a visitor (decision 62; package 65, step 4):
+            # the prompt is his and not her captain's
+            return visitor
         try:
             return people.captain
         except IndexError:
@@ -262,6 +270,19 @@ def where_words(world: Any, person: Any) -> str:
 # ---------------------------------------------------------------------------
 
 
+# What a visitor aboard another ship may order from her deck (decision 62): his own body's
+# moves, his needs, a question or a reading, a free line, a word said (the stations'
+# sentences are not orders of the vocabulary and come another way).
+VISITOR_VERBS = frozenset(
+    {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore"}
+)
+VISITOR_OBJECTS = frozenset({"query", "needs", "free"})
+
+
+def _visitors_own(verb: str, obj: str) -> bool:
+    return obj in VISITOR_OBJECTS or verb in VISITOR_VERBS
+
+
 def is_deck_order(verb: str, obj: str) -> bool:
     """Whether an order is the deck's: given from the quarterdeck or the deck alone."""
     return obj in DECK_OBJECTS or verb in DECK_NAVIGATION
@@ -293,6 +314,25 @@ def check(ship: Any, verb: str, obj: str) -> None:
     person = person_of_actor(world, actor)
     if person is None:
         return
+    here = hull_of(world, getattr(person, "hull", None)) if person.aboard else None
+    home_id = str(getattr(person, "home", "") or "")
+    if (
+        here is not None
+        and not is_boat_hull(here)  # his own ship's boat is his to command
+        and home_id
+        and str(here.id) != home_id
+        and not _visitors_own(verb, obj)
+    ):
+        # a visitor aboard another ship (decision 62; package 65, step 4): a passenger's
+        # reach, as a seated visitor's domain gives it (`agent.VISITOR_DOMAIN`)
+        home = hull_of(world, home_id)
+        raise OrderError(
+            f"You are aboard the {hull_name(here)} as a visitor"
+            f"{', of the ' + hull_name(home) if home is not None else ''}: a visitor aboard "
+            "another ship gives no order of her deck, and none of his own ship's from there "
+            "(hail her, make a signal or send a letter); 'go to the boat' takes you off in "
+            "your own boat where she lies alongside, 'come aboard' sends hers for you."
+        )
     if is_deck_order(verb, obj):
         # where he went by his own word: the master's reckoning takes him below to his
         # sights and his day's work by its own rule (his mirror), which is not his going
@@ -941,6 +981,7 @@ def put_aboard(
         "by": by,
     }
     text = f"{person.name} came aboard{whence}."
+    _drivers_follow(world, person, hull)
     if said:
         left = was
         if left is None and was_where in ("boat", "cutter"):
@@ -954,6 +995,40 @@ def put_aboard(
             )
         hull.record(Severity.NOTABLE, "person.aboard", text, data=data)
     return "person.aboard", text, data
+
+
+def _drivers_follow(world: Any, person: Any, hull: Any) -> None:
+    """The prompt follows the player's person's body (decision 62; package 65, step 4):
+    when he is the player's one person (`knowledge.players_person`) and his hull changes,
+    the drivers follow him into it, as `boats.follow_boat` has them follow him into the
+    boat: a routine line `hull.followed` of her log, a consequence of his order and never
+    a driver's input, so that a replay moves it the same. The owner's `follow` stands for
+    his own choice."""
+    from freesail.world import knowledge
+    from freesail.world.hulls import Hull
+
+    root = world
+    while isinstance(root, Hull):
+        root = root.world  # the one World behind a façade (`followed` is the World's)
+    hulls = getattr(root, "hulls", None)
+    if not isinstance(hulls, dict) or str(getattr(hull, "id", "")) not in hulls:
+        return
+    if getattr(root, "followed", None) == hull.id:
+        return
+    try:
+        his = knowledge.players_person(root)
+    except Exception:  # noqa: BLE001  (a world whose people cannot be read)
+        his = None
+    if his is not person:
+        return
+    root.followed = str(hull.id)
+    with root.as_hull(hull):
+        root.record(
+            Severity.ROUTINE,
+            "hull.followed",
+            f"The drivers follow {person.name} aboard the {hull_name(hull)}: her readings are his.",
+            data={"ship": str(hull.id), "person": person.name},
+        )
 
 
 def where_am_i(world: Any, person: Any) -> str:
@@ -978,7 +1053,9 @@ def where_am_i(world: Any, person: Any) -> str:
         how = oars.words() if oars is not None else "under oars"
         mark = dict(getattr(oars, "pulling_for", {}) or {})
         for_words = ""
-        if mark.get("alongside"):
+        if mark.get("fast"):
+            for_words = f", made fast alongside {mark.get('name') or 'the ship'}"
+        elif mark.get("alongside"):
             for_words = ", pulling for the ship"
         elif mark.get("quay"):
             for_words = ", pulling for the quay"

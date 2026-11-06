@@ -166,6 +166,7 @@ from freesail.ui.console import (
     start_world,
     station_watcher,
 )
+from freesail.world import knowledge
 
 CLIENT_DIR = Path(__file__).resolve().parents[2] / "client"
 
@@ -283,8 +284,18 @@ class Driver:
             return
         if e.kind in STATION_SPEAKS and self._heard is None and e.actor.startswith("the "):
             self._heard = (e.actor.removeprefix("the "), "speaks")  # `--ease-on-station`
+        if not self.hears(e):
+            return  # the player reads by his place as a model does (decision 59)
         for x in self._view.feed(e, self.compression):
             self._emit_shown(x)
+
+    def hears(self, e: Event) -> bool:
+        """Whether a line reaches the player's person where he is (package 65, step 4;
+        decision 59), as the console's `hears`: the pages' play log is his person's."""
+        world = self.world
+        return knowledge.hears(
+            world, knowledge.players_senses(world), e, knowledge.players_station(world)
+        )
 
     def _on_channel(self, line: dict[str, Any]) -> None:
         """A line of the channel between the player and the director (package 67): the
@@ -502,7 +513,8 @@ class Driver:
         return [
             x.to_dict() if isinstance(x, Rollup) else event_dict(x)
             for x in rolled(
-                [e for e in self.world.log.tail(n) if not for_the_record(e)], self.compression
+                [e for e in self.world.log.tail(n) if not for_the_record(e) and self.hears(e)],
+                self.compression,
             )
         ]
 
@@ -531,6 +543,12 @@ class Driver:
             if path is not None:
                 # `save PATH`, as in the console: writing the disk is the driver's too
                 return self._save(path)
+            moved = self._drivers_eye(text)
+            if moved is not None:
+                # `follow "X"` and `look at <where>` typed at the order line (package 65,
+                # step 4; decision 62): the owner's eye, the driver's as at the console, and
+                # never an order of the game; refused in words to the pages alone
+                return moved
             live = live_world_order(text)
             if live is not None:
                 from freesail.agents import director as director_mod
@@ -582,6 +600,39 @@ class Driver:
             if not self._ease_for_station():
                 self.emit_snapshot()
             return e
+
+    def _drivers_eye(self, text: str) -> Event | None:
+        """`follow "X"`, `follow nobody`, `look at <where>` at the order line: the drivers'
+        centre moved, the line the World writes sent to the pages; a refusal sent to them
+        as a line of the driver's and written nowhere. None for any other line."""
+        words = str(text).split()
+        if not words:
+            return None
+        head = words[0].lower()
+        if head == "follow" and len(words) > 1:
+            move, arg = self.world.follow, " ".join(words[1:])
+        elif head == "look" and len(words) > 2 and words[1].lower() == "at":
+            move, arg = self.world.look_at, " ".join(words[2:])
+        else:
+            return None
+        try:
+            e = move(arg)
+        except ValueError as err:
+            e = Event(
+                tick=self.world.clock.tick,
+                ship_time=self.world.clock.ship_time,
+                severity=Severity.ROUTINE,
+                kind="driver.refused",
+                text=str(err).rstrip(".") + ".",
+                actor="driver",
+                data={},
+            )
+            self._emit({"type": "event", "event": event_dict(e)})
+            return e
+        self._follow_log()
+        self._emit({"type": "event", "event": event_dict(e)})
+        self.emit_snapshot()
+        return e
 
     def _console_query(self, text: str) -> Event | None:
         """`state`, `muster`, `the sail room` and `the booms` typed at the browser's order
@@ -1418,7 +1469,8 @@ def create_app(
             events = driver.world.log.since(since) if since is not None else driver.world.log.all()
             if until is not None:
                 events = [e for e in events if e.tick <= until]
-            events = [e for e in events if not for_the_record(e)]  # decision 46
+            # decision 46; and the player's person's reach (package 65, step 4; decision 59)
+            events = [e for e in events if not for_the_record(e) and driver.hears(e)]
             events = events[-max(1, min(limit, 5000)) :]
             return JSONResponse([event_dict(e) for e in events])
 

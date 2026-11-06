@@ -81,6 +81,7 @@ from freesail.core import replay as replay_mod
 from freesail.core.events import Event, RollupView, Severity, Shown, for_the_record
 from freesail.core.world import UNLOGGED_KINDS, Scenario, World
 from freesail.ship.stub import OrderError
+from freesail.world import knowledge
 
 HELP = __doc__.split("Driver commands")[1] if __doc__ else ""
 
@@ -105,6 +106,14 @@ ALARM_SPEED = 1.0
 
 # The words for the driver's speed, the console's `time` and the owner's `speed`.
 SPEED_WORDS = ("speed", "time")
+
+
+def _is_number(word: str) -> bool:
+    try:
+        float(word)
+    except ValueError:
+        return False
+    return True
 
 
 def clamp_compression(value: float) -> float:
@@ -532,8 +541,22 @@ class Console:
             # at the console carries a world order's effects, never the order, nor the
             # director's coming and going; 'the director's log' reads them
             return
+        if not self.hears(e):
+            return  # the player reads by his place as a model does (decision 59)
         for x in self._view.feed(e, self.compression):
             self._show(x)
+
+    def hears(self, e: Event) -> bool:
+        """Whether a line of the log reaches the player's person where he is (package 65,
+        step 4; decision 59: the play log is his person's, what reaches him where he is;
+        decision 62: one person, the seat's or his ship's captain, the prompt following his
+        body into the boat and aboard another ship). Everything under `knowledge: all`, at
+        the director's seat, in an observed world, and under `follow` of a hull he holds no
+        person in, which is the owner's eye (`world.knowledge.players_senses`)."""
+        world = self.world
+        return knowledge.hears(
+            world, knowledge.players_senses(world), e, knowledge.players_station(world)
+        )
 
     def _show(self, x: Shown) -> None:
         self._print(x.line())
@@ -586,7 +609,9 @@ class Console:
             return False
         if cmd == "help":
             self._print(HELP)
-        elif cmd == "hold":
+        elif cmd == "hold" and not args:
+            # `hold` alone holds the clock; `hold water` is the boat's order and `hold your
+            # fire` the guns' (decision 62: a driver's word never shadows an order of the game)
             self.running = False
             self._print("Clock held.")
         elif cmd == "go" and not args:
@@ -594,7 +619,7 @@ class Console:
             # person's own moves (package 53), orders to the ship like any other
             self.running = True
             self._print(f"Clock running at {self.compression:g}x.")
-        elif cmd in SPEED_WORDS:
+        elif cmd in SPEED_WORDS and (not args or _is_number(args[0])):
             try:
                 wanted = float(args[0])
                 self.set_compression(wanted)
@@ -602,7 +627,7 @@ class Console:
                 self._print(f"Compression {self.compression:g}x{most}.")
             except (IndexError, ValueError):
                 self._print(f"Say '{cmd} 30' for thirty game seconds per real second.")
-        elif cmd == "tick":
+        elif cmd == "tick" and (not args or args[0].isdigit()):
             n = int(args[0]) if args else 1
             self.running = False
             done = self._run(n)
@@ -627,7 +652,7 @@ class Console:
                 self._print(e.text)
             except ValueError as err:
                 self._print(str(err).rstrip(".") + ".")
-        elif cmd == "state":
+        elif cmd == "state" and not args:
             self._print(self.world.followed_line)
             for s in self.world.summary_lines():
                 self._print(s)
@@ -662,10 +687,10 @@ class Console:
             # the book (spec M4 §3): a query like `state`, printed, never journaled
             for s in self._book_lines(line):
                 self._print(s)
-        elif cmd == "log":
+        elif cmd == "log" and (not args or args[0].isdigit()):
             n = int(args[0]) if args else 20
             for e in self.world.log.tail(n):
-                if not for_the_record(e):
+                if not for_the_record(e) and self.hears(e):
                     self._print(e.line())
         elif directors_log_asked(line):
             # the director's log revealed on request (spec M7b §6; package 50): a driver's

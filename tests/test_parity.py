@@ -121,6 +121,10 @@ SNAPSHOT_BLOCKS = {
     "crew": "the readings `hands_on_deck`, `watch_below`; the muster",
     "agents": "the reading `stations` and the `state` tool",
     "driver": "the reading `pace`",
+    # package 65, step 4 (decision 59): the player at the prompt reads by his place as a
+    # station does; the browser's greyed readouts are the sample's rows left out
+    "knowledge": "the `readings` tool's line on the rows not to be had where the station "
+    "stands and where each is; the brief's line on where he is",
 }
 
 # The station's tools (`agents.tools.TOOLS`), each with the player's counterpart, or the
