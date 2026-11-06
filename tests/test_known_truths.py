@@ -13612,3 +13612,26 @@ def test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_r
     )
 
     test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs()
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 4 (`docs/design/Design-DoorAndVisitor.md` §5): not half blind at far detail
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks():
+    """Six brigs within the range, the cap's three awake: a model at a fourth's and a fifth's
+    captain's station holds each over the cap (`HELD_OVER_CAP`, two) and nobody sleeps for
+    them; a sixth takes the farthest unheld hull's place. A held brig asleep twenty-nine
+    miles off, steered for the Wolf, is put about by her plan's own order at a mile and a
+    half (88's chart test on her leg), the line urgent in her log and in her captain's
+    sample; a brig whose harness has no door keeps the far plan as it was."""
+    from tests.test_held_hulls import (
+        test_a_far_held_hull_standing_for_a_rock_is_put_about_and_her_captain_called,
+        test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was,
+        test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance,
+    )
+
+    test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance()
+    test_a_far_held_hull_standing_for_a_rock_is_put_about_and_her_captain_called()
+    test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was()

@@ -460,6 +460,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_far_hail.py::test_the_hail_between_two_far_hulls_replays_by_both_roads_to_the_same_logs",
         "test_known_truths.py::test_truth_7_393_a_far_hulls_hail_goes_to_her_captains_model_and_the_table_waits",
         "test_known_truths.py::test_truth_7_394_the_hail_between_two_model_held_far_hulls_replays_by_both_roads",
+        # package 82b, item 4: the hulls a model holds over the cap, and the far plan's danger
+        # (4 to 14 s alone, 2026-11-06)
+        "test_held_hulls.py::test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance",
+        "test_held_hulls.py::test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was",
+        "test_known_truths.py::test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks",
     }
 )
 

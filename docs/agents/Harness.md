@@ -464,6 +464,12 @@ A hail of a ship whose captain a model holds goes to that model whatever her hul
 her captain's sample carries it, and he answers with his own `hail`; the table answers only a
 ship nobody holds, and meanwhile the hailer's log says she has not yet answered.
 
+A hull whose captain a model holds through a door is held over the cap (package 82b, item 4):
+she ranks with the ships in dealings, and up to two such hulls are awake beside the cap's three
+(`crews.HELD_OVER_CAP`). Asleep beyond the range, her plan keeps her off the land and the
+charted rocks by the chart test her rules captain uses awake: a leg that stands into danger is
+put about by the plan's own order, and the urgent line in her log calls her captain.
+
 ## 17b. The seat on another ship, the boat, and the readings following the person (package 82)
 
 **The player's own seat on another ship.** `--seat captain --ship <name>` at the console and

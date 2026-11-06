@@ -17133,3 +17133,32 @@ ruff format --check clean. The whole suite is the lead's in the cloud at the mer
 run of the fast tier on the step's tree found three checkpoint tests failing (a harness
 restored from a save written before the package lacked the slept span: a class default
 mended it) and the slow tier the two truths above; both runs are in the commits' messages.
+
+## Package 82b: the hulls a model holds, over the cap (2026-11-06)
+
+**`crews.HELD_OVER_CAP = 2`** (judgement, `docs/design/Design-DoorAndVisitor.md` §5; the
+owner's convoy of the testing week: "four or five" sail in company, four of them held by
+models). A hull whose captain's station a model holds through a door (`crews.model_held`: a
+harness at `captain`, started, not released, with its door, which the save carries) ranks with
+the dealings in the cap's order, and up to two such hulls are left out of the cap's count: the
+three of `CREWED_CAP` and two held beside them, five awake beside the player's. Past the
+allowance a held hull takes the farthest unheld hull's place, as a stationed one does under
+the cap. The range and its hysteresis are unchanged: a held hull beyond six miles sleeps, and
+her plan's danger check (`crews.far_dangers`, 88's chart test on the far body's leg) keeps her
+off the land and the rocks while she does.
+
+**The pace of a convoy, informatively** (no pace truth moved or added; this container's four
+cores, `tests/test_held_hulls.py`'s `_sail` and `_seat`: six merchant brigs hove to in a line
+one to three miles from the frigate, the fakes' samples every hour, 900 ticks after two
+minutes' settling, two runs each):
+
+| held hulls | awake beside the player's | ticks a second |
+|---|---|---|
+| none | 3 (the cap) | 165, 167 |
+| four | 5 (the cap and the allowance) | 108, 102 |
+
+Measured while the fast tier ran beside it (load 4.9 on four cores), so the figures are low in
+the same proportion; quiet figures below when taken. Five awake costs about two crewed hulls'
+worth over the cap, as package 43's measure has it (a crewed hull costs what the frigate costs),
+and stays above `CREWED_FLOOR_TICKS_S` (60) here; the owner's machine is about half the build
+machine's figure.
