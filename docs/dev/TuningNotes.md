@@ -17251,3 +17251,21 @@ passed alone and in the re-run; not of this step, noted for the lead.
 **The pace.** The filter's cost is step 1's (nothing of this step is on the tick's path but
 `add_word`'s string join at a word and the director's read of its log at its sample); the
 pace tests are run as the rule asks and their figures are below.
+
+**The suites on the step's final tree** (`ff319e1`, the trunk's `dee47da` merged; this
+container's four cores): the fast tier whole, `python -m pytest -n 4 -p no:cacheprovider`,
+5,929 passed, 1 expected failure (the old count test kept under decision 60), none failed (399
+slow tests left out); the slow tier of the touched files and the known truths
+(`tests/test_knowledge.py`, `test_agents`, `test_officer`, `test_tell`, `test_rollup`,
+`test_regatta`, `test_wardroom_doors`, `test_local_runner`, `test_mcp_server`, `test_agent_api`,
+`test_api_door`, `test_director`, `test_consent`, `test_between_hulls`, `test_aboard_another`,
+`test_people`, `test_crews`, `test_hulls`, `test_checkpoint`, `test_replay`, `test_in_world`,
+`test_known_truths`; `--slow -m "not pace" -n 4`), 946 passed, 9 expected failures, none
+failed; the pace tests alone and last (`--slow -m pace`), all thirteen passed, the figures: the
+frigate alone 569 ticks a second, truth 7-386's three stations seated 615 under the rule
+against 617 with it off (619 against 602 in the known truths' run of the same measure: the
+filter's cost is within the run-to-run spread, as at step 1), the Channel observed 347 and with
+the frigate at the view 230; ruff check and ruff format --check clean. The first full run of
+the step's tree, before the mending above, failed five tests of the fast tier and five of the
+slow (item (d) to (g) above); both runs are in the commits' messages. The whole suite is the
+lead's in the cloud at the merge.
