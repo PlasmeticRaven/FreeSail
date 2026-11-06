@@ -17865,6 +17865,24 @@ shown (the player's person found by a few reads, the `driver.left` scan from whe
 off) and once a snapshot; the boat made fast is a position copy a tick for one hull while she
 lies alongside. The pace tests are run as the rule asks and their figures are below.
 
+**The suites on the step's final tree (7cd7887, the trunk at eabf20f merged, package 95 whole).**
+Fast tier whole: 6309 passed, 1 xfailed, 45 min 7 s (exit 0); the fast tier was run on each
+merged tree as the lead asked: on 875c192 it found the one red of the step (the snapshot's
+`knowledge` block wanting in the parity test's registry of blocks, added at d42cfa7), on
+0e9a84b (95's step 1 merged) 6305 passed and 1 xfailed, and on 7cd7887 the figure above. Slow
+tier of the thirty-six touched files and the known truths (`--slow -m "not pace" -n 4`), in
+two halves so neither met the two-hour limit a single run of the whole met: the first (the
+known truths, the knowledge, the hulls, the boats, the replay, the checkpoint, the people, the
+ports and places, the director, the consent, the wardroom's doors) 722 passed, 8 xfailed,
+1 h 0 min 35 s; the second (the agents, the primer, the grammar book, the in-world words, the
+orders, the console, the server, the observer, the doors, the boats' and the visitors' names,
+the sail by name, the parity) 2402 passed, 1 xfailed, 17 min 11 s; both exit 0. Pace tests
+alone and last (`--slow -m pace -rP`): 13 passed, 5 min 26 s; three stations seated, the
+knowledge filter's place 559 ticks a second against `all` 556 (truth 7-386's run 517 against
+546: the filter's cost within the noise, as at steps 1 to 3); the frigate alone 519, the
+Channel observed 319, the same Channel with the frigate at the view 213. ruff check and
+ruff format --check clean.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was
