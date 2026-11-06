@@ -2963,7 +2963,9 @@ class Dealings:
                     f"She is under way; bring her to an anchor in "
                     f"{_possessive(found[0].name)} roads before the boat goes ashore."
                 )
-            raise OrderError("She is not in port; there is no shore within a boat's pull.")
+            raise OrderError(
+                "She is not in port; there is no shore within a boat's pull." + _ship_form(world)
+            )
         if self.stance(port) == "hostile":
             raise OrderError(f"{port.name} is hostile to her; a boat sent in would be taken.")
         low = words.lower()
@@ -3837,3 +3839,23 @@ class Dealings:
         if due is not None:
             data["due_tick"] = due
         return text, data
+
+
+def _ship_form(world: Any) -> str:
+    """At sea, with a sail in sight within a boat's pull, the form that sends the boat to
+    her (package 95, the case study's lesson 3: the refusal sent the captains to port
+    instead of to the form that would have worked); '' with none."""
+    from freesail.world import lookout as L
+    from freesail.world.movement import BOAT_BETWEEN_NM
+
+    if not L.SAIL_BY_NAME:
+        return ""
+    lookout = getattr(world, "lookout", None)
+    reach = BOAT_BETWEEN_NM * units.NAUTICAL_MILE
+    for s in getattr(lookout, "sightings", None) or []:
+        if getattr(s, "seen_as", "") == "sail" and s.distance_m <= reach:
+            return (
+                " A sail in sight within a boat's pull is reached by 'send the boat to the "
+                "<ship> with <persons>', the ship by her name or as the lookout names her."
+            )
+    return ""

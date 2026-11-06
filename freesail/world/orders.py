@@ -319,6 +319,12 @@ def hull_named(world: Any, words: str, make: bool = True) -> Any:
         return hulls[key]
     vessels = getattr(world, "vessels", None)
     vessel = vessels.find(words.strip().strip('"')) if vessels is not None else None
+    if vessel is None:
+        # a sail in sight named as her lookout names her (package 95: 'the razee', 'the brig
+        # on the larboard quarter'), where the world keeps a lookout
+        from freesail.world.lookout import vessel_in_sight
+
+        vessel = vessel_in_sight(world, words)
     if vessel is None or vessel.done:
         names = ", ".join(v.name for v in vessels.active() if v.description) if vessels else ""
         raise WorldOrderError(

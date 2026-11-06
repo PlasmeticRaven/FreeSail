@@ -203,6 +203,14 @@ def _addressee(world: Any, who_words: str) -> Any:
         by_kind = [v for v in pool if w in str(v.what or "").lower() or w in v.kind.lower()]
     if by_kind:
         return min(by_kind, key=near)
+    # the sail as the lookout names her (package 95): her quarter, her bearing, her distance
+    # and the words made out of her, among the sails in sight
+    lookout = getattr(world, "lookout", None)
+    seen_sail = lookout.sail_named(who_words, world) if hasattr(lookout, "sail_named") else None
+    if seen_sail is not None:
+        for v in candidates:
+            if str(v.id) == str(seen_sail.feature.modern):
+                return v
     mark = _mark_in_sight(world, w)
     if mark is not None:
         raise OrderError(
