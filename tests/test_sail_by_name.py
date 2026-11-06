@@ -279,6 +279,9 @@ def test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb()
     # the port's verb keeps its own words whole
     for words in ("hail the pilot", "hail the pilot's cutter", "hail for a pilot"):
         assert stations.recognises(words) is None, words
+    # and the captain's `hail the pilot` at the prompt is the port's, as on the trunk
+    e = off_the_lizard().submit("hail the pilot")
+    assert e.kind == "order.rejected" and "There is no pilot to hail" in e.text, e.text
 
 
 # ---------------------------------------------------------------------------
