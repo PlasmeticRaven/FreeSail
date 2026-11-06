@@ -5934,14 +5934,14 @@ def test_truth_7b_104_a_player_without_food_or_sleep_reads_the_urgent_lines_and_
 PLACES_EVERY = 600  # the officer sampled every ten minutes, in lockstep
 
 
-def _officer_below_and_up():
+def _officer_below_and_up(script=None):
     from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
     from freesail.agents.agent import officer
 
     world = _directed_world()
     world.submit("set plain sail")
     world.run(60)
-    script = [
+    script = script or [
         reply("", call("stand_by", until="ten minutes")),
         reply(
             "",
@@ -5969,6 +5969,29 @@ def _officer_below_and_up():
     return world, oh
 
 
+def _officer_kept_on_deck_and_below_off_watch():
+    """Package 65 (the lead's ruling of 2026-10-31 on the design's §12): the officer with
+    the deck is refused `go below` in words naming hand_over; he hands the deck over, goes
+    below off watch, and his deck order is refused; a glass later he comes on deck, the
+    captain gives him the deck again and the same order is carried out."""
+    from freesail.agents import call, reply
+
+    script = [
+        reply("", call("stand_by", until="ten minutes")),
+        reply(
+            "",
+            call("submit_order", text="go below"),
+            call("hand_over", note="Going below to the gunroom; nothing in sight."),
+            call("submit_order", text="go below"),
+            call("submit_order", text="set the royals"),
+            call("stand_by", until="a glass"),
+        ),
+        reply("", call("submit_order", text="go on deck"), call("stand_by", until="a glass")),
+        reply("", call("submit_order", text="set the royals"), call("stand_by", until="a watch")),
+    ]
+    return _officer_below_and_up(script)
+
+
 def _until_line(world, kind: str, n: int, seconds: int = 3600) -> None:
     """Run the world a minute at a time until it has `n` lines of `kind`."""
     for _ in range(seconds // 60):
@@ -5978,14 +6001,18 @@ def _until_line(world, kind: str, n: int, seconds: int = 3600) -> None:
     raise AssertionError(f"no {n} lines of {kind} in {seconds} s")
 
 
-def test_truth_7b_100_a_person_who_goes_below_is_below_and_his_deck_order_refused_until_up(
-    tmp_path,
-):
-    """Spec M7b §18, truth 100: "A person who goes below is below in the muster and the
-    state; an order of the deck's from him is refused in words until `go on deck` brings
-    him back." The officer of the watch (a fake at his station, with the deck) goes below:
-    the gunroom is his place, the people and the muster say so, and his order to set the
-    royals is refused in words naming the way back; a glass later he comes on deck and
+@pytest.mark.xfail(
+    strict=True,
+    reason="package 65 (the lead's ruling of 2026-10-31, decision 59's rule): an officer with "
+    "the deck is refused `go below` and is not blind below; the truth as 53 built it, with "
+    "the deck taken into the gunroom, is kept beside the new reading",
+)
+def test_truth_7b_100_old_the_officer_with_the_deck_went_below_and_kept_it(tmp_path):
+    """Spec M7b §18, truth 100 as package 53 built it: "A person who goes below is below in
+    the muster and the state; an order of the deck's from him is refused in words until `go
+    on deck` brings him back." The officer of the watch (a fake at his station, with the deck)
+    goes below: the gunroom is his place, the people and the muster say so, and his order to
+    set the royals is refused in words naming the way back; a glass later he comes on deck and
     the same order is carried out. The player at the prompt alike: the captain in his cabin
     is refused the helm and given it on the quarterdeck. The game saved and replayed by the
     transcript and by the acts is the same log."""
@@ -6014,6 +6041,76 @@ def test_truth_7b_100_a_person_who_goes_below_is_below_and_his_deck_order_refuse
     )
     taken = [e for e in events(world, "order.accepted") if "royals" in e.text]
     assert taken and taken[0].actor == "the officer of the watch"
+    # the player at the prompt is a person with a place too: the captain below is refused
+    # the helm, and has it on the quarterdeck
+    assert world.submit("go below").kind == "captain.below"
+    e = world.submit("steer south-west")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith("You are in the cabin; go on deck to give the helm an order.")
+    assert world.submit("come on deck").kind == "captain.on_deck"
+    assert world.submit("steer south-west").kind != "order.rejected"
+    world.run(60)
+    path = replay_mod.save_to_file(world, tmp_path / "places.json", checkpoint=False)
+    data = replay_mod.load_file(path)
+    for road in (replay_mod.BY_TRANSCRIPT, replay_mod.BY_ACTS):
+        copy = replay_mod.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == world.log.digest(), road
+        assert copy.stations.holder("officer of the watch").where == "quarterdeck", road
+        assert copy.people.captain.where == "quarterdeck", road
+
+
+def test_truth_7b_100_a_person_who_goes_below_is_below_and_his_deck_order_refused_until_up(
+    tmp_path,
+):
+    """Spec M7b §18, truth 100: "A person who goes below is below in the muster and the
+    state; an order of the deck's from him is refused in words until `go on deck` brings
+    him back." As package 65 reads it (the lead's ruling of 2026-10-31, decision 59's rule:
+    a man with the deck is not blind below, and the period's officer of the watch did not
+    leave the deck): the officer with the deck is refused `go below` in words naming
+    hand_over and keeps the deck on the quarterdeck; he hands it over, goes below off watch
+    (the gunroom his place, the people and the muster say so) and his order to set the royals
+    is refused in words; a glass later he comes on deck, the captain gives him the deck again
+    and the same order is carried out. The player at the prompt alike: the captain in his
+    cabin is refused the helm and given it on the quarterdeck. The game saved and replayed
+    by the transcript and by the acts is the same log."""
+    from freesail.agents.model import DATA
+    from freesail.api import queries
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world, oh = _officer_kept_on_deck_and_below_off_watch()
+    _until_line(world, "person.moved", 1)
+    pearce = world.stations.holder("officer of the watch")
+
+    def results() -> list[str]:
+        return [
+            str(r.get("result"))
+            for t in oh.turns
+            if t.role == DATA
+            for r in t.content.get("tool_results", [])
+        ] + [str(r.get("result")) for _at, stood in oh.stood_results for r in stood]
+
+    said = results()
+    assert any(
+        "You have the deck: it is not left for the gunroom" in x and "hand_over" in x for x in said
+    ), said
+    assert pearce.where == "gunroom" and not oh.agent.deck
+    assert world.people.state_words(pearce) == "off watch, in the gunroom"
+    assert f"{pearce.name}, off watch, in the gunroom" in queries.muster_lines(world)[-1]
+    moved = events(world, "person.moved")
+    assert [e.text for e in moved] == [f"{pearce.name} went below to the gunroom."]
+    assert any("Going below to the gunroom" in e.text for e in events(world, "agent.handover"))
+    assert not any("royal" in e.text for e in events(world, "evolution.started"))
+    _until_line(world, "person.moved", 2)
+    assert pearce.where == "quarterdeck"
+    assert (
+        events(world, "person.moved")[-1].text == f"{pearce.name} came on deck, to the quarterdeck."
+    )
+    assert world.submit("you have the deck").kind == "agent.deck"
+    assert world.people.state_words(pearce) == "on deck, with the watch"
+    _until_line(world, "evolution.started", len(events(world, "evolution.started")) + 1, 2400)
+    taken = [e for e in events(world, "order.accepted") if "royals" in e.text]
+    assert taken and taken[-1].actor == "the officer of the watch"
     # the player at the prompt is a person with a place too: the captain below is refused
     # the helm, and has it on the quarterdeck
     assert world.submit("go below").kind == "captain.below"
@@ -10524,19 +10621,27 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
                 return Reply(
                     calls=(call("submit_order", text=f"shape a course for {port} via the Start"),)
                 )
+            if "wait for her at the quay" in said:
+                # package 65: ashore he does not see the boat pulling back to the ship, so
+                # his `come aboard` may find her away; he asks again at his next sample
+                stage["again"] = "come aboard"
             return Reply()
         log = last.get("log") or []
         kinds = {str(e.get("kind")) for e in log}
         text = " ".join(str(e.get("text", "")) for e in log).lower()
         heard = " ".join(str(x) for x in (last.get("heard") or [])).lower()
         s, orders = stage["n"], []
-        if s == 0:
+        if stage.get("again"):
+            orders, stage["again"] = [stage["again"]], None
+        elif s == 0:
             orders, s = ["come to an anchor"], 1
         elif s == 1 and "signal.read" in kinds and "plymouth" in text:
             orders, s = ["answer the signal", "weigh", "shape a course for Plymouth"], 2
         elif s == 2 and "ship.anchored" in kinds and "the sound" in text:
             orders, s = ["go ashore"], 3
-        elif s == 3 and "boat.alongside" in kinds:
+        elif s == 3 and "person.ashore" in kinds:
+            # package 65: ashore he has nothing of the ship (the boat alongside her is not
+            # seen from the quay); his own landing is the quay's line, and it reaches him
             orders = [
                 "go to the counting house",
                 "say good day to you, Mr Gill; I am come for the packet",
@@ -10651,11 +10756,13 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     for words in ("counting house", "mr gill", "packet", "lugger", "barbican"):
         assert words not in own, words
     # every order of the fake's was taken but the two the land guard refused, answered by
-    # the way by marks
+    # the way by marks, and his `come aboard` asked while the boat was still pulling back to
+    # the ship (package 65: ashore he does not see her), asked again until she was home
     refused = [e for e in crew.log if e.kind == "order.rejected" and e.actor == "the captain"]
-    assert len(refused) == 2 and all("give the way by marks" in e.text for e in refused), [
-        e.text for e in refused
-    ]
+    guard = [e for e in refused if "give the way by marks" in e.text]
+    away = [e for e in refused if "The boat is away; wait for her at the quay" in e.text]
+    assert len(guard) == 2 and len(guard) + len(away) == len(refused), [e.text for e in refused]
+    assert away and all("come aboard" in e.text for e in away)
     assert stage["orders"][0] == "come to an anchor" and stage["orders"][-1] == "hail the frigate"
     assert fake.calls > 6
     h.release("the test is done") if hasattr(h, "release") else None
@@ -13300,6 +13407,110 @@ def test_truth_7_332_the_directors_new_forms_perform_in_the_dry_run_and_in_play_
     test_the_director_follows_a_ship_as_a_drivers_line_and_the_dry_run_says_so()
     test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea()
     test_the_truth_shows_a_manned_boat_as_a_vessel_and_the_harness_names_her()
+
+
+# ---------------------------------------------------------------------------
+# Package 65: the place's knowledge (truths 7-370 onward; `docs/design/Design-PlaceKnowledge.md`).
+# A sample carries what the person's place allows (decision 59; the owner's ruling of
+# 2026-10-19). Step 1's truths are here; 7-370 is completed by step 3 (the officer's report).
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks():
+    """A captain in the cabin: his sample carries no deck reading (no wind, no speed, no
+    sail, no sail in sight) and says in one line where they are to be had; the glass, the
+    tell-tale compass's heading and the chart's rows are his; the bell reaches him and the
+    lookout's sighting does not; the sail work overhead a sound and not a figure. The
+    officer's report of a sail sighted reaching him there is step 3's clause."""
+    from tests.test_knowledge import test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks
+
+    test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+
+
+def test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where():
+    """At the prompt (`what is the depth` from the cabin), by the `readings` tool
+    (`not_here`) and in the sample's line, a reading not to be had where the asker stands is
+    answered with where it is to be had, never the figure; the same reading from the deck
+    gives the figure; the book and the rules read the ship as before."""
+    from tests.test_knowledge import (
+        test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks,
+        test_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where,
+    )
+
+    test_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where()
+    test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+
+
+def test_truth_7_376_the_handover_fold_keeps_the_place():
+    """A handover note written in the cabin folds the conversation into a turn whose readings
+    are the cabin's, whole (58a's rule), and the brief's head says the rule once."""
+    from tests.test_knowledge import test_the_handover_fold_keeps_the_place
+
+    test_the_handover_fold_keeps_the_place()
+
+
+def test_truth_7_380_every_kind_the_code_writes_is_placed_and_the_hulls_sounds_reach_below():
+    """The lines' reach: every kind the code writes is in the table or falls to the deck by
+    design (the lead's guard); the bell, a gun and all hands reach the hold; the sail work
+    reaches the cabin as a sound and not the gunroom; a sleeper is woken by a gun and not by
+    the bell; the readings' places are the design's table."""
+    from tests.test_knowledge import (
+        test_every_kind_the_code_writes_is_placed_or_falls_to_the_deck_by_design,
+        test_the_reach_of_the_hulls_sounds_the_deck_and_the_record,
+        test_the_senses_of_each_place_and_the_readings_places,
+    )
+
+    test_every_kind_the_code_writes_is_placed_or_falls_to_the_deck_by_design()
+    test_the_reach_of_the_hulls_sounds_the_deck_and_the_record()
+    test_the_senses_of_each_place_and_the_readings_places()
+
+
+def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail():
+    """The lookout's sample carries the horizon's rows and the heading, no log, no lead, no
+    glass; the quarterdeck's `say` does not reach it, `say to the lookout` does, and the sail
+    work aloft does."""
+    from tests.test_knowledge import test_the_lookouts_station_reads_the_horizon_and_no_instrument
+
+    test_the_lookouts_station_reads_the_horizon_and_no_instrument()
+
+
+def test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place(tmp_path):
+    """A station in the cabin restored from a checkpoint samples the cabin's; a station on a
+    hull that sleeps in the far shape and wakes reads by its person's place in her
+    throughout."""
+    from tests.test_knowledge import (
+        test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place,
+        test_a_station_restored_from_a_checkpoint_keeps_its_place_and_its_senses,
+    )
+
+    test_a_station_restored_from_a_checkpoint_keeps_its_place_and_its_senses(tmp_path)
+    test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place()
+
+
+@pytest.mark.pace
+def test_truth_7_386_the_filters_cost_with_three_stations_seated_is_within_a_fifth():
+    """The pace (informative): the frigate under plain sail with three fakes seated, in truth
+    51's form, `knowledge: place` against `knowledge: all` on the same tree; the figures in
+    docs/dev/TuningNotes.md (package 65, step 1). Asserted within a band: the rule costs
+    under a fifth of the pace (measured a wash: the senses are read once a tick)."""
+    from tests.test_knowledge import test_the_filters_cost_measured_with_three_stations_seated
+
+    test_the_filters_cost_measured_with_three_stations_seated()
+
+
+def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
+    """A captain in the cabin standing by for `speed under 20 knots` is woken with 'Mr Pearce
+    sends down to you' before the words, the log being hove on deck; a tripwire the cabin can
+    judge (the depth by the chart) and the same stand-by on deck wake as 58a's. The call's
+    line in the log is step 3's clause. Also the lead's ruling: an officer with the deck does
+    not go below."""
+    from tests.test_knowledge import (
+        test_a_tripwire_judged_below_wakes_as_the_officers_call,
+        test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft,
+    )
+
+    test_a_tripwire_judged_below_wakes_as_the_officers_call()
+    test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
 
 
 # ---------------------------------------------------------------------------

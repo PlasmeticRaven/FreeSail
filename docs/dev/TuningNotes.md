@@ -17014,3 +17014,122 @@ Not proven here: the build machine may not run another C library's code, so the 
 were not sailed under glibc 2.43. The proof is the lead's to choose: the whole suite on the
 trunk `5b7e719` on the new image (red in the same nine if this is so), or the workflow's
 `runs-on` pinned to `ubuntu-24.04` (green on the hotfix if this is so).
+## Package 65: the place's knowledge (2026-10-31)
+
+The brief in `docs/dev/M7-WorkPackages.md` ("Package 65"); the design in
+`docs/design/Design-PlaceKnowledge.md`, written and reported before anything was built, the
+lead's rulings on its six questions recorded in it, a postscript for each step as it is built.
+Built as a sibling session in its own container on `claude/pkg-65`, off the trunk's `b896c4c`
+(82 closed whole), each step a mergeable state with the fast tier whole on its final tree, the
+slow tier of the touched files and the known truths (`--slow -m "not pace" -n 4`), the pace
+tests alone and last, the trunk brought in at the boundary before the step's final run; the
+whole suite the lead's in the cloud at each merge. The physics are not touched; no consent
+file; no ship file.
+
+### Step 1: the rule in the harness (the design's §2, §4, §5 and §11's key)
+
+**What was built.** `freesail/world/knowledge.py` new, the three functions of §2 as data and
+reads: a person's **senses** from his spot (66's `hearing.spot_of`, and whether he is asleep by
+his needs or the bill), the open deck's, the masthead's, the cabin's, the gunroom's, a room's
+below, the shore's, a sleeper's, the director's everything; a **reach** class on every kind of
+log line, by the kind (`REACH`, 130 kinds) or by its family (`FAMILIES`, 80 families), **the
+deck the default** for a kind nobody placed, a line's data (`place`, `to`, `heard_by`) read
+first; the cabin hearing the sail and yard work overhead as a sound (`as_heard`: "Sail handled
+overhead.", "The hands at the braces.", the kind kept, the lead's ruling), an evolution's lines
+as written; a **place** on every row of the readings registry (`Reading.where`, the deck by
+default, and `where_words`: "the lead is cast on deck"), 82 rows placed by hand in
+`api/readings.py` and the four readings modules, the rest the deck's. In the harness
+(`agents/harness.py`): `Harness.senses()` (cached by the tick, the orders and the log's length:
+the stand-by's scan asks for it many times a tick), the sample's log by reach with the lines
+slept through read with a sleeper's senses (`_slept`), the sample's readings by place with one
+line for the rest (`Sample.readings_elsewhere`, `knowledge.elsewhere_words`), `_reaches`
+extended from 66's words to every kind (so the stand-by's wake, the danger's wake, the
+severity's sample and the notable digest carry only what reached him), the brief head and the
+handover fold by senses, a tripwire judged for a station that cannot read its rows where it
+stands fired as the officer's call ("Mr Pearce sends down to you: speed under 20 knots";
+`Tripwire.rows`, `Condition.rows`). The `readings` tool's `not_here` and `where_you_are`; the
+prompt's query answered with where (`orders/prompt.py` `_elsewhere`: "The depth: the lead is
+cast on deck; you are in the cabin.", a `query.reading` line whose data says `elsewhere`); the
+scenario key `knowledge: all` (`Scenario.knowledge`, the loader's check); `go below` and `go to
+<a place below>` refused to a station with the deck below the captain's
+(`movement._deck_kept`, naming `hand_over`; `go aloft` allowed); one sentence in every brief's
+head (`agent.PLACE_KNOWLEDGE_WORDS`). Tests: `tests/test_knowledge.py` (the kinds' guard, the
+senses and the places, the cabin, the prompt, the fold, the key, the masthead, the deck kept,
+the tripwire's call, the checkpoint, the hull asleep, the pace), truths 7-370 (in part), 7-373,
+7-376, 7-380, 7-383, 7-385, 7-386 and 7-387 (in part).
+
+**Taken another way, with the reason.** (1) The design's table (§3) had the glass the
+cabin's alone and the purser's books the cabin's and the hold's, so that the deck had no glass;
+built, every row has the deck among its places (the glass is read at each watch and entered on
+the log board, and the purse and the stores are asked of the purser on deck as every pinned
+passage asks them), so that **the deck reads every row as it did** and the sample's
+`readings_elsewhere` line is absent on deck, as §5 promised; the cabin's distinction is what the
+cabin has, not what the deck lacks. (2) The design's §12 had the handover fold rebuild the
+brief head; 37g's fold keeps the brief whole and puts the readings as they stood in the folded
+turn (58a: the first sample after a fold is whole), so it is that turn that carries the cabin's
+rows, and the head's "readings now" and "last lines" are by senses at the seating. (3) The
+tripwire's `depth under <n> fathoms` reads the chart's depth as well as the lead's (58a), and
+the chart is the cabin's: so a captain below is woken by it as 58a's, and the call's words come
+for a tripwire whose every row is the deck's (the speed, the wind, a sail within so many
+cables). (4) `message.aboard` (a letter come aboard by the boat) is the deck's, the gangway
+being on deck; the door and the reading are the captain's.
+
+**Found on the way.** (a) The brief head leaked the whole readings and the whole log to a
+station seated below (`resend_brief` read `tools.read_log` and `readings_words` without a
+person); found while placing the fold, mended with it. (b) The stand-by's danger wake
+(`_danger_in`, 37g) read no hearing at all: a captain in the cabin was woken by "her sails
+lifting" before the filter reached it; gated by `_reaches` with the rest. (c) The `readings`
+tool at a station nobody holds through a door (the watcher in `test_agents`) raised a
+`KeyError` through `_holder`; caught, the station's own place serves. (d) `readings_words`
+carries the per-asker rows (`where am I`) with no asker, as it did before this package; left as
+it was.
+
+**The pace.** Truth 51's form in this container (four cores, the load under 0.5): the frigate
+alone on the station trial **485 ticks a second** on the design note's tree (the trunk's
+`b896c4c`); with three fakes seated and standing by a glass (the captain's, the officer's and
+the lookout's stations), `knowledge: place` **563** against `knowledge: all` **484** (truth
+7-386's measurement on the step's tree: a wash, the difference the machine's noise). Before the
+senses were cached by the tick the same measure read 496 against 532: the stand-by's scan of
+each new line asked for the person's spot afresh each time, a people lookup a line; cached by
+(the tick, the orders, the log's length) it is read once a tick.
+
+**What moved: nothing pinned; two truths moved to the rule, old beside new.** No recorded
+passage moves a person below or ashore (`data/scenarios/*.orders`, the fixtures' saves: none
+has `go below`), the deck reads every row as before, and the filter writes nothing; the
+samples are not in any digest. The slow tier found the two tests that read by the old rule:
+**truth 7b-100** (53's: the officer of the watch took the deck into the gunroom, "with the
+deck, in the gunroom") is kept as it was, a strict expected failure with the lead's ruling as
+its reason (`test_truth_7b_100_old_...`), and read anew beside it: the officer with the deck
+is refused `go below` in words naming `hand_over`, hands the deck over, goes below off watch
+and is refused the royals, comes up, is given the deck and sets them; the captain's half and
+the replay by both roads as before. **Truth 7-200** (74's tender): the fake skipper landed at
+Plymouth waited for `the boat alongside` in his sample, the boat alongside his ship in the
+Sound, which a man on the quay does not see; he acts on his own landing (`person.ashore`, the
+quay's line) instead, and, since from the counting house he does not see the boat pulling back
+to the ship either, his `come aboard` finds her away ("The boat is away; wait for her at the
+quay") and he asks again at his next sample, as a man ashore would; the rest of the truth as it
+was. Found by it: a person in the script's
+boat on her errand (the place `boat`, no hull of his own) had no senses at all and missed
+`the boat alongside` on his way back aboard; within a boat's pull of her he has her deck's
+senses (judgement: he sees her sails handled and hears her bell across the water), nothing of
+what every man in the hull feels. 53's test of the officer below without the deck stands; 41's
+tests are step 2's. The pace truth 7-159 read 496 ticks a second under the pace run and 500 is
+its floor; alone again it passed (the frigate alone on the trunk's tree measured 485 in this
+container, so the floor is the build machine's and the container reads about at it).
+
+**The suites on the step's final tree** (`1bb8933`, the trunk's `d4e6701` merged; this
+container's four cores): the fast tier whole, `python -m pytest -n 4 -q -p no:cacheprovider`,
+5,927 passed, none failed (397 slow tests left out); the slow tier of the touched files and the
+known truths (`tests/test_knowledge.py`, `test_agents`, `test_harness_instruments`,
+`test_officer`, `test_people`, `test_orders_places`, `test_readings`, `test_scenarios`,
+`test_places`, `test_between_hulls`, `test_in_world`, `test_checkpoint`, `test_replay`,
+`test_crews`, `test_wardroom_doors`, `test_world_orders`, `test_director`, `test_known_truths`;
+`--slow -m "not pace" -n 4`), 841 passed, 8 expected failures (the rulings', truth 7b-100's old
+reading among them), none failed; the pace tests alone and last (`--slow -m pace`), every one
+passed, the figures: the frigate alone 530 ticks a second, truth 7-386's three stations seated
+593 under the rule against 615 with it off (and 556 against 568 in the known truths' run of the
+same measure), the Channel observed 310 and with the frigate at the view 209; ruff check and
+ruff format --check clean. The whole suite is the lead's in the cloud at the merge. A first
+run of the fast tier on the step's tree found three checkpoint tests failing (a harness
+restored from a save written before the package lacked the slept span: a class default
+mended it) and the slow tier the two truths above; both runs are in the commits' messages.

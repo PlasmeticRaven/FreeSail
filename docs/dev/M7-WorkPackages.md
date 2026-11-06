@@ -62,7 +62,7 @@ on these packages; that is the owner's choice.
 | 87 | Opus (the owner, 2026-10-29; Fable before) | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them. **Added by the owner, 2026-11-05 (the case study of the all-models encounter, lesson 6):** the surgeon's order of treatment as a station's judgement and the captain's word: 73 built the period's rule, first come first served (Turnbull), with a knob for worst first; 87 adds `the surgeon to <name>` (the captain's order to see to a named man), the surgeon's own precedence for the captain and the officers when treatable (Nelson's refusals at the Nile and at Trafalgar are the proof the surgeon would have taken him first; a wound judged mortal is dressed and left, and the surgeon goes back to his work), and the wounded captain's own body: his `how am I` reading the bill's wound and not the needs' "rested", his sleep in the cockpit the surgeon's to allow, the surgeon's report a wake for his station | to brief after 85's pass over the orders, the primer and the docs is merged (the owner, 2026-10-29), and after 77; the brief fixes the pattern on the gunner and the four follow it |
 | 88 | Opus (the owner, 2026-10-29; Fable before) | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; **briefed 2026-10-30 (below)**, each item with the symptom, the rule as it stands, the rule as it should read and what proves it, the moved pins by bisection (the owner, 2026-10-29); **approved and launched 2026-10-30** as an Opus sibling session on `claude/pkg-88`, beside 82; **built and merged 2026-10-31** (below, "Package 88 as merged") |
 | 89 | Opus | **The held gauges' water** (79b's finding): a held gauge enters the tide's blend for the positions within its own block's bounds alone, so that the Channel east's six, Biscay's, Portugal's and the islands' gauges give their water its own tide and no position west of 1 W reads anything new; the master's epitome's rises by the same water; the proof that no recorded passage's digest moves | briefed below (2026-10-29); **approved and launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-89`, with the Mediterranean's held gauges of 79c and 79d now among its cases; **built and stopped for the lead's ruling the same night** (the rule as briefed, 73 gauges given their blocks, no recorded passage moved; four of the blocks' own tests failing on their true water, Bournemouth and Portsmouth held in `channel-mid`, Beachy Head a hundredth over the brief's foot, the tiles' fill on the false mean level): **ruled 2026-10-30, a step 4** (the four re-measured or their data mended old beside new, the two gauges held with the options recorded, 7-280 pinned at the measured figure, the gap at 40.50 N closed if no tile moves) and the fill's rebuild booked as package 93; **merged 2026-10-30** (the record below) |
-| 90 | Opus (the ships session) | **The tartane and the xebec** (the owner, 2026-10-29): the Mediterranean's two lateen hulls on 79c's water, the tartane the third reference vessel of decision 11 (one raking mast, the lateen mainsail, the jibs on the long bowsprit, the small mizen, the boat in tow), the xebec with the lateen on three masts and her sweeps, each as a trader or fisherman and as a corsair or the King's by fits and roles, built to Build-Ships.md §5.0's principles and the ladder of evidence from Roux's and Tofiño's plans and the pilots 79c lays down, with the lateen handling B3.1 gives (worn, not tacked; the yard dipped round the mast); the regency's cruisers as a role with their doctrine; inside milestone 7 | the ships session's next window after 75 closes, on 79c's block; to brief by the session in its plan's form, for the lead's gate |
+| 90 | Opus (the ships session) | **The Spanish and Mediterranean ships** (the owner, 2026-10-29, widened 2026-11-06 from the tartane and the xebec to five hulls): on 79c's water, from the smallest up: the tartane, the third reference vessel of decision 11 (one raking mast with the lateen mainsail and a square topsail over it, the lateen on the small mizen, one or two headsails on the long bowsprit by judgement, the boat in tow); the polacre, a lateen on a forward-raked foremast and on the mizen with square sail on the main (a lateen and square sails on one hull, the bilander's problem on a Mediterranean hull); the xebec, a lateen on all three masts and her sweeps as an option; the twenty-gun corvette *Diana* as captured and used by the Spanish navy in 1809; and the *Purísima Concepción* class three-decker of the Spanish navy, the game's first three-decked ship. Each as her trades and roles allow (a trader or fisherman and a corsair or the King's for the small three; the navy's fits for the two ships), built to Build-Ships.md §5.0's principles and the ladder of evidence from Roux's and Tofiño's plans, Winfield and the Spanish sources the session finds, and the pilots 79c lays down, with the lateen handling B3.1 gives (worn, not tacked; the yard dipped round the mast); the regency's cruisers as a role with their doctrine; inside milestone 7 | the ships session's next window after 75 closes, on 79c's block; to brief by the session in its plan's form (a design document each, the ladder of evidence, the lead's gate before a file), for the lead's gate |
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull; when the owner likes |
 | 91 | Opus | **The viewer's light and air** (the owner's references of 2026-10-29, decision 57): the ship's own lights warm and distinct at night (the stern lantern, the top lights and the binnacle 71 already hoists, each a glow on the faces near it); the scene's light by the hour and the sky (the sun's altitude and azimuth from `core/moon.py`, the weather's cover and visibility: a gradient sky and sea, the faces tinted by their side to the light, dusk's warmth, night's dark with the lights alone, haze by the visibility); a lively telltale at the masthead and a waving ensign, canned but driven by the apparent wind the physics already gives (direction, a flutter whose rate and amplitude follow the speed), animated between snapshots; all in the present SVG viewer, stylesheet-driven, drawing only, nothing of the world read that the readings do not give | after 81 and 75's hull; when the owner likes; the two reference pictures stay with the owner (another game's work), described in the decision |
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
@@ -70,7 +70,7 @@ on these packages; that is the owner's choice.
 | 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
 | 82b | Opus | **The door follows its harness, the visitor's name, the far hull's hail** (the owner's testing of 2026-10-31 to 11-05: the Mr Hill and Captain Owen cases, the hails between model captains answered by the table): the agent API's desk keyed to the harness and not to a station's name and ship (`agents/remote.py` `Desk.seats`, `Seat`), so a model's door follows its person between hulls and `stand down` stands down one station; the visitor keeps his own station's name ("officer of the watch, of the Raven, aboard the Amazon") as the primer promises (`world/movement.py` `visiting_station`, `world/seats.py`); a hail of a hull in the far shape whose captain a model holds is his to answer, never the table's (`world/hail.py` `deliver`, `model_holds_her`); truths 7-390 to 7-394 | launched 2026-11-05 on the hotfix's merge, beside 65 (session_01XooV4BCBsF3TQSAwxBrxmy) | | |
 | 95 | Opus | **The sail by her name** (the owner, 2026-10-31 and 11-05): one resolver for a sail named in words (the kind, the quarter, the bearing, the distance, each narrowing the pool; the closer on remaining ambiguity; a name once known over all), serving `the glass on`, `make out`, the hail's addressee, `bearing of` and `pull for` (`world/lookout.py` `glass_on`, `make_out`; `world/hail.py` `_addressee`; `orders/boat.py`); a sail made out and identified named in the readings (`strangers`, `in_sight`, `sail_in_sight`) by her name while she is in sight, and her identification lost when she is lost sight of until she is closed and made out again; truths 7-395 to 7-399 | after 82b (both touch `hail.py`) | | |
-| 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule; **launched 2026-10-31; step 1 closed on its branch 10-31 and held unmerged through the week's pause; resumed from step 2 on 2026-11-05 with decisions 62 and 63 and the hearing across hulls added on 82's whole merge** as a Fable sibling session on `claude/pkg-65` (session_01XooV47SeuYqmTZ8W1Rzyoo), the design note first |
+| 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule; **launched 2026-10-31; step 1 closed on its branch 10-31 and held unmerged through the week's pause; step 1 merged 2026-11-05 (eb147e7); resumed from step 2 on 2026-11-05 with decisions 62 and 63 and the hearing across hulls added on 82's whole merge** as a Fable sibling session on `claude/pkg-65` (session_01XooV47SeuYqmTZ8W1Rzyoo), the design note first |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -1953,11 +1953,65 @@ lead's proofs: run 31, the trunk as it stood on the unpinned workflow (red in th
 if so), and the workflow's Linux runner pinned to ubuntu-24.04 from this merge, the run on
 the merged trunk after it (green if so). The builder found on the way that `hail._addressee`
 takes the distance to every candidate on every hail (a cost, not a change). The pace job's
-three floors under on run 30: the runner's speed.
+three floors under on run 30: the runner's speed. Run 31 (the trunk at ce9071f, no hotfix
+aboard, the workflow still on ubuntu-latest, 21:18 to 22:18 UTC): lint green, all six shards
+red, pace green; the failures the same nine and no other (shard 0 the two captain trials,
+the thick-weather merchant 424 lines for 426 and the lee-shore digest c2bfe179 for 04f2fcd0;
+shard 1 truths 78 and 79 and the merchant at seed 7, 96480 for 96540; shard 2 gate 5B's
+schooner, 767 lines for 766; shard 3 the anchorings [57, 100918] for [57, 100616, 115547];
+shard 4 gate 6A's intent, brought up at 111239 for 111238; shard 5 truth 77's digest
+5422360d for 6abbbff4), the first proof made: the image moves the pins, the hotfix moved
+none. Run 32 (the trunk at 36d30c4, the hotfix aboard, the runner pinned to ubuntu-24.04,
+22:18 to 23:01 UTC): lint green, all six shards green, 6,266 passed, 11 skipped, 10
+expected failures (run 29's 6,264 and the hotfix's two tests); the pace job 7 of 11, the
+four floors under at 423 to 486 against 500, the runner's speed as on run 30. The second
+proof made: the nine pins stand on the 24.04 machine with the hotfix in, and the trunk is
+green again in the cloud. The image moves only when the lead moves it and re-measures.
 
 **Beside them:** the owner's Opus session's hotfixes are on no branch on GitHub (the saves'
 rules digest `9221bc3593cad15d` against the trunk's); the lead has asked for that branch, so
 the testing build and the trunk do not diverge and the saves replay on the trunk.
+
+### Package 65, step 1 (the rule in the harness), as merged (2026-11-05)
+
+Merged `claude/pkg-65` at f52f146 (eb147e7, `--no-ff`; the step's final tree 1bb8933 with
+the trunk's d4e6701 merged, then the suites' record), held unmerged on its branch from
+2026-10-31 through the week's pause by the owner's word and merged on the week's turn with
+the hotfix in. **Built as designed, with the lead's rulings of 2026-10-31** (the tell-tale in
+the cabin alone; the sail work a sound in the cabin by `as_heard`; the deck the default reach
+and the default place of a reading, the kinds' test generated from the code's string
+literals; `go below` and `go to <a place below>` refused to a station with the deck below
+the captain's, `go aloft` allowed): `freesail/world/knowledge.py` (130 kinds and 80 families
+placed), `Reading.where` on 82 rows by hand, the harness's sample by place (`Harness.senses`
+cached by tick, orders and log length; the log by reach with the lines slept through read
+with a sleeper's senses; `readings_elsewhere`; `_reaches` extended from 66's words to every
+kind: the stand-by's wake, the danger wake, the severity sample and the notable digest; the
+brief head and the handover fold by senses; a tripwire judged below fired as the officer's
+words), the readings tool's `not_here` and `where_you_are`, the prompt's query answered with
+where (`orders/prompt.py` `_elsewhere`), the scenario key `knowledge: all`, one sentence in
+every brief's head. **Taken another way, accepted:** the deck reads every row (the glass
+and the purser's books the deck's too), so the pinned deck samples stand and the note's "the
+glass none" is corrected; the fold carries the cabin's rows in the folded turn and keeps
+37g's brief whole; the depth tripwire reads the chart, which the cabin has, so a captain
+below is woken by it as 58a's, the call's words coming for a tripwire of the deck's rows
+alone; `message.aboard` the deck's; a person in the script's boat has her deck's senses
+within a pull. **Found on the way:** the brief head leaked the whole readings and log to a
+station seated below (mended); the danger wake read no hearing (gated); the readings tool
+at a station nobody holds raised (caught). **Pins:** nothing recorded moved (no recorded
+passage moves a person below or ashore; the filter writes nothing); two truths moved old
+beside new with the reason: 7b-100 (53's officer took the deck into the gunroom) kept as a
+strict expected failure with the ruling and read anew; 7-200 (74's tender) the fake skipper
+ashore acting on his own landing and asking for the boat again while she was away. The
+informative pace band of truth 7-386 widened from eight tenths to seven for the machine's
+noise, the figures the record (three stations seated, 593 under the rule against 615 with
+it off; the frigate alone 530). **The suites:** the builder's fast tier whole 5,927 passed;
+the slow tier of the eighteen touched files and the known truths 841 passed, 8 expected
+failures; the pace tests all passed; the lead's trial merge on the trunk's 36d30c4 (the
+tuning notes' conflict with the hotfix builder's section resolved keeping both, in order),
+ruff check and format clean, the fast tier whole green (exit 0); the whole suite in the
+cloud on the pinned runner dispatched after the hotfix's own proof run. Steps 2 to 8 go on
+from the resumption of 2026-11-05 with decisions 62 and 63 and the hearing across hulls
+added to the brief.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -4749,3 +4803,59 @@ as the owner says you will; the *Neufchatel*'s main topgallant and the generalis
 rigs are in the owner's hands with you, and the proposal comes to the lead with the step
 that builds it. Nothing new is launched this week.
 
+**2026-11-06, package 90 widened: the Spanish and Mediterranean ships.** The owner's word
+of today, for your plan when 75's last window closes: package 90 is no longer the tartane
+and the xebec alone but a Spanish and Mediterranean package of five hulls, from the smallest
+up: (1) the tartane of decision 11, as booked; (2) a **polacre**, a lateen on a forward-raked
+foremast and on the mizen with square sail on the main, which puts a lateen and square sails
+on one hull as the bilander does and so takes the generalising of mixed rigs you are working
+out with the owner for the *Neufchatel*; (3) the **xebec**, a lateen on all three masts, with
+her sweeps as an option of the fit; (4) the twenty-gun **corvette *Diana*** as captured and
+used by the Spanish navy in 1809, a ship-rigged sixth rate's size for the Spanish side; (5)
+the ***Purísima Concepción* class three-decker** of the Spanish navy (the owner's spelling
+"Concepión" read as the ship's), the game's first three-decked ship, which asks of the
+generator what no hull yet has: three gun decks, a first rate's complement and her stations,
+the great ship's handling. The design is yours in your plan's form as before (a design
+document each, the ladder of evidence, the lead's gate before a file); the sources Roux's and
+Tofiño's plans, Winfield where he reaches, and the Spanish sources you find, cited by page;
+the *Diana* is settled by the owner (2026-11-06): the Danish frigate *Diana* built in 1804,
+taken at Cartagena with the declaration of war and kept by the Spanish navy to 1832, Winfield,
+*Spanish Warships* (the owner's edition, p. 930): 124 ft by 32 ft 6 in by 16 ft (34.55 by
+9.06 by 4.46 m), 335 tons, 167 men; twenty 24-pounder carronades as captured, twenty
+30-pounder carronades as first rearmed, and by 31.10.1817 twelve 12-pounders, eight
+30-pounder carronades and four 3-pounder obuses; so her fits are three, dated. Her plan is
+the Spanish navy's own, "Plano de la Corbeta de Guerra la Diana, del porte de 20 carronadas
+de á 30, mandada por el Teniente de Navío de la Real Armada D. José de Julián por los años de
+1809 y 1810", a sheer with the body plan and the half-breadth and a table of her particulars,
+in the Ministry of Defence's virtual library (Biblioteca Virtual de Defensa, record 1037832,
+https://bibliotecavirtual.defensa.gob.es/BVMDefensa/es/consulta/registro.do?id=1037832), the
+same library 79c's pilots came from: a §5.0 rung-A source for her lines. The file is in the
+tree as `docs/references/images/corvette-diana-1809-plano-bvmdefensa.jpg` (the owner, the
+same day: the library distributes the digital copy under CC BY 4.0 on the condition that the
+source is named, "Fuente: Archivo Histórico de la Armada Juan Sebastián de Elcano /
+Biblioteca Virtual de Defensa"; the provenance and the condition in the images README). Her
+particulars on the sheet are in the navy's units (pies de Burgos, 0.2786 m), and so are
+Winfield's feet for every Spanish row (his metres prove it: 124 ft is 34.55 m at that foot),
+so her design document reads both in metres and never as English feet. The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
+is yours to propose; the lead's view is the tartane first as the reference vessel and the
+smallest, the three-decker last as the largest departure. Nothing of it opens before 75's
+last window closes, and nothing this week (decision 61).
+
+**2026-11-06, later: Winfield's passages for 90 set down.** The owner sent the passages of
+*Spanish Warships in the Age of Sail* on the five (the tartanas, pp. 1249 to 1252; the
+polacres, pp. 1083 to 1084; the xebecs in Spanish service with the Artillery Regulation of
+1752's batteries, pp. 1134 to 1136; the *Purísima Concepción* class whole with her service,
+pp. 406 to 410; the *Diana*, p. 930) with three of its pictures. The facts are in
+`docs/design/VesselReferences-2026-11-Spanish.md` in the lead's words, cited by page; the
+book's text is copyright and is not in the tree, and the three pictures are cited and not
+held (Monleón's polacre and xebec, the Greenwich draught of *San José*). Two things of the
+lead's reading for your design documents: Winfield's feet for Spanish ships are **pies de
+Burgos** (his metres prove it), so the game's constants come from his metres; and the
+polacre's pole masts (no tops, the yards lowered to hand the square sails) are a handling
+the generator does not yet say, to be said in her document with the mixed-rig generalising.
+**The owner's offer:** further passages of Winfield are sourced on request; ask the lead by
+title and class and the lead asks the owner. **The tartane's rig, corrected by the owner the
+same day:** the Roux-school watercolour shows the square topsail over the lateen as
+Monleón's print does, so she is rigged with a lateen and a square topsail on the main, a
+lateen on the small mizen, and one or two headsails by judgement from the sources together
+and the hull's implications.
