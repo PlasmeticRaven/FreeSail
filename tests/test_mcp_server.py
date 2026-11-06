@@ -838,7 +838,7 @@ def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_e
     )
     assert spoke.startswith(
         "Your turn is open: sample at Morning watch (04:02) (its own word).\n"
-        "Noted in your journal while the game had the floor. Your words are in the log "
+        "Noted in your journal while the game had the floor. Your words are in your journal "
         "under your mark, and your stand-by (until a glass) ended at your own word"
     )
     assert "While you stood by (since Morning watch, 8 bells (04:00), until a glass): 1 " in spoke

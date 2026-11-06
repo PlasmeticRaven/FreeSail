@@ -72,6 +72,28 @@ Scenarios as 75 ships them (a scenario of 1796 among them); the items are the br
 - [ ] **14. The pictures.** `ship_view` from two facings and `chart` at each span, through a door with the page open. *Her two decks of ports drawn; the picture put back only by the model's hand.*
 - [ ] **15. A scenario of 1796.** Her year's wars (the nations' table as of 1796 in `the war`), her service and her station as the scenario gives them. *The war the ship sailed with is 1796's, not 1805's, and the pilot's news fits it.*
 
+## Judgement decisions for the gate's testing (the owner, 2026-11-06)
+
+Figures built on judgement are ruled finally by the owner after the gate's testing and tuning,
+not at the merge; each is an item here with its figure and its measure, and the ruling goes
+into the record with the figures tuned, old beside new.
+
+- [ ] **J1. The lee ports and the roll** (package 75, L2 and L3; Build-Ships.md §7;
+  `combat/ports.py`). The figures: a port shut when its sill is within a foot of the water
+  (`shot.PORT_SHUT_M`), opened again six inches clear (`PORT_REOPEN_M`); the dip the heel
+  plus the roll's amplitude on the lee side and the roll less the heel on the weather side,
+  so the small ships' weather ports shut in bands of wind in a seaway (the cutter's at 17.5
+  to 20 kn on the beam); the dwell of a minute before a shut port reopens, ruled by the lead
+  for the flicker in gusts (the frigate at 21 kn gave 46 changes of port in an hour without
+  it); the deck's side said once, and only with her guns cast loose. *Test:* an action on a
+  reach in a fresh breeze and one in a seaway with the sea on the beam, in the frigate and in
+  the cutter; `the guns` and the log through the hour; the gun's silence behind its shut port
+  and the broadside's and the division's words. *Judge:* whether the ports shut and open as a
+  seaman expects at those winds and seas, whether the flicker is gone and the hold is not too
+  long (a port kept shut a minute after the sea has left it), whether the weather side's
+  shutting reads true, and what the lines say; tune the foot, the six inches, the minute
+  and the roll's share, old beside new, and rule.
+
 ## Open items found in the records
 
 - **The owner's debrief of 70 to 72** (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/debrief.md`): the convoy's stall on `full and by` with no orders (reproduced and its cause named by 86, the commodore's own brig-sloop, not the near station order the study suspected; the mend 88's, moving truths 7-152 and 7-153); a model captain of another ship unable to go ashore before 84 (84's step 4, to be seen in item 1); going between ships by the boat (82's heart, not built); the colours flickering between false and true under fire (71's privateer doctrine; 88's, the colours held once shown before an enemy, 85 not having taken it); the viewer's ports, guns, smoke, signals and flags (81's order of work); the enemy's view (a design question for 81).

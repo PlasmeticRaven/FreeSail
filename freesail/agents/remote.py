@@ -323,6 +323,26 @@ class Seat:
     parent: Any = None
     # the handover fold's budget the door asked for (`--budget-tokens`), when it did (67)
     budget_tokens: int | None = None
+    # the door's own address for the station, as it stationed (`seat_key`: its name, and
+    # the ship's before it); the seat is filed by its harness's identity once it has one
+    # (package 82b), and the address is only what the door's calls name
+    address: str = ""
+
+    @property
+    def ident(self) -> str:
+        """The seat's key in the desk (package 82b): its harness's identity once the
+        station is taken, the door's address while its consent conversation runs."""
+        h = self.harness
+        if h is not None and getattr(h, "ident", None):
+            return str(h.ident)
+        return f"asked:{self.address}"
+
+    @property
+    def hull(self) -> Any:
+        """The hull the station is in now: its harness's, which follows its person
+        (package 82b); the hull it was asked for on before a harness exists."""
+        h = self.harness
+        return h.world if h is not None else self.world
 
     def bump(self) -> None:
         with self.cond:
@@ -364,9 +384,30 @@ class Seat:
 
 
 def seat_key(station: str, ship: str = "") -> str:
-    """The desk's key for a seat: the station's name, and on another ship (package 43)
-    the ship's before it ('palinure/captain')."""
+    """A door's address for a seat: the station's name, and on another ship (package 43)
+    the ship's before it ('palinure/captain'). The desk files a seat by its harness's
+    identity (package 82b, `Seat.ident`) and finds it by this address only for a call."""
     return f"{ship.lower()}/{station}" if ship else station
+
+
+def home_harness(world: Any, name: str) -> Any:
+    """The harness whose own station is `name` on this hull (package 82b): one whose person
+    is away from it as a visitor elsewhere, else the harness at that name here; None for
+    none. So a door stationing at its own station finds its harness wherever it is."""
+    hid = harness_mod.hull_id_of(world)
+    here = (getattr(world, "agents", None) or {}).get(name)
+    away = None
+    for _hull, h in harness_mod.harnesses_of(world):
+        home = getattr(h, "_home", None)
+        if home is None or str(home[0]) != hid:
+            continue
+        if str(getattr(home[1], "name", home[1])) == name:
+            away = h
+            if not h.agent.released:
+                return h
+    if here is not None and not here.agent.released:
+        return here
+    return here if here is not None else away
 
 
 class Desk:
@@ -470,8 +511,8 @@ class Desk:
             # and a station below the captain's is told who commands (package 52)
             session = session_kind_of(asked_kind, station_kind, race=self.race, world=world)
             key_name = seat_key(name, ship)
-            seat = self.seats.get(key_name)
-            if seat is not None and seat.world is not None and seat.world is not world:
+            seat = self.seat_at(name, ship)
+            if seat is not None and seat.parent is not None and seat.parent is not parent:
                 seat = None  # the game was replaced (the console's replay): a new seat
             reconnected = _reconnected(seat, model_name)
             if seat is not None and not seat.released:
@@ -486,7 +527,8 @@ class Desk:
                 return self._attach(seat, door, body) | (
                     {"reconnected": True} if reconnected else {}
                 )
-            existing = world.agents.get(name)
+            # the station's own harness, wherever its person is (package 82b)
+            existing = home_harness(world, name)
             if existing is not None and not existing.agent.released:
                 if not isinstance(existing.model, Playback):
                     raise DeskError(
@@ -531,6 +573,7 @@ class Desk:
                 director_seat=director_seat,
                 parent=parent,
                 budget_tokens=int(budget) if budget else None,
+                address=key_name,
             )
             ask_again = bool(body.get("ask_again"))
             opted_out = decided.ask_again and not ask_again
@@ -578,7 +621,7 @@ class Desk:
             else:
                 seat.words = why
                 self._take_station(seat, record)
-            self.seats[key_name] = seat
+            self._file(seat)
             self.changed()
             answer = self._answer(seat, 0) | {"since": 0, "key": seat.key}
             if reconnected and seat.phase == STATION:
@@ -672,7 +715,7 @@ class Desk:
         world = seat.world
         note = (self._note(seat, record) + self._seat_note(seat)).strip()
         model = RemoteModel(seat.bump)
-        existing = world.agents.get(seat.station)
+        existing = home_harness(world, seat.station)
         samples_at = 0
         budget = self._budget_tokens(seat)
         if existing is not None and existing.agent.released:
@@ -928,6 +971,7 @@ class Desk:
             seat.left_at = ""
         if ok:
             self._take_station(seat, rec)
+            self._file(seat)
         else:
             seat.phase = STOPPED
             seat.conv = None
@@ -977,7 +1021,8 @@ class Desk:
             # turn opens now (recorded, so a replay speaks at the same point)
             was = a.stand_by.words if a.standing_by and a.stand_by is not None else None
             h.door_act("speak", reply.text, "its own word")
-            words = "Your words are in the log under your mark"
+            # (in the journal, not the log, since decision 60: package 65, step 2)
+            words = "Your words are in your journal under your mark"
             if h.station.name == "director":
                 # the director's words are its log's, never the play log's (package 67;
                 # R-21: "in the log under your mark" sent a note for the captain nowhere)
@@ -1202,7 +1247,7 @@ class Desk:
         seating's key, as every read for that station does (package 37g); the library
         itself is open to a door that holds no station yet."""
         with self.lock:
-            seat = self.seats.get(seat_key(station_name(name), str(ship or "")))
+            seat = self.seat_at(station_name(name), str(ship or ""))
             if seat is not None and not seat.released and seat.key:
                 self._seat(name, key, ship)
             return str(tools.library(self.world(), name, topic or "contents", section, find))
@@ -1235,7 +1280,7 @@ class Desk:
             if (
                 seat.phase == STATION
                 and h is not None
-                and (seat.world is world or getattr(seat.world, "parent", None) is world)
+                and (seat.hull is world or getattr(seat.hull, "parent", None) is world)
                 and isinstance(h.model, RemoteModel)
                 and h.floor == "model"
             ):
@@ -1264,6 +1309,10 @@ class Desk:
                 d["station"] = name
                 d["ship"] = getattr(getattr(w, "vessel", None), "name", "")
                 d["shape"] = getattr(w, "shape", "")
+            if h.visiting:
+                # a visitor (package 82b): his own station, his ship and his host
+                d["station"] = name
+            d["ident"] = h.ident
             d["line"] = _station_line(d)
             out.append(d)
         for seat in self.seats.values():
@@ -1313,7 +1362,17 @@ class Desk:
         say the station is held and by which identity, and that nothing was run. `ship`
         names another ship the station is on (package 43)."""
         name = station_name(name)  # 'officer' names the officer of the watch (package 37)
-        seat = self.seats.get(seat_key(name, " ".join(str(ship or "").split())))
+        ship = " ".join(str(ship or "").split())
+        address = seat_key(name, ship)
+        # by the seating's key first (package 82b): the seat the door was given, wherever its
+        # harness's person has gone; the address only to say who holds it otherwise
+        seat = next(
+            (s for s in self.seats.values() if key and s.key == key and s.address == address),
+            None,
+        )
+        if seat is not None:
+            return seat
+        seat = self.seat_at(name, ship)
         if seat is None:
             raise DeskError(
                 404,
@@ -1323,6 +1382,23 @@ class Desk:
         if seat.key and key != seat.key:
             raise DeskError(409, self.held_words(seat, key))
         return seat
+
+    def seat_at(self, name: str, ship: str = "") -> Seat | None:
+        """The seat a door's address names (package 82b): of those asked at it, the one
+        not released, else the latest; None for none."""
+        address = seat_key(station_name(name), " ".join(str(ship or "").split()))
+        at = [s for s in self.seats.values() if s.address == address]
+        live = [s for s in at if not s.released]
+        return (live or at or [None])[-1]
+
+    def _file(self, seat: Seat) -> None:
+        """The seat filed under its key (package 82b: its harness's identity once it has
+        one), any earlier filing of the same seat taken out; a seat asked at the same
+        address and never seated gives its place."""
+        for k, s in list(self.seats.items()):
+            if s is seat or (k == seat.ident and s is not seat):
+                del self.seats[k]
+        self.seats[seat.ident] = seat
 
     def held_words(self, seat: Seat, key: str | None) -> str:
         """What a call without the seating's key is told: the station is held, by which

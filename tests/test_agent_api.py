@@ -549,7 +549,7 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     # (package 28c), recorded so that a replay speaks at the same point
     a = g.reply("Hello there.")
     assert a["out_of_turn"] and a["spoke"] and a["floor"] == "model"
-    assert "Your words are in the log under your mark" in a["words"]
+    assert "Your words are in your journal under your mark" in a["words"]
     assert "Hello there." in g.notes()
     assert reasons(a) == ["its own word"] and a["interim"] is None
     assert g.harness.transcript[-1] == {

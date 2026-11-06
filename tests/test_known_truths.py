@@ -13546,6 +13546,49 @@ def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
     test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
 
 
+# ---------------------------------------------------------------------------
+# Package 82b, item 1 (`docs/design/Design-DoorAndVisitor.md` §2): the door follows its harness
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save():
+    """A station held through the agent API whose person goes aboard another ship in his own
+    boat keeps its door, its model and its identity (`Harness.ident`, the hull it was seated
+    on and its station) through the move, a stationing again by its own name, and a save and
+    a load by both roads: one harness, one seat, nothing made at his own station, and the
+    desk's listing naming him by his station, his ship and his host."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_door_follows import (
+        test_the_moved_station_keeps_its_door_its_model_and_its_identity,
+        test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load,
+    )
+
+    test_the_moved_station_keeps_its_door_its_model_and_its_identity(Path(tempfile.mkdtemp()))
+    test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_the_load(
+        Path(tempfile.mkdtemp())
+    )
+
+
+def test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness():
+    """Two "captain" stations of two hulls, each through a door of the same model; one
+    captain goes aboard the other's ship. Each door is answered by its own harness (the
+    host's captain's harness is never carried into the visitor's station: the owner's
+    "one door covering two stations, the newest by recency"), and a stand-down by the
+    visitor's name stands his harness down and leaves the other stationed."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_door_follows import (
+        test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down,
+    )
+
+    test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down(
+        Path(tempfile.mkdtemp())
+    )
+
+
 def test_truth_7_379_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard():
     """Decision 60 (package 65, step 2): a reply's prose is journaled under the station's
     mark and in the director's log, in no log of the play, heard by no station; `say` is

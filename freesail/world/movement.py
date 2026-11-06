@@ -687,8 +687,11 @@ def seat_of_person(world: Any, person: Any) -> tuple[Any, Any] | None:
         seat = getattr(hull, "player_seat", None)
         if seat is None or seat.agent.released:
             continue
-        if str(getattr(seat.station, "person", "") or "") == name:
+        named = str(getattr(seat.station, "person", "") or "")
+        if named == name:
             return hull, seat  # his voice, or his own station made for him by name
+        if named:
+            continue  # a station that names another (package 82b: never by the holder)
         try:
             holder = hull.stations.holder(seat.station.name)
         except Exception:  # noqa: BLE001  (a muster that cannot run binds nobody)
@@ -701,15 +704,22 @@ def seat_of_person(world: Any, person: Any) -> tuple[Any, Any] | None:
 def harness_of(world: Any, person: Any) -> tuple[Any, Any] | None:
     """(the hull it is in, the harness) of the station a person holds through a door, on
     any hull of the game (package 82: a harness lives where its person is); None when no
-    model holds him."""
+    model holds him. A station that names its person is his by that name alone (package
+    82b): the binding's holder of a hull is read through the people of the hull whose block
+    is running, so while his boat's arrival runs in his own hull's block another hull's
+    "captain" read as him, and her captain's harness was carried into the visitor's station
+    (one harness at two stations; the owner's notes of 2026-11-01 and 11-05)."""
     from freesail.agents.harness import harnesses_of
 
     name = str(getattr(person, "name", "") or "")
     for hull, h in harnesses_of(world):
         if getattr(h.agent, "released", False):
             continue
-        if str(getattr(h.station, "person", "") or "") == name:
+        named = str(getattr(h.station, "person", "") or "")
+        if named == name:
             return hull, h
+        if named:
+            continue
         stations = getattr(hull, "stations", None)
         try:
             holder = stations.holder(h.station.name) if stations is not None else None
