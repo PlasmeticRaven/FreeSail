@@ -4829,10 +4829,13 @@ de á 30, mandada por el Teniente de Navío de la Real Armada D. José de Juliá
 1809 y 1810", a sheer with the body plan and the half-breadth and a table of her particulars,
 in the Ministry of Defence's virtual library (Biblioteca Virtual de Defensa, record 1037832,
 https://bibliotecavirtual.defensa.gob.es/BVMDefensa/es/consulta/registro.do?id=1037832), the
-same library 79c's pilots came from: a §5.0 rung-A source for her lines. The file itself is
-not in the tree (the Greenwich rule of 2026-10-31: the record and the link stand in its place
-until the owner says the library's terms allow it, and then it goes in with its provenance
-in `docs/references/images/README.md`). The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
+same library 79c's pilots came from: a §5.0 rung-A source for her lines. The file is in the
+tree as `docs/references/images/corvette-diana-1809-plano-bvmdefensa.jpg` (the owner, the
+same day: the library distributes the digital copy under CC BY 4.0 on the condition that the
+source is named, "Fuente: Archivo Histórico de la Armada Juan Sebastián de Elcano /
+Biblioteca Virtual de Defensa"; the provenance and the condition in the images README). Her
+particulars on the sheet are in the Spanish navy's units (Burgos feet), to be reconciled
+with Winfield's English feet in her design document before any file. The count: thirteen after 75, eighteen after 90 (decision 56 amended). The order within 90
 is yours to propose; the lead's view is the tartane first as the reference vessel and the
 smallest, the three-decker last as the largest departure. Nothing of it opens before 75's
 last window closes, and nothing this week (decision 61).
