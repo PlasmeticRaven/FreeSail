@@ -28,6 +28,7 @@ from freesail.combat import action, ports
 from freesail.combat import shot as S
 from freesail.combat.guns import Battery, FireMode, Firer, Target, _is_lee, battery_of, magazine
 from freesail.core import replay
+from freesail.core.clock import TICK_SECONDS
 from freesail.core.events import Severity
 from freesail.core.world import Scenario
 from freesail.crew.quarters import quarters_of
@@ -55,6 +56,10 @@ PRE_75_CUTTER = "tests/fixtures/saves/pre-75-cutter-guns-cast-loose.checkpoint"
 
 SHUT_M = S.PORT_SHUT_M
 REOPEN_M = ports.PORT_REOPEN_M
+# The hold (the lead's ruling of 2026-11-06): a shut port opens only once the sea has kept from
+# its sill a minute. The rule's tests read it at ticks of their own; `HOLD` ticks after the sea
+# was last at a sill is the first tick at which that port may open
+HOLD = round(ports.PORT_HOLD_S / TICK_SECONDS)
 
 
 def shut_heel(sill: float, half: float) -> float:
@@ -252,20 +257,24 @@ def test_the_lugger_and_the_smack_have_no_port_and_no_gun_to_shut(path):
 )
 def test_each_triple_shuts_and_reopens_at_the_rules_arithmetic(path, triple):
     """A gun stood on the triple, its half-breadth the profile's: open a hair below the heel
-    that shuts it, shut a hair above; shut still a hair above the heel that opens it, open a
-    hair below. Both are §7.1's, on the sill lowered by `half × sin(heel)`."""
+    that shuts it, shut a hair above, at once; shut still a hair above the heel that opens it,
+    and a hair below it held a tick short of the minute and open at the minute (the lead's
+    ruling of 2026-11-06; before it, open at once). Both heels are §7.1's, on the sill lowered
+    by `half × sin(heel)`."""
     deck, x, sill, half, _ = triple
     battery = the_battery_of_one(path, a_gun(x, sill, deck))
     gid = "gun.1.starboard"
     shut, reopen = shut_heel(sill, half), open_heel(sill, half)
     assert reopen < shut
-    assert ports.update(battery, firer_at(shut - 0.01)) == (frozenset(), frozenset())
+    assert ports.update(battery, firer_at(shut - 0.01), 0) == (frozenset(), frozenset())
     assert battery._shut == frozenset()
-    assert ports.update(battery, firer_at(shut + 0.01)) == (frozenset({gid}), frozenset())
+    assert ports.update(battery, firer_at(shut + 0.01), 1) == (frozenset({gid}), frozenset())
     assert battery._shut == {gid}
-    assert ports.update(battery, firer_at(reopen + 0.01)) == (frozenset(), frozenset())
+    assert ports.update(battery, firer_at(reopen - 0.01), HOLD) == (frozenset(), frozenset())
+    assert ports.update(battery, firer_at(reopen + 0.01), 1 + HOLD) == (frozenset(), frozenset())
     assert battery._shut == {gid}
-    assert ports.update(battery, firer_at(reopen - 0.01)) == (frozenset(), frozenset({gid}))
+    opened = ports.update(battery, firer_at(reopen - 0.01), 1 + HOLD)
+    assert opened == (frozenset(), frozenset({gid}))
     assert battery._shut == frozenset()
 
 
@@ -304,15 +313,15 @@ def test_every_gun_of_the_fit_shuts_at_the_heel_of_its_own_place(path, fit, deck
         toward = 1.0 if gun.side == "starboard" else -1.0
         one = Battery(ship)
         if (gun.height_m - SHUT_M) / half >= 1.0:
-            ports.update(one, firer_at(toward * 89.9))
+            ports.update(one, firer_at(toward * 89.9), 0)
             assert gun.id not in one._shut, gun.id
             continue
         shut = shut_heel(gun.height_m, half)
         if gun.deck == deck:
             heels.append(shut)
-        ports.update(one, firer_at(toward * (shut - 0.01)))
+        ports.update(one, firer_at(toward * (shut - 0.01)), 0)
         assert gun.id not in one._shut, gun.id
-        ports.update(one, firer_at(toward * (shut + 0.01)))
+        ports.update(one, firer_at(toward * (shut + 0.01)), 1)
         assert gun.id in one._shut, gun.id
     assert min(heels) == pytest.approx(lowest, abs=0.05), (fit, deck)
 
@@ -326,7 +335,7 @@ def test_she_shuts_the_side_she_heels_to_and_never_the_other(heel, lee):
     the roll less the heel, below nought on the heel alone, so at any heel it stays open."""
     ship = load_ship(BRIG)
     battery = Battery(ship)
-    shut, opened = ports.update(battery, firer_at(heel))
+    shut, opened = ports.update(battery, firer_at(heel), 0)
     assert not opened
     assert shut == battery._shut
     assert shut, "at 25 degrees the brig's midships ports are under"
@@ -335,15 +344,19 @@ def test_she_shuts_the_side_she_heels_to_and_never_the_other(heel, lee):
             assert gun.side == lee and _is_lee(gun, heel)
     # the same ports of the other side at the other heel, number for number
     other = Battery(ship)
-    ports.update(other, firer_at(-heel))
+    ports.update(other, firer_at(-heel), 0)
 
     def numbers(ids):
         return sorted((ship.guns[g].place, ship.guns[g].x_m) for g in ids)
 
     assert numbers(other._shut) == numbers(shut)
     assert not (other._shut & shut)
-    # she goes about: the old lee side opens as the heel comes off and the new one shuts
-    ports.update(battery, firer_at(-heel))
+    # she goes about: the new lee side shuts at once, and the old one is held until the sea
+    # has kept from its sills a minute (the lead's ruling of 2026-11-06; before it, it opened
+    # at once)
+    ports.update(battery, firer_at(-heel), 1)
+    assert battery._shut == shut | other._shut
+    ports.update(battery, firer_at(-heel), HOLD)
     assert battery._shut == other._shut
 
 
@@ -351,7 +364,7 @@ def test_she_shuts_the_side_she_heels_to_and_never_the_other(heel, lee):
 def test_the_weather_side_never_shuts_on_the_heel_alone(heel):
     ship = load_ship(FRIGATE)
     battery = Battery(ship)
-    ports.update(battery, firer_at(heel))
+    ports.update(battery, firer_at(heel), 0)
     weather = "larboard" if heel > 0.0 else "starboard"
     assert battery._shut, "she is on her beam ends, every lee port under"
     assert all(ship.guns[g].side != weather for g in battery._shut)
@@ -645,7 +658,9 @@ def test_a_lee_broadside_past_the_shut_heel_is_run_in_and_silent(path, fit, side
     highest of the deck none of it does: each is run in, each is served to loaded and primed
     behind its port (the loading goes on), and a loaded gun stays loaded; what fires over the
     rail or from a higher deck goes on firing. Back under the heel that opens the last port,
-    they run out and fire again, unbidden."""
+    held a tick short of the minute after the sea last stood at their sills, then at the minute
+    they run out and fire again, unbidden (the hold, the lead's ruling of 2026-11-06; before
+    it, at the first tick under)."""
     w = _at_quarters(path, fit)
     serving = _Serving(w, side)
     ship, battery = serving.ship, serving.battery
@@ -686,7 +701,9 @@ def test_a_lee_broadside_past_the_shut_heel_is_run_in_and_silent(path, fit, side
         assert above and all(g.id not in battery._shut for g in above)
         assert any(after[g.id] > fired[g.id] for g in above), "the quarterdeck stands clear"
 
-    # back: open, run out and firing again
+    # back: held a minute after the sea left the sills, then open, run out and firing again
+    serving.serve(min(opens.values()) - 0.5, HOLD - 1)
+    assert {g.id for g in lee} <= battery._shut
     serving.serve(min(opens.values()) - 0.5, 1)
     assert not (battery._shut & {g.id for g in lee})
     serving.serve(min(opens.values()) - 0.5, 150)
@@ -761,7 +778,7 @@ def test_by_divisions_a_division_with_a_gun_open_keeps_its_turn_while_that_gun_l
     battery.mode = FireMode.BY_DIVISIONS
     aft, mid, fore = sorted(serving.lee_guns(), key=lambda g: g.x_m)
     firer = replace(action._firer(w, w.ship), heel_deg=14.85)
-    ports.update(battery, firer)
+    ports.update(battery, firer, 0)
     assert battery._shut == {mid.id}
     aft.loaded, aft.primed, aft.run_out = None, False, False
     battery.division_turn = "after"
@@ -961,7 +978,8 @@ def _port_lines(w) -> list:
 def test_the_log_says_each_deck_and_side_once_a_change_of_state(heeled):
     """The frigate's three decks by their words: the upper deck's line at the first of its
     ports, none as the rest go under, the quarterdeck's and the forecastle's when theirs do,
-    and each opened once, when the last of it has opened. A line is not said twice."""
+    and each opened once, when the last of it has opened, a minute after the sea left it (the
+    hold). A line is not said twice."""
     w = _quiet(FRIGATE)
     cast_loose(w.ship)
     w.run(5)
@@ -983,14 +1001,14 @@ def test_the_log_says_each_deck_and_side_once_a_change_of_state(heeled):
         "The lee quarterdeck ports are shut, the sea at their sills.",
     ]
     heeled["deg"] = 25.0  # the two upper decks open; part of the upper deck stays shut
-    w.run(3)
+    w.run(HOLD + 3)
     assert [e.text for e in _port_lines(w)[3:]] == [
         "The lee forecastle ports are opened again, their sills clear of the sea.",
         "The lee quarterdeck ports are opened again, their sills clear of the sea.",
     ]
     assert b._shut and all(w.ship.guns[g].deck == "upper" for g in b._shut)
     heeled["deg"] = 5.0  # the last of the upper deck's opens
-    w.run(3)
+    w.run(HOLD + 3)
     assert [(e.kind, e.text) for e in _port_lines(w)[5:]] == [
         (
             "guns.ports_opened",
@@ -1019,8 +1037,9 @@ def test_the_lower_deck_is_said_in_the_designs_own_words(heeled):
 
 
 def test_each_side_is_a_state_of_its_own(heeled):
-    """She goes about at a heel past both sides' shut heels: the old lee side's line opened
-    and the new one's shut, on the same tick, each with its side."""
+    """She goes about at a heel past both sides' shut heels: the new lee side's line shut at
+    once, and the old lee side's opened a minute after the sea left its sills, each with its
+    side (the hold, the lead's ruling of 2026-11-06; before it, both on the same tick)."""
     w = _quiet(CUTTER)
     cast_loose(w.ship)
     w.run(2)
@@ -1028,6 +1047,11 @@ def test_each_side_is_a_state_of_its_own(heeled):
     w.run(2)
     heeled["deg"] = -20.0
     w.run(2)
+    assert [(e.kind, e.data["side"]) for e in _port_lines(w)] == [
+        ("guns.ports_shut", "starboard"),
+        ("guns.ports_shut", "larboard"),
+    ]
+    w.run(HOLD)
     assert [(e.kind, e.data["side"]) for e in _port_lines(w)] == [
         ("guns.ports_shut", "starboard"),
         ("guns.ports_shut", "larboard"),
@@ -1049,7 +1073,7 @@ def test_the_line_is_the_guns_and_no_passage_hears_it(heeled):
     assert len(b._shut) == 3 and "ports shut" in guns_reading(w, None)["words"]
     assert not _port_lines(w)
     heeled["deg"] = 2.0
-    w.run(2)
+    w.run(HOLD + 2)
     assert b._shut == frozenset() and not _port_lines(w)
 
     heeled["deg"] = 20.0
@@ -1060,7 +1084,7 @@ def test_the_line_is_the_guns_and_no_passage_hears_it(heeled):
     w.run(5)
     assert len(_port_lines(w)) == 1
     heeled["deg"] = 2.0
-    w.run(2)
+    w.run(HOLD + 2)
     assert [(e.kind, e.severity) for e in _port_lines(w)[1:]] == [
         ("guns.ports_opened", Severity.NOTABLE)
     ]
@@ -1072,7 +1096,7 @@ def test_the_line_is_the_guns_and_no_passage_hears_it(heeled):
         gun.cast_loose = False
     w.run(2)
     heeled["deg"] = 2.0
-    w.run(2)
+    w.run(HOLD + 2)
     assert b._shut == frozenset() and len(_port_lines(w)) == 3 and b._ports_told == frozenset()
 
 
@@ -1088,7 +1112,7 @@ def test_the_reading_says_ports_shut_while_any_are_and_only_then(heeled):
     assert reading["ports_shut"] == sorted(battery_of(w.ship)._shut)
     assert w.readings.value("guns")["ports_shut"] == reading["ports_shut"]
     heeled["deg"] = 2.0
-    w.run(2)
+    w.run(HOLD + 2)
     assert guns_reading(w, None) == before
 
 
@@ -1098,7 +1122,8 @@ def test_the_reading_says_ports_shut_while_any_are_and_only_then(heeled):
 def test_a_port_does_not_flicker_in_a_gust():
     """A gusty heel swinging over the shut heel and back above the reopening heel for an hour:
     shut once, at the first gust over, and never opened, and one line. Under the reopening
-    heel it opens once, and one line."""
+    heel it opens once, a minute after the last gust that brought the sea to its sill (the
+    hold, the lead's ruling of 2026-11-06), and one line."""
     ship = load_ship(CUTTER)
     cast_loose(ship)
     profile = ship.hull.spec.profile
@@ -1113,15 +1138,125 @@ def test_a_port_does_not_flicker_in_a_gust():
         # heel and no further at each trough
         swing = (shut - reopen) * 0.55 * math.sin(second * 0.628)
         heel = max(reopen + 0.01, (shut + reopen) / 2.0 + swing)
-        changes.append(ports.update(battery, firer_at(heel)))
+        changes.append(ports.update(battery, firer_at(heel), second))
     assert sum(gun.id in s for s, _ in changes) == 1
     assert sum(gun.id in o for _, o in changes) == 0
     assert gun.id in battery._shut
-    for _ in range(60):
-        ports.update(battery, firer_at(reopen - 0.5))
+    last_sea = battery._sea_at_sill[gun.id]
+    assert 3590 <= last_sea < 3600  # the last crest over the shut heel
+    for second in range(3600, last_sea + HOLD):
+        ports.update(battery, firer_at(reopen - 0.5), second)
+    assert gun.id in battery._shut  # held a tick short of the minute
+    ports.update(battery, firer_at(reopen - 0.5), last_sea + HOLD)
     assert gun.id not in battery._shut
     notes = lines_of(ship, "guns.ports_shut", "guns.ports_opened")
     assert [n[1] for n in notes] == ["guns.ports_shut", "guns.ports_opened"]
+
+
+# -- the hold: a minute before a shut port opens (the lead's ruling of 2026-11-06) -----------------
+
+
+def _cutters_lowest():
+    """The cutter, a battery of her own, her lowest gun, and the heels a hair over the one that
+    shuts it and a hair under the one that opens it."""
+    ship = load_ship(CUTTER)
+    gun = _at_x(ship, -0.5)
+    half = half_breadth_at_sill(ship.hull.spec.profile, gun.deck, gun.x_m)
+    shut, reopen = shut_heel(gun.height_m, half), open_heel(gun.height_m, half)
+    return ship, Battery(ship), gun, firer_at(shut + 0.01), firer_at(reopen - 0.01)
+
+
+def test_a_port_is_held_a_minute_through_the_gusts():
+    """A gusty heel swinging over the shut heel at each crest and under the reopening heel at
+    each trough, ten seconds a swing, for an hour: without the hold the port opened at every
+    trough and shut at the next crest (the gun run in each time; the frigate's ports so changed
+    46 times in an hour of gusts at 21 knots, Build-Ships.md §7.2's note since L3). With it, the
+    port is shut once, at the first crest, and held while the gusts go on, and opens a minute
+    after the last crest that brought the sea to its sill; one line each way."""
+    ship = load_ship(CUTTER)
+    cast_loose(ship)
+    battery = Battery(ship)
+    gun = _at_x(ship, -0.5)
+    half = half_breadth_at_sill(ship.hull.spec.profile, gun.deck, gun.x_m)
+    shut, reopen = shut_heel(gun.height_m, half), open_heel(gun.height_m, half)
+    changes, clear = [], 0
+    for second in range(3600):
+        heel = (shut + reopen) / 2.0 + (shut - reopen) * 0.8 * math.sin(second * 0.628)
+        clear += heel < reopen
+        changes.append(ports.update(battery, firer_at(heel), second))
+    assert clear > 900  # the sill stood clear of the reopening line at every trough
+    assert sum(gun.id in s for s, _ in changes) == 1 and changes[0] == (frozenset(), frozenset())
+    assert sum(gun.id in o for _, o in changes) == 0
+    last_sea = battery._sea_at_sill[gun.id]
+    assert 3590 <= last_sea < 3600
+    for second in range(3600, last_sea + HOLD):
+        ports.update(battery, firer_at(reopen - 0.5), second)
+    assert gun.id in battery._shut
+    ports.update(battery, firer_at(reopen - 0.5), last_sea + HOLD)
+    assert gun.id not in battery._shut and battery._sea_at_sill == {}
+    notes = lines_of(ship, "guns.ports_shut", "guns.ports_opened")
+    assert [n[1] for n in notes] == ["guns.ports_shut", "guns.ports_opened"]
+
+
+def test_the_sea_at_the_sill_again_starts_the_hold_afresh():
+    """The hold counts from the last tick the sea was at the sill: a sea again within the minute
+    starts it afresh, and a port opened and shut again by a later sea has a new minute. The
+    shutting itself is at once, every time."""
+    ship, battery, gun, over, clear = _cutters_lowest()
+    assert ports.update(battery, over, 0) == (frozenset({gun.id}), frozenset())
+    ports.update(battery, clear, 1)
+    ports.update(battery, over, 30)  # a sea again within the minute
+    assert battery._sea_at_sill == {gun.id: 30}
+    ports.update(battery, clear, 31)
+    ports.update(battery, clear, HOLD)  # a minute from the first sea: held still
+    ports.update(battery, clear, 30 + HOLD - 1)
+    assert gun.id in battery._shut
+    assert ports.update(battery, clear, 30 + HOLD) == (frozenset(), frozenset({gun.id}))
+    # opened, and the next sea shuts it at once, for a new minute
+    assert ports.update(battery, over, 31 + HOLD) == (frozenset({gun.id}), frozenset())
+    ports.update(battery, clear, 30 + 2 * HOLD)
+    assert gun.id in battery._shut
+    assert ports.update(battery, clear, 31 + 2 * HOLD) == (frozenset(), frozenset({gun.id}))
+
+
+def test_a_port_shut_in_a_save_before_the_hold_is_held_from_its_first_reading():
+    """A battery saved with a port shut before the hold has no tick for it (the class default,
+    None): its minute counts from the first tick the rule reads it, and it opens then."""
+    ship, battery, gun, _, clear = _cutters_lowest()
+    battery._shut = frozenset({gun.id})  # as a save made at L3 left it
+    assert "_sea_at_sill" not in battery.__dict__ and battery._sea_at_sill is None
+    assert ports.update(battery, clear, 500) == (frozenset(), frozenset())
+    assert battery._sea_at_sill == {gun.id: 500}
+    ports.update(battery, clear, 500 + HOLD - 1)
+    assert gun.id in battery._shut
+    assert ports.update(battery, clear, 500 + HOLD) == (frozenset(), frozenset({gun.id}))
+
+
+def test_a_checkpoint_taken_in_the_hold_keeps_it(heeled, tmp_path):
+    """A save made while her ports are held keeps the tick the sea was last at each sill: read
+    back, they open on the same tick as in the World that ran on, a minute after it."""
+    w = _quiet(CUTTER)
+    cast_loose(w.ship)
+    w.run(2)
+    heeled["deg"] = 20.0
+    w.run(2)
+    heeled["deg"] = 2.0
+    w.run(20)
+    held = dict(battery_of(w.ship)._sea_at_sill)
+    assert len(held) == 3 and len(set(held.values())) == 1 and battery_of(w.ship)._shut
+    path = replay.write_checkpoint(w, tmp_path / "held.checkpoint")
+    _, loaded = replay.read_checkpoint(path)
+    assert battery_of(loaded.ship)._sea_at_sill == held
+    opened_at = []
+    for world in (w, loaded):
+        battery = battery_of(world.ship)
+        for _ in range(2 * HOLD):
+            if not battery._shut:
+                break
+            world.run(1)
+        opened_at.append(world.clock.tick)
+    assert opened_at[0] == opened_at[1]
+    assert max(held.values()) + HOLD <= opened_at[0] <= max(held.values()) + HOLD + 1
 
 
 def test_she_shuts_her_own_lee_ports_by_the_press_of_her_own_sail():
@@ -1174,8 +1309,8 @@ def test_the_half_breadth_is_read_once_a_gun(monkeypatch):
     monkeypatch.setattr(ports, "half_breadth_at_sill", counted)
     ship = load_ship(FRIGATE)
     battery = Battery(ship)
-    for heel in (0.0, 5.0, 25.0, 50.0, 25.0, 0.0, -25.0):
-        ports.update(battery, firer_at(heel))
+    for i, heel in enumerate((0.0, 5.0, 25.0, 50.0, 25.0, 0.0, -25.0)):
+        ports.update(battery, firer_at(heel), i * HOLD)
     port_guns = [g for g in ship.guns.values() if g.place in ports.PORT_PLACES]
     assert len(calls) == len(port_guns) == len(battery._port_breadths)
 
@@ -1191,13 +1326,13 @@ def test_a_boat_with_a_gun_falls_back_to_half_the_beam():
     battery = the_battery_of_one(LAUNCH, a_gun(1.0, sill, deck=None, place="bow"))
     gid = "gun.1.starboard"
     shut, reopen = shut_heel(sill, half), open_heel(sill, half)
-    ports.update(battery, firer_at(shut - 0.01, half))
+    ports.update(battery, firer_at(shut - 0.01, half), 0)
     assert battery._shut == frozenset()
-    ports.update(battery, firer_at(shut + 0.01, half))
+    ports.update(battery, firer_at(shut + 0.01, half), 1)
     assert battery._shut == {gid}
-    ports.update(battery, firer_at(reopen + 0.01, half))
+    ports.update(battery, firer_at(reopen + 0.01, half), 1 + HOLD)
     assert battery._shut == {gid}
-    ports.update(battery, firer_at(reopen - 0.01, half))
+    ports.update(battery, firer_at(reopen - 0.01, half), 1 + HOLD)
     assert battery._shut == frozenset()
     assert battery._port_breadths == {gid: None}
 
@@ -1205,8 +1340,8 @@ def test_a_boat_with_a_gun_falls_back_to_half_the_beam():
 def test_the_lines_say_no_deck_for_a_gun_with_none():
     battery = the_battery_of_one(LAUNCH, a_gun(1.0, 0.60, deck=None, place="bow"))
     cast_loose(battery.ship)
-    ports.update(battery, firer_at(30.0, 1.2))
-    ports.update(battery, firer_at(0.0, 1.2))
+    ports.update(battery, firer_at(30.0, 1.2), 0)
+    ports.update(battery, firer_at(0.0, 1.2), HOLD)
     notes = lines_of(battery.ship, "guns.ports_shut", "guns.ports_opened")
     assert [n[2] for n in notes] == [
         "The lee ports are shut, the sea at their sills.",
@@ -1240,9 +1375,9 @@ def test_a_chaser_of_no_side_is_said_on_the_centre_line_and_neither_lee_nor_weat
         solo.guns = {one.id: one}
         cast_loose(solo)
         alone = Battery(solo)
-        ports.update(alone, firer_at(heel))
+        ports.update(alone, firer_at(heel), 0)
         one.height_m = 1.0
-        ports.update(alone, firer_at(heel))
+        ports.update(alone, firer_at(heel), HOLD)
         notes = lines_of(solo, "guns.ports_shut", "guns.ports_opened")
         assert [n[2] for n in notes] == [
             "The upper-deck ports are shut, the sea at their sills.",
@@ -1257,16 +1392,16 @@ def test_a_chaser_of_no_side_is_said_on_the_centre_line_and_neither_lee_nor_weat
     at = shut_heel(1.0, ports._half_breadth(Battery(solo), one, firer_at(0.0)))
     for heel in (0.0, 5.0, -5.0, 10.0, -10.0, 30.0, -30.0):
         alone = Battery(solo)
-        ports.update(alone, firer_at(heel))
+        ports.update(alone, firer_at(heel), 0)
         assert one.id not in alone._shut, heel
-        ports.update(alone, firer_at(heel, roll_deg=at - 0.01))
+        ports.update(alone, firer_at(heel, roll_deg=at - 0.01), 1)
         assert one.id not in alone._shut, heel
-        ports.update(alone, firer_at(heel, roll_deg=at + 0.01))
+        ports.update(alone, firer_at(heel, roll_deg=at + 0.01), 2)
         assert one.id in alone._shut, heel
     said = [(n[2], n[4]["lee"]) for n in lines_of(solo, "guns.ports_shut")]
     assert said == [("The upper-deck ports are shut, the sea at their sills.", None)] * 7
     # the side's own gun beside it keeps its side's word: upright, its name
-    ports.update(battery, firer_at(0.0))
+    ports.update(battery, firer_at(0.0), 0)
     said = [(n[2], n[4]["lee"]) for n in lines_of(ship, "guns.ports_shut")]
     assert said == [
         ("The upper-deck ports are shut, the sea at their sills.", None),
@@ -1285,9 +1420,9 @@ def test_a_deck_with_no_ports_in_the_profile_and_no_profile_at_all_take_half_the
             ship.hull.spec = replace(ship.hull.spec, profile=None)
         ship.guns = {"g": a_gun(0.0, sill, deck=deck, gid="g")}
         battery = Battery(ship)
-        ports.update(battery, firer_at(shut - 0.01, half))
+        ports.update(battery, firer_at(shut - 0.01, half), 0)
         assert battery._shut == frozenset(), (deck, hull_profile)
-        ports.update(battery, firer_at(shut + 0.01, half))
+        ports.update(battery, firer_at(shut + 0.01, half), 1)
         assert battery._shut == {"g"}, (deck, hull_profile)
 
 
@@ -1308,7 +1443,7 @@ def test_a_pivot_and_a_rail_gun_never_shut(path, fit, heel):
     battery = Battery(ship)
     over_the_rail = [g for g in ship.guns.values() if g.place in ("pivot", "rail")]
     assert over_the_rail
-    ports.update(battery, firer_at(heel))
+    ports.update(battery, firer_at(heel), 0)
     lee = "starboard" if heel > 0.0 else "larboard"
     assert battery._shut == {
         g.id for g in ship.guns.values() if g.place == "broadside" and g.side == lee
@@ -1333,23 +1468,23 @@ def test_the_roll_is_read_and_shuts_both_sides_by_itself():
     battery = Battery(ship)
     assert ports.roll_in_the_dip(firer_at(0.0, roll_deg=40.0)) == 40.0
     broadside = frozenset(g.id for g in ship.guns.values() if g.place == "broadside")
-    assert ports.update(battery, firer_at(0.0, roll_deg=40.0)) == (broadside, frozenset())
+    assert ports.update(battery, firer_at(0.0, roll_deg=40.0), 0) == (broadside, frozenset())
     assert {ship.guns[g].side for g in battery._shut} == {"starboard", "larboard"}
     gun = _at_x(ship, -0.5)
     half = half_breadth_at_sill(ship.hull.spec.profile, gun.deck, gun.x_m)
     heel = shut_heel(gun.height_m, half)
     battery = Battery(ship)
-    ports.update(battery, firer_at(heel - 0.01, roll_deg=40.0))
+    ports.update(battery, firer_at(heel - 0.01, roll_deg=40.0), 0)
     assert gun.id in battery._shut
     weather = _at_x(ship, -0.5, "larboard")
     battery = Battery(ship)
-    ports.update(battery, firer_at(5.0, roll_deg=5.0 + heel - 0.01))
+    ports.update(battery, firer_at(5.0, roll_deg=5.0 + heel - 0.01), 0)
     assert gun.id in battery._shut and weather.id not in battery._shut
-    ports.update(battery, firer_at(5.0, roll_deg=5.0 + heel + 0.01))
+    ports.update(battery, firer_at(5.0, roll_deg=5.0 + heel + 0.01), 1)
     assert weather.id in battery._shut
     cast_loose(ship)
     lines_of(ship)
-    ports.update(Battery(ship), firer_at(0.0, roll_deg=40.0))
+    ports.update(Battery(ship), firer_at(0.0, roll_deg=40.0), 0)
     said = [(n[2], n[4]["side"], n[4]["lee"]) for n in lines_of(ship, "guns.ports_shut")]
     assert said == [
         ("The larboard upper-deck ports are shut, the sea at their sills.", "larboard", None),
@@ -1432,16 +1567,17 @@ def test_the_one_compare_short_of_the_least_dip_changes_no_port(path):
     ]
     least = ports._least_dip(battery, firer_at(0.0))
     assert least < min(heels) < least + 1e-5
-    ports.update(battery, firer_at(least - 0.01))
+    ports.update(battery, firer_at(least - 0.01), 0)
     assert not battery._shut
-    ports.update(battery, firer_at(min(heels) + 0.01))
+    ports.update(battery, firer_at(min(heels) + 0.01), 1)
     assert battery._shut
     battery._shut = frozenset()
     battery._ports_told = frozenset()
     sweep = [h / 4.0 for h in range(0, 161)]
-    for heel in sweep + sweep[::-1] + [-h for h in sweep] + [-h for h in sweep[::-1]]:
+    heels_swept = sweep + sweep[::-1] + [-h for h in sweep] + [-h for h in sweep[::-1]]
+    for tick, heel in enumerate(heels_swept, start=2):
         firer = firer_at(heel)
-        assert ports.update(battery, firer) == ports.update(whole, firer), heel
+        assert ports.update(battery, firer, tick) == ports.update(whole, firer, tick), heel
         assert battery._shut == whole._shut, heel
 
 
@@ -1478,9 +1614,10 @@ def test_the_one_compare_takes_the_roll(path, roll):
     whole = Battery(ship)
     whole._least_shut_dip = -1.0  # never short of it
     sweep = [h / 4.0 for h in range(0, 161)]
-    for heel in sweep + sweep[::-1] + [-h for h in sweep] + [-h for h in sweep[::-1]]:
+    heels_swept = sweep + sweep[::-1] + [-h for h in sweep] + [-h for h in sweep[::-1]]
+    for tick, heel in enumerate(heels_swept):
         firer = firer_at(heel, roll_deg=roll)
-        assert ports.update(battery, firer) == ports.update(whole, firer), heel
+        assert ports.update(battery, firer, tick) == ports.update(whole, firer, tick), heel
         assert battery._shut == whole._shut, heel
 
 
@@ -1532,13 +1669,14 @@ def _in_a_sea(path: str, fit: str | None = None):
     return w
 
 
-def _ports_at(w, heel_deg: float, roll_deg: float) -> frozenset[str]:
+def _ports_at(w, heel_deg: float, roll_deg: float, tick: int) -> frozenset[str]:
     """Her ports as the rule reads them at this heel (to starboard) and this roll, both set on
-    the World's own names (`ship.dyn.heel`, `world.motion`) and read through `action._firer`."""
+    the World's own names (`ship.dyn.heel`, `world.motion`) and read through `action._firer`,
+    at a tick of the test's own (the hold counts in ticks)."""
     w.ship.dyn.heel = math.radians(heel_deg)
     w.motion.roll_deg = roll_deg
     battery = battery_of(w.ship)
-    ports.update(battery, action._firer(w, w.ship))
+    ports.update(battery, action._firer(w, w.ship), tick)
     return battery._shut
 
 
@@ -1556,22 +1694,24 @@ def _lowest_lee(w, deck: str):
     return gid, heels[gid]
 
 
-def _open_then_shut(w, deck: str, figure: float, roll: float) -> tuple[int, int]:
+def _open_then_shut(w, deck: str, figure: float, roll: float, at: int) -> tuple[int, int]:
     """Her lowest lee port of the deck open half a degree below its shut heel less the roll, and
-    shut a degree above it; the counts shut at each, the weather side open at both."""
+    shut a degree above it; the counts shut at each, the weather side open at both; upright
+    with no roll every port open again once the minute's hold has run, from tick `at`."""
     gid, heel = _lowest_lee(w, deck)
     assert heel == pytest.approx(figure, abs=0.05), (w.ship.name, deck)
-    assert not _ports_at(w, 0.0, 0.0)
-    below = _ports_at(w, heel - roll - 0.5, roll)
+    assert not _ports_at(w, 0.0, 0.0, at)
+    below = _ports_at(w, heel - roll - 0.5, roll, at + 1)
     assert gid not in below
-    above = _ports_at(w, heel - roll + 1.0, roll)
+    above = _ports_at(w, heel - roll + 1.0, roll, at + 2)
     assert gid in above
     assert all(w.ship.guns[g].side == "starboard" for g in below | above)
     counts = (
         sum(1 for g in below if w.ship.guns[g].deck == deck),
         sum(1 for g in above if w.ship.guns[g].deck == deck),
     )
-    assert not _ports_at(w, 0.0, 0.0)
+    assert _ports_at(w, 0.0, 0.0, at + 1 + HOLD)  # held a tick short of the minute
+    assert not _ports_at(w, 0.0, 0.0, at + 2 + HOLD)
     return counts
 
 
@@ -1591,13 +1731,14 @@ def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_r
     half a degree below that heel, and that port shut a degree above it, with 4, 2, 5, 2, 1, 6
     and 6 of the deck's lee ports; with a roll of 4 degrees on the World's motion, the same
     four degrees of heel sooner, a roll's amplitude, by the same counts. Her weather side open
-    throughout; upright with no roll, every port open again. Measured on the owner's machine,
+    throughout; upright with no roll, every port open again once the minute's hold has run (the
+    lead's ruling of 2026-11-06; at once before it). Measured on the owner's machine,
     2026-11-05, at L3. She is built with no fit named, so that the row's fit is her file's
     default (since L3's review: the fit was named, and the line could not fail)."""
     w = _in_a_sea(path)
     assert w.ship.fit == fit
-    assert _open_then_shut(w, deck, figure, 0.0) == (0, count)
-    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG) == (0, count)
+    assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG, 4 * HOLD) == (0, count)
 
 
 def test_truth_7_190_the_frigates_lee_ports_stand_open_at_the_seventy_fours_shut_heel():
@@ -1609,9 +1750,9 @@ def test_truth_7_190_the_frigates_lee_ports_stand_open_at_the_seventy_fours_shut
     motion as well."""
     w = _in_a_sea(FRIGATE, None)
     assert _lowest_lee(w, "upper")[1] == pytest.approx(19.7, abs=0.05)
-    for roll in (0.0, ROLL_SET_DEG):
-        assert _ports_at(w, SEVENTY_FOURS_SHUT_DEG, roll) == frozenset()
-        assert _ports_at(w, -SEVENTY_FOURS_SHUT_DEG, roll) == frozenset()
+    for tick, roll in enumerate((0.0, ROLL_SET_DEG)):
+        assert _ports_at(w, SEVENTY_FOURS_SHUT_DEG, roll, 2 * tick) == frozenset()
+        assert _ports_at(w, -SEVENTY_FOURS_SHUT_DEG, roll, 2 * tick + 1) == frozenset()
 
 
 @pytest.mark.parametrize("deck,figure,count", RAZEE_DECKS)
@@ -1624,8 +1765,8 @@ def test_truth_7_190_the_razees_lee_ports_deck_by_deck(deck, figure, count):
     Phase 5, as above. Each of her default fit and the 64's."""
     w = _in_a_sea(RAZEE)
     assert w.ship.fit == "as carried 1796"
-    assert _open_then_shut(w, deck, figure, 0.0) == (0, count)
-    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG) == (0, count)
+    assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG, 4 * HOLD) == (0, count)
     if deck == "upper":
         her = _lowest_lee(w, "upper")[1]
         sixty_four = _in_a_sea(SIXTY_FOUR)
@@ -1659,7 +1800,7 @@ def _an_old_ship(w) -> None:
     for gun in w.ship.guns.values():
         gun.deck = None
     battery = battery_of(w.ship)
-    for name in ("_shut", "_port_breadths", "_least_shut_dip"):
+    for name in ("_shut", "_port_breadths", "_least_shut_dip", "_sea_at_sill"):
         battery.__dict__.pop(name, None)
 
 
@@ -1671,8 +1812,9 @@ def test_an_old_battery_with_no_shut_reads_the_class_defaults():
     old.__dict__.update(made.__dict__)
     assert "_shut" not in old.__dict__ and "_port_breadths" not in old.__dict__
     assert old._shut == frozenset() and old._port_breadths is None
-    assert ports.update(old, firer_at(0.0)) == (frozenset(), frozenset())
+    assert ports.update(old, firer_at(0.0), 0) == (frozenset(), frozenset())
     assert "_shut" not in old.__dict__  # nothing to hold, nothing written
+    assert "_sea_at_sill" not in old.__dict__ and old._sea_at_sill is None
 
 
 def test_an_old_checkpoint_of_a_ship_with_guns_loads_and_fights_at_its_old_heights(tmp_path):
@@ -1693,10 +1835,10 @@ def test_an_old_checkpoint_of_a_ship_with_guns_loads_and_fights_at_its_old_heigh
     half = loaded.ship.hull.spec.beam_m / 2.0
     shut = shut_heel(old_heights[gun.id], half)
     firer = firer_at(shut - 0.01, half)
-    ports.update(battery, firer)
+    ports.update(battery, firer, loaded.clock.tick)
     assert gun.id not in battery._shut
     firer = firer_at(shut + 0.01, half)
-    ports.update(battery, firer)
+    ports.update(battery, firer, loaded.clock.tick + 1)
     assert gun.id in battery._shut
 
 
@@ -1754,7 +1896,7 @@ def test_a_real_checkpoint_from_before_the_package_fights_at_its_old_heights(hee
     assert [e.text for e in _port_lines(w)] == ["The lee ports are shut, the sea at their sills."]
     assert set(battery._port_breadths.values()) == {None}
     heeled["deg"] = 0.0
-    w.run(3)
+    w.run(HOLD + 3)
     assert battery._shut == frozenset()
     assert [e.text for e in _port_lines(w)[1:]] == [
         "The lee ports are opened again, their sills clear of the sea."

@@ -8,12 +8,19 @@ of no side's (a chaser on the centre line) the roll alone, for no heel is toward
 lowered is the gun's `height_m` less the side's half-breadth at the sill
 (`ship.profile.half_breadth_at_sill`, held once a gun; else half the beam, a gun with no deck
 or a ship with no profile: an old save, a boat) times the sine of the dip; the port is shut
-when the sill lowered is within `shot.PORT_SHUT_M` of the water (`shot.lee_port_shut`), and
-opened again when it stands `PORT_REOPEN_M` clear of that, so that a port does not open and
-shut at each small change of heel. Six inches of sill is 1.6 to 3.1 degrees of heel (the
-frigate's lowest port to the cutter's), less than a gust swings her, so in gusts a port near
-its own heel opens and shuts gun by gun, while the log's line for its deck's side stands
-(Build-Ships.md §7.2's note since L3, for the lead).
+when the sill lowered is within `shot.PORT_SHUT_M` of the water (`shot.lee_port_shut`), at
+once, for a sea that comes in once is enough to shut a lid; and opened again only when it
+stands `PORT_REOPEN_M` clear of that line **and** the sea has kept from its sill a full
+`PORT_HOLD_S`, so that a port does not open and shut at each small change of heel.
+
+**The hold (the lead's ruling of 2026-11-06, the owner leaning to it).** The six inches are
+the physical criterion and the minute the gun captain's: his lid stays shut until the sea has
+kept clear a while. The hold counts from the last tick at which the sea was at the port's
+sill (its sill lowered within the foot), so a held port that the sea reaches again starts its
+hold afresh, and a port opened and shut again later starts a new one. Without it six inches
+of sill was 1.6 to 3.1 degrees of heel (the frigate's lowest port to the cutter's), less than
+a gust swings her, and in gusts the ports opened and shut gun by gun, some six seconds apart
+(Build-Ships.md §7.1's note since the hold; the minute is a judgement the gate rules on).
 
 **The roll (L3, §7.3).** `roll_in_the_dip` is the one place the rule reads a roll, and it
 reads `Firer.roll_deg`, her World's motion (`physics.motion.Motion.roll_deg`): the amplitude
@@ -51,9 +58,10 @@ import math
 from typing import Any
 
 from freesail.combat import shot as S
+from freesail.core.clock import TICK_SECONDS
 from freesail.ship.profile import half_breadth_at_sill
 
-__all__ = ["PORT_PLACES", "PORT_REOPEN_M", "roll_in_the_dip", "update"]
+__all__ = ["PORT_HOLD_S", "PORT_PLACES", "PORT_REOPEN_M", "roll_in_the_dip", "update"]
 
 # The places of a gun that fires through a port in the side, the bow or the stern (a pivot
 # and a rail gun fire over the rail: docs/design/Proposal-PivotGun.md §4.4); the schema's
@@ -62,6 +70,10 @@ PORT_PLACES: tuple[str, ...] = ("broadside", "bow", "stern")
 # A shut port is opened again when its sill lowered stands this far clear of the shut
 # line: six inches (judgement), so that a port does not open and shut with each gust.
 PORT_REOPEN_M = 0.15
+# And only once the sea has kept from its sill this long: the gun captain's minute (the lead's
+# ruling of 2026-11-06, a judgement for the gate's playtest), so that in gusts a port shut at
+# one sea is not opened between the next ones.
+PORT_HOLD_S = 60.0
 # The decks said with "-deck" in the log's line ("the lee upper-deck ports"); the others are
 # their own word ("the lee quarterdeck ports"; `schema.DECK_WORDS`).
 _DECKS_SAID_SO = ("lower", "middle", "upper")
@@ -76,13 +88,14 @@ def roll_in_the_dip(firer: Any) -> float:
     return float(firer.roll_deg)
 
 
-def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
-    """The battery's ports this tick against the rule (the module's head): the ids of the
+def update(battery: Any, firer: Any, tick: int) -> tuple[frozenset[str], frozenset[str]]:
+    """The battery's ports at this tick against the rule (the module's head): the ids of the
     guns whose ports were shut this tick and of those opened, each set once a change of
     state, the battery's `_shut` set to the guns now shut and the log told of a deck's side
-    that has changed. `_shut` is not written while nothing changes. With no port shut and
+    that has changed. `_shut` is not written while nothing changes; the tick the sea was last
+    at each shut port's sill is (`Battery._sea_at_sill`, for the hold). With no port shut and
     none told, a tick whose dip is short of the battery's least (`_least_dip`) costs one
-    compare; else a sine and a compare a port gun."""
+    compare; else a sine and a compare a port gun, and two for a port shut."""
     from freesail.combat.guns import _is_lee  # guns imports this module
 
     was = battery._shut
@@ -91,6 +104,9 @@ def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
     roll = roll_in_the_dip(firer)
     if not was and not battery._ports_told and roll + heel < _least_dip(battery, firer):
         return _NONE, _NONE
+    sea_at = battery._sea_at_sill
+    if sea_at is None:
+        sea_at = battery._sea_at_sill = {}
     shut: list[str] = []
     opened: list[str] = []
     for gun in battery.ship.guns.values():
@@ -102,15 +118,24 @@ def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
         else:
             dip = max(0.0, roll + heel if _is_lee(gun, heel_deg) else roll - heel)
         if gun.id in was:
-            if not S.lee_port_shut(gun.height_m - PORT_REOPEN_M, dip, half_breadth):
-                opened.append(gun.id)
+            # held: the sea at the sill again starts the hold afresh; else the port opens once
+            # the hold has run and the sill stands clear. A port shut in a save made before
+            # the hold has no tick: its hold counts from the first tick it is read
+            if S.lee_port_shut(gun.height_m, dip, half_breadth):
+                sea_at[gun.id] = tick
+            elif (tick - sea_at.setdefault(gun.id, tick)) * TICK_SECONDS >= PORT_HOLD_S:
+                if not S.lee_port_shut(gun.height_m - PORT_REOPEN_M, dip, half_breadth):
+                    opened.append(gun.id)
         elif S.lee_port_shut(gun.height_m, dip, half_breadth):
             shut.append(gun.id)
+            sea_at[gun.id] = tick
     now, newly, reopened = was, _NONE, _NONE
     if shut or opened:
         newly, reopened = frozenset(shut), frozenset(opened)
         now = (was | newly) - reopened
         battery._shut = now
+        for gid in opened:
+            del sea_at[gid]
     if now or battery._ports_told:
         _tell(battery, now, reopened, heel_deg, _is_lee)
     return newly, reopened

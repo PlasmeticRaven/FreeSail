@@ -36,6 +36,10 @@ whole lateen naming one is refused in words; no file of the eight carries a late
 boom (the probe); and `frigate_with_driver()` loads, bent and unbent, cut to §17.2's contract.
 That boom alone of its class may file `rigged_out` (Ext §17.11), and no file of the eight has it
 on a boom (the probe); `tests/test_driver.py` has what the engine does with the key.
+
+The schooner's mast (package 75, B3.4): its five rigs in memory load and validate here with the
+others; their classing, and the guard that no committed file trips the rule, are
+`tests/test_schooner_mast.py`'s, and this file's golden table is the proof that no file moved.
 """
 
 from __future__ import annotations
@@ -60,6 +64,16 @@ from rig_fixtures import (
     frigate_with_driver_doc,
     frigate_with_mizen_yard,
     frigate_with_mizen_yard_doc,
+    polacre_probe,
+    polacre_probe_doc,
+    schooner_with_fore_course,
+    schooner_with_fore_course_doc,
+    schooner_with_main_topgallant,
+    schooner_with_main_topgallant_doc,
+    schooner_with_main_topsail,
+    schooner_with_main_topsail_doc,
+    tartane_probe,
+    tartane_probe_doc,
     write_ship,
 )
 
@@ -470,6 +484,12 @@ FIXTURES = {
         lambda: frigate_with_driver(bent=True),
         lambda: frigate_with_driver_doc(bent=True),
     ),
+    # the schooner's mast's rigs (package 75, B3.4): their classing is tests/test_schooner_mast.py's
+    "schooner-fore-course": (schooner_with_fore_course, schooner_with_fore_course_doc),
+    "schooner-main-topgallant": (schooner_with_main_topgallant, schooner_with_main_topgallant_doc),
+    "schooner-main-topsail": (schooner_with_main_topsail, schooner_with_main_topsail_doc),
+    "tartane": (tartane_probe, tartane_probe_doc),
+    "polacre": (polacre_probe, polacre_probe_doc),
 }
 
 
