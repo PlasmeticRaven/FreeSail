@@ -735,7 +735,7 @@ class Harness:
                 f"The station of the {station.name} is {other.agent.words()}; a game has "
                 f"one harness to a station.{again}"
             )
-        self.world = world
+        self.world = world.own if isinstance(getattr(world, "hulls", None), dict) else world  # 97
         self.station = station
         self.model = model
         self.save_fn = save
