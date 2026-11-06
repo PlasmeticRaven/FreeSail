@@ -18036,3 +18036,14 @@ against the trunk, the measure alternating, four rounds: the branch 457, 502, 50
 495, 486, 475, 517: alike, the container's margin (82b's builder read the trunk at 494, 473, 502
 in the same container). The others: three stations seated 502 to 535; the frigate alone 479; the
 Channel observed 283.
+
+**The suites on the final tree** (the trunk at 1662b54, package 65's step 4, brought in at
+11844e7): ruff and format clean; the fast tier whole exit 0, 6,315 passed, 1 expected failure
+(51 minutes under four workers); the slow tier of the touched and related files with the known
+truths (`--slow -m "not pace"`, 34 files, before step 4's merge) exit 0, 839 passed, 9 expected
+failures, and after it the files step 4 touched with its truths (7-380, 7-382, 7-383, 7-401,
+7-420, 7-421) and ours (7-325, 7-394) exit 0; the save-and-replay truths among them all passed
+(22, 49, 72, 7-170, 7-171, 7-175, 7-183, 7-322, 7-324, 7-390, 7-394, 7b-94, 7b-95, 85's two;
+84's step 8 saves of many hulls in `test_hulls.py` and `test_replay.py`). The pace alone on the
+final tree: 12 of 13, 7-159 at 474, toggled against 1662b54: the branch 492, 501, 498; the trunk
+455, 487, 491.
