@@ -1650,7 +1650,8 @@ def test_the_console_stations_the_scripted_watcher_and_prints_its_lines(tmp_path
     # the narrator's prose is its note, in its journal and not in the log the console prints
     # (decision 60); its answer to the ask is said, and printed
     assert "[watcher] Wind from N" not in text
-    assert any(e.text.startswith("Wind from N") for e in h.journal.entries if e.kind == "agent.note")
+    noted = [e for e in h.journal.entries if e.kind == "agent.note"]
+    assert any(e.text.startswith("Wind from N") for e in noted)
     assert "* Morning watch, 1 bell (04:30)  [watcher] You asked how the sails are drawing." in text
     assert "The watcher: stationed." in text
     assert "The watcher stood down by the captain" in text
