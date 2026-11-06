@@ -13554,3 +13554,31 @@ def test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harn
     test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down(
         Path(tempfile.mkdtemp())
     )
+
+
+# ---------------------------------------------------------------------------
+# Package 82b, item 2 (`docs/design/Design-DoorAndVisitor.md` §3): the visitor's name
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers():
+    """A station whose person goes aboard another ship is named there "officer of the
+    watch, of the X, aboard the <host>": in the host's stations, the desk's listing,
+    `where am I` and the log's mark. He is addressed by that name with its commas or
+    without, by "the officer of the watch of the X" and by his person's name; the host's own
+    officer of the watch is unchanged and answered by her own harness; home again, his own
+    station is his and the visitor's name is let go."""
+    import tempfile
+    from pathlib import Path
+
+    from tests.test_visitor_name import (
+        test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go,
+        test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own,
+        test_the_visitor_is_named_by_his_station_his_ship_and_hers,
+    )
+
+    test_the_visitor_is_named_by_his_station_his_ship_and_hers(Path(tempfile.mkdtemp()))
+    test_the_visitor_is_addressed_by_each_form_and_the_hosts_officer_by_his_own(
+        Path(tempfile.mkdtemp())
+    )
+    test_the_visitor_home_again_has_his_own_station_and_the_name_is_let_go(Path(tempfile.mkdtemp()))

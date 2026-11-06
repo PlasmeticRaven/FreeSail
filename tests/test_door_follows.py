@@ -19,6 +19,7 @@ from freesail.agents import consent
 from freesail.agents.remote import Desk, home_harness
 from freesail.api.session import ship_factory
 from freesail.core import replay
+from freesail.world.movement import visitor_name
 from freesail.world.seats import _voice_name
 from tests.test_between_hulls import _brig_alongside, _run_until
 
@@ -95,7 +96,7 @@ def test_the_moved_station_keeps_its_identity_through_the_save_and_a_door_after_
         a["ident"] for a in data["agents"]
     )
     assert set(idents) == {h_own.ident, h_far.ident}
-    voice = _voice_name(captain)
+    voice = visitor_name(w, captain, w.own, "captain")  # package 82b, item 2
     for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
         copy = replay.replay(data, ship_factory, road=road)
         moved = copy.agents.get(voice)

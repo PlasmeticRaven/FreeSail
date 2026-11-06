@@ -451,6 +451,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_door_follows.py::test_two_captains_through_one_door_each_answered_by_its_own_and_one_stood_down",
         "test_known_truths.py::test_truth_7_390_the_moved_station_keeps_its_door_its_model_and_its_ident_through_the_save",
         "test_known_truths.py::test_truth_7_391_two_captains_through_one_door_each_answered_by_its_own_harness",
+        # package 82b, item 2: the visitor's name (7.6 s alone, 2026-11-06)
+        "test_visitor_name.py::test_the_visitor_is_named_by_his_station_his_ship_and_hers",
+        "test_known_truths.py::test_truth_7_392_the_visitor_keeps_his_own_stations_name_and_the_hosts_officer_hers",
     }
 )
 

@@ -427,10 +427,12 @@ person a model holds goes into another ship (sent in his ship's boat by `send th
 <ship> with <name>`, put aboard by the director's `person: "<name>" goes aboard the <ship> by
 the boat`, carried over as the boarders' officer when a deck is won, or put aboard a captor),
 his station is not stood down: the same conversation goes on, and its samples are the ship
-he is in from the next tick. In that ship he is **a visitor**: his station there is his own
-name's, of the passenger's kind, with a passenger's reach and no more (the readings of the
+he is in from the next tick. In that ship he is **a visitor**: his station there is named by
+his own station, his ship and hers ("officer of the watch, of the Raven, aboard the Amazon",
+package 82b), of the passenger's kind, with a passenger's reach and no more (the readings of the
 ship he is in, the conversation by spot, his journal, a free line, `where am I`, which says
-"aboard the <ship>, on the quarterdeck, a visitor, of the <his ship>"); he gives none of her
+"aboard the <ship>, on the quarterdeck, a visitor, of the <his ship>, standing as the <his
+station>, of the <his ship>, aboard the <ship>"); he gives none of her
 deck's orders, and none of his own ship's from there (the words say so: hail her, make a
 signal or send a letter). His own station on his ship stands bound to him meanwhile (her deck
 is nobody's or the book's), and when he comes back aboard, by `come aboard` (her boat takes
@@ -441,6 +443,21 @@ under the hull it was first seated on, and a replay seats it there and moves it 
 did. The consent brief describes both kinds a visitor passes between, and the particulars of
 a station may change without the question being put again, so no new question follows a
 visit.
+
+**As built since package 82b (`docs/design/Design-DoorAndVisitor.md` §2 and §3).** The
+door follows its harness: a door's seat at the desk is keyed to its harness's identity
+(`Harness.ident`, "<the hull first seated on>/<the station>", carried in the save), not to a
+station's name and a ship. A door that stations again by its own name and ship after its
+person has gone into another ship (a door restarted, or a door after a load) takes up the
+same harness where it is now, and no fresh station is made on the ship he left; two doors at
+two ships' captains are each answered by their own harness, and a stand-down of one leaves the
+other. The desk's listing names a visitor by his own station, his ship and his host, with the
+identity beside it. In the host's sentences the visitor is addressed by his station's whole
+name, with its commas or without ("tell the officer of the watch, of the Raven, aboard the
+Amazon to ..."), by "the officer of the watch of the Raven", or by his person's name; the
+host's own officer of the watch keeps her name and is answered by her own harness, whatever
+the visitor's words begin with. The name is the station's key, lower-case as every station's
+name is.
 
 ## 17b. The seat on another ship, the boat, and the readings following the person (package 82)
 
