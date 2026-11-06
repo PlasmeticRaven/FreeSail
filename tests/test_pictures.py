@@ -54,7 +54,12 @@ MCP_IDENTITY = "made-up-chat-model, as the client lists it"
 # A picture is blank when its pixels hardly vary and nothing dark is drawn on it: the
 # chart's coast and names are ink on paper, the ship's hull and spars dark on the sky and
 # the sea (judgement: a flat white or sky-blue frame has a standard deviation under two).
-BLANK_STD = 8.0
+# The floor was 8.0 until 2026-11-06, which is the drawn chart's own figure on the cloud
+# containers (measured 7.9 to 8.03 on one machine and one tree, alone and under four
+# workers: the tuning notes name four such readings since October), so the test read the
+# machine's noise and not the picture; 4.0 is twice a blank frame's and half the chart's
+# (the lead, at the merge of package 75's lee-port step).
+BLANK_STD = 4.0
 DARK_LEVEL = 110
 DARK_FRACTION = 0.001
 
