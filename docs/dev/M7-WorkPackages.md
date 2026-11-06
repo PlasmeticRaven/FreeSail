@@ -92,6 +92,20 @@ takes over or redesigns; the gunner, his crew and the quarter gunners made posts
 compete for hands (86's filling party is read and never moved, the build's decision 5);
 truths 7-162 to 7-166 kept or replaced by its own, each with the old figure beside the new.
 
+
+**For package 77's brief, from package 75's lee-port step (the lead, 2026-11-06):** four
+things the ports' rule (`combat/ports.py`, Build-Ships.md §7) leaves in 77's files, each
+reproduced and measured in `docs/dev/TuningNotes.md`, "The lee ports with the roll", "Left,
+and for whom": (1) `orders/gunnery.py`: with every port of a side shut, `engage` answers
+"the guns to fire as they bear" and nothing follows; "fire the broadside" says no gun is run
+out two seconds before the ports' line; the review's mend is in the record. (2) Two served
+words for the weather side, `the weather ports shut` and `the weather ports opened` (the
+line's `lee` False), new under 85's in-world rule. (3) The rules captains read nothing of
+the ports: `engage_side` weather puts the mark on the guns the roll has shut;
+`_a_gun_for_a_signal` and the distress gun take a gun behind a shut port. (4) Latent: a
+weather port shut by the roll that opens exactly upright is said the lee's. The ports'
+own figure (the dwell `PORT_HOLD_S = 60` for the flicker in gusts) is the ships session's,
+ruled 2026-11-06 in the notes below.
 ## As merged
 
 ### Package 70 as merged (2026-10-24)
