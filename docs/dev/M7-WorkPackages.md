@@ -76,11 +76,12 @@ on these packages; that is the owner's choice.
 | 82b | Opus | **The door follows its harness, the visitor's name, the far hull's hail** (the owner's testing of 2026-10-31 to 11-05: the Mr Hill and Captain Owen cases, the hails between model captains answered by the table): the agent API's desk keyed to the harness and not to a station's name and ship (`agents/remote.py` `Desk.seats`, `Seat`), so a model's door follows its person between hulls and `stand down` stands down one station; the visitor keeps his own station's name ("officer of the watch, of the Raven, aboard the Amazon") as the primer promises (`world/movement.py` `visiting_station`, `world/seats.py`); a hail of a hull in the far shape whose captain a model holds is his to answer, never the table's (`world/hail.py` `deliver`, `model_holds_her`); truths 7-390 to 7-394 | launched 2026-11-05 on the hotfix's merge, beside 65 (session_01XooV4BCBsF3TQSAwxBrxmy) | | |
 | 95 | Opus | **The sail by her name** (the owner, 2026-10-31 and 11-05): one resolver for a sail named in words (the kind, the quarter, the bearing, the distance, each narrowing the pool; the closer on remaining ambiguity; a name once known over all), serving `the glass on`, `make out`, the hail's addressee, `bearing of` and `pull for` (`world/lookout.py` `glass_on`, `make_out`; `world/hail.py` `_addressee`; `orders/boat.py`); a sail made out and identified named in the readings (`strangers`, `in_sight`, `sail_in_sight`) by her name while she is in sight, and her identification lost when she is lost sight of until she is closed and made out again; truths 7-395 to 7-399 | after 82b (both touch `hail.py`) | | |
 | 65 | Fable | **The place's knowledge** (M7b's provisional row brought up by the owner, 2026-10-30; spec M7b §14 "Brought back and forward"): what reaches a person from where he stands, the sample carrying the readings and the log's lines his place allows and no other, ashore the ship by report, boat or letter only; the papers in their places; the drill's walk; each kind of work done in its room, the rules' people and the stations' persons alike; the director untouched; scoped to the edge cases (asleep below, the boat away, a visitor on another hull, the captive, the stand-by's wakings, the pictures, a hull asleep), an Opus follow-up booked from the testing | briefed 2026-10-30 (below), for the owner's approval; **launches when 82 is whole** (the owner: one Fable package at a time beside 74); 74 runs after it and takes the captive's places from its rule; **launched 2026-10-31; step 1 closed on its branch 10-31 and held unmerged through the week's pause; step 1 merged 2026-11-05 (eb147e7); resumed from step 2 on 2026-11-05 with decisions 62 and 63 and the hearing across hulls added on 82's whole merge** as a Fable sibling session on `claude/pkg-65` (session_01XooV47SeuYqmTZ8W1Rzyoo), the design note first |
+| 96 | Fable | **The harbour and the ship's configuration** (the owner, 2026-11-06, in place of M7b's package 64, struck): a design package first, on two layers. (1) **The ship's configuration as a thing of its own**: one description of any hull's whole setup (her class file and fit, her role, her nation and its parameters, her stations and who holds each with its door, her people by name, her papers and private signal, her crew's number and quality, her books, her intent and her squadron) with defaults by role and nation, that the scenario maker, the director's `ship` order in live play and the business all build from, so that any hull is set up as wanted without nasty surprises. (2) **The harbour presenting every configuration the game has**: the doors and stations, the settings and flags, the scenario's settings with the full configuration of the player's ship and, at choice, of every other ship (the squadrons, the papers, the private signal explained, each ship's role, fit and crew), so that direct file editing is never necessary. The design document with the lead's gate, then the build in steps; M7b's harbour points of 2026-10-18 as facts | to brief; the Fable queue after 65, its place against 74 the owner's |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
 expected failures until it); the owner's decisions listed in 58a's, 58b's and 67's
-as-merged records; 51, 60, 61, 63, 64, 65 and 69 on the books in `M7b-WorkPackages.md`; 55
+as-merged records; 51, 60, 61, 63, 65 and 69 on the books in `M7b-WorkPackages.md` (64 struck 2026-11-06 for 96); 55
 deferred until testing begins in earnest.
 
 **For package 77's brief, from package 86** (the review of the owner's local work, section
@@ -3807,6 +3808,78 @@ dawn). Truths 7-395 (the resolver's narrowing, four cases), 7-396 (ambiguity to 
 7-397 (a name over all), 7-398 (the identified sail named in the rows and forgotten when
 lost), 7-399 (the recorded passages unmoved: every pinned passage names its sails as before).
 **After 82b**, since both touch `world/hail.py`. **The suites and the head rules** as 82b's.
+
+## Package 96: the harbour and the ship's configuration (`docs/design/Design-Configuration.md` new, first; then `freesail/world/scenarios.py` the configuration's shape and the loader; `freesail/world/ships.py`, `crews.py`, `business.py`, `world/orders.py` the director's `ship` order built from it; `freesail/settings.py` the doors per station; `freesail/ui/harbour.py`, `client/harbour.html`, `harbour.js` the page; `docs/TechnicalSpec-M7b.md` §21d to §21f as built; the primer's chapter on starting a game; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-402 to 7-419)
+
+**Intent (the owner, 2026-11-06).** In place of M7b's package 64 (the harbour's second pass,
+struck): a Fable package, a deep design first, on two layers that meet. **The deeper layer:**
+the configuration of any ship made a thing of its own, so that the player in the scenario
+maker and the director in live play can set up any kind of hull with the role, the national
+parameters, the stations and the configuration they want, and so can the business under the
+seed, without nasty surprises. **The harbour layer:** the harbour presenting, elegantly, every
+configuration option the game has: the doors and the stations, the settings and the flags,
+and above all the scenario's settings, with the full configuration of the player's ship and,
+at choice, of every other ship of the scenario, so that the proper configuration of every
+setting is possible from the page, where today a file must be edited by hand to configure a
+squadron, the full parameters of one's own ship or another's, the papers, a private signal
+(what it is and what the table does), or the role, fit and crew of each ship.
+
+**The facts to start from.** The loader (`scenarios.py` `load_scenario`) reads some forty keys:
+the player's `ship` (file, fit, name, nation, intent, crewed, position, heading, speed, cargo,
+knowledge), the other `ships` with their intents, the `squadrons` (id, name, kind, commander,
+members, formation; package 72), the `papers` (chart, epitome, almanac, chronometer, price
+lists), the `people` (role, name, skill, place), the `stations` (player, model, rules), the
+`standing_orders`, the `director` block (models, seats, budget), the `world_orders`, the
+weather, the business, the ports and the region. The maker (`client/harbour.js`, package 59)
+writes only the fields it shows, and shows neither the papers nor the people nor the squadrons
+nor any other ship's fit, role and crew; the settings (`settings.py`) hold one model per door,
+so several models at several stations want several settings files; the ship's own
+configuration is spread over her class file (`data/ships/`), her fit's name, her wardroom file
+(`data/people/<ship>.yaml`), her nation's block (`data/nations.yaml`), her captain's doctrine
+(`data/captains/`), her private signal (drawn under the seed by 71), her books and the
+scenario's keys, with no one place that says what she is. The director's `ship "X": ...`
+order (M7b §3) makes a hull from a few words with the rest defaulted, and the business
+(M6 §19, 72, 79a) draws hulls by its knobs; neither says its defaults back. M7b's harbour
+points of 2026-10-18 (`M7b-WorkPackages.md`, "The harbour's second pass": the stations and
+the seats as three notions with one word, the flags unexplained where set, several models
+and stations, the maker's missing fields, the people's names and briefs per scenario, the
+director's grant shown) are facts for this brief, each still true. The owner's testing of
+2026-11-01 and 11-05 (the testing-week section above; the case studies in `docs/playtests/`)
+holds the nasty surprises: a door restationed as "the Mr Hill" (82b mends the road, 96 says
+the configuration), a ship with no station briefed for a model, a scenario whose squadrons
+could not be set but by the file.
+
+**The design document, first, for the lead's gate** (`docs/design/Design-Configuration.md`, in
+83's shape): (1) the configuration of a ship as one described thing, its fields and their
+sources, its defaults by role and nation (a merchant brig of Britain, a Spanish xebec of the
+King's, a French privateer schooner: each a complete, sane setup from her role, her nation
+and her class alone, every field overridable), its validation (what a hull cannot be: a fit
+her class has not, a station her bill has not, a book her nation has not), and its
+presentation back (the configuration said in words, so the player and the director read what
+they made); (2) the three builders of hulls, the scenario maker, the director's `ship` order
+and the business, all building from it, so that a hull made by any road is the same kind of
+thing and a hull's configuration can be read, written, saved and replayed by the same code;
+(3) the harbour: how the page presents the whole of it without becoming a wall of fields
+(the common case a few choices, the full configuration opened by a step, every ship of the
+scenario configurable the same way, the doors and stations one control, each setting with
+its words from the parser's help, the private signal and the papers explained where they
+are set), what the page shows of the defaults it fills, and how a scenario written by hand
+and one written by the page are the same file; (4) what moves and what does not (the saves,
+the recorded scenarios of the truths, the scenario files under `data/scenarios/` and the
+owner's, every pinned passage: the design says which fields are new and which are read as
+before, so that nothing recorded moves); (5) the steps, each a mergeable state; (6) the open
+questions for the owner. The lead gates the document; the build follows the gate.
+
+**The build** (after the gate; the steps the design names): the configuration's shape and its
+loader with the defaults and the validation; the three builders on it; the settings' doors
+per station; the harbour's page; the words; truths 7-402 to 7-419 (allotted: the
+configuration from role and nation alone, the overrides, the validation's refusals in words,
+the three roads giving one kind of hull, the save and the replay of a configured hull, the
+page writing the file a hand would write, the pinned passages unmoved). **The suites and the
+head rules** as the briefs before have them; the harbour tested here headless and proved by
+the owner on Windows as 59 was; nothing under `docs/agents/consent/` touched. A Fable
+package, generously scoped: the builder designs to the intent and says what it took another
+way.
 
 ## Package 83: the one-world study (`docs/design/Design-OneWorld.md` new; a draft brief for package 84 in this file; throwaway measurements in the scratchpad only; no code in the repository)
 

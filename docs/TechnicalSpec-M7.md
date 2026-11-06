@@ -1191,8 +1191,8 @@ R-17 and R-54 (7-i); the pumps, the carpenter and the capstan's purchases (7-iii
 thrust aground and the kedge's heave-taut (7-iii with 63); R-39 the weather's stacking and
 the climatology's drift (placed with 72); the land-avoiding planner (61, placed with 72 or
 78); the boat as a vessel and towing (63, before 77's cutting out); the place's knowledge
-(65, with the hail: who perceives what); the harbour's second pass (64, the owner's Fable
-run, when he likes); the cold (26); the thermometer's first layer (deferred with §26); the
+(65, with the hail: who perceives what); the harbour's second pass (64, struck 2026-11-06
+for package 96, the harbour and the ship's configuration, a Fable design package); the cold (26); the thermometer's first layer (deferred with §26); the
 lay line (43b, with 79's convoys beating); the Windows pins (69, before the gate); the
 lead's playtest of 58b's gale book and the owner's decisions listed in 58a's, 58b's and
 67's as-merged records (`docs/dev/M7b-WorkPackages.md`).

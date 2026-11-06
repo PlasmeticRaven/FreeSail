@@ -886,6 +886,20 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     spec M7 §28; the sources begin with Winfield's *Spanish Warships* on the owner's shelf
     and Tofiño's *Derroteros*.
 
+65. **The harbour's second pass struck; the harbour and the ship's configuration.** Owner,
+    2026-11-06. M7b's package 64 (the harbour's second pass, noted 2026-10-18 and never
+    briefed) is struck. In its place a Fable design package, 96: the configuration of any
+    ship made a thing of its own (her class and fit, role, nation and its parameters, her
+    stations and their doors, her people, papers and private signal, her crew, her books,
+    her intent and squadron, with defaults by role and nation), which the scenario maker, the
+    director in live play and the business all build from without nasty surprises; and the
+    harbour presenting every configuration the game has (the doors and stations, the
+    settings, the scenario's settings with the full configuration of the player's ship and,
+    at choice, of every other ship: the squadrons, the papers, the private signal, each
+    ship's role, fit and crew), so that no setting needs a file edited by hand. A design
+    document for the lead's gate first, then the build in steps. Booked in
+    `docs/dev/M7-WorkPackages.md`.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
