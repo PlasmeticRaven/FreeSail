@@ -722,6 +722,9 @@ def test_the_lee_ports_events_are_registered_and_said_by_the_rule():
     for words in ("the lee ports shut", "the lee ports opened"):
         assert not EVENTS[words].absent
         assert words in STAND_BY_EVENTS and words in STAND_BY_WORDS
+        # the lee's line, a port's of no side or one shut upright; never the weather's (L3)
+        test = EVENTS[words].test
+        assert test({"lee": True}) and test({"lee": None}) and not test({"lee": False})
     parse_standing(
         load_ship(BRIG), 'standing order "ports": at the lee ports shut then beat to quarters'
     )

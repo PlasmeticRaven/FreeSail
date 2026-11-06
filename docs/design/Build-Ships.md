@@ -1263,6 +1263,35 @@ ship in a World that keeps a sea, and nobody else until 84 mends it. The rule dr
 above; a port truly turned about the waterline shuts a little sooner (the cutter 14.1° for 14.7°, the
 frigate 18.5° for 19.7°): left as this section binds it, for the lead.
 
+*Since L3 (2026-11-05), as built and measured:* `ports.roll_in_the_dip` returns `float(firer.roll_deg)`,
+and nothing else of the rule moved. The roll is the amplitude this section asks: `Motion.roll_deg`, the
+degrees she rolls to each side, relaxed toward what the sea gives on her heading with a time constant of
+90 s (`physics/motion.py`, `MOTION_TIME_CONSTANT_S` and `Motion.tick`), never signed and never the angle
+of the moment, given the battery by `action._firer` (`combat/action.py:214-227`). A crewed ship still reads
+nought at this head (`_crew_scenario` at `world/crews.py:263`, `sea=False` at :284): in `merchant-cutter.yaml`
+after ten minutes the player's cutter rolled 7.82° and her two crewed hulls had no sea, no motion and a
+roll of 0.0. Of the 46 shipped scenarios 36 keep a sea and 24 of those arm the player's ship (the frigate
+in 20, the cutter in 3, the merchant brig in 1); the first action, the encounter, the two convoys, the
+squadron, the leak and the exercise keep none. **The weather side does move**, against "a roll 20° beyond
+the heel" above: the small ships roll far more than they heel in a seaway, the cutter 17-23° on the beam
+at 15-20 kn, so her weather ports shut in a band of wind: in the sea a scenario opens on, at 17.5 to 20 kn,
+on the beam at about 17.5 alone (at 18 kn steady, heel 9.5° and roll 22.9°, they stand open) and with the
+sea abaft her beam to 20, at 2-8° of heel; at 12.5 to 17.5 kn in a sea fully risen; none from 22.5 kn in
+either, where her heel outweighs the roll. The privateer's shut with the sea on her quarter and not on the
+beam, the long tom's at 20 to 27.5 kn (17.5 to 22.5 fully risen) and the letter of marque's at 20 to 30
+(15 to 27.5 fully risen, and then on the beam as well at 17.5); the merchant brig's at 25 to 27.5 (22.5 to
+25), on the beam at 27.5 alone; and in a sea fully risen the brig's at 22.5 kn with the sea on her quarter, and the 64's and
+the razee's at 25 to 30 with the sea on her bow or quarter, never on the beam. Measured in the tuning
+notes, "The lee ports with the roll".
+
+*Since L3's reviews (2026-11-05):* **a port of no side** (a chaser on the centre line; no file carries one)
+takes the roll alone, for no heel is toward it: under the one line it took the weather side's arithmetic,
+the roll less the heel, so that a roll shut it upright and heeling her either way opened it. At L2, with no
+roll, both give nought. At this head the lines cited above stand at: `_is_lee` `combat/guns.py:1151-1159`;
+the roll `combat/action.py:220` and the half-beam :223 (`_firer` at :214-227); `ship.extra["motion"]`
+`core/world.py:890`; `PER_SHIP_FIELDS` `world/hulls.py:62`; `_crew_scenario` `world/crews.py:263`,
+`sea=False` at :284. `PORT_SHUT_M` and `lee_port_shut` stand where cited.
+
 ### 7.2 The wiring (B8 fills stage 0's hooks)
 
 - `ports.update(battery, firer)`, once a tick at the head of `Battery.tick`: each port gun's
@@ -1297,6 +1326,29 @@ The pace, on this machine: 1.2 to 1.4% alone and 1.3% crewed, taken back by `por
 compare a tick while no port can shut, so that neither figure now stands above the noise. The floors are
 the lead's on the build machine.
 
+*Since L3 (2026-11-05), for the lead:* three things of the wiring the roll brings out, each reproduced and
+measured in `docs/dev/TuningNotes.md`, "The lee ports with the roll": the first left (§7.1's own figure),
+the second mended at L3's commit (package 75's own words), the third left (outside its files):
+- **The ports work gun by gun in gusts.** `PORT_REOPEN_M`'s six inches is 1.6° of heel at the frigate's
+  lowest port and 3.1° at the cutter's, less than a gust swings her, and the roll lowers her shut heel into the band
+  the gusts sweep: an hour engaged in gusts with the sea on her beam gave the frigate at 21 kn 46 changes
+  of port over 13 guns, the shortest 6 s (none at L2), the brig at 17 kn 24, the 64 at 17.5 kn 43 (12 at
+  L2), while the log said two lines or none, a deck's side being one line from its first port shut to its
+  last opened. A dwell (a port held shut a minute) or a margin in heel would steady them; either changes
+  §7.1's figure.
+- **The words `the lee ports shut` and `the lee ports opened`** (`api/practice_readings.py:329-330`) went by
+  the line's kind alone, so they answered the weather side's line as well, which L2 never said, and a book
+  written to them acted on the wrong side. Mended at the commit: a test on the line's `lee`
+  (`d.get("lee") is not False`), so the weather's line answers neither. Two words for the weather's line
+  are proposed, not added (new served words, the lead's).
+- **The replies** of `engage` and `fire` behind a side all shut (L2's items) come now with little heel and
+  with both sides shut at once: "the guns to fire as they bear" and nothing fired, and "no gun of it is
+  loaded and run out yet" two seconds before the port's own line.
+
+The pace since L3: the roll's read in the one compare, and §7.2's own cost wherever the roll keeps a port
+shut, 1.8% of the frigate's tick in the station's gale; the reviews' test of a gun's side adds 0.1 to 0.3
+microseconds a tick to the loop it guards.
+
 ### 7.3 The steps and the proof
 
 | Step | Change | Pins expected |
@@ -1329,6 +1381,28 @@ candidate reaches the gate with her guns cast loose, the most heel cast loose am
 quoin silences a lee gun before its port does: the cutter's carronades fall short at two cables from 8.5°,
 about 18 kn under plain sail, against her first port at 14.7°, 24.5 kn (the tuning notes, "The quoin before
 the port").
+
+*Since L3 (2026-11-05), as measured:* no truth, action or trial moved. The candidates as L2 widened them
+(truths 7-133 to 7-342 and 7b-114 less the pace truths, now 129 with package 82's three, and the pivot,
+practice, magazine, ordnance, profile and lee-port files): 525 passed on a clean archive of 1238bedf, 545
+on the tree at the build and 546 on the final tree after the reviews (their line of 7-190 that its rows
+are every armed file), no test changing its outcome; the captain's trials 3 failed and 4 passed on both with the
+same digests; the whole logs of the first action, the encounter and the station's lee shore and gale the
+same line for line and digest for digest, the frigate's ports shut by the roll for most of both trials'
+twenty hours with her guns secured, so that the gate says nothing. Two pins moved, L2's own
+`test_the_roll_is_held_at_nought` and, with the reviews' mend of the word upright (a port shut with no heel
+said by its side's name), the last line of L2's chaser test; the bisection is the commit itself, L2 against
+L3. No scripted action keeps a sea, so the expected movers have no pin; but the blockade's evening (the
+*Hortense*'s sortie at 22:00 into the gale's 5 m sea, the frigate rolling 22.5° with 11 of her 20 lee port
+guns shut by the rule), the naval cruise (the *Palinure*) and the station-stranger trial put an enemy before
+the player's frigate in a World that keeps one, where only she rolls, and no pin plays them. Measured
+instead, the roll is the bigger half of the dip for the small ships: with her side to the sea a scenario
+opens on, the cutter's lee ports shut at about 12.6 kn under plain sail (24.5 on the heel alone) and her
+weather ports at 17.5 to 20 kn (on the beam at about 17.5 alone), the privateer's at 12
+to 13 kn, the brig's, the merchant brig's and the 64's at 17 to 18, the razee's at 19.5 and the frigate's
+at 21 (about 29). The quoin's figures do not move (it reads the heel), but in a seaway the port comes
+before it: the cutter at 15 kn has her lee battery shut with her shot still carrying two cables, and fires
+her weather battery as before (the tuning notes, "The lee ports with the roll").
 
 ## 8. The sub-types as fits and roles (B8, SW-4)
 
@@ -1743,7 +1817,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | SW-1 | the hull step's standing comparisons against its base commit, which take the whole document or each fit's keys, to rebase old beside new: `tests/test_hull_frigate.py` and `tests/test_hull_brig.py`'s `test_no_figure_the_physics_or_the_gunnery_reads_moved`, `tests/test_hull_cutter.py`'s `test_a_diff_of_her_physics_keys_against_git_shows_none`, `tests/test_hull_schooner.py`'s `test_no_figure_the_physics_reads_moved`; the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
 | SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
 | SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4; on the drawn hulls 10.5°, 14.7°, 17.5° and 19.7°, §7.3). *As built, no action moved; stage 0's two hook tests did* | old beside new, the reason, the bisection of §7.3 |
-| SW-5 L3 | actions in a sea, on the player's ship | the bisection L2 → L3 |
+| SW-5 L3 | actions in a sea, on the player's ship. *As built, no action, truth or trial moved: no scripted action keeps a sea, and the three shipped Worlds that put an enemy before her in one (the blockade's evening, the naval cruise, the station-stranger trial) have no pin that plays it. Two pins moved, in `tests/test_lee_ports.py`: L2's `test_the_roll_is_held_at_nought`, now `test_the_roll_is_read_and_shuts_both_sides_by_itself`, and the last line of L2's chaser test (a port shut upright said by its side's name, the reviews' mend); truth 7-190 drafted in that file for Phase 5* | the bisection L2 → L3, the commit itself; the candidates by junit, test by test; the whole logs and the captain's trials the base's |
 | The caches | none (the results unchanged) | the pace measured |
 
 **None of the existing ships' sailing passages moves:** no hull figure, spar or sail of an

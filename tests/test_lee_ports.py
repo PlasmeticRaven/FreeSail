@@ -1,19 +1,21 @@
-"""The lee ports, built on the heel alone (package 75, L2; docs/design/Build-Ships.md §7.1,
-§7.2, §14.1): a gun's port shut when the sea comes within a foot of its sill, opened again six
-inches clear of that, the gun behind it run in and silent, its loading going on, the log told
+"""The lee ports, built on the heel (package 75, L2) and the roll (L3; docs/design/Build-Ships.md
+§7.1, §7.2, §14.1): a gun's port shut when the sea comes within a foot of its sill, opened again
+six inches clear of that, the gun behind it run in and silent, its loading going on, the log told
 once a change of state a deck and side.
 
 The figures are the rule's arithmetic on each file's own triples, and the tables below are the
 tuning notes' "The port triples before L2", typed from them, so that the files, the notes and
 the rule are held to one another. Her heel is the test's hand wherever a heel is named, by
 7-135's form (`Battery.tick` with a `Firer`) or by `heeled` below; one test heels her by her
-own sails.
+own sails, and one rolls her by her own sea. Her roll is the test's hand likewise, on a `Firer`
+or on the World's motion (truth 7-190's draft, at the end).
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -1216,7 +1218,11 @@ def test_the_lines_say_no_deck_for_a_gun_with_none():
 def test_a_chaser_of_no_side_is_said_on_the_centre_line_and_neither_lee_nor_weather():
     """A bow or stern gun may have no side (`Gun.name`: 'the stern chaser'). No file carries
     one today and the heel alone shuts none but a sill within a foot of the water upright;
-    L3's roll would. The reading and the log must not guess a side for it."""
+    the roll does, by its amplitude alone, for no heel is toward the centre line (§7.1: the
+    heel toward the gun's side plus the roll). The reading and the log must not guess a side
+    for it. **Since L3's review** a sided port shut upright is said by its side's name, for
+    upright she has no lee: old beside new, "The lee upper-deck ports are shut" for the
+    larboard gun at no heel, now "The larboard upper-deck ports are shut"."""
     gun = a_gun(-12.0, 0.30, deck="upper", side=None, place="stern", gid="stern")
     assert gun.name == "the stern chaser"
     ship = load_ship(BRIG)
@@ -1243,12 +1249,28 @@ def test_a_chaser_of_no_side_is_said_on_the_centre_line_and_neither_lee_nor_weat
             "The upper-deck ports are opened again, their sills clear of the sea.",
         ], heel
         assert notes[0][4]["lee"] is None and notes[0][4]["side"] is None
-    # the side's own gun beside it keeps its word
+    # the roll shuts it by its amplitude, heeled or upright, and the heel alone never does
+    one = a_gun(-12.0, 1.0, deck="upper", side=None, place="stern", gid="stern")
+    solo = load_ship(BRIG)
+    solo.guns = {one.id: one}
+    cast_loose(solo)
+    at = shut_heel(1.0, ports._half_breadth(Battery(solo), one, firer_at(0.0)))
+    for heel in (0.0, 5.0, -5.0, 10.0, -10.0, 30.0, -30.0):
+        alone = Battery(solo)
+        ports.update(alone, firer_at(heel))
+        assert one.id not in alone._shut, heel
+        ports.update(alone, firer_at(heel, roll_deg=at - 0.01))
+        assert one.id not in alone._shut, heel
+        ports.update(alone, firer_at(heel, roll_deg=at + 0.01))
+        assert one.id in alone._shut, heel
+    said = [(n[2], n[4]["lee"]) for n in lines_of(solo, "guns.ports_shut")]
+    assert said == [("The upper-deck ports are shut, the sea at their sills.", None)] * 7
+    # the side's own gun beside it keeps its side's word: upright, its name
     ports.update(battery, firer_at(0.0))
-    said = [n[2] for n in lines_of(ship, "guns.ports_shut")]
+    said = [(n[2], n[4]["lee"]) for n in lines_of(ship, "guns.ports_shut")]
     assert said == [
-        "The upper-deck ports are shut, the sea at their sills.",
-        "The lee upper-deck ports are shut, the sea at their sills.",
+        ("The upper-deck ports are shut, the sea at their sills.", None),
+        ("The larboard upper-deck ports are shut, the sea at their sills.", None),
     ]
 
 
@@ -1294,20 +1316,100 @@ def test_a_pivot_and_a_rail_gun_never_shut(path, fit, heel):
     assert not (battery._shut & {g.id for g in over_the_rail})
 
 
-# -- the roll, held at nought -------------------------------------------------------------------
+# -- the roll (L3) ------------------------------------------------------------------------------
 
 
-def test_the_roll_is_held_at_nought():
-    """L2 is the heel alone (§7.3). **L3 moves this test, and nothing else of L2's:** it makes
-    `ports.roll_in_the_dip` read `firer.roll_deg`, and a roll then shuts both sides by itself."""
+def test_the_roll_is_read_and_shuts_both_sides_by_itself():
+    """L3 (§7.3): `ports.roll_in_the_dip` reads `firer.roll_deg`. **Old beside new**, L2's
+    `test_the_roll_is_held_at_nought`, which L3's one line moves: there the roll read 0.0, a
+    roll of 40 degrees upright shut nothing, and her lowest gun stood open a hair short of its
+    own heel under that roll. Now the roll reads 40.0; upright it shuts every broadside port of
+    both sides; a hair short of the lowest gun's heel it shuts that gun; and a weather port
+    shuts once the roll passes the heel by that port's own heel, and not a hair before (§7.1:
+    the weather side's dip is the roll less the heel). Upright she has no lee, so with her guns
+    cast loose each side's line is said by its name (since L3's review; before it, both lines
+    said "lee")."""
     ship = load_ship(CUTTER)
     battery = Battery(ship)
-    assert ports.roll_in_the_dip(firer_at(0.0, roll_deg=40.0)) == 0.0
-    assert ports.update(battery, firer_at(0.0, roll_deg=40.0)) == (frozenset(), frozenset())
+    assert ports.roll_in_the_dip(firer_at(0.0, roll_deg=40.0)) == 40.0
+    broadside = frozenset(g.id for g in ship.guns.values() if g.place == "broadside")
+    assert ports.update(battery, firer_at(0.0, roll_deg=40.0)) == (broadside, frozenset())
+    assert {ship.guns[g].side for g in battery._shut} == {"starboard", "larboard"}
     gun = _at_x(ship, -0.5)
     half = half_breadth_at_sill(ship.hull.spec.profile, gun.deck, gun.x_m)
-    ports.update(battery, firer_at(shut_heel(gun.height_m, half) - 0.01, roll_deg=40.0))
-    assert gun.id not in battery._shut
+    heel = shut_heel(gun.height_m, half)
+    battery = Battery(ship)
+    ports.update(battery, firer_at(heel - 0.01, roll_deg=40.0))
+    assert gun.id in battery._shut
+    weather = _at_x(ship, -0.5, "larboard")
+    battery = Battery(ship)
+    ports.update(battery, firer_at(5.0, roll_deg=5.0 + heel - 0.01))
+    assert gun.id in battery._shut and weather.id not in battery._shut
+    ports.update(battery, firer_at(5.0, roll_deg=5.0 + heel + 0.01))
+    assert weather.id in battery._shut
+    cast_loose(ship)
+    lines_of(ship)
+    ports.update(Battery(ship), firer_at(0.0, roll_deg=40.0))
+    said = [(n[2], n[4]["side"], n[4]["lee"]) for n in lines_of(ship, "guns.ports_shut")]
+    assert said == [
+        ("The larboard upper-deck ports are shut, the sea at their sills.", "larboard", None),
+        ("The starboard upper-deck ports are shut, the sea at their sills.", "starboard", None),
+    ]
+
+
+def test_she_rolls_her_own_ports_under_in_a_seaway_lee_first_then_weather():
+    """No hand on her heel or her roll: the cutter in a World that keeps a sea, 17.5 knots of
+    wind and its sea on her starboard beam, plain sail set, her guns cast loose. Her roll builds
+    over her first minutes (the motion's 90 s) while she is still all but upright, and by the
+    World's own tick her lee ports shut when the heel and the roll first reach her lowest gun's
+    heel, 14.74 degrees, and her weather ports when the roll less the heel does, each said once
+    in its own words. At L2 (the roll held at nought) neither came: she settles at about 7.9
+    degrees of heel, short of her ports by the heel alone (measured on the owner's machine,
+    2026-11-05: the lee at tick 74, heel 1.81 and roll 12.97, the log's line at 75; the weather
+    at 116, 1.96 and 16.72, its line at 117; settled, heel 7.87 and roll 23.35)."""
+    w = make_world(
+        SEED,
+        CUTTER,
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=17.5,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=270.0,
+            ship_speed_kn=4.0,
+            sea=True,
+        ),
+    )
+    cast_loose(w.ship)
+    w.submit("set plain sail")
+    battery = battery_of(w.ship)
+    lowest = ports._least_dip(battery, action._firer(w, w.ship))
+    assert lowest == pytest.approx(14.74, abs=0.01)
+    first: dict[str, tuple[int, float, float]] = {}
+    for i in range(1800):
+        if i % 120 == 0:
+            w.submit("trim sails")
+        w.tick()
+        heel = abs(math.degrees(float(w.ship.dyn.heel)))
+        for gid in battery._shut:
+            first.setdefault(w.ship.guns[gid].side, (w.clock.tick, heel, w.motion.roll_deg))
+    lee, weather = first["larboard"], first["starboard"]
+    assert lee[0] < weather[0] < 300
+    assert lee[1] < 2.5 and weather[1] < 2.5
+    assert lowest <= lee[1] + lee[2] < lowest + 0.2
+    assert lowest <= weather[2] - weather[1] < lowest + 0.2
+    heel = abs(math.degrees(float(w.ship.dyn.heel)))
+    assert 7.5 < heel < lowest - 6.0 and w.motion.roll_deg > 22.0
+    assert {w.ship.guns[g].side for g in battery._shut} == {"larboard", "starboard"}
+    assert [(e.text, e.data["side"], e.data["lee"]) for e in _port_lines(w)] == [
+        ("The lee upper-deck ports are shut, the sea at their sills.", "larboard", True),
+        ("The weather upper-deck ports are shut, the sea at their sills.", "starboard", False),
+    ]
+    # the lee's words answer the lee's line and never the weather's, which the roll brings
+    # (`api/practice_readings.py`; a book `at the lee ports shut` acts on the lee side alone)
+    lee_words = readings.EVENTS["the lee ports shut"]
+    said = [readings.event_matches(lee_words, e.kind, e.data) for e in _port_lines(w)]
+    assert said == [True, False]
 
 
 @pytest.mark.parametrize(
@@ -1364,6 +1466,187 @@ def test_no_sea_no_roll():
     sea.run(120)
     assert sea.motion is not None and sea.ship.extra["motion"] is sea.motion
     assert action._firer(sea, sea.ship).roll_deg == sea.motion.roll_deg > 0.0
+
+
+@pytest.mark.parametrize("roll", [3.0, 12.0])
+@pytest.mark.parametrize("path", [CUTTER, PRIVATEER, FRIGATE, SIXTY_FOUR])
+def test_the_one_compare_takes_the_roll(path, roll):
+    """`ports._least_dip`'s compare is the roll plus the heel: with a roll on, a battery with the
+    compare shuts and opens the same ports as one without it, both ways and on either side."""
+    ship = load_ship(path)
+    battery = Battery(ship)
+    whole = Battery(ship)
+    whole._least_shut_dip = -1.0  # never short of it
+    sweep = [h / 4.0 for h in range(0, 161)]
+    for heel in sweep + sweep[::-1] + [-h for h in sweep] + [-h for h in sweep[::-1]]:
+        firer = firer_at(heel, roll_deg=roll)
+        assert ports.update(battery, firer) == ports.update(whole, firer), heel
+        assert battery._shut == whole._shut, heel
+
+
+# -- truth 7-190 (§15), drafted here for Phase 5 to move into tests/test_known_truths.py --------
+
+# Each armed file and her default fit: the deck and shut heel of her lowest port with a gun in it
+# by §7.1's arithmetic on her drawn hull, degrees (L2's `LOWEST_WITH_A_GUN`, read again at L3),
+# and the count of that deck's lee ports shut a degree above it (measured). Every file of
+# `data/ships` whose default fit has a port gun is a row (the truth's last line below).
+LOWEST_LEE_PORT = (
+    (BRIG, "diligence class 1796", "upper", 17.5, 4),
+    (CUTTER, "carronades", "upper", 14.7, 2),
+    (FRIGATE, "amazon class 1795", "upper", 19.7, 5),
+    (MERCHANT_BRIG, "merchant", "upper", 18.2, 2),
+    (PRIVATEER, "long tom", "upper", 13.5, 1),
+    (RAZEE, "as carried 1796", "upper", 14.5, 6),
+    (SIXTY_FOUR, "ardent class 1784", "lower", 10.55, 6),
+)
+# The razee's three decks with guns in them, as lines of the truth (§15, "Not truths, said";
+# Indf §3.4): her main battery the 64's lower deck raised by her rise, and the two above it.
+RAZEE_DECKS = (("upper", 14.5, 6), ("quarterdeck", 42.02, 1), ("forecastle", 43.84, 1))
+# The 74's lowest lee port shuts at 10.6 degrees of heel alone: the *Bellona*'s 5 ft 2 in at
+# Channel draught on 22.7 ft (Research-74-2026-10.md §13.1 answer 5, revised by the owner
+# 2026-10-28; §15's row 7-195). Her file is not built yet, so the figure is §15's and Bel's.
+SEVENTY_FOURS_SHUT_DEG = 10.6
+# The roll set on the World's motion for the truth's second half (judgement: a ship "rolling"
+# in the motion's words, `physics.motion.ROLL_ROLLING_DEG` 6, short of heavily).
+ROLL_SET_DEG = 4.0
+
+
+def _in_a_sea(path: str, fit: str | None = None):
+    """A World that keeps a sea (`sea: true` under a fixed wind), so that she has her motion;
+    her default fit unless one is named."""
+    w = make_world(
+        SEED,
+        path,
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=6.0,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=90.0,
+            ship_speed_kn=0.0,
+            sea=True,
+            fit=fit,
+        ),
+    )
+    assert w.motion is not None and w.ship.extra["motion"] is w.motion
+    return w
+
+
+def _ports_at(w, heel_deg: float, roll_deg: float) -> frozenset[str]:
+    """Her ports as the rule reads them at this heel (to starboard) and this roll, both set on
+    the World's own names (`ship.dyn.heel`, `world.motion`) and read through `action._firer`."""
+    w.ship.dyn.heel = math.radians(heel_deg)
+    w.motion.roll_deg = roll_deg
+    battery = battery_of(w.ship)
+    ports.update(battery, action._firer(w, w.ship))
+    return battery._shut
+
+
+def _lowest_lee(w, deck: str):
+    """Her lowest starboard port gun of the deck, and its shut heel by §7.1's arithmetic (a sill
+    higher above the shut line than the side is broad never shuts on the heel, and is passed)."""
+    profile = w.ship.hull.spec.profile
+    heels = {}
+    for g in w.ship.guns.values():
+        if g.place in ports.PORT_PLACES and g.side == "starboard" and g.deck == deck:
+            half = half_breadth_at_sill(profile, g.deck, g.x_m)
+            if g.height_m - SHUT_M < half:
+                heels[g.id] = shut_heel(g.height_m, half)
+    gid = min(heels, key=heels.get)
+    return gid, heels[gid]
+
+
+def _open_then_shut(w, deck: str, figure: float, roll: float) -> tuple[int, int]:
+    """Her lowest lee port of the deck open half a degree below its shut heel less the roll, and
+    shut a degree above it; the counts shut at each, the weather side open at both."""
+    gid, heel = _lowest_lee(w, deck)
+    assert heel == pytest.approx(figure, abs=0.05), (w.ship.name, deck)
+    assert not _ports_at(w, 0.0, 0.0)
+    below = _ports_at(w, heel - roll - 0.5, roll)
+    assert gid not in below
+    above = _ports_at(w, heel - roll + 1.0, roll)
+    assert gid in above
+    assert all(w.ship.guns[g].side == "starboard" for g in below | above)
+    counts = (
+        sum(1 for g in below if w.ship.guns[g].deck == deck),
+        sum(1 for g in above if w.ship.guns[g].deck == deck),
+    )
+    assert not _ports_at(w, 0.0, 0.0)
+    return counts
+
+
+@pytest.mark.parametrize("path,fit,deck,figure,count", LOWEST_LEE_PORT)
+def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_roll_sooner(
+    path, fit, deck, figure, count
+):
+    """**A draft, for Phase 5 to move into `tests/test_known_truths.py` and measure again on the
+    merged tree** (Build-Ships.md §15, row 7-190; the lead's ruling; the owner's rule, Bel §13.1
+    answer 7: the dip is the heel toward the gun's side plus the roll's amplitude). Each armed
+    file's default fit in a World that keeps a sea (`sea: true`, six knots, seed 7), her heel
+    to starboard and her roll set by hand on the World's own names (`ship.dyn.heel`,
+    `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
+    digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
+    14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5
+    and the 64's lower deck's 10.55 degrees (±0.05). With no roll, no port of that deck shut
+    half a degree below that heel, and that port shut a degree above it, with 4, 2, 5, 2, 1, 6
+    and 6 of the deck's lee ports; with a roll of 4 degrees on the World's motion, the same
+    four degrees of heel sooner, a roll's amplitude, by the same counts. Her weather side open
+    throughout; upright with no roll, every port open again. Measured on the owner's machine,
+    2026-11-05, at L3. She is built with no fit named, so that the row's fit is her file's
+    default (since L3's review: the fit was named, and the line could not fail)."""
+    w = _in_a_sea(path)
+    assert w.ship.fit == fit
+    assert _open_then_shut(w, deck, figure, 0.0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG) == (0, count)
+
+
+def test_truth_7_190_the_frigates_lee_ports_stand_open_at_the_seventy_fours_shut_heel():
+    """7-190's clause (Bel §6.1, P5, "the frigate unmoved"; `Design-Ship-Bellerophon.md` §14.3
+    leaves it to this truth). A draft for Phase 5, as above. At the 74's 10.6 degrees of heel
+    alone (`SEVENTY_FOURS_SHUT_DEG`: §15's and Bel's figure, her file not yet built) every port
+    of the frigate-36 stands open, heeled to either side, her lowest shutting at 19.7 on her
+    drawn hull (Bel's 21.0 was her first written sill); and with a roll of 4 degrees on her
+    motion as well."""
+    w = _in_a_sea(FRIGATE, None)
+    assert _lowest_lee(w, "upper")[1] == pytest.approx(19.7, abs=0.05)
+    for roll in (0.0, ROLL_SET_DEG):
+        assert _ports_at(w, SEVENTY_FOURS_SHUT_DEG, roll) == frozenset()
+        assert _ports_at(w, -SEVENTY_FOURS_SHUT_DEG, roll) == frozenset()
+
+
+@pytest.mark.parametrize("deck,figure,count", RAZEE_DECKS)
+def test_truth_7_190_the_razees_lee_ports_deck_by_deck(deck, figure, count):
+    """The razee's lee ports, lines of 7-190 (§15; Indf §3.4, 10.6 and 14.5 heel alone): her
+    main battery is the 64's lower deck raised by her rise, and shuts at 14.5 for the 64's
+    10.55 on the drawn hulls (3.95 degrees later, ±0.1); her quarterdeck at 42.02 and her
+    forecastle at 43.84. Each open half a degree below and shut a degree above, and a roll's
+    amplitude sooner, as the truth's row, with 6, 1 and 1 of the deck's lee ports. A draft for
+    Phase 5, as above. Each of her default fit and the 64's."""
+    w = _in_a_sea(RAZEE)
+    assert w.ship.fit == "as carried 1796"
+    assert _open_then_shut(w, deck, figure, 0.0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG) == (0, count)
+    if deck == "upper":
+        her = _lowest_lee(w, "upper")[1]
+        sixty_four = _in_a_sea(SIXTY_FOUR)
+        assert sixty_four.ship.fit == "ardent class 1784"
+        was = _lowest_lee(sixty_four, "lower")[1]
+        assert her - was == pytest.approx(3.95, abs=0.1)
+
+
+def test_truth_7_190_covers_every_armed_file():
+    """7-190 is of every armed file: each file of `data/ships` whose default fit carries a gun
+    in a port (`ports.PORT_PLACES`) is a row of `LOWEST_LEE_PORT`, and no row is of a file that
+    carries none, so that a ship file added or rearmed is not passed by in silence. Today the
+    seven: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
+    razee and the 64 (since L3's review). A draft for Phase 5, as above."""
+    armed = {
+        path.as_posix()
+        for path in sorted(Path("data/ships").glob("*.yaml"))
+        if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
+    }
+    assert armed == {row[0] for row in LOWEST_LEE_PORT}
+    assert len(armed) == 7
 
 
 # -- the old saves -----------------------------------------------------------------------------

@@ -23,8 +23,10 @@ filled` (`guns.filled`), `the powder all filled` (`guns.powder_out`), `the hoy a
 and `the mark in sight again` (`practice.mark_sight`, by its `seen`), `the exercise`
 (`practice.exercise`), `beyond the allowance` (`practice.beyond_allowance`). Package 75's lee
 ports (docs/design/Build-Ships.md §3.1 item 19, §7.2) add `the lee ports shut`
-(`guns.ports_shut`) and `the lee ports opened` (`guns.ports_opened`), registered here beside
-the guns' other lines and said by the lee ports' rule (`combat/ports.py`).
+(`guns.ports_shut`) and `the lee ports opened` (`guns.ports_opened`), by the line's `lee`: the
+lee's line, or a port's of no side or one shut upright, and never the weather's, which the
+roll can bring since L3 (§7.2); registered here beside the guns' other lines and said by the
+lee ports' rule (`combat/ports.py`).
 
 The drill's counts are the battery's (`guns.Drill`, kept per gun and never read for pace or
 aim: the owner's ruling that practice improves no skill); the reading only says them.
@@ -325,8 +327,8 @@ def register() -> None:
         ev("the exercise", "practice.exercise"),
         ev("beyond the allowance", "practice.beyond_allowance"),
         # package 75 (Build-Ships.md §7.2): the lee ports, once a change of state a deck and
-        # side
-        ev("the lee ports shut", "guns.ports_shut"),
-        ev("the lee ports opened", "guns.ports_opened"),
+        # side; the weather side's line (`lee` False) answers neither
+        ev("the lee ports shut", "guns.ports_shut", lambda d: d.get("lee") is not False),
+        ev("the lee ports opened", "guns.ports_opened", lambda d: d.get("lee") is not False),
     ):
         R.EVENTS[spec.words] = spec

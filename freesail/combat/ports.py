@@ -3,21 +3,28 @@ when the sea comes to its sill, and opened again when the sill stands clear of i
 
 **The rule** (§7.1): for a gun placed broadside, bow or stern (`PORT_PLACES`; a pivot and a
 rail gun fire over the rail and have no port), the dip is the heel toward the gun's side plus
-the roll's amplitude, never below nought, the other side's the roll less the heel; the sill
+the roll's amplitude, never below nought, the other side's the roll less the heel, and a port
+of no side's (a chaser on the centre line) the roll alone, for no heel is toward it; the sill
 lowered is the gun's `height_m` less the side's half-breadth at the sill
 (`ship.profile.half_breadth_at_sill`, held once a gun; else half the beam, a gun with no deck
 or a ship with no profile: an old save, a boat) times the sine of the dip; the port is shut
 when the sill lowered is within `shot.PORT_SHUT_M` of the water (`shot.lee_port_shut`), and
-opened again when it stands `PORT_REOPEN_M` clear of that, so that a port does not flicker in
-a gust.
+opened again when it stands `PORT_REOPEN_M` clear of that, so that a port does not open and
+shut at each small change of heel. Six inches of sill is 1.6 to 3.1 degrees of heel (the
+frigate's lowest port to the cutter's), less than a gust swings her, so in gusts a port near
+its own heel opens and shuts gun by gun, while the log's line for its deck's side stands
+(Build-Ships.md §7.2's note since L3, for the lead).
 
-**The roll is held at nought (L2, §7.3): the heel alone.** `roll_in_the_dip` is the one place
-the rule reads a roll, and L3 makes it `firer.roll_deg`, in its own commit, with nothing else
-to change. What it will read: `Firer.roll_deg`, her World's motion, is the player's ship's
-own where her World keeps a sea (`Scenario.sea`, or weather systems and no script), and
-nought in a World that keeps none; a crewed ship's reads nought wherever she sails, for
-`crews._crew_scenario` builds her with no sea and no motion though the World round her has
-both.
+**The roll (L3, §7.3).** `roll_in_the_dip` is the one place the rule reads a roll, and it
+reads `Firer.roll_deg`, her World's motion (`physics.motion.Motion.roll_deg`): the amplitude
+she rolls to each side, relaxed toward what the sea gives on her heading over about 90 s
+(`MOTION_TIME_CONSTANT_S`), never the angle of the moment. So a lee port shuts a roll's
+amplitude of heel sooner; a weather port shuts once the roll passes the heel by its own shut
+heel; upright in a seaway both sides go alike. The roll is the player's ship's own where her
+World keeps a sea (`Scenario.sea`, or weather systems and no script), and nought in a World
+that keeps none; a crewed ship's is nought wherever she sails, for `crews._crew_scenario`
+builds her with no sea and no motion though the World round her has both (§7.1, until
+package 84 gives each hull her sea).
 
 **The wiring** (§7.2): `update` is called once a tick at the head of `guns.Battery.tick`, and
 keeps every port gun's state in `Battery._shut`, secured or cast loose, for a port is shut by
@@ -63,10 +70,10 @@ _NONE: frozenset[str] = frozenset()
 
 
 def roll_in_the_dip(firer: Any) -> float:
-    """The roll's amplitude in the dip, in degrees. Held at nought: L2 is the heel alone
-    (Build-Ships.md §7.3), and L3 makes this `float(firer.roll_deg)` and changes nothing
-    else (`tests/test_lee_ports.py`'s `test_the_roll_is_held_at_nought` moves with it)."""
-    return 0.0
+    """The roll's amplitude in the dip, in degrees: the firer's own (the module's head), added
+    to the heel on the side she heels to, less the heel on the other, and alone on the centre
+    line (§7.1, the owner's rule)."""
+    return float(firer.roll_deg)
 
 
 def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
@@ -90,7 +97,10 @@ def update(battery: Any, firer: Any) -> tuple[frozenset[str], frozenset[str]]:
         if gun.place not in PORT_PLACES:
             continue
         half_breadth = _half_breadth(battery, gun, firer)
-        dip = max(0.0, roll + heel if _is_lee(gun, heel_deg) else roll - heel)
+        if gun.side is None:  # on the centre line: the roll, and no heel toward it
+            dip = roll
+        else:
+            dip = max(0.0, roll + heel if _is_lee(gun, heel_deg) else roll - heel)
         if gun.id in was:
             if not S.lee_port_shut(gun.height_m - PORT_REOPEN_M, dip, half_breadth):
                 opened.append(gun.id)
@@ -175,10 +185,18 @@ def _tell(
     gone = _by_deck(guns, reopened)
     lines += [(key, gone[key], False) for key in told if key not in shut and key in gone]
     for (deck, side), ids, closing in sorted(lines):
-        # upright she has no lee, and a port opening as she comes upright was the lee's; a
-        # chaser on the centre line has neither side's word
-        lee = None if not side else heel_deg == 0.0 or is_lee(guns[ids[0]], heel_deg)
-        which = "" if lee is None else "lee " if lee else "weather "
+        # upright she has no lee: a port shut so (by the roll, or a sill within a foot of the
+        # water) is said by its side's name, and one opening as she comes upright is said the
+        # lee's, as it was while she heeled (a weather port the roll shut, opening exactly
+        # upright, is said so too: left, for the lead); a chaser on the centre line has
+        # neither side's word
+        if not side:
+            lee, which = None, ""
+        elif heel_deg == 0.0 and closing:
+            lee, which = None, f"{side} "
+        else:
+            lee = heel_deg == 0.0 or is_lee(guns[ids[0]], heel_deg)
+            which = "lee " if lee else "weather "
         said = f"{deck}-deck " if deck in _DECKS_SAID_SO else f"{deck} " if deck else ""
         if closing:
             kind = "guns.ports_shut"
