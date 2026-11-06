@@ -47,6 +47,7 @@ from typing import Any
 
 from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
+from freesail.world.people import WRITING
 from freesail.world.places import (
     DEFAULT_ASHORE,
     PLACES,
@@ -520,8 +521,12 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
         if person.where == "shore":
             return _go_ashore_place(world, person, verb, words)
         raise OrderError(f"You are {place_words(person.where)}; wait until you are aboard.")
-    if person.occupied:
+    if person.occupied and person.task != WRITING:
         raise OrderError(f"You are at the {person.task}; it is not left for a walk about the ship.")
+    if person.occupied and person.task == WRITING and person.mirror is None:
+        # the captain's writing is his own to leave (package 65, step 6)
+        person.occupied_until = None
+        person.occupied_with = ""
     if verb == "go below":
         place_id = "cabin" if "cabin" in words.lower() else _berth(person, world)
     elif verb == "come on deck":

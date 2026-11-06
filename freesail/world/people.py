@@ -159,6 +159,11 @@ ROLE_WORDS: dict[str, str] = {
 # at his casks in the hold, the stewards and servants with their masters aft and below,
 # the clerk at the captain's papers (judgement: where the trade's work is; any other trade
 # on the deck).
+# The captain's writing (package 65, step 6; the design's §9): a book drafted is written in
+# the cabin, and the task's words; his own to leave by his own move.
+WRITING = "writing"
+WRITING_MINUTES = 5
+
 TRADE_PLACES: dict[str, str] = {
     "cook": "galley",
     "cooper": "hold",
@@ -1342,18 +1347,39 @@ class People:
     # -- occupying and moving ----------------------------------------------------------
 
     def occupy(self, p: Person, place: str, until: int, with_what: str) -> str | None:
-        """Occupy a person with a task until a tick; the refusal in words when he is busy."""
+        """Occupy a person with a task until a tick, in the room where it is done (package
+        65, step 6; the design's §9): the one road for the rules' people and a station's
+        person alike. `place` is a room's id; the mirror's "on deck" and "below" are taken
+        too and mapped to the quarterdeck and his berth. The room is kept for a mirrored
+        person (the master's) as well, so that his place reads the room and not the berth
+        the mirror would give. The refusal in words when he is busy. When the work is done
+        he is left where it was (a man does not walk back by himself); the master's
+        "came on deck" line stands as the reckoning writes it."""
         if p.occupied:
             return f"{p.name} is at the {p.task}; he will be free at {self._when(p)}"
+        room = place
+        if place == "on deck":
+            room = "quarterdeck"
+        elif place == "below":
+            # the room he is in when he is below already (the schooner's master who commands
+            # went below to his cabin), else his berth
+            room = p.where if PLACES.get(p.where, PLACES["deck"]).below else self._berth(p)
         if p.mirror is not None:
             p.mirror.occupy(
-                "on deck" if place in ("quarterdeck", "deck") else "below", until, with_what
+                "on deck" if room in ("quarterdeck", "deck", "tops") else "below", until, with_what
             )
+            p.place = room
         else:
-            p.where = place
+            p.where = room
             p.occupied_until = until
             p.occupied_with = with_what
         return None
+
+    def _berth(self, p: Person) -> str:
+        """Where "below" is for him: the captain's cabin, a trade's place, else the gunroom."""
+        if p is self.captain:
+            return "cabin"
+        return TRADE_PLACES.get(p.role, "gunroom")
 
     def _when(self, p: Person) -> str:
         until = p.mirror.occupied_until if p.mirror is not None else p.occupied_until
@@ -1431,6 +1457,9 @@ class People:
         want = "cabin" if below else "quarterdeck"
         if captain.where == want:
             raise OrderError(f"You are {place_words(want)} already.")
+        if captain.occupied and captain.task == WRITING:
+            # his writing is his own to leave (package 65, step 6), unlike a sight's working
+            self.free(captain)
         captain.where = want
         text = (
             "The captain went below to his cabin; the deck is the officer of the watch's."

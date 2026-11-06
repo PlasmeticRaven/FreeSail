@@ -943,3 +943,41 @@ the same call, so a model that walks reads it again by the stub's call.
 
 **Found on the way** is in the tuning notes (`_section_page` reopens by number where the
 section's words hold an apostrophe; the test of 35's parity moved to the rule).
+
+### Step 6: work in its place (§9; 2026-11-06)
+
+**Built as designed**: `People.occupy(p, place, until, with_what)` the one road, taking the
+room's id (the mirror's "on deck" and "below" taken too and mapped to the quarterdeck and his
+berth: the captain's cabin, a trade's place, else the gunroom; "below" for a man below already
+is the room he is in), keeping the room for a mirrored person (the master's) as well, so that
+his place reads the room and not the berth the mirror would give; when the work is done he is
+left where it was, and the master's "came on deck, the day's work done" line stands as the
+reckoning writes it. The master's noon sight on the quarterdeck and his day's work in the
+gunroom were already one road for the rules' master and a model at his station (the mirror's
+"below" read as the gunroom by `Person.where` since 53, the station's senses his person's since
+step 1): the step proves it (truth 7-375): a model master's sample while he is below is the
+gunroom's (the slate's rows, no deck reading, the line saying where the rest are), the deck
+reaching him by what is felt (the bell, the watch relieved). The captain's writing is done in
+the cabin (truth 7-388): `draft a book` from the quarterdeck takes him below first (one
+`captain.below` line, as his own `go below` writes it, before the order's own lines) and
+occupies him `writing` for five minutes (`people.WRITING_MINUTES`, judgement); he stays in the
+cabin until he comes on deck; a second book drafted in the cabin moves him nowhere; a captain
+ashore, in the boat or at a task already writes where he is; another drafter (an officer at
+his station) writes where he stands. The primer's chapter 14 says it in a sentence. Truths
+7-375 and 7-388; two tests.
+
+**Taken another way, with the reason.** (1) **The captain's writing is his own to leave**: his
+`come on deck` and any walk of his (`go to the hold`) free him of it and move him, where the
+master's sight-working is not left for a walk ("You are at the day's work; it is not left for a
+walk about the ship"): a man at his desk gets up when he chooses, a man working a sight
+cannot, and the five minutes bind only what he may do meanwhile (the deck's orders, refused
+from the cabin as from any going below). (2) The `captain.below` line is written before the
+order's `order.accepted` line (the handler moves him as it carries the order out), as the
+boat's `hull.followed` line is at step 4; the order's own line follows, so the log reads "went
+below; Order: draft a book; drafted a book". (3) The letter of §9's table has no order of its
+own today (a letter comes aboard by the boat and is read where the captain is; none is
+written at the prompt), so nothing of a letter is built.
+
+**Found on the way** is in the tuning notes (the reckoning's rows are the gunroom's already;
+`People.occupy` dropped the room for a mirrored person; the test of step 5 that drafted a book
+on the deck and walked to the hold at once).

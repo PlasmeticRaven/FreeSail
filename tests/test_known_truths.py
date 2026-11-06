@@ -13520,6 +13520,18 @@ def test_truth_7_374_a_book_is_read_after_the_walk():
     test_the_keeper_carries_his_paper_while_he_is_at_it()
 
 
+def test_truth_7_375_the_masters_days_work_is_done_in_the_gunroom():
+    """The master's noon sight on the quarterdeck and his day's work in the gunroom, the
+    rules' master and a model at his station alike: occupied there, the sample is the
+    gunroom's (the slate's rows, no deck reading), the deck reaching him by what is felt;
+    `People.occupy` the one road, keeping the room (the design's §9)."""
+    from tests.test_knowledge import (
+        test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike,
+    )
+
+    test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike()
+
+
 def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
     """The console shows the captain in the cabin no deck line and the officer's report, and
     `log N` reads back the same; `knowledge: all` shows everything; the director's seat and
@@ -13865,6 +13877,15 @@ def test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_
 # Package 65, step 3, decision 63 (the lead's numbering at step 4's boundary): the command
 # devolved, and the told order the captain's word
 # ---------------------------------------------------------------------------
+
+
+def test_truth_7_388_the_captains_writing_is_done_in_the_cabin():
+    """`draft a book` from the quarterdeck takes the captain below and occupies him writing;
+    his sample while writing is the cabin's; he stays until he comes on deck (the design's
+    §9)."""
+    from tests.test_knowledge import test_the_captains_writing_is_done_in_the_cabin
+
+    test_the_captains_writing_is_done_in_the_cabin()
 
 
 def test_truth_7_420_the_command_devolves_on_the_held_officer_and_is_given_back():
