@@ -17292,11 +17292,12 @@ minutes' settling, two runs each):
 
 | held hulls | awake beside the player's | ticks a second |
 |---|---|---|
-| none | 3 (the cap) | 165, 167 |
-| four | 5 (the cap and the allowance) | 108, 102 |
+| none | 3 (the cap) | 165, 167 (under load); 167, 171 (quiet) |
+| four | 5 (the cap and the allowance) | 108, 102 (under load); 113, 110 (quiet) |
 
-Measured while the fast tier ran beside it (load 4.9 on four cores), so the figures are low in
-the same proportion; quiet figures below when taken. Five awake costs about two crewed hulls'
+The first pair of each row was measured while the fast tier ran beside it (load 4.9 on four
+cores); the second on the merged tree (the trunk at 2b59ea4 brought in) with the machine
+quiet. Four held hulls cost about a third of the pace either way. Five awake costs about two crewed hulls'
 worth over the cap, as package 43's measure has it (a crewed hull costs what the frigate costs),
 and stays above `CREWED_FLOOR_TICKS_S` (60) here; the owner's machine is about half the build
 machine's figure.
