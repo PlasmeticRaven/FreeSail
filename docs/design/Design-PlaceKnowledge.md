@@ -836,3 +836,54 @@ shore named "the quay at Falmouth"; a boat hull's people unmustered; three pinne
 moved by the new lines alone, the merchant passage's master being below at his sights and at
 the noon's day's work when the mate reports and sends for him, re-measured old beside new;
 the rules' master called does not come up from his work, for the lead).
+
+### Step 4: the player at the prompt reads by his place; one person (§11; decisions 59 and 62; 2026-11-06)
+
+**Built as designed**: the console's and the browser's play log by the player's person
+(`world.knowledge.players_person`, `players_senses`, `hears`: the lines that reach him where
+he is, the words by 66's hearing as the harness applies it; `log N`, the pages' log and its
+reach-back by the same rule), the snapshot's `knowledge` block (his place in words, the rows
+not to be had there each with where it is, the sample's sentence, and whether the deck's are
+his) with the instruments pane greying those readouts and saying where each is to be had; the
+owner's eye everything (the director's seat, an observed world, `follow` of a hull he holds no
+person in) and `knowledge: all` everything. Decision 62: the player is one person, the seat's
+or the captain of the ship he is aboard as her captain (his own, or the one `--ship` named,
+read from the `driver.left` line of his own ship's log); the prompt follows his body: into
+the boat (82's `follow_boat`), aboard another ship and home again (`movement.put_aboard`
+writes a `hull.followed` line of her log when the player's person changes hull, a consequence
+of his order and never a driver's input, so a replay moves it the same); the road from his own
+manned boat aboard another ship (`come alongside the Medusa` from the boat: she pulls for her
+and, alongside, whoever is in her but her crew goes aboard her as a visitor by `put_aboard`,
+the boat made fast alongside and keeping her station until an oar is pulled or the lug set;
+`go to the boat` from her deck takes him off in his own boat lying alongside; `come alongside`
+brings him home); the prompt his there (`person_of_actor` gives the player's visitor for the
+captain's actor, `movement.check` refuses her deck's orders and his own ship's with the
+visitor's words, his body's moves, his needs, a question, a reading and a free line his;
+`hearing.station_spot` reads his spot for a word at the captain's); the driver's words never
+shadow an order of the game (`hold` alone, `speed N`, `tick N`, `state`, `log N` the driver's,
+`hold water`, `hold your fire`, `go below` the ship's, every verb and synonym of the vocabulary
+whose first word is a driver's reaching the ship, tested); `follow` and `look at` typed at the
+browser's order line the driver's as at the console, a refusal sent to the pages alone; the
+primer's chapters 14, 19 and 26 and the browser's page say the one-person rule in a sentence.
+Truth 7-382; four tests and the truth in the slow tier.
+
+**Taken another way, with the reason.** (1) The player's person is found from the world and
+the log, never kept as a field: the seat's person, else the captain of the ship the
+`driver.left` line names, else his own ship's; a save and a replay read the same without a
+new field in the save. (2) The owner's eye is told from the player's road by the hull: the
+player's person is in the followed hull (or in the boat of it, or ashore from it) or he is
+not; `follow` of another ship shows everything of her as the director sees it, which §11
+asks. (3) The visitor at the prompt is given a passenger's reach by `movement.check` with the
+seated visitor's words (`agent.VISITOR_DOMAIN`), not a seat made for him: his `say` there is
+still said as "the captain" by the stations' sentences, with his spot (the hearers right, the
+name hers); a seat of the visitor's voice for the prompt is for the lead to rule (found on the
+way, in the tuning notes). (4) The boat alongside another ship is made fast (her position
+the ship's, a boat's length abeam) rather than left to drift: lying on her oars she fell a
+cable astern of a ship hove to in minutes, and `go to the boat` from her deck found no boat
+alongside. (5) The browser greys a readout and writes where the reading is to be had in its
+place, instead of leaving the figure dimmed: decision 59 is that there are not two views of
+one world, and a dimmed figure is still a figure.
+
+**Found on the way** is in the tuning notes (a World's `parent` is the followed hull's façade
+and not the World; the frigate hove to makes near three knots; the visitor's `say` at the
+prompt; `World.dealings` reads the followed hull).

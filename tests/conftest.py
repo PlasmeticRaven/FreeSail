@@ -111,6 +111,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
         "test_known_truths.py::test_truth_7_371_a_captain_ashore_has_nothing_of_the_ship_but_the_boats_report",
         "test_known_truths.py::test_truth_7_372_a_sleeping_station_is_woken_by_the_call_and_not_by_a_notable_line",
+        # package 65, step 4: the player's play log by his place, the browser's, the boat road
+        "test_knowledge.py::test_the_console_shows_the_captain_what_reaches_him_where_he_is",
+        "test_knowledge.py::test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye",
+        "test_knowledge.py::test_the_browsers_log_and_snapshot_are_the_players_persons",
+        "test_knowledge.py::test_the_player_goes_aboard_another_ship_in_his_own_boat_and_the_prompt_follows_him",
+        "test_known_truths.py::test_truth_7_382_the_player_at_the_prompt_reads_by_his_place",
         "test_knowledge.py::test_a_station_on_a_hull_that_sleeps_and_wakes_reads_by_its_place",
         "test_knowledge.py::test_the_handover_fold_keeps_the_place",
         "test_knowledge.py::test_the_lookouts_station_reads_the_horizon_and_no_instrument",

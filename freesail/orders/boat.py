@@ -104,7 +104,7 @@ def execute(ship: Any, order: Order) -> Result:
     if verb == "come alongside":
         from freesail.world import boats
 
-        text = boats.come_alongside(world, world.own)
+        text = boats.come_alongside(world, world.own, rest)
         return "boat.alongside", text, _data(oars)
     raise OrderError(f"'{verb}' is no order of the boat's.")
 

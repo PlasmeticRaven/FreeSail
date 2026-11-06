@@ -17784,3 +17784,52 @@ against 592; the filter's cost is within the run's noise, as at steps 1 and 2); 
 alone 557 ticks a second, the Channel observed 348, the same Channel with the frigate at the
 view 221 (step 2's tree gave 568/556, 554/346/230 and 559/576 on the step's first final tree).
 `ruff check` and `ruff format --check` clean on the whole tree.
+
+### Step 4: the player at the prompt reads by his place; one person (the design's §11; decisions 59 and 62; 2026-11-06)
+
+**What was built.** The console's and the browser's play log filtered by the player's person
+(`world.knowledge.players_person`, `players_senses`, `hears`), `log N`, the pages' log and
+its reach-back the same; the snapshot's `knowledge` block and the instruments pane's greying
+with the words for where; the owner's eye (the director's seat, an observed world, `follow` of
+a hull he holds no person in) and `knowledge: all` everything; decision 62 whole: one person
+(the seat's, or the captain of the ship he is aboard as her captain, `--ship`'s read from the
+`driver.left` line), the prompt following his body (a `hull.followed` line of her log written
+by `movement.put_aboard` when the player's person changes hull, as 82's `follow_boat`), the
+road from his own manned boat aboard another ship (`come alongside the Medusa`, the boat made
+fast alongside, `go to the boat` from her deck, `come alongside` home), the prompt his there
+with a passenger's reach, the driver's words never shadowing an order of the game, `follow`
+and `look at` at the browser's order line, the primer's chapters 14, 19 and 26 and the page's
+sentence. Truth 7-382 in `tests/test_known_truths.py`; five tests in `tests/test_knowledge.py`
+(the console, the owner's eye, the browser, the boat road, the driver's words), four of them
+and the truth in the slow tier (16, 18, 28 and 39 s alone).
+
+**Taken another way, with the reason** is in the design note's postscript (the player's person
+read from the world and the log, no new field; the owner's eye told by the hull; the visitor's
+reach by `movement.check` and not a seat; the boat made fast alongside; the readout replaced
+by the words, not dimmed).
+
+**Found on the way.** (a) **A World's `parent` is the followed hull's façade**, not the World
+(package 84, step 6: the shared code tells the player's ship from another by it), so "the
+root is `parent` or the world", which `knowledge.all_known` reads for the scenario, is the
+wrong idiom for the drivers' `followed`: the first follow hook set `followed` on a façade and
+nothing moved. The knowledge module and the hook walk `Hull.world` to the one World, as the
+boats module's `_root` does. (b) **The frigate hove to makes near three knots** (1.5 m/s in
+the hove-to world of the hulls' tests), and the launch three and a half fresh: pulled home
+from a ship a mile off she closes at half a knot and the men tire; the road's test gives the
+return three hours. Whether a ship hove to should forereach so is the engine's (not read
+here). (c) **The visitor's `say` at the prompt is said as "the captain"**: the stations'
+sentences (`orders.stations`) speak for the captain's station by its name, so a player aboard
+another ship as a visitor speaks in her log as her captain, though from his own spot (the
+hearers are right). A seat of the visitor's voice for the bare prompt, as 82 made for a seated
+visitor, would mend it; for the lead to rule, and not widened here. (d) **`World.dealings`
+reads the followed hull**, so a test that reads "the boat away" after the prompt followed the
+player aboard another ship reads hers: `world.players.dealings` is the player's ship's. (e)
+**The boat lying on her oars alongside a ship hove to falls a cable astern in minutes** (the
+ship forereaches, the boat does not); she is made fast alongside now (her position the ship's
+a boat's length abeam, her way the ship's, as the tow's coupling), cast off when an oar is
+pulled or the lug set.
+
+**The pace.** Nothing of this step runs on the tick's path: the filter is read once a line
+shown (the player's person found by a few reads, the `driver.left` scan from where it left
+off) and once a snapshot; the boat made fast is a position copy a tick for one hull while she
+lies alongside. The pace tests are run as the rule asks and their figures are below.

@@ -42,7 +42,8 @@
     <div class="command-line">
       <span class="prompt">&gt;</span>
       <input id="command" type="text" autocomplete="off" spellcheck="false"
-             placeholder="an order, or hold / go / speed 30 / tick 600 / library / world: ... / the director's log"
+             placeholder="an order, or hold / go / speed 30 / tick 600 / follow &quot;Medusa&quot; / library / world: ... / the director's log"
+             title="You are one person, your ship's captain or your seat's: the log and the readings are what reaches him where he is, and the prompt follows his body into the boat and aboard another ship; 'follow' is the owner's eye, for looking on, never the player's road."
              aria-describedby="hint">
     </div>
     <!-- the console's completer as the line is typed (package 33d): Tab takes the first,
@@ -77,6 +78,8 @@
     <div class="panel-head"><span>Instruments</span><span id="i-tick" class="hint"></span></div>
     <dl class="instruments">
       <dt>Ship's time</dt><dd id="i-time"></dd>
+      <!-- where the player's person is and what is not to be had there (package 65, step 4) -->
+      <dt>Where you are</dt><dd id="i-knowledge" class="wrap muted"></dd>
       <dt>Bells</dt><dd id="i-bell"></dd>
       <dt>Clock</dt><dd id="i-clock"></dd>
       <dt></dt><dd class="wrap"><label class="option" title="as an urgent line eases it; speed up again by hand (also --ease-on-station)"><input id="opt-ease-on-station" type="checkbox"> ease to 1x when a station is sampled or speaks</label></dd>

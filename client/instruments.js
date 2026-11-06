@@ -65,6 +65,7 @@
 
     renderCrew(snap.crew);
     renderStations(snap.agents);
+    renderKnowledge(snap.knowledge);
 
     var evoList = document.getElementById("i-evolutions");
     if (evoList) {
@@ -88,6 +89,48 @@
         evoList.appendChild(li2);
       });
     }
+  }
+
+  // The readings rows each readout shows (freesail/api/readings.py REGISTRY ids), for the
+  // place's knowledge below.
+  var ROW_IDS = {
+    heading: ["i-heading"], course: ["i-course"], speed: ["i-speed"], leeway: ["i-leeway"],
+    heel: ["i-heel"], true_wind_from: ["i-true-wind"], true_wind_speed: ["i-true-wind", "i-wind-words"],
+    apparent_wind_angle: ["i-apparent"], apparent_wind_speed: ["i-apparent"],
+    helm: ["i-helm", "i-balance"], glass: ["i-glass"], tendency: ["i-tendency"], sky: ["i-sky"],
+    sea: ["i-sea"], motion: ["i-motion"], watch: ["i-watch"], hands_on_deck: ["i-hands"],
+    time: ["i-bell"], work_in_hand: ["i-evolutions"]
+  };
+  var DECK_IDS = ["i-sails", "i-strain", "i-tack"];
+
+  /** The place's knowledge (package 65, step 4; decision 59): the player reads by his
+   * place as a model does. A readout whose row is not to be had where his person stands is
+   * greyed and says where it is, after the snapshot's `knowledge.hidden` (the same rows
+   * his sample would leave out); the sails, the yards and the work in hand are the deck's.
+   * Nothing is greyed for the owner's eye (the director's seat, `follow` of another ship)
+   * or under `knowledge: all`. */
+  function renderKnowledge(k) {
+    var hidden = {};
+    var everything = !k || k.everything;
+    ((k && k.hidden) || []).forEach(function (h) { hidden[h.id] = h.where; });
+    function mark(id, where) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (where) {
+        el.classList.add("not-here");
+        el.textContent = "not to be had " + k.place + " (" + where + ")";
+        el.title = where;
+      } else {
+        el.classList.remove("not-here");
+        el.title = "";
+      }
+    }
+    Object.keys(ROW_IDS).forEach(function (row) {
+      ROW_IDS[row].forEach(function (id) { mark(id, everything ? "" : hidden[row]); });
+    });
+    DECK_IDS.forEach(function (id) { mark(id, everything || k.deck ? "" : "the deck's"); });
+    var line = document.getElementById("i-knowledge");
+    if (line) line.textContent = everything ? "" : "you are " + k.place + (k.words ? "; " + k.words : "; every reading is yours here");
   }
 
   /** The glass and the sky (spec M5 §5): the registry's words, as the console says them.

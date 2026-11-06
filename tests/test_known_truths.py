@@ -13506,6 +13506,23 @@ def test_truth_7_380_every_kind_the_code_writes_is_placed_and_the_hulls_sounds_r
     test_the_senses_of_each_place_and_the_readings_places()
 
 
+def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
+    """The console shows the captain in the cabin no deck line and the officer's report, and
+    `log N` reads back the same; `knowledge: all` shows everything; the director's seat and
+    `follow` of another hull show everything of her (the owner's eye); the browser's log, its
+    reach-back and its snapshot's `knowledge` are the player's person's (decision 59; the
+    design's §11)."""
+    from tests.test_knowledge import (
+        test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye,
+        test_the_browsers_log_and_snapshot_are_the_players_persons,
+        test_the_console_shows_the_captain_what_reaches_him_where_he_is,
+    )
+
+    test_the_console_shows_the_captain_what_reaches_him_where_he_is()
+    test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye()
+    test_the_browsers_log_and_snapshot_are_the_players_persons()
+
+
 def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail():
     """The lookout's sample carries the horizon's rows and the heading, no log, no lead, no
     glass; the quarterdeck's `say` does not reach it, `say to the lookout` does, and the sail

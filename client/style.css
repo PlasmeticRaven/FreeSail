@@ -231,6 +231,7 @@ main {
 .instruments dd { margin: 0; }
 .instruments dd.wrap { white-space: normal; }
 .instruments .muted { color: var(--ink-soft); }
+.instruments .not-here { color: var(--ink-soft); font-style: italic; }
 .evolutions { margin: 0; padding-left: 16px; }
 .instruments .stations .station-line.state-paused { color: var(--urgent); }
 .instruments .stations .station-line.state-released { color: var(--ink-soft); }
