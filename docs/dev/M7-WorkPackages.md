@@ -5164,3 +5164,13 @@ the trunk and on your tree alike, set at 4.0 from the chart's own 8.0. Nothing o
 The whole suite runs in the cloud; bring the trunk in at your next boundary (82b's item 1 and
 65's step 2 are on it since this morning: the harness's `ident`, the say across hulls, a
 reply's prose the person's own note). Build the dwell as ruled above, then B3.4.
+
+**2026-11-06, night: the owner's word for the ships session's night.** The dwell is in on
+your side; the owner has you work on through the night and foresees no blocker that wants
+their attention for 75 to finish as planned; you keep in touch with the lead as you work
+and hold for the lead on any judgement call; the lead reviews and merges each step as it
+comes, through the night, by the same road (the trial merge, the fast tier, the whole suite
+in the cloud, the record). The lead's own night: 82b's items 2 to 5 merged when reported,
+then package 95 launched (the sail by her name, on `world/hail.py`'s `_addressee` beside
+your files, nothing of the ships'), then 97; 65's step 3 merged when reported; 74 launched
+when 65 closes.
