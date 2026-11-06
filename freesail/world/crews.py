@@ -960,6 +960,29 @@ def far_dangers(world: Any) -> None:
         )
 
 
+def _pilot_water(hull: Any, plan: list[Any]) -> bool:
+    """Whether the far plan's leg in hand is a port's own track in (`Captain._inner_leg`'s
+    pilot water, read on the far body's plan, which keeps the marks' places and not their
+    kinds): the plan ends at that port's anchor and the leg's mark is one of its `from_sea`
+    marks after the first, its `in` marks or its anchorage, the charted way in, which the far
+    body sails mark to mark with no account to set her off it (found on truth 7-200: the
+    Raven put about by her land ahead between the Sound's mark and Cawsand Bay, and never
+    reached Plymouth)."""
+    last = plan[-1]
+    dealings = getattr(hull, "dealings", None)
+    if last[0] != "anchor" or not last[1] or dealings is None:
+        return False
+    port = (getattr(dealings, "ports", None) or {}).get(last[1])
+    if port is None:
+        return False
+    # the sea's end of the track (its first `from_sea` mark) is where she joins it from the
+    # open sea, a leg the check still judges
+    marks = [*dealings._track_marks(port, "from_sea")[1:], *dealings._track_marks(port, "in")]
+    inner = [m[1] for m in marks] + [port.anchorage.position]
+    mark = plan[0][1]
+    return any(bearing_and_distance(mark, m)[1] <= units.CABLE for m in inner)
+
+
 def _far_danger_ahead(hull: Any, v: Any, chart: Any) -> str:
     """The land or a charted danger on the far body's head within the doctrine's reach, in
     the log's words; "" for none (88's test, on the plan's leg: her place and her head)."""
@@ -978,6 +1001,8 @@ def _far_danger_ahead(hull: Any, v: Any, chart: Any) -> str:
     if leg[0] == "to" and len(leg) > 1 and isinstance(leg[1], Position):
         if bearing_and_distance(here, leg[1])[1] <= reach:
             return ""  # she is making for it
+        if _pilot_water(hull, plan):
+            return ""  # a port's inner track, where the awake captain does not judge either
     shore = chart.line_shore(here, destination(here, head, reach), 0.0)
     if shore is not None and shore[2]:
         along = bearing_and_distance(here, shore[1])[1]

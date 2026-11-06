@@ -469,7 +469,9 @@ she ranks with the ships in dealings, and up to two such hulls are awake beside 
 (`crews.HELD_OVER_CAP`); a cap of nought (`crewed: {cap: 0}`, the tender's day) is a scenario's
 word that nobody is promoted, and no allowance is made over it. Asleep beyond the range, her plan keeps her off the land and the
 charted rocks by the chart test her rules captain uses awake: a leg that stands into danger is
-put about by the plan's own order, and the urgent line in her log calls her captain.
+put about by the plan's own order, and the urgent line in her log calls her captain. On a port's own
+track in (its `from_sea` marks after the first, its `in` marks and its anchorage) the check is
+not made, as the awake captain makes none in pilot water.
 
 ## 17b. The seat on another ship, the boat, and the readings following the person (package 82)
 
