@@ -17330,7 +17330,24 @@ needs of a station's person are the company's until the harness takes them in ha
 minute after the seating): a fake told to turn in at its first sample is "rested" and does
 not; the tests tire him after the minute. (f) **`come aboard` from the shore is refused
 while the boat that landed him is away** ("wait for her at the quay"): the devolution's test
-waits for her.
+waits for her. (g) **Three pinned passages moved, by the new lines alone.** The merchant
+passage's master is below at his sights when a sail is sighted off the Lizard (26100; the
+mate's report at 26160, the sail lost at 26700) and below at the noon's day's work in the
+Goulet (111661 to 112801), where the Mingan is sighted a danger, her sails lift, the Mingan
+closes, the land is ahead and the pilot warns: two reports and five calls, seven lines more
+(3100 to 3107, every tick the same, the stations' lines aside the fake captain's passage the
+same seven more, 3112 to 3119); the schooner on an intent has her boat away for the prices
+reported to the master below (2078 to 2079). The first replay showed the call's words doubled
+where the line names the danger already ("a danger sighted: ..., a danger", "the pilot's
+warning: the pilot warns ..."): the line's own words are used when a stem is shared, and the
+boat's report drops its "the boat:" when the line names her. The pins are re-measured with
+the old figures beside them. (h) **For the lead: the rules master, called, does not come
+up.** The call is a line; a model or the player at the captain's station is woken by it, but
+the rules' master working his day's work below (`reckoning.Master.occupy`) stays at it until
+it is done, so the mate sends five times in twenty minutes in the Goulet while the book
+sails her. Whether the rules' captain drops his work for a call is the people's and the
+reckoning's business (the mirror's place), not widened here; the design's §7 says the call
+"reaches him wherever he is aboard and wakes him asleep", which it does for a station.
 
 **The pace.** Nothing of this step runs on the tick's path but `reports.tick`: a muster check
 and, for a mustered ship, a read of the log's tail for the lines of the tick before and of

@@ -832,4 +832,7 @@ has no truth number in the brief's 7-370 to 7-389; its tests are in `tests/test_
 and the lead may give them one.
 
 **Found on the way** is in the tuning notes (the masthead's hail a danger line; the port's
-shore named "the quay at Falmouth"; a boat hull's people unmustered).
+shore named "the quay at Falmouth"; a boat hull's people unmustered; three pinned passages
+moved by the new lines alone, the merchant passage's master being below at his sights and at
+the noon's day's work when the mate reports and sends for him, re-measured old beside new;
+the rules' master called does not come up from his work, for the lead).
