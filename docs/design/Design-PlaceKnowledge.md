@@ -921,7 +921,7 @@ standing orders, on the quarterdeck and in the cabin, and not in the cabin alone
 table has it: a book drafted is the captain's writing for his people (a sheet of night orders
 is the officer of the watch's to read at the binnacle, where the night orders hang; a manifest
 is given to the boat), and the owner's ruling of 2026-10-16 that a station reads them "from
-anywhere" (package 53; truth 7b-… of the books, `tests/test_known_truths.py`, and
+anywhere" (package 53; truth 7b-102 in `tests/test_known_truths.py` and
 `tests/test_orders_places.py`, where the officer of the watch on the quarterdeck reads 'night
 orders' and 'cargo') is kept to the deck and the cabin rather than reversed; a man in the hold
 or aloft is refused with the walk. For the lead's ruling if the cabin alone is wanted. (2)
