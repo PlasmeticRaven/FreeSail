@@ -1846,8 +1846,14 @@ people, which the loader reads; and no way to write the people aboard into a sce
 name with a short brief each, which the owner hoped for (`people:` takes a role, a name, a
 skill and a place; the character, rank, traits, history and station brief, is the ship's
 wardroom file's `Outline` per role, the same in every scenario; the owner's clarification
-of the same day: the people, not the stations). The refinement is package 64, briefed after
-the owner's testing round; `docs/dev/M7b-WorkPackages.md`, "The harbour's second pass".
+of the same day: the people, not the stations). The refinement was package 64, **struck by
+the owner on 2026-11-06 for package 96** (`docs/dev/M7-WorkPackages.md`): a Fable design
+package in which the harbour presents every configuration the game has (the doors and the
+stations, the settings, the scenario's settings with the full configuration of the player's
+ship and, at choice, of every other ship: the squadrons, the papers, the private signal,
+each ship's role, fit and crew) so that no setting needs a file edited by hand, and in which
+the configuration of any ship is made a thing of its own that the scenario maker, the
+director in live play and the business all build from without surprises (decision 65).
 
 ### 21e. The scenario maker (`client/harbour.js`; `freesail/world/scenarios.py` `write_scenario`)
 

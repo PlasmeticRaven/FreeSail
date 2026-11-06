@@ -874,6 +874,32 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     do. Built in package 65's step 3 with the captain's whereabouts and the officer's duty
     to report.
 
+64. **Spain and the Mediterranean in every nation-specific extension.** Owner, 2026-11-06,
+    with package 90 widened to the Spanish and Mediterranean ships (decision 56 amended).
+    Any extension of milestone 7 that is specific to a nation (the signal books, the naval
+    and squadron doctrines, the fighting habits, the regimes, the colours and the hail's
+    forms, any nation-keyed table to come) includes Spain and the relevant Mediterranean
+    factions where it can: the regency of Algiers and the Barbary states, Naples, Sardinia
+    and the Italian states, Portugal on the Atlantic side. A builder writes Spain's row with
+    its source or says in the tuning notes what was looked for and not found and leaves the
+    row at the basic foundation; never British-and-French only in silence. The rule is in
+    spec M7 §28; the sources begin with Winfield's *Spanish Warships* on the owner's shelf
+    and Tofiño's *Derroteros*.
+
+65. **The harbour's second pass struck; the harbour and the ship's configuration.** Owner,
+    2026-11-06. M7b's package 64 (the harbour's second pass, noted 2026-10-18 and never
+    briefed) is struck. In its place a Fable design package, 96: the configuration of any
+    ship made a thing of its own (her class and fit, role, nation and its parameters, her
+    stations and their doors, her people, papers and private signal, her crew, her books,
+    her intent and squadron, with defaults by role and nation), which the scenario maker, the
+    director in live play and the business all build from without nasty surprises; and the
+    harbour presenting every configuration the game has (the doors and stations, the
+    settings, the scenario's settings with the full configuration of the player's ship and,
+    at choice, of every other ship: the squadrons, the papers, the private signal, each
+    ship's role, fit and crew), so that no setting needs a file edited by hand. A design
+    document for the lead's gate first, then the build in steps. Booked in
+    `docs/dev/M7-WorkPackages.md`.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
