@@ -34,6 +34,7 @@ forgot to place fails the suite instead of leaking.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -957,3 +958,184 @@ def rows_elsewhere(senses: Senses) -> list[Any]:
         and not r.per_asker
         and not reading_here(r, senses)
     ]
+
+
+# -- books, papers and pictures in their places (the design's §8; step 5) -----------------
+
+# Where the ship's own things are kept, by the senses that read them there: the log (the
+# log board on the quarterdeck, the log books in the cabin and the gunroom), the chart (the
+# chart table in the cabin and the gunroom, the binnacle's chart on deck), the book of
+# standing orders (the quarterdeck, where the night orders hang at the binnacle, and the
+# cabin), the books drafted (with the book of standing orders: a sheet of night orders is
+# the officer's to read at the binnacle, a manifest the boat's; the owner's ruling of
+# 2026-10-16 that a book is read from anywhere aboard is kept to the deck and the cabin,
+# and not to the cabin alone as §8's table has it) and the ship seen (`ship_view`: the open
+# deck, aloft and the boat). The player's reference (the primer, the catalogue, the grammar,
+# the tools, the world) is nowhere and everywhere: his own, read from anywhere.
+KEPT: dict[str, tuple[str, ...]] = {
+    "log": (DECK, CABIN, GUNROOM),
+    "chart": (DECK, CABIN, GUNROOM),
+    "standing orders": (DECK, CABIN),
+    "books": (DECK, CABIN),
+    "ship_view": (DECK, ALOFT, "boat", "cutter"),
+}
+KEPT_WORDS: dict[str, str] = {
+    "log": "The log book is in the cabin and the gunroom, the log board on the quarterdeck",
+    "chart": "The chart is in the cabin and the gunroom, and at the binnacle on deck",
+    "standing orders": "The book of standing orders is on the quarterdeck and in the cabin",
+    "books": "on the quarterdeck and in the cabin, with the book of standing orders",
+    "ship_view": "She is seen from the deck or the boat",
+}
+# what a man does with each where it is
+KEPT_DO: dict[str, str] = {
+    "log": "read it",
+    "chart": "read it",
+    "standing orders": "read it",
+    "books": "read it",
+    "ship_view": "see her",
+}
+ASLEEP_WORDS = "You are asleep; nothing is read until you are woken."
+# ashore, where the sentence is not the kept words' subject
+ASHORE_WORDS: dict[str, str] = {"log": "The ship's log is aboard her."}
+
+
+def _below(senses: Senses) -> bool:
+    """Whether he is below decks (the cabin, the gunroom, a room)."""
+    return bool(senses.tokens & ({CABIN, GUNROOM} | ROOMS))
+
+
+def walk_words(senses: Senses, places: tuple[str, ...], do: str = "read it") -> str:
+    """The walk that would bring him to a thing kept in `places`, for the end of a
+    sentence: ': come on deck to read it', ': come down to read it' (aloft), ': go below to
+    read it'; '' where no walk of his own would (ashore, asleep, in a boat)."""
+    if senses.asleep or ASHORE in senses.tokens or (senses.spot and senses.spot[0] != "aboard"):
+        return ""
+    if DECK in places:
+        if ALOFT in senses.tokens:
+            return f": come down to {do}"
+        if _below(senses):
+            return f": come on deck to {do}"
+        return ""
+    if CABIN in places or GUNROOM in places:
+        return f": go below to {do}"
+    return ""
+
+
+def thing_here(key: str, senses: Senses) -> bool:
+    """Whether a thing of the ship's (`KEPT`) is to be had where he is: everything for the
+    director and under `knowledge: all`; nothing by a sleeper or ashore."""
+    if senses.everything:
+        return True
+    if senses.asleep or ASHORE in senses.tokens:
+        return False
+    return any(w in senses.tokens for w in KEPT[key])
+
+
+def thing_elsewhere(key: str, senses: Senses, title: str = "") -> str | None:
+    """The sentence for a thing not to be had where he is, with where it is and the walk
+    ("The log book is in the cabin and the gunroom, the log board on the quarterdeck; you
+    are in the hold: come on deck to read it."); ashore, "The ship's log is aboard her.";
+    None where it is to be had."""
+    if thing_here(key, senses):
+        return None
+    if senses.asleep:
+        return ASLEEP_WORDS
+    if key == "books":
+        what = f"The book '{title}' is" if title else "The books drafted are"
+        where = f"{what} {KEPT_WORDS[key]}"
+    else:
+        where = KEPT_WORDS[key]
+    if ASHORE in senses.tokens:
+        if key in ASHORE_WORDS:
+            return ASHORE_WORDS[key]
+        if key == "ship_view":
+            return f"{where}; you are ashore."
+        thing = where.split(" is ", 1)[0].split(" are ", 1)[0]
+        return f"{thing} {'are' if ' are ' in where else 'is'} aboard her."
+    return f"{where}; you are {senses.words()}{walk_words(senses, KEPT[key], KEPT_DO[key])}."
+
+
+# -- the papers -------------------------------------------------------------------------
+
+
+def _shares_stem(task: str, handle: str) -> bool:
+    """Whether the words of a man's task name the paper (a stem of four letters shared:
+    'writing up the manifest' and 'the manifest'; 'the purser's books' and 'books')."""
+    small = {"the", "and", "with", "for", "of", "his", "book", "books", "list", "account"}
+    stems = {w[:4] for w in re.findall(r"[a-z]+", str(handle or "").lower()) if w not in small}
+    if not stems:
+        stems = {w[:4] for w in re.findall(r"[a-z]+", str(handle or "").lower())}
+    words = {w[:4] for w in re.findall(r"[a-z]+", str(task or "").lower())}
+    return bool(stems & words)
+
+
+def paper_place(world: Any, page: Any) -> tuple[str, str]:
+    """Where a paper is now and in whose hands: (the place's id, 'with the purser'). The
+    keeper's rule: the keeper carries his paper with him while he is occupied with it (the
+    words of his task name it), else it lies in its place."""
+    keeper_role = str(getattr(page, "keeper", "") or "")
+    people = getattr(world, "people", None)
+    keeper = None
+    if people is not None and keeper_role:
+        try:
+            keeper = people.find(f"the {keeper_role}")
+        except Exception:  # noqa: BLE001  (a company that cannot be read)
+            keeper = None
+    with_whom = f"with the {keeper_role}" if keeper_role else ""
+    if (
+        keeper is not None
+        and getattr(keeper, "aboard", True)
+        and getattr(keeper, "occupied", False)
+        and _shares_stem(str(getattr(keeper, "task", "") or ""), str(page.handle))
+    ):
+        where = str(getattr(keeper, "where", "") or page.place)
+        return ("quarterdeck" if where == "deck" else where), f"{with_whom} at his {keeper.task}"
+    return str(page.place), with_whom
+
+
+def place_here(place_id: str, senses: Senses) -> bool:
+    """Whether a place aboard is where he is: the open deck's three one place, the rooms
+    each their own; nothing for a sleeper, ashore or in a boat."""
+    if senses.everything:
+        return True
+    if senses.asleep or ASHORE in senses.tokens:
+        return False
+    if senses.spot and senses.spot[0] != "aboard":
+        return False
+    needed = senses_of_place(place_id) - {ABOARD}
+    return bool(needed) and needed <= senses.tokens
+
+
+def paper_here(world: Any, page: Any, senses: Senses) -> bool:
+    return place_here(paper_place(world, page)[0], senses)
+
+
+def paper_where_words(world: Any, page: Any) -> str:
+    """Where a paper is, for a listing: 'in the hold, with the purser'."""
+    place, with_whom = paper_place(world, page)
+    return f"{place_words(place)}, {with_whom}" if with_whom else place_words(place)
+
+
+def paper_elsewhere(world: Any, page: Any, senses: Senses) -> str | None:
+    """The sentence for a paper not where he is: "The manifest is kept in the hold, with
+    the purser; go to the hold to read it (or ask the purser)."; None where he reads it."""
+    if paper_here(world, page, senses):
+        return None
+    if senses.asleep:
+        return ASLEEP_WORDS
+    head = str(page.handle)
+    head = head[:1].upper() + head[1:]
+    place, with_whom = paper_place(world, page)
+    keeper = str(getattr(page, "keeper", "") or "")
+    if ASHORE in senses.tokens:
+        return f"{head} is aboard her, {place_words(place)}."
+    kept = f"{head} is kept {place_words(place)}" + (f", {with_whom}" if with_whom else "")
+    ask = f" (or ask the {keeper})" if keeper else ""
+    # the walk, in the same words whoever reads them (the pane and a station agree): the
+    # cabin is the captain's, and a man who may not walk in asks him for it
+    senses_there = senses_of_place(place) - {ABOARD}
+    if DECK in senses_there:
+        walk = "come down" if ALOFT in senses.tokens else "come on deck"
+    else:
+        walk = f"go to {PLACES[place].name}" if place in PLACES else f"go to {place}"
+    return f"{kept}; {walk} to read it{ask}."

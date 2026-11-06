@@ -207,30 +207,53 @@ def test_the_mate_keeps_the_pursers_papers_in_a_merchantman():
 def test_the_papers_are_served_by_handle_through_the_library_to_every_station_the_same():
     """Papers-and-Books.md: in-world things read through the same tool and shelf as the
     reference; the parity gap 33d found (a paper reachable only through submit_order)
-    closes here: the watcher, the captain and the browser's pane read one page."""
+    closes here: the watcher, the captain and the browser's pane read one page. Since
+    package 65, step 5 (the design's §8), each paper is read where it is kept: the same page
+    at every station standing where it is, and the same refusal, with where it is and the
+    walk, at every station standing elsewhere (before it, the manifest was served from the
+    quarterdeck to the watcher, the lookout and the captain alike)."""
     w = world_for()
     listing = tools.library(w, "watcher", "papers")
     # eleven since practice and resupply (the owner's, folded in by package 86): the
     # gunner's account (10 before it)
     assert listing.startswith("the ship's papers: 12 papers aboard, each by handle")
     assert "  2. the manifest, about" in listing
-    page = tools.library(w, "watcher", "papers", section="manifest")
-    assert page.title == "the ship's papers, the manifest"
-    assert page.reopen == "library(topic='papers', section='manifest')"
+    assert "To be had on the quarterdeck: the boatswain's store book, the booms' list" in listing
+    assert "Not on the quarterdeck: the sailmaker's account (in the sail room" in listing
+    # the deck's paper from the deck: one page, whatever the station
+    page = tools.library(w, "watcher", "papers", section="boatswain")
+    assert page.title == "the ship's papers, the boatswain's store book"
+    assert page.reopen == "library(topic='papers', section='boatswain')"
     assert page.splitlines()[0].startswith(
-        "The manifest: the hold's capacity and the cargo in it by tons, with the purse; kept by "
-        "the purser in the hold; last written 10 June"
+        "The boatswain's store book: the spare cordage, in fathoms; kept by the boatswain in "
+        "the deck; last written 10 June"
     )
-    assert page.splitlines()[1:] == w.papers.page("manifest").lines
-    # the same page whatever the station; a station with no authority reads it too
-    assert str(tools.call(w, "lookout", "library", {"topic": "papers", "section": "2"})) == str(
+    assert page.splitlines()[1:] == w.papers.page("boatswain's store book").lines
+    assert str(tools.call(w, "captain", "library", {"topic": "papers", "section": "4"})) == str(
         page
     )
-    assert str(tools.library(w, "captain", "the ship's papers", "manifest")) == str(page)
+    # the hold's paper from the deck: the refusal, the same at every station there and at
+    # the pane; the lookout aloft is told to come down
+    refused = tools.library(w, "watcher", "papers", section="manifest")
+    assert refused.title == "the ship's papers, the manifest"
+    assert refused.reopen == "library(topic='papers', section='manifest')"
+    assert str(refused) == (
+        "The manifest is kept in the hold, with the purser; go to the hold to read it (or ask "
+        "the purser)."
+    )
+    assert str(tools.library(w, "captain", "the ship's papers", "manifest")) == str(refused)
+    aloft = str(tools.call(w, "lookout", "library", {"topic": "papers", "section": "4"}))
+    assert aloft == (
+        "The boatswain's store book is kept on the deck, with the boatswain; come down to read "
+        "it (or ask the boatswain)."
+    )
     whole = tools.library(w, "watcher", "papers", section="all")
-    assert "The epitome's table of the establishments:" in whole
+    assert "The boatswain's store book:" in whole
+    assert "The epitome's table of the establishments:" not in whole
+    assert "Not on the quarterdeck: the sailmaker's account (in the sail room" in whole
     found = tools.library(w, "watcher", "papers", find="Falmouth")
-    assert "[the ship's papers, the epitome" in found
+    assert "[the ship's papers, the epitome" not in found
+    assert "Not searched, being elsewhere: the sailmaker's account (in the sail room" in found
     # listed in the contents beside the ship, with its handles
     contents = tools.library(w, "watcher", "contents")
     assert "  papers: the ship's papers, 12 aboard" in contents  # 10 before package 86
@@ -239,7 +262,29 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
 
     pane = ship_papers(w)
     assert pane["waiting"] == [] and [p["handle"] for p in pane["papers"]][1] == "the manifest"
-    assert pane["papers"][1]["lines"] == w.papers.page("manifest").lines
+    assert pane["papers"][1]["here"] is False and pane["papers"][1]["lines"] == []
+    assert pane["papers"][1]["where"] == str(refused)
+    assert pane["papers"][3]["here"] is True
+    assert pane["papers"][3]["lines"] == w.papers.page("boatswain's store book").lines
+    # in the hold, the manifest is the captain's to read, and the pane's; the cabin's
+    # papers are found by `find` from the cabin
+    assert w.submit("go to the hold").kind == "person.moved"
+    page = tools.library(w, "captain", "papers", section="manifest")
+    assert page.splitlines()[0].startswith(
+        "The manifest: the hold's capacity and the cargo in it by tons, with the purse; kept by "
+        "the purser in the hold; last written 10 June"
+    )
+    assert page.splitlines()[1:] == w.papers.page("manifest").lines
+    assert ship_papers(w)["papers"][1]["lines"] == w.papers.page("manifest").lines
+    assert ship_papers(w)["papers"][3]["here"] is False
+    assert w.submit("go to the cabin").kind == "captain.below"
+    found = tools.library(w, "captain", "papers", find="Falmouth")
+    assert "[the ship's papers, the epitome" in found
+    assert "The epitome's table of the establishments:" in tools.library(
+        w, "captain", "papers", section="all"
+    )
+    # the director reads every paper from anywhere, as before
+    assert str(tools.library(w, "director", "papers", section="2")).startswith("The manifest:")
     # a point ship keeps none, and the library says so rather than failing
     from freesail.core.world import World
 

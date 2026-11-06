@@ -402,6 +402,11 @@
           h.id = "paper-" + p.handle.replace(/\W+/g, "-");
           text.appendChild(h);
           text.appendChild(el("div", "library-asked", p.words + "; at the order line: '" + p.handle + "'"));
+          if (p.here === false) {
+            // the place's knowledge (package 65, step 5; decision 59): a paper kept where the
+            // player's person is not says where it is and the walk, and shows no lines
+            text.appendChild(el("p", "not-here", p.where || "Kept elsewhere."));
+          }
           p.lines.forEach(function (ln) {
             text.appendChild(el("p", "", ln));
           });

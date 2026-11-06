@@ -1308,3 +1308,169 @@ def test_a_drivers_word_never_shadows_an_order_of_the_game():
         assert "Clock held" not in out.getvalue()[mark:], phrase
     con.handle_line("hold")
     assert not con.running and "Clock held." in out.getvalue()
+
+
+# ---------------------------------------------------------------------------
+# Step 5: books, papers and pictures in their places (the design's §8; truth 7-374)
+# ---------------------------------------------------------------------------
+
+
+def test_the_ships_own_are_read_where_they_are_kept_and_the_reference_anywhere():
+    """Truth 7-374: the library refuses the manifest from the quarterdeck with "in the hold"
+    and the walk, serves it after `go to the hold`, and serves the primer anywhere; the log
+    book, the chart, the book of standing orders and a book drafted are read where they are
+    kept and refused elsewhere with where they are; the ship is seen from the deck and not
+    from the cabin; `find` across the library says what it left out; the director and
+    `knowledge: all` read everything from anywhere."""
+    w = world_at()
+    lib = lambda *a, **k: str(tools.library(w, "captain", *a, **k))  # noqa: E731
+    assert lib("papers", "manifest") == (
+        "The manifest is kept in the hold, with the purser; go to the hold to read it (or ask "
+        "the purser)."
+    )
+    assert lib("papers", "the news of the war").startswith(
+        "The news of the war is kept in the cabin, with the captain; go to the cabin to read it"
+    )
+    assert "To be had on the quarterdeck: the boatswain's store book" in lib("papers")
+    e = w.submit(
+        'draft a book "night orders": standing order "lead": every glass then heave the lead'
+    )
+    assert e.kind == "book.drafted"
+    assert "heave the lead" in lib("books", "night orders")
+    assert w.submit("go to the hold").kind == "person.moved"
+    # in the hold: the manifest and the purser's books his, the primer his, the rest not
+    page = lib("papers", "manifest")
+    assert page.startswith("The manifest: the hold's capacity and the cargo in it by tons")
+    assert page.splitlines()[1:] == w.papers.page("manifest").lines
+    assert "The purser's books:" in lib("papers", "all")
+    assert "Not in the hold: the sailmaker's account (in the sail room" in lib("papers", "all")
+    assert lib("primer 2").startswith("primer 2: The wind and the points of sail.")
+    assert "fore mast" in lib("the ship") and "submit_order:" in lib("tools")
+    assert lib("papers", "booms") == (
+        "The booms' list is kept on the deck, with the boatswain; come on deck to read it (or "
+        "ask the boatswain)."
+    )
+    assert lib("standing orders") == (
+        "The book of standing orders is on the quarterdeck and in the cabin; you are in the "
+        "hold: come on deck to read it."
+    )
+    assert lib("books", "night orders") == (
+        "The book 'night orders' is on the quarterdeck and in the cabin, with the book of "
+        "standing orders; you are in the hold: come on deck to read it."
+    )
+    assert lib("books") == (
+        "The books drafted are on the quarterdeck and in the cabin, with the book of standing "
+        "orders; you are in the hold: come on deck to read it."
+    )
+    got = tools.read_log(w, "captain", since_tick=0)
+    assert got == {
+        "error": "The log book is in the cabin and the gunroom, the log board on the "
+        "quarterdeck; you are in the hold: come on deck to read it."
+    }
+    assert tools.chart(w, "captain") == (
+        "The chart is in the cabin and the gunroom, and at the binnacle on deck; you are in the "
+        "hold: come on deck to read it."
+    )
+    assert tools.ship_view(w, "captain") == (
+        "She is seen from the deck or the boat; you are in the hold: come on deck to see her."
+    )
+    found = lib(find="heave the lead")
+    assert "Not searched, being elsewhere:" in found
+    assert "the book of standing orders (on the quarterdeck and in the cabin)" in found
+    assert "the books drafted (on the quarterdeck and in the cabin)" in found
+    assert "the ship's papers elsewhere (the sailmaker's account (in the sail room" in found
+    contents = lib("contents")
+    assert (
+        "the ship's own are read where they are kept. In the hold, the papers to be had are "
+        "the manifest, the purser's books"
+    ) in contents
+    assert (
+        "The book of standing orders and the books drafted are on the quarterdeck and in the cabin."
+    ) in contents
+    # on deck: the log, the chart, the ship and the books his; the primer still his
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    assert "lines" in tools.read_log(w, "captain", since_tick=0)
+    assert isinstance(tools.chart(w, "captain"), dict)  # no page open: the words and the rows
+    assert isinstance(tools.ship_view(w, "captain"), dict)
+    assert "heave the lead" in lib("books", "night orders")
+    assert lib("standing orders").startswith("There are no standing orders in the book.")
+    assert "The book of standing orders and the books drafted are here." in lib("contents")
+    # in the cabin: the chart and the log his, the ship not seen
+    assert w.submit("go below").kind == "captain.below"
+    assert isinstance(tools.chart(w, "captain"), dict)
+    assert "lines" in tools.read_log(w, "captain", since_tick=0)
+    assert tools.ship_view(w, "captain") == (
+        "She is seen from the deck or the boat; you are in the cabin: come on deck to see her."
+    )
+    assert lib("papers", "the news of the war").startswith("The news of the war: the nations'")
+    # a seated model reads the same through its harness
+    script = [
+        reply("", call("submit_order", text="go to the hold")),
+        reply("", call("library", topic="papers", section="manifest")),
+        reply("", call("library", topic="papers", section="the price list")),
+        reply("", call("read_log")),
+        reply("", call("stand_by", until="a glass")),
+    ]
+    h = seated(world_at(), script)
+    h.world.run(60)
+    pages = results(h, "library")  # each a book, stubbed with its handle and number
+    assert pages[0].startswith("the ship's papers, the manifest, opened")
+    assert "The manifest: the hold's capacity" in pages[0]
+    assert "The price list is kept in the cabin, with the purser; go to the cabin" in pages[1]
+    assert "error" in results(h, "read_log")[0]
+    # the director everything, from anywhere; `knowledge: all` the same for everyone
+    assert str(tools.library(w, "director", "papers", "manifest")).startswith("The manifest:")
+    assert "lines" in tools.read_log(w, "director", since_tick=0)
+    every = world_at(knowledge="all")
+    assert str(tools.library(every, "captain", "papers", "manifest")).startswith("The manifest:")
+    assert "To be had" not in str(tools.library(every, "captain", "papers"))
+    # ashore and asleep, the words (the design's §8; the port's tests have the walk)
+    ashore = K.Senses(frozenset({K.ASHORE}), ("ashore", "falmouth", "quay"), "")
+    assert K.thing_elsewhere("log", ashore) == "The ship's log is aboard her."
+    assert K.thing_elsewhere("chart", ashore) == "The chart is aboard her."
+    assert K.thing_elsewhere("standing orders", ashore) == (
+        "The book of standing orders is aboard her."
+    )
+    assert K.thing_elsewhere("ship_view", ashore) == (
+        "She is seen from the deck or the boat; you are ashore."
+    )
+    page = w.papers.page("manifest")
+    assert K.paper_elsewhere(w, page, ashore) == "The manifest is aboard her, in the hold."
+    asleep = K.Senses(frozenset({K.ASLEEP}), ("aboard", "x", "gunroom"), "gunroom", asleep=True)
+    assert K.thing_elsewhere("log", asleep) == K.ASLEEP_WORDS
+    assert K.paper_elsewhere(w, page, asleep) == K.ASLEEP_WORDS
+
+
+def test_the_keeper_carries_his_paper_while_he_is_at_it():
+    """The keeper's rule (the design's §8): a paper is in its place until its keeper is
+    occupied with it, and then it is with him where he is; the listing says so; freed, it
+    lies in its place again. A task of his that does not name the paper leaves it."""
+    w = world_at()
+    purser = w.people.find("the purser")
+    assert purser is not None and purser.where == "gunroom"
+    books = w.papers.page("the purser's books")
+    assert K.paper_place(w, books) == ("hold", "with the purser")
+    assert w.people.occupy(purser, "cabin", w.clock.tick + 600, "the purser's books") is None
+    assert K.paper_place(w, books) == ("cabin", "with the purser at his the purser's books")
+    assert K.paper_place(w, w.papers.page("manifest")) == ("hold", "with the purser")
+    assert w.submit("go below").kind == "captain.below"
+    page = str(tools.library(w, "captain", "papers", "purser's books"))
+    assert page.startswith("The purser's books: the stores of water and provisions")
+    assert str(tools.library(w, "captain", "papers", "manifest")).startswith(
+        "The manifest is kept in the hold, with the purser; go to the hold"
+    )
+    listing = str(tools.library(w, "captain", "papers"))
+    here = listing.split("To be had in the cabin: ")[1].split("\n")[0]
+    assert here.startswith("the purser's books, the epitome's table of the establishments")
+    assert "the manifest (in the hold, with the purser)" in listing
+    w.people.free(purser)
+    assert K.paper_place(w, books) == ("hold", "with the purser")
+    assert str(tools.library(w, "captain", "papers", "purser's books")).startswith(
+        "The purser's books are kept in the hold"
+    ) or str(tools.library(w, "captain", "papers", "purser's books")).startswith(
+        "The purser's books is kept in the hold"
+    )
+    # a task that does not name the paper: the slops are not the books
+    assert w.people.occupy(purser, "deck", w.clock.tick + 600, "the slops issued") is None
+    assert K.paper_place(w, books) == ("hold", "with the purser")
+    w.people.free(purser)

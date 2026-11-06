@@ -887,3 +887,59 @@ one world, and a dimmed figure is still a figure.
 **Found on the way** is in the tuning notes (a World's `parent` is the followed hull's façade
 and not the World; the frigate hove to makes near three knots; the visitor's `say` at the
 prompt; `World.dealings` reads the followed hull).
+
+### Step 5: books, papers and pictures in their places (§8; 2026-11-06)
+
+**Built as designed**: the library by the reader's senses (`tools.library_by`, which
+`tools.library` reaches through the station's senses and the browser's pane through the
+player's, `knowledge.players_senses`): the player's reference (the primer, the catalogue, the
+grammar, the ship's names, the tools, the world page) from anywhere; the ship's papers each
+where it is kept (`knowledge.paper_place`, `paper_here`, `paper_elsewhere`), the listing
+saying which are to be had where he stands and where the rest are, a paper asked for from
+elsewhere refused with its place, whose hands it is in and the walk ("The manifest is kept in
+the hold, with the purser; go to the hold to read it (or ask the purser)."), `section='all'`
+the papers here and the rest named, `find` searching the papers here and naming the rest; the
+book of standing orders and the books drafted on the quarterdeck and in the cabin
+(`knowledge.KEPT`, `thing_here`, `thing_elsewhere`), refused elsewhere with where and the walk
+("...; you are in the hold: come on deck to read it"); a search of the whole library reads
+what is where he is and the reference, and says what it left out ("Not searched, being
+elsewhere: ..."); the contents page says in one line what is to be had where he stands. The
+log book (`read_log`) on the quarterdeck, in the cabin and the gunroom, refused elsewhere with
+where it is, ashore "The ship's log is aboard her."; the chart (`chart`) in the cabin, the
+gunroom and at the binnacle on deck; the ship seen (`ship_view`) from the deck, aloft and the
+boat, from the cabin "She is seen from the deck or the boat; you are in the cabin: come on
+deck to see her." The keeper's rule: the keeper carries his paper while he is occupied with it
+(the words of his task name it: `the purser's books` in the cabin while the purser is at them
+there), else it lies in its place. The browser's papers pane (`/api/library/papers`) says of
+each paper whether it is to be had where the player's person stands, withholds the lines of
+one that is not and says where it is; its library route reads by the same senses. The
+director and `knowledge: all` read everything from anywhere, as before. The primer's chapters
+14 and 19 say the rule in a sentence each. Truth 7-374; two tests.
+
+**Taken another way, with the reason.** (1) **The books drafted are kept with the book of
+standing orders, on the quarterdeck and in the cabin, and not in the cabin alone** as §8's
+table has it: a book drafted is the captain's writing for his people (a sheet of night orders
+is the officer of the watch's to read at the binnacle, where the night orders hang; a manifest
+is given to the boat), and the owner's ruling of 2026-10-16 that a station reads them "from
+anywhere" (package 53; truth 7b-… of the books, `tests/test_known_truths.py`, and
+`tests/test_orders_places.py`, where the officer of the watch on the quarterdeck reads 'night
+orders' and 'cargo') is kept to the deck and the cabin rather than reversed; a man in the hold
+or aloft is refused with the walk. For the lead's ruling if the cabin alone is wanted. (2)
+**The refusal's words are the same whoever reads them** (the pane and a bodiless station agree
+with the captain's): a cabin paper is "go to the cabin to read it (or ask the captain)" for
+everyone, since the captain may walk in and another may not, and `go to the cabin` refuses him
+in its own words; the first draft said "it is his to show you" to a man who was not the
+captain, and the browser's page and the watcher's then differed. (3) **"Ask the keeper" rather
+than "send for"**: the papers answer first when a keeper is asked (package 86's service
+reading; `ask the purser the manifest` gives the paper's words), so the alternative the
+sentence offers is one that is true today; a keeper sent for does not bring his paper (the
+keeper's rule carries it only while he is at it). (4) **The keeper's rule reads the words of
+his task against the handle** by a shared stem of four letters, the small words left out ("the
+purser's books" and "books" share nothing but "books", so "purs" decides; "the slops issued"
+does not carry them): step 6 gives the tasks their rooms and their words, and this rule reads
+them as they come. (5) **A refusal is a book like any page** (the library's every page is a
+book, stubbed with its handle): a refusal's title is the page's it stood for and its reopen
+the same call, so a model that walks reads it again by the stub's call.
+
+**Found on the way** is in the tuning notes (`_section_page` reopens by number where the
+section's words hold an apostrophe; the test of 35's parity moved to the rule).

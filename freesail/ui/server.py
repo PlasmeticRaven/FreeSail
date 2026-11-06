@@ -1101,8 +1101,9 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
 # since package 45c `state` and `muster` are the browser's too (`Driver._console_query`).
 CONSOLE_ONLY = ("log", "replay ", "help", "quit")
 
-# The station the browser's captain reads the library as. The library serves every
-# station the same pages (`tools.library`); the name only fills its signature.
+# The station the browser's captain reads the library as (its name fills the tool's
+# signature where a station is wanted); since package 65, step 5, the pane reads with the
+# player's person's senses (`knowledge.players_senses`), as the console does.
 BROWSER_READER = "captain"
 
 
@@ -1110,17 +1111,23 @@ def ship_papers(world: World) -> dict[str, Any]:
     """The ship's papers (package 35; spec M5 §22): the library's `papers` topic, the
     same pages the model's `library(topic='papers')` serves (`freesail.agents.tools`),
     each by handle with its keeper, its place and its last entry; nothing waits any
-    more. Read, never logged: the keepers' writing is what the log says."""
+    more. Read, never logged: the keepers' writing is what the log says. Since package 65,
+    step 5 (decision 59), each paper is read where it is kept: a paper not where the
+    player's person stands has `here` false, no lines and `where` the words that say
+    where it is and the walk; everything for the owner's eye."""
     from freesail.agents import tools
+    from freesail.world import knowledge
     from freesail.world.places import PLACES
 
     ship = world.ship
     if not hasattr(ship, "spars"):
         return {"papers": [], "waiting": [], "words": "A ship with no parts keeps no papers."}
     top = tools._papers_topic(world)
+    senses = knowledge.players_senses(world)
     papers = []
     for page in world.papers.pages():
         place = PLACES.get(page.place)
+        where = knowledge.paper_elsewhere(world, page, senses)
         papers.append(
             {
                 "handle": page.handle,
@@ -1128,14 +1135,19 @@ def ship_papers(world: World) -> dict[str, Any]:
                     f"{page.words}; kept by the {page.keeper} in "
                     f"{place.name if place is not None else page.place}; last written {page.as_of}"
                 ),
-                "lines": page.lines,
+                "lines": page.lines if where is None else [],
                 "keeper": page.keeper,
                 "place": page.place,
                 "as_of": page.as_of,
+                "here": where is None,
+                "where": where or "",
                 "ask": f"library(topic='papers', section='{page.handle}')",
             }
         )
-    return {"papers": papers, "waiting": [], "words": "", "title": top.title}
+    words = ""
+    if not senses.everything:
+        words = f"Read {senses.words()}: a paper kept elsewhere says where."
+    return {"papers": papers, "waiting": [], "words": words, "title": top.title}
 
 
 def shelf_routes(lock: Any, world: Callable[[], World]) -> APIRouter:
@@ -1166,7 +1178,12 @@ def shelf_routes(lock: Any, world: Callable[[], World]) -> APIRouter:
     @router.get("/api/library")
     def api_library(topic: str = "contents", section: str = "", find: str = "") -> JSONResponse:
         with lock:
-            page = tools.library(world(), BROWSER_READER, topic or "contents", section, find)
+            # the player's person's senses (package 65, step 5; decision 59): the pane reads
+            # the ship's own where he stands, as the console and a station do
+            w = world()
+            page = tools.library_by(
+                w, knowledge.players_senses(w), topic or "contents", section, find
+            )
         return JSONResponse(
             {
                 "topic": topic or "contents",
