@@ -285,13 +285,15 @@ class Battery:
     # ports are shut, the sea at their sills, set by `ports.update` at the head of the tick;
     # each is run in and fires nothing, and its loading goes on. The side's half-breadth at
     # each port gun's sill, held once a gun (`ports._half_breadth`), the least dip that shuts
-    # one (`ports._least_dip`), and the decks' sides the log has told shut (`ports._tell`).
-    # Class defaults, written to the instance only when they have something to hold, so that
-    # a battery pickled before them loads
+    # one (`ports._least_dip`), the decks' sides the log has told shut (`ports._tell`), and the
+    # tick the sea was last at each shut port's sill, from which its minute's hold runs
+    # (`ports.PORT_HOLD_S`). Class defaults, written to the instance only when they have
+    # something to hold, so that a battery pickled before them loads
     _shut: frozenset[str] = frozenset()
     _port_breadths: dict[str, float | None] | None = None
     _least_shut_dip: float | None = None
     _ports_told: frozenset[tuple[str, str]] = frozenset()
+    _sea_at_sill: dict[str, int] | None = None
 
     def __init__(self, ship: Any) -> None:
         self.ship = ship
@@ -475,7 +477,7 @@ class Battery:
         `hits.resolve_shot`, given each shot that goes."""
         # the lee ports first, so that a gun whose port shuts this tick is run in and fires
         # nothing in it (Build-Ships.md §7.2); `update` tells the log
-        shut, _opened = ports.update(self, firer)
+        shut, _opened = ports.update(self, firer, tick)
         ship = self.ship
         for gid in shut:
             self._housed(ship.guns[gid])

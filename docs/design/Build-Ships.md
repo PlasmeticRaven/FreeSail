@@ -1292,9 +1292,20 @@ the roll `combat/action.py:220` and the half-beam :223 (`_firer` at :214-227); `
 `core/world.py:890`; `PER_SHIP_FIELDS` `world/hulls.py:62`; `_crew_scenario` `world/crews.py:263`,
 `sea=False` at :284. `PORT_SHUT_M` and `lee_port_shut` stand where cited.
 
+*Since the hold (2026-11-06, the lead's ruling, the owner leaning to it):* **opened again** when the sill
+lowered stands `PORT_REOPEN_M` clear of the shut line, as above, **and** the sea has kept from the sill
+`ports.PORT_HOLD_S` (60 s, judgement, for the gate's playtest, J1): the six inches are the physical
+criterion and the minute the gun captain's. The hold counts from the last tick the sea was at the port's
+sill (its sill lowered within the foot), kept a gun on the battery (`Battery._sea_at_sill`, a class
+default), so a sea again within the minute starts it afresh, and a port opened and shut by a later sea has
+a new minute; the shutting is at once, as before. `ports.update(battery, firer, tick)`, the tick passed
+from `Battery.tick`. A port shut in a save made before the hold has no tick: its minute counts from the
+first tick the rule reads it. The 3° margin in heel was put aside: it would make the reopening a different
+physical thing from the shutting. Measured in the tuning notes, "The lee ports held a minute".
+
 ### 7.2 The wiring (B8 fills stage 0's hooks)
 
-- `ports.update(battery, firer)`, once a tick at the head of `Battery.tick`: each port gun's
+- `ports.update(battery, firer)` (since the hold, `ports.update(battery, firer, tick)`), once a tick at the head of `Battery.tick`: each port gun's
   state against the rule's two lines, kept in `Battery._shut`. The log, once a change of state a
   deck and side: `guns.ports_shut` ("The lee lower-deck ports are shut, the sea at their sills")
   and `guns.ports_opened`, the deck named by its word.
@@ -1335,7 +1346,8 @@ the second mended at L3's commit (package 75's own words), the third left (outsi
   of port over 13 guns, the shortest 6 s (none at L2), the brig at 17 kn 24, the 64 at 17.5 kn 43 (12 at
   L2), while the log said two lines or none, a deck's side being one line from its first port shut to its
   last opened. A dwell (a port held shut a minute) or a margin in heel would steady them; either changes
-  §7.1's figure.
+  §7.1's figure. *Ruled 2026-11-06 by the lead, the owner leaning to it: the dwell, built (§7.1's note since
+  the hold).*
 - **The words `the lee ports shut` and `the lee ports opened`** (`api/practice_readings.py:329-330`) went by
   the line's kind alone, so they answered the weather side's line as well, which L2 never said, and a book
   written to them acted on the wrong side. Mended at the commit: a test on the line's `lee`
@@ -1818,6 +1830,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
 | SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4; on the drawn hulls 10.5°, 14.7°, 17.5° and 19.7°, §7.3). *As built, no action moved; stage 0's two hook tests did* | old beside new, the reason, the bisection of §7.3 |
 | SW-5 L3 | actions in a sea, on the player's ship. *As built, no action, truth or trial moved: no scripted action keeps a sea, and the three shipped Worlds that put an enemy before her in one (the blockade's evening, the naval cruise, the station-stranger trial) have no pin that plays it. Two pins moved, in `tests/test_lee_ports.py`: L2's `test_the_roll_is_held_at_nought`, now `test_the_roll_is_read_and_shuts_both_sides_by_itself`, and the last line of L2's chaser test (a port shut upright said by its side's name, the reviews' mend); truth 7-190 drafted in that file for Phase 5* | the bisection L2 → L3, the commit itself; the candidates by junit, test by test; the whole logs and the captain's trials the base's |
+| SW-5, the hold | the lead's ruling of 2026-11-06: a shut port opens only once the sea has kept from its sill a minute (`ports.PORT_HOLD_S`). *As built, no action, truth or trial moved* (the candidates, the captain's trials and the whole logs against L3's commit). *L2's and L3's pins that open a port moved to open it a minute after the sea left it, each with this ruling as the reason; `ports.update` takes the tick* | the candidates by junit against L3's commit; the tuning notes' old beside new, "The lee ports held a minute" |
 | The caches | none (the results unchanged) | the pace measured |
 
 **None of the existing ships' sailing passages moves:** no hull figure, spar or sail of an

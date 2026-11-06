@@ -13162,7 +13162,7 @@ Six inches of sill (`PORT_REOPEN_M`) is 1.6° of heel at the frigate's lowest po
 - **The roll's size is the motion's, which L3 was not to move.** The cutter's 23° at 17.5 kn comes of her 4.4-second roll meeting the sea's 4.6-second period with the damping at a fifth (a magnification of 2.5 at resonance) and `MOTION_GAIN`'s heavier rolls; `physics/motion.py`'s own comment puts a frigate's lee ports "near the water at twelve degrees of roll to each side". If the owner finds "fairly easily" too easy, the levers are there or in the rule's share of the amplitude, and neither is this step's.
 - **A port shut by the amplitude stays shut while the sea runs**, though a lid could be opened between rolls; the owner's answer 7 reads the amplitude, so it is built so.
 - **The word upright** (above): mended for a port shut, left for one opening.
-- **The ports work gun by gun in gusts** (above). `PORT_REOPEN_M`'s six inches is §7.1's own figure, so it is not this step's to move. Two ways to steady them, for the lead: a dwell, a port held shut a minute (`PORT_HOLD_S`, its shutting tick kept on the battery as a class default and `tick` passed from `Battery.tick`) before its sill may open it; or a margin in heel, about 3°, the cutter's 3.1° today, in place of six inches of sill. Either changes the rule's text and the L2 pins of the reopening band.
+- **The ports work gun by gun in gusts** (above). `PORT_REOPEN_M`'s six inches is §7.1's own figure, so it is not this step's to move. Two ways to steady them, for the lead: a dwell, a port held shut a minute (`PORT_HOLD_S`, its shutting tick kept on the battery as a class default and `tick` passed from `Battery.tick`) before its sill may open it; or a margin in heel, about 3°, the cutter's 3.1° today, in place of six inches of sill. Either changes the rule's text and the L2 pins of the reopening band. *Ruled by the lead on 2026-11-06, the owner leaning to it: the dwell, built ("The lee ports held a minute", below).*
 - **A port of no side** (mended, above): the roll alone, as §7.1 reads; the conservative alternative, the roll plus the heel as the compare reads, would shut a centre-line port by the heel as well, which no sill on the centre line feels.
 
 ### Left, and for whom
@@ -13173,7 +13173,7 @@ Six inches of sill (`PORT_REOPEN_M`) is 1.6° of heel at the frigate's lowest po
 
 **For package 84:** a crewed ship reads nought until each hull keeps her sea; the moment she does, her ports take her roll with nothing here to change.
 
-**For the lead, in `orders/` and the captains' files, which L3 was not to touch; L2's list, made sharper by the roll:**
+**For the lead, in `orders/` and the captains' files, which L3 was not to touch; L2's list, made sharper by the roll:** *Booked by the lead to package 77's brief, 2026-11-06, with the two weather words below.*
 - The rules captains read nothing of the ports: a cutter in a 15-knot sea on her beam has her whole lee battery shut and her weather battery free, and `engage_side: weather` puts the mark to leeward, on the guns that are shut. Measured above: to windward she fires as before, 65 rounds the hour.
 - `orders/gunnery._a_gun_for_a_signal` (and the distress gun in `orders/signals.py`) falls to the first lee gun whether its port is shut or not; with the roll both sides can be shut, and then no gun of hers can make the signal at all.
 - `_fire`'s and `_engage`'s replies to a word behind shut ports (L2's items) now come with little heel, where a reader would least expect them, and with both sides shut at once. Reproduced: the cutter's carronades at 17.5 kn with the sea on her quarter (heel 2.3°, roll 19.5°), all six ports shut; "Engage the mark one cable on the larboard beam: the larboard battery, the guns to fire as they bear." and nothing fired in 20 minutes; at 600 s "Fire the larboard broadside: no gun of it is loaded and run out yet; the word stands until one bears." and at 602 s "The larboard broadside's ports are shut; the sea is at their sills.", the reading "3 loaded, 0 run out, 3 primed ... ports shut (three to larboard and three to starboard)". A review's mend: in `_engage_mark` (`orders/gunnery.py:987-1030`), with every port gun of the side engaged shut, the reply adds that her ports on that side are shut, the sea at their sills (both sides' when they are); in the fire reply (:686-691), the port's line in place of "no gun of it is loaded and run out yet".
@@ -13215,6 +13215,61 @@ All with `py -m pytest`, `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"
 - **Broken on a scratch copy** (a copy of the clean archive with the tree's `ports.py` and `test_lee_ports.py` laid over it, one mutant at a time, `test_lee_ports` whole): the roll ignored (`return 0.0`), subtracted (`return -float(firer.roll_deg)`) and added twice (`return 2.0 * float(firer.roll_deg)`) each fail 12, the moved test, the seaway's, 7-190's seven files and its razee's three decks, and pass L2's other 151, the roll's compare and the frigate's clause, which are not written to see them; the compare read on the heel alone (`heel < _least_dip`) fails 18, all eight of the roll's compare among them. The copy is cleared.
 
 **Not run:** the rest of the slow tier (in which L2 found six gate pins failing on this machine at the base and the tree alike), and the pace tests, the lead's on the build machine.
+
+## The lee ports held a minute (package 75, the lead's ruling of 2026-11-06) (2026-11-06)
+
+**The ruling.** The lead's note of 2026-11-06 to the ships session, on L3's report of the ports working gun by gun in gusts: "the dwell, as the owner leans, and not the heel margin. A port's shutting is a crew's act when the sea comes in, and its opening is the gun captain's judgement once the sea has kept clear a while; the six inches of sill is the physical criterion and stays, and the human one is a hold." The owner's word before it: "I would start with judging at least a minute hold". The minute is a judgement for the gate's playtest (J1 of `docs/gates/gate-m7-interim.md`), tuned there, old beside new.
+
+**As built** (`combat/ports.py`, `combat/guns.py`): `PORT_HOLD_S = 60.0`. A port is shut at once, as before, when its sill lowered comes within `PORT_SHUT_M` of the water; it is opened only when its sill lowered stands `PORT_REOPEN_M` clear of that line **and** the sea has kept from its sill a full minute. The hold counts from the last tick at which the sea was at the sill, kept a gun in `Battery._sea_at_sill` (a class default, `None`, made on first use as `_port_breadths` is): so a sea again within the minute starts it afresh ("a port shut again within the hold starting it afresh", read so), and a port opened and shut by a later sea has a new minute. The time is the tick's count by `core.clock.TICK_SECONDS`. `ports.update(battery, firer, tick)` takes the tick, passed from `Battery.tick`, and every caller gives it: no default that means "no clock". A port shut in a save made before the hold (L2's or L3's) has no tick of its own, and its minute counts from the first tick the rule reads it. `_least_dip`'s early-out is unchanged: it stands only while nothing is shut and nothing told. The log's line is unchanged in form, one a deck's side; the opened line comes a minute after the sea has left the last port of the side.
+
+### The pins moved, old beside new (the reason: the ruling)
+
+| Test (`tests/test_lee_ports.py`) | Old | New |
+|---|---|---|
+| `test_each_triple_shuts_and_reopens_at_the_rules_arithmetic` (63 triples) | a hair under the reopening heel, opened at the next reading | held a tick short of the minute, opened at the minute; still shut a hair over the reopening heel at the minute |
+| `test_she_shuts_the_side_she_heels_to_and_never_the_other` | going about, the old lee side opened as the new one shut, at one reading | the new lee side shut at once, the old held, and opened at the minute |
+| `test_a_lee_broadside_past_the_shut_heel_is_run_in_and_silent` (7 cases) | back under the heel, open at the first tick | held 59 ticks, open at the 60th, then run out and firing |
+| `test_a_port_does_not_flicker_in_a_gust` | opened within 60 ticks under the reopening heel | held until a minute after the last crest (tick 3,590 to 3,599), opened at it exactly |
+| `test_each_side_is_a_state_of_its_own` | the old side's opened line on the tick the new side's shut | the opened line a minute after the two shut lines |
+| `test_the_log_says_each_deck_and_side_once_a_change_of_state`, `test_the_line_is_the_guns_and_no_passage_hears_it`, `test_the_reading_says_ports_shut_while_any_are_and_only_then`, `test_a_real_checkpoint_from_before_the_package_fights_at_its_old_heights` | the opened state or line two or three ticks under | the same, a minute and two or three ticks under |
+| Truth 7-190's draft (`_open_then_shut`) | upright with no roll, every port open at the next reading | held a tick short of the minute, open at it |
+| The chaser, the boat, the no-deck line, the compare sweeps, the old ship | `ports.update(battery, firer)` | the same with a tick; where a port opens, a minute later |
+
+`tests/test_profile.py`'s hook test gives its tick. The old-save helpers pop `_sea_at_sill` with the others. No assert was weakened; each moved one still fails if the port opens at once. New tests: `test_a_port_is_held_a_minute_through_the_gusts` (a ten-second swing over the shut heel and under the reopening heel for an hour: without the hold it opened at each trough; with it, shut once and held, opened a minute after the last crest), `test_the_sea_at_the_sill_again_starts_the_hold_afresh` (and a new minute after a reopening), `test_a_port_shut_in_a_save_before_the_hold_is_held_from_its_first_reading`, `test_a_checkpoint_taken_in_the_hold_keeps_it` (read back, the ports open on the same tick as in the World that ran on). Broken on purpose: the hold at nought fails 7 tests of the file, the hold never restarted 10.
+
+### The hour in gusts, old beside new
+
+The review's script of L3 (an hour engaged to leeward at quarters by real orders, the World's own gusts, the sea on her beam, gun by gun), run on this tree with the hold and with `PORT_HOLD_S` set to nought in the process, which is L3 as committed. The three rows the lead named:
+
+| | Port changes an hour (guns) | Within a minute of that gun's last change | Shortest | Run out when its port shut | Rounds fired | Port-seconds shut | The log's port lines |
+|---|---|---|---|---|---|---|---|
+| Frigate, 21 kn | 46 → 46 (13) | 7 → 0 | 6 s → 63 s | 3 → 2 | 348 → 347 | 21,572 → 21,964 | 2 → 2 |
+| Brig, 17 kn | 24 → 24 (5) | 2 → 0 | 5 s → 61 s | 1 → 0 | 126 → 126 | 12,502 → 12,615 | 0 → 0 |
+| 64, 17.5 kn | 43 → 43 (10) | 6 → 0 | 4 s → 61 s | 1 → 1 | 913 → 913 | 13,851 → 14,185 | 2 → 2 |
+
+The other eight rows (the cutter's both fits at 12.5 to 18 kn, the privateer's both) did not move: none of their ports changed within a minute of its last.
+
+**In words.** The minute takes out the quick cycling, and only that: no port now opens and shuts again inside a minute, where the frigate's did seven times in the hour, six seconds apart at the least. The count of changes stands, because in the World's gusts the ports follow gusts and lulls that last minutes: shut in a gust, opened in the lull a minute after the sea has left the sill, shut at the next gust. It costs no fire to speak of (a round in an hour) and keeps the ports shut 0.9 to 2.4% longer.
+
+**A longer hold, for the gate (J1)**, the same three rows: two minutes, 44, 20 and 39 changes (shortest 121 to 123 s), rounds 345, 121 and 905; five minutes, 31, 18 and 31 changes, rounds 320, 116 and 888, the ports shut 11 to 22% longer than without a hold. A longer hold buys few changes for the fire it costs, which is the minute's case.
+
+### Judgements
+
+- **The hold restarts only on the sea at the sill**, not on the sill standing within the six inches: a port whose sill lies between the shut line and the reopening line after the minute is held still, as before the hold, by the six inches.
+- **The count of changes is the gusts', not a fault.** A gun captain opening his lid a minute after the sea has left it, in a lull of minutes, opens it.
+- **A save made before the hold** with a port shut gives that port a full minute from its first reading after loading: the safe side.
+
+### The suite, as run
+
+All with `py -m pytest`, `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, at seed 7 on the owner's machine, no two suites together, against L3 as committed (e88df444, a worktree of it for the base).
+- **The candidates,** `--slow -m "not pace"`, L3's list: **550 passed in 17:37.** Compared by junit, test by test, with L3's final 546: no test changed outcome; 4 only in the new, the hold's tests above.
+- **`test_lee_ports` and `test_checkpoint`:** 190 passed; the two mutants above as said.
+- **The captain's trials,** `--slow`: 3 failed, 4 passed, the same tests with the same messages as L3's (the gale's digest 8df0ab2beba93320 for 04f2fcd0fe9023a4, the thick weather's df5f02eb6e6ce68a for cfa538b19cb0d2fe, the stranger's 3dedbdf737c368b8 for bf059c3211b7cc9c: the machine's, as L2 found).
+- **Whole logs:** the first action (472 lines, 1eb54b45226abd10), the encounter (229, 523ebf0bf6180321), the station's lee shore (1,561, 8f2e1783e6d13312) and gale (1,722, 8df0ab2beba93320) line for line and digest for digest as L3's, no port line in any. **What moved beneath them:** the ticks with a port shut, the lee shore 67,218 to 69,179 and the gale 59,196 to 61,434, and the most shut at once 15 to 22 and 18 to 26, her guns secured throughout, so that nothing is said and no log moves.
+- **The pace:** `ports.update` timed a call in the station's gale from tick 10,000, 3,000 ticks, twice a tree: 24.4 and 25.0 µs at L3, 25.2 and 24.9 with the hold, 2.3 to 2.4% of the tick either way, the World at 948 to 964 ticks a second on both. (The gale's ticks a second, best of three thousands, read alternately with other load on the machine, gave L3 609 to 641 and the hold 523 to 598, and the frigate alone 517 to 867 and 548 to 865: noise, which the direct timing does not show.)
+- **The fast tier whole,** last of all: **6,276 passed, 2 skipped in 40:02** (397 slow tests left out): L3's 6,272 and the hold's 4.
+
+**Not run:** the rest of the slow tier, and the pace tests, the lead's on the build machine.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
