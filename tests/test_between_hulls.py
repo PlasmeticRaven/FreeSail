@@ -180,7 +180,11 @@ def test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him
     from freesail.combat import boarding as B
     from tests.test_fight import _alongside
 
-    w, v, enemy = _alongside(10.0, her_quarters=True)
+    # the officer's survival is the fight's draw; this seed is the first from 1 under which
+    # the first lieutenant (Mr Freeman by this seed's muster) stands at the deck won; under
+    # the default he (Mr Pearce) is killed at tick 530 by a tomahawk, a draw the trunk's
+    # Health misread as the Medusa's man (package 97; the pin of it is the test below)
+    w, v, enemy = _alongside(10.0, her_quarters=True, seed=1)
     lieutenant = B.boarders_officer(w)
     assert lieutenant is not None and lieutenant.role == "first lieutenant"
     policy = SamplingPolicy.in_lockstep(300, "notable", "urgent")
@@ -207,6 +211,44 @@ def test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him
     assert any(e.kind == "person.moved" and "leads the boarders" in e.text for e in w.log)
     assert any(e.kind == "person.aboard" and "with the boarders" in e.text for e in enemy.log)
     assert "a visitor" in M.where_am_i(w, lieutenant)
+
+
+def test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_none_leads_on():
+    """Package 97: under the default seed the first lieutenant falls in the boarding (her
+    Health reads her own people since the binding; on the trunk it read the running block's,
+    the Medusa's, and killed her man of the same post): the deck is carried all the same and
+    no officer leads on. Who leads on when the boarders' officer falls (the senior standing
+    of the party) is package 74's on the same function (`boarding._officer_on_her_deck`)."""
+    from freesail.agents.agent import officer as officer_station
+    from freesail.combat import boarding as B
+    from tests.test_fight import _alongside
+
+    w, v, enemy = _alongside(10.0, her_quarters=True)
+    lieutenant = B.boarders_officer(w)
+    assert lieutenant is not None and lieutenant.name == "Mr Pearce"
+    h = Harness(
+        w,
+        officer_station(SamplingPolicy.in_lockstep(300, "notable", "urgent"), world=w),
+        Fake([lambda last, turns: Reply(text="Aye.")], loop=True),
+    )
+    h.start()
+    w.submit("grapple her")
+    w.submit("serve out the small arms")
+    w.run(400)
+    assert w.submit("boarders away").kind == "action.boarders"
+    for _ in range(B.CONTEST_ROUNDS + 1):
+        w.run(60)
+        f = B.fight_of(w.ship)
+        if f is not None and f.over:
+            break
+    assert f is not None and f.over == "carried"
+    assert lieutenant.dead and lieutenant.hull == w.own.id
+    killed = [e for e in w.log if e.kind == "person.killed" and "Mr Pearce" in e.text]
+    assert [(e.tick, e.text) for e in killed] == [
+        (530, "Mr Pearce is killed: a blow of a tomahawk.")
+    ]
+    assert B.boarders_officer(w) is None
+    assert not any("leads the boarders" in e.text for e in w.log)
 
 
 def test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_it_far_off():
