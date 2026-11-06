@@ -465,6 +465,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_held_hulls.py::test_a_hull_a_model_holds_is_held_over_the_cap_up_to_the_allowance",
         "test_held_hulls.py::test_a_far_hull_held_through_no_door_keeps_the_far_plan_as_it_was",
         "test_known_truths.py::test_truth_7_400_a_hull_a_model_holds_is_held_over_the_cap_and_kept_off_the_rocks",
+        # package 82b, item 5: the boat's names, three hulls beside the frigate (5 to 17 s alone,
+        # 2026-11-06)
+        "test_boat_names.py::test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay",
+        "test_boat_names.py::test_a_person_of_another_ship_named_in_the_order_is_refused_in_words",
+        "test_known_truths.py::test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_refused",
     }
 )
 
