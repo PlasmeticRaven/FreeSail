@@ -785,3 +785,51 @@ and grants and lacked `add_word`; a station on another hull wrote her note's cop
 hull's director's log, which the director never reads, now the game's one on the player's
 hull with that hull current; truth 78's pin moved by the fake captain's "I have the command."
 leaving the log, re-measured old beside new).
+
+### Step 3: report, the messenger and the call; the sleeper's wake; the command devolved (§7; decision 63; 2026-11-06)
+
+**Built as designed**: `freesail/world/reports.py`, ticked by `World.tick` after the lookout
+and the routine and before the stations. The rules' officer of the watch reports to the
+captain below, each reportable line of the deck a minute after it (`report.made`, the
+messenger's minute, reach `person`), with the captain in the hull, awake and not where he
+sees the deck, and no model or player at a station of the officer's kind; the call
+(`report.called`, reach `wakes`) for a line of `DANGER_LINES`, an urgent line of the deck's
+business and, by night, every reportable line, written at once for the lines of the tick
+before; `call the captain [: <why>]` the officer's order (the vocabulary's verb, his domain's
+by name, refused from the captain and when he is on deck); the boat's report at the quay
+(`report.boat`, reach `port`) when a ship's boat manned as a hull comes in where a person of
+her company is ashore; the tripwire's call a line of the log; the officer's brief says the
+duty and the harness says it once in his sample when the captain goes below while he has the
+deck; the sleeper woken by the call and by the `wakes` kinds whatever their severity (all
+hands, a gun, the ship striking) and by nothing else of the deck's; `report.called` ends any
+stand-by of the station it reaches. Decision 63: the command devolves on the senior officer,
+a held station first (his deck, a notice, a line in his journal), when the captain is
+unavailable (ashore, in the boat, aboard another ship, wounded or sick below, a captive),
+said in the log (`ship.command_devolved`); he holds the captain's authority whole
+(`tools.judge`, `in_command`), his orders logged "in command"; given back
+(`ship.command_resumed`) when the captain is available again and has given an order again;
+the state is read from the log, cached by its length, so a checkpoint and a replay read the
+same. A told order is the captain's word (`told_covers`; `tools.judge` gives `TOLD`, the
+order logged "at the captain's word", and it passes the deck's gate). Truths 7-370 whole,
+7-371, 7-372, 7-387 whole; the stand-by events "a report", "the captain called", "the
+boat's report".
+
+**Taken another way, with the reason.** (1) The call is written for the lines of the tick
+before and the report for the lines of the minute before, both read from the log and not
+from a list kept aside, so that a checkpoint written between the line and the report loses
+nothing and the replay by the acts gives the same lines. (2) A danger call is made once for
+a thing: the recurring lines (her sails lifting at every look while nobody trims) would have
+sent for the captain every four minutes; the officer sends once and again only after the
+captain has come on deck, or an hour later. (3) A captain asleep by day is not reported to
+(the messenger lets him sleep; by night the line is a call, and so is a danger). (4) The
+devolution's seniority among the rules' persons is the health module's order for a captain
+killed (the first lieutenant, the lieutenants, the mate, the master, the boatswain); a held
+station of the officer's kind comes before them whoever its person is. (5) The command is
+given back on the captain's order given while available again, judged from the orders'
+journal (an order from the shore does not take it back); his first order back aboard is
+usually `come aboard` itself, which is right: he is aboard and has spoken. (6) Decision 63
+has no truth number in the brief's 7-370 to 7-389; its tests are in `tests/test_knowledge.py`
+and the lead may give them one.
+
+**Found on the way** is in the tuning notes (the masthead's hail a danger line; the port's
+shore named "the quay at Falmouth"; a boat hull's people unmustered).

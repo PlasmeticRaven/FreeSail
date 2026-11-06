@@ -13422,11 +13422,40 @@ def test_truth_7_370_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
     """A captain in the cabin: his sample carries no deck reading (no wind, no speed, no
     sail, no sail in sight) and says in one line where they are to be had; the glass, the
     tell-tale compass's heading and the chart's rows are his; the bell reaches him and the
-    lookout's sighting does not; the sail work overhead a sound and not a figure. The
-    officer's report of a sail sighted reaching him there is step 3's clause."""
-    from tests.test_knowledge import test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks
+    lookout's sighting does not; the sail work overhead a sound and not a figure; and the
+    rules' officer's report of what the deck saw reaches him there a minute after the line,
+    the line itself not (package 65, step 3), a captain on deck getting no report."""
+    from tests.test_knowledge import (
+        test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks,
+        test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck,
+    )
 
     test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks()
+    test_the_rules_officer_reports_to_the_captain_below_a_minute_later_and_not_on_deck()
+
+
+def test_truth_7_371_a_captain_ashore_has_nothing_of_the_ship_but_the_boats_report():
+    """A captain ashore at the port: nothing of the ship in his sample (the deck's lines
+    none) but the boat's report when her manned boat comes to the quay (`report.boat`: her
+    state, whose the deck is, all well), which reaches the quay of that port."""
+    from tests.test_knowledge import (
+        test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship,
+    )
+
+    test_the_boats_report_at_the_quay_reaches_the_captain_ashore_and_nothing_else_of_the_ship()
+
+
+def test_truth_7_372_a_sleeping_station_is_woken_by_the_call_and_not_by_a_notable_line():
+    """A sleeping station is woken by the call (`report.called`, the officer's `call the
+    captain`) and not by a notable line of the deck nor by the bell; woken by all hands; the
+    captain is called for a danger once for a thing, and for everything by night."""
+    from tests.test_knowledge import (
+        test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do,
+        test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night,
+    )
+
+    test_call_the_captain_is_the_officers_order_and_the_call_wakes_the_sleeper_as_all_hands_do()
+    test_the_captain_is_called_for_a_danger_once_for_a_thing_and_for_everything_by_night()
 
 
 def test_truth_7_373_a_reading_asked_where_it_is_not_to_be_had_is_answered_with_where():
@@ -13503,15 +13532,17 @@ def test_truth_7_386_the_filters_cost_with_three_stations_seated_is_within_a_fif
 def test_truth_7_387_a_tripwire_judged_below_wakes_as_the_officers_call():
     """A captain in the cabin standing by for `speed under 20 knots` is woken with 'Mr Pearce
     sends down to you' before the words, the log being hove on deck; a tripwire the cabin can
-    judge (the depth by the chart) and the same stand-by on deck wake as 58a's. The call's
-    line in the log is step 3's clause. Also the lead's ruling: an officer with the deck does
-    not go below."""
+    judge (the depth by the chart) and the same stand-by on deck wake as 58a's; the call is
+    a line of the log (`report.called`, package 65, step 3), before the wake's. Also the
+    lead's ruling: an officer with the deck does not go below."""
     from tests.test_knowledge import (
         test_a_tripwire_judged_below_wakes_as_the_officers_call,
         test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft,
+        test_the_tripwires_call_is_a_line_in_the_log,
     )
 
     test_a_tripwire_judged_below_wakes_as_the_officers_call()
+    test_the_tripwires_call_is_a_line_in_the_log()
     test_an_officer_with_the_deck_does_not_go_below_and_may_go_aloft()
 
 
