@@ -3183,7 +3183,11 @@ xfailed; the slow tier of the touched files, their neighbours and the known trut
 passed, 8 xfailed; the pace alone and last 13 of 13. **The lead's merge:** the trial on b92dca34
 clean and lint-clean; no forbidden word new in the diff; nothing of 74's, 75's or 81's files,
 the physics and `data/ships/` untouched; the fast tier whole on it green, exit 0 (15:04 to 15:45 UTC), 6,657 passed, 2 skipped, 1 xfailed, none failed; the whole suite
-in the cloud dispatched after run 53, the figures to follow. Step 5's substance (the lookout's
+in the cloud: run 54 on d7dfbdf9 (15:46 to 17:03 UTC): lint green, all six shards green, 7,072
+passed, 11 skipped, 12 xfailed, no failure; the pace job (informative) 9 of 13, the same four floor
+tests as runs 48, 49, 52 and 53 at 379 to 437 against 500, the shared runner's hour (the build
+machine alone held 13 of 13 at 12:09; the flags add no tick to the pace's passages, the lookout's
+refresh once a minute with the look). Step 5's substance (the lookout's
 reading, the private signals in succession) is item 8's; what a corrected number moves is the
 steps' "what moved". Package 76 has one thing left: the owner's shelf answers to its seven
 questions as they come (the 1797 quaderno, the 1799 fog book, the convoy book, the French book
