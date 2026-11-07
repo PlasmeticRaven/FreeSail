@@ -18703,3 +18703,9 @@ book's "three guns, two quick and one slow" (heard as "The brig fires three guns
 and one slow: to tack."). No log pins a day-book number that moved: the engine's own hoists
 (the squadrons' "enemy in sight", No. 1, unchanged; the convoys' close round the commodore,
 make more sail and anchor, all the convoy book's, unchanged) stand.
+
+**The suites as run at c13e429** (a worktree pinned there): the fast tier whole, exit 0, 6,368
+passed and 439 slow left out; the slow tier of the touched files and the known truths
+(`tests/test_signals.py`, `tests/test_known_truths.py`, `--slow -m "not pace"`), exit 0, 322
+run, 314 passed and 8 xfailed (the truths marked so on the trunk); the pace tests alone and
+last, exit 0, 13 of 13. Ruff check and ruff format clean.
