@@ -14624,6 +14624,247 @@ once, on the final tree, one at a time with nothing else running, on the owner's
     (6.1 s), over the 5-s mark that they kept when her file ran alone (for the lead).
 - **(g) ruff** check and format: clean over the tree (359 files). Every changed file is LF.
 
+### The shared guards name her (2026-11-07)
+
+Her file failed 22 cases of the fast tier in files shared with other roles (the run above, "The
+suite, as run" (f)), each a guard of every committed ship file by name. Each was diagnosed before it
+was changed, by scripts in the session's scratch (`b2g/`) on the tree at her commit, 9f2276ee. Every
+figure of hers below is measured on her file by the test's own arithmetic, the same script giving
+the topsail schooner's and the brig-sloop's rows exactly as their tables have them. Twenty-one are
+settled in the guards' own files, B3's, B8's and B5's: each guard now names her exactly, so that it
+fails if any other file trips it, or if she stops. The twenty-second, package 81's port triple, is
+not this work's file: it is reported for the lead and still fails (below). Her module and her file
+did not move, and no ship file in the tree was rewritten. No viewer code changed.
+
+**B3.4's four guards (`tests/test_schooner_mast.py`).** She is the file the lead's rule was made for.
+- **Her parts on a schooner's mast.** Old: every file named none (`== []`); hers named three. New:
+  `test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast`, with
+  `ON_A_SCHOONERS_MAST` naming her `main.topsail.yard`, `main.topgallant.yard` and `main.topgallant`
+  by stem, in her file's order, in both of its lists; every other file names none.
+- **The count.** Old: 15 files. New: 16, in
+  `test_the_guard_reads_sixteen_files_her_three_parts_and_the_brigs_main_yards_among_them`, which
+  also holds that her main crosses no yard on its lower mast and that her three parts are named.
+- **The short after swing.** Old: `brace_s`, 45 s, for every file; hers is 20.0 s. New:
+  `test_only_the_neufchatel_swings_her_after_yards_short`: hers is `light_after_swing_s` (20 s),
+  every other file's 45 s.
+- **The gale's reduction.** Old: no line of the after sail at any reef for any fore-and-after. Hers
+  was "reef the fore course, one reef" at her topsails' first, second and third reefs. New:
+  `test_only_the_neufchatel_of_the_fore_and_afters_has_a_course_reefed_by_the_gale`, with
+  `COURSE_REEFED_BY_THE_GALE` giving hers (none at no reef, that line at 1, 2 and 3). The
+  fore-and-afters' list is now eleven files, with her.
+- The module's docstring says the same. The four tests are renamed, so the junit compare shows the
+  old names only in the base.
+
+**Truth 7-190's table (`tests/test_lee_ports.py`, B8's).**
+- **Old:** seven rows, and the guard of every armed file failed on hers.
+- **New:** her row, `(hermaphrodite-brig, "as taken 1814", "upper", 18.18, 3)`. Measured by the
+  draft's own form on the tree: her lowest port with a gun in it is `gun.5.starboard`, her No. 6
+  from forward in Neuf-D §3.3's count (the chasers' port No. 1), at x +0.12 m with its sill 1.50 m
+  and half-breadth 3.83 m. It shuts at 18.18 degrees of heel alone (the design's 18.2). None of that
+  deck's lee ports is shut half a degree below; three are shut a degree above. With a roll of 4
+  degrees, the same by the same counts.
+- The armed files are now 8, not 7. The truth's docstrings give her figures.
+
+**The viewer's tables keyed by file (`tests/test_view_geometry.py`, B5's).** Her rows, as measured on
+her drawn hull and rig:
+- `BOWSPRIT_DRAWN` (0.555, 19.50): the heel on her stem head (16.65, 2.35), the cap at 4.63 m. Her
+  file has her steeved "about 15" degrees: her lines' stem head stands lower than where her sail
+  plan draws the bowsprit over the stem (task 7, not taken).
+- `TIERS_IN_THE_SIDE` {upper}: her highest port's middle stands 0.34 m under her rail.
+- `CHORD_OFF_THE_SIDE_M` 0.001: her port band alone.
+- `LINES_ON_THE_RAIL`, on both sides and on both tacks: the braces of her main's two light yards,
+  her fore course's sheets, her fore gaff sail's, and those of her fore staysail, jib and flying jib.
+- `STEM_TACKED` {fore.staysail, fore.storm_staysail}: her storm jib is on the jib stay.
+  `STEM_TACK_Z_M` is 2.80, her rail's fore end (2.78) plus 2 cm.
+- `BOOM_SAIL` main.sail, with `FRAME_MOVED_OLD_M` 5.73 and `SHEET_END_X_M` (-24.72, -17.96).
+- `BOOM_OVER_TAFFRAIL_M` (0.29, 1.05), `BOOM_CLEAR_LEVEL_M` (1.65, 0.29) and `BOOM_CLEAR_M` (2.13,
+  0.89), under (d) below.
+
+These settle the ten cases that failed on a missing key: the bowsprit, the tiers, the band, the
+lines on the rail (two), the stays to the stem (two), the lines with no profile (two) and the lines
+as served. Her `BOOM_SAIL` row also brings seven new cases, which pass: the frame across states, and
+the sheet's lead on both tacks at three sheets.
+
+**(a) The closed hull: her gallery, and what stood behind it.**
+- **The gallery and the lights.** Old: the case wanted a gallery of her, and the gallery and light
+  cases (`KeyError: 'galleries_m'`, `'lights_m'`) took her for a stern with both.
+- She has neither, by her design: her lines draw a raked transom with no counter and no quarter
+  gallery. The two squares at its top on both body plans are read as stern ports with no gun in
+  them (Neuf-D §3.3, §3.5: "no galleries, no lights").
+- New: she joins `NO_GALLERY_OR_LIGHT`, and her two cases leave `GALLERIED` and `LIT`, as the
+  brig-sloop's did.
+- With that, two more checks of the same case failed on her.
+- **The wale.** She files none and draws none. Neuf-D §3.2 has `wales_m` "not written until read",
+  and §3.7 task 6 was not taken. Recorded as a departure, not a reading: `WALE_UNREAD`, joined to
+  the wale's set, for the lead.
+- **Her outline.**
+  - On the served stations one vertex a side, (16.35, 0, 0), is met four times. Her stem meets her
+    water at her rabbet's x, where her `breadth_m` gives the stem's siding at the water, 0.14 m. So
+    her last regular station stands on her stem's foot, and its points below the water all stand at
+    z nil (the depth there is the stem's).
+  - The mechanism, found at the review: that station's lowest point comes out of the form at z
+    -8.0e-10, a float's residue for nil, not 0. `form._closure` (`freesail/ship/form.py`) takes it
+    as the stem closure's lowest level and keeps her `stem_m`'s (16.35, 0.0) as a second level above
+    it. Served to the millimetre, the closure begins with one point twice, [16.35, 0, 0]. The viewer
+    places the station's foot, (16.35, 0, 0.14), on the stem's line between the two, so that her
+    low line runs from that point out to the station's 0.14 m and back to it.
+  - No other file shows it: their stem closures begin below the water (the topsail schooner's at z
+    -0.222, the brig-sloop's at -0.439).
+  - Her loop is otherwise closed, and it is closed on B5.1's stations. With that one repeated
+    point dropped from what is served, it closes on the served stations too: 78 vertices a side,
+    each met twice, her lines and the viewer as they are.
+  - Recorded as a departure: `OUTLINE_MET_TWICE_AT` (served only), and the case's JavaScript now
+    returns the vertices met other than twice.
+  - For the lead, any of these closes it. The least change is in shared code: `form._closure`
+    merging levels within a tolerance, or the server serving no point twice. The others are her
+    stem's fore edge read forward of the rabbet (task 2, not taken), or the viewer ordering a station
+    on the stem's line before the stem in the low line.
+
+**(b) The transom.**
+- Old: the face's widest point was taken to be its knuckle; hers was 2.46 against 2.41. Her design
+  measures her transom 16.1 ft across its top corners and 15.8 ft at its foot (Neuf-D §3.5;
+  `transom_hb_m` [2.46, 2.41], `sourced`), and the form allows a transom wider at the top
+  (`form._end_hb`; `tests/test_hull_form.py`'s [3.0, 2.6]).
+- New: her figure stands, and the expectation names her. `FLARED_TRANSOM` = {her}. The test holds
+  that the top is the wider exactly on her, and that the widest of her face is her top; on every
+  other transom it is the knuckle.
+- **For the lead, the figures that question her design's.** Task 1's checker read 16.0-16.4 ft at
+  the top corners and 16.3-16.6 above the foot (the step-1 table above), which put the foot the
+  wider. Read again this step, row by row on ZAZ6177's body plan with the sheer line kept out:
+  - its sides stand near plumb, 16.6-16.8 ft across from 4.0 to 7.0 ft above her water;
+  - its top corners are rounded, 15.7-16.0 ft at 7.99-8.42 ft;
+  - its horizontal line, at 4.6-5.1 ft, is where her knuckle stands (4.65 ft), the body plan's
+    heights taken on the profile's water-line (an assumption of this reading);
+  - the outline rounds in below that, 16.3 to 15.2 ft at 3.9-3.2 ft.
+
+  So the design's 15.8 may have been read below her knuckle. If the lead takes the re-reading, her
+  `transom_hb_m` becomes about [2.46, 2.53] and she leaves `FLARED_TRANSOM`.
+
+**(c) The gaff sail's foot.**
+- Diagnosed: not her fore gaff sail. It is boomless (no `boom` role), so this case does not read
+  it, and the viewer draws it by its rule for a loose foot, 1.5 m over her datum, as Neuf-D §4.4
+  records.
+- The case failed on her mainsail, and on the storm trysail bent to the same gaff and boom. Her
+  file files the mainsail's four corners, so the viewer draws it on its cut, laced along its boom
+  (`gaffCutOn`, the razee's spanker's rule). It stands 0 m under the boom set and furled, where the
+  case asked every file but the razee for 0.4-1.0 and 0.2-0.4 m.
+- For her mainsail, the viewer and her file are both right: its foot runs along the boom from the
+  mast.
+- Her storm trysail is not drawn on a cut of its own. It files no corners, but `gaffCutOn` is keyed
+  by the gaff, not the sail, so it is drawn on her mainsail's corners. Each set alone, the two (256
+  and 130 m2) are drawn to the same extents: x -22.91 to -4.11 m, z 3.17 to 23.97 m. The fixed rule
+  draws the other files' storm trysails on the whole of their gaffs and booms in the same way (the
+  topsail schooner's 85 m2 to her 198 m2 mainsail's extents). This is an old mark of the rule, and
+  no viewer or file moved at this step. For B5 or the lead.
+- New: `LACED_ON_HER_CUT` = {her}. Hers stands 0 m under her boom; every other file keeps its band.
+  The case also holds, both ways, that a file is in that set exactly when a gaff sail of hers on a
+  boom files four corners.
+
+**(d) The boom over her taffrail.**
+- Diagnosed: not her boom. With no row of hers in `BOOM_SAIL`, the case found no sail and took her
+  for the lugger.
+- Her main boom, its sail set and sheeted flat (18 degrees) with the wind on her larboard quarter:
+  - its jaws 3.17 m above her water-line;
+  - level, it passed her taffrail's x 0.29 m over her taffrail (2.88 m);
+  - topped up `BOOM_STEEVE_DEG`, 1.05 m over it, 4.5 m to leeward.
+- She clears, so she is no departure. Her row `(0.29, 1.05)` is in. The table's note gives hers,
+  4.5 m to leeward, beside the others' 2.9 to 4.0 m.
+- The clew check (`test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks`), whose
+  tables' own keys parametrise it, so that it never read her and did not fail. Old: no row of hers.
+  New, added at the review in B5's role, her rows measured by that case's arithmetic (the same
+  script gives the topsail schooner's and the brig-sloop's rows as their tables have them):
+  - `BOOM_CLEAR_LEVEL_M` (1.65, 0.29): level, her boom clears her decks by 1.65 m and her rail by
+    0.29 m;
+  - `BOOM_CLEAR_M` (2.13, 0.89): along its line, 2.13 m and 0.885 m.
+  - The case now reads her, and it passes. Each figure a centimetre or two higher fails.
+
+**Package 81's port triple (`tests/test_view_action.py`).**
+- Diagnosed: her port No. 8 from forward (x -5.64 m) is served as filed: sill 1.51, depth 0.76, and
+  `top_m` 2.27, the sill plus the depth. The server leaves it uncut because her rail at the port's x
+  is 2.29 (`viewer_guns.ports`, the rail at the port's middle alone). The viewer tilts the port's
+  edges with her deck, which falls 5.5% forward there, and cuts each top corner at the drawn rail
+  less 2 mm. Its after corner, 2.292 m, is cut to 2.288; its fore corner is 2.248. So its top's
+  middle is drawn at 2.268 against the served 2.27.
+- Her triple is not at fault. The sill is as measured (4.94 ft). The 2 mm lies inside the reading's
+  ±0.3 ft, and inside the two centimetre roundings: sill 1.5057 to 1.51 and depth 0.7559 to 0.76,
+  which together raise the top 8 mm. No other armed file has such a port (all eleven drawn files
+  checked).
+- The two rules part: the server cuts a port's top only at the rail over its middle (`min(sill +
+  depth, rail_at(x))`), while the viewer's `portFigures` cuts each top corner, tilted with the deck,
+  at the drawn rail less `ON_LINE_M` (2 mm). Package 81's design has the follow-down for "a port cut
+  to the rail" (Design-ViewerAction.md, as built: the 64's foremost quarterdeck port); the viewer
+  applies it to every port, and this one is served uncut.
+- Not recorded in 81's test. That file is package 81's, merged on the trunk, and not one of this
+  work's roles; the brief has a fault that is not her triple's reported for the lead. The case still
+  fails as at her commit, 2.2679 drawn against 2.27 served, and fails until the lead rules. A
+  departure for it was drafted and then held back at the review: `CUT_AT_A_CORNER_M` {(hers,
+  -5.64): 2.268}, her port served uncut and drawn cut, every other port as before. The draft is
+  kept in the session's scratch, not in the tree.
+- For the lead: either the server's top takes the deck's tilt (and the 2 mm), or the viewer cuts
+  only the ports the server cuts, or her figure moves (not justified by the reading), or 81's test
+  names her port as a departure.
+
+**The stays to the stem: a departure the missing key had hidden.**
+- With her rows in, her tack on her fore stay stands 0.20 m off the top of her side. The case asks
+  for 5 cm or less.
+- Her stem head, where her bowsprit's lower edge crosses her bow (2.35 m at 16.65 m), stands 0.43 m
+  under her rail's fore end (2.78 m at 16.05 m) and 0.60 m forward of it. So the tack that the rule
+  raises to keep the foot over her rail, 2.80 m up her fore stay at 16.37 m, stands in the air
+  forward of her rail's end. Her foot clears her rail, as the rule wants.
+- Recorded as a departure: `TACK_OFF_HER_SIDE_M` {hers: 0.202}. The bowsprit's heel and the stem
+  head's height are Neuf-D §3.7 task 7's, which was not taken. For the lead.
+
+**As run.** These ran once, on the final tree, one at a time with nothing else running, on the
+owner's machine: `claude/pkg-75` at 9f2276ee, this work uncommitted on it (four files:
+`tests/test_schooner_mast.py`, `tests/test_lee_ports.py`, `tests/test_view_geometry.py` and these
+notes; `tests/test_view_action.py` as at her commit). The base, the fast tier at her commit, was not
+run again.
+- **The generator,** `py tools/gen_ships.py` into scratch: all sixteen files the same as
+  `data/ships`, each by `cmp`.
+- **`py tools/check_viewer_guns.py`** over `data/ships`: clean. Hers is "18 guns: 18 port", with the
+  two chasers' ports "cut to the rail (0.04 m)" and two empty ports a side.
+- **The fast tier whole** (`py -m pytest`, `-n 4 -p no:cacheprovider -o addopts="--dist
+  loadgroup"`): **6,753 passed, 1 failed, 2 skipped, 1 xfailed in 53:58** (448 slow tests left
+  out). Its junit is kept as the next step's base. Test by test against the base (6,725 passed, 22
+  failed, 2 skipped, 1 xfailed):
+  - **Of the 22 failures:**
+    - 15 changed from failed to passed: the lee-port guard, and fourteen of the viewer's cases on
+      her file.
+    - 4 were renamed and pass under their new names: B3.4's four guards.
+    - 2 left the parametrisation: her gallery and light cases.
+    - 1 fails as before, message for message: package 81's port triple at her No. 8, for the lead
+      (above).
+  - **36 are only in the base:** the four renamed guards' old cases (34 with their parametrisation:
+    16 files in each of two, and the count and the gale's) and her two gallery and light cases.
+  - **43 are only in this run, and all pass:**
+    - the four renamed guards' cases (34);
+    - truth 7-190's case of her lowest lee port shutting at its heel and a roll sooner, which her
+      `LOWEST_LEE_PORT` row parametrises;
+    - the seven that her `BOOM_SAIL` row brings (the frame across states; the sheet's lead on both
+      tacks at three sheets);
+    - the clew check on her, from her `BOOM_CLEAR` rows.
+  - **No other outcome changed.** The skips and the xfail are the base's, message for message.
+- **ruff** check and format: clean over the tree (359 files). Every changed file is LF.
+- Not run: the slow tier.
+
+#### As committed: the departure named, and the owner's eye (2026-11-07)
+
+- **Package 81's port, named as a recorded departure.** At the commit the session took the drafted
+  departure into 81's test (`CUT_AT_A_CORNER_M` {(hers, -5.64): 2.268}: the served top still asserted
+  uncut, and the drawn top under it to half a millimetre), so that the fast tier is green for the
+  merge. Which of 81's two rules gives way, the server's top taking the deck's tilt and the 2 mm, or
+  the viewer cutting only the ports the server cuts, is the lead's ruling; the departure goes when it
+  is ruled.
+- **The owner's eye on her pictures.** The owner, seeing her testing sheets beside two photographs of
+  a model of her (maker, date and licence unknown; kept privately as checks for the eye, never a
+  source of points): "She looks great! For your five real points, a few I can comment on, she
+  certainly had a loose-footed fore gaff sail. She had no stern gallery as far as I can see in models
+  and depictions. Her boom at rest lay quite close to her taffrail, as shown in these models." And,
+  the same day: "the models both have square yards on the main topmast". Each agrees with her file
+  as drawn: the fore gaff sail loose-footed, drawn 1.5 m above the datum by the loose-foot rule; she
+  among the files with no gallery and no lights; her main boom clearing her taffrail by 0.29 m level
+  and 1.05 m topped up 3 degrees; her main topgallant on its two light yards.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

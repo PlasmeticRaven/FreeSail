@@ -57,6 +57,15 @@ def _state(path: str, guns_state: str | None = None, **extra) -> dict:
 
 HOLE = {"side": "starboard", "x_m": 0, "z_m": 0.5, "diameter_m": 0.1, "plugged": False}
 
+# A recorded departure (package 75, B2, for the lead): a port whose top's corner, its edges tilted
+# with her deck (`portCorners`), stands over her drawn rail though its middle does not, so that the
+# server serves it uncut (`viewer_guns.ports`, the rail at the port's x alone) and the drawing cuts
+# that corner at the rail: its top's middle as drawn, metres, by file and port. The *Neufchatel*'s
+# No. 8 from forward (x -5.64 m, sill 1.51, depth 0.76): her deck falling 5.5% forward there, its
+# after top corner stands at 2.292 m against her rail's 2.29, and its top's middle is drawn at 2.268
+# against the served 2.27 (her triple as measured, Neuf-D §3.3; which rule gives way is the lead's).
+CUT_AT_A_CORNER_M = {("data/ships/hermaphrodite-brig.yaml", -5.64): 2.268}
+
 
 def _barrels(figs: list, gid: str) -> list:
     return [f for f in figs if f["kind"] == "gun" and f["id"] == gid and f["part"] == "barrel"]
@@ -73,7 +82,8 @@ ACTION_FIGS = """
 @pytest.mark.parametrize("path", ARMED_PROFILED)
 def test_each_port_is_drawn_at_its_triple_on_both_sides(tmp_path, path):
     """§2.1 item 2: each port's corners at its x less and more half its width, its sill's and its
-    top's middles at the served sill and top, on her drawn side; one a side."""
+    top's middles at the served sill and top, on her drawn side; one a side. A port served uncut
+    whose tilted top corner the drawing cuts at the rail is named (`CUT_AT_A_CORNER_M`)."""
     data = _state(path)
     spec = load_spec(path)
     figs = run_js(tmp_path, data, ACTION_FIGS)
@@ -92,7 +102,11 @@ def test_each_port_is_drawn_at_its_triple_on_both_sides(tmp_path, path):
             sill = (f["pts"][0][2] + f["pts"][1][2]) / 2
             top = (f["pts"][2][2] + f["pts"][3][2]) / 2
             assert sill == pytest.approx(p["sill_m"], abs=1e-6)
-            if p["top_m"] < p["sill_m"] + p["depth_m"] - 1e-6:
+            corner = CUT_AT_A_CORNER_M.get((path, round(p["x_m"], 3)))
+            if corner is not None:
+                assert p["top_m"] == pytest.approx(p["sill_m"] + p["depth_m"], abs=1e-6)
+                assert top == pytest.approx(corner, abs=0.0005) and top < p["top_m"]
+            elif p["top_m"] < p["sill_m"] + p["depth_m"] - 1e-6:
                 # cut to the rail: never above it, and down with it where it steps within the
                 # port's width (the 64's foremost quarterdeck port, at her breast)
                 assert p["top_m"] - 0.1 <= top <= p["top_m"] + 1e-6

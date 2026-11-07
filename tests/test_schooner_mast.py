@@ -10,9 +10,12 @@ main yards (`scripts.TackScript._after_swing_s`); and, by the lead's ruling 3, a
 no mast carries yards, every fore yard shot away, her main's yards her after yards
 (`scripts.head_and_after_yards`).
 
-No committed ship file trips it (the guard, every file of `data/ships/` with the boats), so no
-file's classing moves: the golden table's own run (`tests/test_rig_classing.py`, and the razee's
-and the 64's rows in `tests/test_indefatigable.py`) is that proof, and is not repeated here.
+One committed ship file trips it, the *Prince de Neufchatel*'s, the file the rule was made for (her
+main topgallant's two light yards and the sail between them; package 75, B2), and no other (the
+guard, every file of `data/ships/` with the boats), so no other file's classing moves: the golden
+table's own run (`tests/test_rig_classing.py`, and the razee's and the 64's rows in
+`tests/test_indefatigable.py`) is that proof, and is not repeated here; hers is her own tests'
+(`tests/test_neufchatel.py`).
 Here: the rigs in memory (`tests/rig_fixtures.py`) classed through the golden table's gates, the
 topsail schooner with the *Neufchatel*'s main topgallant and with a main topsail (Eng §3.3's
 trial B) fore-and-afters with the fore's yards their head yards and the main's their after yards
@@ -27,7 +30,7 @@ it, and the word they are hauled by, "Main-topsail haul" (the lead's ruling 2, L
 her main crosses no course); and the gale's reduction (`orders.storm._after_sail_lines`, the
 lead's ruling 4): a fore-and-after's course reefed at the topsails' second reef as a ship's
 are, the after take-ins a square-rigged ship's alone, a course with no reef bands named and
-left as it is, and no committed file moved by it.
+left as it is, and of the committed files the *Neufchatel*'s fore course alone named by it.
 """
 
 from __future__ import annotations
@@ -160,27 +163,45 @@ ROWS = {
 }
 
 
-# -- the guard: no committed file trips the rule --------------------------------------------
+# -- the guard: the one committed file the rule names ------------------------------------------
+
+# Each committed file the rule names, by stem, and its parts on a schooner's mast in the file's
+# order: the *Prince de Neufchatel*'s main topgallant, her main's two light yards and the square
+# sail between them (Neuf-D §4.5, §12.2a; package 75, B2), the rig the lead's ruling of 2026-11-06
+# was made for. Every other file names nothing.
+ON_A_SCHOONERS_MAST = {
+    "hermaphrodite-brig": ["main.topsail.yard", "main.topgallant.yard", "main.topgallant"],
+}
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_no_committed_ship_file_has_a_yard_or_a_square_sail_on_a_schooners_mast(path):
-    """Every file of `data/ships/`, the boats among them: on every after mast with yards a yard
-    is crossed on the lower mast itself (the brigs and the three-masted ships), or one mast
-    carries every braced yard (the schooners, the cutter, the smack), or none does (the lugger
-    and the boats, whose yards are lug yards). So places 1 and 3 read every committed file as
-    before the rule."""
+def test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast(path):
+    """Every file of `data/ships/`, the boats among them, but the *Neufchatel*'s: on every after
+    mast with yards a yard is crossed on the lower mast itself (the brigs and the three-masted
+    ships), or one mast carries every braced yard (the schooners, the cutter, the smack), or none
+    does (the lugger and the boats, whose yards are lug yards). So places 1 and 3 read every other
+    committed file as before the rule. Hers names her main's two light yards and her main
+    topgallant, and nothing else (`ON_A_SCHOONERS_MAST`): her main crosses no yard on its lower
+    mast."""
     ship = load_ship(path)
+    named = ON_A_SCHOONERS_MAST.get(path.stem, [])
     yards = [p for p in ship.spars.values() if p.cls == "yard"]
     squares = [s for s in ship.sails.values() if s.cls == "square"]
-    assert [p.id for p in yards + squares if ship.on_schooner_mast(p)] == []
-    assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == []
+    assert [p.id for p in yards + squares if ship.on_schooner_mast(p)] == named
+    assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == named
 
 
-def test_the_guard_reads_fifteen_files_and_the_brigs_main_yards_among_them():
-    """The guard is not empty: the fifteen files of the tree, and the brig's main topsail,
-    topgallant and royal yards, which a rule without its lower-yard test would name."""
-    assert len(SHIP_FILES) == 15
+def test_the_guard_reads_sixteen_files_her_three_parts_and_the_brigs_main_yards_among_them():
+    """The guard is not empty: the sixteen files of the tree (the *Neufchatel*'s the sixteenth,
+    package 75, B2), her three parts named, and the brig's main topsail, topgallant and royal
+    yards, which a rule without its lower-yard test would name."""
+    assert len(SHIP_FILES) == 16
+    assert set(ON_A_SCHOONERS_MAST) <= {p.stem for p in SHIP_FILES}
+    her = load_ship(ROOT / "data" / "ships" / "hermaphrodite-brig.yaml")
+    assert her.spars["main.topsail.yard"].parent == "main.topmast"
+    assert not any(s.parent == "main.mast" for s in her.spars.values() if s.cls == "yard")
+    named = [pid for pid in her.parts if her.on_schooner_mast(pid)]
+    assert named == ON_A_SCHOONERS_MAST["hermaphrodite-brig"]
     brig = load_ship(ROOT / "data" / "ships" / "brig.yaml")
     upper = ["main.topsail.yard", "main.topgallant.yard", "main.royal.yard"]
     assert all(brig.spars[y].parent != "main.mast" for y in upper)
@@ -552,11 +573,15 @@ def test_the_short_after_swing_is_a_schooners_light_main_yards_alone(build, seco
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_no_committed_ship_file_swings_her_after_yards_short(path):
-    """No file has a yard on a schooner's mast (the guard above), so every ship of every file,
-    the brig's and the frigate's after yards among them, swings in `brace_s` at "mainsail haul"
-    as before: the short swing for every ship's after yards is the lead's, not built."""
-    assert _after_swing_s(load_ship(path)) == EVOLUTIONS["tack"].timing["brace_s"]
+def test_only_the_neufchatel_swings_her_after_yards_short(path):
+    """No file but the *Neufchatel*'s has a yard on a schooner's mast (the guard above), so every
+    ship of every other file, the brig's and the frigate's after yards among them, swings in
+    `brace_s` at "mainsail haul" as before: the short swing for every ship's after yards is the
+    lead's, not built. Hers, every after yard of hers on her main's schooner's mast, swings in
+    `light_after_swing_s` (20 s), as the fixture with her main topgallant's does above."""
+    timing = EVOLUTIONS["tack"].timing
+    key = "light_after_swing_s" if path.stem in ON_A_SCHOONERS_MAST else "brace_s"
+    assert _after_swing_s(load_ship(path)) == timing[key]
 
 
 @pytest.mark.parametrize(
@@ -714,12 +739,23 @@ def test_a_course_with_no_reef_bands_is_not_named_and_stays_as_it_is():
     assert _after_sail_lines(frigate) == ["take in the main course", "take in the mizzen spanker"]
 
 
-def test_no_committed_fore_and_after_has_a_course_reefed_by_the_gale():
-    """No committed file moves with the ruling: each file that is not square-rigged has no line
-    of the after sail at any reef, her plain sail and her courses set (the schooners cross no
-    course; the cutter's topsail has one reef band, so never a second; the smack's topsail yard
-    is on her pole mast, no topsail of a topmast; the lugger's are set flying; the boats have
-    none). The square-rigged files are `tests/test_gale.py`'s and the other files' as before."""
+# The committed fore-and-afters whose course the gale names, by stem: at each reef of her
+# topsails, from none to three, the lines of the after sail, her course not yet reefed. The
+# *Neufchatel*'s fore course, the ruling's own case (Cobb 1841 p. 95, "a double-reefed foresail";
+# package 75, B2): reefed once from her topsails' first reef on.
+COURSE_REEFED_BY_THE_GALE = {
+    "hermaphrodite-brig": [[]] + [["reef the fore course, one reef"]] * 3,
+}
+
+
+def test_only_the_neufchatel_of_the_fore_and_afters_has_a_course_reefed_by_the_gale():
+    """The ruling moves no other committed file: each file that is not square-rigged but the
+    *Neufchatel*'s has no line of the after sail at any reef, her plain sail and her courses set
+    (the schooners cross no course; the cutter's topsail has one reef band, so never a second;
+    the smack's topsail yard is on her pole mast, no topsail of a topmast; the lugger's are set
+    flying; the boats have none). Hers reefs her fore course once from her topsails' first reef
+    on, and takes in nothing (`COURSE_REEFED_BY_THE_GALE`; her gale is her own tests'). The
+    square-rigged files are `tests/test_gale.py`'s and the other files' as before."""
     fore_and_afters = []
     for path in SHIP_FILES:
         ship = load_ship(path)
@@ -730,10 +766,11 @@ def test_no_committed_fore_and_after_has_a_course_reefed_by_the_gale():
             for sid in ship.groups.get(group) or []:
                 if ship.sails[sid].state is not SailState.UNBENT:
                     ship.sails[sid].state = SailState.SET
+        named = COURSE_REEFED_BY_THE_GALE.get(path.stem, [[]] * 4)
         for reefs in (0, 1, 2, 3):
             for sid in ship.groups.get("topsails") or []:
                 ship.sails[sid].reefs = min(reefs, ship.sails[sid].reef_bands)
-            assert _after_sail_lines(ship) == [], (path.stem, reefs)
+            assert _after_sail_lines(ship) == named[reefs], (path.stem, reefs)
     assert fore_and_afters == [
         "boat-cutter-23",
         "boat-cutter-28",
@@ -741,6 +778,7 @@ def test_no_committed_fore_and_after_has_a_course_reefed_by_the_gale():
         "boat-launch-31",
         "boat-yawl-16",
         "cutter",
+        "hermaphrodite-brig",
         "lugger",
         "privateer-schooner",
         "smack",

@@ -2132,6 +2132,10 @@ B6's test, not a truth (Build decision 27).
     `tests/test_view_action.py`'s 2-mm port top at her No. 8.
 
   Build-Ships.md §16.1's B2 row lists the same. No pin of another file moved.*
+  *Named, the same day (the tuning notes, "The shared guards name her"): the twenty-one in their
+  owners' files, B3's, B8's and B5's, each guard naming her exactly so that it fails if another file
+  trips it or if she stops; the twenty-second, package 81's port at her No. 8, a recorded departure
+  in 81's test (`CUT_AT_A_CORNER_M`), for the lead to rule which of 81's two rules gives way.*
 - **Not hers:** the lee-port wiring's combat pins (B8's).
 
 ---
