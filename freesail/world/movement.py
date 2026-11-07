@@ -179,9 +179,10 @@ def person_of_actor(world: Any, actor: str | None) -> Any:
         from freesail.world.captive import captive_person
 
         captive = captive_person(world)
-        if captive is not None:
-            # the player's person a captive (package 74, the design's §3.1): the prompt's
-            # orders are his wherever the prompt is, never the prize master's
+        if captive is not None and getattr(world, "is_followed", True):
+            # the player's person a captive (package 74, the design's §3.1): the followed
+            # hull's prompt is his wherever it is, never the prize master's; another hull's
+            # "captain" is her own captain's hand (the director's, a test's)
             return captive
         visitor = knowledge.players_visitor(world)
         if visitor is not None:

@@ -18567,4 +18567,12 @@ Brest from the Iroise (48° 18' N 4° 48' W) lays no course (the leg to the road
 and the port's `from_sea` track is not taken up from there): he beats without way for hours
 within five miles of the road. Not this package's (the chart's and the passage planner's);
 noted for the lead, and the test lands the prisoners from a captor already in the road.
-(4) `Person.liberty` and `Person.cartel` are new fields (defaults, nothing in old saves).
+(4) `Person.liberty` and `Person.cartel` are new fields (defaults, nothing in old saves). (5) The
+far brain dropped its mark on entering `taking possession` (the reset on leaving the detour
+states did not count the new one), so `prize taken` fired at once on a mark of None and he sailed
+on; the state is a detour state for the reset. (6) The captive's person was read as the giver of
+every "captain" order on every hull, the captor's own anchor included; he is the followed prompt's
+alone (`movement.person_of_actor`). (7) A far vessel whose plan runs out is done and gone from the
+sea at the minute's end, which ended the cartel at her own goal's arrival before her errand; her
+minute keeps her on the sea until her persons are landed, and lands them at once where she lies
+in her port's road already.

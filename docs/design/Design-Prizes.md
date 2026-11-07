@@ -1223,5 +1223,8 @@ the way**: the far brain forgot a struck mark's nation (she shows no colours) an
 `enemy struck`; the privateer's `chasing` rows had him evade a frigate that had struck to him as
 a superior force and a man of war (both judgements now pass a struck ship by); a rules captain
 bound for Brest from the Iroise lays no course through the goulet and beats without way (the
-chart's and the planner's, noted for the lead). The figures and the pins are in
+chart's and the planner's, noted for the lead); the far brain dropped its mark on entering
+`taking possession`; the captive's person was read as every hull's captain (he is the followed
+prompt's alone); a far vessel whose plan runs out is gone from the sea at the minute's end, so the
+cartel's minute keeps her until her persons are landed. The figures and the pins are in
 `docs/dev/TuningNotes.md`, "Package 74", step 3.

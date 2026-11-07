@@ -25,7 +25,11 @@ from freesail.world.things import things_of
 from tests.test_brains import put, world_at
 from tests.test_fight import FRIGATE
 
-BREST_ROAD = {"lat_deg": 48.3815, "lon_deg": -4.4935}
+BREST_ROAD = {
+    "lat_deg": 48.34181,
+    "lon_deg": -4.69340,
+}  # the road of Bertheaume, the port's outer road
+OFF_BREST = "bound for Brest"  # from her road, the port's own track in
 
 
 def _scenario(position: dict | None = None) -> Scenario:
@@ -44,7 +48,9 @@ def _scenario(position: dict | None = None) -> Scenario:
     )
 
 
-def _struck_to_a_crewed_frigate(seed: int = 7, position: dict | None = None):
+def _struck_to_a_crewed_frigate(
+    seed: int = 7, position: dict | None = None, her_goal: str = "bound for 48 20 N 4 50 W"
+):
     """The player's frigate at quarters with a French frigate crewed ten metres off her beam,
     her captain engaging by his own machine; the player strikes his colours and her captain
     takes possession within the quarter hour (`taking possession`: closed, hove to, `take
@@ -62,8 +68,8 @@ def _struck_to_a_crewed_frigate(seed: int = 7, position: dict | None = None):
             "name": "Medusa",
             "nation": "france",
             "position": there,
-            "goal": "bound for 48 20 N 4 50 W",
-            "intent": "bound for 48 20 N 4 50 W",
+            "goal": her_goal,
+            "intent": her_goal,
         },
         w.vessels.serial,
     )
@@ -292,7 +298,7 @@ def test_a_far_body_that_takes_the_players_ship_is_made_a_hull_and_holds_him():
     assert any(state == "taking possession" for _, state in f.brain.history)
     hull = f.crew
     assert hull is not None and hull.awake and hull.shape == "full"
-    assert f.id in w.vessels.crewed_ids
+    assert w.hulls[f.id] is hull and f.dealing_tick >= 0  # a dealing of the first rank
     assert w.followed == f.id and w.own is hull
     assert "aboard the Renard, in the cabin, a prisoner" in w.submit("where am i").text
     assert P.record_of(w.vessels.own)["how"] == "struck at far detail"
@@ -319,8 +325,11 @@ def test_the_prisoners_are_landed_to_the_agent_at_brest_and_a_cartel_brings_the_
     a day's sail."""
     from freesail.world import orders as WO
 
-    w, enemy = _struck_to_a_crewed_frigate(position=BREST_ROAD)
-    assert enemy.submit("come to an anchor").kind != "order.rejected"
+    w, enemy = _struck_to_a_crewed_frigate(position=BREST_ROAD, her_goal=OFF_BREST)
+    # her captain's own hand (the rule's actor): the followed prompt's "captain" is the
+    # captive's from the taking
+    out = enemy.captain.give("come to an anchor", why="the prisoners landed")
+    assert out.kind != "order.rejected", out.text
     for _ in range(10):
         w.run(60)
         if enemy.dealings.in_port() is not None:
@@ -347,7 +356,7 @@ def test_the_prisoners_are_landed_to_the_agent_at_brest_and_a_cartel_brings_the_
     e = w.world_order("cartel: a cartel from Brest for Captain Bowen", "the test")
     assert e.data.get("result") != "done" and "Nobody holds" in e.text
     # the cartel's road: a second scene with the captive aboard her still
-    w2, enemy2 = _struck_to_a_crewed_frigate(position=BREST_ROAD)
+    w2, enemy2 = _struck_to_a_crewed_frigate(position=BREST_ROAD, her_goal=OFF_BREST)
     doubt = WO.doubt(w2, WO.parse("cartel: a cartel from Falmouth for Captain Bowen"))
     assert doubt is not None and "beyond a day's sail" in doubt
     e = w2.world_order("cartel: a cartel from Brest for Captain Bowen", "the test")

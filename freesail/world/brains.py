@@ -386,11 +386,10 @@ class FarCaptain(Judgement):
             self._business.pop("fishing_tick", None)  # the trip's hours counted on the ground
         if state in ("investigating a stranger", "chasing", "evading"):
             self._business["since"] = self.world.clock.tick
-        if old in ("investigating a stranger", "chasing", "evading") and state not in (
-            "investigating a stranger",
-            "chasing",
-            "evading",
-        ):
+        # the mark in hand is kept through the detour states (package 74: `taking possession`
+        # keeps the struck mark he closes; it is dropped when he leaves them for a plan state)
+        detours = ("investigating a stranger", "chasing", "evading", "taking possession")
+        if old in detours and state not in detours:
             self._stranger = None
 
     # -- the plan ----------------------------------------------------------------------

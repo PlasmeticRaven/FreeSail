@@ -798,8 +798,9 @@ def cartel_minute(world: Any) -> list[tuple[Any, ...]]:
         return lines
     for v in list(sea.vessels):
         rec = getattr(v, "cartel", None)
-        if not rec or v.done:
+        if not rec or rec.get("landed_at"):
             continue
+        v.done = False  # her errand goes on whatever her own plan's end said of her
         if not rec.get("taken_off"):
             holder = _hull_of(root, rec["holder"])
             target = getattr(holder, "vessel", None) if holder is not None else None
@@ -853,6 +854,7 @@ def _cartel_takes_off(root: Any, v: Any, holder: Any, rec: dict[str, Any], lines
     rec["taken_at"] = tick
     port = (getattr(root.ports, "ports", {}) or {}).get(rec["port"])
     v.plan = [("to", port.outer_road.position, port.name)] if port is not None else []
+    v.done = False  # her errand goes on whatever her own goal's arrival said
     text = (
         f"{v.name[:1].upper()}{v.name[1:]}, under a flag of truce, takes off "
         f"{', '.join(taken) or 'nobody'} by the boat and shapes her course for "
@@ -864,7 +866,14 @@ def _cartel_takes_off(root: Any, v: Any, holder: Any, rec: dict[str, Any], lines
         text,
         data={"cartel": v.id, "persons": taken, "port": rec["port"]},
     )
-    lines.append((Severity.NOTABLE, "prize.cartel", text, {"cartel": v.id, "persons": taken}))
+    if port is not None:
+        from freesail.world.geo import bearing_and_distance
+
+        _, d = bearing_and_distance(v.position, port.outer_road.position)
+        if d <= 2.0 * units.NAUTICAL_MILE:
+            # she lies in her port's road already: landed at once (a vessel done is gone
+            # from the sea at the minute's end)
+            _cartel_lands(root, v, port, rec, lines)
 
 
 def _cartel_lands(root: Any, v: Any, port: Any, rec: dict[str, Any], lines: list) -> None:
@@ -889,10 +898,18 @@ def _cartel_lands(root: Any, v: Any, port: Any, rec: dict[str, Any], lines: list
         f"{v.name[:1].upper()}{v.name[1:]} comes into {port.name} and lands "
         f"{', '.join(names) or 'her people'} free; the exchange is her business ashore."
     )
-    lines.append((Severity.URGENT, "prize.cartel_landed", text, {"cartel": v.id, "persons": names}))
     holder = _hull_of(root, rec.get("holder"))
     if holder is not None:
-        holder.record(Severity.NOTABLE, "prize.cartel_landed", text, data={"cartel": v.id})
+        holder.record(
+            Severity.URGENT,
+            "prize.cartel_landed",
+            text,
+            data={"cartel": v.id, "persons": names, "port": port.id},
+        )
+    else:
+        lines.append(
+            (Severity.URGENT, "prize.cartel_landed", text, {"cartel": v.id, "persons": names})
+        )
 
 
 def cartel_doubt(world: Any, port: Any) -> str | None:
