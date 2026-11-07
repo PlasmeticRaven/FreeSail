@@ -397,10 +397,11 @@ def _after_sail_lines(ship: Ship) -> list[str]:
     fore-and-after with topsails as for a ship (a schooner's fore course; the *Neufchatel*
     on 28 December under a double-reefed foresail and a closely reefed mainsail, Cobb
     p. 95), and only the after take-ins, the aftermost course's and the driver's
-    (`after_gaff_sails`), are a square-rigged ship's. A fore-and-after keeps her mainsail,
-    her driving sail: no line of this list takes it in or reefs it. A course with no reef
-    bands stays as it is, and is named all the same, so that the order says why in its
-    "Not done" (the refusal of `reef`)."""
+    (`after_gaff_sails`), are a square-rigged ship's. So a fore-and-after has no sail taken
+    in by this list, and her gaff or boom mainsail, her driving sail, is neither taken in
+    nor reefed by it; a course, on whatever mast, is reefed once as any rig's with topsails
+    (the polacre probe's main course, which is her mainsail, among them). A course with no
+    reef bands is not named, as before the ruling."""
     from freesail.evolutions.scripts import after_gaff_sails
     from freesail.physics.sails import _square_rigged
 
@@ -425,8 +426,7 @@ def _after_sail_lines(ship: Ship) -> list[str]:
         courses = [sl for sl in courses if sl is not aftermost]
     if reefs >= 2:
         for sl in courses:
-            # one with no reef bands is named for the refusal's words, and stays as it is
-            if sl.reefs < sl.reef_bands or sl.reef_bands == 0:
+            if sl.reefs < sl.reef_bands:
                 lines.append(f"reef the {_name(ship, sl)}, one reef")
     if reefs >= 3 and square:
         for sl in after_gaff_sails(ship):

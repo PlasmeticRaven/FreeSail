@@ -506,13 +506,6 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_sail_by_name.py::test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb",
         # package 95, step 2: the identified sail's four cases together (11 s alone)
         "test_known_truths.py::test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost",
-        # package 75, the lead's ruling 1 (the short after swing): trial B settled 2,400 s and
-        # tacked as B3.4 measured her (6 s alone), 2026-11-07
-        "test_schooner_mast.py::test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_does",
-        # package 75, the lead's ruling 3 (place 2 with no mast carrying yards): trial B settled
-        # 2,400 s with her fore yards shot away and tacked as B3.4 measured her, the same sailing
-        # as ruling 1's above (2.4 s and 2.3 s alone on the owner's machine), 2026-11-07
-        "test_schooner_mast.py::test_trial_b_with_every_fore_yard_shot_away_swings_her_main_topsail_yard_round",
     }
 )
 

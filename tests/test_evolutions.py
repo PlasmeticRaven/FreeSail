@@ -740,18 +740,75 @@ def test_the_word_at_the_after_yards_haul_is_luces_by_the_main_course(path, fore
     assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == said
 
 
-def test_the_main_yard_shot_away_takes_the_mainsail_with_it_from_the_word():
-    """The main yard shot away, its course goes with it from the courses (`lowest_square_sails`
-    reads the working yards): the after yards left are hauled by "Main-topsail haul"."""
+@pytest.mark.parametrize("how", ["wrecked", "sent_down"], ids=["shot away", "sent down"])
+def test_the_main_yard_shot_away_takes_the_mainsail_with_it_from_the_word(how):
+    """The main yard shot away (or sent down), its course is no longer set, whatever its state:
+    the after yards left are hauled by "Main-topsail haul"."""
     from freesail.evolutions import scripts
 
     ship = load_ship(FRIGATE)
     for sid in ("fore.course", "main.course"):
         ship.sails[sid].state = SailState.SET
-    ship.spars["main.yard"].wrecked = True
+    setattr(ship.spars["main.yard"], how, True)
     assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == (
         "Rise tacks and sheets. Main-topsail haul"
     )
+
+
+@pytest.mark.parametrize(
+    ("fore", "settee", "said"),
+    [
+        (SET, SET, "Rise tacks and sheets. Mainsail haul"),
+        (UP, SET, "Rise tacks and sheets. Mainsail haul"),
+        (SET, UP, "Rise tacks and sheets. Main-topsail haul"),
+        (UP, UP, "Main-topsail haul"),
+    ],
+    ids=["both set", "fore hauled up", "settee lowered", "both down"],
+)
+def test_the_bilanders_settee_is_her_main_course_to_the_word(fore, settee, said):
+    """The bilander of `tests/rig_fixtures.py` has a settee bent on her main in place of the main
+    course, in her "courses" group and named her mainsail, her main yard dry: the word reads the
+    courses as her file names them (the review of the lead's ruling 2, 2026-11-07), so her settee
+    set is her mainsail set. Before that mend the word read the square courses alone and never
+    saw the settee: the first two cases said "Rise tacks and sheets. Main-topsail haul" and
+    "Main-topsail haul", the last two as here."""
+    from rig_fixtures import brig_with_settee
+
+    from freesail.evolutions import scripts
+
+    ship = brig_with_settee()
+    ship.sails["fore.course"].state = fore
+    ship.sails["main.settee"].state = settee
+    assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == said
+
+
+def test_the_bilander_tacks_with_her_settee_lowered_and_hauls_by_main_topsail_haul():
+    """In the tack her settee, a dipping sail, is lowered at "helm's a-lee" ("lower the
+    mainsail") and dipped round after the haul, so her main course is not set when the after
+    yards are hauled: "Rise tacks and sheets. Main-topsail haul.", her fore course's tacks and
+    sheets risen with it (the lead's ruling 2; "Rise tacks and sheets. Mainsail haul." before
+    it), then "Dip the mainsail" and "Let go and haul.". The stub's turn, the frigate's above."""
+    from rig_fixtures import brig_with_settee
+
+    ship = brig_with_settee()
+    for sid in ("fore.course", "main.settee"):
+        ship.sails[sid].state = SailState.SET
+    runner = Runner(ship)
+    wind = make_wind(from_deg=90.0, knots=10.0)
+    close_hauled_on_starboard(ship, wind)
+    for y in ship.spars.values():
+        if y.is_yard:
+            y.brace_angle = y.brace_limit  # braced up on the starboard tack
+    assert runner.start(ship, "tack", "ship") == "All hands about ship."
+    ticks, notes = run(runner, ship, wind, turner(0.4))
+    words = texts(notes)
+    assert kinds(notes)[-1] == "ship.tacked"
+    assert words[0] == "Ready about. Helm's a-lee; lower the mainsail."
+    haul = words.index("Rise tacks and sheets. Main-topsail haul.")
+    assert haul < words.index("Dip the mainsail; shift the tacks to the weather bow.")
+    assert haul < words.index("Let go and haul.")
+    assert not any("Mainsail haul" in w for w in words)
+    assert 240 <= ticks <= 600
 
 
 def test_tack_misses_stays_when_she_loses_her_way():

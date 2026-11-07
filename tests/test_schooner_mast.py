@@ -680,27 +680,38 @@ def test_the_after_take_ins_are_a_square_rigged_ships_alone(monkeypatch):
     ]
 
 
-def test_a_course_with_no_reef_bands_is_named_and_stays_as_it_is():
-    """The lead's ruling 4: a course with no reef bands in her file stays as it is at the topsails'
-    second reef, and `shorten sail` names it, so that its "Not done" says why (the refusal of
-    `reef`). Trial A with her fore course filed with none, in memory (no rig, filed or in
-    memory, has such a course)."""
+def test_a_course_with_no_reef_bands_is_not_named_and_stays_as_it_is():
+    """The lead's ruling 4 keeps the courses' reef as it was and gates only the after take-ins:
+    a course with no reef bands in her file is not named at the topsails' second reef, in a
+    fore-and-after as in a square-rigged ship, and stays as it is. Trial A with her fore course
+    filed with none, in memory, and the frigate with hers so read (no rig, filed or in memory,
+    has such a course). At the ruling's build the list named it, so that "shorten sail" said
+    in its "Not done" "'reef the fore course, one reef': The fore course has no reef bands; it
+    is set whole or not at all."; the review of 2026-11-07 took that out, the ruling not naming
+    it (the lead's)."""
     doc = schooner_with_fore_course_doc()
     for sail in doc["sails"]:
         if sail["id"] == "fore.course":
             sail["reef_bands"] = 0
     ship = _under_plain_sail(ship_from_dict(doc, "tests/test_schooner_mast.py:no-reef-bands"))
     ship.sails["fore.topsail"].reefs = 1
-    assert _after_sail_lines(ship) == ["reef the fore course, one reef"]
+    assert _after_sail_lines(ship) == []
     Runner(ship)
     ship.dyn.apparent_wind_angle = math.radians(-60.0)
     ship.dyn.apparent_wind_speed = 6.0
     _kind, words, data = orders.handle(ship, "shorten sail")
-    said = "'reef the fore course, one reef': The fore course has no reef bands; it is set whole"
-    assert said in words
-    assert "reef the fore course, one reef" not in [o["order"] for o in data["orders"]]
+    assert "fore course" not in words
+    assert not any("fore course" in o["order"] for o in data["orders"])
     course = ship.sails["fore.course"]
     assert course.is_set and course.reefs == 0
+    frigate = _under_plain_sail(load_ship(ROOT / "data" / "ships" / "frigate-36.yaml"))
+    frigate.sails["fore.course"].reef_bands = 0
+    for sid in frigate.groups["topsails"]:
+        frigate.sails[sid].reefs = 1
+    assert _after_sail_lines(frigate) == ["reef the main course, one reef"]
+    for sid in frigate.groups["topsails"]:
+        frigate.sails[sid].reefs = 2
+    assert _after_sail_lines(frigate) == ["take in the main course", "take in the mizzen spanker"]
 
 
 def test_no_committed_fore_and_after_has_a_course_reefed_by_the_gale():

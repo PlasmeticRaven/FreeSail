@@ -1424,7 +1424,8 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   pickle and checkpoint is as it was (tested). **Judgement:** a lug's yard and a lateen yard are no
   braced yard (`Spar.is_yard`), so neither makes a mast one with yards nor stands as its lower yard.
 - **Read at places 1 and 3 alone** (`_masts_with_yards` skips such yards; `_square_rigged` counts
-  none); `working_yards`, place 2, `light_sails_forward_of`, trim and "shorten sail" and the physics
+  none; read since by the lead's rulings 1 and 3, below, for the tack's after swing and at place 2
+  with no mast carrying yards); `working_yards`, place 2, `light_sails_forward_of`, trim and "shorten sail" and the physics
   untouched (§12.2 items 5 and 6). No committed file trips it (the guard on the fifteen files, the
   boats among them), so no row of the golden table moved, nor the razee's and the 64's.
 - **The classing in memory**, through the golden table's gates, old beside new:
@@ -1531,11 +1532,20 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   gale of the reviews trial B and the main topgallant reef their fore course once again (at
   4,864 s and 4,877 s, reefed at 5,281 s and 5,358 s, the seconds they reefed it at before the
   rule), trial A hers (4,854 s), the mainsail kept set and whole, and all three lie a-try as before
-  under the fore topsail and the staysails; a course with no reef bands is named and left as it
-  is, the order saying why. No file moved: the cutter, the smack and the two schooners as filed
-  sail that gale line for line, and the four whole logs are as at SW-4. Cobb's closely reefed
-  mainsail is not built: no line of "shorten sail" reefs a fore-and-after's mainsail (the
+  under the fore topsail and the staysails; a course with no reef bands is left as it is and is
+  not named, as before the ruling (named at the build, the order saying why; taken out at the
+  review, the ruling not naming it). No file moved: the cutter, the smack and the two schooners as
+  filed sail that gale line for line, and the four whole logs are as at SW-4. Cobb's closely reefed
+  mainsail is not built: no line of "shorten sail" reefs a fore-and-after's gaff mainsail (the
   lead's).
+- **The review's mends (2026-11-07; the tuning notes, as above):** the word at the haul reads the
+  main course from her own "courses" group, on the after yards' foremost mast, where it read the
+  square courses alone: the bilander's settee is her main course to it, and as it is lowered at
+  "helm's a-lee" to be dipped, her after yards are hauled by "Rise tacks and sheets. Main-topsail
+  haul." as ruling 2 made it, no log of hers or of any rig moving with the mend; the gale's
+  reduction names no course without reef bands (above); trial B's two tacks of rulings 1 and 3
+  are sailed in the fast tier, being under its threshold. The fore course's rise said with "Main-topsail
+  haul" when her mainsail is not set stays as built, the lead's (ruling 2's lean (a)).
 
 ### 12.3 What the viewer builder (B5) is asked
 

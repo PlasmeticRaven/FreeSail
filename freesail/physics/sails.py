@@ -871,11 +871,11 @@ def _square_rigged(ship: Ship) -> bool:
     docs/design/Design-Ship-PrinceDeNeufchatel.md §12.2a), so that a schooner with yards on
     her main above it (the hermaphrodite's main topgallant, a main topsail) steers as a
     fore-and-after, and the gale's reduction (`orders.storm._after_sail_lines`) takes her as
-    a fore-and-after: it keeps her mainsail, whole, taking in no after sail of hers, the
-    after take-ins being a square-rigged ship's alone; her course is reefed at the topsails'
-    second reef as any rig's with topsails (the lead's ruling 4 of 2026-11-06; Luce 1884
-    p. 476, and the *Neufchatel* on 28 December under a double-reefed foresail and a
-    closely reefed mainsail, Cobb p. 95, her §12.2 item 4)."""
+    a fore-and-after: it keeps her gaff mainsail, whole, taking in no after sail of hers, the
+    after take-ins being a square-rigged ship's alone; her fore course is reefed at the
+    topsails' second reef as any rig's course with topsails (the lead's ruling 4 of
+    2026-11-06; Luce 1884 p. 476, and the *Neufchatel* on 28 December under a double-reefed
+    foresail and a closely reefed mainsail, Cobb p. 95, her §12.2 item 4)."""
     rigged = ship.extra.get("sails.square_rigged")
     if not isinstance(rigged, bool):
         masts = {

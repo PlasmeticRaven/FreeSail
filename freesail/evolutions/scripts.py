@@ -1094,30 +1094,38 @@ class TackScript(Script):
         course is not set (none bent, or hauled up), "Rise tacks and sheets. Mainsail haul."
         kept for a main course set.
 
-        The mainsail is the main course: the course (`lowest_square_sails`) on the foremost of
-        the after yards' masts, the main of a ship and of a brig; a schooner's main crosses
-        none, so hers is never set. A course is set when it is set or goose-winged, its weather
-        clew down and drawing, as the readings count a sail drawing (judgement: the ruling's
-        "none bent, or hauled up" names neither); hauled up or in the gear, furled, loosed,
-        blown out, unbent, or its yard shot away, it is not. "Rise tacks and sheets" is said
-        while any course is set, and not with none set: every course's clews are up already
-        and there is nothing to rise (Luce's own gloss of the order). With the fore course set
-        and the main not it is said as before, of the fore's: Luce does not settle that case's
-        words (pp. 419, 428 and 446 rise the fore tack apart, by its name, before "let go and
-        haul"), and the lead holds it."""
+        The mainsail is the main course: of her courses as her file names them (its "courses"
+        group, as the gale's reduction reads them, `orders.storm._after_sail_lines`), the one
+        on the foremost of the after yards' masts (`Ship.mast_of`): the main course of a ship
+        and of a brig, and the bilander's settee, bent on her main in its place and named her
+        mainsail (`tests/rig_fixtures.py`, her main yard dry), which as a dipping sail is
+        lowered at "helm's a-lee" and so is not set when her after yards are hauled; a
+        schooner's main crosses none, so hers is never set. A course is set when it is set or
+        goose-winged, its weather clew down and drawing, as the readings count a sail drawing
+        (judgement: the ruling's "none bent, or hauled up" names neither); hauled up or in the
+        gear, furled, loosed, blown out, unbent, or its yard shot away or sent down, it is not.
+        "Rise tacks and sheets" is said while any course is set, and not with none set: every
+        course's clews are up already and there is nothing to rise (Luce's own gloss of the
+        order). With the fore course set and the main not it is said as before, of the fore's:
+        Luce does not settle that case's words (pp. 419, 428 and 446 rise the fore tack apart,
+        by its name, before "let go and haul"), and the lead holds it."""
         ship = self.ship
-        after = {y.id for y in self.after}
-        any_set = False
-        main: tuple[float, bool] | None = None  # the foremost after course: its mast's x, set
-        for sl in lowest_square_sails(ship):
-            drawing = sl.is_set or (sl.state is SailState.GOOSE_WINGED and not sl.wrecked)
-            any_set = any_set or drawing
+        masts = [m for m in (ship.mast_of(y) for y in self.after) if m is not None]
+        main_mast = max(masts, key=lambda m: m.x_m) if masts else None
+        any_set = main_set = False
+        for sid in ship.groups.get("courses") or []:
+            sl = ship.sails.get(sid)
+            if sl is None:
+                continue
             yard = ship.yard_of(sl)
-            mast = ship.parent_of(yard) if yard is not None else None
-            if yard is not None and mast is not None and yard.id in after:
-                if main is None or mast.x_m > main[0]:
-                    main = (mast.x_m, drawing)
-        haul = "Mainsail haul" if main is not None and main[1] else "Main-topsail haul"
+            standing = yard is None or not (yard.wrecked or yard.sent_down)
+            drawing = standing and (
+                sl.is_set or (sl.state is SailState.GOOSE_WINGED and not sl.wrecked)
+            )
+            any_set = any_set or drawing
+            if drawing and main_mast is not None and ship.mast_of(sl) is main_mast:
+                main_set = True
+        haul = "Mainsail haul" if main_set else "Main-topsail haul"
         return f"Rise tacks and sheets. {haul}" if any_set else haul
 
     def begin(self, words: dict[str, Any]) -> None:

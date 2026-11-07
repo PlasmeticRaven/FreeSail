@@ -3040,10 +3040,9 @@ GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # package 75, B3.4, the lead's ruling 2 (the word by Luce 1884 p. 417): put about off Black Head
 # with both courses hauled up in the gear, the frigate hauls her after yards by "Main-topsail
 # haul." where she said "Rise tacks and sheets. Mainsail haul."; every tick and line the same,
-# proved by bisection (the old word restored gives 6f062dc60419f52c again; TuningNotes, B3.4)
-GATE_5B_THICK_DIGEST = (
-    "9ce8174ebc6948c6"  # ruling 2 (6f062dc60419f52c, the well, 2026-10-21; 155a46cede6c96a3 at 57)
-)
+# proved by bisection (the old word restored gives 6f062dc60419f52c again; TuningNotes, B3.4);
+# before it: 6f062dc60419f52c, the well, 2026-10-21; 155a46cede6c96a3 at 57, e358748a1eae5fc6 at 45
+GATE_5B_THICK_DIGEST = "9ce8174ebc6948c6"  # ruling 2 (6f062dc60419f52c before it, above)
 
 
 def the_landfall(log):
