@@ -25,7 +25,10 @@ def test_every_root_has_the_six_files_in_one_shape_and_the_nations_name_theirs()
             assert e.number is not None and e.meaning and e.source, (root, e.meaning)
             assert set(e.does) <= {"order", "state", "news", "answer", "closer", "release"}, e
         for e in [*b.night, *b.fog]:
-            assert e.made and (e.show or e.fire), (root, e.meaning)
+            # 71's were all made; 76 read the British night book (1799) and fog book (1796)
+            # from the page: an entry is made, or it carries the page's number and its source
+            assert e.show or e.fire, (root, e.meaning)
+            assert e.made or (e.number is not None and ("179" in e.source)), (root, e.meaning)
     table = load_nations()
     for n in table.nations.values():
         assert S.books_for_nation(table, n.id).root == n.signals_root
@@ -49,7 +52,7 @@ def test_the_british_book_keeps_the_numbers_remembered_and_marks_the_rest_made()
     e, _ = b.find("to chase")
     assert e.does == {"state": "chasing"}
     assert b.find("the convoy to tack in succession", "convoy")[0].number == 5
-    assert b.find("tack", "fog")[0].fire == "two guns"
+    assert b.find("tack", "fog")[0].fire == "three guns, two quick and one slow"  # 1796, fog No. 8
     assert b.find("a sentence the book lacks") is None
 
 
@@ -242,7 +245,7 @@ def test_a_hoist_is_seen_at_the_flags_range_and_read_a_minute_later_by_the_books
     )
     assert (
         heard[0].kind == "signal.read"
-        and heard[0].text == "The brig fires two guns: tack together."
+        and heard[0].text == "The brig fires three guns, two quick and one slow: to tack."
     )
     sender.tidy(100 + 60 + 1800, books.flies_s)
     assert h.down is not None
