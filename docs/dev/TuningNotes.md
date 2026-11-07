@@ -18852,4 +18852,9 @@ tier whole exit 0 (run alone in the pinned worktree 06:13:24 to 07:02:56 after t
 restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree at
 6b717f6: fast exit 1 by the two files' meeting alone, three tests (07:08:42 to 07:48:48), the slow tier of
 the touched files and the known truths exit 0 (07:48:48 to 08:28:02), the pace tests alone exit 0
-(13 passed, 08:28:02 to 08:32:49). The final tree, with the meeting resolved: below.
+(13 passed, 08:28:02 to 08:32:49). **The final tree, f764616** (the meeting resolved), in a worktree
+pinned at it, ruff check and format clean: the fast tier whole exit 0 (08:39:17 to 09:18:18; 444 slow
+tests left out as the tier's rule), the slow tier of the touched files (`test_prizes`,
+`test_squadrons`, `test_fight`, `test_subtypes`, `test_captains`) and the known truths with
+`test_profile` and `test_indefatigable` exit 0 (09:18:18 to 10:00:58), the pace tests alone and
+last exit 0 (13 passed, 10:00:58 to 10:05:33; no floor lowered).
