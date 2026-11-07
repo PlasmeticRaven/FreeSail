@@ -3030,7 +3030,7 @@ green, 6,973 passed, 11 skipped, 12 xfailed, no failure; the pace job (informati
 floor tests short of 500 (490, 457, 433; truth 51's frigate held) where run 50 held 13 of 13 and the
 builder measured 13 of 13 at f764616 on its machine; the lead ran the pace alone on the build
 machine at the trunk head after it (d244be4c, nothing else on the CPU): the known truths' eleven pace tests 11 of 11, exit 0 (the
-three the runner failed among them), the whole thirteen 13 of 13, exit 0 (12:09 to 12:17 UTC); so the shared runner's hour again,
+three the runner failed among them), the whole thirteen 13 of 13, exit 0 (12:09 to 12:14 UTC); so the shared runner's hour again,
 as runs 48 and 49. Step 3 (the captive's channel) follows at its boundary, then 4
 to 7 the same, one at a time.
 
