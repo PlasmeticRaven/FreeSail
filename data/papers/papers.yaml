@@ -63,6 +63,14 @@ papers:
   # the news of the war (the owner's fifth note): what the ship knows of the war is the
   # table she sailed with and every change the news brought her, entered here as a price
   # is, with where and when it came; the reading `the war` gives the same page
+  # package 74 (spec M7 §20; docs/design/Design-Prizes.md §7): the captain's record, the
+  # thing a career remembers (the loss of a ship, the court martial and its verdict, the
+  # appointment), carried into a new command's scenario as `papers.record`
+  - handle: the captain's record
+    keeper: captain
+    place: cabin
+    source: record
+    words: the captain's record, the losses, the courts martial and their verdicts, the appointments, as the service keeps it
   - handle: the news of the war
     keeper: captain
     place: cabin

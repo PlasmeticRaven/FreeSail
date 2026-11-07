@@ -1281,3 +1281,48 @@ people cannot know); the reserved fourth is paid by the record's day from the pr
 second port job; the salvage is paid to the recaptors alone by their nation's court and scheme, the
 enemy's consorts in sight at the first strike sharing nothing of it. The figures and the finds are
 in `docs/dev/TuningNotes.md`, "Package 74", step 5.
+
+### Step 6: the court martial, a new command, and the consent revision drafted (§6, §7; 2026-11-07)
+
+**Built as designed**: §7.1 and §7.2 (`world/court.py`: the court sat by the form at a place of
+the port made for the sitting, the accused before it, the president and the judge advocate found
+there; the questions through `say as` heard at the place; the accused's own `say to the court:
+...`; the log of the action read by the judge advocate; the verdict one of `VERDICTS`, a world
+order journaled as every form is, the play log carrying the sentence read and never the order;
+`Person.record` kept in the save, read as `the record` and as the paper "the captain's record";
+`command: a new command for <person>: the <description> "<name>" at <port>` writing a scenario
+under the saves by 96's writer with his name, his followers and the record, the hooks named for
+M8), §6 (`docs/design/ConsentRevision-AdversarialSeats.md`, the text in the brief's voice and
+sections for the three roles, with a paragraph for the owner; the flag `seats.ADVERSARIAL_SEATS_
+CONSENTED` and the refusal in words at the director's seat and the desk's door, adversarial read
+from the world at the seating, the captain's station alone; nothing under `docs/agents/consent/`
+or in `docs/agents/ConsentBrief.md` touched; the suite's seats audited: none adversarial); truths
+7-364 to 7-366; the primer's chapter 27 "The court martial, and a new command"; the forms in the
+director's table and chapter 20. **Taken another way**: the accused speaks through a verb of the
+prize orders (the court is no station); the court's officers are persons of the sitting, gone at
+the verdict; the brief's `limits:` row for the verdict is not built; the exchange is a `person:`
+form of its own (`is exchanged at <port>`), doubted within a day of his landing; a scenario may
+name the player's ship (`ship.name`, honoured by the loader, nothing recorded moved). **Found on
+the way**: the player's own ship's captain is her prize master after the taking, so the freed
+player's prompt wanted a memory of who he is (`captive.PLAYERS_PERSON_KEY`); his nation for the
+court is his lost ship's, not his prize's colours; the dry run of a form that writes a file wrote
+it (the copy is marked, the form says what it would write). The figures and the finds are in
+`docs/dev/TuningNotes.md`, "Package 74", step 6.
+
+### Step 7: the records and the last truths (§8; 2026-11-07)
+
+**Built as designed**: the scenarios `prize-home.yaml` and `captive.yaml` with the starter brief
+`captive`, each loaded and begun in the fast tier (the possession and the strike the scenarios'
+own world orders two minutes in, by two forms this step adds: `ship "<name>": a prize of the
+<captor>` and `ship "<name>": struck to the <captor>`, journaled and so replayed, doubted after
+the first minute); the truth's rows for the prizes, the prisoners and their paroles, the far
+actions and the courts; the forms' dry runs in `test_director`'s table; the replay by both roads
+of a captive's passage and a far fight's (7-368); spec M7 §11a, §18 to §20 and §29 as built;
+Harness §21i; the primer's chapter 27 in-world; the forms and the events tables; the tuning notes
+whole; these postscripts; truths 7-367 and 7-368. **Taken another way**: the scenarios' starts
+are world orders rather than new scenario keys (the replay gives a world order again; a key the
+loader read at the start would have wanted a second road); the captive's brief carries the forms'
+own examples (the cartel, the parole, a gale). **Found on the way**: a vessel a test adds by hand
+is in no journal (the replay truths put theirs on the sea by the forms); two frigates of one file
+draw one seed's wardroom names. The figures are in `docs/dev/TuningNotes.md`, "Package 74", step 7
+and "The package whole".

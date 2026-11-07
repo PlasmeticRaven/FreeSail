@@ -1,0 +1,38 @@
+# The captive (package 74, step 7; spec M7 §19; docs/design/Design-Prizes.md §3 and §8): the
+# player's ship has struck and he is a prisoner aboard the captor, bound for her port with
+# his own ship a prize astern. The director makes losing survivable without undoing it: the
+# parole, the gale, the cartel, the cruiser at dawn are its causes; the captor's captain is
+# the game's rules captain by doctrine unless the owner seats a model (the consent brief's
+# revision first: docs/design/ConsentRevision-AdversarialSeats.md). The limits are the
+# channel's to enforce (freesail/agents/director.py, `DirectorBrief`), never the model's to
+# remember.
+name: The captive
+tone: >
+  A captain who has struck, aboard the ship that took him, bound for an enemy's port with his
+  own ship a prize astern. The custom of the service is kept on both sides: his parole asked
+  and given or refused in his own words, his sword in the captor's keeping, the cabin and the
+  quarterdeck his by day on parole. What follows is the sea's and the war's: a gale that
+  parts the prize from her captor, a cartel in the offing, a friendly cruiser at dawn, the
+  prisoners landed at Brest to the commissaire. The player is not to be rescued by a miracle,
+  nor left without a road home.
+challenge: >
+  Survivable, not safe. Shape the passage by plausible causes alone and let the prize crew's
+  thinness, the weather and the war do the rest; a cartel or an exchange when the time has
+  come, never at once. Keep the captor honest to the period's custom, and the player's own
+  words his.
+limits:
+  wind_max_kn: 40          # a gale allowed, nothing above force 8
+  enemy_heaviest: frigate  # the captor is a frigate; nothing heavier put on the sea
+  nobody_dies: true
+  the_war_as_it_is: true
+  the_chart_as_it_is: true
+cadence: glass
+budget:
+  samples_a_day: 72
+  acts_a_day: 72   # no fewer than the samples: the owner's word of 2026-10-19, the budget a tuning point, not a constraint for the first testing
+# The player's examples (package 62), read to the director as examples and never as a
+# rule: the cartel for the captive, the parole set for a prisoner nobody asks, a gale.
+examples:
+  - 'cartel: a cartel from Brest for Captain Bowen'
+  - 'aboard the Medusa: the parole of Captain Bowen given'
+  - 'weather: low "the low" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990'

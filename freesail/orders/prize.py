@@ -151,6 +151,18 @@ def execute(ship: Any, order: Order) -> Result:
     verb = order.verb
     words = str(order.object or "")
     world = _world(ship, verb)
+    if verb == "say to the court":
+        # the accused's own words before the court martial (package 74, step 6; the design's
+        # §7.1): his, by the actor's person, wherever his prompt's hull lies
+        from freesail.world import court as CM
+        from freesail.world.movement import person_of_actor
+
+        actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+        person = person_of_actor(world, actor)
+        try:
+            return CM.accused_speaks(world, person, words)
+        except CM.CourtError as e:
+            raise OrderError(str(e)) from None
     if ship.extra.get("struck"):
         raise OrderError("Our own colours are struck: nothing of a prize is ours to order.")
     own = _own_vessel(world)

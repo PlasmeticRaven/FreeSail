@@ -648,6 +648,13 @@ def write_damage(vessel: Any, crew: CrewedWorld) -> None:
     d["spars_gone"] = sum(1 for sp in ship.spars.values() if getattr(sp, "wrecked", False))
     d["sails_blown_out"] = sum(1 for sl in ship.sails.values() if sl.state == SailState.BLOWN_OUT)
     d["slept_at"] = int(crew.parent.clock.tick)
+    # what her parts show is carried in already (package 74, step 4: the far rounds' sums
+    # added while she sleeps are what the wake applies to the parts, `far_damage_into_parts`;
+    # before this the demotion's own sums were applied again at the wake, the wounded twice)
+    d["carried_in"] = {
+        k: int(d.get(k, 0) or 0)
+        for k in ("killed", "wounded", "dismounted", "holes", "holes_below", "spars_gone")
+    } | {"sail_cut": float(d.get("sail_cut", 0.0) or 0.0)}
 
 
 def demote(world: World, vessel: Any) -> None:

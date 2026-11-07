@@ -393,6 +393,8 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     # the file's default when the scenario says none
     if ship.get("fit") is not None:
         sc.fit = " ".join(str(ship["fit"]).split()) or None
+    if ship.get("name"):
+        sc.ship_name = " ".join(str(ship["name"]).split())
     # the papers whole (spec M5 §27; package 36): the epitome and the chronometer may be
     # given under `papers:` beside the chart's year and the almanac; the ship's line wins
     papers_raw = raw.get("papers") or {}

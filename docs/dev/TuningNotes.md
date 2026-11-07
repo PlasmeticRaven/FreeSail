@@ -18607,8 +18607,28 @@ at a cable ends **35 seconds** after the first shot on this tree (fourteen guns 
 design measured three minutes from the docstring's band, not the figure), the far rounds of the
 same two **in two rounds, six minutes**: within two rounds and not one, pinned as found, no table
 moved for the agreement's sake; the far fight cannot end before its first round at 180 s and is
-the coarser by design (rule 5). **The pins moved by the wiring**: measured below with the toggle at
-the step's boundary (the passages 7-152, 7-153, 7-154, 7-159, 7-160 and the far-side files' tests).
+the coarser by design (rule 5). **The pins moved by the wiring** (the toggle `far_action.ENABLED`
+off beside on, the far-side files' tests and the pinned passages run on the step's tree): the
+recorded passages **7-152, 7-153, 7-154, 7-159 and 7-160 did not move** (their digests pass with
+the far fight on: no far pair in anger within gun's reach in any of them; the convoy's cut-out of
+7-153 yields at hail as before, §4.3's rule). **Three tests moved, one by the wiring's intent and
+two by faults it uncovered.** (1) `test_brains`' cruiser-and-merchant hail (seed 7, the French
+brig-sloop Renard bound for Brest on the British schooner Betsey stripped of her way): old, the
+brig chased her, spoke her within hail and she **yielded** to him by 72's rule, struck at tick
+2,280 and his prize in company; new, the brig **engages** at 1,860, one round at seven cables at
+2,040 and she strikes by morale ("the hands would not stand to the guns"), possession at 2,280:
+**the same possession at the same minute by another road, a round fired**; re-pinned (the states
+`engaging` and `taking possession` in his history, her `struck`; his last state at the check is
+`on passage` or `investigating a stranger`, the frigate hove to at his horizon's edge fourteen
+miles off deciding it by the minute, old 3,840 against new 2,400 for the same investigation).
+(2) `test_crews`' sleep-and-wake: a fault, not a pin: the demotion's own sums (three wounded, a
+gun, a hole) were applied to her parts again at the wake (six wounded), since `write_damage` wrote
+no `carried_in`; mended: what her parts show is carried in, the wake applies the far rounds'
+additions alone. (3) 7-352's retaking cutter: the cruiser came up `engaging` the French-flagged
+prize, she yielded to him, and he stayed `engaging` over a ship of his own nation; mended: the
+recaptor's captain speaks her and resumes his passage at the retaking. The fallback (`FALLBACK_
+COUNT`): no passage of the suite has a far ship engaging an awake hull with the cap full; the road
+is exercised by `test_far_action`'s own test and counted there.
 
 ### Step 5: the prize court and the money (the design's §5)
 
@@ -18666,3 +18686,97 @@ salvage of the brig X (the French privateer Vengeur retaking her from the Amazon
 of her hull, guns, powder and shot, the Vengeur's whole; the reserved fourth on a privateer brig
 of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
 seventh day.
+
+### Step 6: the court martial, a new command, and the consent revision drafted (the design's §6, §7)
+
+**Built as designed** (`freesail/world/court.py`; the channels `court` and `command` in
+`world/orders.py` with `person: "<name>" is exchanged at <port>`; the verb `say to the court`
+through the prize orders; `Person.record` as a list the court writes and the paper "the captain's
+record" reads; the reading `the record`; the scenario's `ship.name` and `people[].record` honoured
+by the loader; the flag `seats.ADVERSARIAL_SEATS_CONSENTED` and `prizes.adversarial_seat_why` at
+the director's seat and the desk's door; `docs/design/ConsentRevision-AdversarialSeats.md`): the
+court as the director's proceeding at a place of the port (made for the sitting, gone at the
+verdict), the accused brought before it, the president's and the judge advocate's persons found
+there, the questions by `say as` heard at the place, the accused's own words, the log of the
+action read (the hull's lines of the action, else her story's), the verdict one of the five the
+period's courts gave for the loss of a ship, journaled as every form is and read as the court's;
+the new command written by 96's writer under the saves (`saves/new-command-<ship>-<date>.yaml`),
+his followers the persons ashore at the same port whose record has the same loss (the officers'
+records carry the loss with the captain's, hooked at the possession). Truths 7-364 to 7-366.
+
+**The scene** (seed 7, the frigate struck to a French frigate in Brest's road, carried in and
+landed to the commissaire): exchanged at Falmouth by the form (doubted: "landed 0 hours ago: an
+exchange takes its time"; performed with a reason), the court sat on him at Falmouth (doubted at
+Brest: "a port of his own nation, and Captain Bowen is British"), the president's question in his
+mouth, the accused's answer his own, the judge advocate's reading of the action's lines, the
+verdict acquitted with honour; his first lieutenant exchanged after him follows him into the
+cutter Alert at Falmouth; the scenario loads, the record reads aboard her and her paper carries
+it. The whole takes some two minutes of wall on this container (the far frigate's possession and
+the port's landing the most of it).
+
+**Taken another way.** (1) The accused's words are a verb of the prize orders (`say to the court`,
+object `prize`), not a `say to <station>` of the people's grammar: the court is no station and the
+words want no answer owed. (2) The court's officers are made as persons ashore at the court's place
+for the sitting and removed at the verdict (the port keeps no court martial between sittings;
+witnesses are the director's `say as`). (3) The verdict's limits row of the brief is not built: the
+director decides every cause by the brief as it stands. (4) The `person: ... is exchanged` form
+takes a landed prisoner or one held aboard; one who is neither is refused, and the exchange's doubt
+is the day since his landing. (5) A scenario may name the player's ship (`ship.name`): the files
+named her alone before; the tender's file names hers as her file does, so nothing recorded moves.
+
+**Found on the way.** After the exchange the player's own ship's "captain" is her prize master
+(rehomed into her company at the possession), so the followed prompt and `where am I` fell to the
+captor's captain; the taking now writes the root's memory of the player's person
+(`captive.PLAYERS_PERSON_KEY`), which outlives the captive's record, and `knowledge.players_person`
+and `movement.person_of_actor` read it while he is ashore. The loss entered at the possession had to
+read the person's nation from the record (`nation_was`): his ship a prize flies her captor's
+colours, and the court at Brest would have been his own nation's. The director's dry run performs
+on a copy of the world: a form that writes a file would have written it (the dry run of the new
+command wrote a scenario under `saves/` before the copy was marked `dry_run` and the form made to
+say what it would write).
+
+**The suite's seats audited** (the design's §6): no test seats a model at the captain's station
+of a hull at war with the player's; the far hail's two hulls, the convoy's and the squadron's
+seats and the director tests' Harpy (French, at a station other than the captain's or with no war
+read at the seating) are not adversarial by the rule; the refusal is exercised by `test_court.py`
+alone, and the flag is turned and turned back there.
+
+### Step 7: the records and the last truths (the design's §8)
+
+**Built**: `data/scenarios/prize-home.yaml` (the Amazon off the Lizard for Falmouth with the Deux
+Frères her prize in company, the business on, the quiet passage's brief) and `captive.yaml` (the
+Amazon struck to the Didon in the mouth of the Channel, the player her prisoner bound for Brest
+with his own ship a prize astern, the captive's starter brief `data/director/briefs/captive.yaml`
+with its causes: a gale, a cartel, a cruiser at dawn), each loaded and begun in the fast tier; the
+two forms the scenarios' starts wanted, `ship "<name>": a prize of the <captor>` and `ship
+"<name>": struck to the <captor>` (world orders, journaled, so that a replay makes the taking
+again; doubted after the first minute: afterwards a ship strikes to the guns); the director's
+truth's rows (every prize with her captor, her crew and her prisoners, where bound and in company
+or parted; every hull's prisoners with their paroles; every far action in its rounds; the courts
+pending and sat; a court martial sitting); the replay by both roads of a passage with the player
+taken, the parole exchanged and the captor under way an hour, and of a far fight's passage (the
+`far` stream opened at the first round and drawn again alike); spec M7 §11a, §18 to §20 and §29
+as built; `docs/agents/Harness.md` §21i; the primer's chapter 27 through `test_in_world.py`
+("later milestone's" and "later packages'" were not in-world and are "not yet in the game"); the
+library's forms table in chapter 20 and the events in chapter 11; the work packages' paragraph on
+97's pin. Truths 7-367 and 7-368.
+
+**The scenes' figures** (seed 7): the prize-home world order two minutes in finds the brig a full
+ship beside the frigate and takes her with Mr Ward and twenty-one hands, her 121 people prisoners
+(the brig's one file, 75's); the captive world order two minutes in promotes the Didon and takes
+the Amazon with Mr Gordon and twenty-one hands, her 264 people prisoners, the parole asked a minute
+after in the French row's words. **Found on the way**: two frigates from one file draw the same
+wardroom names from one seed (the Didon's master's mate is a Mr Gordon as the Amazon's is), told
+apart in the one registry by their homes; a vessel a test adds by hand (`tests.test_brains.put`)
+is in no journal and a replay cannot make her again, so the replay truths put their ships on the
+sea by the director's forms.
+
+### The package whole: what moved, and the suites
+
+The pins moved by the package, each with its reason, old beside new: 7-181 (step 2: the prize
+possessed at once), 7-325 (step 2: 72's cut-out a possession on the records), 97's officer-killed
+test (step 2: the party's leader-on), 72's cut-out (7-352, step 2 and step 4), test_brains' hail
+scene (step 4: a round fired where she yielded at hail, the same possession), and the agreement
+pinned as found (7-359). No recorded passage's digest moved for the far fight (the toggle, step 4).
+The two faults the wiring uncovered (the wake's doubled damage, the recaptor's state) are mended,
+not re-pinned. The suites' results on each step's final tree are recorded under the steps above.

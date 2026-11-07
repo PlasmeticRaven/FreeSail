@@ -14272,6 +14272,107 @@ def test_truth_7_361_the_far_rounds_cost_the_frigates_tick_nothing_it_cannot_pay
 
 
 @pytest.mark.slow
+@pytest.mark.slow
+def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place():
+    """The design's §7.1 (the brief's §20 court): the captive landed at Brest and exchanged at
+    Falmouth by the director's form (doubted within a day of his landing), the court sat at the
+    port's place by the form (refused for a man who lost no ship, doubted at a port not his
+    nation's), its questions through `say as the president of the court` heard at the place and
+    answered by the accused's own `say to the court: ...`, the log of the action read by the
+    judge advocate, the verdict a world order journaled in the inputs and the director's log,
+    the play log carrying the sentence read and never the order, his record keeping the loss,
+    the court and the verdict; and (7-365) a new command started from the verdict."""
+    from tests.test_court import (
+        test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_gives_its_verdict,
+    )
+
+    test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_gives_its_verdict(
+        _tmp_dir()
+    )
+
+
+@pytest.mark.slow
+def test_truth_7_365_a_new_command_is_a_scenarios_start_written_under_the_saves_with_the_record():
+    """The design's §7.2: the scenario file written under the saves with his name as her captain,
+    his follower (his first lieutenant exchanged at the same port, the same loss in his record)
+    and the record as a paper, loaded by the loader and begun, the record read aboard the new
+    ship and the paper "the captain's record" carrying it; refused for a man dismissed the
+    service, doubted for one dismissed his ship within the year (one scene with 7-364)."""
+    test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place()
+
+
+def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
+    tmp_path, monkeypatch
+):
+    """The design's §6: a `seat:` at the captain of a hull at war with the player's is refused
+    with the consent brief's reason before any consent record is read; her lookout's station is
+    admitted; the flag `seats.ADVERSARIAL_SEATS_CONSENTED` turned, the seat is admitted (turned
+    back after); a neutral is no adversary; the captor holding the player's person is refused
+    for the prisoner's reason."""
+    from tests.test_court import (
+        test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_when_turned,
+        test_the_captor_holding_the_players_person_is_refused_for_both_reasons,
+    )
+
+    test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_when_turned(
+        tmp_path, monkeypatch
+    )
+    test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
+
+
+def _tmp_dir():
+    import tempfile
+    from pathlib import Path
+
+    return Path(tempfile.mkdtemp(prefix="freesail-7-364-"))
+
+
+def test_truth_7_367_the_readings_the_events_and_the_forms_perform_and_the_truth_shows_the_prizes():
+    """The design's §8: every new form has examples the director test performs in the dry run
+    and in play with its doubt (`test_director`'s forms test, run here on the forms' table);
+    the two scenarios of the package load and begin (the prize in company, the player a
+    prisoner aboard the captor); the director's truth shows every prize with her captor, her
+    crew and her prisoners, and every hull's prisoners with their paroles."""
+    from freesail.agents import director as D
+    from tests.test_director import (
+        test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs,
+    )
+    from tests.test_prize_scenarios import (
+        test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor,
+        test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her,
+    )
+
+    keys = {f.key for f in D.WORLD_ORDER_FORMS}
+    assert {
+        "prize.parole",
+        "prize.cartel",
+        "ship.prize",
+        "ship.struck",
+        "person.exchanged",
+        "court.sits",
+        "court.read",
+        "court.verdict",
+        "command.new",
+    } <= keys
+    test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs()
+    test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her()
+    test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor()
+
+
+@pytest.mark.slow
+def test_truth_7_368_a_prize_passage_and_a_far_fight_replay_by_both_roads():
+    """84's acceptance form: a passage with the player taken near, the captive aboard the captor
+    and the parole exchanged replays by its transcript and by its acts to the same digests of
+    both hulls' logs; a far fight's passage the same, to the same records."""
+    from tests.test_prize_scenarios import (
+        test_a_far_fights_passage_replays_by_both_roads_to_the_same_records,
+        test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads,
+    )
+
+    test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads()
+    test_a_far_fights_passage_replays_by_both_roads_to_the_same_records()
+
+
 def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_the_rounds():
     """The design's §4.3 (the brief's §20): 72's cut-out yields a merchantman without a shot
     where her doctrine yields when caught; a packet, whose doctrine fights for the mails,

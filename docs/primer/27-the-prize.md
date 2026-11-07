@@ -33,6 +33,7 @@ A ship that cannot spare a prize crew does not take possession: the refusal says
 | `the prisoners`, `the prisoners aboard` | the prisoners this ship holds: how many, how many of them hurt, where confined, in irons, the named with their parole ("one prisoner of rank: Captain Bowen in the cabin (parole given)"); "no prisoners" |
 | `the prize crew` | on a prize: the men who work her, how many fit and how tired, the hours since the taking, the prize master; on any other ship "she is no prize" |
 | `the prize money`, `the prize account` | the last court's sentence on a prize of yours and the money paid by the eighths; "no prize money" |
+| `the record`, `my record` | your record: the loss of a ship, an exchange, a court martial and its verdict, an appointment; "no record" |
 
 ```
 The prize: the Medusa, carried by boarding, under Mr Ward with a prize crew of twenty-two and two hundred and fifty prisoners, for Falmouth, in company, bearing SSW, 0.3 miles.
@@ -75,7 +76,7 @@ The captain's doctrine burns of itself what it will not man (`burns_when: not wo
 
 ## The events
 
-For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off); `the sound of guns` (an action heard off the horizon); `the court sits`, `the sentence` and `the prize money` (the court's days, its sentence and the money paid).
+For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off); `the sound of guns` (an action heard off the horizon); `the court sits`, `the sentence` and `the prize money` (the court's days, its sentence and the money paid); `the exchange`, `the court martial sits`, `the verdict` and `a new command` (the captive exchanged, the court martial sat, its sentence read, the scenario written).
 
 ```
 standing order "the prize": at she is taken then take the prisoners aboard
@@ -118,9 +119,19 @@ The money is her hull by the ton and her guns by the hundredweight, her cargo so
 
 `the prize money` (or `the prize account`) reads the last sentence and the money paid; the account's lines are the prize account's in the log. The director may overrule the court (`port falmouth: the court restores the Deux-Frères`), which the game doubts where the court's own rule gives otherwise and performs with a reason: the court's whim is a plausible cause. A prize lost on the way home pays nothing.
 
+## The court martial, and a new command
+
+A captain who loses his ship answers for it before a court martial when he comes home: landed by a cartel, or exchanged (the director's `person: "Captain Bowen" is exchanged at Falmouth`, doubted within a day of his landing, which sets him ashore on the quay a prisoner no more). The court is the director's proceeding and sits by its form, `court: sits on Captain Bowen for the loss of the Amazon at Falmouth`, at a port of his own nation (doubted elsewhere; refused for a man who lost no ship): a place of the port is made for it, "the court martial, the great cabin of the flagship in the harbour", the president and the judge advocate are found there and you are brought before them. The court's questions come in the president's mouth (`say as the president of the court: "..."`, heard at the place); your answers are your own, `say to the court: I engaged a superior force and struck when the ship could fight no more`; and the judge advocate reads the log of the action at the director's word (`court: read the log of the action`), so that the court has the facts and not the director's memory of them. The verdict is the director's, by the form `court: the verdict on Captain Bowen: acquitted with honour` (or `acquitted`, `reprimanded`, `dismissed the ship`, `dismissed the service`), and what you see is the sentence read, never the order:
+
+```
+! Forenoon watch (10:40)  The sentence of the court martial is read: Captain Bowen is honourably acquitted of the loss of the Amazon, which was defended with every exertion against a superior force.
+```
+
+Your **record** keeps it all (`the record`: the loss, the exchange, the court, the verdict, an appointment), and the paper "the captain's record" in the cabin of any ship you command after. A new command is a scenario's start: `command: a new command for Captain Bowen: the cutter "Alert" at Falmouth` writes a scenario file under the game's saves folder (its name is in the answer) with you as her captain, your people who followed you (your officers exchanged at the same port) and your record as a paper, to be given to either driver with `--scenario`; refused for a man dismissed the service, doubted for one dismissed his ship within the year. The career that remembers more than the record (half-pay, a reputation, the next ship chosen by it) is not yet in the game; the record is kept so that it may be.
+
 ## What is not in this chapter
 
-The court martial for the loss of a ship and the new command after it are told in the chapter that follows as they come into the game; the readings and the orders of this chapter are the game's now.
+The prize's people as persons with their own paroles beyond the officers, the prisoners' victualling, and the career beyond the record are not yet in the game; the readings and the orders of this chapter are the game's now.
 
 ## Sources
 

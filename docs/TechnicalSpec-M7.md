@@ -603,6 +603,25 @@ struck in twenty-one minutes; truth 7-139) and not wired to the far brains.
 
 **As built (package 73), the near fight.** `lay her aboard` is the chase's helm laid on the battery's mark with the boarding's word; `grapple her` an evolution (`fight_scripts.py`: eight hands, two minutes, refused beyond `GRAPPLE_RANGE_M` thirty metres) whose grapnels hold from the throw: `extra["grappled_to"]` on both ships, the integrator holding both as the ground holds a ship, so the two lie locked (and overlap on the chart until 78's collision; said). `boarders away` (`combat/boarding.py`) sends the attacker's boarders over: the crossing's fire first (the defenders' marines' volley at point blank and the loaded guns bearing, `CROSSING_GUN_MEAN` one man each), then a round a minute while grappled, each side's strength its men times their arms (served 1.0 or unserved 0.5, the marines by the kit's `boarding`) times its temper (70's morale) times its cover (the defenders 1.3 and the boarders 0.8 in the first round), each side losing a Poisson draw about `ROUND_LOSS` (1.0) times the other's strength over ten, the fallen killed three in ten, written to the muster with the blow in words; the deck **carried** when the defenders' strength falls under `CARRIED_RATIO` (0.5) of the boarders' or their temper under its line (the colours struck by the boarders' hand, `action.strike(words="carried by boarding")`, the prize alongside for 74), the boarders **repulsed** when theirs falls so or their temper under its line (cast off, the morale's `repulses` the worse by `REPULSE_COST` 0.1), a deck **contested** past `CONTEST_ROUNDS` (15) a repulse. The defenders are the marines, the helm, the trimmers, the quarterdeck and the small-arms men, or every fit man but the powder's, the carpenter's and the surgeon's once `repel boarders` has brought the gun crews up (the guns silent); `cast off the grapnels` frees the ships (the attacker's cast-off a repulse at his own word, the defender's refused with boarders on his deck). A line a round on both logs, the readings, and the rules captain's boarding by `board_odds` and `board_when` (the chase, the grapnels within their throw, the boarders away once grappled; her boarders on his deck repelled). Measured: a hundred boarders against a frigate's whole company awake are repulsed in a round (7-180); against her at quarters with the arms served out they carry her in six (7-181). Cutting out by the boats and the fight at far detail stay 74's and the far fight's.
 
+**As built (package 74), the far fight wired (`docs/design/Design-Prizes.md` §4).** Two far
+bodies that meet in anger resolve their action by the same tables at coarse steps:
+`combat/far_action.py` runs one round of `far.round_once` every three minutes for every pair of
+which one is `engaging` with the other as her mark, within the longest random shot of her fit,
+each side's record carried in and the sums written back (`Vessel.damage`: killed, wounded,
+dismounted, holes and holes below, sail cut, spars gone, morale, rounds), the draws from the
+World's `far` stream opened at the first round; the strike by morale as 72's cut-out writes it,
+the captor's `taking possession` and the far possession after. The far brain takes the engaging
+transition by the same doctrine rows as the near (`FarCaptain._enemy_within`, a ship with guns to
+fire; the merchantman's `engage_nm: 0` never fires one) and runs a chase leg at the doctrine's
+range. The far record goes into the parts when she is made a hull or woken, once (`far_damage_
+into_parts`, `carried_in`), and the parts into the record when she sleeps. Within the promotion's
+range the engagement is first among the cap's reasons (`crews._in_action`, rank 0); where the cap
+has no room a far ship replies to an awake hull's battery by the tables (the fallback, counted).
+The guns are heard at the player's ship within twelve miles (`action.guns_heard`, the flashes to
+fifteen by night). The agreement with the near fight is within two rounds, pinned as found (7-359);
+the toggle `far_action.ENABLED` measured the pinned passages old beside new: none moved. Truths
+7-358 to 7-361 and 7-369.
+
 ### 12. Truths for 7-ii (outline)
 
 Two cutters with six carronades each, one broadside at pistol shot, the hits allotted by the
@@ -731,6 +750,39 @@ rising when the prize crew is thin and tired, or by a cruiser coming up; **a cap
 book or private table a paper of the prize**. Burning or scuttling a prize not worth
 manning. The far body carries a prize as a vessel with a new nation and goal.
 
+**As built (package 74; `docs/design/Design-Prizes.md` §2 and §5).** The prize is a hull of the
+one world: possessed by `prizes.possess` from any road (the order `take possession of her` within
+a boat's pull, the far capture, the strike by the rounds), her nation and colours her captor's
+over her own, a prize master out of his wardroom by the period's standing (the role
+`prize-master`, `data/captains/prize-master.yaml`: fights nobody, hauls off from everyone, yields
+to a cruiser of her own nation coming up) bound to her captain's station, a prize crew drawn from
+his muster by the doctrine's thresholds and remustered as hers, her people prisoners confined by
+the custom (the officers to the cabin with their parole not yet asked, the people to the hold;
+`Prisoners`), her goal the nearest port open to him by his doctrine, in his company or parting by
+his rows; the prisoners taken aboard by the boat (`take the prisoners aboard`); the rising when
+the prize crew is thin and tired with no captor near, the retaking by a cruiser coming up, the
+burning and the scuttling (`burn the prize`, `scuttle her`); the readings `the prize`, `the
+prisoners`, `the prize crew`; the captured signal book a paper of hers. The court sits where she
+is brought in (`world/prize_court.py`; `data/business.yaml`'s `prize_values`, `prize_courts`,
+`prize_money`, `prize_shares`): a port job on the prize hull's dealings in the court's days by the
+port's nation (the High Court of Admiralty for a prize brought home, the Vice-Admiralty court
+abroad, le Conseil des prises, el Tribunal de presas), or on a far prize's record in her goal's
+road; condemned (a ship of a nation at war with the captors at the taking, a pirate, a neutral
+carrying an enemy's cargo to an enemy's port), restored with costs and damages a tenth of her
+value against the captors, or salvage an eighth to the recaptors of a ship of their own nation;
+the valuation by the rows (the hull a ton burthen by her kind and age, her guns a hundredweight,
+her cargo at the port's market, her powder and shot at the port's prices), the head money five
+pounds a head of a ship of war's or a privateer's men at the start, the agent's five per cent and
+the court's fees, a King's ship's prize of war three fourths now and a fourth with a later
+sentence; the money shared among every ship in sight at the strike by their complements (the
+lead's ruling from Lavery, Nelson's Navy, p. 116, which also confirms the two British schemes:
+until 1808 the captain three eighths, three classes an eighth, the people a quarter; from 1808
+the captain two eighths, two classes an eighth, the rest a half) and each ship's part by the
+eighths of the scheme in force at the court's date into her purse with the purse's line saying so
+and the prize account's lines; the reading `the prize money`; the director's `port <id>: the
+court condemns | restores the <prize>` doubted against the rule. Truths 7-351 to 7-354, 7-362 and
+7-363; the primer's chapter 27.
+
 ### 19. The player struck: the captive's channel (the striking-colours study's gap 1)
 
 The player who strikes has not lost the game: he is a person aboard the captor, with the
@@ -747,6 +799,40 @@ The continuation is what makes losing survivable; **a career** that remembers (h
 reputation, the next ship) is **M8's campaign layer**, named here so that the records keep
 what it will need.
 
+**As built (package 74; `docs/design/Design-Prizes.md` §3, §6 and §7).** The player who strikes
+is a person aboard the captor (`world/captive.py`): his station stood down and his prompt
+following him (the far body that takes him made a hull and woken first among the cap's dealings),
+his sword in the captor's captain's keeping, confined to the cabin by 65's hook, asked his parole
+by the captor's doctrine in the hail table's words by nation (France's and Spain's rows) a minute
+after the taking and answered in his own words at his prompt (`say to the captain: I give my
+parole`; asked again after a glass, given by rule after a watch), the liberty of the cabin, the
+gunroom and the quarterdeck by day given, his sword returned; the captor's course for his port by
+doctrine, the prisoners landed to the port's agent for prisoners (a place of every port, named by
+nation) with the list of their names; a cartel under a flag of truce (a state of 71's colours,
+`truce`, whom no captain fires on and the far captures pass by) put on the sea by the director
+(`cartel: a cartel from <port> for <persons>`) to take him off within hail and land him free; the
+director's `aboard the <ship>: the parole of <person> given | refused` doubted while her captain
+waits his answer; the readings `the parole`, `where am I` with his state. **The court martial**
+is the director's proceeding at a place of the port (`world/court.py`: `court: sits on <person>
+for the loss of the <ship> at <port>`, doubted where he is not ashore at a port of his own nation;
+`person: "<name>" is exchanged at <port>` lands a prisoner free, doubted within a day of his
+landing), its questions through `say as the president of the court` heard at the place, the
+accused's own `say to the court: ...`, the log of the action read by the judge advocate (`court:
+read the log of the action`), the verdict a form (`court: the verdict on <person>: acquitted with
+honour | acquitted | reprimanded | dismissed the ship | dismissed the service`) journaled as
+every world order is, the play log carrying the sentence read and never the order; `Person.
+record` the thing the career of M8 remembers (the loss, the exchange, the court, the verdict, the
+appointment), read as `the record` and as the paper "the captain's record". **A new command** is
+a scenario's start: `command: a new command for <person>: the <description> "<name>" at <port>`
+writes a scenario file under the saves with his name as her captain, his people who followed him
+(the persons ashore at the same port whose record has the same loss) and the record as a paper,
+loaded by the loader (`ship.name` and `people[].record` honoured) and begun; refused for a man
+dismissed the service, doubted within a year of a dismissal from his ship. **The consent
+revision** is drafted (`docs/design/ConsentRevision-AdversarialSeats.md`) and not applied; a seat
+at the captain of a hull adversarial to a human is refused in words behind
+`seats.ADVERSARIAL_SEATS_CONSENTED` (§29). Truths 7-355 to 7-357 and 7-364 to 7-366; the
+scenarios `captive.yaml` and `prize-home.yaml` with the starter brief `captive`.
+
 ### 20. Truths for 7-v (outline)
 
 A merchant brig taken by a privateer schooner sails for Bayonne under a prize crew of
@@ -756,6 +842,17 @@ ship is asked for his parole in the model's words and answers in his own, the ex
 both logs and nowhere in the operator's voice.
 
 ---
+
+**As built (package 74).** The outline's scenes as the design amends them (`docs/design/
+Design-Prizes.md` §8): the merchant brig cut out by the privateer schooner at far detail,
+possessed on the records, parting for Brest under her prize crew and retaken by a King's cutter
+coming up (7-352); the prize money paid at Falmouth by the eighths with a cutter in sight sharing
+by her complement (7-362); the player struck to a crewed French frigate asked his parole in the
+captor's words and answering in his own, the exchange in both logs and nowhere in the operator's
+voice (7-355, 7-356); the far fight's truths (7-358 to 7-361, 7-369); the court martial and the
+new command (7-364, 7-365); the adversarial seat refused (7-366); the forms and the truth
+(7-367); the replay by both roads (7-368). Twenty truths, 7-350 to 7-369, in
+`tests/test_known_truths.py`, each beside its test.
 
 ## Part 7-vi: The naval system: squadrons and regimes
 
@@ -1125,6 +1222,19 @@ edits no consent file; the revision is the package's. 67's seat (the API door st
 the game under the seat's budget, the consent read from the record, a person nobody holds
 seated as his voice) is the mechanism every adversarial seat uses; the revision changes
 what the brief says and whom the game will seat, not the door.
+
+**As built (package 74, item 6; `docs/design/Design-Prizes.md` §6).** The revision's text is
+drafted in the brief's voice and sections under `docs/design/ConsentRevision-AdversarialSeats.md`
+for the three roles (an enemy captain, a prize master over prisoners, a captor's captain to a
+human captive), with a paragraph for the owner on what it asks and does not; nothing under
+`docs/agents/consent/` or in `docs/agents/ConsentBrief.md` is touched, and package 55 carries the
+revision, the re-brief and the re-pinned digests. Meanwhile the game refuses, in words, a seat
+for a model at the captain's station of a hull adversarial to a human (`seat:`, the desk's
+`--station captain --ship`, the harbour's door), adversarial read from the world at the seating
+(`prizes.adversarial_seat_why`: her nation at war with the nation of a hull a human holds, or her
+holding a human's person as a prisoner), the captain's station alone; the rules captain and the
+director's voice serve those roles; one flag, `seats.ADVERSARIAL_SEATS_CONSENTED`, is what the
+revision's package turns (truth 7-366). The suite's seats were audited: none adversarial.
 
 ## 30. Gate 7 (outline), in the brainstorm's order
 

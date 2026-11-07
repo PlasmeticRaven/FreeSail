@@ -823,6 +823,13 @@ def players_person(world: Any) -> Any:
         # the player's person a captive (package 74, the design's §3.1): his ship's captain
         # answers for the prize master from the taking, so the one world keeps who he is
         return captive
+    from freesail.world.captive import remembered_person
+
+    remembered = remembered_person(root)
+    if remembered is not None:
+        # freed (exchanged, landed by a cartel), he is the player's person still while his
+        # own ship has a prize master for her captain (package 74, step 6)
+        return remembered
     seat = _seat(world)
     if seat is not None:
         return _seat_person(root, seat)

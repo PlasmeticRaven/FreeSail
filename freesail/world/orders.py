@@ -139,6 +139,10 @@ CHANNELS = (
     "convoy",
     # package 74 (spec M7 §19; the design's §3.4): a cartel for the prisoners
     "cartel",
+    # package 74 (spec M7 §20; the design's §7): the court martial as the director's
+    # proceeding, and a new command as a scenario's start
+    "court",
+    "command",
     # package 82 (item 6): the drivers' centre moved by the director, `follow "X"` (a
     # driver's line through the channel, no colon in its head)
     "follow",
@@ -156,7 +160,7 @@ REFUSAL = (
 # deck's conversation and no world order.
 _HEAD = re.compile(
     r"^\s*(?:(weather|ship|message|port|person|captain|mark|seat|unseat|aboard|squadron|convoy"
-    r"|cartel)"
+    r"|cartel|court|command)"
     r"\b\s*(\"[^\"]*\"|[\w-]+|the\s+[\w' -]+?)?\s*:|(say)\s+as\s+[^:]+:"
     r"|(follow)\s+(?:\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$)",
     re.I,
@@ -242,8 +246,8 @@ def parse(text: str) -> WorldOrder:
     if m is None:
         raise WorldOrderError(
             f"'{text}' is no world order: say weather:, ship:, message:, port <id>:, person:, "
-            "captain:, mark:, aboard:, seat:, unseat:, squadron:, convoy:, cartel: or say as "
-            "<person>:."
+            "captain:, mark:, aboard:, seat:, unseat:, squadron:, convoy:, cartel:, court:, "
+            "command: or say as <person>:."
         )
     return WorldOrder((m.group(1) or m.group(3) or m.group(4)).lower(), text, reason)
 
@@ -279,6 +283,10 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _convoy(world, body)
     if order.channel == "cartel":
         return _cartel(world, body)
+    if order.channel == "court":
+        return _court(world, body)
+    if order.channel == "command":
+        return _command(world, body)
     if order.channel == "aboard":
         # the hull named at the head (package 84, step 9): the thing found, made or moved
         # aboard her, her purse and her hold, by her own names; the player's when none
@@ -648,9 +656,101 @@ _LETTER = re.compile(
 )
 
 
+_SHIP_TAKEN = re.compile(
+    r"^ship\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<how>a\s+prize\s+of|struck\s+to)\s+(?:the\s+)?"
+    r"(?P<captor>\"[^\"]+\"|[\w' -]+?)\s*\.?\s*$",
+    re.I,
+)
+
+
+def _taken_parts(world: Any, m: re.Match[str]) -> tuple[Any, Any, str]:
+    """(the ship taken, her captor, how) from `ship "<name>": a prize of the <captor>` or
+    `ship "<name>": struck to the <captor>` (package 74, step 7): the player's own ship by
+    her name or 'the ship'."""
+    sea = world.vessels
+    name = m.group("name").strip()
+    captor_words = m.group("captor").strip().strip('"')
+    own = getattr(sea, "own", None)
+    own_name = str(
+        getattr(getattr(world, "players", None), "ship", None) and world.players.ship.name or ""
+    )
+
+    def find(words: str) -> Any:
+        key = " ".join(words.lower().split())
+        if key in ("the ship", "the player's ship", "our ship") or (
+            own_name and key == own_name.lower()
+        ):
+            return own
+        return sea.find(words)
+
+    taken, captor = find(name), find(captor_words)
+    if taken is None:
+        raise WorldOrderError(f"No ship named {name!r} is on the sea.")
+    if captor is None:
+        raise WorldOrderError(f"No ship named {captor_words!r} is on the sea to take her.")
+    if taken is captor:
+        raise WorldOrderError(f"{taken.name} cannot take herself.")
+    return taken, captor, " ".join(m.group("how").lower().split())
+
+
+def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
+    """A ship made a prize by the director's word, or struck to another and possessed (the
+    scenarios' start: `prize-home.yaml`, `captive.yaml`; a cause given in play is doubted
+    after the first minute): the taking by `prizes.possess`, her captor promoted where the
+    player's ship is the one struck, so that the captive is aboard a real hull."""
+    from freesail.combat import action
+    from freesail.world import prizes as P
+    from freesail.world.ships import PLAYER_ID
+
+    taken, captor, how = _taken_parts(world, m)
+    if P.is_prize(taken):
+        raise WorldOrderError(f"{taken.name} is a prize already.")
+    if str(taken.id) == PLAYER_ID and getattr(captor, "crew", None) is None:
+        from freesail.world.crews import promote
+
+        promote(world, captor)
+    hull = P._hull(taken)
+    if hull is not None and not hull.ship.extra.get("struck"):
+        action.strike(hull, False, f"to the {captor.name}")
+    taken.struck = True
+    by = "struck" if how.startswith("struck") else "made a prize by the director's word"
+    rec = P.possess(world, captor, taken, by=by, said=False)
+    ports = getattr(getattr(world, "ports", None), "ports", {}) or {}
+    goal = str(getattr(ports.get(str(rec.get("goal") or "")), "name", None) or "his company")
+    words = (
+        f"{taken.name} {how.replace('a prize of', 'a prize of the')} {captor.name}: "
+        f"{rec.get('master') or 'a prize master'} and {rec.get('crew', 0)} hands aboard her, "
+        f"{rec.get('prisoners', 0)} of her people prisoners, bound for {goal}"
+    )
+    return words, {
+        "prize": str(taken.id),
+        "captor": str(captor.id),
+        "how": how,
+        "crew": rec.get("crew", 0),
+        "prisoners": rec.get("prisoners", 0),
+        "goal": rec.get("goal"),
+    }
+
+
+def _doubt_taken(world: Any, m: re.Match[str]) -> str | None:
+    try:
+        taken, captor, how = _taken_parts(world, m)
+    except WorldOrderError:
+        return None
+    if int(world.clock.tick) > 60:
+        return (
+            f"{taken.name} taken by {captor.name} by no action of the sea's: a ship is made a "
+            "prize at a scenario's start; afterwards she strikes to the guns"
+        )
+    return None
+
+
 def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world.ships import vessel_from_spec
 
+    tm = _SHIP_TAKEN.match(body)
+    if tm is not None:
+        return _taken(world, tm)
     m = _SHIP_GOAL.match(body)
     if m:
         hm = _HAND_TAIL.match(m.group("goal"))
@@ -2077,6 +2177,9 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     mm = _MAKE.match(body)
     if mm is not None:
         return _make_person(world, mm.group("name"), mm.group("rest") or "")
+    ex = _EXCHANGED.match(body)
+    if ex is not None:
+        return _exchanged(world, ex)
     mv = _MOVE.match(body)
     if mv is not None:
         return _move_person(world, mv)
@@ -3728,6 +3831,118 @@ def _cartel(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     return text, {"cartel": v.id, "port": port.id, "persons": [p.name for p in persons]}
 
 
+def _court(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """The court martial's three forms (package 74, step 6; the design's §7.1): `court: sits
+    on <person> for the loss of the <ship> at <port>`, `court: read the log of the action`,
+    `court: the verdict on <person>: <verdict>`; refused in the court's own words."""
+    from freesail.world import court as CM
+
+    low = " ".join(body.lower().split())
+    try:
+        if low.startswith("court: read"):
+            return CM.read_log(world, body)
+        if low.startswith("court: the verdict"):
+            return CM.verdict(world, body)
+        return CM.sit(world, body)
+    except CM.CourtError as e:
+        raise WorldOrderError(str(e)) from None
+
+
+def _command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`command: a new command for <person>: the <description> "<name>" at <port>` (the
+    design's §7.2): the scenario written under the saves."""
+    from freesail.world import court as CM
+
+    try:
+        return CM.new_command(world, body)
+    except CM.CourtError as e:
+        raise WorldOrderError(str(e)) from None
+
+
+_EXCHANGED = re.compile(
+    r'^person:\s*(?:"(?P<name>[^"]+)"|(?P<bare>.+?))\s+is\s+exchanged(?:\s+at\s+(?P<port>.+?))?'
+    r"\s*\.?\s*$",
+    re.I,
+)
+
+
+def _exchanged(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
+    """`person: "<name>" is exchanged at <port>` (the design's §8): a captive landed as a
+    prisoner freed at the port by cartel or exchange, the plausible cause the director gives:
+    ashore at the port's quay, his confinement gone, the exchange in his record."""
+    from freesail.world import court as CM
+    from freesail.world.captive import captive_of, release
+
+    name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    person = _person_anywhere(world, name)
+    if person is None:
+        raise WorldOrderError(f"No person of the world is named {name!r}.")
+    rec = captive_of(world)
+    mine = rec is not None and rec.get("person") == person.name
+    held = bool(getattr(person, "confined_to", "") or getattr(person, "liberty", ()))
+    landed = not getattr(person, "aboard", True) and (
+        str(getattr(person, "ashore_at", "")) == "agent_for_prisoners"
+    )
+    if not (mine or held or landed):
+        raise WorldOrderError(
+            f"{person.name} is no prisoner: an exchange frees a prisoner of war held aboard or "
+            "landed to the agent for prisoners."
+        )
+    if m.group("port"):
+        port = _port_named(world, m.group("port"))
+    else:
+        ports = getattr(getattr(world, "ports", None), "ports", {}) or {}
+        port = ports.get(str(getattr(person, "port", "") or ""))
+        if port is None:
+            raise WorldOrderError(f"Say at which port {person.name} is exchanged.")
+    was = f"ashore at {_port_words_of(world, person)}" if not person.aboard else "held aboard"
+    person.aboard = False
+    person.where = "shore"
+    person.port = port.id
+    person.ashore_at = "quay"
+    person.occupied_until = None
+    person.occupied_with = ""
+    person.pending = None
+    person.cartel = ""
+    release(world, person, f"exchanged at {port.name}")
+    CM.note(world, person, "exchanged", f"exchanged as a prisoner of war, landed at {port.name}")
+    text = f"{person.name}, {was}, is exchanged and landed at {port.name}, a prisoner no more"
+    world.record(
+        Severity.NOTABLE,
+        "prize.exchanged",
+        f"{text}.",
+        data={"person": person.name, "port": port.id},
+    )
+    return text, {"person": person.name, "port": port.id}
+
+
+def _port_words_of(world: Any, person: Any) -> str:
+    ports = getattr(getattr(world, "ports", None), "ports", {}) or {}
+    p = ports.get(str(getattr(person, "port", "") or ""))
+    return str(getattr(p, "name", None) or "a port")
+
+
+def _doubt_exchanged(world: Any, m: re.Match[str]) -> str | None:
+    """An exchange within a day of his landing wants its time (the cartel's passage, the
+    agent's list, the commissioners' letters)."""
+    from freesail.world.captive import captive_of
+
+    name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    rec = captive_of(world)
+    if rec is None or str(rec.get("person", "")).lower() != name.lower():
+        return None
+    landed = rec.get("landed_at")
+    if landed is None:
+        return f"{name} is held aboard still, not landed: an exchange is made ashore, by the agents"
+    ago = int(world.clock.tick) - int(landed)
+    if ago < 86400:
+        return (
+            f"{name} was landed {ago // 3600} hours ago: an exchange takes its time (the agents' "
+            "lists, the commissioners' letters, the cartel's passage)"
+        )
+    return None
+
+
 def _doubt_cartel(world: Any, body: str) -> str | None:
     from freesail.world.captive import cartel_doubt
 
@@ -3786,6 +4001,14 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
             return _doubt_port(world, body)
         if order.channel == "cartel":
             return _doubt_cartel(world, body)
+        if order.channel == "court":
+            from freesail.world.court import court_doubt
+
+            return court_doubt(world, body)
+        if order.channel == "command":
+            from freesail.world.court import command_doubt
+
+            return command_doubt(world, body)
         if order.channel == "aboard":
             if _aboard_match(world, body) is None:
                 from freesail.world.captive import read_parole_form
@@ -3824,6 +4047,9 @@ def _doubt_ship(world: Any, body: str) -> str | None:
     from freesail.world.geo import bearing_and_distance
     from freesail.world.ships import place_position
 
+    tm = _SHIP_TAKEN.match(body)
+    if tm is not None:
+        return _doubt_taken(world, tm)
     g = _SHIP_GOAL.match(body)
     hm = _HAND_TAIL.match(g.group("goal")) if g is not None else None
     if g is not None and hm is not None:
@@ -4190,6 +4416,9 @@ def _doubt_person(world: Any, body: str) -> str | None:
     supernumerary the story names, and a man's words, want no cause of the sea's."""
     from freesail.world.places import place_words
 
+    ex = _EXCHANGED.match(body)
+    if ex is not None:
+        return _doubt_exchanged(world, ex)
     m = _MOVE.match(body)
     if m is None:
         return None

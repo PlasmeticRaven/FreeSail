@@ -866,6 +866,10 @@ class Papers:
             return (["A ship with no parts keeps no such paper."], keeper)
         from freesail.ship.parts import booms, cordage, ground_tackle, sail_room
 
+        if source == "record":
+            from freesail.world.court import paper_lines
+
+            return paper_lines(world), keeper
         if source == "sail_room":
             return sail_room(ship).inventory_lines(), keeper
         if source == "booms":
