@@ -125,6 +125,12 @@ SNAPSHOT_BLOCKS = {
     # station does; the browser's greyed readouts are the sample's rows left out
     "knowledge": "the `readings` tool's line on the rows not to be had where the station "
     "stands and where each is; the brief's line on where he is",
+    # package 81 (docs/design/Design-ViewerAction.md §7, §12): the guns drawn and their ports,
+    # the shot holes, the flags that fly; the station reads the same in words and sees the
+    # same picture
+    "guns": "the reading `guns` (each state, the ports shut); the `ship_view` picture",
+    "damage": "the reading `damage` (the shot holes by side and place); the `ship_view` picture",
+    "flags": "the reading `colours`; the `ship_view` picture",
 }
 
 # The station's tools (`agents.tools.TOOLS`), each with the player's counterpart, or the
