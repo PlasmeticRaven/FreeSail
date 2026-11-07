@@ -1,18 +1,26 @@
-# FreeSail: the British telegraphic dictionary (spec M7 §3; package 71;
-# docs/design/Design-Signals.md). Sir Home Popham's *Telegraphic Signals or Marine
-# Vocabulary* (1800; the 1803 edition in use at Trafalgar), from memory: with the telegraph
-# flag over the numerals the hoist is a word of the dictionary, numbered in alphabetical
-# order, and a word the book lacks is spelt letter by letter from the alphabet (1 to 25, J
-# wanting and V before U). The eight numbers known by heart from the twelve hoists of 21
-# October 1805 are the book's (do 220, England 253, every 261, expects 269, his 370, man
-# 471, that 863, will 958; 'duty' was spelt D U T Y, 4 21 19 24); every other number here is
-# MADE between them in the book's alphabetical order, and the vocabulary is a few hundred
-# words chosen for what a squadron, a chase and a convoy say, out of Popham's three
-# thousand. Package 76 builds it out against the printed edition. Written by the
-# generator in the package's scratch (the numbers' spread), kept as data.
+# FreeSail: the British telegraphic dictionary (spec M7 §3; package 71, built out by package
+# 76; docs/design/Design-Signals.md). Sir Home Popham's *Telegraphic Signals; or Marine
+# Vocabulary*, London, 1803 (docs/references/signals/, the New York Public Library's copy on
+# the Internet Archive): the edition of the Trafalgar year. With the telegraph flag over the
+# numerals the hoist is a word of the dictionary; a word the book lacks is spelt letter by
+# letter from the table of figures, letters and flags (leaf 13: 1 to 25, I and J one figure
+# at 9, V at 20 before U at 21; 10 the cipher, which hoisted singly annuls the last signal,
+# 11 the substitute). The words are numbered from 26 ("Able") in the book's first part (26 to
+# 999, the original edition's) and its second (1000 to 1999); each is written here as the
+# book prints it, the head and its endings ("Expect-ed-ing-ation"), and the loader reads every
+# form the endings make (`signals.word_forms`). The third part (the sentences and the names
+# of places, 2000 and up) is not here: the engine spells a sentence word by word.
+#
+# The words were read from the page images twice over (the Archive's OCR and a fresh one of
+# each leaf, column by column) and each kept only where its head is an English word and its
+# first letter is the one the book's margin index gives its number ("A 26 to 90 ... Z 996 to
+# 998"): 1444 words of the two parts. Left out: 158 numbers whose reading failed
+# those checks, and the numbers the book left blank for the owner's own words (this copy's
+# are written in by hand and not taken). The eight words of 21 October 1805 are the book's:
+# England 253, expects 269, that 863, every 261, man 471, will 958, do 220, his 370; "duty"
+# was spelt, 4 21 19 24.
 
-source: "Popham, Telegraphic Signals or Marine Vocabulary, 1800 and 1803 (from memory; the eight anchors certain, the rest made)"
-made: true   # every number but the eight anchors
+source: "Popham, Telegraphic Signals; or Marine Vocabulary, London, T. Egerton, 1803 (read from the page images)"
 telegraph_flag: true
 alphabet:   # Popham's, 1 to 25: J wanting, V before U (the spelling of 'duty' on 21 October 1805)
   A: 1
@@ -40,334 +48,1449 @@ alphabet:   # Popham's, 1 to 25: J wanting, V before U (the spelling of 'duty' o
   X: 23
   Y: 24
   Z: 25
+
 words:
-  28: able
-  30: aboard
-  33: about
-  36: admiral
-  39: after
-  41: afternoon
-  44: again
-  47: against
-  50: ahead
-  52: all
-  55: alongside
-  58: am
-  61: anchor
-  63: anchored
-  66: and
-  69: any
-  72: are
-  74: as
-  77: assistance
-  80: astern
-  83: at
-  85: attack
-  88: away
-  91: bay
-  94: be
-  96: bear
-  99: bearing
-  102: been
-  105: before
-  107: behind
-  110: best
-  113: better
-  116: between
-  118: board
-  121: boat
-  124: boats
-  127: both
-  129: bound
-  132: brig
-  135: bring
-  138: but
-  140: by
-  143: cable
-  146: can
-  149: cannot
-  151: cape
-  154: captain
-  157: carry
-  160: chase
-  162: close
-  165: coast
-  168: come
-  171: coming
-  173: company
-  176: convoy
-  179: could
-  182: course
-  184: cruise
-  187: cruiser
-  190: cut
-  193: cutter
-  195: danger
-  198: dark
-  201: day
-  204: daylight
-  206: dead
-  209: deep
-  212: dispatch
-  215: dispatches
-  217: distance
-  220: do
-  224: done
-  227: down
-  231: during
-  235: each
-  238: east
-  242: eastward
-  246: eight
-  249: enemy
-  253: england
-  255: english
-  257: enough
-  259: evening
-  261: every
-  269: expects
-  272: fast
-  274: few
-  277: fire
-  280: first
-  283: five
-  285: fleet
-  288: fog
-  291: follow
-  294: for
-  296: force
-  299: four
-  302: french
-  304: frigate
-  307: from
-  310: full
-  313: gale
-  315: get
-  318: give
-  321: go
-  324: good
-  326: got
-  329: great
-  332: gun
-  335: guns
-  337: had
-  340: half
-  343: harbour
-  345: has
-  348: have
-  351: he
-  354: head
-  356: heavy
-  359: her
-  362: here
-  365: high
-  367: him
-  370: his
-  372: hold
-  375: hope
-  377: hour
-  380: hours
-  382: how
-  385: i
-  387: if
-  390: immediately
-  392: in
-  395: inshore
-  397: intelligence
-  400: into
-  402: is
-  404: island
-  407: it
-  409: keep
-  412: know
-  414: land
-  417: large
-  419: last
-  422: late
-  424: lead
-  427: leak
-  429: leave
-  432: lee
-  434: leeward
-  437: less
-  439: let
-  441: lieutenant
-  444: light
-  446: lights
-  449: line
-  451: little
-  454: long
-  456: look
-  459: lost
-  461: low
-  464: made
-  466: main
-  469: make
-  471: man
-  475: many
-  478: master
-  482: may
-  485: me
-  489: men
-  492: merchant
-  496: miles
-  499: mind
-  503: more
-  506: morning
-  510: most
-  513: much
-  517: must
-  520: my
-  524: near
-  528: nearer
-  531: never
-  535: next
-  538: night
-  542: nine
-  545: no
-  549: north
-  552: not
-  556: nothing
-  559: now
-  563: number
-  566: of
-  570: off
-  573: officer
-  577: on
-  580: once
-  584: one
-  588: only
-  591: open
-  595: or
-  598: order
-  602: orders
-  605: other
-  609: our
-  612: out
-  616: over
-  619: part
-  623: pass
-  626: passage
-  630: pilot
-  633: port
-  637: possible
-  641: present
-  644: prize
-  648: provisions
-  651: put
-  655: quarter
-  658: ready
-  662: rear
-  665: remain
-  669: repair
-  672: return
-  676: rock
-  679: run
-  683: sail
-  686: sailed
-  690: sails
-  693: same
-  697: sea
-  701: seas
-  704: see
-  708: seen
-  711: send
-  715: sent
-  718: set
-  722: seven
-  725: shall
-  729: she
-  732: ship
-  736: ships
-  739: shoal
-  743: shore
-  746: short
-  750: should
-  754: sick
-  757: side
-  761: sight
-  764: signal
-  768: signals
-  771: since
-  775: six
-  778: sloop
-  782: so
-  785: some
-  789: soon
-  792: sound
-  796: soundings
-  799: south
-  803: southward
-  806: spanish
-  810: squadron
-  814: stand
-  817: station
-  821: stay
-  824: steer
-  828: still
-  831: strange
-  835: strong
-  838: such
-  842: sun
-  845: superior
-  849: take
-  852: tell
-  856: ten
-  859: than
-  863: that
-  865: the
-  867: their
-  869: them
-  871: then
-  873: there
-  875: these
-  877: they
-  880: this
-  882: three
-  884: through
-  886: till
-  888: time
-  890: to
-  892: together
-  894: too
-  896: took
-  898: two
-  900: under
-  902: until
-  904: up
-  906: upon
-  908: us
-  911: van
-  913: very
-  915: want
-  917: war
-  919: was
-  921: watch
-  923: water
-  925: way
-  927: we
-  929: weather
-  931: well
-  933: went
-  935: were
-  937: west
-  939: westward
-  941: what
-  944: when
-  946: where
-  948: whether
-  950: which
-  952: while
-  954: who
-  956: whole
-  958: will
-  962: wind
-  966: windward
-  969: with
-  973: without
-  977: wounded
-  981: yards
-  985: yesterday
-  989: yet
-  992: you
-  996: your
+  26: "Able"
+  27: "Above"
+  28: "About"
+  29: "Abreast"
+  30: "Absence-t-ed-ing-tec"
+  31: "Absolute-ly"
+  32: "Accept-ed-ing-ance"
+  33: "Accident-ally"
+  34: "Accompany-ied"
+  35: "According-ly"
+  36: "Acquaint-ed-ing-ance"
+  37: "Act-ed-ing-ion"
+  38: "Active alae"
+  39: "Add-ed-ing-ition-al"
+  40: "Adjourn-ed-ing-ment"
+  41: "Admiral"
+  42: "Admiralty"
+  43: "Advance-d-ing-ment"
+  44: "Advantage-ous-ly"
+  45: "Advise-d-ing"
+  46: "Africa-n"
+  47: "Aft, abaft, after-wards"
+  48: "Again-st"
+  49: "Agree-d-ing-ment-able"
+  50: "Aid-ed-i ent-able"
+  51: "All"
+  52: "Alone"
+  53: "Also"
+  54: "Alternative-ly"
+  55: "A ternative-ly"
+  56: "America-n"
+  57: "Amicable-ly"
+  58: "Ammunition"
+  59: "An x acrity, alert-n"
+  60: "Anchor-age-ed-ing"
+  61: "And"
+  62: "Annul-led-ing"
+  63: "Ante-meridian"
+  64: "Anxious-ly-xiety"
+  65: "Any-thing-how-where"
+  66: "Appear-ed-ing-ance"
+  67: "Appoint-ed-ing-ment"
+  68: "Apprize-d-ing"
+  69: "Approve-d-ing-al"
+  70: "Are"
+  71: "Arm-ed-ing-ament"
+  72: "Army-istice"
+  73: "Arrange-d-ing-ment"
+  74: "Arrive-d-ing-al"
+  75: "Artillery"
+  76: "Arsenal"
+  77: "As"
+  78: "Ask-ed-ing"
+  79: "Assert-ed-ing-ion"
+  80: "At"
+  81: "Attack-ed-ing"
+  82: "Attend-ed-ing-ance"
+  83: "Autumn-al"
+  84: "Avoid"
+  85: "Away"
+  87: "Act-ed-ing-ion"
+  90: "Ace lacie, oe ony"
+  91: "Backward-ness"
+  92: "Bad-ly"
+  93: "Baggage"
+  94: "Ballast"
+  95: "Barometer"
+  96: "Battery-ies-ing"
+  97: "Battle-s"
+  98: "Bay-s"
+  99: "Be-ing, been"
+  100: "Beach-ed"
+  102: "Beam"
+  103: "Bear-er-ing, bore, borne"
+  104: "Became-come-ing"
+  105: "Because"
+  106: "Before-hand"
+  107: "Begin-ning-un"
+  108: "Behind-hand"
+  109: "Believe-d-ing-ief"
+  110: "Below"
+  112: "Bend-ing, bent"
+  113: "Better, best"
+  114: "Between"
+  115: "Black"
+  116: "Blow-ing, blew"
+  117: "Blue"
+  118: "Board-ed-er-ing"
+  119: "Boat-s"
+  123: "Break-ing-ers, broke-n"
+  124: "Brig-s"
+  125: "Bring-ing, brought"
+  126: "Buoy-rope"
+  127: "Burn-ed-ing"
+  128: "But"
+  129: "By cred"
+  136: "Calm"
+  137: "Can"
+  138: "Cape"
+  139: "Captain-s"
+  140: "Capture-d-ing"
+  142: "Cages"
+  143: "Carpenter-s"
+  144: "Carry-iage-ied-ing"
+  145: "Cartridge-s"
+  146: "Cavalry"
+  147: "Caution-ous-ly"
+  149: "Certain-ly-ty"
+  150: "Change-d-ing"
+  152: "Channel-s"
+  153: "Chase-d-ing"
+  154: "Chronometer-s"
+  155: "Circumstance-stantial"
+  156: "City-izens"
+  157: "Clear"
+  158: "Clear"
+  159: "Close-r-est-ly-ness"
+  163: "Come-ing, came"
+  164: "Command-ed-er-ment"
+  165: "Commence-d-ing-ment"
+  166: "Commission-ed-ing"
+  167: "Commodore"
+  168: "Communicate-d-ing-ion"
+  169: "Company-ies-nion"
+  170: "Conduct-ed-ing-or"
+  172: "Confer-ed-ing-ence"
+  173: "Confine-d-ing-ment"
+  175: "Constant-ly"
+  176: "Contain-ed-ing"
+  177: "Continue-ed-ing-uation"
+  178: "Convenient-ly-ence"
+  179: "Convoy-s-ed-ing"
+  180: "Co-operate-ed-ing-ation"
+  182: "Copy-ies-ied-ing"
+  183: "Country-ies"
+  184: "Course-ing"
+  185: "Court-s"
+  186: "Court-martial"
+  187: "Crew-s"
+  188: "Cripple-d"
+  189: "Cruise-d-r-ing"
+  190: "Current-s"
+  192: "Cut-ting-er"
+  196: "Cade"
+  197: "Damage-d-ing-able"
+  198: "Danger-ous-ly"
+  199: "Dark-ness"
+  200: "Day, daily, day-light"
+  201: "Dead"
+  203: "Death"
+  204: "Debark-ed-ing-ation"
+  205: "Decide-d-ing-sion"
+  206: "Deck-ed"
+  207: "Declare-d-ing"
+  208: "Defend-ed-ance-ce-ing"
+  209: "Defer-ed-ing"
+  210: "Delay-s-ed-ing"
+  213: "Denmark"
+  214: "Deny-ed-ies-ing"
+  215: "Depart-ed-ing-ure"
+  216: "Depth"
+  218: "Destroy-ed-ing"
+  219: "Deviate-ed-in g-ation"
+  220: "Did, do, does, doing, done"
+  221: "Direct-ed-ing-ion-ly"
+  223: "Discover-ed-ing-y"
+  224: "Dispatch-es-ed-ing"
+  225: "Distance-s-t"
+  226: "Divide-d-ing-sion"
+  227: "Don't"
+  228: "Double"
+  229: "Doubt-s-ed-ful"
+  230: "Drive-ing-en, drove"
+  234: "During-ance"
+  235: "Dutch-men"
+  238: "Each"
+  239: "Early"
+  240: "East-erly-ward"
+  241: "East-Indies-an"
+  243: "Ease-y-ily"
+  244: "Effect-ed-ing"
+  245: "Embark-ation-ed-ing"
+  246: "Encamp-ed-ing-ment"
+  247: "End-ing-less"
+  249: "Enemy-ies"
+  250: "Enforce-d-ing"
+  251: "Engage-d-ing-ment"
+  253: "England-ish"
+  254: "Enjoin-ed-ing"
+  255: "Entitle-d-ing"
+  256: "Enter-ry-ance"
+  257: "Erase-d-ing-ment"
+  258: "Essential-ly"
+  259: "Establish-ed-ing-ment"
+  260: "Evening"
+  261: "Ever-y-thing-where"
+  264: "Example"
+  265: "Exceed-ed-ing"
+  266: "Excuse-d-ing-able"
+  267: "Execute-d-ing-ion"
+  268: "Exert-ed-ing-ion"
+  269: "Expect-ed-ing-ation"
+  270: "Expedite-d-ing-ion-ous"
+  271: "Express-ed-ing-ion"
+  273: "Extra-ordinary-ly"
+  279: "Fail-ed-ing-ure"
+  280: "Fair-ly"
+  281: "Fall-ing, fell"
+  285: "Fathom-s"
+  287: "Fetch-ed-ing"
+  288: "Few"
+  289: "Fight-ing, fought"
+  290: "Figure-s-d-ative"
+  291: "Final-ly"
+  294: "Finish-ed-ing"
+  295: "Fire-d-ing"
+  296: "Fish, ez"
+  297: "Fix-ed-ing"
+  298: "Flag-s"
+  299: "Fleet-s"
+  300: "Float-ing, afloat"
+  301: "Fog-gy"
+  302: "Follow-ed-ing"
+  304: "For"
+  305: "Forbear-ance-ing-ore"
+  306: "Force-d-ing"
+  307: "Fore, wicut"
+  308: "Form-ed-ing"
+  309: "Fort-s"
+  310: "Fortify-cation-ied"
+  311: "Forward-ed-ing"
+  312: "Foul"
+  314: "Found-ed-ing-ation"
+  315: "France"
+  316: "Friend-s-ly-ship"
+  317: "Frigate-s"
+  318: "From"
+  320: "Further-more-most"
+  321: "Future-ity"
+  328: "Gain-ed-ing"
+  329: "Gale"
+  330: "Gallant-ly"
+  331: "Garrison-ed"
+  332: "Gazette"
+  334: "General-ly"
+  335: "Get-ing, got-gotten"
+  336: "Give, gave, given-ing"
+  337: "Go-ing, gone"
+  338: "Good"
+  339: "Grant-ed-ing"
+  340: "Great-ly-ness"
+  341: "Ground-ed-ing"
+  342: "Guard-ed-ing"
+  344: "Guide-d-ing-ance"
+  345: "Gun-s"
+  346: "Gunner-s"
+  347: "Gun-vessel-s-boat-s"
+  354: "Had, has, have-ing"
+  355: "Hail"
+  356: "Half-ve-s"
+  358: "Haul-ed-ing"
+  359: "Hawse"
+  360: "Hawser"
+  361: "Hazard-ous"
+  362: "Head, ahead, headmost"
+  364: "Health-y-iness"
+  365: "Hear-ing, heard"
+  366: "Her"
+  367: "Here-by-of"
+  368: "High-ly, height"
+  369: "Him"
+  370: "His"
+  371: "Hold-ing, held"
+  372: "Home-wards"
+  375: "Hope-d-ing"
+  376: "Horse-s"
+  377: "Hostile-ly-ity-ies"
+  378: "Hover-ed-ing"
+  379: "Hourly"
+  380: "How-ever"
+  381: "Howitzer-s"
+  387: "If"
+  388: "Immediate-ly"
+  389: "Impart-ed-ing"
+  390: "Impede-d-ing-ment"
+  391: "Important-ance"
+  394: "Improper-ly"
+  396: "In, into"
+  397: "Inability"
+  398: "Inactive-ity-ly"
+  399: "Inconsiderable-bly"
+  400: "Increase-d-ing"
+  401: "Independent-ly"
+  402: "Indicate-d-ing-ion"
+  403: "Indistinct-ly"
+  405: "Ineffectual-ly"
+  406: "Infallible-ly"
+  407: "Infantry"
+  408: "Inform-ation"
+  409: "Inhabit-ed-ing-ants"
+  410: "Injury-ed-ing-ious"
+  411: "Insert-ed-ing-ion"
+  412: "Inside"
+  413: "Instant-ly-ce"
+  415: "Insure-d-ing--ance"
+  416: "Instruct-ed-ing-ion-s"
+  417: "Intelligence-t"
+  418: "Intention-al-ly"
+  419: "Interest-ed-ing"
+  420: "Is"
+  421: "Island-s"
+  422: "It-self"
+  423: "Join-ed-ing, junction"
+  429: "Keep-ing-t"
+  430: "Kill-ed-ing"
+  431: "King-dom"
+  437: "Land-ed-ing"
+  438: "Larboard"
+  439: "Last-ly"
+  440: "Late-ly"
+  441: "Latitude-s, es"
+  442: "Lead-ing, led"
+  445: "Leak-ed-ing-y-age"
+  446: "Learn-ed-ing"
+  447: "Leave-ing, left"
+  448: "Leeward"
+  449: "Lend-ing, lent"
+  450: "Less-en-ed"
+  451: "Letter-s"
+  452: "Lieutenant-s"
+  453: "Light-ly-ness"
+  455: "Limit-ed-ing-ation"
+  456: "Line-s"
+  457: "List"
+  458: "Little, less, least"
+  459: "Load-ed-ing fo"
+  460: "Long"
+  461: "Longitude"
+  462: "Lose, lost, losing"
+  463: "Lower-most"
+  465: "Lugger-s"
+  466: "Lunar-y"
+  467: "Lake"
+  471: "Man, men"
+  472: "Mail-s"
+  473: "Maintain-ed-ing-ancc"
+  475: "Maintain-ed-ing-ance"
+  476: "Majesty-y's"
+  477: "Make-ing, made"
+  478: "Manage-d-ing-ment"
+  479: "Manner"
+  480: "Many-ifold"
+  481: "Marine-s"
+  482: "Mast-s-ed, mast-head"
+  483: "May"
+  485: "Mean-while-time"
+  486: "Me, or"
+  487: "Mediterranean"
+  488: "Meet-ing, met is"
+  489: "Mention-ed-ing"
+  490: "Message-enger"
+  491: "Method"
+  492: "Might"
+  493: "Mile-s"
+  495: "Mill-s"
+  496: "Mind"
+  497: "Misfortune"
+  498: "Misinform-ed-ing-ation"
+  499: "Mission-ary"
+  500: "Mistake-n-ing, mistook"
+  501: "Mizen"
+  502: "Moderate-d-ing-ion"
+  503: "Moment-ary"
+  504: "Month-s-ly"
+  506: "Moor-ed-ing"
+  507: "More-over"
+  508: "Morning"
+  509: "Morrow"
+  510: "Mortar-s"
+  511: "Most-ly"
+  512: "Motive"
+  513: "Move-ed-ing"
+  514: "Much"
+  516: "Must"
+  517: "My, mine"
+  518: "Mayer"
+  526: "Name-ly-less-sake"
+  527: "Narrow-ly-ness"
+  528: "Nation-al"
+  529: "Nature-al-ly"
+  530: "Navy, naval"
+  531: "Near-ly-est-ness"
+  532: "Necessary-ies-ily, need-ful"
+  533: "Neglect-ed-ing-igent"
+  534: "Neither"
+  536: "Never-theless"
+  537: "Neuter-rality"
+  538: "New-ly-s"
+  539: "Night-ly"
+  540: "No-wise"
+  541: "None"
+  542: "Noon-day-tide"
+  543: "Nor"
+  544: "North-erly-ern-ward"
+  546: "Not"
+  547: "Note-d-ing"
+  548: "Nothing"
+  549: "Notice-d-ing-fication"
+  550: "Notwithstanding"
+  551: "Now"
+  552: "Number-ed-ing-eral"
+  561: "Obey-ed-ing-dient-ly-ence"
+  562: "Oblige-d-ing-ation"
+  563: "Observe-d-ing-ation"
+  564: "Obstinate-ly-cy"
+  566: "Obstruct-ed-ing-ion-ive"
+  567: "Obtain-ed-ing-able-ment"
+  568: "Occasion-ed-al-ly"
+  569: "Occur-red-ing-rence"
+  570: "Of"
+  571: "Off-ing"
+  572: "Offensive-ly-ce-fend-er"
+  573: "Offer-ed-ing"
+  574: "Officer-s-like"
+  576: "Official-ly"
+  577: "Omit-ted-ission"
+  578: "On, on board"
+  579: "One"
+  580: "Only"
+  581: "Opinion"
+  582: "Opportune-ity-ly"
+  583: "Oppose-d-ing-ite-ition"
+  584: "Or"
+  586: "Order-ed-inary"
+  587: "Origin-al-ly-ate"
+  588: "Other-wise"
+  589: "Over"
+  590: "Our-selves"
+  591: "Outward"
+  592: "Own"
+  601: "Packet-s"
+  602: "Part-ed-ing-ition"
+  603: "Partake-ing-took"
+  604: "Particular-ly"
+  605: "Pass-ed-ing-age-enger"
+  607: "Peace-ful-ly"
+  608: "People-d-ing"
+  609: "Perfect-ed-ion-ly"
+  610: "Perform-ed-ing-ance"
+  611: "Perhaps"
+  612: "Permit-ted-ing-mission"
+  613: "Persevere-d-ing-ance"
+  614: "Person-al-ly"
+  615: "Persuade-d-ing-sion"
+  617: "Petty-officer"
+  618: "Pilot-ed-ing-age"
+  619: "Place-d-ing"
+  620: "Point-ed-ing, points of the"
+  621: "Port"
+  622: "Portugal"
+  623: "Position"
+  624: "Positive-ly-ness"
+  625: "Possess-ed-ing-ion"
+  628: "Postmeridian"
+  629: "Powder"
+  630: "Power-ful-ly"
+  631: "Practice-d-sing-able"
+  632: "Precaution-ary"
+  633: "Prefer-ed-able-ance"
+  634: "Prepare-d-ing-ation-ative"
+  635: "Present-ed-ing-ation"
+  637: "Preserve-d-ing-ation"
+  638: "Presume-d-ing-ption"
+  639: "Press-ed-ing-ure"
+  640: "Pretend-ed-ing, pretence"
+  641: "Prevail-ed-ing"
+  642: "Prevent-ed-ing"
+  643: "Principal-ly, principle"
+  644: "Prison-cr-s"
+  645: "Private-ly"
+  647: "Privateer-s"
+  648: "Prize-s"
+  649: "Proceed-ed-ing"
+  650: "Procure-d-ing"
+  651: "Progress-ive-ly"
+  652: "Project-ed-ing-ion"
+  653: "Proper-ly"
+  654: "Propose-d-ing-ition"
+  655: "Protest-ed-ing"
+  657: "Prove-d-ing, proof"
+  658: "Provision-s"
+  659: "Public-ly"
+  660: "Punish-ed-ing-ment"
+  661: "Purchase-d-ing"
+  662: "Purport-ing"
+  663: "Pull-ed-ing"
+  664: "Put-ting"
+  671: "Perk leh whe"
+  673: "Qualify-ed-ing-cation"
+  674: "Quality-ties"
+  675: "Quantity-ties"
+  677: "Quarter-s-ed-ing"
+  678: "Question-ed-ing"
+  679: "Quick-ly-ness"
+  680: "Quit-ted-ing"
+  681: "Quite"
+  682: "Quota"
+  688: "Raise-d-ing"
+  689: "Rank-ed-ing"
+  690: "Rate-d-ing"
+  691: "Reach-ed-ing"
+  692: "Read-ing-er"
+  693: "Ready-iness-ly"
+  694: "Rear"
+  695: "Reason-ed-ing-able-y-ness"
+  698: "Receive-d-ing-pt-ion"
+  700: "Recover-ed-ing-y"
+  701: "Red-dish"
+  702: "Redoubt-s"
+  703: "Reduce-d-ing-tion"
+  704: "Refer-ed-ing-ence"
+  705: "Refit-ed-ing"
+  706: "Regard-ed-ing"
+  708: "Regiment-al-ly"
+  709: "Regular-ity-ly"
+  710: "Regulate-d-ing-ion"
+  711: "Reinforce-d-ing-ment"
+  712: "Reject-ed-ing-ment"
+  713: "Relative-ly-ness"
+  714: "Relent-ed-ing"
+  715: "Relieve-d-ing-of"
+  716: "Remain-ed-ing-der"
+  718: "Remark-ed-ing-able-bly"
+  719: "Remonstrance-te-ing-ed"
+  720: "Remove-d-ing-al"
+  721: "Rendezvous"
+  722: "Renew-ed-ing-al"
+  723: "Repair-ed-ing-able"
+  724: "Repeat-ed-ing-ly-ition"
+  725: "Reply-ied-ing"
+  726: "Report-ed-ing-er"
+  728: "Represent-ed-ing-ation"
+  729: "Request-ed-ing-cer"
+  730: "Require-d-ing-site-sition"
+  731: "Reserve-d-ing"
+  732: "Resist-ed-ing-ance-ible-less"
+  733: "Resolve-d-ing-ute-ly-ion"
+  734: "Respect-ed-ing-ive-ly"
+  735: "Restore-d-ing-ation"
+  736: "Retard-ed-ing-ment"
+  738: "Retreat-ed-ing, retire-d-ing"
+  739: "Return-ed-ing"
+  740: "Rich-ly-es-ness"
+  741: "Right-ly"
+  742: "Risk-ed-ing"
+  743: "Romney"
+  744: "Row-ed-ing"
+  745: "Royal-ist"
+  746: "Russia-n"
+  756: "Sail-ed-ing"
+  758: "Sail-maker"
+  759: "Salute-d-ing-ation"
+  760: "Same-ness"
+  761: "Satisfy-ied-ing-action"
+  762: "Safe-ty-ly, save-d-ing"
+  763: "Schooner-s"
+  764: "Sea, ices"
+  765: "Seaman-en"
+  766: "See-ing-n, saw"
+  768: "Second-ly"
+  769: "Secret-ed-ing-ly, cy"
+  770: "Secretary"
+  771: "Secure-d-ing-ly-ity"
+  772: "Send-ing, sent"
+  773: "Senior-ity"
+  774: "Sentence-d-ing"
+  775: "Separate-d-ing-ly-ation"
+  776: "Serve-d-ing"
+  778: "Service-able-y"
+  779: "Settle-d-ing-ment"
+  780: "Shall"
+  781: "She"
+  782: "Shell-s"
+  783: "Shift-ed-ing"
+  784: "Ship-s"
+  785: "Shoal-s"
+  786: "Shore"
+  788: "Single-d-y"
+  789: "Short-ly-en-ed"
+  790: "Shot, shoot-ing"
+  791: "Sick-ly-ened-ness"
+  792: "Signal-s-ly"
+  793: "Signify-ied-ing-ication"
+  794: "Since"
+  795: "Situate-d-ion"
+  796: "Sixth-ly"
+  799: "Slow-ly-ness"
+  800: "So"
+  801: "Soften-ed-ing"
+  802: "Some"
+  803: "Soon"
+  804: "Sort-ed-ing"
+  805: "Sound-ed-ing-s"
+  806: "South-erly-ward-ing"
+  807: "Spain"
+  809: "Speak-ing-er, spoke"
+  810: "Spirit-ed-ly"
+  811: "Split-ed-ing"
+  812: "Spring-ing, sprung"
+  813: "Stand-ing, stood"
+  814: "Starboard"
+  815: "State-d-ing-ly"
+  816: "Station-ed-ing"
+  817: "Stead-ily-ness"
+  819: "Steer-ed-ing-age"
+  820: "Stern-most, astern"
+  821: "Still"
+  822: "Stipulate-d-ing-ion"
+  823: "Stop-ped-ing"
+  824: "Storm-s-y"
+  825: "Strange-ly-er"
+  826: "Strait-en-ed-ing"
+  827: "Strength-en-ed-ing"
+  829: "Strike-ing, struck, surnie"
+  830: "Strong-ly"
+  831: "Subject-ed-ing-ion"
+  832: "Submit-ted-ing-ssion"
+  833: "Substitute-ing-ion"
+  834: "Success-ive-ly-ful-ly"
+  835: "Suffer-ed-ing-s"
+  836: "Sufficient-ly"
+  840: "Supply-ied-ing"
+  841: "Suppose-d-ing-ition"
+  842: "Surgeon-s"
+  843: "Swede-s-ish-n"
+  844: "System-atic-al-ly"
+  850: "Seen"
+  852: "Tack-ed-ing"
+  853: "Take-ing, took"
+  855: "Tarnish-ed-ing"
+  856: "Taste-d-ing-ful"
+  857: "Tell-ing, told"
+  859: "Term-ed-ing-s"
+  860: "Tempt-ed-ing-ation"
+  861: "Tendency"
+  862: "Than"
+  863: "That"
+  864: "The, they, their"
+  865: "Them-selves"
+  866: "Third-ly"
+  867: "These, those"
+  869: "Thick-en-ed-ing"
+  870: "Throw-n"
+  871: "Thunder"
+  872: "Time-d-ly-ous"
+  873: "To-o"
+  874: "Together"
+  875: "Top"
+  876: "Tow-ed-ing"
+  877: "Towards"
+  880: "Transmit-ted-ing-ssion"
+  882: "Travel-led-ing-er"
+  884: "Troops"
+  885: "Truce-s"
+  886: "Twine-d-ing"
+  887: "Twelfth-ly"
+  895: "Value-d-ing-able"
+  896: "Van-most"
+  897: "Variety-able-ous-iation"
+  899: "Veer-ed-ing"
+  900: "Very"
+  901: "Vessel-s"
+  902: "Victor-y-ious"
+  903: "Vocabulary-ies"
+  904: "Voyage"
+  910: "Unable, alle"
+  911: "Under"
+  912: "Understand-ing-ood"
+  914: "Unfit-ing-ly-ness"
+  915: "Unite-d-ing"
+  916: "Unknown-ing-ly"
+  917: "Unless"
+  918: "Until"
+  920: "Unto"
+  921: "Unwilling-ly-ness"
+  922: "Up-on-per-most-ward"
+  923: "Urge-d-ing-ency-t-ly"
+  924: "Us"
+  925: "Useful-ly-ness-ing"
+  926: "Usual-l ore"
+  932: "Wait-ed-ing"
+  934: "Want-ed-ing"
+  935: "War-like-fare"
+  936: "Warp-ed-ing"
+  937: "Warrant-ed-ing-able-y-ness"
+  938: "Was, were eae"
+  940: "Water-ed-ing"
+  941: "Way"
+  942: "We"
+  943: "Weather-ed-ly-most-gage"
+  944: "Weigh-ed-ing"
+  945: "Well"
+  946: "West-erly-ern-ward"
+  948: "When-ever-soever"
+  950: "Whence-soever"
+  951: "Which-ever-soever, what"
+  952: "While-st"
+  953: "Whither, where-ever-socver"
+  954: "Who"
+  956: "Whole-ly"
+  957: "Why"
+  958: "Will-ing-ly-ness"
+  960: "Wind-y-ward"
+  961: "Winter-ed-ing"
+  962: "Wish-ing-ful-ly"
+  963: "With"
+  964: "Withdraw-ing-n"
+  965: "Within"
+  966: "Without"
+  967: "Woman-en"
+  968: "Word-s"
+  970: "Worse-st"
+  971: "Wound-ed-ing"
+  972: "Wreck-ed"
+  973: "Write-ten-ing, wrote"
+  974: "Wrong-ly-ful-ly"
+  985: "Yaw-ed-ing"
+  986: "Yard-s"
+  987: "Yes"
+  988: "Yesterday"
+  990: "Yet"
+  991: "You, your, yours"
+  996: "Zeal-ous-ly"
+  1026: "Abs"
+  1027: "Abate-d-ing-ment"
+  1028: "Abrupt-ly"
+  1029: "Abundance-tly"
+  1030: "Accommodate-d-ing"
+  1031: "Accomplish-cd-ing-ment"
+  1032: "Account-ed-ing"
+  1033: "Accurate-Jy"
+  1034: "Accuse-d"
+  1035: "Acknowledge-d-ing-ment"
+  1036: "Acquire-d-ing"
+  1037: "Acquit-ed-ing-al"
+  1038: "Across"
+  1039: "Actual-ly"
+  1040: "Adapt-ed-ing"
+  1041: "Adequate-ly"
+  1043: "Adjacent"
+  1044: "Administer-ed-ing-ration"
+  1045: "Admit-cd-ing"
+  1046: "Admonish-ed-ing-ition"
+  1047: "Adrift"
+  1048: "Advice-s"
+  1049: "Afar-oft'"
+  1051: "Affect-ed-ing-ly"
+  1053: "Afford-ed"
+  1054: "Afloat"
+  1055: "Ago"
+  1056: "Aground"
+  1057: "Alacrity"
+  1058: "Alarm-ed"
+  1060: "Allow-ed-ing-ance"
+  1061: "Almost"
+  1062: "Aloft"
+  1063: "Along"
+  1064: "Already"
+  1065: "Alter-ed-ing"
+  1066: "Among"
+  1067: "Amount"
+  1068: "Ample"
+  1069: "Announce-d-ing"
+  1070: "Annoy-ed-ing-ance"
+  1071: "Apology-ized"
+  1072: "Apply-ied-ication"
+  1073: "Approach-ed-ing"
+  1074: "Arrest-ed-ing"
+  1075: "Article-s"
+  1076: "Aside"
+  1077: "Assure-d-ing-ance"
+  1078: "Astonish-ed-ing-ment"
+  1079: "Atmosphere"
+  1080: "Attain-ed-ing-ment"
+  1081: "Attempt-ed-ing"
+  1082: "Avail-ed-ing"
+  1083: "Authentic-icity"
+  1084: "Authority-atively"
+  1085: "Awhile"
+  1089: "Alarmed"
+  1091: "Ball-s"
+  1092: "Bank-s-ed"
+  1093: "Bar-s"
+  1094: "Bare"
+  1095: "Beacon-s ty"
+  1096: "Becalm-ed"
+  1097: "Bed-ding"
+  1098: "Behold-ing-en-held rT"
+  1099: "Belay-ed-ing"
+  1100: "Belong-ing"
+  1102: "Beneath"
+  1103: "Berth or birth"
+  1104: "Beside-s"
+  1105: "Besiege-ed-ing dln"
+  1106: "Bespeak-spoke"
+  1107: "Beware ci wget"
+  1108: "Bight or bite"
+  1109: "Bilge-ulge-d"
+  1110: "Billow-s"
+  1112: "Bind-s-ing-er"
+  1113: "Biscuit"
+  1114: "Blame-able-less-ing-d"
+  1115: "Blockade nef"
+  1116: "Blood-y"
+  1117: "Blunder-ing-ed-buss"
+  1118: "Boatswain-s"
+  1119: "Bolt-rope"
+  1120: "Boom-s os"
+  1122: "Bottom-less"
+  1123: "Bow-line"
+  1124: "Bow-sprit"
+  1125: "Brackish fe"
+  1126: "Brail"
+  1127: "Brave-ry-ly xX"
+  1128: "Bulk-head"
+  1129: "Buy-er"
+  1135: "Cabin-s atone"
+  1136: "Call-ed-ing"
+  1137: "Camp-s fa"
+  1138: "Cannon-ade"
+  1139: "Canvas"
+  1140: "Capstan eakiiticads"
+  1142: "Care-ful-ly"
+  1143: "Careen-ed-ing"
+  1144: "Cartel-s"
+  1145: "Castle-s"
+  1146: "Caulk-er-ing"
+  1147: "Chain-s-ed"
+  1148: "Charge-d-able"
+  1149: "Chart-s"
+  1150: "Check-cd-ing"
+  1152: "Chief-ly"
+  1153: "Choice"
+  1154: "Claim-ed-in-able"
+  1155: "Clean-ly-liness"
+  1156: "Cloud-y"
+  1157: "Cluster"
+  1159: "Comr"
+  1160: "Com"
+  1163: "Compass-es"
+  1164: "Complain-ed-ing-t"
+  1165: "Complement"
+  1166: "Compleat-ed-ing"
+  1167: "Comprehend-cd-ing-sion"
+  1168: "C l-ing-ati"
+  1169: "Conceal-ed-ing-ment"
+  1172: "Conciliate-d-i"
+  1173: "Concise-ness"
+  1174: "Conclude-d-ing-sion"
+  1175: "Condescend-ed-ing-sion"
+  1176: "Condition-al"
+  1177: "Confess-ed-ing-ion"
+  1178: "Confidence-tly-tial"
+  1179: "Confirm-ed-ing-ation"
+  1180: "Confuse-d-ion"
+  1182: "Conquer-ed-ing-or-est"
+  1183: "Consequence-tial-tly"
+  1184: "Consume-d-ing"
+  1186: "Continent-al"
+  1187: "Contradict-ed-ing-ion-ory"
+  1188: "Contrive-d-ing-ance"
+  1189: "Cord-age"
+  1190: "Correspond-ed-ing-ent"
+  1192: "Creek-s"
+  1193: "CA"
+  1194: "Cerf"
+  1197: "Dan"
+  1198: "Dare-ing-urst"
+  1199: "Decay-ed-ing"
+  1200: "Deceive-d-ing-t-ption-tful"
+  1201: "Decline-d-ation"
+  1203: "Deliberate-d-ing-ion"
+  1204: "Deliver-ed-ing-ance"
+  1205: "Demand-ed-ing"
+  1206: "Demolish-ed-ing-ion"
+  1207: "Depend-ed-ing-ance"
+  1208: "Describe-d-ing-ption"
+  1209: "Desolate-d-ing aaae"
+  1213: "Determine-d-ation"
+  1214: "Differ-ed-ing-ence"
+  1215: "Diligence-t-ly"
+  1216: "Disappoint-ed-ment"
+  1217: "Disarm-ed-ing sS"
+  1218: "Discharge-s-d-ing"
+  1219: "Discipline-d"
+  1220: "Disguise-s-d-ing"
+  1221: "Dismantle-d-ing"
+  1223: "Dismast-ed"
+  1224: "Disobey-ed-ing-dience"
+  1225: "Disorder-ed-ing-ly"
+  1226: "Disperse-d-ing-ion"
+  1227: "Dispose-d-al"
+  1228: "Distinct-ness-ly ih"
+  1231: "Dock-yard"
+  1233: "Down-ward"
+  1234: "Drag-ged-ing"
+  1235: "Dry-ied"
+  1239: "Eligible"
+  1240: "Else-where"
+  1243: "Employ-ed-ing-er-ment"
+  1244: "Empty-iness"
+  1245: "Enable-d-ing"
+  1246: "Encourage-d-ing-ment"
+  1247: "Endanger-ed-ing"
+  1248: "Enough"
+  1249: "Entire-ly"
+  1250: "Error-oneous-ly"
+  1254: "Evacuate-d-ing-ion"
+  1255: "Ever"
+  1256: "Evolution-s"
+  1257: "Evidence-t-ly"
+  1258: "Exact-ly-ness"
+  1259: "Excellent-ce-cy-tly"
+  1260: "Exceed-ed-ing-ly, excess"
+  1261: "Except-ed-ing-ion-able"
+  1264: "Expend-ed-ing-ce"
+  1265: "Explain-ed-ing-ation"
+  1266: "Explode-sion"
+  1267: "Extend-ed-ing-sive-ion"
+  1268: "External-ly"
+  1269: "Extinguish-tinct"
+  1270: "Extol-led-ing"
+  1279: "Faint-ly-ness"
+  1280: "False-hood, fallacious"
+  1281: "Fancy-iful"
+  1283: "Fatigue-d-ing"
+  1285: "Fear-ful-ly-ness"
+  1286: "Feasible-ility"
+  1287: "Feel-ing-ly"
+  1288: "Feign-ed-ing, feint"
+  1289: "Fend-er-ing"
+  1290: "Fever-ish"
+  1291: "Fierce-ly-ness"
+  1293: "Fine-ness"
+  1294: "Flan"
+  1295: "Flash-es"
+  1296: "Flat-ten-ness-tish"
+  1297: "Flesh-meat"
+  1298: "Fling-ung-ight"
+  1299: "Flow-ing-cd"
+  1300: "Fluke"
+  1301: "Flush"
+  1302: "Fly-ing-ed-own"
+  1304: "Food"
+  1305: "Forbid-den-ing"
+  1306: "Foreland"
+  1307: "Forget-ing-ot-ten"
+  1308: "Former"
+  1309: "Forsake-n-ing-ook"
+  1310: "Forth-coming grotoo"
+  1311: "Frame-d-ing"
+  1312: "Fraud-ulent"
+  1314: "Freight-ed"
+  1315: "Frequent-ed-ly-ncy"
+  1316: "Fresh-cn-cd-iy"
+  1317: "Frustrate-d-ing"
+  1318: "Fuel"
+  1319: "Fugitive-s"
+  1321: "Fury-ious-ly"
+  1328: "Gang-way"
+  1329: "Glad-ly-ness"
+  1330: "Glance"
+  1331: "Glare"
+  1332: "Gloom-y-iness"
+  1334: "Glory-ify-ious-ly"
+  1335: "Grapple-d-ing"
+  1336: "Gratitude-fulness-uitous"
+  1337: "Gravel-ly"
+  1339: "Grey-ish"
+  1340: "Grieve-d-ing-ous"
+  1341: "Grind-ing-ound"
+  1342: "Gross hal so"
+  1344: "Grow-ing-n"
+  1345: "Guess-ed-ing rar"
+  1346: "Guilt-y"
+  1347: "Gush-ed-ing iene"
+  1349: "Geo"
+  1354: "Habit-ation-able"
+  1355: "Hammock-s"
+  1356: "Hand-le"
+  1357: "Hang-ed-ing"
+  1359: "Hare"
+  1360: "Have-ing, has, had"
+  1361: "Heart-ily"
+  1362: "Heavy"
+  1364: "Heavy-iness"
+  1366: "Help-ful-ing-ed-less"
+  1367: "Hemp"
+  1368: "Hide-ing-den"
+  1369: "Hill-y"
+  1370: "Hinder-ed-rance-most"
+  1372: "Hitch"
+  1374: "Hoist-ed-ing"
+  1376: "Holland"
+  1377: "Hook-s-ed-ing"
+  1380: "Hurry"
+  1381: "H urricane"
+  1387: "Image-ine"
+  1388: "I mi"
+  1389: "Impatient-ce"
+  1390: "Imperfect-ly-ion"
+  1391: "Implement"
+  1392: "Imply"
+  1394: "Impose-ition-tor"
+  1395: "Impower"
+  1396: "Impress-ed"
+  1397: "Imprudence-nt-tly"
+  1398: "Inch-es"
+  1399: "Incident-ally"
+  1400: "Incurable"
+  1401: "Indeed"
+  1402: "Induce-d-ing-ment"
+  1403: "Infect-ed-ing-ion"
+  1405: "Inland os ada"
+  1406: "Inspect-ed-ing-ion"
+  1407: "Instrument-al-ly"
+  1408: "Intercept-ed-ing"
+  1409: "Interior"
+  1410: "Interpret-ed-ing-ation"
+  1411: "Intrench-ed-ing-ment"
+  1412: "Intricate-cy eadin ee"
+  1413: "Intrust-ed-ing"
+  1415: "Invade-d-ing-sion"
+  1416: "Inventory"
+  1417: "Investigate-d-ing-tion"
+  1418: "Invoice-s bE ke it"
+  1419: "Ireland"
+  1420: "Jack te"
+  1421: "Joint-ly"
+  1422: "Journal-s"
+  1423: "Just-ly-icc-ify-cation"
+  1429: "Keel"
+  1439: "Lame-ly-ness"
+  1440: "Laniard-s"
+  1441: "Large-ly-ness"
+  1442: "Launch-ed-ing"
+  1443: "Lays-to, lies-to, ing-to"
+  1445: "Lee-way-ward"
+  1446: "Liberty, af"
+  1447: "Licence"
+  1448: "Life"
+  1449: "Lighter-s"
+  1450: "Lightning"
+  1451: "Like-ly"
+  1452: "Lizard"
+  1453: "Locality"
+  1455: "Log"
+  1456: "Look-ed-ing, look-out"
+  1457: "Loom-s-ing"
+  1458: "Loose-en-ed-ly"
+  1459: "Louder-ly-ness sor to"
+  1460: "Loyal-ty"
+  1461: "Luck-y i ts"
+  1462: "Luff-ed-ing"
+  1463: "Lull-ed-ing"
+  1465: "Luminous as to"
+  1466: "Lurk-s-ed-ing"
+  1470: "Lore"
+  1471: "Madeira"
+  1472: "Magazine-s"
+  1473: "Magnify-ies-cd-tude"
+  1475: "Majority"
+  1476: "Malta-ese"
+  1477: "Manifest-ed-ing-ly-ation"
+  1478: "Manufacture"
+  1479: "Map-s"
+  1480: "March-ed-ing"
+  1481: "Mark-er"
+  1482: "Marsh-y"
+  1483: "Martial"
+  1485: "Master-ly"
+  1486: "Mate-s"
+  1487: "Measure-d-ing-ment"
+  1488: "Meddle-ing-some"
+  1489: "Mediate-d-ing-ion-or"
+  1490: "Memory-ial-able-andum"
+  1491: "Mend-ed-ing"
+  1492: "Merchant-dize"
+  1493: "Mercy-ful-ly"
+  1495: "Mere-ly"
+  1496: "Merit-orious-ly ae"
+  1497: "Mid-dle, midst"
+  1498: "Mild-ly-ness"
+  1499: "Military sata"
+  1500: "Mingle-d"
+  1501: "Minute-ly-ness"
+  1502: "Misbehave-d-ing-iour"
+  1503: "Miscarry-ied-age"
+  1504: "Mist-y"
+  1506: "Modest-y-ly"
+  1507: "Mons"
+  1508: "Moon"
+  1509: "Moral-ity-ize-ly"
+  1510: "Motion-less"
+  1511: "Mount-ains-ous"
+  1512: "Mud-dy"
+  1513: "Multiply-ied-ing-cation"
+  1514: "Murmur-ed-in"
+  1516: "Musket-s"
+  1517: "Mutiny-ied-ous"
+  1526: "Naked-ness"
+  1527: "Naples"
+  1528: "Narrate-ion-ive"
+  1529: "Native-s"
+  1530: "Navigate-d-ing-ion-able"
+  1531: "Nautical-ly"
+  1532: "Neap-tide"
+  1533: "Neat-ly-ness"
+  1534: "Necessity-ous"
+  1536: "Needless"
+  1537: "Needle"
+  1538: "Negative-ly"
+  1539: "Negotiate-d-ing-ion"
+  1541: "Net-ting"
+  1542: "Next"
+  1543: "Noble-ness-bly apap eases"
+  1544: "Nobody"
+  1546: "Noise"
+  1548: "Nook-s"
+  1549: "Noose"
+  1550: "Notion"
+  1551: "Nourished-ing-ment"
+  1552: "Numb-ed-ness"
+  1561: "Oak-en"
+  1562: "Oakum"
+  1563: "Oar-s"
+  1564: "Oath"
+  1566: "Object-ed-ing-ion-able"
+  1567: "Oblique-ly-ity"
+  1568: "Oblong"
+  1569: "Obstacle-s"
+  1570: "Obtuse"
+  1571: "Obviate"
+  1572: "Obvious-ly"
+  1573: "Occupy-ied-ing"
+  1574: "Ocean"
+  1576: "Ocular"
+  1578: "Often-times"
+  1579: "Old"
+  1580: "Once"
+  1581: "Ooze-d-ing"
+  1582: "Open-ed-ing-ly-ness"
+  1583: "Operate-ed-ing-ion-or elite"
+  1584: "Opprobrious-ly-um"
+  1586: "Option-al sar to"
+  1587: "Ordain-ed-ing"
+  1588: "Ordnance"
+  1589: "Ornament-al-ly"
+  1590: "Ought"
+  1591: "Outrage-ous-ly"
+  1592: "Owe-d-ing cieigiiee"
+  1601: "Parallel-s"
+  1602: "Parapet-s"
+  1603: "Parole"
+  1604: "Passport-s"
+  1605: "Patrol-ing"
+  1607: "Pay-ed-ing-ment, paid"
+  1608: "Peak"
+  1609: "Pendant-s"
+  1610: "Penetrate-d-ing-ion-ble"
+  1611: "Peninsula"
+  1612: "Perforate-d-ing-ion"
+  1613: "Perish-ed-ing-able"
+  1614: "Perpendicular"
+  1615: "Perpetuate-ed-lly"
+  1617: "Perplex-ed-ing-ity"
+  1618: "Perspective"
+  1619: "Peruse-d-ing-al"
+  1620: "Petition-ed-ing"
+  1621: "Physic-al-i"
+  1622: "Piece-s-meal"
+  1623: "Pierce-d-ing"
+  1624: "Pinnace"
+  1627: "Plan"
+  1628: "Plenty-eous-iful-ly"
+  1629: "Plunder-ed-ing"
+  1630: "Plunge-d-ing"
+  1631: "Pole-ar-ity uaa"
+  1633: "Poor-ly zz"
+  1634: "Portion"
+  1635: "Pounder-s"
+  1637: "Prospect"
+  1638: "Precise-ly-ion"
+  1639: "Predict-ed-ing-ion"
+  1640: "Prefix-ed-ing"
+  1641: "Prejudice-ial"
+  1642: "Preposterous-ly"
+  1643: "Pretty-ily-iness"
+  1644: "Produce-d-ing-tion"
+  1645: "Proffer-ed-ing"
+  1647: "Profit-able-y"
+  1648: "Profuse-ion"
+  1649: "Prohibit-ed-ing-ion"
+  1650: "Prominence-t-ontory"
+  1651: "Promise-d-ing"
+  1652: "Prompt-ed-ing-itude"
+  1653: "Proportion-ed-ing-al-ly"
+  1654: "Propriety-or"
+  1655: "Prosecute-d-ing-ion"
+  1657: "Prospect"
+  1658: "Prosper-ed-ing-ous-ly"
+  1659: "Protect-ed-ing-ion"
+  1660: "Provoke-d-ing-cation"
+  1661: "Prudence-t-ial-ly"
+  1662: "Pump-s-ed-ing"
+  1663: "Purser"
+  1664: "Pursue-d-ing-ant-uit"
+  1667: "Pe ose ot a bacem bP"
+  1673: "Quadrant-s"
+  1674: "Quarantine"
+  1675: "Quarrel-ed-ing-sorae"
+  1677: "Quay-s"
+  1678: "Queen"
+  1679: "Quench-ed-ing"
+  1680: "Query-ies"
+  1681: "Quick-ly"
+  1682: "Quote-d-ing-ation"
+  1688: "Race"
+  1689: "Raft-s"
+  1690: "Rain-y-bow"
+  1691: "Rally-ing-ied"
+  1692: "Range-d-ing"
+  1693: "Ratify-ied-ing-ication"
+  1694: "Rash-ly-ness"
+  1695: "Ratify-ied-ing-ication"
+  1697: "Real-ly-ity-izc"
+  1698: "Recapitulate-d-ing-ion"
+  1699: "Recommence-d-ing-ment"
+  1700: "Recommend-ed-ing"
+  1701: "Recompense-d"
+  1702: "Reconcile-d-ing"
+  1703: "Rectify-ied-ing"
+  1704: "Redress-ed-ing"
+  1705: "Reflect-ed-ing-ion"
+  1706: "Refresh-cd-ing-ment"
+  1708: "Refuse-d-ing"
+  1709: "Regain-cd-ing"
+  1710: "Rejoin-ed-ing"
+  1711: "Relate-d-ing"
+  1712: "Release-d-ing"
+  1714: "Remember-cd-ing-ance oe"
+  1715: "Republic-an-ism"
+  1718: "Rescue-d-ing"
+  1719: "Rest-less gt"
+  1720: "Restrict-ed-ing-ion"
+  1721: "Resume-d-ing"
+  1722: "Review-ed-ing"
+  1723: "Revise-d-ing-ion"
+  1724: "Revoke-d-ing-cation"
+  1725: "Revolution-ary"
+  1726: "Reward-ed-ing"
+  1728: "Rig-gcd-ing-er"
+  1729: "Rise-ing, rose"
+  1730: "Road-s"
+  1731: "Rock-s-y"
+  1732: "Roll-ed-ing"
+  1733: "Rope-s"
+  1734: "Rot-ten-ing"
+  1735: "Rough-ness-ly"
+  1736: "Round"
+  1738: "Rouse-d-ing"
+  1739: "Rub-bed-ing-er"
+  1740: "Rude-ness-ly"
+  1741: "Ruin-ed-ing"
+  1742: "Rule-d-ing-er"
+  1744: "Run-ning-er, ran"
+  1745: "Rupture"
+  1746: "Rust-y"
+  1756: "Sake"
+  1758: "Salvage"
+  1759: "Sand-y"
+  1760: "Say-ing-ed"
+  1761: "Scale-d-ing"
+  1762: "Scarce-ness-ly"
+  1763: "Scatter-ed-ing"
+  1764: "Scheme-d-ing"
+  1765: "Scope"
+  1766: "Scorch-ed-ing"
+  1768: "Scotch or"
+  1769: "Seal-ed-ing"
+  1770: "Search-ed-ing"
+  1771: "Seize-d-ing"
+  1772: "Select-ed-ing"
+  1773: "Self-ish-same"
+  1774: "Sell-ing, sold"
+  1775: "Sense-ible-ility"
+  1776: "Sentry or sentinel"
+  1778: "Signalize-ing"
+  1779: "Seventh-ly"
+  1780: "Several-ly"
+  1781: "Shape-d-ing"
+  1782: "Share-d-ing zat"
+  1783: "Sharp-en-ed-ly-ness"
+  1784: "Shatter-ed-ing"
+  1785: "Sheath or sheathe-d-ing"
+  1786: "Sheet-s tt"
+  1790: "Shine-ing, shone"
+  1791: "Shut-ting"
+  1792: "Shun-ned-ing"
+  1793: "Side xX"
+  1794: "Siege"
+  1796: "Silence-t-ly"
+  1798: "Sink-ing, sunk-en"
+  1799: "Size-d-able"
+  1800: "Sketch-ed-ing"
+  1801: "Slack-ness-ly"
+  1802: "Slight-ed-ing-ly-ness"
+  1803: "Small-ness"
+  1804: "Smoke-y"
+  1805: "Sole-ly"
+  1806: "Solicit-cd-ing-ation"
+  1807: "Spar-s"
+  1809: "Spare-d-ing-ly"
+  1810: "Special-ly"
+  1811: "Speed-y-ily-ness"
+  1812: "Splice-d-ing"
+  1813: "Spread-ing"
+  1814: "Sprit-sail"
+  1815: "Spy-ied-ing"
+  1816: "Squall-y"
+  1817: "Standard"
+  1819: "Stay-s-ed"
+  1820: "Stiff-ly-ness"
+  1821: "Stow-ed-ing-age"
+  1822: "Strand-ed-ing"
+  1823: "Stretch-ed-ing"
+  1824: "Strict-ness-ly"
+  1825: "Stubborn-ly"
+  1826: "Study-ied-ing"
+  1827: "Substance-tial"
+  1830: "Such"
+  1831: "Sudden-ly-ness"
+  1832: "Summon-s"
+  1833: "Superior-ity"
+  1834: "Support-ed-ing"
+  1835: "Supreme-ly"
+  1837: "Surrender-ed-ing"
+  1840: "Survey-ed-ing"
+  1841: "Suspect-ed-ing-icion-ous"
+  1842: "Sustain-ed-ing"
+  1843: "Swell-ed-ing"
+  1844: "Swift-ly-ness"
+  1852: "Tackle-d-ing"
+  1853: "Talk"
+  1854: "Tar"
+  1856: "Teach-ing, taught"
+  1859: "Temper-ed"
+  1860: "Tenth-ly"
+  1861: "Tend"
+  1863: "Then, thence"
+  1864: "Think-ing, thought-ful-ly"
+  1866: "Thing-s"
+  1867: "Though"
+  1870: "Through"
+  1871: "Thus"
+  1874: "Touch-ed-ing"
+  1875: "Track, tract"
+  1876: "Trade"
+  1877: "Transact-ed-ing-ion"
+  1879: "Treachery-ous"
+  1880: "Treat"
+  1881: "Trim-ly-ming"
+  1883: "Trust-ed-ing-ness-y"
+  1884: "True-ly"
+  1885: "Turn"
+  1886: "Try-ied-ing-al"
+  1887: "Twice"
+  1894: "Teen futt ated"
+  1895: "Vain-ly"
+  1896: "Vane-s"
+  1897: "Vast-ly-ness"
+  1899: "Venture-d-ing"
+  1900: "Verbal-ly-tun"
+  1901: "View-ed-ing"
+  1902: "Vigilant-ly, ce"
+  1903: "Visible-y-on-ary"
+  1904: "Visit-ed-ing-ation"
+  1910: "Ultimate-ly-tum"
+  1911: "Unarmed"
+  1912: "Unbent"
+  1913: "Uncertain-ty"
+  1914: "Unfathomable-y-ed"
+  1915: "Unfurl-ed-ing"
+  1916: "Unlade-d-ing, load-ed-ing"
+  1917: "Unit-s"
+  1918: "Unman-ned-ing"
+  1920: "Unprepared-ness"
+  1921: "Unrig-ged-ing"
+  1923: "Unserviceable-y"
+  1924: "Useless-ly-ness"
+  1925: "Utility"
+  1926: "Utmost"
+  1933: "Wade-d-ing"
+  1934: "Waft-ed-ing-er"
+  1935: "Wage-d-ing"
+  1936: "Walk-ed-ing"
+  1937: "Wall-ed-s"
+  1940: "Warn-cd-ing"
+  1941: "Wash-ed-ing"
+  1942: "Waste-d-ing-ful-ly-ness"
+  1944: "Wave-d-ing-y"
+  1945: "Weak-ly-en-ed-ness"
+  1946: "Wear-y-ied-iness"
+  1947: "Week-ly-s"
+  1948: "Welcome-d-ing-ness"
+  1950: "Wet-ness"
+  1951: "Wharf-age"
+  1952: "Wad-ding"
+  1953: "Wherry-ies"
+  1954: "Whirl-wind"
+  1956: "Wide-ly-en-ed-ness, width"
+  1957: "Wild-ly-ness"
+  1958: "Wilful-ly-ness"
+  1960: "Win-ning, won"
+  1961: "Winch"
+  1962: "Wine"
+  1963: "Wise-ly-dom"
+  1964: "Witness-es-ed-ing"
+  1965: "Wonder-ed-ing-ful-ly"
+  1966: "Wont-ed-ness"
+  1967: "Wood-ed-en"
+  1968: "Work-ing"
+  1970: "World-ly"
+  1971: "Worth-y-ily-iness"
+  1972: "Would"
+  1973: "Wreak-ed-ing"
+  1974: "Wrought"
+  1985: "Yacht-s"
+  1986: "Yawl-s"
+  1987: "Year-ly"
+  1988: "Yellow-ish"
+  1990: "Yield-ed-ing"
+  1991: "Yonder"
+  1996: "Zodiac"
