@@ -3847,8 +3847,9 @@
         var mid = stripMid(hull, side, port.x_m, centroid(pts));
         var open = portOpen(port, side, snapshot);
         var gid = port.guns[side] || port.guns.both;
-        var deckWords = port.deck === "upper" ? "upper-deck" : port.deck;
-        var words = (open ? "a " + deckWords + " port, open" : gid ? (gunState(snapshot, gid).shut ? "a " + deckWords + " port, shut, the sea at its sill" : "a " + deckWords + " port, its lid shut") : "an empty " + deckWords + " port, its lid shut");
+        var deckWords = (port.deck === "upper" ? "upper-deck" : port.deck) + " port";
+        var aPort = (/^[aeiou]/.test(deckWords) ? "an " : "a ") + deckWords;
+        var words = open ? aPort + ", open" : !gid ? "an empty " + deckWords + ", its lid shut" : gunState(snapshot, gid).shut ? aPort + ", shut, the sea at its sill" : aPort + ", its lid shut";
         figs.push({ kind: "hull", part: open ? "port" : "lid", side: side, cls: open ? "open" : "shut", pts: pts, sortAt: mid, outward: faceOut(pts, sign), sea: true, words: words, deck: port.deck, at_x: port.x_m });
         if (open) {
           // the lid hauled up outboard about its hinge along the port's top
@@ -3857,7 +3858,7 @@
           var depth = port.top_m - port.sill_m;
           var swing = v(0, sign * Math.sin(a) * depth, -Math.cos(a) * depth);
           var lid = [top[0], top[1], add(top[1], swing), add(top[0], swing)];
-          figs.push({ kind: "hull", part: "lid", side: side, cls: "open", pts: lid, sortAt: centroid(lid), sea: true, words: "a " + deckWords + " port's lid, hauled up", deck: port.deck, at_x: port.x_m });
+          figs.push({ kind: "hull", part: "lid", side: side, cls: "open", pts: lid, sortAt: centroid(lid), sea: true, words: aPort + "'s lid, hauled up", deck: port.deck, at_x: port.x_m });
         }
       });
     });
