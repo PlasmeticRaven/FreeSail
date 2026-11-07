@@ -18395,3 +18395,224 @@ failures, and after it the files step 4 touched with its truths (7-380, 7-382, 7
 84's step 8 saves of many hulls in `test_hulls.py` and `test_replay.py`). The pace alone on the
 final tree: 12 of 13, 7-159 at 474, toggled against 1662b54: the branch 492, 501, 498; the trunk
 455, 487, 491.
+
+## Package 76: the signal books built out (2026-11-07)
+
+Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
+are 71's shape (`docs/design/Design-Signals.md`); this package fills them from the period's
+pages. It begins with the research pass (the brief's item 0, the owner's research phase of
+2026-11-07), committed and pushed on its own and read by the lead before step 1 goes on; the
+steps' sections follow below it as they are done.
+
+### The research pass (step 0): the period's signal books
+
+**Where it was looked for.** The Internet Archive answered every request (advanced search,
+metadata, the OCR texts and the IIIF server; its whole-book PDFs came at about a hundred
+kilobytes a second, so the page images were cut from the IIIF server instead). **Refused by
+the hosts, not by this environment's network** (the proxy passed every request and each
+host answered with its own page): the Biblioteca Digital Hispánica (`bdh.bne.es`, 403 with
+the Biblioteca Nacional's own refusal page), Gallica (`gallica.bnf.fr`, 403), HathiTrust
+(`babel.hathitrust.org`, 403, Cloudflare's "Just a moment..."); Google's Books API answered
+429, its unkeyed daily quota nought. Delpher's public search interface (`jsru.kb.nl`)
+answers, but only for its newspaper and ANP collections; its books are not searchable by it
+without a collection name it does not publish, so no Dutch book was found there. The Royal
+Danish Library's site answers but has no search this session could drive. So every text
+below is the Archive's copy.
+
+**Found, fetched and committed** (twenty-nine OCR texts under `docs/references/signals/`,
+11 MB, each with its row in `docs/references/README.md` saying what it covers and is
+trusted for; all public domain by age):
+
+| Nation | Text | Period | Answers for |
+|---|---|---|---|
+| Britain | *Signal-Book for the Ships of War, Day and Fog*, 1796 | Howe's numerary in the edition before 1799 | **the meanings, the form and the flags** of the day and fog book: the Admiral's single flags, the numeral flags, the numeral and pendant signals, sails and guns, the fog guns, the compass signals, the private ships' table of flags. Not the 1799 numbers (16 here is "Attack the enemy") |
+| Britain | *Night Signals and Instructions for the Conduct of Ships of War*, 1799 | the 1799 issue exactly | **the night book's numbers and forms** (the lights in number and place, false fires, guns, rockets) and the sailing and battle instructions by night |
+| Britain | Popham, *Telegraphic Signals; or Marine Vocabulary*, 1803 | the Trafalgar year's edition | **the dictionary**: the table of figures, letters and flags, the numbered words (about 1,200 numbered lines), the sentences |
+| Britain | *Instructions for the Conduct of the Ships of War*, 1776; *Signals and Instructions in addition*, 1779; *Signals for the Royal Navy and Ships under Convoy*, 1748 | before the numerary's settled form | the instructions' wording and the old convoy form; background, no 1805 numbers |
+| Britain | Corbett, *Fighting Instructions 1530-1816*, 1905, and *Signals and Instructions 1776-1794*, 1908 | editions of 1905 and 1908, out of copyright | the books' history (the 1799 quarto, the numbers changed from Howe's, reprinted 1806 and 1808, in use till 1816), **Howe's Explanatory Instructions of 1799 printed whole**, the bibliography of every signal book to 1816 and where its copies lie |
+| Britain | Jackson, *Logs of the Great Sea Fights*, vol. II, 1900 (already filed under `jackson/`) | the logs of 1798 to 1805 | **the 1799 book's numbers as hoisted** at Copenhagen and Trafalgar (below) |
+| France | Orvilliers, *Signaux généraux pour l'escadre du Roi*, Brest, 1772 | the royal fleet's whole book before du Pavillon | the French form: day, night, fog, getting under way, combat, chase, police |
+| France | Morogues, *Tactique navale*, 1763; du Pavillon, *Rapport d'un projet de signaux*, 1775 | the reform's ground | the principles of the French numerary |
+| France | Tronjoly, *Signaux de jour* and *de nuit ... pour la division*, Isle de France, 1779 | a division's books | a cruising division's day and night signals in the French form |
+| France | Audibert Ramatuelle, *Cours élémentaire de tactique navale*, 1802 | the Consulate's | **the nearest to the French book of 1805**: the signals (ch. IV), the chase, the convoy's escort |
+| Spain | Mazarredo, *Instrucciones y señales para el régimen y maniobras de la esquadra* (Córdoba's), Cádiz 1781, the third edition by royal order, Madrid | the Real Armada's book by royal order | **the Spanish book's spine**: the plan (four hundred two-flag signals from twenty flags or pendants whose values are given on a separate sheet and changed at will, a "universal" flag for any other, the cornets for the compass), the general, régimen and tactical signals by number, the night and fog signals (the night by seven guns), the convoy's divisions and its masters' signals, the ships' numbers |
+| Spain | Mazarredo, *Corrección a las señales de táctica*, Cádiz 1799 | the fleet's tactics of 1799 | the two hundred tactical signals by the five pendants over or under one flag, beside "the four hundred signals of two flags"; the instruction of 31 May 1797 referred to |
+| Spain | *Señales ... esquadra del mando de D. Luis de Córdova*, Cádiz 1778 | before Mazarredo's plan | the older form and words |
+| United States | Barry, *A Set of Signals presented to the Navy of the United States*, Norfolk 1800 | the Quasi-War | the United States' day signals and directions, the nearest American book found |
+| Portugal | Pereira, *Systema de signaes*, Rio de Janeiro 1817; Giraldes, *Memoria relativa aos regimentos de sinaes da Marinha*, 1820 | after the period | Portugal's system as it stood after the court's removal, and the history of her books; read for the form, dated so |
+| Naples | *Segnali di giorno, e di notte ... per uso della flottiglia di S. M.*, Naples 1807 | Joseph's kingdom | the one Mediterranean faction's book found: the flags in colour, day and night signals, the tables of words, places and ships |
+| United Provinces | Bylandt's *Zee-tactic*, Morogues in Dutch with a Dutch captain's additions, Amsterdam, vol. I | the Republic before 1795 | the nearest Dutch text; no Batavian book found |
+| United States | Preble, *History of the Flag of the United States*, 1894 | a history, out of copyright, describing the period's manuscripts | **the American squadron's signals of 1803 to 1804** (Morris's and Preble's Mediterranean day and night signals: ten numerals, a cornet, an answering flag, three triangles as repeaters, the night by lanterns), and the American flags with their dates |
+| every nation (item 8) | *A Display of the Naval Flags of all Nations*, Liverpool, [1820], sixteen plates in colour; *Bowles's Universal Display*, 1795 (its names; its plates grey); the French law of 31 October 1790 on the colours in the pavillons | the flags' charts, fifteen years after and ten before | **the flags' figures and colours** for `colours.yaml`'s drawings, each dated against the histories |
+| Britain, France, Spain (item 8) | Perrin, *British Flags*, 1922; Babron, *Précis des pratiques de l'art naval en France, en Espagne et en Angleterre*, 1817; Roosevelt, *The Naval War of 1812*, 1882 | histories out of copyright, and a royalist officer's comparison of the three services | **where each flag flew and when**: the flags of command, the pendants, the ensigns by squadron and service, the jack; the owner's passage on the *Java* and the *Constitution* (Roosevelt pp. 160 to 161) |
+
+**Page images** under `docs/references/signals/pages/` (forty-nine, 9.9 MB, 1000 to 1100
+pixels wide, grey but for the flags' plates): the 1820 display's frontispiece, index and
+fifteen plates of flags in colour (leaves 5 to 36); the 1796 book's single flags (leaves 28 and 29),
+numeral flags (31), the first page of the numeral signals (32), the pendant signals (66 and
+67), the fog signals' index and tables (74 to 76), the private ships' table of flags and
+its explanation (77 and 78) and the compass signals (88); the 1799 night book's tables
+(leaves 25 to 35) and the figures of the lights (38 and 39); Popham's table of figures,
+letters and flags (leaf 13); Mazarredo's cornets for the compass (leaf 14), his night and
+fog table (157) and the night signals by seven guns (179); the 1799 *Corrección*'s pendant
+values (the Naples copy, leaf 6); the Neapolitan flags' plate (leaf 2) and first page (7).
+The 1796 book's forty pages of numeral signals and Popham's vocabulary are not laid as
+images: their OCR keeps the numbers and the words line by line, and the leaves are cited
+for checking. Mazarredo's four-hundred-square table is filled with flag names in the text,
+not a figure.
+
+**Found and read, not laid**: Knowles's *A Set of Signals for a Fleet*, 1778 (never adopted,
+Corbett 1908 says, like his books of 1798); Squire's *Universal Signal Book* for merchant
+ships, Charleston 1818 (later, and a merchant code); a Nova Scotia *Signal Orders and
+Instructions* of 1802 (a station's ball-and-colours signals, Canadiana microfiche); the
+1846 and 1857 French books (later).
+
+**Not found**, with where it should be: **the 1799 day *Signal Book for the Ships of War*
+itself** (not on the Archive; Corbett 1908, App. F Nos. 124, 125 and 127, places copies in
+the Royal United Service Institution, the Admiralty Library, the Record Office and the
+British Museum); Howe's code of 1790 in print (Corbett 1905, pp. 252 to 253: the one copy known is the
+Admiralty Library's printed draft with the battle signals in manuscript); the period's *Signals and Instructions for Ships under Convoy* (only
+Millan's of 1748 found); the French Republic's *Signaux généraux* of An VI (1797; Corbett
+places a copy in the RUSI) and any Imperial book of 1804 to 1805 (Gallica refused); the
+Spanish *quaderno* of the régimen signals of 1797 and its instruction of 31 May 1797, the
+*Rudimentos de táctica naval* of 1776, any Real Armada convoy instruction (*flota* or
+*registro*) (the Biblioteca Digital Hispánica refused); any Batavian, Danish or Swedish
+signal book; the American *Signal Book* of the 1790s and Truxtun's; any Portuguese book in
+force in 1805.
+
+**What the pass already shows.** The 1799 book's numbers, as Jackson's editor glossed the
+hoists in the logs of Copenhagen (1801) and Trafalgar (1805), both fought under the 1799
+book (vol. II; the gloss is the editor's of 1900, read from the book, and not the log's
+own words): 13 prepare for battle; 14 prepare for battle and for anchoring with springs;
+16 engage the enemy more closely; 19 want boats to tow; 39 discontinue the engagement; 62
+each squadron to anchor separately; 63 anchor as convenient (with the preparative, prepare
+to anchor); 66 weigh, the outer and leewardmost ships first; 72 form the order of sailing
+in two columns; 76 bear up and sail large on the course shown; 82 alter course one point to
+port; 84 pass within hail; 88 make more sail; 99 come to the wind together on the starboard
+tack; 101 in succession on the larboard tack; 102 together on the larboard tack; 108 close
+nearer the Admiral; 180 sound and report the depth; 186 take a ship in tow; 200 the troops
+in readiness to land; 213 for captains; 240 the launches manned and armed; 251 time for
+dinner; 307 make all sail possible with safety to the masts; 312 seeing the Admiral; 314 in
+distress and in want of immediate assistance; 344 aground. Against 71's book this already
+corrects meanings at numbers the book had made (39 is "assist the ships engaged" there, 62
+"shake out the reefs", 63 "prepare to anchor", 88 "veer more cable", 99, 101, 102 and 108
+four wants and the dispatches): that is step 1's work and is not done here. 13, 16, 72 and
+76 stand as 71 remembered them. **No source found gives 1 its meaning**: the logs record no
+hoist of No. 1, and 71's "enemy in sight" stays marked until the owner's shelf or the book
+answers.
+
+**Which text answers for which book** (the plan for steps 1 to 4):
+
+- **Britain, step 1.** The numerary: the 1799 numbers from the logs (above) where they
+  recorded the hoist; the 1796 book for every other meaning the game wants, kept at 71's
+  number and marked the builder's own (the number made, the meaning the book's) where no
+  1799 number is found, unless the owner's shelf gives it; Howe's Explanatory Instructions of
+  1799 (Corbett 1905) for the wording and for what the chase, the line and the anchoring
+  signals ask a captain to do (the `does`). The dictionary from Popham 1803 whole, as far as
+  the OCR reads clean and checked against the leaves where it does not, the alphabet from his
+  table (leaf 13). The night book from the 1799 night signals, number for number; the fog
+  book from the 1796 book's fog guns (the 1799 fog book not found: said so in the file).
+  The convoy book: the 1796 book's convoy signals and Millan's form, the period's convoy
+  book itself not found and the file saying so. The private table's form: the 1806
+  Regulations (already filed, `admiralty/regulations-and-instructions-1808-ocr.txt`) read
+  for the custody, the 1796 and 1799 books for the private ships' signals' form; 71's draw
+  kept.
+- **France, step 2.** Orvilliers 1772 for the whole book's shape and words, du Pavillon and
+  Morogues for the numerary's principle, Audibert Ramatuelle 1802 for the Consulate's practice
+  (the chase, the convoy's escort); the numbers stay `made` unless a page gives the service's
+  own for 1805, which none found here does. The dictionary: the French had none of
+  Popham's kind; the alphabet only where Audibert gives one.
+- **Spain, step 3.** Mazarredo 1781 (third edition) as the book: the declaration in his
+  words (twenty flags and pendants, two to a signal in a table of four hundred, the
+  universal flag, the cornets, the values on a sheet changed at will), the general signals
+  in his numbers, the night signals by guns and lights, the convoy's signals to its
+  masters; the 1799 *Corrección* for the tactical numbers. Whether the 1797 régimen book
+  kept the 1781 table's numbers is the first question below; until it is answered the
+  numbers are the 1781 edition's, said so in `source:`, and `system` turns to `well-built`
+  on them (a period source's numbers), with the question in the declaration.
+- **The others, step 4.** The United States from Barry 1800 and the squadron's signals of
+  1803 to 1804 as Preble describes them (the numerals, the cornet, the answering flag, the
+  three repeaters; the night by lanterns); Naples from the 1807 flotilla
+  book (a root of her own for the Two Sicilies, if the lead agrees the step reaches the
+  Mediterranean factions where a page is found, as the brief allows); Portugal from Pereira
+  1817 only if the lead accepts a book twelve years late for her, else she stays on `basic`;
+  the Batavian Republic, Denmark and the Barbary regencies stay on `basic` (no page). The
+  brief's order (Batavian first) is taken another way for this reason: no Dutch page.
+- **The flags of command and identity, item 8** (the lead's addition to the brief of
+  2026-11-07, read at this step's boundary). `colours.yaml`'s shape is written in the design
+  note's postscript before any root's is filled. Britain's from Perrin (the flags of command,
+  the pendants, the ensigns by squadron, the jack, each with its dates; the red, white and
+  blue squadrons' ensigns of 1805), the places and occasions from Perrin, Babron and the
+  owner's passage in Roosevelt (the pendant at the main, the ensign at the peak, the jack at
+  the jackstaff at anchor, the ensigns doubled and one lashed in the rigging in action); France
+  from the law of 1790 and the tricolour of 1794 as Perrin and the 1820 display draw it; Spain,
+  the United States, Portugal, Naples, the States General and the rest from the 1820 display's
+  plates, each dated against Preble and Perrin (the 1820 plates keep flags already gone, so a
+  flag is taken from them only where a history dates it to 1805). The drawings are short lists
+  of coloured rectangles and lines in the flag's proportion, measured off the plates; a flag
+  whose figure a plate cannot give (a coat of arms) is drawn by its field and named so.
+
+### Questions for the owner's shelf (put through the lead)
+
+The answers come back as figures with their citation, never as copied text. None holds step
+1 from starting on what the pages above give; each is said where it holds a single entry.
+
+1. **The 1799 day book's numbers.** Does Winfield, or another book on the shelf, print or
+   tabulate the 1799 *Signal Book for the Ships of War*'s numbers? Wanted most: No. 1 (71
+   has it "enemy in sight" from memory), the general chase, the recall from chase, form the
+   line of battle, tack and wear together and in succession, make and shorten sail, the
+   affirmative and negative and the annulling flag's use, the convoy's signals, "strange sail
+   in sight" and the private signal's number if it had one. Holds: those entries' numbers
+   only (they stay the builder's, marked, until answered).
+2. **The 1799 fog book.** Was there a separate fog section in 1799 (guns, muskets, the bell,
+   the drum), or did the 1796 fog guns stand? Holds: the fog file's numbers.
+3. **The convoy book in force in 1805.** The *Signals and Instructions for Ships under
+   Convoy* of the 1790s or 1800s: its date, and for its principal signals (make sail,
+   shorten sail, tack, wear, close the commodore, the enemy in sight, anchor, disperse) the
+   number or the hoist. Holds: the convoy file.
+4. **Spain.** Did the Real Armada's books of 1797 to 1805 (Mazarredo's régimen *quaderno*
+   with the 1797 instruction, Gravina's at Trafalgar) keep the 1781 table's numbers, or
+   renumber them? And did the Spanish at Trafalgar sail by the French signals of the
+   combined fleet (as is often said) or their own? Holds: whether the Spanish numerary is
+   "the 1781 edition's numbers" or "the period's".
+5. **France.** The French book of 1804 to 1805 (the Republic's *Signaux généraux* of An VI,
+   or a later imperial edition): its system (du Pavillon's table, how many flags to a hoist)
+   and, for a dozen entries the chase and the convoy hoist (chase, recall, engage, make
+   sail, tack, wear, form the line, the convoy to close, to disperse), the number. Holds: the
+   French entries' `made` marks.
+6. **Batavia, Denmark, the United States, Portugal.** Does the shelf say what signal system
+   the Batavian navy used in 1797 to 1805 (its own, the French, or the old Dutch), and the
+   Danish in 1801? Does it give the American book of 1797 or Truxtun's? Holds: whether those
+   nations get a root in step 4 or stay on `basic`.
+
+7. **The flags (item 8).** Does the shelf give, for 1805: the Spanish navy's ensign and
+   pendant and where a Spanish ship of war flew them; the French ensign and jack of 1794 to
+   1805 and the French custom of the pendant and the jack in action; whether a British ship
+   doubled her ensigns in action as a rule by 1805 or only by her captain's choice (Roosevelt's
+   ships are of 1812)? Holds: the places and occasions in `colours.yaml` for those nations; the
+   drawings do not wait.
+
+### Taken another way, and found on the way
+
+- The page images are thirty-two leaves chosen for what the OCR loses, not every table of
+  every book (the 1796 numerary alone is forty pages whose OCR keeps the numbers): said
+  above, the leaves cited for the rest.
+- Jackson's *Logs* were already in the tree (filed for the 74's research); they are cited, not
+  laid again.
+- The brief's titles checked against the catalogues: the Admiralty's 1799 book is "*Signal
+  Book for the Ships of War*", as the brief has it, but the Archive holds the 1796 edition and
+  the 1799 *night* book, not the 1799 day book; Mazarredo's "*Señales*" that followed the
+  *Rudimentos* is the *Instrucciones y señales* of 1781 (reprinted by royal order) and the 1799
+  *Corrección*; du Pavillon's "tables of 1776" were not found, his *Rapport* of 1775 was;
+  "the Danish *Signalbog*" and "Truxtun's" were not found.
+- Two of the laid OCR texts (Morogues and Orvilliers) read "fable" for "ſable" (sand) in the soundings' signals, as
+  the pilots do; it is the period word and is left as the scan gives it.
+- The lead's addition to the brief (item 8, `colours.yaml` and the private signals in other
+  nations' forms; truths 7-434 and 7-435, item 7's now 7-426 to 7-433) reached the trunk while
+  this pass was being written; the pass was widened to the flags' sources before it was
+  committed (the 1820 display, Bowles, the French law of 1790, Babron, Roosevelt, Perrin,
+  Preble).
+- Roosevelt's 1882 printing reads "a little after 11 she hoisted her private signal" (p. 160,
+  OCR line 5823) where the brief quotes "a little after 1"; the *Constitution*'s private signal
+  came about an hour after the *Java*'s three. Said for the truth's minutes, which do not
+  depend on it.
