@@ -73,7 +73,7 @@ A King's ship's rules captain makes it to every strange sail within the flags' r
 
 ## A signal made and read
 
-The books are the nation's (`the signal book` among the ship's papers, `library(topic='papers', section='the signal book')`, which says whose it is: this ship's own by her service; Britain's from Howe's of 1790 and the Admiralty's of 1799 with Popham's dictionary of 1803; the French smaller; every other nation the common book every navy had, whose page says it is no nation's own and no other ship's numbers are to be read from it), and a signal is made by its meaning, never by a number you must know:
+The books are the nation's (`the signal book` among the ship's papers, `library(topic='papers', section='the signal book')`, which says whose it is: this ship's own by her service; Britain's the Admiralty's of 1799 with Popham's dictionary of 1803; the French by du Pavillon's table, two flags read as a cell; the Spanish Mazarredo's, two flags of twenty read as a cell of four hundred, with his lanterns by night and his guns in fog; the American Barry's, a flag a figure, the same numbers by lanterns at night; the Neapolitan the gunboat flotilla's book, its general signals by number; every other nation the common book every navy had, whose page says it is no nation's own and no other ship's numbers are to be read from it), and a signal is made by its meaning, never by a number you must know:
 
 ```orders cutter
 make the signal to tack in succession

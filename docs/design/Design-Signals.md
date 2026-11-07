@@ -552,3 +552,30 @@ his orders; at sea else), and the flags ordered beside them (`hoist the broad pe
 `hoist a second ensign at the main`, `hoist the jack`). Nothing when her colours are hauled
 down or struck; the ensign turned over under distress. The list is the locker's state and
 the lookout's words; no physics reads it.
+
+### The books, by nation
+
+| Root | The source read on the page | What the book carries | What it lacks |
+|---|---|---|---|
+| `britain` | the Signal Book of 1799's numbers where the logs of Copenhagen and Trafalgar gloss a hoist (Jackson, 1900); the 1796 book's meanings, flags and fog signals; the 1799 night book; Popham's *Telegraphic Signals* of 1803 | a numerary of 171 entries (34 at the 1799 numbers from the page, the rest at Howe's 1790 numbers or made, marked), 73 night signals from the page and 3 made, 24 fog (18 from the page), Popham's 1,444 words and his alphabet | the 1799 day book itself (not online); the masters' convoy book of the period (Millan's form of 1748, the meanings made) |
+| `france` | Audibert Ramatuelle, *Cours élémentaire de tactique navale* (1802), du Pavillon's system; Orvilliers's *Signaux généraux* (1772) | du Pavillon's table (`hoist_form: table`), 74 entries in its cells, 14 in Orvilliers's words; the night and fog by guns in two times; the convoy's escort | the Republic's book of the year VI (not online): every cell made |
+| `spain` | Mazarredo, *Instrucciones y señales* (Cádiz 1781, the third edition) | his four hundred cells (`hoist_form: table`), 100 entries (87 from the page, the signals of one flag numbered above the table), the night under sail in his three chapters and at anchor by lanterns (61), the fog by his guns (19), the convoy reading the squadron's cells with his orders to its commander | whether the régimen quaderno of 1797 kept the 1781 cells (asked of the owner's shelf); the masters' own book |
+| `united-states` | Barry, *A Set of Signals* (Norfolk 1800); Preble's *History of the Flag* (1894) for the squadron's books of 1803 to 1804 | 69 entries at Barry's numbers (54 from the page), a flag a figure; 30 night signals in his lantern figures; the 1803 flags declared (ten numerals, the cornet, the answering flag, three repeaters, the diptote) | the fog signals and the masters' convoy book (made); the 1803 books' numbers (in manuscript) |
+| `naples` | the *Segnali di giorno, e di notte* of the flotilla (Naples 1807, Joseph's kingdom) | 55 entries at its general signals' numbers (46 from the page), its thirteen night signals by number, its flags from the plate | the Bourbon book of 1805; the lanterns of its night signals (in the book's figures); fog and convoy (made) |
+| `basic` | the common form of the period's books (made) | 46 entries, every one made, for the nations it names | everything a nation's own book would give |
+
+**How a nation's book is added.** Her root under `data/signals/<root>/`, the six books and the
+seventh (the colours) in the shapes above; her line in `data/nations.yaml`
+(`signals: {root, system}`); `tools/check_signals.py` and the tests over every root, which
+know no root by name, pass; and her private form kept basic's word for word if she stood on
+basic before, so that her draw does not move. Spain, the United States and Naples were added
+so, with no change of code (truth 7-433). The loader grew one field for France and Spain, the
+book's `hoist_form`, which only the lookout's words without the book read and which no British
+or basic record carries.
+
+**Found on the way.** `shake out the reefs` is a far body's form (`signals.far_perform`) and
+not the dialect's words, which are `shake out the reefs in the topsails`: a near commanded
+captain given it by signal is refused by the dialect (the checker names it a design form;
+reported to the lead). 71's rule that any ship holding a table answers any challenge stands for
+the challenges it made; a challenge made in a named nation's form (item 8) is answered only by
+a ship of that nation.
