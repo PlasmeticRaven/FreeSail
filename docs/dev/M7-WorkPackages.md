@@ -3109,8 +3109,11 @@ digests; no slow test changed outcome. **The lead's rulings on the five open poi
 the notes to the ships session below (2026-11-07, 12:50 UTC). **The builder's suites at
 6e19f46c:** the fast tier 6,495 passed; ruff and format clean. **The lead's merge:** the trial
 on 3a94472d clean and lint-clean (ruff check and format); no forbidden word new in the diff;
-`data/ships/` untouched; the fast tier whole on it green, exit 0 (12:37 to 13:18 UTC), 6,622 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud
-dispatched after run 52, the figures to follow. B2 (the *Neufchatel*) starts on these; the one
+`data/ships/` untouched; the fast tier whole on it green, exit 0 (12:37 to 13:18 UTC), 6,622 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud: run 53 on b28266c3 (13:20 to 14:35 UTC): lint green, all six shards
+green, 7,025 passed, 11 skipped, 12 xfailed, no failure; the pace job (informative) 9 of 13, the same
+four floor tests as runs 48, 49 and 52 at 379 to 442 against 500, the shared runner's hour (the
+build machine alone held 13 of 13 at 12:09 on the trunk before this merge; B3.4 touches no tick of
+the pace's passages). B2 (the *Neufchatel*) starts on these; the one
 final report for 75 follows.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
