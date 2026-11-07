@@ -2846,8 +2846,9 @@ in the diff; the fast tier whole on it green, exit 0, every test passed; the who
 cloud: run 47 on 4423f62 cancelled for the lead's own lint fault (the re-pin's comment line,
 mended at 2dc4921); run 48 on 2dc4921 (06:31 to 07:53 UTC): lint green, all six shards green,
 6,851 passed, 11 skipped, 12 xfailed, no failure; the pace job (informative) 9 of 13 passed,
-the four floor tests short of 500 ticks a second on the shared runner (379 to 438), as on every
-cloud run. B3.4's four steps and B2 follow to one final report.
+the four floor tests short of 500 ticks a second on the shared runner (379 to 438), where runs
+45 and 46 held 13 of 13; whether the runner's load that hour or the brig's ten ports a side, run
+49 (on 76's merge, no engine change) tells. B3.4's four steps and B2 follow to one final report.
 
 ### Package 76, the research pass and step 1 (the British books from the page), as merged (2026-11-07)
 
