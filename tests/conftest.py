@@ -506,6 +506,14 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_sail_by_name.py::test_the_lookouts_hail_of_the_pilots_cutter_is_his_hail_not_the_ports_verb",
         # package 95, step 2: the identified sail's four cases together (11 s alone)
         "test_known_truths.py::test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost",
+        # package 75, SW-4 (the lead's ruling at its merge): truth 7-191's draft (7.5 s) and the
+        # two crewed ships kept evading by a man of war of their own class (8.3 s and 6.9 s),
+        # the final candidates' junit at four workers, 2026-11-06
+        "test_subtypes.py::test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside",
+        "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
+        "[a privateer lugger]",
+        "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
+        "[a revenue cutter]",
     }
 )
 

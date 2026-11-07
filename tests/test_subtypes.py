@@ -12,7 +12,10 @@ bills, measured and pinned (§9.1); and truth 7-191, drafted here for Phase 5 to
 `tests/test_known_truths.py` (§15). The reviews' mends: a crewed ship kept evading by a man of war
 of her own class (a row's `unless` naming several stimuli), a crewed sub-type keeping her first
 role when her intent is changed, the sub-types found after "the", and one role refused in the
-singular."""
+singular. The words step (the lead's ruling at SW-4's merge, 2026-11-07): the revenue cutter told
+and hailed as the Customs' cruiser she is, the Indiaman told by her name, the role sets that key by
+name taking the revenue cutter as armed and of the Crown and the Indiaman as a merchantman, and the
+Musquidobit fit's carronades at Adye's pattern."""
 
 from __future__ import annotations
 
@@ -748,6 +751,11 @@ def test_the_topsail_schooners_two_fits_and_her_bill():
     navy = spec.armament.fit("musquidobit 1813")
     assert _kinds(navy) == [("carronade", 18, "broadside")] * 8 + [("long", 6, "broadside")] * 2
     assert {g.x_m for g in navy.guns if g.kind == "long"} == {10.5}
+    # OLD BESIDE NEW (SW-4's words step, after package 81's note of 2026-11-07): old, the
+    # carronades' 10 cwt, the generator's table's from memory, 11% off Adye's pattern and listed
+    # by the viewer's checker; new, the pattern's 9 cwt, the 3 ft 3 in carronade (Adye 1804
+    # p. 72), Winfield p. 335 giving the nature and the number and no weight
+    assert {g.weight_cwt for g in navy.guns if g.kind == "carronade"} == {9.0}
     assert navy.exercise_charges == 2  # a King's fit: a fourth of her ten upper deck guns
     bill = spec.crew.quarter_bill
     assert bill.trimmers == {"forecastle": 4, "fore_top": 3, "afterguard": 4}
@@ -1054,3 +1062,150 @@ def test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striki
     m = brig.ship.extra["morale"]
     assert m.strike_below == 0.25 and least == pytest.approx(0.273, abs=0.001)
     assert least >= m.strike_below
+
+
+# ---------------------------------------------------------------------------
+# The words step: the revenue cutter's and the Indiaman's words and sets (the lead's ruling at
+# SW-4's merge, 2026-11-07, point 4)
+# ---------------------------------------------------------------------------
+
+
+def _with_role(w, description, name, nation, where, intent, role):
+    """A far ship put on the sea with her scenario entry's `role:`."""
+    w.vessels.serial += 1
+    spec = {
+        "description": description,
+        "name": name,
+        "nation": nation,
+        "position": where.to_dict(),
+        "goal": intent,
+        "intent": intent,
+        "role": role,
+    }
+    return w.vessels.add(S.vessel_from_spec(w, spec, w.vessels.serial))
+
+
+def test_a_revenue_cutter_and_an_indiaman_are_told_by_their_service_in_the_ship_reading():
+    """The reading `the ship` (`readings.ship_words`) of a crewed revenue cutter names her service,
+    the Customs' (Sherbourne's own against the smugglers for the Board of Customs, 1763 to 1779:
+    docs/design/VesselCandidates.md), and of a crewed Indiaman her name, each with her nation.
+    OLD BESIDE NEW: old, both "a merchantman of Britain" (the service map had neither role); new,
+    "a revenue cutter of Britain, in the service of the Customs" and "an Indiaman of Britain"."""
+    from freesail.api import readings as R
+    from freesail.world import crews
+
+    w = _at_sea(Position(49.90, -5.30))
+    here = Position(49.90, -5.20)
+    rose = _sail(w, "revenue cutter", "Rose", "britain", here, "bound for 49 50 N 4 30 W")
+    south = destination(here, 180.0, 2.5 * units.NAUTICAL_MILE)
+    hope = _with_role(
+        w, "merchant brig", "Hope", "britain", south, "bound for Falmouth", "indiaman"
+    )
+    w.run(60)
+    cutter, brig = crews.promote(w, rose), crews.promote(w, hope)
+    assert (cutter.captain.role, brig.captain.role) == ("revenue", "indiaman")
+    assert R.ship_words(cutter).startswith(
+        "The ship: Rose, an armed cutter; a revenue cutter of Britain, in the service of the "
+        "Customs. Her guns: 6 long 3-pounders, 8 half-pounder swivels. Her people: 30 souls by "
+        "the muster."
+    )
+    assert R.ship_words(brig).startswith(
+        "The ship: Hope, a merchant brig; an Indiaman of Britain. Her guns: 4 long 6-pounders. "
+        "Her people: 16 souls by the muster."
+    )
+    assert "merchantman" not in R.ship_words(cutter) + R.ship_words(brig)
+
+
+def test_a_revenue_cutter_answers_a_hail_as_the_customs_cruiser_and_heaves_to_for_a_kings_ship():
+    """`data/captains/hail.yaml`'s `revenue:` answers, at far detail: her name and port, her service
+    and her errand, no cargo; and to a demand to heave to she answers by the table's stance as a
+    merchantman does, heaving to for a King's ship of a nation she is not at war with (the
+    player's own ship's hail is a King's ship's, `hail._heave_to`) and making sail from an
+    enemy's. OLD BESIDE NEW (seed 7, measured on the owner's machine 2026-11-07): old, she
+    answered from the merchant's table, "The Rose of Guernsey, from Guernsey, cruising off The
+    lizard, in ballast."; new, "The revenue cutter Rose of Guernsey, in the service of the
+    Customs, from Guernsey, cruising off The lizard. And what ship is that?". The demand obeyed
+    and run from as before."""
+    from freesail.world import hail as H
+
+    w = _at_sea()
+    here = Position(49.90, -5.20)
+    rose = _sail(
+        w,
+        "revenue cutter",
+        "Rose",
+        "britain",
+        here,
+        "keep the station off the Lizard within 10 miles",
+        goal="cruising off the Lizard within 10 miles",
+    )
+    there = destination(here, 270.0, 6.0 * units.NAUTICAL_MILE)
+    french = _sail(w, "revenue cutter", "Vigilante", "france", there, "bound for 49 50 N 6 30 W")
+    assert (rose.brain.role, french.brain.role) == ("revenue", "revenue")
+    assert H.standard_hail("revenue") == "What ship is that?"
+    said = H.answer_by_table(w, rose, "What ship is that?")
+    assert said.startswith("The revenue cutter Rose of ") and said.endswith(
+        ". And what ship is that?"
+    ), said
+    assert ", in the service of the Customs, from " in said and ", cruising off " in said, said
+    assert H.nation_in_words(w.nations, said) == "britain"
+    more = H.answer_by_table(w, rose, "Whither bound, what cargo, and who commands?")
+    assert "On the Customs' service, from " in more and "in ballast" not in more, more
+    assert "No cargo: she is a revenue cutter." in more and " commands her." in more, more
+    theirs = H.answer_by_table(w, french, "What ship is that?")
+    assert theirs.startswith("The revenue cutter Vigilante of ") and "the Customs" in theirs
+    assert H.nation_in_words(w.nations, theirs) == "france"
+    assert H.answer_by_table(w, rose, "Heave to, I am sending a boat") == "Aye aye: heaving to."
+    assert rose.plan[0][0] == "lie_to"
+    assert H.answer_by_table(w, french, "Heave to!") == "She makes no answer but sail."
+    assert not french.plan or french.plan[0][0] != "lie_to"
+
+
+def test_the_role_sets_take_the_revenue_cutter_as_armed_and_of_the_crown_and_the_indiaman_not():
+    """The role sets keyed by name (the lead's ruling at SW-4's merge, point 4): the revenue
+    cutter an ARMED vessel of the Crown and not a merchantman, in `regimes._MAN_OF_WAR_ROLES` and
+    `squadrons._ARMED_ROLES` and not `orders.HAND_PEACEFUL_ROLES`; the Indiaman a merchantman
+    that is armed, judged from her book: in `HAND_PEACEFUL_ROLES` (her book the merchant's but
+    the fight's figures, hauling off from a hostile stranger and giving chase to nobody), in
+    neither of the others (no man of war; her book takes no prizes, `mans_prizes` false, and
+    `_ARMED_ROLES` makes every role in it a captor as well as a cover). At work, OLD BESIDE NEW
+    (seed 7, measured on the owner's machine 2026-11-07): a French coaster within hail of a
+    British revenue cutter is cut out at the first minute (old, she evaded untaken, 0.68 miles
+    off at five minutes); a British merchant brig half a mile from the revenue cutter is
+    covered (old, not), from an Indiaman not; a British revenue cutter in Brest's road is an
+    enemy man of war in the French squadron's offing (old, not); `give chase` through an
+    Indiaman's captain is doubted in words (old, never), through the revenue cutter's not."""
+    from freesail.world import orders as O
+    from freesail.world import regimes as REG
+    from freesail.world import squadrons as Q
+    from freesail.world.prizes import is_prize, record_of
+
+    assert "revenue" in REG._MAN_OF_WAR_ROLES and "revenue" in Q._ARMED_ROLES
+    assert "revenue" not in O.HAND_PEACEFUL_ROLES
+    assert "indiaman" in O.HAND_PEACEFUL_ROLES
+    assert "indiaman" not in REG._MAN_OF_WAR_ROLES and "indiaman" not in Q._ARMED_ROLES
+    w = _at_sea()
+    here = Position(49.90, -5.20)
+    rose = _sail(w, "revenue cutter", "Rose", "britain", here, "bound for 49 50 N 4 30 W")
+    east = destination(here, 90.0, 0.3 * units.NAUTICAL_MILE)
+    marie = _sail(w, "coasting cutter", "Marie", "france", east, "bound for 49 50 N 6 30 W")
+    north = destination(here, 0.0, 0.5 * units.NAUTICAL_MILE)
+    nancy = _sail(w, "merchant brig", "Nancy", "britain", north, "bound for 49 50 N 6 30 W")
+    away = destination(here, 180.0, 10.0 * units.NAUTICAL_MILE)
+    hope = _with_role(w, "merchant brig", "Hope", "britain", away, "bound for Falmouth", "indiaman")
+    beside = destination(away, 0.0, 0.5 * units.NAUTICAL_MILE)
+    betsey = _sail(w, "merchant brig", "Betsey", "britain", beside, "bound for 49 50 N 6 30 W")
+    brest = w.dealings.ports["brest"]
+    road = brest.outer_road.position
+    _sail(w, "revenue cutter", "Swan", "britain", road, "bound for 48 15 N 4 50 W")
+    assert hope.brain.role == "indiaman"
+    assert Q._covered(w, nancy) and not Q._covered(w, betsey)
+    assert REG._enemy_men_of_war_near(w, brest, "france", 10.0)
+    doubt = O.doubt(w, O.parse('ship "Hope": order give chase'))
+    assert doubt == (
+        "Hope's master sails by the Indiaman's doctrine: he runs from a stranger or keeps his "
+        "course, and gives chase to nobody"
+    )
+    assert O.doubt(w, O.parse('ship "Rose": order give chase')) is None
+    w.run(60)
+    assert is_prize(marie) and record_of(marie)["captor"] == rose.id, record_of(marie)
