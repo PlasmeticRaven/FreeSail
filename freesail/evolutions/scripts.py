@@ -25,6 +25,8 @@ The timings each script uses come from the ``timing:`` block of its
 evolution file, so they can be tuned without touching this code:
 
 - ``brace_s``: seconds to swing a set of yards round (45 s in the spec).
+- ``light_after_swing_s``: the tack's short after swing at "mainsail haul", for a
+  schooner's light main yards (package 75, the lead's ruling 1 of 2026-11-06).
 - ``brace_rate_deg_s``: how fast yards follow the wind when wearing.
 - ``stays_timeout_s``: how long a tacking ship may hang in stays, from the
   moment her way is gone, before she has missed stays (package 32e).
@@ -514,10 +516,11 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
     yards (package 75; Ext §4.2, §4.3). A schooner's main with yards above its lower
     mast (`Ship.on_schooner_mast`, package 75, B3.4) is no mast that carries yards here,
     but its yards are among the rest: they are her after yards, swung at "mainsail haul"
-    and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5), while her fore
-    keeps a working yard. With every fore yard shot away no mast carries yards here, and
-    her main's yards are in neither list, so that the tack and the wear leave them as they
-    stand (reported to the lead at B3.4)."""
+    in the tack's short after swing (`TackScript._after_swing_s`, the lead's ruling 1 of
+    2026-11-06) and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5), while
+    her fore keeps a working yard. With every fore yard shot away no mast carries yards
+    here, and her main's yards are in neither list, so that the tack and the wear leave
+    them as they stand (reported to the lead at B3.4)."""
     masts = _masts_with_yards(ship)
     if not masts:
         return [], []
@@ -967,10 +970,12 @@ class TackScript(Script):
     Helm's a-lee: the helm is ordered to a heading twelve points round, through the
     wind, the head sheets let fly and the spanker (or a fore-and-after's main) sheet
     hauled aft, which brings her up. When her head is within a point of the wind,
-    "mainsail haul": the after yards swing to the new tack. When her head has passed
-    through the wind, "let go and haul": the head yards follow, the head sheets are
-    drawn on the new tack and the helm is ordered to the new close-hauled course. She
-    is tacked when steady on it.
+    "mainsail haul": the after yards swing to the new tack, over ``brace_s``, or over the
+    short ``light_after_swing_s`` when they are a schooner's light main yards
+    (`_after_swing_s`). When her head has passed through the wind and the after yards are
+    round, "let go and haul": the head yards follow, the head sheets are drawn on the new
+    tack and the helm is ordered to the new close-hauled course. She is tacked when steady
+    on it.
 
     Package 32e (spec M5 open item 12): the miss-stays rule reads the vessel, and she
     is given Luce's recovery before she gives up. Her way is gone when she makes less
@@ -1055,6 +1060,24 @@ class TackScript(Script):
 
     def _boom_words(self) -> str:
         return names_of_sails(self.ship, self.booms) if self.booms else ""
+
+    def _after_swing_s(self) -> float:
+        """The after swing's time at "mainsail haul", before the weather and the hands: the
+        short after swing, ``light_after_swing_s``, when every after yard is on a schooner's
+        mast (`Ship.on_schooner_mast`: a topsail schooner's main topsail, the *Neufchatel*'s
+        main topgallant), else ``brace_s``. Package 75, the lead's ruling 1 of 2026-11-06 on
+        place 2's timing, after Luce 1884 p. 417: the after yards hauled with the wind ahead
+        or a point on the bow, "for then the wind on the weather leeches of the sails forces
+        them around smartly", before the head yards and never with them. The swing is the
+        same `YardSwing`, its time shorter, and "let go and haul" still waits on it. Read
+        for a schooner's light yards alone: a brig's and a frigate's after yards swing in
+        ``brace_s`` as before (the lead's), and so does an after list with a yard on a mast
+        that has a lower yard among it, whose heavy yards rule the time (judgement; no rig
+        filed or in memory has one)."""
+        brace_s = self.timing_value("brace_s", 45.0)
+        if self.after and all(self.ship.on_schooner_mast(y) for y in self.after):
+            return self.timing_value("light_after_swing_s", 20.0)
+        return brace_s
 
     def begin(self, words: dict[str, Any]) -> None:
         # the studding sails first, if any are set or their booms out (spec 3b §7)
@@ -1237,7 +1260,9 @@ class TackScript(Script):
                 elif bowlines:
                     self.note("Let go the bowlines.")
                 self.swing = YardSwing(
-                    self.after, [-self.sign * y.brace_limit for y in self.after], brace_s
+                    self.after,
+                    [-self.sign * y.brace_limit for y in self.after],
+                    self._after_swing_s(),
                 )
         if self.phase == "mainsail_haul":
             assert self.swing is not None
@@ -1432,10 +1457,11 @@ class TackScript(Script):
 
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
+        swings = self._after_swing_s() + brace_s  # the after yards', then the head yards'
         if self.phase == "in_studding_sails" and self.studding is not None:
-            return self.studding.remaining_s() + 60.0 + 2 * brace_s + 30.0
+            return self.studding.remaining_s() + 60.0 + swings + 30.0
         if self.phase == "helm_down":
-            return 60.0 + 2 * brace_s + 30.0
+            return 60.0 + swings + 30.0
         if self.phase == "mainsail_haul" and self.swing is not None:
             return self.swing.remaining_s() + brace_s + 30.0
         if self.phase == "let_go_and_haul" and self.swing is not None:
@@ -1443,7 +1469,7 @@ class TackScript(Script):
         if self.phase == "missed" and self.squaring is not None:
             return self.squaring.remaining_s()
         if self.phase == "by_the_wind":
-            return brace_s + 60.0 + 2 * brace_s + 30.0
+            return brace_s + 60.0 + swings + 30.0
         if self.phase == "pay_off":
             return max(0.0, self.timing_value("pay_off_timeout_s", 240.0) - self.pay_t)
         return 30.0

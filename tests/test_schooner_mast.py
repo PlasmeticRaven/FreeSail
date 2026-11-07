@@ -2,9 +2,11 @@
 2026-11-06 on docs/design/Design-Ship-PrinceDeNeufchatel.md §12.2a, "the rule in the key's
 place": "An after mast with yards and no yard on its lower mast handles as a fore-and-after's
 mast", read from the parts as filed, once a ship, the yards under the bowsprit not counted. It
-is read at two places alone (docs/design/Design-ShipsEngineExtensions.md §4.2): place 1,
+is read at two places (docs/design/Design-ShipsEngineExtensions.md §4.2): place 1,
 `scripts._masts_with_yards`, which skips such yards, and place 3, `physics.sails._square_rigged`,
-which counts none.
+which counts none; and, by the lead's ruling 1 of 2026-11-06 on place 2's timing (after Luce
+1884 p. 417), for the time of the tack's swing at "mainsail haul", short for a schooner's light
+main yards (`scripts.TackScript._after_swing_s`).
 
 No committed ship file trips it (the guard, every file of `data/ships/` with the boats), so no
 file's classing moves: the golden table's own run (`tests/test_rig_classing.py`, and the razee's
@@ -16,8 +18,9 @@ and the fore laid aback, trial A as it was, the tartane classed as the cutter is
 with her main her one mast with yards; the yards under the bowsprit, a lug's and a lateen yard
 counted for nothing; a brig whose main yard is shot away and sent down a brig still; the answer
 held once a ship, and the schooner whose fore yards are all shot away pinned as she stands (the
-case reported to the lead); and the pickle and the checkpoint of a rig that has read the rule as
-they were before it read it.
+case reported to the lead); the pickle and the checkpoint of a rig that has read the rule as
+they were before it read it; and the short after swing, a schooner's light main yards' alone,
+trial B's tack with it.
 """
 
 from __future__ import annotations
@@ -41,7 +44,7 @@ from rig_fixtures import (
 from freesail.api.session import make_world
 from freesail.core.replay import checkpoint_bytes, read_checkpoint, write_checkpoint
 from freesail.core.world import Scenario
-from freesail.evolutions import scripts
+from freesail.evolutions import EVOLUTIONS, scripts
 from freesail.physics.sails import _square_rigged
 from freesail.ship import graph
 from freesail.ship.graph import Ship
@@ -438,6 +441,83 @@ def test_each_ship_finds_her_own():
     assert one.on_schooner_mast("main.topsail.yard")
     assert not any(two.on_schooner_mast(p) for p in two.parts)
     assert one._schooner_yards() is not two._schooner_yards()
+
+
+# -- the short after swing (the lead's ruling 1 of 2026-11-06, place 2's timing) -------------------
+
+
+def _after_swing_s(ship: Ship) -> float:
+    """The tack's after swing at "mainsail haul" for her, before the weather and the hands."""
+    return scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._after_swing_s()
+
+
+@pytest.mark.parametrize(
+    ("build", "seconds"),
+    [
+        (schooner_with_main_topsail, 20.0),
+        (schooner_with_main_topgallant, 20.0),
+        (schooner_with_fore_course, 45.0),
+        (polacre_probe, 45.0),
+        (frigate_with_mizen_yard, 45.0),
+    ],
+    ids=["trial B", "main topgallant", "trial A", "polacre", "frigate with a mizen yard"],
+)
+def test_the_short_after_swing_is_a_schooners_light_main_yards_alone(build, seconds):
+    """The short after swing, `light_after_swing_s` (20 s), when every after yard is on a
+    schooner's mast: trial B's main topsail yard, the main topgallant's two light yards. Trial A
+    and the polacre have no after yards and the frigate's are on masts with lower yards: each
+    swings in `brace_s` (45 s) as before the ruling (and an empty swing is done at once)."""
+    assert _after_swing_s(build()) == seconds
+
+
+@pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
+def test_no_committed_ship_file_swings_her_after_yards_short(path):
+    """No file has a yard on a schooner's mast (the guard above), so every ship of every file,
+    the brig's and the frigate's after yards among them, swings in `brace_s` at "mainsail haul"
+    as before: the short swing for every ship's after yards is the lead's, not built."""
+    assert _after_swing_s(load_ship(path)) == EVOLUTIONS["tack"].timing["brace_s"]
+
+
+def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_does(tmp_path):
+    """Trial B tacked at seed 7 in 15 knots, settled 2,400 s under plain sail braced sharp up and
+    trimmed every two minutes (B3.4's measure; the tuning notes, "The lead's four rulings,
+    built"): "Rise tacks and sheets. Mainsail haul." at 32 s, her head 9 degrees short of the
+    wind; the main topsail yard swung in 26 s (the short swing's 20 s by the weather and the
+    hands) where the 45-s swing took 59 s; "Let go and haul." at 58 s where it waited to 91 s,
+    the fore yards no longer held aback with her head through the wind; tacked in 151 s where it
+    was 219 s, within the schooner's two and a half minutes and 2 s over trial A's 149 s."""
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, write_ship(schooner_with_main_topsail_doc(), tmp_path), sc)
+    world.submit("set plain sail")
+    world.submit("brace sharp up on the starboard tack")
+    for i in range(2400):
+        if i % 120 == 0 and i > 300:
+            world.submit("trim sails")
+        world.tick()
+    start = world.clock.tick
+    world.submit("tack ship")
+    ends = ("ship.tacked", "ship.missed_stays", "ship.fell_off", "evolution.failed")
+    done: list = []
+    while not done and world.clock.tick - start < 900:
+        world.tick()
+        done = [e.kind for e in world.log if e.tick > start and e.kind in ends]
+    said: dict[str, int] = {}
+    for e in world.log:
+        for key in ("Mainsail haul", "Let go and haul"):
+            if e.tick >= start and key in e.text:
+                said.setdefault(key, e.tick - start)
+    assert done == ["ship.tacked"]
+    assert set(said) == {"Mainsail haul", "Let go and haul"}
+    assert 20 <= said["Let go and haul"] - said["Mainsail haul"] <= 30  # 26 s; 59 s on brace_s
+    assert 90 <= world.clock.tick - start <= 180  # 151 s; 219 s on brace_s
+    assert world.ship.dyn.tack == "larboard"
 
 
 # -- the pickle and the checkpoint -----------------------------------------------------------------

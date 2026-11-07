@@ -1497,6 +1497,14 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   the key outside §12 (decision 13, §0's stage, §4.1, §4.5's `main.mast` line, §4.8, §13's road, §14
   and §17 item 1), and her main topgallant's groups (§4.5, §4.8), which "shorten sail" never reaches
   ("royals" would take it in with the third line of that list).
+- **The lead's ruling 1, built (2026-11-07; the tuning notes, "The lead's four rulings, built"):** place
+  2's timing after Luce 1884 p. 417, the short after swing: a schooner's light main yards, every after
+  yard being one, are swung at "mainsail haul" over `light_after_swing_s` (20 s, judgement, the engine's
+  `abox_s` for a fore-and-after's light yard) in place of `brace_s`'s 45, before the head yards and never
+  with them; trial B tacks in 151 s (219 s before), the main topgallant in 172 s set and 164 s furled
+  (232 s and 230 s), trial A in 149 s as before, and the brig's and the frigate's after yards swing as
+  before (the short swing for them, measured and not built, takes the frigate under five minutes: the
+  lead's).
 
 ### 12.3 What the viewer builder (B5) is asked
 
