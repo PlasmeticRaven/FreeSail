@@ -18469,6 +18469,12 @@ cutter 6 of 153 (4.2%). The graph's placing is served once, at the page's connec
 snapshot is built off the tick (`Driver.snapshot`); a fight with a snapshot every tick gives the
 same log digest as without (truth 7-441).
 
+**The drawing's cost in the browser** (Node on this machine, `buildSkeleton` and `project` abeam,
+best of thirty): the 64 10.5 ms with the action against 5.3 without, the frigate 7.0 against 5.3,
+the cutter 3.0 against 2.6; the frame's reach of the guns and flags reckoned once a graph (first
+written, every build: the 64 15.3 ms). The loop rebuilds the ship only while a gun recoils or runs
+out; the smoke's frames redraw its two layers alone.
+
 **Found on the way** (reported to the lead): the frigate's quarterdeck has two sizes of port and the
 schema one a deck; the engine has no port stove; 73's hole above the water is made at 0.3 to 1.8 m
 whatever the side's height (drawn at the rail less its radius on the cutter); the readings `the

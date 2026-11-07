@@ -4194,7 +4194,17 @@
   /** The frame's share of the action (§6 item 3): every gun run out and run in, every lid
    *  hauled up, and every flag place's largest fly swung every way, so that no state of the guns
    *  or the colours rescales the view. Plumes are not in it. */
+  var ACTION_FRAMES = typeof WeakMap === "function" ? new WeakMap() : null; // reckoned once a graph
   function actionFrame(graph, hull, spars) {
+    var kept = ACTION_FRAMES && ACTION_FRAMES.get(graph);
+    if (kept) return kept;
+    var pts = reckonActionFrame(graph, hull, spars);
+    if (ACTION_FRAMES) ACTION_FRAMES.set(graph, pts);
+    return pts;
+  }
+  /** `actionFrame`'s points: of the graph and the full rig alone (the frame's spars), whatever
+   *  the snapshot, so reckoned once a graph. */
+  function reckonActionFrame(graph, hull, spars) {
     var pts = [];
     if (!drawnProfile(hull)) return pts; // as 75 left her (§1)
     {
