@@ -14283,3 +14283,48 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
     )
 
     test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
+
+
+def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
+    """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
+    in Falmouth's road is condemned by the court (France at war with Britain at the taking),
+    valued by the rows (the hull a ton burthen by her kind and age, her guns a hundredweight,
+    her powder and shot at the port's prices, nothing for the head money of a merchantman),
+    the agent's five per cent and the court's fees deducted, and the money paid into the
+    captor's purse by the eighths of 1805 (the captain three eighths: Lavery, Nelson's Navy,
+    p. 116) with the purse's line saying so and the prize account's lines; a King's cutter in
+    sight at the strike shares by her complement (Lavery, the same page: the ships in sight at
+    the surrender); the court's job is queued when the prize lies in the port, due in the
+    court's days; a far prize is sentenced on her record in her goal's road; a King's ship's
+    prize of war pays head money and three fourths now, the fourth reserved on its day; a ship
+    retaken by her own nation's cruiser pays salvage to the recaptors alone; the schemes by
+    date are the rows' with their sources."""
+    from tests.test_prize_court import (
+        test_a_far_prize_in_her_goals_road_is_sentenced_on_her_record,
+        test_a_kings_ships_prize_of_war_pays_three_fourths_now_and_the_reserved_fourth_on_its_day,
+        test_a_ship_retaken_by_her_own_nations_cruiser_is_restored_with_salvage_to_the_recaptors,
+        test_the_prize_is_condemned_and_the_money_paid_by_the_eighths_into_the_purse,
+        test_the_schemes_are_laverys_two_british_ones_by_date_and_the_rows_say_their_sources,
+        test_the_valuation_is_the_rows_over_the_files_figures,
+    )
+
+    test_the_schemes_are_laverys_two_british_ones_by_date_and_the_rows_say_their_sources()
+    test_the_valuation_is_the_rows_over_the_files_figures()
+    test_the_prize_is_condemned_and_the_money_paid_by_the_eighths_into_the_purse()
+    test_a_kings_ships_prize_of_war_pays_three_fourths_now_and_the_reserved_fourth_on_its_day()
+    test_a_ship_retaken_by_her_own_nations_cruiser_is_restored_with_salvage_to_the_recaptors()
+    test_a_far_prize_in_her_goals_road_is_sentenced_on_her_record()
+
+
+def test_truth_7_363_a_neutral_wrongly_taken_is_restored_with_costs_and_the_director_may_overrule():
+    """The design's §5.2: a Danish brig at peace with Britain, taken all the same, is restored
+    to her owners by the court with costs and damages against the captors (a tenth of her
+    valuation from the purse), said why; the director's `port <id>: the court condemns |
+    restores the <prize>` is doubted against the court's rule and performs with a reason."""
+    from tests.test_prize_court import (
+        test_a_neutral_wrongly_taken_is_restored_with_costs_against_the_captors,
+        test_the_directors_word_to_the_court_is_doubted_against_the_rule_and_performs_with_a_reason,
+    )
+
+    test_a_neutral_wrongly_taken_is_restored_with_costs_against_the_captors()
+    test_the_directors_word_to_the_court_is_doubted_against_the_rule_and_performs_with_a_reason()

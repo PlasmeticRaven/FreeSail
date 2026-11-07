@@ -267,6 +267,78 @@ def test_the_directors_word_to_the_court_is_doubted_against_the_rule_and_perform
     assert e.data.get("result") != "done" and "No prize named" in e.text
 
 
+def test_a_kings_ships_prize_of_war_pays_three_fourths_now_and_the_reserved_fourth_on_its_day():
+    """The design's §5.3: a prize of war taken by a King's ship and purchased for the service
+    pays head money (five pounds a head of the men aboard at the start) and three fourths of
+    the net now, a fourth reserved for the later sentence in the court's days, paid from the
+    prize's own minute when the day comes (the owner may turn the purchase off by the row)."""
+    w, b, hull, _ = _taken_in_falmouth_road()
+    port = w.ports.ports["falmouth"]
+    rec = P.record_of(b)
+    rec["role_was"], rec["men_at_start"] = "privateer", 80  # a privateer brig, as the record
+    assert rec["service"] == "kings"  # of a King's frigate's taking
+    before = w.purse.pounds
+    acc = PC.sentence(w, b, port)
+    assert acc["sentence"] == "condemned" and acc["head_money"] == 400.0
+    assert (
+        acc["reserved"] == round(acc["net"] * 0.25) and acc["paid"] == acc["net"] - acc["reserved"]
+    )
+    assert w.purse.pounds == before + acc["paid"]
+    assert "reserved for the purchase for the service" in w.log[-1].text or any(
+        "reserved for the purchase" in e.text for e in w.log if e.kind == "prize.money"
+    )
+    rec = P.record_of(b)
+    assert rec["reserved_due"] - w.clock.tick == 7 * 86400
+    w.run(60)
+    assert w.purse.pounds == before + acc["paid"]  # not before its day
+    b.prize["reserved_due"] = w.clock.tick  # the court's days run (the test's hand on the clock)
+    w.run(60)
+    assert w.purse.pounds == before + acc["paid"] + acc["reserved"]
+    paid = [e for e in w.log if e.kind == "prize.money" and e.data.get("reserved")]
+    assert len(paid) == 1 and "reserved fourth" in paid[0].text
+    assert P.record_of(b).get("reserved_due") is None and acc.get("reserved_paid")
+    w.run(60)
+    assert w.purse.pounds == before + acc["paid"] + acc["reserved"]  # once
+
+
+def test_a_ship_retaken_by_her_own_nations_cruiser_is_restored_with_salvage_to_the_recaptors():
+    """The design's §5.2: the brig taken by the frigate and retaken by a French privateer
+    coming up is, at a French port, her owners' again with salvage to the recaptors (an
+    eighth of her value, the French rows' British eighths kept and said), the recaptors the
+    sharers and not the frigate's consorts in sight at the first strike."""
+    w, b, hull, cutter = _taken_in_falmouth_road(consort=True)
+    far = destination(w.position, 180.0, 6.0 * units.NAUTICAL_MILE)
+    pv = put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        colours="shown",
+        name="Vengeur",
+    )
+    P.retake(w, b, by="the Vengeur coming up", how="retaken", captor=pv)
+    rec = P.record_of(b)
+    assert not P.is_prize(b) and rec["recaptor"] == pv.id and b.nation == "france"
+    brest = w.ports.ports["brest"]
+    assert PC.verdict(w, b, rec, brest) == (
+        "salvage",
+        "a ship of her own nation retaken from the enemy",
+    )
+    before = w.purse.pounds
+    acc = PC.sentence(w, b, brest)
+    assert acc["sentence"] == "salvage" and acc["head_money"] == 0.0
+    val = acc["valuation"]
+    whole = val["hull"] + val["guns"] + val["stores"] + acc["cargo"] + acc["goods"]
+    assert acc["gross"] == round(whole * 0.125) and acc["goods"] > 0  # her powder and shot too
+    assert [s["name"] for s in acc["shares"]] == ["Vengeur"]  # not the Amazon, not Sprightly
+    assert acc["shares"][0]["pounds"] == acc["paid"] > 0
+    assert "Conseil des prises" in acc["court"]
+    assert w.purse.pounds == before  # the frigate's purse gets nothing of it
+    assert any("salvage by le Conseil des prises" in words for _, words in b.story)
+
+
 # -- the far court ---------------------------------------------------------------------------------
 
 

@@ -32,6 +32,7 @@ A ship that cannot spare a prize crew does not take possession: the refusal says
 | `the prize`, `the prizes` | every prize of this ship's: her name, how she was taken, her prize master, the prize crew's and the prisoners' counts, her goal, in company or parted, and where she lies by the lookout; "no prize" |
 | `the prisoners`, `the prisoners aboard` | the prisoners this ship holds: how many, how many of them hurt, where confined, in irons, the named with their parole ("one prisoner of rank: Captain Bowen in the cabin (parole given)"); "no prisoners" |
 | `the prize crew` | on a prize: the men who work her, how many fit and how tired, the hours since the taking, the prize master; on any other ship "she is no prize" |
+| `the prize money`, `the prize account` | the last court's sentence on a prize of yours and the money paid by the eighths; "no prize money" |
 
 ```
 The prize: the Medusa, carried by boarding, under Mr Ward with a prize crew of twenty-two and two hundred and fifty prisoners, for Falmouth, in company, bearing SSW, 0.3 miles.
@@ -74,7 +75,7 @@ The captain's doctrine burns of itself what it will not man (`burns_when: not wo
 
 ## The events
 
-For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off); `the sound of guns` (an action heard off the horizon).
+For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off); `the sound of guns` (an action heard off the horizon); `the court sits`, `the sentence` and `the prize money` (the court's days, its sentence and the money paid).
 
 ```
 standing order "the prize": at she is taken then take the prisoners aboard
@@ -105,9 +106,21 @@ You answer in your own words, and the game reads them for your parole only while
 
 Two ships that meet in anger far from you, beyond the reach at which the game gives a ship her full company and her guns as parts, fight all the same, by the same tables chapter 22's guns are drawn from, one broadside a side every three minutes while they lie within gun's reach; a ship that cannot bear it strikes by the same rule of the company's temper, and her captor takes possession of her at hailing distance as any prize is taken. What you hear of it is what the period's logs record: **the sound of guns** to a point of the compass, "distant about twelve miles", once a round while any such action is within hearing, and by night the flashes at the horizon; the log says so (`the sound of guns`), and your lookout says what he can of the ships when they come up over the horizon, hurt as they are. A ship struck or taken that way carries her hurt into her hull when the game gives her one: the men killed and wounded on her muster, the shot holes in her side, her spars gone, so that what was done to her out of your sight is what you find aboard her.
 
+## The court and the money
+
+A prize is nobody's money until a court has sentenced her. The court sits where she is brought in: a prize of yours lying in a port open to your nation (your own nation's, or an ally's at war with hers) is before the court in a week (ten days at a Spanish port), the Vice-Admiralty court at a port abroad, the High Court of Admiralty for a prize brought home, le Conseil des prises at a French port and el Tribunal de presas at a Spanish; the log says the court will sit and when. **Condemned** as lawful prize is a ship of a nation at war with yours when you took her, a pirate, or a neutral carrying an enemy's cargo for an enemy's port. **Restored** to her owners is a neutral wrongly taken, and the court awards costs and damages against you, a tenth of her value from your purse, the line saying why. A ship of your own nation retaken from the enemy is restored to her owners with **salvage** to you, an eighth of her value.
+
+The money is her hull by the ton and her guns by the hundredweight, her cargo sold at the port's market at the day's prices, her powder and shot and her purse, less the agent's five per cent and the court's fees, with **head money** of five pounds a head of the men aboard a ship of war or a privateer when the action began (paid though you burnt her); a King's ship's prize of war that the yard takes up pays three fourths now and a fourth with a later sentence. It is **shared among every ship of yours in sight when the enemy struck**, a ship that fired no shot included, by their complements; and each ship's part is divided **by the eighths** of the Act in force at the court's date: until 1808 the captain three eighths, the lieutenants, the master and the captains of marines one, the warrant officers one, the midshipmen and the petty officers one, and the people a quarter; from 1808 the captain two eighths, the two officers' classes one each, and the petty officers and the people a half between them. A privateer's money is her owners' and her crew's by her articles. The purse's line says all of it:
+
+```
+! Afternoon watch (14:40)  Prize money paid at Falmouth for the Deux-Frères, condemned by the High Court of Admiralty, the prize lying at Falmouth: the hull (304 tons burthen) and her stores £1,944; her guns £1,248; her powder (19 barrels) and shot (16.8 tons) £297; the head money £0 (a merchantman); the agent's commission £174 and the court's fees £20 deducted; shared with Sprightly, in sight at the strike: the Amazon's part £2,772 by the eighths: the captain £1,040, ... The purse: £2,772.
+```
+
+`the prize money` (or `the prize account`) reads the last sentence and the money paid; the account's lines are the prize account's in the log. The director may overrule the court (`port falmouth: the court restores the Deux-Frères`), which the game doubts where the court's own rule gives otherwise and performs with a reason: the court's whim is a plausible cause. A prize lost on the way home pays nothing.
+
 ## What is not in this chapter
 
-The prize court and the prize money (the condemnation, the eighths, the head money and the agent's commission), and the court martial for the loss of a ship and the new command after it, are told in the chapters that follow as they come into the game; the readings and the orders of this chapter are the game's now.
+The court martial for the loss of a ship and the new command after it are told in the chapter that follows as they come into the game; the readings and the orders of this chapter are the game's now.
 
 ## Sources
 

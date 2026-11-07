@@ -321,7 +321,7 @@ def verdict(world: Any, prize: Any, record: dict[str, Any], port: Any) -> tuple[
     nations = getattr(world, "nations", None)
     captor_nation = str(record.get("captor_nation") or "")
     nation_was = str(record.get("nation_was") or "")
-    if record.get("retaken_from"):
+    if record.get("recaptor") and str((record.get("retaken") or ("",))[0]) == "retaken":
         return "salvage", "a ship of her own nation retaken from the enemy"
     if nations is not None and _at_war_at(
         nations, captor_nation, nation_was, int(record.get("taken_at", 0)), world
@@ -425,6 +425,15 @@ def sentence(
     kind, why = (
         verdict(root, prize, rec, port) if override is None else (override, f"by {by}'s word")
     )
+    if kind == "salvage":
+        # the salvors are the recaptors (the design's §5.2): their purse, their nation's scheme,
+        # and no consort of the enemy's shares what the enemy's strike wrote on the record
+        recaptor = root.vessels.get(str(rec.get("recaptor") or ""))
+        if recaptor is not None:
+            captor, captor_hull = recaptor, P._hull(recaptor)
+            captor_nation = str(recaptor.nation)
+            home = str(getattr(port, "nation", "")) == captor_nation
+            court = court_name(port, home)
     rows = money_rows()
     account: dict[str, Any] = {
         "prize": str(prize.id),
@@ -464,6 +473,8 @@ def sentence(
     net = max(0.0, gross - agent - fees) + head
     reserved = 0.0
     service = str(rec.get("service") or "")
+    if kind == "salvage" and captor is not None:
+        service = P._service_of(captor)
     role_was = str(rec.get("role_was") or "")
     if (
         kind == "condemned"
@@ -501,16 +512,25 @@ def sentence(
             "sentence of the court"
         )
     # the sharers: the captor first, then every ship in sight at the strike
-    sharers = [
-        {
-            "id": rec.get("captor"),
-            "name": rec.get("captor_name"),
-            "complement": int(rec.get("captor_complement") or _complement(captor) if captor else 0),
-        }
-    ]
-    for s in rec.get("in_sight") or []:
-        if str(s.get("id")) != str(rec.get("captor")) and bool(rows.get("in_sight_shared", True)):
-            sharers.append(dict(s))
+    if kind == "salvage" and captor is not None:
+        sharers = [
+            {"id": str(captor.id), "name": str(captor.name), "complement": _complement(captor)}
+        ]
+    else:
+        sharers = [
+            {
+                "id": rec.get("captor"),
+                "name": rec.get("captor_name"),
+                "complement": int(
+                    rec.get("captor_complement") or _complement(captor) if captor else 0
+                ),
+            }
+        ]
+        for s in rec.get("in_sight") or []:
+            if str(s.get("id")) != str(rec.get("captor")) and bool(
+                rows.get("in_sight_shared", True)
+            ):
+                sharers.append(dict(s))
     parts = share_out(paid_now, sharers)
     scheme = scheme_for(captor_nation, when, service)
     for sharer, part in parts:
