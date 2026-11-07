@@ -142,7 +142,10 @@ def test_every_nation_has_its_habit_in_action_and_its_signals_root(table):
     assert table.habits_of("ruritania") == DEFAULT_HABITS
     assert table.get("britain").signals_root == "britain"
     assert table.get("france").signals_system == "well-built"
-    assert table.get("spain").signals_root == "basic"
+    # package 76 moved Spain from the basic system to her own root (Mazarredo's book): the
+    # line read "basic" before, and does again with her nations' entry put back
+    assert table.get("spain").signals_root == "spain"
+    assert table.get("spain").signals_system == "well-built"
 
 
 def test_the_stance_of_a_port_toward_a_ship(table, chart):

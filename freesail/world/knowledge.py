@@ -390,6 +390,7 @@ FAMILIES: dict[str, str] = {
     "colours": "deck",
     "crew": "deck",
     "fishing": "deck",
+    "flags": "deck",  # package 76 (item 8): a flag of command hoisted, seen as the colours are
     "fog": "deck",
     "ground": "deck",
     "gun": "deck",

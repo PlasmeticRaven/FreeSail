@@ -242,6 +242,32 @@ with no model seated (truth 7-145). The player's ship obeys nobody's signals. Re
 book". 72's squadron replaces the relation and keeps the entries' `does`; 76 builds the
 books out from the six files.
 
+**As built out (package 76; `docs/design/Design-Signals.md`, "As built out").** Six roots:
+Britain's from the page (the 1799 book's numbers where the logs of 1801 and 1805 gloss a
+hoist, the 1796 book's meanings and fog signals, the 1799 night book, Popham's dictionary of
+1803 whole); France's built out in du Pavillon's table as Audibert (1802) describes it, every
+cell made, Orvilliers's words cited; **Spain's new**, Mazarredo's book of 1781 in its own
+cells (the general signals of two flags, the signals of one flag, the night in his three
+chapters by lanterns and the fog by his guns), the open question of the 1797 quaderno said in
+its declaration; **the United States' new**, Barry's numbers of 1800 by day and by his
+lanterns by night, the squadron's flags of 1803 to 1804 from Preble's account; **Naples's
+new**, the flotilla's book of 1807 of Joseph's kingdom, said so; and `basic`, naming the
+nations it stands for (the Batavian Republic, Denmark, Portugal, the Barbary regencies, the
+Mediterranean states with no book). A book declares its `hoist_form` (`numerary`, a flag a
+figure; `table`, two flags read as a cell), which the lookout's words follow and which no
+British or basic record carries; a nation turned to her own root keeps her private draw
+(her form basic's word for word). **A nation's book is added by data alone**: her six files
+and the seventh, her line in `data/nations.yaml`, and `tools/check_signals.py` and the
+tests over every root, which know no root by name. **The seventh file, `colours.yaml`**:
+the nation's flags of command and identity with their drawings and where each flies by
+occasion and role (81's place words); the locker keeps what flies where (`Locker.flies`, the
+viewer's list) and the flags ordered (`hoist the broad pendant`, `hoist a second ensign at
+the main`, `hoist the jack`); the lookout says what flies beyond the ensign where the colours'
+line already falls. The private signal may be made in another nation's form from a table
+held (an ally's by the papers, a captured one), or every table held in succession, three
+minutes a hoist, a challenge answered only by a ship of its form's nation (truths 7-426 to
+7-435).
+
 ### 4. The hail, and the voice between ships (`freesail/world/hearing.py`, `orders.py`; `crews.py`; the harness)
 
 Within hail (the four cables the lookout has) a ship is spoken by the speaking trumpet:

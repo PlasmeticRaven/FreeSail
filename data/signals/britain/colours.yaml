@@ -1,0 +1,317 @@
+# FreeSail: the British flags of command and identity (spec M7 §1; package 76, the owner's
+# addition of 2026-11-07; docs/design/Design-Signals.md, "As built out", which gives the shape).
+# The authority is Perrin's *British Flags* (Cambridge, 1922; the author the Admiralty's
+# librarian; out of copyright; docs/references/signals/), with Babron's description of the
+# flags of England (1817) and the 1820 display's plates for the colours. In 1805 a King's
+# ship wore the ensign and the pendant of her admiral's squadron, red, white or blue, the jack
+# at the bowsprit; a private ship not under an admiral's flag the red (the senior squadron's;
+# judgement for the game, which gives a ship no admiral's squadron yet); a merchantman the red
+# ensign; a privateer the red ensign and the red jack with the Union in its canton. The Union
+# in the canton is that of 1 January 1801. Where each flew: at sea the ensign at the peak and
+# at anchor at the staff (Babron: "toujours au-dessus de la poupe, soit à la gaule d'enseigne ou
+# à la corne"), the pendant at the main; in action the ensigns doubled and the jack at the
+# fore, as Roosevelt's account of the *Constitution* and the *Java* (1812; the period's
+# practice) has it, a second ensign at the main topgallant masthead. The drawings are the
+# builder's from the blazons in those words, x along the fly from the hoist and y down from
+# the head; the proportions judgement where no page gives them.
+
+nation: britain
+sources:
+  - "Perrin, British Flags, their early history, and their development at sea, Cambridge 1922 (the ensigns, the union flags and jacks, the pendants of command, the admirals' flags, the privateer's jack)"
+  - "Babron, Précis des pratiques de l'art naval, Brest 1817 (the description of the flags of England; where the ensign flies)"
+  - "Fisher, A Display of the Naval Flags of all Nations, Liverpool [1820] (the plates, for the colours)"
+  - "Roosevelt, The Naval War of 1812, New York 1882 (the flags flown in action by the Constitution and the Java)"
+flags:
+  - name: "red ensign"
+    kind: "ensign"
+    service: "navy"
+    squadron: "red"
+    words: "the red ensign"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.1, colour: white}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.1, colour: white}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.0335, colour: red}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.0335, colour: red}
+      - {rect: [0, 0.1667, 0.5, 0.3333], colour: white}
+      - {rect: [0.2083, 0, 0.2917, 0.5], colour: white}
+      - {rect: [0, 0.2, 0.5, 0.3], colour: red}
+      - {rect: [0.225, 0, 0.275, 0.5], colour: red}
+    dates: "1801-"
+    source: "Perrin, British Flags (1922), the colours of distinction: the ensigns of the three squadrons, the Union in the canton from 1 January 1801; Babron, Précis (1817), the flags of England"
+  - name: "white ensign"
+    kind: "ensign"
+    service: "navy"
+    squadron: "white"
+    words: "the white ensign"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.45, 0, 0.55, 1], colour: red}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.1, colour: white}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.1, colour: white}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.0335, colour: red}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.0335, colour: red}
+      - {rect: [0, 0.1667, 0.5, 0.3333], colour: white}
+      - {rect: [0.2083, 0, 0.2917, 0.5], colour: white}
+      - {rect: [0, 0.2, 0.5, 0.3], colour: red}
+      - {rect: [0.225, 0, 0.275, 0.5], colour: red}
+    dates: "1801-"
+    source: "Perrin, British Flags (1922), the colours of distinction: the ensigns of the three squadrons, the Union in the canton from 1 January 1801; Babron, Précis (1817), the flags of England"
+  - name: "blue ensign"
+    kind: "ensign"
+    service: "navy"
+    squadron: "blue"
+    words: "the blue ensign"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.1, colour: white}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.1, colour: white}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.0335, colour: red}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.0335, colour: red}
+      - {rect: [0, 0.1667, 0.5, 0.3333], colour: white}
+      - {rect: [0.2083, 0, 0.2917, 0.5], colour: white}
+      - {rect: [0, 0.2, 0.5, 0.3], colour: red}
+      - {rect: [0.225, 0, 0.275, 0.5], colour: red}
+    dates: "1801-"
+    source: "Perrin, British Flags (1922), the colours of distinction: the ensigns of the three squadrons, the Union in the canton from 1 January 1801; Babron, Précis (1817), the flags of England"
+  - name: "merchant red ensign"
+    kind: "merchant ensign"
+    service: "merchant"
+    words: "the red ensign"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.1, colour: white}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.1, colour: white}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.0335, colour: red}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.0335, colour: red}
+      - {rect: [0, 0.1667, 0.5, 0.3333], colour: white}
+      - {rect: [0.2083, 0, 0.2917, 0.5], colour: white}
+      - {rect: [0, 0.2, 0.5, 0.3], colour: red}
+      - {rect: [0.225, 0, 0.275, 0.5], colour: red}
+    dates: "1801-"
+    source: "Perrin, British Flags (1922), the merchant ships: the red ensign theirs by the Proclamations of 1674 and 1694, the Union of 1801 in its canton"
+  - name: "union jack"
+    kind: "jack"
+    service: "navy"
+    words: "the union jack"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {line: [[0, 0], [1, 1]], width: 0.2, colour: white}
+      - {line: [[0, 1], [1, 0]], width: 0.2, colour: white}
+      - {line: [[0, 0], [1, 1]], width: 0.067, colour: red}
+      - {line: [[0, 1], [1, 0]], width: 0.067, colour: red}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0.4167, 0, 0.5833, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.45, 0, 0.55, 1], colour: red}
+    dates: "1801-"
+    source: "Perrin, British Flags (1922), the union flags and jacks: the jack a small Union flag flown at the bows of one of H.M. ships; the Union of 1801"
+  - name: "privateer's jack"
+    kind: "jack"
+    service: "privateer"
+    words: "the privateer's red jack"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.1, colour: white}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.1, colour: white}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.0335, colour: red}
+      - {line: [[0, 0.5], [0.5, 0]], width: 0.0335, colour: red}
+      - {rect: [0, 0.1667, 0.5, 0.3333], colour: white}
+      - {rect: [0.2083, 0, 0.2917, 0.5], colour: white}
+      - {rect: [0, 0.2, 0.5, 0.3], colour: red}
+      - {rect: [0.225, 0, 0.275, 0.5], colour: red}
+    dates: "1801-"
+    source: "Perrin, British Flags (1922): the red jack with the Union in its canton, a ship with letters of marque's by the Proclamation of 1694, kept until 1856 with the Union of 1801"
+  - name: "red pendant"
+    kind: "pendant"
+    service: "navy"
+    squadron: "red"
+    words: "the red pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.08, 1], colour: white}
+      - {rect: [0, 0.3, 0.08, 0.7], colour: red}
+      - {rect: [0.03, 0, 0.05, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922): the private ships to have an ensign, as well as the customary pendant, of the squadronal colour; the pendant's St George's cross at the head; the proportion judgement"
+  - name: "white pendant"
+    kind: "pendant"
+    service: "navy"
+    squadron: "white"
+    words: "the white pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0, 0.08, 1], colour: white}
+      - {rect: [0, 0.3, 0.08, 0.7], colour: red}
+      - {rect: [0.03, 0, 0.05, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922): the private ships to have an ensign, as well as the customary pendant, of the squadronal colour; the pendant's St George's cross at the head; the proportion judgement"
+  - name: "blue pendant"
+    kind: "pendant"
+    service: "navy"
+    squadron: "blue"
+    words: "the blue pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0, 0, 0.08, 1], colour: white}
+      - {rect: [0, 0.3, 0.08, 0.7], colour: red}
+      - {rect: [0.03, 0, 0.05, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922): the private ships to have an ensign, as well as the customary pendant, of the squadronal colour; the pendant's St George's cross at the head; the proportion judgement"
+  - name: "red broad pendant"
+    kind: "broad pendant"
+    service: "navy"
+    squadron: "red"
+    words: "a commodore's broad pendant"
+    proportion: [1, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922), the commodore's broad pendant: of the squadronal colour (the Regulations of 1806; before them the commodores kept their pendants flying in all circumstances); the plain red judgement for 1805, its proportion judgement"
+  - name: "flag of an admiral of the red"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "red"
+    rank: "admiral"
+    words: "the flag of an admiral of the red"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: "1805-"
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of a vice-admiral of the red"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "red"
+    rank: "vice-admiral"
+    words: "the flag of a vice-admiral of the red"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of a rear-admiral of the red"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "red"
+    rank: "rear-admiral"
+    words: "the flag of a rear-admiral of the red"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of an admiral of the white"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "white"
+    rank: "admiral"
+    words: "the flag of an admiral of the white"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.45, 0, 0.55, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of a vice-admiral of the white"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "white"
+    rank: "vice-admiral"
+    words: "the flag of a vice-admiral of the white"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.45, 0, 0.55, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of a rear-admiral of the white"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "white"
+    rank: "rear-admiral"
+    words: "the flag of a rear-admiral of the white"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.45, 0, 0.55, 1], colour: red}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of an admiral of the blue"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "blue"
+    rank: "admiral"
+    words: "the flag of an admiral of the blue"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of a vice-admiral of the blue"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "blue"
+    rank: "vice-admiral"
+    words: "the flag of a vice-admiral of the blue"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of a rear-admiral of the blue"
+    kind: "admiral's flag"
+    service: "navy"
+    squadron: "blue"
+    rank: "rear-admiral"
+    words: "the flag of a rear-admiral of the blue"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    source: "Perrin, British Flags (1922), the flags of command: the flag officers classed in the squadrons of the red, white and blue and flying flags of their squadron's colour, the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen (the admiral of the red made after Trafalgar); the white the St George's flag"
+  - name: "flag of truce"
+    kind: "truce"
+    service: "any"
+    words: "a flag of truce"
+    proportion: [1, 1.5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+occasions:
+  - {occasion: "at sea", role: "kings ship", flags: [{name: "red ensign", where: "peak"}, {name: "red pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "commodore", flags: [{name: "red ensign", where: "peak"}, {name: "red broad pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "admiral", flags: [{name: "red ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "merchant", flags: [{name: "merchant red ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "privateer", flags: [{name: "merchant red ensign", where: "peak"}]}
+  - {occasion: "at anchor", role: "kings ship", flags: [{name: "red ensign", where: "staff"}, {name: "red pendant", where: "main truck"}, {name: "union jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "commodore", flags: [{name: "red ensign", where: "staff"}, {name: "red broad pendant", where: "main truck"}, {name: "union jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "admiral", flags: [{name: "red ensign", where: "staff"}, {name: "union jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "merchant", flags: [{name: "merchant red ensign", where: "staff"}]}
+  - {occasion: "at anchor", role: "privateer", flags: [{name: "merchant red ensign", where: "staff"}, {name: "privateer's jack", where: "jackstaff"}]}
+  - {occasion: "in action", role: "kings ship", flags: [{name: "red ensign", where: "peak"}, {name: "red ensign", where: "main topgallant masthead"}, {name: "red pendant", where: "main truck"}, {name: "union jack", where: "fore truck"}]}
+  - {occasion: "in action", role: "commodore", flags: [{name: "red ensign", where: "peak"}, {name: "red ensign", where: "main topgallant masthead"}, {name: "red broad pendant", where: "main truck"}, {name: "union jack", where: "fore truck"}]}
+  - {occasion: "in action", role: "admiral", flags: [{name: "red ensign", where: "peak"}, {name: "red ensign", where: "fore topgallant masthead"}, {name: "union jack", where: "fore truck"}]}
+  - {occasion: "in action", role: "merchant", flags: [{name: "merchant red ensign", where: "peak"}]}
+  - {occasion: "in action", role: "privateer", flags: [{name: "merchant red ensign", where: "peak"}, {name: "merchant red ensign", where: "main topgallant masthead"}]}
+  - {occasion: "under truce", role: "any", flags: [{name: "red ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+  - {occasion: "under truce", role: "merchant", flags: [{name: "merchant red ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}

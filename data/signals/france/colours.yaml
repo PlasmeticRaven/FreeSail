@@ -1,0 +1,137 @@
+# FreeSail: the French flags of command and identity (spec M7 §1; package 76, the owner's
+# addition of 2026-11-07; docs/design/Design-Signals.md, "As built out", which gives the shape).
+# The law of 31 October 1790 (docs/references/signals/) gave the navy the national colours in
+# every flag and fixed the pendant (the three vertical bands in its broadest part, the rest
+# white), the guidon (the national colours plainly) and the flags of command (the three bands
+# in their upper quarter); the decree of 1794 made the national flag the three colours in equal
+# vertical bands, blue at the hoist, white, red in the fly, for ships of war and of trade alike
+# (as Preble gives it). Where each flew is Babron's (1817) and the period's practice, as the
+# British file's, marked judgement where no page gives it; the drawings are the builder's
+# from those words.
+
+nation: france
+sources:
+  - "the law of 31 October 1790 fixing the colours in the flags, pendants and other marks of ships of war and of trade (the pendant, the guidon, the flags of command)"
+  - "the decree of 27 pluviôse an II (1794), as Preble, History of the Flag of the United States, Boston 1894, gives it (the national flag)"
+  - "Babron, Précis des pratiques de l'art naval, Brest 1817 (where the flags flew; the proportion)"
+  - "Fisher, A Display of the Naval Flags of all Nations, Liverpool [1820] (the plates, which keep the Republic's older flag)"
+flags:
+  - name: "tricolour ensign"
+    kind: "ensign"
+    service: "navy"
+    words: "the tricolour"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1794-"
+    source: "the decree of 27 pluviôse an II (15 February 1794), as Preble (1894) gives it: the national flag of the three colours in equal bands, placed vertically, the hoist blue, the centre white, the fly red; Babron (1817) for where it flew"
+  - name: "merchant tricolour"
+    kind: "merchant ensign"
+    service: "merchant"
+    words: "the tricolour"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1794-"
+    source: "the decree of 27 pluviôse an II (15 February 1794), as Preble (1894) gives it: the national flag of the three colours in equal bands, placed vertically, the hoist blue, the centre white, the fly red; Babron (1817) for where it flew (the one flag for ships of war and of trade, as the law of 1790 had it of its own)"
+  - name: "French jack"
+    kind: "jack"
+    service: "navy"
+    words: "the tricolour jack"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1794-"
+    source: "the law of 31 October 1790, art. I: the bowsprit's flag of three equal vertical bands; after the decree of 1794 the national flag's order of the colours (judgement: the jack in the national flag's form)"
+  - name: "French pendant"
+    kind: "pendant"
+    service: "navy"
+    words: "the French pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0, 0.04, 1], colour: blue}
+      - {rect: [0.04, 0, 0.08, 1], colour: white}
+      - {rect: [0.08, 0, 0.12, 1], colour: red}
+    dates: "1790-"
+    source: "the law of 31 October 1790, art. III: the pendant of the ships of war bears the three vertical bands in its broadest part, the rest of it white (the bands in the 1794 order, judgement); its proportion judgement"
+  - name: "chef de division's broad pendant"
+    kind: "broad pendant"
+    service: "navy"
+    words: "a chef de division's broad pendant"
+    proportion: [1, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1790-"
+    source: "the law of 31 October 1790, art. III: the guidon to bear the national colours plainly (its form judgement: the three colours in vertical bands, swallow-tailed as the British broad pendant)"
+  - name: "flag of an admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "admiral"
+    words: "an admiral's flag"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1794-"
+    source: "the law of 31 October 1790, art. IV, the flags of command; after 1794 the national flag at the masthead by rank (judgement: the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen, as the British)"
+  - name: "flag of a vice-admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "vice-admiral"
+    words: "a vice-admiral's flag"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1794-"
+    source: "the law of 31 October 1790, art. IV, the flags of command; after 1794 the national flag at the masthead by rank (judgement: the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen, as the British)"
+  - name: "flag of a rear-admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "rear-admiral"
+    words: "a rear-admiral's flag"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1, 1], colour: red}
+    dates: "1794-"
+    source: "the law of 31 October 1790, art. IV, the flags of command; after 1794 the national flag at the masthead by rank (judgement: the admiral's at the main, the vice-admiral's at the fore, the rear-admiral's at the mizen, as the British)"
+  - name: "flag of truce"
+    kind: "truce"
+    service: "any"
+    words: "a flag of truce"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+occasions:
+  - {occasion: "at sea", role: "kings ship", flags: [{name: "tricolour ensign", where: "peak"}, {name: "French pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "commodore", flags: [{name: "tricolour ensign", where: "peak"}, {name: "chef de division's broad pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "admiral", flags: [{name: "tricolour ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "merchant", flags: [{name: "merchant tricolour", where: "peak"}]}
+  - {occasion: "at sea", role: "privateer", flags: [{name: "tricolour ensign", where: "peak"}]}
+  - {occasion: "at anchor", role: "kings ship", flags: [{name: "tricolour ensign", where: "staff"}, {name: "French pendant", where: "main truck"}, {name: "French jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "commodore", flags: [{name: "tricolour ensign", where: "staff"}, {name: "chef de division's broad pendant", where: "main truck"}, {name: "French jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "admiral", flags: [{name: "tricolour ensign", where: "staff"}, {name: "French jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "merchant", flags: [{name: "merchant tricolour", where: "staff"}]}
+  - {occasion: "at anchor", role: "privateer", flags: [{name: "tricolour ensign", where: "staff"}]}
+  - {occasion: "in action", role: "kings ship", flags: [{name: "tricolour ensign", where: "peak"}, {name: "tricolour ensign", where: "main topgallant masthead"}, {name: "French pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "commodore", flags: [{name: "tricolour ensign", where: "peak"}, {name: "tricolour ensign", where: "main topgallant masthead"}, {name: "chef de division's broad pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "admiral", flags: [{name: "tricolour ensign", where: "peak"}, {name: "tricolour ensign", where: "fore topgallant masthead"}]}
+  - {occasion: "in action", role: "merchant", flags: [{name: "merchant tricolour", where: "peak"}]}
+  - {occasion: "in action", role: "privateer", flags: [{name: "tricolour ensign", where: "peak"}]}
+  - {occasion: "under truce", role: "any", flags: [{name: "tricolour ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+  - {occasion: "under truce", role: "merchant", flags: [{name: "merchant tricolour", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}

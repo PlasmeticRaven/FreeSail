@@ -382,21 +382,30 @@ def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
 
 
 def _after_sail_lines(ship: Ship) -> list[str]:
-    """The after sail reduced with the head sail, in a ship or a brig, by the reefs the
-    topsails will have when this `shorten sail` has taken its own (Luce 1884, ch. XXIX,
-    'Reducing Sail to a Gale', p. 476: "As the wind freshens, take a second reef in the
-    topsails, and a single reef in the courses. The wind increasing, to take a third reef
-    ... To Haul up and Furl the Mainsail"; the spanker is not set again there but reefed
-    "if additional after-sail is required"): with the second reef the courses reefed, with
-    the third the mainsail hauled up and the spanker taken in. In the captain's trials the
-    frigate under her courses, three reefs and the spanker, the jib in, came to against a
-    hard-over helm every two minutes for two hours. A fore-and-after keeps her mainsail,
-    which the list reefs."""
+    """The after sail reduced with the head sail by the reefs the topsails will have when
+    this `shorten sail` has taken its own (Luce 1884, ch. XXIX, 'Reducing Sail to a Gale',
+    p. 476: "As the wind freshens, take a second reef in the topsails, and a single reef in
+    the courses. The wind increasing, to take a third reef ... To Haul up and Furl the
+    Mainsail"; the spanker is not set again there but reefed "if additional after-sail is
+    required"): with the second reef the courses reefed, in any rig with topsails; with the
+    third, in a ship or a brig (`physics.sails._square_rigged`), the mainsail hauled up and
+    the spanker taken in. In the captain's trials the frigate under her courses, three
+    reefs and the spanker, the jib in, came to against a hard-over helm every two minutes
+    for two hours.
+
+    The lead's ruling 4 of 2026-11-06 (package 75, B3.4): the courses' reef is kept for a
+    fore-and-after with topsails as for a ship (a schooner's fore course; the *Neufchatel*
+    on 28 December under a double-reefed foresail and a closely reefed mainsail, Cobb
+    p. 95), and only the after take-ins, the aftermost course's and the driver's
+    (`after_gaff_sails`), are a square-rigged ship's. So a fore-and-after has no sail taken
+    in by this list, and her gaff or boom mainsail, her driving sail, is neither taken in
+    nor reefed by it; a course, on whatever mast, is reefed once as any rig's with topsails
+    (the polacre probe's main course, which is her mainsail, among them). A course with no
+    reef bands is not named, as before the ruling."""
     from freesail.evolutions.scripts import after_gaff_sails
     from freesail.physics.sails import _square_rigged
 
-    if not _square_rigged(ship):
-        return []
+    square = _square_rigged(ship)
     topsails = [
         sl
         for sl in ship.sails.values()
@@ -411,7 +420,7 @@ def _after_sail_lines(ship: Ship) -> list[str]:
     lines: list[str] = []
     courses = [ship.sails[sid] for sid in ship.groups.get("courses") or [] if sid in ship.sails]
     courses = [sl for sl in courses if sl.is_set]
-    aftermost = min(courses, key=lambda sl: sl.x_m) if len(courses) > 1 else None
+    aftermost = min(courses, key=lambda sl: sl.x_m) if square and len(courses) > 1 else None
     if reefs >= 3 and aftermost is not None:
         lines.append(f"take in the {_name(ship, aftermost)}")
         courses = [sl for sl in courses if sl is not aftermost]
@@ -419,7 +428,7 @@ def _after_sail_lines(ship: Ship) -> list[str]:
         for sl in courses:
             if sl.reefs < sl.reef_bands:
                 lines.append(f"reef the {_name(ship, sl)}, one reef")
-    if reefs >= 3:
+    if reefs >= 3 and square:
         for sl in after_gaff_sails(ship):
             if sl.is_set:
                 lines.append(f"take in the {_name(ship, sl)}")
