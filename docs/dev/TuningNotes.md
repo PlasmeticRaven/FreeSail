@@ -19283,3 +19283,75 @@ truths, exit 0, 323 run, 315 passed and 8 xfailed; the pace tests alone and last
 13. Ruff format clean; ruff check finds one line too long, the trunk's own
 (`tests/test_captain_trials.py:367`, from 4423f62, package 75's re-pin as merged), not this
 branch's and left to the lead.
+
+### Step 2: the French book built out
+
+**The declaration** (`data/signals/france/book.yaml`) is now du Pavillon's system as Audibert
+Ramatuelle's *Cours élémentaire de tactique navale* (Paris, 1802) describes it in its chapter
+on signals: "the best of the systems known" (§ 67); every signal two flags, an upper and a
+lower, read in a square table whose rows are the upper flags and columns the lower, the cell
+holding the order and its number ("the order in the cell No. 286", § 71); some twenty flags
+of two colours each, with guidons and pendants; a guidon over the two flags for a bare number
+(§ 73); the compass by one flag under a guidon (§ 74). The Republic's book of the year VI is
+not online, so no page gives the service's cells: every French number stays made, as ruled.
+
+**The one engine change, approved in advance** (`freesail/world/signals.py`,
+`freesail/orders/signals.py`): a book declares `hoist_form`, `numerary` (a flag a figure, the
+default, the British and basic books) or `table` (two flags read as a cell, the French and,
+in step 3, the Spanish); the loader reads it into `Books.hoist_form` (refusing any other word
+in a sentence), `make_hoist` puts it on the `Hoist` (`form`), `repeat the signal` carries it,
+and `flags_words` reads it: a table book's numbered signal is "two flags at the main" whatever
+its number, where the numerary's No. 186 is three. The hoist's record (`to_dict`, which goes
+into the events' data) writes `form` only where it is not the numerary's, so that no British or
+basic signal's record, and no digest, changes with the field; `test_a_hoist_shows_its_books_
+form_and_the_british_numerary_is_unchanged_by_it` says so (the British No. 186 three flags and
+No. 16 two, no `form` in the record; the French general chase, a cell under 10, two flags, its
+record `form: table`).
+
+**The numerary** (74 entries, every cell made): 71's 70 meanings checked against Orvilliers's
+*Signaux généraux pour l'escadre du Roi* (Brest, 1772) by their French phrases; fourteen are
+there in his words and cited (the chase chapter; "faire branle-bas"; "former la ligne de
+bataille"; "former les trois colonnes", the order of sailing; "garder ou reprendre leurs
+postes"; "faire revirer l'escadre par la contre-marche"; "forcer de voiles"; "diminuer de
+voiles"; "faire prendre un ris dans les huniers"; "mettre en panne"; "au plus près du vent,
+l'amure à stribord"; the anchoring and the getting-under-way chapters; "faire éteindre tous les
+feux de poupe"); the rest are said to be in the period's form, 71's French phrases from
+memory. 71's sources' "Code of the 1790s" and "du Pavillon 1776" were from memory and are
+rewritten to what was found ("the Republic's book not found"; du Pavillon's system and his
+*Rapport* of 1775). Four entries added for what the squadrons, chases and convoys hoist: chase
+to windward and to leeward (Orvilliers's chase chapter, "les faire chasser au vent", "sous le
+vent"), the ships astern to make more sail, the ships ahead to shorten sail (71's French book
+had neither, so a French convoy's straggler rule hoisted nothing).
+
+**The night and fog books** in Audibert's form (§§ 88 to 93): by night guns in two times, the
+upper and the lower, a minute between, the ships repeating by lanterns upper over lower; three
+chapters, the first without rockets (the battle's orders, which alone can be made by lanterns
+in action), the second a rocket between the times, the third a rocket after; six guns at most,
+twenty-one cells a chapter. Which order stood in which cell no page gives, so the 22 night and
+13 of the 14 fog entries are cells made in that form ("one gun, a rocket, and a minute after two
+guns": the night's tack together); the fog's keeping company is Audibert's own (§ 93: the
+general a gun at intervals, the chiefs repeating each quarter hour, every ship answering with a
+swivel gun), sourced and not made. `tests/test_signals.py`'s step-1 rule for an unmade night or
+fog entry (it carries its number) was British-shaped; it now reads, for every root, that an
+unmade entry's source names its page's year, and for the British book that it also carries its
+number, as before.
+
+**The convoy, private and telegraphic files.** The convoy book's head is Audibert's chapter on
+the escort of convoys (part II ch. V): the commander's own signals for his convoy, by day,
+night and fog, which no ship may let be taken; recognition at a distance by sails hoisted and
+lowered a set number of times; the day's number on a black tablet shown on both sides at his
+signal; at night words of the watch and a doubtful ship questioned. He prints no table, so its
+numbers stay made; two entries added (the ships astern to make more sail, the ships ahead to
+shorten sail). The private form's head cites his § 70 (the recognition signals each government
+gives its ships of war, for which the ships must close to make out the flags); the form's places
+stay 71's, from memory. No telegraphic dictionary: Audibert has none.
+
+**What moved.** Nothing pinned: the fast tier on the step's work (5735d77) and the step's final
+runs found no passage that hoists a French signal or reads one, and the British and basic
+records are proven unchanged by the hoist's form (the test above).
+
+**The suites as run at 1844886** (the step with the trunk's 4f3694b and c9cb4c0 merged in; a
+worktree pinned there): the fast tier, exit 0, 6,449 run, 6,448 passed and 1 xfailed (the
+trunk's); the slow tier of the touched files and the known truths, exit 0, 324 run, 316 passed
+and 8 xfailed (the trunk's); the pace tests alone and last, exit 0, 13 of 13. Ruff check and
+format clean.
