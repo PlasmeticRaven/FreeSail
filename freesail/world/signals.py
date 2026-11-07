@@ -634,6 +634,9 @@ class Hoist:
     serial: int = 0
     complete_at: int | None = None  # a telegraphic sentence's last hoist up; else breaks_out
     form: str = "numerary"  # the book's hoist_form: how the flags look to a lookout without it
+    # package 76 (item 8): a private challenge made in a named nation's form (the *Java*'s
+    # move), answered only by a ship of that nation; '' for 71's own challenge, as before
+    form_nation: str = ""
 
     @property
     def done_at(self) -> int:
@@ -724,6 +727,12 @@ class Locker:
     serial: int = 0
     # what other ships' signals were read (for `the signals` reading), newest last
     log: list[dict[str, Any]] = field(default_factory=list)
+    # package 76 (item 8): what flies where, as the viewer reads it (`{place, name, words,
+    # drawing}`), set by the rules from the nation's colours.yaml (`freesail/world/flags.py`);
+    # None until set, when the viewer serves its own plain ensign; and the flags ordered
+    # beside the file's (`hoist the broad pendant`, `... a second ensign`, `... the jack`)
+    flies: list[dict[str, Any]] | None = None
+    ordered_flags: list[str] = field(default_factory=list)
 
     def next_serial(self) -> int:
         self.serial += 1
@@ -887,6 +896,7 @@ def make_private(
     to: str | None = None,
     wrong: str = "",
     at_once: bool = False,
+    form_nation: str = "",
 ) -> Hoist:
     shown = wrong or (table.reply(light) if reply else table.challenge(light))
     h = Hoist(
@@ -898,6 +908,7 @@ def make_private(
         shown=shown,
         root=books.root,
         to=to,
+        form_nation=form_nation,
     )
     return locker.hoist(h)
 
@@ -1431,6 +1442,40 @@ def vessel_table(world: Any, vessel: Any) -> PrivateTable | None:
         return None
     now = world.clock.ship_time
     return private_table(books, str(vessel.nation), now.year, now.month, root_seed(world))
+
+
+def held_tables(world: Any) -> dict[str, PrivateTable]:
+    """The private tables this World's ship holds this month, by nation (package 76, item 8,
+    the *Java*'s move): her own nation's where she carries it (`table_of`), and the table of
+    each book in her library (`held_books`: an ally's carried by the scenario's papers, a
+    captured one by 74's road; a root or the id of a nation standing on basic), each the same
+    draw the ships of that nation hold."""
+    out: dict[str, PrivateTable] = {}
+    own = table_of(world)
+    if own is not None:
+        out[own.nation] = own
+    nations = getattr(world, "nations", None)
+    now = world.clock.ship_time
+    for held in held_books(world):
+        # a root ('spain') or a nation standing on basic ('portugal'): her books and her name
+        if held in roots():
+            books = load_books(held)
+            nation = books.nation
+        else:
+            try:
+                nation = nations.get(held).id if nations is not None else ""
+            except KeyError:
+                continue
+            books = books_for_nation(nations, nation)
+        if not nation or nation in out or nation == "basic":
+            continue
+        table = private_table(books, nation, now.year, now.month, root_seed(world))
+        try:
+            table.adjective = nations.get(nation).adjective if nations is not None else ""
+        except KeyError:
+            table.adjective = ""
+        out[nation] = table
+    return out
 
 
 def far_order_words(world: Any, vessel: Any, text: str) -> tuple[str, str, dict[str, Any]] | None:

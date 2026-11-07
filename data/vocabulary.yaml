@@ -1783,6 +1783,28 @@ verbs:
     synonyms: [stop the bell, belay the fog signals]
     object: signals
     level: 1
+  # package 76 (item 8): the flags of command and identity, and the private signal in another
+  # nation's form (freesail/orders/signals.py; freesail/world/flags.py)
+  hoist the broad pendant:
+    synonyms: [hoist the commodore's broad pendant, wear the broad pendant]
+    object: signals
+    level: 1
+  hoist a second ensign:
+    synonyms: [hoist a second ensign at the main, hoist another ensign, double the ensigns]
+    object: signals
+    level: 1
+  hoist the jack:
+    synonyms: [hoist the union jack, show the jack]
+    object: signals
+    level: 1
+  make another nation's private signal:
+    synonyms: [make the Spanish private signal, make the French private signal, make the Portuguese private signal]
+    object: signals
+    level: 1
+  make the private signals in succession:
+    synonyms: [show the private signals in succession]
+    object: signals
+    level: 1
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
   hold:

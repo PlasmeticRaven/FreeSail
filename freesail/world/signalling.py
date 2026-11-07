@@ -460,6 +460,9 @@ def _answer_challenge(
     table = _table(cap)
     books = _books(cap)
     light = _light(cap)
+    form = str(getattr(h, "form_nation", "") or "")
+    if table is not None and form and form != _own_nation(cap):
+        return  # package 76: a challenge in another nation's form, which her table answers not
     if table is not None:
         if near:
             try:
@@ -561,13 +564,15 @@ def _judge_challenges(cap: Any, locker: S.Locker, p: Any, tick: int) -> None:
     """Each challenge awaiting its answer: the reply hoist flying from that ship judged
     against the table, or none after the wait; the stranger recognised by the verdict."""
     table = _table(cap)
-    if table is None:
+    forms = any(c.get("nation") for c in locker.challenges.values() if isinstance(c, dict))
+    if table is None and not forms:
         return
     books = _books(cap)
     light = _light(cap)
     own = _own_id(cap)
     nations = _nations(cap)
     own_nation = _own_nation(cap)
+    held = S.held_tables(cap.world) if forms and getattr(cap, "vessel", None) is None else {}
     for sid, c in list(locker.challenges.items()):
         if sid == "__succession__" or c.get("verdict"):
             continue
@@ -592,12 +597,29 @@ def _judge_challenges(cap: Any, locker: S.Locker, p: Any, tick: int) -> None:
                 ):
                     reply = h
                     break
-        verdict = S.judge_private(locker, table, light, sid, reply, tick, books.answer_wait_s)
+        # package 76 (item 8): a challenge in another nation's form is judged against the
+        # table of that form; a succession waits three minutes a hoist, then the next
+        form = str(c.get("nation") or "")
+        judged_by = held.get(form, table) if form else table
+        if judged_by is None:
+            continue
+        wait = SUCCESSION_WAIT_S if "queue" in c else books.answer_wait_s
+        verdict = S.judge_private(locker, judged_by, light, sid, reply, tick, wait)
         if verdict is None:
+            continue
+        if verdict == "none" and c.get("queue"):
+            _next_in_succession(cap, locker, c, sid, light, tick, held)
             continue
         shown = body.nation_shown if hasattr(body, "nation_shown") else None
         enemy = None
-        if verdict == "right":
+        made = list(c.get("made") or [])
+        signals_words = _succession_words(nations, made) if len(made) > 1 else ""
+        if verdict == "right" and form and form != own_nation:
+            # answered rightly in another nation's form: a ship of that nation
+            at_war = nations is not None and nations.at_war(form, own_nation)
+            enemy = bool(at_war)
+            recognise(cap, sid, form, f"the {_adjective(nations, form)} private signal", enemy)
+        elif verdict == "right":
             enemy = False
             recognise(cap, sid, own_nation, "the private signal", False)
             ids = getattr(cap, "spoken_ids", None)
@@ -632,7 +654,14 @@ def _judge_challenges(cap: Any, locker: S.Locker, p: Any, tick: int) -> None:
             else who
         )
         head = f"{_cap(who)} "
-        if verdict == "right":
+        if verdict == "right" and form and form != own_nation:
+            adj = _adjective(nations, form)
+            text = (
+                head
+                + f"answers the {adj} private signal rightly: a {adj} ship"
+                + (", an enemy." if enemy else ".")
+            )
+        elif verdict == "right":
             text = head + "answers the private signal rightly: one of ours."
         elif verdict == "wrong":
             text = (
@@ -651,6 +680,15 @@ def _judge_challenges(cap: Any, locker: S.Locker, p: Any, tick: int) -> None:
             )
         else:
             text = head + "makes no answer to the private signal: a stranger, to be spoken."
+        if signals_words:
+            # 'the private signals, British, Spanish and Portuguese in succession, none answered'
+            text = text.replace(
+                "the private signal", f"the private signals, {signals_words} in succession", 1
+            )
+        elif form and form != own_nation and verdict != "right":
+            text = text.replace(
+                "the private signal", f"the {_adjective(nations, form)} private signal", 1
+            )
         _record(
             cap,
             tick,
@@ -658,6 +696,56 @@ def _judge_challenges(cap: Any, locker: S.Locker, p: Any, tick: int) -> None:
             text,
             {"id": sid, "verdict": verdict, "enemy": enemy},
         )
+
+
+# The wait for the answer to each hoist of the private signals made in succession (package 76,
+# item 8: "three minutes at a hoist", the brief's truth 7-435; judgement)
+SUCCESSION_WAIT_S = 180
+
+
+def _adjective(nations: Any, nid: str) -> str:
+    try:
+        return nations.get(nid).adjective if nations is not None else nid
+    except KeyError:
+        return nid
+
+
+def _succession_words(nations: Any, made: list[str]) -> str:
+    """'British, Spanish and Portuguese'."""
+    words = [_adjective(nations, n) for n in made]
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " and " + words[-1]
+
+
+def _next_in_succession(
+    cap: Any, locker: S.Locker, c: dict[str, Any], sid: str, light: str, tick: int, held: dict
+) -> None:
+    """No answer to this nation's challenge: the next table's run up by the same hands, the
+    wait begun again from its breaking out (package 76, item 8)."""
+    nxt = str(c["queue"].pop(0))
+    table = held.get(nxt)
+    if table is None:
+        return
+    c.update({"verdict": None, "tick": tick, "nation": nxt})
+    c.pop("judged", None)
+    c.setdefault("made", []).append(nxt)
+    for h in locker.flying:  # the last challenge hauled down for the next
+        if h.book == "private" and h.to == sid and h.down is None:
+            h.down = tick
+    locker.flying = [h for h in locker.flying if h.down is None]
+    books = S.books_for_nation(_nations(cap), nxt)
+    hoist = S.make_private(
+        locker, books, table, light, _own_id(cap), tick, reply=False, to=sid, form_nation=nxt
+    )
+    from freesail.orders.signals import _start_hoist
+
+    try:
+        _start_hoist(
+            cap.world, locker, hoist, 1, f"the {_adjective(_nations(cap), nxt)} private signal"
+        )
+    except Exception:  # noqa: BLE001 - no hands to give it: run up in the book's minute
+        hoist.breaks_out = tick + books.hoist_s
+        if hoist not in locker.flying:
+            locker.flying.append(hoist)
 
 
 def _man_of_war_words(known: str) -> bool:

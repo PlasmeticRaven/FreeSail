@@ -100,6 +100,14 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
 # on the build machine with three other suites running beside them (2026-10-01).
 SLOW_TESTS: frozenset[str] = frozenset(
     {
+        # package 76 (item 8): the flags read by the lookout and the private signals in
+        # succession, each a quarter of an hour sailed (7 to 13 s on four loaded cores)
+        "test_flags.py::test_the_lookout_reads_the_pendant_and_the_broad_pendant_at_the_colours_range",
+        "test_flags.py::test_beating_to_quarters_doubles_the_ensigns_with_the_jack_at_the_fore",
+        "test_flags.py::test_the_private_signals_in_succession_unanswered_make_her_an_enemy",
+        "test_flags.py::test_a_stranger_answers_the_challenge_made_in_her_own_form_and_no_other",
+        "test_known_truths.py::test_truth_7_434_the_flags_of_command_are_worn_by_role_and_read_by_the_lookout",
+        "test_known_truths.py::test_truth_7_435_the_private_signals_in_succession_unanswered_make_her_an_enemy",
         # package 65 (the place's knowledge): the fakes seated and sent below, the hull slept
         "test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks",
         # package 65, step 3: the reports, the call, the command devolved, the boat's report

@@ -13971,6 +13971,46 @@ def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
 
 
 # ---------------------------------------------------------------------------
+# Package 76: the signal books built out, and the flags of command and identity
+# (docs/design/Design-Signals.md, "As built out")
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_434_the_flags_of_command_are_worn_by_role_and_read_by_the_lookout():
+    """The owner's addition of 2026-11-07: a King's frigate wears her pendant at the main and
+    her ensign at the peak, a commodore's ship her broad pendant, a merchantman her ensign alone,
+    each read by the lookout at the colours' range in those words ("she wears a pendant at the
+    main: a man-of-war"; "a broad pendant at the main: a commodore"); beating to quarters doubles
+    the frigate's ensigns with the jack at the fore, the locker's list as the viewer reads it."""
+    from tests.test_flags import (
+        test_beating_to_quarters_doubles_the_ensigns_with_the_jack_at_the_fore,
+        test_the_lookout_reads_the_pendant_and_the_broad_pendant_at_the_colours_range,
+        test_what_flies_where_by_role_occasion_and_state,
+    )
+
+    test_what_flies_where_by_role_occasion_and_state()
+    test_the_lookout_reads_the_pendant_and_the_broad_pendant_at_the_colours_range()
+    test_beating_to_quarters_doubles_the_ensigns_with_the_jack_at_the_fore()
+
+
+def test_truth_7_435_the_private_signals_in_succession_unanswered_make_her_an_enemy():
+    """The *Java*'s move: a ship holding three nations' tables (her own and two among her
+    papers) makes the three private signals in succession to a frigate under British colours
+    that answers none, each in its nation's form, three minutes at a hoist, and her captain holds
+    her an enemy by the tell, as 71 has it; a ship answers only the challenge in her own form
+    (a Danish frigate the Danish, rightly); a table not held is refused in words."""
+    from tests.test_flags import (
+        test_a_stranger_answers_the_challenge_made_in_her_own_form_and_no_other,
+        test_a_table_not_held_is_refused_in_words_and_the_tables_held_are_named,
+        test_the_private_signals_in_succession_unanswered_make_her_an_enemy,
+    )
+
+    test_the_private_signals_in_succession_unanswered_make_her_an_enemy()
+    test_a_stranger_answers_the_challenge_made_in_her_own_form_and_no_other()
+    test_a_table_not_held_is_refused_in_words_and_the_tables_held_are_named()
+
+
+# ---------------------------------------------------------------------------
 # Package 81: the viewer's action, from the hull 75 draws (docs/design/Design-ViewerAction.md)
 # ---------------------------------------------------------------------------
 
