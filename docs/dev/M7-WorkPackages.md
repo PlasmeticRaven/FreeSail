@@ -2746,7 +2746,9 @@ exit 0; the pace 13 of 13, the knowledge filter's place 579 ticks a second again
 7-386's run 569 against 571: within the noise, as at every step); ruff and format clean. **The
 lead's merge:** the trial of b4bf0a9 on db5ff15 clean and lint-clean, the fast tier on it begun and stopped when the mend arrived (nothing of code between b4bf0a9
 and aafbb56); the trial of aafbb56 on 632b46f clean and lint-clean (no long line of the spec duplicated), the fast tier whole on it green, exit 0, every test passed;
-the whole suite in the cloud dispatched after run 44, the figures to follow. **Package 65 is
+the whole suite in the cloud run 45 on f67640b (01:12 to 02:09 UTC): lint green, all six
+shards green, 6,771 passed, 11 skipped, 12 expected failures; the pace job 13 of 13 passed (the runner at the floors
+for once). **Package 65 is
 closed**: eight steps, truths 7-370 to 7-389, 7-420 and 7-421, decisions 59 to 63 as built, the
 design note `docs/design/Design-PlaceKnowledge.md` with a postscript a step. Package 74 (Fable)
 launches on this close.
