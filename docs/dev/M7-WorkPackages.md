@@ -3025,8 +3025,11 @@ ruff check and format clean; the fast tier whole exit 0 (08:39 to 09:18); the sl
 touched files and the known truths with test_profile and test_indefatigable exit 0 (09:18 to
 10:01); the pace alone and last 13 of 13 (10:01 to 10:05), no floor lowered. **The lead's
 merge:** the trial on eff2a556 clean but for the notes' meeting, lint-clean (ruff check and
-format); the fast tier whole on it green, exit 0 (10:08 to 10:48 UTC), 6,570 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud dispatched after
-run 50, the figures to follow. Step 3 (the captive's channel) follows at its boundary, then 4
+format); the fast tier whole on it green, exit 0 (10:08 to 10:48 UTC), 6,570 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud: run 51 on 0e38d5e7 (10:49 to 12:02 UTC): lint green, all six shards
+green, 6,973 passed, 11 skipped, 12 xfailed, no failure; the pace job (informative) 10 of 13, three
+floor tests short of 500 (490, 457, 433; truth 51's frigate held) where run 50 held 13 of 13 and the
+builder measured 13 of 13 at f764616 on its machine; the lead ran the pace alone on the build
+machine at the trunk head after it, PACEHERE. Step 3 (the captive's channel) follows at its boundary, then 4
 to 7 the same, one at a time.
 
 ### Package 76, step 2 (the French book from the page), as merged (2026-11-07)
