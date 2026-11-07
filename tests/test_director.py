@@ -1437,6 +1437,12 @@ UNPERFORMED_HERE = {
     'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days': (
         "is not in ordinary"
     ),
+    # package 74: nobody is a prisoner on the test's seas (the captive's channel's forms
+    # are refused in the game's words about the persons, never the form)
+    "aboard the Medusa: the parole of Captain Bowen given": "no prisoner aboard the Medusa",
+    "aboard the Medusa: the parole of Captain Bowen refused": "no prisoner aboard the Medusa",
+    "cartel: a cartel from Brest for Captain Bowen": "Nobody holds",
+    "cartel: a cartel from Brest for the prisoners of the Amazon": "Nobody holds",
 }
 
 

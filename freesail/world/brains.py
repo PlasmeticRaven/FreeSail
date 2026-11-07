@@ -418,11 +418,10 @@ class FarCaptain(Judgement):
             self._business.pop("fishing_tick", None)  # the trip's hours counted on the ground
         if state in ("investigating a stranger", "chasing", "evading"):
             self._business["since"] = self.world.clock.tick
-        if old in ("investigating a stranger", "chasing", "evading") and state not in (
-            "investigating a stranger",
-            "chasing",
-            "evading",
-        ):
+        # the mark in hand is kept through the detour states (package 74: `taking possession`
+        # keeps the struck mark he closes; it is dropped when he leaves them for a plan state)
+        detours = ("investigating a stranger", "chasing", "evading", "taking possession")
+        if old in detours and state not in detours:
             self._stranger = None
 
     # -- the plan ----------------------------------------------------------------------
@@ -503,7 +502,12 @@ class FarCaptain(Judgement):
         # struck is the mark struck (the far fight is 74's; `combat/far.py` the measure)
         th = self.doctrine.threshold if self.doctrine is not None else (lambda k, v=None: v)
         for s in p.strangers:
-            if not self._is_enemy(s) or s.get("estimate_m") is None:
+            if s.get("estimate_m") is None:
+                continue
+            # the mark in hand struck counts whatever her colours say now (struck, she shows
+            # none, and the lookout's nation of her is gone: package 74)
+            mine = bool(self._stranger) and str(s.get("id") or "") == str(self._stranger)
+            if not mine and not self._is_enemy(s):
                 continue
             if float(s["estimate_m"]) / units.NAUTICAL_MILE > float(th("break_off_nm", 2.0)):
                 continue

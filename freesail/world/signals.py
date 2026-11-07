@@ -68,7 +68,7 @@ __all__ = [
 SIGNALS_DIR = Path(__file__).resolve().parents[2] / "data" / "signals"
 BOOK_FILES = ("book", "numerary", "telegraphic", "night_fog", "convoy", "private")
 
-COLOURS_STATES = ("shown", "none", "false", "struck", "distress")
+COLOURS_STATES = ("shown", "none", "false", "struck", "distress", "truce")
 
 # The book a signal is made from by the light: the numerary by day, the night book by
 # night, the fog book when the visibility is under a mile (the flags are not to be seen).
@@ -558,12 +558,13 @@ class Colours:
 
     @property
     def shows(self) -> bool:
-        return self.state in ("shown", "false", "distress")
+        return self.state in ("shown", "false", "distress", "truce")
 
     @property
     def shown_nation(self) -> str:
-        """The nation a lookout makes out from them: '' when none are to be read."""
-        return self.nation if self.shows else ""
+        """The nation a lookout makes out from them: '' when none are to be read, and ''
+        under a flag of truce (package 74: a cartel is nobody's enemy and nobody's prize)."""
+        return self.nation if self.shows and self.state != "truce" else ""
 
     def words(self, nations: Any) -> str:
         """'British colours, the red ensign'; 'no colours'; 'her colours struck'; 'the
@@ -583,6 +584,10 @@ class Colours:
         flag = f", {short}" if short else ""
         if self.state == "distress":
             return f"{adjective} colours{flag}, the ensign union down"
+        if self.state == "truce":
+            # a cartel (package 74, the design's §3.4; the lead's ruling with packages 76 and
+            # 81: the state word `truce`, the words "a flag of truce")
+            return "a flag of truce"
         over = getattr(self, "over", "")
         if over and self.state == "shown":
             # a prize: her captor's colours hoisted over her own (package 74)

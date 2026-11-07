@@ -95,25 +95,27 @@ def _where_words(world: Any, v: Any) -> str:
 
 def _prisoners(world: Any, _: str | None) -> dict[str, Any] | None:
     from freesail.world import prizes as P
+    from freesail.world.captive import _captives_aboard
 
     ship = getattr(world, "ship", None)
     pris = P.prisoners_of(ship)
-    if pris is None or pris.count == 0:
+    captives = _captives_aboard(world) if pris is not None else []
+    if pris is None or (pris.count == 0 and not captives):
         return {"words": "no prisoners", "count": 0}
     tick = int(world.clock.tick)
-    people = getattr(world, "people", None)
     named = []
-    if people is not None:
-        for p in people.all:
-            if getattr(p, "confined_to", "") and not getattr(p, "dead", False):
-                parole = pris.parole.get(p.name, "")
-                named.append(
-                    f"{p.name} in {R_place(p.confined_to)}"
-                    + (f" (parole {parole})" if parole else "")
-                )
-    words = pris.words(tick)
+    for p in captives:
+        parole = pris.parole.get(p.name, "")
+        at = R_place(p.confined_to) if p.confined_to else R_place(p.where)
+        named.append(f"{p.name} in {at}" + (f" (parole {parole})" if parole else ""))
+    words = pris.words(tick) if pris.count else ""
     if named:
-        words += "; " + ", ".join(named)
+        who = (
+            f"{number_words(len(named))} prisoner{'s' if len(named) != 1 else ''} of rank"
+            if not words
+            else ""
+        )
+        words = (words + "; " if words else who + ": ") + ", ".join(named)
     return {
         "words": words,
         "count": pris.count,
@@ -210,3 +212,9 @@ def register() -> None:
     R._event(R.EventSpec("a prize lost", "prize.lost"))
     R._event(R.EventSpec("a prize burnt", "prize.burnt"))
     R._event(R.EventSpec("the prisoners aboard", "prize.prisoners_aboard"))
+    # the captive's channel (the design's §3)
+    R._event(R.EventSpec("a captive aboard", "prize.captive"))
+    R._event(R.EventSpec("the parole asked", "prize.parole_asked"))
+    R._event(R.EventSpec("the parole given", "prize.parole"))
+    R._event(R.EventSpec("the prisoners landed", "prize.prisoners_landed"))
+    R._event(R.EventSpec("the cartel", "prize.cartel"))

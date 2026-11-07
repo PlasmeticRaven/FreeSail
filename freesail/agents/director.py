@@ -922,6 +922,35 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
     Form(
         "unseat", "unseat", "unseat: <ship>[, <a note>]", ("unseat: <ship>",), "the seat stood down"
     ),
+    # package 74 (spec M7 §19; docs/design/Design-Prizes.md §3): the captive's channel
+    Form(
+        "prize.parole",
+        "aboard",
+        'aboard the <ship>: the parole of "<name>" given | refused',
+        (
+            "aboard the Medusa: the parole of Captain Bowen given",
+            "aboard the Medusa: the parole of Captain Bowen refused",
+        ),
+        "a captive's parole set for a prisoner of rank aboard her whom nobody asks: given, "
+        "the cabin and the gunroom are his and the quarterdeck by day, his sword returned; "
+        "refused, the gunroom alone and a sentry at the door; doubted while her captain has "
+        "asked and waits his answer (the answer is the captive's to give), refused for a "
+        "person who is no prisoner of hers",
+    ),
+    Form(
+        "prize.cartel",
+        "cartel",
+        "cartel: a cartel from <port> for <persons>",
+        (
+            "cartel: a cartel from Brest for Captain Bowen",
+            "cartel: a cartel from Brest for the prisoners of the Amazon",
+        ),
+        "a cartel (a merchant brig under a flag of truce, whom no captain fires on and the "
+        "far captures pass by) put on the sea at the port's road for the persons named, who "
+        "steers for the hull that holds them, takes them off by the boat within hail and "
+        "lands them free at her port; refused for a person nobody holds prisoner, doubted "
+        "beyond a day's sail of the port",
+    ),
 )
 
 

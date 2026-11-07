@@ -20153,6 +20153,78 @@ tests left out as the tier's rule), the slow tier of the touched files (`test_pr
 `test_profile` and `test_indefatigable` exit 0 (09:18:18 to 10:00:58), the pace tests alone and
 last exit 0 (13 passed, 10:00:58 to 10:05:33; no floor lowered).
 
+### Step 3: the captive's channel (the design's §3)
+
+**Built as designed** (`freesail/world/captive.py`, the hooks in `prizes.possess`, `knowledge.
+players_person`, `movement.check`/`go`/`where_am_i`, `orders/stations.py`'s word to the captain,
+the director's two forms in `world/orders.py` and `agents/director.py`, the hail table's `parole:`
+rows by nation, `places.PORT_PLACES`' agent for prisoners, the `cartel` description and the
+colours' `truce` state; the primer's chapter 27 extended): the player struck is a person aboard
+the captor with his station stood down and his prompt following his body, a prisoner's reach at
+her prompt and the refusals in words naming his state (hers, his own ship's as a prize's, ashore
+as a prisoner of war); the one world keeps who he is (`captivity` on the root, since his ship's
+`captain` answers for the prize master); the far body that takes him made a hull and woken as a
+dealing of the first rank; the parole asked by doctrine a minute after the taking in the period's
+words of the captor's nation (France's in French and English, Spain's row), read in the captive's
+own words only while asked, asked once more after a glass, given by rule after a watch; the
+places it gives (the quarterdeck by day) and the sword returned; the prisoners landed to the
+port's agent in port; the cartel. Truths 7-355 to 7-357.
+
+**Taken another way.** (1) The captive's officers are not taken into the captor with him: they
+stay confined in the prize by rank (the `divide_prisoners` rule is the counts', not the
+persons'); the design's "with him or confined in the prize by the captor's doctrine" is read as
+the latter. (2) The cartel's persons are kept on her record while she sails (she is a vessel of
+the far sea with the one errand, never a hull), and set ashore at her port's quay when she comes
+in; her words and places are 80's, as the design says. (3) The prisoners' victualling is not
+modelled (nothing of the purser's reads them). (4) The player's own seat (`PlayerSeat`) at a
+lesser station is stood down by `put_aboard`'s rule as the design has it; a model at the player's
+captain's station is stood down the same, "taken in the prize", and the captive's brief for a
+model seated as the captive is not yet written (the voice station of 82 serves him until step
+6's seats pass).
+
+**Found on the way.** (1) The far brain forgot its struck mark: a ship struck shows no colours,
+so the lookout's nation of her was None and `_is_enemy` False, and `enemy struck` never fired;
+the mark in hand struck now counts whatever her colours say. (2) The privateer's `chasing` rows
+put `overmatched` and `man of war near` before `enemy struck`, and a frigate that had struck to
+him was still a superior force and a man of war to fear, so he evaded his own prize;
+`_overmatched` and `_man_of_war_within` pass a struck ship by. (3) A rules captain bound for
+Brest from the Iroise (48° 18' N 4° 48' W) lays no course (the leg to the road crosses the land
+and the port's `from_sea` track is not taken up from there): he beats without way for hours
+within five miles of the road. Not this package's (the chart's and the passage planner's);
+noted for the lead, and the test lands the prisoners from a captor already in the road.
+(4) `Person.liberty` and `Person.cartel` are new fields (defaults, nothing in old saves). (5) The
+far brain dropped its mark on entering `taking possession` (the reset on leaving the detour
+states did not count the new one), so `prize taken` fired at once on a mark of None and he sailed
+on; the state is a detour state for the reset. (6) The captive's person was read as the giver of
+every "captain" order on every hull, the captor's own anchor included; he is the followed prompt's
+alone (`movement.person_of_actor`). (7) A far vessel whose plan runs out is done and gone from the
+sea at the minute's end, which ended the cartel at her own goal's arrival before her errand; her
+minute keeps her on the sea until her persons are landed, and lands them at once where she lies
+in her port's road already.
+
+step's tree**: below, at the step's boundary.
+
+**The trunk merged at the boundary** (1c378de at eff2a55 and 3d1fa25 at 9b821fb, merge commits:
+81's viewer action, 76 whole with the flags of command, B3.4, the api package loading its readings
+first, the records; the meetings the tuning notes' appended sections, kept both in order). 75's
+sub-type rules met the cartel's row in the ship descriptions' index (`ships.DESCRIPTIONS`): every
+row is now a file's own description with its fit and roles, and a shared file's first row names
+her kind for the player's shadow, so the cartel's row (brig.yaml, "a cartel") failed `test_subtypes`
+twice (no fit; the brig's file's first row). She has no row of her own now: the cartel sails as a
+merchant brig of her own file (sixteen men, her ports painted) with the role `cartel` and `what`
+said on her, "a cartel", under her flag of truce. Nothing else met; the captive's scenes hold.
+
+**The suites on the step's tree, 96261d8**, in a worktree pinned at it, ruff check and format clean:
+the fast tier whole run twice, exit 1 then exit 0 (18:34:30 to 19:19:12, one failure, 81's truth 7-441
+whose wall-time ratio of the action's entries to the whole snapshot came out 0.30 under four workers
+where it asserts under a quarter, 6.8 ms against 22.4; it passes alone on this tree and on the bare
+trunk at 9b821fb, and the tier run again whole passed, 20:17:10 to 21:01:21: a timing assertion of
+81's inside the fast tier, said to the lead, nothing moved; 459 slow tests left out by the tier's
+rule); the slow tier of the touched files (`test_captive`, `test_prizes`, `test_brains`,
+`test_far_hail`, `test_squadrons`, `test_captains`, `test_subtypes`, `test_director`,
+`test_world_orders`, `test_readings`) and the known truths with `test_profile` and
+`test_indefatigable` exit 0 (19:19:12 to 20:10:32); the pace tests alone and last exit 0 (13 passed,
+20:10:32 to 20:15:37; no floor lowered).
 
 ## Package 76: the signal books built out (2026-11-07)
 

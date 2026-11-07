@@ -377,6 +377,11 @@ class Person:
     # "cabin"; "" for a free man), which `movement.go` refuses in words; a class default,
     # so that a checkpoint from before loads with nobody confined
     confined_to: str = ""
+    # the captive's liberty (package 74, the design's §3.2): the places his parole gives him
+    # beyond the one he is confined to; () for none
+    liberty: tuple[str, ...] = ()
+    # the cartel carrying him (her vessel's id) while he is in her, "" else
+    cartel: str = ""
 
     def __init__(
         self,

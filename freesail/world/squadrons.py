@@ -1548,6 +1548,8 @@ _MAN_OF_WAR_DESCRIPTIONS = frozenset(
 
 
 def _yields(body: Any) -> bool:
+    if str(getattr(body, "role", "") or "") == "cartel":
+        return False  # a cartel under a flag of truce is nobody's prize (the design's §3.4)
     brain = getattr(body, "brain", None)
     d = getattr(brain, "doctrine", None) if brain is not None else None
     if d is not None:

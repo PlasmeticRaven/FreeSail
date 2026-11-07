@@ -92,15 +92,12 @@ def _struck_mark(world: Any, words: str, verb: str) -> Any:
         v = sea.get(str(target))
         if v is not None and getattr(v, "struck", False) and not is_prize(v):
             return v
-    from freesail.world.ships import PLAYER_ID
-
     struck = [
         v
         for v in list(getattr(sea, "vessels", []) or [])
         if getattr(v, "struck", False)
         and not v.done
         and str(v.id) != own_id
-        and str(v.id) != PLAYER_ID  # the player's ship struck: the captive's channel's
         and not is_prize(v)
         and _distance_nm(world, v) <= BOAT_BETWEEN_NM
     ]
