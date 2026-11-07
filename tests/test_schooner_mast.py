@@ -24,12 +24,16 @@ after yards, tacked so (the lead's ruling 3 of 2026-11-06; pinned in neither lis
 then stood); the pickle and the checkpoint of a rig that has read the rule as they were before
 it read it; and the short after swing, a schooner's light main yards' alone, trial B's tack with
 it, and the word they are hauled by, "Main-topsail haul" (the lead's ruling 2, Luce 1884 p. 417:
-her main crosses no course).
+her main crosses no course); and the gale's reduction (`orders.storm._after_sail_lines`, the
+lead's ruling 4): a fore-and-after's course reefed at the topsails' second reef as a ship's
+are, the after take-ins a square-rigged ship's alone, a course with no reef bands named and
+left as it is, and no committed file moved by it.
 """
 
 from __future__ import annotations
 
 import copy
+import math
 import pickle
 from pathlib import Path
 
@@ -38,6 +42,7 @@ from rig_fixtures import (
     frigate_with_mizen_yard,
     polacre_probe,
     schooner_with_fore_course,
+    schooner_with_fore_course_doc,
     schooner_with_main_topgallant,
     schooner_with_main_topsail,
     schooner_with_main_topsail_doc,
@@ -45,10 +50,12 @@ from rig_fixtures import (
     write_ship,
 )
 
+from freesail import orders
 from freesail.api.session import make_world
 from freesail.core.replay import checkpoint_bytes, read_checkpoint, write_checkpoint
 from freesail.core.world import Scenario
-from freesail.evolutions import EVOLUTIONS, scripts
+from freesail.evolutions import EVOLUTIONS, Runner, scripts
+from freesail.orders.storm import _after_sail_lines
 from freesail.physics import strain
 from freesail.physics.sails import _square_rigged
 from freesail.ship import graph
@@ -617,6 +624,117 @@ def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_do
     assert 20 <= said["Let go and haul"] - said[haul] <= 30  # 26 s; 59 s on brace_s
     assert 90 <= world.clock.tick - start <= 180  # 151 s; 219 s on brace_s
     assert world.ship.dyn.tack == "larboard"
+
+
+# -- the gale's reduction (the lead's ruling 4) ----------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("build", "course"),
+    [
+        (schooner_with_fore_course, "fore course"),
+        (schooner_with_main_topsail, "fore course"),
+        (schooner_with_main_topgallant, "fore course"),
+        (polacre_probe, "main course"),
+    ],
+    ids=["trial A", "trial B", "main topgallant", "polacre"],
+)
+def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(build, course):
+    """The lead's ruling 4 of 2026-11-06 (`orders.storm._after_sail_lines`): the courses' reef
+    at the topsails' second reef kept for any rig with topsails (Luce 1884 p. 476, "a second
+    reef in the topsails, and a single reef in the courses"; the *Neufchatel*'s double-reefed
+    foresail, Cobb p. 95), the after take-ins a square-rigged ship's alone. None of these is
+    square-rigged: with the topsails going to their second reef and after it her course is
+    reefed once, and nothing of hers is taken in, her mainsail kept; before the ruling the list
+    gave a fore-and-after nothing at all."""
+    ship = _under_plain_sail(build())
+    assert not _square_rigged(ship)
+    topsails = [ship.sails[sid] for sid in ship.groups["topsails"]]
+    assert _after_sail_lines(ship) == []
+    for reefs in (1, 2):
+        for sl in topsails:
+            sl.reefs = min(reefs, sl.reef_bands)
+        assert _after_sail_lines(ship) == [f"reef the {course}, one reef"]
+
+
+def test_the_after_take_ins_are_a_square_rigged_ships_alone(monkeypatch):
+    """The lead's ruling 4: only the aftermost course's take-in and the driver's are gated on her
+    being square-rigged (`physics.sails._square_rigged`). The frigate as filed, her topsails
+    going to their third reef, hauls up her main course, reefs her fore course and takes in her
+    spanker (`tests/test_gale.py`); read as no square-rigged ship, in the process, she reefs
+    both courses and takes in neither."""
+    from freesail.physics import sails as physics_sails
+
+    ship = _under_plain_sail(load_ship(ROOT / "data" / "ships" / "frigate-36.yaml"))
+    for sid in ship.groups["topsails"]:
+        ship.sails[sid].reefs = 2
+    assert _after_sail_lines(ship) == [
+        "take in the main course",
+        "reef the fore course, one reef",
+        "take in the mizzen spanker",
+    ]
+    monkeypatch.setattr(physics_sails, "_square_rigged", lambda ship: False)
+    assert _after_sail_lines(ship) == [
+        "reef the fore course, one reef",
+        "reef the main course, one reef",
+    ]
+
+
+def test_a_course_with_no_reef_bands_is_named_and_stays_as_it_is():
+    """The lead's ruling 4: a course with no reef bands in her file stays as it is at the topsails'
+    second reef, and `shorten sail` names it, so that its "Not done" says why (the refusal of
+    `reef`). Trial A with her fore course filed with none, in memory (no rig, filed or in
+    memory, has such a course)."""
+    doc = schooner_with_fore_course_doc()
+    for sail in doc["sails"]:
+        if sail["id"] == "fore.course":
+            sail["reef_bands"] = 0
+    ship = _under_plain_sail(ship_from_dict(doc, "tests/test_schooner_mast.py:no-reef-bands"))
+    ship.sails["fore.topsail"].reefs = 1
+    assert _after_sail_lines(ship) == ["reef the fore course, one reef"]
+    Runner(ship)
+    ship.dyn.apparent_wind_angle = math.radians(-60.0)
+    ship.dyn.apparent_wind_speed = 6.0
+    _kind, words, data = orders.handle(ship, "shorten sail")
+    said = "'reef the fore course, one reef': The fore course has no reef bands; it is set whole"
+    assert said in words
+    assert "reef the fore course, one reef" not in [o["order"] for o in data["orders"]]
+    course = ship.sails["fore.course"]
+    assert course.is_set and course.reefs == 0
+
+
+def test_no_committed_fore_and_after_has_a_course_reefed_by_the_gale():
+    """No committed file moves with the ruling: each file that is not square-rigged has no line
+    of the after sail at any reef, her plain sail and her courses set (the schooners cross no
+    course; the cutter's topsail has one reef band, so never a second; the smack's topsail yard
+    is on her pole mast, no topsail of a topmast; the lugger's are set flying; the boats have
+    none). The square-rigged files are `tests/test_gale.py`'s and the other files' as before."""
+    fore_and_afters = []
+    for path in SHIP_FILES:
+        ship = load_ship(path)
+        if _square_rigged(ship):
+            continue
+        fore_and_afters.append(path.stem)
+        for group in ("plain sail", "courses"):
+            for sid in ship.groups.get(group) or []:
+                if ship.sails[sid].state is not SailState.UNBENT:
+                    ship.sails[sid].state = SailState.SET
+        for reefs in (0, 1, 2, 3):
+            for sid in ship.groups.get("topsails") or []:
+                ship.sails[sid].reefs = min(reefs, ship.sails[sid].reef_bands)
+            assert _after_sail_lines(ship) == [], (path.stem, reefs)
+    assert fore_and_afters == [
+        "boat-cutter-23",
+        "boat-cutter-28",
+        "boat-launch-25",
+        "boat-launch-31",
+        "boat-yawl-16",
+        "cutter",
+        "lugger",
+        "privateer-schooner",
+        "smack",
+        "topsail-schooner",
+    ]
 
 
 # -- the pickle and the checkpoint -----------------------------------------------------------------

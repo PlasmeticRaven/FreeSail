@@ -1524,6 +1524,18 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   468 s and 483 s (152 s and 149 s before, when there were no yards to wait on), and getting under way
   braces them as she is cast; the heave-to and the box-haul are as before. B3.4's pin (in neither
   list) moved old beside new; no file's log, digest or truth moved.
+- **The lead's ruling 4, built (2026-11-07; the tuning notes, as above):** the gale's reduction
+  (`orders/storm.py`, `_after_sail_lines`) keeps the courses' reef at the topsails' second reef
+  for any rig with topsails (Luce 1884 p. 476; Cobb p. 95, the double-reefed foresail), and only
+  the after take-ins, the aftermost course's and the driver's, are a square-rigged ship's. In the
+  gale of the reviews trial B and the main topgallant reef their fore course once again (at
+  4,864 s and 4,877 s, reefed at 5,281 s and 5,358 s, the seconds they reefed it at before the
+  rule), trial A hers (4,854 s), the mainsail kept set and whole, and all three lie a-try as before
+  under the fore topsail and the staysails; a course with no reef bands is named and left as it
+  is, the order saying why. No file moved: the cutter, the smack and the two schooners as filed
+  sail that gale line for line, and the four whole logs are as at SW-4. Cobb's closely reefed
+  mainsail is not built: no line of "shorten sail" reefs a fore-and-after's mainsail (the
+  lead's).
 
 ### 12.3 What the viewer builder (B5) is asked
 
