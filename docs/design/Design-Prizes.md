@@ -1228,3 +1228,26 @@ chart's and the planner's, noted for the lead); the far brain dropped its mark o
 prompt's alone); a far vessel whose plan runs out is gone from the sea at the minute's end, so the
 cartel's minute keeps her until her persons are landed. The figures and the pins are in
 `docs/dev/TuningNotes.md`, "Package 74", step 3.
+
+### Step 4: the far fight on the sleeping hulls (§4; 2026-11-07)
+
+**Built as designed**: §4.2 to §4.6 (`combat/far_action.py`: the far engaging by the role
+files' rows, one round of `far.round_once` every three minutes for a pair in anger within gun's
+reach, each side's record carried in and written back, the draws from the World's `far` stream
+opened at the first round; the strike by morale as the cut-out writes it and the far possession
+after; the guns heard at the player's ship within twelve miles, the flashes to fifteen by night;
+the far ship's reply to an awake hull as the fallback where the cap has no room; the engagement
+first among the cap's reasons; the toggle `ENABLED`; the far record into the parts at `make_hull`
+and `_to_full`); truths 7-358 to 7-361 and 7-369; the primer's chapter 27 "An action off the
+horizon". **Taken another way**: the flashes' fifteen miles by night are a judgement (§4.4 gave
+the guns' twelve alone); the agreement (§4.6) is pinned as found and not tuned: the near fight of
+7-140's two cutters at a cable ends thirty-five seconds after the first shot where the design
+measured three minutes from a docstring's band, and the far rounds of the same pair end in two
+rounds (six minutes), within two rounds and not one, the far fight unable to end before its first
+round at 180 s and the coarser by design (rule 5). **Found on the way**: the far brain forgot its
+mark on entering `engaging` as it had on `taking possession`; the schooner's and the lugger's files
+give no armament (75's), so the packet's cut-out is a cutter's against a brig-sloop privateer; the
+"merchant brig" of the brig's one file carried the brig-sloop's eighteen guns (75's; mended by its
+SW-4, merged at step 2's boundary: her own file, sixteen men and four long 6s). The figures, the pins moved by the wiring measured with the toggle (the passages 7-152,
+7-153, 7-154, 7-159, 7-160) and `FALLBACK_COUNT` are in `docs/dev/TuningNotes.md`, "Package 74",
+step 4.

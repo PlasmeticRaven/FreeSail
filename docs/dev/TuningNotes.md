@@ -19123,6 +19123,55 @@ rule); the slow tier of the touched files (`test_captive`, `test_prizes`, `test_
 `test_indefatigable` exit 0 (19:19:12 to 20:10:32); the pace tests alone and last exit 0 (13 passed,
 20:10:32 to 20:15:37; no floor lowered).
 
+### Step 4: the far fight on the sleeping hulls (the design's §4)
+
+**Built as designed** (`freesail/combat/far_action.py`, the far brain's `_enemy_within` and the
+`engaging` state's chase leg in `world/brains.py`, the cap's rank in `world/crews.py`, the hook in
+`Vessels.tick`, the far record into the parts at `make_hull` and `_to_full`): the far engaging
+transition by the role files' rows (a ship with guns to fire; the merchantman's `engage_nm: 0`
+never fires one); one round of `far.round_once` every three minutes for a pair of far bodies in
+anger within gun's reach (the longest random shot of her fit), each side's record carried in and
+written back (`killed`, `wounded`, `dismounted`, `holes`, `holes_below`, `sail_cut`, `spars_gone`,
+`morale`, `rounds`, `rounds_fired`, `last_round_tick`), the draws from the World's `far` stream
+opened at the first round; the strike by morale as the cut-out writes it, the captor's `taking
+possession` and the far possession after; the guns heard at the player's ship within twelve miles
+(the flashes to fifteen by night: judgement) once a round; the far ship's reply to an awake hull as
+the fallback where the cap has no room (`FALLBACK_COUNT`); the engagement first among the cap's
+reasons; the toggle `ENABLED`. Truths 7-358 to 7-361 and 7-369.
+
+**The figures found** (seed 7): the French frigate (long eighteens, reach 1,830 m) engages the
+King's cutter (carronades, reach 732 m) twelve miles south of the player; the rounds open at
+seven cables and the cutter, overmatched and evading, strikes after **eleven rounds (33 minutes)**
+with one killed and three wounded by the tables, the frigate untouched (her carronades never
+reached); the guns are heard at the player's ship nine times of the eleven (the pair drifts about
+the twelve-mile reach). **The agreement** (§4.6, truth 7-359): 7-140's near fight of two cutters
+at a cable ends **35 seconds** after the first shot on this tree (fourteen guns as they bear; the
+design measured three minutes from the docstring's band, not the figure), the far rounds of the
+same two **in two rounds, six minutes**: within two rounds and not one, pinned as found, no table
+moved for the agreement's sake; the far fight cannot end before its first round at 180 s and is
+the coarser by design (rule 5). **The pins moved by the wiring** (the toggle `far_action.ENABLED`
+off beside on, the far-side files' tests and the pinned passages run on the step's tree): the
+recorded passages **7-152, 7-153, 7-154, 7-159 and 7-160 did not move** (their digests pass with
+the far fight on: no far pair in anger within gun's reach in any of them; the convoy's cut-out of
+7-153 yields at hail as before, §4.3's rule). **Three tests moved, one by the wiring's intent and
+two by faults it uncovered.** (1) `test_brains`' cruiser-and-merchant hail (seed 7, the French
+brig-sloop Renard bound for Brest on the British schooner Betsey stripped of her way): old, the
+brig chased her, spoke her within hail and she **yielded** to him by 72's rule, struck at tick
+2,280 and his prize in company; new, the brig **engages** at 1,860, one round at seven cables at
+2,040 and she strikes by morale ("the hands would not stand to the guns"), possession at 2,280:
+**the same possession at the same minute by another road, a round fired**; re-pinned (the states
+`engaging` and `taking possession` in his history, her `struck`; his last state at the check is
+`on passage` or `investigating a stranger`, the frigate hove to at his horizon's edge fourteen
+miles off deciding it by the minute, old 3,840 against new 2,400 for the same investigation).
+(2) `test_crews`' sleep-and-wake: a fault, not a pin: the demotion's own sums (three wounded, a
+gun, a hole) were applied to her parts again at the wake (six wounded), since `write_damage` wrote
+no `carried_in`; mended: what her parts show is carried in, the wake applies the far rounds'
+additions alone. (3) 7-352's retaking cutter: the cruiser came up `engaging` the French-flagged
+prize, she yielded to him, and he stayed `engaging` over a ship of his own nation; mended: the
+recaptor's captain speaks her and resumes his passage at the retaking. The fallback (`FALLBACK_
+COUNT`): no passage of the suite has a far ship engaging an awake hull with the cap full; the road
+is exercised by `test_far_action`'s own test and counted there.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

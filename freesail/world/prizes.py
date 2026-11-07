@@ -1034,6 +1034,20 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
                 hull.ship.extra.pop("prisoners", None)
         _free_people(world, hull, rec, tick)
     rec["retaken"] = (how, by, tick)
+    if captor is not None:
+        cb = getattr(captor, "brain", None)
+        if cb is not None:
+            # the recaptor's captain has his mark no more (package 74, step 4: wired, the
+            # far cruiser came up `engaging` and stayed so over a ship of his own nation):
+            # spoken, she is a stranger no more, and he resumes his passage
+            cb.spoken_ids.add(str(prize.id))
+            if str(getattr(cb, "_stranger", "") or "") == str(prize.id) and cb.state in (
+                "engaging",
+                "chasing",
+                "investigating a stranger",
+                "taking possession",
+            ):
+                cb._enter("on passage")
     prize.prize = rec
     _story(prize, tick, f"{how} ({by}): her own people have her again")
     if hull is not None:
