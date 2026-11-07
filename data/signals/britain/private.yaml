@@ -1,17 +1,22 @@
-# FreeSail: the form of the British private signals (spec M7 §2; package 71;
-# docs/design/Design-Signals.md). The recognition challenge and its reply, issued under
-# seal, changed by the month and sunk weighted on capture (the Regulations and Instructions
-# of 1806; the period's letters and orders quote the form: "the private signal for the day
-# ... a blue flag at the main topmast head, answered by a red at the fore"; by night lights
-# and false fires). The actual tables were secret and are lost: the game's are MADE under
-# the seed in this form (`freesail/world/signals.py` `private_table`: the world's seed, the
+# FreeSail: the form of the British private signals (spec M7 §2; package 71, read against the
+# Regulations by package 76; docs/design/Design-Signals.md). The recognition challenge and its
+# reply, issued under seal and changed by the month. The Regulations and Instructions of 1806
+# (docs/references/admiralty/, the 1808 printing) give their custody: a captain superseded
+# delivers to his successor "all Signal Books and Instructions relating to them; all secret
+# Signals, Rendezvous, &c. of which he is not to take, nor suffer to be taken, any copy", and a
+# captain wrecked is "to preserve all secret Orders, Signals and Instructions or, if necessary,
+# to destroy them, to prevent their falling into improper hands"; the Regulations print no
+# table and no form of one. The period's letters and orders quote the form (from memory):
+# "the private signal for the day ... a blue flag at the main topmast head, answered by a red
+# at the fore"; by night lights and false fires. The actual tables were secret and are
+# lost: the game's are MADE under the seed in this form (`freesail/world/signals.py` `private_table`: the world's seed, the
 # nation, the year and the month seed the draw, so that two ships of one nation in one world
 # hold the same table and a replay has it again). A captured table (74's prize) is the same
 # draw for the captor, good until the month turns.
 #
 # Each `{slot}` is drawn from the pool of that name; `changes` says when the table turns.
 
-source: "the form of the Admiralty's private signals as the period's orders quote them (from memory); the tables made under the seed"
+source: "the form of the Admiralty's private signals as the period's orders quote them (from memory); their custody the Regulations and Instructions of 1806 (Captain, on being superseded and on shipwreck); the tables made under the seed"
 made: true
 changes: monthly
 day:
