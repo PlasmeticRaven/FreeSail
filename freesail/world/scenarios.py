@@ -56,6 +56,15 @@ systems' surface wind at the ship is the base wind (spec M5 §2), and the sea an
 ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
     nation: britain                  # the ship's nation (spec M5 §24; package 35); by her
                                      # company's names list when not said
+    nations:                         # the scenario's own wars and letters of marque, for a
+      as_of: 1814-08-01              # day data/nations.yaml's June 1805 does not hold
+      wars:                          # (package 75, the Neufchatel's stage 0b): each war in
+                                     # force once, every peace an absence
+        - {between: [britain, united-states], since: 1812-06-18, source: "..."}
+      letters_of_marque: [britain, united-states]   # who issues them; the rest none
+      source: "where the rows are from"
+                                     # each nation by its id, name or adjective, as
+                                     # `nation:` is; optional, and refused in words if wrong
     people:                          # people beyond the muster's posts (§22; package 35)
       - {role: supercargo, name: Mr Pentreath, place: cabin}
     things:                          # things aboard or ashore (M7b §17a; package 53b), each
@@ -111,6 +120,16 @@ the text the mapping was read from, it keeps every top-level block of that text 
 is unchanged, comments and all, and writes again only the blocks that changed, so that a
 file read into the harbour's scenario maker and written with nothing changed is the same
 file, byte for byte.
+
+**The `nations:` block** (package 75, the *Prince de Neufchatel*'s stage 0b: her design,
+docs/design/Design-Ship-PrinceDeNeufchatel.md §11.2 and §12.1 item 2; the lead's ruling on her
+§17, item 4, "a parsed and kept block that nothing reads until her scenario") is read and
+validated here (`_nations_block`) and kept in the World's `Scenario` (`Scenario.nations`), so
+that a save holds it and the file is written again with it. **Nothing reads it yet:** the
+World's replacement of the table's wars and letters of marque with the scenario's, where it
+loads the table (`core/world.py`, `World.__init__`), is NOT built here; it comes with her
+scenario (B6's), the first to carry the block. Until then a World made from a scenario with
+the block has data/nations.yaml's wars and letters as every other has.
 """
 
 from __future__ import annotations
@@ -306,6 +325,114 @@ def _time(value: Any, where: str) -> datetime:
         raise ScenarioError(f"{where}: '{value}' is not a time like 1805-06-01T04:00.") from None
 
 
+# The scenario's own table of the wars and the letters of marque (package 75, the Prince de
+# Neufchatel's stage 0b; her design §11.2 and §12.1 item 2; the lead's ruling on her §17,
+# item 4): the block is the table's wars and letters whole, for the World that B6's change will
+# give it to (the module's docstring), so each war in force is listed once and a peace is an
+# absence, and each nation that issues letters of marque is listed and the rest issue none (the
+# table's `letters_of_marque` by nation). Its four keys are all wanted, an empty list saying
+# "none"; a war's `since` and `source` are its own, as the table's wars carry them.
+NATIONS_BLOCK_KEYS = ("as_of", "wars", "letters_of_marque", "source")
+_WAR_KEYS = ("between", "since", "source")
+
+
+def _day(value: Any, where: str, like: str) -> str:
+    """A day as its ISO words (a save carries words, not dates); refused in words."""
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    if isinstance(value, date):
+        return value.isoformat()
+    try:
+        return date.fromisoformat(str(value).strip()).isoformat()
+    except ValueError:
+        raise ScenarioError(f"{where}: '{value}' is not a day like {like}.") from None
+
+
+def _nations_block(value: Any, where: str) -> dict[str, Any]:
+    """`nations:`, read and validated: its nations by data/nations.yaml's ids, names or
+    adjectives as `nation:` is, kept by their ids; its days as ISO words. Refused in words:
+    a block that is not a mapping of the four keys or lacks one; a day that is no day; a war
+    not between two nations of the table, between a nation and herself, listed twice, or
+    begun after the block's day; a nation issuing letters that is no nation, is listed
+    twice, or is at war with nobody in the block (a letter of marque is against an enemy);
+    a source not in words. Returns {"as_of", "wars": [{"between": [a, b], "since",
+    "source"}], "letters_of_marque": [ids], "source"}."""
+    from freesail.world.nations import load_nations
+
+    at = f"{where}, nations"
+    keys = ", ".join(NATIONS_BLOCK_KEYS[:-1]) + f" and {NATIONS_BLOCK_KEYS[-1]}"
+    if not isinstance(value, dict):
+        raise ScenarioError(f"{at}: a mapping of {keys}.")
+    for key in value:
+        if str(key) not in NATIONS_BLOCK_KEYS:
+            raise ScenarioError(f"{at}: '{key}' is not one of {keys}.")
+    missing = [k for k in NATIONS_BLOCK_KEYS if value.get(k) is None]
+    if missing:
+        raise ScenarioError(
+            f"{at}: {missing[0]} wanted; the block is the wars and letters of marque whole, "
+            f"so it says all of {keys} (an empty list for none)."
+        )
+    table = load_nations()
+
+    def nation(words: Any, here: str) -> str:
+        found = table.find(str(words))
+        if found is None:
+            raise ScenarioError(f"{here}: '{words}' is not a nation of data/nations.yaml.")
+        return found.id
+
+    as_of = _day(value["as_of"], f"{at}, as_of", "1814-08-01")
+    if not isinstance(value["wars"], list):
+        raise ScenarioError(
+            f"{at}, wars: a list of {{between: [a, b], since, source}}, each war in force once "
+            "(an empty list: at peace with all)."
+        )
+    wars: list[dict[str, Any]] = []
+    for i, war in enumerate(value["wars"], start=1):
+        here = f"{at}, wars {i}"
+        pair = war.get("between") if isinstance(war, dict) else None
+        if not isinstance(pair, list) or len(pair) != 2:
+            raise ScenarioError(
+                f"{here}: a war is {{between: [a, b], since, source}}, between two nations."
+            )
+        for key in war:
+            if str(key) not in _WAR_KEYS:
+                raise ScenarioError(f"{here}: '{key}' is not one of between, since and source.")
+        a, b = nation(pair[0], here), nation(pair[1], here)
+        if a == b:
+            raise ScenarioError(f"{here}: a war is between two nations, not {a} and herself.")
+        if any({a, b} == set(w["between"]) for w in wars):
+            raise ScenarioError(f"{here}: the war between {a} and {b} is listed already.")
+        since = None
+        if war.get("since") is not None:
+            since = _day(war["since"], f"{here}, since", "1812-06-18")
+            if since > as_of:
+                raise ScenarioError(
+                    f"{here}, since: {since} is after the block's day, {as_of}; a war not yet "
+                    "begun is not in force."
+                )
+        wars.append({"between": [a, b], "since": since, "source": str(war.get("source") or "")})
+    if not isinstance(value["letters_of_marque"], list):
+        raise ScenarioError(
+            f"{at}, letters_of_marque: a list of the nations that issue letters of marque (an "
+            "empty list: none)."
+        )
+    letters: list[str] = []
+    for words in value["letters_of_marque"]:
+        nid = nation(words, f"{at}, letters_of_marque")
+        if nid in letters:
+            raise ScenarioError(f"{at}, letters_of_marque: {nid} is listed already.")
+        if not any(nid in w["between"] for w in wars):
+            raise ScenarioError(
+                f"{at}, letters_of_marque: {nid} is at war with nobody in the block, and a "
+                "letter of marque is against an enemy."
+            )
+        letters.append(nid)
+    source = value["source"]
+    if not isinstance(source, str) or not source.strip():
+        raise ScenarioError(f"{at}, source: where the block's wars and letters are from, in words.")
+    return {"as_of": as_of, "wars": wars, "letters_of_marque": letters, "source": source.strip()}
+
+
 def load_scenario(path: str | Path) -> ScenarioFile:
     """Read a scenario file. Raises `ScenarioError` (or `OSError`) in words."""
     p = Path(path)
@@ -466,6 +593,10 @@ def load_scenario(path: str | Path) -> ScenarioFile:
                 f"{where}, nation: '{nation}' is not a nation of data/nations.yaml."
             )
         sc.nation = found.id
+    # Package 75 (the Neufchatel's stage 0b): the scenario's own wars and letters, read,
+    # validated and kept; read by nothing until her scenario (the module's docstring)
+    if raw.get("nations") is not None:
+        sc.nations = _nations_block(raw["nations"], where)
     people = raw.get("people") or []
     if not isinstance(people, list):
         raise ScenarioError(f"{where}, people: a list of {{role, name, skill, place}}.")
@@ -870,6 +1001,7 @@ FIELD_ORDER: tuple[str, ...] = (
     "region",
     "chart",
     "nation",
+    "nations",
     "ship",
     "wind",
     "intent",
@@ -894,6 +1026,9 @@ SECTION_COMMENTS: dict[str, str] = {
     "position": "Where she lies at the start: a port's road from the chart, or a place pricked "
     "on it, with the chart's region.",
     "ship": "The ship: her file, her heading, the glass and the master's instrument.",
+    "nations": "The wars and the letters of marque on the scenario's day, where the nations "
+    "table's June 1805 does not hold: each war in force once, and the nations that issue "
+    "letters.",
     "intent": "The captain's intent (spec M6 §4): the rules captain sails by it when nobody "
     "holds the station; a model captain reads it as his night orders.",
     "people": "People beyond the muster's posts.",

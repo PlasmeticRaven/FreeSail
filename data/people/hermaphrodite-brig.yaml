@@ -1,0 +1,195 @@
+# FreeSail: the wardroom of the Prince de Neufchatel (spec M6 §2; package 40; package 75, B2,
+# docs/design/Design-Ship-PrinceDeNeufchatel.md §6.3). The privateer's company as people: every
+# station holder of data/ships/hermaphrodite-brig.yaml, with their rank, their station aboard,
+# their place when nothing calls them elsewhere, and a character outline (a few traits, a line
+# of history and a station brief), as data, in the form of data/people/frigate-36.yaml. Read by
+# freesail/world/people.py, which gives each person their outline and binds the harness's
+# stations to a person by role, and by tools/ships/neufchatel.py, which draws the posts and the
+# people below into the ship file's `crew.posts` and `crew.people`.
+#
+# The posts are her December 1814 crew's as Cobb gives them (A Green Hand's First Cruise, 1841,
+# vol. I p. 40, read (OCR)): the captain, five lieutenants, the sailing master, the boatswain,
+# the gunner, the carpenter and the sailmaker, one of each warrant where Cobb has them "in
+# profusion" (judgement), and the surgeon (pp. 75-76). The people drawn are one of her nine
+# prize-masters (p. 40), a quartermaster (pp. 40, 94) and a boy as the captain's messenger. The
+# outlines take what Cobb gives of her December crew and name no one, for Cobb names none (the
+# owner's answer of 2026-10-29: Neuf-D §17, question 3): her captain her first lieutenant on her
+# former cruises, French by birth; her first lieutenant exact and mild; her surgeon a stranger
+# aboard; her officers mild in harbour and harsh at sea (pp. 40-41). The rest are plain types,
+# their traits and histories judgement, in the period's words. Her people sailed on shares, from
+# the captain down (p. 39). A scenario names her captain or any other by `people:` (a role and a
+# name).
+#
+# The form of an entry is the frigate-36's file's (role, post, drawn, messenger, rank, station,
+# place, traits, history, brief, note).
+
+ship: data/ships/hermaphrodite-brig.yaml
+
+# The harness's stations (spec M4 §11; M6 §3) bound to a person by role: the captain commands,
+# the first lieutenant has the deck (Cobb p. 41: the captain left the duty to the lieutenants),
+# and the master keeps the reckoning.
+stations:
+  captain: captain
+  officer of the watch: first lieutenant
+  master: master
+
+wardroom:
+  - role: captain
+    post: true
+    rank: captain
+    station: the command
+    place: quarterdeck
+    traits: [small of stature, French by birth and American by convenience, seldom on deck]
+    history: "First lieutenant of this brig on her former cruises; given the command when her late captain gave her up through illness and kept a large share in her."
+    brief: >-
+      The vessel, her people and her cruise under her commission and her owners' orders: the
+      course, the chase and the prize, the prize crews sent away and the cargoes taken in.
+      Came aboard only when all was ready for sea, and leaves the deck to the lieutenants until
+      a chase calls them up.
+  - role: first lieutenant
+    post: true
+    rank: first lieutenant
+    station: the first lieutenant's
+    place: quarterdeck
+    traits: [never an angry or a profane word, exact to the letter, liked by the hands]
+    history: "Bred to the sea in the merchant service; first of this brig for her cruise from Boston."
+    brief: >-
+      The vessel's working and her people under the captain: the watch and quarter bills, the
+      sail evolutions and the deck while the captain keeps below. Knows each hand's duty and
+      what each can do, sets no task beyond it, and has every one done to the letter.
+  - role: second lieutenant
+    post: true
+    rank: second lieutenant
+    station: the second lieutenant's
+    place: quarterdeck
+    traits: [loud, quick with the speaking trumpet, mild in harbour and harsh at sea]
+    history: "Mate of a Boston brig in the peace; two cruises in privateers."
+    brief: >-
+      A watch of their own by the bill (the starboard), the deck in it under the captain's
+      orders, every strange sail reported; a gun division at quarters.
+  - role: third lieutenant
+    post: true
+    rank: third lieutenant
+    station: the third lieutenant's
+    place: quarterdeck
+    traits: [young, eager for a prize, apt to carry sail]
+    history: "A Marblehead fisherman's son; a prize-master in the brig's last cruise."
+    brief: >-
+      A watch of their own by the bill (the larboard), the deck in it, the same duties as the
+      second lieutenant's; the bow chasers at quarters.
+  - role: fourth lieutenant
+    post: true
+    rank: fourth lieutenant
+    station: the fourth lieutenant's
+    place: quarterdeck
+    traits: [steady, a good hand in a boat, few words]
+    history: "Out of Salem; two years in the coasting trade before the war."
+    brief: >-
+      The boats and the boarders: the first boat away to a prize, and the boarders at their
+      arms at quarters.
+  - role: fifth lieutenant
+    post: true
+    rank: fifth lieutenant
+    station: the fifth lieutenant's
+    place: quarterdeck
+    traits: [green to command, careful with the small arms]
+    history: "Shipped as an officer for this cruise; a seaman of the West India trade."
+    brief: >-
+      The small arms and the marines at quarters, and the after guns; the deck when the first
+      lieutenant gives it.
+  - role: master
+    post: true
+    rank: sailing master
+    station: the navigation
+    place: quarterdeck
+    traits: [dry, exact with the log board, knows the Channel from the French side]
+    history: "Master of a Baltimore schooner in the peace; sailing master of this brig since she fitted out."
+    brief: >-
+      The reckoning, the sights, the lead and the chart, the stowage and the ground tackle: works
+      the account, warns the captain of the dangers and shapes the course the captain orders.
+  - role: surgeon
+    post: true
+    rank: surgeon
+    station: the sick and the hurt
+    place: cabin
+    traits: [a stranger to all aboard, keeps to the cabin, little seen on deck]
+    history: "Shipped at Boston just before she sailed, on a diploma and recommendations nobody aboard could vouch for; the people doubt the physic."
+    brief: >-
+      The sick and the hurt, and the sick list to the captain.
+  - role: boatswain
+    post: true
+    rank: boatswain
+    station: the rigging and the boats
+    place: deck
+    traits: [loud, harsh at sea, knows every rope by its feel]
+    history: "A Chesapeake waterman before the war; boatswain of the brig on both her cruises."
+    brief: >-
+      The rigging, the cables, the anchors, the boats and the hands at their work: pipes the
+      evolutions and sees the gear overhauled.
+  - role: gunner
+    post: true
+    rank: gunner
+    station: the guns and the magazine
+    place: deck
+    traits: [quiet, methodical, proud of the long sixes]
+    history: "A gunner's mate in the Navy's gunboats; shipped in privateers for the shares."
+    brief: >-
+      The guns, the carriages, the powder and the shot, the double shot of canister and musket
+      balls; the quarters and the drill.
+  - role: carpenter
+    post: true
+    rank: carpenter
+    station: the hull and the spars
+    place: deck
+    traits: [patient, a hand for a fished spar, sounds the well without being told]
+    history: "A ship carpenter of the New York yards, where she was built."
+    brief: >-
+      The hull, the masts, the yards and the pumps: sounds the well, fishes a sprung spar and
+      reports a leak to the captain.
+  - role: sailmaker
+    post: true
+    rank: sailmaker
+    station: the sail room
+    place: sail_room
+    traits: [neat, slow, jealous of the great mainsail]
+    history: "A sailmaker of Fell's Point before the war."
+    brief: >-
+      The sails, bent and unbent, their repair and the sail room's account.
+  - role: prize-master
+    drawn: {station: afterguard, rating: able}
+    rank: prize-master
+    station: a prize's master when one is taken
+    place: deck
+    traits: [a seaman of the coasting trade, quick to take charge, keen on the shares]
+    history: "Kept the brig in charge at Boston while she fitted out."
+    brief: >-
+      Takes a prize into port with the crew told off for her; aboard, a petty officer of the
+      afterguard.
+    note: >-
+      One of her nine prize-masters (Cobb 1841 p. 40; one kept her in charge at Boston while she
+      fitted out, p. 27), an able seaman of the afterguard drawn by name; the rest among the
+      afterguard's able seamen (Neuf-D §6.1; judgement).
+  - role: quartermaster
+    drawn: {station: afterguard, rating: able}
+    rank: quartermaster
+    station: the helm and the masthead
+    place: quarterdeck
+    traits: [sharp-eyed, the best hand aloft, sparing of words]
+    history: "A quartermaster of the brig's former cruises."
+    brief: >-
+      The tiller in action and the conn under the officer of the deck; sent to the masthead when
+      a sail is wanted.
+    note: >-
+      A quartermaster, Cobb 1841 p. 40's 'quarter-masters' (one sent to the masthead as the best
+      man aboard, p. 94), an able seaman of the afterguard (judgement: one drawn).
+  - role: boy
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: boy
+    station: the captain's messenger
+    place: quarterdeck
+    traits: [green, willing, sick the first day out]
+    history: "Shipped at Boston for this cruise, the first of all."
+    brief: >-
+      Carries the captain's word about the vessel (pass the word for, send for).
+    note: A boy as the captain's messenger (judgement).

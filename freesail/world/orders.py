@@ -3631,7 +3631,7 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
     thing with no cause (the table's `plausible_when`); `person:` a person moved where no
     boat could carry him (package 52); `ship "X": order ...` (the hand, package 62) an
     anchor let go too deep for her cables, plain sail in a gale, a chase by a merchantman,
-    a fisherman or a packet. The rest (`ship "X": intent`, a person made or named,
+    an Indiaman, a fisherman or a packet. The rest (`ship "X": intent`, a person made or named,
     `say as`, `captain:`, `seat:`, `unseat:`, a letter left at a port, a port closed or
     opened) are never doubted: a mind changed, a person's errand, a man's words and the
     owner's grant want no cause of the sea's."""
@@ -3714,10 +3714,16 @@ def _doubt_ship(world: Any, body: str) -> str | None:
 # to a hundred and twenty fathoms wants a scope of three or four, and the period's roads lie
 # in five to twenty; beyond thirty no master lets go); plain sail made in a wind at her over
 # this many knots (force 8, a gale, the top of force 7 being 33); a chase given by a master
-# whose doctrine is these roles', who runs from a stranger or keeps his course.
+# whose doctrine is these roles', who runs from a stranger or keeps his course: the
+# Indiaman's among them (package 75, SW-4's words step: her book is the merchant's but for
+# the figures of the fight, hauling off from a hostile stranger and giving chase to nobody),
+# the revenue cutter's not (an armed vessel of the Crown, whose book chases: the lead's ruling
+# at SW-4's merge).
 HAND_ANCHOR_FATHOMS = 30.0
 HAND_GALE_KN = 34.0
-HAND_PEACEFUL_ROLES = ("merchant", "fisherman", "packet")
+HAND_PEACEFUL_ROLES = ("merchant", "fisherman", "packet", "indiaman")
+# the doctrine's name in the doubt's words, where the role's own word is not the period's
+_HAND_ROLE_WORDS = {"indiaman": "Indiaman"}
 _HAND_ANCHOR = re.compile(
     r"^(?:come to (?:an |the )?anchor|let go the (?:best |small |sheet )?(?:bower|anchor)|anchor)"
     r"\b",
@@ -3734,8 +3740,8 @@ _HAND_CHASE = re.compile(r"^(?:give chase|chase\b|stand after)", re.I)
 def _doubt_hand(world: Any, name: str, words: str) -> str | None:
     """Why the order given through her captain is implausible for her, or None (package
     62): an anchor let go too deep for her cables, plain sail in a gale, a chase by a
-    merchantman, a fisherman or a packet. A captain's order is a plausible cause, so the
-    rest are never doubted."""
+    merchantman, an Indiaman, a fisherman or a packet. A captain's order is a plausible
+    cause, so the rest are never doubted."""
     vessel = world.vessels.find(name)
     if vessel is None or vessel.done:
         return None
@@ -3769,8 +3775,8 @@ def _doubt_hand(world: Any, name: str, words: str) -> str | None:
             role = str(getattr(vessel.brain, "role", "") or "")
         if role in HAND_PEACEFUL_ROLES:
             return (
-                f"{vessel.name}'s master sails by the {role}'s doctrine: he runs from a "
-                "stranger or keeps his course, and gives chase to nobody"
+                f"{vessel.name}'s master sails by the {_HAND_ROLE_WORDS.get(role, role)}'s "
+                "doctrine: he runs from a stranger or keeps his course, and gives chase to nobody"
             )
     return None
 

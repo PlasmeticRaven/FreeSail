@@ -2448,6 +2448,11 @@ def ship_words(world: Any) -> str:
 
     kings = role in ("kings-ship", "commodore", "cruiser") or (not role and _is_kings_ship(world))
     escort = ", the convoy's escort" if role == "commodore" else ""
+    # package 75, SW-4's words step: a revenue cutter is the Customs' cruiser, armed and of the
+    # Crown and not the Navy's, as Sherbourne served the Board of Customs against the smugglers
+    # from 1763 to 1779 (docs/design/VesselCandidates.md; the kit's manual); an Indiaman a
+    # merchantman that is armed, named by her book's word (data/captains/indiaman.yaml)
+    duty = ", in the service of the Customs" if role == "revenue" else ""
     if kings:
         service = "a King's ship" if nation in ("", "Britain") else f"a ship of the {nation} navy"
     else:
@@ -2455,13 +2460,15 @@ def ship_words(world: Any) -> str:
             "privateer": "a privateer",
             "packet": "a packet",
             "fisherman": "a fisherman",
+            "revenue": "a revenue cutter",
+            "indiaman": "an Indiaman",
         }.get(role, "a merchantman")
         if cls.startswith("H.M. "):
             # the hull's lines are a King's vessel's (the file's history); she is not
             cls = cls[5:]
             cls = ("an " if cls[:1].lower() in "aeiou" else "a ") + cls
     of = f" of {nation}" if nation and not service.startswith("a ship of the") else ""
-    parts = [f"The ship: {name}, {cls}; {service}{of}{escort}."]
+    parts = [f"The ship: {name}, {cls}; {service}{of}{escort}{duty}."]
     guns = _guns_fit_words(world)
     parts.append(f"Her guns: {guns}." if guns else "She carries no guns.")
     crew = (getattr(ship, "extra", None) or {}).get("crew")

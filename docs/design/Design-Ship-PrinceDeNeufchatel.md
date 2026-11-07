@@ -80,7 +80,9 @@ written.
 with a brig's square foremast and a schooner's main, a large loose-footed fore gaff sail lapping
 the mainmast, eighteen guns and 130 men. She is built whole at once but for her small main
 topgallant, which waits behind one module constant for B3.4's key and sails meanwhile without it
-(D10(c), the sheet's own fallback), so that she is never handled as a brig.
+(D10(c), the sheet's own fallback), so that she is never handled as a brig. *(Superseded by the
+lead's ruling of 2026-11-06 on §12.2a: no key and no wait; her main topgallant is written from her
+first commit and the rule built at B3.4 reads her main as a schooner's: §0's As built.)*
 
 ---
 
@@ -134,8 +136,8 @@ topgallant, which waits behind one module constant for B3.4's key and sails mean
 | 9 | Every port gun on its port's measured x and sill, to the centimetre; eleven sills measured, the lowest 4 ft 11 in (1.50 m), shut at 18.2° of heel alone | The brief's sourced sills; Indf decision 9; Build §5.1 (§3.3-§3.4) |
 | 10 | Spars and sails from ZAZ6179, the yards doubled; Fincham's Ex. 1 only for spars it does not draw | D37(a); Neuf §1.2, §3.2-§3.3 (§4) |
 | 11 | The fore gaff sail to her plan: loose-footed, its clew 2.7-2.9 ft abaft the mainmast, about 154 m², on the topsail schooner's pattern | D21(a); Neuf §1.2 (§4.4) |
-| 12 | **The main topgallant (D10):** behind `MAIN_TOPGALLANT`: `"out"` writes nothing (D10(c)); `"keyed"` writes its two light yards and the sail with D10(a)'s key, once B3.4 is merged. Ids final from the first commit. Out of "plain sail" either way | D10(a) as answered; the lead's item 7; Build §13.1's fallback "(c), not (b)" (§0, §4.5) |
-| 13 | D10(a)'s key `schooner_mast: true` on `main.mast`, read by B3.4 at Ext §4.2's places 1 and 3 only | The lead's item 7; Cobb p. 38, "her mainmast was rigged as a schooner" (§12.2) |
+| 12 | **The main topgallant (D10):** behind `MAIN_TOPGALLANT`: `"out"` writes nothing (D10(c)); `"keyed"` writes its two light yards and the sail with D10(a)'s key, once B3.4 is merged. Ids final from the first commit. Out of "plain sail" either way | D10(a) as answered; the lead's item 7; Build §13.1's fallback "(c), not (b)" (§0, §4.5). *Superseded by the lead's ruling of 2026-11-06 on §12.2a: no flip and no key; the main topgallant written from her first commit (As built, §4.5)* |
+| 13 | D10(a)'s key `schooner_mast: true` on `main.mast`, read by B3.4 at Ext §4.2's places 1 and 3 only | The lead's item 7; Cobb p. 38, "her mainmast was rigged as a schooner" (§12.2). *Superseded by the lead's ruling of 2026-11-06 on §12.2a: no key; the rule built at B3.4 reads her main as a schooner's* |
 | 14 | Plain sail: the fore course, topsail and topgallant, the fore gaff sail, the mainsail, the fore staysail and the jib | The brig's and the schooner's patterns together; put to the owner (§17, owner question 2) |
 | 15 | Light sails as the owner chose: the fore lower, topmast and topgallant studding sails and the main topmast staysail (its upper foot); no ringtail, no water sail; "the Jack" not built | D35(b) limited; D8(b) as answered (§4.6-§4.7) |
 | 16 | One fit, **"as taken 1814"** (default): 16 × 12-pdr carronades (Adye's 5 cwt 3 qr 10 lb) and 2 long 6-pdrs (Adye's 8 ft, 22 cwt); no pivot. Cobb's "nine and eighteen pounders" in the fit's note | D22(a); Winfield pp. 335-336; Adye pp. 72, 155, read here (§5) |
@@ -146,10 +148,10 @@ topgallant, which waits behind one module constant for B3.4's key and sails mean
 | 21 | Quarter bill on the privateer schooner's shares, trimmers by the brig-sloop's scaled | §6.4 |
 | 22 | Her names the `american` list; no nation in her file; the marines' kit the nation's (`basic` for the United States) | D39 with the brief; Build §9.4 (§6.5) |
 | 23 | Ground tackle by Steel 1794's row for "14 Guns, 300 Tons": three bowers of 20 cwt, a stream of 7, a kedge of 3 cwt 2 qr; the cordage table's "Sloops" column, five cables of 13½ in and a stream cable of 8 in (the column judgement) | Steel's tables, read here; the house's preference for Steel (D33) (§7) |
-| 24 | Description `hermaphrodite brig`, "a brig" at a distance, rank 2, `roles: [privateer]`, no description `fit`; four lookout rows | D15(a); Build §8.1 (§8) |
+| 24 | Description `hermaphrodite brig`, "a brig" at a distance, rank 2, `roles: [privateer]`, no description `fit` (*superseded by SW-4's form, Build §8.1: `fit: as taken 1814`, her file's default, which a far ship of hers never writes; §8's As built*); four lookout rows | D15(a); Build §8.1 (§8) |
 | 25 | Polar measured and recorded; 7-193 pins her best speed in 25 kn within her accounts' band and her pointing against the frigate-36, the best point's angle reported | The brief item 6; D24(a); put to the owner (§9, §14) |
 | 26 | Her scenario **August 1814** in the western Channel, with a `nations:` block of that summer; rows read cited by page, the rest named open | D27 with the brief; Build §12.2; the lead's item 6 (§11) |
-| 27 | Her stage 0b: the key's schema (at B3.4's boundary if B3.4 opens first), the `nations:` block (after B6's D48 change to `world/scenarios.py`, Build §4.2), and her `MODULE_FILES` row committed with her first file | Build §3.3; the lead's items 6 and 7 (§12.1). **Plainly:** the key's runtime field and predicate are B3.4's, not stage 0b's (§12.1 item 1) |
+| 27 | Her stage 0b: the key's schema (at B3.4's boundary if B3.4 opens first), the `nations:` block (after B6's D48 change to `world/scenarios.py`, Build §4.2), and her `MODULE_FILES` row committed with her first file | Build §3.3; the lead's items 6 and 7 (§12.1). **Plainly:** the key's runtime field and predicate are B3.4's, not stage 0b's (§12.1 item 1). *Superseded by the lead's ruling of 2026-11-06 on §12.2a: no schema key and no `Spar` field; stage 0b is the `nations:` block and the `MODULE_FILES` row (§12.1's As built).* |
 | 28 | A testing report for the owner at her merge: pictures of the important views and her figures | The owner's direction of 2026-10-29 for the *Indefatigable*, taken to hold for her by judgement; put to the lead (§13) |
 
 ---
@@ -201,6 +203,14 @@ B3.4 as a small step of her own module, re-measured old beside new. Never D10(b)
 main without the key makes her a brig to every handling path (Eng §3.3; D10).
 
 What B3.4 must give her is §12.2.
+
+*Superseded by the lead's ruling of 2026-11-06 on §12.2a (the rule in the key's place, built at
+B3.4, merged before her first commit): no key, no `MAIN_TOPGALLANT` flip, no stage A without the
+sail and no stage B. As built (B2, 2026-11-07): her main topgallant, its two light yards and their
+pole are written from her first commit with no key on `main.mast`, the "keyed" stage above with no
+key, and the engine's rule reads the two yards and the sail as a schooner's mast's: her golden row
+as §12.2 gives it (`tests/test_neufchatel.py`). The text of the two stages is kept as it was
+proposed.*
 
 ---
 
@@ -281,6 +291,16 @@ particulars and dump themselves, so neither is touched):
   middle, 0.30 before it) assumed the rabbet as origin; after the join the main stands 0.112 of
   the waterline abaft the middle and the fore 0.295 before it. The masts' spacing, 43.7 ft, does
   not depend on the join.
+
+  *As built (B2, 2026-11-07): `POST_AT_DECK_FT` stands at 0.85, as designed. Task 1's checker
+  measured the eleven ports' centres from the after rabbet on ZAZ6177 and again on ZAZ6178, each
+  by the frame's outer edges and by the ink's centroid, and the two mast stumps at the deck on both
+  sheets: the ports stand about 0.4 ft abaft this section's figures, the join reading 1.27 ft by
+  the eleven's mean (1.22 and 1.33 at the end ports; 1.26 on ZAZ6178; the centroids 1.42 and 1.38
+  ft), and the masts 41.3 and 84.9 ft from the after rabbet on both sheets (a join of 1.0-1.6 ft
+  against Neuf's ranges). Over §3.7's 0.3 ft, it is reported to the lead before it is written,
+  the figures in `docs/dev/TuningNotes.md`, "The *Prince de Neufchatel*": the one constant moves
+  every port and both masts.*
 - **The file frame.** x in metres forward of the middle of the waterline between the rabbets,
   107.3 ft long (D29(b)): `x_m(x_ft) = (x_ft − 53.65) × 0.3048`, so the waterline runs from −16.35
   to +16.35 m. z in metres above her water at the station. Her water slopes 1.63° to her keel
@@ -307,6 +327,13 @@ With `raise ValueError(...)` and a sentence, never `assert`, which `python -O` s
   gaff, the royal yard and the flying jib-boom, which differ and are noted (D37(a)). A guard
   against a mistyped figure, not evidence that Ex. 1 is her (Neuf §3.4);
 - each sail as cut on her spars within ±15% of its area measured on ZAZ6179 (Neuf §3.3's ±10-15%).
+
+*As built (B2, 2026-11-07):* each check in `particulars()` and `write()`, raising `ValueError` in
+words, the generator's report (`her_report()`) printing what each found: the tonnage 328.29 tons
+against Winfield's 328.23; the masts 43.70 ft apart; the trucks by length and rake 109.9 and 110.1
+ft against the sheet's 110.4 and 110.1 (a check added: within a foot); every spar within 2 ft of
+Fincham; every sail as cut within 11% of the sheet's area. Every gun on a triple comes with the
+fit (step 4).
 
 ---
 
@@ -336,6 +363,24 @@ in 12 ft) in the note.
 **Measured here, from those figures:** her righting moment a degree, 288 t × 9.81 × 2.1 m × sin
 1°, is about 104 kN·m, against the frigate-36's 283, the brig's 67 and the topsail schooner's 36;
 the wetted area the engine reckons, L(1.7T + 0.7B), 354.7 m² against the topsail schooner's 277.6.
+
+*As built at step 5 (B2, 2026-11-07; §9's knobs, the figures in `docs/dev/TuningNotes.md`, "Step
+5"): `clr_x_m` tuned from +0.3 to **+2.0**, the one figure of the table moved. At +0.3 she carried
+lee helm close-hauled and abeam in 15 kn (−5.2° at 60° off, −1.3° abeam); at +2.0 she is balanced
+close-hauled (+0.4° at 60°) with +1.6° of weather helm abeam, the lead now 2.8 m ahead of the
+geometric centre, between the topsail schooner's and the frigate's (judgement). `hull_speed_kn`
+12.9 kept: her best in 25 kn lies inside her accounts' band at every hull speed of the bound
+(12.09 kn at 12.5 to 12.67 at 13.9). `gm_m` 2.1 kept: no account gives her heel (5.6° at 90° in 15
+kn under plain sail; 5.9° at 2.0 and 5.35° at 2.2).*
+
+*After the reviews of 2026-11-07 (`docs/dev/TuningNotes.md`, "The reviews' mends"): `clr_x_m` +2.0 to
+**+0.1**, re-tuned after the jib's centre was mended (§4.6's As built): the step-5 lead was
+making up for a jib placed 9 m too far forward. In 15 kn under plain sail she now carries +1.1° of
+weather helm close-hauled (60° off) and +0.8° abeam, the lead 0.9 m ahead of the geometric
+centre, a little short of the topsail schooner's 3.5% of her waterline. Her helm falls from
+close-hauled to the beam where the schooner's rises, so no lead gives her both halves of §9's
+target (−0.2 balances her close-hauled with +0.25° abeam); +0.1 holds the step-5 bands with room
+on both sides (judgement, for the lead). `hull_speed_kn` and `gm_m` kept.*
 
 ### 2.2 The datum (D18)
 
@@ -378,6 +423,17 @@ Her one deck is `upper` (Build §5.1: a frigate's, a sloop's and a cutter's sing
 Every point not yet re-measured by B2 is written with its mark in the note and never left out
 silently (Indf §3.2). The images' figures go in; the images never do.
 
+*As built (B2, 2026-11-07): every point of this table is written as it stands, in the module's
+data in the sheet's feet. Task 1's checker re-traced the rail by its line's peak and by its top
+edge on ZAZ6177 and on ZAZ6178: aft of +8 m both confirm it within 0.06 m (0.2 ft); forward of it
+the re-trace stands higher, 0.09-0.33 m at 14.92 and 16.05 m (the two sheets differing between
+themselves by up to 0.15 m there), reported and not written (§3.7's 0.3 ft). The rail at the
+masts is settled against ZAZ6179 measured again: the sail plan draws the top of her side 7.84 ft
+above her water at the main and 8.37 at the fore, not 8.4 at both, against the lines' 7.5 and 8.1;
+the lines' figure stands (their difference 0.2-0.35 ft, the sail plan's hull drawn as a sketch).
+The deck at side was not re-traced: the red line is faint and broken at 1280 px and neither of the
+checker's tracers held it (the tuning notes).*
+
 ### 3.3 The sills and the half-breadths
 
 Eleven ports a side, lids drawn, the same on ZAZ6178 (Neuf §2.7); "pierced for 22 guns, and
@@ -404,7 +460,14 @@ From forward:
 | 11 | −14.23 | 5.84; 1.78 | 2.72 | 32.8° | 6.07 |
 
 The two measures agree within 0.31 ft: ports 3 and 9 differ by 0.26 and 0.31 ft, the rest by
-0.25 ft or less. Neuf §2.7's "about 4.7 to 5.1 ft above the water amidships" holds. The ports'
+0.25 ft or less. *As built (B2, 2026-11-07): the sills are written as this table has them.
+Task 1's checker read every sill again on ZAZ6177 and on ZAZ6178 by this section's method: nine of
+the eleven agree with the table within 0.04 ft on both sheets, the two sheets with each other
+within 0.05 ft; the lowest, No. 6, 4.93 and 4.96 ft (1.50 m confirmed); No. 11 5.94 and 5.99 ft
+(+0.10-0.15); No. 3 5.60 on both, 0.40 ft above the table's 5.20, which reads the fore channel's
+lower line under the port as its sill (the port frame's own lower edge 3 px above it, seen at 12x).
+Over 0.3 ft, reported to the lead before it is written (the tuning notes).*
+Neuf §2.7's "about 4.7 to 5.1 ft above the water amidships" holds. The ports'
 depths read here run 2.05-2.81 ft, a mean of 2.48 (Neuf's 2.4 ±0.3); the end ports are the
 shallowest (§3.2, `port_size_m`). The eleven sills were re-measured in the review pass by
 `probe/sills.py` and came out as the table, to the hundredth of a foot.
@@ -533,6 +596,30 @@ repository. The figures go in; the images never do.
 None of the shape lines waits on these: each is written now with its mark, and a task done raises
 its rung (principle 12), old beside new.
 
+*As built (B2, 2026-11-07; the figures in `docs/dev/TuningNotes.md`, "The *Prince de
+Neufchatel*"), every figure by two methods, each script outside the repository:*
+- *Task 1: the rail, the transom, the sills, the join and the rabbet re-measured on ZAZ6177 and on
+  ZAZ6178, the Woolwich draught taken from her drawing in 1815 (7.12 px/ft by its bar; its line
+  sloping 1.59° as ZAZ6177's does), each by its own registration. The rail confirmed aft of +8 m,
+  higher forward (reported); the transom confirmed within 0.2 ft at both ends (its face's rake by a
+  fitted line 34.2° and 33.8° on the two sheets, the design's 31° the chord of the same points; the
+  body plans' breadth 16.0-16.6 ft); nine sills confirmed, No. 3 0.40 ft higher (reported); the
+  join 1.27 ft against 0.85 (reported, §1.4); the rabbet 8.60 and 8.67 ft below her line at the
+  dead flat against 8.74 and Neuf's 8.63, confirming `rabbet_m`, and 0.4-0.5 ft below the body
+  plan's 8.21 as §3.2 says. The deck at side not re-traced.*
+- *Task 3: not settled. The body plans' sections cross the waterlines, the diagonals and each other
+  within 2-4 px at 1280 px, and two tracers lost or jumped them at both end ports; the half-breadth
+  plan's top breadth read again at the end ports' stations, 8.87 ft (aft) and 6.77 ft (forward)
+  moulded, with her line's 4.08 and 4.83 ft below them. `measured=()` stands: every gap reported.*
+- *Task 5, in part: the flying jib read on ZAZ6179 (head 66.5-67.1 ft above her water, tack and
+  clew 25.5-25.7 ft, 430-431 sq ft by its corners and 17 of roach, about 447 sq ft, 42 m², against
+  §4.3's working 56 m²; written); the jib stay and the flying jib stay; the main staysail (its head
+  47.4 ft above her water, not Neuf's 60, 522-531 sq ft) and the main topmast staysail on both
+  feet (396-399 sq ft on the upper, 1,326-1,330 on the lower), written. Not read: the jib's clew,
+  the fore staysail, the studding sails' outlines; Fincham's sail-area test and the centre of
+  effort's height.*
+- *Tasks 2, 4, 6 and 7 not taken in this step.*
+
 ---
 
 ## 4. The rig
@@ -563,6 +650,15 @@ its rung (principle 12), old beside new.
   backstays, judgement) and the main's three (ZAZ6177, measured).
 - Mast ids `fore.` and `main.`; she has no mizen. Her rating pass rates every spar from its loads
   (`Builder.rate_spars`, `:918`).
+
+*As built (B2, 2026-11-07): the main topgallant mast carries its light yard from her first commit
+(the row's "bare until 'keyed' crosses its yard" superseded by the lead's ruling of 2026-11-06 on
+§12.2a: no key). The hoists filed are the vertical heights between the spars' tops: the fore topmast
+to its cap above its 5.1-ft head, the fore topgallant to its hounds and its royal pole above, the
+main topmast to its hounds and its pole above, each upper mast heeled at the hounds of the one
+below; the trucks so stacked 109.9 and 110.1 ft above her water against the sheet's 110.4 and 110.1.
+The main stay runs from the main's hounds, the jib stay and the main topmast stay from the topmasts'
+hounds, as ZAZ6179 draws them.*
 
 ### 4.2 Yards, gaffs, booms, brace limits, rope
 
@@ -595,6 +691,23 @@ its rung (principle 12), old beside new.
   √(her sail on that mast ÷ theirs) (judgement, as Indf scales the frigate's). So a line's rating
   grows with the sail it works, and truth 9's strain behaves as the brig's and the schooner's.
   Spar ratings from the rating pass.
+
+*As built (B2, 2026-11-07):* the light yards filed from her first commit (the rows' "keyed only"
+superseded by the ruling of 2026-11-06: no key). **The studding-sail booms read by the engine's
+pattern** (the brig-sloop's file): each studding sail's boom is the one spreading its foot at the
+yard below, so the topmast studding sail's is the fore yard's boom, 16.1 ft beyond the fore
+yardarm, and the topgallant studding sail's the topsail yard's, 6.9 ft beyond its yardarm (§4.7
+puts the topmast studding sail on the topsail yard's boom; said in the boom's note); the lower
+studding sail's the swinging boom at the sail's foot. **The head's spars** stand at the heights
+ZAZ6179 draws their ends, read by task 1's checker: the bowsprit's cap 15.2 ft above her water,
+the jibboom's end 22.8 ft (26.2 ft beyond the cap), the flying jibboom's 25.5 ft (11.1 ft beyond),
+57.4 ft ahead of the stem head; her sail plan draws the bowsprit over the stem about 10 ft above
+her water where her lines' stem head stands 7.7 ft, task 7's question, open. **The brace check**:
+the aftmost lee fore shroud at the fore yard's height bears 49° abaft the beam from the yard's
+truss, the shrouds led from the hounds to the channel's after end at the rail; the brig-sloop's
+60° stands, as designed (judgement), and the figure goes to the lead. **The rope's scales**: the
+fore 1.194, the head 1.455, the fore gaff sail 1.030, the main 1.130, the main topgallant 0.802,
+the main stay 0.822 (the brig's main, the schooner filing none).
 
 ### 4.3 Sails (ZAZ6179, measured from the corners, ±10-15%)
 
@@ -629,6 +742,20 @@ its rung (principle 12), old beside new.
   a jib (`data/evolutions/` holds `reef_square`, `reef_gaff`, `reef_lug` and `reef_bowsprit` only).
   Her storm jib stands in for the reefed jib (§4.8). By the brief, a rig the engine lacks is
   reported to the lead (§17, lead item 7), not approximated silently.
+
+*As built (B2, 2026-11-07):* the square sails cut by the brig's method on her yards (the course its
+measured 33.3 ft deep): the course 181 m² (-3% of the sheet's), the topsail 141 (-11%), the
+topgallant 58 (+8%), the royal 22 (-5%), the main topgallant 29 (+4%; written from the first commit,
+the row's "keyed only" superseded); the fore gaff sail 156 m² (+1%) and the mainsail 256 (-1%) by
+their corners from the spars, filed with them; the gaff topsail 48 (+10%) by its corners up the
+topmast to its hounds; the flying jib 42 m² as read (task 5); the jib and the fore staysail the
+working 121 and 93 m², placed by the topsail schooner's rule on her spars (their centres 0.35 of
+the schooner's feet of her waterline abaft their tacks, the heights a triangle's up their stays:
+judgement until task 5). Plain sail 1,006 m².
+
+*After the reviews of 2026-11-07: the jib's centre is its triangle's (§4.6's As built), x 17.8 m where the
+schooner's rule put it at 26.9; the main topmast staysail 37 m² (its nock mended, §4.7's As
+built). Plain sail 1,006 m² as before.*
 
 ### 4.4 The fore gaff sail (D21(a))
 
@@ -679,6 +806,15 @@ Her hands for it: the fore top's, as for her gaff topsail, by `topmen`'s rule fo
 top (`crew/hands.py:104-108`; she has no `main_top` station). B2 records what `Quarters.beat` and
 the evolutions make of it.
 
+*Superseded by the lead's ruling of 2026-11-06 on §12.2a: the heading's "at `"keyed"`" and the
+`main.mast` line (no key). As built (B2, 2026-11-07): filed from her first commit as listed but for
+that line, no key on her main; the rule reads both yards and the sail as a schooner's mast's
+(`Ship.on_schooner_mast`). **B3.4's finding mended:** "shorten sail" never took in the sail, these
+groups keeping it out of every group its list reaches. It is in "royals" with the fore royal, so
+that "make all sail" sets it ("set the royals") and "shorten sail" takes it in ("take in the
+royals", its list's third line), and still in no group plain sail, the topgallants, the topsails or
+the courses name. Its hands at muster come with her company (step 4).*
+
 ### 4.6 The head, and "the Jack"
 
 - **Bowsprit** about 22.4 ft outboard, stem to cap, steeved about 15° (measured: Neuf §1.2; 14.9° on
@@ -694,6 +830,19 @@ the evolutions make of it.
   64's and the bilander's yards only, and the engine's yards under the bowsprit are B3.2's for
   those. Its note says what it is and where. The lower studding sail's foot is spread by Fincham's
   swinging boom (§4.2) in the engine's usual way.
+
+*As built (B2, 2026-11-07), mended after the reviews of 2026-11-07: the jib's centre is the centroid of the
+triangle whose height her file already wrote, from its tack at the jibboom's end up the jib stay
+to the fore topmast's hounds and aft along a level foot to the clew its 121 m² gives: x 17.8 m,
+12.8 m above her water (judgement). The schooner's rule (0.35 of a foot of 0.35 of her waterline
+abaft the tack) had put it at x 26.9, 3.1 m above its own stay and 0.3 m forward of the flying
+jib's measured centre, though the jib tacks 3.3 m abaft the flying jib. The storm jib follows
+it. A check of §1.5's kind (`check_head_sails`) now raises in words if a headsail's centre stands
+above its stay, abaft the fore mast, or (the jib) forward of the flying jib's. The fore staysail
+keeps the schooner's rule, its centre (12.1, 7.3) inside its sail. **For the lead:** its working
+93 m², as a triangle with a level foot from its tack at 10 ft and its luff up the fore stay to
+the fore hounds, would reach 7.4 m abaft the fore mast; forward of the mast it holds about 46 m².
+Task 5 has not read its clew.*
 
 ### 4.7 Studding sails and light sails (D35(b), limited)
 
@@ -717,6 +866,10 @@ the evolutions make of it.
   plane from both drawing; B2 measures what the polar and the heave-to make of it and records it.
 - **Not carried:** the ringtail and the water sail of the topsail schooner's pattern. Her sources
   show neither, and the owner limited her light sails (D35(b)).
+
+*After the reviews of 2026-11-07: the main topmast staysail's nock is the stay's fore end at the fore
+topmast's hounds. It had been carried along the stay past that end, 0.4 m forward of the raked
+mast. It is now 37 m², the sheet's 37 (38 before).*
 
 ### 4.8 Storm canvas, groups, aliases
 
@@ -760,13 +913,30 @@ the evolutions make of it.
   and "fore-and-aft mainsail" (Cobb p. 95) → `main.sail`; "gaff topsail" and "main gaff topsail" →
   `main.gaff_topsail`; when keyed, "main topgallant" and "main topgallant sail" → `main.topgallant`.
 
+*As built (B2, 2026-11-07): the table's and the aliases' "when keyed" superseded by the lead's
+ruling of 2026-11-06 on §12.2a (no key): the main topgallant, its yards and its words are filed from
+her first commit. Beside the table: "royals" holds the fore royal and the main topgallant (§4.5's
+finding); "staysails" is filed on the brig-sloop's pattern, the fore staysail and the two between
+the masts, since the engine reads it (`world/captains.py`) and "make all sail" sets it; "lower
+masts", "topmasts", "topgallant masts" and "royal masts", the fore's studding sails by level, the
+course's sheets, tacks and bowlines and the topsail's bowlines as the brig's; "fore yard" an alias.
+The engine reads "plain sail", "courses", "topsails", "headsails", "jibs", "gaff sails",
+"staysails", "storm canvas", "storm staysails" and "lying-to staysails" by name, every one hers.*
+
+*After the reviews of 2026-11-07: the fore gaff sail's three lines take her sources' words too: "starboard
+fore-and-aft foresail sheet", "larboard fore-and-aft foresail sheet" and "fore-and-aft
+foresail tack". Strain's warnings read a part's first plain alias, and in her gale they had called
+the gaff sail's sheet "the fore sail sheet" beside "the foresail", her course. The trim
+replies still say "the fore sail" (`orders/resolve.display_name` reads no alias: the engine's,
+for the lead).*
+
 ### 4.9 Her rig's peculiarities, for the physics' reading (the brief)
 
 | Peculiarity | Sail class | In the engine | Said for the lead |
 |---|---|---|---|
 | A brig's square fore under a schooner's main | `square` on the fore, `gaff` on the main | **yes**: she classes as a fore-and-after (`_masts_with_yards` the fore alone), the topsail schooner's handling with four fore yards (Eng §3.3's trial A) | — |
 | The great fore gaff sail lapping the main | `gaff`, loose-footed | **yes**: the topsail schooner's foresail | its overlap with the main staysail (§4.7) |
-| The main topgallant on two light yards | `square` | **no**: any yard on the main makes her a brig to every path | D10(a)'s key, B3.4 (§12.2) |
+| The main topgallant on two light yards | `square` | **no**: any yard on the main makes her a brig to every path | D10(a)'s key, B3.4 (§12.2). *Superseded by the lead's ruling of 2026-11-06 on §12.2a: the rule built at B3.4 reads the two yards and the sail as a schooner's mast's, no key (§4.5's As built)* |
 | Hove to, that topgallant stays set abaft the backed fore | `square` | the heave-to clews up light sails forward of the backed yards only (`light_sails_forward_of`, `evolutions/scripts.py:584-609`) | a finding for B3.4's measure (§12.2 item 8) |
 | The gaff topsail's small head spar | `jibheaded` | the head spar is not modelled | recorded |
 | The jib reefed | `jib` | **no**: no evolution reefs a jib | §17, lead item 7 |
@@ -866,6 +1036,20 @@ chasers), and the frigate-36 421 lb (Indf §5.5). She is no match for a frigate'
 her history bears out: she ran from frigates and fought boats. With the 6s on the broadside, one a
 side, the figure would be 102 lb; as stern chasers, 108.
 
+*As built (B2, 2026-11-07; the figures in `docs/dev/TuningNotes.md`, "The *Prince de Neufchatel*",
+"Steps 4 and 6"): §5.1 to §5.5 as written. The fit "as taken 1814", its note giving Cobb's calibres,
+the other counts, the small arms and the double shot; the carronades `gun.1` to `gun.8` a side in
+ports 2 to 9 from forward and the 6s `chaser.bow.*` in port 1, each on its port's triple of `upper`
+to the centimetre (raised in words otherwise, `check_guns_on_triples`); Adye's 5.84 and 22 cwt,
+Douglas's four and Falconer's five; the privateer schooner's allowance, no exercise charges, the
+filling party four; 108 lb by 70's rule, measured. `period.py`'s two appends as §5.3 gives them,
+at the end of the file. **Departure, for the lead:** the charges are the engine's shares as §5.4
+says, not overridden, but her charges' **note** is her own, citing Table No. 29 as read (Build
+§10), as the *Indefatigable*'s is, where the shared note still says "UNVERIFIED". The builder's
+checklist (Build §6's postscript) clean: `tools/check_viewer_guns.py` places all eighteen in
+ports, lists no weight, and notes the chase port "cut to the rail (0.04 m)", §3.2's end port drawn
+at the deck's one depth.*
+
 ---
 
 ## 6. The company, the marines, the quarter bill and the people file
@@ -961,6 +1145,22 @@ no nation (plan §0). As D39 says, no names list leaves a file wholly without a 
 list implies a default; a scenario's `nation:` wins. Her company's mixed nations (Cobb p. 42;
 Stevens p. 27) are in the note.
 
+*As built (B2, 2026-11-07): §6.1 to §6.5 as written: 130, the twelve posts in this order (the
+captain, the first to the fifth lieutenants, the master, the surgeon, the boatswain, gunner,
+carpenter and sailmaker), 16 marines, 8 idlers, 94 seamen at 20, 24, 30 and 20, the ratings 0.35,
+0.35 and 0.30, the american list and no nation; her people file in the frigate-36's form, the
+captain, the first lieutenant and the surgeon from Cobb, the rest plain types, a prize-master and
+a quartermaster drawn from the afterguard's able seamen and a boy as the messenger; the bill's
+figures as §6.4 gives them. **Measured at the beat** (seed 7): every gun crew fills, ten crews of 42
+men (a crew to each carronade pair and to each chaser: §6.4's 37 counts one chaser); **the marines
+do not stand apart**: the beat takes them to the carronades first for every ship bearing marines
+(`crew/quarters.py`, `_preferred_stations`), so all sixteen stand at the carronades and no marines'
+division forms, as on the frigate-36 and the razee; her bill has no key to say otherwise (for the
+lead). The trimmers at the beat 65 (the bill's 35 and the seamen the guns leave), the helm one, the
+powder eight. **Measured, for the lead:** her rules captain sails by the King's ship's book on a
+passage or a station without prizes, `captains._is_kings_ship` taking her wardroom's captain role,
+"captain", for a King's commission; cruising for prizes, the privateer's.*
+
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores
@@ -1003,6 +1203,16 @@ figures for her go in the note beside Steel's.
   vol. VII p. 120); cordage, spare spars and shot plugs as the brig's on her own spars, one plug a
   gun of the fit; the sail room by the schooner's method; `ration_entries` as the privateer
   schooner's, which `tests/test_stores.py:28` asks of every file.
+
+*As built (B2, 2026-11-07): as written. Steel's row through `b.ground_tackle`, three bowers of
+1,016 kg on 240, 240 and 120 fathoms of 13½-in cable, the stream 356 kg on 8 in, the kedge 178 kg
+on 6¾ in; `period.STEEL_ANCHORS[14]` appended; the house's rule's figures for her (bowers of 16.4
+cwt, a cable of 13 in) printed by the generator's report rather than her note, the lead's rule of
+2026-10-29 keeping a figure a rule computes out of the notes. The long-boat 22 ft and the yawl 18
+ft on her 110 ft 8 in on deck; two hand pumps; the hold 164 tons; water 35 tons, provisions 90
+days, cordage 300 fathoms, 18 shot plugs, the brig-sloop's spare spars; the sail room a second
+fore gaff sail, fore topsail and jib and one of each storm sail; the Navy's ration as the privateer
+schooner's.*
 
 ---
 
@@ -1056,6 +1266,18 @@ Chronicle* vol. 33 p. 72); the Admiralty's "American Schooner" (ZAZ6177, ZAZ6179
 - None of her words appears in any existing text but `SIZE_RANK` and `tests/test_profile.py:920`
   (grep over `freesail/`, `data/`, `tests/`), so her rows move no existing ranking or lookup.
 - **The privateer schooner stays beside her** (Build §9.5): another hull, of class 1.
+
+*As built (B2, 2026-11-07): her description written in her file by SW-4's form (Build §8.1, §8.2),
+which landed after this section: rig, what and note as above, `roles: [privateer]`, and **`fit: as
+taken 1814`, her file's default**, superseding "No `fit`" above (every index row's file now gives
+both, which `tests/test_profile.py` and `tests/test_subtypes.py` ask of every row but the razee's
+and the 64's; a far ship of hers carries her default unwritten, as every row's). Her rows in
+`world/ships.py` at step 6: `DESCRIPTIONS["hermaphrodite brig"]` after the razee's, and the four
+words. **Found:** since SW-4's reviews `description_key` tries the whole words after the article
+first, so "a hermaphrodite brig" and "an hermaphrodite brig" now resolve by the index's own key
+without a row; the probe above was at 8f30be9. Their rows are kept, as the lead accepted the names
+(§17, lead item 9); "a privateer brig" and "privateer brig" still need theirs. "A brig" is
+unchanged.*
 
 ---
 
@@ -1168,7 +1390,68 @@ reports it with the figures and does not force it.
 the frigate-36's (T5: she took in light sails aloft as the wind freshened while the frigates held
 theirs, Cobb p. 96); the strain on her lines at 90° in 25 kn under plain sail (truth 9's behaviour);
 her tack, wear and heave-to at seed 7 in 15 kn beside trial A's (149 s, 449 s, 50° off at 2.65 kn:
-Eng §3.3), at `"out"` and again at `"keyed"`.
+Eng §3.3), at `"out"` and again at `"keyed"` (*superseded by the lead's ruling of 2026-11-06 on
+§12.2a: once, on the file as written*).
+
+*As built at step 5 (B2, 2026-11-07; `polar_of` on her file as written, the figures and their
+methods in `docs/dev/TuningNotes.md`, "Step 5"):*
+
+| File | Best in 8 / 15 / 25 kn | At | 150° / 180° in 25 kn | 60° / 70° in 15 kn; in 25 kn | `closest_deg`; `beat_deg` 8 / 15 / 25 |
+|---|---|---|---|---|---|
+| hermaphrodite-brig | 5.15 / 8.87 / 12.27 | 100°, 100°, 90° | 10.04 / 9.42 | 6.60 / 7.41; 9.90 / 10.87 | 40; 60 / 60 / 60 |
+| frigate-36 | 4.62 / 8.19 / 11.63 | 90°, 90°, 100° | 10.01 / 9.23 | 4.29 / 6.14; 7.03 / 9.62 | 50; 60 / 60 / 60 |
+| brig | 4.57 / 7.92 / 10.97 | 100° | 9.47 / 8.84 | 4.26 / 5.88; 6.89 / 9.10 | 50; 60 / 60 / 60 |
+| topsail-schooner | 4.59 / 7.92 / 10.95 | 100°, 90°, 90° | 8.91 / 8.50 | 6.47 / 7.16; 9.43 / 10.17 | 40; 60 / 60 / 50 |
+
+*- **The targets met without forcing.** Her best in 25 kn, 12.27 kn at 90° (12.25 at 100°), is
+inside 11.5-13.0 on her start figures and at every hull speed of the bound (12.09 at 12.5, 12.27 at
+12.9, 12.52 at 13.5, 12.67 at 13.9): `hull_speed_kn` 12.9 is kept, no account asking more of a reach.
+Her pointing holds every clause: closest 40° against the frigate's 50; faster at 60° and 70° in both
+winds, the slimmest margin 1.25 kn at 70° in 25 kn (the stand-in's 0.8). 7-193 pins both
+(`tests/test_neufchatel.py`); the angle and the running speeds are reported.*
+*- **The helm** (`clr_x_m`, the one knob moved): +0.3 to **+2.0** (§2.1's As built). Sailed in 15 kn
+under plain sail, old beside new: −5.19 / +0.44° at 60° off, −2.72 / +1.77 at six points, −1.31 /
++1.57 abeam, +1.13 / +2.67 at ten points (the topsail schooner −0.04, +3.38, +4.30, +6.11; the
+frigate-36 −0.16, +1.45, +1.99, +2.08). Balanced close-hauled, as the schooner; her weather helm abeam
+"a little" rather than "a few degrees": her helm rises only 1.1° from 60° to the beam where the
+schooner's rises 4.3°, so a few degrees abeam would gripe her close-hauled (+1.9° at 60° at +2.5).
+Truth 6's form holds at either (+1.57 plain, +7.26 the headsails in, −9.15 the mainsail in). The polar
+does not read `clr_x_m`.*
+*- **Her heel** at 90° under plain sail: 5.6° in 15 kn and 14.6° in 25 kn (the frigate-36 5.5° and
+14.4°, the brig-sloop 7.0° and 18.9°, the topsail schooner 8.75° and 21.4°); `gm_m` 2.1 kept within
+2.0-2.2 (5.9° and 15.3° at 2.0, 5.35° and 14.0° at 2.2), no account giving her heel.*
+*- **The strain** (truth 9's forms): nothing carried away or parted under plain sail in 20 kn, her
+fore topgallant yard at 0.53 of its rating, 0.87 in 25 kn (the frigate-36's topgallant yards 1.05);
+under all sail in 35 kn her gaff topsail blown out and the fore royal mast, the main topgallant yard
+and the fore topgallant yard carried away, each said urgently. Risk 2's early parting did not come.*
+*- **Her tack, wear and heave-to** at seed 7 in 15 kn, beside trial A's (149 s, 449 s, 50.2° off at
+2.65 kn, re-measured on this tree to the second) and the main topgallant's fixture (172 s set, 164
+furled): tacked in 201 s (208 s with the main topgallant set), wore in 451 s keeping her mainsail,
+hove to 49.8° off at 2.75 kn (49.2° at 2.51 with the main topgallant set, the sail standing abaft the
+backed fore: inside truth 12's band of angle, above its 1.6 kn as trial A's is); got under way from
+her anchor in 1,466 s (trial A 1,475) on the starboard tack under her fore topsail, mainsail and jib.
+At +0.3: 130 s, 458 s, 54.7° off at 3.74 kn.*
+
+*After the reviews of 2026-11-07 (the jib's centre mended, §4.6; `clr_x_m` +0.1, §2.1; the figures old
+beside new in `docs/dev/TuningNotes.md`, "The reviews' mends"):*
+
+| File | Best in 8 / 15 / 25 kn | At | 150° / 180° in 25 kn | 60° / 70° in 15 kn; in 25 kn | `closest_deg`; `beat_deg` 8 / 15 / 25 |
+|---|---|---|---|---|---|
+| hermaphrodite-brig | 5.12 / 8.82 / 12.22 | 100°, 100°, 90° | 10.00 / 9.42 | 6.53 / 7.34; 9.81 / 10.80 | 40; 60 / 60 / 60 |
+
+*- **The targets still met without forcing:** her best in 25 kn 12.22 kn at 90°, inside 11.5-13.0;
+closest 40°; faster than the frigate-36 at 60° and 70° in both winds, the slimmest margin 1.18 kn
+at 70° in 25 kn. The polar reads the sails' places, so the jib's move took 0.05-0.09 kn off it.*
+*- **The helm** in 15 kn under plain sail at 60°, 67.5°, 78.75°, 90°, 112.5° and 135° off: +1.11,
++2.11, +1.49, +0.78, +1.84, +3.20° (step 5's +0.44, +1.77, +1.82, +1.57, +2.67, +2.94); +1.75° at
+60° and +0.73° abeam in 25 kn. Truth 6's form abeam: +0.78 plain, +5.13 with the headsails in,
+−11.73 with the mainsail in.*
+*- **Her tack, wear and heave-to** beside trial A's (149 s, 449 s, 50.2° at 2.65 kn): truth 10's
+form 182 s from 292.5° (184 and 181 from 290° and 295°), gaining 118 m, "Let go and haul" 25 s
+after "Main-topsail haul"; B3.4's settled form 217 s (192 with the main topgallant set). Wore in
+461 s, 255 m to leeward. Hove to 51.1° off at 3.0 kn, and 51.0° at 3.0 with the main topgallant
+set. Under way from her anchor in 1,465 s, 5.8 kn. Her heel, 5.5° and 14.6° abeam in 15 and 25 kn,
+is unmoved.*
 
 ---
 
@@ -1181,6 +1464,22 @@ reopens six inches clear. Her lowest shuts at 18.2° of heel alone (§3.4); she 
 band, 18-22° amidships. Her roll is her own through `world.motion` (`Firer.roll_deg`); a crewed
 ship's roll stays nought until 84 gives each hull her sea (Build §7.1), so her truth line is sailed
 as the player's ship. Her lines in 7-190 come after L3.
+
+*As built (B2, 2026-11-07): her line measured by the truth's draft (`tests/test_lee_ports.py`, the
+rule as built, the minute's hold included): `(hermaphrodite-brig, "as taken 1814", "upper",
+18.18, 3)`, No. 5 shutting at 18.18 degrees of heel alone and three of her lee ports a degree above
+it, a roll of four degrees the same four sooner. Held in her own tests; the truth's table
+(`LOWEST_LEE_PORT`) is a shared list (§13) and its guard, "every armed file a row", fails until
+the line is added there (for the parent or the lead).*
+
+*As built at step 5 (B2, 2026-11-07; the rule's arithmetic, `tests/test_lee_ports.py`): one deck
+with guns, `upper`. Her shut heels on the heel alone from forward, the bow chaser 58.7°, then
+29.6, 20.5, 19.6, 18.6, **18.2**, 19.1, 20.0 and 21.8° at the eight carronades; with a roll of 4°
+each 4° sooner (the lowest at 14.2°). Beside her, by the same rule: the privateer schooner's
+lowest 13.5° (the long tom's after port; 29.7° forward) and the brig-sloop's 17.5° (17.5 to 23.8
+along her broadside, 36.7° at the chaser). So under plain sail abeam in 25 kn, heeling 14.6°, her
+lee ports stand open on the heel alone and the lowest shuts with a roll of 3.6° or more, where the
+brig-sloop's shut on the heel alone (18.9° of heel against her 17.5°).*
 
 ---
 
@@ -1236,6 +1535,20 @@ Her file with its fit, her description and role, her people file, and a test tha
 rules captains at seed 7 in a world with no named fit (`make_world(7, <her file>, Scenario())`), as
 Indf §11.2's. The scenario file itself is B6's, on `first-action.yaml`'s shape.
 
+*As built (B2, 2026-11-07), B6 out to a supplemental package: the round trip in the
+*Indefatigable*'s form (`tests/test_neufchatel.py`): the great guns' scenario with her file, under
+American colours, cruising for prizes off the Lizard, a British brig-sloop in sight; written, read
+back to itself and loaded with no fit named; she sails it at seed 7 with her default fit under the
+privateer's book, no order refused, 6.11 kn an hour in, and from a checkpoint at half an hour to
+the same world.*
+
+*After the reviews of 2026-11-07: 6.02 kn an hour in on her file as built (the 6.11 above was taken on the
+start's `clr_x_m`, and step 5's +2.0 gave 5.95). **Run on**, she stands on to the north while
+she investigates the stranger and takes the ground on the Stags at 3,911 s. She is stove, and
+founders at about 7,700 s. The lookout's warnings from 3,300 s go unheeded because
+"investigating a stranger" is not among the captain's danger-ahead states (`world/captains.py`,
+`DANGER_AHEAD_STATES`): the engine's, for the lead. The test asks only the hour.*
+
 ---
 
 ## 12. Interfaces
@@ -1285,6 +1598,28 @@ stage-0 agent lays, each item checked by an agent that did not write it (Build �
    8f30be9 that change is not in (`tests/test_scenarios_75.py` does not exist). So item 2 waits for
    B6's D48 change to be merged, or for the lead's word that item 2 goes first and B6 merges onto
    it (§17, lead item 4). Items 1 and 3 do not wait on it.
+
+   *As built (stage 0b, 2026-11-07; the lead's ruling on §17, item 4: "a parsed and kept block
+   that nothing reads until her scenario", B6's D48 change merging onto it):* `world/scenarios.py`
+   reads the block (`_nations_block`) and refuses it in words where it is not a mapping of the
+   four keys or lacks one, a day is no day, a war is not between two nations of the table, is
+   between a nation and herself, is listed twice or begins after `as_of`, a nation issuing
+   letters is no nation, is listed twice or is at war with nobody in the block, or the source is
+   not in words; each nation by its id, name or adjective as `nation:` is, kept by its id, the
+   days as ISO words. **The form, built on the design's lean (for the lead):** `wars` the table's
+   own rows (`{between: [a, b], since, source}`), each war in force once and every peace an
+   absence; `letters_of_marque` the list of the nations that issue them, the rest issuing none
+   (the table's `letters_of_marque` is by nation; the enemy a letter runs against is read from
+   the wars); all four keys wanted, an empty list saying none. It is kept on the World's
+   `Scenario` (`Scenario.nations`), so that a save holds it and the file is written again with
+   it (the writer puts it after `nation:` under its own comment), and left out of the save's
+   dict and the checkpoint's pickled state when None (`Scenario.__getstate__`). **The World's
+   replacement of the table's wars and letters is not built** (`core/world.py`'s table load
+   untouched): a World made from a scenario with the block has data/nations.yaml's wars, as
+   `tests/test_scenario_nations.py` pins. **Checked:** no shipped scenario carries the block;
+   every one of the 41 loads, writes again and saves as before, and its `Scenario`'s pickle,
+   dict and author's lines and four Worlds' checkpoints and saves are byte-identical before and
+   after (measured in scratch with the rules' fingerprint held, which digests the code itself).
 3. **`MODULE_FILES["ships.neufchatel"] = ["hermaphrodite-brig.yaml"]`** in `tests/test_profile.py`
    (`:502-507`). The hook test asserts that each built module writes its own files and a stub none
    (`:525-532`), so this row is committed directly before her first-file commit at the same
@@ -1600,6 +1935,38 @@ machine); the whole suite is the lead's.
 | 7 | **After B3.4 merges:** `MAIN_TOPGALLANT = "keyed"`, her file regenerated, re-measured | old beside new: her classing (the golden row), polar, 7-193's measures, rating, balance, tack, wear, heave-to | B3.4 and its schema key |
 | 8 | The lead's head in again before reporting (the lead's notes, "stage 0 read", item 2); **her testing report** to the owner; reported done; the lead merges | — | 5, 6 (and 7 if B3.4 is in) |
 
+*As built (B2, 2026-11-07): steps 1 to 3 done in the working tree, uncommitted, the parent to commit
+her file with step 0b's item 3 (`MODULE_FILES`) directly before it. Step 2 written with her main
+topgallant (no `MAIN_TOPGALLANT`, no key: the lead's ruling of 2026-11-06 on §12.2a); step 7
+superseded, nothing waiting on B3.4. Her file loads, rates and draws a polar; her golden row read
+through the golden table's gates; every triple's gap reported (none measured); every other file byte
+for byte as it was.*
+
+*As built (B2, 2026-11-07): steps 4 and 6 done in the working tree, uncommitted, step 5 not taken:
+her fit, magazine, company, people file, quarter bill, stores, sail room, ground tackle, boats,
+pumps, hold and description, `period.py`'s appends; her index row and words; every gun crew
+filled at the beat and the round trip at seed 7, measured; every other file byte for byte as it
+was. Her stern's three keys marked at step 4 (`tests/test_profiles.py`'s check, which step 2's run
+did not include).*
+
+*As built (B2, 2026-11-07): step 5 done in the working tree, uncommitted: her polar measured beside
+the frigate-36's, the brig-sloop's and the topsail schooner's and pinned (7-193); `clr_x_m` tuned
+for her helm, +0.3 to +2.0, the hull speed and GM kept (§2.1, §9); her heel, helm, strain, tack,
+wear, heave-to, getting under way, "shorten sail" and gale measured on the tree with B3.4 and the
+lead's four rulings in, beside trial A's; her lee ports beside the privateer schooner's and the
+brig-sloop's (§10); the pair check run on the committed set with her file among them
+(`tests/test_profiles.py`, SW-2b.2 being in: her nearest the two schooners, 10.7, 10.4 and 5.4 px
+apart abeam, ahead and astern, against the check's 4 px); her file regenerated for the clr and its
+three notes alone, every other file byte for byte as it was. Step 8, her testing report, not taken.*
+
+*As built (B2, 2026-11-07), after the reviews of 2026-11-07: the reviews' real findings mended in her
+files: the jib's centre and the clr re-tuned for it, the main topmast staysail's nock, the fore
+gaff sail's lines in her sources' words, and Cobb's page for the prize-master. The words step's
+and stage 0b's records were mended in one local commit. The rest went to the lead. Step 8: her
+testing report was written outside the repository for the lead, its pictures drawn by the game's
+own viewer served by the game's own server; the suite was run once on the final tree
+(`docs/dev/TuningNotes.md`, "The suite, as run" in her section).*
+
 **Her testing report** (the owner's direction of 2026-10-29 for the *Indefatigable*, taken to hold for
 her by judgement: §17, lead item 4), at step 8:
 - **pictures** at 960 × 720 (Build §6's sheets): abeam to leeward, ahead, astern, on the quarter at
@@ -1648,6 +2015,40 @@ her by judgement: §17, lead item 4), at step 8:
 - her polar in `tests/test_ships.py:74-93`'s form with her own figures, ±0.5;
 - the round trip under rules captains at seed 7 with no named fit (§11.3).
 
+*As built (B2, 2026-11-07): the golden row's "after yards none at `"out"`" and the `MAIN_TOPGALLANT`
+bullet superseded by the lead's ruling of 2026-11-06 on §12.2a (no key, no flip): her after yards
+are the main's two light yards from her first commit, and `tests/test_neufchatel.py` holds the row
+as §12.2 gives it, with the rule's three parts (the two yards and the sail) and nothing else on a
+schooner's mast. Begun there at steps 1 to 3: her hull, profile, shape and marks; her spars and
+sails against the sheet and Fincham; her golden row; the groups the engine reads by name and the
+main topgallant in reach of "make all sail" and "shorten sail"; her sources' words; the generator's
+checks and report; her file loading, rating and drawing a polar. The lowest sill's band tightened to
+±0.03 m, task 1's checker having confirmed it.*
+
+*As built at steps 4 and 6 (B2, 2026-11-07): her fit, guns, crews and magazine; the builder's
+checklist; her broadside; her company, posts, marines, people and the wardroom check; the beat on
+her fit, measured; her ground tackle against Steel's row; her boats, pumps, hold and stores; her
+description in her file and through the index, her four phrases, "a brig" unchanged; the round
+trip at seed 7; her line of 7-190, measured; and 7-192 whole with its index clause, drafted now
+because none of its clauses moves with step 5's knobs (her hull speed, clr and GM within
+bounds). 7-193 and her polar wait on step 5.*
+
+*As built at step 5 (B2, 2026-11-07): her polar in `tests/test_ships.py:74-93`'s form with her own
+figures (±0.5, her sailed beam reach within half a knot of the polar's) and 7-193 whole, both its
+pinned clauses holding on her file, the angle and the running speeds in its docstring. Beside
+§14's list, her handling as tuned, each in a band with the measure in its docstring: her helm
+balanced close-hauled and truth 6's form; her light main yards' short swing at "Main-topsail
+haul." (her file the rule's expected exception to `tests/test_schooner_mast.py`'s guards, held
+here); her tack, wear and heave-to in truths 10, 11 and 12's forms, her main topgallant set hove to;
+getting under way from her anchor as a schooner; "shorten sail" taking in her main topgallant,
+sailed; her gale's two course reefs and her mainsail kept (Cobb p. 95, ruling 4); truth 9's two forms.
+Each broken on purpose and failing (`docs/dev/TuningNotes.md`, "Step 5"). The round trip in the slow
+tier (`tests/conftest.py`), at 7.1 s.*
+
+*After the reviews of 2026-11-07: the step-5 tests' measures re-taken on her file as built, their bands
+unchanged. The helm's pin is now +0.1; the polar's beam reaches are 4.95, 8.68 and 12.22; the round
+trip's figure is 6.02.*
+
 **Truths** (Build §15: 7-192 and 7-193 reserved for her). States, counts, ticks and bands only, never a
 digest (decision 26). Written against the names the Hull keeps where a world is made (`world.ship`,
 `world.motion`, `world.sea`, `world.clock`), never `isinstance(..., CrewedWorld)`. Both are
@@ -1670,7 +2071,8 @@ on every machine", `world/ships.py:471-474`), so neither depends on the machine.
    - **Her rig read as Cobb's** (p. 38): she classes as one mast with yards, not square-rigged, her
      main a schooner's.
    - At step 5, the description her file carries (`file_descriptions`): `hermaphrodite brig`, "a
-     brig" at a distance, roles `[privateer]`, no fit; size rank 2 (`SIZE_RANK`, laid).
+     brig" at a distance, roles `[privateer]`, no fit (*superseded by SW-4's form, Build §8.1: `fit:
+     as taken 1814`, her file's default, which a far ship of hers never writes; §8's As built*); size rank 2 (`SIZE_RANK`, laid).
    - At step 6, the index clause: `description("hermaphrodite brig")` gives her file and those
      words, and "a hermaphrodite brig" names her (`description_key`).
 2. **7-193: her polar's best point, from her accounts.** Pinned at step 5 on what the file bears,
@@ -1702,18 +2104,38 @@ B6's test, not a truth (Build decision 27).
 - **None of the existing ships' passages.** The module writes a new file only; no shared function or
   table changes; `brig()`, `schooner()` and `privateer_schooner()` are untouched.
 - **Lists, not pins:** `tests/test_profile.py`'s `MODULE_FILES` row, stage 0b's, with her first file.
-  No other list: the byte test is two-way; her names, her wardroom check, her golden row and her
+  No other list (*superseded: the As built below*): the byte test is two-way; her names, her wardroom check, her golden row and her
   polar test run in her own file. Rank 2 is laid and already asserted (`tests/test_profile.py:920`).
 - **The registries:** new keys and words only; "a brig" unchanged; no scenario, business table or test
   names her words (grep).
 - **The caches** (32) hold her file beside the others. **The harbour's glob** (`ui/harbour.py:382`)
   lists her (membership only).
 - **Stage 0b:** nothing (§12.1's checks). **B3.4:** nothing existing; no file carries the key until
-  hers (the golden table).
+  hers (the golden table) (*superseded: no key; her file the rule's first committed rig, which four of
+  `tests/test_schooner_mast.py`'s guards meet*).
 - **The `nations:` block:** nothing; no scenario carries it until B6's.
 - **Within the package:** her flip moves her own file's bytes, classing (the after yards), rating,
   balance and handling, and her 7-193 measures by at most the light yards' windage, each old beside
-  new.
+  new. *(Superseded by the lead's ruling of 2026-11-06 on §12.2a: no flip; her main topgallant in
+  her file from its first commit, so nothing of hers moves old beside new for it. As built at step
+  5: her file moved for her own tuning alone, `clr_x_m` +0.3 to +2.0 and three notes; no pin of
+  another file moved.)*
+  *As built (B2, 2026-11-07, after the reviews; the whole fast tier on the final tree): beside
+  `MODULE_FILES`, her file joins `tests/conftest.py`'s `SLOW_TESTS` (her round trip, 5.9-7.1 s).
+  It fails 22 cases in shared files until each owner names her:
+  - `tests/test_lee_ports.py`'s guard of every armed file (her row `("data/ships/hermaphrodite-brig.yaml",
+    "as taken 1814", "upper", 18.18, 3)` for `LOWEST_LEE_PORT`, the armed files 7 to 8, and the
+    truth's docstring);
+  - four guards of `tests/test_schooner_mast.py`: her three parts on a schooner's mast, the count 15
+    to 16, her short after swing, and her course reefed by ruling 4;
+  - seventeen viewer cases: sixteen of `tests/test_view_geometry.py`'s tables without her rows, and
+    `tests/test_view_action.py`'s 2-mm port top at her No. 8.
+
+  Build-Ships.md §16.1's B2 row lists the same. No pin of another file moved.*
+  *Named, the same day (the tuning notes, "The shared guards name her"): the twenty-one in their
+  owners' files, B3's, B8's and B5's, each guard naming her exactly so that it fails if another file
+  trips it or if she stops; the twenty-second, package 81's port at her No. 8, a recorded departure
+  in 81's test (`CUT_AT_A_CORNER_M`), for the lead to rule which of 81's two rules gives way.*
 - **Not hers:** the lee-port wiring's combat pins (B8's).
 
 ---
@@ -1723,16 +2145,28 @@ B6's test, not a truth (Build decision 27).
 1. **Her polar's best point against her running accounts** (§9). The truth pins the speed and reports
    the angle. If the owner wants her running speed honoured, that is the polar's shape for every file,
    an engine matter, not hers. Her pointing at 70° is the slimmest clause: 0.8 kn over the frigate in
-   25 kn on her own sails, short of it on the brig-rigged stand-in.
+   25 kn on her own sails, short of it on the brig-rigged stand-in. *As built at step 5: her file
+   holds it by 1.25 kn (10.87 against 9.62), and 7-193 pins it; her best 12.27 kn at 90°.*
+   *After the reviews of 2026-11-07: 1.18 kn (10.80 against 9.62); her best 12.22 kn at 90°.*
 2. **The most canvas for her weight in the game** (about 23.5 m² a tonne^(2/3) against 13.5-17.2):
    heel, the strain on her lines (truth 9's behaviour) and the rating pass. Her lines are scaled per
    mast from the brig's and the schooner's and may part early in a breeze; B2 measures the strain at
-   90° in 25 kn. GM held within 2.0-2.2; her sources agree she was heavily sparred (T5, T7).
+   90° in 25 kn. GM held within 2.0-2.2; her sources agree she was heavily sparred (T5, T7). *As built
+   at step 5: nothing carries away or parts under plain sail in 20 kn or 25 kn (her fore topgallant
+   yard at 0.53 and 0.87 of its rating, the frigate-36's topgallant yards at 0.68 and 1.05); her
+   heel 5.6° and 14.6° at 90° in 15 and 25 kn, the frigate's; GM 2.1 kept.*
 3. **B3.4 after her merge.** She ships at stage A, D10(c), 3% of her canvas left out, **Plainly** said;
-   stage B follows, re-measured old beside new. Never D10(b).
+   stage B follows, re-measured old beside new. Never D10(b). *(Superseded: B3.4 merged before her
+   first commit, with the rule in the key's place, the lead's ruling of 2026-11-06 on §12.2a.)*
 4. **Her main yards in the after list** (place 2 left as it is), and her main topgallant set hove to
    abaft the backed fore (place 7): "mainsail haul" logged on a schooner's main, the swing's time, the
-   heave-to's angle. B3.4 measures and reports before adding any place (§12.2 item 8).
+   heave-to's angle. B3.4 measures and reports before adding any place (§12.2 item 8). *As built at
+   step 5, on her file with the lead's rulings 1 and 2 in: "Rise tacks and sheets. Main-topsail
+   haul." at 42 s and "Let go and haul." at 67 s, her light main yards swung short in 25 s, tacked
+   in 201 s (trial A 149, the main topgallant's fixture 164-172); hove to 49.8° off with the main
+   topgallant furled and 49.2° with it set, inside truth 12's band of angle.*
+   *After the reviews of 2026-11-07: "Main-topsail haul." at 49 s and "Let go and haul." at 74 s; tacked
+   in 182 s in truth 10's form and 217 s settled; hove to 51.1° off.*
 5. **Her profile read at 1280 px** (±0.3 ft): the rail at the masts against ZAZ6179 (0.9 ft at the
    main), the stem's rabbet or fore edge (up to 2 ft at the water), the gripe's foot (judged), the
    rabbet's depth at the dead flat (0.4-0.5 ft between the profile and the body plan), the rail
@@ -1742,25 +2176,35 @@ B6's test, not a truth (Build decision 27).
    by a checker before her first commit, and the row amended old beside new.
 7. **The headsails unmeasured** until task 5: her plain sail ±10%; 7-193's band holds across the
    stand-ins' cases.
+   *After the reviews of 2026-11-07: the jib's centre was outside its sail by the schooner's rule and is now
+   its triangle's; the fore staysail's working area is twice what fits forward of the mast (§4.6's
+   As built, for the lead).*
 8. **Both foresails in plain sail**: no file carries a large fore gaff sail beside a fore course (trial
    A's course had the schooner's smaller gaff sail); the blanketing between them; the tack's shift of
-   the gaff sail round the main with the course set. Measured at step 5.
+   the gaff sail round the main with the course set. Measured at step 5. *As built: the tack's sheets
+   shifted by the engine's own rule, no line of hers; she tacks, wears and heaves to with both set
+   (§9's As built); what each foresail is worth, `TuningNotes.md`, "Step 5".*
 9. **Two sails in one space** between her masts (the fore gaff sail and the main staysail): the physics
    lets both draw. Mitigated by the groups (the main staysail never in plain sail) and the main topmast
-   staysail's upper foot; B2 measures and records.
+   staysail's upper foot; B2 measures and records. *As built at step 5: in "staysails" (with the fore
+   staysail and the main topmast staysail), set by "make all sail" with the fore gaff sail, both
+   drawing; recorded in `TuningNotes.md`, "Step 5".*
 10. **The order with SW-4** for `world/ships.py` while SW-4's rows wait on 84's step 7 (§17, lead item
     3).
 11. **The keel's bottom** (D29(b)): the scale bar's border, as Neuf takes it. On the faint line instead,
     the draught falls 0.5 ft and the lateral plane 5% (Neuf §2.3).
 12. **Her balance:** a great mainsail on a long boom over the stern and a loose fore gaff sail lapping
-    the main. `clr_x_m` tuned against the helm and recorded tuned.
+    the main. `clr_x_m` tuned against the helm and recorded tuned. *As built at step 5: +0.3 to +2.0,
+    balanced close-hauled in 15 kn (§2.1, §9).*
+    *After the reviews of 2026-11-07: +0.1, the jib's centre mended; +1.1° close-hauled and +0.8° abeam (§2.1).*
 13. **The `nations:` block** carries rows not yet read (the letters of marque, the minor powers'
     peaces); named open, not carried as checked.
 14. **The quarter bill's judgement figures** (trimmers, small arms, boarders) and the guns' places
     (the 6s at the bow, Adye's 8-ft 6-pdr, the two aftmost ports empty): `Quarters.beat` measures the
     first; the owner's eye the second.
 15. **The pair check before SW-2b.2 lands:** run in scratch against *Lynx*'s lines, and re-run when the
-    test lands.
+    test lands. *As built at step 5: SW-2b.2 in, the check's own test runs over her file; her nearest
+    pair the two schooners at 10.7, 10.4 and 5.4 px, the brigs at 10.6, 10.8 and 9.1, against 4.*
 16. **Byte identity on the build machine** (Indf risk 4): the module rounds early.
 17. **The far ship's length** (package 74's, booked): `combat/far.py:111` reads every far ship's length
     as 0.0, hers too.
@@ -1772,9 +2216,17 @@ B6's test, not a truth (Build decision 27).
 
 **Answered by the owner (2026-10-29).**
 - **Her best speed:** "Agreed, don't worry about tuning for best speed running." Held to her
-  accounts' band wherever the engine puts it, as proposed; not tuned for running.
+  accounts' band wherever the engine puts it, as proposed; not tuned for running. *As built at step
+  5: 12.27 kn in a strong breeze with the wind abeam, 9.4 dead before it under plain sail and 10.4
+  with her studding sails set (the frigate-36 11.6, 9.2 and 10.8); close-hauled 6.6 and 7.4 kn at 60°
+  and 70° in a moderate breeze against the frigate's 4.3 and 6.1; 7-193 pins the band and the
+  pointing (§9's As built).*
+  *After the reviews of 2026-11-07: 12.22 kn abeam in a strong breeze; 6.5 and 7.3 kn at 60° and 70° in a
+  moderate breeze.*
 - **The fore course and the fore gaff sail together in plain sail:** "Reasonable to start."
-  Both, as proposed, open to a later look once she sails.
+  Both, as proposed, open to a later look once she sails. *As built at step 5: the gaff
+  sail worth 0.8 kn at 60° off in a moderate breeze and half a knot at her best, the course nothing
+  close-hauled and 0.3-0.5 kn off the wind (`docs/dev/TuningNotes.md`, "Step 5").*
 - **Her officers from Cobb's account:** "Fine by me." As proposed.
 - **Her judgement figures:** "Agreed." As proposed.
 
@@ -1819,7 +2271,8 @@ B6's test, not a truth (Build decision 27).
 
 **For the lead:**
 
-1. **D10(a)'s key** (§12.1 item 1, §12.2). Proposed: one mast key, `schooner_mast: true` on her main
+1. *Superseded by the lead's ruling of 2026-11-06 on §12.2a (no key; the rule built at B3.4).*
+   **D10(a)'s key** (§12.1 item 1, §12.2). Proposed: one mast key, `schooner_mast: true` on her main
    ("an opt-in key whose yards the handling ignores"), read through `Ship.on_schooner_mast` at Ext
    §4.2's places 1 and 3 only; place 2 left, so her main yards are after yards that swing at "mainsail
    haul" and are braced by every brace order; the two findings of §12.2 item 8 measured and reported
