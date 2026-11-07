@@ -1,0 +1,11 @@
+# FreeSail: the United States telegraphic dictionary (spec M7 §3; package 76;
+# docs/design/Design-Signals.md). There is none: Barry's book (1800) has no words, only
+# numbered signals, and no American dictionary of Popham's kind is known for the navy of 1805.
+# A ship of the United States ordered `make the telegraphic signal: ...` is refused in words,
+# as a French or a Spanish one is. The file is kept so that every root has the same files.
+
+source: "no American telegraphic dictionary in 1805: Barry 1800 has none"
+made: false
+telegraph_flag: false
+alphabet: {}
+words: {}

@@ -535,6 +535,7 @@ class Lookout:
         lines.extend(self._closing(found, heading, minute))
         lines.extend(self._land_ahead(world, pos, found, heading))
         self._tidy_signals(world)
+        self._refresh_flags(world)
         lines.extend(self._sails(world, found, fresh_ids, heading))
         if self._had_land and not land_now and self._looked:
             lines.append(
@@ -701,7 +702,9 @@ class Lookout:
             elif level > said:
                 self._sail_said[fid] = level
                 self._sail_known[fid] = v.words_at(level)
-                out.append(self._made_out_line(v, s, level, words, relative, glass=False))
+                out.append(
+                    self._made_out_line(v, s, level, words, relative, glass=False, world=world)
+                )
             seen[fid] = f"{_head(self._sail_word(v, level))} {relative}"
             glass = self._glass_line(world, v, s, level, relative)
             if glass is not None:
@@ -798,6 +801,14 @@ class Lookout:
         from freesail.world import signals as S
 
         locker.tidy(int(world.clock.tick), S.books_for(world).flies_s)
+
+    @staticmethod
+    def _refresh_flags(world: Any) -> None:
+        """What flies where on the ship (package 76, item 8): the locker's list set from the
+        nation's colours.yaml once a minute with the look (`flags.refresh_world`)."""
+        from freesail.world.flags import refresh_world
+
+        refresh_world(world)
 
     def _colours_changed(
         self, v: Any, fid: str, level: int
@@ -973,7 +984,14 @@ class Lookout:
         return "the sail"
 
     def _made_out_line(
-        self, v: Any, s: Sighting, level: int, words: str, relative: str, glass: bool
+        self,
+        v: Any,
+        s: Sighting,
+        level: int,
+        words: str,
+        relative: str,
+        glass: bool,
+        world: Any = None,
     ) -> tuple[Severity, str, str, dict[str, Any]]:
         who = self._sail_word(v, level - 1 if level > 1 else 0)
         shown = v.nation_shown  # package 71: the colours shown, false or true
@@ -982,18 +1000,20 @@ class Lookout:
         # out gives her relative bearing, her compass bearing and the course she stands
         point = units.point_name(math.radians(s.bearing_deg))
         where = f"{relative}, bearing {point}"
+        # package 76 (item 8): what flies beyond her ensign, where her colours are said
+        flags = _flags_said(world, v) if colours else ""
         if glass:
-            text = f"The glass aloft makes out {who} {where}: {words}."
+            text = f"The glass aloft makes out {who} {where}: {words}{flags}."
         elif level == 1:
             text = f"{_head(who)} {where}, is {words}."
         elif level == 2:
             text = (
-                f"{_head(who)} {where}, {v.course_words()}, shows {v.colours_words()}."
+                f"{_head(who)} {where}, {v.course_words()}, shows {v.colours_words()}{flags}."
                 if colours
                 else (f"{_head(who)} {where}, {v.course_words()}, is {v.colours_words()}.")
             )
         else:
-            text = f"{_head(who)} {where}, is {words}."
+            text = f"{_head(who)} {where}, is {words}{flags}."
         data = {
             "id": v.id,
             "level": level,
@@ -1039,7 +1059,9 @@ class Lookout:
                 f"below the horizon, distant {estimate_words(s.judged_m)}."
             )
             return text, {"id": v.id, "level": 0, "colours": False, "glass": True}
-        _, _, text, data = self._made_out_line(v, s, level, words, relative, glass=True)
+        _, _, text, data = self._made_out_line(
+            v, s, level, words, relative, glass=True, world=world
+        )
         return text, data
 
     def strangers(self, world: Any, heading_rad: float) -> dict[str, Any]:
@@ -1062,7 +1084,7 @@ class Lookout:
                 # the course and the colours after the bearing: what has been made out
                 detail = ": " + v.course_words()
                 if level >= 2:
-                    detail += "; " + v.colours_words()
+                    detail += "; " + v.colours_words() + _flags_said(world, v)
             items.append(
                 {
                     "id": s.feature.modern,
@@ -1859,6 +1881,18 @@ def vessel_in_sight(world: Any, words: str, vessels: Any = None) -> Any:
 
 def _head(name: str) -> str:
     return name[:1].upper() + name[1:]
+
+
+def _flags_said(world: Any, v: Any) -> str:
+    """'; she wears a pendant at the main: a man-of-war', after her colours where the
+    colours' line already falls (package 76, item 8; `flags.vessel_flies_words`); '' when
+    she wears her ensign alone, or for a body that is no far vessel."""
+    if world is None or not hasattr(v, "brain"):
+        return ""
+    from freesail.world.flags import vessel_flies_words
+
+    said = vessel_flies_words(world, v)
+    return f"; {said}" if said else ""
 
 
 def _marks() -> Any:

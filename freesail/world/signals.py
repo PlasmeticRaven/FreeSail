@@ -197,6 +197,10 @@ class Books:
     # the dictionary's words by every form its printed entries give ('Expect-ed-ing-ation':
     # expect, expected, expecting, expectation), to the entry's number (package 76)
     forms: dict[str, int] = field(default_factory=dict)
+    # how a numbered signal is hoisted (package 76): 'numerary', a flag a figure (the British
+    # book: No. 245 three flags), or 'table', two flags, the upper and the lower, read as a
+    # cell of a square table whatever its number (du Pavillon's, Mazarredo's)
+    hoist_form: str = "numerary"
 
     # -- finding an entry --------------------------------------------------------------
 
@@ -440,7 +444,18 @@ def load_books(root: str = "basic", base: str | None = None) -> Books:
         carried_by=tuple(str(r) for r in (private.get("carried_by") or _ROLES_WITH_TABLE)),
         answer_wait_s=int(private.get("answer_wait_s", 300)),
         forms=word_forms(words),
+        hoist_form=_hoist_form(head, folder),
     )
+
+
+HOIST_FORMS = ("numerary", "table")
+
+
+def _hoist_form(head: dict[str, Any], folder: Path) -> str:
+    form = str(head.get("hoist_form") or "numerary")
+    if form not in HOIST_FORMS:
+        raise BookFileError(f"{folder}/book.yaml: hoist_form is one of {HOIST_FORMS}, not {form!r}")
+    return form
 
 
 def roots() -> list[str]:
@@ -638,6 +653,10 @@ class Hoist:
     words_made: list[str] = field(default_factory=list)  # a telegraphic sentence's hoists
     serial: int = 0
     complete_at: int | None = None  # a telegraphic sentence's last hoist up; else breaks_out
+    form: str = "numerary"  # the book's hoist_form: how the flags look to a lookout without it
+    # package 76 (item 8): a private challenge made in a named nation's form (the *Java*'s
+    # move), answered only by a ship of that nation; '' for 71's own challenge, as before
+    form_nation: str = ""
 
     @property
     def done_at(self) -> int:
@@ -672,6 +691,9 @@ class Hoist:
         if self.book == "telegraphic":
             return "the telegraph flag over a hoist of flags"
         if self.book in ("numerary", "convoy"):
+            if self.form == "table":
+                # two flags a signal, the upper and the lower, whatever the cell's number
+                return f"{_count(2 * max(1, len(self.numbers)))} flags at the main"
             n = len(str(self.numbers[0])) if self.numbers else 1
             return f"{_count(n)} flag{'s' if n > 1 else ''} at the main"
         if self.book in ("private", "reply"):
@@ -691,6 +713,9 @@ class Hoist:
             "to": self.to,
             "down": self.down,
             "answered_by": sorted(self.answered_by),
+            # written only where it is not the numerary's, so that no British or basic
+            # signal's record changes with the field (package 76)
+            **({"form": self.form} if self.form != "numerary" else {}),
         }
 
 
@@ -722,6 +747,12 @@ class Locker:
     serial: int = 0
     # what other ships' signals were read (for `the signals` reading), newest last
     log: list[dict[str, Any]] = field(default_factory=list)
+    # package 76 (item 8): what flies where, as the viewer reads it (`{place, name, words,
+    # drawing}`), set by the rules from the nation's colours.yaml (`freesail/world/flags.py`);
+    # None until set, when the viewer serves its own plain ensign; and the flags ordered
+    # beside the file's (`hoist the broad pendant`, `... a second ensign`, `... the jack`)
+    flies: list[dict[str, Any]] | None = None
+    ordered_flags: list[str] = field(default_factory=list)
 
     def next_serial(self) -> int:
         self.serial += 1
@@ -869,6 +900,7 @@ def make_hoist(
         in_succession=entry.in_succession,
         root=books.root,
         to=to,
+        form=books.hoist_form,
     )
     return locker.hoist(h)
 
@@ -884,6 +916,7 @@ def make_private(
     to: str | None = None,
     wrong: str = "",
     at_once: bool = False,
+    form_nation: str = "",
 ) -> Hoist:
     shown = wrong or (table.reply(light) if reply else table.challenge(light))
     h = Hoist(
@@ -895,6 +928,7 @@ def make_private(
         shown=shown,
         root=books.root,
         to=to,
+        form_nation=form_nation,
     )
     return locker.hoist(h)
 
@@ -1428,6 +1462,40 @@ def vessel_table(world: Any, vessel: Any) -> PrivateTable | None:
         return None
     now = world.clock.ship_time
     return private_table(books, str(vessel.nation), now.year, now.month, root_seed(world))
+
+
+def held_tables(world: Any) -> dict[str, PrivateTable]:
+    """The private tables this World's ship holds this month, by nation (package 76, item 8,
+    the *Java*'s move): her own nation's where she carries it (`table_of`), and the table of
+    each book in her library (`held_books`: an ally's carried by the scenario's papers, a
+    captured one by 74's road; a root or the id of a nation standing on basic), each the same
+    draw the ships of that nation hold."""
+    out: dict[str, PrivateTable] = {}
+    own = table_of(world)
+    if own is not None:
+        out[own.nation] = own
+    nations = getattr(world, "nations", None)
+    now = world.clock.ship_time
+    for held in held_books(world):
+        # a root ('spain') or a nation standing on basic ('portugal'): her books and her name
+        if held in roots():
+            books = load_books(held)
+            nation = books.nation
+        else:
+            try:
+                nation = nations.get(held).id if nations is not None else ""
+            except KeyError:
+                continue
+            books = books_for_nation(nations, nation)
+        if not nation or nation in out or nation == "basic":
+            continue
+        table = private_table(books, nation, now.year, now.month, root_seed(world))
+        try:
+            table.adjective = nations.get(nation).adjective if nations is not None else ""
+        except KeyError:
+            table.adjective = ""
+        out[nation] = table
+    return out
 
 
 def far_order_words(world: Any, vessel: Any, text: str) -> tuple[str, str, dict[str, Any]] | None:

@@ -1,0 +1,38 @@
+# FreeSail: the United States signal books' declaration (spec M7 §3; package 76;
+# docs/design/Design-Signals.md). The same shape as data/signals/britain/book.yaml (its head
+# says the fields).
+#
+# The sources, laid under docs/references/signals/ and read on the page (the research pass is
+# in docs/dev/TuningNotes.md, "Package 76"). John Barry's *A Set of Signals presented to the
+# Navy of the United States of America* (Norfolk, 1800): its "Essay on Signals", the signals
+# by day and night numbered in the order of their first words, each made by a flag a figure,
+# the units uppermost (his example: No. 214 by a red flag for the unit, a blue for the tens, a
+# yellow for the hundreds, in "the original disposition" of the flags' values, which may be
+# changed), the same numbers by night in lanterns on frames. Preble's *History of the Flag of
+# the United States* (Boston, 1894) tells the squadron's books of 1803 to 1804 (Morris's,
+# continued by Preble before Tripoli): twelve square flags and three pendants, the ten
+# numerals, a cornet that makes a hoist a bare number or the answer to a question, an
+# answering flag, three triangles as repeaters, and a flag called the diptote that postpones
+# a signal (and doubles the value of the flags above it, so that a ship with one set of flags
+# may make any number); the night signals by lanterns. The numbers are Barry's, read on the
+# page; the 1803 books' numbers are in manuscript and not laid out, so whether they kept
+# Barry's is not known. No telegraphic dictionary.
+
+nation: united-states
+system: well-built           # Barry's numbers of 1800; the meanings the game wants and his pages lack made
+sources:
+  - "Barry, A Set of Signals presented to the Navy of the United States of America, Norfolk 1800 (the numbers, the flags a figure, the lanterns by night)"
+  - "Preble, History of the Flag of the United States, Boston 1894 (the squadron's books of 1803 to 1804: the flags, the cornet, the repeaters, the diptote, the night lanterns; the convoy signals of 1800 named)"
+flags:
+  numerals: 10               # the ten numerals, 1 to 0 (the squadron's books of 1803 to 1804)
+  substitute: true           # the three triangles, the repeaters
+  cornet: true               # a hoist under the cornet a bare number, or the answer to a question
+  answering_pennant: true    # the answering flag
+  diptote: true              # the execution postponed; the value of the flags above it doubled
+  annul: true                # Barry's annulling signal, No. 153
+  telegraph: false           # no dictionary
+hoist_s: 60
+read_s: 60
+read_nm: 2.0
+glass_factor: 1.5
+flies_s: 1800

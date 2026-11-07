@@ -1,0 +1,32 @@
+# FreeSail: the form of the Spanish private signals, the 'señales de reconocimiento' (spec M7
+# §2; package 76; docs/design/Design-Signals.md). The form is data/signals/britain/private.yaml's
+# (its head says the fields and the draw). Mazarredo's book (Cádiz 1781, the third edition;
+# docs/references/signals/) names two kinds in its general signals of the chase: the squadron's
+# own particular signals of recognition, which the chasers make to vessels they take to be of
+# the squadron (No. 144), and the general signals of recognition, which they make to vessels
+# they take to be ours or allied men of war (No. 145); and it bids them make none but to
+# answer (No. 146). The tables themselves are not in the book (they were given apart, as the
+# values of the flags were, "en pliego separado") and are lost: the game's are MADE under the
+# seed, and in basic's form word for word (the templates and the pools), so that Spain turned
+# from basic to her own root changes nothing of her private signal's draw (the brief's truth;
+# the draw is 71's, seeded by the world, the nation, the year and the month).
+
+source: "the señales de reconocimiento as Mazarredo 1781 names them (the general signals, Nos. 144 to 146); the form basic's, so that the draw stands; the tables made under the seed"
+made: true
+changes: monthly
+day:
+  challenge: "a {flag} at the {place}"
+  reply: "a {flag} at the {place}, with the ensign at the {ensign_place}"
+  pools:
+    flag: ["blue flag", "red flag", "white flag", "yellow flag", "blue and yellow flag", "red and white flag", "blue pendant", "red pendant", "white pendant", "chequered flag"]
+    place: ["main topmast head", "fore topmast head", "mizen peak", "fore yardarm", "main yardarm", "ensign staff"]
+    ensign_place: ["mizen peak", "ensign staff", "main topmast head"]
+night:
+  challenge: "{n} lights {arrangement} at the {place}"
+  reply: "{n} lights {arrangement} at the {place}, and a false fire"
+  pools:
+    n: ["one", "two", "three"]
+    arrangement: ["horizontal", "one over the other", "in a triangle"]
+    place: ["mizen peak", "ensign staff", "main topmast head", "fore topmast head"]
+carried_by: [kings-ship, cruiser, commodore]
+answer_wait_s: 300

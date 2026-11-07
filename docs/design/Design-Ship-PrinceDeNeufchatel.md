@@ -1424,7 +1424,8 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   pickle and checkpoint is as it was (tested). **Judgement:** a lug's yard and a lateen yard are no
   braced yard (`Spar.is_yard`), so neither makes a mast one with yards nor stands as its lower yard.
 - **Read at places 1 and 3 alone** (`_masts_with_yards` skips such yards; `_square_rigged` counts
-  none); `working_yards`, place 2, `light_sails_forward_of`, trim and "shorten sail" and the physics
+  none; read since by the lead's rulings 1 and 3, below, for the tack's after swing and at place 2
+  with no mast carrying yards); `working_yards`, place 2, `light_sails_forward_of`, trim and "shorten sail" and the physics
   untouched (§12.2 items 5 and 6). No committed file trips it (the guard on the fifteen files, the
   boats among them), so no row of the golden table moved, nor the razee's and the 64's.
 - **The classing in memory**, through the golden table's gates, old beside new:
@@ -1497,6 +1498,54 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   the key outside §12 (decision 13, §0's stage, §4.1, §4.5's `main.mast` line, §4.8, §13's road, §14
   and §17 item 1), and her main topgallant's groups (§4.5, §4.8), which "shorten sail" never reaches
   ("royals" would take it in with the third line of that list).
+- **The lead's ruling 1, built (2026-11-07; the tuning notes, "The lead's four rulings, built"):** place
+  2's timing after Luce 1884 p. 417, the short after swing: a schooner's light main yards, every after
+  yard being one, are swung at "mainsail haul" over `light_after_swing_s` (20 s, judgement, the engine's
+  `abox_s` for a fore-and-after's light yard) in place of `brace_s`'s 45, before the head yards and never
+  with them; trial B tacks in 151 s (219 s before), the main topgallant in 172 s set and 164 s furled
+  (232 s and 230 s), trial A in 149 s as before, and the brig's and the frigate's after yards swing as
+  before (the short swing for them, measured and not built, takes the frigate under five minutes: the
+  lead's).
+- **The lead's ruling 2, built (2026-11-07; the tuning notes, as above):** the word by Luce 1884
+  p. 417: the after yards of every ship whose main course is not set are hauled by "Main-topsail
+  haul", "Rise tacks and sheets. Mainsail haul." kept for a main course set, and "Rise tacks and
+  sheets" said only while a course is set (`TackScript._haul_words`). Her main crossing no course,
+  trial B and the main topgallant say "Rise tacks and sheets. Main-topsail haul." at 32 s, their
+  fore course's tacks and sheets risen with it; every other line and every time as before, no whole
+  log moved, and one digest (gate 5b's thick passage, the frigate put about with both courses
+  hauled up) re-pinned old beside new. Her main topgallant's yards are hauled by "Main-topsail haul"
+  though she crosses no main topsail, as ruled; the fore's rise named apart before "let go and
+  haul", as Luce has it when the mainsail is hauled up, is a lean for the lead, not built.
+- **The lead's ruling 3, built (2026-11-07; the tuning notes, as above):** place 2 with no mast
+  carrying yards: with every fore yard shot away her main's yards are her after yards
+  (`head_and_after_yards`), no longer left standing, and she has no head yards. The tack hauls them
+  by "Main-topsail haul." in the short after swing, and she is tacked full on the new tack: trial B
+  in 164 s (289 s before, her main topsail aback when tacked), the main topgallant's rig in 186 s
+  (350 s before, fallen back on the old tack when "Tacked" was said). The wear braces them round,
+  468 s and 483 s (152 s and 149 s before, when there were no yards to wait on), and getting under way
+  braces them as she is cast; the heave-to and the box-haul are as before. B3.4's pin (in neither
+  list) moved old beside new; no file's log, digest or truth moved.
+- **The lead's ruling 4, built (2026-11-07; the tuning notes, as above):** the gale's reduction
+  (`orders/storm.py`, `_after_sail_lines`) keeps the courses' reef at the topsails' second reef
+  for any rig with topsails (Luce 1884 p. 476; Cobb p. 95, the double-reefed foresail), and only
+  the after take-ins, the aftermost course's and the driver's, are a square-rigged ship's. In the
+  gale of the reviews trial B and the main topgallant reef their fore course once again (at
+  4,864 s and 4,877 s, reefed at 5,281 s and 5,358 s, the seconds they reefed it at before the
+  rule), trial A hers (4,854 s), the mainsail kept set and whole, and all three lie a-try as before
+  under the fore topsail and the staysails; a course with no reef bands is left as it is and is
+  not named, as before the ruling (named at the build, the order saying why; taken out at the
+  review, the ruling not naming it). No file moved: the cutter, the smack and the two schooners as
+  filed sail that gale line for line, and the four whole logs are as at SW-4. Cobb's closely reefed
+  mainsail is not built: no line of "shorten sail" reefs a fore-and-after's gaff mainsail (the
+  lead's).
+- **The review's mends (2026-11-07; the tuning notes, as above):** the word at the haul reads the
+  main course from her own "courses" group, on the after yards' foremost mast, where it read the
+  square courses alone: the bilander's settee is her main course to it, and as it is lowered at
+  "helm's a-lee" to be dipped, her after yards are hauled by "Rise tacks and sheets. Main-topsail
+  haul." as ruling 2 made it, no log of hers or of any rig moving with the mend; the gale's
+  reduction names no course without reef bands (above); trial B's two tacks of rulings 1 and 3
+  are sailed in the fast tier, being under its threshold. The fore course's rise said with "Main-topsail
+  haul" when her mainsail is not set stays as built, the lead's (ruling 2's lean (a)).
 
 ### 12.3 What the viewer builder (B5) is asked
 

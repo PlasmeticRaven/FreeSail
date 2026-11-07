@@ -21,6 +21,14 @@
     show no lights                  darken ship
     keep the fog signals            the bell at anchor, the gun or the drum under way, in fog
     cease the fog signals
+    hoist the broad pendant         a commodore's broad pendant at the main (package 76)
+    hoist a second ensign at the    the ensigns doubled, the second at the main topgallant
+      main                          masthead, as in action
+    hoist the jack                  the jack at the jackstaff at anchor, at the fore under way
+    make the Spanish private        another nation's challenge, where the ship holds that
+      signal                        nation's table (a captured book, an ally's papers)
+    make the private signals in     every table held, one after another, three minutes a
+      succession                    hoist for the answer (the Java's move, 1812)
     hail her / hail the brig        the speaking trumpet within hail: the standard hail, or
     hail the Nancy: what ship is    the words given, answered by her body (`world.hail`);
     hail the brig what ship is that the colon optional, the sail told from the words
@@ -63,6 +71,13 @@ SIGNAL_VERBS: tuple[str, ...] = (
     "keep the fog signals",
     "cease the fog signals",
     "hail",
+    # package 76 (item 8): the flags of command and identity, and the private signal in
+    # another nation's form
+    "hoist the broad pendant",
+    "hoist a second ensign",
+    "hoist the jack",
+    "make another nation's private signal",
+    "make the private signals in succession",
 )
 
 _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -157,6 +172,40 @@ _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
         "cease the fog signals",
         re.compile(r"^(?:cease|stop|belay)\s+(?:the\s+)?(?:fog signals?|bell)$"),
     ),
+    # package 76 (item 8): appended, so that the forms above keep their places
+    (
+        "hoist the broad pendant",
+        re.compile(
+            r"^(?:hoist|wear|break out|fly|show)\s+(?:the|a|his|my|our)\s+"
+            r"(?:commodore's\s+)?broad (?:pendant|pennant)$"
+        ),
+    ),
+    (
+        "hoist a second ensign",
+        re.compile(
+            r"^(?:hoist|show|run up|wear)\s+(?:a\s+)?(?:second|another)\s+(?:ensign|colours)"
+            r"(?:\s+at\s+the\s+main(?:\s+topgallant\s+mast-?head)?)?$|"
+            r"^double the (?:ensigns|colours)$"
+        ),
+    ),
+    (
+        "hoist the jack",
+        re.compile(r"^(?:hoist|show|run up|wear)\s+(?:the|a|our)\s+(?:union\s+)?jack$"),
+    ),
+    (
+        "make another nation's private signal",
+        re.compile(
+            r"^(?:make|show|hoist)\s+the\s+(?P<nation>[a-z]+(?:\s+[a-z]+)?)\s+private signal"
+            r"(?:\s+to\s+(?P<to>.+))?$"
+        ),
+    ),
+    (
+        "make the private signals in succession",
+        re.compile(
+            r"^(?:make|show|hoist)\s+the\s+private signals\s+in\s+succession"
+            r"(?:\s+to\s+(?P<to>.+))?$"
+        ),
+    ),
 )
 # The addressee of a hail: 'her', a name, 'the <sail>' or 'a <sail>'; the words after a colon
 # or a comma, or after a space with no colon (the colon optional: 'hail the brig what ship
@@ -214,6 +263,10 @@ def recognises(text: str, ship: Any = None) -> str | None:
             if verb == "hoist false colours" and not _nation_words(
                 ship, pat.match(low).group("nation")
             ):
+                continue
+            if verb == "make another nation's private signal" and _nation_words(
+                ship, pat.match(low).group("nation")
+            ) in (None, "enemy"):
                 continue
             return verb
     m = _HAIL.match(s) or _SAY_TO.match(s)
@@ -389,7 +442,34 @@ def handle(ship: Any, text: str) -> Result:
     )
 
 
+# The orders after which what flies where is set again at once (package 76, item 8)
+_FLAG_VERBS = (
+    "hoist the colours",
+    "hoist false colours",
+    "haul down the colours",
+    "hoist the ensign union down",
+    "hoist the broad pendant",
+    "hoist a second ensign",
+    "hoist the jack",
+)
+
+
 def execute(ship: Any, order: Order) -> Result:
+    result = _execute(ship, order)
+    if order.verb in _FLAG_VERBS:
+        from freesail.world.flags import refresh_world
+
+        world = world_of(ship)
+        if world is not None:
+            refresh_world(world)
+    return result
+
+
+def _form_of(verb: str) -> re.Pattern[str]:
+    return next(pat for v, pat in _FORMS if v == verb)
+
+
+def _execute(ship: Any, order: Order) -> Result:
     from freesail.world import signals as S
 
     world = world_of(ship)
@@ -454,6 +534,16 @@ def execute(ship: Any, order: Order) -> Result:
             + "; she may be seen at the range a light carries by night."
         )
         return "lights.changed", text, {"verb": verb, "level": 1, "lights": kind}
+    if verb in ("hoist the broad pendant", "hoist a second ensign", "hoist the jack"):
+        return _hoist_flag(world, locker, verb)
+    if verb == "make another nation's private signal":
+        m = _form_of(verb).match(low)
+        nid = _nation_words(world.ship, m.group("nation")) if m else None
+        return _private_of(world, locker, tick, [nid or ""], m.group("to") if m else None)
+    if verb == "make the private signals in succession":
+        m = _form_of(verb).match(low)
+        held = list(S.held_tables(world))
+        return _private_of(world, locker, tick, held, m.group("to") if m else None)
     if verb == "show no lights":
         locker.lights = "none"
         text = "No lights shown: the lanterns doused, the ship darkened."
@@ -806,6 +896,7 @@ def _repeat(world: Any, locker: Any, tick: int) -> Result:
         in_succession=h.in_succession,
         root=h.root,
         to=h.to,
+        form=h.form,
     )
     locker.hoist(copy)
     line = _start_hoist(world, locker, copy, 1, copy.words())
@@ -855,6 +946,124 @@ def _private(
         text,
         {"verb": "answer the private signal" if reply else "show the private signal", "level": 1},
     )
+
+
+def _hoist_flag(world: Any, locker: Any, verb: str) -> Result:
+    """A flag of command or identity hoisted beside the colours (package 76, item 8): the
+    broad pendant at the main, a second ensign at the main topgallant masthead, the jack at
+    the jackstaff at anchor and at the fore under way; kept in the locker until the colours
+    come down."""
+    from freesail.world.flags import ORDERED, file_for_nation
+
+    c = locker.colours
+    if c.state in ("none", "struck"):
+        raise OrderError(
+            "Her colours are down: no flag of hers flies until they are hoisted ('hoist the "
+            "colours')."
+        )
+    key = {"hoist the broad pendant": "broad pendant", "hoist a second ensign": "second ensign"}
+    key = key.get(verb, "jack")
+    kind = ORDERED[key][0]
+    f = file_for_nation(world.nations, c.nation)
+    flag = f.first_of(kind)
+    if flag is None:
+        raise OrderError(f"The {kind} of her nation is not in her locker: she has none to hoist.")
+    ordered = list(getattr(locker, "ordered_flags", None) or [])
+    if key in ordered:
+        return (
+            "flags.changed",
+            f"The {kind} is flying already.",
+            {"verb": verb, "level": 1, "flag": key},
+        )
+    ordered.append(key)
+    locker.ordered_flags = ordered
+    where = {
+        "broad pendant": "at the main",
+        "second ensign": "at the main topgallant masthead, the ensigns doubled",
+        "jack": "at the jackstaff" if getattr(world, "at_anchor", False) else "at the fore",
+    }[key]
+    text = f"{_cap_first(flag.words)} hoisted {where}."
+    return "flags.changed", text, {"verb": verb, "level": 1, "flag": key, "notable": True}
+
+
+def _cap_first(words: str) -> str:
+    return words[:1].upper() + words[1:]
+
+
+def _private_of(
+    world: Any, locker: Any, tick: int, wanted: list[str], to_words: str | None
+) -> Result:
+    """The private signal in another nation's form, or every table held in succession (package
+    76, item 8; the *Java*'s move of 1812): each a challenge in that nation's form from the
+    table the ship holds, refused in words for a table she does not; the stranger's answer
+    judged against the table of the challenge, three minutes a hoist in succession
+    (`signalling._judge_challenges`)."""
+    from freesail.world import signals as S
+
+    held = S.held_tables(world)
+    nations = world.nations
+
+    def adjective(nid: str) -> str:
+        try:
+            return nations.get(nid).adjective
+        except KeyError:
+            return nid or "that nation's"
+
+    if not wanted:
+        raise OrderError(
+            "There is no private table aboard: the tables are issued to the King's ships under "
+            "seal, and another nation's is held only from a captured book or an ally's papers."
+        )
+    for nid in wanted:
+        if nid not in held:
+            have = ", ".join(adjective(n) for n in held) or "none"
+            adj = adjective(nid)
+            raise OrderError(
+                f"There is no {adj} table aboard: the {adj} private signal is made only from "
+                "that nation's table, a captured book or an ally's papers (the tables held: "
+                f"{have})."
+            )
+    if to_words:
+        v = world.vessels.find(to_words.strip())
+        if v is None:
+            raise OrderError(f"Nothing in sight answers to '{to_words}'.")
+        to = str(v.id)
+    else:
+        to = _nearest_stranger_id(world)
+    if to is None:
+        raise OrderError("No strange sail in sight to make the private signal to.")
+    first = wanted[0]
+    locker.challenges[str(to)] = {
+        "tick": tick,
+        "verdict": None,
+        "nation": first,
+        "queue": list(wanted[1:]),
+        "made": [first],
+    }
+    books = S.books_for_nation(nations, first)
+    light = S.light_now(world)
+    hoist = S.make_private(
+        locker,
+        books,
+        held[first],
+        light,
+        S.own_id(world),
+        tick,
+        reply=False,
+        to=to,
+        form_nation=first,
+    )
+    what = f"the {adjective(first)} private signal"
+    line = _start_hoist(world, locker, hoist, 1, what)
+    rest = ", ".join(adjective(n) for n in wanted[1:])
+    then = f"; then {rest} in succession, three minutes a hoist for the answer" if rest else ""
+    text = f"{line.rstrip('.')} ({hoist.shown}{then})."
+    verb = (
+        "make the private signals in succession"
+        if len(wanted) > 1
+        else ("make another nation's private signal")
+    )
+    return "signal.ordered", text, {"verb": verb, "level": 1, "tables": list(wanted)}
 
 
 def _nearest_stranger_id(world: Any) -> str | None:
