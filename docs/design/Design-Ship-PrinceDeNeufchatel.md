@@ -1285,6 +1285,28 @@ stage-0 agent lays, each item checked by an agent that did not write it (Build �
    8f30be9 that change is not in (`tests/test_scenarios_75.py` does not exist). So item 2 waits for
    B6's D48 change to be merged, or for the lead's word that item 2 goes first and B6 merges onto
    it (§17, lead item 4). Items 1 and 3 do not wait on it.
+
+   *As built (stage 0b, 2026-11-07; the lead's ruling on §17, item 4: "a parsed and kept block
+   that nothing reads until her scenario", B6's D48 change merging onto it):* `world/scenarios.py`
+   reads the block (`_nations_block`) and refuses it in words where it is not a mapping of the
+   four keys or lacks one, a day is no day, a war is not between two nations of the table, is
+   between a nation and herself, is listed twice or begins after `as_of`, a nation issuing
+   letters is no nation, is listed twice or is at war with nobody in the block, or the source is
+   not in words; each nation by its id, name or adjective as `nation:` is, kept by its id, the
+   days as ISO words. **The form, built on the design's lean (for the lead):** `wars` the table's
+   own rows (`{between: [a, b], since, source}`), each war in force once and every peace an
+   absence; `letters_of_marque` the list of the nations that issue them, the rest issuing none
+   (the table's `letters_of_marque` is by nation; the enemy a letter runs against is read from
+   the wars); all four keys wanted, an empty list saying none. It is kept on the World's
+   `Scenario` (`Scenario.nations`), so that a save holds it and the file is written again with
+   it (the writer puts it after `nation:` under its own comment), and left out of the save's
+   dict and the checkpoint's pickled state when None (`Scenario.__getstate__`). **The World's
+   replacement of the table's wars and letters is not built** (`core/world.py`'s table load
+   untouched): a World made from a scenario with the block has data/nations.yaml's wars, as
+   `tests/test_scenario_nations.py` pins. **Checked:** no shipped scenario carries the block;
+   every one of the 41 loads, writes again and saves as before, and its `Scenario`'s pickle,
+   dict and author's lines and four Worlds' checkpoints and saves are byte-identical before and
+   after (measured in scratch with the rules' fingerprint held, which digests the code itself).
 3. **`MODULE_FILES["ships.neufchatel"] = ["hermaphrodite-brig.yaml"]`** in `tests/test_profile.py`
    (`:502-507`). The hook test asserts that each built module writes its own files and a stub none
    (`:525-532`), so this row is committed directly before her first-file commit at the same

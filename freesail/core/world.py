@@ -266,6 +266,24 @@ class Scenario:
     # "all", the rule off for testing (everyone reads everything, as before the package). A
     # save from before loads with the rule on.
     knowledge: str = "place"
+    # The scenario's own table of the wars and the letters of marque (package 75, the Prince
+    # de Neufchatel's stage 0b; her design §11.2 and §12.1 item 2): `nations: {as_of, wars,
+    # letters_of_marque, source}` in the file, read and validated by `world/scenarios.py`
+    # (`_nations_block`), its days as ISO words and its nations by their ids; None for a
+    # scenario that says nothing, every one shipped. Kept so that a save holds it, and READ BY
+    # NOTHING YET: the World's replacement of the table's wars and letters with these, where
+    # it loads the table (`World.__init__`, `load_nations`), comes with her scenario (B6's).
+    # Left out of the dict and of the pickled state when None, so that every save and every
+    # checkpoint before it reads as it did, byte for byte.
+    nations: dict[str, Any] | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """The scenario's state for the checkpoint, its `nations` only where the file gives
+        the block (package 75), so that a scenario without it is pickled as before."""
+        state = dict(self.__dict__)
+        if state.get("nations") is None:
+            state.pop("nations", None)
+        return state
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -295,6 +313,8 @@ class Scenario:
             d.pop("observed", None)
         if d.get("knowledge", "place") == "place":
             d.pop("knowledge", None)
+        if d.get("nations") is None:
+            d.pop("nations", None)
         return d
 
     @classmethod
