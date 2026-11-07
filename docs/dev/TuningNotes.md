@@ -18616,3 +18616,90 @@ The answers come back as figures with their citation, never as copied text. None
   OCR line 5823) where the brief quotes "a little after 1"; the *Constitution*'s private signal
   came about an hour after the *Java*'s three. Said for the truth's minutes, which do not
   depend on it.
+
+### Step 1: the British books from the page
+
+**The day book (`numerary.yaml`, 171 entries).** 34 stand at the 1799 book's numbers as
+Jackson's editor glossed the hoists in the logs of Copenhagen and Trafalgar (vol. II), each
+entry's source naming the battle and the hour: 13, 14, 16, 39, 50, 58, 62, 63, 66, 72, 76,
+82, 84, 88, 99, 101, 102, 108, 109, 131, 180, 186, 200, 213, 239, 240, 241, 251, 307, 312,
+314, 318, 344, 370 (eight more than the pass first counted: 50, 58, 109, 131, 239, 241, 318,
+370, found when every bracketed gloss was read, not only those after "No."). 137 are the
+builder's own and marked: fifteen of 71's made entries stood on numbers the 1799 book gives
+to other signals (14 "I have soundings" on the 1799 book's "prepare for battle and for
+anchoring with springs", 39 "assist the ships engaged" on "discontinue the engagement", 63
+"prepare to anchor" on "anchor as convenient", 88 "veer more cable" on "make more sail", and
+eleven more) and moved to numbers of their own above 150, each source saying where it stood;
+nine made entries whose meaning the 1799 book carries at a logged number were folded into it
+(71's 36, 38, 57, 58, 70, 71, 83, 98, 132: "discontinue the action" into 39, "make more sail"
+into 88, "make all sail" into 307, the two "keep the wind" signals into 99 and 102, "anchor
+as convenient" into 63, "heave the lead" into 180, "want assistance" into 314, "take
+possession" into 58). Thirteen made entries' meanings are the 1796 book's own signals, its
+number cited (Howe's before 1799): among them **No. 1, "To denote an Enemy in Sight", is No.
+1 in the 1796 book too**, which bears 71's memory out for Howe's numbering; no page of 1799
+gives it, so it stays marked. The other made meanings are in the period's form and were not
+traced to a page one by one, and the file says so. "Prepare to anchor" was the 1799 book's 63
+with the preparative over it (Trafalgar, 12.05); the engine has no preparative, so it keeps a
+number of its own (155), said in its source.
+
+**Taken another way.** The lead's ruling listed No. 19 among the day signals; the log reads
+"answered night signal 19 [want boats to tow]", and the 1799 night book's No. 19 is "Wanting
+the assistance of boats to tow": it is the night book's, and the day book's "want boats to
+tow" is the 1799 book's 318 (Copenhagen).
+
+**The night book (`night_fog.yaml`, `night`: 73 entries).** The 1799 night book read on its
+page images, Nos. 1 to 70 number for number (leaves 24 to 36; leaves 24, 36 and 37 laid in
+this step, the last blank): each signal by its guns (one to seven), its lights (one to four,
+two of them abreast or one over the other as the book draws them) and its rocket or false
+fire. Three meanings the game's orders want and the book lacks by night (discontinue the
+action, the private signal, the negative) stay made with no number. In the presence of an
+enemy the book makes some signals by lights alone in its figures (leaves 38 and 39); the game
+makes them by guns, and the file says so.
+
+**The fog book (`night_fog.yaml`, `fog`: 24 entries).** The 1796 book's fog signals, Nos. 1 to
+18 (leaves 75 and 76): the drums for the starboard tack and the bells for the larboard, a gun
+an hour or a half hour as the admiral keeps or changes his sail, and the guns slow and quick
+for anchoring, weighing, tacking, hauling the wind, wearing, altering course, lying to,
+danger, distress and a ship aground. **The gun counts are written by hand into the printed
+blanks of the copy scanned**, and are taken as written. Six meanings the game's orders want
+and the book lacks in fog (tack in succession, make more sail, shorten sail, fill and make
+sail, enemy in sight, the affirmative) stay made. The 1799 fog book was not found (the 1799
+night book has no fog section).
+
+**The dictionary (`telegraphic.yaml`: 1,444 words).** Popham's 1803 vocabulary as printed,
+the head and its endings ("Expect-ed-ing-ation"), its first part (26 to 999) and second (1000
+to 1999). The Archive's OCR caught about half the lines; each leaf was read again (Tesseract,
+the whole page as one block and each column apart), and a word kept only where its head is an
+English word and its first letter is the one the book's own margin index gives its number:
+1,444 kept, 158 numbers left out (a read that failed those checks), the blanks the book leaves
+for an owner's words not taken (this copy's are filled in by hand). The alphabet confirmed on
+leaf 13 exactly as 71 had it. **The loader gained one field** (`Books.forms`, from
+`signals.word_forms`): every form the printed endings make, joined by the common rules, and a
+head's -s form, since Popham's introduction (p. 7) says "In verbs, the number, person, tense,
+and mood, must be applied to the sense of the sentence" ("expects" is Expect's hoist, 269).
+The twelve hoists of 21 October 1805 come out of the page's dictionary as made: 253 269 863
+261 471 958 220 370, and "duty" spelt 4 21 19 24. The third part (the sentences and places,
+2000 up) is not taken: the engine encodes a sentence word by word.
+
+**The declaration, the convoy and private files.** `book.yaml` names the sources read and
+takes its flags from the 1796 book's leaf 31 (the numerals 1 to 9 and the cypher 0, the
+substitute, the pendant that adds a hundred, the flag of truce: two keys new to its free
+mapping, `hundred_pendant` and `truce`) and Popham's leaf 13. The convoy book keeps every
+number made (its period edition not found; Millan's form and the 1796 fleet book's convoy
+signals named). The private form is unchanged; its custody is cited from the 1806 Regulations
+(a superseded captain hands on "all secret Signals ... of which he is not to take ... any
+copy"; a wrecked one destroys them), which print no table; the draw is 71's, untouched.
+
+**What moved, and the proof.** The fast tier on the step's tree moved one pinned passage:
+truth 7-147, whose fog signal to heave to was 71's made "four guns, bring to"; the page's is
+the 1796 book's No. 14, "To lie to on the starboard tack", six guns slow and two minutes after
+two quick, and the truth now reads those words (its substance unchanged: the signal a gun in
+fog, heard two miles off, answered and obeyed). Proven by the entry: at fcff1b2 with 71's
+`night_fog.yaml` put back alone the unchanged truth passes, and with the page's it fails.
+`tests/test_signals.py` had two assertions of 71's made state, rewritten to the page's and not
+loosened: every night and fog entry was asserted made, now each is made or carries the page's
+number and a source naming its year; the fog signal to tack was "two guns", now the 1796
+book's "three guns, two quick and one slow" (heard as "The brig fires three guns, two quick
+and one slow: to tack."). No log pins a day-book number that moved: the engine's own hoists
+(the squadrons' "enemy in sight", No. 1, unchanged; the convoys' close round the commodore,
+make more sail and anchor, all the convoy book's, unchanged) stand.
