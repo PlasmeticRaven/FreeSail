@@ -18580,3 +18580,32 @@ alone (`movement.person_of_actor`). (7) A far vessel whose plan runs out is done
 sea at the minute's end, which ended the cartel at her own goal's arrival before her errand; her
 minute keeps her on the sea until her persons are landed, and lands them at once where she lies
 in her port's road already.
+
+### Step 4: the far fight on the sleeping hulls (the design's §4)
+
+**Built as designed** (`freesail/combat/far_action.py`, the far brain's `_enemy_within` and the
+`engaging` state's chase leg in `world/brains.py`, the cap's rank in `world/crews.py`, the hook in
+`Vessels.tick`, the far record into the parts at `make_hull` and `_to_full`): the far engaging
+transition by the role files' rows (a ship with guns to fire; the merchantman's `engage_nm: 0`
+never fires one); one round of `far.round_once` every three minutes for a pair of far bodies in
+anger within gun's reach (the longest random shot of her fit), each side's record carried in and
+written back (`killed`, `wounded`, `dismounted`, `holes`, `holes_below`, `sail_cut`, `spars_gone`,
+`morale`, `rounds`, `rounds_fired`, `last_round_tick`), the draws from the World's `far` stream
+opened at the first round; the strike by morale as the cut-out writes it, the captor's `taking
+possession` and the far possession after; the guns heard at the player's ship within twelve miles
+(the flashes to fifteen by night: judgement) once a round; the far ship's reply to an awake hull as
+the fallback where the cap has no room (`FALLBACK_COUNT`); the engagement first among the cap's
+reasons; the toggle `ENABLED`. Truths 7-358 to 7-361 and 7-369.
+
+**The figures found** (seed 7): the French frigate (long eighteens, reach 1,830 m) engages the
+King's cutter (carronades, reach 732 m) twelve miles south of the player; the rounds open at
+seven cables and the cutter, overmatched and evading, strikes after **eleven rounds (33 minutes)**
+with one killed and three wounded by the tables, the frigate untouched (her carronades never
+reached); the guns are heard at the player's ship nine times of the eleven (the pair drifts about
+the twelve-mile reach). **The agreement** (§4.6, truth 7-359): 7-140's near fight of two cutters
+at a cable ends **35 seconds** after the first shot on this tree (fourteen guns as they bear; the
+design measured three minutes from the docstring's band, not the figure), the far rounds of the
+same two **in two rounds, six minutes**: within two rounds and not one, pinned as found, no table
+moved for the agreement's sake; the far fight cannot end before its first round at 180 s and is
+the coarser by design (rule 5). **The pins moved by the wiring**: measured below with the toggle at
+the step's boundary (the passages 7-152, 7-153, 7-154, 7-159, 7-160 and the far-side files' tests).

@@ -74,7 +74,7 @@ The captain's doctrine burns of itself what it will not man (`burns_when: not wo
 
 ## The events
 
-For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off).
+For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off); `the sound of guns` (an action heard off the horizon).
 
 ```
 standing order "the prize": at she is taken then take the prisoners aboard
@@ -101,9 +101,13 @@ You answer in your own words, and the game reads them for your parole only while
 
 **A prisoner of your own prize** is served by the same channel from the other side: her master is a person of her company confined in her cabin by his parole, and you speak to him by `say to the master of the Deux-Frères` within hail, or aboard her as a visitor by the boat.
 
+## An action off the horizon
+
+Two ships that meet in anger far from you, beyond the reach at which the game gives a ship her full company and her guns as parts, fight all the same, by the same tables chapter 22's guns are drawn from, one broadside a side every three minutes while they lie within gun's reach; a ship that cannot bear it strikes by the same rule of the company's temper, and her captor takes possession of her at hailing distance as any prize is taken. What you hear of it is what the period's logs record: **the sound of guns** to a point of the compass, "distant about twelve miles", once a round while any such action is within hearing, and by night the flashes at the horizon; the log says so (`the sound of guns`), and your lookout says what he can of the ships when they come up over the horizon, hurt as they are. A ship struck or taken that way carries her hurt into her hull when the game gives her one: the men killed and wounded on her muster, the shot holes in her side, her spars gone, so that what was done to her out of your sight is what you find aboard her.
+
 ## What is not in this chapter
 
-The prize court and the prize money (the condemnation, the eighths, the head money and the agent's commission), the court martial for the loss of a ship and the new command after it, and the fight heard off the horizon are told in the chapters that follow as they come into the game; the readings and the orders of this chapter are the game's now.
+The prize court and the prize money (the condemnation, the eighths, the head money and the agent's commission), and the court martial for the loss of a ship and the new command after it, are told in the chapters that follow as they come into the game; the readings and the orders of this chapter are the game's now.
 
 ## Sources
 
