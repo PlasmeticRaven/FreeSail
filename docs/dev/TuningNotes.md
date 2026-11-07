@@ -19046,6 +19046,9 @@ tests left out as the tier's rule), the slow tier of the touched files (`test_pr
 `test_profile` and `test_indefatigable` exit 0 (09:18:18 to 10:00:58), the pace tests alone and
 last exit 0 (13 passed, 10:00:58 to 10:05:33; no floor lowered).
 
+
+step's tree**: below, at the step's boundary.
+
 ### Step 3: the captive's channel (the design's §3)
 
 **Built as designed** (`freesail/world/captive.py`, the hooks in `prizes.possess`, `knowledge.
@@ -19098,6 +19101,16 @@ alone (`movement.person_of_actor`). (7) A far vessel whose plan runs out is done
 sea at the minute's end, which ended the cartel at her own goal's arrival before her errand; her
 minute keeps her on the sea until her persons are landed, and lands them at once where she lies
 in her port's road already.
+
+**The trunk merged at the boundary** (1c378de at eff2a55 and 3d1fa25 at 9b821fb, merge commits:
+81's viewer action, 76 whole with the flags of command, B3.4, the api package loading its readings
+first, the records; the meetings the tuning notes' appended sections, kept both in order). 75's
+sub-type rules met the cartel's row in the ship descriptions' index (`ships.DESCRIPTIONS`): every
+row is now a file's own description with its fit and roles, and a shared file's first row names
+her kind for the player's shadow, so the cartel's row (brig.yaml, "a cartel") failed `test_subtypes`
+twice (no fit; the brig's file's first row). She has no row of her own now: the cartel sails as a
+merchant brig of her own file (sixteen men, her ports painted) with the role `cartel` and `what`
+said on her, "a cartel", under her flag of truce. Nothing else met; the captive's scenes hold.
 
 ### Step 4: the far fight on the sleeping hulls (the design's §4)
 

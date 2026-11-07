@@ -82,7 +82,10 @@ __all__ = [
 
 CAPTIVE_KEY = "captive"  # the root World's record of the player's person taken
 CARTEL_ROLE = "cartel"
-CARTEL_DESCRIPTION = "cartel"
+# the cartel sails as a merchant brig of her own file (75's sub-type rows: every row of the
+# index is a file's own description with its fit and roles, so she has no row of her own;
+# what she is when made out is said on her, below)
+CARTEL_DESCRIPTION = "merchant brig"
 PAROLE_ASK_AGAIN_S = 1800  # a glass: the question put once more when nothing readable came
 PAROLE_BY_RULE_S = 4 * 3600  # a watch: an officer's parole given by rule when nobody spoke
 PAROLE_FIRST_ASK_S = 60  # the rules captain asks a minute after the taking
@@ -797,6 +800,7 @@ def put_cartel(world: Any, port: Any, who: list[Any], holder: Any, said_for: str
     }
     v = vessel_from_spec(root, spec, sea.serial)
     v.role = CARTEL_ROLE
+    v.what = "a cartel"  # what the glass makes out of her, under her flag of truce
     v.cartel = {
         "port": port.id,
         "holder": str(holder.id),
