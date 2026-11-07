@@ -18790,7 +18790,7 @@ which no transcript carries, so the step pins the checkpoint round trip instead.
 | 7-181 and `test_fight`'s carried deck | she lies struck after the deck is carried, no prize; her hurt on her own bill | she is a prize of ours at once (`how` "carried by boarding"), her colours ours over hers; her hurt are the prisoners' (`the prisoners` says "of them hurt"); the fight's bands (2 to 12 rounds, the losses' order) as they were |
 | 7-325 and 82b's officer on the deck won | the first lieutenant stands on her deck as a visitor at the voice station, his home his own ship | he is her prize master: her `captain`'s station his, his harness carried into it, his home the prize, his own ship's station kept for his return |
 | 97's officer killed in the round | the deck carried, none leads on | Mr Ward (the senior standing of the party, a master's mate) leads on and is her prize master |
-| 72's cut-out (`test_squadrons`) | the Nancy struck, in the Vengeur's company | the Nancy his prize at once on the records (six men, 121 prisoners, for Brest), parted by his doctrine |
+| 72's cut-out (`test_squadrons`) | the Nancy struck, in the Vengeur's company | the Nancy his prize at once on the records (six men, her people the prisoners' count: 121 before the trunk's SW-4, sixteen after it, for Brest), parted by his doctrine |
 | 7-139, 7-350 | unchanged by this step | |
 
 **The rising's figures** (the frigate's prize, the brig of 121 taken by the order, the frigate
@@ -18821,6 +18821,7 @@ prisoners; `merchant-brig.yaml` (a complement of 16) is a shadow file. Not this 
 aboard` as the free verb `take` with a tail; the parser gives the prisoners' order its number
 inside the phrase. (5) The orders' road recorded a verb's reply and the function's own line both,
 so `possess`, `take_prisoners_aboard` and `burn` take `said` for the captor's line and the
+<<<<<<< HEAD
 order's road passes False. **The suites on the step's tree**: below, at the step's boundary.
 
 ### Step 3: the captive's channel (the design's §3)
@@ -19075,3 +19076,26 @@ scene (step 4: a round fired where she yielded at hail, the same possession), an
 pinned as found (7-359). No recorded passage's digest moved for the far fight (the toggle, step 4).
 The two faults the wiring uncovered (the wake's doubled damage, the recaptor's state) are mended,
 not re-pinned. The suites' results on each step's final tree are recorded under the steps above.
+=======
+order's road passes False.
+
+**The trunk merged at the boundary** (b97109e, a merge commit of `origin/claude/dreamy-darwin-d77nty`
+at 2dc4921 with package 75's SW-4 in it, by the lead's word of 05:43): two meetings resolved by
+keeping both sides (`world/service.py`'s `ROLE_SERVICE`, 75's `indiaman` and `revenue` rows beside
+74's `prize-master`; `world/captains.py`'s `ROLES`, the same three), nothing else met. SW-4 gives
+the merchant brig her own file (`merchant-brig.yaml`, sixteen men and four long 6s, where she
+sailed `brig.yaml`'s hundred and twenty-one), which moves the step's scenes with "a merchant
+brig": the prize crew out of the frigate is **eight over sixteen prisoners** (twenty-one over a
+hundred and twenty-one before; the thresholds unchanged, the muster read from her file), the
+boat's second load of prisoners takes **the ten she has left** where it took twenty of the
+hundred and fifteen (re-pinned, the reason in the test), and the rising put down in irons wants a
+muster the merchant brig no longer has, so that scene takes **a French brig-sloop of war** (the
+same `brig.yaml` hundred and twenty-one the scene was found on; its seeds hold: seed 2's rising is
+put down in the third hour, seed 1's over a hundred taken never draws). The rising won (seed 1)
+and the retaking by the cutter hold on the sixteen as they were; 7-181, 7-325, 7-152 to 7-154 and
+7-188 pass on the merged tree.
+
+**The suites on the step's tree.** Step 2 alone, at bc6f406 (before the trunk's merge): the fast
+tier whole exit 0 (run alone in the pinned worktree 06:13:24 to 07:02:56 after two container
+restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree: below.
+>>>>>>> 6b717f6

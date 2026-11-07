@@ -42,14 +42,16 @@ def _frigate(seed: int = 7):
     )
 
 
-def _struck_brig(seed: int = 7):
+def _struck_brig(seed: int = 7, description: str = "merchant brig"):
     """The frigate hove to with a French brig put on the sea six cables off and promoted at
     the first switch, held hove to by the director's hand within a boat's pull, and struck
-    to the frigate by her colours (`action.strike` with the words, as her captain would)."""
+    to the frigate by her colours (`action.strike` with the words, as her captain would).
+    Since package 75 (SW-4) the merchant brig sails her own file with sixteen men and four
+    long 6s; a scene that wants a brig of a hundred and twenty-one takes the brig-sloop."""
     w = _frigate(seed)
     w.submit("set plain sail")
     w.submit("heave to")
-    e = w.world_order('ship: a merchant brig "X" of France at 49 30 N 5 29 W, bound for Brest')
+    e = w.world_order(f'ship: a {description} "X" of France at 49 30 N 5 29 W, bound for Brest')
     assert e.data.get("result") == "done", e.text
     assert w.world_order('ship "X": intent bound for Brest').data.get("result") == "done"
     w.run(61)
@@ -217,10 +219,12 @@ def test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counte
     assert all(s.id.startswith(f"{b.id}:") for s in ours.crew.sailors)
     assert w.readings.words("prisoners").startswith("six prisoners, confined below")
     assert "(six more taken out of her)" in hull.readings.words("prisoners")
+    # the boat takes so many as she has left (ten of her sixteen since package 75 gave the
+    # merchant brig her own file; before it twenty of her hundred and twenty-one, and the
+    # rest by `take the prisoners aboard`)
+    assert hers == 16
     out = w.submit("take 20 of the prisoners aboard from the X")
-    assert out.kind == "prize.prisoners_aboard" and out.data["taken"] == 20
-    out = w.submit("take the prisoners aboard")
-    assert out.kind == "prize.prisoners_aboard" and out.data["taken"] == hers - 26
+    assert out.kind == "prize.prisoners_aboard" and out.data["taken"] == hers - 6
     assert P.prisoners_of(hull.ship).count == 0 and P.prisoners_of(w.ship).count == hers
     w.run(60)  # the readings are the minute's
     # her people's count is nought; her officers of rank are persons confined in her still
@@ -269,12 +273,12 @@ def test_a_prize_is_burnt_by_the_order_her_people_prisoners_and_the_prize_crew_h
 # -- the rising ---------------------------------------------------------------------------------
 
 
-def _stood_off(seed: int, taken: int = 0):
+def _stood_off(seed: int, taken: int = 0, description: str = "merchant brig"):
     """The prize taken, so many of her prisoners taken aboard, the frigate filled away and
     stood off beyond the cover distance; the hours since the taking set back nineteen on
     the record (the test's hand on the clock: a prize crew tired by the hours) so that the
     rule is judged at its next hour."""
-    w, b, hull = _struck_brig(seed)
+    w, b, hull = _struck_brig(seed, description)
     assert w.submit("take possession of her").kind == "prize.taken"
     if taken:
         assert w.submit(f"take {taken} of the prisoners aboard").kind == "prize.prisoners_aboard"
@@ -295,14 +299,14 @@ def _risings(hull) -> list[str]:
 
 @pytest.mark.slow
 def test_the_prisoners_rise_on_a_thin_tired_prize_crew_with_no_captor_near_and_retake_her():
-    """The design's §2.8: a hundred and twenty-one prisoners over a prize crew of
-    twenty-one (the King's ship's share of our two hundred and sixty-four), nineteen hours in
-    her, the frigate two miles off: the rule draws once an
-    hour (a quarter's chance) and at seed 1 they rise in the first hour and have the deck by
-    73's tables; she is retaken by her own people (her nation, colours, role and intent
-    hers again, the prize crew her prisoners, the prize master a captive in her cabin), the
-    frigate's log says so with the prize lost. At seed 7 the two draws of the first two
-    hours fail and nothing is said."""
+    """The design's §2.8: sixteen prisoners over a prize crew of eight (the merchant brig's
+    own sixteen since package 75's SW-4; before it a hundred and twenty-one over twenty-one,
+    the King's ship's share of our two hundred and sixty-four), nineteen hours in her, the
+    frigate two miles off: the rule draws once an hour (a quarter's chance) and at seed 1
+    they rise in the first hour and have the deck by 73's tables; she is retaken by her own
+    people (her nation, colours, role and intent hers again, the prize crew her prisoners, the
+    prize master a captive in her cabin), the frigate's log says so with the prize lost. At
+    seed 7 the two draws of the first two hours fail and nothing is said."""
     w, b, hull = _stood_off(1)
     for _ in range(61):
         w.run(60)
@@ -334,7 +338,9 @@ def test_a_rising_put_down_puts_the_prisoners_in_irons_for_a_day_and_the_odds_ru
     in the third hour: the prisoners in irons for a day (the reading says so), the prize ours
     still. With a hundred taken (twenty-one over twenty-one) the rule never draws: the odds
     are under two to one."""
-    w, b, hull = _stood_off(PUT_DOWN_SEED, taken=70)
+    # a French brig-sloop of war struck to the frigate: her hundred and twenty-one give the
+    # odds the scene wants (the merchant brig sails her own sixteen since package 75)
+    w, b, hull = _stood_off(PUT_DOWN_SEED, taken=70, description="brig-sloop")
     for _ in range(250):
         w.run(60)
         if _risings(hull):
@@ -344,7 +350,7 @@ def test_a_rising_put_down_puts_the_prisoners_in_irons_for_a_day_and_the_odds_ru
     assert pris.in_irons(w.clock.tick) and P.is_prize(b)
     assert ", in irons" in hull.readings.words("prisoners")
     assert pris.irons_until - w.clock.tick <= P.IRONS_HOURS * 3600
-    w2, b2, hull2 = _stood_off(1, taken=100)
+    w2, b2, hull2 = _stood_off(1, taken=100, description="brig-sloop")
     rec = P.record_of(b2)
     for _ in range(125):
         w2.run(60)
