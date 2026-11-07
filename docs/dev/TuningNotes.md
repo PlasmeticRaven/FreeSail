@@ -19049,3 +19049,14 @@ passed and 439 slow left out; the slow tier of the touched files and the known t
 (`tests/test_signals.py`, `tests/test_known_truths.py`, `--slow -m "not pace"`), exit 0, 322
 run, 314 passed and 8 xfailed (the truths marked so on the trunk); the pace tests alone and
 last, exit 0, 13 of 13. Ruff check and ruff format clean.
+
+The trunk moved twice after those runs (28c228e, package 74's step 1 with
+`freesail/combat/far.py`; d20e585, the ships session's hull tools and records), both merged
+without conflict but for the two packages' sections at the end of these notes (both kept), at
+cfaf48c; the merge's message says "records" and the range was more than records. **The suites
+again at cfaf48c** (a worktree pinned there): the fast tier, exit 0, 6,448 run, 6,447 passed
+and 1 xfailed (a test the trunk marks so); the slow tier of the touched files and the known
+truths, exit 0, 323 run, 315 passed and 8 xfailed; the pace tests alone and last, exit 0, 13 of
+13. Ruff format clean; ruff check finds one line too long, the trunk's own
+(`tests/test_captain_trials.py:367`, from 4423f62, package 75's re-pin as merged), not this
+branch's and left to the lead.
