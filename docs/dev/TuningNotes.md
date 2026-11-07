@@ -19492,3 +19492,47 @@ before); judged against the table of its form; in succession three minutes a hoi
 captain's doctrine of what to hoist (when a rules captain doubles his ensigns, hoists a broad
 pendant, makes another nation's challenge) is 74's files: the data and the lookout's side are
 built and the doctrine's hook is reported to the lead, not built.
+
+### Step 7: the truths and the records
+
+Truths 7-426 to 7-433 (`tests/test_known_truths.py`): a Spanish frigate signals her consort a
+general chase on Mazarredo's No. 247 and the consort reads it and chases, while the British
+frigate in sight logs "two flags at the main, a signal we cannot read: not of our book"
+(7-426); the Trafalgar numbers 13, 16, 63, 72 and 76 at the 1799 book's from the page, No. 1
+standing and marked made (7-427); a sentence of fifteen words found whole in Popham, none
+spelled (7-428); no root's signal read by a ship holding another root's book, over every pair
+(7-429); the French book answering the squadron, the chase and the convoy, every number made
+and Orvilliers's words cited (7-430); Spain, the United States and Naples keeping their
+private draws month by month under two seeds (7-431); the checker passing every root (7-432);
+a nation's book added by data alone, the convoy of four on the three new roots (7-433). Item
+8's 7-434 and 7-435 beside them. The records: the design note's postscript "As built out"
+(the colours' shape first, then the books by nation, how a nation's book is added, and found
+on the way); spec M7 §3's as-built paragraph extended; Harness §21d's four places where a
+station's reading changes; the primer's chapter 23 (the flags she wears; another nation's
+private signal; the books named as a sea officer would name them).
+
+**What moved, across steps 3, 4, 6 and 7 and item 8.** Two pins, each proven by its entry put back. (1) test_nations' line for Spain,
+`signals_root == "basic"`, now `"spain"` and `well-built` (step 3; the nations' line put back,
+the old assertion passes and the new fails). (2) The merchant's trial with a French brig-sloop
+(`tests/test_captain_trials.py`, `TRIAL_TRADE_STRANGER_DIGEST`): her two made-out lines, at
+14580 and 18540, now end "...; she wears a pendant at the main: a man-of-war" (item 8, the
+lookout's words where the colours' line already falls); old `5e7bdba2a4f4770b`, new
+`aa04702e062bc64b`; the words off (`flags.FLAGS_SPOKEN = False`) give the old digest again, the
+1,594 lines, the states and the anchored ticks unmoved. Nothing else: the other trials'
+digests stand (their strangers wear their ensign alone, or are not made out with colours); no
+recorded log under tests/fixtures/saves hoists a Spanish, American or Neapolitan signal (the
+grep of the saves for the signals' lines finds none); the three new roots' private draws are
+basic's (truth 7-431); the British and basic records carry no new key.
+
+**The suites as run at b0cda9c** (steps 3, 4, 6 and 7 and item 8, with the trunk's 943b453 and
+aa353db merged in at 6aea118, and the trial's pin re-measured; a worktree pinned there):
+the fast tier, exit 0, 6,601 run, 6,600 passed and 1 xfailed (the
+trunk's), 456 slow left out; the slow tier of the touched files, their neighbours (the
+lookout, the squadrons, the captains' trials, the crews, the brains, the view, the prizes)
+and the known truths, exit 0, 578 run, 570 passed and 8 xfailed (the trunk's); the pace
+tests alone and last, exit 0, 13 of 13. Ruff check and format clean. Two measurements before it found what the two fixes mend: at 9c3a306 (the trunk's
+0e38d5e merged) the fast tier found the new log family `flags.changed` unplaced in the
+knowledge's reach (test_knowledge and truth 7-380, the lead's guard; 6,601 run, 6,598 passed, 2
+failed, 1 xfailed), placed on the deck at ca47c9e; at 6aea118 the fast tier passed (exit 0,
+6,601 run, 6,600 passed, 1 xfailed, 456 slow left out) and the slow tier found the trade
+trial's digest (578 run, 569 passed, 1 failed, 8 xfailed), re-measured at b0cda9c.
