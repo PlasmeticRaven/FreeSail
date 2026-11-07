@@ -6,9 +6,14 @@ among the frigate's company, but the boat kept them by their ids, which are thei
 master", "the boatswain") and so shared by every hull's company, and her landing looked them
 up by an id map over every hull, the last hull's man of each post standing for the frigate's.
 Three hulls beside the frigate, two of them asleep, reproduce it by that mechanism: the
-frigate's master, boatswain and gunner go to the Lynx and the Lynx's master comes back in
+frigate's master, boatswain and carpenter go to the Lynx and the Lynx's master comes back in
 the same boat, and the sleeping brigs' men of the same posts stay in their own ships. A
 person of another ship named in the order is refused in words, and the boat is not sent.
+
+Package 75 (SW-4, Build-Ships.md §8.4): the merchant brigs sail their own file, whose company
+of sixteen has a master, a mate and a second mate, a boatswain, a carpenter and a boy and no
+gunner, where the brig-sloop's file gave them the frigate's posts all through; the third post
+shared by every hull is the carpenter's (old: the gunner's).
 """
 
 from __future__ import annotations
@@ -17,7 +22,7 @@ from freesail.world import crews as K
 from tests.test_between_hulls import _run_until
 from tests.test_crews import hove_to_world
 
-POSTS = ("master", "boatswain", "gunner")
+POSTS = ("master", "boatswain", "carpenter")  # SW-4: was the gunner, no merchant brig's post
 
 
 def three_hulls():
@@ -73,7 +78,9 @@ def test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts
 
 def test_a_person_of_another_ship_named_in_the_order_is_refused_in_words():
     w, lynx, chev, ren = three_hulls()
-    other = _of(chev, "lieutenant")  # Mr Newton, of the Chevalier: no man of the frigate's
+    # the Chevalier's mate, a post the frigate has not (package 75, SW-4: the merchant brig's own
+    # company; old: her lieutenant, Mr Newton, of the brig-sloop's file)
+    other = _of(chev, "mate")
     e = w.submit(f"send the boat to the Lynx with the captain and {other.name}")
     assert e.kind == "order.rejected"
     assert f"{other.name} is of the Chevalier, not of this ship; the boat is not sent" in e.text

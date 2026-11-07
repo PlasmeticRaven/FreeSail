@@ -434,9 +434,10 @@ def test_a_pivot_without_an_arc_is_refused_and_no_side_is_still_heard_first():
     with pytest.raises(ShipFileError, match="no side"):
         _parse_gun(dict(pivot, side="starboard"), 0, "the fit 'long tom'", "test")
     assert _parse_gun(dict(pivot, arc_deg=[55, 135]), 0, "f", "test").arc_deg == (55.0, 135.0)
-    # the one pivot on file carries its arc
+    # the one pivot on file carries its arc: SW-4 (Build-Ships.md §9.2) reckons it from her rig,
+    # old (60.0, 140.0), the owner's by eye, new (62.0, 141.0) (tests/test_subtypes.py)
     tom = load_ship("data/ships/privateer-schooner.yaml").guns["pivot"]
-    assert tom.arc_deg == (60.0, 140.0)
+    assert tom.arc_deg == (62.0, 141.0)
 
 
 # -- the other hooks of stage 0 ------------------------------------------------------------
@@ -802,14 +803,21 @@ def _sea():
 
 def test_a_descriptions_fit_and_roles_are_its_files_and_absent_where_it_gives_none(monkeypatch):
     """Item 22 (§8.1): `description` carries the file's own `fit` and `roles` for it, the
-    roles kept a list; no file gives either yet, so every description is as it was."""
+    roles kept a list. SW-4 (§8.2), old beside new: no file gave either, and every index row's
+    file now gives both but the razee's and the 64's, which the table does not list; the rest of
+    each description is as it was. The files' side left the merchant brig's out too, her row
+    then sailing brig.yaml, whose pair of words carries none; the world side moved her row to
+    merchant-brig.yaml (§8.4, the lead's ruling), whose words give both."""
+    without = {"razee", "sixty-four"}
     for key in S.DESCRIPTIONS:
-        assert set(S.description(key)) == {"file", "rig", "what"}, key
+        given = set() if key in without else {"fit", "roles"}
+        assert set(S.description(key)) == {"file", "rig", "what"} | given, key
     assert S._description_value("roles", ["cruiser", "kings-ship"]) == ["cruiser", "kings-ship"]
     assert S._description_value("roles", "merchant") == ["merchant"]
     assert S._description_value("what", 1) == "1"
     assert S._default_fit(BRIG) == "diligence class 1796"
-    assert S._default_fit("data/ships/topsail-schooner.yaml") == UNARMED  # no armament
+    assert S._default_fit("data/ships/topsail-schooner.yaml") == UNARMED  # her default (SW-4)
+    assert S._default_fit("data/ships/boat-yawl-16.yaml") == UNARMED  # no armament
     own = {"brig-sloop": {"what": "a brig-sloop", "fit": "carronades", "roles": ["cruiser"]}}
     monkeypatch.setattr(S, "file_descriptions", lambda ship_file: own)
     d = S.description("brig-sloop")
@@ -938,7 +946,7 @@ def test_the_size_words_rank_the_new_ships_the_razees_first():
     assert captains.size_rank_of("a ship of the line") == captains.size_rank_of("two-decker") == 4
     assert captains.size_rank_of("a bilander") == 1
     # the words of today's sail rank as before
-    assert captains.size_of_words("a brig-sloop of war, sixteen ports a side") == 2
+    assert captains.size_of_words("a brig-sloop of war, ten ports a side") == 2
     assert captains.size_of_words("a ship") == captains.size_rank_of("a French frigate") == 3
     assert captains.size_rank_of("a chasse-marée") == 1 and captains.size_of_words("a sail") == 0
 

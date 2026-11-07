@@ -10,7 +10,8 @@ is the first of these that gives one:
 1. the scenario's papers, `papers: {service: kings}` (or `privateer`, `merchant`), read as
    the private signals are (`signals.table_of`);
 2. the captain's role: a King's ship, a cruiser or a commodore is the King's; a privateer
-   a privateer's; a merchantman, a packet or a fisherman a merchant's;
+   a privateer's; a merchantman, a packet, a fisherman, an Indiaman or a revenue cutter a
+   merchant's (package 75: the last two neither the Navy's nor a privateer's);
 3. her wardroom file's binding of the captain's station (`captains._is_kings_ship`): a
    captain or a commander commands a King's ship;
 4. otherwise a merchantman.
@@ -62,6 +63,15 @@ ROLE_SERVICE: dict[str, str] = {
     # package 74: a prize under her prize crew is her captor's (the record's `service`
     # answers first; the King's where none is written)
     "prize-master": KINGS,
+    # package 75 (docs/design/Build-Ships.md §8.3; SW-4): an East Indiaman is a merchant
+    # ship, the Company's and not the King's; a revenue cutter is the Customs' or the
+    # Excise's and not the Navy's, under no Admiralty Regulations, so neither is the King's
+    # here, and each buys of the merchants as the hired cutter does (judgement, for the
+    # lead: the Boards' own service is not in the game). Each is what her file's wardroom
+    # gives without a role (a master commands the merchant brig and the cutter), so the
+    # service of neither file moves with the role.
+    "indiaman": MERCHANT,
+    "revenue": MERCHANT,
 }
 
 # The words the papers may give for each, beside the service's own name.

@@ -56,6 +56,10 @@ def test_the_ship_reading_says_her_name_class_service_nation_guns_people_and_com
 
 
 def test_a_far_hull_is_told_as_herself_not_as_her_files_ship():
+    """A crewed far merchant brig is told by her own name, not her file's ship's. Since package
+    75 (SW-4, Build-Ships.md §8.4) she sails the merchant brig's own file, her class, guns, people
+    and master that file's, where she sailed the brig-sloop's (old: "a brig-sloop of the Diligence
+    class; a merchantman of France", the Harpy's file's, commanded by "Captain Pope")."""
     from tests.test_brains import put
     from tests.test_crews import hove_to_world
 
@@ -72,9 +76,10 @@ def test_a_far_hull_is_told_as_herself_not_as_her_files_ship():
     w.run(61)
     words = R.ship_words(v.crew)
     assert words.startswith(
-        "The ship: Nancy, a brig-sloop of the Diligence class; a merchantman of France. "
+        "The ship: Nancy, a merchant brig; a merchantman of France. Her guns: 4 long 6-pounders. "
+        "Her people: 16 souls by the muster. Commanding: Mr Bradley, merchant; "
     )
-    assert "Harpy" not in words and "Captain Pope" in words
+    assert "Industry" not in words and "Harpy" not in words and "Captain Pope" not in words
 
 
 STATIONS = ("watcher", "officer", "captain", "master", "lookout", "passenger")

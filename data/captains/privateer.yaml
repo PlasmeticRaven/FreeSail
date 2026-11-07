@@ -316,7 +316,12 @@ transitions:
   - {from: keeping station, on: enemy in range, to: engaging, unless: overmatched}
   - {from: investigating a stranger, on: enemy in range, to: engaging, unless: overmatched}
   - {from: chasing, on: enemy in range, to: engaging, unless: overmatched}
-  - {from: evading, on: enemy in range, to: engaging, unless: overmatched}
+  # package 75 (SW-4's reviews): out of `evading` an enemy in range is engaged unless she is
+  # overmatched or a man of war is near (`engage_nm`'s own words), the guard the other states
+  # take from their `man of war near` rows before it; with `overmatched` alone a man of war
+  # of her own class (a revenue cutter made out) had her evading and engaging by turns,
+  # every minute, at crewed detail
+  - {from: evading, on: enemy in range, to: engaging, unless: [overmatched, man of war near]}
   - {from: engaging, on: aground, to: in distress}
   # package 74 (spec M7 §18): the mark struck is taken possession of (the state's work
   # closes her to a boat's pull and gives 'take possession of her'); the prize his, or a

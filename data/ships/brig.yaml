@@ -17,16 +17,24 @@ ship:
   era_notes: 'H.M. brig-sloop Harpy of the Diligence class (launched 1796, sold 1817): 316 tons burthen,
     95 ft on the gun deck, 75 ft 1 5/8 in on the keel, 28 ft 1 1/2 in beam, 12 ft 0 1/2 in in the hold;
     sixteen 32-pounder carronades and two 6-pounder chase guns (the armament below, package 70). The Navy''s
-    brig; the merchant brig is her second description at far detail (package 36). Hull''s figures from
-    the kit''s manual and Winfield p. 256, her lines as drawn from the class''s draughts, ZAZ4491 and
-    ZAZ4492 (tools/ships/hull_brig.py); spars by Fincham 1843''s table of proportions for brigs of war
-    (p. 88) checked against Luce 1866 ch. VII; sails by Steel 1794; see tools/gen_ships.py for every rule.'
+    brig; the merchant brig''s words are kept beside hers (package 36; the shared design''s §4.4), the
+    description sailing her own file, merchant-brig.yaml, since package 75 (Build-Ships.md §8.4). Hull''s
+    figures from the kit''s manual and Winfield p. 256, her lines as drawn from the class''s draughts,
+    ZAZ4491 and ZAZ4492 (tools/ships/hull_brig.py); spars by Fincham 1843''s table of proportions for
+    brigs of war (p. 88) checked against Luce 1866 ch. VII; sails by Steel 1794; see tools/gen_ships.py
+    for every rule.'
   descriptions:
     brig-sloop:
       rig: a brig
-      what: a brig-sloop of war, sixteen ports a side
+      what: a brig-sloop of war, ten ports a side
       note: 'Harpy herself: sixteen 32-pounder carronades (the kit''s manual; docs/design/VesselCandidates.md);
-        the ports are what the glass counts.'
+        the ports are what the glass counts, ten a side on her class''s sheet (RMG ZAZ4491, read: docs/design/ships-design/pages-zaz4491.md).
+        Her fit her file''s default; her roles a King''s cruiser''s (Build-Ships.md §8.2).'
+      fit: diligence class 1796
+      roles:
+      - cruiser
+      - kings-ship
+      - commodore
     merchant brig:
       rig: a brig
       what: a merchant brig, deep laden
@@ -1932,7 +1940,7 @@ crew:
     afterguard: 22
     # Waisters: 14, judgement; the station whose numbers make up the establishment.
     waisters: 14
-    # Marines: 20, judgement, a sergeant's party for a sloop (a brig-sloop of the class carried about twenty); they work as afterguard, never aloft.
+    # Marines: 20, judgement, a sergeant's party for a sloop (a brig-sloop of the class carried about twenty); they work as afterguard, never aloft. The nearest print is a frigate's (package 75, Build-Ships.md §9.4): a lieutenant and 50 for the Doris, 44, in March 1803 (Naval Chronicle vol. IX p. 245; docs/design/Research-74-2026-10.md §4.4); none for a sloop was found, the 20 kept.
     marines: 20
     # Idlers: the trades below.
     idlers: 17

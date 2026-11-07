@@ -18,6 +18,16 @@ ship:
     fore topsail and topgallant over a loose-footed foresail. Rig by Fincham''s rules as Chapelle gives
     them (pp. 159-162) checked against his spar tables; rope by Luce ch. IV; see tools/gen_ships.py for
     every rule.'
+  descriptions:
+    schooner:
+      rig: a schooner
+      what: a topsail schooner
+      note: 'Speedwell, a Baltimore topsail schooner of Lynx''s draught, as the trader of the war: the
+        tops make her out a schooner, and the glass a topsail schooner (spec M5 §25; judgement on the
+        words). Unarmed, her file''s default; a merchant''s role (Build-Ships.md §8.2).'
+      fit: unarmed
+      roles:
+      - merchant
 hull:
   # 85 ft: judgement between Lynx's 73 ft keel and 94.6 ft deck (Chapelle p. 82), her stem and post raking hard.
   length_waterline_m: 25.9
@@ -999,6 +1009,307 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers:
+      # The trimmers: four of the forecastlemen for the head sails, as the privateer of her draught has them (judgement).
+      forecastle: 4
+      # Three of the fore topmen for the fore braces and the topsail.
+      fore_top: 3
+      # Four of the afterguard at the main sheet and the gaffs.
+      afterguard: 4
+    # One man at the tiller (a Baltimore schooner steered with a tiller; judgement).
+    helm: 1
+    # One of the waisters to pass the cartridges beside the idlers (judgement).
+    powder: 1
+    # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
+    priority: sail before guns
+    # Eight of her people with the stand of arms' muskets, as the privateer of her draught (judgement after the King's cutter's six of thirty); she bears no marines.
+    small_arms: 8
+    # Twenty-six boarders of her forty with cutlass and pistol, as the privateer of her draught (judgement after the King's cutter's twenty of thirty).
+    boarders: 26
+# The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): unarmed by default, as Speedwell has sailed since package 32, with two fits the scenario may name (ship: {fit: ...}): Lynx's own as a letter of marque and Musquidobit's as the Navy armed her. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
+armament:
+  default: unarmed
+  fits:
+    # A letter of marque's fit: Lynx's six guns, six long 6-pounders, and four swivels (judgement).
+    letter of marque:
+      source: Chapelle, The Baltimore Clipper, 1930, pp. 81-82 (Lynx, 6 guns and 40 men, April 1813),
+        p. 83 and the plates after it (her seven ports a side; her port sills); the calibre a judgement
+        (p. 54); the weights from memory
+      guns:
+      # Six long 6-pounders, three a side, in the 2nd, 4th and 6th of the seven ports: Lynx's six guns (Chapelle p. 82), the calibre a judgement (the Americans preferred the long 6 and 9, p. 54); the 7 ft gun of 20 cwt (from memory, UNVERIFIED), six men to the pair.
+      - id: gun.1.starboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 8.4
+        height_m: 1.3
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      - id: gun.1.larboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 8.4
+        height_m: 1.3
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      - id: gun.2.starboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: 0.0
+        height_m: 0.96
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      - id: gun.2.larboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: 0.0
+        height_m: 0.96
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      - id: gun.3.starboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 3
+        side: starboard
+        x_m: -8.4
+        height_m: 1.07
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      - id: gun.3.larboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 3
+        side: larboard
+        x_m: -8.4
+        height_m: 1.07
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      # Four half-pounder swivels on the rail, two a side at the bow and the quarter (judgement; Falconer 1780, SWIVEL), a man each when a man is spare.
+      - id: swivel.1.starboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 1
+        side: starboard
+        x_m: 10.0
+        height_m: 2.3
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.1.larboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 1
+        side: larboard
+        x_m: 10.0
+        height_m: 2.3
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.2.starboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 2
+        side: starboard
+        x_m: -10.0
+        height_m: 2.07
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.2.larboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 2
+        side: larboard
+        x_m: -10.0
+        height_m: 2.07
+        crew: 1
+        weight_cwt: 0.5
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
+      cartridges:
+        long:
+          6: 330
+        swivel:
+          0.5: 176
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          6: 2.0
+        swivel:
+          0.5: 0.25
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 4
+      shot:
+        6:
+          round: 240
+          grape: 36
+          chain: 24
+        0.5:
+          round: 160
+    # The Navy's fit of her, ten guns: eight 18-pounder carronades and two long 6-pounders. Her naval company was 50 (Winfield p. 335); the file's is forty, the letter of marque's, and a fit cannot change it, so forty fight her. Chapelle p. 98 has the Mosquidobit and the Lynx carrying six guns, though rated at twelve, as the privateer's list gives them; this fit is the Navy's arming of her, Winfield p. 335.
+    musquidobit 1813:
+      source: 'Winfield, British Warships in the Age of Sail 1793-1817, p. 335 (H.M. schooner Musquidobit,
+        late the privateer Lynx, taken April 1813: eight 18-pounder carronades and two 6-pounders, 50
+        men); the ports a judgement; the weights from memory'
+      guns:
+      # Musquidobit's two 6-pounders (Winfield 1793-1817 p. 335), long guns in the foremost ports a side (judgement): the 7 ft gun of 20 cwt (from memory, UNVERIFIED), six men to the pair.
+      - id: gun.1.starboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 10.5
+        height_m: 1.44
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      - id: gun.1.larboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 10.5
+        height_m: 1.44
+        crew: 6
+        weight_cwt: 20.0
+        deck: upper
+      # Musquidobit's eight 18-pounder carronades (Winfield 1793-1817 p. 335), four a side abaft the long guns (the ports judgement): the 18-pounder of 10 cwt (from memory, UNVERIFIED), four men to the pair.
+      - id: gun.2.starboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: 8.4
+        height_m: 1.3
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.2.larboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: 8.4
+        height_m: 1.3
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.3.starboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 3
+        side: starboard
+        x_m: 4.81
+        height_m: 1.11
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.3.larboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 3
+        side: larboard
+        x_m: 4.81
+        height_m: 1.11
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.4.starboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 4
+        side: starboard
+        x_m: 0.0
+        height_m: 0.96
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.4.larboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 4
+        side: larboard
+        x_m: 0.0
+        height_m: 0.96
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.5.starboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 5
+        side: starboard
+        x_m: -7.5
+        height_m: 1.04
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      - id: gun.5.larboard
+        kind: carronade
+        pounder: 18
+        place: broadside
+        number: 5
+        side: larboard
+        x_m: -7.5
+        height_m: 1.04
+        crew: 4
+        weight_cwt: 10.0
+        deck: upper
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
+      cartridges:
+        long:
+          6: 158
+        carronade:
+          18: 632
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          6: 2.0
+        carronade:
+          18: 1.5
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 7
+      # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
+      exercise_charges: 2
+      shot:
+        6:
+          round: 120
+          grape: 12
+          chain: 12
+        18:
+          round: 480
+          grape: 48
+          chain: 48
 # The hold (package 35, spec M5 §23): room for 112 tons of cargo beyond her own stores, 0.5 of the 224 tons burthen (a sharp Baltimore hull stows about half her tonnage: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 112

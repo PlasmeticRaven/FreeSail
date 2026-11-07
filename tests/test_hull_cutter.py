@@ -432,9 +432,22 @@ def test_a_diff_of_her_physics_keys_against_git_shows_none(doc):
     assert {key: v for key, v in doc["hull"].items() if key != "profile"} == filed["hull"]
     assert list(doc["hull"])[:-1] == list(filed["hull"])  # the existing keys keep their order
     assert list(doc) == list(filed)
-    # of the ship's own keys her source note alone is reworded
-    assert list(doc["ship"]) == list(filed["ship"])
-    assert {key: v for key, v in doc["ship"].items() if key != "era_notes"} == {
+    # of the ship's own keys her source note alone is reworded; and (package 75, SW-4:
+    # Build-Ships.md §8.1, §8.2, §16.1, old beside new) her descriptions land in her own file,
+    # where she had none: the King's cutter's, the index's words, and the table's three new rows of
+    # her hull, each with its fit and roles and no glass words, the one key SW-4 writes
+    assert "descriptions" not in filed["ship"]
+    assert list(doc["ship"]) == [*filed["ship"], "descriptions"]
+    assert {
+        key: (d.get("what"), d["fit"], d["roles"]) for key, d in doc["ship"]["descriptions"].items()
+    } == {
+        "cutter": ("a cutter", "carronades", ["cruiser", "kings-ship"]),
+        "revenue cutter": (None, "long guns", ["revenue"]),
+        "hired armed cutter": (None, "long guns", ["cruiser"]),
+        "coasting cutter": (None, "unarmed", ["merchant"]),
+    }
+    new_keys = ("era_notes", "descriptions")
+    assert {key: v for key, v in doc["ship"].items() if key not in new_keys} == {
         key: v for key, v in filed["ship"].items() if key != "era_notes"
     }
     for section in filed:
