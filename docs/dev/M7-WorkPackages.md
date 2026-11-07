@@ -3072,8 +3072,10 @@ suites at 2df464d** (a worktree pinned there): ruff check and format clean; the 
 exit 0, 6,550 passed, 1 xfailed; the slow tier of the touched files and the known truths exit
 0, 326 passed, 8 xfailed; the pace alone and last 13 of 13 (and the same three at 1844886
 before the trunk's two moves). **The lead's merge:** the trial on 0e38d5e7 clean and
-lint-clean; the fast tier whole on it green, exit 0 (11:05 to 11:45 UTC), 6,571 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud dispatched after
-run 51, the figures to follow. Steps 3 (Spain), 4 (the United States and Naples), 6, 7 and
+lint-clean; the fast tier whole on it green, exit 0 (11:05 to 11:45 UTC), 6,571 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud: run 52 on d244be4c (12:03 to 12:55 UTC): lint green, all six shards
+green, 6,974 passed, 11 skipped, 12 xfailed, no failure; the pace job (informative) 9 of 13, the
+same four floor tests as runs 48 and 49 at 381 to 439 against 500, where the lead's own pace run
+alone on the build machine at 12:09 on the same code held 13 of 13: the shared runner's hour. Steps 3 (Spain), 4 (the United States and Naples), 6, 7 and
 item 8 are built on the branch and follow by one report when their suites finish.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
