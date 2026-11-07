@@ -19232,6 +19232,13 @@ trunk's); the slow tier of the touched files and the known truths, exit 0, 324 r
 and 8 xfailed (the trunk's); the pace tests alone and last, exit 0, 13 of 13. Ruff check and
 format clean.
 
+**The suites again at 2df464d** (the trunk's eff2a55 merged in at the step's boundary; that
+merge's message says "records", but the range it brought carried code: package 81's viewer,
+merged on the trunk at a8b716d, and the readings' import order of ec424f9): the fast tier,
+exit 0, 6,551 run, 6,550 passed and 1 xfailed (the trunk's), 439 slow left out; the slow tier
+of the touched files and the known truths, exit 0, 334 run, 326 passed and 8 xfailed (the
+trunk's); the pace tests alone and last, exit 0, 13 of 13. Ruff check and format clean.
+
 ### Step 3: the Spanish book, a root of its own
 
 **The root** (`data/signals/spain/`, the six files, and the seventh of item 8): the Real
