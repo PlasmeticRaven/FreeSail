@@ -1247,8 +1247,8 @@ rounds (six minutes), within two rounds and not one, the far fight unable to end
 round at 180 s and the coarser by design (rule 5). **Found on the way**: the far brain forgot its
 mark on entering `engaging` as it had on `taking possession`; the schooner's and the lugger's files
 give no armament (75's), so the packet's cut-out is a cutter's against a brig-sloop privateer; the
-"merchant brig" of the brig's one file carries the brig-sloop's eighteen guns (75's, noted to the
-lead). The figures, the pins moved by the wiring measured with the toggle (the passages 7-152,
+"merchant brig" of the brig's one file carried the brig-sloop's eighteen guns (75's; mended by its
+SW-4, merged at step 2's boundary: her own file, sixteen men and four long 6s). The figures, the pins moved by the wiring measured with the toggle (the passages 7-152,
 7-153, 7-154, 7-159, 7-160) and `FALLBACK_COUNT` are in `docs/dev/TuningNotes.md`, "Package 74",
 step 4.
 

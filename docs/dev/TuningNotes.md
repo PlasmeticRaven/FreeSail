@@ -18821,8 +18821,27 @@ prisoners; `merchant-brig.yaml` (a complement of 16) is a shadow file. Not this 
 aboard` as the free verb `take` with a tail; the parser gives the prisoners' order its number
 inside the phrase. (5) The orders' road recorded a verb's reply and the function's own line both,
 so `possess`, `take_prisoners_aboard` and `burn` take `said` for the captor's line and the
-<<<<<<< HEAD
-order's road passes False. **The suites on the step's tree**: below, at the step's boundary.
+order's road passes False.
+
+**The trunk merged at the boundary** (b97109e, a merge commit of `origin/claude/dreamy-darwin-d77nty`
+at 2dc4921 with package 75's SW-4 in it, by the lead's word of 05:43): two meetings resolved by
+keeping both sides (`world/service.py`'s `ROLE_SERVICE`, 75's `indiaman` and `revenue` rows beside
+74's `prize-master`; `world/captains.py`'s `ROLES`, the same three), nothing else met. SW-4 gives
+the merchant brig her own file (`merchant-brig.yaml`, sixteen men and four long 6s, where she
+sailed `brig.yaml`'s hundred and twenty-one), which moves the step's scenes with "a merchant
+brig": the prize crew out of the frigate is **eight over sixteen prisoners** (twenty-one over a
+hundred and twenty-one before; the thresholds unchanged, the muster read from her file), the
+boat's second load of prisoners takes **the ten she has left** where it took twenty of the
+hundred and fifteen (re-pinned, the reason in the test), and the rising put down in irons wants a
+muster the merchant brig no longer has, so that scene takes **a French brig-sloop of war** (the
+same `brig.yaml` hundred and twenty-one the scene was found on; its seeds hold: seed 2's rising is
+put down in the third hour, seed 1's over a hundred taken never draws). The rising won (seed 1)
+and the retaking by the cutter hold on the sixteen as they were; 7-181, 7-325, 7-152 to 7-154 and
+7-188 pass on the merged tree.
+
+**The suites on the step's tree.** Step 2 alone, at bc6f406 (before the trunk's merge): the fast
+tier whole exit 0 (run alone in the pinned worktree 06:13:24 to 07:02:56 after two container
+restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree: below.
 
 ### Step 3: the captive's channel (the design's §3)
 
@@ -18956,10 +18975,12 @@ the strike: the Amazon's part £...".
 
 **The figures found** (seed 7, the French merchant brig X taken in Falmouth's road): 304 tons
 burthen (her displacement over 1.36, the frigate's file's ratio: the ship files give no tons of
-their own, 75's), the hull £1,944 at £8 a ton worn ten years, her guns £1,248 (the brig's one file
-gives a "merchant brig" the brig-sloop's eighteen guns, 75's), her powder and shot £297, the agent
-£174, the fees £20: £3,295 alone, the captain's three eighths £1,236; with the cutter Sprightly in
-sight the frigate's part is by 264 to the cutter's complement. A Danish brig wrongly taken is
+their own, 75's), the hull £1,944 at £8 a ton worn ten years, her guns £320 (four long 6s of 20 cwt at
+£4 the hundredweight: her own file since the trunk's SW-4, merged at step 2's boundary; before it the
+brig's one file gave a "merchant brig" the brig-sloop's eighteen, £1,248, her powder and shot £297 and
+the whole £3,295), her powder (two barrels) and shot £13, the agent £114, the fees £20: £2,143 alone,
+the captain's three eighths £804; with the cutter Sprightly in sight the frigate's part is £1,925 by
+264 to the cutter's complement, the cutter's £218. A Danish brig wrongly taken is
 restored with £194 of costs (a tenth of £1,944). The far prize Nancy sentenced at Brest by le
 Conseil des prises on her record, her privateer captor's part the whole (no consort in sight).
 
@@ -18978,8 +18999,8 @@ minute's end, so the court's days keep her lying to until the sentence; the salv
 key the retaking never wrote and the salvage's sharers were the enemy who first took her and his
 consorts in sight (mended before the step's commit: the recaptors alone, by their nation's court
 and scheme; the tests for the reserved fourth and the salvage are the step's last two). A Brest
-salvage of the brig X (the French privateer Vengeur retaking her from the Amazon): £436, an eighth
-of her hull, guns, powder and shot, the Vengeur's whole; the reserved fourth on a privateer brig
+salvage of the brig X (the French privateer Vengeur retaking her from the Amazon): £285 (£436 on the
+brig-sloop's guns before SW-4), an eighth of her hull, guns, powder and shot, the Vengeur's whole; the reserved fourth on a privateer brig
 of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
 seventh day.
 
@@ -19076,26 +19097,3 @@ scene (step 4: a round fired where she yielded at hail, the same possession), an
 pinned as found (7-359). No recorded passage's digest moved for the far fight (the toggle, step 4).
 The two faults the wiring uncovered (the wake's doubled damage, the recaptor's state) are mended,
 not re-pinned. The suites' results on each step's final tree are recorded under the steps above.
-=======
-order's road passes False.
-
-**The trunk merged at the boundary** (b97109e, a merge commit of `origin/claude/dreamy-darwin-d77nty`
-at 2dc4921 with package 75's SW-4 in it, by the lead's word of 05:43): two meetings resolved by
-keeping both sides (`world/service.py`'s `ROLE_SERVICE`, 75's `indiaman` and `revenue` rows beside
-74's `prize-master`; `world/captains.py`'s `ROLES`, the same three), nothing else met. SW-4 gives
-the merchant brig her own file (`merchant-brig.yaml`, sixteen men and four long 6s, where she
-sailed `brig.yaml`'s hundred and twenty-one), which moves the step's scenes with "a merchant
-brig": the prize crew out of the frigate is **eight over sixteen prisoners** (twenty-one over a
-hundred and twenty-one before; the thresholds unchanged, the muster read from her file), the
-boat's second load of prisoners takes **the ten she has left** where it took twenty of the
-hundred and fifteen (re-pinned, the reason in the test), and the rising put down in irons wants a
-muster the merchant brig no longer has, so that scene takes **a French brig-sloop of war** (the
-same `brig.yaml` hundred and twenty-one the scene was found on; its seeds hold: seed 2's rising is
-put down in the third hour, seed 1's over a hundred taken never draws). The rising won (seed 1)
-and the retaking by the cutter hold on the sixteen as they were; 7-181, 7-325, 7-152 to 7-154 and
-7-188 pass on the merged tree.
-
-**The suites on the step's tree.** Step 2 alone, at bc6f406 (before the trunk's merge): the fast
-tier whole exit 0 (run alone in the pinned worktree 06:13:24 to 07:02:56 after two container
-restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree: below.
->>>>>>> 6b717f6

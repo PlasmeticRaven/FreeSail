@@ -67,8 +67,8 @@ def _port_like(nation: str):
 
 def test_the_valuation_is_the_rows_over_the_files_figures():
     """A merchant brig of 304 tons burthen (her displacement over 1.36) at £8 a ton worn ten
-    years at two per cent: £1,944; her guns at £4 the hundredweight; a frigate at the man of
-    war's £12."""
+    years at two per cent: £1,944; her four long 6s at £4 the hundredweight, £320; a frigate
+    at the man of war's £12."""
     w = _frigate()
     from freesail.world.geo import Position
     from freesail.world.ships import Vessel
@@ -76,7 +76,9 @@ def test_the_valuation_is_the_rows_over_the_files_figures():
     brig = Vessel("x", "X", "a brig", "data/ships/brig.yaml", "france", Position(49.4, -5.4))
     brig.description = "merchant brig"
     val = PC.valuation(w, brig)
-    assert val["tons"] == 304 and val["hull"] == 1944.0 and val["guns"] == 1248.0
+    # her four long 6s of 20 cwt at £4 the hundredweight (the merchant brig's own file since
+    # package 75's SW-4; the brig-sloop's eighteen gave £1,248 before the trunk's merge)
+    assert val["tons"] == 304 and val["hull"] == 1944.0 and val["guns"] == 320.0
     frigate = Vessel(
         "y", "Y", "a ship", "data/ships/frigate-36.yaml", "france", Position(49.4, -5.4)
     )
@@ -147,7 +149,7 @@ def _taken_in_falmouth_road(consort: bool = False):
 
 def test_the_prize_is_condemned_and_the_money_paid_by_the_eighths_into_the_purse():
     """The design's §5.2 and §5.3 (truth 7-362): the French brig taken is condemned (France at
-    war with Britain at the taking), valued by the rows (the hull £1,944, her guns £1,248,
+    war with Britain at the taking), valued by the rows (the hull £1,944, her guns £320,
     her powder and shot), nothing for the head money (a merchantman), the agent's five per
     cent and the court's fees deducted, the whole into the frigate's purse with the purse's
     line saying the eighths of 1805 (the captain three eighths), the account's lines as the
@@ -166,7 +168,7 @@ def test_the_prize_is_condemned_and_the_money_paid_by_the_eighths_into_the_purse
     before = w.purse.pounds
     acc = PC.sentence(w, b, port)
     assert acc["sentence"] == "condemned" and acc["head_money"] == 0.0
-    assert acc["valuation"]["hull"] == 1944.0 and acc["valuation"]["guns"] == 1248.0
+    assert acc["valuation"]["hull"] == 1944.0 and acc["valuation"]["guns"] == 320.0
     assert acc["agent"] == round(acc["gross"] * 0.05) and acc["fees"] == 20.0
     assert acc["net"] == acc["gross"] - acc["agent"] - 20.0 and acc["reserved"] == 0.0
     ours, theirs = acc["shares"]
