@@ -2967,8 +2967,9 @@ whole 6,548 passed, 1 xfailed, the one failure the trunk's import cycle above (n
 branch's); the slow tier of the touched files and the known truths 1,330 passed, 8 xfailed;
 the pace alone and last 13 of 13. **The lead's merge:** the trial on 6f244969 clean and
 lint-clean (ruff check and format); the fast tier whole on it green, exit 0 (08:37 to 09:17 UTC), 6,555 passed, 2 skipped, 1 xfailed, none failed; the Node tests of
-the viewer among them (Node 22 on the build machine); the whole suite in the cloud dispatched
-after run 49, the figures to follow. PACKAGE 81 IS CLOSED: the standard, the data, the drawing,
+the viewer among them (Node 22 on the build machine); the whole suite in the cloud: run 50 on eff2a556 (09:27 to 10:23 UTC): lint green, all six
+shards green, 6,953 passed, 11 skipped, 12 xfailed, no failure; the pace job 13 of 13 (so runs
+48 and 49's four floor failures were the shared runner's hour, as the lead held). PACKAGE 81 IS CLOSED: the standard, the data, the drawing,
 the checker, the truths and the records in one package, the builder's seven departures each the
 better rule. Package 91 (the viewer's light and air) follows after it in its turn.
 
