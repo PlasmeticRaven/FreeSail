@@ -54,7 +54,7 @@ on these packages; that is the owner's choice.
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package; the hold (SW-5) and B3.4 merged 2026-11-06 (f414ed1); SW-4 and B2 in hand to one final report |
-| 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below), for the owner's approval**, to run beside 74 as an Opus sibling session on `claude/pkg-76`: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone |
+| 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
@@ -68,7 +68,7 @@ on these packages; that is the owner's choice.
 | 88 | Opus (the owner, 2026-10-29; Fable before) | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; **briefed 2026-10-30 (below)**, each item with the symptom, the rule as it stands, the rule as it should read and what proves it, the moved pins by bisection (the owner, 2026-10-29); **approved and launched 2026-10-30** as an Opus sibling session on `claude/pkg-88`, beside 82; **built and merged 2026-10-31** (below, "Package 88 as merged") |
 | 89 | Opus | **The held gauges' water** (79b's finding): a held gauge enters the tide's blend for the positions within its own block's bounds alone, so that the Channel east's six, Biscay's, Portugal's and the islands' gauges give their water its own tide and no position west of 1 W reads anything new; the master's epitome's rises by the same water; the proof that no recorded passage's digest moves | briefed below (2026-10-29); **approved and launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-89`, with the Mediterranean's held gauges of 79c and 79d now among its cases; **built and stopped for the lead's ruling the same night** (the rule as briefed, 73 gauges given their blocks, no recorded passage moved; four of the blocks' own tests failing on their true water, Bournemouth and Portsmouth held in `channel-mid`, Beachy Head a hundredth over the brief's foot, the tiles' fill on the false mean level): **ruled 2026-10-30, a step 4** (the four re-measured or their data mended old beside new, the two gauges held with the options recorded, 7-280 pinned at the measured figure, the gap at 40.50 N closed if no tile moves) and the fill's rebuild booked as package 93; **merged 2026-10-30** (the record below) |
 | 90 | Opus (the ships session) | **The Spanish and Mediterranean ships** (the owner, 2026-10-29, widened 2026-11-06 from the tartane and the xebec to five hulls): on 79c's water, from the smallest up: the tartane, the third reference vessel of decision 11 (one raking mast with the lateen mainsail and a square topsail over it, the lateen on the small mizen, one or two headsails on the long bowsprit by judgement, the boat in tow); the polacre, a lateen on a forward-raked foremast and on the mizen with square sail on the main (a lateen and square sails on one hull, the bilander's problem on a Mediterranean hull); the xebec, a lateen on all three masts and her sweeps as an option; the twenty-gun corvette *Diana* as captured and used by the Spanish navy in 1809; and the *Purísima Concepción* class three-decker of the Spanish navy, the game's first three-decked ship. Each as her trades and roles allow (a trader or fisherman and a corsair or the King's for the small three; the navy's fits for the two ships), built to Build-Ships.md §5.0's principles and the ladder of evidence from Roux's and Tofiño's plans, Winfield and the Spanish sources the session finds, and the pilots 79c lays down, with the lateen handling B3.1 gives (worn, not tacked; the yard dipped round the mast); the regency's cruisers as a role with their doctrine; the schooner's-mast rule of 75's B3.4 classing the tartane as the cutter and the polacre's square main as her one mast with yards, with its two limits (a lower square-sail yard on the main, a pole main with its topsail yard on the lower mast, each still a brig) and the polacre's lateen mizen and pole masts for her own document (the notes to the ships session, 2026-11-06, 18:00); inside milestone 7 | the ships session's next window after 75 closes, on 79c's block; to brief by the session in its plan's form (a design document each, the ladder of evidence, the lead's gate before a file), for the lead's gate |
-| 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull (both merged); **briefed 2026-11-07 (below), for the owner's approval**, to run beside 74 as an Opus sibling session on `claude/pkg-81`: the standard written first, every gun of every hull placed by one rule from the file's data, a checker every new ship passes |
+| 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull (both merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-81` (session_01XooV4BCduVgUGzypUoJmNm), beside 74 and 76, the trunk at f466051: the standard written first, every gun of every hull placed by one rule from the file's data, a checker every new ship passes |
 | 91 | Opus | **The viewer's light and air** (the owner's references of 2026-10-29, decision 57): the ship's own lights warm and distinct at night (the stern lantern, the top lights and the binnacle 71 already hoists, each a glow on the faces near it); the scene's light by the hour and the sky (the sun's altitude and azimuth from `core/moon.py`, the weather's cover and visibility: a gradient sky and sea, the faces tinted by their side to the light, dusk's warmth, night's dark with the lights alone, haze by the visibility); a lively telltale at the masthead and a waving ensign, canned but driven by the apparent wind the physics already gives (direction, a flutter whose rate and amplitude follow the speed), animated between snapshots; all in the present SVG viewer, stylesheet-driven, drawing only, nothing of the world read that the readings do not give | after 81 and 75's hull; when the owner likes; the two reference pictures stay with the owner (another game's work), described in the decision |
 | 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8 |
 | 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93`; **merged whole 2026-10-30** at `d9465d9` from `7e6b9f1` (the record below): ten regions rebuilt on the world's own tide, the raise one source of truth with the tide, Agincourt Sound keeping the eleven's raise until a sheet is read, truths 7-305 to 7-309 |
@@ -3579,7 +3579,7 @@ work is said so, and the builder goes on with what does not wait for it.
    the tests it does not know about. A test of each new root: a signal hoisted under it and
    read by a ship of the same nation holding the book; read as "a signal we cannot read" by
    a ship of another; the convoy's instruction obeyed by a commanded captain under it.
-7. **Truths 7-426 to 7-435 and the records.** A Spanish frigate and her consort work a
+7. **Truths 7-426 to 7-433 and the records.** A Spanish frigate and her consort work a
    chase on the Spanish book's numbers and the British frigate in sight reads the hoist and
    not its meaning; the British numerary's Trafalgar entries (1, 13, 16, 63, 72, 76) stand
    at the 1799 book's numbers from the page; a telegraphic sentence of a dozen words is
@@ -3596,8 +3596,56 @@ work is said so, and the builder goes on with what does not wait for it.
    numbers, no "package"), the tuning notes (the pass, each book's figures: entries, made
    entries, sources; what moved and its proof; found on the way; the suite as run).
 
+
+8. **The flags of command and identity (the owner's addition, 2026-11-07; truths 7-434 and
+   7-435).** Reading Roosevelt's *The Naval War of 1812* (part I, pp. 160 to 161, out of
+   copyright), the owner found the one thing of the colours the game has not: "she carried her
+   commodore's pendant at the main, national ensigns at the mizzen-peak and main top-gallant
+   mast-head, and a Jack at the fore. The *Java* also ... hoisting her ensign at the mizzen-peak,
+   a union Jack at the mizzen top-gallant mast-head, and another lashed to the main-rigging"; and
+   before it, "At 10 the *Java* made the private signals, English, Spanish, and Portuguese in
+   succession, none being answered; ... a little after 1 she [the *Constitution*] hoisted her
+   private signal, and then, being satisfied that the strange sail was an enemy, she wore and
+   stood off." 71's colours are a state (shown, none, false, struck, distress) with no flag in a
+   place; this item gives each root **a seventh file, `colours.yaml`**: the nation's flags of
+   identity and command by name (the ensign and its variants by service or squadron, the
+   merchant's ensign, the jack, the commissioning pendant, the broad pendant of a commodore, an
+   admiral's flag by rank, the flag of truce), **where each flies and when** (the ensign at the
+   peak or the staff; the pendant at the main; the jack at the jackstaff at anchor and, by the
+   period's practice in action, at the fore or a topgallant masthead; the ensigns doubled in
+   action, one at the peak and one at a masthead, and one lashed in the rigging so that no shot
+   can bring the colours down by accident), and **a drawing of each** (the field, the cantons, the
+   crosses or stripes as a short list of coloured rectangles and lines in the flag's proportion,
+   the source named; package 81 draws from it and 91 animates it). The engine: 71's locker gains
+   **what flies where** (a small list set by the rules at the colours' hoisting from the nation's
+   file, the ship's role and her captain's rank: a King's ship wears her pendant, a commodore his
+   broad pendant (72's role), a merchantman her ensign alone; at anchor the jack; beating to
+   quarters doubles the ensigns and bends the jack as the file has it), **read by the lookout** at
+   the colours' range in words ("she wears a broad pendant at the main": a commodore; "a pendant:
+   a man-of-war"; "her ensign at the peak and another at the main"), and **the orders** (`hoist the
+   broad pendant`, `hoist a second ensign at the main`, `hoist the jack`) with the standing
+   orders' and the doctrine's hooks named for 74 and 72 (the files of the captains are 74's:
+   report what a rules captain should hoist by his doctrine and build the data and the lookout's
+   side; the lead carries the doctrine's line to 74). **The private signal in another nation's
+   form**, the *Java*'s move: `make the Spanish private signal` (or `make the private signals in
+   succession`) where the ship **holds the table** (a captured table by 74's road, or an ally's
+   carried by the scenario's `papers.signal_books`), each a challenge in that nation's form the
+   stranger reads and answers or not, the minute a hoist, the answer judged against the table
+   held, the log saying "the private signals, English, Spanish and Portuguese in succession, none
+   answered"; a table the ship does not hold is refused in words. Truth 7-434: a King's frigate
+   wears her pendant at the main and her ensign at the peak, a commodore's ship her broad pendant,
+   a merchantman her ensign alone, each read by the lookout at the colours' range in those words,
+   and beating to quarters doubles the frigate's ensigns with the jack at the fore, nothing of it
+   moving any pinned passage's digest (the places are the locker's state and the lookout's
+   words only where the colours' line already falls, or the passage is named and re-measured).
+   Truth 7-435: a ship holding three nations' tables makes the three private signals in
+   succession to a stranger that answers none, three minutes at a hoist, and her captain holds
+   her an enemy by the tell, as 71 has it. The data shape of `colours.yaml` is written in the
+   design note's postscript before it is filled, as 71 wrote the six files', so that every nation's
+   flags fit it and 81 reads one shape.
+
 **Not built here:** the squadron's signals beyond the books' entries (72's set stands), the
-captured book's use (74's), the far ships' reading (71's and 72's as they stand), the eastern
+captured book's use (74's), the captains' doctrine of what to hoist (74's files; reported to the lead), the far ships' reading (71's and 72's as they stand), the eastern
 Mediterranean's factions. **The head rules bind** as every brief has them: no model
 identifier in any file; nothing under `docs/agents/consent/` or in the consent brief
 touched; the pins re-measured only where a change moves them, old beside new, proven by the
@@ -3710,7 +3758,7 @@ for it.
    eight files with triples today (the brig, the cutter, the frigate, the merchant brig,
    the privateer schooner, the razee, the 64, the topsail schooner) are the first to pass;
    a gun of theirs that does not is reported, not fixed here.
-5. **Truths 7-436 to 7-445.** Every gun of every ship file with the contract is drawn on
+5. **Truths 7-436 to 7-443.** Every gun of every ship file with the contract is drawn on
    its deck's triple within 0.01 m or over the rail by the rule, the checker clean; the
    Amazon's forecastle guns are drawn over the rail and through no port, her upper-deck
    guns in ports of the upper deck's size; a lee port the engine shuts by the roll is drawn
@@ -3728,8 +3776,37 @@ for it.
    what moved and its proof, found on the way, the suite as run); the harbour's page if a
    setting is added (none expected).
 
+
+7. **The flags drawn at their places (the owner's addition, 2026-11-07; truths 7-444 and
+   7-445).** Reading Roosevelt's *The Naval War of 1812* (part I, p. 161): "she carried her
+   commodore's pendant at the main, national ensigns at the mizzen-peak and main top-gallant
+   mast-head, and a Jack at the fore"; the viewer draws no flag at all today. By the same rule
+   for every hull: the flags that fly are drawn **at their places on the drawn spars**, the
+   ensign at the mizzen peak (the gaff's peak the projection already has) or the ensign staff
+   at the taffrail where the hull has no gaff, the pendant at the main truck, the jack at the
+   jackstaff on the bowsprit or at the fore truck, a second ensign at a topgallant masthead, one
+   lashed in the rigging, as **what flies where** says it: package 76 gives each nation's root a
+   `colours.yaml` (the flags by name, where each flies by occasion, and a drawing of each as a
+   short list of coloured rectangles and lines in the flag's proportion) and the engine's locker
+   the list of what flies where; the snapshot serves that list with each flag's drawing, and
+   the viewer draws it stiff (cloth drawn flat, the fly to leeward of the apparent wind by a
+   fixed angle; the waving is 91's). **The contract between the two packages**, so that neither
+   waits: 81 reads the snapshot's `flags` (place, flag name, drawing) and draws whatever is
+   there; until 76's file exists for a root the server serves one plain ensign at the peak in a
+   field of the nation's `flag` word from `data/nations.yaml`, so that 81's drawing and its truths
+   are complete on the trunk as it stands and 76's data refines them. The struck colours draw
+   nothing; false colours draw the other nation's; the flag of truce (74's cartel) the white; the
+   distress signal the ensign union down. The frame equal across states as every flag flies or
+   comes down. Truth 7-444: every hull with a drawn profile draws her ensign at her peak or
+   staff and her pendant at the main truck when the locker says they fly, a commodore's broad
+   pendant for a commodore, the jack at its place at anchor, the second ensign at the masthead
+   when the ensigns are doubled, each within 0.1 m of the spar's point in the projection, the
+   bounds unmoved. Truth 7-445: the flags follow the state in the next snapshot: struck draws
+   none, false colours the other nation's, the cartel's white, and a hull whose nation has no
+   `colours.yaml` yet draws the plain ensign from the nations' table.
+
 **Not built here:** the light and the air (91, which reuses this package's animation
-road); a three-dimensional ship or a damage picture beyond the present honesty (M8); any
+road and waves the flags 81 placed); a three-dimensional ship or a damage picture beyond the present honesty (M8); any
 ship file's triples (the ships session's, by its plan); the guns' mechanics (70's, 77's).
 **The head rules bind** as every brief has them: no model identifier in any file; nothing
 under `docs/agents/consent/` or in the consent brief touched; the pins re-measured only
