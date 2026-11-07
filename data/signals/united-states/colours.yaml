@@ -1,0 +1,138 @@
+# FreeSail: the United States flags of command and identity (spec M7 §1; package 76, the
+# owner's addition of 2026-11-07; docs/design/Design-Signals.md, "As built out", which gives the
+# shape). The flag of fifteen stripes and fifteen stars (1795 to 1818), the long pennant of a
+# captain in command, and the commodore's broad pennant with the union's stars are Preble's
+# (1894); the United States had no admiral, so no admiral's flag; where each flew in action is
+# Roosevelt's account of the *Constitution* (1812): her commodore's pendant at the main,
+# ensigns at the mizzen peak and the main topgallant masthead, a jack at the fore. The drawings
+# are the builder's from those words, the proportions judgement.
+
+nation: united-states
+sources:
+  - "Preble, History of the Flag of the United States of America, Boston 1894 (the flag of 1795 to 1818, the pennant, the commodore's broad pennant)"
+  - "Babron, Précis des pratiques de l'art naval, Brest 1817 (the flag of the United States, for war and trade)"
+  - "Roosevelt, The Naval War of 1812, New York 1882 (the commodore's pendant at the main, the ensigns doubled and the jack at the fore in action)"
+flags:
+  - name: "stars and stripes"
+    kind: "ensign"
+    service: "any"
+    words: "the stars and stripes"
+    proportion: [10, 19]
+    drawing:
+      - {rect: [0, 0, 1, 0.0667], colour: red}
+      - {rect: [0, 0.0667, 1, 0.1333], colour: white}
+      - {rect: [0, 0.1333, 1, 0.2], colour: red}
+      - {rect: [0, 0.2, 1, 0.2667], colour: white}
+      - {rect: [0, 0.2667, 1, 0.3333], colour: red}
+      - {rect: [0, 0.3333, 1, 0.4], colour: white}
+      - {rect: [0, 0.4, 1, 0.4667], colour: red}
+      - {rect: [0, 0.4667, 1, 0.5333], colour: white}
+      - {rect: [0, 0.5333, 1, 0.6], colour: red}
+      - {rect: [0, 0.6, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 0.7333], colour: red}
+      - {rect: [0, 0.7333, 1, 0.8], colour: white}
+      - {rect: [0, 0.8, 1, 0.8667], colour: red}
+      - {rect: [0, 0.8667, 1, 0.9333], colour: white}
+      - {rect: [0, 0.9333, 1, 1], colour: red}
+      - {rect: [0, 0, 0.4, 0.5333], colour: blue}
+      - {rect: [0.0542, 0.0283, 0.0792, 0.0783], colour: white}
+      - {rect: [0.1875, 0.0283, 0.2125, 0.0783], colour: white}
+      - {rect: [0.3208, 0.0283, 0.3458, 0.0783], colour: white}
+      - {rect: [0.0542, 0.135, 0.0792, 0.185], colour: white}
+      - {rect: [0.1875, 0.135, 0.2125, 0.185], colour: white}
+      - {rect: [0.3208, 0.135, 0.3458, 0.185], colour: white}
+      - {rect: [0.0542, 0.2417, 0.0792, 0.2917], colour: white}
+      - {rect: [0.1875, 0.2417, 0.2125, 0.2917], colour: white}
+      - {rect: [0.3208, 0.2417, 0.3458, 0.2917], colour: white}
+      - {rect: [0.0542, 0.3483, 0.0792, 0.3983], colour: white}
+      - {rect: [0.1875, 0.3483, 0.2125, 0.3983], colour: white}
+      - {rect: [0.3208, 0.3483, 0.3458, 0.3983], colour: white}
+      - {rect: [0.0542, 0.455, 0.0792, 0.505], colour: white}
+      - {rect: [0.1875, 0.455, 0.2125, 0.505], colour: white}
+      - {rect: [0.3208, 0.455, 0.3458, 0.505], colour: white}
+    dates: "1795-1818"
+    source: "Preble, History of the Flag of the United States (1894): the flag of fifteen stripes and fifteen stars, 1795 to 1818; Babron (1817): the same for ships of war and of trade, the stripes red and white, the first and last red, the stars white on a blue canton by the staff; the canton over eight stripes and the stars in five rows of three, judgement"
+  - name: "American jack"
+    kind: "jack"
+    service: "navy"
+    words: "the American jack, the union of stars"
+    proportion: [1, 1.4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.1417, 0.05, 0.1917, 0.15], colour: white}
+      - {rect: [0.475, 0.05, 0.525, 0.15], colour: white}
+      - {rect: [0.8083, 0.05, 0.8583, 0.15], colour: white}
+      - {rect: [0.1417, 0.25, 0.1917, 0.35], colour: white}
+      - {rect: [0.475, 0.25, 0.525, 0.35], colour: white}
+      - {rect: [0.8083, 0.25, 0.8583, 0.35], colour: white}
+      - {rect: [0.1417, 0.45, 0.1917, 0.55], colour: white}
+      - {rect: [0.475, 0.45, 0.525, 0.55], colour: white}
+      - {rect: [0.8083, 0.45, 0.8583, 0.55], colour: white}
+      - {rect: [0.1417, 0.65, 0.1917, 0.75], colour: white}
+      - {rect: [0.475, 0.65, 0.525, 0.75], colour: white}
+      - {rect: [0.8083, 0.65, 0.8583, 0.75], colour: white}
+      - {rect: [0.1417, 0.85, 0.1917, 0.95], colour: white}
+      - {rect: [0.475, 0.85, 0.525, 0.95], colour: white}
+      - {rect: [0.8083, 0.85, 0.8583, 0.95], colour: white}
+    dates: "1795-1818"
+    source: "Preble, History of the Flag of the United States (1894): the flag of fifteen stripes and fifteen stars, 1795 to 1818 (the union, the blue with the stars, worn as the jack; judgement for the period)"
+  - name: "American pendant"
+    kind: "pendant"
+    service: "navy"
+    words: "the long pendant"
+    proportion: [1, 25]
+    drawing:
+      - {rect: [0, 0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1], colour: white}
+      - {rect: [0, 0, 0.12, 1], colour: blue}
+    dates: ""
+    source: "Preble (1894), the distinguishing flags of the navy: the long and narrow pennant, the coach-whip, the mark of a captain in command of a vessel of war, forbidden to merchant ships and privateers in the presence of one; its colours (the stars at the head, the fly red and white) judgement"
+  - name: "commodore's broad pendant"
+    kind: "broad pendant"
+    service: "navy"
+    words: "a commodore's broad pendant"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.1292, 0.155, 0.1542, 0.205], colour: white}
+      - {rect: [0.3125, 0.155, 0.3375, 0.205], colour: white}
+      - {rect: [0.4958, 0.155, 0.5208, 0.205], colour: white}
+      - {rect: [0.1292, 0.315, 0.1542, 0.365], colour: white}
+      - {rect: [0.3125, 0.315, 0.3375, 0.365], colour: white}
+      - {rect: [0.4958, 0.315, 0.5208, 0.365], colour: white}
+      - {rect: [0.1292, 0.475, 0.1542, 0.525], colour: white}
+      - {rect: [0.3125, 0.475, 0.3375, 0.525], colour: white}
+      - {rect: [0.4958, 0.475, 0.5208, 0.525], colour: white}
+      - {rect: [0.1292, 0.635, 0.1542, 0.685], colour: white}
+      - {rect: [0.3125, 0.635, 0.3375, 0.685], colour: white}
+      - {rect: [0.4958, 0.635, 0.5208, 0.685], colour: white}
+      - {rect: [0.1292, 0.795, 0.1542, 0.845], colour: white}
+      - {rect: [0.3125, 0.795, 0.3375, 0.845], colour: white}
+      - {rect: [0.4958, 0.795, 0.5208, 0.845], colour: white}
+    dates: ""
+    source: "Preble (1894): the commodore's broad pennant blazoned with the union's stars, blue, red or white by the seniority of the captains commanding squadrons, the blue always worn but by a junior in company (the blue drawn)"
+  - name: "flag of truce"
+    kind: "truce"
+    service: "any"
+    words: "a flag of truce"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+occasions:
+  - {occasion: "at sea", role: "kings ship", flags: [{name: "stars and stripes", where: "peak"}, {name: "American pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "commodore", flags: [{name: "stars and stripes", where: "peak"}, {name: "commodore's broad pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "merchant", flags: [{name: "stars and stripes", where: "peak"}]}
+  - {occasion: "at sea", role: "privateer", flags: [{name: "stars and stripes", where: "peak"}]}
+  - {occasion: "at anchor", role: "kings ship", flags: [{name: "stars and stripes", where: "staff"}, {name: "American pendant", where: "main truck"}, {name: "American jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "commodore", flags: [{name: "stars and stripes", where: "staff"}, {name: "commodore's broad pendant", where: "main truck"}, {name: "American jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "merchant", flags: [{name: "stars and stripes", where: "staff"}]}
+  - {occasion: "at anchor", role: "privateer", flags: [{name: "stars and stripes", where: "staff"}]}
+  - {occasion: "in action", role: "kings ship", flags: [{name: "stars and stripes", where: "peak"}, {name: "stars and stripes", where: "main topgallant masthead"}, {name: "American pendant", where: "main truck"}, {name: "American jack", where: "fore truck"}]}
+  - {occasion: "in action", role: "commodore", flags: [{name: "stars and stripes", where: "peak"}, {name: "stars and stripes", where: "main topgallant masthead"}, {name: "commodore's broad pendant", where: "main truck"}, {name: "American jack", where: "fore truck"}]}
+  - {occasion: "in action", role: "any", flags: [{name: "stars and stripes", where: "peak"}, {name: "stars and stripes", where: "fore topgallant masthead"}]}
+  - {occasion: "in action", role: "merchant", flags: [{name: "stars and stripes", where: "peak"}]}
+  - {occasion: "in action", role: "privateer", flags: [{name: "stars and stripes", where: "peak"}]}
+  - {occasion: "under truce", role: "any", flags: [{name: "stars and stripes", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+  - {occasion: "under truce", role: "merchant", flags: [{name: "stars and stripes", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
