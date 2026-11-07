@@ -106,6 +106,10 @@ def test_the_spanish_book_is_added_by_data_alone_in_mazarredos_numbers():
     assert fog["Shorten sail"].fire == "two guns"
     assert fog["Wear together"].fire == "two guns, and a full minute after three guns"
     assert all(not x.made for x in es.night + es.fog)
+    # her private signal's draw is the one she drew on basic: the form kept word for word
+    for month in (1, 6, 12):
+        drawn = S.private_table(S.load_books("basic"), "spain", 1805, month, 7)
+        assert S.private_table(es, "spain", 1805, month, 7) == drawn
 
 
 def test_the_telegraphic_dictionary_spells_nelsons_sentence_in_twelve_hoists():
