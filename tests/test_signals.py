@@ -3,6 +3,8 @@ hail (spec M7 §1 to §5; package 71; `docs/design/Design-Signals.md`)."""
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from freesail import units
@@ -25,7 +27,13 @@ def test_every_root_has_the_six_files_in_one_shape_and_the_nations_name_theirs()
             assert e.number is not None and e.meaning and e.source, (root, e.meaning)
             assert set(e.does) <= {"order", "state", "news", "answer", "closer", "release"}, e
         for e in [*b.night, *b.fog]:
-            assert e.made and (e.show or e.fire), (root, e.meaning)
+            # 71's were all made; 76 read the British night book (1799) and fog book (1796)
+            # and Audibert's French fog (1802) from the page: an entry is made, or its source
+            # names the page's year
+            assert e.show or e.fire, (root, e.meaning)
+            assert e.made or re.search(r"\b1[78]\d\d\b", e.source), (root, e.meaning)
+            if root == "britain" and not e.made:
+                assert e.number is not None, e.meaning  # the British tables are numbered
     table = load_nations()
     for n in table.nations.values():
         assert S.books_for_nation(table, n.id).root == n.signals_root
@@ -49,8 +57,28 @@ def test_the_british_book_keeps_the_numbers_remembered_and_marks_the_rest_made()
     e, _ = b.find("to chase")
     assert e.does == {"state": "chasing"}
     assert b.find("the convoy to tack in succession", "convoy")[0].number == 5
-    assert b.find("tack", "fog")[0].fire == "two guns"
+    assert b.find("tack", "fog")[0].fire == "three guns, two quick and one slow"  # 1796, fog No. 8
     assert b.find("a sentence the book lacks") is None
+
+
+def test_a_hoist_shows_its_books_form_and_the_british_numerary_is_unchanged_by_it():
+    """Package 76: a book declares how its numbered signals are hoisted. The British numerary
+    is a flag a figure (No. 186 three flags), as before the field, and its hoist's record
+    carries no new key; du Pavillon's table (the French book) is two flags, the upper and the
+    lower, whatever the cell's number (Audibert 1802, ch. IV § 71)."""
+    gb = S.load_books("britain")
+    assert gb.hoist_form == "numerary" and S.load_books("basic").hoist_form == "numerary"
+    e, q = gb.find("No. 186")
+    h = S.make_hoist(S.Locker(), gb, e, q, "harpy", 100)
+    assert h.flags_words() == "three flags at the main" and "form" not in h.to_dict()
+    e, q = gb.find("No. 16")
+    assert S.make_hoist(S.Locker(), gb, e, q, "harpy", 100).flags_words() == "two flags at the main"
+    fr = S.load_books("france")
+    assert fr.hoist_form == "table"
+    e, q = fr.find("general chase")
+    h = S.make_hoist(S.Locker(), fr, e, q, "renard", 100)
+    assert e.number < 10 and h.flags_words() == "two flags at the main"
+    assert h.to_dict()["form"] == "table"
 
 
 def test_the_telegraphic_dictionary_spells_nelsons_sentence_in_twelve_hoists():
@@ -242,7 +270,7 @@ def test_a_hoist_is_seen_at_the_flags_range_and_read_a_minute_later_by_the_books
     )
     assert (
         heard[0].kind == "signal.read"
-        and heard[0].text == "The brig fires two guns: tack together."
+        and heard[0].text == "The brig fires three guns, two quick and one slow: to tack."
     )
     sender.tidy(100 + 60 + 1800, books.flies_s)
     assert h.down is not None

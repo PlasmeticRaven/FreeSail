@@ -338,8 +338,11 @@ def test_boarders_against_a_whole_company_awake_are_repulsed_and_the_temper_pays
 def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_their_hand():
     """§11a: against a frigate at quarters, her gun crews at the guns, the boarders with
     their arms served out carry the deck in a few rounds: her colours come down by the
-    boarders' hand (`action.strike` with the words), the far body struck, the losses on
-    both musters by name, the prize crew left to 74."""
+    boarders' hand (`action.strike` with the words), the losses on both musters by name;
+    the far body struck for the moment of the strike and then (package 74, the design's
+    §2.3: the officer on the deck won takes possession of her at once) a prize of ours, her
+    record saying how she was taken, her colours ours over hers. The pin moved by 74: on the
+    trunk she lay struck and no prize; the bands of the fight are as they were."""
     w, v, enemy = _alongside(10.0, her_quarters=True)
     w.submit("grapple her")
     w.submit("serve out the small arms")
@@ -359,11 +362,17 @@ def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_
     assert carried and "by our boarders' hand" in carried[0].text
     struck = _events(enemy, "action.struck")
     assert struck and "carried by boarding" in struck[0].text
-    assert v.struck and enemy.ship.extra.get("struck")
-    assert B.grappled_to(w.ship) == v.id  # the prize alongside, 74's
-    her_hurt = [s for s in enemy.ship.extra["crew"].sailors if s.hurt]
+    from freesail.world import prizes as P
+
+    assert P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")  # 74's
+    assert (P.record_of(v) or {}).get("how") == "carried by boarding"
+    assert B.grappled_to(w.ship) == v.id  # the prize alongside
+    # her people are the prize's prisoners (74's muster swap): their hurt the fight's
+    prisoners = P.prisoners_of(enemy.ship)
+    assert prisoners is not None
+    her_hurt = [s for s in prisoners.crew.sailors if s.hurt]
     assert len(her_hurt) == f.lost_defence > f.lost_attack
-    assert "wounded" in enemy.readings.words("bill")
+    assert "of them hurt" in enemy.readings.words("prisoners")
     assert "the last fight carried" in w.readings.words("boarders")
 
 

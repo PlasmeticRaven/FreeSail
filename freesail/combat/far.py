@@ -1,9 +1,10 @@
 """The far fight's measure (spec M7 §11a; package 70, item 9): two ships that meet in anger
 beyond the promotion's range resolved by the same tables at coarse steps, with no ship
 graph, no crew and no World, so that 74 has a measured ground to build the far fight on.
-**Not wired to the far brains**: a far body never takes the engaging transition in this
-package (`brains.FarCaptain._enemy_within`); this module is run apart, by the truth that
-measures it and by whoever tunes it.
+**Not wired to the far brains by package 70**: a far body took no engaging transition in that
+package (`brains.FarCaptain._enemy_within`); this module was run apart, by the truth that
+measures it and by whoever tunes it, and package 74 wires its rounds to the far records
+(`combat/far_action.py`, its step 4), the measure's loop and the world's one function.
 
 A round is `step_s` of the ship's time (three minutes by default: a drilled ship's two
 broadsides, a merchantman's one). In a round each ship fires her engaged broadside at the
@@ -34,7 +35,7 @@ from freesail.combat import shot as S
 from freesail.combat.guns import LIGHT_GUN_SHARE_FLOOR, NUMBERS_POWER, PHASES, REFERENCE_CWT
 from freesail.ship.loader import load_spec
 
-__all__ = ["FarShip", "Round", "fight", "far_ship"]
+__all__ = ["FarShip", "Round", "far_ship", "fight", "round_once"]
 
 # The rigging hit's shares at far detail (judgement, as `hits.RIGGING_SHARES`): the sail
 # cut by this share of her canvas a hit; a spar carried away with this chance.
@@ -108,7 +109,10 @@ def far_ship(ship_file: str, nation: str, fit: str | None = None, **doctrine: An
                 continue  # one side's guns fire
             guns.append((g.kind, float(g.pounder), float(g.weight_cwt)))
     complement = int(getattr(spec.crew, "complement", 0) or 0)
-    length = float(getattr(spec.hull, "length_m", 0.0) or 0.0)
+    # her length on the waterline (`HullSpec.length_waterline_m`; package 74, step 1: 70 read a
+    # key the spec has not, so every far ship was 0.0 long and `shot.hit_chance` floored her
+    # size at 0.5 whatever she was; found by package 75)
+    length = float(getattr(spec.hull, "length_waterline_m", 0.0) or 0.0)
     return FarShip(
         name=spec.name,
         nation=nation,
@@ -260,6 +264,33 @@ def _judge(ship: FarShip, enemy: FarShip, under_fire: bool) -> float:
     return ship.morale
 
 
+def round_once(
+    a: FarShip,
+    b: FarShip,
+    range_m: float,
+    rng: Any,
+    t_s: float,
+    fired_on: dict[str, bool],
+    step_s: float = 180.0,
+) -> Round:
+    """One round of the far fight at `t_s` (package 74, step 1: the body of `fight`'s loop,
+    factored out so that the world's far action runs the same round the measure runs):
+    each side's broadside at the other, the morale judged on the sums, the colours struck
+    under the doctrine's line once fired on; `fired_on` is kept across the rounds (whether
+    each has yet been fired on, by name). The round's record is returned."""
+    fa, sa = _fire(a, b, range_m, rng, step_s)
+    fb, sb = _fire(b, a, range_m, rng, step_s)
+    fired_on[b.name] = fired_on.get(b.name, False) or fa > 0
+    fired_on[a.name] = fired_on.get(a.name, False) or fb > 0
+    ma = _judge(a, b, fired_on[a.name])
+    mb = _judge(b, a, fired_on[b.name])
+    if fired_on[a.name] and ma < a.strike_below:
+        a.struck_at_s = t_s
+    if fired_on[b.name] and mb < b.strike_below and a.struck_at_s is None:
+        b.struck_at_s = t_s
+    return Round(t_s, (fa, fb), (sa, sb), (a.hurt, b.hurt), (ma, mb))
+
+
 def fight(
     a: FarShip,
     b: FarShip,
@@ -276,15 +307,5 @@ def fight(
     fired_on = {a.name: False, b.name: False}
     while t < minutes * 60.0 and a.struck_at_s is None and b.struck_at_s is None:
         t += step_s
-        fa, sa = _fire(a, b, range_m, rng, step_s)
-        fb, sb = _fire(b, a, range_m, rng, step_s)
-        fired_on[b.name] = fired_on[b.name] or fa > 0
-        fired_on[a.name] = fired_on[a.name] or fb > 0
-        ma = _judge(a, b, fired_on[a.name])
-        mb = _judge(b, a, fired_on[b.name])
-        if fired_on[a.name] and ma < a.strike_below:
-            a.struck_at_s = t
-        if fired_on[b.name] and mb < b.strike_below and a.struck_at_s is None:
-            b.struck_at_s = t
-        rounds.append(Round(t, (fa, fb), (sa, sb), (a.hurt, b.hurt), (ma, mb)))
+        rounds.append(round_once(a, b, range_m, rng, t, fired_on, step_s))
     return rounds

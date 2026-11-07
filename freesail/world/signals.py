@@ -194,6 +194,13 @@ class Books:
     private_form: dict[str, Any]
     carried_by: tuple[str, ...]
     answer_wait_s: int
+    # the dictionary's words by every form its printed entries give ('Expect-ed-ing-ation':
+    # expect, expected, expecting, expectation), to the entry's number (package 76)
+    forms: dict[str, int] = field(default_factory=dict)
+    # how a numbered signal is hoisted (package 76): 'numerary', a flag a figure (the British
+    # book: No. 245 three flags), or 'table', two flags, the upper and the lower, read as a
+    # cell of a square table whatever its number (du Pavillon's, Mazarredo's)
+    hoist_form: str = "numerary"
 
     # -- finding an entry --------------------------------------------------------------
 
@@ -244,7 +251,7 @@ class Books:
                 f"the {self.nation} book has no telegraphic dictionary; a signal is made by its "
                 "meaning from the numerary ('make the signal to chase')"
             )
-        by_word = {w.lower(): n for n, w in self.words.items()}
+        by_word = self.forms or word_forms(self.words)
         out: list[tuple[int, str]] = []
         for raw in re.findall(r"[A-Za-z']+", sentence):
             w = raw.lower().replace("'", "")
@@ -275,6 +282,58 @@ def _norm(words: str) -> str:
             s = s[len(lead) :]
             break
     return s.strip(" :,")
+
+
+def _entry_forms(entry: str) -> tuple[list[str], list[str]]:
+    """A printed entry of Popham's vocabulary as its words: the heads (each word before a
+    hyphen, the alternatives a comma parts: 'Man, men') and the forms its endings make
+    ('Expect-ed-ing-ation': expected, expecting, expectation; 'Ever-y-thing-where': every,
+    everything, everywhere; 'Copy-ies-ied-ing': copies, copied, copying). The endings are
+    the book's; the joining by the common rules (a final e dropped before a vowel, a final y
+    turned to i) is the loader's. A head stands for its number and person too ('expects' is
+    Expect's hoist, 269 on 21 October 1805): Popham, p. 7, "In verbs, the number, person,
+    tense, and mood, must be applied to the sense of the sentence"."""
+    heads: list[str] = []
+    forms: list[str] = []
+    for alt in str(entry).split(","):
+        parts = [p.strip().lower().replace("'", "") for p in alt.strip().split("-")]
+        parts = [p for p in parts if p and p.isalpha()]
+        if not parts:
+            continue
+        base = parts[0]
+        heads.append(base)
+        plural_y = base.endswith("y") and base[-2:-1] not in "aeiou"
+        forms.append(base[:-1] + "ies" if plural_y else base + "s")
+        if base.endswith(("s", "sh", "ch", "x", "o")):
+            forms.append(base + "es")
+        prev = base
+        for end in parts[1:]:
+            made = []
+            for stem in dict.fromkeys((base, prev)):
+                if stem.endswith("e") and end[0] in "aeiou":
+                    made.append(stem[:-1] + end)
+                if stem.endswith("y") and end[0] == "i":
+                    made.append(stem[:-1] + end)
+                made.append(stem + end)
+            forms.extend(made)
+            if len(end) <= 2 and end in ("y", "s", "d", "r", "n", "t", "ly", "al"):
+                prev = made[-1]
+    return heads, forms
+
+
+def word_forms(words: dict[int, str]) -> dict[str, int]:
+    """Every word the dictionary's entries give, to its number: the heads first, then the
+    forms the endings make where no head has the word already."""
+    out: dict[str, int] = {}
+    derived: list[tuple[str, int]] = []
+    for n in sorted(words):
+        heads, forms = _entry_forms(words[n])
+        for h in heads:
+            out.setdefault(h, n)
+        derived.extend((f, n) for f in forms)
+    for f, n in derived:
+        out.setdefault(f, n)
+    return out
 
 
 _COMPASS = re.compile(
@@ -384,7 +443,19 @@ def load_books(root: str = "basic", base: str | None = None) -> Books:
         private_form=dict(private),
         carried_by=tuple(str(r) for r in (private.get("carried_by") or _ROLES_WITH_TABLE)),
         answer_wait_s=int(private.get("answer_wait_s", 300)),
+        forms=word_forms(words),
+        hoist_form=_hoist_form(head, folder),
     )
+
+
+HOIST_FORMS = ("numerary", "table")
+
+
+def _hoist_form(head: dict[str, Any], folder: Path) -> str:
+    form = str(head.get("hoist_form") or "numerary")
+    if form not in HOIST_FORMS:
+        raise BookFileError(f"{folder}/book.yaml: hoist_form is one of {HOIST_FORMS}, not {form!r}")
+    return form
 
 
 def roots() -> list[str]:
@@ -479,6 +550,11 @@ class Colours:
     fired_under_false: int | None = None
     adjective: str = ""  # the words of the nation shown, for a reader with no table in hand
     flag: str = ""
+    # package 74 (spec M7 §18): a prize wears her captor's colours over her own for a day
+    # after the taking (`over`: the nation whose colours fly under; `over_since` the tick),
+    # the period's sign of a prize; "" and 0 else, and in a checkpoint from before
+    over: str = ""
+    over_since: int = 0
 
     @property
     def shows(self) -> bool:
@@ -507,6 +583,16 @@ class Colours:
         flag = f", {short}" if short else ""
         if self.state == "distress":
             return f"{adjective} colours{flag}, the ensign union down"
+        over = getattr(self, "over", "")
+        if over and self.state == "shown":
+            # a prize: her captor's colours hoisted over her own (package 74)
+            under = None
+            if nations is not None:
+                try:
+                    under = nations.get(over)
+                except KeyError:
+                    under = None
+            return f"{adjective} colours{flag} over {under.adjective if under else over}"
         return f"{adjective} colours{flag}"
 
     def to_dict(self) -> dict[str, Any]:
@@ -562,6 +648,7 @@ class Hoist:
     words_made: list[str] = field(default_factory=list)  # a telegraphic sentence's hoists
     serial: int = 0
     complete_at: int | None = None  # a telegraphic sentence's last hoist up; else breaks_out
+    form: str = "numerary"  # the book's hoist_form: how the flags look to a lookout without it
 
     @property
     def done_at(self) -> int:
@@ -596,6 +683,9 @@ class Hoist:
         if self.book == "telegraphic":
             return "the telegraph flag over a hoist of flags"
         if self.book in ("numerary", "convoy"):
+            if self.form == "table":
+                # two flags a signal, the upper and the lower, whatever the cell's number
+                return f"{_count(2 * max(1, len(self.numbers)))} flags at the main"
             n = len(str(self.numbers[0])) if self.numbers else 1
             return f"{_count(n)} flag{'s' if n > 1 else ''} at the main"
         if self.book in ("private", "reply"):
@@ -615,6 +705,9 @@ class Hoist:
             "to": self.to,
             "down": self.down,
             "answered_by": sorted(self.answered_by),
+            # written only where it is not the numerary's, so that no British or basic
+            # signal's record changes with the field (package 76)
+            **({"form": self.form} if self.form != "numerary" else {}),
         }
 
 
@@ -793,6 +886,7 @@ def make_hoist(
         in_succession=entry.in_succession,
         root=books.root,
         to=to,
+        form=books.hoist_form,
     )
     return locker.hoist(h)
 

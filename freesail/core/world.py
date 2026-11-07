@@ -2387,6 +2387,12 @@ class World:
             # writes nothing unless one runs out, and the people's needs, told to the
             # person stationed and never to the log
             self._tick_needs()
+            # the prize's minute (package 74, spec M7 §18): the prisoners rising, the
+            # captor's colours over hers hauled down after a day; nothing on a ship that
+            # holds no prisoners and is no prize
+            from freesail.world.prizes import minute as prize_minute
+
+            prize_minute(self.own)
             # the fishery once a minute (package 56): the gear in the water fishing, the
             # catch's spoilage and its day line; nothing on a ship with no gear
             fishery = getattr(self, "fishery", None)

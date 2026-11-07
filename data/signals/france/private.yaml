@@ -1,11 +1,15 @@
 # FreeSail: the form of the French private signals, the 'signaux de reconnaissance' (spec
-# M7 §2; package 71; docs/design/Design-Signals.md). The form is
-# data/signals/britain/private.yaml's (its head says the fields and the draw): the French
-# navy's recognition signals of the 1790s were a flag at a named place answered by another,
-# with the ensign where the table said (from memory), and by night lights and 'feux de
-# Bengale'; the tables themselves are lost and the game's are MADE under the seed.
+# M7 §2; package 71, read against Audibert by package 76; docs/design/Design-Signals.md). The
+# form is data/signals/britain/private.yaml's (its head says the fields and the draw).
+# Audibert Ramatuelle (Cours élémentaire de tactique navale, 1802, ch. IV § 70) says what they
+# were: the recognition signals each government gives its ships of war, flags hoisted and
+# answered, for which the ships must close near enough to make out the flags (and in thick
+# weather nearer still, not without danger); he wishes them preceded by preparatory signals
+# made with the highest sails. The flags at named places answered by others, with the ensign
+# where the table says, and by night lights and 'feux de Bengale', are 71's form from memory;
+# the tables themselves are lost and the game's are MADE under the seed.
 
-source: "the form of the Code's signaux de reconnaissance (from memory); the tables made under the seed"
+source: "the signaux de reconnaissance as Audibert 1802, ch. IV § 70, describes them; the form's places from memory; the tables made under the seed"
 made: true
 changes: monthly
 day:

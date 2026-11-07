@@ -360,7 +360,12 @@ TRIAL_TRADE_STRANGER_LINES = 1594  # package 88 (1247 at 73; 1246 at 71; 1248 at
 # last shot by the game's tick; at 17520 before, the shot's tick written by the brig's World's
 # clock, counted from her promotion and behind the game's (TuningNotes, step 6)
 TRIAL_TRADE_STRANGER_DIGEST = (
-    "bf059c3211b7cc9c"  # package 88 (02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
+    # package 75, SW-4: the brig-sloop made out as "ten ports a side" (RMG ZAZ4491) where she was
+    # "sixteen", the word served from brig.yaml's own descriptions; the one word put back gives
+    # the old digest again, the states, the anchored ticks and the lines unmoved (the lead, on
+    # the build machine, 2026-11-07)
+    "5e7bdba2a4f4770b"  # package 75 SW-4 (bf059c3211b7cc9c at 88; 02313d83240a11d5 at 84 step 6;
+    # 11b8a45bdc8c935a at 73)
 )
 
 

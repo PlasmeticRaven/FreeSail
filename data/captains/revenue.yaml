@@ -146,6 +146,7 @@ books:
     - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day and the visibility is not a mile and the visibility is not a cable then get under way on the {cast_in} tack and steer {course_in}'
     - 'standing order "under way for the port": at under way then set plain sail'
   in port: []
+  taking possession: []  # package 74: the work is the captain's own (`_take_possession`)
   investigating a stranger:
     - 'standing order "close the stranger": every glass, if a stranger in sight is in sight then give chase'
     - 'standing order "more of her": at a sail made out, if a stranger in sight is in sight then make her out'
@@ -261,7 +262,14 @@ transitions:
   # turns every minute at crewed detail)
   - {from: evading, on: enemy in range, to: engaging, unless: [overmatched, man of war near]}
   - {from: engaging, on: aground, to: in distress}
-  - {from: engaging, on: enemy struck, to: on passage}
+  # package 74 (spec M7 §18): the mark struck is taken possession of, as the cruiser's book
+  # has it (the state and its rows came to the cruiser's book at step 2, after this file was
+  # copied from it; the meeting resolved at the trunk's merge)
+  - {from: engaging, on: enemy struck, to: taking possession}
+  - {from: chasing, on: enemy struck, to: taking possession}
+  - {from: taking possession, on: prize taken, to: on passage}
+  - {from: taking possession, on: overmatched, to: evading}
+  - {from: taking possession, on: aground, to: in distress}
   - {from: engaging, on: enemy out of range, to: on passage}
   - {from: engaging, on: overmatched, to: evading}
   # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): in company, a cruiser at

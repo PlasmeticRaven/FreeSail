@@ -1,6 +1,6 @@
 # 22. An action
 
-From clearing for action to the colours struck, in the player's words. What the game can fairly do with a fight between two ships in 1805, and no more: the guns as parts of the ship with their crews from the muster, served by a cycle that runs while hands and powder last; the shot's fall by the range, the heel and the sea; a hit as a change of the state the ship already has (a line parted, a spar carried away, a sail holed, a gun dismounted, a shot hole, a man hurt); the company's temper, and the colours that come down when it fails. The marines' fire, the fight on deck, the water from the holes and the surgeon are chapter 25's; the prize is not yet in the game.
+From clearing for action to the colours struck, in the player's words. What the game can fairly do with a fight between two ships in 1805, and no more: the guns as parts of the ship with their crews from the muster, served by a cycle that runs while hands and powder last; the shot's fall by the range, the heel and the sea; a hit as a change of the state the ship already has (a line parted, a spar carried away, a sail holed, a gun dismounted, a shot hole, a man hurt); the company's temper, and the colours that come down when it fails. The marines' fire, the fight on deck, the water from the holes and the surgeon are chapter 25's; the prize, chapter 27's.
 
 ## The guns
 
@@ -13,6 +13,10 @@ the guns
 ```
 The guns: 6 12-pounder carronades; secured.
 ```
+
+### The guns in the browser's picture of her
+
+The picture of your ship in the browser draws her guns where her file puts them, every hull by the same rule: a gun of a deck with ports stands in the port at its own place, its lid hauled up while the gun is cast loose and let down while it is secured or the sea is at the sill; a gun on a deck whose rail stands too low for a port (the frigate's forecastle, the 64's roundhouse) is drawn over the rail; a swivel on its yoke on the rail; the long tom on its slide amidships, trained as she trains it. Run out, the muzzle stands out of the port; run in to load, it is inboard; secured, the lid is shut over it. When a gun fires you see it as it happens: a flash at the muzzle, the gun coming in on its recoil, and its smoke rolling out and away to leeward on the wind she feels, thinning over half a minute; only the guns that fired flash. A shot hole is drawn where the carpenter reports it, dark, and buff once it is plugged; a spar carried away is gone from the picture. Hold the pointer over a gun, a port or a hole and the picture names it in the ship's words: "No. 3 starboard gun, a long 18-pounder: run out"; "an upper-deck port, shut, the sea at its sill".
 
 ## The quarter bill
 
@@ -106,7 +110,7 @@ Morale is the one new quantity: the company's readiness to fight on, from the ca
 ! Forenoon watch (11:12)  The colours are struck: five of 30 hurt, against a broadside of 36 pounds to our 13; the hands will not stand to the guns. The guns fall silent and she lies to for her captor.
 ```
 
-What follows the colours down (the prize crew, the prisoners, the captive's channel) is not yet in the game; this chapter ends at the colours struck and the firing ceased.
+What follows the colours down (possession taken, the prize crew, the prisoners) is chapter 27's; this chapter ends at the colours struck and the firing ceased.
 
 ## The first action
 

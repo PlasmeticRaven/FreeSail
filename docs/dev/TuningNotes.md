@@ -9140,7 +9140,7 @@ hatchways, and the first measure had her guns never come loose).
 | Two cutters at a cable, as they bear (7-140) | the French cutter struck three minutes after the first shot |
 | The first action at long shot (7-133) | opened 10:13, struck 12:06; five of thirty hurt, eight shot holes; the King's cutter a topgallant mast and two yards gone, eight lines shot away, nobody hurt |
 | The merchant brig under a privateer's fire (7-137) | engaged 10:06, chased down and fired on at a cable 10:14, struck 10:15 at the first shot that told, by the odds (0.37 under 0.4) |
-| The far fight at two cables (7-139) | seven rounds of three minutes; the long-gun cutter struck with four hurt and three holes |
+| The far fight at two cables (7-139) | seven rounds of three minutes; the long-gun cutter struck with four hurt and three holes (the old read of her length, 0.0: package 74, step 1, re-measured it at five hurt with the King's cutter one hurt) |
 | The pace, two crewed cutters in action (7-138) | 538 ticks a second (best of three thousands), against the crewed floor of 60 and the owner's 95 with twelve crewed ships |
 
 The far fight against the near: at two cables the far tables end the two cutters' fight in
@@ -18778,3 +18778,668 @@ failures, and after it the files step 4 touched with its truths (7-380, 7-382, 7
 84's step 8 saves of many hulls in `test_hulls.py` and `test_replay.py`). The pace alone on the
 final tree: 12 of 13, 7-159 at 474, toggled against 1662b54: the branch 492, 501, 498; the trunk
 455, 487, 491.
+
+## Package 81: the viewer's action, from the hull 75 draws (2026-11-07)
+
+The standard is `docs/design/Design-ViewerAction.md` (the lead approved it on 2026-11-07 with
+seven rulings, its postscript as built). The rule and the table are `freesail/api/viewer_guns.py`,
+the flags' fallback `freesail/api/viewer_flags.py`, the drawing `client/projection.js`'s section
+"the action", the checker `tools/check_viewer_guns.py`.
+
+**The gun table's sources.** Adye, *The Bombardier, and Pocket Gunner* (1804): p. 155, "Length and
+Weight of English Iron Guns" (IA leaf n178), and p. 72, "Carronades. Their Weight and Dimensions"
+(leaf n95), read on their page images; the 24s to the 9s and the carronades of 42, 32, 24, 18 and
+12 read before by the ships sessions (`tools/ships/period.py`, Research-Indefatigable-2026-10.md
+§6.4, Design-Ship-PrinceDeNeufchatel.md), the 42s, the 6s, the 4s and the 3 read here: the
+4-pounder of 6 ft is printed "22 1" and read 12 cwt 1 qr by its own column of metal to the pound of
+shot (343 lb × 4 = 12¼ cwt; 22¼ cwt would be 623). Adye p. 230 (leaf n253): the free recoil on a
+level platform, 11 ft for the 32 and the 24 and 10 ft 6 in for the 18 at a third's charge, longer
+than the gun, so the drawn run in is judgement under the breeching (the owner's shelf, question 1).
+Douglas 1829 art. 134 ("run out the gun square to the breast of the port") and art. 136 (the
+carronade "with taught breechings", a non-recoil principle), read (OCR). Falconer 1780, PORTS, and
+Steel 1805, PORT-LIDS and HALF-PORTS, read (OCR): the lids hinged at their upper edges and let down
+when the guns are drawn in; the ports' edges parallel to the deck. No swivel's length in Adye or
+Falconer (question 4). Every other figure of the drawing is judgement, named at the top of the
+section and in the design's §3 and §4.
+
+**Each ship's placing, as the checker reports it** (`python tools/check_viewer_guns.py`, clean):
+
+| File | Fit | Guns | In a port | Over the rail | On the rail | Pivot | Empty ports a side |
+|---|---|---|---|---|---|---|---|
+| brig | diligence class 1796 | 18 | 18 | | | | upper 1 |
+| cutter | carronades | 6 | 6 | | | | upper 4 |
+| cutter | long guns | 14 | 6 | | 8 | | upper 4 |
+| frigate-36 | amazon class 1795 | 40 | 36 | 4 | | | |
+| merchant brig | merchant | 4 | 4 | | | | upper 8 |
+| privateer schooner | long tom | 9 | 4 | | 4 | 1 | upper 6 |
+| privateer schooner | letter of marque | 10 | 6 | | 4 | | upper 5 |
+| razee | as razeed 1795 | 44 | 44 | | | | forecastle 1 |
+| razee | as carried 1796 | 46 | 46 | | | | |
+| sixty-four | ardent class 1784 | 64 | 62 | 2 | | | quarterdeck 1 |
+| sixty-four | ardent class 1794 | 72 | 62 | 10 | | | quarterdeck 1 |
+| topsail schooner | letter of marque | 10 | 6 | | 4 | | upper 5 |
+| topsail schooner | musquidobit 1813 | 10 | 10 | | | | upper 3 |
+| lugger | gun lugger 1795 | 3 | | | 3 | | |
+| smack | culloden 1746 | 2 | | | 2 | | |
+
+As first measured (f466051), 327 guns over eleven fits; the lugger's, the smack's and the topsail
+schooner's armaments came with the ships session's SW-4 (merged into the branch at f7b21f8) and
+passed the checker with no change of code: 352 guns over fifteen fits, none refused. The topsail
+schooner's eight 18-pounder carronades of the fit "musquidobit 1813" are listed for the ships
+session, their 10 cwt 11% off Adye's 9 cwt pattern of 3 ft 3 in (drawn at it); this package's own
+test first held that no gun stood a tenth off (stricter than §3.2, which lists and never refuses)
+and now pins the listing, every such gun and no other. The checker's notes for the ships session: the 64's
+foremost forecastle triple (18.41 m) put over the rail by the side's test, 0.07 m under the rail
+and not at the generator's 2 in (the lead's ruling 1); her foremost quarterdeck port (−5.88 m) cut
+to the rail, 0.02 m, its top following the rail where it steps down at her breast within the
+port's width (found in the drawing: the port's forward top corner stood above the drawn rail, on
+no side). No gun's weight more than a tenth off its pattern's: the files' from-memory long 9s (26
+cwt) and 6s (20) draw at Adye's 7 ft 6 in (6% off) and 8 ft (9% off).
+
+**What moved, and the proof.** No pin and no figure of the world moved: the viewer reads and writes
+nothing of it, and `combat/`, the physics, the evolutions and the ship files are not touched
+(`action.fired` already named its guns). The view's figures moved where the hull has a profile: her
+guns, ports, holes and flags are drawn. One pin of the view moved in the build and was put back by
+the rule and not by the pin: `test_view_geometry.py`'s `FRAME_MOVED_OLD_M` (the frigate's frame
+spread drawn with no profile, 5.59 m) read 5.46 when the first form gave a hull with no profile the
+flags' frame; the brief's rule is that such a hull draws as 75 left her, so the action draws and
+frames nothing without a profile (truth 7-442 pins it point for point), and the pin stands at 5.59.
+
+**The frame.** Equal across every state on every file (truths 7-441, 7-444): every gun secured or
+run out with its lid hauled up, a hole, every flag flying, the smoke alive (which is not in the
+frame). The guns never widen it (the yards' swing holds them). The flags' reach does where a flag
+could fly past the rig, measured against the frame without the action: nothing on the frigate, the
+razee, the 64, the privateer and the topsail schooner; 0.20 m on the brigs; 1.24 to 1.91 m on the
+boats and the smack; 2.86 m on the cutter (her jack at the bowsprit's end); 5.03 m on the lugger (a
+pendant at her truck, its length by her beam where she has no square yard). First written, every
+place took the pendant's reach and a drop of it straight down, which grew the frames 2 to 9 m; each
+place now takes its own flags drooped as they are drawn, and the peak is held swung every way about
+its gaff's throat (first written, the peak as the snapshot's sheet had it: the cutter's and the
+smack's frames moved 0.19 m between states, caught by `test_view_geometry`'s boom-frame test at
+the final run, be9e557, and mended; the figures above are the mended frame's).
+
+**The snapshot's cost.** The new fields (`guns`, `damage`, `flags`), timed on this machine, 300
+snapshots best of five: the 64 (64 guns) 20 µs of 393 (5.1%), the frigate 14 of 330 (4.4%), the
+cutter 6 of 153 (4.2%). The graph's placing is served once, at the page's connection. The
+snapshot is built off the tick (`Driver.snapshot`); a fight with a snapshot every tick gives the
+same log digest as without (truth 7-441).
+
+**The drawing's cost in the browser** (Node on this machine, `buildSkeleton` and `project` abeam,
+best of thirty): the 64 10.5 ms with the action against 5.3 without, the frigate 7.0 against 5.3,
+the cutter 3.0 against 2.6; the frame's reach of the guns and flags reckoned once a graph (first
+written, every build: the 64 15.3 ms). The loop rebuilds the ship only while a gun recoils or runs
+out; the smoke's frames redraw its two layers alone.
+
+**Found on the way** (reported to the lead): the frigate's quarterdeck has two sizes of port and the
+schema one a deck; the engine has no port stove; 73's hole above the water is made at 0.3 to 1.8 m
+whatever the side's height (drawn at the rail less its radius on the cutter); the readings `the
+guns` and `the damage` make the battery and the damage keeper on first asking, so the snapshot reads
+the state they read where the ship keeps it and never makes it (`signals.locker_of` likewise).
+
+**The suite as run:** see the design note's postscript and the reports to the lead.
+
+## Package 74: prizes, the strike and what follows, and the far fight (2026-11-07)
+
+The brief, its refresh after 84, 85 and 82 and the paragraph from package 97 in
+`docs/dev/M7-WorkPackages.md` ("Package 74"); the design in `docs/design/Design-Prizes.md`,
+written and reported before anything was built, approved by the lead with nine rulings on its
+§12 (recorded in the note's postscript), a postscript for each step as it is built. Built as a
+sibling session in its own container on the package's branch off the trunk's `f67640b`, each
+step a mergeable state with the fast tier whole on its final tree, the slow tier of the touched
+files and the known truths, the pace tests alone and last, the trunk brought in at the boundary
+before the step's final runs; the whole suite the lead's in the cloud at each merge. The physics
+are read and not changed; no consent file is touched; no ship file is touched (the cartel's gun
+stays words until package 75 closes, the lead's ruling 9); every figure from memory is marked
+so in the data and here, for the owner's references through the lead (ruling 3).
+
+### Step 1: the far ship's length (the design's §4.1; package 75's finding)
+
+**The one read.** `combat/far.py`'s `far_ship` read `spec.hull.length_m`, a key `HullSpec`
+has not (`length_waterline_m` is its), so every far ship's length was 0.0 and `shot.hit_chance`
+floored her size term at 0.5 whatever she was (a frigate as narrow a mark as a boat). The read
+is `length_waterline_m` (the cutter 15.2 m, the frigate 41.8). Nothing else of the tables moved;
+`fight`'s loop body is `round_once`, the one function the world's far action (step 4) runs, the
+loop itself unchanged (truth 7-350 pins that the round-by-round record is the measure's own).
+
+**What moved, old beside new** (seed 7, the build machine; the old read set by hand in the test
+as the toggle):
+
+| the far fight | the old read (length 0.0, size 0.5) | the mended read (her waterline) |
+|---|---|---|
+| truth 7-139: two cutters at two cables (400 m), the King's carronades at the hull, the privateer's long guns at the rigging | struck after seven rounds (21 min); the long-gun cutter four hurt, three holes, 58 shot fired; the King's cutter nobody hurt, 63 fired | struck after **seven rounds (21 min)**; **five hurt**, three holes, 61 fired; the King's cutter **one hurt**, 57 fired |
+| the same two at a cable (185 m) | struck after three rounds (9 min) | struck after **two rounds (6 min)** |
+| two frigates at two cables (370 m), one at the hull (0.9/0.1), one at the rigging (0.8/0.2) | struck after six rounds (18 min), 81 hurt to 14 | struck after **three rounds (9 min)**, 75 hurt to 22 |
+
+The cause is the one line: a cutter of 15 m is a size of 0.62 and a frigate of 42 m 1.02 against
+the floor's 0.5, so more shot tells at every range, the more the bigger the mark. **The pin
+7-139's bands hold** (she strikes under the hour, with men hurt and holes, the record repeating),
+its docstring's figures are brought to the new read with the old beside them, and the row of
+package 70's table above reads "four hurt and three holes" for the old read. No other pin reads
+the far fight: `test_profile.py` and `test_indefatigable.py` (truth 7-188) read `far_ship` for the
+broadside's weight alone and do not move; the near fights (7-133, 7-134, 7-137, 7-140) read the
+part graph's length and never the far read. The pace tests do not run the far fight (nothing is
+wired until step 4).
+
+**Truth 7-350** pins the read and the move. **Found on the way:** nothing. **The suites on the
+step's tree** (a worktree pinned at the step's commit, 797860d, the lead's order): ruff check and
+format clean; the fast tier whole, exit 0 (four workers, 01:46 to 02:42 UTC; 439 slow tests left
+out); the slow tier of `test_known_truths.py`, `test_profile.py` and `test_indefatigable.py`
+(`--slow -m "not pace"`), exit 0 (02:42 to 03:42); the pace tests alone and last, 13 passed, exit
+0 (03:47 to 03:53; the first run was cut by the background task's two-hour limit after the slow
+tier and run again alone, nothing else of this session's on the CPU). Nothing moved but the far
+fight's figures above.
+
+### Step 2: the prize as a hull of the one world (the design's §2)
+
+**Built as designed** (`freesail/world/prizes.py`, `orders/prize.py`, `api/prize_readings.py`,
+the role files' thresholds and `data/captains/prize-master.yaml`, the hail table's rows for the
+prize master, the vocabulary's four verbs, the primer's chapter 27 in its first form): possession
+by `take possession of her` within a boat's pull and at once by the officer on a deck carried; the
+one record on the far `Vessel` (`prize`), the muster swap (`remuster`), her people confined by
+rank, the prize master at her `captain`'s station rehomed into her, her colours over hers for a
+day, her nation, role and intent new, her set by the captor's doctrine; the prisoners taken aboard
+by the boat; the rising by 73's tables once an hour (the counts' rising for a far prize); the far
+cut-out's possession on the records; the retaking by her people and by a cruiser of her nation
+coming up (`far_captures`' road, the prize yielding by the prize master's doctrine); the prize
+burnt or scuttled by order; the readings `the prize`, `the prisoners`, `the prize crew` and the
+seven events; the checkpoint round trip.
+
+**The keepers' audit** (the lead's ruling 1): of the hull's keepers that hold the muster, two cache
+it and both are re-pointed by `remuster`: the routine (`extra["routine"].crew`, its all-hands
+call's state dropped with it) and the quarter bill (`extra["quarters"]`, popped and reckoned afresh
+at the next beat); the battery is put to HOLD. Health, the needs, the runner and the hull's people
+read `extra["crew"]` or the registry afresh each call and cache nothing. None could not be
+re-pointed.
+
+**Taken another way.** (1) Possession is taken at once when the order is given within a boat's
+pull, not after the boat's quarter of an hour: the boat's errands are chapter 14's machinery with
+their own times, and a prize crew crossing in her as an errand with the ship's boat away for the
+quarter hour is more than the step's words carry; the line says "by the boat" and the boat must be
+at the booms (an order with her away is refused). The quarter hour can be given to the errand
+when the captive's channel (step 3) moves persons by the same boat. (2) The privateer's doctrine
+**parts** from her prize (`prize_company: parts`, the Channel privateers' habit of sending a prize
+in and cruising on, from memory), so 72's pinned cut-out moves: the Nancy no longer joins the
+Vengeur's company but sails for Brest alone under six men, and the cut-out's line says "sent in
+under a prize crew"; a King's ship keeps hers in company while bound the same way. (3) The
+player's own ship struck to a rules captain is **not** taken possession of in this step: his
+`taking possession` closes her and lies by her and gives no order for her (`Captain.
+_take_possession`, `prizes.far_minute`, `orders.prize._struck_mark` each skip `PLAYER_ID`), the
+captive's channel (step 3, the design's §3) taking it up with the seat's rules. (4) The doctrine's
+own burning (`burns_when` with the valuation's `worth_least`) waits for the court's figures (step
+5); the burning is by order here. (5) The replay by both roads with a prize is step 4's passage
+(where she strikes by the fight, a recorded road): the scene here strikes her by the test's hand,
+which no transcript carries, so the step pins the checkpoint round trip instead.
+
+**Pins moved, old beside new** (each with its reason in the docstring):
+
+| pin | on the trunk | on the step's tree |
+|---|---|---|
+| 7-181 and `test_fight`'s carried deck | she lies struck after the deck is carried, no prize; her hurt on her own bill | she is a prize of ours at once (`how` "carried by boarding"), her colours ours over hers; her hurt are the prisoners' (`the prisoners` says "of them hurt"); the fight's bands (2 to 12 rounds, the losses' order) as they were |
+| 7-325 and 82b's officer on the deck won | the first lieutenant stands on her deck as a visitor at the voice station, his home his own ship | he is her prize master: her `captain`'s station his, his harness carried into it, his home the prize, his own ship's station kept for his return |
+| 97's officer killed in the round | the deck carried, none leads on | Mr Ward (the senior standing of the party, a master's mate) leads on and is her prize master |
+| 72's cut-out (`test_squadrons`) | the Nancy struck, in the Vengeur's company | the Nancy his prize at once on the records (six men, her people the prisoners' count: 121 before the trunk's SW-4, sixteen after it, for Brest), parted by his doctrine |
+| 7-139, 7-350 | unchanged by this step | |
+
+**The rising's figures** (the frigate's prize, the brig of 121 taken by the order, the frigate
+stood off two miles and the hours set back to nineteen; the draw once an hour at a quarter's
+chance, two to one in fit men):
+
+| prize crew over prisoners | seed 1 | seed 2 | seed 3 | seed 4 | seed 7 |
+|---|---|---|---|---|---|
+| 21 over 121 | rise in the first hour, the deck theirs (5 of the crew down, 1 of theirs) | nothing in two hours | rise in the second hour, the deck theirs | | nothing in two hours |
+| 21 over 51 (seventy taken aboard) | rise in the first hour, the deck theirs (16 and 16 down) | put down in the third hour (15 of theirs down, 11 of the crew hurt), irons a day | put down in the second hour | put down in the first hour | nothing in four hours |
+| 21 over 21 (a hundred taken aboard) | never drawn (under two to one) | | | | |
+
+Truth 7-353 pins seed 1 (retaken), seed 7 (nothing), seed 2 at 51 (put down) and the odds rule.
+Under the default doctrine before `_doctrine` learned the player's service (a share of a tenth,
+26 men) the same seeds gave the same outcomes for the first row and seed 2 put down at 61 over 26.
+
+**Found on the way.** (1) `prizes._doctrine` read the player's captain's doctrine, which is None
+when the scenario gives him no role, so the prize rules ran on defaults (a tenth, 26 men); it
+now answers the hull's service's role file (a King's ship's for the frigate). (2) A person rehomed
+into a company that has his post already (the Amazon's first lieutenant into the Medusa, both
+`first_lieutenant`) made two of one id in one company, and `People.captain` read the Medusa's
+own man as the one commanding; `Registry.rehome` now gives him his old home's id after a colon
+(`first_lieutenant:the ship`), the record reading the id as it stands after the move. (3) The
+world order's "merchant brig" takes `data/ships/brig.yaml` (the one file of the brig-sloop and the
+merchant brig, two descriptions) with its muster of 121, so a merchant brig cut out has 121
+prisoners; `merchant-brig.yaml` (a complement of 16) is a shadow file. Not this package's
+(`data/ships/` is 75's); noted for the lead. (4) The grammar read `take six of the prisoners
+aboard` as the free verb `take` with a tail; the parser gives the prisoners' order its number
+inside the phrase. (5) The orders' road recorded a verb's reply and the function's own line both,
+so `possess`, `take_prisoners_aboard` and `burn` take `said` for the captor's line and the
+order's road passes False.
+
+**The trunk merged at the boundary** (b97109e, a merge commit of `origin/claude/dreamy-darwin-d77nty`
+at 2dc4921 with package 75's SW-4 in it, by the lead's word of 05:43): two meetings resolved by
+keeping both sides (`world/service.py`'s `ROLE_SERVICE`, 75's `indiaman` and `revenue` rows beside
+74's `prize-master`; `world/captains.py`'s `ROLES`, the same three), nothing else met. SW-4 gives
+the merchant brig her own file (`merchant-brig.yaml`, sixteen men and four long 6s, where she
+sailed `brig.yaml`'s hundred and twenty-one), which moves the step's scenes with "a merchant
+brig": the prize crew out of the frigate is **eight over sixteen prisoners** (twenty-one over a
+hundred and twenty-one before; the thresholds unchanged, the muster read from her file), the
+boat's second load of prisoners takes **the ten she has left** where it took twenty of the
+hundred and fifteen (re-pinned, the reason in the test), and the rising put down in irons wants a
+muster the merchant brig no longer has, so that scene takes **a French brig-sloop of war** (the
+same `brig.yaml` hundred and twenty-one the scene was found on; its seeds hold: seed 2's rising is
+put down in the third hour, seed 1's over a hundred taken never draws). The rising won (seed 1)
+and the retaking by the cutter hold on the sixteen as they were; 7-181, 7-325, 7-152 to 7-154 and
+7-188 pass on the merged tree.
+
+Two more meetings the merge's text did not show: 75's `revenue.yaml` and `indiaman.yaml` are the
+cruiser's and the merchant's books copied before step 2 gave every role the `taking possession`
+state, so `test_subtypes`' two "her book is the other's" tests and `test_captains`' every-doctrine
+test failed on the merged tree by that one book, its rows and the merchant's `mans_prizes` row; the
+revenue cutter takes possession of what strikes to her as the cruiser does (the book and the four
+rows added to her file; her thresholds were the cruiser's already) and the Indiaman takes no prizes
+as the merchant does (the row and the empty book).
+
+**The suites on the step's tree.** Step 2 alone, at bc6f406 (before the trunk's merge): the fast
+tier whole exit 0 (run alone in the pinned worktree 06:13:24 to 07:02:56 after two container
+restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree at
+6b717f6: fast exit 1 by the two files' meeting alone, three tests (07:08:42 to 07:48:48), the slow tier of
+the touched files and the known truths exit 0 (07:48:48 to 08:28:02), the pace tests alone exit 0
+(13 passed, 08:28:02 to 08:32:49). **The final tree, f764616** (the meeting resolved), in a worktree
+pinned at it, ruff check and format clean: the fast tier whole exit 0 (08:39:17 to 09:18:18; 444 slow
+tests left out as the tier's rule), the slow tier of the touched files (`test_prizes`,
+`test_squadrons`, `test_fight`, `test_subtypes`, `test_captains`) and the known truths with
+`test_profile` and `test_indefatigable` exit 0 (09:18:18 to 10:00:58), the pace tests alone and
+last exit 0 (13 passed, 10:00:58 to 10:05:33; no floor lowered).
+
+
+## Package 76: the signal books built out (2026-11-07)
+
+Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
+are 71's shape (`docs/design/Design-Signals.md`); this package fills them from the period's
+pages. It begins with the research pass (the brief's item 0, the owner's research phase of
+2026-11-07), committed and pushed on its own and read by the lead before step 1 goes on; the
+steps' sections follow below it as they are done.
+
+### The research pass (step 0): the period's signal books
+
+**Where it was looked for.** The Internet Archive answered every request (advanced search,
+metadata, the OCR texts and the IIIF server; its whole-book PDFs came at about a hundred
+kilobytes a second, so the page images were cut from the IIIF server instead). **Refused by
+the hosts, not by this environment's network** (the proxy passed every request and each
+host answered with its own page): the Biblioteca Digital Hispánica (`bdh.bne.es`, 403 with
+the Biblioteca Nacional's own refusal page), Gallica (`gallica.bnf.fr`, 403), HathiTrust
+(`babel.hathitrust.org`, 403, Cloudflare's "Just a moment..."); Google's Books API answered
+429, its unkeyed daily quota nought. Delpher's public search interface (`jsru.kb.nl`)
+answers, but only for its newspaper and ANP collections; its books are not searchable by it
+without a collection name it does not publish, so no Dutch book was found there. The Royal
+Danish Library's site answers but has no search this session could drive. So every text
+below is the Archive's copy.
+
+**Found, fetched and committed** (twenty-nine OCR texts under `docs/references/signals/`,
+11 MB, each with its row in `docs/references/README.md` saying what it covers and is
+trusted for; all public domain by age):
+
+| Nation | Text | Period | Answers for |
+|---|---|---|---|
+| Britain | *Signal-Book for the Ships of War, Day and Fog*, 1796 | Howe's numerary in the edition before 1799 | **the meanings, the form and the flags** of the day and fog book: the Admiral's single flags, the numeral flags, the numeral and pendant signals, sails and guns, the fog guns, the compass signals, the private ships' table of flags. Not the 1799 numbers (16 here is "Attack the enemy") |
+| Britain | *Night Signals and Instructions for the Conduct of Ships of War*, 1799 | the 1799 issue exactly | **the night book's numbers and forms** (the lights in number and place, false fires, guns, rockets) and the sailing and battle instructions by night |
+| Britain | Popham, *Telegraphic Signals; or Marine Vocabulary*, 1803 | the Trafalgar year's edition | **the dictionary**: the table of figures, letters and flags, the numbered words (about 1,200 numbered lines), the sentences |
+| Britain | *Instructions for the Conduct of the Ships of War*, 1776; *Signals and Instructions in addition*, 1779; *Signals for the Royal Navy and Ships under Convoy*, 1748 | before the numerary's settled form | the instructions' wording and the old convoy form; background, no 1805 numbers |
+| Britain | Corbett, *Fighting Instructions 1530-1816*, 1905, and *Signals and Instructions 1776-1794*, 1908 | editions of 1905 and 1908, out of copyright | the books' history (the 1799 quarto, the numbers changed from Howe's, reprinted 1806 and 1808, in use till 1816), **Howe's Explanatory Instructions of 1799 printed whole**, the bibliography of every signal book to 1816 and where its copies lie |
+| Britain | Jackson, *Logs of the Great Sea Fights*, vol. II, 1900 (already filed under `jackson/`) | the logs of 1798 to 1805 | **the 1799 book's numbers as hoisted** at Copenhagen and Trafalgar (below) |
+| France | Orvilliers, *Signaux généraux pour l'escadre du Roi*, Brest, 1772 | the royal fleet's whole book before du Pavillon | the French form: day, night, fog, getting under way, combat, chase, police |
+| France | Morogues, *Tactique navale*, 1763; du Pavillon, *Rapport d'un projet de signaux*, 1775 | the reform's ground | the principles of the French numerary |
+| France | Tronjoly, *Signaux de jour* and *de nuit ... pour la division*, Isle de France, 1779 | a division's books | a cruising division's day and night signals in the French form |
+| France | Audibert Ramatuelle, *Cours élémentaire de tactique navale*, 1802 | the Consulate's | **the nearest to the French book of 1805**: the signals (ch. IV), the chase, the convoy's escort |
+| Spain | Mazarredo, *Instrucciones y señales para el régimen y maniobras de la esquadra* (Córdoba's), Cádiz 1781, the third edition by royal order, Madrid | the Real Armada's book by royal order | **the Spanish book's spine**: the plan (four hundred two-flag signals from twenty flags or pendants whose values are given on a separate sheet and changed at will, a "universal" flag for any other, the cornets for the compass), the general, régimen and tactical signals by number, the night and fog signals (the night by seven guns), the convoy's divisions and its masters' signals, the ships' numbers |
+| Spain | Mazarredo, *Corrección a las señales de táctica*, Cádiz 1799 | the fleet's tactics of 1799 | the two hundred tactical signals by the five pendants over or under one flag, beside "the four hundred signals of two flags"; the instruction of 31 May 1797 referred to |
+| Spain | *Señales ... esquadra del mando de D. Luis de Córdova*, Cádiz 1778 | before Mazarredo's plan | the older form and words |
+| United States | Barry, *A Set of Signals presented to the Navy of the United States*, Norfolk 1800 | the Quasi-War | the United States' day signals and directions, the nearest American book found |
+| Portugal | Pereira, *Systema de signaes*, Rio de Janeiro 1817; Giraldes, *Memoria relativa aos regimentos de sinaes da Marinha*, 1820 | after the period | Portugal's system as it stood after the court's removal, and the history of her books; read for the form, dated so |
+| Naples | *Segnali di giorno, e di notte ... per uso della flottiglia di S. M.*, Naples 1807 | Joseph's kingdom | the one Mediterranean faction's book found: the flags in colour, day and night signals, the tables of words, places and ships |
+| United Provinces | Bylandt's *Zee-tactic*, Morogues in Dutch with a Dutch captain's additions, Amsterdam, vol. I | the Republic before 1795 | the nearest Dutch text; no Batavian book found |
+| United States | Preble, *History of the Flag of the United States*, 1894 | a history, out of copyright, describing the period's manuscripts | **the American squadron's signals of 1803 to 1804** (Morris's and Preble's Mediterranean day and night signals: ten numerals, a cornet, an answering flag, three triangles as repeaters, the night by lanterns), and the American flags with their dates |
+| every nation (item 8) | *A Display of the Naval Flags of all Nations*, Liverpool, [1820], sixteen plates in colour; *Bowles's Universal Display*, 1795 (its names; its plates grey); the French law of 31 October 1790 on the colours in the pavillons | the flags' charts, fifteen years after and ten before | **the flags' figures and colours** for `colours.yaml`'s drawings, each dated against the histories |
+| Britain, France, Spain (item 8) | Perrin, *British Flags*, 1922; Babron, *Précis des pratiques de l'art naval en France, en Espagne et en Angleterre*, 1817; Roosevelt, *The Naval War of 1812*, 1882 | histories out of copyright, and a royalist officer's comparison of the three services | **where each flag flew and when**: the flags of command, the pendants, the ensigns by squadron and service, the jack; the owner's passage on the *Java* and the *Constitution* (Roosevelt pp. 160 to 161) |
+
+**Page images** under `docs/references/signals/pages/` (forty-nine, 9.9 MB, 1000 to 1100
+pixels wide, grey but for the flags' plates): the 1820 display's frontispiece, index and
+fifteen plates of flags in colour (leaves 5 to 36); the 1796 book's single flags (leaves 28 and 29),
+numeral flags (31), the first page of the numeral signals (32), the pendant signals (66 and
+67), the fog signals' index and tables (74 to 76), the private ships' table of flags and
+its explanation (77 and 78) and the compass signals (88); the 1799 night book's tables
+(leaves 25 to 35) and the figures of the lights (38 and 39); Popham's table of figures,
+letters and flags (leaf 13); Mazarredo's cornets for the compass (leaf 14), his night and
+fog table (157) and the night signals by seven guns (179); the 1799 *Corrección*'s pendant
+values (the Naples copy, leaf 6); the Neapolitan flags' plate (leaf 2) and first page (7).
+The 1796 book's forty pages of numeral signals and Popham's vocabulary are not laid as
+images: their OCR keeps the numbers and the words line by line, and the leaves are cited
+for checking. Mazarredo's four-hundred-square table is filled with flag names in the text,
+not a figure.
+
+**Found and read, not laid**: Knowles's *A Set of Signals for a Fleet*, 1778 (never adopted,
+Corbett 1908 says, like his books of 1798); Squire's *Universal Signal Book* for merchant
+ships, Charleston 1818 (later, and a merchant code); a Nova Scotia *Signal Orders and
+Instructions* of 1802 (a station's ball-and-colours signals, Canadiana microfiche); the
+1846 and 1857 French books (later).
+
+**Not found**, with where it should be: **the 1799 day *Signal Book for the Ships of War*
+itself** (not on the Archive; Corbett 1908, App. F Nos. 124, 125 and 127, places copies in
+the Royal United Service Institution, the Admiralty Library, the Record Office and the
+British Museum); Howe's code of 1790 in print (Corbett 1905, pp. 252 to 253: the one copy known is the
+Admiralty Library's printed draft with the battle signals in manuscript); the period's *Signals and Instructions for Ships under Convoy* (only
+Millan's of 1748 found); the French Republic's *Signaux généraux* of An VI (1797; Corbett
+places a copy in the RUSI) and any Imperial book of 1804 to 1805 (Gallica refused); the
+Spanish *quaderno* of the régimen signals of 1797 and its instruction of 31 May 1797, the
+*Rudimentos de táctica naval* of 1776, any Real Armada convoy instruction (*flota* or
+*registro*) (the Biblioteca Digital Hispánica refused); any Batavian, Danish or Swedish
+signal book; the American *Signal Book* of the 1790s and Truxtun's; any Portuguese book in
+force in 1805.
+
+**What the pass already shows.** The 1799 book's numbers, as Jackson's editor glossed the
+hoists in the logs of Copenhagen (1801) and Trafalgar (1805), both fought under the 1799
+book (vol. II; the gloss is the editor's of 1900, read from the book, and not the log's
+own words): 13 prepare for battle; 14 prepare for battle and for anchoring with springs;
+16 engage the enemy more closely; 19 want boats to tow; 39 discontinue the engagement; 62
+each squadron to anchor separately; 63 anchor as convenient (with the preparative, prepare
+to anchor); 66 weigh, the outer and leewardmost ships first; 72 form the order of sailing
+in two columns; 76 bear up and sail large on the course shown; 82 alter course one point to
+port; 84 pass within hail; 88 make more sail; 99 come to the wind together on the starboard
+tack; 101 in succession on the larboard tack; 102 together on the larboard tack; 108 close
+nearer the Admiral; 180 sound and report the depth; 186 take a ship in tow; 200 the troops
+in readiness to land; 213 for captains; 240 the launches manned and armed; 251 time for
+dinner; 307 make all sail possible with safety to the masts; 312 seeing the Admiral; 314 in
+distress and in want of immediate assistance; 344 aground. Against 71's book this already
+corrects meanings at numbers the book had made (39 is "assist the ships engaged" there, 62
+"shake out the reefs", 63 "prepare to anchor", 88 "veer more cable", 99, 101, 102 and 108
+four wants and the dispatches): that is step 1's work and is not done here. 13, 16, 72 and
+76 stand as 71 remembered them. **No source found gives 1 its meaning**: the logs record no
+hoist of No. 1, and 71's "enemy in sight" stays marked until the owner's shelf or the book
+answers.
+
+**Which text answers for which book** (the plan for steps 1 to 4):
+
+- **Britain, step 1.** The numerary: the 1799 numbers from the logs (above) where they
+  recorded the hoist; the 1796 book for every other meaning the game wants, kept at 71's
+  number and marked the builder's own (the number made, the meaning the book's) where no
+  1799 number is found, unless the owner's shelf gives it; Howe's Explanatory Instructions of
+  1799 (Corbett 1905) for the wording and for what the chase, the line and the anchoring
+  signals ask a captain to do (the `does`). The dictionary from Popham 1803 whole, as far as
+  the OCR reads clean and checked against the leaves where it does not, the alphabet from his
+  table (leaf 13). The night book from the 1799 night signals, number for number; the fog
+  book from the 1796 book's fog guns (the 1799 fog book not found: said so in the file).
+  The convoy book: the 1796 book's convoy signals and Millan's form, the period's convoy
+  book itself not found and the file saying so. The private table's form: the 1806
+  Regulations (already filed, `admiralty/regulations-and-instructions-1808-ocr.txt`) read
+  for the custody, the 1796 and 1799 books for the private ships' signals' form; 71's draw
+  kept.
+- **France, step 2.** Orvilliers 1772 for the whole book's shape and words, du Pavillon and
+  Morogues for the numerary's principle, Audibert Ramatuelle 1802 for the Consulate's practice
+  (the chase, the convoy's escort); the numbers stay `made` unless a page gives the service's
+  own for 1805, which none found here does. The dictionary: the French had none of
+  Popham's kind; the alphabet only where Audibert gives one.
+- **Spain, step 3.** Mazarredo 1781 (third edition) as the book: the declaration in his
+  words (twenty flags and pendants, two to a signal in a table of four hundred, the
+  universal flag, the cornets, the values on a sheet changed at will), the general signals
+  in his numbers, the night signals by guns and lights, the convoy's signals to its
+  masters; the 1799 *Corrección* for the tactical numbers. Whether the 1797 régimen book
+  kept the 1781 table's numbers is the first question below; until it is answered the
+  numbers are the 1781 edition's, said so in `source:`, and `system` turns to `well-built`
+  on them (a period source's numbers), with the question in the declaration.
+- **The others, step 4.** The United States from Barry 1800 and the squadron's signals of
+  1803 to 1804 as Preble describes them (the numerals, the cornet, the answering flag, the
+  three repeaters; the night by lanterns); Naples from the 1807 flotilla
+  book (a root of her own for the Two Sicilies, if the lead agrees the step reaches the
+  Mediterranean factions where a page is found, as the brief allows); Portugal from Pereira
+  1817 only if the lead accepts a book twelve years late for her, else she stays on `basic`;
+  the Batavian Republic, Denmark and the Barbary regencies stay on `basic` (no page). The
+  brief's order (Batavian first) is taken another way for this reason: no Dutch page.
+- **The flags of command and identity, item 8** (the lead's addition to the brief of
+  2026-11-07, read at this step's boundary). `colours.yaml`'s shape is written in the design
+  note's postscript before any root's is filled. Britain's from Perrin (the flags of command,
+  the pendants, the ensigns by squadron, the jack, each with its dates; the red, white and
+  blue squadrons' ensigns of 1805), the places and occasions from Perrin, Babron and the
+  owner's passage in Roosevelt (the pendant at the main, the ensign at the peak, the jack at
+  the jackstaff at anchor, the ensigns doubled and one lashed in the rigging in action); France
+  from the law of 1790 and the tricolour of 1794 as Perrin and the 1820 display draw it; Spain,
+  the United States, Portugal, Naples, the States General and the rest from the 1820 display's
+  plates, each dated against Preble and Perrin (the 1820 plates keep flags already gone, so a
+  flag is taken from them only where a history dates it to 1805). The drawings are short lists
+  of coloured rectangles and lines in the flag's proportion, measured off the plates; a flag
+  whose figure a plate cannot give (a coat of arms) is drawn by its field and named so.
+
+### Questions for the owner's shelf (put through the lead)
+
+The answers come back as figures with their citation, never as copied text. None holds step
+1 from starting on what the pages above give; each is said where it holds a single entry.
+
+1. **The 1799 day book's numbers.** Does Winfield, or another book on the shelf, print or
+   tabulate the 1799 *Signal Book for the Ships of War*'s numbers? Wanted most: No. 1 (71
+   has it "enemy in sight" from memory), the general chase, the recall from chase, form the
+   line of battle, tack and wear together and in succession, make and shorten sail, the
+   affirmative and negative and the annulling flag's use, the convoy's signals, "strange sail
+   in sight" and the private signal's number if it had one. Holds: those entries' numbers
+   only (they stay the builder's, marked, until answered).
+2. **The 1799 fog book.** Was there a separate fog section in 1799 (guns, muskets, the bell,
+   the drum), or did the 1796 fog guns stand? Holds: the fog file's numbers.
+3. **The convoy book in force in 1805.** The *Signals and Instructions for Ships under
+   Convoy* of the 1790s or 1800s: its date, and for its principal signals (make sail,
+   shorten sail, tack, wear, close the commodore, the enemy in sight, anchor, disperse) the
+   number or the hoist. Holds: the convoy file.
+4. **Spain.** Did the Real Armada's books of 1797 to 1805 (Mazarredo's régimen *quaderno*
+   with the 1797 instruction, Gravina's at Trafalgar) keep the 1781 table's numbers, or
+   renumber them? And did the Spanish at Trafalgar sail by the French signals of the
+   combined fleet (as is often said) or their own? Holds: whether the Spanish numerary is
+   "the 1781 edition's numbers" or "the period's".
+5. **France.** The French book of 1804 to 1805 (the Republic's *Signaux généraux* of An VI,
+   or a later imperial edition): its system (du Pavillon's table, how many flags to a hoist)
+   and, for a dozen entries the chase and the convoy hoist (chase, recall, engage, make
+   sail, tack, wear, form the line, the convoy to close, to disperse), the number. Holds: the
+   French entries' `made` marks.
+6. **Batavia, Denmark, the United States, Portugal.** Does the shelf say what signal system
+   the Batavian navy used in 1797 to 1805 (its own, the French, or the old Dutch), and the
+   Danish in 1801? Does it give the American book of 1797 or Truxtun's? Holds: whether those
+   nations get a root in step 4 or stay on `basic`.
+
+7. **The flags (item 8).** Does the shelf give, for 1805: the Spanish navy's ensign and
+   pendant and where a Spanish ship of war flew them; the French ensign and jack of 1794 to
+   1805 and the French custom of the pendant and the jack in action; whether a British ship
+   doubled her ensigns in action as a rule by 1805 or only by her captain's choice (Roosevelt's
+   ships are of 1812)? Holds: the places and occasions in `colours.yaml` for those nations; the
+   drawings do not wait.
+
+### Taken another way, and found on the way
+
+- The page images are thirty-two leaves chosen for what the OCR loses, not every table of
+  every book (the 1796 numerary alone is forty pages whose OCR keeps the numbers): said
+  above, the leaves cited for the rest.
+- Jackson's *Logs* were already in the tree (filed for the 74's research); they are cited, not
+  laid again.
+- The brief's titles checked against the catalogues: the Admiralty's 1799 book is "*Signal
+  Book for the Ships of War*", as the brief has it, but the Archive holds the 1796 edition and
+  the 1799 *night* book, not the 1799 day book; Mazarredo's "*Señales*" that followed the
+  *Rudimentos* is the *Instrucciones y señales* of 1781 (reprinted by royal order) and the 1799
+  *Corrección*; du Pavillon's "tables of 1776" were not found, his *Rapport* of 1775 was;
+  "the Danish *Signalbog*" and "Truxtun's" were not found.
+- Two of the laid OCR texts (Morogues and Orvilliers) read "fable" for "ſable" (sand) in the soundings' signals, as
+  the pilots do; it is the period word and is left as the scan gives it.
+- The lead's addition to the brief (item 8, `colours.yaml` and the private signals in other
+  nations' forms; truths 7-434 and 7-435, item 7's now 7-426 to 7-433) reached the trunk while
+  this pass was being written; the pass was widened to the flags' sources before it was
+  committed (the 1820 display, Bowles, the French law of 1790, Babron, Roosevelt, Perrin,
+  Preble).
+- Roosevelt's 1882 printing reads "a little after 11 she hoisted her private signal" (p. 160,
+  OCR line 5823) where the brief quotes "a little after 1"; the *Constitution*'s private signal
+  came about an hour after the *Java*'s three. Said for the truth's minutes, which do not
+  depend on it.
+
+### Step 1: the British books from the page
+
+**The day book (`numerary.yaml`, 171 entries).** 34 stand at the 1799 book's numbers as
+Jackson's editor glossed the hoists in the logs of Copenhagen and Trafalgar (vol. II), each
+entry's source naming the battle and the hour: 13, 14, 16, 39, 50, 58, 62, 63, 66, 72, 76,
+82, 84, 88, 99, 101, 102, 108, 109, 131, 180, 186, 200, 213, 239, 240, 241, 251, 307, 312,
+314, 318, 344, 370 (eight more than the pass first counted: 50, 58, 109, 131, 239, 241, 318,
+370, found when every bracketed gloss was read, not only those after "No."). 137 are the
+builder's own and marked: fifteen of 71's made entries stood on numbers the 1799 book gives
+to other signals (14 "I have soundings" on the 1799 book's "prepare for battle and for
+anchoring with springs", 39 "assist the ships engaged" on "discontinue the engagement", 63
+"prepare to anchor" on "anchor as convenient", 88 "veer more cable" on "make more sail", and
+eleven more) and moved to numbers of their own above 150, each source saying where it stood;
+nine made entries whose meaning the 1799 book carries at a logged number were folded into it
+(71's 36, 38, 57, 58, 70, 71, 83, 98, 132: "discontinue the action" into 39, "make more sail"
+into 88, "make all sail" into 307, the two "keep the wind" signals into 99 and 102, "anchor
+as convenient" into 63, "heave the lead" into 180, "want assistance" into 314, "take
+possession" into 58). Thirteen made entries' meanings are the 1796 book's own signals, its
+number cited (Howe's before 1799): among them **No. 1, "To denote an Enemy in Sight", is No.
+1 in the 1796 book too**, which bears 71's memory out for Howe's numbering; no page of 1799
+gives it, so it stays marked. The other made meanings are in the period's form and were not
+traced to a page one by one, and the file says so. "Prepare to anchor" was the 1799 book's 63
+with the preparative over it (Trafalgar, 12.05); the engine has no preparative, so it keeps a
+number of its own (155), said in its source.
+
+**Taken another way.** The lead's ruling listed No. 19 among the day signals; the log reads
+"answered night signal 19 [want boats to tow]", and the 1799 night book's No. 19 is "Wanting
+the assistance of boats to tow": it is the night book's, and the day book's "want boats to
+tow" is the 1799 book's 318 (Copenhagen).
+
+**The night book (`night_fog.yaml`, `night`: 73 entries).** The 1799 night book read on its
+page images, Nos. 1 to 70 number for number (leaves 24 to 36; leaves 24, 36 and 37 laid in
+this step, the last blank): each signal by its guns (one to seven), its lights (one to four,
+two of them abreast or one over the other as the book draws them) and its rocket or false
+fire. Three meanings the game's orders want and the book lacks by night (discontinue the
+action, the private signal, the negative) stay made with no number. In the presence of an
+enemy the book makes some signals by lights alone in its figures (leaves 38 and 39); the game
+makes them by guns, and the file says so.
+
+**The fog book (`night_fog.yaml`, `fog`: 24 entries).** The 1796 book's fog signals, Nos. 1 to
+18 (leaves 75 and 76): the drums for the starboard tack and the bells for the larboard, a gun
+an hour or a half hour as the admiral keeps or changes his sail, and the guns slow and quick
+for anchoring, weighing, tacking, hauling the wind, wearing, altering course, lying to,
+danger, distress and a ship aground. **The gun counts are written by hand into the printed
+blanks of the copy scanned**, and are taken as written. Six meanings the game's orders want
+and the book lacks in fog (tack in succession, make more sail, shorten sail, fill and make
+sail, enemy in sight, the affirmative) stay made. The 1799 fog book was not found (the 1799
+night book has no fog section).
+
+**The dictionary (`telegraphic.yaml`: 1,444 words).** Popham's 1803 vocabulary as printed,
+the head and its endings ("Expect-ed-ing-ation"), its first part (26 to 999) and second (1000
+to 1999). The Archive's OCR caught about half the lines; each leaf was read again (Tesseract,
+the whole page as one block and each column apart), and a word kept only where its head is an
+English word and its first letter is the one the book's own margin index gives its number:
+1,444 kept, 158 numbers left out (a read that failed those checks), the blanks the book leaves
+for an owner's words not taken (this copy's are filled in by hand). The alphabet confirmed on
+leaf 13 exactly as 71 had it. **The loader gained one field** (`Books.forms`, from
+`signals.word_forms`): every form the printed endings make, joined by the common rules, and a
+head's -s form, since Popham's introduction (p. 7) says "In verbs, the number, person, tense,
+and mood, must be applied to the sense of the sentence" ("expects" is Expect's hoist, 269).
+The twelve hoists of 21 October 1805 come out of the page's dictionary as made: 253 269 863
+261 471 958 220 370, and "duty" spelt 4 21 19 24. The third part (the sentences and places,
+2000 up) is not taken: the engine encodes a sentence word by word.
+
+**The declaration, the convoy and private files.** `book.yaml` names the sources read and
+takes its flags from the 1796 book's leaf 31 (the numerals 1 to 9 and the cypher 0, the
+substitute, the pendant that adds a hundred, the flag of truce: two keys new to its free
+mapping, `hundred_pendant` and `truce`) and Popham's leaf 13. The convoy book keeps every
+number made (its period edition not found; Millan's form and the 1796 fleet book's convoy
+signals named). The private form is unchanged; its custody is cited from the 1806 Regulations
+(a superseded captain hands on "all secret Signals ... of which he is not to take ... any
+copy"; a wrecked one destroys them), which print no table; the draw is 71's, untouched.
+
+**What moved, and the proof.** The fast tier on the step's tree moved one pinned passage:
+truth 7-147, whose fog signal to heave to was 71's made "four guns, bring to"; the page's is
+the 1796 book's No. 14, "To lie to on the starboard tack", six guns slow and two minutes after
+two quick, and the truth now reads those words (its substance unchanged: the signal a gun in
+fog, heard two miles off, answered and obeyed). Proven by the entry: at fcff1b2 with 71's
+`night_fog.yaml` put back alone the unchanged truth passes, and with the page's it fails.
+`tests/test_signals.py` had two assertions of 71's made state, rewritten to the page's and not
+loosened: every night and fog entry was asserted made, now each is made or carries the page's
+number and a source naming its year; the fog signal to tack was "two guns", now the 1796
+book's "three guns, two quick and one slow" (heard as "The brig fires three guns, two quick
+and one slow: to tack."). No log pins a day-book number that moved: the engine's own hoists
+(the squadrons' "enemy in sight", No. 1, unchanged; the convoys' close round the commodore,
+make more sail and anchor, all the convoy book's, unchanged) stand.
+
+**The suites as run at c13e429** (a worktree pinned there): the fast tier whole, exit 0, 6,368
+passed and 439 slow left out; the slow tier of the touched files and the known truths
+(`tests/test_signals.py`, `tests/test_known_truths.py`, `--slow -m "not pace"`), exit 0, 322
+run, 314 passed and 8 xfailed (the truths marked so on the trunk); the pace tests alone and
+last, exit 0, 13 of 13. Ruff check and ruff format clean.
+
+The trunk moved twice after those runs (28c228e, package 74's step 1 with
+`freesail/combat/far.py`; d20e585, the ships session's hull tools and records), both merged
+without conflict but for the two packages' sections at the end of these notes (both kept), at
+cfaf48c; the merge's message says "records" and the range was more than records. **The suites
+again at cfaf48c** (a worktree pinned there): the fast tier, exit 0, 6,448 run, 6,447 passed
+and 1 xfailed (a test the trunk marks so); the slow tier of the touched files and the known
+truths, exit 0, 323 run, 315 passed and 8 xfailed; the pace tests alone and last, exit 0, 13 of
+13. Ruff format clean; ruff check finds one line too long, the trunk's own
+(`tests/test_captain_trials.py:367`, from 4423f62, package 75's re-pin as merged), not this
+branch's and left to the lead.
+
+### Step 2: the French book built out
+
+**The declaration** (`data/signals/france/book.yaml`) is now du Pavillon's system as Audibert
+Ramatuelle's *Cours élémentaire de tactique navale* (Paris, 1802) describes it in its chapter
+on signals: "the best of the systems known" (§ 67); every signal two flags, an upper and a
+lower, read in a square table whose rows are the upper flags and columns the lower, the cell
+holding the order and its number ("the order in the cell No. 286", § 71); some twenty flags
+of two colours each, with guidons and pendants; a guidon over the two flags for a bare number
+(§ 73); the compass by one flag under a guidon (§ 74). The Republic's book of the year VI is
+not online, so no page gives the service's cells: every French number stays made, as ruled.
+
+**The one engine change, approved in advance** (`freesail/world/signals.py`,
+`freesail/orders/signals.py`): a book declares `hoist_form`, `numerary` (a flag a figure, the
+default, the British and basic books) or `table` (two flags read as a cell, the French and,
+in step 3, the Spanish); the loader reads it into `Books.hoist_form` (refusing any other word
+in a sentence), `make_hoist` puts it on the `Hoist` (`form`), `repeat the signal` carries it,
+and `flags_words` reads it: a table book's numbered signal is "two flags at the main" whatever
+its number, where the numerary's No. 186 is three. The hoist's record (`to_dict`, which goes
+into the events' data) writes `form` only where it is not the numerary's, so that no British or
+basic signal's record, and no digest, changes with the field; `test_a_hoist_shows_its_books_
+form_and_the_british_numerary_is_unchanged_by_it` says so (the British No. 186 three flags and
+No. 16 two, no `form` in the record; the French general chase, a cell under 10, two flags, its
+record `form: table`).
+
+**The numerary** (74 entries, every cell made): 71's 70 meanings checked against Orvilliers's
+*Signaux généraux pour l'escadre du Roi* (Brest, 1772) by their French phrases; fourteen are
+there in his words and cited (the chase chapter; "faire branle-bas"; "former la ligne de
+bataille"; "former les trois colonnes", the order of sailing; "garder ou reprendre leurs
+postes"; "faire revirer l'escadre par la contre-marche"; "forcer de voiles"; "diminuer de
+voiles"; "faire prendre un ris dans les huniers"; "mettre en panne"; "au plus près du vent,
+l'amure à stribord"; the anchoring and the getting-under-way chapters; "faire éteindre tous les
+feux de poupe"); the rest are said to be in the period's form, 71's French phrases from
+memory. 71's sources' "Code of the 1790s" and "du Pavillon 1776" were from memory and are
+rewritten to what was found ("the Republic's book not found"; du Pavillon's system and his
+*Rapport* of 1775). Four entries added for what the squadrons, chases and convoys hoist: chase
+to windward and to leeward (Orvilliers's chase chapter, "les faire chasser au vent", "sous le
+vent"), the ships astern to make more sail, the ships ahead to shorten sail (71's French book
+had neither, so a French convoy's straggler rule hoisted nothing).
+
+**The night and fog books** in Audibert's form (§§ 88 to 93): by night guns in two times, the
+upper and the lower, a minute between, the ships repeating by lanterns upper over lower; three
+chapters, the first without rockets (the battle's orders, which alone can be made by lanterns
+in action), the second a rocket between the times, the third a rocket after; six guns at most,
+twenty-one cells a chapter. Which order stood in which cell no page gives, so the 22 night and
+13 of the 14 fog entries are cells made in that form ("one gun, a rocket, and a minute after two
+guns": the night's tack together); the fog's keeping company is Audibert's own (§ 93: the
+general a gun at intervals, the chiefs repeating each quarter hour, every ship answering with a
+swivel gun), sourced and not made. `tests/test_signals.py`'s step-1 rule for an unmade night or
+fog entry (it carries its number) was British-shaped; it now reads, for every root, that an
+unmade entry's source names its page's year, and for the British book that it also carries its
+number, as before.
+
+**The convoy, private and telegraphic files.** The convoy book's head is Audibert's chapter on
+the escort of convoys (part II ch. V): the commander's own signals for his convoy, by day,
+night and fog, which no ship may let be taken; recognition at a distance by sails hoisted and
+lowered a set number of times; the day's number on a black tablet shown on both sides at his
+signal; at night words of the watch and a doubtful ship questioned. He prints no table, so its
+numbers stay made; two entries added (the ships astern to make more sail, the ships ahead to
+shorten sail). The private form's head cites his § 70 (the recognition signals each government
+gives its ships of war, for which the ships must close to make out the flags); the form's places
+stay 71's, from memory. No telegraphic dictionary: Audibert has none.
+
+**What moved.** Nothing pinned: the fast tier on the step's work (5735d77) and the step's final
+runs found no passage that hoists a French signal or reads one, and the British and basic
+records are proven unchanged by the hoist's form (the test above).
+
+**The suites as run at 1844886** (the step with the trunk's 4f3694b and c9cb4c0 merged in; a
+worktree pinned there): the fast tier, exit 0, 6,449 run, 6,448 passed and 1 xfailed (the
+trunk's); the slow tier of the touched files and the known truths, exit 0, 324 run, 316 passed
+and 8 xfailed (the trunk's); the pace tests alone and last, exit 0, 13 of 13. Ruff check and
+format clean.

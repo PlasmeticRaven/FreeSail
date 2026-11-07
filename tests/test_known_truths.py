@@ -8410,7 +8410,11 @@ def test_truth_7_139_the_far_fight_measured_once_ends_within_the_near_fights_hou
     (twenty-one minutes) with four hurt and three shot holes, against the near fight at a
     cable in three minutes (truth 7-140) and at long shot in near two hours (7-133); the
     far fight's range is the far brain's choice, which is 74's. The same seed gives the
-    same record."""
+    same record. **Re-measured by package 74, step 1** (`docs/design/Design-Prizes.md` §4.1):
+    `far_ship` read a length key the spec has not, so every far ship was 0.0 long and the
+    hit chance's size term floored at 0.5; read as her waterline's length the long-gun cutter
+    strikes in the same seven rounds with five hurt (four before) and three holes, and the
+    King's cutter has one man hurt (none before); the bands below hold on both reads."""
     from freesail.combat import far
     from freesail.core.rng import Rng
 
@@ -8791,7 +8795,12 @@ def test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag():
     _guns_ready(w)
     w.run(10)
     said = w.submit("make the signal to heave to")
-    assert said.kind == "signal.made" and "by gun: four guns, bring to" in said.text
+    # the fog book is the 1796 book's from the page (package 76): No. 14, "To lie to on the
+    # starboard tack", six guns slow and two quick; 71's made hoist was "four guns, bring to"
+    assert said.kind == "signal.made" and (
+        "by gun: six guns slow, and two minutes after two quick, to lie to on the starboard tack"
+        in said.text
+    )
     assert [e for e in w.log if e.kind == "signal.made"].__len__() == 1  # told once
     for _ in range(8):
         w.run(60)
@@ -8799,9 +8808,11 @@ def test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag():
     assert near is not None, "a sail two miles off is a near body (CREWED_NM)"
     kinds = [(e.kind, e.text) for e in near.log]
     heard = [t for k, t in kinds if k == "signal.read"]
-    assert heard and "fires four guns: bring to" in heard[0], kinds[-12:]
+    assert (
+        heard and "fires six guns slow, and two minutes after two quick: to lie to" in heard[0]
+    ), kinds[-12:]
     assert any(k == "signal.ordered" and "answering pendant" in t for k, t in kinds), kinds[-12:]
-    assert any("heaving to (the signal from the ship: Bring to)" in t for _, t in kinds), kinds[
+    assert any("heaving to (the signal from the ship: To lie to" in t for _, t in kinds), kinds[
         -12:
     ]
     assert any(k == "ship.hove_to" for k, _ in kinds), kinds[-12:]
@@ -10443,10 +10454,14 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
     """Spec M7 §11a: the deck won. Against the same frigate at quarters, her gun crews at
     their guns and the deck held by her marines, the helm, the trimmers and the
     quarterdeck, the boarders with their arms served out carry it in a few rounds: her
-    colours come down 'carried by boarding' (the strike's own line, the far body struck),
-    the prize alongside for 74; the losses by name on both bills."""
+    colours come down 'carried by boarding' (the strike's own line, the far body struck for
+    the moment of it), and (package 74, step 2: the officer on the deck won takes possession
+    at once) she is a prize of ours alongside, her record saying how; the losses by name on
+    both bills, hers the prisoners'. The pin moved by 74: on the trunk she lay struck and no
+    prize; the fight's bands are as they were."""
     from freesail.combat import boarding as B
     from freesail.combat import small_arms as SA
+    from freesail.world import prizes as P
     from tests.test_fight import _alongside
 
     w, v, enemy = _alongside(10.0, her_quarters=True)
@@ -10463,9 +10478,10 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
     f = B.fight_of(w.ship)
     assert f.over == "carried" and 2 <= f.round <= 12, (f.over, f.round)
     assert any("carried by boarding" in e.text for e in events(enemy, "action.struck"))
-    assert v.struck and events(w, "action.carried")
+    assert events(w, "action.carried") and events(w, "prize.taken")
+    assert P.is_prize(v) and not v.struck and P.record_of(v)["how"] == "carried by boarding"
     assert f.lost_defence > f.lost_attack > 0
-    assert "killed" in enemy.readings.words("bill") or "wounded" in enemy.readings.words("bill")
+    assert "of them hurt" in enemy.readings.words("prisoners")
 
 
 def test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down():
@@ -13960,3 +13976,477 @@ def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
     from tests.test_knowledge import test_a_told_order_is_the_captains_word_and_never_refused
 
     test_a_told_order_is_the_captains_word_and_never_refused()
+
+
+# ---------------------------------------------------------------------------
+# Package 81: the viewer's action, from the hull 75 draws (docs/design/Design-ViewerAction.md)
+# ---------------------------------------------------------------------------
+
+from freesail.api import queries  # noqa: E402
+
+
+def test_truth_7_436_every_gun_of_every_file_is_placed_by_the_one_rule_and_the_checker_is_clean():
+    """§2, §3, §8: every gun of every armed file under data/ships placed by the one rule (on its
+    deck's triple within 0.01 m in a port or over the rail by the side's test, on the rail, or a
+    pivot), none refused, every port's sill on her drawn side, the checker clean; and a gun's
+    figure the same on every ship for its kind, calibre and weight, its length its pattern's."""
+    import sys
+    from pathlib import Path
+
+    from freesail.api.viewer_guns import figure
+    from freesail.ship.loader import load_ship
+    from tests.test_viewer_action import (
+        ARMED,
+        test_every_gun_of_every_armed_file_is_placed_by_the_rule,
+    )
+
+    for path in ARMED:
+        test_every_gun_of_every_armed_file_is_placed_by_the_rule(path)
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import check_viewer_guns
+
+    assert check_viewer_guns.main([]) == 0
+    seen: dict[tuple, float] = {}
+    for path in ARMED:
+        for g in queries.ship_graph(load_ship(path))["guns"]:
+            spec = load_ship(path).guns[g["id"]]
+            key = (spec.kind, spec.pounder, spec.weight_cwt)
+            assert g["length_m"] == round(figure(*key).length_m, 3)
+            assert seen.setdefault(key, g["length_m"]) == g["length_m"], key
+
+
+def test_truth_7_437_the_frigates_forecastle_guns_over_the_rail_her_upper_deck_in_its_ports(
+    tmp_path,
+):
+    """§2.3: the Amazon's pair 18 and her bow chasers placed and drawn over the rail, through no
+    port; her upper-deck guns in ports of the upper deck's size, drawn at their triples."""
+    from tests.test_view_action import test_a_gun_over_the_rail_is_drawn_above_it_through_no_port
+    from tests.test_viewer_action import (
+        test_the_frigates_forecastle_guns_are_over_the_rail_and_her_upper_deck_in_ports,
+    )
+
+    test_the_frigates_forecastle_guns_are_over_the_rail_and_her_upper_deck_in_ports()
+    test_a_gun_over_the_rail_is_drawn_above_it_through_no_port(tmp_path)
+
+
+def test_truth_7_438_the_64s_forecastle_9s_of_1784_are_over_the_rail_by_the_sides_test():
+    """§2.2 (the lead's ruling of 2026-11-07): her foremost forecastle triple 0.07 m under the
+    rail, where a 0.69 m port cannot be cut, is a place over the rail, said for the ships
+    session; the 64's other forecastle and roundhouse places over the rail at the generator's
+    2 in, and no triple over the rail drawn as a port."""
+    from tests.test_viewer_action import (
+        test_a_triple_over_the_rail_is_no_port,
+        test_the_64s_forecastle_9s_of_1784_are_over_the_rail_by_the_sides_test_and_said,
+    )
+
+    test_the_64s_forecastle_9s_of_1784_are_over_the_rail_by_the_sides_test_and_said()
+    test_a_triple_over_the_rail_is_no_port()
+
+
+def test_truth_7_439_a_lee_port_the_sea_shuts_is_served_shut_and_drawn_with_its_lid_down(tmp_path):
+    """§2.5: the cutter's lee ports shut by the engine past her shut heel are served shut in the
+    next snapshot with their guns run in, and a port so served is drawn with its lid let down and
+    its gun run in, its words saying the sea is at its sill."""
+    from tests.test_view_action import test_a_port_shut_by_the_sea_is_drawn_shut_and_its_gun_run_in
+    from tests.test_viewer_action import (
+        test_a_lee_port_shut_by_the_sea_is_served_shut_and_its_gun_run_in,
+    )
+
+    test_a_lee_port_shut_by_the_sea_is_served_shut_and_its_gun_run_in()
+    test_a_port_shut_by_the_sea_is_drawn_shut_and_its_gun_run_in(tmp_path)
+
+
+def test_truth_7_440_a_broadside_flashes_at_each_gun_that_fired_and_its_smoke_goes_to_leeward(
+    tmp_path,
+):
+    """§4: the King's cutter's starboard broadside at the word (truth 7-134's): the guns whose
+    rounds rose between the snapshots are the guns the minute's `action.fired` names, and the
+    view flashes at each of them and at no other, its smoke carried to leeward of the apparent
+    wind the snapshot gives."""
+    from tests.test_view_geometry import run_js
+
+    w, _v, _enemy, _battery = _two_cutters_at_pistol_shot()
+    prev = queries.snapshot(w)
+    w.submit("fire")
+    snaps = [prev]
+    for _ in range(70):
+        w.run(1)
+        snaps.append(queries.snapshot(w))  # every tick, as the server's stream at 1x
+    named = sorted(gid for e in w.log if e.kind == "action.fired" for gid in e.data["guns"])
+    assert named
+    graph = queries.ship_graph(w.ship)
+    out = run_js(
+        tmp_path,
+        {"graph": graph, "snaps": snaps},
+        """
+      const fs = [];
+      for (let i = 1; i < d.snaps.length; i++) {
+        fs.push(...P.firingsBetween(d.snaps[i - 1], d.snaps[i]));
+      }
+      const flashed = new Set(), lee = [];
+      fs.forEach(f => {
+        const snap = d.snaps.find(s => s.tick === f.tick);
+        const e = P.effects(d.graph, snap, [f], f.tick + 0.05, {});
+        e.figures.filter(x => x.cls === 'flash').forEach(() => flashed.add(f.gun));
+        const later = P.effects(d.graph, snap, [f], f.tick + 10, {});
+        const plume = later.figures.filter(x => x.cls === 'plume')[0];
+        const wv = P.windVector(snap.wind.apparent_angle);
+        lee.push(plume.centre[0] * wv[0] + plume.centre[1] * wv[1]);
+      });
+      return { fired: fs.map(f => f.gun).sort(), flashed: [...flashed].sort(), lee };
+    """,
+    )
+    assert out["fired"] == named
+    assert out["flashed"] == sorted(set(named))
+    assert all(x > 0 for x in out["lee"]), out["lee"]
+
+
+def test_truth_7_441_the_frame_holds_every_state_and_the_view_writes_nothing(tmp_path):
+    """§6 and the viewer's law: on every hull drawn from her profile the bounds are the same with
+    every gun secured and every gun run out with its lid hauled up, a hole in her side, the
+    flags flying at every place, and the smoke alive (which is not in the frame); the snapshot's
+    new fields cost a small share of it (measured: 4-5% on the cutter, the frigate and the 64,
+    tuning notes); and a fight run with a snapshot every tick gives the same log, digest for
+    digest, as without (the view reads the world and writes nothing of it)."""
+    import time
+
+    from tests.test_view_action import _state
+    from tests.test_view_geometry import PROFILED, run_js
+
+    flags = [
+        {
+            "place": p,
+            "name": n,
+            "words": n,
+            "drawing": {"proportion": [1, 2], "parts": [{"rect": [0, 0, 1, 1], "colour": "red"}]},
+        }
+        for p, n in (
+            ("peak", "ensign"),
+            ("main truck", "pendant"),
+            ("jackstaff", "jack"),
+            ("main rigging", "ensign"),
+        )
+    ]
+    hole = {"side": "starboard", "x_m": 0.0, "z_m": 0.4, "diameter_m": 0.15, "plugged": False}
+    for path in PROFILED:
+        quiet = _state(path, "secured")
+        busy = _state(path, "run out", damage={"holes": [hole]}, flags=flags)
+        busy["snap"]["wind"] = {"apparent_angle": 1.0, "apparent_speed": 8.0}
+        fires = [{"gun": g["id"], "tick": 100} for g in busy["graph"]["guns"] if g["how"]]
+        out = run_js(
+            tmp_path,
+            {"quiet": quiet, "busy": busy, "fires": fires},
+            """
+          const views = [0, 0.8, 1.6, 3.1, 4.7];
+          const box = (s, f, h) => P.project(P.buildSkeleton(s.graph, s.snap), f, h).bounds;
+          let worst = 0;
+          views.forEach(f => [0, 0.2].forEach(h => {
+            const a = box(d.quiet, f, h), b = box(d.busy, f, h);
+            ['minX', 'maxX', 'minY', 'maxY'].forEach(k => {
+              worst = Math.max(worst, Math.abs(a[k] - b[k]));
+            });
+          }));
+          const e = P.effects(d.busy.graph, d.busy.snap, d.fires, 103, {});
+          return { worst, smoke: e.figures.length };
+        """,
+        )
+        assert out["worst"] <= 1e-9, (path, out["worst"])
+        assert out["smoke"] >= len(fires) or not fires
+    w = make_world(SEED, FRIGATE)
+    w.run(5)
+    t0 = time.perf_counter()
+    for _ in range(50):
+        queries.snapshot(w)
+    whole = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    for _ in range(50):
+        queries._action_entries(w, w.ship)
+    part = time.perf_counter() - t0
+    assert part < 0.25 * whole, (part, whole)
+    digests = []
+    for watched in (False, True):
+        a, _v, _enemy, _b = _two_cutters_at_pistol_shot()
+        a.submit("fire")
+        for _ in range(120):
+            a.run(1)
+            if watched:
+                queries.snapshot(a)
+        digests.append(a.log.digest())
+    assert digests[0] == digests[1]
+
+
+def test_truth_7_442_a_hull_without_the_contract_draws_as_75_left_her(tmp_path):
+    """§1: the in-test document with no profile draws none of the action's figures, and with
+    every gun run out, a hole and a flag served her figures and her bounds are those she draws
+    with none of it, point for point."""
+    from tests.test_view_action import HOLE, _state
+    from tests.test_view_geometry import run_js, without_profile
+
+    plain = without_profile(_state(FRIGATE))
+    for k in ("guns", "damage", "flags"):
+        plain["snap"].pop(k, None)
+    busy = without_profile(_state(FRIGATE, "run out", damage={"holes": [HOLE]}))
+    busy["snap"]["flags"] = [{"place": "peak", "name": "ensign", "words": "e", "drawing": {}}]
+    out = run_js(
+        tmp_path,
+        {"plain": plain, "busy": busy},
+        """
+      const a = P.buildSkeleton(d.plain.graph, d.plain.snap);
+      const b = P.buildSkeleton(d.busy.graph, d.busy.snap);
+      const same = k => JSON.stringify(a[k]) === JSON.stringify(b[k]);
+      return [same('figures'), same('frame')];
+    """,
+    )
+    assert out == [True, True]
+
+
+def test_truth_7_443_a_ship_written_with_the_contract_passes_the_checker_with_no_change_of_code(
+    tmp_path,
+):
+    """§8, §9: a ship file written to a temporary directory with the contract and a fit of its
+    own making passes the checker; the same with a pair of guns off their triple is refused and
+    says why."""
+    from tests.test_check_viewer_guns import (
+        test_a_ship_written_with_the_contract_passes_with_no_change_of_code,
+        test_the_same_ship_with_a_gun_off_its_triple_is_refused_and_says_why,
+    )
+
+    for name, test in (
+        ("a", test_a_ship_written_with_the_contract_passes_with_no_change_of_code),
+        ("b", test_the_same_ship_with_a_gun_off_its_triple_is_refused_and_says_why),
+    ):
+        (tmp_path / name).mkdir()
+        test(tmp_path / name)
+
+
+_FLAGS_FLYING = [
+    ("peak", "ensign"),
+    ("main truck", "pendant"),
+    ("main truck", "broad pendant"),
+    ("jackstaff", "jack"),
+    ("main topgallant masthead", "ensign"),
+]
+
+
+def test_truth_7_444_the_flags_are_drawn_at_their_places_and_the_bounds_unmoved(tmp_path):
+    """§12.2 (the owner's addition of 2026-11-07): on every hull drawn from her profile, as the
+    locker says what flies where, the ensign at her peak (or her staff with no gaff), a pendant
+    and a commodore's broad pendant at the main truck, the jack at the jackstaff, a second ensign
+    at the main topgallant masthead, each hoist's head within 0.1 m of its place's point on the
+    drawn spars; the bounds unmoved by any of them. The locker's list is given here as 76's file
+    will give it; the server passes such a list through as it is (`viewer_flags.flags`)."""
+    from types import SimpleNamespace
+
+    from freesail.api import viewer_flags
+    from tests.test_view_action import _state
+    from tests.test_view_geometry import PROFILED, run_js
+
+    listed = [
+        {
+            "place": p,
+            "name": n,
+            "words": n,
+            "drawing": {"proportion": [1, 2], "parts": [{"rect": [0, 0, 1, 1], "colour": "blue"}]},
+        }
+        for p, n in _FLAGS_FLYING
+    ]
+    ship = SimpleNamespace(extra={"signals": SimpleNamespace(flies=listed)})
+    assert viewer_flags.flags(None, ship) == listed
+    for path in PROFILED:
+        bare = _state(path)
+        flying = _state(path, flags=listed)
+        out = run_js(
+            tmp_path,
+            {"bare": bare, "flying": flying},
+            """
+          const sk = P.buildSkeleton(d.flying.graph, d.flying.snap);
+          const res = [];
+          d.flying.snap.flags.forEach((f, n) => {
+            const at = P.flagPlace(d.flying.graph, d.flying.graph.hull, sk.spars, f.place);
+            const fig = sk.figures.filter(x => x.kind === 'flag' && x.id === 'flag.' + n + '.0')[0];
+            const q = fig && fig.pts[0];
+            res.push(at && q ? Math.hypot(at[0] - q[0], at[1] - q[1], at[2] - q[2]) : null);
+          });
+          const box = s => P.project(P.buildSkeleton(s.graph, s.snap), 1.2, 0.1).bounds;
+          const a = box(d.bare), b = box(d.flying);
+          const ks = ['minX', 'maxX', 'minY', 'maxY'];
+          return { res, moved: Math.max(...ks.map(k => Math.abs(a[k] - b[k]))) };
+        """,
+        )
+        drawn = [r for r in out["res"] if r is not None]
+        assert drawn and all(r <= 0.1 for r in drawn), (path, out["res"])
+        assert out["res"][0] is not None, path  # the ensign at her peak or her staff
+        assert out["moved"] <= 1e-9, path
+
+
+def test_truth_7_445_the_flags_follow_the_colours_in_the_next_snapshot():
+    """§12.1: the colours set, the next snapshot serves them: her own ensign shown, the other
+    nation's under false colours, turned over in distress, the white under a flag of truce, none
+    with no colours or struck; a nation with no colours.yaml the plain ensign of its flag word."""
+    from tests.test_viewer_action import _locker
+
+    w = make_world(SEED, FRIGATE)
+    for state, nation, expect in (
+        ("shown", "britain", ("ensign", "red", False)),
+        ("false", "france", ("ensign", "cloth", False)),
+        ("distress", "britain", ("ensign", "red", True)),
+        ("truce", "", ("flag of truce", "white", False)),
+        ("none", "", None),
+        ("struck", "", None),
+    ):
+        _locker(w, state, nation)
+        w.run(1)
+        flags = queries.snapshot(w)["flags"]
+        if expect is None:
+            assert flags == [], state
+            continue
+        (f,) = flags
+        assert (
+            f["name"],
+            f["drawing"]["parts"][0]["colour"],
+            bool(f["drawing"].get("inverted")),
+        ) == expect, state
+        if state == "false":
+            assert f["words"].startswith("French colours")
+
+
+# ---------------------------------------------------------------------------
+# Package 74 (`docs/design/Design-Prizes.md`): prizes, the strike and what follows, and the
+# far fight
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_350_the_far_ships_length_is_her_waterlines_and_the_size_term_hers():
+    """The design's §4.1 (package 75's finding): `far_ship` read `spec.hull.length_m`, a key
+    `HullSpec` has not, so every far ship was 0.0 long and `shot.hit_chance` floored her size
+    term at 0.5 whatever she was; read as `length_waterline_m` the cutter is 15.2 m and the
+    frigate 41.8, and the size term is each hull's own. The pin re-measured old beside new,
+    the old read set by hand (the toggle): truth 7-139's two cutters at two cables at seed 7
+    strike in the same seven rounds either way, the long-gun cutter with four hurt and three
+    holes before and five hurt and three holes after, the King's cutter nobody hurt before and
+    one after; the cutters at a cable move from three rounds to two, which no pin reads."""
+    from freesail.combat import far
+    from freesail.core.rng import Rng
+    from freesail.ship.loader import load_spec
+
+    assert far.far_ship(CUTTER, "britain").length_m == load_spec(CUTTER).hull.length_waterline_m
+    assert far.far_ship(CUTTER, "britain").length_m == 15.2
+    assert far.far_ship(FRIGATE, "britain").length_m == 41.8
+
+    def cutters(range_m: float, old_read: bool):
+        rng = Rng(SEED).stream("far")
+        a = far.far_ship(
+            CUTTER, "britain", "carronades", aim="hull", morale_start=0.9, strike_below=0.1
+        )
+        b = far.far_ship(
+            CUTTER, "france", "long guns", aim="rigging", morale_start=0.7, strike_below=0.35
+        )
+        if old_read:
+            a.length_m = b.length_m = 0.0  # the read before this step, by hand
+        rounds = far.fight(a, b, range_m, rng, minutes=180)
+        return a, b, rounds
+
+    a_old, b_old, r_old = cutters(400.0, True)
+    a_new, b_new, r_new = cutters(400.0, False)
+    assert len(r_old) == len(r_new) == 7 and b_old.struck_at_s == b_new.struck_at_s == 1260.0
+    assert (a_old.hurt, b_old.hurt, b_old.holes) == (0, 4, 3)
+    assert (a_new.hurt, b_new.hurt, b_new.holes) == (1, 5, 3)
+    assert len(cutters(185.0, True)[2]) == 3 and len(cutters(185.0, False)[2]) == 2
+    # the round the world runs is the measure's own loop (`round_once`)
+    a, b = cutters(400.0, False)[:2]
+    a2 = far.far_ship(
+        CUTTER, "britain", "carronades", aim="hull", morale_start=0.9, strike_below=0.1
+    )
+    b2 = far.far_ship(
+        CUTTER, "france", "long guns", aim="rigging", morale_start=0.7, strike_below=0.35
+    )
+    rng = Rng(SEED).stream("far")
+    fired_on: dict[str, bool] = {}
+    t = 0.0
+    rounds = []
+    while t < 180 * 60 and a2.struck_at_s is None and b2.struck_at_s is None:
+        t += 180.0
+        rounds.append(far.round_once(a2, b2, 400.0, rng, t, fired_on))
+    assert [(r.fired, r.struck, r.hurt) for r in rounds] == [
+        (r.fired, r.struck, r.hurt) for r in r_new
+    ]
+    assert (a2.hurt, b2.hurt, b2.struck_at_s) == (a.hurt, b.hurt, b.struck_at_s)
+
+
+def test_truth_7_351_a_ship_struck_near_is_possessed_by_take_possession_of_her():
+    """The design's §2.1 to §2.5 (step 2): `take possession of her` on a struck ship within
+    a boat's pull writes her record (how, when, her nation and intent before), draws the
+    prize crew out of the captor's muster (his bill short by them, hers the prize crew's),
+    puts the prize master, the ladder's man, at her captain's station with his home the
+    prize, confines her people below by their rank, hoists his colours over hers for a day
+    and gives her his nation, the prize master's role and the intent of his doctrine's port,
+    in his company by the set; refused in its five ways (not struck, beyond a boat's pull, a
+    prize already, our own colours struck, the boat away). Taken at once, not after the
+    boat's quarter of an hour (the postscript says why). The boarders' officer on a deck
+    carried takes possession at once and is her prize master (7-325 and 97's test re-pinned),
+    the senior standing of the party leading on when he falls."""
+    from tests.test_between_hulls import (
+        test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_the_party_leads_on,
+    )
+    from tests.test_prizes import (
+        test_take_possession_is_refused_in_its_five_ways,
+        test_take_possession_of_a_struck_brig_within_a_boats_pull_makes_her_a_prize_of_ours,
+    )
+
+    test_take_possession_of_a_struck_brig_within_a_boats_pull_makes_her_a_prize_of_ours()
+    test_take_possession_is_refused_in_its_five_ways()
+    test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_the_party_leads_on()
+
+
+@pytest.mark.slow
+def test_truth_7_352_the_cut_out_prize_parts_under_her_prize_crew_and_a_cruiser_retakes_her():
+    """The brief's §20 first truth as the design amends it (§2.8, §2.9; the lead's ruling 7):
+    the merchant brig cut out by the privateer schooner at far detail is possessed on the far
+    records at once (a prize crew of six, her people the prisoners' count, bound for the
+    nearest port open to him, Brest, under the prize master's role, his colours over hers),
+    parts from him by his doctrine (`prize_company: parts`), and is retaken by a King's
+    cutter coming up at sea, to whom she yields as the prize master's doctrine has her: her
+    nation, colours, goal and role her own again, the retaking a line of the log and of both
+    stories. 72's pin of the cut-out moved with it (the prize in his company before)."""
+    from tests.test_prizes import (
+        test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_retakes_her,
+    )
+
+    test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_retakes_her()
+
+
+@pytest.mark.slow
+def test_truth_7_353_the_prisoners_rise_on_a_thin_tired_prize_crew_and_the_odds_rule_holds():
+    """The design's §2.8: a hundred and twenty-one prisoners over a prize crew of twenty-one
+    (the King's ship's share, one man in twelve of the captor's fit), nineteen hours in her,
+    the captor two miles off, rise at seed 1 in the first hour and have the deck by 73's
+    tables (she is retaken by her own people, the prize crew her prisoners, the prize master
+    a captive in her cabin, the captor's log saying the prize is lost); at seed 7 the first
+    two draws fail. With fifty-one over twenty-one the rising at seed 2 is put down in the
+    third hour and the prisoners are in irons for a day; with twenty-one over twenty-one the
+    rule never draws (the odds under two to one). The figures are the design's judgement (a
+    quarter's chance an hour, two to one, tired at eighteen hours)."""
+    from tests.test_prizes import (
+        test_a_rising_put_down_puts_the_prisoners_in_irons_for_a_day_and_the_odds_rule_holds,
+        test_the_prisoners_rise_on_a_thin_tired_prize_crew_with_no_captor_near_and_retake_her,
+    )
+
+    test_the_prisoners_rise_on_a_thin_tired_prize_crew_with_no_captor_near_and_retake_her()
+    test_a_rising_put_down_puts_the_prisoners_in_irons_for_a_day_and_the_odds_rule_holds()
+
+
+def test_truth_7_354_the_prisoners_are_taken_aboard_by_the_boat_and_a_prize_is_burnt_by_order():
+    """The design's §2.6 and §2.7 as step 2 builds them: `take six of the prisoners aboard`
+    puts six of hers into our hold by the boat (prisoners of ours, counted by `the
+    prisoners`, six fewer in her), `take the prisoners aboard` the rest; `burn the prize`
+    (or `scuttle`) takes her people aboard as prisoners, brings the prize crew and the prize
+    master home and strikes the vessel from the sea with the line that nothing is to be had
+    for her but the head money. The doctrine's own burning (`burns_when`, the valuation's
+    `worth_least`) is step 5's with the court, the prisoners' victualling step 3's."""
+    from tests.test_prizes import (
+        test_a_prize_is_burnt_by_the_order_her_people_prisoners_and_the_prize_crew_home,
+        test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counted,
+    )
+
+    test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counted()
+    test_a_prize_is_burnt_by_the_order_her_people_prisoners_and_the_prize_crew_home()

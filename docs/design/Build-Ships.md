@@ -1225,6 +1225,32 @@ beside new. A threshold is re-pinned only if one fails, old beside new.
 - today's shared shape beside the eight;
 - D18 (a) and (c) on the first sheet; the three ways of drawing the hull below the water (§19.1 item 16) at B5.6.
 
+*Since the viewer's action (package 81, 2026-11-07; `docs/design/Design-ViewerAction.md`):* the
+viewer draws every gun of every hull drawn from her profile by one rule from what her file carries,
+with her ports, their lids, the shot holes and the flags; the rule is `freesail/api/viewer_guns.py`'s
+and the server serves the graph's `guns` and `ports` and the snapshot's `guns`, `damage` and `flags`.
+A port gun stands at its deck's triple at its own x (within §5.3's 0.01 m), in a port where the
+side stands the deck's `port_size_m` depth above the sill (within 0.05 m) and over the rail where it
+does not (the lead's ruling of 2026-11-07, over the 64's `OVER_THE_RAIL_M`: the side's own test,
+which holds every place the constant gives); a swivel on the rail, a pivot on the middle line; a
+chaser at its own triple, trained toward its end. A hull whose file gives no profile draws as
+before. `tools/check_viewer_guns.py` checks every file, and its test runs over `data/ships/`.
+
+**The ship builder's checklist** (for her guns to be drawn; nothing is drawn by hand for any ship):
+1. `hull.profile` with `rail_m`, `breadth_m` and `decks_m`, each deck a gun stands on;
+2. `ports_m.<deck>`: a triple [x, sill, half-breadth] at every broadside gun's and chaser's own
+   `x_m` (within 0.01 m), the sill her sheet's at that x and the half-breadth her side's at the
+   sill; for a gun that fires over the rail, a triple whose sill stands less than a port's depth
+   under the rail (2 in under it, `OVER_THE_RAIL_M`, as the 64's and the frigate's forecastles have
+   it);
+3. `port_size_m.<deck>`: [width, depth] for every deck with ports (one size a deck: where her sheet
+   has two, as the frigate's quarterdeck has, the gun ports' and a note);
+4. every gun's `kind`, `pounder`, `place`, `side` (but a pivot), `x_m`, `weight_cwt` (its drawn
+   length is the pattern of nearest weight in Adye's tables, so a weight from memory is listed
+   when more than a tenth off), and `deck` for a broadside gun and a chaser; a swivel and a pivot
+   need no deck;
+5. then `python tools/check_viewer_guns.py data/ships/<her>.yaml` clean, and the test.
+
 ## 7. The lee ports (B8: L1 = SW-2, then L2 and L3)
 
 ### 7.1 The rule

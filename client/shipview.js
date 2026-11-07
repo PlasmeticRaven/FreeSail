@@ -54,6 +54,8 @@
     el("rect", { class: "sky", x: x0, y: y0, width: w, height: -y0 }, svg);
     el("rect", { class: "sea", x: x0, y: 0, width: w, height: h + y0 }, svg);
 
+    // package 81: the smoke behind her and before her, filled between snapshots (`renderEffects`)
+    el("g", { class: "effects behind" }, svg);
     var rig = el("g", { class: "rig" }, svg);
     scene.figures.forEach(function (f) {
       var node;
@@ -67,7 +69,17 @@
         if (f.part === "head" && f.cls && f.cls.indexOf("strip") < 0) what = "the " + f.cls + " on the head";
         if (f.part === "wale" && f.cls && f.cls.indexOf("channel") >= 0) what = "channel wale";
         if (f.part === "transom" && f.cls && f.cls.indexOf("tuck") >= 0) what = "tuck";
-        title(node, "hull " + what + (f.side ? " (" + f.side + " side)" : "") + (f.under ? ", below the water" : ""));
+        // package 81: a port, its lid or a shot hole says itself in the ship's own words
+        if (f.words) title(node, f.words + (f.under ? ", below the water" : ""));
+        else title(node, "hull " + what + (f.side ? " (" + f.side + " side)" : "") + (f.under ? ", below the water" : ""));
+      } else if (f.kind === "gun") {
+        // package 81: a gun's barrel (cut at the side, inboard and outboard) and its carriage
+        var gcls = "gun " + f.part + " " + f.cls + " " + f.state + (f.piece ? " " + f.piece : "");
+        node = el("polygon", { class: gcls, points: polygonPoints(f.pts) }, rig);
+        title(node, f.words || f.id);
+      } else if (f.kind === "flag") {
+        node = el("polygon", { class: "flag " + f.cls, points: polygonPoints(f.pts) }, rig);
+        title(node, f.words || "a flag");
       } else if (f.kind === "spar") {
         var cls = "spar " + f.cls + " " + f.state + (f.busy ? " busy" : "");
         node = el("line", { class: cls, x1: f.pts[0].x.toFixed(2), y1: f.pts[0].y.toFixed(2), x2: f.pts[1].x.toFixed(2), y2: f.pts[1].y.toFixed(2) }, rig);
@@ -91,6 +103,7 @@
       }
     });
 
+    el("g", { class: "effects front" }, svg);
     el("line", { class: "sea-line", x1: x0, y1: 0, x2: x0 + w, y2: 0 }, svg);
 
     if (info) {
@@ -100,5 +113,29 @@
     }
   }
 
-  root.ShipView = { render: render };
+  /**
+   * Package 81 (Design-ViewerAction.md §6): the flash and the smoke, projected
+   * (`Projection.projectEffects`), into the two layers `render` made: behind her middle and
+   * before it. Only these layers are redrawn between snapshots.
+   */
+  function renderEffects(svg, figs) {
+    var behind = svg.querySelector("g.effects.behind");
+    var front = svg.querySelector("g.effects.front");
+    if (!behind || !front) return;
+    [behind, front].forEach(function (g) {
+      while (g.firstChild) g.removeChild(g.firstChild);
+    });
+    figs
+      .slice()
+      .sort(function (a, b) {
+        return b.depth - a.depth;
+      })
+      .forEach(function (f) {
+        var node = el("polygon", { class: "effect " + f.cls, points: polygonPoints(f.pts) }, f.behind ? behind : front);
+        if (f.opacity !== undefined) node.setAttribute("opacity", f.opacity.toFixed(3));
+        title(node, f.words || f.cls);
+      });
+  }
+
+  root.ShipView = { render: render, renderEffects: renderEffects };
 })(window);
