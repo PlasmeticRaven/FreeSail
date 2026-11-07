@@ -8404,7 +8404,11 @@ def test_truth_7_139_the_far_fight_measured_once_ends_within_the_near_fights_hou
     (twenty-one minutes) with four hurt and three shot holes, against the near fight at a
     cable in three minutes (truth 7-140) and at long shot in near two hours (7-133); the
     far fight's range is the far brain's choice, which is 74's. The same seed gives the
-    same record."""
+    same record. **Re-measured by package 74, step 1** (`docs/design/Design-Prizes.md` §4.1):
+    `far_ship` read a length key the spec has not, so every far ship was 0.0 long and the
+    hit chance's size term floored at 0.5; read as her waterline's length the long-gun cutter
+    strikes in the same seven rounds with five hurt (four before) and three holes, and the
+    King's cutter has one man hurt (none before); the bands below hold on both reads."""
     from freesail.combat import far
     from freesail.core.rng import Rng
 
@@ -13961,3 +13965,66 @@ def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
     from tests.test_knowledge import test_a_told_order_is_the_captains_word_and_never_refused
 
     test_a_told_order_is_the_captains_word_and_never_refused()
+
+
+# ---------------------------------------------------------------------------
+# Package 74 (`docs/design/Design-Prizes.md`): prizes, the strike and what follows, and the
+# far fight
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_350_the_far_ships_length_is_her_waterlines_and_the_size_term_hers():
+    """The design's §4.1 (package 75's finding): `far_ship` read `spec.hull.length_m`, a key
+    `HullSpec` has not, so every far ship was 0.0 long and `shot.hit_chance` floored her size
+    term at 0.5 whatever she was; read as `length_waterline_m` the cutter is 15.2 m and the
+    frigate 41.8, and the size term is each hull's own. The pin re-measured old beside new,
+    the old read set by hand (the toggle): truth 7-139's two cutters at two cables at seed 7
+    strike in the same seven rounds either way, the long-gun cutter with four hurt and three
+    holes before and five hurt and three holes after, the King's cutter nobody hurt before and
+    one after; the cutters at a cable move from three rounds to two, which no pin reads."""
+    from freesail.combat import far
+    from freesail.core.rng import Rng
+    from freesail.ship.loader import load_spec
+
+    assert far.far_ship(CUTTER, "britain").length_m == load_spec(CUTTER).hull.length_waterline_m
+    assert far.far_ship(CUTTER, "britain").length_m == 15.2
+    assert far.far_ship(FRIGATE, "britain").length_m == 41.8
+
+    def cutters(range_m: float, old_read: bool):
+        rng = Rng(SEED).stream("far")
+        a = far.far_ship(
+            CUTTER, "britain", "carronades", aim="hull", morale_start=0.9, strike_below=0.1
+        )
+        b = far.far_ship(
+            CUTTER, "france", "long guns", aim="rigging", morale_start=0.7, strike_below=0.35
+        )
+        if old_read:
+            a.length_m = b.length_m = 0.0  # the read before this step, by hand
+        rounds = far.fight(a, b, range_m, rng, minutes=180)
+        return a, b, rounds
+
+    a_old, b_old, r_old = cutters(400.0, True)
+    a_new, b_new, r_new = cutters(400.0, False)
+    assert len(r_old) == len(r_new) == 7 and b_old.struck_at_s == b_new.struck_at_s == 1260.0
+    assert (a_old.hurt, b_old.hurt, b_old.holes) == (0, 4, 3)
+    assert (a_new.hurt, b_new.hurt, b_new.holes) == (1, 5, 3)
+    assert len(cutters(185.0, True)[2]) == 3 and len(cutters(185.0, False)[2]) == 2
+    # the round the world runs is the measure's own loop (`round_once`)
+    a, b = cutters(400.0, False)[:2]
+    a2 = far.far_ship(
+        CUTTER, "britain", "carronades", aim="hull", morale_start=0.9, strike_below=0.1
+    )
+    b2 = far.far_ship(
+        CUTTER, "france", "long guns", aim="rigging", morale_start=0.7, strike_below=0.35
+    )
+    rng = Rng(SEED).stream("far")
+    fired_on: dict[str, bool] = {}
+    t = 0.0
+    rounds = []
+    while t < 180 * 60 and a2.struck_at_s is None and b2.struck_at_s is None:
+        t += 180.0
+        rounds.append(far.round_once(a2, b2, 400.0, rng, t, fired_on))
+    assert [(r.fired, r.struck, r.hurt) for r in rounds] == [
+        (r.fired, r.struck, r.hurt) for r in r_new
+    ]
+    assert (a2.hurt, b2.hurt, b2.struck_at_s) == (a.hurt, b.hurt, b.struck_at_s)

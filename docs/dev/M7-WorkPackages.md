@@ -52,7 +52,7 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b; **the design approved 2026-11-07** (nine rulings; `docs/design/Design-Prizes.md`); step 1 merged 2026-11-07 (9acab09); on step 2 |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package; the hold (SW-5) and B3.4 merged 2026-11-06 (f414ed1); SW-4 and B2 in hand to one final report |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806); **found by package 81 (2026-11-07), for this package:** a hole above the water is made at 0.3 to 1.8 m above the waterline whatever the side's height (`combat/hits.py`, 73's), so a cutter's hole can stand above her rail: cap a hole at the side's height at its x (the profile's rail where the file gives one); and a tick on each volley (`Volley` in `combat/guns.py`) for the viewer's exact stamp of each round (81 stamps a round with its snapshot's tick meanwhile) | behind 70 and 73 |
@@ -2752,6 +2752,58 @@ for once). **Package 65 is
 closed**: eight steps, truths 7-370 to 7-389, 7-420 and 7-421, decisions 59 to 63 as built, the
 design note `docs/design/Design-PlaceKnowledge.md` with a postscript a step. Package 74 (Fable)
 launches on this close.
+
+### Package 74, the design and step 1 (the far ship's length), as merged (2026-11-07)
+
+Merged `claude/pkg-74` at 797860d (9acab09, `--no-ff`; the design note at 2079122, step 1 at
+797860d; the branch's trunk merge f0457e9 and step 1's record commit 0352b3e lie after step 2's
+first commit 88af63e, whose suites had not run, so step 1 is merged at its own commit and its
+record paragraph in the tuning notes reaches the trunk with step 2). **The design**
+(`docs/design/Design-Prizes.md`, 1,187 lines, approved 2026-11-07 with nine rulings): the prize
+a hull of the one world possessed by one function for every road (the strike by morale, the
+captain's word, the deck carried, the far rounds, the cut-out), the muster swapped (the prize
+crew's sailors out of the captor's, her former company a prisoners' record confined below, the
+named few by 65's confinement), one ladder of standing for the prize master and for who leads
+the boarders on when their officer falls (97's paragraph; 97's pin to move old beside new), the
+captors' doctrine in their role files with a prize master's file of its own, the captured book
+and table, the rising and the retaking, burning and scuttling, the prisoners fed at two thirds
+(the Regulations on file); the captive's channel the visitor's voice with his own station stood
+down and his prompt following his body, the parole asked in the period's words by nation
+(Spain's row by decision 64), the prisoners landed to the agent for prisoners at the port, the
+cartel a hull of the sea with one errand; the far fight wired to the sleeping hulls by 70's
+rounds every third minute with 75's finding mended first, the far state carried into the parts
+and back, the engagement first among the cap's reasons; the prize court a job of the port by
+nation, the valuation and the cargo and the prize goods on 86's ordnance, the money by the
+eighths by date; the consent revision drafted under `docs/design/` with the refusal in words
+behind a flag; the court martial the director's proceeding and a new command a scenario's start
+under the saves. **Ruled:** the muster swap over a flag; the captive's station stood down; the
+eighths from memory until the shelf answered (it did, the same day: Lavery, *Nelson's Navy*,
+p. 116, confirming both schemes and adding the ships in sight sharing the money, built at step
+5); the far ship's reply to an awake hull only as the fallback when the cap has no room for her;
+the guns heard off the horizon kept under the rounds' toggle; the new command's scenario written
+by a small writer of 74's own under `saves/` (96 is held); the boats' retaking amended to a
+cruiser at sea; the adversarial refusal reaching every station of hers that gives an order of
+the deck or the guns, the voices and the lookout admitted; `combat/boarding.py` and
+`world/crews.py` granted, the cartel's gun words until 75 closes; the flag of truce the colours'
+state `truce`. **Step 1, built as the design's §4.1:** `combat/far.py` reads the far ship's
+length from `length_waterline_m` (70 read a key the spec has not, so every far ship was 0.0 m
+long and her size floored at 0.5; found by 75), and `fight`'s loop body is `round_once`, the one
+function the world's far action will run at step 4, the loop and its record unchanged; truth
+7-350 pins the read and the move old beside new (the old read set by hand as the toggle); 7-139's
+docstring carries the new figures beside the old: the two cutters at two cables strike in the
+same seven rounds, the long-gun cutter five hurt and three holes against four and three, the
+King's cutter one hurt against none; at a cable two rounds against three; two frigates at two
+cables three rounds against six; the pin's bands hold and no other pin reads the far fight.
+**Found, carried:** the world order's "merchant brig" takes `brig.yaml`'s muster of 121
+(`merchant-brig.yaml` a shadow; to the ships session's notes); a rules captain bound for Brest
+from the Iroise lays no course through the goulet and beats without way within five miles of
+the road (the planner's, 61's family; the lead's list). **The builder's suites on 797860d, in a
+pinned worktree:** ruff and format clean; the fast tier whole exit 0; the slow tier of the known
+truths, the profile and the Indefatigable's tests exit 0; the pace alone and last 13 of 13 (the
+first pace run cut by the background task's two-hour limit and run again alone). **The lead's
+merge:** the trial of 797860d on 2a1cd96 clean and lint-clean; the fast tier whole on it green,
+exit 0, every test passed; the whole suite in the cloud dispatched after run 45, the figures to
+follow. Steps 2 to 7 follow at their boundaries, each at one hash.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -6159,3 +6211,5 @@ ships' files) and, next after this, 65's step 5 (the library by the reader's pla
 rulings stand as written above; the owner is awake and has your send.
 
 **2026-11-07, 02:40 UTC: found by package 81 (the viewer's action), for the ships session and the schema.** The frigate's quarterdeck carries two sizes of port on her sheet (carronade ports 3 ft by 2 ft 11½ in, gun ports 2 ft 3 in by 2 ft 4 in, `pages-zaz2587.md` §7.2), and `port_size_m` is by deck, so her file gives the gun ports' size to the carronades too; 81 draws each port at its deck's size until the schema gives a size by port. A `port_size_m` entry by port (or a fourth value in a triple) is the schema's and yours when a hull wants it, in your plan's form; nothing is asked now. Also for the record: 81 places every gun of every fit by one rule from the files' triples (327 guns over eleven fits, none refused), and puts the 64's foremost forecastle triple of 1784 (18.41 m, 0.07 m under the rail) over the rail by the side's own test rather than `OVER_THE_RAIL_M`; its checker names such triples for you to keep or to write 2 in under the rail. Package 74 is told that the cartel's one gun stays words until 75 closes.
+
+**2026-11-07, 05:00 UTC: found by package 74, for the record (SW-4 mends it):** the world order's "merchant brig" took `data/ships/brig.yaml`'s muster of 121 before SW-4, `merchant-brig.yaml` being a shadow; the lead merges SW-4 next.
