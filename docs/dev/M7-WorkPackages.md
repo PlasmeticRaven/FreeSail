@@ -2898,7 +2898,12 @@ session's tools too. **The builder's suites at cfaf48c, in a pinned worktree:** 
 passed 8 xfailed, exit 0; the pace 13 of 13; ruff and format clean at e200d9c. **The lead's
 merge:** the trial on 2dc4921 clean and lint-clean, no forbidden word new in the diff; the fast
 tier whole on it green, exit 0, every test passed; the whole suite in the cloud dispatched after
-run 48, the figures to follow. Step 2 (France) follows at its boundary.
+run 48: run 49 on c9cb4c0a (08:08 to 09:24 UTC): lint green, all six shards green, 6,851 passed,
+11 skipped, 12 xfailed, no failure; the pace job (informative) 9 of 13 as on run 48, the same four
+floor tests at 382 to 439 against 500 (a merge of documents and data with no engine change, so the
+two runs agree with each other and not with runs 45 and 46; on the build machines packages 76 and
+81 both ran the pace at 13 of 13 on trees carrying SW-4, so the lead holds it the shared runner's
+hour until a third run on another day says otherwise). Step 2 (France) follows at its boundary.
 
 ### Package 81, the viewer's action (items 1 to 7), as merged; the package closed (2026-11-07)
 
