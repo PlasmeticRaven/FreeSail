@@ -3239,8 +3239,7 @@ and format clean; the slow candidates no outcome changed; the captain's trials t
 three; the four whole logs as before but the first action, 473 to 497 lines, bisected to the
 trunk merge c3d46cca (74's step 2), not to her. **The lead's merge:** the trial on 9b821fb5 clean
 and lint-clean (ruff check and format); no model or vendor name in the diff; `data/ships/`
-touched by the generator alone; the fast tier whole on it exit 0, 6,791 passed by the dots and 1 xfailed, 20:58 to 21:41 UTC (43 minutes); the whole suite in the
-cloud dispatched after run 54, the figures to follow. Next in 75: B3.4b (the word's two cases,
+touched by the generator alone; the fast tier whole on it exit 0, 6,791 passed by the dots and 1 xfailed, 20:58 to 21:41 UTC (43 minutes); the whole suite in the cloud, run 55 (2026-11-07, 21:43 to 22:43 UTC, on 8e552bd8): lint green; the six shards green, 7,216 passed, 11 skipped, 12 xfailed, the longest shard 51 minutes; the pace job 9 of 13, the four floor tests at 446, 431, 410 and 386 ticks a second against 500 on the shared runner, as at runs 48 to 54 (the build machine alone held 13 of 13 at 12:09). Next in 75: B3.4b (the word's two cases,
 the dismasted lines), then B3.3 (the settee) with B4 (the bilander); the 74 and Phase 5 after.
 
 ### Package 74, step 3: the captive's channel (the design's §3), as merged (2026-11-07)
