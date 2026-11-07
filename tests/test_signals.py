@@ -81,6 +81,37 @@ def test_a_hoist_shows_its_books_form_and_the_british_numerary_is_unchanged_by_i
     assert h.to_dict()["form"] == "table"
 
 
+def test_the_spanish_book_is_added_by_data_alone_in_mazarredos_numbers():
+    """Package 76: Spain's own root, the six files and the nations' line and nothing else.
+    Mazarredo's plan (Cádiz 1781, the third edition): two flags read as a cell of four
+    hundred, the cell's number the article (No. 247 the chase without keeping the order);
+    the signals of one flag numbered above the table; by night the lanterns high and low of
+    his nineteen, by fog the guns in two times a full minute apart."""
+    from freesail.world.nations import load_nations
+
+    assert load_nations().get("spain").signals_root == "spain"
+    es = S.books_for_nation(load_nations(), "spain")
+    assert es.nation == "spain" and es.hoist_form == "table" and not es.telegraph
+    e, q = es.find("general chase")
+    assert e.number == 247 and not e.made and e.original.startswith("Dar caza")
+    h = S.make_hoist(S.Locker(), es, e, q, "santa-sabina", 100)
+    assert h.flags_words() == "two flags at the main" and h.to_dict()["form"] == "table"
+    assert es.find("man overboard")[0].number == 409
+    assert es.find("engage the enemy more closely")[0].does == {"closer": True}
+    night = {x.meaning: x for x in es.night}
+    assert night["Wear together"].show == "two lanterns high and three lanterns low"
+    third = "and then a rocket or the stern lanterns left lit"  # his chapter III, told after
+    assert night["Tack in succession"].show.endswith(third)
+    fog = {x.meaning: x for x in es.fog}
+    assert fog["Shorten sail"].fire == "two guns"
+    assert fog["Wear together"].fire == "two guns, and a full minute after three guns"
+    assert all(not x.made for x in es.night + es.fog)
+    # her private signal's draw is the one she drew on basic: the form kept word for word
+    for month in (1, 6, 12):
+        drawn = S.private_table(S.load_books("basic"), "spain", 1805, month, 7)
+        assert S.private_table(es, "spain", 1805, month, 7) == drawn
+
+
 def test_the_telegraphic_dictionary_spells_nelsons_sentence_in_twelve_hoists():
     b = S.load_books("britain")
     hoists = b.encode("England expects that every man will do his duty")
@@ -636,3 +667,88 @@ def test_a_captains_answer_to_a_hail_reaches_the_ship_that_hailed_her():
     far = w.vessels.player_shadow(w)
     assert crew.ship.extra["hail_pending"]["from"] == str(far.id)
     assert H._has_hailed_us(crew, far, 1.0) and not H._has_hailed_us(crew, far, 2000.0)
+
+
+# -- every root (package 76, step 6): the checker, and each root's hoist read and obeyed ----
+
+NATION_OF_ROOT = {r: S.load_books(r).nation for r in S.roots()}
+NATIONS_ROOTS = [r for r in S.roots() if r != "basic"]
+
+
+@pytest.fixture(scope="module")
+def _a_frigate():
+    from tools.check_signals import _a_ship
+
+    return _a_ship()
+
+
+@pytest.mark.parametrize("root", S.roots())
+def test_the_checker_passes_every_root(root, _a_frigate):
+    """`tools/check_signals.py` over every root under data/signals/, so that a nation added
+    later is checked by a test that does not know her name: her files load, every `does` an
+    order a ship takes or a form 71's design names, every qualifier one the engine fills,
+    every source named, every made entry marked, every nation reading her under her name."""
+    from tools.check_signals import check_root
+
+    assert check_root(root, _a_frigate) == []
+
+
+@pytest.mark.parametrize("root", NATIONS_ROOTS)
+def test_a_hoist_is_read_by_her_own_book_and_not_by_anothers(root):
+    """A signal made under a nation's book is read by a ship holding that book ('No. N, the
+    meaning') and is 'a signal we cannot read' to a ship holding another's."""
+    books = S.load_books(root)
+    entry, q = books.find("tack in succession")
+    h = S.make_hoist(S.Locker(), books, entry, q, "sender", 100)
+    near = 1.0 * units.NAUTICAL_MILE
+
+    stranger = S.Locker()
+
+    def read(reader_books, tick):
+        return S.read_flying(
+            stranger, reader_books, "sender", "the brig", [h], near, "day", False, tick, "x"
+        )
+
+    own = S.Locker()
+    S.read_flying(own, books, "sender", "the brig", [h], near, "day", False, 170, "x")
+    got = S.read_flying(own, books, "sender", "the brig", [h], near, "day", False, 230, "x")
+    assert [x.kind for x in got] == ["signal.read"]
+    assert f"No. {entry.number}, " in got[0].text
+    other = "britain" if root != "britain" else "france"
+    seen = read(S.load_books(other), 170)
+    assert seen and "a signal we cannot read: not of our book" in seen[0].text
+    assert read(S.load_books(other), 300) == []
+
+
+@pytest.mark.parametrize("root", [r for r in NATIONS_ROOTS if r != "britain"])
+def test_the_convoy_tacks_in_succession_on_one_hoist_of_her_own_book(root):
+    """The convoy of four (data/scenarios/convoy.yaml) under each nation's colours and books:
+    the player's one hoist of her convoy book's 'tack in succession' is read by every master,
+    each a commanded captain under her orders, and performed in succession (Britain's is truth
+    7-145)."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    nation = NATION_OF_ROOT[root]
+    sf = load_scenario("data/scenarios/convoy.yaml")
+    sf.scenario.nation = nation
+    for spec in sf.scenario.ships:
+        spec["nation"] = nation
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    names = ["Nancy", "Two Brothers", "Providence", "Friendship"]
+    assert S.books_for(w).root == root
+    w.run(600)
+    said = w.submit("make the signal to tack in succession")
+    assert said.kind == "signal.ordered", said.text
+    entry = S.load_books(root).find("tack in succession", "convoy")[0]
+    assert f"No. {entry.number}, " in said.text
+    about: dict[str, int] = {}
+    for _ in range(30):
+        w.run(60)
+        for n in names:
+            v = w.vessels.find(n)
+            if n not in about and any("went about" in words for _, words in (v.story or ())):
+                about[n] = next(t for t, words in v.story if "went about" in words)
+    assert set(about) == set(names), about
+    ticks = [about[n] for n in names]
+    assert ticks == sorted(ticks) and len(set(ticks)) == 4, ticks

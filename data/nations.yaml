@@ -150,8 +150,9 @@ nations:
       roll: up
       source: "between the French and the British: the Spanish fleet drilled with the French and fired high (Trafalgar's accounts, from memory); 70's judgement, moved here"
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
-    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
-    signals: {root: basic, system: basic}
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md);
+    # package 76: her own root, Mazarredo's book in its own numbers (data/signals/spain/book.yaml)
+    signals: {root: spain, system: well-built}
     # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
     # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
     # the share aloft); the detachment itself is the ship file's
@@ -238,8 +239,9 @@ nations:
       roll: down
       source: "the American frigates of 1812 fired low and fast into the hull (the Constitution's and the United States's actions, from memory); 70's judgement, moved here"
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
-    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
-    signals: {root: basic, system: basic}
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md);
+    # package 76: her own root, Barry's book of 1800 in its own numbers (data/signals/united-states/book.yaml)
+    signals: {root: united-states, system: well-built}
     # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
     # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
     # the share aloft); the detachment itself is the ship file's
@@ -485,7 +487,9 @@ nations:
       aim: hull
       roll: down
       source: "no record read; the common habit (judgement, package 71's form)"
-    signals: {root: basic, system: basic}
+    # package 76 (the lead's ruling): her own root, the flotilla's book of 1807 of Joseph's kingdom
+    # (data/signals/naples/book.yaml says so); the Bourbon book of 1805 not found
+    signals: {root: naples, system: well-built}
     marines: {kit: basic}
     naval:
       keeps_the_sea: false

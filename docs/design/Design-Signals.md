@@ -482,3 +482,100 @@ from the encounter that were not in the design: the captain names his stranger's
 the chase order (the order's own choice is the lookout's nearest stranger, who counts a
 sail under our colours none), and a chase on the other side of the wind's eye is gone about
 for. Every figure is in `docs/dev/TuningNotes.md` (package 71).
+
+## As built out (package 76)
+
+*The postscript of the books built out from the page. The colours' file is written first, as
+the brief has it, before any root is filled; the books' part follows at the package's end.*
+
+### The seventh file: `colours.yaml` (the flags of command and identity)
+
+Every root gains a seventh file beside the six, its shape the same for every nation so that
+the locker, the lookout and the viewer (81) read one shape:
+
+```yaml
+nation: britain                 # the root's nation; `basic` for the basic root
+sources: ["...", "..."]          # the pages the flags are drawn from, each named
+flags:                           # the nation's flags by name
+  - name: red ensign             # the name the occasions use, unique in the file
+    kind: ensign                 # ensign | merchant ensign | jack | pendant | broad pendant |
+                                 #   admiral's flag | truce | standard
+    service: navy                # who wears it: navy | merchant | privateer | any
+    squadron: red                # the squadron's colour where the nation has them, else ""
+    rank: ""                     # an admiral's flag: admiral | vice-admiral | rear-admiral
+    words: "the red ensign"      # as the lookout names it
+    proportion: [1, 2]           # hoist, fly
+    drawing:                     # x along the fly from the hoist, y down from the head, 0 to 1
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.05, colour: white}   # width in the hoist's units
+    dates: "1801-"               # the years it flew: "1801-", "1785-1808", "-1800"
+    source: "..."                # the page the flag is drawn from, or `made` and why
+occasions:                       # what flies where, by occasion and role
+  - occasion: at sea             # at sea | at anchor | in action | in company under a
+                                 #   commodore | in harbour | under truce
+    role: kings ship             # kings ship | commodore | admiral | merchant | privateer | any
+    flags:
+      - {name: red ensign, where: peak}
+      - {name: pendant, where: main truck}
+```
+
+- **`where`** takes 81's place words exactly (Design-ViewerAction.md §12.2): `peak` (the viewer
+  falls back to `staff` where there is no gaff), `staff`, `main truck`, `fore truck`, `mizen
+  truck` (a one-masted ship's mast is her main), `<mast> <piece> masthead` (`main topgallant
+  masthead`), `jackstaff`, `<mast> rigging`. The checker refuses any other word, and an
+  occasion naming a flag the file has not.
+- **An occasion's list replaces the at-sea list** for that role; a role with no list of its
+  own at an occasion takes the `any` list there, and failing that its at-sea list. A doubled
+  ensign is the same flag named at two places.
+- **The flag of truce** flies under the colours state `truce` (74 adds it to 71's states), by
+  the `under truce` occasion's list.
+- **The `basic` root** stands for the nations with no root of their own. Its file's `flags`
+  and `occasions` are the plain ensign every nation has (drawn from her `colours` words in
+  `data/nations.yaml` where she has no flags of her own) and the plain pendant of a man of
+  war; under `nations:` it carries, by nation id, the flags a page gives for a nation that
+  stands on `basic` for her signals (Portugal's, dated), each in the same shape (`sources`,
+  `flags`, `occasions`), read before the basic list.
+- **The snapshot** serves `flags` as 81 reads them, `{place, name, words, drawing}`, the
+  drawing as `{proportion, parts}` with the rectangles in `parts`; the lines go under
+  `drawing.lines` beside them (81's viewer draws a part without `rect` as the whole field,
+  so a line among the parts would cover the flag; 81 draws `lines` when it can).
+- **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
+  two ensigns at the peak), for 74's prize when the lead rules it.
+
+The rules, in the locker: **what flies where** is a pure function of the nation's file, the
+colours' state and the nation shown (the other nation's file under false colours), the
+ship's role (her captain's, read as the rules read it), her captain's rank where an
+admiral's flag is wanted, the occasion (at anchor when she lies at anchor; in action when
+she has beaten to quarters or is engaging; in company under a commodore when she is under
+his orders; at sea else), and the flags ordered beside them (`hoist the broad pendant`,
+`hoist a second ensign at the main`, `hoist the jack`). Nothing when her colours are hauled
+down or struck; the ensign turned over under distress. The list is the locker's state and
+the lookout's words; no physics reads it.
+
+### The books, by nation
+
+| Root | The source read on the page | What the book carries | What it lacks |
+|---|---|---|---|
+| `britain` | the Signal Book of 1799's numbers where the logs of Copenhagen and Trafalgar gloss a hoist (Jackson, 1900); the 1796 book's meanings, flags and fog signals; the 1799 night book; Popham's *Telegraphic Signals* of 1803 | a numerary of 171 entries (34 at the 1799 numbers from the page, the rest at Howe's 1790 numbers or made, marked), 73 night signals from the page and 3 made, 24 fog (18 from the page), Popham's 1,444 words and his alphabet | the 1799 day book itself (not online); the masters' convoy book of the period (Millan's form of 1748, the meanings made) |
+| `france` | Audibert Ramatuelle, *Cours élémentaire de tactique navale* (1802), du Pavillon's system; Orvilliers's *Signaux généraux* (1772) | du Pavillon's table (`hoist_form: table`), 74 entries in its cells, 14 in Orvilliers's words; the night and fog by guns in two times; the convoy's escort | the Republic's book of the year VI (not online): every cell made |
+| `spain` | Mazarredo, *Instrucciones y señales* (Cádiz 1781, the third edition) | his four hundred cells (`hoist_form: table`), 100 entries (87 from the page, the signals of one flag numbered above the table), the night under sail in his three chapters and at anchor by lanterns (61), the fog by his guns (19), the convoy reading the squadron's cells with his orders to its commander | whether the régimen quaderno of 1797 kept the 1781 cells (asked of the owner's shelf); the masters' own book |
+| `united-states` | Barry, *A Set of Signals* (Norfolk 1800); Preble's *History of the Flag* (1894) for the squadron's books of 1803 to 1804 | 69 entries at Barry's numbers (54 from the page), a flag a figure; 30 night signals in his lantern figures; the 1803 flags declared (ten numerals, the cornet, the answering flag, three repeaters, the diptote) | the fog signals and the masters' convoy book (made); the 1803 books' numbers (in manuscript) |
+| `naples` | the *Segnali di giorno, e di notte* of the flotilla (Naples 1807, Joseph's kingdom) | 55 entries at its general signals' numbers (46 from the page), its thirteen night signals by number, its flags from the plate | the Bourbon book of 1805; the lanterns of its night signals (in the book's figures); fog and convoy (made) |
+| `basic` | the common form of the period's books (made) | 46 entries, every one made, for the nations it names | everything a nation's own book would give |
+
+**How a nation's book is added.** Her root under `data/signals/<root>/`, the six books and the
+seventh (the colours) in the shapes above; her line in `data/nations.yaml`
+(`signals: {root, system}`); `tools/check_signals.py` and the tests over every root, which
+know no root by name, pass; and her private form kept basic's word for word if she stood on
+basic before, so that her draw does not move. Spain, the United States and Naples were added
+so, with no change of code (truth 7-433). The loader grew one field for France and Spain, the
+book's `hoist_form`, which only the lookout's words without the book read and which no British
+or basic record carries.
+
+**Found on the way.** `shake out the reefs` is a far body's form (`signals.far_perform`) and
+not the dialect's words, which are `shake out the reefs in the topsails`: a near commanded
+captain given it by signal is refused by the dialect (the checker names it a design form;
+reported to the lead). 71's rule that any ship holding a table answers any challenge stands for
+the challenges it made; a challenge made in a named nation's form (item 8) is answered only by
+a ship of that nation.

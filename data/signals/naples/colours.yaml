@@ -1,0 +1,67 @@
+# FreeSail: the Neapolitan flags of command and identity (spec M7 §1; package 76, the owner's
+# addition of 2026-11-07; docs/design/Design-Signals.md, "As built out", which gives the shape).
+# The Bourbon kingdom's white with the arms (Babron, 1817), which the game's Naples of 1805
+# wears; the flags of Joseph's kingdom, whose signal book this root's is, were not found. The
+# pendant and the broad pendant are made, marked so.
+
+nation: naples
+sources:
+  - "Babron, Précis des pratiques de l'art naval, Brest 1817 (the flags of Naples and Sicily)"
+  - "Fisher, A Display of the Naval Flags of all Nations, Liverpool [1820] (the plate of Naples and Sicily)"
+flags:
+  - name: "Neapolitan ensign"
+    kind: "ensign"
+    service: "any"
+    words: "the white with the arms"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0.38, 0.25, 0.62, 0.75], colour: red}
+      - {rect: [0.42, 0.3, 0.58, 0.7], colour: yellow}
+      - {rect: [0.45, 0.15, 0.55, 0.25], colour: yellow}
+    dates: "-1806, 1815-"
+    source: "Babron, Précis (1817), the flags of Naples: the royal flag white, charged with the arms and orders of the kingdom; the merchants' the same without the collar; the Bourbon kingdom's (Joseph's flags of 1806 to 1808 not found); the arms drawn as a red and gold shield crowned, judgement"
+  - name: "Neapolitan pendant"
+    kind: "pendant"
+    service: "navy"
+    words: "the Neapolitan pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0, 0.1, 1], colour: red}
+    dates: ""
+    source: "made: a white pendant with the red at the head (judgement; no page found gives it)"
+  - name: "Neapolitan broad pendant"
+    kind: "broad pendant"
+    service: "navy"
+    words: "a commodore's broad pendant"
+    proportion: [1, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0, 0.2, 1], colour: red}
+    dates: ""
+    source: "made: judgement, as the pendant"
+  - name: "flag of truce"
+    kind: "truce"
+    service: "any"
+    words: "a flag of truce"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+occasions:
+  - {occasion: "at sea", role: "kings ship", flags: [{name: "Neapolitan ensign", where: "peak"}, {name: "Neapolitan pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "commodore", flags: [{name: "Neapolitan ensign", where: "peak"}, {name: "Neapolitan broad pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "merchant", flags: [{name: "Neapolitan ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "privateer", flags: [{name: "Neapolitan ensign", where: "peak"}]}
+  - {occasion: "at anchor", role: "kings ship", flags: [{name: "Neapolitan ensign", where: "staff"}, {name: "Neapolitan pendant", where: "main truck"}]}
+  - {occasion: "at anchor", role: "commodore", flags: [{name: "Neapolitan ensign", where: "staff"}, {name: "Neapolitan broad pendant", where: "main truck"}]}
+  - {occasion: "at anchor", role: "merchant", flags: [{name: "Neapolitan ensign", where: "staff"}]}
+  - {occasion: "at anchor", role: "privateer", flags: [{name: "Neapolitan ensign", where: "staff"}]}
+  - {occasion: "in action", role: "kings ship", flags: [{name: "Neapolitan ensign", where: "peak"}, {name: "Neapolitan ensign", where: "main topgallant masthead"}, {name: "Neapolitan pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "commodore", flags: [{name: "Neapolitan ensign", where: "peak"}, {name: "Neapolitan ensign", where: "main topgallant masthead"}, {name: "Neapolitan broad pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "merchant", flags: [{name: "Neapolitan ensign", where: "peak"}]}
+  - {occasion: "in action", role: "privateer", flags: [{name: "Neapolitan ensign", where: "peak"}]}
+  - {occasion: "under truce", role: "any", flags: [{name: "Neapolitan ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+  - {occasion: "under truce", role: "merchant", flags: [{name: "Neapolitan ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}

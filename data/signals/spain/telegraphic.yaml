@@ -1,0 +1,14 @@
+# FreeSail: the Spanish telegraphic dictionary (spec M7 §3; package 76;
+# docs/design/Design-Signals.md). There is none: the free sentence by flags was Popham's (1800,
+# 1803), and no Spanish dictionary of the kind is known for 1805. Mazarredo's book (Cádiz 1781,
+# the third edition) has the watchword and countersign by a table of its own (the general
+# signals, No. 45: the upper flag the watchword and the lower the countersign) and the signals
+# added below a signal for numbers (fathoms, leagues, the sick, days of provisions), but no
+# words. A Spanish ship ordered `make the telegraphic signal: ...` is refused in words, as a
+# French one is. The file is kept so that every root has the same six.
+
+source: "no Spanish telegraphic dictionary in 1805: Mazarredo 1781 has none"
+made: false
+telegraph_flag: false
+alphabet: {}
+words: {}

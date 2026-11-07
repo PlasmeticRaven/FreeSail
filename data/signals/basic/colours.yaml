@@ -1,0 +1,147 @@
+# FreeSail: the basic flags of command and identity (spec M7 §1; package 76, the owner's
+# addition of 2026-11-07; docs/design/Design-Signals.md, "As built out", which gives the shape).
+# The flags every nation with no root of her own wears by the game's common form: her ensign at
+# the peak (at the staff at anchor), drawn from her own flag word in data/nations.yaml as a
+# plain field of the first colour it names, and, in a ship of war, a plain pendant at the main;
+# doubled in action; the flag of truce at the fore. Under `nations:`, by nation id, the flags a
+# page gives for a nation that stands on basic for her signals, read before the basic list:
+# Portugal's ensign of the years before 1816, from the 1820 plate and Babron, dated (the
+# lead's ruling of 2026-11-07).
+
+nation: basic
+sources:
+  - "made: the common form of the period's colours (an ensign at the peak, a pendant at the main for a ship of war), each nation's ensign from her flag word in data/nations.yaml"
+flags:
+  - name: "ensign"
+    kind: "ensign"
+    service: "any"
+    words: "her ensign"
+    proportion: [2, 3]
+    drawing:
+    dates: ""
+    source: "made: the basic form every nation's colours share; the ensign drawn at the serving from the nation's own flag word in data/nations.yaml, a plain field of the first colour it names"
+  - name: "pendant"
+    kind: "pendant"
+    service: "navy"
+    words: "a man-of-war's pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "made: a plain pendant, the mark of a ship of war every navy of the period wore at the main (judgement on its colour)"
+  - name: "broad pendant"
+    kind: "broad pendant"
+    service: "navy"
+    words: "a commodore's broad pendant"
+    proportion: [1, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "made: a plain broad pendant (judgement)"
+  - name: "flag of an admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "admiral"
+    words: "an admiral's flag"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "made: a plain flag at the main (judgement)"
+  - name: "flag of a vice-admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "vice-admiral"
+    words: "a vice-admiral's flag"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "made: a plain flag at the fore (judgement)"
+  - name: "flag of a rear-admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "rear-admiral"
+    words: "a rear-admiral's flag"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "made: a plain flag at the mizen (judgement)"
+  - name: "flag of truce"
+    kind: "truce"
+    service: "any"
+    words: "a flag of truce"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+occasions:
+  - {occasion: "at sea", role: "kings ship", flags: [{name: "ensign", where: "peak"}, {name: "pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "commodore", flags: [{name: "ensign", where: "peak"}, {name: "broad pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "admiral", flags: [{name: "ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "merchant", flags: [{name: "ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "privateer", flags: [{name: "ensign", where: "peak"}]}
+  - {occasion: "at anchor", role: "kings ship", flags: [{name: "ensign", where: "staff"}, {name: "pendant", where: "main truck"}]}
+  - {occasion: "at anchor", role: "commodore", flags: [{name: "ensign", where: "staff"}, {name: "broad pendant", where: "main truck"}]}
+  - {occasion: "at anchor", role: "admiral", flags: [{name: "ensign", where: "staff"}]}
+  - {occasion: "at anchor", role: "merchant", flags: [{name: "ensign", where: "staff"}]}
+  - {occasion: "at anchor", role: "privateer", flags: [{name: "ensign", where: "staff"}]}
+  - {occasion: "in action", role: "kings ship", flags: [{name: "ensign", where: "peak"}, {name: "ensign", where: "main topgallant masthead"}, {name: "pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "commodore", flags: [{name: "ensign", where: "peak"}, {name: "ensign", where: "main topgallant masthead"}, {name: "broad pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "admiral", flags: [{name: "ensign", where: "peak"}, {name: "ensign", where: "fore topgallant masthead"}]}
+  - {occasion: "in action", role: "merchant", flags: [{name: "ensign", where: "peak"}]}
+  - {occasion: "in action", role: "privateer", flags: [{name: "ensign", where: "peak"}]}
+  - {occasion: "under truce", role: "any", flags: [{name: "ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+  - {occasion: "under truce", role: "merchant", flags: [{name: "ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+nations:
+  portugal:
+    sources:
+      - "Fisher, A Display of the Naval Flags of all Nations [1820], the plate of Portugal: 'Portugal Ensign', white with the arms crowned at the hoist"
+      - "Babron, Précis des pratiques de l'art naval, Brest 1817 (the flags of Portugal and Brazil, after 1808)"
+    flags:
+      - name: "Portuguese ensign"
+        kind: "ensign"
+        service: "any"
+        words: "the white with the arms"
+        proportion: [2, 3]
+        drawing:
+          - {rect: [0, 0, 1, 1], colour: white}
+          - {rect: [0.12, 0.2, 0.26, 0.3], colour: yellow}
+          - {rect: [0.12, 0.3, 0.26, 0.74], colour: red}
+          - {rect: [0.145, 0.36, 0.235, 0.68], colour: white}
+          - {rect: [0.18, 0.38, 0.2, 0.44], colour: blue}
+          - {rect: [0.18, 0.6, 0.2, 0.66], colour: blue}
+          - {rect: [0.155, 0.49, 0.175, 0.55], colour: blue}
+          - {rect: [0.205, 0.49, 0.225, 0.55], colour: blue}
+          - {rect: [0.18, 0.49, 0.2, 0.55], colour: blue}
+        dates: "-1816"
+        source: "Fisher, A Display of the Naval Flags of all Nations [1820], the plate of Portugal: 'Portugal Ensign', white with the arms crowned at the hoist; Babron (1817): the same flag for the merchants as for the ships of war, and since the court's removal to Brazil the arms over a golden sphere (the sphere of 1816 left out here); drawn as a red shield with the white field and the blue quinas, the crown over it, judgement"
+      - name: "Portuguese pendant"
+        kind: "pendant"
+        service: "navy"
+        words: "the Portuguese pendant"
+        proportion: [1, 20]
+        drawing:
+          - {rect: [0, 0, 1, 1], colour: white}
+          - {rect: [0, 0, 0.1, 1], colour: red}
+        dates: ""
+        source: "made: a white pendant with the red at the head (judgement; no page found gives it)"
+      - name: "flag of truce"
+        kind: "truce"
+        service: "any"
+        words: "a flag of truce"
+        proportion: [3, 4]
+        drawing:
+          - {rect: [0, 0, 1, 1], colour: white}
+        dates: ""
+        source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+    occasions:
+      - {occasion: "at sea", role: "kings ship", flags: [{name: "Portuguese ensign", where: "peak"}, {name: "Portuguese pendant", where: "main truck"}]}
+      - {occasion: "at sea", role: "commodore", flags: [{name: "Portuguese ensign", where: "peak"}, {name: "Portuguese pendant", where: "main truck"}]}
+      - {occasion: "at sea", role: "any", flags: [{name: "Portuguese ensign", where: "peak"}]}
+      - {occasion: "at anchor", role: "kings ship", flags: [{name: "Portuguese ensign", where: "staff"}, {name: "Portuguese pendant", where: "main truck"}]}
+      - {occasion: "at anchor", role: "any", flags: [{name: "Portuguese ensign", where: "staff"}]}
+      - {occasion: "in action", role: "kings ship", flags: [{name: "Portuguese ensign", where: "peak"}, {name: "Portuguese ensign", where: "main topgallant masthead"}, {name: "Portuguese pendant", where: "main truck"}]}
+      - {occasion: "under truce", role: "any", flags: [{name: "Portuguese ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}

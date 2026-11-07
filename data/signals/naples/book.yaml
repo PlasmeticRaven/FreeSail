@@ -1,0 +1,36 @@
+# FreeSail: the Neapolitan signal books' declaration (spec M7 §3; package 76;
+# docs/design/Design-Signals.md). The same shape as data/signals/britain/book.yaml (its head
+# says the fields).
+#
+# The book is of 1807 and of Joseph's kingdom: the *Segnali di giorno, e di notte all'ancora
+# ed alla vela per uso della flottiglia di S. M.* (Naples, Angelo Coda, 1807;
+# docs/references/signals/), the gunboat flotilla's book of the Kingdom of Naples under Joseph
+# Bonaparte (king from 1806), two years after the period and of the kingdom the French made of
+# the Bourbons' mainland; the Bourbon navy of 1805, which kept Sicily, is not found. It is the
+# one Mediterranean faction's book found, and so the root the lead ruled for Naples, said so
+# here. Its flags (the plate at its head): thirteen flags numbered 0 to 12, the yellow 0 the
+# general flag that alone annuls, three swallow-tailed cornets, six pendants and the
+# substitutes; the white and blue flag striped across is "understood", the national flag at
+# any mast "the commander wanted". Its thirty particular signals are two flags and a pendant on
+# one halyard, the upper flag the order, the pendant's place the ten (above both, the first
+# ten articles; between, the second; below, the third), the lower flag with the pendant naming
+# the vessel or the division; its general signals are numbered, by day at anchor and under
+# sail; its night signals by lanterns; tables of words for places and of the ships' numbers.
+
+nation: naples
+system: well-built           # the flotilla's book of 1807, Joseph's kingdom; the Bourbon book of 1805 not found
+sources:
+  - "Segnali di giorno, e di notte all'ancora ed alla vela per uso della flottiglia di S. M., Naples, Angelo Coda, 1807 (the flags' plate, the particular and general signals, the night signals)"
+flags:
+  numerals: 13               # the flags 0 to 12 (the plate)
+  substitute: true           # the substitute pendants (the plate)
+  cornets: 3                 # three swallow-tailed cornets (the plate)
+  pendants: 6                # six pendants (the plate)
+  annul: true                # the all-yellow general flag hoisted alone
+  understood: true           # the white and blue flag striped across
+  telegraph: false           # no dictionary
+hoist_s: 60
+read_s: 60
+read_nm: 2.0
+glass_factor: 1.5
+flies_s: 1800
