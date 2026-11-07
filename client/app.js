@@ -47,6 +47,9 @@
     history: [],
     historyIndex: -1,
     hint: { items: [], chosen: -1, asked: 0, timer: null },
+    // package 81 (Design-ViewerAction.md §6): the rounds fired as the snapshots show them, the
+    // guns run out at a tick, when the last snapshot came, and the view the loop draws on
+    action: { firings: [], runs: {}, arrived: 0, raf: null, facing: 0, heel: 0 },
   };
 
   var log, seaMap, svg, library;
@@ -68,12 +71,14 @@
     return side + (state.facingOverride === null ? " (to leeward)" : "");
   }
 
-  function drawShip() {
+  function drawShip(outs) {
     if (!state.ship || !state.snapshot || !svg) return;
     var snap = state.snapshot;
     var facing = state.facingOverride !== null ? state.facingOverride : P.leewardFacing(snap.ship.tack);
-    var skeleton = P.buildSkeleton(state.ship, snap);
+    var skeleton = P.buildSkeleton(state.ship, snap, outs ? { outs: outs } : null);
     var scene = P.project(skeleton, facing, snap.ship.heel);
+    state.action.facing = facing;
+    state.action.heel = snap.ship.heel;
     root.ShipView.render(svg, scene, {
       name: state.ship.name,
       facingWords: facingWords(facing),
@@ -81,7 +86,60 @@
     });
   }
 
+  // -- the action between snapshots (package 81, Design-ViewerAction.md §4, §6) -----------
+
+  /** What the new snapshot says happened since the last: the rounds fired, stamped with its
+   *  tick, and the guns run out; what has burnt out is let go. */
+  function noteAction(prev, snap) {
+    var A = state.action;
+    A.arrived = performance.now();
+    if (!prev || !snap || !snap.guns || prev.tick > snap.tick) {
+      A.firings = [];
+      A.runs = {};
+      return;
+    }
+    A.firings = A.firings
+      .filter(function (f) {
+        return snap.tick - f.tick <= P.constants.PLUME_LIFE_S;
+      })
+      .concat(P.firingsBetween(prev, snap));
+    var was = {};
+    (prev.guns || []).forEach(function (g) {
+      was[g.id] = g.state;
+    });
+    snap.guns.forEach(function (g) {
+      if (g.state === "run out" && was[g.id] === "run in") A.runs[g.id] = snap.tick;
+    });
+    Object.keys(A.runs).forEach(function (id) {
+      if (snap.tick - A.runs[id] > P.constants.RUN_OUT_S) delete A.runs[id];
+    });
+  }
+
+  /** One frame of the action: the clock between snapshots, the guns that move redrawn with the
+   *  ship, the flash and the smoke in their layers; it runs only while something is alive. */
+  function actionFrame() {
+    var A = state.action;
+    A.raf = null;
+    var snap = state.snapshot;
+    if (!state.ship || !snap || !svg) return;
+    var d = state.driver || {};
+    var t = P.clockAt(snap.tick, A.arrived, performance.now(), d.compression, d.running, d.snapshot_every);
+    var e = P.effects(state.ship, snap, A.firings, t, A.runs);
+    var moving = Object.keys(e.moving).length > 0;
+    if (moving || A.wasMoving) drawShip(moving ? e.moving : null);
+    A.wasMoving = moving;
+    root.ShipView.renderEffects(svg, P.projectEffects(e.figures, A.facing, A.heel));
+    if (e.alive) A.raf = requestAnimationFrame(actionFrame);
+  }
+
+  function startAction() {
+    if (state.action.raf === null && typeof requestAnimationFrame === "function") {
+      state.action.raf = requestAnimationFrame(actionFrame);
+    }
+  }
+
   function onSnapshot(snap) {
+    noteAction(state.snapshot, snap);
     state.snapshot = snap;
     if (snap.driver) state.driver = snap.driver;
     if (!state.ship && snap.ship) {
@@ -92,6 +150,7 @@
     seaMap.record(snap);
     seaMap.draw(snap);
     drawShip();
+    startAction();
     updateDriverButtons();
   }
 

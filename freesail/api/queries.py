@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from freesail.api import readings
+from freesail.api import readings, viewer_flags, viewer_guns
 from freesail.core.world import World
 from freesail.crew import bill
 from freesail.crew.model import Crew, Station, Watch
@@ -364,7 +364,35 @@ def snapshot(world: World) -> dict[str, Any]:
     out["evolutions_in_progress"] = list(runner.in_progress()) if runner is not None else []
     out["crew"] = crew_state(world)
     out["agents"] = agents_state(world)
+    out.update(_action_entries(world, ship))
     return out
+
+
+def _action_entries(world: World, ship: Ship) -> dict[str, Any]:
+    """The viewer's action (package 81; docs/design/Design-ViewerAction.md §4, §5, §7, §12):
+    each gun's state with its port shut by the sea and its rounds fired; the shot holes as the
+    damage report gives them; the flags that fly. Read from the state the readings `the guns`
+    and `the damage` read (the battery's shut ports, the damage keeper's holes) and the colours'
+    locker, where the ship keeps them, and never made: a snapshot writes nothing of the world."""
+    extra = ship.extra if isinstance(getattr(ship, "extra", None), dict) else {}
+    battery = extra.get("battery")
+    shut = getattr(battery, "_shut", ()) if battery is not None else ()
+    keeper = extra.get("damage")
+    holes = [
+        {
+            "side": h.get("side", "starboard"),
+            "x_m": float(h.get("x_m", 0.0)),
+            "z_m": float(h.get("z_m", 0.0)),
+            "diameter_m": float(h.get("diameter_m", 0.0)),
+            "plugged": h.get("plugged") is not None,
+        }
+        for h in (getattr(keeper, "holes", None) or [])
+    ]
+    return {
+        "guns": viewer_guns.snapshot_guns(ship.guns.values(), shut),
+        "damage": {"holes": holes},
+        "flags": viewer_flags.flags(world, ship),
+    }
 
 
 def agents_state(world: World) -> list[dict[str, Any]]:
@@ -526,6 +554,9 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
     if profile is not None:
         hull["profile"] = _profile_entry(profile)
         hull["stations"] = [_station_entry(s) for s in drawn_stations(h)]
+    # package 81 (Design-ViewerAction.md §7): each gun placed by the one rule, or why not, and
+    # each port of the hull with the guns that stand in it
+    action = viewer_guns.served(profile, ship.guns.values())
     return {
         "name": ship.name,
         "rig": ship.spec.rig,
@@ -535,6 +566,8 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
         "lines": [_line_entry(ln) for ln in ship.lines.values()],
         "groups": {g: list(m) for g, m in ship.groups.items()},
         "aliases": dict(ship.aliases),
+        "guns": action["guns"],
+        "ports": action["ports"],
     }
 
 
