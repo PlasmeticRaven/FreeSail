@@ -667,3 +667,88 @@ def test_a_captains_answer_to_a_hail_reaches_the_ship_that_hailed_her():
     far = w.vessels.player_shadow(w)
     assert crew.ship.extra["hail_pending"]["from"] == str(far.id)
     assert H._has_hailed_us(crew, far, 1.0) and not H._has_hailed_us(crew, far, 2000.0)
+
+
+# -- every root (package 76, step 6): the checker, and each root's hoist read and obeyed ----
+
+NATION_OF_ROOT = {r: S.load_books(r).nation for r in S.roots()}
+NATIONS_ROOTS = [r for r in S.roots() if r != "basic"]
+
+
+@pytest.fixture(scope="module")
+def _a_frigate():
+    from tools.check_signals import _a_ship
+
+    return _a_ship()
+
+
+@pytest.mark.parametrize("root", S.roots())
+def test_the_checker_passes_every_root(root, _a_frigate):
+    """`tools/check_signals.py` over every root under data/signals/, so that a nation added
+    later is checked by a test that does not know her name: her files load, every `does` an
+    order a ship takes or a form 71's design names, every qualifier one the engine fills,
+    every source named, every made entry marked, every nation reading her under her name."""
+    from tools.check_signals import check_root
+
+    assert check_root(root, _a_frigate) == []
+
+
+@pytest.mark.parametrize("root", NATIONS_ROOTS)
+def test_a_hoist_is_read_by_her_own_book_and_not_by_anothers(root):
+    """A signal made under a nation's book is read by a ship holding that book ('No. N, the
+    meaning') and is 'a signal we cannot read' to a ship holding another's."""
+    books = S.load_books(root)
+    entry, q = books.find("tack in succession")
+    h = S.make_hoist(S.Locker(), books, entry, q, "sender", 100)
+    near = 1.0 * units.NAUTICAL_MILE
+
+    stranger = S.Locker()
+
+    def read(reader_books, tick):
+        return S.read_flying(
+            stranger, reader_books, "sender", "the brig", [h], near, "day", False, tick, "x"
+        )
+
+    own = S.Locker()
+    S.read_flying(own, books, "sender", "the brig", [h], near, "day", False, 170, "x")
+    got = S.read_flying(own, books, "sender", "the brig", [h], near, "day", False, 230, "x")
+    assert [x.kind for x in got] == ["signal.read"]
+    assert f"No. {entry.number}, " in got[0].text
+    other = "britain" if root != "britain" else "france"
+    seen = read(S.load_books(other), 170)
+    assert seen and "a signal we cannot read: not of our book" in seen[0].text
+    assert read(S.load_books(other), 300) == []
+
+
+@pytest.mark.parametrize("root", [r for r in NATIONS_ROOTS if r != "britain"])
+def test_the_convoy_tacks_in_succession_on_one_hoist_of_her_own_book(root):
+    """The convoy of four (data/scenarios/convoy.yaml) under each nation's colours and books:
+    the player's one hoist of her convoy book's 'tack in succession' is read by every master,
+    each a commanded captain under her orders, and performed in succession (Britain's is truth
+    7-145)."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    nation = NATION_OF_ROOT[root]
+    sf = load_scenario("data/scenarios/convoy.yaml")
+    sf.scenario.nation = nation
+    for spec in sf.scenario.ships:
+        spec["nation"] = nation
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    names = ["Nancy", "Two Brothers", "Providence", "Friendship"]
+    assert S.books_for(w).root == root
+    w.run(600)
+    said = w.submit("make the signal to tack in succession")
+    assert said.kind == "signal.ordered", said.text
+    entry = S.load_books(root).find("tack in succession", "convoy")[0]
+    assert f"No. {entry.number}, " in said.text
+    about: dict[str, int] = {}
+    for _ in range(30):
+        w.run(60)
+        for n in names:
+            v = w.vessels.find(n)
+            if n not in about and any("went about" in words for _, words in (v.story or ())):
+                about[n] = next(t for t, words in v.story if "went about" in words)
+    assert set(about) == set(names), about
+    ticks = [about[n] for n in names]
+    assert ticks == sorted(ticks) and len(set(ticks)) == 4, ticks
