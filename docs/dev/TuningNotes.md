@@ -18439,7 +18439,13 @@ part graph's length and never the far read. The pace tests do not run the far fi
 wired until step 4).
 
 **Truth 7-350** pins the read and the move. **Found on the way:** nothing. **The suites on the
-step's tree**: below, at the step's boundary.
+step's tree** (a worktree pinned at the step's commit, 797860d, the lead's order): ruff check and
+format clean; the fast tier whole, exit 0 (four workers, 01:46 to 02:42 UTC; 439 slow tests left
+out); the slow tier of `test_known_truths.py`, `test_profile.py` and `test_indefatigable.py`
+(`--slow -m "not pace"`), exit 0 (02:42 to 03:42); the pace tests alone and last, 13 passed, exit
+0 (03:47 to 03:53; the first run was cut by the background task's two-hour limit after the slow
+tier and run again alone, nothing else of this session's on the CPU). Nothing moved but the far
+fight's figures above.
 
 ### Step 2: the prize as a hull of the one world (the design's §2)
 
