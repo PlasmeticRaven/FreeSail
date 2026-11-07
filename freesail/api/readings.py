@@ -4083,6 +4083,33 @@ def _own_state_truth(world: Any) -> str:
     return "under way"
 
 
+def _truth_prize(world: Any, v: Any) -> dict[str, Any]:
+    """The director's truth of a prize (package 74): her captor, how and when she was taken,
+    her prize master, the prize crew's and the prisoners' counts, her goal; and of any hull's
+    prisoners. Nothing on a ship that is none and holds none, so that the pinned forms stand."""
+    from freesail.world import prizes as P
+
+    out: dict[str, Any] = {}
+    rec = P.record_of(v)
+    if rec:
+        words = (
+            f"prize to {rec.get('captor_name', rec.get('captor'))} ({rec.get('how', '')}), "
+            f"{rec.get('master') or 'no prize master'}, a prize crew of {rec.get('crew', 0)}, "
+            f"{rec.get('prisoners', 0)} prisoners"
+        )
+        if rec.get("retaken"):
+            how, by = rec["retaken"][0], rec["retaken"][1]
+            words = f"was a prize to {rec.get('captor_name')}: {how} ({by})"
+        elif rec.get("fate"):
+            words = f"was a prize to {rec.get('captor_name')}: {rec['fate'][0]}"
+        out["prize"] = words
+    hull = getattr(v, "crew", None)
+    pris = P.prisoners_of(getattr(hull, "ship", None)) if hull is not None else None
+    if pris is not None and pris.count:
+        out["prisoners"] = pris.words(int(world.clock.tick))
+    return out
+
+
 def _truth_signals(body: Any, true_nation: str, world: Any) -> dict[str, Any]:
     """The director's truth of a ship's colours and signals (package 71): the colours she
     shows beside her true nation (the ruse laid bare for him alone), the hoists flying,
@@ -4232,6 +4259,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
         d.update(_truth_boat(world, v))  # package 82: a manned boat as a vessel
         if getattr(v, "regime", ""):
             d["regime"] = v.regime  # package 72: in ordinary, and the rest
+        d.update(_truth_prize(world, v))  # package 74: a prize, her crew and her prisoners
         crew = getattr(v, "crew", None)
         if crew is not None and getattr(crew, "shape", "full") == "full":
             d.update(_truth_action(crew))  # package 70: a crewed ship's guns and damage
@@ -4705,3 +4733,9 @@ _damage_readings.register()  # package 73: the pumps, the leaks, the hatches, th
 from freesail.api import practice_readings as _practice_readings  # noqa: E402
 
 _practice_readings.register()
+
+# The prize's (package 74; spec M7 §18): the prizes, the prisoners and the prize crew, with
+# the events of the taking, the rising and the retaking, after the practice's.
+from freesail.api import prize_readings as _prize_readings  # noqa: E402
+
+_prize_readings.register()

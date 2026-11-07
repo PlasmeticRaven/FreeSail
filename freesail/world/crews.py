@@ -431,6 +431,10 @@ def far_tick(hull: Any) -> None:
     hull.dealings.tick()
     for severity, kind, text, data in hull.people.tick(clock.tick):
         hull.record(severity, kind, text, data=data)
+    if clock.ship_time.second == 0:
+        from freesail.world.prizes import minute as prize_minute
+
+        prize_minute(hull)  # package 74: a sleeping prize's prisoners may rise
     hull._tick_sun()
     bells = hull._bells_struck()
     if bells is not None:

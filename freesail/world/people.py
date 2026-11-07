@@ -372,6 +372,11 @@ class Person:
     ashore_at: str = ""
     # dead (package 73, spec M7 §16a): his station ended, the command passed by the bill
     dead: bool = False
+    # a prisoner's confinement (package 74, spec M7 §18, §19; the place's knowledge's hook,
+    # `docs/design/Design-PlaceKnowledge.md` §12): the place aboard he may not leave ("hold",
+    # "cabin"; "" for a free man), which `movement.go` refuses in words; a class default,
+    # so that a checkpoint from before loads with nobody confined
+    confined_to: str = ""
 
     def __init__(
         self,
@@ -591,8 +596,14 @@ class Registry:
                     return
 
     def rehome(self, person: Person, hull_id: str) -> None:
-        """A person given another home (a prize crew's man, 74): moved between the lists."""
+        """A person given another home (a prize master, 74): moved between the lists. A
+        company's ids are its muster's posts (`first_lieutenant`), so a man rehomed into a
+        company that has his post already is told apart by his old home's id after a colon
+        (`first_lieutenant:the ship`); `People.captain` and the records read the id as it
+        stands after the move."""
         self.remove(person)
+        if any(p.id == person.id for p in self.company(hull_id)):
+            person.id = f"{person.id}:{person.home}"
         person.home = hull_id
         self.company(hull_id).append(person)
 

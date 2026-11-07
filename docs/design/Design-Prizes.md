@@ -1185,3 +1185,24 @@ unchanged; truth 7-139's docstring brought to the new read with the old figures 
 `round_once`'s record is the measure's own. The figures are §4.1's table, confirmed on the step's
 tree (`docs/dev/TuningNotes.md`, "Package 74", step 1). **Taken another way**: nothing. **Found on
 the way**: nothing.
+
+### Step 2: the prize as a hull of the one world (§2; 2026-11-07)
+
+**Built as designed**: §2.1 to §2.9 whole (`world/prizes.py`, `orders/prize.py`,
+`api/prize_readings.py`, the role files' thresholds, `data/captains/prize-master.yaml`, the hail
+table's rows, the four verbs, the three readings and the seven events, the primer's chapter 27 in
+its first form); truths 7-351 to 7-354; 7-181, 7-325, 97's test and 72's cut-out re-pinned with
+the reasons (the table in `docs/dev/TuningNotes.md`, "Package 74", step 2). The keepers' audit
+(ruling 1): two keepers cache the muster (the routine and the quarter bill), both re-pointed by
+`remuster`; none could not be. **Taken another way**: possession at once when the order is given
+within a boat's pull, the boat's quarter of an hour left to the errand when step 3 moves persons by
+the same boat; the privateer parts from her prize by his doctrine, so 72's cut-out no longer joins
+his company (the Channel privateers' habit, from memory); the player's own ship struck is not
+possessed until step 3 (the rules captain lies by her); the doctrine's own burning waits for the
+court's valuation (step 5); the replay by both roads with a prize is step 4's passage (the strike
+by the test's hand is no recorded act), the checkpoint round trip pinned here. **Found on the
+way**: the prize rules ran on defaults for a player's captain with no role (`_doctrine` now answers
+the hull's service's file); a rehomed person of a post the new company has already (`Registry.
+rehome` gives him his old home's id after a colon); the world order's "merchant brig" is
+`brig.yaml`'s muster of 121 (75's file, noted for the lead); the parser's `take <n> of the
+prisoners aboard`; the orders' road doubling a function's line (`said`).

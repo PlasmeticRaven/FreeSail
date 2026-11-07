@@ -130,6 +130,31 @@ thresholds:
   mending_sooner_kn: {value: 4, source: "less than a force, so that she does not fill away into the gale's tail; judgement"}
   station_wear_hours: {value: 2, source: "the cruise's book: wore ship at the end of every second hour"}
 
+  # Package 74 (spec M7 §18; docs/design/Design-Prizes.md §2.4): the prize. `mans_prizes`
+  # whether a struck enemy is taken possession of; `prize_crew_share` the share of his fit
+  # men put aboard her (at least `prize_crew_least`, never more than half her complement nor
+  # a third of his own); `prize_master_from` the roles he sends to command her, in order;
+  # `divide_prisoners` the prisoners over so many times the prize crew at which half come
+  # into his own hold ('never' for none); `prisoners_most` the share of his fit men above
+  # which he burns or lands them; `burns_when` 'not worth manning' (a prize under
+  # `worth_least` pounds with his fit men under `fit_least` of his complement, or nobody to
+  # command her) or 'never'; `prize_goal` where she is sent ('the nearest friendly port',
+  # 'home'); `prize_company` whether she keeps his company ('in company while bound the same
+  # way') or 'parts'; `parole_accepted` and `prisoners_landed` the captive's channel's.
+  mans_prizes: {value: true, source: "a King's ship takes possession of what strikes to her: Falconer 1780, ENGAGEMENT, the conqueror invests his principal officer with the command of the prize"}
+  prize_crew_share: {value: 0.08, source: "a frigate of 260 sends a prize crew of twenty-odd: the thin prize crews of the single-ship actions (James, passim); judgement"}
+  prize_crew_least: {value: 6, source: "six men work a brig's plain sail and keep a watch of three; judgement"}
+  prize_master_from: {value: "lieutenant, mate, master's mate, midshipman, petty officer", source: "the first lieutenant stays with his ship; a lieutenant, a master's mate or a midshipman takes the prize (Falconer, ENGAGEMENT: his principal officer; the actions' narratives, James); judgement on the order"}
+  divide_prisoners: {value: 1.5, source: "the prisoners half into his own hold when they outnumber the prize crew by half again (the practice of the single-ship actions: the officers and part of the people taken into the captor); judgement"}
+  prisoners_most: {value: 1.2, source: "a frigate holds more prisoners than her own people uneasily; the Regulations Sect. XII ch. III on their confinement and victualling; judgement on the share"}
+  burns_when: {value: not worth manning, source: "a prize not worth her prize crew is burnt or scuttled (the actions' narratives, James, passim); judgement"}
+  worth_least: {value: 400, source: "pounds of her valuation under which she is not worth a prize crew; FROM MEMORY of the small prizes burnt, UNVERIFIED; judgement"}
+  fit_least: {value: 0.8, source: "with fewer than four fifths of his complement fit he spares no prize crew to a poor prize; judgement"}
+  prize_goal: {value: the nearest friendly port, source: "a King's ship's prize for the nearest port of her nation's or an ally's (Falmouth and Plymouth from the Channel); the practice, judgement"}
+  prize_company: {value: in company while bound the same way, source: "the prize kept in company while he can (the actions' narratives, James); judgement"}
+  parole_accepted: {value: true, source: "an officer's parole taken by the custom of the period (the Regulations Sect. XII ch. III art. VI on those on parole); judgement"}
+  prisoners_landed: {value: the first friendly port, source: "the prisoners landed to the Agent for Prisoners at the first port (the Regulations Sect. XII ch. III art. V, on file)"}
+
 books:
   on passage:
     - 'standing order "the leg": every hour, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
@@ -244,6 +269,7 @@ books:
     - 'standing order "she strikes": at the enemy strikes then cease firing'
     - 'standing order "the colours": at the colours struck then cease firing'
   struck: []  # package 70: the colours down, lying to for her captor
+  taking possession: []  # package 74: the work is the captain's own (`_take_possession`)
 
 transitions:
   # aground from any state at sea is distress (package 40c, the captain's trials: the
@@ -291,7 +317,14 @@ transitions:
   - {from: chasing, on: enemy in range, to: engaging, unless: overmatched}
   - {from: evading, on: enemy in range, to: engaging, unless: overmatched}
   - {from: engaging, on: aground, to: in distress}
-  - {from: engaging, on: enemy struck, to: on passage}
+  # package 74 (spec M7 §18): the mark struck is taken possession of (the state's work
+  # closes her to a boat's pull and gives 'take possession of her'); the prize his, or a
+  # superior force coming up before he has her, ends it
+  - {from: engaging, on: enemy struck, to: taking possession}
+  - {from: chasing, on: enemy struck, to: taking possession}
+  - {from: taking possession, on: prize taken, to: on passage}
+  - {from: taking possession, on: overmatched, to: evading}
+  - {from: taking possession, on: aground, to: in distress}
   - {from: engaging, on: enemy out of range, to: on passage}
   - {from: engaging, on: overmatched, to: evading}
   # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): in company, a King's ship

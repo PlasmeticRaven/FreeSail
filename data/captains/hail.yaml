@@ -25,6 +25,7 @@ standard_hail:
   packet: "What ship is that?"
   privateer: "What ship is that?"
   fisherman: "What ship is that?"
+  prize-master: "What ship is that?"  # package 74: a prize under her prize crew
 
 questions:
   what ship: ["what ship", "who are you", "what vessel", "your name", "what is she", "what ship is that", "ahoy"]
@@ -74,6 +75,16 @@ answers:
     captain: "{captain} commands her."
     days out: "{days} days from {port}."
     heave to: "A King's ship heaves to for nobody: stand on."
+  # package 74 (spec M7 §18): a prize under her prize crew answers whose prize she is
+  prize-master:
+    what ship: "The {name}, prize to {captain}'s ship, {voyage}."
+    whence: "From {port}; taken these few days."
+    whither: "{voyage_short}, with the prize crew."
+    cargo: "What she had when taken: {cargo}."
+    news: "{news}."
+    captain: "{captain}, prize master."
+    days out: "{days} days since the taking."
+    heave to: "{heave_to}"
   merchant:
     what ship: "The {name} of {port}, {voyage}, {cargo}."
     whence: "From {port}, {days} days."

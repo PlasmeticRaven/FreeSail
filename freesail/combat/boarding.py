@@ -357,8 +357,8 @@ def boarders_away(world: Any) -> str:
         raise OrderError("She is a far sail with no company modelled to fight; nothing to board.")
     if body.extra.get("struck"):
         raise OrderError(
-            "She has struck already: taking possession (the prize crew, the prisoners) is not "
-            "yet in the game."
+            "She has struck already: 'take possession of her' puts the prize crew aboard "
+            "(package 74's road, within a boat's pull)."
         )
     quarters = ship.extra.get("quarters")
     if quarters is None or not getattr(quarters, "at_quarters", False):
@@ -566,8 +566,7 @@ def _end(f: Fight, how: str, why: str) -> None:
             "action.carried",
             f"Her deck is carried: {who}'s colours come down by our boarders' hand "
             f"({number_words(f.lost_attack)} of ours lost in the boarding, "
-            f"{number_words(f.lost_defence)} of hers); the prize crew and the prisoners are "
-            "not yet in the game.",
+            f"{number_words(f.lost_defence)} of hers).",
             data={"lost_attack": f.lost_attack, "lost_defence": f.lost_defence, "tick": tick},
         )
         if dw is not None:
@@ -601,6 +600,24 @@ def _end(f: Fight, how: str, why: str) -> None:
         )
 
 
+def party_leader(world: Any) -> Any:
+    """Who leads the boarders on when their officer falls (package 74; package 97's
+    paragraph; `docs/design/Design-Prizes.md` §2.3): the ladder of standing among the party
+    on her deck (a lieutenant, the mate, the senior midshipman), the senior petty officer of
+    the party drawn as a person last, so that a deck won has a man on it who leads on; the
+    first lieutenant where he stands, as before."""
+    officer = boarders_officer(world)
+    if officer is not None:
+        return officer
+    from freesail.world.prizes import party_leader as leader_of
+
+    ship = getattr(world, "ship", None)
+    if ship is None:
+        return None
+    party = [s for s, _f in boarders_of(ship, world)]
+    return leader_of(world, party)
+
+
 def boarders_officer(world: Any) -> Any:
     """The officer who leads the boarders (package 82; the design's §2): the first
     lieutenant by the period's practice (the captain stays with his ship), a person of the
@@ -628,33 +645,61 @@ def _officer_on_her_deck(f: Fight, aw: Any, dw: Any) -> None:
     on the deck of another); the prize crew and the captive are 74's on the same function."""
     from freesail.world.movement import hull_of, put_aboard
 
-    officer = boarders_officer(aw)
-    if officer is None:
-        return
     target = hull_of(aw.world, getattr(dw, "id", None)) if hasattr(aw, "world") else None
     if target is None:
         target = dw if hasattr(dw, "id") and hasattr(dw, "record") else None
     if target is None:
         return
+    # the boarders' officer, or the next of the ladder when he fell in the round (package
+    # 74; package 97's paragraph): the party is led on all the same
+    officer = party_leader(aw)
     who = _words_in(aw, f.defender_id, "the enemy")
-    aw.record(
-        Severity.NOTABLE,
-        "person.moved",
-        f"{officer.name} leads the boarders on to {who}'s deck and has it.",
-        data={"person": officer.to_dict(), "ship": str(getattr(target, "id", ""))},
-    )
-    put_aboard(aw.world, officer, target, "quarterdeck", by="the boarders", said=False)
-    target.record(
-        Severity.NOTABLE,
-        "person.aboard",
-        f"{officer.name} of the enemy stands on the quarterdeck with the boarders.",
-        data={
-            "person": officer.name,
-            "ship": str(target.id),
-            "from": str(aw.id),
-            "by": "the boarders",
-        },
-    )
+    if officer is not None:
+        led = (
+            "leads the boarders on to"
+            if boarders_officer(aw) is officer
+            else ("leads the boarders on, their officer fallen, to")
+        )
+        aw.record(
+            Severity.NOTABLE,
+            "person.moved",
+            f"{officer.name} {led} {who}'s deck and has it.",
+            data={"person": officer.to_dict(), "ship": str(getattr(target, "id", ""))},
+        )
+        put_aboard(aw.world, officer, target, "quarterdeck", by="the boarders", said=False)
+        target.record(
+            Severity.NOTABLE,
+            "person.aboard",
+            f"{officer.name} of the enemy stands on the quarterdeck with the boarders.",
+            data={
+                "person": officer.name,
+                "ship": str(target.id),
+                "from": str(aw.id),
+                "by": "the boarders",
+            },
+        )
+    # possession at once (package 74, spec M7 §18; the design's §2.1): the party on her deck
+    # is the prize crew's first draught and its leader the prize master
+    _possess_the_deck_won(f, aw, target, officer)
+
+
+def _possess_the_deck_won(f: Fight, aw: Any, target: Any, officer: Any) -> None:
+    from freesail.world.prizes import possess
+
+    captor = getattr(aw, "vessel", None)
+    prize = getattr(target, "vessel", None)
+    if captor is None or prize is None:
+        return
+    party = [s for s, _f in boarders_of(f.attacker, aw)]
+    try:
+        possess(aw.world, captor, prize, by="carried by boarding", master=officer, party=party)
+    except Exception as e:  # noqa: BLE001  (a possession that cannot be made is said, not raised)
+        aw.record(
+            Severity.NOTABLE,
+            "prize.not_taken",
+            f"Her deck is ours but possession could not be taken: {e}",
+            data={"ship": str(getattr(target, "id", ""))},
+        )
 
 
 def repel(world: Any) -> str:

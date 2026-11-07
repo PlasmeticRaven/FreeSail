@@ -521,6 +521,15 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
         if person.where == "shore":
             return _go_ashore_place(world, person, verb, words)
         raise OrderError(f"You are {place_words(person.where)}; wait until you are aboard.")
+    confined = str(getattr(person, "confined_to", "") or "")
+    if confined:
+        # a prisoner (package 74, spec M7 §19): confined to his place by his parole or his
+        # captor's word; the deck is not his to walk
+        where = PLACES[confined].name if confined in PLACES else confined
+        raise OrderError(
+            f"You are a prisoner, confined to {where}; the ship is not yours to walk about. "
+            "You may speak ('say to the captain: ...')."
+        )
     if person.occupied and person.task != WRITING:
         raise OrderError(f"You are at the {person.task}; it is not left for a walk about the ship.")
     if person.occupied and person.task == WRITING and person.mirror is None:

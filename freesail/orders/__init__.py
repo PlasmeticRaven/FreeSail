@@ -288,6 +288,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import fight
 
         return fight.execute(ship, order)
+    if vocab.verbs[order.verb].object == "prize":
+        # the prize taken possession of, her prisoners, the prize burnt (spec M7 §18; package 74)
+        from freesail.orders import prize as prize_orders
+
+        return prize_orders.execute(ship, order)
     if order.verb == "set" and getattr(getattr(ship, "spec", None), "oars", None) is not None:
         from freesail.orders import boat
 
