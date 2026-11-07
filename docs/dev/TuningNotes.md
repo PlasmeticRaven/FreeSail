@@ -18188,6 +18188,12 @@ world's clock stands at the scenario's start (04:00), so the walker eats "the fi
 **The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
 asks and their figures are below.
 
+**The suites.** Steps 7 and 8 were measured together on the package's final tree (c37c813, the
+branch with both steps whole), each suite in a worktree pinned at that head: fast tier whole
+6367 passed, 1 xfailed, exit 0; the slow tier of the touched files and the known truths in two
+halves 835 passed, 8 xfailed and 2413 passed, 1 xfailed, exit 0; the pace 13 of 13, the knowledge
+filter's cost within the noise. The whole figures are in step 8's section below.
+
 ### Step 8: the edge cases' truths and the records (the design's §12 to §14; 2026-11-06)
 
 **What was built** is in the design note's postscript ("As built", step 8): truths 7-377, 7-378
@@ -18211,6 +18217,19 @@ the slow tier (`tests/conftest.py`); the visitor's 5 s is not.
 
 **The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
 asks and their figures are below.
+
+**The suites on the package's final tree (c37c813, the branch with steps 7 and 8 whole and
+step 6's figures; fa25309 after it merges the trunk at db5ff15, one records file and nothing of
+code; the commit after adds this paragraph and step 7's), each in a worktree pinned at c37c813,
+steps 7 and 8 measured together.** Fast tier whole: 6367 passed, 1 xfailed, 46 min 26 s (exit
+0). Slow tier of the forty-one touched files and the known truths (`--slow -m "not pace" -n 4`),
+in two halves under the two-hour limit: the first (step 6's first half with the signals' tests
+for the visitor's voice) 835 passed, 8 xfailed, 1 h 5 min 3 s; the second (step 6's) 2413
+passed, 1 xfailed, 15 min 45 s; both exit 0. Pace tests alone and last (`--slow -m pace -rP`):
+13 passed, 5 min 3 s; three stations seated, the knowledge filter's place 579 ticks a second
+against `all` 580 (truth 7-386's run 569 against 571: the filter's cost within the noise, as at
+every step); the frigate alone 560, the Channel observed 339, the same Channel with the frigate
+at the view 234. ruff check and ruff format --check clean on c37c813 and fa25309 alike.
 
 ## Package 95: the sail by her name (2026-11-06)
 
