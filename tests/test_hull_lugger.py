@@ -216,10 +216,10 @@ def _port_guns(doc: dict) -> list[tuple[str, dict]]:
 
 
 def test_each_port_gun_stands_on_a_triple_of_its_deck(doc, spec):
-    """§5.3, §5.6. Her file carries no gun today ("guns are not parts until milestone 7": the fit
-    "gun lugger 1795" is SW-4's, §9.1), and the pick of the note's §6.4 gives her rail guns, which
-    §5.1 gives no port. So the check stands for the fit to come, a port gun on a triple of its
-    deck within 0.01 m, and today it holds of none."""
+    """§5.3, §5.6. Her fit "gun lugger 1795" (SW-4's, §9.1) is the note's §6.4 pick, three rail
+    guns, which §5.1 gives no port. So the check stands for a port gun to come, on a triple of its
+    deck within 0.01 m, and holds of none: old beside new, before SW-4 she had no gun at all, and
+    the assertion below is unchanged."""
     p = spec.profile
     triples = {word: line for word, line in p.ports_m}
     for fit, gun in _port_guns(doc):

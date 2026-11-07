@@ -129,10 +129,12 @@ ARC_SWIVEL_DEG = 100.0
 # PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): a pivot gun on its
 # racers amidships fires over either side between the fore rigging and the main, through
 # the arc its ship file gives it (`arc_deg`, per gun since package 86's fold-in: the
-# privateer schooner's is sixty degrees off the bow to a hundred and forty, the owner's
+# privateer schooner's was sixty degrees off the bow to a hundred and forty, the owner's
 # ruling of the day reasoned from her rig, the fore topmast backstays at about 55 to 60
 # degrees from the pivot, the main shrouds at about 140 to 150;
-# docs/design/Proposal-PivotGun.md §3, which proposes each pivot's arcs from its own ship).
+# docs/design/Proposal-PivotGun.md §3, which proposes each pivot's arcs from its own ship;
+# since package 75 the generator reckons it so, `gen_ships.pivot_arc_from_rig`:
+# docs/design/Build-Ships.md §9.2).
 # Since package 75 a pivot whose file names no arc is refused at the load (`schema._parse_gun`),
 # so the two figures below are kept only for a gun pickled before package 86, which has no
 # arc of its own (the lead's ruling, 2026-10-28: an old checkpoint's pivot still bears where

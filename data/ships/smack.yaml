@@ -25,6 +25,9 @@ ship:
       what: a fishing smack, her well amidships
       note: The Culloden smack's hull (Charnock vol. III p. 274) as the fisherman of the Channel's grounds
         (spec M6 §19; judgement on the words).
+      fit: unarmed
+      roles:
+      - fisherman
 hull:
   # 40 ft: judgement between the 34 ft keel and the 43 ft gun deck (Charnock vol. III p. 274), a plumb stem and a raking post.
   length_waterline_m: 12.2
@@ -659,6 +662,64 @@ crew:
     station: afterguard
     rating: ordinary
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers: {}
+    # One man at the tiller (judgement).
+    helm: 1
+    # None beyond the cook, an idler, who passes the cartridges (judgement: eight men, six of them wanted at her two guns).
+    powder: 0
+    # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
+    priority: sail before guns
+    # None: her eight work the vessel and her two guns (judgement); she bears no marines.
+    small_arms: 0
+    # None: a smack of eight boards no one (judgement).
+    boarders: 0
+# The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): unarmed by default, the fisherman, with one fit the scenario may name (ship: {fit: ...}): the Navy's smack Culloden of 1746 and her two guns. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
+armament:
+  default: unarmed
+  fits:
+    # The Navy's smack's fit: two long 3-pounders over the rail.
+    culloden 1746:
+      source: Charnock 1802 vol. III p. 274 (Culloden, 2 guns, 8 men); the calibre and the places a judgement;
+        the weights from memory
+      guns:
+      # Culloden's two guns (Charnock vol. III p. 274), their calibre not given: long 3-pounders, the smallest of the table (judgement), one a side over the rail abaft the mast and the well (judgement); the gun of 7 cwt (from memory, UNVERIFIED), three men to a gun by the gun's rule.
+      - id: rail.1.starboard
+        kind: long
+        pounder: 3
+        place: rail
+        number: 1
+        side: starboard
+        x_m: -2.91
+        height_m: 1.44
+        crew: 3
+        weight_cwt: 7.0
+      - id: rail.1.larboard
+        kind: long
+        pounder: 3
+        place: rail
+        number: 1
+        side: larboard
+        x_m: -2.91
+        height_m: 1.44
+        crew: 3
+        weight_cwt: 7.0
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
+      cartridges:
+        long:
+          3: 158
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          3: 1.0
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 1
+      shot:
+        3:
+          round: 120
+          grape: 12
+          chain: 12
 # The hold (package 35, spec M5 §23): room for 18 tons of cargo beyond her own stores, 0.5 of the 35 tons burthen (a fishing smack's hold forward and aft of her well: judgement; Falconer 1780, HOLD); see tools/gen_ships.py. The well, 9.1 m3 (10 ft by 8 by 4 ft below the water-line, judgement), the water-tight compartment amidships open to the sea through holes in her bottom (Holdsworth 1874 pp. 139 to 140; Steel 1805, WELL), where the live cod are kept.
 hold:
   capacity_tons: 18

@@ -11,6 +11,7 @@ has moved: everything in her file but `hull.profile` is what it was at the commi
 
 from __future__ import annotations
 
+import copy
 import functools
 import json
 import math
@@ -257,9 +258,15 @@ def test_every_line_she_gives_carries_its_rung(raw):
 
 
 def test_she_has_no_port_gun_and_no_port_triple(ship, hull):
-    """Each port gun on a triple of its deck within 0.01 m (§5.6): she has no gun at this commit,
-    and the plate and the table draw no port (pages §4.16), so there is nothing to stand on one."""
-    assert ship.spec.armament is None
+    """Each port gun on a triple of its deck within 0.01 m (§5.6): she sails unarmed, and the plate
+    and the table draw no port (pages §4.16), so there is nothing to stand on one. SW-4 (§9.1), old
+    beside new: her armament was none, and is unarmed by default with one fit, its two guns over
+    the rail, no port gun among them (Build-Ships.md §5.1)."""
+    from freesail.combat.ports import PORT_PLACES
+
+    assert ship.spec.armament.default == "unarmed" and not ship.guns
+    for fit in ship.spec.armament.fits.values():
+        assert {g.place for g in fit.guns} == {"rail"} and "rail" not in PORT_PLACES
     assert not hull.profile.ports_m and not hull.profile.port_size_m
 
 
@@ -580,7 +587,7 @@ def test_her_file_but_for_her_lines_is_what_it_was_against_git(raw):
     """A diff of her file against the commit before her lines: `hull.profile` added last of the
     hull's keys, with its notes, and not a byte else (Build-Ships.md §5.0 principle 8, §5.6). SW-4,
     which brings her fits (§9.1), moves this file by design, and rebases this and the test of her
-    having no gun."""
+    having no gun: as built, the keys it writes are taken out below, old beside new."""
     run = subprocess.run(
         ["git", "show", f"{BEFORE}:data/ships/smack.yaml"],
         cwd=ROOT,
@@ -592,9 +599,25 @@ def test_her_file_but_for_her_lines_is_what_it_was_against_git(raw):
     was = run.stdout.replace("\r\n", "\n")
     now = SMACK.read_text(encoding="utf-8").replace("\r\n", "\n")
     before = yaml.safe_load(was)
-    after = {**raw, "hull": _her_hull_without_lines(raw)}
+    after = copy.deepcopy({**raw, "hull": _her_hull_without_lines(raw)})
+    # SW-4 (Build-Ships.md §8.2, §9.1, §16.1), old beside new, the keys it writes and no other: her
+    # description's fit and role, unarmed and the fisherman's; her armament, unarmed by default with
+    # the fit "culloden 1746"; and her bill, where she had none of the three
+    assert "armament" not in before and "quarter_bill" not in before["crew"]
+    assert after.pop("armament")["default"] == "unarmed"
+    assert after["crew"].pop("quarter_bill")["helm"] == 1
+    words = after["ship"]["descriptions"]["smack"]
+    assert (words.pop("fit"), words.pop("roles")) == ("unarmed", ["fisherman"])
     assert after == before
     assert list(after) == list(before)
+    # and in her text the same three, the bill and the armament between her people and her hold
+    added = "      fit: unarmed\n      roles:\n      - fisherman\n"
+    assert now.count(added) == 1
+    now = now.replace(added, "")
+    bill = now.index("  # The quarter bill beyond the gun crews")
+    hold = now.index("# The hold (package 35", bill)
+    assert now[bill:hold].count("\narmament:\n") == 1
+    now = now[:bill] + now[hold:]
     # the file's head says where her lines are, as the cutter's does; that sentence and no more
     assert now.count(HEAD_SAYS) == 1
     now = now.replace(HEAD_SAYS, "")

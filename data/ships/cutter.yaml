@@ -21,6 +21,43 @@ ship:
     from the kit''s manual, her drawn hull from Greenwich''s draught of her, ZAZ6381; spars by Fincham
     1843''s table of proportions for revenue cruisers (p. 67) and his rules for cutters'' sails (arts.
     86, 87); sails by Steel 1794; see tools/gen_ships.py for every rule.'
+  descriptions:
+    cutter:
+      rig: a cutter
+      what: a cutter
+      note: 'Sherbourne''s hull as the King''s cutter of the war: the tops make her out a cutter, one
+        mast and a long running bowsprit, and so does the glass (spec M5 §25; judgement on the words).
+        Her fit her file''s default, the Admiralty''s carronades; her roles a King''s cruiser''s (Build-Ships.md
+        §8.2).'
+      fit: carronades
+      roles:
+      - cruiser
+      - kings-ship
+    revenue cutter:
+      rig: a cutter
+      note: 'The Customs'' cutter of the Channel, as Sherbourne herself served from 1763 to 1779 (docs/design/VesselCandidates.md),
+        with her own guns as built, the fit ''long guns'' (the kit''s manual: six 3-pounders and eight
+        swivels); the revenue role (Build-Ships.md §8.2, §8.3). What the glass makes her out is the index''s
+        (world/ships.py), its words not yet settled.'
+      fit: long guns
+      roles:
+      - revenue
+    hired armed cutter:
+      rig: a cutter
+      note: 'A cutter hired to the Admiralty for the war with her own master and men: the hired cutters''
+        long guns, Sherbourne''s as built (the kit''s manual); a cruiser''s role (Build-Ships.md §8.2).
+        What the glass makes her out is the index''s (world/ships.py), its words not yet settled.'
+      fit: long guns
+      roles:
+      - cruiser
+    coasting cutter:
+      rig: a cutter
+      note: A trader of the cutter's rig and size carrying no guns, where a trader described 'cutter'
+        had carried the King's carronades (Build-Ships.md §8.2, §8.4); a merchant's role. What the glass
+        makes her out is the index's (world/ships.py), its words not yet settled.
+      fit: unarmed
+      roles:
+      - merchant
 hull:
   # 50 ft: judgement between the 44 ft keel for tonnage (85 tons on 19 ft by the Navy's rule) and the 54.5 ft on deck (the kit's manual), a plumb stem and a raking post. ZAZ6381: her own load line (the note's §7); the keel for tonnage 44 ft 7 in on all three sheets: recorded, not moved (Build-Ships.md §5.0 principle 8).
   length_waterline_m: 15.2

@@ -864,9 +864,10 @@ def test_the_persons_of_every_hull_are_one_registry_and_each_company_a_view_of_i
 
 
 def test_a_word_ashore_is_heard_by_whoever_is_at_that_place_whichever_hull_brought_him():
-    """Hearing is by spot in the one registry: the brig's master ashore at Falmouth at the
-    counting house hears the player's Mr Gill there and not his own captain aboard the
-    brig; aboard, a word on one hull's quarterdeck is not heard on the other's; a thing
+    """Hearing is by spot in the one registry: the brig's mate (her master until package 75's
+    SW-4, when the merchant brig took her own file, whose master is her captain) ashore at
+    Falmouth at the counting house hears the player's Mr Gill there and not his own captain
+    aboard the brig; aboard, a word on one hull's quarterdeck is not heard on the other's; a thing
     lying at the counting house is within his reach, and given to Mr Gill it is Mr Gill's
     (the acts themselves, going ashore from a crewed hull and a port's business for her,
     are step 3's: the master's whereabouts are written here as the boat would write them)."""
@@ -882,7 +883,11 @@ def test_a_word_ashore_is_heard_by_whoever_is_at_that_place_whichever_hull_broug
     gill = w.people.find("Mr Gill")
     assert gill is not None and not gill.aboard and gill.home == w.own.id
     assert H.spot_of(w, gill) == ("ashore", "falmouth", "counting_house")
-    master = crew.people.find("the master")
+    # the brig's mate: since package 75 (SW-4, Build-Ships.md §8.4) the merchant brig sails her
+    # own file, whose master commands her, so the officer ashore apart from her captain is the
+    # mate (old: "the master", the brig-sloop's file's, who did not command her)
+    master = crew.people.find("the mate")
+    assert master is not crew.people.captain and crew.people.captain.id == "master"
     master.aboard, master.where, master.port, master.ashore_at = (
         False,
         "shore",

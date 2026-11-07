@@ -1432,6 +1432,28 @@ it is not her file's default: `Vessel.to_dict` writes a non-empty `fit`
 (`world/ships.py:974-975`), so a default set on every far frigate, brig-sloop, cutter or
 privateer would move their pinned forms with no change in their guns.
 
+*As built (SW-4, the world side, 2026-11-06):* stage 0 laid the refusal where she is made
+(`ships._role_of_spec`, from `vessel_from_spec`); the world side refuses it at the scenario's load as
+well (`scenarios.load_scenario`, the same words with the file and the ship's place: "'kings-ship' is
+no role a merchant brig takes; her file gives a merchant brig the roles merchant, packet, indiaman."),
+so a role outside her description's or the captains' never reaches a World. "The first the one the
+intent rules give" is built for the four new rows alone (`brains.SUB_TYPE_ROWS`): where the intent's
+kind names no role (a letter the packet's, prizes the privateer's, a ground the fisherman's, a convoy
+the commodore's) a revenue cutter sails the revenue's book, a hired armed cutter the cruiser's, a
+coasting cutter the merchant's and a privateer lugger the privateer's; the rows before them keep the
+rules they had (a cutter in trade the merchant's), so that no far ship's book moves (the lean of
+this section's sentence, built; for the lead to strike if the rows are to take their roles only by
+`role:`).
+
+*As built (SW-4, the reviews' mends, 2026-11-06):* the same rule holds for her crewed captain: her
+description's first role is carried in at the promotion (`Captain.sub_type_role`, from
+`brains.sub_type_role`; a class default `""`, so that every other ship and every older checkpoint
+reads as before) and `captains.role_for` takes it after the scenario's `role:` and where the intent's
+kind names none, as her far brain does. Before it, a world order changing a crewed revenue cutter's,
+hired armed cutter's or privateer lugger's intent left her far brain's role hers and dropped her
+crewed captain's to the merchant's book. One role is refused in the singular ("her file gives a smack
+the role fisherman."), where it read "the roles fisherman".
+
 ### 8.2 The table
 
 | Description | File | Fit (default) | Roles | New |
@@ -1456,6 +1478,64 @@ B1's merge. Rank 1 each in `SIZE_RANK`. "revenue" is already a man-of-war word
 (`captains.py:190-198`), so a privateer keeps away from a revenue cutter made out. The new ships'
 descriptions are their own designs' (D15, D16).
 
+*As built (SW-4, the files' side, 2026-11-06):* `gen_ships.Builder.descriptions` takes an entry of
+(key, rig, what, note, fit, roles), writing `fit` and `roles` only where given, so the files without
+them move no byte. Every row of the table whose file exists carries its fit and roles in that file:
+the frigate's, the schooner's and the cutter's descriptions land in their own files, where the index
+alone had held their words (the index's words copied, so nothing served moves); every existing row's
+fit is its file's default, so no far ship's pinned form moves (§8.1's last sentence, as wired at
+stage 0). The four new rows (the revenue cutter, the hired armed cutter, the coasting cutter, the
+privateer lugger) are written in their files with their rig, note, fit and roles and **no `what`**:
+no design gives the glass words of a revenue cutter, a hired cutter or a coasting cutter made out,
+so `description()` will take them from the index's row, which the second pass writes and the lead
+words (for the lead). Their fits are not their files' defaults, so a far ship of each will carry it.
+`brig.yaml` keeps its two descriptions, the merchant brig's with no fit or role (the shared design's
+§4.4: the pair kept); `merchant-brig.yaml`'s carries `merchant` and the roles merchant, packet and
+indiaman. The roles `indiaman` and `revenue` are written though `captains.ROLES` has them not yet:
+until the second pass adds them with their books, a far ship's `role:` naming either is refused in
+words, and `tests/test_subtypes.py` lets the two stand beside `ROLES`. The brig-sloop's `what` is
+now "ten ports a side" (RMG ZAZ4491, read), in her file and in the index's copy (`world/ships.py`).
+
+*As built (SW-4, the world side, 2026-11-06):* the four rows are in `DESCRIPTIONS`, each after the
+plain row of her file (so that `size_of_file` and the player's shadow, which take a file's first
+row, still find the cutter and the lugger), with their words in `_DESCRIPTION_WORDS` ("a revenue
+cutter", "a hired cutter", "a hired armed cutter", "a coasting cutter", "a privateer lugger"; a
+qualified "a French privateer lugger" takes the row by its tail, as before) and rank 1 each in
+`SIZE_RANK`. The glass words (`what`): the revenue cutter's "a revenue cutter", the lean of this
+section's own sentence (a privateer keeps away from a revenue cutter made out only if the words she
+is made out by hold "revenue"; measured in `tests/test_subtypes.py`: the French privateer lugger runs
+from her at nine minutes, and chases on after the hired armed cutter); the hired armed and the
+coasting cutters' "a cutter" and the privateer lugger's "a chasse-marée, three-masted under lugs",
+their files' plain rows' words, since no design words them otherwise (for the lead, with the first
+pass's candidates). No shipped scenario, world order or business table names a trader cutter (the
+cutters at sea are the Navy's Lark and Sparrow, the mail's Swift, the privateer Renard and the tender
+Raven, and `data/business.yaml`'s `trader_kinds` draws none), so "a trader cutter takes coasting
+cutter" moved no word of the data; no rule rewrites a scenario's "cutter" in trade into one.
+
+*As built (SW-4, the reviews' mends, 2026-11-06):* **"A privateer keeps away"** held at far detail
+only. "A revenue cutter" is the first class-1 description whose words hold a man-of-war word, so she
+never overmatches a privateer of her class, and the privateer's way out of `evading`
+(`{from: evading, on: enemy in range, to: engaging, unless: overmatched}`) took a crewed privateer
+lugger within her engaging distance of an enemy's revenue cutter from evading to engaging and back
+every minute, beating to quarters and securing the guns by turns (27 changes of state in thirty
+minutes; the revenue cutter's copy of the row, 13 against a French revenue cutter). A row's `unless`
+may now name several stimuli, any of which holds it back (`captains.Transition.unless_any`; one
+stimulus stays the word it was, so every older row and every pickled one reads as before), and the
+two books' row reads `unless: [overmatched, man of war near]`, the privateer's `engage_nm` in its own
+words ("unless she is overmatched or a man of war is near"): she stays evading (three changes, the
+last to evading at seven minutes). `data/captains/privateer.yaml` is not this step's file; its one
+row is mended here, the fault being this step's to reach (for the lead). **"The revenue cutter"**,
+which the `ship:` world order takes, took the cutter's row by its last word, with the cutter's guns
+and the merchant's book: `description_key` now tries the whole of the words after the article first,
+so each sub-type is found by "the" as by "a", and "the frigate" and "the brig-sloop", refused before,
+load. **Left, for the lead** (none of it this step's files): a crewed coasting cutter is served as "an
+armed cutter" that "carries no guns" (`readings.ship_class_words` reads cutter.yaml's era note, "H.M.
+armed cutter"), with the King's cutter's company of thirty, which a fit cannot change (the fault
+§8.4 cured for the merchant brig: her own file, or the departure recorded); a revenue cutter's words
+say "a merchantman of Britain" (`readings.ship_words`' service map has no `revenue`), and hailed she
+answers from the merchant's table with a home port, a voyage and "in ballast", and heaves to when
+hailed (`data/captains/hail.yaml` has no `revenue:` answers).
+
 ### 8.3 The two new roles
 
 - **`indiaman`** (`data/captains/indiaman.yaml`): the merchant's book with the figures of a ship
@@ -1475,6 +1555,41 @@ descriptions are their own designs' (D15, D16).
   `:134` run every book on the four ships, and `tests/test_service.py:73` asserts the two sets
   equal; both must pass.
 
+*As built (SW-4, the world side, 2026-11-06):* **`indiaman.yaml`** is `merchant.yaml` line for line
+but its head and the seven figures above (`board_odds` the merchant's nought already), each with
+its source: Dance's China fleet read at James 1837 vol. 3 pp. 249-253 (the line lying to all night at
+quarters, p. 251; borne down in line ahead and engaged forty-three minutes until Linois hauled off,
+p. 252; 30 to 36 guns, no crew over 140, p. 253), so the account runs to p. 253 and not p. 251; and
+the *Ceylon*, *Windham* and *Astell* at vol. 5 pp. 132-136 (800 tons and 26 guns, some 250 troops each,
+five hours against two frigates and a corvette, the *Ceylon* striking with her guns disabled and the
+water gaining, the *Windham* with nine guns dismounted, p. 135). Her books and transitions are the
+merchant's: she hauls off from a hostile stranger as he does, and fights when brought to.
+**`revenue.yaml`** is `cruiser.yaml` with four differences, each judgement: no `friend made out` row
+from `investigating a stranger`, so that a friend she closes is spoken before she lets her go (every
+lugger, smack and coaster within `investigate_nm` among them; the cruiser lets a neutral go by her
+colours, measured: a Danish brig at two minutes, never spoken, where the revenue cutter speaks her at
+thirty-two); `man_of_war_nm` 6 and the privateer's `man of war near` rows to `evading`, before each
+state's `enemy in range`; no `stations:` table, so the world's business puts her on no blockade
+station; her `investigate_nm` the cruiser's ten miles. **Plainly**, in the book's head: the smuggler
+and the search are not modelled. **Service:** both are the merchant's in `ROLE_SERVICE` (an
+Indiaman the Company's, a revenue cutter the Customs' or the Excise's, neither under the Admiralty's
+Regulations), which is what the merchant brig's and the cutter's wardrooms give without a role, so
+that the service of neither file moves (judgement, for the lead). `captains._doctrine`'s cache holds
+sixteen books where it held eight, the roles being nine now. The role sets keyed by name elsewhere
+(the hail's tables, `signals._ROLES_WITH_TABLE`, `regimes._MAN_OF_WAR_ROLES`, `squadrons._ARMED_ROLES`,
+`orders.HAND_PEACEFUL_ROLES`, the readings' service words) are not widened: an Indiaman reads as a
+merchantman there, and a revenue cutter answers a hail as a merchantman and keeps no private signals
+(for the lead).
+
+*As built (SW-4, the reviews' mends, 2026-11-06):* the revenue cutter's way out of `evading` takes the
+privateer's guard, `unless: [overmatched, man of war near]` (§8.2's note), the one row of hers that
+differs from the cruiser's beyond the four above; her book's head names her long guns as Sherbourne's
+own in the Customs' service (`docs/design/VesselCandidates.md`; the kit's manual), where it had them
+"the hired cutters'" and her description's note said no source for her guns was in hand. The
+Indiaman's book is the merchant's line for line but its head, the seven figures and one comment
+brought true to her own (an enemy "within a mile", her `engage_nm`, where the merchant's says three
+cables).
+
 ### 8.4 Found on the way: the merchant brig sails the brig-sloop's guns (for the lead)
 
 `DESCRIPTIONS["merchant brig"]` names `brig.yaml` (`world/ships.py:187-191`), whose one fit is
@@ -1489,6 +1604,24 @@ pin with a far or crewed merchant brig (the convoys, the trade trials) and
 long 6s, judgement) is cheap, but her company of 16 is short of a packet's (memory, about 28,
 UNVERIFIED) and a fit cannot change a complement (`FIT_KEYS`, `schema.py:215-223`); the lead may
 prefer to leave the packet's description for her own hull.
+
+*As built (SW-4, the files' side):* §8.4 is ruled in (the lead, 2026-10-29: "ruled as §8.4 proposes,
+built by its owner before the brig's phrases are next touched"). This pass writes the merchant
+brig's fit and roles into `merchant-brig.yaml`; the index's file for the description, `SHADOW_FILES`
+and the trader cutter's "coasting cutter" are the world side's, the second pass's, with the pins
+they move. No packet fit is made: a fit cannot change a complement, so the packet stays one of the
+merchant brig's roles and her own description waits for her own hull.
+
+*As built (SW-4, the world side, 2026-11-06):* `DESCRIPTIONS["merchant brig"]` names
+`merchant-brig.yaml`: her polar and her masthead are the brig's to the figure (`tests/test_ships.py`),
+her far fight's side two 6-pounders of her four and her company 16, where the brig-sloop's file gave
+eight 32-pounder carronades and the two bow 6s and 121. `SHADOW_FILES` is removed: the player's
+shadow takes her words by her file's first row, which for `merchant-brig.yaml` is now the merchant
+brig's (her words as before; her shadow's file her own, where it was the brig's, with the same polar
+and masthead). An old checkpoint, save and replay with a far and a crewed merchant brig, written at
+5dd7d67a (the base, before the step; the reviews' run, read again on the final tree), all load and
+run on to the base's own continuation (the tuning notes, SW-4): the pickled ships keep the brig's
+file they were made with, and the replay makes them anew from their own (§16.2).
 
 ## 9. Every file's armament, bill and marines (B8, SW-4)
 
@@ -1507,6 +1640,47 @@ No battery is made from an unarmed default, and a ship with no guns never engage
 claim stands. To measure: a scenario that beats to quarters in an unarmed schooner meets the
 file's bill in place of the reckoned defaults (`crew/quarters.py:111-112`).
 
+*As built (SW-4):* the three files sail unarmed by default with the fits above. **The schooner:**
+"letter of marque" is the privateer's own fit, built once for both files (Chapelle p. 82, "the Lynx,
+6 guns and 40 men", the day in April 1813 on p. 81 and her seven ports on p. 83; p. 98, she "only
+carried six guns"; the long 6s judgement on p. 54's American preference for the long 6 and 9; its
+four swivels the privateer's judgement); "musquidobit 1813" puts the two long 6s in the foremost
+ports, the plate's 7th, and the eight 18-pounder carronades in the plate's ports 6, 5, 4 and 2,
+numbered from aft as `pages-chapelle-fig17.md` §6.3 and `hull_schooner.PORTS` number them (x +8.4,
++4.81, 0.0 and −7.5; the 2nd, 3rd, 4th and 6th from forward), its 3rd beside the main mast and its
+1st, aftmost, left empty; on the file's existing triples, so no triple is new: +8.4, 0.0 and −7.5
+the other fits' places, +4.81 the plate's own port 5, where no other gun stands, and the 6s at
++10.5 the long Tom's carronades' place (the ports judgement); a King's fit, its exercise charges 2.
+Chapelle p. 98 gives the Mosquidobit and the Lynx six guns each, as the privateers' list has them;
+the fit is the Navy's arming of her (Winfield p. 335), said in its note. Her bill is the privateer's trimmers (four, three and four),
+helm 1, powder 1, `filling` reckoned, small arms 8 and boarders 26. **The lugger:** the caption's
+calibre is read 18, probable (`pages-zaz6306.md` §2.1, read after this table was written), so three
+long 18-pounders; her sheet has no port, so the three are rail guns at the waist rail (the note's
+§6.4 pick and §5.1), a pair forward of the main mast and the third abaft it to starboard (judgement:
+three guns do not divide between two sides); ten men a gun by the gun's rule, thirty against her
+company of thirty, said in the fit's note; her bill two forecastlemen and two of the afterguard,
+helm 1, powder 1, small arms 6 and boarders 20 (the King's cutter's of thirty), `filling` reckoned.
+**The smack:** two long 3-pounders (the table's smallest; calibre judgement), one a side over the
+rail abaft the mast and the well; no trimmers, helm 1, powder 0, no small arms or boarders,
+`filling` reckoned. A rail gun is named by the engine as a swivel (`Gun.name`, "the No. 1 starboard
+swivel") whatever its kind, which the lugger's and the smack's long guns are not (for the lead).
+Beating to quarters in the three unarmed ships now meets the file's bill (`tests/test_subtypes.py`;
+the measure in the tuning notes).
+
+*Found at the reviews (SW-4, 2026-11-06; for the lead, not this step's files):* the engine crews and
+counts a rail gun as a swivel throughout, so the two fits cannot fight as their records say. Each
+rail gun has its own crew on its own side (`Gun.pair_key`), where a broadside's pair shares one: the
+gun lugger 1795 at quarters mans No. 1 larboard and No. 1 starboard with ten each and No. 2 starboard
+with none ("Not hands enough for every gun: the swivels stand unmanned"), and the Culloden smack her
+larboard gun with three and her starboard with one, which never loads. The broadside's ready count
+(`orders/gunnery.py`, `g.place != "broadside"`) and the enemy's weight (`combat/action.py`) count
+every rail gun of both sides: "2 guns ready to go together" for the lugger's one larboard gun, her
+broadside reckoned 54 lb where her starboard side throws 36; "fire the swivels" fires her three long
+18-pounders. Either the engine made kind-aware (a non-swivel rail gun's pair key `gun:rail.{n}`, its
+name "No. n <side> gun", counted on its own side only, the quarters' "the swivels" for swivels alone),
+or the two fits built as numbered pivots with arcs by §9.2's rule: the lead's choice, measured in the
+tuning notes.
+
 ### 9.2 The pivot's arc from its own rig
 
 `pivot_arc_from_rig(b, x_m, margin_deg=5.0)` (B8, in `gen_ships.py`) computes the open arc from
@@ -1517,6 +1691,23 @@ backstays' places come from Steel 1794 vol. I and Luce 1866, cited by page; the 
 working go in the gun's note. The privateer schooner's pivot takes it. **Plainly:** the brief's
 "Dolphin's arc" belongs to HMS *Dolphin* of 1836, which has no file in 75; her arc can come only
 from this rule when her file does.
+
+*As built (SW-4):* `pivot_arc_from_rig(b, x_m, margin_deg=5.0)` in `tools/gen_ships.py`. The
+channels' places are **her own plate's** and not a rule's: Lynx's sheer plan draws both channels
+(`pages-chapelle-fig17.md` §5.10, measured: the fore +5.26 to +8.45 m with four deadeyes, the main
+−5.18 to −2.54 with three, her masts' axes +8.26 and −2.60), taken with their masts at the file's
+length (`hull_schooner.channels`). Neither Steel 1794 vol. I nor Luce 1866 gives a channel's length
+for a vessel of her size (Luce 1866 pp. 97-98 takes the channels' length and the deadeyes' places from
+the ship's own draft); Steel gives the backstays' place, in the after end of the channel or in a
+stool abaft it (vol. I pp. 199-200, 206, the word on p. 206 garbled in the held OCR and read as
+pp. 199-200 have it, a reading the generator's comment says so; p. 176, STOOLS). So the arc opens at the fore channel's
+after end (the fore topmast backstays) and shuts at the main channel's fore end (the foremost main
+shroud), each at the rail's half-breadth there, five degrees each way (judgement), whole degrees
+(judgement). From the pivot at +2.6 m: 57.0° and 146.2°, so **62 to 141, where the owner's arc by
+eye was 60 to 140**; `tests/test_pivot_gun.py`'s two pins and her standing comparison moved old
+beside new. The rule and its sources are in the gun's note; the bearings it computes are in the
+generator's report, by the lead's ruling on computed figures (2026-10-29, item 2). A file whose
+module gives no channels has no arc by this rule: it refuses in words.
 
 ### 9.3 The fillers as posts: left to 77 (the lead's call)
 
@@ -1537,6 +1728,10 @@ frigate's 40 and the brig's 20 stay (the existing files are the lead's), their n
 nearest print (the 44-gun *Doris*'s lieutenant and 50 marines, March 1803: *Naval Chronicle* vol.
 IX p. 245; Bel §4.4). The new ships' detachments are their designs' (Indf §6).
 
+*As built (SW-4):* the notes of the frigate's 40 and the brig's 20 gain the *Doris*'s print (*Naval
+Chronicle* vol. IX p. 245, the Plymouth report of March 1803, as `Research-74-2026-10.md` §4.4 reads
+it); both figures kept.
+
 ### 9.5 `privateer-schooner.yaml`: kept beside the *Neufchatel*
 
 The owner's answer on file is against making her a fit of `topsail-schooner.yaml` (the trade
@@ -1547,6 +1742,22 @@ of the scenarios (`convoy-six.yaml`) into a brig of rank 2. What 75 gives her: h
 its note citing the type; "letter of marque" re-cited to *Lynx*'s six guns and forty men), and
 her PROVISIONAL marks off where a figure is now sourced. Her wardroom file stays absent: one
 would bind outlines where none bind today, and move her pins.
+
+*As built (SW-4; its citation mended at the reviews, 2026-11-06):* "long tom" kept as the owner's
+loadout and default, its source and note citing the type faithfully, and the type leans against
+it at her size: Chapelle p. 54, "The pivot gun was used mainly on gun-boats and on a few 1-gun
+privateer schooners. The larger vessels seldom used it", the long Tom more often on a broadside
+carriage shifted where needed; p. 55, none of the privateers of the larger class with a way to
+mount one above their high bulwarks (*Lynx* "has high bulwarks", p. 83); p. 67, the pilot-boat
+privateers of fifty to seventy-five feet with one long gun, a pivot or a carriage gun; p. 83, her
+draught's full rating twelve or thirteen guns "including a traversing piece". So the pivot stands
+on the owner's ruling (2026-10-25), recorded as such, and not on the type's record (the first
+pass had quoted p. 54 without its "1-gun" and cited the pages for the pivot). "Letter of marque"
+re-cited to *Lynx*'s six guns and forty men (pp. 81-82; her seven ports p. 83). The PROVISIONAL
+marks are off the file's head, its era note and description and the figures now sourced (the two
+fits' counts, the pivot's arc) and off the long Tom as the owner's ruling; they stay on the
+judgements 75 has not sourced (the four carronades, the swivels, the bill's trimmers, small arms and
+boarders). No wardroom file.
 
 ## 10. Table No. 29 (B8, SW-1)
 
@@ -1827,7 +2038,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | SW-2 with SW-2b.2 | the eight files' bytes (profile, port guns' `height_m` and `deck`, the shape keys and marks; three keys of text, the brig's and the cutter's era notes and the letter of marque's source); no behaviour: every log line, tick and dynamic of the eight identical, all ten polars byte-identical. **Pins moved, as landed:** truth 7-185's brig band, the one pin the lead moved, drafted in `tests/test_profiles.py` for Phase 5, 1.22-1.52 m to 1.555-1.585 m (the lead's point 4); `tests/test_scenarios.py`'s `test_a_merchant_brig_free_sails_a_merchant_brigs_own_file` compares her hull but for `profile.ports_m`, which the lead's point 5 makes differ, the difference pinned by `tests/test_hull_brig.py`. The shared tests that named a shipped file as having no profile now build one in the test (`tests/test_profile.py`, `test_hull_form.py`, `test_ship_particulars.py`) | old beside new in the tuning notes, "The eight hulls"; the trace on a clean archive |
 | B5.6 | the drawing; the pictures' standard deviation and dark fraction (thresholds stood, unmoved). **The hull step's mends, as landed** (the lead's point 10): the band on the drawn side, the head's back strip, foot and wedge, the taffrail by the stern's line, the painter's order (§6); `tests/test_view_geometry.py`'s tables and `RIGHTLY_WITHOUT` | old beside new in the tuning notes, "The eight hulls"; the owner's sheets, `docs/playtests/2026-10-31-hulls-the-eight/` |
 | SW-1 | the hull step's standing comparisons against its base commit, which take the whole document or each fit's keys, to rebase old beside new: `tests/test_hull_frigate.py` and `tests/test_hull_brig.py`'s `test_no_figure_the_physics_or_the_gunnery_reads_moved`, `tests/test_hull_cutter.py`'s `test_a_diff_of_her_physics_keys_against_git_shows_none`, `tests/test_hull_schooner.py`'s `test_no_figure_the_physics_reads_moved`; the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
-| SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
+| SW-4 | the same standing comparisons as SW-1's, and `tests/test_hull_smack.py`'s `test_her_file_but_for_her_lines_is_what_it_was_against_git`, her fits landing; the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103`. *As built, the files' side (the first pass): the standing comparisons rebased on the keys it writes alone (the frigate's, the brig's and the merchant brig's, the cutter's, both schooners', the smack's); the arc 60-140 to 62-141 (`tests/test_pivot_gun.py`'s two pins, `tests/test_profile.py`'s); stage 0's description pin, the Speedwell's and the lugger's and the smack's "no armament" pins; the quarters beaten unarmed meet the bill (helm 2 to 1, the powder by one), no pin; the brig-sloop's "ten ports a side" moves two digests with no tick or line (the naval cruise's, the station's stranger's), re-pinned, and the trade trial's stranger, which fails on this machine at the base, reported with both figures; no whole log moved. The merchant brig's index row is the second pass's.* *As built, the world side (the second pass): §8.4's pins, each for the far and crewed merchant brigs' file alone (bisected: each old form passes with the row put back on `brig.yaml` and fails without): `tests/test_ships.py:103` (her file `merchant-brig.yaml`, the brig-sloop's `brig.yaml`); a crewed merchant brig's people, eleven of the brig-sloop's to her own six (`tests/test_crews.py`); stage 0's description pin as the files' side rebased it, the merchant brig's now with her fit and roles (`tests/test_profile.py`); truth 7-389's say ashore (`tests/test_knowledge.py`: her master's station is her mate's, her master commanding her) and truth 7-401's boat (`tests/test_boat_names.py`: the posts every hull shares the master, the boatswain and the carpenter, no merchant brig having a gunner, and her mate refused where the lieutenant was); the word ashore (`tests/test_people.py`: her mate ashore, apart from her captain) and a far hull told as herself (`tests/test_the_ship_herself.py`: "a merchant brig ... 4 long 6-pounders ... 16 souls ... Mr Bradley" where she was the Diligence-class brig-sloop under Captain Pope); and `tests/test_subtypes.py`'s own (the `NEW_ROLES` allowance gone). No digest, truth's figure or trial moved, the convoys and the trade trials among them (the trade trial's stranger 826d8855f87befdc as the first pass left it); the four whole logs the base's; the player's merchant brig's own class 0 to 2 (`size_of_file`, now that a row names her file) moved no pin; an old checkpoint, save and replay with far and crewed merchant brigs load and run on; quarters beaten unarmed pinned (`tests/test_subtypes.py`); truth 7-191 drafted there* *As built, the reviews' mends: `tests/test_captains.py:102` (a row's `unless` one stimulus or several); `tests/test_crews.py:47` and `:359`, whose `endswith("brig.yaml")` had changed subject with §8.4 and still passed, now `"/merchant-brig.yaml"`; `tests/test_subtypes.py`'s own (the refusal of one role in the singular, the revenue cutter's way out of `evading`, the sub-types after "the", the crewed first role); the four ship files' notes and sources (no key the physics, the gunnery or the served words read). No outcome, digest, truth's figure or trial moved against the base (the candidates by junit; the trade trial's stranger 826d8855f87befdc as before); the four whole logs the base's; an old checkpoint, save and journal written at 5dd7d67a load and run on to the base's own continuation (§16.2)* | old beside new, bisected on the commit |
 | SW-5 L2 | actions heeled past their new shut heels (the privateer's 10.2°, the cutter's 13.9°, the brig's 17.1°, the frigate's 18.8°; §5.4; on the drawn hulls 10.5°, 14.7°, 17.5° and 19.7°, §7.3). *As built, no action moved; stage 0's two hook tests did* | old beside new, the reason, the bisection of §7.3 |
 | SW-5 L3 | actions in a sea, on the player's ship. *As built, no action, truth or trial moved: no scripted action keeps a sea, and the three shipped Worlds that put an enemy before her in one (the blockade's evening, the naval cruise, the station-stranger trial) have no pin that plays it. Two pins moved, in `tests/test_lee_ports.py`: L2's `test_the_roll_is_held_at_nought`, now `test_the_roll_is_read_and_shuts_both_sides_by_itself`, and the last line of L2's chaser test (a port shut upright said by its side's name, the reviews' mend); truth 7-190 drafted in that file for Phase 5* | the bisection L2 → L3, the commit itself; the candidates by junit, test by test; the whole logs and the captain's trials the base's |
 | SW-5, the hold | the lead's ruling of 2026-11-06: a shut port opens only once the sea has kept from its sill a minute (`ports.PORT_HOLD_S`). *As built, no action, truth or trial moved* (the candidates, the captain's trials and the whole logs against L3's commit). *L2's and L3's pins that open a port moved to open it a minute after the sea left it, each with this ruling as the reason; `ports.update` takes the tick* | the candidates by junit against L3's commit; the tuning notes' old beside new, "The lee ports held a minute" |
@@ -1847,6 +2058,7 @@ which holds her spars.
 | An old ship with no profile and no gun decks | the lee port falls back to the gun's pickled height and half the beam; the viewer draws the lens. Documented: an old save fights with its old heights |
 | An old save resumed after L2 or L3 | the ports now shut by the rule: a behaviour change on resume, as any rule's. Documented |
 | An old save's magazine after SW-1 | cartridges filled after the load take the table's charge (an ounce less for a 32-pdr carronade). Documented |
+| An old checkpoint after SW-4 | its pickled ships keep their files, arcs, bills and books: the privateer's pivot 60 to 140; a far or crewed merchant brig on `brig.yaml`, a crewed one with her 121 and eleven people, the player's shadow on `brig.yaml`; the Speedwell, the lugger and the smack with no armament and no bill (quarters reckoned, the helm two); a privateer's captain with the book he was pickled with, his way out of `evading` guarded by `overmatched` alone, until a new intent loads it anew; every captain's `sub_type_role` the class's `""`. A replay makes them anew (62 to 141, sixteen men and six people, the bills, the books). Measured on a checkpoint, a save and a journal written at 5dd7d67a: each runs on to the base's own continuation. Documented |
 | `ArmamentSpec.fit` returning None | the three callers handle it in stage 0; old specs carry FitSpecs as before |
 | Recorded replays across SW-1, L2, L3 | the replay truths (7-170, 7-171, 7-183) re-run at each of those commits; any move shown old beside new |
 | The kept saves (`tests/fixtures/saves/`) | loaded by the fast tier at every step |
@@ -1992,9 +2204,17 @@ Items 16 and 19 stay open until the owner decides them on the sheets.
    takes her own default with a line in the log (`world/scenarios.py:738-748`), which serves every
    file with named fits and changes behaviour only where today raises, but is world code outside
    the brief's list. Lean: (3), built by B6 if ruled in.
-4. **The fillers as posts** left to 77 (§9.3).
+4. **The fillers as posts** left to 77 (§9.3). *Ruled (the lead, 2026-10-28): "to 77, as
+   proposed." SW-4 makes no filler a post: the three bills it writes (the topsail schooner's, the
+   lugger's, the smack's) leave `filling` to Falconer's rule, reckoned from the fit she carries
+   (`combat/filling.py`).*
 5. **The merchant brig's description** moved to `merchant-brig.yaml`, and the packet's
-   description (§8.4).
+   description (§8.4). *Ruled (the lead, 2026-10-29): as §8.4 proposes. **Built** (SW-4, the
+   world side, 2026-11-06): the description sails `merchant-brig.yaml`, `SHADOW_FILES` removed,
+   the pins it moved old beside new and bisected (§16.1's SW-4 row; the tuning notes, SW-4); no
+   trader cutter is named in the data, so "coasting cutter" replaced none; no packet fit (a fit
+   cannot change a complement), the packet one of the merchant brig's roles and her own
+   description left for her own hull.*
 6. **The scenario's `nations:` block** (§12.1), outside the brief's list.
 7. **D10(a)'s key** for the *Neufchatel* built by B3 as a fourth step (§13.1).
 8. **The order of the ships** after the *Indefatigable* (§2.3), and whether the lead merges

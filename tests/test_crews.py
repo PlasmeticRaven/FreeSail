@@ -44,7 +44,9 @@ def test_a_vessel_with_a_brain_within_the_range_is_promoted_and_demoted_beyond_i
     assert b.crew is not None and b.detail == "crewed" and w.vessels.crewed_ids == (b.id,)
     crew = b.crew
     assert isinstance(crew, K.Hull) and crew.shape == "full"  # a hull of the World (step 6)
-    assert crew.ship.name and crew.ship.spec.source.endswith("brig.yaml")
+    # package 75, SW-4 (Build-Ships.md §8.4): her own file (old: "brig.yaml", which matched
+    # both the brig-sloop's file and hers)
+    assert crew.ship.name and crew.ship.spec.source.endswith("/merchant-brig.yaml")
     assert crew.people.captain.name and crew.stations.aboard("captain")
     cap = crew.captain
     assert cap.intent is not None and cap.intent.words == "bound for Falmouth"
@@ -354,7 +356,8 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
         driver.tick(61)
         assert crew.shape == "full" and crew.agents["captain"] is h and b.crew is crew
         assert any("full detail again" in e.text for e in crew.log)
-        assert crew.ship.spec.source.endswith("brig.yaml") and crew.captain.seated
+        # package 75, SW-4 (Build-Ships.md §8.4): her own file (old: "brig.yaml", either file)
+        assert crew.ship.spec.source.endswith("/merchant-brig.yaml") and crew.captain.seated
         http.post(
             "/api/agents/captain/release",
             json={"reason": "the test is done", "key": key, "ship": "X"},
@@ -844,7 +847,11 @@ def test_a_ship_demoted_sleeps_with_her_damage_and_wakes_the_same_ship(tmp_path)
     assert crew is not None and crew.shape == "full"
     ship = crew.ship
     hers = [p for p in w.registry.persons() if p.home == b.id]
-    assert len(hers) >= 8
+    # package 75, SW-4 (Build-Ships.md §8.4): the merchant brig's own people, six (the master,
+    # the mate and the second mate, the boatswain, the carpenter, a boy), where she sailed the
+    # brig-sloop's file and mustered its eleven, a commander and a sergeant of marines among
+    # them (old: `>= 8`)
+    assert len(hers) >= 6
     muster = ship.extra["crew"]
     for s in muster.sailors[:3]:
         s.hurt = "wounded"

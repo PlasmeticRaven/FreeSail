@@ -70,7 +70,10 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
                                      # with `intent:` her rules-based captain sails her; with
                                      # `free_intent:` (any words) a model at her captain's
                                      # station is told its goal, and the rules-based captain
-                                     # keeps her lying to (2026-10-27)
+                                     # keeps her lying to (2026-10-27); `role:` the book her
+                                     # captain sails by, one of her description's roles
+                                     # (package 75: the merchant brig's merchant, packet or
+                                     # indiaman), refused at the load in words otherwise
     world_orders:                    # orders to the world by time (§26; freesail.world.orders)
       - {at: 1805-06-12T14:00, order: 'message: at Brest from the Prefect maritime: "..."'}
     director:                        # the director (spec M6 §23; M7b §4, package 50); or
@@ -498,16 +501,25 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         raise ScenarioError(
             f"{where}, ships: a list of {{id, description, name, nation, position, goal}}."
         )
-    from freesail.world.ships import DESCRIPTIONS, description_key
+    from freesail.world.ships import DESCRIPTIONS, _role_of_spec, description, description_key
 
     for i, s in enumerate(ships_raw):
         if not isinstance(s, dict):
             raise ScenarioError(f"{where}, ships {i + 1}: a ship is a mapping.")
-        if description_key(str(s.get("description") or s.get("kind") or "")) is None:
+        key = description_key(str(s.get("description") or s.get("kind") or ""))
+        if key is None:
             raise ScenarioError(
                 f"{where}, ships {i + 1}: '{s.get('description')}' is no description; say one "
                 f"of {', '.join(DESCRIPTIONS)}."
             )
+        if str(s.get("role") or "").strip():
+            # package 75 (docs/design/Build-Ships.md §8.1): her role one of her description's
+            # roles and of the captains' (`captains.ROLES`), refused here in words at the load
+            # (`ships.vessel_from_spec` refuses it in the same words when she is made)
+            try:
+                _role_of_spec(s, key, description(key))
+            except ValueError as e:
+                raise ScenarioError(f"{where}, ships {i + 1}: {e}") from None
         if s.get("position") is None or not str(s.get("goal") or "").strip():
             raise ScenarioError(f"{where}, ships {i + 1}: a ship needs a position and a goal.")
         # a free intent (2026-10-27): her goal in any words, for a model at her captain's

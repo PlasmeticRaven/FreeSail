@@ -245,9 +245,14 @@ def test_each_file_holds_the_triples_the_notes_have(path):
 
 @pytest.mark.parametrize("path", [LUGGER, SMACK])
 def test_the_lugger_and_the_smack_have_no_port_and_no_gun_to_shut(path):
+    """Package 75, SW-4 (Build-Ships.md §9.1), old beside new: each had no armament, and sails
+    unarmed by default now, with one fit for the editor whose guns fire over the rail, which no
+    port shuts (`ports.PORT_PLACES`)."""
     spec = load_spec(path)
-    assert not spec.hull.profile.ports_m and spec.armament is None
+    assert not spec.hull.profile.ports_m and spec.armament.default == "unarmed"
     assert battery_of(load_ship(path)) is None
+    for name, fit in spec.armament.fits.items():
+        assert not [g for g in fit.guns if g.place in ports.PORT_PLACES], name
 
 
 @pytest.mark.parametrize(

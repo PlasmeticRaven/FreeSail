@@ -94,21 +94,34 @@ def test_the_polar_is_drawn_from_the_file_and_agrees_with_the_measured_polars():
 
 
 def test_the_descriptions_name_the_four_files_and_the_brigs_two_come_from_her_file():
+    """The brig's file keeps her two descriptions' words; since package 75 (SW-4,
+    Build-Ships.md §8.4, the lead's ruling of 2026-10-29) the merchant brig sails her own
+    file, the brig's hull and rig with her own sixteen men and four 6-pounders, where both
+    descriptions sailed `brig.yaml` (old: `description("merchant brig")["file"] == BRIG`), her
+    words the same in both files and her polar and masthead the brig's."""
     assert S.description_key("a merchant brig") == "merchant brig"
     assert S.description_key("brig-sloop") == "brig-sloop"
     assert S.description_key("a ship of the line") is None
     own = S.file_descriptions(BRIG)
-    assert set(own) == {"brig-sloop", "merchant brig"}  # one file, two descriptions
+    assert set(own) == {"brig-sloop", "merchant brig"}  # one file, two descriptions' words
     assert S.description("merchant brig")["what"] == own["merchant brig"]["what"]
-    assert S.description("brig-sloop")["file"] == S.description("merchant brig")["file"] == BRIG
+    merchant = "data/ships/merchant-brig.yaml"
+    assert S.description("brig-sloop")["file"] == BRIG
+    assert S.description("merchant brig")["file"] == merchant  # SW-4: was BRIG
+    assert S.file_descriptions(merchant)["merchant brig"]["what"] == own["merchant brig"]["what"]
+    assert S.polar_of(merchant) == S.polar_of(BRIG)
+    assert S.rig_height_m(merchant) == S.rig_height_m(BRIG)
     assert S.description("frigate")["rig"] == "a ship"  # three masts, square-rigged, from the tops
 
 
 def test_the_privateer_schooner_is_the_schooner_armed_and_the_schooner_stays_unarmed():
-    """PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the letter of
+    """The owner's ask of 2026-10-25, kept by package 75 (Build-Ships.md §9.5): the letter of
     marque of the schooner's draught is a file of her own, so that every passage and trial
     sailing the unarmed Speedwell is untouched: the same hull, rig and company, her guns and
-    her quarter bill added; the tops make her out a schooner, the glass her ports."""
+    her quarter bill added; the tops make her out a schooner, the glass her ports. Package 75,
+    SW-4 (§9.1): the Speedwell carries fits and a bill for the editor and sails unarmed by
+    default, so old beside new her armament went from none to an `unarmed` default with no
+    fit made and no gun; the claim stands."""
     import yaml
 
     from freesail.ship.loader import load_spec
@@ -123,7 +136,8 @@ def test_the_privateer_schooner_is_the_schooner_armed_and_the_schooner_stays_una
     assert armed["rig"] == S.description("schooner")["rig"] == "a schooner"
     assert armed["what"] == S.file_descriptions(armed_path)["privateer schooner"]["what"]
     plain, spec = load_spec(plain_path), load_spec(armed_path)
-    assert plain.armament is None and plain.crew.quarter_bill is None
+    assert plain.armament.default == "unarmed" and plain.armament.fit() is None
+    assert plain.crew.quarter_bill is not None  # SW-4: her bill for a fit the editor names
     assert spec.armament.default == "long tom"
     tom = spec.armament.fit()
     kinds = sorted((g.kind, g.pounder, g.place) for g in tom.guns)
