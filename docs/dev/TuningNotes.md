@@ -19122,3 +19122,13 @@ numbers stay made; two entries added (the ships astern to make more sail, the sh
 shorten sail). The private form's head cites his § 70 (the recognition signals each government
 gives its ships of war, for which the ships must close to make out the flags); the form's places
 stay 71's, from memory. No telegraphic dictionary: Audibert has none.
+
+**What moved.** Nothing pinned: the fast tier on the step's work (5735d77) and the step's final
+runs found no passage that hoists a French signal or reads one, and the British and basic
+records are proven unchanged by the hoist's form (the test above).
+
+**The suites as run at 1844886** (the step with the trunk's 4f3694b and c9cb4c0 merged in; a
+worktree pinned there): the fast tier, exit 0, 6,449 run, 6,448 passed and 1 xfailed (the
+trunk's); the slow tier of the touched files and the known truths, exit 0, 324 run, 316 passed
+and 8 xfailed (the trunk's); the pace tests alone and last, exit 0, 13 of 13. Ruff check and
+format clean.
