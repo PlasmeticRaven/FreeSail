@@ -175,6 +175,13 @@ COMPANY_CLOSING_KN = 2.0
 # her hundred and twenty-one; a file shared by two rows names the first of them for a ship
 # of that file (`size_of_file`, the player's shadow), so the plain row comes first.
 DESCRIPTIONS: dict[str, dict[str, str]] = {
+    # package 74 (the design's §3.4): a cartel, a merchant brig under a flag of truce with
+    # the one errand; her words and places filled out are package 80's
+    "cartel": {
+        "file": "data/ships/brig.yaml",
+        "rig": "a brig",
+        "what": "a cartel",
+    },
     "frigate": {
         "file": "data/ships/frigate-36.yaml",
         "rig": "a ship",

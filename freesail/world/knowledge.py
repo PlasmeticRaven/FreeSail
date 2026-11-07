@@ -816,6 +816,13 @@ def players_person(world: Any) -> Any:
     (in the boat, aboard another ship, ashore). None where there is none: an observed world,
     a seat bound to nobody (the director's), or a model at that captain's station."""
     root = _root(world)
+    from freesail.world.captive import captive_person
+
+    captive = captive_person(root)
+    if captive is not None:
+        # the player's person a captive (package 74, the design's §3.1): his ship's captain
+        # answers for the prize master from the taking, so the one world keeps who he is
+        return captive
     seat = _seat(world)
     if seat is not None:
         return _seat_person(root, seat)

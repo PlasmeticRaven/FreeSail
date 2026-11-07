@@ -43,6 +43,7 @@ __all__ = [
     "PAPERS_PATH",
     "PLACES",
     "PORT_PLACES",
+    "agent_for_prisoners_words",
     "Hold",
     "Paper",
     "Papers",
@@ -281,8 +282,34 @@ PORT_PLACES: dict[str, PortPlace] = {
             "the pilots of the port not at their stations",
             ("pilot",),
         ),
+        # package 74 (spec M7 §19; the design's §3.3): prisoners of war landed from a ship
+        # are given over here with the list of their names and the day they were first
+        # victualled (the Regulations, Sect. XII ch. III art. V); the name by the port's
+        # nation (`agent_for_prisoners_words`)
+        PortPlace(
+            "agent_for_prisoners",
+            "the agent for prisoners",
+            "prisoners of war are landed and given over with the list of their names",
+            "the agent for prisoners and his clerk, and prisoners waiting to be marched",
+            ("agent for prisoners", "prisoner of war", "prisoner"),
+        ),
     )
 }
+
+# The agent's name by the port's nation (decision 64: Spain's row with France's).
+AGENT_FOR_PRISONERS_BY_NATION: dict[str, str] = {
+    "britain": "the Agent for Prisoners",
+    "france": "le commissaire des prisonniers",
+    "spain": "el comisario de prisioneros",
+}
+
+
+def agent_for_prisoners_words(port: Any) -> str:
+    """'the Agent for Prisoners at Falmouth', 'le commissaire des prisonniers at Brest'."""
+    nation = str(getattr(port, "nation", "") or "")
+    name = AGENT_FOR_PRISONERS_BY_NATION.get(nation, "the agent for prisoners")
+    return f"{name} at {getattr(port, 'name', 'the port')}"
+
 
 # Where a person ashore is when nothing said puts him elsewhere (judgement): the quay,
 # where the boat landed him.

@@ -30,7 +30,7 @@ A ship that cannot spare a prize crew does not take possession: the refusal says
 | reading | what it says |
 |---|---|
 | `the prize`, `the prizes` | every prize of this ship's: her name, how she was taken, her prize master, the prize crew's and the prisoners' counts, her goal, in company or parted, and where she lies by the lookout; "no prize" |
-| `the prisoners`, `the prisoners aboard` | the prisoners this ship holds: how many, how many of them hurt, where confined, in irons, the named with their parole; "no prisoners" |
+| `the prisoners`, `the prisoners aboard` | the prisoners this ship holds: how many, how many of them hurt, where confined, in irons, the named with their parole ("one prisoner of rank: Captain Bowen in the cabin (parole given)"); "no prisoners" |
 | `the prize crew` | on a prize: the men who work her, how many fit and how tired, the hours since the taking, the prize master; on any other ship "she is no prize" |
 
 ```
@@ -74,15 +74,36 @@ The captain's doctrine burns of itself what it will not man (`burns_when: not wo
 
 ## The events
 
-For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it) and `a prize burnt`.
+For the standing book and the stand-by (chapter 16): `she is taken` (possession taken of a prize, on the captor), `possession taken` (on the prize herself), `the prisoners aboard` (a boat's load of them), `the prisoners rising`, `the prize retaken`, `a prize lost` (retaken, by her people or by a cruiser, when you learn of it), `a prize burnt`, `a captive aboard` (a prisoner of rank brought aboard), `the parole asked` and `the parole given` (given or refused), `the prisoners landed` and `the cartel` (a cartel alongside, her persons taken off).
 
 ```
 standing order "the prize": at she is taken then take the prisoners aboard
 ```
 
+## When it is you who strike
+
+Your own `strike the colours` (chapter 22) has its consequence now. Your ship lies to, and when her captor takes possession of her, by his boat within a boat's pull or at hailing distance if he is far, **you are taken aboard him a prisoner**: put in his cabin, your sword given up to his captain, your people prisoners below under his prize crew and a prize master at your ship's helm. Your own station stands down by the handover's rule (the game saved, the journal kept), for a captive commands nothing; but **the prompt follows you**. You read where you are and what your place allows, you speak and ask (`say to the captain: ...`, `ask the surgeon ...`), you keep your journal and you wait; every order of his deck is refused in words that say what you are, and every order of your own ship's, from his prompt or from hers if you look back at her, is refused as a prize's:
+
+```
+Where am i: aboard the Medusa, in the cabin, a prisoner, his parole not asked, of the Amazon.
+# rejected: steer west
+```
+
+**The parole.** His captain comes to the cabin a minute after the taking and asks it in the words of his service (a French captain in French and English, a Spanish in Spanish and English, an Englishman in his own), the question a line of the log where you stand:
+
+```
+Captain Pope, in the cabin: Votre parole, monsieur: Captain Bowen, your sword is returned you. Will you give me your word not to attempt the ship nor to leave her without my leave?
+```
+
+You answer in your own words, and the game reads them for your parole only while the question is open: `say to the captain: I give you my parole, sir` gives it (the cabin and the gunroom are yours, the quarterdeck by day, and your sword is returned you); `say to the captain: I will not give it` refuses it (the gunroom alone, a sentry at the door). Say nothing and he asks once more after a glass, and after a watch takes an officer's word as given, which was the custom. `where am I` says which it is: "a prisoner on parole", "a prisoner, his parole refused". Your people are not asked; the officers of your ship are asked as you are.
+
+**Landed.** Your captor shapes his course for the first port of his nation's (or home, if he is a privateer) and lands his prisoners there to the agent for prisoners, with the list of their names and the day they were first victualled, which is the Regulations' rule; you are ashore there, a prisoner of war, and the chapters that follow say how you come home: by a cartel the director sends (`cartel: a cartel from Brest for Captain Bowen`, a merchant brig under a flag of truce which no captain fires on, who takes you off and lands you free at her port), by an exchange, or to face the court for the loss of your ship.
+
+**A prisoner of your own prize** is served by the same channel from the other side: her master is a person of her company confined in her cabin by his parole, and you speak to him by `say to the master of the Deux-Frères` within hail, or aboard her as a visitor by the boat.
+
 ## What is not in this chapter
 
-The prize court and the prize money (the condemnation, the eighths, the head money and the agent's commission), the captive's own channel when the person you hold is a captain with a voice of his own, and the fight heard off the horizon are told in the chapters that follow as they come into the game; the readings and the orders of this chapter are the game's now.
+The prize court and the prize money (the condemnation, the eighths, the head money and the agent's commission), the court martial for the loss of a ship and the new command after it, and the fight heard off the horizon are told in the chapters that follow as they come into the game; the readings and the orders of this chapter are the game's now.
 
 ## Sources
 
