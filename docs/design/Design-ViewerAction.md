@@ -210,20 +210,22 @@ asked of a file, and a gun of a new weight draws at its pattern's length.
 
 | Kind, pounder | Patterns: length (ft in) at weight (cwt) | Source | Files' weights today |
 |---|---|---|---|
-| long 32 | 9 6 at 55 | Adye 1804 p. 155, IA leaf n178, read (by the ships sessions: `tools/ships/period.py:16-29`; Research-Indefatigable-2026-10.md §6.4) | (the 74, to come) |
+| long 42 | 10 0 at 67; 9 6 at 65 | Adye p. 155, read here (R1) | (none) |
+| long 32 | 10 0 at 58; 9 6 at 55 | Adye 1804 p. 155, IA leaf n178, read (by the ships sessions: `tools/ships/period.py:16-29`; Research-Indefatigable-2026-10.md §6.4) | (the 74, to come) |
 | long 24 | 10 0 at 52; 9 6 at 49½; 9 0 at 47½ | the same | razee, 64: 49.5 |
 | long 18 | 9 6 at 42; 9 0 at 40 | the same | frigate 42 (her note's "9 ft" is the comment's only: `Decisions-ShipsRound2-2026-10.md` l. 536); 64 |
 | long 12 | 9 6 at 34; 9 0 at 32; 8 6 at 31½; 7 6 at 29¼ | the same | razee 34 |
 | long 9 | 7 6 at 24½; 7 0 at 23 | the same | frigate, 64: 26 (from memory, `gen_ships.py:4195`) → 7 6 |
 | long 6 | 8 0 at 22; 6 0 at 16½ | Adye p. 155, read by the Neufchatel's design (`Design-Ship-PrinceDeNeufchatel.md:836`) | brig, merchant brig, privateer 20 (from memory) → 8 0 |
-| long 4, long 3 | to read on p. 155 (R1) | (`gen_ships.py:4191`: 6 0 at 12½ and 4 6 at 7, from memory, until read) | cutter 7 |
-| carronade 68, 42, 32 | 5 2 at 36; 4 3½ at 22¼; 4 0½ at 17⅛ | Adye p. 72, IA leaf n95, read (by the ships sessions, as above) | 32: frigate, brig 17 |
-| carronade 24, 18 | 3 7½ at 13 or 3 0 at 11¾; 3 3 at 9 or 2 4 at 8½ | the same (`period.py:31-37`) | 64: 18 and 24; razee 42 |
-| carronade 12 | 2 2 at 5¾ | Adye p. 72, read by the Neufchatel's design (`:835`) | cutter, privateer 6 |
+| long 4, long 3 | 4: 6 0 at 12¼; 5 6 at 11¼. 3: 4 6 at 7¼ | Adye p. 155, IA leaf n178, read here (R1, 2026-11-07): the 4-pounder of 6 ft printed "22 1", read 12 cwt 1 qr by its own column of metal to the pound of shot (343 lb × 4 = 12¼ cwt; 22¼ would be 623) | cutter's 3s 7 → 4 6 |
+| carronade 68, 42, 32 | 68: 5 2 at 36 or 4 0 at 29; 42: 4 3½ at 22¼; 32: 4 0½ at 17⅛ (17 cwt 14 lb) | Adye p. 72, IA leaf n95, read (by the ships sessions, as above; and here, R2) | 32: frigate, brig 17 |
+| carronade 24, 18 | 24: 3 7½ at 13 or 3 0 at 11 cwt 2 qr 25 lb; 18: 3 3 at 9 or 2 4 at 8 cwt 1 qr 25 lb | the same (`period.py:31-37`) | 64: 18 and 24; razee 42 |
+| carronade 12 | 2 2 at 5 cwt 3 qr 10 lb | Adye p. 72, read by the Neufchatel's design (`:835`), and here | cutter, privateer 6 |
 | swivel ½ | to read (R5) | (judgement until read: 3 ft) | cutter, privateer |
 
-- **The bore** is the shot's diameter (`combat/hits.py:106` `shot_diameter_m`, the gunner's rule,
-  Douglas) and the windage (Adye's, R2). **The outside**: a long gun tapers from the base ring,
+- **The bore**: a carronade's as Adye prints it (p. 72: 68, 8.05 in; 42, 6.84; 32, 6.35; 24, 5.68;
+  18, 5.16; 12, 4.52; read); a long gun's the shot's diameter (`combat/hits.py:106`
+  `shot_diameter_m`, the gunner's rule, Douglas) and its windage (Adye pp. 255-257, R2, to read). **The outside**: a long gun tapers from the base ring,
   `BREECH_CALIBRES` of the bore across, to the muzzle's swell, `MUZZLE_CALIBRES` (judgement, 3.4 and
   2.2, until Caruana's Blomefield dimensions, question 3); a carronade is a short thick tube,
   `CARRONADE_CALIBRES` 2.6 across to its cup (judgement, question 3). The trunnions at 3/7 of a long
@@ -252,7 +254,7 @@ her file lands, and until then a gun of a weight no pattern gives draws at the n
 | The engine's state | Drawn | Ground |
 |---|---|---|
 | secured (not cast loose) | housed: the muzzle `HOUSED_INBOARD_M` (0.1 m) inside the side, the lid shut | judgement; Falconer, the lids let down when the guns are drawn in |
-| cast loose, run in (loading, or run in by the sea) | the muzzle inboard by `RECOIL_SHARE` of its length (0.4, judgement; Adye p. 230, R2) | the room to sponge and load |
+| cast loose, run in (loading, or run in by the sea) | the muzzle inboard by `RECOIL_SHARE` of its length (0.4, judgement) | the room to sponge and load; Adye p. 230 (IA leaf n253, read) gives the free recoil on a level platform, 11 ft for the 32 and the 24 and 10 ft 6 in for the 18 at a third's charge, longer than the gun: aboard the breeching stopped it short (question 1) |
 | run out | the muzzle outboard of the side by `OUT_SHARE` of its length: long 0.33, carronade 0.25 (judgement, question 1) | the carriage against the side |
 | dismounted | the barrel off its carriage, on the deck at its port, tipped 15° (judgement) | `the damage`'s `dismounted` |
 
@@ -395,16 +397,18 @@ the hover words in-world (no build's word).
 ### 11.1 The plan (for the builder, beside the work; each reading recorded with its mark)
 
 - **R1. Adye 1804 p. 155** (IA leaf n178): the rows the ships sessions did not take (the long 6s, 4s,
-  3s, the 9 of 7 ft, the 12s' four lengths as a check). The page image fetched through the proxy into
+  3s, the 9 of 7 ft, the 12s' four lengths as a check). *Done 2026-11-07, read: §3.1's rows; every
+  row the files use is now read on the page.* The page image fetched through the proxy into
   a new directory, read as an image, its rows cited by page; the OCR loses the columns.
 - **R2. Adye p. 72** (leaf n95) as a check of the carronades; **p. 230**, recoil (`adye…ocr.txt:636`
-  the index); **pp. 255-257**, the shot's and the windage's diameters (l. 22869-23000).
+  the index); *both read 2026-11-07 on their images (§3.1, §3.3)*; **pp. 255-257**, the shot's and the windage's diameters (l. 22869-23000).
 - **R3. Douglas 1829**: the exercise, arts. 122-135 (running out and in, housing, the breechings'
   length) and the carronade on its slide, art. 136 ff. (l. 7151-7645); the smoke, art. 175 p. 218
   (l. 9612-9625) and p. 280 (l. 11795-11805).
 - **R4. Falconer 1780, PORTS** (l. 13783-13789) and **Steel 1805, HALF-PORTS and PORT-LIDS** (l.
   3052-3053, 4061): the lids, read (OCR); the page images where the OCR is unsure.
-- **R5. The swivel**: Adye's and Falconer's SWIVEL entries for the half-pounder's length.
+- **R5. The swivel**: Adye's and Falconer's SWIVEL entries for the half-pounder's length. *Searched
+  2026-11-07 (OCR, every spelling): neither gives one; question 4 stands, 3 ft by judgement.*
 - **R6. Secondary, read and cited, never copied:** public museum records of surviving Blomefield
   guns and carronades (the outside diameters, to check §3.1's calibres); a modern source on black
   powder's combustion products (the share that is smoke). Searched through the proxy; each cited by
