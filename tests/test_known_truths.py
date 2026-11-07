@@ -14716,3 +14716,118 @@ def test_truth_7_357_the_prisoners_are_landed_to_the_ports_agent_and_a_cartel_br
     )
 
     test_the_prisoners_are_landed_to_the_agent_at_brest_and_a_cartel_brings_the_captive_home()
+
+
+@pytest.mark.slow
+def test_truth_7_358_two_far_ships_that_meet_in_anger_beyond_the_range_fight_by_the_rounds():
+    """The design's §4.2, §4.3 and §4.5 (step 4): the far brain takes the engaging transition
+    (the same rows as the near captain's) and closes to the doctrine's range; within gun's
+    reach the rounds of `combat/far.py` fire every three minutes on the records, each side's
+    record carried in and written back, the draws from the World's `far` stream opened at the
+    first round and not before; the loser strikes by morale (at seed 7 the cutter to the
+    frigate after eleven rounds, 33 minutes), is struck as the cut-out writes it and is taken
+    possession of at hailing distance on the records; the player's lookout twelve miles off
+    hears the guns once a round. Beyond the reach nothing fires and the chase leg closes her;
+    with `far_action.ENABLED` False the world is 70's."""
+    from tests.test_far_action import (
+        test_beyond_the_guns_reach_nothing_fires_and_the_chase_leg_closes_her,
+        test_the_toggle_off_leaves_the_world_as_it_was_and_the_far_brain_never_engages,
+        test_two_far_ships_meet_in_anger_beyond_the_range_and_fight_by_the_rounds_to_a_strike,
+    )
+
+    test_two_far_ships_meet_in_anger_beyond_the_range_and_fight_by_the_rounds_to_a_strike()
+    test_beyond_the_guns_reach_nothing_fires_and_the_chase_leg_closes_her()
+    test_the_toggle_off_leaves_the_world_as_it_was_and_the_far_brain_never_engages()
+
+
+def test_truth_7_359_the_near_fight_and_the_far_rounds_of_the_same_two_cutters_agree():
+    """The design's §4.6: 7-140's near action of two cutters at a cable ends 35 seconds
+    after the first shot at seed 7 on this tree; the far rounds of the same two at the same
+    range (the mended far ships) end in two rounds, six minutes. Pinned as found: the two are
+    within two rounds and not one (the far fight cannot end before its first round), the far
+    the coarser by design; no table's figure moved for the agreement's sake."""
+    from tests.test_far_action import (
+        test_the_near_fight_of_two_cutters_at_a_cable_and_the_far_rounds_agree_within_a_round,
+    )
+
+    test_the_near_fight_of_two_cutters_at_a_cable_and_the_far_rounds_agree_within_a_round()
+
+
+@pytest.mark.slow
+def test_truth_7_360_the_far_state_goes_into_the_near_body_at_her_waking_and_back_at_her_sleep():
+    """The design's §4.4: a hull made or woken with a far record carries it in her parts (the
+    men killed and wounded on her muster, the shot holes in her damage keeper, the guns, the
+    spars, the sail cut), applied once; slept again, the parts sum back to the same record. A
+    hull fought awake and slept carries the parts' sum. The far ship's reply to an awake hull
+    fires only where the cap has no room to wake her (the lead's ruling 4), said and counted."""
+    from tests.test_far_action import (
+        test_a_far_ship_replies_to_an_awake_hull_only_where_the_cap_has_no_room,
+        test_a_hull_fought_awake_and_slept_carries_the_parts_sum_in_her_record,
+        test_a_hull_made_or_woken_with_far_damage_carries_it_in_her_parts_and_sums_it_back,
+    )
+
+    test_a_hull_made_or_woken_with_far_damage_carries_it_in_her_parts_and_sums_it_back()
+    test_a_hull_fought_awake_and_slept_carries_the_parts_sum_in_her_record()
+    test_a_far_ship_replies_to_an_awake_hull_only_where_the_cap_has_no_room()
+
+
+@pytest.mark.pace
+def test_truth_7_361_the_far_rounds_cost_the_frigates_tick_nothing_it_cannot_pay():
+    """The pace (informative; the floors not lowered): truth 51's form (the gate's day, a
+    thousand ticks to settle, the best of three thousands) with two far ships in anger
+    twelve miles off the frigate, fighting by the rounds the whole measure; the figure is
+    recorded in docs/dev/TuningNotes.md (package 74, step 4) and asserted at the build
+    machine's floor as truth 51 is."""
+    import time
+
+    from freesail.combat import far_action as FA
+    from freesail.world.geo import destination
+    from tests.test_brains import put
+
+    world, _, _ = the_gate_day(until=1000, saves=())
+    world.crewed_settings = {"cap": 0}
+    far = destination(world.position, 180.0, 12.0 * units.NAUTICAL_MILE)
+    a = put(
+        world,
+        "frigate",
+        "france",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        colours="shown",
+        name="Renard",
+    )
+    q = destination(far, 90.0, 0.8 * units.NAUTICAL_MILE)
+    put(
+        world,
+        "frigate",
+        "britain",
+        {"lat_deg": q.lat_deg, "lon_deg": q.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise off the Lizard within 20 miles",
+        colours="shown",
+        name="Medusa",
+    )
+    world.run(600)
+    assert a.brain.state == "engaging" and FA.ENABLED
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        world.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert a.damage.get("rounds", 0) >= 1, "the far rounds did not fire during the measure"
+    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+
+
+@pytest.mark.slow
+def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_the_rounds():
+    """The design's §4.3 (the brief's §20): 72's cut-out yields a merchantman without a shot
+    where her doctrine yields when caught; a packet, whose doctrine fights for the mails,
+    fires within her four cables and is struck by morale under the privateer's rounds, then
+    taken possession of at hailing distance: the two rules together carry the cut-out from
+    hail to its end by the same rounds."""
+    from tests.test_far_action import (
+        test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken,
+    )
+
+    test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
