@@ -18135,6 +18135,102 @@ master takes his noon sight at 11:44 and goes below at 11:59 in the knowledge te
 **The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
 asks and their figures are below.
 
+**The suites on the step's final tree (d6e52a7: the step's code at 0df145f with the trunk at
+8542e49 merged, carrying package 97; the commit after adds this paragraph alone).** Fast tier
+whole: 6322 passed, 1 xfailed, 45 min 16 s (exit 0), run in a worktree pinned at the head. A
+first run in the working tree read one red, the replay's rules fingerprint: step 7's edits to
+the consent and harness files landed under it while it ran (the fingerprint is read from the
+files as they stand), and the test passes alone on both trees; the suites are run in a pinned
+worktree from here on, so that no edit touches a running suite. Slow tier of the forty touched
+files and the known truths (`--slow -m "not pace" -n 4`), in two halves under the two-hour
+limit: the first (the known truths, the knowledge, the hulls, the boats, the replay, the
+checkpoint, the captain, the officer, the people, the health, the ports, the places, the war's
+date, the reckoning, the readers on the hull, the tell, the crews, the director, the consent,
+the wardroom's doors) 812 passed, 8 xfailed, 1 h 14 min 50 s; the second (the agents, the
+primer, the grammar book, the in-world words, the orders, the standing orders, the console,
+the server, the observer, the doors, the names, the sail by name, the parity, the pictures,
+the map view) 2413 passed, 1 xfailed, 16 min 43 s; both exit 0. Pace tests alone and last
+(`--slow -m pace -rP`): 13 passed, 5 min 28 s; three stations seated, the knowledge filter's
+place 532 ticks a second against `all` 535 (truth 7-386's run 543 against 539: the filter's
+cost within the noise, as at steps 1 to 5); the frigate alone 528, the Channel observed 333,
+the same Channel with the frigate at the view 214. The master's test and truth 7-375 were put
+in the slow tier after these figures were taken (at f825749), so the fast tier's figure counts
+them in. ruff check and ruff format --check clean.
+
+### Step 7: the drill, extended (the design's §10; 2026-11-06)
+
+**What was built** is in the design note's postscript ("As built", step 7): the walk in the
+fitness drill (go below, eat or drink, a paper read where it is kept, come on deck), seven things in
+eight replies, the walk's orders alone, the drill's world the frigate at seed 0 and its captain the
+walker; behind `consent.DRILL_WALK`, off on the trunk by the lead's ruling (§17's item 5) until
+package 55 re-briefs; truth 7-381 with the switch on.
+
+**Judgements.** (1) Eight replies for seven things, 37's one-to-spare kept. (2) The drill's world a
+real ship (the frigate, seed 0, a calm, a third of a second to make) when the walk is on, because a
+point world has no cabin and no papers; the consent step is run once a model, so the cost is
+nothing; with the switch off the point world stands. (3) The walker the drill's world's captain, so
+that the drill asks no authority of the consent station and `go below` has a cabin to go to; a drill
+run for a station whose person is not the captain still walks as the captain, which is the drill's
+fiction and not the game's. (4) A deck's order in the drill is refused in the drill's words and
+counts for nothing; a world order the same. (5) The three-thing drill's words are kept to the letter
+with the switch off (the record's "not passed: library and stand_by not run in 4 replies", the
+reminder's "library and journal and stand_by"), so that a record written before this step reads
+the same and 37's tests stand unchanged.
+
+**Found on the way.** (a) The consent module's `Record` is a dataclass; a helper placed between
+its decorator and its `class` line made the decorator a function's (a test's `__mro__` error); the
+helpers sit above the decorator. (b) At the runner's door the developer's empty turn after the
+answer is the fake's first reply in the drill: the drill's first reminder names all seven with seven
+replies left, and the three calls of 37 in one reply leave the walk's four with six; a script of nine
+items passes with no reply to spare, as 37's test of the three-in-one did with four. (c) The drill's
+world's clock stands at the scenario's start (04:00), so the walker eats "the first since 04:00".
+
+**The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
+asks and their figures are below.
+
+**The suites.** Steps 7 and 8 were measured together on the package's final tree (c37c813, the
+branch with both steps whole), each suite in a worktree pinned at that head: fast tier whole
+6367 passed, 1 xfailed, exit 0; the slow tier of the touched files and the known truths in two
+halves 835 passed, 8 xfailed and 2413 passed, 1 xfailed, exit 0; the pace 13 of 13, the knowledge
+filter's cost within the noise. The whole figures are in step 8's section below.
+
+### Step 8: the edge cases' truths and the records (the design's §12 to §14; 2026-11-06)
+
+**What was built** is in the design note's postscript ("As built", step 8): truths 7-377, 7-378
+and 7-384; the visitor's `say` at the prompt in his own name; the records (spec M7b §14 as built,
+`docs/agents/Harness.md` §21h, the primer's chapters 14, 16 and 19, the director's library page).
+
+**Judgements.** (1) Truth 7-378's passage is the frigate hove to with the brig X in sight at
+night (22:00), so that her sighting lines are reports and calls both and the captain's going
+below, the reports, the call, his coming up and his book are all in two hours of the ship's time;
+the save at the half and at the end both replay by both roads. (2) The boat's "by sight" is the
+boat's own lookout's line on the ship, and "by hail" a word said on her deck heard across the
+water; the ship's standing order sets her royals while the player is away, which is how her deck
+does its business with nobody at her prompt. (3) The visitor's voice: the line's name and the
+speaker's skipping, and no seat; the lead books a seat of the visitor's voice if one is wanted.
+
+**Found on the way.** (a) Under `follow` of another hull `world.people` is hers (97's binding):
+a test that wants the player's own captain after the drivers follow him keeps the person by hand.
+(b) The primer's in-world test reads "gate" as a build's word: the officer's chapter says "carried
+out as his own would be" where the design says the deck's gate. (c) Truth 7-378's passage runs 83 s under load and the boat's 7 s: both and their truths are in
+the slow tier (`tests/conftest.py`); the visitor's 5 s is not.
+
+**The pace.** Nothing of this step runs on the tick's path. The pace tests are run as the rule
+asks and their figures are below.
+
+**The suites on the package's final tree (c37c813, the branch with steps 7 and 8 whole and
+step 6's figures; fa25309 after it merges the trunk at db5ff15, one records file and nothing of
+code; the commit after adds this paragraph and step 7's), each in a worktree pinned at c37c813,
+steps 7 and 8 measured together.** Fast tier whole: 6367 passed, 1 xfailed, 46 min 26 s (exit
+0). Slow tier of the forty-one touched files and the known truths (`--slow -m "not pace" -n 4`),
+in two halves under the two-hour limit: the first (step 6's first half with the signals' tests
+for the visitor's voice) 835 passed, 8 xfailed, 1 h 5 min 3 s; the second (step 6's) 2413
+passed, 1 xfailed, 15 min 45 s; both exit 0. Pace tests alone and last (`--slow -m pace -rP`):
+13 passed, 5 min 3 s; three stations seated, the knowledge filter's place 579 ticks a second
+against `all` 580 (truth 7-386's run 569 against 571: the filter's cost within the noise, as at
+every step); the frigate alone 560, the Channel observed 339, the same Channel with the frigate
+at the view 234. ruff check and ruff format --check clean on c37c813 and fa25309 alike.
+
 ## Package 95: the sail by her name (2026-11-06)
 
 `docs/design/Design-SailByName.md` holds the design; these are its judgements and what was

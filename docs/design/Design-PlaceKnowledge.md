@@ -981,3 +981,97 @@ written at the prompt), so nothing of a letter is built.
 **Found on the way** is in the tuning notes (the reckoning's rows are the gunroom's already;
 `People.occupy` dropped the room for a mirrored person; the test of step 5 that drafted a book
 on the deck and walked to the hold at once).
+
+### Step 7: the drill, extended (§10; the lead's ruling of 2026-10-31 on §17's item 5; 2026-11-06)
+
+**Built as designed, behind one switch**: the fitness drill's walk is built whole and kept behind
+`consent.DRILL_WALK`, **off on the trunk** by the lead's ruling: the drill a model meets stays the
+three things the consent brief describes (`DRILL_TEXT`, `DRILL_REPLIES` four, `DRILL_TOOLS` three)
+until package 55 re-briefs, so that a model whose yes is on record for a drill of three things is
+not asked eight before the brief says eight; `drill_spec()` gives the drill as the switch has it.
+With the switch on the drill gains the walk after 37's three: go below (`submit_order(text='go
+below')`), eat or drink there (`submit_order(text='eat')`), read one of the ship's papers where it is
+kept (`library(topic='papers', section='the price list')` from the cabin; the text says the listing
+names which are to be had where he stands), come on deck (`submit_order(text='come on deck')`);
+seven things in up to eight replies (`DRILL_WALK_REPLIES`; 37's judgement of one reply a thing and
+one to spare kept); the drill's tools gain `submit_order` for the walk's four orders alone
+(`DRILL_ORDERS`; any other is refused in the drill's words, `DRILL_REFUSED`: "The drill's orders are
+the walk's alone: 'go below', 'eat' or 'drink', 'come on deck'. '<the order>' waits for the game.");
+the judge (`_drill_done`) counts each of the seven once by its result (`DRILL_WALK_THINGS`: a move
+refused, "you are on the quarterdeck already", is not a move; a paper counts only where it was read,
+one asked for from elsewhere being the refusal in words) and names what is still to run in words
+("still to run, go below, eat or drink, a paper read where it is kept and come on deck"); the
+consent record's `drill` field says which drill ran: "passed" for the three, "passed, with the walk"
+for the seven (`DRILL_PASSED_WALK`; `Record.proceeds` and `drilled` take both). The walk's orders
+are carried out by the drill's world's own captain (`Harness.drill`: in the drill the harness gives
+the walk's four orders through `World.submit` as the captain's and refuses the rest; the
+conversation's senses are his meanwhile, so the library reads by his place), its lines real in that
+world (`captain.below`, `captain.on_deck`, the eating) and in no game's; the station brief follows
+when the seven have run. In-world under 85's rule (the drill's text names no package and no build;
+tested). `docs/agents/ConsentBrief.md` not edited. Truth 7-381 runs with the switch on; 37's drill
+tests stand unchanged with it off.
+
+**The sentence package 55 will need in the consent brief**, for when the switch is turned on: "For a
+station that asks it (the officer of the watch's), a short drill follows a yes, as data in the same
+conversation and before the station brief: open a section of the library, write a line in the
+journal, stand by until a bell, and take a walk about the ship (go below, eat or drink there, read
+one of the ship's papers where it is kept, come on deck); seven things in up to eight replies; a
+model that cannot is thanked and stood down, with a record."
+
+**Taken another way, with the reason.** (1) **The drill's world is a ship and not a point** when
+the walk is on: the consent conversation sailed `World(seed=0)`, a point ship with people and no
+stores, which keeps no papers and has no cabin to go below to; with the switch on the drill's world
+is the frigate at seed 0 in a calm (`DRILL_SHIP`, `make_world`, a third of a second), so the walk has
+rooms and a paper; its lines are the consent conversation's own and never a game's (§10's "the real
+world" read as the drill's world, the only world the consent step has). With the switch off the
+point world stands as it was. (2) **The walker is the drill's world's captain**, not the station's
+person: the consent conversation has no station and no person (`CONSENT_STATION`, authority none),
+so `submit_order` through the tools would be refused for want of authority; `Harness.drill` gives
+the walk's four orders as the captain's at the prompt and refuses every other in the drill's words,
+which is also how "an order of the deck or of the world is refused" is kept without widening the
+consent station's authority. (3) **The paper the text names is the price list in the cabin**, since
+the walker is the captain and `go below` takes him there; §10's "any paper kept where he is" stands
+(the judge counts any paper read where it is kept). (4) **A reminder follows an empty reply or a
+reply a stand-by ended, and no other**: after a reply whose calls ran, the drill goes on from their
+results, as 37l has it; the test pins the three reminders of its script.
+
+**Found on the way** is in the tuning notes (the `@dataclass` decorator and a helper's placing; the
+developer's empty turn counted as the drill's first reply).
+
+### Step 8: the edge cases' truths and the records (§12, §13, §14; 2026-11-06)
+
+**Built as designed**: truth 7-377 (the boat away with the player: his senses the boat's deck's,
+every row his and nothing greyed; the ship's standing order sets her royals while he is away and
+the lines are in her log and not in the boat's; her lookout's line in the boat's log is the ship
+seen; a word said on her deck within hearing written in the boat's log as heard), truth 7-378
+(the frigate with the brig X in sight at night and a fake captain who goes below, is reported to
+and called, comes on deck and drafts a book, saved at the half and at the end, replayed by its
+transcript and by its acts to the same digests of both hulls' logs), truth 7-384 (a visitor put in
+another hull's cabin reads her glass, her tell-tale's heading, her chart's rows and her log and
+chart, none of her deck and not her view; a person put in her hold reads the hold's, her manifest
+there, none of her deck, her log not to be had; the confinement itself is package 74's,
+`Person.confined_to`, nothing of it built here). The records: spec M7b §14's provisional list
+replaced by the rule as built; `docs/agents/Harness.md` §21h (the place's knowledge, for a
+model's reader) and §21's words; the primer's chapters 14 (what reaches a person in each place),
+16 (the duty to report and the call, the command devolved, the told order) and 19 (every sample
+carries what the place allows; the library where the ship's own are kept), in-world under 85's
+rule; the director's library page gains a section, "what a person knows where he stands"; the
+tuning notes. Every truth of 7-370 to 7-389, 7-420 and 7-421 has its test.
+
+**Taken another way, with the reason.** (1) Truth 7-377's "by sight and hail": the ship's own
+lookout line in the boat's log is the sight (the boat's lookout has her as a sail in sight), and
+the hail is a word said on her deck heard across the water (`say as the first lieutenant`), since
+a hail order from her deck wants a giver aboard her and her captain is in the boat; the test
+asserts the word only while the boat lies within four cables. (2) Truth 7-378 is run with the
+brig X in sight at night so that the sighting lines are reports and calls both, deterministic
+from the seed; the digest compared is of both hulls' logs, as 84's tests compare them. (3) The
+captive's reading is tested by his place alone, the confinement being 74's hook. (4) The
+visitor's `say` at the prompt said as "the captain" (step 4's finding c; the lead's ruling: mine
+in step 8 if a seat of the visitor's voice and no wider): mended narrower than a seat. `orders.stations._say`
+reads `knowledge.players_visitor` when the prompt's words are the captain's own: the line is then in
+his name and from his spot ("Captain Bowen, a visitor of the Amazon, in the cabin: good day to you"),
+and the ship's own captain's station is not skipped as the speaker, so a model at her captain's
+hears him; no seat is made and nothing else of 82's voice is touched. The hearers were right
+already (step 4's `hearing.station_spot` read his spot).
+
+**Found on the way** is in the tuning notes.

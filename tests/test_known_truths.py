@@ -13532,6 +13532,39 @@ def test_truth_7_375_the_masters_days_work_is_done_in_the_gunroom():
     test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike()
 
 
+def test_truth_7_377_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone():
+    """The player in his own boat manned as a hull reads her as a deck; the ship's lines
+    reach him by sight and hail alone (the design's §12)."""
+    from tests.test_knowledge import (
+        test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone,
+    )
+
+    test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone()
+
+
+def test_truth_7_378_the_replay_to_the_same_digest_by_both_roads():
+    """A passage with a fake captain who went below, was reported to and called, came up
+    and drafted a book, saved at the half and at the end, replays by its transcript and by
+    its acts to the same digests of both hulls' logs (the design's §13)."""
+    from tests.test_knowledge import (
+        test_a_passage_with_a_captain_below_reported_to_called_and_writing_replays_by_both_roads,
+    )
+
+    test_a_passage_with_a_captain_below_reported_to_called_and_writing_replays_by_both_roads()
+
+
+def test_truth_7_381_the_drills_walk(tmp_path, monkeypatch):
+    """The fitness drill's walk (the design's §10), behind the `DRILL_WALK` switch (off on
+    the trunk by the lead's ruling until package 55 re-briefs; on here): a model that goes
+    below, eats, reads a paper where it is kept and comes on deck passes; one that asks for
+    the manifest from the cabin is told it is in the hold and passes with another paper; the
+    record says "passed, with the walk"; one that never walks is stood down with the walk
+    named."""
+    from tests.test_knowledge import test_the_drills_walk_teaches_the_places_before_the_game
+
+    test_the_drills_walk_teaches_the_places_before_the_game(tmp_path, monkeypatch)
+
+
 def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
     """The console shows the captain in the cabin no deck line and the officer's report, and
     `log N` reads back the same; `knowledge: all` shows everything; the director's seat and
@@ -13556,6 +13589,17 @@ def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words
     from tests.test_knowledge import test_the_lookouts_station_reads_the_horizon_and_no_instrument
 
     test_the_lookouts_station_reads_the_horizon_and_no_instrument()
+
+
+def test_truth_7_384_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places():
+    """A visitor aboard another hull reads her by his place in her (her cabin's glass and
+    none of her deck); a person put in her hold reads the hold's (the design's §12; the
+    confinement itself is package 74's)."""
+    from tests.test_knowledge import (
+        test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places,
+    )
+
+    test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places()
 
 
 def test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place(tmp_path):

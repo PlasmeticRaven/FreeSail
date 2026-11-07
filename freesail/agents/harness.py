@@ -1650,6 +1650,11 @@ class Harness:
         knowledge, `world.knowledge.Senses`): his place's senses, a sleeper's, everything
         for the director and under `knowledge: all`. Read afresh at each call (the person
         moves by his own orders between looks); the lookups are the people's."""
+        if self.drill is not None:
+            # the drill's walker (package 65, step 7): the conversation reads by the place of
+            # the drill's world's captain, whom the walk moves
+            people = getattr(self.world, "people", None)
+            return knowledge.senses_of(self.world, getattr(people, "captain", None))
         if self._is_directors or self.conversation:
             return knowledge.EVERYTHING
         world = self.world
@@ -1665,6 +1670,9 @@ class Harness:
     # moves by an order, and a job's move writes a line): the stand-by's scan of each new
     # line a tick asks for them many times (package 65; the pace)
     _senses_held: tuple[tuple[int, int, int], knowledge.Senses] | None = None
+    # the fitness drill's walk (package 65, step 7): the orders the drill takes and the
+    # words that refuse any other; None outside the drill (`consent.Session._begin_drill`)
+    drill: tuple[tuple[str, ...], str] | None = None
     # the lines slept through (package 65; `__init__` sets it): a class default so that a
     # harness restored from a checkpoint written before the package has it
     _slept: tuple[int, int] | None = None
@@ -2722,6 +2730,15 @@ class Harness:
                 f"There is no tool named '{c.name}' in this conversation; the tools here "
                 f"are {only}."
             )
+        if c.name == "submit_order" and self.drill is not None:
+            # the drill's walk (package 65, step 7; the design's §10): the walk's orders
+            # alone, given as the drill's world's own captain (the walker, whose senses the
+            # conversation reads meanwhile); any other order waits for the game
+            orders, refused = self.drill
+            text = " ".join(str(c.args.get("text", "")).lower().split()).rstrip(".")
+            if text not in orders:
+                return refused.format(text=" ".join(str(c.args.get("text", "")).split()))
+            return self.world.submit(text).text
         before = len(self.world.log)
         if c.name == "submit_order":
             self._in_order, self._nudge_for_result = True, None
