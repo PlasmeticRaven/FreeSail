@@ -1505,6 +1505,16 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   (232 s and 230 s), trial A in 149 s as before, and the brig's and the frigate's after yards swing as
   before (the short swing for them, measured and not built, takes the frigate under five minutes: the
   lead's).
+- **The lead's ruling 2, built (2026-11-07; the tuning notes, as above):** the word by Luce 1884
+  p. 417: the after yards of every ship whose main course is not set are hauled by "Main-topsail
+  haul", "Rise tacks and sheets. Mainsail haul." kept for a main course set, and "Rise tacks and
+  sheets" said only while a course is set (`TackScript._haul_words`). Her main crossing no course,
+  trial B and the main topgallant say "Rise tacks and sheets. Main-topsail haul." at 32 s, their
+  fore course's tacks and sheets risen with it; every other line and every time as before, no whole
+  log moved, and one digest (gate 5b's thick passage, the frigate put about with both courses
+  hauled up) re-pinned old beside new. Her main topgallant's yards are hauled by "Main-topsail haul"
+  though she crosses no main topsail, as ruled; the fore's rise named apart before "let go and
+  haul", as Luce has it when the mainsail is hauled up, is a lean for the lead, not built.
 
 ### 12.3 What the viewer builder (B5) is asked
 

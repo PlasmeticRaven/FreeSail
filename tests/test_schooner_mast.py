@@ -20,7 +20,8 @@ counted for nothing; a brig whose main yard is shot away and sent down a brig st
 held once a ship, and the schooner whose fore yards are all shot away pinned as she stands (the
 case reported to the lead); the pickle and the checkpoint of a rig that has read the rule as
 they were before it read it; and the short after swing, a schooner's light main yards' alone,
-trial B's tack with it.
+trial B's tack with it, and the word they are hauled by, "Main-topsail haul" (the lead's ruling
+2, Luce 1884 p. 417: her main crosses no course).
 """
 
 from __future__ import annotations
@@ -478,14 +479,38 @@ def test_no_committed_ship_file_swings_her_after_yards_short(path):
     assert _after_swing_s(load_ship(path)) == EVOLUTIONS["tack"].timing["brace_s"]
 
 
+@pytest.mark.parametrize(
+    ("build", "said"),
+    [
+        (schooner_with_main_topsail, "Rise tacks and sheets. Main-topsail haul"),
+        (schooner_with_main_topgallant, "Rise tacks and sheets. Main-topsail haul"),
+        (polacre_probe, None),
+        (schooner_with_fore_course, None),
+    ],
+    ids=["trial B", "main topgallant", "polacre", "trial A"],
+)
+def test_a_schooners_main_yards_are_hauled_by_main_topsail_haul(build, said):
+    """The lead's ruling 2 of 2026-11-06 (Luce 1884 p. 417): a schooner's main crosses no course,
+    so her mainsail is never set and her after yards, the main topsail yard or the main
+    topgallant's two, are hauled by "Main-topsail haul!", her fore course's tacks and sheets
+    risen with it while it is set ("Rise tacks and sheets. Mainsail haul." before the ruling).
+    The polacre and trial A have no after yards and say nothing at the haul, as before."""
+    ship = _under_plain_sail(build())
+    tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
+    assert (tack._haul_words() if tack.after else None) == said
+
+
 def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_does(tmp_path):
     """Trial B tacked at seed 7 in 15 knots, settled 2,400 s under plain sail braced sharp up and
     trimmed every two minutes (B3.4's measure; the tuning notes, "The lead's four rulings,
-    built"): "Rise tacks and sheets. Mainsail haul." at 32 s, her head 9 degrees short of the
-    wind; the main topsail yard swung in 26 s (the short swing's 20 s by the weather and the
-    hands) where the 45-s swing took 59 s; "Let go and haul." at 58 s where it waited to 91 s,
-    the fore yards no longer held aback with her head through the wind; tacked in 151 s where it
-    was 219 s, within the schooner's two and a half minutes and 2 s over trial A's 149 s."""
+    built"): "Rise tacks and sheets. Main-topsail haul." at 32 s, her head 9 degrees short of
+    the wind (her main crossing no course, the word is Luce's for the mainsail not set, the
+    lead's ruling 2; "Rise tacks and sheets. Mainsail haul." before it, the rise of her fore
+    course's tacks and sheets kept); the main topsail yard swung in 26 s (the short swing's 20 s
+    by the weather and the hands) where the 45-s swing took 59 s; "Let go and haul." at 58 s
+    where it waited to 91 s, the fore yards no longer held aback with her head through the wind;
+    tacked in 151 s where it was 219 s, within the schooner's two and a half minutes and 2 s over
+    trial A's 149 s."""
     sc = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,
@@ -508,14 +533,15 @@ def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_do
     while not done and world.clock.tick - start < 900:
         world.tick()
         done = [e.kind for e in world.log if e.tick > start and e.kind in ends]
+    haul = "Rise tacks and sheets. Main-topsail haul."
     said: dict[str, int] = {}
     for e in world.log:
-        for key in ("Mainsail haul", "Let go and haul"):
+        for key in (haul, "Mainsail haul", "Let go and haul"):
             if e.tick >= start and key in e.text:
                 said.setdefault(key, e.tick - start)
     assert done == ["ship.tacked"]
-    assert set(said) == {"Mainsail haul", "Let go and haul"}
-    assert 20 <= said["Let go and haul"] - said["Mainsail haul"] <= 30  # 26 s; 59 s on brace_s
+    assert set(said) == {haul, "Let go and haul"}  # no "Mainsail haul" (ruling 2)
+    assert 20 <= said["Let go and haul"] - said[haul] <= 30  # 26 s; 59 s on brace_s
     assert 90 <= world.clock.tick - start <= 180  # 151 s; 219 s on brace_s
     assert world.ship.dyn.tack == "larboard"
 

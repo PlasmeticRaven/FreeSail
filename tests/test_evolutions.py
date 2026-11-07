@@ -674,12 +674,14 @@ def test_tack_succeeds_when_the_ship_turns(path):
     assert "braced up on the larboard tack" in texts(notes)[-1]
     words = texts(notes)
     if path == FRIGATE:
-        assert words.index("Rise tacks and sheets. Mainsail haul.") < words.index(
-            "Let go and haul."
-        )
+        # her courses furled as she is loaded, so no course is set: "Main-topsail haul." (Luce
+        # 1884 p. 417; package 75, the lead's ruling 2), "Rise tacks and sheets. Mainsail
+        # haul." before it
+        assert words.index("Main-topsail haul.") < words.index("Let go and haul.")
     else:
         # a vessel with no after yards has no "mainsail haul" (package 32e)
-        assert "Let go and haul." in words and not any("Mainsail haul" in w for w in words)
+        assert "Let go and haul." in words
+        assert not any("Mainsail haul" in w or "Main-topsail haul" in w for w in words)
     # The stub's turn rate sets the time; a frigate should take five to ten minutes.
     assert 240 <= ticks <= 600
     assert ship.dyn.tack == "larboard"
@@ -690,6 +692,66 @@ def test_tack_succeeds_when_the_ship_turns(path):
             assert y.brace_angle == pytest.approx(-y.brace_limit), y.id
     assert ship.dyn.helm_mode is HelmMode.HEADING
     assert runner.in_progress() == []
+
+
+BRIG = "data/ships/brig.yaml"
+SET, UP = SailState.SET, SailState.IN_THE_GEAR
+
+
+@pytest.mark.parametrize(
+    ("path", "fore", "main", "said"),
+    [
+        (FRIGATE, SET, SET, "Rise tacks and sheets. Mainsail haul"),
+        (FRIGATE, UP, SET, "Rise tacks and sheets. Mainsail haul"),
+        (FRIGATE, SET, UP, "Rise tacks and sheets. Main-topsail haul"),
+        (FRIGATE, UP, UP, "Main-topsail haul"),
+        (FRIGATE, SailState.FURLED, SailState.FURLED, "Main-topsail haul"),
+        (FRIGATE, UP, SailState.GOOSE_WINGED, "Rise tacks and sheets. Mainsail haul"),
+        (FRIGATE, SET, SailState.BLOWN_OUT, "Rise tacks and sheets. Main-topsail haul"),
+        (BRIG, SET, SET, "Rise tacks and sheets. Mainsail haul"),
+        (BRIG, SET, UP, "Rise tacks and sheets. Main-topsail haul"),
+        (BRIG, UP, UP, "Main-topsail haul"),
+    ],
+    ids=[
+        "frigate both set",
+        "frigate fore hauled up",
+        "frigate main hauled up",
+        "frigate both hauled up",
+        "frigate both furled",
+        "frigate main goose-winged",
+        "frigate main blown out",
+        "brig both set",
+        "brig main hauled up",
+        "brig both hauled up",
+    ],
+)
+def test_the_word_at_the_after_yards_haul_is_luces_by_the_main_course(path, fore, main, said):
+    """Luce 1884 pp. 416-417 (package 75, the lead's ruling 2 of 2026-11-06): "Rise tacks and
+    sheets! ... Mainsail haul!" with the mainsail, the main course, set; "Main-topsail haul!"
+    when it is not (hauled up, furled, blown out); "Rise tacks and sheets" while any course is
+    set, and not with none (their clews up already); goose-winged, drawing by its weather clew,
+    counts as set (judgement). Before the ruling every one of these said "Rise tacks and sheets.
+    Mainsail haul"."""
+    from freesail.evolutions import scripts
+
+    ship = load_ship(path)
+    ship.sails["fore.course"].state = fore
+    ship.sails["main.course"].state = main
+    assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == said
+
+
+def test_the_main_yard_shot_away_takes_the_mainsail_with_it_from_the_word():
+    """The main yard shot away, its course goes with it from the courses (`lowest_square_sails`
+    reads the working yards): the after yards left are hauled by "Main-topsail haul"."""
+    from freesail.evolutions import scripts
+
+    ship = load_ship(FRIGATE)
+    for sid in ("fore.course", "main.course"):
+        ship.sails[sid].state = SailState.SET
+    ship.spars["main.yard"].wrecked = True
+    assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == (
+        "Rise tacks and sheets. Main-topsail haul"
+    )
 
 
 def test_tack_misses_stays_when_she_loses_her_way():
