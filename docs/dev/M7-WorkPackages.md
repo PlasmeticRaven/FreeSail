@@ -54,7 +54,7 @@ on these packages; that is the owner's choice.
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b; **the design approved 2026-11-07** (nine rulings; `docs/design/Design-Prizes.md`); step 1 merged 2026-11-07 (9acab09); step 2 merged 2026-11-07 (1bb24f52), truths 7-351 to 7-354; on step 3 (the captive's channel), steps 3 to 7 one at a time from the builder's scratch branch |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package; the hold (SW-5) and B3.4 merged 2026-11-06 (f414ed1); SW-4 merged 2026-11-07 (73b9469); B3.4's four rulings merged 2026-11-07 (3c9df9e1); B2 (the *Neufchatel*) and B3.4b (the word's two cases, the dismasted lines) in hand to one final report |
-| 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone; the research pass approved 2026-11-07; **the pass and step 1 (Britain) merged 2026-11-07 (4f3694b2)**; step 2 (France) merged 2026-11-07 (943b453f); steps 3 (Spain), 4 (the United States and Naples), 6, 7 and item 8 (colours.yaml) built on the branch, their report awaited |
+| 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone; the research pass approved 2026-11-07; **the pass and step 1 (Britain) merged 2026-11-07 (4f3694b2)**; step 2 (France) merged 2026-11-07 (943b453f); steps 3 (Spain), 4 (the United States and Naples), 6, 7 and item 8 (the flags of command and identity) merged 2026-11-07 (649c5478), truths 7-426 to 7-435; open for the owner's shelf answers to its seven questions, each a data change by the same road |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806); **found by package 81 (2026-11-07), for this package:** a hole above the water is made at 0.3 to 1.8 m above the waterline whatever the side's height (`combat/hits.py`, 73's), so a cutter's hole can stand above her rail: cap a hole at the side's height at its x (the profile's rail where the file gives one); and a tick on each volley (`Volley` in `combat/guns.py`) for the viewer's exact stamp of each round (81 stamps a round with its snapshot's tick meanwhile) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
@@ -3115,6 +3115,80 @@ four floor tests as runs 48, 49 and 52 at 379 to 442 against 500, the shared run
 build machine alone held 13 of 13 at 12:09 on the trunk before this merge; B3.4 touches no tick of
 the pace's passages). B2 (the *Neufchatel*) starts on these; the one
 final report for 75 follows.
+
+### Package 76, steps 3, 4, 6 and 7 and item 8 (Spain, the United States and Naples from the page; the checker; the truths; the flags of command and identity), as merged (2026-11-07)
+
+**What landed:** the builder's 7c35713 (claude/pkg-76: the steps' commits, the trunk merged at
+9c3a306 and 6aea118, the trade trial's pin re-measured at b0cda9c, the figures and step 7's
+notes at 7c35713, nothing after it), merged `--no-ff` by hash at 649c5478 onto b92dca34, a
+clean merge. **Step 3, Spain a root of her own:** `data/signals/spain/` from Mazarredo's
+Instrucciones y señales (Cádiz 1781, the third edition by royal order), read on the page: the
+hoist's form a table (his four hundred cells of two flags of twenty), the numerary 100 entries,
+87 from the page (his cells; his twenty one-flag signals numbered 401 to 420) and 13 made and
+marked; the night 61 from the page (his three chapters under sail told apart by a rocket or the
+stern lanterns, five articles at anchor); the fog 19 (his first chapter, guns in two times); the
+convoy 35 (the squadron's cells and his orders to a convoy's commander, 4 made); the private
+form basic's word for word so that her draw stands; no dictionary; the system well-built on his
+numbers of 1781, the 1797 question stated in the declaration for the owner's shelf; her line in
+nations.yaml moved to her root; no code changed for her. **Step 4:** the United States from
+Barry's A Set of Signals (Norfolk 1800), a flag a figure, 69 entries (54 at his numbers, 15
+made), the night his lantern figures, the squadron's flags of 1803 to 1804 from Preble's account
+in the declaration; Naples from the flotilla's book of 1807 (the declaration saying 1807 and
+Joseph's kingdom, the Bourbon book of 1805 not found), 55 entries (46 at its numbers, 9 made),
+13 night signals by number; Portugal on basic for signals, her flags in basic's colours.yaml
+dated to 1816; basic's declaration naming whom it stands for (the Batavian Republic, Denmark,
+Portugal, Morocco and Algiers, Sardinia, Etruria, Liguria, the Papal State). **Step 6:**
+`tools/check_signals.py` over every root (each root loads with its seventh file; every does
+parses against a frigate or names a form of 71's design; every source named; an entry not
+marked made cites a page of the period; the private form drawable; every nation reads the root
+under her name), and per root a hoist read by her own book and "a signal we cannot read" by
+another's, the convoy of four tacking in succession on one hoist of her own book. **Step 7:**
+truths 7-426 to 7-433 as the brief words them; the design note's postscript "As built out",
+spec M7 §3 as built, Harness §21d, the primer's chapter 23 in-world, the tuning notes. **Item 8,
+the flags of command and identity (the owner's addition):** every root's `colours.yaml` in the
+approved shape (the flags by name with words, proportion, drawing, dates and source; the
+occasions by role in 81's place words), Britain from Perrin, France from the law of 1794 as
+Preble gives it, Spain from the owner's Winfield answer (pp. 59 to 60, cited and not copied: the
+ensign of 28 May 1785 and the quartered jack, the jack's colours the builder's judgement and
+said so), the rest from the 1820 plates dated against Perrin and Preble; `freesail/world/flags.py`
+(new) sets what flies where by the colours, the role, the occasion and the flags ordered;
+`Locker.flies` the viewer's list (81's viewer serves it as it is; the drawing's lines kept apart
+under `drawing.lines`, since 81 draws a part with no rect as the whole field); the lookout says
+what flies beyond the ensign where the colours' line already falls ("she wears a pendant at the
+main: a man-of-war"); the orders `hoist the broad pendant`, `hoist a second ensign at the main`,
+`hoist the jack`; `make the Spanish private signal` and `make the private signals in succession`
+from the tables held (her own, an ally's by the scenario's papers, a captured book by 74's road),
+refused in words naming the tables held, a challenge in a named form answered only by a ship of
+that nation and judged against that form's table, three minutes a hoist in succession, the
+verdict naming the forms (the Java's move of 1812). **Truths 7-434 and 7-435.** **What moved,
+two pins, each proven by its entry put back:** test_nations' Spain line (basic to spain,
+well-built); TRIAL_TRADE_STRANGER_DIGEST 5e7bdba2a4f4770b to aa04702e062bc64b, the French
+brig-sloop's two made-out lines gaining "; she wears a pendant at the main: a man-of-war", the
+words switched off (`flags.FLAGS_SPOKEN`) giving the old digest with the 1,594 lines, the states
+and the anchored ticks unmoved. **Taken another way, each accepted:** weighing in the Spanish
+book made (433); the Spanish convoy reading the squadron's cells; the three new roots' private
+forms basic's word for word; the checker parsing against a frigate; a stranger answering only a
+challenge in her own form, for the item's named-form challenges alone; the succession's wait
+three minutes a hoist; the drawing's lines apart from 81's parts. **Found for others:** "shake
+out the reefs" in every root is a far body's form and not the dialect's words (a near commanded
+captain given it by signal would be refused): named a design form in the checker, for the lead
+(71's handling); a challenge made by the player while his captain does not command is never
+judged (71's rule); 74's `Colours.over` is the field an "as a prize" occasion would read, not
+built as ruled. **Hooks named for 74 and 72, not built:** a doctrine line for a rules captain
+holding more than one table (the private signals in succession to a stranger who does not
+answer the first) and a privateer hoisting another nation's challenge as a ruse (74's files); a
+set's admiral by rank wanting the captain's rank (72's). **The builder's suites at b0cda9c** (a
+worktree pinned there): ruff check and format clean; the fast tier exit 0, 6,600 passed, 1
+xfailed; the slow tier of the touched files, their neighbours and the known truths exit 0, 570
+passed, 8 xfailed; the pace alone and last 13 of 13. **The lead's merge:** the trial on b92dca34
+clean and lint-clean; no forbidden word new in the diff; nothing of 74's, 75's or 81's files,
+the physics and `data/ships/` untouched; the fast tier whole on it green, exit 0 (15:04 to 15:45 UTC), 6,657 passed, 2 skipped, 1 xfailed, none failed; the whole suite
+in the cloud dispatched after run 53, the figures to follow. Step 5's substance (the lookout's
+reading, the private signals in succession) is item 8's; what a corrected number moves is the
+steps' "what moved". Package 76 has one thing left: the owner's shelf answers to its seven
+questions as they come (the 1797 quaderno, the 1799 fog book, the convoy book, the French book
+of 1804 to 1805), each a data change by the same road; the lead holds the package open for them
+and closes it with the owner.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
