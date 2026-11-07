@@ -197,6 +197,10 @@ class Books:
     # the dictionary's words by every form its printed entries give ('Expect-ed-ing-ation':
     # expect, expected, expecting, expectation), to the entry's number (package 76)
     forms: dict[str, int] = field(default_factory=dict)
+    # how a numbered signal is hoisted (package 76): 'numerary', a flag a figure (the British
+    # book: No. 245 three flags), or 'table', two flags, the upper and the lower, read as a
+    # cell of a square table whatever its number (du Pavillon's, Mazarredo's)
+    hoist_form: str = "numerary"
 
     # -- finding an entry --------------------------------------------------------------
 
@@ -440,7 +444,18 @@ def load_books(root: str = "basic", base: str | None = None) -> Books:
         carried_by=tuple(str(r) for r in (private.get("carried_by") or _ROLES_WITH_TABLE)),
         answer_wait_s=int(private.get("answer_wait_s", 300)),
         forms=word_forms(words),
+        hoist_form=_hoist_form(head, folder),
     )
+
+
+HOIST_FORMS = ("numerary", "table")
+
+
+def _hoist_form(head: dict[str, Any], folder: Path) -> str:
+    form = str(head.get("hoist_form") or "numerary")
+    if form not in HOIST_FORMS:
+        raise BookFileError(f"{folder}/book.yaml: hoist_form is one of {HOIST_FORMS}, not {form!r}")
+    return form
 
 
 def roots() -> list[str]:
@@ -618,6 +633,7 @@ class Hoist:
     words_made: list[str] = field(default_factory=list)  # a telegraphic sentence's hoists
     serial: int = 0
     complete_at: int | None = None  # a telegraphic sentence's last hoist up; else breaks_out
+    form: str = "numerary"  # the book's hoist_form: how the flags look to a lookout without it
 
     @property
     def done_at(self) -> int:
@@ -652,6 +668,9 @@ class Hoist:
         if self.book == "telegraphic":
             return "the telegraph flag over a hoist of flags"
         if self.book in ("numerary", "convoy"):
+            if self.form == "table":
+                # two flags a signal, the upper and the lower, whatever the cell's number
+                return f"{_count(2 * max(1, len(self.numbers)))} flags at the main"
             n = len(str(self.numbers[0])) if self.numbers else 1
             return f"{_count(n)} flag{'s' if n > 1 else ''} at the main"
         if self.book in ("private", "reply"):
@@ -671,6 +690,9 @@ class Hoist:
             "to": self.to,
             "down": self.down,
             "answered_by": sorted(self.answered_by),
+            # written only where it is not the numerary's, so that no British or basic
+            # signal's record changes with the field (package 76)
+            **({"form": self.form} if self.form != "numerary" else {}),
         }
 
 
@@ -849,6 +871,7 @@ def make_hoist(
         in_succession=entry.in_succession,
         root=books.root,
         to=to,
+        form=books.hoist_form,
     )
     return locker.hoist(h)
 

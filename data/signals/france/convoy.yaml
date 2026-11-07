@@ -1,10 +1,19 @@
-# FreeSail: the French instructions to merchantmen under convoy (spec M7 §3; package 71;
-# docs/design/Design-Signals.md). The form is data/signals/britain/convoy.yaml's; the French
-# coastal convoys of 1805 (Brest to Lorient, the Channel ports under the batteries) were
-# worked by the escort's signals in the Code's manner (from memory); every number and hoist
-# MADE, the book the dozen meanings a convoy wants.
+# FreeSail: the French instructions to merchantmen under convoy (spec M7 §3; package 71, built
+# out by package 76; docs/design/Design-Signals.md). Audibert Ramatuelle's chapter on the
+# escort of convoys (Cours élémentaire de tactique navale, 1802, part II ch. V; docs/references/
+# signals/) gives the practice: the commander of the convoy gives every ship under his escort
+# its own signals of day, night and fog, which no ship may let be taken (an officer who does,
+# in a surrender, answers to a council of war); recognition at a distance by sails hoisted,
+# lowered, sheeted home or clewed up a set number of times, with a flag or pendant at the
+# moment named; by day each ship shows on his signal a black tablet with the day's number
+# painted on it, on both sides; at night words of the watch, and a doubtful ship questioned on
+# her port, her owners, her captain and her name. He prints no table of the convoy's signals,
+# so the meanings below are the masters' book's in the period's form and every number is MADE.
+#
+# The form is the numerary's (number, meaning, also, does, in_succession, qualifiers, source,
+# made).
 
-source: "the French escorts' convoy signals (the form from memory; made)"
+source: "the practice Audibert 1802, part II ch. V (the escort of convoys); the meanings in the period's form, the numbers made"
 made: true
 
 entries:
@@ -31,3 +40,5 @@ entries:
   - {number: 21, meaning: "Affirmative", also: ["yes", "affirmative", "the signal is seen and understood"], does: {answer: "affirmative"}, source: "made", made: true}
   - {number: 22, meaning: "Negative", also: ["no", "negative", "cannot comply"], does: {answer: "negative"}, source: "made", made: true}
   - {number: 23, meaning: "Annul the last signal", also: ["annul", "annul the signal", "annul the last signal"], does: {answer: "annulled"}, source: "made", made: true}
+  - {number: 24, meaning: "The ships astern to make more sail", also: ["the ships astern to make more sail", "ships astern make more sail", "the sternmost ships to make sail"], does: {order: "make all sail"}, source: "the meaning in the period's form (package 76: what the convoy's escort hoists for a straggler); made", made: true}
+  - {number: 25, meaning: "The ships ahead to shorten sail", also: ["the ships ahead to shorten sail", "ships ahead shorten sail", "the headmost ships to shorten sail"], does: {order: "shorten sail"}, source: "the meaning in the period's form; made", made: true}

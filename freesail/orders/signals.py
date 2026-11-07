@@ -806,6 +806,7 @@ def _repeat(world: Any, locker: Any, tick: int) -> Result:
         in_succession=h.in_succession,
         root=h.root,
         to=h.to,
+        form=h.form,
     )
     locker.hoist(copy)
     line = _start_hoist(world, locker, copy, 1, copy.words())
