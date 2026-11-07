@@ -1966,6 +1966,8 @@ class Judgement:
             and int(s.get("size") or 0) > int(p.own_size or 0)
             # package 70: a merchantman of a bigger hull is a prize, not a superior force
             and "merchant" not in str(s.get("known") or "").lower()
+            # package 74: a ship that has struck is nobody's superior force
+            and not self._stranger_struck(s)
         ]
         if not enemies:
             return None
@@ -2219,6 +2221,8 @@ class Judgement:
             words = str(s.get("known") or "").lower()
             if not any(w in words for w in MAN_OF_WAR_WORDS):
                 continue
+            if self._stranger_struck(s):
+                continue  # package 74: a man of war that has struck is nobody's danger
             if self._is_enemy(s) or s.get("nation") is None:
                 return s
         return None
@@ -4474,12 +4478,6 @@ class Captain(Judgement):
         if v is None or getattr(v, "done", False) or not getattr(v, "struck", False) or is_prize(v):
             if not (v is not None and is_prize(v)):
                 self._enter("on passage")
-            return
-        from freesail.world.ships import PLAYER_ID
-
-        if str(getattr(v, "id", "")) == PLAYER_ID:
-            # the player's own ship struck to him: the captive's channel (the design's §3,
-            # step 3) takes possession of her; until then he lies by her and no more
             return
         here = getattr(self.world, "position", None)
         if here is None or v.position is None:

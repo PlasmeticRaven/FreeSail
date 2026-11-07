@@ -168,6 +168,13 @@ COMPANY_CLOSING_KN = 2.0
 # the tops make out at four miles), and what she is when made out (spec M5 §25: the
 # brig-sloop of the Navy and the merchant brig of the trade, one file, two descriptions).
 DESCRIPTIONS: dict[str, dict[str, str]] = {
+    # package 74 (the design's §3.4): a cartel, a merchant brig under a flag of truce with
+    # the one errand; her words and places filled out are package 80's
+    "cartel": {
+        "file": "data/ships/brig.yaml",
+        "rig": "a brig",
+        "what": "a cartel",
+    },
     "frigate": {
         "file": "data/ships/frigate-36.yaml",
         "rig": "a ship",

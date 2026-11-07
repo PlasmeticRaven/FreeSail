@@ -471,7 +471,12 @@ class FarCaptain(Judgement):
         # struck is the mark struck (the far fight is 74's; `combat/far.py` the measure)
         th = self.doctrine.threshold if self.doctrine is not None else (lambda k, v=None: v)
         for s in p.strangers:
-            if not self._is_enemy(s) or s.get("estimate_m") is None:
+            if s.get("estimate_m") is None:
+                continue
+            # the mark in hand struck counts whatever her colours say now (struck, she shows
+            # none, and the lookout's nation of her is gone: package 74)
+            mine = bool(self._stranger) and str(s.get("id") or "") == str(self._stranger)
+            if not mine and not self._is_enemy(s):
                 continue
             if float(s["estimate_m"]) / units.NAUTICAL_MILE > float(th("break_off_nm", 2.0)):
                 continue

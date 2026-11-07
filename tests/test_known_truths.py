@@ -14105,3 +14105,66 @@ def test_truth_7_354_the_prisoners_are_taken_aboard_by_the_boat_and_a_prize_is_b
 
     test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counted()
     test_a_prize_is_burnt_by_the_order_her_people_prisoners_and_the_prize_crew_home()
+
+
+def test_truth_7_355_the_player_struck_is_a_person_aboard_the_captor_with_a_prisoners_reach():
+    """The design's §3.1 (step 3): the player's colours struck have their consequence. Her
+    captor's rules captain takes possession of her (the prize master at her captain's
+    station, her people prisoners), and the player's person is put aboard the captor in the
+    cabin, a prisoner with his parole not yet asked and his sword in her captain's keeping,
+    his own station stood down by the handover's rule; his prompt follows his body (the
+    drivers follow him, a line of her log), and at her prompt he has a prisoner's reach:
+    `where am I` says his state, `say to the captain`, `ask`, `tell` and the readings his
+    place allows are his, every order of her deck is refused in words naming his state, and
+    every order of his own ship's, from her prompt or from his ship's, is refused as a prize's
+    under a prize master; her captain shapes his course for his doctrine's port with the
+    prisoners. A far body that takes him is made a hull and woken as a dealing of the first
+    rank, the prompt hers."""
+    from tests.test_captive import (
+        test_a_far_body_that_takes_the_players_ship_is_made_a_hull_and_holds_him,
+        test_the_player_struck_is_a_person_aboard_the_captor_his_station_down_and_his_prompt_with_him,
+    )
+
+    test_the_player_struck_is_a_person_aboard_the_captor_his_station_down_and_his_prompt_with_him()
+    test_a_far_body_that_takes_the_players_ship_is_made_a_hull_and_holds_him()
+
+
+def test_truth_7_356_the_parole_is_asked_in_the_captors_words_and_answered_in_the_captives_own():
+    """The design's §3.2 (the brief's §20 third truth as the design takes it): the captor's
+    rules captain asks the captive his parole a minute after the taking, in the period's words
+    of his nation from the hail table (the French captain's in French and English, Spain's
+    row beside), a line of her log where the captive stands and in no sample's operator voice
+    (the harness sends the brief alone in that voice; the exchange is the log's data: the
+    consent brief's rule); the captive's own words are read for it only while it is asked
+    (`I give you my parole` given, `I will not give it` refused), given by rule after a watch
+    when nothing readable came, the question put once more after a glass; given, the cabin and
+    the gunroom are his and the quarterdeck by day, his sword returned; refused, the gunroom
+    alone and a sentry at the door, said. The director sets a parole for a captive nobody asks
+    and is doubted while the captain waits an answer."""
+    from tests.test_captive import (
+        test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_while_one_waits,
+        test_the_parole_asked_by_doctrine_in_the_captors_words_and_given_in_the_captives_own,
+        test_the_parole_refused_asked_again_after_a_glass_and_given_by_rule_after_a_watch,
+    )
+
+    test_the_parole_asked_by_doctrine_in_the_captors_words_and_given_in_the_captives_own()
+    test_the_parole_refused_asked_again_after_a_glass_and_given_by_rule_after_a_watch()
+    test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_while_one_waits()
+
+
+@pytest.mark.slow
+def test_truth_7_357_the_prisoners_are_landed_to_the_ports_agent_and_a_cartel_brings_him_home():
+    """The design's §3.3 and §3.4: the captor in port lands her prisoners to the port's agent
+    for prisoners (le commissaire des prisonniers at Brest, el comisario de prisioneros at a
+    Spanish port, the Agent for Prisoners at a British one) with the list of their names and
+    the day they were first victualled, the captive's person ashore at that place, a prisoner
+    of war whose prompt's orders are refused as such; `cartel: a cartel from <port> for
+    <persons>` puts a cartel under a flag of truce on the sea at the port's road, whom no
+    captain fires on and the far captures pass by, who steers for the hull that holds the
+    persons, takes them off by the boat within hail and lands them free at her port; refused
+    for a person nobody holds, doubted beyond a day's sail of the port."""
+    from tests.test_captive import (
+        test_the_prisoners_are_landed_to_the_agent_at_brest_and_a_cartel_brings_the_captive_home,
+    )
+
+    test_the_prisoners_are_landed_to_the_agent_at_brest_and_a_cartel_brings_the_captive_home()
