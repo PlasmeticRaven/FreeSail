@@ -73,7 +73,9 @@ def test_the_valuation_is_the_rows_over_the_files_figures():
     from freesail.world.geo import Position
     from freesail.world.ships import Vessel
 
-    brig = Vessel("x", "X", "a brig", "data/ships/brig.yaml", "france", Position(49.4, -5.4))
+    brig = Vessel(
+        "x", "X", "a brig", "data/ships/merchant-brig.yaml", "france", Position(49.4, -5.4)
+    )  # her own file since package 75's SW-4 (brig.yaml's eighteen gave £1,248 before it)
     brig.description = "merchant brig"
     val = PC.valuation(w, brig)
     # her four long 6s of 20 cwt at £4 the hundredweight (the merchant brig's own file since
