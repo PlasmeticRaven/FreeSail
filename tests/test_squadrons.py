@@ -351,8 +351,12 @@ def test_an_enemy_made_out_closes_the_convoy_round_the_commodore_with_no_model_s
 def test_a_merchantman_brought_to_by_a_privateer_with_no_cover_strikes_and_joins_his_company():
     """Rule 5's least (74's hook): a merchant brig alone, a French privateer schooner a mile
     off who chases her and comes up within hail with no man of war of hers within two
-    miles: she strikes by rule, her colours struck, and joins the privateer's company as a
-    prize, keeping station on him as he returns to his cruise."""
+    miles: she strikes by rule, her colours struck, and (package 74, the design's §2.9: the
+    far possession on the records) is his prize at once, his colours over hers, under a
+    prize crew of his and bound for his port; by the privateer's doctrine (`prize_company:
+    parts`, the Channel privateers' habit of sending a prize in and cruising on) she parts
+    from him for Brest alone. The pin moved by 74: on the trunk she lay struck and joined his
+    company, keeping station on him; the cut-out's rule and its distance are as they were."""
     w = world_at(49.5, -5.5, intent=STATION_INTENT)
     w.crewed_settings = {"cap": 0}
     w.run(60)
@@ -381,15 +385,23 @@ def test_a_merchantman_brought_to_by_a_privateer_with_no_cover_strikes_and_joins
         name="Vengeur",
     )
     pv.sailing_factor = 1.0
+    from freesail.world import prizes as P
+
     for _ in range(150):
         w.run(60)
-        if prey.struck:
+        if P.is_prize(prey):
             break
-    assert prey.struck and prey.state == "struck"
-    assert prey.signals.colours.state == "struck"
-    company = w.squadrons.commanded_by(pv.id)
-    assert company is not None and prey.id in company.prizes and prey.squadron == company.id
+    rec = P.record_of(prey) or {}
+    assert P.is_prize(prey) and rec.get("how") == "cut out" and rec.get("captor") == pv.id
+    assert prey.nation == "france" and rec.get("nation_was") == "britain"
+    assert prey.signals.colours.state == "shown" and prey.signals.colours.over == "britain"
+    assert rec.get("crew", 0) >= P.PRIZE_CREW_LEAST and rec.get("prisoners", 0) > 0
+    assert rec.get("goal") == "brest"
+    assert w.squadrons.commanded_by(pv.id) is None and not rec.get("company")
+    assert not prey.squadron and prey.role == P.PRIZE_MASTER_ROLE
+    assert prey.brain is not None and prey.brain.intent.destination == "brest"
     assert any("struck" in words for _, words in prey.story)
+    assert any("taken by the Vengeur" in words for _, words in prey.story)
     assert any(e.kind == "squadron.cut_out" for e in w.log)
 
 

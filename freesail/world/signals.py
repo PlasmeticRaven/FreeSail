@@ -550,6 +550,11 @@ class Colours:
     fired_under_false: int | None = None
     adjective: str = ""  # the words of the nation shown, for a reader with no table in hand
     flag: str = ""
+    # package 74 (spec M7 §18): a prize wears her captor's colours over her own for a day
+    # after the taking (`over`: the nation whose colours fly under; `over_since` the tick),
+    # the period's sign of a prize; "" and 0 else, and in a checkpoint from before
+    over: str = ""
+    over_since: int = 0
 
     @property
     def shows(self) -> bool:
@@ -578,6 +583,16 @@ class Colours:
         flag = f", {short}" if short else ""
         if self.state == "distress":
             return f"{adjective} colours{flag}, the ensign union down"
+        over = getattr(self, "over", "")
+        if over and self.state == "shown":
+            # a prize: her captor's colours hoisted over her own (package 74)
+            under = None
+            if nations is not None:
+                try:
+                    under = nations.get(over)
+                except KeyError:
+                    under = None
+            return f"{adjective} colours{flag} over {under.adjective if under else over}"
         return f"{adjective} colours{flag}"
 
     def to_dict(self) -> dict[str, Any]:

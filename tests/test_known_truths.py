@@ -10451,10 +10451,14 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
     """Spec M7 §11a: the deck won. Against the same frigate at quarters, her gun crews at
     their guns and the deck held by her marines, the helm, the trimmers and the
     quarterdeck, the boarders with their arms served out carry it in a few rounds: her
-    colours come down 'carried by boarding' (the strike's own line, the far body struck),
-    the prize alongside for 74; the losses by name on both bills."""
+    colours come down 'carried by boarding' (the strike's own line, the far body struck for
+    the moment of it), and (package 74, step 2: the officer on the deck won takes possession
+    at once) she is a prize of ours alongside, her record saying how; the losses by name on
+    both bills, hers the prisoners'. The pin moved by 74: on the trunk she lay struck and no
+    prize; the fight's bands are as they were."""
     from freesail.combat import boarding as B
     from freesail.combat import small_arms as SA
+    from freesail.world import prizes as P
     from tests.test_fight import _alongside
 
     w, v, enemy = _alongside(10.0, her_quarters=True)
@@ -10471,9 +10475,10 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
     f = B.fight_of(w.ship)
     assert f.over == "carried" and 2 <= f.round <= 12, (f.over, f.round)
     assert any("carried by boarding" in e.text for e in events(enemy, "action.struck"))
-    assert v.struck and events(w, "action.carried")
+    assert events(w, "action.carried") and events(w, "prize.taken")
+    assert P.is_prize(v) and not v.struck and P.record_of(v)["how"] == "carried by boarding"
     assert f.lost_defence > f.lost_attack > 0
-    assert "killed" in enemy.readings.words("bill") or "wounded" in enemy.readings.words("bill")
+    assert "of them hurt" in enemy.readings.words("prisoners")
 
 
 def test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down():
@@ -14566,3 +14571,82 @@ def test_truth_7_350_the_far_ships_length_is_her_waterlines_and_the_size_term_he
         (r.fired, r.struck, r.hurt) for r in r_new
     ]
     assert (a2.hurt, b2.hurt, b2.struck_at_s) == (a.hurt, b.hurt, b.struck_at_s)
+
+
+def test_truth_7_351_a_ship_struck_near_is_possessed_by_take_possession_of_her():
+    """The design's §2.1 to §2.5 (step 2): `take possession of her` on a struck ship within
+    a boat's pull writes her record (how, when, her nation and intent before), draws the
+    prize crew out of the captor's muster (his bill short by them, hers the prize crew's),
+    puts the prize master, the ladder's man, at her captain's station with his home the
+    prize, confines her people below by their rank, hoists his colours over hers for a day
+    and gives her his nation, the prize master's role and the intent of his doctrine's port,
+    in his company by the set; refused in its five ways (not struck, beyond a boat's pull, a
+    prize already, our own colours struck, the boat away). Taken at once, not after the
+    boat's quarter of an hour (the postscript says why). The boarders' officer on a deck
+    carried takes possession at once and is her prize master (7-325 and 97's test re-pinned),
+    the senior standing of the party leading on when he falls."""
+    from tests.test_between_hulls import (
+        test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_the_party_leads_on,
+    )
+    from tests.test_prizes import (
+        test_take_possession_is_refused_in_its_five_ways,
+        test_take_possession_of_a_struck_brig_within_a_boats_pull_makes_her_a_prize_of_ours,
+    )
+
+    test_take_possession_of_a_struck_brig_within_a_boats_pull_makes_her_a_prize_of_ours()
+    test_take_possession_is_refused_in_its_five_ways()
+    test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_the_party_leads_on()
+
+
+@pytest.mark.slow
+def test_truth_7_352_the_cut_out_prize_parts_under_her_prize_crew_and_a_cruiser_retakes_her():
+    """The brief's §20 first truth as the design amends it (§2.8, §2.9; the lead's ruling 7):
+    the merchant brig cut out by the privateer schooner at far detail is possessed on the far
+    records at once (a prize crew of six, her people the prisoners' count, bound for the
+    nearest port open to him, Brest, under the prize master's role, his colours over hers),
+    parts from him by his doctrine (`prize_company: parts`), and is retaken by a King's
+    cutter coming up at sea, to whom she yields as the prize master's doctrine has her: her
+    nation, colours, goal and role her own again, the retaking a line of the log and of both
+    stories. 72's pin of the cut-out moved with it (the prize in his company before)."""
+    from tests.test_prizes import (
+        test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_retakes_her,
+    )
+
+    test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_retakes_her()
+
+
+@pytest.mark.slow
+def test_truth_7_353_the_prisoners_rise_on_a_thin_tired_prize_crew_and_the_odds_rule_holds():
+    """The design's §2.8: a hundred and twenty-one prisoners over a prize crew of twenty-one
+    (the King's ship's share, one man in twelve of the captor's fit), nineteen hours in her,
+    the captor two miles off, rise at seed 1 in the first hour and have the deck by 73's
+    tables (she is retaken by her own people, the prize crew her prisoners, the prize master
+    a captive in her cabin, the captor's log saying the prize is lost); at seed 7 the first
+    two draws fail. With fifty-one over twenty-one the rising at seed 2 is put down in the
+    third hour and the prisoners are in irons for a day; with twenty-one over twenty-one the
+    rule never draws (the odds under two to one). The figures are the design's judgement (a
+    quarter's chance an hour, two to one, tired at eighteen hours)."""
+    from tests.test_prizes import (
+        test_a_rising_put_down_puts_the_prisoners_in_irons_for_a_day_and_the_odds_rule_holds,
+        test_the_prisoners_rise_on_a_thin_tired_prize_crew_with_no_captor_near_and_retake_her,
+    )
+
+    test_the_prisoners_rise_on_a_thin_tired_prize_crew_with_no_captor_near_and_retake_her()
+    test_a_rising_put_down_puts_the_prisoners_in_irons_for_a_day_and_the_odds_rule_holds()
+
+
+def test_truth_7_354_the_prisoners_are_taken_aboard_by_the_boat_and_a_prize_is_burnt_by_order():
+    """The design's §2.6 and §2.7 as step 2 builds them: `take six of the prisoners aboard`
+    puts six of hers into our hold by the boat (prisoners of ours, counted by `the
+    prisoners`, six fewer in her), `take the prisoners aboard` the rest; `burn the prize`
+    (or `scuttle`) takes her people aboard as prisoners, brings the prize crew and the prize
+    master home and strikes the vessel from the sea with the line that nothing is to be had
+    for her but the head money. The doctrine's own burning (`burns_when`, the valuation's
+    `worth_least`) is step 5's with the court, the prisoners' victualling step 3's."""
+    from tests.test_prizes import (
+        test_a_prize_is_burnt_by_the_order_her_people_prisoners_and_the_prize_crew_home,
+        test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counted,
+    )
+
+    test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counted()
+    test_a_prize_is_burnt_by_the_order_her_people_prisoners_and_the_prize_crew_home()

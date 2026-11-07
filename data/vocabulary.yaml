@@ -1680,6 +1680,29 @@ verbs:
                repel the boarders, prepare to repel boarders]
     object: fight
     level: 1
+  # Package 74 (spec M7 §18; docs/design/Design-Prizes.md §2): the prize. `take possession
+  # of her` puts a prize master and a prize crew aboard a ship struck within a boat's pull
+  # and brings her people to the hold as prisoners; `take the prisoners aboard` (or `take
+  # six of the prisoners aboard`) brings them into our hold by the boat; `burn the prize`
+  # and `scuttle the prize` a prize not worth manning, her people taken aboard first.
+  take possession of:
+    synonyms: [take possession, send the prize crew aboard, send a prize crew aboard, man the prize,
+               put a prize crew aboard, put a prize crew into, board the prize, take possession of the prize]
+    object: prize
+    level: 1
+  take the prisoners aboard:
+    synonyms: [bring the prisoners aboard, take the prisoners out of her, take her people aboard,
+               bring her people aboard, take the prisoners]
+    object: prize
+    level: 1
+  burn the prize:
+    synonyms: [set fire to the prize, fire the prize, burn her, set her on fire, set fire to her]
+    object: prize
+    level: 1
+  scuttle the prize:
+    synonyms: [scuttle her, sink the prize, sink her, scuttle]
+    object: prize
+    level: 1
   bury the dead:
     synonyms: [commit the dead to the deep, read the burial service, bury the killed, commit the bodies to the deep,
                bury them]

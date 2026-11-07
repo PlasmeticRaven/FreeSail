@@ -357,6 +357,7 @@ FAMILIES: dict[str, str] = {
     "guns": "wakes",
     "action": "wakes",
     "small_arms": "wakes",
+    "prize": "wakes",  # package 74: she is taken, the prisoners rising, the prize retaken
     "marines": "aboard",
     "evolution": "aft",
     "sail": "aft",
@@ -484,7 +485,7 @@ NOT_KINDS: frozenset[str] = frozenset(
 # The kinds that wake a sleeper (the `wakes` class: the design's §3.1), beside a word or a
 # question to him, which the harness reads.
 WAKES: frozenset[str] = frozenset(k for k, c in REACH.items() if c == "wakes") | frozenset(
-    {"guns", "action", "small_arms"}
+    {"guns", "action", "small_arms", "prize"}
 )
 
 

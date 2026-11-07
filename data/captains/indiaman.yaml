@@ -128,6 +128,10 @@ thresholds:
   mending_wind_kn: {value: 6, source: "as above"}
   worsening_sooner_kn: {value: 6, source: "a force; judgement"}
   mending_sooner_kn: {value: 4, source: "less than a force, so that she does not fill away into the gale's tail; judgement"}
+  # Package 74 (spec M7 §18; docs/design/Design-Prizes.md §2.4): the prize, as the merchant's
+  # book has it (the row came to the merchant's book at step 2, after this file was copied from
+  # it; the meeting resolved at the trunk's merge): an Indiaman takes no prizes.
+  mans_prizes: {value: false, source: "a merchantman, an Indiaman too, takes no prizes: nought turns it off"}
 
 books:
   on passage:
@@ -186,6 +190,7 @@ books:
     - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day and the visibility is not a mile and the visibility is not a cable then get under way on the {cast_in} tack and steer {course_in}'
     - 'standing order "under way for the port": at under way then set plain sail'
   in port: []
+  taking possession: []  # package 74: never entered by this role (no transition into it)
   investigating a stranger: []
   chasing: []
   evading:

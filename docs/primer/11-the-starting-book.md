@@ -151,6 +151,7 @@ Every event the book's `at` takes, by family; each is also a word a station may 
 | `at the well rising`, `at the pumps gaining`, `at the pumps losing`, `at the pumps suck`, `at the leak stopped`, `at a shot hole plugged`, `at she is settling`, `at she founders`, `at the ship founders`, `at the hatches battened` | The water and the pumps |
 | `at a man taken ill`, `at a man dead`, `at a death`, `at the burial`, `at the morning report`, `at the surgeon's report`, `at a man collapsed` | The people's health |
 | `at the gunner filling`, `at the cartridges filled`, `at the powder all filled`, `at the hoy alongside`, `at the powder stowed`, `at the hoy turned back`, `at the mark over the side`, `at the mark struck`, `at the mark lost`, `at the mark lost to sight`, `at the mark in sight again`, `at the exercise`, `at beyond the allowance` | The practice and the powder |
+| `at she is taken`, `at possession taken`, `at the prisoners aboard`, `at the prisoners rising`, `at the prize retaken`, `at a prize lost`, `at a prize burnt` | The prize (chapter 27) |
 
 `at the lee ports shut` and `at the lee ports opened` go by the log's line for a deck and side, the lee's alone: in a seaway the weather's ports can shut as well, by the roll less the heel, and their line answers neither word (`the guns` says `ports shut` by side). They are heard only with a gun of that deck's side cast loose; with the guns secured neither comes, and `the guns` says `ports shut` at any time.
 
