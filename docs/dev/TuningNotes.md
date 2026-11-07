@@ -18839,9 +18839,20 @@ put down in the third hour, seed 1's over a hundred taken never draws). The risi
 and the retaking by the cutter hold on the sixteen as they were; 7-181, 7-325, 7-152 to 7-154 and
 7-188 pass on the merged tree.
 
+Two more meetings the merge's text did not show: 75's `revenue.yaml` and `indiaman.yaml` are the
+cruiser's and the merchant's books copied before step 2 gave every role the `taking possession`
+state, so `test_subtypes`' two "her book is the other's" tests and `test_captains`' every-doctrine
+test failed on the merged tree by that one book, its rows and the merchant's `mans_prizes` row; the
+revenue cutter takes possession of what strikes to her as the cruiser does (the book and the four
+rows added to her file; her thresholds were the cruiser's already) and the Indiaman takes no prizes
+as the merchant does (the row and the empty book).
+
 **The suites on the step's tree.** Step 2 alone, at bc6f406 (before the trunk's merge): the fast
 tier whole exit 0 (run alone in the pinned worktree 06:13:24 to 07:02:56 after two container
-restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree: below.
+restarts cut the first two runs; 444 slow tests left out as the tier's rule). The merged tree at
+6b717f6: fast exit 1 by the two files' meeting alone, three tests (07:08:42 to 07:48:48), the slow tier of
+the touched files and the known truths exit 0 (07:48:48 to 08:28:02), the pace tests alone exit 0
+(13 passed, 08:28:02 to 08:32:49). The final tree, with the meeting resolved: below.
 
 ### Step 3: the captive's channel (the design's §3)
 
