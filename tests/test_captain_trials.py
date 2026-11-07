@@ -79,7 +79,10 @@ TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; neve
 # the private signal broke out at and never showed it her; she answers it now (a reply at
 # 9840, one line more), the states, the books and the chase as before (TuningNotes, step 6)
 TRIAL_STATION_STRANGER_LINES = 788  # package 84 step 6 (787 at 71; 756 at 56, the glass; 754 at 57)
-TRIAL_STATION_STRANGER_DIGEST = "d56963daf49d566a"  # 84 step 6 (f8f4e544cc34b86e at 71)
+# package 75, SW-4: the brig-sloop made out "ten ports a side" (RMG ZAZ4491, read), where the
+# words had sixteen; every tick and line the same, proved by bisection (the word put back gives
+# d56963daf49d566a again; docs/dev/TuningNotes.md, SW-4)
+TRIAL_STATION_STRANGER_DIGEST = "c1d54413006885aa"  # SW-4 (d56963daf49d566a at 84 step 6)
 
 
 @pytest.fixture(scope="module")
@@ -357,7 +360,11 @@ TRIAL_TRADE_STRANGER_LINES = 1594  # package 88 (1247 at 73; 1246 at 71; 1248 at
 # last shot by the game's tick; at 17520 before, the shot's tick written by the brig's World's
 # clock, counted from her promotion and behind the game's (TuningNotes, step 6)
 TRIAL_TRADE_STRANGER_DIGEST = (
-    "bf059c3211b7cc9c"  # package 88 (02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
+    # package 75, SW-4: the brig-sloop made out as "ten ports a side" (RMG ZAZ4491) where she was
+    # "sixteen", the word served from brig.yaml's own descriptions; the one word put back gives
+    # the old digest again, the states, the anchored ticks and the lines unmoved (the lead, on
+    # the build machine, 2026-11-07)
+    "5e7bdba2a4f4770b"  # package 75 SW-4 (bf059c3211b7cc9c at 88; 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
 )
 
 

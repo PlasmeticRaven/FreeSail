@@ -542,6 +542,36 @@ def _without_the_drawing(doc: dict) -> dict:
     return doc
 
 
+# Package 75, SW-4 (Build-Ships.md §8.2, §16.1): the keys it writes in her descriptions, old beside
+# new. Each of the table's descriptions gains `fit` and `roles`; the brig-sloop's `what` was
+# "sixteen ports a side" and is ten (RMG ZAZ4491, read: pages-zaz4491.md §0), her note now citing
+# the sheet; the merchant brig's note names her fit and roles, in merchant-brig.yaml, which the
+# description sails by the lead's ruling of §8.4; brig.yaml's merchant brig keeps her words.
+SW4_FITS_AND_ROLES = {
+    BRIG: {"brig-sloop": ("diligence class 1796", ["cruiser", "kings-ship", "commodore"])},
+    MERCHANT: {"merchant brig": ("merchant", ["merchant", "packet", "indiaman"])},
+}
+SW4_REWORDED = {BRIG: {"brig-sloop": ("what", "note")}, MERCHANT: {"merchant brig": ("note",)}}
+
+
+def _without_sw4_words(path, now, then):
+    """Her descriptions less the keys SW-4 writes, in place, after holding each to its words."""
+    if path == BRIG:
+        assert then["ship"]["descriptions"]["brig-sloop"]["what"] == (
+            "a brig-sloop of war, sixteen ports a side"
+        )
+        assert now["ship"]["descriptions"]["brig-sloop"]["what"] == (
+            "a brig-sloop of war, ten ports a side"
+        )
+    for key, words in now["ship"]["descriptions"].items():
+        fit, roles = SW4_FITS_AND_ROLES[path].get(key, (None, None))
+        assert (words.pop("fit", None), words.pop("roles", None)) == (fit, roles), key
+        assert "fit" not in then["ship"]["descriptions"][key], key
+        for reworded in SW4_REWORDED[path].get(key, ()):
+            words.pop(reworded)
+            then["ship"]["descriptions"][key].pop(reworded)
+
+
 @pytest.mark.parametrize("path", [BRIG, MERCHANT])
 def test_no_figure_the_physics_or_the_gunnery_reads_moved(path):
     """§5.0 principle 8, §5.6: her file against git, every key but the drawing's: the hull's
@@ -553,6 +583,7 @@ def test_no_figure_the_physics_or_the_gunnery_reads_moved(path):
         pytest.skip(f"{BEFORE} is not in this checkout")
     now = yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
     then = yaml.safe_load(before)
+    _without_sw4_words(path, now, then)
     assert _without_the_drawing(now) == _without_the_drawing(then)
     # and the hull's own keys are in their old order, the profile last (§5.1)
     assert list(now["hull"]) == [*then["hull"], "profile"]

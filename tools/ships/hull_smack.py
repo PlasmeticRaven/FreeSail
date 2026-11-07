@@ -9,10 +9,11 @@ Pl. LIX No. 3, the English smack, is of her type and not the *Culloden*. The pla
 the main breadth and the rail by station, the midship section, the keel, the stem, the stern, the
 wale, the deck and its own nine frames, the body above and under the water (§5.0 principle 5;
 §5.7). Steel's coasting sloop of 60 tons (1805, bodies p. 27) is kept beside them as a check. No
-port and no gun is drawn on the plate or in the table, and the file has no gun, so she has no port
-triple and no sill (§5.4; §9.1). The stern is raked and rounded, at the plate's own 0.78 m; she has
-no head. The figures are the pages note's, docs/design/ships-design/pages-chapman-pl59.md (a `§`
-below with no document named is that note's). The Cooke etching of 1829 in docs/references/images/
+port and no gun is drawn on the plate or in the table, and her two guns (SW-4's fit, §9.1) fire
+over the rail, so she has no port triple and no sill (§5.4; §5.1). The stern is raked and rounded,
+at the plate's own 0.78 m; she has no head. The figures are the pages note's,
+docs/design/ships-design/pages-chapman-pl59.md (a `§` below with no document named is that
+note's). The Cooke etching of 1829 in docs/references/images/
 is for the eye only (§5.8) and gave no point.
 
 **The ruling (the lead, 2026-10-31): the plate's own frames, sourced points over the rule.** §5.7 as
@@ -676,7 +677,10 @@ def add_her_lines(hull: dict, notes: dict) -> None:
         f"{-at_middle:.2f} m at the middle and {-keel[1][1]:.2f} m at the forefoot, against the "
         f"file's mean draught of {hull['draught_m']:g} m: recorded, not moved."
     )
-    REPORT.append("her port triples: none; no port and no gun is drawn, and the file has no gun.")
+    REPORT.append(
+        "her port triples: none; no port and no gun is drawn, and her fit's guns fire over the "
+        "rail."
+    )
     notes.update(NOTES)
     notes["profile.sections_m"] = SECTIONS_NOTES[UNDER_WATER]
     for line in REPORT:
