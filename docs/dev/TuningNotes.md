@@ -18461,7 +18461,10 @@ razee, the 64, the privateer and the topsail schooner; 0.20 m on the brigs; 1.24
 boats and the smack; 2.86 m on the cutter (her jack at the bowsprit's end); 5.03 m on the lugger (a
 pendant at her truck, its length by her beam where she has no square yard). First written, every
 place took the pendant's reach and a drop of it straight down, which grew the frames 2 to 9 m; each
-place now takes its own flags drooped as they are drawn.
+place now takes its own flags drooped as they are drawn, and the peak is held swung every way about
+its gaff's throat (first written, the peak as the snapshot's sheet had it: the cutter's and the
+smack's frames moved 0.19 m between states, caught by `test_view_geometry`'s boom-frame test at
+the final run, be9e557, and mended; the figures above are the mended frame's).
 
 **The snapshot's cost.** The new fields (`guns`, `damage`, `flags`), timed on this machine, 300
 snapshots best of five: the 64 (64 guns) 20 µs of 393 (5.1%), the frigate 14 of 330 (4.4%), the

@@ -4073,20 +4073,26 @@
     return r.a[2] >= r.b[2] ? r.a : r.b;
   }
 
+  /** The aftmost mast's gaff as placed ({a: throat, b: peak}), or null. */
+  function peakGaff(graph, spars) {
+    var aft = mastsByName(graph).list.slice().sort(function (a, b) {
+      return (a.x_m || 0) - (b.x_m || 0);
+    })[0];
+    var gaff = aft && graph.spars.filter(function (s) {
+      return s.class === "gaff" && s.parent === aft.id;
+    })[0];
+    var r = gaff && spars[gaff.id];
+    return r && r.a && r.b ? r : null;
+  }
+
   /** The point of a flag's place word on the drawn spars (the top of its hoist), or null where
    *  the ship has no such place (§12.2). */
   function flagPlace(graph, hull, spars, word) {
     var M = mastsByName(graph);
     var parts = word.split(" ");
     if (word === "peak") {
-      var aft = M.list.slice().sort(function (a, b) {
-        return (a.x_m || 0) - (b.x_m || 0);
-      })[0];
-      var gaff = aft && graph.spars.filter(function (s) {
-        return s.class === "gaff" && s.parent === aft.id;
-      })[0];
-      if (gaff && spars[gaff.id] && spars[gaff.id].b) return spars[gaff.id].b;
-      return flagPlace(graph, hull, spars, "staff");
+      var g = peakGaff(graph, spars);
+      return g ? g.b : flagPlace(graph, hull, spars, "staff");
     }
     if (word === "staff") {
       var t = taffrail(hull);
@@ -4240,11 +4246,19 @@
     words.forEach(function (word) {
       var at = flagPlace(graph, hull, spars, word);
       if (!at) return;
+      // the peak swings with its gaff's sheet and tack: held swung every way about the throat,
+      // at the peak's height, as the frame holds the gaff itself
+      var swing = 0;
+      var gaff = word === "peak" ? peakGaff(graph, spars) : null;
+      if (gaff) {
+        swing = Math.hypot(gaff.b[0] - gaff.a[0], gaff.b[1] - gaff.a[1]);
+        at = v(gaff.a[0], gaff.a[1], gaff.b[2]);
+      }
       var sizes = word.indexOf("truck") >= 0 ? [ensign, pendant] : [ensign];
       [1, -1].forEach(function (s) {
         var p = v(at[0], s * at[1], at[2]);
         sizes.forEach(function (size) {
-          var out = (size.fly * Math.cos(droop)) / Math.cos(Math.PI / 16);
+          var out = (size.fly * Math.cos(droop) + swing) / Math.cos(Math.PI / 16);
           var drop = size.fly * Math.sin(droop);
           for (var k = 0; k < 16; k++) {
             var a = (k * Math.PI) / 8;

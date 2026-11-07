@@ -547,7 +547,9 @@ notes, "Package 81":
 - **The flags' frame** is each place's own flags drooped as drawn (first written, the pendant's reach
   at every place and a drop of it straight down, 2 to 9 m on every hull): nothing on the frigate,
   the razee, the 64 and the schooners, 0.20 m on the brigs, 1.2 to 1.9 m on the boats and the smack,
-  2.9 m on the cutter and 5.0 m on the lugger.
+  2.9 m on the cutter and 5.0 m on the lugger; the peak held swung every way about its gaff's
+  throat, since the gaff swings with its sheet (first written, the frame moved 0.19 m on the cutter
+  and the smack between states).
 - **A port cut to the rail follows the rail down** where it steps within the port's width: the 64's
   foremost quarterdeck port, at her breast, whose forward top corner stood above the drawn rail.
 - **A port on her drawn side, not at its triple's half-breadth:** the razee's and the 64's drawn
