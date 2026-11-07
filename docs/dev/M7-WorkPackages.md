@@ -2802,8 +2802,8 @@ pinned worktree:** ruff and format clean; the fast tier whole exit 0; the slow t
 truths, the profile and the Indefatigable's tests exit 0; the pace alone and last 13 of 13 (the
 first pace run cut by the background task's two-hour limit and run again alone). **The lead's
 merge:** the trial of 797860d on 2a1cd96 clean and lint-clean; the fast tier whole on it green,
-exit 0, every test passed; the whole suite in the cloud dispatched after run 45, the figures to
-follow. Steps 2 to 7 follow at their boundaries, each at one hash.
+exit 0, every test passed; the whole suite in the cloud run 46 on 28c228e (04:53 to 05:47 UTC): lint green, all six shards green, 6,772
+passed, 11 skipped, 12 expected failures; the pace job 13 of 13 passed. Steps 2 to 7 follow at their boundaries, each at one hash.
 
 ### Package 75, SW-4 (the sub-types as fits and roles), as merged (2026-11-07)
 
