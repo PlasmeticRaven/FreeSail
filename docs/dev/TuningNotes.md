@@ -18395,3 +18395,84 @@ failures, and after it the files step 4 touched with its truths (7-380, 7-382, 7
 84's step 8 saves of many hulls in `test_hulls.py` and `test_replay.py`). The pace alone on the
 final tree: 12 of 13, 7-159 at 474, toggled against 1662b54: the branch 492, 501, 498; the trunk
 455, 487, 491.
+
+## Package 81: the viewer's action, from the hull 75 draws (2026-11-07)
+
+The standard is `docs/design/Design-ViewerAction.md` (the lead approved it on 2026-11-07 with
+seven rulings, its postscript as built). The rule and the table are `freesail/api/viewer_guns.py`,
+the flags' fallback `freesail/api/viewer_flags.py`, the drawing `client/projection.js`'s section
+"the action", the checker `tools/check_viewer_guns.py`.
+
+**The gun table's sources.** Adye, *The Bombardier, and Pocket Gunner* (1804): p. 155, "Length and
+Weight of English Iron Guns" (IA leaf n178), and p. 72, "Carronades. Their Weight and Dimensions"
+(leaf n95), read on their page images; the 24s to the 9s and the carronades of 42, 32, 24, 18 and
+12 read before by the ships sessions (`tools/ships/period.py`, Research-Indefatigable-2026-10.md
+§6.4, Design-Ship-PrinceDeNeufchatel.md), the 42s, the 6s, the 4s and the 3 read here: the
+4-pounder of 6 ft is printed "22 1" and read 12 cwt 1 qr by its own column of metal to the pound of
+shot (343 lb × 4 = 12¼ cwt; 22¼ cwt would be 623). Adye p. 230 (leaf n253): the free recoil on a
+level platform, 11 ft for the 32 and the 24 and 10 ft 6 in for the 18 at a third's charge, longer
+than the gun, so the drawn run in is judgement under the breeching (the owner's shelf, question 1).
+Douglas 1829 art. 134 ("run out the gun square to the breast of the port") and art. 136 (the
+carronade "with taught breechings", a non-recoil principle), read (OCR). Falconer 1780, PORTS, and
+Steel 1805, PORT-LIDS and HALF-PORTS, read (OCR): the lids hinged at their upper edges and let down
+when the guns are drawn in; the ports' edges parallel to the deck. No swivel's length in Adye or
+Falconer (question 4). Every other figure of the drawing is judgement, named at the top of the
+section and in the design's §3 and §4.
+
+**Each ship's placing, as the checker reports it** (`python tools/check_viewer_guns.py`, clean):
+
+| File | Fit | Guns | In a port | Over the rail | On the rail | Pivot | Empty ports a side |
+|---|---|---|---|---|---|---|---|
+| brig | diligence class 1796 | 18 | 18 | | | | upper 1 |
+| cutter | carronades | 6 | 6 | | | | upper 4 |
+| cutter | long guns | 14 | 6 | | 8 | | upper 4 |
+| frigate-36 | amazon class 1795 | 40 | 36 | 4 | | | |
+| merchant brig | merchant | 4 | 4 | | | | upper 8 |
+| privateer schooner | long tom | 9 | 4 | | 4 | 1 | upper 6 |
+| privateer schooner | letter of marque | 10 | 6 | | 4 | | upper 5 |
+| razee | as razeed 1795 | 44 | 44 | | | | forecastle 1 |
+| razee | as carried 1796 | 46 | 46 | | | | |
+| sixty-four | ardent class 1784 | 64 | 62 | 2 | | | quarterdeck 1 |
+| sixty-four | ardent class 1794 | 72 | 62 | 10 | | | quarterdeck 1 |
+| topsail schooner | (no armament) | | | | | | upper 8 |
+
+327 guns over eleven fits, none refused. The checker's notes for the ships session: the 64's
+foremost forecastle triple (18.41 m) put over the rail by the side's test, 0.07 m under the rail
+and not at the generator's 2 in (the lead's ruling 1); her foremost quarterdeck port (−5.88 m) cut
+to the rail, 0.02 m, its top following the rail where it steps down at her breast within the
+port's width (found in the drawing: the port's forward top corner stood above the drawn rail, on
+no side). No gun's weight more than a tenth off its pattern's: the files' from-memory long 9s (26
+cwt) and 6s (20) draw at Adye's 7 ft 6 in (6% off) and 8 ft (9% off).
+
+**What moved, and the proof.** No pin and no figure of the world moved: the viewer reads and writes
+nothing of it, and `combat/`, the physics, the evolutions and the ship files are not touched
+(`action.fired` already named its guns). The view's figures moved where the hull has a profile: her
+guns, ports, holes and flags are drawn. One pin of the view moved in the build and was put back by
+the rule and not by the pin: `test_view_geometry.py`'s `FRAME_MOVED_OLD_M` (the frigate's frame
+spread drawn with no profile, 5.59 m) read 5.46 when the first form gave a hull with no profile the
+flags' frame; the brief's rule is that such a hull draws as 75 left her, so the action draws and
+frames nothing without a profile (truth 7-442 pins it point for point), and the pin stands at 5.59.
+
+**The frame.** Equal across every state on every file (truths 7-441, 7-444): every gun secured or
+run out with its lid hauled up, a hole, every flag flying, the smoke alive (which is not in the
+frame). The guns never widen it (the yards' swing holds them). The flags' reach does where a flag
+could fly past the rig, measured against the frame without the action: nothing on the frigate, the
+razee, the 64, the privateer and the topsail schooner; 0.20 m on the brigs; 1.24 to 1.91 m on the
+boats and the smack; 2.86 m on the cutter (her jack at the bowsprit's end); 5.03 m on the lugger (a
+pendant at her truck, its length by her beam where she has no square yard). First written, every
+place took the pendant's reach and a drop of it straight down, which grew the frames 2 to 9 m; each
+place now takes its own flags drooped as they are drawn.
+
+**The snapshot's cost.** The new fields (`guns`, `damage`, `flags`), timed on this machine, 300
+snapshots best of five: the 64 (64 guns) 20 µs of 393 (5.1%), the frigate 14 of 330 (4.4%), the
+cutter 6 of 153 (4.2%). The graph's placing is served once, at the page's connection. The
+snapshot is built off the tick (`Driver.snapshot`); a fight with a snapshot every tick gives the
+same log digest as without (truth 7-441).
+
+**Found on the way** (reported to the lead): the frigate's quarterdeck has two sizes of port and the
+schema one a deck; the engine has no port stove; 73's hole above the water is made at 0.3 to 1.8 m
+whatever the side's height (drawn at the rail less its radius on the cutter); the readings `the
+guns` and `the damage` make the battery and the damage keeper on first asking, so the snapshot reads
+the state they read where the ship keeps it and never makes it (`signals.locker_of` likewise).
+
+**The suite as run:** see the design note's postscript and the reports to the lead.

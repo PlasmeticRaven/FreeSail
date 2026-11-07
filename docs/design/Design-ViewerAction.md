@@ -522,3 +522,51 @@ The light and the air and the flags' waving (91, which reuses §6); 76's `colour
 list of what flies where (76's); a three-dimensional ship or damage beyond the present
 honesty (M8); any ship file's triples or port sizes (the ships session's); a key of port size by
 port (the schema's); the guns' mechanics (70's, 77's); a tick on each volley (§4.1, the battery's).
+
+## Postscript: as built (2026-11-07)
+
+The lead approved the note on 2026-11-07 with seven rulings: §2.2's side's test (truth 7-438 pins
+it); §1's deck asked of port guns only; §2.4's chasers at their own triples; §1's per gun with the
+test strict; §4.1's stamp at the first snapshot (a tick on each volley booked to package 77); no
+engine touch; §12.2's place words carried to 76, and the flag of truce's word ruled for all three
+packages: 74 adds the state `truce` to `COLOURS_STATES`, "a flag of truce", and the fallback serves
+the white under it (pinned on a locker given the state).
+
+**Built as the note has it**, and these taken another way or found, each measured in the tuning
+notes, "Package 81":
+- **The snapshot reads where the ship keeps the state, never through the two readings** (§7 said
+  through the registry). `the guns` and `the damage` make the battery and the damage keeper on
+  first asking (`battery_of`, `damage_of`), and `signals.locker_of` a locker: served in every
+  snapshot they would write the world. So `queries._action_entries` reads `ship.extra`'s battery
+  (its shut ports), damage keeper (its holes) and locker (its colours) where they are, the same
+  state the readings read, and makes none; a fight with a snapshot every tick gives the same log
+  digest as without (truth 7-441).
+- **A hull with no profile draws and frames nothing of the action**, its flags too: the first form
+  gave her the flags' frame, which moved `test_view_geometry`'s pin of her frame (5.59 m to 5.46);
+  the brief's rule is that she draws as 75 left her, so the pin stands.
+- **The flags' frame** is each place's own flags drooped as drawn (first written, the pendant's reach
+  at every place and a drop of it straight down, 2 to 9 m on every hull): nothing on the frigate,
+  the razee, the 64 and the schooners, 0.20 m on the brigs, 1.2 to 1.9 m on the boats and the smack,
+  2.9 m on the cutter and 5.0 m on the lugger.
+- **A port cut to the rail follows the rail down** where it steps within the port's width: the 64's
+  foremost quarterdeck port, at her breast, whose forward top corner stood above the drawn rail.
+- **A port on her drawn side, not at its triple's half-breadth:** the razee's and the 64's drawn
+  sides stand up to 0.17 m off some triples (the gaps §5.3 records and never moves); the port is
+  drawn on the side as drawn.
+- **The smoke and the flash face the viewer**: a plume drawn in the ship's plane read as a flat coin
+  seen from the bow; each is a disc (the flash a star) about its point's projection, the plume's
+  foot held at the sea. **Each barrel has its muzzle's face**, so a gun run out towards the viewer
+  shows.
+- **The served `charge_lb`** sizes each gun's plume by the cube root of its powder (Table No. 29's,
+  `parts.charge_lb`).
+- **The words**: a port, its lid, a hole, a gun, a flag each say themselves in the ship's words
+  ("No. 3 starboard gun, a long 18-pounder: run out"; "an upper-deck port, shut, the sea at its
+  sill"; "a shot hole through the side to larboard"; "British colours, the red ensign, at the
+  peak"), and the primer's chapters 22 and 23 say what the picture shows.
+- **The hook for 77**: `Volley` (`combat/guns.py`) keeps no tick, so a round is stamped with the
+  first snapshot's tick (`Projection.firingsBetween`); a tick on each volley served beside
+  `action.fired`'s guns would let `firingsBetween` stamp each round at its own.
+
+**Not built**, as §13 has it; and the owner's shelf's seven answers wait to replace §3's, §2.5's and
+§12.3's judgements by cited figures, each a constant at the top of `viewer_guns.py` or of
+`projection.js`'s action section.

@@ -14,6 +14,10 @@ the guns
 The guns: 6 12-pounder carronades; secured.
 ```
 
+### The guns in the browser's picture of her
+
+The picture of your ship in the browser draws her guns where her file puts them, every hull by the same rule: a gun of a deck with ports stands in the port at its own place, its lid hauled up while the gun is cast loose and let down while it is secured or the sea is at the sill; a gun on a deck whose rail stands too low for a port (the frigate's forecastle, the 64's roundhouse) is drawn over the rail; a swivel on its yoke on the rail; the long tom on its slide amidships, trained as she trains it. Run out, the muzzle stands out of the port; run in to load, it is inboard; secured, the lid is shut over it. When a gun fires you see it as it happens: a flash at the muzzle, the gun coming in on its recoil, and its smoke rolling out and away to leeward on the wind she feels, thinning over half a minute; only the guns that fired flash. A shot hole is drawn where the carpenter reports it, dark, and buff once it is plugged; a spar carried away is gone from the picture. Hold the pointer over a gun, a port or a hole and the picture names it in the ship's words: "No. 3 starboard gun, a long 18-pounder: run out"; "an upper-deck port, shut, the sea at its sill".
+
 ## The quarter bill
 
 At quarters every man has a station by a quarter bill the ship's file carries beside her watch bill: the gun crews (one crew to each pair of guns, who serve whichever side is engaged), the sail trimmers (the hands told off to work the ship), the helm, the powder, the marines, the carpenter at the wings and the surgeon below. The drum is a crew order and never queues behind the work in hand:
