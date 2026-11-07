@@ -20,7 +20,13 @@ ship:
       rig: a brig
       what: a merchant brig, deep laden
       note: The trade's brig, her ports painted and no guns run out (Falconer 1780, BRIG); 'deep laden'
-        is the merchantman's look, judgement.
+        is the merchantman's look, judgement. Her fit her file's default; her roles a merchant's, a packet's
+        and an armed Indiaman's (Build-Ships.md §8.2, §8.3).
+      fit: merchant
+      roles:
+      - merchant
+      - packet
+      - indiaman
 hull:
   # 88 ft: judgement, 0.93 of the 95 ft gun deck (keel 75 ft 1 5/8 in), a brig-sloop's ends raking more than a frigate's. Recorded, not moved: her class's WL1 (ZAZ4491; the note's §7).
   length_waterline_m: 26.8

@@ -17,6 +17,17 @@ ship:
     143 ft 2.5 in, keel 119 ft 5.5 in, beam 38 ft 4 in, 933 tons burthen. Spars by the rules of Luce 1866
     ch. VII checked against Falconer 1780; rope by Luce ch. IV; see tools/gen_ships.py for every rule
     and judgement.'
+  descriptions:
+    frigate:
+      rig: a ship
+      what: a frigate
+      note: 'The Amazon class''s frigate of 1795 (Winfield 1793-1817 p. 143): the tops make her out a
+        ship, three masts square-rigged, and the glass a frigate (spec M5 §25; judgement on the words).
+        Her fit her file''s default; her roles a King''s ship''s (Build-Ships.md §8.2).'
+      fit: amazon class 1795
+      roles:
+      - kings-ship
+      - commodore
 hull:
   # 137 ft: judgement, 0.96 of the 143 ft gundeck (keel 119 ft 6 in). Amazon class 1795, Winfield.
   length_waterline_m: 41.8
@@ -2489,7 +2500,7 @@ crew:
     afterguard: 50
     # Waisters: judgement. The spec's 48 less the twelve posts, so that stations and posts make the 264 of the establishment (the spec's figures made 276); the waist is the station whose numbers no yard or gear fixes.
     waisters: 36
-    # Marines: judgement (spec M3 2.3), a sergeant's party for a frigate; they stand watch and work as afterguard, never aloft (Luce 1884 ch. XX).
+    # Marines: judgement (spec M3 2.3), a sergeant's party for a frigate; they stand watch and work as afterguard, never aloft (Luce 1884 ch. XX). The nearest print (package 75, Build-Ships.md §9.4): a lieutenant and 50 marines embarked for the Doris, 44, at Plymouth on 16 March 1803 (Naval Chronicle vol. IX p. 245, the Plymouth report; docs/design/Research-74-2026-10.md §4.4); the 40 kept.
     marines: 40
     # Idlers: the trades below (Luce 1884 ch. XX: they stand no night watches).
     idlers: 30

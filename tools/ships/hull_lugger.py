@@ -22,10 +22,10 @@ one factor, 2.53 m deep amidships; and her line at her sheet's length, not the f
 from principle 7's last sentence, whose words would make the length factor 0.793. The hold's floor
 line is a depth of hold and no draught, and is not the measure.
 
-**No port.** Her sheet draws none and no gun is in her file: her three guns are taken to fire over
-the rail (the note's §6.4), which §5.1 gives no triple. `ports_m` and `port_size_m` are therefore
-not given, as built by the lead's ruling; the triples a port would take are in the note and reported
-by her test.
+**No port.** Her sheet draws none: her three guns (SW-4's fit "gun lugger 1795", Build-Ships.md
+§9.1) fire over the rail (the note's §6.4), which §5.1 gives no triple. `ports_m` and
+`port_size_m` are therefore not given, as built by the lead's ruling; the triples a port would
+take are in the note and reported by her test.
 """
 
 from __future__ import annotations

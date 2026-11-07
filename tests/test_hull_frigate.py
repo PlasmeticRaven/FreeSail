@@ -513,6 +513,18 @@ def test_no_figure_the_physics_or_the_gunnery_reads_moved(spec):
     assert "profile" not in old["hull"]
     guns = [g for fit in old["armament"]["fits"].values() for g in fit["guns"]]
     assert {g["height_m"] for g in guns} == {2.4, 4.5} and all("deck" not in g for g in guns)
+    # Package 75, SW-4 (Build-Ships.md §8.1, §8.2, §16.1), old beside new: her description lands
+    # in her own file, where she had none and the index alone held her words; the index's words,
+    # her default fit and a King's ship's roles. The one key SW-4 writes, taken out here only.
+    assert "descriptions" not in old["ship"]
+    words = new["ship"].pop("descriptions")
+    assert list(words) == ["frigate"] and words["frigate"].pop("note")
+    assert words["frigate"] == {
+        "rig": "a ship",
+        "what": "a frigate",
+        "fit": "amazon class 1795",
+        "roles": ["kings-ship", "commodore"],
+    }
     assert without_the_drawing(new) == without_the_drawing(old)
 
 

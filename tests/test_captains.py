@@ -99,7 +99,8 @@ def test_every_doctrine_loads_with_sources_states_and_stimuli_the_captain_knows(
         for t in d.transitions:
             assert t.frm in C.STATES and t.to in C.STATES
             assert t.on in C.STIMULI, f"{role}: {t.on}"
-            assert not t.unless or t.unless in C.STIMULI
+            # package 75 (SW-4's reviews): a row's `unless` one stimulus or several (old: one)
+            assert all(u in C.STIMULI for u in t.unless_any), f"{role}: {t.unless}"
     # the fisherman is package 43b's (the world's business), the privateer package 70's
     # (truth changed: her file exists now, a letter of marque cruising for prizes); a role
     # with no file is refused

@@ -476,7 +476,20 @@ def test_no_figure_the_physics_reads_moved(path):
     if shown.returncode != 0:
         pytest.skip(f"git has no {BEFORE} here: the hull's figures above still hold")
     before = yaml.safe_load(shown.stdout)
-    assert physics_view(now) == physics_view(before)
+    now_view, before_view = physics_view(now), physics_view(before)
+    # Package 75, SW-4 (Build-Ships.md §9.1, §9.2, §16.1), old beside new, the keys it writes and
+    # no other: the Speedwell had no armament and has two fits for the editor, unarmed by default;
+    # the privateer's pivot took its arc from her rig, 60 to 140 then (the owner's by eye), 62 to
+    # 141 now (tests/test_subtypes.py holds the reckoning)
+    if path == TOPSAIL:
+        assert before_view["fits"] == {} and now["armament"]["default"] == "unarmed"
+        assert list(now_view.pop("fits")) == ["letter of marque", "musquidobit 1813"]
+        before_view.pop("fits")
+    else:
+        (old,) = [g for g in before_view["fits"]["long tom"] if g["place"] == "pivot"]
+        (new,) = [g for g in now_view["fits"]["long tom"] if g["place"] == "pivot"]
+        assert (old.pop("arc_deg"), new.pop("arc_deg")) == ([60.0, 140.0], [62.0, 141.0])
+    assert now_view == before_view
 
 
 def test_a_guns_height_is_what_moved_and_its_x_is_not():

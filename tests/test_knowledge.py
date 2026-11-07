@@ -707,9 +707,14 @@ def test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard():
 
     w, b = _world_with_a_crewed_brig()
     crew = b.crew
+    # the person at the brig's master's station: since package 75 (SW-4, Build-Ships.md §8.4)
+    # the merchant brig sails her own file, whose master commands her and whose mate keeps the
+    # master's station (old: the person "the master", the brig-sloop's file's, who kept both)
+    master_of = crew.stations.holder("master")
+    assert (master_of.id, crew.people.find("the master").station) == ("mate", "captain")
     # the player's captain and the brig's master both ashore at Falmouth, at the counting
     # house, their whereabouts written as the boat would write them (package 84, step 2)
-    for person in (w.people.captain, crew.people.find("the master")):
+    for person in (w.people.captain, master_of):
         person.aboard, person.where, person.port, person.ashore_at = (
             False,
             "shore",
@@ -731,7 +736,7 @@ def test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard():
     s = samples(cap)[-1]
     assert s.get("heard") and s["heard"][0].endswith("at the counting house: good day to you all")
     # aboard, three miles apart, a word on one quarterdeck reaches no station of the other
-    for person in (w.people.captain, crew.people.find("the master")):
+    for person in (w.people.captain, master_of):
         person.aboard, person.where, person.port, person.ashore_at = True, "quarterdeck", "", ""
     n = len(w.log)
     e = crew.submit("say the glass is falling", actor="the master")
