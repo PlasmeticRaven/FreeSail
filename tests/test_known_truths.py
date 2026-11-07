@@ -13976,6 +13976,169 @@ def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
 # ---------------------------------------------------------------------------
 
 
+def test_truth_7_426_a_spanish_chase_on_mazarredos_numbers_is_read_by_her_consort_alone():
+    """A Spanish frigate signals her consort a general chase on the Spanish book's number
+    (Mazarredo's No. 247, two flags read as a cell); the consort, under her orders, reads it
+    and chases; the British frigate in sight sees the hoist and not its meaning ("two flags at
+    the main, a signal we cannot read: not of our book")."""
+    from freesail.world import signals as S
+    from tests.test_brains import put, world_at
+
+    w = world_at(49.5, -5.5)
+    medea = put(
+        w,
+        "frigate",
+        "spain",
+        "49 29 N 5 31 W",
+        "bound for Brest",
+        name="Medea",
+        intent="bound for Brest",
+    )
+    clara = put(
+        w,
+        "frigate",
+        "spain",
+        "49 28 N 5 30 W",
+        "bound for Brest",
+        name="Clara",
+        intent="bound for Brest",
+    )
+    clara.under_orders_of = medea.id
+    w.run(120)
+    kind, text, _ = S.far_order_words(w, medea, "make the signal: general chase")
+    assert kind == "signal.made" and "No. 247, chase with all diligence" in text
+    w.run(300)
+    read = [x for x in S.vessel_locker(clara).log if x["kind"] == "signal.read"]
+    assert (
+        read and "No. 247, chase with all diligence, without keeping the order" in read[0]["words"]
+    )
+    assert clara.state == "chasing"
+    seen = [e.text for e in w.log if e.kind == "signal.seen"]
+    assert seen == [
+        "The ship makes a signal: two flags at the main, a signal we cannot read: not of our book."
+    ]
+    assert not [e for e in w.log if e.kind == "signal.read"]
+
+
+def test_truth_7_427_the_trafalgar_numbers_stand_at_the_1799_books_from_the_page():
+    """The British numerary's Trafalgar entries stand at the 1799 book's numbers, read from the
+    logs' glosses of the hoists (Jackson, 1900): No. 13 prepare for battle, No. 16 engage the
+    enemy more closely, No. 63 anchor as convenient, No. 72 the order of sailing in two
+    columns, No. 76 bear up and sail large; No. 1, enemy in sight, stands at its number and is
+    marked made, no page of 1799 giving it (the reason in its source)."""
+    from freesail.world import signals as S
+
+    b = S.load_books("britain")
+    for n, starts in (
+        (13, "Prepare for battle"),
+        (16, "Engage the enemy more closely"),
+        (63, "Anchor as convenient"),
+        (72, "Form the order of sailing in two columns"),
+        (76, "Bear up and sail large"),
+    ):
+        e = b.by_number(n)
+        assert e.meaning.startswith(starts) and not e.made and "1799" in e.source, (n, e)
+    one = b.by_number(1)
+    assert one.meaning == "Enemy in sight" and one.made and "no page" in one.source
+
+
+def test_truth_7_428_a_sentence_of_a_dozen_words_is_found_whole_in_popham():
+    """A telegraphic sentence of a dozen words, every word found whole in Popham's dictionary
+    of 1803 (its own word or a form of its head) and none spelled letter by letter."""
+    from freesail.world import signals as S
+
+    b = S.load_books("britain")
+    sentence = "the enemy fleet is at sea and the admiral expects every ship to engage closely"
+    words = sentence.split()
+    assert len(words) >= 12
+    hoists = b.encode(sentence)
+    assert [w for _, w in hoists] == words and all(n > 25 for n, _ in hoists), hoists
+
+
+def test_truth_7_429_a_signal_of_one_nations_book_is_never_read_by_anothers():
+    """A signal made under each nation's book is read by a ship holding that book and is 'a
+    signal we cannot read' to a ship holding any other root's, never its meaning."""
+    from freesail import units
+    from freesail.world import signals as S
+
+    near = 1.0 * units.NAUTICAL_MILE
+    for root in S.roots():
+        books = S.load_books(root)
+        e, q = books.find("tack in succession")
+        h = S.make_hoist(S.Locker(), books, e, q, "sender", 100)
+        for other in S.roots():
+            locker = S.Locker()
+            ob = S.load_books(other)
+            seen = S.read_flying(
+                locker, ob, "sender", "the brig", [h], near, "day", False, 170, "x"
+            )
+            got = S.read_flying(locker, ob, "sender", "the brig", [h], near, "day", False, 230, "x")
+            if other == root:
+                assert [x.kind for x in got] == ["signal.read"], (root, other)
+            else:
+                assert "a signal we cannot read" in seen[0].text and got == [], (root, other)
+
+
+def test_truth_7_430_the_french_book_answers_the_squadron_the_chase_and_the_convoy():
+    """The French book answers the orders the squadron, the chase and the convoy hoist, each
+    entry du Pavillon's table cell; every number is made (the Republic's book of the year VI not
+    found), and the meanings are Orvilliers's and Audibert's where they have them, named by
+    their source."""
+    from freesail.world import signals as S
+
+    fr = S.load_books("france")
+    for words, book in (
+        ("general chase", "numerary"),
+        ("discontinue the chase", "numerary"),
+        ("tack in succession", "numerary"),
+        ("wear together", "numerary"),
+        ("engage the enemy", "numerary"),
+        ("keep closer order", "numerary"),
+        ("the convoy to tack in succession", "convoy"),
+        ("the convoy to disperse", "convoy"),
+    ):
+        found = fr.find(words, book)
+        assert found is not None, words
+        assert found[0].made and found[0].source, words
+    cited = [e for e in fr.numerary if "Orvilliers" in e.source]
+    assert len(cited) >= 14 and all(e.original for e in cited)
+
+
+def test_truth_7_431_a_nation_turned_from_basic_to_her_root_keeps_her_private_draw():
+    """Spain, the United States and Naples, each turned from basic to her own root, draw the
+    same private table under the same seed, month by month, as they drew on basic."""
+    from freesail.world import signals as S
+    from freesail.world.nations import load_nations
+
+    nations = load_nations()
+    basic = S.load_books("basic")
+    for nation in ("spain", "united-states", "naples"):
+        own = S.books_for_nation(nations, nation)
+        assert own.root == nation
+        for month in range(1, 13):
+            for seed in (7, 11):
+                assert S.private_table(own, nation, 1805, month, seed) == S.private_table(
+                    basic, nation, 1805, month, seed
+                ), (nation, month, seed)
+
+
+def test_truth_7_432_the_checker_passes_every_root():
+    """`tools/check_signals.py` passes every root under data/signals/ and exits 0."""
+    from tools.check_signals import main
+
+    assert main([]) == 0
+
+
+def test_truth_7_433_a_nations_book_is_added_by_data_alone():
+    """Spain, the United States and Naples were added as roots by their files and their lines
+    in data/nations.yaml, with no change of code: each loads, her ships read her book, and her
+    convoy of four tacks in succession on one hoist of her own convoy book."""
+    from tests.test_signals import test_the_convoy_tacks_in_succession_on_one_hoist_of_her_own_book
+
+    for root in ("spain", "united-states", "naples"):
+        test_the_convoy_tacks_in_succession_on_one_hoist_of_her_own_book(root)
+
+
 def test_truth_7_434_the_flags_of_command_are_worn_by_role_and_read_by_the_lookout():
     """The owner's addition of 2026-11-07: a King's frigate wears her pendant at the main and
     her ensign at the peak, a commodore's ship her broad pendant, a merchantman her ensign alone,

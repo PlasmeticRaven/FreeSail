@@ -108,6 +108,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_flags.py::test_a_stranger_answers_the_challenge_made_in_her_own_form_and_no_other",
         "test_known_truths.py::test_truth_7_434_the_flags_of_command_are_worn_by_role_and_read_by_the_lookout",
         "test_known_truths.py::test_truth_7_435_the_private_signals_in_succession_unanswered_make_her_an_enemy",
+        # package 76 (step 7): a Spanish chase signalled and read (10 s); three nations' convoys
+        "test_known_truths.py::test_truth_7_426_a_spanish_chase_on_mazarredos_numbers_is_read_by_her_consort_alone",
+        "test_known_truths.py::test_truth_7_433_a_nations_book_is_added_by_data_alone",
         # package 76 (step 6): the convoy of four under each nation's book, half an hour sailed
         *(
             f"test_signals.py::test_the_convoy_tacks_in_succession_on_one_hoist_of_her_own_book[{r}]"
