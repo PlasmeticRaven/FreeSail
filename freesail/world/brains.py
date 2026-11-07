@@ -149,13 +149,42 @@ def perceive_vessel(world: Any, vessel: Any, brain: Any = None) -> Perception:
 # ---------------------------------------------------------------------------
 
 
+# The descriptions package 75 adds as sub-types of a file already sailed (docs/design/
+# Build-Ships.md §8.2; SW-4), whose captain's role by the intent rules is her description's
+# first; the rows before them keep the rules they had, so that no far ship's book moves.
+SUB_TYPE_ROWS: tuple[str, ...] = (
+    "revenue cutter",
+    "hired armed cutter",
+    "coasting cutter",
+    "privateer lugger",
+)
+
+
+def sub_type_role(vessel: Any) -> str:
+    """Her description's first role, read from her file, where she is one of the sub-types
+    (`SUB_TYPE_ROWS`); "" for every other vessel. Her far brain takes it where the intent's
+    kind names no role (`role_of_vessel`), and her crewed captain the same (`fold_in`, then
+    `captains.role_for`)."""
+    key = str(getattr(vessel, "description", "") or "")
+    if key not in SUB_TYPE_ROWS:
+        return ""
+    from freesail.world.ships import description
+
+    roles = description(key).get("roles") or []
+    return str(roles[0]) if roles else ""
+
+
 def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
     """The doctrine a far-detail vessel's captain sails by, by her description and her
     intent (package 43: "a doctrine by nation and role"): a frigate is a King's ship; a
     brig-sloop is a cruiser, and so is a cutter on a station; a letter or the mail is the
     packet's; a merchant brig, a schooner or a cutter in trade is the merchant's. A role
     her scenario gave her (`Vessel.role`, package 75) comes first, whatever the rest say;
-    the sixty-four, the razee and the seventy-four are King's ships as the frigate is."""
+    the sixty-four, the razee and the seventy-four are King's ships as the frigate is; and
+    the sub-types package 75 adds (`SUB_TYPE_ROWS`) sail by their description's first role
+    where the intent's kind names none (Build-Ships.md §8.1: "the first the one the intent
+    rules give"): a revenue cutter the revenue's, a hired armed cutter a cruiser's, a
+    coasting cutter a merchant's, a privateer lugger a privateer's."""
     own = str(getattr(vessel, "role", "") or "")
     if own:
         return own  # package 75 (docs/design/Build-Ships.md §8.1): her scenario's `role:`
@@ -172,6 +201,9 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
         # sailed by the cruiser's doctrine (`role_for` had the row, this function had not),
         # and left her convoy to investigate every stranger
         return "commodore"
+    first = sub_type_role(vessel)
+    if first:
+        return first  # package 75 (SW-4): her file's first role for the row
     if key in ("frigate", "sixty-four", "razee", "seventy-four"):
         return "kings-ship"  # package 75: the new men of war's descriptions with the frigate
     if key == "brig-sloop":
@@ -790,6 +822,12 @@ class FarCaptain(Judgement):
             # again when his intent is changed (`Captain.set_intent`); unset without one, so
             # that his checkpoint is as before
             captain.scenario_role = own
+        first = sub_type_role(self.vessel)
+        if first:
+            # package 75 (SW-4's reviews): a sub-type's first role, which her captain takes
+            # again where a new intent's kind names none (`captains.role_for`), as her far
+            # brain does; unset for every other ship, so that its checkpoint is as before
+            captain.sub_type_role = first
         captain.doctrine = self.doctrine
         captain.trend = self.trend
         captain._wind_log = list(self._wind_log)

@@ -166,7 +166,14 @@ COMPANY_CLOSING_KN = 2.0
 
 # The descriptions a scenario may give a far-detail ship: her file, her rig's word (what
 # the tops make out at four miles), and what she is when made out (spec M5 §25: the
-# brig-sloop of the Navy and the merchant brig of the trade, one file, two descriptions).
+# brig-sloop of the Navy and the merchant brig of the trade, one hull and rig, two
+# descriptions). A description is a sub-type (package 75; docs/design/Build-Ships.md §8):
+# her file's own `ship.descriptions` give the fit a far ship of it carries and the roles a
+# scenario may give her. Since package 75 (SW-4; §8.4, the lead's ruling of 2026-10-29) the
+# merchant brig sails her own file, merchant-brig.yaml, the brig's hull and rig with her own
+# company of sixteen and her four 6-pounders, where she sailed the brig-sloop's guns and
+# her hundred and twenty-one; a file shared by two rows names the first of them for a ship
+# of that file (`size_of_file`, the player's shadow), so the plain row comes first.
 DESCRIPTIONS: dict[str, dict[str, str]] = {
     "frigate": {
         "file": "data/ships/frigate-36.yaml",
@@ -186,19 +193,46 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "what": "a topsail schooner, pierced for guns",
     },
     "cutter": {"file": "data/ships/cutter.yaml", "rig": "a cutter", "what": "a cutter"},
+    # package 75 (Build-Ships.md §8.2; SW-4): the cutter's sub-types, each with her file's
+    # fit and roles. What the glass makes out: the revenue cutter by her service's word, a man
+    # of war's to a privateer (`captains.MAN_OF_WAR_WORDS`: "revenue"), the design's §8.2;
+    # the hired and the coasting cutters as a cutter, as the King's cutter is, since no design
+    # words them otherwise (the lead's to word)
+    "revenue cutter": {
+        "file": "data/ships/cutter.yaml",
+        "rig": "a cutter",
+        "what": "a revenue cutter",
+    },
+    "hired armed cutter": {
+        "file": "data/ships/cutter.yaml",
+        "rig": "a cutter",
+        "what": "a cutter",
+    },
+    "coasting cutter": {
+        "file": "data/ships/cutter.yaml",
+        "rig": "a cutter",
+        "what": "a cutter",
+    },
     "brig-sloop": {
         "file": "data/ships/brig.yaml",
         "rig": "a brig",
-        "what": "a brig-sloop of war, sixteen ports a side",
+        "what": "a brig-sloop of war, ten ports a side",  # package 75, SW-4: RMG ZAZ4491
     },
     "merchant brig": {
-        "file": "data/ships/brig.yaml",
+        "file": "data/ships/merchant-brig.yaml",  # package 75, SW-4 (§8.4): her own file
         "rig": "a brig",
         "what": "a merchant brig, deep laden",
     },
     # package 43b (spec M6 §19): the chasse-marée on the Éclair of 1795 and the smack on the
     # Culloden of 1746, the coaster and the fisherman of the world's business
     "lugger": {
+        "file": "data/ships/lugger.yaml",
+        "rig": "a lugger",
+        "what": "a chasse-marée, three-masted under lugs",
+    },
+    # package 75 (§8.2; SW-4): the chasse-marée with the Éclair's three guns over the rail,
+    # made out as a chasse-marée, since no design words her otherwise (the lead's to word)
+    "privateer lugger": {
         "file": "data/ships/lugger.yaml",
         "rig": "a lugger",
         "what": "a chasse-marée, three-masted under lugs",
@@ -238,6 +272,13 @@ _DESCRIPTION_WORDS = {
     "letter of marque": "privateer schooner",
     "a cutter": "cutter",
     "cutter": "cutter",
+    # package 75 (Build-Ships.md §8.2; SW-4): the sub-types' words
+    "a revenue cutter": "revenue cutter",
+    "a hired cutter": "hired armed cutter",
+    "hired cutter": "hired armed cutter",
+    "a hired armed cutter": "hired armed cutter",
+    "a coasting cutter": "coasting cutter",
+    "a privateer lugger": "privateer lugger",
     "a brig": "merchant brig",
     "brig": "merchant brig",
     "a merchant brig": "merchant brig",
@@ -282,9 +323,11 @@ def description_key(words: str) -> str | None:
         return found
     # the description's own words after what qualifies them (package 68; the cold review
     # of 2026-10-22, R-43: "a French lugger" and "a small fishing lugger" were no
-    # descriptions): the longest tail of the words that names one
+    # descriptions): the longest tail of the words that names one, the whole of them after
+    # the article first (package 75, SW-4's reviews: "the revenue cutter" took the cutter's
+    # row by its last word, and "the frigate" none, the `ship:` order taking "the")
     parts = key.removeprefix("a ").removeprefix("an ").removeprefix("the ").split()
-    for n in range(len(parts) - 1, 0, -1):
+    for n in range(len(parts), 0, -1):
         tail = " ".join(parts[-n:])
         if tail in DESCRIPTIONS:
             return tail
@@ -299,10 +342,11 @@ def description_key(words: str) -> str | None:
 @functools.lru_cache(maxsize=32)
 def file_descriptions(ship_file: str) -> dict[str, dict[str, Any]]:
     """The descriptions a ship file carries of itself (`ship.descriptions`, written by
-    `tools/gen_ships.py`: the brig's two), each {rig, what, note} and, where the file gives
-    them (package 75; docs/design/Build-Ships.md §8.1), the `fit` a far ship of it carries
-    when the scenario names none and the `roles` a scenario may give her, kept a list;
-    empty for a file without them. The file is the source and `DESCRIPTIONS` the index."""
+    `tools/gen_ships.py`: the brig's two, the cutter's four), each {rig, what, note} and,
+    where the file gives them (package 75; docs/design/Build-Ships.md §8.1), the `fit` a far
+    ship of it carries when the scenario names none and the `roles` a scenario may give her,
+    kept a list; empty for a file without them. The file is the source and `DESCRIPTIONS`
+    the index."""
     import yaml
 
     try:
@@ -324,9 +368,10 @@ def _description_value(key: str, value: Any) -> Any:
     return str(value)
 
 
-# The player's ship files that no far description sails, by the description their words
-# are taken from for her shadow in another ship's lookout (package 70).
-SHADOW_FILES: dict[str, str] = {"merchant-brig.yaml": "merchant brig"}
+# Package 70's `SHADOW_FILES` (the player's ship files that no far description sailed, by
+# the description her shadow's words were taken from: the merchant brig's own file) went in
+# package 75 (SW-4; Build-Ships.md §8.4): every ship file but the boats' is a description's
+# now, the merchant brig sailing her own, so the shadow finds her words by her file.
 
 
 def description(key: str) -> dict[str, Any]:
@@ -1348,7 +1393,12 @@ def _role_of_spec(spec: dict[str, Any], key: str, d: dict[str, Any]) -> str:
         raise ValueError(f"'{role}' is no captain's role; the roles: {', '.join(ROLES)}.")
     roles = list(d.get("roles") or [])
     if role not in roles:
-        given = f"the roles {', '.join(roles)}" if roles else "no role"
+        # one role in the singular (SW-4's reviews: "the roles fisherman")
+        given = (
+            (f"the role {roles[0]}" if len(roles) == 1 else f"the roles {', '.join(roles)}")
+            if roles
+            else "no role"
+        )
         raise ValueError(f"'{role}' is no role a {key} takes; her file gives a {key} {given}.")
     return role
 
@@ -1740,22 +1790,16 @@ class Vessels:
             s = self.__dict__.get("own")
             if s is None:
                 source = str(getattr(getattr(ship, "spec", None), "source", "") or "")
-                key = ""
-                for k, d in DESCRIPTIONS.items():
-                    if (
-                        source
-                        and d["file"].split("/")[-1] == source.replace("\\", "/").split("/")[-1]
-                    ):
-                        key = k
-                        if k != "merchant brig":
-                            break
-                if key in ("merchant brig", "brig-sloop"):
-                    key = "brig-sloop" if _is_kings_ship(world) else "merchant brig"
-                if not key:
-                    # a player's file no far description sails (the merchant brig's own, package
-                    # 70): her words by the file's name, so that another ship's lookout does not
-                    # read a trader as 'a ship' of the line's class
-                    key = SHADOW_FILES.get(source.replace("\\", "/").split("/")[-1], "")
+                name = source.replace("\\", "/").split("/")[-1]
+                # her words by her file's first description (package 75, SW-4: the merchant
+                # brig's own file is the merchant brig's row, where package 70 named it in
+                # `SHADOW_FILES`), so that another ship's lookout does not read a trader as
+                # 'a ship' of the line's class; the brig's file a brig-sloop under a King's
+                # officer and a merchant brig under a master, as before
+                rows = [k for k, d in DESCRIPTIONS.items() if d["file"].split("/")[-1] == name]
+                key = rows[0] if source and rows else ""
+                if key == "brig-sloop" and not _is_kings_ship(world):
+                    key = "merchant brig"
                 d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
                 ports = getattr(world, "dealings", None)
                 nation_id = str(getattr(ports, "ship_nation", "") or "britain")

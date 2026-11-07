@@ -26,6 +26,18 @@ ship:
       what: a chasse-marée, three-masted under lugs
       note: L'Éclair's hull (RMG ZAZ6306) as the Breton and Norman coaster, fisherman or privateer of
         the war (Forfait 1788 pp. 52 to 55; spec M6 §19; judgement on the words).
+      fit: unarmed
+      roles:
+      - fisherman
+      - merchant
+    privateer lugger:
+      rig: a lugger
+      note: The lugger as the privateer of the war, with Éclair's own guns (the fit 'gun lugger 1795');
+        a privateer's role (Build-Ships.md §8.2, §9.1). What the glass makes her out is the index's (world/ships.py),
+        its words not yet settled.
+      fit: gun lugger 1795
+      roles:
+      - privateer
 hull:
   # 55 ft: judgement between the 45.9 ft keel for tonnage and the 59.25 ft on the range of the deck (RMG ZAZ6306).
   length_waterline_m: 16.8
@@ -703,6 +715,78 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers:
+      # The trimmers: two of the forecastlemen at the fore lug's tack and halyard and the jib (judgement).
+      forecastle: 2
+      # Two of the afterguard at the main and mizen lugs' sheets.
+      afterguard: 2
+    # One man at the tiller (a lugger steers with a tiller; judgement).
+    helm: 1
+    # One of the waisters to pass the cartridges beside the idlers (judgement).
+    powder: 1
+    # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
+    priority: sail before guns
+    # Six of her people with the stand of arms' muskets (judgement: the King's cutter's six of thirty, her company being thirty); she bears no marines.
+    small_arms: 6
+    # Twenty of her thirty with cutlass and pistol (judgement: the King's cutter's twenty of thirty; a privateer's company boards almost whole).
+    boarders: 20
+# The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): unarmed by default, the coaster and the fisherman, with one fit the scenario may name (ship: {fit: ...}): her own three guns as the gun lugger taken in 1795. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
+armament:
+  default: unarmed
+  fits:
+    # The gun lugger's fit: three long 18-pounders over the rail. Ten men to each by the gun's rule, thirty in all against her company of thirty (judgement both): short-handed at quarters, as the log will say.
+    gun lugger 1795:
+      source: 'RMG ZAZ6306, the caption (read: three 18-pounders, the calibre''s second digit probable);
+        the places over the rail a judgement; the weights from memory'
+      guns:
+      # Éclair's three 18-pounders (RMG ZAZ6306's caption, read, the 8 probable), long guns over the waist's rail, her sheet drawing no port (judgement on the places: a pair forward of the main mast, the third abaft it to starboard); the gun of 42 cwt (from memory, UNVERIFIED), ten men to a gun by the gun's rule.
+      - id: rail.1.starboard
+        kind: long
+        pounder: 18
+        place: rail
+        number: 1
+        side: starboard
+        x_m: 2.4
+        height_m: 1.57
+        crew: 10
+        weight_cwt: 42.0
+      - id: rail.1.larboard
+        kind: long
+        pounder: 18
+        place: rail
+        number: 1
+        side: larboard
+        x_m: 2.4
+        height_m: 1.57
+        crew: 10
+        weight_cwt: 42.0
+      - id: rail.2.starboard
+        kind: long
+        pounder: 18
+        place: rail
+        number: 2
+        side: starboard
+        x_m: -2.17
+        height_m: 1.52
+        crew: 10
+        weight_cwt: 42.0
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
+      cartridges:
+        long:
+          18: 165
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          18: 6.0
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 5
+      shot:
+        18:
+          round: 120
+          grape: 18
+          chain: 12
 # The hold (package 35, spec M5 §23): room for 50 tons of cargo beyond her own stores, 0.5 of the 101 tons burthen (a chasse-marée, a coaster deep in the hold: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 50

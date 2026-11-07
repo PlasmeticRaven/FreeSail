@@ -1,0 +1,275 @@
+# FreeSail: the doctrine of a revenue cutter's commander (package 75, SW-4;
+# docs/design/Build-Ships.md §8.3). The form is merchant.yaml's (see its head) and the book
+# is the cruiser's (cruiser.yaml), whose seamanship, station and chase she keeps, with four
+# differences, each judgement:
+#
+# - every sail she closes within `investigate_nm` she speaks: the cruiser lets a stranger go
+#   once she is made out a friend, and a revenue cutter goes on to hail her, since the lugger,
+#   the smack and the coaster her service looks to are of her own nation as often as not
+#   (no `friend made out` row from `investigating a stranger`; the sail spoken lets her go);
+# - an enemy of her size or less within `engage_nm` is engaged, as the cruiser's (a privateer
+#   of her size), and a bigger one hauled off from (`overmatched`);
+# - a man of war of the enemy's within `man_of_war_nm` is hauled off from whatever her size,
+#   as the privateer's (`man of war near`: the lookout's words of a man of war, among them
+#   "revenue", `captains.MAN_OF_WAR_WORDS`), and not engaged out of `evading` while she is
+#   near (`unless: [overmatched, man of war near]`, the privateer's guard);
+# - no blockade station: the world's business puts no revenue cutter on one (no `stations:`
+#   table); a scenario may still give her a station to keep, and she keeps it by the
+#   cruiser's book.
+#
+# Plainly: the smuggler and the search are not modelled (no search order exists, no cargo is
+# contraband), so the role differs from the cruiser's in whom she speaks and in the man of war
+# she keeps clear of, and in nothing else. The cutter's file is her hull and her guns
+# (data/ships/cutter.yaml, the "revenue cutter" description, the long guns: Sherbourne's own
+# as built, six 3-pounders and eight swivels, in the Customs' service from 1763 to 1779,
+# docs/design/VesselCandidates.md); Fincham 1843 p. 67's revenue cruisers are the hull's
+# source, not her doctrine's.
+
+role: revenue
+name: the commander of a revenue cutter
+source: "package 75 (Build-Ships.md §8.3): cruiser.yaml's book, every sail investigated spoken and a man of war of the enemy's hauled off from as the privateer's; judgement on every figure; the smuggler and the search not modelled"
+
+thresholds:
+  # package 73 (spec M7 §11, §11a, §13, §14): the fight on deck and the damage. `board_odds`
+  # his boarders so many times her fit company before he boards (nought: never),
+  # `board_when` 'her guns silent' (no shot of hers has struck for five minutes) or 'at any
+  # time'; `musketry_cables` the range the marines open by volley within; `marines_tops`
+  # whether the book sends the marksmen aloft on entering the action (`kit`: the nation's
+  # share aloft decides, data/marines.yaml); `pumps_at_m` the well's depth he mans the pumps
+  # at, `spell_minutes` the spell at the brakes (the keeper's), `give_up_at_share` the share
+  # of the foundering water at which, the pumps losing and an enemy at hand, he strikes;
+  # `damage_priority` the order of his repairs (freesail/world/captains.py `_damage_work`)
+  board_odds: {value: 1.3, source: "a King's ship boards when her boarders are so many times the enemy's fit company and her fire has slackened (the frigate actions of 1793 to 1815, James: the boarding the end of a beaten ship); judgement"}
+  board_when: {value: her guns silent, source: "as board_odds"}
+  musketry_cables: {value: 1.0, source: "the marines open within a cable, musket shot being a hundred yards (spec M7 §11): a cable is the outside of it; judgement"}
+  marines_tops: {value: kit, source: "the French put sharpshooters in the tops, the British kept theirs on the poop (Nelson's objection; Trafalgar's accounts, from memory): the nation's kit decides"}
+  pumps_at_m: {value: 0.3, source: "a foot of water in the well mans the pumps beyond the watch's routine spell (Falconer 1780, PUMP: the well sounded each watch and the pumps worked when she makes water); judgement"}
+  spell_minutes: {value: 30, source: "a spell at the brakes half an hour (freesail/world/water.py SPELL_S; Falconer 1780, SPELL); judgement"}
+  give_up_at_share: {value: 0.4, source: "with the water at two fifths of what founders her and the pumps losing, an enemy at hand, the colours come down rather than the ship go down with her people (the sinking actions, James; judgement)"}
+  damage_priority: {value: "the leak, the rigging, the guns", source: "the leak first (she must float), then the rigging that keeps her sailing, then a dismounted gun (77's remount); the carpenter's and the boatswain's order of work, judgement"}
+  # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
+  # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
+  # opened at (the nation's habit may double it: data/nations.yaml `habits:`, package 71);
+  # `break_off_nm` and `break_off_minutes` the distance and the minutes with no enemy
+  # within it that end the action; `engage_side` the gage (weather or lee); `charge` and
+  # `aim` what the guns load and are laid for; `morale_start` and `strike_below` the
+  # company's figure and the line the colours come down at (freesail/combat/morale.py).
+  engage_nm: {value: 1.0, source: "as the King's ship's"}
+  engage_range_cables: {value: 2, source: "as the King's ship's"}
+  break_off_nm: {value: 3, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
+  break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
+  engage_side: {value: weather, source: "as the King's ship's"}
+  # package 71 (item 8): what he does when the enemy passes through the wind's eye and the
+  # engaging helm may not follow her through it: `shift` the engaged battery and keep his
+  # tack (the guns go on), or `tack` or `wear` for her
+  through_the_eye: {value: shift, source: "the battery shifted and the tack kept: the course never put in the wind's eye in action (the owner's first action, 2026-10-24); judgement"}
+  charge: {value: round, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
+  aim: {value: hull, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
+  morale_start: {value: 0.85, source: "a cruiser's company at the start of an action (spec M7 §10, decision 7); judgement"}
+  strike_below: {value: 0.15, source: "a brig-sloop or a cutter of the Navy strikes a little sooner than a frigate: her company smaller, a loss of a quarter of them the end of her fight (James, the sloops' actions); judgement"}
+  gale_kn: {value: 38, source: "between the merchantman's force 8 and the King's ship's force 9: a brig-sloop lies to sooner than a frigate; judgement on Beaufort's scale"}
+  gale_over_kn: {value: 30, source: "judgement, between the two"}
+  beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
+  beating_band_points: {value: 0.5, source: "package 43b: the course laid again only half a point freer than the shaping's edge, so that a course on the edge of the wind is one verdict and not two by turns; judgement"}
+  gale_over_minutes: {value: 10, source: "as the King's ship's"}
+  shorten_sail_kn: {value: 30, source: "the starter book's thirty knots"}
+  # Package 58b (item 2): casts on a long leg, the captain's own (freesail/world/captains.py
+  # `_casts`), not only at the leg's ends: the hand lead every glass where the chart has
+  # under `cast_glass_fathoms` at the account, the deep-sea lead every hour in deeper water
+  # within `cast_hour_fathoms` inshore (`cast_inshore_nm`), brought to for it when her way
+  # is over the four knots the lead wants and the wind under `shorten_sail_kn` (the Eclair's
+  # first cruise: a leg of
+  # twenty miles in sixteen fathoms with no cast put her on the Heaux de Brehat, the flood
+  # having set her four miles)
+  cast_glass_fathoms: {value: 20, source: "the hand lead's twenty fathoms (freesail/world/reckoning.py HAND_LEAD_FATHOMS); the Master, art. XXVI, 'always sounding to inform' (as data/scenarios/gate-5b-passage.orders has it); the glass judgement"}
+  cast_hour_fathoms: {value: 100, source: "the hundred-fathom line, the edge of soundings; Falconer 1780, 'Sounding', 'it is usual previously to bring-to the ship' for the deep-sea lead; the hour judgement"}
+  cast_inshore_nm: {value: 15, source: "the deep-sea lead brought to for every hour only with the land in sight or the coast by account within five leagues, making the land (taken another way, package 58b: brought to every hour across the open Channel the schooner on her intent lost a quarter of her time and never made Brest in 36 hours); judgement"}
+  cast_bring_to_hours: {value: 4, source: "brought to for the deep-sea lead once a watch at most when her way is over the four knots it wants; the hourly cast taken without bringing to only when her way allows (taken another way, package 58b: brought to every hour within five leagues of the land the schooner on her intent lost an hour in four along the coast of Leon); judgement"}
+  sea_room_nm: {value: 10, source: "as the merchant's; judgement"}
+  lee_shore_nm: {value: 6, source: "two leagues, spec M6 §4"}
+  shelter_land_nm: {value: 0, source: "a cruiser keeps the sea in thick weather, as a King's ship does; nought turns the stimulus off"}
+  shelter_within_nm: {value: 0, source: "none: see shelter_land_nm"}
+  stranger_hostile_nm: {value: 6, source: "an enemy she cannot fight (a bigger class) made out within two leagues is hauled off from; her colours are made out at two miles and her rig at four, so this is the first she can know; judgement"}
+  investigate_nm: {value: 10, source: "as the cruiser's: a sail within ten miles is closed and made out, and here spoken, every lugger, smack and coaster in her reach among them; judgement"}
+  man_of_war_nm: {value: 6, source: "a man of war of the enemy's made out within two leagues is hauled off from, as a superior force is (stranger_hostile_nm): her service is the revenue's, not to fight the enemy's cruisers; judgement"}
+  stranger_chase_nm: {value: 25, source: "as the King's ship's"}
+  chase_stale_hours: {value: 3, source: "a watch of chasing without a mile gained is given up (the trials' brig chased a schooner fifteen hours without closing her); judgement"}
+  offing_nm: {value: 3, source: "a league; judgement"}
+  leg_reached_nm: {value: 2, source: "as the merchant's"}
+  anchor_within_nm: {value: 0.5, source: "as the merchant's"}
+  road_cables: {value: 3, source: "spec M6 §4"}
+  wear_wind_kn: {value: 30, source: "as the King's ship's (package 45)"}
+  aback_recover_minutes: {value: 3, source: "as the King's ship's (package 88): Luce 1866 ch. XXV, 'To Box Off'; the minutes judgement"}
+  danger_ahead_nm: {value: 1.5, source: "as the King's ship's (package 88): Falconer 1780, CLAWING; the distance judgement"}
+  tack_regardless_nm: {value: 2, source: "as the King's ship's (package 45)"}
+  sail_again_kn: {value: 25, source: "as the King's ship's (package 45)"}
+  sail_again_minutes: {value: 30, source: "as above; halved when the glass is rising"}
+  worsening_wind_kn: {value: 6, source: "as the King's ship's (package 45)"}
+  mending_wind_kn: {value: 6, source: "as above"}
+  worsening_sooner_kn: {value: 6, source: "as above"}
+  mending_sooner_kn: {value: 4, source: "as above"}
+  station_wear_hours: {value: 2, source: "the cruise's book: wore ship at the end of every second hour"}
+  hail: {value: "What ship is that?", source: "the hail of a King's ship coming up with a stranger (Luce 1884 ch. XX, the custom of the hail); the words judgement"}
+
+# No `stations:` table: the world's business puts no revenue cutter on a blockade station
+# (Build-Ships.md §8.3), as it puts none of the merchant's or the packet's.
+
+books:
+  on passage:
+    - 'standing order "the leg": every hour, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
+    - 'standing order "the pilot boards": at the pilot''s hail then take the pilot'
+    - 'standing order "the pilot put off": at the pilot asks to be put off then heave to'
+    - 'standing order "the pilot off": at the pilot off then fill away'
+    - 'standing order "under way again": at filled away then set plain sail'
+    - 'standing order "a sail on passage": at a sail sighted then make her out'
+    - 'standing order "the lead in pilot water": every 5 minutes, if the distance to {anchorage} is under 6 miles then heave the lead'
+    - 'standing order "the anchorage": at a sounding, if the distance to {anchorage} is under 1.8 miles and the depth of water is under {anchorage_fathoms} fathoms and the speed is over 2 knots then come to an anchor'
+  beating:
+    - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+  hove to for weather:
+    - 'standing order "bearings hove to": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "shorten sail lying to": when the true wind exceeds {gale_kn} knots for 5 minutes then shorten sail'
+    - 'standing order "storm canvas": when the true wind exceeds 40 knots for 5 minutes then set the storm staysails; send down the topgallant masts'
+  running for shelter: []
+  at anchor:
+    - 'standing order "the tide to go in": at the turn to the flood, if the daylight is day and the visibility is not a mile and the visibility is not a cable then get under way on the {cast_in} tack and steer {course_in}'
+    - 'standing order "under way for the port": at under way then set plain sail'
+  in port: []
+  investigating a stranger:
+    - 'standing order "close the stranger": every glass, if a stranger in sight is in sight then give chase'
+    - 'standing order "more of her": at a sail made out, if a stranger in sight is in sight then make her out'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+  chasing:
+    - 'standing order "keep her bearing": every glass, if a stranger in sight is in sight then give chase'
+    - 'standing order "more of her": at a sail made out, if a stranger in sight is in sight then give chase'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+  evading:
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "make all sail to haul off": at steady on the course, if the true wind is under {shorten_sail_kn} knots then make all sail'
+  keeping station:
+    - 'standing order "wear at the hour": every 2 hours, if a stranger in sight is not in sight and the distance to {station} is under {radius_out} miles then wear ship'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "by the wind": at wore then keep her full and by'
+    - 'standing order "back to the station": every watch, if a stranger in sight is not in sight and the distance to {station} is over {radius} miles then shape a course for {station}'
+    - 'standing order "a sail on the station": at a sail sighted then make her out'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    - 'standing order "the morning sight": at two bells, if the daylight is day then take a sight for the longitude'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
+  in distress: []
+  in company:
+    # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): her station in the set,
+    # kept by `keep your station` every two minutes (freesail/orders/station.py: the held
+    # order of the navigation, judged by the lookout's bearing and distance of the flag,
+    # the helm's law and the sail to hold it); the trims and the land as on her station
+    - 'standing order "the station": every 2 minutes, if the manoeuvre in hand is not hove to then keep your station'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "land ahead": at land ahead then put her about'
+    - 'standing order "land close ahead": at land close ahead then put her about'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+  engaging:
+    # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
+    # and laid, and the mark engaged on the side she bears are the captain's own on entering
+    # (freesail/world/captains.py `_engage_now`); the course that keeps her on the engaged
+    # beam at the doctrine's range his each minute (`_engaging`); the fire is the book's.
+    - 'standing order "open fire": when the range is under {engage_range_cables} cables then fire as they bear'
+    - 'standing order "long shot": when the range exceeds {break_off_nm} miles then hold your fire'
+    - 'standing order "return her fire": at she opens fire then fire as they bear'
+    - 'standing order "she strikes": at the enemy strikes then cease firing'
+    - 'standing order "the colours": at the colours struck then cease firing'
+  struck: []  # package 70: the colours down, lying to for her captor
+
+transitions:
+  # aground from any state at sea is distress (package 40c)
+  - {from: keeping station, on: aground, to: in distress}
+  - {from: beating, on: aground, to: in distress}
+  - {from: hove to for weather, on: aground, to: in distress}
+  - {from: investigating a stranger, on: aground, to: in distress}
+  - {from: chasing, on: aground, to: in distress}
+  - {from: evading, on: aground, to: in distress}
+  - {from: at anchor, on: aground, to: in distress}
+  - {from: in port, on: under way, to: on passage}
+  - {from: on passage, on: anchored in port, to: in port}
+  - {from: on passage, on: aground, to: in distress}
+  - {from: on passage, on: gale, to: hove to for weather, unless: no sea room}
+  # a superior enemy within two leagues is hauled off from; a stranger near enough is
+  # closed and made out, unless she is that enemy
+  - {from: on passage, on: overmatched, to: evading}
+  - {from: on passage, on: stranger near, to: investigating a stranger}
+  - {from: on passage, on: course not laid, to: beating}
+  - {from: beating, on: course laid, to: on passage}
+  - {from: beating, on: overmatched, to: evading}
+  - {from: beating, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: hove to for weather, on: gale over, to: on passage}
+  - {from: hove to for weather, on: lee shore, to: on passage}
+  - {from: keeping station, on: overmatched, to: evading}
+  - {from: keeping station, on: stranger, to: investigating a stranger}
+  - {from: keeping station, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: investigating a stranger, on: overmatched, to: evading}
+  - {from: investigating a stranger, on: enemy made out, to: chasing}
+  # no `friend made out` row (package 75): a friend she investigates is spoken before she
+  # is let go, the revenue's difference from the cruiser
+  - {from: investigating a stranger, on: stranger spoken, to: on passage}
+  - {from: investigating a stranger, on: stranger lost, to: on passage}
+  - {from: chasing, on: overmatched, to: evading}
+  - {from: chasing, on: stranger spoken, to: on passage}
+  - {from: chasing, on: stranger lost, to: on passage}
+  - {from: chasing, on: chase stale, to: on passage}
+  # package 88 (found on item 1): a mark engaged beyond the engaging distance and not
+  # gained on in `chase_stale_hours` is a stale chase, given up as one
+  - {from: engaging, on: chase stale, to: on passage}
+  - {from: investigating a stranger, on: chase stale, to: on passage}
+  - {from: evading, on: stranger lost, to: on passage}
+  - {from: evading, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: at anchor, on: under way, to: on passage}
+  - {from: at anchor, on: anchored in port, to: in port}
+  - {from: in distress, on: afloat, to: on passage}
+  # package 75: a man of war of the enemy's near is hauled off from whatever her size, as the
+  # privateer's (`man_of_war_nm`), before an enemy in range is engaged
+  - {from: on passage, on: man of war near, to: evading}
+  - {from: beating, on: man of war near, to: evading}
+  - {from: keeping station, on: man of war near, to: evading}
+  - {from: investigating a stranger, on: man of war near, to: evading}
+  - {from: chasing, on: man of war near, to: evading}
+  - {from: engaging, on: man of war near, to: evading}
+  # package 70 (spec M7 §10): into the action and out of it
+  - {from: on passage, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: beating, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: keeping station, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: investigating a stranger, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: chasing, on: enemy in range, to: engaging, unless: overmatched}
+  # package 75 (SW-4's reviews): out of `evading` unless a man of war is near as well, as the
+  # privateer's (an enemy's revenue cutter, of her own class, had her evading and engaging by
+  # turns every minute at crewed detail)
+  - {from: evading, on: enemy in range, to: engaging, unless: [overmatched, man of war near]}
+  - {from: engaging, on: aground, to: in distress}
+  - {from: engaging, on: enemy struck, to: on passage}
+  - {from: engaging, on: enemy out of range, to: on passage}
+  - {from: engaging, on: overmatched, to: evading}
+  # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): in company, a cruiser at
+  # her station in a squadron: the ground, the gale, a superior force and an enemy within
+  # her engaging distance as on her station; no stranger row (the flag's signal frees her)
+  - {from: in company, on: aground, to: in distress}
+  - {from: in company, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: in company, on: anchored in port, to: in port}
+  - {from: in company, on: man of war near, to: evading}
+  - {from: in company, on: overmatched, to: evading}
+  - {from: in company, on: enemy in range, to: engaging, unless: overmatched}

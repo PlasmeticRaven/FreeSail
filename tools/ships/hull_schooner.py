@@ -424,6 +424,28 @@ def add_hull(b, file_word):
     print("\n".join(f"{file_word}: {line}" for line in report), file=sys.stderr)
 
 
+# Her channels on the plate (the note's §5.10, measured on the sheer plan, Lynx's own frame): each
+# lower mast's axis at the sill line, and its channel's after and fore ends, x in metres; the fore
+# channel carries four deadeyes a side and the main three (read). Not drawn: read for the pivot's
+# arc alone (package 75, SW-4; Build-Ships.md §9.2), by `channels`.
+CHANNELS = {
+    "fore.mast": (8.26, 5.26, 8.45),
+    "main.mast": (-2.60, -5.18, -2.54),
+}
+
+
+def channels(hull):
+    """Each lower mast's channel as (fore end, after end), metres from the mast's own x in the file,
+    at the file's length (the note's §6.2, k_L): the plate's channel goes with its mast, which the
+    files stand a little off the plate's (§5.10), so that it is abeam of the mast where the file has
+    it."""
+    k_l = hull["length_waterline_m"] / LYNX_LOAD_LINE_M
+    return {
+        mast: (round((fore - axis) * k_l, 2), round((aft - axis) * k_l, 2))
+        for mast, (axis, aft, fore) in CHANNELS.items()
+    }
+
+
 def port_sill(hull, x):
     """The sill of the port at a gun's x, from the hull's own triples: a port gun stands on a triple
     of its deck, and no gun's place moves (Build-Ships.md §4.4, §5.3)."""

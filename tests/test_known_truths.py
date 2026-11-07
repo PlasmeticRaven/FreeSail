@@ -4110,7 +4110,10 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
-GATE_5C_CRUISE_DIGEST = "5a62f6fca122c6ad"  # 58a (728522e26dd25a49 at 56, the glass)
+# package 75, SW-4: the Palinure made out "a brig-sloop of war, ten ports a side" (RMG ZAZ4491,
+# read), where the words had sixteen; every tick and line the same, proved by bisection (the
+# word put back gives 5a62f6fca122c6ad again; docs/dev/TuningNotes.md, SW-4)
+GATE_5C_CRUISE_DIGEST = "1e7f8ab24b84e6f7"  # SW-4 (5a62f6fca122c6ad at 58a; 728522e26dd25a49 at 56)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E

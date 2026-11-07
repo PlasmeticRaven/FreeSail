@@ -143,6 +143,11 @@ ROLES: tuple[str, ...] = (
     "fisherman",
     "privateer",  # package 70: a letter of marque cruising for prizes
     "prize-master",  # package 74: a prize under her prize crew, for a friendly port
+    # package 75 (docs/design/Build-Ships.md §8.3; SW-4): an armed Indiaman, the merchant's
+    # book with the figures of a ship that fights when brought to; a revenue cutter, the
+    # cruiser's with every sail she investigates spoken and a man of war hauled off from
+    "indiaman",
+    "revenue",
 )
 
 # The kinds of intent the captain reads (package 43b: `fish`, a trip to a fishing ground
@@ -295,7 +300,13 @@ SIZE_RANK: dict[str, int] = {
     "schooner": 1,
     "privateer schooner": 1,  # PROVISIONAL (2026-10-25): the schooner's hull, armed
     "cutter": 1,
+    # package 75 (Build-Ships.md §8.2; SW-4): the cutter's and the lugger's sub-types, each
+    # her file's hull and so her file's class
+    "revenue cutter": 1,
+    "hired armed cutter": 1,
+    "coasting cutter": 1,
     "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
+    "privateer lugger": 1,
     "smack": 0,  # a fishing smack of thirty-five tons is nobody's match
     # package 75's ships (docs/design/Build-Ships.md §3.1 item 24; their files and rows
     # come with each ship): the razee a heavy frigate, rated a 44 (James vol. 3 p. 311;
@@ -331,7 +342,7 @@ _SIZE_WORDS: tuple[tuple[str, int], ...] = (
 
 def size_of_words(known: str) -> int:
     """The class of a sail from the lookout's words for her ('a brig-sloop of war,
-    sixteen ports a side, standing ...'): nought while she is 'a sail'."""
+    ten ports a side, standing ...'): nought while she is 'a sail'."""
     head = str(known or "").split(",")[0].split(";")[0].lower()
     for word, rank in _SIZE_WORDS:
         if word in head:
@@ -917,12 +928,22 @@ def _place_id(world: Any, words: str) -> str:
 @dataclass(frozen=True)
 class Transition:
     """One row of a doctrine's table: from a state, on a stimulus, to a state, unless
-    another stimulus holds."""
+    another stimulus holds; or unless any of several holds, the file's `unless` a list
+    (package 75, SW-4's reviews: `unless: [overmatched, man of war near]`), kept as a
+    tuple, where one stimulus stays the word it was, so that every older row and every
+    pickled one reads as before."""
 
     frm: str
     on: str
     to: str
-    unless: str = ""
+    unless: str | tuple[str, ...] = ""
+
+    @property
+    def unless_any(self) -> tuple[str, ...]:
+        """The stimuli any of which holds the row back: none, one or several."""
+        if isinstance(self.unless, str):
+            return (self.unless,) if self.unless else ()
+        return tuple(self.unless)
 
 
 @dataclass(frozen=True)
@@ -948,7 +969,9 @@ class Doctrine:
         return [t for t in self.transitions if t.frm == state]
 
 
-@functools.lru_cache(maxsize=8)
+# The books read once a run: every role's (`ROLES`, nine since package 75's two) with room
+# (package 75, SW-4: the cache held eight, one fewer than the roles now).
+@functools.lru_cache(maxsize=16)
 def _doctrine(path: str) -> Doctrine:
     raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     role = str(raw.get("role") or Path(path).stem)
@@ -976,9 +999,10 @@ def _doctrine(path: str) -> Doctrine:
         for key in ("from", "to"):
             if t[key] not in STATES:
                 raise ValueError(f"{path}, transitions {i + 1}: '{t[key]}' is no state.")
-        transitions.append(
-            Transition(str(t["from"]), str(t["on"]), str(t["to"]), str(t.get("unless") or ""))
-        )
+        unless = t.get("unless") or ""
+        # package 75 (SW-4's reviews): a list holds the row back on any of its stimuli
+        unless = tuple(str(u) for u in unless) if isinstance(unless, list) else str(unless)
+        transitions.append(Transition(str(t["from"]), str(t["on"]), str(t["to"]), unless))
     return Doctrine(
         role, str(raw.get("name") or role), path, thresholds, sources, books, tuple(transitions)
     )
@@ -994,16 +1018,29 @@ def load_doctrine(role: str) -> Doctrine:
     return _doctrine(str(path))
 
 
-def role_for(world: Any, intent: Intent | None, given: str = "") -> str:
+def role_for(world: Any, intent: Intent | None, given: str = "", sub_type_role: str = "") -> str:
     """The role a ship's captain plays by her and her intent: a King's ship on station
     or bound for one is `kings-ship`; a letter carried is the packet's; a convoy's
     commodore is named by the intent; the rest trade. `given`, the role a scenario gave the
     far vessel a crewed ship's World is made from (`ships.Vessel.role`, package 75), comes
     first, as it does for her far brain (`brains.role_of_vessel`); the far brain carries it
     to her captain at the promotion (`Captain.scenario_role`), so that nothing here reads
-    the crewed World's own vessel, which the Hull does not keep."""
+    the crewed World's own vessel, which the Hull does not keep. `sub_type_role`, her
+    description's first role where she is one of package 75's sub-types
+    (`brains.SUB_TYPE_ROWS`, carried in as `Captain.sub_type_role`), comes next where the
+    intent's kind names no role, as it does for her far brain (SW-4's reviews: a crewed
+    revenue cutter given a new intent had fallen to the merchant's book)."""
     if given:
         return given
+    if sub_type_role and not (
+        intent is not None
+        and (
+            intent.kind in ("fish", "letter")
+            or (intent.kind == "station" and intent.prizes)
+            or intent.convoy
+        )
+    ):
+        return sub_type_role
     if intent is not None and intent.kind == "station":
         return "privateer" if intent.prizes else "kings-ship"
     if intent is not None and intent.kind == "letter":
@@ -1937,7 +1974,7 @@ class Judgement:
         if self.doctrine is None or self.state is None:
             return
         for t in self.doctrine.from_state(self.state):
-            if self._stimulus(t.on, p) and not (t.unless and self._stimulus(t.unless, p)):
+            if self._stimulus(t.on, p) and not any(self._stimulus(u, p) for u in t.unless_any):
                 if t.on == "chase stale" and self._stranger is not None:
                     # the chase given up: she is done with, and not closed again in sight
                     if not isinstance(self.given_up, set):
@@ -2254,6 +2291,11 @@ class Captain(Judgement):
     # promotion (`brains.FarCaptain.fold_in`) and taken first when his intent is changed;
     # "" for none, the player's captain, and a checkpoint from before
     scenario_role: str = ""
+    # package 75 (SW-4's reviews): her description's first role where she is one of the
+    # sub-types (`brains.SUB_TYPE_ROWS`), carried in at the promotion as the role is, and
+    # taken by `role_for` where a new intent's kind names none; "" for every other ship and
+    # a checkpoint from before
+    sub_type_role: str = ""
 
     def __init__(self, world: Any, intent: str | None = None, books: tuple[str, ...] = ()):
         self.world = world
@@ -2396,7 +2438,7 @@ class Captain(Judgement):
         self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
         if not (self.intent.kind == FREE and self.role):
-            self.role = role_for(self.world, self.intent, self.scenario_role)
+            self.role = role_for(self.world, self.intent, self.scenario_role, self.sub_type_role)
         self.doctrine = load_doctrine(self.role)
         self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
         self._business = {}
