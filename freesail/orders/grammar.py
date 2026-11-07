@@ -159,6 +159,10 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         span = compound_span(noun_table(ship), after) if after else None
         if span is not None or after[:2] == ["water", "sail"]:
             verb_phrase, verb = "take in", "take in"
+    if verb == "take" and "prisoners" in words and "aboard" in words:
+        # 'take six of the prisoners aboard' (package 74): the prisoners' order with its
+        # number inside the phrase, not a free line's 'take'
+        verb_phrase, verb = "take", "take the prisoners aboard"
     rest = words[len(verb_phrase.split()) :]
     if verb == "belay" and verb_phrase in work.STOP_WORDS:
         # a bare "belay" or "avast", or one said of work, belays work (package 29c); said
@@ -188,6 +192,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "damage",  # package 73: the pumps, the hatches, the carpenter's and the boatswain's work
         "fight",  # package 73: the marines, the small arms and the boarders
         "boat",  # package 82: the boat's mark to pull for
+        "prize",  # package 74: the ship taken possession of, the prisoners, the prize burnt
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by

@@ -124,6 +124,10 @@ STATES: tuple[str, ...] = (
     # package 72 (spec M7 §21): a member of a squadron or a convoy at her station in the
     # set; the rows out of it are each role file's (docs/design/Design-Squadrons.md)
     "in company",
+    # package 74 (spec M7 §18; docs/design/Design-Prizes.md §2.4): the captor closing a
+    # struck enemy to take possession of her (the boat's pull; at far detail hailing
+    # distance), out of it when the prize is his (`prize taken`) or a cruiser comes up
+    "taking possession",
 )
 
 # The roles the doctrine files give; the cruiser (package 43) is the small man-of-war on
@@ -138,6 +142,7 @@ ROLES: tuple[str, ...] = (
     "cruiser",
     "fisherman",
     "privateer",  # package 70: a letter of marque cruising for prizes
+    "prize-master",  # package 74: a prize under her prize crew, for a friendly port
 )
 
 # The kinds of intent the captain reads (package 43b: `fish`, a trip to a fishing ground
@@ -705,6 +710,9 @@ _LETTER = re.compile(
     r"^carry\s+(?:this|a|the)\s+(?:letter|message|dispatch|despatch)\s+to\s+(?P<b>.+)$"
 )
 _HOME = re.compile(r"^run\s+home\s+(?:to|for)\s+(?P<b>.+)$")
+# package 74 (spec M7 §18): a prize's passage under her prize crew, `carry the prize to
+# Falmouth` (a passage to that port; the prize master's doctrine is her role's)
+_PRIZE = re.compile(r"^carry\s+(?:the|this|her)\s+prize\s+(?:to|for|home\s+to|into)\s+(?P<b>.+)$")
 # package 43b: `fish on the Eddystone ground for 20 hours from Plymouth`
 _FISH = re.compile(
     r"^fish\s+(?:on|at|over)\s+(?P<ground>.+?)(?:\s+within\s+(?P<radius>[\d.]+)\s+miles?)?"
@@ -816,6 +824,10 @@ def read_intent(world: Any, words: str, free: bool = False) -> Intent:
     if m:
         b, via = to_and_via(group(m, "b"))
         return Intent("home", said, destination=b, via=via)
+    m = _PRIZE.match(text)
+    if m:
+        b, via = to_and_via(group(m, "b"))
+        return Intent("passage", said, destination=b, via=via)
     m = _FISH.match(text)
     if m:
         # a fishing trip (package 43b): to the ground, worked as a station of a mile or two
@@ -1800,6 +1812,8 @@ STIMULI: tuple[str, ...] = (
     "enemy in range",
     "enemy out of range",
     "enemy struck",
+    # package 74: possession taken of his struck mark (the prize's record written)
+    "prize taken",
     "man of war near",
 )
 
@@ -2031,6 +2045,9 @@ class Judgement:
             return p.tick - since >= float(th("break_off_minutes", 10)) * 60.0
         if name == "enemy struck":
             return self._enemy_struck(p)
+        if name == "prize taken":
+            # package 74: the struck mark in hand is his prize (`prizes.possess` wrote his id)
+            return self._prize_taken(p)
         if name == "man of war near":
             # package 72: a privateer's own distance for a man of war (`man_of_war_nm`),
             # apart from the two leagues a superior force is hauled off from, so that she
@@ -2211,6 +2228,20 @@ class Judgement:
 
     def _enemy_struck(self, p: Perception) -> bool:
         return False
+
+    def _own_vessel_id(self) -> str:
+        return ""
+
+    def _prize_taken(self, p: Perception) -> bool:
+        """Package 74: whether the struck mark in hand (`_stranger`) is a prize of his."""
+        from freesail.world.prizes import record_of
+
+        sea = getattr(self.world, "vessels", None)
+        v = sea.get(str(self._stranger or "")) if sea is not None else None
+        rec = record_of(v) if v is not None else None
+        if not rec:
+            return self._stranger is None
+        return str(rec.get("captor")) == str(self._own_vessel_id())
 
 
 class Captain(Judgement):
@@ -2932,6 +2963,8 @@ class Captain(Judgement):
                 self._haul_off(p)
         elif state == "engaging":
             self._engaging(p)
+        elif state == "taking possession":
+            self._take_possession(p)  # package 74 (spec M7 §18)
         elif state == "at anchor":
             if "ship.under_way" in kinds or "ship.weighed" in kinds:
                 self._waiting_at_road = False
@@ -4416,7 +4449,57 @@ class Captain(Judgement):
         if target is None:
             return False
         v = self._vessel_of(str(target))
-        return bool(v is not None and getattr(v, "struck", False))
+        struck = bool(v is not None and getattr(v, "struck", False))
+        if struck and self._stranger != str(target):
+            self._stranger = str(target)  # the struck mark is the one he takes possession of
+        return struck
+
+    def _own_vessel_id(self) -> str:
+        from freesail.world.signals import own_id
+
+        return own_id(self.world)
+
+    # -- the prize taken possession of (package 74; spec M7 §18) -------------------------
+
+    def _take_possession(self, p: Perception) -> None:
+        """Each minute in `taking possession`: the struck mark closed to a boat's pull (the
+        chase renewed every three minutes), hove to there, and `take possession of her`
+        given once hove to; a mark gone or no longer struck (retaken by her people before he
+        reached her) ends the state."""
+        from freesail.world.movement import BOAT_BETWEEN_NM
+        from freesail.world.prizes import is_prize
+
+        mark = self._stranger
+        v = self._vessel_of(str(mark or ""))
+        if v is None or getattr(v, "done", False) or not getattr(v, "struck", False) or is_prize(v):
+            if not (v is not None and is_prize(v)):
+                self._enter("on passage")
+            return
+        from freesail.world.ships import PLAYER_ID
+
+        if str(getattr(v, "id", "")) == PLAYER_ID:
+            # the player's own ship struck to him: the captive's channel (the design's §3,
+            # step 3) takes possession of her; until then he lies by her and no more
+            return
+        here = getattr(self.world, "position", None)
+        if here is None or v.position is None:
+            return
+        _, distance = bearing_and_distance(here, v.position)
+        last_tick = int(self._business.get("steered_tick", -(10**9)))
+        if distance / units.NAUTICAL_MILE > BOAT_BETWEEN_NM * 0.8:
+            if p.tick - last_tick >= 180:
+                self._business["steered_tick"] = p.tick
+                self.give(self._chase_order(p), why="to take possession of her")
+            return
+        lying = p.manoeuvre in ("hove to", "heaving to")
+        if not lying:
+            if p.tick - int(self._business.get("possession_hove", -(10**9))) >= 180:
+                self._business["possession_hove"] = p.tick
+                self.give("heave to", why="within a boat's pull of the prize")
+            return
+        if p.tick - int(self._business.get("possession_tick", -(10**9))) >= 180:
+            self._business["possession_tick"] = p.tick
+            self.give("take possession of her", why="she has struck")
 
     def _vessel_of(self, vid: str) -> Any:
         world = self.world

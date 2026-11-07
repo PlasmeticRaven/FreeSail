@@ -59,6 +59,9 @@ ROLE_SERVICE: dict[str, str] = {
     "merchant": MERCHANT,
     "packet": MERCHANT,
     "fisherman": MERCHANT,
+    # package 74: a prize under her prize crew is her captor's (the record's `service`
+    # answers first; the King's where none is written)
+    "prize-master": KINGS,
 }
 
 # The words the papers may give for each, beside the service's own name.
@@ -80,7 +83,15 @@ def service_of(world: Any) -> str:
     given = _papers_service(world)
     if given is not None:
         return given
-    by_role = ROLE_SERVICE.get(_role(world))
+    role = _role(world)
+    if role == "prize-master":
+        # a prize (package 74): her captor's service, written on her record at the taking
+        from freesail.world.prizes import record_of
+
+        rec = record_of(getattr(world, "vessel", None))
+        if rec and rec.get("service") in SERVICES:
+            return str(rec["service"])
+    by_role = ROLE_SERVICE.get(role)
     if by_role is not None:
         return by_role
     from freesail.world.captains import _is_kings_ship

@@ -605,13 +605,23 @@ class Vessel:
     # `captains.role_for`); "" for none, and in a checkpoint from before. Left out of her
     # saved forms while empty (`to_dict`, `__getstate__`), so that none of them moves
     role: str = ""
+    # package 74 (spec M7 §18; docs/design/Design-Prizes.md §2.1): her prize record when she
+    # is or was a prize (`prizes.possess` writes it: her captor, when and how she was taken,
+    # her nation and role before, the prize crew's and the prisoners' counts, the prize
+    # master, her goal; `retaken` or `restored` when she was given back); None for a ship
+    # that was never one, and in a checkpoint from before. Left out of her saved forms while
+    # None, so that none of them moves.
+    prize: dict[str, Any] | None = None
 
     def __getstate__(self) -> dict[str, Any]:
         """Her state for the checkpoint, her role only where a scenario gave her one
-        (package 75), so that a vessel without one is pickled as before it."""
+        (package 75) and her prize record only where she has one (package 74), so that a
+        vessel without them is pickled as before."""
         state = dict(self.__dict__)
         if not state.get("role"):
             state.pop("role", None)
+        if state.get("prize") is None:
+            state.pop("prize", None)
         return state
 
     @property
@@ -1099,6 +1109,8 @@ class Vessel:
             d["role"] = self.role  # package 75: only where a scenario gave her one
         if getattr(self, "struck", False):
             d["struck"] = True
+        if getattr(self, "prize", None):
+            d["prize"] = dict(self.prize)  # package 74: only on a ship that is or was a prize
         locker = getattr(self, "signals", None)
         if locker is not None and locker.colours.state != "shown":
             d["colours"] = locker.colours.to_dict()  # package 71: only off the plain state
@@ -1639,6 +1651,17 @@ class Vessels:
             # the commanders' frames, the stragglers counted, the commanders' books read;
             # and the far captures, a rule of the sea whether a set is on it or not
             lines.extend(sets.tick(world))
+        if any(
+            getattr(v, "prize", None)
+            or (getattr(v, "brain", None) is not None and v.brain.state == "taking possession")
+            for v in self.vessels
+        ):
+            # the prizes' minute (package 74, spec M7 §18): a captor at hailing distance of
+            # his struck mark takes possession on the far records; a far prize's prisoners
+            # may rise by the counts
+            from freesail.world.prizes import far_minute
+
+            lines.extend(far_minute(world))
         if any(getattr(v, "regime", "") == "in ordinary" for v in self.vessels):
             # the regimes' minute (package 72; spec M7 §22): the commissions due, the sorties
             from freesail.world.regimes import minute as regimes_minute

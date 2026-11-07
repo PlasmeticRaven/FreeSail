@@ -1618,7 +1618,23 @@ def far_captures(world: Any) -> list[tuple[Any, ...]]:
         if captor is None or _covered(world, prey):
             continue
         from freesail.world import signals as S
+        from freesail.world.prizes import is_prize, possess, record_of
 
+        rec = record_of(prey)
+        if is_prize(prey) and rec and str(rec.get("nation_was")) == str(captor.nation):
+            # a prize of his own nation under her prize crew (package 74, the design's §2.8):
+            # retaken by him coming up, her prize crew striking to him with no help near
+            possess(world, captor, prey, by=f"{captor.name} coming up", said=False)
+            lines.append(
+                (
+                    Severity.NOTABLE,
+                    "prize.retaken",
+                    f"{prey.name}, prize to {rec.get('captor_name', 'the enemy')}, is retaken by "
+                    f"{captor.name} coming up: her prize crew strike to him with no help near.",
+                    {"id": prey.id, "captor": captor.id, "was": rec.get("captor")},
+                )
+            )
+            continue
         prey.struck = True
         S.set_colours(
             S.vessel_locker(prey).colours, getattr(world, "nations", None), "struck", "", tick
@@ -1630,31 +1646,19 @@ def far_captures(world: Any) -> list[tuple[Any, ...]]:
         if brain is not None:
             brain.state = "struck"
             brain.history.append((tick, "struck"))
-        old = sets.of(prey.id)
-        if old is not None:
-            old.leave(world, prey.id, f"cut out by {captor.name}")
-        company = sets.commanded_by(captor.id)
-        if company is None:
-            company = Squadron(
-                id=f"{captor.id}-company",
-                name=f"{captor.name}'s company",
-                kind="squadron",
-                nation=str(captor.nation),
-                commander=str(captor.id),
-                members=[str(captor.id)],
-                goal=str(getattr(captor, "intent_words", "") or ""),
-                formation="line ahead",
-            )
-            sets.add(company, world)
-        company.join(world, prey.id, as_prize=True)
         _story(prey, tick, f"brought to by {captor.name} alongside, no help in sight: struck")
         _story(captor, tick, f"{prey.name} struck to us alongside: a prize, in company")
+        # possession on the far records (package 74, spec M7 §18): her nation and colours the
+        # captor's, her role the prize master's, her record, her captor's company by his
+        # doctrine (72's hook); a prize of the captor's own nation retaken is given back
+        taken = possess(world, captor, prey, by="cut out", said=False)
+        fate = "carried off in company" if taken.get("company") else "sent in under a prize crew"
         lines.append(
             (
                 Severity.NOTABLE,
                 "squadron.cut_out",
                 f"{prey.name} is cut out: brought to by {captor.name} with no help near, she "
-                "strikes and is carried off in company.",
+                f"strikes and is {fate}.",
                 {"id": prey.id, "captor": captor.id},
             )
         )

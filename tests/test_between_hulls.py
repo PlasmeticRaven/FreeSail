@@ -205,20 +205,31 @@ def test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him
         if f is not None and f.over:
             break
     assert f is not None and f.over == "carried"
-    assert lieutenant.hull == v.id and lieutenant.home == w.own.id
-    voice = M.visitor_name(w, lieutenant, enemy, "officer of the watch")  # package 82b
-    assert h.visiting and h.world is enemy and enemy.agents[voice] is h
+    # package 74 (the design's §2.3): the officer on the deck won takes possession of her
+    # and is her prize master, her `captain`'s station his and his harness carried into it,
+    # his home the prize (`registry.rehome`) with his own ship's station written for his
+    # return. The pin moved by 74: on the trunk he stood on her deck as a visitor at the
+    # voice station of 82b, his home his own ship.
+    from freesail.world import prizes as P
+
+    assert lieutenant.hull == v.id and lieutenant.home == v.id
+    assert (P.record_of(v) or {}).get("master") == lieutenant.name
+    assert h.world is enemy and enemy.agents["captain"] is h and h.station.name == "captain"
+    assert h._home is not None and h._home[0] == w.own.id  # his own ship's station kept
+    assert enemy.stations.holder("captain") is lieutenant and enemy.people.captain is lieutenant
     assert any(e.kind == "person.moved" and "leads the boarders" in e.text for e in w.log)
     assert any(e.kind == "person.aboard" and "with the boarders" in e.text for e in enemy.log)
-    assert "a visitor" in M.where_am_i(w, lieutenant)
+    assert any(e.kind == "person.aboard" and "as prize master" in e.text for e in enemy.log)
+    assert "a visitor" not in M.where_am_i(w, lieutenant)
 
 
-def test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_none_leads_on():
+def test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_the_party_leads_on():
     """Package 97: under the default seed the first lieutenant falls in the boarding (her
     Health reads her own people since the binding; on the trunk it read the running block's,
-    the Medusa's, and killed her man of the same post): the deck is carried all the same and
-    no officer leads on. Who leads on when the boarders' officer falls (the senior standing
-    of the party) is package 74's on the same function (`boarding._officer_on_her_deck`)."""
+    the Medusa's, and killed her man of the same post): the deck is carried all the same.
+    Package 74 (the design's §2.3, on the same function `boarding._officer_on_her_deck`):
+    the senior standing of the party on her deck leads on and takes possession of her as
+    her prize master. The pin moved by 74: on the trunk none led on."""
     from freesail.agents.agent import officer as officer_station
     from freesail.combat import boarding as B
     from tests.test_fight import _alongside
@@ -248,7 +259,15 @@ def test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_no
         (530, "Mr Pearce is killed: a blow of a tomahawk.")
     ]
     assert B.boarders_officer(w) is None
-    assert not any("leads the boarders" in e.text for e in w.log)
+    from freesail.world import prizes as P
+
+    led = [e.text for e in w.log if "leads the boarders on, their officer fallen" in e.text]
+    assert len(led) == 1 and led[0].startswith("Mr Ward ")
+    rec = P.record_of(v) or {}
+    assert rec.get("master") == "Mr Ward" and rec.get("how") == "carried by boarding"
+    ward = enemy.people.find("Mr Ward")
+    assert ward is not None and ward.hull == v.id and ward.home == v.id
+    assert enemy.stations.holder("captain") is ward
 
 
 def test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_it_far_off():

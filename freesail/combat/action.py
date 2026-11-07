@@ -511,8 +511,7 @@ def strike(world: Any, by_rule: bool, words: str = "") -> str:
         text = (
             "The colours are struck"
             + (f" ({words})" if words else "")
-            + ": the guns fall silent and she lies to for her captor; what follows (the "
-            "prize crew, the prisoners) is not yet in the game."
+            + ": the guns fall silent and she lies to for her captor."
         )
     world.record(
         Severity.URGENT,

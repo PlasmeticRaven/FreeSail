@@ -149,7 +149,8 @@ The crossing costs the boarders her marines' volley and whatever guns bear on th
 is a round a minute, each side's strength its men by their arms (served out or not, the
 bayonet) and their temper and their cover, each side losing by the other's strength. The deck
 is carried when the defenders' strength falls under half the boarders' or their temper
-breaks: her colours come down by your boarders' hand, and the prize is not yet in the game.
+breaks: her colours come down by your boarders' hand, and the officer on her deck takes
+possession of her (chapter 27).
 The boarders are repulsed the other way, or after a quarter of an hour contested; they cast
 off, and the hands' temper pays for it. A hundred boarders against a frigate's whole company
 awake on deck are driven back in a round; against her at quarters, her gun crews at the guns,

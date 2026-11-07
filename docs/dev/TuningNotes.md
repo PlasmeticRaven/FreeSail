@@ -18440,3 +18440,84 @@ wired until step 4).
 
 **Truth 7-350** pins the read and the move. **Found on the way:** nothing. **The suites on the
 step's tree**: below, at the step's boundary.
+
+### Step 2: the prize as a hull of the one world (the design's §2)
+
+**Built as designed** (`freesail/world/prizes.py`, `orders/prize.py`, `api/prize_readings.py`,
+the role files' thresholds and `data/captains/prize-master.yaml`, the hail table's rows for the
+prize master, the vocabulary's four verbs, the primer's chapter 27 in its first form): possession
+by `take possession of her` within a boat's pull and at once by the officer on a deck carried; the
+one record on the far `Vessel` (`prize`), the muster swap (`remuster`), her people confined by
+rank, the prize master at her `captain`'s station rehomed into her, her colours over hers for a
+day, her nation, role and intent new, her set by the captor's doctrine; the prisoners taken aboard
+by the boat; the rising by 73's tables once an hour (the counts' rising for a far prize); the far
+cut-out's possession on the records; the retaking by her people and by a cruiser of her nation
+coming up (`far_captures`' road, the prize yielding by the prize master's doctrine); the prize
+burnt or scuttled by order; the readings `the prize`, `the prisoners`, `the prize crew` and the
+seven events; the checkpoint round trip.
+
+**The keepers' audit** (the lead's ruling 1): of the hull's keepers that hold the muster, two cache
+it and both are re-pointed by `remuster`: the routine (`extra["routine"].crew`, its all-hands
+call's state dropped with it) and the quarter bill (`extra["quarters"]`, popped and reckoned afresh
+at the next beat); the battery is put to HOLD. Health, the needs, the runner and the hull's people
+read `extra["crew"]` or the registry afresh each call and cache nothing. None could not be
+re-pointed.
+
+**Taken another way.** (1) Possession is taken at once when the order is given within a boat's
+pull, not after the boat's quarter of an hour: the boat's errands are chapter 14's machinery with
+their own times, and a prize crew crossing in her as an errand with the ship's boat away for the
+quarter hour is more than the step's words carry; the line says "by the boat" and the boat must be
+at the booms (an order with her away is refused). The quarter hour can be given to the errand
+when the captive's channel (step 3) moves persons by the same boat. (2) The privateer's doctrine
+**parts** from her prize (`prize_company: parts`, the Channel privateers' habit of sending a prize
+in and cruising on, from memory), so 72's pinned cut-out moves: the Nancy no longer joins the
+Vengeur's company but sails for Brest alone under six men, and the cut-out's line says "sent in
+under a prize crew"; a King's ship keeps hers in company while bound the same way. (3) The
+player's own ship struck to a rules captain is **not** taken possession of in this step: his
+`taking possession` closes her and lies by her and gives no order for her (`Captain.
+_take_possession`, `prizes.far_minute`, `orders.prize._struck_mark` each skip `PLAYER_ID`), the
+captive's channel (step 3, the design's §3) taking it up with the seat's rules. (4) The doctrine's
+own burning (`burns_when` with the valuation's `worth_least`) waits for the court's figures (step
+5); the burning is by order here. (5) The replay by both roads with a prize is step 4's passage
+(where she strikes by the fight, a recorded road): the scene here strikes her by the test's hand,
+which no transcript carries, so the step pins the checkpoint round trip instead.
+
+**Pins moved, old beside new** (each with its reason in the docstring):
+
+| pin | on the trunk | on the step's tree |
+|---|---|---|
+| 7-181 and `test_fight`'s carried deck | she lies struck after the deck is carried, no prize; her hurt on her own bill | she is a prize of ours at once (`how` "carried by boarding"), her colours ours over hers; her hurt are the prisoners' (`the prisoners` says "of them hurt"); the fight's bands (2 to 12 rounds, the losses' order) as they were |
+| 7-325 and 82b's officer on the deck won | the first lieutenant stands on her deck as a visitor at the voice station, his home his own ship | he is her prize master: her `captain`'s station his, his harness carried into it, his home the prize, his own ship's station kept for his return |
+| 97's officer killed in the round | the deck carried, none leads on | Mr Ward (the senior standing of the party, a master's mate) leads on and is her prize master |
+| 72's cut-out (`test_squadrons`) | the Nancy struck, in the Vengeur's company | the Nancy his prize at once on the records (six men, 121 prisoners, for Brest), parted by his doctrine |
+| 7-139, 7-350 | unchanged by this step | |
+
+**The rising's figures** (the frigate's prize, the brig of 121 taken by the order, the frigate
+stood off two miles and the hours set back to nineteen; the draw once an hour at a quarter's
+chance, two to one in fit men):
+
+| prize crew over prisoners | seed 1 | seed 2 | seed 3 | seed 4 | seed 7 |
+|---|---|---|---|---|---|
+| 21 over 121 | rise in the first hour, the deck theirs (5 of the crew down, 1 of theirs) | nothing in two hours | rise in the second hour, the deck theirs | | nothing in two hours |
+| 21 over 51 (seventy taken aboard) | rise in the first hour, the deck theirs (16 and 16 down) | put down in the third hour (15 of theirs down, 11 of the crew hurt), irons a day | put down in the second hour | put down in the first hour | nothing in four hours |
+| 21 over 21 (a hundred taken aboard) | never drawn (under two to one) | | | | |
+
+Truth 7-353 pins seed 1 (retaken), seed 7 (nothing), seed 2 at 51 (put down) and the odds rule.
+Under the default doctrine before `_doctrine` learned the player's service (a share of a tenth,
+26 men) the same seeds gave the same outcomes for the first row and seed 2 put down at 61 over 26.
+
+**Found on the way.** (1) `prizes._doctrine` read the player's captain's doctrine, which is None
+when the scenario gives him no role, so the prize rules ran on defaults (a tenth, 26 men); it
+now answers the hull's service's role file (a King's ship's for the frigate). (2) A person rehomed
+into a company that has his post already (the Amazon's first lieutenant into the Medusa, both
+`first_lieutenant`) made two of one id in one company, and `People.captain` read the Medusa's
+own man as the one commanding; `Registry.rehome` now gives him his old home's id after a colon
+(`first_lieutenant:the ship`), the record reading the id as it stands after the move. (3) The
+world order's "merchant brig" takes `data/ships/brig.yaml` (the one file of the brig-sloop and the
+merchant brig, two descriptions) with its muster of 121, so a merchant brig cut out has 121
+prisoners; `merchant-brig.yaml` (a complement of 16) is a shadow file. Not this package's
+(`data/ships/` is 75's); noted for the lead. (4) The grammar read `take six of the prisoners
+aboard` as the free verb `take` with a tail; the parser gives the prisoners' order its number
+inside the phrase. (5) The orders' road recorded a verb's reply and the function's own line both,
+so `possess`, `take_prisoners_aboard` and `burn` take `said` for the captor's line and the
+order's road passes False. **The suites on the step's tree**: below, at the step's boundary.

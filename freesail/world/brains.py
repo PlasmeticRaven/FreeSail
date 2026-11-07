@@ -187,6 +187,7 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
 # and taken up again when she returns to a plan state.
 _DETOUR_STATES = frozenset(
     {
+        "taking possession",  # package 74: the struck mark closed to hailing distance
         "hove to for weather",
         "investigating a stranger",
         "chasing",
@@ -462,6 +463,9 @@ class FarCaptain(Judgement):
         v = self.world.vessels.get(str(s.get("id") or ""))
         return bool(v is not None and getattr(v, "struck", False))
 
+    def _own_vessel_id(self) -> str:
+        return str(self.vessel.id)
+
     def _enemy_struck(self, p: Perception) -> bool:
         # the far body has no battery: the nearest enemy within the breaking-off distance
         # struck is the mark struck (the far fight is 74's; `combat/far.py` the measure)
@@ -472,6 +476,7 @@ class FarCaptain(Judgement):
             if float(s["estimate_m"]) / units.NAUTICAL_MILE > float(th("break_off_nm", 2.0)):
                 continue
             if self._stranger_struck(s):
+                self._stranger = str(s.get("id") or "")  # the mark he takes possession of
                 return True
         return False
 
@@ -936,7 +941,9 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
             vessel.cycle = False
     elif state == "hove to for weather":
         vessel.plan = [("lie_to", math.inf)]
-    elif state in ("investigating a stranger", "chasing"):
+    elif state in ("investigating a stranger", "chasing", "taking possession"):
+        # `taking possession` (package 74): the struck mark closed to hailing distance, where
+        # the far possession is taken (`prizes.far_minute`)
         vessel.plan = [("chase", brain._stranger, HAIL_REACH_M)]
     elif state == "evading":
         vessel.plan = [("away", brain._stranger)]

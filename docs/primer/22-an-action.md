@@ -1,6 +1,6 @@
 # 22. An action
 
-From clearing for action to the colours struck, in the player's words. What the game can fairly do with a fight between two ships in 1805, and no more: the guns as parts of the ship with their crews from the muster, served by a cycle that runs while hands and powder last; the shot's fall by the range, the heel and the sea; a hit as a change of the state the ship already has (a line parted, a spar carried away, a sail holed, a gun dismounted, a shot hole, a man hurt); the company's temper, and the colours that come down when it fails. The marines' fire, the fight on deck, the water from the holes and the surgeon are chapter 25's; the prize is not yet in the game.
+From clearing for action to the colours struck, in the player's words. What the game can fairly do with a fight between two ships in 1805, and no more: the guns as parts of the ship with their crews from the muster, served by a cycle that runs while hands and powder last; the shot's fall by the range, the heel and the sea; a hit as a change of the state the ship already has (a line parted, a spar carried away, a sail holed, a gun dismounted, a shot hole, a man hurt); the company's temper, and the colours that come down when it fails. The marines' fire, the fight on deck, the water from the holes and the surgeon are chapter 25's; the prize, chapter 27's.
 
 ## The guns
 
@@ -106,7 +106,7 @@ Morale is the one new quantity: the company's readiness to fight on, from the ca
 ! Forenoon watch (11:12)  The colours are struck: five of 30 hurt, against a broadside of 36 pounds to our 13; the hands will not stand to the guns. The guns fall silent and she lies to for her captor.
 ```
 
-What follows the colours down (the prize crew, the prisoners, the captive's channel) is not yet in the game; this chapter ends at the colours struck and the firing ceased.
+What follows the colours down (possession taken, the prize crew, the prisoners) is chapter 27's; this chapter ends at the colours struck and the firing ceased.
 
 ## The first action
 
