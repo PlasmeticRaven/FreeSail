@@ -32,7 +32,10 @@ under `docs/references/` only; **read (by …)**, another session's reading, cit
   (`requestAnimationFrame`) draws only a layer of effects and moving guns. 91 reuses it.
 - **The engine is not touched.** `action.fired` already names its guns (`data["guns"]`,
   `combat/guns.py:1115`), so item 2's one allowed touch is not needed (§7).
-- **Questions for the owner's shelf (§11)**, none holding the work: each has a judgement in place.
+- **The flags (§12)**, the owner's addition to the brief: drawn at their places on the drawn spars by
+  one rule of place words, from the snapshot's `flags`; until 76's `colours.yaml` lands, one plain
+  ensign at the peak from the nations' table.
+- **Questions for the owner's shelf (§11, §12.6)**, none holding the work: each has a judgement in place.
 
 ## 0. What stands today (read at the trunk's head, f466051)
 
@@ -345,6 +348,7 @@ guns) in the server's test for their cost against the snapshot as it is.
   `train_deg`; and `damage`: the holes as `the damage` gives them. Read through the readings registry
   where a reading gives it (`the guns`' `ports_shut`, `the damage`'s `holes` and `dismounted`) and
   from the parts where it does not (each gun's own state, as the snapshot reads each sail's).
+- **The snapshot's `flags`** (§12.1), from `freesail/api/viewer_flags.py` (new, pure).
 - **`action.fired`** already names its guns (`data["guns"]`, `combat/guns.py:1115`): no engine file
   is touched. Nothing of the physics, the evolutions or the ship files is written; no pin moves.
 
@@ -357,7 +361,7 @@ the rail; each gun whose weight stands more than 10% off its pattern's; and that
 her drawn side between her stem's and her stern's closures, below her rail and above her drawn depth.
 Its exit is non-zero on any refusal. `tests/test_viewer_guns.py` runs it parametrized over the files
 (a file added later is checked by it with no change), and on a file written to a temporary directory
-with the contract and a made-up fit (truth 7-444).
+with the contract and a made-up fit (truth 7-443).
 
 ## 9. The ship builder's checklist (for `Build-Ships.md` §6's postscript)
 
@@ -373,20 +377,19 @@ For her guns to be drawn, a ship's file gives:
 5. then runs `python tools/check_viewer_guns.py data/ships/<her>.yaml` and the test; nothing is drawn
    by hand for any ship.
 
-## 10. The truths (item 5), 7-436 to 7-445, as planned
+## 10. The truths (item 5), 7-436 to 7-443, and the flags' 7-444 and 7-445 (§12)
 
 | Truth | Pins |
 |---|---|
-| 7-436 | every gun of every file with the contract placed: on its deck's triple within 0.01 m in a port, or over the rail by §2.2, or on the rail, or a pivot; no refusal; the checker clean |
+| 7-436 | every gun of every file with the contract placed: on its deck's triple within 0.01 m in a port, or over the rail by §2.2, or on the rail, or a pivot; no refusal; the checker clean; each gun's figure the same on every ship for its kind, calibre and weight, its length its pattern's |
 | 7-437 | the frigate's forecastle guns (pair 18, the bow chasers) over the rail and through no port; her upper-deck guns in ports of the upper deck's size |
-| 7-438 | the 64's forecastle 9-pounders of 1784 over the rail by the side's test (§2.2) |
+| 7-438 | the 64's forecastle 9-pounders of 1784 over the rail by the side's test (§2.2; as the lead rules) |
 | 7-439 | a lee port the engine shuts by the roll is served shut in the next snapshot and its gun run in; drawn with its lid down |
 | 7-440 | a broadside fired: a flash at each gun that fired in that minute and at no other; the plume to leeward of the apparent wind |
-| 7-441 | the frame's bounds equal with every gun secured, every gun run out with its lid open, every plume alive, and a hole in her side |
+| 7-441 | the frame's bounds equal with every gun secured, every gun run out with its lid open, every plume alive, a hole in her side and every flag flying; the snapshot's new fields' cost measured; the replay's digests the same by both roads (nothing of the world is written) |
 | 7-442 | a hull without the contract (the in-test document with no profile) draws no gun and no port, her figures as before point for point |
-| 7-443 | each gun's figure the same on every ship for its kind, calibre and weight; the length its pattern's |
-| 7-444 | a ship file written to a test's temporary directory with the contract and a made-up fit passes the checker with no change of code; the same file with one gun's x off its triple is refused, and says why |
-| 7-445 | the snapshot's new fields' cost measured; the replay's digests the same by both roads (nothing of the world is written) |
+| 7-443 | a ship file written to a test's temporary directory with the contract and a made-up fit passes the checker with no change of code; the same file with one gun's x off its triple is refused, and says why |
+| 7-444, 7-445 | the flags, as the brief words them (§12.5) |
 
 The Node tests in `tests/test_view_geometry.py` beside them: each port on the drawn side within 1 cm;
 each port gun's muzzle outboard by its state; nothing below the drawn depth; the frame across states;
@@ -437,8 +440,81 @@ their citation, never copied text; none holds the work)
 6. **Winfield**: nothing is asked of him for this package; the ports by class are the ships
    session's.
 
-## 12. What this package does not build
+## 12. The flags drawn at their places (the brief's item 7, the owner's addition of 2026-11-07)
 
-The light and the air (91, which reuses §6); a three-dimensional ship or damage beyond the present
+### 12.1 What 81 reads, and what it serves until 76's file exists
+
+- **The snapshot's `flags`**: a list, each `{place, name, words, drawing}`: the place word (§12.2),
+  the flag's name in the nation's file, its words for the hover ("British colours, the red ensign";
+  "the ensign union down"), and its drawing, a short list of coloured rectangles and lines in the
+  flag's proportion, as 76's `colours.yaml` gives it. The viewer draws whatever is there, at its
+  place, by the rule; a place word it does not know draws nothing and the server's test says so.
+- **Until 76's file exists for a root** (the trunk as it stands): the server serves, from the
+  player's ship's colours (71's `Colours`, `world/signals.py:470`) and `data/nations.yaml`, **one
+  plain ensign at the peak** while her colours show (`shown`, `false`, `distress`), the nation shown
+  (the other's under false colours), its words `Colours.words` as the lookout reads them, its drawing
+  a single field in the proportion 1:2 (judgement) coloured by the first colour the nation's `flag`
+  word names ("the red ensign" red; "the white ensign with the arms" white; a word naming none, the
+  plain cloth's colour), **nothing** under `none` and `struck`, and the drawing turned over under
+  `distress` (the union down; a plain field shows it only in its words). The flag of truce (74's
+  cartel) is 76's and 74's; until it is in the locker the server serves none.
+- **Where the code stands:** the fallback in `freesail/api/viewer_flags.py` (new, pure), read by
+  `queries.snapshot`; 76's locker list read through the same function when it exists, so the
+  meeting of the two packages is one function's first line.
+
+### 12.2 The place words, and the one rule that puts each on a drawn spar
+
+The masts are the graph's root spars of class `mast`, named by their ids' first word (`fore`,
+`main`, `mizzen` or `mizen`); a ship of one mast has that mast as her main. A mast's **truck** is the
+top of the highest spar stepped on it as drawn (a struck topmast's lower head, a housed one's), a
+**masthead** of a named mast piece its top; the **peak** is the outer end of the aftmost mast's gaff.
+
+| Place word | Drawn at | Where the ship lacks it |
+|---|---|---|
+| `peak` | the aftmost gaff's peak, on its halyard's line | `staff` |
+| `staff` | the ensign staff: the taffrail's middle, `ENSIGN_STAFF_M` (2.5 m, judgement) above it, raked aft 15° | (every profiled hull has one) |
+| `main truck`, `fore truck`, `mizen truck` | that mast's truck | the main for a ship of one mast; else not drawn, said |
+| `main topgallant masthead` (and the others by mast and piece) | that piece's head | its mast's truck |
+| `jackstaff` | the bowsprit's cap end, `JACKSTAFF_M` (1.5 m, judgement) above it | not drawn, said |
+| `main rigging` (and the fore's, the mizen's) | halfway up that mast's weather shrouds, lashed flat to them | not drawn, said |
+
+The words are 81's, offered to 76 through the lead for `colours.yaml`'s `where`, so that one shape
+serves both packages; **for the lead to carry to 76.**
+
+### 12.3 The drawing
+
+Stiff, as the brief has it: the cloth a flat quadrilateral with its hoist along its halyard at the
+place, its fly to leeward of the apparent wind (`windVector`), drooped `FLAG_DROOP_DEG` (15°,
+judgement) below the level; a pendant a long tapering streamer the same way; each in its drawing's
+rectangles and lines; the waving is 91's, on §6's road. **Sizes** (judgement, question 7): an
+ensign's fly half her beam, a jack's half the ensign's, a pendant's length 0.6 of her main yard,
+the hoist by the drawing's proportion. In the painter's order a flag sorts at its own middle as a
+sail does. In the frame (§6): every place word's point the ship has, with the largest flag's fly
+swung every way about it, so that a flag hoisted, struck or doubled leaves the bounds as they were.
+
+### 12.4 Hover words
+
+The flag's `words` as served (in-world, the lookout's own words), and its place: "British colours,
+the red ensign, at the peak".
+
+### 12.5 The truths
+
+7-444 and 7-445 as the brief words them: each flag within 0.1 m of its place's point in the
+projection when the locker says it flies; the bounds unmoved; struck draws none, false colours the
+other nation's, the cartel's white once 76 serves it, and a hull whose nation has no
+`colours.yaml` draws the plain ensign of §12.1. Until 76's file lands, the truths run on the
+fallback; their rows for the pendant, the broad pendant, the jack and the doubled ensigns run on a
+locker list given in the test, so that they pin 81's placing and not 76's data.
+
+### 12.6 The question it adds for the owner's shelf
+
+7. **The flags' sizes** by rate (an ensign's fly against the ship's beam or her main yard; a
+   pendant's length): Lavery, or the Admiralty's flag tables if the shelf has them. *(In place:
+   §12.3's judgement.)*
+
+## 13. What this package does not build
+
+The light and the air and the flags' waving (91, which reuses §6); 76's `colours.yaml` and the locker's
+list of what flies where (76's); a three-dimensional ship or damage beyond the present
 honesty (M8); any ship file's triples or port sizes (the ships session's); a key of port size by
 port (the schema's); the guns' mechanics (70's, 77's); a tick on each volley (§4.1, the battery's).
