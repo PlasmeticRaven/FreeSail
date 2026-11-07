@@ -16,6 +16,7 @@ run in Node on the graph and the snapshot the server serves, as `test_view_geome
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import pytest
 from test_view_geometry import needs_node, run_js, ship_state, without_profile
@@ -28,15 +29,12 @@ from freesail.ship.loader import load_spec
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SIXTY_FOUR = "data/ships/sixty-four.yaml"
-ARMED_PROFILED = [
-    "data/ships/brig.yaml",
-    "data/ships/cutter.yaml",
-    FRIGATE,
-    "data/ships/merchant-brig.yaml",
-    "data/ships/privateer-schooner.yaml",
-    "data/ships/razee-44.yaml",
-    SIXTY_FOUR,
-]
+# every armed file, drawn from her profile (a ship added later is drawn by these tests with her)
+ARMED_PROFILED = sorted(
+    f"data/ships/{p.name}"
+    for p in Path(__file__).resolve().parents[1].joinpath("data", "ships").glob("*.yaml")
+    if load_spec(p).armament is not None and load_spec(p).hull.profile is not None
+)
 
 
 def _state(path: str, guns_state: str | None = None, **extra) -> dict:

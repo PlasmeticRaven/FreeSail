@@ -130,12 +130,29 @@ def test_the_figure_is_the_pattern_of_nearest_weight(kind, pounder, cwt, length_
 
 
 @pytest.mark.parametrize("path", ARMED)
-def test_no_gun_of_the_files_stands_a_tenth_off_its_pattern(path):
-    """§3.2: no file's gun more than WEIGHT_LISTED_SHARE off its pattern's weight today."""
+def test_a_gun_a_tenth_off_its_patterns_weight_is_listed_by_the_checker_and_no_other(path):
+    """§3.2: a gun whose file's weight stands more than WEIGHT_LISTED_SHARE off its pattern's is
+    drawn at the pattern and listed by the checker for the ships session (never refused); every
+    other gun is not listed."""
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import check_viewer_guns
+
+    listed = {
+        line.split()[1].rstrip(":")
+        for line in check_viewer_guns.check(path).lines
+        if line.strip().startswith("weight ")
+    }
+    off = set()
     for _name, fit in _fits(path):
         for g in fit.guns:
             f = viewer_guns.figure(g.kind, g.pounder, g.weight_cwt)
-            assert f.weight_off <= viewer_guns.WEIGHT_LISTED_SHARE, (g.id, f.pattern)
+            if f.weight_off > viewer_guns.WEIGHT_LISTED_SHARE:
+                off.add(g.id)
+    assert listed == off
+    assert check_viewer_guns.check(path).ok
 
 
 def test_the_graph_serves_the_guns_and_the_ports():

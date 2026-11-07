@@ -18729,9 +18729,18 @@ section and in the design's §3 and §4.
 | razee | as carried 1796 | 46 | 46 | | | | |
 | sixty-four | ardent class 1784 | 64 | 62 | 2 | | | quarterdeck 1 |
 | sixty-four | ardent class 1794 | 72 | 62 | 10 | | | quarterdeck 1 |
-| topsail schooner | (no armament) | | | | | | upper 8 |
+| topsail schooner | letter of marque | 10 | 6 | | 4 | | upper 5 |
+| topsail schooner | musquidobit 1813 | 10 | 10 | | | | upper 3 |
+| lugger | gun lugger 1795 | 3 | | | 3 | | |
+| smack | culloden 1746 | 2 | | | 2 | | |
 
-327 guns over eleven fits, none refused. The checker's notes for the ships session: the 64's
+As first measured (f466051), 327 guns over eleven fits; the lugger's, the smack's and the topsail
+schooner's armaments came with the ships session's SW-4 (merged into the branch at f7b21f8) and
+passed the checker with no change of code: 352 guns over fifteen fits, none refused. The topsail
+schooner's eight 18-pounder carronades of the fit "musquidobit 1813" are listed for the ships
+session, their 10 cwt 11% off Adye's 9 cwt pattern of 3 ft 3 in (drawn at it); this package's own
+test first held that no gun stood a tenth off (stricter than §3.2, which lists and never refuses)
+and now pins the listing, every such gun and no other. The checker's notes for the ships session: the 64's
 foremost forecastle triple (18.41 m) put over the rail by the side's test, 0.07 m under the rail
 and not at the generator's 2 in (the lead's ruling 1); her foremost quarterdeck port (−5.88 m) cut
 to the rail, 0.02 m, its top following the rail where it steps down at her breast within the
