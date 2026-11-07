@@ -497,7 +497,8 @@ def _masts_with_yards(ship: Ship) -> list[Spar]:
     hermaphrodite brig, a brig's fore and a schooner's main (Cobb 1841 vol. I p. 38), and a
     topsail schooner with a square main topsail have the fore alone, and are handled as
     fore-and-afters; their main's yards are still braced (`working_yards`) and are her after
-    yards (`head_and_after_yards`) while her fore keeps a working yard."""
+    yards (`head_and_after_yards`), with every fore yard shot away too (the lead's ruling 3
+    of 2026-11-06)."""
     masts: list[Spar] = []
     for y in working_yards(ship):
         if ship.under_bowsprit(y) or ship.on_schooner_mast(y):
@@ -517,13 +518,16 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
     mast (`Ship.on_schooner_mast`, package 75, B3.4) is no mast that carries yards here,
     but its yards are among the rest: they are her after yards, swung at "mainsail haul"
     in the tack's short after swing (`TackScript._after_swing_s`, the lead's ruling 1 of
-    2026-11-06) and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5), while
-    her fore keeps a working yard. With every fore yard shot away no mast carries yards
-    here, and her main's yards are in neither list, so that the tack and the wear leave
-    them as they stand (reported to the lead at B3.4)."""
+    2026-11-06) and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5). With
+    every fore yard shot away no mast carries yards here, and her main's working yards are
+    her after yards still, with no head yards: the lead's ruling 3 of 2026-11-06, "they are
+    abaft her fore and are swung as after yards while she had a working fore yard; nothing
+    changes in their handling but that they are no longer left standing" (before it they
+    were in neither list, and the tack and the wear left them as they stood: B3.4). With
+    no mast carrying yards, any other yard is in neither list, as before."""
     masts = _masts_with_yards(ship)
     if not masts:
-        return [], []
+        return [], [y for y in working_yards(ship) if ship.on_schooner_mast(y)]
     foremost = max(masts, key=lambda m: m.x_m)
     yards = working_yards(ship)
     head = [y for y in yards if ship.mast_of(y) is foremost or ship.under_bowsprit(y)]

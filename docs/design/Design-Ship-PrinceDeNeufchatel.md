@@ -1515,6 +1515,15 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   hauled up) re-pinned old beside new. Her main topgallant's yards are hauled by "Main-topsail haul"
   though she crosses no main topsail, as ruled; the fore's rise named apart before "let go and
   haul", as Luce has it when the mainsail is hauled up, is a lean for the lead, not built.
+- **The lead's ruling 3, built (2026-11-07; the tuning notes, as above):** place 2 with no mast
+  carrying yards: with every fore yard shot away her main's yards are her after yards
+  (`head_and_after_yards`), no longer left standing, and she has no head yards. The tack hauls them
+  by "Main-topsail haul." in the short after swing, and she is tacked full on the new tack: trial B
+  in 164 s (289 s before, her main topsail aback when tacked), the main topgallant's rig in 186 s
+  (350 s before, fallen back on the old tack when "Tacked" was said). The wear braces them round,
+  468 s and 483 s (152 s and 149 s before, when there were no yards to wait on), and getting under way
+  braces them as she is cast; the heave-to and the box-haul are as before. B3.4's pin (in neither
+  list) moved old beside new; no file's log, digest or truth moved.
 
 ### 12.3 What the viewer builder (B5) is asked
 

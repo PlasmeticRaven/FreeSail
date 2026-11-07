@@ -6,7 +6,9 @@ is read at two places (docs/design/Design-ShipsEngineExtensions.md §4.2): place
 `scripts._masts_with_yards`, which skips such yards, and place 3, `physics.sails._square_rigged`,
 which counts none; and, by the lead's ruling 1 of 2026-11-06 on place 2's timing (after Luce
 1884 p. 417), for the time of the tack's swing at "mainsail haul", short for a schooner's light
-main yards (`scripts.TackScript._after_swing_s`).
+main yards (`scripts.TackScript._after_swing_s`); and, by the lead's ruling 3, at place 2 where
+no mast carries yards, every fore yard shot away, her main's yards her after yards
+(`scripts.head_and_after_yards`).
 
 No committed ship file trips it (the guard, every file of `data/ships/` with the boats), so no
 file's classing moves: the golden table's own run (`tests/test_rig_classing.py`, and the razee's
@@ -17,11 +19,12 @@ trial B) fore-and-afters with the fore's yards their head yards and the main's t
 and the fore laid aback, trial A as it was, the tartane classed as the cutter is and the polacre
 with her main her one mast with yards; the yards under the bowsprit, a lug's and a lateen yard
 counted for nothing; a brig whose main yard is shot away and sent down a brig still; the answer
-held once a ship, and the schooner whose fore yards are all shot away pinned as she stands (the
-case reported to the lead); the pickle and the checkpoint of a rig that has read the rule as
-they were before it read it; and the short after swing, a schooner's light main yards' alone,
-trial B's tack with it, and the word they are hauled by, "Main-topsail haul" (the lead's ruling
-2, Luce 1884 p. 417: her main crosses no course).
+held once a ship, and the schooner whose fore yards are all shot away with her main's yards her
+after yards, tacked so (the lead's ruling 3 of 2026-11-06; pinned in neither list at B3.4, as it
+then stood); the pickle and the checkpoint of a rig that has read the rule as they were before
+it read it; and the short after swing, a schooner's light main yards' alone, trial B's tack with
+it, and the word they are hauled by, "Main-topsail haul" (the lead's ruling 2, Luce 1884 p. 417:
+her main crosses no course).
 """
 
 from __future__ import annotations
@@ -46,6 +49,7 @@ from freesail.api.session import make_world
 from freesail.core.replay import checkpoint_bytes, read_checkpoint, write_checkpoint
 from freesail.core.world import Scenario
 from freesail.evolutions import EVOLUTIONS, scripts
+from freesail.physics import strain
 from freesail.physics.sails import _square_rigged
 from freesail.ship import graph
 from freesail.ship.graph import Ship
@@ -421,18 +425,87 @@ def test_the_answer_is_found_once_a_ship_and_held_through_the_fight():
     assert not any(brig.on_schooner_mast(p) for p in brig.parts)
 
 
-def test_with_every_fore_yard_shot_away_her_main_yards_are_in_neither_list():
-    """The case reported to the lead at B3.4, pinned as it stands, place 2 being left: the rule
-    is the rig's, so with every fore yard shot away her main is a schooner's still, no mast
-    carries yards at place 1, and `head_and_after_yards` gives her neither head yards nor after
-    yards, where before the rule her main topsail yard was her head yard; it is a working yard
-    still, braced by the brace orders and "trim sails". A ruling at place 2 moves this pin."""
-    ship = schooner_with_main_topsail()
+@pytest.mark.parametrize(
+    ("build", "named"),
+    [
+        (schooner_with_main_topsail, ["main.topsail.yard"]),
+        (schooner_with_main_topgallant, ["main.topsail.yard", "main.topgallant.yard"]),
+    ],
+    ids=["trial B", "main topgallant"],
+)
+def test_with_every_fore_yard_shot_away_her_main_yards_are_her_after_yards(build, named):
+    """The lead's ruling 3 of 2026-11-06 (place 2 with no mast carrying yards): the rule is the
+    rig's, so with every fore yard shot away her main is a schooner's still and no mast carries
+    yards at place 1; her main's yards "are her after yards (they are abaft her fore and are
+    swung as after yards while she had a working fore yard; nothing changes in their handling
+    but that they are no longer left standing)". So `head_and_after_yards` gives her no head
+    yards and them as her after yards, the tack holds them and swings them short at "mainsail
+    haul" as before, and she has still no yards to lay aback. Pinned at B3.4 as it stood, in
+    neither list (`([], [])`, the test named "...are_in_neither_list"); before the rule they
+    were her head yards."""
+    ship = build()
     _shot_away(ship, *FORE)
-    assert [y.id for y in scripts.working_yards(ship)] == ["main.topsail.yard"]
+    assert [y.id for y in scripts.working_yards(ship)] == named
     assert scripts._masts_with_yards(ship) == []
-    assert scripts.head_and_after_yards(ship) == ([], [])
+    head, after = scripts.head_and_after_yards(ship)
+    assert (head, [y.id for y in after]) == ([], named)
     assert scripts.yards_to_back(ship) == []
+    tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
+    assert [y.id for y in tack.after] == named and tack.head == []
+    assert set(named) <= tack.holds()
+    assert tack._after_swing_s() == EVOLUTIONS["tack"].timing["light_after_swing_s"]
+
+
+def test_trial_b_with_every_fore_yard_shot_away_swings_her_main_topsail_yard_round(tmp_path):
+    """Trial B with her three fore yards shot away at 300 s of the settle (B3.4's measure: seed 7,
+    15 knots, settled 2,400 s under plain sail braced sharp up and trimmed every two minutes),
+    then tacked, the lead's ruling 3: "Main-topsail haul." at 35 s, her head 9 degrees short of
+    the wind (no course set, the fore course gone with its yard), the main topsail yard swung
+    round in the short swing and her head sheets drawn at 59 s with no "let go and haul", there
+    being no head yards; tacked in 164 s, the main topsail yard braced up on the new tack and
+    its sail full. Before the ruling the yard was left standing, in neither list: no word at the
+    haul, the main topsail aback on the new tack, 289 s (the tuning notes, "The lead's four
+    rulings, built")."""
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, write_ship(schooner_with_main_topsail_doc(), tmp_path), sc)
+    world.submit("set plain sail")
+    world.submit("brace sharp up on the starboard tack")
+    for i in range(2400):
+        if i == 300:
+            st = strain.strain_state(world.ship)
+            for y in FORE:
+                strain._wreck_spar(world.ship, st, world.ship.spars[y], 0.0, how="shot away")
+        if i % 120 == 0 and i > 300:
+            world.submit("trim sails")
+        world.tick()
+    assert [y.id for y in scripts.working_yards(world.ship)] == ["main.topsail.yard"]
+    start = world.clock.tick
+    world.submit("tack ship")
+    ends = ("ship.tacked", "ship.missed_stays", "ship.fell_off", "evolution.failed")
+    done: list = []
+    while not done and world.clock.tick - start < 900:
+        world.tick()
+        done = [e.kind for e in world.log if e.tick > start and e.kind in ends]
+    said: dict[str, int] = {}
+    for e in world.log:
+        for key in ("Main-topsail haul.", "Mainsail haul", "Let go and haul", "Draw jib"):
+            if e.tick >= start and key in e.text:
+                said.setdefault(key, e.tick - start)
+    yard = world.ship.spars["main.topsail.yard"]
+    assert done == ["ship.tacked"]
+    assert set(said) == {"Main-topsail haul.", "Draw jib"}  # no head yards to let go and haul
+    assert 15 <= said["Draw jib"] - said["Main-topsail haul."] <= 35  # 24 s
+    assert 90 <= world.clock.tick - start <= 240  # 164 s; 289 s left standing
+    assert world.ship.dyn.tack == "larboard"
+    assert yard.brace_angle == pytest.approx(-yard.brace_limit)
+    assert not world.ship.sails["main.topsail"].backed
 
 
 def test_each_ship_finds_her_own():
