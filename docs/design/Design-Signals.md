@@ -482,3 +482,73 @@ from the encounter that were not in the design: the captain names his stranger's
 the chase order (the order's own choice is the lookout's nearest stranger, who counts a
 sail under our colours none), and a chase on the other side of the wind's eye is gone about
 for. Every figure is in `docs/dev/TuningNotes.md` (package 71).
+
+## As built out (package 76)
+
+*The postscript of the books built out from the page. The colours' file is written first, as
+the brief has it, before any root is filled; the books' part follows at the package's end.*
+
+### The seventh file: `colours.yaml` (the flags of command and identity)
+
+Every root gains a seventh file beside the six, its shape the same for every nation so that
+the locker, the lookout and the viewer (81) read one shape:
+
+```yaml
+nation: britain                 # the root's nation; `basic` for the basic root
+sources: ["...", "..."]          # the pages the flags are drawn from, each named
+flags:                           # the nation's flags by name
+  - name: red ensign             # the name the occasions use, unique in the file
+    kind: ensign                 # ensign | merchant ensign | jack | pendant | broad pendant |
+                                 #   admiral's flag | truce | standard
+    service: navy                # who wears it: navy | merchant | privateer | any
+    squadron: red                # the squadron's colour where the nation has them, else ""
+    rank: ""                     # an admiral's flag: admiral | vice-admiral | rear-admiral
+    words: "the red ensign"      # as the lookout names it
+    proportion: [1, 2]           # hoist, fly
+    drawing:                     # x along the fly from the hoist, y down from the head, 0 to 1
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {line: [[0, 0], [0.5, 0.5]], width: 0.05, colour: white}   # width in the hoist's units
+    dates: "1801-"               # the years it flew: "1801-", "1785-1808", "-1800"
+    source: "..."                # the page the flag is drawn from, or `made` and why
+occasions:                       # what flies where, by occasion and role
+  - occasion: at sea             # at sea | at anchor | in action | in company under a
+                                 #   commodore | in harbour | under truce
+    role: kings ship             # kings ship | commodore | admiral | merchant | privateer | any
+    flags:
+      - {name: red ensign, where: peak}
+      - {name: pendant, where: main truck}
+```
+
+- **`where`** takes 81's place words exactly (Design-ViewerAction.md §12.2): `peak` (the viewer
+  falls back to `staff` where there is no gaff), `staff`, `main truck`, `fore truck`, `mizen
+  truck` (a one-masted ship's mast is her main), `<mast> <piece> masthead` (`main topgallant
+  masthead`), `jackstaff`, `<mast> rigging`. The checker refuses any other word, and an
+  occasion naming a flag the file has not.
+- **An occasion's list replaces the at-sea list** for that role; a role with no list of its
+  own at an occasion takes the `any` list there, and failing that its at-sea list. A doubled
+  ensign is the same flag named at two places.
+- **The flag of truce** flies under the colours state `truce` (74 adds it to 71's states), by
+  the `under truce` occasion's list.
+- **The `basic` root** stands for the nations with no root of their own. Its file's `flags`
+  and `occasions` are the plain ensign every nation has (drawn from her `colours` words in
+  `data/nations.yaml` where she has no flags of her own) and the plain pendant of a man of
+  war; under `nations:` it carries, by nation id, the flags a page gives for a nation that
+  stands on `basic` for her signals (Portugal's, dated), each in the same shape (`sources`,
+  `flags`, `occasions`), read before the basic list.
+- **The snapshot** serves `flags` as 81 reads them, `{place, name, words, drawing}`, the
+  drawing as `{proportion, parts}` with the rectangles in `parts`; the lines go under
+  `drawing.lines` beside them (81's viewer draws a part without `rect` as the whole field,
+  so a line among the parts would cover the flag; 81 draws `lines` when it can).
+- **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
+  two ensigns at the peak), for 74's prize when the lead rules it.
+
+The rules, in the locker: **what flies where** is a pure function of the nation's file, the
+colours' state and the nation shown (the other nation's file under false colours), the
+ship's role (her captain's, read as the rules read it), her captain's rank where an
+admiral's flag is wanted, the occasion (at anchor when she lies at anchor; in action when
+she has beaten to quarters or is engaging; in company under a commodore when she is under
+his orders; at sea else), and the flags ordered beside them (`hoist the broad pendant`,
+`hoist a second ensign at the main`, `hoist the jack`). Nothing when her colours are hauled
+down or struck; the ensign turned over under distress. The list is the locker's state and
+the lookout's words; no physics reads it.
