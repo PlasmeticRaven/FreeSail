@@ -298,9 +298,9 @@ def test_the_prisoners_rise_on_a_thin_tired_prize_crew_with_no_captor_near_and_r
     own sixteen since package 75's SW-4; before it a hundred and twenty-one over twenty-one,
     the King's ship's share of our two hundred and sixty-four), nineteen hours in her, the
     frigate two miles off: the rule draws once an hour (a quarter's chance) and at seed 1
-    they rise in the first hour and have the deck by 73's tables; she is retaken by her own people (her nation, colours, role and intent
-    hers again, the prize crew her prisoners, the prize master a captive in her cabin), the
-    frigate's log says so with the prize lost. At seed 7 the two draws of the first two
+    they rise in the first hour and have the deck by 73's tables; she is retaken by her own
+    people (her nation, colours, role and intent hers again, the prize crew her prisoners, the
+    prize master a captive in her cabin), the frigate's log says so with the prize lost. At seed 7 the two draws of the first two
     hours fail and nothing is said."""
     w, b, hull = _stood_off(1)
     for _ in range(61):
