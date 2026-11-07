@@ -298,7 +298,8 @@ def _entry_forms(entry: str) -> tuple[list[str], list[str]]:
             continue
         base = parts[0]
         heads.append(base)
-        forms.append(base[:-1] + "ies" if base.endswith("y") and base[-2:-1] not in "aeiou" else base + "s")
+        plural_y = base.endswith("y") and base[-2:-1] not in "aeiou"
+        forms.append(base[:-1] + "ies" if plural_y else base + "s")
         if base.endswith(("s", "sh", "ch", "x", "o")):
             forms.append(base + "es")
         prev = base
