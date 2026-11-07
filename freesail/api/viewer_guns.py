@@ -25,6 +25,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
+from freesail.ship.parts import charge_lb
 from freesail.ship.profile import interp, ports_of, rail_at
 
 FT = 0.3048
@@ -428,6 +429,7 @@ def served(profile: Any, guns: Iterable[Any]) -> dict[str, Any]:
                     "bore_m": round(f.bore_m, 4),
                     "breech_m": round(f.breech_m, 3),
                     "muzzle_m": round(f.muzzle_m, 3),
+                    "charge_lb": charge_lb(g.kind, g.pounder),
                 }
             )
         out_guns.append(entry)

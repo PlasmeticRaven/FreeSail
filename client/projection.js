@@ -346,7 +346,7 @@
    * Build the skeleton. `graph` is /api/ship; `snapshot` is /api/state (may be
    * null for a static drawing: then brace angles and states come from the graph).
    */
-  function buildSkeleton(graph, snapshot) {
+  function buildSkeleton(graph, snapshot, options) {
     var hull = graph.hull;
     var deck = hull.deck_height_m || 1.5;
     var profile = drawnProfile(hull); // package 75: her side, decks and stem, where the file gives them
@@ -1880,7 +1880,11 @@
         figures.push({ kind: "spar", id: "oar." + (oi + 1), cls: "oar", state: pulling ? "pulling" : "lying_on", side: oarSide > 0 ? "starboard" : "larboard", pts: [loom, blade], busy: false });
       }
     }
-    return { figures: figures, hull: hull, spars: spars, stays: stayFoot, frame: fullRigFrame(graph, home, hull) };
+    // package 81: the guns, the ports, the shot holes and the flags (Design-ViewerAction.md);
+    // `options.outs` moves a gun's muzzle while it recoils or runs out between snapshots
+    figures.push.apply(figures, actionFigures(graph, snapshot, hull, spars, options && options.outs));
+    var frame = fullRigFrame(graph, home, hull).concat(actionFrame(graph, hull, home));
+    return { figures: figures, hull: hull, spars: spars, stays: stayFoot, frame: frame };
   }
 
   /** The full rig's reach, for the view's fixed scale (spec M3 §9 item 14): every spar in
@@ -3578,7 +3582,7 @@
       if (p.y > maxY) maxY = p.y;
     }
     skeleton.figures.forEach(function (f) {
-      var g = { kind: f.kind, id: f.id, cls: f.cls, state: f.state, side: f.side, part: f.part, of: f.of, busy: f.busy, backed: f.backed, reefs: f.reefs, piece: f.piece, hoist: f.hoist, brace: f.brace };
+      var g = { kind: f.kind, id: f.id, cls: f.cls, state: f.state, side: f.side, part: f.part, of: f.of, busy: f.busy, backed: f.backed, reefs: f.reefs, piece: f.piece, hoist: f.hoist, brace: f.brace, words: f.words };
       var all = [];
       if (f.path) {
         g.path = projectPath(f.path, proj);
@@ -3719,6 +3723,641 @@
     return tack === "larboard" ? Math.PI / 2 : (3 * Math.PI) / 2;
   }
 
+  // -- the action (package 81; docs/design/Design-ViewerAction.md) -------------------------
+  //
+  // The guns, the ports, the shot holes and the flags, from what the server serves: the graph's
+  // `guns` and `ports` (each gun placed by the one rule, `freesail/api/viewer_guns.py`) and the
+  // snapshot's `guns`, `damage` and `flags`. A hull the server places no gun on (no profile, or
+  // a file without the contract) draws as before. The flash, the plume and the recoil are
+  // effects on the clock between snapshots (`clockAt`, `firingsBetween`, `effects`), outside
+  // the frame, which holds every gun run out and every flag's swing instead (`actionFrame`).
+
+  // §2.5, §3.3 (judgement; the questions to the owner's shelf, §11.2)
+  var LID_OPEN_DEG = 70; // a lid hauled up from hanging shut, outboard
+  var OUT_SHARE = { long: 0.33, carronade: 0.25, swivel: 0.5 }; // run out: the muzzle outboard
+  var RECOIL_SHARE = { long: 0.4, carronade: 0.15, swivel: 0 }; // run in: the muzzle inboard
+  var HOUSED_INBOARD_M = 0.1; // secured: the muzzle just inside the side
+  var TRUNNION_SHARE = 3 / 7; // the trunnions from the base ring, of the length
+  var CARRIAGE_SHARE = 0.45; // a truck carriage's length, of its gun's
+  var SLIDE_SHARE = 1.6; // a carronade's or a pivot's slide, of its gun's
+  var DISMOUNT_TIP_DEG = 15; // a gun off its carriage lies tipped on the deck
+  var YOKE_M = 0.04; // a swivel's yoke, drawn as a post this wide
+  var HOLE_SIDES = 8;
+  // §4.2 (judgement, to be held against the period's words: R3, R6)
+  var FLASH_S = 0.15;
+  var FLASH_CALIBRES = 6;
+  var THROW_M = 4; // the smoke thrown out along the barrel at 6 lb of powder
+  var PLUME_GROW_S = 2.5;
+  var PLUME_RADIUS_M = 3; // at 6 lb of powder, grown
+  var PLUME_LIFE_S = 30;
+  var PLUME_SPREAD = 0.04; // the plume widens this share of its radius a second after it is grown
+  var PLUME_CHARGE_LB = 6;
+  var RECOIL_S = 0.4;
+  var RUN_OUT_S = 2;
+  // §12.3 (judgement; question 7)
+  var FLAG_DROOP_DEG = 15;
+  var ENSIGN_STAFF_M = 2.5;
+  var ENSIGN_STAFF_RAKE_DEG = 15;
+  var JACKSTAFF_M = 1.5;
+  var ENSIGN_FLY_OF_BEAM = 0.5;
+  var PENDANT_OF_MAIN_YARD = 0.6;
+  var PENDANT_HOIST_M = 0.3;
+
+  function gunState(snapshot, id) {
+    var guns = (snapshot && snapshot.guns) || [];
+    for (var i = 0; i < guns.length; i++) if (guns[i].id === id) return guns[i];
+    return { id: id, state: "secured", loaded: false, shut: false, fired: 0 };
+  }
+
+  /** The strips of the side as drawn, by side: [{x0, x1, mid}], for a port or a hole to be
+   *  sorted with the strip it lies on (as the bands are) and painted after it. */
+  var SIDE_STRIPS = typeof WeakMap === "function" ? new WeakMap() : null;
+  function sideStrips(hull) {
+    var kept = SIDE_STRIPS && SIDE_STRIPS.get(hull);
+    if (kept) return kept;
+    var out = { starboard: [], larboard: [] };
+    hullFigures(hull).forEach(function (f) {
+      if (f.part !== "side" || !f.side || !f.sortAt) return;
+      var xs = f.pts.map(function (p) {
+        return p[0];
+      });
+      out[f.side].push({ x0: Math.min.apply(null, xs), x1: Math.max.apply(null, xs), mid: f.sortAt });
+    });
+    if (SIDE_STRIPS) SIDE_STRIPS.set(hull, out);
+    return out;
+  }
+  function stripMid(hull, side, x, fallback) {
+    var best = null;
+    sideStrips(hull)[side].forEach(function (s) {
+      if (s.x0 - 1e-9 <= x && x <= s.x1 + 1e-9 && (!best || s.x1 - s.x0 < best.x1 - best.x0)) best = s;
+    });
+    return best ? best.mid : fallback;
+  }
+
+  /** The slope of a deck's line at x (rise over run), for a port's edges parallel to it
+   *  (Falconer 1780, PORTS). */
+  function deckSlope(profile, deck, x) {
+    var pts = (profile.decks_m || {})[deck];
+    if (!pts || pts.length < 2) return 0;
+    return (lineAt(pts, x + 0.5) - lineAt(pts, x - 0.5)) / 1.0;
+  }
+
+  /** A port's opening on the drawn side, [x, z] corners from its sill's after end round: its
+   *  sill at the triple's, its top as cut, its edges parallel to its deck. */
+  function portCorners(profile, port) {
+    var w = port.width_m / 2;
+    var s = deckSlope(profile, port.deck, port.x_m);
+    var depth = port.top_m - port.sill_m;
+    return [
+      [port.x_m - w, port.sill_m - s * w],
+      [port.x_m + w, port.sill_m + s * w],
+      [port.x_m + w, port.sill_m + s * w + depth],
+      [port.x_m - w, port.sill_m - s * w + depth],
+    ];
+  }
+
+  /** Whether the port on `side` is open: its gun cast loose (run in or out, or off its carriage)
+   *  and the sea not at its sill; shut for a gun secured, a port shut by the sea and an empty
+   *  port (Design-ViewerAction.md §2.5). */
+  function portOpen(port, side, snapshot) {
+    var id = port.guns[side] || port.guns.both;
+    if (!id) return false;
+    var st = gunState(snapshot, id);
+    return !st.shut && st.state !== "secured";
+  }
+
+  function portFigures(hull, graph, snapshot) {
+    var ports = (graph && graph.ports) || [];
+    if (!ports.length) return [];
+    var profile = drawnProfile(hull);
+    var hbAt = drawnSideAt(hull);
+    var railAt = drawnRailAt(hull);
+    var figs = [];
+    ports.forEach(function (port) {
+      // a port cut to the rail follows it where it steps down within the port's width (the
+      // 64's foremost quarterdeck port, at her breast)
+      var corners = portCorners(profile, port).map(function (c, i) {
+        return i < 2 ? c : [c[0], Math.min(c[1], railAt(c[0]).z - ON_LINE_M)];
+      });
+      [1, -1].forEach(function (sign) {
+        var side = sign > 0 ? "starboard" : "larboard";
+        var pts = corners.map(function (c) {
+          return v(c[0], sign * hbAt(c[0], c[1]), c[1]);
+        });
+        var mid = stripMid(hull, side, port.x_m, centroid(pts));
+        var open = portOpen(port, side, snapshot);
+        var gid = port.guns[side] || port.guns.both;
+        var deckWords = port.deck === "upper" ? "upper-deck" : port.deck;
+        var words = (open ? "a " + deckWords + " port, open" : gid ? (gunState(snapshot, gid).shut ? "a " + deckWords + " port, shut, the sea at its sill" : "a " + deckWords + " port, its lid shut") : "an empty " + deckWords + " port, its lid shut");
+        figs.push({ kind: "hull", part: open ? "port" : "lid", side: side, cls: open ? "open" : "shut", pts: pts, sortAt: mid, outward: faceOut(pts, sign), sea: true, words: words, deck: port.deck, at_x: port.x_m });
+        if (open) {
+          // the lid hauled up outboard about its hinge along the port's top
+          var a = (LID_OPEN_DEG * Math.PI) / 180;
+          var top = [pts[3], pts[2]];
+          var depth = port.top_m - port.sill_m;
+          var swing = v(0, sign * Math.sin(a) * depth, -Math.cos(a) * depth);
+          var lid = [top[0], top[1], add(top[1], swing), add(top[0], swing)];
+          figs.push({ kind: "hull", part: "lid", side: side, cls: "open", pts: lid, sortAt: centroid(lid), sea: true, words: "a " + deckWords + " port's lid, hauled up", deck: port.deck, at_x: port.x_m });
+        }
+      });
+    });
+    return figs;
+  }
+
+  /** The direction a gun's bore points, (x, y, z), by its place: square to its side, a chaser
+   *  trained toward its end, a pivot by its training (a relative bearing from the bow, starboard
+   *  positive; fore and aft secured). */
+  function gunDirection(gun, st) {
+    var t;
+    if (gun.how === "pivot") {
+      t = ((st && st.train_deg) || 0) * (Math.PI / 180);
+      return v(Math.cos(t), Math.sin(t), 0);
+    }
+    var sign = gun.side === "larboard" ? -1 : 1;
+    t = ((gun.train_deg || 0) * Math.PI) / 180;
+    var end = gun.place === "stern" ? -1 : 1;
+    return v(end * Math.sin(t), sign * Math.cos(t), 0);
+  }
+
+  /** How far the muzzle stands outboard of the side (negative inboard) in a state (§3.3). */
+  function muzzleOut(gun, state) {
+    var L = gun.length_m;
+    if (state === "run out") return (OUT_SHARE[gun.kind] || 0.3) * L;
+    if (state === "run in") return -(RECOIL_SHARE[gun.kind] || 0) * L;
+    return -HOUSED_INBOARD_M;
+  }
+
+  /** The point on the side (or the rail) the gun's bore comes out at, and its direction. */
+  function gunMount(hull, gun, st) {
+    var d = gunDirection(gun, st);
+    if (gun.how === "pivot") return { at: v(gun.x_m, 0, gun.axis_z_m), d: d };
+    var sign = gun.side === "larboard" ? -1 : 1;
+    var y;
+    if (gun.how === "port") y = drawnSideAt(hull)(gun.x_m, gun.axis_z_m);
+    else y = drawnRailAt(hull)(gun.x_m).hb;
+    return { at: v(gun.x_m, sign * y, gun.axis_z_m), d: d };
+  }
+
+  /** A tapered barrel from `breech` to `muzzle` as two crossed quads (one upright, one flat),
+   *  so that it shows from any side: [quads]. */
+  function barrelQuads(breech, muzzle, rb, rm) {
+    var d = norm(sub(muzzle, breech));
+    var up = v(0, 0, 1);
+    var flat = norm(cross(d, up));
+    if (!isFinite(flat[0])) flat = v(0, 1, 0);
+    return [up, flat].map(function (n) {
+      return [add(breech, mul(n, rb)), add(muzzle, mul(n, rm)), sub(muzzle, mul(n, rm)), sub(breech, mul(n, rb))];
+    });
+  }
+
+  /** A quad cut at u = 0 along `d` from `at` into the parts inboard (u < 0) and outboard. */
+  function cutAtSide(quad, at, d) {
+    var u = quad.map(function (p) {
+      return dot(sub(p, at), d);
+    });
+    function part(keepOut) {
+      var out = [];
+      for (var i = 0; i < quad.length; i++) {
+        var j = (i + 1) % quad.length;
+        var ui = u[i], uj = u[j];
+        var inI = keepOut ? ui >= 0 : ui <= 0;
+        if (inI) out.push(quad[i]);
+        if ((ui < 0 && uj > 0) || (ui > 0 && uj < 0)) out.push(lerp(quad[i], quad[j], ui / (ui - uj)));
+      }
+      return out.length >= 3 ? out : null;
+    }
+    return { inboard: part(false), outboard: part(true) };
+  }
+
+  /** One gun's figures, its muzzle `out` metres outboard of where its bore meets the side. */
+  function gunFigures(hull, gun, st, out) {
+    var m = gunMount(hull, gun, st);
+    var L = gun.length_m, rb = gun.breech_m / 2, rm = gun.muzzle_m / 2;
+    var words = gun.name + ", a " + gun.kind_words + ": " + (st.shut ? "run in, the sea at its port" : st.state);
+    var base = { kind: "gun", id: gun.id, cls: gun.kind, state: st.state.replace(/ /g, "_"), side: gun.side, words: words };
+    function fig(part, pts, piece) {
+      var f = {};
+      Object.keys(base).forEach(function (k) {
+        f[k] = base[k];
+      });
+      f.part = part;
+      f.pts = pts;
+      if (piece) f.piece = piece;
+      f.sortAt = centroid(pts);
+      return f;
+    }
+    var figs = [];
+    var breech, muzzle;
+    if (st.state === "dismounted") {
+      // off its carriage, on the deck at its port, tipped (§3.3)
+      var tip = (DISMOUNT_TIP_DEG * Math.PI) / 180;
+      var dd = norm(v(m.d[0] * Math.cos(tip) + m.d[1] * Math.sin(tip), m.d[1] * Math.cos(tip) - m.d[0] * Math.sin(tip), 0));
+      muzzle = add(v(m.at[0], m.at[1], gun.deck_z_m + rb), mul(m.d, -0.3));
+      breech = sub(muzzle, mul(dd, L));
+      barrelQuads(breech, muzzle, rb, rm).forEach(function (q) {
+        figs.push(fig("barrel", q));
+      });
+      return figs;
+    }
+    if (gun.how === "pivot") {
+      var back = st.state === "run in" ? (RECOIL_SHARE[gun.kind] || 0) * L : 0;
+      breech = sub(m.at, mul(m.d, L * TRUNNION_SHARE + back));
+      muzzle = add(breech, mul(m.d, L));
+    } else {
+      muzzle = add(m.at, mul(m.d, out));
+      breech = sub(muzzle, mul(m.d, L));
+    }
+    // the muzzle's face, square to the bore, so that a gun pointed at the viewer shows
+    var dirM = norm(sub(muzzle, breech));
+    var e1 = norm(cross(dirM, v(0, 0, 1)));
+    if (!isFinite(e1[0])) e1 = v(0, 1, 0);
+    var e2 = cross(e1, dirM);
+    var face = [];
+    for (var k = 0; k < 8; k++) {
+      var ak = (2 * Math.PI * k) / 8;
+      face.push(add(muzzle, add(mul(e1, Math.cos(ak) * rm), mul(e2, Math.sin(ak) * rm))));
+    }
+    figs.push(fig("muzzle", face, gun.how === "port" && out <= 0 ? "inboard" : "outboard"));
+    barrelQuads(breech, muzzle, rb, rm).forEach(function (q) {
+      if (gun.how === "port" && out > 0) {
+        var cut = cutAtSide(q, m.at, m.d);
+        if (cut.inboard) figs.push(fig("barrel", cut.inboard, "inboard"));
+        if (cut.outboard) figs.push(fig("barrel", cut.outboard, "outboard"));
+      } else figs.push(fig("barrel", q));
+    });
+    // the carriage, the slide or the yoke under it (§3.1): an upright plate along the bore
+    var foot = gun.deck_z_m;
+    var under = gun.axis_z_m - rb;
+    if (gun.how === "rail") {
+      // the swivel's yoke: a post on the rail up to its bore
+      var across = mul(norm(cross(m.d, v(0, 0, 1))), YOKE_M / 2);
+      var low = v(m.at[0], m.at[1], foot), high = v(m.at[0], m.at[1], under);
+      figs.push(fig("carriage", [add(low, across), add(high, across), sub(high, across), sub(low, across)]));
+      return figs;
+    }
+    var trunnion = add(breech, mul(m.d, L * TRUNNION_SHARE));
+    var len = (gun.kind === "carronade" || gun.how === "pivot" ? SLIDE_SHARE : CARRIAGE_SHARE) * L;
+    var c0 = sub(trunnion, mul(m.d, len / 2)), c1 = add(trunnion, mul(m.d, len / 2));
+    if (gun.how === "port") {
+      // the carriage stays inboard of the side
+      var u1 = dot(sub(c1, m.at), m.d);
+      if (u1 > 0) {
+        c1 = sub(c1, mul(m.d, u1));
+        c0 = sub(c0, mul(m.d, u1));
+      }
+    }
+    figs.push(fig("carriage", [v(c0[0], c0[1], foot), v(c1[0], c1[1], foot), v(c1[0], c1[1], under), v(c0[0], c0[1], under)]));
+    return figs;
+  }
+
+  /** A shot hole's figure (§5): an octagon of its diameter on the drawn side at its place
+   *  against the waterline, held under the rail by its own radius. */
+  function holeFigures(hull, holes) {
+    if (!holes || !holes.length) return [];
+    var profile = drawnProfile(hull);
+    if (!profile) return [];
+    var hbAt = drawnSideAt(hull), railAt = drawnRailAt(hull);
+    return holes.map(function (h) {
+      var sign = h.side === "larboard" ? -1 : 1;
+      var r = Math.max(h.diameter_m, 0.05) / 2;
+      var z = Math.min(h.z_m, railAt(h.x_m).z - r);
+      var pts = [];
+      for (var k = 0; k < HOLE_SIDES; k++) {
+        var a = (2 * Math.PI * k) / HOLE_SIDES;
+        var x = h.x_m + r * Math.cos(a), zz = z + r * Math.sin(a);
+        pts.push(v(x, sign * hbAt(x, zz), zz));
+      }
+      var side = sign > 0 ? "starboard" : "larboard";
+      return { kind: "hull", part: "hole", side: side, cls: h.plugged ? "plugged" : "open", pts: pts, sortAt: stripMid(hull, side, h.x_m, centroid(pts)), outward: faceOut(pts, sign), sea: true, words: "a shot hole " + (h.z_m <= 0 ? "between wind and water" : "through the side") + " to " + side + (h.plugged ? ", plugged" : "") };
+    });
+  }
+
+  // -- the flags (§12) ----------------------------------------------------------------------
+
+  var FLAG_PIECES = { topgallant: "topgallant_mast", royal: "royal_mast", top: "topmast" };
+
+  /** The masts by name ('fore', 'main', 'mizen'; a mast of one ship-rigged as 'mizzen' answers
+   *  to 'mizen'), from the graph's root masts; a ship of one mast has it as her main. */
+  function mastsByName(graph) {
+    var masts = graph.spars.filter(function (s) {
+      return s.class === "mast" && !s.parent;
+    });
+    var out = {};
+    masts.forEach(function (s) {
+      var word = s.id.split(".")[0];
+      if (word === "mizzen") word = "mizen";
+      out[word] = s;
+    });
+    if (masts.length === 1 && !out.main) out.main = masts[0];
+    return { byName: out, list: masts };
+  }
+
+  /** A mast's chain of pieces stepped on it, the lower mast first. */
+  function mastChain(graph, mast) {
+    var chain = [mast];
+    var at = mast;
+    for (;;) {
+      var next = graph.spars.filter(function (s) {
+        return s.parent === at.id && MAST_CLASSES[s.class];
+      })[0];
+      if (!next) break;
+      chain.push(next);
+      at = next;
+    }
+    return chain;
+  }
+
+  function topOf(r) {
+    if (!r || !r.a || !r.b) return null;
+    return r.a[2] >= r.b[2] ? r.a : r.b;
+  }
+
+  /** The point of a flag's place word on the drawn spars (the top of its hoist), or null where
+   *  the ship has no such place (§12.2). */
+  function flagPlace(graph, hull, spars, word) {
+    var M = mastsByName(graph);
+    var parts = word.split(" ");
+    if (word === "peak") {
+      var aft = M.list.slice().sort(function (a, b) {
+        return (a.x_m || 0) - (b.x_m || 0);
+      })[0];
+      var gaff = aft && graph.spars.filter(function (s) {
+        return s.class === "gaff" && s.parent === aft.id;
+      })[0];
+      if (gaff && spars[gaff.id] && spars[gaff.id].b) return spars[gaff.id].b;
+      return flagPlace(graph, hull, spars, "staff");
+    }
+    if (word === "staff") {
+      var t = taffrail(hull);
+      var rake = (ENSIGN_STAFF_RAKE_DEG * Math.PI) / 180;
+      return add(t, v(-Math.sin(rake) * ENSIGN_STAFF_M, 0, Math.cos(rake) * ENSIGN_STAFF_M));
+    }
+    if (word === "jackstaff") {
+      var bs = graph.spars.filter(function (s) {
+        return s.class === "bowsprit";
+      })[0];
+      var r = bs && spars[bs.id];
+      if (!r || !r.b) return null;
+      var end = r.b[0] >= r.a[0] ? r.b : r.a;
+      return add(end, v(0, 0, JACKSTAFF_M));
+    }
+    var mast = M.byName[parts[0]];
+    if (!mast) return null;
+    var chain = mastChain(graph, mast);
+    if (parts[1] === "truck") return topOf(spars[chain[chain.length - 1].id]);
+    if (parts[parts.length - 1] === "masthead") {
+      var cls = FLAG_PIECES[parts[1]] || parts[1] + "_mast";
+      var piece = chain.filter(function (s) {
+        return s.class === cls;
+      })[0];
+      return topOf(spars[(piece || chain[chain.length - 1]).id]);
+    }
+    if (parts[1] === "rigging") {
+      var lower = spars[mast.id];
+      if (!lower || !lower.a) return null;
+      var mid = lerp(lower.a, lower.b, 0.55);
+      var hb = drawnProfile(hull) ? drawnRailAt(hull)(mid[0]).hb : (hull.beam_m || 6) / 2;
+      return v(mid[0], hb * 0.9, mid[2]); // the weather side's sign is set by the caller
+    }
+    return null;
+  }
+
+  function flagSize(hull, graph, flag) {
+    var beam = hull.beam_m || 6;
+    var p = (flag.drawing && flag.drawing.proportion) || [1, 2];
+    var name = (flag.name || "").toLowerCase();
+    if (name.indexOf("pendant") >= 0) {
+      var yard = graph.spars.filter(function (s) {
+        return s.id.indexOf("main.") === 0 && s.class === "yard";
+      })[0];
+      var fly = (yard ? yard.length_m : beam * 2) * PENDANT_OF_MAIN_YARD;
+      return { fly: fly, hoist: PENDANT_HOIST_M, pendant: true };
+    }
+    var ensign = beam * ENSIGN_FLY_OF_BEAM;
+    var f = name.indexOf("jack") >= 0 ? ensign / 2 : ensign;
+    return { fly: f, hoist: (f * p[0]) / p[1] };
+  }
+
+  /** The flags' figures (§12.3): each stiff at its place, its fly to leeward of the apparent wind
+   *  drooped FLAG_DROOP_DEG, in its drawing's rectangles; nothing at a place the ship lacks. */
+  function flagFigures(graph, hull, spars, snapshot) {
+    var flags = (snapshot && snapshot.flags) || [];
+    if (!flags.length) return [];
+    var app = snapshot.wind ? snapshot.wind.apparent_angle : 0;
+    var w = windVector(app);
+    var lee = norm(v(w[0], w[1], 0));
+    if (!isFinite(lee[0])) lee = v(-1, 0, 0);
+    var droop = (FLAG_DROOP_DEG * Math.PI) / 180;
+    var flyDir = add(mul(lee, Math.cos(droop)), v(0, 0, -Math.sin(droop)));
+    var weather = Math.sin(app || 0) >= 0 ? 1 : -1;
+    var figs = [];
+    flags.forEach(function (flag, n) {
+      var at = flagPlace(graph, hull, spars, flag.place);
+      if (!at) return;
+      if (flag.place.indexOf("rigging") >= 0) at = v(at[0], weather * at[1], at[2]);
+      var size = flagSize(hull, graph, flag);
+      var down = v(0, 0, -size.hoist);
+      function point(fx, fy) {
+        var y = flag.drawing && flag.drawing.inverted ? 1 - fy : fy;
+        var taper = size.pendant ? 1 - fx * 0.9 : 1;
+        return add(add(at, mul(flyDir, fx * size.fly)), mul(down, 0.5 + (y - 0.5) * taper));
+      }
+      var parts = (flag.drawing && flag.drawing.parts) || [{ rect: [0, 0, 1, 1], colour: "cloth" }];
+      parts.forEach(function (p, k) {
+        var r = p.rect || [0, 0, 1, 1];
+        var pts = [point(r[0], r[1]), point(r[2], r[1]), point(r[2], r[3]), point(r[0], r[3])];
+        figs.push({ kind: "flag", id: "flag." + n + "." + k, cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: (flag.words || flag.name) + ", at the " + flag.place, pts: pts, sortAt: centroid(pts) });
+      });
+    });
+    return figs;
+  }
+
+  /** The action's figures in ship coordinates: the ports and their lids, the guns by their
+   *  states, the shot holes, and the flags. `outs` (optional) moves a gun's muzzle to so many
+   *  metres outboard while it recoils or runs out (`effects`' `moving`). */
+  function actionFigures(graph, snapshot, hull, spars, outs) {
+    var figs = [];
+    if (!drawnProfile(hull)) return []; // a hull with no profile draws as 75 left her (§1)
+    figs.push.apply(figs, portFigures(hull, graph, snapshot));
+    (graph.guns || []).forEach(function (gun) {
+      if (!gun.how) return;
+      var st = gunState(snapshot, gun.id);
+      var out = outs && outs[gun.id] !== undefined ? outs[gun.id] : muzzleOut(gun, st.state);
+      figs.push.apply(figs, gunFigures(hull, gun, st, out));
+    });
+    figs.push.apply(figs, holeFigures(hull, snapshot && snapshot.damage && snapshot.damage.holes));
+    figs.push.apply(figs, flagFigures(graph, hull, spars, snapshot));
+    return figs;
+  }
+
+  /** The frame's share of the action (§6 item 3): every gun run out and run in, every lid
+   *  hauled up, and every flag place's largest fly swung every way, so that no state of the guns
+   *  or the colours rescales the view. Plumes are not in it. */
+  function actionFrame(graph, hull, spars) {
+    var pts = [];
+    if (!drawnProfile(hull)) return pts; // as 75 left her (§1)
+    {
+        (graph.guns || []).forEach(function (gun) {
+        if (!gun.how) return;
+        ["run out", "run in", "secured"].forEach(function (state) {
+          gunFigures(hull, gun, { state: state, train_deg: 0 }, muzzleOut(gun, state)).forEach(function (f) {
+            pts.push.apply(pts, f.pts);
+          });
+        });
+        if (gun.how === "pivot") {
+          // swung every way about its pivot
+          for (var k = 0; k < 16; k++) {
+            gunFigures(hull, gun, { state: "run out", train_deg: k * 22.5 }, 0).forEach(function (f) {
+              pts.push.apply(pts, f.pts);
+            });
+          }
+        }
+      });
+      var opened = { guns: graph.guns.map(function (g) {
+        return { id: g.id, state: "run out", shut: false };
+      }) };
+      portFigures(hull, graph, opened).forEach(function (f) {
+        pts.push.apply(pts, f.pts);
+      });
+    }
+    // each place with the flags that may fly there (an ensign or a jack anywhere, the pendant at
+    // a truck or a masthead), its fly swung every way drooped as it is drawn, its hoist below
+    var ensign = flagSize(hull, graph, { name: "ensign" });
+    var pendant = flagSize(hull, graph, { name: "pendant" });
+    var droop = (FLAG_DROOP_DEG * Math.PI) / 180;
+    var words = ["peak", "staff", "jackstaff", "fore truck", "main truck", "mizen truck", "fore rigging", "main rigging", "mizen rigging"];
+    words.forEach(function (word) {
+      var at = flagPlace(graph, hull, spars, word);
+      if (!at) return;
+      var sizes = word.indexOf("truck") >= 0 ? [ensign, pendant] : [ensign];
+      [1, -1].forEach(function (s) {
+        var p = v(at[0], s * at[1], at[2]);
+        sizes.forEach(function (size) {
+          var out = (size.fly * Math.cos(droop)) / Math.cos(Math.PI / 16);
+          var drop = size.fly * Math.sin(droop);
+          for (var k = 0; k < 16; k++) {
+            var a = (k * Math.PI) / 8;
+            var tip = add(p, v(Math.cos(a) * out, Math.sin(a) * out, -drop));
+            pts.push(tip, add(tip, v(0, 0, -size.hoist)));
+          }
+          pts.push(add(p, v(0, 0, -size.hoist)));
+        });
+      });
+    });
+    return pts;
+  }
+
+  // -- the clock and the effects (§4, §6) ---------------------------------------------------
+
+  /** The game's time now, in ticks (seconds), between snapshots: the snapshot's tick, and the
+   *  real seconds since it came times the clock's compression while the clock runs (held while
+   *  held), never beyond the next snapshot's tick. */
+  function clockAt(snapTick, arrivedMs, nowMs, compression, running, every) {
+    if (!running) return snapTick;
+    var t = snapTick + ((nowMs - arrivedMs) / 1000) * (compression || 1);
+    return Math.min(t, snapTick + (every || 1));
+  }
+
+  /** The rounds fired between two snapshots (§4.1): one {gun, tick} a round each gun's count
+   *  rose by, stamped with the later snapshot's tick; none against no earlier snapshot. */
+  function firingsBetween(prev, snap) {
+    if (!prev || !snap || !prev.guns || !snap.guns) return [];
+    var before = {};
+    prev.guns.forEach(function (g) {
+      before[g.id] = g.fired;
+    });
+    var out = [];
+    snap.guns.forEach(function (g) {
+      if (!(g.id in before)) return;
+      for (var n = before[g.id]; n < g.fired; n++) out.push({ gun: g.id, tick: snap.tick });
+    });
+    return out;
+  }
+
+  /** The figures of the flash, the plume and the recoil alive at time `t` (§4.2), in ship
+   *  coordinates for the plume's origin and drifted in the air: {figures (ship coordinates,
+   *  each `air`: not heeled with her), moving ({gun id: muzzle out} while a gun recoils or runs
+   *  out), alive (whether anything is)}. `charges` gives each gun's powder in pounds (the
+   *  graph's), `runs` the guns run out at a tick ({gun id: tick}). */
+  function effects(graph, snapshot, firings, t, runs) {
+    var hull = graph.hull;
+    var byId = {};
+    (graph.guns || []).forEach(function (g) {
+      byId[g.id] = g;
+    });
+    var wind = snapshot && snapshot.wind ? snapshot.wind : {};
+    var drift = mul(windVector(wind.apparent_angle || 0), wind.apparent_speed || 0);
+    var figs = [], moving = {}, alive = false;
+    (firings || []).forEach(function (f, n) {
+      var gun = byId[f.gun];
+      if (!gun || !gun.how) return;
+      var age = t - f.tick;
+      if (age < 0 || age > PLUME_LIFE_S) return;
+      alive = true;
+      var st = gunState(snapshot, gun.id);
+      var m = gunMount(hull, gun, st);
+      var outNow = muzzleOut(gun, "run out");
+      var muzzle = gun.how === "pivot" ? add(m.at, mul(m.d, gun.length_m * (1 - TRUNNION_SHARE))) : add(m.at, mul(m.d, outNow));
+      if (age < RECOIL_S && gun.how !== "pivot") {
+        var k = age / RECOIL_S;
+        moving[gun.id] = outNow + (muzzleOut(gun, "run in") - outNow) * k;
+      }
+      var scale = Math.pow((gun.charge_lb || PLUME_CHARGE_LB) / PLUME_CHARGE_LB, 1 / 3);
+      if (age < FLASH_S) {
+        // a star at the muzzle, drawn facing the viewer (`projectEffects`)
+        var fr = (gun.bore_m * FLASH_CALIBRES) / 2;
+        var fc = add(muzzle, mul(m.d, fr * 0.6));
+        figs.push({ kind: "effect", id: "flash." + n, cls: "flash", at: fc, radius: fr, star: true, words: "the flash of " + gun.name });
+      }
+      var grow = Math.min(age / PLUME_GROW_S, 1);
+      var radius = PLUME_RADIUS_M * scale * (0.25 + 0.75 * grow) * (1 + PLUME_SPREAD * Math.max(age - PLUME_GROW_S, 0));
+      var thrown = mul(m.d, THROW_M * scale * Math.sqrt(grow));
+      var away = add(thrown, mul(drift, age)); // in the air from the muzzle as heeled
+      var thin = 1 - age / PLUME_LIFE_S;
+      figs.push({ kind: "effect", id: "plume." + n, cls: "plume", origin: muzzle, centre: away, radius: radius, opacity: Math.max(thin, 0) * 0.85, air: true, words: "the smoke of " + gun.name });
+    });
+    Object.keys(runs || {}).forEach(function (id) {
+      var gun = byId[id];
+      var age = t - runs[id];
+      if (!gun || age < 0 || age >= RUN_OUT_S || moving[id] !== undefined) return;
+      alive = true;
+      var from = muzzleOut(gun, "run in"), to = muzzleOut(gun, "run out");
+      moving[id] = from + (to - from) * (age / RUN_OUT_S);
+    });
+    return { figures: figs, moving: moving, alive: alive || Object.keys(moving).length > 0 };
+  }
+
+  /** Project the effects' figures (`effects`' own) for a view: the plume, in the air, is not
+   *  heeled with her; each comes back with its depth for the two layers, behind her middle and
+   *  before it. They are not in the frame (§6). */
+  function projectEffects(figs, facing, heel) {
+    var proj = makeProjector(facing, heel);
+    var still = makeProjector(facing, 0);
+    var mid = proj(v(0, 0, 0)).depth;
+    return figs.map(function (f) {
+      // smoke and flash are drawn facing the viewer: a disc (the plume, a little flattened) or a
+      // star about the point's projection. The muzzle heels with her; the smoke from it is in
+      // the air as it stands.
+      var c, depth;
+      if (f.air) {
+        var base = heelPoint(f.origin, heel || 0);
+        var air = add(base, f.centre);
+        // smoke lies on the water, it does not sink into it: its foot held at the sea
+        air = v(air[0], air[1], Math.max(air[2], f.radius * 0.8));
+        c = still(air);
+      } else c = proj(f.at);
+      depth = c.depth;
+      var pts = [];
+      var n = f.star ? 10 : 16;
+      for (var k = 0; k < n; k++) {
+        var a = (2 * Math.PI * k) / n;
+        var r = f.star && k % 2 ? f.radius * 0.4 : f.radius;
+        pts.push({ x: c.x + Math.cos(a) * r, y: c.y + Math.sin(a) * r * (f.star ? 1 : 0.8) });
+      }
+      return { kind: f.kind, id: f.id, cls: f.cls, pts: pts, centre: { x: c.x, y: c.y }, depth: depth, behind: depth > mid, opacity: f.opacity, words: f.words };
+    });
+  }
+
   return {
     buildSkeleton: buildSkeleton,
     project: project,
@@ -3740,6 +4379,15 @@
     flattenPath: flattenPath,
     splitAtX: splitAtX,
     sortFigures: sortFigures,
+    actionFigures: actionFigures,
+    actionFrame: actionFrame,
+    portCorners: portCorners,
+    muzzleOut: muzzleOut,
+    clockAt: clockAt,
+    firingsBetween: firingsBetween,
+    effects: effects,
+    projectEffects: projectEffects,
+    flagPlace: flagPlace,
     constants: {
       GAFF_PEAK_ANGLE: GAFF_PEAK_ANGLE,
       LOOSE_FOOT_HEIGHT_M: LOOSE_FOOT_HEIGHT_M,
@@ -3762,6 +4410,16 @@
       FIGURE_SHARE: FIGURE_SHARE,
       HEAD_SIDING_M: HEAD_SIDING_M,
       DECK_END_CLEAR_M: DECK_END_CLEAR_M,
+      LID_OPEN_DEG: LID_OPEN_DEG,
+      OUT_SHARE: OUT_SHARE,
+      RECOIL_SHARE: RECOIL_SHARE,
+      HOUSED_INBOARD_M: HOUSED_INBOARD_M,
+      FLASH_S: FLASH_S,
+      PLUME_GROW_S: PLUME_GROW_S,
+      PLUME_LIFE_S: PLUME_LIFE_S,
+      RECOIL_S: RECOIL_S,
+      RUN_OUT_S: RUN_OUT_S,
+      FLAG_DROOP_DEG: FLAG_DROOP_DEG,
     },
   };
 });
