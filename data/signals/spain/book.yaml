@@ -1,0 +1,45 @@
+# FreeSail: the Spanish signal books' declaration (spec M7 §3; package 76;
+# docs/design/Design-Signals.md). The same shape as data/signals/britain/book.yaml (its head
+# says the fields).
+#
+# The sources, laid under docs/references/signals/ and read on the page (the research pass is
+# in docs/dev/TuningNotes.md, "Package 76"). The Real Armada made its signals by José de
+# Mazarredo's plan, printed at Cádiz in 1781 for Córdoba's squadron and again by royal order
+# (the third edition, Madrid, read here). The plan: a numeral table of four hundred cells, with
+# twenty flags or pendants whose values are given on a separate sheet and may be changed at
+# any hour; every signal of the table is two of them, the upper and the lower, the cell's
+# number its article; if they fly apart, the upper goes at the preferred place (the main
+# before the fore, the fore before the mizen, the mizen before its peak, the peak before the
+# ensign staff). Beside the twenty, a flag or pendant "universal, or equal to all", which
+# stands for whichever flag it flies with, so that no double set is wanted, and which alone
+# annuls; the signals of one flag alone, a series of twenty of their own; a cornet over a
+# number makes it a ship's number (every ship has hers, her other name), and two cornets with
+# sixteen flags make the table of the courses; the Spanish and the white pendants, outside the
+# table, for the signals added below. By night and in fog the same numerary form by lanterns
+# and guns (night_fog.yaml). The numbers are Mazarredo's of 1781, read on the page. Whether
+# the books of 1797 to 1805 kept them is the open question: his *Corrección a las señales de
+# táctica* (Cádiz, 1799) adds two hundred tactical signals to "the four hundred signals of two
+# flags" of the régimen book and refers to an instruction of 31 May 1797, which says the
+# régimen table stood in 1799, but no page found shows the régimen quaderno of 1797 itself, or
+# whether it moved any cell; asked of the owner's shelf. No telegraphic dictionary: none is
+# known for the Spanish navy of 1805.
+
+nation: spain
+system: well-built           # Mazarredo's numbers of 1781; whether the 1797 quaderno kept every cell is asked (above)
+sources:
+  - "Mazarredo, Instrucciones y señales para el régimen y maniobras de la esquadra, Cádiz 1781, the third edition by royal order, Madrid (the plan, the general signals of two flags, the signals of one flag, the night and fog signals, the convoy's orders, the ships' numbers)"
+  - "Mazarredo, Corrección a las señales de táctica para el quaderno de las del régimen de las Esquadras, Cádiz, 1799 (the tactical signals by five pendants; the instruction of 31 May 1797 referred to)"
+  - "Señales que han de observar los navíos, fragatas y demás embarcaciones de la esquadra de Córdova, Cádiz, 1778 (the older form, before the plan)"
+hoist_form: table            # two flags, the upper and the lower, read as a cell of the four hundred (the plan)
+flags:
+  table_flags: 20            # "veinte banderas ó gallardetes indistintamente", their values on a separate sheet, changed at any hour (the plan)
+  universal: true            # the flag "universal ó igual á todas", standing for the flag it flies with; alone, the annulment (the plan; the signals of one flag)
+  cornets: true              # a cornet over a number makes it a ship's number; two cornets and sixteen flags the courses (the plan)
+  pendants: true             # the Spanish and the white pendants, outside the table, for the signals added below (the plan)
+  annul: true                # the universal flag alone
+  telegraph: false           # no dictionary
+hoist_s: 60
+read_s: 60
+read_nm: 2.0
+glass_factor: 1.5
+flies_s: 1800

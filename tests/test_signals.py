@@ -81,6 +81,33 @@ def test_a_hoist_shows_its_books_form_and_the_british_numerary_is_unchanged_by_i
     assert h.to_dict()["form"] == "table"
 
 
+def test_the_spanish_book_is_added_by_data_alone_in_mazarredos_numbers():
+    """Package 76: Spain's own root, the six files and the nations' line and nothing else.
+    Mazarredo's plan (Cádiz 1781, the third edition): two flags read as a cell of four
+    hundred, the cell's number the article (No. 247 the chase without keeping the order);
+    the signals of one flag numbered above the table; by night the lanterns high and low of
+    his nineteen, by fog the guns in two times a full minute apart."""
+    from freesail.world.nations import load_nations
+
+    assert load_nations().get("spain").signals_root == "spain"
+    es = S.books_for_nation(load_nations(), "spain")
+    assert es.nation == "spain" and es.hoist_form == "table" and not es.telegraph
+    e, q = es.find("general chase")
+    assert e.number == 247 and not e.made and e.original.startswith("Dar caza")
+    h = S.make_hoist(S.Locker(), es, e, q, "santa-sabina", 100)
+    assert h.flags_words() == "two flags at the main" and h.to_dict()["form"] == "table"
+    assert es.find("man overboard")[0].number == 409
+    assert es.find("engage the enemy more closely")[0].does == {"closer": True}
+    night = {x.meaning: x for x in es.night}
+    assert night["Wear together"].show == "two lanterns high and three lanterns low"
+    third = "and then a rocket or the stern lanterns left lit"  # his chapter III, told after
+    assert night["Tack in succession"].show.endswith(third)
+    fog = {x.meaning: x for x in es.fog}
+    assert fog["Shorten sail"].fire == "two guns"
+    assert fog["Wear together"].fire == "two guns, and a full minute after three guns"
+    assert all(not x.made for x in es.night + es.fog)
+
+
 def test_the_telegraphic_dictionary_spells_nelsons_sentence_in_twelve_hoists():
     b = S.load_books("britain")
     hoists = b.encode("England expects that every man will do his duty")

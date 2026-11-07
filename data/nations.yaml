@@ -150,8 +150,9 @@ nations:
       roll: up
       source: "between the French and the British: the Spanish fleet drilled with the French and fired high (Trafalgar's accounts, from memory); 70's judgement, moved here"
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
-    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
-    signals: {root: basic, system: basic}
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md);
+    # package 76: her own root, Mazarredo's book in its own numbers (data/signals/spain/book.yaml)
+    signals: {root: spain, system: well-built}
     # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
     # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
     # the share aloft); the detachment itself is the ship file's
