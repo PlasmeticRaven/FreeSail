@@ -3606,9 +3606,9 @@ work is said so, and the builder goes on with what does not wait for it.
    mast-head, and a Jack at the fore. The *Java* also ... hoisting her ensign at the mizzen-peak,
    a union Jack at the mizzen top-gallant mast-head, and another lashed to the main-rigging"; and
    before it, "At 10 the *Java* made the private signals, English, Spanish, and Portuguese in
-   succession, none being answered; ... a little after 1 she [the *Constitution*] hoisted her
+   succession, none being answered; ... a little after 11 she [the *Constitution*] hoisted her
    private signal, and then, being satisfied that the strange sail was an enemy, she wore and
-   stood off." 71's colours are a state (shown, none, false, struck, distress) with no flag in a
+   stood off." (The hour is "11" in the 1882 printing laid under `docs/references/signals/`; the owner's copy reads "1"; found by 76.) 71's colours are a state (shown, none, false, struck, distress) with no flag in a
    place; this item gives each root **a seventh file, `colours.yaml`**: the nation's flags of
    identity and command by name (the ensign and its variants by service or squadron, the
    merchant's ensign, the jack, the commissioning pendant, the broad pendant of a commodore, an
