@@ -3186,8 +3186,8 @@ the physics and `data/ships/` untouched; the fast tier whole on it green, exit 0
 in the cloud: run 54 on d7dfbdf9 (15:46 to 17:03 UTC): lint green, all six shards green, 7,072
 passed, 11 skipped, 12 xfailed, no failure; the pace job (informative) 9 of 13, the same four floor
 tests as runs 48, 49, 52 and 53 at 379 to 437 against 500, the shared runner's hour (the build
-machine alone held 13 of 13 at 12:09; the flags add no tick to the pace's passages, the lookout's
-refresh once a minute with the look). Step 5's substance (the lookout's
+machine alone held 13 of 13 at 12:09 before this merge, and the builder measured the pace alone
+13 of 13 at b0cda9c with the flags in; the lookout's refresh is once a minute with the look). Step 5's substance (the lookout's
 reading, the private signals in succession) is item 8's; what a corrected number moves is the
 steps' "what moved". Package 76 has one thing left: the owner's shelf answers to its seven
 questions as they come (the 1797 quaderno, the 1799 fog book, the convoy book, the French book
