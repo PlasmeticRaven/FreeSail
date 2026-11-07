@@ -458,7 +458,10 @@ their citation, never copied text; none holds the work)
   word names ("the red ensign" red; "the white ensign with the arms" white; a word naming none, the
   plain cloth's colour), **nothing** under `none` and `struck`, and the drawing turned over under
   `distress` (the union down; a plain field shows it only in its words). The flag of truce (74's
-  cartel) is 76's and 74's; until it is in the locker the server serves none.
+  cartel): the trunk's colours have no such state (`COLOURS_STATES`, `world/signals.py:71`: shown,
+  none, false, struck, distress; no cartel in the engine), so the fallback serves a plain white
+  field at the peak the moment the locker holds one, by whatever word 74 or 76 gives it, and the test
+  pins it on a locker given in the test. `signals.py` is read, never written.
 - **Where the code stands:** the fallback in `freesail/api/viewer_flags.py` (new, pure), read by
   `queries.snapshot`; 76's locker list read through the same function when it exists, so the
   meeting of the two packages is one function's first line.
