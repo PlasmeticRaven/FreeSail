@@ -48,8 +48,10 @@ __all__ = [
     "PER_SHIP_FIELDS",
     "SHARED_FIELDS",
     "Hull",
+    "bind_to_hull",
     "delegated",
     "is_observer",
+    "world_of",
     "lift_old_state",
     "own_id",
 ]
@@ -186,6 +188,20 @@ def delegated(target: str, name: str) -> property:
         delattr(getattr(self, target), name)
 
     return property(fget, fset, fdel, doc=f"the {target}'s `{name}`")
+
+
+def world_of(handle: Any) -> Any:
+    """The World a handle is of: a Hull's World, a World itself (package 97). The game's own
+    state that is neither a hull's field nor a shared field the Hull exposes (`unheld_
+    questions`, `books`, `person_journals`, the seats' count) is set on the World by it, for
+    a plain attribute set through a Hull lands on the Hull, which a system bound to her
+    since this package holds as its `world`."""
+    from freesail.core.world import World
+
+    if isinstance(handle, World):
+        return handle
+    world = getattr(handle, "__dict__", {}).get("world")
+    return world if isinstance(world, World) else handle
 
 
 def own_id() -> str:
@@ -411,6 +427,93 @@ class Hull:
 for _name in SHARED_FIELDS:
     setattr(Hull, _name, delegated("world", _name))
 del _name
+
+
+def bind_to_hull(hull: Any, building: Any) -> int:
+    """Every reference to `building` (a World) in the hull's own graph made the hull, and
+    every reference to its clock the World's one clock (the watch bill's, the routine's,
+    the runner's); returns how many references were made the hull's. Her systems (`People`,
+    `Stations`, `Dealings`, `Navigation`, the ground, the needs, the water, the health, the
+    standing runtime, the captain, whatever her `ship.extra` keeps) read her as their
+    `world` from here, whichever hull's block is running when they are read: a system
+    holding the World reads the running hull's fields through its façade, and a system of
+    one hull is read from inside another's (package 97; `docs/design/Design-FacadeReaders.md`).
+
+    Two callers: a far vessel's hull adopted from the World that built her (`crews.
+    adopt_hull`, `building` that World and `hull.world` the game's), and the World's own
+    hull at the end of the World's making and at a checkpoint's load (`World.__init__`,
+    `World.__setstate__`, `building` the World itself, whose `hull.world` stays). The walk
+    stays within hers: the shared things (the chart, the registry, the ports, the nations,
+    the tide, the systems, the sea's vessels, the hulls, the World) are not entered."""
+    world = hull.world
+    swap = {id(building): hull}
+    temp_clock = building.__dict__.get("clock")
+    if temp_clock is not None and temp_clock is not world.clock:
+        swap[id(temp_clock)] = world.clock
+    skip = {
+        id(world),
+        id(building),
+        id(world.clock),
+        id(getattr(world, "chart", None)),
+        id(getattr(world, "registry", None)),
+        id(getattr(world, "ports", None)),
+        id(getattr(world, "nations", None)),
+        id(getattr(world, "tide", None)),
+        id(getattr(world, "systems", None)),
+        id(getattr(world, "weather", None)),
+        id(getattr(world, "squadrons", None)),
+        id(getattr(world, "business", None)),
+        id(world.sea_vessels),
+        id(getattr(world, "hulls", None)),
+    }
+    swapped = 0
+    seen: set[int] = set()
+    stack: list[Any] = [hull]
+    while stack:
+        obj = stack.pop()
+        oid = id(obj)
+        if oid in seen or oid in skip:
+            continue
+        seen.add(oid)
+        if isinstance(obj, dict):
+            for k, v in list(obj.items()):
+                if id(v) in swap:
+                    obj[k] = swap[id(v)]
+                    swapped += 1
+                elif _walkable(v):
+                    stack.append(v)
+            continue
+        if isinstance(obj, (list, tuple, set, frozenset)):
+            if isinstance(obj, list):
+                for i, v in enumerate(obj):
+                    if id(v) in swap:
+                        obj[i] = swap[id(v)]
+                        swapped += 1
+                    elif _walkable(v):
+                        stack.append(v)
+            else:
+                for v in obj:
+                    if _walkable(v):
+                        stack.append(v)
+            continue
+        d = getattr(obj, "__dict__", None)
+        if d is None:
+            continue
+        for k, v in list(d.items()):
+            if obj is hull and k == "world":
+                continue  # her own back-reference to the World she is kept in
+            if id(v) in swap:
+                d[k] = swap[id(v)]
+                swapped += 1
+            elif _walkable(v):
+                stack.append(v)
+    return swapped
+
+
+def _walkable(v: Any) -> bool:
+    return isinstance(v, (dict, list, tuple, set, frozenset)) or (
+        hasattr(v, "__dict__") and not isinstance(v, type) and not callable(v)
+    )
 
 
 def lift_old_state(world: Any, state: dict[str, Any]) -> dict[str, Any]:

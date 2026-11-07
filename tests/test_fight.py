@@ -74,11 +74,14 @@ def _enemy(
     return v, enemy
 
 
-def _alongside(distance_m: float = 10.0, her_quarters: bool = False, her_captain: bool = False):
+def _alongside(
+    distance_m: float = 10.0, her_quarters: bool = False, her_captain: bool = False, seed: int = 7
+):
     """The player's frigate at quarters with her fire held, and a French frigate made so far
     off her starboard beam and crewed; the lookout given his minute; the mark engaged to
-    starboard. Her captain stands aside (the test moves her) unless `her_captain`."""
-    w = make_world(7, FRIGATE, _scenario())
+    starboard. Her captain stands aside (the test moves her) unless `her_captain`. `seed` the
+    game's (package 97: a test whose story needs a man to live through the fight's draw)."""
+    w = make_world(seed, FRIGATE, _scenario())
     w.submit("beat to quarters")
     w.run(5)
     heading = math.degrees(float(w.ship.heading))

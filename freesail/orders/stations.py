@@ -559,11 +559,25 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
     if world is None:
         raise OrderError("There is nobody to hear it: the ship is not in a world.")
     speaker = _station_speaking(ship)
+    visitor = None
     if speaker is None:
         if verb == "hail":
             raise OrderError(HAIL_NAMES_NO_SAIL)
         station, who = CAPTAIN, "the captain"
         place = place_of(world, CAPTAIN)
+        from freesail.world import knowledge
+
+        visitor = knowledge.players_visitor(world)
+        if visitor is not None:
+            # the player aboard another ship as a visitor (decision 62; package 65, step 8):
+            # his words are his own, in his name and from his spot, and not her captain's
+            from freesail.world.movement import hull_name, hull_of
+
+            home = hull_of(world, getattr(visitor, "home", None))
+            who = f"{visitor.name}, a visitor" + (
+                f" of the {hull_name(home)}" if home is not None else ""
+            )
+            place = str(getattr(visitor, "where", "") or place)
         where = place_words(place)
         kind = "agent.spoke"
         is_hail = False
@@ -594,10 +608,12 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
     line = f"{who[:1].upper()}{who[1:]}, {where}: {words}"
     hearers: list[str] = []  # this hull's
     elsewhere: dict[Any, list[str]] = {}  # each other hearing hull's, by the hull
-    me = holder_of(world, station)
+    me = holder_of(world, station) if visitor is None else None
     for hull, other in stations_everywhere(world):
         same_hull = own_hull(hull) == here
-        if other is me or (me is None and same_hull and other.station.name == station):
+        if other is me or (
+            me is None and visitor is None and same_hull and other.station.name == station
+        ):
             continue
         at = station_spot_on(hull, other.station.name)  # read in its own hull's block
         if is_hail:

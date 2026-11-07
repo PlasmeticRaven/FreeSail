@@ -259,8 +259,25 @@ def go_to_boat(world: Any, person: Any, words: str = "") -> tuple[str, str, dict
         raise OrderError(f"You are in {hull_name_of(here)} already.")
     if getattr(person, "occupied", False):
         raise OrderError(f"You are at the {person.task}; the boat waits on it.")
-    hull = manned_hull(world, here)
+    home = hull_of(world, getattr(person, "home", None))
     made = ""
+    if home is not None and home is not here:
+        # a visitor aboard another ship (package 65, step 4; decision 62): his own boat,
+        # lying alongside her where she brought him, takes him off; her boats are not his
+        hull = manned_hull(world, home)
+        if hull is None:
+            raise OrderError(
+                f"No boat of the {hull_name_of(home)}'s is manned here; 'come aboard' has "
+                f"the {hull_name_of(here)} send hers for you."
+            )
+        _bearing, distance = _bearing_distance(here, hull)
+        if distance is not None and distance > ALONGSIDE_M:
+            raise OrderError(
+                f"{_cap(hull_name_of(hull))} is away, {distance_words(distance)} off; she "
+                "comes alongside first."
+            )
+    else:
+        hull = manned_hull(world, here)
     if hull is None:
         hull, made = man_boat(world, here, words, by=person.name)
     else:
@@ -288,9 +305,12 @@ def follow_boat(world: Any, hull: Any, person: Any) -> None:
     `follow` stand for the owner's own choice."""
     if getattr(_root(world), "followed", None) == hull.id:
         return
-    _root(world).followed = str(hull.id)
-    with world.as_hull(hull):
-        world.record(
+    root = _root(world)
+    root.followed = str(hull.id)
+    # on the World itself, the boat current (package 97: a hull's façade given here, the
+    # player's bound systems', makes herself current again in her own `record`)
+    with root.as_hull(hull):
+        root.record(
             Severity.ROUTINE,
             "hull.followed",
             f"The drivers follow {person.name} into {hull_name_of(hull)}: her readings are his.",
@@ -439,6 +459,28 @@ def end_tow(world: Any, ship_hull: Any, why: str = "the line cast off") -> str:
     return hoist_in(world, hull)
 
 
+def _fast_alongside(hull: Any, other: Any) -> None:
+    """The boat made fast alongside another ship (package 65, step 4): a boat's length off
+    her starboard side, her heading and her way the ship's, as the tow's coupling is."""
+    ship = other.ship
+    pos = getattr(other, "position", None)
+    if pos is None:
+        return
+    heading = float(ship.dyn.heading)
+    abeam = heading + math.pi / 2
+    off = 0.5 * float(getattr(ship.hull, "beam_m", 10.0) or 10.0) + ALONGSIDE_M / 2
+    dyn = hull.ship.dyn
+    hull.__dict__["_position"] = pos.advanced(off * math.sin(abeam), off * math.cos(abeam))
+    hull.__dict__["_geo_last"] = (float(dyn.x), float(dyn.y))
+    dyn.heading = units.wrap_2pi(heading)
+    dyn.target_heading = dyn.heading
+    dyn.u = max(0.0, float(ship.dyn.u))
+    dyn.speed = dyn.u
+    dyn.v = 0.0
+    dyn.r = 0.0
+    dyn.rudder = 0.0
+
+
 def _tow_station(hull: Any, ship_hull: Any, bearing: float) -> None:
     """The boat's place on the line: a line's length ahead of the ship's stem on the
     bearing, her heading the bearing, her way the ship's (the two are one body on the
@@ -520,6 +562,15 @@ def tick_boat(world: Any) -> None:
     mark = dict(oars.pulling_for or {})
     if not mark:
         return
+    if mark.get("fast"):
+        # made fast alongside another ship: she goes where the ship goes until an oar is
+        # pulled or the lug set, which casts her off
+        other = (getattr(world, "hulls", None) or {}).get(str(mark.get("hull") or ""))
+        if other is None or oars.stroke > 0.0 or _lug_set(hull):
+            oars.pulling_for = {}
+        else:
+            _fast_alongside(hull, other)
+        return
     if mark.get("tow"):
         _tow_tick(world, hull, ship_hull, oars, mark)
         return
@@ -533,7 +584,11 @@ def tick_boat(world: Any) -> None:
         return
     bearing, distance = _bearing_to(hull, target)
     if mark.get("alongside") and ship_hull is not None and distance <= ALONGSIDE_M:
-        hoist_in(world, hull)
+        other = (getattr(world, "hulls", None) or {}).get(str(mark.get("hull") or ""))
+        if mark.get("board") and other is not None and other is not ship_hull:
+            board_from_boat(world, hull, other)  # another ship: aboard her as visitors
+        else:
+            hoist_in(world, hull)
         return
     if mark.get("quay") and distance <= QUAY_M:
         oars.pulling_for = {}
@@ -632,34 +687,121 @@ def _bearing_distance(a: Any, b: Any) -> tuple[float | None, float | None]:
 # ---------------------------------------------------------------------------
 
 
-def come_alongside(world: Any, hull: Any) -> str:
+def come_alongside(world: Any, hull: Any, words: str = "") -> str:
     """`come alongside` from the boat: she pulls for her ship (the coxswain's mark her,
     the oars out and giving way) and, within a boat's length, is hoisted in; alongside
-    already, hoisted in at once."""
+    already, hoisted in at once. `come alongside the Medusa` (package 65, step 4; decision
+    62): she pulls for that ship and, alongside her, whoever is in her but her crew goes
+    aboard her as a visitor, the boat lying on her oars alongside for his coming back."""
     ship_hull = ship_of(world, hull)
     if ship_hull is None:
         raise OrderError("She is no ship's boat: there is nothing to come alongside of.")
-    _bearing, distance = _bearing_distance(hull, ship_hull)
+    other = _other_ship(world, hull, ship_hull, words)
+    target = other if other is not None else ship_hull
+    _bearing, distance = _bearing_distance(hull, target)
     if distance is not None and distance <= ALONGSIDE_M:
+        if other is not None:
+            return board_from_boat(world, hull, other)
         return hoist_in(world, hull)
     oars = _oars(hull)
     if oars is None:
         raise OrderError("She has no oars to pull with.")
-    oars.pulling_for = {"hull": str(ship_hull.id), "alongside": True}
+    mark: dict[str, Any] = {"hull": str(target.id), "alongside": True}
+    if other is not None:
+        mark["board"] = True
+    oars.pulling_for = mark
+    then = (
+        f"alongside, {_boarders_words(world, hull)} aboard her"
+        if other is not None
+        else "alongside, she is hoisted in"
+    )
     if _lug_set(hull):
         # under the lug: the coxswain steers for her, the lug taken in as she is hoisted
-        _steer(hull, _bearing_distance(hull, ship_hull)[0] or 0.0)
+        _steer(hull, _bearing_distance(hull, target)[0] or 0.0)
         return (
-            f"Making for the {hull_name_of(ship_hull)} under the lug, "
-            f"{distance_words(distance or 0.0)} off; alongside, she is hoisted in."
+            f"Making for the {hull_name_of(target)} under the lug, "
+            f"{distance_words(distance or 0.0)} off; {then}."
         )
     oars.out = True
     oars.manned = oars.number
     oars.stroke = 1.0
-    return (
-        f"Pulling for the {hull_name_of(ship_hull)}, {distance_words(distance or 0.0)} "
-        "off; alongside, she is hoisted in."
+    return f"Pulling for the {hull_name_of(target)}, {distance_words(distance or 0.0)} off; {then}."
+
+
+def _other_ship(world: Any, hull: Any, ship_hull: Any, words: str) -> Any:
+    """The other ship `come alongside <her name>` names: her hull, None for the boat's own
+    ship or no words; refused in words for a ship not on the sea."""
+    key = " ".join(str(words or "").split()).strip('"')
+    if not key or key.lower() in ("the ship", "ship", "her", "us", "our ship"):
+        return None
+    from freesail.world.orders import WorldOrderError, hull_named
+
+    root = _root(world)
+    try:
+        other = hull_named(root, key)
+    except WorldOrderError as e:
+        raise OrderError(str(e).rstrip(".") + ".") from None
+    if other is root:
+        other = root.players
+    if other is ship_hull or str(getattr(other, "id", "")) == str(ship_hull.id):
+        return None
+    if is_boat(other):
+        raise OrderError(f"{_cap(hull_name_of(other))} is a boat; there is no going aboard her.")
+    return other
+
+
+def _boarders(world: Any, boat: Any) -> list[Any]:
+    """Whoever is in the boat but her own crew (the one who took her, a passenger)."""
+    registry = getattr(_root(world), "registry", None)
+    people = list(registry.aboard(str(boat.id))) if registry is not None else []
+    return [p for p in people if str(getattr(p, "home", "") or "") != str(boat.id)]
+
+
+def _boarders_words(world: Any, boat: Any) -> str:
+    names = [p.name for p in _boarders(world, boat)]
+    if not names:
+        return "nobody goes"
+    return f"{_and(names)} {'goes' if len(names) == 1 else 'go'}"
+
+
+def _and(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def board_from_boat(world: Any, boat: Any, other: Any) -> str:
+    """The boat alongside another ship (package 65, step 4; decision 62): whoever is in her
+    but her crew goes aboard her as a visitor (`put_aboard`: his station his voice there,
+    the drivers following the player's person), and the boat lies on her oars alongside,
+    manned, for `go to the boat` from her deck and `come alongside` home."""
+    from freesail.world.movement import put_aboard
+
+    oars = _oars(boat)
+    name, hers = hull_name_of(boat), hull_name_of(other)
+    if oars is not None:
+        # made fast alongside her: the painter holds her where the ship goes (the tick keeps
+        # her station) until an oar is pulled or the lug set
+        made = hers if hers.startswith("the ") else f"the {hers}"
+        oars.pulling_for, oars.stroke = {"hull": str(other.id), "fast": True, "name": made}, 0.0
+    _fast_alongside(boat, other)
+    boarders = _boarders(world, boat)
+    if not boarders:
+        text = f"{_cap(name)} alongside the {hers}, lying on her oars; nobody in her to go aboard."
+        boat.record(Severity.NOTABLE, "boat.alongside", text, data={"ship": str(other.id)})
+        return text
+    for p in boarders:
+        put_aboard(world, p, other, "quarterdeck", by="the boat", said=True)
+    names = _and([p.name for p in boarders])
+    text = (
+        f"{_cap(name)} alongside the {hers}; {names} went aboard her, the boat lying on her "
+        "oars alongside."
     )
+    boat.record(
+        Severity.NOTABLE,
+        "boat.alongside",
+        text,
+        data={"ship": str(other.id), "people": [p.name for p in boarders]},
+    )
+    return text
 
 
 def hoist_in(world: Any, hull: Any) -> str:

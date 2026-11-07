@@ -13509,6 +13509,82 @@ def test_truth_7_380_every_kind_the_code_writes_is_placed_and_the_hulls_sounds_r
     test_the_senses_of_each_place_and_the_readings_places()
 
 
+def test_truth_7_374_a_book_is_read_after_the_walk():
+    """The library refuses the manifest from the quarterdeck with "in the hold" and the
+    walk; after `go to the hold` it serves it; the primer is served anywhere; the log book,
+    the chart, the book of standing orders, the books drafted and the ship's view each where
+    they are kept (the design's §8); the keeper carries his paper while he is at it."""
+    from tests.test_knowledge import (
+        test_the_keeper_carries_his_paper_while_he_is_at_it,
+        test_the_ships_own_are_read_where_they_are_kept_and_the_reference_anywhere,
+    )
+
+    test_the_ships_own_are_read_where_they_are_kept_and_the_reference_anywhere()
+    test_the_keeper_carries_his_paper_while_he_is_at_it()
+
+
+def test_truth_7_375_the_masters_days_work_is_done_in_the_gunroom():
+    """The master's noon sight on the quarterdeck and his day's work in the gunroom, the
+    rules' master and a model at his station alike: occupied there, the sample is the
+    gunroom's (the slate's rows, no deck reading), the deck reaching him by what is felt;
+    `People.occupy` the one road, keeping the room (the design's §9)."""
+    from tests.test_knowledge import (
+        test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike,
+    )
+
+    test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike()
+
+
+def test_truth_7_377_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone():
+    """The player in his own boat manned as a hull reads her as a deck; the ship's lines
+    reach him by sight and hail alone (the design's §12)."""
+    from tests.test_knowledge import (
+        test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone,
+    )
+
+    test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone()
+
+
+def test_truth_7_378_the_replay_to_the_same_digest_by_both_roads():
+    """A passage with a fake captain who went below, was reported to and called, came up
+    and drafted a book, saved at the half and at the end, replays by its transcript and by
+    its acts to the same digests of both hulls' logs (the design's §13)."""
+    from tests.test_knowledge import (
+        test_a_passage_with_a_captain_below_reported_to_called_and_writing_replays_by_both_roads,
+    )
+
+    test_a_passage_with_a_captain_below_reported_to_called_and_writing_replays_by_both_roads()
+
+
+def test_truth_7_381_the_drills_walk(tmp_path, monkeypatch):
+    """The fitness drill's walk (the design's §10), behind the `DRILL_WALK` switch (off on
+    the trunk by the lead's ruling until package 55 re-briefs; on here): a model that goes
+    below, eats, reads a paper where it is kept and comes on deck passes; one that asks for
+    the manifest from the cabin is told it is in the hold and passes with another paper; the
+    record says "passed, with the walk"; one that never walks is stood down with the walk
+    named."""
+    from tests.test_knowledge import test_the_drills_walk_teaches_the_places_before_the_game
+
+    test_the_drills_walk_teaches_the_places_before_the_game(tmp_path, monkeypatch)
+
+
+def test_truth_7_382_the_player_at_the_prompt_reads_by_his_place():
+    """The console shows the captain in the cabin no deck line and the officer's report, and
+    `log N` reads back the same; `knowledge: all` shows everything; the director's seat and
+    `follow` of another hull show everything of her (the owner's eye); the browser's log, its
+    reach-back and its snapshot's `knowledge` are the player's person's (decision 59; the
+    design's §11)."""
+    from tests.test_knowledge import (
+        test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye,
+        test_the_browsers_log_and_snapshot_are_the_players_persons,
+        test_the_console_shows_the_captain_what_reaches_him_where_he_is,
+    )
+
+    test_the_console_shows_the_captain_what_reaches_him_where_he_is()
+    test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye()
+    test_the_browsers_log_and_snapshot_are_the_players_persons()
+
+
 def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words_by_hail():
     """The lookout's sample carries the horizon's rows and the heading, no log, no lead, no
     glass; the quarterdeck's `say` does not reach it, `say to the lookout` does, and the sail
@@ -13516,6 +13592,17 @@ def test_truth_7_383_the_mastheads_knowledge_is_the_horizons_and_the_decks_words
     from tests.test_knowledge import test_the_lookouts_station_reads_the_horizon_and_no_instrument
 
     test_the_lookouts_station_reads_the_horizon_and_no_instrument()
+
+
+def test_truth_7_384_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places():
+    """A visitor aboard another hull reads her by his place in her (her cabin's glass and
+    none of her deck); a person put in her hold reads the hold's (the design's §12; the
+    confinement itself is package 74's)."""
+    from tests.test_knowledge import (
+        test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places,
+    )
+
+    test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places()
 
 
 def test_truth_7_385_a_station_reseated_after_a_sleep_and_a_wake_reads_by_its_place(tmp_path):
@@ -13831,3 +13918,42 @@ def test_truth_7_401_the_boats_names_are_the_givers_hulls_and_another_ships_man_
 
     test_the_boats_people_are_the_givers_and_the_far_brigs_men_of_the_same_posts_stay()
     test_a_person_of_another_ship_named_in_the_order_is_refused_in_words()
+
+
+# ---------------------------------------------------------------------------
+# Package 65, step 3, decision 63 (the lead's numbering at step 4's boundary): the command
+# devolved, and the told order the captain's word
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_388_the_captains_writing_is_done_in_the_cabin():
+    """`draft a book` from the quarterdeck takes the captain below and occupies him writing;
+    his sample while writing is the cabin's; he stays until he comes on deck (the design's
+    §9)."""
+    from tests.test_knowledge import test_the_captains_writing_is_done_in_the_cabin
+
+    test_the_captains_writing_is_done_in_the_cabin()
+
+
+def test_truth_7_420_the_command_devolves_on_the_held_officer_and_is_given_back():
+    """Decision 63: when the captain is unavailable (ashore, in the boat, aboard another
+    ship, wounded or sick below, a captive) the command devolves on the senior officer, a
+    held station first, said in the log (`ship.command_devolved`), his authority the captain's
+    whole with the standing orders as his guide (his orders logged "in command"), and given
+    back (`ship.command_resumed`) when the captain is available again and has given an order
+    (`freesail/world/reports.py`; the design's §7 postscript)."""
+    from tests.test_knowledge import (
+        test_the_command_devolves_on_the_held_officer_while_the_captain_is_away,
+    )
+
+    test_the_command_devolves_on_the_held_officer_while_the_captain_is_away()
+
+
+def test_truth_7_421_a_told_order_is_the_captains_word_and_never_refused():
+    """Decision 63: an order the captain tells a station to carry out is the captain's word
+    for that thing, logged as given by the station at the captain's word ("By the officer of
+    the watch, at the captain's word: ..."), never refused for his domain, with the deck or
+    without (`reports.told_covers`; `tools.judge` gives `TOLD`)."""
+    from tests.test_knowledge import test_a_told_order_is_the_captains_word_and_never_refused
+
+    test_a_told_order_is_the_captains_word_and_never_refused()

@@ -1099,51 +1099,77 @@ everything reached him in the sample wherever he stood, so moving bought nothing
 an order, and the station felt like a fixed seat with a view; ashore in Plymouth market he
 had the ship's heading, leeway, sails and the frigate's bearing from three miles off. The
 owner's ruling: a place is to carry at least what can reasonably be perceived from it, by
-action and by what is there. Provisionally, then, and for the brief to settle:
+action and by what is there. Provisionally it was a list for the brief to settle; **as built (package
+65, 2026-10-31 to 2026-11-06; `freesail/world/knowledge.py` and `world/reports.py` new;
+`agents/harness.py`, `agents/tools.py`, `agents/consent.py`, `agents/agent.py`; `world/movement.py`,
+`world/people.py`, `world/books.py`, `world/boats.py`; `api/queries.py`, `api/readings.py`;
+`ui/console.py`, `ui/driver.py`, `ui/server.py` and the client; `docs/design/Design-PlaceKnowledge.md`
+holds the design, the lead's rulings and a postscript a step; truths 7-370 to 7-389, 7-420 and
+7-421)** the rule is this, the harness keeping it and not the model:
 
-- **What a place gives.** The quarterdeck: the deck's readings, the log as it is spoken,
-  the lookout's hails, the conversation of the deck. The masthead: the lookout's horizon
-  and his glass, the deck by hail. The cabin: the chart, the papers and the quiet to work a
-  course, the deck by report (the officer's word, the messenger) and by what is felt (the
-  heel, the motion, the sounds of sail work and all hands). The gunroom: the master's day's
-  work and his slate. Below, asleep: nothing until called or woken. Ashore: the port's
-  places as §14 has them, and the ship by report, by boat or by letter only; the readings
-  of the ship come to nobody ashore. The harness keeps the rule, not the model: a sample
-  carries the readings the place allows, and a reading asked for elsewhere is answered
-  with where it is to be had ("the chart is in the cabin").
-- **Books and papers in their places.** The library's chart, epitome, almanac and papers
-  are in the cabin; the master's slate in the gunroom or on deck with him; the book of
-  standing orders on deck and in the cabin; the primer and the catalogue anywhere (they
-  are the player's reference, not the ship's). A book read where it is not is a walk first.
-- **The always-present line.** Every sample of a seated person opens with one line of his
-  own: who he is, where he is and since when, the deck (his, another's, nobody's), and his
-  state in the needs' words ("You: the captain, ashore at Plymouth, at the market, since
-  15:43; the deck the officer's; on your feet since 05:02, hungry"). The owner's thought
-  was the `how am I` reading printed each sample; this is that reading with the place and
-  the deck added, one line, never more, and the needs' cautions when they come as §20 has
-  them. It is the sample's first line so that a model never has to remember where it is.
-- **The drill.** Before the station brief, after the three calls of today, a short walk: go
-  below, eat, drink, read a book from the library where it is kept, come on deck; each
-  answered, so that the model has seen the places and its own line change before the game.
-- **Work in its place (the owner, 2026-10-19).** Each kind of work is done where it is
-  done: the sailmaker's in the sail room, the master's day's work and his sights' working
-  in the gunroom, the captain's writing (his book, a letter) in the cabin, the carpenter's
-  below at the damage, the purser's at the hold. Today the rules' people are occupied with
-  a place that is only "on deck" or "below" (`People.occupy`, the reckoning's master and
-  the mirrored persons), the muster's trades go to their trade's place when sent
-  (`TRADE_PLACES`, `movement.py`), and a station holder's own work moves him nowhere but
-  the master's, whose sights and day's work occupy him on deck and below through the same
-  reckoning whoever holds the station. 65 makes the work's place the room itself, the same
-  for the rules' person and for a model or the player at the station doing the same work
-  (the model master working the day's work goes to the gunroom and is occupied there, as
-  the rules' master is; the captain writing his standing orders is in the cabin), so that
-  the place's knowledge follows the work: the master below at his slate hears the deck by
-  report. Where a station holder's work and the rules' person's differ today, the brief
-  lists them and makes them one.
-- **What is not done yet.** Hearing by place is in (§14's earshot); the readings by place,
-  the papers' places, the line and the drill are 65's. Decision 47's other dropped item,
-  the papers kept in a place, comes with this one as far as the library is concerned and no
-  further.
+- **The rule.** A person perceives what his place allows (`knowledge.Senses`, read afresh from
+  where he is at each look, nothing kept): on the open deck the deck's readings and the deck's
+  lines (the default for every kind and every row, so a ship whose people stand where they stood
+  reads line for line as before); aloft the horizon's rows and the heading, no instrument, the
+  deck by hail; in the cabin the glass, the tell-tale's heading, the chart's and the reckoning's
+  rows, the purser's books, the port, the health rows, and of the deck's lines the sounds alone
+  (the sail and yard work as a sound, "sail handled overhead"; an evolution's lines as written);
+  in the gunroom the slate's and the chart's rows without the heading; in a room below the
+  room's own; asleep nothing until woken; ashore nothing of the ship but the date, the war, the
+  port and the weather over it; in the boat away the boat's own rows, the ship a sail in sight.
+  The sounds and the motion of a wooden ship reach every man awake aboard (the bell, the pipes,
+  the drum, a gun, the ship striking, a spar gone, the pumps), and a sleeper is woken by the call,
+  all hands, a gun, a hit, the ship striking, a spar carried away and a word to him, and nothing
+  else. The sample carries the lines that reach him and the rows that are his, with one line
+  saying where the rest are to be had ("Not to be had in the cabin: the speed (the log is hove on
+  deck); ..."); a reading asked at the prompt or by the `readings` tool where it is not to be had
+  is answered with where ("The depth: the lead is cast on deck; you are in the cabin."); the brief
+  says the rule in a sentence; `knowledge: all` in the scenario turns it off for everyone, and
+  the director sees everything always.
+- **A reply's prose is the person's own note** (decision 60): written in his journal under his
+  mark and heard by nobody; a thing is heard only when said (`say`, `tell`, `ask`); prose alone
+  where an answer was owed is counted with the empty replies, the nudge saying so.
+- **The report, the call and the command** (§7 of the design; decision 63). The rules' officer of
+  the watch sends down to the captain below each reportable line of the deck a minute after it
+  (`report.made`, for him alone); a danger, an urgent line of the deck's business and by night
+  every reportable line call him (`report.called`), once for a thing until he comes up; `call the
+  captain` is the officer's order, and a sleeping stand-by is woken by it and by what wakes any
+  sleeper; the command devolves on the held officer when the captain is ashore, in the boat,
+  aboard another ship, wounded or sick below or a captive (`ship.command_devolved`), and comes back
+  with his first order available again; a told order is the captain's word and passes the deck's
+  gate; the boat's coxswain reports to a captain ashore at the quay (`report.boat`).
+- **Books, papers and pictures in their places** (§8). The library serves the player's reference
+  (the primer, the catalogue, the grammar, the ship's names, the tools, the world page) from
+  anywhere and the ship's own where it is kept: each paper in its place, the keeper carrying his
+  while he is at it ("The manifest is kept in the hold, with the purser; go to the hold to read
+  it (or ask the purser)."), the book of standing orders and the books drafted on the quarterdeck
+  and in the cabin, the listing saying which are to be had where he stands; the log book on the
+  quarterdeck, in the cabin and the gunroom; the chart in the cabin, the gunroom and at the
+  binnacle; the ship's view from the deck, aloft and the boat; the browser's panes the same by the
+  player's person.
+- **Work in its place** (§9). `People.occupy` takes the room and keeps it (the master's mirror
+  mapped); the master's day's work is done in the gunroom by the rules' master and a model alike,
+  his sample the slate's there; the captain's writing is done in the cabin: `draft a book` takes
+  him below first and occupies him writing for five minutes, his own to leave by his own move.
+- **The player at the prompt** (decision 59) reads by his one person's place as a station does:
+  the console's and the browser's play log carry what reaches him where he stands, the browser's
+  readouts grey what is not to be had there and say where it is, the prompt follows his body into
+  the boat and aboard another ship (decision 62), and the owner's eye (the director's seat,
+  `follow` of a hull he holds no person in, `knowledge: all`) sees everything.
+- **The line** is 66's, as built there, the sample's first line.
+- **The drill's walk** (§10) is built whole behind `consent.DRILL_WALK`, off until package 55
+  re-briefs: go below, eat or drink, a paper read where it is kept, come on deck, seven things in
+  eight replies, the record saying "passed, with the walk".
+- **The edge cases** (§12): the handover fold keeps the place; a station reseated after a sleep
+  and a wake, and one on a hull asleep, read by their persons' places; the boat away with the
+  player reads the ship by sight and hail alone; a visitor aboard another hull by his place in
+  her, a captive put in her hold the hold's (the confinement itself is package 74's); an officer
+  with the deck is refused `go below` ("hand it over first"); a reading asked by nobody (a rule,
+  a standing order) is the ship's. **The replay**: the filter writes nothing and no digest moved;
+  the new lines (the reports, the calls, the writing, the walk) are functions of the log, the
+  places and the inputs, and a passage with a captain below, reported to, called and writing
+  replays by both roads to the same digests (truth 7-378). **The pace**: the filter's cost is
+  within the noise (the tuning notes, package 65, each step's figures; truth 7-386).
 
 **As built (package 66, 2026-10-19; `freesail/world/hearing.py` new; `orders._say_as`,
 `orders/stations.py` `_say`; `agents/tools.py` `submit_order`; the console and the

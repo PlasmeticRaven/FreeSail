@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from freesail import units
+from freesail.world.hulls import world_of
 
 __all__ = [
     "HANDOVER_KIND",
@@ -105,7 +106,7 @@ def journal_of(world: Any, station: str) -> Journal:
         return journals.setdefault(station, Journal(station))
     by_person = getattr(world, "person_journals", None)
     if by_person is None:  # a World from before package 45c (a checkpoint)
-        by_person = world.person_journals = {}
+        by_person = world_of(world).person_journals = {}  # the World's (97)
     journal = by_person.get(who)
     if journal is None:
         # the person's first station: the journal kept under its name until now is his
@@ -125,7 +126,7 @@ def person_journal(world: Any, person: Any) -> Journal:
     name = str(getattr(person, "name", person) or "")
     by_person = getattr(world, "person_journals", None)
     if by_person is None:  # a World from before package 45c (a checkpoint)
-        by_person = world.person_journals = {}
+        by_person = world_of(world).person_journals = {}  # the World's (97)
     journal = by_person.get(name)
     if journal is not None:
         return journal

@@ -1120,3 +1120,804 @@ def test_the_officers_brief_says_the_duty_and_the_kinds_are_placed():
         R.EVENTS["a report"].kind == "report.made"
         and R.EVENTS["the captain called"].kind == "report.called"
     )
+
+
+# ---------------------------------------------------------------------------
+# Step 4: the player at the prompt reads by his place (decision 59), one person (decision 62)
+# ---------------------------------------------------------------------------
+
+
+def _console(w):
+    import io
+
+    from freesail.ui.console import Console
+
+    out = io.StringIO()
+    return Console(w, out=out), out
+
+
+def test_the_console_shows_the_captain_what_reaches_him_where_he_is():
+    """Truth 7-382, the console: the play log is the player's person's, what reaches him
+    where he is (decision 59; the design's §11). The captain in the cabin is shown no deck
+    line (the lookout's sightings, the sail work) and is shown the officer's report; `log N`
+    reads back by the same rule; on deck again the deck's lines are his."""
+    from freesail.world import reports
+
+    w = world_at()
+    con, out = _console(w)
+    assert con.handle_line("set the royals")
+    assert "set the royals" in out.getvalue()
+    assert con.handle_line("go below")
+    assert "went below" in out.getvalue()
+    mark = out.tell()
+    assert con.handle_line("tick 7200")
+    below = out.getvalue()[mark:]
+    made = [e for e in w.log if e.kind == reports.REPORT_MADE]
+    assert made, [e.kind for e in w.log if e.kind.startswith("report.")]
+    assert "sent down to the captain, in the cabin" in below
+    deck = [e for e in w.log if e.kind in ("lookout.sighting", "lookout.made_out", "agent.hail")]
+    assert deck
+    for e in deck:
+        assert e.text not in below, e.text
+    mark = out.tell()
+    assert con.handle_line("log 400")
+    read_back = out.getvalue()[mark:]
+    assert "sent down to the captain" in read_back
+    for e in deck:
+        assert e.text not in read_back, e.text
+    assert con.handle_line("come on deck")
+    mark = out.tell()
+    con.handle_line("heave the log")  # the deck's business, his again on deck
+    assert "Order: heave the log." in out.getvalue()[mark:]
+    assert K.players_senses(w).spot == ("aboard", w.players.id, "quarterdeck")
+
+
+def test_knowledge_all_the_directors_seat_and_follow_of_another_hull_are_the_owners_eye():
+    """Truth 7-382, the owner's eye: under `knowledge: all` the captain in the cabin is shown
+    everything; in an observed world the director's seat and `follow` of a hull he holds no
+    person in show everything of her (the design's §11)."""
+    from tests.test_observer import observed_world
+
+    w = world_at(knowledge="all")
+    con, out = _console(w)
+    con.handle_line("go below")
+    mark, since = out.tell(), w.clock.tick
+    con.handle_line("tick 3600")
+    shown = out.getvalue()[mark:]
+    deck = [
+        e
+        for e in w.log
+        if e.tick > since and e.kind in ("lookout.sighting", "sail.set", "agent.hail")
+    ]
+    assert deck and all(e.text in shown for e in deck)
+    assert K.players_senses(w).everything
+    w2, _ = observed_world()
+    assert K.players_person(w2) is None and K.players_senses(w2).everything
+    con2, out2 = _console(w2)
+    assert con2.handle_line('follow "Medusa"')
+    assert K.players_senses(w2).everything
+    mark = out2.tell()
+    con2.handle_line("set the royals")
+    assert "set the royals" in out2.getvalue()[mark:]
+
+
+def test_the_browsers_log_and_snapshot_are_the_players_persons():
+    """Truth 7-382, the browser: the pages' play log and the log's reach-back are filtered
+    as the console's; the snapshot's `knowledge` says where the player is, the rows not to
+    be had there with where each is, and whether the deck's are his; `follow` and `look at`
+    typed at the order line are the driver's, a refusal sent to the pages alone."""
+    from freesail.ui.server import Driver
+    from freesail.world import reports
+
+    w = world_at()
+    d = Driver(w)
+    k = d.snapshot()["knowledge"]
+    assert k["place"] == "on the quarterdeck" and not k["everything"] and k["deck"]
+    assert k["hidden"] == [] and k["words"] == ""
+    d.submit("go below")
+    d.tick(7200)
+    k = d.snapshot()["knowledge"]
+    assert k["place"] == "in the cabin" and not k["deck"]
+    hidden = {h["id"]: h["where"] for h in k["hidden"]}
+    assert hidden["speed"] == "the log is hove on deck" and "in_sight" in hidden
+    assert "heading" not in hidden and "glass" not in hidden
+    assert k["words"].startswith("Not to be had in the cabin: ")
+    shown = d.shown_log(2000)
+    kinds = {x.get("kind") for x in shown}
+    assert reports.REPORT_MADE in kinds
+    assert not kinds & {"lookout.sighting", "lookout.made_out", "agent.hail"}
+    sent: list[dict] = []
+    d.add_listener(sent.append)
+    e = d.submit('follow "the ship"')
+    assert e.kind == "driver.follow" and sent[0]["event"]["kind"] == "driver.follow"
+    e = d.submit('follow "Nobody Afloat"')
+    assert e.kind == "driver.refused" and "Nobody Afloat" in e.text
+    assert not [x for x in w.log if x.kind == "driver.refused"]
+
+
+def test_the_player_goes_aboard_another_ship_in_his_own_boat_and_the_prompt_follows_him():
+    """Decision 62: the player is one person and the prompt follows his body. From his own
+    manned boat `come alongside the X` pulls for her and, alongside, puts him aboard her as
+    a visitor, the drivers following him (a `hull.followed` line, no driver's input); his
+    log there is hers by his place; `go to the boat` from her deck puts him back in his own
+    boat lying alongside, and `come alongside` brings him home, the drivers with him."""
+    from tests.test_between_hulls import _brig_alongside, _run_until
+
+    w, b, hull = _brig_alongside()
+    captain = w.people.captain
+    assert K.players_person(w) is captain
+    e = w.submit("go to the boat")
+    assert e.kind == "person.aboard", e.text
+    boat = w.hulls[w.followed]
+    assert boat is not w.players and captain.hull == boat.id
+    e = w.submit("come alongside the X")
+    assert "Pulling for the X" in e.text and "goes aboard her" in e.text, e.text
+    _run_until(w, lambda: captain.hull == hull.id, 1.0)  # raises when not reached
+    assert w.followed == hull.id  # the prompt followed his body
+    followed = [x for x in hull.log if x.kind == "hull.followed"]
+    assert followed and captain.name in followed[-1].text
+    assert not [x for x in w.players.log if x.kind == "driver.follow"]
+    assert "aboard the X, on the quarterdeck, a visitor, of the" in w.submit("where am i").text
+    # the prompt is his there (decision 62): a passenger's reach, as a seated visitor's
+    e = w.submit("steer west")
+    assert e.kind == "order.rejected" and "as a visitor" in e.text, e.text
+    assert "gives no order of her deck" in e.text and "'go to the boat' takes you off" in e.text
+    assert hull.people.captain is not K.players_visitor(hull) is captain
+    senses = K.players_senses(w)
+    assert senses.spot == ("aboard", hull.id, "quarterdeck") and not senses.everything
+    alongside = [x for x in boat.log if x.kind == "boat.alongside"]
+    assert alongside and "went aboard her" in alongside[-1].text
+    # back into his own boat, made fast alongside her, and home
+    w.run(600)  # she keeps her station alongside while the X lies to
+    e = w.submit("go to the boat")
+    assert e.kind == "person.aboard" and captain.hull == boat.id, e.text
+    assert w.followed == boat.id
+    assert "made fast alongside the X" in w.submit("where am i").text
+    e = w.submit("come alongside")
+    assert "hoisted in" in e.text
+    # the frigate hove to still makes near three knots and the launch three and a half:
+    # two hours and a half of pulling, the men tiring (package 82's figures)
+    _run_until(w, lambda: captain.hull == w.players.id, 3.0)
+    assert w.followed == w.players.id and not w.players.dealings.boat.away
+
+
+def test_a_drivers_word_never_shadows_an_order_of_the_game():
+    """Decision 62 (the owner's clarification): a driver's word never shadows an order of
+    the game, and an order of the game is never read as the driver's. `hold` alone holds
+    the clock and `hold water` is the boat's order; every verb and synonym of the vocabulary
+    whose first word is a driver's reaches the ship from the console."""
+    from freesail.orders.vocabulary import load_vocabulary
+    from freesail.ui.console import HELP
+
+    heads = {"hold", "go", "speed", "time", "tick", "state", "follow", "look", "log", "save"}
+    for word in heads:
+        assert re.search(rf"^\s+{word}\b", HELP, re.M), word  # each a driver's command
+    vocab = load_vocabulary()
+    phrases = sorted(
+        p
+        for p, verb in vocab.phrase_to_verb.items()
+        if p.split()[0] in heads and vocab.verbs[verb].object != "driver"
+    )
+    assert {"hold water", "hold your fire", "go below", "go ashore", "go aloft"} <= set(phrases)
+    w = world_at()
+    con, out = _console(w)
+    con.handle_line("go")
+    con.handle_line("time 30")
+    for phrase in phrases:
+        before = (con.running, con.compression, w.clock.tick, len(w.log), len(w.journal))
+        mark = out.tell()
+        con.handle_line(phrase)
+        after = (con.running, con.compression, w.clock.tick, len(w.log), len(w.journal))
+        assert after[:3] == before[:3], phrase  # nothing of the driver's moved
+        assert after[3] > before[3] or after[4] > before[4], phrase  # the ship answered
+        assert "Clock held" not in out.getvalue()[mark:], phrase
+    con.handle_line("hold")
+    assert not con.running and "Clock held." in out.getvalue()
+
+
+# ---------------------------------------------------------------------------
+# Step 5: books, papers and pictures in their places (the design's §8; truth 7-374)
+# ---------------------------------------------------------------------------
+
+
+def test_the_ships_own_are_read_where_they_are_kept_and_the_reference_anywhere():
+    """Truth 7-374: the library refuses the manifest from the quarterdeck with "in the hold"
+    and the walk, serves it after `go to the hold`, and serves the primer anywhere; the log
+    book, the chart, the book of standing orders and a book drafted are read where they are
+    kept and refused elsewhere with where they are; the ship is seen from the deck and not
+    from the cabin; `find` across the library says what it left out; the director and
+    `knowledge: all` read everything from anywhere."""
+    w = world_at()
+    lib = lambda *a, **k: str(tools.library(w, "captain", *a, **k))  # noqa: E731
+    assert lib("papers", "manifest") == (
+        "The manifest is kept in the hold, with the purser; go to the hold to read it (or ask "
+        "the purser)."
+    )
+    assert lib("papers", "the news of the war").startswith(
+        "The news of the war is kept in the cabin, with the captain; go to the cabin to read it"
+    )
+    assert "To be had on the quarterdeck: the boatswain's store book" in lib("papers")
+    e = w.submit(
+        'draft a book "night orders": standing order "lead": every glass then heave the lead'
+    )
+    assert e.kind == "book.drafted"
+    assert "heave the lead" in lib("books", "night orders")
+    assert w.submit("go to the hold").kind == "person.moved"
+    # in the hold: the manifest and the purser's books his, the primer his, the rest not
+    page = lib("papers", "manifest")
+    assert page.startswith("The manifest: the hold's capacity and the cargo in it by tons")
+    assert page.splitlines()[1:] == w.papers.page("manifest").lines
+    assert "The purser's books:" in lib("papers", "all")
+    assert "Not in the hold: the sailmaker's account (in the sail room" in lib("papers", "all")
+    assert lib("primer 2").startswith("primer 2: The wind and the points of sail.")
+    assert "fore mast" in lib("the ship") and "submit_order:" in lib("tools")
+    assert lib("papers", "booms") == (
+        "The booms' list is kept on the deck, with the boatswain; come on deck to read it (or "
+        "ask the boatswain)."
+    )
+    assert lib("standing orders") == (
+        "The book of standing orders is on the quarterdeck and in the cabin; you are in the "
+        "hold: come on deck to read it."
+    )
+    assert lib("books", "night orders") == (
+        "The book 'night orders' is on the quarterdeck and in the cabin, with the book of "
+        "standing orders; you are in the hold: come on deck to read it."
+    )
+    assert lib("books") == (
+        "The books drafted are on the quarterdeck and in the cabin, with the book of standing "
+        "orders; you are in the hold: come on deck to read it."
+    )
+    got = tools.read_log(w, "captain", since_tick=0)
+    assert got == {
+        "error": "The log book is in the cabin and the gunroom, the log board on the "
+        "quarterdeck; you are in the hold: come on deck to read it."
+    }
+    assert tools.chart(w, "captain") == (
+        "The chart is in the cabin and the gunroom, and at the binnacle on deck; you are in the "
+        "hold: come on deck to read it."
+    )
+    assert tools.ship_view(w, "captain") == (
+        "She is seen from the deck or the boat; you are in the hold: come on deck to see her."
+    )
+    found = lib(find="heave the lead")
+    assert "Not searched, being elsewhere:" in found
+    assert "the book of standing orders (on the quarterdeck and in the cabin)" in found
+    assert "the books drafted (on the quarterdeck and in the cabin)" in found
+    assert "the ship's papers elsewhere (the sailmaker's account (in the sail room" in found
+    contents = lib("contents")
+    assert (
+        "the ship's own are read where they are kept. In the hold, the papers to be had are "
+        "the manifest, the purser's books"
+    ) in contents
+    assert (
+        "The book of standing orders and the books drafted are on the quarterdeck and in the cabin."
+    ) in contents
+    # on deck: the log, the chart, the ship and the books his; the primer still his
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    assert "lines" in tools.read_log(w, "captain", since_tick=0)
+    assert isinstance(tools.chart(w, "captain"), dict)  # no page open: the words and the rows
+    assert isinstance(tools.ship_view(w, "captain"), dict)
+    assert "heave the lead" in lib("books", "night orders")
+    assert lib("standing orders").startswith("There are no standing orders in the book.")
+    assert "The book of standing orders and the books drafted are here." in lib("contents")
+    # in the cabin: the chart and the log his, the ship not seen
+    assert w.submit("go below").kind == "captain.below"
+    assert isinstance(tools.chart(w, "captain"), dict)
+    assert "lines" in tools.read_log(w, "captain", since_tick=0)
+    assert tools.ship_view(w, "captain") == (
+        "She is seen from the deck or the boat; you are in the cabin: come on deck to see her."
+    )
+    assert lib("papers", "the news of the war").startswith("The news of the war: the nations'")
+    # a seated model reads the same through its harness
+    script = [
+        reply("", call("submit_order", text="go to the hold")),
+        reply("", call("library", topic="papers", section="manifest")),
+        reply("", call("library", topic="papers", section="the price list")),
+        reply("", call("read_log")),
+        reply("", call("stand_by", until="a glass")),
+    ]
+    h = seated(world_at(), script)
+    h.world.run(60)
+    pages = results(h, "library")  # each a book, stubbed with its handle and number
+    assert pages[0].startswith("the ship's papers, the manifest, opened")
+    assert "The manifest: the hold's capacity" in pages[0]
+    assert "The price list is kept in the cabin, with the purser; go to the cabin" in pages[1]
+    assert "error" in results(h, "read_log")[0]
+    # the director everything, from anywhere; `knowledge: all` the same for everyone
+    assert str(tools.library(w, "director", "papers", "manifest")).startswith("The manifest:")
+    assert "lines" in tools.read_log(w, "director", since_tick=0)
+    every = world_at(knowledge="all")
+    assert str(tools.library(every, "captain", "papers", "manifest")).startswith("The manifest:")
+    assert "To be had" not in str(tools.library(every, "captain", "papers"))
+    # ashore and asleep, the words (the design's §8; the port's tests have the walk)
+    ashore = K.Senses(frozenset({K.ASHORE}), ("ashore", "falmouth", "quay"), "")
+    assert K.thing_elsewhere("log", ashore) == "The ship's log is aboard her."
+    assert K.thing_elsewhere("chart", ashore) == "The chart is aboard her."
+    assert K.thing_elsewhere("standing orders", ashore) == (
+        "The book of standing orders is aboard her."
+    )
+    assert K.thing_elsewhere("ship_view", ashore) == (
+        "She is seen from the deck or the boat; you are ashore."
+    )
+    page = w.papers.page("manifest")
+    assert K.paper_elsewhere(w, page, ashore) == "The manifest is aboard her, in the hold."
+    asleep = K.Senses(frozenset({K.ASLEEP}), ("aboard", "x", "gunroom"), "gunroom", asleep=True)
+    assert K.thing_elsewhere("log", asleep) == K.ASLEEP_WORDS
+    assert K.paper_elsewhere(w, page, asleep) == K.ASLEEP_WORDS
+
+
+def test_the_keeper_carries_his_paper_while_he_is_at_it():
+    """The keeper's rule (the design's §8): a paper is in its place until its keeper is
+    occupied with it, and then it is with him where he is; the listing says so; freed, it
+    lies in its place again. A task of his that does not name the paper leaves it."""
+    w = world_at()
+    purser = w.people.find("the purser")
+    assert purser is not None and purser.where == "gunroom"
+    books = w.papers.page("the purser's books")
+    assert K.paper_place(w, books) == ("hold", "with the purser")
+    assert w.people.occupy(purser, "cabin", w.clock.tick + 600, "the purser's books") is None
+    assert K.paper_place(w, books) == ("cabin", "with the purser at his the purser's books")
+    assert K.paper_place(w, w.papers.page("manifest")) == ("hold", "with the purser")
+    assert w.submit("go below").kind == "captain.below"
+    page = str(tools.library(w, "captain", "papers", "purser's books"))
+    assert page.startswith("The purser's books: the stores of water and provisions")
+    assert str(tools.library(w, "captain", "papers", "manifest")).startswith(
+        "The manifest is kept in the hold, with the purser; go to the hold"
+    )
+    listing = str(tools.library(w, "captain", "papers"))
+    here = listing.split("To be had in the cabin: ")[1].split("\n")[0]
+    assert here.startswith("the purser's books, the epitome's table of the establishments")
+    assert "the manifest (in the hold, with the purser)" in listing
+    w.people.free(purser)
+    assert K.paper_place(w, books) == ("hold", "with the purser")
+    assert str(tools.library(w, "captain", "papers", "purser's books")).startswith(
+        "The purser's books are kept in the hold"
+    ) or str(tools.library(w, "captain", "papers", "purser's books")).startswith(
+        "The purser's books is kept in the hold"
+    )
+    # a task that does not name the paper: the slops are not the books
+    assert w.people.occupy(purser, "deck", w.clock.tick + 600, "the slops issued") is None
+    assert K.paper_place(w, books) == ("hold", "with the purser")
+    w.people.free(purser)
+
+
+# ---------------------------------------------------------------------------
+# Step 6: work in its place (the design's §9; truths 7-375, 7-388)
+# ---------------------------------------------------------------------------
+
+
+def test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike():
+    """Truth 7-375: the master's noon sight is taken on the quarterdeck and his day's work
+    done in the gunroom, the rules' master and a model at his station alike: occupied there,
+    the model's sample is the gunroom's (the slate's rows, no deck reading, the line saying
+    where the rest are), the deck reaching him by what is felt (the bell, the watch
+    relieved); the people say where he is; he comes on deck when the work is done, by the
+    reckoning's own line. `People.occupy` keeps the room for a mirrored person too, and
+    takes the mirror's words."""
+    from freesail.agents.agent import master as master_station
+
+    w = world_at(start=datetime(1805, 6, 10, 11, 30))
+    stand = reply("", call("stand_by", until="a glass"))
+    h = seated(w, [stand], make=master_station, every=300, loop=True)
+    m = w.people.find("the master")
+    assert m.mirror is not None and m.where == "quarterdeck"
+    w.run(80 * 60)  # the sight from 11:44, the day's work below from 11:59 to 12:29
+    places = [e.text for e in w.log if e.kind == "master.place"]
+    assert places == [f"{m.name} came on deck, the day's work done."]
+    on_deck = [s for s in samples(h) if "on the quarterdeck" in str(s.get("you"))]
+    below = [s for s in samples(h) if "in the gunroom" in str(s.get("you"))]
+    assert on_deck and below, [s.get("you") for s in samples(h)]
+    s = below[-1]
+    assert "since 11:59" in str(s["you"])
+    rows = set(s["readings"])
+    assert rows >= {"reckoning", "reckoning_uncertainty", "run_since_noon", "course_made_good"}
+    assert not rows & {"speed", "true_wind_speed", "sails", "sail_in_sight", "helm", "depth"}
+    assert s["readings_elsewhere"].startswith("Not to be had in the gunroom:")
+    assert "(to be had on deck)" in s["readings_elsewhere"]
+    kinds = {ln["kind"] for s_ in below for ln in s_["log"]}
+    assert "clock.bell" in kinds
+    assert not kinds & {"lookout.sighting", "helm.order", "sail.set", "sail.handled"}
+    # on deck again after the work, by the reckoning's line, the deck's rows his
+    assert m.where == "quarterdeck" and not m.occupied
+    assert "speed" in samples(h)[-1]["readings"] or "readings_elsewhere" not in samples(h)[-1]
+    # the one road: a room given is kept for the mirrored master too, and the mirror's own
+    # words are taken and mapped
+    until = w.clock.tick + 600
+    assert w.people.occupy(m, "cabin", until, "lunar") is None
+    assert m.where == "cabin" and m.mirror.place == "below"
+    assert w.people.state_words(m) == "at the lunar, in the cabin"
+    w.run(600)
+    assert m.where == "quarterdeck"
+    assert w.people.occupy(m, "below", w.clock.tick + 600, "day's work") is None
+    assert m.where == "gunroom"
+    w.run(600)
+    assert w.people.occupy(m, "on deck", w.clock.tick + 600, "sight") is None
+    assert m.where == "quarterdeck" and m.occupied
+    w.run(600)
+    captain = w.people.captain
+    assert w.people.occupy(captain, "below", w.clock.tick + 600, "a letter") is None
+    assert captain.where == "cabin" and captain.occupied
+    w.people.free(captain)
+    assert captain.where == "cabin"  # left where the work was: a man does not walk back
+
+
+def test_the_captains_writing_is_done_in_the_cabin():
+    """Truth 7-388: `draft a book` from the quarterdeck takes the captain below (one
+    `captain.below` line, as his own `go below` writes it) and occupies him writing for five
+    minutes; a seated captain's sample while writing is the cabin's; he stays until he comes
+    on deck; his writing is his own to leave by his own move; a second book in the cabin
+    moves him nowhere; an officer drafting at his station writes where he stands."""
+    from freesail.world.people import WRITING, WRITING_MINUTES
+
+    w = world_at()
+    captain = w.people.captain
+    assert captain.where == "quarterdeck"
+    n = len(w.log)
+    e = w.submit(
+        'draft a book "night orders": standing order "lead": every glass then heave the lead'
+    )
+    assert e.kind == "book.drafted"
+    kinds = [x.kind for x in list(w.log)[n:]]
+    assert kinds == ["captain.below", "order.accepted", "book.drafted"]
+    below = [x for x in list(w.log)[n:] if x.kind == "captain.below"][0]
+    assert (
+        below.text == "The captain went below to his cabin; the deck is the officer of the watch's."
+    )
+    assert below.data["verb"] == "draft a book" and below.data["place"] == "cabin"
+    assert captain.where == "cabin" and captain.occupied and captain.task == WRITING
+    assert w.people.state_words(captain) == "at the writing, in the cabin"
+    assert w.submit("where am I").text.endswith("aboard the Amazon, in the cabin.")
+    # the deck's orders are refused from there as from any going below
+    e = w.submit("set the royals")
+    assert e.kind == "order.rejected" and "go on deck" in e.text
+    # the writing done, he is in the cabin still
+    w.run(WRITING_MINUTES * 60 + 1)
+    assert not captain.occupied and captain.where == "cabin"
+    # a second book in the cabin: no going below, occupied again
+    n = len(w.log)
+    w.submit('draft a book "cargo": buy 2 tons of tin')
+    assert [x.kind for x in list(w.log)[n:]] == ["order.accepted", "book.drafted"]
+    assert captain.occupied
+    # his writing is his own to leave: `come on deck` and a walk free him of it
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    assert not captain.occupied and captain.where == "quarterdeck"
+    w.submit('draft a book "note": all well.')
+    assert captain.where == "cabin" and captain.occupied
+    assert w.submit("go to the hold").kind == "person.moved"
+    assert not captain.occupied and captain.where == "hold"
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    # a seated captain drafting through his harness: his sample is the cabin's after
+    script = [
+        reply(
+            "",
+            call(
+                "submit_order",
+                text='draft a book "orders": "deep": every glass then heave the lead',
+            ),
+        ),
+        reply("", call("stand_by", until="a glass")),
+    ]
+    w2 = world_at()
+    h = seated(w2, script)
+    w2.run(700)  # the writing done at five minutes; the sample at ten finds him below still
+    assert w2.people.captain.where == "cabin" and not w2.people.captain.occupied
+    assert any("in the cabin" in str(s.get("you")) for s in samples(h))
+    # an officer at his station writes where he stands
+    from freesail.world.books import books_of
+
+    seated(w2, [reply("", call("stand_by", until="a glass"))], make=officer)
+    pearce = w2.stations.holder("officer of the watch")
+    said = tools.call(
+        w2, "officer of the watch", "submit_order", {"text": 'draft a book "mine": all well.'}
+    )
+    assert "drafted a book, 'mine'" in said, said
+    assert books_of(w2).find("mine") is not None
+    assert pearce.where == "quarterdeck" and not pearce.occupied
+
+
+# ---------------------------------------------------------------------------
+# Step 7: the drill extended with the walk (the design's §10; truth 7-381)
+# ---------------------------------------------------------------------------
+
+
+def _drill_results(fake: Fake) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for turns in fake.seen:
+        for t in turns:
+            if t.role == DATA and "tool_results" in t.content:
+                for r in t.content["tool_results"]:
+                    if not any(r is x for x in out):
+                        out.append(r)
+    return out
+
+
+def test_the_drills_walk_teaches_the_places_before_the_game(tmp_path, monkeypatch):
+    """Truth 7-381: the fitness drill's walk, behind the `DRILL_WALK` switch (off on the trunk
+    by the lead's ruling, until package 55 re-briefs; on here). A model that opens the
+    library, writes its line
+    and stands by, then goes below, eats, asks for the manifest from the cabin and is told it
+    is in the hold, reads the price list there and comes on deck passes, the record saying
+    "passed"; an order of the deck in the drill is refused in the drill's words and counts
+    for nothing; the walk's lines are the drill's world's captain's own (`captain.below`,
+    `captain.on_deck`) and the library reads by his place meanwhile; a model that does the
+    three of 37 and never walks is stood down, the record naming the walk's four."""
+    import datetime as dt
+    import io
+
+    from freesail.agents import consent
+
+    monkeypatch.setattr(consent, "DRILL_WALK", True)
+    weights = "made-up-drill-model.gguf"  # made up: no model is named here
+    today = dt.date(2026, 11, 6)
+    script = [
+        reply("", call("answer", text="Yes.")),
+        "",
+        reply(
+            "",
+            call("library", topic="primer 6", section="watches"),
+            call("journal", note="The drill: a line in the journal."),
+            call("stand_by", until="eight bells"),
+        ),
+        reply("", call("submit_order", text="set the royals")),
+        reply("", call("submit_order", text="go below")),
+        reply("", call("submit_order", text="eat")),
+        reply("", call("library", topic="papers", section="the manifest")),
+        reply("", call("library", topic="papers", section="the price list")),
+        reply("", call("submit_order", text="come on deck")),
+    ]
+    fake = Fake(script)
+    out = io.StringIO()
+    rec = consent.ensure(
+        weights,
+        "the drill's test runtime",
+        fake,
+        door="runner",
+        owner=lambda words: "The owner's reply.",
+        records_dir=tmp_path / "consent",
+        out=out,
+        today=today,
+        drills=True,
+    )
+    assert rec is not None and rec.verdict == consent.YES
+    assert rec.drill == consent.DRILL_PASSED_WALK == "passed, with the walk"
+    assert rec.proceeds and rec.drilled
+    by: dict[str, str] = {}
+    for r in _drill_results(fake):
+        by.setdefault(
+            f"{r['name']}:{r.get('args', {}).get('text', r.get('args', {}).get('section', ''))}",
+            str(r["result"]),
+        )
+    assert by["submit_order:set the royals"] == consent.DRILL_REFUSED.format(text="set the royals")
+    assert by["submit_order:go below"].startswith("The captain went below to his cabin")
+    assert by["submit_order:eat"].startswith("You eat in the cabin")
+    assert (
+        "The manifest is kept in the hold, with the purser; go to the hold"
+        in by["library:the manifest"]
+    )
+    assert "The price list:" in by["library:the price list"]
+    assert by["submit_order:come on deck"].startswith("The captain came on deck")
+    # the drill's reminders named what was still to run, the walk's things among them
+    seen: list[dict[str, Any]] = []
+    for turns in fake.seen:
+        for t in turns:
+            if (
+                t.role == DATA
+                and isinstance(t.content, dict)
+                and not any(t.content is x for x in seen)
+            ):
+                seen.append(t.content)
+    texts = [d.get("question") for d in seen if d.get("reason") == consent.DRILL]
+    assert texts[0] == consent.DRILL_WALK_TEXT
+    # the reminders: after the empty reply all seven; after the three calls, whose stand-by
+    # ended the turn before their results were counted (37l's case), the walk's four; none
+    # follows a reply whose calls ran, the drill going on from their results
+    walk = "go below, eat or drink, a paper read where it is kept and come on deck"
+    assert len(texts) == 3
+    assert texts[1].startswith(
+        f"The drill goes on: still to run, the library, the journal, the stand-by, {walk}."
+    )
+    assert texts[2] == f"The drill goes on: still to run, {walk}. 6 replies left."
+    # the record holds the drill's words and the pass
+    body = rec.path.read_text(encoding="utf-8")
+    assert "- **Drill:** passed, with the walk" in body and consent.DRILL_WALK_TEXT in body
+    # a model that does 37's three and never walks is stood down with the walk named
+    fake2 = Fake(
+        [
+            reply("", call("answer", text="Yes.")),
+            "",
+            reply("", call("library", topic="primer 6", section="watches")),
+            reply("", call("journal", note="a line")),
+            reply("", call("stand_by", until="eight bells")),
+            "Ready for the station.",
+            "Ready.",
+            "Ready.",
+            "Ready.",
+            "Ready.",
+        ]
+    )
+    rec2 = consent.ensure(
+        weights + "2",
+        "the drill's test runtime",
+        fake2,
+        door="runner",
+        owner=lambda words: "The owner's reply.",
+        records_dir=tmp_path / "consent2",
+        out=io.StringIO(),
+        today=today,
+        drills=True,
+    )
+    assert rec2 is None
+    back = consent.check(weights + "2", tmp_path / "consent2")
+    assert back.drill == (
+        "not passed: go below, eat or drink, a paper read where it is kept and come on deck not "
+        "run in 8 replies"
+    )
+    # the drill's words name no package and no build (85's rule)
+    # with the switch off the drill is 37's three things, as the consent brief describes
+    words = consent.DRILL_WALK_TEXT.lower()
+    assert "package" not in words and "build" not in words
+    monkeypatch.setattr(consent, "DRILL_WALK", False)
+    assert consent.drill_spec()[0] == consent.DRILL_TEXT and consent.drill_spec()[1] == 4
+
+
+# ---------------------------------------------------------------------------
+# Step 8: the edge cases' truths (the design's §12 and §13; truths 7-377, 7-378, 7-384)
+# ---------------------------------------------------------------------------
+
+
+def _with_the_brig_x(start=datetime(1805, 6, 10, 10, 0)):
+    """The frigate hove to with the brig X put on the sea and promoted beside her, as
+    `tests.test_crews._frigate_and_the_brig_x_on_the_sea` makes her, at the hour given."""
+    w = world_at({"lat_deg": 49.5, "lon_deg": -5.5}, start=start)
+    w.submit("heave to")
+    w.record_driver("routine", "driver.book", "The book of standing orders begins empty.")
+    e = w.world_order(
+        'ship: a merchant brig "X" of Britain at 49 33 N 5 30 W, bound for Falmouth', "t"
+    )
+    assert e.data["result"] == "done", e.text
+    assert w.world_order('ship "X": intent bound for Falmouth', "t").data["result"] == "done"
+    w.run(61)
+    b = w.vessels.find("X")
+    assert b.crew is not None and b.crew.shape == "full"
+    return w, b, b.crew
+
+
+def test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone():
+    """Truth 7-377: the player in his own boat manned as a hull (82) reads her as a deck
+    (every row his, nothing greyed) and the ship's lines reach him by sight and hail alone:
+    her deck's work (a sail set by her standing order while he is away) is in her log and
+    not in the boat's; a word said on her deck within hearing is written in the boat's log
+    as heard."""
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    frigate = w.players
+    w.submit('standing order "royals": every glass then set the royals')
+    e = w.submit("go to the launch")
+    assert e.kind == "person.aboard" and "manned" in e.text
+    boat = w.own
+    assert boat is not frigate and w.followed == boat.id
+    senses = K.players_senses(w)
+    assert senses.spot[:2] == ("aboard", boat.id) and senses.has(K.DECK) and not senses.everything
+    assert K.rows_elsewhere(senses) == []  # the boat's rows are a deck's: his
+    w.submit("give way")
+    w.run(40 * 60)  # past the glass: the ship's standing order sets her royals
+    set_lines = [e for e in frigate.log if e.kind == "order.accepted" and "royals" in e.text]
+    assert set_lines, "the ship's standing order did not fire"
+    assert frigate.log.digest() != boat.log.digest()
+    assert not [e for e in boat.log if "royals" in e.text]
+    assert not [e for e in boat.log if e.kind.startswith(("sail.", "yard.", "evolution."))]
+    # by sight: the boat's own lookout has her as a sail in sight
+    assert [e for e in boat.log if e.kind.startswith("lookout.")]
+    # a word on her deck reaches the boat within hearing, as heard
+    w.submit("lay on your oars")
+    e = w.world_order('say as the first lieutenant: "launch ahoy, how does she pull"', "t")
+    assert e.data["result"] == "done", e.text
+    w.run(2)
+    heard = [e for e in boat.log if e.kind == "agent.spoke" and "launch ahoy" in e.text]
+    if bearing_cables(w, frigate, boat) <= 4:
+        assert heard, [e.text for e in boat.log if e.kind == "agent.spoke"]
+    # home again, the deck is the ship's and the lines hers
+    w.submit("come alongside")
+    assert K.players_senses(w).spot[1] == boat.id
+
+
+def bearing_cables(w, a, b) -> float:
+    from freesail.world.geo import bearing_and_distance
+
+    _, nm = bearing_and_distance(a.position, b.position)
+    return nm * 10.0
+
+
+def test_a_passage_with_a_captain_below_reported_to_called_and_writing_replays_by_both_roads():
+    """Truth 7-378: a fake captain who goes below, is reported to and called by the officer
+    of the watch (the brig X in sight at night), comes on deck and drafts a book; the game
+    saved at the half and at the end replays by its transcript and by its acts to the same
+    digests of both hulls' logs (the design's §13: the new lines are functions of the log,
+    the places and the inputs; none is an input of its own)."""
+    import json
+
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+    from freesail.world import reports
+
+    w, b, hull = _with_the_brig_x(start=datetime(1805, 6, 10, 22, 0))
+    script = [
+        reply("", call("submit_order", text="go below")),
+        reply("", call("stand_by", until="a glass")),
+        reply("", call("stand_by", until="a glass")),
+        reply("", call("submit_order", text="come on deck")),
+        reply(
+            "",
+            call(
+                "submit_order",
+                text='draft a book "night orders": "lead": every glass then heave the lead',
+            ),
+        ),
+        reply("", call("stand_by", until="a glass")),
+    ]
+    h = seated(w, script, every=600)
+    w.run(3600)
+    half = json.loads(json.dumps(w.save()))
+    d_half = (w.log.digest(), hull.log.digest())
+    w.run(3600)
+    kinds = [e.kind for e in w.log]
+    assert "captain.below" in kinds and "captain.on_deck" in kinds and "book.drafted" in kinds
+    assert reports.REPORT_MADE in kinds or reports.REPORT_CALLED in kinds, sorted(set(kinds))
+    assert any("in the cabin" in str(s.get("you")) for s in samples(h))
+    whole = json.loads(json.dumps(w.save()))
+    d_whole = (w.log.digest(), hull.log.digest())
+    for data, want in ((half, d_half), (whole, d_whole)):
+        for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+            copy = replay.replay(data, ship_factory, road=road)
+            got = (copy.log.digest(), copy.hulls[hull.id].log.digest())
+            assert got == want, (road, got, want)
+
+
+def test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places():
+    """Truth 7-384: a visitor aboard another hull reads her by his place in her (82's voice
+    in her cabin has her glass and her chart's rows and none of her deck); a person put in
+    her hold reads the hold's (her manifest there, none of her deck, her log not to be had);
+    the confinement itself is package 74's (`Person.confined_to`), nothing of it built
+    here."""
+    from freesail.world import movement
+
+    w, b, hull = _with_the_brig_x()
+    guest = w.people.find("the first lieutenant")
+    captive = w.people.find("the master")
+    kind, text, _ = movement.put_aboard(w, guest, hull, place="cabin")
+    assert kind == "person.aboard", text
+    kind, text, _ = movement.put_aboard(w, captive, hull, place="hold")
+    assert kind == "person.aboard", text
+    with w.as_hull(hull):
+        s_guest = K.senses_of(w, guest)
+        s_captive = K.senses_of(w, captive)
+        assert s_guest.spot == ("aboard", hull.id, "cabin") and s_guest.has(K.CABIN)
+        assert not s_guest.has(K.DECK) and not s_guest.everything
+        glass = R.REGISTRY.get("glass")
+        assert K.reading_here(glass, s_guest) and K.reading_here(R.REGISTRY.get("heading"), s_guest)
+        assert not K.reading_here(R.REGISTRY.get("speed"), s_guest)
+        assert K.thing_here("log", s_guest) and K.thing_here("chart", s_guest)
+        assert not K.thing_here("ship_view", s_guest)
+        assert s_captive.spot == ("aboard", hull.id, "hold") and s_captive.has("hold")
+        assert not K.reading_here(glass, s_captive) and not K.reading_here(
+            R.REGISTRY.get("speed"), s_captive
+        )
+        assert not K.thing_here("log", s_captive) and not K.thing_here("chart", s_captive)
+        manifest = w.papers.page("manifest")  # hers, read in her block
+        assert K.paper_here(w, manifest, s_captive) and not K.paper_here(w, manifest, s_guest)
+        assert K.paper_elsewhere(w, manifest, s_guest).startswith(
+            "The manifest is kept in the hold, with the"
+        )
+    # at home the frigate's people are where they were; her captain reads his own deck
+    assert K.players_senses(w).spot == ("aboard", w.players.id, "quarterdeck")
+    # the player himself aboard her as a visitor (decision 62): his `say` at the prompt is
+    # his own, in his name and from his spot, and not her captain's (step 4's finding c)
+    bowen = w.people.captain  # the frigate's, before the drivers follow him into the X
+    kind, text, _ = movement.put_aboard(w, bowen, hull, place="cabin")
+    assert kind == "person.aboard" and w.followed == hull.id
+    assert K.players_visitor(w) is bowen and w.people.captain is not bowen  # hers now
+    e = w.submit("say good day to you")
+    assert e.kind == "agent.spoke", e.text
+    assert e.text == f"{bowen.name}, a visitor of the Amazon, in the cabin: good day to you"
+    assert e.data["where"] == "in the cabin"

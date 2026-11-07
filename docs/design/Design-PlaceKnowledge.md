@@ -836,3 +836,242 @@ shore named "the quay at Falmouth"; a boat hull's people unmustered; three pinne
 moved by the new lines alone, the merchant passage's master being below at his sights and at
 the noon's day's work when the mate reports and sends for him, re-measured old beside new;
 the rules' master called does not come up from his work, for the lead).
+
+### Step 4: the player at the prompt reads by his place; one person (§11; decisions 59 and 62; 2026-11-06)
+
+**Built as designed**: the console's and the browser's play log by the player's person
+(`world.knowledge.players_person`, `players_senses`, `hears`: the lines that reach him where
+he is, the words by 66's hearing as the harness applies it; `log N`, the pages' log and its
+reach-back by the same rule), the snapshot's `knowledge` block (his place in words, the rows
+not to be had there each with where it is, the sample's sentence, and whether the deck's are
+his) with the instruments pane greying those readouts and saying where each is to be had; the
+owner's eye everything (the director's seat, an observed world, `follow` of a hull he holds no
+person in) and `knowledge: all` everything. Decision 62: the player is one person, the seat's
+or the captain of the ship he is aboard as her captain (his own, or the one `--ship` named,
+read from the `driver.left` line of his own ship's log); the prompt follows his body: into
+the boat (82's `follow_boat`), aboard another ship and home again (`movement.put_aboard`
+writes a `hull.followed` line of her log when the player's person changes hull, a consequence
+of his order and never a driver's input, so a replay moves it the same); the road from his own
+manned boat aboard another ship (`come alongside the Medusa` from the boat: she pulls for her
+and, alongside, whoever is in her but her crew goes aboard her as a visitor by `put_aboard`,
+the boat made fast alongside and keeping her station until an oar is pulled or the lug set;
+`go to the boat` from her deck takes him off in his own boat lying alongside; `come alongside`
+brings him home); the prompt his there (`person_of_actor` gives the player's visitor for the
+captain's actor, `movement.check` refuses her deck's orders and his own ship's with the
+visitor's words, his body's moves, his needs, a question, a reading and a free line his;
+`hearing.station_spot` reads his spot for a word at the captain's); the driver's words never
+shadow an order of the game (`hold` alone, `speed N`, `tick N`, `state`, `log N` the driver's,
+`hold water`, `hold your fire`, `go below` the ship's, every verb and synonym of the vocabulary
+whose first word is a driver's reaching the ship, tested); `follow` and `look at` typed at the
+browser's order line the driver's as at the console, a refusal sent to the pages alone; the
+primer's chapters 14, 19 and 26 and the browser's page say the one-person rule in a sentence.
+Truth 7-382; four tests and the truth in the slow tier.
+
+**Taken another way, with the reason.** (1) The player's person is found from the world and
+the log, never kept as a field: the seat's person, else the captain of the ship the
+`driver.left` line names, else his own ship's; a save and a replay read the same without a
+new field in the save. (2) The owner's eye is told from the player's road by the hull: the
+player's person is in the followed hull (or in the boat of it, or ashore from it) or he is
+not; `follow` of another ship shows everything of her as the director sees it, which §11
+asks. (3) The visitor at the prompt is given a passenger's reach by `movement.check` with the
+seated visitor's words (`agent.VISITOR_DOMAIN`), not a seat made for him: his `say` there is
+still said as "the captain" by the stations' sentences, with his spot (the hearers right, the
+name hers); a seat of the visitor's voice for the prompt is for the lead to rule (found on the
+way, in the tuning notes). (4) The boat alongside another ship is made fast (her position
+the ship's, a boat's length abeam) rather than left to drift: lying on her oars she fell a
+cable astern of a ship hove to in minutes, and `go to the boat` from her deck found no boat
+alongside. (5) The browser greys a readout and writes where the reading is to be had in its
+place, instead of leaving the figure dimmed: decision 59 is that there are not two views of
+one world, and a dimmed figure is still a figure.
+
+**Found on the way** is in the tuning notes (a World's `parent` is the followed hull's façade
+and not the World; the frigate hove to makes near three knots; the visitor's `say` at the
+prompt; `World.dealings` reads the followed hull).
+
+### Step 5: books, papers and pictures in their places (§8; 2026-11-06)
+
+**Built as designed**: the library by the reader's senses (`tools.library_by`, which
+`tools.library` reaches through the station's senses and the browser's pane through the
+player's, `knowledge.players_senses`): the player's reference (the primer, the catalogue, the
+grammar, the ship's names, the tools, the world page) from anywhere; the ship's papers each
+where it is kept (`knowledge.paper_place`, `paper_here`, `paper_elsewhere`), the listing
+saying which are to be had where he stands and where the rest are, a paper asked for from
+elsewhere refused with its place, whose hands it is in and the walk ("The manifest is kept in
+the hold, with the purser; go to the hold to read it (or ask the purser)."), `section='all'`
+the papers here and the rest named, `find` searching the papers here and naming the rest; the
+book of standing orders and the books drafted on the quarterdeck and in the cabin
+(`knowledge.KEPT`, `thing_here`, `thing_elsewhere`), refused elsewhere with where and the walk
+("...; you are in the hold: come on deck to read it"); a search of the whole library reads
+what is where he is and the reference, and says what it left out ("Not searched, being
+elsewhere: ..."); the contents page says in one line what is to be had where he stands. The
+log book (`read_log`) on the quarterdeck, in the cabin and the gunroom, refused elsewhere with
+where it is, ashore "The ship's log is aboard her."; the chart (`chart`) in the cabin, the
+gunroom and at the binnacle on deck; the ship seen (`ship_view`) from the deck, aloft and the
+boat, from the cabin "She is seen from the deck or the boat; you are in the cabin: come on
+deck to see her." The keeper's rule: the keeper carries his paper while he is occupied with it
+(the words of his task name it: `the purser's books` in the cabin while the purser is at them
+there), else it lies in its place. The browser's papers pane (`/api/library/papers`) says of
+each paper whether it is to be had where the player's person stands, withholds the lines of
+one that is not and says where it is; its library route reads by the same senses. The
+director and `knowledge: all` read everything from anywhere, as before. The primer's chapters
+14 and 19 say the rule in a sentence each. Truth 7-374; two tests.
+
+**Taken another way, with the reason.** (1) **The books drafted are kept with the book of
+standing orders, on the quarterdeck and in the cabin, and not in the cabin alone** as §8's
+table has it: a book drafted is the captain's writing for his people (a sheet of night orders
+is the officer of the watch's to read at the binnacle, where the night orders hang; a manifest
+is given to the boat), and the owner's ruling of 2026-10-16 that a station reads them "from
+anywhere" (package 53; truth 7b-102 in `tests/test_known_truths.py` and
+`tests/test_orders_places.py`, where the officer of the watch on the quarterdeck reads 'night
+orders' and 'cargo') is kept to the deck and the cabin rather than reversed; a man in the hold
+or aloft is refused with the walk. For the lead's ruling if the cabin alone is wanted. (2)
+**The refusal's words are the same whoever reads them** (the pane and a bodiless station agree
+with the captain's): a cabin paper is "go to the cabin to read it (or ask the captain)" for
+everyone, since the captain may walk in and another may not, and `go to the cabin` refuses him
+in its own words; the first draft said "it is his to show you" to a man who was not the
+captain, and the browser's page and the watcher's then differed. (3) **"Ask the keeper" rather
+than "send for"**: the papers answer first when a keeper is asked (package 86's service
+reading; `ask the purser the manifest` gives the paper's words), so the alternative the
+sentence offers is one that is true today; a keeper sent for does not bring his paper (the
+keeper's rule carries it only while he is at it). (4) **The keeper's rule reads the words of
+his task against the handle** by a shared stem of four letters, the small words left out ("the
+purser's books" and "books" share nothing but "books", so "purs" decides; "the slops issued"
+does not carry them): step 6 gives the tasks their rooms and their words, and this rule reads
+them as they come. (5) **A refusal is a book like any page** (the library's every page is a
+book, stubbed with its handle): a refusal's title is the page's it stood for and its reopen
+the same call, so a model that walks reads it again by the stub's call.
+
+**Found on the way** is in the tuning notes (`_section_page` reopens by number where the
+section's words hold an apostrophe; the test of 35's parity moved to the rule).
+
+### Step 6: work in its place (§9; 2026-11-06)
+
+**Built as designed**: `People.occupy(p, place, until, with_what)` the one road, taking the
+room's id (the mirror's "on deck" and "below" taken too and mapped to the quarterdeck and his
+berth: the captain's cabin, a trade's place, else the gunroom; "below" for a man below already
+is the room he is in), keeping the room for a mirrored person (the master's) as well, so that
+his place reads the room and not the berth the mirror would give; when the work is done he is
+left where it was, and the master's "came on deck, the day's work done" line stands as the
+reckoning writes it. The master's noon sight on the quarterdeck and his day's work in the
+gunroom were already one road for the rules' master and a model at his station (the mirror's
+"below" read as the gunroom by `Person.where` since 53, the station's senses his person's since
+step 1): the step proves it (truth 7-375): a model master's sample while he is below is the
+gunroom's (the slate's rows, no deck reading, the line saying where the rest are), the deck
+reaching him by what is felt (the bell, the watch relieved). The captain's writing is done in
+the cabin (truth 7-388): `draft a book` from the quarterdeck takes him below first (one
+`captain.below` line, as his own `go below` writes it, before the order's own lines) and
+occupies him `writing` for five minutes (`people.WRITING_MINUTES`, judgement); he stays in the
+cabin until he comes on deck; a second book drafted in the cabin moves him nowhere; a captain
+ashore, in the boat or at a task already writes where he is; another drafter (an officer at
+his station) writes where he stands. The primer's chapter 14 says it in a sentence. Truths
+7-375 and 7-388; two tests.
+
+**Taken another way, with the reason.** (1) **The captain's writing is his own to leave**: his
+`come on deck` and any walk of his (`go to the hold`) free him of it and move him, where the
+master's sight-working is not left for a walk ("You are at the day's work; it is not left for a
+walk about the ship"): a man at his desk gets up when he chooses, a man working a sight
+cannot, and the five minutes bind only what he may do meanwhile (the deck's orders, refused
+from the cabin as from any going below). (2) The `captain.below` line is written before the
+order's `order.accepted` line (the handler moves him as it carries the order out), as the
+boat's `hull.followed` line is at step 4; the order's own line follows, so the log reads "went
+below; Order: draft a book; drafted a book". (3) The letter of §9's table has no order of its
+own today (a letter comes aboard by the boat and is read where the captain is; none is
+written at the prompt), so nothing of a letter is built.
+
+**Found on the way** is in the tuning notes (the reckoning's rows are the gunroom's already;
+`People.occupy` dropped the room for a mirrored person; the test of step 5 that drafted a book
+on the deck and walked to the hold at once).
+
+### Step 7: the drill, extended (§10; the lead's ruling of 2026-10-31 on §17's item 5; 2026-11-06)
+
+**Built as designed, behind one switch**: the fitness drill's walk is built whole and kept behind
+`consent.DRILL_WALK`, **off on the trunk** by the lead's ruling: the drill a model meets stays the
+three things the consent brief describes (`DRILL_TEXT`, `DRILL_REPLIES` four, `DRILL_TOOLS` three)
+until package 55 re-briefs, so that a model whose yes is on record for a drill of three things is
+not asked eight before the brief says eight; `drill_spec()` gives the drill as the switch has it.
+With the switch on the drill gains the walk after 37's three: go below (`submit_order(text='go
+below')`), eat or drink there (`submit_order(text='eat')`), read one of the ship's papers where it is
+kept (`library(topic='papers', section='the price list')` from the cabin; the text says the listing
+names which are to be had where he stands), come on deck (`submit_order(text='come on deck')`);
+seven things in up to eight replies (`DRILL_WALK_REPLIES`; 37's judgement of one reply a thing and
+one to spare kept); the drill's tools gain `submit_order` for the walk's four orders alone
+(`DRILL_ORDERS`; any other is refused in the drill's words, `DRILL_REFUSED`: "The drill's orders are
+the walk's alone: 'go below', 'eat' or 'drink', 'come on deck'. '<the order>' waits for the game.");
+the judge (`_drill_done`) counts each of the seven once by its result (`DRILL_WALK_THINGS`: a move
+refused, "you are on the quarterdeck already", is not a move; a paper counts only where it was read,
+one asked for from elsewhere being the refusal in words) and names what is still to run in words
+("still to run, go below, eat or drink, a paper read where it is kept and come on deck"); the
+consent record's `drill` field says which drill ran: "passed" for the three, "passed, with the walk"
+for the seven (`DRILL_PASSED_WALK`; `Record.proceeds` and `drilled` take both). The walk's orders
+are carried out by the drill's world's own captain (`Harness.drill`: in the drill the harness gives
+the walk's four orders through `World.submit` as the captain's and refuses the rest; the
+conversation's senses are his meanwhile, so the library reads by his place), its lines real in that
+world (`captain.below`, `captain.on_deck`, the eating) and in no game's; the station brief follows
+when the seven have run. In-world under 85's rule (the drill's text names no package and no build;
+tested). `docs/agents/ConsentBrief.md` not edited. Truth 7-381 runs with the switch on; 37's drill
+tests stand unchanged with it off.
+
+**The sentence package 55 will need in the consent brief**, for when the switch is turned on: "For a
+station that asks it (the officer of the watch's), a short drill follows a yes, as data in the same
+conversation and before the station brief: open a section of the library, write a line in the
+journal, stand by until a bell, and take a walk about the ship (go below, eat or drink there, read
+one of the ship's papers where it is kept, come on deck); seven things in up to eight replies; a
+model that cannot is thanked and stood down, with a record."
+
+**Taken another way, with the reason.** (1) **The drill's world is a ship and not a point** when
+the walk is on: the consent conversation sailed `World(seed=0)`, a point ship with people and no
+stores, which keeps no papers and has no cabin to go below to; with the switch on the drill's world
+is the frigate at seed 0 in a calm (`DRILL_SHIP`, `make_world`, a third of a second), so the walk has
+rooms and a paper; its lines are the consent conversation's own and never a game's (§10's "the real
+world" read as the drill's world, the only world the consent step has). With the switch off the
+point world stands as it was. (2) **The walker is the drill's world's captain**, not the station's
+person: the consent conversation has no station and no person (`CONSENT_STATION`, authority none),
+so `submit_order` through the tools would be refused for want of authority; `Harness.drill` gives
+the walk's four orders as the captain's at the prompt and refuses every other in the drill's words,
+which is also how "an order of the deck or of the world is refused" is kept without widening the
+consent station's authority. (3) **The paper the text names is the price list in the cabin**, since
+the walker is the captain and `go below` takes him there; §10's "any paper kept where he is" stands
+(the judge counts any paper read where it is kept). (4) **A reminder follows an empty reply or a
+reply a stand-by ended, and no other**: after a reply whose calls ran, the drill goes on from their
+results, as 37l has it; the test pins the three reminders of its script.
+
+**Found on the way** is in the tuning notes (the `@dataclass` decorator and a helper's placing; the
+developer's empty turn counted as the drill's first reply).
+
+### Step 8: the edge cases' truths and the records (§12, §13, §14; 2026-11-06)
+
+**Built as designed**: truth 7-377 (the boat away with the player: his senses the boat's deck's,
+every row his and nothing greyed; the ship's standing order sets her royals while he is away and
+the lines are in her log and not in the boat's; her lookout's line in the boat's log is the ship
+seen; a word said on her deck within hearing written in the boat's log as heard), truth 7-378
+(the frigate with the brig X in sight at night and a fake captain who goes below, is reported to
+and called, comes on deck and drafts a book, saved at the half and at the end, replayed by its
+transcript and by its acts to the same digests of both hulls' logs), truth 7-384 (a visitor put in
+another hull's cabin reads her glass, her tell-tale's heading, her chart's rows and her log and
+chart, none of her deck and not her view; a person put in her hold reads the hold's, her manifest
+there, none of her deck, her log not to be had; the confinement itself is package 74's,
+`Person.confined_to`, nothing of it built here). The records: spec M7b §14's provisional list
+replaced by the rule as built; `docs/agents/Harness.md` §21h (the place's knowledge, for a
+model's reader) and §21's words; the primer's chapters 14 (what reaches a person in each place),
+16 (the duty to report and the call, the command devolved, the told order) and 19 (every sample
+carries what the place allows; the library where the ship's own are kept), in-world under 85's
+rule; the director's library page gains a section, "what a person knows where he stands"; the
+tuning notes. Every truth of 7-370 to 7-389, 7-420 and 7-421 has its test.
+
+**Taken another way, with the reason.** (1) Truth 7-377's "by sight and hail": the ship's own
+lookout line in the boat's log is the sight (the boat's lookout has her as a sail in sight), and
+the hail is a word said on her deck heard across the water (`say as the first lieutenant`), since
+a hail order from her deck wants a giver aboard her and her captain is in the boat; the test
+asserts the word only while the boat lies within four cables. (2) Truth 7-378 is run with the
+brig X in sight at night so that the sighting lines are reports and calls both, deterministic
+from the seed; the digest compared is of both hulls' logs, as 84's tests compare them. (3) The
+captive's reading is tested by his place alone, the confinement being 74's hook. (4) The
+visitor's `say` at the prompt said as "the captain" (step 4's finding c; the lead's ruling: mine
+in step 8 if a seat of the visitor's voice and no wider): mended narrower than a seat. `orders.stations._say`
+reads `knowledge.players_visitor` when the prompt's words are the captain's own: the line is then in
+his name and from his spot ("Captain Bowen, a visitor of the Amazon, in the cabin: good day to you"),
+and the ship's own captain's station is not skipped as the speaker, so a model at her captain's
+hears him; no seat is made and nothing else of 82's voice is touched. The hearers were right
+already (step 4's `hearing.station_spot` read his spot).
+
+**Found on the way** is in the tuning notes.

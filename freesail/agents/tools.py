@@ -52,7 +52,7 @@ import hashlib
 import json
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -399,6 +399,15 @@ def read_log(
         log = hull.log
         if since_tick is None and before_tick is None:
             since = 0
+    else:
+        # the log book is read where it is kept (package 65, step 5; the design's §8): the
+        # log board on the quarterdeck, the log books in the cabin and the gunroom; a man
+        # in the hold, aloft or ashore is told where it is; the director from anywhere
+        from freesail.world import knowledge
+
+        words = knowledge.thing_elsewhere("log", _senses_of(world, station))
+        if words:
+            return {"error": words}
     events = [
         e for e in log if e.tick >= since and e.severity.rank >= sev.rank and not for_the_record(e)
     ]  # decision 46: a world order as given is not a station's to read
@@ -581,16 +590,54 @@ class Page(str):
 def library(
     world: World, station: str, topic: str = "contents", section: str = "", find: str = ""
 ) -> Page:
+    """The library as the station's person reads it where he stands (package 65, step 5;
+    the design's §8): the player's reference from anywhere, the ship's own where it is
+    kept, a thing kept elsewhere refused with where it is and the walk."""
+    return library_by(world, _senses_of(world, station), topic, section, find)
+
+
+def library_by(
+    world: World, senses: Any, topic: str = "contents", section: str = "", find: str = ""
+) -> Page:
+    """The library read with these senses (`world.knowledge.Senses`; the browser's pane
+    reads it with the player's): the primer, the catalogue, the grammar, the ship's names,
+    the tools and the world page from anywhere (the player's reference, his own); the
+    ship's papers each where it is kept (the keeper carrying his while he is at it), the
+    book of standing orders and the books drafted on the quarterdeck and in the cabin; a
+    thing read where it is not is refused with where it is and the walk, the listing says
+    where each is, `section='all'` serves what is here and names the rest, and `find`
+    searches what is here and says what it left out. Everything for the director and
+    under `knowledge: all`."""
+    from freesail.world import knowledge as K
+
     key = " ".join(str(topic or "contents").lower().split()).strip("'\"")
     section = " ".join(str(section or "").split()).strip("'\"")
     find = " ".join(str(find or "").split()).strip("'\"")
+    everything = senses is None or senses.everything
     if key in ("", "contents", "index", "the library", "library"):
         if find:
-            return _find(_every_topic(world), find, "the library", "")
-        return Page(_contents(world), "the contents", "library(topic='contents')")
+            if everything:
+                return _find(_every_topic(world), find, "the library", "")
+            topics, left = _topics_here(world, senses)
+            page = _find(topics, find, "the library", "")
+            if left:
+                return Page(f"{page}\n\n{left}", page.title, page.reopen)
+            return page
+        return Page(_contents(world, senses), "the contents", "library(topic='contents')")
     top = _topic(world, key)
     if isinstance(top, str):
         return Page(top, f"the library, '{key}'", "library(topic='contents')")
+    if not everything and top.key == "papers" and top.sections:
+        return _papers_page(world, top, senses, section, find)
+    if not everything and top.key in ("standing orders", "books"):
+        title = section if top.key == "books" and section.lower() not in ALL_WORDS else ""
+        if top.key == "books" and title and top.sections:
+            found = _match(top.sections, title)
+            title = found[0].heading if len(found) == 1 else title
+        words = K.thing_elsewhere(top.key, senses, title)
+        if words:
+            name = f"{top.name}, {_lower_first(title)}" if title else top.name
+            return Page(words, name, _reopen(top.key, section))
     if find:
         return _find([top], find, top.name, top.key)
     if top.sections and section:
@@ -598,6 +645,101 @@ def library(
     if top.sections:
         return Page(_listing(top), top.name, _reopen(top.key))
     return Page(top.whole, top.name, _reopen(top.key))
+
+
+def _papers_split(world: World, top: Topic, senses: Any) -> tuple[list[Section], list[str]]:
+    """The papers' sections to be had where he is, and for each of the rest the words
+    that name it with where it is ('the manifest (in the hold, with the purser)')."""
+    from freesail.world import knowledge as K
+
+    here: list[Section] = []
+    away: list[str] = []
+    pages = world.papers.pages()
+    for sec, page in zip(top.sections, pages, strict=True):
+        if K.paper_here(world, page, senses):
+            here.append(sec)
+        else:
+            away.append(f"{page.handle} ({K.paper_where_words(world, page)})")
+    return here, away
+
+
+def _papers_page(world: World, top: Topic, senses: Any, section: str, find: str) -> Page:
+    """The ship's papers as read from where he is (the design's §8): the listing with where
+    each is, a paper not here refused with its place and the walk, the whole bundle what is
+    here and the rest named, a search of what is here with the rest named."""
+    from freesail.world import knowledge as K
+
+    here, away = _papers_split(world, top, senses)
+    where = senses.words()
+    rest = f"Not {where}: {'; '.join(away)}." if away else ""
+    if find:
+        topic_here = replace(top, sections=tuple(here), whole="\n\n".join(s.text for s in here))
+        page = _find([topic_here] if here else [], find, top.name, top.key)
+        if away:
+            note = f"Not searched, being elsewhere: {'; '.join(away)}."
+            return Page(f"{page}\n\n{note}", page.title, page.reopen)
+        return page
+    if section and section.lower() in ALL_WORDS:
+        whole = "\n\n".join(s.text for s in here)
+        head = f"{top.title}, {top.whole_words} as read {where}"
+        text = f"{head}: {len(here)} of {len(top.sections)}.\n\n{whole}" if here else head + "."
+        if rest:
+            text += f"\n\n{rest}"
+        return Page(text, f"{top.name}, {top.whole_words}", _reopen(top.key, "all"))
+    if section:
+        found = _match(top.sections, section)
+        if len(found) == 1 and found[0] not in here:
+            page = world.papers.pages()[top.sections.index(found[0])]
+            words = K.paper_elsewhere(world, page, senses) or ""
+            return Page(
+                words,
+                f"{top.name}, {_lower_first(found[0].heading)}",
+                _reopen(top.key, section if "'" not in section else found[0].number),
+            )
+        return _section_page(top, section)
+    names = [s.heading for s in here]
+    extra = (
+        f"To be had {where}: {', '.join(names) if names else 'none of them'}.",
+        *((rest,) if rest else ()),
+    )
+    return Page(_listing(replace(top, extra=(*top.extra, *extra))), top.name, _reopen(top.key))
+
+
+def _topics_here(world: World, senses: Any) -> tuple[list[Topic], str]:
+    """The topics a search of the whole library reads from where he is: the player's
+    reference whole, the ship's papers to be had there, the book of standing orders and the
+    books drafted where they are kept; and one sentence naming what it left out."""
+    from freesail.world import knowledge as K
+
+    out: list[Topic] = [*_primer_all(), _catalogue_topic(), _grammar_topic(), _ship_topic(world)]
+    left: list[str] = []
+    papers = _papers_topic(world)
+    if papers.sections:
+        here, away = _papers_split(world, papers, senses)
+        if here:
+            out.append(replace(papers, sections=tuple(here)))
+        if away:
+            left.append(f"the ship's papers elsewhere ({'; '.join(away)})")
+    else:
+        out.append(papers)
+    drafted = _books_topic(world)
+    if drafted.sections:
+        if K.thing_here("books", senses):
+            out.append(drafted)
+        else:
+            left.append("the books drafted (on the quarterdeck and in the cabin)")
+    standing = _topic(world, "standing orders")
+    assert isinstance(standing, Topic)
+    if K.thing_here("standing orders", senses):
+        out.append(standing)
+    else:
+        left.append("the book of standing orders (on the quarterdeck and in the cabin)")
+    for key in ("tools", "the world"):
+        top = _topic(world, key)
+        assert isinstance(top, Topic)
+        out.append(top)
+    words = f"Not searched, being elsewhere: {'; '.join(left)}." if left else ""
+    return out, words
 
 
 def _reopen(key: str, section: str = "", find: str = "") -> str:
@@ -1328,22 +1470,34 @@ def _picture(world: World, view: str, facing: str = "", span: str = "") -> Any:
 
 
 def chart(world: World, station: str, span: str = "") -> Any:
+    """The chart where it is kept (package 65, step 5): the cabin, the gunroom and the
+    binnacle on deck; elsewhere the words say where, and the walk."""
     from freesail.agents import pictures as P
+    from freesail.world import knowledge
 
     try:
         key = P.span_of(span)
     except ValueError as e:
         return str(e)
+    words = knowledge.thing_elsewhere("chart", _senses_of(world, station))
+    if words:
+        return words
     return _picture(world, "chart", span=key)
 
 
 def ship_view(world: World, station: str, facing: str = "") -> Any:
+    """The ship seen from where he stands (package 65, step 5): the open deck, aloft and
+    the boat; from the cabin or the hold the words say so, and the walk."""
     from freesail.agents import pictures as P
+    from freesail.world import knowledge
 
     try:
         P.facing_of(facing)
     except ValueError as e:
         return str(e)
+    words = knowledge.thing_elsewhere("ship_view", _senses_of(world, station))
+    if words:
+        return words
     return _picture(world, P.SHIP, facing)
 
 
@@ -1427,7 +1581,8 @@ TOOLS: dict[str, Tool] = {
             "from, the lines (tick, stamp, severity, kind, text, and for an order who gave "
             f"it) and how many older ones were left out. It returns the newest {READ_LOG_LIMIT} "
             "lines unless count asks for more; before_tick reads back the lines before a "
-            "tick, a page at a time.",
+            "tick, a page at a time. The log is read where it is kept: the log board on the "
+            "quarterdeck, the log books in the cabin and the gunroom; elsewhere it says where.",
             {
                 "since_tick": "int, optional: the first tick wanted (by default your last "
                 "sample's; 0 for the start of the log)",
@@ -1468,7 +1623,10 @@ TOOLS: dict[str, Tool] = {
             "account, the price list); section='reefing' (a word of its heading, or its "
             "number) serves one, "
             "section='all' the whole; find='goose-wing' returns the matching paragraphs, "
-            "each with where it is, in a topic or the whole library. Every read is a book "
+            "each with where it is, in a topic or the whole library. The reference is yours "
+            "from anywhere; the ship's own (her papers, the book of standing orders, the "
+            "books drafted) are read where they are kept, and a page asked for elsewhere "
+            "says where it is and the walk. Every read is a book "
             "with a number, which shelve puts back.",
             {
                 "topic": "string, optional: which topic (default 'contents')",
@@ -2874,7 +3032,7 @@ def _find(topics: list[Topic], q: str, where: str, key: str) -> Page:
     return Page("\n\n".join(out), title, again)
 
 
-def _contents(world: World) -> str:
+def _contents(world: World, senses: Any = None) -> str:
     intro = size_words(tokens(_primer_topic().whole))
     lines = [
         "The library holds these topics, always there to read. Each size is what reading "
@@ -2941,6 +3099,29 @@ def _contents(world: World) -> str:
         "section='all' the whole. find='goose-wing' returns the paragraphs that match, each "
         "with where it is, in a topic or, with no topic, in the whole library."
     )
+    if senses is not None and not senses.everything:
+        # the place's knowledge (package 65, step 5): the ship's own are read where they are
+        # kept; the reference is his own, from anywhere
+        from freesail.world import knowledge as K
+
+        here, away = _papers_split(world, papers, senses) if papers.sections else ([], [])
+        kept = (
+            "The primer, the catalogue, the grammar, the ship's names, the tools and the world "
+            "are yours from anywhere; the ship's own are read where they are kept. "
+            f"{senses.words()[:1].upper()}{senses.words()[1:]}, the papers to be had are "
+            f"{', '.join(s.heading for s in here) if here else 'none'}"
+        )
+        if away:
+            kept += f"; elsewhere {'; '.join(away)}"
+        kept += ". The book of standing orders" + (
+            " and the books drafted are" if drafted.sections else " is"
+        )
+        kept += (
+            " here."
+            if K.thing_here("standing orders", senses)
+            else " on the quarterdeck and in the cabin."
+        )
+        lines.append(kept)
     return "\n".join(lines)
 
 

@@ -547,14 +547,37 @@ def test_the_ship_papers_are_the_librarys_papers_topic_and_nothing_waits(client,
         "the gunner's account",  # practice and resupply (between packages 72 and 73)
     ]
     assert by["the booms' list"]["lines"] == queries.booms_lines(world)
-    assert by["the sailmaker's account"]["lines"] == queries.sail_room_lines(world)
+    # the place's knowledge (package 65, step 5; decision 59): the pane reads each paper
+    # where the player's person stands; the sail room's from the quarterdeck says where it
+    # is and shows no lines (before step 5 every paper's lines were served from anywhere)
+    assert by["the sailmaker's account"]["here"] is False
+    assert by["the sailmaker's account"]["lines"] == []
+    assert by["the sailmaker's account"]["where"].startswith(
+        "The sailmaker's account is kept in the sail room, with the sailmaker; go to the sail "
+        "room to read it"
+    )
+    assert data["words"] == "Read on the quarterdeck: a paper kept elsewhere says where."
+    assert by["the boatswain's store book"]["here"] is True
     assert by["the boatswain's store book"]["lines"] == cordage(world.ship).inventory_lines()
     assert by["the establishment of ground tackle"]["lines"] == ground_tackle(world.ship).describe()
     for handle, query in (
         ("the booms' list", "the booms"),
-        ("the sailmaker's account", "the sail room"),
         ("the boatswain's store book", "the boatswain's store"),
         ("the establishment of ground tackle", "the ground tackle"),
+    ):
+        answered = world.submit(query)  # the same words at the order line
+        assert answered.kind.startswith("query.")
+        assert answered.text == "\n".join(by[handle]["lines"])
+    assert world.submit("go to the sail room").kind == "person.moved"
+    there = {p["handle"]: p for p in client.get("/api/library/papers").json()["papers"]}
+    assert there["the sailmaker's account"]["lines"] == queries.sail_room_lines(world)
+    assert there["the boatswain's store book"]["lines"] == []
+    sail_room = there["the sailmaker's account"]["lines"]
+    assert world.submit("the sail room").text == "\n".join(sail_room)
+    assert world.submit("come on deck").kind == "captain.on_deck"
+    for handle, query in (
+        ("the booms' list", "the booms"),
+        ("the boatswain's store book", "the boatswain's store"),
     ):
         answered = world.submit(query)  # the same words at the order line
         assert answered.kind.startswith("query.")

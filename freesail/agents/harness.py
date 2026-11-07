@@ -442,13 +442,13 @@ NO_PERSON_ANSWER_WORDS = (
 # gate m6a-2): a word told, a question put, an answer, a person's words. Heard by a
 # station within earshot of the speaker, each counts as "a word on deck" for its stand-by.
 # A free line (package 53b, `free.line`) is heard so too, by the stations it names.
-WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke", "free.line")
+WORDS_BETWEEN_PEOPLE = knowledge.WORDS_BETWEEN_PEOPLE
 # The lines that are words said in a place (package 66): a word wakes or samples a station
 # only when it reached it (said within its hearing, or to it); the ship's own lines reach
 # every station from her log, and the director hears everything. A reply's prose is no
 # word said (decision 60; package 65, step 2): it is the person's own note, in his journal
 # and the director's log, and no line of the play log carries it.
-WORD_KINDS = (*WORDS_BETWEEN_PEOPLE, "agent.spoke")
+WORD_KINDS = knowledge.WORD_KINDS
 WORD_ON_DECK = "a word on deck"  # the event's words (`readings.EVENTS`)
 # The journal's kind for a reply's prose (decision 60): the model's own words, apart from
 # the journal tool's notes ("note") and the harness's lines.
@@ -735,7 +735,7 @@ class Harness:
                 f"The station of the {station.name} is {other.agent.words()}; a game has "
                 f"one harness to a station.{again}"
             )
-        self.world = world
+        self.world = world.own if isinstance(getattr(world, "hulls", None), dict) else world
         self.station = station
         self.model = model
         self.save_fn = save
@@ -1650,6 +1650,11 @@ class Harness:
         knowledge, `world.knowledge.Senses`): his place's senses, a sleeper's, everything
         for the director and under `knowledge: all`. Read afresh at each call (the person
         moves by his own orders between looks); the lookups are the people's."""
+        if self.drill is not None:
+            # the drill's walker (package 65, step 7): the conversation reads by the place of
+            # the drill's world's captain, whom the walk moves
+            people = getattr(self.world, "people", None)
+            return knowledge.senses_of(self.world, getattr(people, "captain", None))
         if self._is_directors or self.conversation:
             return knowledge.EVERYTHING
         world = self.world
@@ -1665,6 +1670,9 @@ class Harness:
     # moves by an order, and a job's move writes a line): the stand-by's scan of each new
     # line a tick asks for them many times (package 65; the pace)
     _senses_held: tuple[tuple[int, int, int], knowledge.Senses] | None = None
+    # the fitness drill's walk (package 65, step 7): the orders the drill takes and the
+    # words that refuse any other; None outside the drill (`consent.Session._begin_drill`)
+    drill: tuple[tuple[str, ...], str] | None = None
     # the lines slept through (package 65; `__init__` sets it): a class default so that a
     # harness restored from a checkpoint written before the package has it
     _slept: tuple[int, int] | None = None
@@ -2027,15 +2035,7 @@ class Harness:
         and where each is to be had; None on deck, where every row is his."""
         if senses.everything:
             return None
-        rows = [
-            r
-            for r in R.REGISTRY
-            if not r.is_absent
-            and r.parametric is None
-            and r.kind not in R.DRIVER_KINDS
-            and not r.per_asker
-            and not knowledge.reading_here(r, senses)
-        ]
+        rows = knowledge.rows_elsewhere(senses)
         return knowledge.elsewhere_words(rows, senses)
 
     def _as_told(self, content: dict[str, Any]) -> dict[str, Any]:
@@ -2312,6 +2312,8 @@ class Harness:
         and on another ship (package 43; spec M6 §20) her shape, told at the start and
         whenever it changes across the switch."""
         shape = getattr(self.world, "shape", None)
+        if getattr(self.world, "players", None) is self.world:
+            shape = None  # the player's own ship is not another ship
         if shape is not None and shape != self._shape_told and not self.conversation:
             from freesail.world.crews import shape_words
 
@@ -2728,6 +2730,15 @@ class Harness:
                 f"There is no tool named '{c.name}' in this conversation; the tools here "
                 f"are {only}."
             )
+        if c.name == "submit_order" and self.drill is not None:
+            # the drill's walk (package 65, step 7; the design's §10): the walk's orders
+            # alone, given as the drill's world's own captain (the walker, whose senses the
+            # conversation reads meanwhile); any other order waits for the game
+            orders, refused = self.drill
+            text = " ".join(str(c.args.get("text", "")).lower().split()).rstrip(".")
+            if text not in orders:
+                return refused.format(text=" ".join(str(c.args.get("text", "")).split()))
+            return self.world.submit(text).text
         before = len(self.world.log)
         if c.name == "submit_order":
             self._in_order, self._nudge_for_result = True, None

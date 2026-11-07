@@ -99,8 +99,14 @@ __all__ = [
     "CONSENT_TOOLS",
     "DOOR_TEXT",
     "DRILL",
+    "DRILL_ORDERS",
     "DRILL_PASSED",
+    "DRILL_PASSED_WALK",
+    "DRILL_REFUSED",
     "DRILL_REPLIES",
+    "DRILL_THINGS",
+    "DRILL_WALK",
+    "DRILL_WALK_TEXT",
     "DRILL_TEXT",
     "DRILL_TOOLS",
     "IDENTITY_KINDS",
@@ -211,6 +217,8 @@ RE_ASK_SECTIONS: tuple[str, ...] = (
 # calls in four replies cannot hold a station that lives by them).
 DRILL_REPLIES = 4
 DRILL_TOOLS: tuple[str, ...] = ("library", "journal", "stand_by")
+# the three things, as the judge names them while one is still to run
+DRILL_THINGS: tuple[str, ...] = ("library", "journal", "stand_by")
 DRILL_TEXT = (
     "Before the station brief, a short drill, to see that the station's tools work for "
     "you: in your next replies, open a section of the library (library(topic='primer 6', "
@@ -221,6 +229,67 @@ DRILL_TEXT = (
     "leaves."
 )
 DRILL_AGAIN = "The drill goes on: still to run, {missing}. {left} replies left."
+
+# The walk (package 65, step 7; the design's §10), behind one switch, off on the trunk by
+# the lead's ruling of 2026-10-31 (§17, item 5): the drill a model meets stays the three
+# things the consent brief describes until package 55 re-briefs; a yes on record for a
+# drill of three is not asked eight before the brief says eight. With the switch on the
+# drill gains the walk after the three: go below, eat or drink there, read one of the
+# ship's papers where it is kept, come on deck, so that a model has seen the places and
+# felt the rule before the game; seven things in up to eight replies (one a thing and one
+# to spare, 37's judgement kept); the drill's tools gain `submit_order` for the walk's four
+# orders alone, any other refused in the drill's words (`Harness.drill`); the walk is taken
+# by the drill's world's own captain, that world a ship with her people and her papers
+# (`DRILL_SHIP`), its lines real there and in no game's; the record says which drill ran.
+DRILL_WALK = False
+DRILL_WALK_REPLIES = 8
+DRILL_WALK_TOOLS: tuple[str, ...] = ("library", "journal", "stand_by", "submit_order")
+DRILL_ORDERS: tuple[str, ...] = ("go below", "eat", "drink", "come on deck")
+DRILL_REFUSED = (
+    "The drill's orders are the walk's alone: 'go below', 'eat' or 'drink', 'come on deck'. "
+    "'{text}' waits for the game."
+)
+DRILL_WALK_THINGS: tuple[str, ...] = (
+    "the library",
+    "the journal",
+    "the stand-by",
+    "go below",
+    "eat or drink",
+    "a paper read where it is kept",
+    "come on deck",
+)
+_WALK_THING: dict[str, str] = {
+    "go below": "go below",
+    "eat": "eat or drink",
+    "drink": "eat or drink",
+    "come on deck": "come on deck",
+}
+DRILL_SHIP = Path(__file__).resolve().parents[2] / "data" / "ships" / "frigate-36.yaml"
+DRILL_WALK_TEXT = (
+    "Before the station brief, a short drill, to see that the station's tools work for "
+    "you and that you have the measure of the ship's places: in your next replies, open a "
+    "section of the library (library(topic='primer 6', section='watches'), or any topic and "
+    "section), write one line in your journal (journal(note='...')), stand by until a bell "
+    "(stand_by(until='eight bells')), and take a walk: go below (submit_order(text='go "
+    "below')), eat or drink there (submit_order(text='eat')), read one of the ship's papers "
+    "where it is kept (library(topic='papers') lists them and says which are to be had where "
+    "you stand; from the cabin, library(topic='papers', section='the price list')), and come "
+    "on deck again (submit_order(text='come on deck')). Seven things, in any order the ship "
+    f"allows, in up to {DRILL_WALK_REPLIES} replies; the station brief follows when the seven "
+    "have run. The drill's orders are the walk's alone; the deck's and the world's wait for "
+    "the game. This is still not the game, and the token still leaves."
+)
+DRILL_PASSED_WALK = "passed, with the walk"
+
+
+def drill_spec() -> tuple[str, int, tuple[str, ...], tuple[str, ...]]:
+    """The drill as the switch has it: (the text put, the replies allowed, the tools, the
+    things the judge counts)."""
+    if DRILL_WALK:
+        return DRILL_WALK_TEXT, DRILL_WALK_REPLIES, DRILL_WALK_TOOLS, DRILL_WALK_THINGS
+    return DRILL_TEXT, DRILL_REPLIES, DRILL_TOOLS, DRILL_THINGS
+
+
 DRILL_PASSED = "passed"
 DRILL = "the drill"
 
@@ -419,6 +488,43 @@ def slug(identity: str) -> str:
 _HEADER = re.compile(r"^<!-- freesail-consent-record: (\{.*\}) -->$", re.MULTILINE)
 
 
+def _and(names: Sequence[str]) -> str:
+    """'a', 'a and b', 'a, b and c'."""
+    names = list(names)
+    if len(names) <= 1:
+        return "".join(names)
+    return f"{', '.join(names[:-1])} and {names[-1]}"
+
+
+def _library_refused(result: str) -> bool:
+    """A library result that served no page: no such topic or section, or several."""
+    head = result.split("\n", 1)[0]
+    return "has no topic" in result or "has no section" in result or " sections of " in head
+
+
+def _paper_read(args: dict[str, Any], result: str) -> bool:
+    """Whether a library call read one of the ship's papers where it is kept (package 65,
+    step 7): the papers topic with one section asked, and the result a page and not the
+    words that say where the paper is."""
+    topic = " ".join(str(args.get("topic") or "").lower().split())
+    section = " ".join(str(args.get("section") or "").lower().split()).strip("'\"")
+    if "papers" not in topic or not section or section in ("all", "whole", "everything"):
+        return False
+    body = result.split("\n", 1)[1] if "; book " in result.split("\n", 1)[0] else result
+    refusals = (" is kept ", " are kept ", " is aboard her", "You are asleep", "keeps no papers")
+    return not any(w in body for w in refusals)
+
+
+def _order_refused(result: str) -> bool:
+    """An order's result that carried nothing out: the ship's refusal, the drill's, the
+    authority's."""
+    return (
+        result.startswith(("Order not carried out", "The drill's orders", "There is no tool"))
+        or "not carried out" in result
+        or "has no authority" in result
+    )
+
+
 @dataclass
 class Record:
     """One consent record. `identity` is exact; `verdict` one of the six; `conditions`
@@ -445,11 +551,11 @@ class Record:
 
     @property
     def proceeds(self) -> bool:
-        return self.verdict == YES and self.drill in ("", DRILL_PASSED)
+        return self.verdict == YES and self.drill in ("", DRILL_PASSED, DRILL_PASSED_WALK)
 
     @property
     def drilled(self) -> bool:
-        return self.drill == DRILL_PASSED
+        return self.drill in (DRILL_PASSED, DRILL_PASSED_WALK)
 
     def header(self) -> dict[str, Any]:
         d = {
@@ -836,7 +942,7 @@ class Conversation:
         (`IDENTITY_KINDS` by door when not given); `drill_carried`: the date of a record
         whose drill passed, carried to this one and not put again (the question put again
         after an opt-out, package 37b)."""
-        from freesail.core.world import World
+        from freesail.core.world import Scenario, World
 
         self.identity = identity
         self.runtime = runtime
@@ -867,7 +973,18 @@ class Conversation:
         self.tells = tells
         self._words: list[str] = []
         self.text = brief_text(identity, runtime, door)
-        self.world = World(seed=0)
+        if DRILL_WALK and self.drill:
+            # the drill's world with the walk (package 65, step 7): a ship with her people
+            # and her papers, where a point world has no room to go below to and no paper
+            from freesail.api.session import make_world
+
+            self.world = make_world(
+                0,
+                str(DRILL_SHIP),
+                Scenario(wind_from_deg=0.0, ship_heading_deg=180.0, gustiness=0.0, variability=0.0),
+            )
+        else:
+            self.world = World(seed=0)
         self.harness = Harness(
             self.world,
             CONSENT_STATION,
@@ -1053,19 +1170,25 @@ class Conversation:
         h = self.harness
         self.stage = DRILL_STAGE
         h.close_turn()
-        h.allowed_tools = tuple(dict.fromkeys((*self._base_tools, *DRILL_TOOLS)))
+        text, _, drill_tools, _ = drill_spec()
+        h.allowed_tools = tuple(dict.fromkeys((*self._base_tools, *drill_tools)))
+        if DRILL_WALK:
+            h.drill = (DRILL_ORDERS, DRILL_REFUSED)  # the walk's orders, as the ship's captain
         self._drill_from = len(h.turns)
         self._drill_ran = set()
-        self._put(DRILL_TEXT, DRILL)
+        self._put(text, DRILL)
 
     def _drill_done(self) -> tuple[set[str], int]:
-        """Which of the three ran (a tool result that is not a refusal) in the drill's
-        turns, and how many replies the model has made in it. Package 37l (the review of
-        gate 5c's playtests, G13: in game 10 the model sent the three calls in one reply;
-        the drill counted the stand-by alone and asked for the other two, and when they
-        were sent again asked for the stand-by again): every result counts, those of a
+        """Which of the seven ran (`DRILL_THINGS`: a tool result that is not a refusal) in
+        the drill's turns, and how many replies the model has made in it. Package 37l (the
+        review of gate 5c's playtests, G13: in game 10 the model sent the three calls in one
+        reply; the drill counted the stand-by alone and asked for the other two, and when
+        they were sent again asked for the stand-by again): every result counts, those of a
         reply a stand-by ended as much as those the turns hold (`Harness.stood_results`),
-        and a call once counted stays counted, whatever the stand-by's state later."""
+        and a call once counted stays counted, whatever the stand-by's state later. The
+        walk (package 65, step 7): an order counts by its result as the others do (a move
+        refused, "you are on the quarterdeck already", is not a move), and a paper counts
+        only where it was read (one asked for from elsewhere is a refusal in words)."""
         done: set[str] = self._drill_ran
         replies = 0
         results: list[dict[str, Any]] = []
@@ -1077,32 +1200,48 @@ class Conversation:
         for at, stood in self.harness.stood_results:
             if at >= self._drill_from:
                 results.extend(stood)
+        _, _, drill_tools, _ = drill_spec()
+        walk = DRILL_WALK
         for r in results:
             name, result = str(r.get("name")), str(r.get("result", ""))
-            if name not in DRILL_TOOLS or "args" not in r:
+            if name not in drill_tools or "args" not in r:
                 continue
-            if name == "library" and ("has no topic" in result or "has no section" in result):
-                continue
-            if name == "journal" and not result.startswith("Noted"):
-                continue
-            if name == "stand_by" and not result.startswith("Standing by"):
-                continue
-            done.add(name)
+            args = r.get("args") or {}
+            if name == "library":
+                if _library_refused(result):
+                    continue
+                done.add("the library" if walk else "library")
+                if walk and _paper_read(args, result):
+                    done.add("a paper read where it is kept")
+            elif name == "journal":
+                if result.startswith("Noted"):
+                    done.add("the journal" if walk else "journal")
+            elif name == "stand_by":
+                if result.startswith("Standing by"):
+                    done.add("the stand-by" if walk else "stand_by")
+            elif name == "submit_order" and walk:
+                text = " ".join(str(args.get("text", "")).lower().split()).rstrip(".")
+                thing = _WALK_THING.get(text)
+                if thing and not _order_refused(result):
+                    done.add(thing)
         return set(done), replies
 
     def _settle_drill(self) -> None:
         h = self.harness
         done, replies = self._drill_done()
-        missing = [n for n in DRILL_TOOLS if n not in done]
+        _, allowed, _, things = drill_spec()
+        missing = [n for n in things if n not in done]
         if not missing:
-            self.drill_result = DRILL_PASSED
+            self.drill_result = DRILL_PASSED_WALK if DRILL_WALK else DRILL_PASSED
             self._finish(*self.pending)
             return
         if h.open_sample is not None:
             self.waiting = MODEL_TURN
             return
-        if replies >= DRILL_REPLIES:
-            named = " and ".join(missing)
+        if replies >= allowed:
+            # the three things of 37 named as before ("library and stand_by"), the walk's
+            # seven in words with a comma
+            named = _and(missing) if DRILL_WALK else " and ".join(missing)
             self.drill_result = f"not passed: {named} not run in {replies} replies"
             self._finish(*self.pending)
             return
@@ -1110,8 +1249,9 @@ class Conversation:
             # a stand-by ended the turn (package 28c): the drill goes on with the next put
             h.agent.state = "stationed"
             h.agent.stand_by = None
-        left = DRILL_REPLIES - replies
-        self._put(DRILL_AGAIN.format(missing=" and ".join(missing), left=left), DRILL)
+        left = allowed - replies
+        named = _and(missing) if DRILL_WALK else " and ".join(missing)
+        self._put(DRILL_AGAIN.format(missing=named, left=left), DRILL)
 
     def _finish(self, verdict: str, answer: str, rest: str) -> None:
         h = self.harness
@@ -1119,7 +1259,7 @@ class Conversation:
         if verdict == LEFT and self.tells:
             told = "The conversation ended with the token" + (f": {rest}." if rest else ".")
         if verdict == YES and self.drill_result and self.tells:
-            passed = self.drill_result == DRILL_PASSED
+            passed = self.drill_result in (DRILL_PASSED, DRILL_PASSED_WALK)
             told = TOLD_DRILL[passed].format(why=self.drill_result.removeprefix("not passed: "))
         record = Record(
             identity=self.identity,

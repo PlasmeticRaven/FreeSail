@@ -389,7 +389,9 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if within is not None:
         seat["within"] = within
     seats[key] = seat
-    world.director_seats_made = made + 1
+    from freesail.world.hulls import world_of
+
+    world_of(world).director_seats_made = made + 1  # the World's (97)
     _log(world, f"The seat held: {seat_words(world, key, seat)} for {int(n):g} {unit}.")
     return _held_words(target, seat), {
         "ship": target["ship"] or "",
@@ -696,7 +698,8 @@ def _log(world: Any, text: str) -> None:
     """A line in the director's log (`director.seat`), never the play log."""
     from freesail.agents import director as director_mod
 
-    director_mod.log_of(world).append(world, text, kind="director.seat")
+    # on the director's own hull, the player's, whichever is followed (package 97)
+    director_mod.log_of(world).append(director_mod.director_hull(world), text, kind="director.seat")
 
 
 # ---------------------------------------------------------------------------
