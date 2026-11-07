@@ -257,8 +257,8 @@ her file lands, and until then a gun of a weight no pattern gives draws at the n
 | The engine's state | Drawn | Ground |
 |---|---|---|
 | secured (not cast loose) | housed: the muzzle `HOUSED_INBOARD_M` (0.1 m) inside the side, the lid shut | judgement; Falconer, the lids let down when the guns are drawn in |
-| cast loose, run in (loading, or run in by the sea) | the muzzle inboard by `RECOIL_SHARE` of its length (0.4, judgement) | the room to sponge and load; Adye p. 230 (IA leaf n253, read) gives the free recoil on a level platform, 11 ft for the 32 and the 24 and 10 ft 6 in for the 18 at a third's charge, longer than the gun: aboard the breeching stopped it short (question 1) |
-| run out | the muzzle outboard of the side by `OUT_SHARE` of its length: long 0.33, carronade 0.25 (judgement, question 1) | the carriage against the side |
+| cast loose, run in (loading, or run in by the sea) | the muzzle inboard by `RECOIL_SHARE` of its length (a long gun 0.4, a carronade 0.15: judgement) | the room to sponge and load; Adye p. 230 (IA leaf n253, read) gives the free recoil on a level platform, 11 ft for the 32 and the 24 and 10 ft 6 in for the 18 at a third's charge, longer than the gun: aboard the breeching stopped it short (question 1). A carronade is served "with taught breechings", which Douglas's note calls a non-recoil principle (art. 136, p. 163, read (OCR), l. 7631-7640), so it is drawn coming in little |
+| run out | the muzzle outboard of the side by `OUT_SHARE` of its length: long 0.33, carronade 0.25 (judgement, question 1) | the carriage against the side: "run out the gun square to the breast of the port" (Douglas 1829 art. 134, pp. 161-162, read (OCR), l. 7560-7585) |
 | dismounted | the barrel off its carriage, on the deck at its port, tipped 15° (judgement) | `the damage`'s `dismounted` |
 
 ## 4. The firing
@@ -407,7 +407,8 @@ the hover words in-world (no build's word).
   the index); *both read 2026-11-07 on their images (§3.1, §3.3)*; **pp. 255-257**, the shot's and the windage's diameters (l. 22869-23000).
 - **R3. Douglas 1829**: the exercise, arts. 122-135 (running out and in, housing, the breechings'
   length) and the carronade on its slide, art. 136 ff. (l. 7151-7645); the smoke, art. 175 p. 218
-  (l. 9612-9625) and p. 280 (l. 11795-11805).
+  (l. 9612-9625) and p. 280 (l. 11795-11805). *Read (OCR) 2026-11-07 for arts. 134 and 136 (§3.3);
+  the smoke's passages say it envelops the hulls and covers a ship's manoeuvre, and give no figure.*
 - **R4. Falconer 1780, PORTS** (l. 13783-13789) and **Steel 1805, HALF-PORTS and PORT-LIDS** (l.
   3052-3053, 4061): the lids, read (OCR); the page images where the OCR is unsure.
 - **R5. The swivel**: Adye's and Falconer's SWIVEL entries for the half-pounder's length. *Searched
