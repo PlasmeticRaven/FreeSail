@@ -1119,6 +1119,10 @@ class Builder:
         self.hold_note: str = ""
         self.boat_notes: dict[tuple[str, ...], str] = {}
         self.oars_note: str = ""
+        # package 75 (SW-4; Build-Ships.md §9.2): each lower mast's channel as (fore end,
+        # after end), metres from the mast's own x, where her hull's module gives them from
+        # her sheet; read by `pivot_arc_from_rig` alone and written to no file
+        self.channels: dict[str, tuple[float, float]] = {}
 
     def spar(self, id, cls, note=None, **kw):
         d = {"id": id, "class": cls}
@@ -1494,10 +1498,29 @@ class Builder:
         two descriptions where the type served two trades (the brig-sloop of the Navy and
         the merchant brig). Each {key: {rig, what, note}}: her rig's word as the tops make
         it out at four miles, what she is when made out, and the source. Read by
-        `freesail.world.ships` for the other sail; the engine's physics reads none of it."""
-        self.doc["ship"]["descriptions"] = {
-            key: {"rig": rig, "what": what, "note": note} for key, rig, what, note in entries
-        }
+        `freesail.world.ships` for the other sail; the engine's physics reads none of it.
+
+        Package 75 (SW-4; docs/design/Build-Ships.md §8.1, §8.2): an entry may go on to
+        (key, rig, what, note, fit, roles), the sub-type's `fit` (one of the file's fits or
+        `unarmed`, the fit a far ship of it carries when the scenario names none) and its
+        `roles` (the roles a scenario may give her, the first the one the intent rules
+        give), each written only where given; and `what` may be None, left to the index
+        (`world/ships.py`'s `DESCRIPTIONS`) for a description whose glass words no design
+        has settled yet."""
+        out = {}
+        for entry in entries:
+            key, rig, what, note, *rest = entry
+            fit, roles = (list(rest) + [None, None])[:2]
+            d = {"rig": rig}
+            if what is not None:
+                d["what"] = what
+            d["note"] = note
+            if fit is not None:
+                d["fit"] = fit
+            if roles is not None:
+                d["roles"] = list(roles)
+            out[key] = d
+        self.doc["ship"]["descriptions"] = out
 
     def dump(self, path, header):
         self.whole_ship_groups()
@@ -3094,6 +3117,24 @@ def frigate(out_dir="data/ships"):
             ],
         ),
     )
+    # Her description at far detail in her own file (package 75, SW-4; Build-Ships.md §8.1,
+    # §8.2): the index's words since package 36 (world/ships.py), her default fit and a King's
+    # ship's roles
+    b.descriptions(
+        [
+            (
+                "frigate",
+                "a ship",
+                "a frigate",
+                "The Amazon class's frigate of 1795 (Winfield 1793-1817 p. 143): the tops make "
+                "her out a ship, three masts square-rigged, and the glass a frigate (spec M5 "
+                "§25; judgement on the words). Her fit her file's default; her roles a King's "
+                "ship's (Build-Ships.md §8.2).",
+                "amazon class 1795",
+                ["kings-ship", "commodore"],
+            ),
+        ]
+    )
     b.dump(
         os.path.join(out_dir, "frigate-36.yaml"),
         "# Reference ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class (Rule, 1795).\n"
@@ -3227,6 +3268,8 @@ def schooner(out_dir="data/ships", armed=False):
     from ships import hull_schooner
 
     hull_schooner.add_hull(b, "privateer-schooner" if armed else "topsail-schooner")
+    # her channels from her own plate, for the pivot's arc (package 75, SW-4; §9.2)
+    b.channels = hull_schooner.channels(b.doc["hull"])
 
     # -- spars in feet by Fincham's rules for two-masted schooners (Chapelle pp. 160-161),
     # taken at the upper end of each range because "the resultant rig is perhaps a little
@@ -3896,6 +3939,8 @@ def schooner(out_dir="data/ships", armed=False):
     schooner_crew(b)
     if armed:
         schooner_armament(b)
+    else:
+        topsail_schooner_armament(b)
     hold_for(b, 224.0, False, "a sharp Baltimore hull stows about half her tonnage: judgement")
     b.pumps(PUMPS_NOTE, pump_entries(0, 2, ["the starboard pump", "the larboard pump"]))
     b.boats(
@@ -3919,6 +3964,23 @@ def schooner(out_dir="data/ships", armed=False):
     if armed:
         privateer_schooner(b, out_dir)
         return
+    # her description at far detail in her own file (package 75, SW-4; Build-Ships.md §8.1,
+    # §8.2): the index's words since package 36, unarmed, her default, and a merchant's role
+    b.descriptions(
+        [
+            (
+                "schooner",
+                "a schooner",
+                "a topsail schooner",
+                "Speedwell, a Baltimore topsail schooner of Lynx's draught, as the trader of the "
+                "war: the tops make her out a schooner, and the glass a topsail schooner (spec M5 "
+                "§25; judgement on the words). Unarmed, her file's default; a merchant's role "
+                "(Build-Ships.md §8.2).",
+                UNARMED,
+                ["merchant"],
+            ),
+        ]
+    )
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
         "# Reference ship: Speedwell, a Baltimore-built topsail schooner of about 1804, to the\n"
@@ -4435,6 +4497,84 @@ def swivels(count, xs_m, height_m, note=None, deck=None, round_to=0.1):
     return out
 
 
+# The pivot's arc from its own rig (package 75, SW-4; docs/design/Build-Ships.md §9.2, as
+# docs/design/Proposal-PivotGun.md §4.2 proposes). A pivot amidships fires over the rail on
+# either side between the rigging of the mast before it and the mast abaft it. Each lower
+# mast's shrouds are set up in its channel, abeam of the mast and spreading aft along it
+# (Luce 1866, the held 1877 printing, p. 97: the channels abreast each mast and the positions of
+# the lower dead eyes, their lengths taken from the ship's own draft); the topmast backstays in
+# the after end of the channel, abaft the shrouds, or in a stool abaft it (Steel 1794 vol. I
+# pp. 199-200, 'after-back-stays ... to a dead-eye in the after end of the channel', p. 206, the
+# topgallant backstays set up 'to a small dead-eye in the [?] of the channel, or in a stool abaft
+# the channel' (the held OCR, l. 22939-22940, garbles the word as 'Pee'; read here as the after
+# end, as pp. 199-200 have it, a reading and not Steel's word), and p. 176, STOOLS; Luce p. 98,
+# each backstay measured from the channels abreast the mast to its own dead eye). The stays and
+# the bowsprit stand on the
+# centreline ahead, the boom and the helm astern, outside any arc over the side. So the arc
+# opens at the bearing of the after end of the channel of the mast before the pivot and shuts at
+# the fore end of the channel of the mast abaft it, each at the rail's half-breadth there (the
+# profile's `breadth_m`), with a margin each way for the blast on the rigging (five degrees, the
+# proposal's: judgement), whole degrees (judgement: the channels are measured to a few
+# centimetres). The channels' places are her hull module's, from her own sheet; neither Steel
+# 1794 vol. I nor Luce 1866 gives a channel's length for a vessel of her size, and a file
+# whose module gives none has no arc by this rule.
+PIVOT_ARC_MARGIN_DEG = 5.0
+
+
+def pivot_arc_from_rig(b, x_m, margin_deg=PIVOT_ARC_MARGIN_DEG):
+    """The open arc, (from, to) whole degrees off the bow over either side, of a pivot gun on
+    the centreline at `x_m`, from the builder's lower masts (`b.doc["spars"]`), their channels
+    (`b.channels`: each mast's (fore end, after end) from its own x) and the rail's
+    half-breadth (`b.doc["hull"]["profile"]["breadth_m"]`), and the working, the lines for the
+    generator's report. A mast with no channel given, or a pivot standing within a channel's
+    run, is refused in words."""
+    from freesail.ship.profile import interp
+
+    rail = [[x, hb_rail] for x, _water, hb_rail in b.doc["hull"]["profile"]["breadth_m"]]
+    masts = [(s["id"], float(s["x_m"])) for s in b.doc["spars"] if s["class"] == "mast"]
+    if not masts:
+        raise ValueError("she has no lower mast, so no rig to reckon a pivot's arc from")
+
+    def bearing(x):
+        return math.degrees(math.atan2(interp(rail, x), x - x_m))
+
+    before, abaft = [], []
+    for mast_id, mast_x in masts:
+        if mast_id not in b.channels:
+            raise ValueError(
+                f"no channel is given for {mast_id}; a pivot's arc wants every lower mast's "
+                "channel from her own sheet (Build-Ships.md §9.2)"
+            )
+        fore, aft = b.channels[mast_id]
+        if mast_x + aft <= x_m <= mast_x + fore:
+            raise ValueError(f"a pivot at x {x_m:g} m stands within the run of {mast_id}'s channel")
+        if mast_x > x_m:
+            x = mast_x + aft  # its backstays, in the channel's after end
+            before.append(
+                (bearing(x), f"{mast_id}'s backstays at the channel's after end, x {x:.2f} m")
+            )
+        else:
+            x = mast_x + fore  # its foremost shroud, at the channel's fore end
+            abaft.append(
+                (bearing(x), f"{mast_id}'s foremost shroud at the channel's fore end, x {x:.2f} m")
+            )
+    lo = max(before)[0] if before else 0.0
+    hi = min(abaft)[0] if abaft else 180.0
+    arc = (float(round(lo + margin_deg)), float(round(hi - margin_deg)))
+    if not arc[0] < arc[1]:
+        raise ValueError(f"a pivot at x {x_m:g} m has no arc clear of her rigging: {arc}")
+    working = [f"{what}: {deg:.1f} degrees off the bow" for deg, what in sorted(before + abaft)]
+    working.append(
+        f"the arc {arc[0]:g} to {arc[1]:g} degrees, {margin_deg:g} each way for the blast"
+    )
+    return arc, working
+
+
+# The word for a ship of a file that carries no guns, a file's default where she sails
+# unarmed (package 75; `freesail.ship.schema.UNARMED`, which the load checks).
+UNARMED = "unarmed"
+
+
 def spaced(fore_m, aft_m, n):
     """n positions from `fore_m` to `aft_m` along the hull, forward positive."""
     if n == 1:
@@ -4768,17 +4908,18 @@ def cutter_armament(b):
 
 
 def privateer_schooner(b, out_dir):
-    """The letter of marque of Speedwell's draught (PROVISIONAL; the owner's ask of
-    2026-10-25, ahead of package 75): the hull, the rig, the company and the boats are the
-    topsail schooner's, built above, with her guns and her quarter bill
-    (`schooner_armament`); a file of her own so that every scenario and trial sailing the
-    unarmed Speedwell is untouched."""
+    """The letter of marque of Speedwell's draught (the owner's ask of 2026-10-25; kept by
+    package 75 beside the Prince de Neufchatel, Build-Ships.md §9.5): the hull, the rig, the
+    company and the boats are the topsail schooner's, built above, with her guns and her
+    quarter bill (`schooner_armament`); a file of her own so that every scenario and trial
+    sailing the unarmed Speedwell is untouched."""
     b.doc["ship"]["era_notes"] = (
-        "A Baltimore privateer schooner of about 1804 (PROVISIONAL, ahead of package 75): "
-        "Speedwell's draught, Kemp's Lynx of 1812 (Chapelle 1930, pp. 82-83), her hull, rig "
-        "and company of forty the topsail schooner's, armed with a long 12-pounder on a pivot "
-        "amidships and four carronades (the default fit), or a letter of marque's six long "
-        "6-pounders; see tools/gen_ships.py for every rule."
+        "A Baltimore privateer schooner of about 1804 (the owner's ask of 2026-10-25, kept "
+        "beside the Prince de Neufchatel by package 75): Speedwell's draught, Kemp's Lynx of "
+        "1812 (Chapelle 1930, pp. 82-83), her hull, rig and company of forty the topsail "
+        "schooner's, armed with a long 12-pounder on a pivot amidships and four carronades (the "
+        "default fit), or a letter of marque's six long 6-pounders; see tools/gen_ships.py for "
+        "every rule."
     )
     b.descriptions(
         [
@@ -4786,47 +4927,43 @@ def privateer_schooner(b, out_dir):
                 "privateer schooner",
                 "a schooner",
                 "a topsail schooner, pierced for guns",
-                "PROVISIONAL. A Baltimore schooner armed as a letter of marque; her ports are "
-                "what the glass makes out, not her commission (judgement).",
+                "A Baltimore schooner armed as a letter of marque; her ports are what the glass "
+                "makes out, not her commission (judgement). Her fit her file's default, the "
+                "owner's loadout; a privateer's role (Build-Ships.md §8.2).",
+                "long tom",
+                ["privateer"],
             ),
         ]
     )
     b.dump(
         os.path.join(out_dir, "privateer-schooner.yaml"),
-        "# PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): a letter of marque\n"
-        "# of Speedwell's draught, Kemp's Lynx of 1812 (Chapelle, The Baltimore Clipper, 1930,\n"
-        "# pp. 82-83), the hull, rig and company the topsail schooner's (topsail-schooner.yaml\n"
-        "# and its sources), with two fits (a long 12-pounder on a pivot and four carronades,\n"
-        "# the default; a letter of marque's six long 6-pounders) and a quarter bill.\n"
-        "# Generated by tools/gen_ships.py; edit that script and rerun, do not edit this file.\n"
-        "# Units: metres, m2, kg, kN. Comments mark judgements.\n"
+        "# A letter of marque of Speedwell's draught (the owner's ask of 2026-10-25; kept by\n"
+        "# package 75 beside the Prince de Neufchatel), Kemp's Lynx of 1812 (Chapelle, The\n"
+        "# Baltimore Clipper, 1930, pp. 82-83), the hull, rig and company the topsail schooner's\n"
+        "# (topsail-schooner.yaml and its sources), with two fits (a long 12-pounder on a pivot\n"
+        "# and four carronades, the default; a letter of marque's six long 6-pounders) and a\n"
+        "# quarter bill. Generated by tools/gen_ships.py; edit that script and rerun, do not\n"
+        "# edit this file. Units: metres, m2, kg, kN. Comments mark judgements.\n"
         "# Her drawn hull, the profile: Lynx's draught, a stand-in for the type\n"
         "# (docs/design/ships-design/pages-chapelle-fig17.md; tools/ships/hull_schooner.py),\n"
         "# drawn only.\n",
     )
 
 
-def schooner_armament(b):
-    """PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the topsail
-    schooner's first fit, to test the armament's extensibility to a new hull through the
-    generator alone. A letter of marque's armament of about 1805: six long 6-pounders, three
-    a side, in the 2nd, 4th and 6th of Lynx's seven ports a side (Chapelle 1930, p. 82: seven
-    ports a side on the Admiralty's draught), and four half-pounder swivels on the rail. A
-    Baltimore letter of marque of Lynx's size shipped six or eight guns and about forty men,
-    a privateer twice the guns and three times the men (from memory, UNVERIFIED; the count
-    a judgement for the file's complement of forty). The pivot gun ('long Tom') the type is
-    known for is the default fit built below it (`pivot_gun`, the place `pivot` of
-    `GUN_PLACES`, the owner's loadout of 2026-10-25), with four carronades and the swivels;
-    this six-gun fit is the letter of marque's. Package 75 replaces both fits from the
-    type's own records (spec M7 §7, §27)."""
-    # Package 75 (SW-2; docs/design/Build-Ships.md §5.3, §5.4): each port gun on a triple of her
-    # upper deck, its x_m unmoved, its height the port's sill on Lynx's sill line, the lowest the
-    # plate's own 3 ft 1 in (the lead's ruling, 2026-10-31); a low-sided vessel whose lee ports shut
-    # at about 10 degrees of heel (shot.lee_port_shut's foot above the water). The pivot and the
-    # swivels on the rail at their own x's. All from her hull's own module.
-    from ships.hull_schooner import on_the_rail, port_sill, rail_z
+def letter_of_marque_fit(hull, provisional):
+    """The letter of marque of Lynx's draught, both schooner files' alike (package 75, SW-4;
+    Build-Ships.md §9.1, §9.5): Lynx herself in April 1813, 'the Lynx, 6 guns and 40 men'
+    (Chapelle 1930, p. 82, read (OCR) l. 4798; p. 98, 'the Mosquidobit and the Lynx only
+    carried six guns, though rated at twelve', l. 5223-5224), her calibre not given: six long
+    6-pounders, three a side, in the 2nd, 4th and 6th of her seven ports a side (the long 6 a
+    judgement, the Americans' preference for the long 6 and 9 being Chapelle's, p. 54), and
+    four half-pounder swivels on the rail (judgement). Each port gun on a triple of her upper
+    deck, its x_m unmoved, its height the port's sill on Lynx's sill line (SW-2); the swivels on
+    the rail at their own x's. `provisional` marks the swivels' judgement as the privateer's
+    file has carried it since the owner's ask of 2026-10-25. Returns (guns, magazine)."""
+    from ships.hull_schooner import on_the_rail, port_sill
 
-    hull = b.doc["hull"]
+    mark = "PROVISIONAL. " if provisional else ""
     guns = []
     for i, x in enumerate(spaced(8.4, -8.4, 3), start=1):
         guns += broadside_pair(
@@ -4837,9 +4974,10 @@ def schooner_armament(b):
             x,
             port_sill(hull, x),
             (
-                "PROVISIONAL (ahead of package 75). Six long 6-pounders, three a side, in the "
-                "2nd, 4th and 6th of the seven ports (Chapelle p. 82; the count a judgement): "
-                "the 7 ft gun of 20 cwt (from memory), six men to the pair."
+                "Six long 6-pounders, three a side, in the 2nd, 4th and 6th of the seven ports: "
+                "Lynx's six guns (Chapelle p. 82), the calibre a judgement (the Americans "
+                "preferred the long 6 and 9, p. 54); the 7 ft gun of 20 cwt (from memory, "
+                "UNVERIFIED), six men to the pair."
                 if i == 1
                 else None
             ),
@@ -4852,32 +4990,86 @@ def schooner_armament(b):
             4,
             [10.0, -10.0],
             0.0,
-            "PROVISIONAL. Four half-pounder swivels on the rail, two a side at the bow and the "
+            mark + "Four half-pounder swivels on the rail, two a side at the bow and the "
             "quarter (judgement; Falconer 1780, SWIVEL), a man each when a man is spare.",
             round_to=0.01,
         ),
     )
-    magazine = fit_magazine(guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+    return guns, fit_magazine(guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+
+
+# The pages as the held OCR has them (SW-4's reviews): the day in April 1813 on p. 81, the
+# Lynx's six guns and forty men on p. 82, her seven ports on p. 83.
+LETTER_OF_MARQUE_SOURCE = (
+    "Chapelle, The Baltimore Clipper, 1930, pp. 81-82 (Lynx, 6 guns and 40 men, April 1813), "
+    "p. 83 and the plates after it (her seven ports a side; her port sills); the calibre a "
+    "judgement (p. 54); the weights from memory"
+)
+LETTER_OF_MARQUE_NOTE = (
+    "A letter of marque's fit: Lynx's six guns, six long 6-pounders, and four swivels (judgement)."
+)
+
+
+def schooner_armament(b):
+    """The privateer schooner's two fits (the owner's ask of 2026-10-25; package 75, SW-4:
+    Build-Ships.md §9.2, §9.5): the long Tom, the owner's loadout, kept as the default, its
+    note citing the type, its arc from her own rig (`pivot_arc_from_rig`); and the letter of
+    marque re-cited to Lynx's six guns and forty men (`letter_of_marque_fit`). The pivot is the
+    owner's ruling, kept against Chapelle's lean for a schooner of her size: 'The pivot gun was
+    used mainly on gun-boats and on a few 1-gun privateer schooners. The larger vessels seldom
+    used it' (Chapelle 1930, p. 54, read (OCR) l. 2934-2935; the OCR's 'i-gun' read '1-gun'),
+    the long Tom more often on a broadside carriage shifted where needed (l. 2929-2933), and
+    none of the privateers of the larger class with a way to mount one above their high
+    bulwarks (p. 55, l. 2950-2952; Lynx 'has high bulwarks', p. 83, l. 4854, the OCR's
+    'hulwarks'); the pilot-boat
+    privateers of fifty to seventy-five feet 'usually fitted with one long gun, either a pivot
+    or a carriage gun', their 'chief dependence' their long Tom and boarders (p. 67, l.
+    3570-3574); Lynx's draught, had she carried her full rating, twelve or thirteen guns
+    'including a traversing piece' (p. 83, l. 4856-4859). The carronades, the swivels and the
+    bill's counts stay the judgements they were, marked PROVISIONAL."""
+    # SW-2 (docs/design/Build-Ships.md §5.3, §5.4): each port gun on a triple of her upper deck,
+    # its x_m unmoved, its height the port's sill on Lynx's sill line, the lowest the plate's own
+    # 3 ft 1 in (the lead's ruling, 2026-10-31); a low-sided vessel whose lee ports shut at about
+    # 10 degrees of heel. The pivot and the swivels on the rail at their own x's. All from her
+    # hull's own module.
+    from ships.hull_schooner import on_the_rail, port_sill, rail_z
+
+    hull = b.doc["hull"]
+    guns, magazine = letter_of_marque_fit(hull, provisional=True)
     # The long Tom (the owner's loadout, 2026-10-25): one long 12-pounder on a pivot
     # amidships between the masts (the fore at +7.8 m, the main at -2.6 m), firing over the
     # rail on either side, and four 12-pounder carronades, two a side, in the ports forward
     # of the fore mast and abaft the main, clear of the pivot's sweep; the swivels as above.
-    # The Baltimore privateers of 1812 carried a long 12, 18 or 24 on the pivot and a few
-    # carronades or long guns on the broadside (Chapelle 1930, from memory, UNVERIFIED; the
-    # long 12 a judgement for a hull of 224 tons).
+    # The pivot the owner's loadout (2026-10-25), against Chapelle's lean: a pivot on gun-boats
+    # and a few 1-gun privateer schooners, seldom on the larger (pp. 54-55); the pilot-boat
+    # privateers' one long gun a pivot or a carriage gun (p. 67); a traversing piece in Lynx's
+    # full rating (p. 83). The long 12 a judgement for a hull of 224 tons. Its arc from her rig
+    # (Build-Ships.md §9.2): `pivot_arc_from_rig`, its working in the generator's report.
+    arc, working = pivot_arc_from_rig(b, 2.6)
+    print(
+        "\n".join(f"privateer-schooner: the pivot's arc: {line}" for line in working),
+        file=sys.stderr,
+    )
     tom = pivot_gun(
         "long",
         12,
         LONG_GUN_CWT[12],
         2.6,
         rail_z(hull, 2.6),
-        (60.0, 140.0),
-        "PROVISIONAL (the owner's loadout, 2026-10-25). The long Tom: a long 12-pounder of "
-        "34 cwt (from memory) on a pivot amidships between the masts, firing over the rail to "
-        "either side; nine men by the gun's rule. Its arc from 60 to 140 degrees off the bow "
-        "(the owner's ruling of the day, from her rig: the fore topmast backstays at about 55 "
-        "to 60 degrees from the pivot, the main shrouds at about 140 to 150; "
-        "docs/design/Proposal-PivotGun.md §3).",
+        arc,
+        "The long Tom (the owner's loadout, 2026-10-25): a long 12-pounder of 34 cwt (from "
+        "memory, UNVERIFIED) on a pivot amidships between the masts, firing over the rail to "
+        "either side; the pivot the owner's ruling, against Chapelle's lean (a pivot on "
+        "gun-boats and a few 1-gun privateer schooners, seldom on the larger, pp. 54-55; the "
+        "pilot-boat privateers' one long gun a pivot or a carriage gun, p. 67; a traversing "
+        "piece in Lynx's full rating, p. 83); nine men by the gun's rule. Its arc from her "
+        "rig (Build-Ships.md §9.2): from the fore topmast backstays in the after end of the "
+        "fore channel (Steel 1794 vol. I pp. 199-200, 206) to the foremost main shroud in the "
+        "fore end of the main channel, each at the rail's half-breadth there, the channels "
+        "where Lynx's plate has them (Chapelle's plates after p. 83, measured: "
+        "docs/design/ships-design/pages-chapelle-fig17.md §5.10), five degrees each way for "
+        "the blast (judgement). The owner's ruling of 2026-10-25 had 60 to 140 from the same "
+        "rig by eye (docs/design/Proposal-PivotGun.md §3).",
         round_to=0.01,
     )
     for i, x in enumerate((10.5, -7.5), start=1):
@@ -4903,32 +5095,33 @@ def schooner_armament(b):
         tom, {"long": HIRED_ROUNDS, "carronade": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS}
     )
     b.armament(
-        "The armament (spec M7 7; package 70's shape): PROVISIONAL, the owner's ask of "
-        "2026-10-25 ahead of package 75, which gives the schooner her fits from the type's own "
-        "records. Two fits the scenario chooses between (ship: {fit: ...}): the long Tom on "
-        "its pivot with four carronades, the default, and a letter of marque's six long "
-        "6-pounders. Every figure's source is in tools/gen_ships.py; the weights are from "
-        "memory and UNVERIFIED against a page.",
+        "The armament (spec M7 7; package 70's shape): the owner's ask of 2026-10-25, its fits "
+        "from the type's own records by package 75 (Build-Ships.md §9.5). Two fits the "
+        "scenario chooses between (ship: {fit: ...}): the long Tom on its pivot with four "
+        "carronades, the default, the owner's loadout; and the letter of marque, Lynx's six "
+        "guns. Every figure's source is in tools/gen_ships.py; the weights are from memory and "
+        "UNVERIFIED against a page.",
         "long tom",
         [
             (
                 "long tom",
-                "Chapelle, The Baltimore Clipper, 1930 (the pivot gun of the Baltimore "
-                "privateers, from memory, UNVERIFIED); the owner's loadout of 2026-10-25; the "
-                "weights from memory",
+                "The owner's loadout of 2026-10-25, against the lean of Chapelle, The Baltimore "
+                "Clipper, 1930 (read: the pivot on a few 1-gun schooners, seldom on the larger, "
+                "the long Tom more often on a broadside carriage, pp. 54-55; the pilot-boat "
+                "privateers' one long gun a pivot or a carriage gun, p. 67; a traversing piece in "
+                "Lynx's full rating, p. 83); the carronades a judgement; the weights from memory",
                 tom,
                 tom_magazine,
-                "PROVISIONAL. A privateer's fit: a long 12-pounder on the pivot, four "
-                "12-pounder carronades and four swivels.",
+                "A privateer's fit, the owner's loadout: a long 12-pounder on the pivot, four "
+                "12-pounder carronades and four swivels (the carronades and the swivels "
+                "PROVISIONAL, judgement).",
             ),
             (
                 "letter of marque",
-                "Chapelle, The Baltimore Clipper, 1930, p. 82 (Lynx's seven ports a side) and "
-                "the plates after p. 83 (her port sills); the count of guns a judgement for a "
-                "letter of marque of forty men (UNVERIFIED from memory); the weights from memory",
+                LETTER_OF_MARQUE_SOURCE,
                 guns,
                 magazine,
-                "PROVISIONAL. A letter of marque's fit: six long 6-pounders and four swivels.",
+                LETTER_OF_MARQUE_NOTE,
             ),
         ],
     )
@@ -4965,6 +5158,134 @@ def schooner_armament(b):
             "boards almost whole)."
         ),
         filling=filling_party(tom),
+    )
+
+
+def topsail_schooner_armament(b):
+    """Speedwell's fits for the editor (package 75, SW-4; Build-Ships.md §9.1): the default
+    `unarmed`, so that she sails with no guns, no battery is made and every passage and
+    trial of the unarmed Speedwell sails as it did, unless a scenario names a fit. Two fits
+    from the type's records: Lynx's own as a letter of marque (`letter_of_marque_fit`), and
+    H.M. schooner Musquidobit's, the same Lynx taken into the Navy in 1813: eight 18-pounder
+    carronades and two 6-pounders, her company 50 (Winfield, British Warships in the Age of
+    Sail 1793-1817, p. 335, the owner's copy). The file's company is forty, the letter of
+    marque's; a fit cannot change it (`schema.FIT_KEYS`), so the naval fit is fought by forty,
+    said in its note. The bill: the privateer's trimmers, the same rig and company
+    (judgement), a man at the helm and one at the powder, the filling left to the reckoning
+    (`combat.filling`, from the fit she carries), the small arms and the boarders as the
+    privateer's."""
+    from ships.hull_schooner import port_sill
+
+    hull = b.doc["hull"]
+    marque, marque_magazine = letter_of_marque_fit(hull, provisional=False)
+    # Musquidobit's ten guns in five of her seven ports a side, on the file's existing triples,
+    # so no triple is new: +8.4, 0.0 and -7.5 the other fits' places, +4.81 the plate's own
+    # port 5, where no other gun stands, and the 6s at +10.5 the long Tom's carronades' place.
+    # The two long 6s in the foremost ports, the plate's 7th, the long guns forward where they
+    # chase (judgement); the eight carronades in the plate's ports 6, 5, 4 and 2 (numbered from
+    # aft, as pages-chapelle-fig17.md §6.3 and `hull_schooner.PORTS` number them), its 3rd
+    # beside the main mast and its 1st, aftmost, left empty (judgement); the 6-pounder's weight
+    # the letter of marque's, the 18-pounder carronade's the generator's table's (from memory,
+    # UNVERIFIED)
+    navy = broadside_pair(
+        1,
+        "long",
+        6,
+        LONG_GUN_CWT[6],
+        10.5,
+        port_sill(hull, 10.5),
+        "Musquidobit's two 6-pounders (Winfield 1793-1817 p. 335), long guns in the foremost "
+        "ports a side (judgement): the 7 ft gun of 20 cwt (from memory, UNVERIFIED), six men to "
+        "the pair.",
+        deck="upper",
+        round_to=0.01,
+    )
+    for i, x in enumerate((8.4, 4.81, 0.0, -7.5), start=2):
+        navy += broadside_pair(
+            i,
+            "carronade",
+            18,
+            CARRONADE_CWT[18],
+            x,
+            port_sill(hull, x),
+            (
+                "Musquidobit's eight 18-pounder carronades (Winfield 1793-1817 p. 335), four a "
+                "side abaft the long guns (the ports judgement): the 18-pounder of 10 cwt (from "
+                "memory, UNVERIFIED), four men to the pair."
+                if i == 2
+                else None
+            ),
+            deck="upper",
+            round_to=0.01,
+        )
+    navy_magazine = fit_magazine(
+        navy,
+        {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS},
+        exercise_charges=exercise_allowance(len(navy)),
+    )
+    b.armament(
+        "The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): "
+        "unarmed by default, as Speedwell has sailed since package 32, with two fits the "
+        "scenario may name (ship: {fit: ...}): Lynx's own as a letter of marque and "
+        "Musquidobit's as the Navy armed her. Every figure's source is in tools/gen_ships.py; "
+        "the weights are from memory and UNVERIFIED against a page.",
+        UNARMED,
+        [
+            (
+                "letter of marque",
+                LETTER_OF_MARQUE_SOURCE,
+                marque,
+                marque_magazine,
+                LETTER_OF_MARQUE_NOTE,
+            ),
+            (
+                "musquidobit 1813",
+                "Winfield, British Warships in the Age of Sail 1793-1817, p. 335 (H.M. schooner "
+                "Musquidobit, late the privateer Lynx, taken April 1813: eight 18-pounder "
+                "carronades and two 6-pounders, 50 men); the ports a judgement; the weights from "
+                "memory",
+                navy,
+                navy_magazine,
+                "The Navy's fit of her, ten guns: eight 18-pounder carronades and two long "
+                "6-pounders. Her naval company was 50 (Winfield p. 335); the file's is forty, "
+                "the letter of marque's, and a fit cannot change it, so forty fight her. "
+                "Chapelle p. 98 has the Mosquidobit and the Lynx carrying six guns, though rated "
+                "at twelve, as the privateer's list gives them; this fit is the Navy's arming of "
+                "her, Winfield p. 335.",
+            ),
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            (
+                "forecastle",
+                4,
+                "The trimmers: four of the forecastlemen for the head sails, as the privateer "
+                "of her draught has them (judgement).",
+            ),
+            ("fore_top", 3, "Three of the fore topmen for the fore braces and the topsail."),
+            ("afterguard", 4, "Four of the afterguard at the main sheet and the gaffs."),
+        ],
+        1,
+        1,
+        "sail before guns",
+        {
+            "helm": "One man at the tiller (a Baltimore schooner steered with a tiller; "
+            "judgement).",
+            "powder": "One of the waisters to pass the cartridges beside the idlers (judgement).",
+            "priority": PRIORITY_NOTE,
+        },
+        small_arms=8,
+        boarders=26,
+        small_arms_note=(
+            "Eight of her people with the stand of arms' muskets, as the privateer of her "
+            "draught (judgement after the King's cutter's six of thirty); she bears no marines."
+        ),
+        boarders_note=(
+            "Twenty-six boarders of her forty with cutlass and pistol, as the privateer of her "
+            "draught (judgement after the King's cutter's twenty of thirty)."
+        ),
     )
 
 
@@ -5184,7 +5505,11 @@ def frigate_crew(b):
                 ("stations", "marines"),
                 40,
                 "Marines: judgement (spec M3 2.3), a sergeant's party for a frigate; they "
-                "stand watch and work as afterguard, never aloft (Luce 1884 ch. XX).",
+                "stand watch and work as afterguard, never aloft (Luce 1884 ch. XX). The "
+                "nearest print (package 75, Build-Ships.md §9.4): a lieutenant and 50 marines "
+                "embarked for the Doris, 44, at Plymouth on 16 March 1803 (Naval Chronicle vol. "
+                "IX p. 245, the Plymouth report; docs/design/Research-74-2026-10.md §4.4); the "
+                "40 kept.",
             ),
             (
                 ("stations", "idlers"),
@@ -6302,6 +6627,59 @@ def cutter(out_dir="data/ships"):
     from ships import hull_cutter
 
     hull_cutter.add_to(b, hull_profile, hull_form)
+    # Her descriptions at far detail in her own file (package 75, SW-4; Build-Ships.md §8.1,
+    # §8.2): the King's cutter, the index's words since package 36, and the three sub-types of
+    # her hull and rig the table adds, each with its fit and roles. The three new rows' glass
+    # words (`what`) are left to the index, which no design has yet given them.
+    left_to_the_index = (
+        " What the glass makes her out is the index's (world/ships.py), its words not yet settled."
+    )
+    b.descriptions(
+        [
+            (
+                "cutter",
+                "a cutter",
+                "a cutter",
+                "Sherbourne's hull as the King's cutter of the war: the tops make her out a "
+                "cutter, one mast and a long running bowsprit, and so does the glass (spec M5 "
+                "§25; judgement on the words). Her fit her file's default, the Admiralty's "
+                "carronades; her roles a King's cruiser's (Build-Ships.md §8.2).",
+                "carronades",
+                ["cruiser", "kings-ship"],
+            ),
+            (
+                "revenue cutter",
+                "a cutter",
+                None,
+                "The Customs' cutter of the Channel, as Sherbourne herself served from 1763 to "
+                "1779 (docs/design/VesselCandidates.md), with her own guns as built, the fit "
+                "'long guns' (the kit's manual: six 3-pounders and eight swivels); the revenue "
+                "role (Build-Ships.md §8.2, §8.3)." + left_to_the_index,
+                "long guns",
+                ["revenue"],
+            ),
+            (
+                "hired armed cutter",
+                "a cutter",
+                None,
+                "A cutter hired to the Admiralty for the war with her own master and men: the "
+                "hired cutters' long guns, Sherbourne's as built (the kit's manual); a "
+                "cruiser's role (Build-Ships.md §8.2)." + left_to_the_index,
+                "long guns",
+                ["cruiser"],
+            ),
+            (
+                "coasting cutter",
+                "a cutter",
+                None,
+                "A trader of the cutter's rig and size carrying no guns, where a trader "
+                "described 'cutter' had carried the King's carronades (Build-Ships.md §8.2, "
+                "§8.4); a merchant's role." + left_to_the_index,
+                "unarmed",
+                ["merchant"],
+            ),
+        ]
+    )
     b.dump(
         os.path.join(out_dir, "cutter.yaml"),
         "# The cutter: Sherbourne, H.M. armed cutter of 1763 (Slade; Woolwich), the Channel's\n"
@@ -6536,8 +6914,10 @@ def brig(out_dir="data/ships", merchant=False):
         "H.M. brig-sloop Harpy of the Diligence class (launched 1796, sold 1817): 316 tons "
         "burthen, 95 ft on the gun deck, 75 ft 1 5/8 in on the keel, 28 ft 1 1/2 in beam, "
         "12 ft 0 1/2 in in the hold; sixteen 32-pounder carronades and two 6-pounder chase "
-        "guns (the armament below, package 70). The Navy's brig; the merchant brig is "
-        "her second description at far detail (package 36). Hull's figures from the kit's "
+        "guns (the armament below, package 70). The Navy's brig; the merchant brig's words are "
+        "kept beside hers (package 36; the shared design's §4.4), the description sailing her "
+        "own file, merchant-brig.yaml, since package 75 (Build-Ships.md §8.4). Hull's figures "
+        "from the kit's "
         "manual and Winfield p. 256, her lines as drawn from the class's draughts, ZAZ4491 and "
         "ZAZ4492 (tools/ships/hull_brig.py); spars by Fincham 1843's table of "
         "proportions for brigs of war (p. 88) checked against Luce 1866 ch. VII; sails by "
@@ -7323,14 +7703,24 @@ def brig(out_dir="data/ships", merchant=False):
     # the tops make out at four miles is the rig, two square-rigged masts (Falconer 1780,
     # BRIG: "a merchant-ship with two masts"; Steel 1794 vol. I: the brig's sails as a
     # ship's fore and main), and what she is when made out within a mile and a half.
+    # Package 75 (SW-4; Build-Ships.md §8.2): the brig-sloop's fit and roles; her ports ten a
+    # side as her class's sheet has them (RMG ZAZ4491, read), where the words had sixteen.
+    # The merchant brig's words stay here as they were (the shared design's §4.4: the pair
+    # kept), with no fit or role: the description sails merchant-brig.yaml by the lead's
+    # ruling (§8.4), which carries them.
     b.descriptions(
         [
             (
                 "brig-sloop",
                 "a brig",
-                "a brig-sloop of war, sixteen ports a side",
+                "a brig-sloop of war, ten ports a side",
                 "Harpy herself: sixteen 32-pounder carronades (the kit's manual; "
-                "docs/design/VesselCandidates.md); the ports are what the glass counts.",
+                "docs/design/VesselCandidates.md); the ports are what the glass counts, ten a "
+                "side on her class's sheet (RMG ZAZ4491, read: "
+                "docs/design/ships-design/pages-zaz4491.md). Her fit her file's default; her "
+                "roles a King's cruiser's (Build-Ships.md §8.2).",
+                "diligence class 1796",
+                ["cruiser", "kings-ship", "commodore"],
             ),
             (
                 "merchant brig",
@@ -7406,6 +7796,11 @@ def merchant_brig(b, out_dir, burthen, gundeck_ft):
             ],
         ),
     )
+    # Package 75 (SW-4; Build-Ships.md §8.2, §8.4 as the lead ruled it): the description
+    # sails this file, her own sixteen men and four 6-pounders, its fit her default; her roles
+    # the merchant's, the packet's and the armed Indiaman's. A packet's own company (about 28,
+    # from memory, UNVERIFIED) is no fit's to give, so the packet's own description waits for
+    # her own hull (the lead's ruling).
     b.descriptions(
         [
             (
@@ -7413,7 +7808,11 @@ def merchant_brig(b, out_dir, burthen, gundeck_ft):
                 "a brig",
                 "a merchant brig, deep laden",
                 "The trade's brig, her ports painted and no guns run out (Falconer 1780, "
-                "BRIG); 'deep laden' is the merchantman's look, judgement.",
+                "BRIG); 'deep laden' is the merchantman's look, judgement. Her fit her file's "
+                "default; her roles a merchant's, a packet's and an armed Indiaman's "
+                "(Build-Ships.md §8.2, §8.3).",
+                "merchant",
+                ["merchant", "packet", "indiaman"],
             ),
         ]
     )
@@ -7568,7 +7967,11 @@ def brig_crew(b):
                 ("stations", "marines"),
                 20,
                 "Marines: 20, judgement, a sergeant's party for a sloop (a brig-sloop of the "
-                "class carried about twenty); they work as afterguard, never aloft.",
+                "class carried about twenty); they work as afterguard, never aloft. The nearest "
+                "print is a frigate's (package 75, Build-Ships.md §9.4): a lieutenant and 50 "
+                "for the Doris, 44, in March 1803 (Naval Chronicle vol. IX p. 245; "
+                "docs/design/Research-74-2026-10.md §4.4); none for a sloop was found, the 20 "
+                "kept.",
             ),
             (("stations", "idlers"), 17, "Idlers: the trades below."),
             (
@@ -8298,11 +8701,27 @@ def lugger(out_dir="data/ships"):
                 "L'Éclair's hull (RMG ZAZ6306) as the Breton and Norman coaster, fisherman or "
                 "privateer of the war (Forfait 1788 pp. 52 to 55; spec M6 §19; judgement on the "
                 "words).",
-            )
+                # package 75 (SW-4; Build-Ships.md §8.2): unarmed, her default; the
+                # fisherman's and the coaster's roles
+                "unarmed",
+                ["fisherman", "merchant"],
+            ),
+            (
+                "privateer lugger",
+                "a lugger",
+                None,
+                "The lugger as the privateer of the war, with Éclair's own guns (the fit "
+                "'gun lugger 1795'); a privateer's role (Build-Ships.md §8.2, §9.1). What the "
+                "glass makes her out is the index's (world/ships.py), its words not yet "
+                "settled.",
+                "gun lugger 1795",
+                ["privateer"],
+            ),
         ]
     )
     ground_tackle_for(b, burthen, beam_ft, draught_ft)
     lugger_crew(b)
+    lugger_armament(b)
     hold_for(b, burthen, False, "a chasse-marée, a coaster deep in the hold: judgement")
     b.pumps(PUMPS_NOTE, pump_entries(0, 1, ["the pump"]))
     b.boats(
@@ -9046,6 +9465,10 @@ def smack(out_dir="data/ships"):
                 "a fishing smack, her well amidships",
                 "The Culloden smack's hull (Charnock vol. III p. 274) as the fisherman of the "
                 "Channel's grounds (spec M6 §19; judgement on the words).",
+                # package 75 (SW-4; Build-Ships.md §8.2): unarmed, her default; the
+                # fisherman's role
+                "unarmed",
+                ["fisherman"],
             )
         ]
     )
@@ -9121,6 +9544,15 @@ def smack(out_dir="data/ships"):
     from ships import hull_smack
 
     hull_smack.add_her_lines(b.doc["hull"], b.hull_notes)
+    # her guns over the rail her lines draw (package 75, SW-4), the armament after the crew as
+    # in every armed file
+    smack_armament(b)
+    doc, b.doc = b.doc, {}
+    armament = doc.pop("armament")
+    for key, value in doc.items():
+        b.doc[key] = value
+        if key == "crew":
+            b.doc["armament"] = armament
     b.dump(
         os.path.join(out_dir, "smack.yaml"),
         "# The smack: Culloden, the Navy's smack of 1746 (B. Slade, Plymouth), 35 tons, 43 ft on\n"
@@ -9135,6 +9567,165 @@ def smack(out_dir="data/ships"):
         "# Her drawn hull, the profile: Chapman 1768 Pl. LIX No. 3, a stand-in for the type\n"
         "# (docs/design/ships-design/pages-chapman-pl59.md; tools/ships/hull_smack.py), drawn\n"
         "# only.\n",
+    )
+
+
+def rail_guns(guns_at, kind, pounder, cwt, rail_m, note):
+    """Guns that fire over the rail where her sheet draws no port (package 75, SW-4;
+    Build-Ships.md §9.1): each (number, side, x_m) a gun of `place: rail`, its height the rail's
+    at its x (`rail_m`, the profile's), its crew by the gun's rule; the note on the first. A
+    rail gun stands on no triple (truth 7-185 reads the port places alone) and no port shuts it
+    (`combat.ports.PORT_PLACES`)."""
+    from freesail.ship.profile import interp
+
+    out = []
+    for i, (number, side, x) in enumerate(guns_at):
+        g = {
+            "id": f"rail.{number}.{side}",
+            "kind": kind,
+            "pounder": pounder,
+            "place": "rail",
+            "number": number,
+            "side": side,
+            "x_m": round(x, 2),
+            "height_m": round(interp(rail_m, x), 2),
+            "crew": gun_crew(kind, cwt),
+            "weight_cwt": cwt,
+        }
+        out.append((g, note if i == 0 else None))
+    return out
+
+
+def lugger_armament(b):
+    """L'Éclair's guns for the editor (package 75, SW-4; Build-Ships.md §9.1): the default
+    `unarmed`, as she has sailed since package 43b, and one fit, 'gun lugger 1795', her own
+    three guns as taken in 1795 (RMG ZAZ6306, the caption 'Carrying No. 3 - 18 Pounder Guns',
+    read; the calibre's second digit read as an 8, probable, a 10-pounder being no calibre of
+    either service: docs/design/ships-design/pages-zaz6306.md §2.1). Her sheet draws no port,
+    slide or carriage (§5.4, §6.4: as built, no ports, by the lead's ruling of 2026-10-31), so
+    the three are long guns firing over the waist's rail, the note's pick (§6.4); where each
+    stood no sheet says: two forward of the main mast, one a side, and the third abaft it to
+    starboard, numbered a side from forward as the swivels are (judgement). The bill: her
+    stations, judgement."""
+    rail_m = b.doc["hull"]["profile"]["rail_m"]
+    guns = rail_guns(
+        [(1, "starboard", 2.4), (1, "larboard", 2.4), (2, "starboard", -2.17)],
+        "long",
+        18,
+        LONG_GUN_CWT[18],
+        rail_m,
+        "Éclair's three 18-pounders (RMG ZAZ6306's caption, read, the 8 probable), long guns "
+        "over the waist's rail, her sheet drawing no port (judgement on the places: a pair "
+        "forward of the main mast, the third abaft it to starboard); the gun of 42 cwt "
+        "(from memory, UNVERIFIED), ten men to a gun by the gun's rule.",
+    )
+    b.armament(
+        "The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): "
+        "unarmed by default, the coaster and the fisherman, with one fit the scenario may name "
+        "(ship: {fit: ...}): her own three guns as the gun lugger taken in 1795. Every "
+        "figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED "
+        "against a page.",
+        UNARMED,
+        [
+            (
+                "gun lugger 1795",
+                "RMG ZAZ6306, the caption (read: three 18-pounders, the calibre's second digit "
+                "probable); the places over the rail a judgement; the weights from memory",
+                guns,
+                fit_magazine(guns, {"long": HIRED_ROUNDS}),
+                "The gun lugger's fit: three long 18-pounders over the rail. Ten men to each by "
+                "the gun's rule, thirty in all against her company of thirty (judgement both): "
+                "short-handed at quarters, as the log will say.",
+            ),
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            (
+                "forecastle",
+                2,
+                "The trimmers: two of the forecastlemen at the fore lug's tack and halyard and "
+                "the jib (judgement).",
+            ),
+            ("afterguard", 2, "Two of the afterguard at the main and mizen lugs' sheets."),
+        ],
+        1,
+        1,
+        "sail before guns",
+        {
+            "helm": "One man at the tiller (a lugger steers with a tiller; judgement).",
+            "powder": "One of the waisters to pass the cartridges beside the idlers (judgement).",
+            "priority": PRIORITY_NOTE,
+        },
+        small_arms=6,
+        boarders=20,
+        small_arms_note=(
+            "Six of her people with the stand of arms' muskets (judgement: the King's cutter's "
+            "six of thirty, her company being thirty); she bears no marines."
+        ),
+        boarders_note=(
+            "Twenty of her thirty with cutlass and pistol (judgement: the King's cutter's "
+            "twenty of thirty; a privateer's company boards almost whole)."
+        ),
+    )
+
+
+def smack_armament(b):
+    """The Culloden smack's guns for the editor (package 75, SW-4; Build-Ships.md §9.1): the
+    default `unarmed`, the fisherman as she has sailed since package 43b, and one fit,
+    'culloden 1746', her two guns as the Navy's smack of 1746 carried them (Charnock 1802 vol.
+    III p. 274: 35 tons, 8 men, 2 guns, read from the page image by 43b). Charnock gives no
+    calibre: the smallest long gun of the generator's table, a long 3-pounder (judgement). Her
+    plate and table draw no port and the file's profile has none, so the two fire over the rail,
+    one a side abaft the mast and the well (judgement). The bill: judgement for eight men."""
+    rail_m = b.doc["hull"]["profile"]["rail_m"]
+    guns = rail_guns(
+        [(1, "starboard", -2.91), (1, "larboard", -2.91)],
+        "long",
+        3,
+        LONG_GUN_CWT[3],
+        rail_m,
+        "Culloden's two guns (Charnock vol. III p. 274), their calibre not given: long "
+        "3-pounders, the smallest of the table (judgement), one a side over the rail abaft "
+        "the mast and the well (judgement); the gun of 7 cwt (from memory, UNVERIFIED), three "
+        "men to a gun by the gun's rule.",
+    )
+    b.armament(
+        "The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): "
+        "unarmed by default, the fisherman, with one fit the scenario may name (ship: {fit: "
+        "...}): the Navy's smack Culloden of 1746 and her two guns. Every figure's source is in "
+        "tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.",
+        UNARMED,
+        [
+            (
+                "culloden 1746",
+                "Charnock 1802 vol. III p. 274 (Culloden, 2 guns, 8 men); the calibre and the "
+                "places a judgement; the weights from memory",
+                guns,
+                fit_magazine(guns, {"long": KINGS_ROUNDS}),
+                "The Navy's smack's fit: two long 3-pounders over the rail.",
+            ),
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [],
+        1,
+        0,
+        "sail before guns",
+        {
+            "helm": "One man at the tiller (judgement).",
+            "powder": "None beyond the cook, an idler, who passes the cartridges (judgement: "
+            "eight men, six of them wanted at her two guns).",
+            "priority": PRIORITY_NOTE,
+        },
+        small_arms=0,
+        boarders=0,
+        small_arms_note=(
+            "None: her eight work the vessel and her two guns (judgement); she bears no marines."
+        ),
+        boarders_note="None: a smack of eight boards no one (judgement).",
     )
 
 

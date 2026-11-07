@@ -93,8 +93,10 @@ def test_a_pivot_bears_over_either_side_once_trained_and_never_ahead_or_astern(s
     for ahead in (0.0, 15.0, -170.0):  # the fore rigging, the main and the boom in the way
         g.train_deg = ahead
         assert not b.bears(g, math.radians(ahead))
-    # the owner's arc of 2026-10-25: sixty to a hundred and forty off the bow, either side
-    for deg, bears in ((55.0, False), (61.0, True), (139.0, True), (145.0, False)):
+    # her arc from her rig (package 75, SW-4; Build-Ships.md §9.2): 62 to 141 off the bow, either
+    # side, where the owner's arc of 2026-10-25 by eye was sixty to a hundred and forty; old beside
+    # new, 61 bore and bears no longer, 63 bears (tests/test_subtypes.py holds the reckoning)
+    for deg, bears in ((55.0, False), (61.0, False), (63.0, True), (139.0, True), (145.0, False)):
         for sign in (1.0, -1.0):
             g.train_deg = sign * deg
             assert b.bears(g, math.radians(sign * deg)) is bears, (sign * deg, bears)
@@ -176,12 +178,13 @@ def test_a_pivot_gun_with_a_side_is_refused_at_the_load():
 
 def test_each_pivot_bears_through_its_own_arc_from_its_ship_file(ship):
     """Package 86 (the review of the owner's local work, section 3): the arc is the gun's,
-    read from its ship file, so another ship's pivot need not inherit the schooner's sixty
-    to a hundred and forty; a gun with none (or pickled before it) takes the default."""
+    read from its ship file, so another ship's pivot need not inherit the schooner's arc; a gun
+    with none (or pickled before it) takes the default. Package 75, SW-4: her arc reckoned from
+    her rig (Build-Ships.md §9.2), old (60.0, 140.0), the owner's by eye, new (62.0, 141.0)."""
     from freesail.orders.gunnery import _guns_bearing
 
     g = _pivot(ship)
-    assert g.arc_deg == (60.0, 140.0) and G.pivot_arc(g) == (60.0, 140.0)
+    assert g.arc_deg == (62.0, 141.0) and G.pivot_arc(g) == (62.0, 141.0)
     b = G.Battery(ship)
     g.arc_deg = (40.0, 120.0)  # a pivot clear of the fore rigging further forward
     for deg, bears in ((45.0, True), (125.0, False)):
