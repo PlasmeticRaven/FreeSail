@@ -19097,6 +19097,16 @@ in her port's road already.
 
 step's tree**: below, at the step's boundary.
 
+**The trunk merged at the boundary** (1c378de at eff2a55 and 3d1fa25 at 9b821fb, merge commits:
+81's viewer action, 76 whole with the flags of command, B3.4, the api package loading its readings
+first, the records; the meetings the tuning notes' appended sections, kept both in order). 75's
+sub-type rules met the cartel's row in the ship descriptions' index (`ships.DESCRIPTIONS`): every
+row is now a file's own description with its fit and roles, and a shared file's first row names
+her kind for the player's shadow, so the cartel's row (brig.yaml, "a cartel") failed `test_subtypes`
+twice (no fit; the brig's file's first row). She has no row of her own now: the cartel sails as a
+merchant brig of her own file (sixteen men, her ports painted) with the role `cartel` and `what`
+said on her, "a cartel", under her flag of truce. Nothing else met; the captive's scenes hold.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
