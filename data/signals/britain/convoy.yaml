@@ -1,15 +1,20 @@
-# FreeSail: the British instructions to merchantmen under convoy (spec M7 §3; package 71;
-# docs/design/Design-Signals.md). The Admiralty's *Signals and Instructions for Ships under
-# Convoy*, a short book of its own given to the masters, who never saw the fleet's book:
-# the meanings from memory of its form (make sail, shorten sail, tack, wear, close round the
-# commodore, the enemy in sight, anchor, the convoy to disperse, a ship to come within hail,
-# the lights by night), the numbers and hoists MADE. A merchantman under a commodore's orders
-# reads this book and no other; the commodore's ship reads both. Package 76 builds it out.
+# FreeSail: the British instructions to merchantmen under convoy (spec M7 §3; package 71,
+# built out by package 76; docs/design/Design-Signals.md). The Admiralty's *Signals and
+# Instructions for Ships under Convoy*, a short book of its own given to the masters, who
+# never saw the fleet's book. Its edition of the 1790s and 1800s was looked for and not found
+# (docs/dev/TuningNotes.md, "Package 76"; asked of the owner's shelf): the oldest printed
+# convoy signals found are Millan's engraved *Signals for the Royal Navy and Ships under
+# Convoy* of 1748, whose plates give the form (a flag or pendant at a named place, the ensign
+# staff, a topmast head or the crosstrees, with or without a gun) but whose numbers are of the
+# old system and not the numerary; the 1796 fleet book carries the fleet's signals about a
+# convoy (to make sail on a stated course, to disperse, to keep within limits, to stay by it)
+# and not the masters'. So the meanings below are the masters' book's as the period's orders
+# give them, and every number and hoist is MADE, as 71 made them: no page found gives one.
 #
 # The form is the numerary's (number, meaning, also, does, in_succession, qualifiers,
 # source, made); the hoists are flags over a pendant by the convoy book's custom.
 
-source: "Signals and Instructions for Ships under Convoy (the Admiralty's; the form from memory, the numbers and hoists made)"
+source: "Signals and Instructions for Ships under Convoy (the Admiralty's; its period edition not found; the form after Millan 1748 and the 1796 fleet book; the numbers and hoists made)"
 made: true
 
 entries:

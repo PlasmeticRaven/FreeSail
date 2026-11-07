@@ -194,6 +194,9 @@ class Books:
     private_form: dict[str, Any]
     carried_by: tuple[str, ...]
     answer_wait_s: int
+    # the dictionary's words by every form its printed entries give ('Expect-ed-ing-ation':
+    # expect, expected, expecting, expectation), to the entry's number (package 76)
+    forms: dict[str, int] = field(default_factory=dict)
 
     # -- finding an entry --------------------------------------------------------------
 
@@ -244,7 +247,7 @@ class Books:
                 f"the {self.nation} book has no telegraphic dictionary; a signal is made by its "
                 "meaning from the numerary ('make the signal to chase')"
             )
-        by_word = {w.lower(): n for n, w in self.words.items()}
+        by_word = self.forms or word_forms(self.words)
         out: list[tuple[int, str]] = []
         for raw in re.findall(r"[A-Za-z']+", sentence):
             w = raw.lower().replace("'", "")
@@ -275,6 +278,58 @@ def _norm(words: str) -> str:
             s = s[len(lead) :]
             break
     return s.strip(" :,")
+
+
+def _entry_forms(entry: str) -> tuple[list[str], list[str]]:
+    """A printed entry of Popham's vocabulary as its words: the heads (each word before a
+    hyphen, the alternatives a comma parts: 'Man, men') and the forms its endings make
+    ('Expect-ed-ing-ation': expected, expecting, expectation; 'Ever-y-thing-where': every,
+    everything, everywhere; 'Copy-ies-ied-ing': copies, copied, copying). The endings are
+    the book's; the joining by the common rules (a final e dropped before a vowel, a final y
+    turned to i) is the loader's. A head stands for its number and person too ('expects' is
+    Expect's hoist, 269 on 21 October 1805): Popham, p. 7, "In verbs, the number, person,
+    tense, and mood, must be applied to the sense of the sentence"."""
+    heads: list[str] = []
+    forms: list[str] = []
+    for alt in str(entry).split(","):
+        parts = [p.strip().lower().replace("'", "") for p in alt.strip().split("-")]
+        parts = [p for p in parts if p and p.isalpha()]
+        if not parts:
+            continue
+        base = parts[0]
+        heads.append(base)
+        plural_y = base.endswith("y") and base[-2:-1] not in "aeiou"
+        forms.append(base[:-1] + "ies" if plural_y else base + "s")
+        if base.endswith(("s", "sh", "ch", "x", "o")):
+            forms.append(base + "es")
+        prev = base
+        for end in parts[1:]:
+            made = []
+            for stem in dict.fromkeys((base, prev)):
+                if stem.endswith("e") and end[0] in "aeiou":
+                    made.append(stem[:-1] + end)
+                if stem.endswith("y") and end[0] == "i":
+                    made.append(stem[:-1] + end)
+                made.append(stem + end)
+            forms.extend(made)
+            if len(end) <= 2 and end in ("y", "s", "d", "r", "n", "t", "ly", "al"):
+                prev = made[-1]
+    return heads, forms
+
+
+def word_forms(words: dict[int, str]) -> dict[str, int]:
+    """Every word the dictionary's entries give, to its number: the heads first, then the
+    forms the endings make where no head has the word already."""
+    out: dict[str, int] = {}
+    derived: list[tuple[str, int]] = []
+    for n in sorted(words):
+        heads, forms = _entry_forms(words[n])
+        for h in heads:
+            out.setdefault(h, n)
+        derived.extend((f, n) for f in forms)
+    for f, n in derived:
+        out.setdefault(f, n)
+    return out
 
 
 _COMPASS = re.compile(
@@ -384,6 +439,7 @@ def load_books(root: str = "basic", base: str | None = None) -> Books:
         private_form=dict(private),
         carried_by=tuple(str(r) for r in (private.get("carried_by") or _ROLES_WITH_TABLE)),
         answer_wait_s=int(private.get("answer_wait_s", 300)),
+        forms=word_forms(words),
     )
 
 

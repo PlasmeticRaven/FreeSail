@@ -8792,7 +8792,12 @@ def test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag():
     _guns_ready(w)
     w.run(10)
     said = w.submit("make the signal to heave to")
-    assert said.kind == "signal.made" and "by gun: four guns, bring to" in said.text
+    # the fog book is the 1796 book's from the page (package 76): No. 14, "To lie to on the
+    # starboard tack", six guns slow and two quick; 71's made hoist was "four guns, bring to"
+    assert said.kind == "signal.made" and (
+        "by gun: six guns slow, and two minutes after two quick, to lie to on the starboard tack"
+        in said.text
+    )
     assert [e for e in w.log if e.kind == "signal.made"].__len__() == 1  # told once
     for _ in range(8):
         w.run(60)
@@ -8800,9 +8805,11 @@ def test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag():
     assert near is not None, "a sail two miles off is a near body (CREWED_NM)"
     kinds = [(e.kind, e.text) for e in near.log]
     heard = [t for k, t in kinds if k == "signal.read"]
-    assert heard and "fires four guns: bring to" in heard[0], kinds[-12:]
+    assert (
+        heard and "fires six guns slow, and two minutes after two quick: to lie to" in heard[0]
+    ), kinds[-12:]
     assert any(k == "signal.ordered" and "answering pendant" in t for k, t in kinds), kinds[-12:]
-    assert any("heaving to (the signal from the ship: Bring to)" in t for _, t in kinds), kinds[
+    assert any("heaving to (the signal from the ship: To lie to" in t for _, t in kinds), kinds[
         -12:
     ]
     assert any(k == "ship.hove_to" for k, _ in kinds), kinds[-12:]
