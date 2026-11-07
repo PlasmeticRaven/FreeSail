@@ -3493,6 +3493,18 @@ shape allows it. The books are built out from the six files and never before the
 shape is 71's and this package fills it; the engine's hoist, its reading and the `does` of a commanded captain are
 71's and 72's and not changed here.
 
+**The research phase (the owner, 2026-11-07, for this package and 81).** The builder is an
+independent session and may conduct a deep research phase in the package's domain to
+supplement what is filed in the repository (`docs/references/`, the design notes, the
+tuning notes): the period's texts fetched through the proxy as step 0 has it, the
+secondary literature read and cited, and **direct questions to the owner's own references
+(Winfield and the rest of his shelf) put to the owner through the lead** in the step's
+report, the owner's answers relayed as figures with their citation and never as copied
+text (Winfield's text is never copied into the tree; a period text out of copyright may
+be laid whole). The research plan is part of step 0's report, and **the lead approves the
+plan and the pass before step 1 goes on**; a question for the owner that would hold the
+work is said so, and the builder goes on with what does not wait for it.
+
 0. **The research pass (step 0, its own commit and push, reported at its boundary).** The
    period's signal books, found, fetched through the proxy, their licences read, and laid
    under `docs/references/signals/` as 79b and 79c laid the pilots (the page images where
@@ -3625,6 +3637,21 @@ added continuously, so 81 establishes a procedure, not a picture.** Every gun of
 hull is drawn by one rule from the data the ship file already carries, a new ship is drawn
 at the same standard by passing the same checker with no change of code, and the ship's
 builder knows from one checklist what her file must give.
+
+**The research phase (the owner, 2026-11-07, for this package and 76).** The builder is an
+independent session and may conduct a deep research phase in the package's domain to
+supplement what is filed in the repository (the gun tables and the carriages' and slides'
+figures by pattern and pounder, the run-out and the recoil, the smoke of black powder, the
+ports' lids and their furniture; `docs/references/`, the ships-design notes, Build-Ships.md):
+the period's and the standard texts fetched through the proxy where they are out of
+copyright, the secondary literature read and cited, and **direct questions to the owner's
+own references (Winfield, Lavery's *Arming and Fitting*, Caruana and the rest of his
+shelf) put to the owner through the lead** in the design's report, the owner's answers
+relayed as figures with their citation and never as copied text (Winfield's text is never
+copied into the tree). The research plan is part of the design note of item 1, and **the
+lead approves the design and the plan before the drawing is touched**; a question for the
+owner that would hold the work is said so, and the builder goes on with what does not wait
+for it.
 
 1. **The standard, written first** (`docs/design/Design-ViewerAction.md`, pushed and
    reported before the drawing is touched; the lead rules on it). (a) The data contract: a
