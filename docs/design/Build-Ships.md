@@ -2090,6 +2090,7 @@ which holds her spars.
 | The kept saves (`tests/fixtures/saves/`) | loaded by the fast tier at every step |
 | 84's later steps merged under the package | the fresh merge before each stage; new code reads only the names the Hull keeps; `World.__setstate__` (`core/world.py:861-`) is 84's |
 | A `HullProfile` pickled before stage 0H | the eight shape fields are plain class defaults, left out of the pickle while empty (`HullProfile.__getstate__`, 0H), so a profile without them pickles as before and an old one reads the defaults |
+| A `Scenario` pickled before the *Neufchatel*'s stage 0b | `nations` a plain class default (`None`), left out of the pickled state and of the save's dict while `None` (`Scenario.__getstate__`, `to_dict`), so an old one reads `None` and pickles and saves as before (measured at the reviews of 2026-11-07: seven saves made at c3d46cca and the three kept fixtures, by the checkpoint road and the replay road) |
 
 ### 16.3 Pace
 

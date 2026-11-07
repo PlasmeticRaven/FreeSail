@@ -7,7 +7,10 @@ the crews of `gen_ships.gun_crew`, a judgement reading of Douglas). Adye's 18-po
 (9 cwt) and 9-pounder (24 1/2) differ from the shared tables' 10 and 26, from memory, which
 feed the eight files: so the new ships read this one sourced table and no figure of the eight
 moves (Design-Ship-Indefatigable.md §5.3). After stage 0 the builder of each ship's window may
-append to it, and changes no figure another ship reads.
+append to it, and changes no figure another ship reads. Since SW-4's words step (2026-11-07) one
+figure of the eight reads this table too: the topsail schooner's Musquidobit fit's 18-pounder
+carronades, `ADYE_CARRONADE_CWT[18]`, 9 cwt in place of the shared table's 10, no source giving
+the 10 (docs/dev/TuningNotes.md, "The words step").
 
 Marks as the research notes give them: read, the page or its image; read (OCR), the OCR text
 under docs/references/ only; judgement.
