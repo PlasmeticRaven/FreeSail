@@ -364,7 +364,8 @@ TRIAL_TRADE_STRANGER_DIGEST = (
     # "sixteen", the word served from brig.yaml's own descriptions; the one word put back gives
     # the old digest again, the states, the anchored ticks and the lines unmoved (the lead, on
     # the build machine, 2026-11-07)
-    "5e7bdba2a4f4770b"  # package 75 SW-4 (bf059c3211b7cc9c at 88; 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
+    "5e7bdba2a4f4770b"  # package 75 SW-4 (bf059c3211b7cc9c at 88; 02313d83240a11d5 at 84 step 6;
+    # 11b8a45bdc8c935a at 73)
 )
 
 
