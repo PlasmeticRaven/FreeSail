@@ -1141,3 +1141,47 @@ place, the court's name and days, the shares' rows.
    for the cartel's fit through `tools/gen_ships.py` with its source, which is 75's road: **the lead
    rules** whether the merchant brig's file may gain the fit now or the cartel sails with the
    merchant's fit and the one gun is words until 75 closes; the design takes the words).
+
+## As built (the postscripts, step by step)
+
+### Step 0: the lead's rulings on §12 (2026-11-07)
+
+The note read whole and approved as the design, with these rulings, each taken into the steps:
+(1) the muster swap as designed, the keepers' audit the step's first job, a report before building
+further if the caches are more than a handful or one cannot be re-pointed; (2) the captive's own
+station stood down, as designed; (3) the 1805 scheme of the eighths with 1808's beside it, the head
+money, the hull's price a ton, the agent's share, the court's days and the salvage eighth all FROM
+MEMORY and marked, built so and not waited on; the lead puts the figures to the owner's references
+and cited figures come back by the same road, the data rows then moved old beside new; (4) the far
+ship's reply to an awake hull by a gun of her fit is the **fallback only** when the cap has no room
+to wake her (three held hulls), never the ordinary case within the range, said in the round's data
+and measured for how often it fires in the pinned passages (expected rarely or never); beyond her
+guns' reach nothing fires; (5) the guns heard off the horizon kept as a sound of the lookout's
+rule under the same toggle as the rounds, the reach and the night flashes' range judgement named
+in the notes; (6) the new command's scenario under the game's `saves/`, never `data/`, with **one
+correction**: package 96 is held by the owner to the end of the milestone, so no writer of its
+exists; a small writer of this package's in `scenarios.py` emits exactly the keys the loader reads
+(the ship, the people with their roles and records, the papers' record, the date, the nation and
+the war), tested by loading it back, 96 taking it up later (the hook named in step 6's postscript);
+(7) the boats' retaking amended to a cruiser at sea, as designed; (8) the adversarial rule's reach
+**wider than the captain alone**: any station of an adversarial hull that may give an order of her
+deck or her guns (her captain, her officer of the watch, the warrant stations when 87 makes them)
+refused behind the same flag with the same reason while she is adversarial; the voices that give
+no order (a passenger's, a prisoner's) and the lookout's admitted; a seat held before the war not
+stood down and the owner told; the suite's seats listed at the step; (9) the touches to
+`combat/boarding.py` and `world/crews.py`'s `rank` and `make_hull` granted; the cartel's one gun
+stays words and the merchant's fit until package 75 closes, nothing of `data/ships/` meanwhile.
+Noted and accepted without change: §2.1's colours over hers for a day, §2.3's one ladder, §2.8's
+figures as judgement, §4.1's table, §4.6's agreement pinned at the figure found, §5.2's court by
+nation with Spain's row, §6's draft under `docs/design/`, §9's outlaw left honest, decision 64 in
+every table.
+
+### Step 1: the far ship's length (§4.1; 2026-11-07)
+
+**Built as designed**: the one read (`length_waterline_m`) in `far_ship`; `fight`'s loop body
+factored into `round_once`, the function step 4's far action runs, the loop and its record
+unchanged; truth 7-139's docstring brought to the new read with the old figures beside it; truth
+7-350 pinning the read, the move old beside new (the old read set by hand as the toggle) and that
+`round_once`'s record is the measure's own. The figures are §4.1's table, confirmed on the step's
+tree (`docs/dev/TuningNotes.md`, "Package 74", step 1). **Taken another way**: nothing. **Found on
+the way**: nothing.

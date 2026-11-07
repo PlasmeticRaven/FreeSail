@@ -9140,7 +9140,7 @@ hatchways, and the first measure had her guns never come loose).
 | Two cutters at a cable, as they bear (7-140) | the French cutter struck three minutes after the first shot |
 | The first action at long shot (7-133) | opened 10:13, struck 12:06; five of thirty hurt, eight shot holes; the King's cutter a topgallant mast and two yards gone, eight lines shot away, nobody hurt |
 | The merchant brig under a privateer's fire (7-137) | engaged 10:06, chased down and fired on at a cable 10:14, struck 10:15 at the first shot that told, by the odds (0.37 under 0.4) |
-| The far fight at two cables (7-139) | seven rounds of three minutes; the long-gun cutter struck with four hurt and three holes |
+| The far fight at two cables (7-139) | seven rounds of three minutes; the long-gun cutter struck with four hurt and three holes (the old read of her length, 0.0: package 74, step 1, re-measured it at five hurt with the King's cutter one hurt) |
 | The pace, two crewed cutters in action (7-138) | 538 ticks a second (best of three thousands), against the crewed floor of 60 and the owner's 95 with twelve crewed ships |
 
 The far fight against the near: at two cables the far tables end the two cutters' fight in
@@ -18395,3 +18395,48 @@ failures, and after it the files step 4 touched with its truths (7-380, 7-382, 7
 84's step 8 saves of many hulls in `test_hulls.py` and `test_replay.py`). The pace alone on the
 final tree: 12 of 13, 7-159 at 474, toggled against 1662b54: the branch 492, 501, 498; the trunk
 455, 487, 491.
+
+## Package 74: prizes, the strike and what follows, and the far fight (2026-11-07)
+
+The brief, its refresh after 84, 85 and 82 and the paragraph from package 97 in
+`docs/dev/M7-WorkPackages.md` ("Package 74"); the design in `docs/design/Design-Prizes.md`,
+written and reported before anything was built, approved by the lead with nine rulings on its
+§12 (recorded in the note's postscript), a postscript for each step as it is built. Built as a
+sibling session in its own container on the package's branch off the trunk's `f67640b`, each
+step a mergeable state with the fast tier whole on its final tree, the slow tier of the touched
+files and the known truths, the pace tests alone and last, the trunk brought in at the boundary
+before the step's final runs; the whole suite the lead's in the cloud at each merge. The physics
+are read and not changed; no consent file is touched; no ship file is touched (the cartel's gun
+stays words until package 75 closes, the lead's ruling 9); every figure from memory is marked
+so in the data and here, for the owner's references through the lead (ruling 3).
+
+### Step 1: the far ship's length (the design's §4.1; package 75's finding)
+
+**The one read.** `combat/far.py`'s `far_ship` read `spec.hull.length_m`, a key `HullSpec`
+has not (`length_waterline_m` is its), so every far ship's length was 0.0 and `shot.hit_chance`
+floored her size term at 0.5 whatever she was (a frigate as narrow a mark as a boat). The read
+is `length_waterline_m` (the cutter 15.2 m, the frigate 41.8). Nothing else of the tables moved;
+`fight`'s loop body is `round_once`, the one function the world's far action (step 4) runs, the
+loop itself unchanged (truth 7-350 pins that the round-by-round record is the measure's own).
+
+**What moved, old beside new** (seed 7, the build machine; the old read set by hand in the test
+as the toggle):
+
+| the far fight | the old read (length 0.0, size 0.5) | the mended read (her waterline) |
+|---|---|---|
+| truth 7-139: two cutters at two cables (400 m), the King's carronades at the hull, the privateer's long guns at the rigging | struck after seven rounds (21 min); the long-gun cutter four hurt, three holes, 58 shot fired; the King's cutter nobody hurt, 63 fired | struck after **seven rounds (21 min)**; **five hurt**, three holes, 61 fired; the King's cutter **one hurt**, 57 fired |
+| the same two at a cable (185 m) | struck after three rounds (9 min) | struck after **two rounds (6 min)** |
+| two frigates at two cables (370 m), one at the hull (0.9/0.1), one at the rigging (0.8/0.2) | struck after six rounds (18 min), 81 hurt to 14 | struck after **three rounds (9 min)**, 75 hurt to 22 |
+
+The cause is the one line: a cutter of 15 m is a size of 0.62 and a frigate of 42 m 1.02 against
+the floor's 0.5, so more shot tells at every range, the more the bigger the mark. **The pin
+7-139's bands hold** (she strikes under the hour, with men hurt and holes, the record repeating),
+its docstring's figures are brought to the new read with the old beside them, and the row of
+package 70's table above reads "four hurt and three holes" for the old read. No other pin reads
+the far fight: `test_profile.py` and `test_indefatigable.py` (truth 7-188) read `far_ship` for the
+broadside's weight alone and do not move; the near fights (7-133, 7-134, 7-137, 7-140) read the
+part graph's length and never the far read. The pace tests do not run the far fight (nothing is
+wired until step 4).
+
+**Truth 7-350** pins the read and the move. **Found on the way:** nothing. **The suites on the
+step's tree**: below, at the step's boundary.
