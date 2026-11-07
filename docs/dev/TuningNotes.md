@@ -19107,6 +19107,18 @@ twice (no fit; the brig's file's first row). She has no row of her own now: the 
 merchant brig of her own file (sixteen men, her ports painted) with the role `cartel` and `what`
 said on her, "a cartel", under her flag of truce. Nothing else met; the captive's scenes hold.
 
+**The suites on the step's tree, 96261d8**, in a worktree pinned at it, ruff check and format clean:
+the fast tier whole run twice, exit 1 then exit 0 (18:34:30 to 19:19:12, one failure, 81's truth 7-441
+whose wall-time ratio of the action's entries to the whole snapshot came out 0.30 under four workers
+where it asserts under a quarter, 6.8 ms against 22.4; it passes alone on this tree and on the bare
+trunk at 9b821fb, and the tier run again whole passed, 20:17:10 to 21:01:21: a timing assertion of
+81's inside the fast tier, said to the lead, nothing moved; 459 slow tests left out by the tier's
+rule); the slow tier of the touched files (`test_captive`, `test_prizes`, `test_brains`,
+`test_far_hail`, `test_squadrons`, `test_captains`, `test_subtypes`, `test_director`,
+`test_world_orders`, `test_readings`) and the known truths with `test_profile` and
+`test_indefatigable` exit 0 (19:19:12 to 20:10:32); the pace tests alone and last exit 0 (13 passed,
+20:10:32 to 20:15:37; no floor lowered).
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
