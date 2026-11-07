@@ -18545,6 +18545,10 @@ own words only while asked, asked once more after a glass, given by rule after a
 places it gives (the quarterdeck by day) and the sword returned; the prisoners landed to the
 port's agent in port; the cartel. Truths 7-355 to 7-357.
 
+**Pins moved: none.** The far brain's three mends (the struck mark kept, a struck ship no superior
+force and no man of war to fear) touch judgements no pinned passage reaches: the brains', the
+far hail's, the squadrons' and the captains' tests pass as they stood.
+
 **Taken another way.** (1) The captive's officers are not taken into the captor with him: they
 stay confined in the prize by rank (the `divide_prisoners` rule is the counts', not the
 persons'); the design's "with him or confined in the prize by the captor's doctrine" is read as
