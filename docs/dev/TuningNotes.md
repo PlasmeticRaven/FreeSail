@@ -19231,3 +19231,133 @@ worktree pinned there): the fast tier, exit 0, 6,449 run, 6,448 passed and 1 xfa
 trunk's); the slow tier of the touched files and the known truths, exit 0, 324 run, 316 passed
 and 8 xfailed (the trunk's); the pace tests alone and last, exit 0, 13 of 13. Ruff check and
 format clean.
+
+### Step 3: the Spanish book, a root of its own
+
+**The root** (`data/signals/spain/`, the six files, and the seventh of item 8): the Real
+Armada's book in its own numbers, Mazarredo's *Instrucciones y señales* (Cádiz 1781, the third
+edition by royal order), read on the page. The declaration gives his plan: a numeral table of
+four hundred cells, twenty flags or pendants whose values are on a separate sheet and change at
+any hour, a "universal" flag that stands for any other and alone annuls, cornets for the ships'
+numbers and the courses, the Spanish and the white pendants outside the table;
+`hoist_form: table`; `system: well-built` on his numbers of 1781, the open question stated
+there: whether the régimen quaderno of 1797 kept every cell (his 1799 *Corrección* refers to
+"the four hundred signals of two flags" and the instruction of 31 May 1797, so the table stood
+in 1799; no page shows the quaderno itself; asked of the owner's shelf).
+
+| File | Entries | From the page | Made |
+|---|---|---|---|
+| numerary | 100 | 87 (the general signals of two flags, his cells; the signals of one flag, Nos. 1 to 20, numbered 401 to 420) | 13 (421 the universal flag's number; 422 to 433 meanings the orders want) |
+| night | 61 | 61 (the night under sail in his three chapters of nineteen, told apart by a rocket before or after; five articles at anchor) | 0 |
+| fog | 19 | 19 (his first chapter by the guns, common to night and fog) | 0 |
+| convoy | 35 | 31 (the squadron's cells; his orders to the commander of a convoy, Nos. 376 to 381) | 4 |
+
+The convoy's reading of the squadron's cells is the builder's reading of the book (his
+convoy's masters are called by the day signals at anchor, Nos. 48 to 50, and he gives them no
+book of their own), said in the file. Two cells first thought the port table's (374 and 380)
+were the sea table's other articles on the page; weighing is made (433, his words "dar la
+vela" from the night signals at anchor). **The private form is basic's word for word**: the
+step's first commit gave Spain a form with her own pools, which drew other words from the same
+stream; the brief's truth (a nation turned from basic to her root changes nothing of her
+private signal's draw) put it back to basic's, Mazarredo's names kept in its head (the test
+pins the draw against basic's for three months; truth 7-431 for every month).
+
+**No code changed**: the root is read by the loader as it stood after step 2 (the hoist's form
+was step 2's). **What moved:** test_nations' line for Spain, `signals_root == "basic"`, now
+`"spain"` and `well-built`; proven by the entry put back (the nations' line returned to basic,
+the old assertion passes and the new fails).
+
+### Step 4: the United States, Naples, Portugal's flags and basic's declaration
+
+**The United States** (`data/signals/united-states/`): Barry's *A Set of Signals* (Norfolk,
+1800) for the numbers, a flag a figure (`hoist_form: numerary`); Preble's *History of the Flag*
+(1894) for the squadron's books of 1803 to 1804 (ten numerals, a cornet, an answering flag,
+three triangles as repeaters, the diptote), which are in manuscript and not laid out. The
+numerary 69 entries, 54 at Barry's numbers from the page (the long s read; a figure the scan
+split read by the list's order; a series by the bearing taken at its first), 15 made; the night
+30, the same numbers in his lantern figures; the fog 12 and the masters' convoy orders 18,
+made (none found), the fleet's convoy signals 10 from Barry; the private form basic's. Her line
+moved from basic to her root.
+
+**Naples** (`data/signals/naples/`): the flotilla's book of 1807 (Naples, Angelo Coda), Joseph's
+kingdom, said in the declaration with the Bourbon book of 1805 not found. The flags from the
+plate (thirteen flags 0 to 12, the yellow 0 the general flag that annuls, three cornets, six
+pendants); the thirty particular signals (two flags and a pendant, the pendant's place giving
+the ten; the page image confirms the layout, articles N, N+10 and N+20 under flag N) named in
+the declaration and not taken as entries. The numerary 55, 46 at the general signals' numbers
+(the scan's figures read as letters set right by the list's order), 9 made; the night 12 by
+number, their lanterns left to the book's figures; fog and convoy made; private basic's.
+
+**Portugal** stays on basic for her signals (her books found, Pereira 1817 and Giraldes 1820,
+are after the period); her flags go into basic's colours under `nations: portugal`, dated
+`-1816` (the 1820 plate's "Portugal Ensign", white with the arms crowned at the hoist; Babron's
+armillary sphere is of 1816, left out). **basic's declaration** names whom it stands for: the
+Batavian Republic and Denmark (no book online), Portugal, the Barbary regencies (Morocco and
+Algiers), Sardinia, Etruria, Liguria and the Papal State.
+
+**What moved:** nothing pinned by the two new lines (no test named the United States' or
+Naples's root); their private draws are kept (truth 7-431).
+
+### Step 6: the checker and the tests over every root
+
+`tools/check_signals.py` (new) and `test_the_checker_passes_every_root` over `S.roots()`. Each
+root loads with its seventh file; every `does` is an order parsed against a frigate (some verbs
+read her gear) or a form 71's design names (`close the flag`; `shake out the reefs`, which
+`far_perform` takes and the dialect does not: found on the way, see below), a state, an
+answer, `closer`, `release` or `news`; every qualifier is one the engine fills (compass,
+number, ship, place) and an order's blanks are among them; every entry names its source, an
+entry whose source calls itself made is marked so, and one not marked made cites a page of the
+period; the private form draws; every nation reading the root does so under her own name. The
+checker's first run found a false alarm (a British source quoting "made sail") and tightened
+its pattern. Per root: a hoist read by her own book and unreadable by another's; the convoy of
+four (data/scenarios/convoy.yaml under each nation's colours) tacks in succession on one hoist
+of her own convoy book (France, Naples, Spain, the United States; 5 to 9 s each, in the slow
+list). The checker over the six roots:
+
+```
+basic: passes (basic, numerary; numerary 46 entries, 46 made; night 20, fog 14, convoy 21; 0 words)
+britain: passes (well-built, numerary; numerary 171 entries, 137 made; night 73, fog 24, convoy 32; 1444 words)
+france: passes (well-built, table; numerary 74 entries, 74 made; night 22, fog 14, convoy 25; 0 words)
+naples: passes (well-built, numerary; numerary 55 entries, 9 made; night 12, fog 8, convoy 32; 0 words)
+spain: passes (well-built, table; numerary 100 entries, 13 made; night 61, fog 19, convoy 35; 0 words)
+united-states: passes (well-built, numerary; numerary 69 entries, 15 made; night 30, fog 12, convoy 28; 0 words)
+```
+
+**Found on the way.** `shake out the reefs` (every root's numerary or convoy) is not the
+dialect's words: the dialect wants `shake out the reefs in the topsails`, which a near
+commanded captain would be given; a far body performs it itself (`signals.far_perform`), so
+71's convoys never met it. Named in the checker as a design form and reported to the lead
+rather than changed (the far body's handling is 71's; the near body's order is the captain's).
+
+### Item 8: the flags of command and identity (the owner's addition of 2026-11-07)
+
+**The shape first** (the design note's postscript, committed before any root was filled):
+`colours.yaml`, the lead's approved shape, with basic's `nations:` block for a nation standing
+on basic for her signals (Portugal), the snapshot's lines kept apart from 81's parts (81's
+viewer draws a part with no `rect` as the whole field; the lines go under `drawing.lines`), and
+the prize's occasion named as a hook. **The files**: Britain from Perrin's *British Flags*
+(1922; the ensigns of the three squadrons with the Union of 1801, the pendant of the squadron's
+colour with St George's cross at the head, the commodore's broad pendant, the admirals' flags
+by squadron and rank, the privateer's red jack), Babron (1817) for where the ensign flies, and
+Roosevelt (1882) for the flags doubled in action; France from the law of 31 October 1790 and the
+decree of 1794 (as Preble gives it); Spain from the owner's Winfield answer (the ensign of 28
+May 1785 and the jack, cited, the jack's colours judgement and said so), Mazarredo (the Spanish
+pendant and the cornet) and Babron; the United States from Preble (the flag of fifteen stripes
+and stars, the coach-whip pennant, the commodore's broad pennant) and Roosevelt (the jack at the
+fore in action); Naples the Bourbon white with the arms (Babron), Joseph's not found; basic's
+plain list, a nation's ensign drawn from her flag word; Portugal's, dated.
+
+**The engine** (`freesail/world/flags.py`, new; `signals.py` the locker's two fields and
+`held_tables`; `signalling.py` the judging by the challenge's form and the succession;
+`lookout.py` the refresh and the words; `orders/signals.py` the five orders): what flies where
+is a pure function of the file, the colours, the role, the occasion and the flags ordered; the
+player's ship's list set once a minute with the look and at every order of the colours (the
+viewer's `Locker.flies`, which 81's `viewer_flags.flags` serves as it is); a far vessel's
+computed when read. The lookout adds what flies beyond the ensign where the colours' line
+already falls. A challenge made in a named nation's form carries `Hoist.form_nation` and is
+answered only by a ship of that nation (71's own challenges carry none and are answered as
+before); judged against the table of its form; in succession three minutes a hoist (truth
+7-435's words), the last challenge hauled down for the next, the verdict naming the forms. A
+captain's doctrine of what to hoist (when a rules captain doubles his ensigns, hoists a broad
+pendant, makes another nation's challenge) is 74's files: the data and the lookout's side are
+built and the doctrine's hook is reported to the lead, not built.
