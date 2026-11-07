@@ -487,7 +487,9 @@ nations:
       aim: hull
       roll: down
       source: "no record read; the common habit (judgement, package 71's form)"
-    signals: {root: basic, system: basic}
+    # package 76 (the lead's ruling): her own root, the flotilla's book of 1807 of Joseph's kingdom
+    # (data/signals/naples/book.yaml says so); the Bourbon book of 1805 not found
+    signals: {root: naples, system: well-built}
     marines: {kit: basic}
     naval:
       keeps_the_sea: false

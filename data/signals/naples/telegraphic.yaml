@@ -1,0 +1,11 @@
+# FreeSail: the Neapolitan telegraphic dictionary (spec M7 §3; package 76;
+# docs/design/Design-Signals.md). None: the flotilla's book of 1807 carries tables of places
+# and of the ships' numbers, not a dictionary of words for free sentences. A Neapolitan ship
+# ordered `make the telegraphic signal: ...` is refused in words. The file is kept so that
+# every root has the same files.
+
+source: "no Neapolitan telegraphic dictionary: the flotilla's book of 1807 has none"
+made: false
+telegraph_flag: false
+alphabet: {}
+words: {}
