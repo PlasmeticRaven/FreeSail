@@ -3579,7 +3579,7 @@ work is said so, and the builder goes on with what does not wait for it.
    the tests it does not know about. A test of each new root: a signal hoisted under it and
    read by a ship of the same nation holding the book; read as "a signal we cannot read" by
    a ship of another; the convoy's instruction obeyed by a commanded captain under it.
-7. **Truths 7-426 to 7-435 and the records.** A Spanish frigate and her consort work a
+7. **Truths 7-426 to 7-433 and the records.** A Spanish frigate and her consort work a
    chase on the Spanish book's numbers and the British frigate in sight reads the hoist and
    not its meaning; the British numerary's Trafalgar entries (1, 13, 16, 63, 72, 76) stand
    at the 1799 book's numbers from the page; a telegraphic sentence of a dozen words is
@@ -3596,8 +3596,56 @@ work is said so, and the builder goes on with what does not wait for it.
    numbers, no "package"), the tuning notes (the pass, each book's figures: entries, made
    entries, sources; what moved and its proof; found on the way; the suite as run).
 
+
+8. **The flags of command and identity (the owner's addition, 2026-11-07; truths 7-434 and
+   7-435).** Reading Roosevelt's *The Naval War of 1812* (part I, pp. 160 to 161, out of
+   copyright), the owner found the one thing of the colours the game has not: "she carried her
+   commodore's pendant at the main, national ensigns at the mizzen-peak and main top-gallant
+   mast-head, and a Jack at the fore. The *Java* also ... hoisting her ensign at the mizzen-peak,
+   a union Jack at the mizzen top-gallant mast-head, and another lashed to the main-rigging"; and
+   before it, "At 10 the *Java* made the private signals, English, Spanish, and Portuguese in
+   succession, none being answered; ... a little after 1 she [the *Constitution*] hoisted her
+   private signal, and then, being satisfied that the strange sail was an enemy, she wore and
+   stood off." 71's colours are a state (shown, none, false, struck, distress) with no flag in a
+   place; this item gives each root **a seventh file, `colours.yaml`**: the nation's flags of
+   identity and command by name (the ensign and its variants by service or squadron, the
+   merchant's ensign, the jack, the commissioning pendant, the broad pendant of a commodore, an
+   admiral's flag by rank, the flag of truce), **where each flies and when** (the ensign at the
+   peak or the staff; the pendant at the main; the jack at the jackstaff at anchor and, by the
+   period's practice in action, at the fore or a topgallant masthead; the ensigns doubled in
+   action, one at the peak and one at a masthead, and one lashed in the rigging so that no shot
+   can bring the colours down by accident), and **a drawing of each** (the field, the cantons, the
+   crosses or stripes as a short list of coloured rectangles and lines in the flag's proportion,
+   the source named; package 81 draws from it and 91 animates it). The engine: 71's locker gains
+   **what flies where** (a small list set by the rules at the colours' hoisting from the nation's
+   file, the ship's role and her captain's rank: a King's ship wears her pendant, a commodore his
+   broad pendant (72's role), a merchantman her ensign alone; at anchor the jack; beating to
+   quarters doubles the ensigns and bends the jack as the file has it), **read by the lookout** at
+   the colours' range in words ("she wears a broad pendant at the main": a commodore; "a pendant:
+   a man-of-war"; "her ensign at the peak and another at the main"), and **the orders** (`hoist the
+   broad pendant`, `hoist a second ensign at the main`, `hoist the jack`) with the standing
+   orders' and the doctrine's hooks named for 74 and 72 (the files of the captains are 74's:
+   report what a rules captain should hoist by his doctrine and build the data and the lookout's
+   side; the lead carries the doctrine's line to 74). **The private signal in another nation's
+   form**, the *Java*'s move: `make the Spanish private signal` (or `make the private signals in
+   succession`) where the ship **holds the table** (a captured table by 74's road, or an ally's
+   carried by the scenario's `papers.signal_books`), each a challenge in that nation's form the
+   stranger reads and answers or not, the minute a hoist, the answer judged against the table
+   held, the log saying "the private signals, English, Spanish and Portuguese in succession, none
+   answered"; a table the ship does not hold is refused in words. Truth 7-434: a King's frigate
+   wears her pendant at the main and her ensign at the peak, a commodore's ship her broad pendant,
+   a merchantman her ensign alone, each read by the lookout at the colours' range in those words,
+   and beating to quarters doubles the frigate's ensigns with the jack at the fore, nothing of it
+   moving any pinned passage's digest (the places are the locker's state and the lookout's
+   words only where the colours' line already falls, or the passage is named and re-measured).
+   Truth 7-435: a ship holding three nations' tables makes the three private signals in
+   succession to a stranger that answers none, three minutes at a hoist, and her captain holds
+   her an enemy by the tell, as 71 has it. The data shape of `colours.yaml` is written in the
+   design note's postscript before it is filled, as 71 wrote the six files', so that every nation's
+   flags fit it and 81 reads one shape.
+
 **Not built here:** the squadron's signals beyond the books' entries (72's set stands), the
-captured book's use (74's), the far ships' reading (71's and 72's as they stand), the eastern
+captured book's use (74's), the captains' doctrine of what to hoist (74's files; reported to the lead), the far ships' reading (71's and 72's as they stand), the eastern
 Mediterranean's factions. **The head rules bind** as every brief has them: no model
 identifier in any file; nothing under `docs/agents/consent/` or in the consent brief
 touched; the pins re-measured only where a change moves them, old beside new, proven by the
@@ -3710,7 +3758,7 @@ for it.
    eight files with triples today (the brig, the cutter, the frigate, the merchant brig,
    the privateer schooner, the razee, the 64, the topsail schooner) are the first to pass;
    a gun of theirs that does not is reported, not fixed here.
-5. **Truths 7-436 to 7-445.** Every gun of every ship file with the contract is drawn on
+5. **Truths 7-436 to 7-443.** Every gun of every ship file with the contract is drawn on
    its deck's triple within 0.01 m or over the rail by the rule, the checker clean; the
    Amazon's forecastle guns are drawn over the rail and through no port, her upper-deck
    guns in ports of the upper deck's size; a lee port the engine shuts by the roll is drawn
@@ -3728,8 +3776,37 @@ for it.
    what moved and its proof, found on the way, the suite as run); the harbour's page if a
    setting is added (none expected).
 
+
+7. **The flags drawn at their places (the owner's addition, 2026-11-07; truths 7-444 and
+   7-445).** Reading Roosevelt's *The Naval War of 1812* (part I, p. 161): "she carried her
+   commodore's pendant at the main, national ensigns at the mizzen-peak and main top-gallant
+   mast-head, and a Jack at the fore"; the viewer draws no flag at all today. By the same rule
+   for every hull: the flags that fly are drawn **at their places on the drawn spars**, the
+   ensign at the mizzen peak (the gaff's peak the projection already has) or the ensign staff
+   at the taffrail where the hull has no gaff, the pendant at the main truck, the jack at the
+   jackstaff on the bowsprit or at the fore truck, a second ensign at a topgallant masthead, one
+   lashed in the rigging, as **what flies where** says it: package 76 gives each nation's root a
+   `colours.yaml` (the flags by name, where each flies by occasion, and a drawing of each as a
+   short list of coloured rectangles and lines in the flag's proportion) and the engine's locker
+   the list of what flies where; the snapshot serves that list with each flag's drawing, and
+   the viewer draws it stiff (cloth drawn flat, the fly to leeward of the apparent wind by a
+   fixed angle; the waving is 91's). **The contract between the two packages**, so that neither
+   waits: 81 reads the snapshot's `flags` (place, flag name, drawing) and draws whatever is
+   there; until 76's file exists for a root the server serves one plain ensign at the peak in a
+   field of the nation's `flag` word from `data/nations.yaml`, so that 81's drawing and its truths
+   are complete on the trunk as it stands and 76's data refines them. The struck colours draw
+   nothing; false colours draw the other nation's; the flag of truce (74's cartel) the white; the
+   distress signal the ensign union down. The frame equal across states as every flag flies or
+   comes down. Truth 7-444: every hull with a drawn profile draws her ensign at her peak or
+   staff and her pendant at the main truck when the locker says they fly, a commodore's broad
+   pendant for a commodore, the jack at its place at anchor, the second ensign at the masthead
+   when the ensigns are doubled, each within 0.1 m of the spar's point in the projection, the
+   bounds unmoved. Truth 7-445: the flags follow the state in the next snapshot: struck draws
+   none, false colours the other nation's, the cartel's white, and a hull whose nation has no
+   `colours.yaml` yet draws the plain ensign from the nations' table.
+
 **Not built here:** the light and the air (91, which reuses this package's animation
-road); a three-dimensional ship or a damage picture beyond the present honesty (M8); any
+road and waves the flags 81 placed); a three-dimensional ship or a damage picture beyond the present honesty (M8); any
 ship file's triples (the ships session's, by its plan); the guns' mechanics (70's, 77's).
 **The head rules bind** as every brief has them: no model identifier in any file; nothing
 under `docs/agents/consent/` or in the consent brief touched; the pins re-measured only
