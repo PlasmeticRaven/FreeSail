@@ -25,6 +25,8 @@ The timings each script uses come from the ``timing:`` block of its
 evolution file, so they can be tuned without touching this code:
 
 - ``brace_s``: seconds to swing a set of yards round (45 s in the spec).
+- ``light_after_swing_s``: the tack's short after swing at "mainsail haul", for a
+  schooner's light main yards (package 75, the lead's ruling 1 of 2026-11-06).
 - ``brace_rate_deg_s``: how fast yards follow the wind when wearing.
 - ``stays_timeout_s``: how long a tacking ship may hang in stays, from the
   moment her way is gone, before she has missed stays (package 32e).
@@ -495,7 +497,8 @@ def _masts_with_yards(ship: Ship) -> list[Spar]:
     hermaphrodite brig, a brig's fore and a schooner's main (Cobb 1841 vol. I p. 38), and a
     topsail schooner with a square main topsail have the fore alone, and are handled as
     fore-and-afters; their main's yards are still braced (`working_yards`) and are her after
-    yards (`head_and_after_yards`) while her fore keeps a working yard."""
+    yards (`head_and_after_yards`), with every fore yard shot away too (the lead's ruling 3
+    of 2026-11-06)."""
     masts: list[Spar] = []
     for y in working_yards(ship):
         if ship.under_bowsprit(y) or ship.on_schooner_mast(y):
@@ -514,13 +517,17 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
     yards (package 75; Ext §4.2, §4.3). A schooner's main with yards above its lower
     mast (`Ship.on_schooner_mast`, package 75, B3.4) is no mast that carries yards here,
     but its yards are among the rest: they are her after yards, swung at "mainsail haul"
-    and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5), while her fore
-    keeps a working yard. With every fore yard shot away no mast carries yards here, and
-    her main's yards are in neither list, so that the tack and the wear leave them as they
-    stand (reported to the lead at B3.4)."""
+    in the tack's short after swing (`TackScript._after_swing_s`, the lead's ruling 1 of
+    2026-11-06) and braced up full hove to (the *Neufchatel*'s design, §12.2 item 5). With
+    every fore yard shot away no mast carries yards here, and her main's working yards are
+    her after yards still, with no head yards: the lead's ruling 3 of 2026-11-06, "they are
+    abaft her fore and are swung as after yards while she had a working fore yard; nothing
+    changes in their handling but that they are no longer left standing" (before it they
+    were in neither list, and the tack and the wear left them as they stood: B3.4). With
+    no mast carrying yards, any other yard is in neither list, as before."""
     masts = _masts_with_yards(ship)
     if not masts:
-        return [], []
+        return [], [y for y in working_yards(ship) if ship.on_schooner_mast(y)]
     foremost = max(masts, key=lambda m: m.x_m)
     yards = working_yards(ship)
     head = [y for y in yards if ship.mast_of(y) is foremost or ship.under_bowsprit(y)]
@@ -967,10 +974,13 @@ class TackScript(Script):
     Helm's a-lee: the helm is ordered to a heading twelve points round, through the
     wind, the head sheets let fly and the spanker (or a fore-and-after's main) sheet
     hauled aft, which brings her up. When her head is within a point of the wind,
-    "mainsail haul": the after yards swing to the new tack. When her head has passed
-    through the wind, "let go and haul": the head yards follow, the head sheets are
-    drawn on the new tack and the helm is ordered to the new close-hauled course. She
-    is tacked when steady on it.
+    "mainsail haul": the after yards swing to the new tack, over ``brace_s``, or over the
+    short ``light_after_swing_s`` when they are a schooner's light main yards
+    (`_after_swing_s`); the word is "main-topsail haul" when her main course is not set
+    (Luce 1884 p. 417; `_haul_words`). When her head has passed through the wind and the
+    after yards are round, "let go and haul": the head yards follow, the head sheets are
+    drawn on the new tack and the helm is ordered to the new close-hauled course. She is
+    tacked when steady on it.
 
     Package 32e (spec M5 open item 12): the miss-stays rule reads the vessel, and she
     is given Luce's recovery before she gives up. Her way is gone when she makes less
@@ -1055,6 +1065,68 @@ class TackScript(Script):
 
     def _boom_words(self) -> str:
         return names_of_sails(self.ship, self.booms) if self.booms else ""
+
+    def _after_swing_s(self) -> float:
+        """The after swing's time at "mainsail haul", before the weather and the hands: the
+        short after swing, ``light_after_swing_s``, when every after yard is on a schooner's
+        mast (`Ship.on_schooner_mast`: a topsail schooner's main topsail, the *Neufchatel*'s
+        main topgallant), else ``brace_s``. Package 75, the lead's ruling 1 of 2026-11-06 on
+        place 2's timing, after Luce 1884 p. 417: the after yards hauled with the wind ahead
+        or a point on the bow, "for then the wind on the weather leeches of the sails forces
+        them around smartly", before the head yards and never with them. The swing is the
+        same `YardSwing`, its time shorter, and "let go and haul" still waits on it. Read
+        for a schooner's light yards alone: a brig's and a frigate's after yards swing in
+        ``brace_s`` as before (the lead's), and so does an after list with a yard on a mast
+        that has a lower yard among it, whose heavy yards rule the time (judgement; no rig
+        filed or in memory has one)."""
+        brace_s = self.timing_value("brace_s", 45.0)
+        if self.after and all(self.ship.on_schooner_mast(y) for y in self.after):
+            return self.timing_value("light_after_swing_s", 20.0)
+        return brace_s
+
+    def _haul_words(self) -> str:
+        """The order as the after yards are hauled, after Luce 1884 pp. 416-417: "RISE TACKS AND
+        SHEETS!", the fore and main tacks and sheets let go and the courses' clews hauled up by
+        the clew-garnets, then "Haul taut! MAINSAIL HAUL!"; and when "the mainsail is not set,
+        to haul the after yards, order— MAIN-TOPSAIL HAUL!" (p. 417, the line's first word lost
+        to the scan; p. 446, the mainsail hauled up, "a late 'maintopsail haul'"). Package 75,
+        the lead's ruling 2 of 2026-11-06: "Main-topsail haul!" for every ship whose main
+        course is not set (none bent, or hauled up), "Rise tacks and sheets. Mainsail haul."
+        kept for a main course set.
+
+        The mainsail is the main course: of her courses as her file names them (its "courses"
+        group, as the gale's reduction reads them, `orders.storm._after_sail_lines`), the one
+        on the foremost of the after yards' masts (`Ship.mast_of`): the main course of a ship
+        and of a brig, and the bilander's settee, bent on her main in its place and named her
+        mainsail (`tests/rig_fixtures.py`, her main yard dry), which as a dipping sail is
+        lowered at "helm's a-lee" and so is not set when her after yards are hauled; a
+        schooner's main crosses none, so hers is never set. A course is set when it is set or
+        goose-winged, its weather clew down and drawing, as the readings count a sail drawing
+        (judgement: the ruling's "none bent, or hauled up" names neither); hauled up or in the
+        gear, furled, loosed, blown out, unbent, or its yard shot away or sent down, it is not.
+        "Rise tacks and sheets" is said while any course is set, and not with none set: every
+        course's clews are up already and there is nothing to rise (Luce's own gloss of the
+        order). With the fore course set and the main not it is said as before, of the fore's:
+        Luce does not settle that case's words (pp. 419, 428 and 446 rise the fore tack apart,
+        by its name, before "let go and haul"), and the lead holds it."""
+        ship = self.ship
+        masts = [m for m in (ship.mast_of(y) for y in self.after) if m is not None]
+        main_mast = max(masts, key=lambda m: m.x_m) if masts else None
+        any_set = main_set = False
+        for sid in ship.groups.get("courses") or []:
+            sl = ship.sails.get(sid)
+            if sl is None:
+                continue
+            yard = ship.yard_of(sl)
+            standing = yard is None or not (yard.wrecked or yard.sent_down)
+            drawing = standing and (
+                sl.is_set or (sl.state is SailState.GOOSE_WINGED and not sl.wrecked)
+            )
+            any_set = any_set or drawing
+            if drawing and main_mast is not None and ship.mast_of(sl) is main_mast:
+                main_set = True
+        haul = "Mainsail haul" if main_set else "Main-topsail haul"
+        return f"Rise tacks and sheets. {haul}" if any_set else haul
 
     def begin(self, words: dict[str, Any]) -> None:
         # the studding sails first, if any are set or their booms out (spec 3b §7)
@@ -1230,14 +1302,14 @@ class TackScript(Script):
                 bowlines = let_go_bowlines(self.ship)
                 let_fly_sheets(self.ship, self.shifted)
                 if self.after:
-                    if bowlines:
-                        self.note("Rise tacks and sheets. Mainsail haul; let go the bowlines.")
-                    else:
-                        self.note("Rise tacks and sheets. Mainsail haul.")
+                    haul = self._haul_words()
+                    self.note(f"{haul}; let go the bowlines." if bowlines else f"{haul}.")
                 elif bowlines:
                     self.note("Let go the bowlines.")
                 self.swing = YardSwing(
-                    self.after, [-self.sign * y.brace_limit for y in self.after], brace_s
+                    self.after,
+                    [-self.sign * y.brace_limit for y in self.after],
+                    self._after_swing_s(),
                 )
         if self.phase == "mainsail_haul":
             assert self.swing is not None
@@ -1432,10 +1504,11 @@ class TackScript(Script):
 
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
+        swings = self._after_swing_s() + brace_s  # the after yards', then the head yards'
         if self.phase == "in_studding_sails" and self.studding is not None:
-            return self.studding.remaining_s() + 60.0 + 2 * brace_s + 30.0
+            return self.studding.remaining_s() + 60.0 + swings + 30.0
         if self.phase == "helm_down":
-            return 60.0 + 2 * brace_s + 30.0
+            return 60.0 + swings + 30.0
         if self.phase == "mainsail_haul" and self.swing is not None:
             return self.swing.remaining_s() + brace_s + 30.0
         if self.phase == "let_go_and_haul" and self.swing is not None:
@@ -1443,7 +1516,7 @@ class TackScript(Script):
         if self.phase == "missed" and self.squaring is not None:
             return self.squaring.remaining_s()
         if self.phase == "by_the_wind":
-            return brace_s + 60.0 + 2 * brace_s + 30.0
+            return brace_s + 60.0 + swings + 30.0
         if self.phase == "pay_off":
             return max(0.0, self.timing_value("pay_off_timeout_s", 240.0) - self.pay_t)
         return 30.0

@@ -1269,8 +1269,10 @@ files take it to 108.
     `under_bowsprit`), true for a braced yard on an after mast that carries none on its lower mast
     and is not the foremost with yards, and for its square sail, read from the parts as filed once
     a ship, the yards under the bowsprit counted for nothing; read at places 1 and 3 alone, every
-    other place as it was. No committed file trips it; the measures are the tuning notes', "The
-    schooner's mast".*
+    other place as it was, and, by the lead's rulings 1 and 3 of 2026-11-06 (built 2026-11-07),
+    for the tack's after swing (`TackScript._after_swing_s`) and at place 2 with no mast
+    carrying yards (`head_and_after_yards`). No committed file trips it; the measures are the
+    tuning notes', "The schooner's mast" and "The lead's four rulings, built".*
 13. **The tartane's full lateen**, dipped or changed by *muder*, and its curve, in a later
     package (§3.7).
 14. **D18 and D25** stay open; nothing here depends on them.

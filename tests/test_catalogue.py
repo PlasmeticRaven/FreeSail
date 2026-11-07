@@ -125,8 +125,11 @@ M2_TIMINGS = {
     # moment her way is gone); brace_s, steady_deg and steady_timeout_s stand
     # package 37m: milestone 2's stand; the three after steady_deg are a tack ordered for a
     # course, luffed up from a reach first and paying off to the course after it
+    # package 75 (the lead's ruling 1 of 2026-11-06): milestone 2's stand; the one after
+    # brace_s is the short after swing of a schooner's light main yards, which no file has
     "tack": {
         "brace_s": 45.0,
+        "light_after_swing_s": 20.0,
         "stays_timeout_s": 180.0,
         "hang_after_s": 5.0,
         "way_gone_fraction": 0.25,

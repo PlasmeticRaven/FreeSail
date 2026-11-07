@@ -228,10 +228,14 @@ class Ship:
         fight stays a brig. Read where the manoeuvres count the masts with yards
         (`evolutions.scripts._masts_with_yards`, Ext §4.2's place 1) and where the helm and the
         gale's reduction ask whether she is square-rigged (`physics.sails._square_rigged`, place
-        3), and nowhere else: her main's yards are still braced and trimmed, and swung as after
-        yards while her fore keeps a working yard (with every fore yard shot away no mast
-        carries yards at place 1, and `evolutions.scripts.head_and_after_yards`, place 2, left,
-        puts them in neither list: reported to the lead at B3.4).
+        3), and for the time of the tack's swing at "mainsail haul", the short after swing for a
+        schooner's light main yards (`evolutions.scripts.TackScript._after_swing_s`, the lead's
+        ruling 1 of 2026-11-06 on place 2's timing), and where no mast carries yards at place 1,
+        every fore yard shot away, for her after yards (`evolutions.scripts.head_and_after_yards`,
+        place 2, the lead's ruling 3 of 2026-11-06: "nothing changes in their handling but that
+        they are no longer left standing"; before it they were in neither list), and nowhere
+        else: her main's yards are still braced and trimmed, and swung as after yards, her fore
+        yards whole or shot away.
         The limits, recorded: a schooner with a lower square-sail yard on her main (Fincham p. 78,
         as her design cites it; the *Neufchatel*'s D10(d), not taken) still classes as a brig;
         and so does one whose main is a pole mast with a square topsail yard filed on the lower
