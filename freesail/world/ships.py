@@ -256,6 +256,14 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "what": "a razee, a heavy frigate cut down from a sixty-four, one tier of "
         "twenty-four-pounders",
     },
+    # package 75 (docs/design/Design-Ship-PrinceDeNeufchatel.md §8; D15 (a)): the American
+    # privateer of 1812-1814, a brig's foremast and a schooner's main; the tops make out a brig
+    "hermaphrodite brig": {
+        "file": "data/ships/hermaphrodite-brig.yaml",
+        "rig": "a brig",
+        "what": "a hermaphrodite brig, a brig's foremast and a schooner's main, long and low, "
+        "pierced for eleven guns a side",
+    },
 }
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
@@ -309,6 +317,13 @@ _DESCRIPTION_WORDS = {
     "razee": "razee",
     "a razee frigate": "razee",
     "a cut-down sixty-four": "razee",
+    # package 75 (Design-Ship-PrinceDeNeufchatel.md §8): her sources' words, Cobb's
+    # "hermaphrodite brig" (1841 p. 23) and her log's "privateer brig" (Stevens 1915 p. 26;
+    # James vol. 6 p. 237, "the American privateer brig"); never "a brig", the merchant brig's
+    "a hermaphrodite brig": "hermaphrodite brig",
+    "an hermaphrodite brig": "hermaphrodite brig",
+    "a privateer brig": "hermaphrodite brig",
+    "privateer brig": "hermaphrodite brig",
 }
 
 

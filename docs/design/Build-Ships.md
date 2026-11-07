@@ -1894,6 +1894,26 @@ stage 0, her files, her truths' measures and her pins.
 - her scenario's year and the `nations:` block (§12.1);
 - the band of her polar's best point from her accounts (7-193).
 
+*As built (B2, 2026-11-07; `Design-Ship-PrinceDeNeufchatel.md` and `docs/dev/TuningNotes.md`, "The
+*Prince de Neufchatel*"): D10 settled by the lead's ruling of 2026-11-06 on her design's §12.2a, the
+rule in the key's place built at B3.4, so no key and no (c): her main topgallant on its two light
+yards written from her first commit, the rule reading her main as a schooner's. Her file
+`hermaphrodite-brig.yaml`, "hermaphrodite brig" made out, "a brig" at a distance, rank 2, her
+fit "as taken 1814" (16 × 12-pdr carronades and 2 long 6s, no pivot) written in her description
+by SW-4's form (§8.1). Her profile from ZAZ6177 and ZAZ6179, her deck at side 1.16 m, eleven sills,
+her lowest 1.50 m shutting at 18.2° (7-190's line, her own tests until the shared table takes
+it); her stern measured `raked` where §5.7's row says square (her design's lead item 8). Her
+company of 130 and its prize-masters, the american names, the United States' basic marines' kit.
+Her scenario's year August 1814 (B6's, out to a supplemental package) and the `nations:` block
+laid at her stage 0b, parsed and kept. **The band of her polar's best point: 11.5-13.0 kn in 25
+kn of wind, her file's 12.27 kn at 90° pinned by 7-193 with her pointing above the frigate-36's;
+the angle and her running speeds reported**, `hull_speed_kn` 12.9 and GM 2.1 kept, `clr_x_m` tuned
++0.3 to +2.0 for her helm.*
+
+*After the reviews of 2026-11-07 (her design's §4.6 and §2.1, As built): the jib's centre mended to its
+triangle's, where the schooner's rule had put it above its own stay, and `clr_x_m` re-tuned to +0.1;
+her best 12.22 kn at 90°, her pointing held by 1.18 kn at 70° in 25 kn.*
+
 ### 13.2 The *Bellerophon* (B7)
 
 **Laid:** the stub `tools/ships/bellerophon.py`; the key `seventy-four` at rank 4, with "ship of
@@ -2054,6 +2074,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 |---|---|---|
 | Stage 0, 0E, 0b-0d | nothing | the byte test, the guards, the fast tier |
 | B1, B2, B7, B4 | nothing of the existing ships; their own files only | — |
+| B2, as built (2026-11-07) | *nothing of the existing ships: her module writes her file alone, every other file of `data/ships/` byte for byte as it was at each step; her rows in `world/ships.py` new keys and words only, "a brig" the merchant brig's still. The shared lists her file joins: `tests/test_profile.py`'s `MODULE_FILES` (her stage 0b's item 3, committed directly before her file) and `tests/conftest.py`'s `SLOW_TESTS` (her round trip, 7.1 s). Shared guards that read every file and fail on hers until their owners name her, none of hers to amend (her design's §13): `tests/test_lee_ports.py`'s "every armed file a row" (her row `(hermaphrodite-brig, "as taken 1814", "upper", 18.18, 3)`, held in her tests); four of `tests/test_schooner_mast.py`'s guards written for "no committed file" on a schooner's mast (the rule's first committed rig: her two light yards and main topgallant, the count of sixteen files, her short after swing by ruling 1, her course reefed by ruling 4); seventeen of the viewer's cases on her file (`tests/test_view_geometry.py`'s tables without her rows, its galleried-stern and widest-knuckle assumptions; `tests/test_view_action.py`'s 2-mm port top at her No. 8). Her own tuning, old beside new: `clr_x_m` +0.3 to +2.0 (her helm, tack, wear and heave-to; not her polar). After the reviews of 2026-11-07: the jib's centre mended and `clr_x_m` +0.1 (her helm, tack, wear, heave-to and, by the jib's place, her polar by 0.05-0.09 kn), the main topmast staysail's nock, the fore gaff sail's lines in her sources' words* | *test by test against the bases on the same files, no other outcome moved; her tests and the tuning notes, "The *Prince de Neufchatel*", old beside new* |
 | B7 | `tests/test_ships.py:99` and `:188`, `tests/test_world_orders.py:98`: "a ship of the line" names her description | old beside new, the reason |
 | B1 stage B | the 64's own figures (her polar, her balance: the mizen course's offset from 0.8√A in place of the stand-in's 11.1-m head; the driver); both files' bytes for the hull's shape keys and marks (no behaviour, no port triple) | old beside new in her notes |
 | B3.1-B3.3, B3.5 | none expected: every change is keyed on something no existing file carries (Ext §11). The library's count of evolutions (`tests/test_agents.py:1873`), a count of data files, moves with each step that adds evolution files: B3.1 98 → 104, B3.3 → 108 | the guards; the trace; the count old beside new |
@@ -2091,6 +2112,7 @@ which holds her spars.
 | 84's later steps merged under the package | the fresh merge before each stage; new code reads only the names the Hull keeps; `World.__setstate__` (`core/world.py:861-`) is 84's |
 | A `HullProfile` pickled before stage 0H | the eight shape fields are plain class defaults, left out of the pickle while empty (`HullProfile.__getstate__`, 0H), so a profile without them pickles as before and an old one reads the defaults |
 | A `Scenario` pickled before the *Neufchatel*'s stage 0b | `nations` a plain class default (`None`), left out of the pickled state and of the save's dict while `None` (`Scenario.__getstate__`, `to_dict`), so an old one reads `None` and pickles and saves as before (measured at the reviews of 2026-11-07: seven saves made at c3d46cca and the three kept fixtures, by the checkpoint road and the replay road) |
+| An old save naming "a privateer brig", "privateer brig" or "a"/"an hermaphrodite brig" | before the *Neufchatel*'s rows those words took the merchant brig by their last word, and now take her file: a replay of such a save makes her hull where its checkpoint keeps the merchant brig. Documented; no shipped scenario names the words (grep), nor any save or scenario in the owner's harbour folder (they name a privateer brig in names, briefs and letters only, never as a `description:` or in a world order) |
 
 ### 16.3 Pace
 

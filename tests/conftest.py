@@ -514,6 +514,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "[a privateer lugger]",
         "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
         "[a revenue cutter]",
+        # package 75, B2: the Prince de Neufchatel's round trip, a scenario of hers sailed an
+        # hour and from its checkpoint (7.1 s, her file alone at four workers, 2026-11-07)
+        "test_neufchatel.py::test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_no_fit_named",
     }
 )
 
