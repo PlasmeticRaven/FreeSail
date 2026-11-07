@@ -54,7 +54,7 @@ on these packages; that is the owner's choice.
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b; **the design approved 2026-11-07** (nine rulings; `docs/design/Design-Prizes.md`); step 1 merged 2026-11-07 (9acab09); step 2 merged 2026-11-07 (1bb24f52), truths 7-351 to 7-354; on step 3 (the captive's channel), steps 3 to 7 one at a time from the builder's scratch branch |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package; the hold (SW-5) and B3.4 merged 2026-11-06 (f414ed1); SW-4 merged 2026-11-07 (73b9469); B3.4's four steps and B2 in hand to one final report |
-| 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone; the research pass approved 2026-11-07; **the pass and step 1 (Britain) merged 2026-11-07 (4f3694b2)**; on step 2 (France) |
+| 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone; the research pass approved 2026-11-07; **the pass and step 1 (Britain) merged 2026-11-07 (4f3694b2)**; step 2 (France) merged 2026-11-07 (943b453f); steps 3 (Spain), 4 (the United States and Naples), 6, 7 and item 8 (colours.yaml) built on the branch, their report awaited |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806); **found by package 81 (2026-11-07), for this package:** a hole above the water is made at 0.3 to 1.8 m above the waterline whatever the side's height (`combat/hits.py`, 73's), so a cutter's hole can stand above her rail: cap a hole at the side's height at its x (the profile's rail where the file gives one); and a tick on each volley (`Volley` in `combat/guns.py`) for the viewer's exact stamp of each round (81 stamps a round with its snapshot's tick meanwhile) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d approved 2026-10-29 (the owner); 79c launched 2026-10-29** as an Opus sibling session on `claude/pkg-79c`; **its research pass (step 0) merged 2026-10-29** (`38b0145`: fifteen texts of both basins under `docs/references/pilots/`, the Admiralty's meteorological tables as page images, the pass's report in the tuning notes; Gallica, the BDH, HathiTrust and Europeana refusing with their own pages, the Archive answering everything); **79d launched 2026-10-29** from it as an Opus sibling session on `claude/pkg-79d` **and merged 2026-10-30** (the record below; the four packages of 79 done); **79c merged 2026-10-29** (the record below; its block ruled two regions at the builder's report of 57.5 MB in one: `mediterranean-west` the Alboran, Málaga to Cartagena and Barbary to Oran, 5 W to a tile column at 0.05 E, and `balearics`, the Balearics with Algiers, thence to 4.5 E; every tile written, the numbering one package's); **79d's Gulf ruled two regions the same day** (`gulf-of-lion` 3 to 7.73 E and `ligurian-sea` 7.73 to 11 E, with `tyrrhenian` within the rule: three regions in the package; the Gulf's south bound to 40.56 N to meet `balearics`, so no open water between the blocks answers nothing; a port's nation allowed a dated form, `{nation, since, until}` by 79a's form, read for the world's date, for Genoa's annexation of June 1805, the smallest change in the ports' readers, 84 told); none depends on 84 |
@@ -3028,6 +3028,48 @@ merge:** the trial on eff2a556 clean but for the notes' meeting, lint-clean (ruf
 format); the fast tier whole on it green, exit 0 (10:08 to 10:48 UTC), 6,570 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud dispatched after
 run 50, the figures to follow. Step 3 (the captive's channel) follows at its boundary, then 4
 to 7 the same, one at a time.
+
+### Package 76, step 2 (the French book from the page), as merged (2026-11-07)
+
+**What landed:** the builder's 2df464d (claude/pkg-76: 5735d77 the book and the hoist's form,
+c280716 and 2c5ea3c the notes, the trunk merged at the step's boundary), merged `--no-ff` by
+hash at 943b453f onto 0e38d5e7, a clean merge. The branch's later commit 2c3e1cc (the step's
+suite figures in the tuning notes) was committed after steps 3, 4, 6 and 7 and item 8 landed on
+the branch, so its tree is not step 2's and the lead merged 2df464d, the step's own tree, as
+the rule of 04:06 has it; that paragraph of the notes reaches the trunk with the next merge.
+**Built:** `data/signals/france/` as du Pavillon's system, read in Audibert Ramatuelle's Cours
+élémentaire de tactique navale (1802, ch. IV §§ 67 to 74; docs/references/signals/): every
+signal two flags, the upper and the lower, read as a cell of a square table of some twenty
+flags with guidons and pendants, a guidon over two flags for a bare number, the compass by one
+flag under a guidon; the numerary 74 entries, EVERY cell made and marked (the Republic's book
+of the year VI is not online; Corbett places a copy at the RUSI), 14 meanings in Orvilliers's
+words (Signaux généraux pour l'escadre du Roi, Brest 1772) given as `original` with his source,
+four entries added (the chase to windward and to leeward, Orvilliers's; the ships astern to make
+more sail, the ships ahead to shorten); the night and fog in Audibert's form (guns in two times,
+ten seconds between the guns and a minute between the times, the ships repeating by lanterns;
+three chapters told apart by a rocket between or after; the fog one chapter), every cell made
+but the fog's keeping company, which is his (§ 93, the signal de conserve); the convoy's
+practice cited to Audibert's chapter on the escort of convoys (part II ch. V), its numbers made;
+the private form read against his § 70; no dictionary (he has none and proposes none). **The
+one engine change, as approved in advance:** `Books.hoist_form` ('numerary' or 'table', refused
+in words otherwise) read from book.yaml, `Hoist.form` carried on the hoist and by `repeat the
+signal`, `flags_words` saying "two flags at the main" for a table hoist whatever the cell's
+number; the record writes `form` only where it is not the numerary's, so no British or basic
+record changes; the British numerary proven unmoved by it (the new test: No. 186 three flags
+and no form key in its record, No. 16 two flags, the French general chase two flags with form
+'table'). **What moved:** nothing pinned (no passage hoists or reads a French signal).
+**Taken another way, accepted:** the night and fog test's rule (every entry from a page names a
+year of the period, or is marked made) reads the year by a regular expression, so Audibert's
+fog signal of 1802 passes by its year and not by a number; the British tables stay numbered.
+**Found on the way:** the branch's merge commit 2df464d says "(records)" where the trunk's
+range carried code (81's merge and the import mend); said, not rewritten. **The builder's
+suites at 2df464d** (a worktree pinned there): ruff check and format clean; the fast tier
+exit 0, 6,550 passed, 1 xfailed; the slow tier of the touched files and the known truths exit
+0, 326 passed, 8 xfailed; the pace alone and last 13 of 13 (and the same three at 1844886
+before the trunk's two moves). **The lead's merge:** the trial on 0e38d5e7 clean and
+lint-clean; the fast tier whole on it green, exit 0 (11:05 to 11:45 UTC), 6,571 passed, 2 skipped, 1 xfailed, none failed; the whole suite in the cloud dispatched after
+run 51, the figures to follow. Steps 3 (Spain), 4 (the United States and Naples), 6, 7 and
+item 8 are built on the branch and follow by one report when their suites finish.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
