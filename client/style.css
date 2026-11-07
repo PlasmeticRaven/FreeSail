@@ -33,6 +33,22 @@
   --torn: #9c2f22;
   --rope: #5a5147;
   --rope-busy: #c2782e;
+  --port: #15110d;
+  --lid: #5f4c3a;
+  --iron: #26231f;
+  --carriage: #7a5c3c;
+  --hole: #0d0b09;
+  --plug: #a58a5e;
+  --flash: #ffd36a;
+  --smoke: #f2efe8;
+  --flag-red: #b3261e;
+  --flag-white: #f7f5ef;
+  --flag-blue: #1f3a7a;
+  --flag-yellow: #e2b72f;
+  --flag-green: #2f6b3a;
+  --flag-black: #1b1a18;
+  --flag-orange: #d9822b;
+  --flag-cloth: #d8cdb3;
 
   --map-sea: #7b98a8;
   --map-ink: #2b2925;
@@ -194,6 +210,30 @@ main {
 .ship-view .hull.under,
 .ship-view .hull.under.strip { fill: var(--under); stroke: var(--under); }
 .ship-view .hull.outline.under { fill: none; stroke: var(--under-line); }
+
+/* package 81, the action: an open port dark in the side, a lid in the side's paint edged dark,
+   shut flush or hauled up; a gun's barrel iron on its carriage or slide; a shot hole dark, a plug
+   buff; the flags in their drawings' colours; the flash bright and the smoke pale, its opacity
+   thinning as the view draws it (Design-ViewerAction.md). */
+.ship-view .hull.port { fill: var(--port); stroke: var(--port); stroke-width: 0.5px; }
+.ship-view .hull.lid { fill: var(--lid); stroke: var(--hull-far); stroke-width: 0.6px; }
+.ship-view .hull.hole { fill: var(--hole); stroke: var(--hole); stroke-width: 0.5px; }
+.ship-view .hull.hole.plugged { fill: var(--plug); stroke: var(--hull-far); }
+.ship-view .gun { stroke-width: 0.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.ship-view .gun.barrel { fill: var(--iron); stroke: var(--iron); }
+.ship-view .gun.carriage { fill: var(--carriage); stroke: var(--hull-far); }
+.ship-view .gun.muzzle { fill: var(--iron); stroke: var(--port); }
+.ship-view .flag { stroke: var(--rope); stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+.ship-view .flag.colour-red { fill: var(--flag-red); }
+.ship-view .flag.colour-white { fill: var(--flag-white); }
+.ship-view .flag.colour-blue { fill: var(--flag-blue); }
+.ship-view .flag.colour-yellow { fill: var(--flag-yellow); }
+.ship-view .flag.colour-green { fill: var(--flag-green); }
+.ship-view .flag.colour-black { fill: var(--flag-black); }
+.ship-view .flag.colour-orange { fill: var(--flag-orange); }
+.ship-view .flag.colour-cloth { fill: var(--flag-cloth); }
+.ship-view .effect.flash { fill: var(--flash); stroke: none; }
+.ship-view .effect.plume { fill: var(--smoke); stroke: none; }
 
 .ship-view .spar { stroke: var(--spar); stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .ship-view .spar.mast { stroke-width: 3.2px; }
