@@ -16449,6 +16449,167 @@ machine, one suite at a time, on the steps' final code.
 candidates, the captain's trials and the four whole logs; `tests/test_view_geometry.py` (B5's), whose
 twenty cases on her file from her step 2 are B5.6's.
 
+### The shared guards name her (2026-11-08)
+
+With her file in `data/ships/` and her rows in, the whole fast tier failed 22 cases (the run below),
+each a guard in a file shared with another role that reads every committed ship file or description
+row by name. Each was diagnosed before it was changed, by scripts in the session's scratch
+(`b4/guards/`) on the tree at 7fe5a877 with her work uncommitted on it. Every figure of hers below is
+measured on her file by the test's own arithmetic, the same scripts giving the *Neufchatel*'s, the
+brig-sloop's and the topsail schooner's rows exactly as their tables have them. All 22 are settled
+in the guards' own files, B2's, B3's and B5's: each guard now names her exactly, so that it fails if
+any other file trips it, or if she stops. None is a fault of her file. One recorded departure, for
+the lead: her settee's block, drawn outboard of her round counter. Her module and her file did not
+move; no ship file was rewritten; no viewer, engine or server code changed.
+
+**The *Neufchatel*'s role guard (`tests/test_neufchatel.py`, B2's).**
+- Old: `ROLE_BY_INTENT` had no row of hers (the row's keys must be `world/ships.py`'s
+  `DESCRIPTIONS`), and `own_sub_type_role` named the *Neufchatel*'s file alone.
+- New: her row `["merchant"] * 4 + _TAIL`, measured by the guard's own loop: a merchant with no
+  intent, on a passage, homeward and on a station; then privateer (a station cruising for prizes),
+  fisherman, packet, commodore. The own table is `{"bilander.yaml": "merchant",
+  "hermaphrodite-brig.yaml": "privateer"}`.
+- Her row is filed since package 75 with `roles: [merchant]` (Bil-D §8), so `brains.sub_type_role`
+  reads its first role, as the lead's ruling (3)(b) of 2026-11-07 has it for every such row. The
+  merchant brig's row, by the intent's rules, is unmoved (merchant three times, then kings-ship).
+
+**The count (`tests/test_schooner_mast.py`, B3's).** Old: 16 files. New: 17, in
+`test_the_guard_reads_seventeen_files_her_three_parts_and_the_brigs_main_yards_among_them`
+(renamed, so the junit compare shows the old name only in the fast tier), which also holds that her
+dry yard is crossed on her main lower mast, so that the rule names none of her parts (the per-file
+guard, `== []` on her, as at her steps 2 to 5).
+
+**The viewer's guards (`tests/test_view_geometry.py`, B5's).** Nineteen cases on her file, and the
+settee guard.
+- **Her rows in the tables kept by file:**
+  - `BOWSPRIT_DRAWN` (1.270, 28.99): her heel on her stem head (x +11.27, 2.65 m above her
+    water-line), her end 6.75 m; her file has her steeved about 29 degrees (Chapman 1768 Pl. LXII
+    No. 5, measured: Bil-D §4.2).
+  - `TIERS_IN_THE_SIDE` {upper}: her highest port's middle stands 0.17 m under her rail.
+  - `CHORD_OFF_THE_SIDE_M` 0.250: her wale's after end at x -10.0, where her round counter turns in.
+    Her wale and her port band follow her side within 0.8 mm (the case's 2 mm).
+  - `LINES_ON_THE_RAIL`, on both sides and on both tacks: the braces of her dry yard
+    (`main.crossjack.yard`), main topsail and main topgallant yards, with no mast abaft them, and
+    her fore course's, fore topmast staysail's and jib's sheets.
+  - `STEM_TACKED` {fore.storm_staysail} and `STEM_TACK_Z_M` 2.67, her stem head's 2.65 and 2 cm:
+    her storm staysail's tack 0.022 m off the top of her side, inside the 5 cm. Her fore topmast
+    staysail and jib are on stays to the bowsprit's cap and the jib-boom's end.
+  - The bulkheads: her quarterdeck's breast, `{("quarterdeck", "fore")}`, at x -4.29, from her
+    upper deck's 1.02 m up to her rail's 2.49 (her quarterdeck 2.25 there).
+- **Her round stern, with lights and no gallery.**
+  - `RIGHTLY_WITHOUT`: she joins "gallery" (`LIT_WITH_NO_GALLERY`) and "transom" (beside the
+    lugger). Gwyn's stern view draws her stern round with three oval lights, and the badge on each
+    quarter is carving, not a gallery (Bil-D §3.2). She stays out of "light", "head", "wale" and
+    "band": she draws and files each.
+  - So she leaves four cases: the transom's run from its knuckle to the taffrail (its list now
+    leaves out the lugger and her), the transom at the taffrail and its foot, the galleries and
+    lights at their places, and the stern painted last from abaft. That last is a transom's rule:
+    forward of the beam a transom's face is seen from inside and goes first. Her near quarter's
+    light is seen from outside there, at its depth; from 135 to 225 degrees her three lights take
+    the stern's layer, after the rest of her hull (measured).
+  - So that her lights stay under a guard, the round-stern case (the 64's stern made round) is now
+    run on her file as well, parametrised: her three marks, 1.75 to 2.75 m, within 0.95 m of her
+    middle line (her band's 1.10), on her drawn face to 0.02 mm, and no gallery drawn, as she files
+    none.
+  - The stern under a rig figure abaft and nearer keeps her (`STERN_LAYERED`, a transom or a round
+    stern's lights): it passed on her in the fast tier.
+  - **The lights by facing:** 0, 1, 3 and 3 drawn at 0, 90, 135 and 180 degrees, against a
+    transom's 0, 0, n, n. On the curve of her counter the near quarter's light faces outboard as
+    well as aft: it is seen from 60 degrees off her bow to abeam, two from 105 degrees, all three
+    from 135 to 225; from ahead, none. The drawing's rule for a face seen, not a fault:
+    `LIGHTS_SEEN_ABEAM` {hers: 1}, the case holding that only a round stern has a row.
+- **No boom:** `NO_BOOM` {the lugger, hers}. The boom's case and the gaff sail's case took any file
+  with no row for the lugger; each now holds that a file has no boom (and so no gaff sail on one)
+  exactly when it is in that set.
+- **Her settee's sheet.** The lines' guard places a settee's sheet at its block: `where_it_ends`
+  takes the tack and knows the block by B5.4's own helper, `settee_block`, which now reads the drawn
+  deck from the served graph (`served_deck_at`, the viewer's `deckAt`): the fixture's block as
+  before, hers on her quarterdeck, and on the datum with no profile. `SHEETED_TO_A_BLOCK` {hers:
+  `main.settee.sheet`}. Through the game's own doors, the same.
+- **The settee guard.** Old: `test_no_committed_file_carries_a_settee_so_none_draws_one`. New:
+  `test_only_the_bilanders_file_carries_a_settee_and_none_starts_with_its_yard_lowered`, with
+  `SETTEE_FILES` {hers}: her served graph and her file name `main.settee` and nothing else, no other
+  file names one, and no file starts with a yard lowered.
+
+**A recorded departure: her settee's block outboard of her counter (for the lead).**
+- Her settee's clew stands at x -9.66, 2.12 m inside her taffrail (x -11.78). A fathom abaft where
+  it stands at the sail's floor (8 degrees) is x -11.41, 0.37 m inside the taffrail, over her round
+  counter.
+- There the block, abreast the clew, is drawn 1.21 m off her middle line, at her quarterdeck's
+  height (2.80 m). Her drawn rail at that x is 0.45 m off her middle line and 3.26 m up. So the block
+  hangs 0.76 m outboard of her rail, in the air beside her counter.
+- The trim's block for her cut (`trim.sheet_geometry`) is at x -11.47, 1.57 m off her middle line,
+  where her side is 0.31 m out at the deck's height. It lies 0.36 m from the drawn block (the
+  fixture's 0.33, within B5.4's 0.5).
+- The fixture's block stands inside its rail (B5.4's case asks it); hers cannot by the rule. Her
+  design's §12.3 asked for the sheet "to the profile's taffrail"; the lead's ruling on her §17 lead
+  item 4 put the block a fathom abaft the clew and abreast of it, which on her round stern falls
+  outside her.
+- Recorded in the guard as `BLOCK_OFF_HER_SIDE_M` {hers: 0.760}, the Neufchatel's precedent for a
+  drawn point off her side (`TACK_OFF_HER_SIDE_M`); every other file's block must stand inside its
+  rail. Nothing built. The ways it could go: the block held inside the rail at its x for a round
+  stern; the taffrail on the middle line for a round stern (Ext §6.3 as designed); or her clew read
+  again on Gwyn. The trim's block meets the same question; her handling figures stand on it as it
+  is.
+
+**The yards' crossing on her own file (her §12.3; B5.4's 0.03 m).** The least distance between her
+settee's yard and her dry yard as drawn (starboard tack, the lee arm aft, the settee to larboard),
+metres, by the settee's sheet (rows) and the dry yard's brace (columns, degrees):
+
+| Sheet \ brace | 0 | 20 | 40 | 50 | 62 |
+|---|---|---|---|---|---|
+| 8 | 0.89 | 0.81 | 0.64 | 0.51 | 0.30 |
+| 20 | 0.88 | 0.76 | 0.53 | 0.36 | 0.10 |
+| 25 | 0.87 | 0.73 | 0.47 | 0.28 | 0.01 |
+| 30 | 0.86 | 0.70 | 0.41 | 0.20 | 0.08 |
+| 40 | 0.82 | 0.62 | 0.25 | 0.02 | 0.25 |
+| 50 | 0.76 | 0.50 | 0.07 | 0.16 | 0.40 |
+| 60 | 0.68 | 0.35 | 0.11 | 0.32 | 0.52 |
+| 85 | 0.34 | 0.10 | 0.45 | 0.58 | 0.69 |
+
+At the engine's own trims by the wind (seed 7, 15 kn, 67.5 degrees off on the starboard tack, her
+settle): the settee's sheet 27.0 degrees, the dry yard braced 62.0 (its limit): **0.02 m**. Her dry
+yard stands 1.01 m above the settee's slings, so the two lie closer on her file than on the fixture
+at every sheet and brace of the grid (0.01 to 0.89 m against B5.4's 0.09 to 3.90), and within a
+yard's thickness, some 0.3 m, in 13 of its 40 cells. The spars are drawn as lines. No engine or
+viewer change built; for the lead.
+
+**As run.** On the owner's machine, one suite at a time with nothing else running, `py -m pytest`
+with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, from the tree root: `claude/pkg-75` at
+7fe5a877, her work uncommitted on it.
+- **The generator,** `py tools/gen_ships.py` into scratch, before and after: seventeen of seventeen
+  files byte for byte as in `data/ships/` (the sixteen committed as they were, hers as at her step
+  5). `py tools/check_viewer_guns.py`: clean.
+- **The fast tier whole** (`--junitxml` kept in the session's scratch, `b4/guards-fast.xml`): **7,009
+  passed, 22 failed, 2 skipped, 2 xfailed in 55:54** (465 slow tests left out). Test by test against
+  the fast base (B3.4b's and B2b's final fast tier, 6,912 passed, 2 skipped, 2 xfailed):
+  - only in the base, none;
+  - only in this run, 119: her 56 fast tests, all passing, and 63 cases other suites take by her
+    file (53 of the viewer's, 2 each of `test_view_action`'s, `test_viewer_action`'s and
+    `test_schooner_mast`'s, one each of `test_check_viewer_guns`', `test_driver`'s,
+    `test_hull_form`'s and `test_subtypes`'), of which the nineteen viewer's cases above failed;
+  - changed outcome, 3, each from passed to failed: the role guard, the count and the settee guard;
+  - every other outcome unchanged; the skips and the xfails the base's, message for message.
+  - The tracebacks in its log show the guards' source as edited during the run (read when the log
+    was written); the outcomes are those of the code collected at its start.
+- **After the guards' changes**, the three files that changed, one run each:
+  - `tests/test_view_geometry.py`: **993 passed**. Against the fast tier's 996 cases: the fifteen of
+    the twenty failures still in the parametrisation now pass; her four transomed and galleried
+    cases have left it, and the settee guard is renamed, its new name passing; the round-stern case
+    is parametrised, the 64's and hers passing in place of the one; no other outcome changed.
+  - `tests/test_schooner_mast.py` with `tests/test_neufchatel.py`: **131 passed, 1 xfailed**: the
+    count renamed and passing, the role guard passing, the *Neufchatel*'s close-hauled helm's xfail
+    the same; no other outcome changed.
+- **ruff** check and format over the tree: clean (367 files). Every changed file is LF.
+- **Not run:** the slow tier, the captain's trials and the four whole logs (the session's, at the
+  end).
+- **At her review (2026-11-08):** her wale hung 33 px under the drawn rail (her section, "Her
+  review's mends"), `CHORD_OFF_THE_SIDE_M`'s row for her 0.250 to **0.103 m** (measured, the
+  test's own arithmetic); the comments on `LIGHTS_SEEN_ABEAM` and `BLOCK_OFF_HER_SIDE_M` name
+  their cause, her round stern drawn closed to the middle line where Gwyn's stern view gives her
+  rail 1.55 m off it at the taffrail. No other row moved: her upper deck's end, her rabbet (not
+  drawn) and her `clr_x_m` move none of the viewer's figures.
+
 ### Her review's mends (2026-11-08)
 
 Two reviews read her work before her merge: her sources and her file (re-measured from the

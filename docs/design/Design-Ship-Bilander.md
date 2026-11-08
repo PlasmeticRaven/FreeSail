@@ -1367,6 +1367,13 @@ end with the touched files' slow tier, one suite at a time on the owner's machin
 *As built (B4, 2026-11-08): steps 1 to 5 done in the package's clone, nothing committed (her
 `MODULE_FILES` row made for the parent's commit, then her ship commit, then the shared guards'
 commit); step 6, the testing report, waits on B5.6 drawing her file.*
+*The shared guards named her the same day (`docs/dev/TuningNotes.md`, "The shared guards name
+her"): the twenty-two fast-tier cases her file and rows failed, each in its owner's file (B2's,
+B3's, B5's), each guard naming her exactly so that it fails if another file trips it or if she
+stops; the viewer draws her file with no code changed. One recorded departure, for the lead: her
+settee's block, a fathom abaft her clew and abreast of it by the lead's ruling on §17 lead item 4,
+drawn 0.76 m outboard of her round counter's rail (§12.3 asked for the sheet to the taffrail).
+Her dry yard and her settee's yard lie 0.02 m apart by the wind in the drawing on her own file.*
 
 ### 13.1 The testing report (the owner's direction of 2026-10-29)
 

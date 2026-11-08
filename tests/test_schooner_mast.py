@@ -12,7 +12,8 @@ no mast carries yards, every fore yard shot away, her main's yards her after yar
 
 One committed ship file trips it, the *Prince de Neufchatel*'s, the file the rule was made for (her
 main topgallant's two light yards and the sail between them; package 75, B2), and no other (the
-guard, every file of `data/ships/` with the boats), so no other file's classing moves: the golden
+guard, every file of `data/ships/` with the boats, the bilander's among them since package 75's
+B4, her main crossing her dry yard on its lower mast), so no other file's classing moves: the golden
 table's own run (`tests/test_rig_classing.py`, and the razee's and the 64's rows in
 `tests/test_indefatigable.py`) is that proof, and is not repeated here; hers is her own tests'
 (`tests/test_neufchatel.py`).
@@ -191,12 +192,16 @@ def test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast(pat
     assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == named
 
 
-def test_the_guard_reads_sixteen_files_her_three_parts_and_the_brigs_main_yards_among_them():
-    """The guard is not empty: the sixteen files of the tree (the *Neufchatel*'s the sixteenth,
-    package 75, B2), her three parts named, and the brig's main topsail, topgallant and royal
-    yards, which a rule without its lower-yard test would name."""
-    assert len(SHIP_FILES) == 16
+def test_the_guard_reads_seventeen_files_her_three_parts_and_the_brigs_main_yards_among_them():
+    """The guard is not empty: the seventeen files of the tree (the *Neufchatel*'s the sixteenth,
+    package 75, B2; the bilander's the seventeenth, B4, her main crossing her dry yard on its lower
+    mast, so that the rule names none of hers), her three parts named, and the brig's main
+    topsail, topgallant and royal yards, which a rule without its lower-yard test would name. Old:
+    sixteen files."""
+    assert len(SHIP_FILES) == 17
     assert set(ON_A_SCHOONERS_MAST) <= {p.stem for p in SHIP_FILES}
+    bilander = load_ship(ROOT / "data" / "ships" / "bilander.yaml")
+    assert bilander.spars["main.crossjack.yard"].parent == "main.mast"
     her = load_ship(ROOT / "data" / "ships" / "hermaphrodite-brig.yaml")
     assert her.spars["main.topsail.yard"].parent == "main.topmast"
     assert not any(s.parent == "main.mast" for s in her.spars.values() if s.cls == "yard")

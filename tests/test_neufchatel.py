@@ -993,7 +993,9 @@ def test_a_brig_stays_the_merchant_brigs_and_her_index_row_is_her_files():
 # a passage, home, a station, a station cruising for prizes, a ground, a letter and a convoy
 # (measured at B2's tree, 52fad521; package 75, B2b). Hers alone moved: by the intent rules
 # merchant, merchant, merchant, kings-ship, privateer, fisherman, packet, commodore, where her
-# file's first role is a privateer's now wherever the intent's kind names none.
+# file's first role is a privateer's now wherever the intent's kind names none. The bilander's row
+# (package 75, B4), filed since 75 with `roles: [merchant]` (Bil-D §8), sails by its first role,
+# a merchant wherever the intent's kind names none (measured at her landing, the same arithmetic).
 INTENT_KINDS = (
     ("", False, False),
     ("passage", False, False),
@@ -1021,6 +1023,7 @@ ROLE_BY_INTENT = {
     "sixty-four": ["kings-ship"] * 4 + _TAIL,
     "razee": ["kings-ship"] * 4 + _TAIL,
     "hermaphrodite brig": ["privateer"] * 4 + _TAIL,
+    "bilander": ["merchant"] * 4 + _TAIL,
 }
 
 
@@ -1032,7 +1035,8 @@ def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
     is a privateer wherever the intent's kind names no role, and every other row's role is as
     before at every intent's kind (`ROLE_BY_INTENT`, measured before the step). A crewed World's
     captain takes his own file's first row's by the same rule (`brains.own_sub_type_role`), hers
-    alone of the files."""
+    alone of the files until the bilander's landing (package 75, B4), whose row, filed since 75
+    with its roles, sails by its first role as hers does: a merchant."""
     for key, roles in ROLE_BY_INTENT.items():
         got = []
         for kind, prizes, convoy in INTENT_KINDS:
@@ -1045,7 +1049,10 @@ def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
     for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
         world = SimpleNamespace(ship=SimpleNamespace(spec=SimpleNamespace(source=str(path))))
         own[path.name] = brains.own_sub_type_role(world)
-    assert {k: v for k, v in own.items() if v} == {"hermaphrodite-brig.yaml": "privateer"}
+    assert {k: v for k, v in own.items() if v} == {
+        "bilander.yaml": "merchant",
+        "hermaphrodite-brig.yaml": "privateer",
+    }
 
 
 def _her_world(intent="", papers=None):

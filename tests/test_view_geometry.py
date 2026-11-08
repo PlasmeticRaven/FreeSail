@@ -78,7 +78,13 @@ fields the projection reads always run.
   furled along it; its sheet to a block a fathom abaft the clew at its floor (the lead's ruling on
   the bilander's §17 lead item 4); its derrick from the yard's after part; the dry main yard above
   it in every state; the frame across states; the dip in stays through the game's own doors; and no
-  committed file carrying the key.
+  committed file carrying the key, until the bilander's.
+- Package 75 (B4, the shared guards at her landing): the bilander's rows in the tables kept by file,
+  each measured on her file by its case's own arithmetic: her bowsprit, her tier of ports, her
+  wale's chord, her lines on the rail and her settee's sheet to its block (its place outboard of
+  her round counter a recorded departure, for the lead), her storm staysail on the stem, her
+  quarterdeck's breast; her round stern with its lights and no gallery, the near quarter's light
+  seen abeam; no boom; and hers the one committed file with a settee.
 """
 
 from __future__ import annotations
@@ -90,6 +96,7 @@ import shutil
 import subprocess
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -142,6 +149,7 @@ MERCHANT_BRIG = "data/ships/merchant-brig.yaml"  # and the rest of the eight (SW
 PRIVATEER = "data/ships/privateer-schooner.yaml"
 SMACK = "data/ships/smack.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2: the Prince de Neufchatel
+BILANDER = "data/ships/bilander.yaml"  # package 75, B4: the bilander
 EVERY_SHIP = sorted(f"data/ships/{p.name}" for p in (ROOT / "data" / "ships").glob("*.yaml"))
 # the ships' boats (package 82, item 4: `boat-*.yaml`, a lug on one mast, no bowsprit and
 # no gaff sail; her drawing is that package's last step)
@@ -1164,9 +1172,11 @@ def test_the_sides_top_runs_through_every_rail_point_and_the_head_rule(tmp_path,
 
 
 @needs_node
-@pytest.mark.parametrize(("path", "builder"), [d for d in DRAWN_BY if d[0] != LUGGER])
+@pytest.mark.parametrize(
+    ("path", "builder"), [d for d in DRAWN_BY if d[0] not in (LUGGER, BILANDER)]
+)
 def test_the_transom_runs_from_the_knuckle_to_the_taffrail(tmp_path, path, builder):
-    """Every stern with a transom; the lugger's is round (`RIGHTLY_WITHOUT`)."""
+    """Every stern with a transom; the lugger's and the bilander's are round (`RIGHTLY_WITHOUT`)."""
     hull = hull_of(path, builder)
     profile = hull["profile"]
     got = run_js(
@@ -1272,7 +1282,9 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
 # *Neufchatel*'s measured at her landing (package 75, B2): her heel on her stem head, 2.35 m above
 # her water-line, her cap 4.63 m, 19.50 degrees where her file has her steeved about 15 (her sail
 # plan draws the bowsprit over the stem about 10 ft above her water, her lines' stem head lower:
-# her file's note, Neuf-D §3.7 task 7).
+# her file's note, Neuf-D §3.7 task 7). The bilander's measured at her landing (package 75, B4): her
+# heel on her stem head, 2.65 m above her water-line at x +11.27, her end 6.75 m, 28.99 degrees
+# where her file has her steeved about 29 (Chapman 1768 Pl. LXII No. 5, measured: Bil-D §4.2).
 BOWSPRIT_DRAWN = {
     SIXTY_FOUR: (1.004, 27.05),
     RAZEE: (0.941, 27.77),
@@ -1285,6 +1297,7 @@ BOWSPRIT_DRAWN = {
     SCHOONER: (2.833, 19.98),
     PRIVATEER: (2.833, 19.98),
     NEUFCHATEL: (0.555, 19.50),
+    BILANDER: (1.270, 28.99),
 }
 # The three whose files' ends give no rise from the stem head (the viewer step for the rig's lines,
 # the lead's ruling of 2026-10-31: "rooted at the sheet's height"), metres above her water-line: the
@@ -1599,13 +1612,18 @@ NO_GALLERY_OR_LIGHT = {BRIG, MERCHANT_BRIG, CUTTER, LUGGER, SMACK, SCHOONER, PRI
 # `wales_m` "not written until read"; §3.7 task 6, not taken at B2), so her file files none and
 # none is drawn. She leaves the set when the wale is read, or the lead rules her plate without one.
 WALE_UNREAD = {NEUFCHATEL}
+# The bilander (package 75, B4) has her lights and no gallery: Gwyn's stern view draws her stern
+# round with three oval lights in one band, and the oval badge on each quarter is carving in
+# scrollwork, not a gallery (Bil-D §3.2, "Carving and paint in words"), so that she files
+# `lights_m` and no `galleries_m`. Her round stern, as the lugger's, has no transom.
+LIT_WITH_NO_GALLERY = {BILANDER}
 # a ship's boat (package 82: her drawing by rule) has no gallery, no stern light, no head
 # and no ports, a square transom and a rubbing strake for her wale
 RIGHTLY_WITHOUT = {
-    "gallery": NO_GALLERY_OR_LIGHT | set(BOATS),
+    "gallery": NO_GALLERY_OR_LIGHT | LIT_WITH_NO_GALLERY | set(BOATS),
     "light": NO_GALLERY_OR_LIGHT | set(BOATS),
     "head": {CUTTER, LUGGER, SMACK} | set(BOATS),
-    "transom": {LUGGER},
+    "transom": {LUGGER, BILANDER},
     "wale": {SCHOONER, PRIVATEER} | WALE_UNREAD,
     "band": {LUGGER, SMACK} | set(BOATS),
 }
@@ -1621,6 +1639,10 @@ GALLERIED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["gallery"]]
 LIT = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["light"]]
 HEADED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["head"]]
 TRANSOMED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["transom"]]
+# the files whose stern, seen from abaft, takes the stern's layer: a transom, or a round stern's
+# lights (the bilander's, package 75, B4: her three from 135 to 225 degrees, after the rest of
+# her hull, measured at her landing); the lugger's round stern has neither
+STERN_LAYERED = [p for p in PROFILED if p in TRANSOMED or p in LIT]
 
 
 def parts_filed(profile: dict) -> set[str]:
@@ -1907,17 +1929,22 @@ def test_the_transom_stands_at_the_taffrail_and_transom_hb_m_its_foot_rounded_up
 
 
 @needs_node
-def test_a_round_stern_has_no_transom_and_its_lights_lie_on_its_drawn_face(tmp_path):
+@pytest.mark.parametrize("path", [SIXTY_FOUR, BILANDER])
+def test_a_round_stern_has_no_transom_and_its_lights_lie_on_its_drawn_face(tmp_path, path):
     """§6: a round stern has no transom; the strips close to the middle line (form.py's closure
     there), and each band of lights is spread within its half-breadth across the drawn face, each
-    mark's corners on the drawn side within a centimetre. The 64's stern made round here."""
-    ship = make_ship(SIXTY_FOUR)
+    mark's corners on the drawn side within a centimetre; its galleries drawn where it files them.
+    The 64's stern made round here; the bilander's, the first committed round stern with lights,
+    as her file has it (package 75, B4: her three in one band, 1.75 to 2.75 m, within 0.95 m of
+    her middle line, on her drawn face to 0.02 mm, measured at her landing)."""
+    ship = make_ship(path)
     spec = ship.hull.spec
     p = spec.profile
     was = p.form.stern
-    stern = HullStern(type="round", galleries_m=was.galleries_m, lights_m=was.lights_m)
-    spec = replace(spec, profile=replace(p, form=replace(p.form, stern=stern)))
-    ship.hull.spec = spec
+    if was.type != "round":
+        stern = HullStern(type="round", galleries_m=was.galleries_m, lights_m=was.lights_m)
+        spec = replace(spec, profile=replace(p, form=replace(p.form, stern=stern)))
+        ship.hull.spec = spec
     hull = queries.ship_graph(ship)["hull"]
     assert hull["profile"]["form"]["stern"]["type"] == "round"
     assert all(hb == 0.0 for _x, _z, hb in hull["stations"][0])
@@ -1931,7 +1958,8 @@ def test_a_round_stern_has_no_transom_and_its_lights_lie_on_its_drawn_face(tmp_p
         """,
     )
     assert "transom" not in got["parts"]
-    assert {"light", "gallery", "side"} <= set(got["parts"])
+    assert {"light", "side"} <= set(got["parts"])
+    assert ("gallery" in got["parts"]) == bool(was.galleries_m) == (path == SIXTY_FOUR)
     for b, (zl, zh, n, hb) in enumerate(was.lights_m):
         marks = [pts for band, pts in got["lights"] if band == b]
         assert len(marks) == n, b
@@ -2396,12 +2424,26 @@ def test_the_hull_below_the_water_is_drawn_three_ways_hidden_by_default(tmp_path
         assert ways["solid"]["nUnder"] == 0 and ways["solid"]["overMax"] > 0.75
 
 
+# How many of a round stern's lights are drawn seen from abeam, upright: the bilander's (package
+# 75, B4), the first committed round stern with lights, measured at her landing. On the curve of
+# her counter the near quarter's light faces outboard as well as aft, so that it is seen from abeam
+# (and from 60 degrees off her bow), her middle one from 105 degrees and all three from 135; from
+# ahead, none. A transom's lights are seen edge on abeam, none drawn. The cause (her review,
+# 2026-11-08): a round stern is drawn closed to the middle line along the post and the counter, so
+# her lights, filed +-1.10 m across her stern (Gwyn's +-1.22), are drawn within 0.95 m on a face
+# that turns toward the beam; Gwyn's stern view gives her rail 1.55 m off the middle line at the
+# taffrail and about 2.0 at the wale, a breadth her file cannot give (her `breadth_m` note; the
+# lead's, a key for a round stern's breadth at the counter).
+LIGHTS_SEEN_ABEAM = {BILANDER: 1}
+
+
 @needs_node
 @pytest.mark.parametrize("path", LIT)
 def test_the_stern_lights_are_seen_only_from_abaft_the_transom(tmp_path, path):
     """The lights are marks on the transom's after face (no opening): drawn seen from astern and
     on the quarter, not from ahead, where the face's back stands above the bow, nor abeam, where
-    it is seen edge on."""
+    it is seen edge on. On a round stern they lie on the curve of her counter, and the near
+    quarter's is seen from abeam (`LIGHTS_SEEN_ABEAM`)."""
     graph = graph_of(path)
     n = sum(band[2] for band in graph["hull"]["profile"]["form"]["stern"]["lights_m"])
     got = run_js(
@@ -2413,7 +2455,9 @@ def test_the_stern_lights_are_seen_only_from_abaft_the_transom(tmp_path, path):
           P.project(sk, facing, 0).figures.filter(f => f.part === 'light').length);
         """,
     )
-    assert got == [0, 0, n, n]
+    round_stern = graph["hull"]["profile"]["form"]["stern"]["type"] == "round"
+    assert round_stern == (path in LIGHTS_SEEN_ABEAM)
+    assert got == [0, LIGHTS_SEEN_ABEAM.get(path, 0), n, n]
 
 
 # The views the review drew (heel positive lowers the starboard side, toward a viewer at pi/2)
@@ -2457,7 +2501,9 @@ def test_wales_and_bands_are_drawn_only_on_the_outside_of_the_side(tmp_path, pat
 
 # Each file's tiers cut in the side, each port's middle below the rail: the frigate's forecastle
 # ports stand 0.31 m over it, and the lugger and the smack file no ports; the *Neufchatel*'s one
-# tier, her highest port's middle 0.34 m under her rail (measured at her landing, B2)
+# tier, her highest port's middle 0.34 m under her rail (measured at her landing, B2); the
+# bilander's one tier, the armed fit's ports cut in her waist bulwark, her highest port's middle
+# 0.17 m under her rail (measured at her landing, B4)
 TIERS_IN_THE_SIDE = {
     SIXTY_FOUR: {"lower", "upper", "quarterdeck"},
     RAZEE: {"upper", "quarterdeck", "forecastle"},
@@ -2470,6 +2516,7 @@ TIERS_IN_THE_SIDE = {
     SCHOONER: {"upper"},
     PRIVATEER: {"upper"},
     NEUFCHATEL: {"upper"},
+    BILANDER: {"upper"},
 }
 
 
@@ -2497,7 +2544,9 @@ def test_each_tier_of_ports_cut_in_the_side_is_drawn_as_a_band(tmp_path, path, b
 # How far inside the drawn side the straight chord between a band's two heights stood at its worst,
 # metres, read at each end from the band's own corners: what drew the comb along the wale and the
 # port bands from ahead and astern, plainest on the frigate-36; the *Neufchatel*'s, her port band
-# alone (no wale filed), 0.001 m (measured at her landing, B2)
+# alone (no wale filed), 0.001 m (measured at her landing, B2); the bilander's, her wale's after end
+# at x -10.0 where her round counter turns in, 0.103 m (measured at her review, 2026-11-08, her wale
+# hung 33 px under the drawn rail; 0.250 at her landing, B4, the band 0.17 m lower)
 CHORD_OFF_THE_SIDE_M = {
     FRIGATE: 0.613,
     RAZEE: 0.109,
@@ -2510,6 +2559,7 @@ CHORD_OFF_THE_SIDE_M = {
     PRIVATEER: 0.009,
     LUGGER: 0.005,
     NEUFCHATEL: 0.001,
+    BILANDER: 0.103,
 }
 BANDS = """
     const H = P.formHull(d.hull);
@@ -2711,8 +2761,10 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
     64's roundhouse front, quarterdeck breast and forecastle's after end; the razee's breast and
     forecastle. So dead ahead the space under her quarterdeck and roundhouse is not seen through,
     and on the quarter her forecastle deck is not seen through its after end. The frigate's breast
-    and forecastle, as the razee's but for her roundhouse; every other file carries one deck, with
-    nothing to close."""
+    and forecastle, as the razee's but for her roundhouse; the bilander's breast, her raised
+    quarterdeck's fore end at x -4.29 over her flush upper deck, from 1.02 m up to her rail's 2.49
+    (package 75, B4, measured at her landing); every other file carries one deck, with nothing to
+    close."""
     hull = hull_of(path, builder)
     profile = hull["profile"]
     decks = profile["decks_m"]
@@ -2731,6 +2783,7 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
         "sixty-four": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
         "razee-44": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
         "frigate-36": {("quarterdeck", "fore"), ("forecastle", "aft")},
+        "bilander": {("quarterdeck", "fore")},
     }.get(Path(path).stem, set())
     at = {(f["deck"], "aft" if f["pts"][0][0] == decks[f["deck"]][0][0] else "fore") for f in got}
     assert at == ends and len(got) == len(ends)
@@ -4378,6 +4431,10 @@ BOOM_SAIL = {
     PRIVATEER: "main.sail",
     NEUFCHATEL: "main.sail",
 }
+# The files with no boom, so no gaff sail on one: the lugger's lugs, and the bilander's settee on
+# her main and her square sails and staysails (package 75, B4), each sheeted to the rail, a block
+# or the yard below
+NO_BOOM = {LUGGER, BILANDER}
 # Across those states the frame itself is one on every file but the smack's: the top of it there
 # is her gaff's peak as that stands sheeted, 0.09 m higher at 85 degrees heeled 0.3 rad. A gaff's,
 # and no boom's, and as before her lines: recorded.
@@ -4744,7 +4801,8 @@ def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(t
     the boom topped up BOOM_STEEVE_DEG (the owner's word of 2026-11-05), the clew with its end:
     measured under the jaws' height, as the level boom was, 0.50-0.88 m and 0.26-0.33 m; under its
     line, which now rises aft, 0.50-0.87 m and 0.26-0.33 m (under the jaws' height they would now
-    read 0.26-0.47 m and 0.03-0.05 m)."""
+    read 0.26-0.47 m and 0.03-0.05 m). The bilander carries no gaff sail and no boom (`NO_BOOM`,
+    package 75, B4): none is drawn of hers."""
     bands = {SailState.SET: (0.4, 1.0), SailState.FURLED: (0.2, 0.4)}
     cut = [
         s.id
@@ -4775,7 +4833,7 @@ def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(t
             });
             """,
         )
-        assert got, path
+        assert bool(got) == (path not in NO_BOOM), path  # the bilander's file: none
         for under in got:
             if path in LACED_ON_HER_CUT:
                 assert under == pytest.approx(0.0, abs=1e-9), (path, state)
@@ -4880,7 +4938,8 @@ def test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail(tmp_path,
     `BOOM_OVER_TAFFRAIL_M` on the brigs, the razee, the schooners, the smack, the cutter, the 64 and
     the *Neufchatel*, within 2 cm; drawn level it stood at its jaws' height there, the old figure.
     The frigate-36's still stands under hers, her file's figure (`UNDER_HER_TAFFRAIL`). The lugger
-    carries no boom. The same state with no profile lays every boom level, as before."""
+    and the bilander carry no boom (`NO_BOOM`). The same state with no profile lays every boom
+    level, as before."""
     sail = DRIVER if path == SIXTY_FOUR else BOOM_SAIL.get(path)
     ship = driver_ship(path, bent=True) if path == SIXTY_FOUR else make_ship(path)
     for sid in ship.groups["plain sail"]:
@@ -4892,8 +4951,9 @@ def test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail(tmp_path,
     data = ship_state(ship, awa=math.radians(-150.0), tack="larboard")
     booms = {s["id"]: s for s in data["graph"]["spars"] if s["class"] == "boom"}
     if not sail:
-        assert path == LUGGER and not booms
+        assert path in NO_BOOM and not booms
         return
+    assert path not in NO_BOOM
     bare = without_profile(json.loads(json.dumps(data)))
     got = run_js(
         tmp_path,
@@ -5618,10 +5678,11 @@ def test_the_stern_seen_from_abaft_is_painted_after_the_rest_of_the_hull(tmp_pat
 
 
 @needs_node
-@pytest.mark.parametrize("path", TRANSOMED)
+@pytest.mark.parametrize("path", STERN_LAYERED)
 def test_the_stern_stays_under_a_rig_figure_abaft_and_nearer(tmp_path, path):
     """A boom's end or a sheet abaft the transom and nearer than all of it stays in front of it, the
-    stern's layer going no later than that; so nothing but such a figure comes between."""
+    stern's layer going no later than that; so nothing but such a figure comes between. The
+    bilander's round stern, its lights its layer (`STERN_LAYERED`), as a transom."""
     for view in sweep_of(tmp_path, path):
         figures = view["figures"]
         stern = [i for i, f in enumerate(figures) if f["layer"] == 2]
@@ -5776,6 +5837,7 @@ STEM_TACK_Z_M = {
     SCHOONER: 2.69,
     PRIVATEER: 2.69,
     NEUFCHATEL: 2.80,
+    BILANDER: 2.67,  # her stem head's 2.65 (package 75, B4)
 }
 
 
@@ -5852,6 +5914,17 @@ LINES_ON_THE_RAIL[NEUFCHATEL] = both_sides(
     "jib.sheet",
     "flying_jib.sheet",
 )
+# the bilander's (package 75, B4, measured at her landing): her fore course's and her head sails'
+# sheets as the brig's, and the braces of her main's three yards, the dry yard among them, with no
+# mast abaft them; her settee's one sheet to its block (`SHEETED_TO_A_BLOCK`)
+LINES_ON_THE_RAIL[BILANDER] = both_sides(
+    "main.crossjack.yard.brace",
+    "main.topsail.yard.brace",
+    "main.topgallant.yard.brace",
+    "fore.course.sheet",
+    "fore.topmast_staysail.sheet",
+    "jib.sheet",
+)
 # a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
 LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
 # The sails each file hanks to a stay led to the stem, and cuts by the viewer's rule: the 64's and
@@ -5868,6 +5941,7 @@ STEM_TACKED = {
     SCHOONER: {"fore.staysail", "jib", "storm_jib"},
     PRIVATEER: {"fore.staysail", "jib", "storm_jib"},
     NEUFCHATEL: {"fore.staysail", "fore.storm_staysail"},  # her storm jib on the jib stay
+    BILANDER: {"fore.storm_staysail"},  # her two head sails' stays to the bowsprit and jib-boom
 }
 # A recorded departure (package 75, B2, for the lead): how far a head sail's tack on a stay to the
 # stem stands off the top of her side, where it is more than 5 cm. The *Neufchatel*'s stem head,
@@ -5878,6 +5952,21 @@ STEM_TACKED = {
 # above her water; the bowsprit's heel and the stem head's height are Neuf-D §3.7 task 7's, not
 # taken.
 TACK_OFF_HER_SIDE_M = {NEUFCHATEL: 0.202}
+# The sheets each file leads to a block on her deck (B5.4's rule for a settee's one sheet: Ext §5.9
+# with the lead's ruling on the bilander's §17 lead item 4, `settee_block`): the bilander's settee's
+# (package 75, B4)
+SHEETED_TO_A_BLOCK = {BILANDER: {"main.settee.sheet"}}
+# A recorded departure (package 75, B4, for the lead): how far a sheet's block stands outboard of
+# her drawn rail, where it does. The bilander's settee's clew stands 2.12 m inside her taffrail, so
+# that a fathom abaft it at the sail's floor, x -11.41, is 0.37 m inside the taffrail, over her
+# round counter: her drawn rail there is 0.45 m off her middle line, the block, abreast the clew,
+# 1.21 m, on her quarterdeck's height (2.80 m) under her rail's 3.26. The trim's block for her cut
+# stands farther out still (x -11.47, 1.57 m off the middle line, her side 0.31 m there at the
+# deck). Her figures and the ruling's rule stand; which gives way on a round stern is the lead's.
+# The cause (her review, 2026-11-08): her round stern is drawn closed to the middle line, 0.35 m
+# off it 0.4 m inside the taffrail at her lights' height, where Gwyn's stern view gives her rail
+# 1.55 m off it at the taffrail, outboard of the drawn block's 1.21 m.
+BLOCK_OFF_HER_SIDE_M = {BILANDER: 0.760}
 LINE_ENDS = """
     const sk = P.buildSkeleton(d.graph, d.snap);
     const spars = {};
@@ -5919,11 +6008,11 @@ def fully_dressed(path: str, tack: str = "larboard", extra: tuple = ()) -> dict:
     return ship_state(ship, awa=math.radians(60.0) * sign, tack=tack)
 
 
-def where_it_ends(line: dict, graph: dict, spars: dict) -> str:
+def where_it_ends(line: dict, graph: dict, spars: dict, tack: str | None = None) -> str:
     """Where a brace's or a sheet's end stands: on her drawn rail; at the taffrail on the centreline
-    (a boom sail's); up in the rig, on a mast abaft its yard (a brace's, 0.3 m to its own side) or
-    on the arm of the yard below (a topsail's sheet); or elsewhere: on a hull drawn from her
-    profile, in the air."""
+    (a boom sail's); at a settee's block, on her tack (`settee_block`); up in the rig, on a mast
+    abaft its yard (a brace's, 0.3 m to its own side) or on the arm of the yard below (a topsail's
+    sheet); or elsewhere: on a hull drawn from her profile, in the air."""
     end = line["pts"][1]
     hull = graph["hull"]
     if hull.get("profile"):
@@ -5932,6 +6021,10 @@ def where_it_ends(line: dict, graph: dict, spars: dict) -> str:
             return "rail"
     if end == pytest.approx(taffrail_of(graph), abs=RAIL_BAND_M):
         return "taffrail"
+    sail = next((s for s in graph["sails"] if s["id"] == line["of"]), {})
+    if tack and line["cls"] == "sheet" and sail.get("settee"):
+        if end == pytest.approx(settee_block(graph, tack), abs=1e-6):
+            return "block"
     if line["cls"] == "brace" and abs(end[1]) == pytest.approx(0.3, abs=1e-9):
         return "mast"
     for spar in spars.values():
@@ -5967,8 +6060,10 @@ def side_of(line: dict) -> float:
     return 1.0 if line["pts"][0][1] >= 0 else -1.0
 
 
-def assert_every_end_is_on_the_rail_or_up_in_the_rig(got: dict, graph: dict) -> set[str]:
-    places = {ln["id"]: where_it_ends(ln, graph, got["spars"]) for ln in got["lines"]}
+def assert_every_end_is_on_the_rail_or_up_in_the_rig(
+    got: dict, graph: dict, tack: str | None = None
+) -> set[str]:
+    places = {ln["id"]: where_it_ends(ln, graph, got["spars"], tack) for ln in got["lines"]}
     in_the_air = [i for i, place in places.items() if place == "elsewhere"]
     assert not in_the_air, in_the_air
     on_the_rail = {i for i, place in places.items() if place == "rail"}
@@ -5990,11 +6085,25 @@ def test_each_line_that_comes_down_ends_on_her_drawn_rail(tmp_path, path, tack):
     mizzen yards' braces under her counter, in the air 1.9 to 2.3 m outboard of the rail. Every
     other line stays where it was, up in the rig or at the taffrail, and none ends in the air:
     braces leading to the next mast, topsails' sheets to the yard below, boom sails' to the
-    taffrail. The set of lines on the rail is each file's, exactly."""
+    taffrail, a settee's to its block (`SHEETED_TO_A_BLOCK`), inside her rail but where it stands
+    outboard of it (`BLOCK_OFF_HER_SIDE_M`, the bilander's, recorded). The set of lines on the rail
+    is each file's, exactly."""
     data = fully_dressed(path, tack)
     got = run_js(tmp_path, data, LINE_ENDS)
-    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"])
+    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"], tack)
     assert on_the_rail == LINES_ON_THE_RAIL[path]
+    blocks = {
+        ln["id"]: ln["pts"][1]
+        for ln in got["lines"]
+        if where_it_ends(ln, data["graph"], got["spars"], tack) == "block"
+    }
+    assert set(blocks) == SHEETED_TO_A_BLOCK.get(path, set())
+    for lid, end in blocks.items():
+        outboard = abs(end[1]) - abs(rail_end(data["graph"]["hull"], end[0], 1.0)[1])
+        if path in BLOCK_OFF_HER_SIDE_M:
+            assert outboard == pytest.approx(BLOCK_OFF_HER_SIDE_M[path], abs=0.005), lid
+        else:
+            assert outboard < 0.0, lid
 
 
 @needs_node
@@ -6211,10 +6320,11 @@ AS_BEFORE = [*BOATS, *WITHOUT_PROFILE]
 @pytest.mark.parametrize("tack", ["starboard", "larboard"])
 def test_with_no_profile_the_lines_come_down_as_before(tmp_path, case, tack):
     """A graph with no profile: each line that comes down ends half the beam out at the datum,
-    where the hull it is drawn on has its rail, with no x held; a stay led to the stem lands at half
-    her length or her bowsprit's heel, at the datum. The boats were here until package 82 drew each
-    from her own profile; their lug's sheet now ends on her gunwale with the rest
-    (`test_each_line_that_comes_down_ends_on_her_drawn_rail`)."""
+    where the hull it is drawn on has its rail, with no x held, but a settee's one sheet, at its
+    block on the datum (`settee_block`; the bilander's, package 75, B4); a stay led to the stem
+    lands at half her length or her bowsprit's heel, at the datum. The boats were here until
+    package 82 drew each from her own profile; their lug's sheet now ends on her gunwale with the
+    rest (`test_each_line_that_comes_down_ends_on_her_drawn_rail`)."""
     data = fully_dressed(case.removesuffix(BARE), tack)
     if case.endswith(BARE):
         without_profile(data)
@@ -6223,7 +6333,7 @@ def test_with_no_profile_the_lines_come_down_as_before(tmp_path, case, tack):
     assert got["lines"]
     came_down = set()
     for line in got["lines"]:
-        if where_it_ends(line, graph, got["spars"]) != "elsewhere":
+        if where_it_ends(line, graph, got["spars"], tack) != "elsewhere":
             continue
         came_down.add(line["id"])
         x = lead_x(line, graph, got, on_a_profile=False)
@@ -6397,14 +6507,15 @@ def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
         data = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
     assert data["snap"]["ship"]["tack"] == "larboard"
     got = run_js(tmp_path, data, LINE_ENDS)
-    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"])
+    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"], "larboard")
     assert on_the_rail
     assert on_the_rail <= LINES_ON_THE_RAIL[path]
 
 
 # ---------------------------------------------------------------------------
 # Package 75 (B5.4, docs/design/Design-ShipsEngineExtensions.md §6.3 to §6.5): the settee on its
-# yard, on the fixture `brig_with_settee()` (tests/rig_fixtures.py); the bilander's own file is B4's
+# yard, on the fixture `brig_with_settee()` (tests/rig_fixtures.py); the bilander's own file is
+# B4's, her settee's sheet to its block among the lines on the rail above (`SHEETED_TO_A_BLOCK`)
 # ---------------------------------------------------------------------------
 
 SETTEE = "main.settee"
@@ -6491,11 +6602,21 @@ def _lee(tack: str) -> float:
     return 1.0 if tack == "larboard" else -1.0  # +1 starboard
 
 
+def served_deck_at(hull: dict, x: float) -> float:
+    """The drawn deck's height at `x` (`client/projection.js`'s `deckAt`, freesail/ship/profile.py's
+    `deck_at`) on the served profile's decks, or the datum on a graph with none."""
+    decks = (hull.get("profile") or {}).get("decks_m")
+    if not decks:
+        return hull["deck_height_m"]
+    return deck_at(SimpleNamespace(decks_m=tuple(decks.items())), x)
+
+
 def settee_block(graph: dict, tack: str) -> list:
     """Where the settee's sheet is drawn to (Ext §5.9 with the lead's ruling on the bilander's §17
     lead item 4): a fathom abaft the clew at the sail's floor and abreast of it, by the trim's own
     floor and lead (`TRIM_RANGE`, `LOOSE_FOOTED_LEAD_AFT_M`), with the cut swung about its slings
-    as it is drawn, the slings on the lee side of the mast; on the drawn deck there."""
+    as it is drawn, the slings on the lee side of the mast; on the drawn deck there, read from the
+    served graph (the fixture's or a file's), or on the datum with no profile."""
     sail, deck, beam = _settee_of(graph)
     sx, sz = _slings_of(graph)
     cx = sail["corners_m"][3][0]
@@ -6503,7 +6624,7 @@ def settee_block(graph: dict, tack: str) -> list:
     floor = TRIM_RANGE["lug"][0]
     x = sx + shift + (cx - sx) * math.cos(floor) - LOOSE_FOOTED_LEAD_AFT_M
     y = _lee(tack) * (LUG_LEE_OF_BEAM * beam - (cx - sx) * math.sin(floor))
-    return [x, y, deck_at(brig_with_settee().hull.spec.profile, x)]
+    return [x, y, served_deck_at(graph["hull"], x)]
 
 
 @needs_node
@@ -6810,14 +6931,24 @@ def test_the_frame_holds_the_settee_across_states(tmp_path, facing_deg):
                 assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
 
 
-def test_no_committed_file_carries_a_settee_so_none_draws_one():
-    """Ext §6: the settee's branches are reached only by its key, which no committed file carries:
-    no served graph names a settee and no ship starts with a yard lowered, so every file draws as
-    before."""
+# The committed files that carry a settee: the bilander's main (package 75, B4), the key's first
+SETTEE_FILES = {BILANDER}
+
+
+def test_only_the_bilanders_file_carries_a_settee_and_none_starts_with_its_yard_lowered():
+    """Ext §6: the settee's branches are reached only by its key, which one committed file carries,
+    the bilander's (`SETTEE_FILES`; package 75, B4): her served graph alone names a settee, her
+    main's, and no ship starts with a yard lowered, so every other file draws as before. Old: no
+    committed file carried the key (B5.4, before her landing)."""
+    carries = set()
     for path in EVERY_SHIP:
         ship = make_ship(path)
-        assert not [s for s in queries.ship_graph(ship)["sails"] if "settee" in s], path
-        assert not any(s.settee or s.yard_lowered for s in ship.sails.values()), path
+        served = [s["id"] for s in queries.ship_graph(ship)["sails"] if "settee" in s]
+        filed = [s.id for s in ship.sails.values() if s.settee]
+        assert served == filed == ([SETTEE] if path in SETTEE_FILES else []), path
+        assert not any(s.yard_lowered for s in ship.sails.values()), path
+        carries |= {path} if filed else set()
+    assert carries == SETTEE_FILES
 
 
 @needs_node
