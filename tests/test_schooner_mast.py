@@ -587,8 +587,8 @@ def test_only_the_neufchatel_swings_her_after_yards_short(path):
 @pytest.mark.parametrize(
     ("build", "said"),
     [
-        (schooner_with_main_topsail, "Rise tacks and sheets. Main-topsail haul"),
-        (schooner_with_main_topgallant, "Rise tacks and sheets. Main-topsail haul"),
+        (schooner_with_main_topsail, "Main-topsail haul"),
+        (schooner_with_main_topgallant, "Main-topsail haul"),
         (polacre_probe, None),
         (schooner_with_fore_course, None),
     ],
@@ -597,9 +597,13 @@ def test_only_the_neufchatel_swings_her_after_yards_short(path):
 def test_a_schooners_main_yards_are_hauled_by_main_topsail_haul(build, said):
     """The lead's ruling 2 of 2026-11-06 (Luce 1884 p. 417): a schooner's main crosses no course,
     so her mainsail is never set and her after yards, the main topsail yard or the main
-    topgallant's two, are hauled by "Main-topsail haul!", her fore course's tacks and sheets
-    risen with it while it is set ("Rise tacks and sheets. Mainsail haul." before the ruling).
-    The polacre and trial A have no after yards and say nothing at the haul, as before."""
+    topgallant's two, are hauled by "Main-topsail haul!"; the order names the haul of the after
+    yards, not the sail (the lead's ruling (2)(c) of 2026-11-07). Her fore course set, its tack
+    is kept fast at the haul and risen apart at "let go and haul" (the ruling's (2)(a), B3.4b:
+    Luce pp. 421, 428, 446; the sailed tack below). Old beside new: "Rise tacks and sheets.
+    Main-topsail haul" from ruling 2 to B3.4b, "Rise tacks and sheets. Mainsail haul." before
+    ruling 2. The polacre and trial A have no after yards and say nothing at the haul, as
+    before."""
     ship = _under_plain_sail(build())
     tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
     assert (tack._haul_words() if tack.after else None) == said
@@ -608,14 +612,18 @@ def test_a_schooners_main_yards_are_hauled_by_main_topsail_haul(build, said):
 def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_does(tmp_path):
     """Trial B tacked at seed 7 in 15 knots, settled 2,400 s under plain sail braced sharp up and
     trimmed every two minutes (B3.4's measure; the tuning notes, "The lead's four rulings,
-    built"): "Rise tacks and sheets. Main-topsail haul." at 32 s, her head 9 degrees short of
-    the wind (her main crossing no course, the word is Luce's for the mainsail not set, the
-    lead's ruling 2; "Rise tacks and sheets. Mainsail haul." before it, the rise of her fore
-    course's tacks and sheets kept); the main topsail yard swung in 26 s (the short swing's 20 s
-    by the weather and the hands) where the 45-s swing took 59 s; "Let go and haul." at 58 s
-    where it waited to 91 s, the fore yards no longer held aback with her head through the wind;
-    tacked in 151 s where it was 219 s, within the schooner's two and a half minutes and 2 s over
-    trial A's 149 s."""
+    built"): "Main-topsail haul." at 32 s, her head 9 degrees short of the wind (her main
+    crossing no course, the word is Luce's for the mainsail not set, the lead's ruling 2); the
+    main topsail yard swung in 26 s (the short swing's 20 s by the weather and the hands) where
+    the 45-s swing took 59 s; "Rise fore tack and sheet. Let go and haul." at 58 s where it
+    waited to 91 s, the fore yards no longer held aback with her head through the wind; tacked
+    in 151 s where it was 219 s, within the schooner's two and a half minutes and 2 s over trial
+    A's 149 s. Old beside new, words only, every tick the same: "Rise tacks and sheets.
+    Main-topsail haul." and "Let go and haul." from ruling 2 to B3.4b, where her fore tack is
+    kept fast at the haul and risen apart before the head yards are hauled (the lead's ruling
+    (2)(a) of 2026-11-07; Luce 1884 p. 421, "RISE FORE TACK AND SHEET! and when the after sails
+    fill, Haul well taut! LET GO AND HAUL!"; pp. 428, 446); "Rise tacks and sheets. Mainsail
+    haul." before ruling 2."""
     sc = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,
@@ -638,15 +646,17 @@ def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_do
     while not done and world.clock.tick - start < 900:
         world.tick()
         done = [e.kind for e in world.log if e.tick > start and e.kind in ends]
-    haul = "Rise tacks and sheets. Main-topsail haul."
+    haul = "Main-topsail haul."
+    let_go = "Rise fore tack and sheet. Let go and haul."
     said: dict[str, int] = {}
     for e in world.log:
-        for key in (haul, "Mainsail haul", "Let go and haul"):
-            if e.tick >= start and key in e.text:
+        for key in (haul, let_go, "Mainsail haul", "Rise tacks and sheets"):
+            hit = e.text.startswith(key) if key in (haul, let_go) else key in e.text
+            if e.tick >= start and hit:
                 said.setdefault(key, e.tick - start)
     assert done == ["ship.tacked"]
-    assert set(said) == {haul, "Let go and haul"}  # no "Mainsail haul" (ruling 2)
-    assert 20 <= said["Let go and haul"] - said[haul] <= 30  # 26 s; 59 s on brace_s
+    assert set(said) == {haul, let_go}  # no "Mainsail haul" (ruling 2), the fore tack apart
+    assert 20 <= said[let_go] - said[haul] <= 30  # 26 s; 59 s on brace_s
     assert 90 <= world.clock.tick - start <= 180  # 151 s; 219 s on brace_s
     assert world.ship.dyn.tack == "larboard"
 

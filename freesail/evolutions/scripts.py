@@ -1115,8 +1115,11 @@ class TackScript(Script):
     (`_after_swing_s`); the word is "main-topsail haul" when her main course is not set
     (Luce 1884 p. 417; `_haul_words`). When her head has passed through the wind and the
     after yards are round, "let go and haul": the head yards follow, the head sheets are
-    drawn on the new tack and the helm is ordered to the new close-hauled course. She is
-    tacked when steady on it.
+    drawn on the new tack and the helm is ordered to the new close-hauled course; with her
+    fore course set and her main not, its tack is kept fast at the haul and risen apart
+    before it, "Rise fore tack and sheet. Let go and haul." (Luce 1884 pp. 421, 428 and 446;
+    `_haul_words`). She is tacked when steady on it, or after ``steady_timeout_s`` on the new
+    course order, the line then naming the tack she lies on, read from her (`words`).
 
     Package 32e (spec M5 open item 12): the miss-stays rule reads the vessel, and she
     is given Luce's recovery before she gives up. Her way is gone when she makes less
@@ -1176,6 +1179,12 @@ class TackScript(Script):
     retrim_in = 0.0
     last_trim = False
     by_wind_drawn = False
+    # package 75, B3.4b: set on the script only when true, so that a tack's pickle is as it was
+    # unless one arises: the fore tack kept fast at the haul, to be risen at "let go and haul"
+    # (`_haul_words`); and the tack ended by `steady_timeout_s`, not steady on her course
+    # (`words`)
+    fore_rise = False
+    timed_out = False
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
@@ -1226,40 +1235,25 @@ class TackScript(Script):
             return self.timing_value("light_after_swing_s", 20.0)
         return brace_s
 
-    def _haul_words(self) -> str:
-        """The order as the after yards are hauled, after Luce 1884 pp. 416-417: "RISE TACKS AND
-        SHEETS!", the fore and main tacks and sheets let go and the courses' clews hauled up by
-        the clew-garnets, then "Haul taut! MAINSAIL HAUL!"; and when "the mainsail is not set,
-        to haul the after yards, order— MAIN-TOPSAIL HAUL!" (p. 417, the line's first word lost
-        to the scan; p. 446, the mainsail hauled up, "a late 'maintopsail haul'"). Package 75,
-        the lead's ruling 2 of 2026-11-06: "Main-topsail haul!" for every ship whose main
-        course is not set (none bent, or hauled up), "Rise tacks and sheets. Mainsail haul."
-        kept for a main course set.
-
-        The mainsail is the main course: of her courses as her file names them (its "courses"
-        group, as the gale's reduction reads them, `orders.storm._after_sail_lines`), the one
-        on the foremost of the after yards' masts (`Ship.mast_of`): the main course of a ship
-        and of a brig; a schooner's main crosses none, so hers is never set. The bilander's
-        settee, bent on her main in the course's place and named her mainsail
-        (`tests/rig_fixtures.py`, her main yard dry), is in her "courses" but is no course
+    def _courses_drawing(self) -> tuple[bool, bool]:
+        """Her fore course and her main course, each drawing or not, for the words of the tack
+        (`_haul_words`). Of her courses as her file names them (its "courses" group, as the
+        gale's reduction reads them, `orders.storm._after_sail_lines`), the main course is the
+        one on the foremost of the after yards' masts (`Ship.mast_of`): the main course of a
+        ship and of a brig; a schooner's main crosses none, so hers is never set. The fore course
+        is any other (in every rig filed or in memory the one on her fore, her "courses" holding
+        no third). The bilander's settee, bent on her main in the course's place and named her
+        mainsail (`tests/rig_fixtures.py`, her main yard dry), is in her "courses" but is no course
         hauled at the order: it is kept drawing as a ship's mizen is, its tack not risen, and
-        changed last (D3(b); `SetteeChange`, package 75, B3.3). So it counts for neither words,
-        and her line is "Rise tacks and sheets. Main-topsail haul." with her fore course set,
-        as it was while the settee was lowered at "helm's a-lee" (judgement, kept for the
-        lead: the order hauls her dry main yard and her main topsail yard, with no sail of
-        hers to haul as a mainsail). A course is set when it is set or
-        goose-winged, its weather clew down and drawing, as the readings count a sail drawing
-        (judgement: the ruling's "none bent, or hauled up" names neither); hauled up or in the
-        gear, furled, loosed, blown out, unbent, or its yard shot away or sent down, it is not.
-        "Rise tacks and sheets" is said while any course is set, and not with none set: every
-        course's clews are up already and there is nothing to rise (Luce's own gloss of the
-        order). With the fore course set and the main not it is said as before, of the fore's:
-        Luce does not settle that case's words (pp. 419, 428 and 446 rise the fore tack apart,
-        by its name, before "let go and haul"), and the lead holds it."""
+        changed last (D3(b); `SetteeChange`, package 75, B3.3), so it counts for neither. A
+        course is drawing when it is set or goose-winged, its weather clew down and drawing, as
+        the readings count a sail drawing (judgement: the ruling's "none bent, or hauled up"
+        names neither); hauled up or in the gear, furled, loosed, blown out, unbent, or its
+        yard shot away or sent down, it is not."""
         ship = self.ship
         masts = [m for m in (ship.mast_of(y) for y in self.after) if m is not None]
         main_mast = max(masts, key=lambda m: m.x_m) if masts else None
-        any_set = main_set = False
+        fore_set = main_set = False
         for sid in ship.groups.get("courses") or []:
             sl = ship.sails.get(sid)
             if sl is None or sl.settee:
@@ -1269,11 +1263,46 @@ class TackScript(Script):
             drawing = standing and (
                 sl.is_set or (sl.state is SailState.GOOSE_WINGED and not sl.wrecked)
             )
-            any_set = any_set or drawing
-            if drawing and main_mast is not None and ship.mast_of(sl) is main_mast:
+            if not drawing:
+                continue
+            if main_mast is not None and ship.mast_of(sl) is main_mast:
                 main_set = True
-        haul = "Mainsail haul" if main_set else "Main-topsail haul"
-        return f"Rise tacks and sheets. {haul}" if any_set else haul
+            else:
+                fore_set = True
+        return fore_set, main_set
+
+    def _haul_words(self) -> str:
+        """The order as the after yards are hauled, after Luce 1884 pp. 416-417: "RISE TACKS AND
+        SHEETS!", the fore and main tacks and sheets let go and the courses' clews hauled up by
+        the clew-garnets, then "Haul taut! MAINSAIL HAUL!"; and when "the mainsail is not set,
+        to haul the after yards, order— MAIN-TOPSAIL HAUL!" (p. 417, the line's first word lost
+        to the scan; p. 446, the mainsail hauled up, "a late 'maintopsail haul'"). Package 75,
+        the lead's ruling 2 of 2026-11-06: "Main-topsail haul!" for every ship whose main
+        course is not set (none bent, or hauled up), "Rise tacks and sheets. Mainsail haul."
+        kept for both courses set. Her courses are read by `_courses_drawing`.
+
+        The word's two cases, the lead's ruling (2) of 2026-11-07 (B3.4b), each course risen
+        apart by its name as Luce rises it: (a) her fore course set and her main not, the haul
+        is "Main-topsail haul" alone, the fore tack kept fast, and it is risen apart before the
+        head yards are hauled, "Rise fore tack and sheet. Let go and haul." (the tick's
+        `fore_rise`: Luce 1884 p. 421, under double-reefed topsails, "RISE FORE TACK AND SHEET!
+        and when the after sails fill, Haul well taut! LET GO AND HAUL!"; p. 428, the fore tack
+        "should not be eased until after 'mainsail haul'"; p. 446, the mainsail hauled up, "RISE
+        FORE TACK! and LET GO AND HAUL!"); (b) her main course set and her fore not, "Rise main
+        tack and sheet. Mainsail haul" (p. 417, "RISE MAIN TACK AND SHEET!" with the fore tack
+        kept fast; p. 421; p. 446). With neither set, "Main-topsail haul" alone, every course's
+        clews being up already and nothing to rise (Luce's own gloss of the order). The order
+        names the haul of the after yards, not a sail (the lead's ruling (2)(c): p. 417 gives it
+        whenever the mainsail is not set, p. 446 with it hauled up), so the *Neufchatel*'s main
+        topgallant yards and a schooner's main topsail yard are hauled by it, no source giving a
+        schooner's own word; and the bilander's after yards by it at every tack, "none bent"
+        meaning no square course bent to her dry main yard (the ruling's (2)(d)): her fore
+        course set, her line is "Main-topsail haul." and "Rise fore tack and sheet. Let go and
+        haul." after it, as any ship's with her mainsail hauled up."""
+        fore, main = self._courses_drawing()
+        if not main:
+            return "Main-topsail haul"
+        return f"{'Rise tacks and sheets' if fore else 'Rise main tack and sheet'}. Mainsail haul"
 
     def begin(self, words: dict[str, Any]) -> None:
         # the studding sails first, if any are set or their booms out (spec 3b §7)
@@ -1467,6 +1496,11 @@ class TackScript(Script):
                 if self.after:
                     haul = self._haul_words()
                     self.note(f"{haul}; let go the bowlines." if bowlines else f"{haul}.")
+                    fore, main = self._courses_drawing()
+                    if fore and not main:
+                        # the fore tack kept fast, to be risen apart at "let go and haul"
+                        # (package 75, B3.4b; Luce 1884 pp. 421, 428 and 446)
+                        self.fore_rise = True
                 elif bowlines:
                     self.note("Let go the bowlines.")
                 self.swing = YardSwing(
@@ -1492,7 +1526,11 @@ class TackScript(Script):
                 self._draw_on_new_tack(new_lee, wind)
                 draw = " Draw jib; trim aft the head sheets." if self.heads else ""
                 if self.head:
-                    self.note("Let go and haul." + draw)
+                    # the fore tack kept fast at the haul is risen now, by its name, while its
+                    # course still draws (package 75, B3.4b; `_haul_words`)
+                    rise = self.fore_rise and self._courses_drawing()[0]
+                    said = "Let go and haul." + draw
+                    self.note(f"Rise fore tack and sheet. {said}" if rise else said)
                 elif draw:
                     self.note(draw.strip())
                 sharp = sharp_up_targets(self.ship, self.head, self.after)
@@ -1543,10 +1581,14 @@ class TackScript(Script):
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
             dyn.target_heading = self.new_course
             error = abs(units.wrap_pi(dyn.heading - self.new_course))
+            steady = error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
             if (
-                error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
-                or (self.t_steady >= self.timing_value("steady_timeout_s", 120.0))
+                steady or (self.t_steady >= self.timing_value("steady_timeout_s", 120.0))
             ) and not self._lugs_down():
+                if not steady:
+                    # ended by the timeout, not steady on her course: the line names the tack
+                    # she lies on, read from her (package 75, B3.4b; `words`)
+                    self.timed_out = True
                 if self.steer is not None and self.steer.given:
                     self._to_the_course(wind)
                 else:
@@ -1725,8 +1767,17 @@ class TackScript(Script):
         return 30.0
 
     def words(self) -> dict[str, Any]:
+        """The lines' words. The new tack is the one she was put about for, but for a tack
+        ended by ``steady_timeout_s`` and not steady on her course, which names the tack she
+        lies on, read from her: package 75, the lead's ruling (3) of 2026-11-07 (B3.4b), so
+        that a ship fallen back on the old tack is not said to lie on the new one (the main
+        topgallant's rig with her fore yards shot away, before the lead's ruling 3 of
+        2026-11-06, lay 76.7 degrees off on the old tack at 1.5 kn when it said "Tacked;
+        braced up on the larboard tack": B3.4)."""
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        if self.timed_out:
+            new = self.ship.dyn.tack
         steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
@@ -1903,9 +1954,15 @@ class WearScript(Script):
                 if self.dip.ids:
                     dipped = f" Lowered the {self.dip.names()} to dip them."
                     self.dip.dip(new_lee, self.timing_value("dip_s", 90.0))
+                # "you have now the wind directly aft ... LAY THE HEAD YARDS SQUARE! Shift over
+                # the head sheets!" (Luce 1884 p. 424), the after yards braced in as she fell
+                # off (p. 423) and braced up as she comes to: with no head yards (a lugger, a
+                # boat, a schooner whose fore yards are all shot away) there are none to square
+                # and the words say nothing of them (package 75, the lead's ruling (3) of
+                # 2026-11-07, B3.4b; "Squared the head yards" before it, whatever she had)
+                squared = "Squared the head yards; shifted" if self.head else "Shifted"
                 self.note(
-                    "Wind aft. Squared the head yards; shifted over the sheets; hauled out "
-                    "and braced up." + dipped
+                    f"Wind aft. {squared} over the sheets; hauled out and braced up." + dipped
                 )
         if self.dip is not None:
             self.dip.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
@@ -2824,11 +2881,20 @@ class HeaveToScript(Script):
 
             drifting = f"; she has {number_words(round(astern))} knots of sternway, and drifts"
         if not self.yards and getattr(self, "headsail", None) is not None:
+            # no yards to lay aback (a fore-and-after with no topsail set, a lugger, a schooner
+            # whose fore yards are all shot away): hove to under her fore-and-aft canvas, her
+            # main sheet flat aft and her staysail's sheet to windward (Luce 1884, ch. XXXIV,
+            # 'To Heave to'), with nothing "to the mast" (package 75, the lead's ruling (3) of
+            # 2026-11-07, B3.4b; "..., fore staysail sheet to windward, to the mast, ..."
+            # before it)
             from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
-            backed = part_name(self.ship, self.headsail.id) + " sheet to windward,"
-            return {"backed": backed, "hove_tack": tack, "drifting": drifting}
-        return {"backed": self._backed_name(), "hove_tack": tack, "drifting": drifting}
+            held = part_name(self.ship, self.headsail.id)
+            lying = f"under her fore-and-aft canvas, {held} sheet to windward"
+            return {"backed": held, "lying": lying, "hove_tack": tack, "drifting": drifting}
+        backed = self._backed_name()
+        lying = f"{backed} to the mast"
+        return {"backed": backed, "lying": lying, "hove_tack": tack, "drifting": drifting}
 
     def data(self) -> dict[str, Any]:
         d = super().data()

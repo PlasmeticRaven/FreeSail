@@ -1700,6 +1700,21 @@ fore alone; not square-rigged; head yards the four fore yards; after yards the t
 B3.4 built the rule: the topsail schooner with her main topgallant in memory classes so through the
 same gates, with the schooner's three fore yards for her four (`tests/test_schooner_mast.py`).*
 
+**The word her main topgallant yards are hauled by (the lead's ruling (2)(c) of 2026-11-07; built
+at B3.4b).** Kept as built: her two light main yards are hauled by "Main-topsail haul" though she
+crosses no main topsail. The order names the haul of the after yards and not the sail (Luce 1884
+p. 417 gives it whenever the mainsail is not set, p. 446 with the mainsail hauled up), and no source
+gives a schooner's own word for it: Cobb 1841's text, searched for it, has none. If her sources
+(Cobb, the court papers) are found to give her people's word, her file's words may carry it then.
+Beside it, the ruling's (2)(a): her fore course set and no main course, her fore tack is kept fast
+at the haul and risen apart as her head yards are hauled (Luce 1884 p. 421, "RISE FORE TACK AND
+SHEET! and when the after sails fill, Haul well taut! LET GO AND HAUL!"; p. 428; p. 446). On her
+file at seed 7 in 15 kn, settled 2,400 s under plain sail (B3.4's settle): "Main-topsail haul." at
+49 s and "Rise fore tack and sheet. Let go and haul. Draw jib; trim aft the head sheets." at 73 s,
+where they were "Rise tacks and sheets. Main-topsail haul." and "Let go and haul. ..."; tacked in
+217 s, every line's tick and every figure the same (`docs/dev/TuningNotes.md`, B3.4b). With her fore
+course hauled up there is nothing to rise and the lines are as they were.
+
 ### 12.2a The owner's proposal of 2026-10-31: a rule in the key's place (for the lead)
 
 **Ruled by the lead, 2026-11-06** (`docs/dev/M7-WorkPackages.md`, "§12.2a, ruled now: the rule in the
@@ -1850,7 +1865,8 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   log moved, and one digest (gate 5b's thick passage, the frigate put about with both courses
   hauled up) re-pinned old beside new. Her main topgallant's yards are hauled by "Main-topsail haul"
   though she crosses no main topsail, as ruled; the fore's rise named apart before "let go and
-  haul", as Luce has it when the mainsail is hauled up, is a lean for the lead, not built.
+  haul", as Luce has it when the mainsail is hauled up, is a lean for the lead, not built. *Built
+  at B3.4b by the lead's ruling (2) of 2026-11-07, the word kept for her: §12.2 above.*
 - **The lead's ruling 3, built (2026-11-07; the tuning notes, as above):** place 2 with no mast
   carrying yards: with every fore yard shot away her main's yards are her after yards
   (`head_and_after_yards`), no longer left standing, and she has no head yards. The tack hauls them
@@ -1880,7 +1896,8 @@ rule as under the key. **Still to measure, at B3.4:** how such a rig sails, the 
   haul." as ruling 2 made it, no log of hers or of any rig moving with the mend; the gale's
   reduction names no course without reef bands (above); trial B's two tacks of rulings 1 and 3
   are sailed in the fast tier, being under its threshold. The fore course's rise said with "Main-topsail
-  haul" when her mainsail is not set stays as built, the lead's (ruling 2's lean (a)).
+  haul" when her mainsail is not set stays as built, the lead's (ruling 2's lean (a)). *Ruled and
+  built at B3.4b: the fore tack risen apart at "let go and haul" (§12.2 above).*
 
 ### 12.3 What the viewer builder (B5) is asked
 
@@ -2166,7 +2183,8 @@ B6's test, not a truth (Build decision 27).
    in 201 s (trial A 149, the main topgallant's fixture 164-172); hove to 49.8° off with the main
    topgallant furled and 49.2° with it set, inside truth 12's band of angle.*
    *After the reviews of 2026-11-07: "Main-topsail haul." at 49 s and "Let go and haul." at 74 s; tacked
-   in 182 s in truth 10's form and 217 s settled; hove to 51.1° off.*
+   in 182 s in truth 10's form and 217 s settled; hove to 51.1° off.* *At B3.4b: "Main-topsail haul."
+   at 49 s and "Rise fore tack and sheet. Let go and haul." at 74 s, every tick the same (§12.2).*
 5. **Her profile read at 1280 px** (±0.3 ft): the rail at the masts against ZAZ6179 (0.9 ft at the
    main), the stem's rabbet or fore edge (up to 2 ft at the water), the gripe's foot (judged), the
    rabbet's depth at the dead flat (0.4-0.5 ft between the profile and the body plan), the rail

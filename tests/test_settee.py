@@ -870,7 +870,11 @@ def test_filling_away_draws_the_settee_kept_hove_to_and_loosing_to_dry_hangs_it_
 # The lugger's tack and wear at seed 7 from B3.4's settle (15 kn, 292.5 degrees): every line but
 # the leeway's, with its tick after the order, the same on the tree before this step and after
 # (the trace of Ext §10.1, measured both ways by B3.3 and found identical, the frigate's tack,
-# wear and heave-to and the brig's with them).
+# wear and heave-to and the brig's with them). One line moved since, words only, every tick the
+# same: the wear's at 36 s, "Wind aft. Squared the head yards; shifted over the sheets; ..."
+# until B3.4b, where with no head yards (her lug yards are no braced yards) it says nothing of
+# squaring them (the lead's ruling (3) of 2026-11-07; Luce 1884 p. 424, the head yards laid
+# square with the wind aft).
 LUGGER_TACK = [
     (0, "Order: tack ship."),
     (1, "All hands! (to tack ship)"),
@@ -898,8 +902,8 @@ LUGGER_WEAR = [
     (1, "Stations for wearing ship."),
     (
         36,
-        "Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up. "
-        "Lowered the foresail and the mainsail to dip them.",
+        "Wind aft. Shifted over the sheets; hauled out and braced up. Lowered the foresail and "
+        "the mainsail to dip them.",
     ),
     (90, "All hands on deck."),
     (
@@ -915,7 +919,8 @@ LUGGER_WEAR = [
 @pytest.mark.parametrize("order, lines", [("tack ship", LUGGER_TACK), ("wear ship", LUGGER_WEAR)])
 def test_the_luggers_tack_and_wear_are_as_they_were(order, lines):
     """Ext §10.1, the trace: the lugger's dip and lowering take her lugs alone (`lugger_lugs`),
-    her lines and ticks as before the settee step."""
+    her lines and ticks as before the settee step (the wear's wind-aft line's words since moved
+    by B3.4b, above)."""
     scenario = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,
@@ -974,7 +979,11 @@ def test_truth_7_198_the_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_an
     degrees off. Judged by her heading and tack at a set time, never by the "Tacked" line
     (D13(a)). Rule 5's clause is not pinned here: in her own tack at seed 7 the settee is never
     aback (its single sheet lies it to leeward of the wind; Ext §5.10's measure, the tuning notes),
-    so that half goes to the lead. To be measured again on the bilander's file (B4) in Phase 5."""
+    so that half goes to the lead. To be measured again on the bilander's file (B4) in Phase 5.
+    The words since, every tick the same (B3.4b, the lead's ruling (2) of 2026-11-07; Luce 1884
+    pp. 421, 428, 446): her after yards hauled by "Main-topsail haul." with her fore tack kept
+    fast, and that line "Rise fore tack and sheet. Let go and haul. ..." (at 97 s in 15 kn), where
+    they were "Rise tacks and sheets. Main-topsail haul." and "Let go and haul. ..."."""
     world = _world(tmp_path, knots=knots)
     settee = world.ship.sails[SETTEE]
     start = world.clock.tick

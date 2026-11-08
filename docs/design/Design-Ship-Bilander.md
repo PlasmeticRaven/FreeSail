@@ -1014,6 +1014,19 @@ so stage 0d is the fresh merge, the checks and the one list's move.
    storm lug; set after the cast as her after sail; getting under way as a ship.
 3. In stays, D3 (b): hauled aft at helm's a-lee, dipped when the head yards' swing ends, the tack
    ended only once it is hoisted (Ext §5.5; `settee_dip_s` 120 s in code).
+   **The word her after yards are hauled by (the lead's ruling (2)(d) of 2026-11-07; recorded at
+   B3.4b):** "Main-topsail haul" at every tack, and it stands as the review of B3.4's ruling 2
+   left it. Her settee is her main course, in her "courses" and named her mainsail, but no course
+   is hauled at the order: the settee is kept drawing in stays as a ship's mizen and changed last
+   (this item), and "none bent", in the ruling of 2026-11-06 that gives the word, means no square
+   course bent to her dry main yard. She sails the same whichever word is said. Her fore course
+   set, its tack is kept fast at the haul and risen apart as her head yards are hauled (the
+   ruling's (2)(a); Luce 1884 pp. 421, 428 and 446). On the fixture (`tests/rig_fixtures.py`'s
+   `brig_with_settee`) at seed 7 in 15 kn, settled 2,400 s under plain sail: "Main-topsail haul."
+   at 40 s and "Rise fore tack and sheet. Let go and haul. Draw jib; trim aft the head sheets." at
+   97 s, where they were "Rise tacks and sheets. Main-topsail haul." and "Let go and haul. ...";
+   tacked in 318 s, every line's tick and every figure the same (TuningNotes, B3.4b). B4 measures
+   it again on her file.
 4. In wearing: lowered at "up helm", hoisted on the new lee once the wind has crossed the stern
    (Ext §5.6).
 5. **Hove to, by the lead's ruling on Ext §14 item 3:** the main laid aback by `heave_to_aback`

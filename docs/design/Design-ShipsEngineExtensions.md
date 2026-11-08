@@ -704,7 +704,11 @@ a-lee and dipped through the wind; at +400 s on the new tack within a degree of 
 her main course, on the premise that it was lowered at helm's a-lee; set there now, it counts for
 neither words, being no course hauled at the order (its tack not risen, changed last, her main
 yard dry), and her line stays "Rise tacks and sheets. Main-topsail haul." (judgement, for the
-lead; the other way says "Mainsail haul"). Rule 5's half of truth 7-198: below, §5.10. *The
+lead; the other way says "Mainsail haul"). *The lead's ruling (2)(d) of 2026-11-07 holds the word,
+"none bent" meaning no square course bent to her dry main yard; since B3.4b her fore course's tack
+is kept fast at the haul and risen apart, "Main-topsail haul." and then "Rise fore tack and sheet.
+Let go and haul." (the ruling's (2)(a); the bilander's design §12.2 item 3).* Rule 5's half of
+truth 7-198: below, §5.10. *The
 review's mends (2026-11-07), where step 5 says nothing:* a settee whose yard hangs on the new lee
 side already (left on the weather side before the tack) is to leeward of its mast once she is
 through and is not changed, as the dip order leaves it ("Tacked" at 261 s in 15 kn, where it was

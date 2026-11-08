@@ -1199,9 +1199,14 @@ def test_truth_6_her_headsails_and_her_mainsail_set_her_helm():
 def test_her_light_main_yards_swing_short_at_main_topsail_haul():
     """The lead's rulings 1 and 2 of 2026-11-06 (Luce 1884 p. 417), built at B3.4, on her file:
     her main crossing no course, her two light main yards, every after yard of hers on a
-    schooner's mast, are hauled by "Rise tacks and sheets. Main-topsail haul." (her fore course's
-    tacks and sheets risen with it) in the short after swing, `light_after_swing_s`'s 20 s and
-    not `brace_s`'s 45, as the fixture with her main topgallant (tests/test_schooner_mast.py)."""
+    schooner's mast, are hauled by "Main-topsail haul." in the short after swing,
+    `light_after_swing_s`'s 20 s and not `brace_s`'s 45, as the fixture with her main topgallant
+    (tests/test_schooner_mast.py). The word kept for her by the lead's ruling (2)(c) of
+    2026-11-07: the order names the haul of the after yards and not the sail, and no source
+    gives a schooner's own word (her design's §12.2). Her fore course set, its tack is kept fast
+    at the haul and risen apart at "let go and haul" (the ruling's (2)(a), B3.4b; Luce 1884 pp.
+    421, 428, 446; the next test). Old beside new: "Rise tacks and sheets. Main-topsail haul"
+    from her file's first tree to B3.4b."""
     from freesail.evolutions import EVOLUTIONS
 
     ship = load_ship(HER)
@@ -1210,7 +1215,8 @@ def test_her_light_main_yards_swing_short_at_main_topsail_haul():
     tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
     assert [y.id for y in tack.after] == ["main.topsail.yard", "main.topgallant.yard"]
     assert tack._after_swing_s() == 20.0
-    assert tack._haul_words() == "Rise tacks and sheets. Main-topsail haul"
+    assert tack._haul_words() == "Main-topsail haul"
+    assert tack._courses_drawing() == (True, False)
 
 
 def test_she_stays_quickly_her_light_main_yards_hauled_short():
@@ -1218,10 +1224,13 @@ def test_she_stays_quickly_her_light_main_yards_hauled_short():
     tree (the topsail schooner with a fore course, settled 2,400 s: tacked in 149 s; Eng §3.3)
     and the main topgallant's fixture (172 s with it set, 164 s furled; B3.4, ruling 1). From
     292.5 degrees she tacks in 182 s (from 290 and 295: 184 and 181 s), gaining 118 m to
-    windward: "Rise tacks and sheets. Main-topsail haul." at 49 s and "Let go and haul." at 74 s,
-    her light main yards swung in 25 s (the short swing's 20 by the weather and the hands), and
-    no "Mainsail haul". At the start's `clr_x_m` +0.3 she tacked in 198 s (229 and 224), gaining
-    129 m (docs/dev/TuningNotes.md)."""
+    windward: "Main-topsail haul." at 49 s and "Rise fore tack and sheet. Let go and haul." at 74
+    s, her light main yards swung in 25 s (the short swing's 20 by the weather and the hands),
+    and no "Mainsail haul". At the start's `clr_x_m` +0.3 she tacked in 198 s (229 and 224),
+    gaining 129 m (docs/dev/TuningNotes.md). Old beside new, words only, every tick the same:
+    "Rise tacks and sheets. Main-topsail haul." and "Let go and haul." until B3.4b, where her
+    fore tack is kept fast at the haul and risen apart before her head yards are hauled (the
+    lead's ruling (2)(a) of 2026-11-07; Luce 1884 pp. 421, 428, 446)."""
     from tests.test_known_truths import close_hauled_on_starboard, until
 
     world = close_hauled_on_starboard(HER)
@@ -1231,14 +1240,16 @@ def test_she_stays_quickly_her_light_main_yards_hauled_short():
     assert [e.kind for e in done] == ["ship.tacked"]
     assert 120 <= seconds <= 300, seconds
     assert world.ship.dyn.tack == "larboard" and world.ship.dyn.y > y_before
-    haul = "Rise tacks and sheets. Main-topsail haul."
+    haul = "Main-topsail haul."
+    let_go = "Rise fore tack and sheet. Let go and haul."
     said = {}
     for e in world.log:
-        for key in (haul, "Mainsail haul", "Let go and haul"):
-            if e.tick >= start and key in e.text:
+        for key in (haul, let_go, "Mainsail haul", "Rise tacks and sheets"):
+            hit = e.text.startswith(key) if key in (haul, let_go) else key in e.text
+            if e.tick >= start and hit:
                 said.setdefault(key, e.tick - start)
-    assert set(said) == {haul, "Let go and haul"}  # no "Mainsail haul" (ruling 2)
-    assert 20 <= said["Let go and haul"] - said[haul] <= 35
+    assert set(said) == {haul, let_go}  # no "Mainsail haul" (ruling 2), the fore tack apart
+    assert 20 <= said[let_go] - said[haul] <= 35
 
 
 def test_she_wears_and_lies_to_as_a_fore_and_after_with_a_square_fore():
