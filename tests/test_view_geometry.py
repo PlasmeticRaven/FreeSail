@@ -1609,20 +1609,14 @@ RIGHTLY_WITHOUT = {
     "wale": {SCHOONER, PRIVATEER} | WALE_UNREAD,
     "band": {LUGGER, SMACK} | set(BOATS),
 }
-# A recorded departure (package 75, B2, for the lead): the *Neufchatel*'s stem meets her water at
-# her rabbet's x, 16.35 m, where her `breadth_m` gives the stem's siding at the water, 0.14 m
-# (Neuf-D §3.2: whether `stem_m` is the rabbet or the fore edge there is §3.7 task 2's, not taken),
-# so that her last station stands on her stem's foot, its points below the water all at z nil. Its
-# lowest comes out of the form at z -8.0e-10, a float's residue for nil, and `form._closure` keeps
-# it and her `stem_m`'s (16.35, 0.0) as two levels of her stem's closure: served to the millimetre,
-# one point twice, [16.35, 0, 0]. The viewer places that station's foot, (16.35, 0, 0.14), on the
-# stem's line between the two, so that the low line runs from the point out to it and back, the
-# vertex below met four times a side. Her loop otherwise closed, and closed on B5.1's stations; with
-# the one repeated point dropped it closes on the served stations too (78 vertices a side, each met
-# twice). Any of these would close it: the closure's levels merged within a tolerance (`form.py`,
-# shared) or a repeated point not served; her stem's fore edge read forward of the rabbet (task 2);
-# the viewer taking a station on the stem's line before the stem in the low line's order.
-OUTLINE_MET_TWICE_AT = {NEUFCHATEL: "16.350000,0.000000,0.000000"}
+# The *Neufchatel*'s stem meets her water at her rabbet's x, 16.35 m, where her `breadth_m` gives
+# the stem's siding at the water, 0.14 m (Neuf-D §3.2), so that her last station stands on her
+# stem's foot, its lowest point out of the form at z -8.0e-10, a float's residue for nil. Until
+# package 75's B2b `form._closure` kept it and her `stem_m`'s (16.35, 0.0) as two levels, served
+# to the millimetre as one point twice, and her low line ran out to the station's foot and back,
+# the vertex met four times a side (the departure `OUTLINE_MET_TWICE_AT`, B2). The closure now
+# takes levels within a millimetre as one (`form.CLOSURE_LEVEL_M`, the lead's ruling of
+# 2026-11-07), and her outline closes on the served stations as on B5.1's, every vertex met twice.
 GALLERIED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["gallery"]]
 LIT = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["light"]]
 HEADED = [p for p in PROFILED if p not in RIGHTLY_WITHOUT["head"]]
@@ -1657,8 +1651,9 @@ def test_every_file_draws_a_closed_hull_with_no_nan(tmp_path, path, builder):
     and on the served stations (B5.6) exactly the parts it should draw. The case that demanded
     gallery, light and head parts of every profiled file is turned, not loosened: `RIGHTLY_WITHOUT`
     names the exact files that have none of each, and every other file must draw it, both ways
-    round, and the file's own keys must say the same. The *Neufchatel*'s outline on the served
-    stations meets itself at her stem's foot, a recorded departure (`OUTLINE_MET_TWICE_AT`)."""
+    round, and the file's own keys must say the same. Every vertex of each outline is met twice,
+    the *Neufchatel*'s at her stem's foot among them since her closure's levels within a
+    millimetre are one (package 75, B2b: four times there, `OUTLINE_MET_TWICE_AT`, before)."""
     hull = graph_of(path)["hull"]
     if builder == "profile":
         del hull["stations"]
@@ -1677,9 +1672,7 @@ def test_every_file_draws_a_closed_hull_with_no_nan(tmp_path, path, builder):
                 assert (part in filed) == (path not in files), part
     for side, loop in got["loops"].items():
         assert loop["vertices"] > 20, side
-        served = builder == "served" and path in OUTLINE_MET_TWICE_AT
-        twice = [[OUTLINE_MET_TWICE_AT[path], 4]] if served else []
-        assert loop["oddAt"] == twice and loop["reached"] == loop["vertices"], (side, loop)
+        assert loop["oddAt"] == [] and loop["reached"] == loop["vertices"], (side, loop)
 
 
 def test_the_sets_of_files_with_no_part_name_files_that_exist():
@@ -1840,12 +1833,12 @@ def test_the_strips_lie_on_the_served_stations_within_a_millimetre(tmp_path, pat
 
 
 # The files whose transom is wider across its top than at its knuckle, the face flaring as it
-# rises: the *Neufchatel*'s alone, her raked transom measured on her body plan 16.1 ft across its
-# top corners and 15.8 ft at its foot (`transom_hb_m` [2.46, 2.41]; Neuf-D §3.5). Every other
-# transom is widest at its knuckle, the stern tumbling home above it. Her design's figures stand;
-# her checker's reading of both body plans (16.0-16.4 ft at the top corners, 16.3-16.6 above the
-# foot) is recorded for the lead (docs/dev/TuningNotes.md, "The shared guards name her").
-FLARED_TRANSOM = {NEUFCHATEL}
+# rises: none. Every transom is widest at its knuckle, the stern tumbling home above it. The set
+# stays as the mechanism (the lead's ruling of 2026-11-07, package 75's B2b): the *Neufchatel* was
+# in it at B2, her body plan's 15.8 ft at the foot read at 3.2-3.9 ft above her water, below her
+# knuckle at 4.65 ft (`transom_hb_m` [2.46, 2.41]); re-read at the knuckle's height, 16.6 ft
+# across, her transom tumbles home above it as every other does ([2.46, 2.53]; Neuf-D §3.5).
+FLARED_TRANSOM: set[str] = set()
 
 
 @needs_node
@@ -1859,7 +1852,8 @@ def test_the_transom_stands_at_the_taffrail_and_transom_hb_m_its_foot_rounded_up
     transom on her body plan: 6 ft 9 in above WL1 at the middle line, 6 ft 4 1/2 in at its
     ends); the tuck under the arch closes the stern down to the knuckle; every point of it on the
     stern's line at its height. The face is widest at its knuckle, or at its top on a transom that
-    flares above the knuckle (`FLARED_TRANSOM`, the *Neufchatel*'s alone)."""
+    flares above the knuckle (`FLARED_TRANSOM`, empty since package 75's B2b: the *Neufchatel*'s
+    alone at B2, before her knuckle's breadth was read at its height)."""
     hull = graph_of(path)["hull"]
     profile = hull["profile"]
     stern = profile["form"]["stern"]

@@ -184,16 +184,21 @@ def test_her_stern_is_raked_and_her_head_a_knee(her):
     """Neuf-D §3.5: a flat transom raking from its foot, 4.65 ft above her water just abaft the
     post's head, to the taffrail, 9.46 ft above her water and 5.26 ft abaft the after rabbet, with
     no counter (measured on ZAZ6177; re-traced by task 1's checker within 0.2 ft at both ends on
-    ZAZ6177 and ZAZ6178); 16.1 ft across its top corners and 15.8 ft at its foot; her head a knee,
-    its terminal unread."""
+    ZAZ6177 and ZAZ6178); 16.1 ft across its top corners and 16.6 ft at its knuckle, so that it
+    tumbles home above the knuckle as every transom does; her head a knee, its terminal unread.
+    The knuckle's breadth is the re-reading at the knuckle's height, taken by the lead's ruling of
+    2026-11-07 (package 75, B2b): the sides near plumb, 16.6-16.8 ft across from 4.0 to 7.0 ft above
+    her water. Old beside new: 15.8 ft, read at 3.2-3.9 ft below the knuckle, `transom_hb_m`
+    [2.46, 2.41] to [2.46, 2.53]."""
     profile = her.hull.spec.profile
     form = profile.form
     assert form.stern.type == "raked"
     assert form.head == "knee"
     assert form.stern.knuckle_z_m == pytest.approx(4.65 * FT, abs=0.02)
     assert list(form.stern.transom_hb_m) == pytest.approx(
-        [16.1 * FT / 2.0, 15.8 * FT / 2.0], abs=0.02
+        [16.1 * FT / 2.0, 16.6 * FT / 2.0], abs=0.02
     )
+    assert form.stern.transom_hb_m[0] < form.stern.transom_hb_m[1]  # tumbling home
     taffrail = profile.stern_m[-1]
     assert taffrail[1] == pytest.approx(9.46 * FT, abs=0.02)
     rake = math.degrees(
@@ -576,12 +581,16 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     gaps = re.search(rf"{re.escape(drawn)} the upper deck's ports: [^\n]* by ([^m]*) m", said)
     assert gaps and len(gaps.group(1).split(",")) == 11
     assert "reported and never moved to the drawing" in said
-    # her road's step 4: the quarter bill's arithmetic and the house's anchor rule set aside
+    # her road's step 4: the quarter bill's arithmetic and the house's anchor rule set aside;
+    # plain sail 1006 m2 to 959 with her fore staysail corrected from the working 93 m2 to the
+    # triangle that fits forward of the fore mast, 46 (the lead's ruling of 2026-11-07, B2b), the
+    # arithmetic 35.5 to 33.8 trimmers and the bill's 35 kept as written (for the lead)
     assert (
-        "the quarter bill on 'as taken 1814': her plain sail 1006 m2 against the brig-sloop's 766 "
-        "carries the brig's 27 trimmers to 35.5 (35 written); of her 94 seamen, the beat takes 42 "
+        "the quarter bill on 'as taken 1814': her plain sail 959 m2 against the brig-sloop's 766 "
+        "carries the brig's 27 trimmers to 33.8 (35 written); of her 94 seamen, the beat takes 42 "
         "to her guns" in said
     )
+    assert "hermaphrodite-brig: her rope's scales, fore 1.194, head 1.314, fore gaff" in said
     assert "bowers of 16.4 cwt by five to the hundred tons (32.6 by the beam rule)" in said
     assert "against Steel's 20 cwt and 13.5 in." in said
 
@@ -971,12 +980,154 @@ def test_a_brig_stays_the_merchant_brigs_and_her_index_row_is_her_files():
         "",
     )
     assert brains.role_of_vessel(v, None) == "privateer"
-    # with no role given, her intent rules (brains.py is not hers): the merchant's on a passage
+    # with no role given, her file's first role (B2b, the lead's ruling of 2026-11-07: old, the
+    # merchant's on a passage by the intent rules, which her row no longer keeps)
     assert brains.role_of_vessel(SimpleNamespace(description=v.description, role=""), None) == (
-        "merchant"
+        "privateer"
     )
     with pytest.raises(ValueError, match="'kings-ship' is no role a hermaphrodite brig takes"):
         S.vessel_from_spec(world, dict(spec, role="kings-ship"), 2)
+
+
+# Every row's role by `brains.role_of_vessel` with no role given, by the intent's kind: none,
+# a passage, home, a station, a station cruising for prizes, a ground, a letter and a convoy
+# (measured at B2's tree, 52fad521; package 75, B2b). Hers alone moved: by the intent rules
+# merchant, merchant, merchant, kings-ship, privateer, fisherman, packet, commodore, where her
+# file's first role is a privateer's now wherever the intent's kind names none.
+INTENT_KINDS = (
+    ("", False, False),
+    ("passage", False, False),
+    ("home", False, False),
+    ("station", False, False),
+    ("station", True, False),
+    ("fish", False, False),
+    ("letter", False, False),
+    ("passage", False, True),
+)
+_TAIL = ["privateer", "fisherman", "packet", "commodore"]
+ROLE_BY_INTENT = {
+    "frigate": ["kings-ship"] * 4 + _TAIL,
+    "schooner": ["merchant"] * 3 + ["kings-ship"] + _TAIL,
+    "privateer schooner": ["merchant"] * 3 + ["kings-ship"] + _TAIL,
+    "cutter": ["merchant"] * 3 + ["cruiser"] + _TAIL,
+    "revenue cutter": ["revenue"] * 4 + _TAIL,
+    "hired armed cutter": ["cruiser"] * 4 + _TAIL,
+    "coasting cutter": ["merchant"] * 4 + _TAIL,
+    "brig-sloop": ["cruiser"] * 4 + _TAIL,
+    "merchant brig": ["merchant"] * 3 + ["kings-ship"] + _TAIL,
+    "lugger": ["merchant"] * 3 + ["kings-ship"] + _TAIL,
+    "privateer lugger": ["privateer"] * 4 + _TAIL,
+    "smack": ["merchant"] * 3 + ["kings-ship"] + _TAIL,
+    "sixty-four": ["kings-ship"] * 4 + _TAIL,
+    "razee": ["kings-ship"] * 4 + _TAIL,
+    "hermaphrodite brig": ["privateer"] * 4 + _TAIL,
+}
+
+
+def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
+    """The lead's ruling (3)(b) of 2026-11-07 (package 75, B2b), the smallest road: her row files
+    `roles: [privateer]` in her file as SW-4's sub-type rows do, and `brains.sub_type_role` reads
+    the first role of any description that files them but the rows sailed before package 75,
+    which keep the intent's rules (`brains.INTENT_RULED_ROWS`): so hers, the first whole file to,
+    is a privateer wherever the intent's kind names no role, and every other row's role is as
+    before at every intent's kind (`ROLE_BY_INTENT`, measured before the step). A crewed World's
+    captain takes his own file's first row's by the same rule (`brains.own_sub_type_role`), hers
+    alone of the files."""
+    for key, roles in ROLE_BY_INTENT.items():
+        got = []
+        for kind, prizes, convoy in INTENT_KINDS:
+            intent = SimpleNamespace(kind=kind, prizes=prizes, convoy=convoy) if kind else None
+            got.append(brains.role_of_vessel(SimpleNamespace(description=key, role=""), intent))
+        assert got == roles, key
+    assert set(ROLE_BY_INTENT) == set(S.DESCRIPTIONS)
+    assert set(brains.SUB_TYPE_ROWS).isdisjoint(brains.INTENT_RULED_ROWS)
+    own = {}
+    for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
+        world = SimpleNamespace(ship=SimpleNamespace(spec=SimpleNamespace(source=str(path))))
+        own[path.name] = brains.own_sub_type_role(world)
+    assert {k: v for k, v in own.items() if v} == {"hermaphrodite-brig.yaml": "privateer"}
+
+
+def _her_world(intent="", papers=None):
+    """Her crewed World under American colours off the Lizard (tests/test_brains.py's world)."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.5, "lon_deg": -5.5},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="united-states",
+        intent=intent,
+        papers=dict(papers or {}),
+    )
+    return make_world(7, HER, sc)
+
+
+@pytest.mark.parametrize(
+    "intent",
+    [
+        "",
+        "bound for Plymouth",
+        "keep the station off the Lizard within 10 miles",
+        "cruise for prizes off the Lizard within 10 miles",
+    ],
+    ids=["no intent", "a passage", "a station", "cruising for prizes"],
+)
+def test_she_is_a_privateer_wherever_no_scenario_or_intent_names_a_role(intent):
+    """The lead's ruling (3)(b) of 2026-11-07 (package 75, B2b): her own captain, crewed under
+    American colours at seed 7, sails, signals and reads as a privateer wherever no scenario or
+    intent names a role, as the privateer schooner does cruising for prizes: the privateer's book,
+    the privateer's service, no private table (none unless the scenario's papers give her one,
+    package 76's rule), and "a privateer of the United States" in her reading. Old, her wardroom's
+    captain read as a King's commission (`captains._is_kings_ship`, left as it is): with no intent
+    no role, the King's service, no private table and "a ship of the the United States navy"; on a
+    passage and on a station the King's ship's book, the King's service, the private table of the
+    United States and the same words. Cruising for prizes she was a privateer before as now."""
+    from freesail.api import readings as R
+    from freesail.world import service, signals
+
+    w = _her_world(intent)
+    c = w.captain
+    assert (c.role, c.sub_type_role) == ("privateer", "privateer")
+    assert (c.doctrine.role if intent else c.doctrine) == ("privateer" if intent else None)
+    assert service.service_of(w) == "privateer" and signals.table_of(w) is None
+    assert R.ship_words(w).startswith(
+        "The ship: Prince de Neufchatel, a Baltimore privateer hermaphrodite brig of 1812, built "
+        "at New York; a privateer of the United States."
+    )
+    papered = _her_world(intent, papers={"private_signals": True})
+    assert signals.table_of(papered) is not None and papered.captain.role == "privateer"
+
+
+def test_a_far_ship_of_hers_answers_a_hail_as_a_privateer():
+    """Her far ship with no role given, on a passage and on a station (package 75, B2b): her
+    brain's role the privateer's, she answers a hail by the privateer's table (data/captains/
+    hail.yaml) and carries no private table. Old: on a passage the merchant's book and answer,
+    on a station the King's ship's ("the United States brig ...") with the private table of the
+    United States, her intent ruling her as the row's."""
+    from freesail.world import hail, signals
+    from tests.test_brains import put, world_at
+
+    w = world_at(49.5, -5.5)
+    goals = (
+        ("bound for Brest", "bound for Brest"),
+        ("patrolling off Ushant within 15 miles", "keep the station off Ushant within 15 miles"),
+    )
+    for n, (goal, intent) in enumerate(goals):
+        at = "49 30.4 N 5 30 W"
+        v = put(w, "hermaphrodite brig", "united-states", at, goal, intent=intent, name=f"N{n}")
+        assert v.brain.role == "privateer"
+        answer = hail.answer_by_table(w, v, "What ship is that?")
+        assert answer.startswith(f"The privateer N{n} of "), answer
+        assert signals.vessel_table(w, v) is None
 
 
 # ---------------------------------------------------------------------------
@@ -995,13 +1146,16 @@ def test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_
     prizes off the Lizard) reads back to itself and loads with no fit named; she sails it at seed 7
     under her rules captain by the privateer's book with her default fit, a British brig-sloop in
     sight under a cruiser's, and no order of hers refused; saved at half an hour and loaded from
-    the checkpoint, she carries on as the world that was never saved. Measured: an hour in, 6.02
-    kn in ten knots of wind, her captain investigating the stranger (before the jib's mend of the
-    reviews of 2026-11-07, 6.11 at her start's `clr_x_m` +0.3 and 5.95 at step 5's +2.0). The hour
-    is all it asks: run on, she stands on to the north while she investigates and takes the ground
-    on the Stags at 3,911 s, the lookout's warning at 3,300 s not acted on, since the captain's
-    danger-ahead states leave out "investigating a stranger" (world/captains.py; the reviews of
-    2026-11-07, for the lead)."""
+    the checkpoint, she carries on as the world that was never saved. Measured: an hour in, 6.19
+    kn in ten knots of wind, her captain a privateer investigating the stranger, as before (old
+    beside new: 6.02 kn with her fore staysail the working 93 m2, before package 75's B2b
+    corrected it to the triangle that fits forward of the fore mast, 46; before the jib's mend of
+    the reviews of 2026-11-07, 6.11 at her start's `clr_x_m` +0.3 and 5.95 at step 5's +2.0). The
+    hour is all it asks: run on, she stands on to the north while she investigates and takes the
+    ground at 4,251 s in a fathom and a half (with the 93 m2, on the Stags at 3,911 s, the
+    lookout's warning at 3,300 s not acted on), since the captain's danger-ahead states leave out
+    "investigating a stranger" (world/captains.py; the rules captain's, for the lead's list, not
+    mended: the lead's ruling (3)(c) of 2026-11-07)."""
     from freesail.api.session import ship_factory
     from freesail.core import replay as replay_mod
     from freesail.world.scenarios import (
@@ -1047,7 +1201,7 @@ def test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_
     saved = replay_mod.save_to_file(world, tmp_path / "hers.json")
     world.run(1800)
     assert not [e for e in world.log if e.kind == "order.rejected"]
-    assert units.ms_to_knots(world.ship.dyn.speed) == pytest.approx(6.02, abs=0.5)
+    assert units.ms_to_knots(world.ship.dyn.speed) == pytest.approx(6.19, abs=0.5)
     loaded, how = replay_mod.load(saved, ship_factory)
     assert how == "checkpoint" and loaded.ship.fit == FIT
     loaded.run(1800)
@@ -1091,10 +1245,13 @@ def test_her_polar_is_drawn_from_her_file_and_agrees_with_her_sailed_beam_reach(
     """`polar_of` balances the sails model against her hull's resistance at each angle off the
     wind (tests/test_ships.py:74-93's form, her own figures). Her beam reach in fifteen knots is
     within half a knot of the one she sails under plain sail with the yards trimmed (the known
-    truths' `under_plain_sail` at 90 degrees: 8.43 kn, heeling 5.5 degrees; the polar 8.68), and
-    her polar's beam reaches in 8, 15 and 25 kn are her measured 4.95, 8.68 and 12.22 kn (+-0.5;
-    4.99, 8.73 and 12.27 before the reviews of 2026-11-07 moved her jib's centre aft to its
-    triangle's). Her start figures stand (Neuf-D §9's knobs; docs/dev/TuningNotes.md):
+    truths' `under_plain_sail` at 90 degrees: 8.29 kn, heeling 5.4 degrees; the polar 8.53), and
+    her polar's beam reaches in 8, 15 and 25 kn are her measured 4.85, 8.53 and 12.07 kn (+-0.5).
+    Old beside new: 4.95, 8.68 and 12.22 (sailed 8.43 kn, heeling 5.5) before her fore staysail
+    was corrected from the working 93 m2 to the triangle that fits forward of the fore mast, 46
+    (the lead's ruling of 2026-11-07, B2b); 4.99, 8.73 and 12.27 before the reviews of 2026-11-07
+    moved her jib's centre aft to its triangle's. Her start figures stand (Neuf-D §9's knobs;
+    docs/dev/TuningNotes.md):
     `hull_speed_kn` 12.9 kept, her best in 25 kn inside her accounts' band at every hull speed of
     12.5-13.9 (12.09 to 12.67 kn, measured before the jib's mend); `gm_m` 2.1 kept (no account
     gives her heel); `clr_x_m`, tuned for her helm (+0.3 to +0.1), is not read by the polar.
@@ -1106,7 +1263,7 @@ def test_her_polar_is_drawn_from_her_file_and_agrees_with_her_sailed_beam_reach(
     from tests.test_known_truths import knots, under_plain_sail
 
     p = polar_of(HER)
-    measured = {8.0: 4.95, 15.0: 8.68, 25.0: 12.22}
+    measured = {8.0: 4.85, 15.0: 8.53, 25.0: 12.07}
     for wind, kn in measured.items():
         assert abs(p.speed_kn(90.0, wind) - kn) <= 0.5, (wind, p.speed_kn(90.0, wind))
     assert p.speed_kn(90.0, 8.0) < p.speed_kn(90.0, 15.0) < p.speed_kn(90.0, 25.0)
@@ -1128,16 +1285,20 @@ def test_truth_7_193_her_polars_best_point_from_her_accounts():
     and 25 kn above the frigate-36's ("we could haul closer upon the wind than the enemy", Cobb
     p. 96, her strongest evidence), pinned because her file bears it out.
 
-    Measured on the owner's machine, 2026-11-07, her start figures standing (`hull_speed_kn`
-    12.9): her best in 25 kn 12.22 kn (12.27 before the jib's mend of the reviews of 2026-11-07).
-    **Reported, not pinned:** the best point's angle, 90 degrees (12.20 kn at 100), where her
-    accounts were running; at 150 degrees 10.00 kn and dead before it 9.42 (the frigate-36 10.01
-    and 9.23); sailed with her studding sails set, 11.17 and 10.36 kn against the frigate-36's
-    11.70 and 10.76, so that the frigate gains on her running as the frigates did (Cobb p. 97).
-    Her closest 40 degrees against the frigate's 50; at 60 and 70 degrees 6.53 and 7.34 kn in 15
-    kn against the frigate's 4.29 and 6.14, and 9.81 and 10.80 in 25 kn against 7.03 and 9.62, the
-    slimmest margin 1.18 kn at 70 degrees in 25 kn (Neuf-D §9's 0.8 on its stand-in). Arithmetic
-    on the files ("the same on every machine", world/ships.py)."""
+    Measured on the owner's machine, 2026-11-08, her start figures standing (`hull_speed_kn`
+    12.9) and her fore staysail the triangle that fits forward of the fore mast, 46 m2 (the lead's
+    ruling of 2026-11-07, B2b: the design's working 93 m2 a derivation of its own): her best in 25
+    kn 12.07 kn, inside the band as before (old beside new: 12.22 with the 93 m2, 12.27 before the
+    jib's mend of the reviews of 2026-11-07). **Reported, not pinned:** the best point's angle, 90
+    degrees (12.06 kn at 100; 12.22 and 12.20 before), where her accounts were running; at 150
+    degrees 9.92 kn and dead before it 9.35 (10.00 and 9.42 before; the frigate-36 10.01 and
+    9.23); sailed with her studding sails set, 11.12 and 10.37 kn (11.17 and 10.36 before) against
+    the frigate-36's 11.70 and 10.76, so that the frigate gains on her running as the frigates did
+    (Cobb p. 97). Her closest 40 degrees against the frigate's 50; at 60 and 70 degrees 6.30 and
+    7.14 kn in 15 kn against the frigate's 4.29 and 6.14, and 9.54 and 10.60 in 25 kn against 7.03
+    and 9.62 (6.53, 7.34, 9.81 and 10.80 before), the slimmest margin 0.98 kn at 70 degrees in 25
+    kn (1.18 before; Neuf-D §9's 0.8 on its stand-in). Arithmetic on the files ("the same on every
+    machine", world/ships.py)."""
     hers, frigate = polar_of(HER), polar_of(FRIGATE)
     best = max(hers.speeds_kn[hers.winds_kn.index(25.0)])
     assert 11.5 <= best <= 13.0, best
@@ -1152,24 +1313,28 @@ def test_truth_7_193_her_polars_best_point_from_her_accounts():
 # ---------------------------------------------------------------------------
 
 
-def test_her_helm_as_tuned_is_balanced_close_hauled():
+def test_her_helm_as_tuned_carries_weather_helm_close_hauled_and_abeam():
     """`clr_x_m` tuned with her rig whole (Neuf-D §9's knob, in the topsail schooner's way: "at
     +0.5 m she is balanced close-hauled in 15 kn"; docs/dev/TuningNotes.md, old beside new),
-    measured at seed 7 in fifteen knots under plain sail, the yards and sheets trimmed: **+0.1 m**
-    gives her +1.11 degrees of weather helm close-hauled, 60 degrees off (her `beat_deg`; the
-    topsail schooner's -0.04), +2.11 at six points, +1.49 at seven, +0.78 abeam (the frigate-36
-    +1.99, the brig-sloop +1.57, the topsail schooner +4.30), +1.84 at ten points and +3.20 at
-    twelve; +1.75 at 60 degrees and +0.73 abeam in 25 kn. Her helm falls from close-hauled to the
-    beam where the schooner's rises, so that no lead gives her both halves of Neuf-D §9's target
-    (-0.2 balances her close-hauled with +0.25 abeam): +0.1 holds the bands below with room on
-    both sides. At the start's +0.3: +1.73, +2.66, +1.92, +1.13, +2.03, +3.23; at 0.0: +0.82,
-    +1.83, +1.27, +0.60, +1.74, +3.19. Before the reviews of 2026-11-07 moved her jib's centre
-    aft to its triangle's (from above its stay), she was tuned to +2.0 against the lee helm the
-    misplaced jib gave her (docs/dev/TuningNotes.md, old beside new)."""
+    measured at seed 7 in fifteen knots under plain sail, the yards and sheets trimmed. At
+    **+0.1 m**, with her fore staysail the triangle that fits forward of the fore mast, 46 m2 (the
+    lead's ruling of 2026-11-07, package 75's B2b), she carries +3.95 degrees of weather helm
+    close-hauled, 60 degrees off (her `beat_deg`; the topsail schooner's -0.04), +4.30 at six
+    points, +2.81 at seven, +1.61 abeam (the frigate-36 +1.99, the brig-sloop +1.57, the topsail
+    schooner +4.30), +2.10 at ten points and +3.16 at twelve; +5.09 at 60 degrees and +1.60 abeam
+    in 25 kn. Old beside new, with the working 93 m2 (the test then named for her helm balanced
+    close-hauled, its close-hauled band -1.0 to +1.5): +1.11, +2.11, +1.49, +0.78, +1.84 and
+    +3.20; +1.75 and +0.73 in 25 kn. The 47 m2 taken from forward of her mast gives her the weather
+    helm; her helm falls from close-hauled to the beam where the schooner's rises, so that no lead
+    now holds both of the old bands (her lead swept with the new staysail: -0.3 m gives +2.66
+    close-hauled and +0.92 abeam, -0.6 +1.65 and +0.39, -0.9 +0.60 and -0.17, -1.2 -0.50 and
+    -0.75): the lead is kept as tuned and its re-tuning is the lead's (docs/dev/TuningNotes.md,
+    B2b). Before the reviews of 2026-11-07 moved her jib's centre aft to its triangle's (from
+    above its stay), she was tuned to +2.0 against the lee helm the misplaced jib gave her."""
     from tests.test_known_truths import reading, under_plain_sail
 
     close_hauled = reading(under_plain_sail(HER, 300.0))["weather_helm"]
-    assert -1.0 <= close_hauled <= 1.5, close_hauled
+    assert 2.5 <= close_hauled <= 5.0, close_hauled
     for off in (90.0, 112.5):
         helm = reading(under_plain_sail(HER, 360.0 - off))["weather_helm"]
         assert 0.5 <= helm <= 4.0, (off, helm)
@@ -1178,9 +1343,10 @@ def test_her_helm_as_tuned_is_balanced_close_hauled():
 
 def test_truth_6_her_headsails_and_her_mainsail_set_her_helm():
     """Truth 6's form on her file as tuned (tests/test_known_truths.py), abeam in 15 kn, seed 7:
-    +0.78 degrees of weather helm under plain sail, +5.13 with the headsails in, -11.73 (lee
-    helm) with the headsails set and the mainsail, her driving sail, in (at the start's
-    `clr_x_m` +0.3: +1.13, +5.39, -11.24)."""
+    +1.61 degrees of weather helm under plain sail, +5.29 with the headsails in, -11.24 (lee
+    helm) with the headsails set and the mainsail, her driving sail, in (with the working 93 m2
+    fore staysail before B2b: +0.78, +5.13, -11.73; at the start's `clr_x_m` +0.3 then: +1.13,
+    +5.39, -11.24)."""
     from tests.test_known_truths import run, under_plain_sail
 
     world = under_plain_sail(HER, 270.0)
@@ -1223,10 +1389,13 @@ def test_she_stays_quickly_her_light_main_yards_hauled_short():
     """Truth 10's form on her file as tuned, measured at seed 7 in 15 kn, beside trial A's on this
     tree (the topsail schooner with a fore course, settled 2,400 s: tacked in 149 s; Eng §3.3)
     and the main topgallant's fixture (172 s with it set, 164 s furled; B3.4, ruling 1). From
-    292.5 degrees she tacks in 182 s (from 290 and 295: 184 and 181 s), gaining 118 m to
-    windward: "Main-topsail haul." at 49 s and "Rise fore tack and sheet. Let go and haul." at 74
-    s, her light main yards swung in 25 s (the short swing's 20 by the weather and the hands),
-    and no "Mainsail haul". At the start's `clr_x_m` +0.3 she tacked in 198 s (229 and 224),
+    292.5 degrees she tacks in 261 s (from 290 and 295: 269 and 268 s), gaining 144 m to
+    windward: "Main-topsail haul." at 50 s, hanging in stays at 62 s, and "Rise fore tack and
+    sheet. Let go and haul." at 75 s, her light main yards swung in 25 s (the short swing's 20 by
+    the weather and the hands), and no "Mainsail haul". Old beside new, her fore staysail the
+    working 93 m2 before it was corrected to the triangle that fits forward of the fore mast, 46
+    (the lead's ruling of 2026-11-07, B2b): 182 s (184 and 181), gaining 118 m, the words at 49 and
+    74 s, never in stays. At the start's `clr_x_m` +0.3 she tacked then in 198 s (229 and 224),
     gaining 129 m (docs/dev/TuningNotes.md). Old beside new, words only, every tick the same:
     "Rise tacks and sheets. Main-topsail haul." and "Let go and haul." until B3.4b, where her
     fore tack is kept fast at the haul and risen apart before her head yards are hauled (the
@@ -1254,14 +1423,17 @@ def test_she_stays_quickly_her_light_main_yards_hauled_short():
 
 def test_she_wears_and_lies_to_as_a_fore_and_after_with_a_square_fore():
     """Truths 11 and 12's forms on her file as tuned, measured at seed 7 in 15 kn, beside trial
-    A's (wore in 449 s; hove to 50.2 degrees off at 2.65 kn; Eng §3.3). She wears in 461 s
-    keeping her mainsail ("Up helm; brace in the after yards"), 255 m to leeward. Hove to the
+    A's (wore in 449 s; hove to 50.2 degrees off at 2.65 kn; Eng §3.3). She wears in 521 s
+    keeping her mainsail ("Up helm; brace in the after yards"), 241 m to leeward. Hove to the
     fore-and-after's way (the mainsail sheet flat aft, the fore staysail to windward, the fore
-    topsail aback, the helm a-lee) she lies 51.1 degrees off forereaching 3.01 kn, inside truth
+    topsail aback, the helm a-lee) she lies 49.1 degrees off forereaching 2.59 kn, inside truth
     12's band of angle (45-65) and above its 1.6 kn, as trial A is. With her main topgallant set
     abaft the backed fore (the heave-to clews up the light sails forward of the backed yards only:
-    Neuf-D §12.2 item 8's second finding) she lies 51.0 degrees off at 2.98 kn, the sail still set,
-    within truth 12's band. At the start's `clr_x_m` +0.3: 467 s, 50.4 degrees at 2.86 kn."""
+    Neuf-D §12.2 item 8's second finding) she lies 49.0 degrees off at 2.56 kn, the sail still set,
+    within truth 12's band. Old beside new, her fore staysail the working 93 m2 before it was
+    corrected to the triangle that fits forward of the fore mast, 46 (the lead's ruling of
+    2026-11-07, B2b): 461 s and 255 m; 51.1 degrees at 3.01 kn, 51.0 at 2.98 with the main
+    topgallant set; at the start's `clr_x_m` +0.3 then: 467 s, 50.4 degrees at 2.86 kn."""
     from tests.test_known_truths import (
         close_hauled_on_starboard,
         events,
@@ -1361,12 +1533,18 @@ def test_her_gale_reefs_her_fore_course_twice_and_keeps_her_mainsail():
     fore-and-after with topsails reefs her course once as the topsails take their second reef and
     once more at the third, her two reef bands then taken, and takes in nothing after: her
     mainsail, her driving sail, is kept whole, no line of "shorten sail" reefing a fore-and-
-    after's gaff mainsail (the closely reefed mainsail not built, the lead's). Sailed in the gale
-    of B3.4's reviews (15 kn rising to 44, "shorten sail" at six winds, "lie a-try"; measured,
-    docs/dev/TuningNotes.md): the course reefed at 4,629 s and again at 5,611 s, the fore topsail
-    close-reefed, the jib in at 30 kn and the fore storm staysail set at 34; lying a-try 37 degrees
-    off at 2.75 kn under the fore topsail, the storm staysail, the fore gaff sail and the mainsail
-    whole, the course taken in by "lie a-try"."""
+    after's gaff mainsail (the closely reefed mainsail not built, the lead's). Beside ruling 4,
+    the lead's ruling (3)(e) of 2026-11-07 (package 75, B2b): her fore gaff sail, a boomless gaff
+    sail on the mast that crosses her course, is taken in with the topsails' second reef, as she
+    took hers in when it made bad weather lying to (Cobb 1841 p. 79). Old: the course's reef alone,
+    her fore gaff sail kept whole throughout. Sailed in the gale of B3.4's reviews (15 kn rising to
+    44, "shorten sail" at six winds, "lie a-try"; measured, docs/dev/TuningNotes.md, B2b): the
+    fore gaff sail taken in at 4,487 s and the course reefed at 4,622 s and again at 5,581 s, the
+    fore topsail close-reefed, the jib in at 30 kn; lying a-try at 7,664 s under the fore topsail,
+    the mainsail and the fore staysail, the course taken in by "lie a-try" (old: the course
+    reefed at 4,628 and 5,616 s, the fore storm staysail set at 34 kn, lying a-try at 7,674 s 39.7
+    degrees off at 2.45 kn under the fore topsail, the storm staysail, the fore gaff sail and the
+    mainsail whole)."""
     from freesail.orders.storm import _after_sail_lines
 
     ship = load_ship(HER)
@@ -1377,22 +1555,68 @@ def test_her_gale_reefs_her_fore_course_twice_and_keeps_her_mainsail():
     assert not _square_rigged(ship)
     assert _after_sail_lines(ship) == []
     topsail.reefs = 1
-    assert _after_sail_lines(ship) == ["reef the fore course, one reef"]
+    take_in = "take in the fore sail"  # her fore gaff sail by its parts' words, as the course's
+    assert _after_sail_lines(ship) == ["reef the fore course, one reef", take_in]
     course.reefs, topsail.reefs = 1, 2
-    assert _after_sail_lines(ship) == ["reef the fore course, one reef"]
+    assert _after_sail_lines(ship) == ["reef the fore course, one reef", take_in]
     course.reefs = 2
+    assert _after_sail_lines(ship) == [take_in]
+    ship.sails["fore.sail"].state = SailState.IN_THE_GEAR
     assert _after_sail_lines(ship) == []
     assert ship.sails["main.sail"].is_set and ship.sails["main.sail"].reefs == 0
+
+
+def test_only_she_has_a_boomless_gaff_sail_beside_a_course():
+    """The guard of the lead's ruling (3)(e) of 2026-11-07 (package 75, B2b): the gale's take-in and
+    lie a-try's handing of a boomless gaff sail on a mast that crosses a course
+    (`scripts.gaff_sails_beside_a_course`) are hers alone of the files, her fore gaff sail abaft
+    her fore course. The schooners' fore gaff sails are boomless too, but their fore masts cross
+    no course; every other gaff sail is on its boom."""
+    found = {}
+    for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
+        ship = load_ship(path)
+        found[path.name] = [sl.id for sl in scripts.gaff_sails_beside_a_course(ship)]
+    assert {k: v for k, v in found.items() if v} == {"hermaphrodite-brig.yaml": ["fore.sail"]}
+    for name in ("topsail-schooner.yaml", "privateer-schooner.yaml"):
+        fg = load_ship(ROOT / "data" / "ships" / name).sails["fore.sail"]
+        assert fg.cls == "gaff" and "boom" not in fg.roles  # boomless, but no course beside it
+
+
+def test_she_lies_a_try_under_her_mainsail_her_fore_gaff_sail_taken_in():
+    """Lie a-try on her (the lead's ruling (3)(e) of 2026-11-07, package 75's B2b): her fore gaff
+    sail handed with the square sails, she lies to under the fore topsail, her mainsail and her
+    staysails, and the line names her two gaff sails: "Lying a-try under the fore topsail, the
+    mainsail and the staysails, the fore-and-aft foresail taken in, helm a-lee." Old: "Lying
+    a-try under the fore topsail and the staysails, helm a-lee.", whatever was set, her two gaff
+    sails standing whole beside it. Every other file's line is as it was ("the main topsail and
+    the staysails" on the frigate, truth 28's)."""
+    from tests.test_known_truths import run, under_plain_sail
+
+    world = under_plain_sail(HER, 300.0)
+    start = world.clock.tick
+    world.submit("lie a-try")
+    run(world, 600)
+    lying = [e.text for e in world.log if e.tick > start and e.kind == "ship.hove_to"]
+    assert lying == [
+        "Lying a-try under the fore topsail, the mainsail and the staysails, the fore-and-aft "
+        "foresail taken in, helm a-lee."
+    ]
+    sails = world.ship.sails
+    assert not sails["fore.sail"].is_set and sails["main.sail"].is_set
+    assert sails["fore.topsail"].is_set and not sails["fore.course"].is_set
 
 
 def test_truth_9_she_carries_plain_sail_in_twenty_knots_and_her_light_sails_go_in_thirty_five():
     """Truth 9's two forms on her file (tests/test_known_truths.py, `sail_in_a_wind`: the wind on
     the larboard beam twenty minutes), Neuf-D §16 risk 2 (the most canvas for her weight in the
     game, her lines scaled per mast): under plain sail in 20 kn nothing carries away and no line
-    parts, her worst strain her fore topgallant yard's 0.53 of its rating (0.87 in 25 kn, the
+    parts, her worst strain her fore topgallant yard's 0.54 of its rating (0.88 in 25 kn, the
     frigate-36's main topgallant yard 1.05); under all sail in 35 kn her light sails and yards go,
-    each said urgently: the fore royal mast, the main topgallant mast, the main topmast and the
-    fore topgallant yard carried away (measured, seed 7)."""
+    each said urgently: the main topmast and the fore royal yard carried away (measured, seed 7).
+    Old beside new, her fore staysail the working 93 m2 before package 75's B2b corrected it to
+    the triangle that fits forward of the fore mast, 46, and her head's rope scaled down with it
+    (1.455 to 1.314): 0.53 and 0.87; the fore royal mast, the main topgallant mast, the main
+    topmast and the fore topgallant yard carried away."""
     from tests.test_known_truths import CARRIED_AWAY, events, sail_in_a_wind
 
     world = sail_in_a_wind(HER, 20.0, "set plain sail")

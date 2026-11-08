@@ -530,6 +530,20 @@ re-traces the transom before her first commit. Reed's model
 shows the same raked transom (Winfield pp. 335-336's photograph, a modern model, for the eye
 only).
 
+*As built at B2b (2026-11-08), the lead's ruling of 2026-11-07 (4): the transom's knuckle
+re-read at the knuckle's height, taken.* The 15.8 ft above was read at 3.2-3.9 ft above her
+water, below her knuckle at 4.65 ft, where the outline rounds in; a knuckle's half-breadth is
+read at the knuckle's height. Re-read row by row on ZAZ6177's body plan with the sheer line kept
+out, the sides stand near plumb, 16.6-16.8 ft across from 4.0 to 7.0 ft above her water, the
+horizontal line at 4.6-5.1 ft where her knuckle stands, the top corners rounded at 15.7-16.0 ft.
+So her transom is 16.1 ft across its top corners and **16.6 ft at its knuckle**, and tumbles home
+above it as every other transom in the game does. Old beside new: `transom_hb_m` [2.46, 2.41] to
+**[2.46, 2.53]**, the mark `sourced` as before; her file's note says the same. The drawing: her
+served stations move at her stern alone (the knuckle's point 2.41 to 2.53 m, the end station
+abaft the regular ones by 1-2 mm), and the viewer's test of a flaring transom
+(`tests/test_view_geometry.py`'s `FLARED_TRANSOM`) is emptied and kept as the mechanism; none of
+the viewer's rows of hers moved, and no other file's.
+
 **Her head.** A light knee, its head rails rising from the stem to about 7 ft before it. Reed's
 model cannot settle the terminal at this size either. If a later reading resolves it, the word
 changes and nothing in the game's behaviour does (principle 12).
@@ -757,6 +771,17 @@ judgement until task 5). Plain sail 1,006 m².
 schooner's rule put it at 26.9; the main topmast staysail 37 m² (its nock mended, §4.7's As
 built). Plain sail 1,006 m² as before.*
 
+*As built at B2b (2026-11-08), the lead's ruling of 2026-11-07 (4): the fore staysail's 93 m² is
+the table's working figure above, a derivation of this design's own (Fincham's remainder for the
+jib and the fore topmast staysail, closed with the jib's 121: Neuf §2.8), not her sail plan's,
+whose fore staysail is not read. So it is corrected to the triangle that fits forward of the
+fore mast (§4.6's As built): **46 m²** (93 before), its centre x 11.0 m (12.1), its cloth's
+rating 14.7 kN (29.8). Plain sail **959 m²** (1,006). With it her head's rope scale (her three
+headsails over the brig's 121) goes from 1.455 to 1.314, and the head's standing rigging and the
+headsails' lines with it, old beside new in `docs/dev/TuningNotes.md` (B2b); her polar, best
+point, helm and handling are re-measured there, 7-193's band standing (12.07 kn in 25 kn, 12.22
+before).*
+
 ### 4.4 The fore gaff sail (D21(a))
 
 To her plan, boomless and loose-footed, lapping the main: gaff 32.9 ft, luff about 37.9, leech
@@ -844,6 +869,18 @@ keeps the schooner's rule, its centre (12.1, 7.3) inside its sail. **For the lea
 the fore hounds, would reach 7.4 m abaft the fore mast; forward of the mast it holds about 46 m².
 Task 5 has not read its clew.*
 
+*As built at B2b (2026-11-08), the lead's ruling of 2026-11-07 (4): "not a drawing matter but a
+sail area in her polar". The 93 m² was this design's derivation (§4.3's table: "judgement until
+task 5", closing Fincham's remainder), not her sail plan's figure, so it is corrected to the
+triangle that fits: from the tack at 10 ft above her water where the sail plan draws the bowsprit
+over the stem, up the fore stay to the fore hounds, and along a level foot to the fore mast at
+the tack's height, its leech down the mast: **46 m²** (46.3), its centre the triangle's centroid,
+x 11.0 m and 7.3 m above her water (the schooner's rule's 12.1 before; the height the same).
+`head_sails` cuts it so, the jib and the flying jib as they were; `check_head_sails` holds it
+inside its stay and forward of the mast. Her file's note says which (a derivation of the
+design's own, corrected), old beside new; her polar and best point re-measured, 7-193's band
+standing (`docs/dev/TuningNotes.md`, B2b).*
+
 ### 4.7 Studding sails and light sails (D35(b), limited)
 
 - **The fore lower studding sail**, drawn solid, about 19 ft wide and 35 deep (62 m²), on the fore
@@ -887,6 +924,21 @@ mast. It is now 37 m², the sheet's 37 (38 before).*
   her gaff sails, as a schooner (`data/evolutions/lie_a_try.yaml`'s head). Cobb's lying to under the
   fore gaff sail alone is recorded, not built: no path lies a vessel to under a gaff foresail, and
   T4 is not pinned.
+
+  *As built at B2b (2026-11-08), the lead's ruling of 2026-11-07 (3)(e), beside ruling 4: hers
+  alone by her rig, a boomless gaff sail on a mast that crosses a course (the schooners' fore
+  gaff sails are boomless too, but their fore masts cross no course: `scripts.gaff_sails_beside_a_course`,
+  her tests' guard over every file). The gale's reduction takes in her fore gaff sail with the
+  topsails' second reef, beside the course's first reef ("take in the fore sail"), as she took
+  hers in when it made bad weather lying to (Cobb 1841 p. 79, a figure of what she did); lie a-try
+  hands it with the square sails, so that she lies to under the close-reefed fore topsail, her
+  mainsail and her staysails, and the line names her two gaff sails: "Lying a-try under the fore
+  topsail, the mainsail and the staysails, the fore-and-aft foresail taken in, helm a-lee." (old:
+  "Lying a-try under the fore topsail and the staysails, helm a-lee.", her two gaff sails standing
+  whole beside it). The ruling's "reefed mainsail" is not built: no line reefs a fore-and-after's
+  gaff mainsail (ruling 4's), so the line names her mainsail as it stands, whole. Every other
+  file's line is as before. The gale as sailed, old beside new, in `docs/dev/TuningNotes.md`
+  (B2b), with what the take-in costs her (for the lead).*
 - **Groups**, with the names the engine reads (map-generator fact 11), on the brig's and the
   schooner's patterns:
 
@@ -929,6 +981,15 @@ foresail tack". Strain's warnings read a part's first plain alias, and in her ga
 the gaff sail's sheet "the fore sail sheet" beside "the foresail", her course. The trim
 replies still say "the fore sail" (`orders/resolve.display_name` reads no alias: the engine's,
 for the lead).*
+
+*At B2b (2026-11-08), the lead's rulings (3)(d) and (3)(f) of 2026-11-07, neither one function's
+or one alias table's line, so both left for the lead with the figures (`docs/dev/TuningNotes.md`,
+B2b), nothing built: the trim's reply names its sheets by `resolve.the`, and reading the alias
+there moves the reply of every sailing file (the frigate's "the mizzen spanker" to "the spanker",
+the cutter's "the fore staysail" to "the foresail", four test files' pins); and "take in the
+square sail" is read in her and the two schooners as "square", a brace's word, before the noun
+"sail" that their `fore.sail` and `main.sail` give, in the grammar's leading words
+(`grammar._match_object`), not in any file's aliases.*
 
 ### 4.9 Her rig's peculiarities, for the physics' reading (the brief)
 
@@ -1161,6 +1222,10 @@ powder eight. **Measured, for the lead:** her rules captain sails by the King's 
 passage or a station without prizes, `captains._is_kings_ship` taking her wardroom's captain role,
 "captain", for a King's commission; cruising for prizes, the privateer's.*
 
+*At B2b (2026-11-08), the lead's ruling of 2026-11-07 (3)(b): she is a privateer wherever no
+scenario or intent names a role (§8's As built at B2b), her captain's book the privateer's on a
+passage and on a station too; `_is_kings_ship` is left as it is.*
+
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores
@@ -1278,6 +1343,25 @@ first, so "a hermaphrodite brig" and "an hermaphrodite brig" now resolve by the 
 without a row; the probe above was at 8f30be9. Their rows are kept, as the lead accepted the names
 (§17, lead item 9); "a privateer brig" and "privateer brig" still need theirs. "A brig" is
 unchanged.*
+
+*As built at B2b (2026-11-08), the lead's ruling of 2026-11-07 (3)(b), the smallest road: her row
+already carries `roles: [privateer]` in her file, as SW-4's sub-type rows do, and
+`brains.sub_type_role` now reads the first role of any description that files them but the rows
+sailed before package 75, which keep the intent's rules (`brains.INTENT_RULED_ROWS`: the frigate,
+the two schooners, the cutter, the brig-sloop, the merchant brig, the lugger and the smack); hers is
+the first whole file to. A far ship of hers is a privateer wherever the intent's kind names no
+role (old: the merchant's on a passage, the King's ship's on a station), and answers a hail by the
+privateer's table ("The privateer ... of Salem, cruising."; old, on a station, "The United States
+brig ..."); her own captain, crewed, takes his file's first row's role by the same rule at his
+making (`brains.own_sub_type_role`, hers alone of the files), so that with no intent, on a passage
+and on a station he is a privateer, sails by the privateer's book, is in the privateer's service,
+carries no private table unless the scenario's papers give her one (package 76's rule), and her
+reading says "a privateer of the United States" (old: the King's book and service, the private
+table of the United States, "a ship of the the United States navy"). Every other row's role is
+as before at every intent's kind (her tests' table). Her round trip, cruising for prizes, was a
+privateer's before as now. The reading of a navy now takes its nation's adjective (the ruling's
+(3)(a)): "a ship of the French navy", "the Spanish navy", "the American navy", where the name
+gave "the France navy" and "the the United States navy".*
 
 ---
 
@@ -1452,6 +1536,24 @@ after "Main-topsail haul"; B3.4's settled form 217 s (192 with the main topgalla
 461 s, 255 m to leeward. Hove to 51.1° off at 3.0 kn, and 51.0° at 3.0 with the main topgallant
 set. Under way from her anchor in 1,465 s, 5.8 kn. Her heel, 5.5° and 14.6° abeam in 15 and 25 kn,
 is unmoved.*
+
+*At B2b (2026-11-08): her fore staysail corrected from the working 93 m² to the triangle that
+fits forward of the fore mast, 46 (the lead's ruling of 2026-11-07, (4); §4.3 and §4.6's As
+built), `clr_x_m` kept at +0.1. Old beside new (`docs/dev/TuningNotes.md`, B2b):*
+*- **The polar:** her best in 8, 15 and 25 kn 5.01, 8.67 and **12.07** kn (5.12, 8.82 and 12.22),
+still at 100°, 100° and 90° (12.06 at 100°); at 60° and 70° 6.30 and 7.14 kn in 15 kn and 9.54 and
+10.60 in 25 kn (6.53, 7.34, 9.81, 10.80), the slimmest margin over the frigate-36 0.98 kn at 70° in
+25 kn (1.18); closest 40°, `beat_deg` 60 in every wind, as before. 7-193's band stands.*
+*- **The helm**, the 47 m² taken from forward of her mast: +3.95, +4.30, +2.81, +1.61, +2.10 and
++3.16° at the six angles (+1.11, +2.11, +1.49, +0.78, +1.84, +3.20); +5.09 at 60° and +1.60 abeam in
+25 kn. No lead now holds both of step 5's bands, close-hauled −1.0 to +1.5 and abeam +0.5 to +4.0
+(swept: −0.3 m gives +2.66 and +0.92, −0.6 +1.65 and +0.39, −0.9 +0.60 and −0.17): the lead is kept
+as tuned, her helm test's close-hauled band moved to her measure, and its re-tuning is for the
+lead. Truth 6's form abeam: +1.61, +5.29, −11.24.*
+*- **Her handling:** truth 10's form 261 s from 292.5° (269 and 268), gaining 144 m, hanging in stays
+at 62 s, the words at 50 and 75 s; the settled form 261 s (313 with the main topgallant set). Wore
+in 521 s, 241 m to leeward. Hove to 49.1° off at 2.6 kn (49.0° at 2.6 with the main topgallant
+set). Under way in 1,466 s, 5.8 kn. Her heel 5.4° and 14.2° abeam in 15 and 25 kn.*
 
 ---
 

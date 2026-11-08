@@ -1026,8 +1026,8 @@ def role_for(world: Any, intent: Intent | None, given: str = "", sub_type_role: 
     first, as it does for her far brain (`brains.role_of_vessel`); the far brain carries it
     to her captain at the promotion (`Captain.scenario_role`), so that nothing here reads
     the crewed World's own vessel, which the Hull does not keep. `sub_type_role`, her
-    description's first role where she is one of package 75's sub-types
-    (`brains.SUB_TYPE_ROWS`, carried in as `Captain.sub_type_role`), comes next where the
+    description's first role where she is one of package 75's sub-types or whole files
+    (`brains.sub_type_role`, carried in as `Captain.sub_type_role`), comes next where the
     intent's kind names no role, as it does for her far brain (SW-4's reviews: a crewed
     revenue cutter given a new intent had fallen to the merchant's book)."""
     if given:
@@ -2298,7 +2298,9 @@ class Captain(Judgement):
     # package 75 (SW-4's reviews): her description's first role where she is one of the
     # sub-types (`brains.SUB_TYPE_ROWS`), carried in at the promotion as the role is, and
     # taken by `role_for` where a new intent's kind names none; "" for every other ship and
-    # a checkpoint from before
+    # a checkpoint from before. Since B2b, a whole file's row that files roles too
+    # (`brains.sub_type_role`), and the World's own file's at his making where no far brain
+    # carries one in (`brains.own_sub_type_role`: the player's *Neufchatel* a privateer)
     sub_type_role: str = ""
 
     def __init__(self, world: Any, intent: str | None = None, books: tuple[str, ...] = ()):
@@ -2346,13 +2348,23 @@ class Captain(Judgement):
         self.pirates: set[str] = set()
         self.spoken_ids: set[str] = set()
         self.error = ""
+        from freesail.world.brains import own_sub_type_role
+
+        # package 75, B2b (the lead's ruling of 2026-11-07): her own file's row's first role
+        # where its roles are read, so that she sails, hails, signals and reads by it wherever
+        # no scenario or intent names a role, with no intent too; unset for every other ship,
+        # so that its checkpoint is as before
+        own = own_sub_type_role(world)
+        if own:
+            self.sub_type_role = own
+            self.role = own
         if self.intent_words:
             try:
                 self.intent = read_intent(world, self.intent_words)
             except ValueError as e:
                 self.error = str(e)
                 self.intent = None
-            self.role = role_for(world, self.intent)
+            self.role = role_for(world, self.intent, "", self.sub_type_role)
             self.doctrine = load_doctrine(self.role)
 
     # -- who and what ------------------------------------------------------------------

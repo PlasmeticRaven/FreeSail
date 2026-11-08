@@ -665,23 +665,30 @@ def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_do
 
 
 @pytest.mark.parametrize(
-    ("build", "course"),
+    ("build", "lines"),
     [
-        (schooner_with_fore_course, "fore course"),
-        (schooner_with_main_topsail, "fore course"),
-        (schooner_with_main_topgallant, "fore course"),
-        (polacre_probe, "main course"),
+        (schooner_with_fore_course, ["reef the fore course, one reef", "take in the fore sail"]),
+        (schooner_with_main_topsail, ["reef the fore course, one reef", "take in the fore sail"]),
+        (
+            schooner_with_main_topgallant,
+            ["reef the fore course, one reef", "take in the fore sail"],
+        ),
+        (polacre_probe, ["reef the main course, one reef"]),
     ],
     ids=["trial A", "trial B", "main topgallant", "polacre"],
 )
-def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(build, course):
+def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(build, lines):
     """The lead's ruling 4 of 2026-11-06 (`orders.storm._after_sail_lines`): the courses' reef
     at the topsails' second reef kept for any rig with topsails (Luce 1884 p. 476, "a second
     reef in the topsails, and a single reef in the courses"; the *Neufchatel*'s double-reefed
     foresail, Cobb p. 95), the after take-ins a square-rigged ship's alone. None of these is
     square-rigged: with the topsails going to their second reef and after it her course is
-    reefed once, and nothing of hers is taken in, her mainsail kept; before the ruling the list
-    gave a fore-and-after nothing at all."""
+    reefed once, and no after sail of hers is taken in, her mainsail kept; before the ruling the
+    list gave a fore-and-after nothing at all. Beside it, the lead's ruling (3)(e) of 2026-11-07
+    (package 75, B2b): a boomless gaff sail on a mast that crosses a course, the *Neufchatel*'s
+    fore gaff sail beside her fore course, is taken in at the same reef, by her rig (Cobb 1841
+    p. 79), so that the three rigs in memory with a schooner's foresail beside a fore course take
+    theirs in too ("take in the fore sail"; old, the course's reef alone); the polacre has none."""
     ship = _under_plain_sail(build())
     assert not _square_rigged(ship)
     topsails = [ship.sails[sid] for sid in ship.groups["topsails"]]
@@ -689,7 +696,7 @@ def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(buil
     for reefs in (1, 2):
         for sl in topsails:
             sl.reefs = min(reefs, sl.reef_bands)
-        assert _after_sail_lines(ship) == [f"reef the {course}, one reef"]
+        assert _after_sail_lines(ship) == lines
 
 
 def test_the_after_take_ins_are_a_square_rigged_ships_alone(monkeypatch):
@@ -723,14 +730,15 @@ def test_a_course_with_no_reef_bands_is_not_named_and_stays_as_it_is():
     has such a course). At the ruling's build the list named it, so that "shorten sail" said
     in its "Not done" "'reef the fore course, one reef': The fore course has no reef bands; it
     is set whole or not at all."; the review of 2026-11-07 took that out, the ruling not naming
-    it (the lead's)."""
+    it (the lead's). Her boomless foresail beside the course is taken in at that reef since
+    package 75's B2b (the lead's ruling (3)(e) of 2026-11-07; old, nothing named)."""
     doc = schooner_with_fore_course_doc()
     for sail in doc["sails"]:
         if sail["id"] == "fore.course":
             sail["reef_bands"] = 0
     ship = _under_plain_sail(ship_from_dict(doc, "tests/test_schooner_mast.py:no-reef-bands"))
     ship.sails["fore.topsail"].reefs = 1
-    assert _after_sail_lines(ship) == []
+    assert _after_sail_lines(ship) == ["take in the fore sail"]
     Runner(ship)
     ship.dyn.apparent_wind_angle = math.radians(-60.0)
     ship.dyn.apparent_wind_speed = 6.0
@@ -752,9 +760,11 @@ def test_a_course_with_no_reef_bands_is_not_named_and_stays_as_it_is():
 # The committed fore-and-afters whose course the gale names, by stem: at each reef of her
 # topsails, from none to three, the lines of the after sail, her course not yet reefed. The
 # *Neufchatel*'s fore course, the ruling's own case (Cobb 1841 p. 95, "a double-reefed foresail";
-# package 75, B2): reefed once from her topsails' first reef on.
+# package 75, B2): reefed once from her topsails' first reef on; and since B2b her fore gaff sail,
+# boomless beside the course, taken in with it (the lead's ruling (3)(e) of 2026-11-07; Cobb p. 79;
+# old, the course's line alone).
 COURSE_REEFED_BY_THE_GALE = {
-    "hermaphrodite-brig": [[]] + [["reef the fore course, one reef"]] * 3,
+    "hermaphrodite-brig": [[]] + [["reef the fore course, one reef", "take in the fore sail"]] * 3,
 }
 
 
@@ -764,7 +774,8 @@ def test_only_the_neufchatel_of_the_fore_and_afters_has_a_course_reefed_by_the_g
     (the schooners cross no course; the cutter's topsail has one reef band, so never a second;
     the smack's topsail yard is on her pole mast, no topsail of a topmast; the lugger's are set
     flying; the boats have none). Hers reefs her fore course once from her topsails' first reef
-    on, and takes in nothing (`COURSE_REEFED_BY_THE_GALE`; her gale is her own tests'). The
+    on, and takes in her fore gaff sail with it, no after sail (`COURSE_REEFED_BY_THE_GALE`; her
+    gale is her own tests'; the take-in since B2b, old nothing taken in). The
     square-rigged files are `tests/test_gale.py`'s and the other files' as before."""
     fore_and_afters = []
     for path in SHIP_FILES:

@@ -89,6 +89,11 @@ DISPLACEMENT_RECORD_SHARE = 0.15
 PORT_GAP_M = 0.05
 # A given point is drawn through within a millimetre (§14.1).
 THROUGH_M = 0.001
+# An end's closure takes its levels within a millimetre of one another as one level (package
+# 75, B2b, the lead's ruling of 2026-11-07), so that a float's residue for nil is nil: the
+# *Neufchatel*'s last station stands on her stem's foot, its lowest point at z -8.0e-10, and
+# her `stem_m`'s (16.35, 0.0) was a second level beside it, served twice to the millimetre.
+CLOSURE_LEVEL_M = 0.001
 # The drawn displacement is summed over this many levels from the lowest point to the water.
 DISPLACEMENT_LEVELS = 64
 # The outlines for the pair check (§5.6): abeam, and ahead and astern (the fore body and the
@@ -705,12 +710,27 @@ def _closure(p: HullProfile, side: str, z_low: float) -> Station:
         if z_low < knuckle < top:
             levels.append(knuckle)
     out: list[Point] = []
-    for z in sorted(set(levels)):
+    for z in _merged_levels(levels):
         x, hb = _end_x(p, side, z), _end_hb(p, side, z)
         if hb > 0.0 and out and out[-1][2] == 0.0:
             out.append((x, z, 0.0))  # the knuckle: the post's top, then the transom's foot
         out.append((x, z, hb))
     return tuple(out)
+
+
+def _merged_levels(levels: list[float]) -> list[float]:
+    """A closure's levels, low to high, a level within `CLOSURE_LEVEL_M` of the one kept below
+    it taken as that one: the lowest, the station's own, is kept, so that the closure meets
+    its station, and the top (the stem head or the taffrail) stays the last."""
+    top = max(levels)
+    out: list[float] = []
+    for z in sorted(set(levels)):
+        if out and z - out[-1] < CLOSURE_LEVEL_M:
+            if z == top and len(out) > 1:
+                out[-1] = top
+            continue
+        out.append(z)
+    return out
 
 
 def _end_stations(

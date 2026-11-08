@@ -99,11 +99,11 @@ hull:
     # Her form (Build-Ships.md §5.1): the ends under the water by the design's default rule (judgement: only the dead flat is drawn below WL3); her stern raked; her head a knee.
     form:
       fullness: [1.0, 1.0]
-      # A flat transom along stern_m's rake with no counter (Build-Ships.md §5.1, raked; measured on ZAZ6177): its foot 4.65 ft above her water just abaft the post's head, 16.1 ft across its top corners and 15.8 ft at its foot on the body plan, its top arched about 0.35 ft (measured; the checker reads 16.0-16.6 ft on both body plans). Reed's modern model (Winfield pp. 335-336's photograph) shows the same raked transom, for the eye only.
+      # A flat transom along stern_m's rake with no counter (Build-Ships.md §5.1, raked; measured on ZAZ6177): its foot 4.65 ft above her water just abaft the post's head, 16.1 ft across its top corners and 16.6 ft at its knuckle on the body plan, so that it tumbles home above the knuckle, its top arched about 0.35 ft (measured; the checker reads 16.0-16.6 ft on both body plans). The knuckle's breadth is read at the knuckle's height, the sides near plumb at 16.6-16.8 ft from 4.0 to 7.0 ft above her water (re-read on ZAZ6177's body plan); the first reading's 15.8 ft, below the knuckle, made the transom wider at its top than at its foot (2.46 and 2.41 m before, 2.46 and 2.53 now). Reed's modern model (Winfield pp. 335-336's photograph) shows the same raked transom, for the eye only.
       stern:
         type: raked
         knuckle_z_m: 1.42
-        transom_hb_m: [2.46, 2.41]
+        transom_hb_m: [2.46, 2.53]
         round_up_m: 0.11
       # A knee: its head rails are drawn; a small terminal at its top is not resolved at 1280 px, so no billet, scroll or figure is drawn (Build-Ships.md §5.0 principle 9: nothing invented).
       head: knee
@@ -134,7 +134,7 @@ spars:
   x_m: 9.65
   rake_deg: 10.3
   height_m: 17.52
-  rating_kn: 452.5
+  rating_kn: 428.4
 # fore topmast 34.8 ft, 29.8 to the hounds and a 5.1-ft head (ZAZ6179, measured, not re-measured: Neuf §3.2; Fincham p. 72's 35.2), its heel at the lower mast's hounds; height_m its vertical hoist above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, fore.royal, jib, flying_jib in 40 kn.
 - id: fore.topmast
   class: topmast
@@ -248,7 +248,7 @@ spars:
   x_m: 16.65
   length_m: 6.83
   height_m: 3.47
-  rating_kn: 142.0
+  rating_kn: 117.9
 # jibboom 38.7 ft heel to end (ZAZ6179, measured: Neuf §1.2; Fincham's 38.9 on the hounded reading), 26.2 ft of it beyond the bowsprit's cap and its end 22.8 ft above her water (measured on ZAZ6179 by the checker). Provisional (truth 9), see gen_ships.py. Rating: the sails named in the script in 30 kn (the engine's graph loads nothing on it).
 - id: jib_boom
   class: jib_boom
@@ -403,15 +403,15 @@ sails:
   centre_height_m: 31.0
   canvas_no: 6
   cloth_rating_kn: 6.6
-# the fore staysail on the fore stay, tacked where the bowsprit lies over the stem at the height ZAZ6179 draws it (judgement), its clew not read: its area the design's working figure, 93 m2, cut by the topsail schooner's rule on her spars (judgement, Neuf-D §4.3 and §4.6, until task 5 reads it): its centre 0.35 of its foot abaft its tack, the foot 0.4 of her waterline (Fincham), its height a triangle's up its stay, which stands inside the sail; with the jib it closes Fincham's remainder for the jib and the fore topmast staysail (Neuf §2.8). As a triangle with a level foot forward of the fore mast it would hold about half that area (judgement, until task 5 reads it). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Smack's foresail': No. 1 or 2; 'Fore staysail' (a ship's, on the fore stay): No. 1 to 3); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
+# the fore staysail on the fore stay, tacked where the bowsprit lies over the stem at the height ZAZ6179 draws it (judgement), its clew not read: cut as the triangle that fits forward of the fore mast, its luff up the fore stay to the fore hounds, its foot level from the tack to the mast and its leech down the mast (judgement, until task 5 reads it), its centre that triangle's. The design's working 93 m2 (Neuf-D §4.3, §4.6) was a derivation of its own, closing Fincham's remainder for the jib and the fore topmast staysail with the jib (Neuf §2.8), not her sail plan's figure, which is not read: so triangled its clew stood 7.4 m abaft the fore mast. Corrected to the triangle that fits, the lead's ruling of 2026-11-07. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Smack's foresail': No. 1 or 2; 'Fore staysail' (a ship's, on the fore stay): No. 1 to 3); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: fore.staysail
   class: jibheaded
   stay: fore.stay
-  area_m2: 93
-  x_m: 12.1
+  area_m2: 46
+  x_m: 11.0
   centre_height_m: 7.3
   canvas_no: 2
-  cloth_rating_kn: 29.8
+  cloth_rating_kn: 14.7
 # the jib on the jib stay, from the fore topmast head to the jibboom's end (read on ZAZ6179 by the checker), its clew not read: its area the design's working figure, 121 m2, cut on her spars (judgement, Neuf-D §4.3 and §4.6, until task 5 reads it): its tack at the jibboom's end, its centre a triangle's from the tack up its stay to the fore topmast's hounds and aft along a level foot to the clew its area gives (judgement): the topsail schooner's rule, its centre 0.35 of a foot of 0.35 of her waterline abaft the tack, put it above its own stay and forward of the flying jib's. Cobb's jib was 'closely reefed' (1841 p. 95), but no evolution reefs a jib (data/evolutions/): filed without reef bands, the storm jib standing in, and reported for a later package (Neuf-D §17, lead item 7). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Smack's jib': No. 1 or 2; the sloop's first jib No. 2 to 6); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: jib
   class: jibheaded
@@ -935,12 +935,12 @@ lines:
 - id: jib.stay
   class: stay
   of: fore.topmast
-  rating_kn: 51.2
+  rating_kn: 42.7
 # from the fore topgallant mast head to the flying jibboom's end (ZAZ6179, read by the checker): the flying jib sets on it.
 - id: flying_jib.stay
   class: stay
   of: fore.topgallant_mast
-  rating_kn: 28.0
+  rating_kn: 24.8
 # from the main mast's hounds to the fore mast 13 ft above her water (ZAZ6179, read by the checker), as a brig's (Steel 1794 vol. I, 'The main-staysail'); the main staysail sets on it. The brig-sloop's main stay scaled by the root of her main's sail over the brig's main (judgement: the schooner files none).
 - id: main.stay
   class: stay
@@ -954,11 +954,11 @@ lines:
 - id: bobstay
   class: stay
   of: bowsprit
-  rating_kn: 261.8
+  rating_kn: 213.9
 - id: martingale
   class: stay
   of: jib_boom
-  rating_kn: 51.2
+  rating_kn: 42.7
 # four shrouds a side of the fore channel's seven chain plates (ZAZ6177, measured; four shrouds and three backstays, judgement).
 - id: fore.shrouds.starboard
   class: shroud
@@ -1006,58 +1006,58 @@ lines:
 - id: fore.staysail.halyard
   class: halyard
   of: fore.staysail
-  rating_kn: 56.0
+  rating_kn: 49.6
 # the brig-sloop's head sails' lines scaled by the root of her three headsails over the brig's (judgement, Neuf-D §4.2).
 - id: fore.staysail.sheet.starboard
   class: sheet
   of: fore.staysail
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 24.8
 - id: fore.staysail.sheet.larboard
   class: sheet
   of: fore.staysail
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 24.8
 - id: fore.staysail.downhaul
   class: downhaul
   of: fore.staysail
-  rating_kn: 19.0
+  rating_kn: 16.4
 - id: jib.halyard
   class: halyard
   of: jib
-  rating_kn: 56.0
+  rating_kn: 49.6
 - id: jib.sheet.starboard
   class: sheet
   of: jib
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 24.8
 - id: jib.sheet.larboard
   class: sheet
   of: jib
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 24.8
 - id: jib.downhaul
   class: downhaul
   of: jib
-  rating_kn: 19.0
+  rating_kn: 16.4
 - id: flying_jib.halyard
   class: halyard
   of: flying_jib
-  rating_kn: 27.9
+  rating_kn: 23.4
 - id: flying_jib.sheet.starboard
   class: sheet
   of: flying_jib
   side: starboard
-  rating_kn: 13.9
+  rating_kn: 11.7
 - id: flying_jib.sheet.larboard
   class: sheet
   of: flying_jib
   side: larboard
-  rating_kn: 13.9
+  rating_kn: 11.7
 - id: flying_jib.downhaul
   class: downhaul
   of: flying_jib
-  rating_kn: 9.7
+  rating_kn: 7.8
 - id: main.staysail.halyard
   class: halyard
   of: main.staysail
@@ -1222,21 +1222,21 @@ lines:
 - id: storm_jib.halyard
   class: halyard
   of: storm_jib
-  rating_kn: 56.0
+  rating_kn: 49.6
 - id: storm_jib.sheet.starboard
   class: sheet
   of: storm_jib
   side: starboard
-  rating_kn: 28.0
+  rating_kn: 24.8
 - id: storm_jib.sheet.larboard
   class: sheet
   of: storm_jib
   side: larboard
-  rating_kn: 28.0
+  rating_kn: 24.8
 - id: storm_jib.downhaul
   class: downhaul
   of: storm_jib
-  rating_kn: 21.8
+  rating_kn: 16.4
 groups:
   plain sail:
   - fore.course

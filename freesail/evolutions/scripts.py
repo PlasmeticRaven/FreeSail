@@ -767,6 +767,31 @@ def after_gaff_sails(ship: Ship) -> list:
     ]
 
 
+def gaff_sails_beside_a_course(ship: Ship) -> list:
+    """The boomless gaff sails, set or not, on a mast that crosses a course of her "courses"
+    (package 75, B2b, the lead's ruling of 2026-11-07, beside ruling 4): the *Neufchatel*'s
+    fore gaff sail abaft her fore course, her two foresails. In the gale of December 1814 she lay
+    to under it until it made bad weather and was taken in (Cobb 1841 p. 79), so the gale's
+    reduction takes it in with the topsails' second reef (`orders.storm._after_sail_lines`) and
+    lie a-try hands it, she lying to under her mainsail and her staysails (`LieATryScript`).
+    No other file has one: the schooners' foresails stand on masts that cross no course, and every
+    other gaff sail is on its boom (`tests/test_neufchatel.py`'s guard)."""
+    masts = set()
+    for sid in ship.groups.get("courses") or []:
+        sail = ship.sails.get(sid)
+        mast = ship.mast_of(sail) if sail is not None else None
+        if mast is not None:
+            masts.add(mast.id)
+    out = []
+    for sl in ship.sails.values():
+        if sl.cls != "gaff" or "boom" in sl.roles:
+            continue
+        mast = ship.mast_of(sl)
+        if mast is not None and mast.id in masts:
+            out.append(sl)
+    return out
+
+
 def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
     """The topgallants and royals set on the masts forward of the backed
     yards' mast: the light head sails. Hove to they are clewed up (Luce 1866
@@ -5327,6 +5352,10 @@ class LieATryScript(Script):
         ship = self.ship
         keep = {s.id for s in self.topsails}
         jibs = set(ship.groups.get("jibs", []))
+        # a boomless gaff sail beside a course, the *Neufchatel*'s fore gaff sail, is handed
+        # too, as the gale's reduction has it in at the topsails' second reef: she lies to
+        # under her mainsail and her staysails (package 75, B2b; Cobb 1841 p. 79)
+        beside = {sl.id for sl in gaff_sails_beside_a_course(ship)}
         out = []
         for sl in ship.sails.values():
             if sl.id in keep or not (sl.state in DRAWING or sl.state is SailState.LOOSED):
@@ -5336,7 +5365,7 @@ class LieATryScript(Script):
             # spanker are handed and as the gale's reduction has it in before she lies a-try
             # (Ext §5.8). Left standing, the line named the main topsail and the staysails
             # alone (B3.3's review)
-            if sl.cls in ("square", "studding") or sl.id in jibs or sl.settee:
+            if sl.cls in ("square", "studding") or sl.id in jibs or sl.settee or sl.id in beside:
                 out.append(sl)
         drivers = {sl.id for sl in after_gaff_sails(ship)}
         out += [sl for sl in ship.sails.values() if sl.id in drivers and sl not in out]
@@ -5452,7 +5481,23 @@ class LieATryScript(Script):
         return self.swing.remaining_s() if self.swing else brace
 
     def words(self) -> dict[str, Any]:
-        return {"topsail": names_of_sails(self.ship, self.topsails)[4:]}
+        topsail = names_of_sails(self.ship, self.topsails)[4:]
+        return {"topsail": topsail, "under": self._under_words(topsail)}
+
+    def _under_words(self, topsail: str) -> str:
+        """What she lies a-try under, for the line: "the main topsail and the staysails"; with
+        a boomless gaff sail beside a course (the *Neufchatel*'s fore gaff sail; package 75,
+        B2b) her gaff sails are named, those standing among what she lies under and that one
+        taken in: "the fore topsail, the mainsail and the staysails, the fore-and-aft foresail
+        taken in"."""
+        beside = gaff_sails_beside_a_course(self.ship)
+        if not beside:
+            return f"the {topsail} and the staysails"
+        sails = self.ship.sails.values()
+        standing = [sl for sl in sails if sl.cls == "gaff" and sl.is_set and sl not in beside]
+        under = [f"the {topsail}"] + [names_of_sails(self.ship, [sl]) for sl in standing]
+        taken_in = names_of_sails(self.ship, beside)
+        return ", ".join(under) + f" and the staysails, {taken_in} taken in"
 
 
 class ScudScript(Script):
