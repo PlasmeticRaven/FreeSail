@@ -15373,6 +15373,179 @@ this record was written):
   `test_schooner_mast`: **1,739 passed, 1 xfailed in 9:51** (the xfail her helm's close-hauled
   band).
 
+### The owner's two rulings (B2c, 2026-11-08)
+
+The owner's two rulings on the *Prince de Neufchatel*, made on 2026-11-08 in the lead's place (the
+lead's usage spent for the week), recorded in their words, "the owner, ruling for the lead":
+
+1. On B2b's take-in of her fore gaff sail at the topsails' second reef (the lead's item above,
+   "the ruling's moment, not the source's, settles when it comes in"): **"At lie a-try"**. Her fore
+   gaff sail is taken in when she lies a-try, as Cobb has it (1841 p. 79), not at the topsails'
+   second reef.
+2. On her lead (B2b's "Her helm, for the lead", no lead holding both of step 5's bands with her fore
+   staysail at 46 m²): **"Re-tune, widen bands 0.2 degrees"**. `clr_x_m` to −0.6, each of her helm
+   test's bands widened by 0.2 degrees.
+
+Built on the package's branch at bd12a802 (B4's head), one commit. Measured on the owner's machine at
+seed 7, the scripts in the session's scratch (`b2c/`), outside the repository; "old" is bd12a802,
+"new" the tree as committed. Every old figure below was first reproduced at bd12a802 to B2b's
+record (her helm, tack, wear, heave-to, strain, running, under way, round trip, and her gale and
+the three rigs' gales to the digest).
+
+**(1) Her fore gaff sail at lie a-try.** `orders.storm._after_sail_lines` takes in no gaff sail:
+the loop B2b added for `gaff_sails_beside_a_course` goes, so that the function is as it was at
+52fad521 but for its docstring, which says why. Kept as B2b built them: lie a-try's handing of a
+boomless gaff sail beside a course (`LieATryScript._to_hand`) and its line naming her two gaff
+sails (`_under_words`, `data/evolutions/lie_a_try.yaml`'s `{under}`, the yaml unchanged); the key
+(`scripts.gaff_sails_beside_a_course`, its docstring and lie a-try's comment brought true) and
+her tests' guard that it is hers alone of the files. "Shorten sail" at the topsails' second reef
+now names her course's reef alone, as before B2b.
+
+Her gale as sailed (ruling 4's `gale.py` unchanged: 15 kn rising to 44, "shorten sail" at 20, 25,
+30, 34, 38 and 42 kn, "lie a-try" at 7,200 s, trimmed every two minutes), old beside new, with
+ruling (1) alone (her old file, `clr_x_m` +0.1, on the new tree) between them:
+
+| | Old (B2b) | (1) alone (+0.1) | New (both) |
+|---|---|---|---|
+| "shorten sail" at 25 kn | "All hands reef the fore topsail. All hands reef the foresail. Hands to the fore-and-aft foresail brails and halyards." | "All hands reef the fore topsail. All hands reef the foresail." (as before B2b) | the same as (1) alone |
+| The fore gaff sail | taken in at 4,487 s | whole until lie a-try: "Took in the foresail and the fore-and-aft foresail." at 7,586 s | the same, at 7,598 s |
+| The course's reefs | 4,622 and 5,581 s | 4,626 and 5,592 s | 4,625 and 5,600 s |
+| The jib | in at 30 kn (5,359 s) | in at 30 kn (5,364 s) | the same |
+| Her course from the jib's take-in to lie a-try | gripes up from about 5,700 s: 37-38° off at 2.2-2.8 kn with the helm hard over (+30° to +33°) | **gripes up as at B2b**, from about 5,550 s: 35-38° off at 2.0-2.5 kn with the helm hard over (+28° to +35°) | **bears away**: a luff of three minutes to 47° off at 5.2-6.8 kn with the helm hard over (−29° to −35°, 5,460-5,640 s), then 65-69° off at 10.1-11.3 kn with the helm −19° to −24° from 5,760 s until lie a-try; 54° at 9.1 kn at 7,200 s |
+| The fore storm staysail | not set by 8,400 s (8,453 s in B2b's run lengthened), the fore staysail taken in at 7,664 s, loaded near its rating | not set by 8,400 s; the fore staysail taken in at 7,689 s, loaded near its rating | **set at 34 kn (6,780 s)**, in place of the fore staysail, as before B2b (6,791 s) |
+| Lying a-try | 7,664 s, "Lying a-try under the fore topsail, the mainsail and the staysails, the fore-and-aft foresail taken in, helm a-lee." | 7,664 s, the same line | 7,677 s, the same line |
+| At 8,400 s | 36.1° off at 5.29 kn, under the fore topsail and the mainsail | 36.1° at 5.29 kn, the same sails | 38.9° at 3.26 kn, under the fore topsail, the mainsail and the fore storm staysail |
+| The probe's digest | 1b099362a83683c9 | 4fd4e8a70e812cf2 | ae706626e06a8021 |
+
+Before B2b (52fad521, her fore staysail the working 93 m², B2b's record above): the course reefed
+at 4,628 and 5,616 s, from 30 kn 57-69° off at 9.4-11.4 kn with the helm −14° to −19°, the storm
+staysail set at 6,791 s, lying a-try at 7,674 s, the old line. Nothing carried away, parted or
+blew out in any. **So B2b's griping is gone, but by the two rulings together:** with ruling (1)
+alone, at +0.1, she gripes up from the jib's take-in exactly as she did at B2b; with her fore
+staysail at 46 m² and her fore gaff sail standing she has too little canvas forward of her
+mainsail at +0.1, and it is the lead of ruling (2) that keeps her off. Her lines are as before
+B2b but for lie a-try's: the 25 kn reply without the take-in, the jib at 30 kn, the storm staysail
+at 34 kn, and lie a-try's new line with "Took in the foresail and the fore-and-aft foresail.".
+
+**The three rigs in memory with a fore course** (trial A, trial B and the main topgallant's
+fixture, `tests/rig_fixtures.py`), sailed in the same gale, old beside new, with the gale before
+B2b beside them (52fad521's, reproduced on bd12a802 to the digest with the key read as none in the
+process, f490576bd3488942, b37a0f6c595cc061, e81ca5e670bed5c6; and B2b's, reproduced on the new
+tree with its take-in put back in the process to its digests, cd9fb8b6b8feed3b, c2db1535bdd0b8e8,
+4e7fd7fd2192e895):
+
+| Trial A; trial B; the main topgallant's fixture | Before B2b | Old (B2b) | New |
+|---|---|---|---|
+| "Took in the foresail." before lie a-try | never | 5,726; 5,462; 6,090 s | **never** |
+| "Shorten sail" at 34 kn | refused in all three | "Man the jib downhaul."; the same; "'Take in the foresail' will follow ..." | **refused in all three** |
+| The jib hauled down | 6,774 s (38 kn) in all three | 6,029; 6,028; 6,774 s | **6,774 s in all three** |
+| From a minute after the jib's take-in to lie a-try | 62-70° off at 8.3-9.5 kn, helm −23° to −31°; 59-70° at 7.9-9.3, −23° to −28°; 47-70° at 6.1-9.2, −27° to −35° | 36-50° off at 1.0-4.6 kn, the helm hard over (to +35°); 35-52° at 1.0-4.6; 36-44° at 1.0-3.6 | **as before B2b** |
+| Just before "lie a-try" (7,199 s) | 62.2° at 8.47 kn; 59.0° at 7.86; 46.7° at 6.08 | 36.7° at 2.35; 35.7° at 2.40; 37.3° at 2.42 | **as before B2b** |
+| Every line before 7,200 s | 455; 512; 567 lines | 433; 485; 565, parting from those before B2b at 25 kn (4,263 s), the take-in's mark | **line for line those before B2b** (455; 512; 567) |
+| Lying a-try | 7,767; 7,775; 7,734 s, "Lying a-try under the fore topsail and the staysails, helm a-lee." | 7,695; 7,698; 7,705 s, "Lying a-try under the fore topsail, the mainsail and the staysails, the foresail taken in, helm a-lee." | 7,809; 8,014; 7,791 s, B2b's line, the foresail and the course handed by lie a-try |
+| At 8,400 s | 48.3° at 2.45 kn; 46.8° at 2.43; 32.1° at 2.71 | 37.3° at 2.67; 37.2° at 2.70; 37.5° at 2.71 | 49.8° at 2.58; 47.0° at 1.94; 37.5° at 2.71 |
+| On her beam ends (40° to 42°), before lie a-try; after it | 3, 1; 3, 1; 4, 2 | 0, 0; 0, 0; 1, 0 | **3, 2; 3, 0; 4, 0** (before lie a-try at the same ticks as before B2b) |
+| The fore staysail's sheet parted | 8,297 s; 8,300 s; never | never | never |
+| The probe's digest | f490576bd3488942; b37a0f6c595cc061; e81ca5e670bed5c6 | cd9fb8b6b8feed3b; c2db1535bdd0b8e8; 4e7fd7fd2192e895 | d3ada7ae57a0241a; fc7bec081de5020d; 84f3882bf9409472 |
+
+So the three rigs' gales are as before B2b to the line until lie a-try, and after it differ by
+lie a-try's handing of the foresail alone; their beam ends before lie a-try come back with the
+reach they are pressed on, as in ruling 4's record (c) above (4, 4 and 6 in all, before B2b),
+and in all they lie on their beam ends 5, 3 and 4 times now (0, 0 and 1 at B2b). The topsail and
+the privateer schooners' gales are line for line and digest for digest as at B2b
+(5851117d3d1be5dd).
+
+**The pins moved back, old beside new:** `tests/test_neufchatel.py`'s gale test (the take-in at
+the topsails' first to third reefs → the course's line alone, as before B2b; its fore gaff sail
+set when the course is double-reefed; the docstring's figures); `tests/test_schooner_mast.py`'s
+gale case on trial A, trial B and the main topgallant's fixture (`["reef the fore course, one
+reef", "take in the fore sail"]` → the course's line alone, its parameter `course` as before B2b),
+the course with no reef bands (trial A, `["take in the fore sail"]` → `[]`) and
+`COURSE_REEFED_BY_THE_GALE`'s row for her (the take-in gone from her topsails' first to third
+reefs). Docstrings only: her guard of the key and her lie a-try test (the take-in at lie a-try
+alone). Her lie a-try test's line and sails as B2b pinned them.
+
+**(2) Her lead −0.6, the bands widened by 0.2 degrees.** Her module's `clr_x_m` +0.1 → **−0.6**
+and its note (the reason and the bands; 0.2 m ahead of the geometric centre, −0.80 m, where +0.1
+was 0.9 m); her file written by the generator, the other sixteen byte for byte (`py
+tools/gen_ships.py` into scratch, `cmp`). Her helm tests: the close-hauled band, step 5's −1.0 to
++1.5, widened to **−1.0 to +1.7**, the strict known failure taken off
+(`test_her_helm_as_tuned_is_balanced_close_hauled`, passing); the abeam and ten-point band, +0.5
+to +4.0, widened to **+0.3 to +4.0** (`test_her_helm_as_tuned_abeam_and_at_ten_points`, its pin of
+the lead −0.6). **The reason, recorded with the tests:** her fore staysail corrected to the 46 m²
+that fits forward of her fore mast (B2b) gives her the weather helm close-hauled, and her helm
+falls from close-hauled to the beam where the schooner's rises, so that no single lead holds both
+of step 5's bands; −0.6 holds the widened two, with 0.05° to spare close-hauled and 0.09° abeam.
+
+| Her, seed 7, 15 kn under plain sail | Old (+0.1) | New (−0.6) |
+|---|---|---|
+| her helm at 60°, 67.5°, 78.75°, 90°, 112.5°, 135° | +3.95, +4.30, +2.81, +1.61, +2.10, +3.16 | **+1.65, +2.25, +1.30, +0.39, +1.39, +3.06** |
+| her helm at 60° and abeam in 25 kn | +5.09, +1.60 | +2.44, +0.07 |
+| speed, heel, leeway at 60° and abeam | 6.08 kn, 5.10°, 3.60°; 8.29, 5.38°, 1.97° | 6.07, 5.09°, 3.75°; 8.29, 5.37°, 2.05° |
+| abeam in 25 kn: speed, heel | 11.81, 14.24° | 11.81, 14.20° |
+| truth 6's form abeam: plain; headsails in; mainsail in | +1.61; +5.29; −11.24 | +0.39; +4.23; −13.02 |
+| truth 17's form (from rest at 293°) | aback once, never under 67.0° off, settled at 392 s, 3.70 kn | aback once, 67.0°, settled at 398 s, 3.54 kn |
+| truth 10's form, tack from 290 / 292.5 / 295° | 269 / 261 / 268 s, gaining 147 / 144 / 133 m | **192 / 189 / 193 s**, gaining 118 / 114 / 114 m |
+| her tack test's words: "Main-topsail haul."; hanging in stays; "Rise fore tack and sheet. Let go and haul." | 50, 62, 75 s | 53, 63, 77 s |
+| B3.4's settled tack (main topgallant set) | 261 s (313 s) | 189 s (203 s) |
+| truth 11's form, wear (B3.4's settled form; the main topgallant set) | 521 s, 241 m to leeward (521 s; 533 s) | **452 s, 249 m** (452 s; 484 s) |
+| her heave-to test's form (the main topgallant set) | 49.1° at 2.59 kn (49.0° at 2.56) | **51.3° at 3.12 kn (51.3° at 3.09)**, no aback, the sail still set |
+| truth 12's form | 49.1° at 2.59 kn | 51.3° at 3.12 kn |
+| under way from her anchor, 15 kn (10 kn) | 1,466 s, 5.79 kn (1,338 s, 4.01) | 1,465 s, 5.76 kn (1,339 s, 4.01) |
+| lie a-try from close-hauled (her test's form) | the line as pinned, 34.9° at 1.60 kn | the same line, 35.1° at 1.56 kn |
+| "shorten sail" with her main topgallant set | it and the fore topgallant taken in | the same |
+| truth 9's forms: plain sail in 20, 25, 30 kn, the worst strain | the fore topgallant yard 0.54, 0.88, 1.32 | 0.54, 0.88, 1.31 |
+| all sail in 35 kn: carried away | the main topmast (699 s), the fore royal yard (741) | the fore royal mast (739 s), the main topmast (773) |
+| running 15 / 25 kn at 150° under plain sail and "make all sail" | 6.54, 6.94 / 9.94, 10.44 kn | the same |
+| dead before it, the same | 5.98, 6.29 / 9.38, 9.79 kn | 5.99, 6.30 / 9.39, 9.76 kn |
+| studding sails set, 150° and 180° in 15 / 25 kn | 7.49, 6.71 / 11.12, 10.37 kn | 7.49, 6.72 / 11.12, 10.37 kn |
+| the round trip an hour in | 6.19 kn, investigating the stranger; run on, aground at 4,251 s in a fathom and a half | **6.22 kn**, the same state; aground at 4,266 s, the same depth |
+
+**Her polar is unmoved, proved:** `world.ships._balanced_speed_ms` on `_rigged_for_plain_sail`, her
+45 cells (three winds by fifteen angles), unrounded, are the same to the last bit on her new file
+and on her old one, and `polar_of`'s rows the same; `polar_of` over her file, the frigate-36's,
+the brig-sloop's and the two schooners' the same figure for figure old and new (her best 5.01 /
+8.67 / 12.07 kn, closest 40°). `clr_x_m` is read by the sails' yaw moment and the rudder's and the
+sternway's levers (`physics.sails`, `physics.hull`), which the polar's thrust-against-resistance
+balance does not reach; 7-193 stands as it was.
+
+**The pins moved, old beside new** (each with its reason in its docstring), in
+`tests/test_neufchatel.py`: the helm tests (the close-hauled band −1.0 to +1.5 → −1.0 to +1.7, its
+strict known failure taken off; the abeam band +0.5 to +4.0 → +0.3 to +4.0; the lead's pin +0.1 →
+−0.6); the round trip's speed (6.19 → 6.22, ±0.5). Docstrings only, every band standing: the
+polar's (`clr_x_m` +0.3 to −0.6, not read by the polar), truth 6's, the tack's, the wear's and
+heave-to's, getting under way, truth 9's. No other file's pin moved; no other ship file, whole
+log or trial.
+
+**The suites, as run** (`py -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` from
+the tree root, one at a time with nothing else running):
+- **Her tests and the files that read what the step touched** (`--slow`: `test_neufchatel`,
+  `test_schooner_mast`, `test_evolutions`, `test_gale`; the other files that read `storm.py`,
+  `test_bowsprit_yards`, `test_driver`, `test_indefatigable`, `test_lateen` and `test_settee`; and
+  the files that read her ship file, `test_ship_particulars` with the byte test,
+  `test_view_geometry`, `test_view_action`, `test_lee_ports` and `test_profile`), on the tree as
+  committed but these records: **1,859 passed in 5:25.** By junit, test by test, against the bases
+  on the same files (B4's fast tier, `b4/final-fast.xml`, and its slow candidates,
+  `b4/final-slow.xml`, 1,859 tests): **one outcome changed**, her helm's close-hauled band,
+  xfailed → passed (ruling 2); none only in either.
+- **The generator** (`py tools/gen_ships.py` into scratch): the sixteen other files byte for byte
+  with `data/ships` by `cmp`, hers moved at its `clr_x_m` and its note alone and taken from it.
+- **ruff** check and format clean (367 files); every changed file LF.
+- **With these records written**, the files that read the documents (`test_hull_schooner`,
+  `test_hull_brig`, `test_hull_cutter`, `test_hull_frigate`, `test_hull_lugger`, `test_hull_smack`,
+  `test_practice`, `test_in_world`, `test_hull_form`, `test_knowledge`, `test_primer`,
+  `test_grammar_book`, `test_indefatigable`, `test_officer`) with `test_neufchatel` and
+  `test_schooner_mast`: **1,743 passed in 9:54.** Against the fast base on the same files: the
+  one outcome changed, her helm's close-hauled band, xfailed → passed; none only in either.
+- **The files that read every ship file** (fast: `test_business`, `test_catalogue`,
+  `test_check_viewer_guns`, `test_known_truths`, `test_orders`, `test_profiles`, `test_regatta`,
+  `test_scenario_nations`, `test_scenarios`, `test_standing`, `test_stores`, `test_subtypes`,
+  `test_ships`, `test_ship_loader`, `test_rig_classing`), with `test_practice` again once these
+  records were written: **1,546 passed in 12:59**, every outcome as in the fast base.
+- Not run: the captain's trials (the machine's three on their digests, 8df0ab2beba93320,
+  df5f02eb6e6ce68a and 8dac97a4c9bdfe43, as at B4), the four whole logs and the rest of the fast
+  tier, none of which sails her file or a rig with a boomless gaff sail beside a course.
+
 ## The settee in the engine (package 75, B3.3) (2026-11-07)
 
 **The design.** `docs/design/Design-ShipsEngineExtensions.md` §5 whole (Ext), as approved, with D3(b), D4(a), D5(a), D44(a) and D46(d) (`docs/design/Decisions-ShipsRound2-2026-10.md`), the bilander's §12.2 (what B3.3 must give her) and two of the lead's rulings in `docs/dev/M7-WorkPackages.md`: on Ext §14 item 3, "the engine's driver rule holds for the settee hove to unless the measured figures say otherwise, and then D4(a) with the figures in TuningNotes"; and on the bilander's §17 lead item 4, "the reserve branch from the start, keyed on `settee`, the foot from the corners with the block a fathom abaft the clew and abreast of it, the trim reading no part of the profile". Rule 5's measure on her file is B4's (the same note, item 8): this step measures it on the settee brig in memory and reports. The bilander's file is not written here.

@@ -771,11 +771,12 @@ def gaff_sails_beside_a_course(ship: Ship) -> list:
     """The boomless gaff sails, set or not, on a mast that crosses a course of her "courses"
     (package 75, B2b, the lead's ruling of 2026-11-07, beside ruling 4): the *Neufchatel*'s
     fore gaff sail abaft her fore course, her two foresails. In the gale of December 1814 she lay
-    to under it until it made bad weather and was taken in (Cobb 1841 p. 79), so the gale's
-    reduction takes it in with the topsails' second reef (`orders.storm._after_sail_lines`) and
-    lie a-try hands it, she lying to under her mainsail and her staysails (`LieATryScript`).
-    No other file has one: the schooners' foresails stand on masts that cross no course, and every
-    other gaff sail is on its boom (`tests/test_neufchatel.py`'s guard)."""
+    to under it until it made bad weather and was taken in (Cobb 1841 p. 79), so lie a-try hands
+    it, she lying to under her mainsail and her staysails (`LieATryScript`), and the gale's
+    reduction leaves it standing (the owner's ruling for the lead of 2026-11-08, package 75's
+    B2c: B2b took it in with the topsails' second reef). No other file has one: the schooners'
+    foresails stand on masts that cross no course, and every other gaff sail is on its boom
+    (`tests/test_neufchatel.py`'s guard)."""
     masts = set()
     for sid in ship.groups.get("courses") or []:
         sail = ship.sails.get(sid)
@@ -5353,8 +5354,8 @@ class LieATryScript(Script):
         keep = {s.id for s in self.topsails}
         jibs = set(ship.groups.get("jibs", []))
         # a boomless gaff sail beside a course, the *Neufchatel*'s fore gaff sail, is handed
-        # too, as the gale's reduction has it in at the topsails' second reef: she lies to
-        # under her mainsail and her staysails (package 75, B2b; Cobb 1841 p. 79)
+        # too, here and not before (Cobb 1841 p. 79): she lies to under her mainsail and her
+        # staysails (package 75, B2b; the owner's ruling for the lead of 2026-11-08, B2c)
         beside = {sl.id for sl in gaff_sails_beside_a_course(ship)}
         out = []
         for sl in ship.sails.values():
