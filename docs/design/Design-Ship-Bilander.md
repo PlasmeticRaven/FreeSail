@@ -1302,7 +1302,13 @@ Her figures do not overturn the fixture's: no B3 follow-up. *(As reviewed, at he
 +2.0: kept 65.1-65.4 and 62.7-63.6 degrees off in 15 and 20 kn, and 64.8-70.0 in 8 kn, where at
 +2.25 she was forced round; clewed up 68.0-69.0 and 67.3-69.3. A guard is found missing on her
 file, for B3 before her merge (item 7): a kept settee forced round with her stays on the old lee
-and fill away draws it there, undipped.)* **Item 6**, the sheet's block: 0.31 m
+and fill away draws it there, undipped.)* *(B3.3b, 2026-11-08: the follow-up is in, keyed on
+`settee` alone. At "fill away" such a settee is dipped first, as she lies, and hoisted on her lee
+trimmed for full and by as the tack hoists it, and then she is filled away: on her file in 15 kn,
+forced round by a shift of eight points, hoisted at +158 s and filled away at +218 s, 4.15 kn at
++300 s, where left against its mast it drew 41.3 m² of its 61.8 and she made 3.13 kn
+(`tests/test_bilander.py`; Ext §5.7's as-built note; `docs/dev/TuningNotes.md`, "B3.3b, the
+settee kept and forced round hove to").)* **Item 6**, the sheet's block: 0.31 m
 inside her taffrail (x -11.47 against -11.78), within the fathom; this design's 0.03 m and the
 proxy's 4.45 m were on the taffrail at x -11.52, before her step 1 moved it 0.26 m aft (the proxy's
 block now 4.72 m inside). **Item 7**, the untried manoeuvres run once on her file: each to its end
@@ -1668,7 +1674,11 @@ with the rest of her carving and paint (§3.2).
    her figures overturn, or D44 (c)'s `settee` row if rule 5 fails (`data/sail_classes.yaml`;
    `tests/test_sails.py:65-74`, old beside new), is a follow-up B3 step keyed on `settee` alone,
    before her merge. After the row, B4 measures her polar and 7-197's rule-1 clause again on it,
-   old beside new.
+   old beside new. *Taken up (2026-11-08):* the one guard found missing (§12.2 item 5's note, her
+   review's finding 1), built as B3.3b in `FillAwayScript`, keyed on `settee` alone, before her
+   merge; no heave-to way overturned and no `settee` row, so nothing for her polar or 7-197's
+   rule-1 clause to be measured again on (both pass unchanged, `tests/test_bilander.py` with
+   `--slow`).
 9. **Names:** the armed fit "armed merchant"; the description key `bilander` and its words (§8); the
    dry yard's id `main.crossjack.yard`.
 10. **If the owner takes the open rail** (owner's question 1): a long gun at place `rail` is allowed

@@ -776,6 +776,27 @@ faster through the water than the brig as filed (1.21-2.92 kn from 10 to 25 kn a
 settee (2.9 kn in 25 kn); clewed up, the brig's way (the review's measure). Both to the lead and the
 owner; her file's are B4's. Figures in `docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)".
 
+*As built (B3.3b, 2026-11-08), the follow-up the bilander's design §17 lead item 8 provides for,
+keyed on `settee` alone (her review found the need on her file):* kept hove to, the settee's yard
+hangs where she hove to; forced round through the wind lying to, `_judge_lying_to` changes the
+record's tack and yards, not its side, and its yard is on her weather side, against its mast. Fill
+away drew it there and never dipped it (at seed 7 in 15 kn after a shift of eight points, the
+fixture's drawing 57.2 m² to the end where 85.8 drew clear, hers 41.3 where 61.8 did, 3.38 and 3.21
+kn at +600 s, and no line said so). Now `FillAwayScript` dips a settee set on the weather side of
+the tack she is to be filled on first, as she lies (its phase `dip_settee`): lowered at the order
+("Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the weather
+bow."), hoisted on her lee once `settee_dip_s` is done by the crew's factor ("Dipped the mainsail;
+hoisted on the starboard side, to leeward of the mast."), its sheet drawn for the wind she will have
+full and by, as the tack hoists it (§5.5's change, D3(b)), her hands tending the helm and the head
+sheets meanwhile as the watch does; then she is let fall off and filled away as from any heave-to.
+One on her lee is left as it is; a ship with no settee set is not touched (the trace of seven
+committed files, identical). Dipped as she fell off instead, the settee down while she had a knot of
+way, her file came head to the wind when it was hoisted and went astern after "Filled away" in 15
+and 20 kn (aback at +254 s in 15): not kept. As built, in 8 to 20 kn on both: filled away 133-183 s
+later, nothing aback, the settee clear of its mast; 4.08 and 5.36 kn at +900 s on her file in 15 and
+20 kn (3.21 and 4.24 before), about as before in 8 kn. Figures in `docs/dev/TuningNotes.md`, "B3.3b,
+the settee kept and forced round hove to".
+
 ### 5.8 Getting under way, rounding to, the gale
 
 - **Getting under way.** With `_lugs_all` leaving out settees, she takes the ship's path:

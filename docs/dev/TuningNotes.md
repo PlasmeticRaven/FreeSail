@@ -15739,6 +15739,66 @@ All with `py -m pytest`, `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"
 - **The ship files:** `py tools/gen_ships.py` into scratch, its sixteen files byte for byte the committed sixteen (`cmp`).
 - **ruff** check and format clean (360 files).
 
+### B3.3b, the settee kept and forced round hove to (2026-11-08)
+
+**Why.** The follow-up B3 step the bilander's design §17 lead item 8 provides for, keyed on `settee` alone (the lead's answer (8) in `docs/dev/M7-WorkPackages.md`, "5. The bilander (her §17)": "a follow-up B3 step keyed on `settee` alone before her merge if one is needed"). Her review found the need on her file ("Her review's mends", below, found item 1): hove to with the settee kept (its sheet eased by the driver rule, Ext §5.7 as B3.3 built it), forced round through the wind, its yard stays on the old lee, now the weather side of its mast, and "fill away" draws its sheet there and never dips it, no line saying so.
+
+**Reproduced first**, at seed 7 in 15 kn, the wind shifted eight points at a stroke as `tests/test_lying_to.py` forces a ship round (the shift is the test's; at her `clr_x_m` of +2.0 her heave-to no longer comes round of itself):
+
+| | The fixture (`brig_with_settee()`, settle 1,200 s, hove to 600 s) | Her file (her settle, hove to at +106 s and 60 s more) |
+|---|---|---|
+| Forced round | 20 s after the shift, "... lies on the larboard tack, the fore topsail to the mast" | the same, 20 s |
+| Fill away, ordered 60 s after the shift | "Filled away on the larboard tack" at +59 s | the same, +59 s |
+| The settee to the end | its yard larboard, its sheet starboard: against its mast, 57.2 of 86.0 m² (85.8 drawing clear at the settle) | the same, 41.3 m² (61.8 clear at her settle; 73.0 its cloth) |
+| Her way, +300 s; +600 s | 3.35 kn; 3.38 | 3.13; 3.21 |
+
+`_judge_lying_to`'s forced-round branch changes the record's tack and yards only, and `FillAwayScript` drew the kept after sails to the new lee without shifting the settee's yard (`freesail/evolutions/scripts.py`).
+
+**Built** (`FillAwayScript` alone, keyed on the set settees, which no other committed file has). At "fill away" a settee set on the weather side of the tack she is to be filled on is dipped first, as she lies, before she is let fall off: a new phase, `dip_settee`, the change the tack's (`SetteeChange`, D3(b) and Ext §5.5): lowered at the order, passed round abaft the mast with its tack shifted to the weather bow, hoisted on the lee once `settee_dip_s` (120 s, the file giving none) is done by the crew's factor, its sheet drawn for the wind she will have full and by with the way she has, as the tack hoists it (`full_and_by_apparent`). Meanwhile her hands tend the helm and the head sheets as the watch does (`tend_lying_to` on a record of the script's own, the heave-to's figures); the tack is read once from the wind itself, as the fill away reads it, and a change in hand is hoisted on that tack's lee. Then she is filled away as from any heave-to, the dipped settee keeping its trim as hoisted. The fill away holds the settee while it is changed and counts the change in its estimate; one on her lee is left as it is, and so is every ship with no settee set, the script then carrying none of the three new fields (`settee_change`, `lying`, `fall_t0`: class defaults, so that a fill away's pickle is as it was and a checkpoint from an earlier build loads). The words, the fixture's (her file's the same, a tick later):
+
+| s after the order | Kind | Line |
+|---|---|---|
+| 1 | evolution.step | Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the weather bow. |
+| 1 | evolution.started | Fill away; man the after braces. |
+| 157 | evolution.step | Dipped the mainsail; hoisted on the starboard side, to leeward of the mast. |
+| 157 | helm.order | Hauled aft the head sheets; kept the helm a-lee to let her fall off. |
+| 158 | evolution.step | Braced the fore topsail full. |
+| 217 | ship.filled_away | Filled away on the larboard tack; braced full and steering NNW (338°). |
+
+**The way chosen, measured** (seed 7, both settles, hove to 60 s after "Hove to" and for 600 s, the same shift, the order 60 s after it; twelve runs a build). Five other builds were tried first and not kept, each on the same runs:
+
+- **Dipped at the order as she falls off, hoisted for the deck's reading, filled away when it is up** (the first build): the fixture well (3.88 kn at +600 s in 15 kn), and her file in 8 kn; in 15 and 20 kn her file came head to the wind once it was hoisted (at +154 s and +167 s, the settee down while she had a knot of way, 57 degrees off, 10 degrees of helm not bearing her away): in 15 kn "Her sails lifting" at +177 s and aback at +254 s, in both 41-45 degrees off and 0.6-1.3 kn astern from +300 s to +900 s.
+- **Dipped once braced full** (as the tack changes it last): her file aback at +251 s and +260 s in 15 and 20 kn.
+- **Either of those, hoisted for the deck's reading at the order** (eased for the wind she lay to with, 78 degrees in 15 kn): her file in 20 kn 49-55 degrees off from +300 s, going astern.
+- **Dipped first as she lies, the settee then trimmed with the head sheets for the deck's reading**: none aback; the fixture in 8 kn 1.80-1.86 kn at +900 s, the settee eased for the wind she had fallen off to while it was down.
+
+As built, the figures at +300 s and +900 s (degrees off; kn), "Filled away" after the order, and beside them the build before (the settee left against its mast) and a plain fill away from the same heave-to with no shift (the settee on her lee, the same on both trees):
+
+| | Wind | Hoisted; filled away | +300 s | +900 s | Before: filled away; +900 s | Plain, +900 s |
+|---|---|---|---|---|---|---|
+| Her file | 8 kn | 133 s; 184 s | 67.8, 2.02 / 60.9, 1.10 | 67.5, 2.16 / 1.96 | 51 s; 2.06 / 2.03 | 2.26 / 2.16 |
+| | 15 kn | 158 s; 218 s | 68.3, 4.15 | 67.5, 4.08 | 59 s; 3.21 | 4.12 / 4.03 |
+| | 20 kn | 180 s; 248 s | 68.9, 5.47 | 67.5, 5.36 | 65 s; 4.24 | 5.45 / 5.39 |
+| The fixture | 8 kn | 133 s; 184 s | 63.8, 1.44 / 62.6, 1.37 | 67.5, 2.01 / 2.00 | 51 s; 2.07 / 2.23 | 2.46 / 2.32 |
+| | 15 kn | 157 s; 217 s | 68.4, 4.51 | 67.5, 4.25 | 59 s; 3.38 | 4.47 / 4.46 |
+| | 20 kn | 178 s; 245 s | 69.9, 6.15 | 67.5, 5.65 | 66 s; 4.49 | 5.87 / 5.86 |
+
+(Where the two heave-tos differ, the 60 s one first.) In every run the settee ends on her lee, clear of its mast, drawing as at the settle, and nothing of hers is aback after the order. While its yard is on deck she lies 64-98 degrees off (her file 64-92, the fixture 65-98), past seven points at the most, as she lies with it clewed up (D4(a)'s way, Ext §5.7's figures), and is full and by again by +300 s. Filled away 133-183 s later than before, the dip's time by the factor first. In 8 kn the fixture makes 2.00-2.01 kn at +900 s against 2.07-2.23 with the settee left against its mast and 2.32-2.46 from a plain fill away: its sheet as hoisted for full and by with the knot she had, which the fill away does not trim again (as it never trims a kept settee: "trim sails" is the captain's); her file in 8 kn about as before (2.16 and 1.96 against 2.06 and 2.03).
+
+**Pinned** (states, ticks and bands, each broken on purpose): `tests/test_settee.py`, the script's own turn on the bare fixture three ways (on her lee: left, she falls off at once, no new field on the script; on her weather side: lowered at once, held, the estimate 120 + 180 + 45 s, hoisted on her lee at 120 ticks, then the head sheets, its trim the full-and-by one; the deck's reading behind her: the change taken to the lee of the tack read from the wind), and the fixture forced round and filled away in 15 kn (the order's words at +1 s, its yard on deck to the hoist at 157 ± 10 s, the head sheets on the hoist's tick, "Filled away on the larboard tack" within 90 s after, nothing aback, the settee clear of its mast drawing as at the settle); `tests/test_bilander.py`, the same on her file in 15 kn (hoisted at 158 ± 10 s, full and by within five degrees of 67.5 at +300 s). Broken on purpose: with the build before (no guard) four of the five fail; with the first build (dipped as she falls off) the same four; with the settee trimmed for the deck's reading at the fall-off, the two of the script's turn that dip; with the side's filter removed, the one on her lee.
+
+**The trace** (a scratch script; the base, 8b327687, exported to scratch beside the tree): the frigate, the brig, the lugger, the Neufchatel (`hermaphrodite-brig.yaml`), the topsail schooner, the cutter and the merchant brig, each from a settle of 1,200 s at seed 7 in 15 kn, hove to 600 s and filled away, hove to and forced round by the same shift and filled away 60 s after it, and filled away "and steer west": 21 runs, every tick's state (her heading, way, rates, heel, rudder and helm, her tack, the record, every sail's state, sheet, side and yard, every spar's brace) and every line, tick and kind identical on the base and the tree. On the Neufchatel, the topsail schooner and the cutter the shift leaves nothing aback, she is hove to no longer, and fill away is refused, on both trees alike; the merchant brig's company is still setting plain sail when the order comes, alike. Checkpoints the base wrote 30 s after each fill away (15 with a fill away in hand) load on the tree and run on 570 s tick for tick as the base's own continuation, the fill away's pickled fields the base's. Her own plain fill away and fill away with a course, traced the same way: identical. **The ship files:** `py tools/gen_ships.py` into scratch, seventeen files byte for byte the committed seventeen (`cmp`).
+
+**Found on the way, not built (for the lead):**
+
+1. **Forced round and left to herself, the settee stays against its mast.** With no fill away ordered, the record's "filled" branch (`_judge_lying_to`, "Her after yards full, she gathers way ...: hove to no longer. The helm keeps her full and by.") follows the forced round, 96-439 s after the shift on the fixture and 119-156 s on her file in 15 and 20 kn, and she sails on full and by with the settee against its mast at two-thirds to +1,800 s (the fixture 57 m², 1.56-3.74 kn; her file 41 m², 2.54 and 3.37 kn), no word said; in 8 kn her file lies to on the new tack so to +1,800 s. Not fill away's: `_judge_lying_to`'s forced-round branch or `_hove_to_no_longer`, keyed on `settee`, would be the place; "dip the mainsail" (`dip_settee`) mends it by order meanwhile.
+2. **Filled away to a course, a kept settee is never trimmed again.** `_pay_off` trims the head sails and the boom sails as she pays off; a kept settee keeps the trim the fill away gave it (before as now, on the plain path as on the dipped).
+3. **Her plain fill away in 8 kn from a short heave-to** (60 s after "Hove to"): filled away at +230 s and aback at +239 s, on the base and the tree alike (from 600 s hove to, filled away at +51 s and sailing on): her heave-to's light-air lie, recorded beside her review's 8 kn case.
+
+**The suites, as run** (`py -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, one at a time on the step's final code, at seed 7 on the owner's machine): `tests/test_settee.py` 60 passed in 28.0 s, `test_bilander` 60 passed in 34.9 s (both `--slow`, run again after their docstrings were brought true), `test_evolutions` 89 passed in 12.4 s and `test_lateen` 40 passed in 10.1 s (`--slow`), and `test_lying_to` 34 passed in 39.4 s (fast; fill away's own tests on the committed files). By junit against B4's bases (`b4/final-fast.xml` and `final-slow.xml`, not re-run): no changed outcome; only in the new, the four of `tests/test_settee.py` and the one of `tests/test_bilander.py` above. **ruff** check and format clean on the three files.
+
+**Not run:** the fast tier whole, the slow candidates and the whole logs (no committed file reaches the change: the trace above).
+
 ## The settee drawn (package 75, B5.4) (2026-11-07)
 
 **The design.** `docs/design/Design-ShipsEngineExtensions.md` (Ext) §6.3 to §6.5 and §9.2 (B5 draws each of B3's steps after it lands, from the fixtures first), with D5(a) and D45 (`docs/design/Decisions-ShipsRound2-2026-10.md`) and the lead's ruling on the bilander's §17 lead item 4 in `docs/dev/M7-WorkPackages.md` (the sheet's block: "a fathom abaft the clew and abreast of it, the trim reading no part of the profile"); the bilander's §12.2 item 8 and §12.3, what B5.4 is asked for. Drawn on the fixture `brig_with_settee()` (`tests/rig_fixtures.py`, "The settee in the engine (package 75, B3.3)", "The rig in memory"); the bilander's file is B4's and is not written here.
