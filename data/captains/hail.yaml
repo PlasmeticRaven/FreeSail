@@ -189,3 +189,30 @@ lies:
 cargo:
   deep: ["a cargo of wine and brandy", "a cargo of salt", "a cargo of tin and copper", "a cargo of pilchards", "a general cargo", "a cargo of wheat", "a cargo of coals"]
   light: ["in ballast"]
+
+# package 74 (spec M7 §19; docs/design/Design-Prizes.md §3.2): the captor's captain asks a
+# captive officer his parole in the period's words, by his nation (the French captain's in
+# French and English as the lies are; Spain's row, decision 64); {name} the captive, {captain}
+# the asker. The forms from memory of the period's narratives and the Regulations (Sect. XII
+# ch. III art. VI on officers on parole); judgement on the words.
+parole:
+  default:
+    ask: "{name}, your sword, sir; I return it you. Will you give me your parole not to attempt the ship nor to leave her without my leave?"
+    ask_again: "{name}, I must have your answer, sir: your parole, or the gunroom under a sentry."
+    taken: "Your word is enough, sir; the cabin and the gunroom are yours, and the quarterdeck by day."
+    refused: "As you please, sir; the sentry has his orders."
+  britain:
+    ask: "{name}, your sword, sir; I return it you. Will you give me your parole not to attempt the ship nor to leave her without my leave?"
+    ask_again: "{name}, I must have your answer, sir: your parole, or the gunroom under a sentry."
+    taken: "Your word is enough, sir; the cabin and the gunroom are yours, and the quarterdeck by day."
+    refused: "As you please, sir; the sentry has his orders."
+  france:
+    ask: "Votre parole, monsieur: {name}, your sword is returned you. Will you give me your word not to attempt the ship nor to leave her without my leave?"
+    ask_again: "Monsieur, il me faut votre réponse: your parole, sir, or the gunroom under a sentry."
+    taken: "Votre parole me suffit, monsieur; the cabin and the gunroom are yours, and the quarterdeck by day."
+    refused: "Comme vous voulez, monsieur; the sentry has his orders."
+  spain:
+    ask: "Su palabra, señor: {name}, your sword is returned you. Will you give me your word not to attempt the ship nor to leave her without my leave?"
+    ask_again: "Señor, necesito su respuesta: your parole, sir, or the gunroom under a sentry."
+    taken: "Su palabra me basta, señor; the cabin and the gunroom are yours, and the quarterdeck by day."
+    refused: "Como usted quiera, señor; the sentry has his orders."

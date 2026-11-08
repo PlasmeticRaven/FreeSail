@@ -227,7 +227,14 @@ def test_the_prisoners_are_taken_aboard_by_the_boat_so_many_at_a_time_and_counte
     assert out.kind == "prize.prisoners_aboard" and out.data["taken"] == hers - 6
     assert P.prisoners_of(hull.ship).count == 0 and P.prisoners_of(w.ship).count == hers
     w.run(60)  # the readings are the minute's
-    assert hull.readings.words("prisoners") == "no prisoners"
+    # her people's count is nought; her officers of rank are persons confined in her still
+    # (the named few are not moved by the boat's loads: the design's §2.2 and §3.5)
+    # (the merchant brig's own wardroom since package 75's SW-4: six of rank under her master,
+    # where brig.yaml's eleven under a captain stood before the trunk's merge)
+    words = hull.readings.words("prisoners")
+    assert (
+        words.startswith("six prisoners of rank: ") and "in the cabin (parole not asked)" in words
+    )
     out = w.submit("take the prisoners aboard")
     assert out.kind == "order.rejected" and "has no prisoners left" in out.text
 

@@ -68,7 +68,7 @@ __all__ = [
 SIGNALS_DIR = Path(__file__).resolve().parents[2] / "data" / "signals"
 BOOK_FILES = ("book", "numerary", "telegraphic", "night_fog", "convoy", "private")
 
-COLOURS_STATES = ("shown", "none", "false", "struck", "distress")
+COLOURS_STATES = ("shown", "none", "false", "struck", "distress", "truce")
 
 # The book a signal is made from by the light: the numerary by day, the night book by
 # night, the fog book when the visibility is under a mile (the flags are not to be seen).
@@ -558,12 +558,13 @@ class Colours:
 
     @property
     def shows(self) -> bool:
-        return self.state in ("shown", "false", "distress")
+        return self.state in ("shown", "false", "distress", "truce")
 
     @property
     def shown_nation(self) -> str:
-        """The nation a lookout makes out from them: '' when none are to be read."""
-        return self.nation if self.shows else ""
+        """The nation a lookout makes out from them: '' when none are to be read, and ''
+        under a flag of truce (package 74: a cartel is nobody's enemy and nobody's prize)."""
+        return self.nation if self.shows and self.state != "truce" else ""
 
     def words(self, nations: Any) -> str:
         """'British colours, the red ensign'; 'no colours'; 'her colours struck'; 'the
@@ -583,6 +584,10 @@ class Colours:
         flag = f", {short}" if short else ""
         if self.state == "distress":
             return f"{adjective} colours{flag}, the ensign union down"
+        if self.state == "truce":
+            # a cartel (package 74, the design's §3.4; the lead's ruling with packages 76 and
+            # 81: the state word `truce`, the words "a flag of truce")
+            return "a flag of truce"
         over = getattr(self, "over", "")
         if over and self.state == "shown":
             # a prize: her captor's colours hoisted over her own (package 74)
@@ -649,6 +654,9 @@ class Hoist:
     serial: int = 0
     complete_at: int | None = None  # a telegraphic sentence's last hoist up; else breaks_out
     form: str = "numerary"  # the book's hoist_form: how the flags look to a lookout without it
+    # package 76 (item 8): a private challenge made in a named nation's form (the *Java*'s
+    # move), answered only by a ship of that nation; '' for 71's own challenge, as before
+    form_nation: str = ""
 
     @property
     def done_at(self) -> int:
@@ -739,6 +747,12 @@ class Locker:
     serial: int = 0
     # what other ships' signals were read (for `the signals` reading), newest last
     log: list[dict[str, Any]] = field(default_factory=list)
+    # package 76 (item 8): what flies where, as the viewer reads it (`{place, name, words,
+    # drawing}`), set by the rules from the nation's colours.yaml (`freesail/world/flags.py`);
+    # None until set, when the viewer serves its own plain ensign; and the flags ordered
+    # beside the file's (`hoist the broad pendant`, `... a second ensign`, `... the jack`)
+    flies: list[dict[str, Any]] | None = None
+    ordered_flags: list[str] = field(default_factory=list)
 
     def next_serial(self) -> int:
         self.serial += 1
@@ -902,6 +916,7 @@ def make_private(
     to: str | None = None,
     wrong: str = "",
     at_once: bool = False,
+    form_nation: str = "",
 ) -> Hoist:
     shown = wrong or (table.reply(light) if reply else table.challenge(light))
     h = Hoist(
@@ -913,6 +928,7 @@ def make_private(
         shown=shown,
         root=books.root,
         to=to,
+        form_nation=form_nation,
     )
     return locker.hoist(h)
 
@@ -1446,6 +1462,40 @@ def vessel_table(world: Any, vessel: Any) -> PrivateTable | None:
         return None
     now = world.clock.ship_time
     return private_table(books, str(vessel.nation), now.year, now.month, root_seed(world))
+
+
+def held_tables(world: Any) -> dict[str, PrivateTable]:
+    """The private tables this World's ship holds this month, by nation (package 76, item 8,
+    the *Java*'s move): her own nation's where she carries it (`table_of`), and the table of
+    each book in her library (`held_books`: an ally's carried by the scenario's papers, a
+    captured one by 74's road; a root or the id of a nation standing on basic), each the same
+    draw the ships of that nation hold."""
+    out: dict[str, PrivateTable] = {}
+    own = table_of(world)
+    if own is not None:
+        out[own.nation] = own
+    nations = getattr(world, "nations", None)
+    now = world.clock.ship_time
+    for held in held_books(world):
+        # a root ('spain') or a nation standing on basic ('portugal'): her books and her name
+        if held in roots():
+            books = load_books(held)
+            nation = books.nation
+        else:
+            try:
+                nation = nations.get(held).id if nations is not None else ""
+            except KeyError:
+                continue
+            books = books_for_nation(nations, nation)
+        if not nation or nation in out or nation == "basic":
+            continue
+        table = private_table(books, nation, now.year, now.month, root_seed(world))
+        try:
+            table.adjective = nations.get(nation).adjective if nations is not None else ""
+        except KeyError:
+            table.adjective = ""
+        out[nation] = table
+    return out
 
 
 def far_order_words(world: Any, vessel: Any, text: str) -> tuple[str, str, dict[str, Any]] | None:

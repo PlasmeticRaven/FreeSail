@@ -649,6 +649,33 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
     return kind, line, data
 
 
+def _captive_to_the_captain(ship: Any, words: str, speaker: Any) -> tuple | None:
+    """The player's person a prisoner aboard her speaking to her captain: his words a line
+    of her log where he stands (`person.spoke`), heard by the stations within earshot, read
+    for his parole while one is asked (`captive.hear_parole`); None when the speaker is no
+    captive of hers."""
+    from freesail.orders.prompt import world_of
+    from freesail.world import knowledge
+    from freesail.world.captive import hear_parole, is_captive
+    from freesail.world.places import place_words
+
+    world = world_of(ship)
+    if world is None or speaker is not None:
+        return None
+    person = knowledge.players_visitor(world)
+    if person is None or not is_captive(person):
+        return None
+    place = str(getattr(person, "where", "") or "cabin")
+    line = f"{person.name}, {place_words(place)}, to the captain: {words}"
+    from freesail.world.captive import _hearers
+
+    for h in _hearers(world, place):
+        h.hear(line)
+    read = hear_parole(world, world, person, words)
+    data = {"station": CAPTAIN, "words": words, "place": place, "parole_read": read}
+    return "person.spoke", line, data
+
+
 def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     verb = recognises(text, ship)
     extra = getattr(ship, "extra", None) or {}
@@ -714,6 +741,12 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         if speaker is not None and speaker["station"] == station:
             # a station's own word is never its wake (package 65, step 2)
             raise OrderError(f"The {station} tells itself nothing; tell another station.")
+        if station == CAPTAIN and not by:
+            # a captive's words to the captor's captain (package 74, the design's §3.2): read
+            # for his parole while one is asked of him, the line said where he stands
+            heard = _captive_to_the_captain(ship, words, speaker)
+            if heard is not None:
+                return heard
         if not by and _player_captain(ship, station, agents, seat):
             return _to_the_player_captain(station, words, speaker)
         held = _held(agents, station, seat)

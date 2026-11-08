@@ -1,0 +1,148 @@
+# FreeSail: the Spanish flags of command and identity (spec M7 §1; package 76, the owner's
+# addition of 2026-11-07; docs/design/Design-Signals.md, "As built out", which gives the shape).
+# The ensign and the jack are the owner's answer from Winfield's *Spanish Warships in the Age
+# of Sail* (cited, never copied): the Royal Order of 28 May 1785 gave the navy the red and
+# yellow, the red bands a quarter of the depth each and the yellow a half, with the reduced
+# arms of Castile and Leon crowned on the yellow; the jack square and quartered Castile, Leon,
+# Aragon and Navarre, its colours judgement. The merchant ensign is Babron's (1817); the
+# pendant and the cornet are named in Mazarredo's plan of the signals, their colours judgement.
+# Where each flew in 1805 Winfield does not give: Babron's and the 1820 plates' practice, as
+# the British file's, marked judgement.
+
+nation: spain
+sources:
+  - "Winfield, Spanish Warships in the Age of Sail (2017), pp. 59 to 60 (cited, not copied) (the ensign of 1785 and the jack; the owner's shelf)"
+  - "Mazarredo, Instrucciones y señales, Cádiz 1781, the third edition (the Spanish pendant and the cornet)"
+  - "Babron, Précis des pratiques de l'art naval, Brest 1817 (the flags of Spain; where the flags flew)"
+  - "Fisher, A Display of the Naval Flags of all Nations, Liverpool [1820] (the ensign's plate)"
+flags:
+  - name: "Spanish ensign"
+    kind: "ensign"
+    service: "navy"
+    words: "the red and yellow"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.25], colour: red}
+      - {rect: [0, 0.75, 1, 1], colour: red}
+      - {rect: [0.12, 0.33, 0.21, 0.5], colour: red}
+      - {rect: [0.21, 0.33, 0.3, 0.5], colour: white}
+      - {rect: [0.12, 0.5, 0.21, 0.67], colour: white}
+      - {rect: [0.21, 0.5, 0.3, 0.67], colour: red}
+    dates: "1785-"
+    source: "Winfield, Spanish Warships in the Age of Sail (2017), pp. 59 to 60 (cited, not copied): the Royal Order of 28 May 1785, red, yellow, red in horizontal bands, the red each a quarter of the depth and the yellow a half, on the yellow the reduced arms of Castile and Leon with the crown (drawn here as the quartered field of the arms, red and white, at the hoist's third, the crown left out: judgement); the 1820 display's plate agrees"
+  - name: "Spanish merchant ensign"
+    kind: "merchant ensign"
+    service: "merchant"
+    words: "the red and yellow of a merchantman"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 0.1667], colour: yellow}
+      - {rect: [0, 0.1667, 1, 0.3333], colour: red}
+      - {rect: [0, 0.3333, 1, 0.5], colour: yellow}
+      - {rect: [0, 0.5, 1, 0.6667], colour: red}
+      - {rect: [0, 0.6667, 1, 0.8333], colour: yellow}
+      - {rect: [0, 0.8333, 1, 1], colour: red}
+    dates: "1785-"
+    source: "Babron, Précis (1817), the flags of Spain: the merchant ships' of six or eight horizontal bands, red and yellow, without the arms (six drawn, the yellow at the head: judgement)"
+  - name: "Spanish jack"
+    kind: "jack"
+    service: "navy"
+    words: "the Spanish jack"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: yellow}
+      - {rect: [0.0312, 0.5, 0.0938, 1], colour: red}
+      - {rect: [0.1562, 0.5, 0.2188, 1], colour: red}
+      - {rect: [0.2812, 0.5, 0.3438, 1], colour: red}
+      - {rect: [0.4062, 0.5, 0.4688, 1], colour: red}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: "1785-"
+    source: "Winfield, Spanish Warships in the Age of Sail (2017), pp. 59 to 60 (cited, not copied): the jack square, quartered Castile, Leon, Aragon and Navarre; Winfield gives the quartering and not the colours, so the colours are judgement (Castile red, Leon white, Aragon yellow with red pales, Navarre red)"
+  - name: "Spanish pendant"
+    kind: "pendant"
+    service: "navy"
+    words: "the Spanish pendant"
+    proportion: [1, 20]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.25], colour: red}
+      - {rect: [0, 0.75, 1, 1], colour: red}
+    dates: ""
+    source: "Mazarredo 1781, the plan of the signals, names the Spanish pendant beside the white; its colours those of the ensign (judgement), its proportion judgement"
+  - name: "Spanish broad pendant"
+    kind: "broad pendant"
+    service: "navy"
+    words: "a commodore's broad pendant"
+    proportion: [1, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.25], colour: red}
+      - {rect: [0, 0.75, 1, 1], colour: red}
+    dates: ""
+    source: "Mazarredo 1781, the plan of the signals: the 'gallardetón ó corneta española'; its colours those of the ensign and its form judgement"
+  - name: "flag of an admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "admiral"
+    words: "a captain-general's flag"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.25], colour: red}
+      - {rect: [0, 0.75, 1, 1], colour: red}
+    dates: "1785-"
+    source: "the ensign's colours as a square flag at the masthead by rank (judgement: the captain-general's at the main, the lieutenant-general's at the fore, the jefe de escuadra's at the mizen, as the British; Babron (1817) and the 1820 plates give no place)"
+  - name: "flag of a vice-admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "vice-admiral"
+    words: "a lieutenant-general's flag"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.25], colour: red}
+      - {rect: [0, 0.75, 1, 1], colour: red}
+    dates: "1785-"
+    source: "the ensign's colours as a square flag at the masthead by rank (judgement: the captain-general's at the main, the lieutenant-general's at the fore, the jefe de escuadra's at the mizen, as the British; Babron (1817) and the 1820 plates give no place)"
+  - name: "flag of a rear-admiral"
+    kind: "admiral's flag"
+    service: "navy"
+    rank: "rear-admiral"
+    words: "a jefe de escuadra's flag"
+    proportion: [1, 1]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.25], colour: red}
+      - {rect: [0, 0.75, 1, 1], colour: red}
+    dates: "1785-"
+    source: "the ensign's colours as a square flag at the masthead by rank (judgement: the captain-general's at the main, the lieutenant-general's at the fore, the jefe de escuadra's at the mizen, as the British; Babron (1817) and the 1820 plates give no place)"
+  - name: "flag of truce"
+    kind: "truce"
+    service: "any"
+    words: "a flag of truce"
+    proportion: [3, 4]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    source: "a white flag, the period's flag of truce (from memory); the place at the fore judgement"
+occasions:
+  - {occasion: "at sea", role: "kings ship", flags: [{name: "Spanish ensign", where: "peak"}, {name: "Spanish pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "commodore", flags: [{name: "Spanish ensign", where: "peak"}, {name: "Spanish broad pendant", where: "main truck"}]}
+  - {occasion: "at sea", role: "admiral", flags: [{name: "Spanish ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "merchant", flags: [{name: "Spanish merchant ensign", where: "peak"}]}
+  - {occasion: "at sea", role: "privateer", flags: [{name: "Spanish ensign", where: "peak"}]}
+  - {occasion: "at anchor", role: "kings ship", flags: [{name: "Spanish ensign", where: "staff"}, {name: "Spanish pendant", where: "main truck"}, {name: "Spanish jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "commodore", flags: [{name: "Spanish ensign", where: "staff"}, {name: "Spanish broad pendant", where: "main truck"}, {name: "Spanish jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "admiral", flags: [{name: "Spanish ensign", where: "staff"}, {name: "Spanish jack", where: "jackstaff"}]}
+  - {occasion: "at anchor", role: "merchant", flags: [{name: "Spanish merchant ensign", where: "staff"}]}
+  - {occasion: "at anchor", role: "privateer", flags: [{name: "Spanish ensign", where: "staff"}]}
+  - {occasion: "in action", role: "kings ship", flags: [{name: "Spanish ensign", where: "peak"}, {name: "Spanish ensign", where: "main topgallant masthead"}, {name: "Spanish pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "commodore", flags: [{name: "Spanish ensign", where: "peak"}, {name: "Spanish ensign", where: "main topgallant masthead"}, {name: "Spanish broad pendant", where: "main truck"}]}
+  - {occasion: "in action", role: "admiral", flags: [{name: "Spanish ensign", where: "peak"}, {name: "Spanish ensign", where: "fore topgallant masthead"}]}
+  - {occasion: "in action", role: "merchant", flags: [{name: "Spanish merchant ensign", where: "peak"}]}
+  - {occasion: "in action", role: "privateer", flags: [{name: "Spanish ensign", where: "peak"}]}
+  - {occasion: "under truce", role: "any", flags: [{name: "Spanish ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}
+  - {occasion: "under truce", role: "merchant", flags: [{name: "Spanish merchant ensign", where: "peak"}, {name: "flag of truce", where: "fore truck"}]}

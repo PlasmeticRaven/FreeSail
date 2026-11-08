@@ -1,9 +1,14 @@
 # FreeSail: the basic signal system every nation has from the foundation (spec M7 §3, the
 # owner's note of 2026-10-23; package 71; docs/design/Design-Signals.md). The same shape as
 # data/signals/britain/book.yaml (its head says the fields). A nation whose entry in
-# data/nations.yaml names `signals: {root: basic}` (or names none) reads this root: the
-# Spanish, the Dutch, the Danes, the Americans, the Portuguese and the Moors in 1805, each
-# built out into a root of her own by package 76 as her sources are found.
+# data/nations.yaml names `signals: {root: basic}` (or names none) reads this root. Package 76
+# gave Spain, the United States and Naples roots of their own from their books, and this root
+# now stands for (by the lead's ruling of 2026-11-07): the Batavian Republic and Denmark (their
+# books of the period not found online), Portugal (her books found are of 1817 and 1820, after
+# the period, read for the form; her flags of the period are in this root's colours.yaml under
+# her name, dated), the Barbary regencies (Morocco and Algiers; no book found), and the
+# Mediterranean states with no book found (Sardinia, Etruria, Liguria and the Papal State). A
+# nation built out later is moved by her line in data/nations.yaml and her own root's files.
 #
 # What it is: a numerary book of a few dozen entries in the common form of the period's
 # national books (every navy of 1805 had numeral flags after Howe's manner, or a table

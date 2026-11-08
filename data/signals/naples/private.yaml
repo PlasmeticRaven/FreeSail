@@ -1,0 +1,25 @@
+# FreeSail: the form of the Neapolitan private signals (spec M7 §2; package 76;
+# docs/design/Design-Signals.md). The form is data/signals/britain/private.yaml's. The
+# flotilla's book of 1807 gives no recognition table; the game's tables are MADE under the seed
+# in basic's form word for word, so that Naples turned from basic to her own root changes
+# nothing of her private signal's draw (the brief's truth).
+
+source: "no Neapolitan table found; the form basic's, so that the draw stands; the tables made under the seed"
+made: true
+changes: monthly
+day:
+  challenge: "a {flag} at the {place}"
+  reply: "a {flag} at the {place}, with the ensign at the {ensign_place}"
+  pools:
+    flag: ["blue flag", "red flag", "white flag", "yellow flag", "blue and yellow flag", "red and white flag", "blue pendant", "red pendant", "white pendant", "chequered flag"]
+    place: ["main topmast head", "fore topmast head", "mizen peak", "fore yardarm", "main yardarm", "ensign staff"]
+    ensign_place: ["mizen peak", "ensign staff", "main topmast head"]
+night:
+  challenge: "{n} lights {arrangement} at the {place}"
+  reply: "{n} lights {arrangement} at the {place}, and a false fire"
+  pools:
+    n: ["one", "two", "three"]
+    arrangement: ["horizontal", "one over the other", "in a triangle"]
+    place: ["mizen peak", "ensign staff", "main topmast head", "fore topmast head"]
+carried_by: [kings-ship, cruiser, commodore]
+answer_wait_s: 300

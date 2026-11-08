@@ -616,11 +616,13 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
 
     vessel.role = role
     brain = getattr(vessel, "brain", None)
-    if brain is None:
+    if brain is None and str(getattr(vessel, "id", "")) == PLAYER_ID:
+        brain = None  # the player's own hull is awake always: no far brain for her
+    elif brain is None:
         brain = FarCaptain(_root(world), vessel, words, role=role)
         vessel.brain = brain
         vessel.intent_words = brain.intent_words
-    else:
+    elif brain is not None:
         try:
             brain.set_intent(words)
         except ValueError:
@@ -669,6 +671,15 @@ def possess(
     if rec and is_prize(prize) and str(rec.get("nation_was")) == str(captor.nation):
         return retake(world, prize, by=f"{captor.name} coming up", how="retaken", captor=captor)
     captor_hull, prize_hull = _hull(captor), _hull(prize)
+    if str(prize.id) == PLAYER_ID and captor_hull is None:
+        # the player's ship taken by a far body (the design's §3.1): her captor is made a
+        # hull and woken, a dealing of the first rank under the cap, so that the captive is
+        # aboard a real hull with places, a company and a log
+        from freesail.world.crews import promote
+
+        promote(world, captor)
+        captor.dealing_tick = tick
+        captor_hull = _hull(captor)
     doctrine = _doctrine(captor)
     nation_was = str(prize.nation)
     role_was = str(getattr(prize, "role", "") or "")
@@ -742,6 +753,11 @@ def possess(
             s.at = None
             s.quarters = ""
         remuster(prize_hull, new_crew)
+        if str(prize.id) == PLAYER_ID:
+            # the player's person taken aboard the captor (the captive's channel, §3.1)
+            from freesail.world.captive import player_taken
+
+            player_taken(world, captor, captor_hull, prize_hull, record)
         if old_crew is not None:
             prize_hull.ship.extra["prisoners"] = Prisoners(
                 crew=old_crew, nation=nation_was, since=tick, parole={}
@@ -1268,6 +1284,12 @@ def minute(hull: Any) -> None:
     tick = int(world.clock.tick)
     if vessel is not None:
         _over_down(vessel, tick)
+    if pris is not None and getattr(hull, "awake", True):
+        # the captor's side (the captive's channel): the parole by doctrine, the prisoners
+        # landed in port
+        from freesail.world.captive import minute as captive_minute
+
+        captive_minute(hull)
     if pris is None or vessel is None or not rec or not is_prize(vessel):
         return
     if pris.in_irons(tick) or pris.count == 0:
@@ -1393,6 +1415,9 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
     if sea is None:
         return lines
     tick = int(world.clock.tick)
+    from freesail.world.captive import cartel_minute
+
+    lines.extend(cartel_minute(world))
     for v in list(sea.vessels):
         if getattr(v, "prize", None) and _hull(v) is None:
             _over_down(v, tick)
@@ -1405,8 +1430,6 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
         prey = sea.get(str(brain._stranger or ""))
         if prey is None or prey.done or not getattr(prey, "struck", False) or is_prize(prey):
             continue
-        if str(prey.id) == PLAYER_ID:
-            continue  # the player's ship struck: the captive's channel's (the design's §3)
         _, d = _bearing_distance(v.position, prey.position)
         if d > HAIL_REACH_M:
             continue

@@ -1206,3 +1206,25 @@ the hull's service's file); a rehomed person of a post the new company has alrea
 rehome` gives him his old home's id after a colon); the world order's "merchant brig" is
 `brig.yaml`'s muster of 121 (75's file, noted for the lead); the parser's `take <n> of the
 prisoners aboard`; the orders' road doubling a function's line (`said`).
+
+### Step 3: the captive's channel (§3; 2026-11-07)
+
+**Built as designed**: §3.1 to §3.5 (`world/captive.py` and its hooks; the design's roads for
+the player struck near, by a model's hand and by the far body made a hull; the parole asked by
+doctrine in the hail table's words by nation with Spain's row, answered in the captive's own
+words, by rule after a watch; the places and the sword; the prisoners landed to the port's agent
+with its name by nation; the cartel under a flag of truce; the director's two forms and their
+doubts); truths 7-355 to 7-357; the primer's chapter 27 extended. **Taken another way**: the
+captive's officers stay confined in the prize (the `divide_prisoners` rule is the counts'); the
+cartel keeps her persons on her record and sets them ashore at her port's quay (80's words fill
+her out); the prisoners' victualling is not modelled; a model seated as the captive is served by
+82's voice station until step 6's seats pass, the captive's brief sentence with it. **Found on
+the way**: the far brain forgot a struck mark's nation (she shows no colours) and never saw
+`enemy struck`; the privateer's `chasing` rows had him evade a frigate that had struck to him as
+a superior force and a man of war (both judgements now pass a struck ship by); a rules captain
+bound for Brest from the Iroise lays no course through the goulet and beats without way (the
+chart's and the planner's, noted for the lead); the far brain dropped its mark on entering
+`taking possession`; the captive's person was read as every hull's captain (he is the followed
+prompt's alone); a far vessel whose plan runs out is gone from the sea at the minute's end, so the
+cartel's minute keeps her until her persons are landed. The figures and the pins are in
+`docs/dev/TuningNotes.md`, "Package 74", step 3.

@@ -25,6 +25,24 @@ The colours: British colours, the red ensign.
 
 The browser's picture of her flies what her colours say: her ensign at the peak of her aftermost gaff (at an ensign staff over the taffrail where she has no gaff), standing out to leeward of the wind she feels; the ensign of the nation she pretends under false colours; the ensign turned over in distress; nothing with her colours struck or none shown. Hold the pointer over it and it reads as the lookout reads it: "British colours, the red ensign, at the peak". A nation's other flags (the pendant, the jack, a commodore's broad pendant) are drawn at their places as the colours' book gives them.
 
+## The flags she wears
+
+Beyond her colours a ship wears what her service and her captain's place give her, as her nation's colours have it: a King's ship her pendant at the main, the long streamer that marks a man-of-war to every eye that can make out her colours; a commodore his broad pendant in its place; an admiral his flag at the main, the fore or the mizen by his rank; a merchantman her ensign alone, and a privateer hers with her own jack at anchor. At anchor the ensign flies from the staff over the taffrail and the jack from the jackstaff at the bowsprit's end; beating to quarters doubles the ensigns, one at the peak and another at the main topgallant masthead, and sends the jack to the fore, so that no shot can bring her colours down by accident. The lookout reads them at the colours' range, with the colours: "The ship abeam to larboard, bearing SW by W, is a frigate, standing to the north-eastward (NE), under plain sail; British colours, the red ensign; she wears a pendant at the main: a man-of-war." A commodore's ship is read "she wears a broad pendant at the main: a commodore"; a merchantman's ensign alone adds nothing to her colours.
+
+```orders cutter
+hoist the broad pendant
+hoist a second ensign at the main
+hoist the jack
+```
+
+```
+A commodore's broad pendant hoisted at the main.
+The red ensign hoisted at the main topgallant masthead, the ensigns doubled.
+The union jack hoisted at the fore.
+```
+
+The flags you order stay up with the colours and come down with them. Every nation's flags are drawn from her own colours (the British ensigns of the three squadrons with the Union of 1801 in the canton, the pendant and the jack; the French tricolour, blue at the hoist; the Spanish red and yellow of 1785, the red a quarter of the depth above and below; Portugal's white with the arms), and a nation with no colours of her own drawn wears a plain ensign of the colour her flag is named by, and a plain pendant in a ship of war.
+
 ## The private signal
 
 The recognition signal: a small table per nation per month, issued under seal to the King's ships (a merchantman, a packet, a fisherman and a privateer never had it), the challenge a flag at a named place by day and lights by night, the reply another. The actual tables are lost; the game's are drawn under the seed in the period's form, the same for every ship of one nation in one world. It is a paper of the cabin:
@@ -42,11 +60,20 @@ The private signal: by day, a blue flag at the mizen topmast head; the reply, a 
 Bend on the signal: the private signal (a blue flag at the mizen topmast head; the table for June 1805).
 ```
 
+A ship that holds another nation's table beside her own (an ally's carried among her papers, or one taken in a prize) may make that nation's challenge, or every table she holds one after another, as the *Java* made the English, Spanish and Portuguese private signals in succession to a strange frigate in 1812, and none was answered:
+
+```orders cutter
+# rejected: make the Spanish private signal
+# rejected: make the private signals in succession
+```
+
+Each challenge is made in its own nation's form, a minute to run it up and three minutes for the answer before the next goes up in its place. A ship answers only the challenge made in her own nation's form, so the answer, or none, is judged against the table it was made from: "The frigate answers the Danish private signal rightly: a Danish ship"; "The frigate makes no answer to the private signals, British, Spanish and Portuguese in succession: a man of war under false colours, an enemy." A table the ship does not hold is refused in words that name the tables she does.
+
 A King's ship's rules captain makes it to every strange sail within the flags' range once her colours are made out, and reads the answer from the minute his flags are up: right makes her one of his; a reply and the wrong one is the tell whatever her colours ("The cutter answers the private signal wrong: a stranger under false colours, an enemy"), and he gives chase by his doctrine; no answer under his own colours is the tell for a man of war's rig, and leaves a trader's rig "a merchantman, who has none; a stranger to be spoken". A ship with no table cannot answer; a privateer may bluff a guess, which is wrong by every table but her own.
 
 ## A signal made and read
 
-The books are the nation's (`the signal book` among the ship's papers, `library(topic='papers', section='the signal book')`, which says whose it is: this ship's own by her service; Britain's from Howe's of 1790 and the Admiralty's of 1799 with Popham's dictionary of 1803; the French smaller; every other nation the common book every navy had, whose page says it is no nation's own and no other ship's numbers are to be read from it), and a signal is made by its meaning, never by a number you must know:
+The books are the nation's (`the signal book` among the ship's papers, `library(topic='papers', section='the signal book')`, which says whose it is: this ship's own by her service; Britain's the Admiralty's of 1799 with Popham's dictionary of 1803; the French by du Pavillon's table, two flags read as a cell; the Spanish Mazarredo's, two flags of twenty read as a cell of four hundred, with his lanterns by night and his guns in fog; the American Barry's, a flag a figure, the same numbers by lanterns at night; the Neapolitan the gunboat flotilla's book, its general signals by number; every other nation the common book every navy had, whose page says it is no nation's own and no other ship's numbers are to be read from it), and a signal is made by its meaning, never by a number you must know:
 
 ```orders cutter
 make the signal to tack in succession
@@ -114,7 +141,9 @@ the lights
 | `hoist French colours` / `hoist false colours` | another nation's (the principal enemy's when none is named): the ruse, until the first shot |
 | `haul down the colours` | none shown; under fire, the strike |
 | `hoist the ensign union down` | the signal of distress (with `fire a gun to leeward`) |
+| `hoist the broad pendant` / `hoist a second ensign at the main` / `hoist the jack` | a commodore's broad pendant at the main; the ensigns doubled; the jack at the fore, or the jackstaff at anchor |
 | `show the private signal` / `answer the private signal` | the month's challenge and reply, with a table aboard |
+| `make the Spanish private signal` / `make the private signals in succession` | another nation's challenge from her table held, or every table held one after another |
 | `make the signal <meaning>` / `make the signal No. <n>` | a signal of the book by day, the night book's lights by night, the fog book's gun in fog |
 | `make the telegraphic signal: <words>` | Popham's free sentence, a hoist a word (a well-built book with a dictionary) |
 | `answer the signal` / `repeat the signal` / `haul down the signal` | the answering pendant; the last signal read made again; the hoists down |

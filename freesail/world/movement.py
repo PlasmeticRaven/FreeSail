@@ -176,7 +176,14 @@ def person_of_actor(world: Any, actor: str | None) -> Any:
         return None
     if actor == "captain":
         from freesail.world import knowledge
+        from freesail.world.captive import captive_person
 
+        captive = captive_person(world)
+        if captive is not None and getattr(world, "is_followed", True):
+            # the player's person a captive (package 74, the design's §3.1): the followed
+            # hull's prompt is his wherever it is, never the prize master's; another hull's
+            # "captain" is her own captain's hand (the director's, a test's)
+            return captive
         visitor = knowledge.players_visitor(world)
         if visitor is not None:
             # the player aboard another ship as a visitor (decision 62; package 65, step 4):
@@ -317,6 +324,16 @@ def check(ship: Any, verb: str, obj: str) -> None:
         return
     here = hull_of(world, getattr(person, "hull", None)) if person.aboard else None
     home_id = str(getattr(person, "home", "") or "")
+    if not _visitors_own(verb, obj):
+        # a captive (package 74, the design's §3.1): no deck is his, this one least of all,
+        # and his own ship's is a prize's; the words name his state
+        from freesail.world.captive import captive_words
+        from freesail.world.hearing import own_hull
+
+        prompt_hull = hull_of(world, own_hull(world))
+        said = captive_words(world, person, prompt_hull)
+        if said:
+            raise OrderError(said)
     if (
         here is not None
         and not is_boat_hull(here)  # his own ship's boat is his to command
@@ -512,6 +529,37 @@ def _moved_line(person: Any, place_id: str) -> str:
     return f"{person.name} went to {p.name}."
 
 
+def _within_liberty(world: Any, person: Any, verb: str, words: str, liberty: tuple) -> bool:
+    """Whether a captive's move keeps to the places his parole gives him (the design's
+    §3.2): the quarterdeck by day only."""
+    if not liberty:
+        return False
+    low = " ".join(str(words or "").lower().split()).removeprefix("the ").strip()
+    if verb == "go below":
+        want = "cabin" if "cabin" in low else "gunroom"
+    elif verb == "come on deck" or low in ("deck", "on deck", "upper deck", "quarterdeck"):
+        want = "quarterdeck"
+    elif verb == "go aloft":
+        return False
+    else:
+        found = Places().find(low)
+        if found is None and low in ("wardroom",):
+            found = PLACES["gunroom"]
+        want = found.id if found is not None else ""
+    if want not in liberty:
+        return False
+    if want == "quarterdeck":
+        light = getattr(getattr(world, "conditions", None), "light", None)
+        if callable(light):
+            try:
+                light = light(world.clock.tick)
+            except Exception:  # noqa: BLE001
+                light = None
+        if str(light or "").lower() == "night":
+            return False
+    return True
+
+
 def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, dict[str, Any]]:
     """`go below`, `come on deck`, `go to the <place>`, `go aloft` for the person who
     gives it: (the log's kind, its words, its data); OrderError in words for a place his
@@ -522,13 +570,21 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
             return _go_ashore_place(world, person, verb, words)
         raise OrderError(f"You are {place_words(person.where)}; wait until you are aboard.")
     confined = str(getattr(person, "confined_to", "") or "")
-    if confined:
+    liberty = tuple(getattr(person, "liberty", ()) or ())
+    if confined and not _within_liberty(world, person, verb, words, liberty):
         # a prisoner (package 74, spec M7 §19): confined to his place by his parole or his
-        # captor's word; the deck is not his to walk
+        # captor's word; the deck is not his to walk beyond the liberty his parole gives
         where = PLACES[confined].name if confined in PLACES else confined
+        given = (
+            " Your parole gives you "
+            + ", ".join(PLACES[x].name for x in liberty if x in PLACES)
+            + (" (the quarterdeck by day)." if "quarterdeck" in liberty else ".")
+            if liberty
+            else ""
+        )
         raise OrderError(
-            f"You are a prisoner, confined to {where}; the ship is not yours to walk about. "
-            "You may speak ('say to the captain: ...')."
+            f"You are a prisoner, confined to {where}; the ship is not yours to walk about."
+            f"{given} You may speak ('say to the captain: ...')."
         )
     if person.occupied and person.task != WRITING:
         raise OrderError(f"You are at the {person.task}; it is not left for a walk about the ship.")
@@ -1083,6 +1139,13 @@ def where_am_i(world: Any, person: Any) -> str:
         place = getattr(person, "where", "")
     words = place_words(place) if place else "aboard"
     home_id = str(getattr(person, "home", "") or "")
+    if here is not None and (getattr(person, "confined_to", "") or getattr(person, "liberty", ())):
+        # a prisoner aboard her (package 74, the design's §3.1): his state and his own ship
+        from freesail.world.captive import state_words
+
+        home = hull_of(world, home_id) if home_id and str(here.id) != home_id else None
+        of = f", of the {hull_name(home)}" if home is not None else ""
+        return f"aboard the {hull_name(here)}, {words}, {state_words(world, person)}{of}"
     if here is not None and home_id and str(here.id) != home_id:
         home = hull_of(world, home_id)
         of = f", of the {hull_name(home)}" if home is not None else ""

@@ -1,0 +1,53 @@
+# FreeSail: the Spanish convoy's signals (spec M7 §3; package 76;
+# docs/design/Design-Signals.md).
+# The form is data/signals/britain/convoy.yaml's (the numerary's fields). Mazarredo's
+# *Instrucciones y señales* (Cádiz 1781, the third edition; docs/references/signals/) gives a
+# convoy no book of its own: its general signals carry the orders to the commander of a convoy
+# (Nos. 376 to 381: to manoeuvre in sight of the squadron on the side away from the enemy, to
+# leave for the rendezvous, to go on to its destination, to bear up for the port it sailed
+# from or the first port to leeward), and its day signals at anchor call the commanders of the
+# convoy's divisions, their aides and the masters of its vessels (Nos. 48 to 50 of that
+# table). So the convoy here reads the squadron's own cells, each entry's number and meaning
+# his and its source saying which; that a Spanish convoy at sea was signalled by those cells is
+# the builder's reading of the book, not a page. Four meanings the game's orders want and the
+# book lacks are marked `made: true`, numbered as the numerary's.
+
+source: "Mazarredo 1781: the general signals of two flags, the orders to the commander of a convoy (Nos. 376 to 381), and the day signals at anchor calling the convoy's masters (Nos. 48 to 50); the masters' reading of the squadron's cells the builder's"
+made: false
+
+entries:
+  - {number: 186, meaning: "The convoy to make more sail", also: ["make sail", "make more sail", "more sail"], does: {order: "make sail"}, source: "Mazarredo 1781, the general signals of two flags, No. 186"}
+  - {number: 60, meaning: "Some ship or ships can make more sail, or are out of their place", also: ["make all sail", "the ships astern to make more sail", "ships astern make more sail"], does: {order: "make all sail"}, qualifiers: [ship], source: "Mazarredo 1781, the general signals of two flags, No. 60"}
+  - {number: 191, meaning: "The convoy to shorten sail", also: ["shorten sail", "take in sail", "less sail"], does: {order: "shorten sail"}, source: "Mazarredo 1781, the general signals of two flags, No. 191"}
+  - {number: 165, meaning: "The convoy to tack together", also: ["tack", "tack together", "put about", "go about"], does: {order: "put her about"}, source: "Mazarredo 1781, the general signals of two flags, No. 165"}
+  - {number: 163, meaning: "The convoy to tack in succession", also: ["tack in succession", "put about in succession", "go about in succession"], does: {order: "put her about"}, in_succession: true, source: "Mazarredo 1781, the general signals of two flags, No. 163"}
+  - {number: 166, meaning: "The convoy to wear together", also: ["wear", "wear together", "wear ship"], does: {order: "wear ship"}, source: "Mazarredo 1781, the general signals of two flags, No. 166"}
+  - {number: 164, meaning: "The convoy to wear in succession", also: ["wear in succession", "wear ship in succession"], does: {order: "wear ship"}, in_succession: true, source: "Mazarredo 1781, the general signals of two flags, No. 164"}
+  - {number: 68, meaning: "The union charged again: keep close to the general", also: ["close round the commodore", "keep closer order", "close order", "close up", "keep together"], does: {order: "close the flag"}, source: "Mazarredo 1781, the general signals of two flags, No. 68"}
+  - {number: 329, meaning: "The sails in sight are enemies", also: ["enemy in sight", "the enemy in sight", "an enemy in sight"], does: {news: true}, qualifiers: [compass], source: "Mazarredo 1781, the general signals of two flags, No. 329"}
+  - {number: 304, meaning: "Sails in sight in the first quadrant", also: ["a strange sail in sight", "strange sail", "sails in sight"], does: {news: true}, qualifiers: [number], source: "Mazarredo 1781, the general signals of two flags, No. 304"}
+  - {number: 399, meaning: "The convoy to anchor", also: ["anchor", "come to an anchor", "to anchor"], does: {order: "come to an anchor"}, source: "Mazarredo 1781, the general signals of two flags, No. 399"}
+  - {number: 396, meaning: "The convoy to prepare to anchor", also: ["prepare to anchor"], does: {news: true}, source: "Mazarredo 1781, the general signals of two flags, No. 396"}
+  - {number: 103, meaning: "The convoy to heave to", also: ["heave to", "bring to", "lie to"], does: {order: "heave to"}, source: "Mazarredo 1781, the general signals of two flags, No. 103"}
+  - {number: 105, meaning: "The convoy to fill", also: ["fill", "fill away", "fill and make sail"], does: {order: "fill away"}, source: "Mazarredo 1781, the general signals of two flags, No. 105"}
+  - {number: 14, meaning: "The convoy to steer the course to be given", also: ["steer", "steer the course", "steer the course indicated"], does: {order: "steer {compass}"}, qualifiers: [compass], source: "Mazarredo 1781, the general signals of two flags, No. 14"}
+  - {number: 107, meaning: "The convoy to haul the wind on the starboard tack", also: ["keep the wind on the starboard tack", "haul the wind on the starboard tack"], does: {order: "keep her full and by on the starboard tack"}, source: "Mazarredo 1781, the general signals of two flags, No. 107"}
+  - {number: 108, meaning: "The convoy to haul the wind on the larboard tack", also: ["keep the wind on the larboard tack", "haul the wind on the larboard tack"], does: {order: "keep her full and by on the larboard tack"}, source: "Mazarredo 1781, the general signals of two flags, No. 108"}
+  - {number: 92, meaning: "The convoy to sail with one reef in the topsails", also: ["take in a reef", "take in a reef in the topsails", "reef the topsails"], does: {order: "take in a reef in the topsails"}, source: "Mazarredo 1781, the general signals of two flags, No. 92"}
+  - {number: 97, meaning: "The convoy to shake out all the reefs", also: ["shake out the reefs", "let out the reefs"], does: {order: "shake out the reefs"}, source: "Mazarredo 1781, the general signals of two flags, No. 97"}
+  - {number: 49, meaning: "The ship pointed out to pass within hail of the general", also: ["come within hail", "come within hail of the commodore", "pass within hail"], does: {order: "close the flag"}, qualifiers: [ship], source: "Mazarredo 1781, the general signals of two flags, No. 49"}
+  - {number: 59, meaning: "Every ship to keep her station, or find it", also: ["keep station", "keep your station"], does: {news: true}, qualifiers: [ship], source: "Mazarredo 1781, the general signals of two flags, No. 59"}
+  - {number: 370, meaning: "I am in want of assistance very soon", also: ["want assistance", "in want of assistance", "in distress", "assistance"], does: {news: true}, source: "Mazarredo 1781, the general signals of two flags, No. 370"}
+  - {number: 376, meaning: "The convoy to manoeuvre in sight of the squadron while it faces the enemy, and always on the side away from him", also: ["keep the squadron between you and the enemy"], does: {}, source: "Mazarredo 1781, the general signals of two flags, No. 376, among the orders to the commander of a convoy"}
+  - {number: 377, meaning: "The convoy to make haste to leave the squadron for the first rendezvous", also: ["make for the rendezvous"], does: {}, source: "Mazarredo 1781, the general signals of two flags, No. 377, among the orders to the commander of a convoy"}
+  - {number: 378, meaning: "The convoy to follow its course to its destination", also: ["proceed on your voyage", "proceed to your destination", "proceed", "part company", "you may part company"], does: {release: true}, source: "Mazarredo 1781, the general signals of two flags, No. 378, among the orders to the commander of a convoy"}
+  - {number: 380, meaning: "The convoy to bear up for the port it sailed from", also: ["return to the port of departure", "return to port"], does: {}, source: "Mazarredo 1781, the general signals of two flags, No. 380, among the orders to the commander of a convoy"}
+  - {number: 381, meaning: "The convoy to bear up for the first port to leeward", also: ["make for the nearest port to leeward"], does: {}, source: "Mazarredo 1781, the general signals of two flags, No. 381, among the orders to the commander of a convoy"}
+  - {number: 415, meaning: "What is asked is granted", also: ["yes", "affirmative", "the affirmative", "granted"], does: {answer: "affirmative"}, source: "Mazarredo 1781, the signals of one flag, No. 15 (numbered 415 as in the numerary)"}
+  - {number: 416, meaning: "What is asked is refused", also: ["no", "negative", "the negative", "refused"], does: {answer: "negative"}, source: "Mazarredo 1781, the signals of one flag, No. 16 (numbered 416 as in the numerary)"}
+  - {number: 421, meaning: "Annul the last signal", also: ["annul", "annul the signal", "annul the last signal"], does: {answer: "annulled"}, source: "Mazarredo 1781: the universal flag alone annuls (numbered 421 as in the numerary)"}
+  - {number: 427, meaning: "The convoy to disperse", also: ["disperse", "the convoy to disperse", "proceed independently"], does: {release: true}, source: "the meaning in the period's form; made", made: true}
+  - {number: 433, meaning: "The convoy to weigh", also: ["weigh", "weigh anchor", "get under way"], does: {order: "weigh anchor"}, source: "as the numerary's No. 433 (Mazarredo's words 'Dar la vela', the night signals at anchor; the day cell not found); made", made: true}
+  - {number: 428, meaning: "The convoy to show their lights", also: ["hoist your lights", "show your lights", "hoist their lights"], does: {order: "hoist a stern lantern"}, source: "the meaning in the period's form; made", made: true}
+  - {number: 429, meaning: "The convoy to show no lights", also: ["show no lights", "no lights", "douse the lights"], does: {order: "show no lights"}, source: "the meaning in the period's form; made", made: true}
+  - {number: 422, meaning: "Show your colours", also: ["hoist your colours", "show your colours", "show colours"], does: {order: "hoist the colours"}, qualifiers: [ship], source: "the meaning in the period's form; made", made: true}

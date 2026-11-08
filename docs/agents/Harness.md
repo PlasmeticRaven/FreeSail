@@ -836,6 +836,23 @@ it; a crewed ship whose captain stands aside or holds by the director's hand is 
 the table. The table's heave-to is obeyed, run from or declined only when the hail demands
 it (`heave to, I am sending a boat`); a question moves no sail.
 
+**As built out (package 76).** A station's reading changes in four places. The lookout's
+line that makes out a sail's colours adds what she wears beyond her ensign ("British colours,
+the red ensign; she wears a pendant at the main: a man-of-war"; "a broad pendant at the main:
+a commodore"; in action "her ensign at the peak and another at the main" and the jack), and
+the `strangers` reading's words carry the same; a merchantman's ensign alone adds nothing.
+The ship's own flags are set by her role and her occasion and changed by `hoist the broad
+pendant`, `hoist a second ensign at the main`, `hoist the jack` (`flags.changed`, "A
+commodore's broad pendant hoisted at the main"). The private signal may be made in another
+nation's form where the ship holds that table (`make the Spanish private signal`, `make the
+private signals in succession`; refused in words naming the tables held), and its verdict
+names the form ("The frigate answers the Danish private signal rightly: a Danish ship"; "...
+makes no answer to the private signals, British, Spanish and Portuguese in succession: a man
+of war under false colours, an enemy"). And the books are each nation's own: a Spanish
+signal is two flags read as a cell whatever its number ("two flags at the main"), an American
+a flag a figure, and every nation's but the reader's is "a signal we cannot read: not of our
+book".
+
 ## 21e. The squadron, the convoy and the station (package 72)
 
 Spec M7 §21 to §23 "as built (package 72)"; `docs/design/Design-Squadrons.md`; the primer's
