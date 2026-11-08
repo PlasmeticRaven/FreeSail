@@ -1,0 +1,44 @@
+# Dip a settee: lower its yard right down on deck, pass it round abaft the mast and shift the
+# tack to the new weather bow, and hoist it again on the lee side. A settee's yard is slung
+# across one side of the mast as a dipping lug's is, so after going about with no dip the sail
+# lies against the mast; Röding sets the bilander's great sail among the lugs, which in going
+# about are first lowered and then shifted round ("erst gestrichen und durchgekaiet", Röding
+# 1794 vol. II col. 581). This is the order by itself, for a settee left on the wrong side;
+# going about does it as part of the manoeuvre. A longer yard than a lugger's: the lug's dip
+# lengthened (judgement; no period figure).
+
+# Build notes (not served by the library's catalogue):
+# Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (D1(a); dip_lug's 30/60/60
+# lengthened for a yard of 15-17 m against the lugger's 10.3 m). Its own file, so that the
+# lugger's dip_lug.yaml is not touched for `yard_lowered`.
+id: dip_settee
+verb: dip
+applies_to: {class: settee}
+preconditions:
+  - {check: sail.dipping, reason: "The {sail} is a standing sail; it is not dipped."}
+  - {check: sail.settee, reason: "The {sail} is not a settee."}
+  - {check: sail.state == set, reason: "The {sail} is {state}; only a settee that is set is dipped. Set it, and it is hoisted on the lee side."}
+  - {check: "against_the_mast(sail)", reason: "The {sail} lies to leeward of its mast already.", done: true}
+  - {check: "not wrecked(halyard_of(sail))", reason: "{parted}"}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: lower
+    duration_s: 30
+    sets: {sail.state: in_the_gear, sail.yard_lowered: "true"}
+    log: "Lowered the {sail}'s yard right down and cast off the jeers."
+  - do: shift
+    duration_s: 75
+    sets: {sail.lug_side: "lee_side()"}
+    log: "Passed the {sail}'s yard round abaft the mast and shifted the tack to the weather bow."
+  - do: hoist
+    duration_s: 75
+    via: halyard_of(sail)
+    sets: {sail.state: set, sail.yard_lowered: "false"}
+on_start: {log: "Dip the {sail}! Hands to the jeers and the tack."}
+on_complete: {log: "Dipped the {sail}; it stands to leeward of the mast.", kind: sail.dipped, severity: notable}
+on_fail: {log: "Could not dip the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen and the afterguard, able hands, as dip_lug's (judgement)
+crew: {hands: 6, rating: able, stations: [forecastle, afterguard]}
+source: "Röding 1794 vol. II col. 581; dip_lug's times lengthened (judgement)"

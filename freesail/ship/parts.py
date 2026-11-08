@@ -213,9 +213,11 @@ class Spar(Part):
     rating_whole_kn: float = 0.0
     # The lower mast whose yards are laid aback to heave to, where the file names one (package
     # 75; docs/design/Design-ShipsEngineExtensions.md §5.7: the bilander's main); false, the
-    # mast of the most square sail, as before. Read by nothing yet: the engine's settee step
-    # will. A class default, left out of the checkpoint while false (`__getstate__`), so
-    # that older saves load and a spar without it is pickled as before it.
+    # mast of the most square sail, as before. Read by `evolutions.scripts.yards_to_back` (the
+    # engine's settee step, B3.3), which the heave-to, lying a-try, backing and filling and
+    # the captains' storm topsail follow. A class default, left out of the checkpoint while
+    # false (`__getstate__`), so that older saves load and a spar without it is pickled as
+    # before it.
     heave_to_aback: bool = False
 
     def __getstate__(self) -> dict[str, Any]:
@@ -303,11 +305,13 @@ class Sail(Part):
     # gear a settee is clewed up aloft where a lug is lowered on deck; a lateen cut at the
     # mast (the 64's and the 74's mizen course), whose curve and trim are the gaff's
     # (`curve_class`), and the ship's driver (`evolutions.scripts.drives_aft`, the engine's
-    # lateen step). The settee's are read now only by the runner's `class: settee` and the
-    # served graph and snapshot, none of which differs for a sail without them: the engine's
-    # settee step will give them their behaviour. Class defaults, left out of the checkpoint
-    # while false (`__getstate__`), so that older saves load and a sail without them is
-    # pickled as before them.
+    # lateen step). The settee's are read by the runner's `class: settee`, the orders'
+    # routing (`orders.verbs.evolution_key`), the manoeuvres (`evolutions.scripts`:
+    # `lugger_lugs`, `settees`, `SetteeChange`), the sheet's lead (`evolutions.trim`) and the
+    # served graph and snapshot (the engine's settee step, B3.3), none of which differs for a
+    # sail without them. Class defaults, left out of the checkpoint while false
+    # (`__getstate__`), so that older saves load and a sail without them is pickled as before
+    # them.
     settee: bool = False
     yard_lowered: bool = False
     cut_at_mast: bool = False

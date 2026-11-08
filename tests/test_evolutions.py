@@ -758,20 +758,25 @@ def test_the_main_yard_shot_away_takes_the_mainsail_with_it_from_the_word(how):
 @pytest.mark.parametrize(
     ("fore", "settee", "said"),
     [
-        (SET, SET, "Rise tacks and sheets. Mainsail haul"),
-        (UP, SET, "Rise tacks and sheets. Mainsail haul"),
+        (SET, SET, "Rise tacks and sheets. Main-topsail haul"),
+        (UP, SET, "Main-topsail haul"),
         (SET, UP, "Rise tacks and sheets. Main-topsail haul"),
         (UP, UP, "Main-topsail haul"),
     ],
     ids=["both set", "fore hauled up", "settee lowered", "both down"],
 )
-def test_the_bilanders_settee_is_her_main_course_to_the_word(fore, settee, said):
+def test_the_bilanders_settee_is_no_course_hauled_at_the_word(fore, settee, said):
     """The bilander of `tests/rig_fixtures.py` has a settee bent on her main in place of the main
-    course, in her "courses" group and named her mainsail, her main yard dry: the word reads the
-    courses as her file names them (the review of the lead's ruling 2, 2026-11-07), so her settee
-    set is her mainsail set. Before that mend the word read the square courses alone and never
-    saw the settee: the first two cases said "Rise tacks and sheets. Main-topsail haul" and
-    "Main-topsail haul", the last two as here."""
+    course, in her "courses" group and named her mainsail, her main yard dry. The word reads the
+    courses as her file names them (the review of the lead's ruling 2, 2026-11-07), but since the
+    engine's settee step (package 75, B3.3: D3(b)) the settee is kept drawing in stays as a ship's
+    mizen, its tack not risen, and changed last: it is no course hauled at the order and counts
+    for neither words, her main yard dry (judgement, for the lead). So her line is "Rise tacks and
+    sheets. Main-topsail haul" with her fore course set and "Main-topsail haul" with it hauled up,
+    whatever the settee does. Old beside new: B3.4's review read the settee set as her mainsail
+    set, the first case "Rise tacks and sheets. Mainsail haul" and the second the same, while the
+    settee was lowered at "helm's a-lee" and so never set at the haul; before that mend the word
+    read the square courses alone, as now."""
     from rig_fixtures import brig_with_settee
 
     from freesail.evolutions import scripts
@@ -782,12 +787,16 @@ def test_the_bilanders_settee_is_her_main_course_to_the_word(fore, settee, said)
     assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == said
 
 
-def test_the_bilander_tacks_with_her_settee_lowered_and_hauls_by_main_topsail_haul():
-    """In the tack her settee, a dipping sail, is lowered at "helm's a-lee" ("lower the
-    mainsail") and dipped round after the haul, so her main course is not set when the after
-    yards are hauled: "Rise tacks and sheets. Main-topsail haul.", her fore course's tacks and
-    sheets risen with it (the lead's ruling 2; "Rise tacks and sheets. Mainsail haul." before
-    it), then "Dip the mainsail" and "Let go and haul.". The stub's turn, the frigate's above."""
+def test_the_bilander_tacks_with_her_settee_kept_drawing_and_hauls_by_main_topsail_haul():
+    """In the tack her settee is kept drawing as a ship's mizen, its sheet hauled aft and its
+    ourse braced to leeward at "helm's a-lee", and changed last, once the head yards are swung
+    (D3(b); package 75, B3.3): her after yards are hauled by "Rise tacks and sheets. Main-topsail
+    haul.", her fore course's tacks and sheets risen with it (the lead's ruling 2; "Rise tacks and
+    sheets. Mainsail haul." before it), then "Let go and haul." and, the head yards swung, "Dip the
+    mainsail: lower the yard ...". The stub's turn, the frigate's above. Old beside new: until B3.3
+    the settee was lowered at "helm's a-lee" ("Ready about. Helm's a-lee; lower the mainsail.")
+    and dipped through the wind ("Dip the mainsail; shift the tacks to the weather bow.", before
+    "Let go and haul."), as the lugger's lugs are."""
     from rig_fixtures import brig_with_settee
 
     ship = brig_with_settee()
@@ -803,10 +812,15 @@ def test_the_bilander_tacks_with_her_settee_lowered_and_hauls_by_main_topsail_ha
     ticks, notes = run(runner, ship, wind, turner(0.4))
     words = texts(notes)
     assert kinds(notes)[-1] == "ship.tacked"
-    assert words[0] == "Ready about. Helm's a-lee; lower the mainsail."
+    assert words[0] == (
+        "Ready about. Helm's a-lee; haul aft the mainsail sheet and brace the ourse to leeward."
+    )
     haul = words.index("Rise tacks and sheets. Main-topsail haul.")
-    assert haul < words.index("Dip the mainsail; shift the tacks to the weather bow.")
-    assert haul < words.index("Let go and haul.")
+    dip = words.index(
+        "Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the "
+        "weather bow."
+    )
+    assert haul < words.index("Let go and haul.") < dip
     assert not any("Mainsail haul" in w for w in words)
     assert 240 <= ticks <= 600
 
