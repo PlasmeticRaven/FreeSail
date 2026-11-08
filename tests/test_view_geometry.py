@@ -71,6 +71,14 @@ fields the projection reads always run.
   taffrail on all but the frigate-36, whose file hangs its jaws too low; the razee's spanker's and
   the driver's clews on its line at their files' feet, off their filed corners, recorded; a graph
   with no profile, its boom level as before.
+- Package 75 (B5.4, Ext §6.3 to §6.5), on the fixture `brig_with_settee()`: the settee on its yard
+  drawn from its corners as its cut, slung a third along its head on the mast, swung by its sheet to
+  the lee of the tack with its slings on its yard's side (against the mast while the yard hangs to
+  windward), aloft unless its yard is lowered to be dipped, gathered under its yard in the gear and
+  furled along it; its sheet to a block a fathom abaft the clew at its floor (the lead's ruling on
+  the bilander's §17 lead item 4); its derrick from the yard's after part; the dry main yard above
+  it in every state; the frame across states; the dip in stays through the game's own doors; and no
+  committed file carrying the key.
 """
 
 from __future__ import annotations
@@ -93,6 +101,8 @@ from rig_fixtures import (
     SPRITSAIL_FOOT_ABOVE_WATER_M,
     SPRITSAIL_HANG_M,
     SPRITSAIL_STATION,
+    brig_with_settee,
+    brig_with_settee_doc,
     frigate_with_driver,
     frigate_with_driver_doc,
     frigate_with_mizen_yard,
@@ -105,7 +115,12 @@ from freesail.api import queries
 from freesail.api.session import attach_systems, make_ship, make_world
 from freesail.core.world import Scenario
 from freesail.evolutions import Runner
-from freesail.evolutions.trim import set_sheet_angle
+from freesail.evolutions.trim import (
+    LOOSE_FOOTED_LEAD_AFT_M,
+    TRIM_RANGE,
+    set_sheet_angle,
+    sheet_geometry,
+)
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship import form
 from freesail.ship.loader import ship_from_dict
@@ -6391,3 +6406,491 @@ def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
     on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"])
     assert on_the_rail
     assert on_the_rail <= LINES_ON_THE_RAIL[path]
+
+
+# ---------------------------------------------------------------------------
+# Package 75 (B5.4, docs/design/Design-ShipsEngineExtensions.md §6.3 to §6.5): the settee on its
+# yard, on the fixture `brig_with_settee()` (tests/rig_fixtures.py); the bilander's own file is B4's
+# ---------------------------------------------------------------------------
+
+SETTEE = "main.settee"
+SETTEE_YARD = "main.lug_yard"
+DRY_YARD = "main.yard"
+LUG_LEE_OF_BEAM = 0.03  # client/projection.js: LUG_LEE_OF_MAST_OF_BEAM, the slings off the mast
+YARD_BEFORE_OF_BEAM = 0.05  # client/projection.js: YARD_BEFORE_MAST_OF_BEAM
+DERRICK_ALONG = 2.0 / 3.0  # client/projection.js: SETTEE_DERRICK_ALONG
+# The trim's block for a settee's cut and the block drawn lie this far apart on the fixture
+# (measured, 2026-11-07: 0.33 m, nearly all athwartships), since the trim swings the clew about the
+# tack on the centreline and the drawing swings the whole cut about its slings (D5(a))
+BLOCK_FROM_THE_TRIMS_M = 0.5
+
+
+def settee_by_the_wind(
+    tack: str,
+    sheet_deg: float = 20.0,
+    state: SailState = SailState.SET,
+    side: str | None = None,
+    lowered: bool = False,
+) -> dict:
+    """`brig_with_settee()` under plain sail on `tack`, the settee in `state` sheeted `sheet_deg`
+    off the centreline, its yard on `side` of the mast (the lee of `tack` unless named), lowered on
+    deck to be dipped where `lowered`, her square yards square: the graph and snapshot, the
+    snapshot's `yard_lowered` only while it is true, as the game serves it (Ext §6.4)."""
+    ship = brig_with_settee()
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    settee = ship.sails[SETTEE]
+    set_sheet_angle(ship, settee, math.radians(sheet_deg))
+    settee.state = state
+    settee.lug_side = side or ("larboard" if tack == "starboard" else "starboard")
+    settee.yard_lowered = lowered
+    sign = 1.0 if tack == "starboard" else -1.0
+    data = ship_state(ship, awa=math.radians(50.0) * sign, tack=tack)
+    for s in data["snap"]["sails"]:
+        if ship.sails[s["id"]].yard_lowered:
+            s["yard_lowered"] = True
+    return data
+
+
+SETTEE_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const y = sk.spars['main.lug_yard'], m = sk.spars['main.mast'], dry = sk.spars['main.yard'];
+    const pieces = sk.figures.filter(f => f.id === 'main.settee');
+    const fig = id => sk.figures.filter(f => f.id === id)[0] || null;
+    return {
+      throat: y.a, peak: y.b, sling: y.centre, hoist: y.hoist, onDeck: !!y.onDeck,
+      mx: m.xAt(y.centre[2]), masthead: m.head,
+      yardFig: fig('main.lug_yard').pts,
+      dry: dry.centre, dryFig: fig('main.yard').pts, dryHoist: fig('main.yard').hoist,
+      topsail: fig('main.topsail') ? fig('main.topsail').corners : null,
+      pieces: pieces.map(f => f.piece || ''), state: pieces.length ? pieces[0].state : null,
+      corners: pieces.length ? pieces[0].corners : null,
+      path: [].concat(...pieces.map(f => P.flattenPath(f.path))),
+      lines: sk.figures.filter(f => f.kind === 'line' && (f.of === 'main.settee' ||
+        f.of === 'main.lug_yard')).map(f => ({id: f.id, cls: f.cls, pts: f.pts})),
+    };
+"""
+
+
+def _settee_of(graph: dict) -> tuple[dict, float, float]:
+    sail = next(s for s in graph["sails"] if s["id"] == SETTEE)
+    return sail, graph["hull"]["deck_height_m"], graph["hull"]["beam_m"]
+
+
+def _main_mast_x(graph: dict, z: float) -> float:
+    """The main mast's raked line's x at height z above the water (`client/projection.js`'s
+    `xAt`)."""
+    mast = next(s for s in graph["spars"] if s["id"] == "main.mast")
+    deck = graph["hull"]["deck_height_m"]
+    return mast["x_m"] - math.tan(mast.get("rake") or 0.0) * (z - deck)
+
+
+def _slings_of(graph: dict) -> tuple[float, float]:
+    """The point a third along the settee's head from the throat, (x, height above the deck), on
+    the file's corners: where it is slung (D5(a); Ext §5.1)."""
+    sail, _deck, _beam = _settee_of(graph)
+    _tack, (hx, hz), (px, pz), _clew = sail["corners_m"]
+    return hx + (px - hx) / 3.0, hz + (pz - hz) / 3.0
+
+
+def _lee(tack: str) -> float:
+    return 1.0 if tack == "larboard" else -1.0  # +1 starboard
+
+
+def settee_block(graph: dict, tack: str) -> list:
+    """Where the settee's sheet is drawn to (Ext §5.9 with the lead's ruling on the bilander's §17
+    lead item 4): a fathom abaft the clew at the sail's floor and abreast of it, by the trim's own
+    floor and lead (`TRIM_RANGE`, `LOOSE_FOOTED_LEAD_AFT_M`), with the cut swung about its slings
+    as it is drawn, the slings on the lee side of the mast; on the drawn deck there."""
+    sail, deck, beam = _settee_of(graph)
+    sx, sz = _slings_of(graph)
+    cx = sail["corners_m"][3][0]
+    shift = _main_mast_x(graph, deck + sz) - sx
+    floor = TRIM_RANGE["lug"][0]
+    x = sx + shift + (cx - sx) * math.cos(floor) - LOOSE_FOOTED_LEAD_AFT_M
+    y = _lee(tack) * (LUG_LEE_OF_BEAM * beam - (cx - sx) * math.sin(floor))
+    return [x, y, deck_at(brig_with_settee().hull.spec.profile, x)]
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_settee_unswung_lies_on_its_files_corners_slung_on_the_mast(tmp_path, tack):
+    """Ext §6.3, §6.5: with its sheet at no angle the settee lies on the file's corners within
+    0.1 m fore and aft and to the millimetre in height, its slings a third along its head from the
+    throat (D5(a)) on the main mast's raked line at their height, which the corners' contract puts
+    within 0.1 m of it (Ext §5.1), and a mast's half-diameter to leeward of it, as a lug's."""
+    data = settee_by_the_wind(tack)
+    for s in data["snap"]["sails"]:
+        if s["id"] == SETTEE:
+            s["sheet_angle"] = 0.0
+    got = run_js(tmp_path, data, SETTEE_FIGURES)
+    sail, deck, beam = _settee_of(data["graph"])
+    sx, sz = _slings_of(data["graph"])
+    lee = _lee(tack)
+    drawn = [got["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
+    for p, (x, z) in zip(drawn, sail["corners_m"], strict=True):
+        assert abs(p[0] - x) <= 0.1
+        assert p[1] == pytest.approx(lee * LUG_LEE_OF_BEAM * beam)
+        assert p[2] == pytest.approx(deck + z, abs=1e-3)
+    sling = got["sling"]
+    assert sling[0] == pytest.approx(got["mx"])
+    assert sling[0] == pytest.approx(_main_mast_x(data["graph"], sling[2]))
+    assert abs(sling[0] - sx) <= 0.1 and sling[2] == pytest.approx(deck + sz)
+    third = [a + (b - a) / 3.0 for a, b in zip(drawn[1], drawn[2], strict=True)]
+    assert sling == pytest.approx(third)
+    assert got["throat"] == pytest.approx(drawn[1]) and got["peak"] == pytest.approx(drawn[2])
+    assert got["hoist"] == 1 and not got["onDeck"]
+
+
+@needs_node
+@pytest.mark.parametrize("sheet_deg", [8.0, 30.0, 85.0])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_settee_swung_by_its_sheet_lies_to_leeward_on_its_cut(tmp_path, tack, sheet_deg):
+    """Ext §6.3: set, the cut swung whole about its slings by its sheet's angle to the lee of the
+    tack, on either tack: each corner as high as the file has it and as far from the slings' upright
+    as the file has it fore and aft; the head swung through the sheet's angle; the peak and the
+    clew to leeward, the tack to windward of the clew; the yard along the head; cut at the mast in
+    two pieces while the mast stands within the cloth."""
+    data = settee_by_the_wind(tack, sheet_deg)
+    got = run_js(tmp_path, data, SETTEE_FIGURES)
+    sail, deck, _beam = _settee_of(data["graph"])
+    sx, _sz = _slings_of(data["graph"])
+    lee = _lee(tack)
+    sling = got["sling"]
+    drawn = [got["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
+    for p, (x, z) in zip(drawn, sail["corners_m"], strict=True):
+        assert p[2] == pytest.approx(deck + z)
+        assert math.hypot(p[0] - sling[0], p[1] - sling[1]) == pytest.approx(abs(x - sx))
+    peak = drawn[2]
+    swung = math.degrees(math.atan2(abs(peak[1] - sling[1]), sling[0] - peak[0]))
+    assert swung == pytest.approx(sheet_deg, abs=1e-6)
+    assert peak[1] * lee > 0.5 and drawn[3][1] * lee > 0.5
+    assert drawn[0][1] * lee < drawn[3][1] * lee
+    assert got["yardFig"] == [pytest.approx(drawn[1]), pytest.approx(drawn[2])]
+    yard = next(s for s in data["graph"]["spars"] if s["id"] == SETTEE_YARD)
+    assert math.dist(got["throat"], got["peak"]) == pytest.approx(yard["length_m"], abs=0.01)
+    if sheet_deg < 60.0:
+        assert sorted(got["pieces"]) == ["abaft", "forward"]
+    assert got["state"] == "set" and got["hoist"] == 1
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_with_its_yard_on_the_weather_side_the_settee_lies_against_the_mast_to_leeward(
+    tmp_path, tack
+):
+    """Ext §5.5 step 3: through the wind and until it is dipped the yard hangs on the old side,
+    now the weather side, and the one sheet lies the sail to the new lee (`read_sheet`), so that it
+    lies against the mast: drawn with its slings a mast's half-diameter to windward of the mast,
+    the cloth swung to leeward by its sheet, its sheet to the lee block. Dipped, the yard comes to
+    the lee side and the slings with it (the cases above)."""
+    lee = _lee(tack)
+    weather = run_js(tmp_path, settee_by_the_wind(tack, side=tack), SETTEE_FIGURES)
+    data = settee_by_the_wind(tack)
+    leeward = run_js(tmp_path, data, SETTEE_FIGURES)
+    across = LUG_LEE_OF_BEAM * data["graph"]["hull"]["beam_m"]
+    assert weather["sling"][1] == pytest.approx(-lee * across)
+    assert leeward["sling"][1] == pytest.approx(lee * across)
+    assert weather["sling"][0] == pytest.approx(weather["mx"])
+    peak, clew = weather["corners"][1], weather["corners"][2]
+    assert peak[1] * lee > 0.5 and clew[1] * lee > 0.5  # the cloth to leeward of the tack
+    # the same cut and the same swing, moved across by the mast's diameter
+    for p, q in zip(weather["corners"], leeward["corners"], strict=True):
+        assert [p[0], p[1] - q[1], p[2]] == pytest.approx([q[0], -2.0 * lee * across, q[2]])
+    (sheet,) = [ln["pts"] for ln in weather["lines"] if ln["cls"] == "sheet"]
+    assert sheet[1] == pytest.approx(settee_block(data["graph"], tack))
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_settee_is_on_deck_only_while_its_yard_is_lowered(tmp_path, tack):
+    """Ext §6.3, §6.5: a settee's yard stays aloft to set, take in and furl its sail, and comes down
+    on deck only to be dipped. Lowered (`yard_lowered`, served only then), the yard and the sail lie
+    along the deck below the deck and a metre, as a lowered lug's. In the gear and not lowered, the
+    yard stays where it was set and the sail hangs under it aloft in festoons, straight down by the
+    gear's share (IN_GEAR_DEPTH) of its depth square to the yard, deepest by 1.3 of that between its
+    festoons, clear above its foot. Furled, a bundle along the yard aloft, no sheet drawn. The
+    lugger's lug, in the gear, lies on deck as before (the lug's case above)."""
+    graph = settee_by_the_wind(tack)["graph"]
+    deck = graph["hull"]["deck_height_m"]
+    set_ = run_js(tmp_path, settee_by_the_wind(tack), SETTEE_FIGURES)
+    lowered = run_js(
+        tmp_path,
+        settee_by_the_wind(tack, state=SailState.IN_THE_GEAR, lowered=True),
+        SETTEE_FIGURES,
+    )
+    gear = run_js(tmp_path, settee_by_the_wind(tack, state=SailState.IN_THE_GEAR), SETTEE_FIGURES)
+    furled = run_js(tmp_path, settee_by_the_wind(tack, state=SailState.FURLED), SETTEE_FIGURES)
+
+    assert lowered["onDeck"] and lowered["hoist"] == 0
+    for p in [lowered["throat"], lowered["peak"], *lowered["path"]]:
+        assert p[2] < deck + 1.0 and p[1] == pytest.approx(0.0)
+    assert not [ln for ln in lowered["lines"] if ln["cls"] == "lift"]  # the derrick is not drawn
+
+    tack_z = set_["corners"][3][2]
+    assert min(p[2] for p in set_["path"]) < tack_z + 0.5  # set, down to its foot
+    for got in (gear, furled):
+        assert not got["onDeck"] and got["hoist"] == 1
+        assert got["throat"] == pytest.approx(set_["throat"])
+        assert got["peak"] == pytest.approx(set_["peak"])
+    throat, peak = gear["throat"], gear["peak"]
+    # the depth square to the yard: the clew's distance from the head, on the file's corners
+    sail, _deck, _beam = _settee_of(graph)
+    _t, (hx, hz), (px, pz), (cx, cz) = sail["corners_m"]
+    deep = abs((px - hx) * (cz - hz) - (pz - hz) * (cx - hx)) / math.hypot(px - hx, pz - hz)
+    hang = GEAR_DEPTH * deep
+    run = math.hypot(peak[0] - throat[0], peak[1] - throat[1])
+    drops = []
+    for p in gear["path"]:
+        along = math.hypot(p[0] - throat[0], p[1] - throat[1]) / run
+        drops.append(throat[2] + along * (peak[2] - throat[2]) - p[2])
+    assert min(drops) >= -1e-6 and hang - 1e-6 <= max(drops) <= 1.3 * hang + 1e-6
+    assert min(p[2] for p in gear["path"]) > tack_z + 1.0
+    assert gear["state"] == "in_the_gear"
+    assert furled["state"] == "furled"
+    bundle = 0.25 + 0.03 * math.dist(throat, peak)
+    assert max(_off_the_segment(p, throat, peak) for p in furled["path"]) <= bundle + 1e-6
+    assert not [ln for ln in furled["lines"] if ln["cls"] == "sheet"]
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_settees_sheet_leads_to_its_block_a_fathom_abaft_its_clew_at_its_floor(tmp_path, tack):
+    """Ext §5.9 and §6.3 with the lead's ruling (the bilander's §17 lead item 4): the one sheet runs
+    from the clew to a block on the deck a fathom abaft where the clew stands at the sail's floor
+    and abreast of it, on the lee side, by the trim's own floor and lead (`settee_block`); hauled
+    flat aft to the floor it leads straight aft a fathom. The block is a fitting: the same set at
+    any sheet, with the yard either side, in the gear (the sheet from the clew hauled up in the
+    after festoon) and lowered (from the clew on deck); inside her taffrail and her rail; and
+    within BLOCK_FROM_THE_TRIMS_M of the trim's block for her cut, which swings the clew about the
+    tack. Not to the taffrail on the centreline, Ext §6.3 as designed, which the ruling departs
+    from."""
+    data = settee_by_the_wind(tack)
+    block = settee_block(data["graph"], tack)
+    states = {
+        "floor": settee_by_the_wind(tack, math.degrees(TRIM_RANGE["lug"][0])),
+        "20": data,
+        "45": settee_by_the_wind(tack, 45.0),
+        "85": settee_by_the_wind(tack, 85.0),
+        "weather": settee_by_the_wind(tack, side=tack),
+        "gear": settee_by_the_wind(tack, state=SailState.IN_THE_GEAR),
+        "lowered": settee_by_the_wind(tack, state=SailState.IN_THE_GEAR, lowered=True),
+    }
+    got = {k: run_js(tmp_path, v, SETTEE_FIGURES) for k, v in states.items()}
+    sheets = {}
+    for k, g in got.items():
+        (sheets[k],) = [ln["pts"] for ln in g["lines"] if ln["cls"] == "sheet"]
+        assert sheets[k][1] == pytest.approx(block, abs=1e-6), k
+    clew, end = sheets["floor"]
+    assert clew == pytest.approx(got["floor"]["corners"][2])
+    lead = [clew[0] - end[0], clew[1] - end[1]]
+    assert lead == pytest.approx([LOOSE_FOOTED_LEAD_AFT_M, 0.0], abs=1e-6)
+    for k in ("20", "45", "85", "weather"):
+        assert sheets[k][0] == pytest.approx(got[k]["corners"][2]), k
+    throat, peak = got["gear"]["throat"], got["gear"]["peak"]
+    hauled_up = sheets["gear"][0]
+    assert min(math.dist(hauled_up, p) for p in got["gear"]["path"]) <= 1e-6
+    assert hauled_up[2] < throat[2] + 2.0 / 3.0 * (peak[2] - throat[2])
+    # in the after festoon: two-thirds along the head from the throat, the gear's share of the
+    # sail's depth square to the yard below it (the gear's case above), not in the fore festoon
+    sail, _deck, _beam = _settee_of(data["graph"])
+    _t, (hx, hz), (px, pz), (cx, cz) = sail["corners_m"]
+    deep = abs((px - hx) * (cz - hz) - (pz - hz) * (cx - hx)) / math.hypot(px - hx, pz - hz)
+    after = [t + 2.0 / 3.0 * (p - t) for t, p in zip(throat, peak, strict=True)]
+    after[2] -= GEAR_DEPTH * deep
+    assert hauled_up == pytest.approx(after, abs=1e-6)
+    assert sheets["lowered"][0] == pytest.approx(got["lowered"]["corners"][2])
+    # inside her taffrail and her rail, on the lee side
+    hull = data["graph"]["hull"]
+    assert block[0] > taffrail_of(data["graph"])[0] + 1.0
+    assert 0.5 < block[1] * _lee(tack) < abs(rail_end(hull, block[0], 1.0)[1])
+    # beside the trim's block, from the tack on the centreline (the same floor and lead)
+    ship = brig_with_settee()
+    geo = sheet_geometry(ship, ship.sails[SETTEE])
+    assert geo.floor == TRIM_RANGE["lug"][0] and geo.lead_aft_m == LOOSE_FOOTED_LEAD_AFT_M
+    tack_x = ship.sails[SETTEE].corners_m[0][0]
+    trims = [tack_x - geo.arm_m * math.cos(geo.floor) - geo.lead_aft_m, _lee(tack) * geo.offset_m]
+    assert math.dist(block[:2], trims) < BLOCK_FROM_THE_TRIMS_M
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_settees_derrick_holds_its_yards_after_part_from_the_masthead(tmp_path, tack):
+    """The lifts of every yard drawn faint (B5.1): the settee's yard's one, its derrick (the
+    martinet, Lescallier 1791 p. 390), from two-thirds of the way from the slings to the peak, as
+    the mizen yard's (Steel 1794 vol. I p. 207), up to the main mast's head; none drawn lowered
+    (above). No brace; its vangs and ourses not drawn, as no ship's are."""
+    got = run_js(tmp_path, settee_by_the_wind(tack, 30.0), SETTEE_FIGURES)
+    lifts = [ln for ln in got["lines"] if ln["cls"] == "lift"]
+    assert [ln["id"] for ln in lifts] == [f"{SETTEE_YARD}.derrick"]
+    foot, top = lifts[0]["pts"]
+    sling, peak = got["sling"], got["peak"]
+    along = [s + DERRICK_ALONG * (p - s) for s, p in zip(sling, peak, strict=True)]
+    assert foot == pytest.approx(along)
+    assert top == pytest.approx(got["masthead"])
+    assert {ln["cls"] for ln in got["lines"]} == {"lift", "sheet"}
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_dry_main_yard_stands_above_the_settee_in_every_state(tmp_path, tack):
+    """D40(a); Bil §12.3: the dry main yard, crossed for the main topsail's sheets, is drawn where
+    every lower yard is (at its height, slung before its mast), above the settee's slings by the
+    file's gap, and does not move as the settee is set either side, clewed up, furled or lowered;
+    the main topsail's clews come down to its height. (Braced sharp up with the settee trimmed by
+    the same wind, the two yards cross in the drawing: measured and recorded in
+    docs/dev/TuningNotes.md, "The settee drawn (package 75, B5.4)", for the lead.)"""
+    cases = [
+        settee_by_the_wind(tack, 8.0),
+        settee_by_the_wind(tack, 85.0),
+        settee_by_the_wind(tack, side=tack),
+        settee_by_the_wind(tack, state=SailState.IN_THE_GEAR),
+        settee_by_the_wind(tack, state=SailState.FURLED),
+        settee_by_the_wind(tack, state=SailState.IN_THE_GEAR, lowered=True),
+    ]
+    got = [run_js(tmp_path, d, SETTEE_FIGURES) for d in cases]
+    graph = cases[0]["graph"]
+    deck, beam = graph["hull"]["deck_height_m"], graph["hull"]["beam_m"]
+    dry = next(s for s in graph["spars"] if s["id"] == DRY_YARD)
+    z = deck + dry["height_m"]
+    want = [_main_mast_x(graph, z) + YARD_BEFORE_OF_BEAM * beam, 0.0, z]
+    _sx, sz = _slings_of(graph)
+    for g in got:
+        assert g["dry"] == pytest.approx(want) and g["dryHoist"] == 1
+        assert g["dryFig"] == [pytest.approx(p) for p in got[0]["dryFig"]]
+        assert g["dryFig"][0][1] == pytest.approx(-dry["length_m"] / 2.0)
+    assert got[0]["dry"][2] - got[0]["sling"][2] == pytest.approx(dry["height_m"] - sz)
+    assert dry["height_m"] - sz > 1.0
+    assert all(c[2] == pytest.approx(z) for c in got[0]["topsail"][2:])
+
+
+@needs_node
+@pytest.mark.parametrize("facing_deg", [0.0, 45.0, 90.0, 135.0, 225.0])
+def test_the_frame_holds_the_settee_across_states(tmp_path, facing_deg):
+    """The fixed scale (spec M3 §9 item 14): every point of the settee, its yard and its lines lies
+    within the frame alone, upright or heeled, on either tack, at any sheet, with the yard either
+    side, set, clewed up, furled or lowered; and the view's bounds are the same in each."""
+    states = {
+        f"{tack}-{sheet}-{state.value}": settee_by_the_wind(tack, sheet, state)
+        for tack in ("starboard", "larboard")
+        for sheet in (8.0, 45.0, 85.0)
+        for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED)
+    }
+    for tack in ("starboard", "larboard"):
+        states[f"{tack}-weather"] = settee_by_the_wind(tack, side=tack)
+        states[f"{tack}-lowered"] = settee_by_the_wind(
+            tack, state=SailState.IN_THE_GEAR, lowered=True
+        )
+    body = f"""
+        const f = {math.radians(facing_deg)};
+        const ours = g => [g.id, g.of].some(i => i === 'main.lug_yard' || i === 'main.settee');
+        const out = {{}};
+        Object.keys(d).forEach(k => {{
+          const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+          out[k] = {json.dumps(HEELS)}.map(h => {{
+            const proj = P.makeProjector(f, h);
+            const fr = sk.frame.map(proj);
+            const xs = fr.map(p => p.x), ys = fr.map(p => p.y);
+            const box = {{minX: Math.min(...xs), maxX: Math.max(...xs),
+                          minY: Math.min(...ys), maxY: Math.max(...ys)}};
+            let over = -1e9, n = 0;
+            sk.figures.filter(ours).forEach(g => {{
+              (g.path ? P.flattenPath(g.path) : g.pts).map(proj).forEach(q => {{
+                over = Math.max(over, box.minX - q.x, q.x - box.maxX, box.minY - q.y,
+                                q.y - box.maxY);
+                n += 1;
+              }});
+            }});
+            return {{frame: box, over: over, n: n, bounds: P.project(sk, f, h).bounds}};
+          }});
+        }});
+        return out;
+    """
+    got = run_js(tmp_path, states, body)
+    first = got[next(iter(got))]
+    for name, views in got.items():
+        for heel, view, same in zip(HEELS, views, first, strict=True):
+            assert view["n"] > 4 and view["over"] <= 1e-6, (name, heel, view["over"])
+            for k in ("minX", "maxX", "minY", "maxY"):
+                assert view["frame"][k] == pytest.approx(same["frame"][k], abs=1e-6), (name, k)
+                assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
+
+
+def test_no_committed_file_carries_a_settee_so_none_draws_one():
+    """Ext §6: the settee's branches are reached only by its key, which no committed file carries:
+    no served graph names a settee and no ship starts with a yard lowered, so every file draws as
+    before."""
+    for path in EVERY_SHIP:
+        ship = make_ship(path)
+        assert not [s for s in queries.ship_graph(ship)["sails"] if "settee" in s], path
+        assert not any(s.settee or s.yard_lowered for s in ship.sails.values()), path
+
+
+@needs_node
+def test_the_settee_dipped_in_stays_as_the_game_serves_it(tmp_path):
+    """Through the game's own doors (`/api/ship`, `/api/state`) and the engine's own tack (Ext
+    §5.5, D3(b)): the fixture by the wind on the starboard tack, the settee set to larboard; tacked,
+    the yard lowered when the head yards' swing ends, the snapshot serving `yard_lowered` then and
+    only then, and the drawing laying the yard and the sail on deck; hoisted on the new lee, the
+    snapshot without it, and the settee drawn aloft to starboard, slung to starboard of the mast,
+    its sheet to the starboard block."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.ui.server import Driver, create_app
+
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, write_ship(brig_with_settee_doc(), tmp_path, "settee"), scenario)
+    world.submit("set plain sail")
+    world.submit("brace sharp up on the starboard tack")
+    for _ in range(600):
+        world.tick()
+    settee = world.ship.sails[SETTEE]
+    assert settee.is_set and settee.lug_side == "larboard" and world.ship.dyn.tack == "starboard"
+
+    def served(client) -> dict:
+        return {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
+
+    def mine(data: dict) -> dict:
+        return next(s for s in data["snap"]["sails"] if s["id"] == SETTEE)
+
+    with TestClient(create_app(Driver(world))) as client:
+        before = served(client)
+        world.submit("tack ship")
+        for _ in range(600):
+            world.tick()
+            if settee.yard_lowered:
+                break
+        assert settee.yard_lowered
+        down = served(client)
+        for _ in range(600):
+            world.tick()
+            if not settee.yard_lowered:
+                break
+        assert not settee.yard_lowered and settee.is_set
+        world.tick()
+        up = served(client)
+    graph = before["graph"]
+    assert next(s for s in graph["sails"] if s["id"] == SETTEE)["settee"] is True
+    assert "yard_lowered" not in mine(before) and "yard_lowered" not in mine(up)
+    assert mine(down)["yard_lowered"] is True
+    deck, beam = graph["hull"]["deck_height_m"], graph["hull"]["beam_m"]
+
+    first = run_js(tmp_path, before, SETTEE_FIGURES)
+    assert first["hoist"] == 1 and first["corners"][2][1] < -0.5  # the clew to larboard
+    lowered = run_js(tmp_path, down, SETTEE_FIGURES)
+    assert lowered["onDeck"] and all(p[2] < deck + 1.0 for p in lowered["path"])
+    hoisted = run_js(tmp_path, up, SETTEE_FIGURES)
+    assert up["snap"]["ship"]["tack"] == "larboard" and mine(up)["lug_side"] == "starboard"
+    assert hoisted["hoist"] == 1 and hoisted["state"] == "set"
+    assert hoisted["sling"][1] == pytest.approx(LUG_LEE_OF_BEAM * beam)
+    assert hoisted["corners"][2][1] > 0.5 and hoisted["peak"][1] > 0.5
+    (sheet,) = [ln["pts"] for ln in hoisted["lines"] if ln["cls"] == "sheet"]
+    assert sheet[1] == pytest.approx(settee_block(graph, "larboard"))

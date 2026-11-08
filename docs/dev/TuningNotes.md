@@ -15058,6 +15058,136 @@ All with `py -m pytest`, `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"
 - **The ship files:** `py tools/gen_ships.py` into scratch, its sixteen files byte for byte the committed sixteen (`cmp`).
 - **ruff** check and format clean (360 files).
 
+## The settee drawn (package 75, B5.4) (2026-11-07)
+
+**The design.** `docs/design/Design-ShipsEngineExtensions.md` (Ext) §6.3 to §6.5 and §9.2 (B5 draws each of B3's steps after it lands, from the fixtures first), with D5(a) and D45 (`docs/design/Decisions-ShipsRound2-2026-10.md`) and the lead's ruling on the bilander's §17 lead item 4 in `docs/dev/M7-WorkPackages.md` (the sheet's block: "a fathom abaft the clew and abreast of it, the trim reading no part of the profile"); the bilander's §12.2 item 8 and §12.3, what B5.4 is asked for. Drawn on the fixture `brig_with_settee()` (`tests/rig_fixtures.py`, "The settee in the engine (package 75, B3.3)", "The rig in memory"); the bilander's file is B4's and is not written here.
+
+**As built** (`client/projection.js`; `tests/test_view_geometry.py`). Every branch is keyed on the served `settee`, which no committed file carries (`test_no_committed_file_carries_a_settee_so_none_draws_one`). `api/queries.py` has served `settee` in the graph and `yard_lowered` in the snapshot, each only when true, since stage 0E (Ext §6.4), and is unchanged.
+
+- **Aloft unless lowered.** `lugHoisted` gives a settee hoisted unless `yard_lowered` is set. Set, clewed up and furled, it is drawn aloft. Lowered to be dipped, the yard and the sail lie on deck as a lowered lug's do (ON_DECK_M above the datum, along the centreline). The lug's own rule (on deck in the gear or furled) is unchanged.
+- **The cut.** `lugCut` works as for a lug: slung a third along throat→peak on the mast's raked line (D5(a)), the cut swung about its slings by the sheet's angle. For a settee, the slings stand on the side its yard hangs (`lug_side`), and the cloth swings to the lee of the tack, where its one sheet lies it wherever the yard hangs unless that sheet is held over to windward (`trim.read_sheet`; Ext §5.5 step 3).
+  - With the yard to leeward, the two sides are the same and the drawing is the lug's.
+  - Through the wind and until the change, the yard hangs on the old side, now the weather side. The sail is drawn against the mast: its slings 0.26 m to windward of the mast (LUG_LEE_OF_MAST_OF_BEAM 0.03 of her 8.6-m beam), the cloth to leeward.
+  - Judgement: the design names no rule here. Drawn as a lug, the sail lay wholly on the weather side with its sheet there, as if aback, which the engine does not say.
+  - **Held over to windward** (hung in stays, Ext §5.5 step 2, or hauled to windward by order) it is still drawn to leeward, as every fore-and-aft sail is (`sheetDirection`): the snapshot serves no sheet's side. Measured on the fixture at seed 7 (the review's finding, reproduced): "haul the mainsail sheet to windward" in 15 kn on the starboard tack, `read_sheet` lies it to starboard, held to windward, the served `backed` true, the clew drawn 1.38 m to larboard; hung in stays in 8 kn with 2 kn of way after "tack ship", seven ticks held to windward and set, `backed` false, drawn the same. Not a regression: the base drew it so. Serving the side would be a change to `api/queries.py` under Ext §6.4, not the drawing's alone (for the lead).
+- **The yard's length.** The drawing draws a settee's yard as its head, throat to peak (`lugCut`, as every lug's yard); its `length_m` reaches only the frame. So the drawing needs the yard to span the head (Bil §4.4, "If the drawing needs the yard to span the head exactly ... B5 says so"): it does, and says so here. Measured (the review's finding, reproduced): the fixture's yard is filed as its 17.00-m head and drawn 16.994 m (between its rounded corners), and filed 17.92 m it is drawn 16.994 m still; her 16.59-m yard on her 15.67-m head would be drawn 0.92 m short. By Bil §4.4's lean, her yard is cut to the head on her file, recorded (B4's). The other way, for the lead: the drawing carries the yard half the difference beyond the throat and the peak, keyed on `settee`.
+- **In the gear aloft.** `gathered` under the yard, the festoons straight down by IN_GEAR_DEPTH (0.35) of the sail's depth square to the yard: the clew's distance from the head, 8.75 m on the fixture, a hang of 3.06 m.
+  - Old beside new: by the depth the sail figure is handed (its leech, 12.24 m, the hint a lug passes for its belly), the hang was 4.28 m. At the slings that brought the cloth down to 2.6 m above the deck, 1.6 m over the tack (judgement).
+  - The clew is drawn in the after festoon, two-thirds along the head, and the sheet is drawn from there.
+  - The lowest point is 3.94 m above the water on the fixture, 1.44 m above the tack.
+- **Furled.** The sail figure's bundle along the yard aloft, 0.25 m plus 0.03 of the yard's length thick. No sheet is drawn.
+- **The sheet**, by the lead's ruling. It leads to a block on the deck a fathom abaft where the clew stands at the sail's floor, and abreast of it, on the lee side.
+  - The floor and the lead are the trim's: `trim.py`'s lug floor of 8 degrees and LOOSE_FOOTED_LEAD_AFT_M. The drawing has them as SETTEE_SHEET_FLOOR and SETTEE_LEAD_AFT_M, and the test checks them against the trim's own.
+  - The clew is taken where the drawing's swing about the slings puts it at the floor, with the slings to leeward. The block stands on the drawn deck there (`deckAt`).
+  - The block is a fixed fitting: the same at any sheet, with the yard either side, clewed up (the sheet from the clew in the after festoon) and lowered (the sheet from the clew on deck).
+  - Not to the taffrail on the centreline at rail height (Ext §6.3 as designed), from which the ruling departs.
+- **The derrick.** It is a `lift` with no side, which B5.1's rule drew from the peak to the main masthead. It is now drawn from two-thirds of the way from the slings to the peak instead, as the mizen yard's derrick is (Ext §6.1; Steel 1794 vol. I p. 207). Judgement, for the lead: Ext §6.3's "not drawn" was the standard before B5.1 drew every yard's lifts. The vangs and the ourses are not drawn, as no ship's are. Nothing is drawn while the yard is lowered.
+- **The frame.** Its rule is unchanged: the settee's yard reaches about its centre in the file's rig, as every swinging yard does. Every point of the settee, its yard and its lines lies within the frame in every state tested.
+
+### The measures (the fixture, as drawn)
+
+| | Figure |
+|---|---|
+| The slings (a third along throat→peak) | x −4.383, 6.90 m above the deck; the main mast's raked line there at x −4.382, 0.001 m off it |
+| The block (starboard tack) | x −14.20, 1.38 m to larboard, 1.65 m above the water on the drawn deck. The taffrail is at x −16.47 (2.27 m abaft the block); the rail there is 2.80 m off the centreline and 3.30 m high |
+| The trim's block (from the tack on the centreline, x −0.31) | x −14.26, 1.70 m off: 0.33 m from the drawn one (0.06 m fore and aft, 0.32 m athwartships) |
+| The hang in the gear | 3.06 m (old, by the leech: 4.28 m) |
+| The dry main yard over the slings | 5.40 m (the file's 12.3 m against the slings' 6.90 m) |
+
+**The two yards cross (for the lead).** The dry main yard is drawn where every lower yard is: at its height, slung 0.43 m before the mast, braced with the main topsail. The settee's yard is slung on the mast below it and rises at 44 degrees aft. On the fixture it passes the dry yard's height 5.6 m abaft its slings, inside the dry yard's half-length of 7.9 m. So wherever the settee's sheet angle and the dry yard's brace sum to near 90 degrees (the yard's lee arm lying along the settee's after part), the two cross in the drawing.
+
+The least distance between them as drawn, in metres, by sheet and brace (starboard tack, the lee arm aft):
+
+| Sheet \ brace | 0° | 20° | 40° | 50° | 62° |
+|---|---|---|---|---|---|
+| 8° | 3.90 | 3.62 | 2.97 | 2.45 | 1.61 |
+| 20° | 3.80 | 3.33 | 2.37 | 1.65 | 0.57 |
+| 25° | 3.73 | 3.16 | 2.05 | 1.24 | 0.09 |
+| 30° | 3.64 | 2.96 | 1.68 | 0.79 | 0.40 |
+| 40° | 3.40 | 2.45 | 0.83 | 0.16 | 1.34 |
+| 50° | 3.04 | 1.77 | 0.13 | 1.12 | 2.14 |
+| 60° | 2.53 | 0.92 | 1.08 | 1.96 | 2.78 |
+| 85° | 0.54 | 1.44 | 2.87 | 3.32 | 3.69 |
+
+At the engine's own trims (seed 7, 15 kn, settled 1,800 s under plain sail and trimmed):
+
+| Point of sailing | Settee's sheet | Dry yard's brace | Least, fixture | Least, the bilander's dry yard |
+|---|---|---|---|---|
+| By the wind, 67.5 degrees off | 26.4° | 62.0° | 0.05 m | 0.03 m |
+| The wind abeam | 36.1° | 62.0° | 0.98 m | 0.21 m |
+| A broad reach, 135 off | 82.9° | 22.2° | 1.45 m | 0.04 m |
+| Running, 170 off | 85.0° | 0° | 0.54 m | 0.45 m |
+
+"The bilander's dry yard" is the fixture with her dry yard put in: 12.44 m long, 1.02 m above the slings (her §4.4). The spars are drawn as lines, and a yard is some 0.3 m through. By the wind, the settee's yard runs through the dry yard's lee arm, which the bilander's §12.3 asks the drawing not to show. The trims are the engine's: the dry yard is braced with the topsail by "brace sharp up" and "trim sails", and the settee's sheet is set by `wanted_sheet`. So the drawing shows them as they are and moves neither spar. For the lead and B4: whether the engine braces her dry yard short of the settee or eases the settee, or the crossing is left for the eye.
+
+### The pictures (for the eye, not in the repository)
+
+Drawn by the game's own viewer from the game's own server, as the *Neufchatel*'s were. The fixture was written to scratch and sailed by the engine at seed 7 in a northerly of 15 kn. Its World was served by `freesail.ui.server` on a local port, the page opened in the installed Chrome, and each cell drawn by the page's own `Projection` and `ShipView`. Each state has five views: abeam to leeward, abeam to windward, ahead, astern and the lee quarter.
+
+The six states:
+- set on the starboard tack (1,800 s, sheet 26.4 degrees);
+- through the wind, before the change, the yard on the old side and the sail against the mast (67 s after "tack ship");
+- lowered to be dipped (195 s);
+- dipped and set on the larboard tack (614 s);
+- clewed up aloft ("clew up the mainsail");
+- furled aloft ("furl the mainsail").
+
+Every cell is drawn (standard deviation 37.6 or more, dark share 0.016 or more), with no page error. They are in scratch, `settee/pics/`.
+
+What the eye finds:
+- A settee lowered on deck lies under her bulwarks, hidden from a viewer level with the water, as a lowered lug of the lugger's is.
+- By the wind, the crossing above shows.
+
+### The review (2026-11-07): what it found, and what was done
+
+One lens, the drawing on real ticks and in pictures (the fixture sailed at seed 7 through the tack, the wear, the heave-to, filling away, clewing up, furling and setting again, 2,027 ticks drawn; eleven states drawn in Chrome; the frigate, the brig, the 64 and the *Neufchatel* drawn by the base and by the tree and compared pixel for pixel, none differing but the *Neufchatel*'s 3 and 5 pixels in the beam views, which the tree drawn twice gives against itself, the page's own noise). Each finding reproduced on the fixture before it was mended.
+
+| Finding | Reproduced | Done |
+|---|---|---|
+| The drawing draws a settee's yard as its head, so a yard filed longer than its head is drawn short, and Bil §4.4 asks B5 to say so | the fixture's yard filed 17.92 m for 17.00 is drawn 16.994 m, as before | recorded (above, "The yard's length"; Ext §6.3 as built; `lugCut`'s branch in `client/projection.js`): her yard cut to the head by Bil §4.4's lean, B4's; the other way for the lead |
+| No case pins the clew hauled up in the after festoon | the clew put in the fore festoon (1/3 for 2/3): all 25 settee cases passed | mended: `test_the_settees_sheet_leads_to_its_block_a_fathom_abaft_its_clew_at_its_floor` pins the clew two-thirds along the head and the gear's share of the depth below it; the mutant now fails on both tacks |
+| The record says the cloth lies where `read_sheet` lies it, which is not so while its sheet is held over to windward | by order and hung in stays (above, "The cut"): the engine's side to windward, the clew drawn to leeward | recorded as the drawing's limit, the claim mended in `lugCut`'s note, above and Ext §6.3 as built; serving the side is a §6.4 change, for the lead |
+| The step's report gave the pictures' blank floor as 8.0 | `tests/test_pictures.py` reads BLANK_STD 4.0 (since 3478abf9) | the figures true here ("Pins moved", below); no file was wrong |
+| `settee_by_the_wind`'s `brace_deg` is passed by no case | none of the ten tests passes it | mended: the parameter, its loop and its clause removed (the yards square, as every case drew them) |
+
+### Left, and for whom
+
+- **For the lead and B4:** the two yards' crossing by the wind (above, figures); the derrick drawn against Ext §6.3's literal "not drawn" (above); a settee's sheet held over to windward drawn to leeward (serving its side, Ext §6.4); the yard's length, cut to the head on her file or carried beyond both ends by the drawing.
+- **For the lead:** a lug's slings and cloth drawn apart, as a settee's are, if the lugger's lugs are ever drawn set with the yard on the weather side (her lowering at helm's a-lee keeps it from showing now; every committed file is drawn as before).
+- **For B4, on her file:** her yard cut to her head (Bil §4.4), recorded; her own drawing cases and pictures (her §12.3, §13.1), and her crossing measured on her file.
+
+### Pins moved: none
+
+No committed file's drawing moved. Every committed file (the sixteen in `data/ships/`) was drawn by the base's `projection.js` (994bf966, exported to scratch) and by the tree's, in nine states each:
+- as she starts;
+- dressed on either tack;
+- set, clewed up and furled on either tack, a lug's yard on the weather side and its sheet at 40 degrees.
+
+Across the 144 states, the skeleton's figures, the frame and five projected views are equal as text. No existing case changed. The pictures' thresholds stand (`tests/test_pictures.py`'s BLANK_STD 4.0, DARK_LEVEL 110 and DARK_FRACTION 0.001; both tests passed).
+
+### The suite, as run
+
+**The build's runs,** flags `--slow -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, one suite at a time:
+- `tests/test_view_geometry.py`: **943 passed in 97.6 s** (25 of them new).
+- `tests/test_view_action.py`: **33 passed in 7.7 s.**
+- `tests/test_pictures.py` (the installed Chrome through `FREESAIL_CHROMIUM`): **2 passed in 23.3 s.**
+- `tests/test_settee.py`: **56 passed in 28.8 s.**
+- By junit against the bases (B2's fast tier and slow candidates, on these four files):
+  - nothing only in the old;
+  - only in the new, the 25 settee cases and B3.3's 56;
+  - one changed outcome, the departure recorded at a244e1bb (`tests/test_view_action.py`'s port case on the *Neufchatel*), failure to passed, as recorded;
+  - `tests/test_pictures.py`'s two are in B2's fast tier as skips (no Chromium named there), passed here.
+- The ship files: `py tools/gen_ships.py` into scratch, its sixteen files byte for byte the committed sixteen (`cmp`).
+- ruff check and format: clean (360 files).
+
+**After the review** (2026-11-07, on the review's mends, the same flags, one suite at a time with nothing else running):
+- **The touched files, each whole with `--slow`:** `tests/test_view_geometry.py` **943 passed in 127.3 s**; `tests/test_view_action.py` **33 passed in 7.8 s**; `tests/test_pictures.py` (the installed Chrome through `FREESAIL_CHROMIUM`) **2 passed in 22.6 s**; `tests/test_server.py` **61 passed in 32.9 s**. By junit against B2's fast tier and slow candidates on these four files: nothing only in the old; only in the new, the 25 settee cases; changed, the a244e1bb departure (failure to passed) and `tests/test_pictures.py`'s two (skipped there, no Chromium named, to passed).
+- **The fast tier whole** (no `--slow`; the next step's base): **6,835 passed, 2 skipped, 1 xfailed in 53:22** (448 slow left out). By junit, test by test, against B2's 6,757 (6,753 passed, 2 skipped, 1 xfailed and the one failure since named a recorded departure at a244e1bb), B3.3's changes and this step's together: one changed outcome, that departure (`tests/test_view_action.py`'s port case on the *Neufchatel*, failure to passed, as recorded); only in the old, the five of B3.4's two tests on the fixture that B3.3 renamed and moved (`tests/test_evolutions.py`, "The pins moved" in B3.3's section); only in the new, 86: those five under their new names, the 56 of `tests/test_settee.py` (B3.3) and this step's 25; the two skips (`tests/test_pictures.py`, no Chromium named) and the xfail (`tests/test_agents.py`) the same.
+- **The ship files:** `py tools/gen_ships.py` into scratch, its sixteen files byte for byte the committed sixteen (`cmp`).
+- **ruff** check and format clean (360 files).
+
+**Not run:** the slow tier whole, the captain's trials and the whole logs. No Python under `freesail/` changed in this step: only the drawing, a test file and the record. B3.3's ran at its review (its section, "After the review").
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

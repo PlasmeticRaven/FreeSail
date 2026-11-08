@@ -967,6 +967,41 @@ a yard under the bowsprit, so no existing ship draws differently.
   the mast (§5.1).
 - The vangs, ourses and derrick are not drawn, to the current standard.
 
+*As built (B5.4, 2026-11-07), on the fixture* `brig_with_settee()` (the bilander's file is B4's):
+`lugHoisted` as designed, the yard aloft unless `yard_lowered`; the slings a third along
+throat→peak, on the main mast's raked line (the fixture's 0.001 m off it). Set, the cut swung about
+its slings by the sheet's angle to the lee of the tack, **the slings on the side its yard hangs**
+(`lug_side`): through the wind, until it is dipped, the yard hangs on the weather side and the one
+sheet lies the cloth to leeward (§5.5 step 3; `read_sheet`), so it is drawn against the mast, its
+slings a mast's half-diameter to windward (judgement, keyed on the settee: a lug is drawn wholly on
+its yard's side, which the lugger's lowering at helm's a-lee keeps from showing). Its one sheet
+held over to windward (hung in stays, §5.5 step 2, or hauled to windward by order), the cloth is
+still drawn to leeward, as every fore-and-aft sail is: the snapshot serves no sheet's side
+(serving it would be a §6.4 change, for the lead). **The yard is drawn as its head**, throat to
+peak, as every lug's; its `length_m` reaches only the frame, so the drawing needs the yard to span
+the head and says so (Bil §4.4): her 16.59-m yard on her 15.67-m head would be drawn 0.92 m short,
+and by Bil §4.4 her yard is cut to the head, recorded (B4's; the other way, the yard carried beyond
+both ends keyed on `settee`, for the lead). In the gear aloft,
+`gathered` under the yard, its festoons straight down by IN_GEAR_DEPTH of the clew's distance from
+the head (8.75 m on the fixture, a 3.06-m hang), not of the leech (12.24 m, 4.28 m, near the slings
+almost down to the tack), the clew in the after festoon (judgement); furled, the bundle along the
+yard aloft; lowered, on deck as a lug. **The sheet**, by the lead's ruling on the bilander's §17 lead
+item 4 (§5.9), not to the taffrail on the centreline as above: to the block a fathom abaft the clew
+at the sail's floor and abreast of it, on the lee side, on the drawn deck, by the trim's floor and
+lead (`SETTEE_SHEET_FLOOR`, `SETTEE_LEAD_AFT_M`), the clew taken as the drawing swings the cut; on
+the fixture x −14.20 m, 1.38 m off the centreline, 2.27 m inside the taffrail, 0.33 m from the
+trim's own block, which swings the clew about the tack on the centreline. **The derrick**: every
+yard's lifts are drawn since B5.1 (the owner's answer), so the derrick, a `lift`, is drawn, from
+two-thirds of the way from the slings to the peak as the mizen yard's (§6.1); "not drawn" above was
+the standard before B5.1 (judgement, for the lead). The vangs and ourses are not drawn. §6.4 was
+served from stage 0E; §6.5's cases in `tests/test_view_geometry.py` (25), every committed file drawn
+figure for figure as before. **For the lead:** the dry main yard is drawn where every lower yard is,
+5.40 m above the slings on the fixture; braced sharp up with the settee trimmed by the same wind the
+two yards cross wherever sheet and brace sum near 90 degrees: by the wind at the engine's own trim
+(sheet 26.4, brace 62) 0.05 m apart, and 0.03 m with the bilander's dry yard (12.44 m, 1.02 m above
+the slings; her §4.4, §12.3's "without the two crossing"). The trims are the engine's, not the
+drawing's. Figures and pictures in `docs/dev/TuningNotes.md`, "The settee drawn (package 75, B5.4)".
+
 ### 6.4 What is served
 
 `api/queries.py`: `settee` and `cut_at_mast` in the sail's entry (`_sail_entry`, 333-353), and
