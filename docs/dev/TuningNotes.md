@@ -15696,6 +15696,914 @@ Across the 144 states, the skeleton's figures, the frame and five projected view
 
 **Not run:** the slow tier whole, the captain's trials and the whole logs. No Python under `freesail/` changed in this step: only the drawing, a test file and the record. B3.3's ran at its review (its section, "After the review").
 
+## The bilander (package 75, B4) (2026-11-08)
+
+Her road's steps 1 and 2 (`docs/design/Design-Ship-Bilander.md`, cited as Bil-D, §13): the
+measuring tasks of Bil-D §3.6, each figure read twice by a second method, then her modules,
+`tools/ships/settee.py` (her settee cut to D5 (a), its lines and its checks, pure) and
+`tools/ships/bilander.py`, writing her hull, profile and shape, her masts and yards, her square
+sails, the settee on its yard, the head with the spritsail yard and its sail, the main topmast
+staysail, the storm canvas, the groups and the aliases into `data/ships/bilander.yaml`. Her fits,
+company, people, stores, ground tackle, boat, pumps, hold and description are step 3 (below); her
+`world/ships.py` rows with them; her polar, her helm and truth 7-197 step 4, and her handling on
+the engine's settee, with truths 7-198 and 7-199, step 5 (below, each with its old beside new: her
+file's `clr_x_m`, tuned at step 4, the one figure moved after it was first written). **There is no
+old: her file is new.** Every other file of
+`data/ships/` came out of the generator byte for byte as it was. Everything below was measured on
+the owner's machine, the scripts in the session's scratch (`b4/m1/`, `b4/m2/`), outside the
+repository; the images read are the owner's held copies (Gwyn's PAG3828 at 1560 px, Chapman's IA
+leaf 0141, Adye's p. 155) and the cached Steel 1805 leaves, never copied. Her notes carry sources,
+departures and judgements; what her rules compute from her own keys is printed by the generator's
+report (`her_report()`) and held by her tests (`tests/test_bilander.py`).
+
+### Step 1: the measuring tasks, each by two methods (Bil-D §3.6)
+
+**Task 1, Steel 1805's brig collier.** Tables p. 26 (IA n484; the cached image is the full 2954 x
+3946, despite its file's name) read twice, at full size on one set of crops and at 1.25x on crops
+cut elsewhere, every cell the same; the second method each row's fairness along the stations (the
+second difference against the line through its neighbours: no sign change, no spike). The table
+prints **no rising line and no breadth sweeps** (task 1 asked for the rising line: there is none;
+its "cutting down line" is the floors' inner line, kept as read and not drawn); no `floor_m` is
+written. Folio I's brig column re-read at full size (C 76 3, D 60 8, E 30 0, F 4 5, G 2 11, H 66 3,
+I 83 0, K and L 22 6 and 22 11, M 10 0, N 170, O and P 10 9, Q blank, the keel 9 1/2, 12 and 9 1/2
+in sided and 11 1/2 deep); Folios II, VII, XXXII, LI and LV's brig columns from the cached right
+leaves, each row read beside the coasting sloop's, whose figures the pages note gives, every one
+of those matching. The transcription, facts only, is handed to the session as text (scratch
+`b4/transcription-steel-1805-collier.md`) for `ships-design/pages-steel-1805-collier.md`. The
+arithmetic: the table's dead flat, foremost and after timbers are Folio I's E, F and G to the inch;
+dead flat's main half-breadth doubled is Folio I's moulded breadth; the keel for the tonnage by the
+extreme breadth gives 169.5 tons against 170. **Folio IV (the post, the wing transom) not read**:
+its leaves are not cached, and fetching them is a download nobody approved in this window.
+
+**The collier's length (Bil-D §3.4's conflict), settled at 76 ft 11 in.** The after body's room is
+2 ft from timber 4 to 22; counted four rooms from dead flat to timber 4, as it holds to an inch on
+Steel's 36 (136 ft 11 in against Folio I's 137 ft 0 in) and Steel's cutter (78 ft 0 in exactly), whose
+lengths Folio I prints, the length between the perpendiculars is 30 0 + 8 0 + 38 11. Row C, 76 ft
+3 in outside the stem and the post at the wing transom's height, is shorter, where on the sloop and
+the cutter it is 1 ft 9 in and 2 ft 6 in longer; row C less the stem's 11-in moulding (Folio II,
+read) and a post of about a foot gives about 74 ft, which would stand timber 4 5 ft 1 in abaft dead
+flat, three timbers in five feet; the keel for the tonnage with three-fifths of the extreme breadth
+gives 74 ft 5 in. The stations' length is taken (the stand-in's stations are its own table's): the
+length ratio **0.918** (70.6 over 76.92 ft), Bil-D's 0.92, so nothing is written again; the beam
+ratio 0.847 (19.4 over 22.92 ft). The conflict is the lead's to note.
+
+**Task 2, Gwyn's rig** (the 1560-px image; heights in px above y 961, the masts' feet, Bil-D's
+datum; the first method the eye on ruled strips at 1x, the second each yard's and top's ink run
+through its mast and, for the trucks and the topmast caps, where the mast's ink ends upward):
+
+| Feature | Bil-D (share, px above y 961) | The eye | The ink | Taken |
+|---|---|---|---|---|
+| Fore yard | 0.276 (217) | y 745 | y 741-747, a 214-px run | Bil-D's |
+| Fore top | 0.329 (258) | 703 | 701-707 | Bil-D's |
+| Fore lower cap | 0.396 (311) | 645 | (no run of 30 px) | Bil-D's (5 px) |
+| Fore topsail yard | 0.580 (455) | 497 | 498-503 | Bil-D's (both readings 5-9 px higher, inside the +-10 px) |
+| Fore topmast cap | 0.669 (525) | 435 | (the topgallant mast in the same column) | Bil-D's |
+| Fore topgallant yard | 0.750 (589) | 368 | 370-375 | Bil-D's |
+| Fore truck | 0.85, Bil (667) | 300 | 299 | Bil's 0.85 (both 0.843; Bil's own 665 px is 0.847) |
+| Main dry yard | 0.293 (230) | (misread at 1x) | 726-733, a 183-px run | Bil-D's |
+| Main top | 0.35, Bil (275) | (misread at 1x) | 683-697, a 92-px run | Bil's |
+| Main lower cap | 0.425 (334) | 625 | 623-630 | Bil-D's |
+| Main topsail yard | 0.633 (497) | 460 | 460-468 | Bil-D's |
+| Main topmast cap | 0.721 (566) | 405 | 391 (the topmast's ink ends) | Bil-D's |
+| Main topgallant yard | 0.834 (655) | 302 | 303-308 | Bil-D's |
+| Main truck | 0.95, Bil (746) | 218 | 218 | Bil's 0.95 (both 0.946; Bil's own 743 px) |
+
+Every figure stands within the design's +-10 px (0.3 m); none is moved. **The datum, for the lead:**
+the waist rail between the masts reads at **y 969** (the ink's dark rail line at x 760-910, y
+968-972; the ruled strip the same), 8 px (0.23 m at her scale) below y 961, where the side steps up
+just forward of the main mast (x about 935, the quarterdeck's planksheer beginning there; Chapman's
+plate draws the like step, the raised rail ending just forward of the plate's main mast). Bil-D's "the
+masts' feet at image y 958 against the rail at 961" reads the stepped side at the main mast. Every
+Gwyn height is laid from y 961 as Bil-D has it (the masts' feet); laid from the waist rail proper,
+every rig height, the quarterdeck's rail and the bow's rise would stand 0.23 m higher. Built as
+designed; for the lead.
+
+**Task 3, Gwyn's hull.** The wale (the ink's colours down eight columns, x 760-1150, the black band
+998-1002 to 1019-1028; the eye on the ruled strip the same): its top **39 px** below y 961 and
+**25 px** broad in the waist, against Bil-D's 26 and 20 px (0.76 and 0.59 m), off by more than its
+error: **taken**, the band 1.14 m below the datum's 1.65 to its top and 0.73 m broad (0.50 to -0.23 m
+above her water at midships, against 0.89 to 0.30), carried along the sheer by Bil-D's points (the
+ink at x 700 and 1150 px within 1 and 3 px of the carried band). *Superseded at her review: two
+reference lines mixed; 33 px from the drawn rail ("Her review's mends").* The collier's main wale, scaled,
+lies -0.12 to 0.39 m at dead flat (Folio VII), the check. The quarterdeck's light rail on stanchions
+(its fore end y 932-935 at x 1011-1030, at the taffrail 900-905) stands as Bil-D's 0.84 and 1.65 m
+above y 961; its planksheer, the top of the blue band, reads 1.91-1.97 m above her water at the break
+and 2.68 m at the taffrail, against Bil-D's quarterdeck at side 2.25 and 2.80 (judged): recorded,
+the deck as designed. The stern view (ruled grid at 3x, scaled to her taffrail): the lights' band
+1.72 to 2.91 m, half-spread about 1.22 m, against Bil-D's 1.75 to 2.75 and 1.10 (the top 6 px off,
+the rest within 4): Bil-D's stand; its half-breadth 2.02 m at the wale (Bil-D's 2.05), not drawn,
+her round stern closing to the middle line (her review, below). The side
+steps at x 900-920 px, about x -1.0 to -1.3 m (for the record).
+
+**Task 4, Gwyn's settee.** The yard fitted by least squares on 169 columns of its ink (rms 0.92 px):
+**43.6 degrees**, 566 px long (Bil's 564 and 557), 0.383 of it before the mast (Bil's 0.395); the
+main mast's line fitted on its ink below the top, raking aft 2.5 degrees. The yard crosses the mast
+at y 743, **58 px (1.70 m) below the main top** and 13.5 px (0.40 m) below the dry yard; the eye on a
+ruled grid, 56 px. Bil-D's three readings were 32, about 48 and about 67 px. Recorded beside D5 (a)'s
+2.33 m below the top and 1.02 m below the dry yard; the cut does not move (Bil-D §4.4). The tack at
+y 957 by the eye at 3x: 12 px above the waist rail at y 969 (0.35 m), 4 px above y 961 (0.12 m);
+Bil-D's 0.30 m above the waist rail stands.
+
+**Task 5, Chapman's No. 5** (IA leaf 0141 at 9.79 px a Swedish foot): **the overhang's split
+measured**, by the eye on a ruled strip at 1x (the taffrail at x 124, the post at the water 162, the
+stem at the water 854, the stem head 874: 3.9 and 2.0 Swedish ft) and by the ink's rows (the stern's
+line from x 109 at the rail's height to 137 at the water, the stem's 854 to 864-872: 2.9-3.1 and
+1.0-1.6 ft): both two-thirds or more of the overhang abaft the post; **two-thirds taken** of
+Chapman's 5.0 ft (75.6 less 70.6). Old beside new: the taffrail x -11.52 to **-11.78**, the stem head
++11.52 to **+11.27**; Gwyn's places measured from the taffrail move with it (the quarterdeck's break
+-4.03 to -4.29, its rail's point -8.00 to -8.25, the decks' after ends -11.20 to -11.46), the
+counter's and the stem's offsets carried to the measured overhangs, the head's reach from the stem
+head unchanged (1.48 m), the bowsprit's root at the new stem head. A raised quarter with its rail is
+drawn on No. 5, ending a little forward of the main mast (read). Not read: whether a staysail is
+drawn between the masts, the stem's fore edge, the post and the bowsprit's heel (the plate's head
+and ensign crowd the ends at this resolution).
+
+**Task 6, Adye 1804 p. 155** (IA leaf n178, the owner's held image): the long 3-pounder of 18.6
+calibres, 4 ft 6 in, **7 cwt 1 qr**; the page's proportion of metal to shot, 270, and the calibres,
+4 ft 6 in over a 2.9-in bore, both agree (the second method). Appended to `tools/ships/period.py`
+as `ADYE_LONG_GUN_CWT[3]`; the shared table's 7 cwt, from memory, within a tenth (the checklist).
+
+**Task 7, Steel 1805's brigantine of 10 guns,** Folio XXXII (cached `_0551`, read; the cutter's
+column the check, every figure the pages note's): ports 1 ft 5 in deep and 2 ft 0 in fore and aft,
+their sills 1 ft 6 in above the plank. Her armed fit's ports, 0.50 by 0.30 m on sills the deck + 16
+in, stand under her rail; the brigantine's port on her deck would stand its top 0.16 m over her
+rail at both her ports (the generator's report): the check recorded, her ports as designed.
+
+### Step 2: her file as first written
+
+**The checks of Bil-D §1.4,** raised in words before the file is written and printed by the report:
+her burthen by the old measure 118.0 tons on her waterline and 128.0 on her length taffrail to stem
+head (D6 (a)'s "about 130"); the settee's contract (`settee.check`, below); the spritsail's foot
+1.22 m above her water (`spritsail_yards.cut`'s own check); the fore course's foot 2.79 m above the
+water, 0.89 m clear of the rail at the fore mast; the main topmast staysail's foot clear of the
+settee's yard. Beside them, the sources' checks: Chapman's length overall, 83 ft, puts
+the head 2.25 m beyond the stem head against Gwyn's 1.48 (Bil-D §3.2's check, recorded).
+
+**Her sails as cut:**
+
+| Sail | m2 | How |
+|---|---|---|
+| `fore.course` | 58 | the brig's rule on her 12.44-m yard |
+| `fore.topsail` | 65 | the brig's rule between her yards |
+| `fore.topgallant` | 27 | the same |
+| `main.topsail` | 74 | the same, its foot on the dry yard |
+| `main.topgallant` | 32 | the same |
+| `main.settee` | 73 (73.4) | D5 (a) by `settee.cut` |
+| `fore.topmast_staysail` | 15 | a triangle on its stay from the bowsprit's cap, its head 0.516 of the stay's rise up it as Gwyn draws it |
+| `jib` | 28 | the same from the jib-boom's end, its head 0.674 of the rise |
+| `spritsail` | 33 (32.9) | 14 cloths at the head and foot, 4 1/2 yards deep, to within a metre of the water in Steel's half yards |
+| `main.topmast_staysail` | 64 | Steel's rule as the brig's, the leech cut from 11.94 to 10.44 m so that its foot stands 0.30 m above the settee's yard; the foot 8.74 m to the fore mast (Steel's 8.88) |
+| `fore.storm_staysail`, `main.storm_staysail` | 18, 13 | the brig's pattern, in the sail room |
+
+**Plain sail 372 m2** (Bil-D's "about 380"); her rope's scale on the brig's, the root of 372 over 766,
+**0.697**. **The headsails, 43 m2,** against the design's estimates of about 50 (the fidelity draft)
+and about 63 m2 (rough triangles): Gwyn's heads laid on her stays (Chapman's bowsprit and jib-boom
+end stand higher and longer than Gwyn's, so Gwyn's ratios give less canvas there). They decide rule 1's
+margin (below).
+
+**The settee as cut** (`settee.cut`; heights above the water): tack (1.54, 1.95), throat (1.54,
+3.76), peak (-9.74, 14.65), clew (-9.66, 3.36); slung at (-2.22, 7.39), on the main mast's line as
+filed; 73.4 m2, its centre x -5.43, 6.67 m above the water; the peak 2.04 m (0.088 of the rail
+length, Gwyn's 0.09 +-0.02) and the clew 2.12 m inside the taffrail. **Its yard cut to its head,
+15.68 m** (B5.4's finding: the drawing draws a settee's yard as its head; by Bil-D §4.4's lean), Gwyn's
+564 px (16.55 m) recorded; Bil-D's head 15.67 m on the rail length rounded to 23.04, 15.68 on the
+unrounded. `settee.check` passes on the corners as filed (each figure to the centimetre). Its lines
+on the brig's sizes for the like lines by her rope's scale.
+
+**The settee's yard and the dry yard (B5.4's crossing, for the lead).** The dry yard stands 8.40 m
+above the water, 1.01 m above the settee's sling; the settee's yard passes the dry yard's height
+1.00 m abaft the mast's line (on the fixture 5.6 m abaft the slings), well inside the dry yard's
+half-length of 6.22 m. So by the wind, where the settee's sheet angle and the dry yard's brace sum to
+near 90 degrees, her two spars cross in the drawing as B5.4 measured them (0.03 m apart with her dry
+yard on the fixture). Bil-D §12.3 asks them drawn without crossing; no engine or viewer change is
+built here; the lead's.
+
+**The hull as drawn** (`freesail/ship/form.py`, the report): drawn displacement **215 t** against the
+filed 229 (**-6%**, inside the principles' 15%); drawn 2.65 m deep at the greatest section (x 3.99)
+against her draught of 3.51 m, the collier's keel drawn 2.77 m down (its 10 ft 9 in by the beam
+ratio; principle 7: recorded, never moved). The two port triples' gaps to the drawn side, aft to
+forward, **+0.01 and +0.02 m** (their half-breadths the collier's at the sill, 2.80 and 2.79 m; none
+measured at a port, so reported, none raised).
+
+**The collier at her scale beside her** (the report): its top-timber line at dead flat 1.56 m above
+her water against Chapman's waist rail 1.65; its sheer rail 2.23, 1.63 and 2.49 m afore, midship and
+abaft against her rail's 2.65, 1.65 and 3.30 (the quarterdeck's light rail); its taffrail 3.16 m
+against her 3.30; its stem head 2.53 m against her 2.65 (Folio II); its stern 2.02 m half-broad at
+the top-timber line against Gwyn's 2.05 at the wale. **Its deck at side about 1.50 m above her
+water** (its top-timber line less its 3-in waist, Folio XXXII), against her datum's 0.92: a
+collier's flush deck nearly at the top of the side; Bil-D's datum stands, the check recorded (for
+the lead: Bil-D §2.1 named Folio XXXII as the check on her deck, and it does not hold for a vessel
+with a raised quarterdeck and an open waist; the datum moves every spar height's meaning and the
+deck's wind, so it is not moved on a check).
+
+**The pair check** (`tests/test_profiles.py`'s method, normalised on her own drawn figures, in a
+100-px box, abeam, ahead and astern): her nearest the 64 (12.2, 11.9 and 12.0 px), the frigate-36
+(13.2, 8.8, 10.7), the lugger (14.2, 14.0, 14.8), the razee (15.0, 7.0, 7.3), the brig and the
+merchant brig (17.5, 13.3, 16.9); the threshold 4 px. She is no other hull.
+
+**Her polar on her start figures** (`polar_of`, plain sail; `hull_speed_kn` 10.3, `clr_x_m` +0.40,
+GM 0.66, untuned), beside the brig's:
+
+| | Best in 8 / 15 / 25 kn, at | 60 / 70 / 90 degrees in 15 kn | Beam reach in 8 / 25 kn | `closest_deg`; `beat_deg` 8 / 15 / 25 |
+|---|---|---|---|---|
+| bilander | 3.79 / 6.66 / 9.38, at 100 | 3.62 / 5.11 / 6.62 | 3.76 / 9.31 | 50; 60 / 60 / 60 |
+| brig | 4.57 / 7.92 / 10.97, at 100 | 4.26 / 5.88 / 7.83 | 4.47 / 10.93 | 50; 60 / 60 / 60 |
+
+**Rule 1 holds on her file:** closest 50 degrees and the beat at 60 in every wind, no wider than the
+brig's; her way to windward in 15 kn **1.81 kn at 60 degrees against 1.75 at 70, a margin of 0.06
+kn** (Bil-D's probe on its 50 m2 of headsails: 0.05). Her best speeds stand within 0.05 kn of Bil-D's
+probe (3.82 / 6.70 / 9.43). She is slower than the brig by 1.3 kn on the beam in 15 kn, a deep-laden
+hull under Gwyn's short rig (recorded, not tuned up: no source gives a bilander's speed). Sailed under
+plain sail at 90 degrees in 15 kn (the known truths' `under_plain_sail`): **6.49 kn**, heeling 6.8
+degrees, the rudder at +4.1 degrees (the brig at its tuned `clr_x_m`: 7.59 kn, 7.0 degrees, -1.5); her
+helm is step 4's second knob.
+
+### For the lead (her road's steps 1 and 2)
+
+- **The datum of Gwyn's heights** (task 2): y 961 is the masts' feet and the side's step at the main
+  mast; the waist rail between the masts is y 969, 0.23 m lower at her scale. Built on 961 as
+  designed; laid from the waist rail, every Gwyn height would rise 0.23 m.
+- **The collier's length** (task 1): row C against the stations; the stations' 76 ft 11 in taken,
+  the ratio 0.918 as designed.
+- **The collier's deck** (step 2's report): about 1.50 m above her water against her datum's 0.92;
+  her datum stands.
+- **Her headsails, 43 m2** by Gwyn's heads on her stays, against the design's 50-63: rule 1 holds by
+  0.06 kn; the margin rests on their cut, the first of §9's knobs.
+- **The main topmast staysail** cut 1.49 m short of Steel's leech so that its foot clears the settee's
+  yard by a foot (judgement on the clearance): 64 m2, her lying-to staysail.
+- **The settee's yard and the dry yard cross by the wind in the drawing** (B5.4's 0.03 m), no change
+  built (Bil-D §12.3).
+- **Folio IV** (the collier's post) not fetched: a download not approved in this window.
+- **The quarterdeck's planksheer** reads 1.91-1.97 m at the break against the designed deck at side
+  of 2.25 (judged): recorded, not moved.
+
+### The suites, as run (steps 1 and 2)
+
+- `tests/test_bilander.py`, begun: **23 passed** (her hull, burthen, profile and marks, the collier
+  scaled and its transcription's own checks, her stern and head, her ports, her masts and rig, her
+  settee and its lines, `settee.py`'s checks each raised, her spritsail and staysails, her groups,
+  the generator's report and her file byte for byte, her notes, her class's words, her file loading
+  rated and polared, her polar against her sailed beam reach, rule 1's clause drafted).
+- The generator into scratch and then into `data/ships/`: sixteen committed files byte for byte,
+  hers the seventeenth; `tools/check_viewer_guns.py data/ships/bilander.yaml` clean (no armament
+  yet; two empty ports a side).
+- The suites that read every ship file, with hers in `data/ships/`, one run (`-n 4`): **3,880
+  passed, 23 failed**, every failure her file met by a list, a count or a case written before a
+  committed file had a settee, a round stern or her shape, and none in her lines' arithmetic:
+  `tests/test_profile.py`'s hook test (her `MODULE_FILES` row, the parent's commit);
+  `tests/test_stores.py`'s ration over every file (her company is step 3);
+  `tests/test_schooner_mast.py`'s "sixteen files" (the shared guards' commit); and twenty in
+  `tests/test_view_geometry.py`, B5's: the per-file tables keyed by name (the closed hull's
+  `RIGHTLY_WITHOUT`, the bulkheads' table, wanting her quarterdeck's fore end, and four keyed
+  dicts), the transom's and galleries' cases meeting the first round stern, the lights' views, the
+  booms' and the gaff sails' cases, the lines brought down to the rail and to the stem head
+  meeting her settee's sheet and her stays, and `test_no_committed_file_carries_a_settee_so_none_draws_one`,
+  which her file turns. Each is B5.6's or the shared guards' to take her in (Bil-D §12.3, §13 step 6).
+
+### Step 3: her guns, company and stores (Bil-D §5-§8)
+
+Her fits, the quarter bill set against the armed one, her company of eight and her wardroom file
+(`data/people/bilander.yaml`), her ground tackle, boat, pumps, hold and stores, her description in
+her file and her rows in `freesail/world/ships.py` (`DESCRIPTIONS["bilander"]`; "a bilander",
+"bilander", "a billander", "billander"). **Old beside new: none**, her file being new; every other
+file of `data/ships/` came out of the generator byte for byte, and her polar is unmoved (the guns,
+the company and the stores change no figure `polar_of` reads).
+
+**The fits.** `armament.default: unarmed`, so that `load_ship` of her file makes no battery; one
+fit, "armed merchant": four long 3-pounders (Adye 1804 p. 155, 4 ft 6 in, 7 cwt 1 qr; three men to
+the pair of a number, Falconer 1780 QUARTERS), No. 1 at x +4.00 on its sill 1.40 m and No. 2 at
++1.00 on 1.34, each on its port's triple to the centimetre; four half-pounder swivels on the
+quarterdeck rail, `swivel.1.*` at x -5.50 and `swivel.2.*` at -9.00, each at the rail's height at its
+x, **2.63 and 3.02 m** (Bil-D §5.2's 2.66 and 3.05 were on the rail before her step 1 moved the
+taffrail aft). The magazine the merchant brig's: 104 cartridges of 1 lb for the 3-pounders and 176
+of 4 oz for the swivels, 80 round and 16 grape of 3 lb and 160 half-pound balls, one barrel below,
+no exercise charges; the swivel's 4 oz is the engine's half until SW-1 enters Table No. 29's 2 oz.
+The builder's checklist: `tools/check_viewer_guns.py data/ships/bilander.yaml` clean, "8 guns: 4
+port, 4 rail", no empty port, no note, every weight on its pattern. **The broadside by 70's rule
+8 lb** (`far_ship`: one side's two 3-pounders and every gun off the broadside, all four swivels),
+against Bil-D §5.3's 7. **The lee ports** on the armed fit by 7-190's form: No. 2 shuts at **21.70
+degrees** of heel alone (sill 1.34 m, half-breadth 2.80 m at it), No. 1 at 23.11; Bil-D §10's 20.8
+was on a half-breadth of 2.92. Unarmed by default, she has no line in 7-190.
+
+**The company, eight** (D43): the master and the mate (posts), fore top 2, main top 2, afterguard 1
+(the boy, the messenger), idlers 1 (the cook); no forecastle; the merchant brig's shares (0.70,
+0.20, 0.10); the english list. **The muster at seed 7:** her five seamen by the shares four able and
+one ordinary; the tops are filled first (`crew/muster.py`, `FILL_ORDER`), so the fore top is two
+able, the main top an able and the ordinary, and the afterguard's one hand **able**: the boy, drawn
+from the afterguard wanting `ordinary` and finding none, is that able seaman (`world/people.py`
+takes the station's hand). Shares of 0.80 able and 0.20 landsmen would muster four able topmen
+and a landsman boy, the merchant brig's boy's rating; built as designed, for the lead.
+
+**`Quarters.beat` on the armed fit** (seed 7, off the Lizard, `tests/test_bilander.py`), her six
+hands off the quarterdeck:
+
+| | Trimmers | Helm | Powder | Gun crews (wanted / manned) | The log |
+|---|---|---|---|---|---|
+| Unarmed (her default) | 4: the topmen | 1: the afterguard's hand, the boy | 1: the cook | none | "no gun crews manned, the trimmers 4, the helm 1, the powder 1." |
+| Armed merchant | 2: a topman of each top | 1: the boy | 1: the cook | No. 1 3 / 2 (a fore and a main topman), No. 2 3 / 0, each swivel 1 / 0 | "one gun crew manned, the trimmers 2, the helm 1, the powder 1. Not hands enough for every gun: the swivels and No. 2 gun stand unmanned." |
+
+One gun, short by a man, as Bil-D §5.4 expected ("one gun or none"); recorded as the period's
+numbers give it, not forced.
+
+**Her requests at eight, first seen** (step 5 measures every one): her sailed beam reach in 15 kn
+(the known truths' harness) now sets plain sail by her company, where at her step 2 her file had
+none. The watch alone, three hands, takes the sails in turn ("Setting plain sail: not hands enough
+for all at once; the watch takes the sails in turn"): in 1,200 s the foresail, the settee and the
+fore topsail set, the main topsail sheeted, 1.36 kn. All hands called: each square sail loosed in
+turn (the foresail at 104 s, the settee at 298, the fore topsail at 432, the main topsail at 701, the
+fore topgallant at 971, the main topgallant at 1,241), **plain sail set by about 1,700 s**; then 800
+s trimmed: **6.51 kn**, heeling 6.84 degrees, leeway 2.3 (6.49 kn at her step 2). Her test sails it
+so (called all hands, 1,800 s to set sail). Recorded, not tuned (Bil-D §16 risk 7).
+
+**The ground tackle**, the house's rule on 128 tons, 19.4 ft and 11.5 ft: two bowers of 6.4 cwt
+(330 kg) on 9 1/2-in hemp, the best bower's two cables spliced, a kedge of 40 kg on 5 in; no sheet or
+stream under 200 tons. Steel 1794's Navy rows (the brigs of 200 tons, three anchors of 12 cwt; the
+cutter, three of 10) give 6 cwt to the hundred tons, **7.7 cwt** on her, against the house's 6.4:
+the check, in her note and the report. **The boat** the long-boat, 18 ft by Luce's rule on 75.6 ft
+at the small vessel's factor, six oars, a crew of seven by the rule (one boat: judgement; Gwyn draws
+none). Two hand pumps; the hold 64 tons. **The stores:** water 3 tons (eight men two months at a
+gallon a day is 1.9 tons at 252 gallons to the ton), provisions 60 days, cordage 80 fathoms, shot
+plugs 2, a spare topsail yard; the sail room a second fore topsail and jib and the two storm
+staysails; the Navy's ration (`tests/test_stores.py`).
+
+**Her description.** In her file, by SW-4's form: rig "a bilander", what "a bilander, a merchantman
+under a settee main, deep laden", `fit: unarmed` (her default, so a far ship of hers carries no fit:
+`vessel_from_spec` gives `fit` ""), `roles: [merchant]`. Rank 1 by her words and her file; no man
+of war's word. Her role by `brains.sub_type_role` (B2b): the merchant's with no intent, on a
+passage, homeward and on a station; the intent's own where it names one (prizes the privateer's, a
+ground the fisherman's, a letter the packet's, a convoy the commodore's); her own World's captain
+the merchant's (`own_sub_type_role`). A role she does not take is refused: "'kings-ship' is no role a
+bilander takes; her file gives a bilander the role merchant."
+
+### For the lead (her road's step 3)
+
+- **The boy mustered an able seaman.** The design's shares (0.70, 0.20, 0.10) on her five seamen
+  give four able and one ordinary; the tops are filled first, so the afterguard's one hand, whom the
+  boy is drawn from, is able (the file's `ordinary` finds none there). Built as designed. Shares of
+  0.80 able and 0.20 landsmen would muster four able topmen and a landsman boy, as the merchant
+  brig's boy is rated.
+- **Her requests at eight** are slow by her company, not by any rule tuned for her: plain sail
+  about 1,700 s with all hands called, and the watch of three alone takes the sails in turn. Her
+  sailed beam reach's test now calls all hands and waits 1,800 s (7.2 s on this machine alone,
+  above the fast tier's 5 s).
+- **Her description files `fit: unarmed`** beside `roles: [merchant]`, where Bil-D §8 said "no fit
+  word": SW-4's form and the guards in `tests/test_profile.py` and `tests/test_subtypes.py` want both
+  on every index row, as the *Neufchatel*'s met; her default, so a far ship of hers carries nothing
+  new.
+- **The guards her rows meet** (not hers to move; the shared guards' commit):
+  `tests/test_neufchatel.py::test_her_row_sails_by_her_first_role_and_no_other_row_moves` wants her
+  row in `ROLE_BY_INTENT` (measured: merchant, merchant, merchant, merchant, privateer, fisherman,
+  packet, commodore) and her file in its `own_sub_type_role` table (`bilander.yaml`: merchant);
+  `tests/test_schooner_mast.py`'s sixteen files are seventeen.
+
+### The suites, as run (step 3)
+
+- `tests/test_bilander.py`: **45 passed** (her step 2's 23 and step 3's 22).
+- The generator into scratch, then into `data/ships/`: sixteen committed files byte for byte, hers
+  the seventeenth; `tools/check_viewer_guns.py data/ships/bilander.yaml` clean.
+- With her file, her people file and her rows in: `test_bilander`, `test_profile` (her
+  `MODULE_FILES` row made, uncommitted, for the parent's commit: the hook test passes with it),
+  `test_subtypes`, `test_neufchatel`, `test_wardroom`, `test_people`, `test_stores` (her ration:
+  passes), `test_lee_ports`, `test_check_viewer_guns`, `test_ships`, `test_captains`,
+  `test_brains`, `test_magazine`, `test_in_world`, `test_profiles`, `test_hull_form`,
+  `test_ship_particulars`, `test_schooner_mast`, `test_harbour`, `test_driver`, `test_view_action`,
+  `test_viewer_action` and `test_rig_classing`, one run (`-n 4`): 1,181 passed, 4 failed, 1
+  xfailed. Two of the four were the byte tests (`test_ship_particulars`, `test_profiles`' 7-185),
+  meeting a note of hers changed during the run; the generator rerun, the byte tests, her file,
+  `test_profile` and the two guards again: 287 passed, **the two guards above failing**, and no
+  other. `tests/test_view_geometry.py` (B5's) not run again: her step-2 cases are its
+  B5.6's to take her in, and her default fit is unarmed.
+
+### Step 4: her polar, the knobs, her helm and truth 7-197 (Bil-D §9, §14)
+
+**One figure of her file moved, by her own tuning: `clr_x_m` +0.40 to +2.25**, its note saying so
+and `hull_speed_kn`'s saying it was kept; the module's `CLR_X_M` and a report line beside it
+(`clr_x_m +2.25 as tuned for her helm, against her start, the brig's 0.5 m as a share of her
+waterline, +0.40.`). Her file regenerated by `py tools/gen_ships.py` into scratch, the figure and
+the two notes its only difference; every other file of `data/ships/` byte for byte as it was
+(`cmp` of all sixteen). The scripts are in the session's scratch (`b4/m4/`), outside the
+repository. Her helm is read in the known truths' form (`under_plain_sail`'s settle, the heading
+`360 - off`) with her eight called first and 1,800 s to set sail (`settle(..., sail_wait=1800)`;
+the harness's 400 s sets her courses and fore topsail only).
+
+**The knobs, each beside its start and its bound** (Bil-D §9, in its order):
+
+| Knob | Start | Bound | As built | Measured |
+|---|---|---|---|---|
+| the headsails' cut | 43 m2: Gwyn's heads on her own stays (0.516 and 0.674 of the stays' rise), the leech upright, by `stay_sail_cut`'s rule | "only by its sources: her stays as rigged" | **kept** | no source cuts them otherwise; rule 1 holds on them by 0.06 kn |
+| `clr_x_m` | +0.40 (the brig's 0.5 m as a share of her waterline) | none given: "for the helm" | **+2.25** | below |
+| `hull_speed_kn` | 10.3 (D24 (a): the brig's 11.5 kn by the root of the waterlines) | 9.8-10.8 | **10.3, kept** | at 9.8 / 10.3 / 10.8: closest 50 and the beat 60 in every wind at each; the beat's margin 0.069 / 0.062 / 0.064 kn; her best 3.78 / 3.79 / 3.80 (8 kn), 6.58 / 6.66 / 6.72 (15), 9.18 / 9.38 / 9.57 (25); nothing asks a move |
+| brace limits | the brig's, level for level | "never without a source" | **kept** | no source gives hers |
+
+**Her polar** (`polar_of`, plain sail, the same on every machine; `clr_x_m` is not read by it, so
+this is her step 2's polar), beside the brig-sloop's and the merchant brig's, which are one polar
+to the hundredth (the merchant brig sails the brig-sloop's hull, spars and sails, her file's head
+note says so):
+
+| | 50° | 60° | 70° | 80° | 90° | 100° | 120° | 150° | 180° | best, at | `closest_deg`; `beat_deg` 8 / 15 / 25 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| hers, 8 kn | 1.06 | 1.94 | 2.77 | 3.42 | 3.76 | 3.79 | 3.56 | 3.04 | 2.72 | 3.79, 100° | 50; 60 / 60 / 60 |
+| hers, 15 kn | 1.98 | 3.62 | 5.11 | 6.16 | 6.62 | 6.66 | 6.33 | 5.55 | 5.01 | 6.66, 100° | |
+| hers, 25 kn | 3.30 | 5.88 | 7.90 | 9.01 | 9.31 | 9.38 | 9.07 | 8.35 | 7.75 | 9.38, 100° | |
+| the brig-sloop and the merchant brig, 8 kn | 1.40 | 2.28 | 3.19 | 3.98 | 4.47 | 4.57 | 4.38 | 3.46 | 3.11 | 4.57, 100° | 50; 60 / 60 / 60 |
+| the same, 15 kn | 2.62 | 4.26 | 5.88 | 7.16 | 7.83 | 7.92 | 7.55 | 6.32 | 5.73 | 7.92, 100° | |
+| the same, 25 kn | 4.34 | 6.89 | 9.10 | 10.44 | 10.93 | 10.97 | 10.64 | 9.47 | 8.84 | 10.97, 100° | |
+
+Her way to windward (the speed by the cosine of the angle): in 8 kn 0.970 at 60° against 0.947 at
+70° (margin 0.023 kn); in 15 kn **1.810 against 1.748 (0.062)**; in 25 kn 2.940 against 2.702
+(0.238); the brig-sloop's 0.049, 0.119 and 0.333. **Rule 1 holds:** her `closest_deg` 50 and
+`beat_deg(15)` 60, no wider than the brig's (truth 7-197, pinned whole in her tests). "Closer" is
+not pinned, as Bil-D §9 has it. She is 1.2 kn slower than the brig abeam in 15 kn (recorded, not
+tuned up).
+
+**Her helm, old beside new** (`clr_x_m`, the one knob moved; weather helm in degrees, positive to
+weather; sailed under plain sail in 15 kn at seed 7, the yards and sheets trimmed; truth 6's form
+abeam: plain, the headsails taken in, the settee taken in; truth 10's form, tacked from 292.5°
+close-hauled at the end of the settle; truth 12's form, hove to from close-hauled at 5 kn, the
+window from +300 s to +900 s):
+
+| `clr_x_m` | 60° | 67.5° | 78.75° | 90° | 112.5° | 135° | truth 6's form | tacked (truth 10's form) | hove to (truth 12's form) |
+|---|---|---|---|---|---|---|---|---|---|
+| +0.40 (start) | −12.24 | −7.47 | −4.98 | −4.06 | −1.92 | −0.74 | −4.06, −2.48, −6.63 | 572 s, 193 m to windward | 64.0-70.8°, at most 2.51 kn |
+| +1.0 | −9.00 | −5.27 | −3.48 | −2.85 | −1.20 | −0.49 | | | |
+| +1.5 | −6.40 | −3.58 | −2.34 | −1.93 | −0.65 | −0.33 | | | |
+| +2.0 | −4.00 | −2.05 | −1.29 | −1.09 | −0.14 | −0.18 | | | |
+| **+2.25 (as built)** | **−2.86** | **−1.32** | **−0.80** | **−0.69** | **+0.10** | **−0.11** | **−0.69, +0.74, −2.83** | **512 s, 223 m** | **58.6-64.6°, at most 2.87 kn** |
+| +2.5 | −1.73 | −0.63 | −0.32 | −0.30 | +0.33 | −0.04 | −0.30, +1.11, −2.39 | 530 s, 241 m | 53.4-64.8°, 1.53 kn |
+| +2.75 | −0.72 | −0.01 | +0.13 | +0.07 | +0.55 | +0.02 | | | |
+| +3.0 | +0.31 | +0.68 | +0.58 | +0.42 | +0.77 | +0.09 | +0.42, +1.80, −1.59 | 514 s, 242 m | 0.4-73.8°: head to wind |
+| +3.25 | +1.26 | +1.31 | +1.01 | +0.77 | +0.97 | +0.15 | +0.77, +2.13, −1.20 | 501 s, 193 m | 0.3-122.0° |
+| +3.5 | +2.35 | gripes (13.4°, 1.72 kn) | +1.41 | +1.10 | +1.17 | +0.21 | | | |
+| +4.0 | gripes (19.0°, 0.69 kn) | +3.04 | +2.20 | +1.73 | +1.55 | +0.32 | | | |
+| the brig-sloop | +5.77 | +4.37 | +2.36 | +1.57 | +1.49 | +1.39 | | | |
+| the merchant brig (all hands called) | +11.66 | +5.00 | +2.45 | +1.59 | +1.40 | +1.46 | | | |
+
+**Her heave-to across the knob** (Ext §5.7's measure on her settle, below, the settee kept by the
+driver rule, as built; the lie from +300 s to +900 s and the mean headway there):
+
+| `clr_x_m` | 10 kn | 15 kn | 20 kn | 25 kn |
+|---|---|---|---|---|
+| +0.40 | | 64.2°, 1.85 kn ahead | 64.3°, 2.46 | |
+| +1.0 | | 63.6°, 1.51 | 63.6°, 2.01 | |
+| +2.0 | | 65.1-65.4°, 0.95 | 62.7-63.6°, 1.14 | |
+| **+2.25** | **62.8-67.3°, 0.49** (up to 46.7° at +150 s) | **63.9-64.2°, 0.72** | **63.9-64.0°, 0.92** | **63.5-64.0°, 1.09** |
+| +2.5 | 62.4-82.3°: past seven points | 61.4-63.1°, 0.21 | 62.0-62.1°, 0.28 | 61.8°, 0.36 |
+| +2.75 | | 61.2-75.9°, sternway 0.43 (37.3° at +150 s) | 61.2°, sternway 0.51 | |
+| +3.0 | | 62.0-72.5° (16.8° at +150 s: head to wind) | 60.8°, sternway 0.81 (13.4° at +150 s) | |
+| +3.25 | | 60.3-60.6°, sternway 0.81 (8.7° at +150 s) | 65.2-124.7°: fallen off | |
+
+- **Why +2.25.** Bil-D §9's knob is "for the helm", and her file's note at her start said how the
+  house tunes it: "a little weather helm close-hauled and a few degrees on a beam reach in 15 kn".
+  At her start she carried lee helm on every point (12.2° at 60°, 4.1 abeam), which neither half
+  allows. Balance close-hauled wants about +3.0, and there, hove to, she comes head to wind by +150
+  s and makes sternway; from +2.75 she makes sternway hove to; at +2.5 she falls off past seven
+  points hove to in 10 kn. **+2.25 is the most weather helm her heave-to keeps her lying to within
+  the heave-to's four to seven points in 10 to 25 kn** (Bil-D §14 pins that test; *superseded at
+  her review: forced round hove to in 8 kn, +2.0 taken, "Her review's mends"*); there she
+  carries 2.86° of lee helm at 60°, 1.32° at 67.5° and 0.69° abeam, truth 6's form holding (the
+  headsails in, her helm to weather; the settee in, to lee). The design's lean (the knob, for the
+  helm, the house's way) is built so, the heave-to its bound; the house's "little weather helm
+  close-hauled" is not reached on her rig without losing her heave-to (for the lead, below). Her
+  drawn lateral plane's centroid stands at x −0.23 (her keel, stem and stern lines as filed): the
+  figure is the engine's balance of her sail plan, not a drawn point: her plain sail's centre by
+  its areas and centres as filed stands at x +3.06 (her fore mast 0.148 of the waterline from the
+  stem with three square sails and both headsails before it, her settee's centre at −5.4), where
+  the brig-sloop's stands at +0.66 against her `clr_x_m` of +0.5 (measured here).
+- **Her tack and her heave-to moved with it** (step 5's figures are at +2.25): tacked in 512 s
+  against 572 at her start in truth 10's form; at her settle (below) the tack's ticks within 5 s of
+  her start's (31, 89, 148 and 309 s against 36, 94, 153 and 314 in 15 kn); the wear's within 2 s.
+- **Truth 7-197** (`tests/test_bilander.py`, drafted for Phase 5), whole: her hull against Chapman
+  and Lloyd's, her burthen, her waist rail; her settee to D5 (a) and Gwyn; her rig to Gwyn's shares
+  and Chapman's yards, a dry yard and no royal; her company of eight with two in the main top;
+  `heave_to_aback` on the main alone; her fits; her description at rank 1, "merchant" in its what;
+  rule 1. **One clause read as built:** the yard is its head, 0.68 of the rail length (Gwyn's 534 px
+  of 785), where Bil-D §14 wrote "the yard 0.72 of the rail length" (Gwyn's 564 px) before her step
+  2 cut it to its head on B5.4's finding (16.59 to 15.68 m). Rule 1's clause stands as measured: rule
+  5 did not take D44 (c) (step 5), so it is not measured again on a settee row.
+- **Her old test moved:** her step 2's `test_rule_1_she_lies_as_close_to_the_wind_as_the_brig`
+  became `test_her_polar_as_measured_and_tuned_beside_the_brig_sloops_and_the_merchant_brigs` (its
+  margin of 0.06 kn kept, her rows and the brigs' beside it, the hull speed's band) and truth 7-197's
+  rule-1 clause; her sailed beam reach's test gained her helm as tuned and truth 6's form (renamed
+  `..._and_her_helm_is_as_tuned`), 6.52 kn sailed where it was 6.51 at +0.40.
+
+### Step 5: her handling on B3.3's settee (Bil-D §12.2, §14; Ext §5)
+
+On the tree with B3.3 (994bf966), B5.4 (1bdb0546) and B3.4b (52fad521) in (`claude/pkg-75` at
+7fe5a877, her steps 1 to 4 uncommitted beneath it). Nothing of the engine was changed. The scripts
+are in the session's scratch (`b4/m5/`), outside the repository: B3.3's own measures (`rule5.py`,
+`measure.py`, `untried.py`) run on her file unchanged in their worlds and orders.
+
+**Her settle** (judgement, two changes from B3.4's): B3.4's world (seed 7, the wind from the north,
+no gusts, 292.5° at 5 kn, plain sail braced sharp up, 2,400 s, trimmed every two minutes after 300
+s), with her eight called first and kept up, and the trim ordered only while her hands are free,
+the settle ending once their work in hand is done. Her watch of two or three sets her plain sail
+one sail at a time: all hands set it by 1,647 s in 15 kn and 1,802 s in 20 (the jib last; 1,442 s in
+8 kn, 1,965 s in 25). Trimmed every two minutes regardless, her eight fall behind: each "trim sails"
+queues three sheets and the yards, the trims pile up (the settee's sheet trimmed ten times over
+from one backlog), and a heave-to ordered after them waits on them ("Not hands enough on deck to
+heave to; the hands are trimming the mainsail.", at 891 s in 20 kn); so the trim waits for free
+hands. The settle ends at 2,580 s in 15 kn and 2,535 s in 20, 67.6° and 67.3° off at 4.17 and 4.60
+kn, her helm 1.27° to lee and 3.30° to weather.
+
+**Hove to, both ways (Ext §5.7; the lead's ruling on Ext §14 item 3).** Her main topsail to the
+mast by her file's key ("Braced the main topsail aback; braced up the other yards; hauled aft the
+head sheets; helm a-lee."), her courses hauled up, and the settee by the driver rule, kept, its
+sheet eased ("Hauled up the courses; eased off the mainsail sheet."), or, the other way
+(`SETTEE_KEPT_HOVE_TO` false), clewed up aloft ("... clewed up the mainsail."):
+
+| | +150 s | +300 s | +300 s to +900 s | through the water; ahead | the fixture (B3.3) |
+|---|---|---|---|---|---|
+| kept, 15 kn | 59.9° | 63.9° | 63.9-64.2° | 1.04 kn; 0.72 | 63.4-63.5°, 1.76; 1.59 |
+| kept, 20 kn | 61.6° | 64.0° | 63.9-64.0° | 1.36; 0.92 | 63.5°, 2.35; 2.12 |
+| clewed up, 15 kn | 65.0° | 68.7° | 67.8-68.6° | 1.25; 1.08 | 68.0-93.3° |
+| clewed up, 20 kn | 72.7° | 66.6° | 66.6-66.7° | 1.60; 1.35 | 68.4-98.4° |
+| kept, 10 / 25 kn | 46.7° / 62.1° | 67.5° / 63.5° | 62.8-67.3° / 63.5-64.0° | 0.70; 0.49 / 1.66; 1.09 | |
+| clewed up, 10 / 25 kn | 43.7° / 73.4° | 3.0° / 66.7° | 3.1-88.4°: head to wind, then off / 66.7° | 0.81; sternway 0.48 / 1.98; 1.66 | |
+| at her start (+0.40), kept, 15 / 20 kn | 67.6° / 68.3° | 64.2° / 64.3° | 64.2° / 64.3° | 1.93; 1.85 / 2.57; 2.46 | |
+| at her start, clewed up, 15 / 20 kn | 79.1° / 99.4° | 100.2° / 91.8° | 90.5-179.7° / 91.9-179.9°: to a run | | |
+
+- **The driver rule stands on her file.** Kept, she lies to inside four to seven points in 10 to 25
+  kn; clewed up, inside the band in 15 to 25 kn at her `clr_x_m` as tuned, head to wind and off in
+  10, and at her start's +0.40 off to a run, as the fixture fell off. So her figures do not overturn
+  the fixture's (her §12.2 item 5): no B3 follow-up. Kept, she goes slower through the water than
+  the fixture did (1.04 and 1.36 kn against 1.76 and 2.35), about the brig as filed (1.37 and 1.76):
+  the forereach D1 (c) counted against a standing settee is the fixture's, not hers. Her test pins
+  both ways as measured (`test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways`).
+
+**The sheet's block (Ext §5.9; the lead's ruling on Bil-D §17 lead item 4).** Her settee's foot by
+its corners, tack to clew, 11.29 m, where the loose-footed proxy gives 6.84 (0.8 of the root of 73
+m2); the block a fathom abaft the clew at the lug's floor (8°) and abreast of it at x −11.47, **0.31
+m inside her taffrail** (x −11.78): within the fathom. Her design's 0.03 m (and the proxy's 4.45 m)
+were on its taffrail at x −11.52, before her step 1 moved it 0.26 m aft: old beside new. The proxy's
+block would have stood at x −7.06, 4.72 m inside. Her clew 2.12 m inside the taffrail (her design's
+1.86). The physics' lateral offset for her settee (half of 0.8√A, `physics/sails.py`) is 3.42 m
+against her cut's half foot of 5.64 (39% less): unchanged under the gate, for the lead as before.
+
+**Rule 5 against the tables on her file (Ext §5.10; B3.3's `rule5.py` on her file).** At rest in
+15 kn, one sail set at a time: the settee held on its weather side at its floor by its sheet, clear
+of the mast (its yard on that side) and against it (on the other); the main topsail on a square yard;
+the incidence on the back face swept. Per square metre of the sail's file area (73 and 74 m2):
+
+| Incidence | Settee clear, kN/m2; coefficient | Against the mast | Main topsail | Settee ÷ topsail, kN/m2: clear; against |
+|---|---|---|---|---|
+| 20° | 0.0242; 0.726 | 0.0162; 0.484 | 0.0073; 0.192 | 3.32; 2.22 |
+| 25° | 0.0348; 1.041 | 0.0232; 0.694 | 0.0181; 0.474 | 1.92; 1.28 |
+| 30° | 0.0408; 1.223 | 0.0272; 0.815 | 0.0319; 0.836 | 1.28; 0.85 |
+| 35° | 0.0429; 1.285 | 0.0286; 0.857 | 0.0418; 1.096 | 1.03; 0.68 |
+| 40° | 0.0403; 1.208 | 0.0269; 0.805 | 0.0468; 1.227 | 0.86; 0.57 |
+| 45° | 0.0383; 1.145 | 0.0255; 0.764 | 0.0468; 1.226 | 0.82; 0.54 |
+| 60° | 0.0371; 1.110 | 0.0247; 0.740 | 0.0455; 1.192 | 0.82; 0.54 |
+| 75° | 0.0393; 1.176 | 0.0262; 0.784 | 0.0461; 1.208 | 0.85; 0.57 |
+
+- The coefficients are the fixture's and Ext §5.10's columns to the third place. In the engine's
+  load a square metre her settee presses the main mast harder than her main topsail held aback near
+  its trim, below about 35° clear of the mast and 27° against it, and less laid flat aback; the main
+  mast's `load_kn` a square metre is the sail's force a square metre in every case.
+- **In her own tack** at seed 7 from her settle, every tick from helm's a-lee to "Tacked": her
+  settee never aback in 15 kn or 20 (its single sheet lies it to leeward of the wind; against its
+  mast but drawing); her main topsail aback 39 ticks in 15 kn (0.051 kN/m2 at the most, 0.034 the
+  mean) and 36 in 20 (0.084, 0.055). **A shift close-hauled**, her head turned at once toward the
+  wind by one point (the deck's wind 42.7°) and by two (33.7°): neither her settee nor her main
+  topsail is aback (the settee's chord 27°, flat at two points, 0.0048 kN/m2; the topsail's 29°).
+- **So, as on the fixture:** the case that holds is the settee held aback near its trim, and
+  neither case the design named puts it aback in the engine. By the lead's ruling on Ext §14 item 4
+  (the case that holds pinned and named; D44 (c) only if neither holds), the clause is pinned on
+  that case and named so (`test_rule_5_on_her_file_holds_held_aback_near_its_trim_and_never_in_stays`,
+  and 7-198's "never aback in stays"): **D44 (c)'s `settee` row is not taken** (judgement on the
+  design's lean, for the lead: whether the static case counts, as B3.3 left it). No B3 follow-up;
+  `data/sail_classes.yaml` and `tests/test_sails.py` unmoved; her polar, §9's table and 7-197's
+  rule-1 clause therefore not measured again on a row.
+
+**Truth 7-198 on her file** (drafted on the fixture by B3.3; hers now, in her tests, for Phase 5):
+
+| | 15 kn, hers | 15 kn, the fixture | 20 kn, hers | 20 kn, the fixture |
+|---|---|---|---|---|
+| helm's a-lee + 1 tick | set at its floor, 8°; "haul aft the mainsail sheet and brace the ourse to leeward" | the same | the same | the same |
+| "Main-topsail haul." | 31 s | 40 s | 28 s | |
+| "Rise fore tack and sheet. Let go and haul. Draw jib; trim aft the head sheets." | 89 s | 97 s | 93 s | 96 s |
+| the swing ended, the yard lowered | 148 s | 155 s | 160 s | 161 s |
+| down, one spell | 161 ticks (120 by 1.342) | 159 (1.33) | 182 (1.517) | 181 (1.51) |
+| hoisted; "Tacked" | 309 s; 309 s | 314 s; 318 s | 342 s; 342 s | 342 s; 342 s |
+| at +400 s | the larboard tack, 67.4° off, 4.44 kn | 67.7° | 66.5°, 5.52 kn | 66.8° |
+| her settee aback | never | never | never | never |
+
+- **Rule 2's hands** (D46 (d), "and by how many hands"): **six of her eight** at her dip, the tack's
+  all hands (her two fore topmen, her two main topmen, the afterguard's hand and the cook); the master
+  and the mate on the quarterdeck.
+- B3.4b's words measured again on her file (her §12.2 item 3): "Main-topsail haul." and then "Rise
+  fore tack and sheet. Let go and haul. ...", as on the fixture.
+
+**Truth 7-199 on her file:**
+
+| | 15 kn, hers | the fixture | 20 kn, hers | the fixture |
+|---|---|---|---|---|
+| lowered at "up helm" | + 1 tick, "Up helm; lower the mainsail; brace in the after yards." | + 1 tick | + 1 tick | + 1 tick |
+| the wind across her stern | 57 s | 66 s | 48 s | 55 s |
+| hoisted, the wind on the new side | 153 s, 121.4° | 152 s, 99.6° | 168 s, 120.4° | 168 s, 133.6° |
+| "Wore" | 472 s | 478 s | 516 s | 520 s |
+| at +600 s | the larboard tack, 67.5° off, 4.54 kn | 67.3° | 67.4°, 5.79 kn | 67.3° |
+
+**The untried manoeuvres (Ext §5.4), each run once on her file** from her settle in 15 kn
+(B3.3's `untried.py`): every one to its end with the settee as B3.3's guards have it; **no guard
+missing, no B3 follow-up.**
+
+| Manoeuvre | Her file |
+|---|---|
+| Box-haul | "Lower the mainsail! Square away the after yards! Brace abox the head yards!" at 44 s; her head through the wind by the bow at 53 s (so the fixture's and the brig's as filed); "Wind aft" at 125 s; "Dipped the mainsail; hoisted on the starboard side, to leeward of the mast." at 197 s, as she comes to; box-hauled at 237 s, 67.5° off on the larboard tack at 4.57 kn |
+| Wear short round | lowered at once; "Wind aft" at 58 s; "Hoisted the mainsail on the starboard side, to leeward of the mast; the wind is past the stern." at 153 s; worn at 161 s |
+| Box off, from coming to | boxed off at 116 s on her tack, the settee on its lee throughout |
+| Box off, from aback (her head 25° across) | lowered with the mainsail at once, hoisted on her new lee and boxed off at 157 s, the larboard tack, 72.1° off at 4.61 kn at +900 s |
+| Lie a-try | "Took in the foresail, the fore topsail, the fore topgallant, the main topgallant, the mainsail and the jib." at 236 s; "Lying a-try under the main topsail and the staysails, helm a-lee." at 294 s; the settee clewed up aloft; 59.3° off at 2.04 kn at +900 s |
+| Scud | scudding at 148 s, the settee standing; 165° off at 4.76 kn |
+| Back and fill | "Hauled up the foresail, the fore topgallant and the mainsail." (clewed up aloft); head to wind at about 98 s and to a run by 321 s; "Backed and filled" at 638 s; fallen off before the wind at 1,051 s and taken aback at 1,157 s: the engine's backing and filling, as the fixture and the brig as filed (B3.3, for the lead) |
+| Fill away (from hove to 600 s) | filled away at 60 s, the settee's sheet drawn on her lee |
+| Come to an anchor (Carrick Road, 12 kn) | clewed up aloft as she rounds to; let go at 272 s, brought up at 1,230 s (the fixture's 298 and 1,246) |
+| Furl all | furled on its yard aloft at 417 s, the yard not lowered |
+| Loose sails to dry (after furl all) | loosed in its gear aloft at 222 s |
+| Getting under way (Falmouth's outer road, Ext §5.8) | a ship's path: loosed with the topsails at 556 s and 605 s (10 and 15 kn), set at the cast at 1,060 and 1,075 s, under way in 1,343 s and 1,479 s (the fixture's 1,342 and 1,475), 77.2° and 75.5° off at 2.84 and 4.09 kn at +300 s, the settee on her lee |
+
+**Her settee requests at eight (Bil-D §14, §16 risk 7; Ext §5.3).** Her eight are the master and the
+mate (posts, never hands), her five seamen and the cook (an idler, on deck by day only, never aloft).
+Mustered at seed 7 her **starboard watch is three** (a fore topman, a main topman, the afterguard's
+hand) and her **larboard watch two** (a fore topman and the ordinary main topman): the afterguard's
+one hand falls to the starboard. Each settee evolution asks six; begun short-handed with half
+(`hands.SHORT_HANDED_SHARE`), the set and the furl from hands who go aloft, the company clamping the
+set and the furl to five:
+
+| Watch on deck | set | take in | furl | dip |
+|---|---|---|---|---|
+| starboard, by night | short, 3 of 5 | short, 3 of 6 | short, 3 of 5 | short, 3 of 6 |
+| starboard, by day (the cook up) | short, 3 of 5 | short, 4 of 6 | short, 3 of 5 | short, 4 of 6 |
+| larboard, by night | too few | too few | too few | too few |
+| larboard, by day | too few | short, 3 of 6 | too few | short, 3 of 6 |
+
+Sailed from her settle with the watch alone (all hands piped down at 2,300 s, her plain sail set):
+with the starboard watch (04:00 and 12:00) clewed up in 118 s and 125 s, set from the gear in 128
+and 136 s, furled from set in 343 s, set from furled in 221 s; with the larboard watch by day (08:00)
+clewed up in 197 s and set from the gear in 213 s, three hands, and the furl waiting ("Not hands
+enough on deck to furl the mainsail; there are but two to spare.", 1,500 s and never begun); with
+the larboard watch by night (00:00, 20:00), the take in waiting likewise. **Bil-D §14's "every
+settee request begins at her company of eight" does not hold:** Ext §5.3's "a company of eight meets
+with a watch on deck of four" counted eight hands, where hers are six and her watches three and
+two. Recorded as measured, nothing tuned to make her quicker (Bil-D §16 risk 7); her test pins the
+table (`test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_with_the_larboard`).
+For the lead (below).
+
+**Her first hour at seed 7 (Bil-D §11).** `make_world(7, her file, Scenario())`: no fit named, so
+unarmed (no gun, `fit` ""), an hour with nothing refused. A scenario of hers written from its fields
+by the harbour's maker (the great guns' with her file in the frigate's place, British, "bound for
+Plymouth", a British merchant brig in sight bound for Falmouth; her rules captain's book alone)
+reads back to itself and loads with no fit named; under her rules captain by the merchant's book
+she is on passage, shaping a course for Plymouth; her watch sets her plain sail one sail at a time,
+the last at about 2,700 s (one sail at 300 s, five at 1,800 s); an hour in 4.38 kn in the westerly
+of ten knots, heading 060; no order refused; saved at half an hour and loaded from the checkpoint,
+she carries on as the world that was never saved.
+
+**Her lee ports (Bil-D §10) and 7-190.** Unchanged by step 4 (`clr_x_m` reaches no port's heel):
+her armed fit's lowest lee port, No. 2, shuts at 21.70° of heel alone, a roll's four degrees sooner,
+the minute's hold included (her test, step 3's); unarmed by default she has no line in 7-190
+(`tests/test_lee_ports.py`'s "every armed file" reads default fits). Her armed fit's line in
+7-190's form, for the record: (bilander, "armed merchant", upper, 21.70, No. 2).
+
+### Her tests broken on purpose (steps 4 and 5)
+
+Each mutation a scratch pytest plugin (`b4/m5/mut/mutplug.py`, loaded with `-p`, never in the tree)
+applied to the engine or to her file as loaded, her test file run whole with its slow tier (`--slow
+-n 4`); the base 58 passed.
+
+| Mutation (scratch) | What it breaks | Her tests that fail |
+|---|---|---|
+| none | — | none: 58 passed |
+| `scripts.SETTEE_DIP_S` 120 to 60 | the settee's change in stays and in wearing | 7-198 in 15 and 20 kn (the spell's length), 7-199 in 15 and 20 kn (the hoist's tick): 4 |
+| `trim.FATHOM_M` to 3.0 m | the sheet's lead aft of the clew | the sheet's block: 1 |
+| `hands.SHORT_HANDED_SHARE` 0.5 to 0.75 | the short-handed rule | her requests at eight; her first hour (her plain sail never all set); the heave-to in 20 kn both ways: 4 |
+| `sails.LUG_AGAINST_MAST_AREA` 2/3 to 0.3 | the settee against its mast | rule 5's static case: 1 |
+| her `clr_x_m` back to +0.40 as loaded | her helm | her sailed beam reach and helm; the heave-to, all four: 5 |
+| `scripts.HOVE_TO_DRIVER_APPARENT` 6 points to 3 | the driver rule's eased sheet | the heave-to kept, 15 and 20 kn: 2 |
+| her main's `heave_to_aback` taken off as loaded | the main laid aback | the heave-to, all four; 7-197; her masts' stations: 6 |
+| her beam 5.91 to 6.2 m as loaded | her particulars | 7-197; her hull against Chapman; her polar's record: 3 |
+| her default fit the armed merchant as loaded | her fits | 7-197; her first hour; her fits; her broadside; her quarters unarmed; her description; her index row: 7 |
+| her settee furled for the polar | rule 1 | 7-197; her polar's record: 2 |
+| `scripts.SETTEE_KEPT_HOVE_TO` false | — | none: her heave-to test sets it itself, both ways (no mutation, recorded) |
+
+### For the lead (her road's steps 4 and 5)
+
+- **Her helm.** `clr_x_m` +0.40 to +2.25 for her helm, bounded by her heave-to: she keeps 2.86° of
+  lee helm at 60°, 1.32° at 67.5° and 0.69° abeam in 15 kn. The house's little weather helm
+  close-hauled wants about +3.0, where hove to she comes head to wind and makes sternway (from +2.75).
+  The design's lean built (the knob for the helm, the house's way), the heave-to its bound; whether
+  she may carry a little lee helm, or her heave-to give way, is yours.
+- **Rule 5: D44 (c) not taken.** On her file, as on the fixture, the case that holds is the settee
+  held aback near its trim (it presses the main mast harder than her main topsail below about 35°
+  clear of the mast, 27° against it); in her own tack and in a shift of two points it is never
+  aback. Pinned on the static case and named, by your ruling on Ext §14 item 4; whether the static
+  case counts (B3.3's open point) is yours. If not, D44 (c)'s row is a B3 step before her merge, and
+  her polar, §9's table and 7-197's rule-1 clause are measured again on it.
+- **Her settee requests at eight.** Her larboard watch's two hands begin no settee request by night
+  and neither the furl nor the loosing aloft by day; her starboard watch's three begin each one
+  short-handed. Recorded as measured, nothing tuned (Bil-D §16 risk 7). The ways it could go: the
+  boy's hand to the larboard watch (the muster's), the settee files' six hands (B3's), or a watch of
+  two calling all hands, as a coaster's would.
+- **Her heave-to:** the driver rule stands on her file (no B3 follow-up). Clewed up aloft (D4 (a)'s
+  way) she also lies to in 15 to 25 kn at her tuned `clr_x_m`, where at her start's she fell off to a
+  run: the way's figures hang on her helm.
+- **Her settle for the handling truths** is B3.4's with two changes for her eight (all hands kept
+  up; the trim only while her hands are free), judgement: trimmed every two minutes regardless, the
+  trims queue on her watch and a heave-to ordered after them waits.
+- **Still open from steps 1 to 3:** the datum of Gwyn's heights (y 961 against 969); the collier's
+  deck check; row C; Folio IV not fetched; the settee's yard and her dry yard crossing by the wind in
+  the drawing (0.03 m, B5.4's; the dry yard 1.01 m above the settee's sling, the settee's yard passing
+  its height 1.00 m abaft the mast, inside its 6.22-m half-length; no engine or viewer change built);
+  the boy mustered an able seaman.
+- **The shared guards** her file and rows meet stand as reported at her steps 2 and 3 (her
+  `MODULE_FILES` row; `tests/test_schooner_mast.py`'s sixteen files; the *Neufchatel*'s role guard;
+  twenty of `tests/test_view_geometry.py`'s cases, B5.6's): nothing at steps 4 and 5 adds one.
+
+### The suites, as run (steps 4 and 5)
+
+All with `py -m pytest`, `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on the owner's
+machine, one suite at a time, on the steps' final code.
+
+- `tests/test_bilander.py` with its slow tier (`--slow`): **58 passed** (her steps 1 to 3's 45, her
+  step 2 rule-1 draft now her polar's record, and steps 4 and 5's: 7-197 whole, the heave-to both
+  ways in 15 and 20 kn, the sheet's block, rule 5's static case, her requests at eight, 7-198 and
+  7-199 in 15 and 20 kn, her first hour). Alone in one process, her first hour 13.3 s and her
+  sailed beam reach with truth 6's form 9.3 s, both put in `tests/conftest.py`'s `SLOW_TESTS`;
+  the heave-to's four cases 4.4-4.6 s and the truths' 4.2-4.3 s, under the threshold, in the fast
+  tier.
+- Her tests broken on purpose, eleven mutations (above): each new test fails under one at least.
+- `test_bilander`, `test_ship_particulars`, `test_profiles`, `test_hull_form`, `test_profile` (her
+  `MODULE_FILES` row as made at step 3), `test_settee`, `test_lee_ports`, `test_check_viewer_guns`,
+  `test_stores`, `test_rig_classing`, `test_neufchatel` and `test_schooner_mast`, one run: **782
+  passed, 2 failed, 1 xfailed** (95.6 s). By junit against the fast base (B3.4b and B2b's final
+  fast tier): only in the new, 60 (her 56 fast tests and four cases other suites take by her file);
+  two changed outcome, **the two shared guards her step 3 reported**
+  (`test_neufchatel.py::test_her_row_sails_by_her_first_role_and_no_other_row_moves`,
+  `test_schooner_mast.py`'s sixteen files); the *Neufchatel*'s close-hauled helm's xfail the same.
+- The generator into scratch: seventeen of seventeen files byte for byte as in `data/ships/` (the
+  sixteen committed as they were, hers as regenerated with `clr_x_m` +2.25);
+  `tools/check_viewer_guns.py data/ships/bilander.yaml` clean; `ruff check` and `ruff format
+  --check` clean (367 files).
+
+**Not run** (the task's: run once at the end, by the session): the fast tier whole, the slow
+candidates, the captain's trials and the four whole logs; `tests/test_view_geometry.py` (B5's), whose
+twenty cases on her file from her step 2 are B5.6's.
+
+### Her review's mends (2026-11-08)
+
+Two reviews read her work before her merge: her sources and her file (re-measured from the
+sources), and her as sailed at seed 7 in 8, 15 and 25 kn on real orders. Each finding was
+reproduced first. Her own work's were mended, old beside new below; the engine's and the shared
+code's are for the lead, nothing of them built (her design's §13: B3's engine files and the
+shared code are not hers).
+
+**Mended in her files.**
+
+- **The wale, measured from the rail it hangs from.** Her step 1 laid Gwyn's band 39 px below y
+  961, the masts' feet and the datum of her rig's heights, while the band is hung from Chapman's
+  waist rail (Bil-D §3.2), drawn at y 968-969 between the masts: two reference lines mixed, and
+  her step 1's "Bil-D's 26 px off by more than its error" did not hold. Measured again from the
+  drawn rail's top at the same x by two methods: the ink's luminance down thirteen clean columns
+  (x 730-940; the rail's top at y 963-973; the wale's top 32 or 33 px under it at every column but
+  one, 29; the median **33**) and the eye on a ruled crop at midships (31-34 px); its breadth 25-28
+  px (her step 1's **25** kept). `wales_m`, old beside new: x -10.0 (0.08, 0.81) to (0.25, 0.99);
+  -4.0 (-0.17, 0.56) to (0.00, 0.74); 0.12 (-0.23, 0.50) to (-0.06, 0.68); 4.0 (-0.16, 0.57) to
+  (0.01, 0.75); 10.0 (0.42, 1.15) to (0.59, 1.33). At Chapman's scale the lower edge still stands
+  0.06 m under her water at midships, where Gwyn draws 2-7 px of side under the band before the
+  sea: the drawing's vertical scale is not its horizontal (Bil-D §18 item 8; its side, rail to sea,
+  64 px for Chapman's 1.65 m). Laid as shares of that side the band would stand 0.16 to 0.80 m:
+  not taken (the design hangs Gwyn's figures from the rail at Chapman's scale), for the lead. The
+  collier's main wale at her scale, -0.12 to 0.39 m at dead flat (Folio VII), lies lower still.
+  The viewer's chord row for her wale's after end is re-measured with it (the shared guards).
+- **Her round stern's breadth, recorded.** Gwyn's stern view gives her rail about 1.55 m off the
+  middle line at the taffrail and about 2.0 m at the wale, her lights spread +-1.22 m (her step 1;
+  Bil-D's 2.05); the collier's stern, 15 ft 8 in broad (Folio LI), 2.02 m a side at her scale.
+  Her drawn stern closes along the post and the counter to the middle line as a round stern is
+  drawn (`freesail/ship/form.py`): at the lights' middle height, 2.25 m, 0.35 m off it 0.4 m
+  inside the taffrail and 0.91 m 0.8 m inside (the generator's report, new). Her file cannot
+  widen it: no station abaft the post can be filed (a half-breadth of nothing at the water is
+  refused), and a round stern has no `transom_hb_m`. Now in her `breadth_m` note and the report;
+  her step 1's "Bil-D's stand" for the stern view (above) holds for the lights' band, not for the
+  breadth, which is not drawn. It is the cause of the two viewer departures recorded at her
+  landing, her settee's block 0.76 m outboard of her counter's rail and one light seen forward of
+  the beam (the shared guards' rows now say so). For the lead: a key for a round stern's breadth
+  at the counter (B8's `form.py`, its schema), which would bring the block inside her rail and her
+  lights out to their filed spread.
+- **Her upper deck's after end** moved 0.26 m aft with the taffrail at her step 1 while the
+  counter at its height moved 0.13 m, so it stood 0.10 m outside the drawn hull (the half-breadth
+  there nothing). Now 0.01 m inside the counter's line at its height, as Bil-D's (-11.20, 1.45)
+  stood against its counter at -11.21 (judgement): (-11.46, 1.45) to (-11.36, 1.45), the
+  counter's line at -11.365.
+- **Her rabbet, kept** (principle 11): Folio I's sidings read at her step 1 (R, S and T: 9 1/2, 12
+  and 9 1/2 in) had been dropped. `rabbet_m` written, kept and not drawn, judged: at the collier's
+  base scaled, -2.65 m, from the post to the fore-foot, [-10.40, -2.65, 0.10], [2.37, -2.65,
+  0.13], [8.13, -2.65, 0.10]. Her test of the marks names it.
+- **Persons as they/them:** "his" and "he" for Steel, Chapman, Gwyn, Adye and Lescallier in her
+  module, her settee module, her tests and her notes reworded by name; the generated file with
+  them. The overhang's comment reads "two-thirds taken" as its code does.
+- **Truths 7-198 and 7-199 judge the report by its order alone:** they pinned the "Tacked" and
+  "Wore" lines' ticks (+-15 s), against D13 (a) and her design's §14. Now, as the fixture's 7-198,
+  the report only after the hoist; her heading and tack at a set time as before.
+- **`clr_x_m` +2.25 to +2.0** (Bil-D §9's second knob, its bound her heave-to). At +2.25, hove to
+  in 8 kn from her settle, the lightest of the polar's winds, she was forced round through the
+  wind both ways (kept at +307 s, clewed up at +269 s), where the brig, the merchant brig, the
+  fixture and her own start lie to; her step 4 had bounded the knob on 10 to 25 kn. Kept, by
+  clr_x_m, in 8 kn: +2.25 forced round; +2.2 forced round at +360 s; +2.15 63.4-72.8 degrees off;
+  +2.1 63.9-71.3; +2.0 64.8-70.0; in 6 and 7 kn +2.0 to +2.15 lie to (53-74). **+2.0, on her
+  step 4's grid of a quarter metre, the most weather helm her heave-to keeps her lying to within
+  four to seven points in 8 to 25 kn** (kept: 64.8-70.0, 65.0-67.6, 65.2-66.3, 65.1-65.4,
+  62.7-63.6 and 62.6 in 8, 9, 10, 15, 20 and 25 kn; clewed up, the other way, 68.0-69.0,
+  67.3-69.3 and 67.6-70.2 in 15, 20 and 25 kn, past seven points in 8 to 10). Her figures beside
+  her step 4's (15 kn; degrees of weather helm at 60 / 67.5 / 78.75 / 90 / 112.5 / 135 off; truth
+  6's form, plain, headsails in, settee in; truth 10's form; her beam reach):
+
+| `clr_x_m` | 60 | 67.5 | 78.75 | 90 | 112.5 | 135 | truth 6's form | truth 10's form | abeam |
+|---|---|---|---|---|---|---|---|---|---|
+| +2.25 (her step 4) | -2.86 | -1.32 | -0.80 | -0.69 | +0.10 | -0.11 | -0.69, +0.74, -2.83 | 512 s, 223 m | 6.52 kn |
+| **+2.0 (as built)** | **-4.00** | **-2.05** | **-1.29** | **-1.09** | **-0.14** | **-0.18** | **-1.09, +0.36, -3.28** | **568 s, 253 m** | **6.52 kn** |
+
+  Her polar does not read the figure (closest 50, the beat 60, rule 1 by 0.06 kn: unmoved). Her
+  pins moved with it, old beside new in her tests: her helm (above); hove to from her settle at
+  +150 s, +300 s and from +300 s to +900 s, headway: 15 kn kept 59.9, 63.9, 63.9-64.2, 0.72 to
+  61.7, 65.2, 65.1-65.4, 0.95; 20 kn kept 61.6, 64.0, 63.9-64.0, 0.92 to 65.3, 62.7, 62.7-63.6,
+  1.14; 15 kn clewed up 65.0, 68.7, 67.8-68.6, 1.08 to 67.0, 68.1, 68.0-69.0, 1.16; 20 kn clewed
+  up 72.7, 66.6, 66.6-66.7, 1.35 to 73.1, 67.3, 67.3-69.3, 1.23; **a case added, 8 kn kept**:
+  45.8, 70.0, 64.8-70.0, 0.54; her helm close-hauled before the order -1.27 and +3.30 to -2.02 and
+  +0.25 in 15 and 20 kn (-2.02 in 8); 7-198's haul 89 to 90 s and lowering 148/160 to 149/159 s,
+  "Tacked" 309/342 to 310/341 s (recorded); 7-199's wind across the stern 57 to 58 s in 15 kn,
+  "Wore" 472/516 to 472/517 s (recorded); her first hour 4.38 kn, unchanged; rule 5's measure
+  unchanged (her settee never aback in her tack, nor in a shift of one or two points). Truth 17's
+  form: aback twice, closest 66.9 degrees, no sternway; truth 12's: 61.0-65.4 degrees off, at
+  most 2.35 kn.
+
+**Found on her file, not hers, not built (for the lead):**
+
+1. **A settee guard missing (B3's, keyed on `settee` alone; her design's §12.2 item 7 and the
+   lead's answer (8): before her merge).** Forced round through the wind while hove to with the
+   settee kept, it stays on the old lee, now the weather side of the mast; "fill away" then draws
+   its sheet there and never dips it, and no line says so. At +2.25 in 8 kn: forced round at +307
+   s, filled away at +951 s on the larboard tack, the settee's side larboard every sample to +1,800
+   s, 41.4 m2 drawing against the mast, 2.23 kn, where a plain tack in 8 kn gives it the starboard
+   side, 62.0 m2 and 2.47 kn. `_judge_lying_to`'s forced-round branch changes the tack and the
+   yards only, and `FillAwayScript` draws the kept after sails to the new lee without shifting the
+   settee (`freesail/evolutions/scripts.py`). At +2.0 her heave-to no longer reaches it at seed 7
+   in 6 to 25 kn; any forced round of a kept settee still would.
+2. **Her armed fit's one manned gun never loads before a side is engaged.** "Cast loose the guns"
+   at seed 7 on a beam reach in 15 kn: cast loose at +248 s, then by +600 s every gun unloaded,
+   every service stalled "short-handed", silently, the reading "loading with round shot"; her one
+   crew of two is divided across both sides' No. 1 guns (`Battery.tick`, `freesail/combat/
+   guns.py`: 2 hands over 2 guns against a crew of 3). Engaged to one side, the same two load and
+   fire ("One shot at a cutter: one struck her." at +660 s). The combat engine's; her bill (two
+   trimmers, a helm, a filler, two for the guns) is her design's judgement and was not changed.
+3. **"1 guns ready"**: the fire order's reply counts one gun in the plural
+   (`freesail/orders/gunnery.py`).
+4. **Lying a-try "under the main topsail and the staysails"** said with no staysail set
+   (`LieATryScript._under_words`): in her gale (15 to 45 kn over 90 minutes, "shorten sail" every
+   ten minutes, "lie a try" at 45 kn) at +8,202 s, her fore topmast staysail blown out at +5,067
+   s and the storm staysails set only at +8,377 and +8,553 s.
+5. **"The fore topmast staysail taken in before the fore storm staysail is up"** said on the tick
+   the take in was refused for want of hands (`freesail/orders/storm.py`), at +4,501 s; the sail
+   split at +5,067 s.
+6. **Her served words name people she does not carry:** the well "has the carpenter sound it"
+   (`freesail/api/readings.py`), and the boatswain's and the sailmaker's papers are kept by them
+   (`freesail/world/places.py`'s `_keeper`); her people are the master, the mate and the boy.
+   Engine-wide, not hers.
+
+### The suite, as run
+
+Once, on the final tree (HEAD 7fe5a877 on `claude/pkg-75`, her work, her `MODULE_FILES` row and
+the shared guards' changes uncommitted), from the tree root, one at a time with nothing else
+running (`-n 4 -p no:cacheprovider -o "addopts=--dist loadgroup"`), each against its base. Her
+docs' persons were reworded while the first ran (docs only; no test reads them); the code and the
+data were as run throughout.
+
+- **The slow candidates** (`--slow -m slow`; the candidates' list with every file B2, B3.3, B3.4b
+  and B2b touched, `tests/test_bilander.py`, `tests/test_stores.py` and
+  `tests/test_check_viewer_guns.py` added): 313 cases, **294 passed, 9 failed, 1 skipped, 9
+  xfailed** in 1,606.8 s. Against the base (311 cases: 289 passed, 12 failed): none only in the
+  base; only here her two slow tests, both passing (her first hour, her sailed beam reach); three
+  changed, failure to passed, truth 51's three pace floors (`test_the_pace_on_the_day_under_systems
+  _holds_truth_51s_floor`, `..._on_the_gates_day_with_the_region_loaded_...`, `test_truth_7_159_
+  the_pace_with_the_convoy_of_six_at_far_detail_...`), ticks a second on this machine with nothing
+  else running; every other non-pass the same, message for message (the three trials' digests,
+  the merchant passage's and the schooner's constants, truths 77 to 79, the schooner's log of 767
+  lines, the nine xfails, the Playwright skip).
+- **The captain's trials** (`--slow`): 4 passed, 3 failed, the same three digests as the base and
+  the task's (the gale 8df0ab2beba93320, the thick weather df5f02eb6e6ce68a, the trade stranger
+  8dac97a4c9bdfe43); no outcome changed.
+- **The four whole logs** (`log_digests.py`): all four the same as `digests-final.json`, the first
+  action 497 lines, 84176c16104a2c67.
+- **The generator** into scratch: 17 written, 17 in `data/ships/`, every one byte for byte.
+  `tools/check_viewer_guns.py` over `data/ships/`: clean; on her file "8 guns: 4 port, 4 rail".
+- **The whole fast tier:** **7,029 passed, 2 skipped, 2 xfailed** in 1,909.0 s, exit 0, 465 slow
+  tests left out. Against the base (6,916 cases: 6,912 passed, 2 skipped, 2 xfailed): changed
+  outcome none; only in the base three, the guards renamed or parametrised at her landing (the
+  count of sixteen files, now seventeen; the round-stern case, now on the 64 made round and on
+  hers; the settee guard, now hers alone); only here 120, all passing, her 57 fast tests (the 8-kn
+  heave-to case among them) and 63 cases other suites run on her file; the four non-passes the
+  same, message for message (two xfails, two Playwright skips). Green, no known failure.
+- **ruff** check and format over the tree: clean, 367 files. Every changed file is LF.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
