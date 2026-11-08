@@ -3294,8 +3294,7 @@ exit 0 (the one failure 7-441 as above, passing alone there and on the bare trun
 of the touched files and the known truths with `test_profile` and `test_indefatigable` exit 0; the
 pace alone and last 13 of 13. **The lead's merge:** the trial on 04136d99 (B2 merged) clean and lint-clean; no
 model or vendor name in the diff; nothing of 75's, 81's or 76's files, the physics and `data/
-ships/` untouched; the fast tier whole on it exit 0, 6,807 passed by the dots and 1 xfailed, 21:42 to 22:25 UTC (43 minutes); the whole suite in the cloud dispatched
-after run 55, the figures to follow. Step 4 (the far fight wired; truths 7-358 to 7-361 and
+ships/` untouched; the fast tier whole on it exit 0, 6,807 passed by the dots and 1 xfailed, 21:42 to 22:25 UTC (43 minutes); the whole suite in the cloud, run 56 (2026-11-07/08, 23:20 to 00:35 UTC, on fbc6c930): lint green; the six shards green, 7,235 passed, 11 skipped, 12 xfailed, the longest shard 65 minutes; the pace job 9 of 13, the four floor tests at 443, 427, 410 and 388 ticks a second against 500 on the shared runner, as at runs 48 to 55 (the build machine alone held 13 of 13; the builder's pace alone at 96261d8 13 of 13 at 20:15). Step 4 (the far fight wired; truths 7-358 to 7-361 and
 7-369) follows from the scratch branch, one hash with the trunk merged, with 74's answer on 76's
 two doctrine hooks.
 
