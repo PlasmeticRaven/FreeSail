@@ -2646,8 +2646,8 @@ def quarter_bill(b, guns):
                 "forecastle",
                 TRIMMERS["forecastle"],
                 "The trimmers: the brig-sloop's twenty-seven (brig.yaml's bill) carried by her "
-                "plain sail against the brig's, a third more (Neuf-D §6.4; the arithmetic in the "
-                "generator's report), split by each mast's work (judgement). Of the "
+                "plain sail against the brig's, a quarter more (Neuf-D §6.4; the arithmetic in "
+                "the generator's report), split by each mast's work (judgement). Of the "
                 "forecastlemen, for the headsails and the fore tacks and sheets.",
             ),
             ("fore_top", TRIMMERS["fore_top"], "Of the fore topmen, for her four fore yards."),

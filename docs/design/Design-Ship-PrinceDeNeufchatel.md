@@ -1224,7 +1224,10 @@ passage or a station without prizes, `captains._is_kings_ship` taking her wardro
 
 *At B2b (2026-11-08), the lead's ruling of 2026-11-07 (3)(b): she is a privateer wherever no
 scenario or intent names a role (§8's As built at B2b), her captain's book the privateer's on a
-passage and on a station too; `_is_kings_ship` is left as it is.*
+passage and on a station too; `_is_kings_ship` is left as it is. Her plain sail at 959 m² (§4.3's
+As built at B2b), a quarter more than the brig-sloop's 766 where the design's was a third more,
+carries the brig's 27 trimmers to 33.8; the bill's 35 is kept as written, its note in her file
+saying a quarter more since the review of 2026-11-08 (for the lead: 34 by the rule).*
 
 ---
 
@@ -1548,8 +1551,10 @@ still at 100°, 100° and 90° (12.06 at 100°); at 60° and 70° 6.30 and 7.14 
 +3.16° at the six angles (+1.11, +2.11, +1.49, +0.78, +1.84, +3.20); +5.09 at 60° and +1.60 abeam in
 25 kn. No lead now holds both of step 5's bands, close-hauled −1.0 to +1.5 and abeam +0.5 to +4.0
 (swept: −0.3 m gives +2.66 and +0.92, −0.6 +1.65 and +0.39, −0.9 +0.60 and −0.17): the lead is kept
-as tuned, her helm test's close-hauled band moved to her measure, and its re-tuning is for the
-lead. Truth 6's form abeam: +1.61, +5.29, −11.24.*
+as tuned and its re-tuning is for the lead. Her helm test keeps step 5's close-hauled band as a
+recorded departure, a known failure (its band moved to her measure at the build, restored at the
+review of 2026-11-08), the abeam band a passing test of its own. Truth 6's form abeam: +1.61,
++5.29, −11.24.*
 *- **Her handling:** truth 10's form 261 s from 292.5° (269 and 268), gaining 144 m, hanging in stays
 at 62 s, the words at 50 and 75 s; the settled form 261 s (313 with the main topgallant set). Wore
 in 521 s, 241 m to leeward. Hove to 49.1° off at 2.6 kn (49.0° at 2.6 with the main topgallant

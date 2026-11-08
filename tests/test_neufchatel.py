@@ -1313,28 +1313,53 @@ def test_truth_7_193_her_polars_best_point_from_her_accounts():
 # ---------------------------------------------------------------------------
 
 
-def test_her_helm_as_tuned_carries_weather_helm_close_hauled_and_abeam():
-    """`clr_x_m` tuned with her rig whole (Neuf-D §9's knob, in the topsail schooner's way: "at
-    +0.5 m she is balanced close-hauled in 15 kn"; docs/dev/TuningNotes.md, old beside new),
-    measured at seed 7 in fifteen knots under plain sail, the yards and sheets trimmed. At
-    **+0.1 m**, with her fore staysail the triangle that fits forward of the fore mast, 46 m2 (the
-    lead's ruling of 2026-11-07, package 75's B2b), she carries +3.95 degrees of weather helm
-    close-hauled, 60 degrees off (her `beat_deg`; the topsail schooner's -0.04), +4.30 at six
-    points, +2.81 at seven, +1.61 abeam (the frigate-36 +1.99, the brig-sloop +1.57, the topsail
-    schooner +4.30), +2.10 at ten points and +3.16 at twelve; +5.09 at 60 degrees and +1.60 abeam
-    in 25 kn. Old beside new, with the working 93 m2 (the test then named for her helm balanced
-    close-hauled, its close-hauled band -1.0 to +1.5): +1.11, +2.11, +1.49, +0.78, +1.84 and
-    +3.20; +1.75 and +0.73 in 25 kn. The 47 m2 taken from forward of her mast gives her the weather
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason=(
+        "A recorded departure: her fore staysail at 46 m2, the triangle that fits forward of the "
+        "fore mast, gives her +3.95 deg of weather helm close-hauled at clr_x_m +0.1, outside "
+        "step 5's band; no lead now holds both of step 5's bands, and the re-tune is the lead's "
+        "(docs/dev/TuningNotes.md, 'Her ruled fixes (B2b, 2026-11-08)')."
+    ),
+)
+def test_her_helm_as_tuned_is_balanced_close_hauled():
+    """Step 5's close-hauled band (Neuf-D §9's knob, `clr_x_m`, tuned with her rig whole in the
+    topsail schooner's way: "at +0.5 m she is balanced close-hauled in 15 kn";
+    docs/dev/TuningNotes.md, old beside new), measured at seed 7 in fifteen knots under plain
+    sail, the yards and sheets trimmed, 60 degrees off (her `beat_deg`; the topsail schooner's
+    -0.04): -1.0 to +1.5 degrees of weather helm. **Known to fail since B2b** (strict, so that a
+    re-tune which brings her into the band says so): at **+0.1 m**, with her fore staysail the
+    triangle that fits forward of the fore mast, 46 m2 (the lead's ruling of 2026-11-07, package
+    75's B2b), she carries +3.95 degrees close-hauled, +4.30 at six points and +2.81 at seven;
+    +5.09 at 60 degrees in 25 kn. Old beside new, with the working 93 m2: +1.11, +2.11 and +1.49;
+    +1.75 in 25 kn, inside the band. The 47 m2 taken from forward of her mast gives her the weather
     helm; her helm falls from close-hauled to the beam where the schooner's rises, so that no lead
-    now holds both of the old bands (her lead swept with the new staysail: -0.3 m gives +2.66
+    now holds both of step 5's bands (her lead swept with the new staysail: -0.3 m gives +2.66
     close-hauled and +0.92 abeam, -0.6 +1.65 and +0.39, -0.9 +0.60 and -0.17, -1.2 -0.50 and
     -0.75): the lead is kept as tuned and its re-tuning is the lead's (docs/dev/TuningNotes.md,
-    B2b). Before the reviews of 2026-11-07 moved her jib's centre aft to its triangle's (from
-    above its stay), she was tuned to +2.0 against the lee helm the misplaced jib gave her."""
+    B2b). At B2b this band was moved to her measure, +2.5 to +5.0, and the test renamed for her
+    weather helm; the review of 2026-11-08 restored step 5's band as a recorded departure, no
+    ruling having accepted the helm. Before the reviews of 2026-11-07 moved her jib's centre aft
+    to its triangle's (from above its stay), she was tuned to +2.0 against the lee helm the
+    misplaced jib gave her."""
     from tests.test_known_truths import reading, under_plain_sail
 
     close_hauled = reading(under_plain_sail(HER, 300.0))["weather_helm"]
-    assert 2.5 <= close_hauled <= 5.0, close_hauled
+    assert -1.0 <= close_hauled <= 1.5, close_hauled
+
+
+def test_her_helm_as_tuned_abeam_and_at_ten_points():
+    """Step 5's band abeam and at ten points, +0.5 to +4.0 degrees of weather helm, measured as
+    the close-hauled band (the test above) at seed 7 in fifteen knots under plain sail, the yards
+    and sheets trimmed, with `clr_x_m` as tuned, **+0.1 m**: +1.61 abeam (the frigate-36 +1.99,
+    the brig-sloop +1.57, the topsail schooner +4.30) and +2.10 at ten points, +3.16 at twelve;
+    +1.60 abeam in 25 kn, with her fore staysail the triangle that fits, 46 m2 (B2b). Old beside
+    new, with the working 93 m2: +0.78, +1.84 and +3.20; +0.73 in 25 kn. Split from the
+    close-hauled band at the review of 2026-11-08, so that this half stays live while that one is
+    a recorded departure."""
+    from tests.test_known_truths import reading, under_plain_sail
+
     for off in (90.0, 112.5):
         helm = reading(under_plain_sail(HER, 360.0 - off))["weather_helm"]
         assert 0.5 <= helm <= 4.0, (off, helm)
@@ -1542,9 +1567,9 @@ def test_her_gale_reefs_her_fore_course_twice_and_keeps_her_mainsail():
     fore gaff sail taken in at 4,487 s and the course reefed at 4,622 s and again at 5,581 s, the
     fore topsail close-reefed, the jib in at 30 kn; lying a-try at 7,664 s under the fore topsail,
     the mainsail and the fore staysail, the course taken in by "lie a-try" (old: the course
-    reefed at 4,628 and 5,616 s, the fore storm staysail set at 34 kn, lying a-try at 7,674 s 39.7
-    degrees off at 2.45 kn under the fore topsail, the storm staysail, the fore gaff sail and the
-    mainsail whole)."""
+    reefed at 4,628 and 5,616 s, the fore storm staysail set at 34 kn, lying a-try at 7,674 s,
+    and at 8,400 s 39.7 degrees off at 2.45 kn under the fore topsail, the storm staysail, the
+    fore gaff sail and the mainsail whole)."""
     from freesail.orders.storm import _after_sail_lines
 
     ship = load_ship(HER)

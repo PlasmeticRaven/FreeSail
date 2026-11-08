@@ -688,7 +688,10 @@ def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(buil
     (package 75, B2b): a boomless gaff sail on a mast that crosses a course, the *Neufchatel*'s
     fore gaff sail beside her fore course, is taken in at the same reef, by her rig (Cobb 1841
     p. 79), so that the three rigs in memory with a schooner's foresail beside a fore course take
-    theirs in too ("take in the fore sail"; old, the course's reef alone); the polacre has none."""
+    theirs in too ("take in the fore sail"; old, the course's reef alone); the polacre has none.
+    Sailed in B3.4's gale (docs/dev/TuningNotes.md, B2b, the review of 2026-11-08), the three
+    gripe up to 36-42 degrees off at about 2 kn with the helm hard over once the jib is in, as she
+    does, and lie on their beam ends 0, 0 and 1 times (4, 4 and 6 before, ruling 4's record)."""
     ship = _under_plain_sail(build())
     assert not _square_rigged(ship)
     topsails = [ship.sails[sid] for sid in ship.groups["topsails"]]

@@ -15011,6 +15011,27 @@ privateer schooner's crewed roles, books, services, tables and readings identica
 adjective. **Her round trip** (cruising for prizes) was a privateer's before as now, its captain's
 role and book the same; an hour in 6.02 → 6.19 kn by (4)'s fore staysail, not by this.
 
+**For the lead, the rows' roles (the review of 2026-11-08; nothing built).** The ruling's "hers
+the first whole file to" file roles is not so on this tree: the eight rows sailed before package
+75 file them since SW-4 (the frigate `[kings-ship, commodore]`, the schooner `[merchant]`, the
+privateer schooner `[privateer]`, the cutter `[cruiser, kings-ship]`, the brig-sloop `[cruiser,
+kings-ship, commodore]`, the merchant brig `[merchant, packet, indiaman]`, the lugger `[fisherman,
+merchant]`, the smack `[fisherman]`; the sixty-four and the razee file none). Read literally,
+"reads the roles of any description that files them" would move six of them, by the intent's
+kind (none, a passage, home, a station; measured with `INTENT_RULED_ROWS` emptied in the
+process): the schooner and the merchant brig merchant on a station (kings-ship now); the
+privateer schooner privateer at all four (merchant, merchant, merchant, kings-ship now); the
+cutter cruiser at all four (merchant at the first three now); the lugger and the smack fisherman
+at all four (merchant, merchant, merchant, kings-ship now); the frigate's and the brig-sloop's
+first roles are what the intent's rules give them already. The crewed World's captain the same
+way (`own_sub_type_role`): nine files would carry a role where hers alone does now (the
+brig-sloop and the cutter cruiser, the frigate kings-ship, the lugger and the smack fisherman,
+the merchant brig and the topsail schooner merchant, the privateer schooner privateer).
+`INTENT_RULED_ROWS` is the build's reconciliation of the ruling's two sentences ("reads the
+roles of any description that files them" and "no other file's row moves"), a list no ruling
+names; whole files added after hers (the bilander, the 74) sail by their first role unless the
+lead lists them there.
+
 **(3)(d) The trim's reply by the sail's alias: not one function's line; for the lead, not built.**
 The trim's reply ("Trimming the sheets of the fore sail, the main sail, the fore staysail and the
 jib.", "The sheet of the fore sail stands as trimmed.") names each sheet's sail by `resolve.the`,
@@ -15075,6 +15096,36 @@ helm hard over for some 25 minutes before she is ordered to lie a-try, and lying
 lay to under the fore gaff sail and was put before the wind when it made bad weather (p. 79), so
 the ruling's moment, not the source's, settles when it comes in.
 
+**The three rigs in memory with the key, sailed (the review of 2026-11-08).** At the build they
+were said to follow her rig and only their lists were pinned (`tests/test_schooner_mast.py`'s
+gale case); sailed in the same gale (ruling 4's script, its world and its orders unchanged), they
+move as she does. "Old" is 52fad521, sailed on that tree as exported to scratch and, the same to
+the digest and line for line, on this tree with `gaff_sails_beside_a_course` read as none in the
+process; "new" the tree at 46cf8218.
+
+| Trial A; trial B; the main topgallant's fixture | Old | New |
+|---|---|---|
+| "Took in the foresail." (the schooner's foresail beside the fore course) | never | 5,726; 5,462; 6,090 s |
+| "Shorten sail" at 34 kn | refused in all three, the gale's own lines (`shorten_sail_lines`) none and the standing ones done | "Man the jib downhaul."; the same; "'Take in the foresail' will follow ..., which the hands are still at." |
+| The jib hauled down | 6,774 s (38 kn) in all three | 6,029 and 6,028 s (34 kn); 6,774 s |
+| Her course from 6,000 s to lie a-try | 58-70° off at 7.6-9.5 kn, the helm -5° to -32° | **gripes up to 36-42° off at 1.8-2.6 kn with the helm hard over (+24° to +35°)**, from about 6,150, 6,180 and 6,840 s, a minute or two after the jib comes in |
+| Just before "lie a-try" (7,199 s) | 62.2° at 8.47 kn; 59.0° at 7.86; 46.7° at 6.08 | 36.7° at 2.35 kn; 35.7° at 2.40; 37.3° at 2.42 |
+| Lying a-try | 7,767, 7,775 and 7,734 s: "Lying a-try under the fore topsail and the staysails, helm a-lee." | 7,695, 7,698 and 7,705 s: "Lying a-try under the fore topsail, the mainsail and the staysails, the foresail taken in, helm a-lee." |
+| At 8,400 s | 48.3° at 2.45 kn; 46.8° at 2.43; 32.1° at 2.71 | 37.3° at 2.67; 37.2° at 2.70; 37.5° at 2.71 |
+| "On her beam ends, 40° to larboard; she would not have come up again." (40° to 42°) | 4; 4; 6 | **0; 0; 1** (the main topgallant's at 5,312 s, before the take-in, as before) |
+| The probe's digest (every line, then her heading, speed and surge) | f490576bd3488942; b37a0f6c595cc061; e81ca5e670bed5c6 | cd9fb8b6b8feed3b; c2db1535bdd0b8e8; 4e7fd7fd2192e895 |
+
+Nothing carried away or blown out in any, old or new. Ruling 4's record (c) above, the three
+rigs on their beam ends 4, 4 and 6 times, is superseded by these: 0, 0 and 1, she lying near
+head to wind at 2 kn and no longer pressed on a reach; the topsail schooner's 3 as filed is
+unmoved. **For the lead** (the item above, widened): the take-in at the topsails' second reef
+leaves every rig with the key unmanageable once the jib is in, whatever her fore staysail's area
+(hers at 93 m² griped the same, the table's middle column), her and the three rigs alike griping
+up with the helm hard over until she lies a-try; in trial A and trial B it brings the jib's
+take-in one mark sooner (34 kn for 38), the jib loaded to `HEAD_SAIL_IN_RATIO` of its rating at
+34 kn with the foresail in (the gale's lines "take in the jib"), where before they were none there
+and the order refused.
+
 **(3)(f) "take in the square sail": not the alias table's line; for the lead, not built.** Traced
 by `orders.grammar.parse` on every file: in her and the two schooners the line parses as the noun
 "sail" (the shorthand their `fore.sail` and `main.sail` give) with "square" a brace mode stepped
@@ -15123,7 +15174,10 @@ staysail's, the jib's, the flying jib's and the storm jib's halyards, sheets and
 49.6, 28.0 → 24.8, 19.0 (21.8 the storm jib's) → 16.4, 27.9 → 23.4, 13.9 → 11.7, 9.7 → 7.8); by the
 rating pass, the fore mast 452.5 → 428.4 kN and the bowsprit 142.0 → 117.9. The quarter bill's
 arithmetic, 27 trimmers by her plain sail over the brig's, 35.5 → 33.8, the bill's 35 kept as
-written (for the lead: 34 by the rule). Nothing else in her file or any other.
+written (for the lead: 34 by the rule). Nothing else in her file or any other. (At the review of
+2026-11-08 the bill's note in her file, "carried by her plain sail against the brig's, a third
+more", true of 1,006 against 766, says "a quarter more", 959 against 766 being 1.25; written by
+her module, the other fifteen files byte for byte.)
 
 | Her, re-measured (seed 7) | Old (93 m²) | New (46 m²) |
 |---|---|---|
@@ -15156,16 +15210,24 @@ so that no lead holds both of step 5's bands (close-hauled -1.0 to +1.5, abeam a
 +0.5 to +4.0), swept on the new file in 15 kn: -0.3 m +2.66 close-hauled and +0.92 abeam (+3.10
 at six points, +1.70 at ten), -0.6 +1.65 and +0.39 (+2.25, +1.39), -0.9 +0.60 and -0.17 (+1.40,
 +1.06), -1.2 -0.50 and -0.75 (+0.48, +0.73). No ruling settles the lead, so `clr_x_m` stays +0.1
-as tuned at the reviews, and her helm test, `test_her_helm_as_tuned_is_balanced_close_hauled`,
-now `test_her_helm_as_tuned_carries_weather_helm_close_hauled_and_abeam`, has its close-hauled
-band moved to her measure, +2.5 to +5.0 (the abeam band unmoved), old beside new in its
-docstring. Her tack, now 261 s, stands inside its 120-300 s band.
+as tuned at the reviews. At the build her helm test,
+`test_her_helm_as_tuned_is_balanced_close_hauled`, was renamed
+`test_her_helm_as_tuned_carries_weather_helm_close_hauled_and_abeam` and its close-hauled band
+moved to her measure, +2.5 to +5.0; the review of 2026-11-08 found that the
+band so moved accepted the helm before the lead's call, and restored step 5's: the test under its
+old name keeps -1.0 to +1.5 close-hauled and is marked a known failure (strict, on its assertion
+alone), the recorded departure with the +3.95 in its reason, so that a re-tune which brings her
+into the band fails it until the mark is taken off; the abeam and ten-point band, +0.5 to +4.0,
+is a test of its own, `test_her_helm_as_tuned_abeam_and_at_ten_points`, passing, the old beside
+new in both docstrings. Her tack, now 261 s, stands inside its 120-300 s band.
 
 **The pins moved, old beside new** (each with its reason in its docstring):
 - `tests/test_neufchatel.py`: the stern (15.8 → 16.6 ft at the knuckle, tumbling home); the
   generator's report (plain sail 1006 → 959 m², 35.5 → 33.8 trimmers, the head's rope 1.314); a
   far ship of hers with no role given, "merchant" → "privateer"; the polar's beam figures (4.95,
-  8.68, 12.22 → 4.85, 8.53, 12.07, ±0.5); the helm test, renamed, its close-hauled band; the gale's
+  8.68, 12.22 → 4.85, 8.53, 12.07, ±0.5); the helm test, renamed, its close-hauled band (at the
+  review of 2026-11-08 the old name and band restored as a strict known failure, and the abeam
+  half split to a passing test of its own); the gale's
   lines (the take-in added at the topsails' first to third reefs); the round trip's speed (6.02 →
   6.19, ±0.5); docstrings of 7-193, truth 6, the tack, the wear and heave-to and truth 9.
 - `tests/test_schooner_mast.py`: `COURSE_REEFED_BY_THE_GALE`'s row for her (the take-in beside the
@@ -15216,6 +15278,100 @@ this machine, one at a time with nothing else running, on the tree as committed 
   `data/ships` by `cmp`, hers as written by her module. `python tools/check_viewer_guns.py
   data/ships/hermaphrodite-brig.yaml` clean, and over every file clean.
 - **ruff** check and format clean (365 files); every changed file LF.
+
+### The review's mends and the final suites (B3.4b and B2b, 2026-11-08)
+
+An independent review of 52fad521 (B3.4b) and 46cf8218 (B2b) re-ran their measures on real ticks
+at the tree's head (her gale, her round trip, nine of B3.4b's 44 cases, every file's served graph,
+the generator, the four whole logs) and found them as recorded, and found no code defect against
+a ruling and nothing in B3.4b. Its five findings, each reproduced first on the owner's machine
+(the scripts in the session's scratch, `b34b/rev3/`, outside the repository), and what was done,
+in one commit:
+
+1. **B2b's key moves the three rigs in memory's gales, unrecorded** (should-fix; measure only).
+   Reproduced to the digest, on this tree with the key read as none in the process and on
+   52fad521 as exported, the two the same line for line: recorded above, "The three rigs in
+   memory with the key, sailed", with ruling 4's record (c) superseded there and the lead's item
+   widened. Two of the review's figures corrected in reproducing: the main topgallant's fixture
+   gripes from about 6,840 s (trial A and trial B from about 6,150 and 6,180 s, a 30 s trace),
+   its jib coming in at 38 kn as before.
+2. **Her helm test's close-hauled band moved to her measure without a ruling** (should-fix;
+   mended). Step 5's band, -1.0 to +1.5, is restored under the test's old name,
+   `test_her_helm_as_tuned_is_balanced_close_hauled`, marked a known failure (strict, on its
+   assertion alone: a re-tune into the band fails it until the mark is taken off), the
+   departure and its +3.95 in the mark's reason (measured at the head by the failing assertion,
+   3.949); the abeam and ten-point band, +0.5 to +4.0, is
+   `test_her_helm_as_tuned_abeam_and_at_ten_points`, passing; old beside new in both
+   docstrings, and above ("Her helm, for the lead").
+3. **Her quarter bill's note, "a third more"** (nit; mended): "a quarter more" in her module,
+   959 m² against 766 being 1.25; her file written by the generator, the fifteen others byte for
+   byte; noted above and in her design's §6. The bill's 35 against the arithmetic's 33.8 stays
+   the lead's.
+4. **Her gale test's docstring** gave the old run's state at 8,400 s as hers at lie a-try
+   (nit; mended, words only).
+5. **`INTENT_RULED_ROWS`, the build's reconciliation of the ruling's two sentences, not put to
+   the lead** (nit; recorded, nothing built): reproduced with the list emptied in the process,
+   six of the eight rows moving and nine files' crewed captains taking a role; recorded above,
+   "For the lead, the rows' roles". The review had the lugger and the smack moving on a passage
+   or a station; they move at all four kinds.
+
+**Pins moved, old beside new:** `tests/test_neufchatel.py`'s helm test,
+`test_her_helm_as_tuned_carries_weather_helm_close_hauled_and_abeam` (close-hauled +2.5 to
++5.0; abeam and at ten points +0.5 to +4.0) → `test_her_helm_as_tuned_is_balanced_close_hauled`
+(close-hauled -1.0 to +1.5, a strict known failure) and
+`test_her_helm_as_tuned_abeam_and_at_ten_points` (+0.5 to +4.0). Docstrings only: her gale test's
+old figures, and `tests/test_schooner_mast.py`'s gale case (the three rigs' gales as sailed). No
+other pin, digest, truth or whole log moved.
+
+**The suites, as run** (`py -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`
+from the tree root, one at a time with nothing else running, on the tree with the mends before
+this record was written):
+- **The touched files first** (`--slow`: `test_neufchatel`, `test_schooner_mast`,
+  `test_ship_particulars`): **154 passed, 1 xfailed in 0:33.**
+- **(a) The slow candidates** (`--slow -m slow`: SW-4's 67 files with every file B2, B3.3, B3.4b,
+  B2b and these mends touched, 81 files, 311 tests): **289 passed, 9 xfailed, 1 skipped, 12
+  failed in 46:11.** By junit, test by test, against B3.3's slow candidates (`settee/b33-slow.xml`,
+  299): **one outcome changed**, truth 51's pace, failed → passed (the machine's pace). The 12
+  failures are the machine's nine with their values as in the base and three pace tests: the
+  station's gale 8df0ab2beba93320 for 04f2fcd0fe9023a4 and the thick weather df5f02eb6e6ce68a for
+  cfa538b19cb0d2fe, as before; the trade stranger **8dac97a4c9bdfe43 for the trunk's
+  aa04702e062bc64b** (826d8855f87befdc for 5e7bdba2a4f4770b in the base: the trunk merge
+  2da2668f's, as B3.4b and B2b found, not these steps'); the six gate truths (the merchant
+  passage's and the schooner's constants, the schooner's octant log, truths 77, 78 and 79), the
+  same values; and the pace on the day under systems, on the gates' day and with the convoy of six
+  at 498, 475 and 452 ticks a second against 500 (439, 421 and 383 in the base). Twelve tests have
+  no base, all passing: `test_chart`'s three slow (B2b's file, outside B3.3's list) and the
+  trunk's truths 7-357, 7-426 and 7-433 to 7-435 and `test_signals`' four.
+- **(b) The captain's trials** (`--slow`): **3 failed, 4 passed in 5:23**, the three on their
+  digests alone, as in (a).
+- **(c) The four whole logs** (`log_digests.py` against `b2/digests-final.json`, re-based on the
+  trunk as the lead's (8) of 2026-11-07 says): **every field equal.** The first action 497 lines,
+  84176c16104a2c67 (473 lines and ce709e3b47a4d362 at SW-4 and B3.4: package 74's step 2, the
+  captain taking possession at 6,180 s, merged with its own pins; no pin moved for it); the
+  encounter 229, 523ebf0bf6180321; the station's lee shore 1,561, 8f2e1783e6d13312, 69,179 ticks
+  with a port shut, most 22, roll 22.19°, heel 20.83°; its gale 1,722, 8df0ab2beba93320, 61,434,
+  26, 23.0°, 27.07°.
+- **(d) The generator** (`py tools/gen_ships.py` into scratch): **all sixteen files byte for byte**
+  with `data/ships` by `cmp`, hers as taken from it. `python tools/check_viewer_guns.py` over
+  `data/ships`: **clean**, exit 0.
+- **(e) The whole fast tier** (`--junitxml` into the session's scratch, `b34b/final-fast.xml`, the
+  next step's base): **6,912 passed, 2 skipped, 2 xfailed in 55:17**, exit 0. By junit against the
+  fast tier at 1bdb0546 (`settee/final-fast.xml`, 6,838): **one outcome changed**, her helm's
+  close-hauled band, passed → xfailed (+1.11 with the 93 m² fore staysail at 1bdb0546, +3.95 with
+  the 46 m² since B2b; mend 2). Only in the base, five `test_primer` orders blocks of chapters 20
+  and 23 whose lines the trunk moved (seven in this run). Only in this run, 83, all passing: the
+  trunk's 56 (`test_captive` 4, `test_flags` 10, `test_known_truths` 8, truths 7-355, 7-356 and
+  7-427 to 7-432, `test_primer` 22, `test_signals` 12), B3.4b's 11 (`test_evolutions`), B2b's 15
+  (`test_chart` 1, `test_hull_form` 1, `test_neufchatel` 8, `test_the_ship_herself` 5) and mend
+  2's one. The other xfail and the two skips as in the base. The tier took 55:17 here without
+  B3.4b's recorder (56:17 with it, 29:51 at B3.4), so the recorder was not the cause.
+- **(f) ruff** check and format clean (365 files); every changed file LF.
+- **With this record written**, the files that read the documents (`test_hull_schooner`,
+  `test_hull_brig`, `test_hull_cutter`, `test_hull_frigate`, `test_hull_lugger`, `test_hull_smack`,
+  `test_practice`, `test_in_world`, `test_hull_form`, `test_knowledge`, `test_primer`,
+  `test_grammar_book`, `test_indefatigable`, `test_officer`) with `test_neufchatel` and
+  `test_schooner_mast`: **1,739 passed, 1 xfailed in 9:51** (the xfail her helm's close-hauled
+  band).
 
 ## The settee in the engine (package 75, B3.3) (2026-11-07)
 
