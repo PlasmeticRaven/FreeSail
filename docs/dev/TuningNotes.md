@@ -19172,6 +19172,29 @@ recaptor's captain speaks her and resumes his passage at the retaking. The fallb
 COUNT`): no passage of the suite has a far ship engaging an awake hull with the cap full; the road
 is exercised by `test_far_action`'s own test and counted there.
 
+**The suites on the step's tree** (8bfdde0, a worktree pinned there; ruff check and format
+clean; the trunk last merged at 9b821fb, its later heads to be merged with the resumption's runs;
+2026-11-07 to 08): the fast tier whole **exit 0** (21:24:15 to 22:17:02); the slow tier of the
+touched files and the known truths **exit 0** (23:24:48 to 01:02:45, run alone after a combined
+three-tier run was cut at the runner's two-hour cap); the pace tests alone and last **exit 1**
+(01:03:11 to 01:12:34), **two red**: 7-159 (the convoy of six at far detail) at **175 ticks/s
+against its floor of 500** with the machine's load about one, and 7-361 (this step's own pace
+truth) failing before it measures, the gate day's world having no position (`world.position` is
+None into `destination`; the truth never ran as a pace test before this tier). **7-159's cause,
+named by a profile and not mended** (the pause below): on the step's tree the far brain's
+`_enemy_within` runs `far_action.has_guns` for a stranger in sight at every tick of the far brain
+(once a world minute), and `has_guns` reads the fit by `load_spec(vessel.ship_file)` from disk
+each time; in the convoy's scene the far brains' five minute-ticks over 300 world ticks spent
+2.7 s of the 4.7 s in `load_spec` alone, a road the far brain never reached before this step (its
+engaging transition returned None). The mend is the fit read once a vessel (a cache by file, or
+the guns' reach kept on the far body at her making), to be measured with the toggle off beside on
+at the resumption, the floor never lowered. 7-361's mend is a world with a position for its
+measure (the scene's `world_at`). **The package pauses here at the owner's word** (2026-11-07,
+the record on the trunk; the account's weekly limit), the step's tree standing at 8bfdde0 with
+its two reds named and nothing of step 4 in the trunk; it resumes about 2026-11-12 19:00 UTC or
+when the owner says, with these two mends, the trunk merged and the three tiers run again at one
+hash.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
