@@ -6064,6 +6064,21 @@ builder reproduces each first and mends it at its cause.
    person may carry word to and fro as a station does; an order passed from the cabin with its
    minute is to be designed with that).
 
+7. **The flags of command come down, and are read** (added 2026-11-09, the owner's further note:
+   "there didn't seem to be a way to bring them back down, and checking 'the flags' even with
+   the broad pendant and jack hoisted gave none"; reproduced by the lead on the trunk). 76's
+   item 8 built `hoist the broad pendant`, `hoist the jack` and `hoist a second ensign at the
+   main` (`orders/signals.py`, `_hoist_flag`, the locker's `ordered_flags`) and no way down but
+   the colours': "haul down the broad pendant", "haul down the jack" and "haul down the second
+   ensign" are read as a sail's take-in and refused ("There is no such part as the broad pendant
+   in this ship"), and "strike the broad pendant" is no order. And `the flags` reads the signal
+   hoists alone ("The flags: none." with all three flying), `the colours` the ensign alone, and
+   nothing reads what flies. Build: each of the three hauled down by its name (haul down, strike
+   and lower as its words), refused in words when it is not flying; `the flags` says what flies
+   where (the ensign, the pendant, the jack, the broad pendant, a second ensign, from the
+   locker's `flies`) and then the signal hoist if one is up; `the colours` as it is. By the
+   deck's rule with step 6. The primer's chapter 23.
+
 **Rules:** the standing ones (no pin moved but old beside new with its proof; no test skipped or
 weakened; ship files through the generator alone; served words in-world; the consent files not
 touched; no key in the repository or a log). The fast tier on the step's tree, the slow tier of
