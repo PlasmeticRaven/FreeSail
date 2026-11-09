@@ -81,7 +81,7 @@ on these packages; that is the owner's choice.
 | 98 | Opus | **The mends from the owner's play of 2026-11-09** (the lead, from the triage above): the player's own readings and refusals heard wherever he stands, and "go below" reaching the server; a kept live-browser probe that proves each mend as the player sees it; the viewer's paint order for guns and flags, a flag's lines, the truce state and 81's port-top rule; the picture at the OpenRouter door; the Rade de Brest's stream; the colours and signals by the deck's rule | briefed 2026-11-09 (below); **approved and launched 2026-11-09 (the owner)** as an Opus sibling session on `claude/pkg-98` (session_01XooV4AQeh4Fkc3zC5jdAuL), the trunk at be9c951e, with the owner's two rulings in the brief (the colours and signals the deck's; a man's own word, refusals and readings always shown him, a thing done out of his sight not) |
 | 99 | Opus (a design note first) | **The views under the knowledge rule** (the owner's note 3): the chart and the ship view show what the person knows, the last value he learned with its hour where he lacks the live one; the captive's cabin and its senses ruled with it | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
 | 100 | Opus | **Letters and things as one system** (the owner's note 8): a letter a thing with words, written, carried, handed, read, sealed and destroyed by anyone by one road; the director's things with a description, removed by his form; the letters by boat and by cutter carried as things | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
-| 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **for the owner's approval**; the design note may start at once, the building after 74's step 5 (the valuation) is on the trunk |
+| 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **to run after 74 closes (the owner, 2026-11-09: "it's good to let 74 close cleanly before starting anything else major")**, the design note and the building both; the brief to be put to the owner for approval then |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -6167,7 +6167,7 @@ old ship thereafter (sold, laid in ordinary, or left to her officer under an int
 (the Crown's ship is not her captain's to sell or buy by the service's rule, a privateer's and a
 merchantman's are their owners'; the player as owner, as owner's captain, as the King's officer);
 and how 74's new command and a prize the player takes command of himself would use the same act
-later. The note may be written before 74 closes, reading its scratch branch.
+later. The note is written after 74 closes, on the trunk as it then stands.
 
 **Then, in steps, each at one hash:**
 
@@ -6201,8 +6201,8 @@ later. The note may be written before 74 closes, reading its scratch branch.
    errand and reported in the purser's words, the play log never showing the order (M7b's 99c
    and 99d, numbered here).
 
-**Sequence:** the design note at once on approval; steps 1 and 2 after the note's gate; steps 3
-to 5 after 74's step 5 (the valuation and the court) is on the trunk. **Rules:** the standing
+**Sequence (the owner, 2026-11-09):** the whole package after 74 closes, the design note first
+and then the steps in order; nothing of it starts while 74 is open. **Rules:** the standing
 ones; every save and checkpoint from before loads and replays as it did (the kept saves are the
 proof); no pin moved but old beside new with its proof.
 
