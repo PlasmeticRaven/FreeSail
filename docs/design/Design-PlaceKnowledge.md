@@ -1075,3 +1075,27 @@ hears him; no seat is made and nothing else of 82's voice is touched. The hearer
 already (step 4's `hearing.station_spot` read his spot).
 
 **Found on the way** is in the tuning notes.
+
+### Package 98, step 2: the player hears his own answer (the owner's ruling of 2026-11-09)
+
+The owner's play of 2026-11-09 found 30 of 45 lines typed ashore and in the cabin answered by the
+server and never shown him (the triage's note 6): `query.*` lines are classed `said` with no
+place and fell to the deck's default, `order.*` lines to the deck's, so the player's own readings
+and refusals, and his own word below to another station (`agent.told`, received by the station),
+were dropped wherever he was not on deck, against §5's "the asker's own question, heard where he
+asked it". **The owner's ruling:** what is not in the world is always shown the man who made it,
+wherever he stands: his own word, his refusals and his readings. What is done in the world out of
+his sight is not shown him and is not reported of itself (that waits package 99's design).
+
+**As built.** `knowledge.his_own(e, station)` reads a line as the player's own by its actor:
+the station's at the prompt (`captain`, or the seat's `the master (the player)`), for the families
+`query.*` and `order.*` and the words' kinds (`WORD_KINDS`), and the seat's own driver lines
+(`agent.refused`, `agent.answered`: `data.seat` and his station). `knowledge.hears` lets such a
+line through first, asleep or awake, so the pages, their reach-back (a reload, `shown_log`) and
+the console show it by the one rule. A rule captain (`captain's rule ...`), a standing order
+(`standing order ...`) and a model's station have their own actors and are untouched; a deed done
+by his order (a sail set, the colours changed) is not of the families and reaches him by his
+place as before. The page's `go` is the clock's only alone or with a number (`client/app.js`), so
+`go below`, `go aloft` and `go ashore` reach the game. Proven by the browser probe's eight plans
+(`tools/browser_probe.py`, `tests/browser_plans/`), every line typed answered in the page; truths
+7-446 to 7-448.

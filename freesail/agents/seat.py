@@ -55,6 +55,7 @@ from freesail.agents.harness import Harness
 from freesail.agents.journal import Journal, journal_of
 from freesail.core.events import Event, Severity
 from freesail.orders.errors import OrderError
+from freesail.world.knowledge import SEAT_ACTOR_SUFFIX
 
 if TYPE_CHECKING:
     from freesail.core.world import World
@@ -122,8 +123,8 @@ SEAT_KIND = "seat.taken"
 
 # The seat's actor is the station's with this after it, so that the World journals the
 # player's orders (a station's own actor is a harness's, whose replies are its transcript
-# and are not journaled) and the log says whose they were.
-SEAT_ACTOR_SUFFIX = " (the player)"
+# and are not journaled) and the log says whose they were (`SEAT_ACTOR_SUFFIX`, spelt in
+# `world.knowledge`, whose play log knows the player's own lines by it).
 
 
 def seat_actor(station: str) -> str:

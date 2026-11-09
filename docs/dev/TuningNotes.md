@@ -20803,3 +20803,106 @@ knowledge's reach (test_knowledge and truth 7-380, the lead's guard; 6,601 run, 
 failed, 1 xfailed), placed on the deck at ca47c9e; at 6aea118 the fast tier passed (exit 0,
 6,601 run, 6,600 passed, 1 xfailed, 456 slow left out) and the slow tier found the trade
 trial's digest (578 run, 569 passed, 1 failed, 8 xfailed), re-measured at b0cda9c.
+
+## Package 98: the mends from the owner's play (2026-11-09)
+
+The owner's play of 2026-11-09 on the *Prince de Neufchatel* triaged by the lead
+(`docs/dev/M7-WorkPackages.md`, "The owner's play of 2026-11-09"); one builder, in steps, each
+reported at one hash.
+
+### Steps 1, 2 and 6: the probe; the player hears his own answer; the colours and the signals by the deck's rule
+
+**Step 1, the probe, built.** `tools/browser_probe.py`, from the lead's prototype (its
+`probe.js`, plan and scenario; the folder removed, the scenario kept as
+`tests/browser_plans/scenarios/neufchatel-falmouth.yaml`). Written in Python over Playwright's
+sync API, as `tests/test_pictures.py` is, so that the tool and its test are one program: the
+game is made by the server's own road (`ui.server.prepare_game` from the plan's flags and
+scenario), or by a plan's `world:` builder where no scenario reaches the place by play (the
+prisoner: `tests/browser_plans/worlds.py`, the struck frigate of `tests/test_captive.py`), and
+served by uvicorn in a thread on a free port with the consent records and the saves in the
+run's own folder; the clock held and advanced by the plan's ticks. For each line typed it keeps
+whether a request left the page (`/api/order`, `/api/driver`, none), the server's answer, the
+socket's frames after it, the log pane's new rows and the "Where you are" instrument, marks the
+line ANSWERED, OTHER or UNSHOWN, and judges it against the plan's expectation (answered by
+default; `sent`, `shown`, `contains`, `absent`, `kind`); a failed step is screenshotted; the
+run writes `report.json` and `report.txt`, exit 1 on a failure, 2 with no browser. Eight plans
+by place and state (`tests/browser_plans/`): `deck-and-below` (the deck, the cabin, the gunroom
+and aloft at anchor), `ashore` (the quay, the market and the tavern), `under-way`, `action` (the
+first action at quarters), `asleep`, `boat-and-visitor` (the frigate's launch and a visitor
+aboard a brig put on the sea by the owner's world order), `seated` (the master's station) and
+`prisoner`. `tests/test_browser_probe.py` plays them in the slow tier (`DAY_FIXTURES`: the
+browser is the module's fixture), skipped where Playwright or its browser is missing; its fast
+test checks the plans are found and well formed.
+
+**Taken another way, with the reason.** (1) Python, not the prototype's Node script: one
+language with the server and the test, the game in-process so that its clock is read for the
+page to catch up (below). (2) The page is waited for after a tick until its last snapshot is the
+World's tick: at 1x a tick of an hour is 3,600 snapshots on the socket and the page reads them
+one by one, so a line typed at once was answered before the pane had caught up (the prototype's
+fixed waits marked such lines unshown). (3) A plan's setup moves by `go to the cabin` and `go to
+the tops` after the typed `go below` and `go aloft`, so that the page's defect fails its own line
+and not every line after it. (4) The seated plan takes the master's station: the officer of the
+watch's seat without the deck refuses every line, readings among them (found for others below).
+(5) The visitor's plan says `say good day to you`, not `say to the captain: ...` (found below).
+(6) The Neufchatel's boats have no file of their own, so the boat's plan sails the frigate in
+Carrick Road (`scenarios/frigate-falmouth.yaml`).
+
+**Step 2, the player hears his own answer, built** at its cause, `knowledge.hears`: a line the
+player made is his wherever he stands (`knowledge.his_own`: by the actor, the station's at the
+prompt or the seat's, for `query.*`, `order.*` and the words' kinds, and the seat's own driver
+lines), asleep or awake; the console, the pages and their reach-back by the one rule. The seat's
+actor suffix is spelt once (`knowledge.SEAT_ACTOR_SUFFIX`, imported by `agents.seat`). The
+page's `go` is the clock's only alone or with a number (`client/app.js`, `submitLine`). The
+owner's ruling's other half holds by construction: a deed (a sail set, the colours changed)
+is of no own family and reaches him by his place as before; nothing is reported of itself.
+
+**Step 6, the colours and the signals by the deck's rule, built** (the owner's ruling, yes, by
+the current standard): `orders.handle` checks the place of a signal order before its handler
+(`movement.check` with the object `signals`, now among `DECK_OBJECTS`), so the colours, the
+signals, the private signal, the lights and a hail are refused below and ashore in the deck's
+words ("You are in the cabin; go on deck to give an order of the deck."; ashore "come aboard to
+give an order of the deck"); their readings answered as before; a visitor aboard another ship
+keeps his hail and his signal (as the visitor's refusal says), refused by the place below; a
+captive's are refused as his other orders are (before, they bypassed the check). The primer's
+chapters 14 and 23.
+
+**The figures, old beside new** (the probe's eight plans, the same plans at both hashes; the
+plan files are step 1's):
+
+| plan | at e861079 (step 1, before the mend): unshown of typed, expectations failed | after (steps 2 and 6) |
+|---|---|---|
+| action | 5 of 12, 7 | 0 of 12, 0 |
+| ashore | 23 of 29, 24 | 0 of 29, 0 |
+| asleep | 2 of 4, 3 | 0 of 4, 0 |
+| boat-and-visitor | 3 of 13, 3 | 0 of 13, 0 |
+| deck-and-below | 20 of 34, 30 | 2 of 34, 0 (`go` and `hold`, the clock's, sent to the driver) |
+| prisoner | 5 of 6, 5 | 0 of 6, 0 |
+| seated | 5 of 11, 7 | 0 of 11, 0 |
+| under-way | 8 of 14, 10 | 0 of 14, 0 |
+| all | 71 of 123 unshown, 89 failed, 0 of 8 plans met | 2 of 123, 0 failed, 8 of 8 met |
+
+The prototype as run by the lead at 7693cad5 found 30 of 45 (reproduced here at be9c951 before
+any change: 30 of 45, the same lines). **No pin moved**: no truth or test asserted a player's
+own line dropped; the fast tier of the touched files passed unchanged (test_knowledge,
+test_orders_places, test_signals, test_captive, test_console, test_driver, test_flags,
+test_aboard_another, test_places, test_server, test_visitor_name, test_observer, test_primer,
+test_in_world). The new tests each fail with their mend toggled off (`his_own` disabled in
+`hears`: both step 2 tests fail at their first own line; `orders/__init__.py` restored: step 6's
+test fails at the cabin's `haul down the colours`, done). Truths 7-446 (his own lines, the
+pages, the reach-back, the console, the seat), 7-447 (a deed and a rule's, a standing order's
+or a model station's line are never his own), 7-448 (slow: the probe's `ashore` and
+`deck-and-below` plans met), 7-449 (the colours and the signals refused below and ashore).
+
+**Found for others (not mended).** (a) A player seated at the officer of the watch's station
+without the deck has every line refused for want of it, readings among them ("where am I", "the
+time": `agents/seat.py`, `PlayerSeat.route`, whose deck check exempts the reckoning and the
+conversation and no reading); the seat's package. (b) A visitor's `say to the captain: ...`
+aboard another ship is refused "The captain tells himself nothing": the host's captain is not
+addressable by "the captain" from the visitor's prompt (82's voice). (c) After a long tick the
+page's "Where you are" and log lag the World by as many snapshots as ticks at 1x (the page's
+reading of the stream; the probe waits for it). (d) `go ashore` given from the tops is accepted
+(the boat takes him from aloft); judgement whether he should come down first. (e) The
+*Neufchatel*'s boats have no file of their own: `go to the boat` is refused in her ("The
+long-boat has no file of her own to be a vessel by"), the ships session's. (f) A world order
+typed at the page gets no row in the log pane (decision 46: the play log carries its effects,
+not the order); the owner, typing one, sees nothing unless it does something in sight.
