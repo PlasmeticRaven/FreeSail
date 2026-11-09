@@ -501,7 +501,7 @@ print(repr(seen))
 # none, and a built module its own files only.
 MODULE_FILES = {
     "ships.indefatigable": ["razee-44.yaml", "sixty-four.yaml"],
-    "ships.neufchatel": [],
+    "ships.neufchatel": ["hermaphrodite-brig.yaml"],
     "ships.bilander": [],
     "ships.bellerophon": [],
 }

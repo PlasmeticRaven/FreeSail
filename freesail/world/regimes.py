@@ -187,7 +187,10 @@ def _story(vessel: Any, tick: int, words: str) -> None:
 # The minute: the commissions due and the sorties
 # ---------------------------------------------------------------------------
 
-_MAN_OF_WAR_ROLES = frozenset({"kings-ship", "cruiser", "commodore"})
+# the revenue cutter's among them (package 75, SW-4's words step, the lead's ruling at SW-4's
+# merge: an armed vessel of the Crown, so a squadron in ordinary waits for her to leave the
+# offing as for a cruiser)
+_MAN_OF_WAR_ROLES = frozenset({"kings-ship", "cruiser", "commodore", "revenue"})
 # the descriptions of the men of war (package 75 adds the new ships' rows, keyed before
 # their files come: docs/design/Build-Ships.md §3.1 item 25)
 _MAN_OF_WAR_DESCRIPTIONS = frozenset(
