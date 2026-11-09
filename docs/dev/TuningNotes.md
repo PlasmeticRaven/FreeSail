@@ -22806,3 +22806,59 @@ reading of the stream; the probe waits for it). (d) `go ashore` given from the t
 long-boat has no file of her own to be a vessel by"), the ships session's. (f) A world order
 typed at the page gets no row in the log pane (decision 46: the play log carries its effects,
 not the order); the owner, typing one, sees nothing unless it does something in sight.
+
+### Step 3: the viewer's paint order
+
+**Built.** (1) **The guns** (`client/projection.js`, `gunFigures`): a port gun's inboard figures
+(its carriage, its barrel inboard of the side, its muzzle's face while inboard, a gun dismounted)
+sort at its port's strip of the side (`stripMid`, the strip the lid sorts with) and
+`PORT_GUN_BEHIND_M` (0.01 m, judgement, over `DEPTH_TIE`) farther by `sortBias`, so that a gun
+secured or run in is behind her side and its lid from outboard on every file; its outboard
+figures keep their own middles. (2) **The flags** (`flagFigures`): every part and line of a flag
+sorts at the flag's middle (§12.3, "as a sail does"), painted in the drawing's order, which
+76's file now serves (`Flag.served_drawing`: each part and line with `n`, its place in the
+drawing; the Union's crosses over its saltires); `flagsWhole` keeps each flag's figures together
+after the sort. (3) **A drawing's lines drawn** (`flagLine`): a band of the line's width (a share
+of the hoist) about it, cut to the rectangle its ends span, so that a saltire's arm ends at the
+canton's corners. (4) **The kinds' ranks**: `gun` after the hull on a tie and before the rig,
+`flag` as a sail. (5) **The truce**: the fallback (`viewer_flags.flags`, no locker list) serves
+the flag of truce at the fore truck (`TRUCE_PLACE`, the basic file's occasion), not the peak; a
+vessel of one mast flies at her only mast what a ship flies at her fore (`flagPlace`). The list's
+road drew it at the fore already. (6) **81's port-top rule** (the lead's ruling of 2026-11-07:
+the server's top takes the deck's tilt and the 2 mm): `viewer_guns.port_top`, the top tilted
+with its deck as the viewer draws it, cut where either corner would stand over the rail at that
+corner's x less `TOP_UNDER_RAIL_M` (the viewer's `ON_LINE_M`), floored to the millimetre the graph
+serves; the departure `CUT_AT_A_CORNER_M` gone from 81's test with it. (7) **The settee's sheet's
+side served** (`queries._settee_sheet_side`: `sheet_side` while its one sheet is held over to
+windward, by `evolutions.trim.read_sheet`, read and not changed), and the cloth drawn there
+(`lugCut`), its block on the lee side as before.
+
+**The figures, old beside new** (measured by the tests' own projections, every 15 degrees,
+heel 0 and 15, 48 views a file). A port gun's inboard figure painted after its shut lid, seen
+from outboard on her side, guns secured: brig 283 (in 44 of 48 views), cutter 60 (34), frigate
+359 (41), *Neufchatel* 299 (44), merchant brig 56 (38), privateer schooner 75 (44), razee 591
+(44), sixty-four 688 (44); after, 0 on every file and in every state (secured, run in, run out).
+Every root's ensign out of its drawing's order at the base: Britain 44 of 48 views, France 42,
+Spain 46, the United States 46, Naples 17, basic (Portugal) 46 on the frigate; after, 0 on the
+frigate and the *Neufchatel*. The served port tops that move (`viewer_guns.port_top`): the
+*Neufchatel*'s upper deck at x -14.23 2.516 to 2.498, at -5.64 (No. 8) 2.270 to 2.265, at 14.39
+2.756 to 2.749; the sixty-four's quarterdeck at -5.88 6.191 to 6.105; no other file's.
+`tools/check_viewer_guns.py`'s output unchanged on every file.
+
+**Pins moved, old beside new.** `tests/test_viewer_action.py`'s fallback row for the truce:
+the place "peak" to "fore truck" (the toggle: `TRUCE_PLACE` back to the peak passes the old
+row). `tests/test_view_action.py`'s `CUT_AT_A_CORNER_M` departure removed with the rule that
+answers it (her No. 8 now served 2.265 and drawn at it). Truth 7-445 is unmoved (it checks the
+truce's name and colour). New: truths 7-450 (the guns behind their lids, 24 cases), 7-451 (every
+root's ensign as one flag, 12 cases), 7-452 (the truce at the fore, every armed file and the
+lugger), 7-453 (the port tops), 7-454 (the settee's sheet), and the Union's lines in its canton;
+each mend toggled off fails its cases (of the 70 cases of step 3's tests and the two files'
+port and fallback cases: the base `projection.js` 40 fail, the guns', the flags', the lines'
+and the settee's drawing; the base `world/flags.py` the Union's drawing order; the base
+`viewer_flags.py` 14, the truce's; the base `queries.py` 1, the settee's served side; the
+base `viewer_guns.py` 2, the port tops).
+
+**Found for others (not mended).** A gun run out keeps its outboard figures at their own
+middles, so that in oblique views its barrel's outboard part paints before its open port (brig
+65 views by guns, cutter 42, frigate 189, *Neufchatel* 52, merchant brig 8, privateer schooner 1,
+razee 275, sixty-four 455; the same at the base and after: not this step's ask).
