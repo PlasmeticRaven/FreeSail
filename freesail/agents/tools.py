@@ -1456,11 +1456,13 @@ def _picture(world: World, view: str, facing: str = "", span: str = "") -> Any:
 
     _, said = P.facing_of(facing) if view == P.SHIP else (None, "")
     made = P.paint(world, view, facing if view == P.SHIP else "", span if view == P.CHART else "")
-    if isinstance(made, P.Picture):
-        return {"picture": made.note(), "words": made.words()}
     keys = P.CHART_WORDS if view == P.CHART else P.SHIP_WORDS
     every = readings_words(world)
     shown = {k: every[k] for k in keys if k in every}
+    if isinstance(made, P.Picture):
+        # the readings it shows beside it (package 98, step 4): a door that cannot show the
+        # picture says so and gives them (`pictures.not_shown`); one that shows it drops them
+        return {"picture": made.note(), "words": made.words(), "readings": shown}
     what = "the chart" if view == P.CHART else f"the ship seen from {said}"
     return {
         "words": f"{made}, so there is no picture of {what}; the readings it would have "

@@ -22862,3 +22862,41 @@ base `viewer_guns.py` 2, the port tops).
 middles, so that in oblique views its barrel's outboard part paints before its open port (brig
 65 views by guns, cutter 42, frigate 189, *Neufchatel* 52, merchant brig 8, privateer schooner 1,
 razee 275, sixty-four 455; the same at the base and after: not this step's ask).
+
+### Step 4: the picture at the OpenRouter door
+
+**Reproduced** in code at its cause: `agents/api.py`'s `main` built `OpenRouterModel` with no
+`fetch_picture` (the Anthropic dialect's `ApiModel` had it), so `local.LocalModel._image_part`
+returned None and the tool's result went to the model as its words alone ("a picture of 1200 by
+900 pixels"), for every model at that door; and the door being `api`, the picture tools were
+offered whatever the model reads (`tools.PICTURE_DOORS`).
+
+**Built.** (1) `OpenRouterModel.identity` keeps the model's `architecture.input_modalities` from
+OpenRouter's models list, and `reads_pictures` reads `image` in it (None where the list does not
+say, taken as no). (2) `main`: where it reads an image the door's `fetch_picture` is the game's
+picture road and the seating says `pictures: true`; where it does not, `pictures: false`, and the
+door says which at its start (`OPENROUTER_PICTURES_WORDS`). (3) The seating's explicit no is kept
+apart from 45c's yes (`Seat.no_pictures`, `Harness.no_pictures`, class defaults False, so that a
+checkpoint from before loads as it was; the harness offers the picture tools at a picture door
+or where the seating says yes, and never where it says no); the Anthropic dialect and the local
+runner send what they sent. (4) Wherever a picture cannot be shown the words say so and give the
+readings: the game sends the readings a picture shows beside every picture
+(`tools._picture`), a door that shows the image leaves them out (`pictures.shown_result`), and one
+that cannot says it was drawn and not shown, and why, with the readings (`pictures.not_shown`:
+`NOT_SENT`, `NOT_FETCHED`), at the local runner's shape (the OpenRouter door's) and at the
+Messages API's (`ApiModel._picture`; its `PICTURE_GONE` words replaced). `docs/agents/Harness.md`
+section 5's pictures paragraph.
+
+**Taken another way, with the reason.** The seating's tri-state (`pictures` True, False or None)
+was written first and given up: the harness's class default `False` is in old checkpoints, and
+read as "said no" it would have taken the pictures from an API door's station restored from
+one; hence the separate `no_pictures`.
+
+**Tests, a stub door, no provider called** (`tests/test_api_door.py`): truth 7-455, the door
+end to end on the test game against a mock transport whose models list says `["text", "image"]`
+(the chart offered, fetched and sent as an image part, the result's words with its size and
+without the readings) or `["text"]` (no picture tool offered, said at the start); truth 7-456, a
+picture not shown at both shapes, said so with its readings and no size, and the game's result
+carrying them. Toggles: the base `api.py` fails all three; the base `harness.py` the
+not-reading case; the base `local.py` the reading case and the not-shown case; the base
+`tools.py` the not-shown case. **No pin moved.**
