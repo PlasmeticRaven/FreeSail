@@ -14899,3 +14899,14 @@ def test_truth_7_456_a_picture_not_shown_says_so_with_its_readings():
     )
 
     test_a_picture_not_shown_says_so_and_gives_its_readings_never_its_size()
+
+
+def test_truth_7_457_the_flags_of_command_come_down_by_name_and_are_read():
+    """Package 98, step 7 (the owner's further note of 2026-11-09): the broad pendant, the
+    jack and a second ensign hauled down each by its name and refused when not flying; `the
+    flags` reads what flies where and then the signal hoist; by the deck's rule."""
+    from tests.test_flags import (
+        test_the_flags_of_command_come_down_by_their_names_and_the_flags_read_what_flies,
+    )
+
+    test_the_flags_of_command_come_down_by_their_names_and_the_flags_read_what_flies()

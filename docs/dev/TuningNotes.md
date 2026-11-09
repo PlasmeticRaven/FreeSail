@@ -22900,3 +22900,29 @@ picture not shown at both shapes, said so with its readings and no size, and the
 carrying them. Toggles: the base `api.py` fails all three; the base `harness.py` the
 not-reading case; the base `local.py` the reading case and the not-shown case; the base
 `tools.py` the not-shown case. **No pin moved.**
+
+### Step 7: the flags of command come down, and are read (the lead's addition of 2026-11-09)
+
+**Reproduced** on the *Neufchatel* as the lead found it: the three hoisted ("A commodore's
+broad pendant hoisted at the main.", "The American jack, the union of stars hoisted at the
+fore.", "The stars and stripes hoisted at the main topgallant masthead, the ensigns doubled."),
+`the flags` "The flags: none." (an alias of the signals' reading, which reads the hoists alone),
+`haul down the jack` and its kin refused as a sail's take-in, `strike the jack` no order.
+
+**Built.** `orders/signals.py`: three forms appended (so that the forms before keep their
+places), `haul down the broad pendant`, `haul down the second ensign` and `haul down the jack`,
+each by haul down, strike, lower or take in, read before the grammar as the hoists are; carried
+out by `_haul_down_flag`, the flag taken out of the locker's `ordered_flags`, the colours left
+flying, what flies set again at once (`_FLAG_VERBS`); refused in words when it is not flying
+("No jack of hers is flying: there is none to haul down."); by the deck's rule with step 6 (the
+signal orders' place checked before their handler). `api/signal_readings.py`: a reading of its
+own, `flags` ("the flags", "what flies", "the flags flying", "the pendants", "the jack", on deck
+and aloft), each flag of the locker's `flies` with its words at its place, then "the signal
+flying: ..." while a hoist is up, "none (her colours are down)" with none; `the flags` taken
+from the signals' aliases, which keep "the signals" and "the signal"; `the colours` as it was.
+The primer's chapter 23 (the block run by `tests/test_primer.py`, its words as the game says
+them on the cutter, the table's two rows). Truth 7-457 (`tests/test_flags.py`), failing with
+`orders/signals.py` and `api/signal_readings.py` toggled to the base.
+
+**Taken another way.** `the jack` and `the pendants` read the whole list (one reading, as `the
+colours` is), rather than one flag each.
