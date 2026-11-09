@@ -81,6 +81,7 @@ on these packages; that is the owner's choice.
 | 98 | Opus | **The mends from the owner's play of 2026-11-09** (the lead, from the triage above): the player's own readings and refusals heard wherever he stands, and "go below" reaching the server; a kept live-browser probe that proves each mend as the player sees it; the viewer's paint order for guns and flags, a flag's lines, the truce state and 81's port-top rule; the picture at the OpenRouter door; the Rade de Brest's stream; the colours and signals by the deck's rule | briefed 2026-11-09 (below); **approved and launched 2026-11-09 (the owner)** as an Opus sibling session on `claude/pkg-98` (session_01XooV4AQeh4Fkc3zC5jdAuL), the trunk at be9c951e, with the owner's two rulings in the brief (the colours and signals the deck's; a man's own word, refusals and readings always shown him, a thing done out of his sight not) |
 | 99 | Opus (a design note first) | **The views under the knowledge rule** (the owner's note 3): the chart and the ship view show what the person knows, the last value he learned with its hour where he lacks the live one; the captive's cabin and its senses ruled with it | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
 | 100 | Opus | **Letters and things as one system** (the owner's note 8): a letter a thing with words, written, carried, handed, read, sealed and destroyed by anyone by one road; the director's things with a description, removed by his form; the letters by boat and by cutter carried as things | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
+| 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **for the owner's approval**; the design note may start at once, the building after 74's step 5 (the valuation) is on the trunk |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -6131,6 +6132,79 @@ handed to their addressee, the captain no longer reading every letter aloud whoe
 the old `Message` kept loadable and turned into a thing at the load, so that every save and
 checkpoint reads. Every moved pin and digest of a passage with a letter old beside new. The
 books (the sheets, the manifests and the notes) stay as they are in this package.
+
+## Package 60 (from M7b): a ship bought, and the player's ship changed in play (`docs/design/Design-ShipBought.md` new, first; then `freesail/core/world.py` the player's hull re-pointed, `core/acts.py`, `core/replay.py` the change journaled and replayed; `freesail/world/knowledge.py` `player_hull`, `players_person`; `freesail/world/movement.py`, `people.py`, `prizes.py` the seat carried and the hands moved; `freesail/world/ships.py`, `ports.py`, `dealings.py`, `business.py`, `data/business.yaml` the owner, the price and the listings; `freesail/world/prize_court.py` the valuation with her condition; `freesail/orders/port.py`, `data/vocabulary.yaml` the orders; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the `for sale` tail and the errand's answer; `freesail/api/readings.py`; `data/scenarios/` a ship bought at Falmouth; `docs/TechnicalSpec-M7b.md` §21g and §21h as built; the primer's chapter 14; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-480 to 7-489)
+
+**For the owner's approval. Re-briefed by the lead, 2026-11-09, on a survey of the trunk and of
+74's unmerged steps.** The spec's bridge was four general things and no "buy a ship" feature
+(M7b §21g); it was written before the one world. What has been built since, and what has not:
+
+- **Built since:** every ship a hull of one world (84); the player aboard another ship, the
+  drivers following him, `follow` (82); a station handed over (65); persons moved between hulls
+  by the boat and by the director's form; `Registry.rehome` and the muster swap (74, for the
+  prize master alone); journals keyed to the person, so they travel; the save's `hulls` block and
+  inputs keyed by hull; the purse's ledger and transactions (53b); a ship laid in ordinary at a
+  port. On 74's scratch branch: a hull valued by her tons and guns (`prize_court.valuation`, £8
+  and £12 a ton, worn by her years, no term for her condition), a prize's cargo sold, the purse
+  credited; and a new command after a court martial, written as a new scenario's start, not a
+  ship taken up in the running world.
+- **Not built, and this package's:** (1) **no road makes another hull the player's own.** His
+  hull is fixed when the game is made (`World.players`); the save's first block and its
+  `ship_ref` are that hull's; a visitor's and a prisoner's hull are never his home; the one code
+  that carries a seat into another hull's captain's station is the prize master's, and the
+  player's own person is never one. (2) **No order moves hands as a count** between two hulls
+  for the player. (3) **No vessel has an owner, a price or a for-sale state**; the markets sell
+  goods. (4) **No errand ashore by a named person** with the director's answer in it (the boat
+  goes for the prices, a letter, the yard and the goods).
+
+**The design note first, for the lead's gate** (in 83's shape, read against the code): the change
+of the player's ship as one journaled act that the replay repeats at its tick (what re-points:
+`World.players`, the `""` keys of the acts, `player_hull`; what the save's first block is after
+it, so that every older save still loads); what travels with him (his person, his seat, his
+journal, his followers by name) and what is the hull's and stays or is settled (her purse, hold,
+papers, stores, reckoning, standing orders and bindings; the chart marks are the world's); the
+old ship thereafter (sold, laid in ordinary, or left to her officer under an intent); ownership
+(the Crown's ship is not her captain's to sell or buy by the service's rule, a privateer's and a
+merchantman's are their owners'; the player as owner, as owner's captain, as the King's officer);
+and how 74's new command and a prize the player takes command of himself would use the same act
+later. The note may be written before 74 closes, reading its scratch branch.
+
+**Then, in steps, each at one hash:**
+
+1. **The player's ship changed in play.** One order of the person's, where the ship is his to
+   take (bought, or given him by the director's word) and he is aboard her: his person rehomed,
+   his seat carried to her captain's station (the prize master's road made general), the player's
+   hull re-pointed, said in both logs; the save and the replay across the two ships with the
+   journals intact; the old ship a vessel of the world as the note rules. Refused in words where
+   she is not his, where a model or another person holds her captain's station, where he is a
+   prisoner.
+2. **The company moved.** The persons by the roads that exist; the hands as a count by one order
+   between two hulls within a boat's pull (`transfer the people and the hands to the "Fly"`, and
+   a number of hands by name of rating), the boat's loads taking their time as the prisoners'
+   do, each muster and bill re-made; refused where it would leave either unable to be worked,
+   in words that say how many she wants.
+3. **Owner, price and sale.** A vessel's owner and her for-sale state with an asking price;
+   listings at a port by its size and trade (`data/business.yaml`, drawn under the seed); the
+   director's `for sale at £900` tail on the ship order, doubted as any order; a reading of the
+   ships for sale where the port's business is known (ashore, or by the errand); `buy the ship
+   "Fly"` and `sell the ship` among the market orders, through the purse's ledger with their
+   cause, the hull valued by 74's function with a term for her condition (her damage, her
+   spars and sails wanting, her copper's years) and the yard's or the broker's margin; the
+   purse, the hold and the papers settled at the sale as the note rules.
+4. **The errand ashore.** `send <person> ashore to <errand>` (to ask what is for sale, to treat
+   for her, to find a broker), answered from the port's facts first and by a seated director
+   second, reported in the person's words when the boat returns; the purse and the cargo in the
+   director's truth if they are not.
+5. **The truths and a scenario:** the player sells the cutter at Falmouth, buys a listed
+   schooner, moves his people and hands by one order and sails her out, and the save replays
+   across the two ships with the journals intact; a director's listing found by the purser's
+   errand and reported in the purser's words, the play log never showing the order (M7b's 99c
+   and 99d, numbered here).
+
+**Sequence:** the design note at once on approval; steps 1 and 2 after the note's gate; steps 3
+to 5 after 74's step 5 (the valuation and the court) is on the trunk. **Rules:** the standing
+ones; every save and checkpoint from before loads and replays as it did (the kept saves are the
+proof); no pin moved but old beside new with its proof.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
