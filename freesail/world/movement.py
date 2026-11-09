@@ -285,6 +285,63 @@ VISITOR_VERBS = frozenset(
     {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore"}
 )
 VISITOR_OBJECTS = frozenset({"query", "needs", "free"})
+# What a captive's prompt performs (package 74; the owner's play of 2026-11-09), and nothing
+# else: his body's moves about the places his parole gives him (`_within_liberty`), his
+# needs, a question or a reading his place allows, a free line, and a word said (the
+# stations' `say to`, `ask` and `tell`: `CAPTIVE_STATION_VERBS`). He does not go ashore nor
+# aboard another ship at his own word, hails nobody, makes no signal, gives no standing
+# order and keeps none of her books.
+CAPTIVE_VERBS = frozenset({"go to", "go below", "come on deck", "go aloft"})
+CAPTIVE_STATION_VERBS = frozenset({"say", "ask", "tell"})
+CAPTIVE_LEAVING_VERBS = frozenset({"go ashore", "come aboard"})
+
+
+def _captives_own(verb: str, obj: str) -> bool:
+    return obj in VISITOR_OBJECTS or verb in CAPTIVE_VERBS
+
+
+def captive_at_prompt(ship: Any, leaving: bool = False) -> str | None:
+    """The captive's refusal for an order given at this ship's prompt, or None when its
+    giver is no captive (or no person stands behind it): for the orders that are read before
+    the vocabulary's (a hail, a signal, the colours, a standing order, a book, a station
+    stood down), which the place's `check` never sees."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    if world is None or not _mustered(world):
+        return None
+    actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+    person = person_of_actor(world, actor)
+    if person is None:
+        return None
+    from freesail.world.captive import captive_words
+    from freesail.world.hearing import own_hull
+
+    return captive_words(world, person, hull_of(world, own_hull(world)), leaving=leaving)
+
+
+def hand_on_her(world: Any, actor: str | None) -> bool:
+    """Whether an order given at this hull's prompt is the player's hand on her captain
+    (decision 41: the rules captain stands aside at it): only where its giver is one of her
+    own company and a free man. A captive's words and readings aboard his captor, and a
+    visitor's aboard another ship, are a person's own and never a hand on her captain
+    (package 74, the owner's play of 2026-11-09: a prisoner's 'say to Captain Penrose Yes.'
+    stood the captor's captain aside, and she lay aback and took the ground with nobody
+    commanding her). True where no person stands behind the actor, as before."""
+    person = person_of_actor(world, actor)
+    if person is None:
+        return True
+    from freesail.world.captive import captive_of, is_captive
+    from freesail.world.hearing import own_hull
+
+    rec = captive_of(world)
+    if is_captive(person) or (rec is not None and rec.get("person") == person.name):
+        return False
+    here = hull_of(world, own_hull(world))
+    home_id = str(getattr(person, "home", "") or "")
+    if here is None or not home_id or is_boat_hull(here):
+        return True
+    return str(here.id) == home_id
 
 
 def _visitors_own(verb: str, obj: str) -> bool:
@@ -324,14 +381,16 @@ def check(ship: Any, verb: str, obj: str) -> None:
         return
     here = hull_of(world, getattr(person, "hull", None)) if person.aboard else None
     home_id = str(getattr(person, "home", "") or "")
-    if not _visitors_own(verb, obj):
+    if not _captives_own(verb, obj):
         # a captive (package 74, the design's §3.1): no deck is his, this one least of all,
-        # and his own ship's is a prize's; the words name his state
+        # and his own ship's is a prize's; the words name his state. His going ashore or
+        # aboard another ship is refused him in his own words too (the owner's play of
+        # 2026-11-09: 'go ashore' met the free man's "bring her to an anchor")
         from freesail.world.captive import captive_words
         from freesail.world.hearing import own_hull
 
         prompt_hull = hull_of(world, own_hull(world))
-        said = captive_words(world, person, prompt_hull)
+        said = captive_words(world, person, prompt_hull, leaving=verb in CAPTIVE_LEAVING_VERBS)
         if said:
             raise OrderError(said)
     if (

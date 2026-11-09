@@ -78,7 +78,7 @@ answers:
     heave to: "A King's ship heaves to for nobody: stand on."
   # package 74 (spec M7 §18): a prize under her prize crew answers whose prize she is
   prize-master:
-    what ship: "The {name}, prize to {captain}'s ship, {voyage}."
+    what ship: "The {name}, prize to the {captor}, {voyage}."
     whence: "From {port}; taken these few days."
     whither: "{voyage_short}, with the prize crew."
     cargo: "What she had when taken: {cargo}."

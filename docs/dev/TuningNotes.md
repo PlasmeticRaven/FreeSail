@@ -20206,8 +20206,6 @@ sea at the minute's end, which ended the cartel at her own goal's arrival before
 minute keeps her on the sea until her persons are landed, and lands them at once where she lies
 in her port's road already.
 
-step's tree**: below, at the step's boundary.
-
 **The trunk merged at the boundary** (1c378de at eff2a55 and 3d1fa25 at 9b821fb, merge commits:
 81's viewer action, 76 whole with the flags of command, B3.4, the api package loading its readings
 first, the records; the meetings the tuning notes' appended sections, kept both in order). 75's
@@ -20301,6 +20299,100 @@ the record on the trunk; the account's weekly limit), the step's tree standing a
 its two reds named and nothing of step 4 in the trunk; it resumes about 2026-11-12 19:00 UTC or
 when the owner says, with these two mends, the trunk merged and the three tiers run again at one
 hash.
+
+**The resumption (2026-11-09, at the owner's word through the lead): the two mends, measured.**
+The trunk merged first (2dce392 at 7693cad, a merge commit, no meeting). **The fit read once a
+file** (`far.file_figures(ship_file, fit)`, cached: her name, the engaged broadside, her
+complement and her length; `far_ship` and the far brain's `has_guns` and `reach_m` read it): the
+cost had two sites, not one. The far brain's `has_guns` at every minute of hers was the first
+(7-159's); the second showed when 7-361 first ran with a world to stand in: `far_ship_of` built
+both sides from the file again at every round, 8.6 s of 11.6 s of a profiled thousand ticks in
+`load_spec`. The toggle `far_action.ENABLED` off beside on, each the best of three thousands
+after the first ten minutes, this container's four cores quiet:
+
+| the scene | the tree | off | on |
+|---|---|---|---|
+| 7-159's convoy of six at far detail, the privateer to windward | 8bfdde0 (old) | 423 to 568 | **162 to 185** |
+| the same | the mends (new) | 536 to 585 | **539 to 565** |
+| 7-361's two far frigates in anger twelve miles off the frigate hove to | the first cache alone | 1,244 to 1,259 | **384 to 400** |
+| the same | both sites cached (new) | 1,208 to 1,270 | **1,149 to 1,213** |
+
+(the frigate alone, hove to, 1,274 to 1,343). 7-159 is back over its floor of 500 on this
+machine with the far fight on, the floor not lowered, and its log's digest is the same with the
+toggle either way and on either tree (`a9f39f0f6e53`): no pin moved by the mend, which changes
+where a figure is read from and no figure. **7-361's world given a position**: the truth as first
+written stood on the gate's day, a world with no place on the chart to put a far ship at, and
+failed before it measured; it stands now on the frigate of the brains' sea hove to (7-159's
+form), two far frigates eight cables apart twelve miles south of her. The scene as it fights,
+found and pinned: the King's frigate `engaging`, the Frenchman `evading` (overmatched with the
+player's frigate in sight to the north of her) and fighting as she runs, two rounds by the
+measure's start and fifteen more in it, the Frenchman struck in the last thousand; the truth
+asserts the rounds fired through the measure (ten or more) and the floor.
+
+**Found on the way, not this package's (for the lead):** on the old tree 7-159's scene gave a
+different digest (`7b715d938512` against `a9f39f0f6e53`, the same count of events, the fourth
+world made in the process) in two processes of nine, and never on the mended tree in twelve
+worlds. Nothing in the simulation reads the wall clock; the one thing found that can differ
+between two like runs in a process is `squadrons._LAST_COURSE`, a module's table keyed by
+`id(world)`, which a new World standing at a dead World's address inherits (the old tree's
+thousands of specs read and dropped move the addresses about). Not proven: a probe that looked
+for stale keys at each world's making found none in five processes, and none of those five
+differed either. Said to the lead; `squadrons.py` not touched for it.
+
+### Step 3's mends from the owner's play (2026-11-09, with step 4 at its one hash)
+
+The lead replayed the owner's strike save of this week on the trunk and found five defects of
+the captive's channel in real play; each is reproduced here in the step's own scene (the
+player's frigate struck to a crewed French frigate, `tests/test_captive.py`), mended, and tested.
+
+**(1) A captive's words stood his captor's captain aside.** `World.submit` took any order given
+at the followed prompt while a rules captain commands for the player's hand on her (decision 41,
+`Captain.player_hand`): the prisoner's `say to the captain: Yes.` was `order.accepted` and then
+`captain.aside`, his book struck, and nobody commanded her (the owner's Vigilante lay aback and
+took the ground forty minutes on). Reproduced: old, in the scene, `aside` True and `state` None
+from the first word said, and so ten minutes on; new, `aside` False and `on passage` throughout,
+no `captain.aside` in either log, and she is more than three hundred metres on her way to Brest
+in ten minutes. The rule is the giver's (`movement.hand_on_her`): the hand is one of her own
+company's and a free man's; a captive's, and a visitor's aboard a hull that is not his, never.
+The step's own scenes had set him aside without seeing it, as the lead guessed.
+
+**(2) The captor engaged his own prize.** She had fired on him before she struck, so she stood in
+his `fired_on` and `_known_enemy` was True whatever her colours; a minute after the possession
+he went `engaging` again. Reproduced (the player's id written into his `fired_on` before the
+strike, as `action._fired_on` writes it): old, `engaging` at the first judgement after the
+possession and **38 shot at his prize in the quarter hour**, thirteen striking; new, `on passage`,
+no shot. The mend is twofold: his own prize, and any prize of his nation in her captor's hands,
+is no enemy (`Judgement._prize_of_ours`, read first in `_known_enemy`; a prize retaken or given
+back is judged as any sail again), and the taking clears her from `fired_on`, `pirates` and
+`recognised` as an enemy (`prizes._no_enemy_now`).
+
+**(3) A bare "Yes." was not read for the parole.** While the question is open, yes, oui, sí (and
+si), aye, "I do", "you have it" give it and no, non, "never", "I will not" refuse it, read as
+whole words after the phrases the step already read ("yesterday" is no yes, "not" no no); both
+in one answer, or neither, leaves it open; nothing is read once it is answered.
+
+**(4) A prisoner hailed from his captor's deck, and the prize answered "prize to Mr Ray's
+ship".** The orders read before the vocabulary's (a hail, the colours, a signal, a standing
+order, a book, a station's sentence, `captain: carry on`) never met the place's check. A
+captive's prompt now performs exactly: a word said, asked or told (`CAPTIVE_STATION_VERBS`), a
+reading or a question, his body's moves within his parole (`CAPTIVE_VERBS`: go to, go below,
+come on deck, go aloft, the last refused by his liberty), his needs and a free line; every other
+order is refused in the words that name his state (`orders._refuse_a_captive`,
+`movement.captive_at_prompt`), and nothing of it is done. The prize's answer: the hail table's
+row read `{captain}'s ship`, filled with the hailed world's captain's name; it reads `prize to
+the {captor}` from her record now, and her `captain` answer names her prize master.
+
+**(5) "go ashore" met the free man's refusal** ("bring her to an anchor"): going ashore and
+going aboard another ship were a visitor's own verbs and passed the captive's check. They are
+refused him in his own words ("you leave her where her captain lands you, or by a cartel").
+
+**Pins moved: none.** The five mends change what a captive's prompt does and what a captor
+judges of his prize; the step's own tests pass as they stood beside the six new ones, and the
+suites' figures are below. Truths 7-355 and 7-356 carry the new tests.
+
+**Three tidies of step 3's** (the lead's word): the broken sentence in the step's notes above
+("step's tree**: below, at the step's boundary.") removed; `captive.py`'s unused `nm()` and its
+`_ = math` line removed.
 
 ## Package 76: the signal books built out (2026-11-07)
 

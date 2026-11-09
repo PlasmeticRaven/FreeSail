@@ -791,8 +791,30 @@ def possess(
             # from words (the design's §2.6)
             fill_far_prize(prize_hull, record, nation_was, tick)
     prize.prize = record
+    _no_enemy_now(captor, captor_hull, prize)
     _lines(world, captor, prize, record, said)
     return record
+
+
+def _no_enemy_now(captor: Any, captor_hull: Any, prize: Any) -> None:
+    """The taking clears the prize from what her captor knew her an enemy by: her shot at
+    him (`fired_on`), a pirate's act (`pirates`), the signal or the hail (`recognised`); she
+    is his prize from now and judged so (`Judgement._prize_of_ours`)."""
+    sid = str(prize.id)
+    judges = (
+        getattr(captor, "brain", None),
+        getattr(captor_hull, "captain", None) if captor_hull is not None else None,
+    )
+    for judge in judges:
+        if judge is None:
+            continue
+        for name in ("fired_on", "pirates"):
+            held = getattr(judge, name, None)
+            if isinstance(held, set):
+                held.discard(sid)
+        known = getattr(judge, "recognised", None)
+        if isinstance(known, dict) and (known.get(sid) or {}).get("enemy"):
+            known[sid] = {**known[sid], "enemy": False}
 
 
 def _service_of(captor: Any) -> str:
