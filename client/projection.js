@@ -126,6 +126,19 @@
   // far abaft the fore mast (judgement).
   var SPRIT_SHEET_ABAFT_M = 1.0;
   var FORE_TOP_BELOW_HEAD_M = 1.0;
+  // Package 75 (B5.4; docs/design/Design-ShipsEngineExtensions.md §6.3, §5.9 with the lead's ruling
+  // on the bilander's §17 lead item 4). A settee's one sheet leads to a block on the deck a fathom
+  // abaft where its clew stands with the sail at its floor, and abreast of it: the block the trim
+  // gives a settee's cut (freesail/evolutions/trim.py, the lug's floor of 8 degrees and
+  // LOOSE_FOOTED_LEAD_AFT_M), here from the clew as the drawing swings the cut about its slings.
+  // Drawn on the deck, not at the taffrail on the centreline (Ext §6.3 as designed; the lead's
+  // ruling departs from it).
+  var SETTEE_SHEET_FLOOR = (8 * Math.PI) / 180;
+  var SETTEE_LEAD_AFT_M = 1.8288;
+  // A settee's derrick (the martinet, Lescallier 1791 p. 390) holds its yard's after part, drawn
+  // from this share of the way from the slings to the peak, as the mizen yard's (Steel 1794 vol. I
+  // p. 207: the derrick between the slings and the peak; judgement)
+  var SETTEE_DERRICK_ALONG = 2 / 3;
   // Package 75 (B5.1; docs/design/Build-Ships.md §6): a hull whose file gives a profile
   // (`hull.profile`, §5.1: x forward of midships, z above her waterline) is drawn from it, as
   // herself. Each side is drawn in strips, one polygon between each two neighbouring stations,
@@ -389,6 +402,9 @@
         sheet_angle: s.sheet_angle != null ? s.sheet_angle : spec.sheet_angle || 0,
         backed: !!s.backed,
         lug_side: s.lug_side != null ? s.lug_side : spec.lug_side || null,
+        // package 75 (B5.4; Ext §6.4): a settee's yard lowered on deck to be dipped, served only
+        // while it is
+        yard_lowered: !!s.yard_lowered,
       };
     }
     var beamM = hull.beam_m || 8;
@@ -428,8 +444,11 @@
       if (!side) side = tack === "starboard" ? "larboard" : "starboard";
       return sideSign(side);
     }
-    /** Whether a lug is hoisted (set, or drawn as set: blown out, wrecked, goose-winged). */
+    /** Whether a lug is hoisted (set, or drawn as set: blown out, wrecked, goose-winged). A
+     *  settee's yard (package 75, B5.4; Ext §6.3) stays aloft to set, take in and furl its sail,
+     *  and is on deck only while the engine has it lowered to be dipped (`yard_lowered`). */
     function lugHoisted(spec) {
+      if (spec.settee) return !sailDyn(spec).yard_lowered;
       var st = sailDyn(spec).state;
       return st === "set" || st === "goose_winged" || st === "blown_out" || st === "wrecked";
     }
@@ -438,7 +457,15 @@
      *  a lug topsail about its lower lug's, to whose peak its clew is sheeted) by the
      *  sheet's angle to the side it lies on, two thirds of it abaft the mast, the slings on
      *  the lee side of the mast; lowered, along the deck. `mastAt(id)` places a mast.
-     *  Returns {pts, pivotMast, sling, along, normal, onDeck}, or null with no cut. */
+     *  A settee (package 75, B5.4; Ext §6.3): its slings on the side its yard hangs
+     *  (`lug_side`), the cloth swung to the lee of the tack, where its one sheet lies it
+     *  wherever the yard hangs unless that sheet is held over to windward
+     *  (freesail/evolutions/trim.py's `read_sheet`; Ext §5.5 step 3): with the yard on the
+     *  weather side, after she is through the wind and until it is dipped, the sail lies
+     *  against the mast. Held over (hung in stays, Ext §5.5 step 2, or hauled to windward by
+     *  order) it is still drawn to leeward, as every fore-and-aft sail is: the snapshot serves
+     *  no sheet's side. And its sheet's block (`block`, SETTEE_SHEET_FLOOR). Returns {pts,
+     *  pivotMast, along, normal, onDeck, block}, or null with no cut. */
     function lugCut(spec, mastAt) {
       if (!spec || !spec.corners_m || spec.corners_m.length !== 4) return null;
       var host = spec.sheeted_to ? sailSpecs[spec.sheeted_to] : null;
@@ -451,19 +478,30 @@
       var down = !lugHoisted(spec) || (host && !lugHoisted(host));
       var a = sailDyn(host || spec).sheet_angle || 0;
       var ss = lugSideSign(spec);
+      var sw = spec.settee ? (tack === "starboard" ? -1 : 1) : ss; // the side the cloth swings to
       var ca = Math.cos(a), sa = Math.sin(a);
       var pts = spec.corners_m.map(function (q) {
         var dx = q[0] - sx;
         if (down) return v(sx + shift + dx, 0, deck + ON_DECK_M);
-        return v(sx + shift + dx * ca, ss * (lugLee - dx * sa), deck + q[1]);
+        return v(sx + shift + dx * ca, ss * lugLee - sw * dx * sa, deck + q[1]);
       });
-      var along = down ? [-1, 0, 0] : [-ca, ss * sa, 0];
+      var along = down ? [-1, 0, 0] : [-ca, sw * sa, 0];
+      var block = null;
+      if (spec.settee) {
+        // a fathom abaft the clew at the sail's floor and abreast of it, on the lee side, with
+        // the yard on that side of the mast: a fixed block, wherever the yard hangs now
+        var cdx = spec.corners_m[3][0] - sx;
+        var bx = sx + shift + cdx * Math.cos(SETTEE_SHEET_FLOOR) - SETTEE_LEAD_AFT_M;
+        var bz = profile ? deckAt(profile, bx) : null;
+        block = v(bx, sw * (lugLee - cdx * Math.sin(SETTEE_SHEET_FLOOR)), bz === null ? deck : bz);
+      }
       return {
         pts: pts,
         pivotMast: M,
         along: along,
         normal: cross(along, [0, 0, 1]),
         onDeck: down,
+        block: block,
       };
     }
     /** Package 75 (B5.2; docs/design/Design-ShipsEngineExtensions.md §6.1): a lateen cut at
@@ -783,6 +821,10 @@
           r.hoist = lc.onDeck ? 0 : 1;
           r.onDeck = lc.onDeck;
           r.flyingDown = sentDownFlying(lsp);
+          // package 75 (B5.4): a settee's derrick from its after part; its yard drawn as its
+          // head, throat to peak, as every lug's, so a yard filed longer than its head (the
+          // bilander's, Bil §4.4) is drawn to the head, its `length_m` reaching only the frame
+          r.settee = !!lsp.settee;
         } else if (where && spec.class === "yard" && yardOnDeck(id)) {
           // package 57: a royal set flying and sent down: its yard on deck, fore and aft,
           // beside the foot of its lower mast
@@ -1463,6 +1505,21 @@
           var lp = lcut.pts; // tack, throat, peak, clew
           var lfig = sailFigure(spec, dyn, [lp[1], lp[2], lp[3], lp[0]], lcut.normal, Y, len(sub(lp[2], lp[3])));
           if (lcut.onDeck) lfig.path = bundle(lp[1], lp[2], 0.3);
+          if (spec.settee) {
+            // package 75 (B5.4; Ext §6.3): a settee clewed up hangs in its gear under its yard
+            // aloft, its festoons straight down by the gear's share of its depth square to the
+            // yard (the clew's distance from the head), not of its leech, which near the slings
+            // would bring it down almost to the tack; its clew hauled up in the after festoon,
+            // where its sheet is drawn from. Furled, a bundle along the yard aloft; lowered, on
+            // deck as a lug. Its sheet goes to its block (`lugCut`)
+            if (!lcut.onDeck && dyn.state === "in_the_gear") {
+              var headS = sub(lp[2], lp[1]);
+              var deepS = len(cross(headS, sub(lp[3], lp[1]))) / Math.max(len(headS), 1e-9);
+              lfig.path = gathered(lp[1], lp[2], deepS, [0, 0, -1]);
+              lfig.clewAt = add(lerp(lp[1], lp[2], 2 / 3), v(0, 0, -deepS * IN_GEAR_DEPTH));
+            }
+            lfig.block = lcut.block;
+          }
           lfig.cutMast = lcut.pivotMast;
           lfig.mastId = lcut.pivotMast ? lcut.pivotMast.id : null;
           piecesAtMast(lfig).forEach(function (f) {
@@ -1750,6 +1807,9 @@
         if (Yl.cutAtMast) {
           arm = lerp(Yl.truss, Yl.b, ln.side ? 0.5 + 0.05 * sideSign(ln.side) : 2 / 3);
         }
+        // package 75 (B5.4): a settee's derrick, its yard's one lift, from its after part
+        // (SETTEE_DERRICK_ALONG), not from the peak
+        if (Yl.settee && !ln.side) arm = lerp(Yl.centre, Yl.b, SETTEE_DERRICK_ALONG);
         var up = state === "parted" ? add(arm, v(0, 0, -2.5)) : liftedFrom;
         figures.push({ kind: "line", id: ln.id, cls: "lift", of: ln.of, state: state, pts: [arm, up], busy: !!busy[ln.of] });
       } else if (ln.class === "sheet") {
@@ -1769,6 +1829,11 @@
           var BmS = spars[(sheetSpec.roles || {}).boom];
           if (BmS && boomRiggedIn(BmS.id)) return;
           pts = [BmS && BmS.dir ? BmS.b : sf.clewAt || sf.corners[2], taffrail(hull)];
+        } else if (sheetSpec.settee && sf.block) {
+          // package 75 (B5.4; Ext §6.3, §5.9 with the lead's ruling): a settee's one sheet from its
+          // clew (hauled up in its gear, or on deck with its yard lowered) to its block on the deck
+          // a fathom abaft the clew at its floor, on the lee side (`lugCut`)
+          pts = [sf.clewAt || sf.corners[2], sf.block];
         } else if ((sf.cls === "lug" || sf.cls === "lateen") && sheetSpec.corners_m) {
           // package 57: a lug's sheet from its clew aft to the lee side, and a whole lateen's
           // drawn as a lug (package 75); a lug topsail's is at its lower lug's peak, where its

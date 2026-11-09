@@ -12,7 +12,8 @@ no mast carries yards, every fore yard shot away, her main's yards her after yar
 
 One committed ship file trips it, the *Prince de Neufchatel*'s, the file the rule was made for (her
 main topgallant's two light yards and the sail between them; package 75, B2), and no other (the
-guard, every file of `data/ships/` with the boats), so no other file's classing moves: the golden
+guard, every file of `data/ships/` with the boats, the bilander's among them since package 75's
+B4, her main crossing her dry yard on its lower mast), so no other file's classing moves: the golden
 table's own run (`tests/test_rig_classing.py`, and the razee's and the 64's rows in
 `tests/test_indefatigable.py`) is that proof, and is not repeated here; hers is her own tests'
 (`tests/test_neufchatel.py`).
@@ -191,12 +192,16 @@ def test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast(pat
     assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == named
 
 
-def test_the_guard_reads_sixteen_files_her_three_parts_and_the_brigs_main_yards_among_them():
-    """The guard is not empty: the sixteen files of the tree (the *Neufchatel*'s the sixteenth,
-    package 75, B2), her three parts named, and the brig's main topsail, topgallant and royal
-    yards, which a rule without its lower-yard test would name."""
-    assert len(SHIP_FILES) == 16
+def test_the_guard_reads_seventeen_files_her_three_parts_and_the_brigs_main_yards_among_them():
+    """The guard is not empty: the seventeen files of the tree (the *Neufchatel*'s the sixteenth,
+    package 75, B2; the bilander's the seventeenth, B4, her main crossing her dry yard on its lower
+    mast, so that the rule names none of hers), her three parts named, and the brig's main
+    topsail, topgallant and royal yards, which a rule without its lower-yard test would name. Old:
+    sixteen files."""
+    assert len(SHIP_FILES) == 17
     assert set(ON_A_SCHOONERS_MAST) <= {p.stem for p in SHIP_FILES}
+    bilander = load_ship(ROOT / "data" / "ships" / "bilander.yaml")
+    assert bilander.spars["main.crossjack.yard"].parent == "main.mast"
     her = load_ship(ROOT / "data" / "ships" / "hermaphrodite-brig.yaml")
     assert her.spars["main.topsail.yard"].parent == "main.topmast"
     assert not any(s.parent == "main.mast" for s in her.spars.values() if s.cls == "yard")
@@ -587,8 +592,8 @@ def test_only_the_neufchatel_swings_her_after_yards_short(path):
 @pytest.mark.parametrize(
     ("build", "said"),
     [
-        (schooner_with_main_topsail, "Rise tacks and sheets. Main-topsail haul"),
-        (schooner_with_main_topgallant, "Rise tacks and sheets. Main-topsail haul"),
+        (schooner_with_main_topsail, "Main-topsail haul"),
+        (schooner_with_main_topgallant, "Main-topsail haul"),
         (polacre_probe, None),
         (schooner_with_fore_course, None),
     ],
@@ -597,9 +602,13 @@ def test_only_the_neufchatel_swings_her_after_yards_short(path):
 def test_a_schooners_main_yards_are_hauled_by_main_topsail_haul(build, said):
     """The lead's ruling 2 of 2026-11-06 (Luce 1884 p. 417): a schooner's main crosses no course,
     so her mainsail is never set and her after yards, the main topsail yard or the main
-    topgallant's two, are hauled by "Main-topsail haul!", her fore course's tacks and sheets
-    risen with it while it is set ("Rise tacks and sheets. Mainsail haul." before the ruling).
-    The polacre and trial A have no after yards and say nothing at the haul, as before."""
+    topgallant's two, are hauled by "Main-topsail haul!"; the order names the haul of the after
+    yards, not the sail (the lead's ruling (2)(c) of 2026-11-07). Her fore course set, its tack
+    is kept fast at the haul and risen apart at "let go and haul" (the ruling's (2)(a), B3.4b:
+    Luce pp. 421, 428, 446; the sailed tack below). Old beside new: "Rise tacks and sheets.
+    Main-topsail haul" from ruling 2 to B3.4b, "Rise tacks and sheets. Mainsail haul." before
+    ruling 2. The polacre and trial A have no after yards and say nothing at the haul, as
+    before."""
     ship = _under_plain_sail(build())
     tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
     assert (tack._haul_words() if tack.after else None) == said
@@ -608,14 +617,18 @@ def test_a_schooners_main_yards_are_hauled_by_main_topsail_haul(build, said):
 def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_does(tmp_path):
     """Trial B tacked at seed 7 in 15 knots, settled 2,400 s under plain sail braced sharp up and
     trimmed every two minutes (B3.4's measure; the tuning notes, "The lead's four rulings,
-    built"): "Rise tacks and sheets. Main-topsail haul." at 32 s, her head 9 degrees short of
-    the wind (her main crossing no course, the word is Luce's for the mainsail not set, the
-    lead's ruling 2; "Rise tacks and sheets. Mainsail haul." before it, the rise of her fore
-    course's tacks and sheets kept); the main topsail yard swung in 26 s (the short swing's 20 s
-    by the weather and the hands) where the 45-s swing took 59 s; "Let go and haul." at 58 s
-    where it waited to 91 s, the fore yards no longer held aback with her head through the wind;
-    tacked in 151 s where it was 219 s, within the schooner's two and a half minutes and 2 s over
-    trial A's 149 s."""
+    built"): "Main-topsail haul." at 32 s, her head 9 degrees short of the wind (her main
+    crossing no course, the word is Luce's for the mainsail not set, the lead's ruling 2); the
+    main topsail yard swung in 26 s (the short swing's 20 s by the weather and the hands) where
+    the 45-s swing took 59 s; "Rise fore tack and sheet. Let go and haul." at 58 s where it
+    waited to 91 s, the fore yards no longer held aback with her head through the wind; tacked
+    in 151 s where it was 219 s, within the schooner's two and a half minutes and 2 s over trial
+    A's 149 s. Old beside new, words only, every tick the same: "Rise tacks and sheets.
+    Main-topsail haul." and "Let go and haul." from ruling 2 to B3.4b, where her fore tack is
+    kept fast at the haul and risen apart before the head yards are hauled (the lead's ruling
+    (2)(a) of 2026-11-07; Luce 1884 p. 421, "RISE FORE TACK AND SHEET! and when the after sails
+    fill, Haul well taut! LET GO AND HAUL!"; pp. 428, 446); "Rise tacks and sheets. Mainsail
+    haul." before ruling 2."""
     sc = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,
@@ -638,15 +651,17 @@ def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_do
     while not done and world.clock.tick - start < 900:
         world.tick()
         done = [e.kind for e in world.log if e.tick > start and e.kind in ends]
-    haul = "Rise tacks and sheets. Main-topsail haul."
+    haul = "Main-topsail haul."
+    let_go = "Rise fore tack and sheet. Let go and haul."
     said: dict[str, int] = {}
     for e in world.log:
-        for key in (haul, "Mainsail haul", "Let go and haul"):
-            if e.tick >= start and key in e.text:
+        for key in (haul, let_go, "Mainsail haul", "Rise tacks and sheets"):
+            hit = e.text.startswith(key) if key in (haul, let_go) else key in e.text
+            if e.tick >= start and hit:
                 said.setdefault(key, e.tick - start)
     assert done == ["ship.tacked"]
-    assert set(said) == {haul, "Let go and haul"}  # no "Mainsail haul" (ruling 2)
-    assert 20 <= said["Let go and haul"] - said[haul] <= 30  # 26 s; 59 s on brace_s
+    assert set(said) == {haul, let_go}  # no "Mainsail haul" (ruling 2), the fore tack apart
+    assert 20 <= said[let_go] - said[haul] <= 30  # 26 s; 59 s on brace_s
     assert 90 <= world.clock.tick - start <= 180  # 151 s; 219 s on brace_s
     assert world.ship.dyn.tack == "larboard"
 
@@ -655,23 +670,33 @@ def test_trial_b_hauls_her_main_topsail_yard_short_and_comes_round_as_trial_a_do
 
 
 @pytest.mark.parametrize(
-    ("build", "course"),
+    ("build", "lines"),
     [
-        (schooner_with_fore_course, "fore course"),
-        (schooner_with_main_topsail, "fore course"),
-        (schooner_with_main_topgallant, "fore course"),
-        (polacre_probe, "main course"),
+        (schooner_with_fore_course, ["reef the fore course, one reef", "take in the fore sail"]),
+        (schooner_with_main_topsail, ["reef the fore course, one reef", "take in the fore sail"]),
+        (
+            schooner_with_main_topgallant,
+            ["reef the fore course, one reef", "take in the fore sail"],
+        ),
+        (polacre_probe, ["reef the main course, one reef"]),
     ],
     ids=["trial A", "trial B", "main topgallant", "polacre"],
 )
-def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(build, course):
+def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(build, lines):
     """The lead's ruling 4 of 2026-11-06 (`orders.storm._after_sail_lines`): the courses' reef
     at the topsails' second reef kept for any rig with topsails (Luce 1884 p. 476, "a second
     reef in the topsails, and a single reef in the courses"; the *Neufchatel*'s double-reefed
     foresail, Cobb p. 95), the after take-ins a square-rigged ship's alone. None of these is
     square-rigged: with the topsails going to their second reef and after it her course is
-    reefed once, and nothing of hers is taken in, her mainsail kept; before the ruling the list
-    gave a fore-and-after nothing at all."""
+    reefed once, and no after sail of hers is taken in, her mainsail kept; before the ruling the
+    list gave a fore-and-after nothing at all. Beside it, the lead's ruling (3)(e) of 2026-11-07
+    (package 75, B2b): a boomless gaff sail on a mast that crosses a course, the *Neufchatel*'s
+    fore gaff sail beside her fore course, is taken in at the same reef, by her rig (Cobb 1841
+    p. 79), so that the three rigs in memory with a schooner's foresail beside a fore course take
+    theirs in too ("take in the fore sail"; old, the course's reef alone); the polacre has none.
+    Sailed in B3.4's gale (docs/dev/TuningNotes.md, B2b, the review of 2026-11-08), the three
+    gripe up to 36-42 degrees off at about 2 kn with the helm hard over once the jib is in, as she
+    does, and lie on their beam ends 0, 0 and 1 times (4, 4 and 6 before, ruling 4's record)."""
     ship = _under_plain_sail(build())
     assert not _square_rigged(ship)
     topsails = [ship.sails[sid] for sid in ship.groups["topsails"]]
@@ -679,7 +704,7 @@ def test_the_gale_reefs_a_fore_and_afters_course_and_takes_in_no_after_sail(buil
     for reefs in (1, 2):
         for sl in topsails:
             sl.reefs = min(reefs, sl.reef_bands)
-        assert _after_sail_lines(ship) == [f"reef the {course}, one reef"]
+        assert _after_sail_lines(ship) == lines
 
 
 def test_the_after_take_ins_are_a_square_rigged_ships_alone(monkeypatch):
@@ -713,14 +738,15 @@ def test_a_course_with_no_reef_bands_is_not_named_and_stays_as_it_is():
     has such a course). At the ruling's build the list named it, so that "shorten sail" said
     in its "Not done" "'reef the fore course, one reef': The fore course has no reef bands; it
     is set whole or not at all."; the review of 2026-11-07 took that out, the ruling not naming
-    it (the lead's)."""
+    it (the lead's). Her boomless foresail beside the course is taken in at that reef since
+    package 75's B2b (the lead's ruling (3)(e) of 2026-11-07; old, nothing named)."""
     doc = schooner_with_fore_course_doc()
     for sail in doc["sails"]:
         if sail["id"] == "fore.course":
             sail["reef_bands"] = 0
     ship = _under_plain_sail(ship_from_dict(doc, "tests/test_schooner_mast.py:no-reef-bands"))
     ship.sails["fore.topsail"].reefs = 1
-    assert _after_sail_lines(ship) == []
+    assert _after_sail_lines(ship) == ["take in the fore sail"]
     Runner(ship)
     ship.dyn.apparent_wind_angle = math.radians(-60.0)
     ship.dyn.apparent_wind_speed = 6.0
@@ -742,9 +768,11 @@ def test_a_course_with_no_reef_bands_is_not_named_and_stays_as_it_is():
 # The committed fore-and-afters whose course the gale names, by stem: at each reef of her
 # topsails, from none to three, the lines of the after sail, her course not yet reefed. The
 # *Neufchatel*'s fore course, the ruling's own case (Cobb 1841 p. 95, "a double-reefed foresail";
-# package 75, B2): reefed once from her topsails' first reef on.
+# package 75, B2): reefed once from her topsails' first reef on; and since B2b her fore gaff sail,
+# boomless beside the course, taken in with it (the lead's ruling (3)(e) of 2026-11-07; Cobb p. 79;
+# old, the course's line alone).
 COURSE_REEFED_BY_THE_GALE = {
-    "hermaphrodite-brig": [[]] + [["reef the fore course, one reef"]] * 3,
+    "hermaphrodite-brig": [[]] + [["reef the fore course, one reef", "take in the fore sail"]] * 3,
 }
 
 
@@ -754,7 +782,8 @@ def test_only_the_neufchatel_of_the_fore_and_afters_has_a_course_reefed_by_the_g
     (the schooners cross no course; the cutter's topsail has one reef band, so never a second;
     the smack's topsail yard is on her pole mast, no topsail of a topmast; the lugger's are set
     flying; the boats have none). Hers reefs her fore course once from her topsails' first reef
-    on, and takes in nothing (`COURSE_REEFED_BY_THE_GALE`; her gale is her own tests'). The
+    on, and takes in her fore gaff sail with it, no after sail (`COURSE_REEFED_BY_THE_GALE`; her
+    gale is her own tests'; the take-in since B2b, old nothing taken in). The
     square-rigged files are `tests/test_gale.py`'s and the other files' as before."""
     fore_and_afters = []
     for path in SHIP_FILES:
