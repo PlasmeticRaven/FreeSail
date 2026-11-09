@@ -1,0 +1,18 @@
+# The player asleep in his cabin (package 98, step 1): what is done on deck while he sleeps
+# is not shown him (the owner's ruling for step 2); his own line wakes him and is answered.
+name: Asleep in the cabin at anchor
+scenario: tests/browser_plans/scenarios/neufchatel-falmouth.yaml
+steps:
+  - {label: "TURNING IN"}
+  - {say: let go the anchor, setup: true}
+  - {tick: 300}
+  - {tick: 3600}
+  - {say: go to the cabin, setup: true}
+  - {tick: 30}
+  - {say: sleep, expect: answered}
+  - {tick: 60}
+  - {where: asleep}
+  - {label: "WOKEN BY HIS OWN WORD"}
+  - where am I
+  - the time
+  - {say: set plain sail, expect: {answered: true, kind: order.rejected}}
