@@ -76,6 +76,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import shutil
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -14801,3 +14802,100 @@ def test_truth_7_449_the_colours_and_the_signals_are_the_decks_orders():
     )
 
     test_the_colours_and_the_signals_are_the_decks_refused_below_and_ashore_in_its_words()
+
+
+def _made(folder: Path) -> Path:
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+def test_truth_7_450_a_port_guns_inboard_figures_are_behind_its_side_and_lid(tmp_path):
+    """Package 98, step 3: on every armed, profiled file with a port gun, secured, run in or
+    run out, every inboard figure of a port gun is painted before its lid or its opening from
+    outboard on her side, at every 15 degrees, heel 0 and 15."""
+    from tests.test_view_action import (
+        PORT_ARMED,
+    )
+    from tests.test_view_action import (
+        test_a_port_guns_inboard_figures_paint_behind_its_side_and_lid_from_outboard as case,
+    )
+
+    if shutil.which("node") is None:
+        pytest.skip("Node is not installed")
+    for k, path in enumerate(PORT_ARMED):
+        for state in ("secured", "run in", "run out"):
+            case(_made(tmp_path / f"{k}-{state}"), path, state)
+
+
+def test_truth_7_451_every_roots_ensign_paints_as_one_flag_in_its_order(tmp_path):
+    """Package 98, step 3: every root's ensign as one flag in its drawing's order at every 15
+    degrees, heel 0 and 15; the Union's saltires drawn in its canton, under its crosses."""
+    from tests.test_view_action import (
+        ENSIGNS,
+        test_the_unions_lines_lie_inside_its_canton,
+    )
+    from tests.test_view_action import (
+        test_every_roots_ensign_paints_as_one_flag_in_its_drawings_order as case,
+    )
+
+    for root in sorted(ENSIGNS):
+        for path in ("data/ships/frigate-36.yaml", "data/ships/hermaphrodite-brig.yaml"):
+            case(_made(tmp_path / f"{root}-{Path(path).stem}"), root, path)
+    test_the_unions_lines_lie_inside_its_canton(_made(tmp_path / "union"))
+
+
+def test_truth_7_452_a_flag_of_truce_is_white_at_the_fore(tmp_path):
+    """Package 98, step 3: under a flag of truce the white served and drawn at the fore truck
+    on every armed file and the lugger."""
+    from tests.test_view_action import ARMED_PROFILED
+    from tests.test_view_action import test_a_flag_of_truce_is_drawn_white_at_the_fore as case
+
+    for k, path in enumerate(ARMED_PROFILED + ["data/ships/lugger.yaml"]):
+        case(_made(tmp_path / str(k)), path)
+
+
+def test_truth_7_453_a_ports_served_top_is_under_the_rail_as_drawn():
+    """Package 98, step 3: 81's port-top rule, the served top tilted with its deck under the
+    rail less 2 mm; the *Neufchatel*'s No. 8 served 2.265 (was 2.27)."""
+    from tests.test_view_action import (
+        test_a_ports_served_top_takes_its_decks_tilt_and_stands_under_the_rail,
+    )
+
+    test_a_ports_served_top_takes_its_decks_tilt_and_stands_under_the_rail()
+
+
+def test_truth_7_454_a_settees_sheet_held_to_windward_is_drawn_there(tmp_path):
+    """Package 98, step 3: the bilander's settee, its sheet hauled to windward, served and
+    drawn on the weather side, and to leeward again when let go."""
+    from tests.test_view_action import (
+        test_a_settees_sheet_held_to_windward_is_served_and_drawn_there,
+    )
+
+    test_a_settees_sheet_held_to_windward_is_served_and_drawn_there(tmp_path)
+
+
+def test_truth_7_455_the_openrouter_door_sends_the_picture_where_its_model_reads_one(
+    monkeypatch, tmp_path
+):
+    """Package 98, step 4: at the OpenRouter door, a stub door and no provider called, the
+    picture fetched and sent where the models list says the model reads an image, and no
+    picture tool offered where it does not."""
+    pytest.importorskip("anthropic")
+    pytest.importorskip("fastapi")
+    from tests.test_api_door import (
+        test_the_openrouter_door_sends_the_picture_only_where_its_model_reads_one as case,
+    )
+
+    for reads in (True, False):
+        case(monkeypatch, _made(tmp_path / str(reads)), reads)
+
+
+def test_truth_7_456_a_picture_not_shown_says_so_with_its_readings():
+    """Package 98, step 4: wherever a picture cannot be shown the words say so, and why, and
+    give its readings, never its size in pixels alone."""
+    pytest.importorskip("anthropic")
+    from tests.test_api_door import (
+        test_a_picture_not_shown_says_so_and_gives_its_readings_never_its_size,
+    )
+
+    test_a_picture_not_shown_says_so_and_gives_its_readings_never_its_size()
