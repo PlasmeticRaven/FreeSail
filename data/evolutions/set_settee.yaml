@@ -1,0 +1,65 @@
+# Set a settee, a bilander's main: a four-cornered lateen on a yard slung obliquely across the
+# main mast, set and clewed up as a square sail is. Furled, the topmen lay aloft and loose it on
+# its yard; in the gear, the clewlines and buntlines are let go on deck; lowered on deck to be
+# dipped, its yard is hoisted by the jeers on the lee side of the mast. Then the tack is hauled
+# down to windward and the sheet aft to the taffrail, its clewlines and buntlines "comme pour
+# les voiles quarrées" (Lescallier 1791 p. 390). Its yard aloft keeps the side of the mast it
+# hangs on; one never yet hoisted is hoisted to leeward. Its sheet is trimmed to the point of
+# sail as a lug's, 8 to 85 degrees. No period
+# timing was found: the times are a square sail's loosing and letting go and a lug's hoisting
+# (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (Falconer 1780, YARD, for
+# the furl aloft; set_square's loose and let-go, dip_lug's hoist). The angle is `wanted_sheet`'s,
+# by the class whose trim the sail takes (the lug's). Six hands, which a company of eight
+# meets with a watch of four on deck (D43; `hands.SHORT_HANDED_SHARE`).
+id: set_settee
+verb: set
+applies_to: {class: settee}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+  - {check: sail.state != unbent, reason: "The {sail} is unbent; bend a sail to the yard first."}
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(lines_of(sail, tack)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: loose
+    duration_s: 90
+    if: sail.state == furled and not sail.yard_lowered
+    sets: {sail.state: loosed}
+    log: "Laid aloft and loosed the {sail}."
+    aloft: true
+  - do: let_go_gear
+    instead_of: loose
+    duration_s: 20
+    if: sail.state == in_the_gear and not sail.yard_lowered
+    sets: {sail.state: loosed}
+    log: "Let go the {sail} clewlines and buntlines."
+  - do: hoist
+    instead_of: loose
+    duration_s: 60
+    if: sail.yard_lowered
+    via: halyard_of(sail)
+    sets: {sail.state: loosed, sail.yard_lowered: "false", sail.lug_side: "lee_side()"}
+    log: "Hoisted the {sail}'s yard on the lee side of the mast."
+  - do: find_its_side
+    duration_s: 0
+    if: sail.lug_side == none
+    sets: {sail.lug_side: "lee_side()"}
+  - do: tack_and_sheet
+    duration_s: 45
+    sets: {sail.state: set, sail.sheet_angle: "wanted_sheet(sail)"}
+on_start:
+  log: "Hands aloft to loose the {sail}."
+  # in the gear its yard is aloft or on deck (`yard_lowered`, which the map does not read): the
+  # line is true of both, and the step's own line says which (B3.3's review)
+  from: {in_the_gear: "Man the {sail} tack and sheet."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the main top's men loose it aloft, the afterguard and the forecastlemen man its tack and
+# sheet (judgement, as set_square's stations)
+crew: {hands: 6, rating: ordinary, stations: [topmen, afterguard, forecastle]}
+source: "Lescallier 1791 p. 390 (the settee set and clewed up as a square sail); Falconer 1780, YARD; set_square's and dip_lug's times (judgement)"

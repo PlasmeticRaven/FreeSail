@@ -494,6 +494,23 @@ def test_the_dialect_reads_the_land_and_the_depth_of_water():
     assert lead.holds(inshore.readings, {}) is True
 
 
+def test_the_grounding_line_says_the_water_by_the_chart_and_none_on_a_rock_that_dries():
+    """The grounding's words (`Grounding.words`): the water under her keel by the chart in the
+    lead's words, and on a rock that dries "no water by the chart" (package 75, B2b, words only:
+    old "no water of water by the chart", the *Neufchatel* on the Stags)."""
+    assert C.Grounding(4.6, 3.16, "aft", "sand").words == (
+        "She has taken the ground aft, on sand: two fathoms and a half of water by the chart, "
+        "and she draws 10 feet."
+    )
+    assert C.Grounding(-1.2, 3.16, "forward", "rock").words == (
+        "She has taken the ground forward, on rock: no water by the chart, and she draws 10 feet."
+    )
+    assert C.Grounding(0.6, 3.16, "amidships").words == (
+        "She has taken the ground amidships: half a fathom of water by the chart, and she draws "
+        "10 feet."
+    )
+
+
 def test_she_takes_the_ground_and_the_log_says_so_once_and_comes_off_again():
     w = chart_world(50.12, -5.03, heading=0.0)
     w.submit("set plain sail")

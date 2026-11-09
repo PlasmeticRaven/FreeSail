@@ -649,6 +649,23 @@ def test_the_abeam_outline_follows_the_stem_and_the_stern():
                 assert any(c == pytest.approx(corner, abs=1e-9) for c in abeam), (x, z)
 
 
+def test_a_closure_takes_its_levels_within_a_millimetre_as_one():
+    """An end's closure takes levels within a millimetre of one another as one level
+    (`form.CLOSURE_LEVEL_M`; package 75, B2b, the lead's ruling of 2026-11-07), the lowest kept so
+    that the closure meets its station and the top always the last: so a float's residue for nil
+    is nil. The *Neufchatel*'s last station stands on her stem's foot, its lowest point out of the
+    form at z -8.0e-10, and her `stem_m`'s (16.35, 0.0) beside it: her stem's closure is served
+    from that point once, [16.35, 0, 0], where B2 served it twice (`OUTLINE_MET_TWICE_AT`, gone).
+    Every other file's served stations are as before, to the millimetre (measured: the closures
+    begin below the water, the schooners' at -0.222 m and the brig-sloop's at -0.439)."""
+    assert form._merged_levels([-8.0e-10, 0.0, 0.92, 2.03]) == [-8.0e-10, 0.92, 2.03]
+    assert form._merged_levels([0.0, 0.0011, 1.0]) == [0.0, 0.0011, 1.0]  # over a millimetre
+    assert form._merged_levels([0.0, 0.9995, 1.0]) == [0.0, 1.0]  # the top kept
+    assert form._merged_levels([0.2, 0.2]) == [0.2]
+    fore = ship_graph(load_ship("data/ships/hermaphrodite-brig.yaml"))["hull"]["stations"][-1]
+    assert fore[:2] == [[16.35, 0.0, 0.0], [16.7, 0.92, 0.0]]
+
+
 def _greatest_x(spec: HullSpec) -> float:
     """The middle of the flat of greatest breadth at the water (`form`'s greatest section)."""
     greatest = max(hw for _x, hw, _hr in spec.profile.breadth_m)

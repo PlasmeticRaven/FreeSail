@@ -13,7 +13,11 @@
 # Luce's fore storm staysail is the fore topmast staysail here. His "probably single
 # reefed trysail" has no counterpart: the frigate's spanker is far bigger, and set it
 # brings her head to the wind with sternway, so it is brailed up; a schooner keeps her
-# gaff sails. Luce's reducing of sail to a gale is a long sequence of reefs and furls; the
+# gaff sails. A hermaphrodite brig's fore gaff sail, set abaft her fore course, is handed
+# with the square sails (a privateer of 1814 lay to under hers in a gale until it made bad
+# weather and was taken in: Cobb 1841 p. 79): she lies to under her mainsail and her
+# staysails, and the line names her two gaff sails, the one standing and the one taken in.
+# Luce's reducing of sail to a gale is a long sequence of reefs and furls; the
 # game hands the sails in one phase and leaves them in the gear. In thirty knots with the
 # topgallant masts sent down the frigate lies five points off with a knot and a half of
 # headway; with them aloft their windage gives her a knot or two of sternway. She is left
@@ -29,7 +33,7 @@ timing:
   brace_s: 45    # the topsail yard braced sharp up
   helm_deg: 5    # the helm a-lee, a little
 on_start: {log: "All hands! Shorten sail and bring her to under the {topsail}."}
-on_complete: {log: "Lying a-try under the {topsail} and the staysails, helm a-lee.", kind: ship.hove_to, severity: notable}
+on_complete: {log: "Lying a-try under {under}, helm a-lee.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not bring her to: {reason}.", kind: evolution.failed, severity: notable}
 # crew: reducing sail to a gale and bringing her to is all hands' work (Luce 1884, ch. XXIX
 # In a Gale, 'Reducing Sail to a Gale'; ch. XXIII, 'blowy weather').

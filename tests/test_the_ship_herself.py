@@ -55,6 +55,38 @@ def test_the_ship_reading_says_her_name_class_service_nation_guns_people_and_com
     )
 
 
+@pytest.mark.parametrize(
+    ("nation", "navy"),
+    [
+        ("france", "a ship of the French navy"),
+        ("spain", "a ship of the Spanish navy"),
+        ("united-states", "a ship of the American navy"),
+        ("batavian-republic", "a ship of the Dutch navy"),
+        ("britain", "a King's ship of Britain"),
+    ],
+)
+def test_a_navy_is_named_by_its_nations_adjective(tmp_path, nation, navy):
+    """A King's ship of another nation reads her navy by its nation's adjective (package 75, B2b,
+    the lead's ruling of 2026-11-07, words only): the naval cruise's frigate under each colours,
+    a King's ship by her wardroom with no intent. Old, by the nation's name: "a ship of the France
+    navy", "the Spain navy", "the the United States navy", "the the Batavian Republic navy";
+    Britain's "a King's ship of Britain" as before."""
+    import copy
+
+    from freesail.world.scenarios import (
+        load_scenario,
+        make_scenario_world,
+        read_scenario_text,
+        write_scenario,
+    )
+
+    _text, fields = read_scenario_text(ROOT / "data" / "scenarios" / "naval-cruise.yaml")
+    fields = copy.deepcopy(fields)
+    fields["nation"] = nation
+    w = make_scenario_world(load_scenario(write_scenario(fields, tmp_path / "s.yaml")), seed=7)
+    assert R.ship_words(w).split(". Her guns")[0].endswith(f"ship-rigged; {navy}")
+
+
 def test_a_far_hull_is_told_as_herself_not_as_her_files_ship():
     """A crewed far merchant brig is told by her own name, not her file's ship's. Since package
     75 (SW-4, Build-Ships.md §8.4) she sails the merchant brig's own file, her class, guns, people

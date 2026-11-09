@@ -279,6 +279,12 @@ TRIM_RANGE = {
 # so that the sheet hauled aft flattens the sail to its floor and no further (judgement;
 # the head sheets lead to the bows' and the gangways' cavils, the staysails' to the rail).
 # A boom whose file gives no horse takes a horse a quarter of its own length (judgement).
+# A settee (package 75; docs/design/Design-ShipsEngineExtensions.md §5.9, the lead's ruling
+# on the bilander's §17 lead item 4) takes its foot from its own corners, tack to clew, in
+# place of the proxy, and its block the same fathom abaft the clew and abreast of it: the
+# block falls by its cut near the taffrail, where its one sheet leads (Lescallier 1791
+# p. 390), the trim reading no part of the hull's profile. Its foot is the longer, the
+# proxy's lying well short of the stern (the bilander's 11.29 m against 6.85 m).
 LOOSE_FOOTED_FOOT_FACTOR = 0.8
 LOOSE_FOOTED_LEAD_AFT_M = 1.8288
 DEFAULT_HORSE_FRACTION_OF_BOOM = 0.25
@@ -392,6 +398,10 @@ def sheet_geometry(ship: Ship, sail: Sail) -> SheetGeometry:
             )
         else:
             foot = LOOSE_FOOTED_FOOT_FACTOR * math.sqrt(max(sail.area_m2, 1.0))
+            if sail.settee and sail.corners_m and len(sail.corners_m) == 4:
+                # a settee's foot from its corners, tack to clew (package 75, Ext §5.9)
+                (tx, tz), _throat, _peak, (cx, cz) = sail.corners_m
+                foot = max(math.hypot(cx - tx, cz - tz), FATHOM_M)
             offset = foot * math.sin(floor)
             geo = SheetGeometry(
                 floor, ceiling, foot, offset, 0.0, parts, False, LOOSE_FOOTED_LEAD_AFT_M

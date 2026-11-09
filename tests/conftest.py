@@ -535,6 +535,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 75, B2: the Prince de Neufchatel's round trip, a scenario of hers sailed an
         # hour and from its checkpoint (7.1 s, her file alone at four workers, 2026-11-07)
         "test_neufchatel.py::test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_no_fit_named",
+        # package 75, B4: the bilander's first hour, a scenario of hers sailed an hour and from
+        # its checkpoint (13.3 s alone), and her beam reach sailed with truth 6's form (9.3 s
+        # alone), her file alone in one process, 2026-11-08
+        "test_bilander.py::test_her_first_hour_at_seed_7_under_her_rules_captain_with_no_fit_named",
+        "test_bilander.py::test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned",
     }
 )
 
