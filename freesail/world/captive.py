@@ -47,7 +47,6 @@ by the same record, his voice a seat the director may hold (not an adversarial o
 
 from __future__ import annotations
 
-import math
 import re
 from typing import Any
 
@@ -113,6 +112,11 @@ PAROLE_REFUSED_WORDS: tuple[str, ...] = (
     "do not give",
     "cannot give",
 )
+# a bare answer to the open question (the owner's play of 2026-11-09: "Yes." was not read),
+# read as whole words and only while the question is open; both sides in one answer read
+# as neither, and the question stays open
+PAROLE_YES_WORDS: tuple[str, ...] = ("yes", "oui", "sí", "si", "aye", "i do", "you have it")
+PAROLE_NO_WORDS: tuple[str, ...] = ("no", "non", "never", "i will not")
 # the cartel's errand
 CARTEL_HAIL_M = 4.0 * units.CABLE  # within hail of the holder: the persons taken off
 CARTEL_DAY_NM = 100.0  # a day's sail from her port, beyond which the form is doubted
@@ -385,10 +389,11 @@ def _course_for_port(root: Any, captor: Any, captor_hull: Any, record: dict[str,
 # -- the words at the prompt -----------------------------------------------------------------------
 
 
-def captive_words(world: Any, person: Any, here: Any) -> str | None:
+def captive_words(world: Any, person: Any, here: Any, leaving: bool = False) -> str | None:
     """The refusal a captive's order of a deck meets (§3.1), or None when he is no captive:
     aboard the captor, her deck is not his; at the prompt of his own ship (a prize under a
-    prize master), nothing of her deck is his from there; ashore, a prisoner of war."""
+    prize master), nothing of her deck is his from there; ashore, a prisoner of war. With
+    `leaving`, the words for his going ashore or aboard another ship by his own order."""
     from freesail.world.movement import hull_name
 
     rec = captive_of(world)
@@ -415,6 +420,12 @@ def captive_words(world: Any, person: Any, here: Any) -> str | None:
             "and least of all this one."
         )
     name = hull_name(his) if his is not None else "her"
+    if leaving:
+        return (
+            f"You are a prisoner aboard the {name}; you leave her where her captain lands "
+            "you, or by a cartel, and not at your own word. You may speak: 'say to the "
+            "captain: ...', 'ask the ...', 'tell the ...'; and read what your place allows."
+        )
     return (
         f"You are a prisoner aboard the {name}; her deck is not yours. You may speak: 'say "
         "to the captain: ...', 'ask the ...', 'tell the ...'; and read what your place "
@@ -633,7 +644,16 @@ def hear_parole(world: Any, hull: Any, person: Any, words: str) -> bool:
     if any(w in low for w in PAROLE_GIVEN_WORDS):
         answer_parole(world, hull, person, True, "in his own words")
         return True
+    yes, no = _whole_words(low, PAROLE_YES_WORDS), _whole_words(low, PAROLE_NO_WORDS)
+    if yes != no:
+        answer_parole(world, hull, person, yes, "in his own words")
+        return True
     return False
+
+
+def _whole_words(low: str, forms: tuple[str, ...]) -> bool:
+    """Whether any of the forms stands in the words as whole words ('no', not 'not')."""
+    return any(re.search(rf"(?<!\w){re.escape(f)}(?!\w)", low) for f in forms)
 
 
 def set_parole(world: Any, hull: Any, name: str, given: bool, by: str) -> str:
@@ -955,12 +975,3 @@ def cartel_doubt(world: Any, port: Any) -> str | None:
             f"is a day or more away"
         )
     return None
-
-
-def nm(a: Any, b: Any) -> float:
-    from freesail.world.geo import bearing_and_distance
-
-    return bearing_and_distance(a, b)[1] / units.NAUTICAL_MILE
-
-
-_ = math  # the module's arithmetic is the geo's; kept for the leg's words

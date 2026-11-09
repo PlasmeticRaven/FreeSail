@@ -5174,6 +5174,7 @@ def topsail_schooner_armament(b):
     (judgement), a man at the helm and one at the powder, the filling left to the reckoning
     (`combat.filling`, from the fit she carries), the small arms and the boarders as the
     privateer's."""
+    from ships import period
     from ships.hull_schooner import port_sill
 
     hull = b.doc["hull"]
@@ -5185,8 +5186,11 @@ def topsail_schooner_armament(b):
     # chase (judgement); the eight carronades in the plate's ports 6, 5, 4 and 2 (numbered from
     # aft, as pages-chapelle-fig17.md §6.3 and `hull_schooner.PORTS` number them), its 3rd
     # beside the main mast and its 1st, aftmost, left empty (judgement); the 6-pounder's weight
-    # the letter of marque's, the 18-pounder carronade's the generator's table's (from memory,
-    # UNVERIFIED)
+    # the letter of marque's (from memory, UNVERIFIED), the 18-pounder carronade's Adye's
+    # pattern of 3 ft 3 in, 9 cwt (1804 p. 72, `period.ADYE_CARRONADE_CWT`), no source giving
+    # her own (Winfield p. 335 gives the nature and number alone). OLD BESIDE NEW (SW-4's
+    # words step, after package 81's note of 2026-11-07): the generator's table's 10 cwt, from
+    # memory, 11% off the pattern, which the viewer's checker listed; 9 cwt now
     navy = broadside_pair(
         1,
         "long",
@@ -5205,13 +5209,13 @@ def topsail_schooner_armament(b):
             i,
             "carronade",
             18,
-            CARRONADE_CWT[18],
+            period.ADYE_CARRONADE_CWT[18],
             x,
             port_sill(hull, x),
             (
                 "Musquidobit's eight 18-pounder carronades (Winfield 1793-1817 p. 335), four a "
-                "side abaft the long guns (the ports judgement): the 18-pounder of 10 cwt (from "
-                "memory, UNVERIFIED), four men to the pair."
+                "side abaft the long guns (the ports judgement): the 3 ft 3 in carronade of 9 cwt "
+                "(Adye 1804 p. 72, the pattern; no source gives her own), four men to the pair."
                 if i == 2
                 else None
             ),
@@ -5228,7 +5232,8 @@ def topsail_schooner_armament(b):
         "unarmed by default, as Speedwell has sailed since package 32, with two fits the "
         "scenario may name (ship: {fit: ...}): Lynx's own as a letter of marque and "
         "Musquidobit's as the Navy armed her. Every figure's source is in tools/gen_ships.py; "
-        "the weights are from memory and UNVERIFIED against a page.",
+        "the long guns' and the swivels' weights are from memory and UNVERIFIED against a "
+        "page, the Navy's carronades' Adye's pattern (1804 p. 72).",
         UNARMED,
         [
             (
@@ -5242,8 +5247,8 @@ def topsail_schooner_armament(b):
                 "musquidobit 1813",
                 "Winfield, British Warships in the Age of Sail 1793-1817, p. 335 (H.M. schooner "
                 "Musquidobit, late the privateer Lynx, taken April 1813: eight 18-pounder "
-                "carronades and two 6-pounders, 50 men); the ports a judgement; the weights from "
-                "memory",
+                "carronades and two 6-pounders, 50 men); the ports a judgement; the 6-pounders' "
+                "weight from memory, the carronades' Adye 1804 p. 72",
                 navy,
                 navy_magazine,
                 "The Navy's fit of her, ten guns: eight 18-pounder carronades and two long "

@@ -25,6 +25,7 @@ waterline, the sail cut, the spars gone, the rounds fired; and who struck, and w
 
 from __future__ import annotations
 
+import functools
 import math
 from dataclasses import dataclass, field
 from typing import Any
@@ -96,12 +97,18 @@ class Round:
     morale: tuple[float, float]
 
 
-def far_ship(ship_file: str, nation: str, fit: str | None = None, **doctrine: Any) -> FarShip:
-    """A far side from her ship file (the engaged broadside: one side's guns and the
-    chasers), her complement and her length; the doctrine's figures as given."""
+@functools.lru_cache(maxsize=64)
+def file_figures(
+    ship_file: str, fit: str = ""
+) -> tuple[str, tuple[tuple[str, float, float], ...], int, float]:
+    """What a far side takes from her ship file, read once a file and fit: (her name, the
+    engaged broadside: one side's guns and the chasers as (kind, pounder, weight in cwt),
+    her complement, her length on the waterline). The file's reading from disk at every
+    round and at every minute of a far brain cost the pace two thirds of its tick (package
+    74, step 4: docs/dev/TuningNotes.md)."""
     spec = load_spec(ship_file)
     arm = spec.armament
-    fs = arm.fit(fit) if arm is not None else None
+    fs = arm.fit(fit or None) if arm is not None else None
     guns: list[tuple[str, float, float]] = []
     if fs is not None:
         for g in fs.guns:
@@ -113,10 +120,17 @@ def far_ship(ship_file: str, nation: str, fit: str | None = None, **doctrine: An
     # key the spec has not, so every far ship was 0.0 long and `shot.hit_chance` floored her
     # size at 0.5 whatever she was; found by package 75)
     length = float(getattr(spec.hull, "length_waterline_m", 0.0) or 0.0)
+    return str(spec.name), tuple(guns), complement, length
+
+
+def far_ship(ship_file: str, nation: str, fit: str | None = None, **doctrine: Any) -> FarShip:
+    """A far side from her ship file (the engaged broadside: one side's guns and the
+    chasers), her complement and her length; the doctrine's figures as given."""
+    name, guns, complement, length = file_figures(str(ship_file), str(fit or ""))
     return FarShip(
-        name=spec.name,
+        name=name,
         nation=nation,
-        guns=guns,
+        guns=list(guns),
         complement=complement,
         length_m=length,
         aim=str(doctrine.get("aim", "hull")),

@@ -14667,14 +14667,31 @@ def test_truth_7_355_the_player_struck_is_a_person_aboard_the_captor_with_a_pris
     every order of his own ship's, from her prompt or from his ship's, is refused as a prize's
     under a prize master; her captain shapes his course for his doctrine's port with the
     prisoners. A far body that takes him is made a hull and woken as a dealing of the first
-    rank, the prompt hers."""
+    rank, the prompt hers. From the owner's play of 2026-11-09 (the step's mends): nothing a
+    captive says, reads or does stands his captor's captain aside, who commands her
+    throughout and sails for his port (the player's hand is one of her own free company's
+    alone, never a captive's nor a visitor's); his prompt performs a word said, asked or
+    told, a reading, his own moves within his parole, his needs and a free line, and nothing
+    else (he hails nobody, makes no signal, gives no standing order, keeps none of her books
+    and does not go ashore at his own word, each refused in the words that name his state);
+    a captor she had fired on before she struck does not engage his own prize, who is no
+    enemy of his nor of his nation's while she is a prize; and a prize hailed answers whose
+    prize she is by her captor's ship and her prize master's own name."""
     from tests.test_captive import (
+        test_a_captives_words_and_readings_never_stand_his_captors_captain_aside,
+        test_a_captor_she_fired_on_before_she_struck_does_not_engage_his_own_prize,
         test_a_far_body_that_takes_the_players_ship_is_made_a_hull_and_holds_him,
+        test_a_prisoner_hails_nobody_and_his_prompt_performs_his_own_words_moves_and_needs_alone,
+        test_a_prizes_answer_to_a_hail_names_her_captors_ship_and_her_prize_master,
         test_the_player_struck_is_a_person_aboard_the_captor_his_station_down_and_his_prompt_with_him,
     )
 
     test_the_player_struck_is_a_person_aboard_the_captor_his_station_down_and_his_prompt_with_him()
     test_a_far_body_that_takes_the_players_ship_is_made_a_hull_and_holds_him()
+    test_a_captives_words_and_readings_never_stand_his_captors_captain_aside()
+    test_a_captor_she_fired_on_before_she_struck_does_not_engage_his_own_prize()
+    test_a_prisoner_hails_nobody_and_his_prompt_performs_his_own_words_moves_and_needs_alone()
+    test_a_prizes_answer_to_a_hail_names_her_captors_ship_and_her_prize_master()
 
 
 def test_truth_7_356_the_parole_is_asked_in_the_captors_words_and_answered_in_the_captives_own():
@@ -14688,8 +14705,12 @@ def test_truth_7_356_the_parole_is_asked_in_the_captors_words_and_answered_in_th
     when nothing readable came, the question put once more after a glass; given, the cabin and
     the gunroom are his and the quarterdeck by day, his sword returned; refused, the gunroom
     alone and a sentry at the door, said. The director sets a parole for a captive nobody asks
-    and is doubted while the captain waits an answer."""
+    and is doubted while the captain waits an answer. From the owner's play of 2026-11-09: a
+    bare yes (oui, sí, aye, "I do", "you have it") gives it and a bare no (non, "never", "I
+    will not") refuses it while the question is open, read as whole words; both in one
+    answer, or neither, leaves it open."""
     from tests.test_captive import (
+        test_a_bare_yes_gives_the_parole_and_a_bare_no_refuses_it_read_as_whole_words,
         test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_while_one_waits,
         test_the_parole_asked_by_doctrine_in_the_captors_words_and_given_in_the_captives_own,
         test_the_parole_refused_asked_again_after_a_glass_and_given_by_rule_after_a_watch,
@@ -14698,6 +14719,7 @@ def test_truth_7_356_the_parole_is_asked_in_the_captors_words_and_answered_in_th
     test_the_parole_asked_by_doctrine_in_the_captors_words_and_given_in_the_captives_own()
     test_the_parole_refused_asked_again_after_a_glass_and_given_by_rule_after_a_watch()
     test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_while_one_waits()
+    test_a_bare_yes_gives_the_parole_and_a_bare_no_refuses_it_read_as_whole_words()
 
 
 @pytest.mark.slow
@@ -14773,19 +14795,25 @@ def test_truth_7_360_the_far_state_goes_into_the_near_body_at_her_waking_and_bac
 
 @pytest.mark.pace
 def test_truth_7_361_the_far_rounds_cost_the_frigates_tick_nothing_it_cannot_pay():
-    """The pace (informative; the floors not lowered): truth 51's form (the gate's day, a
-    thousand ticks to settle, the best of three thousands) with two far ships in anger
-    twelve miles off the frigate, fighting by the rounds the whole measure; the figure is
+    """The pace (informative; the floors not lowered): truth 7-159's form (the frigate of the
+    brains' sea, hove to on the chart, the first ten minutes to settle, the best of three
+    thousands) with two far frigates in anger twelve miles off her, fighting by the rounds
+    the whole measure (the King's frigate engaging, the Frenchman, overmatched with the
+    player's frigate in sight to the north of her, evading and fighting as she runs: two
+    rounds fired by the measure's start and fifteen more in it, seed nought); the figure is
     recorded in docs/dev/TuningNotes.md (package 74, step 4) and asserted at the build
-    machine's floor as truth 51 is."""
+    machine's floor as truth 51 is. (The gate's day, as first written, is a world with no
+    place on the chart to put a far ship at.)"""
     import time
 
     from freesail.combat import far_action as FA
     from freesail.world.geo import destination
-    from tests.test_brains import put
+    from tests.test_brains import put, world_at
 
-    world, _, _ = the_gate_day(until=1000, saves=())
+    world = world_at(49.5, -5.5)
     world.crewed_settings = {"cap": 0}
+    world.submit("heave to")
+    world.run(60)
     far = destination(world.position, 180.0, 12.0 * units.NAUTICAL_MILE)
     a = put(
         world,
@@ -14798,7 +14826,7 @@ def test_truth_7_361_the_far_rounds_cost_the_frigates_tick_nothing_it_cannot_pay
         name="Renard",
     )
     q = destination(far, 90.0, 0.8 * units.NAUTICAL_MILE)
-    put(
+    b = put(
         world,
         "frigate",
         "britain",
@@ -14809,13 +14837,15 @@ def test_truth_7_361_the_far_rounds_cost_the_frigates_tick_nothing_it_cannot_pay
         name="Medusa",
     )
     world.run(600)
-    assert a.brain.state == "engaging" and FA.ENABLED
+    assert b.brain.state == "engaging" and a.brain.state == "evading" and FA.ENABLED
+    before = int(a.damage.get("rounds", 0))
     best = 0.0
     for _ in range(3):
         t0 = time.perf_counter()
         world.run(1000)
         best = max(best, 1000 / (time.perf_counter() - t0))
-    assert a.damage.get("rounds", 0) >= 1, "the far rounds did not fire during the measure"
+    fired = int(a.damage.get("rounds", 0)) - before
+    assert fired >= 10, f"the far rounds did not fire through the measure ({fired})"
     assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
 
 

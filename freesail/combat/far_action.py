@@ -36,6 +36,7 @@ the far brain never engages and the world is 70's.
 
 from __future__ import annotations
 
+import functools
 import math
 from typing import Any
 
@@ -76,33 +77,40 @@ _CARRIED = ("killed", "wounded", "dismounted", "holes", "holes_below", "sail_cut
 
 def has_guns(vessel: Any) -> bool:
     """Whether her fit has guns to fire (a merchantman's 'unarmed' has none)."""
+    return _fit_has_guns(str(vessel.ship_file), str(getattr(vessel, "fit", "") or ""))
+
+
+@functools.lru_cache(maxsize=64)
+def _fit_has_guns(ship_file: str, fit: str) -> bool:
     try:
-        return bool(_guns_of(vessel))
+        return bool(_fit_guns(ship_file, fit))
     except Exception:  # noqa: BLE001  (a file without armament)
         return False
 
 
-def _guns_of(vessel: Any) -> list[tuple[str, float, float]]:
-    from freesail.ship.loader import load_spec
+def _fit_guns(ship_file: str, fit: str) -> tuple[tuple[str, float, float], ...]:
+    """The engaged broadside of a file's fit (one side's guns and the chasers), read once a
+    file and fit (`far.file_figures`): the far brain asks it of every stranger at every
+    minute of hers, and the file's reading from disk each time cost the convoy's pace two
+    thirds of its tick (docs/dev/TuningNotes.md, package 74, step 4)."""
+    return F.file_figures(ship_file, fit)[1]
 
-    spec = load_spec(vessel.ship_file)
-    arm = spec.armament
-    fs = arm.fit(getattr(vessel, "fit", "") or None) if arm is not None else None
-    if fs is None:
-        return []
-    return [
-        (g.kind, float(g.pounder), float(g.weight_cwt))
-        for g in fs.guns
-        if not (g.place == "broadside" and g.side != "starboard")
-    ]
+
+def _guns_of(vessel: Any) -> list[tuple[str, float, float]]:
+    return list(_fit_guns(str(vessel.ship_file), str(getattr(vessel, "fit", "") or "")))
 
 
 def reach_m(vessel: Any) -> float:
     """The longest random shot of her fit's guns, in metres; nought with no guns."""
+    return _fit_reach_m(str(vessel.ship_file), str(getattr(vessel, "fit", "") or ""))
+
+
+@functools.lru_cache(maxsize=64)
+def _fit_reach_m(ship_file: str, fit: str) -> float:
     from freesail.combat import shot as S
 
     best = 0.0
-    for kind, pounder, _w in _guns_of(vessel):
+    for kind, pounder, _w in _fit_guns(ship_file, fit):
         b = S.ballistics_of(kind, pounder)
         best = max(best, float(b.random_m))
     return best

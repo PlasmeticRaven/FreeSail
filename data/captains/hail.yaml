@@ -26,6 +26,7 @@ standard_hail:
   privateer: "What ship is that?"
   fisherman: "What ship is that?"
   prize-master: "What ship is that?"  # package 74: a prize under her prize crew
+  revenue: "What ship is that?"  # package 75: the revenue cutter's, her book's hail
 
 questions:
   what ship: ["what ship", "who are you", "what vessel", "your name", "what is she", "what ship is that", "ahoy"]
@@ -77,7 +78,7 @@ answers:
     heave to: "A King's ship heaves to for nobody: stand on."
   # package 74 (spec M7 §18): a prize under her prize crew answers whose prize she is
   prize-master:
-    what ship: "The {name}, prize to {captain}'s ship, {voyage}."
+    what ship: "The {name}, prize to the {captor}, {voyage}."
     whence: "From {port}; taken these few days."
     whither: "{voyage_short}, with the prize crew."
     cargo: "What she had when taken: {cargo}."
@@ -111,6 +112,22 @@ answers:
     news: "{news}."
     captain: "{captain}, skipper."
     days out: "{days} days out."
+    heave to: "{heave_to}"
+  # package 75 (SW-4's words step): a revenue cutter answers as the Customs' cruiser she is,
+  # armed and of the Crown and not the Navy's (Sherbourne's own service against the smugglers
+  # for the Board of Customs, 1763 to 1779: docs/design/VesselCandidates.md, the kit's manual):
+  # her name and her port, her errand from her goal (cruising off her station, or bound), no
+  # cargo; to a demand to heave to she answers by the stance below as a merchantman does,
+  # heaving to for a King's ship of a nation she is not at war with and making sail from any
+  # other's, an enemy's among them. The words MADE in the hail's form, as the rest of the table
+  revenue:
+    what ship: "The revenue cutter {name} of {port}, in the service of the Customs, {voyage}. And what ship is that?"
+    whence: "From {port}, {days} days."
+    whither: "On the Customs' service, {voyage}."
+    cargo: "No cargo: she is a revenue cutter."
+    news: "{news}."
+    captain: "{captain} commands her."
+    days out: "{days} days from {port}."
     heave to: "{heave_to}"
   privateer:
     what ship: "The privateer {name} of {port}, cruising. And what ship is that?"

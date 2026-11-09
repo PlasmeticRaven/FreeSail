@@ -1535,7 +1535,12 @@ def _locker_of(world: Any, vid: str) -> Any:
 # that fight. The design note said pistol shot; the far chase never comes nearer than hail.
 CUT_OUT_M = 0.4 * units.NAUTICAL_MILE
 COVER_NM = 2.0
-_ARMED_ROLES = frozenset({"privateer", "cruiser", "kings-ship", "commodore"})
+# The revenue cutter's among them (package 75, SW-4's words step, the lead's ruling at SW-4's
+# merge: an armed vessel of the Crown, who takes possession as the cruiser does); the
+# Indiaman's not, though she is armed: her book takes no prizes (`mans_prizes` false,
+# data/captains/indiaman.yaml), and this one set makes a captor of every role in it as well
+# as a cover, so her cover of a straggler of her nation is left out with the captor's part
+_ARMED_ROLES = frozenset({"privateer", "cruiser", "kings-ship", "commodore", "revenue"})
 # package 75 adds the new ships' descriptions, keyed before their files come
 _MAN_OF_WAR_DESCRIPTIONS = frozenset(
     {"frigate", "brig-sloop", "sixty-four", "razee", "seventy-four"}

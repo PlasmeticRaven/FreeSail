@@ -7,7 +7,10 @@ the crews of `gen_ships.gun_crew`, a judgement reading of Douglas). Adye's 18-po
 (9 cwt) and 9-pounder (24 1/2) differ from the shared tables' 10 and 26, from memory, which
 feed the eight files: so the new ships read this one sourced table and no figure of the eight
 moves (Design-Ship-Indefatigable.md §5.3). After stage 0 the builder of each ship's window may
-append to it, and changes no figure another ship reads.
+append to it, and changes no figure another ship reads. Since SW-4's words step (2026-11-07) one
+figure of the eight reads this table too: the topsail schooner's Musquidobit fit's 18-pounder
+carronades, `ADYE_CARRONADE_CWT[18]`, 9 cwt in place of the shared table's 10, no source giving
+the 10 (docs/dev/TuningNotes.md, "The words step").
 
 Marks as the research notes give them: read, the page or its image; read (OCR), the OCR text
 under docs/references/ only; judgement.
@@ -87,3 +90,28 @@ TWO_DECKS_EXERCISE_NOTE = (
     "Captain's chapter, l.8842-8879, gives a third too); the first six months' figure, the "
     "game keeping no commissioning date (judgement)."
 )
+
+# -- the Prince de Neufchatel's appends (package 75, B2; Design-Ship-PrinceDeNeufchatel.md §5.3,
+# §7). Adye 1804 p. 72 (the page image, IA leaf n95, read for her design): the 12-pounder
+# carronade of 2 ft 2 in, bore 4.52 in, 5 cwt 3 qr 10 lb, to the hundredth. Adye p. 155 (the page
+# image, IA leaf n178, read for her design): the long 6-pounder of 8 ft 0 in, 22 cwt, and of
+# 6 ft 0 in, 16 cwt 2 qr. The shared tables' 6 and 20 cwt (`gen_ships.CARRONADE_CWT`,
+# `LONG_GUN_CWT`), from memory, feed the eight files and stay as they are.
+ADYE_CARRONADE_CWT[12] = 5.84
+ADYE_LONG_GUN_CWT[6] = {(8, 0): 22.0, (6, 0): 16.5}
+
+# Steel 1794 vol. I, the folding anchor table's row for "14 Guns, 300 Tons" (the page image, IA
+# leaf n127, read for her design): three bowers of 20 cwt, a stream of 7 cwt and a kedge of 3 cwt
+# 2 qr; and "A Cordage Table" (IA leaf n117, read), which has no column for 14 guns: its "Sloops"
+# column, five bower cables of 13 1/2 in and a stream cable of 8 in, taken for a vessel of 14 guns
+# and about 300 tons (judgement; the "20 guns" column, six cables of 14 1/2 in, the other). Keyed
+# by the anchor table's guns, as the 64's row is.
+STEEL_ANCHORS[14] = {
+    "bowers": 3,
+    "bower_cwt": 20.0,
+    "stream_cwt": 7.0,
+    "kedge_cwt": 3.5,
+    "bower_cables": 5,
+    "bower_cable_in": 13.5,
+    "stream_cable_in": 8.0,
+}

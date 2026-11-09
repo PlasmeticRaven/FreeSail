@@ -505,6 +505,14 @@ def _fills(
     pool = (table.get("cargo") or {}).get("deep" if deep else "light") or ["in ballast"]
     cargo = str(pool[rng.randrange(len(pool))])
     captain = _captain_name(vessel, other_world, rng, nation)
+    # a prize under her prize crew (package 74): her captor by his ship's name and her
+    # prize master by his own, from her record, never from whoever stands at the hailing
+    # prompt (the owner's play of 2026-11-09: "prize to Mr Ray's ship")
+    prize = getattr(vessel, "prize", None)
+    prize = prize if isinstance(prize, dict) else {}
+    captor = str(prize.get("captor_name") or "her captor")
+    if role == "prize-master" and prize.get("master"):
+        captain = str(prize["master"])
     days = str(1 + rng.randrange(9))
     news = nations.wars_words() if nations is not None else "no news"
     return {
@@ -515,6 +523,7 @@ def _fills(
         "voyage_short": voyage_short,
         "cargo": cargo,
         "captain": captain,
+        "captor": captor,
         "days": days,
         "news": news[:1].upper() + news[1:],
         "kind": kind,
