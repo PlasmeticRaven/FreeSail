@@ -457,3 +457,49 @@ def test_the_directors_letter_for_one_of_the_people_is_left_at_the_port_and_hand
     assert [e.text for e in events(w, "message.received")] == [
         "The captain read it: For the captain."
     ]
+
+
+# A kept save of the trunk's making before step 2 (e5977db, `tests/fixtures/saves/`): the
+# schooner at anchor in the Bay of Brest, the boat come off with the Prefect's letter, saved
+# at tick 8140 with the letter in the messenger's hand (an old `Message`, no thing). The
+# trunk's own world, run on 600 seconds from the save, gave the digest below; this build's
+# must give the same, from the checkpoint and from the journal alike.
+OLD_LETTER_SAVE = "pre-100-step-2-letter-in-hand"
+OLD_LETTER_SAVE_TICK = 8140
+OLD_LETTER_SAVE_DIGEST = "8325f8d7bfd115a8599d9beed207c7cf0a4961aa4137312de0cb8dacedcfdb25"
+OLD_LETTER_RUN_ON_DIGEST = "ba062f9d0951f132bf6539a473953ddf90794153ae718e7755e4ae81a5a615fc"
+
+
+def test_a_save_from_before_step_2_with_a_letter_in_hand_loads_and_replays_to_its_old_digests():
+    """The old `Message` in the messenger's hand of a checkpoint written before step 2 is
+    made a thing at the load; the world carries on to the trunk's digest, the letter read at
+    the door and in the captain's keeping; the journal alone replays to the same digests."""
+    from pathlib import Path
+
+    from freesail.core.replay import load_report
+
+    save = Path(__file__).resolve().parent / "fixtures" / "saves" / f"{OLD_LETTER_SAVE}.json"
+    world, report = load_report(save, ship_factory)
+    assert report.how == "checkpoint"
+    assert world.clock.tick == OLD_LETTER_SAVE_TICK
+    assert world.log.digest() == OLD_LETTER_SAVE_DIGEST
+    (message, _due) = world.people.messages[0]
+    letter = next(t for t in TH.things_of(world) if t.id == message.thing)
+    assert letter.keeper == world.people.messenger.id and letter.sealed and not letter.broken
+    assert letter.words == "The Prefect begs the captain to dine on Thursday."
+    world.run(600)
+    assert world.log.digest() == OLD_LETTER_RUN_ON_DIGEST
+    assert letter.keeper == world.people.captain.id and letter.broken
+    # the journal alone, its checkpoint set aside: replayed (the build is another, and the
+    # save holds no station, so the flag is asked for) to the same two digests
+    import shutil
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        alone = Path(d) / "alone.json"
+        shutil.copy(save, alone)
+        again, rep = load_report(alone, ship_factory, replay_anyway=True)
+        assert rep.how == "replay"
+        assert again.log.digest() == OLD_LETTER_SAVE_DIGEST
+        again.run(600)
+        assert again.log.digest() == OLD_LETTER_RUN_ON_DIGEST

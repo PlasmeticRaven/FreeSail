@@ -1,0 +1,122 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "34738b7d0d18cf78"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "34738b7d0d18cf78"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "Open water",
+    "start_time": "1805-06-12T09:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 12.0,
+    "gustiness": 0.0,
+    "variability": 0.0,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 250.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.0,
+    "position": {
+      "lat_deg": 48.345,
+      "lon_deg": -4.47
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [],
+    "systems": [],
+    "climatology": false,
+    "background": {},
+    "glass": false,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "octant",
+    "current": null,
+    "sky": null,
+    "chronometer": null,
+    "epitome": null,
+    "nation": null,
+    "people": [],
+    "papers": {},
+    "cargo": {
+      "purse_pounds": 200.0
+    },
+    "ports": null,
+    "ships": [],
+    "world_orders": [],
+    "intent": "",
+    "books": [],
+    "director": {}
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/topsail-schooner.yaml"
+  },
+  "end_tick": 8140,
+  "journal": [
+    [
+      60,
+      "captain",
+      "let go the best bower"
+    ],
+    [
+      360,
+      "captain",
+      "go below"
+    ],
+    [
+      960,
+      "captain",
+      "send the boat ashore"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 60,
+      "actor": "captain",
+      "order": "let go the best bower"
+    },
+    {
+      "tick": 360,
+      "world_order": "message: at Brest from the Prefect maritime: \"The Prefect begs the captain to dine on Thursday.\"",
+      "source": "the test"
+    },
+    {
+      "tick": 360,
+      "actor": "captain",
+      "order": "go below"
+    },
+    {
+      "tick": 960,
+      "actor": "captain",
+      "order": "send the boat ashore"
+    }
+  ],
+  "standing_orders": [],
+  "agents": [],
+  "agent_journals": {},
+  "world_orders": [
+    {
+      "tick": 360,
+      "source": "the test",
+      "order": "message: at Brest from the Prefect maritime: \"The Prefect begs the captain to dine on Thursday.\"",
+      "result": "done",
+      "words": "a letter from the Prefect maritime left at Brest"
+    }
+  ],
+  "chart_marks": [],
+  "station_acts": [],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  },
+  "director": {},
+  "hulls": []
+}

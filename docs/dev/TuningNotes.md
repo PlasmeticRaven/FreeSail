@@ -24810,7 +24810,20 @@ vessel's `letter`, the boat's `bringing`), with a new field `thing` (a plain cla
 ""), the letter's id once it is aboard. A checkpoint from before holding a letter in the
 messenger's hand (`People.messages`, an old `Message` and no thing) has it made a thing at the
 load (`replay._rebind` calls `People.letters_as_things` on each company), so that it is handed
-and read at the door as it would be now.
+and read at the door as it would be now. **Proven on the kept saves**: the four of `tests/fixtures/saves/` hold no
+letter (none in a messenger's hand, none waiting at a port, none read), and each loads from its
+checkpoint to its header's digest as before (`tests/test_checkpoint.py`, `test_lee_ports.py`,
+`test_hulls.py`). So that the conversion itself is proven on a save of before, a fifth is kept
+beside them, of the trunk's making at e5977db (before this step):
+`pre-100-step-2-letter-in-hand.json` with its checkpoint, the schooner at anchor in the Bay of
+Brest, the boat come off with the Prefect's letter left by world order, saved at tick 8140 with
+the letter in the messenger's hand (an old `Message`, no thing). The trunk's world run on 600
+seconds from it gave ba062f9d0951f132 (its save's digest 8325f8d7bfd115a8). Under this step
+(`tests/test_letters.py::test_a_save_from_before_step_2_with_a_letter_in_hand_loads_and_
+replays_to_its_old_digests`) it loads from its checkpoint at 8325f8d7bfd115a8, the letter made a
+thing in the messenger's keeping, and run on 600 seconds gives ba062f9d0951f132, the letter read
+at the door and in the captain's keeping with its seal broken; its journal alone (the checkpoint
+set aside, `replay_anyway` as for any save of another build) replays to the same two digests.
 
 **Taken another way, with the reason.** (1) A letter not yet in any hull stays the carrier's
 `Message` (a port's letters, a cutter's, the boat's bringing) and is made a thing where it comes
