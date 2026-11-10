@@ -153,7 +153,7 @@ the lights
 | `haul down the colours` | none shown; under fire, the strike |
 | `hoist the ensign union down` | the signal of distress (with `fire a gun to leeward`) |
 | `hoist the broad pendant` / `hoist a second ensign at the main` / `hoist the jack` | a commodore's broad pendant at the main; the ensigns doubled; the jack at the fore, or the jackstaff at anchor |
-| `haul down the broad pendant` / `haul down the second ensign` / `haul down the jack` (or `strike`, `lower`) | each flag of command down by its name, the colours left flying |
+| `haul down the broad pendant` / `haul down the second ensign` / `haul down the jack` (or strike, lower) | each flag of command down by its name, the colours left flying |
 | `the flags` | what flies where, and then the signal flying |
 | `show the private signal` / `answer the private signal` | the month's challenge and reply, with a table aboard |
 | `make the Spanish private signal` / `make the private signals in succession` | another nation's challenge from her table held, or every table held one after another |
