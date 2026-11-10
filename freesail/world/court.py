@@ -7,14 +7,15 @@ proceeding has the facts without the director inventing them), its verdict a for
 world order journaled, the play log carrying the sentence read and never the order; **the
 person's record** (`Person.record`, a list of dated entries: the loss, the trial, the
 verdict, the appointment) the thing the career of M8 remembers, kept in the save and read
-as `the record` and as the paper "the captain's record"; and **a new command as a
+as `the record`; and **a new command as a
 scenario's start**: `command: a new command for <person>: the <description> "<name>" at
 <port>` writes a scenario file under the saves' folder (never `data/scenarios/`) carrying
 his name as her captain, his people who followed him (the persons ashore at the same port
-whose record has the same loss) and the record as a paper, to be given to either driver
+whose record has the same loss) and a copy of the record as a thing with words in his
+keeping (package 100's letter, by the scenario's `things:`), to be given to either driver
 with `--scenario`; the career that remembers (half-pay, the reputation, the next ship chosen
-by the record) is M8's, the hooks named here (`record_of`, the paper, the scenario's
-`papers.record` and `people[].record`, `VERDICTS`).
+by the record) is M8's, the hooks named here (`record_of`, `record_thing`, the scenario's
+`people[].record`, `VERDICTS`).
 
 The verdicts are the period's for the loss of a ship (the Articles of War's sentences as
 the courts of 1805 gave them, FROM MEMORY: honourably acquitted, acquitted, reprimanded,
@@ -44,6 +45,7 @@ __all__ = [
     "note",
     "read_log",
     "record_lines",
+    "record_thing",
     "record_loss",
     "record_of",
     "sit",
@@ -742,7 +744,7 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         },
         "ship": {"file": str(desc["file"]), "name": ship_name, "heading_deg": 0},
         "people": people,
-        "papers": {"record": record_lines(person)},
+        "things": [record_thing(person)],
         "ports": [str(port.id)],
     }
     if region:
@@ -801,21 +803,15 @@ def record_words(world: Any, person: Any) -> str:
     )
 
 
-def paper_lines(world: Any) -> list[str]:
-    """The paper "the captain's record": the scenario's `papers.record` lines (a record
-    carried from the last game) and the captain's own entries."""
-    out: list[str] = []
-    sc = getattr(world, "scenario", None)
-    carried = (getattr(sc, "papers", None) or {}).get("record") if sc is not None else None
-    for line in carried or []:
-        out.append(str(line))
-    people = getattr(world, "people", None)
-    try:
-        captain = people.captain if people is not None else None
-    except Exception:  # noqa: BLE001
-        captain = None
-    if captain is not None:
-        out += [ln for ln in record_lines(captain) if ln not in out]
-    if not out:
-        return ["Nothing is entered in the captain's record."]
-    return out
+RECORD_THING = "a copy of the captain's record"
+
+
+def record_thing(person: Any) -> str:
+    """The words that make the copy of his record he carries into a new command: a thing
+    with words in the captain's keeping (package 100's road: a scenario's `things:` entry
+    made as `aboard:` makes a letter), its words his record's entries as they stood at the
+    appointment. Read, sealed, given and burnt as any letter is; the reading `the record`
+    is the record itself, which goes on."""
+    words = " ".join(record_lines(person)).replace('"', "'").replace("\u201c", "'")
+    words = words.replace("\u201d", "'")
+    return f'{RECORD_THING}, in the captain\'s keeping: "{words}"'

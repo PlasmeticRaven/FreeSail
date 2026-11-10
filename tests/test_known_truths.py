@@ -14950,9 +14950,10 @@ def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_
 def test_truth_7_365_a_new_command_is_a_scenarios_start_written_under_the_saves_with_the_record():
     """The design's §7.2: the scenario file written under the saves with his name as her captain,
     his follower (his first lieutenant exchanged at the same port, the same loss in his record)
-    and the record as a paper, loaded by the loader and begun, the record read aboard the new
-    ship and the paper "the captain's record" carrying it; refused for a man dismissed the
-    service, doubted for one dismissed his ship within the year (one scene with 7-364)."""
+    and a copy of the record in his keeping, loaded by the loader and begun, the record read
+    aboard the new ship and the copy read as a letter is, a thing with words; refused for a
+    man dismissed the service, doubted for one dismissed his ship within the year (one scene
+    with 7-364)."""
     test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place()
 
 

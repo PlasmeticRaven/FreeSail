@@ -23627,8 +23627,8 @@ lead's records while these ran (229d024, the work packages' page alone) and was 
 
 **Built as designed** (`freesail/world/court.py`; the channels `court` and `command` in
 `world/orders.py` with `person: "<name>" is exchanged at <port>`; the verb `say to the court`
-through the prize orders; `Person.record` as a list the court writes and the paper "the captain's
-record" reads; the reading `the record`; the scenario's `ship.name` and `people[].record` honoured
+through the prize orders; `Person.record` as a list the court writes; the reading `the record`;
+the copy of the record a thing with words in his keeping aboard a new command; the scenario's `ship.name` and `people[].record` honoured
 by the loader; the flag `seats.ADVERSARIAL_SEATS_CONSENTED` and `prizes.adversarial_seat_why` at
 the director's seat and the desk's door; `docs/design/ConsentRevision-AdversarialSeats.md`): the
 court as the director's proceeding at a place of the port (made for the sitting, gone at the
@@ -23646,8 +23646,8 @@ exchange takes its time"; performed with a reason), the court sat on him at Falm
 Brest: "a port of his own nation, and Captain Bowen is British"), the president's question in his
 mouth, the accused's answer his own, the judge advocate's reading of the action's lines, the
 verdict acquitted with honour; his first lieutenant exchanged after him follows him into the
-cutter Alert at Falmouth; the scenario loads, the record reads aboard her and her paper carries
-it. The whole takes some two minutes of wall on this container (the far frigate's possession and
+cutter Alert at Falmouth; the scenario loads, the record reads aboard her and the copy in his
+keeping reads as a letter does. The whole takes some two minutes of wall on this container (the far frigate's possession and
 the port's landing the most of it).
 
 **Taken another way.** (1) The accused's words are a verb of the prize orders (`say to the court`,
@@ -23659,15 +23659,21 @@ director decides every cause by the brief as it stands. (4) The `person: ... is 
 takes a landed prisoner or one held aboard; one who is neither is refused, and the exchange's doubt
 is the day since his landing. (5) A scenario may name the player's ship (`ship.name`): the files
 named her alone before; the tender's file names hers as her file does, so nothing recorded moves.
-(6) The paper "the captain's record" is a **carried paper** (`data/papers/papers.yaml`'s
-`carried:` list, `Papers._carried`): aboard only where the ship's scenario carries a record
-(`papers.record`, a new command's), last among her papers and no part of her catalogue. As first
-built on the scratch it was a thirteenth paper of every ship's catalogue, which moved the pinned
-lists and counts of the papers in four test files (`test_places`, `test_agents`, `test_server`,
-`test_ordnance`: 12 papers, the gunner's account last) and would have mustered the people of any
-world whose papers were listed; found by the step's pre-check on the package branch and taken
-this way before the step's commit, so that **no pin moves**: every other ship's papers are as
-they were. The reading `the record` serves him everywhere.
+(6) **The record he carries into a new command is a thing with words, not a paper of the ship's**
+(the lead's word of 2026-11-10 on package 100's step: a paper given to an officer is a thing with
+words by that road and no kind of its own). The scenario the form writes lists it under `things:`
+in the words that make a letter (`court.record_thing`: "a copy of the captain's record, in the
+captain's keeping", its words his record's entries as they stood at the appointment), the loader
+makes it as `aboard:` makes one, and he reads it as a letter is read (`read the copy of the
+captain's record`; its words come to its reader alone), seals it, gives it or burns it. The design
+had a paper of the new ship's, "the captain's record". It was built twice before this: on the
+scratch as a thirteenth paper of every ship's catalogue, which moved the pinned lists and counts of
+the papers in four test files (`test_places`, `test_agents`, `test_server`, `test_ordnance`: 12
+papers, the gunner's account last) and would have mustered the people of any world whose papers
+were listed; then, on the package branch at 0624c2f, as a "carried" paper outside the catalogue
+(`papers.yaml`'s `carried:` list, `Papers._carried`), which moved no pin but was a kind of its own.
+Both are gone: `data/papers/papers.yaml` and `world/places.py` are the trunk's again, and **no pin
+moves**. The reading `the record` is the record itself and serves him everywhere.
 
 **Found on the way.** After the exchange the player's own ship's "captain" is her prize master
 (rehomed into her company at the possession), so the followed prompt and `where am I` fell to the
@@ -23706,8 +23712,18 @@ seats and the director tests' Harpy (French, at a station other than the captain
 read at the seating) are not adversarial by the rule; the refusal is exercised by `test_court.py`
 alone, and the flag is turned and turned back there.
 
-**The trunk merged at the step's boundary**: one merge (at 229d024), the lead's records alone
-(the work packages' page), which met nothing. **Pins moved by the step: none.** The officer's
+**The trunk merged at the step's boundary**: two merges. The first (at 229d024) brought the
+lead's records alone and met nothing; the fast tier whole and the slow tier of the touched files
+were measured on it at 9722244, **exit 0** both (15:04:19 to 15:57:02, 7,220 passed and the
+trunk's one expected failure; 15:57:02 to 16:23:17, 2,948 passed and one expected failure), and
+the truths were not run there, the trunk having by then gained package 100's step 1 and this
+package's step 5 as merged. The second (b3eaa53 at e1e2ba7) brought those. It merged without a
+conflict. What met: 100's `ORDER_AS_SAID` and `THEN_LINES` are taken out of an order's result in
+`World.submit` before this package's test of the player's hand, and the two read side by side;
+100's reach class `reader` and this step's family `court` are separate rows of the reach table;
+100's `aboard: a letter ...` and `aboard: remove ...` stand beside the court's and the command's
+forms in `world/orders.py`; and the record carried into a new command was made a thing with
+words by 100's road (item (6) above), on the lead's word. **Pins moved by the step: none.** The officer's
 conversation at his seat measures 13,584 tokens with this step (13,516 before it: the reading
 `the record` and the court's events in the stand-by's words), under the 13,800 the handover
 test allows at its budget of 23,000.
