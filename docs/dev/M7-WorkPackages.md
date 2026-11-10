@@ -80,8 +80,26 @@ on these packages; that is the owner's choice.
 | 97 | Opus | **The hull façade's readers audited** (the lead, 2026-11-06, from two builders' findings of the same day): 84's per-hull delegation (`World.own`, `as_hull`, `PER_SHIP_FIELDS`) answers for the hull whose block is running, so an object of one hull that reads `world.people`, `world.stations` or `log_of(world)` from inside another hull's block reads the wrong hull's: 82b found the player's hull's `Stations.holder` (her `Stations` is built with the World itself) reading the running block's people, so a named station on her matched another hull's captain moving; 65 found `station_spot` read from inside another hull's order (mended for `_say` with `station_spot_on`) and the director's own writes (`thought`, the budget lines, `director.seat`) landing in the followed hull's log under `follow`. The package: every reader of a per-hull field through a World handle audited and listed; each either bound to its own hull at construction (the Stations' and People's hull, not the World) or read in its own hull's block; a test per finding (the holder under another hull's block, the director's writes under `follow`, a façade read from inside another hull's order) and one guard that walks the readers; no pin moved (the faults are latent in the recorded passages, which run one hull's block at a time); one tidy rides with it, found by 95's builder: `hail_order`'s refusal in `world/hail.py` ("the strangers are listed") to give the strangers' words as `Lookout.sail_refusal` does; truths 7-422 to 7-425 | after 82b and 95; **launched 2026-11-06 12:40 UTC** (session_01XooV4AUe3L3SVNNGyD3K6i, claude/pkg-97, from the trunk at 9936e12 with 95 closed): the design note first (the audit's list), then the mends; the design note (c299be0, `docs/design/Design-FacadeReaders.md`: one cause, the player's own hull never walked at construction; eighteen readers listed; two roads; a guard) approved 13:04, one step; the one line in 65's `agents/harness.py` (a harness binds the hull whose agents it enters) granted; left by ruling: the shared person ids (96's), the replay's seating order of two hulls in one tick (a loose end beside truth 7-394, not a façade reader), the sea's one visibility under follow (noted for M8); 14:16: one fight's outcome moved by the binding and bisected (the Amazon's Health, holding the World, killed the Medusa's man of the boarder's post; the branch kills her own first lieutenant at tick 530): the branch right, the test's story kept under a chosen seed with the reason written, a new pin of the default draw beside it; who leads on when the boarders' officer falls booked to 74; merged 2026-11-06 (7e479b7); **closed** |
 | 98 | Opus | **The mends from the owner's play of 2026-11-09** (the lead, from the triage above): the player's own readings and refusals heard wherever he stands, and "go below" reaching the server; a kept live-browser probe that proves each mend as the player sees it; the viewer's paint order for guns and flags, a flag's lines, the truce state and 81's port-top rule; the picture at the OpenRouter door; the Rade de Brest's stream; the colours and signals by the deck's rule | briefed 2026-11-09 (below); **approved and launched 2026-11-09 (the owner)** as an Opus sibling session on `claude/pkg-98` (session_01XooV4AQeh4Fkc3zC5jdAuL), the trunk at be9c951e, with the owner's two rulings in the brief (the colours and signals the deck's; a man's own word, refusals and readings always shown him, a thing done out of his sight not); **steps 1, 2 and 6 merged 2026-11-10 (985c8777)**, truths 7-446 to 7-449: the probe a kept tool, 71 of 123 typed lines unshown before and 2 after; step 7 added by the owner (the flags of command hauled down and read); **steps 3, 4, 5 and 7 with the four additions merged 2026-11-10 (12bd5f48)**, truths 7-450 to 7-459, the Rade's stream moving three passages' pins by the toggle, one line met with 74's step 4 and both kept; **step 8 added by the lead 2026-11-10** (the set's last course kept in the world: `squadrons._LAST_COURSE`, a module's table keyed by `id(world)`, found by 74 and proven by planting; its own report after) |
 | 99 | Opus (a design note first) | **The views under the knowledge rule** (the owner's note 3): the chart and the ship view show what the person knows, the last value he learned with its hour where he lacks the live one; the captive's cabin and its senses ruled with it | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
-| 100 | Opus | **Letters and things as one system** (the owner's note 8): a letter a thing with words, written, carried, handed, read, sealed and destroyed by anyone by one road; the director's things with a description, removed by his form; the letters by boat and by cutter carried as things | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
-| 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **to run after 74 closes (the owner, 2026-11-09: "it's good to let 74 close cleanly before starting anything else major")**, the design note and the building both; the brief to be put to the owner for approval then |
+| 100 | Opus | **Letters and things as one system** (the owner's note 8): a letter a thing with words, written, carried, handed, read, sealed and destroyed by anyone by one road; the director's things with a description, removed by his form; the letters by boat and by cutter carried as things | booked 2026-11-09 (below); held by the owner (2026-11-09); **approved by the owner and launched 2026-11-10** as an Opus sibling session on `claude/pkg-100` (session_01XooV47cDNM2igRU6E9FkQ4), the trunk at 2a291604; two steps, each at one hash (the thing with words; the letters that travel), truths 7-470 to 7-479 |
+| 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **to run after 74 closes (the owner, 2026-11-09: "it's good to let 74 close cleanly before starting anything else major")**, the design note and the building both; **the design note approved by the owner 2026-11-10 to be written now** (a document alone, `docs/design/Design-ShipBought.md`, by an Opus sibling session on `claude/pkg-60`, session_01XooV4BEMb2fNbYpMywL2G9, launched 2026-11-10 for the lead's gate); the building still after 74 closes |
+| 101 | Opus | **The Catalan coast block** (the owner, 2026-11-10: the gap in the chart on the eastern Iberian coast): a new region of `atlantic-east` between `balearics`' north bound (40.56 N) and `gulf-of-lion`'s west bound (3.0 E), the Ebro's mouths and the Alfaques, Salou, Tarragona, Barcelona and Mataró to the coast's crossing of 3 E near Tossa; with it the ports the coast lacks, in the block and in the charted water beside it | proposed 2026-11-10, **the gap measured by the lead** (the chart probed on a tenth of a degree): nothing at all (no depth, no land, no coast, no region) north of 40.56 N and west of 2.61 E as far as the land; the Gulf's first tile column gives depth from 2.61 E to 3.0 E, which no region owns; the sea so missing is a wedge of some 80 miles north and south by 110 east and west at its foot, from the coast at 0.5 E on 40.56 N to the coast's crossing of 3 E at 41.75 N. A box of 40.56 to about 41.9 N and about 0.3 to 3.0 E is some 3.6 square degrees, the smallest of the Mediterranean's blocks (about 28 level-2 tiles, 4 to 6 MB by the others' sizes, far under the 40 MB rule); the seam's exact meridian (3.0 E or the Gulf's tile edge) the builder's first measurement by `docs/dev/ChartBlocks.md`. **No port file exists between Cartagena and Marseille on the main**: in the block Barcelona, Tarragona (with Salou's road) and the Alfaques; beside it in water already charted Rosas and Palamós (`gulf-of-lion`), Valencia's Grao and Alicante (`mediterranean-west`). **Approved by the owner 2026-11-10: all seven ports, launched at the close of package 98**; briefed 2026-11-10 (below), truths 7-490 to 7-499 |
+| 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design |
+
+**An open design question, recorded for the owner (2026-11-10): the day and the range.** The
+game's purpose is a world that can be simulated over a wide range of dates, 1792 to 1825 as
+it stands, and earlier and later where possible; the build's attention has gathered on 1805
+(the scenarios' year, the lights and shores "as 1805 had them", the signal books of 1799 and
+1803). The owner's questions, open: which is better, fidelity to the day in every element
+or a world that functions reasonably on any given day; and where attention to historical
+fidelity gets in the way of an interesting simulation and game, "not because it is not
+important to the intent of the game, but because the world must be subject to the game and
+not vice-versa". **The owner's ruling the same day (decision 66, `docs/DesignProposal.md`): history is the starting state, not a rail; the elements are correct, their interactions are the world's own once play begins; fidelity is a lever.** How far each element is dated across the range is still open. What the lead notes for the discussion: the data that
+carries its dates in its rows (79a's regimes, a port that changes hands by `since` and
+`until`, a nation's wars) already answers for any day, while the data written as one year's
+picture (a harbour's moles, a coast's lights, a signal book, a ship list) answers for 1805
+and is silently wrong elsewhere; so a brief that says "as 1805 had it" builds the second
+kind, and briefs from here say which kind each item is.
+
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -3626,8 +3644,7 @@ passed, 1 xfailed, 482 slow left out; the slow of the known truths, the profile 
 Indefatigable exit 0, 506 passed, 8 xfailed; the slow of the touched files exit 0, 1,803 passed;
 the pace alone and last exit 0, 14 passed, no floor lowered; nothing skipped in any tier; ruff
 clean. **The lead's merge:** the trial on b4e99f33 clean and lint-clean; no model or vendor name
-in the diff; no ship file, no physics; the fast tier whole on it exit 0, 7,057 passed by the dots and 1 xfailed, 05:19 to 06:24 UTC (an hour and five minutes, the machine shared with the investigation for its first quarter hour); the whole
-suite in the cloud dispatched after run 59, the figures to follow.
+in the diff; no ship file, no physics; the fast tier whole on it exit 0, 7,057 passed by the dots and 1 xfailed, 05:19 to 06:24 UTC (an hour and five minutes, the machine shared with the investigation for its first quarter hour); the whole suite in the cloud, run 60 (2026-11-10, 06:25 to 07:44 UTC, on c54a0537): lint green; the six shards green, 7,494 passed, 20 skipped, 12 xfailed, the longest shard 70 minutes; the pace job 10 of 14 in 7 minutes 17 (the step's own pace truth, 7-361, among the passes), the same four floor tests short on the runner (426 to 488 ticks a second against 500; 7-159's convoy 426, where run 59 before the far fight was wired had it at 388 and the builder's machine 539 to 565), so the shortfall is the runner's hour and not the step's.
 
 **Given back to the builder for step 5's tree (none held the merge):** (i) the parole's plain
 answer reads "I do not." and "I do not know" and "you have it not" as given (the yes list's "i
@@ -6410,7 +6427,7 @@ ship view stays a ship view.
 
 ## Package 100: letters and things as one system (`freesail/world/things.py` a thing's words, author, addressee and seal; `freesail/orders/free.py` write, read, seal, break the seal, destroy; `freesail/world/books.py` the drafting's road shared; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the director's thing with a description and its removal; `freesail/world/people.py`, `ports.py`, `ships.py`, `dealings.py` the letter by the boat, the cutter, the pilot and the port carried as a thing and handed to its addressee; `freesail/core/replay.py` the old `Message` read; the primer's chapters 14, 20 and 26; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-470 to 7-479)
 
-**Held by the owner (2026-11-09) for the moment.** One road for everyone, the player, a station and the director: a
+**Held by the owner (2026-11-09); approved and launched 2026-11-10 (the owner).** One road for everyone, the player, a station and the director: a
 letter is a thing with words. **Written** (`write a letter to <whom>: "<words>"`, by the
 drafting's road: the writer, the hour, the cabin's table), **carried, handed, put down and
 hidden** as any thing is, **sealed and opened**, **read** where it is in reach (its words shown
@@ -6426,8 +6443,9 @@ books (the sheets, the manifests and the notes) stay as they are in this package
 
 ## Package 60 (from M7b): a ship bought, and the player's ship changed in play (`docs/design/Design-ShipBought.md` new, first; then `freesail/core/world.py` the player's hull re-pointed, `core/acts.py`, `core/replay.py` the change journaled and replayed; `freesail/world/knowledge.py` `player_hull`, `players_person`; `freesail/world/movement.py`, `people.py`, `prizes.py` the seat carried and the hands moved; `freesail/world/ships.py`, `ports.py`, `dealings.py`, `business.py`, `data/business.yaml` the owner, the price and the listings; `freesail/world/prize_court.py` the valuation with her condition; `freesail/orders/port.py`, `data/vocabulary.yaml` the orders; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the `for sale` tail and the errand's answer; `freesail/api/readings.py`; `data/scenarios/` a ship bought at Falmouth; `docs/TechnicalSpec-M7b.md` §21g and §21h as built; the primer's chapter 14; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-480 to 7-489)
 
-**For the owner's approval. Re-briefed by the lead, 2026-11-09, on a survey of the trunk and of
-74's unmerged steps.** The spec's bridge was four general things and no "buy a ship" feature
+**The design note approved by the owner 2026-11-10 to be written now, while 74 is open (a
+document alone; the build still waits for 74's close and the note's gate). Re-briefed by the
+lead, 2026-11-09, on a survey of the trunk and of 74's unmerged steps.** The spec's bridge was four general things and no "buy a ship" feature
 (M7b §21g); it was written before the one world. What has been built since, and what has not:
 
 - **Built since:** every ship a hull of one world (84); the player aboard another ship, the
@@ -6496,6 +6514,157 @@ later. The note is written after 74 closes, on the trunk as it then stands.
 and then the steps in order; nothing of it starts while 74 is open. **Rules:** the standing
 ones; every save and checkpoint from before loads and replays as it did (the kept saves are the
 proof); no pin moved but old beside new with its proof.
+
+## Package 101: the Catalan coast block (`catalan-coast`; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index and manifest entry, `features/catalan-coast.yaml`, `overrides/catalan-coast/`; `features/gulf-of-lion.yaml` and `features/mediterranean-west.yaml` with their indexes only for the four ports beside the block, by the how-to's road for a mark added; `data/ports/*.yaml` seven new; `data/nations.yaml` the ports' index and their dated states; `data/tides/constituents.yaml`, `streams.yaml`, `establishments.yaml`; `data/weather/climatology.yaml` the coast's box; `data/business.yaml` only where a port's market needs a good; `data/scenarios/tarragona.yaml` new; `docs/references/README.md`; `docs/dev/ChartBlocks.md` where the how-to proves wrong; `docs/TechnicalSpec-M7.md` §28's pointer as built; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_ports.py`, `test_tide.py`, `test_weather.py`, `test_scenarios.py`, `test_known_truths.py` truths 7-490 to 7-499)
+
+Opus. The gap in the chart on the eastern Iberian coast (the owner, 2026-11-10: "a very
+noticeable gap", which "makes western Mediterranean play a bit iffy"), closed by one small
+block, and with it the ports the Spanish main lacks from Cartagena to the French border:
+**all seven, by the owner's word of 2026-11-10**. Built as `docs/dev/ChartBlocks.md` says
+(read it whole first, with the recipe form over `REGIONS` in `tools/build_charts.py`, and
+79c's and 79d's sections of it and of the tuning notes as the latest Mediterranean blocks:
+their findings are this block's starting point, the 40 MB rule, the world's tide over the
+Mediterranean, the Spanish gauges' reports, the isles the grid lacks, the draft positions
+that miss by a kilometre, the business that wants a price ratio, among them). It changes
+no byte of any other region's level-2 tiles or coast.
+
+**The gap as the lead measured it** (the chart probed on a tenth of a degree, 2026-11-10):
+nothing at all, no depth, no land, no coast, no region, north of 40.56 N (`balearics`' north
+bound and its tiles' edge) and west of 2.6133 E (9,408 seconds of arc, the west edge of
+`gulf-of-lion`'s first tile column) as far as the land; from 2.6133 E to 3.0 E (the Gulf's
+west bound) the Gulf's tiles give depth and no region owns the water. The coast stands at
+about 0.5 E on 40.56 N and crosses 3 E at about 41.75 N, near Tossa: the sea so missing is
+a wedge of some 80 miles north and south by 110 east and west at its foot.
+
+0. **The sources, a short pass and no new research** (its report first in the tuning notes'
+   section): what `docs/references/pilots/` already holds for this coast, read and cited by
+   page: Tofiño's *Derrotero* of 1787 (the coast from Cape San Antonio to Cape Creus), the
+   *Derrotero* of 1849, Michelot, Purdy 1826 and 1840, Norie 1831, Smyth 1854, the
+   Admiralty's *Mediterranean Pilot* vol. I with **Barcelona's meteorological table (p. 726,
+   named by 79c's pass as outside its blocks and not cut)**; Roux's plates of Barcelona and
+   Roses (79c's pass read pls. 12 to 39) and Heather's of 1814; Tofiño's plans of Barcelona,
+   Tarragona and Salou, the Alfaques, Rosas, Palamós, Valencia's road and Alicante where
+   they can be fetched. What is not found is said so with the host's answer, and nothing is
+   invented in its place. Every source is data: read, never run.
+1. **The region** `catalan-coast`: the main from the Sénia's mouth and the Alfaques by the
+   Ebro's delta and Cape Tortosa, the Coll de Balaguer, Cambrils, Cape Salou, Tarragona,
+   the coast of Garraf, the Llobregat, Barcelona with Montjuïc, Mataró and the Maresme to
+   Blanes and Tossa. **Bounds 40.56 N to about 41.9 N and about 0.3 E to 3.0 E: the south
+   bound `balearics`' north bound exactly, the east bound `gulf-of-lion`'s west bound
+   exactly**, the north and west bounds on the land (moved to a tile row's or column's edge
+   where the form asks it; the west far enough to hold the Ebro to Amposta). **The seam at
+   the east is the builder's first measurement**: the Gulf's tiles already hold 2.6133 E to
+   3.0 E, so by the how-to's seam rule the block either lists the Gulf's tiles there and
+   writes none of its own east of 2.6133 E, or the rule gives another answer; say which,
+   with `git status` showing no change to any tile the Gulf lists. East of 1 W no corridor
+   lies under the block, so every tile is written, land and sea alike (79c's finding).
+   **Before the tiles are committed, report their count and bytes to the lead** (the lead
+   expects some 28 tiles and 4 to 6 MB; past 40 MB stop at the report). Said in the notes
+   and the chart's title: the open sea east of 4.5 E between Minorca and Sardinia, and the
+   Algerian coast east of Algiers, are still no block's.
+2. **The period's shore.** The Ebro's delta as Tofiño drew it and not as it is (it has
+   grown and changed its mouths: the period's Cape Tortosa, the Alfaques' bay and its bar
+   by the plan, by the overrides' road, with the residuals said); Barcelona's mole and
+   lantern, the Barceloneta, the citadel and Montjuïc as 1805 had them, and no modern
+   harbour works there or at Tarragona (its mole was building); the lights of 1805 dated,
+   the towers marks by day. The marks from seaward by the directions: Montserrat, Montjuïc,
+   Montseny, the castle of the Coll de Balaguer, Cape Salou, the towers of the coast.
+   Render each harbour with its marks over the tiles' land and water before trusting a
+   position (79c's finding).
+3. **The harbour patches** (level 3, about 15′ by 15′ each) **in the block**: Barcelona;
+   Tarragona with Salou's road; the Alfaques (the port of San Carlos). **Beside the block,
+   in water already charted, the four ports get their marks and roads at level 2 by the
+   how-to's road for a mark added to a built region** (the features file and its index
+   alone; no level-2 tile, coast or other mark of that region changed, shown by `git
+   status` and the region's checks): Rosas bay with the citadel and the Trinity castle,
+   and Palamós, in `gulf-of-lion`; Valencia's Grao and Alicante with its castle, in
+   `mediterranean-west`. **A level-3 patch for any of the four only if the tool adds one to
+   a built region without rebuilding its level-2 tiles**; if it cannot, say so in the
+   report and make none: the lead rules. Where a datum cannot be read the port file says
+   `datum: unverified` and no patch is made, as the how-to has it.
+4. **The seven ports**, each a file on package 35's machinery, entered in the nations'
+   index and `test_ports.py`'s list: **Barcelona** (the Principality's capital, the
+   captain general's seat; a mole harbour of little water, the road open), **Tarragona**
+   (with Salou, where the brandies of Reus were shipped), **the Alfaques** (a road and
+   San Carlos's canal port: a small file), **Rosas** (the bay the best anchorage of the
+   coast in a northerly), **Palamós** (a small mole), **Valencia's Grao** (an open road off
+   the beach, dangerous in an easterly), **Alicante** (the bay and the mole under the
+   castle of Santa Bárbara). Each with its nation and its state by 79a's dated form: Spain
+   hostile to a King's ship from December 1804 and Britain's ally from the summer of 1808;
+   **the French in Barcelona from February 1808 to 1814, in Rosas from December 1808, in
+   Tarragona from June 1811 to 1813 and in Valencia from January 1812 to 1813, Alicante
+   never taken: these dates are the lead's memory and are to be verified from James and
+   the sources on file before a row is written, each row with its source or FROM MEMORY
+   said**, in the form Genoa's file uses for a port that changes hands. Its road, pilot's
+   station, market, pool and the pilot's four words, every `feature:` spot with its
+   position beside it; no King's yard on this coast (Cartagena's is the arsenal). The
+   markets so that the business can people the region (79c's finding, a price ratio of 1.3
+   at least between two ports): the period's trades from the sources (the brandies and
+   wines of Salou and Tarragona, Valencia's fruit, rice and silk, Alicante's barilla and
+   wine, Barcelona buying grain and salt fish and selling her manufactures), each good one
+   the business file already has or a row added in its form.
+5. **The tide.** As 79c found it: the sea's is a foot, the world's over it a far gauge's,
+   and the block keeps the world's level as the Strait's recipe does (`fill_to_chart_datum`,
+   the land above that tide's high water). The gauges of the coast (Puertos del Estado's
+   REDMAR reports give the mean level and the lowest astronomical tide: Barcelona,
+   Tarragona, and for the two ports beside the block Valencia and Alicante if their
+   regions lack them; TICON's read as every block's are) go in by package 89's form with
+   their `block:`; the eleven do not move. The streams by the directions: the set along the
+   coast to the south-west as the pilots give it, with `current:` where the period gives a
+   set and no tide, the Ebro's outflow off its mouths if a pilot gives it a rate, an area
+   over the block's whole box after them, the box appended to `book_limits`; the master's
+   epitome places with the period's rise where a pilot gives one. The polygons kept off
+   the water the recorded passages sail (none reaches the block; say so).
+6. **The weather.** No box of `climatology.yaml` holds the block (`mediterranean-west`
+   ends at 40.5 N, `gulf-of-lion` begins at 3.0 E), so `box_at` answers with the nearest,
+   which is one or the other by the mile. **A box of the block's own** from Barcelona's
+   table (the *Mediterranean Pilot* vol. I, p. 726, read from the PDF's page upright and
+   each month checked against the printed totals, as 79c read the others), its generator's
+   figures fitted by simulated months with the checking tool; or, if the table's months do
+   not differ from the Gulf's box beyond the fit's noise, the Gulf's box widened west to
+   hold the block, the comparison printed. Either way said, and `test_weather.py` holding
+   the rows to the file's form.
+7. **A scenario** `tarragona.yaml`: the frigate from Port Mahon to Tarragona's road in
+   1809, Spain the ally and the French in Barcelona, by the Balearic channel and the coast,
+   `chart: atlantic-east`, sailed once at seed 7 to the anchor by a short book, its figures
+   in the notes; not pinned. It crosses the seam at 40.56 N, which is the point.
+8. **The build**: `python tools/build_charts.py --region catalan-coast` through the proxy,
+   the checks printed and passing, the tiles committed within item 1's rule, the manifest
+   with every other entry carried over, the region appended to
+   `CHARTS["atlantic-east"]["regions"]` and the chart's title amended to name the coast,
+   and after the build `git status` showing no change to any tile, coast or index another
+   region lists but the two features files and indexes item 3 names. Build early, to
+   fetch; rebuild with `--skip-fetch` after the marks are written. If a source the build
+   needs is refused by the network, read the environment's documentation and say exactly
+   which host and what it answered; do not work around it.
+9. **Truths 7-490 to 7-499**, each a behaviour, pinning states and counts and no digest:
+   the chart answers with depth and land along the whole main from Cape Palos to Cape
+   Creus on a walk of the coast (no point of the old gap answers nothing); a ship from
+   `balearics` crosses 40.56 N and from the Gulf crosses 3 E with her region, her tide and
+   her weather's box changing and nothing lost (the lookout's land, the business carried);
+   the lookout off Barcelona raises Montjuïc and Montserrat at the directions' distances;
+   a frigate lies at anchor in Rosas bay in a northerly and is uneasy in Valencia's road in
+   an easterly, as the pilots say of each; Barcelona refuses a King's ship in 1805 and in
+   1809 and Tarragona receives her in 1809; the business draws a trader between two of the
+   seven ports; and what the build earns.
+10. **The records**: the tuning notes' section "Package 101" (the sources' report; the
+    seam's measurement and the tiles' count and bytes; the patches' datums and residuals;
+    the checks as printed; the ports' dated states with their sources; the weather's
+    comparison; the scenario's run; what was found on the way; the suites as run);
+    `ChartBlocks.md` a section "The Catalan coast (package 101, as built)" with what the
+    next block should know; spec M7 §28's pointer.
+
+**The suites, at ONE hash, in a worktree pinned there:** the fast tier whole; the slow of
+the chart's, the ports', the tide's, the weather's, the nations' and the scenarios' tests
+and of `test_known_truths.py`; the recorded passages, `gate_5b` and `gate_5c` once by name,
+which must pass to the digest (the block touches no water they sail: a digest that moves
+is a fault to find, not a pin to move); the pace alone and last; ruff check and format.
+The figures paragraph committed, then ONE report to the lead naming the one hash. A pin
+moves only where the block's own data moves it, re-measured old beside new and proven by a
+toggle; none is expected.
+
+The hard rules as every brief has them; `claude/pkg-101`, pushed after each commit; the
+lead merges by the reported hash.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
