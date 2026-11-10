@@ -63,6 +63,7 @@ __all__ = [
     "as_heard",
     "elsewhere_words",
     "hears",
+    "his_own",
     "is_asleep",
     "player_hull",
     "players_person",
@@ -920,13 +921,41 @@ def players_senses(world: Any) -> Senses:
     return senses_of(root, person)
 
 
+# The player's own lines (package 98, step 2; the owner's ruling of 2026-11-09): what is not
+# in the world, made by the man at the prompt, is always shown him wherever he stands, asleep
+# or awake: his readings (`query.*`, the information calls), his orders' acknowledgements
+# and refusals (`order.*`), his own word (the words' kinds said by him: `say`, `tell` and
+# `ask`, a word said below directly to another station among them) and the seat's lines of
+# his own (a refusal by the station's authority, an answer he gave). What is done in the
+# world out of his sight is not shown him by this, and is not reported of itself.
+OWN_FAMILIES: tuple[str, ...] = ("query.", "order.")
+SEAT_ACTOR_SUFFIX = " (the player)"  # `agents.seat.seat_actor`'s: "the master (the player)"
+
+
+def his_own(e: Any, station: str = "captain") -> bool:
+    """Whether a line is the player's own at the prompt (`OWN_FAMILIES`, the words he said,
+    his seat's lines), by its actor: the captain's at the captain's prompt, the seat's
+    actor at a station's, the driver's for the seat's own refusals and answers. A rule
+    captain, a standing order and a station held by a model each have their own actor."""
+    kind = str(getattr(e, "kind", "") or "")
+    actor = str(getattr(e, "actor", "") or "")
+    data = getattr(e, "data", None) or {}
+    mine = actor == station or actor == f"the {station}{SEAT_ACTOR_SUFFIX}"
+    if mine and (kind.startswith(OWN_FAMILIES) or kind in WORD_KINDS):
+        return True
+    return bool(data.get("seat")) and actor == "driver" and str(data.get("station")) == station
+
+
 def hears(world: Any, senses: Senses, e: Any, station: str = "captain") -> bool:
     """Whether a line reaches a person at the prompt with these senses (the console's and
-    the browser's play log, decision 59): `reaches` for every kind but the words, and for
+    the browser's play log, decision 59): his own lines wherever he stands (`his_own`, the
+    owner's ruling of 2026-11-09); `reaches` for every other kind but the words, and for
     the words 66's hearing as the harness applies it to a station (`Harness._reaches`): his
     own, a word to him, one whose hearers name his station, else one said within his
     hearing; a sleeper hears a word to him and nothing else."""
     if senses.everything:
+        return True
+    if his_own(e, station):
         return True
     kind = str(getattr(e, "kind", "") or "")
     if kind not in WORD_KINDS:

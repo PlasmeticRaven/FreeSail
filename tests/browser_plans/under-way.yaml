@@ -1,0 +1,29 @@
+# The frigate under way in pilot water off Falmouth (package 98, step 1): the player's lines
+# on deck and below while she sails.
+name: Under way off Falmouth, on deck and below
+scenario: data/scenarios/lesson-falmouth.yaml
+steps:
+  - {label: "ON DECK, under way"}
+  - {tick: 120}
+  - where am I
+  - the speed
+  - the heading
+  - the wind
+  - {say: steer north, setup: true}
+  - {label: "IN THE CABIN, under way"}
+  - {say: go below, expect: {sent: order, answered: true}}
+  - {say: go to the cabin, setup: true}  # the move made whatever the page did with the line above
+  - {tick: 60}
+  - {where: cabin}
+  - where am I
+  - the heading
+  - the speed
+  - the glass
+  - {say: steer north east, expect: {answered: true, kind: order.rejected}}
+  - {say: take in the royals, expect: {answered: true, kind: order.rejected}}
+  - "say to the officer of the watch: keep her so"
+  - ask the officer of the watch for the speed
+  - {say: come on deck, setup: true}
+  - {tick: 30}
+  - {where: quarterdeck}
+  - the speed

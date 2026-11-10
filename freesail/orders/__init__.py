@@ -92,11 +92,17 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         return standing.handle(ship, book)
     from freesail.orders import signals as signal_orders
 
-    if signal_orders.recognises(text, ship):
+    signal_verb = signal_orders.recognises(text, ship)
+    if signal_verb:
         # the colours, the signals, the private signal, the lights and a hail of another
         # ship (spec M7 §1 to §5; package 71): read by their words before the stations,
-        # since `hail the brig` is a hail across the water and `hail <words>` the lookout's
-        _refuse_a_captive(ship)
+        # since `hail the brig` is a hail across the water and `hail <words>` the lookout's;
+        # given from the deck as the deck's other orders are (package 98, step 6: the
+        # owner's ruling of 2026-11-09), refused below and ashore in their words, and to
+        # a captive in his (package 74: the place's check names his state first)
+        from freesail.world import movement
+
+        movement.check(ship, signal_verb, movement.SIGNALS)
         return signal_orders.handle(ship, text)
     station_verb = stations.recognises(text, ship)
     if station_verb:

@@ -1,0 +1,14 @@
+# A prisoner (package 98, step 1): the player's frigate struck to a French frigate and
+# taken possession of, his person in her cabin a prisoner (the world built as
+# tests/test_captive.py builds it; no scenario reaches the state by play in minutes).
+name: A prisoner aboard the captor
+world: tests.browser_plans.worlds:prisoner
+steps:
+  - {label: "A PRISONER IN THE CAPTOR'S CABIN"}
+  - {where: in the cabin}
+  - where am I
+  - the time
+  - {say: steer west, expect: {answered: true, kind: order.rejected}}
+  - {say: go to the boat, expect: {answered: true, kind: order.rejected}}
+  - "say to the captain: I protest"
+  - the ship

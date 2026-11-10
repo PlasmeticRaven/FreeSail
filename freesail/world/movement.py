@@ -63,6 +63,7 @@ __all__ = [
     "DECK_NAVIGATION",
     "DECK_OBJECTS",
     "DECK_PLACES",
+    "SIGNALS",
     "HELM_OBJECTS",
     "MOVE_VERBS",
     "PERSON_MOVED",
@@ -100,6 +101,9 @@ MOVE_VERBS: tuple[str, ...] = (
 # `come on deck` keep theirs, `captain.below` and `captain.on_deck`).
 PERSON_MOVED = "person.moved"
 
+# The vocabulary's object of the colours and the signals (`orders.signals`, package 71).
+SIGNALS = "signals"
+
 # The places the deck's orders are given from (spec M7b §14: "the helm only on deck").
 DECK_PLACES: frozenset[str] = frozenset({"quarterdeck", "deck"})
 
@@ -120,6 +124,10 @@ DECK_OBJECTS: frozenset[str] = frozenset(
         "gunnery",
         "damage",  # package 73: the pumps and the carpenter's work are the deck's orders
         "fight",  # package 73: the marines and the boarders
+        # package 98, step 6 (the owner's ruling of 2026-11-09): the colours, the signals,
+        # the private signal, the lights and a hail across the water, by the deck's rule;
+        # word passed from below to the deck to make them is a later step's
+        SIGNALS,
     }
 )
 # The master's verbs that are the helm's: the course shaped, the chase given, the ship put
@@ -413,6 +421,7 @@ def check(ship: Any, verb: str, obj: str) -> None:
         and home_id
         and str(here.id) != home_id
         and not _visitors_own(verb, obj)
+        and obj != SIGNALS  # his own hail and signal, as the refusal below says (package 98)
     ):
         # a visitor aboard another ship (decision 62; package 65, step 4): a passenger's
         # reach, as a seated visitor's domain gives it (`agent.VISITOR_DOMAIN`)
