@@ -23593,6 +23593,21 @@ the charges' table or the regenerated files; the officer's conversation at his s
 13,516 tokens, as before the merge. The step's figures are the ones measured at that tree,
 below.
 
+**Measured at eb9e9dc** (that merge and these notes; a worktree pinned there; ruff check and
+format clean): the fast tier whole **exit 0** (10:37:44 to 11:28:29; 7,203 passed and the
+trunk's one expected failure, 486 slow tests left out); the slow tier of the touched files
+**exit 0** (11:28:29 to 11:53:17; 1,994 passed). The slow tier of the truths was not run there:
+the trunk had by then re-pinned the schooner's recorded passage for package 75's ruled build
+(3) (the lead's 4016629, one line of the 766 moved, his toggle), a pin of the trunk's own that
+the tree at eb9e9dc held at its old digest, and had merged package 98's step 8. **A sixth
+merge** (at 61b170d) brought both, with the records. It merged without a conflict. What met:
+98's step 8 took its visitor's condition out of `World.submit`'s test of the player's hand
+(`not data.get("visitor")`) and its `visitor: True` out of the event's data, leaving a
+visitor's word to this package's rule of mend (v) (`kind != "person.spoke"`), which covers it;
+`squadrons.py` has 98's last course kept in the world beside this step's three lines of the
+cut-out's strike hook, untouched by either hand in the other's lines. The step's figures are
+the ones measured at that tree, below.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
