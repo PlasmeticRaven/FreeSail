@@ -100,9 +100,16 @@ re-ask rule's digests move in the sections that bear on it (*What an instance wo
   person is on), or the hull holding a human's person as a prisoner (the captor over a captive, a
   prize master over a prize whose prisoners include him). The captain's station only: a passenger's
   voice aboard an enemy, a prisoner's voice and a lookout's fire into nobody and are admitted.
-- A seat held before the hulls became adversaries (a French captain seated in peace, then war
-  declared by the news) is not stood down: the brief's promise is about seating, and the owner is at
-  the door; 55 decides the rest.
+- **A known limit, for package 55 to decide.** The check runs when a seat is given, and never
+  again: a seat held before the hulls became adversaries (a French captain seated in peace, then
+  war declared by the news; a hull taken, or a human's person made a prisoner aboard her, after the
+  seating) is not looked at a second time and is not stood down. The brief's promise as built is
+  about seating, and the owner is at the door. Whether a seat that becomes adversarial is to be
+  stood down, warned, or left is the revision's question; nothing of it is built.
+- The refusal is the live door's. A replay repeats what the journal holds: a seat the journal has
+  as held (one made with the flag turned, or a save from before this rule) is held again in the
+  replay with the flag as it stands, so that the log comes out the same; a seat refused in play
+  is refused again in the same words.
 - The flag `seats.ADVERSARIAL_SEATS_CONSENTED` is the one thing the revision's package turns; the
   tests turn it and turn it back (truth 7-366).
 - The suite's seats at other ships' captains were audited at the step: `tests/test_far_hail.py`'s

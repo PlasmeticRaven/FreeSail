@@ -2438,6 +2438,13 @@ class World:
             from freesail.world.prizes import minute as prize_minute
 
             prize_minute(self.own)
+            if self.is_followed and self.__dict__.get("court_martial"):
+                # a court martial sitting (package 74, step 6): dissolved in words where
+                # its accused is dead or gone from the world; a shared part of the tick, run
+                # for the followed hull alone, whose log has the court's other lines
+                from freesail.world.court import minute as court_minute
+
+                court_minute(self)
             # the fishery once a minute (package 56): the gear in the water fishing, the
             # catch's spoilage and its day line; nothing on a ship with no gear
             fishery = getattr(self, "fishery", None)

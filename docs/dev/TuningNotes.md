@@ -24568,6 +24568,85 @@ skipped in any tier. The trunk gained package 101 (the Catalan coast: charts, po
 their tests, nothing under `freesail/`) and the lead's records while these ran, and was not
 chased; it is merged at step 7's start.
 
+### Step 6's mends from the lead's review (2026-11-10; the step not merged until they stood)
+
+The lead held step 6 at 1e941f0 on an independent review's findings, read-only and by
+reproduction, and asked each mended in the step's tree with its assertion failing before the
+mend. **Every finding reproduced.** Each was measured alone on the unmended tree (71f21f0, the
+step with the trunk at 65c73a6 merged) and again on the mended one, by one script; old beside
+new:
+
+| | the unmended tree | the mended tree |
+|---|---|---|
+| (A) the log's data and his record name a machine's path | yes, both | neither: `saves/<name>` |
+| (A) a replay with the saves elsewhere | another digest; the file written again | the same digest; nothing written |
+| (B) the served line | "A new command: ...; her scenario is <path>, to be given to either driver with --scenario; ..." heard by everyone (`record`) | "Captain Bowen is appointed to the cutter Alert at Falmouth; nobody of his old company follows him." said ashore at the port |
+| (B) a witness's refusal | "... (the director's 'say as <him>: ...')" | "... a witness speaks when the court calls him." |
+| (C) `prize.exchanged` | `wakes`: the man ashore does not hear it, a deck does, a sleeper is woken | `said`, ashore at the port: he hears it, no deck, no sleeper |
+| (D) the accused dead, a minute on | the court sits still, and sentences him | dissolved in words; a dead man is refused a court |
+| (D) the accused gone from the world | the verdict refused, every further sitting refused, the place left at the port | dissolved at the next form that names it; a new court sits |
+| (E) "the captain of the <ship>", her lieutenant first in the registry | the lieutenant | the man who commanded her |
+| (F) retaken and his own captain again | the mark stands; with a model at her captain's station the player's person is still he | the mark cleared; no player's person (the owner looks on) |
+| (G) the court's officers | of a ship's company (the followed hull's) | of none (`COURT_HOME`) |
+| (G) a witness at the place at the verdict | left at a place that is gone | on the quay with the accused |
+| (H) two names that make one file's name the same day | written over, silently | refused in words; nothing written |
+| (I)(i) a seat at an enemy's captain held in play, replayed | refused in the replay, another digest | held again, the same digest |
+| (I)(ii) a model with no consent record at an enemy's captain | "No consent is on record ..." | the brief's reason, before any record is read |
+
+**What was changed.** (A), (B), (H) `court.new_command`: the file's name alone
+(`court.scenario_name`, shown as `saves/<name>`) in the log's data, the record's entry and the
+director's reply, never `Path.as_posix()` of where the saves lie; the served line the appointment
+in the service's words, `command.new` now `said` with the shore and the port in its data, the
+file and `--scenario` in the director's reply (which is record-only) as the dry run's had them; a
+replay writes nothing and repeats what the journal holds (`World.replayed_orders`, the road the
+seat's consent takes: a command done in play is done again, one refused in play for the file is
+refused again in the same words); in play a file that stands under that name and is not what this
+appointment would write is refused and left as it was. (C) `prize.exchanged` placed by its own
+row in `knowledge.REACH` (`said`), its data naming the shore. (D) `court.dissolve_if_gone`, run at
+the World's minute for the followed hull (whose log has the court's other lines; found by the
+mend's own test, the first line having gone to the player's old ship's log) and at the head of
+every court form; `court.dissolved`, notable, heard ashore at the port; `sit` refuses a dead man.
+(E) `court._by_ship`: the living man whose loss entry has `command`, else the first living
+officer with her loss. (F) `captive.remembered_person` answers None once his home hull's captain
+is he again, `captive.settle_person` clears the mark at `prizes.retake`, and
+`knowledge.players_person` reads the seat before the mark. (G) `court._rise` for the verdict and
+the dissolution alike: the place gone, the officers gone, everyone who stood at the place on the
+quay; the officers made under a home that is no hull (`COURT_HOME`, a list of the one registry no
+ship's company reads). (I) `seats.hold`: the adversarial check before the consent read, by the
+target resolved without making her World, and not at all for an order the journal holds as done;
+the later check gone. The known limit (a seat is looked at when it is given and never again: a
+war declared or a hull taken after it) is written into the consent revision's draft for 55.
+
+**(F): what a model seated at the captain's station sees after an exchange.** Three cases. A
+model that held her captain's station when she struck: no player's person is taken
+(`captive.player_taken` answers None), no mark is made, and her captain is a prisoner as any.
+A model seated after the taking at the captain's station of the player's old ship is at her
+prize master's station (an adversarial seat, refused until the flag is turned): it has the prize
+master's place and nothing of the exchanged man, who is the player's person still, ashore, by
+the mark. Once she is retaken and he is her captain again the mark is gone: a model seated at
+her captain's station is her captain, and there is no player's person, as before the taking. A
+new command is another world and has no mark.
+
+**(J)** `test_known_truths.py`'s `_tmp_dir` is gone (the truths take the test's own temporary
+path); truth 7-365 no longer runs 7-364's scene again: it stands on a scene of its own, a new
+command in a plain world that a replay can make again (the captive's scene puts its frigate on
+the sea by hand, which no journal holds), and carries the replay's and the file's assertions;
+the follower stays in 7-364's scene. 7-364 is marked slow, as its scene's own test is (it ran
+its two minutes in the fast tier unmarked). Package 98's heading in the truths' file, which this
+step's truths had been put under, is back above 98's first truth.
+
+**(K), not this package's by origin (the ships session's find, mended here on the lead's
+word).** "fire No. 1 gun" named both guns of the pair and both fired, the larboard at a starboard
+mark, the named guns firing with no check of what bears. `orders.gunnery._of_the_side_meant`: a
+number said with no side is the gun of the side engaged, else of the side the mark is on
+(`Battery.target_relative_rad`); said with a side it is that side's; with no side engaged and no
+mark, or both sides engaged, the pair as before. One test (`test_practice_orders.py`), failing
+before. The only orders in the suite that fire a gun by number say its side, so no recorded
+passage should move by it; the tiers below are the proof.
+
+**The tests** (`tests/test_court.py`, five functions with the one in `test_practice_orders.py`):
+all fail on the unmended tree and pass on the mended. **Pins moved by the mends: none.**
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

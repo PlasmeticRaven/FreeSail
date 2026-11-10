@@ -1105,6 +1105,10 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
                 f"The {prize.name}, our prize, is {how} ({by}).",
                 data={"prize": str(prize.id), "how": how, "by": by},
             )
+    # the player's person his own ship's captain again: the mark of who he is is past
+    from freesail.world.captive import settle_person
+
+    settle_person(world)
     return rec
 
 

@@ -329,6 +329,22 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     played = (getattr(world, "replayed_orders", None) or {}).get(
         (int(world.clock.tick), " ".join(str(body).split()))
     )
+    if played != "done":
+        # a seat at the captain of a hull adversarial to a human (package 74, item 6; the
+        # design's §6): refused in words before any consent record is read, as the desk's
+        # door refuses it. The refusal is the live door's: a replay repeats what the journal
+        # holds, so a seat the journal has as held is held again (a save from before this
+        # rule, or one made with the flag turned, replays to the same log)
+        try:
+            early = _resolve(world, m.group("who"))
+        except Exception:  # noqa: BLE001  (the target's own refusal comes in its place below)
+            early = None
+        if early is not None and early.get("vessel") is not None:
+            from freesail.world.prizes import adversarial_seat_why
+
+            why = adversarial_seat_why(world, early["vessel"], early["station"])
+            if why:
+                raise _error(why)
     if played == "done":
         record = None  # held in play: the consent read then stands in the replay
     else:
@@ -363,12 +379,6 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if made >= in_voyage:
         raise _error(f"The director's seats in this voyage are spent ({in_voyage}).")
     target = _target(world, m.group("who"))
-    if target.get("vessel") is not None:
-        from freesail.world.prizes import adversarial_seat_why
-
-        why = adversarial_seat_why(world, target["vessel"], target["station"])
-        if why:
-            raise _error(why)
     key = seat_key(target)
     on_hers = bool(target.get("own")) or (target.get("person") and target.get("aboard"))
     if on_hers and grant.get("seats_on_the_players_ship", True) is False:

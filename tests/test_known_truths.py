@@ -14925,10 +14925,8 @@ def test_truth_7_363_a_neutral_wrongly_taken_is_restored_with_costs_and_the_dire
     test_the_directors_word_to_the_court_is_doubted_against_the_rule_and_performs_with_a_reason()
 
 
-# -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
-
-
-def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place():
+@pytest.mark.slow
+def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place(tmp_path):
     """The design's §7.1 (the brief's §20 court): the captive landed at Brest and exchanged at
     Falmouth by the director's form (doubted within a day of his landing), the court sat at the
     port's place by the form (refused for a man who lost no ship, doubted at a port not his
@@ -14936,25 +14934,36 @@ def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_
     answered by the accused's own `say to the court: ...`, the log of the action read by the
     judge advocate, the verdict a world order journaled in the inputs and the director's log,
     the play log carrying the sentence read and never the order, his record keeping the loss,
-    the court and the verdict; and (7-365) a new command started from the verdict."""
+    the court and the verdict; and in the same scene a new command started from the verdict
+    with his follower (his first lieutenant exchanged at the same port, the same loss in his
+    record), refused for a man dismissed the service and doubted for one dismissed his ship
+    within the year."""
     from tests.test_court import (
         test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_gives_its_verdict,
     )
 
     test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_gives_its_verdict(
-        _tmp_dir()
+        tmp_path
     )
 
 
-@pytest.mark.slow
-def test_truth_7_365_a_new_command_is_a_scenarios_start_written_under_the_saves_with_the_record():
-    """The design's §7.2: the scenario file written under the saves with his name as her captain,
-    his follower (his first lieutenant exchanged at the same port, the same loss in his record)
-    and a copy of the record in his keeping, loaded by the loader and begun, the record read
-    aboard the new ship and the copy read as a letter is, a thing with words; refused for a
-    man dismissed the service, doubted for one dismissed his ship within the year (one scene
-    with 7-364)."""
-    test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place()
+def test_truth_7_365_a_new_command_is_a_scenarios_start_written_under_the_saves_with_the_record(
+    tmp_path, monkeypatch
+):
+    """The design's §7.2, on a scene of its own (the court's is 7-364's): the scenario file
+    written under the saves with his name as her captain and a copy of the record in his
+    keeping, a thing with words; named by its name alone in the log, the data, his record and
+    the director's reply, the served line the appointment in the service's words; a replay
+    with the saves elsewhere comes to the same digest and writes nothing; a second ship whose
+    name makes the same file's name is refused in words; the file loaded by the loader and
+    begun, the copy read as a letter is."""
+    from tests.test_court import (
+        test_a_new_command_names_its_file_by_name_alone_and_a_replay_writes_nothing,
+    )
+
+    test_a_new_command_names_its_file_by_name_alone_and_a_replay_writes_nothing(
+        tmp_path, monkeypatch
+    )
 
 
 def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
@@ -14976,11 +14985,7 @@ def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
     test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
 
 
-def _tmp_dir():
-    import tempfile
-    from pathlib import Path
-
-    return Path(tempfile.mkdtemp(prefix="freesail-7-364-"))
+# -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
 
 
 def test_truth_7_446_the_players_own_lines_reach_him_wherever_he_stands():

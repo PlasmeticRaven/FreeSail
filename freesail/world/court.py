@@ -72,6 +72,7 @@ _SENTENCE_WORDS: dict[str, str] = {
 }
 COURT_KEY = "court_martial"  # the root World's record of the court sitting
 COURT_PLACE = "court_martial"  # the place of the port while the court sits
+COURT_HOME = "the court martial"  # the home of the court's officers: no hull's company
 PRESIDENT = "the president of the court"
 JUDGE_ADVOCATE = "the judge advocate"
 LOG_KINDS_READ = ("action.", "prize.taken", "prize.possessed", "prize.captive", "colours.struck")
@@ -215,11 +216,24 @@ def _person(root: Any, name: str) -> Any:
 
 
 def _by_ship(root: Any, ship: str) -> Any:
+    """'The captain of the <ship>': the man who commanded her at her loss (his loss entry's
+    `command`), whoever stands first in the registry; where no commander of hers lives, the
+    first living officer whose record has her loss (the senior survivor answers for her)."""
     key = " ".join(ship.lower().split())
     registry = getattr(root, "registry", None)
+    survivor = None
     for p in registry.persons() if registry is not None else []:
-        if any(str(e.get("ship_name", "")).lower() == key for e in _losses(p)):
-            return p
+        if getattr(p, "dead", False):
+            continue
+        for e in _losses(p):
+            if str(e.get("ship_name", "")).lower() != key:
+                continue
+            if e.get("command"):
+                return p
+            if survivor is None:
+                survivor = p
+    if survivor is not None:
+        return survivor
     raise CourtError(f"Nobody of the world lost a ship named {ship!r}.")
 
 
@@ -351,8 +365,95 @@ def _make_officer(root: Any, name: str, role: str, port: Any) -> Any:
         return found
     p = Person(pid, name, role, 0.8, place="shore", aboard=False, port=port.id)
     p.ashore_at = COURT_PLACE
-    root.people.add(p)
+    # of no ship's company: the court's officers are the port's, kept in the one registry
+    # under a home that is no hull (`COURT_HOME`), so that no ship's muster or people lists
+    # them and the hearing and `say as` find them as they find anyone ashore
+    p.home = COURT_HOME
+    p.hull = None
+    root.registry.by_home.setdefault(COURT_HOME, []).append(p)
     return p
+
+
+def _accused(root: Any, rec: dict[str, Any]) -> Any:
+    """The accused of the court sitting, found in the one registry by his name and id; None
+    where he is gone from the world."""
+    registry = getattr(root, "registry", None)
+    for p in registry.persons() if registry is not None else []:
+        if p.name == rec.get("person") and p.id == rec.get("id"):
+            return p
+    return None
+
+
+def _rise(root: Any, rec: dict[str, Any]) -> None:
+    """The court rises: its place gone from the port, its officers gone from the world, and
+    everyone who stood at the place (the accused, a witness, whoever was brought there) on
+    the port's quay; the root's record of the sitting cleared."""
+    port_id = str(rec.get("port") or "")
+    ports = getattr(getattr(root, "ports", None), "ports", {}) or {}
+    port = ports.get(port_id)
+    if port is not None:
+        port.places = tuple(
+            e for e in (getattr(port, "places", ()) or ()) if e.get("id") != COURT_PLACE
+        )
+    registry = getattr(root, "registry", None)
+    for p in list(registry.persons()) if registry is not None else []:
+        if str(getattr(p, "home", "") or "") == COURT_HOME:
+            root.people.remove(p)
+            continue
+        if (
+            str(getattr(p, "ashore_at", "") or "") == COURT_PLACE
+            and str(getattr(p, "port", "") or "") == port_id
+        ):
+            p.ashore_at = "quay"
+    if registry is not None and not registry.by_home.get(COURT_HOME):
+        registry.by_home.pop(COURT_HOME, None)
+    root.__dict__.pop(COURT_KEY, None)
+
+
+def dissolve_if_gone(world: Any) -> bool:
+    """A court whose accused is dead or gone from the world is dissolved, in words heard at
+    its port (`court.dissolved`), its place and its officers removed: at the next minute
+    (`minute`) or at the next form that names the court. True when it was dissolved."""
+    root = _root(world)
+    rec = sitting(root)
+    if rec is None:
+        return False
+    person = _accused(root, rec)
+    if person is not None and not getattr(person, "dead", False):
+        return False
+    why = "is dead" if person is not None else "is not to be found"
+    text = f"The court martial at {rec.get('port_name')} is dissolved: {rec.get('person')} {why}."
+    hearers: list[Any] = []
+    for p in list(root.registry.persons()):
+        if p.id == rec.get("president") and str(getattr(p, "home", "") or "") == COURT_HOME:
+            hearers = _hearers_at(root, p)
+            break
+    _rise(root, rec)
+    root.record(
+        Severity.NOTABLE,
+        "court.dissolved",
+        text,
+        data={
+            "person": rec.get("person"),
+            "port": rec.get("port"),
+            "place": "shore",
+            "ship": rec.get("ship"),
+        },
+    )
+    for h in hearers:
+        h.hear(text)
+    root.__dict__["last_court_martial"] = {
+        **rec,
+        "verdict": "dissolved",
+        "tick": int(root.clock.tick),
+    }
+    return True
+
+
+def minute(world: Any) -> None:
+    """The court's minute (the World's tick, while a court sits): dissolved where its
+    accused is dead or gone."""
+    dissolve_if_gone(world)
 
 
 def _hearers_at(root: Any, person: Any) -> list[Any]:
@@ -370,6 +471,7 @@ def sit(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     there, the sitting entered in his record and said (`court.sits`, urgent)."""
     root = _root(world)
     tick = int(root.clock.tick)
+    dissolve_if_gone(root)
     if sitting(root) is not None:
         rec = sitting(root)
         raise CourtError(
@@ -377,6 +479,8 @@ def sit(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             "its verdict first."
         )
     person, loss, port = _parts_sit(root, body)
+    if getattr(person, "dead", False):
+        raise CourtError(f"{person.name} is dead: a court martial sits on no dead man.")
     ship_name = str(loss.get("ship_name") or "her")
     port.places = (*tuple(getattr(port, "places", ()) or ()), _place_entry(port, person))
     president = _make_officer(root, PRESIDENT, "president of the court", port)
@@ -472,6 +576,7 @@ def read_log(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     the lost ship's log to the court (`court.reading`, heard at the place), so that the
     proceeding has the facts without the director inventing them."""
     root = _root(world)
+    dissolve_if_gone(root)
     rec = sitting(root)
     if rec is None:
         raise CourtError("No court martial sits: 'court: sits on <person> ...' first.")
@@ -523,8 +628,8 @@ def accused_speaks(world: Any, person: Any, words: str) -> tuple[str, str, dict[
     if person is None or person.name != rec.get("person"):
         who = getattr(person, "name", None) or "you"
         raise CourtError(
-            f"The court sits on {rec.get('person')}, not on {who}: a witness speaks when he "
-            "is called (the director's 'say as <him>: ...')."
+            f"The court sits on {rec.get('person')}, not on {who}: a witness speaks when the "
+            "court calls him."
         )
     if str(getattr(person, "ashore_at", "")) != COURT_PLACE or getattr(person, "aboard", True):
         raise CourtError(f"You are not before the court; it sits at {rec.get('port_name')}.")
@@ -551,6 +656,7 @@ def verdict(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             "The verdict is 'court: the verdict on <person>: acquitted with honour | acquitted "
             "| reprimanded | dismissed the ship | dismissed the service'."
         )
+    dissolve_if_gone(root)
     rec = sitting(root)
     if rec is None:
         raise CourtError("No court martial sits: 'court: sits on <person> ...' first.")
@@ -570,10 +676,8 @@ def verdict(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             f"The court knows no sentence {m.group('verdict').strip()!r}; its sentences for "
             f"the loss of a ship are {', '.join(VERDICTS)}."
         )
-    person = _person(root, name)
+    person = _accused(root, rec)
     port_id = str(rec.get("port") or "")
-    ports = getattr(getattr(root, "ports", None), "ports", {}) or {}
-    port = ports.get(port_id)
     ship_name = str(rec.get("ship_name") or "her")
     sentence = f"{person.name} {_SENTENCE_WORDS[said].format(ship=ship_name)}"
     note(
@@ -600,18 +704,8 @@ def verdict(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     )
     for h in _hearers_at(root, person):
         h.hear(text)
-    # the court rises
-    if port is not None:
-        port.places = tuple(
-            e for e in (getattr(port, "places", ()) or ()) if e.get("id") != COURT_PLACE
-        )
-    registry = getattr(root, "registry", None)
-    for p in list(registry.persons()) if registry is not None else []:
-        if p.id in (rec.get("president"), rec.get("judge_advocate")):
-            root.people.remove(p)
-    if str(getattr(person, "ashore_at", "")) == COURT_PLACE:
-        person.ashore_at = "quay"
-    root.__dict__.pop(COURT_KEY, None)
+    # the court rises: everyone at its place on the quay, its officers gone
+    _rise(root, rec)
     root.__dict__["last_court_martial"] = {**rec, "verdict": said, "tick": int(root.clock.tick)}
     return (
         f"the sentence of the court martial on {person.name}: {said}; the court rises",
@@ -685,11 +779,26 @@ def _saves_dir(root: Any) -> Path:
     return Path(SAVES_DIR)
 
 
+def scenario_name(ship_name: str, start: Any) -> str:
+    """The new command's file by its name alone: `new-command-<ship>-<date>.yaml`."""
+    slug = re.sub(r"[^a-z0-9]+", "-", ship_name.lower()).strip("-") or "ship"
+    return f"new-command-{slug}-{start:%Y-%m-%d}.yaml"
+
+
 def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     """`command: a new command for <person>: the <description> "<name>" at <port>`: a
     scenario file written under the saves' folder (96's writer) carrying what the records
-    keep, named in the answer; refused for a man dismissed the service."""
-    from freesail.world.scenarios import write_scenario
+    keep; refused for a man dismissed the service.
+
+    **The file is named by its name alone** (`saves/<name>`) in the log, the data, his record
+    and the director's reply: where the saves lie is the machine's, and a log that named it
+    would not replay elsewhere. **The served line is the appointment in the service's
+    words** (`command.new`, heard ashore at the port); the file and how to load it are the
+    director's reply's alone. **A replay writes nothing**: it repeats what the journal
+    holds (`World.replayed_orders`), the file having been written in play. **A file that
+    stands under that name and is not this appointment's own is refused in words** (two
+    names that make one name, the same day), never written over."""
+    from freesail.world.scenarios import scenario_text
 
     root = _root(world)
     person, key, desc, ship_name, port = _parts_command(root, body)
@@ -707,16 +816,22 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     position = port.anchorage.position
     nation = _nation_of_person(root, person) or str(getattr(port, "nation", "") or "")
     region = str(getattr(getattr(root, "scenario", None), "region", "") or "")
-    slug = re.sub(r"[^a-z0-9]+", "-", ship_name.lower()).strip("-") or "ship"
-    path = _saves_dir(root) / f"new-command-{slug}-{start:%Y-%m-%d}.yaml"
+    name = scenario_name(ship_name, start)
+    shown = f"saves/{name}"
+    path = _saves_dir(root) / name
+    names = ", ".join(f.name for f in followers)
     if root.__dict__.get("dry_run"):
         # the director's dry run performs on a copy of the world and writes no file
-        names = ", ".join(f.name for f in followers) or "nobody of his old company"
         return (
             f"a new command for {person.name}: the {key} {ship_name} at {port.name}; her "
-            f"scenario would be written to {path.as_posix()}; following him, {names}",
+            f"scenario would be written to {shown}; following him, "
+            f"{names or 'nobody of his old company'}",
             {"person": person.name, "ship": ship_name, "port": port.id, "dry_run": True},
         )
+    replayed = getattr(root, "replayed_orders", None)
+    played = None
+    if replayed is not None:
+        played = replayed.get((int(root.clock.tick), " ".join(str(body).split())))
     # the appointment in his record first, so that the record the scenario carries has it
     appointed = note(
         root,
@@ -725,7 +840,7 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         f"appointed to the {key} {ship_name} at {port.name}",
         ship_name=ship_name,
         port=port.id,
-        scenario=path.as_posix(),
+        scenario=shown,
     )
     people: list[dict[str, Any]] = [
         {"role": "captain", "name": person.name, "record": [dict(e) for e in record_of(person)]}
@@ -752,36 +867,64 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if nation:
         raw["nation"] = nation
     try:
-        written = write_scenario(raw, path)
+        if replayed is not None:
+            # a replay repeats what the journal holds and writes nothing: refused there as
+            # it was refused in play (the one refusal that reaches here is the file's)
+            stands = played is not None and played != "done"
+        else:
+            text = scenario_text(raw, None, path=path)
+            stands = path.exists() and path.read_text(encoding="utf-8") != text
+        if stands:
+            raise CourtError(
+                f"A scenario named {shown} stands already and is not this appointment's: "
+                f"name her otherwise than {ship_name!r}, or take that file away first."
+            )
+        if replayed is None:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("w", encoding="utf-8", newline="\n") as f:
+                f.write(text)
+    except CourtError:
+        record_of(person).remove(appointed)
+        raise
     except Exception as e:  # noqa: BLE001  (the writer's own words)
         record_of(person).remove(appointed)
         raise CourtError(f"the scenario could not be written: {str(e).rstrip('.')}") from None
-    names = ", ".join(f.name for f in followers)
-    follow = f"; {names} follow him" if followers else "; nobody of his old company follows him"
-    text = (
-        f"A new command: the {key} {ship_name} at {port.name} for {person.name}; her scenario "
-        f"is {written.as_posix()}, to be given to either driver with --scenario{follow}."
-    )
+    follow = f"; {_and_names(followers)} follow{'s' if len(followers) == 1 else ''} him"
+    if not followers:
+        follow = "; nobody of his old company follows him"
+    served = f"{person.name} is appointed to the {key} {ship_name} at {port.name}{follow}."
     root.record(
         Severity.NOTABLE,
         "command.new",
-        text,
+        served,
         data={
             "person": person.name,
             "ship": ship_name,
             "file": str(desc["file"]),
             "port": port.id,
-            "scenario": written.as_posix(),
+            "place": "shore",
+            "scenario": shown,
             "followers": [f.name for f in followers],
         },
     )
-    return text.rstrip("."), {
+    reply = (
+        f"a new command for {person.name}: the {key} {ship_name} at {port.name}; her scenario "
+        f"is {shown}, to be given to either driver with --scenario{follow}"
+    )
+    return reply, {
         "person": person.name,
         "ship": ship_name,
         "port": port.id,
-        "scenario": written.as_posix(),
+        "scenario": shown,
         "followers": [f.name for f in followers],
     }
+
+
+def _and_names(persons: list[Any]) -> str:
+    names = [str(p.name) for p in persons]
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + " and " + names[-1]
 
 
 def _port_words(root: Any, port_id: Any) -> str:
