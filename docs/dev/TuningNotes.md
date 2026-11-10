@@ -23706,6 +23706,12 @@ seats and the director tests' Harpy (French, at a station other than the captain
 read at the seating) are not adversarial by the rule; the refusal is exercised by `test_court.py`
 alone, and the flag is turned and turned back there.
 
+**The trunk merged at the step's boundary**: one merge (at 229d024), the lead's records alone
+(the work packages' page), which met nothing. **Pins moved by the step: none.** The officer's
+conversation at his seat measures 13,584 tokens with this step (13,516 before it: the reading
+`the record` and the court's events in the stand-by's words), under the 13,800 the handover
+test allows at its budget of 23,000.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
