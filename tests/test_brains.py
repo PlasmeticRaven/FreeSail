@@ -15,6 +15,7 @@ from freesail.api.session import make_world
 from freesail.core.world import Scenario
 from freesail.world import brains as B
 from freesail.world import captains as C
+from freesail.world import prizes as P
 from freesail.world.geo import Position, bearing_and_distance, destination
 from freesail.world.ships import Vessel, vessel_from_spec
 
@@ -281,8 +282,17 @@ def test_a_cruiser_chases_a_merchant_she_can_fight_and_speaks_her_within_hail(fa
     assert spoken
     bs = [st for _, st in b.brain.history]
     ss = [st for _, st in s.brain.history]
-    assert "chasing" in bs and bs[-1] == "on passage"
-    assert "evading" in ss
+    # package 74, step 4 (the far fight wired): come up with the enemy merchant within his
+    # engaging distance the brig-sloop engages her and she strikes by morale to his first
+    # round at seven cables, where before she yielded at hail by 72's rule (the same
+    # possession, taken at the same minute, by another road: the toggle `far_action.ENABLED`
+    # measured old beside new, docs/dev/TuningNotes.md "Package 74", step 4); then he is on
+    # passage for Brest with his prize in company, or investigating the frigate at his
+    # horizon's edge fourteen miles off, as the minute falls
+    assert "chasing" in bs and "engaging" in bs and "taking possession" in bs
+    assert bs[-1] in ("on passage", "investigating a stranger")
+    assert P.is_prize(s) and s.nation == "france"
+    assert "evading" in ss and "struck" in ss
     assert [e for e in w.log if e.kind == "sail.spoke"] or not any(
         f"sail:{x}" in getattr(w.lookout, "_sails_seen", {}) for x in (b.id, s.id)
     )
