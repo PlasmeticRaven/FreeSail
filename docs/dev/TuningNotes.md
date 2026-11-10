@@ -25943,3 +25943,18 @@ passages by name** (`--slow -k "gate_5b or gate_5c"` on `test_known_truths.py`):
 one test the names select passed to its digest. **No pin moved.** **The pace**, alone and
 last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The
 tree reported differs from `d2f0b34` by this paragraph alone.
+
+**Truth 7-196's clause alone, the lead's measurement at the 74's merge (2026-11-10): recorded,
+not pinned, and its test taken out.** The lead's answer (5) to her design: pinned only if the
+build machine leaves a tenth's margin over truth 51's floor (550 ticks a second or more), else
+recorded, and no floor lowered. Measured on the build machine by the test's own arithmetic
+(the gate's day with her file in the frigate's place, a thousand ticks to settle, the best of
+three thousands), three runs of hers between two of the frigate's: with a review running
+beside it (load 2.0) hers 477, 475 and 469, the frigate 501 and 512; quiet (load 0.6) hers
+**505, 476 and 492**, the frigate **524 and 516**. On the owner's machine the session had 474
+to 490 for her, 505 and 631 for the frigate-36 and 484 and 486 for the 64. She runs about a
+twentieth slower than the frigate in the same form, and the frigate holds the floor by less
+than that on this machine today. The test
+`test_truth_7_196_the_seventy_four_ticks_at_the_build_machines_floor` is removed from `tests/test_bellerophon.py` by the lead (its figures in a
+comment where it stood); the crewed clause (106 against 60) stays; `tools/pace.py
+seventy-four` measures both still. No floor was lowered and no other test touched.
