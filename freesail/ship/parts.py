@@ -556,13 +556,21 @@ class Gun(Part):
     # not say, and a gun pickled before it): read by the lee ports' rule, and the 74's bill by
     # deck will
     deck: str | None = None
+    # numbered by deck (package 75, B7.d's stage 0: docs/design/Design-Ship-Bellerophon.md §5.2,
+    # §12.1 item 2): true for a gun of a file whose armament numbers its guns `by deck`, each
+    # deck's pairs from No. 1. A plain class default, no field, false for every other gun and
+    # for one pickled before it, and left out of the pickle while false. Set by nothing yet.
+    by_deck = False
 
     def __getstate__(self) -> dict[str, Any]:
         """Its state for the checkpoint, its deck only where its file names one (package
-        75), so that a gun without one is pickled as before it."""
+        75), and its numbering by deck only where it is so numbered (B7.d's stage 0), so that
+        a gun without them is pickled as before them."""
         state = dict(self.__dict__)
         if state.get("deck") is None:
             state.pop("deck", None)
+        if not state.get("by_deck"):
+            state.pop("by_deck", None)
         return state
 
     @classmethod

@@ -2051,6 +2051,84 @@ def test_her_tack_at_quarters_under_sail_before_guns_is_her_cleared_tack():
 
 
 # ---------------------------------------------------------------------------
+# Numbering by deck (B7.d: Bel-D §5.2, §12.1 item 2, §12.5; her road's step 7)
+# ---------------------------------------------------------------------------
+
+
+def _numbered(numbering, *guns):
+    """A small ship's spec (tests/test_profile.py's) with these broadside guns, its armament
+    numbered as said (None: nothing said); the guns (id, deck, number) to starboard, each on a
+    port of its deck, a gun of no deck on the upper deck's."""
+    from freesail.ship.loader import spec_from_dict
+    from tests.test_profile import PROFILE, _doc, _gun
+
+    port = {"upper": (0.0, 2.0), "quarterdeck": (-18.0, 4.2), None: (0.0, 2.0)}
+    made = [
+        _gun(gid, deck=deck, number=n, x_m=port[deck][0], height_m=port[deck][1])
+        for gid, deck, n in guns
+    ]
+    extra = {"numbering": numbering} if numbering is not None else {}
+    return spec_from_dict(_doc(PROFILE, made, **extra), "p.yaml")
+
+
+def test_the_numbering_key_is_read_left_out_of_the_pickle_unset_and_refused_in_words():
+    """B7.d's stage 0 (Bel-D §12.1 item 2): the armament's `numbering`, `by deck` its one word,
+    read onto `ArmamentSpec.numbering` and pickled only where a file gives it; without it a number
+    is one gun a side as before, so a No. 1 on two decks is refused as two No. 1 guns; under it a
+    number is one gun a side on each deck, the refusal naming the deck, and a broadside gun that
+    names no deck is refused; any other word is refused, saying the one."""
+    import pickle
+
+    from freesail.ship.schema import BY_DECK, ArmamentSpec, ShipFileError
+
+    upper = ("gun.upper.1.starboard", "upper", 1)
+    quarterdeck = ("gun.quarterdeck.1.starboard", "quarterdeck", 1)
+    spec = _numbered(BY_DECK, upper, quarterdeck)
+    assert spec.armament.numbering == "by deck"
+    assert "numbering" in spec.armament.__getstate__()
+    assert pickle.loads(pickle.dumps(spec.armament)).numbering == "by deck"
+    plain = _numbered(None, upper)
+    assert plain.armament.numbering is None and "numbering" not in plain.armament.__getstate__()
+    back = ArmamentSpec.__new__(ArmamentSpec)
+    back.__dict__.update(plain.armament.__getstate__())
+    assert back.numbering is None  # an armament pickled before the key
+    with pytest.raises(ShipFileError, match=r"has two No\. 1 guns to starboard\.$"):
+        _numbered(None, upper, quarterdeck)
+    with pytest.raises(ShipFileError, match="has two No. 1 guns to starboard on the upper deck"):
+        _numbered(BY_DECK, upper, ("gun.upper.one.starboard", "upper", 1))
+    with pytest.raises(ShipFileError, match="numbers its guns by deck, and the gun 'gun.1"):
+        _numbered(BY_DECK, upper, ("gun.1.starboard", None, 2))
+    with pytest.raises(ShipFileError, match="numbers its guns 'on across'; a file numbers them"):
+        _numbered("on across", upper)
+
+
+def test_no_file_carries_the_numbering_key_and_no_gun_is_numbered_by_deck():
+    """B7.d's stage 0, laid inert: no committed file gives the armament's `numbering`, so every
+    armament reads None and pickles as before it; `Gun.by_deck` is a plain class default, false on
+    every gun of every fit of every file and in no gun's pickled state; a gun pickled before it
+    reads false."""
+    import dataclasses
+
+    from freesail.ship.graph import Ship
+    from freesail.ship.parts import Gun
+
+    assert "by_deck" not in {f.name for f in dataclasses.fields(Gun)}
+    for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
+        spec = load_spec(path)
+        if spec.armament is None:
+            continue
+        assert spec.armament.numbering is None, path.name
+        assert "numbering" not in spec.armament.__getstate__(), path.name
+        for fit in spec.armament.fits:
+            for gun in Ship(spec, fit).guns.values():
+                assert gun.by_deck is False and "by_deck" not in gun.__getstate__(), gun.id
+    gun = Gun(id="gun.1.starboard", cls="long", rating_kn=0.0)
+    back = Gun.__new__(Gun)
+    back.__dict__.update(gun.__getstate__())
+    assert back.by_deck is False
+
+
+# ---------------------------------------------------------------------------
 # Truth 7-195: her lower-deck ports shut at the heel the sources give (Bel-D §14.3; step 6)
 # ---------------------------------------------------------------------------
 
