@@ -113,7 +113,7 @@ owner's testing. (4) The milestone's end, **the review and design packages toget
 owner: "we should consolidate the review packages together, towards the end of the order,
 and ensure we cover sufficient range with them together"): 103 first, Fable as the primary
 review agent with subagents, then 96 on its answers and 92 beside them, the three together
-covering the whole range of dates; then 69 and 55 with the consent revision and the gates; 61
+covering the whole range of dates (confirmed by the owner the same day: "that's the consolidation I meant, and I intend for a fairly wide-ranging review at the end of the milestone"); then 69 and 55 with the consent revision and the gates; 61
 and 51's chart briefed with them or carried to milestone 8. The limit that sets the pace: the lead proves each report with one whole fast tier of
 about an hour before it merges, one at a time, so five builders reporting already make a
 queue.
