@@ -370,6 +370,19 @@ A line takes the word of its weakest point (§5.0 principle 4), and its note nam
 sheet and the weak points by station. Until a point marked "to measure" is measured, the module
 writes it as judgement in its note, never leaving it out silently.
 
+*As built (B7, 2026-11-10), steps 1 to 3 (`docs/dev/TuningNotes.md`, "The 74, the *Bellerophon*
+(package 75, B7)"): every "to measure" measured or said not taken. `stem_m` the stem proper's fore
+edge, through WL1 at 169.02 ft to the stem head at 170.13 ft and 16.25 ft above WL1 (task 2),
+`judged` for its run behind the cheeks; `head_m` the knee traced to its top, 182.5 ft and 22 ft,
+`sourced`; `stern_m` the post (3.4 degrees), the counter's knuckle at 7.42 ft and the taffrail's
+crown at 13.05 ft abaft AP and 30.25 ft above WL1, `sourced`; `breadth_m` at the traced stations
+with WL1's half-breadths, the rail's by the tumblehome, `judged` (the top-timber line not traced);
+`section_m` traced to the waist rail at 35 ft, `sourced`; `sections_m` WL1-WL5 and the body plan's
+26 traced stations, `sourced`; `breadth_line_m` each traced section's widest point, `sourced`;
+`wales_m` and `channel_wales_m` carried from their midship figures parallel to the sills, `judged`
+(not traced along the length); `decks_m` `judged` (the forecastle carried, the poop measured, §3.5).
+`rabbet_m` not written. The ports' triples measured at 26 places (§3.4).*
+
 ### 3.3 The ports and their sills (at the Channel line)
 
 **The lower deck:** fourteen a side, centres and sills measured on 1357F (Bel §3.3, both readers;
@@ -410,6 +423,11 @@ pair No. 8.
   roundhouse is given no port size (§3.2). Package 81 draws the ports from the triples and
   `port_size_m` (Build §5.1), so a line for 81's design goes to the lead: a triple within
   `OVER_THE_RAIL_M` of the rail at its x is a gun place, not drawn as a port (§17.2 item 14).
+
+*As built (B7, 2026-11-10): every sill as this section has it, to the centimetre. The forecastle's
+two ports read again on 1363F at full resolution, 13.6 ft apart (task 6), their sills the deck and 1
+ft (judgement); no chase port read (J2938 and ZAZ1065-1069 not taken). The lower ports' depth, 2 ft
+8 1/2 in, is 0.83 m, not §3.2's 0.82 (a rounding slip), for 7-194.*
 
 ### 3.4 The half-breadth at the sill, and the shut heels
 
@@ -461,6 +479,14 @@ Put to the owner within §17.1 item 1, and the truth's wording to the lead (§17
 - **What it bounds.** The 1795 fit's six carronades stand on it (§5.1), the mizen course's foot
   reaches over it to its clew (§4.5), and the driver's boom crosses it (§4.6). If Lavery's deck
   drawings are photographed (§17.1 item 6), its length and height become `sourced`.
+
+*As built (B7, 2026-11-10), task 5: the poop measured on ZAZ1359 in red, its beams hung under it,
+from the stern timbers about 11 ft abaft AP to its breast beam **36.75 ft before AP** (ZAZ1357's red
+pair within 0.15 ft, its end post at 36.74), its middle line 26.50 ft above WL1 aft to 24.55 at the
+breast, the beams rounding up 10 in (Steel 1805's tables, read (OCR)); one green beam carries it to
+39.0 ft, unlabelled, recorded and not taken. **It runs over the mizen mast and the wheel**, not
+abaft them as judged here; the mizen course's tack follows (§4.5). Its three places a side at 4, 12
+and 20 ft over its rail (§3.3).*
 
 ### 3.6 Her shape keys under §5.0's ladder (each line's rung)
 
@@ -532,6 +558,40 @@ module with their marks; the images and the traces stay in owner-notes.
     channels; and Steel's 74 rigging lists (vol. II pp. 37, 39-40, held) for the lines' sizes where
     legible (Ext §17.9 item 3).
 11. **The stern lights:** Steel 1805's 74 on Folio LI (cached), as `stand-in`.
+
+*As built (B7, 2026-11-10), each task by two methods (`docs/dev/TuningNotes.md`, "The 74, the
+*Bellerophon* (package 75, B7)"). Task 1 done: the knuckle 7.42 ft above WL1 at the middle line and
+7.15 at its ends, 15.0 ft out (the round-up 0.28 ft; the second reading of Bel §3.3 settled), the
+transom 9.9 ft out at 28.4 ft, the crown 13.05 ft abaft AP and 30.25 ft above WL1 on 1357F;
+ZAZ1359's inboard profile draws the stern's top 1.5 ft lower without the arch, recorded. Task 2 done
+(§3.2's As built). Task 3: the body plan traced at 26 stations from 14.85 to 156.46 ft (as first traced the
+checker's midship section 0.08-0.09 ft off at 24.3 and 25 ft, not the 0.04 written; re-traced at the
+review of 2026-11-10 from 41.94 to 129.50 ft by the lines' order, within 0.01 ft of it from 24.3 to
+27 ft and 0.05 at 28, the lines 0.14-0.18 ft outside the half-breadth plan's WL1); the section above 28 ft and the
+main-breadth line by station taken; WL1 at 160 ft not resolved; the top-timber line, the wales along
+the length and the rabbets not taken. Task 4 done: the lowest sill's half-breadth 7.04 m (7.02 before
+the re-trace), 26 triples
+asserted within 0.05 m. Task 5 done (§3.5, §4.5, §4.6). Task 6: 1363F read (§3.3); J2938 and
+ZAZ1065-1069 not. Task 7 done (§4.7). Task 8: the mean of the top and middle lines, the hold's depth
+midway (the checker). Task 9: four chain pumps, for step 4. Task 10 (§4.3's As built); Steel's 74
+lists not read. Task 11: Lavery D1 (her class's stern, eight lights in each of two bands) taken
+before Folio LI.*
+
+*As mended at her review (2026-11-10), each old beside new in `docs/dev/TuningNotes.md` ("Her
+review's mends"). **The body plan re-traced** from 41.94 to 129.50 ft by the lines' order, each line
+followed a pixel row at a time: the first trace had dropped the dead flat's own line where it stands
+22.98-23.13 ft out (taken for the breadth line), carried the stations about the middle a line inside
+from 2 to 8 ft above WL1 and 52.70 on 47.34's line, and run 41.94 to 58.11 and 129.50 on the
+outermost line in the topsides. The lower triples L5-L10 move out 1-4 cm (L7 7.02 to 7.04 m, its
+shut heel 10.38 to 10.35, the design's own figure), U4-U5 in 2-4 cm, Q4-Q6 in 2-9 cm. **Her stern:**
+abaft the aftmost traced station and above the wing transom's ends the half-breadth is taken straight
+toward her stern's outline seen from aft, where it was carried on past it: the poop's aftmost place
+2.68 to 3.32 m (its gap to the drawn side +0.51 to +0.08), U1 4.38 to 4.56, Q1 3.70 to 3.96, the 10-ft
+station's rail 3.11 to 3.40 m. **The marks** by the weakest point: `rail_m`, `breadth_line_m` and
+`sections_m` judged; `form.fullness` written `[1, 1]`, judged (§3.6's table). The upper stern lights
+10.6 ft out by D1's 0.84 (10.7 written); Q6 and Q7's cut to the rail noted; the research's "2-3
+degrees of deadrise" named a slip (its 0.3-0.4 ft from 3 to 8 ft out is 3.4-4.6 degrees). The pair
+check now passes, astern by 0.02 px (§3.6).*
 
 ---
 
@@ -633,6 +693,15 @@ her topgallants and royals are cut on the 64's reading, about 60% of Steel's dep
 - **Rope:** `FRIGATE_ROPE` scaled by √(her plain sail ÷ the frigate's 1,584 m²), 1.19 on 2,226 m²
   (measured here; judgement, as the 64's). Spar ratings from the rating pass.
 
+*As built (B7, 2026-11-10): the yards and booms as this section has them; plain sail 2,225 m², her
+rope's scale 1.185. Task 10 against her own lee rigging (two methods, the plan bearing and a sweep
+of the arm, agreeing to 0.01 degree): the lower yards meet the foremost lee shroud only at 71
+(fore), 72 (main) and 67 (cross-jack) degrees from square; the foremost lee topmast backstay, set
+up, would stop them at about 56, 60 and 47 (her deadeyes spaced evenly along her channels:
+judgement). Her limits the frigate-36's, unchanged (the owner's word only). Lavery's leads not laid
+on her spars; Steel's 74 rigging lists not read for the lines' sizes (the 64's scaled with her rope,
+judgement).*
+
 ### 4.4 Sails
 
 Steel's table IV, 74 column (Bel §5.6, read on both copies' page images), at 22½ in a cloth; ±10%
@@ -707,6 +776,13 @@ cut to her yards is Steel's.
   1815, and no "mizen yard" appears in her logs after 1794 (Bel §5.4). In the 1815 scenario she
   carries the earlier spar; the owner accepts that (answer 15).
 
+*As built (B7, 2026-11-10), for the lead: task 5 measured the poop over the mizen (§3.5), so the
+deck the mast stands through at I32 is the poop. The tack is built **9 ft above the poop's middle
+line at the mast, 10.24 m above her water**, the throat 20.30 m, the foot 2.32 m over the poop at
+the least; 137 m², its centre 17.7 m. The other readings, in the generator's report: 9 ft above the
+quarterdeck as written here, the tack 8.33 m and the foot 0.42 m over the poop's middle line;
+Steel's 6 ft 6 in above the poop, 9.48 m and 1.56 m. The lead's to rule.*
+
 ### 4.6 The driver (Ext §17; the owner's choice)
 
 By `mizen_yard.driver(...)` with her figures, under its two rules (the course filed before the
@@ -766,6 +842,13 @@ in about fifteen minutes by the file's times, seventeen at the 64's company, its
 p. 53): §9's check S7 is taken with the driver bent. The 1773 driver hung abaft a set course (Lavery
 Table 15) is not built (the lead's ruling, Ext §14 item 10).
 
+*As built (B7, 2026-11-10): head room first at 6 ft over the poop's middle line, and every check
+passes there, so `DRIVER = True` and no report of a breach. The jaws **12.30 m** above her water,
+set by its after leech; the fore leech 8.00 m, the after leech 22.86 m (Steel's band 21.03-22.86);
+265 m² against Steel's 265.2; centre 20.38 m; the boom of 70 ft 6 in 3.16 m over the taffrail's
+crown. Unbent, its boom in; the shift and back on her file at the file's times (900 s drawing, 690 s
+furled).*
+
 ### 4.7 The head, and the yards under the bowsprit (D8 (b); Ext §4)
 
 - Bowsprit 66-0 and jib-boom 48-0 (Table 10); the steeve and heel by task 7, the 64's 27° (±2°) the
@@ -781,6 +864,12 @@ Table 15) is not built (the lead's ruling, Ext §14 item 10).
   which each brace's lead meets the yard, measured on her spars (judgement), reported.
 - **The period:** at the Nile she wore clear of *L'Orient* "setting her spritsail" (James vol. 2
   p. 180, read (OCR); Bel §5.5).
+
+*As built (B7, 2026-11-10), task 7: the steeve measured **31.6 degrees** on ZAZ1357 (its two edges
+31.6 and 31.8, its dark lines 31.5) and checked on ZAZ1359 (32.3 projected, 31.8 heel to root),
+against the 64's 27 taken until measured; the heel 155.4 ft from AP; 17.3 ft inboard of the stem
+head (170.13 ft, 16.25 ft above WL1) and 48.7 ft outboard; its end 12.65 m above her water; the
+spritsail's foot 3.37 m above it; the sprit topsail 125 m².*
 
 ### 4.8 Storm and occasional sails, groups, aliases
 
@@ -950,6 +1039,21 @@ The degrees the sources allow (brief item 4; Build §8.1): on the quarterdeck an
 most six) of those established (the 1797 order); on the poop none to six carronades; the two gun
 decks' 56 fixed. The form the editor reads is SW-4's.
 
+*As built (B7, 2026-11-10), step 4: the three fits as §5.1 tables them, each gun on its deck's
+triple to the centimetre and numbered as §5.2 (the 1812 fit leaving Nos. 38 and 41 empty, its poop's
+two 18s at No. 39 and its two 12s at No. 40, judgement); 74, 82 and 78 pieces, 781, 867 and 938 lb
+and 362, 378 and 364 men a side, raised on before the file is written. The weights by §5.3's rule:
+the 1812 fit's long 12s Lavery's types of 1812 (34 and 29 cwt) as its 18s are, Adye's table of 1804
+holding the 12 of 9 ft at 32 and of 7 ft 6 in at 29 1/4 (as package 81 read p. 155 for the viewer);
+the 12-pounder carronade Adye's 5 cwt 3 qr 10 lb (p. 72, the Neufchatel's append to `period.py`) by
+the rule, over §5.3's table's 6 cwt (Table 17), so nothing for it was appended. Charges Table No.
+29's, exercise 9, the King's allowance. The poop given the quarterdeck's port size, no port drawn
+there (Build-Ships.md §6's postscript, item 3; the 64's), so that the viewer's checker places its
+guns over the rail: `py tools/check_viewer_guns.py data/ships/seventy-four.yaml` clean, its notes the
+forecastle's two ports and the quarterdeck's foremost (the side under a port's depth above their
+sills, over the rail by the side's test) and the forecastle's 8 ft 6 in nines listed 12% off Adye's
+7 ft 6 in, Adye giving no longer nine.*
+
 ---
 
 ## 6. The company, the marines, the quarter bill by deck and the people file
@@ -1020,6 +1124,21 @@ division is the whole 111. **B7 measures the beat at muster on each fit**, befor
 records every crew filled, the marines at the guns and in their division, and the trimmers, as B1's
 test does.
 
+*As built (B7, 2026-11-10), step 4: the bill as tabled, `marines: 95` written after the generator's
+call. The beat measured at muster, before B7.b (seed 7, `tests/test_brains.py`'s world): every crew
+fills on each fit; all 111 marines go to the guns (1793: 111 at the long guns; 1795: 103 at the long
+guns and 8 at the carronades; 1812: 86 and 25), no division forms, and the topmen the guns leave fall
+to the trimmers, 166, 150 and 164 against the bill's 55.*
+
+*As built (B7, 2026-11-10), step 6, after B7.b (§6.4 item 1), the beat measured again at muster, the
+same world: every crew fills on each fit; no marine at a long gun; the division 111, 95 and 95 (1793,
+1795, 1812), the carronades' marines 0, 16 and 16, the trimmers 55, 55 and 69, the helm 2 and the
+powder 31 on each: §6.3's arithmetic to the man. The 64's and the razee's bills carry no `marines`
+(their files are B1's, closed), so no division forms on either, as before; with the key set in memory
+at their marines less their carronades' crews (84 and 14), a division of 84 and 14 forms, every crew
+fills, and their trimmers come to their bills' 53 and 79 exactly (measured, for the lead's answer (1):
+the key on their bills is the lead's to place).*
+
 ### 6.4 The bill by deck (answer 9): what is built, B7.b
 
 The owner asked for "a deck key on each gun, with orders, divisions, stations and robbing by deck,
@@ -1076,6 +1195,38 @@ the 64 untouched, items 2 and 4 are keyed on her bill's `marines` key instead (�
 **Not built:** "run in the lower deck" (a deck kept run in behind shut ports: Douglas arts. 150-152)
 reaches `combat/guns.py`, B8's after stage 0. It is booked for the gunnery's later package.
 
+*As built (B7, 2026-11-10), step 6, keyed as the lead answered ((1) and (2)): in `crew/quarters.py`,
+item 1 on the bill's `marines` (her file alone carries it); `GunCrew.deck` copied from its guns on a
+ship whose broadside guns stand on a `lower` deck, None elsewhere and left out of the pickle while None,
+so that every other file's quarters pickle byte for byte as before (measured on the seven armed files of
+one gun deck); item 2's lines on two gun decks, from below, the poop said "the poop" ("The lower deck:
+14 gun crews, 182 men.", the house's `number_words`); item 4's leading term in `_rob_order` on a `lower`
+deck, the shut crews read from the battery's `_shut` on the engaged side only (with no side engaged
+either gun of a pair may yet bear, so none is taken for shut), and the robbed line by deck ("from the
+lower deck, Nos. 7 to 11, their ports shut"). Item 5 in `orders/gunnery.py` (B7's for the package, the
+lead's note): the deck words of §6.4 in `guns_named`, "the quarterdeck" and "the forecastle" said bare
+naming no gun (places of the ship: "the captain of the forecastle" stays a man), "carronades" naming a
+deck's carronades alone; a deck's guns fired by name, the reply naming the deck ("The starboard
+lower-deck guns to fire each as soon as it is ready, 14 guns."). **The 64, old beside new:** her beat's
+lines gain four deck lines (13, 13, five and one crews; 143, 117, 30 and 6 men), her crews and
+divisions man for man as before; heeled 12.5 degrees and engaged to starboard, sail work wanting sixty
+hands took "from the guns, Nos. 12 to 13 and 24 to 26 and 30 to 31" and takes "from the lower deck, Nos.
+5 to 10, their ports shut"; with no side engaged her upper works' crews from the end that bears least
+before her lower deck's. No pin of B1's moved (her beat's counts pinned, not its lines). §12.5's checks
+as built: below.*
+
+*As mended at her review (2026-11-10), item 5's fire order (`_fire_a_deck`): a deck is a broadside of
+it, so the dumb show refuses "fire the starboard lower deck" as it refuses the broadside at the word
+(before the mend the deck went by the named-gun path and fourteen 32-pounders fired live while the
+battery exercised); a deck said without a side is the engaged side's, as "fire" alone is ("fire the gun
+deck" engaged to starboard: "The starboard gun-deck guns to fire each as soon as it is ready, 14
+guns.", where it promised 28 and the far side's guns fired at the mark through her), refused in words
+with no side engaged; the guns behind ports the sea has shut left out and said once ("six guns; eight
+are behind ports the sea has shut", heeled 12.5 degrees), a deck all shut refused in the broadside's
+words. `guns_named` unchanged (the director's slots name both sides). The robbing line past every gun
+ends "..., the lower deck, Nos. 1 to 3 and 12 to 14, and the marines", one "and". The named-gun loop's
+want of a bearing check (`combat/guns.py`, B8's) is booked for the lead.*
+
 ### 6.5 The officers by deck
 
 After the *Caesar* of 1794 (the Molloy minutes, read (OCR)) and Cumby's *Bellerophon* (Bel §4.5;
@@ -1104,6 +1255,14 @@ answer 10 left fit or role to the design within the schema, and neither holds me
 15 men added to her muster when a flag is hoisted, needs a crew key in stage 0c and world code to
 read it. Put to the owner (§17.1 item 4).
 
+*As built (B7, 2026-11-10), step 4, on the owner's answer (§17.0), which replaced the pick above,
+and stage 0c's laid form: her crew's `flag:` carries the rear-admiral, the flag lieutenant, the
+admiral's secretary and twelve of the admiral's servants, fifteen, James's customary supernumeraries
+for a rear-admiral (the party's make-up judgement, no establishment of a retinue read), each a post
+in the posts' form; her people file gives their stations and places (the quarterdeck and the cabin)
+and their outlines, marked `flag`, drawn from no station. Counted in no station and not in her 590;
+inert until the flag's own package (the lead's answer (15)).*
+
 ### 6.7 The tack at quarters (answer 17): reasoned
 
 **Today.** At quarters under "sail before guns", an all-hands manoeuvre takes half of every gun crew
@@ -1131,6 +1290,16 @@ her truths, only on the lead's word, its own commit, with 7-136 and the frigate'
 at quarters old beside new and the move bisected to it; else it goes to the gunnery's later package
 (§17.2 item 4). Meanwhile B7 records her own tack at quarters (cleared, sail before guns, guns before
 sail) from 290°, 292.5° and 295° in truth 7-136's world, beside the scratch's (Bel §7.4).
+
+*Recorded (B7, 2026-11-10), step 5, on her tuned file, B7.c not built, in truth 7-136's world (seed 7,
+fifteen knots; `docs/dev/TuningNotes.md`, "The 74, the *Bellerophon*", step 5): from 290, 292.5 and 295
+degrees, cleared 237, 243 and 258 s (gaining 105, 95 and 69 m); at quarters under "sail before guns",
+half of every crew lent (175 hands), 382, 386 and 405 s (32, 28 and -23 m); under "guns before sail"
+479, 531 and 556 s, losing 63, 99 and 130 m. The 64 the same way: 244, 251, 266; 362, 368, 401 (135
+lent); 437, 500, 520. The frigate-36: 343, 447, 370; 424, 436, 455 (84 lent); 614, 642, 660. Her tack
+at quarters is 1.5-1.6 times her cleared tack, where the frigate's is 0.98-1.24 and the scratch's 1.21
+(Bel §7.4): B7.c's case, for the lead's word at step 7. Measured again after B7.b at step 6, the
+marines' division standing: the same to the second, the same 175 hands lent (TuningNotes).*
 
 ### 6.8 The people file (B7's, hand-written data)
 
@@ -1182,6 +1351,17 @@ the barge's work (judgement, Bel §13.4).
   note. The spare spars and the sail room by the frigate's method on her own spars and sails, the
   driver's spare among them (Ext §17.2); `ration_entries("a King's ship")`.
 
+*As built (B7, 2026-11-10), step 4: the anchors as tabled, Steel's "Smaller 74 Guns" appended to
+`period.STEEL_ANCHORS[74]` and Lavery's cables to `period.LAVERY_74_CABLES`; the kedge's hawser of
+her cables' 100 fathoms (judgement). The boats as tabled by the generator's factors on Lavery's
+lengths (the launch 2.1 t of 10 oars; Table 5's larger pinnace of 32 ft filed as the barge whose
+work it does, the owner's "six or seven, with a barge", answer 13). **Four chain
+pumps**, as task 9 counted them, two abaft the main mast and two before it, and two hand pumps. The
+hold 160 t; water 223 t, provisions 120 days, cordage 1,350 fathoms, 82 shot plugs; the sail room the
+64's list on her sails, twenty, the driver among its occasional sails. Her launch is 31 ft, the
+frigate-36's boat file's length (`boat-launch-31.yaml`); her boats carry no `file`, as the 64's do
+not.*
+
 ---
 
 ## 8. Far description, vessel type and size rank
@@ -1221,6 +1401,25 @@ no file are refused, now by a ship the game still lacks):
 
 "A first rate" names no description: `description_key`'s tail search reaches "rate", which is in no
 row or word list (read). If a later package adds a first rate, these three move again.
+
+*As built (B7, 2026-11-10), step 4: the row and the words as listed; the three assertions moved as
+tabled (now `tests/test_ships.py:107-108` and `:207-208`, `tests/test_world_orders.py:101`). Two pins the
+table did not name moved with her row, old beside new: `tests/test_neufchatel.py`'s
+`ROLE_BY_INTENT` (her row, filed since 75 with its roles, sails by its first, `kings-ship`, at every
+intent's kind but the tail's) and its crewed captains' roles by file (hers `kings-ship` beside the
+bilander's and the Neufchatel's); and `tests/test_bill_marines_and_flag.py`'s inert test narrowed to
+the files that carry neither key. Her row files her default fit beside her roles, as every row since
+SW-4 files both (`tests/test_profile.py` and `tests/test_subtypes.py` hold every row but the 64's and
+the razee's to both), where §8.1 had none, the default serving either way. The shared guards name
+her (truth 7-190's table, her lowest lee port at 10.38 degrees, 10.35 since the review's re-trace;
+the eighteen files; the viewer's tables by file); the pair check finds her outline and the 64's 3.93,
+3.85 and 3.99 px apart against its 4.0, for the lead (`docs/dev/TuningNotes.md`, step 4); since the
+review's mends of 2026-11-10 (her stern's half-breadths taken toward her outline, her body plan
+re-traced) 3.93, 3.85 and 4.02, so that the check passes astern by 0.02 px.*
+
+*Found at step 6 (B7, 2026-11-10), the suites that read her row run: a fourth pin of the three
+assertions' kind, `tests/test_indefatigable.py`'s "a ship of the line" naming no description, moved
+old beside new (None to "seventy-four"), the reason her row.*
 
 ### 8.3 King's frigates and a ship of the line (Build §13.2; Bel §7.2)
 
@@ -1302,6 +1501,46 @@ spritsails clewed up hove to; she lies to within truth 12's band, as the *Bellon
 the mainsail and mizen staysail (Table 2); the driver's shift and back and its paths (Ext §17.7's cases
 on her file).
 
+*As built (B7, 2026-11-10), her polar on her start figures (untuned): best 4.50 / 7.87 / 11.03 kn in
+8 / 15 / 25 kn, `closest_deg` 50, `beat_deg(15)` 70 (the 64's; the frigate's 60); sailed under plain
+sail at 90 degrees in 15 kn, 7.74 kn, heeling 5.2 degrees, the rudder at -1.0. Within the targets'
+bands as first written; tuning is step 5's.*
+
+*As built (B7, 2026-11-10), step 5, the knobs in their order, each beside its start and bound
+(`docs/dev/TuningNotes.md`): `hull_speed_kn` **12.0, kept** within 11.5-13.0 (her best in 25 kn
+10.83, 11.03, 11.22 and 11.40 at 11.5, 12.0, 12.5 and 13.0; closest 50 and the beat 70, 70, 60 at
+each): the owner's "about 11" is met, no band asks more, and no end of the band closes the
+close-hauled gap. `clr_x_m` **5.5 to 4.8** for the helm, the most weather helm truth 17's form holds
+in 15 and 16 kn (aback at 4.9 in 16 kn, at 5.0 in 15; the 64's 4.8 the same way): truth 6's form +0.39,
++2.32, -0.83; six points -0.97 deg (lee helm, as the 64's -0.95); seven points to ten +0.16 to +0.79.
+With the spritsails set her helm moves toward the weather by 0.75 and 0.43 degrees at 60 and 67.5, by
+0.08 abeam, and toward the lee by 0.39 at ten points; with the driver bent and set she carries 3.84
+degrees of weather helm at six points and 2.19 abeam, her helm hard over at 60 degrees (17.7), and in
+truth 17's form with the driver she is taken aback at every lead from 4.7 to 4.9 (recorded: the driver
+is an occasional sail, set by order). The brace limits kept. Her polar is unmoved by the helm (`polar_of` balances no
+moment). **The sailed checks:** the *Vanguard*'s 4.75-5.5 kn a point abaft the beam under courses,
+topsails and driver, 5.31 kn in 11 kn of wind (4.86 in 10, 6.20 in 13); the *Bellona*'s 6-9 kn under
+reefed topsails close-hauled, 6.93 in 25 kn (6.17 in 22, 7.66 in 28). **Her handling:** her classing the
+64's; "Mainsail haul" the main and mizzen yards; the mizen yard never braced; the course brailed and the
+spritsails clewed up hove to; she stays in 237-258 s (under the frigate-36's 343-447), wears in 499 s,
+lies to hove to 56.5-63.4 degrees off at 1.18 kn; after a tack with the spritsails set and clewed up she
+lies 59.1-65.0, the swing's peak 0.02 over truth 12's 65 (no knob of the helm's moves it: for the
+lead). Her beat in 15 kn stays 70 by a hair (2.035 kn made good at 70, 2.030 at 60); the close-hauled
+gap stands (6.64 kn at 60 degrees in 25 kn against the Bellona's 9, often 10): a line for both files in
+TuningNotes, the lead's answer (12).*
+
+*Recorded at her review (2026-11-10), for the lead, not built: after "shorten sail" five times through
+a gale from plain sail and "lie a-try", she does not lie a-try. At 35 kn she settles beam-on, 87.2-87.7
+degrees off at 3.51 kn once the courses and topsails but the main are furled, the log saying "Lying
+a-try under the main topsail and the staysails, helm a-lee." (30 kn: 87 degrees at 3.0 kn); the 64 at her
+own 4.8 the same (90.4-91.0 degrees, 3.60 kn), the frigate-36 44-61 degrees at 1.66. From rest, truth
+28's own form holds (56-58 degrees at 1.30 kn in 35 kn), and "heave to" on the same path lies her at 67.6
+degrees at 1.61 kn. The cause is her `clr_x_m` of 4.8 with lie a-try's helm only 5 degrees a-lee: 5.2
+gives 74 degrees at 2.2 kn and 5.5 62 degrees at 1.6 (the review's sweep), where truth 17's getting
+under way is aback from 4.9 in 16 kn. No one lead holds both on this path; the choice (a lead for the
+two-deckers with truth 17's case re-ruled, or a harder lee helm in `LieATryScript`, measured on her,
+the 64 and the frigate) is the lead's (`docs/dev/TuningNotes.md`, her review's mends).*
+
 ---
 
 ## 10. The lee ports: what her file supplies
@@ -1319,6 +1558,14 @@ on her file).
   scratch 74's midship lee port shut at 28-30 kn of wind on the drawn line's 11.3° (Bel §7.4); on
   her file's 10.35° it would shut at about 27-28½ kn (interpolated here on Bel §7.4's heels), and in
   the gusts at 24 kn. B7 re-measures it on her file and records it (§14.3).
+- *As built (B7, 2026-11-10), step 6, and as re-traced at its review the same day: on her file, the
+  side at each sill measured (task 4), her lower ports shut at 10.35 (L7, No. 8), 10.42, 10.67, 10.72,
+  11.16, 11.17, 11.72, 11.86, 12.89, 12.94, 14.58, 14.64, 18.90 and 18.98 degrees of heel alone (at
+  step 6 10.38, 10.45, 10.68, 10.78, 11.20, 11.24 for the first six); her upper deck's lowest at 32.37;
+  the lowest reopens below 9.11 (9.14). Close-hauled under plain sail, no gusts: 7.73 degrees of heel
+  in 22 kn, 9.23 in 24 (the setting of sail heels her to 10.72 for a moment, and the two lowest ports
+  shut then stay shut; one at step 6), 16.55 at most in 32 kn with twelve shut; in the World's gusts at
+  24 kn a lee lower port is shut 31% of the hour (30% at step 6) (§14.3).*
 - **The period's own cases** are swell and rolling, not steady heel (*Blenheim*, *Monarch*, the
   *Droits de l'Homme*: Bel §6.1). L3's roll brings them within the rule's reach. A crewed ship's roll
   stays nought until 84 gives each hull her sea (Build §7.1), so a truth on the roll uses the player's
@@ -1435,6 +1682,15 @@ item 4), stage 0c also lays one optional crew key, inert and left out of the pic
 | B7.d | every pair key, gun name and order of the eight unchanged (no file carries the key); the 64's and the razee's old beside new |
 | B7.e | no pinned scenario puts a frigate against rank 4 (grep); the 64's scenario tests re-run |
 
+*As built (B7, 2026-11-10), step 6, B7.b's rows: every armed file's beat at muster before B7.b and
+after (seed 7), line for line and man for man: the eight that are armed and the razee the same, the 64
+her four deck lines new and nothing else; their quarters' pickles (the crews and the divisions) byte
+for byte on the seven armed files of one gun deck, the 64's crews moved by their decks; the robbing
+order on the frigate-36 and the razee heeled and engaged, the same; 42 phrases (the tests' own and the
+module's) through `guns_named` on every file, every one that named guns before naming the same, the
+deck words alone new; an old crew's state without `deck` reads None. Held by her tests
+(`tests/test_bellerophon.py`, "Her bill by deck").*
+
 ---
 
 ## 13. File ownership, and the road
@@ -1495,6 +1751,16 @@ In place of the owner's own test, a few pages, the basics and the important view
 - **What was taken another way:** each "Plainly" of this document, one line each, and what the owner
   is asked (§17.1).
 
+*As built (B7, 2026-11-10): her testing report made at the end of her steps 0 to 6 and her review's
+mends, for the lead and the owner, its pictures drawn by the game's own viewer from the game's own
+server at seed 7 (scratch, never the repository): her five views under plain sail and furled; her mizen
+course, her driver and her spritsails set; her hull alone beside the 64's, the razee's and the
+frigate-36's at one scale and normalised; her two gun decks' guns run out, and heeled 11 degrees to
+leeward; the page at 800 x 600. Her figures beside them are the tuning notes' ("The 74, the
+*Bellerophon*"). Heeled 11 degrees the rule shuts her lower ports Nos. 6 to 9 (four), the deck's line
+"The lee lower-deck ports are shut, the sea at their sills."; the pictures draw no port shut (the
+viewer draws the ports as package 81 left them).*
+
 ---
 
 ## 14. Tests and truths
@@ -1537,6 +1803,15 @@ Her file loads, and:
   boats (Lavery p. 16);
 - `description_key("a ship of the line") == "seventy-four"`, rank 4.
 
+*As built (B7, 2026-11-10), step 5: pinned whole in `tests/test_bellerophon.py`
+(`test_truth_7_194_her_particulars_hold_their_sources`), each clause able to fail (broken on purpose:
+her beam at 14.5 m and her lower sills raised 0.1 m each fail it). Read as built: the lower ports 1.04
+by 0.83 m (2 ft 8 1/2 in is 0.83: this section's 0.82 a rounding slip); the main mast 107.9 ft from its
+heel to its head by her file's heights (the heights to the decimetre, so the band's top 108 ft 5 in);
+the forecastle's ports two a side by the 1793 fit's places (its third triple the 1795 carronade's,
+over the rail); the eleven officers and NCOs of marines in her notes and her people file's captain,
+lieutenant and serjeant of marines drawn from the 111.*
+
 ### 14.3 Truth 7-195: her lower-deck ports shut at the heel the sources give (step 6, after L3)
 
 In truth 7-190's form (B8's, at L3), with her file as the player's ship, no sea unless set:
@@ -1570,6 +1845,17 @@ threshold; so no count is pinned near them. The frigate's lee ports open at her 
 that the period's own cases are swell and rolling, which the roll clause serves and steady heel does
 not.
 
+*As built (B7, 2026-11-10), step 6, L3 and the hold in: drafted in `tests/test_bellerophon.py` in 7-190's
+form, the rule, the battery, the reopening within the minute's hold and after it, the roll's 4 degrees
+and the log's line pinned as written; the battery's counts on the measured file (the ends measured by
+task 4 shut later than the midship figure): none at 10.0, eight at 12.4, ten at 13.7, twelve at 16.0,
+all fourteen at 19.4 (each 0.3 degree or more from every threshold). **The ordinary sailing clause is
+recorded, not pinned:** in 24 kn her steady heel stands 1.15 degrees under her threshold, but the
+setting of sail heels her past it for a moment and the two lowest ports then stay shut (they reopen
+below 9.11 and 9.18; one port and 9.14 before the review's re-trace), so "open at 24 kn" does not hold
+with a degree's margin; 32 kn shuts twelve. In the World's gusts at 24 kn a lee lower port is shut 31%
+of the hour (30% before).*
+
 ### 14.4 Truth 7-196: a 74 crewed holds the floors (routed as a pace test)
 
 - **Crewed** (`test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor`, marked
@@ -1601,6 +1887,19 @@ not.
   reported. No floor is lowered** (§17.2 item 5).
 - **`tools/pace.py`** gains `py tools/pace.py seventy-four`: alone, and with three 74s crewed, printing
   ticks a second with the load. Measured on the owner's machine to record a figure only (Build §2.5).
+
+*As built (B7, 2026-11-10), step 6: both clauses drafted in `tests/test_bellerophon.py`, the crewed one
+marked `pace` by hand, the alone one routed by its name; `py tools/pace.py seventy-four` measures both.
+Her world settled by measurement: the frigate at 49 54 N 5 12.6 W, the 74s at 49 55.5 N 5 12.0 W, 49
+53.5 N 5 14.0 W and 49 52.5 N 5 11.0 W. **Plainly:** the 74s do not keep their station but engage the
+frigate, who carries no private signal in truth 88's world (no table aboard her), so their challenge
+goes unanswered and a man of war under their own colours that does not answer is an enemy by the King's
+ship's book (`world/signalling.py`); they fire into her. The crewed clause holds on that heavier load:
+the cap full and every 74 within 0.25 to 3.59 miles at the ends of the timed thousands, **106 ticks a
+second** on the owner's machine against the floor of 60. **The alone clause: 474 to 490 ticks a second
+on the owner's machine** (the frigate-36 505-631 and the 64 484-486 in the same form, the same runs),
+under the floor of 500 here; the lead's build machine decides (pinned at 550 or more; else recorded, no
+floor lowered).*
 
 **Not truths:** her polar (no pinned point until the close-hauled gap is compared); her tack at
 quarters (recorded); her scenario's round trip and first hour (B6's tests).

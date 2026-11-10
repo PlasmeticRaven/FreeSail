@@ -730,3 +730,12 @@ ports:
   civita-vecchia: papal-state
   gaeta: naples
   naples: naples
+  # package 101: the Catalan coast's three and the four beside it, Spain's (each file's
+  # dated `nation:` gives the French holding of Barcelona, Rosas, Tarragona and Valencia)
+  barcelona: spain
+  tarragona: spain
+  alfaques: spain
+  rosas: spain
+  palamos: spain
+  valencia: spain
+  alicante: spain

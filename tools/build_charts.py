@@ -598,6 +598,47 @@ REGIONS: dict[str, dict[str, Any]] = {
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
         "fill_to_chart_datum": True,
     },
+    # package 101: the Catalan coast, the hole in the chart north of `balearics` and west of
+    # `gulf-of-lion` closed: the main from the Alfaques by the Ebro's delta, Tarragona and
+    # Barcelona to Blanes and Tossa. The south bound is `balearics`' north bound exactly
+    # (40.56 N, the row edge: its tiles end there), the east bound `gulf-of-lion`'s west
+    # bound exactly (3.0 E). The level-2 tiles that meet the bounds span 40.56 to 42.27 N
+    # and 0.05 to 3.04 E (4 rows, 7 columns); the east column (2.61 to 3.04 E) is
+    # gulf-of-lion's (the seam rule, `tiles_listed_elsewhere`): computed with the block,
+    # so that the field knows the shore from Blanes to Tossa, and not written ("4 kept").
+    # East of 1 W no corridor lies under the block, so every other tile is written, land
+    # and sea alike (package 79c's finding). The west bound on the land (0.3 E, inside the
+    # column from 0.05 E: the Ebro to Amposta and Tortosa held), the north on the land
+    # (41.9 N, inside the row to 42.27 N: Montseny and Montserrat held).
+    "catalan-coast": {
+        "title": "The Catalan coast, the Alfaques and the Ebro to Tarragona, Barcelona and Blanes",
+        "bounds": {"south": 40.56, "north": 41.9, "west": 0.3, "east": 3.0},
+        "fetch": {"south": 40.45, "north": 42.4, "west": -0.05, "east": 3.15},
+        "harbours": {
+            "barcelona": {"south": 41.33, "north": 41.42, "west": 2.12, "east": 2.24},
+            "tarragona": {"south": 41.03, "north": 41.14, "west": 1.09, "east": 1.28},
+            # the Alfaques and the Ebro's delta whole: EMODnet has no sounding over the
+            # delta's land and lagoons, and GEBCO's fifteen seconds lay that flat ground
+            # under mean sea level, so that the block's own water (0.2 m) floods it from
+            # Amposta to the Fangal (the first build's sweep: 34,401 cells, the ten largest
+            # all here). Package 93's rule for a shore the grid smears: the patch keeps the
+            # eleven's raise within its box until a sheet is read with its datum (Tofino's
+            # 'Carta esferica desde Cabo Oropesa a Cabo de Creux' of 1786 is too small a
+            # scale; Heather's 'Le Sofa Bay' of 1814 is the plan wanted, under its licence)
+            "alfaques": {
+                "south": 40.56,
+                "north": 40.83,
+                "west": 0.55,
+                "east": 0.92,
+                "fill_raise": "eleven",
+            },
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, the rule's (`mean_level_grid`):
+        # the block's own gauges within its bounds once they are read (Barcelona's and
+        # Tarragona's), the land standing above that tide's high water
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -643,7 +684,8 @@ CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
         "title": (
             "The Channel, Biscay and the Iberian coast to Madeira, the Strait, the "
-            "Mediterranean west and the Balearics, the Gulf of Lion and the Tyrrhenian"
+            "Mediterranean west and the Balearics, the Catalan coast, the Gulf of Lion and "
+            "the Tyrrhenian"
         ),
         "regions": [
             "channel-west",
@@ -665,6 +707,8 @@ CHARTS: dict[str, dict[str, Any]] = {
             "gulf-of-lion",
             "ligurian-sea",
             "tyrrhenian",
+            # package 101: the Catalan coast, the hole between the Balearics and the Gulf
+            "catalan-coast",
         ],
         "corridor": "atlantic-corridor",
     },

@@ -101,7 +101,11 @@ def test_the_descriptions_name_the_four_files_and_the_brigs_two_come_from_her_fi
     words the same in both files and her polar and masthead the brig's."""
     assert S.description_key("a merchant brig") == "merchant brig"
     assert S.description_key("brig-sloop") == "brig-sloop"
-    assert S.description_key("a ship of the line") is None
+    # package 75 (Design-Ship-Bellerophon.md §8.2; Build-Ships.md §16.1): "a ship of the line"
+    # names the 74's description (old: `description_key("a ship of the line") is None`); the
+    # refusal kept by words that name no file still, a first rate, which the game lacks
+    assert S.description_key("a ship of the line") == "seventy-four"
+    assert S.description_key("a first rate") is None
     own = S.file_descriptions(BRIG)
     assert set(own) == {"brig-sloop", "merchant brig"}  # one file, two descriptions' words
     assert S.description("merchant brig")["what"] == own["merchant brig"]["what"]
@@ -198,8 +202,10 @@ def test_a_goal_makes_a_plan_and_a_goal_the_captain_does_not_know_is_refused_in_
         put(w, "cutter", 0.0, 3.0, "hunting the coast")
     with pytest.raises(ValueError, match="knows no such place"):
         put(w, "cutter", 0.0, 3.0, "bound for Valparaiso")
+    # package 75 (Design-Ship-Bellerophon.md §8.2): "ship of the line" is the 74's description
+    # now (old: `put(w, "ship of the line", ...)` refused); a first rate names none
     with pytest.raises(ValueError, match="no description"):
-        put(w, "ship of the line", 0.0, 3.0, "bound for Brest")
+        put(w, "first rate", 0.0, 3.0, "bound for Brest")
     # two brigs of one file are not one brig: the sailing factor is drawn once each
     other = put(w, "merchant brig", 100.0, 7.0, "trading Falmouth to the Lizard")
     assert S.SAILING_FACTOR_MIN <= trade.sailing_factor <= 1.0

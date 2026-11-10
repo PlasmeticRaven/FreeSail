@@ -846,18 +846,25 @@ landing), its questions through `say as the president of the court` heard at the
 accused's own `say to the court: ...`, the log of the action read by the judge advocate (`court:
 read the log of the action`), the verdict a form (`court: the verdict on <person>: acquitted with
 honour | acquitted | reprimanded | dismissed the ship | dismissed the service`) journaled as
-every world order is, the play log carrying the sentence read and never the order; `Person.
-record` the thing the career of M8 remembers (the loss, the exchange, the court, the verdict, the
+every world order is, the play log carrying the sentence read and never the order; a court
+whose accused is dead or gone from the world is dissolved in words at the next minute, and at
+its rising everyone at its place goes to the quay, its officers of no ship's company; the
+court's lines, the exchange and an appointment are said ashore at the port and wake no deck;
+`Person.record` the thing the career of M8 remembers (the loss, the exchange, the court, the verdict, the
 appointment), read as `the record`. **A new command** is
 a scenario's start: `command: a new command for <person>: the <description> "<name>" at <port>`
 writes a scenario file under the saves with his name as her captain, his people who followed him
 (the persons ashore at the same port whose record has the same loss) and a copy of the record
 as a thing with words in his keeping (a letter by the scenario's `things:`, spec M7b §17a),
-loaded by the loader (`ship.name` and `people[].record` honoured) and begun; refused for a man
-dismissed the service, doubted within a year of a dismissal from his ship. **The consent
+loaded by the loader (`ship.name` and `people[].record` honoured) and begun; the file named by
+its name alone (`saves/<name>`) in the log, the data, his record and the director's reply,
+the served line the appointment in the service's words; a replay writes nothing and repeats
+what the journal holds; refused for a man dismissed the service or where a file of that name
+stands that is not this appointment's, doubted within a year of a dismissal from his ship. **The consent
 revision** is drafted (`docs/design/ConsentRevision-AdversarialSeats.md`) and not applied; a seat
 at the captain of a hull adversarial to a human is refused in words behind
-`seats.ADVERSARIAL_SEATS_CONSENTED` (§29). Truths 7-355 to 7-357 and 7-364 to 7-366; the
+`seats.ADVERSARIAL_SEATS_CONSENTED` (§29), before any consent record is read, at the live door
+alone (a replay holds again what the journal holds). Truths 7-355 to 7-357 and 7-364 to 7-366; the
 scenarios `captive.yaml` and `prize-home.yaml` with the starter brief `captive`.
 
 ### 20. Truths for 7-v (outline)
@@ -1225,6 +1232,14 @@ Naples); the five Italian and Sardinian nations as data; a port's nation by date
 annexation of June 1805); the Gulf's and the Tyrrhenian's weather boxes from the
 Admiralty's printed tables of Marseille and Naples; the scenario `agincourt-sound.yaml`. As
 built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 79d".
+**As built: the Catalan coast (package 101, 2026-11-10).** The owner's "very noticeable gap"
+on the eastern Iberian coast closed: the region `catalan-coast` between `balearics` and
+`gulf-of-lion`, the Alfaques and the Ebro's delta to Tarragona, Barcelona and Tossa, with
+seven ports (Barcelona, Tarragona, the Alfaques; Rosas and Palamós, Valencia's Grao and
+Alicante beside it in water already charted), the French holding of four of them by dated
+nations; found on the way, that the nations table's wars are one year's picture (no end
+date), so that Spain stays at war with Britain after 1808: for the owner, by decision 66.
+As built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 101".
 **As built: the held gauges' water (package 89, 2026-10-30).** The finding every block since
 39a carried: the world's tide blended every gauge within 400 miles, so a block's gauges were
 held out of it and its water read the Channel's eleven (Newhaven's spring range 3.9 feet for

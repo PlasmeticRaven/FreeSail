@@ -1038,9 +1038,11 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         'command: a new command for <person>: the <description> "<name>" at <port>',
         ('command: a new command for Captain Bowen: the cutter "Alert" at Plymouth',),
         "a scenario file written under the saves' folder with his name as her captain, his "
-        "people who followed him and the record as a paper, to be given to either driver with "
-        "--scenario (the answer names it); refused for a man dismissed the service, doubted "
-        "for one dismissed his ship within the year",
+        "people who followed him and a copy of his record in his keeping, to be given to "
+        "either driver with --scenario (the answer names it, 'saves/<name>'; the world hears "
+        "the appointment alone); refused for a man dismissed the service or where a file of "
+        "that name stands that is not this appointment's, doubted for one dismissed his ship "
+        "within the year",
     ),
 )
 

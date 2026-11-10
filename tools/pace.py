@@ -11,9 +11,17 @@ with the machine's load beside. Run it on a quiet machine:
     py tools/pace.py crewed --ships 3 6   # with so many crewed ships
     py tools/pace.py crewed --profile     # and a profile of three crewed ships' ticks
     py tools/pace.py squadrons       # the convoy of six at far detail, the default cap, a cap of 12
+    py tools/pace.py seventy-four    # the 74 alone, and the frigate with three 74s crewed
 
 Sixty ticks a second is the owner's play at 60x; the crewed cap (`freesail/world/crews.py`,
 `CREWED_CAP`) was chosen from these figures on the build machine (TuningNotes, package 43).
+
+The 74's mode (package 75, B7: `docs/design/Design-Ship-Bellerophon.md` §14.4, her truth 7-196)
+measures her file alone in truth 51's form, the gate's day with her in the frigate's place, against
+`BUILD_MACHINE_FLOOR`; and the frigate hove to about three miles south of the Lizard with three of
+her file crewed beside her, keeping the station off the Lizard, against `CREWED_FLOOR_TICKS_S`,
+truth 88's form in a world where the 74s keep within the crewed range (truth 88's own place lies
+thirty miles from the Lizard, so 74s keeping a station off it would sail out of the range).
 """
 
 from __future__ import annotations
@@ -29,6 +37,12 @@ from freesail.core.world import Scenario  # noqa: E402
 from freesail.world.scenarios import begin, load_scenario, make_scenario_world  # noqa: E402
 
 TRIAL = "data/scenarios/trials/trial-station-stranger.yaml"
+GATE_DAY = "data/scenarios/gate-4c-day.yaml"
+SEVENTY_FOUR = "data/ships/seventy-four.yaml"
+# The frigate's place for the 74s' crewed measure (truth 7-196): about three miles south of the
+# Lizard (49 57.5 N 5 12.4 W), and the 74s' places one to three miles from her
+OFF_THE_LIZARD = (49.9, -5.21)
+SEVENTY_FOURS_AT = ("49 55.5 N 5 12.0 W", "49 53.5 N 5 14.0 W", "49 52.5 N 5 11.0 W")
 
 # twelve ships in the Channel with intents, a mix of the four files
 SHIPS = [
@@ -60,6 +74,52 @@ def crewed(sf, i, ship_file, lat, lon, intent):
     sc.ship_speed_kn = 5.0
     w = make_world(7 + i, ship_file, sc)
     w.submit("set plain sail")
+    return w
+
+
+def seventy_four_alone():
+    """Her file in the frigate's place on the gate's day, truth 51's form (package 75, B7)."""
+    sf = load_scenario(GATE_DAY)
+    w = make_scenario_world(sf, ship=SEVENTY_FOUR)
+    begin(w, sf)
+    return w
+
+
+def seventy_fours_crewed():
+    """The frigate off the Lizard, her plain sail set and then hove to, with three 74s of her file
+    put one to three miles from her keeping the station off the Lizard (package 75, B7: her truth
+    7-196's world, tests/test_bellerophon.py)."""
+    from datetime import datetime
+
+    from freesail.world.ships import vessel_from_spec
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": OFF_THE_LIZARD[0], "lon_deg": OFF_THE_LIZARD[1]},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+    )
+    w = make_world(7, "data/ships/frigate-36.yaml", sc)
+    w.submit("set plain sail")
+    w.run(900)
+    w.submit("heave to")
+    for i, where in enumerate(SEVENTY_FOURS_AT):
+        w.vessels.serial += 1
+        spec = {
+            "description": "seventy-four",
+            "name": f"S{i}",
+            "nation": "britain",
+            "position": where,
+            "goal": "patrolling off the Lizard within 2 miles",
+            "intent": "keep the station off the Lizard within 2 miles",
+            "colours": "shown",
+        }
+        w.vessels.add(vessel_from_spec(w, spec, w.vessels.serial))
     return w
 
 
@@ -129,6 +189,12 @@ def main(which: str = "all", ships: list[int] | None = None, profile: bool = Fal
         begin(hers, sf4)
         hers.submit("set plain sail")
         measure([hers], "the same Channel with the frigate given at the view (the player's)")
+    if which in ("all", "seventy-four"):
+        # package 75, B7 (her truth 7-196): her file alone, and three of hers crewed
+        measure([seventy_four_alone()], "the seventy-four alone (the gate's day, truth 51's form)")
+        crewed_74s = seventy_fours_crewed()
+        measure([crewed_74s], "the frigate off the Lizard with three seventy-fours crewed")
+        print(f"  crewed: {len(crewed_74s.vessels.crewed_ids)} of the cap", flush=True)
     if which in ("all", "crewed"):
         ns = ships or [1, 3, 6, 12]
         crews = [crewed(sf, i, *s) for i, s in enumerate(SHIPS)]
@@ -151,7 +217,7 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    choices = ["all", "alone", "far", "crewed", "squadrons", "observer"]
+    choices = ["all", "alone", "far", "crewed", "squadrons", "observer", "seventy-four"]
     ap.add_argument("which", nargs="?", default="all", choices=choices)
     ap.add_argument("--ships", type=int, nargs="+", help="how many crewed ships, each a measure")
     ap.add_argument("--profile", action="store_true", help="profile three crewed ships' ticks")

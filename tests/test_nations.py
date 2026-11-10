@@ -241,6 +241,14 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "civita-vecchia": "papal-state",
         "gaeta": "naples",
         "naples": "naples",
+        # the Catalan coast's and the four beside it (package 101), Spain's in the index
+        "barcelona": "spain",
+        "tarragona": "spain",
+        "alfaques": "spain",
+        "rosas": "spain",
+        "palamos": "spain",
+        "valencia": "spain",
+        "alicante": "spain",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

@@ -1337,6 +1337,17 @@ court is his lost ship's, not his prize's colours; the dry run of a form that wr
 it (the copy is marked, the form says what it would write). The figures and the finds are in
 `docs/dev/TuningNotes.md`, "Package 74", step 6.
 
+**The lead's review of the step (2026-11-10), mended in its tree**: the new command's file is
+named by its name alone (`saves/<name>`) in the log, the data, the record and the director's
+reply, a replay writes nothing, and a name that would write over another's file is refused; the
+served line is the appointment in the service's words, said ashore at the port, as the exchange
+is; a court whose accused is dead or gone is dissolved in words, and at its rising everyone at
+its place goes to the quay; its officers are of no ship's company; "the captain of the <ship>"
+is the man who commanded her; the mark of the player's person is cleared when he is his own
+ship's captain again; the adversarial seat's refusal comes before any consent record is read and
+is the live door's alone (a replay repeats the journal). Each finding old beside new in the
+tuning notes, "Step 6's mends from the lead's review".
+
 ### Step 7: the records and the last truths (§8; 2026-11-07)
 
 **Built as designed**: the scenarios `prize-home.yaml` and `captive.yaml` with the starter brief

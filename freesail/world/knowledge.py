@@ -349,7 +349,12 @@ REACH: dict[str, str] = {
     "needs.answer": "person",
     "needs.felt": "person",
     "log.rollup": "record",
-    "command.new": "record",  # package 74 (step 6): the new command's file, the driver's to read
+    # package 74 (step 6): an appointment and an exchange are the port's news, said ashore
+    # where the man stands (each line's data names the shore and the port): he and the
+    # persons ashore at that port have them, and no ship's deck is woken by them (the
+    # `prize` family wakes a ship; these two are not her business)
+    "command.new": "said",
+    "prize.exchanged": "said",
     "log.read": "record",
     # the report, the call and the boat's report (step 3 writes them; placed first)
     "report.made": "person",
@@ -843,16 +848,18 @@ def players_person(world: Any) -> Any:
         # the player's person a captive (package 74, the design's §3.1): his ship's captain
         # answers for the prize master from the taking, so the one world keeps who he is
         return captive
+    seat = _seat(world)
+    if seat is not None:
+        return _seat_person(root, seat)
     from freesail.world.captive import remembered_person
 
     remembered = remembered_person(root)
     if remembered is not None:
         # freed (exchanged, landed by a cartel), he is the player's person still while his
-        # own ship has a prize master for her captain (package 74, step 6)
+        # own ship has a prize master for her captain (package 74, step 6): after the seat,
+        # which is the player's own choice of person, and only while the mark stands (it is
+        # past once he is her captain again, and the checks below read as they did)
         return remembered
-    seat = _seat(world)
-    if seat is not None:
-        return _seat_person(root, seat)
     hull = player_hull(root)
     if hull is None:
         return None

@@ -272,6 +272,13 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a bilander",
         "what": "a bilander, a merchantman under a settee main, deep laden",
     },
+    # package 75 (docs/design/Design-Ship-Bellerophon.md §8): HMS Bellerophon, the
+    # Arrogant-class 74 of 1786, a third rate; the tops make out a ship, the glass her two tiers
+    "seventy-four": {
+        "file": "data/ships/seventy-four.yaml",
+        "rig": "a ship",
+        "what": "a seventy-four, a ship of the line, fourteen ports a tier",
+    },
 }
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
@@ -338,6 +345,18 @@ _DESCRIPTION_WORDS = {
     "bilander": "bilander",
     "a billander": "bilander",
     "billander": "bilander",
+    # package 75 (Design-Ship-Bellerophon.md §8.2): the period's words for a 74 and for a ship of
+    # the line, the line's being hers alone of the files; never "a two-decker" or "a third rate",
+    # which name the sixty-four as well (judgement)
+    "a seventy-four": "seventy-four",
+    "seventy-four": "seventy-four",
+    "a 74": "seventy-four",
+    "a seventy-four gun ship": "seventy-four",
+    "a ship of the line": "seventy-four",
+    "ship of the line": "seventy-four",
+    "a line-of-battle ship": "seventy-four",
+    "line-of-battle ship": "seventy-four",
+    "a line of battle ship": "seventy-four",
 }
 
 

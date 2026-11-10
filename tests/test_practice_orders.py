@@ -544,6 +544,37 @@ def test_the_exercise_ends_when_the_hands_are_piped_down_from_quarters():
     assert battery.exercise == "starboard"
 
 
+def test_a_gun_named_by_its_number_alone_is_the_gun_of_the_side_engaged_or_of_the_marks():
+    """A number names the pair (the ships session's find, mended with package 74's step 6 on
+    the lead's word): 'fire No. 1 gun' with a side engaged is that side's gun, with no side
+    engaged and a mark on one side that side's, said with a side that side's whatever is
+    engaged, and with neither a side nor a mark the pair as before."""
+    import math
+
+    w = frigate()
+    at_quarters(w)
+    battery = battery_of(w.ship)
+
+    def sides(order):
+        battery.single.clear()
+        data = say(w, order)[2]
+        assert list(battery.single) == data["guns"]
+        return sorted({w.ship.guns[g].side for g in data["guns"]})
+
+    assert battery.engaged is None and not battery.target
+    assert sides("fire No. 1 gun") == ["larboard", "starboard"]
+    battery.engaged = "starboard"
+    assert sides("fire No. 1 gun") == ["starboard"]
+    assert sides("fire No. 1 larboard gun") == ["larboard"]
+    battery.engaged = "both"
+    assert sides("fire No. 1 gun") == ["larboard", "starboard"]
+    battery.engaged = None
+    battery.target, battery.target_relative_rad = "a mark", math.radians(-80.0)
+    assert sides("fire No. 1 gun") == ["larboard"]
+    battery.target_relative_rad = math.radians(95.0)
+    assert sides("fire No. 1 gun") == ["starboard"]
+
+
 def test_the_word_to_fire_is_refused_in_dumb_show_and_a_gun_by_name_fires():
     w = frigate()
     at_quarters(w)

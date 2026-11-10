@@ -61,7 +61,8 @@
 # source dates it between. `range_nm` is the period lamp's, from the pilot's leagues or
 # JUDGEMENT.
 #
-# Not here: west of 3 E (the Canigou, Roses) is a later block's; east of 7.73 E the
+# Not here: west of 3 E (the Canigou) is a later block's (Rosas bay and Palamos, east of
+# it, added by package 101 at this file's end, its marks for the two ports); east of 7.73 E the
 # region `ligurian-sea`'s. The block reaches south to 40.56 N, where `balearics` (package
 # 79c) ends, the open sea between Minorca and the Gulf with no mark in it.
 
@@ -1377,3 +1378,151 @@ features:
     source: 'Purdy 1826, p. 66: by the sea-side, three leagues east from Monaco, the town of Vintimiglia at the base of a tract of elevated land; above the town on the west a considerable fortress; on the east the mouth of the River Roya; small vessels may anchor before it in fair weather in from 13 to 10 fathoms, but the ground is bad and there is no shelter from the sea; Derrotero 1849, p. 65: in summer anchor before Vintimiglia in 9 to 12 brazas, a considerable fortress above the town; height JUDGEMENT'
     says: 'Vintimiglia, the first town of the Genoese Riviera, its fortress on the height above it and the Roya beside it; an open road with bad ground.'
 
+
+  # ---------------------------------------------------------------------------
+  # Package 101: Rosas bay and Palamos, south-west of Cape Creus, for the two ports beside
+  # the Catalan coast's block (the region `catalan-coast` ends at 3 E; these lie within
+  # this region's bounds and are its marks, added by the how-to's road for a mark added to
+  # a built region: this file and its index alone, no tile, coast or other mark changed).
+  # The sources Tofino 1787, pp. 131 to 137, with Michelot 1709 and 1715, Purdy 1826,
+  # Norie 1831 and Smyth 1854's table (package 101's short pass, docs/dev/TuningNotes.md).
+  # No light at Rosas, Cape Norfeo or Palamos in any period text.
+  # ---------------------------------------------------------------------------
+
+  - id: rosas-citadel
+    kind: castle
+    name: the citadel of Rosas
+    modern: 'the Ciutadella of Roses'
+    lat_deg: 42.2640
+    lon_deg: 3.1730
+    height_m: 8
+    source: 'Tofino 1787, pp. 135 to 136: the Plaza de Rosas and its suburb, the Arrabal, at the head of the bay; Michelot 1715, OCR l. 2812 to 2818: the citadel of Roses, five bastions, about a good mile NNW of the Bouton; Michelot 1709, OCR l. 4065 to 4070: fishermen''s warehouses by it; do not close the citadel, there is very little water; height JUDGEMENT'
+    says: 'The citadel of Rosas, a low fortress of five bastions at the head of the bay beside the town; the water shoals off it.'
+
+  - id: trinidad-castle
+    kind: castle
+    name: the castle of the Trinity
+    modern: 'the Castell de la Trinitat (the Bouton of Roses)'
+    lat_deg: 42.2530
+    lon_deg: 3.1880
+    height_m: 60
+    source: 'Tofino 1787, pp. 135 to 136: the east part of the bay mountainous, and on the point the castle of the Santisima Trinidad, a little more than half a mile SSE of the beach of Rosas; it is on with the Medas islands and Cape Begur S 7 E, 12 miles from them and 19 1/2 from the cape; Michelot 1715, OCR l. 2812: the Bouton of Roses or the Fort of Trinity, a little fort in the form of a star; Norie 1831, p. 34: called also the Bouton de Rosas; Smyth 1854, table: Rosas, fort Trinidad 42 16 12, 3 10 25; the height JUDGEMENT on the hill under it'
+    says: 'The castle of the Trinity, the little star fort on the point east of Rosas, which with the Medas islands gives the line south toward Cape Begur.'
+
+  - id: rosas-road
+    kind: anchorage
+    name: the bay of Rosas
+    modern: 'the bay of Roses, under the eastern shore NW of the Trinitat'
+    lat_deg: 42.2566
+    lon_deg: 3.1783
+    fix: 'moved 146 m to the grid''s water (the first placing read 1 m of land)'
+    height_m: 0
+    depth_fathoms: 8
+    bottom: loose mud
+    source: 'Tofino 1787, pp. 135 to 136: the bay fit for any number of ships of every size, generally sheltered from all winds, the bottom loose mud clean of stones, near the shore sand with patches of long weed; to be quite safe from the SE come under the east coast in 8 or 9 brazas NW of the castle of the Santisima Trinidad, half a mile S of the middle of the Arrabal, and even to 7 brazas, all being clean; no wind is known here to do more harm than the N, the Tramontana, which though it comes over the land blows with much force, but being fair for getting under sail though the anchors drag, the harm it does can never be great; Purdy 1826, pp. 30 to 31: 7 or 8 fathoms under the eastern shore, the castle bearing S.S.E.; Michelot 1709, OCR l. 4072 to 4087: anchor all over the bay with any vessel and even a fleet'
+    says: 'The bay of Rosas, a great clear bay sheltered from nearly every wind: eight fathoms of loose mud under the eastern shore north-west of the Trinity castle. The tramontana comes down hard off the Pyrenees, but it blows off the land and raises no sea.'
+
+  - id: cape-norfeo
+    kind: headland
+    name: Cape Norfeo
+    modern: 'Cap Norfeu'
+    lat_deg: 42.2425
+    lon_deg: 3.2640
+    fix: 'moved 179 m to the grid''s land (the first placing read 34 m of water)'
+    height_m: 100
+    source: 'Tofino 1787, p. 137: E by NE almost 2 miles from Cape Falco the front of Cape Norfeo, the end of the gulf of Rosas, high and steep with an islet on its western part, but deep and clean; a ruined watch tower called of Norfeo; Purdy 1826, p. 31: Cadaques 2 1/2 miles N 40 E from Cape Norfeo; height JUDGEMENT'
+    says: 'Cape Norfeo, a high steep front closing the bay of Rosas on the east, a ruined watch tower on it; deep and clean close to.'
+
+  - id: medas-islands
+    kind: island
+    name: the Medas islands
+    modern: 'les Illes Medes'
+    lat_deg: 42.0470
+    lon_deg: 3.2230
+    height_m: 77
+    extent_m: 400
+    grid_lacks: true
+    fix: 'FROM MEMORY, the Meda Gran; the grid has 33 m of water there and no land within a kilometre (an isle the grid lacks, ChartBlocks.md); height and extent JUDGEMENT'
+    source: 'Tofino 1787, p. 136: the castle of the Santisima Trinidad on with the islands of the Medas and Cape Begur S 7 E, 12 miles from them; Norie 1831, p. 34: 12 miles; height JUDGEMENT from the modern map'
+    says: 'The Medas islands off the mouth of the Ter, high rocky isles; with the Trinity castle they give the line of Rosas bay.'
+
+  - id: palamos
+    kind: town
+    name: Palamos
+    modern: Palamos
+    lat_deg: 41.8470
+    lon_deg: 3.1290
+    height_m: 15
+    source: 'Tofino 1787, p. 131: the town of Palamos with a piece of mole running 170 varas to the W, which with the north beach forms a little port 300 varas from N to S, its greatest depth 22 or 23 feet close to the mole''s head; it admits few vessels, none above frigates, and with moderate weather; Smyth 1854, table: Palamos, mole-head 41 50 57, 3 6 25; Michelot 1715, OCR l. 2655: moor well toward the NW'
+    says: 'Palamos, a small walled town on its point with a short mole running west; a little port for a few vessels, none bigger than a frigate.'
+
+  - id: molino-point
+    kind: headland
+    name: the Windmill Point of Palamos
+    modern: 'the Punta del Moli, Palamos'
+    lat_deg: 41.8436
+    lon_deg: 3.1332
+    fix: 'moved 85 m to the grid''s land (the first placing read 9 m of water)'
+    height_m: 15
+    source: 'Tofino 1787, p. 131: the Punta del Molino, a windmill half ruined on it, in latitude 41 51 10 and longitude 9 21 from Cadiz, running out to the S a little more than 300 toesas; p. 130: 3 1/2 miles NE of the point of San Pol; Purdy 1826, p. 30, puts the latitude on Punta Grosa; height JUDGEMENT'
+    says: 'The Windmill Point of Palamos, its half-ruined mill on top, running south from the town; give it a cable''s berth coming in from the east.'
+
+  - id: palamos-port
+    kind: anchorage
+    name: within Palamos mole
+    modern: 'the old harbour within the first mole of Palamos'
+    lat_deg: 41.8458
+    lon_deg: 3.1260
+    fix: 'moved 20 m to the grid''s water (the first placing read 1 m of water)'
+    height_m: 0
+    depth_fathoms: 3
+    bottom: grass and mud
+    source: 'Tofino 1787, p. 131: 22 or 23 feet close to the end of the mole; the only shelter from the ESE and S winds on the coast of Catalonia as far as the gulf of Rosas; the W and SW winds send all their sea in, and still worse the NW, which though it raises no sea, coming over the land, blows so hard that it has broken vessels from their moorings and dashed them against the mole; Michelot 1709, OCR l. 3806 to 3823: two or three brasses within the mole, grass and mud'
+    says: 'Within Palamos mole, three fathoms close to its head on grass and mud: the one shelter of this coast from the east-south-easters and southerlies; moor strongly to the north-west, for that wind off the land has driven ships onto the mole.'
+
+  - id: palamos-road
+    kind: anchorage
+    name: the road of Palamos
+    modern: 'the bay of Palamos outside the mole'
+    lat_deg: 41.8420
+    lon_deg: 3.1230
+    height_m: 0
+    depth_fathoms: 10
+    bottom: sandy mud
+    source: 'Tofino 1787, p. 131: large ships lie E and W with the mole in 8 brazas, but to be free it is better to anchor in 10 brazas NE and SW with the mole''s head, the windmill then bearing ESE; Michelot 1709, OCR l. 3864: east of Cape Gros the galleys anchor in eight or nine brasses, sandy mud; the bottom JUDGEMENT from the two'
+    says: 'The road of Palamos, ten fathoms with the mole''s head north-east and the windmill east-south-east; mind the rock to the south-west of the point.'
+
+  - id: palamos-rock
+    kind: ledge
+    name: the rock in Palamos bay
+    modern: 'La Llosa, Palamos'
+    lat_deg: 41.8375
+    lon_deg: 3.1256
+    height_m: 0
+    extent_m: 40
+    fix: 'by Tofino''s bearing and distance from the windmill (W 41 S, half a mile); the grid holds no head there (29 m), the rock at the pilot''s place'
+    dries_m: -3.1
+    source: 'Tofino 1787, p. 132: W 41 S of the windmill and half a mile off a shoal of stones, its most water 11 feet, very dangerous, steep-to, 11 or 12 brazas close by, more than 70 varas in extent; Punta Grosa on with the windmill is the line it lies on; Smyth 1854, p. 333: the rock in Palamos bay on which a Spanish line-of-battle ship was lost in 1796; the 11 pies of Burgos as the depth'
+    says: 'The rock in Palamos bay, half a mile south-west of the windmill with eleven feet on it and twelve fathoms all round: a Spanish ship of the line was lost on it with nearly all her people.'
+
+  - id: hormigas
+    kind: rock
+    name: the Hormigas
+    modern: 'les Formigues'
+    lat_deg: 41.8640
+    lon_deg: 3.1930
+    height_m: 3
+    extent_m: 300
+    fix: 'FROM MEMORY, les Formigues; the grid has 48 m of water there and no land within a kilometre: rocks the grid lacks, a rock of their height and extent (ChartBlocks.md)'
+    source: 'Tofino 1787, p. 133: E of the Punta de Castell nearly 1 mile some islets called the Hormigas, so flat that the sea commonly covers them, but between them and the coast a passage for any ship of the line in need, keeping well in to the coast; Michelot 1709, OCR l. 3875: some rocks above water called the Fornigues, five or six brasses in the passage; Purdy 1826, p. 30: a cluster of islets nearly midway between Punta Grosa and Cape San Sebastian; height JUDGEMENT'
+    says: 'The Hormigas, a cluster of low rocks that the sea washes over, a mile off the Point of Castell; a ship may pass inside them in need, keeping close to the coast.'
+
+  - id: cape-san-sebastian
+    kind: headland
+    name: Cape San Sebastian
+    modern: 'Cap de Sant Sebastia, with its chapel'
+    lat_deg: 41.8950
+    lon_deg: 3.2030
+    height_m: 160
+    source: 'Tofino 1787, p. 133: Cape San Sebastian, a little more than 2 miles from the Punta de Castell, latitude 41 53 30, longitude 9 25 30 from Cadiz; Purdy 1826, p. 30: the cape and chapel of S. Sebastian; Smyth 1854, table: Cape S. Sebastian 41 53 10, 3 12 14; height JUDGEMENT'
+    says: 'Cape San Sebastian, a high cape with its chapel north-east of Palamos.'

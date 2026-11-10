@@ -108,6 +108,7 @@ book_limits:
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
   - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
   - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
+  - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1349,6 +1350,47 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: no constant current and no tide stated for the open Tyrrhenian (Smyth 1854, p. 178; Admiralty 1916, p. 14)"
+  # package 101, the Catalan coast's block (the region `catalan-coast`): as the Gulf's, the
+  # streams nought and the coast's set as `current:` alone: the set along the main to the
+  # south-west, in a band about ten miles wide from Tossa to the Alfaques, and the block's
+  # open water after it with none. The set onto the Ebro's mouths with sea winds (Tofino
+  # 1787, p. 119; Michelot 1715, OCR l. 2278) follows the wind and is no constant current:
+  # said in the band's statement, not modelled. The polygons lie in the Mediterranean, far
+  # from every recorded passage's water.
+  - id: catalan-coast-set
+    chart: catalan-coast
+    name: the coast of Catalonia, Tossa to the Alfaques
+    polygon: [[41.75, 2.98], [41.62, 2.72], [41.47, 2.38], [41.32, 2.06], [41.17, 1.62], [41.07, 1.20], [40.92, 0.95], [40.72, 0.95], [40.56, 0.80], [40.56, 1.05], [40.80, 1.22], [41.00, 1.47], [41.12, 1.92], [41.22, 2.22], [41.37, 2.52], [41.52, 2.86], [41.62, 3.00], [41.75, 3.00]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 225, kn: 0.5}
+    source: "Michelot 1715, OCR l. 2415 and 2471: the currents do generally set pretty swiftly to the SW all along this coast, sometimes to the N.W. according as the winds have blown; Purdy 1826, p. 28: the current on the coast generally sets to the south-westward; Smyth 1854, p. 162: so sluggish as to be almost imperceptible, reversed by strong north-westers; no text gives a rate: half a knot JUDGEMENT between Michelot's and Smyth's; no tidal stream (Smyth 1854, p. 176)"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SW, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the pilots' (Michelot 1715; Purdy 1826, p. 28), the rate JUDGEMENT; off the Ebro the current sets onto the mouths with sea winds (Tofino 1787, p. 119): give the low land two leagues"
+  - id: catalan-coast-open
+    chart: catalan-coast
+    name: the sea off Catalonia
+    polygon: [[40.56, 0.30], [41.90, 0.30], [41.90, 3.00], [40.56, 3.00]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "no constant set stated for the open sea off the coast and no tidal stream (Smyth 1854, pp. 162 and 176): the world's water still"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open sea off Catalonia"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

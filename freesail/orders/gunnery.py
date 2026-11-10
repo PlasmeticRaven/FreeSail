@@ -22,6 +22,9 @@
     fire the bow chaser             a shot across her bows and a gun to leeward strike nothing
     fire a shot across her bows     and say so
     fire a gun to leeward
+    fire the starboard lower deck   a deck's broadside guns by name, each once as it is ready:
+    fire the poop carronades        the lower, the upper (or main) and the gun deck, the
+                                    quarterdeck and the forecastle guns, the poop
     cease firing                    the firing's doctrine back to hold; the mark is kept
     strike the colours              never refused: the colours come down, the guns fall silent
                                     and she lies to; the consequence told (what follows is 74's)
@@ -53,6 +56,16 @@ until the hands are at quarters (`beat to quarters`, or `clear for action`), and
 loose the guns` has the crews cast them loose. The boarders are 73's (the vocabulary
 refuses them in words). A gun's number is the pair's (No. 3 is the third pair from
 forward, either side); a place is the bow chaser, the stern chaser or a swivel.
+
+**A deck by its words** (package 75, B7.b: `docs/design/Design-Ship-Bellerophon.md` §6.4 item 5,
+the owner's answer 9): "the lower deck", "the lower-deck guns", "the upper deck", "the main
+deck" (the upper: Cumby's "the main and lower decks", the *Bellerophon* at Trafalgar), "the gun
+deck" (the lowest deck that carries broadside guns: the lower on a two-decker, the upper on a ship
+of one gun deck), "the quarterdeck guns", "the forecastle guns" (those two places named with their
+guns, being places of the ship besides), "the poop" and "the poop carronades", each with a side or
+without, name that deck's broadside guns (its carronades alone where "carronades" is said), in
+`guns_named` and so in the director's and the world orders' slots that read it. Words that name
+no gun of hers are refused as before.
 """
 
 from __future__ import annotations
@@ -78,6 +91,7 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 from freesail.ship.parts import BARREL_LB, Charge, Gun, fit_levels, gun_words, kind_rank, magazine
+from freesail.ship.schema import DECK_WORDS
 
 __all__ = ["GUNNERY_VERBS", "check", "execute", "guns_named"]
 
@@ -172,6 +186,30 @@ _HER = (
     "the target",
 )
 _GUN_NUMBER = re.compile(r"^(?:the\s+)?(?:no|number|num)?\s*(\d+)\s*(?:gun|carronade)?$")
+# A deck by its words, its side already taken out (package 75, B7.b; the module's head): the gun
+# decks with "deck" and their guns or not; the quarterdeck and the forecastle with their guns;
+# the poop with them or not. A trailing "to" is the side's ("the lower deck to starboard").
+_WHAT = r"(?:\s+(?P<what>guns?|carronades?|battery|tier))"
+_DECK_NAMED = re.compile(
+    r"^(?:the\s+)?(?:"
+    r"(?P<gun_deck>lower|upper|main|middle|gun)(?:\s+|-)deck(?:'s)?" + _WHAT + "?"
+    r"|(?P<place>quarterdeck|quarter deck|quarter-deck|forecastle)(?:'s)?"
+    + _WHAT.replace("what", "what_p")
+    + r"|(?P<poop>poop)(?:'s)?"
+    + _WHAT.replace("what", "what_q")
+    + r"?)(?:\s+to)?$"
+)
+_DECK_OF_WORD = {
+    "lower": "lower",
+    "upper": "upper",
+    "main": "upper",
+    "middle": "middle",
+    "quarterdeck": "quarterdeck",
+    "quarter deck": "quarterdeck",
+    "quarter-deck": "quarterdeck",
+    "forecastle": "forecastle",
+    "poop": "roundhouse",
+}
 _WORD_NUMBERS = {
     "one": 1,
     "two": 2,
@@ -571,7 +609,10 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
         return {"side": "both"}
     guns = _guns_named(ship, w)
     if guns:
-        return {"guns": guns}
+        deck = _deck_said(w)
+        if not deck:
+            return {"guns": guns}
+        return {"guns": guns, "deck": deck, "deck_side": _side_said(w)}
     raise OrderError(
         f"Fire what? Say 'fire' for the broadside at the word, 'fire the starboard broadside', "
         f"'fire No. 3 gun', 'fire the bow chaser', 'fire the pivot gun', 'fire a shot across "
@@ -589,6 +630,60 @@ def guns_named(ship: Any, words: str) -> list[str]:
     return _guns_named(ship, w)
 
 
+def _side_said(w: str) -> str | None:
+    """The side the words say ('starboard', 'larboard' for either name), or None."""
+    words = w.lower().replace(".", " ").split()
+    side = next((x for x in words if x in ("starboard", "larboard", "port")), None)
+    return "larboard" if side == "port" else side
+
+
+def _deck_said(w: str) -> str | None:
+    """The words of a deck's guns named ('the starboard lower-deck guns', 'the poop carronades')
+    for the reply, or None where the words name no deck (package 75, B7.b)."""
+    words = w.lower().replace(".", " ").split()
+    side = next((x for x in words if x in ("starboard", "larboard", "port")), None)
+    rest = " ".join(x for x in words if x not in ("starboard", "larboard", "port"))
+    m = _DECK_NAMED.match(rest)
+    if m is None:
+        return None
+    side_words = f"{'larboard' if side == 'port' else side} " if side else ""
+    what = m.group("what") or m.group("what_p") or m.group("what_q") or ""
+    guns = "carronades" if what.startswith("carronade") else "guns"
+    if m.group("gun_deck"):
+        return f"the {side_words}{m.group('gun_deck')}-deck {guns}"
+    if m.group("place"):
+        return f"the {side_words}{_DECK_OF_WORD[m.group('place')]} {guns}"
+    return f"the {side_words}poop {guns}"
+
+
+def _guns_of_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str] | None:
+    """The broadside guns of the deck the words name, its carronades alone where they are said
+    (package 75, B7.b; the module's head), on the side if one was said; None where the words
+    name no deck, and [] where the deck carries no gun of hers."""
+    m = _DECK_NAMED.match(w2)
+    if m is None:
+        return None
+    broadside = [g for g in guns.values() if g.place == "broadside"]
+    if m.group("gun_deck") == "gun":
+        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
+        if not decks:
+            return []
+        deck = min(decks, key=DECK_WORDS.index)
+    elif m.group("gun_deck"):
+        deck = _DECK_OF_WORD[m.group("gun_deck")]
+    elif m.group("place"):
+        deck = _DECK_OF_WORD[m.group("place")]
+    else:
+        deck = "roundhouse"
+    what = m.group("what") or m.group("what_p") or m.group("what_q") or ""
+    only = "carronade" if what.startswith("carronade") else None
+    return [
+        g.id
+        for g in broadside
+        if g.deck == deck and (side is None or g.side == side) and (only is None or g.kind == only)
+    ]
+
+
 def _guns_named(ship: Any, w: str) -> list[str]:
     guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
     words = w.replace(".", " ").split()
@@ -599,6 +694,9 @@ def _guns_named(ship: Any, w: str) -> list[str]:
         if name in words:
             side = s
             w2 = " ".join(x for x in words if x != name)
+    by_deck = _guns_of_a_deck(guns, w2, side)
+    if by_deck is not None:
+        return by_deck
     m = _GUN_NUMBER.match(w2)
     if m:
         n = int(m.group(1))
@@ -626,6 +724,66 @@ def _guns_named(ship: Any, w: str) -> list[str]:
     return []
 
 
+def _fire_a_deck(ship: Any, battery: Battery, what: dict[str, Any], data: dict[str, Any]) -> Result:
+    """A deck's guns fired by name (package 75, B7.b; the module's head), each once as it is
+    ready, the reply naming the deck. A deck is a broadside of it, so the dumb show refuses it as
+    it refuses the broadside at the word (a gun by name still fires); a deck said without a side
+    is the engaged side's, as 'fire' alone is, and is refused with no side engaged; the guns
+    behind ports the sea has shut are left out and said once, and a deck all behind them is
+    refused in the broadside's words (the review's mends, 2026-11-10)."""
+    if battery.exercise:
+        raise OrderError(
+            "The battery is exercising in dumb show: no deck is fired at the word; say "
+            "'cease exercising' first."
+        )
+    guns, words = list(what["guns"]), what["deck"]
+    if what.get("deck_side") is None and len({ship.guns[g].side for g in guns}) > 1:
+        side = battery.engaged
+        if side is None:
+            example = words.replace("the ", "the starboard ", 1)
+            raise OrderError(
+                f"Fire {words} of which side? No side is engaged: say 'fire {example}', or "
+                f"'engage her to starboard' first."
+            )
+        if side != "both":
+            guns = [g for g in guns if ship.guns[g].side == side]
+            words = words.replace("the ", f"the {side} ", 1)
+    shut = [g for g in guns if g in battery._shut]
+    guns = [g for g in guns if g not in battery._shut]
+    if not guns:
+        raise OrderError(f"{_cap(words)}' ports are shut; the sea is at their sills.")
+    for gid in guns:
+        if gid not in battery.single:
+            battery.serve_by_name(gid)
+            battery.single.append(gid)
+    data["guns"] = guns
+    n = len(guns)
+    many = f"{number_words(n)} gun{'s' if n != 1 else ''}"
+    text = f"{_cap(words)} to fire each as soon as it is ready, {many}"
+    if shut:
+        k = len(shut)
+        text += f"; {number_words(k)} {'is' if k == 1 else 'are'} behind ports the sea has shut"
+    return "guns.fire", text + ".", data
+
+
+def _of_the_side_meant(ship: Any, battery: Battery, guns: list[str]) -> list[str]:
+    """A number names the pair (the ships session's find of 2026-11-10: 'fire No. 1 gun'
+    fired the larboard No. 1 too, away from a starboard mark, the named guns firing with no
+    check of what bears): broadside guns named with no side are the guns of the side
+    engaged, else of the side the mark is on; said with a side they are that side's (the
+    words chose already); with no side engaged and no mark, the pair as before."""
+    named = [ship.guns[g] for g in guns]
+    if any(g.place != "broadside" for g in named) or len({g.side for g in named}) < 2:
+        return guns
+    side = battery.engaged if battery.engaged in ("starboard", "larboard") else None
+    relative = battery.target_relative_rad
+    if side is None and battery.engaged is None and battery.target and relative is not None:
+        side = "starboard" if relative >= 0.0 else "larboard"
+    if side is None:
+        return guns
+    return [g.id for g in named if g.side == side]
+
+
 def _fire(ship: Any, battery: Battery, said: str) -> Result:
     what = _fire_words(ship, said)
     data: dict[str, Any] = {"verb": "fire", "level": 1}
@@ -651,14 +809,17 @@ def _fire(ship: Any, battery: Battery, said: str) -> Result:
             )
         data.update({"gun": gun.id, "across_bows": bool(what.get("across"))})
         return "guns.fire", text, data
+    if what.get("deck"):
+        return _fire_a_deck(ship, battery, what, data)
     if what.get("guns"):
         names = []
-        for gid in what["guns"]:
+        guns = _of_the_side_meant(ship, battery, list(what["guns"]))
+        for gid in guns:
             if gid not in battery.single:
                 battery.serve_by_name(gid)
                 battery.single.append(gid)
             names.append(ship.guns[gid].name)
-        data["guns"] = list(what["guns"])
+        data["guns"] = guns
         return "guns.fire", f"{_cap(_and(names))} to fire as soon as ready.", data
     if battery.exercise:
         # practice and resupply: the dumb show fires no gun at the word; a gun by name and

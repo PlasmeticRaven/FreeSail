@@ -2800,3 +2800,196 @@ boxes:
           northerly_pct: 40
           gust31_days: 10
           gust54_days: 1.0
+  # package 101: the Catalan coast, the region `catalan-coast`'s bounds (no box held it:
+  # `mediterranean-west` ends at 40.5 N and `gulf-of-lion` begins at 3.0 E, so `box_at` gave
+  # the nearest, one or the other by the mile). Its check rows are Barcelona's printed table
+  # (the Admiralty's Mediterranean Pilot, vol. I, 1913, appendix III, p. 726, the page image
+  # under docs/references/pilots/pages/, package 101's cut; eleven years' winds, the
+  # "Observaciones Meteorologicas de Provincias"), every month's columns checked against the
+  # printed totals: the days of wind from each of the eight points, each half-point's days
+  # split between its two quarters, scaled to nine tenths for the days the model leaves with
+  # no prevailing quarter (79c's rule). Barcelona's table differs from the Gulf's box
+  # (Marseille's) by 16 to 37 points of a quarter in every month (the westerlies of the
+  # winter, the summer's southerlies and easterlies, the coast's sea breeze, where Marseille
+  # has the mistral), beyond the fit's noise (five points): so a box of the block's own and
+  # not the Gulf's widened, the comparison in docs/dev/TuningNotes.md. The generator's
+  # figures JUDGEMENT, fitted by simulated months (the check tool's run with this box the
+  # default, a scratch search outside the repository, from the Mediterranean west's rows),
+  # every month within five points of the table's westerly and easterly shares; the gale
+  # days the table's halved for the strong-gale days and trebled for the strong-breeze days
+  # (79c's rule), which the fit does not reach in winter (a finding). One year's picture:
+  # the observations of about 1880 to 1912, not the period's.
+  catalan-coast:
+    title: "the coast of Catalonia, the Alfaques to Tossa, with the summer's southerly and the winter's westerly"
+    bounds: {south: 40.56, north: 41.9, west: 0.3, east: 3.0}
+    provisional: true
+    source: "Barcelona's table (the Admiralty's Mediterranean Pilot vol. I, 1913, Appendix III, p. 726) for the quarters, the gales and the glass; the generator's figures judgement fitted to them by simulated months; package 101"
+    months:
+      1:
+        name: January
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 2, NE 4, E 3, SE 1, S 2, SW 5, W 10, NW 4, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.8 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 4.0; the glass Barcelona's mean of 30.07 inches"
+        background_hpa: 1018
+        gradient: {"hpa_per_100km": 0.129, "high_toward_deg": 220}
+        lows_per_month: 6
+        track_bearing_deg: {"mean": 99, "spread": 30}
+        closest_approach_km: {"mean": -531, "spread": 794}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1008, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 162, "spread": 118}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 42, "easterly_pct": 16, "southerly_pct": 15, "northerly_pct": 17, "gust31_days": 2.4, "gust54_days": 0.4}
+      2:
+        name: February
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 1, NE 3, E 2, SE 2, S 4, SW 7, W 6, NW 3, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.7 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 2.2; the glass Barcelona's mean of 30.05 inches"
+        background_hpa: 1018
+        gradient: {"hpa_per_100km": 0.123, "high_toward_deg": 196}
+        lows_per_month: 7
+        track_bearing_deg: {"mean": 115, "spread": 30}
+        closest_approach_km: {"mean": 256, "spread": 757}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1004, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 52, "spread": 106}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 35, "easterly_pct": 14, "southerly_pct": 27, "northerly_pct": 13, "gust31_days": 2.1, "gust54_days": 0.35}
+      3:
+        name: March
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 1, NE 3, E 5, SE 4, S 6, SW 8, W 3, NW 1, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.8 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 1.4; the glass Barcelona's mean of 29.96 inches"
+        background_hpa: 1015
+        gradient: {"hpa_per_100km": 0.054, "high_toward_deg": 157}
+        lows_per_month: 9
+        track_bearing_deg: {"mean": 16, "spread": 30}
+        closest_approach_km: {"mean": 133, "spread": 346}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 991, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.96, "bearing_deg": {"mean": 131, "spread": 69}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 22, "easterly_pct": 25, "southerly_pct": 35, "northerly_pct": 9, "gust31_days": 2.4, "gust54_days": 0.4}
+      4:
+        name: April
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 1, NE 2, E 5, SE 5, S 5, SW 7, W 4, NW 1, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.8 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.7; the glass Barcelona's mean of 29.92 inches"
+        background_hpa: 1013
+        gradient: {"hpa_per_100km": 0.071, "high_toward_deg": 23}
+        lows_per_month: 8
+        track_bearing_deg: {"mean": 77, "spread": 30}
+        closest_approach_km: {"mean": 451, "spread": 313}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 997, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 36, "spread": 114}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 24, "easterly_pct": 26, "southerly_pct": 33, "northerly_pct": 8, "gust31_days": 2.4, "gust54_days": 0.4}
+      5:
+        name: May
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 0, NE 2, E 7, SE 5, S 6, SW 8, W 2, NW 1, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.3 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.3; the glass Barcelona's mean of 29.97 inches"
+        background_hpa: 1015
+        gradient: {"hpa_per_100km": 0.1, "high_toward_deg": 100}
+        lows_per_month: 9
+        track_bearing_deg: {"mean": 91, "spread": 30}
+        closest_approach_km: {"mean": -75, "spread": 703}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 995, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 31, "spread": 123}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 19, "easterly_pct": 30, "southerly_pct": 36, "northerly_pct": 4, "gust31_days": 0.9, "gust54_days": 0.15}
+      6:
+        name: June
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 0, NE 1, E 6, SE 7, S 9, SW 6, W 1, NW 0, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.1 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.2; the glass Barcelona's mean of 30.01 inches"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.162, "high_toward_deg": 78}
+        lows_per_month: 5
+        track_bearing_deg: {"mean": 70, "spread": 30}
+        closest_approach_km: {"mean": 753, "spread": 454}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1003, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 357, "spread": 116}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 12, "easterly_pct": 30, "southerly_pct": 46, "northerly_pct": 2, "gust31_days": 0.3, "gust54_days": 0.05}
+      7:
+        name: July
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 0, NE 1, E 6, SE 7, S 10, SW 6, W 1, NW 0, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.2 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.1; the glass Barcelona's mean of 30.02 inches"
+        background_hpa: 1017
+        gradient: {"hpa_per_100km": 0.109, "high_toward_deg": 66}
+        lows_per_month: 2
+        track_bearing_deg: {"mean": 70, "spread": 30}
+        closest_approach_km: {"mean": 6, "spread": 403}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 991, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.92, "bearing_deg": {"mean": 48, "spread": 101}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 12, "easterly_pct": 29, "southerly_pct": 48, "northerly_pct": 1, "gust31_days": 0.6, "gust54_days": 0.1}
+      8:
+        name: August
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 0, NE 1, E 5, SE 8, S 10, SW 6, W 1, NW 0, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.2 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.3; the glass Barcelona's mean of 30.01 inches"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.256, "high_toward_deg": 62}
+        lows_per_month: 2
+        track_bearing_deg: {"mean": 114, "spread": 30}
+        closest_approach_km: {"mean": -169, "spread": 681}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 994, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 232, "spread": 84}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 12, "easterly_pct": 28, "southerly_pct": 49, "northerly_pct": 1, "gust31_days": 0.6, "gust54_days": 0.1}
+      9:
+        name: September
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 1, NE 4, E 6, SE 6, S 6, SW 6, W 1, NW 0, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.1 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.6; the glass Barcelona's mean of 30.04 inches"
+        background_hpa: 1017
+        gradient: {"hpa_per_100km": 0.119, "high_toward_deg": 17}
+        lows_per_month: 8
+        track_bearing_deg: {"mean": 194, "spread": 30}
+        closest_approach_km: {"mean": -404, "spread": 84}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1006, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 37, "spread": 116}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 12, "easterly_pct": 33, "southerly_pct": 36, "northerly_pct": 9, "gust31_days": 0.3, "gust54_days": 0.05}
+      10:
+        name: October
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 1, NE 4, E 5, SE 4, S 4, SW 7, W 5, NW 1, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.5 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 0.7; the glass Barcelona's mean of 29.98 inches"
+        background_hpa: 1015
+        gradient: {"hpa_per_100km": 0.098, "high_toward_deg": 74}
+        lows_per_month: 5
+        track_bearing_deg: {"mean": 115, "spread": 30}
+        closest_approach_km: {"mean": 871, "spread": 474}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 994, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 330, "spread": 115}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 26, "easterly_pct": 26, "southerly_pct": 28, "northerly_pct": 10, "gust31_days": 1.5, "gust54_days": 0.25}
+      11:
+        name: November
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 2, NE 3, E 3, SE 2, S 3, SW 4, W 8, NW 5, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.4 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 2.3; the glass Barcelona's mean of 30.00 inches"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.198, "high_toward_deg": 201}
+        lows_per_month: 9
+        track_bearing_deg: {"mean": 47, "spread": 30}
+        closest_approach_km: {"mean": 281, "spread": 358}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1004, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.9, "bearing_deg": {"mean": 351, "spread": 61}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 38, "easterly_pct": 16, "southerly_pct": 18, "northerly_pct": 18, "gust31_days": 1.2, "gust54_days": 0.2}
+      12:
+        name: December
+        note: "judgement: the generator's figures fitted by simulated months (a scratch search, then 400 months at seed 11, within five points of the check row's westerly and easterly shares) to the check row, which is Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 726, about 1880 to 1912): N 4, NE 4, E 1, SE 0, S 1, SW 4, W 9, NW 8, the calm column blank, a half-point's days split between its quarters and the shares scaled to nine tenths; the gales 0.4 days a month (the strong-gale days half, the strong-breeze days three times, JUDGEMENT), the fogs 3.1; the glass Barcelona's mean of 30.04 inches"
+        background_hpa: 1017
+        gradient: {"hpa_per_100km": 0.058, "high_toward_deg": 220}
+        lows_per_month: 4
+        track_bearing_deg: {"mean": 140, "spread": 30}
+        closest_approach_km: {"mean": 605, "spread": 295}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1002, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.98, "bearing_deg": {"mean": 239, "spread": 87}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 44, "easterly_pct": 9, "southerly_pct": 9, "northerly_pct": 29, "gust31_days": 1.2, "gust54_days": 0.2}

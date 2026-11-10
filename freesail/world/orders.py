@@ -4004,7 +4004,7 @@ def _exchanged(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
         Severity.NOTABLE,
         "prize.exchanged",
         f"{text}.",
-        data={"person": person.name, "port": port.id},
+        data={"person": person.name, "port": port.id, "place": "shore"},
     )
     return text, {"person": person.name, "port": port.id}
 
