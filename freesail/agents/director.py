@@ -740,7 +740,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "aboard.removed",
         "aboard",
         "aboard: remove <a thing>",
-        ("aboard: remove the cask of brandy", "aboard: the packet removed"),
+        ("aboard: remove the sealed packet", "aboard: the packet removed"),
         "a thing taken out of the world, as if it had never been; never out of a held "
         "person's keeping, and doubted where it lies before a held person's eyes",
     ),
