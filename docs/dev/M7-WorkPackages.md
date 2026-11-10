@@ -3480,7 +3480,7 @@ with the machine's nine as before and two pace floors under load that pass alone
 whole logs the trunk's; seventeen ship files the generator's bytes; ruff clean. **The lead's
 merge:** the trial on 3b76d06a clean and lint-clean; no model or vendor name in the diff;
 `data/ships/` touched by the generator alone (her `clr_x_m` and its note); the fast tier whole on
-it exit 0, 7,040 passed by the dots and 1 xfailed, 01:24 to 02:22 UTC (run twice: the first run was killed at 99 percent by a restart of the lead's container, no failure to that point, and is not counted); the whole suite in the cloud dispatched after run 57, the figures to follow.
+it exit 0, 7,040 passed by the dots and 1 xfailed, 01:24 to 02:22 UTC (run twice: the first run was killed at 99 percent by a restart of the lead's container, no failure to that point, and is not counted); the whole suite in the cloud, run 58 (2026-11-10, 02:24 to 03:39 UTC, on 2c9485fd): lint green; the six shards green, 7,470 passed, 11 skipped, 12 xfailed (one xfail fewer than run 57, her helm test passing), the longest shard 68 minutes; the pace job 13 of 13 in 5 minutes 16.
 
 ### Package 98, steps 1, 2 and 6 (the browser probe; the player hears his own answer; the colours and signals by the deck's rule), as merged (2026-11-10)
 
