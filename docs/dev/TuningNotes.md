@@ -23623,6 +23623,89 @@ slow tests left out); the pace tests alone and last **exit 0** (14:04:58 to 14:1
 passed, no floor lowered). Nothing skipped in any tier. The trunk gained one line of the
 lead's records while these ran (229d024, the work packages' page alone) and was not chased.
 
+### Step 6: the court martial, a new command, and the consent revision drafted (the design's §6, §7)
+
+**Built as designed** (`freesail/world/court.py`; the channels `court` and `command` in
+`world/orders.py` with `person: "<name>" is exchanged at <port>`; the verb `say to the court`
+through the prize orders; `Person.record` as a list the court writes and the paper "the captain's
+record" reads; the reading `the record`; the scenario's `ship.name` and `people[].record` honoured
+by the loader; the flag `seats.ADVERSARIAL_SEATS_CONSENTED` and `prizes.adversarial_seat_why` at
+the director's seat and the desk's door; `docs/design/ConsentRevision-AdversarialSeats.md`): the
+court as the director's proceeding at a place of the port (made for the sitting, gone at the
+verdict), the accused brought before it, the president's and the judge advocate's persons found
+there, the questions by `say as` heard at the place, the accused's own words, the log of the
+action read (the hull's lines of the action, else her story's), the verdict one of the five the
+period's courts gave for the loss of a ship, journaled as every form is and read as the court's;
+the new command written by 96's writer under the saves (`saves/new-command-<ship>-<date>.yaml`),
+his followers the persons ashore at the same port whose record has the same loss (the officers'
+records carry the loss with the captain's, hooked at the possession). Truths 7-364 to 7-366.
+
+**The scene** (seed 7, the frigate struck to a French frigate in Brest's road, carried in and
+landed to the commissaire): exchanged at Falmouth by the form (doubted: "landed 0 hours ago: an
+exchange takes its time"; performed with a reason), the court sat on him at Falmouth (doubted at
+Brest: "a port of his own nation, and Captain Bowen is British"), the president's question in his
+mouth, the accused's answer his own, the judge advocate's reading of the action's lines, the
+verdict acquitted with honour; his first lieutenant exchanged after him follows him into the
+cutter Alert at Falmouth; the scenario loads, the record reads aboard her and her paper carries
+it. The whole takes some two minutes of wall on this container (the far frigate's possession and
+the port's landing the most of it).
+
+**Taken another way.** (1) The accused's words are a verb of the prize orders (`say to the court`,
+object `prize`), not a `say to <station>` of the people's grammar: the court is no station and the
+words want no answer owed. (2) The court's officers are made as persons ashore at the court's place
+for the sitting and removed at the verdict (the port keeps no court martial between sittings;
+witnesses are the director's `say as`). (3) The verdict's limits row of the brief is not built: the
+director decides every cause by the brief as it stands. (4) The `person: ... is exchanged` form
+takes a landed prisoner or one held aboard; one who is neither is refused, and the exchange's doubt
+is the day since his landing. (5) A scenario may name the player's ship (`ship.name`): the files
+named her alone before; the tender's file names hers as her file does, so nothing recorded moves.
+(6) The paper "the captain's record" is a **carried paper** (`data/papers/papers.yaml`'s
+`carried:` list, `Papers._carried`): aboard only where the ship's scenario carries a record
+(`papers.record`, a new command's), last among her papers and no part of her catalogue. As first
+built on the scratch it was a thirteenth paper of every ship's catalogue, which moved the pinned
+lists and counts of the papers in four test files (`test_places`, `test_agents`, `test_server`,
+`test_ordnance`: 12 papers, the gunner's account last) and would have mustered the people of any
+world whose papers were listed; found by the step's pre-check on the package branch and taken
+this way before the step's commit, so that **no pin moves**: every other ship's papers are as
+they were. The reading `the record` serves him everywhere.
+
+**Found on the way.** After the exchange the player's own ship's "captain" is her prize master
+(rehomed into her company at the possession), so the followed prompt and `where am I` fell to the
+captor's captain; the taking now writes the root's memory of the player's person
+(`captive.PLAYERS_PERSON_KEY`), which outlives the captive's record, and `knowledge.players_person`
+and `movement.person_of_actor` read it while he is ashore. The loss entered at the possession had to
+read the person's nation from the record (`nation_was`): his ship a prize flies her captor's
+colours, and the court at Brest would have been his own nation's. The director's dry run performs
+on a copy of the world: a form that writes a file would have written it (the dry run of the new
+command wrote a scenario under `saves/` before the copy was marked `dry_run` and the form made to
+say what it would write).
+
+**Three faults of the step as first built, found by its pre-check on the package branch and
+mended before its commit.** (a) The court's kinds had no place in the reach table
+(`knowledge.REACH`, the lead's guard in `test_knowledge.py`): a line nobody placed falls to the
+deck, so a model at the accused's person ashore would not have had the court's lines in his
+events, and a deck would. The family `court` is now `said`, each line's data naming the shore
+and the port, so that the persons ashore at the court's port have them and no ship's deck
+does, at that port or another; `command.new` is the record's (it names a file for the driver).
+(b) The accused's words were in the log twice: once written by the court and once as the
+order's own line. The court writes none now; the order's line is the one, with the port and
+the shore in its data. (c) His words were lower-cased by the grammar ("i engaged a superior
+force"): they are read again from the line as typed, after its colon (`orders.prize.as_said`),
+and stand in the log as he said them. Each has its assertion in `test_court.py`.
+
+**A citation corrected** (package 60's design note, §1.5 item 8, checked on the page on file):
+the three fourths paid and the fourth reserved on a prize purchased for the service is art. XXXI
+of the Regulations' articles "For Flag Officers" (the Commander in Chief "when he orders a prize
+Ship to be purchased", p. 28 of the 1808 printing), not the Captain's, as this package's note and
+the comment in `data/business.yaml` had it. The figure and the rule built on it are as they were;
+the three places now name the article rightly.
+
+**The suite's seats audited** (the design's §6): no test seats a model at the captain's station
+of a hull at war with the player's; the far hail's two hulls, the convoy's and the squadron's
+seats and the director tests' Harpy (French, at a station other than the captain's or with no war
+read at the seating) are not adversarial by the rule; the refusal is exercised by `test_court.py`
+alone, and the flag is turned and turned back there.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

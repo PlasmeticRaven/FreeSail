@@ -14928,6 +14928,60 @@ def test_truth_7_363_a_neutral_wrongly_taken_is_restored_with_costs_and_the_dire
 # -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
 
 
+def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place():
+    """The design's §7.1 (the brief's §20 court): the captive landed at Brest and exchanged at
+    Falmouth by the director's form (doubted within a day of his landing), the court sat at the
+    port's place by the form (refused for a man who lost no ship, doubted at a port not his
+    nation's), its questions through `say as the president of the court` heard at the place and
+    answered by the accused's own `say to the court: ...`, the log of the action read by the
+    judge advocate, the verdict a world order journaled in the inputs and the director's log,
+    the play log carrying the sentence read and never the order, his record keeping the loss,
+    the court and the verdict; and (7-365) a new command started from the verdict."""
+    from tests.test_court import (
+        test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_gives_its_verdict,
+    )
+
+    test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_gives_its_verdict(
+        _tmp_dir()
+    )
+
+
+@pytest.mark.slow
+def test_truth_7_365_a_new_command_is_a_scenarios_start_written_under_the_saves_with_the_record():
+    """The design's §7.2: the scenario file written under the saves with his name as her captain,
+    his follower (his first lieutenant exchanged at the same port, the same loss in his record)
+    and the record as a paper, loaded by the loader and begun, the record read aboard the new
+    ship and the paper "the captain's record" carrying it; refused for a man dismissed the
+    service, doubted for one dismissed his ship within the year (one scene with 7-364)."""
+    test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place()
+
+
+def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
+    tmp_path, monkeypatch
+):
+    """The design's §6: a `seat:` at the captain of a hull at war with the player's is refused
+    with the consent brief's reason before any consent record is read; her lookout's station is
+    admitted; the flag `seats.ADVERSARIAL_SEATS_CONSENTED` turned, the seat is admitted (turned
+    back after); a neutral is no adversary; the captor holding the player's person is refused
+    for the prisoner's reason."""
+    from tests.test_court import (
+        test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_when_turned,
+        test_the_captor_holding_the_players_person_is_refused_for_both_reasons,
+    )
+
+    test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_when_turned(
+        tmp_path, monkeypatch
+    )
+    test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
+
+
+def _tmp_dir():
+    import tempfile
+    from pathlib import Path
+
+    return Path(tempfile.mkdtemp(prefix="freesail-7-364-"))
+
+
 def test_truth_7_446_the_players_own_lines_reach_him_wherever_he_stands():
     """Package 98, step 2 (the owner's ruling of 2026-11-09): what is not in the world is
     always shown the man who made it, wherever he stands: in the cabin his readings, his

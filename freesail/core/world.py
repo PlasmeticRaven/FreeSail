@@ -110,6 +110,9 @@ class Scenario:
     ship_y: float = 0.0
     ship_heading_deg: float = 0.0
     ship_speed_kn: float = 0.0
+    # her name where the scenario gives one other than her file's (package 74, step 6: a
+    # new command's scenario names the ship the service gave him); None keeps the file's
+    ship_name: str | None = None
     # The sun's latitude (spec M4 §5): 50 N, the Channel. Saved and restored with the rest;
     # a save from before the sun loads with the default.
     latitude_deg: float = DEFAULT_LATITUDE_DEG

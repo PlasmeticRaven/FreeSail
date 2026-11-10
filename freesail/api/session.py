@@ -50,6 +50,8 @@ def make_ship(path: str | Path, scenario: Scenario | None = None) -> Ship:
     fit = getattr(scenario, "fit", None) if scenario is not None else None
     ship = attach_systems(load_ship(path, fit=fit))
     if scenario is not None:
+        if getattr(scenario, "ship_name", None):
+            ship.name = str(scenario.ship_name)  # the scenario's name for her (package 74)
         ship.dyn.x = scenario.ship_x
         ship.dyn.y = scenario.ship_y
         ship.dyn.heading = units.wrap_2pi(units.deg_to_rad(scenario.ship_heading_deg))

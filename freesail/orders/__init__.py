@@ -157,6 +157,12 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
     if order.verb in vocab.readings:
         # a reading asked at the prompt (package 33c): a query, in the registry's words
         return prompt.answer(ship, order, text, vocab)
+    if order.verb == "say to the court":
+        # the accused's words before the court martial as he said them (package 74, step
+        # 6): the grammar's are lower-cased, and they are his own in the log
+        from freesail.orders.prize import as_said
+
+        order.object = as_said(text, order.object or "") or None
     spec = vocab.verbs.get(order.verb)
     if spec is not None:
         # where the giver is (spec M7b §14; package 53, truth 100): the deck's orders from

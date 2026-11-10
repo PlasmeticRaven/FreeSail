@@ -68,6 +68,12 @@ __all__ = [
 # The seat's key for the player's own ship's stations and for a person's voice.
 OWN = "own"
 VOICE = "voice"
+# Package 74 (item 6; the design's §6): the consent brief names no role in which a model
+# fires into a human's ship or takes him prisoner, so a seat at the captain's station of a
+# hull adversarial to a human is refused in words until the brief is revised and the
+# question put again (`docs/design/ConsentRevision-AdversarialSeats.md` drafts the text;
+# package 55 carries the revision). One flag, which the revision's package turns.
+ADVERSARIAL_SEATS_CONSENTED = False
 # The kind of station a person's voice is (the passenger's: no order of any ship's).
 VOICE_KIND = "passenger"
 # The actor of a voice's binding lines: the director's, so that they are for the record
@@ -357,6 +363,12 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if made >= in_voyage:
         raise _error(f"The director's seats in this voyage are spent ({in_voyage}).")
     target = _target(world, m.group("who"))
+    if target.get("vessel") is not None:
+        from freesail.world.prizes import adversarial_seat_why
+
+        why = adversarial_seat_why(world, target["vessel"], target["station"])
+        if why:
+            raise _error(why)
     key = seat_key(target)
     on_hers = bool(target.get("own")) or (target.get("person") and target.get("aboard"))
     if on_hers and grant.get("seats_on_the_players_ship", True) is False:

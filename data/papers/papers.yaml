@@ -91,3 +91,16 @@ papers:
     place: gunroom
     source: magazine
     words: the powder below, the filled cartridges and the shot, with the receipts and the practice beyond the allowance
+# Papers a ship has only where her scenario carries them (package 74, step 6; spec M7 §20;
+# docs/design/Design-Prizes.md §7): each is aboard when the scenario's `papers:` has its
+# `carried_as` key, and is no part of the catalogue above, so every other ship's papers are
+# as they were. The captain's record is the thing a career remembers (the loss of a ship,
+# the court martial and its verdict, the appointment), written into a new command's scenario
+# as `papers.record` and read in her cabin.
+carried:
+  - handle: the captain's record
+    carried_as: record
+    keeper: captain
+    place: cabin
+    source: record
+    words: the captain's record, the losses, the courts martial and their verdicts, the appointments, as the service keeps it

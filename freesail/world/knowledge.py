@@ -344,6 +344,7 @@ REACH: dict[str, str] = {
     "needs.answer": "person",
     "needs.felt": "person",
     "log.rollup": "record",
+    "command.new": "record",  # package 74 (step 6): the new command's file, the driver's to read
     "log.read": "record",
     # the report, the call and the boat's report (step 3 writes them; placed first)
     "report.made": "person",
@@ -361,6 +362,10 @@ FAMILIES: dict[str, str] = {
     "action": "wakes",
     "small_arms": "wakes",
     "prize": "wakes",  # package 74: she is taken, the prisoners rising, the prize retaken
+    # package 74 (step 6): the court martial's lines are words said before the court, heard
+    # by the persons ashore at its port (each line's data names the shore and the port) and
+    # on no ship's deck
+    "court": "said",
     "marines": "aboard",
     "evolution": "aft",
     "sail": "aft",
@@ -827,6 +832,13 @@ def players_person(world: Any) -> Any:
         # the player's person a captive (package 74, the design's §3.1): his ship's captain
         # answers for the prize master from the taking, so the one world keeps who he is
         return captive
+    from freesail.world.captive import remembered_person
+
+    remembered = remembered_person(root)
+    if remembered is not None:
+        # freed (exchanged, landed by a cartel), he is the player's person still while his
+        # own ship has a prize master for her captain (package 74, step 6)
+        return remembered
     seat = _seat(world)
     if seat is not None:
         return _seat_person(root, seat)

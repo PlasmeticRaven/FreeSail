@@ -155,6 +155,7 @@ Every event the book's `at` takes, by family; each is also a word a station may 
 | `at a captive aboard`, `at the parole asked`, `at the parole given`, `at the prisoners landed`, `at the cartel` | The captive (chapter 27) |
 | `at the sound of guns` | An action off the horizon (chapter 27) |
 | `at the court sits`, `at the sentence`, `at the prize money` | The prize court (chapter 27) |
+| `at the exchange`, `at the court martial sits`, `at the verdict`, `at a new command` | The court martial and a new command (chapter 27) |
 
 `at the lee ports shut` and `at the lee ports opened` go by the log's line for a deck and side, the lee's alone: in a seaway the weather's ports can shut as well, by the roll less the heel, and their line answers neither word (`the guns` says `ports shut` by side). They are heard only with a gun of that deck's side cast loose; with the guns secured neither comes, and `the guns` says `ports shut` at any time.
 

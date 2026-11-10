@@ -146,7 +146,7 @@ prize_money:
   head_money_pounds: 5.0     # a head of the men aboard a ship of war or a privateer at the start of the engagement; the Prize Acts' figure FROM MEMORY, unverified
   costs_share: 0.1           # costs and damages against the captor for a neutral wrongly taken: a tenth of her valuation; FROM MEMORY of the Admiralty court's awards, unverified
   salvage_share: 0.125       # an eighth to the recaptors of a ship of their own nation retaken; FROM MEMORY, unverified
-  purchase_for_the_service: true   # a King's ship's prize of war taken up by the yard: three fourths now, a fourth with a later sentence (the Regulations, the Captain, art. XXXI, on file)
+  purchase_for_the_service: true   # a King's ship's prize of war taken up by the yard: three fourths now, a fourth with a later sentence (the Regulations, For Flag Officers, art. XXXI, the Commander in Chief's order, p. 28, on file)
   reserved_share: 0.25
   # the sharing among all the ships in sight at the moment the enemy surrendered, a ship that
   # took no part included (Lavery, Nelson's Navy, p. 116: the sharing; the division among them
