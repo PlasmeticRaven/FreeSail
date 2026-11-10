@@ -15566,3 +15566,37 @@ def test_truth_7_499_the_frigate_sails_from_port_mahon_to_tarragonas_road_by_her
     _, off = bearing_and_distance(w.position, Position(41.0950, 1.2500))
     assert off < 0.6 * units.NAUTICAL_MILE
     assert any("soft brown mud" in e.text for e in w.log if e.kind == "sounding")
+
+
+def test_truth_7_477_a_letter_come_aboard_is_a_thing_handed_to_the_captain_and_read_by_him():
+    """Package 100, step 2: a letter by a carrier is a thing, sealed, in the messenger's hand
+    and then the captain's, opened and read at the door; its reading shown him alone."""
+    from tests.test_letters import (
+        test_a_letter_come_aboard_is_a_thing_handed_to_the_captain_and_its_words_his_alone as c,
+    )
+
+    c()
+
+
+def test_truth_7_478_a_letter_for_another_is_handed_him_sealed_and_the_captain_reads_it_not():
+    """Package 100, step 2: the captain no longer reads every letter aloud whoever it is
+    for: a letter for one of the people goes to him sealed, one for nobody aboard is kept."""
+    from tests.test_letters import (
+        test_a_letter_for_another_is_handed_to_him_sealed_and_the_captain_reads_no_letter_not_his as c,  # noqa: E501
+    )
+
+    c()
+
+
+def test_truth_7_479_a_letter_travels_as_the_thing_and_an_old_message_loads_as_one(tmp_path):
+    """Package 100, step 2: the letter sent ashore with the boat goes as the thing and is
+    landed at the quay; an old `Message` of a checkpoint is made a thing at the load."""
+    from tests.test_letters import (
+        test_a_letter_sent_ashore_with_the_boat_goes_as_the_thing_and_is_landed_on_the_quay as a,
+    )
+    from tests.test_letters import (
+        test_an_old_message_in_the_messengers_hand_is_made_a_thing_at_the_load as b,
+    )
+
+    a()
+    b(tmp_path)
