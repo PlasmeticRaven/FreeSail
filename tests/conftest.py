@@ -549,6 +549,21 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # alone), her file alone in one process, 2026-11-08
         "test_bilander.py::test_her_first_hour_at_seed_7_under_her_rules_captain_with_no_fit_named",
         "test_bilander.py::test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned",
+        # package 75, B7: the 74's sailed tests over the threshold, her file alone at four
+        # workers, 2026-11-10: her stays, wear and heave-to (28.8 s), her round trip (24.0 s), her
+        # helm in truths 6 and 17's forms (23.2 s), the Vanguard's and the Bellona's speeds (12.6
+        # s), a frigate and a cruiser meeting her (9.6 s and 5.9 s), her handling (7.6 s), and her
+        # posts drawn at muster (5.2 s); her truth 7-196 is the pace run's by its name and mark
+        "test_bellerophon.py::test_she_stays_quickly_wears_and_lies_to",
+        "test_bellerophon.py::test_she_sails_under_her_rules_captain_with_no_fit_named_and_round_trips",
+        "test_bellerophon.py::test_her_helm_as_tuned_holds_truths_6_and_17",
+        "test_bellerophon.py::test_she_sails_as_the_vanguard_and_the_bellona_were_reported",
+        "test_bellerophon.py::test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today"
+        "[kings-ship]",
+        "test_bellerophon.py::test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today"
+        "[cruiser]",
+        "test_bellerophon.py::test_she_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails",
+        "test_bellerophon.py::test_her_posts_draw_at_muster_the_second_master_and_the_chaplain_as_the_others",
     }
 )
 

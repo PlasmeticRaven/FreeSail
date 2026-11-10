@@ -1,0 +1,451 @@
+# FreeSail: the wardroom of the seventy-four (spec M6 §2; package 40; package 75, HMS Bellerophon,
+# the Arrogant-class 74 of 1786, docs/design/Design-Ship-Bellerophon.md §6.5, §6.6 and §6.8). The
+# ship's company as people: every station holder of data/ships/seventy-four.yaml, with their rank,
+# their station aboard, their place when nothing calls them elsewhere, and a character outline (a
+# few traits, a line of history and a station brief), as data, in the form of
+# data/people/sixty-four.yaml. Read by freesail/world/people.py, which gives each person their
+# outline and binds the harness's stations to a person by role, and by tools/ships/bellerophon.py,
+# which draws the posts, the people below and the flag party into the ship file's `crew.posts`,
+# `crew.people` and `crew.flag`.
+#
+# The posts are the 590 column of the Regulations' table of officers and ratings (the Regulations
+# 1806, 1808 printing, p. 165: its first row, the captain, five lieutenants, the master, the second
+# master, the surgeon, the carpenter, the boatswain, the gunner, the purser and the chaplain; Bel
+# §4.3), with the sailmaker and the master-at-arms, posts in the frigate-36's and the sixty-four's
+# files; the people drawn are the column's three master's mates, a midshipman as the captain's
+# messenger, and the detachment's captain, lieutenant and serjeant of marines. The file serves her
+# years 1786 to 1815, so the outlines name no one; a scenario names Hope, Pasley, Darby, Cooke,
+# Loring, Cumby or Maitland by `people:` (a role and a name).
+#
+# The officers by deck at quarters (Bel-D §6.5) follow the Caesar's of 1794 (the Molloy minutes,
+# read (OCR)) and Cumby's Bellerophon at Trafalgar (The Nineteenth Century, 1899, p. 721; Bel
+# §4.5): the captain, the first lieutenant, the master and the captain of marines on the
+# quarterdeck; the second lieutenant with the upper deck's after guns and the fourth with its
+# foremost; the third lieutenant commanding the lower deck with its after guns, and the fifth, the
+# junior, its seven foremost a side; the forecastle under the boatswain (judgement: five
+# lieutenants have none to spare); the lieutenant of marines, a signal midshipman and the captain's
+# clerk on the poop. No engine reads an officer at the guns, so they stand in the briefs alone.
+#
+# The flag party (Bel-D §17.0, the owner's answer: the rear-admiral and their people in the ship
+# file, so that models may be stationed as them): the rear-admiral, their flag lieutenant and
+# secretary, and their servants, marked `flag`, fifteen, the "customary supernumeraries" James adds
+# for a rear-admiral (vol. 1 p. 156; Bel §4.3), the make-up of the party judgement. They are not of her company: drawn from no station, counted in no station and
+# not in her 590, and not aboard until a scenario hoists the flag, which a package of its own
+# builds (the lead's answer (15)). Their places are the quarterdeck and the admiral's cabin.
+#
+# The duties are the Regulations' and Luce's (1884 ch. XX and XXIII) in the period's words; the
+# characters are the writer's, and judgement.
+#
+# The form of an entry is the frigate-36's file's (role, post, drawn, messenger, rank, station,
+# place, traits, history, brief, note), and `flag` for one of the flag party.
+
+ship: data/ships/seventy-four.yaml
+
+# The harness's stations (spec M4 §11; M6 §3) bound to a person by role, as the sixty-four's:
+# the second and third lieutenants keep the watches the officer of the watch's stations name.
+stations:
+  captain: captain
+  officer of the watch: first lieutenant
+  master: master
+  second officer: {kind: officer of the watch, holder: second lieutenant}
+  third officer: {kind: officer of the watch, holder: third lieutenant}
+
+wardroom:
+  - role: captain
+    post: true
+    rank: post-captain
+    station: the command
+    place: quarterdeck
+    traits: [cool, sparing of words, close to the line]
+    history: "Made post in the American war; a seventy-four of the Channel fleet since the armament."
+    brief: >-
+      The ship, her people and her orders are theirs (the Regulations of 1806, the Captain:
+      to keep her in constant readiness for sea and to see every officer do their duty). They
+      keep her station in the line or on the admiral's errands, give the standing orders and
+      fight her from the quarterdeck.
+  - role: first lieutenant
+    post: true
+    rank: lieutenant
+    station: the first lieutenant's
+    place: quarterdeck
+    traits: [steady, exact with the station bill, a seaman to the bone]
+    history: "Twelve years a lieutenant; first of this ship since she commissioned."
+    brief: >-
+      The ship's working and her people under the captain: the watch bill, the quarter bill,
+      the sail evolutions and the quarterdeck in their watch (Luce 1884 ch. XXIII). They keep
+      no watch by the bill; at quarters on the quarterdeck, going down to the decks when the
+      captain sends them.
+  - role: second lieutenant
+    post: true
+    rank: lieutenant
+    station: the second lieutenant's
+    place: quarterdeck
+    traits: [eager, a good hand at a fix, apt to carry sail]
+    history: "Six years a lieutenant, two of them in the West Indies."
+    brief: >-
+      A watch of their own by the bill (the starboard), the deck in it under the captain's
+      night orders, every strange sail and every shift of wind reported (the Regulations, the
+      Lieutenant, art. IV); at quarters the upper deck's after eighteen-pounders.
+  - role: third lieutenant
+    post: true
+    rank: lieutenant
+    station: the third lieutenant's
+    place: quarterdeck
+    traits: [careful, slow to shorten sail, good with the people]
+    history: "Four years a lieutenant, from a frigate's quarterdeck."
+    brief: >-
+      A watch of their own by the bill (the larboard), the deck in it under the night orders,
+      the same duties as the second lieutenant's; at quarters the lower deck, its after
+      thirty-two-pounders under their own eye.
+  - role: fourth lieutenant
+    post: true
+    rank: lieutenant
+    station: the fourth lieutenant's
+    place: quarterdeck
+    traits: [young, quick with the signals, keen]
+    history: "Made lieutenant two years since, from a flagship's midshipmen's berth."
+    brief: >-
+      A watch in turn when the captain has the watches kept in three; at quarters the upper
+      deck's foremost eighteen-pounders.
+  - role: fifth lieutenant
+    post: true
+    rank: lieutenant
+    station: the fifth lieutenant's
+    place: quarterdeck
+    traits: [new to the rank, anxious to please, a good hand in a boat]
+    history: "Passed for lieutenant at Somerset House last year; this is their first commission."
+    brief: >-
+      The boats and the boarders; at quarters the seven foremost guns on each side of the
+      lower deck, under the third lieutenant, as the junior had them in her at Trafalgar.
+  - role: master
+    post: true
+    rank: master
+    station: the navigation
+    place: quarterdeck
+    traits: [dry, exact with the log board, trusts the lead over the chart]
+    history: "Twenty years at sea; master's mate in a ninety-gun ship before their warrant."
+    brief: >-
+      The reckoning, the sights, the lead and the chart, the stowage and the ground tackle
+      (the Regulations, the Master, art. I to XXIX): they work the account, warn the captain
+      of the dangers and shape the course the captain orders; at quarters the conning of the
+      ship by the captain's side.
+  - role: second master
+    post: true
+    rank: second master
+    station: the master's second
+    place: quarterdeck
+    traits: [patient, a fair hand at a chart, careful of the stowage]
+    history: "Passed for master at the Trinity House; this is their first ship of the line."
+    brief: >-
+      The master's second in the navigation and the hold: the log, the stowage and the water,
+      a watch by the bill when the master orders it (the Regulations' table of 1806, a
+      seventy-four's second master).
+  - role: boatswain
+    post: true
+    rank: warrant officer
+    station: the rigging and the boats
+    place: deck
+    traits: [loud, knows every rope by its feel, hard on idlers]
+    history: "Twenty years in ships of the line, the last ten as a warrant officer."
+    brief: >-
+      The rigging, the cables, the anchors, the boats and the hands at their stations: they
+      pipe the evolutions and see the gear overhauled (the Regulations, the Boatswain); at
+      quarters the forecastle and the repairs aloft.
+  - role: gunner
+    post: true
+    rank: warrant officer
+    station: the guns and the magazine
+    place: deck
+    traits: [quiet, methodical, keeps the magazine dry]
+    history: "Gunner's mate in a ninety-gun ship; their warrant since."
+    brief: >-
+      The guns, the carriages, the powder and the shot (the Regulations, the Gunner): two tiers
+      of guns and the quarterdeck's, the forecastle's and the poop's, the quarter gunners and
+      the cartridges filled; at quarters the magazine.
+  - role: carpenter
+    post: true
+    rank: warrant officer
+    station: the hull and the spars
+    place: deck
+    traits: [patient, a hand for a fished spar, sounds the well without being told]
+    history: "Out of the yard at Chatham; carpenter of a sixty-four before this ship."
+    brief: >-
+      The hull, the masts, the yards and the four chain pumps (the Regulations, the Carpenter):
+      they sound the well, fish a sprung spar and report a leak to the captain; at quarters the
+      shot plugs and the wings.
+  - role: purser
+    post: true
+    rank: warrant officer
+    station: the stores and the books
+    place: gunroom
+    traits: [careful with a pound, slow to issue, keeps good books]
+    history: "Clerk to a purser in two ships before their own warrant."
+    brief: >-
+      The provisions, the slops and the ship's books (the Regulations, the Purser): the stores
+      demanded and issued, the manifest and the purse kept.
+  - role: surgeon
+    post: true
+    rank: warrant officer
+    station: the sick berth
+    place: gunroom
+    traits: [plain-spoken, reads at night, reports the sick list every morning]
+    history: "Walked the hospitals in London; three ships before this one."
+    brief: >-
+      The sick and the hurt, the sick berth and the assistant surgeons (the Regulations, the
+      Surgeon): the sick list to the captain each morning; at quarters the cockpit.
+  - role: chaplain
+    post: true
+    rank: chaplain
+    station: the ship's prayers
+    place: gunroom
+    traits: [mild, a reader of sermons, good with the boys]
+    history: "A curate in Kent before their warrant; two years in the fleet."
+    brief: >-
+      Divine service on the Sunday and the burials (the Regulations' table of 1806, a
+      seventy-four's chaplain); often the boys' schooling beside the schoolmaster; at quarters
+      in the cockpit with the surgeon.
+  - role: sailmaker
+    post: true
+    rank: warrant officer
+    station: the sail room
+    place: sail_room
+    traits: [neat, slow, proud of their seams]
+    history: "A sailmaker of Chatham yard before going to sea."
+    brief: >-
+      The sails, bent and unbent, their repair and the sail room's account.
+  - role: master-at-arms
+    post: true
+    rank: petty officer
+    station: the discipline
+    place: deck
+    traits: [upright, a soldier's bearing, misses nothing]
+    history: "A serjeant of marines before being rated to the ship."
+    brief: >-
+      The ship's police: the rounds, the lights out, the small arms and the prisoners (the
+      Regulations, the Master at Arms).
+  - role: master's mate
+    drawn: {station: forecastle, rating: able}
+    rank: master's mate
+    station: the master's assistant
+    place: quarterdeck
+    traits: [handy, keen on the sights, aims at a warrant]
+    history: "An able seaman of the forecastle rated mate to the master this commission."
+    brief: >-
+      Assists the master in the observations and the reckoning (the Regulations, the Master,
+      art. XXVIII), and keeps a watch by the bill; at quarters the forecastle under the
+      boatswain.
+    note: >-
+      Three master's mates, the 590 column's three (the Regulations 1806 p. 165), able seamen
+      of the forecastle (the Master, art. XXVIII: the mates and midshipmen assist in the
+      observations).
+  - role: master's mate
+    drawn: {station: forecastle, rating: able}
+    rank: master's mate
+    station: the master's assistant
+    place: quarterdeck
+    traits: [older, steady, a good hand with the lead]
+    history: "Twelve years before the mast and two as a mate."
+    brief: >-
+      As the first master's mate's.
+  - role: master's mate
+    drawn: {station: forecastle, rating: able}
+    rank: master's mate
+    station: the master's assistant
+    place: quarterdeck
+    traits: [young for it, quick at figures, a little vain of their quadrant]
+    history: "Came to sea as a captain's servant; a midshipman five years before their rating."
+    brief: >-
+      As the first master's mate's; the log board in the night watches.
+  - role: midshipman
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: midshipman
+    station: the captain's messenger
+    place: quarterdeck
+    traits: [quick, fifteen, everywhere at once]
+    history: "Two years in the ship; their father a lieutenant on half pay."
+    brief: >-
+      Carries the captain's word about the ship (pass the word for, send for), keeps a watch
+      by the bill and learns the reckoning from the master; at quarters the signals on the
+      poop.
+    note: A midshipman as the captain's messenger, one of the boys of the afterguard.
+  # the detachment's officers and serjeant (the 590 column: a captain, three lieutenants, three
+  # serjeants, two corporals and two drummers; Bel §4.3), drawn from the detachment so that the
+  # muster's count stands
+  - role: captain of marines
+    drawn: {station: marines, rating: marine}
+    rank: captain of marines
+    station: the marines
+    place: quarterdeck
+    traits: [formal, a soldier first, careful of the detachment's credit]
+    history: "Twelve years in the corps, the last four afloat in ships of the line."
+    brief: >-
+      Commands the detachment: its sentries, its guard and its drill; at quarters on the
+      quarterdeck, the marines on the poop and the gangways under their officers, the fire by
+      volley within musket shot, and the guard on the prisoners.
+    note: The captain of marines, drawn from the detachment.
+  - role: lieutenant of marines
+    drawn: {station: marines, rating: marine}
+    rank: lieutenant of marines
+    station: the marines
+    place: quarterdeck
+    traits: [upright, exact at the drill, a little apart from the sea officers]
+    history: "Four years in the corps; a frigate's detachment before this one."
+    brief: >-
+      Under the captain of marines: the sentries at the cabin door, the spirit room and the
+      gangway, the drill in the forenoon; at quarters the marines on the poop.
+    note: The lieutenant of marines, drawn from the detachment.
+  - role: sergeant of marines
+    drawn: {station: marines, rating: marine}
+    rank: sergeant of marines
+    station: the marines
+    place: deck
+    traits: [a loud voice, the halberd, twenty years' service]
+    history: "A private in the last war; a serjeant since the peace."
+    brief: >-
+      Posts the sentries, takes the drill and the muster of the detachment, carries the
+      halberd at quarters and leads the file on a boarding.
+    note: The serjeant of marines, drawn from the detachment.
+  # the flag party (Bel-D §17.0; the lead's answer (15)): beyond her company, aboard only when a
+  # scenario hoists a rear-admiral's flag in her, and none of it drawn from her stations
+  - role: rear-admiral
+    flag: true
+    rank: rear-admiral
+    station: the flag
+    place: cabin
+    traits: [grave, long in the service, slow to praise]
+    history: "Forty years at sea; a captain in the American war, their flag hoisted this year."
+    brief: >-
+      Commands the division or the squadron whose flag she wears, under the commander in
+      chief: the signals, the line and the ships' stations are theirs, the ship the captain's
+      (the Regulations, the Flag Officers); in the admiral's cabin, and on the quarterdeck in
+      action.
+  - role: flag lieutenant
+    flag: true
+    rank: lieutenant
+    station: the flag's signals
+    place: quarterdeck
+    traits: [quick, exact with the signal book, the admiral's shadow]
+    history: "A lieutenant of the admiral's own choosing, followed from their last ship."
+    brief: >-
+      The admiral's signals made and answered, their orders carried to the captains; on the
+      poop with the signal midshipman and the flags in action.
+  - role: admiral's secretary
+    flag: true
+    rank: secretary
+    station: the flag's papers
+    place: cabin
+    traits: [close, a neat hand, knows every captain's seniority]
+    history: "The admiral's clerk in the last war, their secretary since."
+    brief: >-
+      The admiral's letters, orders and returns, the squadron's books and the dispatches (the
+      Regulations' allowance to the secretaries of flag officers).
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [quiet, quick on their feet, long in the admiral's service]
+    history: "In the admiral's service ashore and afloat these ten years."
+    brief: >-
+      The admiral's cabin, their table, their dress and their stores; at quarters in the
+      cockpit or carrying the admiral's word.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [young, willing, new to the sea]
+    history: "Came aboard with the admiral's baggage."
+    brief: >-
+      As the first servant's.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [a cook's hand, sharp-tongued, proud of the admiral's table]
+    history: "A cook in a London house before the admiral took them to sea."
+    brief: >-
+      As the first servant's; the admiral's galley.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [steady, careful with the plate, slow of speech]
+    history: "The admiral's steward's mate in their last flagship."
+    brief: >-
+      As the first servant's; the plate and the wine.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [cheerful, a fiddler, the boys' favourite]
+    history: "Born in the admiral's parish, in their service since a boy."
+    brief: >-
+      As the first servant's.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [silent, strong, a seaman once]
+    history: "An able seaman discharged with a wound, taken into the admiral's service."
+    brief: >-
+      As the first servant's; the admiral's boat when it is called away.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [neat, vain of their livery, quick to take offence]
+    history: "A footman in the admiral's house in town."
+    brief: >-
+      As the first servant's.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [old, deaf in one ear, devoted]
+    history: "With the admiral since they were a lieutenant."
+    brief: >-
+      As the first servant's.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [young, homesick, a good hand with a horse]
+    history: "A groom's boy from the admiral's stables."
+    brief: >-
+      As the first servant's.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [shrewd, a keeper of accounts, close with the purser]
+    history: "Kept the admiral's household books ashore."
+    brief: >-
+      As the first servant's; the admiral's private stores.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [lively, a great talker, a little idle]
+    history: "Taken on at Portsmouth when the flag was hoisted."
+    brief: >-
+      As the first servant's.
+  - role: admiral's servant
+    flag: true
+    rank: servant
+    station: the admiral's cabin
+    place: cabin
+    traits: [careful, clean in their work, a churchgoer]
+    history: "A maid's brother from the admiral's house, two years afloat."
+    brief: >-
+      As the first servant's.

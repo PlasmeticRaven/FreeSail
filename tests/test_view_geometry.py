@@ -89,6 +89,11 @@ fields the projection reads always run.
 - Package 75 (the lead's ruling (11) of 2026-11-09): her round counter drawn to its filed
   half-breadths (`form.stern.counter_hb_m`, freesail/ship/form.py), every other file's served
   stations as they were; her settee's block now inside her rail, her lights on her counter.
+- Package 75 (B7, the shared guards at her step 4): the 74's rows in the tables kept by file, each
+  measured on her file by its case's own arithmetic: her bowsprit, her three tiers of ports, her
+  wale's chord, her three bulkheads as the 64's, her lower gallery's foot cut to her stern's line,
+  her lines on the rail as the 64's, her driver's boom (a lateen cut's, as the 64's) the one that
+  goes rigged in and the one topped up over her taffrail, and no gaff sail on a boom.
 """
 
 from __future__ import annotations
@@ -154,6 +159,10 @@ PRIVATEER = "data/ships/privateer-schooner.yaml"
 SMACK = "data/ships/smack.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2: the Prince de Neufchatel
 BILANDER = "data/ships/bilander.yaml"  # package 75, B4: the bilander
+SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7: the Bellerophon
+# The files whose driver is Steel's boomsail on a lateen cut at the mast, her boom named by the cut
+# (Ext §17): the 64's since her stage B, and the 74's (package 75, B7)
+LATEEN_DRIVEN = {SIXTY_FOUR, SEVENTY_FOUR}
 EVERY_SHIP = sorted(f"data/ships/{p.name}" for p in (ROOT / "data" / "ships").glob("*.yaml"))
 # the ships' boats (package 82, item 4: `boat-*.yaml`, a lug on one mast, no bowsprit and
 # no gaff sail; her drawing is that package's last step)
@@ -1288,7 +1297,10 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
 # plan draws the bowsprit over the stem about 10 ft above her water, her lines' stem head lower:
 # her file's note, Neuf-D §3.7 task 7). The bilander's measured at her landing (package 75, B4): her
 # heel on her stem head, 2.65 m above her water-line at x +11.27, her end 6.75 m, 28.99 degrees
-# where her file has her steeved about 29 (Chapman 1768 Pl. LXII No. 5, measured: Bil-D §4.2).
+# where her file has her steeved about 29 (Chapman 1768 Pl. LXII No. 5, measured: Bil-D §4.2). The
+# 74's measured at her step 4 (package 75, B7): her heel on her stem head, 4.87 m above her water at
+# x +26.25, her end 12.66 m, 31.76 degrees where her file has her steeved 31.6 (task 7: measured on
+# ZAZ1357 and ZAZ1359, Bel-D §4.7).
 BOWSPRIT_DRAWN = {
     SIXTY_FOUR: (1.004, 27.05),
     RAZEE: (0.941, 27.77),
@@ -1302,6 +1314,7 @@ BOWSPRIT_DRAWN = {
     PRIVATEER: (2.833, 19.98),
     NEUFCHATEL: (0.555, 19.50),
     BILANDER: (1.270, 28.99),
+    SEVENTY_FOUR: (1.235, 31.76),
 }
 # The three whose files' ends give no rise from the stem head (the viewer step for the rig's lines,
 # the lead's ruling of 2026-10-31: "rooted at the sheet's height"), metres above her water-line: the
@@ -1990,7 +2003,10 @@ def test_each_gallery_and_band_of_lights_lies_at_its_place(tmp_path, path):
     band to the transom's knuckle and taffrail. The 64's and the razee's are drawn as filed: the
     razee's stand under her taffrail since her short roundhouse is in her profile (Build-Ships.md
     §19.1 item 18), where before it they were cut to her side and her transom. The frigate's tier,
-    filed from x -23.99, is cut at its foot to her stern's line there."""
+    filed from x -23.99, is cut at its foot to her stern's line there; and the 74's lower tier,
+    filed from x -28.19, at its foot, 4.34 m above her water, to her stern's line at x -27.92
+    (package 75, B7, measured at her step 4), her upper tier and her two bands of lights as
+    filed."""
     hull = graph_of(path)["hull"]
     profile = hull["profile"]
     stern = profile["form"]["stern"]
@@ -2015,8 +2031,9 @@ def test_each_gallery_and_band_of_lights_lies_at_its_place(tmp_path, path):
         z_top = min(zh, taffrail)
         cut = cut or z_top != zh
         bands.append((max(zl, stern["knuckle_z_m"]), z_top, n, hb))
-    # the razee's roundhouse in (B1, 2026-10-29): nothing cut on her two; the frigate's foot is
-    assert cut == (path == FRIGATE)
+    # the razee's roundhouse in (B1, 2026-10-29): nothing cut on her two; the frigate's foot is,
+    # and the 74's lower tier's (B7)
+    assert cut == (path in (FRIGATE, SEVENTY_FOUR))
     got = run_js(
         tmp_path,
         {"hull": hull},
@@ -2509,7 +2526,9 @@ def test_wales_and_bands_are_drawn_only_on_the_outside_of_the_side(tmp_path, pat
 # ports stand 0.31 m over it, and the lugger and the smack file no ports; the *Neufchatel*'s one
 # tier, her highest port's middle 0.34 m under her rail (measured at her landing, B2); the
 # bilander's one tier, the armed fit's ports cut in her waist bulwark, her highest port's middle
-# 0.17 m under her rail (measured at her landing, B4)
+# 0.17 m under her rail (measured at her landing, B4); the 74's three, as the 64's, her
+# quarterdeck's highest port's middle 0.30 m under her rail, her forecastle's and her poop's places
+# 0.31 m over it (measured at her step 4, B7)
 TIERS_IN_THE_SIDE = {
     SIXTY_FOUR: {"lower", "upper", "quarterdeck"},
     RAZEE: {"upper", "quarterdeck", "forecastle"},
@@ -2523,6 +2542,7 @@ TIERS_IN_THE_SIDE = {
     PRIVATEER: {"upper"},
     NEUFCHATEL: {"upper"},
     BILANDER: {"upper"},
+    SEVENTY_FOUR: {"lower", "upper", "quarterdeck"},
 }
 
 
@@ -2552,7 +2572,8 @@ def test_each_tier_of_ports_cut_in_the_side_is_drawn_as_a_band(tmp_path, path, b
 # port bands from ahead and astern, plainest on the frigate-36; the *Neufchatel*'s, her port band
 # alone (no wale filed), 0.001 m (measured at her landing, B2); the bilander's, her wale's after end
 # at x -10.0 where her round counter turns in, 0.103 m (measured at her review, 2026-11-08, her wale
-# hung 33 px under the drawn rail; 0.250 at her landing, B4, the band 0.17 m lower)
+# hung 33 px under the drawn rail; 0.250 at her landing, B4, the band 0.17 m lower); the 74's, her
+# main wale's after end at x -13.35, 0.089 m (measured at her step 4, B7)
 CHORD_OFF_THE_SIDE_M = {
     FRIGATE: 0.613,
     RAZEE: 0.109,
@@ -2566,6 +2587,7 @@ CHORD_OFF_THE_SIDE_M = {
     LUGGER: 0.005,
     NEUFCHATEL: 0.001,
     BILANDER: 0.103,
+    SEVENTY_FOUR: 0.089,
 }
 BANDS = """
     const H = P.formHull(d.hull);
@@ -2769,8 +2791,10 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
     and on the quarter her forecastle deck is not seen through its after end. The frigate's breast
     and forecastle, as the razee's but for her roundhouse; the bilander's breast, her raised
     quarterdeck's fore end at x -4.29 over her flush upper deck, from 1.02 m up to her rail's 2.49
-    (package 75, B4, measured at her landing); every other file carries one deck, with nothing to
-    close."""
+    (package 75, B4, measured at her landing); the 74's as the 64's, her poop's front at x -14.40
+    from 5.50 m to her rail's 7.40, her quarterdeck's breast at x -1.52 from 3.19 to 5.19 and her
+    forecastle's after end at x +11.28 from 3.45 to 5.54 (package 75, B7, measured at her step 4);
+    every other file carries one deck, with nothing to close."""
     hull = hull_of(path, builder)
     profile = hull["profile"]
     decks = profile["decks_m"]
@@ -2790,6 +2814,7 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
         "razee-44": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
         "frigate-36": {("quarterdeck", "fore"), ("forecastle", "aft")},
         "bilander": {("quarterdeck", "fore")},
+        "seventy-four": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
     }.get(Path(path).stem, set())
     at = {(f["deck"], "aft" if f["pts"][0][0] == decks[f["deck"]][0][0] else "fore") for f in got}
     assert at == ends and len(got) == len(ends)
@@ -4273,8 +4298,8 @@ def test_only_a_drivers_boom_goes_from_the_drawing_when_it_is_rigged_in(tmp_path
     """The rule's key, every file: `rigged_out` false on a boom that a lateen cut at the mast
     names. Every boom of every file is served rigged in, as no file can say of a gaff sail's (the
     schema refuses it). A gaff sail's boom is drawn where it was, the whole drawing equal to the
-    last figure; only a driver's goes, the 64's alone of the ten, and every other spar, a studding
-    sail boom rigged in among them, keeps its figure."""
+    last figure; only a driver's goes, the 64's and the 74's (package 75, B7) of the files, and
+    every other spar, a studding sail boom rigged in among them, keeps its figure."""
     served = ship_state(make_ship(path))
     rigged_in = json.loads(json.dumps(served))
     booms = {s["id"] for s in served["graph"]["spars"] if s["class"] == "boom"}
@@ -4300,7 +4325,7 @@ def test_only_a_drivers_boom_goes_from_the_drawing_when_it_is_rigged_in(tmp_path
         if s.get("cut_at_mast") and "boom" in s["roles"]
     }
     assert set(got["rigged_in"]["spars"]) == every - of_a_cut
-    assert of_a_cut == ({DRIVER_BOOM} if path == SIXTY_FOUR else set())
+    assert of_a_cut == ({DRIVER_BOOM} if path in LATEEN_DRIVEN else set())
     if not of_a_cut:
         assert got["rigged_in"]["whole"] == got["served"]["whole"]
 
@@ -4795,7 +4820,7 @@ LACED_ON_HER_CUT = {NEUFCHATEL}
 
 
 @needs_node
-@pytest.mark.parametrize("path", [p for p in PROFILED if p not in (LUGGER, *PILOT)])
+@pytest.mark.parametrize("path", [p for p in PROFILED if p not in (LUGGER, *PILOT, *LATEEN_DRIVEN)])
 def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(tmp_path, path):
     """The razee's spanker and the *Neufchatel*'s mainsail alone are drawn laced along their booms
     (`gaffCutOn`, which asks for a profile and four filed corners, and no gaff sail of the other
@@ -4808,7 +4833,9 @@ def test_every_other_gaff_sail_keeps_the_foot_and_the_bundle_it_was_drawn_with(t
     measured under the jaws' height, as the level boom was, 0.50-0.88 m and 0.26-0.33 m; under its
     line, which now rises aft, 0.50-0.87 m and 0.26-0.33 m (under the jaws' height they would now
     read 0.26-0.47 m and 0.03-0.05 m). The bilander carries no gaff sail and no boom (`NO_BOOM`,
-    package 75, B4): none is drawn of hers."""
+    package 75, B4): none is drawn of hers. The 74, as the 64, has no gaff sail: her driver on her
+    boom is a lateen cut at the mast (`LATEEN_DRIVEN`, package 75, B7), drawn by the driver's
+    cases."""
     bands = {SailState.SET: (0.4, 1.0), SailState.FURLED: (0.2, 0.4)}
     cut = [
         s.id
@@ -4914,7 +4941,9 @@ def test_the_razees_spanker_is_drawn_on_its_files_cut(tmp_path):
 # larboard quarter: its height over the taffrail (`taffrail_of`), metres, old (level, at its jaws'
 # height) beside new (topped up BOOM_STEEVE_DEG). It passes 2.9 to 4.0 m to leeward of her
 # centreline there, over her quarter (the *Neufchatel*'s 4.5 m, her main boom 19.57 m from jaws
-# 3.17 m above her water-line, against her taffrail's 2.88 m: measured at her landing, B2).
+# 3.17 m above her water-line, against her taffrail's 2.88 m: measured at her landing, B2). The
+# 74's, her driver bent and set as the 64's: her boom 3.16 m over her taffrail's crown level, as her
+# report gives it, and 3.80 m topped up, 3.8 m to leeward (measured at her step 4, B7).
 BOOM_OVER_TAFFRAIL_M = {
     BRIG: (-0.38, 0.31),
     MERCHANT_BRIG: (-0.38, 0.31),
@@ -4926,6 +4955,7 @@ BOOM_OVER_TAFFRAIL_M = {
     SIXTY_FOUR: (1.16, 1.81),
     FRIGATE: (-1.83, -1.33),
     NEUFCHATEL: (0.29, 1.05),
+    SEVENTY_FOUR: (3.16, 3.80),
 }
 # The frigate-36's boom still stands under her taffrail, topped up: her file hangs its jaws 2.4 m
 # over her datum, 4.20 m above her water-line against her taffrail's 6.03 m, a file figure for a
@@ -4941,13 +4971,13 @@ def test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail(tmp_path,
     stands BOOM_STEEVE_DEG above the level from its jaws, swung by its sheet, its figure drawn
     so, its length the file's; no file moves and the physics reads none of it. Where it passes her
     taffrail, its sail set and its sheet hauled flat, it clears her taffrail by
-    `BOOM_OVER_TAFFRAIL_M` on the brigs, the razee, the schooners, the smack, the cutter, the 64 and
-    the *Neufchatel*, within 2 cm; drawn level it stood at its jaws' height there, the old figure.
-    The frigate-36's still stands under hers, her file's figure (`UNDER_HER_TAFFRAIL`). The lugger
-    and the bilander carry no boom (`NO_BOOM`). The same state with no profile lays every boom
-    level, as before."""
-    sail = DRIVER if path == SIXTY_FOUR else BOOM_SAIL.get(path)
-    ship = driver_ship(path, bent=True) if path == SIXTY_FOUR else make_ship(path)
+    `BOOM_OVER_TAFFRAIL_M` on the brigs, the razee, the schooners, the smack, the cutter, the 64,
+    the *Neufchatel* and the 74, within 2 cm; drawn level it stood at its jaws' height there, the
+    old figure. The frigate-36's still stands under hers, her file's figure
+    (`UNDER_HER_TAFFRAIL`). The lugger and the bilander carry no boom (`NO_BOOM`). The same state
+    with no profile lays every boom level, as before."""
+    sail = DRIVER if path in LATEEN_DRIVEN else BOOM_SAIL.get(path)
+    ship = driver_ship(path, bent=True) if path in LATEEN_DRIVEN else make_ship(path)
     for sid in ship.groups["plain sail"]:
         if ship.sails[sid].state is not SailState.UNBENT:
             ship.sails[sid].state = SailState.SET
@@ -5908,6 +5938,8 @@ LINES_ON_THE_RAIL = {
 LINES_ON_THE_RAIL[RAZEE] = LINES_ON_THE_RAIL[SIXTY_FOUR]
 LINES_ON_THE_RAIL[MERCHANT_BRIG] = LINES_ON_THE_RAIL[BRIG]
 LINES_ON_THE_RAIL[PRIVATEER] = LINES_ON_THE_RAIL[SCHOONER]
+# the 74's as the 64's, her rig the 64's (package 75, B7, measured at her step 4 on both tacks)
+LINES_ON_THE_RAIL[SEVENTY_FOUR] = LINES_ON_THE_RAIL[SIXTY_FOUR]
 # the *Neufchatel*'s (package 75, B2, measured at her landing): her fore course's sheets as the
 # brig's, her fore gaff sail's and her head sails' as the schooners', and the braces of her main's
 # two light yards, the brig's main yards' with no mast abaft them
@@ -5948,6 +5980,7 @@ STEM_TACKED = {
     PRIVATEER: {"fore.staysail", "jib", "storm_jib"},
     NEUFCHATEL: {"fore.staysail", "fore.storm_staysail"},  # her storm jib on the jib stay
     BILANDER: {"fore.storm_staysail"},  # her two head sails' stays to the bowsprit and jib-boom
+    SEVENTY_FOUR: set(),  # cut from her file's corners, as the 64's (package 75, B7)
 }
 # A recorded departure (package 75, B2, for the lead): how far a head sail's tack on a stay to the
 # stem stands off the top of her side, where it is more than 5 cm. The *Neufchatel*'s stem head,
