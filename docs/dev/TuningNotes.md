@@ -23555,6 +23555,31 @@ the stand-by's words); with both (b14433a), **13,516**, sixteen over the fractio
 (22,500 before), by the test's practice, with the four figures in its comment. Nothing of the
 harness's own figures is changed (`HANDOVER_AT_FRACTION` is 0.6 as it was).
 
+**The suites as first measured, at 2d0a6d8** (the step with the trunk at ef0446c; a worktree
+pinned there; ruff check and format clean; every run started in the harness's background mode,
+the tiers as separate tasks under its two-hour cap; 2026-11-10 UTC): the slow tier of the
+touched files **exit 0** (08:20:06 to 08:44:18; 1,994 passed); the slow tier of the known
+truths, the profile and the Indefatigable **exit 0** (08:44:18 to 09:37:17; 518 passed and the
+trunk's eight expected failures); the fast tier whole **exit 0** (09:38:00 to 10:27:30; 7,144
+passed and one expected failure of the trunk's own, 486 slow tests left out); the pace tests
+alone and last **exit 0** (10:27:30 to 10:33:09; 14 passed, no floor lowered). Nothing skipped
+in any tier. The Rade de Brest's new stream moved no scene of this package: the captor's
+passage to Brest and every truth that sails there passed as they stood. The measures before
+it: the fast tier at 45a3a00 (the step as lifted, the trunk at dd12cba) **exit 0** (05:29:46
+to 06:14:48; 7,070 passed); the fast tier at b14433a **exit 1** (07:30:39 to 08:18:06; 7,143
+passed and the handover test failed, above).
+
+**The trunk moved while those ran, and the step is measured again on it.** A fifth merge
+(cb79d9c at 137bd30) brought package 75's SW-1 (Table No. 29's service charges by kind and
+calibre) and the lead's ruled builds of the 9th and 10th (the ship files regenerated, the
+settee, the runner), package 60's design note and the lead's records. It merged without a
+conflict. Checked on the merged tree before the tiers: the step's own files (`test_prize_court`,
+`test_prizes`, `test_captive`, `test_far_action`, `test_ordnance`, `test_officer`) pass as they
+stood, so the court's figures (the brig's guns £320, her powder and shot £13) are not moved by
+the charges' table or the regenerated files; the officer's conversation at his seat measures
+13,516 tokens, as before the merge. The step's figures are the ones measured at that tree,
+below.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
