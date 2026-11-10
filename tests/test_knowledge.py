@@ -119,6 +119,7 @@ def test_every_kind_the_code_writes_is_placed_or_falls_to_the_deck_by_design():
         "place",
         "port",
         "record",
+        "reader",  # package 100: a letter's words, the reader's alone (`tests/test_letters.py`)
     }
 
 

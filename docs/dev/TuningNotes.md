@@ -24435,3 +24435,157 @@ pace alone and last (`--slow -m pace -n 0`, the same files, 7-159 among them) ex
 ruff check and format clean. An earlier fast tier at 00a6f3e8 (exit 0, 7,123 passed) was of
 the tree before the trunk's package 74 and is not the report's. The tree reported differs from
 453ed374 by this paragraph alone.
+
+## Package 100: letters and things as one system (2026-11-10)
+
+The owner's play of 2026-11-09, note 8 (`docs/dev/M7-WorkPackages.md`): a letter and a thing
+one system, with descriptions, removal and destruction. One builder, two steps, each reported
+at one hash.
+
+### The design sketch (written before step 1's code; for the lead to read first)
+
+**The thing's new fields** (`world.things.Thing`, each with a plain class default so that every
+checkpoint from before loads, and left out of `to_dict` while empty so that a thing of before
+reads and digests as it did): `words` (a letter's text, as written), `author` (the writer's
+name), `to` (the addressee in words, "the port admiral", "Mr Veale") and `to_id`/`to_home`
+(the person it names, where the words name one of the people), `written` (the stamp of its
+writing, the drafting's "10 June, 10:05"), `sealed` (closed by a seal) and `broken` (its seal
+broken: it shows, in its name's words wherever it is listed, "a letter to the port admiral, its
+seal broken"), and `gone` (how it ceased to be: "burnt", "torn up"; its place `GONE`). A thing
+is a **letter** when it has words or an addressee; its noun is then "letter" whatever its name
+says, and "the letter", "the letter to the port admiral" and "the letter from Mr Veale" name it.
+
+**The orders' words** (the free lines' road, `orders/free.py`; every station's but the
+director's, journaled and replayed as the free lines are):
+
+    write a letter to <whom>: "<words>"   by the drafting's road (`books._who`, `_stamp`,
+                                           `_in_the_cabin`: the writer's mark, the hour, the
+                                           captain gone below to his table and at his writing
+                                           five minutes); the letter in the writer's keeping
+    seal <a letter>                        within reach, not sealed already
+    open <a letter> / break the seal of    the seal broken, which shows ever after
+    read <a thing>                         a letter within reach, unsealed or broken: its words
+                                           shown to the reader; a sealed letter is not read
+                                           but by breaking its seal first (as said, and why)
+    look at <a thing> / examine            the thing as seen: its name, its description, where
+                                           it lies, a letter's seal and its direction (never
+                                           its words)
+    burn <a thing> / tear up               a paper within reach destroyed: gone, and said;
+                                           burnt where there is a fire to burn it (aboard,
+                                           ashore; not in the boat); a thing that is no paper
+                                           is refused in words ("throw it overboard")
+    throw <a thing> overboard              as now; a letter so thrown is gone with it
+
+and the director's form beside `aboard: <a thing>, <where>`: `aboard: a letter from <whom> to
+<whom>, <where>[, sealed]: "<words>"` (a letter made with its words) and `aboard: remove <a
+thing>` (`aboard: the packet removed` the same): the thing taken out of the world, no line of
+the play log, by the rule of reach (nothing out of a held person's keeping) and doubted where it
+lies within a held person's sight.
+
+**What a reader sees, and who else sees what.** The free line stays a word heard where it is
+said ("By the captain, in the cabin: read the letter from Mr Veale; the letter read."), its
+data's `said` without the letter's words, so that the stations within earshot, the stand-by and
+the log's other readers have the deed and never the text. The words are a line of their own,
+`letter.read` ("The letter from Mr Veale to the captain, written 10 June, 10:05: \"...\""), of a
+new reach class `reader` (`knowledge.REACH`): the person it names (`to`) and nobody else,
+asleep or awake, with no fallback to the place (the class `person` falls back to the deck and
+the place of delivery, which is how a letter is read aloud today); the director's sample, which
+has everything, has it too. The writer is shown his own words once (`letter.written`, the same
+class), since a man's own word is always his; nobody else sees them until he hands the letter
+over and it is read. Looking at a thing shows what anyone there would see, so its line is the
+free line itself, heard where it is said.
+
+**How the old `Message` loads.** The class stays, unchanged, in `world.people` (an old
+checkpoint names it). Step 2 makes every letter that travels a thing: a letter left at a port
+lies at the port in the port's keeping for the ship (`Port.letters` then a list of things), a
+cutter's letter is carried by her (`Vessel.letter` a thing), the boat and the pilot bring them,
+and the messenger hands each to its addressee (into his keeping, or before him where a model or
+the player holds him, by the rule of reach), the line of its coming and the knock at the door as
+now. At the load (`replay._rebind`, beside the other befores) every `Message` still held by a
+checkpoint (a port's letters, a cutter's, the messenger's hand) is made the thing it would be
+under this build, by one function that the scenario's and the world order's letters use too, so
+that a checkpoint read and a replay of its save stand in the same state; a save's JSON holds no
+`Message` (the scenario's `letters:` and the `message:` orders are words), so its replay reads
+by the new road. Every pin and digest of a passage with a letter that moves is put old beside
+new with its proof (a toggle of the new road).
+
+### Step 1: the thing with words
+
+**Built, against the brief.** A letter is a thing (`world.things.Thing`) with `words`,
+`author`, `to` (and `to_id`/`to_home` where the words name one of the people), `written`,
+`sealed`, `broken` and `gone`, each a plain class default and out of `to_dict` while empty (so
+a thing of before reads and digests as it did; a letter's words are never in `to_dict`). Its
+noun is "letter" (or the "packet", "note" or "dispatch" of its name), and "the letter", "the
+letter to <whom>", "the letter from <whom>", "<whom>'s letter" and "the sealed letter" name
+it. **Written** by the free line `write a letter to <whom>: "<words>"` (`pen`, `write to`) by
+the drafting's road: the writer's own name, the stamp of `books._stamp`, and `books.
+_in_the_cabin` (the captain on deck goes below to his table and is at his writing five
+minutes); the letter in the writer's keeping, so **carried, given, put down, hidden and thrown
+overboard** by the free lines of 53b unchanged. **Sealed** (`seal`, `seal up`), **opened**
+(`open`, `break the seal of`, `unseal`: the seal broken, which shows wherever the letter is
+listed, "a letter to the port admiral with its seal broken"; a sealed one listed "a sealed
+letter to ..."; no new seal over a broken one), **read** (`read`, within reach; a sealed letter
+refused as said "it is read only by breaking its seal ('open the letter'), which shows"),
+**looked at** (`examine`, `look at`, `inspect`, `look over`: the thing's name, its
+description, a letter's direction, hand and seal, and where it lies; never its words) and
+**destroyed** (`burn`, `tear up`, `tear`, `rip up`, `destroy`: a paper within reach gone,
+its place `GONE` and how it went kept, "the letter to the port admiral is burnt, and gone";
+a thing that is no paper refused as said "the cask is no paper to burn; throw it overboard";
+no fire in the boat). A thing that is no letter is opened and read as it always was (as said,
+nothing moves). **The director's form**: `aboard: a letter from <whom> to <whom>, <where>[,
+sealed]: "<words>"` (the words peeled from the end before the commas are read), and `aboard:
+remove <a thing>` (`aboard: the packet removed`, `take away`): out of the world, as if never,
+no line of the play log; refused out of a held person's keeping (the rule of reach), doubted
+where it lies within a held person's reach ("who would see it go by no hand"). Two forms in
+`agents/director.py` (`aboard.letter`, `aboard.removed`), their examples performed by the
+forms' test. **One road**: the player at the prompt, a station by its `submit_order`, the
+director's form; the director has no hands for the free lines, as before.
+
+**Who sees the words.** The free line is a word heard where it is said and carries the deed
+only ("By the captain, in the cabin: read the letter; the letter to the port admiral read.");
+its data's `said` and the `order.accepted` line say a writing without the words (the World
+reads `order_as_said` from the result, `core.world.ORDER_AS_SAID`; the journal keeps the order
+whole for the replay). The words are a line after it (`THEN_LINES`, the World writing the
+order's own line first): `free.read` to the reader and `free.written` to the writer (his own
+word, shown him), of a new reach `reader` in `world.knowledge.REACH`: the person named by his
+whole name, asleep or awake, and nobody else (the class `person` falls back to the deck and
+the place of delivery, how a letter is read aloud today); the director's sample, which has
+everything, has it.
+
+**Taken another way, with the reason.** (1) `look at` was the observer's driver command at the
+console and the page whatever the world (`ui.console`, `ui.server._drivers_eye`), refused with
+"The view is the ship's" in a world with a ship of the player's; it is now the driver's only in
+an observed world, and the game's free line otherwise (the probe found it). (2) A prisoner
+writes, reads and looks as he speaks: 74's rule (`captive.captive_words`, "You may speak ...
+and read what your place allows") refuses a captive his deck's orders and the books
+(`orders.handle` before `books.handle`), never the free lines, which reach no deck; so a
+captive's letter is written where he is (no going to a cabin of the captor's: `_in_the_cabin`
+is not called for him), and `captive.py` is untouched. (3) A director's thing named "a letter
+for the port admiral" with no words stays the plain thing it was (a letter is one with words or
+written), so no thing of before changes its noun.
+
+**Pins moved.** None. No passage of the trunk's writes, seals, reads or burns a letter by the
+new verbs, and a thing of before digests as it did (the new fields are out of `to_dict` while
+empty). One test's set grew rather than moved: `tests/test_knowledge.py`'s set of the design's
+reach classes has `reader` beside the others.
+
+**Step 1: the suites as run.** At **7e50d00** (the branch's head: the trunk merged at eb42c04
+by a merge commit, 0570a02, which brought records only, and one mend after it, below), in a
+worktree pinned there, one suite at a time: ruff check and ruff format --check clean; the fast
+tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`) exit 0, 7,166 passed, 1 xfailed, 486
+slow left out; the slow tier of the touched files (`--slow -m "not pace" -n 4` on
+tests/test_letters.py, test_people.py, test_director.py, test_knowledge.py, test_primer.py,
+test_in_world.py, test_orders.py, test_world_orders.py, test_known_truths.py,
+test_browser_probe.py, test_observer.py, test_console.py, test_server.py) exit 0, 2,508
+passed, 8 xfailed (the probe plan `a-letter` met among them); the pace alone and last
+(`--slow -m pace -n 0`, the same files) **exit 1**: 9 passed, 4 failed, truth 51's floor of
+500 ticks a second (truth 51's frigate 474, the day under systems 498, the gate's day 384, 7-159's
+convoy 397). The same four at the trunk's eb42c04 in a worktree of their own, one after the
+other on the same machine, fail alike (427, 462, 442, 428 against step 1's 478, 412, 451, 369),
+and the convoy run four times in turn, trunk and step 1, gives 434, 445, 446, 456: this
+container is under the floor whatever the tree, and step 1 costs the tick nothing measurable
+(it adds nothing to the tick; the reach `reader` is read only for its own two kinds). Before it,
+at 0570a02, the fast tier was exit 0 and the slow tier found one failure, the removal form's
+example (`aboard: remove the cask of brandy`) performed on none of the forms' test seas; mended
+at 7e50d00 (`aboard: remove the sealed packet`, the packet of the near sea) and all of it
+measured again there. The tree reported differs from 7e50d00 by this paragraph alone.

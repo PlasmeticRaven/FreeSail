@@ -724,6 +724,27 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "a thing made, or moved when it is known; never into a held person's keeping",
     ),
     Form(
+        "aboard.letter",
+        "aboard",
+        'aboard: a letter from <whom> to <whom>, <where>[, sealed]: "<its words>"',
+        (
+            'aboard: a letter from the agent to the captain, on the cabin table, sealed: "Your '
+            'cargo waits at the quay."',
+            'aboard: a letter from Mr Veale to the first lieutenant, in the gunroom: "Ask for '
+            'me at the Ship."',
+        ),
+        "a letter with its words, read by whoever has it in reach and breaks its seal; its "
+        "words shown to its reader alone",
+    ),
+    Form(
+        "aboard.removed",
+        "aboard",
+        "aboard: remove <a thing>",
+        ("aboard: remove the sealed packet", "aboard: the packet removed"),
+        "a thing taken out of the world, as if it had never been; never out of a held "
+        "person's keeping, and doubted where it lies before a held person's eyes",
+    ),
+    Form(
         "aboard.paid_in",
         "aboard",
         "aboard: <a sum> paid into the purse by <person>[ for <what>]",
