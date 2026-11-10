@@ -24663,3 +24663,23 @@ the step's code and at the trunk's (where the captain's station has them too), s
 holds, nothing of a world order before its effect, is held as strongly.
 
 **Found for others (not mended).** None.
+
+**Step 2: the suites as run.** At **c95d191** (the branch's head: the trunk merged at 229d024
+by a merge commit, 17fdd64, bringing package 75's SW-1 and ruled builds, 98's step 8, 60's
+design note and records; the conflicts were two appends at the ends of the tuning notes and
+the truths, both kept whole, 98's step 8 notes put back before this package's heading; and the
+test moved above, after it), in a worktree pinned there, one suite at a time: ruff check and
+ruff format --check clean; the fast tier exit 0, 7,237 passed, 1 xfailed, 486 slow left out;
+the slow tier of the touched files and of the letter's roads (`--slow -m "not pace" -n 4` on
+tests/test_letters.py, test_people.py, test_knowledge.py, test_ports.py, test_ships.py,
+test_world_orders.py, test_director.py, test_primer.py, test_in_world.py,
+test_known_truths.py, with the replay's and the recorded passages' test_replay.py,
+test_checkpoint.py, test_captain_trials.py, test_agents.py, test_harbour.py and
+test_boat_director.py) exit 0, 1,954 passed, 9 xfailed (gate 5c's cruise and merchant passages,
+each with its letter read at its pinned tick and its digest, among them, unmoved); the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 1, 12 passed, 1 failed: 7-159's
+convoy at 494 ticks a second against truth 51's floor of 500; run again four times in turn,
+the trunk's 229d024 and step 2's c95d191 twice each, it passed every time (the container's
+noise about the floor, as at step 1). Before it, at 17fdd64, the fast tier was exit 1 on the one
+test moved above, and nothing else. The tree reported differs from c95d191 by this paragraph
+alone.
