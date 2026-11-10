@@ -678,3 +678,44 @@ where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea
   split between two quarters; the systems are tuned toward it by the check tool's `run` with
   the box made the default. One track of lows a month cannot give two regimes at once (the
   mistral's lows east of the Gulf and the Levant's south of it): say which the box takes.
+
+## The Catalan coast (package 101, as built)
+
+`catalan-coast`, 40.56 to 41.9 N and 0.3 to 3 E, the hole between `balearics` and
+`gulf-of-lion` closed. Its south bound is `balearics`' north bound and its tiles' edge (the
+row edge 40.56 N takes in no row below: `tiles_over` starts on it), its east bound
+`gulf-of-lion`'s west bound; the Gulf's first column (2.61 to 3.04 E) meets both and is the
+Gulf's by the seam rule ("4 kept"), so the block's bounds own water whose tiles are the
+Gulf's, and the depth does not step at 3 E. What it found, for the next blocks:
+
+- **A small block in a corner is cheap**: 24 level-2 tiles of 3.4 MB (14 all land, written
+  east of 1 W), the patches 2.6 MB, the whole 6.1 MB. Measure first all the same.
+- **A delta the grid smears floods on the block's own water.** EMODnet has nothing over the
+  Ebro's delta and GEBCO's fifteen seconds lay its flat land under mean sea level; on the
+  block's own tide (0.2 m) the whole delta from Amposta to the Fangar read as shoal water
+  (the sweep's 34,401 cells, its ten largest places all there), where the first build on
+  the eleven's raise (Saint-Malo's 6.83 m, no gauge of the block's yet) had stood it up.
+  Package 93's rule mends it: the Alfaques patch widened over the delta with `fill_raise:
+  eleven` (the sweep then 1,642 cells, the modern harbours' basins). **Rebuild after the
+  block's gauge goes in** and before trusting the shore: the raise follows the tide.
+- **The four ports beside a block get no patch**: the tool builds a region's level-2 and
+  level-3 tiles together, so a patch for a built region means rebuilding its level-2
+  tiles. Their marks go in the neighbour's features file and its index is rebuilt from the
+  file (`build_index` over its features, the diff additions only), the manifest's
+  `feature_count` and `features_by_kind` for that region edited alone; `--check` on the
+  neighbour passes and `git status` shows no tile or coast of it.
+- **A new gauge in a built region changes its water and its tiles' fill** (package 93):
+  Valencia's TICON gauge was left out of `mediterranean-west` by the lead's ruling, and the
+  world's tide on the Valencian coast is still the Alboran gauges' blend (an M2 of 13 cm
+  where Valencia's is 1.7): a gauge for that coast is a package of its own, with the
+  region's rebuild.
+- **The business needs its ports' tracks**: a port whose anchorage lies behind a spit (the
+  Alfaques' haven) or whose straight line to its neighbour crosses a cape (Tarragona to
+  Barcelona across the Garraf) has its routes refused by the far-detail guard
+  (`land_crossing`), and the region draws no trader between them; `tracks:` to and from
+  the sea in the port files open them.
+- **A weather box's seam is not the region's**: `mediterranean-west`'s box ends at 40.5 N,
+  so the strip to 40.56 N takes the nearest box, now Barcelona's.
+- **The isles the grid lacks, again**: the Medas, Tabarca and the Hormigas (Formigues) are
+  water in EMODnet's grid; given as islands the grid lacks (the first two) and a rock of
+  its height (the third), as the pilots name them.

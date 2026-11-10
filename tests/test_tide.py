@@ -330,7 +330,7 @@ MED_WEST_CURRENTS = [
 ]
 # package 79d: the Mediterranean blocks' charts, whose areas carry the coasts' constant sets
 # and no tide (`current:` alone), and their areas' ids
-MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian"}
+MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian", "catalan-coast"}  # 101
 MEDITERRANEAN_AREAS = (
     "provence-current",
     "gulf-of-lion-open",
@@ -339,6 +339,8 @@ MEDITERRANEAN_AREAS = (
     "ligurian-sea-open",
     "roman-coast-current",
     "tyrrhenian-open",
+    "catalan-coast-set",  # package 101
+    "catalan-coast-open",
 )
 
 
@@ -1102,7 +1104,8 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 75
+    # package 101: Barcelona's, the Catalan coast's
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 76
     for g in blocks:
         # its own block first (a list's further blocks are the rule of the seams': below)
         own = g["block"][0] if isinstance(g["block"], list) else g["block"]
@@ -1124,6 +1127,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         "ligurian-sea",
         "tyrrhenian",
         "solent",  # package 94: a tide region of the manifest, bounds and no tiles
+        "catalan-coast",  # package 101
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None

@@ -122,3 +122,42 @@ STEEL_ANCHORS[14] = {
 # of metal to shot, 270, the check (7 cwt 1 qr of 112 lb over 3 lb). The shared table's 7 cwt
 # (`gen_ships.LONG_GUN_CWT[3]`), from memory, feeds the eight files and stays as it is.
 ADYE_LONG_GUN_CWT[3] = {(4, 6): 7.25}
+
+# -- the 74's appends (package 75, B7; Design-Ship-Bellerophon.md §5.3, §6.1, §7). Lavery, The
+# 74-Gun Ship Bellona (1985), p. 21, Table 17, the types of gun carried at various times (read
+# (owner's book)): the long 18-pounder of 9 ft of 1812, 42 cwt, which Adye lacks (Adye's 9-ft gun
+# is the 40-cwt one of 1761); the long 12-pounders of 1812, 9 ft and 34 cwt, 7 ft 6 in and 29 cwt;
+# and the long 9-pounder of 8 ft 6 in of 1761, 27 1/2 cwt (Table 18 prints 27). Keyed as Adye's
+# table, the length in feet and inches. Her design's rule for a weight (§5.3): Adye's where Adye
+# gives the pattern, else this table; her 1812 fit's long guns are Lavery's types of 1812, which
+# Adye's table of 1804 does not hold (the 18 of 42 cwt the design's own case; Adye's 12-pounders
+# of 9 ft and 7 ft 6 in are 32 and 29 1/4 cwt, as package 81 read p. 155 for the viewer).
+LAVERY_LONG_GUN_CWT = {
+    18: {(9, 0): 42.0},
+    12: {(9, 0): 34.0, (7, 6): 29.0},
+    9: {(8, 6): 27.5},
+}
+
+# Steel 1794 vol. I, the folding anchor table's "Smaller 74 Guns" column and "A Cordage Table"
+# (the page images, IA leaves n127 and n117, read: Research-74-2026-10.md §5.7): four bowers of
+# 67 cwt, a stream of 16 cwt and a kedge of 8 cwt; seven bower cables of 22 in ("23 or 22" for
+# the 74) and a stream cable of 12 1/2 in. Lavery 1985 p. 15, Table 4, a 74 about 1800 (read
+# (owner's book)), gives the same anchors, and the cables below.
+STEEL_ANCHORS[74] = {
+    "bowers": 4,
+    "bower_cwt": 67.0,
+    "stream_cwt": 16.0,
+    "kedge_cwt": 8.0,
+    "bower_cables": 7,
+    "bower_cable_in": 22.0,
+    "stream_cable_in": 12.5,
+}
+# Lavery 1985 p. 15, Table 4, a 74's cables about 1800 (after NMM SPB 15, by Lavery p. 23): seven
+# of 22 in and one of 13 1/2 in, each of 100 fathoms.
+LAVERY_74_CABLES = {"bower_cables": 7, "bower_cable_in": 22.0, "stream_cable_in": 13.5}
+LAVERY_74_CABLE_FATHOMS = 100.0
+
+# The Regulations' table of officers and ratings (1806, 1808 printing, p. 165 and IA leaves
+# 455-460, the page images read row by row: Research-74-2026-10.md §4.3): the 590 column is the
+# 74's.
+REGULATIONS_COLUMNS[74] = 590

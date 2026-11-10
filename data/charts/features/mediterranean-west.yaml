@@ -1102,3 +1102,134 @@ features:
   source: 'Tofiño 1787, p. 149: the isles passed at a musket shot, so that they bear NNW, is the true anchorage of the bay in 7, 8 or 9 brazas sand, with nothing to fear but what is seen; smaller craft in 4 brazas weed nearer the western shore with a hawser to a cave, sheltered from all winds; in the bottom of the bay the islet of Tujismes and near it the ruins of the city of Arecú. Purdy 1826, pp. 323 to 324 (an officer''s note of 1817): the best anchorage with the South Rock E.N.E. and the Granary W. by N., 10 to 6 fathoms sandy bottom, 2 or 3 cables from shore; open to E and N.E. winds; not more than 10 or 12 ships can ride in it. Bérard 1837, pp. 166 to 167: an excellent anchorage in all seasons for ordinary merchant ships; great ships outside the line from the fort''s point to the high land of the Chelif in 6, 7 and 8 brasses sand, good in the fine season only'
   says: 'Arzeo road, the isles bearing north-north-west a musket shot off, seven to nine brazas sand: the best berth on this coast for ten or twelve ships.'
   fix: a musket shot SSE of the isle, by Tofiño's mark; 7 to 9 brazas (6.4 to 8.2 fathoms); moved 325 m to the nearest water of the tiles holding half the pilot's depth (6.4 m)
+# ---------------------------------------------------------------------------
+# Package 101: Valencia's Grao and Alicante, north of Cape Palos, for the two ports beside
+# the Catalan coast's block (79c's head: "the coast north of Cape Palos ... a later
+# block's"). Added by the how-to's road for a mark added to a built region: this file and
+# its index alone, no tile, coast or other mark changed. The sources Tofino 1787, pp. 93
+# to 109, with Michelot 1709 and 1715, Purdy 1826 and 1840, Norie 1831 and Smyth 1854's
+# table (package 101's short pass, docs/dev/TuningNotes.md). No light at Valencia's Grao
+# or Alicante in 1805: the Grao's harbour light first in Purdy 1840 (no year), Alicante's
+# mole light first in Smyth 1854's table (no year).
+# ---------------------------------------------------------------------------
+- id: cape-cullera
+  kind: headland
+  name: Cape Cullera
+  modern: 'Cap de Cullera'
+  lat_deg: 39.1878
+  lon_deg: -0.2200
+  fix: 'moved 20 m to the grid''s land (the first placing read 3 m of water)'
+  height_m: 53
+  source: 'Tofino 1787, p. 107: Cape Cullera in latitude 39 9 and longitude 6 5 20 from Cadiz, a watch tower on it; the Jucar of little depth with a bar, which only small boats can enter to load rice; a covered stone off the river''s mouth; Smyth 1854, table: Cape Cullera, tower 39 12 5, 0 13 0 W, 174 feet, the height'
+  says: 'Cape Cullera, a high lone headland with its watch tower on the flat coast south of Valencia; the Jucar beside it, where small craft load rice.'
+- id: valencia-cathedral
+  kind: church
+  name: the cathedral tower of Valencia
+  modern: 'the Miguelete, Valencia cathedral'
+  lat_deg: 39.4755
+  lon_deg: -0.3752
+  height_m: 60
+  source: 'Tofino 1787, p. 108: the city of Valencia two miles and a half from the beach to the WNW; the cathedral tower, the highest and stoutest of all, on with the tower of the Barracas a mile from the beach shows the reef of the Barreta; Smyth 1854, table: Valencia cathedral 39 28 35, 0 22 10 W; Admiralty 1913: the Miguelete 197 feet, the height'
+  says: 'The great tower of Valencia cathedral, the highest of the city two miles and a half inland of the Grao; the mark for the Barreta reef and the anchorage.'
+- id: valencia-grao
+  kind: town
+  name: the Grao of Valencia
+  modern: 'El Grau, Valencia (the modern port its land)'
+  lat_deg: 39.4620
+  lon_deg: -0.3300
+  height_m: 5
+  source: 'Tofino 1787, p. 109: the Grao of Valencia in latitude 39 26 and longitude 5 59 from Cadiz; Purdy 1826, p. 24: the Grao, or town on the strand, lat. 39 26, long. 0 18 35 W.; Norie 1831, p. 27: the commerce carried on by lighters which load and unload at the Grao'
+  says: 'The Grao, Valencia''s town on the strand, where the lighters work the ships lying off; no mole, an open beach.'
+- id: grao-road
+  kind: anchorage
+  name: the road of Valencia
+  modern: 'the road off the Grao of Valencia, outside the modern port'
+  lat_deg: 39.4500
+  lon_deg: -0.3000
+  height_m: 0
+  depth_fathoms: 6
+  bottom: hard mud
+  source: 'Tofino 1787, pp. 108 to 109: very dangerous in the autumn, the winds from NE to SE doing most harm, and with the E there is no clawing off, the Grao being the westernmost point of the gulf, so that ships parting their cables go on the beach, where a bank of sand 300 varas off has only 6 feet and its breakers drown the boats'' crews; much of the bottom stone; to anchor clear of the Barreta open the cathedral tower a little south of the church of the Barracas, and in 6 brazas of hard mud let go; Purdy 1826, p. 24: highly dangerous for a vessel caught here in an easterly, next to impossible to get out to sea; the usual anchorage before the Grao in 10 to 6 fathoms'
+  says: 'The road of Valencia off the open beach, six fathoms of hard mud with the cathedral tower open south of the Barracas: in an easterly a ship cannot claw off, and those that part their cables go on the bank and the beach.'
+- id: barreta-reef
+  kind: ledge
+  name: the Barreta
+  modern: 'the stony bank off the Cabanyal (the Admiralty''s Algar del Cabanal)'
+  lat_deg: 39.4800
+  lon_deg: -0.3130
+  height_m: 0
+  extent_m: 400
+  dries_m: -9.1
+  source: 'Tofino 1787, p. 108: the cathedral tower on with the tower of the Barracas a mile from the beach shows a reef of stones running north more than a third of a league, called the Barreta, its most water 5 and 6 brazas; Norie 1831, p. 27: the Barretta rocks half a mile from the beach running northerly full a mile and a half; Admiralty 1913: the stony bank 5 1/2 to 8 fathoms (modern); 5 1/2 fathoms as the depth'
+  says: 'The Barreta, a reef of stones a mile off the beach north of the Grao with five or six fathoms over it: foul ground for an anchor.'
+- id: murviedro
+  kind: castle
+  name: Murviedro
+  modern: 'the castle of Sagunto'
+  lat_deg: 39.6780
+  lon_deg: -0.2760
+  height_m: 160
+  source: 'Tofino 1787, p. 109: the beach runs 11 miles N 22 15 E to the Grao of Morviedro, a tower of 2 guns and some warehouses, the town three miles from the sea; Purdy 1826, p. 24: Murviedro, the ancient Saguntum, its citadel occupying the entire summit of a high rock; height JUDGEMENT'
+  says: 'Murviedro, the ancient Saguntum, its citadel along the summit of a high rock three miles inland north of Valencia.'
+- id: santa-barbara-castle
+  kind: castle
+  name: the castle of Santa Barbara
+  modern: 'the Castell de Santa Barbara, Alicante'
+  lat_deg: 38.3490
+  lon_deg: -0.4775
+  height_m: 179
+  source: 'Tofino 1787, p. 97: the castle of Alicante (called Santa Barbara, on its eminence) in latitude 38 20 41 by five meridian altitudes, longitude 5 47 25 from Cadiz; S 41 39 W of the Cuchillada de Roldan, S 20 25 W of the peak of the Sierra del Hombre; Michelot 1709, OCR l. 1853: known from afar by the whiteness of its walls on a mountain of white earth; Admiralty 1913: the castle hill about 587 feet, the height'
+  says: 'The castle of Santa Barbara on its white bare hill over Alicante, seen far off by the whiteness of its walls.'
+- id: alicante-road
+  kind: anchorage
+  name: the road of Alicante
+  modern: 'the road off Alicante, outside the modern port'
+  lat_deg: 38.3290
+  lon_deg: -0.4750
+  height_m: 0
+  depth_fathoms: 8
+  bottom: weed and sand
+  source: 'Tofino 1787, p. 96: the capes leave the regular anchorage without shelter from ENE to S by SW, but the holding good, weed and sand, and no ground swell, one rides well with winds of the second and third quadrants, and much better with the opposite, the mountains sheltering; moor NE and SW about a mile from the land in 12 to 6 brazas, weed and sand, and even to 2 or 3 brazas S by SE or SSE of the castle of Santa Barbara, the gate of the mole open; Purdy 1826, p. 21: large vessels anchor without in about 7 fathoms; Michelot 1709, OCR l. 1856 to 1885: the land refuses the wind'
+  says: 'The road of Alicante, eight fathoms on weed and sand a mile off the mole with the castle north by west: open from east-north-east round to south, but the holding is good and the mountains break the wind.'
+- id: cape-huertas
+  kind: headland
+  name: Cape de la Huerta
+  modern: 'Cap de l''Horta (Cabo de las Huertas)'
+  lat_deg: 38.3540
+  lon_deg: -0.4068
+  fix: 'moved 160 m to the grid''s land (the first placing read 3 m of water)'
+  height_m: 20
+  source: 'Tofino 1787, pp. 97 to 98: Cape de la Huerta with the tower of Alcora and the Picacho de las Matas, latitude 38 20 56 (OCR) deduced from bearings; the tower N 85 25 E of the castle of Alicante; Michelot 1709, OCR l. 1895: about three miles E by S of the town; height JUDGEMENT'
+  says: 'Cape de la Huerta, the low point closing Alicante road on the east, a tower on it.'
+- id: cape-santa-pola
+  kind: headland
+  name: Cape Santa Pola
+  modern: 'Cabo de Santa Pola'
+  lat_deg: 38.2090
+  lon_deg: -0.5100
+  height_m: 140
+  source: 'Tofino 1787, p. 93: the middle of Cape Santa Pola in latitude 38 12 5, exactly S 9 W 9 miles from the castle of Alicante and S 28 33 W of Cape de la Huerta 10 long miles; the Talayola tower; Michelot 1709, OCR l. 1848: Cape St. Paul; height JUDGEMENT'
+  says: 'Cape Santa Pola, the high flat cape closing Alicante bay on the south, the Talayola tower on it.'
+- id: tabarca
+  kind: island
+  name: the Isla Plana, or New Tabarca
+  modern: 'Nueva Tabarca'
+  lat_deg: 38.1646
+  lon_deg: -0.4789
+  height_m: 11
+  extent_m: 800
+  grid_lacks: true
+  fix: 'the grid has no land within two kilometres (its shoalest 1.9 m of water at this place, moved 600 m to it from the first placing): an isle the grid lacks (ChartBlocks.md); extent JUDGEMENT, the isle a mile long'
+  source: 'Tofino 1787, pp. 93 to 96: the west end of the Isla Plana or Nueva Tabarca, where the mole and gate are, about 2 miles SE by S of Cape Santa Pola, the isle lying E by SE half a league; so low it has but 36 feet of height, that of the walls; the spacious castle of San Pablo at its west part, latitude 38 9 58; peopled about 1768 by some 600 Genoese ransomed from Algiers, coral fishers from Tabarca; the channel between it and the cape has 7 brazas in the middle and no ship has come to harm in it, but never prudent for great ships save in need'
+  says: 'The Isla Plana, New Tabarca, a low walled isle two miles south-east of Cape Santa Pola, its Genoese coral fishers'' town and the castle of San Pablo; the channel inside it has seven fathoms but is no place for a great ship.'
+- id: tabarca-shoal
+  kind: rock
+  name: the shoal east of the Isla Plana
+  modern: 'the shoal east of Nueva Tabarca'
+  lat_deg: 38.1600
+  lon_deg: -0.4300
+  height_m: 0
+  extent_m: 150
+  dries_m: -4.2
+  source: 'Tofino 1787, p. 94: E 15 S of the Piedra de fuera (itself a cable and a half E 15 S of Cape Falcon, the isle''s east end) a mile off a dangerous shoal with only 2 1/2 brazas, stone; its marks the N side of the Piedra on the middle of the church towers of the isle; some charts put it between the isle and the cape, where it is not; 2 1/2 brazas as the depth'
+  says: 'The shoal a mile east of the Isla Plana with two and a half fathoms on stone: the old charts put it in the channel inside the isle, where there is none.'

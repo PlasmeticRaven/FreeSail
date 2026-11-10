@@ -1028,6 +1028,9 @@ ROLE_BY_INTENT = {
     "razee": ["kings-ship"] * 4 + _TAIL,
     "hermaphrodite brig": ["privateer"] * 4 + _TAIL,
     "bilander": ["merchant"] * 4 + _TAIL,
+    # package 75, B7: the 74's row, filed since 75 with her roles, sails by her first, a King's
+    # ship's (Design-Ship-Bellerophon.md §8.1), as the frigate's and the 64's rows do by theirs
+    "seventy-four": ["kings-ship"] * 4 + _TAIL,
 }
 
 
@@ -1040,7 +1043,8 @@ def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
     before at every intent's kind (`ROLE_BY_INTENT`, measured before the step). A crewed World's
     captain takes his own file's first row's by the same rule (`brains.own_sub_type_role`), hers
     alone of the files until the bilander's landing (package 75, B4), whose row, filed since 75
-    with its roles, sails by its first role as hers does: a merchant."""
+    with its roles, sails by its first role as hers does: a merchant; and the 74's (B7), a King's
+    ship (old: the bilander's and hers alone)."""
     for key, roles in ROLE_BY_INTENT.items():
         got = []
         for kind, prizes, convoy in INTENT_KINDS:
@@ -1056,6 +1060,7 @@ def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
     assert {k: v for k, v in own.items() if v} == {
         "bilander.yaml": "merchant",
         "hermaphrodite-brig.yaml": "privateer",
+        "seventy-four.yaml": "kings-ship",
     }
 
 
