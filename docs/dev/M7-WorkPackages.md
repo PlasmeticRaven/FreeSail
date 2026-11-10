@@ -3627,8 +3627,7 @@ passed, 1 xfailed, 482 slow left out; the slow of the known truths, the profile 
 Indefatigable exit 0, 506 passed, 8 xfailed; the slow of the touched files exit 0, 1,803 passed;
 the pace alone and last exit 0, 14 passed, no floor lowered; nothing skipped in any tier; ruff
 clean. **The lead's merge:** the trial on b4e99f33 clean and lint-clean; no model or vendor name
-in the diff; no ship file, no physics; the fast tier whole on it exit 0, 7,057 passed by the dots and 1 xfailed, 05:19 to 06:24 UTC (an hour and five minutes, the machine shared with the investigation for its first quarter hour); the whole
-suite in the cloud dispatched after run 59, the figures to follow.
+in the diff; no ship file, no physics; the fast tier whole on it exit 0, 7,057 passed by the dots and 1 xfailed, 05:19 to 06:24 UTC (an hour and five minutes, the machine shared with the investigation for its first quarter hour); the whole suite in the cloud, run 60 (2026-11-10, 06:25 to 07:44 UTC, on c54a0537): lint green; the six shards green, 7,494 passed, 20 skipped, 12 xfailed, the longest shard 70 minutes; the pace job 10 of 14 in 7 minutes 17 (the step's own pace truth, 7-361, among the passes), the same four floor tests short on the runner (426 to 488 ticks a second against 500; 7-159's convoy 426, where run 59 before the far fight was wired had it at 388 and the builder's machine 539 to 565), so the shortfall is the runner's hour and not the step's.
 
 **Given back to the builder for step 5's tree (none held the merge):** (i) the parole's plain
 answer reads "I do not." and "I do not know" and "you have it not" as given (the yes list's "i
