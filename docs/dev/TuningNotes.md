@@ -22742,7 +22742,9 @@ in the stations' `tell` 98's visitor's road is asked only where this package's
 `the second ensign`, `the jack`) are the deck's orders by the place's check, and a prisoner is
 refused them in his own words by the same road as the colours: three lines added to the step's
 test of the prisoner's prompt. The truths' file merged with both packages' truths in order
-(this package's to 7-363 and 7-369, then 98's 7-446 to 7-459).
+(this package's to 7-363 and 7-369, then 98's 7-446 to 7-459). A fourth merge (2ca46c9 at
+ef0446c) brought the lead's records alone (the work packages' page and the design proposal's
+decision 66) and met nothing.
 **One pin moved at the meeting with 98, old beside new** (found by the step's first fast tier,
 at b14433a: exit 1, 7,143 passed and this one failed). `tests/test_officer.py`'s handover test
 holds the officer's conversation at his seat under the fraction (0.6) of the door's budget, and
