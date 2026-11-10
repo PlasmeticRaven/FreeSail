@@ -14982,6 +14982,52 @@ def _tmp_dir():
     return Path(tempfile.mkdtemp(prefix="freesail-7-364-"))
 
 
+def test_truth_7_367_the_readings_the_events_and_the_forms_perform_and_the_truth_shows_the_prizes():
+    """The design's §8: every new form has examples the director test performs in the dry run
+    and in play with its doubt (`test_director`'s forms test, run here on the forms' table);
+    the two scenarios of the package load and begin (the prize in company, the player a
+    prisoner aboard the captor); the director's truth shows every prize with her captor, her
+    crew and her prisoners, and every hull's prisoners with their paroles."""
+    from freesail.agents import director as D
+    from tests.test_director import (
+        test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs,
+    )
+    from tests.test_prize_scenarios import (
+        test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor,
+        test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her,
+    )
+
+    keys = {f.key for f in D.WORLD_ORDER_FORMS}
+    assert {
+        "prize.parole",
+        "prize.cartel",
+        "ship.prize",
+        "ship.struck",
+        "person.exchanged",
+        "court.sits",
+        "court.read",
+        "court.verdict",
+        "command.new",
+    } <= keys
+    test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs()
+    test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her()
+    test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor()
+
+
+@pytest.mark.slow
+def test_truth_7_368_a_prize_passage_and_a_far_fight_replay_by_both_roads():
+    """84's acceptance form: a passage with the player taken near, the captive aboard the captor
+    and the parole exchanged replays by its transcript and by its acts to the same digests of
+    both hulls' logs; a far fight's passage the same, to the same records."""
+    from tests.test_prize_scenarios import (
+        test_a_far_fights_passage_replays_by_both_roads_to_the_same_records,
+        test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads,
+    )
+
+    test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads()
+    test_a_far_fights_passage_replays_by_both_roads_to_the_same_records()
+
+
 def test_truth_7_446_the_players_own_lines_reach_him_wherever_he_stands():
     """Package 98, step 2 (the owner's ruling of 2026-11-09): what is not in the world is
     always shown the man who made it, wherever he stands: in the cabin his readings, his

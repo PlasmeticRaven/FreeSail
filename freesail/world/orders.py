@@ -656,9 +656,101 @@ _LETTER = re.compile(
 )
 
 
+_SHIP_TAKEN = re.compile(
+    r"^ship\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<how>a\s+prize\s+of|struck\s+to)\s+(?:the\s+)?"
+    r"(?P<captor>\"[^\"]+\"|[\w' -]+?)\s*\.?\s*$",
+    re.I,
+)
+
+
+def _taken_parts(world: Any, m: re.Match[str]) -> tuple[Any, Any, str]:
+    """(the ship taken, her captor, how) from `ship "<name>": a prize of the <captor>` or
+    `ship "<name>": struck to the <captor>` (package 74, step 7): the player's own ship by
+    her name or 'the ship'."""
+    sea = world.vessels
+    name = m.group("name").strip()
+    captor_words = m.group("captor").strip().strip('"')
+    own = getattr(sea, "own", None)
+    own_name = str(
+        getattr(getattr(world, "players", None), "ship", None) and world.players.ship.name or ""
+    )
+
+    def find(words: str) -> Any:
+        key = " ".join(words.lower().split())
+        if key in ("the ship", "the player's ship", "our ship") or (
+            own_name and key == own_name.lower()
+        ):
+            return own
+        return sea.find(words)
+
+    taken, captor = find(name), find(captor_words)
+    if taken is None:
+        raise WorldOrderError(f"No ship named {name!r} is on the sea.")
+    if captor is None:
+        raise WorldOrderError(f"No ship named {captor_words!r} is on the sea to take her.")
+    if taken is captor:
+        raise WorldOrderError(f"{taken.name} cannot take herself.")
+    return taken, captor, " ".join(m.group("how").lower().split())
+
+
+def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
+    """A ship made a prize by the director's word, or struck to another and possessed (the
+    scenarios' start: `prize-home.yaml`, `captive.yaml`; a cause given in play is doubted
+    after the first minute): the taking by `prizes.possess`, her captor promoted where the
+    player's ship is the one struck, so that the captive is aboard a real hull."""
+    from freesail.combat import action
+    from freesail.world import prizes as P
+    from freesail.world.ships import PLAYER_ID
+
+    taken, captor, how = _taken_parts(world, m)
+    if P.is_prize(taken):
+        raise WorldOrderError(f"{taken.name} is a prize already.")
+    if str(taken.id) == PLAYER_ID and getattr(captor, "crew", None) is None:
+        from freesail.world.crews import promote
+
+        promote(world, captor)
+    hull = P._hull(taken)
+    if hull is not None and not hull.ship.extra.get("struck"):
+        action.strike(hull, False, f"to the {captor.name}")
+    taken.struck = True
+    by = "struck" if how.startswith("struck") else "made a prize by the director's word"
+    rec = P.possess(world, captor, taken, by=by, said=False)
+    ports = getattr(getattr(world, "ports", None), "ports", {}) or {}
+    goal = str(getattr(ports.get(str(rec.get("goal") or "")), "name", None) or "his company")
+    words = (
+        f"{taken.name} {how.replace('a prize of', 'a prize of the')} {captor.name}: "
+        f"{rec.get('master') or 'a prize master'} and {rec.get('crew', 0)} hands aboard her, "
+        f"{rec.get('prisoners', 0)} of her people prisoners, bound for {goal}"
+    )
+    return words, {
+        "prize": str(taken.id),
+        "captor": str(captor.id),
+        "how": how,
+        "crew": rec.get("crew", 0),
+        "prisoners": rec.get("prisoners", 0),
+        "goal": rec.get("goal"),
+    }
+
+
+def _doubt_taken(world: Any, m: re.Match[str]) -> str | None:
+    try:
+        taken, captor, how = _taken_parts(world, m)
+    except WorldOrderError:
+        return None
+    if int(world.clock.tick) > 60:
+        return (
+            f"{taken.name} taken by {captor.name} by no action of the sea's: a ship is made a "
+            "prize at a scenario's start; afterwards she strikes to the guns"
+        )
+    return None
+
+
 def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world.ships import vessel_from_spec
 
+    tm = _SHIP_TAKEN.match(body)
+    if tm is not None:
+        return _taken(world, tm)
     m = _SHIP_GOAL.match(body)
     if m:
         hm = _HAND_TAIL.match(m.group("goal"))
@@ -3955,6 +4047,9 @@ def _doubt_ship(world: Any, body: str) -> str | None:
     from freesail.world.geo import bearing_and_distance
     from freesail.world.ships import place_position
 
+    tm = _SHIP_TAKEN.match(body)
+    if tm is not None:
+        return _doubt_taken(world, tm)
     g = _SHIP_GOAL.match(body)
     hm = _HAND_TAIL.match(g.group("goal")) if g is not None else None
     if g is not None and hm is not None:

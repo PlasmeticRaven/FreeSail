@@ -23712,6 +23712,46 @@ conversation at his seat measures 13,584 tokens with this step (13,516 before it
 `the record` and the court's events in the stand-by's words), under the 13,800 the handover
 test allows at its budget of 23,000.
 
+### Step 7: the records and the last truths (the design's §8)
+
+**Built**: `data/scenarios/prize-home.yaml` (the Amazon off the Lizard for Falmouth with the Deux
+Frères her prize in company, the business on, the quiet passage's brief) and `captive.yaml` (the
+Amazon struck to the Didon in the mouth of the Channel, the player her prisoner bound for Brest
+with his own ship a prize astern, the captive's starter brief `data/director/briefs/captive.yaml`
+with its causes: a gale, a cartel, a cruiser at dawn), each loaded and begun in the fast tier; the
+two forms the scenarios' starts wanted, `ship "<name>": a prize of the <captor>` and `ship
+"<name>": struck to the <captor>` (world orders, journaled, so that a replay makes the taking
+again; doubted after the first minute: afterwards a ship strikes to the guns); the director's
+truth's rows (every prize with her captor, her crew and her prisoners, where bound and in company
+or parted; every hull's prisoners with their paroles; every far action in its rounds; the courts
+pending and sat; a court martial sitting); the replay by both roads of a passage with the player
+taken, the parole exchanged and the captor under way an hour, and of a far fight's passage (the
+`far` stream opened at the first round and drawn again alike); spec M7 §11a, §18 to §20 and §29
+as built; `docs/agents/Harness.md` §21i; the primer's chapter 27 through `test_in_world.py`
+("later milestone's" and "later packages'" were not in-world and are "not yet in the game"); the
+library's forms table in chapter 20 and the events in chapter 11; the work packages' paragraph on
+97's pin. Truths 7-367 and 7-368.
+
+**The scenes' figures** (seed 7): the prize-home world order two minutes in finds the brig a full
+ship beside the frigate and takes her with Mr Ward and twenty-one hands, her 121 people prisoners
+(the brig's one file, 75's); the captive world order two minutes in promotes the Didon and takes
+the Amazon with Mr Gordon and twenty-one hands, her 264 people prisoners, the parole asked a minute
+after in the French row's words. **Found on the way**: two frigates from one file draw the same
+wardroom names from one seed (the Didon's master's mate is a Mr Gordon as the Amazon's is), told
+apart in the one registry by their homes; a vessel a test adds by hand (`tests.test_brains.put`)
+is in no journal and a replay cannot make her again, so the replay truths put their ships on the
+sea by the director's forms.
+
+### The package whole: what moved, and the suites
+
+The pins moved by the package, each with its reason, old beside new: 7-181 (step 2: the prize
+possessed at once), 7-325 (step 2: 72's cut-out a possession on the records), 97's officer-killed
+test (step 2: the party's leader-on), 72's cut-out (7-352, step 2 and step 4), test_brains' hail
+scene (step 4: a round fired where she yielded at hail, the same possession), and the agreement
+pinned as found (7-359). No recorded passage's digest moved for the far fight (the toggle, step 4).
+The two faults the wiring uncovered (the wake's doubled damage, the recaptor's state) are mended,
+not re-pinned. The suites' results on each step's final tree are recorded under the steps above.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

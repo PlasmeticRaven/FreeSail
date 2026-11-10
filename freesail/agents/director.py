@@ -951,6 +951,26 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "lands them free at her port; refused for a person nobody holds prisoner, doubted "
         "beyond a day's sail of the port",
     ),
+    # package 74, step 7: a ship made a prize or struck at a scenario's start (the director's
+    # cause, doubted after the first minute)
+    Form(
+        "ship.prize",
+        "ship",
+        'ship "<name>": a prize of the <captor>',
+        ('ship "Harpy": a prize of the Medusa',),
+        "a ship on the sea made a prize of another's by the director's word: her captor's "
+        "prize crew and prize master aboard her, her people prisoners, bound for his port; a "
+        "scenario's start (doubted after the first minute: afterwards she strikes to the guns)",
+    ),
+    Form(
+        "ship.struck",
+        "ship",
+        'ship "<name>": struck to the <captor>',
+        ('ship "the ship": struck to the Harpy',),
+        "a ship struck to another and possessed, the player's own by her name or 'the ship' "
+        "(her captor promoted, the player a prisoner aboard her: chapter 27); a scenario's "
+        "start, doubted after the first minute",
+    ),
     # package 74 (spec M7 §20; docs/design/Design-Prizes.md §7): the court martial as the
     # director's proceeding, and a new command as a scenario's start
     Form(
