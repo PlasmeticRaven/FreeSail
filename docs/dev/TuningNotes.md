@@ -23728,6 +23728,20 @@ conversation at his seat measures 13,584 tokens with this step (13,516 before it
 `the record` and the court's events in the stand-by's words), under the 13,800 the handover
 test allows at its budget of 23,000.
 
+**The suites on the step's final tree** (1e941f0, one hash, the trunk at e1e2ba7 merged in it;
+a worktree pinned there; ruff check and format clean; every run started in the harness's
+background mode, the tiers as separate tasks under its two-hour cap; 2026-11-10 UTC): the slow
+tier of the known truths, the profile and the Indefatigable **exit 0** (16:54:29 to 17:46:23;
+530 passed and the trunk's eight expected failures); the slow tier of the touched files
+(`test_court`, `test_letters`, `test_agents`, `test_server`, `test_seat_hook`, `test_orders`,
+`test_people`, `test_scenarios` and step 5's twenty-seven) **exit 0** (17:46:23 to 18:12:18;
+2,978 passed and the trunk's one expected failure); the fast tier whole **exit 0** (18:12:44 to
+19:04:40; 7,257 passed and the trunk's one expected failure, 490 slow tests left out); the pace
+tests alone and last **exit 0** (19:04:40 to 19:10:19; 14 passed, no floor lowered). Nothing
+skipped in any tier. The trunk gained package 101 (the Catalan coast: charts, ports, data and
+their tests, nothing under `freesail/`) and the lead's records while these ran, and was not
+chased; it is merged at step 7's start.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
