@@ -24,8 +24,9 @@ without a commission a pirate, prisoners victualled at two thirds, their lists t
 Prisoners, the parole), ch. IV (head money: the sentence of condemnation under the court's seal,
 the certificate of the men aboard at the beginning of the engagement, the agent's letter of
 attorney, paid though she be sunk or burnt), Sect. XIII ch. I art. VI (lieutenants of marines
-share in prizes with the warrant officers), and the Captain's art. XXXI (a prize purchased for
-the service: three fourths of the appraised value paid to the captors' agents, a fourth reserved);
+share in prizes with the warrant officers), and the Flag Officers' art. XXXI (the Commander in
+Chief's; a prize purchased for the service: three fourths of the appraised value paid to the
+captors' agents, a fourth reserved);
 Falconer 1780, ENGAGEMENT ("the defeated ship having acknowledged the victory by striking her
 colours is immediately taken possession of by the conqueror, who secures her officers and crew as
 prisoners in his own ship, and invests his principal officer with the command of the prize until a
@@ -721,8 +722,9 @@ the court's whim is a plausible cause), and the captain reads `the prize` and `t
 (`head_money_pounds` 5 a head of the men aboard her at the beginning of the engagement, the record's
 `men_at_start`: the Regulations ch. IV's certificate, on file; the five pounds the Prize Acts'
 figure FROM MEMORY, UNVERIFIED; paid though she was burnt, art. V), **three fourths now and a fourth
-reserved** where the prize is purchased for the service (the Captain's art. XXXI, on file: a King's
-ship's prize of war that the yard takes; the fourth comes with a later sentence of the court,
+reserved** where the prize is purchased for the service (the Flag Officers' art. XXXI, the
+Commander in Chief's, on file: a King's ship's prize of war that the yard takes; the fourth comes
+with a later sentence of the court,
 `court_days` more, as a second job: the owner may turn it off by `purchase_for_the_service:
 false`), the whole into the **captor's purse** by `Purse.receive(sum, by="the court", words=...)`
 with the account's lines (the valuation, the cargo good by good, the prize goods, the head money,
@@ -1311,7 +1313,9 @@ the port made for the sitting, the accused before it, the president and the judg
 there; the questions through `say as` heard at the place; the accused's own `say to the court:
 ...`; the log of the action read by the judge advocate; the verdict one of `VERDICTS`, a world
 order journaled as every form is, the play log carrying the sentence read and never the order;
-`Person.record` kept in the save, read as `the record` and as the paper "the captain's record";
+`Person.record` kept in the save, read as `the record` and as the paper "the captain's record"
+(a carried paper: aboard only where the ship's scenario carries a record, a new command's, so
+that no other ship's papers move);
 `command: a new command for <person>: the <description> "<name>" at <port>` writing a scenario
 under the saves by 96's writer with his name, his followers and the record, the hooks named for
 M8), §6 (`docs/design/ConsentRevision-AdversarialSeats.md`, the text in the brief's voice and

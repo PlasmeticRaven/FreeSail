@@ -278,10 +278,12 @@ class Driver:
             and self._alarm is None
         ):
             self._alarm = e  # eased once the tick is over (`_run_ticks`)
-        if for_the_record(e):
+        if for_the_record(e) and not knowledge.owners_world_order(e):
             # decision 46: the play log carries a world order's effects, not the order; and
-            # the director's lines, for the record, ease nothing (package 68, R-20)
+            # the director's lines, for the record, ease nothing (package 68, R-20); the
+            # owner's own world order is his line, shown him (package 98, addition (d))
             return
+        e = knowledge.as_the_owner_sees(e)
         if e.kind in STATION_SPEAKS and self._heard is None and e.actor.startswith("the "):
             self._heard = (e.actor.removeprefix("the "), "speaks")  # `--ease-on-station`
         if not self.hears(e):
@@ -513,7 +515,11 @@ class Driver:
         return [
             x.to_dict() if isinstance(x, Rollup) else event_dict(x)
             for x in rolled(
-                [e for e in self.world.log.tail(n) if not for_the_record(e) and self.hears(e)],
+                [
+                    knowledge.as_the_owner_sees(e)
+                    for e in self.world.log.tail(n)
+                    if (not for_the_record(e) or knowledge.owners_world_order(e)) and self.hears(e)
+                ],
                 self.compression,
             )
         ]
@@ -1487,7 +1493,11 @@ def create_app(
             if until is not None:
                 events = [e for e in events if e.tick <= until]
             # decision 46; and the player's person's reach (package 65, step 4; decision 59)
-            events = [e for e in events if not for_the_record(e) and driver.hears(e)]
+            events = [
+                knowledge.as_the_owner_sees(e)
+                for e in events
+                if (not for_the_record(e) or knowledge.owners_world_order(e)) and driver.hears(e)
+            ]
             events = events[-max(1, min(limit, 5000)) :]
             return JSONResponse([event_dict(e) for e in events])
 

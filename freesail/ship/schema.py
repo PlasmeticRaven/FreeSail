@@ -310,7 +310,15 @@ SHAPE_KEYS = PROFILE_KEYS[PROFILE_KEYS.index("head_m") :]
 # the ladder of evidence's one word a line (§5.0 principles 3 and 4): sourced (S), stand-in (S†),
 # rule (R) and judged (T).
 FORM_KEYS = ("fullness", "stern", "head")
-STERN_KEYS = ("type", "knuckle_z_m", "transom_hb_m", "round_up_m", "galleries_m", "lights_m")
+STERN_KEYS = (
+    "type",
+    "knuckle_z_m",
+    "transom_hb_m",
+    "counter_hb_m",
+    "round_up_m",
+    "galleries_m",
+    "lights_m",
+)
 STERN_TYPES = ("square", "raked", "round")
 HEAD_WORDS = ("none", "knee", "scroll", "billet", "figure")
 MARK_WORDS = ("sourced", "stand-in", "rule", "judged")
@@ -434,15 +442,19 @@ class RudderSpec:
 class HullStern:
     """The stern as the profile's `form` gives it (stage 0H; docs/design/Build-Ships.md §5.1),
     drawn only: its type (`STERN_TYPES`); the knuckle, the transom's foot, metres above the
-    waterline; the transom's half-breadths at the taffrail and at the knuckle (a square or raked
-    stern's; a round stern has no transom); the transom's round up; each tier of galleries
-    [x_aft, x_fore, z_low, z_high], drawn on both quarters; and each band of lights
-    [z_low, z_high, n, hb], n lights across the stern's face within ±hb. None or empty where the
-    file gives none."""
+    waterline (a round stern's counter's foot, where it gives `counter_hb_m`); the transom's
+    half-breadths at the taffrail and at the knuckle (a square or raked stern's; a round stern
+    has no transom); a round stern's half-breadths at its counter by height, each [z, hb], low to
+    high (package 75, the lead's ruling of 2026-11-09: the half-breadth at which, at that height,
+    the side rounds in to the middle line on the stern's line; `freesail.ship.form`); the
+    transom's round up; each tier of galleries [x_aft, x_fore, z_low, z_high], drawn on both
+    quarters; and each band of lights [z_low, z_high, n, hb], n lights across the stern's face
+    within ±hb. None or empty where the file gives none."""
 
     type: str
     knuckle_z_m: float | None = None
     transom_hb_m: tuple[float, float] | None = None
+    counter_hb_m: tuple[tuple[float, float], ...] | None = None
     round_up_m: float | None = None
     galleries_m: tuple[tuple[float, float, float, float], ...] = ()
     lights_m: tuple[tuple[float, float, int, float], ...] = ()
@@ -781,10 +793,11 @@ class FitSpec:
     """A fit of guns with its magazine: the guns, the filled cartridges by the gun's kind and
     calibre, the shot by calibre and kind, and the source the generator names for the whole;
     and (practice and resupply, between packages 72 and 73) a cartridge's charge in pounds by
-    kind and calibre (None: `ship.parts.charge_lb`'s), the powder below in barrels, and a
-    King's fit's allowance of charges for exercise a month (the Regulations 1806, the
-    Gunner, Art. XXI, l.13122-13144). A fit pickled before them has calibre-keyed
-    `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits the keys)."""
+    kind and calibre (None: the shares as filed, `ship.parts.filed_charge_lb`'s), the powder
+    below in barrels, and a King's fit's allowance of charges for exercise a month (the
+    Regulations 1806, the Gunner, Art. XXI, l.13122-13144). A fit pickled before them has
+    calibre-keyed `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits
+    the keys)."""
 
     name: str
     guns: list[GunSpec]
@@ -1811,11 +1824,19 @@ def _parse_stern(raw: Any, stern_line: tuple[tuple[float, ...], ...], source: st
                 f"({taffrail:g} m, stern_m's top); the knuckle is the transom's foot."
             )
     transom = None
+    counter = None
+    if kind != "round" and raw.get("counter_hb_m") is not None:
+        raise ShipFileError(
+            f"{source}: {where} is {kind} and gives counter_hb_m; a {kind} stern gives its "
+            "transom's half-breadths in transom_hb_m, and counter_hb_m is a round stern's."
+        )
     if kind == "round":
         if raw.get("transom_hb_m") is not None:
             raise ShipFileError(
                 f"{source}: {where} is round and gives transom_hb_m; a round stern has no transom."
             )
+        if raw.get("counter_hb_m") is not None:
+            counter = _parse_counter(raw["counter_hb_m"], knuckle, stern_line, source)
     elif raw.get("transom_hb_m") is None:
         raise ShipFileError(
             f"{source}: {where} is {kind} and gives no transom_hb_m; a {kind} stern gives its "
@@ -1872,10 +1893,46 @@ def _parse_stern(raw: Any, stern_line: tuple[tuple[float, ...], ...], source: st
         type=kind,
         knuckle_z_m=knuckle,
         transom_hb_m=transom,
+        counter_hb_m=counter,
         round_up_m=round_up,
         galleries_m=tuple(galleries),
         lights_m=tuple(lights),
     )
+
+
+def _parse_counter(
+    raw: Any, knuckle: float | None, stern_line: tuple[tuple[float, ...], ...], source: str
+) -> tuple[tuple[float, float], ...]:
+    """A round stern's `counter_hb_m` (package 75, the lead's ruling of 2026-11-09): its
+    half-breadths at its counter by height, [z, hb] low to high, each above the counter's foot
+    (`knuckle_z_m`, else the water) and at or below the taffrail, each half-breadth more than
+    nothing."""
+    what = "form.stern.counter_hb_m"
+    foot = knuckle if knuckle is not None else 0.0
+    taffrail = stern_line[-1][1]
+    out: list[tuple[float, float]] = []
+    for p in _form_list(raw, "counter_hb_m", source):
+        z, hb = _profile_point(p, 2, "z, hb", what, source)
+        if not foot < z <= taffrail:
+            raise ShipFileError(
+                f"{source}: the profile's {what} has the point {p!r}; a point of the counter "
+                f"stands above its foot ({foot:g} m) and no higher than the taffrail "
+                f"({taffrail:g} m, stern_m's top)."
+            )
+        if out and not z > out[-1][0]:
+            raise ShipFileError(
+                f"{source}: the profile's {what} goes from z {out[-1][0]:g} to {z:g}; its points "
+                "run low to high, each z greater than the last."
+            )
+        if not hb > 0.0:
+            raise ShipFileError(
+                f"{source}: the profile's {what} has a half-breadth of {hb:g} m; a half-breadth "
+                "is more than nothing."
+            )
+        out.append((z, hb))
+    if not out:
+        raise ShipFileError(f"{source}: the profile's {what} gives no point; give [z, hb] or none.")
+    return tuple(out)
 
 
 def _form_list(raw: Any, key: str, source: str) -> list[Any]:

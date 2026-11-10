@@ -335,6 +335,9 @@ def snapshot(world: World) -> dict[str, Any]:
             "lug_side": _lug_side(ship, s),  # package 57: a lug drawn on its side of the mast
             # package 75: a settee's yard lowered on deck to be dipped, only while it is
             **_only_when_true(s, "yard_lowered"),
+            # package 98, step 3: a settee's sheet held over to windward, the side it holds the
+            # cloth to, only while it is (the viewer drew every settee to leeward)
+            **_settee_sheet_side(ship, s),
         }
         for s in ship.sails.values()
     ]
@@ -445,6 +448,23 @@ def _sail_entry(s: Sail) -> dict[str, Any]:
     }
 
 
+def _settee_sheet_side(ship: Any, s: Sail) -> dict[str, str]:
+    """`{"sheet_side": "starboard"|"larboard"}` for a settee whose one sheet is held over to
+    windward (`evolutions.trim.read_sheet`: hung in stays, or hauled to windward by order),
+    else nothing: a settee to leeward is as the snapshot always served it."""
+    if not getattr(s, "settee", False):
+        return {}
+    from freesail.evolutions.trim import read_sheet
+
+    try:
+        r = read_sheet(ship, s)
+    except Exception:  # noqa: BLE001  (a ship without the trim's lines reads no side)
+        return {}
+    if not r.held_to_windward or r.side is None:
+        return {}
+    return {"sheet_side": "starboard" if r.side > 0 else "larboard"}
+
+
 def _only_when_true(s: Sail, *keys: str) -> dict[str, bool]:
     """Package 75's keys on a sail (docs/design/Design-ShipsEngineExtensions.md §6.4), each
     served as true where it holds and left out where it does not, so that the graph and the
@@ -512,7 +532,7 @@ def _form_entry(form: HullForm) -> dict[str, Any]:
             value = getattr(form.stern, key)
             if value is None or value == ():
                 continue
-            if key in ("galleries_m", "lights_m"):
+            if key in ("counter_hb_m", "galleries_m", "lights_m"):
                 stern[key] = [list(pt) for pt in value]
             elif key == "transom_hb_m":
                 stern[key] = list(value)
@@ -555,8 +575,10 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
         hull["profile"] = _profile_entry(profile)
         hull["stations"] = [_station_entry(s) for s in drawn_stations(h)]
     # package 81 (Design-ViewerAction.md §7): each gun placed by the one rule, or why not, and
-    # each port of the hull with the guns that stand in it
-    action = viewer_guns.served(profile, ship.guns.values())
+    # each port of the hull with the guns that stand in it; its charge the fit's (package 75,
+    # SW-1)
+    fit = getattr(ship, "fit_spec", None)
+    action = viewer_guns.served(profile, ship.guns.values(), getattr(fit, "charges", None))
     return {
         "name": ship.name,
         "rig": ship.spec.rig,

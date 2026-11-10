@@ -718,6 +718,17 @@ class LocalModel:
                             image = self._image_part(value)
                             if image is not None:
                                 images.append(image)
+                            if isinstance(value, dict) and isinstance(value.get("picture"), dict):
+                                # shown beside its image, or said not shown with the readings
+                                # it shows, never its size alone (package 98, step 4)
+                                from freesail.agents import pictures as P
+
+                                why = P.NOT_SENT if self.fetch_picture is None else P.NOT_FETCHED
+                                value = (
+                                    P.shown_result(value)
+                                    if image is not None
+                                    else P.not_shown(value, why)
+                                )
                             content = (
                                 value
                                 if isinstance(value, str)

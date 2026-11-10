@@ -676,6 +676,46 @@ def _captive_to_the_captain(ship: Any, words: str, speaker: Any) -> tuple | None
     return "person.spoke", line, data
 
 
+def _visitor_to_the_captain(
+    ship: Any, words: str, speaker: Any, asked: bool = False
+) -> tuple | None:
+    """The player's person a visitor aboard another ship (no captive) speaking to her
+    captain (package 98, the lead's addition (b) of 2026-11-10: refused "The captain tells
+    himself nothing", the visitor's prompt being the captain's): his word or his question
+    to the man commanding the hull he stands in, a line of her log where he stands
+    (`person.spoke`, his own and shown him), heard by her stations within earshot; None
+    when the speaker is no visitor, or a captive (package 74's road)."""
+    from freesail.orders.prompt import world_of
+    from freesail.world import knowledge
+    from freesail.world.captive import _hearers, is_captive
+    from freesail.world.movement import hull_name, hull_of
+    from freesail.world.places import place_words
+
+    world = world_of(ship)
+    if world is None or speaker is not None:
+        return None
+    person = knowledge.players_visitor(world)
+    if person is None or is_captive(person):
+        return None
+    words = " ".join(str(words).split())
+    if not words:
+        what, verb = ("the question", "Ask") if asked else ("the words", "Tell")
+        raise OrderError(f"{verb} the captain what? Say {what} after the name.")
+    place = str(getattr(person, "where", "") or "quarterdeck")
+    home = hull_of(world, str(getattr(person, "home", "") or ""))
+    of = f", a visitor of the {hull_name(home)}" if home is not None else ", a visitor"
+    who = f"{person.name}{of}, {place_words(place)}"
+    if asked:
+        question = words.rstrip("?")
+        line = f"{who}, asks the captain: {question}?"
+    else:
+        line = f"{who}, to the captain: {words}"
+    for h in _hearers(world, place):
+        h.hear(line)
+    data = {"station": CAPTAIN, "words": words, "place": place}
+    return "person.spoke", line, data
+
+
 def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     verb = recognises(text, ship)
     extra = getattr(ship, "extra", None) or {}
@@ -721,6 +761,10 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             return routed
     if verb == "ask":
         station, question = _split_ask(text, ship)
+        if station == CAPTAIN and not by:
+            heard = _visitor_to_the_captain(ship, question, speaker, asked=True)
+            if heard is not None:
+                return heard
         if not by and _player_captain(ship, station, agents, seat):
             return _to_the_player_captain(station, question, speaker, asked=True)
         if not by and _kind_of(ship, station) == "lookout" and _held_now(ship, station) is None:
@@ -745,6 +789,9 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             # a captive's words to the captor's captain (package 74, the design's §3.2): read
             # for his parole while one is asked of him, the line said where he stands
             heard = _captive_to_the_captain(ship, words, speaker)
+            if heard is None:
+                # a visitor's to her captain (package 98, the lead's addition (b))
+                heard = _visitor_to_the_captain(ship, words, speaker)
             if heard is not None:
                 return heard
         if not by and _player_captain(ship, station, agents, seat):

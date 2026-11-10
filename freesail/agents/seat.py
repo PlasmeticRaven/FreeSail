@@ -520,9 +520,12 @@ class PlayerSeat:
             and self._wants_deck
             and not tools.own_reckoning_order(self.world, text)
             and not tools.conversation_order(self.world, text)
+            and not tools.reading_order(self.world, text)
         ):
             # his own reckoning he keeps off watch as well (package 40b), and the deck's
-            # conversation wants no deck (package 41); a station with no deck at all
+            # conversation wants no deck (package 41), nor does a reading, answered by his
+            # place as at the captain's prompt (package 98, the lead's addition (a)); a
+            # station with no deck at all
             # (the master's, the lookout's, a passenger's) is judged by its domain alone
             why = (
                 f"The {st.name} has not the deck ({a.deck_lost or 'the captain has it'}); an "

@@ -144,6 +144,20 @@ def _boat_ready(world: Any) -> None:
         raise OrderError(f"{name[:1].upper()}{name[1:]} is away; wait for her.")
 
 
+def as_said(text: str | None, words: str) -> str:
+    """The accused's words as he said them: the grammar's are lower-cased and its commas
+    gone, so the words are read again from the line as it was typed, after its colon, or
+    after the verb where he put none; the grammar's where the line is not to hand."""
+    raw = " ".join(str(text or "").split())
+    if ":" in raw:
+        return raw.split(":", 1)[1].strip() or words
+    low = raw.lower().rstrip(" .")
+    tail = str(words or "").strip(" .")
+    if tail and low.endswith(tail):
+        return raw.rstrip(" .")[len(low) - len(tail) :]
+    return words
+
+
 def execute(ship: Any, order: Order) -> Result:
     from freesail.world import prizes as P
     from freesail.world.movement import BOAT_BETWEEN_NM

@@ -236,6 +236,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_reef_speeds_up",
         "test_known_truths.py::test_the_cutter_and_the_brig_sail_through_the_same_orders[data/ships/brig.yaml]",
         "test_known_truths.py::test_the_cutter_and_the_brig_sail_through_the_same_orders[data/ships/cutter.yaml]",
+        # package 98, step 3: every file's guns and every root's ensign at 48 views each
+        "test_known_truths.py::test_truth_7_450_a_port_guns_inboard_figures_are_behind_its_side_and_lid",
+        "test_known_truths.py::test_truth_7_451_every_roots_ensign_paints_as_one_flag_in_its_order",
         "test_known_truths.py::test_the_pace_on_the_day_under_systems_holds_truth_51s_floor",
         "test_known_truths.py::test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor",
         "test_known_truths.py::test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning",

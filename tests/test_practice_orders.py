@@ -564,6 +564,32 @@ def test_the_word_to_fire_is_refused_in_dumb_show_and_a_gun_by_name_fires():
     assert battery.exercise == "starboard"
 
 
+def test_the_word_to_fire_counts_its_guns_ready_and_one_gun_is_one():
+    """Package 75, the lead's ruling (13)(iii) of 2026-11-09 (found on the bilander's armed fit,
+    "1 guns ready"): the word to fire a broadside counts the guns ready on that side, two or more
+    "to go together as they bear", one alone "to go as it bears"."""
+    from freesail.ship.loader import load_ship
+    from freesail.ship.parts import Charge
+
+    ship = load_ship(CUTTER)
+    battery = Battery(ship)
+    battery.target = "mark"
+    side = sorted(
+        (g for g in ship.guns.values() if g.side == "starboard" and g.place == "broadside"),
+        key=lambda g: g.x_m,
+    )
+    said = []
+    for gun in side[:2]:
+        gun.loaded, gun.primed, gun.run_out = Charge.ROUND, True, True
+        kind, text, data = gunnery._fire(ship, battery, "the starboard broadside")
+        assert kind == "guns.fire"
+        said.append((data["ready"], text))
+    assert said == [
+        (1, "Fire the starboard broadside: 1 gun ready to go as it bears."),
+        (2, "Fire the starboard broadside: 2 guns ready to go together as they bear."),
+    ]
+
+
 def test_in_dumb_show_from_empty_a_gun_fired_by_name_takes_a_cartridge_and_fires():
     """Decision 21's way, the exercise given before the guns are cast loose so that every
     cycle starts empty: a gun fired by name and the gun to leeward leave the dumb show, are

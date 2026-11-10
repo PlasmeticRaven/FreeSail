@@ -321,6 +321,46 @@ REFUSALS = [
         "is round and gives transom_hb_m; a round stern has no transom",
     ),
     ("a transom of nothing", "form.stern.transom_hb_m", [3.0, 0.0], "a half-breadth of 0 m"),
+    # a round stern's counter (package 75, the lead's ruling (11) of 2026-11-09): a round stern's
+    # alone, its points [z, hb] low to high, above its foot and no higher than the taffrail
+    (
+        "a square stern's counter",
+        "form.stern.counter_hb_m",
+        [[3.5, 2.8]],
+        "is square and gives counter_hb_m; a square stern gives its transom's half-breadths in "
+        "transom_hb_m, and counter_hb_m is a round stern's",
+    ),
+    (
+        "a counter down",
+        "form.stern",
+        {"type": "round", "counter_hb_m": [[3.0, 2.0], [2.0, 1.5]]},
+        "goes from z 3 to 2; its points run low to high, each z greater than the last",
+    ),
+    (
+        "a counter over the taffrail",
+        "form.stern",
+        {"type": "round", "counter_hb_m": [[5.5, 2.0]]},
+        r"stands above its foot \(0 m\) and no higher than the taffrail \(5 m, stern_m's top\)",
+    ),
+    (
+        "a counter under its foot",
+        "form.stern",
+        {"type": "round", "knuckle_z_m": 2.0, "counter_hb_m": [[1.0, 2.0]]},
+        r"stands above its foot \(2 m\)",
+    ),
+    (
+        "a counter of nothing",
+        "form.stern",
+        {"type": "round", "counter_hb_m": [[3.0, 0.0]]},
+        "a half-breadth of 0 m",
+    ),
+    ("a counter of no point", "form.stern", {"type": "round", "counter_hb_m": []}, "no point"),
+    (
+        "a counter point of three",
+        "form.stern",
+        {"type": "round", "counter_hb_m": [[3.0, 2.0, 1.0]]},
+        r"not two numbers \[z, hb\]",
+    ),
     # the stern without stern_m; the knuckle at or above the taffrail
     ("a stern and no stern_m", "stern_m", None, "gives a stern and the profile no stern_m"),
     (
@@ -491,6 +531,56 @@ def test_a_round_stern_and_a_stern_with_no_form_close_to_the_middle_line():
             p["form"] = {"stern": stern}
         aft = form.stations(_hull(p))[0]
         assert all(hb == 0.0 for _x, _z, hb in aft) and aft[-1][:2] == (-21.0, 5.0)
+
+
+# A round counter on the hand-built profile: 3.2 m a side 1 m above the water, 2.4 at the
+# taffrail (5 m), its foot the water
+ROUND_COUNTER = {"type": "round", "counter_hb_m": [[1.0, 3.2], [5.0, 2.4]]}
+
+
+def test_a_round_counter_is_drawn_to_its_half_breadths_and_the_stern_stays_round():
+    """Package 75, the lead's ruling (11) of 2026-11-09 (the bilander's round stern): a round stern
+    giving `counter_hb_m` holds out over its counter to the half-breadths it gives by height,
+    from nothing at its foot (the water here), and rounds in to the middle line on the stern's
+    line over `ROUND_STERN_DEPTH_SHARE` of it. Drawn on stations over the counter, one at the
+    corner of each height of the counter's points and the stern's line (1, 3 and 5 m here: x
+    -19.03, -19.80 and -20.40), each from the stern's line, where it is nothing, up to the top of
+    the side; the closure on the middle line, the stern round; the stations forward of them, the
+    drawn displacement and `check`'s notes as without the key; the side read off the stations
+    as the viewer draws it, straight between them at each height, nothing abaft the line."""
+    p = _without("marks")
+    p["form"]["stern"] = dict(ROUND_COUNTER)
+    spec = _hull(p)
+    bare = _without("marks")
+    bare["form"]["stern"] = {"type": "round"}
+    plain = _hull(bare)
+    drawn, before = form.stations(spec), form.stations(plain)
+    assert drawn[0] == before[0] and all(hb == 0.0 for _x, _z, hb in drawn[0])
+    assert drawn[4:] == before[1:]
+    over = drawn[1:4]
+    share = form.ROUND_STERN_DEPTH_SHARE
+    assert [s[0][0] for s in over] == pytest.approx(
+        [-21.0 + share * 2.4, -20.5 + share * 2.8, _stern_x(spec.profile, 1.0) + share * 3.2]
+    )
+    pr = spec.profile
+    for s in over:
+        x = s[0][0]
+        assert {pt[0] for pt in s} == {x}
+        assert s[0][2] == 0.0 and x == pytest.approx(_stern_x(pr, s[0][1]))  # on the line
+        assert s[-1][1] == pytest.approx(_interp(pr.rail_m, x, 1))  # the top of the side
+    assert _on(over[1], 3.0) == pytest.approx(2.8) and _on(over[2], 1.0) == pytest.approx(3.2)
+    # read as drawn: straight between two stations at a height where both stand, nothing abaft
+    # the stern's line
+    x_mid, z = 0.5 * (over[0][0][0] + over[1][0][0]), 4.0
+    assert form.half_breadth_at(spec, x_mid, z) == pytest.approx(
+        0.5 * (_on(over[0], z) + _on(over[1], z))
+    )
+    assert form.half_breadth_at(spec, _stern_x(pr, z) - 0.01, z) == 0.0
+    assert form.half_breadth_at(spec, -19.8, 4.0) > 2.5 > form.half_breadth_at(plain, -19.8, 4.0)
+    assert form.drawn_displacement_kg(spec) == form.drawn_displacement_kg(plain)
+    assert form.check(spec) == form.check(plain)
+    # a round stern's counter is its own: a square stern's drawing does not read it
+    assert form.stations(_hull(PROFILE))[0] == form.stations(_hull(_without("marks")))[0]
 
 
 def test_the_fullness_fills_the_ends_and_leaves_the_body():
@@ -732,7 +822,15 @@ READERS = {"freesail/ship/schema.py", "freesail/ship/form.py", "freesail/api/que
 POINT_KEYS = SHAPE[:6]
 # The form's and the stern's own fields, and the schema's names for the shape: none is read in
 # the package outside the three readers (grep, at stage 0H), so each is a shape read anywhere.
-FORM_FIELDS = ("fullness", "knuckle_z_m", "transom_hb_m", "round_up_m", "galleries_m", "lights_m")
+FORM_FIELDS = (
+    "fullness",
+    "knuckle_z_m",
+    "transom_hb_m",
+    "counter_hb_m",
+    "round_up_m",
+    "galleries_m",
+    "lights_m",
+)
 SHAPE_NAMES = (
     "HullForm",
     "HullStern",

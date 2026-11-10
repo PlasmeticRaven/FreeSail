@@ -9,6 +9,9 @@ which `readings` imports at its end after the action's.
     the private signal  this month's challenge and reply (or 'none aboard'), and the last
                         exchange's verdict
     the lights          what she shows by night: 'none', 'a stern lantern', 'the top lights'
+    the flags           what flies where (package 98, step 7): the ensign, the pendant, the
+                        jack, the broad pendant, a second ensign, from the locker's `flies`,
+                        and then the signal hoist if one is up
 
 The events, for `at` and a stand-by: `her colours change`, `she hoists her colours`, `she
 hauls down her colours` (`colours.changed` seen on another ship), `our colours changed`, `a
@@ -88,6 +91,31 @@ def _signals(world: Any, _: str | None) -> dict[str, Any] | None:
     }
 
 
+def _flags(world: Any, _: str | None) -> dict[str, Any] | None:
+    """What flies where (package 98, step 7; the owner's further note of 2026-11-09, where
+    `the flags` read the signal hoists alone and said none with three flags flying): each
+    flag the locker's `flies` lists, its words and its place, then the hoist flying."""
+    locker = _locker(world)
+    if locker is None:
+        return None
+    from freesail.world.flags import refresh_world
+
+    listed = getattr(locker, "flies", None)
+    if listed is None:
+        listed = refresh_world(world) or []
+    flown = [f"{f['words']} at the {f['place']}" for f in listed or []]
+    tick = int(world.clock.tick)
+    hoists = [h.words() for h in locker.flying_now(tick)]
+    words = "; ".join(flown) if flown else "none (her colours are down)"
+    if hoists:
+        words += "; the signal flying: " + "; ".join(hoists)
+    return {
+        "words": words,
+        "flying": [{"name": f["name"], "place": f["place"]} for f in listed or []],
+        "hoists": hoists,
+    }
+
+
 def _private(world: Any, _: str | None) -> dict[str, Any] | None:
     locker = _locker(world)
     if locker is None:
@@ -134,12 +162,24 @@ def register() -> None:
     R.REGISTRY.add(
         R.Reading(
             "signals",
-            ("the signals", "the signal", "the flags"),
+            ("the signals", "the signal"),
             "state",
             "",
             _signals,
             description="the hoists flying and the signals seen and read this glass, with "
             "their meanings where the book is ours; 'none'",
+            where=("deck", "aloft"),
+        )
+    )
+    R.REGISTRY.add(
+        R.Reading(
+            "flags",
+            ("the flags", "what flies", "the flags flying", "the pendants", "the jack"),
+            "state",
+            "",
+            _flags,
+            description="what flies where: the ensign, the pendant, the jack, the broad "
+            "pendant, a second ensign, each at its place, then the signal hoist if one is up",
             where=("deck", "aloft"),
         )
     )

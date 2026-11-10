@@ -302,6 +302,9 @@ class Seat:
     cadence: str = ""  # the seating's cadence, when the door asked one (package 41)
     ship: str = ""  # the other ship the station is on, as the door named her (package 43)
     pictures: bool = False  # the door's model reads an image (the local runner's; 45c)
+    # the door said its model reads no image (the OpenRouter door's word, package 98, step 4):
+    # no picture tool is offered, whatever the door's kind
+    no_pictures: bool = False
     key: str = ""  # the seating's key, given once to the door that stationed (package 37g)
     left_at: str = ""  # the station this identity left by its own word, when it is asked again
     phase: str = CONSENT
@@ -580,6 +583,7 @@ class Desk:
                 cadence=cadence,
                 ship=ship,
                 pictures=bool(body.get("pictures")),
+                no_pictures=body.get("pictures") is False,
                 director_seat=director_seat,
                 parent=parent,
                 budget_tokens=int(budget) if budget else None,
@@ -788,6 +792,7 @@ class Desk:
         h.model_name = seat.model_name
         h.door = seat.door
         h.pictures = seat.pictures
+        h.no_pictures = seat.no_pictures
         if budget:
             h.budget_tokens = budget
         if seat.reserve_tokens:
@@ -834,6 +839,7 @@ class Desk:
             if body.get("context_tokens") or body.get("budget_tokens"):
                 h.budget_tokens = self._budget_tokens(seat)
             h.pictures = seat.pictures = bool(body.get("pictures"))
+            h.no_pictures = seat.no_pictures = body.get("pictures") is False
             h.door_act("door", seat.model_name, door)
             since = len(seat.archive) + len(h.turns) - seat.base
             h.take_over(h.model, save=self._saver(seat), door_note=self._note(seat, seat.record))
@@ -1643,7 +1649,7 @@ class GameClient:
         context_tokens: int | None = None,
         handover_reserve: int | None = None,
         cadence: str = "",
-        pictures: bool = False,
+        pictures: bool | None = None,
         budget_tokens: int | None = None,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
@@ -1662,8 +1668,10 @@ class GameClient:
             body["context_tokens"] = int(context_tokens)  # for the handover (package 37)
         if handover_reserve:
             body["handover_reserve"] = int(handover_reserve)  # its reserve in tokens (37g)
-        if pictures:
-            body["pictures"] = True  # the door's model reads an image (package 45c)
+        if pictures is not None:
+            # whether the door's model reads an image (package 45c; said either way by the
+            # OpenRouter door, package 98, step 4), and nothing where the door does not know
+            body["pictures"] = bool(pictures)
         if budget_tokens:
             body["budget_tokens"] = int(budget_tokens)  # where the fold is counted (67)
         # the answer carries the turns from where this door starts reading (the start, or

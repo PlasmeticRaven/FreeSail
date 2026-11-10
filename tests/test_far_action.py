@@ -298,7 +298,13 @@ def test_a_far_ship_replies_to_an_awake_hull_only_where_the_cap_has_no_room():
     assert not (a.crew is not None and a.crew.awake), "the cap holds the cutter alone"
     assert FA.FALLBACK_COUNT["rounds"] >= 1
     replies = [e for e in b.crew.log if e.kind == "action.far_reply"]
-    assert replies and "the far ship's reply, the cap full" in replies[0].text
+    assert replies and replies[0].data.get("fallback") is True
+    # the line is the ship's words (85's rule): her broadside and the counts in words, with
+    # nothing of the cap or the tables in it; the data keeps the fallback for the record
+    text = replies[0].text
+    assert text.startswith(f"The {a.name} fires her broadside at us from ")
+    assert text.endswith(" us.") and " of her " in text
+    assert "cap" not in text and "reply" not in text and "(" not in text
 
 
 # -- the cut-out carried from hailing distance to its end by the rounds ----------------------------

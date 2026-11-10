@@ -54,5 +54,5 @@ steps:
   - where am I
   - what is in sight
   - the time
-  - {say: go ashore, expect: {sent: order, answered: true}}
+  - {say: go ashore, expect: {sent: order, answered: true, contains: come down on deck first}}
   - {say: come on deck, expect: {sent: order, answered: true}}

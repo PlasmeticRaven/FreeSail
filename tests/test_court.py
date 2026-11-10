@@ -112,6 +112,11 @@ def test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_
         "say to the court: I engaged a superior force and struck when the ship could fight no more"
     )
     assert out.kind == "court.said" and "before the court at Falmouth" in out.text, out.text
+    # his words as he said them, and once in the log (the order's own line)
+    assert out.text.endswith(
+        ": I engaged a superior force and struck when the ship could fight no more"
+    )
+    assert len(_kinds(w.log, "court.said")) == 1
     # the log of the action read by the judge advocate
     e = w.world_order("court: read the log of the action", "the test")
     assert e.data.get("result") == "done", e.text
@@ -128,6 +133,20 @@ def test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_
         "The sentence of the court martial is read: Captain Bowen is honourably acquitted"
     )
     assert f"loss of the {ship_name}" in verdict[0].text
+    # who hears the court (the place's knowledge): the persons ashore at its port, and no
+    # ship's deck, at Falmouth or elsewhere; the new command's line is the record's
+    from freesail.world import knowledge as K
+
+    at_falmouth = K.Senses(frozenset({K.ASHORE}), ("ashore", "falmouth", CM.COURT_PLACE), "")
+    at_brest = K.Senses(frozenset({K.ASHORE}), ("ashore", "brest", "quay"), "")
+    deck = K.Senses(K.senses_of_place("quarterdeck"), ("aboard", "h", "quarterdeck"), "quarterdeck")
+    said = [x for x in w.log if x.kind == "court.said"]
+    for x in (sat[0], said[-1], read[0], verdict[0]):
+        assert x.data.get("port") == "falmouth" and x.data.get("place") == "shore", x.kind
+        assert K.reaches(w, at_falmouth, x), x.kind
+        assert not K.reaches(w, at_brest, x), x.kind
+        assert not K.reaches(w, deck, x), x.kind
+    assert K.reach_of("command.new") == "record"
     assert any(str(i.get("world_order", "")).startswith("court: the verdict") for i in w.inputs)
     assert not any(
         x.kind != "world.order" and "the verdict on Captain Bowen" in x.text for x in w.log
@@ -169,6 +188,13 @@ def test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_
     assert lt2.name == lt.name and CM.record_of(lt2)[0]["kind"] == "loss"
     page = w2.papers.page("the captain's record")
     assert any("acquitted with honour" in ln for ln in page.lines)
+    # the paper is aboard only where the scenario carries a record: last among the new
+    # command's papers and no part of her catalogue, and no paper of the ship he lost (so
+    # every other ship's papers, and every count and list pinned of them, are as they were)
+    assert [p.handle for p in w2.papers.pages()][-1] == "the captain's record"
+    assert len(w2.papers.pages()) == len(w2.papers.catalogue) + 1
+    assert w.papers.find("the captain's record") is None
+    assert len(w.papers.pages()) == len(w.papers.catalogue)
     # a man dismissed the service gets no command
     CM.note(w, me, "verdict", "dismissed the service by the court", verdict="dismissed the service")
     e = w.world_order(order, "the test")

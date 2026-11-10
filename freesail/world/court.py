@@ -422,7 +422,12 @@ def sit(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         Severity.URGENT,
         "court.sits",
         text,
-        data={"person": person.name, "port": port.id, "ship": str(loss.get("ship") or "")},
+        data={
+            "person": person.name,
+            "port": port.id,
+            "place": "shore",
+            "ship": str(loss.get("ship") or ""),
+        },
     )
     for h in _hearers_at(root, person):
         h.hear(text)
@@ -488,7 +493,12 @@ def read_log(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             Severity.NOTABLE,
             "court.reading",
             line,
-            data={"ship": rec.get("ship"), "stamp": stamp},
+            data={
+                "ship": rec.get("ship"),
+                "stamp": stamp,
+                "port": rec.get("port"),
+                "place": "shore",
+            },
         )
         for h in hearers:
             h.hear(line)
@@ -502,7 +512,7 @@ def read_log(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
 def accused_speaks(world: Any, person: Any, words: str) -> tuple[str, str, dict[str, Any]]:
     """`say to the court: <words>` (the player's or a model's, the accused's own): heard at
-    the place, in the play log as his (`court.said`)."""
+    the place, in the play log as his (`court.said`), once, by the order's own line."""
     root = _root(world)
     rec = sitting(root)
     words = " ".join(str(words or "").split()).strip(" ,:")
@@ -519,15 +529,12 @@ def accused_speaks(world: Any, person: Any, words: str) -> tuple[str, str, dict[
     if not words:
         raise CourtError("Say what to the court? Put your words after the colon.")
     line = f"{person.name}, before the court at {rec.get('port_name')}: {words}"
-    root.record(
-        Severity.NOTABLE,
-        "court.said",
-        line,
-        data={"person": person.name, "words": words, "port": rec.get("port")},
-    )
     for h in _hearers_at(root, person):
         h.hear(line)
-    return "court.said", line, {"person": person.name, "words": words, "level": 2}
+    # one line in the log, the order's own (the world writes what an order returns): his
+    # words as he said them, the shore and the port named for who hears them
+    data = {"person": person.name, "words": words, "port": rec.get("port"), "place": "shore"}
+    return "court.said", line, data | {"level": 2}
 
 
 def verdict(world: Any, body: str) -> tuple[str, dict[str, Any]]:
@@ -581,7 +588,13 @@ def verdict(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         Severity.URGENT,
         "court.verdict",
         text,
-        data={"person": person.name, "verdict": said, "port": port_id, "ship": rec.get("ship")},
+        data={
+            "person": person.name,
+            "verdict": said,
+            "port": port_id,
+            "place": "shore",
+            "ship": rec.get("ship"),
+        },
     )
     for h in _hearers_at(root, person):
         h.hear(text)

@@ -802,8 +802,22 @@ class Papers:
             raise KeyError(f"no paper aboard answers to '{handle}'")
         return found
 
+    def _carried(self) -> list[dict[str, Any]]:
+        """The papers this ship has only because her scenario carries them (the file's
+        `carried:` list, each aboard where the scenario's `papers:` has its `carried_as`
+        key: the captain's record of a new command, package 74). Read from the scenario at
+        every asking and never kept on the `Papers`, so the catalogue, a checkpoint and
+        every ship whose scenario carries none are as they were."""
+        sc = getattr(self.world, "scenario", None)
+        had = getattr(sc, "papers", None) or {}
+        if not had:
+            return []
+        own = getattr(self, "path", None)
+        source = Path(own) if own else PAPERS_PATH
+        return [dict(p) for p in _file_papers(source, "carried") if had.get(p.get("carried_as"))]
+
     def _match(self, key: str) -> dict[str, Any] | None:
-        for p in self.catalogue:
+        for p in [*self.catalogue, *self._carried()]:
             if _paper_key(p["handle"]) == key or key in _paper_key(p["handle"]):
                 return p
         return None
@@ -834,7 +848,7 @@ class Papers:
     # -- the pages -----------------------------------------------------------------
 
     def pages(self) -> list[Paper]:
-        return [self.page(p["handle"]) for p in self.catalogue]
+        return [self.page(p["handle"]) for p in [*self.catalogue, *self._carried()]]
 
     def page(self, handle: str) -> Paper:
         entry = self._entry(handle)
@@ -1004,23 +1018,23 @@ def _paper_key(handle: str) -> str:
 # practice and resupply (between packages 72 and 73): the papers file's catalogue as this
 # process read it, by the file's path, time and size, for `Papers._merge`; the module's,
 # never a `Papers`'s, so nothing of it is pickled into a checkpoint
-_FILE_PAPERS: dict[tuple[str, int, int], tuple[dict[str, Any], ...]] = {}
+_FILE_PAPERS: dict[tuple[str, int, int, str], tuple[dict[str, Any], ...]] = {}
 
 
-def _file_papers(path: Path) -> tuple[dict[str, Any], ...]:
-    """The papers of the file at `path`, read once while the file is unchanged; none when
-    it cannot be read."""
+def _file_papers(path: Path, section: str = "papers") -> tuple[dict[str, Any], ...]:
+    """The papers of the file at `path` (its catalogue, or its `carried` list: package 74),
+    read once while the file is unchanged; none when it cannot be read."""
     try:
         st = Path(path).stat()
     except OSError:
         return ()
-    key = (str(path), st.st_mtime_ns, st.st_size)
+    key = (str(path), st.st_mtime_ns, st.st_size, section)
     got = _FILE_PAPERS.get(key)
     if got is None:
         try:
             doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         except OSError:
             doc = {}
-        got = tuple(dict(p) for p in (doc.get("papers") or []) if isinstance(p, dict))
+        got = tuple(dict(p) for p in (doc.get(section) or []) if isinstance(p, dict))
         _FILE_PAPERS[key] = got
     return got

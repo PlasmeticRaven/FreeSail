@@ -485,9 +485,10 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
     assert all(a.chart in names for a in tide.areas), [a.chart for a in tide.areas]
     # the Channel's areas as package 34 and 37e made them, and the blocks' beside them
     channel = [a.id for a in tide.areas if a.chart == "channel-west"]
-    # package 43b: fourteen with Torbay
+    # package 43b: fourteen with Torbay; package 98, step 5: fifteen with the Rade de Brest
+    # after the Goulet (was 14)
     assert (
-        len(channel) == 14 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
+        len(channel) == 15 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
     )
     # package 39a: the Channel east's areas lie east of 3 W, where no Channel west
     # position reaches, and come before the open Channel, whose bounds hold them

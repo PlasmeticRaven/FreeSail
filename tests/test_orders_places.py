@@ -466,3 +466,17 @@ def test_the_colours_and_the_signals_are_the_decks_refused_below_and_ashore_in_i
     until(w, lambda: master.where == "shore" and not w.dealings.boat.away)
     e = w.submit("hoist the colours")
     assert e.kind == "order.rejected" and "come aboard to give an order of the deck" in e.text
+
+
+def test_go_ashore_from_the_tops_is_refused_until_he_comes_down():
+    """Truth 7-459, (c) (package 98, the lead's addition of 2026-11-10): `go ashore` given from
+    the tops is refused in words that bring him down first; from the deck he goes."""
+    w = world_at(CARRICK_ROAD)
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(300)
+    assert w.submit("go aloft").kind == "person.moved"
+    e = w.submit("go ashore")
+    assert e.kind == "order.rejected" and "come down on deck first ('come on deck')" in e.text
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    assert w.submit("go ashore").kind != "order.rejected"

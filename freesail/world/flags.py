@@ -118,9 +118,11 @@ class Flag:
     def served_drawing(self, inverted: bool = False) -> dict[str, Any]:
         """The drawing as the snapshot serves it to 81's viewer: `{proportion, parts}` with the
         rectangles in `parts` and the lines apart under `lines` (81 draws a part with no
-        `rect` as the whole field)."""
-        parts = [dict(p) for p in self.drawing if "rect" in p]
-        lines = [dict(p) for p in self.drawing if "line" in p]
+        `rect` as the whole field), each with `n`, its place in the drawing, so that the
+        viewer paints them in the drawing's order (package 98, step 3: the Union's crosses
+        over its saltires)."""
+        parts = [{**p, "n": i} for i, p in enumerate(self.drawing) if "rect" in p]
+        lines = [{**p, "n": i} for i, p in enumerate(self.drawing) if "line" in p]
         d: dict[str, Any] = {"proportion": list(self.proportion), "parts": parts}
         if lines:
             d["lines"] = lines

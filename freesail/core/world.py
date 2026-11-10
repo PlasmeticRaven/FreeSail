@@ -2076,13 +2076,15 @@ class World:
             captain is not None
             and actor == "captain"
             and not kind.startswith(("agent.", "seat.", "query.", "free."))
+            and kind != "person.spoke"
             and self._hand_on_her(actor)
         ):
             # the player's hand on an intent scenario (decision 41; package 40c): an order
             # of the ship's at the prompt, not a station's sentence nor a reading, and the
             # rules-based captain stands aside until 'captain: carry on'; a free line
-            # (package 53b) is a person's own and no order of the ship's; nor are the words
-            # of a captive or a visitor aboard a hull that is not his (package 74)
+            # (package 53b) is a person's own and no order of the ship's, and so is a word
+            # said, on any hull (`person.spoke`; the lead's word of 2026-11-10); nor are the
+            # words of a captive or a visitor aboard a hull that is not his (package 74)
             captain.player_hand(text)
         if kind == "evolution.started" and not data.get("failed"):
             # the evolution runner writes its own "started" line; avoid saying it twice

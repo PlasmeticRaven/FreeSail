@@ -1592,12 +1592,12 @@ crew:
   # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
   quarter_bill:
     trimmers:
-      # The trimmers: the brig-sloop's twenty-seven (brig.yaml's bill) carried by her plain sail against the brig's, a quarter more (Neuf-D §6.4; the arithmetic in the generator's report), split by each mast's work (judgement). Of the forecastlemen, for the headsails and the fore tacks and sheets.
+      # The trimmers: the brig-sloop's twenty-seven (brig.yaml's bill) carried by her plain sail against the brig's, a quarter more, by the rule (Neuf-D §6.4; the lead's ruling of 2026-11-09; the arithmetic in the generator's report), split by each mast's work (judgement, Neuf-D's 9, 11 and 15 by largest remainder). Of the forecastlemen, for the headsails and the fore tacks and sheets.
       forecastle: 9
       # Of the fore topmen, for her four fore yards.
       fore_top: 11
       # Of the afterguard, at the main sheet, the gaffs and the fore gaff sail's sheet.
-      afterguard: 15
+      afterguard: 14
     # One man at the tiller, as the privateer schooner's (judgement).
     helm: 1
     # Two of the waisters to pass the cartridges, as the privateer schooner's (judgement).
@@ -1825,7 +1825,7 @@ armament:
           12: 880
         long:
           6: 110
-      # A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one shot, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10): the long 6-pounder 2 lb, the 12-pounder carronade 1 lb, which Adye 1804 p. 72 gives too. The engine's shares of the shot, a third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, charge_lb), give each of them to the ounce.
+      # A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one shot, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10): the long 6-pounder 2 lb, the 12-pounder carronade 1 lb, which Adye 1804 p. 72 gives too. The engine's shares of the shot, a third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, CHARGE_SHARE), give each of them to the ounce.
       charges:
         carronade:
           12: 1.0
