@@ -848,10 +848,11 @@ read the log of the action`), the verdict a form (`court: the verdict on <person
 honour | acquitted | reprimanded | dismissed the ship | dismissed the service`) journaled as
 every world order is, the play log carrying the sentence read and never the order; `Person.
 record` the thing the career of M8 remembers (the loss, the exchange, the court, the verdict, the
-appointment), read as `the record` and as the paper "the captain's record". **A new command** is
+appointment), read as `the record`. **A new command** is
 a scenario's start: `command: a new command for <person>: the <description> "<name>" at <port>`
 writes a scenario file under the saves with his name as her captain, his people who followed him
-(the persons ashore at the same port whose record has the same loss) and the record as a paper,
+(the persons ashore at the same port whose record has the same loss) and a copy of the record
+as a thing with words in his keeping (a letter by the scenario's `things:`, spec M7b §17a),
 loaded by the loader (`ship.name` and `people[].record` honoured) and begun; refused for a man
 dismissed the service, doubted within a year of a dismissal from his ship. **The consent
 revision** is drafted (`docs/design/ConsentRevision-AdversarialSeats.md`) and not applied; a seat

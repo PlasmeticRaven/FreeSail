@@ -302,6 +302,19 @@ By the captain, ashore at Plymouth, at the counting house: gave the packet to Mr
 the sealed packet is in Mr Veale's keeping.
 ```
 
+**Letters, and things with words.** A letter is a thing like the packet, with words in it, a writer, the person it is for and, when it is closed, a seal. `write a letter to the port admiral: "I have the honour to report ..."` writes it as a book is drafted: in your hand, at the hour, at your table (from the deck you go below to write it, and are at your writing for five minutes); it is in your keeping, to be carried, given, put down and hidden as any thing is. The log says that you wrote a letter and to whom; its words are shown to you alone (*Your letter to the port admiral, as written: "..."*), and to nobody else until somebody reads it. `seal the letter` closes it. `read the letter` shows its words to the one who reads it, and to nobody else, wherever it lies within his reach; whoever stands by sees only that he read it. A sealed letter is read only by breaking its seal (`open the letter`, or `break the seal of the letter`), and a broken seal shows ever after: *a letter to the port admiral with its seal broken*. `look at the packet` (or `examine`, `inspect`) shows a thing as anyone there sees it: its name, the few words the director gave it, where it lies, and a letter's direction and seal, never its words. A paper is destroyed by your own act: `burn the letter` (aboard or ashore, not in the boat, where there is no fire), `tear up the letter`, or `throw it overboard`; it is gone, and the log says so. A cask is no paper, and is thrown overboard or kept.
+
+```orders frigate plain-sail
+write a letter to the port admiral: "I have the honour to report the Harpy in sight off the Lizard."
+seal the letter
+read the letter
+look at the letter
+open the letter
+read the letter
+burn the letter
+# rejected: write a letter to the port admiral
+```
+
 **Money is paid, not said.** Mr Veale may say he pays twenty guineas; the purse is what it was until the sum is paid, and the purser's books then say who paid it and what the purse holds after (*Paid into the purse by Mr Veale, twenty guineas (£21); the purse £55.*). A freight comes off by the port's lighter at no price and is written in the manifest with whose it is and where it goes; a debt is entered in the purser's books and moves no money. These are the director's to give (chapter 20), never a figure set: `the purse` reads the pounds, and the sums and debts with their causes once there are any.
 
 ```orders frigate plain-sail
@@ -445,7 +458,13 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `take the packet` | `pick up the packet` | a thing lying where you are into your keeping |
 | `put the packet on the table` | `stow the cask in the hold`, `hide the letter in the bread locker` | a thing within your reach put down where you are, or in a place within earshot |
 | `throw the packet overboard` | `toss the bottle over the side` | a thing within your reach over the side |
-| `show the chart to the master` | `open the packet`, `read the letter` | said; nothing moves |
+| `write a letter to the port admiral: "<its words>"` | `write to Mr Veale: "..."`, `pen a letter to ...` | a letter in your hand, at your table, in your keeping; its words shown you alone |
+| `seal the letter` | `seal up the letter` | the letter closed by a seal |
+| `open the letter` | `break the seal of the letter`, `unseal the letter` | its seal broken, which shows ever after |
+| `read the letter` | `read the letter from the agent` | its words shown to you alone, a sealed letter read only once its seal is broken |
+| `look at the packet` | `examine the cask`, `inspect the letter` | a thing as anyone there sees it, with its description; a letter's direction and seal, never its words |
+| `burn the letter` | `tear up the letter`, `destroy the letter` | a paper within your reach gone, and said; no fire in the boat |
+| `show the chart to the master` | `open the packet`, `read the packet` (a thing that is no letter) | said; nothing moves |
 | `ask the pilot about the channel` | `ask the pilot for the marks`, `ask the pilot about the anchorage`, `ask the pilot when the tide serves`, `ask the pilot for the news` | the port file's words, and the world's high water at the port |
 | `the places` | | the places aboard, each a name and a description |
 | `the manifest` | `the cargo`, `the hold` | the cargo by tons and the room left |

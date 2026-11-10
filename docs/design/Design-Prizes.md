@@ -1313,9 +1313,11 @@ the port made for the sitting, the accused before it, the president and the judg
 there; the questions through `say as` heard at the place; the accused's own `say to the court:
 ...`; the log of the action read by the judge advocate; the verdict one of `VERDICTS`, a world
 order journaled as every form is, the play log carrying the sentence read and never the order;
-`Person.record` kept in the save, read as `the record` and as the paper "the captain's record"
-(a carried paper: aboard only where the ship's scenario carries a record, a new command's, so
-that no other ship's papers move);
+`Person.record` kept in the save, read as `the record`; the copy of it he carries into a new
+command **a thing with words** in his keeping (package 100's letter, made by the scenario's
+`things:`; the lead's word of 2026-11-10: a paper given to an officer is a thing with words by
+that road and no kind of its own), where the design had a paper of the ship's, "the captain's
+record", so that no ship's papers move;
 `command: a new command for <person>: the <description> "<name>" at <port>` writing a scenario
 under the saves by 96's writer with his name, his followers and the record, the hooks named for
 M8), §6 (`docs/design/ConsentRevision-AdversarialSeats.md`, the text in the brief's voice and

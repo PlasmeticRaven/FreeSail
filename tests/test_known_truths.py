@@ -14950,9 +14950,10 @@ def test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_
 def test_truth_7_365_a_new_command_is_a_scenarios_start_written_under_the_saves_with_the_record():
     """The design's §7.2: the scenario file written under the saves with his name as her captain,
     his follower (his first lieutenant exchanged at the same port, the same loss in his record)
-    and the record as a paper, loaded by the loader and begun, the record read aboard the new
-    ship and the paper "the captain's record" carrying it; refused for a man dismissed the
-    service, doubted for one dismissed his ship within the year (one scene with 7-364)."""
+    and a copy of the record in his keeping, loaded by the loader and begun, the record read
+    aboard the new ship and the copy read as a letter is, a thing with words; refused for a
+    man dismissed the service, doubted for one dismissed his ship within the year (one scene
+    with 7-364)."""
     test_truth_7_364_the_court_martial_is_the_directors_proceeding_at_the_ports_place()
 
 
@@ -15265,3 +15266,74 @@ def test_truth_7_461_a_stopped_commodores_set_keeps_its_stations_across_a_checkp
     )
 
     case(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Package 100: letters and things as one system (`tests/test_letters.py`)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_470_a_letter_is_written_by_the_draftings_road_into_the_writers_keeping():
+    """Package 100, step 1: `write a letter to <whom>: "<words>"` in the writer's hand, at
+    the hour, at the captain's table; a thing in his keeping; its words shown him alone."""
+    from tests.test_letters import (
+        test_a_letter_is_written_by_the_draftings_road_into_the_writers_keeping as case,
+    )
+
+    case()
+
+
+def test_truth_7_471_a_sealed_letter_is_read_only_by_breaking_its_seal_which_shows():
+    """Package 100, step 1: sealed and opened; a broken seal shows wherever it is listed."""
+    from tests.test_letters import (
+        test_a_sealed_letter_is_read_only_by_breaking_its_seal_which_shows as case,
+    )
+
+    case()
+
+
+def test_truth_7_472_a_letters_words_reach_its_reader_and_nobody_else():
+    """Package 100, step 1: the words a line of the reach `reader`; a station within
+    earshot hears the deed and never the text; the director has it; a station's person who
+    reads is shown them and the player is not."""
+    from tests.test_letters import test_a_letters_words_reach_its_reader_and_nobody_else as case
+
+    case()
+
+
+def test_truth_7_473_a_paper_destroyed_is_gone_and_said():
+    """Package 100, step 1: burnt, torn up or thrown overboard, a paper is gone and said; a
+    thing that is no paper, or out of reach, is not destroyed."""
+    from tests.test_letters import (
+        test_a_paper_burnt_or_torn_up_is_gone_and_said_and_a_thing_that_is_no_paper_is_not as c,
+    )
+
+    c()
+
+
+def test_truth_7_474_a_thing_looked_at_shows_its_description_and_never_a_letters_words():
+    """Package 100, step 1: `look at`, `examine`: the thing as anyone there sees it."""
+    from tests.test_letters import (
+        test_a_thing_looked_at_is_shown_with_its_description_and_a_letter_never_its_words as c,
+    )
+
+    c()
+
+
+def test_truth_7_475_the_director_makes_a_letter_with_words_and_removes_a_thing_by_reach():
+    """Package 100, step 1: the director's letter with its words, none of them in the play
+    log; a thing removed, never out of a held keeping, doubted before a held person's eyes."""
+    from tests.test_letters import (
+        test_the_director_makes_a_letter_with_its_words_and_removes_a_thing_by_the_rule_of_reach as c,  # noqa: E501
+    )
+
+    c()
+
+
+def test_truth_7_476_a_passage_with_letters_replays_to_the_same_log():
+    """Package 100, step 1: every act of a letter journaled, replayed to the same digest."""
+    from tests.test_letters import (
+        test_a_passage_with_letters_written_sealed_read_and_burnt_replays_to_the_same_log as c,
+    )
+
+    c()

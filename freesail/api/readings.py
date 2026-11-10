@@ -2557,7 +2557,7 @@ def _things_words(world: Any) -> list[str]:
     world with no thing in it."""
     from freesail.world import things as TH
 
-    return [f"{t.name}, {TH.where_words(world, t)}" for t in TH.things_of(world)]
+    return [f"{TH.name_words(t)}, {TH.where_words(world, t)}" for t in TH.things_of(world)]
 
 
 def _no_people_words(world: Any) -> str | None:

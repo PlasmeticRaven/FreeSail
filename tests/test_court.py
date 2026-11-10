@@ -186,15 +186,20 @@ def test_the_court_martial_sits_by_the_form_hears_the_accused_reads_the_log_and_
     assert "acquitted with honour" in w2.readings.words("record")
     lt2 = next(p for p in w2.people.people if p.role == "first lieutenant")
     assert lt2.name == lt.name and CM.record_of(lt2)[0]["kind"] == "loss"
-    page = w2.papers.page("the captain's record")
-    assert any("acquitted with honour" in ln for ln in page.lines)
-    # the paper is aboard only where the scenario carries a record: last among the new
-    # command's papers and no part of her catalogue, and no paper of the ship he lost (so
-    # every other ship's papers, and every count and list pinned of them, are as they were)
-    assert [p.handle for p in w2.papers.pages()][-1] == "the captain's record"
-    assert len(w2.papers.pages()) == len(w2.papers.catalogue) + 1
-    assert w.papers.find("the captain's record") is None
-    assert len(w.papers.pages()) == len(w.papers.catalogue)
+    # the copy of his record he carries into her: a thing with words in his keeping, made
+    # by the scenario's `things:` as a letter is, read as a letter is read; no paper of a
+    # kind of its own, the new ship's papers as every ship's
+    copy = [t for t in w2.people.things if t.name == CM.RECORD_THING]
+    assert len(copy) == 1 and copy[0].is_letter and copy[0].keeper == w2.people.captain.id
+    assert "acquitted with honour" in copy[0].words
+    assert copy[0].words.endswith("appointed to the cutter Alert at Falmouth.")
+    out = w2.submit("read the copy of the captain's record")
+    assert out.kind == "free.line" and out.data.get("thing") == copy[0].id, out.text
+    read_lines = [x for x in w2.log if x.kind == "free.read"]
+    assert len(read_lines) == 1 and "acquitted with honour" in read_lines[0].text
+    assert read_lines[0].data.get("reader") == "Captain Bowen"
+    assert w2.papers.find("the captain's record") is None
+    assert len(w2.papers.pages()) == len(w2.papers.catalogue)
     # a man dismissed the service gets no command
     CM.note(w, me, "verdict", "dismissed the service by the court", verdict="dismissed the service")
     e = w.world_order(order, "the test")
