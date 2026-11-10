@@ -23682,3 +23682,29 @@ captive's letter is written where he is (no going to a cabin of the captor's: `_
 is not called for him), and `captive.py` is untouched. (3) A director's thing named "a letter
 for the port admiral" with no words stays the plain thing it was (a letter is one with words or
 written), so no thing of before changes its noun.
+
+**Pins moved.** None. No passage of the trunk's writes, seals, reads or burns a letter by the
+new verbs, and a thing of before digests as it did (the new fields are out of `to_dict` while
+empty). One test's set grew rather than moved: `tests/test_knowledge.py`'s set of the design's
+reach classes has `reader` beside the others.
+
+**Step 1: the suites as run.** At **7e50d00** (the branch's head: the trunk merged at eb42c04
+by a merge commit, 0570a02, which brought records only, and one mend after it, below), in a
+worktree pinned there, one suite at a time: ruff check and ruff format --check clean; the fast
+tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`) exit 0, 7,166 passed, 1 xfailed, 486
+slow left out; the slow tier of the touched files (`--slow -m "not pace" -n 4` on
+tests/test_letters.py, test_people.py, test_director.py, test_knowledge.py, test_primer.py,
+test_in_world.py, test_orders.py, test_world_orders.py, test_known_truths.py,
+test_browser_probe.py, test_observer.py, test_console.py, test_server.py) exit 0, 2,508
+passed, 8 xfailed (the probe plan `a-letter` met among them); the pace alone and last
+(`--slow -m pace -n 0`, the same files) **exit 1**: 9 passed, 4 failed, truth 51's floor of
+500 ticks a second (truth 51's frigate 474, the day under systems 498, the gate's day 384, 7-159's
+convoy 397). The same four at the trunk's eb42c04 in a worktree of their own, one after the
+other on the same machine, fail alike (427, 462, 442, 428 against step 1's 478, 412, 451, 369),
+and the convoy run four times in turn, trunk and step 1, gives 434, 445, 446, 456: this
+container is under the floor whatever the tree, and step 1 costs the tick nothing measurable
+(it adds nothing to the tick; the reach `reader` is read only for its own two kinds). Before it,
+at 0570a02, the fast tier was exit 0 and the slow tier found one failure, the removal form's
+example (`aboard: remove the cask of brandy`) performed on none of the forms' test seas; mended
+at 7e50d00 (`aboard: remove the sealed packet`, the packet of the near sea) and all of it
+measured again there. The tree reported differs from 7e50d00 by this paragraph alone.
