@@ -22743,6 +22743,18 @@ in the stations' `tell` 98's visitor's road is asked only where this package's
 refused them in his own words by the same road as the colours: three lines added to the step's
 test of the prisoner's prompt. The truths' file merged with both packages' truths in order
 (this package's to 7-363 and 7-369, then 98's 7-446 to 7-459).
+**One pin moved at the meeting with 98, old beside new** (found by the step's first fast tier,
+at b14433a: exit 1, 7,143 passed and this one failed). `tests/test_officer.py`'s handover test
+holds the officer's conversation at his seat under the fraction (0.6) of the door's budget, and
+every package that lengthened his brief or his readings has given the budget five hundred more
+(the test's own comment keeps the history). Measured at four trees as the test measures it: the
+trunk before either at c54a053, **13,433** tokens; with 98 alone (bbb6952), **13,474**; with this
+step alone (350df0e), **13,475** (the reading `the prize money` and the court's three events in
+the stand-by's words); with both (b14433a), **13,516**, sixteen over the fraction of 22,500
+(13,500). Neither package moves it alone; together they do. The budget is 23,000 in the test
+(22,500 before), by the test's practice, with the four figures in its comment. Nothing of the
+harness's own figures is changed (`HANDOVER_AT_FRACTION` is 0.6 as it was).
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

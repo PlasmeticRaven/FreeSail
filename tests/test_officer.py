@@ -936,15 +936,20 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     # in every brief) with package 75's lee-port words in the readings, together on the merged
     # tree (13,200 at the seat, exactly the fraction of 22,000): five hundred more, 22,500;
     # package 65, step 3: the officer's duty to report, the call and the command devolved in
-    # the brief's words (13,301 at the seat): five hundred more, 22,500
-    h.budget_tokens = 22500
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 22500
+    # the brief's words (13,301 at the seat): five hundred more, 22,500; package 74's step 5
+    # (the reading `the prize money` and the court's three events in the stand-by's words)
+    # with package 98's `the flags` and the flags of command, together on the merged tree:
+    # 13,433 at the seat before either (the trunk at c54a053), 13,474 with 98 alone, 13,475
+    # with step 5 alone, 13,516 with both, over the fraction of 22,500 (13,500): five
+    # hundred more, 23,000
+    h.budget_tokens = 23000
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 23000
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 22,500 tokens this door gives you" in ask  # 22,000 before 65 and 75 met
+    assert "of the 23,000 tokens this door gives you" in ask  # 22,500 before 74 and 98 met
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"
