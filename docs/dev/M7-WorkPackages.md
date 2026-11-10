@@ -4056,8 +4056,7 @@ last exit 0, 14 passed, no floor lowered; nothing skipped; ruff clean. The trunk
 its tiers twice and it measured again each time. **The lead's merge:** the trial on 41216bbc
 clean (100's step 1 and this step met in `World.submit` and `world/orders.py` and merged of
 themselves) and lint-clean; no model or vendor name in the diff; no ship file, no physics; the
-fast tier whole on it exit 0, 7,244 passed by the dots and 1 xfailed, 15:14 to 16:25 UTC; the whole suite in the cloud dispatched after run
-64, the figures to follow. Next in 74: step 6 (the court martial, a new command, the consent
+fast tier whole on it exit 0, 7,244 passed by the dots and 1 xfailed, 15:14 to 16:25 UTC; the whole suite in the cloud, run 65 (2026-11-10, 17:02 to 18:15 UTC, on e1e2ba78): green whole, lint, the six shards and the pace job. Next in 74: step 6 (the court martial, a new command, the consent
 revision drafted under `docs/design/` with its refusal in words behind the flag; truths 7-364
 to 7-366), then step 7.
 
