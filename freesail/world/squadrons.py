@@ -1422,7 +1422,24 @@ def _velocity_of(world: Any, vid: str) -> tuple[float, float]:
     return ms * math.sin(rad), ms * math.cos(rad)
 
 
-_LAST_COURSE: dict[str, float] = {}
+# The followed ships' last courses (package 98, step 8): kept on the World itself, by the
+# vessel's id, so that it dies with its World, is saved in a checkpoint with it and restored
+# from one (`core.replay` pickles the World's object graph), and no other World made in the
+# process reads it; a module's table keyed by `id(world)` had none of these (a World made at
+# a dead one's address read its courses, and a checkpoint lost them). A checkpoint written
+# before this has none, and the heading stands in, as for a ship with no course yet.
+LAST_COURSES_ATTR = "squadron_last_courses"
+
+
+def _last_courses(world: Any) -> dict[str, float]:
+    from freesail.world.hulls import world_of
+
+    root = world_of(world)
+    courses = getattr(root, LAST_COURSES_ATTR, None)
+    if not isinstance(courses, dict):
+        courses = {}
+        setattr(root, LAST_COURSES_ATTR, courses)
+    return courses
 
 
 def _frame_of(world: Any, vid: str) -> tuple[Position, float, float] | None:
@@ -1439,7 +1456,6 @@ def _frame_of(world: Any, vid: str) -> tuple[Position, float, float] | None:
         heading = units.rad_to_deg(float(ship.heading)) % 360.0
         east, north = _velocity_of(world, vid)
         way = math.hypot(east, north)
-        key = f"{id(world)}:{vid}"
     else:
         body = _body(world, vid)
         if body is None:
@@ -1447,12 +1463,12 @@ def _frame_of(world: Any, vid: str) -> tuple[Position, float, float] | None:
         pos = body.position
         heading = float(body.heading_deg) % 360.0
         way = units.knots_to_ms(float(body.speed_kn))
-        key = f"{id(world)}:{vid}"
+    courses = _last_courses(world)
     if way > 0.3:
         course = heading
-        _LAST_COURSE[key] = course
+        courses[str(vid)] = course
     else:
-        course = _LAST_COURSE.get(key, heading)
+        course = courses.get(str(vid), heading)
     wind_from = _wind_from_at(world, pos)
     rel = units.rad_to_deg(units.wrap_pi(math.radians(wind_from - course)))
     # the wind from the larboard side (rel < 0): leeward is to starboard (+90°)

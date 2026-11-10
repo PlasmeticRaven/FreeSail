@@ -17291,6 +17291,19 @@ the smack line for line and digest for digest (f2d587f438a2cf4b; with her square
 ordered set too, 370de09f2e10b5c7), the cutter's one moved line the lie a-try's ((13)(iv)), with
 her square sail set or not.
 
+**A pin this build moves, found by the cloud's run 62 and re-pinned by the lead at the merge
+(2026-11-10).** The schooner's recorded passage of gate 5b (`GATE_5B_SCHOONER_DIGEST`,
+`tests/test_known_truths.py`, in the slow tier, which neither the session's machine's four
+whole logs nor the lead's fast tier holds): 766 lines before and after; **old
+`2b68e8b1f60e8496`, new `3a1698037811b753`**. Both trees sailed by the lead on the build
+machine and every line compared (the trunk before the merge, 79006d06, against the merge,
+09222043): **one line differs**, the standing order "the outer road"'s "Shorten sail" at tick
+56,234, whose "Not done" list loses "'take in the square sail': 'take in' was understood, but
+'square' belongs with 'brace'" (the topsail schooner has no square sail); every tick, every
+other line and its data the same. **The toggle:** on the merged tree with `storm.listed_lines`
+made the identity the passage gives the old digest, 766 lines. The run's other five shards
+were green, so no other recorded passage moved.
+
 **(6) The *Neufchatel*'s quarter bill, 34 by the rule.** *As built* (`tools/ships/neufchatel.py`):
 `trimmers(plain)`, the brig-sloop's 27 carried by her plain sail against the brig's, 33.8, rounded
 to 34, shared out on Neuf-D §6.4's split by each mast's work (9, 11 and 15, now `TRIMMER_SHARES`)
@@ -24496,3 +24509,73 @@ passed. ruff check and format clean. Before it, at 4a0e07b4, the truths' slow ti
 5's five (above), proven by the toggle and re-measured at fd350b92; a fast tier at 4a0e07b4 (exit
 0, 7,110 passed) was measured before the trunk moved again. The tree reported differs from
 d96dbf31 by this paragraph alone.
+
+### Step 8: the set's last course kept in the world (the lead's addition of 2026-11-10)
+
+**Reproduced** at the base by planting: `tests/test_squadrons.convoy_world()` run three hours
+gave ded7116824f7e3e3 clean twice in one process, and 807f81859e987283 with a stale course
+planted for every member under the new World's `id(world)` keys of the module's
+`_LAST_COURSE`; with the commodore hove to from the start the members' stations themselves
+move every ten minutes (the truth below fails at the base on them).
+
+**Built.** `freesail/world/squadrons.py`: the module table is gone; `_last_courses(world)` keeps
+the followed ships' last courses on the root World (`hulls.world_of`), the attribute
+`squadron_last_courses` (`LAST_COURSES_ATTR`), keyed by the vessel's id, made on first use. It
+dies with its World, is pickled with it in a checkpoint and restored from one; a checkpoint
+written before this step has none and the heading stands in, as for an entry absent before.
+Chosen over the squadron or the vessel's record because the frame is read by vessel id for any
+set the ship leads or guides (the squadron's commander and a division's leader), one table for
+both, as the old one was.
+
+**Truths** (states and counts): 7-460, the convoy made twice in one process, the second after
+the first is dropped and collected, its commodore hove to from the start, a stale course
+planted for every member where the old table would have held it, keeps the first's stations
+every ten minutes for an hour and its count of lines, and no module table of courses is left;
+7-461, the commodore stopped, her head fallen off four points from her last course, saved by a
+checkpoint and resumed, the resumed World's own set keeps the uninterrupted run's stations and
+count of lines over the next hour. Both fail at the base on the stations (the toggle: the base
+`squadrons.py` restored) and pass with the mend.
+
+**Measured old beside new** (the toggle): 7-159's scene (the convoy of six at far detail and the
+Vengeur, 3,600 ticks) 97 lines, a9f39f0f6e53ae06, the same stations, at both; the convoy scene
+ded7116824f7e3e3 clean at both; `tests/test_squadrons.py` whole and the squadron truths
+(7-151 to 7-157, the slow tier with them) pass with the mend. **No pin moved**: in a single
+clean World every entry the old table held was written by the same World.
+
+**Said, not built** (the three other process-wide tables, read). (1) `core/events.py`
+`STATION_ACTORS`: every station ever defined in the process adds "the <name>" (`agents/agent.py`
+`Station.__post_init__`) and nothing removes it, so a second World inherits the first's names.
+It is read by `kept` (a line that is never rolled up), `World._submit_awake` (a station's order
+captured as an act and not journaled), `orders/crew.whose_order` and `world/needs`. A second
+World can be changed by it where one of its lines or orders carries an actor that names a
+station the first World had and it has not: the one such line found by reading is a word heard
+aboard another ship, written with `order_actor` or "the captain" by default
+(`orders/stations._say`), which after a first World with a captain's station would be kept from
+the roll-up (the views and the samples' roll-ups, not the log or its digest); and a visitor's
+station name ("officer of the watch, of the X, aboard the Amazon") stays a station's actor
+after its World is gone. Not proven by a test here. (2) `RECORD_ONLY_ACTORS`: only ever "the
+director", which it starts with (added again for the director's station), so nothing a first
+World leaves can change a second. (3) `world/reports._STATE_CACHE_BY_ID`: used only for a key
+that takes no weak reference (`_STATE_CACHE` is a `WeakKeyDictionary` first); a World and a Hull
+both take one, so in play it is never reached; were it reached, an id reused by a new key would
+read the old cache's line count and state, its `seen > n` guard resetting only a shorter log.
+
+**At the merge of the trunk at bbb69526** (package 74's step 4 at 9944b671, the far fight wired;
+98's combined report at 12bd5f48): clean. 7-159's scene and the convoy scene are the same on the
+merged tree old beside new (97 lines, a9f39f0f6e53ae06; ded7116824f7e3e3 clean and planted).
+**The visitor's condition taken out** (the lead's question at the merge): 74's
+`World._hand_on_her` (`movement.hand_on_her`) already keeps a visitor's word from standing her
+captain aside, so the addition (b)'s `and not data.get("visitor")` in `World._submit_awake`
+and the `visitor: True` it read in `orders/stations._visitor_to_the_captain`'s data are gone;
+the toggle: with both removed truth 7-458's visitor case passes (her captain does not stand
+aside), as it did with them. Nothing else read the key.
+
+**Step 8's suites as run** at **453ed374** (the step's tree, the trunk merged at bbb69526), in a
+worktree pinned there, one suite at a time: the fast tier exit 0, 7,133 passed, 1 xfailed, 485
+slow left out; the slow tier of the touched files (`--slow -m "not pace" -n 4` on
+tests/test_squadrons.py, test_known_truths.py, test_knowledge.py, test_aboard_another.py,
+test_visitor_name.py, test_between_hulls.py, test_captive.py) exit 0, 442 passed, 8 xfailed; the
+pace alone and last (`--slow -m pace -n 0`, the same files, 7-159 among them) exit 0, 13 passed.
+ruff check and format clean. An earlier fast tier at 00a6f3e8 (exit 0, 7,123 passed) was of
+the tree before the trunk's package 74 and is not the report's. The tree reported differs from
+453ed374 by this paragraph alone.

@@ -3031,7 +3031,14 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
-GATE_5B_SCHOONER_DIGEST = "2b68e8b1f60e8496"  # 58a (b9acdeac6354f3bf, the well; b7c16adc at 56)
+# package 75, the lead's ruled build (3) of 2026-11-09 (the gale's list names the square sail
+# only where she has one), re-pinned by the lead at the merge on the cloud's run 62: one line
+# of the 766 moved, the outer road's "Shorten sail" at tick 56234, which loses "'take in the
+# square sail': 'take in' was understood, but 'square' belongs with 'brace'" from its "Not
+# done" list; every tick and every other line the same; the toggle (`storm.listed_lines` made
+# the identity on the merged tree) gives the old digest (TuningNotes, the ruled builds, (3))
+# (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
+GATE_5B_SCHOONER_DIGEST = "3a1698037811b753"  # 75's ruled build (3)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -15137,3 +15144,24 @@ def test_truth_7_459_go_ashore_from_aloft_refused_and_the_owners_world_order_his
 
     test_go_ashore_from_the_tops_is_refused_until_he_comes_down()
     test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is()
+
+
+def test_truth_7_460_a_second_world_reads_nothing_of_a_dead_worlds_set():
+    """Package 98, step 8 (a determinism defect found by package 74, proven by the lead): the
+    set's last course is the World's own; a second convoy made after the first is dropped,
+    with a stale course planted where the old module table would have held it, keeps the
+    first's stations every ten minutes and its count of lines."""
+    from tests.test_squadrons import test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses
+
+    test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses()
+
+
+def test_truth_7_461_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint(tmp_path):
+    """Package 98, step 8: a set whose commodore lies stopped, her head fallen off her last
+    course, saved by a checkpoint and resumed, keeps the uninterrupted run's stations and
+    count of lines over the next hour."""
+    from tests.test_squadrons import (
+        test_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint as case,
+    )
+
+    case(tmp_path)
