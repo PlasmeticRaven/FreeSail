@@ -17487,6 +17487,198 @@ final runs and `digests-final.json`, not run again).
   run again, 142 passed. Every other outcome the base's, the skips and the xfail message for message.
 - **ruff** check and format over the tree: clean (367 files). Every changed file is LF.
 
+### The settee and the runner (the 10th's (3)(i) to (v))
+
+The lead's note of 2026-11-10, "Your new points", (3): B3.3b's finds, (i) to (iv) built, (v)
+recorded. Measured on the owner's machine at seed 7, the scripts in the session's scratch
+(`r10/s/`), outside the repository: before on the tree at 8bceb1cb exported whole, after on this
+step's code, each script the same on both. The settles are the tests' (`tests/test_settee.py`'s
+`_world`, the settee brig of 1,200 s; `tests/test_bilander.py`'s `_her_settle`); "the shift" is the
+eight points `tests/test_lying_to.py` forces a ship round by, as in B3.3b.
+
+**(i) Forced round and left to herself, the watch dips the settee.** *As built*
+(`freesail/evolutions/scripts.py`): `_judge_lying_to` takes the runner from `keep_lying_to`, and
+its forced-round branch hands it to `_hove_to_no_longer`: round with nothing aback, and hove to
+on the other tack then filled ("Her after yards full, she gathers way ...") or fallen off there.
+When she is hove to no longer so, a settee set whose yard hangs on her weather side as the deck
+reads the wind (`_settees_against_their_masts`, the dip order's own `against_the_mast`) is dipped
+by the watch: the urgent line says so ("... hove to no longer. The helm keeps her full and by. The
+watch dips the mainsail, lying against its mast.", its data naming it, `settees_dipped`) and the
+settee's own dip is ordered in the same tick (`dip_settee`; "Dip the mainsail! Hands to the jeers
+and the tack.", its steps' lines, "Dipped the mainsail; it stands to leeward of the mast."). A
+settee on her lee, a ship filled on her own tack and every ship with no settee: the line as before,
+nothing ordered. Lying to on the new tack (her file in 8 kn) she is still hove to, and the watch
+dips nothing; "fill away" dips it (B3.3b).
+
+*Two judgements, for the lead.* **(a) The watch gives the settee's own dip order** (its six able
+hands from the watch on deck, its three steps of 30, 75 and 75 s by the crew's factor, its words,
+and its holds, which keep every other order of the settee off it till it is hoisted), and not the
+fill away's change (`SetteeChange`, 120 s by the fill away's own hands, the tack's words). She is
+under way full and by when it is done, not lying to; and the watch's work is by the order, as the
+helmsman's watch boxes her off and braces up for him (`keep_full_and_by`). Its time is the order's:
+200 to 269 s on the settee brig, 357 to 405 s on her file (her settle's all hands, the order's six
+able at her company's factor), where the fill away's dip took 157 s and 177 s. **(b) Its sheet as it
+lies**: the dip order trims no sheet, and the settee draws at the trim the watch's tending left it
+lying to (the settee brig 26.5° to 33.2°, her file 38.7° to 38.8°). Drawn for full and by at the
+hoist instead (B3.3b's (b), probed in scratch): the settee brig 33.1° and 33.8°, her file 35.5° and
+35.6°, and at +1,800 s 0.06 to 0.21 kn more (the settee brig 3.35 and 4.49 kn in 15 and 20 kn, her
+file 2.76 and 3.67).
+
+*Measured* (hove to 600 s, the shift, left to herself to +1,800 s; "filled" is the urgent line's
+second after the shift, "dipped" the order's last line; the area drawing and her way at +1,800 s,
+old / new):
+
+| | Wind | Filled | Dipped | Drawing, m² | Way, kn |
+|---|---|---|---|---|---|
+| The settee brig (85.8 m² clear at the settle) | 8 kn | 439 | 639 | 57.3 / 86.0 | 1.56 / 1.86 |
+| | 15 kn | 118 | 356 | 57.1 / 85.6 | 2.76 / 3.14 |
+| | 20 kn | 96 | 365 | 56.7 / 84.8 | 3.74 / 4.41 |
+| Her file (61.8 m² clear at her settle) | 8 kn | lies to on the new tack | none | 41.4 / 41.4 | 1.12 / 1.12 |
+| | 15 kn | 156 | 513 | 41.2 / 61.7 | 2.54 / 2.70 |
+| | 20 kn | 119 | 524 | 40.8 / 61.1 | 3.37 / 3.59 |
+
+Hove to 60 s instead, the way the same within 0.02 kn, "filled" and "dipped" one to four seconds
+sooner (the settee brig in 8 kn 44 s sooner). Forced round at +20 s in every run, onto the larboard
+tack, the fore topsail to the mast; to the tick the same on both trees up to "filled". Full and by
+at +1,800 s, 65.1 to 65.8 degrees off before and 65.9 to 67.5 now.
+
+**(ii) Paying off to a course, a kept settee trimmed with the boom sails.** *As built*
+(`FillAwayScript._pay_off`): the sheets drawn as she pays off are the head sails' and
+`_kept_after_sails` (the boom sails, as before, and a settee kept set), on her lee for the wind she
+has as it draws aft, and for the course's wind at the last. A ship with no settee draws what she
+drew. *Measured* ("fill away and steer west" from hove to 600 s, the course 90 degrees off the
+wind; and forced round by the shift and "fill away and steer north" 60 s after, the same course on
+the larboard tack; the settee's sheet and her way at +900 s, on the course, old / new):
+
+| | Wind | Plain: sheet; way | Forced round: sheet; way |
+|---|---|---|---|
+| The settee brig | 15 kn | 30.9° / 65.0°; 5.40 / 4.93 kn | 34.9° / 65.0°; 5.45 / 4.93 kn |
+| | 20 kn | 30.9° / 65.0°; 6.99 / 6.44 | 34.5° / 65.0°; 7.06 / 6.44 |
+| Her file | 15 kn | 34.8° / 65.0°; 5.19 / 4.60 | 35.5° / 65.0°; 5.19 / 4.60 |
+| | 20 kn | 33.6° / 65.0°; 6.63 / 5.99 | 35.5° / 65.0°; 6.67 / 5.99 |
+
+Filled away at the same second on both trees within one (86 to 313 s after the order). **As ruled
+it is trimmed as the boom sails are, and that trim is off, for the lead (not built):** the pay-off
+draws every sheet for `aim`, the true wind's angle on her bow, passed to `draw_sheets` as the
+apparent wind's. On the course 90 degrees off in 15 kn the deck reads 67° to 70°: the brig's
+spanker is drawn to 65.0° (its ceiling) where the deck's reading wants 44.3°, the brig's and the
+frigate's head sheets to 60.0° where it wants 39.0° to 41.3°, on both trees alike; the settee joins
+them at 65.0° (the deck's 44.1° and 45.0°), and she is 0.47 to 0.68 kn slower than with the trim
+the fill away gave it. Probed in scratch, the settee alone drawn for the deck's reading at each
+re-trim: forced round, 42.8° to 43.8° and her way as left (5.16 to 7.01 kn); from the plain
+heave-to its last re-trim reads the wind as her head swings and leaves it at 58° to 70° (4.71 to
+6.44 kn). The pay-off's sheets are every ship's: no change is built to them here.
+
+**(iii) Each manoeuvre holds the settees set from the order.** *As built:* `settees_held(ship)`,
+the set settees' ids, joins the holds of the tack, the wear, the box-haul (and so the box-off and
+wearing short round, its script's) and the fill away, the four scripts that change a settee round
+its mast: the runner reads an evolution's holds once, at the order (`Runner.start`), and an order
+of the settee given while one is in hand now waits its turn behind it; the change's own ids, named
+once it began, stay. A settee clewed up is not named; the heave-to and backing and filling work it
+at the order, lying a-try holds it already (`_to_hand`), and scudding keeps it as it stands. A ship
+with no settee set holds what she held.
+
+*The trace* (`r10/s/trace.py`; every committed sailing file and the settee brig, each from a
+settle at seed 7 in 15 kn: the bilander's her own, the settee brig's `_world`'s of 1,200 s, the
+others under plain sail with all hands called, braced sharp up and trimmed, 1,200 s): tack ship, wear
+ship, box haul and wear short round, each with "trim sails" 30 s after the order and "take in the
+mainsail" at 31 s; heave to 600 s and fill away, and fill away and steer west, the same two orders
+after; hove to, the shift, and 60 s after it fill away, and fill away and steer north, the same
+after; and hove to, the shift and left to herself 1,200 s, "trim sails" at 600 s: 117 runs, every
+tick's state (her heading, way, rates, heel, rudder and helm, tack, `steady`, the record, every
+sail's state, sheet, side, yard and shivering, every spar's brace, and the runner's work, each
+instance's evolution, subject, waiting and phase), every line with its tick, kind and data, and
+every reply. **The brig, the cutter, the frigate, the *Neufchatel*, the lugger, the merchant brig,
+the two schooners, the razee, the 64 and the smack: all 99 runs identical.** The bilander's nine
+and the settee brig's nine move, as the ruling means: in the tack "take in the mainsail" waited for
+hands and at +152 s found the settee in its gear ("there is nothing to take in"), the dip having it
+down, and now waits behind the tack and takes it in at +696 s; in the wear and wearing short round
+it was refused at once (lowered at "up helm") and is now carried out once she is round (+840 s,
++537 s); in the box-haul the trim of its sheet failed ("there is no sail to trim") and the take in
+found it in its gear at +51 s, and both now follow the manoeuvre (+640 s, +670 s); filled away,
+every tick the same and one line gone ("Not hands enough on deck to take in the mainsail; the
+hands are filling away.", the order waiting its turn instead); forced round and filled away, the
+take in refused while the settee lay on deck to be dipped is now done after "Filled away". Her
+later lines follow from her orders so carried out (with her settee taken in by the order, her
+square sails aback at +861 s in the tack's run). The five boat files are not traced: none files a
+settee, and (iv) is the logs' and the trials'. On the case B3.3b's review measured (the settee brig
+forced round, "fill away", "furl the mainsail" 30 s after): the furl waits its turn behind the fill
+away and is begun at "Filled away", +217 s ("Lay aloft and furl the mainsail."), where it began at
++31 s and said "Furled the mainsail on its yard on deck." at +201 s of a yard hoisted at +157 s.
+
+**(iv) The trim's line names only its sails still set.** *As built* (`Runner._group_done`): the
+sheets of a trim group are filtered to the sails still set (`Sail.is_set`) when its last sheet is
+done, the line, its angles and its data theirs; none still set, no line. The braces' line, which
+names yards, as before. *Measured, every ship's:* **the four whole logs** all four as
+`digests-final.json` in every field (497 lines, 84176c16104a2c67; 229, 523ebf0bf6180321; 1,561,
+8f2e1783e6d13312; 1,722, 8df0ab2beba93320); **the captain's trials** 4 passed, 3 failed on the
+machine's three digests (8df0ab2beba93320, 8dac97a4c9bdfe43, df5f02eb6e6ce68a), as the base: no
+trial's pin moves. The gale as B3.4's review sailed it (`r10/m/gale.py`, its script and world as at
+the first step) on eight rigs: the cutter and the smack, each with and without the square sail, and
+the bilander digest for digest; three lines move in the other three, every tick and every other line
+the same, their ends the same:
+
+| | s | Before | Now |
+|---|---|---|---|
+| The *Neufchatel* | 7,860 | Trimmed the sheets of the fore-and-aft foresail and the mainsail; 18° to 27° off the centreline. | Trimmed the mainsail sheet; 18° off the centreline. |
+| | 8,044 | Trimmed the sheets of the fore storm staysail, the fore-and-aft foresail and the mainsail; 15° to 18° off the centreline. | Trimmed the sheets of the fore storm staysail and the mainsail; 15° to 18° off the centreline. |
+| The topsail schooner, the privateer schooner | 6,958 | Trimmed the sheets of the jib and the foresail; 25° to 29° off the centreline. | Trimmed the foresail sheet; 29° off the centreline. |
+
+Her digest c1909bc8eb168d3f to 670f3155f573a95e, the schooners' af5fe3d771829fb9 to
+71fc3b167bcbaa56; no test pins them.
+
+**(v) Her light-air fill away from a short heave-to: recorded, nothing built.** Measured again
+(her settle in 8 kn, hove to 60 s after "Hove to", "fill away"), the same on both trees: filled away
+at +236 s and taken aback at +245 s (+230 s and +239 s on 35e33ad0, before the first step, as B3.3b had them);
+at +300 s 88.2 degrees off on the larboard tack going astern at 1.05 kn with the settee against its
+mast, at +600 s 15.6 degrees off on the starboard tack at 1.73 kn astern, at +900 s 70.6 degrees off
+at 1.63 kn ahead. From 600 s hove to, filled away at +57 s, 2.16 kn at +900 s. The settee brig from
+both: filled away at +95 s and +51 s, nothing aback.
+
+**Found on the way, for the lead (not built):**
+
+1. **Forced round and hove to no longer by her after yards full, her head yards stay aback.** The
+   record lays the forced round's aback yards (the fore yards, braced for the old tack) on the new
+   tack, and "Her after yards full, she gathers way ...: hove to no longer." leaves them so: she sails
+   on full and by with the fore topsail aback until a trim braces them, the settee brig at 3.14 kn
+   and her file at 2.70 kn at +1,800 s in 15 kn, where filled away by the order from the same
+   heave-to they made 4.26 kn at +600 s and 4.04 kn at +300 s (B3.3b's tests). Every ship's: the
+   brig the same in the trace until "trim sails" at +600 s braced them (she was then taken aback and
+   boxed off, on both trees alike). `_judge_lying_to`'s "filled" branch; the ruling asked the settee
+   alone.
+2. **The pay-off's sheets drawn for the true wind's angle** ((ii) above): every ship's.
+3. **Rounding to clews a settee up with the square sails without holding it**, as it does the
+   courses: the anchor scripts hold the ship alone. Not a change round its mast; not among (iii)'s.
+
+**Pins moved, old beside new:** `tests/test_settee.py`, the fill away's own turn (its five cases):
+the settee in its holds from the order, three pins "not in the holds" (at the order; left on her
+lee; after the hoist) now "in", its docstring saying so. None other: `tests/test_bilander.py`,
+`test_lying_to`, `test_staying` and `test_evolutions` as they were; in the slow tier, the trials and
+the four whole logs, none. **New:** `tests/test_settee.py` twelve, (i) the settee brig forced round
+and left to herself, the nothing-aback branch both ways and the own-tack fill; (ii) the pay-off's
+first trim; (iii) the six manoeuvres' holds and the furl behind the fill away; `tests/test_evolutions.py`
+four, (iv) the frigate's trim with none, one, two and three of its sails taken in. **Broken on
+purpose**, each in a copy of the tree with one part undone: the watch's dip left out, the two dip
+cases fail; the dip in every branch, the own-tack case; the pay-off's boom sails alone, its case;
+`settees_held` empty, the six holds, the furl and the fill away's five; every sail named, the three
+with sails taken in.
+
+**The suites, as run** (`py -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` from
+the tree root, one at a time, on this step's code; against SW-1's bases, not run again):
+`tests/test_settee.py` 75 passed in 31.8 s, `test_evolutions` 93 passed in 11.6 s, `test_bilander`
+60 passed in 35.6 s, `test_lying_to` 40 passed in 63.9 s, `test_staying` 20 passed in 25.4 s, each
+`--slow`. By junit against the bases: only in the new, the sixteen new cases and `test_lying_to`'s
+six slow cases (in neither base); none only in the base; no outcome changed. The captain's trials
+and the four whole logs above. **With these records written**, the files that read the documents
+(B2c's fourteen: `test_hull_schooner`, `test_hull_brig`, `test_hull_cutter`, `test_hull_frigate`,
+`test_hull_lugger`, `test_hull_smack`, `test_practice`, `test_in_world`, `test_hull_form`,
+`test_knowledge`, `test_primer`, `test_grammar_book`, `test_indefatigable`, `test_officer`) with
+`tests/test_settee.py` and `test_evolutions`: **1,784 passed in 10:03**, every outcome as in the
+fast base (only in the new the sixteen and the first step's eight of `test_hull_form`, the base being
+SW-1's; `test_evolutions`' three slow cases left out of this run, passed in the run above).
+**The generator,** `py tools/gen_ships.py` into scratch: seventeen of seventeen files byte for byte
+as in `data/ships/`. **ruff** check and format clean (367 files); every changed file LF.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

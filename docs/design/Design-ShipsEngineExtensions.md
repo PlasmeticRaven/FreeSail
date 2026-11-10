@@ -813,6 +813,26 @@ tack's, the wear's and the fill away's) is not seen by the runner, which reads a
 holds once, at the order. Figures in `docs/dev/TuningNotes.md`, "B2c and B3.3b, the review's
 mends".
 
+*The lead's ruled builds of 2026-11-10, (3)(i) to (v) (built 2026-11-10):* **(i)** forced round
+lying to and left to herself, hove to no longer in the record's forced-round branch
+(`_judge_lying_to`, `_hove_to_no_longer`), a settee lying against its mast is dipped by the watch
+and the line says so ("... The helm keeps her full and by. The watch dips the mainsail, lying
+against its mast."): the settee's own dip ordered (`dip_settee`, its hands from the watch on deck,
+its times, words and holds), its sheet as it lies, two judgements for the lead; on the fixture the
+settee drawing whole again 200-269 s after "hove to no longer" (57 m² against its mast before, 86
+now; 3.14 kn at +1,800 s in 15 kn, 2.76 before), on her file 357-405 s (41 m² before, 62 now; 2.70
+kn, 2.54). **(ii)** paying off to a course a kept settee is trimmed with the boom sails
+(`_pay_off`, `_kept_after_sails`); the pay-off draws every sheet for the true wind's angle on her
+bow, so the settee is eased to 65° on a beam course where the deck's reading wants 44-45°, 0.47-0.68
+kn slower than left (the pay-off's sheets, every ship's, for the lead). **(iii)** the tack, the
+wear, the box-haul (with the box-off and wearing short round) and the fill away hold the settees set
+from the order (`settees_held`), so that no order of the settee's is begun while it may be changed;
+the trace of the eleven committed files without one through every manoeuvre, identical in 99 runs.
+**(iv)** a trim's sheets line names only its sails still set (`Runner._group_done`), every ship's:
+the four whole logs and the captain's trials as before; the *Neufchatel*'s gale's two lines and the
+schooners' one move. **(v)** her light-air fill away from a short heave-to recorded, nothing built.
+Figures in `docs/dev/TuningNotes.md`, "The settee and the runner".
+
 ### 5.8 Getting under way, rounding to, the gale
 
 - **Getting under way.** With `_lugs_all` leaving out settees, she takes the ship's path:

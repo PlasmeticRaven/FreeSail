@@ -1345,7 +1345,23 @@ trimmed for full and by as the tack hoists it, and then she is filled away: on h
 forced round by a shift of eight points, hoisted at +158 s and filled away at +218 s, 4.15 kn at
 +300 s, where left against its mast it drew 41.3 m² of its 61.8 and she made 3.13 kn
 (`tests/test_bilander.py`; Ext §5.7's as-built note; `docs/dev/TuningNotes.md`, "B3.3b, the
-settee kept and forced round hove to").)* **Item 6**, the sheet's block: 0.31 m
+settee kept and forced round hove to").)* *(The lead's ruled builds of 2026-11-10, (3)(i) to (v),
+built 2026-11-10: forced round hove to and left to herself, no fill away ordered, she is hove to no
+longer once her after yards fill, and the watch now dips the settee lying against its mast and says
+so ("The watch dips the mainsail, lying against its mast."), by the settee's own dip order: in 15 kn
+"hove to no longer" at +156 s after the shift and the settee dipped at +513 s, drawing 61.7 m² at
++1,800 s and she 2.70 kn full and by (before, 41.2 m² against its mast to the end and 2.54 kn, no
+word said); in 20 kn +119 s, +524 s, 3.59 kn (3.37); in 8 kn she lies to on the new tack, as before,
+and "fill away" dips it. Its sheet stands as it lay (38.8°); her fore topsail stays aback until a
+trim, every ship's, for the lead. Filled away to a course, her settee is trimmed with the boom sails
+as she pays off: eased to 65.0° on a beam course where the deck's reading wants 45.0°, 4.60 kn where
+left at its fill away trim she made 5.19 (the pay-off's sheets drawn for the true wind's angle, every
+ship's, for the lead). The tack, the wear, the box-haul and the fill away hold her settee from the
+order, so that an order of it given meanwhile waits its turn (traced: no other committed file
+moves). Her plain fill away in 8 kn from a short heave-to recorded again, nothing built: filled away
+at +236 s and taken aback at +245 s, as B3.3b found it (+230 s and +239 s then, before the first
+of these builds). Figures in `docs/dev/TuningNotes.md`, "The settee and the runner".)* **Item 6**, the
+sheet's block: 0.31 m
 inside her taffrail (x -11.47 against -11.78), within the fathom; this design's 0.03 m and the
 proxy's 4.45 m were on the taffrail at x -11.52, before her step 1 moved it 0.26 m aft (the proxy's
 block now 4.72 m inside). **Item 7**, the untried manoeuvres run once on her file: each to its end
