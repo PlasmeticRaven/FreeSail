@@ -839,6 +839,10 @@ id. Each is sorted into one of three kinds, which is the builder's whole work li
 - **I, an identity**: compares a vessel's id with "the ship" to mean *that vessel*, the first hull's
   shadow; correct as it stands.
 
+**How each row was sorted** (the gate's addition (b)): a row marked **[run]** was proved by one of
+the scratch runs of §1.4, §9.2 and §9.4 (the behaviour seen, not only read); every other row was
+sorted by reading alone, and the builder proves it by a test at the step that changes it.
+
 For every save with no change, P and F are one hull, so every one of these edits leaves every older
 game as it was.
 
@@ -846,11 +850,11 @@ game as it was.
 
 | Where | What it assumes | Kind |
 |---|---|---|
-| `core/world.py:556-560` `World.players` | the player's ship is `_own` | P: reads `_players` |
-| `core/world.py:562-566` `sea_vessels` | the sea is on the player's hull | F (it is, and stays) |
+| `core/world.py:556-560` `World.players` | the player's ship is `_own` | P: reads `_players` **[run]** |
+| `core/world.py:562-566` `sea_vessels` | the sea is on the player's hull | F (it is, and stays) **[run]** |
 | `core/world.py:597` `follow "the ship"` | the player's ship by name | P (`players`, as now) |
-| `core/world.py:2560` `save` | the first block is the player's | F |
-| `core/world.py:2627-2631` `_hull_blocks` skips `_own` | the first block holds the player's | F (as now) |
+| `core/world.py:2560` `save` | the first block is the player's | F **[run]** |
+| `core/world.py:2627-2631` `_hull_blocks` skips `_own` | the first block holds the player's | F (as now) **[run]** |
 | `core/acts.py:118-126` `hull_id_of` | `""` is the player's hull | F (writes as now) |
 | `core/acts.py:145-155` `act_target_of` | `""` goes to `players` | F: to `_own` |
 | `world/hulls.py:207-213` `own_id` | the first hull's id is the player's | I |
@@ -860,10 +864,10 @@ game as it was.
 
 | Where | What it assumes | Kind |
 |---|---|---|
-| `world/knowledge.py:753-784` `player_hull` | his own hull is `players`; `--ship` by the first hull's log | P, with §2.3 item 7 |
-| `world/knowledge.py:817-848` `players_person` | his hull's `people.captain` | P (through `player_hull`) |
+| `world/knowledge.py:753-784` `player_hull` | his own hull is `players`; `--ship` by the first hull's log | P, with §2.3 item 7 **[run]** |
+| `world/knowledge.py:817-848` `players_person` | his hull's `people.captain` | P (through `player_hull`) **[run]** |
 | `world/knowledge.py:879-917` `players_senses` | the fallback with nothing followed is `players` | P |
-| `world/movement.py:1154-1185` `_drivers_follow` | none (follows his body) | nothing to change |
+| `world/movement.py:1154-1185` `_drivers_follow` | none (follows his body) | nothing to change **[run]** |
 | `world/boats.py:745` going aboard "the ship" | `players` | P |
 | `world/orders.py:306-349` `hull_named` ("the ship", "us") | `players` | P |
 | `world/orders.py:1342-1349`, `1866` the player's ship in the world orders | `players` | P |
@@ -884,17 +888,17 @@ game as it was.
 | Where | What it assumes | Kind |
 |---|---|---|
 | `world/ships.py:1209-1222` `players_current` | the shadow's hull is `_own` | I (the shadow is the first hull's vessel) |
-| `world/ships.py:1811-1870` `player_shadow`, "the one vessel the sea never moves" | the first hull's vessel is the player's and is never moved by the sea | I for the id; **the "never moved" must become "while she is the player's ship"**, and the player's ship's own far body must be brought to her truth every tick (§9.2) |
+| `world/ships.py:1811-1870` `player_shadow`, "the one vessel the sea never moves" | the first hull's vessel is the player's and is never moved by the sea | I for the id; **the "never moved" must become "while she is the player's ship"**, and the player's ship's own far body must be brought to her truth every tick (§9.2) **[run]** |
 | `world/ships.py:769-781` `_target_of` (`target_id == PLAYER_ID`: the target at `world.position`) | a chase of "the ship" is a chase of the player | I: a chase of the first hull's vessel; and a brain that means "the player" must target `players_id` (§9.3) |
 | `world/ships.py:1024-1032` a carrier's `to_ship` leg | goes to `players` | P |
 | `world/ships.py:1986-1995` `_deliver_to_hulls` | `players` | P |
 | `world/ships.py:2165` `_player_id` | the player's id is "the ship" | P: `players_id` |
-| `world/ships.py:862-866` a far body with no plan is done | every crewed hull but the player's has a plan or a brain | the act gives the old ship one (§4.2) |
-| `world/crews.py:554-565` `crewed` leaves `players` out | the player's hull is the one never demoted | P, **and** the first hull never released (§4.2) |
-| `world/crews.py:702-714` `release_done` drops a done hull | the first hull is never done | F: never drop `_own` |
-| `world/crews.py:850-855` the switch's distance by the brain only | every crewed far body but the player's has a brain | read every crewed body's position (§4.2) |
+| `world/ships.py:862-866` a far body with no plan is done | every crewed hull but the player's has a plan or a brain | the act gives the old ship one (§4.2) **[run]** |
+| `world/crews.py:554-565` `crewed` leaves `players` out | the player's hull is the one never demoted | P, **and** the first hull never released (§4.2) **[run]** |
+| `world/crews.py:702-714` `release_done` drops a done hull | the first hull is never done | F: never drop `_own` **[run]** |
+| `world/crews.py:850-855` the switch's distance by the brain only | every crewed far body but the player's has a brain | read every crewed body's position (§4.2) **[run]** |
 | `world/crews.py:429` the sky with nothing followed | `players` is the observer's | F |
-| `world/crews.py:174-175` `HullView.player_shadow` | the sea is not the player's hull's view | F (stays true under the split; it recursed under the move, §1.4) |
+| `world/crews.py:174-175` `HullView.player_shadow` | the sea is not the player's hull's view | F (stays true under the split; it recursed under the move, §1.4) **[run]** |
 
 *The squadrons, the signals and the far brains*
 
@@ -981,7 +985,12 @@ with this note's order inside them:
 
 0. **This note**, gated by the lead; the §9.1 table read again against the trunk with 74 merged (74's
    `PLAYER_ID` reads sorted by the same three kinds) before a line is written.
-1. **The player's ship changed in play.** The split (`World._players`, `World.players`, the first
+1. **The player's ship changed in play.** First, before the act and each with its own test (the
+   gate's addition (a); faults waiting whether or not a ship is ever changed): the four floors of
+   §4.2 (a far body always given a plan, a brain allowed to any ship but the player's, the first hull
+   never released, the switch measuring every crewed body by its position); and the followed ship's
+   far body brought to her truth (§9.2) if nobody has mended it by then, proved by 7-481 either way.
+   Then the split (`World._players`, `World.players`, the first
    block from `_own`, `act_target_of`, `director_hull` and the truth's player's block); every P of
    §9.1; the followed ship's far body at her truth (§9.2, the `--ship` road mended with it); the old
    ship's floor (§4.2: a plan always, her brain allowed, the first hull never released, the switch by
@@ -1053,7 +1062,7 @@ with this note's order inside them:
 
 ## 12. The questions for the owner, and the open items for the lead
 
-### 12.1 For the owner, each answerable in a sentence
+### 12.1 For the owner, each answerable in a sentence (answered at the gate: §13)
 
 - **Q1.** When a captain leaves a ship, should his own money (his prize shares, his pay) go with him
   in a purse of his own, or should all money stay the ship's until M8's career, as this note rules?
@@ -1068,7 +1077,7 @@ with this note's order inside them:
 - **Q5.** In a merchant scenario that names no owner (every one on file), is the player his ship's
   owner, free to sell her, as this note rules, or her owners' master, who may not?
 
-### 12.2 For the lead
+### 12.2 For the lead (ruled at the gate: §13)
 
 1. **The split** (§2.1, §2.2): one new field, `World._players`, and the first hull kept as the game's;
    the move and the id swap rejected (§11).
@@ -1087,6 +1096,54 @@ with this note's order inside them:
    quarter to half an hour), the least to work her (one watch at the sail-handling stations, never
    under four), the most she berths (a complement and a half), the copper (£2 a ton new, nothing at
    eight years), the price held a day.
+
+## 13. The gate (2026-11-10)
+
+The lead accepted the note at the gate on 2026-11-10. The owner's answers and the lead's rulings
+stand here; where they differ from the text above, this section governs.
+
+### 13.1 The owner's answers to §12.1
+
+- **Q1.** All money stays the ship's until milestone 8's career; no purse of the person's own in this
+  package; an owner's purse is carried by the ledger as §5.4 rules.
+- **Q2.** A master's own books and instruments stay with the hull for now (§3.2); revisit with the
+  career.
+- **Q3.** Yes: the director's word is the only road by which a King's officer or an owner's captain
+  takes another ship or a prize (§5.2, §5.5).
+- **Q4.** Yes: an owner may keep his old ship working under her mate with an intent while he sails
+  the new one (§4.1, 3).
+- **Q5.** Yes: in a merchant scenario that names no owner the player is her owner, free to sell her
+  (§5.2); a scenario may say otherwise.
+
+### 13.2 The lead's rulings on §12.2
+
+1. **The split** is accepted: `World._players`, the first hull kept as the game's; the move and the id
+   swap rejected as §11 argues.
+2. **The act journaled by its cause**, with no new input kind: accepted.
+3. **A set's command not carried in step 1**, refused in words: accepted; the broad pendant shifted to
+   another hull is a later package's, on the lead's list.
+4. **The fault of §9.2 is real**: the lead reproduced it on the trunk with the suite's own helper
+   (`tests/test_aboard_another.aboard_x`): the followed hull against her far body 0.0 m at tick 61,
+   933.8 m at tick 361 and 3,803.4 m at tick 1,261. It is said to the owner, whose word it is whether
+   it is mended in 60's step 1 or by a small step sooner, since he tests with that road. Step 1 mends
+   it if nobody has by then, and proves it by 7-481 either way (§10, step 1).
+5. **74's files touched after its close** (`prizes.py`, `court.py`, `prize_court.py`): accepted, after
+   74 closes and not before.
+6. **Art. XXXI's attribution** (§1.5, item 8): the lead tells 74.
+7. **The ports' key `ships_for_sale`**: accepted, optional, with the default by the dockyard's kind
+   (§7.4).
+8. **The JUDGEMENT figures** are accepted as marked, each to the tuning notes at its step. By decision
+   66, each price and rate in the data says which year's picture it is (Steel's contract of 1804, the
+   Regulations of 1806, a FROM MEMORY figure's war years), since a game begins on any day of 1792 to
+   1825 and a price is one of the things a year changes: the builder files the year beside the figure,
+   and the valuation takes no date yet; a scaling by date is not this package's.
+
+### 13.3 The lead's two additions, made in the text
+
+- **(a)** The four floors of §4.2 are step 1's first work, before the act, each with its own test,
+  since they are faults waiting whether or not a ship is ever changed (§10, step 1).
+- **(b)** The table of §9.1 marks the readers proved by a run (**[run]**) apart from those sorted by
+  reading alone, so that the builder knows which to prove.
 
 ## As built (the postscripts, step by step)
 
