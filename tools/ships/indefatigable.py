@@ -4062,19 +4062,11 @@ DEFAULT_FIT = {"sixty-four": "ardent class 1784", "razee": "as carried 1796"}
 # fourth in a ship of one (the Regulations 1806, the Gunner, Art. XXI, OCR l. 13118-13144).
 UPPER_DECK_GUNS = 26
 DECKS_OF = {"sixty-four": 2, "razee": 1}
-# Her cartridges' powder (Indf §5.4): the engine's shares give every calibre of her fits to the
-# ounce of the Regulations' Table No. 29, read on the page image (Ind §6.4), so the shared
-# note, which waits on that table, is overridden in her fits until the shared work (SW-1) fills
-# the table and its note serves her (Build-Ships.md §10).
-CHARGES_NOTE = (
-    "A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for "
-    "one shot, the Regulations 1806 (1808 printing), Table No. 29 (the page image read: "
-    "Research-Indefatigable-2026-10.md §6.4; the OCR has its title at l.27498-27502 and lost its "
-    "figures): the long 24-pounder 8 lb, the 18 6 lb, the 12 4 lb, the 9 3 lb; the 42-pounder "
-    "carronade 3 lb 8 oz, the 24 2 lb, the 18 1 lb 8 oz. The engine's shares of the shot, a "
-    "third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, charge_lb), "
-    "give each of them to the ounce."
-)
+# Her cartridges' powder (Indf §5.4): the Regulations' Table No. 29, read on the page image (Ind
+# §6.4), through `charge_lb` and the shared note since the shared work SW-1 filled the table
+# (Build-Ships.md §10): the long 24-pounder 8 lb, the 18 6 lb, the 12 4 lb, the 9 3 lb; the
+# 42-pounder carronade 3 lb 8 oz, the 24 2 lb, the 18 1 lb 8 oz, as the shares gave them before.
+# Her own note, which stood until then, is gone.
 ARMAMENT_NOTE = (
     "The armament (spec M7 7; package 70; docs/design/Design-Ship-Indefatigable.md §5): the "
     "guns as parts of the graph by their place, in her fits, each on its port of the hull's "
@@ -4376,8 +4368,8 @@ def default_guns(p, fits):
 
 
 def armament(b, p, fits):
-    """Her fits and their magazines (Indf §5), the charges' notes overridden to cite Table No.
-    29 and the 64's exercise note a two-decker's."""
+    """Her fits and their magazines (Indf §5), the charges Table No. 29's and their note the
+    shared one (SW-1), the 64's exercise note a two-decker's."""
     decks = DECKS_OF[p.key]
     exercise = g.exercise_allowance(UPPER_DECK_GUNS, decks=decks)
     rounds = {"long": g.KINGS_ROUNDS, "carronade": g.KINGS_ROUNDS, "swivel": g.SWIVEL_ROUNDS}
@@ -4389,9 +4381,8 @@ def armament(b, p, fits):
             for name, source, guns, note in fits
         ],
     )
-    for name, *_ in fits:
-        b.armament_notes[("magazine", name, "charges")] = CHARGES_NOTE
-        if decks == 2:
+    if decks == 2:
+        for name, *_ in fits:
             b.armament_notes[("magazine", name, "exercise_charges")] = (
                 period.TWO_DECKS_EXERCISE_NOTE
             )

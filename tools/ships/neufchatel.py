@@ -2321,15 +2321,17 @@ CHASERS_NOTE = (
     "Her two aftmost ports a side stand empty, by the cabin trunk and the tiller under the main "
     "boom (judgement): 'mounting 18' in 22 ports leaves four empty."
 )
-# Her cartridges' powder (Neuf-D §5.4): the engine's shares give the Regulations' Table No. 29
-# exactly for her two calibres, the figures not overridden; her own note cites the table as read
-# (Build-Ships.md §10), where the shared one waits on it, as the Indefatigable's does.
+# Her cartridges' powder (Neuf-D §5.4): the Regulations' Table No. 29 through `charge_lb` since
+# the shared work SW-1 filled the table (Build-Ships.md §10), the same to the ounce as the
+# engine's shares gave her two calibres before it; the figures not overridden. Her own note,
+# which cites the table as read, is kept over the shared one for Adye's page beside it, the
+# shares cited at `CHARGE_SHARE`, since `charge_lb` now gives the table first.
 CHARGES_NOTE = (
     "A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one "
     "shot, the Regulations 1806 (1808 printing), Table No. 29, read on the page image "
     "(Build-Ships.md §10): the long 6-pounder 2 lb, the 12-pounder carronade 1 lb, which Adye 1804 "
     "p. 72 gives too. The engine's shares of the shot, a third for a long gun and a twelfth for a "
-    "carronade (freesail/ship/parts.py, charge_lb), give each of them to the ounce."
+    "carronade (freesail/ship/parts.py, CHARGE_SHARE), give each of them to the ounce."
 )
 
 
@@ -2425,7 +2427,12 @@ BRIG_TRIMMERS = 27
 # The brig-sloop's plain sail, m2, from brig.yaml: her courses 94 and 94, topsails 114 and 121,
 # topgallants 46 and 45, fore topmast staysail 33, jib 57 and spanker 162.
 BRIG_PLAIN_M2 = 94 + 94 + 114 + 121 + 46 + 45 + 33 + 57 + 162
-TRIMMERS = {"forecastle": 9, "fore_top": 11, "afterguard": 15}
+# The split by each mast's work, Neuf-D §6.4's 9, 11 and 15 (judgement: the head sails and the
+# fore tacks and sheets, the fore's four yards, the main sheet and the gaffs). The count is the
+# rule's, the brig's 27 by her plain sail rounded, shared out by largest remainder as the muster
+# shares its seamen (`crew.muster.apportion`): the lead's ruling (6) of 2026-11-09 (package 75),
+# "34 by the rule, through the generator", where B2 wrote 35 on the design's 1,024 m2.
+TRIMMER_SHARES = {"forecastle": 9, "fore_top": 11, "afterguard": 15}
 HELM = 1
 POWDER = 2
 SMALL_ARMS = 26
@@ -2634,28 +2641,43 @@ def at_the_guns(guns):
     return sum(gun["crew"] for gun in one_side)
 
 
+def trimmers(plain):
+    """Her trimmers by station (Neuf-D §6.4): the brig-sloop's `BRIG_TRIMMERS` carried by her
+    plain sail against the brig's, rounded to a whole man, and shared out by `TRIMMER_SHARES` by
+    largest remainder (`crew.muster.apportion`, the muster's own rule)."""
+    from fractions import Fraction
+
+    from freesail.crew.muster import apportion
+
+    n = round(BRIG_TRIMMERS * plain / BRIG_PLAIN_M2)
+    shares = [Fraction(v) for v in TRIMMER_SHARES.values()]
+    return dict(zip(TRIMMER_SHARES, apportion(n, shares), strict=True))
+
+
 def quarter_bill(b, guns):
     """Her quarter bill set against her fit (Neuf-D §6.4): the trimmers, the tiller, the powder,
     the filling party, the priority, the small-arms men and the boarders; the arithmetic in the
     generator's report."""
     seamen = sum(SEAMEN.values())
     plain = sum(s["area_m2"] for s in b.doc["sails"] if s["id"] in b.doc["groups"]["plain sail"])
-    REPORT["bill"] = (seamen, at_the_guns(guns), plain)
+    trim = trimmers(plain)
+    REPORT["bill"] = (seamen, at_the_guns(guns), plain, sum(trim.values()))
     b.quarter_bill(
         g.QUARTER_BILL_NOTE,
         [
             (
                 "forecastle",
-                TRIMMERS["forecastle"],
+                trim["forecastle"],
                 "The trimmers: the brig-sloop's twenty-seven (brig.yaml's bill) carried by her "
-                "plain sail against the brig's, a quarter more (Neuf-D §6.4; the arithmetic in "
-                "the generator's report), split by each mast's work (judgement). Of the "
+                "plain sail against the brig's, a quarter more, by the rule (Neuf-D §6.4; the "
+                "lead's ruling of 2026-11-09; the arithmetic in the generator's report), split by "
+                "each mast's work (judgement, Neuf-D's 9, 11 and 15 by largest remainder). Of the "
                 "forecastlemen, for the headsails and the fore tacks and sheets.",
             ),
-            ("fore_top", TRIMMERS["fore_top"], "Of the fore topmen, for her four fore yards."),
+            ("fore_top", trim["fore_top"], "Of the fore topmen, for her four fore yards."),
             (
                 "afterguard",
-                TRIMMERS["afterguard"],
+                trim["afterguard"],
                 "Of the afterguard, at the main sheet, the gaffs and the fore gaff sail's sheet.",
             ),
         ],
@@ -2877,12 +2899,12 @@ def her_report() -> str:
             f"to {BRACE_LIMITS['fore.yard']})."
         )
     if "bill" in REPORT:
-        seamen, men, plain = REPORT["bill"]
+        seamen, men, plain, written = REPORT["bill"]
         out.append(
             f"hermaphrodite-brig: the quarter bill on '{DEFAULT_FIT}': her plain sail {plain:.0f} "
             f"m2 against the brig-sloop's {BRIG_PLAIN_M2:.0f} carries the brig's {BRIG_TRIMMERS} "
-            f"trimmers to {BRIG_TRIMMERS * plain / BRIG_PLAIN_M2:.1f} ({sum(TRIMMERS.values())} "
-            f"written); of her {seamen} seamen, the beat takes {men} to her guns (a crew to each "
+            f"trimmers to {BRIG_TRIMMERS * plain / BRIG_PLAIN_M2:.1f} ({written} written); of "
+            f"her {seamen} seamen, the beat takes {men} to her guns (a crew to each "
             f"carronade pair and to each chaser) and {HELM} to the tiller."
         )
     if "luce" in REPORT:

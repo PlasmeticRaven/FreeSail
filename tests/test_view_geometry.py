@@ -82,9 +82,13 @@ fields the projection reads always run.
 - Package 75 (B4, the shared guards at her landing): the bilander's rows in the tables kept by file,
   each measured on her file by its case's own arithmetic: her bowsprit, her tier of ports, her
   wale's chord, her lines on the rail and her settee's sheet to its block (its place outboard of
-  her round counter a recorded departure, for the lead), her storm staysail on the stem, her
-  quarterdeck's breast; her round stern with its lights and no gallery, the near quarter's light
-  seen abeam; no boom; and hers the one committed file with a settee.
+  her round counter a recorded departure, for the lead, gone since her counter is drawn: below),
+  her storm staysail on the stem, her quarterdeck's breast; her round stern with its lights and
+  no gallery, the near quarter's light seen abeam; no boom; and hers the one committed file with
+  a settee.
+- Package 75 (the lead's ruling (11) of 2026-11-09): her round counter drawn to its filed
+  half-breadths (`form.stern.counter_hb_m`, freesail/ship/form.py), every other file's served
+  stations as they were; her settee's block now inside her rail, her lights on her counter.
 """
 
 from __future__ import annotations
@@ -1936,7 +1940,9 @@ def test_a_round_stern_has_no_transom_and_its_lights_lie_on_its_drawn_face(tmp_p
     mark's corners on the drawn side within a centimetre; its galleries drawn where it files them.
     The 64's stern made round here; the bilander's, the first committed round stern with lights,
     as her file has it (package 75, B4: her three in one band, 1.75 to 2.75 m, within 0.95 m of
-    her middle line, on her drawn face to 0.02 mm, measured at her landing)."""
+    her middle line; since her counter is drawn to its half-breadths, the lead's ruling (11) of
+    2026-11-09, on her counter from x -11.23 to -11.65, where they stood from -10.87 to -11.53,
+    on her drawn face to 1.5 mm, her served stations' millimetres, where it was 0.02 mm)."""
     ship = make_ship(path)
     spec = ship.hull.spec
     p = spec.profile
@@ -2425,15 +2431,15 @@ def test_the_hull_below_the_water_is_drawn_three_ways_hidden_by_default(tmp_path
 
 
 # How many of a round stern's lights are drawn seen from abeam, upright: the bilander's (package
-# 75, B4), the first committed round stern with lights, measured at her landing. On the curve of
-# her counter the near quarter's light faces outboard as well as aft, so that it is seen from abeam
-# (and from 60 degrees off her bow), her middle one from 105 degrees and all three from 135; from
-# ahead, none. A transom's lights are seen edge on abeam, none drawn. The cause (her review,
-# 2026-11-08): a round stern is drawn closed to the middle line along the post and the counter, so
-# her lights, filed +-1.10 m across her stern (Gwyn's +-1.22), are drawn within 0.95 m on a face
-# that turns toward the beam; Gwyn's stern view gives her rail 1.55 m off the middle line at the
-# taffrail and about 2.0 at the wale, a breadth her file cannot give (her `breadth_m` note; the
-# lead's, a key for a round stern's breadth at the counter).
+# 75, B4), the first committed round stern with lights, measured at her landing. The near
+# quarter's light is seen from abeam (and from 60 degrees off her bow), her middle one from 105
+# degrees and all three from 135; from ahead, none. A transom's lights are seen edge on abeam,
+# none drawn. The cause, measured again with her counter drawn to its half-breadths (the lead's
+# ruling (11) of 2026-11-09, `form.stern.counter_hb_m`): the viewer faces a round stern's light
+# by its place in its band (client/projection.js, `lightFigures`: outward (-1, y/hb, 0), her
+# outer two 34 degrees outboard of aft), not by the drawn face it lies on, so the count is the
+# same, 0, 1, 1, 2, 3 and 3 at 0, 60, 90, 105, 135 and 180 degrees, on the counter as on the
+# closure before it; the row stays, its cause the viewer's rule (for the lead).
 LIGHTS_SEEN_ABEAM = {BILANDER: 1}
 
 
@@ -5956,17 +5962,16 @@ TACK_OFF_HER_SIDE_M = {NEUFCHATEL: 0.202}
 # with the lead's ruling on the bilander's §17 lead item 4, `settee_block`): the bilander's settee's
 # (package 75, B4)
 SHEETED_TO_A_BLOCK = {BILANDER: {"main.settee.sheet"}}
-# A recorded departure (package 75, B4, for the lead): how far a sheet's block stands outboard of
-# her drawn rail, where it does. The bilander's settee's clew stands 2.12 m inside her taffrail, so
+# The bilander's settee's block (package 75, B4): her clew stands 2.12 m inside her taffrail, so
 # that a fathom abaft it at the sail's floor, x -11.41, is 0.37 m inside the taffrail, over her
-# round counter: her drawn rail there is 0.45 m off her middle line, the block, abreast the clew,
-# 1.21 m, on her quarterdeck's height (2.80 m) under her rail's 3.26. The trim's block for her cut
-# stands farther out still (x -11.47, 1.57 m off the middle line, her side 0.31 m there at the
-# deck). Her figures and the ruling's rule stand; which gives way on a round stern is the lead's.
-# The cause (her review, 2026-11-08): her round stern is drawn closed to the middle line, 0.35 m
-# off it 0.4 m inside the taffrail at her lights' height, where Gwyn's stern view gives her rail
-# 1.55 m off it at the taffrail, outboard of the drawn block's 1.21 m.
-BLOCK_OFF_HER_SIDE_M = {BILANDER: 0.760}
+# round counter; the block, abreast the clew, 1.21 m off her middle line on her quarterdeck's
+# height (2.80 m). Her round stern drawn closed to the middle line put her rail there 0.45 m off
+# it and the block 0.76 m outboard, a departure recorded at her landing; with her counter drawn
+# to its filed half-breadths (the lead's ruling (11) of 2026-11-09, `form.stern.counter_hb_m`,
+# Gwyn's 1.55 m at the taffrail) her rail there is 1.45 m off it and the block 0.24 m inside, as
+# every other file's: the departure is gone. The trim's block for her cut (x -11.47, 1.57 m off
+# the middle line) stands outboard still, her side there 0.95 m off it at the deck's height
+# (0.31 m before), the trim's and not the drawing's.
 LINE_ENDS = """
     const sk = P.buildSkeleton(d.graph, d.snap);
     const spars = {};
@@ -6085,9 +6090,9 @@ def test_each_line_that_comes_down_ends_on_her_drawn_rail(tmp_path, path, tack):
     mizzen yards' braces under her counter, in the air 1.9 to 2.3 m outboard of the rail. Every
     other line stays where it was, up in the rig or at the taffrail, and none ends in the air:
     braces leading to the next mast, topsails' sheets to the yard below, boom sails' to the
-    taffrail, a settee's to its block (`SHEETED_TO_A_BLOCK`), inside her rail but where it stands
-    outboard of it (`BLOCK_OFF_HER_SIDE_M`, the bilander's, recorded). The set of lines on the rail
-    is each file's, exactly."""
+    taffrail, a settee's to its block (`SHEETED_TO_A_BLOCK`), inside her rail (the bilander's 0.24
+    m inside since her counter is drawn, the lead's ruling (11) of 2026-11-09; 0.76 m outboard
+    before it). The set of lines on the rail is each file's, exactly."""
     data = fully_dressed(path, tack)
     got = run_js(tmp_path, data, LINE_ENDS)
     on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"], tack)
@@ -6100,10 +6105,7 @@ def test_each_line_that_comes_down_ends_on_her_drawn_rail(tmp_path, path, tack):
     assert set(blocks) == SHEETED_TO_A_BLOCK.get(path, set())
     for lid, end in blocks.items():
         outboard = abs(end[1]) - abs(rail_end(data["graph"]["hull"], end[0], 1.0)[1])
-        if path in BLOCK_OFF_HER_SIDE_M:
-            assert outboard == pytest.approx(BLOCK_OFF_HER_SIDE_M[path], abs=0.005), lid
-        else:
-            assert outboard < 0.0, lid
+        assert outboard < 0.0, lid
 
 
 @needs_node

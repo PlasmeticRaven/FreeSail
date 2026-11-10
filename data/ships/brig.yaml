@@ -2286,7 +2286,7 @@ armament:
           32: 1264
         long:
           6: 158
-      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      # A cartridge's powder in pounds, to the nearest ounce: a long gun a third of its shot's weight, a carronade a twelfth, a swivel a half (Falconer 1780's smaller pieces, l.4827: judgement), the shares this file was filed with and keeps until a package of its own re-measures them (the lead's rule for the eight files before package 75: freesail/ship/charges.py). The Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10; its title at OCR l.27498-27502), confirms the third and the twelfth, rounded down to the ounce: it gives the 32-pounder carronade 2 lb 10 oz where the share gives 2 lb 11 oz.
       charges:
         carronade:
           32: 2.6875

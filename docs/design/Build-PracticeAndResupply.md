@@ -25,7 +25,7 @@ Every judgement call a reviewer might question, so the owner can see them in one
 
 | # | Decision | Why, in short |
 |---|---|---|
-| 1 | Charges: a long gun a third of its shot's weight, a carronade a twelfth, a swivel a half, rounded to the ounce. **UNVERIFIED.** Written into the ship files as `charges:` | Table No. 29 has lost its figures in the OCR. Package 75 enters the table's figures through the generator alone |
+| 1 | Charges: a long gun a third of its shot's weight, a carronade a twelfth, a swivel a half, rounded to the ounce. **UNVERIFIED.** Written into the ship files as `charges:` | Table No. 29 has lost its figures in the OCR. Package 75 enters the table's figures through the generator alone. *As built (package 75, SW-1, 2026-11-09; Build-Ships.md §10): the table, read on the page image, confirms the third and the twelfth, rounded down to the ounce, and gives the half-pounder swivel 2 oz; `charge_lb` gives it. The eight files of the packages before 75 keep the shares as filed, by the lead's rule; the new ships' files carry the table's* |
 | 2 | A barrel holds 100 lb | Falconer's French glossary (l.22563-22564). The English barrel's weight is UNVERIFIED |
 | 3 | Each fit starts with **today's cartridge counts, filled**, split by kind, and a reserve below of **half the filled powder** in whole barrels | Nothing an action does today moves. The period kept most powder in barrels; the share is judgement |
 | 4 | The gunner fills **whenever a kind is below its level** (the fit's filled count). At quarters he fills always, with men of the powder division who are not lent out. Out of quarters he fills while the idlers are up. He never fills by night out of quarters, never while the hoy is alongside, and never after the colours are struck | Art. XVIII: "take all opportunities of filling powder" in action. Art. VII: the magazine is opened only with the officer in the light room. The judges preferred this to filling only below a third |
@@ -366,6 +366,16 @@ exceed it. Until the table is read from the page image:
 
 The cartridge counts are today's (§1.2). The code marks all three shares UNVERIFIED, and the
 generator's note says package 75 replaces them from Table No. 29.
+
+*As built (package 75, SW-1, 2026-11-09; `Build-Ships.md` §10): `charge_lb` gives Table No. 29,
+read on the page image, which confirms the third and the twelfth, rounded down to the ounce. Two
+rows of the table above move: the 32-pdr carronade **2 lb 10 oz (2.625), 159** man-seconds, and the
+half-pounder swivel **2 oz, 122**; the rest are the table's to the ounce. The code cites the table
+in place of UNVERIFIED. The eight files of the packages before 75 keep the shares as filed (the
+frigate's and the brig's 32-pdr carronades 2 lb 11 oz, the swivels 4 oz), by the lead's rule, and
+so does a fit without charges; the new ships' files carry the table's.
+`tests/test_magazine.py`'s `test_the_charges_and_the_filling_times_are_the_build_designs_table`
+pins `charge_lb` by these rows as amended.*
 
 ---
 
