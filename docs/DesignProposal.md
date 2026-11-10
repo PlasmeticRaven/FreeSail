@@ -919,6 +919,18 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     where fidelity to the day is worth its cost; nothing is ruled on those. Recorded in
     `docs/dev/M7-WorkPackages.md` beside the packages table.
 
+67. **Strong coverage of ports, and every port built with room for other eras.** Owner,
+    2026-11-11, approving package 104 with every port offered: "our goal should be a very
+    strong coverage as far as ports go in general, including refinement passes on existing
+    chart blocks to fill out ports that exist only now as anchorages or marks"; and "we
+    should always be keeping in mind, from now on, the extensibility of era so that ports,
+    when built for a certain era, have room for being fit properly for other eras as
+    necessary." For the briefs from here: a place a ship of the period went to is a port
+    file and not a mark where the sources can support one; and what is true of a port only
+    for some years (who holds it, its works, its lights, its trade, its garrison) is written
+    with its years, in rows that another era's rows can stand beside, never as the one
+    picture of 1805 (decision 66's rule for an element, applied to ports).
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

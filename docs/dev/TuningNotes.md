@@ -26244,3 +26244,126 @@ than that on this machine today. The test
 `test_truth_7_196_the_seventy_four_ticks_at_the_build_machines_floor` is removed from `tests/test_bellerophon.py` by the lead (its figures in a
 comment where it stood); the crewed clause (106 against 60) stays; `tools/pace.py
 seventy-four` measures both still. No floor was lowered and no other test touched.
+
+### Step 2: the letters that travel
+
+**Built, against the brief.** A letter that comes aboard by a carrier (the boat from the quay,
+the pilot from his cutter, a port's cutter within hail, a hull's own cutter for another hull)
+is made a thing of the world where it comes aboard (`People._letter_thing`): sealed, its words
+the letter's text, its writer the origin, its addressee "the captain" or the person the
+letter is directed to (`to_id`/`to_home` where the words name one of the people), in the
+messenger's keeping on its way (the captain's where the ship has no messenger). At the door
+(`People.tick`, `PASS_THE_WORD_S` later, as before) it is **handed to its addressee**:
+
+- **for the captain**: into his keeping, its seal broken, and read: `message.door` and
+  `message.received` ("The captain read it: ...") word for word and data for data as before;
+  `message.received` is now of the reach `reader` (`world.knowledge.REACH`), which for a line
+  naming no reader is the captain's alone, wherever he reads it, and nobody's beside him (the
+  class `person` gave it to whoever stood within earshot of the door, the letter read aloud);
+  the letter stays in his keeping, read again by the free line (`read the letter from Brest`);
+- **for one of the people aboard**: `message.aboard` says it was taken for him (*A letter from
+  Plymouth directed to Mr Harvey came aboard by the pilot cutter; Mr Jarvis took it for Mr
+  Harvey, who is on the quarterdeck.*), and at the end of the chain it is handed him sealed (*Mr
+  Jarvis brought Mr Harvey a letter from Plymouth, sealed.*, `message.door` with his name as
+  `to`, so the line is his and the place's); no `message.received`, the captain reading no
+  letter not his, and its words in no line of the log;
+- **for somebody not aboard**: given to the captain sealed to keep (*... directed to Mr Nobody,
+  sealed; it is not his to open, and he has it in his keeping.*), and not read.
+
+**Sent ashore with the boat**: `send the boat ashore with the letter to <whom>` names the
+letter (`Dealings._letter_named`: a thing with words or an addressee, within the captain's
+reach, named by the words after "with"); it goes into the boat as she goes away (the `away`
+phase), and at the quay is given into its addressee's hand where he is ashore at that port
+(`thing.handed`, of the reach `port`), else landed on the quay with whatever else lies in the
+boat by 68's road (`thing.landed`), there for whoever comes for it; today nobody of the port
+comes for it. A letter named that the captain cannot lay hands on refuses the order in words
+("... is in Mr Hale's keeping; the boat is not sent."), two refuse it as ambiguous; words that
+name no letter of the world (`send the boat ashore with a letter`) send the order's words as
+before, so every journal of before replays as it was.
+
+**The director's letter for a person**: `message: at <port> from <whom> for "<name>":
+"<words>"` and `message: by a cutter from <port> from <whom> [to <ship>] for "<name>":
+"<words>"` (the name in quotes, which no origin of the trunk's has, so that no order of before
+reads another way); without `for` it is the captain's letter as before.
+
+**The old `Message` kept**: the class stays the carrier's charge (a port's `letters`, a
+vessel's `letter`, the boat's `bringing`), with a new field `thing` (a plain class default,
+""), the letter's id once it is aboard. A checkpoint from before holding a letter in the
+messenger's hand (`People.messages`, an old `Message` and no thing) has it made a thing at the
+load (`replay._rebind` calls `People.letters_as_things` on each company), so that it is handed
+and read at the door as it would be now. **Proven on the kept saves**: the four of `tests/fixtures/saves/` hold no
+letter (none in a messenger's hand, none waiting at a port, none read), and each loads from its
+checkpoint to its header's digest as before (`tests/test_checkpoint.py`, `test_lee_ports.py`,
+`test_hulls.py`). So that the conversion itself is proven on a save of before, a fifth is kept
+beside them, of the trunk's making at e5977db (before this step):
+`pre-100-step-2-letter-in-hand.json` with its checkpoint, the schooner at anchor in the Bay of
+Brest, the boat come off with the Prefect's letter left by world order, saved at tick 8140 with
+the letter in the messenger's hand (an old `Message`, no thing). The trunk's world run on 600
+seconds from it gave ba062f9d0951f132 (its save's digest 8325f8d7bfd115a8). Under this step
+(`tests/test_letters.py::test_a_save_from_before_step_2_with_a_letter_in_hand_loads_and_
+replays_to_its_old_digests`) it loads from its checkpoint at 8325f8d7bfd115a8, the letter made a
+thing in the messenger's keeping, and run on 600 seconds gives ba062f9d0951f132, the letter read
+at the door and in the captain's keeping with its seal broken; its journal alone (the checkpoint
+set aside, `replay_anyway` as for any save of another build) replays to the same two digests.
+
+**Taken another way, with the reason.** (1) A letter not yet in any hull stays the carrier's
+`Message` (a port's letters, a cutter's, the boat's bringing) and is made a thing where it comes
+aboard: no person reaches it before (today nobody ashore takes up a port's letter for the ship,
+and a cutter's is in no hull of the registry), every scenario, save and director order that
+makes one reads unchanged, and a pinned passage with a letter moves by no line. (2) The letter
+landed at the quay goes by 68's road for a thing in the boat (`_land_and_take_off`, its
+`thing.landed` line, as before for any thing) rather than a line of its own: one road for
+things. (3) No pin or digest moved: the lines of a letter for the captain are the same words and
+data, the things made add no line, and `to_dict` of the people is unchanged.
+
+**A test moved, old beside new.** `tests/test_agents.py::
+test_a_letter_sent_by_world_order_is_seen_in_no_sample_before_the_boat_brings_it` (decision
+46: a world order is seen in no station's sample, and a letter left at Brest by it only when
+the boat brings it off). **Old**: its station was `watcher`, bound to nobody and standing on
+the quarterdeck, and its last assertion found the letter's words in a sample after the boat:
+the words read aloud at the door (`message.received` of the class `person`, which fell back to
+the deck). **New**: the station is the captain's (`station(name="captain")`, its person the
+captain, asserted), every assertion else as it was. **Proof by the toggle**: at the step's
+code the old test fails on that last assertion alone (the fast tier at 17fdd64, the words now
+the reader's: the brief's "the captain no longer reading every letter aloud" and the owner's
+rule that a letter's words are shown to the reader and to nobody else); the new test passes at
+the step's code and at the trunk's (where the captain's station has them too), so what the test
+holds, nothing of a world order before its effect, is held as strongly.
+
+**Found for others (not mended).** None.
+
+**Step 2: the suites as run.** At **c95d191** (the branch's head: the trunk merged at 229d024
+by a merge commit, 17fdd64, bringing package 75's SW-1 and ruled builds, 98's step 8, 60's
+design note and records; the conflicts were two appends at the ends of the tuning notes and
+the truths, both kept whole, 98's step 8 notes put back before this package's heading; and the
+test moved above, after it), in a worktree pinned there, one suite at a time: ruff check and
+ruff format --check clean; the fast tier exit 0, 7,237 passed, 1 xfailed, 486 slow left out;
+the slow tier of the touched files and of the letter's roads (`--slow -m "not pace" -n 4` on
+tests/test_letters.py, test_people.py, test_knowledge.py, test_ports.py, test_ships.py,
+test_world_orders.py, test_director.py, test_primer.py, test_in_world.py,
+test_known_truths.py, with the replay's and the recorded passages' test_replay.py,
+test_checkpoint.py, test_captain_trials.py, test_agents.py, test_harbour.py and
+test_boat_director.py) exit 0, 1,954 passed, 9 xfailed (gate 5c's cruise and merchant passages,
+each with its letter read at its pinned tick and its digest, among them, unmoved); the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 1, 12 passed, 1 failed: 7-159's
+convoy at 494 ticks a second against truth 51's floor of 500; run again four times in turn,
+the trunk's 229d024 and step 2's c95d191 twice each, it passed every time (the container's
+noise about the floor, as at step 1). Before it, at 17fdd64, the fast tier was exit 1 on the one
+test moved above, and nothing else. The tree reported differs from c95d191 by this paragraph
+alone.
+
+**Step 2: the final measure, at the lead's word of 2026-11-10 (15:20).** The trunk merged
+again at e5977db by a merge commit (cbe039c: package 74's step 5, the prize court, and 100's
+step 1 as merged at 41216bbc; the conflicts the same two appends, resolved in the trunk's own
+order, 98's truths 7-460 and 7-461 above this package's and no line of the trunk's lost), and
+the kept save of before with a letter in hand added (31ebdf0, above). At **31ebdf0**, in a
+worktree pinned there, one suite at a time: ruff check and ruff format --check clean; the fast
+tier exit 0, 7,253 passed, 1 xfailed, 487 slow left out; the slow tier (`--slow -m "not pace"
+-n 4`) of tests/test_known_truths.py whole with the recorded passages and the kept saves by
+name (test_captain_trials.py, test_replay.py, test_checkpoint.py, test_lee_ports.py,
+test_hulls.py, test_agents.py, test_harbour.py, test_boat_director.py) and the touched files
+(test_letters.py, test_people.py, test_knowledge.py, test_ports.py, test_ships.py,
+test_world_orders.py, test_director.py, test_primer.py, test_in_world.py) exit 0, 2,151
+passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace alone and last
+(`--slow -m pace -n 0`, the same files) exit 0, 13 passed. The tree reported differs from
+31ebdf0 by this paragraph alone.

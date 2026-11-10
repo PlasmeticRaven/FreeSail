@@ -1504,13 +1504,14 @@ def _hand(world: Any, name: str, words: str | None) -> tuple[str, dict[str, Any]
 # ---------------------------------------------------------------------------
 
 _MESSAGE_AT = re.compile(
-    r"^message:\s*at\s+(?P<port>[\w' -]+?)\s+from\s+(?P<origin>.+?)\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
+    r"^message:\s*at\s+(?P<port>[\w' -]+?)\s+from\s+(?P<origin>.+?)"
+    r"(?:\s+for\s+\"(?P<for>[^\"]+)\")?\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
     re.I,
 )
 _MESSAGE_BY = re.compile(
     r"^message:\s*by\s+(?:a|the)\s+cutter\s+from\s+(?P<port>[\w' -]+?)\s+from\s+"
     r"(?P<origin>.+?)(?:\s+to\s+(?P<to>the\s+[\w' -]+?|\"[^\"]+\"))?"
-    r"\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
+    r"(?:\s+for\s+\"(?P<for>[^\"]+)\")?\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
     re.I,
 )
 
@@ -1524,11 +1525,18 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         port = ports.find(m.group("port")) if ports is not None else None
         if port is None:
             raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
-        port.letters.append(Message(m.group("text"), m.group("origin").strip()))
-        return f"a letter from {m.group('origin').strip()} left at {port.name}", {
-            "port": port.id,
-            "origin": m.group("origin").strip(),
-        }
+        # a letter for one of the people (package 100, step 2): `for "<name>"`, handed him
+        # sealed when it comes aboard; else the captain's
+        addressee = (m.group("for") or "").strip()
+        port.letters.append(
+            Message(m.group("text"), m.group("origin").strip(), addressee or "captain")
+        )
+        said = f"a letter from {m.group('origin').strip()} left at {port.name}"
+        data = {"port": port.id, "origin": m.group("origin").strip()}
+        if addressee:
+            said += f" for {addressee}"
+            data["for"] = addressee
+        return said, data
     m = _MESSAGE_BY.match(body)
     if m:
         port = ports.find(m.group("port")) if ports is not None else None
@@ -1545,6 +1553,9 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             "goal": "carrying a letter to the ship",
             "letter": {"text": m.group("text"), "origin": origin},
         }
+        addressee = (m.group("for") or "").strip()
+        if addressee:
+            spec["letter"]["to"] = addressee  # package 100, step 2
         from freesail.world.ships import vessel_from_spec
 
         world.vessels.serial += 1
@@ -1552,6 +1563,9 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         vessel.letter.carried_by = f"the {port.name} cutter"
         words = f"a cutter sent from {port.name} with a letter from {origin}"
         data = {"port": port.id, "origin": origin, "id": vessel.id}
+        if addressee:
+            words += f" for {addressee}"
+            data["for"] = addressee
         if target is not world:
             # a letter to another hull (package 84, step 9): the cutter steers for her body
             # and the letter comes aboard her within hail (`Vessels.tick`)

@@ -304,7 +304,7 @@ REACH: dict[str, str] = {
     "health.invalided": "deck",
     "message.aboard": "deck",
     "message.door": "person",
-    "message.received": "person",
+    "message.received": "reader",  # the words read at the door, the captain's (package 100)
     "message.by": "person",
     "message.at": "port",
     "person.sent_for": "person",
@@ -330,6 +330,7 @@ REACH: dict[str, str] = {
     "stores.out": "aboard",
     "hold.freighted": "place",
     "thing.landed": "port",
+    "thing.handed": "port",  # a letter given from the boat to its addressee ashore (100)
     "boat.at_quay": "port",
     "market.bargain": "port",
     "market.bought": "port",
@@ -553,7 +554,12 @@ def reaches(world: Any, senses: Senses, e: Any) -> bool:
         # name whole (a surname shared is no reader)
         person = senses.person
         name = str(getattr(person, "name", "") or "")
-        return bool(name) and _names(data, "to").lower() == name.lower()
+        to = _names(data, "to")
+        if not to:
+            # a letter come aboard read at the door (`message.received`): the captain's,
+            # whose it is; nobody's beside him, wherever he reads it (step 2)
+            return person is not None and _is_captain(world, person)
+        return bool(name) and to.lower() == name.lower()
     if senses.asleep:
         # a sleeper perceives nothing but what wakes him (the brief's list: the call, all
         # hands, a gun, the ship striking, and nothing else; 54 and 66 let a word or a
