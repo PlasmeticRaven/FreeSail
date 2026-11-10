@@ -1471,7 +1471,8 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 # ---------------------------------------------------------------------------
 
 _PORT = re.compile(
-    r"^port\s+(?P<port>\"[^\"]+\"|[\w-]+)\s*:\s*(?P<what>closed to|open to|price of)\s+"
+    r"^port\s+(?P<port>\"[^\"]+\"|[\w-]+)\s*:\s*"
+    r"(?P<what>closed to|open to|price of|the court condemns|the court restores)\s+"
     r"(?P<rest>.+?)\s*$",
     re.I,
 )
@@ -1489,6 +1490,10 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if port is None:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
     what, rest = m.group("what").lower(), m.group("rest").strip()
+    if what in ("the court condemns", "the court restores"):
+        # the prize court's sentence by the director's word (package 74, the design's §5.2):
+        # the court's whim is a plausible cause; doubted where the rule gives otherwise
+        return _court_word(world, port, what, rest)
     if what in ("closed to", "open to"):
         nation = world.nations.find(rest)
         if nation is None:
@@ -4095,9 +4100,77 @@ def _doubt_message(world: Any, body: str) -> str | None:
     return None
 
 
+def _court_word(world: Any, port: Any, what: str, rest: str) -> tuple[str, dict[str, Any]]:
+    """`port <id>: the court condemns | restores the <prize>`: the sentence on a prize lying
+    at the port (a hull of the sea in her road, or a far record at her goal), performed by the
+    director's word."""
+    from freesail.world import prize_court as PC
+    from freesail.world import prizes as P
+    from freesail.world.hulls import world_of
+
+    root = world_of(world)
+    prize = _prize_named(root, rest)
+    if prize is None:
+        raise WorldOrderError(f"No prize named {rest!r} is on the sea.")
+    if not P.is_prize(prize) and not (P.record_of(prize) or {}).get("recaptor"):
+        raise WorldOrderError(f"The {prize.name} is no prize; the court has nothing to sentence.")
+    override = "condemned" if what.endswith("condemns") else "restored"
+    account = PC.sentence(root, prize, port, override=override, by="the director")
+    words = f"{PC.court_name(port, False)} {override.replace('ed', 's')} the {prize.name}"
+    return words, {
+        "port": port.id,
+        "prize": str(prize.id),
+        "sentence": override,
+        "account": account,
+    }
+
+
+def _prize_named(root: Any, words: str) -> Any:
+    from freesail.world import prizes as P
+
+    sea = getattr(root, "vessels", None)
+    key = " ".join(str(words).lower().split()).removeprefix("the ").strip('"')
+    if sea is None:
+        return None
+    for v in list(sea.vessels):
+        if v.done or not P.record_of(v):
+            continue
+        if (
+            v.id.lower() == key
+            or v.name.lower() == key
+            or v.name.lower().removeprefix("the ") == key
+        ):
+            return v
+    return None
+
+
+def _doubt_court_word(world: Any, body: str) -> str | None:
+    """Doubted where the rule gives otherwise: the court's own sentence against the word."""
+    from freesail.world import prize_court as PC
+    from freesail.world import prizes as P
+    from freesail.world.hulls import world_of
+
+    m = _PORT.match(body)
+    ports = getattr(world, "dealings", None)
+    if m is None or ports is None:
+        return None
+    port = ports.find(m.group("port").strip('"'))
+    root = world_of(world)
+    prize = _prize_named(root, m.group("rest").strip())
+    if port is None or prize is None:
+        return None
+    rule, why = PC.verdict(root, prize, dict(P.record_of(prize) or {}), port)
+    want = "condemned" if m.group("what").lower().endswith("condemns") else "restored"
+    if rule != want:
+        return f"the court's rule gives {rule} ({why}); the word gives {want}"
+    return None
+
+
 def _doubt_port(world: Any, body: str) -> str | None:
     m = _PORT.match(body)
     ports = getattr(world, "dealings", None)
+    if m is not None and m.group("what").lower().startswith("the court"):
+        return _doubt_court_word(world, body)
     if m is None or ports is None or m.group("what").lower() != "price of":
         return None
     port = ports.find(m.group("port").strip('"'))

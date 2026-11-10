@@ -322,6 +322,9 @@ def _strike(root: Any, loser: Any, winner: Any, tick: int) -> None:
 
     loser.struck = True
     loser.damage["struck_tick"] = tick
+    from freesail.world.prize_court import note_in_sight
+
+    note_in_sight(root, loser)
     S.set_colours(
         S.vessel_locker(loser).colours, getattr(root, "nations", None), "struck", "", tick
     )

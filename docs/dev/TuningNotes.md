@@ -22638,6 +22638,65 @@ to 02:08:12), pace **exit 0** (02:08:12 to 02:13:30, 14 passed), fast **exit 0**
 02:59:13). The trunk then gained package 98's steps, and the three tiers were run once more
 at ceed163, above: those are the step's figures.
 
+### Step 5: the prize court and the money (the design's §5)
+
+**Built as designed** (`freesail/world/prize_court.py`; `data/business.yaml`'s `prize_values`,
+`prize_courts`, `prize_money` and `prize_shares`; the hooks in `prizes.possess` (the ships in sight
+at the strike and the captor's complement on the record), `prizes.minute` (the court's job for a
+prize hull in a port open to the captors; the salvage sentence for a ship retaken by her own
+nation's cruiser; the reserved fourth), `prizes.far_minute` (a far prize sentenced on her record in
+her goal's road), `Dealings._apply_job` (`prize_court`), the strike hooks of the near action, the
+far rounds and the cut-out (`prize_court.note_in_sight`), the `port` channel's `the court condemns
+| restores the <prize>` with its doubt, the reading `the prize money` and three events): the
+valuation, the cargo at the market, the prize goods, the court by the port's nation, the three
+sentences, the money by the eighths of the scheme in force at the date, shared among the ships in
+sight at the strike by their complements, the purse's line and the prize account's lines. Truths
+7-362 and 7-363.
+
+**The lead's ruling on the owner's shelf** (2026-11-07, Lavery, Nelson's Navy, p. 116): the two
+British schemes' classes and figures are CONFIRMED and cited (the rows say so; the book's words are
+not in the tree); the flag officer's eighth and third, the small ships' and reduced crews' special
+rules are named in the rows as not modelled; the shares within the 1808 half, the head money's five
+pounds, the agent's five per cent, the hull's price a ton, the court's days, the costs' tenth and the
+salvage eighth stay FROM MEMORY, marked. **The rule the design lacked and the ruling added**: the
+prize money shared among all the ships in sight at the moment the enemy surrendered, a ship that
+took no part included, written on the record at the strike (`in_sight`: the ships at war with her
+in sight from her masthead, with their complements) and divided before the eighths by their
+complements (judgement, FROM MEMORY: Lavery gives the sharing and not the division), each ship's
+part into her purse by her own road, the purse's line saying "shared with the Sprightly, in sight at
+the strike: the Amazon's part £...".
+
+**The figures found** (seed 7, the French merchant brig X taken in Falmouth's road): 304 tons
+burthen (her displacement over 1.36, the frigate's file's ratio: the ship files give no tons of
+their own, 75's), the hull £1,944 at £8 a ton worn ten years, her guns £320 (four long 6s of 20 cwt at
+£4 the hundredweight: her own file since the trunk's SW-4, merged at step 2's boundary; before it the
+brig's one file gave a "merchant brig" the brig-sloop's eighteen, £1,248, her powder and shot £297 and
+the whole £3,295), her powder (two barrels) and shot £13, the agent £114, the fees £20: £2,143 alone,
+the captain's three eighths £804; with the cutter Sprightly in sight the frigate's part is £1,925 by
+264 to the cutter's complement, the cutter's £218. A Danish brig wrongly taken is
+restored with £194 of costs (a tenth of £1,944). The far prize Nancy sentenced at Brest by le
+Conseil des prises on her record, her privateer captor's part the whole (no consort in sight).
+
+**Taken another way.** (1) Her stores are nothing in the valuation (the yard's prices of the port
+would price what her file does not list: said). (2) `take her powder and shot` (§2.7's
+transaction before the court) is not built; the goods are the court's. (3) A prize lost on the way
+home is told by her captor's lookout or her story's line as the design has it; the `prize.lost`
+line at the court's date for a prize that does not come in is not written (judgement: nothing told
+the captor that his people cannot know, and the port's roll is not kept). (4) The reserved fourth
+is paid by the record's day (`reserved_due`) from the prize's minute, not a second port job. (5)
+The salvage sentence is read from the record's `recaptor` when the retaken ship lies in port; the
+recaptor's purse receives it where she has one. **Found on the way**: `Vessel.prize` is replaced
+by the sentence (a new dict), so a reader holding the old record reads stale (the tests re-read
+it); the far prize at her goal's road is `done` when her plan runs out and gone from the sea at the
+minute's end, so the court's days keep her lying to until the sentence; the salvage verdict read a
+key the retaking never wrote and the salvage's sharers were the enemy who first took her and his
+consorts in sight (mended before the step's commit: the recaptors alone, by their nation's court
+and scheme; the tests for the reserved fourth and the salvage are the step's last two). A Brest
+salvage of the brig X (the French privateer Vengeur retaking her from the Amazon): £285 (£436 on the
+brig-sloop's guns before SW-4), an eighth of her hull, guns, powder and shot, the Vengeur's whole; the reserved fourth on a privateer brig
+of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
+seventh day.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

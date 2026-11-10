@@ -1643,6 +1643,9 @@ def far_captures(world: Any) -> list[tuple[Any, ...]]:
             )
             continue
         prey.struck = True
+        from freesail.world.prize_court import note_in_sight
+
+        note_in_sight(world, prey)
         S.set_colours(
             S.vessel_locker(prey).colours, getattr(world, "nations", None), "struck", "", tick
         )
