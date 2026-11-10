@@ -104,6 +104,10 @@ PERSON_MOVED = "person.moved"
 # The vocabulary's object of the colours and the signals (`orders.signals`, package 71).
 SIGNALS = "signals"
 
+# The places aloft (the tops and the masthead), from which a man comes down before he goes
+# down the side into the boat (package 98)
+ALOFT_PLACES: frozenset[str] = frozenset({"tops", "masthead"})
+
 # The places the deck's orders are given from (spec M7b §14: "the helm only on deck").
 DECK_PLACES: frozenset[str] = frozenset({"quarterdeck", "deck"})
 
@@ -773,6 +777,13 @@ def go_ashore(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     if person.mirror is not None and person is not world.people.captain:
         raise OrderError(
             f"You keep the reckoning, {person.name}; the master does not leave the ship."
+        )
+    aloft = str(getattr(person, "where", "") or "")  # by his own word, as `come on deck` reads
+    if aloft in ALOFT_PLACES:
+        # the boat is not reached from the tops (package 98, the lead's addition (c))
+        raise OrderError(
+            f"You are {place_words(aloft)}; come down on deck first ('come on deck') and then "
+            "go ashore."
         )
     agents = getattr(world, "agents", None) or {}
     for name, harness in agents.items():

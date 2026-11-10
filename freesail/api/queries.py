@@ -335,6 +335,9 @@ def snapshot(world: World) -> dict[str, Any]:
             "lug_side": _lug_side(ship, s),  # package 57: a lug drawn on its side of the mast
             # package 75: a settee's yard lowered on deck to be dipped, only while it is
             **_only_when_true(s, "yard_lowered"),
+            # package 98, step 3: a settee's sheet held over to windward, the side it holds the
+            # cloth to, only while it is (the viewer drew every settee to leeward)
+            **_settee_sheet_side(ship, s),
         }
         for s in ship.sails.values()
     ]
@@ -443,6 +446,23 @@ def _sail_entry(s: Sail) -> dict[str, Any]:
         # package 75: a settee and a lateen cut at the mast, each only where the file says
         **_only_when_true(s, "settee", "cut_at_mast"),
     }
+
+
+def _settee_sheet_side(ship: Any, s: Sail) -> dict[str, str]:
+    """`{"sheet_side": "starboard"|"larboard"}` for a settee whose one sheet is held over to
+    windward (`evolutions.trim.read_sheet`: hung in stays, or hauled to windward by order),
+    else nothing: a settee to leeward is as the snapshot always served it."""
+    if not getattr(s, "settee", False):
+        return {}
+    from freesail.evolutions.trim import read_sheet
+
+    try:
+        r = read_sheet(ship, s)
+    except Exception:  # noqa: BLE001  (a ship without the trim's lines reads no side)
+        return {}
+    if not r.held_to_windward or r.side is None:
+        return {}
+    return {"sheet_side": "starboard" if r.side > 0 else "larboard"}
 
 
 def _only_when_true(s: Sail, *keys: str) -> dict[str, bool]:

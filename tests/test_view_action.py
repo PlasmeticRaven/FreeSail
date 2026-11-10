@@ -57,14 +57,10 @@ def _state(path: str, guns_state: str | None = None, **extra) -> dict:
 
 HOLE = {"side": "starboard", "x_m": 0, "z_m": 0.5, "diameter_m": 0.1, "plugged": False}
 
-# A recorded departure (package 75, B2, for the lead): a port whose top's corner, its edges tilted
-# with her deck (`portCorners`), stands over her drawn rail though its middle does not, so that the
-# server serves it uncut (`viewer_guns.ports`, the rail at the port's x alone) and the drawing cuts
-# that corner at the rail: its top's middle as drawn, metres, by file and port. The *Neufchatel*'s
-# No. 8 from forward (x -5.64 m, sill 1.51, depth 0.76): her deck falling 5.5% forward there, its
-# after top corner stands at 2.292 m against her rail's 2.29, and its top's middle is drawn at 2.268
-# against the served 2.27 (her triple as measured, Neuf-D §3.3; which rule gives way is the lead's).
-CUT_AT_A_CORNER_M = {("data/ships/hermaphrodite-brig.yaml", -5.64): 2.268}
+# Package 75's recorded departure at the *Neufchatel*'s No. 8 (`CUT_AT_A_CORNER_M`, 2.268 drawn
+# against 2.27 served) went with 81's port-top rule (package 98, step 3, the lead's ruling of
+# 2026-11-07): the served top takes the deck's tilt and the 2 mm, so the drawing honours it
+# (`viewer_guns.port_top`; her No. 8 served 2.265).
 
 
 def _barrels(figs: list, gid: str) -> list:
@@ -82,8 +78,8 @@ ACTION_FIGS = """
 @pytest.mark.parametrize("path", ARMED_PROFILED)
 def test_each_port_is_drawn_at_its_triple_on_both_sides(tmp_path, path):
     """§2.1 item 2: each port's corners at its x less and more half its width, its sill's and its
-    top's middles at the served sill and top, on her drawn side; one a side. A port served uncut
-    whose tilted top corner the drawing cuts at the rail is named (`CUT_AT_A_CORNER_M`)."""
+    top's middles at the served sill and top, on her drawn side; one a side. A port's top is served
+    as the drawing cuts it, tilted with its deck (package 98, step 3)."""
     data = _state(path)
     spec = load_spec(path)
     figs = run_js(tmp_path, data, ACTION_FIGS)
@@ -102,11 +98,7 @@ def test_each_port_is_drawn_at_its_triple_on_both_sides(tmp_path, path):
             sill = (f["pts"][0][2] + f["pts"][1][2]) / 2
             top = (f["pts"][2][2] + f["pts"][3][2]) / 2
             assert sill == pytest.approx(p["sill_m"], abs=1e-6)
-            corner = CUT_AT_A_CORNER_M.get((path, round(p["x_m"], 3)))
-            if corner is not None:
-                assert p["top_m"] == pytest.approx(p["sill_m"] + p["depth_m"], abs=1e-6)
-                assert top == pytest.approx(corner, abs=0.0005) and top < p["top_m"]
-            elif p["top_m"] < p["sill_m"] + p["depth_m"] - 1e-6:
+            if p["top_m"] < p["sill_m"] + p["depth_m"] - 1e-6:
                 # cut to the rail: never above it, and down with it where it steps within the
                 # port's width (the 64's foremost quarterdeck port, at her breast)
                 assert p["top_m"] - 0.1 <= top <= p["top_m"] + 1e-6
@@ -326,3 +318,253 @@ def test_a_world_serves_what_the_drawing_reads():
     snap = queries.snapshot(w)
     graph = queries.ship_graph(w.ship)
     assert {g["id"] for g in snap["guns"]} == {g["id"] for g in graph["guns"]}
+
+
+# ---------------------------------------------------------------------------
+# Package 98, step 3: the viewer's paint order (the owner's play of 2026-11-09)
+# ---------------------------------------------------------------------------
+
+BEARINGS_AND_HEELS = """
+  const views = [];
+  for (const heel of [0, 15]) for (let b = 0; b < 360; b += 15) views.push([b, heel]);
+"""
+
+GUNS_BEHIND = (
+    BEARINGS_AND_HEELS
+    + """
+  const sk = P.buildSkeleton(d.graph, d.snap);
+  sk.figures.forEach(f => {
+    if (f.part === 'lid' && f.cls === 'shut') f.id = 'lid:' + f.side + ':' + f.at_x;
+    if (f.part === 'port') f.id = 'port:' + f.side + ':' + f.at_x;
+  });
+  const guns = d.graph.guns.filter(g => g.how === 'port');
+  const out = [];
+  for (const [b, heel] of views) {
+    const figs = P.project(sk, b * Math.PI / 180, heel * Math.PI / 180).figures;
+    const at = {};
+    figs.forEach((f, i) => { if (f.id) (at[f.id] = at[f.id] || []).push([i, f.piece || '']); });
+    const toV = Math.sin(b * Math.PI / 180);
+    guns.forEach(g => {
+      const sign = g.side === 'larboard' ? -1 : 1;
+      if (sign * toV < 0.2) return;  // seen from outboard on its own side
+      const key = g.side + ':' + g.x_m;
+      const hole = (at['lid:' + key] || at['port:' + key] || [])[0];
+      const mine = at[g.id] || [];
+      if (!hole || !mine.length) return;
+      const inboard = mine.filter(m => m[1] !== 'outboard').map(m => m[0]);
+      const outboard = mine.filter(m => m[1] === 'outboard').map(m => m[0]);
+      out.push({ gun: g.id, b, heel, inboard_after: inboard.filter(i => i > hole[0]).length,
+                 outboard_before: outboard.filter(i => i < hole[0]).length });
+    });
+  }
+  return out;
+"""
+)
+
+
+# the armed, profiled files with a gun in a port (the lugger's, the smack's and the topsail
+# schooner's are swivels on the rail)
+PORT_ARMED = [
+    p
+    for p in ARMED_PROFILED
+    if load_spec(p).armament.fit() is not None
+    and any(g.place in ("broadside", "bow", "stern") for g in load_spec(p).armament.fit().guns)
+]
+
+
+@needs_node
+@pytest.mark.parametrize("path", PORT_ARMED)
+@pytest.mark.parametrize("state", ["secured", "run in", "run out"])
+def test_a_port_guns_inboard_figures_paint_behind_its_side_and_lid_from_outboard(
+    tmp_path, path, state
+):
+    """Truth 7-450 (package 98, step 3): a port gun's inboard figures sort with its port's
+    strip, a hair inboard, so that from outboard on her side, at every 15 degrees, heel 0 and
+    15, every one of them is painted before its port's lid (shut) or its opening (open); on
+    every armed, profiled file with a port gun. Before the mend her steep deadrise put the
+    strip's middle inboard of the whole carronade on the *Neufchatel*. (A gun run out's outboard
+    figures keep their own middles, as before: found for the viewer's owner, see the notes.)"""
+    rows = run_js(tmp_path, _state(path, state), GUNS_BEHIND)
+    guns = {r["gun"] for r in rows}
+    assert rows and guns, path
+    bad = [r for r in rows if r["inboard_after"]]
+    assert not bad, bad[:5]
+
+
+FLAG_WHOLE = (
+    BEARINGS_AND_HEELS
+    + """
+  const sk = P.buildSkeleton(d.graph, d.snap);
+  const flagFigs = sk.figures.filter(f => f.kind === 'flag');
+  const out = { parts: flagFigs.length, lines: flagFigs.filter(f => f.pts.length !== 4).length,
+                broken: [] };
+  for (const [b, heel] of views) {
+    const figs = P.project(sk, b * Math.PI / 180, heel * Math.PI / 180).figures;
+    const idx = [];
+    figs.forEach((f, i) => { if (f.kind === 'flag') idx.push([i, +f.id.split('.').pop()]); });
+    for (let j = 1; j < idx.length; j++)
+      if (idx[j][0] !== idx[j - 1][0] + 1 || idx[j][1] <= idx[j - 1][1]) {
+        out.broken.push([b, heel]);
+        break;
+      }
+  }
+  return out;
+"""
+)
+
+
+def _ensigns() -> dict:
+    """Every root's ensign as the snapshot serves it, her colours shown (basic's by
+    Portugal, the nation that stands on it)."""
+    from freesail.world import flags as F
+    from freesail.world import signals as S
+    from freesail.world.nations import load_nations
+
+    n = load_nations()
+    roots = {"britain": "britain", "france": "france", "spain": "spain"}
+    roots |= {"united-states": "united-states", "naples": "naples", "basic": "portugal"}
+    out = {}
+    for root, nation in roots.items():
+        flown = F.flies(n, S.Colours(state="shown", nation=nation), "kings-ship")
+        out[root] = next(f for f in flown if f["place"] == "peak")
+    return out
+
+
+ENSIGNS = _ensigns()
+
+
+@needs_node
+@pytest.mark.parametrize("root", sorted(ENSIGNS))
+@pytest.mark.parametrize("path", [FRIGATE, "data/ships/hermaphrodite-brig.yaml"])
+def test_every_roots_ensign_paints_as_one_flag_in_its_drawings_order(tmp_path, root, path):
+    """Truth 7-451 (package 98, step 3; §12.3, "a flag sorts at its own middle as a sail
+    does"): every root's ensign at the peak paints as one flag, its parts and lines one after
+    another in the drawing's order, at every 15 degrees, heel 0 and 15; before the mend each
+    part sorted at its own middle and the canton went behind the stripes over half the
+    circle. The Union's saltires are drawn as its lines, each inside the canton."""
+    flag = ENSIGNS[root]
+    out = run_js(tmp_path, _state(path, flags=[flag]), FLAG_WHOLE)
+    lines = len(flag["drawing"].get("lines") or [])
+    assert out["parts"] == len(flag["drawing"]["parts"]) + lines
+    assert not out["broken"], out["broken"][:5]
+    if root == "britain":
+        assert lines == 4
+
+
+@needs_node
+def test_the_unions_lines_lie_inside_its_canton(tmp_path):
+    """Package 98, step 3: a drawing's lines drawn (they were never drawn): the four of the
+    Union's saltires each a band cut to the canton, on the flag's plane."""
+    flag = ENSIGNS["britain"]
+    out = run_js(
+        tmp_path,
+        _state(FRIGATE, flags=[flag]),
+        """
+      const sk = P.buildSkeleton(d.graph, d.snap);
+      const f = sk.figures.filter(f => f.kind === 'flag');
+      return { canton: f[1].pts, lines: f.slice(2, 6).map(x => [x.cls, x.pts]),
+               order: f.map(x => x.cls), pieces: f.map(x => x.piece) };
+    """,
+    )
+    # in the drawing's order: the field, the canton, the saltires, then the crosses over them
+    drawn = ["red", "blue", "white", "white", "red", "red", "white", "white", "red", "red"]
+    assert out["order"] == [f"colour-{c}" for c in drawn]
+    assert out["pieces"] == ["", ""] + ["line"] * 4 + [""] * 4
+    xs = [p[0] for p in out["canton"]]
+    zs = [p[2] for p in out["canton"]]
+    assert [c for c, _ in out["lines"]] == ["colour-white"] * 2 + ["colour-red"] * 2
+    for _cls, pts in out["lines"]:
+        assert len(pts) >= 3
+        for p in pts:
+            assert min(xs) - 1e-6 <= p[0] <= max(xs) + 1e-6
+            assert min(zs) - 1e-6 <= p[2] <= max(zs) + 1e-6
+
+
+@needs_node
+@pytest.mark.parametrize("path", ARMED_PROFILED + ["data/ships/lugger.yaml"])
+def test_a_flag_of_truce_is_drawn_white_at_the_fore(tmp_path, path):
+    """Truth 7-452 (package 98, step 3): under a flag of truce the white is served and drawn
+    at the fore truck (the basic file's occasion; the fallback had it at the peak), at a
+    vessel of one mast her only mast's truck."""
+    from freesail.api.session import make_world
+    from tests.test_viewer_action import _locker
+
+    w = make_world(7, path)
+    _locker(w, "truce", "")
+    w.run(1)
+    snap = queries.snapshot(w)
+    assert [(f["place"], f["name"]) for f in snap["flags"]] == [("fore truck", "flag of truce")]
+    out = run_js(
+        tmp_path,
+        {"graph": queries.ship_graph(w.ship), "snap": snap},
+        """
+      const sk = P.buildSkeleton(d.graph, d.snap);
+      return sk.figures.filter(f => f.kind === 'flag').map(f => [f.cls, f.words]);
+    """,
+    )
+    assert out == [["colour-white", "a flag of truce, at the fore truck"]]
+
+
+def test_a_ports_served_top_takes_its_decks_tilt_and_stands_under_the_rail():
+    """Truth 7-453 (package 98, step 3; 81's port-top rule, the lead's ruling of 2026-11-07):
+    every port's top as served, tilted with its deck as the viewer draws it, stands at both
+    corners under the rail there less 2 mm or at its full depth; the *Neufchatel*'s No. 8
+    served 2.265 (was 2.27, drawn 2.268: the departure `CUT_AT_A_CORNER_M` gone with it)."""
+    from freesail.api import viewer_guns as V
+    from freesail.ship.profile import rail_at
+
+    for path in ARMED_PROFILED:
+        prof = load_spec(path).hull.profile
+        for port in _state(path)["graph"]["ports"]:
+            s = V.deck_slope(prof, port["deck"], port["x_m"])
+            w = port["width_m"] / 2
+            full = port["sill_m"] + port["depth_m"]
+            assert port["top_m"] <= full + 1e-9
+            for c in (-1, 1):
+                corner = port["top_m"] + c * s * w
+                rail = rail_at(prof, port["x_m"] + c * w)
+                assert corner <= rail - V.TOP_UNDER_RAIL_M + 1e-9 or port["top_m"] == full
+    served = _state("data/ships/hermaphrodite-brig.yaml")["graph"]["ports"]
+    eight = next(p for p in served if abs(p["x_m"] + 5.64) < 1e-6)
+    assert eight["top_m"] == pytest.approx(2.265, abs=1e-9)
+
+
+@needs_node
+def test_a_settees_sheet_held_to_windward_is_served_and_drawn_there(tmp_path):
+    """Truth 7-454 (package 98, step 3): the bilander's settee with its one sheet hauled to
+    windward by order is served the side its sheet holds it (`sheet_side`, the weather side,
+    only while it is) and drawn there, the clew on the weather side of the centreline; let go
+    to leeward, nothing served and the clew to leeward as before. Her sheet's block stays on
+    the lee side."""
+    from freesail.api.session import make_world
+
+    w = make_world(7, "data/ships/bilander.yaml")
+    w.submit("set the settee")
+    w.run(300)
+    tack = queries.snapshot(w)["ship"]["tack"]
+    weather = -1 if tack == "larboard" else 1
+
+    def drawn() -> dict:
+        snap = queries.snapshot(w)
+        served = next(s for s in snap["sails"] if s["id"] == "main.settee")
+        out = run_js(
+            tmp_path,
+            {"graph": queries.ship_graph(w.ship), "snap": snap},
+            """
+          const sk = P.buildSkeleton(d.graph, d.snap);
+          const f = sk.figures.filter(f => f.kind === 'sail' && f.id === 'main.settee')[0];
+          return { clew: f.corners ? f.corners[2] : f.pts[f.pts.length - 1] };
+        """,
+        )
+        return {"served": served.get("sheet_side"), "clew_y": out["clew"][1]}
+
+    lee = drawn()
+    assert lee["served"] is None and lee["clew_y"] * weather < 0
+    assert w.submit("haul the settee sheet to windward").kind == "line.hauled"
+    w.run(5)
+    held = drawn()
+    assert held["served"] == ("larboard" if weather < 0 else "starboard")
+    assert held["clew_y"] * weather > 0
+    w.submit("haul the settee sheet to leeward")
+    w.run(5)
+    assert drawn()["served"] is None

@@ -2026,3 +2026,78 @@ def test_the_seats_own_refusal_and_reading_reach_the_seated_player_below():
     assert e.kind == "agent.refused" and "agent.refused" in _shown_kinds(sent), e.text
     captains = dataclasses.replace(e, actor="captain", data={})
     assert not K.his_own(captains, "master")
+
+
+def test_a_seat_without_the_deck_is_answered_its_readings_and_refused_its_orders():
+    """Truth 7-458, (a) (package 98, the lead's addition of 2026-11-10): the player seated at
+    the officer of the watch's station without the deck is answered his readings by his place
+    (they were refused for want of the deck), and his deck's orders still wait for 'you have
+    the deck'."""
+    w = world_at()
+    s = seat_player(w, "officer", door="browser")
+    for line in ("where am I", "the time", "the depth", "sightings"):
+        e = s.route(line)
+        assert e.kind == "query.reading", (line, e.kind, e.text)
+    e = s.route("set the royals")
+    assert e.kind == "agent.refused" and "has not the deck" in e.text
+
+
+def test_a_visitors_word_to_the_captain_goes_to_her_captain_and_is_shown_him():
+    """Truth 7-458, (b) (package 98, the lead's addition of 2026-11-10): the player a visitor
+    aboard another ship (no captive) says and asks his word to her captain, a line of her log
+    where he stands in his own name, shown him at the pages; her rules captain does not stand
+    aside for it (it is no order of the ship's); a prisoner's words are package 74's road."""
+    from freesail.ui.server import Driver
+    from freesail.world import movement
+
+    w, b, hull = _with_the_brig_x()
+    bowen = w.people.captain
+    movement.put_aboard(w, bowen, hull, place="quarterdeck")
+    assert K.players_visitor(w) is bowen
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    for line, words in (
+        ("say to the captain: good day to you", "to the captain: good day to you"),
+        ("ask the captain where she is bound", "asks the captain: where she is bound?"),
+    ):
+        sent.clear()
+        n = len(list(w.own.log))
+        e = d.submit(line)
+        assert e.kind == "person.spoke" and e.text.endswith(words), (line, e.text)
+        assert e.text.startswith(f"{bowen.name}, a visitor of the ")
+        assert "person.spoke" in _shown_kinds(sent)
+        assert not [x for x in list(w.own.log)[n:] if x.kind == "captain.aside"]
+
+
+def test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is():
+    """Truth 7-459, (d) (package 98, the lead's addition of 2026-11-10): a world order the
+    owner types at the page is his own line, shown him as he gave it with its outcome (done
+    or refused), at the pages, on a reload and at the console; a world order of another
+    source (the director's) is never shown the player; for every other reader decision 46
+    stands (the line is for the record)."""
+    from freesail.core.events import for_the_record
+    from freesail.ui.console import LIVE_WORLD_ORDER_SOURCE
+    from freesail.ui.server import Driver
+
+    assert LIVE_WORLD_ORDER_SOURCE == K.OWNER_SOURCE
+    w = world_at()
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    for order, outcome in (
+        ('ship "Nobody": intent bound for Falmouth', "not carried out"),
+        ('ship: a merchant brig "X" of Britain at 49 33 N 5 30 W, bound for Falmouth', "put"),
+    ):
+        sent.clear()
+        e = d.submit(f"world: {order}")
+        assert e.kind == "world.order" and for_the_record(e) and K.owners_world_order(e)
+        shown = [m["event"]["text"] for m in sent if m.get("type") == "event"]
+        assert any(t.startswith(f"Your world order '{order}': ") and outcome in t for t in shown)
+    back = [x["text"] for x in d.shown_log(400) if x.get("kind") == "world.order"]
+    assert len(back) == 2 and all(t.startswith("Your world order '") for t in back)
+    con, _out = _console(w)
+    assert con.hears(e)
+    # the director's own: never the player's
+    theirs = dataclasses.replace(e, data={**e.data, "source": "the director"})
+    assert not K.owners_world_order(theirs) and not K.his_own(theirs, "captain")

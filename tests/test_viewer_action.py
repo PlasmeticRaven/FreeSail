@@ -255,7 +255,7 @@ def _locker(world, state, nation=""):
 )
 def test_the_flags_fallback_follows_the_colours(state, nation, words, colour, inverted):
     """§12.1: one plain ensign at the peak while her colours show, of the nation shown; the
-    white of a flag of truce; nothing with no colours or struck."""
+    white of a flag of truce at the fore; nothing with no colours or struck."""
     from freesail.api.session import make_world
 
     w = make_world(7, "data/ships/frigate-36.yaml")
@@ -265,7 +265,9 @@ def test_the_flags_fallback_follows_the_colours(state, nation, words, colour, in
         assert flags == []
         return
     (f,) = flags
-    assert f["place"] == "peak" and f["words"] == words
+    # package 98, step 3: the flag of truce at the fore truck (was the peak), as the basic
+    # file's occasion `under truce` flies it
+    assert f["place"] == ("fore truck" if state == "truce" else "peak") and f["words"] == words
     assert f["drawing"]["parts"][0]["colour"] == colour
     assert bool(f["drawing"].get("inverted")) is inverted
 

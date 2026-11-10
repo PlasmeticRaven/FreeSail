@@ -1,16 +1,17 @@
 # The boat and the visitor (package 98, step 1): a merchant brig put on the sea near the
 # Neufchatel by the owner's world order, the player down into the boat, pulled alongside
-# her and aboard her as a visitor; his lines answered in the boat and aboard her.
+# her and aboard her as a visitor; his lines answered in the boat and aboard her; the owner's
+# world orders shown him as given (package 98, addition (d)), his word to her captain (b).
 name: In the boat and a visitor aboard the brig X
 scenario: tests/browser_plans/scenarios/frigate-falmouth.yaml
 steps:
   - {label: "ON DECK, at anchor"}
   - {say: let go the anchor, setup: true}
   - {tick: 300}
-  - {say: 'world: ship: a merchant brig "X" of Britain at 50 9.6 N 5 2.0 W, bound for Falmouth', setup: true}
-  - {say: 'world: ship "X": intent bound for Falmouth', setup: true}
+  - {say: 'world: ship: a merchant brig "X" of Britain at 50 9.6 N 5 2.0 W, bound for Falmouth', expect: {shown: true, contains: Your world order}}
+  - {say: 'world: ship "X": intent bound for Falmouth', expect: {shown: true, contains: Your world order}}
   - {tick: 61}
-  - {say: 'world: ship "X": order heave to for a watch', setup: true}
+  - {say: 'world: ship "X": order heave to for a watch', expect: {shown: true, contains: Your world order}}
   - {tick: 60}
   - {label: "IN THE BOAT"}
   - {say: go to the boat, expect: answered}
@@ -26,6 +27,8 @@ steps:
   - the time
   - {say: set plain sail, expect: {answered: true}}
   - say good day to you
+  - {say: 'say to the captain: good day to you', expect: {answered: true, contains: 'to the captain: good day'}}
+  - {say: ask the captain where she is bound, expect: {answered: true, contains: asks the captain}}
   - {shot: visitor}
   - {say: go to the cabin, expect: answered}
   - {tick: 30}

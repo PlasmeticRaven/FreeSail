@@ -162,11 +162,13 @@ def plan_files(where: str | Path = PLANS) -> list[Path]:
 
 
 def is_plan(path: Path) -> bool:
-    """A plan file (a mapping with `steps`), not a scenario kept beside the plans."""
+    """A plan file (a mapping with `steps`), not a scenario kept beside the plans. A file
+    that is no YAML at all is taken as a plan, so that loading it fails the run in words
+    rather than leaving it out unseen."""
     try:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
     except yaml.YAMLError:
-        return False
+        return True
     return isinstance(data, dict) and isinstance(data.get("steps"), list)
 
 

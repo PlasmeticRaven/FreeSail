@@ -23385,3 +23385,239 @@ reading of the stream; the probe waits for it). (d) `go ashore` given from the t
 long-boat has no file of her own to be a vessel by"), the ships session's. (f) A world order
 typed at the page gets no row in the log pane (decision 46: the play log carries its effects,
 not the order); the owner, typing one, sees nothing unless it does something in sight.
+
+**The suites as run** (steps 1, 2 and 6, at **28f7788e**, the step's tree merged with the trunk
+at 75b63c82, measured in a worktree pinned there, one suite at a time): the fast tier
+(`python3 -m pytest -n 4 -q -p no:cacheprovider`) exit 0, 7,038 passed, 2 xfailed, 474 slow
+left out; the slow tier of the touched files (`--slow -m "not pace" -n 4` on
+tests/test_browser_probe.py, test_knowledge.py, test_orders_places.py, test_known_truths.py)
+exit 0, 397 passed, 8 xfailed (the eight plans of the probe among them, all met); the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12 passed. ruff check and
+format clean. A first fast tier at 00cf000 was stopped at 23% when the trunk moved (the
+settee and the bilander, acdcfb56) and the merge measured instead.
+
+### Step 3: the viewer's paint order
+
+**Built.** (1) **The guns** (`client/projection.js`, `gunFigures`): a port gun's inboard figures
+(its carriage, its barrel inboard of the side, its muzzle's face while inboard, a gun dismounted)
+sort at its port's strip of the side (`stripMid`, the strip the lid sorts with) and
+`PORT_GUN_BEHIND_M` (0.01 m, judgement, over `DEPTH_TIE`) farther by `sortBias`, so that a gun
+secured or run in is behind her side and its lid from outboard on every file; its outboard
+figures keep their own middles. (2) **The flags** (`flagFigures`): every part and line of a flag
+sorts at the flag's middle (§12.3, "as a sail does"), painted in the drawing's order, which
+76's file now serves (`Flag.served_drawing`: each part and line with `n`, its place in the
+drawing; the Union's crosses over its saltires); `flagsWhole` keeps each flag's figures together
+after the sort. (3) **A drawing's lines drawn** (`flagLine`): a band of the line's width (a share
+of the hoist) about it, cut to the rectangle its ends span, so that a saltire's arm ends at the
+canton's corners. (4) **The kinds' ranks**: `gun` after the hull on a tie and before the rig,
+`flag` as a sail. (5) **The truce**: the fallback (`viewer_flags.flags`, no locker list) serves
+the flag of truce at the fore truck (`TRUCE_PLACE`, the basic file's occasion), not the peak; a
+vessel of one mast flies at her only mast what a ship flies at her fore (`flagPlace`). The list's
+road drew it at the fore already. (6) **81's port-top rule** (the lead's ruling of 2026-11-07:
+the server's top takes the deck's tilt and the 2 mm): `viewer_guns.port_top`, the top tilted
+with its deck as the viewer draws it, cut where either corner would stand over the rail at that
+corner's x less `TOP_UNDER_RAIL_M` (the viewer's `ON_LINE_M`), floored to the millimetre the graph
+serves; the departure `CUT_AT_A_CORNER_M` gone from 81's test with it. (7) **The settee's sheet's
+side served** (`queries._settee_sheet_side`: `sheet_side` while its one sheet is held over to
+windward, by `evolutions.trim.read_sheet`, read and not changed), and the cloth drawn there
+(`lugCut`), its block on the lee side as before.
+
+**The figures, old beside new** (measured by the tests' own projections, every 15 degrees,
+heel 0 and 15, 48 views a file). A port gun's inboard figure painted after its shut lid, seen
+from outboard on her side, guns secured: brig 283 (in 44 of 48 views), cutter 60 (34), frigate
+359 (41), *Neufchatel* 299 (44), merchant brig 56 (38), privateer schooner 75 (44), razee 591
+(44), sixty-four 688 (44); after, 0 on every file and in every state (secured, run in, run out).
+Every root's ensign out of its drawing's order at the base: Britain 44 of 48 views, France 42,
+Spain 46, the United States 46, Naples 17, basic (Portugal) 46 on the frigate; after, 0 on the
+frigate and the *Neufchatel*. The served port tops that move (`viewer_guns.port_top`): the
+*Neufchatel*'s upper deck at x -14.23 2.516 to 2.498, at -5.64 (No. 8) 2.270 to 2.265, at 14.39
+2.756 to 2.749; the sixty-four's quarterdeck at -5.88 6.191 to 6.105; no other file's.
+`tools/check_viewer_guns.py`'s output unchanged on every file.
+
+**Pins moved, old beside new.** `tests/test_viewer_action.py`'s fallback row for the truce:
+the place "peak" to "fore truck" (the toggle: `TRUCE_PLACE` back to the peak passes the old
+row). `tests/test_view_action.py`'s `CUT_AT_A_CORNER_M` departure removed with the rule that
+answers it (her No. 8 now served 2.265 and drawn at it). Truth 7-445 is unmoved (it checks the
+truce's name and colour). New: truths 7-450 (the guns behind their lids, 24 cases), 7-451 (every
+root's ensign as one flag, 12 cases), 7-452 (the truce at the fore, every armed file and the
+lugger), 7-453 (the port tops), 7-454 (the settee's sheet), and the Union's lines in its canton;
+each mend toggled off fails its cases (of the 70 cases of step 3's tests and the two files'
+port and fallback cases: the base `projection.js` 40 fail, the guns', the flags', the lines'
+and the settee's drawing; the base `world/flags.py` the Union's drawing order; the base
+`viewer_flags.py` 14, the truce's; the base `queries.py` 1, the settee's served side; the
+base `viewer_guns.py` 2, the port tops).
+
+**Found for others (not mended).** A gun run out keeps its outboard figures at their own
+middles, so that in oblique views its barrel's outboard part paints before its open port (brig
+65 views by guns, cutter 42, frigate 189, *Neufchatel* 52, merchant brig 8, privateer schooner 1,
+razee 275, sixty-four 455; the same at the base and after: not this step's ask).
+
+### Step 4: the picture at the OpenRouter door
+
+**Reproduced** in code at its cause: `agents/api.py`'s `main` built `OpenRouterModel` with no
+`fetch_picture` (the Anthropic dialect's `ApiModel` had it), so `local.LocalModel._image_part`
+returned None and the tool's result went to the model as its words alone ("a picture of 1200 by
+900 pixels"), for every model at that door; and the door being `api`, the picture tools were
+offered whatever the model reads (`tools.PICTURE_DOORS`).
+
+**Built.** (1) `OpenRouterModel.identity` keeps the model's `architecture.input_modalities` from
+OpenRouter's models list, and `reads_pictures` reads `image` in it (None where the list does not
+say, taken as no). (2) `main`: where it reads an image the door's `fetch_picture` is the game's
+picture road and the seating says `pictures: true`; where it does not, `pictures: false`, and the
+door says which at its start (`OPENROUTER_PICTURES_WORDS`). (3) The seating's explicit no is kept
+apart from 45c's yes (`Seat.no_pictures`, `Harness.no_pictures`, class defaults False, so that a
+checkpoint from before loads as it was; the harness offers the picture tools at a picture door
+or where the seating says yes, and never where it says no); the Anthropic dialect and the local
+runner send what they sent. (4) Wherever a picture cannot be shown the words say so and give the
+readings: the game sends the readings a picture shows beside every picture
+(`tools._picture`), a door that shows the image leaves them out (`pictures.shown_result`), and one
+that cannot says it was drawn and not shown, and why, with the readings (`pictures.not_shown`:
+`NOT_SENT`, `NOT_FETCHED`), at the local runner's shape (the OpenRouter door's) and at the
+Messages API's (`ApiModel._picture`; its `PICTURE_GONE` words replaced). `docs/agents/Harness.md`
+section 5's pictures paragraph.
+
+**Taken another way, with the reason.** The seating's tri-state (`pictures` True, False or None)
+was written first and given up: the harness's class default `False` is in old checkpoints, and
+read as "said no" it would have taken the pictures from an API door's station restored from
+one; hence the separate `no_pictures`.
+
+**Tests, a stub door, no provider called** (`tests/test_api_door.py`): truth 7-455, the door
+end to end on the test game against a mock transport whose models list says `["text", "image"]`
+(the chart offered, fetched and sent as an image part, the result's words with its size and
+without the readings) or `["text"]` (no picture tool offered, said at the start); truth 7-456, a
+picture not shown at both shapes, said so with its readings and no size, and the game's result
+carrying them. Toggles: the base `api.py` fails all three; the base `harness.py` the
+not-reading case; the base `local.py` the reading case and the not-shown case; the base
+`tools.py` the not-shown case. **No pin moved.**
+
+### Step 7: the flags of command come down, and are read (the lead's addition of 2026-11-09)
+
+**Reproduced** on the *Neufchatel* as the lead found it: the three hoisted ("A commodore's
+broad pendant hoisted at the main.", "The American jack, the union of stars hoisted at the
+fore.", "The stars and stripes hoisted at the main topgallant masthead, the ensigns doubled."),
+`the flags` "The flags: none." (an alias of the signals' reading, which reads the hoists alone),
+`haul down the jack` and its kin refused as a sail's take-in, `strike the jack` no order.
+
+**Built.** `orders/signals.py`: three forms appended (so that the forms before keep their
+places), `haul down the broad pendant`, `haul down the second ensign` and `haul down the jack`,
+each by haul down, strike, lower or take in, read before the grammar as the hoists are; carried
+out by `_haul_down_flag`, the flag taken out of the locker's `ordered_flags`, the colours left
+flying, what flies set again at once (`_FLAG_VERBS`); refused in words when it is not flying
+("No jack of hers is flying: there is none to haul down."); by the deck's rule with step 6 (the
+signal orders' place checked before their handler). `api/signal_readings.py`: a reading of its
+own, `flags` ("the flags", "what flies", "the flags flying", "the pendants", "the jack", on deck
+and aloft), each flag of the locker's `flies` with its words at its place, then "the signal
+flying: ..." while a hoist is up, "none (her colours are down)" with none; `the flags` taken
+from the signals' aliases, which keep "the signals" and "the signal"; `the colours` as it was.
+The primer's chapter 23 (the block run by `tests/test_primer.py`, its words as the game says
+them on the cutter, the table's two rows). Truth 7-457 (`tests/test_flags.py`), failing with
+`orders/signals.py` and `api/signal_readings.py` toggled to the base.
+
+**Taken another way.** `the jack` and `the pendants` read the whole list (one reading, as `the
+colours` is), rather than one flag each.
+
+### The lead's four additions of 2026-11-10 (in the spirit of the owner's ruling for step 2)
+
+**(a) A seat's readings never refused for want of the deck.** `agents/seat.py`
+`PlayerSeat.route`'s deck check now exempts a reading (`tools.reading_order`: the registry's
+readings, `object: query`, or one said without its article), answered by his place as at the
+captain's prompt; his deck's orders still wait for "you have the deck". Probe:
+`tests/browser_plans/seated-officer.yaml` (new, five lines, met).
+
+**(b) A visitor's word to her captain.** `orders/stations.py`: a new road beside the
+captive's, `_visitor_to_the_captain`, for the player's person a visitor aboard another ship and
+no captive (`knowledge.players_visitor`, not `captive.is_captive`), taken for `say to the
+captain: ...`, `tell the captain ...` and `ask the captain ...` before the road to a captain the
+player holds (which refused "The captain tells himself nothing", the visitor's prompt being the
+captain's): a `person.spoke` line of her log in his name and place ("Captain Bowen, a visitor of
+the Amazon, on the quarterdeck, to the captain: good day to you"), heard by her stations within
+earshot, shown him (his own by `his_own`). And `core/world.py`: such a line (`data.visitor`) is
+not taken as the player's hand on her rules captain, who stood aside for it. **Exactly what was
+touched at package 74's road:** nothing of `_captive_to_the_captain`; the `tell` branch calls the
+visitor's road only where the captive's returns None, and the World's player's-hand test gains
+the one `data.visitor` condition. Probe: two lines in `boat-and-visitor.yaml`.
+
+**(c) `go ashore` from the tops** refused in words ("You are in the tops; come down on deck first
+('come on deck') and then go ashore."), by his `where` as `come on deck` reads it
+(`movement.ALOFT_PLACES`). Found on the way, for others: the schooner's master who keeps the
+reckoning (a mirror) goes aloft in his `place` alone, and `come on deck` then answers "You are
+on the quarterdeck already"; the check reads `where` so that he is never held aloft by it.
+Probe: `deck-and-below.yaml`'s `go ashore` from aloft.
+
+**(d) The owner's world order shown him.** `world/knowledge.py`: `owners_world_order` (a
+`world.order` whose source is the owner's, `OWNER_SOURCE`, which `ui.console`'s
+`LIVE_WORLD_ORDER_SOURCE` now reads) is his own by `his_own`; `as_the_owner_sees` gives it as he
+gave it with its outcome ("Your world order 'ship "Nobody": intent bound for Falmouth': not
+carried out: No ship named 'Nobody' is on the sea."), a copy, the log's line unchanged. The
+pages, their reach-back, `/api/log` and the console show it him; decision 46 stands for every
+other reader (it is still for the record: no station's sample and no other driver), and a
+world order of another source (the director's) is never the player's. Probe: the three world
+orders of `boat-and-visitor.yaml`, each shown. The probe now fails a plan that is no YAML
+(`is_plan`), which it had left out unseen.
+
+**Tests and toggles.** Truths 7-458 ((a), (b)) and 7-459 ((c), (d)), each calling its test in
+`tests/test_knowledge.py` or `tests/test_orders_places.py`; each test fails with its own file
+back at the base (`agents/tools.py` (a); `orders/stations.py` or `core/world.py` (b);
+`world/movement.py` (c); `ui/server.py` (d)) and passes with it. **No pin moved.**
+
+**Step 5's book entry** now says the rate filed (2.0 knots at springs, 1.0 at neaps) and that
+the hydrographic service's atlas of the roads was not read, as the lead asked.
+
+### Step 5: the Rade de Brest's stream
+
+**Reproduced.** The `the-goulet` box (48.29 to 48.37 N, 4.62 to 4.42 W) held the narrows and
+most of the bay, so its 4.5 knots at springs ran in the middle of the Rade; the ships anchored
+at 48.345 N 4.47 W (`THE_RADE_INNER`) lay in it.
+
+**Built** (data alone, `data/tides/streams.yaml`): `the-goulet` the narrows, Petit Minou (48 20.2
+N 4 36.9 W) to Portzic (48 21.5 N 4 32.0 W), its figures as they were; `rade-de-brest` after
+it (48.25 to 48.43 N, 4.53 to 4.18 W), before the Iroise's and the Channel's, 2.0 knots at
+springs and 1.0 at neaps, the flood toward 100 degrees (into the rade's middle), strongest
+three hours before high water as the Goulet's. **The source, read** (as data, its own folder):
+the Parc naturel régional d'Armorique's Natura 2000 document of objectives of the Rade de
+Brest, tome 1 (2014), p. 28: "En situation de vive eau, ils dépassent 4 nœuds dans le goulet et
+2 nœuds au centre de la rade"; p. 29 (after Salomon and Breton, IFREMER 1996), the flood's jet
+from the Goulet east-north-east, the greater part bending south for the centre and the
+south-east toward the Aulne, the ebb almost uniform toward the Goulet; p. 35, above 4 knots at
+the pointe des Espagnols at coefficient 85, the flood's axis toward the île Ronde still above
+2; and the FVA's Livret Naviguide voile-aviron 50, Rade de Brest (2019), p. 3: "les courants ne
+dépassent dans la rade que rarement, et localement, les 2 nœuds". The neaps, the axis and the
+hour are judgement; the book's figures in the period's form are judgement throughout as the
+Goulet's are (`test_tide` ties a book's rates to a period source), its source naming the
+modern rate and saying that the hydrographic service's atlas of the roads (SHOM) was not read.
+
+**Pins moved, old beside new, every one by the toggle** (the old `streams.yaml`, as at
+28f7788e, restored in the pinned tree gives every old figure: all five failing tests pass):
+- `test_tide`: the Channel west's areas 14 to 15.
+- The merchant passage (gate 5c): the pilot of Brest put off at 118860 (121620), anchored in
+  the Bay at 115907 in fifteen fathoms (115547, in 14), the tin sold at 124710 (123272), 3,103
+  lines (3,107), its digest 40bcef34afd0cec4 (6436eb06a665f379); the Bay's anchor 0.11 mile
+  from the truth by bearings (0.052), within the test's mile. Every figure to the road of
+  Bertheaume the same.
+- The fake captain's passage of it (truths 78, 79): its anchors as the merchant's, 3,115 lines
+  (3,119), its digest c0bf4b51621ad91f (7076e667c2bc41e3).
+- The schooner on an intent alone (gate 6a): 2,079 lines the same, its digest 9d9efe6b21c17060
+  (8744d3e56cfc9508), one line moved: a sail on her larboard quarter, a stranger in the Rade's
+  water, lost from sight at 115860 (115980), she in the road of Bertheaume.
+- Truth 77 reads those digests.
+No other pin moved: the slow tier of the touched files and the Brest-area files (test_ports,
+test_tackle_orders, test_captains, test_ordnance, test_agents, test_captive, test_brains) passed
+on the new data, the anchored-in-the-Rade fixtures (48.345 N 4.47 W) among them.
+
+### Steps 3, 4, 5 and 7 and the lead's four additions: the suites as run
+
+At **d96dbf31** (the branch's head, the trunk merged at cae5c333 by a merge commit: package
+75's B2c and B3.3b, and 98's steps 1, 2 and 6 as merged at 985c8777), in a worktree pinned
+there, one suite at a time: the fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`)
+exit 0, 7,119 passed, 1 xfailed, 477 slow left out; the slow tier of the touched files
+(`--slow -m "not pace" -n 4`) in two runs, tests/test_known_truths.py exit 0, 341 passed, 8
+xfailed (the passages into the Bay re-measured among them), and tests/test_browser_probe.py,
+test_knowledge.py, test_orders_places.py, test_view_action.py, test_viewer_action.py,
+test_api_door.py, test_flags.py, test_tide.py, test_primer.py, test_signals.py, with the
+Brest-area files test_ports.py, test_tackle_orders.py, test_captains.py, test_ordnance.py,
+test_agents.py, test_captive.py and test_brains.py, exit 0, 1,614 passed, 1 xfailed (the nine
+probe plans met); the pace alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12
+passed. ruff check and format clean. Before it, at 4a0e07b4, the truths' slow tier found step
+5's five (above), proven by the toggle and re-measured at fd350b92; a fast tier at 4a0e07b4 (exit
+0, 7,110 passed) was measured before the trunk moved again. The tree reported differs from
+d96dbf31 by this paragraph alone.

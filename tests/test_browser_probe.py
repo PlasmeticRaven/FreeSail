@@ -41,7 +41,14 @@ def probe_browser():
 
 def test_the_plans_are_found_and_each_names_its_game():
     names = {p.stem for p in PLANS}
-    assert {"ashore", "deck-and-below", "asleep", "boat-and-visitor", "prisoner"} <= names
+    assert {
+        "ashore",
+        "deck-and-below",
+        "asleep",
+        "boat-and-visitor",
+        "prisoner",
+        "seated-officer",
+    } <= names
     for p in PLANS:
         plan = B.load_plan(p)
         assert bool(plan.scenario) != bool(plan.world) and plan.steps, p

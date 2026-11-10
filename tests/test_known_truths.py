@@ -76,6 +76,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import shutil
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -4187,9 +4188,15 @@ GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
     16200,
     96540,  # package 45 (94380 at 37p, 96240 before package 37j)
 ]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise
+# Package 98, step 5 (the Goulet the narrows, the Rade de Brest its own stream of two knots
+# at springs where the Goulet's four and a half ran over the whole bay): from the mouth of the
+# Goulet in she carries less stream, anchors in the Bay 360 s later in fifteen fathoms (14),
+# the pilot put off 2,760 s sooner and the tin sold 1,438 s later; four lines fewer; every
+# figure to the road of Bertheaume the same. The old stream restored (data/tides/streams.yaml
+# as at 28f7788e) gives every old figure, the toggle (docs/dev/TuningNotes.md, package 98).
 GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
     18300,
-    121620,  # package 45c (121500 at 45, 121380 at 37p)
+    118860,  # package 98, step 5: the Rade's own stream (121620 at 45c, 121500 at 45)
 ]  # Mr Tregenza put off beyond the outer road, the ship hove to for it; Mr Le Floch at the
 # anchor in the Bay of Brest, from the quay (package 37h)
 GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
@@ -4201,7 +4208,7 @@ GATE_5C_MERCHANT_IROISE_CAST_TICK = 90318  # package 45 (90241 at 37p)
 GATE_5C_MERCHANT_ANCHORED_TICKS = [
     57,
     100616,  # package 45 (98515 at 37p, 98814 before it)
-    115547,  # package 45c, the Bay's road moved onto its twelve fathoms (116411 at 45)
+    115907,  # package 98, step 5: the Rade's own stream, in fifteen (115547 at 45c, in 14)
 ]  # Carrick Road; the road of Bertheaume on the 13th; the Bay
 GATE_5C_MERCHANT_FLOOD_TICK = (
     108960  # the turn to the flood at Bertheaume, 11:16 on the 13th, by daylight
@@ -4214,7 +4221,7 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
 GATE_5C_MERCHANT_GOULET_TICK = 112142  # the mouth of the Goulet (112189 at 37p)
-GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125387 at 45)
+GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 125387 at 45)
 # Package 37m (2026-10-09): every tick stands; at anchor in the Bay at 129600 the hourly
 # course for the Iroise, on the other tack with no way on her, is refused as keeping her
 # full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
@@ -4237,7 +4244,7 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
 # closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
-GATE_5C_MERCHANT_LINES = 3107  # 65 step 3 (3100 at 58b, 3099 at 68, 3098 at 56, 3080 at 57)
+GATE_5C_MERCHANT_LINES = 3103  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4245,7 +4252,7 @@ GATE_5C_MERCHANT_LINES = 3107  # 65 step 3 (3100 at 58b, 3099 at 68, 3098 at 56,
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
-GATE_5C_MERCHANT_DIGEST = "6436eb06a665f379"  # package 65, step 3 (6abbbff4d7fa1a57 at 58b)
+GATE_5C_MERCHANT_DIGEST = "40bcef34afd0cec4"  # package 98, step 5 (6436eb06a665f379 at 65)
 
 
 def _people(world) -> list[dict]:
@@ -4705,7 +4712,7 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # package 68, riding: 8eead2f4521f2a61 (90061f779b7db484 before)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave b498761052da0862; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_INTENT_DIGEST = "8744d3e56cfc9508"  # package 65, step 3 (585c52675f10e590 at 58b)
+GATE_6A_INTENT_DIGEST = "9d9efe6b21c17060"  # package 98, step 5 (8744d3e56cfc9508 at 65)
 
 
 @pytest.fixture(scope="module")
@@ -4890,7 +4897,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "7076e667c2bc41e3"  # package 65, step 3 (1c9a985bfd5dce0f at 58b)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "c0bf4b51621ad91f"  # package 98, step 5 (7076e667c2bc41e3 at 65)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -14994,3 +15001,139 @@ def test_truth_7_449_the_colours_and_the_signals_are_the_decks_orders():
     )
 
     test_the_colours_and_the_signals_are_the_decks_refused_below_and_ashore_in_its_words()
+
+
+def _made(folder: Path) -> Path:
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+def test_truth_7_450_a_port_guns_inboard_figures_are_behind_its_side_and_lid(tmp_path):
+    """Package 98, step 3: on every armed, profiled file with a port gun, secured, run in or
+    run out, every inboard figure of a port gun is painted before its lid or its opening from
+    outboard on her side, at every 15 degrees, heel 0 and 15."""
+    from tests.test_view_action import (
+        PORT_ARMED,
+    )
+    from tests.test_view_action import (
+        test_a_port_guns_inboard_figures_paint_behind_its_side_and_lid_from_outboard as case,
+    )
+
+    if shutil.which("node") is None:
+        pytest.skip("Node is not installed")
+    for k, path in enumerate(PORT_ARMED):
+        for state in ("secured", "run in", "run out"):
+            case(_made(tmp_path / f"{k}-{state}"), path, state)
+
+
+def test_truth_7_451_every_roots_ensign_paints_as_one_flag_in_its_order(tmp_path):
+    """Package 98, step 3: every root's ensign as one flag in its drawing's order at every 15
+    degrees, heel 0 and 15; the Union's saltires drawn in its canton, under its crosses."""
+    from tests.test_view_action import (
+        ENSIGNS,
+        test_the_unions_lines_lie_inside_its_canton,
+    )
+    from tests.test_view_action import (
+        test_every_roots_ensign_paints_as_one_flag_in_its_drawings_order as case,
+    )
+
+    for root in sorted(ENSIGNS):
+        for path in ("data/ships/frigate-36.yaml", "data/ships/hermaphrodite-brig.yaml"):
+            case(_made(tmp_path / f"{root}-{Path(path).stem}"), root, path)
+    test_the_unions_lines_lie_inside_its_canton(_made(tmp_path / "union"))
+
+
+def test_truth_7_452_a_flag_of_truce_is_white_at_the_fore(tmp_path):
+    """Package 98, step 3: under a flag of truce the white served and drawn at the fore truck
+    on every armed file and the lugger."""
+    from tests.test_view_action import ARMED_PROFILED
+    from tests.test_view_action import test_a_flag_of_truce_is_drawn_white_at_the_fore as case
+
+    for k, path in enumerate(ARMED_PROFILED + ["data/ships/lugger.yaml"]):
+        case(_made(tmp_path / str(k)), path)
+
+
+def test_truth_7_453_a_ports_served_top_is_under_the_rail_as_drawn():
+    """Package 98, step 3: 81's port-top rule, the served top tilted with its deck under the
+    rail less 2 mm; the *Neufchatel*'s No. 8 served 2.265 (was 2.27)."""
+    from tests.test_view_action import (
+        test_a_ports_served_top_takes_its_decks_tilt_and_stands_under_the_rail,
+    )
+
+    test_a_ports_served_top_takes_its_decks_tilt_and_stands_under_the_rail()
+
+
+def test_truth_7_454_a_settees_sheet_held_to_windward_is_drawn_there(tmp_path):
+    """Package 98, step 3: the bilander's settee, its sheet hauled to windward, served and
+    drawn on the weather side, and to leeward again when let go."""
+    from tests.test_view_action import (
+        test_a_settees_sheet_held_to_windward_is_served_and_drawn_there,
+    )
+
+    test_a_settees_sheet_held_to_windward_is_served_and_drawn_there(tmp_path)
+
+
+def test_truth_7_455_the_openrouter_door_sends_the_picture_where_its_model_reads_one(
+    monkeypatch, tmp_path
+):
+    """Package 98, step 4: at the OpenRouter door, a stub door and no provider called, the
+    picture fetched and sent where the models list says the model reads an image, and no
+    picture tool offered where it does not."""
+    pytest.importorskip("anthropic")
+    pytest.importorskip("fastapi")
+    from tests.test_api_door import (
+        test_the_openrouter_door_sends_the_picture_only_where_its_model_reads_one as case,
+    )
+
+    for reads in (True, False):
+        case(monkeypatch, _made(tmp_path / str(reads)), reads)
+
+
+def test_truth_7_456_a_picture_not_shown_says_so_with_its_readings():
+    """Package 98, step 4: wherever a picture cannot be shown the words say so, and why, and
+    give its readings, never its size in pixels alone."""
+    pytest.importorskip("anthropic")
+    from tests.test_api_door import (
+        test_a_picture_not_shown_says_so_and_gives_its_readings_never_its_size,
+    )
+
+    test_a_picture_not_shown_says_so_and_gives_its_readings_never_its_size()
+
+
+def test_truth_7_457_the_flags_of_command_come_down_by_name_and_are_read():
+    """Package 98, step 7 (the owner's further note of 2026-11-09): the broad pendant, the
+    jack and a second ensign hauled down each by its name and refused when not flying; `the
+    flags` reads what flies where and then the signal hoist; by the deck's rule."""
+    from tests.test_flags import (
+        test_the_flags_of_command_come_down_by_their_names_and_the_flags_read_what_flies,
+    )
+
+    test_the_flags_of_command_come_down_by_their_names_and_the_flags_read_what_flies()
+
+
+def test_truth_7_458_a_seats_readings_and_a_visitors_word_are_his_own():
+    """Package 98, the lead's additions (a) and (b) of 2026-11-10: a seat without the deck is
+    answered its readings by its place; a visitor's word and question to her captain go to
+    her captain where he stands and are shown him, her captain not standing aside."""
+    from tests.test_knowledge import (
+        test_a_seat_without_the_deck_is_answered_its_readings_and_refused_its_orders,
+        test_a_visitors_word_to_the_captain_goes_to_her_captain_and_is_shown_him,
+    )
+
+    test_a_seat_without_the_deck_is_answered_its_readings_and_refused_its_orders()
+    test_a_visitors_word_to_the_captain_goes_to_her_captain_and_is_shown_him()
+
+
+def test_truth_7_459_go_ashore_from_aloft_refused_and_the_owners_world_order_his_own():
+    """Package 98, the lead's additions (c) and (d) of 2026-11-10: `go ashore` from the tops
+    refused until he comes down; the owner's world order typed at the page shown him as
+    given with its outcome, and no other source's."""
+    from tests.test_knowledge import (
+        test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is,
+    )
+    from tests.test_orders_places import (
+        test_go_ashore_from_the_tops_is_refused_until_he_comes_down,
+    )
+
+    test_go_ashore_from_the_tops_is_refused_until_he_comes_down()
+    test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is()

@@ -2075,6 +2075,7 @@ class World:
             and not kind.startswith(("agent.", "seat.", "query.", "free."))
             and kind != "person.spoke"
             and self._hand_on_her(actor)
+            and not data.get("visitor")  # a visitor's word to her captain (package 98)
         ):
             # the player's hand on an intent scenario (decision 41; package 40c): an order
             # of the ship's at the prompt, not a station's sentence nor a reading, and the
