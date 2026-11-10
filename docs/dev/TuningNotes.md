@@ -20355,6 +20355,13 @@ no `captain.aside` in either log, and she is more than three hundred metres on h
 in ten minutes. The rule is the giver's (`movement.hand_on_her`): the hand is one of her own
 company's and a free man's; a captive's, and a visitor's aboard a hull that is not his, never.
 The step's own scenes had set him aside without seeing it, as the lead guessed.
+**A fault of the mend's own, found by the slow tier and mended before the step's tree**: the
+rule first asked for her captain's person in every world, and `People.captain` musters the
+people; a world in which nobody had moved was mustered at its first prompt order and was no
+longer line for line what it had been (truth 7-279, the frigate from the Downs to Spithead by
+her short book, took the ground at tick 91,450 on the tree dccbf84). The rule asks nothing
+where the people are not mustered, as the place's check does (`movement._mustered`); 7-279
+passes again.
 
 **(2) The captor engaged his own prize.** She had fired on him before she struck, so she stood in
 his `fired_on` and `_known_enemy` was True whatever her colours; a minute after the possession
