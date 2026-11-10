@@ -2977,7 +2977,13 @@ class FillAwayScript(Script):
     (`tend_lying_to`); then she is let fall off and filled away as from any heave-to. Left so, it
     drew against its mast at two-thirds and no line said so; dipped as she fell off instead, the
     settee down while she had next to no way, it brought the bilander's head to the wind when it
-    was hoisted, and she was taken aback after "Filled away" (docs/dev/TuningNotes.md, B3.3b)."""
+    was hoisted, and she was taken aback after "Filled away" (docs/dev/TuningNotes.md, B3.3b).
+    Two judgements, for the lead: dipped first, as she lies, and not as the tack changes it; and
+    its sheet as hoisted, for full and by with the way she has, never trimmed again by the fill
+    away (as it trims no kept settee: "trim sails" is the captain's). B3.3b's review: with a
+    settee set, whether it is dipped is read at the first tick from the wind itself, as the tack
+    is (`_first_tick`), not at the order from the deck's reading; belayed while it is being
+    dipped, the settee is said to be left lowered on deck (`left_words`)."""
 
     # class defaults for the fields package 37f added (a checkpoint from an earlier build)
     course: float | None = None
@@ -2992,6 +2998,9 @@ class FillAwayScript(Script):
     settee_change: SetteeChange | None = None
     lying: dict[str, Any] | None = None
     fall_t0 = 0.0
+    # B3.3b's review: true from the order to the first tick when a settee is set, the dip read
+    # then by the wind (`_first_tick`); the field is gone again once read
+    wind_to_read = False
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -3069,10 +3078,31 @@ class FillAwayScript(Script):
 
     def begin(self, words: dict[str, Any]) -> None:
         self.sign = 1.0 if self.ship.dyn.tack == "starboard" else -1.0
-        if self._dip_settee():  # a settee on her weather side, dipped first (package 75)
+        if settees(self.ship):
+            # package 75, B3.3b's review: with a settee set, whether it is dipped first is read
+            # at the first tick from the wind itself (`_first_tick`), not from the deck's
+            # reading, which lags a ship just come round: by the deck's alone one on her lee was
+            # lowered and hoisted again on the side it hung on, and one on her weather side was
+            # found only after she had been let fall off, the head sheets' line said twice
+            self.wind_to_read = True
             lying_to_hands_off(self.ship)  # the watch's tending ends: her hands tend her
             return
         self._fall_off()
+
+    def _first_tick(self, dt: float, wind: Wind, factor: float, rel: float) -> bool:
+        """The first tick with a settee set (package 75, B3.3b's review): the tack she is on read
+        from the wind, as `tick` reads it (the deck's reading standing within half a point of the
+        wind), then a settee on that tack's weather side dipped first, as she lies, or else she
+        is let fall off as from any heave-to. True if the dip began, its first tick done."""
+        del self.wind_to_read  # read now: the class default again, the pickle as before
+        if abs(rel) > 0.5 * POINT:
+            self.signed = True
+            self.sign = 1.0 if rel > 0 else -1.0
+        if self._dip_settee():
+            self._dip_tick(dt, wind, factor, rel)
+            return True
+        self._fall_off()
+        return False
 
     def _fall_off(self) -> None:
         """The helm kept a-lee to let her fall off, the head sheets hauled aft."""
@@ -3131,6 +3161,8 @@ class FillAwayScript(Script):
         self.t += dt
         dyn = self.ship.dyn
         rel = wind_rel(self.ship, wind)
+        if self.wind_to_read and self._first_tick(dt, wind, factor, rel):
+            return  # a settee set, on her weather side by the wind: dipped first (package 75)
         if self.phase == "dip_settee":  # package 75, B3.3b: a settee dipped as she lies
             self._dip_tick(dt, wind, factor, rel)
             return
@@ -3147,7 +3179,9 @@ class FillAwayScript(Script):
                     _lee_name(self.sign),
                 )
                 if self.phase == "fall_off" and self._dip_settee():
-                    return  # a settee on this tack's weather side, dipped first (package 75)
+                    # a settee on this tack's weather side, dipped first (package 75): found
+                    # so only when she lay within half a point of the wind at the first tick
+                    return
         self.new_course = self._course_for(wind)
         if self.phase == "fall_off":
             helm = units.deg_to_rad(self.timing_value("helm_deg", 20.0))
@@ -3243,11 +3277,31 @@ class FillAwayScript(Script):
         fall_s = self.timing_value("fall_off_timeout_s", 180.0)
         if self.phase == "dip_settee" and self.settee_change is not None:
             return self.settee_change.left_s + fall_s + brace_s  # package 75, B3.3b
+        if self.wind_to_read:
+            # a settee set, the first tick to come (package 75, B3.3b's review): its dip
+            # counted if the deck has it on her weather side, as the wind will mostly agree
+            lee = _lee_name(self.sign)
+            dip = any(sl.lug_side != lee for sl in settees(self.ship))
+            dip_s = self.timing_value("settee_dip_s", SETTEE_DIP_S) if dip else 0.0
+            return dip_s + fall_s + brace_s
         if self.phase == "fall_off":
             return max(0.0, fall_s - (self.t - self.fall_t0)) + brace_s
         if self.phase == "pay_off":
             return max(0.0, self.timing_value("pay_off_timeout_s", 240.0) - self.phase_t)
         return self.swing.remaining_s() if self.swing else brace_s
+
+    def left_words(self) -> str | None:
+        """'the helm and the yards left as they stand; the mainsail lowered on deck, not yet
+        dipped': belayed while a settee is being dipped (package 75, B3.3b's review), the
+        settee in its gear on deck, which the runner's words, naming the phase, did not say;
+        None otherwise, for the runner's words."""
+        change = self.settee_change
+        if self.phase != "dip_settee" or change is None or change.done:
+            return None
+        return (
+            f"the helm and the yards left as they stand; the {change.names()} lowered on deck, "
+            "not yet dipped"
+        )
 
     def words(self) -> dict[str, Any]:
         course = units.format_heading(self.new_course)

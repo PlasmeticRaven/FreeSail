@@ -783,12 +783,14 @@ record's tack and yards, not its side, and its yard is on her weather side, agai
 away drew it there and never dipped it (at seed 7 in 15 kn after a shift of eight points, the
 fixture's drawing 57.2 m² to the end where 85.8 drew clear, hers 41.3 where 61.8 did, 3.38 and 3.21
 kn at +600 s, and no line said so). Now `FillAwayScript` dips a settee set on the weather side of
-the tack she is to be filled on first, as she lies (its phase `dip_settee`): lowered at the order
+the tack she is to be filled on first, as she lies (its phase `dip_settee`; judgement, for the lead,
+in place of the tack's way of changing it last): lowered at the order
 ("Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the weather
 bow."), hoisted on her lee once `settee_dip_s` is done by the crew's factor ("Dipped the mainsail;
 hoisted on the starboard side, to leeward of the mast."), its sheet drawn for the wind she will have
-full and by, as the tack hoists it (§5.5's change, D3(b)), her hands tending the helm and the head
-sheets meanwhile as the watch does; then she is let fall off and filled away as from any heave-to.
+full and by, as the tack hoists it (§5.5's change, D3(b)), and never trimmed again by the fill away
+(judgement, for the lead), her hands tending the helm and the head sheets meanwhile as the watch
+does; then she is let fall off and filled away as from any heave-to.
 One on her lee is left as it is; a ship with no settee set is not touched (the trace of seven
 committed files, identical). Dipped as she fell off instead, the settee down while she had a knot of
 way, her file came head to the wind when it was hoisted and went astern after "Filled away" in 15
@@ -796,6 +798,20 @@ and 20 kn (aback at +254 s in 15): not kept. As built, in 8 to 20 kn on both: fi
 later, nothing aback, the settee clear of its mast; 4.08 and 5.36 kn at +900 s on her file in 15 and
 20 kn (3.21 and 4.24 before), about as before in 8 kn. Figures in `docs/dev/TuningNotes.md`, "B3.3b,
 the settee kept and forced round hove to".
+
+*The review's mends (2026-11-09):* with a settee set, whether it is dipped is read at the first
+tick from the wind itself, as the fill away reads her tack, and not at the order from the deck's
+reading, which lags a ship just come round (by the deck's alone, one on her lee by the wind was
+lowered and hoisted again where it hung, and one on her weather side was found only after she had
+been let fall off, the head sheets' line said twice); belayed while it is being dipped, the
+settee is said to be left on deck ("... the yards left as they stand; the mainsail lowered on
+deck, not yet dipped."). On her file and the fixture every tick's state as before, the order's
+first line now said after "Fill away; man the after braces." in the order's tick; the files with
+no settee line for line as before. Her polar and 7-197's rule-1 clause the same to the last bit on
+8b327687, B3.3b and the mends. Found, for the lead: the settee's hold while it is changed (the
+tack's, the wear's and the fill away's) is not seen by the runner, which reads an evolution's
+holds once, at the order. Figures in `docs/dev/TuningNotes.md`, "B2c and B3.3b, the review's
+mends".
 
 ### 5.8 Getting under way, rounding to, the gale
 

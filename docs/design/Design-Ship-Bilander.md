@@ -1676,9 +1676,14 @@ with the rest of her carving and paint (§3.2).
    before her merge. After the row, B4 measures her polar and 7-197's rule-1 clause again on it,
    old beside new. *Taken up (2026-11-08):* the one guard found missing (§12.2 item 5's note, her
    review's finding 1), built as B3.3b in `FillAwayScript`, keyed on `settee` alone, before her
-   merge; no heave-to way overturned and no `settee` row, so nothing for her polar or 7-197's
-   rule-1 clause to be measured again on (both pass unchanged, `tests/test_bilander.py` with
-   `--slow`).
+   merge; no heave-to way overturned and no `settee` row. Her polar and 7-197's rule-1 clause
+   measured again on it all the same, old beside new (the lead's answer (8)): on 8b327687, on
+   B3.3b and on its review's mends, the same to the last bit, her closest 50° and her beat 60° in
+   8, 15 and 25 kn against the brig's 50° and 60°, her way made good at 60° in 15 kn 0.06 kn more
+   than at 70°; neither sails a fill away. Two of B3.3b's choices are judgements, for the lead:
+   the settee dipped first, as she lies, and not as the tack changes it; and its sheet as hoisted
+   never trimmed again by the fill away (`docs/dev/TuningNotes.md`, "B3.3b, the settee kept and
+   forced round hove to", with the figures).
 9. **Names:** the armed fit "armed merchant"; the description key `bilander` and its words (§8); the
    dry yard's id `main.crossjack.yard`.
 10. **If the owner takes the open rail** (owner's question 1): a long gun at place `rail` is allowed
