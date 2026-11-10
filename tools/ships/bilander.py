@@ -709,6 +709,15 @@ HEAD = ((None, 0.50), (0.88, 1.80), (1.48, 2.70))
 # Gwyn's separate stern view (Bil §2.3, read; Bil-D §3.2, measured on the stern view at +-5 px,
 # scaled to her taffrail's 3.30 m): rounded, three oval lights on a blue ground in one band.
 LIGHTS = (1.75, 2.75, 3, 1.10)
+# Her round counter's half-breadths (the lead's ruling (11) of 2026-11-09:
+# `form.stern.counter_hb_m`, freesail/ship/form.py): Gwyn's stern view gives her rail 1.55 m off
+# the middle line at the taffrail and 2.02 m at the wale (her step 1 and her review, measured at
+# her scale; Bil-D's 2.05), the collier's stern 2.02 m a side at the top-timber line (Folio LI)
+# the check. Filed at the taffrail's height and at the wale's middle at its after end (judgement
+# on the height: the band's 0.25 to 0.99 m at x -10.0); the counter's foot the water, where the
+# post meets it.
+COUNTER_AT_WALE_M = 2.02
+COUNTER_AT_TAFFRAIL_M = 1.55
 
 MARKS = {
     "rail_m": "stand-in",  # Gwyn's sheer at Chapman's scale; the overhang measured
@@ -727,6 +736,7 @@ MARKS = {
     "sections_m": "stand-in",
     "form.fullness": "judged",
     "form.stern": "sourced",
+    "form.stern.counter_hb_m": "stand-in",
     "form.stern.lights_m": "stand-in",
     "form.head": "sourced",
 }
@@ -756,12 +766,12 @@ PROFILE_NOTES = {
     "load line 10 ft 3 1/4 in above the base: 10 ft 9 in afore and abaft from the keel's "
     "underside (Folio I), less half the keel's depth (judgement on the rabbet). Abaft the "
     "aftermost timber the side closes along the post and the counter to the middle line, the "
-    "round stern's closure: Gwyn's stern view gives her rail 1.55 m off the middle line at the "
-    "taffrail and about 2.0 m at the wale, her lights spread +-1.22 m (measured at her scale), "
-    "and the collier's stern is 15 ft 8 in broad (Folio LI); her drawn stern closes far inside "
-    "both (the generator's report). Recorded, not drawn: a round stern is closed to the middle "
-    "line, and no station abaft the post can be filed, a half-breadth of nothing at the water "
-    "being refused.",
+    "round stern's closure, held out over the counter to its half-breadths: Gwyn's stern view "
+    "gives her rail 1.55 m off the middle line at the taffrail and 2.02 m at the wale, her "
+    "lights spread +-1.22 m (measured at her scale), and the collier's stern is 15 ft 8 in "
+    "broad (Folio LI). No station abaft the post can be filed here, a half-breadth of nothing at "
+    "the water being refused: the counter's are filed in form.stern.counter_hb_m and drawn by "
+    "it (the generator's report).",
     "profile.keel_m": "Level at the collier's depth to its keel's underside, scaled; from the "
     "post's heel (judged) forward by the collier's tread of the keel, Folio I's 66 ft 3 in, "
     "scaled. Her file's draught, 11.5 ft, is deeper, recorded and never moved (principle 7). "
@@ -812,7 +822,11 @@ PROFILE_NOTES = {
     "(principle 5).",
     "profile.form.stern": "Round, closed to the middle line (Gwyn's separate stern view, read): "
     "three oval lights in one band on a blue ground, a red band below, the rudder; the band's "
-    "heights and spread measured on the stern view, scaled to her taffrail. Her carving and "
+    "heights and spread measured on the stern view, scaled to her taffrail. Her round counter "
+    "1.55 m a side at the taffrail and 2.02 m at the wale (measured on the stern view at her "
+    "scale), filed at the taffrail's height and the wale's middle at its after end (judgement) "
+    "in counter_hb_m, the counter's foot the water; the round's depth is the drawing's rule "
+    "(freesail/ship/form.py). Her carving and "
     "paint in words: the blue stern and red band; an oval carved badge on each quarter in "
     "scrollwork (read on the hull crop); the red ensign on a staff at the taffrail.",
     "profile.form.head": "A figure with head rails (Gwyn, read).",
@@ -860,6 +874,18 @@ def stern_line(depth: float) -> list[list[float]]:
     out += [[-HALF - share * aft_overhang, z] for share, z in COUNTER]
     out.append([TAFFRAIL_X, WAIST + QD_RAIL[0][1]])
     return out
+
+
+def counter_points() -> list[list[float]]:
+    """`form.stern.counter_hb_m`: her round counter's half-breadths by height, low to high, at the
+    wale's middle at its after end and at the taffrail (`COUNTER_AT_WALE_M`,
+    `COUNTER_AT_TAFFRAIL_M`)."""
+    _x, low, high = wales_line()[0]
+    taffrail = stern_line(collier_drawn_depth())[-1][1]
+    return [
+        [round((low + high) / 2.0, 2) + 0.0, COUNTER_AT_WALE_M],
+        [taffrail, COUNTER_AT_TAFFRAIL_M],
+    ]
 
 
 def wales_line() -> list[list[float]]:
@@ -990,7 +1016,7 @@ def profile_into(p: Particulars, report: list) -> None:
     p.hull["profile"] = g.hull_profile(rail, breadth, **ln)
     form = {
         "fullness": [1.0, 1.0],
-        "stern": {"type": "round", "lights_m": [list(LIGHTS)]},
+        "stern": {"type": "round", "counter_hb_m": counter_points(), "lights_m": [list(LIGHTS)]},
         "head": "figure",
     }
     REPORT["gaps"] = g.hull_form(p.hull, form=form, marks=MARKS, measured=(), report=report)
@@ -2169,8 +2195,11 @@ def armament(b, guns) -> None:
 # having no hand to spare for one.
 COMPLEMENT = 8
 STATIONS = {"fore_top": 2, "main_top": 2, "afterguard": 1, "idlers": 1}
-# The merchant brig's shares (judgement): a merchantman shipped able seamen and few others.
-RATINGS = {"able": 0.70, "ordinary": 0.20, "landsman": 0.10}
+# Her shares (the lead's ruling (8) of 2026-11-09, package 75; judgement): able seamen and a boy,
+# no ordinary seaman, so that her five muster four able topmen and a landsman boy, as the
+# merchant brig's boy is rated (data/people/merchant-brig.yaml); the merchant brig's own shares,
+# 0.70, 0.20 and 0.10, mustered the boy an able seaman (B4).
+RATINGS = {"able": 0.80, "ordinary": 0.0, "landsman": 0.20}
 # Her stores (Bil-D §7; judgement): water for eight at a gallon a man a day for two months is
 # about two tons (252 gallons to the ton, data/crew/ration.yaml), and some over; provisions for
 # two months, a coaster's passage and its delays; the spare rope; a small trader's shot plugs,
@@ -2239,11 +2268,13 @@ def company(b) -> None:
         (
             ("ratings", "able"),
             RATINGS["able"],
-            "Share of the seamen by rating: the merchant brig's (judgement). A merchantman "
-            "shipped able seamen and few others. Able: 0.70.",
+            "Share of the seamen by rating (judgement; the lead's ruling of 2026-11-09): a "
+            "coaster's able seamen and a boy, four able topmen and a landsman boy, as the "
+            "merchant brig's boy is rated; her shares (0.70, 0.20, 0.10) mustered the boy an "
+            "able seaman. Able: 0.80.",
         ),
-        (("ratings", "ordinary"), RATINGS["ordinary"], "Ordinary: 0.20, judgement."),
-        (("ratings", "landsman"), RATINGS["landsman"], "Landsmen: 0.10, judgement."),
+        (("ratings", "ordinary"), RATINGS["ordinary"], "Ordinary: none."),
+        (("ratings", "landsman"), RATINGS["landsman"], "Landsmen: 0.20, the boy."),
     ]
     entries += [
         (
@@ -2513,10 +2544,11 @@ def her_report() -> str:
     if "stern" in REPORT:
         (d1, hb1), (d2, hb2) = REPORT["stern"]
         out.append(
-            f"bilander: her round stern drawn closed to the middle line: at the lights' middle "
-            f"height, {(LIGHTS[0] + LIGHTS[1]) / 2.0:.2f} m, {hb1:.2f} m off it {d1:.1f} m inside "
-            f"the taffrail and {hb2:.2f} m {d2:.1f} m inside, against Gwyn's stern view's 1.55 m "
-            "at the taffrail and about 2.0 m at the wale; recorded, not drawn."
+            f"bilander: her round stern drawn to its counter's half-breadths (counter_hb_m): at "
+            f"the lights' middle height, {(LIGHTS[0] + LIGHTS[1]) / 2.0:.2f} m, {hb1:.2f} m off "
+            f"the middle line {d1:.1f} m inside the taffrail and {hb2:.2f} m {d2:.1f} m inside, "
+            f"against Gwyn's stern view's {COUNTER_AT_TAFFRAIL_M:.2f} m at the taffrail and "
+            f"{COUNTER_AT_WALE_M:.2f} m at the wale."
         )
     out += [f"bilander: {line}" for line in REPORT.get("rig", [])]
     if "settee" in REPORT:
@@ -2566,7 +2598,7 @@ def her_report() -> str:
 def drawn_stern(path: str) -> list[tuple[float, float]]:
     """Her drawn stern's half-breadth at the lights' middle height, 0.4 and 0.8 m inside the
     taffrail, read off the file as written (`freesail.ship.form`): for the report beside Gwyn's
-    stern view and the collier's, a round stern being closed to the middle line."""
+    stern view and the collier's, her round counter drawn by `counter_hb_m`."""
     from freesail.ship import form
     from freesail.ship.loader import load_spec
 

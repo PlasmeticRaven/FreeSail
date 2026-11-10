@@ -609,10 +609,12 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     to clear the settee's yard, the settee's corners and the spritsail's foot; and since her step
     3, the quarter bill's arithmetic on the armed fit and Steel's Navy anchors on her tonnage beside
     the house's rule; since her step 4, her `clr_x_m` as tuned beside its start (+2.25 at her step
-    4, +2.0 since her review); since her review, her round stern as drawn beside Gwyn's stern view
-    (0.35 m off the middle line 0.4 m inside the taffrail and 0.91 m 0.8 m inside, at the lights'
-    middle height, against 1.55 m at the taffrail: the round stern closed to the middle line,
-    recorded). Her file comes out as it stands."""
+    4, +2.0 since her review); since her review, her round stern as drawn beside Gwyn's stern view,
+    at the lights' middle height: since her counter is drawn to its filed half-breadths (the lead's
+    ruling (11) of 2026-11-09, `form.stern.counter_hb_m`), 0.99 m off the middle line 0.4 m inside
+    the taffrail and 1.84 m 0.8 m inside, against Gwyn's 1.55 m at the taffrail and 2.02 m at the
+    wale (old: 0.35 and 0.91 m, the round stern closed straight to the middle line, recorded and
+    not drawn). Her file comes out as it stands."""
     done = subprocess.run(
         [sys.executable, "-c", REPORT_PROBE, str(tmp_path)],
         cwd=ROOT,
@@ -649,10 +651,10 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
         "share of her waterline, +0.40." in said
     )
     assert (
-        "bilander: her round stern drawn closed to the middle line: at the lights' middle height, "
-        "2.25 m, 0.35 m off it 0.4 m inside the taffrail and 0.91 m 0.8 m inside, against Gwyn's "
-        "stern view's 1.55 m at the taffrail and about 2.0 m at the wale; recorded, not drawn."
-        in said
+        "bilander: her round stern drawn to its counter's half-breadths (counter_hb_m): at the "
+        "lights' middle height, 2.25 m, 0.99 m off the middle line 0.4 m inside the taffrail and "
+        "1.84 m 0.8 m inside, against Gwyn's stern view's 1.55 m at the taffrail and 2.02 m at the "
+        "wale." in said
     )
 
 
@@ -717,7 +719,11 @@ def test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned():
     1.32 at 67.5) on 10 to 25 kn, where hove to in 8 kn she was forced round through the wind (her
     review). Truth 6's form holds: the headsails taken in, her helm goes to weather (+0.36; +0.74
     at +2.25); the settee taken in, to lee (-3.28; -2.83 at +2.25): her headsails give lee helm and
-    her after sail weather helm. Sailed abeam, 6.52 kn at both figures."""
+    her after sail weather helm. Sailed abeam, 6.52 kn at both figures. Since her boy is a landsman
+    (the lead's ruling (8) of 2026-11-09), sailed in this harness she makes 6.20 kn abeam, within
+    half a knot of her polar's 6.62, and her helm under plain sail at its end is 0.02 of lee helm
+    (old: 1.09), the headsails taken in +0.44 (old +0.36), the settee taken in -3.29 (old -3.28):
+    her company's work at the trims changed, measured and not tuned, her polar the same."""
     from tests.test_known_truths import knots, make, run, settle, tack_for
 
     p = polar_of(HER)
@@ -740,7 +746,7 @@ def test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned():
         return math.degrees(w.ship.dyn.weather_helm)
 
     plain_helm = helm()
-    assert plain_helm == pytest.approx(-1.09, abs=0.3)
+    assert plain_helm == pytest.approx(-0.02, abs=0.3)
     w.submit("take in the headsails")
     run(w, 900, trim_every=120)
     no_headsails = helm()
@@ -750,8 +756,8 @@ def test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned():
     no_settee = helm()
     assert w.ship.sails["main.settee"].state is SailState.IN_THE_GEAR
     assert no_headsails > plain_helm > no_settee, (no_headsails, plain_helm, no_settee)
-    assert no_headsails == pytest.approx(0.36, abs=0.3)
-    assert no_settee == pytest.approx(-3.28, abs=0.3)
+    assert no_headsails == pytest.approx(0.44, abs=0.3)
+    assert no_settee == pytest.approx(-3.29, abs=0.3)
 
 
 def test_her_polar_as_measured_and_tuned_beside_the_brig_sloops_and_the_merchant_brigs(tmp_path):
@@ -1018,9 +1024,11 @@ def test_her_armed_fits_lowest_lee_port_shuts_at_twenty_two_degrees():
 def test_her_company_is_eight_with_two_in_the_main_top():
     """Bil-D §6.1 (D43): eight, the master and the mate (the smack's posts), two in each top (the
     main top's for the settee aloft: Ext §5.1 and its risk 10), the boy in the afterguard as the
-    messenger, the cook; no forecastle station; the merchant brig's shares by rating; the english
-    list. The quarter bill (§5.4): a topman of each top trimming, one at the helm, the powder the
-    cook's, sail before guns, two small-arms men and three boarders (judgement)."""
+    messenger, the cook; no forecastle station; her shares by rating 0.80 able and 0.20 landsmen,
+    the boy drawn a landsman (the lead's ruling (8) of 2026-11-09; old: the merchant brig's shares,
+    0.70, 0.20 and 0.10, the boy drawn an ordinary seaman); the english list. The quarter bill
+    (§5.4): a topman of each top trimming, one at the helm, the powder the cook's, sail before
+    guns, two small-arms men and three boarders (judgement)."""
     crew = load_spec(HER).crew
     assert (crew.complement, crew.names, crew.seamen) == (8, "english", 5)
     assert [p.post for p in crew.posts] == ["master", "mate"]
@@ -1029,9 +1037,9 @@ def test_her_company_is_eight_with_two_in_the_main_top():
     assert crew.stations["forecastle"] == 0
     assert len(crew.posts) + sum(st.values()) == crew.complement
     assert crew.idlers_by_trade == {"cook": 1}
-    assert crew.ratings == {"able": 0.70, "ordinary": 0.20, "landsman": 0.10}
+    assert crew.ratings == {"able": 0.80, "ordinary": 0.0, "landsman": 0.20}
     assert [(p.role, p.station, p.rating, p.messenger) for p in crew.people] == [
-        ("boy", "afterguard", "ordinary", True)
+        ("boy", "afterguard", "landsman", True)
     ]
     bill = crew.quarter_bill
     assert bill.trimmers == {"fore_top": 1, "main_top": 1}
@@ -1077,10 +1085,12 @@ def _her_world(fit=None):
 
 def test_her_muster_at_seed_7_puts_four_topmen_aloft_and_the_boy_aft():
     """Her muster at seed 7 (crew/muster.py): the master and the mate on the quarterdeck; her five
-    seamen by the shares (four able, one ordinary), the tops filled first (`FILL_ORDER`), three able
-    and an ordinary aloft; the afterguard's one hand able, and the boy drawn from it (the file's
-    `ordinary` wanted, none there, the station's hand taken: world/people.py); the cook. Measured
-    and reported to the lead: by the shares as designed the boy is mustered an able seaman."""
+    seamen by the shares (four able, one landsman: the lead's ruling (8) of 2026-11-09), the tops
+    filled first (`FILL_ORDER`), four able topmen aloft; the afterguard's one hand the landsman,
+    and the boy drawn from it (world/people.py), as the merchant brig's boy is rated; the cook.
+    Old: by the merchant brig's shares (four able, one ordinary) three able and the ordinary aloft
+    and the afterguard's hand able, the boy, drawn wanting `ordinary` and finding none there,
+    mustered an able seaman (B4, for the lead)."""
     w = _her_world()
     by = [(s.station.value, s.rating.value) for s in w.ship.extra["crew"].sailors]
     assert by == [
@@ -1089,8 +1099,8 @@ def test_her_muster_at_seed_7_puts_four_topmen_aloft_and_the_boy_aft():
         ("fore_top", "able"),
         ("fore_top", "able"),
         ("main_top", "able"),
-        ("main_top", "ordinary"),
-        ("afterguard", "able"),
+        ("main_top", "able"),
+        ("afterguard", "landsman"),
         ("idlers", "idler"),
     ]
     boy = w.people.find("the boy")
@@ -1105,12 +1115,15 @@ def test_her_muster_at_seed_7_puts_four_topmen_aloft_and_the_boy_aft():
 def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
     """Bil-D §5.4: `Quarters.beat` measured at muster at seed 7 (crew/quarters.py), off the
     Lizard. Her six hands off the quarterdeck: the bill's two trimmers (a topman of each top) and
-    the helm (the afterguard's hand, the boy, the helm taking an able man of the afterguard first)
-    are told off first, the cook to the powder. On the armed fit her guns want ten, a crew of three
-    to each 3-pounder pair and a man to each swivel: No. 1 forward takes the two topmen left, one
-    short, and No. 2 and the swivels stand unmanned, as the log says; her design's 'one gun or
-    none', recorded as the period's numbers give it and not forced. Unarmed, no gun crew forms and
-    the four topmen are the trimmers."""
+    the helm are told off first, the cook to the powder. The helm takes an able man first, and
+    since her boy is a landsman (the lead's ruling (8) of 2026-11-09) it is a fore topman, the
+    afterguard's hand, the boy, going to the trimmers unarmed and to No. 1 armed (old: the boy at
+    the helm, the afterguard's hand able). On the armed fit her guns want ten, a crew of three to
+    each 3-pounder pair and a man to each swivel: No. 1 forward takes the boy and the main topman
+    left, one short (old: the two topmen left), and No. 2 and the swivels stand unmanned, as the
+    log says; her design's 'one gun or none', recorded as the period's numbers give it and not
+    forced. Unarmed, no gun crew forms and the three topmen and the boy are the trimmers (old: the
+    four topmen). The log's lines are the same."""
     from freesail.crew.quarters import HELM, POWDER, TRIMMERS, quarters_of
 
     w = _her_world(fit)
@@ -1124,8 +1137,8 @@ def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
     if fit is None:
         assert manned == {}
         assert sizes == {
-            TRIMMERS: ["fore_top", "main_top", "fore_top", "main_top"],
-            HELM: ["afterguard"],
+            TRIMMERS: ["fore_top", "main_top", "main_top", "afterguard"],
+            HELM: ["fore_top"],
             POWDER: ["idlers"],
         }
         assert said == [
@@ -1141,10 +1154,10 @@ def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
             "gun:swivel.2.larboard": 1,
             "gun:swivel.2.starboard": 1,
         }
-        assert {k: v for k, v in manned.items() if v} == {"gun:1": ["fore_top", "main_top"]}
+        assert {k: v for k, v in manned.items() if v} == {"gun:1": ["afterguard", "main_top"]}
         assert sizes == {
             TRIMMERS: ["fore_top", "main_top"],
-            HELM: ["afterguard"],
+            HELM: ["fore_top"],
             POWDER: ["idlers"],
         }
         assert said == [
@@ -1405,7 +1418,11 @@ HOVE_TO = {
     (15.0, False): (67.0, 68.1, 68.0, 69.0, 1.16),
     (20.0, False): (73.1, 67.3, 67.3, 69.3, 1.23),
 }
-CLOSE_HAULED_HELM = {8.0: -2.02, 15.0: -2.02, 20.0: 0.25}
+# Her helm at the settle's end, measured again with her boy a landsman (the lead's ruling (8) of
+# 2026-11-09): her company's work at the settle's trims changed, the settle ends at another
+# moment of her trim (in 15 kn at 2,667 s, old 2,580; in 20 kn at 2,432, old 2,536), and the
+# figure moves (old: -2.02, -2.02 and +0.25), her lie hove to within its old figures' bounds
+CLOSE_HAULED_HELM = {8.0: -1.14, 15.0: 0.43, 20.0: -4.91}
 
 
 @pytest.mark.parametrize(
@@ -1437,7 +1454,13 @@ def test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways(
     kept 64.2 degrees off at 1.93 kn and clewed up fell off to a run by +900 s; at +3.0 kept she
     came head to wind by +150 s and made sternway (her tuning notes). Her helm close-hauled
     before the order, 67.5 degrees off: 2.02 degrees of lee helm in 8 kn and in 15, 0.25 of
-    weather helm in 20 (at +2.25, 1.27 of lee helm in 15 and 3.30 of weather helm in 20)."""
+    weather helm in 20 (at +2.25, 1.27 of lee helm in 15 and 3.30 of weather helm in 20); since her
+    boy is a landsman (the lead's ruling (8) of 2026-11-09), 1.14 of lee helm in 8 kn, 0.43 of
+    weather helm in 15 and 4.91 of lee helm in 20, her settle ending at another moment of her trim
+    (`CLOSE_HAULED_HELM`), and her lie hove to within two degrees of the figures above (8 kn kept
+    47.5, 69.5, 64.7-69.5 at 0.54 kn; 15 kn kept 61.4, 65.2, 65.1-65.4; clewed up 66.9, 67.9,
+    67.9-68.9; 20 kn kept 65.3, 62.6, 62.6-63.6; clewed up 73.5, 67.2, 67.2-69.3; each headway
+    the same to the hundredth)."""
     from freesail.evolutions import scripts
 
     monkeypatch.setattr(scripts, "SETTEE_KEPT_HOVE_TO", kept)
@@ -1460,9 +1483,12 @@ def test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways(
     texts = [e.text for e in _after(world, start)]
     words = "eased off the mainsail sheet" if kept else "clewed up the mainsail"
     assert f"Hauled up the courses; {words}." in texts, texts
+    # in 20 kn her settle now ends with her yards braced sharp up to their limits, its last trim
+    # not yet ordered (her boy a landsman, the lead's ruling (8) of 2026-11-09), so that none is
+    # braced up at the heave-to (old: "braced up the other yards" at every wind)
+    braced = "" if knots == 20.0 else " braced up the other yards;"
     assert (
-        "Braced the main topsail aback; braced up the other yards; hauled aft the head sheets; "
-        "helm a-lee." in texts
+        f"Braced the main topsail aback;{braced} hauled aft the head sheets; helm a-lee." in texts
     )
     assert any(
         t.startswith("Hove to on the starboard tack, main topsail to the mast") for t in texts
@@ -1487,11 +1513,13 @@ def test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away
     her weather side, against its mast. "Fill away" dips it first, as she lies (Ext §5.7's as-built
     note): lowered at the order, hoisted on the starboard side when its time is done, its sheet
     drawn for the wind she will have full and by, and then she is let fall off and filled away,
-    each said. Seed 7, 15 kn, from her settle, hove to at +106 s and the shift 60 s after: forced
-    round 20 s after the shift, the order 40 s after that; the dip's words at +1 s, she lying
-    65-85 degrees off while its yard is on deck (as she lies with it clewed up, D4 (a)); hoisted
-    and "Hauled aft the head sheets" at +158 s, "Filled away on the larboard tack" at +218 s; at
-    +300 s it draws clear of its mast as at her settle (61.8 m2), at 4.15 kn. Before B3.3b she
+    each said. Seed 7, 15 kn, from her settle, hove to at +108 s (old +106) and the shift 60 s
+    after: forced round 20 s after the shift, the order 40 s after that; the dip's words at +1 s,
+    she lying 65-85 degrees off while its yard is on deck (as she lies with it clewed up, D4 (a));
+    hoisted and "Hauled aft the head sheets" at +177 s, "Filled away on the larboard tack" at +244
+    s; at +300 s it draws clear of its mast as at her settle (61.8 m2), at 4.04 kn. Old, before her
+    boy was a landsman (the lead's ruling (8) of 2026-11-09; the dip is all hands' work, the boy
+    among them): hoisted at +158 s, filled away at +218 s, at 4.15 kn. Before B3.3b she
     was filled away at +59 s with it drawing against its mast to the end, two-thirds of that
     (41.3 m2), at 3.13 kn, and no line said so; at her step 5's +2.25 in 8 kn she was forced round
     of herself and filled away so (41.4 m2, 2.23 kn, her review). Dipped as she fell off instead
@@ -1531,7 +1559,7 @@ def test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away
     hauled = "Hauled aft the head sheets; kept the helm a-lee to let her fall off."
     assert _first_tick(world, start, dip) == 1
     up = _first_tick(world, start, hoisted)
-    assert up is not None and abs(up - 158) <= 10, [e.text for e in _after(world, start)]
+    assert up is not None and abs(up - 177) <= 10, [e.text for e in _after(world, start)]
     assert _first_tick(world, start, hauled) == up  # then she is let fall off
     filled = [e for e in _after(world, start) if e.kind == "ship.filled_away"]
     assert len(filled) == 1 and filled[0].text.startswith("Filled away on the larboard tack")
@@ -1681,12 +1709,17 @@ def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_wi
     topman, two (the afterguard's one hand falls to the starboard). So:
     - the starboard watch begins every request short-handed with three, by night and by day (four
       for the take in and the dip by day, the cook with them); sailed from her settle with that
-      watch alone (all hands piped down), clewed up in 118 s, set from the gear in 128 s, furled
-      from set in 343 s and set from furled in 221 s;
+      watch alone (all hands piped down) at 04:00, clewed up in 169 s, set from the gear in 183 s,
+      furled from set in 490 s and set from furled in 316 s, its third hand the boy, a landsman
+      since the lead's ruling (8) of 2026-11-09 (old, an able seaman: 118, 128, 343 and 221 s);
     - the larboard watch's two begin none by night: "Not hands enough on deck"; by day, the cook
-      up, the take in and the dip begin with three (clewed up in 197 s, set from the gear in 213 s
-      sailed), and the furl and the loosing aloft wait for all hands ("there are but two to
+      up, the take in and the dip begin with three (clewed up in 184 s, set from the gear in 199 s
+      sailed, its two topmen both able since the ruling; old, an able and an ordinary: 197 and
+      213 s), and the furl and the loosing aloft wait for all hands ("there are but two to
       spare").
+    The ruling's (9), the boy's hand to the larboard watch, is not built: it makes the watches two
+    and three, not three and three, and measured in scratch the larboard then begins every request
+    and the starboard none by night (docs/dev/TuningNotes.md, for the lead).
     Her design's claim ("a company of eight meets with a watch on deck of four", Ext §5.3) does
     not hold for her watches of three and two: recorded as measured and nothing tuned to make her
     quicker (§16 risk 7); for the lead. Her main-top pair is there for the loosing and the furling

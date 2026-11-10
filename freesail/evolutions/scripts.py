@@ -5637,15 +5637,34 @@ class LieATryScript(Script):
         a boomless gaff sail beside a course (the *Neufchatel*'s fore gaff sail; package 75,
         B2b) her gaff sails are named, those standing among what she lies under and that one
         taken in: "the fore topsail, the mainsail and the staysails, the fore-and-aft foresail
-        taken in"."""
+        taken in". The staysails are named as they stand (`_staysails_set`; the lead's ruling
+        (13)(iv) of 2026-11-09, found on the bilander's file, her fore topmast staysail blown out
+        and her storm staysails not yet up): "the staysails" where two or more are set, the one
+        by its name, and none where none is."""
+        stays = self._staysails_set()
+        named = [names_of_sails(self.ship, stays)] if len(stays) == 1 else []
+        stay_words = ["the staysails"] if len(stays) > 1 else named
         beside = gaff_sails_beside_a_course(self.ship)
         if not beside:
-            return f"the {topsail} and the staysails"
+            return _joined([f"the {topsail}", *stay_words])
         sails = self.ship.sails.values()
         standing = [sl for sl in sails if sl.cls == "gaff" and sl.is_set and sl not in beside]
         under = [f"the {topsail}"] + [names_of_sails(self.ship, [sl]) for sl in standing]
         taken_in = names_of_sails(self.ship, beside)
-        return ", ".join(under) + f" and the staysails, {taken_in} taken in"
+        return _joined([*under, *stay_words]) + f", {taken_in} taken in"
+
+    def _staysails_set(self) -> list:
+        """The staysails standing as she lies a-try: the jib-headed sails set of the ship
+        file's staysails, storm staysails and storm canvas (a fore-and-after's storm jib stands
+        for a storm staysail, `orders.storm.storm_staysails`) and of her head sails, her jibs
+        being hauled down."""
+        ship = self.ship
+        jibs = set(ship.groups.get("jibs", []))
+        groups = ("staysails", "storm staysails", "storm canvas", "headsails", "lying-to staysails")
+        ids = {sid for g in groups for sid in ship.groups.get(g, [])} - jibs
+        return [
+            sl for sl in ship.sails.values() if sl.id in ids and sl.cls == "jibheaded" and sl.is_set
+        ]
 
 
 class ScudScript(Script):

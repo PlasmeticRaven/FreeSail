@@ -1006,7 +1006,10 @@ a yard under the bowsprit, so no existing ship draws differently.
   the shared work's profile lands (`profileHullFigures`), else −0.52 L.
 - **The sling** stays a third along throat→peak (D5(a)), which the corners' contract puts on
   the mast (§5.1).
-- The vangs, ourses and derrick are not drawn, to the current standard.
+- The vangs and ourses are not drawn, to the current standard. The derrick is drawn: it is a
+  `lift`, and every yard's lifts are drawn since B5.1 (amended by the lead's ruling of 2026-11-09
+  on B5.4, which accepted the derrick as drawn; "the vangs, ourses and derrick are not drawn" was
+  the standard before B5.1).
 
 *As built (B5.4, 2026-11-07), on the fixture* `brig_with_settee()` (the bilander's file is B4's):
 `lugHoisted` as designed, the yard aloft unless `yard_lowered`; the slings a third along
@@ -1034,9 +1037,10 @@ the fixture x −14.20 m, 1.38 m off the centreline, 2.27 m inside the taffrail,
 trim's own block, which swings the clew about the tack on the centreline. **The derrick**: every
 yard's lifts are drawn since B5.1 (the owner's answer), so the derrick, a `lift`, is drawn, from
 two-thirds of the way from the slings to the peak as the mizen yard's (§6.1); "not drawn" above was
-the standard before B5.1 (judgement, for the lead). The vangs and ourses are not drawn. §6.4 was
-served from stage 0E; §6.5's cases in `tests/test_view_geometry.py` (25), every committed file drawn
-figure for figure as before. **For the lead:** the dry main yard is drawn where every lower yard is,
+the standard before B5.1 (judgement, for the lead; accepted, the lead's ruling of 2026-11-09,
+and the bullet above amended). The vangs and ourses are not drawn. §6.4 was served from stage 0E;
+§6.5's cases in `tests/test_view_geometry.py` (25), every committed file drawn figure for figure as
+before. **For the lead:** the dry main yard is drawn where every lower yard is,
 5.40 m above the slings on the fixture; braced sharp up with the settee trimmed by the same wind the
 two yards cross wherever sheet and brace sum near 90 degrees: by the wind at the engine's own trim
 (sheet 26.4, brace 62) 0.05 m apart, and 0.03 m with the bilander's dry yard (12.44 m, 1.02 m above

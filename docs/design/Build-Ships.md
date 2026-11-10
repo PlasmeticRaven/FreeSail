@@ -745,6 +745,7 @@ hull:
   - `square` is a flat transom above the knuckle. `raked` is a transom along `stern_m`'s rake, with no counter. `round` has no transom, and `transom_hb_m` is refused with it.
   - `knuckle_z_m` is the transom's foot. No fixed point of `stern_m` can stand for it: the working 64's runs fourteen points from the heel to the taffrail, so the shared draft's "second point from the top" (`ships-design/shared-design.md` §2) would miss it.
   - The transom's half-breadths live here because `breadth_m` cannot hold a rail's breadth beyond the water's ends (its half-breadths are more than nothing).
+  - *The lead's ruling (11) of 2026-11-09 (package 75, built 2026-11-10):* `counter_hb_m: [[z, hb], ...]`, a round stern's half-breadths at its counter by height, low to high, above the counter's foot (`knuckle_z_m`, else the water) and no higher than the taffrail; refused on a square or raked stern. The bilander's is the one file to give it (her design's §3.2).
 - **Galleries and lights** are given by position:
   - a tier's extent fore and aft and its heights;
   - a band's heights, its count, and the half-breadth the lights spread within across the stern's face, a transom's or a round stern's.
@@ -825,6 +826,7 @@ That the drawn side passes within 0.05 m of a port triple is the generator's che
 4. Above the water: `section_m`'s upper shape, fitted between the water, the breadth and the rail.
 5. `sections_m`'s points are passed through. The rule fills only beyond them, scaled to meet them.
 6. The ends close straight to `stem_m`'s fore edge. Aft, they close to the post below the knuckle and to `transom_hb_m` above it. A round stern closes to the centreline.
+   *Since the lead's ruling (11) of 2026-11-09:* a round stern giving `counter_hb_m` still closes to the centreline on the stern's line, and above the counter's foot its side holds out to the counter's half-breadth at each height, rounding in over `form.ROUND_STERN_DEPTH_SHARE` of it (a quarter, judgement), drawn on stations over the counter; every file giving none as before.
 7. Without `section_m`, the station is §6's three points.
 
 The module also gives:
@@ -1479,6 +1481,16 @@ kind names none, as her far brain does. Before it, a world order changing a crew
 hired armed cutter's or privateer lugger's intent left her far brain's role hers and dropped her
 crewed captain's to the merchant's book. One role is refused in the singular ("her file gives a smack
 the role fisherman."), where it read "the roles fisherman".
+
+*The lead's ruling (2026-11-09, 22:56 UTC, on B2b's rows' roles; confirmed 2026-11-10, 02:25 UTC):*
+`brains.INTENT_RULED_ROWS` is the rule and stands as built at B2b. The eight rows sailed before
+package 75 (the frigate, the schooner, the privateer schooner, the cutter, the brig-sloop, the
+merchant brig, the lugger and the smack) keep the intent's rules they had, so that no far ship's book
+moves; every row that files roles and is none of them sails by its first role where the intent's kind
+names none: the four sub-types above (`brains.SUB_TYPE_ROWS`) and every whole file added since, the
+*Prince de Neufchatel*, the bilander and the 74. The lean of this section's sentence ("the first the
+one the intent rules give"), reconciled at B2b with the intent's rules for the older rows, is so the
+lead's ruling and no longer a builder's reading.
 
 ### 8.2 The table
 

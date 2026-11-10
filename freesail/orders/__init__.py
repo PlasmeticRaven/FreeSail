@@ -386,7 +386,9 @@ def _group_evolution(
 
         # package 57: a topsail set flying (the lugger's lug topsails) is never reefed; it
         # is taken in whole as the wind rises, before the reef of the others; and package
-        # 75: the spritsail and the sprit topsail are taken in first, as it freshens
+        # 75: the spritsail and the sprit topsail are taken in first, as it freshens; the
+        # square sail's line only where she has one (`storm.listed_lines`)
+        lines = storm.listed_lines(ship, lines)
         lines = storm.bowsprit_sail_lines(ship) + storm.flying_topsail_lines(ship) + lines
         lines += storm.shorten_sail_lines(ship, storm.true_wind_kn(ship))
     for line in lines:

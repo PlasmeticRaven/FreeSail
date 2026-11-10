@@ -455,6 +455,17 @@ otherwise (`docs/dev/TuningNotes.md`, "The bilander (package 75, B4)"):*
   height as this table's stood; `rabbet_m` written, kept and not drawn, judged (Folio I's sidings,
   principle 11). The ports' half-breadths the collier's at their sills, 2.80 and 2.79 m; their gaps to the
   drawn side +0.01 and +0.02 m.*
+- *At the lead's ruling (11) of 2026-11-09 (her round stern's breadth, built 2026-11-10): the key is
+  built, `form.stern.counter_hb_m` (`freesail/ship/form.py` and the schema), a round stern's
+  half-breadths at its counter by height, hers the one file to file it: **[[0.62, 2.02], [3.30,
+  1.55]]**, Gwyn's 2.02 m at the wale (at the wale's middle at its after end, judgement on the
+  height) and 1.55 m at the taffrail, `stand-in`, the counter's foot the water. Her side holds out to
+  them and rounds in to the middle line on the stern's line over a quarter of the half-breadth there
+  (the drawing's rule, judgement), on four stations over her counter; the closure on the middle line,
+  her drawn displacement and every other file's served stations as they were. At the lights' middle
+  height her stern is drawn 0.99 m off the middle line 0.4 m inside the taffrail and 1.84 m 0.8 m
+  inside (old 0.35 and 0.91 m). Figures in docs/dev/TuningNotes.md, "The lead's ruled builds of
+  2026-11-09 and 11-10".*
 
 ### 3.3 Why Gwyn's lines are `stand-in` and not `sourced`
 
@@ -918,6 +929,11 @@ the powder 1. Not hands enough for every gun: the swivels and No. 2 gun stand un
 short-handed, as this section expected, recorded and not forced. Unarmed, no gun crew forms and the
 four topmen are the trimmers.*
 
+*Since the lead's ruling (8) of 2026-11-09 (her boy a landsman, built 2026-11-10), measured again:
+the helm takes an able man first, a fore topman, and the boy goes to the trimmers unarmed (three
+topmen and the boy) and to No. 1 armed, with the main topman left, still one short; the log's lines
+the same.*
+
 ## 6. The company and the people file
 
 ### 6.1 Eight (D43)
@@ -954,6 +970,20 @@ courses and the fore topsail set in 1,200 s; all hands called, plain sail is set
 (measured at her step 3, the beam reach in 15 kn; step 5 measures every request). Recorded, not
 tuned (§16 risk 7).*
 
+*At the lead's rulings (8) and (9) of 2026-11-09 (built 2026-11-10): **(8)** her shares are 0.80 able,
+none ordinary and 0.20 landsmen, the boy drawn a landsman (§6.2), as the merchant brig's boy is
+rated: mustered at seed 7, four able topmen and the landsman boy in the afterguard, her watches by
+count as before (the starboard a fore topman, a main topman and the boy; the larboard two topmen).
+Her settee requests at eight measured again: the table by watch, by night and by day, the same
+cell for cell (§14); sailed with the watch alone the starboard's work slower by the boy (clewed up
+169 s, set from the gear 183, furled 490, set from furled 316; old 118, 128, 343, 221) and the
+larboard's by day a little quicker (184 and 199 s; old 197 and 213), the furl waiting as before.
+**(9) is not built, for the lead:** her watches are kept by her five seamen (the cook keeps none,
+the master and the mate are posts), three and two, and the boy's hand moved makes them two and
+three, the larboard then beginning every settee request and the starboard none by night (measured
+in scratch); "three and three" wants six. No muster's line is written and no settee file's hands
+changed. Figures in docs/dev/TuningNotes.md, "The lead's ruled builds of 2026-11-09 and 11-10".*
+
 ### 6.2 The people file (`data/people/bilander.yaml`, hand-written data)
 
 The smack's form: the master (post, the command), the mate (post), the boy (drawn, afterguard,
@@ -964,7 +994,7 @@ on it.
 
 *As built (B4, 2026-11-08, her step 3): `data/people/bilander.yaml` in the smack's form, the
 master (post, the command), the mate (post) and the boy (drawn from the afterguard, `ordinary`, the
-messenger), the harness's stations the smack's; the outlines judgement, bred in the Poole and
+messenger; `landsman` since the lead's ruling (8) of 2026-11-09, as the merchant brig's boy), the harness's stations the smack's; the outlines judgement, bred in the Poole and
 Newfoundland trade of the register's bilanders of Poole, naming no one, with no pronoun for a
 person in the words served (the engine's own "His station" before a brief is package 40's).
 `tests/test_wardroom.py:42-57`'s check is in her own test file.*
@@ -1337,6 +1367,12 @@ clewed up aloft, furled all in 417 s, loosed to dry in 222 s, got under way as a
   the settee's yard passing its height 1.00 m abaft the mast inside its 6.22-m half-length, so the
   two cross by the wind in the drawing by B5.4's 0.03 m; no engine or viewer change built, for the
   lead.)*
+  *(The lead's ruling (11) of 2026-11-09, built 2026-11-10: with her round counter drawn to its
+  filed half-breadths her settee's block, a fathom abaft the clew and abreast of it, stands 0.24 m
+  inside her rail, where it stood 0.76 m outboard: the departure `BLOCK_OFF_HER_SIDE_M` is gone. Her
+  lights lie on her counter; the near quarter's is still seen from abeam, by the viewer's rule for
+  a round stern's lights, faced by their place in the band and not by the drawn face: that row
+  stays, for the lead.)*
 - **B5.3:** her spritsail under B3.2's drawing (Ext §6.2), its foot above the water in every state.
 - **The pictures of the testing report** (§13.1).
 

@@ -17253,6 +17253,240 @@ quarterdeck guns are not touched: her charges' note alone moved.
 3. An old save's fit pickled without charges fills at the shares as filed, so nothing of an old
    game of the eight moves (§16.2's as built).
 
+## The lead's ruled builds of 2026-11-09 and 11-10 (package 75) (2026-11-10)
+
+The lead's notes to the ships session of 2026-11-09, 22:56 UTC, and 2026-11-10, 02:25 UTC
+(`docs/dev/M7-WorkPackages.md` on the lead's branch), built in steps, one commit each, a subsection
+here for each. The 9th's (4) and (5) are withdrawn by the 10th: the *Neufchatel*'s fore gaff sail
+stays taken in at lie a-try and her `clr_x_m` stays -0.6 with her two bands as built (the owner's
+rulings, 8b327687); nothing of these steps reaches her helm. The 9th's (2), the trim's reply by the
+alias for every file, goes with the 74's window and is not built here. Where a ruling leaves a choice
+its lean is built and said; what a ruling's figures do not bear out is for the lead, with the
+figures, and not built.
+
+### The files and the words (the 9th's (1), (3), (6), (8), (9), (11), (13)(iii) to (v), B5.4's derrick)
+
+Measured on the owner's machine, the scripts in the session's scratch (`r10/m/`), outside the
+repository: before on the tree at 35e33ad0 exported whole, after on this step's code, each script
+the same on both. Every ship file came out of the generator (`py tools/gen_ships.py` into scratch,
+compared byte for byte): fifteen as they were, the bilander's and the *Neufchatel*'s as below.
+
+**(3) The gale's list names the square sail only where she has one.** *As built*
+(`freesail/orders/storm.py`, the ships session's by the grant): `listed_lines` keeps the vocabulary's
+`shorten sail` line "take in the square sail" (`SQUARE_SAIL_LINE`) only where the ship has a
+`square_sail` part, the cutter and the smack, and every other line as listed;
+`orders._group_evolution` takes the vocabulary's list through it, one line, before the bowsprit's
+and the flying topsails' lines go in front of it. The grammar's refusal of the phrase typed at the
+prompt is the grammar owner's (the lead's list). *Measured:* the gale as B3.4's review sailed it
+(seed 7; the wind from the north, 15 kn rising to 44 kn between 08:40 and 10:10, gustiness 0.3,
+variability 0.1; plain sail set and braced sharp up, the sails trimmed every two minutes, "shorten
+sail" at 20, 25, 30, 34, 38 and 42 kn and "lie a-try" at 7,200 s; 8,400 s; its script and world
+unchanged) on the *Neufchatel*, the topsail schooner and the privateer schooner (the two one hull,
+rig and company, the same to the digest before and after): each of the six "shorten sail" replies,
+begun or refused, loses "'take in the square sail': 'take in' was understood, but 'square' belongs
+with 'brace';" from its "Not done" or its refusal's list, and no other line of the three moves but
+the lie a-try line ((13)(iv), below): her 442 lines and theirs 441 at the same ticks, her end 38.9
+degrees off at 3.26 kn and theirs 34.5 at 2.30, as before. The cutter and the smack keep the line:
+the smack line for line and digest for digest (f2d587f438a2cf4b; with her square sail and topsail
+ordered set too, 370de09f2e10b5c7), the cutter's one moved line the lie a-try's ((13)(iv)), with
+her square sail set or not.
+
+**(6) The *Neufchatel*'s quarter bill, 34 by the rule.** *As built* (`tools/ships/neufchatel.py`):
+`trimmers(plain)`, the brig-sloop's 27 carried by her plain sail against the brig's, 33.8, rounded
+to 34, shared out on Neuf-D §6.4's split by each mast's work (9, 11 and 15, now `TRIMMER_SHARES`)
+by largest remainder, the muster's own rule (`crew.muster.apportion`): forecastle 9, fore top 11,
+afterguard **14** (old 15); the generator's report "(34 written)" where it said 35; the trimmers'
+note says "by the rule". Her file by the generator, two lines (the note and the afterguard's
+count); her served graph the same. *Measured* (`Quarters.beat` at seed 7 off the Lizard, her
+test's): every gun crew fills, ten crews of 42 men, as before; at the carronades her sixteen
+marines and sixteen of the afterguard (old fifteen and a waister); the trimmers 65 (the
+afterguard's 14 and the waisters' 18; old 15 and 17), the tiller 1, the powder 8; the log's line
+the same ("ten gun crews manned, the trimmers 65, the helm 1, the powder 8").
+
+**(8) The bilander's boy a landsman, by the other shares.** *As built*: her shares 0.80 able, none
+ordinary, 0.20 landsmen (`tools/ships/bilander.py` `RATINGS`, its notes), and her people file's boy
+drawn from the afterguard as a landsman (`data/people/bilander.yaml`, hand-written data; its note),
+the merchant brig's boy's rating; her file by the generator (the ratings, their notes and the
+people's rating). *Measured, the muster at seed 7:* four able topmen and the landsman boy in the
+afterguard, the cook (old: three able and an ordinary aloft, the afterguard's hand able, the boy
+drawn wanting `ordinary`, finding none, mustered an able seaman); her watches by count as before,
+the starboard three (a fore topman, a main topman, the boy) and the larboard two.
+
+*Her requests measured again.* The four settee evolutions' requests by watch, by night and by day
+(her test's table: the outcome, the hands wanted after the company's clamp, the hands got) are the
+same cell for cell. Sailed from her settle with the watch alone (all hands piped down at 2,300 s;
+B4's script, its harness now belaying and recording work the watch on deck cannot finish rather
+than stopping on it):
+
+| Watch on deck | take in | set from the gear | furl | set from furled |
+|---|---|---|---|---|
+| starboard, by night (04:00) | 169 s (old 118) | 183 (128) | 490 (343) | 316 (221) |
+| starboard, by day (12:00) | 154 (125) | 167 (136) | 490 (343) | 316 (221) |
+| larboard, by day (08:00) | 184 (197) | 199 (213) | waits, as before | refused, as before |
+| larboard, by night (00:00, 20:00) | too few, as before | refused | too few | refused |
+
+The starboard watch's third hand is the boy, slower aloft as a landsman; the larboard's two topmen
+are both able now (old an able and an ordinary), a little quicker. By night the settle's last
+braces and the settee's sheet trim, in hand at the pipe-down, now wait on the larboard's two as
+well (at the base they were done by then): recorded, nothing tuned (Bil-D §16 risk 7).
+
+*Her other pins the ruling moves* (her company's work at the trims, the helm and the dip; old
+beside new in `tests/test_bilander.py`): at the beat the helm takes an able man first, a fore
+topman (old the boy), and the boy goes to the trimmers unarmed and to No. 1 armed (old the two
+topmen there), the log's lines the same; her settle's close-hauled helm 1.14 degrees of lee helm in
+8 kn, 0.43 of weather helm in 15 and 4.91 of lee helm in 20 (old 2.02 and 2.02 of lee, 0.25 of
+weather), her settle ending at another moment of her trim (in 20 kn her yards braced sharp up to
+their limits, the last trim not yet ordered, so that the heave-to's line has no "braced up the
+other yards"), her lie hove to within two degrees of its table, which stands, each headway the same
+to the hundredth; the forced round's dip hoisted at +177 s (old +158) and filled away at +244 (old
++218), 4.04 kn at +300 s (old 4.15); her sailed beam reach 6.20 kn (old 6.52, her polar's 6.62), her
+helm under plain sail at its end 0.02 of lee helm (old 1.09), the headsails in +0.44 (old +0.36),
+the settee in -3.29 (old -3.28). Her polar, static, is the same. Her gale (B4's script) moves
+throughout, her work slower: the lie a-try at 8,620 s (old 8,325).
+
+**(9) Not built: the boy's hand to the larboard watch, for the lead.** The ruling's figure, "three
+and three", does not hold on her company: her watches are kept by her five seamen (the cook is an
+idler and keeps none, `crew/muster.py`; the master and the mate are posts, never hands), three and
+two, and the boy's hand moved makes them two and three. Measured in scratch on this step's file,
+the afterguard's hand set to the larboard watch after the muster: the table mirrors, the larboard
+beginning every settee request short-handed (three; four by day for the take in and the dip) and
+the starboard's two none by night and only the take in and the dip by day; sailed, the larboard by
+night clewed up in 169 s, set from the gear in 183, furled in 490 and set from furled in 316, the
+starboard at 04:00 none (its two leave the settle's braces and sheet trim unfinished) and at 12:00
+the take in and the set from the gear (184 and 199 s), the furl waiting. Each watch beginning a
+settee request wants three hands who keep a watch and go aloft in each, six; she has five. The
+ways it could go: a sixth seaman in the cook's place (D43's eight unchanged; the powder at the beat
+then a seaman's), the mate keeping and working the larboard watch (a post is never a hand in the
+engine: an engine change), the settee files' six hands (B3's; ruled out), a watch of two calling
+all hands, as a coaster's would, or as it is. Neither the move nor a muster's line for her is
+built; no settee file's hands changed.
+
+**(11) A round stern's half-breadth at the counter.** *As built:* the schema's stern keys gain
+`counter_hb_m` (`freesail/ship/schema.py`, `STERN_KEYS`, `HullStern`, `_parse_counter`), a round
+stern's alone (a square or raked stern giving it is refused, as a round one giving `transom_hb_m`
+is): its half-breadths at its counter by height, [z, hb] low to high, each above the counter's foot
+(`knuckle_z_m`, else the water) and no higher than the taffrail, each more than nothing. Drawn by
+`freesail/ship/form.py`: above the counter's foot, where it is nothing, the side holds out to the
+counter's half-breadth at each height, straight from it at that height, and rounds in to the middle
+line on the stern's line over `ROUND_STERN_DEPTH_SHARE` of it, a quarter (judgement: her taffrail's
+1.55 m round in over 0.39 m, an arc of about 3.3 m radius), straight from the aftmost station to
+that corner and from the corner to the line; drawn on stations over the counter
+(`_counter_stations`), one at the corner of each height of the counter's points and the stern's
+line, and one at each rail point abaft the aftmost station, each from where the stern's line
+crosses its x up to the top of the side; the side read off them as the viewer draws it, straight
+between them at each height (`_counter_side`, `formHull`'s `hbAt`); the closure on the middle line,
+the stern round; under the counter's foot, and in every file giving none, as before. The served
+form carries the key (`api/queries.py`). Hers is the one file to file it: [[0.62, 2.02], [3.30,
+1.55]], Gwyn's stern view's 2.02 m at the wale (her step 1; Bil-D's 2.05) at the wale's middle at its
+after end (judgement on the height) and 1.55 m at the taffrail (her review), the counter's foot the
+water, marked `stand-in`; her `breadth_m` and `form.stern` notes say so.
+
+*Measured:* every ship file's served graph dumped before and after: the sixteen other files the
+same key for key, their stations point for point; hers four stations over her counter (x -11.393,
+-11.184, -10.800 and -10.524), her other 29 the same to the millimetre, the closure the same; her
+drawn displacement 214.9 t and `check`'s notes the same. Her drawn half-breadths, old beside new:
+
+| z (m) | x -10.3 | -10.7 | -11.0 | -11.2 | -11.41 | -11.6 |
+|---|---|---|---|---|---|---|
+| 0.62 | 1.35 to 2.02 | 0.61 to 1.32 | 0.05 to 0.12 | 0 | 0 | 0 |
+| 1.75 | 1.87 to 2.23 | 1.23 to 1.99 | 0.75 to 1.52 | 0.43 to 1.07 | 0.09 to 0.23 | 0 |
+| 2.25 | 1.87 to 2.19 | 1.31 to 1.99 | 0.88 to 1.83 | 0.60 to 1.68 | 0.31 to 0.87 | 0.04 to 0.11 |
+| 2.80 | 1.84 to 2.13 | 1.32 to 1.93 | 0.92 to 1.78 | 0.66 to 1.66 | 0.39 to 1.19 | 0.14 to 0.43 |
+| 3.26 (her rail there) | | | | | 0.45 to 1.46 | 0.22 to 0.70 |
+
+- **Her settee's block inside her rail:** the block, a fathom abaft her clew and abreast of it at x
+  -11.41, 1.21 m off her middle line, now stands 0.24 m inside her rail (1.45 m off it there) on
+  both tacks, where it stood 0.76 m outboard: the recorded departure `BLOCK_OFF_HER_SIDE_M` goes,
+  and the guard's rule for every other file, inside the rail, holds her too
+  (`tests/test_view_geometry.py`). The trim's block (the engine's, x -11.47, 1.57 m off) stands
+  outboard still, her side there 0.95 m off at the deck (old 0.31). The block is inside for a share
+  of 0.29 or less (0.03 m at 0.29; 0.01 m outboard at 0.30, 0.50 m at 0.50; measured in scratch).
+- **Her lights on her counter:** her three marks lie on her counter from x -11.23 to -11.65 (old
+  -10.87 to -11.53), within 0.95 m of her middle line as before (their bays within the band's 1.10,
+  each mark 0.6 of its bay), on her drawn face to 1.5 mm, her served stations' millimetres (old 0.02
+  mm). **The lights' row does not go, for the lead:** seen 0, 1, 1, 2, 3 and 3 at 0, 60, 90, 105,
+  135 and 180 degrees, before and after. The viewer faces a round stern's light by its place in its
+  band, not by the face it lies on (`client/projection.js`, `lightFigures`: outward (-1, y/hb, 0),
+  her outer two 34 degrees outboard of aft), so no drawn breadth moves it; `LIGHTS_SEEN_ABEAM`
+  {hers: 1} stays with its comment's cause put right. It goes with a viewer change, the light faced
+  by the drawn face it lies on: not this step's file, not built.
+- **Her report:** "her round stern drawn to its counter's half-breadths (counter_hb_m): at the
+  lights' middle height, 2.25 m, 0.99 m off the middle line 0.4 m inside the taffrail and 1.84 m
+  0.8 m inside" (old 0.35 and 0.91 m, "drawn closed to the middle line ... recorded, not drawn").
+- Her other viewer rows measured again and unmoved: her wale's chord (`CHORD_OFF_THE_SIDE_M`
+  0.103), her stern layered, her lines on the rail, her round-stern case's marks (now with her
+  counter: the case's docstring has the figures).
+
+**(13)(iii) "1 guns ready".** `freesail/orders/gunnery.py`: the word to fire a broadside with one
+gun ready says "1 gun ready to go as it bears."; two or more as before ("2 guns ready to go together
+as they bear."). Pinned in `tests/test_practice_orders.py` (new); no pin held the plural for one.
+
+**(13)(iv) Lying a-try names the staysails as they stand.** `LieATryScript._under_words`
+(`freesail/evolutions/scripts.py`; the lead's "yours"): the staysails standing as she lies a-try
+(`_staysails_set`: the jib-headed sails set of the file's staysails, storm staysails, storm canvas,
+head sails and lying-to staysails, her jibs hauled down) are "the staysails" where two or more
+stand, the one by its name, and none where none does, so that "and the staysails" is not said with
+none set (the lean built: the line names what is set and keeps its old words for two or more).
+Moved in the gale above: the *Neufchatel* "Lying a-try under the fore topsail, the mainsail and the
+fore storm staysail, the fore-and-aft foresail taken in, helm a-lee." (old "... and the staysails,
+..."), the two schooners "under the fore topsail and the fore staysail" (old "and the staysails"),
+the cutter "under the topsail and the foresail" (her fore staysail by its name; old "and the
+staysails"), each at the same tick; on the bilander's own gale (B4's script, scratch) "Lying a-try
+under the main topsail, helm a-lee." with her storm staysails not yet up (old "... and the
+staysails"). Pins: `tests/test_gale.py` (new: none, one and two).
+
+**(13)(v) "Taken in before the fore storm staysail is up" said as it waits.** `storm._ease_the_loaded`:
+where the take in it orders must wait for hands (the runner's `waiting_for`), the line says "The
+fore topmast staysail is to be taken in before the fore storm staysail is up: it is loaded near its
+rating.", the runner's own line beside it saying why it waits; begun, "taken in" as before. On the
+bilander's gale (B4's script) at 4,501 s, the one tick it was said, the new line. Pinned in
+`tests/test_gale.py` (new: both ways).
+
+**(1) Build-Ships §8:** `INTENT_RULED_ROWS` is the lead's ruling, the eight older rows keeping the
+intent's rules and every row added since (the four sub-types, the *Neufchatel*, the bilander and the
+74) sailing by its first role: an as-built paragraph in §8.1. **B5.4's derrick:** Ext §6.3's bullet
+"The vangs, ourses and derrick are not drawn" amended, the derrick drawn as a lift since B5.1, and
+its as-built line marked accepted.
+
+**Pins moved, old beside new** (each in its test's words): `tests/test_bilander.py` (her shares and
+the boy's rating, her muster, her quarters both fits, `CLOSE_HAULED_HELM` and the heave-to's line in
+20 kn, the forced round's dip, her sailed beam reach's helms, her report's stern line, the
+requests' sailed times in its docstring); `tests/test_neufchatel.py` (her bill's afterguard, her
+report's "(34 written)", her beat's carronades); `tests/test_view_geometry.py`
+(`BLOCK_OFF_HER_SIDE_M` gone, `LIGHTS_SEEN_ABEAM`'s comment, the round-stern case's and the lines'
+docstrings); in the slow tier, the captain's trials and the four whole logs, none. New: `tests/test_hull_form.py` (the counter's refusals, seven; the
+counter drawn), `tests/test_gale.py` (three), `tests/test_practice_orders.py` (one).
+
+**Found on the way, for the lead:** her settle in her tests (`_her_settle`) ends when her hands'
+work is done, not when she is steady, so her company's pace moves its helm figures by degrees (in 20
+kn it now ends with her yards at their limits, the last trim not ordered): the pins it carries are
+of a moment, not of her trim.
+
+**The suites, as run.** On the owner's machine, one at a time with nothing else running, `py -m
+pytest` with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` from the tree root,
+the package's branch at 35e33ad0 with this step's work uncommitted on it, each against its base (SW-1's
+final runs and `digests-final.json`, not run again).
+- **The generator,** `py tools/gen_ships.py` into scratch: seventeen of seventeen files byte for
+  byte as in `data/ships/`, the bilander's and the *Neufchatel*'s as this step writes them;
+  `py tools/check_viewer_guns.py`: clean.
+- **The slow candidates** (SW-1's 84-file list, `--slow -m slow`): 313 cases, **294 passed, 9
+  failed, 1 skipped, 9 xfailed** in 1,873.6 s. Test by test against the base: none only in one, no
+  outcome changed; the nine failures the base's, message for message (the three trials' digests,
+  the merchant passage's and the schooner's constants, the schooner's log of 767 lines, truths 77
+  to 79), the skip and the xfails the same.
+- **The captain's trials** (`--slow`): 4 passed, 3 failed, the machine's three digests
+  (8df0ab2beba93320, df5f02eb6e6ce68a, 8dac97a4c9bdfe43) as the base's: no trial's pin moves for
+  this step's reason.
+- **The four whole logs** (`log_digests.py`): all four as `digests-final.json`, line counts and
+  digests (the first action 497 lines, 84176c16104a2c67).
+- **The whole fast tier:** **7,074 passed, 1 failed, 2 skipped, 1 xfailed** in 2,012.4 s. Against
+  the base's 7,066 cases: only in this run the twelve new cases, all passing; none only in the base;
+  one changed outcome, `tests/test_in_world.py`'s library topic "catalogue" on a King's ship, failed
+  on this step's new comment in `data/evolutions/lie_a_try.yaml`, which the catalogue serves and
+  which said "package 75": the word taken out, `tests/test_in_world.py` and `tests/test_catalogue.py`
+  run again, 142 passed. Every other outcome the base's, the skips and the xfail message for message.
+- **ruff** check and format over the tree: clean (367 files). Every changed file is LF.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

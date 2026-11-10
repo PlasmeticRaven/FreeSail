@@ -512,7 +512,7 @@ def _form_entry(form: HullForm) -> dict[str, Any]:
             value = getattr(form.stern, key)
             if value is None or value == ():
                 continue
-            if key in ("galleries_m", "lights_m"):
+            if key in ("counter_hb_m", "galleries_m", "lights_m"):
                 stern[key] = [list(pt) for pt in value]
             elif key == "transom_hb_m":
                 stern[key] = list(value)
