@@ -756,3 +756,74 @@ def test_a_station_to_windward_of_her_fetch_is_filled_to_the_close_hauled_course
         far_off = units.rad_to_deg(units.wrap_pi(math.radians(far - wind_from)))
         assert abs(abs(far_off) - beat) < 1e-6, (bearing, far, beat)
     assert bearing_and_distance(w.position, b.position)[1] < 3.0 * units.CABLE
+
+
+# -- package 98, step 8: the set's last course kept in the world ------------------------------
+
+
+def _stations_of(w, sq) -> dict[str, tuple[float, float]]:
+    return {
+        m: (round(p.lat_deg, 7), round(p.lon_deg, 7)) for m, p in sorted(sq.stations(w).items())
+    }
+
+
+def _stations_every_ten_minutes(w, sq, hours: int = 3) -> list[dict[str, tuple[float, float]]]:
+    out = []
+    for _ in range(hours * 6):
+        w.run(600)
+        out.append(_stations_of(w, sq))
+    return out
+
+
+def test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses():
+    """Truth 7-460 (package 98, step 8; found by package 74, proven by the lead): the last
+    course a stopped commodore's set keeps is the World's own (`squadron_last_courses` on the
+    root World), so the same convoy scene made twice in one process, the second after the
+    first is dropped, its commodore hove to from the start, keeps the same stations every ten
+    minutes for an hour and the same count of lines; a stale course planted for every member
+    where the old module table (keyed `id(world)`) would have held it has no place to land;
+    and no module-level table of courses is left in `squadrons`."""
+    import gc
+
+    def stopped():
+        w, sq, harpy = convoy_world()
+        assert w.world_order('ship "Harpy": order heave to for a watch').data["result"] == "done"
+        return w, sq
+
+    w, sq = stopped()
+    first = (_stations_every_ten_minutes(w, sq, hours=1), len(w.log))
+    del w, sq
+    gc.collect()
+    w, sq = stopped()
+    old = getattr(Q, "_LAST_COURSE", None)  # the table before this step, where it stands
+    if isinstance(old, dict):
+        old.update({f"{id(w)}:{vid}": 17.0 for vid in sq.members})
+    assert (_stations_every_ten_minutes(w, sq, hours=1), len(w.log)) == first
+    assert not [k for k, v in vars(Q).items() if isinstance(v, dict) and "COURSE" in k]
+
+
+def test_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint(tmp_path):
+    """Truth 7-461 (package 98, step 8): a set whose commodore lies stopped, saved by a
+    checkpoint and resumed, keeps the same stations and the same count of lines over the
+    next hour as the run that was never interrupted, her head fallen off from her last
+    course: that course is in the checkpoint with the World (the old table was in none, so a
+    resumed game read her heading)."""
+    from freesail.core import replay
+
+    w, sq, harpy = convoy_world()
+    w.run(3600)
+    assert w.world_order('ship "Harpy": order heave to for a watch').data["result"] == "done"
+    w.run(600)
+    body = w.vessels.get(harpy.id)
+    assert float(body.speed_kn) < 0.6  # no way on her: her last course stands
+    # her head fallen off four points as she lies to, so that her heading is not her last
+    # course (a far body hove to keeps her head; the set's frame must not follow it)
+    body.heading_deg = (float(body.heading_deg) + 45.0) % 360.0
+    path = replay.write_checkpoint(w, tmp_path / "set.checkpoint")
+    _header, resumed = replay.read_checkpoint(path)
+    rsq = resumed.squadrons.of(harpy.id)  # the resumed World's own set, not this one's
+    assert rsq is not None and rsq is not sq
+    for world in (w, resumed):
+        world.run(3600)
+    assert _stations_of(resumed, rsq) == _stations_of(w, sq)
+    assert len(resumed.log) == len(w.log)
