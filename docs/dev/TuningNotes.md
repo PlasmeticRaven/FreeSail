@@ -22697,6 +22697,14 @@ brig-sloop's guns before SW-4), an eighth of her hull, guns, powder and shot, th
 of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
 seventh day.
 
+**The trunk merged at the step's boundary** (87f7fe8, a merge commit at dd12cba: the lead's
+records of runs 58 and 59, two lines of `docs/dev/M7-WorkPackages.md`): it met nothing. **A
+soft place of step 4's own mended here**: the test of the cap-full reply
+(`tests/test_far_action.py`) skipped itself if the cap woke the frigate in place of the cutter;
+the scene is the same at every run and the skip was never taken (no tier at step 4's tree
+skipped anything), and it is an assertion now ("the cap holds the cutter alone"). **Pins
+moved: none.**
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
