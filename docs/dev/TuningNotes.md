@@ -18048,6 +18048,198 @@ Junit and logs under `scratchpad/s7/run/`; the measurements `scratchpad/s7/tackq
 `tackq_new.json`. Not run: the whole fast tier, the slow tier beyond the above, the pace tier beyond
 the files' pace tests.
 
+### B7.d, numbering by deck (2026-11-11)
+
+**The step**, on the lead's word ((3) of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md`:
+"B7.d at the end of her window, both two-deckers together, on the lead's allotment of `parts.py` and
+`graph.py` after B3's merge, checked as Build §3.4"): Bel-D §5.2's numbering by deck and §12.1 item
+2's key, for her and the 64 together, in two commits; `freesail/ship/graph.py`, `freesail/ship/parts.py`
+and `tools/ships/indefatigable.py` allotted for the step, returned at its merge.
+
+- **Stage 0, laid inert** (its own commit): `"numbering"` appended to `ARMAMENT_KEYS`, `BY_DECK`
+  ("by deck") its one word, any other refused in words; `ArmamentSpec.numbering`, a plain None
+  default left out of the pickle while None; under it every broadside gun names a deck and a number
+  is one gun a side on each deck, the refusals in words naming the deck, else `(number, side)` as
+  before (`schema.py`); `Gun.by_deck`, a plain class default false and no field, left out of
+  `Gun.__getstate__` while false (`parts.py`). Proved behaviour-free by the stage-0 checker
+  (`scratchpad/s7/b7d/dig.py`, the hash seed and the rules' fingerprint held): the head before and
+  the change give 1,500 digests alike (every ship file's spec, crew and bill pickles and their state
+  keys, each file's Ship by the checkpoint's pickler, a World of each at tick 0 and after 120 ticks
+  and, armed, at quarters with the guns cast loose; the 41 shipped scenarios and the owner's 24; the
+  four kept saves loaded, run and pickled again); the head's 45 checkpoints, read by the head's code
+  and by the change and pickled again, alike; the generator's 18 files byte for byte.
+- **Her module and the 64's** (`tools/ships/bellerophon.py`, `tools/ships/indefatigable.py`): each
+  deck's pairs from No. 1 forward; each id re-keyed after `g.broadside_pair` by its deck
+  (`gun.lower.3.starboard`), the key keeping its place as the crew's does; `numbering: by deck` set
+  after `b.armament(...)`, the generator taking no such key (Bel-D §12.1), its words in the section's
+  note; the lower deck's note says the numbering. The razee's fits, note and file as before.
+- **The engine** (`ship/graph.py`, `ship/parts.py`, `crew/quarters.py`, `orders/gunnery.py`): the
+  ship sets `Gun.by_deck` on every gun of a fit whose armament says so; `Gun.pair_key`
+  `gun:<deck>:<n>` and `Gun.name` "No. 3 starboard gun of the lower deck" there (`Gun.of_deck`, the
+  deck's words `parts.DECK_SAID`, the `roundhouse` "the poop", which the beat's deck lines now share);
+  the quarters' parse sites read a crew's number from the key's last part and its deck from the
+  middle (`_crew_number`: the stations, the robbing order, the robbed words), a crew keeps its deck
+  where the guns are numbered by deck as where they stand on a lower deck, and a pair's line at the
+  muster says its deck; the orders take a number with its deck and refuse a bare number in words,
+  keyed on numbering by deck.
+
+**Judgement, said:** the razee is not renumbered. Bel-D §5.2 item 7 named "the 64 and the razee", and
+Indf §5.2 "both files then take it alike"; the lead's (3) is "both two-deckers together", and the razee
+has one gun deck, numbered on across as the frigate-36's. So her file is byte for byte and no ship of
+one gun deck numbers by deck. The number with its deck is keyed on numbering by deck: on the razee and
+every other file "No. 3 gun of the upper deck" names no gun, as before.
+
+**Their numbers, old beside new:**
+
+| Deck | Hers before | Hers after | The 64's before | The 64's after |
+|---|---|---|---|---|
+| lower | 1-14 | 1-14 | 1-13 | 1-13 |
+| upper | 15-28 | 1-14 | 14-26 | 1-13 |
+| quarterdeck | 29-35 | 1-7 | 27-31 | 1-5 |
+| forecastle | 36-37, the 1795 carronade 38 | 1-2, 3 | the 9s 32, the carronades of 1794 33 | 1, 2 |
+| roundhouse (the poop) | 39-41 | 1-3 | 34-36 (1794) | 1-3 |
+
+**The bytes, old beside new** (`py tools/gen_ships.py <scratch>`, `cmp`): `seventy-four.yaml` 5,721
+lines to 5,722, 388 changed and one added (her 234 ids, `gun.15.starboard` to `gun.upper.1.starboard`;
+the 150 numbers off her lower deck; four notes, the section's and the lower deck's in each fit; the key
+added, last in the armament); `sixty-four.yaml` 4,546 to 4,547, 223 changed and one added (136 ids, 84
+numbers, three notes; the key). The razee's and every other file byte for byte.
+
+**The served words, old beside new** (`scratchpad/s7/b7d/probe.py` and `lines.py`, seed 7, the
+brains' world off the Lizard, on the stage-0 head and this step's tree; compared through each gun's
+place, `cmp_probe.py`):
+
+- **A gun's name:** her "No. 15 starboard gun" is "No. 1 starboard gun of the upper deck", her "No. 8
+  starboard gun" "No. 8 starboard gun of the lower deck", her "No. 39 starboard gun" "No. 1 starboard
+  gun of the poop"; the 64's "No. 14 larboard gun" "No. 1 larboard gun of the upper deck": every
+  gun of their five fits (74, 82, 78; 64, 72), the viewer's served name and its words with it ("No. 1
+  larboard gun of the upper deck, a long 18-pounder"). The shut port's line: "The No. 15 larboard
+  gun's port is shut; the sea is at its sill." to "The No. 1 larboard gun of the upper deck's port is
+  shut; the sea is at its sill."
+- **The beat** at muster on each of the five fits: its said line the same; every crew the same men man
+  for man, the same men wanted, the same deck and the same order (37, 41 and 39 crews; 32 and 36),
+  keyed `gun:upper:1` for `gun:15`; the divisions the same (their pickles byte for byte, the crews'
+  moved by their keys); the muster's pair lines "Nos. 28 guns: manned." to "Nos. 14 guns of the upper
+  deck: manned.", the lower deck's "Nos. 1 guns: manned." to "Nos. 1 guns of the lower deck: manned.".
+- **Robbing**, heeled 12.5 degrees by hand and engaged to starboard: the same men in the same order in
+  every case; with sixty wanted the line the same ("from the lower deck, Nos. 7 to 11, their ports
+  shut" hers, "Nos. 5 to 10" the 64's: the lower deck's numbers did not move); with no side engaged hers
+  "from the poop, Nos. 39 to 41, the upper deck, Nos. 26 to 28, and the quarterdeck, Nos. 32 to 35" to
+  "from the poop, Nos. 1 to 3, the upper deck, Nos. 12 to 14, and the quarterdeck, Nos. 4 to 7", the
+  64's "from the upper deck, Nos. 22 to 26, and the quarterdeck, Nos. 29 to 31" to "Nos. 9 to 13 ...
+  Nos. 3 to 5"; past every gun hers "..., the poop, Nos. 39 to 41, the upper deck, Nos. 15 to 28, the
+  quarterdeck, Nos. 29 to 35, the forecastle, Nos. 36 to 38, ..." to "..., the poop, Nos. 1 to 3, the
+  upper deck, Nos. 1 to 14, the quarterdeck, Nos. 1 to 7, the forecastle, Nos. 1 to 3, ...".
+- **The orders**, at quarters with the guns cast loose and a mark engaged: "fire No. 3 gun", which fired
+  her lower deck's two No. 3s ("No. 3 starboard gun and No. 3 larboard gun to fire as soon as ready."),
+  is refused: "She has a No. 3 gun on the lower deck, the upper deck, the quarterdeck, the forecastle
+  and the poop: name the deck, as 'fire No. 3 gun of the lower deck'." (on her 1793 and 1812 fits and
+  the 64's of 1784 the lower deck, the upper deck and the quarterdeck; on the 64's of 1794 those and
+  the poop); "fire No. 8 starboard gun" ("No. 8 starboard gun to fire as soon as ready.") is refused
+  naming the lower and the upper deck; "fire No. 20 gun", her upper deck's sixth before, names no gun
+  of hers; "fire No. 3 starboard gun of the lower deck", "fire the lower deck's No. 8" and "fire No. 2
+  starboard gun on the poop", refused before as naming no gun, fire as named ("No. 3 starboard gun of
+  the lower deck to fire as soon as ready."). The refusal of words that name no gun gives her example
+  with its deck ("'fire No. 3 gun of the lower deck'"). Through `guns_named` (the director's and the world orders' slots), of
+  42 phrases on her default fit the eight bare numbers that named guns name none, the fifteen numbers
+  with a deck name that deck's (none before), the ten decks' words what they named, the nine others
+  none before and after; her other fits and the 64's the same by what each carries (seven to eight
+  bare numbers, eleven to fifteen with a deck).
+- **Nothing of the other nine armed files moved** (the brig, the cutter's two fits, the frigate-36, the
+  hermaphrodite brig, the merchant brig, the privateer's two, the bilander, the razee's two): every gun's
+  name and crew key, the served names, the 42 phrases, the beat, the crews man for man, the divisions,
+  their pickles, the marines to arms and back, robbing, the fire orders' replies and the dumb show,
+  record for record the same.
+- **The pickles and checkpoints** (the stage-0 checker again, this step's tree against the head before
+  stage 0, the hash seed and the rules' fingerprint held): of 1,500 digests 26 moved, all of the two
+  files: each one's spec pickled (protocols 2 to 5, its deep copy, its round trip), its Ship's
+  checkpoint, its Worlds' checkpoints at tick 0, after 120 ticks and at quarters, and the log's digest
+  at quarters (its data's gun ids; its lines, kind and words, the same); and the owner's two scenarios
+  of the 64 ("64-gun-in-Torbay", "64-gun-schooner-tender"), their Worlds' checkpoints at tick 0 and
+  after 30 (their pickles, dicts, lines and logs the same). Every other leaf the same: the sixteen other
+  files, the 63 other scenarios, the four kept saves. The head's 45 checkpoints, hers and the 64's among
+  them, read by this step's code and pickled again give the head's bytes: a save of either from before
+  keeps the numbering it was saved with (its guns' ids, no `by_deck`).
+- **The viewer's checker** (`tools/check_viewer_guns.py`): clean, as before; its 34 lines that name a
+  gun by id, 26 hers and 8 the 64's, moved by the id alone (her "note gun.29.starboard: over the rail
+  by the side's test, ..." to "note gun.quarterdeck.1.starboard: ...").
+
+**Pins moved, old beside new:**
+
+- `tests/test_bellerophon.py`: `NUMBERS` (the upper 15-28 to 1-14, the quarterdeck 29-35 to 1-7, the
+  forecastle 36-38 to 1-3, the poop 39-41 to 1-3); her numbering test, named "numbered on across her
+  decks" to "numbered by deck", its ids `gun.{n}.{side}` to `gun.{deck}.{n}.{side}` and the 1812 fit's
+  empty places ("forecastle", 38) and ("roundhouse", 41) to 3 and 3; robbing by deck's shut crews read
+  from `gun:lower:7` for `gun:7`, its lines the same; robbing past every gun's line (above); the
+  phrases' row "No. 8 starboard gun" on her file, one gun, to "No. 8 starboard gun of the lower deck",
+  one gun, with two rows for the razee beside it (her bare number one gun, a number with its deck none);
+  stage 0's "no file carries the key" to "only the two two-deckers carry it", every other gun's name and
+  key held in the old forms.
+- `tests/test_indefatigable.py` (B1's), her fits' test: `(number, side)` one gun to `(deck, number,
+  side)` one gun on the 64, each of her decks from No. 1 and each id its deck's; the razee's as before.
+
+**New** (`tests/test_bellerophon.py`, "Numbering by deck"): stage 0's key and its refusals; a gun
+numbered by deck named and crewed by its deck (eight cases, hers and the 64's); her quarters' words by
+deck, the crews' keys and `_crew_number`; a number said with its deck (22 phrases on her, the 64 and the
+frigate-36); a bare number refused naming the decks, one with its deck fired.
+
+**Bisected:** stage 0 moves nothing (its digests); every move above is the step's, between the stage-0
+head and this commit, by the same scripts on both trees (the stage-0 head archived to a scratch tree).
+
+### For the lead (B7.d)
+
+- **The shut port's line** (`combat/guns.py`, `Battery._drop_named`, not B7's): "The No. 3 larboard
+  gun of the lower deck's port is shut; the sea is at its sill." reads as English but heavily; "The
+  port of No. 3 larboard gun of the lower deck is shut" is the mend, one line in `combat/`. Not built.
+- **The marines back from their muskets** (`Quarters.marines_to_guns`): the short crews are made up
+  carronades first and then by their keys as text, so on her 1812 fit and the 64's two fits the same
+  crews take the same number of marines as before, but other marines (her 16, the 64's 84: measured
+  after `marines_to_arms` at muster). Any order by deck and number would move them again; left as the
+  key's text, said.
+- **A bare number in the director's and the world orders' slots** (`world/orders.py`, by
+  `guns_named`): on the two two-deckers it finds no gun, and the slot's own words refuse it; the
+  gunnery order's refusal naming the decks is the gun deck's alone.
+- **The razee**, not renumbered (above): Bel-D §5.2 item 7 and Indf §5.2 named her; the lead's word was
+  the two two-deckers. Renumbering her quarterdeck and forecastle by deck would be a few lines of
+  `indefatigable.py`, her file's ids and numbers moving as the 64's did. Not built.
+
+### The suites, as run (B7.d)
+
+Once, on the final tree (the package's branch at 412658a9, stage 0 committed and the step
+uncommitted), from the tree root with `py`, one run at a time with nothing else running, the tree
+asserted first on `sys.path`, each pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`;
+the bases not re-run. Stage 0 was checked on its own before its commit (above).
+
+- **(a) The touched files' slow tests** (`--slow -m slow` over `test_bellerophon`, `test_indefatigable`
+  and `test_lee_ports`): **9 passed, 2 failed** (77 s), against `b7/final-slow.xml`'s same files and
+  B7.c's run: truth 7-196's floor clause failed at 475 ticks a second (478 at the base, 481 at B7.c), as
+  known; its crewed clause on S2's 6.2087 miles, as at B7.c to the fourth place (passed at the base,
+  moved by B7.c, not by this step); her tack at quarters beside her cleared tack, B7.c's, passed.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (261 s), the three on the known digests
+  (8df0ab2beba93320, df5f02eb6e6ce68a, 8dac97a4c9bdfe43), the base's messages.
+- **(c) The four whole logs** (`log_digests.py`): all four the same as `b2/digests-final.json`.
+- **(d) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`), hers and the 64's this step's; `tools/check_viewer_guns.py` clean (above).
+- **(e) The digests** (above): 26 of 1,500 moved, all of the two files; the head's 45 checkpoints
+  read alike.
+- **(f) The fast tier of the 35 files the step reaches** (`test_bellerophon`, `test_indefatigable`,
+  `test_practice`, `test_practice_orders`, `test_dumb_show`, `test_in_world`,
+  `test_bill_marines_and_flag`, `test_lee_ports`, `test_profile`, `test_ships`, `test_view_action`,
+  `test_viewer_action`, `test_view_geometry`, `test_check_viewer_guns`, `test_magazine`,
+  `test_pivot_gun`, `test_fight`, `test_filling`, `test_bilander`, `test_neufchatel`,
+  `test_world_orders`, `test_known_truths`, `test_subtypes`, `test_prizes`, `test_driver`,
+  `test_hull_form`, `test_profiles`, `test_signals`, `test_powder_orders`, `test_crews`,
+  `test_captive`, `test_flags`, `test_health`, `test_stand_by_words_and_action_flow`, `test_hands`):
+  **2,715 passed** (1,647 s). Against `b7/final-fast.xml`'s same files (2,673): no outcome changed;
+  two cases gone by their names (her numbering test renamed, the phrases' row moved: above), 44 new,
+  B7.c's six and this work's 38 (stage 0's and the step's), passed.
+- **(g) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+
+Junit, logs and the measurements under `scratchpad/s7/b7d/` (`run/`, `s0/`, `probe-old.json`,
+`probe-new.json`, `cmp-probe2.txt`, `lines-old.json`, `lines-new.json`; the stage-0 head's tree
+`old/`). Not run: the whole fast tier, the slow tier beyond the three files, the pace tier beyond the
+files' pace tests.
+
 ## Table No. 29's charges (package 75, SW-1) (2026-11-09)
 
 **The step.** `docs/design/Build-Ships.md` §10 whole, its §2.2 and §16.1 rows, and the

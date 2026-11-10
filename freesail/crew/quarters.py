@@ -43,6 +43,13 @@ lower deck's from that end, its line naming the decks. A ship with no `lower` de
 pickles as before. The stations by deck are the thirds of the length on each deck, unchanged: no
 period source quarters the parts of the ship by deck (Bel-D §6.4 item 3).
 
+**Numbered by deck** (package 75, B7.d: Bel-D §5.2, the lead's answer (3) of 2026-10-29): on a ship
+whose file numbers her guns by deck (the 74 and the 64), a pair's crew is keyed by its deck and
+number (`gun:lower:3`, `Gun.pair_key`), read here as `gun:3` is, its number the key's last part and
+its deck the middle (`_crew_number`); each crew keeps its deck, and the numbers said are each deck's
+own ("the upper deck, Nos. 11 to 14"). Every other ship's keys, and so its stations, its robbing
+and its words, are as before.
+
 Nothing here draws randomness.
 """
 
@@ -52,7 +59,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from freesail.crew.model import Crew, Rating, Sailor, Station, number_words
-from freesail.ship.parts import Gun
+from freesail.ship.parts import DECK_SAID, Gun
+from freesail.ship.schema import DECK_WORDS
 
 __all__ = [
     "CARPENTER",
@@ -93,16 +101,9 @@ FORWARD_SHARE = 1.0 / 6.0
 # first of all where the sea has shut their ports (Bel-D §6.4 item 4).
 LOWER = "lower"
 # The decks in the beat's lines, from below, and their words (`schema.DECK_WORDS`; the
-# `roundhouse` is the poop: Bel-D §3.5).
+# `roundhouse` is the poop: Bel-D §3.5; the words `parts.DECK_SAID`, a gun's name's since B7.d).
 _DECK_ORDER = ("lower", "middle", "upper", "quarterdeck", "forecastle", "roundhouse")
-_DECK_SAID = {
-    "lower": "the lower deck",
-    "middle": "the middle deck",
-    "upper": "the upper deck",
-    "quarterdeck": "the quarterdeck",
-    "forecastle": "the forecastle",
-    "roundhouse": "the poop",
-}
+_DECK_SAID = DECK_SAID
 
 
 @dataclass
@@ -423,9 +424,9 @@ class Quarters:
         """'the swivels', 'the bow chasers', 'the guns, Nos. 7 to 9' for the crews robbed; on a
         ship whose crews keep their deck, the numbered crews by deck in the order given, 'the
         lower deck, Nos. 4 to 10, their ports shut, and the upper deck, Nos. 26 to 28'
-        (package 75, B7.b)."""
-        numbers = sorted(int(k[len(GUN_PREFIX) :]) for k in keys if k[len(GUN_PREFIX) :].isdigit())
-        others = [k for k in keys if not k[len(GUN_PREFIX) :].isdigit()]
+        (package 75, B7.b), each deck's own numbers on a ship numbered by deck (B7.d)."""
+        numbers = sorted(n for k in keys if (n := _crew_number(k)) is not None)
+        others = [k for k in keys if _crew_number(k) is None]
         parts: list[str] = []
         kinds: set[str] = set()
         for k in others:
@@ -506,7 +507,10 @@ class Quarters:
         lines = list(self._beat_lines())
         for gc in self.crews.values():
             guns = [self.ship.guns[g] for g in gc.guns if g in self.ship.guns]
-            name = guns[0].name if len(guns) == 1 else f"Nos. {guns[0].number} guns"
+            # a pair's name, with its deck on a ship numbered by deck (package 75, B7.d)
+            name = (
+                guns[0].name if len(guns) == 1 else f"Nos. {guns[0].number} guns{guns[0].of_deck}"
+            )
             at = len(gc.hands)
             state = "manned" if at >= gc.wanted else f"{at} of {gc.wanted}" if at else "unmanned"
             lines.append(f"{_cap(name)}: {state}.")
@@ -539,8 +543,19 @@ def _gun_order(g: Gun) -> tuple[int, float, str]:
 
 def _keeps_its_deck(guns: list[Gun]) -> bool:
     """Whether the crews keep their guns' deck: a ship whose broadside guns stand on a `lower`
-    deck (package 75, B7.b, keyed so; the lead's answer (2) of 2026-10-29)."""
-    return any(g.place == "broadside" and g.deck == LOWER for g in guns)
+    deck (package 75, B7.b, keyed so; the lead's answer (2) of 2026-10-29), or are numbered by
+    deck, so that a number is said with its deck (B7.d; the same two ships today)."""
+    return any(g.place == "broadside" and (g.deck == LOWER or g.by_deck) for g in guns)
+
+
+def _crew_number(key: str) -> int | None:
+    """The number of a broadside pair's crew from its key: `gun:3`, or on a ship numbered by
+    deck (package 75, B7.d) `gun:lower:3`, the key's last part the number and its middle the deck
+    (Bel-D §5.2 item 5); None for a chaser's, a swivel's or a pivot's (`gun:<the gun's id>`)."""
+    deck, _, n = key[len(GUN_PREFIX) :].rpartition(":")
+    if n.isdigit() and (not deck or deck in DECK_WORDS):
+        return int(n)
+    return None
 
 
 def _deck_rank(deck: str | None) -> int:
@@ -553,16 +568,16 @@ def _decks_words(parts: list[str], crews: list[GunCrew], shut: frozenset[str]) -
     shut, and the upper deck, Nos. 26 to 28'; the chasers and swivels (`parts`) first."""
     groups: list[tuple[str | None, bool, list[int]]] = []
     for gc in crews:
-        n = gc.key[len(GUN_PREFIX) :]
-        if not n.isdigit():
+        n = _crew_number(gc.key)
+        if n is None:
             continue
         tag = (gc.deck, gc.key in shut)
         for deck, is_shut, numbers in groups:
             if (deck, is_shut) == tag:
-                numbers.append(int(n))
+                numbers.append(n)
                 break
         else:
-            groups.append((gc.deck, gc.key in shut, [int(n)]))
+            groups.append((gc.deck, gc.key in shut, [n]))
     said = []
     for deck, is_shut, numbers in groups:
         numbers.sort()
@@ -600,7 +615,7 @@ def _stations_for(gc: GunCrew, length_m: float, has_marines: bool) -> list[Stati
     # ch. XX): after the deck stations, in the order of the masts
     tops = [Station.FORE_TOP, Station.MAIN_TOP, Station.MIZZEN_TOP]
     fc, w, ag, m = Station.FORECASTLE, Station.WAISTERS, Station.AFTERGUARD, Station.MARINES
-    if not key.isdigit():
+    if _crew_number(gc.key) is None:
         if "swivel" in key:
             return [w, ag, fc, m, *tops]
         if "stern" in key:
@@ -622,7 +637,7 @@ def _rob_order(
     key = gc.key[len(GUN_PREFIX) :]
     if "swivel" in key:
         return (0, 0, 0.0, key)
-    if not key.isdigit():
+    if _crew_number(gc.key) is None:
         return (1, 0, 0.0, key)
     # by deck (package 75, B7.b): the lower deck's crews whose port is shut first, the other
     # decks' next, the lower deck's last; constant on a ship whose crews keep no deck

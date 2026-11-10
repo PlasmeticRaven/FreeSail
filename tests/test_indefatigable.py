@@ -1090,11 +1090,28 @@ def test_her_fits_guns_and_crews_are_the_periods(sixty_four, razee):
         ("long", 12, "forecastle"): 2,
     }
     assert sorted(g.place for g in carried.guns if g.pounder == 12) == ["bow", "bow"]
+    # the 64 numbered by deck since package 75's B7.d, with the 74 (Bel-D §5.2; her armament's
+    # `numbering`), each deck from No. 1 and each id its deck's; the razee on across her decks as
+    # the frigate-36, a number one gun a side, as before
+    assert (arm64.numbering, arm.numbering) == ("by deck", None)
     for ship in (sixty_four, razee):
         profile = ship.hull.spec.profile
+        by_deck = ship.spec.armament.numbering is not None
         for fit in ship.spec.armament.fits.values():
-            numbers = [(g.number, g.side) for g in fit.guns if g.place == "broadside"]
+            numbers = [
+                (g.deck if by_deck else None, g.number, g.side)
+                for g in fit.guns
+                if g.place == "broadside"
+            ]
             assert len(numbers) == len(set(numbers)), fit.name
+            if by_deck:
+                firsts = {d: min(n for dd, n, _ in numbers if dd == d) for d, _, _ in numbers}
+                assert set(firsts.values()) == {1}, (fit.name, firsts)
+                assert all(
+                    g.id == f"gun.{g.deck}.{g.number}.{g.side}"
+                    for g in fit.guns
+                    if g.place == "broadside"
+                ), fit.name
             for g in fit.guns:
                 key = (g.kind, int(g.pounder))
                 assert g.weight_cwt == ADYE_CWT[key], (fit.name, g.id)
@@ -1104,7 +1121,8 @@ def test_her_fits_guns_and_crews_are_the_periods(sixty_four, razee):
                     abs(g.x_m - x) <= 0.01 and abs(g.height_m - z) <= 0.01
                     for x, z, _hb in ports_of(profile, g.deck)
                 ), (fit.name, g.id)
-            # numbered from forward on each deck, and on across her decks (Indf §5.2)
+            # numbered from forward on each deck (Indf §5.2): by deck on the 64 (B7.d), on across
+            # her decks on the razee
             side = sorted(
                 (g for g in fit.guns if g.place == "broadside" and g.side == "starboard"),
                 key=lambda g: g.number,

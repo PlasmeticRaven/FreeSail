@@ -964,6 +964,36 @@ alike"). It is offered to the lead as step B7.d. What it needs, each keyed so no
    window, on the lead's word, with both two-deckers; if the lead declines the 64's renumbering, both
    wait for a later package together, so that the two two-deckers never number two ways.
 
+*As built (B7.d, 2026-11-11), on the lead's word ((3) of the answers to her §17.2 in
+`docs/dev/M7-WorkPackages.md`: "B7.d at the end of her window, both two-deckers together, on the
+lead's allotment of `parts.py` and `graph.py` after B3's merge, checked as Build §3.4"), in two
+commits: stage 0 (§12.1 item 2's key and class default, inert, proved by digests) and the step. Her
+guns and the 64's are numbered by deck, each deck's pairs from No. 1 forward: hers the lower 1-14 (as
+before), the upper 1-14 (15-28 before), the quarterdeck 1-7 (29-35), the forecastle 1-3 (36-38) and
+the poop 1-3 (39-41); the 64's the lower 1-13 (as before), the upper 1-13 (14-26), the quarterdeck 1-5
+(27-31), the forecastle 1 and in 1794 2 (32, 33) and the roundhouse 1-3 (34-36). Items 1 to 6 as
+listed: her module and `tools/ships/indefatigable.py` set `numbering: by deck` after
+`b.armament(...)`, its words in the section's note, and re-key each id after `g.broadside_pair`
+(`gun.lower.3.starboard`); `ship/graph.py` sets `Gun.by_deck` on every gun of a fit so numbered;
+`Gun.pair_key` is `gun:<deck>:<n>` and `Gun.name` "No. 3 starboard gun of the lower deck" (the
+`roundhouse` "the poop", `parts.DECK_SAID`, which the beat's deck lines now share); the quarters'
+parse sites read the key's last part as the number and its middle as the deck (`_crew_number`), and a
+pair's line at the muster says its deck ("Nos. 14 guns of the upper deck: manned."); the orders take a
+number with its deck ("No. 3 starboard gun of the lower deck", "No. 3 starboard on the lower deck",
+"the lower deck's No. 3", "No. 2 gun of the poop"), keyed on numbering by deck, and refuse a bare
+number in words naming the decks that have one ("She has a No. 3 gun on the lower deck, the upper
+deck and the quarterdeck: name the deck, as 'fire No. 3 gun of the lower deck'."). **The razee is
+not renumbered** (item 7 named her): she has one gun deck, and the lead's (3) is "both two-deckers";
+she numbers on across her decks as the frigate-36, her file byte for byte, so that no ship of one gun
+deck numbers by deck. **Measured old beside new** (TuningNotes, "B7.d, numbering by deck"): on her
+three fits and the 64's two, at the beat (seed 7) every crew takes the same men man for man in the
+same order, the divisions and the beat's lines the same; robbing takes the same crews in the same
+order, its words each deck's own numbers; every phrase that named guns on every other armed file
+names the same. **Left, for the lead:** the shut port's line reads "The No. 3 larboard gun of the
+lower deck's port is shut" (`combat/guns.py`, not hers); the marines back from their muskets go to
+the same crews in the same numbers, but which marine to which crew follows the crews' keys as text,
+so on her 1812 fit and the 64's two other marines go (`Quarters.marines_to_guns`).*
+
 ### 5.3 Patterns, weights and crews (answer 12)
 
 | Piece | Pattern and weight | Crew | Source |
@@ -1663,6 +1693,21 @@ note. The generator stays untouched.
 loads; every pickle of the eight, the 64 and the razee byte-identical to the head before; a diff
 read for any reach beyond the list. **Plainly:** if the owner chooses the flag on her muster (§17.1
 item 4), stage 0c also lays one optional crew key, inert and left out of the pickle while empty.
+
+*As built, item 2 (B7.d's stage 0, 2026-11-11, its own commit before the step, on the lead's word
+(3) to her §17.2): in `freesail/ship/schema.py`, `"numbering"` appended to `ARMAMENT_KEYS`,
+`BY_DECK` ("by deck") its one word, any other refused in words; `ArmamentSpec.numbering`, a plain
+None default, left out of the pickled state while None; under it every broadside gun of every fit
+names a deck, refused in words where one does not, and a number is one gun a side on each deck, the
+refusal naming the deck ("has two No. 1 guns to starboard on the upper deck"), else as before; in
+`freesail/ship/parts.py`, `Gun.by_deck`, a plain class default false and no field, left out of
+`Gun.__getstate__` while false, set by nothing. Checked by the stage-0 checker's digests: the
+generator's 18 files byte for byte; 1,500 digests alike, the head before and the change, with the
+hash seed and the rules' fingerprint held (every ship file's spec, crew and bill pickles, her Ship's
+checkpoint, each file's World at tick 0, after 120 ticks and at quarters; the 41 shipped scenarios
+and the owner's 24; the four kept saves); the head's 45 checkpoints read by both and pickled again,
+alike; the fast tests of the four files it reaches as the base. The key is written by her module and
+the 64's at the step (§5.2's as-built note), so that the eight and the razee keep `(number, side)`.*
 
 ### 12.2 What she takes from others (the contracts she assumes)
 

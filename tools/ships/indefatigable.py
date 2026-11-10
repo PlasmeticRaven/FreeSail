@@ -4074,6 +4074,17 @@ ARMAMENT_NOTE = (
     "1804 (pp. 72, 155) and their crews by Falconer 1780 and Douglas 1829 (D31); the magazine's "
     "allowance by kind and calibre. Every figure's source is in tools/ships/indefatigable.py."
 )
+# The 64's guns numbered by deck (package 75, B7.d: the 74's design, Bel-D §5.2 item 7, and the
+# lead's answer (3) to her §17.2, both two-deckers together): each deck's pairs from No. 1 forward,
+# the lower 1-13, the upper 1-13, the quarterdeck 1-5, the forecastle's 9s 1 and its carronades of
+# 1794 2, the roundhouse's 1-3; before it on across her decks (the upper 14-26, the quarterdeck
+# 27-31, the forecastle 32-33, the roundhouse 34-36). The razee's one gun deck keeps her numbers.
+NUMBERING = "by deck"
+NUMBERING_NOTE = (
+    " Numbered by deck, each deck's pairs from No. 1 forward as the period numbered each deck "
+    "(Bel §7.2), so her gun is said with its deck, as the 74's is; the `numbering` below says so "
+    "(Bel-D §5.2; package 75, B7.d)."
+)
 
 
 def piece(kind, pounder):
@@ -4093,9 +4104,11 @@ def ports_from_forward(profile, deck):
     return [(x, sill) for x, sill, _ in reversed(profile["ports_m"][deck])]
 
 
-def pairs(ports, deck, first, kind, pounder, note):
+def pairs(ports, deck, first, kind, pounder, note, by_deck=False):
     """Broadside pairs on `ports`, numbered on from `first` from forward (Indf §5.2), each gun's
-    x and height its port's x and sill, its crew the period's (§5.3); the note on the first."""
+    x and height its port's x and sill, its crew the period's (§5.3); the note on the first. The
+    64's `by_deck` (package 75, B7.d, with the 74: Bel-D §5.2 item 7): each deck from No. 1, each
+    id re-keyed after the call by its deck, `gun.lower.3.starboard`, as the 74's are."""
     cwt, crew = piece(kind, pounder)
     out = []
     for i, (x, sill) in enumerate(ports):
@@ -4111,6 +4124,8 @@ def pairs(ports, deck, first, kind, pounder, note):
             round_to=0.01,
         )
         for gun, _ in made:
+            if by_deck:
+                gun["id"] = f"gun.{deck}.{gun['number']}.{gun['side']}"  # the key keeps its place
             gun["crew"] = crew  # reassigned, so the key keeps its place (Indf §5.2)
         out += made
     return out
@@ -4149,39 +4164,43 @@ def sixty_four_fits(profile):
                 "The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun "
                 "of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill "
                 "to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side "
-                "bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her "
-                "decks, as the frigate-36 numbers hers; the period numbered each deck from No. 1 "
-                "(Bel §7.2).",
+                "bears (Falconer 1780, QUARTERS; D31 (c)). Numbered by deck from forward, each "
+                "deck from No. 1 as the period numbered each deck (Bel §7.2) and the 74 numbers "
+                "hers (Bel-D §5.2; package 75, B7.d).",
+                by_deck=True,
             )
             + pairs(
                 upper,
                 "upper",
-                14,
+                1,
                 "long",
                 18,
                 "The upper deck's twenty-six long 18-pounders: the 9 ft gun of 40 cwt (Adye 1804 "
                 "p. 155), the 74's pattern (Bel §13.1 answer 12; judgement for hers); nine men to "
                 "the pair (Falconer 1780, QUARTERS).",
+                by_deck=True,
             )
             + pairs(
                 quarterdeck,
                 "quarterdeck",
-                27,
+                1,
                 "long",
                 9,
                 "The quarterdeck's ten long 9-pounders in its five foremost ports a side, the "
                 "sixth, under the roundhouse, empty: the 7 ft 6 in gun of 24 cwt 2 qr (Adye 1804 "
                 "p. 155; the 74's pattern, judgement for hers); six men to the pair (Falconer "
                 "1780).",
+                by_deck=True,
             )
             + pairs(
                 forecastle[:1],
                 "forecastle",
-                32,
+                1,
                 "long",
                 9,
                 "The forecastle's two long 9-pounders, one a side, firing over its rail (no port "
                 "is drawn on 1407F: Indf §3.3); six men to the pair (Falconer 1780).",
+                by_deck=True,
             )
         )
 
@@ -4207,24 +4226,26 @@ def sixty_four_fits(profile):
             + pairs(
                 forecastle[1:],
                 "forecastle",
-                33,
+                2,
                 "carronade",
                 24,
                 "The forecastle's two 24-pounder carronades of 1794, one a side (Indf "
                 "§5.1, judgement), firing over the rail: 13 cwt, the 3 ft 7 1/2 in carronade (Adye "
                 "1804 p. 72); four men to the pair, its captain, two privates and a provider "
                 "(Douglas 1829 art. 136).",
+                by_deck=True,
             )
             + pairs(
                 roundhouse,
                 "roundhouse",
-                34,
+                1,
                 "carronade",
                 18,
                 "The roundhouse's six 18-pounder carronades of 1794, three a side "
                 "(Indf §5.1; the roundhouse unmeasured but its rail and the line under it, "
                 "judgement), firing over the rail: 9 cwt, the 3 ft 3 in carronade (Adye 1804 p. "
                 "72); four men to the pair (Douglas 1829 art. 136).",
+                by_deck=True,
             ),
             "The class's guns from 1794: those of 1784 with 2 x 24-pounder carronades on the "
             "forecastle and 6 x 18-pounder carronades on the roundhouse, 72 pieces (Winfield "
@@ -4369,7 +4390,10 @@ def default_guns(p, fits):
 
 def armament(b, p, fits):
     """Her fits and their magazines (Indf §5), the charges Table No. 29's and their note the
-    shared one (SW-1), the 64's exercise note a two-decker's."""
+    shared one (SW-1), the 64's exercise note a two-decker's; the 64's guns numbered by deck
+    (package 75, B7.d): her armament's `numbering` set after the call, the generator's own taking
+    no such key (Bel-D §12.1), its words in her section's note. The razee numbers hers on across
+    her decks, as the frigate-36, her one gun deck's pairs Nos. 1-13."""
     decks = DECKS_OF[p.key]
     exercise = g.exercise_allowance(UPPER_DECK_GUNS, decks=decks)
     rounds = {"long": g.KINGS_ROUNDS, "carronade": g.KINGS_ROUNDS, "swivel": g.SWIVEL_ROUNDS}
@@ -4386,6 +4410,8 @@ def armament(b, p, fits):
             b.armament_notes[("magazine", name, "exercise_charges")] = (
                 period.TWO_DECKS_EXERCISE_NOTE
             )
+        b.doc["armament"]["numbering"] = NUMBERING
+        b.armament_notes[("section",)] = ARMAMENT_NOTE + NUMBERING_NOTE
 
 
 # ---------------------------------------------------------------------------

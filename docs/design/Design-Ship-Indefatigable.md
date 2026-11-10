@@ -700,6 +700,23 @@ with this sail (§16, risk 6).
   No. 1 on each deck waits for a deck-aware pair key, the 74's design to propose, and both
   files then take it alike.
 
+*As built for the 64 (package 75, B7.d, 2026-11-11; the 74's design, Design-Ship-Bellerophon.md
+§5.2 and its as-built note; the lead's answer (3) to her §17.2, "both two-deckers together", and
+the allotment of `tools/ships/indefatigable.py` to B7 for the step alone, returned at its merge):
+the 64 is numbered by deck, each deck's pairs from No. 1 forward, the 74's key: the lower 1-13 (as
+before), the upper 1-13 (14-26 before), the quarterdeck 1-5 (27-31), the forecastle's 9s 1 (32) and
+its 24-pounder carronades of 1794 2 (33), the roundhouse's carronades 1-3 (34-36). `pairs` takes
+`by_deck` and re-keys each id after the call, `gun.lower.3.starboard`, the key keeping its place as
+the crew's does; `armament` writes `numbering: by deck` after `b.armament(...)` and the words in her
+section's note; her lower deck's note says so. Her file moves by those lines alone: 136 ids, the 84
+numbers off her lower deck, three notes and the key (`docs/dev/TuningNotes.md`, "B7.d, numbering by
+deck"). Her guns are named with their deck ("No. 1 starboard gun of the upper deck"), her crews keyed
+by it (`gun:upper:1`), and the same men man the same crews at the beat. **The razee is not
+renumbered:** she has one gun deck, her pairs Nos. 1-13 on it and her upper works numbered on, as the
+frigate-36's, and the lead's word was the two two-deckers; her file is byte for byte as it was, so
+that "both files then take it alike" above stands for the 64 and the 74, not the razee. B1's test of
+her fits' numbers moved with it (`(deck, number, side)` one gun on the 64).*
+
 ### 5.3 Patterns, weights and crews
 
 | Piece | Pattern and weight | Crew | Note |

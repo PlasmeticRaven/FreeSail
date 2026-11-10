@@ -17,7 +17,8 @@ handling as tuned (Bel-D §9), her sailed checks against the Vanguard's log and 
 reports, truth 7-194, a cruiser and a King's frigate meeting her, her round trip under her rules
 captain and her checkpoint at quarters; step 6 her bill by deck (B7.b, Bel-D §6.4, with §12.5's
 checks on every armed file) and truths 7-195 and 7-196; step 7 her tack at quarters (B7.c, Bel-D
-§6.7), with the 64's and the brig's.
+§6.7), with the 64's and the brig's, and her guns numbered by deck with the 64's (B7.d, Bel-D §5.2,
+its stage 0's key and its names, keys, quarters and orders, with §12.5's checks).
 
 The figures quoted as measured were measured at seed 7 on the owner's machine (Windows 11,
 2026-11-10); the bands are the sources' or judgement where they say so.
@@ -507,13 +508,15 @@ def test_she_shifts_her_mizen_for_the_driver_and_back_each_to_its_end(drawing):
 
 FIT_1793, FIT_1795, FIT_1812 = "arrogant class 1793", "arrogant class 1795", "as the bellona 1812"
 CWT_KG = 50.80234544  # the hundredweight of 112 lb
-# her places from forward, by deck, numbered on across her decks (Bel-D §5.2)
+# her places from forward, numbered by deck (Bel-D §5.2; B7.d, her road's step 7), each deck from
+# No. 1; old beside new, on across her decks before B7.d: the lower 1-14 as now, the upper 15-28,
+# the quarterdeck 29-35, the forecastle 36-38 and the poop 39-41
 NUMBERS = {
     "lower": range(1, 15),
-    "upper": range(15, 29),
-    "quarterdeck": range(29, 36),
-    "forecastle": range(36, 39),
-    "roundhouse": range(39, 42),
+    "upper": range(1, 15),
+    "quarterdeck": range(1, 8),
+    "forecastle": range(1, 4),
+    "roundhouse": range(1, 4),
 }
 
 
@@ -545,13 +548,18 @@ def test_her_three_fits_hold_their_sources_pieces_and_broadsides():
     assert round(867.0 / frigate, 2) == 2.06
 
 
-def test_every_gun_stands_on_its_decks_triple_numbered_on_across_her_decks():
+def test_every_gun_stands_on_its_decks_triple_numbered_by_deck():
     """Bel-D §5.2: each gun on its port's triple, or its place over the rail, to the centimetre,
-    its deck named (Build-Ships.md §4.4); numbered from forward and on across her decks, the lower
-    deck first (lower 1-14, upper 15-28, quarterdeck 29-35, the forecastle's ports 36-37 and the
-    1795 carronade's place 38, the poop 39-41), a place keeping its number in every fit. The lower
-    deck's lowest port, L7 at x -2.15 m, carries her pair No. 8 (7-195's port)."""
-    profile = load_spec(SEVENTY_FOUR).hull.profile
+    its deck named (Build-Ships.md §4.4); numbered by deck from forward (B7.d), each deck from No. 1
+    (lower 1-14, upper 1-14, quarterdeck 1-7, the forecastle's ports 1-2 and the 1795 carronade's
+    place 3, the poop 1-3), her armament's `numbering` saying so, each id its deck's, a place
+    keeping its number in every fit. The lower deck's lowest port, L7 at x -2.15 m, carries her
+    pair No. 8 (7-195's port). Old beside new: numbered on across her decks before B7.d, the lower
+    deck first (upper 15-28, quarterdeck 29-35, forecastle 36-38, poop 39-41), her ids
+    `gun.8.starboard`."""
+    spec = load_spec(SEVENTY_FOUR)
+    assert spec.armament.numbering == "by deck"
+    profile = spec.hull.profile
     places = {}
     for fit in (FIT_1793, FIT_1795, FIT_1812):
         for g in _guns(fit):
@@ -559,7 +567,7 @@ def test_every_gun_stands_on_its_decks_triple_numbered_on_across_her_decks():
             assert (g.x_m, g.height_m) in triples, (fit, g.id)
             assert g.number in NUMBERS[g.deck], (fit, g.id)
             assert places.setdefault((g.deck, g.number), g.x_m) == g.x_m, (fit, g.id)
-            assert g.id == f"gun.{g.number}.{g.side}"
+            assert g.id == f"gun.{g.deck}.{g.number}.{g.side}"
     for deck, numbers in NUMBERS.items():
         xs = [places[(deck, n)] for n in numbers if (deck, n) in places]
         assert xs == sorted(xs, reverse=True), deck  # from forward
@@ -569,7 +577,7 @@ def test_every_gun_stands_on_its_decks_triple_numbered_on_across_her_decks():
     # aftmost empty
     assert set(places) == {(d, n) for d, ns in NUMBERS.items() for n in ns}
     empty = {(g.deck, g.number) for g in _guns(FIT_1812)} ^ set(places)
-    assert empty == {("forecastle", 38), ("roundhouse", 41)}
+    assert empty == {("forecastle", 3), ("roundhouse", 3)}
 
 
 def test_her_pieces_take_their_patterns_weights_and_the_periods_crews():
@@ -1722,7 +1730,9 @@ def test_robbing_by_deck_takes_the_shut_lower_deck_first_and_the_lower_deck_last
 
     w, _said, q = _beaten(path, heel_deg=heel, engaged="starboard")
     shut = q._shut_crews()
-    assert {int(k[len("gun:") :]) for k in shut} <= set(shut_numbers) and shut
+    # the crews' keys by deck since B7.d (`gun:lower:7`; `gun:7` before)
+    assert {k.rsplit(":", 1)[0] for k in shut} == {"gun:lower"}
+    assert {int(k.rsplit(":", 1)[1]) for k in shut} <= set(shut_numbers) and shut
     assert all(q.crews[k].deck == LOWER for k in shut)
     order = sorted(q.crews.values(), key=lambda gc: _rob_order(gc, True, shut))
     ranks = [(gc.key in shut, gc.deck == LOWER) for gc in order]
@@ -1747,12 +1757,15 @@ def test_robbing_past_every_gun_says_the_marines_last_with_one_and():
     """The review's mend (2026-11-10): sail work wanting more hands than every crew holds, the
     line by deck ends with the marines as its last item and one "and" ('..., the lower deck, Nos.
     1 to 3 and 12 to 14, and the marines'), where before it read '..., and the lower deck, ...,
-    and the marines' (measured). The 64, whose bill keeps no marines, ends on her lower deck."""
+    and the marines' (measured). The 64, whose bill keeps no marines, ends on her lower deck. Each
+    deck's numbers its own since B7.d, the same crews in the same order (measured man for man);
+    old beside new: '..., the poop, Nos. 39 to 41, the upper deck, Nos. 15 to 28, the
+    quarterdeck, Nos. 29 to 35, the forecastle, Nos. 36 to 38, ...'."""
     _w, _said, q = _beaten(SEVENTY_FOUR, heel_deg=12.5, engaged="starboard")
     _freed, said = q.lend(400, False, True)
     assert said == (
-        "from the lower deck, Nos. 4 to 11, their ports shut, the poop, Nos. 39 to 41, the upper "
-        "deck, Nos. 15 to 28, the quarterdeck, Nos. 29 to 35, the forecastle, Nos. 36 to 38, the "
+        "from the lower deck, Nos. 4 to 11, their ports shut, the poop, Nos. 1 to 3, the upper "
+        "deck, Nos. 1 to 14, the quarterdeck, Nos. 1 to 7, the forecastle, Nos. 1 to 3, the "
         "lower deck, Nos. 1 to 3 and 12 to 14, and the marines"
     )
 
@@ -1825,7 +1838,9 @@ def test_a_deck_named_in_an_order_names_its_broadside_guns(path, words, deck, si
         (FRIGATE, "the lower deck", 0),
         (RAZEE, "the poop", 0),
         (SEVENTY_FOUR, "the quarterdeck", 0),
-        (SEVENTY_FOUR, "No. 8 starboard gun", 1),
+        (SEVENTY_FOUR, "No. 8 starboard gun of the lower deck", 1),
+        (RAZEE, "No. 8 starboard gun", 1),
+        (RAZEE, "No. 8 starboard gun of the upper deck", 0),
         ("data/ships/privateer-schooner.yaml", "the long Tom", 1),
         ("data/ships/cutter.yaml", "the upper deck", 6),
     ],
@@ -1834,7 +1849,11 @@ def test_the_words_that_named_guns_before_name_the_same_and_a_bare_place_none(pa
     """§12.5: every phrase `guns_named` answered before answers the same (the tests' own phrases
     and the module's, re-run on every file before B7.b and after: none moved, measured); the
     quarterdeck and the forecastle said bare are places of the ship and name no gun, as before;
-    a deck a ship has not names none."""
+    a deck a ship has not names none. Her No. 8 is said with its deck since B7.d (her guns
+    numbered by deck; "No. 8 starboard gun", one gun before, names none now: the next tests); on
+    the razee, numbered on across her decks, a bare number names her gun as before and a number
+    with a deck none, as before (B7.d's words are keyed on numbering by deck: measured on every
+    file without the key, every phrase the same)."""
     from freesail.orders.gunnery import guns_named
 
     assert len(guns_named(load_ship(path), words)) == n
@@ -2102,30 +2121,234 @@ def test_the_numbering_key_is_read_left_out_of_the_pickle_unset_and_refused_in_w
         _numbered("on across", upper)
 
 
-def test_no_file_carries_the_numbering_key_and_no_gun_is_numbered_by_deck():
-    """B7.d's stage 0, laid inert: no committed file gives the armament's `numbering`, so every
-    armament reads None and pickles as before it; `Gun.by_deck` is a plain class default, false on
-    every gun of every fit of every file and in no gun's pickled state; a gun pickled before it
-    reads false."""
+# The two two-deckers numbered by deck (B7.d; the lead's answer (3): both together); every other
+# armed file, the razee among them, numbered on across her decks as before
+NUMBERED_BY_DECK = (SEVENTY_FOUR, SIXTY_FOUR)
+
+
+def test_only_the_two_deckers_carry_the_numbering_key_and_every_other_gun_is_as_it_was():
+    """B7.d (§12.5: "every pair key, gun name and order of the eight unchanged (no file carries the
+    key)"): the 74's and the 64's armaments give `numbering: by deck` and every gun of their fits
+    is numbered by deck, pickled so; no other file gives it, so every other armament reads None and
+    pickles as before it, and every gun of every fit of theirs is false, in no gun's pickled
+    state, its name and its crew's key the forms they had (`No. 3 starboard gun`, `gun:3`; a
+    chaser's `gun:<its id>`). `Gun.by_deck` is a plain class default, no field; a gun pickled
+    before it reads false."""
     import dataclasses
+    import re
 
     from freesail.ship.graph import Ship
     from freesail.ship.parts import Gun
 
     assert "by_deck" not in {f.name for f in dataclasses.fields(Gun)}
+    carry = set()
     for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
         spec = load_spec(path)
         if spec.armament is None:
             continue
-        assert spec.armament.numbering is None, path.name
-        assert "numbering" not in spec.armament.__getstate__(), path.name
+        by_deck = spec.armament.numbering is not None
+        if by_deck:
+            carry.add(f"data/ships/{path.name}")
+            assert spec.armament.numbering == "by deck"
+        assert ("numbering" in spec.armament.__getstate__()) is by_deck, path.name
         for fit in spec.armament.fits:
             for gun in Ship(spec, fit).guns.values():
-                assert gun.by_deck is False and "by_deck" not in gun.__getstate__(), gun.id
+                assert gun.by_deck is by_deck and ("by_deck" in gun.__getstate__()) is by_deck
+                if by_deck or gun.place != "broadside":
+                    continue
+                assert re.fullmatch(rf"No\. {gun.number} {gun.side} gun", gun.name), gun.name
+                assert gun.pair_key == f"gun:{gun.number}", gun.id
+    assert carry == set(NUMBERED_BY_DECK)
     gun = Gun(id="gun.1.starboard", cls="long", rating_kn=0.0)
     back = Gun.__new__(Gun)
     back.__dict__.update(gun.__getstate__())
     assert back.by_deck is False
+
+
+@pytest.mark.parametrize(
+    "path, fit, gid, name, key",
+    [
+        (
+            SEVENTY_FOUR,
+            FIT_1795,
+            "gun.lower.8.starboard",
+            "No. 8 starboard gun of the lower deck",
+            "gun:lower:8",
+        ),
+        (
+            SEVENTY_FOUR,
+            FIT_1795,
+            "gun.upper.14.larboard",
+            "No. 14 larboard gun of the upper deck",
+            "gun:upper:14",
+        ),
+        (
+            SEVENTY_FOUR,
+            FIT_1795,
+            "gun.quarterdeck.7.starboard",
+            "No. 7 starboard gun of the quarterdeck",
+            "gun:quarterdeck:7",
+        ),
+        (
+            SEVENTY_FOUR,
+            FIT_1795,
+            "gun.forecastle.3.larboard",
+            "No. 3 larboard gun of the forecastle",
+            "gun:forecastle:3",
+        ),
+        (
+            SEVENTY_FOUR,
+            FIT_1795,
+            "gun.roundhouse.1.starboard",
+            "No. 1 starboard gun of the poop",
+            "gun:roundhouse:1",
+        ),
+        (
+            SIXTY_FOUR,
+            "ardent class 1784",
+            "gun.upper.1.starboard",
+            "No. 1 starboard gun of the upper deck",
+            "gun:upper:1",
+        ),
+        (
+            SIXTY_FOUR,
+            "ardent class 1794",
+            "gun.forecastle.2.larboard",
+            "No. 2 larboard gun of the forecastle",
+            "gun:forecastle:2",
+        ),
+        (
+            SIXTY_FOUR,
+            "ardent class 1794",
+            "gun.roundhouse.3.starboard",
+            "No. 3 starboard gun of the poop",
+            "gun:roundhouse:3",
+        ),
+    ],
+)
+def test_a_gun_numbered_by_deck_is_named_and_crewed_by_its_deck(path, fit, gid, name, key):
+    """Bel-D §5.2 items 2 to 4 (B7.d): her module and the 64's re-key each id by its deck; the gun
+    named with its deck, the `roundhouse` the poop (`parts.DECK_SAID`), its crew's key by deck and
+    number. Old beside new: her `gun.15.starboard` "No. 15 starboard gun", `gun:15`, is the upper
+    deck's No. 1 now; the 64's upper deck 14-26 is 1-13, her quarterdeck 27-31 1-5, her forecastle
+    32-33 1-2 and her roundhouse 34-36 1-3; the lower decks' numbers as they were."""
+    ship = load_ship(path, fit=fit)
+    gun = ship.guns[gid]
+    assert gun.by_deck and (gun.name, gun.pair_key) == (name, key)
+    assert gun.of_deck == name[name.index(" of ") :]
+
+
+def test_her_quarters_say_each_decks_numbers_man_for_man_as_before():
+    """B7.d at the beat (§12.5: "the 64's and the razee's old beside new"): her crews, keyed by
+    deck, take the same men man for man as before the step, the same divisions and the same lines
+    (measured on her three fits and the 64's two, by the beat's every crew mapped old to new); the
+    muster's pair names say the deck ("Nos. 14 guns of the upper deck: manned.", "Nos. 28 guns"
+    before), and robbing says each deck's own numbers, the same crews robbed in the same order
+    ("from the poop, Nos. 1 to 3, the upper deck, Nos. 12 to 14, and the quarterdeck, Nos. 4 to 7",
+    "Nos. 39 to 41 ... Nos. 26 to 28 ... Nos. 32 to 35" before)."""
+    from freesail.crew.quarters import _crew_number
+
+    _w, said, q = _beaten(SEVENTY_FOUR)
+    assert said.text.startswith("Beat to quarters! Quarters: 41 gun crews manned, the trimmers 55")
+    lines = q.describe()
+    assert "Nos. 14 guns of the upper deck: manned." in lines
+    assert "Nos. 3 guns of the poop: manned." in lines
+    assert all(_crew_number(k) is not None and k.count(":") == 2 for k in q.crews)
+    assert {k.split(":")[1] for k in q.crews} == set(NUMBERS)
+    w, _said, q = _beaten(SEVENTY_FOUR, heel_deg=12.5, engaged="starboard")
+    w.ship.extra["battery"].engaged = None
+    _freed, said = q.lend(60, False, True)
+    assert said == (
+        "from the poop, Nos. 1 to 3, the upper deck, Nos. 12 to 14, and the quarterdeck, Nos. 4 "
+        "to 7"
+    )
+    assert _crew_number("gun:7") == 7 and _crew_number("gun:chaser.bow.starboard") is None
+    assert _crew_number("gun:lower:7") == 7 and _crew_number("gun:orlop:7") is None
+
+
+@pytest.mark.parametrize(
+    "path, words, n",
+    [
+        (SEVENTY_FOUR, "No. 3 starboard gun of the lower deck", 1),
+        (SEVENTY_FOUR, "No. 3 gun of the lower deck", 2),
+        (SEVENTY_FOUR, "No. 3 on the upper deck", 2),
+        (SEVENTY_FOUR, "the lower deck's No. 3", 2),
+        (SEVENTY_FOUR, "the lower deck's No. 3 larboard gun", 1),
+        (SEVENTY_FOUR, "lower-deck No. 3", 2),
+        (SEVENTY_FOUR, "No. 3 gun of the main deck", 2),
+        (SEVENTY_FOUR, "No. 3 gun of the gun deck", 2),
+        (SEVENTY_FOUR, "the quarterdeck's No. 7", 2),
+        (SEVENTY_FOUR, "No. 1 gun of the forecastle", 2),
+        (SEVENTY_FOUR, "No. 2 gun of the poop", 2),
+        (SEVENTY_FOUR, "the poop's No. 2 starboard carronade", 1),
+        (SEVENTY_FOUR, "No. 9 gun of the quarterdeck", 0),
+        (SEVENTY_FOUR, "No. 3 gun", 0),
+        (SEVENTY_FOUR, "No. 3 starboard gun", 0),
+        (SEVENTY_FOUR, "the upper deck", 28),
+        (SIXTY_FOUR, "No. 13 starboard gun of the upper deck", 1),
+        (SIXTY_FOUR, "No. 2 gun of the forecastle", 0),
+        (SIXTY_FOUR, "No. 1 gun of the forecastle", 2),
+        (SIXTY_FOUR, "No. 26 starboard gun", 0),
+        (FRIGATE, "No. 3 gun of the upper deck", 0),
+        (FRIGATE, "No. 3 gun", 2),
+    ],
+)
+def test_a_number_is_said_with_its_deck_on_a_ship_numbered_by_deck(path, words, n):
+    """Bel-D §5.2 item 6 (B7.d): on a ship numbered by deck a number names her guns with its deck,
+    "No. 3 starboard gun of the lower deck" (her gun's own name), "No. 3 on the upper deck", "the
+    lower deck's No. 3", "No. 2 gun of the poop", the deck in a deck's words (the main deck the
+    upper, the gun deck her lowest with guns); a bare number names none (the 64's carronades of
+    1794 are her forecastle's No. 2 in that fit alone). A deck's words name its guns as before. On
+    a ship numbered on across her decks a bare number names hers as before and a number with a
+    deck none, as before."""
+    from freesail.orders.gunnery import guns_named
+
+    ship = load_ship(path)
+    ids = guns_named(ship, words)
+    assert len(ids) == n, (words, ids)
+    assert len({ship.guns[g].deck for g in ids}) == (1 if n else 0), (words, ids)
+
+
+def test_a_bare_number_is_refused_naming_the_decks_and_one_with_its_deck_fires():
+    """Bel-D §5.2 item 6 (B7.d) through the order, at quarters with her guns cast loose and a mark
+    engaged: "fire No. 3 gun" is refused in words naming the decks that have a No. 3 (her default
+    fit: all five), "fire No. 8 starboard gun" naming her two gun decks, and the refusal of words
+    that name no gun gives the example with its deck; "fire No. 3 starboard gun of the lower deck"
+    and "fire the lower deck's No. 8" fire as named. Old beside new: before B7.d "fire No. 3 gun"
+    fired her lower deck's two No. 3s and "fire No. 8 starboard gun" her lower deck's No. 8; a
+    number with a deck was refused as naming no gun."""
+    from freesail.combat.guns import battery_of
+
+    w = _cast_loose()
+    w.submit("engage a mark four cables on the starboard beam")
+    said = w.submit("fire No. 3 gun")
+    assert said.kind == "order.rejected", said.text
+    assert said.text == (
+        "Order not carried out ('fire No. 3 gun'): She has a No. 3 gun on the lower deck, the "
+        "upper deck, the quarterdeck, the forecastle and the poop: name the deck, as 'fire No. 3 "
+        "gun of the lower deck'."
+    )
+    said = w.submit("fire No. 8 starboard gun")
+    assert said.text.endswith(
+        "She has a No. 8 starboard gun on the lower deck and the upper deck: name the deck, as "
+        "'fire No. 8 starboard gun of the lower deck'."
+    )
+    said = w.submit("fire No. 20 gun")
+    assert "'fire No. 3 gun of the lower deck'" in said.text and "names no gun of hers" in said.text
+    assert battery_of(w.ship).single == []
+    said = w.submit("fire No. 3 starboard gun of the lower deck")
+    assert said.kind == "guns.fire", said.text
+    assert said.text == "No. 3 starboard gun of the lower deck to fire as soon as ready."
+    said = w.submit("fire the lower deck's No. 8")
+    assert said.text == (
+        "No. 8 starboard gun of the lower deck and No. 8 larboard gun of the lower deck to fire as "
+        "soon as ready."
+    )
+    assert battery_of(w.ship).single == [
+        "gun.lower.3.starboard",
+        "gun.lower.8.starboard",
+        "gun.lower.8.larboard",
+    ]
 
 
 # ---------------------------------------------------------------------------

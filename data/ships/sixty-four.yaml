@@ -2881,7 +2881,7 @@ crew:
     small_arms: 39
     # The boarders by the bill, a quarter of her seamen told off from the guns' crews (Luce 1884 ch. XX; judgement, the shared rule), with the marines, who board with the bayonet.
     boarders: 88
-# The armament (spec M7 7; package 70; docs/design/Design-Ship-Indefatigable.md §5): the guns as parts of the graph by their place, in her fits, each on its port of the hull's profile to the centimetre with its deck named (Build-Ships.md §4.4); their weights by Adye 1804 (pp. 72, 155) and their crews by Falconer 1780 and Douglas 1829 (D31); the magazine's allowance by kind and calibre. Every figure's source is in tools/ships/indefatigable.py.
+# The armament (spec M7 7; package 70; docs/design/Design-Ship-Indefatigable.md §5): the guns as parts of the graph by their place, in her fits, each on its port of the hull's profile to the centimetre with its deck named (Build-Ships.md §4.4); their weights by Adye 1804 (pp. 72, 155) and their crews by Falconer 1780 and Douglas 1829 (D31); the magazine's allowance by kind and calibre. Every figure's source is in tools/ships/indefatigable.py. Numbered by deck, each deck's pairs from No. 1 forward as the period numbered each deck (Bel §7.2), so her gun is said with its deck, as the 74's is; the `numbering` below says so (Bel-D §5.2; package 75, B7.d).
 armament:
   default: ardent class 1784
   fits:
@@ -2891,8 +2891,8 @@ armament:
         Warships in the Age of Sail 1793-1817, p. 99, the Ardent class; Adye 1804 pp. 72 and 155, the
         pieces; Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136), the crews
       guns:
-      # The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her decks, as the frigate-36 numbers hers; the period numbered each deck from No. 1 (Bel §7.2).
-      - id: gun.1.starboard
+      # The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered by deck from forward, each deck from No. 1 as the period numbered each deck (Bel §7.2) and the 74 numbers hers (Bel-D §5.2; package 75, B7.d).
+      - id: gun.lower.1.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -2903,7 +2903,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.1.larboard
+      - id: gun.lower.1.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -2914,7 +2914,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.2.starboard
+      - id: gun.lower.2.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -2925,7 +2925,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.2.larboard
+      - id: gun.lower.2.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -2936,7 +2936,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.3.starboard
+      - id: gun.lower.3.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -2947,7 +2947,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.3.larboard
+      - id: gun.lower.3.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -2958,7 +2958,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.4.starboard
+      - id: gun.lower.4.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -2969,7 +2969,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.4.larboard
+      - id: gun.lower.4.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -2980,7 +2980,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.5.starboard
+      - id: gun.lower.5.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -2991,7 +2991,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.5.larboard
+      - id: gun.lower.5.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3002,7 +3002,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.6.starboard
+      - id: gun.lower.6.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3013,7 +3013,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.6.larboard
+      - id: gun.lower.6.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3024,7 +3024,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.7.starboard
+      - id: gun.lower.7.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3035,7 +3035,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.7.larboard
+      - id: gun.lower.7.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3046,7 +3046,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.8.starboard
+      - id: gun.lower.8.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3057,7 +3057,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.8.larboard
+      - id: gun.lower.8.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3068,7 +3068,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.9.starboard
+      - id: gun.lower.9.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3079,7 +3079,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.9.larboard
+      - id: gun.lower.9.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3090,7 +3090,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.10.starboard
+      - id: gun.lower.10.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3101,7 +3101,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.10.larboard
+      - id: gun.lower.10.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3112,7 +3112,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.11.starboard
+      - id: gun.lower.11.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3123,7 +3123,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.11.larboard
+      - id: gun.lower.11.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3134,7 +3134,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.12.starboard
+      - id: gun.lower.12.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3145,7 +3145,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.12.larboard
+      - id: gun.lower.12.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3156,7 +3156,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.13.starboard
+      - id: gun.lower.13.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3167,7 +3167,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.13.larboard
+      - id: gun.lower.13.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3179,286 +3179,286 @@ armament:
         weight_cwt: 49.5
         deck: lower
       # The upper deck's twenty-six long 18-pounders: the 9 ft gun of 40 cwt (Adye 1804 p. 155), the 74's pattern (Bel §13.1 answer 12; judgement for hers); nine men to the pair (Falconer 1780, QUARTERS).
-      - id: gun.14.starboard
+      - id: gun.upper.1.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 14
+        number: 1
         side: starboard
         x_m: 18.27
         height_m: 3.84
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.14.larboard
+      - id: gun.upper.1.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 14
+        number: 1
         side: larboard
         x_m: 18.27
         height_m: 3.84
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.15.starboard
+      - id: gun.upper.2.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 15
+        number: 2
         side: starboard
         x_m: 14.88
         height_m: 3.75
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.15.larboard
+      - id: gun.upper.2.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 15
+        number: 2
         side: larboard
         x_m: 14.88
         height_m: 3.75
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.16.starboard
+      - id: gun.upper.3.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 16
+        number: 3
         side: starboard
         x_m: 11.47
         height_m: 3.68
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.16.larboard
+      - id: gun.upper.3.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 16
+        number: 3
         side: larboard
         x_m: 11.47
         height_m: 3.68
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.17.starboard
+      - id: gun.upper.4.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 17
+        number: 4
         side: starboard
         x_m: 8.08
         height_m: 3.62
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.17.larboard
+      - id: gun.upper.4.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 17
+        number: 4
         side: larboard
         x_m: 8.08
         height_m: 3.62
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.18.starboard
+      - id: gun.upper.5.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 18
+        number: 5
         side: starboard
         x_m: 4.71
         height_m: 3.58
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.18.larboard
+      - id: gun.upper.5.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 18
+        number: 5
         side: larboard
         x_m: 4.71
         height_m: 3.58
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.19.starboard
+      - id: gun.upper.6.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 19
+        number: 6
         side: starboard
         x_m: 1.34
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.19.larboard
+      - id: gun.upper.6.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 19
+        number: 6
         side: larboard
         x_m: 1.34
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.20.starboard
+      - id: gun.upper.7.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 20
+        number: 7
         side: starboard
         x_m: -2.52
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.20.larboard
+      - id: gun.upper.7.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 20
+        number: 7
         side: larboard
         x_m: -2.52
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.21.starboard
+      - id: gun.upper.8.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 21
+        number: 8
         side: starboard
         x_m: -5.86
         height_m: 3.59
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.21.larboard
+      - id: gun.upper.8.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 21
+        number: 8
         side: larboard
         x_m: -5.86
         height_m: 3.59
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.22.starboard
+      - id: gun.upper.9.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 22
+        number: 9
         side: starboard
         x_m: -9.24
         height_m: 3.63
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.22.larboard
+      - id: gun.upper.9.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 22
+        number: 9
         side: larboard
         x_m: -9.24
         height_m: 3.63
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.23.starboard
+      - id: gun.upper.10.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 23
+        number: 10
         side: starboard
         x_m: -12.63
         height_m: 3.69
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.23.larboard
+      - id: gun.upper.10.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 23
+        number: 10
         side: larboard
         x_m: -12.63
         height_m: 3.69
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.24.starboard
+      - id: gun.upper.11.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 24
+        number: 11
         side: starboard
         x_m: -16.02
         height_m: 3.76
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.24.larboard
+      - id: gun.upper.11.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 24
+        number: 11
         side: larboard
         x_m: -16.02
         height_m: 3.76
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.25.starboard
+      - id: gun.upper.12.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 25
+        number: 12
         side: starboard
         x_m: -19.32
         height_m: 3.85
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.25.larboard
+      - id: gun.upper.12.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 25
+        number: 12
         side: larboard
         x_m: -19.32
         height_m: 3.85
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.26.starboard
+      - id: gun.upper.13.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 26
+        number: 13
         side: starboard
         x_m: -22.56
         height_m: 3.95
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.26.larboard
+      - id: gun.upper.13.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 26
+        number: 13
         side: larboard
         x_m: -22.56
         height_m: 3.95
@@ -3466,110 +3466,110 @@ armament:
         weight_cwt: 40.0
         deck: upper
       # The quarterdeck's ten long 9-pounders in its five foremost ports a side, the sixth, under the roundhouse, empty: the 7 ft 6 in gun of 24 cwt 2 qr (Adye 1804 p. 155; the 74's pattern, judgement for hers); six men to the pair (Falconer 1780).
-      - id: gun.27.starboard
+      - id: gun.quarterdeck.1.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 27
+        number: 1
         side: starboard
         x_m: -5.88
         height_m: 5.52
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.27.larboard
+      - id: gun.quarterdeck.1.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 27
+        number: 1
         side: larboard
         x_m: -5.88
         height_m: 5.52
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.28.starboard
+      - id: gun.quarterdeck.2.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 28
+        number: 2
         side: starboard
         x_m: -8.78
         height_m: 5.55
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.28.larboard
+      - id: gun.quarterdeck.2.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 28
+        number: 2
         side: larboard
         x_m: -8.78
         height_m: 5.55
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.29.starboard
+      - id: gun.quarterdeck.3.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 29
+        number: 3
         side: starboard
         x_m: -11.65
         height_m: 5.6
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.29.larboard
+      - id: gun.quarterdeck.3.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 29
+        number: 3
         side: larboard
         x_m: -11.65
         height_m: 5.6
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.30.starboard
+      - id: gun.quarterdeck.4.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 30
+        number: 4
         side: starboard
         x_m: -14.54
         height_m: 5.66
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.30.larboard
+      - id: gun.quarterdeck.4.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 30
+        number: 4
         side: larboard
         x_m: -14.54
         height_m: 5.66
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.31.starboard
+      - id: gun.quarterdeck.5.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 31
+        number: 5
         side: starboard
         x_m: -17.86
         height_m: 5.75
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.31.larboard
+      - id: gun.quarterdeck.5.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 31
+        number: 5
         side: larboard
         x_m: -17.86
         height_m: 5.75
@@ -3577,22 +3577,22 @@ armament:
         weight_cwt: 24.5
         deck: quarterdeck
       # The forecastle's two long 9-pounders, one a side, firing over its rail (no port is drawn on 1407F: Indf §3.3); six men to the pair (Falconer 1780).
-      - id: gun.32.starboard
+      - id: gun.forecastle.1.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 32
+        number: 1
         side: starboard
         x_m: 18.41
         height_m: 5.66
         crew: 6
         weight_cwt: 24.5
         deck: forecastle
-      - id: gun.32.larboard
+      - id: gun.forecastle.1.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 32
+        number: 1
         side: larboard
         x_m: 18.41
         height_m: 5.66
@@ -3634,8 +3634,8 @@ armament:
         Warships in the Age of Sail 1793-1817, p. 99, the Ardent class; Adye 1804 pp. 72 and 155, the
         pieces; Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136), the crews
       guns:
-      # The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her decks, as the frigate-36 numbers hers; the period numbered each deck from No. 1 (Bel §7.2).
-      - id: gun.1.starboard
+      # The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered by deck from forward, each deck from No. 1 as the period numbered each deck (Bel §7.2) and the 74 numbers hers (Bel-D §5.2; package 75, B7.d).
+      - id: gun.lower.1.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3646,7 +3646,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.1.larboard
+      - id: gun.lower.1.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3657,7 +3657,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.2.starboard
+      - id: gun.lower.2.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3668,7 +3668,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.2.larboard
+      - id: gun.lower.2.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3679,7 +3679,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.3.starboard
+      - id: gun.lower.3.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3690,7 +3690,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.3.larboard
+      - id: gun.lower.3.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3701,7 +3701,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.4.starboard
+      - id: gun.lower.4.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3712,7 +3712,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.4.larboard
+      - id: gun.lower.4.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3723,7 +3723,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.5.starboard
+      - id: gun.lower.5.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3734,7 +3734,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.5.larboard
+      - id: gun.lower.5.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3745,7 +3745,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.6.starboard
+      - id: gun.lower.6.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3756,7 +3756,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.6.larboard
+      - id: gun.lower.6.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3767,7 +3767,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.7.starboard
+      - id: gun.lower.7.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3778,7 +3778,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.7.larboard
+      - id: gun.lower.7.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3789,7 +3789,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.8.starboard
+      - id: gun.lower.8.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3800,7 +3800,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.8.larboard
+      - id: gun.lower.8.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3811,7 +3811,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.9.starboard
+      - id: gun.lower.9.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3822,7 +3822,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.9.larboard
+      - id: gun.lower.9.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3833,7 +3833,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.10.starboard
+      - id: gun.lower.10.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3844,7 +3844,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.10.larboard
+      - id: gun.lower.10.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3855,7 +3855,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.11.starboard
+      - id: gun.lower.11.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3866,7 +3866,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.11.larboard
+      - id: gun.lower.11.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3877,7 +3877,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.12.starboard
+      - id: gun.lower.12.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3888,7 +3888,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.12.larboard
+      - id: gun.lower.12.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3899,7 +3899,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.13.starboard
+      - id: gun.lower.13.starboard
         kind: long
         pounder: 24
         place: broadside
@@ -3910,7 +3910,7 @@ armament:
         crew: 11
         weight_cwt: 49.5
         deck: lower
-      - id: gun.13.larboard
+      - id: gun.lower.13.larboard
         kind: long
         pounder: 24
         place: broadside
@@ -3922,286 +3922,286 @@ armament:
         weight_cwt: 49.5
         deck: lower
       # The upper deck's twenty-six long 18-pounders: the 9 ft gun of 40 cwt (Adye 1804 p. 155), the 74's pattern (Bel §13.1 answer 12; judgement for hers); nine men to the pair (Falconer 1780, QUARTERS).
-      - id: gun.14.starboard
+      - id: gun.upper.1.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 14
+        number: 1
         side: starboard
         x_m: 18.27
         height_m: 3.84
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.14.larboard
+      - id: gun.upper.1.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 14
+        number: 1
         side: larboard
         x_m: 18.27
         height_m: 3.84
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.15.starboard
+      - id: gun.upper.2.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 15
+        number: 2
         side: starboard
         x_m: 14.88
         height_m: 3.75
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.15.larboard
+      - id: gun.upper.2.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 15
+        number: 2
         side: larboard
         x_m: 14.88
         height_m: 3.75
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.16.starboard
+      - id: gun.upper.3.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 16
+        number: 3
         side: starboard
         x_m: 11.47
         height_m: 3.68
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.16.larboard
+      - id: gun.upper.3.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 16
+        number: 3
         side: larboard
         x_m: 11.47
         height_m: 3.68
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.17.starboard
+      - id: gun.upper.4.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 17
+        number: 4
         side: starboard
         x_m: 8.08
         height_m: 3.62
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.17.larboard
+      - id: gun.upper.4.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 17
+        number: 4
         side: larboard
         x_m: 8.08
         height_m: 3.62
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.18.starboard
+      - id: gun.upper.5.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 18
+        number: 5
         side: starboard
         x_m: 4.71
         height_m: 3.58
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.18.larboard
+      - id: gun.upper.5.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 18
+        number: 5
         side: larboard
         x_m: 4.71
         height_m: 3.58
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.19.starboard
+      - id: gun.upper.6.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 19
+        number: 6
         side: starboard
         x_m: 1.34
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.19.larboard
+      - id: gun.upper.6.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 19
+        number: 6
         side: larboard
         x_m: 1.34
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.20.starboard
+      - id: gun.upper.7.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 20
+        number: 7
         side: starboard
         x_m: -2.52
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.20.larboard
+      - id: gun.upper.7.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 20
+        number: 7
         side: larboard
         x_m: -2.52
         height_m: 3.56
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.21.starboard
+      - id: gun.upper.8.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 21
+        number: 8
         side: starboard
         x_m: -5.86
         height_m: 3.59
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.21.larboard
+      - id: gun.upper.8.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 21
+        number: 8
         side: larboard
         x_m: -5.86
         height_m: 3.59
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.22.starboard
+      - id: gun.upper.9.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 22
+        number: 9
         side: starboard
         x_m: -9.24
         height_m: 3.63
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.22.larboard
+      - id: gun.upper.9.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 22
+        number: 9
         side: larboard
         x_m: -9.24
         height_m: 3.63
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.23.starboard
+      - id: gun.upper.10.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 23
+        number: 10
         side: starboard
         x_m: -12.63
         height_m: 3.69
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.23.larboard
+      - id: gun.upper.10.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 23
+        number: 10
         side: larboard
         x_m: -12.63
         height_m: 3.69
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.24.starboard
+      - id: gun.upper.11.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 24
+        number: 11
         side: starboard
         x_m: -16.02
         height_m: 3.76
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.24.larboard
+      - id: gun.upper.11.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 24
+        number: 11
         side: larboard
         x_m: -16.02
         height_m: 3.76
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.25.starboard
+      - id: gun.upper.12.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 25
+        number: 12
         side: starboard
         x_m: -19.32
         height_m: 3.85
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.25.larboard
+      - id: gun.upper.12.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 25
+        number: 12
         side: larboard
         x_m: -19.32
         height_m: 3.85
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.26.starboard
+      - id: gun.upper.13.starboard
         kind: long
         pounder: 18
         place: broadside
-        number: 26
+        number: 13
         side: starboard
         x_m: -22.56
         height_m: 3.95
         crew: 9
         weight_cwt: 40.0
         deck: upper
-      - id: gun.26.larboard
+      - id: gun.upper.13.larboard
         kind: long
         pounder: 18
         place: broadside
-        number: 26
+        number: 13
         side: larboard
         x_m: -22.56
         height_m: 3.95
@@ -4209,110 +4209,110 @@ armament:
         weight_cwt: 40.0
         deck: upper
       # The quarterdeck's ten long 9-pounders in its five foremost ports a side, the sixth, under the roundhouse, empty: the 7 ft 6 in gun of 24 cwt 2 qr (Adye 1804 p. 155; the 74's pattern, judgement for hers); six men to the pair (Falconer 1780).
-      - id: gun.27.starboard
+      - id: gun.quarterdeck.1.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 27
+        number: 1
         side: starboard
         x_m: -5.88
         height_m: 5.52
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.27.larboard
+      - id: gun.quarterdeck.1.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 27
+        number: 1
         side: larboard
         x_m: -5.88
         height_m: 5.52
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.28.starboard
+      - id: gun.quarterdeck.2.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 28
+        number: 2
         side: starboard
         x_m: -8.78
         height_m: 5.55
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.28.larboard
+      - id: gun.quarterdeck.2.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 28
+        number: 2
         side: larboard
         x_m: -8.78
         height_m: 5.55
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.29.starboard
+      - id: gun.quarterdeck.3.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 29
+        number: 3
         side: starboard
         x_m: -11.65
         height_m: 5.6
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.29.larboard
+      - id: gun.quarterdeck.3.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 29
+        number: 3
         side: larboard
         x_m: -11.65
         height_m: 5.6
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.30.starboard
+      - id: gun.quarterdeck.4.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 30
+        number: 4
         side: starboard
         x_m: -14.54
         height_m: 5.66
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.30.larboard
+      - id: gun.quarterdeck.4.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 30
+        number: 4
         side: larboard
         x_m: -14.54
         height_m: 5.66
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.31.starboard
+      - id: gun.quarterdeck.5.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 31
+        number: 5
         side: starboard
         x_m: -17.86
         height_m: 5.75
         crew: 6
         weight_cwt: 24.5
         deck: quarterdeck
-      - id: gun.31.larboard
+      - id: gun.quarterdeck.5.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 31
+        number: 5
         side: larboard
         x_m: -17.86
         height_m: 5.75
@@ -4320,22 +4320,22 @@ armament:
         weight_cwt: 24.5
         deck: quarterdeck
       # The forecastle's two long 9-pounders, one a side, firing over its rail (no port is drawn on 1407F: Indf §3.3); six men to the pair (Falconer 1780).
-      - id: gun.32.starboard
+      - id: gun.forecastle.1.starboard
         kind: long
         pounder: 9
         place: broadside
-        number: 32
+        number: 1
         side: starboard
         x_m: 18.41
         height_m: 5.66
         crew: 6
         weight_cwt: 24.5
         deck: forecastle
-      - id: gun.32.larboard
+      - id: gun.forecastle.1.larboard
         kind: long
         pounder: 9
         place: broadside
-        number: 32
+        number: 1
         side: larboard
         x_m: 18.41
         height_m: 5.66
@@ -4343,22 +4343,22 @@ armament:
         weight_cwt: 24.5
         deck: forecastle
       # The forecastle's two 24-pounder carronades of 1794, one a side (Indf §5.1, judgement), firing over the rail: 13 cwt, the 3 ft 7 1/2 in carronade (Adye 1804 p. 72); four men to the pair, its captain, two privates and a provider (Douglas 1829 art. 136).
-      - id: gun.33.starboard
+      - id: gun.forecastle.2.starboard
         kind: carronade
         pounder: 24
         place: broadside
-        number: 33
+        number: 2
         side: starboard
         x_m: 14.6
         height_m: 5.53
         crew: 4
         weight_cwt: 13.0
         deck: forecastle
-      - id: gun.33.larboard
+      - id: gun.forecastle.2.larboard
         kind: carronade
         pounder: 24
         place: broadside
-        number: 33
+        number: 2
         side: larboard
         x_m: 14.6
         height_m: 5.53
@@ -4366,66 +4366,66 @@ armament:
         weight_cwt: 13.0
         deck: forecastle
       # The roundhouse's six 18-pounder carronades of 1794, three a side (Indf §5.1; the roundhouse unmeasured but its rail and the line under it, judgement), firing over the rail: 9 cwt, the 3 ft 3 in carronade (Adye 1804 p. 72); four men to the pair (Douglas 1829 art. 136).
-      - id: gun.34.starboard
+      - id: gun.roundhouse.1.starboard
         kind: carronade
         pounder: 18
         place: broadside
-        number: 34
+        number: 1
         side: starboard
         x_m: -17.0
         height_m: 7.12
         crew: 4
         weight_cwt: 9.0
         deck: roundhouse
-      - id: gun.34.larboard
+      - id: gun.roundhouse.1.larboard
         kind: carronade
         pounder: 18
         place: broadside
-        number: 34
+        number: 1
         side: larboard
         x_m: -17.0
         height_m: 7.12
         crew: 4
         weight_cwt: 9.0
         deck: roundhouse
-      - id: gun.35.starboard
+      - id: gun.roundhouse.2.starboard
         kind: carronade
         pounder: 18
         place: broadside
-        number: 35
+        number: 2
         side: starboard
         x_m: -20.0
         height_m: 7.38
         crew: 4
         weight_cwt: 9.0
         deck: roundhouse
-      - id: gun.35.larboard
+      - id: gun.roundhouse.2.larboard
         kind: carronade
         pounder: 18
         place: broadside
-        number: 35
+        number: 2
         side: larboard
         x_m: -20.0
         height_m: 7.38
         crew: 4
         weight_cwt: 9.0
         deck: roundhouse
-      - id: gun.36.starboard
+      - id: gun.roundhouse.3.starboard
         kind: carronade
         pounder: 18
         place: broadside
-        number: 36
+        number: 3
         side: starboard
         x_m: -23.0
         height_m: 7.67
         crew: 4
         weight_cwt: 9.0
         deck: roundhouse
-      - id: gun.36.larboard
+      - id: gun.roundhouse.3.larboard
         kind: carronade
         pounder: 18
         place: broadside
-        number: 36
+        number: 3
         side: larboard
         x_m: -23.0
         height_m: 7.67
@@ -4467,6 +4467,7 @@ armament:
           round: 720
           grape: 72
           chain: 72
+  numbering: by deck
 # The hold (package 35, spec M5 §23): room for cargo beyond her own stores, 0.1 of the 1384 tons burthen (1,384 tons as built, Winfield 1793-1817 p. 100; a ship of war's hold is her own stores and ballast: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 138
