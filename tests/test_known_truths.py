@@ -2521,7 +2521,10 @@ GATE_5A_SEA_TICKS = {
 # storm line); the topgallants again two seconds later; nothing lost.
 # the well's order gone from the starter book, and its two held lines with it (2026-10-21)
 GATE_5A_DAY_LINES = 623  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
-GATE_5A_DAY_DIGEST = "1680cb1391720dd8"  # bff57a00218b7ec5 at 57 (a235022bc8bf8bc7 at 45c)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 1680cb1391720dd8; TuningNotes)
+GATE_5A_DAY_DIGEST = "0325e18ce782b58b"  # the trim's words (1680cb1391720dd8 before)
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2970,8 +2973,11 @@ GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
 GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
 GATE_5B_DIGEST = (
-    "9a1f2802ba7c6533"  # the well (2026-10-21; c8c81b7617e4e0fd at 56, 5f682b9f676a2db4 at 57)
+    "2c38f76132521e4e"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3042,7 +3048,10 @@ GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # haul." where she said "Rise tacks and sheets. Mainsail haul."; every tick and line the same,
 # proved by bisection (the old word restored gives 6f062dc60419f52c again; TuningNotes, B3.4);
 # before it: 6f062dc60419f52c, the well, 2026-10-21; 155a46cede6c96a3 at 57, e358748a1eae5fc6 at 45
-GATE_5B_THICK_DIGEST = "9ce8174ebc6948c6"  # ruling 2 (6f062dc60419f52c before it, above)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
+GATE_5B_THICK_DIGEST = "f119ec763d2b442e"  # the trim's words (9ce8174ebc6948c6 at ruling 2)
 
 
 def the_landfall(log):
@@ -4116,7 +4125,10 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # package 75, SW-4: the Palinure made out "a brig-sloop of war, ten ports a side" (RMG ZAZ4491,
 # read), where the words had sixteen; every tick and line the same, proved by bisection (the
 # word put back gives 5a62f6fca122c6ad again; docs/dev/TuningNotes.md, SW-4)
-GATE_5C_CRUISE_DIGEST = "1e7f8ab24b84e6f7"  # SW-4 (5a62f6fca122c6ad at 58a; 728522e26dd25a49 at 56)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 1e7f8ab24b84e6f7; TuningNotes)
+GATE_5C_CRUISE_DIGEST = "0ac7eaba9f341529"  # the trim's words (1e7f8ab24b84e6f7 at SW-4)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E

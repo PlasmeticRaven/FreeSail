@@ -18240,6 +18240,158 @@ Junit, logs and the measurements under `scratchpad/s7/b7d/` (`run/`, `s0/`, `pro
 `old/`). Not run: the whole fast tier, the slow tier beyond the three files, the pace tier beyond the
 files' pace tests.
 
+## The trim's words by the alias (package 75) (2026-11-11)
+
+**The ruling.** The lead's note of 2026-11-09, 22:56 UTC, (2), confirmed in the note of 2026-11-10,
+02:25: "BUILD it for every file as one words step (the reply and the done line name a sail by the
+same word, the file's first plain alias), every moved pin old beside new; with the 74's window".
+B2b's finding ((3)(d), above, "not one function's line") had the trim's reply naming each sheet's
+sail by `resolve.the`, that is `resolve.display_name`, which reads no alias, while the runner's
+lines for the same sheets ("Man the fore-and-aft foresail sheet.", "Trimmed the sheets of the
+fore-and-aft foresail, ...") read `runner.part_name`, the file's first plain alias.
+
+**As built** (`freesail/orders/verbs.py` alone among the code): `_the_sail`, "the " and
+`runner.part_name`, names every sail the trim's reply names: the sheets being trimmed, the sheets
+standing as trimmed, a sheet refused, and a sail named to `trim the <sail>` that is not set ("The
+gaff topsail is furled; there is no sail to trim."). The reply and the runner's started and done
+lines now read one function, so they name a sail by one word on every file by construction.
+`display_name` is unchanged, and with it its callers (the grammar, the completions, the readings,
+the other verbs: "Backed the fore staysail" on the cutter is as it was); a yard, a mast or a line
+in the trim's reply is named as before, and so is the order's own object ("Braced the topsails to
+the wind", the captain's noun). A sail with no plain alias is named alike by the two functions
+(measured over the 304 sails of the 18 files: none apart), so only an aliased sail's words move,
+and nothing but words: the names are read for the reply's text and its `trimmed_sheets` and
+`standing_sheets` data, which nothing reads, and the lists keep their lengths.
+
+*Judgement (the ruling's lean):* the refusal of a sail not set is the trim's reply too, so it names
+the sail as the sheets' clauses do; the ruling's "reply" read as every sail the trim's words name.
+
+**The words that move, by file** (the display name, then the first plain alias):
+
+| File | Fore-and-aft sails (the sheets' clauses and the refusal) | Square sails (the refusal alone) |
+|---|---|---|
+| frigate-36, razee-44 | mizzen spanker → spanker | fore course → foresail, main course → mainsail |
+| brig, merchant brig | main spanker → spanker | fore course → foresail, main course → mainsail |
+| seventy-four, sixty-four | mizzen driver → driver (their mizzen course "mizzen course" by both) | fore course → foresail, main course → mainsail |
+| cutter | main sail → mainsail, main gaff topsail → gaff topsail, fore staysail → foresail, storm trysail → trysail | none |
+| smack | main sail → mainsail, fore staysail → foresail, storm trysail → trysail | none |
+| lugger | fore lug → foresail, main lug → mainsail, mizen lug → mizen, taille vent → taille-vent | none |
+| topsail schooner, privateer schooner | fore sail → foresail, main sail → mainsail, main gaff topsail → gaff topsail | none |
+| *Neufchatel* | fore sail → fore-and-aft foresail, main sail → mainsail, main gaff topsail → gaff topsail | fore course → foresail |
+| bilander | main settee → mainsail | fore course → foresail |
+| the five boats | none | none |
+
+A square sail is trimmed by its yard and named as the yard in the trim's words; only the refusal
+of one not set names it as a sail. Her fore course "the foresail" and her fore gaff sail "the
+fore-and-aft foresail" stay apart in the one reply.
+
+**Measured.** The scripts in the session's scratch (`s7/alias/`), outside the repository, each the
+same on the base tree (the branch at 93a15ee5, exported whole) and on this step's.
+
+- *Every file's trim lines* (`trimlines.py`): every file of `data/ships/` under plain sail with the
+  wind abeam (heading 270, the wind from the north at 15 kn, seed 7; the truths' `under_plain_sail`,
+  its trims every two minutes), then "trim sails", "trim the sheets" twice and "trim the <sail>" for
+  each fore-and-aft sail by its display name: **527 trim lines over the 18 files, 122 moved**, every
+  one at the same tick and kind, every log the same length (the 13 sailing files' digests moved,
+  the five boats' not). Hers, old beside new: "trimming the sheets of the fore sail, the main sail,
+  the fore staysail and the jib" to "trimming the sheets of the fore-and-aft foresail, the mainsail,
+  the fore staysail and the jib", beside the runner's "Trimmed the sheets of the fore staysail, the
+  fore-and-aft foresail, the jib and the mainsail; 28° to 32° off the centreline." as before. The
+  frigate's "the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as
+  trimmed" to "the sheets of the spanker, ...", beside "Man the spanker sheet." and "Trimmed the
+  sheets of the fore topmast staysail, the jib and the spanker". The cutter's "trimming the sheets
+  of the main sail, the fore staysail and the jib" to "... of the mainsail, the foresail and the
+  jib", beside "Man the foresail sheet."; the lugger's "the fore lug, the main lug, the mizen lug
+  and the jib" to "the foresail, the mainsail, the mizen and the jib"; the bilander's "the main
+  settee" to "the mainsail". Every started and done line the same, and now the reply's words.
+- *The refusal* (`furled.py`): every sail of every file named to "trim the <sail>" with all furled:
+  **304 orders, 41 moved** (the table's aliased sails), each "The <sail> is furled (unbent); there is
+  no sail to trim." with the alias, the outcome and kind the same.
+- *The four whole logs* (`log_digests.py`, and `loglines.py` line by line): the lines, the port
+  lines, the shut ticks, the roll and the heel the same as `b2/digests-final.json`; the digests
+  moved, every moved line a trim's reply at the same tick and kind: `first-action` (the cutter)
+  497 lines, 84176c16104a2c67 to 234036cc17e6f137, 7 lines ("the main sail, the fore staysail" to
+  "the mainsail, the foresail"); `encounter` (the frigate) 229, 523ebf0bf6180321 to
+  732a6020db4d4755, 9; `trial-station-lee-shore` 1561, 8f2e1783e6d13312 to e8c79e9947e244c3, 20;
+  `trial-station-gale` 1722, 8df0ab2beba93320 to 1e59009004141b08, 13 ("the mizzen spanker" to "the
+  spanker").
+- *The schooner's gate runs* whose truths fail on this machine before their digests are read
+  (`gates.py`): every line's tick and kind the same, the trim lines alone moved: the gate 5b
+  schooner's passage 767 lines, 4343b1c434b5b56a to cae2b06446ea86c3 (40 of 138 trim lines); the
+  merchant passage 2909, 117ddf79cef5831e to 63168300d93caa13 (103 of 466); the schooner on an
+  intent 2098, 0f69f4dc0798176d to f3626a67bca16526 (119 of 558); the merchant passage under the fake
+  captain 2921, 01dd0e989a2f1191 to 1001994b41d53626 (103 of 466) ("the fore sail and the main
+  sail" to "the foresail and the mainsail").
+
+**Pins moved, old beside new.**
+- Words: `tests/test_trim_order.py` ("the mizzen spanker" to "the spanker", the reply and its
+  `trimmed_sheets`); `tests/test_orders_m4a.py` ("trim the spanker" and "tend the sheets": "the
+  mizzen spanker" to "the spanker"; the schooner's "the main sail" to "the mainsail", the reply and
+  its data); `tests/test_staying.py` ("Trimming the sheet of the mizzen spanker" to "... of the
+  spanker"); `tests/test_lateen.py` (the frigate with the 64's mizen course, a fixture whose first
+  plain alias for the course is the frigate's "mizzen": "The sheet of the mizzen course stands as
+  trimmed." to "The sheet of the mizzen stands as trimmed."); `tests/test_orders.py` (the cutter's
+  "trim the headsail sheets": "The sheets of the fore staysail and the jib" to "The sheets of the
+  foresail and the jib").
+- Digests that pass on this machine, re-pinned, every line the same, proved by bisection (the base
+  head gives the old figure, the base's junit): gate 5a's day 1680cb1391720dd8 to
+  0325e18ce782b58b; gate 5b's passage 9a1f2802ba7c6533 to 2c38f76132521e4e (731 lines); its thick
+  weather 9ce8174ebc6948c6 to f119ec763d2b442e (469); the naval cruise 1e7f8ab24b84e6f7 to
+  0ac7eaba9f341529 (2242); the captain's trial on the station with the stranger c1d54413006885aa to
+  d1a7b668bec784ff (788), all the frigate's.
+- Digests that fail on this machine at the base, not re-pinned, both figures here for the lead's
+  build machine: the trials in a gale 8df0ab2beba93320 to 1e59009004141b08 (the pin
+  04f2fcd0fe9023a4), the trade with the stranger 8dac97a4c9bdfe43 to 0b430d261669ba5a
+  (aa04702e062bc64b) and in thick weather df5f02eb6e6ce68a to 41a37f0290be291a (cfa538b19cb0d2fe);
+  truth 77's merchant passage 117ddf79cef5831e to 63168300d93caa13 (`GATE_5C_MERCHANT_DIGEST`
+  6436eb06a665f379); and three whose tests fail here on a tick or a line before the digest is read,
+  the figures from `gates.py`: `GATE_5B_SCHOONER_DIGEST` (2b68e8b1f60e8496), `GATE_6A_INTENT_DIGEST`
+  (8744d3e56cfc9508) and `GATE_6A_FAKE_CAPTAIN_DIGEST` (7076e667c2bc41e3), above. The lee shore's
+  trial reads its digest and asserts none.
+
+**For the lead.**
+1. The seven digests above are the build machine's to re-pin at the merge; each moves by the trim's
+   words alone here (the four gate runs every tick and kind the same, line by line; the three
+   trials their states, anchorings and line counts, asserted before the digest, the same, and the
+   gale's every line by the whole log).
+2. Found on the way, not built (the reply's own grammar, older than this step): a whole-ship trim
+   with one sheet to work says "trimming the sheets of the mainsail" (the bilander's settee, the
+   smack's and the schooners' mainsail), the plural kept unless the sail was named.
+3. Beside the trim, other replies still name a sail by `display_name` ("Backed the fore staysail"
+   on the cutter, "Hauled the mizzen spanker sheet flat aft", the roll-call of a set or a take-in
+   of more than three sails, `verbs._summarise`'s "Hands to ..."): the ruling is the trim's, so
+   they are as they were.
+
+### The suites, as run (the trim's words)
+
+Once, on the final tree (the package's branch at 93a15ee5, the step uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run.
+
+- **(a) The trim's and the words' files, fast** (`test_trim_order`, `test_orders_m4a`, `test_staying`,
+  `test_lateen`, `test_orders`, `test_evolutions`, `test_readings`, `test_in_world`, `test_primer`,
+  `test_grammar_book`): 2,083 passed, 1 failed (494 s), the cutter's headsail sheets in
+  `test_orders`, re-pinned (above).
+- **(b) The slow candidates** (every test that pins a log's digest as a constant: nine truths by
+  name and the captain's trials): 3 passed, 13 failed (809 s); against `b7/final-slow.xml`, the five
+  that passed at the base failed on their digests alone, re-pinned and run again, **5 passed** (284
+  s); the eight that failed at the base failed on the same asserts, the three trials and truth 77
+  with the digests above.
+- **(c) The touched files' slow tests and the words' files'** (`--slow -m slow` over the ten files of
+  (a)): **27 passed** (24 s), as at the base.
+- **(d) The four whole logs**: above.
+- **(e) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`); no ship file is touched.
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- **(g) The whole fast tier**, last, on the final tree with every re-pin: **7,316 passed, 2 skipped,
+  1 xfailed** (1,952 s). Against `b7/final-fast.xml` (7,277): no outcome changed; the 44 new in
+  `test_bellerophon` B7.c's and B7.d's, passed, and the two gone B7.d's renames.
+
+Junit, logs and the measurements under `scratchpad/s7/alias/` (`run/`, `trim_old.json`,
+`trim_new.json`, `cmptrim.txt`; `run/furled-*.json`, `run/lines-*.json`, `run/cmplines.txt`,
+`run/gates-*.json`; the base head's tree `old/`). Not run: the slow tier beyond (b) and (c), the
+pace tier.
+
 ## Table No. 29's charges (package 75, SW-1) (2026-11-09)
 
 **The step.** `docs/design/Build-Ships.md` §10 whole, its §2.2 and §16.1 rows, and the
