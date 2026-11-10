@@ -3976,7 +3976,7 @@ floor tests short on its container, and short the same on the trunk in a worktre
 446, 456): the container's, not the step's. **The lead's merge:** the trial on 229d0247 with the
 two appends kept, lint-clean; no model or vendor name in the diff; no ship file, no physics;
 the fast tier whole on it exit 0, 7,229 passed by the dots and 1 xfailed, 14:02 to 15:13 UTC;
-the whole suite in the cloud dispatched after run 63, the figures to follow. Next in 100:
+the whole suite in the cloud, run 64 (2026-11-10, 15:15 to 16:30 UTC, on dc197104): green whole, lint, the six shards and the pace job (its counts not read, to spare the lead's usage; the run's page has them). Next in 100:
 step 2, the letters that travel (already at 870f071d on its branch, to be measured).
 
 ### Package 74, step 5: the prize court and the money (the design's §5), as merged (2026-11-10)
