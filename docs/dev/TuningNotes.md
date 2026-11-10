@@ -22936,3 +22936,50 @@ them on the cutter, the table's two rows). Truth 7-457 (`tests/test_flags.py`), 
 
 **Taken another way.** `the jack` and `the pendants` read the whole list (one reading, as `the
 colours` is), rather than one flag each.
+
+### The lead's four additions of 2026-11-10 (in the spirit of the owner's ruling for step 2)
+
+**(a) A seat's readings never refused for want of the deck.** `agents/seat.py`
+`PlayerSeat.route`'s deck check now exempts a reading (`tools.reading_order`: the registry's
+readings, `object: query`, or one said without its article), answered by his place as at the
+captain's prompt; his deck's orders still wait for "you have the deck". Probe:
+`tests/browser_plans/seated-officer.yaml` (new, five lines, met).
+
+**(b) A visitor's word to her captain.** `orders/stations.py`: a new road beside the
+captive's, `_visitor_to_the_captain`, for the player's person a visitor aboard another ship and
+no captive (`knowledge.players_visitor`, not `captive.is_captive`), taken for `say to the
+captain: ...`, `tell the captain ...` and `ask the captain ...` before the road to a captain the
+player holds (which refused "The captain tells himself nothing", the visitor's prompt being the
+captain's): a `person.spoke` line of her log in his name and place ("Captain Bowen, a visitor of
+the Amazon, on the quarterdeck, to the captain: good day to you"), heard by her stations within
+earshot, shown him (his own by `his_own`). And `core/world.py`: such a line (`data.visitor`) is
+not taken as the player's hand on her rules captain, who stood aside for it. **Exactly what was
+touched at package 74's road:** nothing of `_captive_to_the_captain`; the `tell` branch calls the
+visitor's road only where the captive's returns None, and the World's player's-hand test gains
+the one `data.visitor` condition. Probe: two lines in `boat-and-visitor.yaml`.
+
+**(c) `go ashore` from the tops** refused in words ("You are in the tops; come down on deck first
+('come on deck') and then go ashore."), by his `where` as `come on deck` reads it
+(`movement.ALOFT_PLACES`). Found on the way, for others: the schooner's master who keeps the
+reckoning (a mirror) goes aloft in his `place` alone, and `come on deck` then answers "You are
+on the quarterdeck already"; the check reads `where` so that he is never held aloft by it.
+Probe: `deck-and-below.yaml`'s `go ashore` from aloft.
+
+**(d) The owner's world order shown him.** `world/knowledge.py`: `owners_world_order` (a
+`world.order` whose source is the owner's, `OWNER_SOURCE`, which `ui.console`'s
+`LIVE_WORLD_ORDER_SOURCE` now reads) is his own by `his_own`; `as_the_owner_sees` gives it as he
+gave it with its outcome ("Your world order 'ship "Nobody": intent bound for Falmouth': not
+carried out: No ship named 'Nobody' is on the sea."), a copy, the log's line unchanged. The
+pages, their reach-back, `/api/log` and the console show it him; decision 46 stands for every
+other reader (it is still for the record: no station's sample and no other driver), and a
+world order of another source (the director's) is never the player's. Probe: the three world
+orders of `boat-and-visitor.yaml`, each shown. The probe now fails a plan that is no YAML
+(`is_plan`), which it had left out unseen.
+
+**Tests and toggles.** Truths 7-458 ((a), (b)) and 7-459 ((c), (d)), each calling its test in
+`tests/test_knowledge.py` or `tests/test_orders_places.py`; each test fails with its own file
+back at the base (`agents/tools.py` (a); `orders/stations.py` or `core/world.py` (b);
+`world/movement.py` (c); `ui/server.py` (d)) and passes with it. **No pin moved.**
+
+**Step 5's book entry** now says the rate filed (2.0 knots at springs, 1.0 at neaps) and that
+the hydrographic service's atlas of the roads was not read, as the lead asked.

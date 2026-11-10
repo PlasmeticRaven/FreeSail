@@ -1522,6 +1522,32 @@ def own_reckoning_order(world: World, text: str) -> bool:
     return order.verb in OWN_RECKONING_VERBS
 
 
+def reading_order(world: World, text: str) -> bool:
+    """Whether the words ask a reading (the registry's, `object: query`; or one said without
+    its article, 'sightings'): never refused for want of the deck, and answered by the
+    asker's place (package 98, the lead's addition (a) of 2026-11-10)."""
+    from freesail.orders import grammar as imperative
+    from freesail.orders import prompt
+    from freesail.orders.errors import UnknownVerbError
+
+    ship = world.ship
+    if not hasattr(ship, "parts"):
+        return False
+    words = " ".join(str(text).split())
+    vocab = load_vocabulary()
+    try:
+        order = imperative.parse(ship, words, vocab)
+    except UnknownVerbError:
+        bare = [w.replace("'", "") for w in prompt.normalise(words).split() if w != ","]
+        asked = prompt._without_asking(bare, vocab) if bare else []
+        verb = vocab.phrase_to_verb.get(" ".join(["the", *asked])) if asked else None
+        return verb in vocab.readings
+    except OrderError:
+        return False
+    spec = vocab.verbs.get(order.verb)
+    return order.verb in vocab.readings or getattr(spec, "object", "") == "query"
+
+
 def conversation_order(world: World, text: str) -> bool:
     """Whether the words are the deck's conversation (package 41): `say <words>`, `hail
     <words>`, `tell the <station> ...` or `ask the <station> ...`, which every station

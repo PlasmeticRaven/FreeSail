@@ -1,0 +1,14 @@
+# The player seated at the officer of the watch's station without the deck (package 98, the
+# lead's addition (a) of 2026-11-10): his readings answered by his place (they were refused
+# for want of the deck), his deck's orders waiting for 'you have the deck', on deck and below.
+name: Seated as the officer of the watch, the deck the captain's
+scenario: tests/browser_plans/scenarios/neufchatel-falmouth.yaml
+flags: [--seat, officer]
+steps:
+  - {label: "ON DECK, the officer of the watch without the deck"}
+  - {tick: 300}
+  - {say: where am I, expect: {answered: true, kind: query.reading}}
+  - {say: the time, expect: {answered: true, kind: query.reading}}
+  - {say: the depth, expect: {answered: true, kind: query.reading}}
+  - {say: set plain sail, expect: {answered: true, contains: has not the deck}}
+  - "say to the captain: the anchor is holding"

@@ -14910,3 +14910,31 @@ def test_truth_7_457_the_flags_of_command_come_down_by_name_and_are_read():
     )
 
     test_the_flags_of_command_come_down_by_their_names_and_the_flags_read_what_flies()
+
+
+def test_truth_7_458_a_seats_readings_and_a_visitors_word_are_his_own():
+    """Package 98, the lead's additions (a) and (b) of 2026-11-10: a seat without the deck is
+    answered its readings by its place; a visitor's word and question to her captain go to
+    her captain where he stands and are shown him, her captain not standing aside."""
+    from tests.test_knowledge import (
+        test_a_seat_without_the_deck_is_answered_its_readings_and_refused_its_orders,
+        test_a_visitors_word_to_the_captain_goes_to_her_captain_and_is_shown_him,
+    )
+
+    test_a_seat_without_the_deck_is_answered_its_readings_and_refused_its_orders()
+    test_a_visitors_word_to_the_captain_goes_to_her_captain_and_is_shown_him()
+
+
+def test_truth_7_459_go_ashore_from_aloft_refused_and_the_owners_world_order_his_own():
+    """Package 98, the lead's additions (c) and (d) of 2026-11-10: `go ashore` from the tops
+    refused until he comes down; the owner's world order typed at the page shown him as
+    given with its outcome, and no other source's."""
+    from tests.test_knowledge import (
+        test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is,
+    )
+    from tests.test_orders_places import (
+        test_go_ashore_from_the_tops_is_refused_until_he_comes_down,
+    )
+
+    test_go_ashore_from_the_tops_is_refused_until_he_comes_down()
+    test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is()
