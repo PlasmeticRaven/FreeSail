@@ -23614,3 +23614,13 @@ captain aside, so the addition (b)'s `and not data.get("visitor")` in `World._su
 and the `visitor: True` it read in `orders/stations._visitor_to_the_captain`'s data are gone;
 the toggle: with both removed truth 7-458's visitor case passes (her captain does not stand
 aside), as it did with them. Nothing else read the key.
+
+**Step 8's suites as run** at **453ed374** (the step's tree, the trunk merged at bbb69526), in a
+worktree pinned there, one suite at a time: the fast tier exit 0, 7,133 passed, 1 xfailed, 485
+slow left out; the slow tier of the touched files (`--slow -m "not pace" -n 4` on
+tests/test_squadrons.py, test_known_truths.py, test_knowledge.py, test_aboard_another.py,
+test_visitor_name.py, test_between_hulls.py, test_captive.py) exit 0, 442 passed, 8 xfailed; the
+pace alone and last (`--slow -m pace -n 0`, the same files, 7-159 among them) exit 0, 13 passed.
+ruff check and format clean. An earlier fast tier at 00a6f3e8 (exit 0, 7,123 passed) was of
+the tree before the trunk's package 74 and is not the report's. The tree reported differs from
+453ed374 by this paragraph alone.
