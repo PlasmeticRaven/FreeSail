@@ -24690,6 +24690,12 @@ apart in the one registry by their homes; a vessel a test adds by hand (`tests.t
 is in no journal and a replay cannot make her again, so the replay truths put their ships on the
 sea by the director's forms.
 
+**A list that grew** (found by the step's pre-check of the fast tier whole, before its measure):
+`tests/test_business.py` keeps the names of the free scenarios with the business on, and
+`prize-home.yaml` is one (a prize's passage home wants the cruisers of both sides about her:
+the retaking is the passage's hazard); its name is added. No recorded passage is among them,
+and none moved.
+
 **The step stands on step 6's mended tree**, which has the trunk to 65c73a6 (package 101, the
 Catalan coast; package 75's B7, the 74-gun ship). Nothing of either met this step: the prize
 courts are by the port's nation, and the block's Spanish and French ports take the rows those
