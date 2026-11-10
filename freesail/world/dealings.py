@@ -2690,6 +2690,14 @@ class Dealings:
         port = self.ports.get(job.port_id)
         if port is None:
             return
+        if job.kind == "prize_court":
+            # the prize court's sentence on a prize lying here (package 74, step 5)
+            from freesail.world import prize_court as PC
+
+            prize = world.vessels.get(str(job.payload.get("prize") or ""))
+            if prize is not None and not getattr(prize, "done", False):
+                PC.sentence(world, prize, port)
+            return
         if job.kind == "waterman":
             # the waterman's pull done (package 68): landed at the quay, or aboard
             p = world.people.find(str(job.payload.get("person") or ""))

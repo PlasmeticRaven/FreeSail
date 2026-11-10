@@ -1273,3 +1273,33 @@ which took truth 7-159 under its floor (175 ticks a second against 500) and woul
 7-361 under its own had it ever run: it stood on a world with no place on the chart. The file's
 figures are read once a file and fit (`far.file_figures`); 7-361 stands on the frigate of the
 brains' sea. No figure of the fight moved; the toggle's measures are in the notes, step 4.
+
+### Step 5: the prize court and the money (§5; 2026-11-07)
+
+**Built as designed**: §5.1 to §5.3 (`world/prize_court.py` and `data/business.yaml`'s four
+blocks; the valuation by the rows over the files' figures, the cargo at the port's market, the
+prize goods on 86's ordnance, the court by the port's nation sitting in its days as a port job on
+the prize hull's dealings or on a far prize's record in her goal's road, the three sentences by the
+rules with the wars' dates, the head money, the agent's five per cent and the court's fees, the
+reserved fourth of a King's ship's prize of war, the money by the eighths of the scheme in force
+at the court's date into the purse with the purse's line and the prize account's lines, the
+director's `port <id>: the court condemns | restores the <prize>` doubted against the rule, the
+reading `the prize money`, three events); truths 7-362 and 7-363; the primer's chapter 27 "The
+court and the money". **The lead's ruling of 2026-11-07 on §5.3** (Lavery, Nelson's Navy, p. 116,
+from the owner's shelf): the two British schemes are CONFIRMED and cited in the rows (the book's
+words not in the tree), the flag officer's share named as not modelled; the head money, the agent's
+commission, the hull's price a ton, the court's days, the costs and the salvage eighth stay FROM
+MEMORY, marked. **Added by the ruling** (the design lacked it): the prize money is **shared among
+every ship in sight at the moment the enemy struck**, a ship that took no part included, written
+on the record at the strike (`in_sight`, the ships at war with her in sight from her masthead, with
+their complements, by the near action's, the far rounds' and the cut-out's strike hooks) and
+divided before the eighths by their complements (the division a judgement, FROM MEMORY: Lavery
+gives the sharing), each ship's part into her purse by her own road, the purse's line saying
+"shared with the Sprightly, in sight at the strike: the Amazon's part £..."; truth 7-362 has a
+King's cutter in sight. **Taken another way**: her stores price nothing (her file lists none);
+`take her powder and shot` is not built (the goods are the court's); the `prize.lost` line at the
+court's date for a prize that does not come in is not written (nothing told the captor that his
+people cannot know); the reserved fourth is paid by the record's day from the prize's minute, not a
+second port job; the salvage is paid to the recaptors alone by their nation's court and scheme, the
+enemy's consorts in sight at the first strike sharing nothing of it. The figures and the finds are
+in `docs/dev/TuningNotes.md`, "Package 74", step 5.

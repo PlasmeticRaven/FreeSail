@@ -14880,6 +14880,54 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
 # -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
 
 
+def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
+    """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
+    in Falmouth's road is condemned by the court (France at war with Britain at the taking),
+    valued by the rows (the hull a ton burthen by her kind and age, her guns a hundredweight,
+    her powder and shot at the port's prices, nothing for the head money of a merchantman),
+    the agent's five per cent and the court's fees deducted, and the money paid into the
+    captor's purse by the eighths of 1805 (the captain three eighths: Lavery, Nelson's Navy,
+    p. 116) with the purse's line saying so and the prize account's lines; a King's cutter in
+    sight at the strike shares by her complement (Lavery, the same page: the ships in sight at
+    the surrender); the court's job is queued when the prize lies in the port, due in the
+    court's days; a far prize is sentenced on her record in her goal's road; a King's ship's
+    prize of war pays head money and three fourths now, the fourth reserved on its day; a ship
+    retaken by her own nation's cruiser pays salvage to the recaptors alone; the schemes by
+    date are the rows' with their sources."""
+    from tests.test_prize_court import (
+        test_a_far_prize_in_her_goals_road_is_sentenced_on_her_record,
+        test_a_kings_ships_prize_of_war_pays_three_fourths_now_and_the_reserved_fourth_on_its_day,
+        test_a_ship_retaken_by_her_own_nations_cruiser_is_restored_with_salvage_to_the_recaptors,
+        test_the_prize_is_condemned_and_the_money_paid_by_the_eighths_into_the_purse,
+        test_the_schemes_are_laverys_two_british_ones_by_date_and_the_rows_say_their_sources,
+        test_the_valuation_is_the_rows_over_the_files_figures,
+    )
+
+    test_the_schemes_are_laverys_two_british_ones_by_date_and_the_rows_say_their_sources()
+    test_the_valuation_is_the_rows_over_the_files_figures()
+    test_the_prize_is_condemned_and_the_money_paid_by_the_eighths_into_the_purse()
+    test_a_kings_ships_prize_of_war_pays_three_fourths_now_and_the_reserved_fourth_on_its_day()
+    test_a_ship_retaken_by_her_own_nations_cruiser_is_restored_with_salvage_to_the_recaptors()
+    test_a_far_prize_in_her_goals_road_is_sentenced_on_her_record()
+
+
+def test_truth_7_363_a_neutral_wrongly_taken_is_restored_with_costs_and_the_director_may_overrule():
+    """The design's §5.2: a Danish brig at peace with Britain, taken all the same, is restored
+    to her owners by the court with costs and damages against the captors (a tenth of her
+    valuation from the purse), said why; the director's `port <id>: the court condemns |
+    restores the <prize>` is doubted against the court's rule and performs with a reason."""
+    from tests.test_prize_court import (
+        test_a_neutral_wrongly_taken_is_restored_with_costs_against_the_captors,
+        test_the_directors_word_to_the_court_is_doubted_against_the_rule_and_performs_with_a_reason,
+    )
+
+    test_a_neutral_wrongly_taken_is_restored_with_costs_against_the_captors()
+    test_the_directors_word_to_the_court_is_doubted_against_the_rule_and_performs_with_a_reason()
+
+
+# -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
+
+
 def test_truth_7_446_the_players_own_lines_reach_him_wherever_he_stands():
     """Package 98, step 2 (the owner's ruling of 2026-11-09): what is not in the world is
     always shown the man who made it, wherever he stands: in the cabin his readings, his
@@ -15098,6 +15146,27 @@ def test_truth_7_459_go_ashore_from_aloft_refused_and_the_owners_world_order_his
     test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is()
 
 
+def test_truth_7_460_a_second_world_reads_nothing_of_a_dead_worlds_set():
+    """Package 98, step 8 (a determinism defect found by package 74, proven by the lead): the
+    set's last course is the World's own; a second convoy made after the first is dropped,
+    with a stale course planted where the old module table would have held it, keeps the
+    first's stations every ten minutes and its count of lines."""
+    from tests.test_squadrons import test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses
+
+    test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses()
+
+
+def test_truth_7_461_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint(tmp_path):
+    """Package 98, step 8: a set whose commodore lies stopped, her head fallen off her last
+    course, saved by a checkpoint and resumed, keeps the uninterrupted run's stations and
+    count of lines over the next hour."""
+    from tests.test_squadrons import (
+        test_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint as case,
+    )
+
+    case(tmp_path)
+
+
 # ---------------------------------------------------------------------------
 # Package 100: letters and things as one system (`tests/test_letters.py`)
 # ---------------------------------------------------------------------------
@@ -15201,24 +15270,3 @@ def test_truth_7_479_a_letter_travels_as_the_thing_and_an_old_message_loads_as_o
 
     a()
     b(tmp_path)
-
-
-def test_truth_7_460_a_second_world_reads_nothing_of_a_dead_worlds_set():
-    """Package 98, step 8 (a determinism defect found by package 74, proven by the lead): the
-    set's last course is the World's own; a second convoy made after the first is dropped,
-    with a stale course planted where the old module table would have held it, keeps the
-    first's stations every ten minutes and its count of lines."""
-    from tests.test_squadrons import test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses
-
-    test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses()
-
-
-def test_truth_7_461_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint(tmp_path):
-    """Package 98, step 8: a set whose commodore lies stopped, her head fallen off her last
-    course, saved by a checkpoint and resumed, keeps the uninterrupted run's stations and
-    count of lines over the next hour."""
-    from tests.test_squadrons import (
-        test_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint as case,
-    )
-
-    case(tmp_path)
