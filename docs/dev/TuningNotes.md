@@ -23604,3 +23604,13 @@ World leaves can change a second. (3) `world/reports._STATE_CACHE_BY_ID`: used o
 that takes no weak reference (`_STATE_CACHE` is a `WeakKeyDictionary` first); a World and a Hull
 both take one, so in play it is never reached; were it reached, an id reused by a new key would
 read the old cache's line count and state, its `seen > n` guard resetting only a shorter log.
+
+**At the merge of the trunk at bbb69526** (package 74's step 4 at 9944b671, the far fight wired;
+98's combined report at 12bd5f48): clean. 7-159's scene and the convoy scene are the same on the
+merged tree old beside new (97 lines, a9f39f0f6e53ae06; ded7116824f7e3e3 clean and planted).
+**The visitor's condition taken out** (the lead's question at the merge): 74's
+`World._hand_on_her` (`movement.hand_on_her`) already keeps a visitor's word from standing her
+captain aside, so the addition (b)'s `and not data.get("visitor")` in `World._submit_awake`
+and the `visitor: True` it read in `orders/stations._visitor_to_the_captain`'s data are gone;
+the toggle: with both removed truth 7-458's visitor case passes (her captain does not stand
+aside), as it did with them. Nothing else read the key.
