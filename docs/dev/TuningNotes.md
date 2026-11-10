@@ -17291,6 +17291,19 @@ the smack line for line and digest for digest (f2d587f438a2cf4b; with her square
 ordered set too, 370de09f2e10b5c7), the cutter's one moved line the lie a-try's ((13)(iv)), with
 her square sail set or not.
 
+**A pin this build moves, found by the cloud's run 62 and re-pinned by the lead at the merge
+(2026-11-10).** The schooner's recorded passage of gate 5b (`GATE_5B_SCHOONER_DIGEST`,
+`tests/test_known_truths.py`, in the slow tier, which neither the session's machine's four
+whole logs nor the lead's fast tier holds): 766 lines before and after; **old
+`2b68e8b1f60e8496`, new `3a1698037811b753`**. Both trees sailed by the lead on the build
+machine and every line compared (the trunk before the merge, 79006d06, against the merge,
+09222043): **one line differs**, the standing order "the outer road"'s "Shorten sail" at tick
+56,234, whose "Not done" list loses "'take in the square sail': 'take in' was understood, but
+'square' belongs with 'brace'" (the topsail schooner has no square sail); every tick, every
+other line and its data the same. **The toggle:** on the merged tree with `storm.listed_lines`
+made the identity the passage gives the old digest, 766 lines. The run's other five shards
+were green, so no other recorded passage moved.
+
 **(6) The *Neufchatel*'s quarter bill, 34 by the rule.** *As built* (`tools/ships/neufchatel.py`):
 `trimmers(plain)`, the brig-sloop's 27 carried by her plain sail against the brig's, 33.8, rounded
 to 34, shared out on Neuf-D §6.4's split by each mast's work (9, 11 and 15, now `TRIMMER_SHARES`)
