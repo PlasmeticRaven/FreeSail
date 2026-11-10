@@ -1127,6 +1127,14 @@ Naples); the five Italian and Sardinian nations as data; a port's nation by date
 annexation of June 1805); the Gulf's and the Tyrrhenian's weather boxes from the
 Admiralty's printed tables of Marseille and Naples; the scenario `agincourt-sound.yaml`. As
 built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 79d".
+**As built: the Catalan coast (package 101, 2026-11-10).** The owner's "very noticeable gap"
+on the eastern Iberian coast closed: the region `catalan-coast` between `balearics` and
+`gulf-of-lion`, the Alfaques and the Ebro's delta to Tarragona, Barcelona and Tossa, with
+seven ports (Barcelona, Tarragona, the Alfaques; Rosas and Palamós, Valencia's Grao and
+Alicante beside it in water already charted), the French holding of four of them by dated
+nations; found on the way, that the nations table's wars are one year's picture (no end
+date), so that Spain stays at war with Britain after 1808: for the owner, by decision 66.
+As built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 101".
 **As built: the held gauges' water (package 89, 2026-10-30).** The finding every block since
 39a carried: the world's tide blended every gauge within 400 miles, so a block's gauges were
 held out of it and its water read the Channel's eleven (Newhaven's spring range 3.9 feet for
