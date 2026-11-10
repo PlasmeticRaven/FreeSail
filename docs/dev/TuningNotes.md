@@ -22697,14 +22697,52 @@ brig-sloop's guns before SW-4), an eighth of her hull, guns, powder and shot, th
 of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
 seventh day.
 
-**The trunk merged at the step's boundary** (87f7fe8, a merge commit at dd12cba: the lead's
-records of runs 58 and 59, two lines of `docs/dev/M7-WorkPackages.md`): it met nothing. **A
-soft place of step 4's own mended here**: the test of the cap-full reply
-(`tests/test_far_action.py`) skipped itself if the cap woke the frigate in place of the cutter;
-the scene is the same at every run and the skip was never taken (no tier at step 4's tree
-skipped anything), and it is an assertion now ("the cap holds the cutter alone"). **Pins
-moved: none.**
+**The lead's five small mends, in this step's tree** (2026-11-10; each with its test, old beside
+new). (i) *The parole's plain answer.* Old: "I do not.", "I do not know", "I do not see why I
+should" and "you have it not" were read as the parole GIVEN (the plain yes's "i do" and "you have
+it" stand in them as whole words), and "you shall not have my parole" by the form "my parole".
+New (`captive.read_parole`, `PAROLE_NEGATIONS`): an answer that holds a negation (not, no, non,
+never, nor, neither, cannot, the n't forms with their apostrophes out, ne ... pas, jamais, nunca,
+jamás) is never read as given, by the forms or the plain words; it is refused by the refused forms
+and the plain no alone (a plain yes beside the no with no negation after it, "yes and no", still
+reads as neither); otherwise the question stays open and he is asked again after the glass. Two
+refused forms added, "shall not have" and "will not have" (so "you shall not have my parole" is
+refused, not left open). The five answers above read: open, open, open, open, refused.
+`test_an_answer_that_holds_a_negation_is_never_read_as_the_parole_given`; the step's earlier
+tests of the plain yes and no pass as they stood. (ii) *The cap-full reply's line*
+(`action.far_reply`). In the test's scene (the Renard far, the cutter awake under a cap of one),
+old: "The Renard fires her broadside at us from 10 cables: 0 of 27 shot strike (the far ship's
+reply, the cap full)." New: "The Renard fires her broadside at us from 10 cables: none of her 27
+shot strike us." (one "strikes"; the counts by the round's line's words); the data's `fallback:
+True` keeps the road for the record, and the test reads the data and that nothing of the cap is
+in the line.
+(iii) *The cruiser and the merchant* (`tests/test_brains.py`). Old: the brig-sloop's last state
+"on passage" or "investigating a stranger", "as the minute falls". Measured twice: she is on
+passage at tick 2,340 and turns to the frigate at her horizon's edge at 2,400, the tick the test
+stops; the one ending is pinned (her last three states and the tick). (iv) *The conditional skip*
+in `tests/test_far_action.py` an assertion ("the cap holds the cutter alone"); the skip was never
+taken. (v) *A word said is no hand on the ship.* My reading in step 4's report was wrong, measured
+here on the intent scenario: on his own ship the player's `say` is `agent.spoke` and his `tell` is
+`agent.told` (a word to a station nobody holds is kept), neither a hand, and his rules captain
+commands through both; `person.spoke` is written only for a captive's words (no hand since step
+3's mend (1)) and a visitor's (98's). The rule is stated in `World.submit` for the kind all the
+same (`person.spoke` is no hand on any hull, as a free line is not) and tested
+(`test_a_word_said_at_the_prompt_is_the_players_own_and_no_hand_on_the_ship`). **Pins moved by
+the five: none** (iii is a test of this package's own made exact).
 
+**The trunk merged at the step's boundary** (merge commits: 87f7fe8 at dd12cba, the lead's
+records of runs 58 and 59; 350df0e at c54a053, step 4 merged and its record; and the last at
+bbb6952, package 98's steps 3, 4, 5 and 7 and its four additions, merged by the lead at 12bd5f4).
+The first two met nothing. **98 met this package on one line, and both are kept as the lead
+merged them**: `World.submit`'s test of the player's hand has this package's `_hand_on_her` and
+`kind != "person.spoke"` and 98's `not data.get("visitor")` side by side (a visitor's word to
+her captain is `person.spoke` with `visitor: True`, so either condition keeps his hand off her);
+in the stations' `tell` 98's visitor's road is asked only where this package's
+`_captive_to_the_captain` gives nothing. 98's flags of command (`haul down the broad pendant`,
+`the second ensign`, `the jack`) are the deck's orders by the place's check, and a prisoner is
+refused them in his own words by the same road as the colours: three lines added to the step's
+test of the prisoner's prompt. The truths' file merged with both packages' truths in order
+(this package's to 7-363 and 7-369, then 98's 7-446 to 7-459).
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

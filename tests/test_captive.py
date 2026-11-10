@@ -454,6 +454,11 @@ def test_a_prisoner_hails_nobody_and_his_prompt_performs_his_own_words_moves_and
         "strike the colours",
         "hoist the colours",
         "make the private signal",
+        # package 98's step 7, met at the trunk: the flags of command are the deck's orders
+        # by the place's check, so a prisoner is refused them by the same road as the colours
+        "haul down the broad pendant",
+        "haul down the second ensign",
+        "haul down the jack",
         'standing order "mine": when the wind shifts then trim sails',
         "captain: carry on",
         "take a fix",
