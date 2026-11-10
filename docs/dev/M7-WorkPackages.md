@@ -93,7 +93,7 @@ it stands, and earlier and later where possible; the build's attention has gathe
 or a world that functions reasonably on any given day; and where attention to historical
 fidelity gets in the way of an interesting simulation and game, "not because it is not
 important to the intent of the game, but because the world must be subject to the game and
-not vice-versa". Nothing is ruled. What the lead notes for the discussion: the data that
+not vice-versa". **The owner's ruling the same day (decision 66, `docs/DesignProposal.md`): history is the starting state, not a rail; the elements are correct, their interactions are the world's own once play begins; fidelity is a lever.** How far each element is dated across the range is still open. What the lead notes for the discussion: the data that
 carries its dates in its rows (79a's regimes, a port that changes hands by `since` and
 `until`, a nation's wars) already answers for any day, while the data written as one year's
 picture (a harbour's moles, a coast's lights, a signal book, a ship list) answers for 1805
@@ -6427,7 +6427,7 @@ ship view stays a ship view.
 
 ## Package 100: letters and things as one system (`freesail/world/things.py` a thing's words, author, addressee and seal; `freesail/orders/free.py` write, read, seal, break the seal, destroy; `freesail/world/books.py` the drafting's road shared; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the director's thing with a description and its removal; `freesail/world/people.py`, `ports.py`, `ships.py`, `dealings.py` the letter by the boat, the cutter, the pilot and the port carried as a thing and handed to its addressee; `freesail/core/replay.py` the old `Message` read; the primer's chapters 14, 20 and 26; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-470 to 7-479)
 
-**Held by the owner (2026-11-09) for the moment.** One road for everyone, the player, a station and the director: a
+**Held by the owner (2026-11-09); approved and launched 2026-11-10 (the owner).** One road for everyone, the player, a station and the director: a
 letter is a thing with words. **Written** (`write a letter to <whom>: "<words>"`, by the
 drafting's road: the writer, the hour, the cabin's table), **carried, handed, put down and
 hidden** as any thing is, **sealed and opened**, **read** where it is in reach (its words shown
@@ -6443,8 +6443,9 @@ books (the sheets, the manifests and the notes) stay as they are in this package
 
 ## Package 60 (from M7b): a ship bought, and the player's ship changed in play (`docs/design/Design-ShipBought.md` new, first; then `freesail/core/world.py` the player's hull re-pointed, `core/acts.py`, `core/replay.py` the change journaled and replayed; `freesail/world/knowledge.py` `player_hull`, `players_person`; `freesail/world/movement.py`, `people.py`, `prizes.py` the seat carried and the hands moved; `freesail/world/ships.py`, `ports.py`, `dealings.py`, `business.py`, `data/business.yaml` the owner, the price and the listings; `freesail/world/prize_court.py` the valuation with her condition; `freesail/orders/port.py`, `data/vocabulary.yaml` the orders; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the `for sale` tail and the errand's answer; `freesail/api/readings.py`; `data/scenarios/` a ship bought at Falmouth; `docs/TechnicalSpec-M7b.md` §21g and §21h as built; the primer's chapter 14; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-480 to 7-489)
 
-**For the owner's approval. Re-briefed by the lead, 2026-11-09, on a survey of the trunk and of
-74's unmerged steps.** The spec's bridge was four general things and no "buy a ship" feature
+**The design note approved by the owner 2026-11-10 to be written now, while 74 is open (a
+document alone; the build still waits for 74's close and the note's gate). Re-briefed by the
+lead, 2026-11-09, on a survey of the trunk and of 74's unmerged steps.** The spec's bridge was four general things and no "buy a ship" feature
 (M7b §21g); it was written before the one world. What has been built since, and what has not:
 
 - **Built since:** every ship a hull of one world (84); the player aboard another ship, the
