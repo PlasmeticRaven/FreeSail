@@ -22983,3 +22983,44 @@ back at the base (`agents/tools.py` (a); `orders/stations.py` or `core/world.py`
 
 **Step 5's book entry** now says the rate filed (2.0 knots at springs, 1.0 at neaps) and that
 the hydrographic service's atlas of the roads was not read, as the lead asked.
+
+### Step 5: the Rade de Brest's stream
+
+**Reproduced.** The `the-goulet` box (48.29 to 48.37 N, 4.62 to 4.42 W) held the narrows and
+most of the bay, so its 4.5 knots at springs ran in the middle of the Rade; the ships anchored
+at 48.345 N 4.47 W (`THE_RADE_INNER`) lay in it.
+
+**Built** (data alone, `data/tides/streams.yaml`): `the-goulet` the narrows, Petit Minou (48 20.2
+N 4 36.9 W) to Portzic (48 21.5 N 4 32.0 W), its figures as they were; `rade-de-brest` after
+it (48.25 to 48.43 N, 4.53 to 4.18 W), before the Iroise's and the Channel's, 2.0 knots at
+springs and 1.0 at neaps, the flood toward 100 degrees (into the rade's middle), strongest
+three hours before high water as the Goulet's. **The source, read** (as data, its own folder):
+the Parc naturel régional d'Armorique's Natura 2000 document of objectives of the Rade de
+Brest, tome 1 (2014), p. 28: "En situation de vive eau, ils dépassent 4 nœuds dans le goulet et
+2 nœuds au centre de la rade"; p. 29 (after Salomon and Breton, IFREMER 1996), the flood's jet
+from the Goulet east-north-east, the greater part bending south for the centre and the
+south-east toward the Aulne, the ebb almost uniform toward the Goulet; p. 35, above 4 knots at
+the pointe des Espagnols at coefficient 85, the flood's axis toward the île Ronde still above
+2; and the FVA's Livret Naviguide voile-aviron 50, Rade de Brest (2019), p. 3: "les courants ne
+dépassent dans la rade que rarement, et localement, les 2 nœuds". The neaps, the axis and the
+hour are judgement; the book's figures in the period's form are judgement throughout as the
+Goulet's are (`test_tide` ties a book's rates to a period source), its source naming the
+modern rate and saying that the hydrographic service's atlas of the roads (SHOM) was not read.
+
+**Pins moved, old beside new, every one by the toggle** (the old `streams.yaml`, as at
+28f7788e, restored in the pinned tree gives every old figure: all five failing tests pass):
+- `test_tide`: the Channel west's areas 14 to 15.
+- The merchant passage (gate 5c): the pilot of Brest put off at 118860 (121620), anchored in
+  the Bay at 115907 in fifteen fathoms (115547, in 14), the tin sold at 124710 (123272), 3,103
+  lines (3,107), its digest 40bcef34afd0cec4 (6436eb06a665f379); the Bay's anchor 0.11 mile
+  from the truth by bearings (0.052), within the test's mile. Every figure to the road of
+  Bertheaume the same.
+- The fake captain's passage of it (truths 78, 79): its anchors as the merchant's, 3,115 lines
+  (3,119), its digest c0bf4b51621ad91f (7076e667c2bc41e3).
+- The schooner on an intent alone (gate 6a): 2,079 lines the same, its digest 9d9efe6b21c17060
+  (8744d3e56cfc9508), one line moved: a sail on her larboard quarter, a stranger in the Rade's
+  water, lost from sight at 115860 (115980), she in the road of Bertheaume.
+- Truth 77 reads those digests.
+No other pin moved: the slow tier of the touched files and the Brest-area files (test_ports,
+test_tackle_orders, test_captains, test_ordnance, test_agents, test_captive, test_brains) passed
+on the new data, the anchored-in-the-Rade fixtures (48.345 N 4.47 W) among them.
