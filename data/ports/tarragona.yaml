@@ -126,3 +126,8 @@ crew_pool:
   landsman: {hands: 8, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+tracks:
+  to_sea: [tarragona-road, 41 00 N 1 18 E]
+  from_sea: [41 00 N 1 18 E, tarragona-road]
+  in: [tarragona-road]

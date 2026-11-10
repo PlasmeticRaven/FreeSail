@@ -111,3 +111,10 @@ crew_pool:
   landsman: {hands: 4, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+tracks:
+  # out of the haven by its south-west mouth between the Bana's sand and the main
+  # (Tofino 1787, p. 116: steer for the tower of San Juan going in), the grid's channel
+  to_sea: [alfaques-outer-road, 40 35.7 N 0 36.3 E, 40 34.8 N 0 34.7 E, 40 30 N 0 37 E]
+  from_sea: [40 30 N 0 37 E, 40 34.8 N 0 34.7 E, 40 35.7 N 0 36.3 E, alfaques-outer-road]
+  in: [alfaques-outer-road]

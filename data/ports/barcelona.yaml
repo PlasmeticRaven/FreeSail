@@ -133,3 +133,8 @@ crew_pool:
   landsman: {hands: 12, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+tracks:
+  to_sea: [barcelona-road, 41 15 N 2 15 E]
+  from_sea: [41 15 N 2 15 E, barcelona-road]
+  in: [barcelona-road]
