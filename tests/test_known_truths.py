@@ -3031,7 +3031,14 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
-GATE_5B_SCHOONER_DIGEST = "2b68e8b1f60e8496"  # 58a (b9acdeac6354f3bf, the well; b7c16adc at 56)
+# package 75, the lead's ruled build (3) of 2026-11-09 (the gale's list names the square sail
+# only where she has one), re-pinned by the lead at the merge on the cloud's run 62: one line
+# of the 766 moved, the outer road's "Shorten sail" at tick 56234, which loses "'take in the
+# square sail': 'take in' was understood, but 'square' belongs with 'brace'" from its "Not
+# done" list; every tick and every other line the same; the toggle (`storm.listed_lines` made
+# the identity on the merged tree) gives the old digest (TuningNotes, the ruled builds, (3))
+# (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
+GATE_5B_SCHOONER_DIGEST = "3a1698037811b753"  # 75's ruled build (3)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
