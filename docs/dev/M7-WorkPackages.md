@@ -86,6 +86,31 @@ on these packages; that is the owner's choice.
 | 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design |
 | 103 | Fable (a design package) | **The range audited** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | proposed 2026-11-10; **briefed 2026-11-10 (below) at the owner's word, for Fable; HELD by the owner, not launched** ("there's enough things in flight right now to let close out, and I'll sleep on it"); when released it runs one Fable package at a time, so after 74 closes |
 
+**The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
+on, not a ruling: every launch still waits for the owner's word).** *In flight:* 74 (Fable;
+steps 5, 6 and 7 left), 98 (Opus; its last step, 8), 100 (Opus; two steps), 60's design note
+(Opus; a document), 75 in the ships session (the ruled builds, SW-1, the 74-gun ship, Phase
+5). *Approved, waiting on its trigger:* 101, at 98's close. *Held by the owner:* 99 (the
+views under the knowledge rule), 103 (Fable; the range audited), 96 (Fable; the harbour and
+the ship's configuration, to the end of the milestone). *Booked and waiting on another
+package:* 77 (on 75), 87 (on 77), 80 (on 74), 60's building (on 74 and the note's gate), 90
+(the ships session's next, on 75), 91 (on 75's hull; when the owner likes), 102 (later), 78
+(where the sailing wants it), 65b (on the owner's testing). *Milestone 7b's, still open:* 51's
+director's chart, 61 (Fable; the land-avoiding route), 69 (the pins on Windows), 55 (the gate
+and the consent revision, deferred until testing begins in earnest). *Milestone 8:* 92 (Fable;
+the career study). *Named and not booked:* a chart block from Minorca to Sardinia and the
+Algerian coast east of Algiers. **The order the lead recommends:** (1) now, to the week's
+reset: close what is in flight and launch 101 when 98 closes; nothing else. (2) When 74 and 75
+close: 77, 60's building and 80 (or 80 folded into what 74 leaves, decided at its close) on
+Opus, 90 in the ships session, and one Fable package, 103 if the owner releases it. (3) Behind
+those: 87 after 77; the viewer's three in the order 99, 102, 91, one at a time since they
+share the viewer; 78, split into its three unrelated parts when it is briefed; 65b from the
+owner's testing. (4) The milestone's end: 96 on 103's answers, then 69 and 55 with the consent
+revision and the gates; 61 and 51's chart briefed with them or carried to milestone 8 with
+92. The limit that sets the pace: the lead proves each report with one whole fast tier of
+about an hour before it merges, one at a time, so five builders reporting already make a
+queue.
+
 **An open design question, recorded for the owner (2026-11-10): the day and the range.** The
 game's purpose is a world that can be simulated over a wide range of dates, 1792 to 1825 as
 it stands, and earlier and later where possible; the build's attention has gathered on 1805
