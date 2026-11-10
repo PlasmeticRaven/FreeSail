@@ -617,7 +617,14 @@ class Driver:
         head = words[0].lower()
         if head == "follow" and len(words) > 1:
             move, arg = self.world.follow, " ".join(words[1:])
-        elif head == "look" and len(words) > 2 and words[1].lower() == "at":
+        elif (
+            head == "look"
+            and len(words) > 2
+            and words[1].lower() == "at"
+            and getattr(self.world, "observed", False)
+        ):
+            # the observer's eye in an observed world; with a ship of the player's, `look at
+            # <a thing>` is the game's free line (package 100)
             move, arg = self.world.look_at, " ".join(words[2:])
         else:
             return None

@@ -1337,7 +1337,9 @@ class People:
         """', a sealed packet in his keeping' (package 53b): the things a person keeps, as
         the people's words end with them; nothing for a person who keeps none, so that a
         world with no thing in it reads as it did."""
-        kept = [t.name for t in getattr(self, "things", None) or [] if t.keeper == p.id]
+        from freesail.world.things import name_words
+
+        kept = [name_words(t) for t in getattr(self, "things", None) or [] if t.keeper == p.id]
         if not kept:
             return ""
         names = kept[0] if len(kept) == 1 else f"{', '.join(kept[:-1])} and {kept[-1]}"

@@ -2768,8 +2768,58 @@ ABOARD_FORMS = (
     "of brandy, in the hold'; 'aboard: the packet, in the keeping of Mr Veale'), a sum "
     "('aboard: twenty guineas paid into the purse by Mr Veale'; 'aboard: £6 paid from the "
     "purse to the pilot'), a freight ('aboard: ten tons of wool freighted by Mr Veale at the "
-    "quay for Falmouth') or a debt ('aboard: a debt of £30 owed to the chandler at Plymouth')"
+    "quay for Falmouth'), a debt ('aboard: a debt of £30 owed to the chandler at Plymouth'), "
+    "a letter with its words ('aboard: a letter from the agent to the captain, on the cabin "
+    "table, sealed: \"Your cargo waits.\"') or a thing removed ('aboard: remove the packet')"
 )
+
+# A thing removed by the director's form (package 100): 'remove the packet', 'the packet
+# removed', 'take away the cask'.
+_REMOVE = (
+    re.compile(r"^(?:remove|take\s+away)\s+(?P<thing>.+?)\.?$", re.I),
+    re.compile(r"^(?P<thing>.+?)\s+(?:removed|taken\s+away)\.?$", re.I),
+)
+
+
+def _removal(body: str) -> str | None:
+    """The thing's words of a removal (`aboard: remove the packet`), or None."""
+    words = _thing_words(body)
+    for rx in _REMOVE:
+        m = rx.match(words)
+        if m is not None:
+            return m.group("thing").strip()
+    return None
+
+
+def _removed_thing(world: Any, words: str) -> Any:
+    """The one thing a removal names, or the refusal in words."""
+    from freesail.world import things as TH
+
+    found = TH.find(world, words)
+    if not found:
+        raise WorldOrderError(f"no thing answering to '{words}' is in the world to remove")
+    if len(found) > 1:
+        raise WorldOrderError(
+            f"'{words}' names {len(found)} things: "
+            + "; ".join(f"{t.name}, {TH.where_words(world, t)}" for t in found)
+        )
+    return found[0]
+
+
+def _aboard_remove(world: Any, words: str) -> tuple[str, dict[str, Any]]:
+    """`aboard: remove <a thing>` (package 100): the thing taken out of the world, as if it
+    had never been; no line of the play log, the director's log keeping the act."""
+    from freesail.world import things as TH
+
+    thing = _removed_thing(world, words)
+    was = TH.where_words(world, thing, keeper_where=False)
+    things = TH.things_of(world)
+    things[:] = [t for t in things if t is not thing]
+    return f"{thing.the} removed: it was {was}", {
+        "thing": thing.id,
+        "name": thing.name,
+        "removed": True,
+    }
 
 
 def read_sum(words: str) -> float | None:
@@ -3006,6 +3056,21 @@ def _aboard_reach(world: Any, body: str) -> str | None:
                     "holder's own word, and nobody gives it for him"
                 )
         return None
+    removal = _removal(body)
+    if removal is not None:
+        # package 100: nothing removed out of a held person's keeping
+        try:
+            thing = _removed_thing(world, removal)
+        except WorldOrderError:
+            return None
+        owner = TH.keeper_of(world, thing)
+        held = TH.held_by(world, owner)
+        if owner is not None and held:
+            return (
+                f"{thing.the} is in {owner.name}'s keeping, and he is held by {held}: nothing "
+                "is taken out of a held person's keeping but by his own act"
+            )
+        return None
     try:
         thing, where, moved = TH.make(world, _thing_words(body))
     except TH.ThingWordsError:
@@ -3041,6 +3106,9 @@ def _doubt_aboard_new(world: Any, body: str) -> str | None:
     from freesail.world.places import pounds_words
 
     tx = _transaction(body)
+    removal = _removal(body) if tx is None else None
+    if removal is not None:
+        return _doubt_removal(world, removal)
     if tx is None:
         try:
             thing, where, moved = TH.make(world, _thing_words(body))
@@ -3096,6 +3164,28 @@ def _doubt_aboard_new(world: Any, body: str) -> str | None:
     return None
 
 
+def _doubt_removal(world: Any, words: str) -> str | None:
+    """The doubt of a thing removed (package 100): it lies before the eyes of a person a
+    model or the player holds (within his reach), who would see it go by no hand."""
+    from freesail.world import things as TH
+
+    try:
+        thing = _removed_thing(world, words)
+    except WorldOrderError:
+        return None
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    for _station, name, who in held_stations_everywhere(world):
+        person = people.find_anywhere(name) if name else None
+        if person is not None and TH.reach_why(world, person, thing) is None:
+            return (
+                f"{thing.the} lies within the reach of {person.name}, held by {who}, who would "
+                "see it go by no hand"
+            )
+    return None
+
+
 def _doubt_thing_moved(world: Any, thing: Any, where: dict[str, Any]) -> str | None:
     from freesail.world import things as TH
 
@@ -3147,6 +3237,9 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         tx = _transaction(body)
         if tx is not None:
             return _aboard_transaction(world, *tx)
+        removal = _removal(body)
+        if removal is not None:
+            return _aboard_remove(world, removal)
         if "," in _thing_words(body):
             return _aboard_thing(world, body)
         forms = "; ".join(_form_words(t) for t in aboard_table())

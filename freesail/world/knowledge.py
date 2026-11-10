@@ -237,7 +237,12 @@ def station_senses(world: Any, station: str, person: Any = None) -> Senses:
 #   place    within earshot of the place the line's data names, and the deck
 #   port     the persons ashore at the port the line names, and the deck of a hull there
 #   record   the record's and the driver's lines, which reach whoever the record reaches
+#   reader   the person the line names (`to`) and nobody else, asleep or awake, with no
+#            fallback to a place (package 100: a letter's words shown its reader, a
+#            writer's own words shown him)
 REACH: dict[str, str] = {
+    "free.read": "reader",
+    "free.written": "reader",
     "clock.bell": "aboard",
     "watch.relieved": "aboard",
     "watch.deck_passed": "deck",
@@ -533,6 +538,12 @@ def reaches(world: Any, senses: Senses, e: Any) -> bool:
     kind = str(getattr(e, "kind", "") or "")
     cls = reach_of(kind)
     data = getattr(e, "data", None) or {}
+    if cls == "reader":
+        # a letter's words (package 100): the reader's, whoever and wherever he is, by his
+        # name whole (a surname shared is no reader)
+        person = senses.person
+        name = str(getattr(person, "name", "") or "")
+        return bool(name) and _names(data, "to").lower() == name.lower()
     if senses.asleep:
         # a sleeper perceives nothing but what wakes him (the brief's list: the call, all
         # hands, a gun, the ship striking, and nothing else; 54 and 66 let a word or a

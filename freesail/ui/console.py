@@ -647,8 +647,9 @@ class Console:
                 self._print(e.text)
             except ValueError as err:
                 self._print(str(err).rstrip(".") + ".")
-        elif cmd == "look" and args[:1] == ["at"]:
-            # the observer's view moved (package 82, item 1): a driver's line
+        elif cmd == "look" and args[:1] == ["at"] and getattr(self.world, "observed", False):
+            # the observer's view moved (package 82, item 1): a driver's line, in an observed
+            # world; with a ship of the player's `look at <a thing>` is the game's (package 100)
             try:
                 e = self.world.look_at(" ".join(args[1:]))
                 self._print(e.text)

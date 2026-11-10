@@ -351,6 +351,10 @@ RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 # A person's own needs (package 54: `eat`, `drink`, `sleep`, `how am I`) are answered to
 # him the same way: the needs show only to the person stationed, never in the log.
 UNLOGGED_KINDS = frozenset({"query.slate", "director.answer", "needs.answer"})
+# The keys of an order's result that the World reads and takes out before the line is written
+# (package 100): the order's words as the log says them, and the lines after its own.
+ORDER_AS_SAID = "order_as_said"
+THEN_LINES = "then_lines"
 
 # The observer's refusal (package 82, item 1): an order at the hull of no ship.
 NO_SHIP_FOLLOWED = (
@@ -2061,12 +2065,17 @@ class World:
             return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
         if not standing and not station:
             self.journal.append((self.clock.tick, actor, text))
+        # the order as the log says it (package 100): a letter's words are its reader's, so
+        # an order that writes one is said without them (`free.write`); the journal keeps it
+        # whole, for the replay
+        shown = str(data.pop(ORDER_AS_SAID, "") or text)
+        then = data.pop(THEN_LINES, None) or ()
         accepted = self.record(
             Severity.NOTABLE if standing and not routine else Severity.ROUTINE,
             "order.accepted",
-            f"{said}." if said else f"Order: {text}.",
+            f"{said}." if said else f"Order: {shown}.",
             actor=actor,
-            data={"order": text},
+            data={"order": shown},
         )
         captain = getattr(self, "captain", None)
         if (
@@ -2091,6 +2100,10 @@ class World:
         notable = kind in NOTABLE_ORDER_KINDS or bool(data.get("notable"))
         severity = Severity.NOTABLE if notable else Severity.ROUTINE
         event = self.record(severity, kind, log_text, actor=actor, data=data)
+        for line_severity, line_kind, line_text, line_data in then:
+            # the lines that follow the order's own (package 100: a letter's words shown its
+            # reader after the line that says he read it)
+            self.record(line_severity, line_kind, line_text, actor=actor, data=line_data)
         self._after_order()
         return event
 
