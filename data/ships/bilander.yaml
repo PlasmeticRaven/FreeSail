@@ -65,7 +65,7 @@ hull:
   profile:
     # The top of the side, taffrail to stem head. The waist Chapman's, 5.4 ft above the water (5.3 to 5.5 ft, measured); above it Gwyn's rise at Chapman's scale: the quarterdeck's light rail on stanchions from its break, 0.325 of the length from the taffrail, up to the taffrail, and the bow's rise to the stem head (measured on the hull crop). The taffrail and the stem head stand beyond the water's ends by Chapman's overhang, 75.6 less 70.6 ft, two-thirds abaft the post and a third before the stem (measured on the plate by two methods). Chapman's own sheer, read roughly, rises 2.7 ft forward and 3.6 ft aft (the check). Stand-in: Gwyn's metres rest on Chapman's scale.
     rail_m: [[-11.78, 3.3], [-8.25, 2.95], [-4.29, 2.49], [-4.19, 1.75], [0.12, 1.65], [4.0, 1.72], [7.57, 1.9], [10.0, 2.3], [11.27, 2.65]]
-    # The collier's half-breadths at its load line and at its top-timber line by timber, the plank on (2 1/2 in a side, Folio I's extreme less its moulded breadth), scaled; the half-breadth at the water straight between the table's points that bracket it, the table printing no breadth sweep (judgement, as the pages note took the sloop's). Its load line 10 ft 3 1/4 in above the base: 10 ft 9 in afore and abaft from the keel's underside (Folio I), less half the keel's depth (judgement on the rabbet). Abaft the aftermost timber the side closes along the post and the counter to the middle line, the round stern's closure: Gwyn's stern view gives her rail 1.55 m off the middle line at the taffrail and about 2.0 m at the wale, her lights spread +-1.22 m (measured at her scale), and the collier's stern is 15 ft 8 in broad (Folio LI); her drawn stern closes far inside both (the generator's report). Recorded, not drawn: a round stern is closed to the middle line, and no station abaft the post can be filed, a half-breadth of nothing at the water being refused.
+    # The collier's half-breadths at its load line and at its top-timber line by timber, the plank on (2 1/2 in a side, Folio I's extreme less its moulded breadth), scaled; the half-breadth at the water straight between the table's points that bracket it, the table printing no breadth sweep (judgement, as the pages note took the sloop's). Its load line 10 ft 3 1/4 in above the base: 10 ft 9 in afore and abaft from the keel's underside (Folio I), less half the keel's depth (judgement on the rabbet). Abaft the aftermost timber the side closes along the post and the counter to the middle line, the round stern's closure, held out over the counter to its half-breadths: Gwyn's stern view gives her rail 1.55 m off the middle line at the taffrail and 2.02 m at the wale, her lights spread +-1.22 m (measured at her scale), and the collier's stern is 15 ft 8 in broad (Folio LI). No station abaft the post can be filed here, a half-breadth of nothing at the water being refused: the counter's are filed in form.stern.counter_hb_m and drawn by it (the generator's report).
     breadth_m: [[-9.94, 1.01, 2.27], [-8.82, 2.16, 2.38], [-7.71, 2.44, 2.47], [-6.59, 2.63, 2.54], [-5.47, 2.75, 2.59], [-4.35, 2.83, 2.64], [-2.11, 2.91, 2.71], [0.13, 2.95, 2.75], [2.37, 2.96, 2.76], [4.49, 2.96, 2.76], [5.61, 2.96, 2.76], [6.73, 2.9, 2.73], [7.85, 2.71, 2.68], [8.4, 2.52, 2.61], [8.96, 2.25, 2.47], [9.52, 1.74, 2.21]]
     # Level at the collier's depth to its keel's underside, scaled; from the post's heel (judged) forward by the collier's tread of the keel, Folio I's 66 ft 3 in, scaled. Her file's draught, 11.5 ft, is deeper, recorded and never moved (principle 7). Judged: the post's heel.
     keel_m: [[-10.4, -2.77], [8.13, -2.77]]
@@ -113,9 +113,10 @@ hull:
     # No fullness beyond the default rule: the collier's sections draw the ends (principle 5).
     form:
       fullness: [1.0, 1.0]
-      # Round, closed to the middle line (Gwyn's separate stern view, read): three oval lights in one band on a blue ground, a red band below, the rudder; the band's heights and spread measured on the stern view, scaled to her taffrail. Her carving and paint in words: the blue stern and red band; an oval carved badge on each quarter in scrollwork (read on the hull crop); the red ensign on a staff at the taffrail.
+      # Round, closed to the middle line (Gwyn's separate stern view, read): three oval lights in one band on a blue ground, a red band below, the rudder; the band's heights and spread measured on the stern view, scaled to her taffrail. Her round counter 1.55 m a side at the taffrail and 2.02 m at the wale (measured on the stern view at her scale), filed at the taffrail's height and the wale's middle at its after end (judgement) in counter_hb_m, the counter's foot the water; the round's depth is the drawing's rule (freesail/ship/form.py). Her carving and paint in words: the blue stern and red band; an oval carved badge on each quarter in scrollwork (read on the hull crop); the red ensign on a staff at the taffrail.
       stern:
         type: round
+        counter_hb_m: [[0.62, 2.02], [3.3, 1.55]]
         lights_m: [[1.75, 2.75, 3, 1.1]]
       # A figure with head rails (Gwyn, read).
       head: figure
@@ -137,6 +138,7 @@ hull:
       rabbet_m: judged
       form.fullness: judged
       form.stern: sourced
+      form.stern.counter_hb_m: stand-in
       form.stern.lights_m: stand-in
       form.head: sourced
 spars:
@@ -1193,12 +1195,12 @@ crew:
     # Idlers: the cook.
     idlers: 1
   ratings:
-    # Share of the seamen by rating: the merchant brig's (judgement). A merchantman shipped able seamen and few others. Able: 0.70.
-    able: 0.7
-    # Ordinary: 0.20, judgement.
-    ordinary: 0.2
-    # Landsmen: 0.10, judgement.
-    landsman: 0.1
+    # Share of the seamen by rating (judgement; the lead's ruling of 2026-11-09): a coaster's able seamen and a boy, four able topmen and a landsman boy, as the merchant brig's boy is rated; her shares (0.70, 0.20, 0.10) mustered the boy an able seaman. Able: 0.80.
+    able: 0.8
+    # Ordinary: none.
+    ordinary: 0.0
+    # Landsmen: 0.20, the boy.
+    landsman: 0.2
   posts:
   # Station holders by post (spec M3 2.3): the master who commands her and the mate, as the smack's (data/people/bilander.yaml); names are drawn at muster.
   - post: master
@@ -1242,10 +1244,10 @@ crew:
     water_gallons: 1
   # The named people beyond the posts (package 35, spec M5 §22): the boy as the messenger; see data/people/bilander.yaml.
   people:
-  # An apprentice boy as the messenger (judgement), as the smack's.
+  # An apprentice boy as the messenger (judgement), as the smack's; a landsman, as the merchant brig's boy is rated (the lead's ruling of 2026-11-09).
   - role: boy
     station: afterguard
-    rating: ordinary
+    rating: landsman
     messenger: true
   # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
   quarter_bill:
@@ -1371,12 +1373,12 @@ armament:
           3: 104
         swivel:
           0.5: 176
-      # A cartridge's powder in pounds, to the ounce: the engine's shares of the shot (freesail/ship/parts.py, charge_lb), a long gun a third and a swivel a half. The long 3-pounder's 1 lb is the Regulations 1806 (1808 printing) Table No. 29's service charge to the ounce (Build-Ships.md §10, read on the page image); the half-pounder swivel's 4 oz is the engine's half, where the table gives 2 oz, which the shared table enters with SW-1 (Build-Ships.md §10).
+      # A cartridge's powder in pounds: the service charge of cylinder powder for one shot by the gun's kind and calibre, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10; the OCR has its title at l.27498-27502 and lost its figures; freesail/ship/charges.py): a third of the shot's weight for a gun and a twelfth for a carronade, rounded down to the ounce, and 2 oz for the half-pounder swivel. A gun the table does not name takes its kind's share of the shot to the nearest ounce (freesail/ship/parts.py, charge_lb).
       charges:
         long:
           3: 1.0
         swivel:
-          0.5: 0.25
+          0.5: 0.125
       # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 1
       shot:

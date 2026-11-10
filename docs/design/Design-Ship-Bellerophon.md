@@ -152,7 +152,7 @@ addendum. Every engine piece she uses is built and merged before her window open
 | `mizen_yard.py` (the course and `driver()`), `spritsail_yards.py` | B1 at stage B | yes: B1 merged whole | the same flips |
 | The settee (B3.3) | B3 | yes: B4 waits on it | nothing of hers |
 | Stage 0H, SW-2b.1 (`g.hull_form` and kin) | stage-0 agent, B8 | yes | her shape keys wait; her profile does not |
-| SW-1, Table No. 29 | B8 | yes (Build §2.2) | her long 32's charge would be the share's 10 lb 11 oz; she waits rather than override |
+| SW-1, Table No. 29 | B8 | yes (Build §2.2) | her long 32's charge would be the share's 10 lb 11 oz; she waits rather than override. *Landed 2026-11-09 (Build §10's as built): `charge_lb` gives the table, her long 32 10 lb 10 oz, through `g.fit_magazine` with no keyword* |
 | SW-2 with SW-2b.2, then SW-5 L2 and L3 (the lee port) | B8 | yes (Build §2.2: B7 after SW-5) | 7-195 waits; her file does not (§17.2 item 7) |
 | SW-4 (a description's `fit` and `roles`) | B8 | yes | her description's `roles` wait |
 | B5's drawings (B5.1-B5.3, B5.5, B5.6) | B5 | yes | her testing report's pictures wait |
@@ -917,7 +917,12 @@ Crews by Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136): `period.FALCONER_
   the page image, Build §10): the long 32 10 lb 10 oz (the share gives 10 lb 11 oz), the 18 6 lb,
   the 12 4 lb, the 9 3 lb; carronades 32-pdr 2 lb 10 oz, 18-pdr 1 lb 8 oz, 12-pdr 1 lb. Under the
   lead's rule the table serves the new ships alone if a figure of the eight would move (the lead's
-  notes, stage 0 read, item 1). No override in her module.
+  notes, stage 0 read, item 1). No override in her module. *SW-1 landed (2026-11-09, Build §10's
+  as built): `CHARGE_TABLE_LB` is filled and `charge_lb` reads it, so her long 32's charge is now
+  the table's 10 lb 10 oz, and each calibre above with it, through `g.fit_magazine` with no
+  keyword and the shared note, which cites the table. A figure of the eight would have moved, so
+  the eight's fits keep their shares as filed (`fit_magazine(..., as_filed=True)`) and the table
+  serves her and the other new ships; her module asks for nothing and overrides nothing.*
 - **Exercise:** `g.exercise_allowance(28, decks=2)` = 9, a third of her upper deck's 28 eighteens
   (the Regulations, the Gunner, Art. XXI, OCR l. 13122-13144), with `period.TWO_DECKS_EXERCISE_NOTE`.
 - **Filling:** the bill's `filling: 18`, the 590 column's quarter gunners (the Regulations 1808

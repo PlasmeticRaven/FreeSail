@@ -577,6 +577,66 @@ def test_brace_waits_for_a_tack_that_holds_the_yards():
     assert runner.in_progress()[1]["step"] == "waiting"
 
 
+@pytest.mark.parametrize(
+    "taken_in, said",
+    [
+        ((), "Trimmed the sheets of the fore topmast staysail, the jib and the spanker; "),
+        (("jib",), "Trimmed the sheets of the fore topmast staysail and the spanker; "),
+        (("jib", "fore.topmast_staysail"), "Trimmed the spanker sheet; "),
+        (("jib", "fore.topmast_staysail", "mizzen.spanker"), None),
+    ],
+)
+def test_a_trims_sheets_line_names_only_the_sails_still_set(taken_in, said):
+    """The lead's ruling (3)(iv) of 2026-11-10 (`Runner._group_done`): a trim's sheets log one line
+    when the group's last sheet is done (package 32e), and it named every sail of the group, one
+    taken in since among them (the *Neufchatel*'s gale: "Trimmed the sheets of the fore-and-aft
+    foresail and the mainsail ..." after lie a-try had taken her fore gaff sail in). It names only
+    the group's sails still set, its angles theirs, its data with them; none still set, no line.
+    The frigate's "trim the sheets", the deck reading 60 degrees of wind (the stub's physics): the
+    staysail's and the jib's sheets are done by 40 s and the spanker's at 67 s; sails taken in
+    meanwhile, before its sheet is done (the spanker's last of all, its sheet still in hand)."""
+    from freesail.orders import handle
+
+    ship = load_ship(FRIGATE)
+    runner = Runner(ship)
+    wind = make_wind(knots=3.0)
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    ship.dyn.apparent_wind_angle = units.deg_to_rad(60.0)
+    ship.dyn.apparent_wind_speed = 8.0
+    handle(ship, "trim the sheets")
+    group = {i.subject_id for i in runner.instances}
+    assert group == {"mizzen.spanker", "fore.topmast_staysail", "jib"}
+    notes = []
+    while any(i.subject_id != "mizzen.spanker" for i in runner.instances):
+        runner.step(ship, 1.0, wind)
+        notes.extend(ship.drain_notes())
+    assert [i.subject_id for i in runner.instances] == ["mizzen.spanker"]
+    assert "sail.trimmed" not in kinds(notes)  # the group's line waits for its last sheet
+    for sid in taken_in:
+        if sid != "mizzen.spanker":
+            ship.sails[sid].state = SailState.IN_THE_GEAR  # hauled down meanwhile
+    for _ in range(20):
+        runner.step(ship, 1.0, wind)
+        notes.extend(ship.drain_notes())
+    if "mizzen.spanker" in taken_in:
+        ship.sails["mizzen.spanker"].state = SailState.IN_THE_GEAR  # brailed up, its sheet in hand
+    _, rest = run(runner, ship, wind)
+    lines = [n for n in notes + rest if n[1] == "sail.trimmed"]
+    if said is None:
+        assert lines == [] and not runner.instances
+        return
+    (line,) = lines
+    assert line[2].startswith(said) and line[2].endswith(" off the centreline."), line[2]
+    order = ("fore.topmast_staysail", "jib", "mizzen.spanker")  # as their sheets were done
+    still = [sid for sid in order if sid not in taken_in]
+    assert line[4]["subjects"] == still and set(line[4]["sheet_deg"]) == set(still)
+    degs = [round(d) for d in line[4]["sheet_deg"].values()]
+    lo, hi = min(degs), max(degs)
+    angle = f"{lo}°" if lo == hi else f"{lo}° to {hi}°"
+    assert line[2].endswith(f"; {angle} off the centreline.")
+
+
 # ---------------------------------------------------------------------------
 # The weather factor
 # ---------------------------------------------------------------------------

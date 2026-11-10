@@ -690,6 +690,10 @@ def _fire(ship: Any, battery: Battery, said: str) -> Result:
             f"one bears.",
             data,
         )
+    if len(ready) == 1:
+        # one gun is no broadside to go together (package 75, the lead's ruling (13)(iii) of
+        # 2026-11-09, found on the bilander's armed fit: "1 guns ready")
+        return "guns.fire", f"Fire {which}: 1 gun ready to go as it bears.", data
     return "guns.fire", f"Fire {which}: {len(ready)} guns ready to go together as they bear.", data
 
 

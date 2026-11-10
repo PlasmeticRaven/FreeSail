@@ -584,10 +584,11 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     # her road's step 4: the quarter bill's arithmetic and the house's anchor rule set aside;
     # plain sail 1006 m2 to 959 with her fore staysail corrected from the working 93 m2 to the
     # triangle that fits forward of the fore mast, 46 (the lead's ruling of 2026-11-07, B2b), the
-    # arithmetic 35.5 to 33.8 trimmers and the bill's 35 kept as written (for the lead)
+    # arithmetic 35.5 to 33.8 trimmers and the bill's 35 kept as written (for the lead); 34 by the
+    # rule since the lead's ruling (6) of 2026-11-09 (old: "(35 written)")
     assert (
         "the quarter bill on 'as taken 1814': her plain sail 959 m2 against the brig-sloop's 766 "
-        "carries the brig's 27 trimmers to 33.8 (35 written); of her 94 seamen, the beat takes 42 "
+        "carries the brig's 27 trimmers to 33.8 (34 written); of her 94 seamen, the beat takes 42 "
         "to her guns" in said
     )
     assert "hermaphrodite-brig: her rope's scales, fore 1.194, head 1.314, fore gaff" in said
@@ -768,7 +769,9 @@ def test_her_company_holds_niles_and_cobb():
         ("boy", "afterguard", "landsman", True),
     ]
     bill = crew.quarter_bill
-    assert bill.trimmers == {"forecastle": 9, "fore_top": 11, "afterguard": 15}
+    # 34 by the rule (the lead's ruling (6) of 2026-11-09): the brig's 27 by her plain sail, 33.8,
+    # rounded, split by largest remainder on Neuf-D's 9, 11 and 15 (old: 35, the afterguard's 15)
+    assert bill.trimmers == {"forecastle": 9, "fore_top": 11, "afterguard": 14}
     assert (bill.helm, bill.powder, bill.priority) == (1, 2, "sail before guns")
     assert (bill.small_arms, bill.boarders) == (26, 85)
 
@@ -803,12 +806,14 @@ def test_her_quarters_at_the_beat_fill_every_gun_and_leave_the_trimmers_measured
     """Neuf-D §6.4: `Quarters.beat` measured at muster on her fit at seed 7 (crew/quarters.py).
     Every gun crew fills: ten crews, a crew to each carronade pair and to each chaser, 42 men. The
     beat takes the marines to the carronades first (`_preferred_stations`, the engine's order for
-    every ship bearing marines), so her sixteen stand at the carronades with fifteen of the
-    afterguard and a waister, and no marines' division forms, as on the frigate-36 and the razee
-    (Indf §18 item 13): the design's 'the marines stand apart from the guns' is not what the engine
-    does, and is reported. Her forecastlemen man the two long 6s; the trimmers are the bill's 35
-    and every seaman the guns leave, 65; the tiller one; the powder her two waisters and six
-    idlers; the carpenter's crew at the wings."""
+    every ship bearing marines), so her sixteen stand at the carronades with sixteen of the
+    afterguard, and no marines' division forms, as on the frigate-36 and the razee (Indf §18 item
+    13): the design's 'the marines stand apart from the guns' is not what the engine does, and is
+    reported. Her forecastlemen man the two long 6s; the trimmers are the bill's 34 and every
+    seaman the guns leave, 65; the tiller one; the powder her two waisters and six idlers; the
+    carpenter's crew at the wings. Old, with the bill's 35 (before the lead's ruling (6) of
+    2026-11-09, 34 by the rule): fifteen of the afterguard and a waister at the carronades, the
+    trimmers 65 the same, the afterguard's one more of them and the waisters' one fewer."""
     from freesail.crew.model import Station
     from freesail.crew.quarters import CARPENTER, HELM, MARINES, POWDER, TRIMMERS, quarters_of
     from tests.test_brains import world_at
@@ -823,8 +828,7 @@ def test_her_quarters_at_the_beat_fill_every_gun_and_leave_the_trimmers_measured
     at_guns = Counter((gc.kind, s.station) for gc in q.crews.values() for s in gc.members)
     assert at_guns == {
         ("carronade", Station.MARINES): 16,
-        ("carronade", Station.AFTERGUARD): 15,
-        ("carronade", Station.WAISTERS): 1,
+        ("carronade", Station.AFTERGUARD): 16,
         ("long", Station.FORECASTLE): 10,
     }
     assert not q.divisions.get(MARINES)

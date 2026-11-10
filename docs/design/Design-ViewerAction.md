@@ -560,7 +560,11 @@ notes, "Package 81":
   foot held at the sea. **Each barrel has its muzzle's face**, so a gun run out towards the viewer
   shows.
 - **The served `charge_lb`** sizes each gun's plume by the cube root of its powder (Table No. 29's,
-  `parts.charge_lb`).
+  `parts.charge_lb`). *Since package 75's SW-1 (2026-11-09): the gun's own charge is its fit's
+  `charges` (`parts.filed_charge_lb`, `viewer_guns.served(..., charges)`, which `ship_graph` passes
+  from the ship's fit), as its magazine fills it: Table No. 29's in the new ships, the shares as
+  filed in the eight files of the packages before 75 (the lead's rule, Build-Ships.md §10), and a
+  fit without charges the shares.*
 - **The words**: a port, its lid, a hole, a gun, a flag each say themselves in the ship's words
   ("No. 3 starboard gun, a long 18-pounder: run out"; "an upper-deck port, shut, the sea at its
   sill"; "a shot hole through the side to larboard"; "British colours, the red ensign, at the
