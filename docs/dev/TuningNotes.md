@@ -23627,3 +23627,58 @@ that a checkpoint read and a replay of its save stand in the same state; a save'
 `Message` (the scenario's `letters:` and the `message:` orders are words), so its replay reads
 by the new road. Every pin and digest of a passage with a letter that moves is put old beside
 new with its proof (a toggle of the new road).
+
+### Step 1: the thing with words
+
+**Built, against the brief.** A letter is a thing (`world.things.Thing`) with `words`,
+`author`, `to` (and `to_id`/`to_home` where the words name one of the people), `written`,
+`sealed`, `broken` and `gone`, each a plain class default and out of `to_dict` while empty (so
+a thing of before reads and digests as it did; a letter's words are never in `to_dict`). Its
+noun is "letter" (or the "packet", "note" or "dispatch" of its name), and "the letter", "the
+letter to <whom>", "the letter from <whom>", "<whom>'s letter" and "the sealed letter" name
+it. **Written** by the free line `write a letter to <whom>: "<words>"` (`pen`, `write to`) by
+the drafting's road: the writer's own name, the stamp of `books._stamp`, and `books.
+_in_the_cabin` (the captain on deck goes below to his table and is at his writing five
+minutes); the letter in the writer's keeping, so **carried, given, put down, hidden and thrown
+overboard** by the free lines of 53b unchanged. **Sealed** (`seal`, `seal up`), **opened**
+(`open`, `break the seal of`, `unseal`: the seal broken, which shows wherever the letter is
+listed, "a letter to the port admiral with its seal broken"; a sealed one listed "a sealed
+letter to ..."; no new seal over a broken one), **read** (`read`, within reach; a sealed letter
+refused as said "it is read only by breaking its seal ('open the letter'), which shows"),
+**looked at** (`examine`, `look at`, `inspect`, `look over`: the thing's name, its
+description, a letter's direction, hand and seal, and where it lies; never its words) and
+**destroyed** (`burn`, `tear up`, `tear`, `rip up`, `destroy`: a paper within reach gone,
+its place `GONE` and how it went kept, "the letter to the port admiral is burnt, and gone";
+a thing that is no paper refused as said "the cask is no paper to burn; throw it overboard";
+no fire in the boat). A thing that is no letter is opened and read as it always was (as said,
+nothing moves). **The director's form**: `aboard: a letter from <whom> to <whom>, <where>[,
+sealed]: "<words>"` (the words peeled from the end before the commas are read), and `aboard:
+remove <a thing>` (`aboard: the packet removed`, `take away`): out of the world, as if never,
+no line of the play log; refused out of a held person's keeping (the rule of reach), doubted
+where it lies within a held person's reach ("who would see it go by no hand"). Two forms in
+`agents/director.py` (`aboard.letter`, `aboard.removed`), their examples performed by the
+forms' test. **One road**: the player at the prompt, a station by its `submit_order`, the
+director's form; the director has no hands for the free lines, as before.
+
+**Who sees the words.** The free line is a word heard where it is said and carries the deed
+only ("By the captain, in the cabin: read the letter; the letter to the port admiral read.");
+its data's `said` and the `order.accepted` line say a writing without the words (the World
+reads `order_as_said` from the result, `core.world.ORDER_AS_SAID`; the journal keeps the order
+whole for the replay). The words are a line after it (`THEN_LINES`, the World writing the
+order's own line first): `free.read` to the reader and `free.written` to the writer (his own
+word, shown him), of a new reach `reader` in `world.knowledge.REACH`: the person named by his
+whole name, asleep or awake, and nobody else (the class `person` falls back to the deck and
+the place of delivery, how a letter is read aloud today); the director's sample, which has
+everything, has it.
+
+**Taken another way, with the reason.** (1) `look at` was the observer's driver command at the
+console and the page whatever the world (`ui.console`, `ui.server._drivers_eye`), refused with
+"The view is the ship's" in a world with a ship of the player's; it is now the driver's only in
+an observed world, and the game's free line otherwise (the probe found it). (2) A prisoner
+writes, reads and looks as he speaks: 74's rule (`captive.captive_words`, "You may speak ...
+and read what your place allows") refuses a captive his deck's orders and the books
+(`orders.handle` before `books.handle`), never the free lines, which reach no deck; so a
+captive's letter is written where he is (no going to a cabin of the captor's: `_in_the_cabin`
+is not called for him), and `captive.py` is untouched. (3) A director's thing named "a letter
+for the port admiral" with no words stays the plain thing it was (a letter is one with words or
+written), so no thing of before changes its noun.
