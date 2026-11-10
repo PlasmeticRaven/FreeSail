@@ -2,9 +2,9 @@
 # Every source with its licence, attribution, URL, retrieval date and checksum; the
 # regions and their tiles; the attribution block the game shows in its about text.
 format: 1
-built: '2026-10-30'
+built: '2026-11-10'
 tool: tools/build_charts.py
-build_hash: 8beeb3495dd95356
+build_hash: cbfaf96df0ffab5d
 levels:
   '0':
     cell_sec: 150.0
@@ -34,7 +34,7 @@ nodata: -32768
 charts:
   atlantic-east:
     title: The Channel, Biscay and the Iberian coast to Madeira, the Strait, the Mediterranean west and
-      the Balearics, the Gulf of Lion and the Tyrrhenian
+      the Balearics, the Catalan coast, the Gulf of Lion and the Tyrrhenian
     regions:
     - channel-west
     - channel-mid
@@ -50,6 +50,7 @@ charts:
     - gulf-of-lion
     - ligurian-sea
     - tyrrhenian
+    - catalan-coast
     corridor: atlantic-corridor
 regions:
   channel-west:
@@ -7051,19 +7052,21 @@ regions:
         west: -0.74
         east: -0.6
     fill_to_chart_datum: true
-    feature_count: 95
+    feature_count: 107
     features_by_kind:
-      anchorage: 32
-      castle: 7
-      headland: 14
+      anchorage: 34
+      castle: 9
+      church: 1
+      headland: 17
       hill: 8
-      island: 13
+      island: 14
+      ledge: 1
       light: 1
       place: 1
-      rock: 8
+      rock: 9
       shoal: 3
       tower: 2
-      town: 6
+      town: 7
   balearics:
     title: The Balearics, and Barbary from Mostaganem to Algiers
     bounds:
@@ -8867,21 +8870,21 @@ regions:
         west: 7.28
         east: 7.35
     fill_to_chart_datum: true
-    feature_count: 114
+    feature_count: 126
     features_by_kind:
-      anchorage: 16
-      castle: 14
+      anchorage: 19
+      castle: 16
       church: 2
-      headland: 16
+      headland: 19
       hill: 7
-      island: 14
-      ledge: 1
+      island: 15
+      ledge: 2
       light: 9
       place: 3
-      rock: 10
+      rock: 11
       shoal: 1
       tower: 4
-      town: 15
+      town: 16
       transit: 2
   ligurian-sea:
     title: The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena
@@ -10512,6 +10515,450 @@ regions:
       rock: 6
       tower: 4
       town: 20
+  catalan-coast:
+    title: The Catalan coast, the Alfaques and the Ebro to Tarragona, Barcelona and Blanes
+    bounds:
+      south: 40.56
+      north: 41.9
+      west: 0.3
+      east: 3.0
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: '146016_192'
+        south_sec: 146016
+        west_sec: 192
+        min_depth_m: null
+        bytes: 136983
+      - name: '146016_1728'
+        south_sec: 146016
+        west_sec: 1728
+        min_depth_m: -0.0
+        bytes: 134552
+      - name: '146016_3264'
+        south_sec: 146016
+        west_sec: 3264
+        min_depth_m: 1.1
+        bytes: 126330
+      - name: '146016_4800'
+        south_sec: 146016
+        west_sec: 4800
+        min_depth_m: 117.7
+        bytes: 214246
+      - name: '146016_6336'
+        south_sec: 146016
+        west_sec: 6336
+        min_depth_m: 673.6
+        bytes: 217426
+      - name: '146016_7872'
+        south_sec: 146016
+        west_sec: 7872
+        min_depth_m: 1116.6
+        bytes: 190400
+      - name: '147552_192'
+        south_sec: 147552
+        west_sec: 192
+        min_depth_m: null
+        bytes: 124983
+      - name: '147552_1728'
+        south_sec: 147552
+        west_sec: 1728
+        min_depth_m: null
+        bytes: 117759
+      - name: '147552_3264'
+        south_sec: 147552
+        west_sec: 3264
+        min_depth_m: 0.0
+        bytes: 130364
+      - name: '147552_4800'
+        south_sec: 147552
+        west_sec: 4800
+        min_depth_m: 0.0
+        bytes: 150420
+      - name: '147552_6336'
+        south_sec: 147552
+        west_sec: 6336
+        min_depth_m: -8.0
+        bytes: 215311
+      - name: '147552_7872'
+        south_sec: 147552
+        west_sec: 7872
+        min_depth_m: 0.0
+        bytes: 247204
+      - name: '149088_192'
+        south_sec: 149088
+        west_sec: 192
+        min_depth_m: null
+        bytes: 112588
+      - name: '149088_1728'
+        south_sec: 149088
+        west_sec: 1728
+        min_depth_m: null
+        bytes: 98286
+      - name: '149088_3264'
+        south_sec: 149088
+        west_sec: 3264
+        min_depth_m: null
+        bytes: 100134
+      - name: '149088_4800'
+        south_sec: 149088
+        west_sec: 4800
+        min_depth_m: null
+        bytes: 116753
+      - name: '149088_6336'
+        south_sec: 149088
+        west_sec: 6336
+        min_depth_m: null
+        bytes: 117594
+      - name: '149088_7872'
+        south_sec: 149088
+        west_sec: 7872
+        min_depth_m: 0.0
+        bytes: 139853
+      - name: '150624_192'
+        south_sec: 150624
+        west_sec: 192
+        min_depth_m: null
+        bytes: 115014
+      - name: '150624_1728'
+        south_sec: 150624
+        west_sec: 1728
+        min_depth_m: null
+        bytes: 124828
+      - name: '150624_3264'
+        south_sec: 150624
+        west_sec: 3264
+        min_depth_m: null
+        bytes: 128080
+      - name: '150624_4800'
+        south_sec: 150624
+        west_sec: 4800
+        min_depth_m: null
+        bytes: 130874
+      - name: '150624_6336'
+        south_sec: 150624
+        west_sec: 6336
+        min_depth_m: null
+        bytes: 124965
+      - name: '150624_7872'
+        south_sec: 150624
+        west_sec: 7872
+        min_depth_m: null
+        bytes: 129687
+      '3':
+      - name: '148576_7616'
+        south_sec: 148576
+        west_sec: 7616
+        min_depth_m: 0.0
+        bytes: 84986
+        harbour: barcelona
+      - name: '148576_7872'
+        south_sec: 148576
+        west_sec: 7872
+        min_depth_m: 32.3
+        bytes: 74736
+        harbour: barcelona
+      - name: '148832_7616'
+        south_sec: 148832
+        west_sec: 7616
+        min_depth_m: -8.0
+        bytes: 54728
+        harbour: barcelona
+      - name: '148832_7872'
+        south_sec: 148832
+        west_sec: 7872
+        min_depth_m: 0.0
+        bytes: 84926
+        harbour: barcelona
+      - name: '149088_7616'
+        south_sec: 149088
+        west_sec: 7616
+        min_depth_m: null
+        bytes: 56596
+        harbour: barcelona
+      - name: '149088_7872'
+        south_sec: 149088
+        west_sec: 7872
+        min_depth_m: 0.0
+        bytes: 58728
+        harbour: barcelona
+      - name: '147552_3776'
+        south_sec: 147552
+        west_sec: 3776
+        min_depth_m: 5.4
+        bytes: 63771
+        harbour: tarragona
+      - name: '147552_4032'
+        south_sec: 147552
+        west_sec: 4032
+        min_depth_m: 0.0
+        bytes: 69158
+        harbour: tarragona
+      - name: '147552_4288'
+        south_sec: 147552
+        west_sec: 4288
+        min_depth_m: 36.7
+        bytes: 67784
+        harbour: tarragona
+      - name: '147552_4544'
+        south_sec: 147552
+        west_sec: 4544
+        min_depth_m: 61.8
+        bytes: 63804
+        harbour: tarragona
+      - name: '147808_3776'
+        south_sec: 147808
+        west_sec: 3776
+        min_depth_m: 0.0
+        bytes: 44854
+        harbour: tarragona
+      - name: '147808_4032'
+        south_sec: 147808
+        west_sec: 4032
+        min_depth_m: 0.0
+        bytes: 53542
+        harbour: tarragona
+      - name: '147808_4288'
+        south_sec: 147808
+        west_sec: 4288
+        min_depth_m: 0.0
+        bytes: 79155
+        harbour: tarragona
+      - name: '147808_4544'
+        south_sec: 147808
+        west_sec: 4544
+        min_depth_m: 0.0
+        bytes: 81637
+        harbour: tarragona
+      - name: '148064_3776'
+        south_sec: 148064
+        west_sec: 3776
+        min_depth_m: null
+        bytes: 43599
+        harbour: tarragona
+      - name: '148064_4032'
+        south_sec: 148064
+        west_sec: 4032
+        min_depth_m: null
+        bytes: 32804
+        harbour: tarragona
+      - name: '148064_4288'
+        south_sec: 148064
+        west_sec: 4288
+        min_depth_m: null
+        bytes: 44980
+        harbour: tarragona
+      - name: '148064_4544'
+        south_sec: 148064
+        west_sec: 4544
+        min_depth_m: 0.0
+        bytes: 51785
+        harbour: tarragona
+      - name: '146016_1728'
+        south_sec: 146016
+        west_sec: 1728
+        min_depth_m: 0.0
+        bytes: 63771
+        harbour: alfaques
+      - name: '146016_1984'
+        south_sec: 146016
+        west_sec: 1984
+        min_depth_m: 0.0
+        bytes: 66848
+        harbour: alfaques
+      - name: '146016_2240'
+        south_sec: 146016
+        west_sec: 2240
+        min_depth_m: 0.0
+        bytes: 52038
+        harbour: alfaques
+      - name: '146016_2496'
+        south_sec: 146016
+        west_sec: 2496
+        min_depth_m: 0.0
+        bytes: 71398
+        harbour: alfaques
+      - name: '146016_2752'
+        south_sec: 146016
+        west_sec: 2752
+        min_depth_m: 8.0
+        bytes: 59476
+        harbour: alfaques
+      - name: '146016_3008'
+        south_sec: 146016
+        west_sec: 3008
+        min_depth_m: 12.7
+        bytes: 65916
+        harbour: alfaques
+      - name: '146016_3264'
+        south_sec: 146016
+        west_sec: 3264
+        min_depth_m: 27.7
+        bytes: 62382
+        harbour: alfaques
+      - name: '146272_1728'
+        south_sec: 146272
+        west_sec: 1728
+        min_depth_m: null
+        bytes: 56398
+        harbour: alfaques
+      - name: '146272_1984'
+        south_sec: 146272
+        west_sec: 1984
+        min_depth_m: null
+        bytes: 40828
+        harbour: alfaques
+      - name: '146272_2240'
+        south_sec: 146272
+        west_sec: 2240
+        min_depth_m: 1.0
+        bytes: 18618
+        harbour: alfaques
+      - name: '146272_2496'
+        south_sec: 146272
+        west_sec: 2496
+        min_depth_m: -0.0
+        bytes: 25630
+        harbour: alfaques
+      - name: '146272_2752'
+        south_sec: 146272
+        west_sec: 2752
+        min_depth_m: 1.0
+        bytes: 38784
+        harbour: alfaques
+      - name: '146272_3008'
+        south_sec: 146272
+        west_sec: 3008
+        min_depth_m: 0.9
+        bytes: 57541
+        harbour: alfaques
+      - name: '146272_3264'
+        south_sec: 146272
+        west_sec: 3264
+        min_depth_m: 8.7
+        bytes: 61544
+        harbour: alfaques
+      - name: '146528_1728'
+        south_sec: 146528
+        west_sec: 1728
+        min_depth_m: null
+        bytes: 36832
+        harbour: alfaques
+      - name: '146528_1984'
+        south_sec: 146528
+        west_sec: 1984
+        min_depth_m: null
+        bytes: 39619
+        harbour: alfaques
+      - name: '146528_2240'
+        south_sec: 146528
+        west_sec: 2240
+        min_depth_m: null
+        bytes: 22754
+        harbour: alfaques
+      - name: '146528_2496'
+        south_sec: 146528
+        west_sec: 2496
+        min_depth_m: 0.0
+        bytes: 23171
+        harbour: alfaques
+      - name: '146528_2752'
+        south_sec: 146528
+        west_sec: 2752
+        min_depth_m: -0.0
+        bytes: 37957
+        harbour: alfaques
+      - name: '146528_3008'
+        south_sec: 146528
+        west_sec: 3008
+        min_depth_m: -0.0
+        bytes: 68313
+        harbour: alfaques
+      - name: '146528_3264'
+        south_sec: 146528
+        west_sec: 3264
+        min_depth_m: 6.5
+        bytes: 62731
+        harbour: alfaques
+      - name: '146784_1728'
+        south_sec: 146784
+        west_sec: 1728
+        min_depth_m: null
+        bytes: 43432
+        harbour: alfaques
+      - name: '146784_1984'
+        south_sec: 146784
+        west_sec: 1984
+        min_depth_m: null
+        bytes: 56010
+        harbour: alfaques
+      - name: '146784_2240'
+        south_sec: 146784
+        west_sec: 2240
+        min_depth_m: null
+        bytes: 41563
+        harbour: alfaques
+      - name: '146784_2496'
+        south_sec: 146784
+        west_sec: 2496
+        min_depth_m: 0.0
+        bytes: 62196
+        harbour: alfaques
+      - name: '146784_2752'
+        south_sec: 146784
+        west_sec: 2752
+        min_depth_m: -0.0
+        bytes: 69184
+        harbour: alfaques
+      - name: '146784_3008'
+        south_sec: 146784
+        west_sec: 3008
+        min_depth_m: 10.7
+        bytes: 73683
+        harbour: alfaques
+      - name: '146784_3264'
+        south_sec: 146784
+        west_sec: 3264
+        min_depth_m: 47.7
+        bytes: 62253
+        harbour: alfaques
+    coast: coast/catalan-coast.geojson
+    features: features/catalan-coast.yaml
+    index: features/catalan-coast.index.json
+    overrides: []
+    harbours:
+      barcelona:
+        south: 41.33
+        north: 41.42
+        west: 2.12
+        east: 2.24
+      tarragona:
+        south: 41.03
+        north: 41.14
+        west: 1.09
+        east: 1.28
+      alfaques:
+        south: 40.56
+        north: 40.83
+        west: 0.55
+        east: 0.92
+        fill_raise: eleven
+    fill_to_chart_datum: true
+    feature_count: 45
+    features_by_kind:
+      anchorage: 8
+      castle: 5
+      church: 1
+      headland: 6
+      hill: 3
+      ledge: 1
+      light: 3
+      place: 1
+      shoal: 2
+      tower: 3
+      town: 12
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -10968,6 +11415,12 @@ sources:
       sha256: 2c526967a9a325c98ed797deb52830740922be843f10a4dfe7ad962415aff026
       bytes: 8064872
       file: gebco_2025_s36.10_n42.45_w-10.40_e-5.70_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 40.35, ''north'':
+        42.5, ''west'': -0.15, ''east'': 3.25})'
+      retrieved: '2026-11-10'
+      sha256: ebe84ef45da27b305a86923ee0646c280b7df6ff796cf99ed1c81c25182c55d2
+      bytes: 2314589
+      file: gebco_2025_s40.35_n42.50_w-0.15_e3.25_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -11122,6 +11575,16 @@ sources:
       sha256: 1287a9f2bc172c91961be5ec9db898d1d4e290cbcccde01b649212a0e2786a32
       bytes: 102148668
       file: emodnet_dtm2024_elevation_max_36.20_42.35_-10.30_-5.80.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(40.45):(42.4)%5D%5B(-0.05):(3.15)%5D
+      retrieved: '2026-11-10'
+      sha256: 30c6fe1388a7d2f322f31eb6080e76d3940721217817adb6e119802c766ecf89
+      bytes: 23067684
+      file: emodnet_dtm2024_elevation_40.45_42.40_-0.05_3.15.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(40.45):(42.4)%5D%5B(-0.05):(3.15)%5D
+      retrieved: '2026-11-10'
+      sha256: f9b8d18ea11ba54741cb35ae6bb98a7f646930759b0664594c892139098a8326
+      bytes: 23067324
+      file: emodnet_dtm2024_elevation_max_40.45_42.40_-0.05_3.15.nc
     status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
