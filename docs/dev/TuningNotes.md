@@ -22407,8 +22407,6 @@ twice (no fit; the brig's file's first row). She has no row of her own now: the 
 merchant brig of her own file (sixteen men, her ports painted) with the role `cartel` and `what`
 said on her, "a cartel", under her flag of truce. Nothing else met; the captive's scenes hold.
 
-
-
 **The suites on the step's tree, 96261d8**, in a worktree pinned at it, ruff check and format clean:
 the fast tier whole run twice, exit 1 then exit 0 (18:34:30 to 19:19:12, one failure, 81's truth 7-441
 whose wall-time ratio of the action's entries to the whole snapshot came out 0.30 under four workers
@@ -22611,6 +22609,35 @@ tests of the prisoner's prompt pass on the merged tree as they stood (the refusa
 `captive_words` by either road), and 98's own (`test_orders_places`, `test_knowledge`) beside
 them.
 
+**The suites on the step's final tree** (ceed163, one hash, a worktree pinned there; ruff check
+and format clean; every run started in the harness's background mode, the tiers as separate
+tasks under its two-hour cap; 2026-11-10 UTC): the fast tier whole **exit 0** (03:27:24 to
+04:13:22; 7,057 passed and one expected failure of the trunk's own, 482 slow tests left out);
+the slow tier of the known truths, the profile and the Indefatigable **exit 0** (04:13:39 to
+04:57:00; 506 passed and the trunk's eight expected failures); the slow tier of the touched
+files (`test_far_action`, `test_captive`, `test_prizes`, `test_brains`, `test_far_hail`,
+`test_squadrons`, `test_captains`, `test_crews`, `test_fight`, `test_between_hulls`,
+`test_signals`, `test_standing`, `test_orders_places`, `test_places`, `test_knowledge`,
+`test_director`, `test_world_orders`, `test_readings`, `test_subtypes`, `test_primer`,
+`test_in_world`) **exit 0** (04:57:00 to 05:11:10; 1,803 passed); the pace tests alone and
+last **exit 0** (05:11:10 to 05:16:23; 14 passed, no floor lowered). Nothing skipped in any
+tier.
+
+**The measures before it, old beside new.** At dccbf84 (the mends as first committed): fast
+**exit 0** (22:26:48 to 23:16:05, 2026-11-09), slow of the truths **exit 1** (23:16:35 to
+00:05:46) with two failures. Truth 7-279 went aground at tick 91,450: mend (1)'s
+`hand_on_her` asked for the person of the actor in every world, and `People.captain` musters
+the people where they were not mustered, which moved a world that had none (old: the people
+mustered by the check, the truth aground; new: the check returns before any person is looked
+for where the world is not mustered, `movement._mustered`, e89110d, and the truth passes as it
+stood). Truth 7-284 is a ratio of two wall-clock times and failed under four workers beside
+the long truths; it passes alone and in every later run, and nothing of it was changed. At
+e89110d: fast **exit 0** (00:11:40 to 00:57:39). At 05e13fc (the trunk at 3b76d06 merged): slow
+of the truths **exit 0** (01:09:56 to 01:55:27), slow of the touched files **exit 0** (01:55:40
+to 02:08:12), pace **exit 0** (02:08:12 to 02:13:30, 14 passed), fast **exit 0** (02:13:45 to
+02:59:13). The trunk then gained package 98's steps, and the three tiers were run once more
+at ceed163, above: those are the step's figures.
+
 ### Step 5: the prize court and the money (the design's §5)
 
 **Built as designed** (`freesail/world/prize_court.py`; `data/business.yaml`'s `prize_values`,
@@ -22669,6 +22696,14 @@ salvage of the brig X (the French privateer Vengeur retaking her from the Amazon
 brig-sloop's guns before SW-4), an eighth of her hull, guns, powder and shot, the Vengeur's whole; the reserved fourth on a privateer brig
 of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
 seventh day.
+
+**The trunk merged at the step's boundary** (87f7fe8, a merge commit at dd12cba: the lead's
+records of runs 58 and 59, two lines of `docs/dev/M7-WorkPackages.md`): it met nothing. **A
+soft place of step 4's own mended here**: the test of the cap-full reply
+(`tests/test_far_action.py`) skipped itself if the cap woke the frigate in place of the cutter;
+the scene is the same at every run and the skip was never taken (no tier at step 4's tree
+skipped anything), and it is an assertion now ("the cap holds the cutter alone"). **Pins
+moved: none.**
 
 ### Step 6: the court martial, a new command, and the consent revision drafted (the design's §6, §7)
 

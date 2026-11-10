@@ -295,8 +295,7 @@ def test_a_far_ship_replies_to_an_awake_hull_only_where_the_cap_has_no_room():
         w.run(60)
         if FA.FALLBACK_COUNT["rounds"] or b.struck or (a.crew is not None and a.crew.awake):
             break
-    if a.crew is not None and a.crew.awake:
-        pytest.skip("the cap woke the frigate in place of the cutter: the near action's road")
+    assert not (a.crew is not None and a.crew.awake), "the cap holds the cutter alone"
     assert FA.FALLBACK_COUNT["rounds"] >= 1
     replies = [e for e in b.crew.log if e.kind == "action.far_reply"]
     assert replies and "the far ship's reply, the cap full" in replies[0].text
