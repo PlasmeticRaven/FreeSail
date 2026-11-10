@@ -4142,8 +4142,7 @@ of the touched files and the known truths whole exit 0, 664 passed, 8 xfailed; `
 merge:** the trial on the trunk after 74's step 5 with the two appends kept, lint-clean; no
 model or vendor name in the diff; the existing tests changed only in their counts of the
 chart's regions, ports and gauges, old beside new; the fast tier whole on it exit 0, 7,252
-passed by the dots and 1 xfailed, 16:26 to 17:37 UTC; the whole suite in the cloud dispatched
-after run 65, the figures to follow. **Package 101 closed.** Next of its kind: 104, the sea
+passed by the dots and 1 xfailed, 16:26 to 17:37 UTC; the whole suite in the cloud, run 66 (2026-11-10, 18:46 to 19:56 UTC, on 73eb6d92): green whole, lint, the six shards and the pace job. **Package 101 closed.** Next of its kind: 104, the sea
 between Minorca and Sardinia, the lead's to measure and put to the owner.
 
 ### Package 75: B7, the 74 (the *Bellerophon*, steps 0 to 6 and her review's mends), as merged (2026-11-10)
