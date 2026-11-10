@@ -87,7 +87,7 @@ on these packages; that is the owner's choice.
 | 101 | Opus | **The Catalan coast block** (the owner, 2026-11-10: the gap in the chart on the eastern Iberian coast): a new region of `atlantic-east` between `balearics`' north bound (40.56 N) and `gulf-of-lion`'s west bound (3.0 E), the Ebro's mouths and the Alfaques, Salou, Tarragona, Barcelona and Mataró to the coast's crossing of 3 E near Tossa; with it the ports the coast lacks, in the block and in the charted water beside it | proposed 2026-11-10, **the gap measured by the lead** (the chart probed on a tenth of a degree): nothing at all (no depth, no land, no coast, no region) north of 40.56 N and west of 2.61 E as far as the land; the Gulf's first tile column gives depth from 2.61 E to 3.0 E, which no region owns; the sea so missing is a wedge of some 80 miles north and south by 110 east and west at its foot, from the coast at 0.5 E on 40.56 N to the coast's crossing of 3 E at 41.75 N. A box of 40.56 to about 41.9 N and about 0.3 to 3.0 E is some 3.6 square degrees, the smallest of the Mediterranean's blocks (about 28 level-2 tiles, 4 to 6 MB by the others' sizes, far under the 40 MB rule); the seam's exact meridian (3.0 E or the Gulf's tile edge) the builder's first measurement by `docs/dev/ChartBlocks.md`. **No port file exists between Cartagena and Marseille on the main**: in the block Barcelona, Tarragona (with Salou's road) and the Alfaques; beside it in water already charted Rosas and Palamós (`gulf-of-lion`), Valencia's Grao and Alicante (`mediterranean-west`). **Approved by the owner 2026-11-10: all seven ports, to launch at the close of package 98**; briefed 2026-11-10 (below), truths 7-490 to 7-499; **launched 2026-11-10 10:56 UTC on 98's close** as an Opus sibling session on `claude/pkg-101` (session_01XooV48XGVqWYMrANqYZQEs), the trunk at 0a7c3a9d; a short measurement report (the seam, the tiles' count and bytes) before any tile is committed, then one final report at one hash; **its measurement report ruled 2026-11-10** (the seam the how-to's plain answer, the Gulf's column kept the Gulf's; 24 level-2 tiles and 26 of the three harbours', 4.94 MB in all; Barcelona's gauge the block's; no patch for the four ports beside the block, no override of the delta for want of a public-domain plan, the truths written to the pilots' own words; **found: the wars table carries `since` and no `until` and `Nations.at_war` reads no date, so Britain is at war with Spain on any day and a Spanish port reads hostile in 1809**: not the block's to mend, a case for decision 66 and package 103, to be said to the owner); **the final report merged 2026-11-10 (1a4a4337): the gap closed, 6.07 MB, seven ports, truths 7-490 to 7-499, no pin moved; CLOSED** |
 | 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design; **briefed 2026-11-11 for the owner's final approval** ("## Package 102" below): five steps, truths 7-500 to 7-509; a stranger's hoist as a strip of flags beside her in the strangers' panel, the view drawing no ship but the player's |
 | 103 | Fable (the primary review agent; subagents allowed) | **The range reviewed, and the lever designed** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | proposed 2026-11-10; **briefed 2026-11-10 (below) at the owner's word, for Fable; HELD by the owner, not launched** ("there's enough things in flight right now to let close out, and I'll sleep on it"); **the brief widened the same day at the owner's word** (Fable as the primary review agent for the date range audit and the overall design of fidelity, a wider and freer scope, subagents allowed); **consolidated with the other review and design packages (96, 92) towards the end of the order**, this one first, the three together to cover the whole range |
-| 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in |
+| 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in; **measured and briefed 2026-11-11 for the owner's final approval and his choice of ports** ("## Package 104" below): the hole is L-shaped, its southern arm running east past Tunis and Cape Bon; two regions in one package (4.5 to 8.0 E north of 36.29 N; 8.0 to 11.15 E south of 38.5 N), some 26 to 29 MB, truths 7-510 to 7-519; **found with it and unbooked: Sicily south of 38.43 N, the Sicilian channel and Malta are off the chart** |
 
 **The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
 on, not a ruling: every launch still waits for the owner's word).** *In flight (as of 11:00 UTC, 98 closed and 60's note merged):* 74 (Fable;
@@ -7513,6 +7513,128 @@ text is the world's (package 85's rule). Each step reports one hash measured in 
 worktree (ruff check and format; the fast tier whole; the slow tier of the touched files and
 of the known truths with the recorded passages by name; the pace alone and last), and the
 lead merges by that hash.
+
+
+## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (two regions in one package, working names `sardinian-sea` and `tunis-coast`; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the regions' tiles, coasts, indexes, manifest entries, features and overrides; `features/balearics.yaml` and `features/tyrrhenian.yaml` with their indexes only for marks beside the block; `data/ports/*.yaml` new; `data/nations.yaml` the regency of Tunis and the ports' index; `data/tides/streams.yaml` `book_limits` and any area a pilot gives; `data/weather/climatology.yaml` the boxes; the tests that name every region)
+
+**BRIEFED 2026-11-11 for the owner's final approval, with the ports for him to choose; not
+launched.** Opus. The chart's second hole in the western basin (the owner, 2026-11-10: "You
+may book the second chart hole, Minorca to Sardinia, for a chart block subsequent to 101"),
+measured by the lead on 2026-11-10 and found larger than booked. Built as
+`docs/dev/ChartBlocks.md` says (read it whole first, with 79c's, 79d's and 101's sections of
+it and of the tuning notes: the 40 MB rule, the seam rule, the world's tide over the
+Mediterranean, the gauges planned before the build, the draft positions that miss by a
+kilometre, the business that wants a price ratio, the `tracks:` a cape between two ports
+asks). It changes no byte of any other region's level-2 tiles or coast.
+
+**The hole as measured** (the chart's own `elevation_at` and `region_at` probed on a tenth of
+a degree from 35.5 N to 44.5 N and 0 to 10.5 E, the edges by bisection; the tiles lie on one
+grid of the globe counted from 90 S and 180 W, 0.42667 degrees to a tile at level 2, so the
+edges are tile edges): **one piece, shaped like an L.** West edge 4.7467 E, the far edge of
+`balearics`' last tile column, at every latitude from 35.5 to 40.55 N. North edge 40.56 N,
+`gulf-of-lion`'s row edge, from 4.75 to 7.73 E. East edge 7.7333 E, `tyrrhenian`'s first
+column, **but only north of 38.4267 N: south of that row the hole runs on eastward** past
+Bizerta, Tunis and Cape Bon, and was still open at 16 E. In it, with no depth, land or
+coast: Bougie, Djidjelli, Collo, Stora, Bona, La Calle, Tabarka, the Galita, Bizerta, Tunis
+and Cape Bon. Already on the chart: Dellys (in `balearics`' tiles, with no feature) and
+Sardinia's west and south coast (`features/tyrrhenian.yaml` has Capo Caccia, Alghero, Bosa,
+Oristano's road, San Pietro and Carloforte, Sant'Antioco, the Toro and the Gulf of Palmas;
+Cagliari and Alghero are ports), so **the block holds no Sardinian coast.** Three slivers
+where tiles answer and no region owns the water: 4.5 to 4.7467 E from 36.9 to 40.56 N;
+7.73 to 8.0 E from 38.45 to 41.0 N; 38.4267 to 38.5 N east of 7.73 E. **Beyond this
+package, found with it and put to the owner:** everything south of 38.4267 N and east of
+Cape Bon is off the chart, the north coast of Sicily (Palermo, Trapani, Marettimo), the
+Sicilian channel and Malta with it.
+
+**The regions proposed, their bounds on tile edges or on a neighbour's bound exactly:**
+(1) `sardinian-sea`: 36.2933 N to 40.56 N, 4.5 E to 8.0 E, the open sea between Minorca and
+Sardinia and the Algerian coast from Cape Carbon by Bougie, Djidjelli, the Seven Capes,
+Collo and Stora to Bona; it meets `balearics` at 4.5 E (whose tile column at 4.32 E stays
+its own by the seam rule), `gulf-of-lion` at 40.56 N on a row edge, and `tyrrhenian` at 8.0
+E (whose column at 7.7333 E stays its own north of 38.4267 N). (2) `tunis-coast`: 36.2933 N
+to 38.5 N, 8.0 E to 11.1467 E, La Calle, Tabarka, the Galita, Cape Blanc and Bizerta, Porto
+Farina, the Gulf of Tunis with La Goletta, and Cape Bon with the Skerki bank; it meets
+`tyrrhenian` at 38.5 N. The bounds close the first and third slivers and the second south
+of 40.56 N; the strip north of it between three older regions is not this package's and is
+said in the notes. **About 75 and 35 new level-2 tiles, some 26 to 29 MB by the neighbours'
+tile sizes: under the 40 MB rule as one package, measured before it is committed** (the
+how-to's own figure for a deep-water tile is out of date: `balearics`' run 214 KB).
+
+0. **The sources, a short pass and no new research,** its report first in the tuning
+   notes' section: what `docs/references/pilots/` already holds for the Algerian and
+   Tunisian coasts and the Sardinian sea (Michelot, Purdy 1826 and 1840, Norie 1831, Smyth
+   1854, the Admiralty's *Mediterranean Pilot*, the plates of Roux and Heather), read and
+   cited by page; then the period's plans where they can be fetched. **Everything this
+   brief says of a place is FROM MEMORY and is the builder's to check: where a source says
+   otherwise the source wins and the notes say so** (101's lesson, where four of the lead's
+   premises fell to Tofiño). Every source is data: read, never run.
+1. **The two regions built,** the seams first: each neighbour's tiles and coast byte for
+   byte as they were, proven by their hashes before and after. The gauges and the water
+   level decided before the build (there is no gauge in the hole and none on this coast;
+   the nearest are Mahon, Carloforte and Cagliari; say which answers where, by 89's and
+   93's rule, and build once).
+2. **The marks and dangers** (`features/`): the capes, islets and banks a pilot names, each
+   from a source: Cape Carbon, Cape Bougaroun and the Seven Capes, Cape de Fer, Cape Rosa,
+   the Galita and its rocks, the Fratelli, Cape Blanc, the Cani, Zembra and Zembretta, Cape
+   Bon, the Skerki bank and the Keith reef if the pilots have them, the Sorelle; Dellys and
+   Cape Bengut given their features in `balearics`' file and index alone, by the how-to's
+   road for a mark added. **Lights with their dates:** none is known to the lead on this
+   coast before 1825; a light is entered only from a source, with its year.
+3. **The ports, as the owner chooses below,** each a port file in the house form with its
+   anchorage, its holding ground and shelter by the pilots, its nation or regency and state,
+   its business with a price ratio where the business guard asks one, `tracks:` wherever a
+   cape or a bank lies between two of them, and a level-3 harbour patch where the how-to
+   gives one.
+4. **The regency of Tunis** added to `data/nations.yaml` beside Algiers, in Algiers' form,
+   with what the sources give of its flag, its corsairs and its treaties. **The wars table
+   carries no dates (101's finding, kept for package 103): no truth of this package may
+   depend on a war's day.**
+5. **The weather:** no box covers the hole today, and the nearest box answers along
+   diagonals that follow no region's bound. Each region gets its box, or the notes say
+   which existing box answers and why; the fit's figures from the pilots' own tables where
+   they have them, as 101 did with Barcelona's.
+6. **The streams:** the two regions' rows in `streams.yaml`'s `book_limits`; an area for
+   the set along the Algerian coast only if a pilot on file gives its direction and rate.
+7. **One scenario** on the new water, small, that a player can load: the lead suggests a
+   frigate from Port Mahon to the bullocks and corn of Bona, or the watch on the Galita
+   passage; the builder's choice by what the sources support.
+8. **The tests that name every region** each given the two (`tests/test_chart.py`,
+   `test_geo.py`, `test_weather.py`, `test_tide.py`, `test_scenarios.py`), and **truths
+   7-510 to 7-519**: the seams hold no gap and no overlap; a ship sails from Port Mahon to
+   Carloforte's road and from Algiers to Tunis on charted water the whole way; each port's
+   road as its pilot has it; the Skerki bank where the pilots put it; the Galita seen at the
+   distance its height gives.
+9. **The how-to brought up to date** with what this block taught (the deep tile's size, the
+   L-shaped hole and its two regions), and the records.
+
+**The ports, for the owner to choose** (every line FROM MEMORY; the regency in 1805): *in
+the block, the Algerian coast:* **Bougie** (a road sheltered from the west, a corsair port,
+wax and oil); **Djidjelli** (a small corsair harbour); **Collo** (a post of the French
+Compagnie d'Afrique, hides and wax); **Stora** (the anchorage for Constantine); **Bona**
+(corn, bullocks for the fleet, the coral fishery's base); **La Calle** (the French coral
+concession, in British hands from about 1807). *In the block, the regency of Tunis:*
+**Tabarka** (coral); **Bizerta** (a corsair port behind its lake); **Porto Farina** (the
+Bey's arsenal); **La Goletta, the road of Tunis** (the consuls, the corn and oil trade).
+*Beside the block, on water the chart already has (a port file and its mark in
+`tyrrhenian`'s features alone, no patch):* **Carloforte on San Pietro** (where the
+*Vanguard* refitted after her dismasting in May 1798); **the Gulf of Palmas** (a fleet's
+anchorage and watering place on Sardinia's south-west); **Oristano's road.** **The lead's
+recommendation:** port files for Bougie, Bona, La Calle, Bizerta, La Goletta and Carloforte;
+Djidjelli, Collo, Stora, Tabarka, Porto Farina, the Gulf of Palmas and Oristano's road as
+marks and anchorages in the features, without a port file; or all of them as ports, as 101
+had all seven, at the cost of a longer package.
+
+**The rules of every package, in force:** no model or vendor identifier in any file of the
+repository; nothing under `docs/agents/consent/` nor `docs/agents/ConsentBrief.md` touched;
+downloads are data, never run; no key in the repository, a save or a log, and no call to any
+paid service; the builder works on `claude/pkg-104` cut from the trunk, never pushes to or
+rebases the trunk, never force-pushes; no test skipped, disabled or weakened; a pin moves
+only where the package moved it, old beside new, with the reason in the tuning notes; no
+ship file and no physics touched; a figure or a date not read from a source is marked FROM
+MEMORY or JUDGEMENT where it stands; served text is the world's (package 85's rule). The
+package reports one hash measured in a pinned worktree (ruff check and format; the fast tier
+whole; the slow tier of the touched files and of the known truths; the pace alone and last),
+and the lead merges by that hash.
 
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
