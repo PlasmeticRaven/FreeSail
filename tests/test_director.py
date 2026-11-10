@@ -1443,6 +1443,11 @@ UNPERFORMED_HERE = {
     "aboard the Medusa: the parole of Captain Bowen refused": "no prisoner aboard the Medusa",
     "cartel: a cartel from Brest for Captain Bowen": "Nobody holds",
     "cartel: a cartel from Brest for the prisoners of the Amazon": "Nobody holds",
+    # package 74, step 6: nobody lost a ship on the test's seas and no court sits
+    'person: "Captain Bowen" is exchanged at Falmouth': "is no prisoner",
+    "court: sits on Captain Bowen for the loss of the Amazon at Falmouth": "lost no ship",
+    "court: read the log of the action": "No court martial sits",
+    "court: the verdict on Captain Bowen: acquitted with honour": "No court martial sits",
 }
 
 

@@ -68,6 +68,12 @@ __all__ = [
 # The seat's key for the player's own ship's stations and for a person's voice.
 OWN = "own"
 VOICE = "voice"
+# Package 74 (item 6; the design's §6): the consent brief names no role in which a model
+# fires into a human's ship or takes him prisoner, so a seat at the captain's station of a
+# hull adversarial to a human is refused in words until the brief is revised and the
+# question put again (`docs/design/ConsentRevision-AdversarialSeats.md` drafts the text;
+# package 55 carries the revision). One flag, which the revision's package turns.
+ADVERSARIAL_SEATS_CONSENTED = False
 # The kind of station a person's voice is (the passenger's: no order of any ship's).
 VOICE_KIND = "passenger"
 # The actor of a voice's binding lines: the director's, so that they are for the record
@@ -323,6 +329,22 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     played = (getattr(world, "replayed_orders", None) or {}).get(
         (int(world.clock.tick), " ".join(str(body).split()))
     )
+    if played != "done":
+        # a seat at the captain of a hull adversarial to a human (package 74, item 6; the
+        # design's §6): refused in words before any consent record is read, as the desk's
+        # door refuses it. The refusal is the live door's: a replay repeats what the journal
+        # holds, so a seat the journal has as held is held again (a save from before this
+        # rule, or one made with the flag turned, replays to the same log)
+        try:
+            early = _resolve(world, m.group("who"))
+        except Exception:  # noqa: BLE001  (the target's own refusal comes in its place below)
+            early = None
+        if early is not None and early.get("vessel") is not None:
+            from freesail.world.prizes import adversarial_seat_why
+
+            why = adversarial_seat_why(world, early["vessel"], early["station"])
+            if why:
+                raise _error(why)
     if played == "done":
         record = None  # held in play: the consent read then stands in the replay
     else:

@@ -768,6 +768,9 @@ def possess(
                 crew=old_crew, nation=nation_was, since=tick, parole={}
             )
             prize_hull.ship.extra["prisoners"].parole = _confine_people(prize_hull, tick)
+        from freesail.world.court import record_loss
+
+        record_loss(world, prize_hull, record)  # the loss in her captain's record (§7)
         record["crew"] = len(men)
         record["prisoners"] = (
             prisoners_of(prize_hull.ship).count if prisoners_of(prize_hull.ship) else 0
@@ -951,6 +954,11 @@ def fill_far_prize(hull: Any, record: dict[str, Any], nation_was: str, tick: int
     remuster(hull, new_crew)
     hull.ship.extra["prisoners"] = Prisoners(crew=old_crew, nation=nation_was, since=tick)
     hull.ship.extra["prisoners"].parole = _confine_people(hull, tick)
+    from freesail.world.court import record_loss
+
+    record_loss(
+        _root(hull.world), hull, record
+    )  # the loss in her captain's record (the design's §7)
     record["prisoners"] = old_crew_count = len(old_crew.sailors)
     people = getattr(hull, "people", None)
     master_name = str(record.get("master") or "")
@@ -1097,7 +1105,71 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
                 f"The {prize.name}, our prize, is {how} ({by}).",
                 data={"prize": str(prize.id), "how": how, "by": by},
             )
+    # the player's person his own ship's captain again: the mark of who he is is past
+    from freesail.world.captive import settle_person
+
+    settle_person(world)
     return rec
+
+
+def adversarial_seat_why(world: Any, vessel: Any, station: str) -> str | None:
+    """Why a model may not be seated at `station` of `vessel` (the design's §6): the
+    captain's station of a hull adversarial to a human, read from the world at the seating:
+    her nation at war with the nation of a hull a human holds (the player's own, or the hull
+    the player's person is on), or her holding a human's person as a prisoner (a prize
+    master's over a prize whose prisoners include him, the captor over a captive); None when
+    the seat is no such thing, or the flag `seats.ADVERSARIAL_SEATS_CONSENTED` is turned. A
+    passenger's voice aboard an enemy, a prisoner's, a lookout's fire into nobody."""
+    from freesail.agents.agent import CAPTAIN
+    from freesail.world import knowledge, seats
+    from freesail.world.captive import is_captive
+
+    if getattr(seats, "ADVERSARIAL_SEATS_CONSENTED", False) or vessel is None:
+        return None
+    if str(station or "").lower() not in (CAPTAIN, "the captain", "prize master"):
+        return None
+    root = _root(world)
+    nations = getattr(root, "nations", None)
+    hulls = getattr(root, "hulls", None) or {}
+    human_hulls: list[Any] = []
+    players = knowledge.player_hull(root)
+    if players is not None:
+        human_hulls.append(players)
+    person = None
+    try:
+        person = knowledge.players_person(root)
+    except Exception:  # noqa: BLE001
+        person = None
+    if person is not None:
+        on = hulls.get(str(getattr(person, "hull", "") or ""))
+        if on is not None and all(on is not h for h in human_hulls):
+            human_hulls.append(on)
+    her_hull = _hull(vessel)
+    human_names: list[str] = []
+    for h in human_hulls:
+        hv = getattr(h, "vessel", None)
+        if her_hull is not None and h is her_hull:
+            continue
+        his_nation = str(getattr(hv, "nation", "") or getattr(root.scenario, "nation", "") or "")
+        his_name = str(getattr(getattr(h, "ship", None), "name", "") or "the player's ship")
+        if nations is not None and his_nation and nations.at_war(str(vessel.nation), his_nation):
+            human_names.append(f"an enemy of the {his_name}'s")
+    if (
+        person is not None
+        and her_hull is not None
+        and str(getattr(person, "hull", "") or "") == str(her_hull.id)
+        and is_captive(person)
+    ):
+        human_names.append(f"who holds {person.name} her prisoner")
+    if not human_names:
+        return None
+    why = " and ".join(dict.fromkeys(human_names))
+    return (
+        "The consent brief names no role in which a model fires into a human's ship or takes "
+        "him prisoner; until it is revised and the question put again, the game seats no model "
+        f"as the captain of the {vessel.name}, {why}. Her rules-based captain and the "
+        "director's voice serve meanwhile (rule 4)."
+    )
 
 
 def _role_of(vessel: Any, intent_words: str | None) -> str:
