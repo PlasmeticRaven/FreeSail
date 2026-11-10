@@ -332,7 +332,11 @@ class Runner:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
         blockers = [
-            other for other in self.instances if other.holds & inst.holds and other is not inst
+            other
+            for other in self.instances
+            if other.holds & inst.holds
+            and other is not inst
+            and not self._settees_only(ship, inst, other)
         ]
         if blockers:
             # The subject is busy: the newcomer waits its turn. Its preconditions
@@ -744,6 +748,24 @@ class Runner:
                     held.add(ship.name)
         return held
 
+    def _settees_only(self, ship: Ship, manoeuvre: Instance, work: Instance) -> bool:
+        """Whether a manoeuvre that belays the step-list work in hand (``belays: true``, with a
+        crew: decision 25, `_call_all_hands`) shares with this step-list work nothing but the
+        settees it holds from the order (`Script.order_settees`). Then the work, given before it,
+        does not keep it waiting: the manoeuvre begins and belays the work in hand, and work
+        still waiting (for hands, or its turn) waits for the manoeuvre (`_start_waiting`), so that
+        no order of the settee's is begun while it may be changed (package 75, the lead's ruling
+        (3)(iii) of 2026-11-10). Held otherwise, a wear ordered in the bilander's larboard watch
+        by night behind "take in the mainsail", itself waiting for hands, waited with it and was
+        never begun; in her starboard watch it waited for the take in, where it had belayed it
+        (docs/dev/TuningNotes.md, "The review's mends of the two builds")."""
+        script = manoeuvre.script
+        if script is None or not script.order_settees or work.script is not None:
+            return False
+        if not manoeuvre.evo.belays or self._crew(ship) is None:
+            return False
+        return (manoeuvre.holds & work.holds) <= script.order_settees
+
     # -- beginning ---------------------------------------------------------------
 
     def _begin(self, ship: Ship, inst: Instance) -> bool:
@@ -777,8 +799,19 @@ class Runner:
                 continue
             if not inst.waiting:
                 continue
+            # given first and holding a part of its, or a manoeuvre at work that it gave way to
+            # on its settees alone (`_settees_only`): the work waits for the manoeuvre
             busy = any(
-                other is not inst and other.order < inst.order and other.holds & inst.holds
+                other is not inst
+                and other.holds & inst.holds
+                and (
+                    (other.order < inst.order and not self._settees_only(ship, inst, other))
+                    or (
+                        other.order > inst.order
+                        and not other.waiting
+                        and self._settees_only(ship, other, inst)
+                    )
+                )
                 for other in self.instances
             )
             if busy:
@@ -966,10 +999,19 @@ class Runner:
     def _group_done(self, ship: Ship, inst: Instance, key: str) -> None:
         """The last of a trim's braces is done: one line for all of them, "Braced twelve
         yards to the wind; 26° to 31° from square.", in the evolution's own kind and
-        severity, its data naming every yard and its angle (package 29b)."""
+        severity, its data naming every yard and its angle (package 29b).
+
+        A trim's sheets name only the group's sails still set when its last sheet is done, and
+        with none still set no line is said (package 75, the lead's ruling (3)(iv) of
+        2026-11-10): the group's line is said when its last queued sheet is done, and it named
+        every sail of the group, one taken in since among them ("Trimmed the sheets of the
+        fore-and-aft foresail and the mainsail ..." after lie a-try had taken the fore gaff
+        sail in, the *Neufchatel*'s gale; docs/dev/TuningNotes.md, B2c's "After the review")."""
         if any(i.params.get("log_group") == key for i in self.instances):
             return
         done = self._log_groups.pop(key, [])
+        if isinstance(inst.subject, Sail):
+            done = [(sid, d) for sid, d in done if sid in ship.sails and ship.sails[sid].is_set]
         if not done:
             return
         degs = [round(d) for _, d in done]

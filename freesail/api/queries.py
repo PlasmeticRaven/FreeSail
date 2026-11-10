@@ -532,7 +532,7 @@ def _form_entry(form: HullForm) -> dict[str, Any]:
             value = getattr(form.stern, key)
             if value is None or value == ():
                 continue
-            if key in ("galleries_m", "lights_m"):
+            if key in ("counter_hb_m", "galleries_m", "lights_m"):
                 stern[key] = [list(pt) for pt in value]
             elif key == "transom_hb_m":
                 stern[key] = list(value)
@@ -575,8 +575,10 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
         hull["profile"] = _profile_entry(profile)
         hull["stations"] = [_station_entry(s) for s in drawn_stations(h)]
     # package 81 (Design-ViewerAction.md §7): each gun placed by the one rule, or why not, and
-    # each port of the hull with the guns that stand in it
-    action = viewer_guns.served(profile, ship.guns.values())
+    # each port of the hull with the guns that stand in it; its charge the fit's (package 75,
+    # SW-1)
+    fit = getattr(ship, "fit_spec", None)
+    action = viewer_guns.served(profile, ship.guns.values(), getattr(fit, "charges", None))
     return {
         "name": ship.name,
         "rig": ship.spec.rig,

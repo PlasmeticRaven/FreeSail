@@ -648,14 +648,16 @@ def _pounder_words(pounder: float) -> str:
 BARREL_LB = 100.0
 # A cartridge's powder as a share of its shot's weight by the gun's kind, where the
 # Regulations' Table No. 29 (OCR l.27498-27502, its figures lost in the OCR) gives none: the
-# table, read from the page image, is `CHARGE_TABLE_LB` in `freesail/ship/charges.py`
-# (package 75's shared work SW-1), which `charge_lb` reads first, and which is empty until it
-# is filled. A long gun a third: Falconer 1780, CANNON (from l.4037), quoting Robins at
-# l.4826-4831, the present allowance is half the ball in the smaller pieces and seven
-# sixteenths in the 32-pounders, and a third or even less would be an advantage; that the
-# service charge of 1805 was a third is from memory, UNVERIFIED. A carronade a twelfth, from
-# memory, UNVERIFIED (Falconer 1780 is before the carronade). A swivel a half, Falconer's
-# smaller pieces (l.4827) applied to a half-pounder (judgement).
+# table, read on the page image, is `CHARGE_TABLE_LB` in `freesail/ship/charges.py`
+# (package 75's shared work SW-1), which `charge_lb` reads first. A long gun a third and a
+# carronade a twelfth, confirmed by that table, whose figures are those shares rounded down
+# to the ounce (Build-Ships.md §10); Falconer 1780, CANNON (from l.4037), quoting Robins at
+# l.4826-4831: the allowance then half the ball in the smaller pieces and seven sixteenths
+# in the 32-pounders, a third or even less an advantage. A swivel a half, Falconer's smaller
+# pieces (l.4827) applied to a half-pounder (judgement), where the table gives its
+# half-pounder 2 oz. The eight files of the packages before 75 keep the shares as filed, and
+# a fit without charges takes them (`share_charge_lb`, `filed_charge_lb`; charges.py says
+# why).
 CHARGE_SHARE: dict[str, float] = {"long": 1 / 3, "carronade": 1 / 12, "swivel": 1 / 2}
 # The powder below at completion, as a share of the filled powder (judgement: the period
 # kept most of its powder in the barrels).
@@ -672,12 +674,33 @@ MAGAZINE_LAYOUT = 2
 def charge_lb(kind: str, pounder: float) -> float:
     """A cartridge's powder in pounds for a gun of the kind and calibre: Table No. 29's figure
     where `charges.CHARGE_TABLE_LB` has one (package 75), else its kind's share of the shot,
-    to the ounce."""
+    to the nearest ounce (`share_charge_lb`)."""
     table = CHARGE_TABLE_LB.get((kind, float(pounder)))
     if table is not None:
         return float(table)
+    return share_charge_lb(kind, pounder)
+
+
+def share_charge_lb(kind: str, pounder: float) -> float:
+    """A cartridge's powder in pounds by its kind's share of the shot alone, to the nearest
+    ounce: `charge_lb` where Table No. 29 names no such gun, and the rule the eight files of
+    the packages before 75 were filed by and keep (`freesail/ship/charges.py`), which a fit
+    without charges takes (`filed_charge_lb`)."""
     share = CHARGE_SHARE.get(kind, CHARGE_SHARE["long"])
     return round(share * float(pounder) * 16.0) / 16.0
+
+
+def filed_charge_lb(
+    charges: Mapping[tuple[str, float], float] | None, kind: str, pounder: float
+) -> float:
+    """A cartridge's powder in pounds for a gun of the kind and calibre as its fit's file
+    gives it: the fit's `charges:`, else its kind's share as filed (`share_charge_lb`). A fit
+    without them was pickled before practice and resupply, and so is one of the eight files
+    of the packages before 75, or is a hand-written file: the table serves a fit only where
+    its file asks, its charges written by the generator (the lead's rule,
+    `freesail/ship/charges.py`). The magazine and the viewer's plume read it."""
+    got = (charges or {}).get((kind, float(pounder)))
+    return float(got) if got is not None else share_charge_lb(kind, pounder)
 
 
 def fill_seconds(charge: float) -> float:
@@ -891,9 +914,9 @@ class Magazine:
         return int(self.cartridges.get(float(pounder), 0))
 
     def charge_of(self, kind: str, pounder: float) -> float:
-        """A cartridge's powder in pounds: the fit's `charges:`, else `charge_lb`."""
-        got = (self.charges or {}).get((kind, float(pounder)))
-        return float(got) if got is not None else charge_lb(kind, pounder)
+        """A cartridge's powder in pounds: the fit's `charges:`, else its kind's share as
+        filed (`filed_charge_lb`)."""
+        return filed_charge_lb(self.charges, kind, pounder)
 
     def can_fill(self, kind: str, pounder: float) -> bool:
         """Whether the gunner can fill a cartridge of the kind now: its charge below and the
@@ -1087,13 +1110,10 @@ def _charges_of(
     fit: Any, levels: Mapping[tuple[str, float], int]
 ) -> dict[tuple[str, float], float]:
     """A cartridge's charge for every kind of the fit's allowance: the file's `charges:`,
-    else `charge_lb` (a fit pickled before them, or a hand-written file without)."""
+    else its kind's share as filed (`filed_charge_lb`: a fit pickled before them, one of the
+    eight, or a hand-written file without)."""
     given = getattr(fit, "charges", None) or {}
-    out: dict[tuple[str, float], float] = {}
-    for key in levels:
-        got = given.get(key)
-        out[key] = float(got) if got is not None else charge_lb(key[0], key[1])
-    return out
+    return {key: filed_charge_lb(given, key[0], key[1]) for key in levels}
 
 
 def _split_store(counts: Mapping[Any, int], guns: Iterable[Any]) -> dict[tuple[str, float], int]:
@@ -1116,7 +1136,8 @@ def _convert_70(store: Magazine, fit: FitSpec | None) -> None:
     """A magazine of packages 70 to 72 (layout 1) brought to layout 2 once, logging and
     drawing nothing: each calibre's cartridges and rounds fired split over the fit's guns of
     that calibre by kind (`split_by_kind`); the allowance, the charges and the shot's level
-    from the fit (an old fit's calibre keys split the same way, its charges `charge_lb`'s);
+    from the fit (an old fit's calibre keys split the same way, its charges the shares as
+    filed, `filed_charge_lb`'s);
     no powder below, and the barrels' establishment the fit's (an old fit's nought, so an
     old game has no reserve until she takes powder in)."""
     guns = list(getattr(fit, "guns", None) or ()) if fit is not None else []

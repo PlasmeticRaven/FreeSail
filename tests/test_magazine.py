@@ -12,22 +12,28 @@ bill's men filling cartridges, all written by tools/gen_ships.py.
 from __future__ import annotations
 
 import copy
+import math
 import pickle
+from fractions import Fraction
+from pathlib import Path
 
 import pytest
 import yaml
 
 from freesail.api.session import make_world
 from freesail.combat.filling import filling_of
+from freesail.ship.charges import CHARGE_TABLE_LB
 from freesail.ship.loader import load_ship, load_spec, spec_from_dict
 from freesail.ship.parts import (
     BARREL_LB,
+    CHARGE_SHARE,
     Charge,
     Magazine,
     charge_lb,
     fill_seconds,
     fit_levels,
     magazine,
+    share_charge_lb,
     split_by_kind,
 )
 from freesail.ship.schema import FitSpec, QuarterBillSpec, ShipFileError
@@ -56,19 +62,187 @@ def _long_tom() -> tuple[object, Magazine]:
         ("long", 9, 3.0, 165),
         ("long", 6, 2.0, 150),
         ("long", 3, 1.0, 135),
-        ("carronade", 32, 2.6875, 160),
+        # package 75, SW-1 (Build-Ships.md §10, §16.1), old beside new: Table No. 29 rounds
+        # down where the share rounded to the nearest ounce, 2 lb 11 oz to 2 lb 10 oz
+        # (was ("carronade", 32, 2.6875, 160))
+        ("carronade", 32, 2.625, 159),
         ("carronade", 12, 1.0, 135),
-        ("swivel", 0.5, 0.25, 124),
+        # the table's half-pounder 2 oz, where the swivel's half gave 4 oz
+        # (was ("swivel", 0.5, 0.25, 124))
+        ("swivel", 0.5, 0.125, 122),
     ],
 )
 def test_the_charges_and_the_filling_times_are_the_build_designs_table(
     kind, pounder, charge, seconds
 ):
-    """A long gun a third of its shot's weight, a carronade a twelfth, a swivel a half, to
-    the ounce (§2; UNVERIFIED until Table No. 29 is read); a cartridge filled in 120
-    man-seconds and fifteen a pound of its charge, the table's seconds rounded."""
+    """The Regulations' Table No. 29 for these calibres (package 75, SW-1: a long gun a third
+    of its shot's weight and a carronade a twelfth, rounded down to the ounce; the
+    half-pounder swivel 2 oz); a cartridge filled in 120 man-seconds and fifteen a pound of
+    its charge, the table's seconds rounded."""
     assert charge_lb(kind, pounder) == charge
     assert fill_seconds(charge) == pytest.approx(seconds, abs=0.5)
+
+
+# Table No. 29 as the design reads it on the page image (Build-Ships.md §10; the Regulations
+# 1806, 1808 printing, the service charge with one shot), typed here from the design's two
+# tables in pounds and ounces as printed, not from charges.py.
+TABLE_NO_29 = [
+    ("long", 42, 14, 0),
+    ("long", 32, 10, 10),
+    ("long", 24, 8, 0),
+    ("long", 18, 6, 0),
+    ("long", 12, 4, 0),
+    ("long", 9, 3, 0),
+    ("long", 6, 2, 0),
+    ("long", 4, 1, 5),
+    ("long", 3, 1, 0),
+    ("long", 2, 0, 10),
+    ("long", 1, 0, 5),
+    ("swivel", 0.5, 0, 2),
+    # the guns' row names no mount: its two least calibres serve the swivel and the long gun
+    # both (charges.py)
+    ("swivel", 1, 0, 5),
+    ("long", 0.5, 0, 2),
+    ("carronade", 68, 5, 10),
+    ("carronade", 42, 3, 8),
+    ("carronade", 32, 2, 10),
+    ("carronade", 24, 2, 0),
+    ("carronade", 18, 1, 8),
+    ("carronade", 12, 1, 0),
+]
+# The eight ship files of the packages before 75, whose charges stay as filed (the lead's
+# rule, the stage 0 read of 2026-10-28, item 1: freesail/ship/charges.py).
+EIGHT = (
+    "frigate-36",
+    "topsail-schooner",
+    "privateer-schooner",
+    "cutter",
+    "brig",
+    "merchant-brig",
+    "lugger",
+    "smack",
+)
+
+
+@pytest.mark.parametrize("kind,pounder,lb,oz", TABLE_NO_29)
+def test_table_no_29_is_the_designs_reading_figure_by_figure(kind, pounder, lb, oz):
+    """Each figure of the table (package 75, SW-1), in `CHARGE_TABLE_LB` and through
+    `charge_lb`, to the ounce."""
+    charge = lb + oz / 16
+    assert CHARGE_TABLE_LB[(kind, float(pounder))] == charge
+    assert charge_lb(kind, pounder) == charge
+
+
+def test_table_no_29_has_the_designs_figures_and_no_others():
+    """The table's eighteen figures by kind and calibre, none more: the guns' row as long guns
+    from the 42 to the 1-pounder, its half-pounder as the swivel, its two least, the 1-pounder
+    and the half-pounder, for the other kind too (twenty keys), and the carronades' six."""
+    assert set(CHARGE_TABLE_LB) == {(k, float(p)) for k, p, _lb, _oz in TABLE_NO_29}
+    assert len(CHARGE_TABLE_LB) == 20
+    assert len({(k == "carronade", p, lb, oz) for k, p, lb, oz in TABLE_NO_29}) == 18
+
+
+def test_the_table_confirms_a_third_and_a_twelfth_rounded_down_to_the_ounce():
+    """A long gun a third of the shot and a carronade a twelfth (`CHARGE_SHARE`), confirmed:
+    each figure is the share of its shot rounded down to the ounce, the half-pounder too as
+    a gun's third. Rounding to the nearest ounce, as the share does, gives an ounce more for
+    the long 32, 2 and half-pounder and the 68- and 32-pounder carronades, and the swivel's
+    half gives 4 oz and 8: the seven the table moves, against the shares the eight files
+    keep."""
+    assert CHARGE_SHARE["long"] == 1 / 3 and CHARGE_SHARE["carronade"] == 1 / 12
+    for (kind, pounder), charge in CHARGE_TABLE_LB.items():
+        share = Fraction(1, 12) if kind == "carronade" else Fraction(1, 3)
+        assert charge == math.floor(share * Fraction(pounder) * 16) / 16, (kind, pounder)
+    moved = {k: (share_charge_lb(*k), v) for k, v in CHARGE_TABLE_LB.items()}
+    moved = {k: pair for k, pair in moved.items() if pair[0] != pair[1]}
+    assert moved == {
+        ("long", 32.0): (10 + 11 / 16, 10 + 10 / 16),
+        ("long", 2.0): (11 / 16, 10 / 16),
+        ("long", 0.5): (3 / 16, 2 / 16),
+        ("carronade", 68.0): (5 + 11 / 16, 5 + 10 / 16),
+        ("carronade", 32.0): (2 + 11 / 16, 2 + 10 / 16),
+        ("swivel", 0.5): (4 / 16, 2 / 16),
+        ("swivel", 1.0): (8 / 16, 5 / 16),
+    }
+
+
+def test_a_gun_the_table_does_not_name_keeps_its_kinds_share():
+    """A kind and calibre not in the table: its kind's share of the shot to the nearest
+    ounce, as before the table (a French 36 and 8, a swivel above a pound)."""
+    assert ("long", 36.0) not in CHARGE_TABLE_LB and charge_lb("long", 36) == 12.0
+    assert ("long", 8.0) not in CHARGE_TABLE_LB and charge_lb("long", 8) == 2 + 11 / 16
+    assert ("swivel", 2.0) not in CHARGE_TABLE_LB and charge_lb("swivel", 2) == 1.0
+    for kind, pounder in (("long", 36), ("long", 8), ("swivel", 2)):
+        assert charge_lb(kind, pounder) == share_charge_lb(kind, pounder)
+
+
+def test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_table():
+    """The lead's rule (freesail/ship/charges.py): every charge of the eight files is its
+    kind's share as filed, the 32-pounder carronade's 2 lb 11 oz and the swivel's 4 oz among
+    them; every charge of the ships after them is the table's, the bilander's swivel 2 oz.
+    The Indefatigable's two files come out the same either way, to the ounce (Indf §5.4)."""
+    files = {p.stem: load_spec(str(p)) for p in sorted(Path("data/ships").glob("*.yaml"))}
+    assert set(EIGHT) <= set(files)
+    charges = {
+        (name, fit.name, key): lb
+        for name, spec in files.items()
+        if spec.armament is not None
+        for fit in spec.armament.fits.values()
+        for key, lb in (fit.charges or {}).items()
+    }
+    eight = {k: lb for k, lb in charges.items() if k[0] in EIGHT}
+    new = {k: lb for k, lb in charges.items() if k[0] not in EIGHT}
+    assert eight and new
+    for (name, fit, (kind, pounder)), lb in eight.items():
+        assert lb == share_charge_lb(kind, pounder), (name, fit, kind, pounder)
+    for (name, fit, (kind, pounder)), lb in new.items():
+        assert lb == charge_lb(kind, pounder) == CHARGE_TABLE_LB[(kind, pounder)], (
+            name,
+            fit,
+            kind,
+            pounder,
+        )
+    assert eight[("frigate-36", "amazon class 1795", ("carronade", 32.0))] == 2 + 11 / 16
+    assert eight[("privateer-schooner", "long tom", SWIVEL)] == 0.25
+    assert new[("bilander", "armed merchant", SWIVEL)] == 0.125
+    for name in ("sixty-four", "razee-44"):
+        theirs = {k: lb for k, lb in new.items() if k[0] == name}
+        assert theirs and all(lb == share_charge_lb(*k[2]) for k, lb in theirs.items())
+
+
+def test_the_viewer_and_an_old_fit_read_a_guns_charge_as_its_file_gives_it():
+    """The lead's rule reaches the readers of a charge too (SW-1): the viewer's plume, the
+    graph's `charge_lb` (`queries.ship_graph`), is the gun's fit's charge as its magazine
+    fills it, the eight's shares as filed (the frigate's 32-pounder carronade 2 lb 11 oz, the
+    privateer's swivel 4 oz) and a new ship's Table No. 29's (the bilander's swivel 2 oz,
+    where the swivel's half gives 4); and a fit without charges, an old save's and so one of
+    the eight's, the shares as filed (`filed_charge_lb`), in the magazine and the viewer
+    alike."""
+    from freesail.api.queries import ship_graph
+
+    def served(ship):
+        return {
+            (g["kind"], g["pounder"]): g["charge_lb"]
+            for g in ship_graph(ship)["guns"]
+            if "charge_lb" in g
+        }
+
+    for path, fit, key, lb in (
+        (FRIGATE, None, ("carronade", 32.0), 2 + 11 / 16),
+        (PRIVATEER, None, SWIVEL, 0.25),
+        ("data/ships/bilander.yaml", "armed merchant", SWIVEL, 0.125),
+    ):
+        ship = load_ship(path, fit=fit)
+        assert served(ship)[key] == lb == magazine(ship).charge_of(*key), (path, key)
+        assert ship.fit_spec.charges[key] == lb
+    assert charge_lb("carronade", 32) == 2 + 10 / 16 and charge_lb(*SWIVEL) == 0.125
+    ship = load_ship(PRIVATEER)
+    old = FitSpec.__new__(FitSpec)
+    old.__dict__.update({k: v for k, v in vars(ship.fit_spec).items() if k != "charges"})
+    ship.fit_spec = pickle.loads(pickle.dumps(old))
+    assert ship.fit_spec.charges is None
+    assert served(ship)[SWIVEL] == 0.25 == magazine(ship).charge_of(*SWIVEL)
+    assert magazine(ship).charges == {LONG_12: 4.0, CARR_12: 1.0, SWIVEL: 0.25}
 
 
 # -- has and take, by kind ----------------------------------------------------------------
@@ -230,8 +404,10 @@ def test_a_package_70_magazine_is_split_by_kind_once_and_logs_and_draws_nothing(
 
 def test_an_old_fit_and_an_old_bill_read_their_plain_defaults():
     """A FitSpec and a QuarterBillSpec pickled before this build: the fit's calibre-keyed
-    cartridges split by kind (`fit_levels`), no charges (charge_lb's), no barrels and no
-    allowance for exercise; the bill's filling reckoned one to every four cannon."""
+    cartridges split by kind (`fit_levels`), no charges (the shares as filed,
+    `filed_charge_lb`'s: such a fit is one of the eight, whose charges stay as filed under
+    the lead's rule, SW-1), no barrels and no allowance for exercise; the bill's filling
+    reckoned one to every four cannon."""
     ship = load_ship(PRIVATEER)
     new = ship.fit_spec
     old = FitSpec.__new__(FitSpec)

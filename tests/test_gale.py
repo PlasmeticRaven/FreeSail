@@ -338,6 +338,95 @@ def test_headed_full_and_by_the_helm_keeps_her_away_and_says_so_once(frigate_by_
 # -- 3: storm canvas --------------------------------------------------------------------
 
 
+def test_the_gale_list_names_the_square_sail_only_where_she_has_one():
+    """Package 75, the lead's ruling (3) of 2026-11-09 (B2b's (3)(f)): "take in the square sail",
+    the vocabulary's `shorten sail` line for the cutter's and the smack's square sail, is in the
+    gale's list only where the ship has a `square_sail` part (`storm.listed_lines`), every other
+    line as listed. In the *Neufchatel* and the two schooners it parsed as their `sail` after a
+    brace word, and every "shorten sail" of their gales listed the parser's refusal in its "Not
+    done" ("'take in' was understood, but 'square' belongs with 'brace'")."""
+    from pathlib import Path
+
+    from freesail.orders.vocabulary import load_vocabulary
+
+    listed = list(load_vocabulary().group_evolutions["shorten sail"])
+    assert storm.SQUARE_SAIL_LINE in listed
+    others = [ln for ln in listed if ln != storm.SQUARE_SAIL_LINE]
+    with_one = set()
+    for path in sorted(Path("data/ships").glob("*.yaml")):
+        ship = load_ship(path.as_posix())
+        kept = storm.listed_lines(ship, listed)
+        assert [ln for ln in kept if ln != storm.SQUARE_SAIL_LINE] == others, path.name
+        if storm.SQUARE_SAIL_LINE in kept:
+            assert "square_sail" in ship.sails, path.name
+            with_one.add(path.name)
+    assert with_one == {"cutter.yaml", "smack.yaml"}
+    world = world_for(SCHOONER, knots=20.0)
+    world.submit("set plain sail")
+    world.run(400)
+    reply = world.submit("shorten sail")
+    assert reply.kind != "order.rejected" and "square" not in reply.text, reply.text
+
+
+def test_a_head_sail_eased_for_the_storm_staysail_is_said_taken_in_only_as_it_is_begun():
+    """Package 75, the lead's ruling (13)(v) of 2026-11-09 (found on the bilander's file): over the
+    storm line a head sail the fore storm staysail is to replace, loaded near its rating, is taken
+    in before the storm staysail is up (`storm._ease_the_loaded`), with a line. Where the take in
+    must wait for hands the line says it is to be taken in (the runner's own line says why: "Not
+    hands enough on deck to take in ..."); where the hands begin it, "taken in" as before. Old:
+    "taken in" either way, on the tick the take in waited."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    said = {}
+    for busy in (False, True):
+        world = world_for(knots=20.0)
+        world.submit("set plain sail")
+        world.run(600)
+        ship = world.ship
+        ship.drain_notes()
+        ship.extra["true_wind_kn"] = storm.STORM_CANVAS_KN + 2.0
+        head = ship.sails["fore.topmast_staysail"]
+        assert head.is_set
+        head.load_kn = storm.HEAD_SAIL_IN_RATIO * head.effective_cloth_rating_kn
+        if busy:
+            for sailor in ship.extra["crew"].sailors:
+                sailor.at = "elsewhere"
+        storm._ease_the_loaded(ship, ship.sails["fore.storm_staysail"], load_vocabulary())
+        notes = ship.drain_notes()
+        said[busy] = [n[2] for n in notes if n[1] == "sail.storm_canvas"]
+        waiting = [n[2] for n in notes if n[1] == "evolution.waiting"]
+        assert bool(waiting) == busy, waiting
+    assert said[False] == [
+        "The fore topmast staysail taken in before the fore storm staysail is up: it is loaded "
+        "near its rating."
+    ]
+    assert said[True] == [
+        "The fore topmast staysail is to be taken in before the fore storm staysail is up: it is "
+        "loaded near its rating."
+    ]
+
+
+def test_lying_a_try_names_the_staysails_as_they_stand():
+    """Package 75, the lead's ruling (13)(iv) of 2026-11-09 (found on the bilander's file, her fore
+    topmast staysail blown out and her storm staysails not yet up, the line said "under the main
+    topsail and the staysails"): the line names the staysails standing as she lies a-try, "the
+    staysails" where two or more stand, the one by its name, and none where none does."""
+    world = world_for(knots=20.0)
+    world.submit("set the topsails")
+    world.run(400)
+    world.submit("lie a-try")
+    world.tick()
+    inst = next(i for i in world.ship.extra["evolutions"].instances if i.evo.id == "lie_a_try")
+    ship = world.ship
+    for sid in ship.groups["staysails"] + ship.groups["storm staysails"]:
+        ship.sails[sid].state = SailState.FURLED
+    assert inst.script.words()["under"] == "the main topsail"
+    ship.sails["main.staysail"].state = SailState.SET
+    assert inst.script.words()["under"] == "the main topsail and the main staysail"
+    ship.sails["fore.storm_staysail"].state = SailState.SET
+    assert inst.script.words()["under"] == "the main topsail and the staysails"
+
+
 def test_set_the_storm_staysails_bends_them_sets_them_and_takes_in_what_they_replace():
     """Luce 1884, ch. XXIX, p. 477: "To set fore-storm staysail, and haul down fore topmast
     staysail"; the mizzen's takes the spanker's place as the after sail."""

@@ -366,6 +366,18 @@ def settees(ship: Ship) -> list[Sail]:
     return [sl for sl in dipping_lugs(ship) if sl.settee]
 
 
+def settees_held(ship: Ship) -> set[str]:
+    """The settees set, by id: held from the order by a manoeuvre that may change one round
+    its mast (the tack, the wear, the box-haul and its kin, the fill away), so that no order of
+    the settee's is begun while it may be changed (package 75, the lead's ruling (3)(iii) of
+    2026-11-10, the smaller way). The runner reads an evolution's holds once, at the order
+    (`Runner.start`), and the change's own ids, named once it begins, came too late: a furl
+    ordered after a fill away began while its settee lay on deck to be dipped, and said it was
+    furled on deck of a yard the dip had hoisted meanwhile (docs/dev/TuningNotes.md, "B2c and
+    B3.3b, the review's mends"). A ship with no settee set holds nothing more."""
+    return {sl.id for sl in settees(ship)}
+
+
 # The settee's lines (package 75; Ext §5.5-§5.6), in the singular for one settee: hoisted on
 # the new lee in stays, and in wearing once the wind is past the stern.
 SETTEE_DIPPED_WORDS = "Dipped the {sail}; hoisted on the {side} side, to leeward of {mast}."
@@ -967,8 +979,21 @@ class Script:
     def timing_value(self, key: str, default: float) -> float:
         return float(self.timing.get(key, default))
 
+    # the settees a manoeuvre holds from the order (`_hold_settees`), read by the runner
+    order_settees: frozenset[str] = frozenset()
+
     def holds(self) -> set[str]:
         return {self.ship.name}
+
+    def _hold_settees(self) -> set[str]:
+        """The settees set (`settees_held`), held from the order by a manoeuvre that may change
+        one round its mast, and kept as `order_settees`: the runner does not keep a manoeuvre that
+        belays the step-list work in hand waiting behind an order of a settee's given before it
+        on these alone (`Runner._settees_only`; package 75, the lead's ruling (3)(iii) of
+        2026-11-10, and its review)."""
+        held = settees_held(self.ship)
+        self.order_settees = frozenset(held)
+        return held
 
     def clears(self) -> set[str]:
         """The parts whose work in hand this script belays when it begins, rather than
@@ -1214,6 +1239,7 @@ class TackScript(Script):
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being changed, till it is hoisted (package 75)
@@ -1867,6 +1893,7 @@ class WearScript(Script):
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee lowered, till it is hoisted (package 75)
@@ -2406,7 +2433,12 @@ def _yards_aback_for(ship: Ship, sign: float) -> list[Spar]:
 
 
 def _judge_lying_to(
-    ship: Ship, info: dict[str, Any], dt: float, wind: Wind, timing: dict[str, float]
+    ship: Ship,
+    info: dict[str, Any],
+    dt: float,
+    wind: Wind,
+    timing: dict[str, float],
+    runner: Any = None,
 ) -> None:
     """If she is forced round all the same (a shift of many points, a squall), one urgent
     line says so and the record follows what she is doing (package 37f, item 1). Her
@@ -2416,7 +2448,13 @@ def _judge_lying_to(
     tack, with nothing of hers aback and more way on than `way_off_kn` for `fill_s`, she
     has filled and gathers way: hove to no longer, urgently (the review's 5.8: "she filled
     in a squall and sailed toward the land for an hour with no alert, the game still
-    answering 'She is hove to'")."""
+    answering 'She is hove to'").
+
+    Package 75, the lead's ruling (3)(i) of 2026-11-10: hove to no longer in the forced
+    round's branch (round with nothing aback, or hove to on the other tack and then filled or
+    fallen off), a settee left lying against its mast is dipped by the watch (`runner`, which
+    gives the order; `_hove_to_no_longer`), keyed on a settee: a ship with none set is as
+    before."""
     dyn = ship.dyn
     sign = float(info.get("sign", 1.0))
     off = lying_off(ship, wind, sign)
@@ -2461,10 +2499,14 @@ def _judge_lying_to(
             f"She has been forced round through the wind onto the {new} tack with nothing "
             f"aback: hove to no longer.",
             {"old_tack": old, "tack": new, "hove_to": False, "why": "forced round"},
+            runner,
         )
         return
     if a_try:
         return
+    # forced round onto this tack and hove to on it: the watch dips a settee left against its
+    # mast when she is hove to no longer (package 75, the lead's ruling (3)(i))
+    forced = runner if info.get("forced") else None
     # -- fallen off, the wind abaft the beam -----------------------------------------------
     # more than `abaft_points` from the wind for `abaft_s`: the helm and the sheets have
     # not brought her to (a brig under her topsails alone has no sheet to regulate by),
@@ -2484,6 +2526,7 @@ def _judge_lying_to(
                 "hove_to": False,
                 "why": "fallen off",
             },
+            forced,
         )
         return
     # -- filled, and gathering way ------------------------------------------------------
@@ -2501,25 +2544,105 @@ def _judge_lying_to(
             ship,
             f"{how} gathers way, the wind {where}: hove to no longer.",
             {"tack": _tack_name(1.0 if rel > 0 else -1.0), "hove_to": False, "why": "filled"},
+            forced,
         )
 
 
-def _hove_to_no_longer(ship: Ship, text: str, data: dict[str, Any]) -> None:
+def _settees_against_their_masts(ship: Ship) -> list[Sail]:
+    """The settees set whose yards hang on the weather side of their masts as the deck reads
+    the wind, the side the dip order reads (`dip_settee`'s `against_the_mast`): forced round
+    lying to, a kept settee's yard stays where she hove to (package 75, B3.3b)."""
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    return [sl for sl in settees(ship) if sl.lug_side not in (None, lee)]
+
+
+def _hove_to_no_longer(
+    ship: Ship, text: str, data: dict[str, Any], forced_round: Any = None
+) -> None:
     """The record cleared with an urgent line, and the helm told to keep her full and by
     on the tack she is on: a ship sailing off with her helm where the tending left it is
-    nobody's, and a heading held might be the wind's eye."""
+    nobody's, and a heading held might be the wind's eye.
+
+    Package 75, the lead's ruling (3)(i) of 2026-11-10: where she was forced round through the
+    wind lying to (`forced_round`, the runner, given by the record's forced-round branch), a
+    settee set and lying against its mast is dipped by the watch, as fill away dips one
+    (B3.3b), and the line says so. Left so, she sailed on full and by with it drawing two-thirds
+    against its mast and nothing said (docs/dev/TuningNotes.md, B3.3b's "Found on the way" 1).
+    The watch gives the settee's own dip (`dip_settee`), as the helmsman's watch boxes her off
+    and braces up for him by the order (`keep_full_and_by`): its hands from the watch on deck,
+    its times and words, its holds keeping every other order of the settee off it till it is
+    hoisted to leeward, and its sheet as it lies; two judgements, for the lead, measured in the
+    tuning notes ("The settee and the runner").
+
+    The line is worded on what the dip does, its own lines after it (docs/dev/TuningNotes.md,
+    "The review's mends of the two builds"):
+    begun, "The watch dips the mainsail, lying against its mast."; waiting, for hands (the
+    bilander's larboard watch of two by night) or its turn, "The mainsail, lying against its
+    mast, is to be dipped.", and it begins when there are hands for it (the watch changed, or all
+    hands called); refused, nothing of a dip, and the refusal's line. Worded before it was begun,
+    the line said the watch dipped it on the tick the dip was found to wait for hands, and the
+    settee stayed against its mast to the watch's end."""
     dyn = ship.dyn
     end_lying_to(ship)
     dyn.helm_mode = HelmMode.FULL_AND_BY
     dyn.steady = False
     data = {**data, "speed_kn": round(units.ms_to_knots(dyn.u), 1), "heading": dyn.heading}
-    ship.note(
+    dip = _settees_against_their_masts(ship) if forced_round is not None else []
+    notes = getattr(ship, "notes", None)
+    at = len(notes) if isinstance(notes, list) else 0  # the line goes before the dip's own
+    begun: list[Sail] = []
+    waiting: list[Sail] = []
+    after: list[tuple[str, str, str]] = []
+    for sl in dip:
+        try:
+            line = forced_round.start(ship, "dip_settee", sl.id)
+        except OrderError as e:
+            why = str(e).strip().rstrip(".")
+            why = why[:1].lower() + why[1:]
+            after.append(
+                ("evolution.failed", f"Could not dip {names_of_sails(ship, [sl])}: {why}.", sl.id)
+            )
+            continue
+        inst = next(
+            (
+                i
+                for i in reversed(forced_round.instances)
+                if i.evo.id == "dip_settee" and i.subject_id == sl.id
+            ),
+            None,
+        )
+        if inst is None:
+            continue  # failed as it began: the dip's own line says so
+        if not inst.waiting:
+            begun.append(sl)
+            continue
+        waiting.append(sl)
+        if inst.waiting_for is None:
+            after.append(("evolution.queued", line, sl.id))  # its turn behind other work
+    said = ""
+    if begun:
+        mast = "its mast" if len(begun) == 1 else "their masts"
+        said += f" The watch dips {names_of_sails(ship, begun)}, lying against {mast}."
+        data["settees_dipped"] = [sl.id for sl in begun]
+    if waiting:
+        one = len(waiting) == 1
+        mast, be = ("its mast", "is") if one else ("their masts", "are")
+        names = names_of_sails(ship, waiting)
+        said += f" {names[:1].upper() + names[1:]}, lying against {mast}, {be} to be dipped."
+        data["settees_to_be_dipped"] = [sl.id for sl in waiting]
+    note = (
         "urgent",
         "ship.filled",
-        f"{text} The helm keeps her full and by.",
+        f"{text} The helm keeps her full and by.{said}",
         ship.name,
         data,
     )
+    if isinstance(notes, list):
+        notes.insert(min(at, len(notes)), note)
+    else:
+        ship.note(*note)
+    for kind, line, sid in after:
+        ship.note("notable" if kind == "evolution.failed" else "routine", kind, line, sid)
 
 
 def keep_lying_to(ship: Ship, dt: float, wind: Wind, runner: Any = None) -> None:
@@ -2544,7 +2667,7 @@ def keep_lying_to(ship: Ship, dt: float, wind: Wind, runner: Any = None) -> None
     if not a_try:
         manned = _lying_to_hands_on(ship, info, clock, timing)
         tend_lying_to(ship, info, dt, wind, timing, sheets=manned)
-    _judge_lying_to(ship, info, dt, wind, timing)
+    _judge_lying_to(ship, info, dt, wind, timing, runner)
     if ship.extra.get("hove_to") is not info:
         return
     # the routine line, one a watch: at the change of the watch by the ship's clock, or
@@ -3017,6 +3140,7 @@ class FillAwayScript(Script):
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.yards}
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being dipped, till it is hoisted (package 75)
@@ -3241,7 +3365,12 @@ class FillAwayScript(Script):
     def _pay_off(self, dt: float, wind: Wind, factor: float, rel: float) -> None:
         """Full and gathering way, she pays off to the course ordered: her yards and
         sheets trimmed to the wind on her bow as it draws aft, and to the course's own
-        wind at the last."""
+        wind at the last. A settee kept set is trimmed with the boom sails (package 75, the
+        lead's ruling (3)(ii) of 2026-11-10, `_kept_after_sails`): left out, it kept the trim
+        the fill away gave it for full and by, dipped or not, with the wind drawn aft. Every
+        sheet here is drawn for `aim`, the true wind's angle on her bow, as if it were the
+        apparent wind's: found eased past the deck's trim on a beam course, for the lead (the
+        tuning notes, "The settee and the runner")."""
         ship = self.ship
         dyn = ship.dyn
         dyn.target_heading = self.new_course
@@ -3270,7 +3399,8 @@ class FillAwayScript(Script):
         every = self.timing_value("retrim_s", 20.0)
         targets = [trim_angle(self.sign * aim, y.brace_limit, ch) for y in self.yards]
         self.swing = YardSwing(list(self.yards), targets, every)
-        draw_sheets(ship, head_sails(ship) + boom_sails(ship), _lee_name(self.sign), aim)
+        drawn = head_sails(ship) + _kept_after_sails(ship, {})
+        draw_sheets(ship, drawn, _lee_name(self.sign), aim)
 
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
@@ -5062,6 +5192,7 @@ class BoxHaulScript(Script):
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
         held |= {s.id for s in _after_sail(self.ship)}
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)
@@ -5637,15 +5768,34 @@ class LieATryScript(Script):
         a boomless gaff sail beside a course (the *Neufchatel*'s fore gaff sail; package 75,
         B2b) her gaff sails are named, those standing among what she lies under and that one
         taken in: "the fore topsail, the mainsail and the staysails, the fore-and-aft foresail
-        taken in"."""
+        taken in". The staysails are named as they stand (`_staysails_set`; the lead's ruling
+        (13)(iv) of 2026-11-09, found on the bilander's file, her fore topmast staysail blown out
+        and her storm staysails not yet up): "the staysails" where two or more are set, the one
+        by its name, and none where none is."""
+        stays = self._staysails_set()
+        named = [names_of_sails(self.ship, stays)] if len(stays) == 1 else []
+        stay_words = ["the staysails"] if len(stays) > 1 else named
         beside = gaff_sails_beside_a_course(self.ship)
         if not beside:
-            return f"the {topsail} and the staysails"
+            return _joined([f"the {topsail}", *stay_words])
         sails = self.ship.sails.values()
         standing = [sl for sl in sails if sl.cls == "gaff" and sl.is_set and sl not in beside]
         under = [f"the {topsail}"] + [names_of_sails(self.ship, [sl]) for sl in standing]
         taken_in = names_of_sails(self.ship, beside)
-        return ", ".join(under) + f" and the staysails, {taken_in} taken in"
+        return _joined([*under, *stay_words]) + f", {taken_in} taken in"
+
+    def _staysails_set(self) -> list:
+        """The staysails standing as she lies a-try: the jib-headed sails set of the ship
+        file's staysails, storm staysails and storm canvas (a fore-and-after's storm jib stands
+        for a storm staysail, `orders.storm.storm_staysails`) and of her head sails, her jibs
+        being hauled down."""
+        ship = self.ship
+        jibs = set(ship.groups.get("jibs", []))
+        groups = ("staysails", "storm staysails", "storm canvas", "headsails", "lying-to staysails")
+        ids = {sid for g in groups for sid in ship.groups.get(g, [])} - jibs
+        return [
+            sl for sl in ship.sails.values() if sl.id in ids and sl.cls == "jibheaded" and sl.is_set
+        ]
 
 
 class ScudScript(Script):

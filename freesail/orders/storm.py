@@ -11,7 +11,9 @@ staysails were in the sail room and nothing set them.
 - `shorten sail` (the group evolution, `orders._group_evolution`) takes in, after its
   list, every jib whose load is `HEAD_SAIL_IN_RATIO` of its own rating or more ("the jib
   first, before it blows out of the bolt-ropes: the sail's own rating is the rule"), and
-  over `STORM_CANVAS_KN` of true wind sets the storm staysails (`shorten_sail_lines`).
+  over `STORM_CANVAS_KN` of true wind sets the storm staysails (`shorten_sail_lines`). Its
+  list's "take in the square sail" is kept only where the ship has a `square_sail` part, the
+  cutter's and the smack's (`listed_lines`; package 75, the lead's ruling of 2026-11-09).
 - `set the storm staysails` sets each storm staysail of the ship file's group (a
   fore-and-after's storm jib where she carries no storm staysail), bending it from the
   sail room first where it is not bent, and takes in what each replaces as it goes up:
@@ -287,10 +289,10 @@ def keep_storm_canvas(ship: Ship) -> None:
 def _ease_the_loaded(ship: Ship, storm: Sail, vocab: Vocabulary) -> None:
     """Over the storm line, take in before the fore storm staysail is set any head sail it
     is to replace that is loaded to `HEAD_SAIL_IN_RATIO` of its rating (`keep_storm_canvas`),
-    with a line. Under the line, and for the spanker, the sail stands until the storm
-    staysail is up: in the lee-shore trial a guard on both at thirty knots left her with
-    neither head nor after sail while the hands bent the storm staysails, and she drove
-    onto Ushant in the evening."""
+    with a line: "taken in", or "is to be taken in" where the take in waits for hands. Under
+    the line, and for the spanker, the sail stands until the storm staysail is up: in the
+    lee-shore trial a guard on both at thirty knots left her with neither head nor after sail
+    while the hands bent the storm staysails, and she drove onto Ushant in the evening."""
     wind = true_wind_kn(ship)
     if wind is None or wind < STORM_CANVAS_KN:
         return
@@ -302,14 +304,47 @@ def _ease_the_loaded(ship: Ship, storm: Sail, vocab: Vocabulary) -> None:
             _run(ship, f"take in the {_name(ship, sl)}", vocab)
         except OrderError:
             continue
+        # the lead's ruling (13)(v) of 2026-11-09 (package 75, found on the bilander's file):
+        # a take in that must wait for hands is not yet taken in, and the line says so; the
+        # runner's own line says why it waits
+        done = "is to be taken in" if _waiting_for_hands(ship, sl.id) else "taken in"
         ship.note(
             "routine",
             "sail.storm_canvas",
-            f"The {_name(ship, sl)} taken in before the {_name(ship, storm)} is up: it is "
+            f"The {_name(ship, sl)} {done} before the {_name(ship, storm)} is up: it is "
             "loaded near its rating.",
             ship.name,
             {"sail": sl.id, "storm": storm.id},
         )
+
+
+def _waiting_for_hands(ship: Ship, sail_id: str) -> bool:
+    """Whether the work on this sail waits for hands (the runner's `waiting_for`)."""
+    from freesail.evolutions.runner import WAITING_FOR_HANDS
+
+    runner = ship.extra.get("evolutions")
+    return any(
+        getattr(inst, "subject_id", None) == sail_id
+        and getattr(inst, "waiting_for", None) == WAITING_FOR_HANDS
+        for inst in getattr(runner, "instances", None) or ()
+    )
+
+
+# The vocabulary's `shorten sail` line for the cutter's and the smack's square sail (package 32b;
+# the file's part `square_sail`), taken in with the studding sails as it freshens. The lead's
+# ruling (3) of 2026-11-09 (package 75, B2b's (3)(f)): the gale's list names it only where the
+# ship has that part. Elsewhere it was passed over as a noun she lacks, but in the *Neufchatel*
+# and the two schooners it parses as the noun "sail", their `fore.sail` and `main.sail`, after a
+# brace mode, "square", and every "shorten sail" of their gales listed the parser's refusal in
+# its "Not done". The grammar's refusal of the phrase typed at the prompt is the grammar's.
+SQUARE_SAIL_LINE = "take in the square sail"
+SQUARE_SAIL_PART = "square_sail"
+
+
+def listed_lines(ship: Ship, lines: list[str]) -> list[str]:
+    """The vocabulary's `shorten sail` lines as this ship takes them: "take in the square sail"
+    only where she has a `square_sail` part (`SQUARE_SAIL_LINE`), every other line as listed."""
+    return [ln for ln in lines if ln != SQUARE_SAIL_LINE or SQUARE_SAIL_PART in ship.sails]
 
 
 def flying_topsail_lines(ship: Ship) -> list[str]:
@@ -451,9 +486,11 @@ def true_wind_kn(ship: Ship) -> float | None:
 
 __all__ = [
     "HEAD_SAIL_IN_RATIO",
+    "SQUARE_SAIL_LINE",
     "STORM_CANVAS_KN",
     "STORM_VERBS",
     "keep_storm_canvas",
+    "listed_lines",
     "set_storm_staysails",
     "shorten_sail_lines",
     "storm_staysails",

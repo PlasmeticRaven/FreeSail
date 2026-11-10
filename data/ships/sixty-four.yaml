@@ -3605,7 +3605,7 @@ armament:
           24: 2054
           18: 2054
           9: 948
-      # A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one shot, the Regulations 1806 (1808 printing), Table No. 29 (the page image read: Research-Indefatigable-2026-10.md §6.4; the OCR has its title at l.27498-27502 and lost its figures): the long 24-pounder 8 lb, the 18 6 lb, the 12 4 lb, the 9 3 lb; the 42-pounder carronade 3 lb 8 oz, the 24 2 lb, the 18 1 lb 8 oz. The engine's shares of the shot, a third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, charge_lb), give each of them to the ounce.
+      # A cartridge's powder in pounds: the service charge of cylinder powder for one shot by the gun's kind and calibre, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10; the OCR has its title at l.27498-27502 and lost its figures; freesail/ship/charges.py): a third of the shot's weight for a gun and a twelfth for a carronade, rounded down to the ounce, and 2 oz for the half-pounder swivel. A gun the table does not name takes its kind's share of the shot to the nearest ounce (freesail/ship/parts.py, charge_lb).
       charges:
         long:
           24: 8.0
@@ -4441,7 +4441,7 @@ armament:
         carronade:
           24: 158
           18: 474
-      # A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one shot, the Regulations 1806 (1808 printing), Table No. 29 (the page image read: Research-Indefatigable-2026-10.md §6.4; the OCR has its title at l.27498-27502 and lost its figures): the long 24-pounder 8 lb, the 18 6 lb, the 12 4 lb, the 9 3 lb; the 42-pounder carronade 3 lb 8 oz, the 24 2 lb, the 18 1 lb 8 oz. The engine's shares of the shot, a third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, charge_lb), give each of them to the ounce.
+      # A cartridge's powder in pounds: the service charge of cylinder powder for one shot by the gun's kind and calibre, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10; the OCR has its title at l.27498-27502 and lost its figures; freesail/ship/charges.py): a third of the shot's weight for a gun and a twelfth for a carronade, rounded down to the ounce, and 2 oz for the half-pounder swivel. A gun the table does not name takes its kind's share of the shot to the nearest ounce (freesail/ship/parts.py, charge_lb).
       charges:
         long:
           24: 8.0

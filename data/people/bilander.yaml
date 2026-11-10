@@ -52,7 +52,7 @@ wardroom:
       the cargo stowed and the log kept; reports every sail and every shift of wind, and takes
       the deck when the master gives it.
   - role: boy
-    drawn: {station: afterguard, rating: ordinary}
+    drawn: {station: afterguard, rating: landsman}
     messenger: true
     rank: boy
     station: the master's messenger
@@ -61,4 +61,4 @@ wardroom:
     history: "Bound apprentice to the master at Poole; this voyage the first."
     brief: >-
       Carries the master's word about the vessel (pass the word for, send for).
-    note: An apprentice boy as the messenger (judgement), as the smack's.
+    note: An apprentice boy as the messenger (judgement), as the smack's; a landsman, as the merchant brig's boy is rated (the lead's ruling of 2026-11-09).
