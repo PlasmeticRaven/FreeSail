@@ -24422,3 +24422,80 @@ pace alone and last (`--slow -m pace -n 0`, the same files, 7-159 among them) ex
 ruff check and format clean. An earlier fast tier at 00a6f3e8 (exit 0, 7,123 passed) was of
 the tree before the trunk's package 74 and is not the report's. The tree reported differs from
 453ed374 by this paragraph alone.
+
+## Package 101: the Catalan coast block (2026-11-10)
+
+Package 101 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 101"; built as
+`docs/dev/ChartBlocks.md` says). The region `catalan-coast` closes the hole in the chart north
+of `balearics` (40.56 N) and west of `gulf-of-lion`'s first tile column (2.6133 E), with seven
+ports: Barcelona, Tarragona with Salou and the Alfaques in the block, and Rosas, Palamós,
+Valencia's Grao and Alicante beside it in water already charted.
+
+### The sources' short pass (item 0)
+
+**On file, read and cited by printed page** (`docs/references/pilots/`, 79c's pass):
+Tofiño 1787, pp. 93 to 98 (Alicante), 108 to 109 (Valencia's Grao), 115 to 128 (the
+Alfaques to Tossa) and 131 to 141 (Palamós, Rosas, Cadaqués, Cape Creus), his positions in
+latitude and in longitude from Cadiz's meridian (about 6° 17′ 35″ east of Greenwich's by
+Purdy 1826's figures) and his enfilaciones true bearings (Purdy's bracketed true bearings
+agree); Purdy 1826 (pp. 25 to 31), Norie 1831 (pp. 28 to 35), Purdy 1840 (pp. 33 to 40 and
+its Pharonology), Michelot 1709 and 1715, Smyth 1854 (pp. 7 to 10, the table of positions
+pp. 431 to 433), and the Admiralty 1913 (pp. 205 to 225, for the heights and depths only).
+**The Derrotero of 1849 does not cover this coast** (it begins at Cape Creus).
+
+**Barcelona's meteorological table** (the Admiralty's Mediterranean Pilot vol. I, 1913, p.
+726, the Archive's PDF page 899; 79c named it and did not cut it): cut at 200 dpi, as printed,
+under `pilots/pages/`. Eleven years' wind observations (barometer and temperature 31, rain 20,
+gales and fogs 30), the "Observaciones Meteorológicas de Provincias (Spain)". The days of wind
+by month, read from the page and each column summed against the printed totals (all eight
+agree, and the gales and fogs):
+
+| month | N | NE | E | SE | S | SW | W | NW | gales | fogs |
+|---|---|---|---|---|---|---|---|---|---|---|
+| January | 2 | 4 | 3 | 1 | 2 | 5 | 10 | 4 | 0.8 | 4.0 |
+| February | 1 | 3 | 2 | 2 | 4 | 7 | 6 | 3 | 0.7 | 2.2 |
+| March | 1 | 3 | 5 | 4 | 6 | 8 | 3 | 1 | 0.8 | 1.4 |
+| April | 1 | 2 | 5 | 5 | 5 | 7 | 4 | 1 | 0.8 | 0.7 |
+| May | 0 | 2 | 7 | 5 | 6 | 8 | 2 | 1 | 0.3 | 0.3 |
+| June | 0 | 1 | 6 | 7 | 9 | 6 | 1 | 0 | 0.1 | 0.2 |
+| July | 0 | 1 | 6 | 7 | 10 | 6 | 1 | 0 | 0.2 | 0.1 |
+| August | 0 | 1 | 5 | 8 | 10 | 6 | 1 | 0 | 0.2 | 0.3 |
+| September | 1 | 4 | 6 | 6 | 6 | 6 | 1 | 0 | 0.1 | 0.6 |
+| October | 1 | 4 | 5 | 4 | 4 | 7 | 5 | 1 | 0.5 | 0.7 |
+| November | 2 | 3 | 3 | 2 | 3 | 4 | 8 | 5 | 0.4 | 2.3 |
+| December | 4 | 4 | 1 | 0 | 1 | 4 | 9 | 8 | 0.4 | 3.1 |
+| **totals as printed** | 13 | 32 | 54 | 51 | 66 | 74 | 51 | 24 | 5.3 | 15.9 |
+
+The calm column is blank; the barometer's monthly means 30.07, 30.05, 29.96, 29.92, 29.97,
+30.01, 30.02, 30.01, 30.04, 29.98, 30.00 and 30.04 inches.
+
+**The plans.** Tofiño's *Atlas Marítimo* in the Universidad de Sevilla's copy (`A062039040`,
+Public Domain Mark), seen whole in a contact sheet of 43 of its 46 leaves through the IIIF
+server (leaves 37, 40 and 44 answered 504 or timed out three times): leaf 14 is the "Carta
+esférica desde Cabo Oropesa a Cabo de Creux" (1786; "los números de la sonda son brazas de
+á 2 varas castellanas"), the coast at a small scale with the delta and the Alfaques drawn;
+**the atlas holds no harbour plan of Barcelona, Tarragona, the Alfaques, Rosas, Palamós,
+Valencia or Alicante** (its plans are Mahon's and the Atlantic ports'). The harbour plans of
+the coast are the David Rumsey Map Collection's scans on the Archive, CC BY-NC-SA 3.0, read
+and not committed as 79c had them: Roux's pl. 12 Barcelona and pl. 13 Roses (1764), Bellin's
+"Plan de Barcelone" and "Plan de Palamos" (1764), Heather's sheets of 1814 (the road of Salou
+by Ayrouard, the port of Barcelona and the bay of Roses by Michelot, Port Palamos, Le Sofa bay
+that is the Alfaques, the bay of Alicant), Luffman's "Bay of Roses" (1801) and the "Plan de
+Tarragone ... le 28 Juin 1811" (1828). The rows are in `docs/references/README.md`.
+
+**Not found.** No year first lit for any light of the coast: Michelot 1715 has Barcelona's
+mole lantern "where a Fire is kept every Night"; the one dated event is the official notice
+of 14 December 1823 of a light on the new mole then building (Norie 1831, p. 31; Purdy 1840,
+p. 36); Tarragona's mole and its 30-foot lantern are first in Purdy 1826 (p. 27, "a modern
+structure"), Tofiño naming no mole there. No rate for the coast's south-westerly set (every
+pilot gives the set, "pretty swiftly" in Michelot, none a rate). No period word of Reus's
+brandies, Tarragona's wines or the Alfaques' rice: the texts give the Alfaques' salt (Tofiño
+p. 116), Salou's "tráfico de frutos" (p. 121), the wine loaded at Villaseca (Michelot 1715),
+Barcelona's manufactures out and corn, fish and rice in (Purdy 1826 p. 28; Norie 1831 p. 30),
+Alicante's exports (Purdy and Norie). **No period text calls Rosas the best anchorage of the
+coast in a northerly**: Tofiño (p. 136) has the bay "resguardada generalmente de todos los
+vientos", the Tramontana its one harmful wind and harmless, blowing off the land; Michelot
+gives "the best port of Catalonia" to Cadaqués; only the Admiralty 1913 recommends Rosas in a
+northerly gale. Every host answered: the Internet Archive (its search, metadata, downloads and
+IIIF server), PANGAEA (TICON's zip, the same file as every block's, SHA-256
+7055f8ed1a14abf8...) and Puertos del Estado's REDMAR reports.
