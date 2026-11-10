@@ -1,0 +1,135 @@
+# FreeSail: Barcelona as a port (package 101, the Catalan coast's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/catalan-coast.yaml,
+# the harbour patch barcelona).
+#
+# Sources. Tofino 1787, Derrotero del Mediterraneo, pp. 123 to 125: Montjui and its castle,
+# seen twelve leagues at sea; the mole running 407 toesas to the south from the east end of
+# the city, its lantern; the bar of the Llobregat's and the Besos's spoil from the lantern to
+# the foot of Montjui with 16 feet and no channel, so that no ship drawing more can use the
+# mole, cleaned with pontoons in summer; the road for squadrons by the lantern on with the
+# tower of La Merced and the coast of Garaf open south of Montjui, 18 to 25 brazas muddy
+# sand. Purdy 1826, p. 28: the bar 14 feet, admitting no vessel drawing more than 12; within
+# it 27 to 28 feet; a heavy sea into the harbour with S S E winds; the road 16 1/2 to 23
+# fathoms muddy sand; the current on the coast generally to the south-westward; the trade:
+# manufactures of silk, cotton, leather, wool and glass, fire-arms and cutlery, out with
+# wine, brandy, cork and fruits; in, corn, fish and woollen goods; more than 1,000 vessels
+# a year. Norie 1831, pp. 30 to 31: the bar frequently not 10 feet; the imports corn, rice,
+# Baltic timber, Barbary wax, Swedish iron, stock-fish and dried cod. Michelot 1715, OCR l.
+# 2440 to 2463: the lantern lit every night; the road 15 to 20 fathom, good clay.
+#
+# The period's shore. The chart's tiles are the modern grid's: the modern port of Barcelona
+# (its docks, its outer moles and the ground reclaimed south of Montjuic to the Llobregat,
+# whose mouth has been turned) stands in the grid where 1805 had the old mole, the bar and
+# the beach. No period sheet is read with its datum (Roux's pl. 12, Bellin's 'Plan de
+# Barcelone' and Heather's 'Port of Barcelona' are read and not transcribed, CC BY-NC-SA):
+# `datum: unverified`, and no patch redraws it. A later package with a public-domain plan of
+# the old mole and the bar would redraw the harbour.
+#
+# The tide. REDMAR 3758 (Barcelona 2): the mean level 30 cm and the lowest astronomical tide
+# 9 cm above the gauge's zero, 0.21 m between: the block's gauge (TICON's Barcelona),
+# data/tides/constituents.yaml. The epitome's hour the gauge's establishment, JUDGEMENT.
+#
+# The stance, dated (79a's form, `nation:`; data that carries its dates, decision 66):
+# Spain's, and hostile to a King's ship by the nations table from Spain's declaration of 12
+# December 1804 (James 1837, vol. 3, p. 200); France's from the French seizure of the
+# citadel and Montjuic at the end of February 1808 (FROM MEMORY: the 29th; to be verified
+# from a history of the Peninsular war, Oman's or Napier's, not on file) to the peace of
+# 1814 (FROM MEMORY: the Treaty of Paris of 30 May; the garrison's leaving day not read),
+# hostile to a King's ship then as France's; Spain's again after. NOTE: the nations table's
+# wars are one year's picture (data/nations.yaml `wars:`, no end date; `Nations.at_war`,
+# freesail/world/nations.py line 109, reads none), so from 1808 to 1814 Spain, Britain's
+# ally from the summer of 1808 (James 1837, vol. 4, pp. 294 to 295), still reads as at war
+# with Britain: a finding for the owner (decision 66), not mended here. Prices FROM MEMORY
+# or JUDGEMENT, in sterling.
+
+id: barcelona
+name: Barcelona
+nation:
+  - {nation: spain, until: 1808-02-28, source: "the King of Spain's; at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200)"}
+  - {nation: france, since: 1808-02-29, until: 1814-05-30, source: "the citadel and Montjuic seized by Duhesme's troops at the end of February 1808, held to the peace of 1814 (FROM MEMORY; a history of the Peninsular war would verify the days)"}
+  - {nation: spain, since: 1814-05-31, source: "Spain's again at the peace (FROM MEMORY)"}
+source: "Tofino 1787 pp. 123-125; Purdy 1826 p. 28; Norie 1831 pp. 30-31; Michelot 1715 OCR l. 2440-2463"
+datum: unverified   # no period sheet read with its datum; the modern port is the grid's
+
+outer_road:
+  feature: barcelona-road
+  name: the road of Barcelona
+  lat_deg: 41.3600
+  lon_deg: 2.1960
+  depth_fathoms: 20
+anchorage:
+  feature: barcelona-road
+  name: the road of Barcelona
+  lat_deg: 41.3600
+  lon_deg: 2.1960
+mooring:
+  feature: barcelona-port
+  name: within Barcelona mole
+  lat_deg: 41.3770
+  lon_deg: 2.1850
+  depth_fathoms: 4
+  bottom: mud
+  deep_draught_ft: 12    # Purdy 1826: the bar admits no vessel drawing more than 12 feet
+shore:
+  feature: barcelona-lantern
+  name: the mole of Barcelona
+  lat_deg: 41.3745
+  lon_deg: 2.1882
+
+pilot:
+  station: barcelona-road
+  cruising_nm: 3                 # judgement: the port's boats
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' falucho of Barcelona
+    under: a lateen sail and oars
+    note: "judgement: the coast's falucho"
+  names: [Puig, Ferrer, Roca, Vidal, Sala, Font, Pujol, Soler]   # Catalan names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 150            # out to the south-east into the road (judgement)
+  words:
+    channel: "There is no channel for a ship of war: the bar runs from the lantern to the foot of Montjui with sixteen feet at best and less after the winter's gales. Merchantmen of twelve feet cross it; you anchor in the road."
+    marks: "Montjui and its castle close west of the city, seen twelve leagues off like an island; the lantern on the head of the mole; the tower of La Merced in the lower town; Montserrat's pinnacles far inland."
+    anchorage: "Anchor in the road with the lantern on with the tower of La Merced and the coast of Garraf open south of Montjui, in eighteen to twenty-five brazas, muddy sand. With the wind at east you can weather the Llobregat; a southerly blows seldom moderate."
+    tide: "There is no tide here to speak of; the current along the coast sets to the south-westward."
+
+tide:
+  establishment: Barcelona
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 30, origin: null, note: "corn the city's chief import (Purdy 1826, p. 28; Norie 1831, p. 30); the price FROM MEMORY"}
+    - {good: rice, price: 26, origin: null, note: "imported (Norie 1831, p. 30); the price JUDGEMENT, dear here against Valencia's"}
+    - {good: salt fish, price: 32, origin: null, note: "fish imported, stock-fish and dried cod (Purdy 1826, p. 28; Norie 1831, p. 30); the price JUDGEMENT"}
+    - {good: salt, price: 12, origin: spain, note: "JUDGEMENT, dear against the Alfaques' salt"}
+    - {good: barilla, price: 18, origin: null, note: "for the city's glass and soap (Purdy 1826, p. 28: manufactures of glass); the price JUDGEMENT, dear against Alicante's"}
+    - {good: timber, price: 14, origin: null, note: "Baltic timber imported (Norie 1831, p. 30); JUDGEMENT"}
+    - {good: wine, price: 26, origin: spain, note: "exported (Purdy 1826, p. 28); JUDGEMENT"}
+    - {good: brandy, price: 70, origin: spain, note: "exported (Purdy 1826, p. 28); JUDGEMENT"}
+    - {good: cork, price: 30, origin: spain, note: "exported (Purdy 1826, p. 28); JUDGEMENT"}
+    - {good: silk, price: 190, origin: spain, note: "the city's manufactures of silk (Purdy 1826, p. 28); JUDGEMENT"}
+    - {good: biscuit, price: 30, origin: spain, note: "JUDGEMENT"}
+    - {good: olive oil, price: 46, origin: spain, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "a spar from the merchants' stores, the Baltic timber; judgement"}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.06, note: "judgement"}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  # judgement: the Matricula de Mar takes the coast's seamen for the King of Spain's ships
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

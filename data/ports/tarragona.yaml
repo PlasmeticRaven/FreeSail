@@ -1,0 +1,128 @@
+# FreeSail: Tarragona with the road of Salou as a port (package 101, the Catalan coast's
+# block), on package 35's machinery; the marks are the features file's
+# (data/charts/features/catalan-coast.yaml, the harbour patch tarragona).
+#
+# Sources. Tofino 1787, Derrotero del Mediterraneo, pp. 120 to 122: Cape Salou, lumpish and
+# yellowish; its road the one shelter from the levante on all this coast as far as beyond
+# Barcelona, safe in summer only, open to all the third quadrant, 7 brazas sand with patches
+# of weed half a mile south of the Old Tower; the traffic in the fruits of the towns about
+# keeps a good number of vessels there, native and foreign; Tarragona seven miles NE 5 E of
+# Salou on its little hill, its road before the city south of it, clean ground, sheltered
+# only from W to N, used by trading vessels. Purdy 1826, p. 27: the mole a modern structure
+# three quarters of a mile into the sea with a lantern 30 feet high, room for 100 sail of
+# merchant shipping, 5 fathoms within; the road 15 to 8 fathoms, soft brown mud; at Salou
+# 6 1/2 fathoms half a mile from shore, the anchors holding so well they must be weighed
+# often. Norie 1831, p. 29. Michelot 1715, OCR l. 2324 to 2348: Salou exposed ESE to WSW;
+# at Villaseca a league north barks load wine; Tarragona's small mole of 70 fathoms then.
+#
+# The period's shore. The chart's tiles are the modern grid's: the modern port of Tarragona
+# (its moles and docks south-west of the city) stands in the grid where 1805 had the road
+# and a mole building (Purdy 1826 calls it modern; Tofino names none; its beginning FROM
+# MEMORY about 1790). No period sheet is read with its datum (Heather's 'Road of Salo' of
+# 1814 is read and not transcribed, CC BY-NC-SA): `datum: unverified`.
+#
+# The tide. No gauge at Tarragona: REDMAR 3756 gives its mean level 30 cm and its lowest
+# astronomical tide 10 cm above the gauge's zero (0.20 m between), but no harmonic
+# constants are on file (TICON has none), so the block's gauge, Barcelona's, serves it.
+#
+# The stance, dated (79a's form; data that carries its dates, decision 66): Spain's, hostile
+# to a King's ship by the nations table from 12 December 1804 (James 1837, vol. 3, p. 200);
+# France's from the storm of 28 June 1811 (FROM MEMORY; the David Rumsey collection's 'Plan
+# de Tarragone ... le 28 Juin 1811', 1828, names the day, read as a title only) to the
+# French leaving in August 1813 (FROM MEMORY: the walls blown up and the place evacuated
+# about the 18th; a history of the Peninsular war would verify). NOTE: the nations table's
+# wars are one year's picture (data/nations.yaml `wars:` has no end date; `Nations.at_war`,
+# freesail/world/nations.py line 109, reads none), so in 1809, Spain Britain's ally since
+# the summer of 1808 (James 1837, vol. 4, pp. 294 to 295), Tarragona still reads as
+# hostile to a King's ship: a finding for the owner (decision 66 and the range's review),
+# not mended here. Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: tarragona
+name: Tarragona
+nation:
+  - {nation: spain, until: 1811-06-27, source: "the King of Spain's; at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200)"}
+  - {nation: france, since: 1811-06-28, until: 1813-08-18, source: "taken by storm by Suchet on 28 June 1811 and evacuated in August 1813 (FROM MEMORY; the storm's day the Rumsey plate's title)"}
+  - {nation: spain, since: 1813-08-19, source: "Spain's again (FROM MEMORY)"}
+source: "Tofino 1787 pp. 120-122; Purdy 1826 p. 27; Norie 1831 p. 29; Michelot 1715 OCR l. 2324-2348"
+datum: unverified   # no period sheet read with its datum; the modern port is the grid's
+
+outer_road:
+  feature: tarragona-road
+  name: the road of Tarragona
+  lat_deg: 41.0950
+  lon_deg: 1.2500
+  depth_fathoms: 10
+anchorage:
+  feature: tarragona-road
+  name: the road of Tarragona
+  lat_deg: 41.0950
+  lon_deg: 1.2500
+mooring:
+  feature: salou-road
+  name: the road of Salou
+  lat_deg: 41.0690
+  lon_deg: 1.1310
+  depth_fathoms: 7
+  bottom: sand with patches of weed
+shore:
+  feature: tarragona-mole
+  name: the mole of Tarragona
+  lat_deg: 41.1050
+  lon_deg: 1.2448
+
+pilot:
+  station: tarragona-road
+  cruising_nm: 3                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' falucho of Tarragona
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Rovira, Gener, Miquel, Sabater, Ripoll, Bonet, Prats, Casals]   # judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 180            # out to the southward (judgement)
+  words:
+    channel: "The road is open water, clean ground. In an easterly go round Cape Salou into its road, the only shelter from the levante on this coast; when the east wind moderates, stand out again, for a southerly blows straight in there."
+    marks: "Tarragona on its little hill with its walls, seen by its extent; Cape Salou to the west, lumpish and yellowish, like a dark island with white spots from afar; the Old Tower within the cape."
+    anchorage: "Anchor before the city south of it in ten fathoms of soft brown mud, sheltered only from the west round to the north; at Salou in seven fathoms, sand and weed, half a mile south of the Old Tower, in summer only."
+    tide: "No tide to speak of; the current sets along the coast to the south-westward."
+
+tide:
+  establishment: Barcelona
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 16, origin: spain, note: "the coast's wine loaded at Villaseca (Michelot 1715, OCR l. 2333); the price JUDGEMENT, cheap against Barcelona's"}
+    - {good: brandy, price: 52, origin: spain, note: "JUDGEMENT; the brandies of Reus shipped at Salou FROM MEMORY, no text on file naming them"}
+    - {good: almonds, price: 34, origin: spain, note: "the traffic in the fruits of the towns about (Tofino 1787, p. 121, 'frutos'); the kind FROM MEMORY"}
+    - {good: hazelnuts, price: 22, origin: spain, note: "the fruits of the country (Tofino 1787, p. 121); the 'Barcelona nuts' the Admiralty 1913 lists among Tarragona's exports (modern); the price JUDGEMENT"}
+    - {good: olive oil, price: 40, origin: spain, note: "JUDGEMENT"}
+    - {good: wheat, price: 30, origin: null, note: "JUDGEMENT"}
+    - {good: salt fish, price: 30, origin: null, note: "JUDGEMENT"}
+    - {good: salt, price: 11, origin: spain, note: "JUDGEMENT"}
+    - {good: biscuit, price: 30, origin: spain, note: "JUDGEMENT"}
+    - {good: cork, price: 30, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 26, origin: spain, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 18, pounds: 52, note: "a spar from the merchants' stores; judgement"}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.06, note: "judgement"}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "the spring in a garden near the Old Tower of Salou (Tofino 1787, p. 121); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  # judgement: the Matricula de Mar takes the coast's seamen for the King of Spain's ships
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
