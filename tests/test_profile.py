@@ -502,7 +502,7 @@ print(repr(seen))
 MODULE_FILES = {
     "ships.indefatigable": ["razee-44.yaml", "sixty-four.yaml"],
     "ships.neufchatel": ["hermaphrodite-brig.yaml"],
-    "ships.bilander": [],
+    "ships.bilander": ["bilander.yaml"],
     "ships.bellerophon": [],
 }
 

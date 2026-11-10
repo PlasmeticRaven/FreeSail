@@ -1865,6 +1865,9 @@ evolutions:
     lateen: set_lateen
     sprit: set_sprit
     flying: set_flying  # package 57: a sail set flying, of whatever cut (royals, lug topsails)
+    # package 75: a settee (a dipping lug, the key `settee`) has its own set, take in, furl and
+    # dip, found before its class; it is reefed, trimmed, bent, unbent and shifted as a lug
+    settee: set_settee
   take in:
     square: take_in_square
     gaff: take_in_gaff
@@ -1874,9 +1877,11 @@ evolutions:
     lateen: take_in_lateen
     sprit: take_in_sprit
     flying: take_in_flying  # package 57: lowered and sent down whole
+    settee: take_in_settee  # package 75: clewed up aloft, the yard standing
   furl:
     square: furl_square
     lateen: furl_lateen  # package 75: furled on its yard aloft (Falconer 1780, YARD)
+    settee: furl_settee  # package 75: furled on its yard aloft, as a lateen yard's sail
   reef:
     square: reef_square
     gaff: reef_gaff
@@ -1891,6 +1896,7 @@ evolutions:
   # package 43b: a dipping lug shifted round its mast to the lee side
   dip:
     lug: dip_lug
+    settee: dip_settee  # package 75: the settee's yard lowered and passed round
   brace: brace
   square: brace
   back: brace
@@ -2000,6 +2006,9 @@ take_in_words:
   # package 75: brailed up to its yard, the mast and the yard standing (Steel 1794 vol. II
   # p. 37); a whole lateen is clewed up "comme les autres voiles" (Lescallier 1791 p. 379)
   lateen: [brail up, brail in, clew up, haul up, lower]
+  # package 75: a settee is clewed up aloft with its clewlines and buntlines "comme pour les
+  # voiles quarrées" (Lescallier 1791 p. 390), its yard standing; it is lowered only to dip
+  settee: [clew up, haul up]
   sprit: [lower]
 
 # ---------------------------------------------------------------------------

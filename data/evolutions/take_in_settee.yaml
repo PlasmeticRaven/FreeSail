@@ -1,0 +1,28 @@
+# Take in a settee: ease off the sheet and the tack and clew it up to its yard with the
+# clewlines and buntlines, as a course is taken in, the yard left standing aloft across the
+# mast, where the sail hangs in its gear (Lescallier 1791 p. 390: its clewlines and buntlines
+# "comme pour les voiles quarrées"). It is not lowered on deck, as a lug is: its yard comes
+# down only to be dipped round the mast. Time as for clewing up a course (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (Lescallier pp. 221-228 and
+# p. 390; take_in_square's clewing up). "In the gear" is a lug lowered on deck but a settee
+# clewed up aloft (`Sail.yard_lowered` false; E11).
+id: take_in_settee
+verb: take_in
+applies_to: {class: settee}
+preconditions:
+  - {check: "sail.state in [set, loosed]", reason: "The {sail} is {state}; there is nothing to take in.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: clew_up
+    duration_s: 60
+    sets: {sail.state: in_the_gear}
+    log: "Eased off the {sail} sheet and tack and clewed it up."
+on_start: {log: "Hands to the {sail} clewlines and buntlines."}
+on_complete: {log: "Took in the {sail}; hanging in the gear, its yard aloft.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard and the forecastlemen at the sheet, the tack and the gear (judgement)
+crew: {hands: 6, rating: ordinary, stations: [afterguard, forecastle]}
+source: "Lescallier 1791 p. 390 (the settee clewed up as a square sail); take_in_square's time (judgement)"

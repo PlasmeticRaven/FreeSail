@@ -412,13 +412,21 @@ def _sail_evolution(
 
 # The classes of sail that `furl` takes in (package 37l): handed and stowed, not furled on
 # a spar. A lug comes down on deck with its yard and is stowed there (package 43b); a sail
-# set flying is sent down whole (package 57).
+# set flying is sent down whole (package 57). A settee, the lug furled on its yard aloft, has
+# a furl of its own, which `evolution_key` finds before the lug's take-in (package 75).
 FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug", "flying")
 
 
 def evolution_key(sail: Sail, mapping: dict[str, Any]) -> str:
-    """The key a sail verb's evolution is found by: 'flying' for a sail set flying where
-    the verb has an evolution for it (set, take in: package 57), else the sail's class."""
+    """The key a sail verb's evolution is found by: 'settee' for a settee where the verb has
+    an evolution of its own for it (set, take in, furl, dip: package 75,
+    docs/design/Design-ShipsEngineExtensions.md §5.2), 'flying' for a sail set flying where
+    the verb has one for it (set, take in: package 57), else the sail's class. So a settee is
+    reefed, its reef shaken out, its sheet trimmed, and it is bent, unbent and shifted as the
+    lug it is (D42(a), D45(a)); and `furl`, whose mapping takes a lug in, finds its own row
+    first (furled aloft on its yard)."""
+    if sail.settee and "settee" in mapping:
+        return "settee"
     return "flying" if sail.flying and "flying" in mapping else sail.cls
 
 
@@ -515,7 +523,12 @@ def _sail_check(
 
 
 def _take_in_kind(ship: Ship, sail: Sail) -> str:
-    """The class a take-in word is chosen by: 'course' for a square sail on a lower yard."""
+    """The class a take-in word is chosen by: 'course' for a square sail on a lower yard;
+    'settee' for a settee, clewed up aloft as a course is and never lowered as a lug is
+    (package 75; Lescallier 1791 p. 390: clewlines and buntlines "comme pour les voiles
+    quarrées"; Ext §5.2): "lower the mainsail" is refused it, "clew up" named."""
+    if sail.settee:
+        return "settee"
     if sail.cls == "square":
         yard = ship.yard_of(sail)
         parent = ship.parent_of(yard) if yard is not None else None
@@ -1566,16 +1579,24 @@ def _yard_for(ship: Ship, pid: str) -> Spar:
         if part.is_yard:
             return part
         sail = ship.sail_of(part)
-        # a lateen yard has vangs in place of braces (package 75; Falconer 1780, VANGS)
-        vangs = part.cls in ("gaff", "boom", "lateen_yard")
+        # a lateen yard has vangs in place of braces (package 75; Falconer 1780, VANGS), and
+        # so has a settee's, its peak brace the English vangs (Lescallier 1791 p. 390; Ext
+        # §5.1): the settee named as itself, not as a lug sail
+        settee = sail is not None and sail.settee
+        vangs = part.cls in ("gaff", "boom", "lateen_yard") or settee
         how = " it is trimmed with its sheet and vangs" if vangs else ""
-        hint = f"; the {sail.cls} sail on it is not braced;{how}" if sail else f";{how}"
+        what = "settee" if settee else f"{sail.cls} sail" if sail else ""
+        hint = f"; the {what} on it is not braced;{how}" if sail else f";{how}"
         hint = hint.rstrip(";")
         raise OrderError(f"The {name} is a {part.cls.replace('_', ' ')}, not a yard{hint}.")
     if isinstance(part, Sail):
         yard = ship.yard_of(part)
         if yard is not None and yard.is_yard:
             return yard
+        if part.settee:
+            raise OrderError(
+                f"The {name} has no braces to its yard; a settee is trimmed with its sheet."
+            )
         raise OrderError(
             f"The {name} is a {part.cls} sail; it has no yard to brace. Trim it with its sheet."
         )
