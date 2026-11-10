@@ -4219,8 +4219,7 @@ changed, her ten new passing but 7-196 alone; the four whole logs equal; eightee
 the generator's bytes; `check_viewer_guns` clean; the captain's trials the machine's three;
 ruff clean. **The lead's merge:** the trial on 61792728 clean and lint-clean; no model or
 vendor name in the diff; `data/ships/` gains her file alone, by the generator; no physics; the
-fast tier whole on it exit 0, 7,433 passed, 1 xfailed, 501 slow left out; the whole suite in the cloud dispatched after run
-66, the figures to follow. **The session's seven points ruled** in the notes at the end of this
+fast tier whole on it exit 0, 7,433 passed, 1 xfailed, 501 slow left out; the whole suite in the cloud, run 67 (2026-11-10, 20:05 to 21:07 UTC, on e4836bd2): green whole, lint, the six shards and the pace job. **The session's seven points ruled** in the notes at the end of this
 file (2026-11-10, after this merge). **Next in 75:** her step 7 (B7.c her tack at quarters,
 1.6 times her cleared tack today; B7.d; B7.e), the trim's alias words, then Phase 5; the
 close-out's word after Phase 5's whole suite is green.
