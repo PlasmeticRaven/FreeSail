@@ -639,6 +639,61 @@ REGIONS: dict[str, dict[str, Any]] = {
         # Tarragona's), the land standing above that tide's high water
         "fill_to_chart_datum": True,
     },
+    # package 104: the Sardinian sea, the open water between Minorca and Sardinia, and the
+    # Algerian coast from Cape Carbon by Bougie, Djidjelli, the Seven Capes, Collo and Stora
+    # to Bona and Cape Rosa. The hole as the lead measured it is shaped like an L; this is
+    # its upright, `tunis-coast` its foot. The west bound is `balearics`' east bound exactly
+    # (4.5 E: its column 4.32 to 4.75 E stays balearics' by the seam rule, "10 kept"), the
+    # north `gulf-of-lion`'s south bound and row edge (40.56 N: `tiles_over` starts on it,
+    # so no row of the Gulf's is taken in), the east `tyrrhenian`'s west bound exactly (8.0
+    # E: the column 7.73 to 8.16 E is the Tyrrhenian's north of the row edge 38.4267 N, "5
+    # kept", and this block's south of it, where the Tyrrhenian's tiles end). The south
+    # bound lies 0.7 m north of the row edge 36.2933 N (36.29333...: a bound below the edge,
+    # as the brief's 36.2933 is by 3.7 m, takes in the row beneath, all land),
+    # on the land behind the Kabyle coast. The level-2 tiles that meet the bounds span
+    # 36.29 to 40.56 N and 4.32 to 8.16 E (10 rows, 9 columns, 75 the block's own). East of
+    # 1 W no corridor lies under the regions, so every tile is written.
+    "sardinian-sea": {
+        "title": "The Sardinian sea, and Barbary from Bougie by Collo and Stora to Bona",
+        "bounds": {"south": 36.29334, "north": 40.56, "west": 4.5, "east": 8.0},
+        "fetch": {"south": 36.15, "north": 40.7, "west": 4.2, "east": 8.3},
+        "harbours": {
+            "bougie": {"south": 36.70, "north": 36.80, "west": 5.02, "east": 5.14},
+            "djidjelli": {"south": 36.78, "north": 36.86, "west": 5.70, "east": 5.82},
+            "collo": {"south": 36.96, "north": 37.04, "west": 6.52, "east": 6.62},
+            "stora": {"south": 36.86, "north": 36.95, "west": 6.83, "east": 6.95},
+            "bona": {"south": 36.84, "north": 36.98, "west": 7.72, "east": 7.84},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, the rule's (`mean_level_grid`)
+        "fill_to_chart_datum": True,
+    },
+    # package 104: the coast from La Calle by Tabarka, the Galita, Cape Blanc and Bizerta
+    # to Porto Farina, the Gulf of Tunis with La Goletta, and Cape Bon with the Skerki bank:
+    # the foot of the L. The north bound is `tyrrhenian`'s south bound exactly (38.5 N: the
+    # row 38.43 to 38.85 N is the Tyrrhenian's, "8 kept"), the west `sardinian-sea`'s east
+    # bound (8.0 E: the column 7.73 to 8.16 E south of 38.43 N is the Sardinian sea's,
+    # built first, "5 kept" more). The south bound as the Sardinian sea's, 0.7 m inside the
+    # row edge; the east bound 7 m inside the column edge 11.14667 E (a bound on the edge
+    # takes in the column beyond it, package 79d's finding), east of Cape Bon. The level-2
+    # tiles that meet the bounds span 36.29 to 38.85 N and 7.73 to 11.15 E (6 rows, 8
+    # columns, 35 the block's own). Everything south of 38.43 N and east of 11.15 E (the
+    # Sicilian channel, Pantellaria, Sicily's south and west) is a later block's.
+    "tunis-coast": {
+        "title": "The coast of Tunis, La Calle and Tabarka to Bizerta, the Goletta and Cape Bon",
+        "bounds": {"south": 36.29334, "north": 38.5, "west": 8.0, "east": 11.1466},
+        "fetch": {"south": 36.15, "north": 38.95, "west": 7.6, "east": 11.3},
+        "harbours": {
+            "la-calle": {"south": 36.87, "north": 36.93, "west": 8.40, "east": 8.48},
+            "tabarka": {"south": 36.93, "north": 37.00, "west": 8.72, "east": 8.80},
+            "bizerta": {"south": 37.15, "north": 37.32, "west": 9.78, "east": 9.95},
+            "porto-farina": {"south": 37.10, "north": 37.20, "west": 10.12, "east": 10.28},
+            "la-goletta": {"south": 36.76, "north": 36.87, "west": 10.17, "east": 10.38},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # as sardinian-sea's
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -709,6 +764,9 @@ CHARTS: dict[str, dict[str, Any]] = {
             "tyrrhenian",
             # package 101: the Catalan coast, the hole between the Balearics and the Gulf
             "catalan-coast",
+            # package 104: the Sardinian sea and the coast of Tunis, the L-shaped hole
+            "sardinian-sea",
+            "tunis-coast",
         ],
         "corridor": "atlantic-corridor",
     },
