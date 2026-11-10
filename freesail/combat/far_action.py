@@ -388,11 +388,17 @@ def _fallback_reply(root: Any, far: Any, awake: Any, rec: dict, tick: int, lines
     _write_back(far, fa, tick)
     if struck:
         _into_parts(root, hull, awake, far, fa, struck, bearing, range_m, rng, tick)
+    from freesail.crew.model import number_words
+
+    # the line in the ship's words, the counts as the round's line has them; that it was the
+    # reply by the tables with the cap full is the data's `fallback`, for the record (85's
+    # rule: the engine's words are not served)
+    told = "none" if not struck else number_words(struck)
     hull.record(
         Severity.NOTABLE,
         "action.far_reply",
         f"The {far.name} fires her broadside at us from {range_m / units.CABLE:.0f} cables: "
-        f"{struck} of {fired} shot strike (the far ship's reply, the cap full).",
+        f"{told} of her {number_words(fired)} shot {'strikes' if struck == 1 else 'strike'} us.",
         data={"from": str(far.id), "fired": fired, "struck": struck, "fallback": True},
     )
 
