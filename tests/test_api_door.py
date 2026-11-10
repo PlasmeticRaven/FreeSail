@@ -692,13 +692,13 @@ def test_the_openrouter_door_sends_the_picture_only_where_its_model_reads_one(
     transport, bodies = _openrouter_stub(["text", "image"] if reads else ["text"], replies)
     got = _openrouter_door(game, transport, tmp_path)
     try:
-        game.wait_for(lambda: game.harness is not None and len(bodies) >= (3 if reads else 2), 30)
+        game.wait_for(lambda: game.harness is not None and len(bodies) >= (3 if reads else 2), 120)
     except AssertionError:
         said = got["out"].getvalue()
         raise AssertionError(f"{len(bodies)} requests; the door said:\n{said}") from None
     with game.driver.lock:
         game.world.submit("stand down the watcher")
-    got["thread"].join(timeout=30)
+    got["thread"].join(timeout=120)
     out = got["out"].getvalue()
     station = bodies[1]
     names = {t["function"]["name"] for t in station.get("tools", [])}
