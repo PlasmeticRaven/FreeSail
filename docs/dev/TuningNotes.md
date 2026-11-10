@@ -24647,6 +24647,19 @@ passage should move by it; the tiers below are the proof.
 **The tests** (`tests/test_court.py`, five functions with the one in `test_practice_orders.py`):
 all fail on the unmended tree and pass on the mended. **Pins moved by the mends: none.**
 
+**The suites on the mended tree** (6b84c96, one hash, the trunk at 65c73a6 merged in it by
+71f21f0; a worktree pinned there; ruff check and format clean; every run started in the
+harness's background mode, the tiers as separate tasks under its two-hour cap; 2026-11-10
+UTC): the fast tier whole **exit 0** (20:10:04 to 21:03:16; 7,449 passed and the trunk's one
+expected failure, 505 slow tests left out); the slow tier of the touched files (step 6's
+thirty-five and `test_practice_orders`) **exit 0** (21:03:16 to 21:29:56; 3,033 passed and
+one expected failure); the slow tier of the known truths, the profile and the Indefatigable
+**exit 0** (21:30:26 to 22:25:06; 540 passed and the trunk's eight expected failures); the
+pace tests alone and last **exit 0** (22:25:06 to 22:31:16; 15 passed, no floor lowered).
+Nothing skipped in any tier. No recorded passage moved by the named gun's mend or any other.
+The trunk gained package 100's step 2 (the letters that travel) and the lead's records while
+these ran, and was not chased; it is merged at step 7's start.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root
