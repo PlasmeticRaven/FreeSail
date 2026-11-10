@@ -15110,3 +15110,333 @@ def test_truth_7_461_a_stopped_commodores_set_keeps_its_stations_across_a_checkp
     )
 
     case(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Package 101: the Catalan coast block, the hole between the Balearics and the Gulf of Lion
+# closed, and seven ports from Alicante to Rosas (truths 7-490 to 7-499)
+# ---------------------------------------------------------------------------
+
+CATALAN_PORTS = [
+    "barcelona",
+    "tarragona",
+    "alfaques",
+    "rosas",
+    "palamos",
+    "valencia",
+    "alicante",
+    "palma",
+    "port-mahon",
+]
+
+
+def _cat_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart on the Catalan coast at seed 7, the seven ports and the
+    Balearics' two loaded, a steady breeze (from the east unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 90.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", CATALAN_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_490_the_chart_answers_along_the_whole_main_from_cape_palos_to_cape_creus():
+    """The brief's items 1 and 9: the hole the chart had north of 40.56 N and west of
+    2.61 E is closed: probed on a tenth of a degree the old gap answers everywhere with a
+    depth or a height and a region; and on every twentieth of a degree of latitude from
+    Cape Palos (37.65 N) to Cape Creus (42.30 N) a walk west from 3.4 E finds the main's
+    shore with the chart answering every step of the way to it."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    for i in range(14):  # 40.6 to 41.9 N
+        for j in range(27):  # 0.3 to 2.9 E (3.0 E itself the Gulf's, first in the chart)
+            p = Position(40.6 + 0.1 * i, 0.3 + 0.1 * j)
+            assert chart.elevation_at(p) is not None, p
+            assert chart.region_at(p) == "catalan-coast", p
+    shores = 0
+    for i in range(94):  # 37.65 to 42.30 N
+        lat = 37.65 + 0.05 * i
+        lon, found = 3.4, False
+        while lon > -1.2:
+            el = chart.elevation_at(Position(lat, lon))
+            assert el is not None, (lat, lon)
+            if el > 0.0:
+                found = True
+                break
+            lon -= 0.02
+        assert found, lat
+        shores += 1
+    assert shores == 94
+
+
+def test_truth_7_491_a_ship_from_the_balearics_crosses_40_56_n_into_the_catalan_coast():
+    """The brief's item 9: the schooner standing north from the Balearics' water before a
+    southerly crosses 40.56 N within the hour; her region, her tide and her weather's box
+    change (the Balearics' blend to Barcelona's gauge at the seam, the Mediterranean west's
+    box to Barcelona's table at 40.5 N, where the boxes meet), the business follows her and peoples the new region once, the
+    lookout keeps the Montsia across the seam, and the depth does not step."""
+    from freesail.world.geo import Position
+    from freesail.world.weather import load_climatology
+
+    w = _cat_at(
+        40.52,
+        1.50,
+        datetime(1805, 6, 14, 10, 0),
+        ship=SCHOONER,
+        wind_from_deg=180.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=0.0,
+        ship_speed_kn=5.0,
+        business="on",
+    )
+    b = w.business
+    assert b.region == "balearics"
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer north")
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "catalan-coast":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 3600, (b.region, w.position)
+    assert b.regions_entered == ["balearics", "catalan-coast"] and len(b.drawn) > before
+    a, c = Position(40.558, 1.5), Position(40.562, 1.5)
+    assert w.chart.region_at(a) == "balearics" and w.chart.region_at(c) == "catalan-coast"
+    assert abs(w.chart.depth_at(a) - w.chart.depth_at(c)) < 0.05 * w.chart.depth_at(a)
+    level, north = w.tide.constants_at(c)
+    assert level == pytest.approx(0.21) and north["M2"] == pytest.approx((0.046, 213.5))
+    assert w.tide.constants_at(a)[1]["M2"][0] < 0.04  # the Balearics' blend
+    clim = load_climatology()
+    # the boxes meet at 40.5 N, the Mediterranean west's box's own bound: the strip to
+    # 40.56 N lies in no box and takes the nearest, Barcelona's
+    assert clim.box_at(40.45, 1.5).name == "mediterranean-west"
+    assert clim.box_at(a.lat_deg, a.lon_deg).name == "catalan-coast"
+    assert clim.box_at(c.lat_deg, c.lon_deg).name == "catalan-coast"
+    noon = datetime(1805, 6, 14, 12, 0)
+    for p in (a, c):
+        assert "montsia" in {s.feature.id for s in w.chart.in_sight(p, 30.0, None, "day", noon)}
+
+
+def test_truth_7_492_a_ship_from_the_gulf_crosses_3_e_into_the_catalan_coast():
+    """The brief's item 9: the schooner standing west from the Gulf of Lion's water off
+    Tossa before an easterly crosses 3 E within the hour; her region and her tide change
+    (the Gulf's gauges to Barcelona's), the business follows her, and the depth does not
+    step, the tiles either side of the meridian being the Gulf's (the seam rule, "4 kept")."""
+    from freesail.world.geo import Position
+
+    w = _cat_at(
+        41.40,
+        3.07,
+        datetime(1805, 6, 14, 10, 0),
+        ship=SCHOONER,
+        wind_from_deg=90.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=5.0,
+        business="on",
+    )
+    b = w.business
+    assert b.region == "gulf-of-lion"
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer west")
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "catalan-coast":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 3600, (b.region, w.position)
+    assert b.regions_entered == ["gulf-of-lion", "catalan-coast"] and len(b.drawn) > before
+    a, c = Position(41.4, 3.002), Position(41.4, 2.998)
+    assert w.chart.region_at(a) == "gulf-of-lion" and w.chart.region_at(c) == "catalan-coast"
+    assert abs(w.chart.depth_at(a) - w.chart.depth_at(c)) < 0.05 * w.chart.depth_at(a)
+    assert w.tide.constants_at(c)[1]["M2"] == pytest.approx((0.046, 213.5))  # Barcelona's
+    assert w.tide.constants_at(a)[1]["M2"][0] > 0.05  # the Gulf's gauges
+
+
+def test_truth_7_493_off_barcelona_the_lookout_raises_montjuic_and_montserrat():
+    """The brief's items 2 and 9: Barcelona is known twelve leagues at sea by Montjui and its
+    castle (Tofiño 1787, pp. 123 to 124; Purdy 1826, p. 28), with Montserrat's pinnacles and
+    the Monsein inland (pp. 123 and 125): from twelve leagues south-east of Montjui by a
+    clear day the masthead has all three in sight; from Barcelona's road the lantern of the
+    mole and the tower of La Merced, the marks of the berth (p. 125)."""
+    import math
+
+    from freesail.world.geo import Position, bearing_and_distance
+
+    noon = datetime(1805, 6, 14, 12, 0)
+    w = _cat_at(41.30, 2.25, noon)
+    mj = w.chart.feature("montjuic").position
+    off = Position(
+        mj.lat_deg - 36.0 / 60.0 * math.cos(math.radians(45.0)),
+        mj.lon_deg + 36.0 / 60.0 * math.sin(math.radians(45.0)) / math.cos(math.radians(41.2)),
+    )
+    _, d = bearing_and_distance(off, mj)
+    assert 35.0 < d / units.NAUTICAL_MILE < 37.0  # twelve leagues
+    seen = {s.feature.id for s in w.chart.in_sight(off, 30.0, None, "day", noon)}
+    assert {"montjuic", "montserrat", "montseny"} <= seen
+    road = w.chart.feature("barcelona-road").position
+    near = {s.feature.id for s in w.chart.in_sight(road, 30.0, None, "day", noon)}
+    assert {"barcelona-lantern", "merced-tower", "montjuic"} <= near
+
+
+def test_truth_7_494_a_frigate_lies_at_anchor_in_rosas_bay_through_a_northerly():
+    """The brief's item 9, to Tofiño's words (1787, p. 136): the bay of Rosas is sheltered
+    from nearly every wind, the Tramontana blowing hard but off the land: brought up by the
+    best bower under the eastern shore north-west of the Trinity castle in eight brazas of
+    loose mud, a northerly of twenty knots for six hours does not drag her, and she lies
+    within her cable's swing with the land to windward. (No period text calls Rosas the best
+    anchorage of the coast in a northerly; the brief's phrase is not pinned.)"""
+    from freesail.world.geo import bearing_and_distance
+
+    road = (42.2566, 3.1783)  # features/gulf-of-lion.yaml's `rosas-road`
+    w = _cat_at(
+        *road,
+        datetime(1805, 6, 17, 12, 0),
+        wind_from_deg=0.0,
+        wind_speed_kn=20.0,
+        ship_heading_deg=0.0,
+    )
+    assert 6.0 < w.chart.depth_at(w.position) < 25.0  # the grid's 7.7 m at the berth
+    w.submit("let go the best bower")
+    w.run(600)
+    assert any(e.kind == "ship.brought_up" for e in w.log)
+    brought = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log if "drag" in e.kind or "aground" in e.kind]
+    _, moved = bearing_and_distance(brought, w.position)
+    assert moved < 0.2 * units.NAUTICAL_MILE
+    shore = w.chart.nearest_shore(w.position)
+    assert shore is not None and shore.distance_m < 1.5 * units.NAUTICAL_MILE
+
+
+def test_truth_7_495_valencias_road_is_open_beach_with_the_shore_to_leeward_in_an_easterly():
+    """The brief's item 9, to the pilots' words: Valencia's road is very dangerous with the
+    winds from north-east to south-east, for with an easterly there is no clawing off, the
+    Grao being the westernmost point of the gulf (Tofiño 1787, p. 108; Purdy 1826, p. 24):
+    from the road the beach lies to leeward of an easterly within two miles, no headland of
+    the bight within ten miles to either hand to weather, and the port's pilot says so."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.ports import load_port, port_files
+
+    road = (39.4500, -0.3000)  # features/mediterranean-west.yaml's `grao-road`
+    w = _cat_at(*road, datetime(1805, 10, 14, 12, 0), wind_from_deg=90.0, wind_speed_kn=20.0)
+    shore = w.chart.nearest_shore(w.position)
+    assert shore is not None and shore.distance_m < 2.0 * units.NAUTICAL_MILE
+    assert abs(((shore.bearing_deg - 270.0) + 180.0) % 360.0 - 180.0) < 50.0  # to leeward
+    for fid in ("cape-cullera", "murviedro"):
+        _, d = bearing_and_distance(w.position, w.chart.feature(fid).position)
+        assert d > 10.0 * units.NAUTICAL_MILE
+    valencia = load_port(port_files()["valencia"], w.chart)
+    assert valencia.pilot.words["anchorage"].count("easterly") == 1
+    assert "no clawing off" in valencia.pilot.words["anchorage"]
+
+
+def test_truth_7_496_barcelona_refuses_a_kings_ship_in_1805_as_spains_and_in_1809_as_frances():
+    """The brief's items 4 and 9, by the ports' dated nations (79a's form): in June 1805
+    Barcelona and Rosas are Spain's and hostile to a King's ship (Spain at war since 12
+    December 1804, James vol. 3, p. 200); in May 1809 Barcelona is France's (the citadel
+    and Montjui seized in February 1808, FROM MEMORY) and Rosas France's (its citadel
+    capitulated on 5 December 1808, James vol. 4, p. 386), both hostile to her as France's
+    and open to a French ship. (Tarragona's 1809 stance is not pinned: the nations table's
+    wars are one year's picture, a finding for the owner.)"""
+    for when, nation in (
+        (datetime(1805, 6, 14, 10, 0), "spain"),
+        (datetime(1809, 5, 12, 10, 0), "france"),
+    ):
+        w = _cat_at(41.30, 2.25, when)
+        for pid in ("barcelona", "rosas"):
+            port = w.ports.ports[pid]
+            assert port.nation_on(when) == nation, (pid, when)
+            assert w.dealings.stance(port) == "hostile", (pid, when)
+        assert w.ports.ports["alicante"].nation_on(when) == "spain"
+    f = _cat_at(41.30, 2.25, datetime(1809, 5, 12, 10, 0), ship=SCHOONER, nation="france")
+    assert f.dealings.stance(f.ports.ports["barcelona"]) == "open"
+
+
+def test_truth_7_497_the_coasts_lights_carry_their_dates_barcelonas_lantern_alone_in_1805():
+    """The brief's item 2 and the lead's ruling on the lights: by night in 1805 off Barcelona
+    the lantern of the old mole is in sight (Michelot 1715: a fire kept every night) and
+    nothing else, and off Tarragona no light; in 1830 the light of Barcelona's new mole (the
+    notice of 14 December 1823) shows beside it, and Tarragona's mole lantern (first in
+    Purdy 1826). Data that carries its dates (decision 66)."""
+    from freesail.world.geo import Position
+
+    off_bcn, off_tgn = Position(41.30, 2.22), Position(41.06, 1.26)
+    w = _cat_at(off_bcn.lat_deg, off_bcn.lon_deg, datetime(1805, 6, 14, 23, 30))
+
+    def lights(p, year):
+        night = datetime(year, 6, 14, 23, 30)
+        return {
+            s.feature.id
+            for s in w.chart.in_sight(p, 20.0, None, "night", night)
+            if s.feature.kind == "light"
+        }
+
+    assert lights(off_bcn, 1805) == {"barcelona-lantern"}
+    assert lights(off_tgn, 1805) == set()
+    assert lights(off_bcn, 1830) == {"barcelona-lantern", "barcelona-new-mole-light"}
+    assert lights(off_tgn, 1830) == {"tarragona-mole-light"}
+
+
+def test_truth_7_498_the_business_carries_the_alfaques_salt_to_barcelona():
+    """The brief's items 4 and 9: the block's ports are priced by the period's trades, so
+    that the business peoples the region: the Alfaques' salt (Tofiño 1787, p. 116: vessels
+    always employed in that traffic) is worth carrying to Barcelona at twice its price, the
+    best route of the region, and within half a day at seed 7 a trader loads salt at the
+    Alfaques for Barcelona."""
+    w = _cat_at(41.10, 1.40, datetime(1805, 6, 14, 10, 0), business="on")
+    b = w.business
+    assert b.region == "catalan-coast"
+    assert {p.id for p in b.ports()} == {"alfaques", "barcelona", "tarragona"}
+    best = b.routes()[0]
+    assert (best[1].id, best[2].id, best[3]) == ("alfaques", "barcelona", "salt")
+    assert best[0] >= 2.0
+    w.run(12 * 3600)
+    salt = [
+        d
+        for d in b.drawn
+        if d.intent.startswith("trade") and "of salt from the Alfaques to Barcelona" in d.intent
+    ]
+    assert salt, [d.intent for d in b.drawn]
+
+
+def test_truth_7_499_the_frigate_sails_from_port_mahon_to_tarragonas_road_by_her_short_book():
+    """The brief's item 7: the block's scenario (`tarragona.yaml`, May 1809) sailed at seed 7
+    by its short book: from off the mouth of Port Mahon round the Isla del Aire and west
+    along Minorca, through the channel between the islands and north-west across the seam
+    at 40.56 N, her landfall the Montsia, Montserrat and the Monsein, to Tarragona's road,
+    where she anchors before the city on soft brown mud within a day and a half (at 12:29
+    on the 13th at seed 7), without touching ground."""
+    from freesail.world.geo import Position, bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "tarragona.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    regions = set()
+    for _ in range(36 * 6):
+        w.run(600)
+        regions.add(w.chart.region_at(w.position))
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # off Port Mahon at the start, Tarragona's road
+    assert anchored[1].tick <= 34 * 3600
+    assert {"balearics", "catalan-coast"} <= regions
+    _, off = bearing_and_distance(w.position, Position(41.0950, 1.2500))
+    assert off < 0.6 * units.NAUTICAL_MILE
+    assert any("soft brown mud" in e.text for e in w.log if e.kind == "sounding")

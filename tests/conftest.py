@@ -492,6 +492,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_290_the_seam_at_5_w_is_crossed_with_the_business_carried",
         "test_known_truths.py::test_truth_7_291_the_seam_between_the_blocks_two_regions_is_crossed_likewise",
         "test_known_truths.py::test_truth_7_294_the_frigate_sails_from_gibraltar_to_port_mahon_by_her_short_book",
+        # package 101: the seams crossed with the business, the business's half day, the
+        # scenario sailed
+        "test_known_truths.py::test_truth_7_491_a_ship_from_the_balearics_crosses_40_56_n_into_the_catalan_coast",
+        "test_known_truths.py::test_truth_7_492_a_ship_from_the_gulf_crosses_3_e_into_the_catalan_coast",
+        "test_known_truths.py::test_truth_7_498_the_business_carries_the_alfaques_salt_to_barcelona",
+        "test_known_truths.py::test_truth_7_499_the_frigate_sails_from_port_mahon_to_tarragonas_road_by_her_short_book",
         # package 79d: Agincourt Sound's six hours in a north-wester (20 s alone, 2026-10-29)
         "test_known_truths.py::test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester",
         # package 82b: the door that follows its harness, a brig brought within a boat's pull
