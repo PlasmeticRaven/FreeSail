@@ -1336,3 +1336,21 @@ player's prompt wanted a memory of who he is (`captive.PLAYERS_PERSON_KEY`); his
 court is his lost ship's, not his prize's colours; the dry run of a form that writes a file wrote
 it (the copy is marked, the form says what it would write). The figures and the finds are in
 `docs/dev/TuningNotes.md`, "Package 74", step 6.
+
+### Step 7: the records and the last truths (§8; 2026-11-07)
+
+**Built as designed**: the scenarios `prize-home.yaml` and `captive.yaml` with the starter brief
+`captive`, each loaded and begun in the fast tier (the possession and the strike the scenarios'
+own world orders two minutes in, by two forms this step adds: `ship "<name>": a prize of the
+<captor>` and `ship "<name>": struck to the <captor>`, journaled and so replayed, doubted after
+the first minute); the truth's rows for the prizes, the prisoners and their paroles, the far
+actions and the courts; the forms' dry runs in `test_director`'s table; the replay by both roads
+of a captive's passage and a far fight's (7-368); spec M7 §11a, §18 to §20 and §29 as built;
+Harness §21i; the primer's chapter 27 in-world; the forms and the events tables; the tuning notes
+whole; these postscripts; truths 7-367 and 7-368. **Taken another way**: the scenarios' starts
+are world orders rather than new scenario keys (the replay gives a world order again; a key the
+loader read at the start would have wanted a second road); the captive's brief carries the forms'
+own examples (the cartel, the parole, a gale). **Found on the way**: a vessel a test adds by hand
+is in no journal (the replay truths put theirs on the sea by the forms); two frigates of one file
+draw one seed's wardroom names. The figures are in `docs/dev/TuningNotes.md`, "Package 74", step 7
+and "The package whole".
