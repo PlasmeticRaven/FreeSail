@@ -31,8 +31,11 @@ budget:
   samples_a_day: 72
   acts_a_day: 72   # no fewer than the samples: the owner's word of 2026-10-19, the budget a tuning point, not a constraint for the first testing
 # The player's examples (package 62), read to the director as examples and never as a
-# rule: the cartel for the captive, the parole set for a prisoner nobody asks, a gale.
+# rule: the cartel for the captive, the parole set for a prisoner nobody asks, a gale; and
+# an order by the hand to the captor's rules captain (hove to for the cartel to come
+# within hail), which every starter brief offers.
 examples:
   - 'cartel: a cartel from Brest for Captain Bowen'
   - 'aboard the Medusa: the parole of Captain Bowen given'
+  - 'ship "Medusa": order heave to'
   - 'weather: low "the low" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990'
