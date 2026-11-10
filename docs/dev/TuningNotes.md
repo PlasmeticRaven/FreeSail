@@ -22807,6 +22807,16 @@ long-boat has no file of her own to be a vessel by"), the ships session's. (f) A
 typed at the page gets no row in the log pane (decision 46: the play log carries its effects,
 not the order); the owner, typing one, sees nothing unless it does something in sight.
 
+**The suites as run** (steps 1, 2 and 6, at **28f7788e**, the step's tree merged with the trunk
+at 75b63c82, measured in a worktree pinned there, one suite at a time): the fast tier
+(`python3 -m pytest -n 4 -q -p no:cacheprovider`) exit 0, 7,038 passed, 2 xfailed, 474 slow
+left out; the slow tier of the touched files (`--slow -m "not pace" -n 4` on
+tests/test_browser_probe.py, test_knowledge.py, test_orders_places.py, test_known_truths.py)
+exit 0, 397 passed, 8 xfailed (the eight plans of the probe among them, all met); the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12 passed. ruff check and
+format clean. A first fast tier at 00cf000 was stopped at 23% when the trunk moved (the
+settee and the bilander, acdcfb56) and the merge measured instead.
+
 ### Step 3: the viewer's paint order
 
 **Built.** (1) **The guns** (`client/projection.js`, `gunFigures`): a port gun's inboard figures
