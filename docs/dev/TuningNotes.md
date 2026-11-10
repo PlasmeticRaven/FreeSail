@@ -24645,7 +24645,21 @@ and a cutter's is in no hull of the registry), every scenario, save and director
 makes one reads unchanged, and a pinned passage with a letter moves by no line. (2) The letter
 landed at the quay goes by 68's road for a thing in the boat (`_land_and_take_off`, its
 `thing.landed` line, as before for any thing) rather than a line of its own: one road for
-things. (3) Nothing pinned moved: the lines of a letter for the captain are the same words and
+things. (3) No pin or digest moved: the lines of a letter for the captain are the same words and
 data, the things made add no line, and `to_dict` of the people is unchanged.
+
+**A test moved, old beside new.** `tests/test_agents.py::
+test_a_letter_sent_by_world_order_is_seen_in_no_sample_before_the_boat_brings_it` (decision
+46: a world order is seen in no station's sample, and a letter left at Brest by it only when
+the boat brings it off). **Old**: its station was `watcher`, bound to nobody and standing on
+the quarterdeck, and its last assertion found the letter's words in a sample after the boat:
+the words read aloud at the door (`message.received` of the class `person`, which fell back to
+the deck). **New**: the station is the captain's (`station(name="captain")`, its person the
+captain, asserted), every assertion else as it was. **Proof by the toggle**: at the step's
+code the old test fails on that last assertion alone (the fast tier at 17fdd64, the words now
+the reader's: the brief's "the captain no longer reading every letter aloud" and the owner's
+rule that a letter's words are shown to the reader and to nobody else); the new test passes at
+the step's code and at the trunk's (where the captain's station has them too), so what the test
+holds, nothing of a world order before its effect, is held as strongly.
 
 **Found for others (not mended).** None.
