@@ -826,7 +826,7 @@ That the drawn side passes within 0.05 m of a port triple is the generator's che
 4. Above the water: `section_m`'s upper shape, fitted between the water, the breadth and the rail.
 5. `sections_m`'s points are passed through. The rule fills only beyond them, scaled to meet them.
 6. The ends close straight to `stem_m`'s fore edge. Aft, they close to the post below the knuckle and to `transom_hb_m` above it. A round stern closes to the centreline.
-   *Since the lead's ruling (11) of 2026-11-09:* a round stern giving `counter_hb_m` still closes to the centreline on the stern's line, and above the counter's foot its side holds out to the counter's half-breadth at each height, rounding in over `form.ROUND_STERN_DEPTH_SHARE` of it (a quarter, judgement), drawn on stations over the counter; every file giving none as before.
+   *Since the lead's ruling (11) of 2026-11-09:* a round stern giving `counter_hb_m` still closes to the centreline on the stern's line, and above the counter's foot its side holds out to the counter's half-breadth at each height, rounding in over `form.ROUND_STERN_DEPTH_SHARE` of it (a quarter, judgement), drawn on stations over the counter; under the counter's foot the side abaft the aftmost station is read through the same stations' underwater parts, 5.4 mm at most from the side as it was on her file, her drawn displacement the same; every file giving none as before.
 7. Without `section_m`, the station is §6's three points.
 
 The module also gives:

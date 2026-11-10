@@ -1348,19 +1348,29 @@ forced round by a shift of eight points, hoisted at +158 s and filled away at +2
 settee kept and forced round hove to").)* *(The lead's ruled builds of 2026-11-10, (3)(i) to (v),
 built 2026-11-10: forced round hove to and left to herself, no fill away ordered, she is hove to no
 longer once her after yards fill, and the watch now dips the settee lying against its mast and says
-so ("The watch dips the mainsail, lying against its mast."), by the settee's own dip order: in 15 kn
-"hove to no longer" at +156 s after the shift and the settee dipped at +513 s, drawing 61.7 m² at
-+1,800 s and she 2.70 kn full and by (before, 41.2 m² against its mast to the end and 2.54 kn, no
-word said); in 20 kn +119 s, +524 s, 3.59 kn (3.37); in 8 kn she lies to on the new tack, as before,
-and "fill away" dips it. Its sheet stands as it lay (38.8°); her fore topsail stays aback until a
+so ("The watch dips the mainsail, lying against its mast."), by the settee's own dip order: with
+all hands kept up from her settle, in 15 kn "hove to no longer" at +156 s after the shift and the
+settee dipped at +513 s, drawing 61.7 m² at +1,800 s and she 2.70 kn full and by (before, 41.2 m²
+against its mast to the end and 2.54 kn, no word said); in 20 kn +119 s, +524 s, 3.59 kn (3.37); in
+8 kn she lies to on the new tack, as before, and "fill away" dips it. As her watches play it by
+night, the hands piped down after the heave-to (the review's measure): her starboard watch's three
+begin it short-handed, dipped at +840 s in 15 kn (684 s) and +895 s in 20 kn (776 s), the same way
+at +1,800 s; her larboard watch's two cannot begin it, and the line says so ("The mainsail, lying
+against its mast, is to be dipped.", then "Not hands enough on deck to dip the mainsail"): it waits
+for hands, begun when all hands are called or at the watch's end, the settee against its mast as
+before. Its sheet stands as it lay (38.8°); her fore topsail stays aback until a
 trim, every ship's, for the lead. Filled away to a course, her settee is trimmed with the boom sails
 as she pays off: eased to 65.0° on a beam course where the deck's reading wants 45.0°, 4.60 kn where
 left at its fill away trim she made 5.19 (the pay-off's sheets drawn for the true wind's angle, every
 ship's, for the lead). The tack, the wear, the box-haul and the fill away hold her settee from the
 order, so that an order of it given meanwhile waits its turn (traced: no other committed file
-moves). Her plain fill away in 8 kn from a short heave-to recorded again, nothing built: filled away
-at +236 s and taken aback at +245 s, as B3.3b found it (+230 s and +239 s then, before the first
-of these builds). Figures in `docs/dev/TuningNotes.md`, "The settee and the runner".)* **Item 6**, the
+moves); an order of it given before a tack, a wear or a box-haul neither keeps the manoeuvre
+waiting nor is lost: in hand it is belayed and taken up again after, and waiting for hands it waits
+for the manoeuvre (the review's mend: held behind it, a wear in her larboard watch by night was
+never begun). Her plain fill away in 8 kn from a short heave-to recorded again, nothing built:
+filled away at +236 s and taken aback at +245 s, as B3.3b found it (+230 s and +239 s then, before
+the first of these builds). Figures in `docs/dev/TuningNotes.md`, "The settee and the runner" and
+"The review's mends of the two builds".)* **Item 6**, the
 sheet's block: 0.31 m
 inside her taffrail (x -11.47 against -11.78), within the fathom; this design's 0.03 m and the
 proxy's 4.45 m were on the taffrail at x -11.52, before her step 1 moved it 0.26 m aft (the proxy's

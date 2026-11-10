@@ -17375,8 +17375,13 @@ that corner and from the corner to the line; drawn on stations over the counter
 line, and one at each rail point abaft the aftmost station, each from where the stern's line
 crosses its x up to the top of the side; the side read off them as the viewer draws it, straight
 between them at each height (`_counter_side`, `formHull`'s `hbAt`); the closure on the middle line,
-the stern round; under the counter's foot, and in every file giving none, as before. The served
-form carries the key (`api/queries.py`). Hers is the one file to file it: [[0.62, 2.02], [3.30,
+the stern round; in every file giving none, as before. Under the counter's foot (hers the water)
+her side abaft her aftmost station (x -9.94) is read through the underwater parts of the same
+stations, not by `_toward_end` as before, and moves by 5.4 mm at most (*the review's correction:*
+this note said "under the counter's foot ... as before"; on a grid of 5 cm by 10 cm from x -11.8 to
+-9.8 and z -2.6 to 0, 260 of 1,107 points differ, all between x -10.70 and -9.95 and z -1.9 and
+-0.1, none by a centimetre, the most at x -10.50, z -0.70, 0.0995 m where it was 0.0941), her drawn
+displacement the same (214,906.4 kg on both trees). The served form carries the key (`api/queries.py`). Hers is the one file to file it: [[0.62, 2.02], [3.30,
 1.55]], Gwyn's stern view's 2.02 m at the wale (her step 1; Bil-D's 2.05) at the wale's middle at its
 after end (judgement on the height) and 1.55 m at the taffrail (her review), the counter's foot the
 water, marked `stand-in`; her `breadth_m` and `form.stern` notes say so.
@@ -17508,32 +17513,41 @@ settee's own dip is ordered in the same tick (`dip_settee`; "Dip the mainsail! H
 and the tack.", its steps' lines, "Dipped the mainsail; it stands to leeward of the mast."). A
 settee on her lee, a ship filled on her own tack and every ship with no settee: the line as before,
 nothing ordered. Lying to on the new tack (her file in 8 kn) she is still hove to, and the watch
-dips nothing; "fill away" dips it (B3.3b).
+dips nothing; "fill away" dips it (B3.3b). *Since the review* ("The review's mends of the two
+builds", below) the line is worded once the dip is given, on what it does: begun, as above;
+waiting, for hands (her larboard watch of two by night) or its turn, "... The mainsail, lying
+against its mast, is to be dipped." (`settees_to_be_dipped`), the runner's own line after it, and
+the dip begun when there are hands; refused, nothing of a dip, the refusal's line after it.
 
 *Two judgements, for the lead.* **(a) The watch gives the settee's own dip order** (its six able
 hands from the watch on deck, its three steps of 30, 75 and 75 s by the crew's factor, its words,
 and its holds, which keep every other order of the settee off it till it is hoisted), and not the
 fill away's change (`SetteeChange`, 120 s by the fill away's own hands, the tack's words). She is
 under way full and by when it is done, not lying to; and the watch's work is by the order, as the
-helmsman's watch boxes her off and braces up for him (`keep_full_and_by`). Its time is the order's:
-200 to 269 s on the settee brig, 357 to 405 s on her file (her settle's all hands, the order's six
-able at her company's factor), where the fill away's dip took 157 s and 177 s. **(b) Its sheet as it
-lies**: the dip order trims no sheet, and the settee draws at the trim the watch's tending left it
-lying to (the settee brig 26.5° to 33.2°, her file 38.7° to 38.8°). Drawn for full and by at the
-hoist instead (B3.3b's (b), probed in scratch): the settee brig 33.1° and 33.8°, her file 35.5° and
-35.6°, and at +1,800 s 0.06 to 0.21 kn more (the settee brig 3.35 and 4.49 kn in 15 and 20 kn, her
-file 2.76 and 3.67).
+helmsman's watch boxes her off and braces up for him (`keep_full_and_by`). Its time is the order's.
+With all hands kept up from the settles: 200 to 269 s on the settee brig, 357 to 405 s on her file
+(the order's six able at her company's factor), where the fill away's dip, all hands' too, took 157
+s and 177 s. As her watches play it by night, the hands piped down after the heave-to (the review's
+measure, below): her starboard watch's three, the landsman boy among them, begin it short-handed
+and take 684 s in 15 kn and 776 s in 20 kn; her larboard watch's two cannot begin it, and it waits
+for hands to the watch's end (04:00), the settee against its mast as before the ruling. **(b) Its
+sheet as it lies**: the dip order trims no sheet, and the settee draws at the trim the watch's
+tending left it lying to (the settee brig 26.5° to 33.2°, her file 38.7° to 38.8°). Drawn for full
+and by at the hoist instead (B3.3b's (b), probed in scratch): the settee brig 33.1° and 33.8°, her
+file 35.5° and 35.6°, and at +1,800 s 0.06 to 0.21 kn more (the settee brig 3.35 and 4.49 kn in 15
+and 20 kn, her file 2.76 and 3.67).
 
 *Measured* (hove to 600 s, the shift, left to herself to +1,800 s; "filled" is the urgent line's
 second after the shift, "dipped" the order's last line; the area drawing and her way at +1,800 s,
-old / new):
+old / new; her file with all hands kept up from her settle, at 04:00, and as her watches play it
+by night in "The review's mends of the two builds", below):
 
 | | Wind | Filled | Dipped | Drawing, m² | Way, kn |
 |---|---|---|---|---|---|
 | The settee brig (85.8 m² clear at the settle) | 8 kn | 439 | 639 | 57.3 / 86.0 | 1.56 / 1.86 |
 | | 15 kn | 118 | 356 | 57.1 / 85.6 | 2.76 / 3.14 |
 | | 20 kn | 96 | 365 | 56.7 / 84.8 | 3.74 / 4.41 |
-| Her file (61.8 m² clear at her settle) | 8 kn | lies to on the new tack | none | 41.4 / 41.4 | 1.12 / 1.12 |
+| Her file (61.8 m² clear at her settle), all hands kept up | 8 kn | lies to on the new tack | none | 41.4 / 41.4 | 1.12 / 1.12 |
 | | 15 kn | 156 | 513 | 41.2 / 61.7 | 2.54 / 2.70 |
 | | 20 kn | 119 | 524 | 40.8 / 61.1 | 3.37 / 3.59 |
 
@@ -17576,7 +17590,14 @@ its mast: the runner reads an evolution's holds once, at the order (`Runner.star
 of the settee given while one is in hand now waits its turn behind it; the change's own ids, named
 once it began, stay. A settee clewed up is not named; the heave-to and backing and filling work it
 at the order, lying a-try holds it already (`_to_hand`), and scudding keeps it as it stands. A ship
-with no settee set holds what she held.
+with no settee set holds what she held. *Since the review* ("The review's mends of the two
+builds", below): a manoeuvre that belays the step-list work in hand (decision 25, with a crew: the
+tack, the wear, the box-haul, the box-off and wearing short round) is not kept waiting by an order
+of the settee's given before it on the settees it holds from the order alone
+(`Script.order_settees`, `Runner._settees_only`): it begins at the order and belays that work in
+hand, and work still waiting, for hands or its turn, waits for the manoeuvre
+(`Runner._start_waiting`). With no crew nothing is belayed, and the manoeuvre waits its turn behind
+the order; the fill away belays nothing, and waits its turn behind one.
 
 *The trace* (`r10/s/trace.py`; every committed sailing file and the settee brig, each from a
 settle at seed 7 in 15 kn: the bilander's her own, the settee brig's `_world`'s of 1,200 s, the
@@ -17678,6 +17699,160 @@ fast base (only in the new the sixteen and the first step's eight of `test_hull_
 SW-1's; `test_evolutions`' three slow cases left out of this run, passed in the run above).
 **The generator,** `py tools/gen_ships.py` into scratch: seventeen of seventeen files byte for byte
 as in `data/ships/`. **ruff** check and format clean (367 files); every changed file LF.
+
+### The review's mends of the two builds (2026-11-10)
+
+The independent review of 8bceb1cb and caf1d329 against the lead's two notes: five findings, each
+reproduced first, on the owner's machine at seed 7 (the probes in the session's scratch, `r10/rv/`
+and `r10/fx/`, outside the repository; the trees at 35e33ad0, 8bceb1cb and caf1d329 exported
+whole). Three are mended, one recorded for the lead and not built, and one corrects a note of the
+stern's. Nothing of the *Neufchatel*'s moves (she carries no settee): her helm stays in the owner's
+bands as built (8b327687).
+
+**1. A manoeuvre kept waiting behind an order of the settee's given before it ((3)(iii)).** The
+runner counts any work whose holds overlap a newcomer's as its blocker, at the order
+(`Runner.start`) and at every try after (`_start_waiting`), before a manoeuvre's call for all hands
+can belay the step-list work in hand (`_call_all_hands`, decision 25); with the settee held from the
+order, an order of the settee's given first held the manoeuvre back. *Reproduced* on her file in 15
+kn from her settle (all hands kept up), "pipe down", 30 s, "take in the mainsail" and 29 s later
+"wear ship":
+
+- her larboard watch by night (00:45, two on deck): the take in waits for hands. At caf1d329 the
+  wear waited behind it (`waiting_for` none), the reply "Order: wear ship." alone and nothing more
+  said to +1,200 s, she on the starboard tack still. At 8bceb1cb it called all hands at +30 s and
+  wore her at +558 s, and the take in was lost at +30 s ("The mainsail is in the gear; there is
+  nothing to take in.", the wear having lowered it), the settee hoisted again on her new lee;
+- her starboard watch (04:45, three on deck): the take in begun short-handed. At caf1d329 the wear
+  waited for it to +169 s ("Took in the mainsail ...") and wore her at +637 s. At 8bceb1cb it
+  belayed the take in at the order ("Belayed taking in the mainsail: stations for wearing ship."),
+  wore her at +501 s, and the take in was taken up again after it, done at +643 s;
+- forced round hove to in her larboard watch (the review's case), "wear ship" 300 s after the
+  shift: at caf1d329 it waited behind the watch's dip, itself waiting for hands, to +1,800 s; at
+  8bceb1cb she wore at +847 s.
+
+*As mended* (`freesail/evolutions/runner.py`, `scripts.py`): each of the four scripts keeps the
+settees it holds from the order (`Script.order_settees`, by `_hold_settees`). A manoeuvre that
+belays the step-list work in hand, with a crew, is not kept waiting by step-list work given before
+it whose holds it shares on those settees alone (`Runner._settees_only`), at the order or at its
+turn; and such work given before it and still waiting, for hands or its turn, is held while the
+manoeuvre is at work. So it begins at the order and belays the work in hand, the work waiting waits
+for it, and no order of the settee's is begun while it may be changed. With no crew nothing is
+belayed, and the manoeuvre waits its turn behind the order, as at caf1d329; every ship with no
+settee set holds nothing more and is as before. The fill away belays nothing (its twelve hands) and
+waits its turn behind a settee's order given before it, as at caf1d329: hove to in her larboard
+watch it waits for hands either way, where at 8bceb1cb it said "Not hands enough on deck to fill
+away; there are but two to spare." and it now says nothing (found on the way, below).
+
+*Measured now*, the same orders: in her larboard watch the wear calls all hands at +30 s and wears
+her at +558 s; the take in waits for it, and after it for hands again (the hands piped down at "Wore
+ship"), kept: all hands called at +563 s, it is begun at +564 s with four and "Took in the mainsail
+..." at +668 s. In her starboard watch, line for line as at 8bceb1cb (belayed at the order, worn at
++501 s, taken in at +643 s). Forced round, "wear ship" 300 s after the shift: all hands at once,
+worn at +847 s as at 8bceb1cb, and the watch's dip then done already ("The mainsail lies to leeward
+of its mast already.", the wear having hoisted it on her new lee).
+
+*The trace* ("The settee and the runner", (iii): its 117 runs, every committed sailing file and
+the settee brig, settee orders given after the manoeuvres, all hands kept up from the settles) on
+caf1d329 and on the mends: **all 117 identical**, tick, line and reply.
+
+**2. The watch's dip said before it was known ((3)(i)).** *Reproduced* (her file hove to from her
+settle at 00:00, the hands piped down at 00:56, 600 s, the shift): at caf1d329 "... The helm keeps
+her full and by. The watch dips the mainsail, lying against its mast." at +156 s, and in the same
+tick "Not hands enough on deck to dip the mainsail; there are but two to spare."; at +1,800 s the
+dip still waiting and the settee against its mast at 41.2 m² and 2.54 kn, as at 8bceb1cb. A dip
+refused ("Could not dip ...") followed the claim too. *As mended* (`_hove_to_no_longer`): each dip
+is given first and the line worded on what it does, set before the dip's own lines (as the watch's
+"Turned up" line is set before the work's, `orders.crew.commit`): begun, "The watch dips the
+mainsail, lying against its mast." (`settees_dipped`); waiting, for hands or its turn, "The
+mainsail, lying against its mast, is to be dipped." (`settees_to_be_dipped`; work waiting in the
+words of the gale's "is to be taken in"), the runner's own line after it ("Not hands enough on deck
+...", or its turn's "'Dip the mainsail' will follow ...", logged); refused, nothing of a dip, and
+"Could not dip the mainsail: ..." after it. **The lean, built:** the dip waiting is left waiting,
+and begins when there are hands (all hands called, or the watch changed); with mend 1 it holds back
+no manoeuvre. *Measured:* her larboard watch by night, the line as above at +156 s and the dip
+waiting; left to the watch, begun as the starboard watch relieves the deck at 04:00 (+10,999 s) and
+dipped 680 s after; hove to 60 s instead (her test), "hove to no longer" at +155 s, all hands
+called at +160 s, begun at +161 s with four, dipped at +555 s.
+
+**3. (i)'s figures were all hands'.** Her file's figures in "The settee and the runner" (+513 s and
++524 s dipped, 357 to 405 s, and the fill away's 157 s and 177 s beside them) were measured with all
+hands kept up from her settle, and are so labelled there now (judgement (a), the table, Ext §5.7,
+Bil-D §12.2 item 5). As her watches play it by night, the hands piped down after the heave-to,
+hove to 600 s, the shift, to +1,800 s (old, 8bceb1cb / new, the mends):
+
+| Her file, the hands piped down | Wind | Filled | Dipped | Drawing, m² | Way, kn |
+|---|---|---|---|---|---|
+| Starboard watch (04:56), three | 15 kn | 156 | 840 (684 s) | 41.2 / 61.7 | 2.54 / 2.70 |
+| | 20 kn | 119 | 895 (776 s) | 40.8 / 61.1 | 3.37 / 3.59 |
+| Larboard watch (00:56), two | 15 kn | 156 | waits for hands | 41.2 / 41.2 | 2.54 / 2.54 |
+| | 20 kn | 119 | waits for hands | 40.8 / 40.8 | 3.37 / 3.37 |
+
+The starboard watch's three (the landsman boy among them) begin the dip short-handed ("Only three
+hands to the mainsail; there are no more on deck."): in 15 kn the yard is lowered by +271 s and
+passed round at +555 s, the settee on deck, drawing nothing, at +300 s and +600 s (her way 2.68 and
+2.08 kn), and drawing whole from +840 s.
+
+**4. "Make all sail" still lists the square sail's refusal (for the lead, not built).** Ruling (3)
+named the gale's list; the vocabulary's "make all sail" lists "set the square sail" too, and in the
+hermaphrodite brig and both schooners its reply's "Not done" still has "'set the square sail': 'set'
+was understood, but 'square' belongs with 'brace'" (seed 7, 10 kn, all hands called), the same at
+35e33ad0, before these steps. Not built: outside the ruling's words.
+
+**5. The stern's note.** "The files and the words", (11), said her side was as before under the
+counter's foot. Below the water her side abaft her aftmost station is now read through the
+underwater parts of the counter's stations, not by `_toward_end`: on a grid of 5 cm by 10 cm from x
+-11.8 to -9.8 and z -2.6 to 0, 260 of 1,107 points differ, all between x -10.70 and -9.95 and z
+-1.9 and -0.1, none by a centimetre, the most at x -10.50, z -0.70 (0.0995 m where it was 0.0941);
+her drawn displacement 214,906.4 kg on both trees. The note is corrected there and in Build-Ships
+§5.1; nothing built.
+
+**Found on the way, for the lead (not built):**
+
+1. **A manoeuvre queued behind other work says nothing.** Its reply ("'Fill away' will follow
+   'take in the mainsail', which the hands are still at.") is the order's, and the World logs an
+   order's reply of the kind `evolution.started` only as "Order: ..." (`core/world.py`, the
+   runner's own line being said for it), while the runner says nothing of work queued: every
+   ship's, before these steps. So the fill away above, and before the mend the wear, waited with
+   no word.
+2. **Work waiting for hands behind a manoeuvre is tried again only after its pipe-down.** In her
+   larboard watch the take in waits through the wear while every hand is at it, and at "Wore
+   ship" the hands are piped down in the same tick, before it is tried: it waits for hands again
+   (the watch of two), where all hands were on deck a moment before. The runner's rule, every
+   ship's; kept, the order said once ("Not hands enough on deck ...") and carried out when there
+   are hands.
+
+**Pins:** none moved. **New:** `tests/test_bilander.py` three, her larboard watch's forced round
+(the words, the dip waiting, begun with all hands called) and the wear after a take in in either
+watch; `tests/test_settee.py` three, the line worded on a dip refused and a dip waiting its turn,
+and a wear with no crew waiting its turn behind a take in. **Broken on purpose**, each in a copy of
+the tree with one part undone: the settee's exemption gone, the two wear cases fail; the work waiting
+not held behind the manoeuvre, the larboard wear (the take in found "done already" as the wear
+lowers the settee, as at 8bceb1cb); the claim made whatever the dip does, her forced round and the
+two worded cases; the line after the dip's own lines, her forced round and the nothing-aback case;
+the exemption with no crew too, the no-crew wear.
+
+**The suites, as run** (`py -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` from
+the tree root, one at a time, nothing else running, on the mends; against SW-1's bases, not run
+again):
+- **the slow candidates** (B4's 84-file list, `--slow -m slow`): 291 passed, 12 failed, 1 skipped, 9
+  xfailed in 43:06. Against the base none only in one; the base's nine failures the same with the
+  same messages (the schooner's passage's differing in an object's address alone); three changed,
+  each passing in the base, the pace tests reading the load under `-n 4` against truth 51's floor
+  of 500 ticks a second (the day under systems 496, the gate's day with the region loaded 471, the
+  convoy of six at far detail 447; the run twelve and a half minutes longer than SW-1's 30:32), all
+  three passing run again alone (13.6 s);
+- **the captain's trials** (`--slow`): 4 passed, 3 failed on the machine's three digests
+  (8df0ab2beba93320, 8dac97a4c9bdfe43, df5f02eb6e6ce68a), as the base;
+- **the four whole logs** (`log_digests.py`): all four as `digests-final.json` in every field;
+- `test_lying_to` `--slow`, the forced round's branch: 40 passed;
+- **the generator**, `py tools/gen_ships.py` into scratch: seventeen of seventeen files byte for
+  byte as in `data/ships/`; `check_viewer_guns` clean;
+- **the whole fast tier**: 7,097 passed, 2 skipped, 1 xfailed in 31:56. Against the base only in
+  the new the 34 cases of the three steps ("The files and the words" twelve, "The settee and the
+  runner" sixteen, these six), none only in the base, and no outcome changed;
+- **ruff** check and format clean (367 files); every changed file LF;
+- **with these records written**, the files that read the documents (B2c's fourteen, as in "The
+  settee and the runner"): 1,619 passed in 5:28, every outcome as in the fast tier above.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

@@ -820,18 +820,28 @@ and the line says so ("... The helm keeps her full and by. The watch dips the ma
 against its mast."): the settee's own dip ordered (`dip_settee`, its hands from the watch on deck,
 its times, words and holds), its sheet as it lies, two judgements for the lead; on the fixture the
 settee drawing whole again 200-269 s after "hove to no longer" (57 m² against its mast before, 86
-now; 3.14 kn at +1,800 s in 15 kn, 2.76 before), on her file 357-405 s (41 m² before, 62 now; 2.70
-kn, 2.54). **(ii)** paying off to a course a kept settee is trimmed with the boom sails
+now; 3.14 kn at +1,800 s in 15 kn, 2.76 before), on her file 357-405 s with all hands kept up (41
+m² before, 62 now; 2.70 kn, 2.54). *The review's mends:* the line is worded once the dip is given,
+on what it does: waiting for hands or its turn, "The mainsail, lying against its mast, is to be
+dipped.", the runner's line after it; refused, nothing of a dip. As her watches play it by night,
+the hands piped down, her starboard watch's three dip it in 684 s (15 kn) and 776 s (20 kn), and
+her larboard watch's two cannot begin it: it waits for hands, the settee against its mast as
+before. **(ii)** paying off to a course a kept settee is trimmed with the boom sails
 (`_pay_off`, `_kept_after_sails`); the pay-off draws every sheet for the true wind's angle on her
 bow, so the settee is eased to 65° on a beam course where the deck's reading wants 44-45°, 0.47-0.68
 kn slower than left (the pay-off's sheets, every ship's, for the lead). **(iii)** the tack, the
 wear, the box-haul (with the box-off and wearing short round) and the fill away hold the settees set
 from the order (`settees_held`), so that no order of the settee's is begun while it may be changed;
 the trace of the eleven committed files without one through every manoeuvre, identical in 99 runs.
+*The review's mend:* a manoeuvre that belays the step-list work in hand (decision 25, with a crew)
+is not kept waiting by an order of the settee's given before it on the settee alone
+(`Runner._settees_only`): it begins and belays it, or the order, still waiting, waits for it.
+Held otherwise, a wear ordered behind a take in waiting for hands was never begun.
 **(iv)** a trim's sheets line names only its sails still set (`Runner._group_done`), every ship's:
 the four whole logs and the captain's trials as before; the *Neufchatel*'s gale's two lines and the
 schooners' one move. **(v)** her light-air fill away from a short heave-to recorded, nothing built.
-Figures in `docs/dev/TuningNotes.md`, "The settee and the runner".
+Figures in `docs/dev/TuningNotes.md`, "The settee and the runner" and "The review's mends of the two
+builds".
 
 ### 5.8 Getting under way, rounding to, the gale
 

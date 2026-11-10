@@ -53,7 +53,7 @@ from freesail.physics import sails as P
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.graph import Ship
 from freesail.ship.loader import load_ship
-from freesail.ship.parts import SailState
+from freesail.ship.parts import LineState, SailState
 from freesail.ship.stub import OrderError
 from freesail.world.captains import Captain
 
@@ -1171,6 +1171,62 @@ def test_forced_round_with_nothing_aback_the_watch_dips_only_a_settee_against_it
     assert settee.is_set and settee.lug_side == "starboard" and not settee.yard_lowered
 
 
+TO_BE_DIPPED = "The mainsail, lying against its mast, is to be dipped."
+
+
+@pytest.mark.parametrize("why", ["parted", "queued"])
+def test_forced_round_the_line_is_worded_on_what_the_watchs_dip_does(why):
+    """The review of the lead's ruling (3)(i) of 2026-11-10: the line is worded once the dip is
+    given, on what it does, its own lines after it. The bare fixture forced round with nothing
+    aback, her yard against its mast, as above. The settee's halyard parted: the dip is refused,
+    the line says nothing of a dip and the refusal's line follows it ("Could not dip the mainsail:
+    ..."), nothing begun. A take in of the settee in hand: the dip waits its turn behind it, the
+    line says it is to be dipped (its data `settees_to_be_dipped`) and the runner's line follows
+    ("'Dip the mainsail' will follow ..."). Before, the line said "The watch dips the mainsail,
+    lying against its mast." whatever came of the order: refused, "Could not dip" followed it;
+    waiting, nothing followed it (and on her file in her larboard watch by night, where the dip
+    waits for hands, "Not hands enough on deck to dip the mainsail" followed it: tests/
+    test_bilander.py)."""
+    ship = _under_plain_sail(brig_with_settee())
+    runner = _bare(ship, CLOSE)
+    for y in scripts.working_yards(ship):
+        y.brace_angle = 0.0  # square: nothing aback on either tack
+    ship.dyn.heading = math.radians(30.0)  # the north wind 30 degrees on her larboard bow
+    settee = ship.sails[SETTEE]
+    settee.lug_side = "larboard"  # her weather side as the deck reads the wind
+    if why == "parted":
+        ship.halyard_of(settee).state = LineState.PARTED
+    else:
+        runner.start(ship, "take_in_settee", SETTEE)
+        ship.drain_notes()
+    timing = scripts.lying_to_timing()
+    ship.extra["hove_to"] = {"yards": [], "sign": 1.0, "round_s": timing["round_s"] - 1.0}
+    scripts.keep_lying_to(ship, 1.0, LIGHT_AIRS, runner)
+    notes = ship.drain_notes()
+    (line,) = [n for n in notes if n[1] == "ship.filled"]
+    assert line[2].startswith("She has been forced round through the wind onto the larboard tack")
+    assert WATCH_DIPS not in line[2] and "settees_dipped" not in line[4]
+    after = notes[notes.index(line) + 1 :]
+    dips = [i for i in runner.instances if i.evo.id == "dip_settee"]
+    if why == "parted":
+        assert line[2].endswith("hove to no longer. The helm keeps her full and by.")
+        assert "settees_to_be_dipped" not in line[4] and dips == []
+        (failed,) = [n for n in after if n[1] == "evolution.failed"]
+        assert failed[2].startswith("Could not dip the mainsail: ") and failed[0] == "notable"
+        assert DIP_ORDERED not in [n[2] for n in notes]
+        return
+    assert line[2].endswith("hove to no longer. The helm keeps her full and by. " + TO_BE_DIPPED)
+    assert line[4]["settees_to_be_dipped"] == [SETTEE]
+    (dip,) = dips
+    assert dip.waiting and dip.waiting_for is None  # its turn, behind the take in
+    (queued,) = [n for n in after if n[1] == "evolution.queued"]
+    assert (
+        queued[2]
+        == "'Dip the mainsail' will follow 'take in the mainsail', which the hands are still at."
+    )
+    assert DIP_ORDERED not in [n[2] for n in notes] and not [n for n in notes if n[0] == "notable"]
+
+
 def test_filled_on_her_own_tack_no_settee_is_dipped_by_the_watch():
     """The ruling (3)(i) is the forced round's branch: hove to on the larboard tack and filled
     there of herself, not forced round ("She has filled and gathers way ..."), the watch dips no
@@ -1250,6 +1306,33 @@ def test_each_manoeuvre_that_may_change_the_settee_holds_it_from_the_order(evolu
     assert scripts.settees_held(brig) == set()
     monkeypatch.setattr(scripts, "settees_held", lambda ship: set())  # as before the ruling
     assert scripts.SCRIPTS[evo.script](brig, dict(evo.params), evo.timing).holds() == held
+
+
+def test_with_no_crew_a_wear_waits_its_turn_behind_an_order_of_the_settee():
+    """The review of the ruling (3)(iii): a manoeuvre that belays the step-list work in hand
+    (decision 25) is not kept waiting by an order of the settee's given before it on the settee
+    alone (`Runner._settees_only`; her file's case is in tests/test_bilander.py). That belay is the
+    crew's, the hands called away from the work: on a ship with no crew nothing is belayed, and
+    the wear waits its turn behind the settee's order, as every order on a part held does, rather
+    than change the settee while that order is at it. The bare fixture with 5 kn of way, "take in
+    the mainsail" in hand, then "wear ship": it will follow, begun once the settee is in the gear.
+    """
+    ship = _under_plain_sail(brig_with_settee())
+    runner = _bare(ship, -CLOSE)
+    ship.dyn.speed = units.knots_to_ms(5.0)  # way enough to wear
+    runner.start(ship, "take_in_settee", SETTEE)
+    line = runner.start(ship, "wear", "ship")
+    (take_in,) = [i for i in runner.instances if i.evo.id == "take_in_settee"]
+    (manoeuvre,) = [i for i in runner.instances if i.evo.id == "wear"]
+    assert not take_in.waiting and manoeuvre.waiting and manoeuvre.waiting_for is None
+    assert SETTEE in manoeuvre.holds and manoeuvre.script.order_settees == {SETTEE}
+    assert line == "'Wear ship' will follow 'take in the mainsail', which the hands are still at."
+    for _ in range(200):
+        runner.step(ship, 1.0, LIGHT_AIRS)
+        if not manoeuvre.waiting:
+            break
+    assert not manoeuvre.waiting and manoeuvre in runner.instances  # begun
+    assert take_in not in runner.instances and ship.sails[SETTEE].state is SailState.IN_THE_GEAR
 
 
 def test_an_order_of_the_settee_waits_for_the_fill_away_that_dips_it(tmp_path):

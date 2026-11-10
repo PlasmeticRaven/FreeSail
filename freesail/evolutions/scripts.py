@@ -979,8 +979,21 @@ class Script:
     def timing_value(self, key: str, default: float) -> float:
         return float(self.timing.get(key, default))
 
+    # the settees a manoeuvre holds from the order (`_hold_settees`), read by the runner
+    order_settees: frozenset[str] = frozenset()
+
     def holds(self) -> set[str]:
         return {self.ship.name}
+
+    def _hold_settees(self) -> set[str]:
+        """The settees set (`settees_held`), held from the order by a manoeuvre that may change
+        one round its mast, and kept as `order_settees`: the runner does not keep a manoeuvre that
+        belays the step-list work in hand waiting behind an order of a settee's given before it
+        on these alone (`Runner._settees_only`; package 75, the lead's ruling (3)(iii) of
+        2026-11-10, and its review)."""
+        held = settees_held(self.ship)
+        self.order_settees = frozenset(held)
+        return held
 
     def clears(self) -> set[str]:
         """The parts whose work in hand this script belays when it begins, rather than
@@ -1226,7 +1239,7 @@ class TackScript(Script):
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
-        held |= settees_held(self.ship)  # from the order (package 75, the lead's (3)(iii))
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being changed, till it is hoisted (package 75)
@@ -1880,7 +1893,7 @@ class WearScript(Script):
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
-        held |= settees_held(self.ship)  # from the order (package 75, the lead's (3)(iii))
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee lowered, till it is hoisted (package 75)
@@ -2559,31 +2572,77 @@ def _hove_to_no_longer(
     and braces up for him by the order (`keep_full_and_by`): its hands from the watch on deck,
     its times and words, its holds keeping every other order of the settee off it till it is
     hoisted to leeward, and its sheet as it lies; two judgements, for the lead, measured in the
-    tuning notes ("The settee and the runner")."""
+    tuning notes ("The settee and the runner").
+
+    The line is worded on what the dip does, its own lines after it (docs/dev/TuningNotes.md,
+    "The review's mends of the two builds"):
+    begun, "The watch dips the mainsail, lying against its mast."; waiting, for hands (the
+    bilander's larboard watch of two by night) or its turn, "The mainsail, lying against its
+    mast, is to be dipped.", and it begins when there are hands for it (the watch changed, or all
+    hands called); refused, nothing of a dip, and the refusal's line. Worded before it was begun,
+    the line said the watch dipped it on the tick the dip was found to wait for hands, and the
+    settee stayed against its mast to the watch's end."""
     dyn = ship.dyn
     end_lying_to(ship)
     dyn.helm_mode = HelmMode.FULL_AND_BY
     dyn.steady = False
     data = {**data, "speed_kn": round(units.ms_to_knots(dyn.u), 1), "heading": dyn.heading}
     dip = _settees_against_their_masts(ship) if forced_round is not None else []
+    notes = getattr(ship, "notes", None)
+    at = len(notes) if isinstance(notes, list) else 0  # the line goes before the dip's own
+    begun: list[Sail] = []
+    waiting: list[Sail] = []
+    after: list[tuple[str, str, str]] = []
+    for sl in dip:
+        try:
+            line = forced_round.start(ship, "dip_settee", sl.id)
+        except OrderError as e:
+            why = str(e).strip().rstrip(".")
+            why = why[:1].lower() + why[1:]
+            after.append(
+                ("evolution.failed", f"Could not dip {names_of_sails(ship, [sl])}: {why}.", sl.id)
+            )
+            continue
+        inst = next(
+            (
+                i
+                for i in reversed(forced_round.instances)
+                if i.evo.id == "dip_settee" and i.subject_id == sl.id
+            ),
+            None,
+        )
+        if inst is None:
+            continue  # failed as it began: the dip's own line says so
+        if not inst.waiting:
+            begun.append(sl)
+            continue
+        waiting.append(sl)
+        if inst.waiting_for is None:
+            after.append(("evolution.queued", line, sl.id))  # its turn behind other work
     said = ""
-    if dip:
-        mast = "its mast" if len(dip) == 1 else "their masts"
-        said = f" The watch dips {names_of_sails(ship, dip)}, lying against {mast}."
-        data["settees_dipped"] = [sl.id for sl in dip]
-    ship.note(
+    if begun:
+        mast = "its mast" if len(begun) == 1 else "their masts"
+        said += f" The watch dips {names_of_sails(ship, begun)}, lying against {mast}."
+        data["settees_dipped"] = [sl.id for sl in begun]
+    if waiting:
+        one = len(waiting) == 1
+        mast, be = ("its mast", "is") if one else ("their masts", "are")
+        names = names_of_sails(ship, waiting)
+        said += f" {names[:1].upper() + names[1:]}, lying against {mast}, {be} to be dipped."
+        data["settees_to_be_dipped"] = [sl.id for sl in waiting]
+    note = (
         "urgent",
         "ship.filled",
         f"{text} The helm keeps her full and by.{said}",
         ship.name,
         data,
     )
-    for sl in dip:
-        try:
-            forced_round.start(ship, "dip_settee", sl.id)
-        except OrderError as e:
-            said = f"Could not dip {names_of_sails(ship, [sl])}: {e}"
-            ship.note("notable", "evolution.failed", said, ship.name)
+    if isinstance(notes, list):
+        notes.insert(min(at, len(notes)), note)
+    else:
+        ship.note(*note)
+    for kind, line, sid in after:
+        ship.note("notable" if kind == "evolution.failed" else "routine", kind, line, sid)
 
 
 def keep_lying_to(ship: Ship, dt: float, wind: Wind, runner: Any = None) -> None:
@@ -3081,7 +3140,7 @@ class FillAwayScript(Script):
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.yards}
-        held |= settees_held(self.ship)  # from the order (package 75, the lead's (3)(iii))
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being dipped, till it is hoisted (package 75)
@@ -5133,7 +5192,7 @@ class BoxHaulScript(Script):
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
         held |= {s.id for s in _after_sail(self.ship)}
-        held |= settees_held(self.ship)  # from the order (package 75, the lead's (3)(iii))
+        held |= self._hold_settees()  # from the order (package 75, the lead's (3)(iii))
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)
