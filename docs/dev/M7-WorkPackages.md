@@ -4268,7 +4268,7 @@ exit 0, 2,151 passed, 9 xfailed; the pace alone and last exit 0, 13 passed; ruff
 lead's merge:** the trial on 65c73a63 with the two appends kept both, lint-clean; no model or
 vendor name in the diff nor in the kept checkpoint's strings, and no path or key in it; no
 ship file, no physics; the fast tier whole on it exit 0, 7,442 passed, 1 xfailed, 500 slow left out, 20:04 to 21:12 UTC; the whole suite in the
-cloud dispatched after run 67, the figures to follow.
+cloud, run 68 (2026-11-10, 21:15 to 22:31 UTC, on f94e6f3b): green whole, lint, the six shards and the pace job.
 
 **Package 100 closed:** two steps, truths 7-470 to 7-479 (this step's 7-477 to 7-479), from the owner's word of 2026-11-09 on
 letters and things with words: a letter a thing with its words, its author, its addressee and
