@@ -1442,6 +1442,30 @@ verbs:
     synonyms: [toss]
     object: free
     level: 1
+  # Package 100: a letter a thing with words, and a thing destroyed. `write a letter to
+  # <whom>: "<words>"` by the drafting's road; `seal` and `open` (above) its seal; `read`
+  # (above) its words, shown to the reader alone; `examine` a thing as seen; `burn` and
+  # `tear up` a paper, gone.
+  write:
+    synonyms: [write a letter, pen]
+    object: free
+    level: 1
+  seal:
+    synonyms: [seal up]
+    object: free
+    level: 1
+  examine:
+    synonyms: [look at, inspect, look over]
+    object: free
+    level: 1
+  burn:
+    synonyms: []
+    object: free
+    level: 1
+  tear up:
+    synonyms: [tear, rip up, destroy]
+    object: free
+    level: 1
   # Milestone 7 (package 70; spec M7 §8, §8a): the quarters and the guns. The four
   # evolutions move the company between the watch bill and the quarter bill (object
   # `none`, `evolutions` below; the beat is a crew order as `call all hands` is, at once,
@@ -1855,7 +1879,8 @@ verbs:
 # `free` (`freesail/orders/free.py`); `eat` and `drink` are the needs' (object `needs`,
 # package 54), of the same class and unchanged: the words after them are taken and kept in
 # the record, the answer the person's alone.
-free_lines: [give, hand, show, take, stow, hide, put, open, read, throw, eat, drink]
+free_lines: [give, hand, show, take, stow, hide, put, open, read, throw, write, seal, examine,
+  burn, tear up, eat, drink]
 
 # ---------------------------------------------------------------------------
 # Which evolution a level 1 sail verb starts, by sail class (spec §8.4).

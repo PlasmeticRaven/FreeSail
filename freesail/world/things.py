@@ -37,6 +37,7 @@ from typing import Any
 from freesail.world.places import PLACES, earshot, find_port_place, place_words
 
 __all__ = [
+    "GONE",
     "OVERBOARD",
     "Thing",
     "ThingWordsError",
@@ -47,6 +48,7 @@ __all__ = [
     "lying_aboard",
     "lying_ashore",
     "make",
+    "name_words",
     "place_of",
     "read_where",
     "reach_why",
@@ -58,6 +60,45 @@ __all__ = [
 # A thing thrown over the side: gone from the ship and the shore, kept in the registry so
 # that the truth and a replay know what became of it.
 OVERBOARD = "overboard"
+# A thing destroyed by a person's act (package 100: burnt, torn up): gone from the ship and
+# the shore, kept in the registry with how it went (`Thing.gone`), as a thing thrown over the
+# side is, so that the truth and a replay know what became of it.
+GONE = "gone"
+# The nouns of a paper, which may be burnt or torn up (package 100); a letter is one whatever
+# its name says.
+PAPER_HEADS = frozenset(
+    {
+        "letter",
+        "letters",
+        "packet",
+        "paper",
+        "papers",
+        "note",
+        "dispatch",
+        "despatch",
+        "dispatches",
+        "despatches",
+        "bill",
+        "chart",
+        "commission",
+        "orders",
+        "book",
+        "list",
+        "warrant",
+        "pass",
+        "certificate",
+        "manifest",
+        "journal",
+        "log",
+        "map",
+        "plan",
+        "sketch",
+        "card",
+        "page",
+        "leaf",
+        "bundle",
+    }
+)
 # A thing lying in the ship's boat (package 68; the cold review's D8): aboard while she is
 # at the booms, landed on the quay when she goes ashore (`ports._land_and_take_off`).
 IN_THE_BOAT = "boat"
@@ -125,6 +166,25 @@ class Thing:
     # company's ("master", "s001"), and two hulls have a master each, so the keeper is the
     # one of that home; "" for a thing kept from before, or by a person of the world's own
     keeper_home: str = ""
+    # a thing with words (package 100): a letter's text as written, its writer's name, the
+    # addressee in words ("the port admiral") and the person they name where they name one of
+    # the people (his id and home hull), the stamp of its writing, whether it is sealed and
+    # whether its seal is broken (which shows), and how it went when it is gone ("burnt");
+    # each a plain class default, so that a thing of a checkpoint from before reads as it did
+    words: str = ""
+    author: str = ""
+    to: str = ""
+    to_id: str = ""
+    to_home: str = ""
+    written: str = ""
+    sealed: bool = False
+    broken: bool = False
+    gone: str = ""
+
+    @property
+    def is_letter(self) -> bool:
+        """Whether the thing is a letter (package 100): it has words or an addressee."""
+        return bool(self.words or self.to)
 
     @property
     def the(self) -> str:
@@ -133,9 +193,21 @@ class Thing:
 
     @property
     def head(self) -> str:
-        """The thing's noun, its name's last word ('packet')."""
+        """The thing's noun, its name's last word ('packet'); a letter's is 'letter',
+        whatever its name says ('a letter to the port admiral')."""
+        if self.is_letter:
+            m = _LETTER_NOUN.search(self.name)
+            return m.group(0).lower() if m is not None else "letter"
         words = _key(self.name).split()
         return words[-1] if words else ""
+
+    @property
+    def is_paper(self) -> bool:
+        """Whether the thing is a paper, to be burnt or torn up (package 100)."""
+        if self.is_letter:
+            return True
+        words = _key(self.name).split()
+        return bool(words) and (words[-1] in PAPER_HEADS or words[0] in PAPER_HEADS)
 
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {"id": self.id, "name": self.name}
@@ -143,7 +215,64 @@ class Thing:
             v = getattr(self, k)
             if v:
                 d[k] = v
+        # a letter's (package 100), only where it has them, so that a thing of before
+        # digests as it did; never its words, which are its reader's (`letter_words`)
+        for k in ("author", "to", "written", "sealed", "broken", "gone"):
+            v = getattr(self, k)
+            if v:
+                d[k] = v
         return d
+
+
+def name_words(t: Thing) -> str:
+    """A thing's name as it is listed (package 100): a letter's seal shows ('a letter to
+    the port admiral, sealed', '..., its seal broken'); any other thing's name as it is."""
+    if t.broken:
+        return f"{t.name} with its seal broken"
+    if t.sealed and t.is_letter:
+        low = t.name.lower()
+        for a in ("a ", "an ", "one ", "the "):
+            if low.startswith(a) and "sealed" not in low:
+                return f"{t.name[: len(a)]}sealed {t.name[len(a) :]}".replace(
+                    "an sealed", "a sealed"
+                )
+        return t.name if "sealed" in low else f"{t.name}, sealed"
+    return t.name
+
+
+def letter_words(t: Thing) -> str:
+    """A letter as its reader reads it (package 100): its direction, its hand, its date and
+    its words ('The letter from Mr Veale to the captain, written 10 June, 10:05: "..."')."""
+    head = the_words(t.name)
+    head = head[:1].upper() + head[1:]
+    if t.author and " from " not in t.name.lower():
+        head += f", in {t.author}'s hand"
+    if t.written:
+        head += f", written {t.written}"
+    words = t.words.strip()
+    if not words:
+        return f"{head}: it is blank."
+    return f'{head}: "{words}"'
+
+
+def seen_words(world: Any, t: Thing) -> str:
+    """A thing as it is seen when looked at (package 100): its name, its description, a
+    letter's direction and seal, and where it is; never a letter's words."""
+    parts = [t.name]
+    if t.description:
+        parts.append(t.description)
+    if t.is_letter:
+        if t.to and " to " not in t.name.lower():
+            parts.append(f"directed to {t.to}")
+        if t.author and " from " not in t.name.lower():
+            parts.append(f"in {t.author}'s hand")
+        if t.broken:
+            parts.append("its seal broken")
+        elif t.sealed:
+            parts.append("sealed")
+        else:
+            parts.append("open")
+    return ", ".join(parts) + f"; {where_words(world, t)}"
 
 
 def the_words(name: str) -> str:
@@ -233,7 +362,10 @@ def find(world: Any, words: str) -> list[Thing]:
         return []
     out = []
     for t in things_of(world):
-        if t.place == OVERBOARD and not t.keeper:
+        if t.place in (OVERBOARD, GONE) and not t.keeper:
+            continue
+        if t.is_letter and key in _letter_keys(t):
+            out.append(t)
             continue
         name = _key(t.name)
         words_of = set(name.split())
@@ -244,6 +376,24 @@ def find(world: Any, words: str) -> list[Thing]:
         # 'the cask' or 'the brandy' for 'a cask of brandy': either side of 'of' names it
         if " of " in name and key in name.split(" of ", 1):
             out.append(t)
+    return out
+
+
+def _letter_keys(t: Thing) -> set[str]:
+    """The words that name a letter beside its name (package 100): 'letter', 'sealed
+    letter', 'letter to <whom>', 'letter from <whom>', '<whom>'s letter'."""
+    out = {"letter", t.head}
+    if t.sealed or t.broken:
+        out.add("sealed letter")
+        out.add(f"sealed {t.head}")
+    if t.to:
+        out.add(f"letter to {_key(t.to)}")
+        out.add(f"letter for {_key(t.to)}")
+    if t.author:
+        a = _key(t.author)
+        out.add(f"letter from {a}")
+        out.add(f"{a}'s letter")
+        out.add(f"{a} s letter")
     return out
 
 
@@ -286,6 +436,8 @@ def where_words(world: Any, thing: Thing, keeper_where: bool = True) -> str:
         return f"in {p.name}'s keeping, {world.people.state_words(p)}"
     if thing.place == OVERBOARD:
         return "thrown over the side"
+    if thing.place == GONE:
+        return thing.gone or "destroyed"
     if thing.place == IN_THE_BOAT:
         return "in the boat"
     if thing.place == "shore":
@@ -323,7 +475,8 @@ def lying_ashore(world: Any, port_id: str) -> dict[str, list[Thing]]:
 
 def lying_words(t: Thing) -> str:
     """'a sealed packet on the table', 'a cask of brandy': a thing as its place lists it."""
-    return f"{t.name} {t.spot}" if t.spot else t.name
+    name = name_words(t)
+    return f"{name} {t.spot}" if t.spot else name
 
 
 # ---------------------------------------------------------------------------
@@ -391,6 +544,8 @@ def reach_why(world: Any, person: Any, thing: Thing) -> str | None:
         return f"{thing.the} is in {other.name}'s keeping"
     if thing.place == OVERBOARD:
         return f"{thing.the} went over the side"
+    if thing.place == GONE:
+        return f"{thing.the} is {thing.gone or 'destroyed'}"
     here = _where_of_person(world, person)
     if same_place(here, place_of(world, thing)):
         return None
@@ -490,8 +645,18 @@ def make(world: Any, words: str) -> tuple[Thing, dict[str, Any], bool]:
     """A thing from words, '<its name>, <where it is>[, <more of it>]' (`aboard: ...`, a
     scenario's `things:`): (the thing, where as read, whether it is a thing already known
     and moved). A name that opens with 'the' and names a thing known moves it; any other
-    makes one. ThingWordsError in words when no where is said or a where names nothing."""
-    phrases = [" ".join(x.split()) for x in str(words).split(",") if x.strip()]
+    makes one. ThingWordsError in words when no where is said or a where names nothing.
+
+    A letter with its words (package 100): `a letter from <whom> to <whom>, <where>[,
+    sealed]: "<its words>"`, the words in quotes after a colon at the end; its writer and its
+    addressee read from its name, 'sealed' among the phrases sealing it."""
+    text = str(words)
+    letter_text: str | None = None
+    m = _LETTER_TAIL.search(text)
+    if m is not None:
+        letter_text = m.group("words").strip()
+        text = text[: m.start()]
+    phrases = [" ".join(x.split()) for x in text.split(",") if x.strip()]
     if len(phrases) < 2:
         raise ThingWordsError(f"say what it is and where: '<a thing>, <where>' ({WHERE_FORMS})")
     name = phrases[0].rstrip(".")
@@ -531,9 +696,58 @@ def make(world: Any, words: str) -> tuple[Thing, dict[str, Any], bool]:
     else:
         thing = Thing(_new_id(world, name), name)
         moved = False
+        if letter_text is not None:
+            _as_letter(world, thing, letter_text, said)
         if said:
             thing.description = "; ".join(said)
+    if moved and letter_text is not None:
+        raise ThingWordsError(
+            f"{thing.the} is known already; its words are its writer's, written once"
+        )
     return thing, where, moved
+
+
+# A letter's noun in its name ('a sealed packet from ...': 'packet'), else 'letter'.
+_LETTER_NOUN = re.compile(r"\b(?:letter|note|dispatch|despatch|packet)\b", re.I)
+# A letter's words at the end of the words that make it: ': "<words>"' (package 100).
+_LETTER_TAIL = re.compile(r":\s*[\"“](?P<words>[^\"”]*)[\"”]\s*\.?\s*$")
+_LETTER_NAME = re.compile(
+    r"^(?:a|an|one|the)?\s*(?P<sealed>sealed\s+)?(?:letter|note|dispatch|despatch|packet)"
+    r"(?:\s+from\s+(?P<author>.+?))?(?:\s+(?:to|for)\s+(?P<to>.+?))?$",
+    re.I,
+)
+
+
+def _as_letter(world: Any, thing: Thing, words: str, said: list[str]) -> None:
+    """The thing made a letter with its words: its writer and addressee read from its name
+    ('a letter from the agent to the captain'), 'sealed' among the phrases sealing it."""
+    thing.words = words
+    m = _LETTER_NAME.match(thing.name.strip())
+    if m is not None:
+        thing.author = (m.group("author") or "").strip()
+        thing.to = (m.group("to") or "").strip()
+        thing.sealed = bool(m.group("sealed"))
+    for phrase in list(said):
+        if phrase.lower() in ("sealed", "under seal", "sealed up"):
+            thing.sealed = True
+            said.remove(phrase)
+    if not thing.to:
+        thing.to = "the captain"
+    addressed(world, thing)
+
+
+def addressed(world: Any, thing: Thing) -> None:
+    """The person a letter's addressee names, where the words name one of the people: his
+    id and home hull kept with it (package 100), so that it is handed to him."""
+    people = getattr(world, "people", None)
+    finder = getattr(people, "find_anywhere", None) or getattr(people, "find", None)
+    try:
+        p = finder(thing.to) if finder is not None and thing.to else None
+    except Exception:  # noqa: BLE001  (a world whose muster cannot be read names nobody)
+        p = None
+    if p is not None:
+        thing.to_id = str(p.id)
+        thing.to_home = str(getattr(p, "home", "") or "")
 
 
 def put(thing: Thing, where: dict[str, Any]) -> None:
