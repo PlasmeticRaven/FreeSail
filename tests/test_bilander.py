@@ -25,6 +25,7 @@ whole. Her road's step 5, on the engine's settee (B3.3; Bil-D §12.2, §14; Ext 
 both ways, her sheet's block against her taffrail, rule 5's measure on her file, her settee
 requests at eight by watch, truths 7-198 and 7-199 on her file, and her first hour at seed 7 with
 no fit named; each judged by her heading and tack a set time after, never by "Tacked" (D13 (a)).
+And B3.3b's guard on her file: forced round hove to, her settee dipped first at "fill away".
 The untried manoeuvres, run once on her file, are recorded in docs/dev/TuningNotes.md.
 
 The figures quoted as measured were measured on the owner's machine (Windows 11, 2026-11-08);
@@ -1472,6 +1473,72 @@ def test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways(
     assert FOUR_POINTS <= min(offs) and max(offs) <= SEVEN_POINTS
     assert abs(min(offs) - least) <= 1.0 and abs(max(offs) - most) <= 1.0, (min(offs), max(offs))
     assert sum(ahead) / len(ahead) == pytest.approx(headway, abs=0.15)
+
+
+def test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away():
+    """Her review's finding 1 (docs/dev/TuningNotes.md, "Her review's mends"), built by B3.3b, the
+    follow-up B3 step keyed on `settee` alone that her design's §17 lead item 8 provides for (the
+    lead's answer (8)): hove to with her settee kept, its yard on the larboard side, the starboard
+    tack's lee, a shift of eight points forces her round onto the larboard tack, and the yard is on
+    her weather side, against its mast. "Fill away" dips it first, as she lies (Ext §5.7's as-built
+    note): lowered at the order, hoisted on the starboard side when its time is done, its sheet
+    drawn for the wind she will have full and by, and then she is let fall off and filled away,
+    each said. Seed 7, 15 kn, from her settle, hove to at +106 s and the shift 60 s after: forced
+    round 20 s after the shift, the order 40 s after that; the dip's words at +1 s, she lying
+    65-85 degrees off while its yard is on deck (as she lies with it clewed up, D4 (a)); hoisted
+    and "Hauled aft the head sheets" at +158 s, "Filled away on the larboard tack" at +218 s; at
+    +300 s it draws clear of its mast as at her settle (61.8 m2), at 4.15 kn. Before B3.3b she
+    was filled away at +59 s with it drawing against its mast to the end, two-thirds of that
+    (41.3 m2), at 3.13 kn, and no line said so; at her step 5's +2.25 in 8 kn she was forced round
+    of herself and filled away so (41.4 m2, 2.23 kn, her review). Dipped as she fell off instead
+    (B3.3b's first build, not committed), the settee down while she had a knot of way, she came
+    head to the wind once it was hoisted and was taken aback at +254 s, going astern."""
+    from freesail.evolutions import trim as yard_trim
+    from freesail.physics import sails as P
+
+    world = _her_settle(15.0)
+    settee = world.ship.sails[SETTEE]
+    whole = settee.area_effective_m2  # clear of its mast, at her settle
+    world.submit("heave to")
+    for _ in range(600):
+        world.tick()
+        if "hove_to" in world.ship.extra:
+            break
+    world.run(60)
+    assert world.ship.extra["hove_to"]["sign"] == 1.0
+    assert settee.is_set and settee.lug_side == "larboard"
+    start = world.clock.tick
+    wind = world.wind  # the wind shifted at a stroke, as tests/test_lying_to.py forces her round
+    wind.follow(units.wrap_2pi(wind.base_direction - 8.0 * units.POINT), wind.base_speed)
+    world.scenario.wind_from_deg = math.degrees(wind.base_direction)
+    world.run(60)
+    (forced,) = [e for e in _after(world, start) if e.kind == "ship.forced_round"]
+    assert "lies on the larboard tack" in forced.text
+    lies = yard_trim.read_sheet(world.ship, settee).side
+    assert settee.lug_side == "larboard" and lies == 1 and P.against_the_mast(settee, lies)
+    start = world.clock.tick
+    assert world.submit("fill away").kind == "order.accepted"
+    world.run(300)
+    dip = (
+        "Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the "
+        "weather bow."
+    )
+    hoisted = "Dipped the mainsail; hoisted on the starboard side, to leeward of the mast."
+    hauled = "Hauled aft the head sheets; kept the helm a-lee to let her fall off."
+    assert _first_tick(world, start, dip) == 1
+    up = _first_tick(world, start, hoisted)
+    assert up is not None and abs(up - 158) <= 10, [e.text for e in _after(world, start)]
+    assert _first_tick(world, start, hauled) == up  # then she is let fall off
+    filled = [e for e in _after(world, start) if e.kind == "ship.filled_away"]
+    assert len(filled) == 1 and filled[0].text.startswith("Filled away on the larboard tack")
+    assert up < filled[0].tick - start <= up + 90
+    assert not [e for e in _after(world, start) if e.kind in ("ship.aback", "ship.filled")]
+    lies = yard_trim.read_sheet(world.ship, settee).side
+    assert settee.is_set and settee.lug_side == "starboard" and not settee.yard_lowered
+    assert lies == 1 and not P.against_the_mast(settee, lies)
+    assert world.ship.dyn.tack == "larboard" and "hove_to" not in world.ship.extra
+    assert settee.area_effective_m2 == pytest.approx(whole, rel=0.01)
+    assert abs(_rel_deg(world)) == pytest.approx(67.5, abs=5.0)  # full and by on the larboard tack
 
 
 def test_its_sheet_leads_a_fathom_abaft_its_clew_and_within_a_fathom_of_her_taffrail():

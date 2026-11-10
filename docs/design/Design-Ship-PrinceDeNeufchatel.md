@@ -382,6 +382,15 @@ close-hauled to the beam where the schooner's rises, so no lead gives her both h
 target (−0.2 balances her close-hauled with +0.25° abeam); +0.1 holds the step-5 bands with room
 on both sides (judgement, for the lead). `hull_speed_kn` and `gm_m` kept.*
 
+*At B2c (2026-11-08), the owner's ruling for the lead, "Re-tune, widen bands 0.2 degrees"
+(`docs/dev/TuningNotes.md`, "The owner's two rulings (B2c, 2026-11-08)"): `clr_x_m` +0.1 to
+**−0.6**, the lead 0.2 m ahead of the geometric centre. Her fore staysail corrected to the 46 m²
+that fits (§4.3's As built at B2b) gave her +3.95° of weather helm close-hauled at +0.1, and her
+helm falls from close-hauled to the beam, so that no single lead holds both of step 5's bands;
+each is widened by 0.2°, close-hauled −1.0 to +1.7 and abeam and at ten points +0.3 to +4.0, and
+at −0.6 she carries +1.65° close-hauled and +0.39° abeam in 15 kn (+1.39° at ten points).
+`hull_speed_kn` and `gm_m` kept; her polar is unmoved, cell for cell.*
+
 ### 2.2 The datum (D18)
 
 Her deck is flush fore and aft (Cobb p. 38, "a flush deck fore and aft", read). The uppermost
@@ -939,6 +948,18 @@ mast. It is now 37 m², the sheet's 37 (38 before).*
   gaff mainsail (ruling 4's), so the line names her mainsail as it stands, whole. Every other
   file's line is as before. The gale as sailed, old beside new, in `docs/dev/TuningNotes.md`
   (B2b), with what the take-in costs her (for the lead).*
+
+  *At B2c (2026-11-08), the owner's ruling for the lead, "At lie a-try": her fore gaff sail is
+  taken in when she lies a-try, as Cobb has it (1841 p. 79), and not at the topsails' second
+  reef. The gale's reduction names it no more (B2b's "take in the fore sail" gone, the course's
+  reef alone as before B2b); lie a-try's handing and its line are as built at B2b. Sailed in the
+  gale with her lead re-tuned (§2.1's As built at B2c), she no longer gripes up with the helm hard
+  over from the jib's take-in to lie a-try: after a luff of three minutes she bears away to
+  65-69° off at 10-11 kn and holds there, her fore storm staysail set at 34 kn as before B2b, and
+  lies a-try at 7,677 s under the fore topsail, the mainsail and the staysails, B2b's line. At
+  B2b's +0.1 she gripes up as before with her fore gaff sail standing, so that it is the two
+  rulings together that keep her off. The three rigs in memory with a fore course sail the gale
+  line for line as before B2b until lie a-try. The figures in `docs/dev/TuningNotes.md` (B2c).*
 - **Groups**, with the names the engine reads (map-generator fact 11), on the brig's and the
   schooner's patterns:
 
@@ -1559,6 +1580,22 @@ review of 2026-11-08), the abeam band a passing test of its own. Truth 6's form 
 at 62 s, the words at 50 and 75 s; the settled form 261 s (313 with the main topgallant set). Wore
 in 521 s, 241 m to leeward. Hove to 49.1° off at 2.6 kn (49.0° at 2.6 with the main topgallant
 set). Under way in 1,466 s, 5.8 kn. Her heel 5.4° and 14.2° abeam in 15 and 25 kn.*
+
+*At B2c (2026-11-08), the owner's two rulings for the lead (`docs/dev/TuningNotes.md`, B2c):
+`clr_x_m` +0.1 to −0.6 (§2.1's As built at B2c), her helm test's bands each widened by 0.2°, the
+known failure taken off. Old beside new:*
+*- **The polar:** unmoved, every cell the same to the last bit (the polar does not read
+`clr_x_m`); 7-193 as at B2b.*
+*- **The helm:** +1.65, +2.25, +1.30, +0.39, +1.39 and +3.06° at the six angles (+3.95, +4.30,
++2.81, +1.61, +2.10, +3.16); +2.44 at 60° and +0.07 abeam in 25 kn (+5.09, +1.60). Inside the
+widened bands, close-hauled −1.0 to +1.7 and abeam and at ten points +0.3 to +4.0. Truth 6's form
+abeam: +0.39, +4.23, −13.02.*
+*- **Her handling:** truth 10's form 189 s from 292.5° (192 and 193), gaining 114 m, hanging in
+stays at 63 s, the words at 53 and 77 s; the settled form 189 s (203 with the main topgallant
+set). Wore in 452 s, 249 m to leeward. Hove to 51.3° off at 3.1 kn (the same with the main
+topgallant set). Under way in 1,465 s, 5.8 kn. Her heel 5.4° and 14.2° abeam in 15 and 25 kn, as
+before. Her round trip an hour in 6.22 kn (6.19).*
+*- **Her gale:** §4.8's As built at B2c.*
 
 ---
 
