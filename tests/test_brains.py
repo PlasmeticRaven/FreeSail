@@ -287,10 +287,13 @@ def test_a_cruiser_chases_a_merchant_she_can_fight_and_speaks_her_within_hail(fa
     # round at seven cables, where before she yielded at hail by 72's rule (the same
     # possession, taken at the same minute, by another road: the toggle `far_action.ENABLED`
     # measured old beside new, docs/dev/TuningNotes.md "Package 74", step 4); then he is on
-    # passage for Brest with his prize in company, or investigating the frigate at his
-    # horizon's edge fourteen miles off, as the minute falls
+    # passage for Brest with his prize in company for a minute (tick 2,340), and at the tick
+    # the test stops (2,400, the fourth ten minutes) he has turned to the frigate hove to at
+    # his horizon's edge fourteen miles off: the scene is the same at every run, and the one
+    # ending is pinned (the lead's word of 2026-11-10; two endings were allowed before)
     assert "chasing" in bs and "engaging" in bs and "taking possession" in bs
-    assert bs[-1] in ("on passage", "investigating a stranger")
+    assert bs[-3:] == ["taking possession", "on passage", "investigating a stranger"]
+    assert b.brain.history[-1][0] == 2400
     assert P.is_prize(s) and s.nation == "france"
     assert "evading" in ss and "struck" in ss
     assert [e for e in w.log if e.kind == "sail.spoke"] or not any(

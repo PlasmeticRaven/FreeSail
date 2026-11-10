@@ -23449,6 +23449,180 @@ to 02:08:12), pace **exit 0** (02:08:12 to 02:13:30, 14 passed), fast **exit 0**
 02:59:13). The trunk then gained package 98's steps, and the three tiers were run once more
 at ceed163, above: those are the step's figures.
 
+### Step 5: the prize court and the money (the design's §5)
+
+**Built as designed** (`freesail/world/prize_court.py`; `data/business.yaml`'s `prize_values`,
+`prize_courts`, `prize_money` and `prize_shares`; the hooks in `prizes.possess` (the ships in sight
+at the strike and the captor's complement on the record), `prizes.minute` (the court's job for a
+prize hull in a port open to the captors; the salvage sentence for a ship retaken by her own
+nation's cruiser; the reserved fourth), `prizes.far_minute` (a far prize sentenced on her record in
+her goal's road), `Dealings._apply_job` (`prize_court`), the strike hooks of the near action, the
+far rounds and the cut-out (`prize_court.note_in_sight`), the `port` channel's `the court condemns
+| restores the <prize>` with its doubt, the reading `the prize money` and three events): the
+valuation, the cargo at the market, the prize goods, the court by the port's nation, the three
+sentences, the money by the eighths of the scheme in force at the date, shared among the ships in
+sight at the strike by their complements, the purse's line and the prize account's lines. Truths
+7-362 and 7-363.
+
+**The lead's ruling on the owner's shelf** (2026-11-07, Lavery, Nelson's Navy, p. 116): the two
+British schemes' classes and figures are CONFIRMED and cited (the rows say so; the book's words are
+not in the tree); the flag officer's eighth and third, the small ships' and reduced crews' special
+rules are named in the rows as not modelled; the shares within the 1808 half, the head money's five
+pounds, the agent's five per cent, the hull's price a ton, the court's days, the costs' tenth and the
+salvage eighth stay FROM MEMORY, marked. **The rule the design lacked and the ruling added**: the
+prize money shared among all the ships in sight at the moment the enemy surrendered, a ship that
+took no part included, written on the record at the strike (`in_sight`: the ships at war with her
+in sight from her masthead, with their complements) and divided before the eighths by their
+complements (judgement, FROM MEMORY: Lavery gives the sharing and not the division), each ship's
+part into her purse by her own road, the purse's line saying "shared with the Sprightly, in sight at
+the strike: the Amazon's part £...".
+
+**The figures found** (seed 7, the French merchant brig X taken in Falmouth's road): 304 tons
+burthen (her displacement over 1.36, the frigate's file's ratio: the ship files give no tons of
+their own, 75's), the hull £1,944 at £8 a ton worn ten years, her guns £320 (four long 6s of 20 cwt at
+£4 the hundredweight: her own file since the trunk's SW-4, merged at step 2's boundary; before it the
+brig's one file gave a "merchant brig" the brig-sloop's eighteen, £1,248, her powder and shot £297 and
+the whole £3,295), her powder (two barrels) and shot £13, the agent £114, the fees £20: £2,143 alone,
+the captain's three eighths £804; with the cutter Sprightly in sight the frigate's part is £1,925 by
+264 to the cutter's complement, the cutter's £218. A Danish brig wrongly taken is
+restored with £194 of costs (a tenth of £1,944). The far prize Nancy sentenced at Brest by le
+Conseil des prises on her record, her privateer captor's part the whole (no consort in sight).
+
+**Taken another way.** (1) Her stores are nothing in the valuation (the yard's prices of the port
+would price what her file does not list: said). (2) `take her powder and shot` (§2.7's
+transaction before the court) is not built; the goods are the court's. (3) A prize lost on the way
+home is told by her captor's lookout or her story's line as the design has it; the `prize.lost`
+line at the court's date for a prize that does not come in is not written (judgement: nothing told
+the captor that his people cannot know, and the port's roll is not kept). (4) The reserved fourth
+is paid by the record's day (`reserved_due`) from the prize's minute, not a second port job. (5)
+The salvage sentence is read from the record's `recaptor` when the retaken ship lies in port; the
+recaptor's purse receives it where she has one. **Found on the way**: `Vessel.prize` is replaced
+by the sentence (a new dict), so a reader holding the old record reads stale (the tests re-read
+it); the far prize at her goal's road is `done` when her plan runs out and gone from the sea at the
+minute's end, so the court's days keep her lying to until the sentence; the salvage verdict read a
+key the retaking never wrote and the salvage's sharers were the enemy who first took her and his
+consorts in sight (mended before the step's commit: the recaptors alone, by their nation's court
+and scheme; the tests for the reserved fourth and the salvage are the step's last two). A Brest
+salvage of the brig X (the French privateer Vengeur retaking her from the Amazon): £285 (£436 on the
+brig-sloop's guns before SW-4), an eighth of her hull, guns, powder and shot, the Vengeur's whole; the reserved fourth on a privateer brig
+of eighty men taken by the frigate: £400 of head money, three fourths now, the fourth on the
+seventh day.
+
+**The lead's five small mends, in this step's tree** (2026-11-10; each with its test, old beside
+new). (i) *The parole's plain answer.* Old: "I do not.", "I do not know", "I do not see why I
+should" and "you have it not" were read as the parole GIVEN (the plain yes's "i do" and "you have
+it" stand in them as whole words), and "you shall not have my parole" by the form "my parole".
+New (`captive.read_parole`, `PAROLE_NEGATIONS`): an answer that holds a negation (not, no, non,
+never, nor, neither, cannot, the n't forms with their apostrophes out, ne ... pas, jamais, nunca,
+jamás) is never read as given, by the forms or the plain words; it is refused by the refused forms
+and the plain no alone (a plain yes beside the no with no negation after it, "yes and no", still
+reads as neither); otherwise the question stays open and he is asked again after the glass. Two
+refused forms added, "shall not have" and "will not have" (so "you shall not have my parole" is
+refused, not left open). The five answers above read: open, open, open, open, refused.
+`test_an_answer_that_holds_a_negation_is_never_read_as_the_parole_given`; the step's earlier
+tests of the plain yes and no pass as they stood. (ii) *The cap-full reply's line*
+(`action.far_reply`). In the test's scene (the Renard far, the cutter awake under a cap of one),
+old: "The Renard fires her broadside at us from 10 cables: 0 of 27 shot strike (the far ship's
+reply, the cap full)." New: "The Renard fires her broadside at us from 10 cables: none of her 27
+shot strike us." (one "strikes"; the counts by the round's line's words); the data's `fallback:
+True` keeps the road for the record, and the test reads the data and that nothing of the cap is
+in the line.
+(iii) *The cruiser and the merchant* (`tests/test_brains.py`). Old: the brig-sloop's last state
+"on passage" or "investigating a stranger", "as the minute falls". Measured twice: she is on
+passage at tick 2,340 and turns to the frigate at her horizon's edge at 2,400, the tick the test
+stops; the one ending is pinned (her last three states and the tick). (iv) *The conditional skip*
+in `tests/test_far_action.py` an assertion ("the cap holds the cutter alone"); the skip was never
+taken. (v) *A word said is no hand on the ship.* My reading in step 4's report was wrong, measured
+here on the intent scenario: on his own ship the player's `say` is `agent.spoke` and his `tell` is
+`agent.told` (a word to a station nobody holds is kept), neither a hand, and his rules captain
+commands through both; `person.spoke` is written only for a captive's words (no hand since step
+3's mend (1)) and a visitor's (98's). The rule is stated in `World.submit` for the kind all the
+same (`person.spoke` is no hand on any hull, as a free line is not) and tested
+(`test_a_word_said_at_the_prompt_is_the_players_own_and_no_hand_on_the_ship`). **Pins moved by
+the five: none** (iii is a test of this package's own made exact).
+
+**The trunk merged at the step's boundary** (merge commits: 87f7fe8 at dd12cba, the lead's
+records of runs 58 and 59; 350df0e at c54a053, step 4 merged and its record; and the last at
+bbb6952, package 98's steps 3, 4, 5 and 7 and its four additions, merged by the lead at 12bd5f4).
+The first two met nothing. **98 met this package on one line, and both are kept as the lead
+merged them**: `World.submit`'s test of the player's hand has this package's `_hand_on_her` and
+`kind != "person.spoke"` and 98's `not data.get("visitor")` side by side (a visitor's word to
+her captain is `person.spoke` with `visitor: True`, so either condition keeps his hand off her);
+in the stations' `tell` 98's visitor's road is asked only where this package's
+`_captive_to_the_captain` gives nothing. 98's flags of command (`haul down the broad pendant`,
+`the second ensign`, `the jack`) are the deck's orders by the place's check, and a prisoner is
+refused them in his own words by the same road as the colours: three lines added to the step's
+test of the prisoner's prompt. The truths' file merged with both packages' truths in order
+(this package's to 7-363 and 7-369, then 98's 7-446 to 7-459). A fourth merge (2ca46c9 at
+ef0446c) brought the lead's records alone (the work packages' page and the design proposal's
+decision 66) and met nothing.
+**One pin moved at the meeting with 98, old beside new** (found by the step's first fast tier,
+at b14433a: exit 1, 7,143 passed and this one failed). `tests/test_officer.py`'s handover test
+holds the officer's conversation at his seat under the fraction (0.6) of the door's budget, and
+every package that lengthened his brief or his readings has given the budget five hundred more
+(the test's own comment keeps the history). Measured at four trees as the test measures it: the
+trunk before either at c54a053, **13,433** tokens; with 98 alone (bbb6952), **13,474**; with this
+step alone (350df0e), **13,475** (the reading `the prize money` and the court's three events in
+the stand-by's words); with both (b14433a), **13,516**, sixteen over the fraction of 22,500
+(13,500). Neither package moves it alone; together they do. The budget is 23,000 in the test
+(22,500 before), by the test's practice, with the four figures in its comment. Nothing of the
+harness's own figures is changed (`HANDOVER_AT_FRACTION` is 0.6 as it was).
+
+**The suites as first measured, at 2d0a6d8** (the step with the trunk at ef0446c; a worktree
+pinned there; ruff check and format clean; every run started in the harness's background mode,
+the tiers as separate tasks under its two-hour cap; 2026-11-10 UTC): the slow tier of the
+touched files **exit 0** (08:20:06 to 08:44:18; 1,994 passed); the slow tier of the known
+truths, the profile and the Indefatigable **exit 0** (08:44:18 to 09:37:17; 518 passed and the
+trunk's eight expected failures); the fast tier whole **exit 0** (09:38:00 to 10:27:30; 7,144
+passed and one expected failure of the trunk's own, 486 slow tests left out); the pace tests
+alone and last **exit 0** (10:27:30 to 10:33:09; 14 passed, no floor lowered). Nothing skipped
+in any tier. The Rade de Brest's new stream moved no scene of this package: the captor's
+passage to Brest and every truth that sails there passed as they stood. The measures before
+it: the fast tier at 45a3a00 (the step as lifted, the trunk at dd12cba) **exit 0** (05:29:46
+to 06:14:48; 7,070 passed); the fast tier at b14433a **exit 1** (07:30:39 to 08:18:06; 7,143
+passed and the handover test failed, above).
+
+**The trunk moved while those ran, and the step is measured again on it.** A fifth merge
+(cb79d9c at 137bd30) brought package 75's SW-1 (Table No. 29's service charges by kind and
+calibre) and the lead's ruled builds of the 9th and 10th (the ship files regenerated, the
+settee, the runner), package 60's design note and the lead's records. It merged without a
+conflict. Checked on the merged tree before the tiers: the step's own files (`test_prize_court`,
+`test_prizes`, `test_captive`, `test_far_action`, `test_ordnance`, `test_officer`) pass as they
+stood, so the court's figures (the brig's guns £320, her powder and shot £13) are not moved by
+the charges' table or the regenerated files; the officer's conversation at his seat measures
+13,516 tokens, as before the merge.
+
+**Measured at eb9e9dc** (that merge and these notes; a worktree pinned there; ruff check and
+format clean): the fast tier whole **exit 0** (10:37:44 to 11:28:29; 7,203 passed and the
+trunk's one expected failure, 486 slow tests left out); the slow tier of the touched files
+**exit 0** (11:28:29 to 11:53:17; 1,994 passed). The slow tier of the truths was not run there:
+the trunk had by then re-pinned the schooner's recorded passage for package 75's ruled build
+(3) (the lead's 4016629, one line of the 766 moved, his toggle), a pin of the trunk's own that
+the tree at eb9e9dc held at its old digest, and had merged package 98's step 8. **A sixth
+merge** (at 61b170d) brought both, with the records. It merged without a conflict. What met:
+98's step 8 took its visitor's condition out of `World.submit`'s test of the player's hand
+(`not data.get("visitor")`) and its `visitor: True` out of the event's data, leaving a
+visitor's word to this package's rule of mend (v) (`kind != "person.spoke"`), which covers it;
+`squadrons.py` has 98's last course kept in the world beside this step's three lines of the
+cut-out's strike hook, untouched by either hand in the other's lines. The step's figures are
+the ones measured at that tree, below.
+
+**The suites on the step's final tree** (bc22961, one hash, the trunk at 61b170d merged in it;
+a worktree pinned there; ruff check and format clean; every run started in the harness's
+background mode, the tiers as separate tasks under its two-hour cap; 2026-11-10 UTC): the slow
+tier of the known truths, the profile and the Indefatigable **exit 0** (11:57:39 to 12:46:46;
+520 passed and the trunk's eight expected failures); the slow tier of the touched files
+(`test_prize_court`, `test_business`, `test_ports`, `test_ordnance`, `test_far_action`,
+`test_captive`, `test_prizes`, `test_brains`, `test_far_hail`, `test_squadrons`,
+`test_captains`, `test_captain_trials`, `test_officer`, `test_crews`, `test_fight`,
+`test_between_hulls`, `test_signals`, `test_standing`, `test_orders_places`, `test_places`,
+`test_knowledge`, `test_director`, `test_world_orders`, `test_readings`, `test_subtypes`,
+`test_primer`, `test_in_world`) **exit 0** (12:46:46 to 13:10:06; 1,996 passed); the fast tier
+whole **exit 0** (13:10:25 to 14:04:58; 7,207 passed and the trunk's one expected failure, 486
+slow tests left out); the pace tests alone and last **exit 0** (14:04:58 to 14:10:54; 14
+passed, no floor lowered). Nothing skipped in any tier. The trunk gained one line of the
+lead's records while these ran (229d024, the work packages' page alone) and was not chased.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

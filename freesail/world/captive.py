@@ -60,6 +60,7 @@ __all__ = [
     "PAROLE_ASK_AGAIN_S",
     "PAROLE_BY_RULE_S",
     "PAROLE_GIVEN_WORDS",
+    "PAROLE_NEGATIONS",
     "PAROLE_REFUSED_WORDS",
     "PLACES_ON_PAROLE",
     "PLACES_ON_PAROLE_NIGHT",
@@ -107,6 +108,8 @@ PAROLE_REFUSED_WORDS: tuple[str, ...] = (
     "refuse",
     "will not give",
     "shall not give",
+    "shall not have",
+    "will not have",
     "no parole",
     "i decline",
     "do not give",
@@ -117,6 +120,44 @@ PAROLE_REFUSED_WORDS: tuple[str, ...] = (
 # as neither, and the question stays open
 PAROLE_YES_WORDS: tuple[str, ...] = ("yes", "oui", "sí", "si", "aye", "i do", "you have it")
 PAROLE_NO_WORDS: tuple[str, ...] = ("no", "non", "never", "i will not")
+# a negation in the answer (the lead's ruling of 2026-11-10: "I do not." and "you shall not
+# have my parole" were read as given): an answer that holds one is never read as given, by
+# the forms or by the plain words; it is refused by the refused forms and the plain no alone,
+# and otherwise the question stays open. Whole words, after the apostrophes are taken out
+# (don't is "dont"); the French ne ... pas and jamais, the Spanish nunca and jamás beside.
+PAROLE_NEGATIONS: tuple[str, ...] = (
+    "not",
+    "no",
+    "non",
+    "never",
+    "nor",
+    "neither",
+    "cannot",
+    "ne",
+    "pas",
+    "jamais",
+    "nunca",
+    "jamás",
+    "jamas",
+    "dont",
+    "wont",
+    "cant",
+    "shant",
+    "wouldnt",
+    "couldnt",
+    "shouldnt",
+    "isnt",
+    "arent",
+    "wasnt",
+    "werent",
+    "doesnt",
+    "didnt",
+    "havent",
+    "hasnt",
+    "hadnt",
+    "mustnt",
+    "neednt",
+)
 # the cartel's errand
 CARTEL_HAIL_M = 4.0 * units.CABLE  # within hail of the holder: the persons taken off
 CARTEL_DAY_NM = 100.0  # a day's sail from her port, beyond which the form is doubted
@@ -614,23 +655,42 @@ def hear_parole(world: Any, hull: Any, person: Any, words: str) -> bool:
     pris = _prisoners(hull)
     if pris is None or pris.parole.get(person.name) != "asked":
         return False
-    low = " ".join(str(words).lower().replace("'", "").split())
+    read = read_parole(words)
+    if read is None:
+        return False
+    answer_parole(world, hull, person, read, "in his own words")
+    return True
+
+
+def read_parole(words: str) -> bool | None:
+    """An answer to the parole's question read: True given, False refused, None neither (the
+    question stays open). The refused forms first; an answer that holds a negation is never
+    given, and is refused by the plain no alone, unless a plain yes stands beside it un-negated
+    ("yes and no": neither); with no negation the given forms and the plain yes give it."""
+    low = " ".join(str(words).lower().replace("'", "").replace("\u2019", "").split())
     if any(w in low for w in PAROLE_REFUSED_WORDS):
-        answer_parole(world, hull, person, False, "in his own words")
+        return False
+    if _whole_words(low, PAROLE_NEGATIONS):
+        no = _whole_words(low, PAROLE_NO_WORDS)
+        return False if no and not _plain_yes(low) else None
+    if any(w in low for w in PAROLE_GIVEN_WORDS) or _whole_words(low, PAROLE_YES_WORDS):
         return True
-    if any(w in low for w in PAROLE_GIVEN_WORDS):
-        answer_parole(world, hull, person, True, "in his own words")
-        return True
-    yes, no = _whole_words(low, PAROLE_YES_WORDS), _whole_words(low, PAROLE_NO_WORDS)
-    if yes != no:
-        answer_parole(world, hull, person, yes, "in his own words")
-        return True
-    return False
+    return None
 
 
 def _whole_words(low: str, forms: tuple[str, ...]) -> bool:
     """Whether any of the forms stands in the words as whole words ('no', not 'not')."""
     return any(re.search(rf"(?<!\w){re.escape(f)}(?!\w)", low) for f in forms)
+
+
+def _plain_yes(low: str) -> bool:
+    """A plain yes that no negation follows at once ('yes and no'; never 'I do not', 'you
+    have it not')."""
+    negated = "|".join(re.escape(n) for n in PAROLE_NEGATIONS)
+    return any(
+        re.search(rf"(?<!\w){re.escape(f)}(?!\w)(?!\W+(?:{negated})(?!\w))", low)
+        for f in PAROLE_YES_WORDS
+    )
 
 
 def set_parole(world: Any, hull: Any, name: str, given: bool, by: str) -> str:
