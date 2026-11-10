@@ -24696,11 +24696,16 @@ sea by the director's forms.
 the retaking is the passage's hazard); its name is added. No recorded passage is among them,
 and none moved.
 
-**The step stands on step 6's mended tree**, which has the trunk to 65c73a6 (package 101, the
-Catalan coast; package 75's B7, the 74-gun ship). Nothing of either met this step: the prize
-courts are by the port's nation, and the block's Spanish and French ports take the rows those
-nations had. A heading of package 98's in the truths' file, which this package's truths 7-362
-to 7-368 stood under, stands once now, above 98's first truth.
+**The trunk merged at the step's measure** (one merge, at 434c33c: package 100's step 2, the
+letters that travel; this package's step 6 as the lead merged it; his briefs and records). It
+merged without a conflict. What met: 100's step 2 sends a letter ashore by the boat's errand
+in `Dealings` (the thing itself in the boat) beside this package's court's job in `_apply_job`,
+neither in the other's lines; its `people.py` and `orders.py` stand beside the court's forms
+and the record's thing; nothing of this step's was changed for it. Before it, on step 6's mended tree, the trunk to 65c73a6 had
+brought package 101 (the Catalan coast) and package 75's B7 (the 74-gun ship), which met
+nothing here: the prize courts are by the port's nation, and the block's Spanish and French
+ports take the rows those nations had. A heading of package 98's in the truths' file, which
+this package's truths 7-362 to 7-368 stood under, stands once now, above 98's first truth.
 
 ### The package whole: what moved, and the suites
 
