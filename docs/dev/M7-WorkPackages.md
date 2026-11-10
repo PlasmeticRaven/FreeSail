@@ -84,7 +84,7 @@ on these packages; that is the owner's choice.
 | 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **to run after 74 closes (the owner, 2026-11-09: "it's good to let 74 close cleanly before starting anything else major")**, the design note and the building both; **the design note approved by the owner 2026-11-10 to be written now** (a document alone, `docs/design/Design-ShipBought.md`, by an Opus sibling session on `claude/pkg-60`, session_01XooV4BEMb2fNbYpMywL2G9, launched 2026-11-10 for the lead's gate); the building still after 74 closes |
 | 101 | Opus | **The Catalan coast block** (the owner, 2026-11-10: the gap in the chart on the eastern Iberian coast): a new region of `atlantic-east` between `balearics`' north bound (40.56 N) and `gulf-of-lion`'s west bound (3.0 E), the Ebro's mouths and the Alfaques, Salou, Tarragona, Barcelona and Mataró to the coast's crossing of 3 E near Tossa; with it the ports the coast lacks, in the block and in the charted water beside it | proposed 2026-11-10, **the gap measured by the lead** (the chart probed on a tenth of a degree): nothing at all (no depth, no land, no coast, no region) north of 40.56 N and west of 2.61 E as far as the land; the Gulf's first tile column gives depth from 2.61 E to 3.0 E, which no region owns; the sea so missing is a wedge of some 80 miles north and south by 110 east and west at its foot, from the coast at 0.5 E on 40.56 N to the coast's crossing of 3 E at 41.75 N. A box of 40.56 to about 41.9 N and about 0.3 to 3.0 E is some 3.6 square degrees, the smallest of the Mediterranean's blocks (about 28 level-2 tiles, 4 to 6 MB by the others' sizes, far under the 40 MB rule); the seam's exact meridian (3.0 E or the Gulf's tile edge) the builder's first measurement by `docs/dev/ChartBlocks.md`. **No port file exists between Cartagena and Marseille on the main**: in the block Barcelona, Tarragona (with Salou's road) and the Alfaques; beside it in water already charted Rosas and Palamós (`gulf-of-lion`), Valencia's Grao and Alicante (`mediterranean-west`). **Approved by the owner 2026-11-10: all seven ports, launched at the close of package 98**; briefed 2026-11-10 (below), truths 7-490 to 7-499 |
 | 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design |
-| 103 | Opus | **The range audited** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | **proposed 2026-11-10; not approved, not briefed**; waits for the owner's word |
+| 103 | Fable (a design package) | **The range audited** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | proposed 2026-11-10; **briefed 2026-11-10 (below) at the owner's word, for Fable; HELD by the owner, not launched** ("there's enough things in flight right now to let close out, and I'll sleep on it"); when released it runs one Fable package at a time, so after 74 closes |
 
 **An open design question, recorded for the owner (2026-11-10): the day and the range.** The
 game's purpose is a world that can be simulated over a wide range of dates, 1792 to 1825 as
@@ -6691,6 +6691,77 @@ toggle; none is expected.
 
 The hard rules as every brief has them; `claude/pkg-101`, pushed after each commit; the
 lead merges by the reported hash.
+
+## Package 103: the range audited, and the lever designed (`docs/design/Design-TheRange.md` new, the package's whole product; `docs/dev/TuningNotes.md` its section with the probes' runs and the tables; scratch scenarios and scripts kept under `tools/range_audit/` only where they are worth keeping as tools; no file of the game, its data or its tests changed)
+
+Fable (the owner, 2026-11-10: "you may brief it, and for Fable, but don't launch it yet").
+**Held by the owner: not launched. Enough is in flight to let close out, and the owner sleeps
+on the question first.** It runs when the owner says, one Fable package at a time as the head
+rules have it, so after 74 closes. A design package, generously scoped as the Fable packages
+are: the intent binds, the ground is named, and the designer is trusted with the way, taking
+an item another way with its reason and saying plainly what it left.
+
+**The intent.** The game's purpose is a world that can be begun on any day of a wide range,
+1792 to 1825 as it stands and earlier and later where possible, and that then goes its own
+way. The build's attention has gathered on 1805. Decision 66 rules the principle (history is
+the starting state, not a rail; the elements are correct, their interactions the world's own
+once play begins; fidelity is a lever) and leaves open how far each element is dated and where
+fidelity is worth its cost. This package finds out what the game actually does away from
+1805, what the project's research actually covers, and puts a design before the owner. **It
+builds nothing of the game.** Read first: decision 66 in `docs/DesignProposal.md`, and the
+note "An open design question" with "The discussion so far" beside the packages table of this
+file, which hold the owner's words and the lead's thoughts; neither binds the designer beyond
+decision 66.
+
+**The ground, in four parts:**
+
+1. **The game played away from 1805.** The same rules-only scenarios begun on dates far from
+   1805: at the least a year of the first war (1793 to 1797), the peace of 1802, a year of
+   the long war after Trafalgar (1809 to 1813), and a year after 1815; in the Channel, on
+   the Spanish coast and in the Mediterranean; a King's ship, a merchantman and a privateer.
+   Played by the replay and the kept browser probe, with no model seated and no provider
+   called. A list of what reads wrong for the day (a flag, a book, a port's state, a ship
+   that did not exist, a light not yet lit, a word), what is missing, and what refuses to
+   work, each with the line that showed it. And the plainer question beside it: on a day of
+   peace, what is there to do.
+2. **The dates in the data.** Every dated row and every year written into a file, a brief or
+   the code found and classed: read against the running clock as the game goes (a rail, by
+   decision 66), read once when the game is made, or one year's picture with no date in it
+   at all. The regimes and the ports' states (79a's dated form), the nations' wars, the
+   signal books, the lights and the shores, the ship files and their fits, the people's
+   names and ranks, the prices, the almanac and the epitome among them. What a game does
+   today when its clock crosses a dated boundary, shown by running one across.
+3. **The research on file, mapped.** Everything under `docs/references/`, the sources the
+   design notes and the ships' notes cite, and the owner's shelf as the notes record it:
+   by element and by year from 1792 to 1825, what is covered, what is covered for one year
+   alone, and what is not covered at all; for each gap, where it might be filled (the hosts
+   that answered the earlier passes and those that refused are in the tuning notes) and
+   what a reasonable bridge would be where no source is likely: the owner's phrase is
+   "bridging extant gaps on a reasonable basis for our game and simulation". Searching for
+   and reading new sources is within the package; laying a new source in the tree follows
+   the references' rules (its licence read, a README row, read as data and never run).
+4. **The design note, for the owner.** From the three: (a) the layers (the elements; the
+   state on the day a game begins; what happened afterwards) drawn through the data as it
+   stands, with what belongs to each; (b) the lever as codified modes, with the owner's
+   caution answered: what a strict mode means when the player's own acts contradict the
+   record, and what each mode does when the clock crosses a recorded event; (c) the line the
+   owner asks for, between period features (the Barbary states' cruising is his example),
+   the shifting political, diplomatic and governmental realities as they bear on the game,
+   and the general features that can happen at any time by circumstance, with a rule for
+   telling them apart and the hard cases named; (d) what it would cost to hold each kind of
+   element across the range, in data and in building, so that the owner can choose where
+   fidelity is worth it; (e) a proposed order of work in packages, small first. Each part
+   ends in a recommendation and in the questions for the owner, each stated so that it can
+   be answered in a sentence. The note is written for a reader who is not a programmer.
+
+**What it is not:** it changes no dated row, moves no pin and mends nothing it finds (each
+find is listed for a package to come); it does not decide the open half of decision 66, it
+lays the ground for the owner to. **The suites:** none of the game's is needed for a
+document; if a kept tool is committed it is linted and has a test, and the fast tier is run
+whole once on that tree.
+
+The hard rules as every brief has them; `claude/pkg-103`; one report to the lead at one hash
+with the note, the lead reads it against the code and brings the owner its questions.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
