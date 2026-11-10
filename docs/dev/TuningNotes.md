@@ -24770,3 +24770,22 @@ for every day (below).
   not tested here; the guard may refuse their routes as it did the block's.
 - **The Admiralty's Mediterranean Pilot vol. I PDF's page for p. 726 is 899** (the offset
   varies through the volume: p. 618 is 745, p. 717 is 890).
+
+### The suites, as run (package 101)
+
+At `d2f0b34` (the trunk merged at `229d024` by the merge commit `95841e1`; what met, the M7
+records, the schooner's gate 5b re-pin and runs 62's and 63's figures, no file of the
+block's), in a worktree pinned there, this container, four workers. `ruff check .` and `ruff
+format --check .` clean (378 files). **The fast tier** whole (`python3 -m pytest -n 4 -q -p
+no:cacheprovider`): exit 0, 7,200 passed, 1 xfailed, 489 slow left out. An earlier fast tier at
+`9416ca2` exited 1 on one failure of this package's, `test_geo.py`'s list of the chart's
+regions without the block's (79c met the same test); mended at `d2f0b34` and the whole tier
+run again there. **The slow tier of the touched files** (`--slow -m "not pace" -n 4` on
+`test_chart.py`, `test_ports.py`, `test_tide.py`, `test_weather.py`, `test_nations.py`,
+`test_scenarios.py`, `test_known_truths.py` whole, `test_geo.py`, `test_ordnance.py`,
+`test_tackle_orders.py`, `test_log_lines.py`): exit 0, 664 passed, 8 xfailed; the recorded
+passages' tests among them, every pinned digest, line count and tick held. **The recorded
+passages by name** (`--slow -k "gate_5b or gate_5c"` on `test_known_truths.py`): exit 0, the
+one test the names select passed to its digest. **No pin moved.** **The pace**, alone and
+last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The
+tree reported differs from `d2f0b34` by this paragraph alone.
