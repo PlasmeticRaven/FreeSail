@@ -23708,3 +23708,63 @@ at 0570a02, the fast tier was exit 0 and the slow tier found one failure, the re
 example (`aboard: remove the cask of brandy`) performed on none of the forms' test seas; mended
 at 7e50d00 (`aboard: remove the sealed packet`, the packet of the near sea) and all of it
 measured again there. The tree reported differs from 7e50d00 by this paragraph alone.
+
+### Step 2: the letters that travel
+
+**Built, against the brief.** A letter that comes aboard by a carrier (the boat from the quay,
+the pilot from his cutter, a port's cutter within hail, a hull's own cutter for another hull)
+is made a thing of the world where it comes aboard (`People._letter_thing`): sealed, its words
+the letter's text, its writer the origin, its addressee "the captain" or the person the
+letter is directed to (`to_id`/`to_home` where the words name one of the people), in the
+messenger's keeping on its way (the captain's where the ship has no messenger). At the door
+(`People.tick`, `PASS_THE_WORD_S` later, as before) it is **handed to its addressee**:
+
+- **for the captain**: into his keeping, its seal broken, and read: `message.door` and
+  `message.received` ("The captain read it: ...") word for word and data for data as before;
+  `message.received` is now of the reach `reader` (`world.knowledge.REACH`), which for a line
+  naming no reader is the captain's alone, wherever he reads it, and nobody's beside him (the
+  class `person` gave it to whoever stood within earshot of the door, the letter read aloud);
+  the letter stays in his keeping, read again by the free line (`read the letter from Brest`);
+- **for one of the people aboard**: `message.aboard` says it was taken for him (*A letter from
+  Plymouth directed to Mr Harvey came aboard by the pilot cutter; Mr Jarvis took it for Mr
+  Harvey, who is on the quarterdeck.*), and at the end of the chain it is handed him sealed (*Mr
+  Jarvis brought Mr Harvey a letter from Plymouth, sealed.*, `message.door` with his name as
+  `to`, so the line is his and the place's); no `message.received`, the captain reading no
+  letter not his, and its words in no line of the log;
+- **for somebody not aboard**: given to the captain sealed to keep (*... directed to Mr Nobody,
+  sealed; it is not his to open, and he has it in his keeping.*), and not read.
+
+**Sent ashore with the boat**: `send the boat ashore with the letter to <whom>` names the
+letter (`Dealings._letter_named`: a thing with words or an addressee, within the captain's
+reach, named by the words after "with"); it goes into the boat as she goes away (the `away`
+phase), and at the quay is given into its addressee's hand where he is ashore at that port
+(`thing.handed`, of the reach `port`), else landed on the quay with whatever else lies in the
+boat by 68's road (`thing.landed`), there for whoever comes for it; today nobody of the port
+comes for it. A letter named that the captain cannot lay hands on refuses the order in words
+("... is in Mr Hale's keeping; the boat is not sent."), two refuse it as ambiguous; words that
+name no letter of the world (`send the boat ashore with a letter`) send the order's words as
+before, so every journal of before replays as it was.
+
+**The director's letter for a person**: `message: at <port> from <whom> for "<name>":
+"<words>"` and `message: by a cutter from <port> from <whom> [to <ship>] for "<name>":
+"<words>"` (the name in quotes, which no origin of the trunk's has, so that no order of before
+reads another way); without `for` it is the captain's letter as before.
+
+**The old `Message` kept**: the class stays the carrier's charge (a port's `letters`, a
+vessel's `letter`, the boat's `bringing`), with a new field `thing` (a plain class default,
+""), the letter's id once it is aboard. A checkpoint from before holding a letter in the
+messenger's hand (`People.messages`, an old `Message` and no thing) has it made a thing at the
+load (`replay._rebind` calls `People.letters_as_things` on each company), so that it is handed
+and read at the door as it would be now.
+
+**Taken another way, with the reason.** (1) A letter not yet in any hull stays the carrier's
+`Message` (a port's letters, a cutter's, the boat's bringing) and is made a thing where it comes
+aboard: no person reaches it before (today nobody ashore takes up a port's letter for the ship,
+and a cutter's is in no hull of the registry), every scenario, save and director order that
+makes one reads unchanged, and a pinned passage with a letter moves by no line. (2) The letter
+landed at the quay goes by 68's road for a thing in the boat (`_land_and_take_off`, its
+`thing.landed` line, as before for any thing) rather than a line of its own: one road for
+things. (3) Nothing pinned moved: the lines of a letter for the captain are the same words and
+data, the things made add no line, and `to_dict` of the people is unchanged.
+
+**Found for others (not mended).** None.

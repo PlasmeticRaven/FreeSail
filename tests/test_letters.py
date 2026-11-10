@@ -302,3 +302,158 @@ def test_the_new_verbs_are_free_lines_and_the_director_has_no_hands(verb):
     d = directed()
     e = d.submit(f"{verb} the packet", actor="the director")
     assert e.kind == "order.rejected" and "no hands aboard" in e.text
+
+
+# ---------------------------------------------------------------------------
+# Step 2: the letters that travel
+# ---------------------------------------------------------------------------
+
+
+def _come_aboard(w, to="captain", text="The admiral desires a return of defaulters."):
+    from freesail.world.people import Message
+
+    lines = w.people.message_aboard(Message(text, "Plymouth", to=to, carried_by="the pilot cutter"))
+    for severity, kind, words, data in lines:
+        w.record(severity, kind, words, data=data)
+    return TH.things_of(w)[-1]
+
+
+def test_a_letter_come_aboard_is_a_thing_handed_to_the_captain_and_its_words_his_alone():
+    """A letter come aboard by a carrier is a thing, sealed, with its words, its writer and
+    its addressee, in the messenger's keeping on its way aft; at the door it is the
+    captain's, opened (its seal broken) and read, the line of its reading said word for
+    word as before and shown the captain alone, whoever else is in the cabin; the letter
+    stays in his keeping, to be read again by the free line's road."""
+    from freesail.world.people import PASS_THE_WORD_S
+
+    w = world_for()
+    cap = w.people.captain
+    w.submit("go below")
+    first = w.people.find("the first lieutenant")
+    first.where = "cabin"
+    letter = _come_aboard(w)
+    messenger = w.people.messenger
+    assert (letter.name, letter.author, letter.to, letter.to_id) == (
+        "a letter from Plymouth",
+        "Plymouth",
+        "the captain",
+        cap.id,
+    )
+    assert letter.keeper == messenger.id and letter.sealed and not letter.broken
+    w.run(PASS_THE_WORD_S)
+    door = events(w, "message.door")[-1]
+    got = events(w, "message.received")[-1]
+    assert door.text == f"{messenger.name} knocked at the cabin door with a letter from Plymouth."
+    assert got.text == "The captain read it: The admiral desires a return of defaulters."
+    assert letter.keeper == cap.id and letter.broken
+    assert knowledge.reaches(w, _senses_of(w, cap), got)
+    assert not knowledge.reaches(w, _senses_of(w, first), got)  # in the cabin, and not his
+    assert knowledge.reaches(w, _senses_of(w, first), door)  # the knock he hears
+    e = w.submit("read the letter from Plymouth")
+    assert e.kind == "free.line" and e.data["moved"], e.text
+    assert "The admiral desires a return of defaulters." in events(w, "free.read")[-1].text
+
+
+def test_a_letter_for_another_is_handed_to_him_sealed_and_the_captain_reads_no_letter_not_his():
+    """A letter directed to one of the company goes to him, sealed, and the captain reads
+    it not (no line of its reading at all); a letter directed to nobody aboard is given the
+    captain to keep, sealed and unread."""
+    from freesail.world.people import PASS_THE_WORD_S
+
+    w = world_for()
+    cap = w.people.captain
+    master = w.people.find("the master")
+    for_him = _come_aboard(w, to=master.name, text="Your warrant is at the Navy Office.")
+    for_nobody = _come_aboard(w, to="Mr Nobody", text="Pay what you owe.")
+    aboard = events(w, "message.aboard")
+    assert f"took it for {master.name}, who is on the quarterdeck" in aboard[0].text
+    assert aboard[1].text.endswith("took it for the captain.")
+    w.run(PASS_THE_WORD_S)
+    assert events(w, "message.received") == []
+    door = events(w, "message.door")
+    assert door[0].text.endswith(f"brought {master.name} a letter from Plymouth, sealed.")
+    assert door[0].data["to"] == master.name
+    assert "it is not his to open, and he has it in his keeping" in door[1].text
+    assert for_him.keeper == master.id and for_him.sealed and not for_him.broken
+    assert for_nobody.keeper == cap.id and for_nobody.sealed and not for_nobody.broken
+    assert all("Your warrant" not in e.text for e in w.log)  # its words in no line at all
+
+
+def test_an_old_message_in_the_messengers_hand_is_made_a_thing_at_the_load(tmp_path):
+    """A checkpoint from before step 2 holds a letter in the messenger's hand as an old
+    `Message` and no thing; at the load it is made the thing it would be now, and it is
+    handed and read at the door as it was."""
+    from freesail.world.people import PASS_THE_WORD_S, Message
+
+    w = world_for()
+    w.people.messages.append((Message("Come to Plymouth.", "the admiral"), PASS_THE_WORD_S))
+    assert TH.things_of(w) == []
+    path = replay.write_checkpoint(w, tmp_path / "old.ckpt")
+    _, back = replay.read_checkpoint(path)
+    letter = TH.things_of(back)[-1]
+    assert letter.words == "Come to Plymouth." and letter.keeper == back.people.messenger.id
+    back.run(PASS_THE_WORD_S)
+    assert events(back, "message.received")[-1].text == "The captain read it: Come to Plymouth."
+    assert letter.keeper == back.people.captain.id and letter.broken
+
+
+def test_a_letter_sent_ashore_with_the_boat_goes_as_the_thing_and_is_landed_on_the_quay():
+    """`send the boat ashore with the letter to <whom>`: the letter itself goes in the boat
+    and is landed at the quay as any thing in the boat is, for whoever comes for it (today
+    nobody does); a letter the order names that the captain cannot lay hands on refuses the
+    order in words; the passage replays to the same log."""
+    from tests.test_known_truths import THE_RADE_INNER, _in_port
+
+    w = _in_port(THE_RADE_INNER, cargo={"purse_pounds": 200.0})
+    w.submit('write a letter to the agent at Brest: "Send the bill of lading."')
+    w.run(1200)
+    letter = TH.find(w, "the letter to the agent at Brest")[0]
+    mate = w.people.find("the mate")
+    e = w.submit(f"give the letter to {mate.name}")
+    assert e.kind == "free.line" and e.data["moved"], e.text
+    e = w.submit("send the boat ashore with the letter to the agent at Brest")
+    assert e.kind == "order.rejected", e.text
+    assert e.text.endswith(f"is in {mate.name}'s keeping; the boat is not sent.")
+    w.world_order("aboard: the letter to the agent at Brest, on the quarterdeck", "the test")
+    e = w.submit("take the letter")
+    assert e.kind == "free.line" and e.data["moved"], e.text
+    e = w.submit("send the boat ashore with the letter to the agent at Brest")
+    assert e.kind == "order.accepted", e.text
+    for _ in range(240):
+        w.run(60)
+        if not w.dealings.boat.away:
+            break
+    landed = events(w, "thing.landed")
+    assert landed and landed[-1].data["thing"] == letter.id
+    assert (letter.place, letter.port, letter.ashore_at) == ("shore", "brest", "quay")
+    back = replay.replay_world(w, ship_factory)
+    assert back.log.digest() == w.log.digest()
+
+
+def test_the_directors_letter_for_one_of_the_people_is_left_at_the_port_and_handed_him_sealed():
+    """`message: at <port> from <whom> for "<name>": "<words>"`: the director's letter for one
+    of the people, which comes off by the boat and is handed him sealed; the form without
+    `for` is the captain's letter as before."""
+    from tests.test_known_truths import THE_RADE_INNER, _in_port
+
+    w = _in_port(THE_RADE_INNER, cargo={"purse_pounds": 200.0})
+    mate = w.people.find("the mate")
+    e = w.world_order(f'message: at Brest from the agent for "{mate.name}": "Come ashore."', "t")
+    assert e.data["result"] == "done", e.text
+    (letter,) = w.dealings.ports["brest"].letters
+    assert (letter.to, letter.origin) == (mate.name, "the agent")
+    e = w.world_order('message: at Brest from the agent: "For the captain."', "t")
+    assert w.dealings.ports["brest"].letters[-1].to == "captain"
+    w.submit("send the boat ashore")
+    for _ in range(240):
+        w.run(60)
+        if len(events(w, "message.door")) == 2:
+            break
+    held = {t.words: t for t in TH.things_of(w)}
+    assert held["Come ashore."].keeper == mate.id and not held["Come ashore."].broken
+    assert (
+        held["For the captain."].keeper == w.people.captain.id and held["For the captain."].broken
+    )
+    assert [e.text for e in events(w, "message.received")] == [
+        "The captain read it: For the captain."
+    ]

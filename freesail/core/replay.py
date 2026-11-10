@@ -589,6 +589,15 @@ def _rebind(world: World, _seen: set[int] | None = None) -> None:
     if papers is not None and getattr(papers, "known_wars", None) is None:
         papers.known_wars = [dict(w) for w in nations.wars] if nations is not None else []
         papers.war_news = []
+    # the letters in a messenger's hand of a checkpoint from before package 100's step 2
+    # (an old `Message`) made things of the world at the load, as a letter come aboard is
+    companies = [getattr(world, "people", None)]
+    companies += [
+        getattr(h, "people", None) for h in (getattr(world, "hulls", None) or {}).values()
+    ]
+    for company in companies:
+        if company is not None and hasattr(company, "letters_as_things"):
+            company.letters_as_things()
     ship = world.ship
     if getattr(ship, "extra", None) is not None and "evolutions" in ship.extra:
         from freesail.api.session import rebind_hooks
