@@ -1731,6 +1731,15 @@ class Vessels:
             # and the far captures, a rule of the sea whether a set is on it or not
             lines.extend(sets.tick(world))
         if any(
+            getattr(v, "brain", None) is not None and v.brain.state == "engaging"
+            for v in self.vessels
+        ):
+            # the far rounds (package 74, step 4; spec M7 §18; the design's §4.3): one round
+            # every three minutes for each pair of far bodies in anger within gun's reach
+            from freesail.combat.far_action import minute as far_rounds
+
+            lines.extend(far_rounds(world))
+        if any(
             getattr(v, "prize", None)
             or (getattr(v, "brain", None) is not None and v.brain.state == "taking possession")
             for v in self.vessels

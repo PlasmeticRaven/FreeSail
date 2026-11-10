@@ -2206,12 +2206,32 @@ class Judgement:
         fired on him or he saw her fire under false colours, or the private signal or the
         hail made her an enemy; False when they made her a friend; None when neither."""
         sid = str(s.get("id") or "")
+        if self._prize_of_ours(sid):
+            return False
         if sid in (self.fired_on or ()) or sid in (getattr(self, "pirates", None) or ()):
             return True
         known = (getattr(self, "recognised", None) or {}).get(sid)
         if known is not None and known.get("enemy") is not None:
             return bool(known["enemy"])
         return None
+
+    def _prize_of_ours(self, sid: str) -> bool:
+        """Package 74 (the owner's play of 2026-11-09): his own prize, and any prize of his
+        nation under her captor's hands, is no enemy whatever she did before she struck (a
+        captor whom she had fired on engaged her again a minute after the possession and
+        fired into his own prize crew). A prize retaken or given back is judged as any
+        sail again."""
+        if not sid:
+            return False
+        from freesail.world import signalling
+        from freesail.world.prizes import record_of
+
+        sea = getattr(self.world, "vessels", None)
+        v = sea.get(sid) if sea is not None else None
+        rec = record_of(v) if v is not None else None
+        if not rec or rec.get("retaken") or rec.get("restored"):
+            return False
+        return str(rec.get("captor_nation") or "") == signalling._own_nation(self)
 
     def _friend_sure(self, s: dict[str, Any]) -> bool:
         from freesail.world import signalling

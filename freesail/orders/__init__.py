@@ -75,17 +75,20 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
             # world order to the scenario, though it wears the captain channel's form (the
             # collision found by package 85's reading: refused at the prompt as the
             # director's)
+            _refuse_a_captive(ship)
             return _carry_on(ship)
         # a world order at the captain's prompt (spec M5 §26, truth 71; package 36): the
         # channel is the scenario's and the director's, never the captain's grammar's;
         # refused in the vocabulary's words
         raise OrderError(load_vocabulary().world_order_refusal or world_channel.REFUSAL)
     if standing.recognises(text):
+        _refuse_a_captive(ship)
         return standing.handle(ship, text)
     book = standing.bare_book_sentence(ship, text)
     if book is not None:
         # `belay "blind lead"`: a standing order by its name, without the words
         # 'standing order' (package 33c)
+        _refuse_a_captive(ship)
         return standing.handle(ship, book)
     from freesail.orders import signals as signal_orders
 
@@ -95,19 +98,27 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         # ship (spec M7 §1 to §5; package 71): read by their words before the stations,
         # since `hail the brig` is a hail across the water and `hail <words>` the lookout's;
         # given from the deck as the deck's other orders are (package 98, step 6: the
-        # owner's ruling of 2026-11-09), refused below and ashore in their words
+        # owner's ruling of 2026-11-09), refused below and ashore in their words, and to
+        # a captive in his (package 74: the place's check names his state first)
         from freesail.world import movement
 
         movement.check(ship, signal_verb, movement.SIGNALS)
         return signal_orders.handle(ship, text)
-    if stations.recognises(text, ship):
+    station_verb = stations.recognises(text, ship)
+    if station_verb:
         # a sentence to an agent's station (spec M4 §12): `ask the watcher ...`, `stand
-        # down the watcher`, `resume the watcher`, `show the watcher's journal`
+        # down the watcher`, `resume the watcher`, `show the watcher's journal`; a captive
+        # speaks, asks and tells, and gives no deck away nor stands a station down
+        from freesail.world.movement import CAPTIVE_STATION_VERBS
+
+        if station_verb not in CAPTIVE_STATION_VERBS:
+            _refuse_a_captive(ship)
         return stations.handle(ship, text)
     from freesail.world import books
 
     if books.recognises(text):
         # a book drafted, posted, given to the boat or read (spec M7b §16; package 53)
+        _refuse_a_captive(ship)
         return books.handle(ship, text)
     vocab = load_vocabulary()
     refused = vocab.refused(text)
@@ -436,6 +447,18 @@ def _group_evolution(
         "failed": failed,
     }
     return "evolution.started", text, data
+
+
+def _refuse_a_captive(ship: Any) -> None:
+    """The captive's refusal for an order read before the vocabulary's (package 74; the
+    owner's play of 2026-11-09: a prisoner's 'hail her' was made from his captor's deck):
+    a hail, a signal, the colours, a standing order, a book, a station stood down or the
+    deck given, `captain: carry on`. Nothing for a free man."""
+    from freesail.world.movement import captive_at_prompt
+
+    said = captive_at_prompt(ship)
+    if said:
+        raise OrderError(said)
 
 
 def _carry_on(ship: Any) -> tuple[str, str, dict[str, Any]]:

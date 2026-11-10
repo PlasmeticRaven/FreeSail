@@ -1228,3 +1228,48 @@ chart's and the planner's, noted for the lead); the far brain dropped its mark o
 prompt's alone); a far vessel whose plan runs out is gone from the sea at the minute's end, so the
 cartel's minute keeps her until her persons are landed. The figures and the pins are in
 `docs/dev/TuningNotes.md`, "Package 74", step 3.
+
+**The step's mends from the owner's play (2026-11-09, landed with step 4).** Five defects found
+by the lead's replay of the owner's strike save, each reproduced in the step's scene, mended and
+tested: (1) a captive's words were taken for the player's hand on his captor's captain, who
+stood aside and left her with nobody commanding (the hand is one of her own free company's
+alone: `movement.hand_on_her`); (2) a captor she had fired on before she struck engaged his own
+prize a minute after the possession (his own prize, and any of his nation's, is no enemy:
+`Judgement._prize_of_ours`; the taking clears her from what he knew her an enemy by); (3) a bare
+yes or no to the open question was not read (read now as whole words, §3.2's list beside); (4) a
+prisoner's hail was made from his captor's deck (§3.1 said "his orders of any deck refused"; the
+orders read before the vocabulary's were not: a captive's prompt performs a word said, asked or
+told, a reading, his moves within his parole, his needs and a free line, and nothing else), and
+a prize's answer to a hail named whoever stood at the hailing prompt (her captor's ship and her
+prize master now, from her record); (5) his going ashore met the free man's refusal (his own
+words now). The measures old beside new are in the notes, "Step 3's mends from the owner's play".
+
+### Step 4: the far fight on the sleeping hulls (§4; 2026-11-07)
+
+**Built as designed**: §4.2 to §4.6 (`combat/far_action.py`: the far engaging by the role
+files' rows, one round of `far.round_once` every three minutes for a pair in anger within gun's
+reach, each side's record carried in and written back, the draws from the World's `far` stream
+opened at the first round; the strike by morale as the cut-out writes it and the far possession
+after; the guns heard at the player's ship within twelve miles, the flashes to fifteen by night;
+the far ship's reply to an awake hull as the fallback where the cap has no room; the engagement
+first among the cap's reasons; the toggle `ENABLED`; the far record into the parts at `make_hull`
+and `_to_full`); truths 7-358 to 7-361 and 7-369; the primer's chapter 27 "An action off the
+horizon". **Taken another way**: the flashes' fifteen miles by night are a judgement (§4.4 gave
+the guns' twelve alone); the agreement (§4.6) is pinned as found and not tuned: the near fight of
+7-140's two cutters at a cable ends thirty-five seconds after the first shot where the design
+measured three minutes from a docstring's band, and the far rounds of the same pair end in two
+rounds (six minutes), within two rounds and not one, the far fight unable to end before its first
+round at 180 s and the coarser by design (rule 5). **Found on the way**: the far brain forgot its
+mark on entering `engaging` as it had on `taking possession`; the schooner's and the lugger's files
+give no armament (75's), so the packet's cut-out is a cutter's against a brig-sloop privateer; the
+"merchant brig" of the brig's one file carried the brig-sloop's eighteen guns (75's; mended by its
+SW-4, merged at step 2's boundary: her own file, sixteen men and four long 6s). The figures, the pins moved by the wiring measured with the toggle (the passages 7-152,
+7-153, 7-154, 7-159, 7-160) and `FALLBACK_COUNT` are in `docs/dev/TuningNotes.md`, "Package 74",
+step 4.
+
+**The pace mended at the resumption (2026-11-09).** The far fight read each side's ship file
+from disk at every minute of a far brain (`has_guns`) and again at every round (`far_ship_of`),
+which took truth 7-159 under its floor (175 ticks a second against 500) and would have taken
+7-361 under its own had it ever run: it stood on a world with no place on the chart. The file's
+figures are read once a file and fit (`far.file_figures`); 7-361 stands on the frigate of the
+brains' sea. No figure of the fight moved; the toggle's measures are in the notes, step 4.

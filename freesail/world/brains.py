@@ -457,7 +457,13 @@ class FarCaptain(Judgement):
             self._business["since"] = self.world.clock.tick
         # the mark in hand is kept through the detour states (package 74: `taking possession`
         # keeps the struck mark he closes; it is dropped when he leaves them for a plan state)
-        detours = ("investigating a stranger", "chasing", "evading", "taking possession")
+        detours = (
+            "investigating a stranger",
+            "chasing",
+            "evading",
+            "engaging",
+            "taking possession",
+        )
         if old in detours and state not in detours:
             self._stranger = None
 
@@ -521,11 +527,14 @@ class FarCaptain(Judgement):
         return bool(nations is not None and nations.at_war(str(nation), self.vessel.nation))
 
     def _enemy_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
-        # the far body never takes the engaging transition (package 70): the far fight is
-        # 74's, and a far ship that lay to in "engaging" with no battery would neither fight
-        # nor close to hail; she chases and speaks as M6 had her (`combat/far.py` is the
-        # measure of the far fight, run apart)
-        return None
+        # the far body takes the engaging transition (package 74, step 4; the design's §4.2:
+        # before it the far fight was 70's measure run apart, and a far ship never engaged):
+        # the same shape as the near captain's, for a ship with guns to fire
+        from freesail.combat.far_action import ENABLED, has_guns
+
+        if not ENABLED or not has_guns(self.vessel):
+            return None
+        return super()._enemy_within(p, within_nm)
 
     def _stranger_struck(self, s: dict[str, Any]) -> bool:
         v = self.world.vessels.get(str(s.get("id") or ""))
@@ -1038,7 +1047,14 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
     elif state in ("at anchor", "in port"):
         if not vessel.plan or vessel.plan[0][0] != "anchor":
             vessel.plan = [("anchor", "")]
-    elif state in ("in distress", "engaging", "struck"):
+    elif state == "engaging":
+        # package 74, step 4 (the design's §4.2): a chase leg to the mark at the doctrine's
+        # engaging range (the nation's habit over the file), kept once reached; the rounds
+        # are `combat/far_action.py`'s once a minute
+        from freesail.combat.far_action import engage_range_m
+
+        vessel.plan = [("chase", brain._stranger, engage_range_m(brain))]
+    elif state in ("in distress", "struck"):
         vessel.plan = [("lie_to", math.inf)]
     vessel.tack = 0.0
     vessel.state = state
