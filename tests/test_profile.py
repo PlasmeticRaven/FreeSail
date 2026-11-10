@@ -503,7 +503,7 @@ MODULE_FILES = {
     "ships.indefatigable": ["razee-44.yaml", "sixty-four.yaml"],
     "ships.neufchatel": ["hermaphrodite-brig.yaml"],
     "ships.bilander": ["bilander.yaml"],
-    "ships.bellerophon": [],
+    "ships.bellerophon": ["seventy-four.yaml"],
 }
 
 
