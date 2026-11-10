@@ -117,6 +117,8 @@ and 51's chart briefed with them or carried to milestone 8. The limit that sets 
 about an hour before it merges, one at a time, so five builders reporting already make a
 queue.
 
+**The order approved (the owner, 2026-11-10, about 23:20 UTC):** "The continuation order may be as you currently hold it from your proposal." The order above stands as the owner's; each launch still takes his word, asked for when its trigger comes. With it, on the lead's check-ins: every 50 minutes while anything is in flight or to be launched (they are the cheaper way, the owner's reckoning), held only when nothing is; and on usage: not the lead's worry before the reset of Thursday 2026-11-12.
+
 **An open design question, recorded for the owner (2026-11-10): the day and the range.** The
 game's purpose is a world that can be simulated over a wide range of dates, 1792 to 1825 as
 it stands, and earlier and later where possible; the build's attention has gathered on 1805
