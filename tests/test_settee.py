@@ -13,9 +13,12 @@ the wind is past the stern (D46(d) rule 4 as reworded, Ext §5.6); hove to her m
 the mast by her file's `heave_to_aback` (D4(a)), the settee kept with its sheet eased by the
 engine's driver rule, which the lead's ruling on Ext §14 item 3 holds for it unless the figures
 say otherwise (Ext §5.7; the figures both ways in docs/dev/TuningNotes.md, "The settee in the
-engine"). In the gale it is one of her courses (E15): reefed with the topsails' second reef,
-taken in with their third. Its sheet's block is a fathom abaft its clew by its own corners (Ext
-§5.9; the lead's ruling on the bilander's §17 lead item 4).
+engine"); forced round so through the wind and filled away, a settee left on her weather side is
+dipped first, as she lies (B3.3b, the bilander's design §17 lead item 8), her tack read for it from
+the wind at the first tick, and belayed meanwhile it is said to be left on deck (B3.3b's review). In
+the gale it is one of her courses (E15): reefed with the topsails' second reef, taken in with their
+third. Its sheet's block is a fathom abaft its clew by its own corners (Ext §5.9; the lead's ruling
+on the bilander's §17 lead item 4).
 
 None of the committed files carries a settee (`tests/test_rig_classing.py`, the probe), so the
 tests run on the fixture `brig_with_settee()` (`tests/rig_fixtures.py`, stage 0E): `brig.yaml`
@@ -865,6 +868,200 @@ def test_filling_away_draws_the_settee_kept_hove_to_and_loosing_to_dry_hangs_it_
     world.run(300)
     assert any(e.kind == "sail.loosed" for e in _after(world, start))
     assert settee.state is SailState.LOOSED and not settee.yard_lowered
+
+
+DIP_AT_FILL_AWAY = (
+    "Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the "
+    "weather bow."
+)
+HAULED_AFT = "Hauled aft the head sheets; kept the helm a-lee to let her fall off."
+
+
+def _shift_the_wind(world, points: float) -> None:
+    """The wind shifted `points` at a stroke, as `tests/test_lying_to.py` forces a ship round
+    hove to (a squall's front: the one way to do it in a test)."""
+    wind = world.wind
+    wind.follow(units.wrap_2pi(wind.base_direction + points * units.POINT), wind.base_speed)
+    world.scenario.wind_from_deg = math.degrees(wind.base_direction)
+
+
+FILL_CASES = {
+    # case: the deck's reading of the wind, the settee's side, her head (degrees; the true wind
+    # from the north), whether it is dipped, and to which side
+    "on her lee": (-CLOSE, "larboard", 300.0, None),
+    "on her weather side": (-CLOSE, "starboard", 300.0, "larboard"),
+    "the deck's reading behind, on her lee": (CLOSE, "larboard", 300.0, None),
+    "the deck's reading behind, on her weather side": (CLOSE, "starboard", 300.0, "larboard"),
+    "head to the wind at the first tick": (CLOSE, "starboard", 2.0, "larboard"),
+}
+
+
+@pytest.mark.parametrize("case", list(FILL_CASES))
+def test_at_fill_away_a_settee_on_her_weather_side_is_dipped_first_as_she_lies(case):
+    """B3.3b (Ext §5.7; B4's review on her file), with its review's mend: the script's own turn on
+    the bare fixture, the true wind (from the north) on her starboard bow, 60 degrees. At "fill
+    away" with a settee set nothing is done till the first tick, which reads the tack she is on
+    from the wind itself, as the fill away reads it, and not from the deck's reading, which lags
+    a ship just come round (counted meanwhile by the deck's: the dip's 120 s if the deck has the
+    settee on her weather side). A settee on her weather side by the wind (starboard, as a forced
+    round leaves it) is then lowered, before she is let fall off: the fill away holds it and
+    counts it in its estimate, and her hands tend her as she lies (`tend_lying_to`); when its
+    time is done (120 ticks at a factor of one) it is hoisted on her lee with its sheet drawn for
+    the wind she will have full and by, as the tack hoists it, and she is let fall off with the
+    head sheets hauled aft once, its trim kept. One on her lee by the wind is left drawing and
+    she is let fall off at once, braced full as she lies 60 degrees off; the script then carries
+    no change, its fields as before the guard. Before the mend, read at the order from the deck's
+    reading behind her, the one on her lee was lowered and hoisted again on the side it hung on,
+    120 s lost, and the one on her weather side was found only at the first tick, after "Hauled
+    aft the head sheets" had been said, and that line said again at the hoist (the review's
+    finding). Within half a point of the wind at the first tick the deck's reading stands: with
+    the settee on its lee she is let fall off, and once her head is off the wind on the other
+    tack the settee is found on that tack's weather side and dipped, and she is let fall off
+    again when it is up, each said."""
+    awa, side, head, dipped_to = FILL_CASES[case]
+    ship = _under_plain_sail(brig_with_settee())
+    _bare(ship, awa)
+    ship.dyn.heading = math.radians(head)
+    settee = ship.sails[SETTEE]
+    settee.lug_side = side
+    ship.extra["hove_to"] = {"yards": [], "sign": 1.0}
+    fill = scripts.FillAwayScript(ship, {}, EVOLUTIONS["fill_away"].timing)
+    assert fill.check({}) is None
+    fill.begin({})
+    timing = EVOLUTIONS["fill_away"].timing
+    after_s = timing["fall_off_timeout_s"] + timing["brace_s"]
+    deck_lee = "larboard" if ship.dyn.tack == "starboard" else "starboard"
+    by_the_deck = side != deck_lee  # on her weather side as the deck reads the wind
+    assert ship.drain_notes() == [] and fill.phase == "ready" and fill.wind_to_read
+    assert settee.is_set and not settee.yard_lowered and SETTEE not in fill.holds()
+    assert fill.remaining_s() == pytest.approx(after_s + scripts.SETTEE_DIP_S * by_the_deck)
+    fill.tick(1.0, LIGHT_AIRS, 1.0)
+    texts = [n[2] for n in ship.drain_notes()]
+    assert "wind_to_read" not in vars(fill)  # read: the field gone again
+    if case == "head to the wind at the first tick":  # the deck's reading stands
+        assert fill.phase == "fall_off" and texts == [HAULED_AFT] and fill.sign == -1.0
+        assert "settee_change" not in vars(fill)
+        ship.dyn.heading = math.radians(300.0)  # her head off the wind, the starboard tack's
+        fill.tick(1.0, LIGHT_AIRS, 1.0)
+        texts = [n[2] for n in ship.drain_notes()]
+    if dipped_to is None:  # left as it is: she falls off at once
+        assert fill.phase in ("fall_off", "brace_full") and texts[0] == HAULED_AFT
+        assert DIP_AT_FILL_AWAY not in texts and fill.sign == 1.0
+        assert "settee_change" not in vars(fill) and "lying" not in vars(fill)
+        assert settee.is_set and not settee.yard_lowered and SETTEE not in fill.holds()
+        assert settee.lug_side == side
+        return
+    change = fill.settee_change
+    assert change is not None and change.ids == [SETTEE] and not change.done
+    assert change.side == dipped_to and fill.sign == 1.0  # the starboard tack, by the wind
+    assert fill.phase == "dip_settee" and texts == [DIP_AT_FILL_AWAY]
+    assert settee.yard_lowered and settee.state is SailState.IN_THE_GEAR
+    assert SETTEE in fill.holds()
+    begun = case != "head to the wind at the first tick"  # its first tick done with the order's
+    assert fill.remaining_s() == pytest.approx(scripts.SETTEE_DIP_S - begun + after_s)
+    ticks = int(begun)
+    while fill.phase == "dip_settee" and ticks < 400:
+        fill.tick(1.0, LIGHT_AIRS, 1.0)
+        ticks += 1
+    assert ticks == 120 and change.done and fill.sign == 1.0
+    assert [n[2] for n in ship.drain_notes()] == [
+        "Dipped the mainsail; hoisted on the larboard side, to leeward of the mast.",
+        HAULED_AFT,
+    ]
+    assert fill.phase == "fall_off" and SETTEE not in fill.holds()
+    assert settee.is_set and settee.lug_side == "larboard" and not settee.yard_lowered
+    geo = yard_trim.sheet_geometry(ship, settee)
+    full_and_by = scripts.full_and_by_apparent(ship, LIGHT_AIRS, 0.0)
+    trimmed = max(geo.floor, min(geo.ceiling, yard_trim.wanted_sheet_angle("lug", full_and_by)))
+    assert yard_trim.read_sheet(ship, settee).angle == pytest.approx(trimmed, abs=1e-6)
+
+
+def test_forced_round_hove_to_the_kept_settee_is_dipped_first_and_she_fills_away(tmp_path):
+    """B3.3b (Ext §5.7; the bilander's design §17 lead item 8, the lead's answer: a follow-up B3
+    step keyed on `settee` alone, B4's review having found the need on her file). Hove to on the
+    starboard tack with the settee kept by the driver rule, its yard on the larboard side, her
+    lee; a shift of eight points forces her round onto the larboard tack, and `_judge_lying_to`
+    changes her tack and her yards, not its side: its yard is on her weather side, against its
+    mast. "Fill away" dips it first, as she lies: lowered at the order, hoisted on the starboard
+    side when its time is done, and then she is let fall off and filled away, each said. Seed 7,
+    15 kn, from a settle of 1,200 s: forced round 20 s after the shift, the order 40 s after that;
+    the dip's words at +1 s, its yard on deck to +156 s, she lying 69-98 degrees off meanwhile
+    (as she lies with it clewed up, D4(a)); hoisted and "Hauled aft the head sheets" at +157 s,
+    "Filled away on the larboard tack" at +217 s; at +600 s it draws whole, as at the settle, at
+    4.26 kn. Before the guard she was filled away at +59 s with it drawing against its mast to the
+    end, two-thirds of it (57.2 of 86.0 m2), at 3.38 kn, and no line said so."""
+    world = _world(tmp_path, settle_s=1200)
+    settee = world.ship.sails[SETTEE]
+    whole = settee.area_effective_m2  # as it draws clear of its mast at the settle
+    world.submit("heave to")
+    world.run(600)
+    assert world.ship.extra["hove_to"]["sign"] == 1.0
+    assert settee.is_set and settee.lug_side == "larboard"
+    start = world.clock.tick
+    _shift_the_wind(world, -8.0)
+    world.run(60)
+    (forced,) = [e for e in _after(world, start) if e.kind == "ship.forced_round"]
+    assert "lies on the larboard tack" in forced.text
+    assert world.ship.extra["hove_to"]["sign"] == -1.0
+    lies = yard_trim.read_sheet(world.ship, settee).side
+    assert settee.lug_side == "larboard" and lies == 1 and P.against_the_mast(settee, lies)
+    start = world.clock.tick
+    assert world.submit("fill away").kind == "order.accepted"
+    lowered = []
+    for _ in range(600):
+        world.tick()
+        lowered.append(settee.yard_lowered)
+    texts = [e.text for e in _after(world, start)]
+    hoisted = "Dipped the mainsail; hoisted on the starboard side, to leeward of the mast."
+    assert DIP_AT_FILL_AWAY in texts and hoisted in texts, texts
+    assert _first_tick(world, start, DIP_AT_FILL_AWAY) == 1
+    up = _first_tick(world, start, hoisted)
+    assert abs(up - 157) <= 10 and _first_tick(world, start, HAULED_AFT) == up  # then falls off
+    assert all(lowered[: up - 1]) and not any(lowered[up - 1 :])  # on deck till the hoist
+    filled = [e for e in _after(world, start) if e.kind == "ship.filled_away"]
+    assert len(filled) == 1 and filled[0].text.startswith("Filled away on the larboard tack")
+    assert up < filled[0].tick - start <= up + 90
+    assert not [e for e in _after(world, start) if e.kind in ("ship.aback", "ship.filled")]
+    assert "hove_to" not in world.ship.extra and world.ship.dyn.tack == "larboard"
+    lies = yard_trim.read_sheet(world.ship, settee).side
+    assert settee.is_set and settee.lug_side == "starboard" and not settee.yard_lowered
+    assert lies == 1 and not P.against_the_mast(settee, lies)
+    assert settee.area_effective_m2 == pytest.approx(whole, rel=0.01)
+
+
+def test_belayed_while_the_settee_is_dipped_the_words_say_it_is_left_on_deck(tmp_path):
+    """B3.3b's review (should-fix): "fill away" belayed while the settee is being dipped. The
+    runner's words named the script's phase, "... left as they stand at dip settee", and did not
+    say the settee was left lowered on deck; the fill away's own words now do (`left_words`), the
+    sail by its name, as the log names it. Seed 7, 15 kn, the fixture forced round as in the test
+    above, "fill away", and "belay that" 30 s after: the settee left in its gear on deck on its old
+    side, nothing of the fill away in hand; "set the mainsail" hoists it again, the captain's."""
+    world = _world(tmp_path, settle_s=1200)
+    settee = world.ship.sails[SETTEE]
+    world.submit("heave to")
+    world.run(600)
+    _shift_the_wind(world, -8.0)
+    world.run(60)
+    assert world.ship.extra["hove_to"]["sign"] == -1.0 and settee.lug_side == "larboard"
+    start = world.clock.tick
+    assert world.submit("fill away").kind == "order.accepted"
+    world.run(30)
+    assert _first_tick(world, start, DIP_AT_FILL_AWAY) == 1 and settee.yard_lowered
+    reply = world.submit("belay that")
+    assert reply.kind == "work.belayed"
+    assert reply.text == (
+        "Belayed filling away; the helm and the yards left as they stand; the mainsail lowered "
+        "on deck, not yet dipped."
+    )
+    assert settee.state is SailState.IN_THE_GEAR and settee.yard_lowered
+    assert settee.lug_side == "larboard"
+    runner = world.ship.extra["evolutions"]
+    assert not [i for i in runner.instances if i.evo.id == "fill_away"]
+    assert world.submit("set the mainsail").kind == "order.accepted"
+    world.run(300)
+    lies = yard_trim.read_sheet(world.ship, settee).side
+    assert settee.is_set and not settee.yard_lowered and world.ship.dyn.tack == "larboard"
+    assert settee.lug_side == "starboard" and not P.against_the_mast(settee, lies)
 
 
 # The lugger's tack and wear at seed 7 from B3.4's settle (15 kn, 292.5 degrees): every line but

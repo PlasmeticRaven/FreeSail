@@ -721,7 +721,7 @@ HULL_FIGURES = {
     "draught_m": round(10.36 * FT, 2),
     "displacement_kg": 288000.0,
     "gm_m": 2.1,
-    "clr_x_m": 0.1,
+    "clr_x_m": -0.6,
     "lateral_area_m2": 102.0,
     "hull_speed_kn": 12.9,
     "deck_height_m": DATUM_M,
@@ -750,10 +750,12 @@ HULL_NOTES = {
     "2.0-2.2 (Neuf-D §9): no account gives her heel (docs/dev/TuningNotes.md).",
     "clr_x_m": "Tuned against the helm (Neuf-D §9; docs/dev/TuningNotes.md, old beside new), so "
     "that she carries a little weather helm close-hauled in 15 kn and a little with the wind "
-    "abeam, as near the topsail schooner's tuning as her rig allows (judgement): ahead of the "
-    "geometric centre of the plane the file counts, -0.80 m without the rudder (measured, Neuf "
-    "§2.6), by 0.9 m, a little short of the topsail schooner's lead of 3.5% of her waterline, "
-    "+0.3 to start, which gave her nearly two degrees of weather helm close-hauled.",
+    "abeam (judgement): ahead of the geometric centre of the plane the file counts, -0.80 m "
+    "without the rudder (measured, Neuf §2.6), by 0.2 m. Her helm falls from close-hauled to the "
+    "beam, so that with her fore staysail the 46 m2 that fits forward of her fore mast no single "
+    "figure holds both of the helm's bands as first set: each band is widened by 0.2 degrees and "
+    "the centre re-tuned to this figure (the owner's ruling for the lead, 2026-11-08). +0.3 to "
+    "start; +0.1 before the fore staysail was corrected from its working 93 m2.",
     "lateral_area_m2": "1,100 sq ft to the false keel's bottom, keel, gripe and post counted and "
     "the rudder not (measured, +-5%: Neuf §2.6; D29 (b)); 97 m2 on the faint line and 105 with "
     "the rudder.",

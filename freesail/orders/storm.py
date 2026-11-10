@@ -403,12 +403,13 @@ def _after_sail_lines(ship: Ship) -> list[str]:
     (the polacre probe's main course, which is her mainsail, among them). A course with no
     reef bands is not named, as before the ruling.
 
-    Beside ruling 4 (the lead's ruling of 2026-11-07, package 75's B2b): a boomless gaff sail
-    on a mast that crosses a course (`gaff_sails_beside_a_course`, the *Neufchatel*'s fore gaff
-    sail abaft her fore course, hers alone of the files) is taken in with the topsails' second
-    reef, as she took hers in when it made bad weather lying to in the gale of December 1814
-    (Cobb 1841 p. 79); her mainsail is kept whole as before."""
-    from freesail.evolutions.scripts import after_gaff_sails, gaff_sails_beside_a_course
+    Beside ruling 4: a boomless gaff sail on a mast that crosses a course (the *Neufchatel*'s
+    fore gaff sail abaft her fore course, `scripts.gaff_sails_beside_a_course`) is not named by
+    this list at any reef; she hands it when she lies a-try (`LieATryScript`), as Cobb has her
+    take it in (1841 p. 79). The owner's ruling for the lead of 2026-11-08 (package 75, B2c):
+    B2b had it taken in with the topsails' second reef, and the rigs in memory with one griped up
+    with the helm hard over once the jib was in, as she did."""
+    from freesail.evolutions.scripts import after_gaff_sails
     from freesail.physics.sails import _square_rigged
 
     square = _square_rigged(ship)
@@ -434,9 +435,6 @@ def _after_sail_lines(ship: Ship) -> list[str]:
         for sl in courses:
             if sl.reefs < sl.reef_bands:
                 lines.append(f"reef the {_name(ship, sl)}, one reef")
-        for sl in gaff_sails_beside_a_course(ship):
-            if sl.is_set:
-                lines.append(f"take in the {_name(ship, sl)}")
     if reefs >= 3 and square:
         for sl in after_gaff_sails(ship):
             if sl.is_set:

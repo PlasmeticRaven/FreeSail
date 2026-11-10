@@ -1153,16 +1153,17 @@ def test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_
     prizes off the Lizard) reads back to itself and loads with no fit named; she sails it at seed 7
     under her rules captain by the privateer's book with her default fit, a British brig-sloop in
     sight under a cruiser's, and no order of hers refused; saved at half an hour and loaded from
-    the checkpoint, she carries on as the world that was never saved. Measured: an hour in, 6.19
-    kn in ten knots of wind, her captain a privateer investigating the stranger, as before (old
-    beside new: 6.02 kn with her fore staysail the working 93 m2, before package 75's B2b
+    the checkpoint, she carries on as the world that was never saved. Measured: an hour in, 6.22
+    kn in ten knots of wind, her captain a privateer investigating the stranger, as before, at
+    `clr_x_m` -0.6 (the owner's ruling for the lead of 2026-11-08, B2c; old beside new: 6.19 at
+    +0.1 before it; 6.02 kn with her fore staysail the working 93 m2, before package 75's B2b
     corrected it to the triangle that fits forward of the fore mast, 46; before the jib's mend of
     the reviews of 2026-11-07, 6.11 at her start's `clr_x_m` +0.3 and 5.95 at step 5's +2.0). The
     hour is all it asks: run on, she stands on to the north while she investigates and takes the
-    ground at 4,251 s in a fathom and a half (with the 93 m2, on the Stags at 3,911 s, the
-    lookout's warning at 3,300 s not acted on), since the captain's danger-ahead states leave out
-    "investigating a stranger" (world/captains.py; the rules captain's, for the lead's list, not
-    mended: the lead's ruling (3)(c) of 2026-11-07)."""
+    ground at 4,266 s in a fathom and a half (4,251 s at +0.1; with the 93 m2, on the Stags at
+    3,911 s, the lookout's warning at 3,300 s not acted on), since the captain's danger-ahead
+    states leave out "investigating a stranger" (world/captains.py; the rules captain's, for the
+    lead's list, not mended: the lead's ruling (3)(c) of 2026-11-07)."""
     from freesail.api.session import ship_factory
     from freesail.core import replay as replay_mod
     from freesail.world.scenarios import (
@@ -1208,7 +1209,7 @@ def test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_
     saved = replay_mod.save_to_file(world, tmp_path / "hers.json")
     world.run(1800)
     assert not [e for e in world.log if e.kind == "order.rejected"]
-    assert units.ms_to_knots(world.ship.dyn.speed) == pytest.approx(6.19, abs=0.5)
+    assert units.ms_to_knots(world.ship.dyn.speed) == pytest.approx(6.22, abs=0.5)
     loaded, how = replay_mod.load(saved, ship_factory)
     assert how == "checkpoint" and loaded.ship.fit == FIT
     loaded.run(1800)
@@ -1261,7 +1262,9 @@ def test_her_polar_is_drawn_from_her_file_and_agrees_with_her_sailed_beam_reach(
     docs/dev/TuningNotes.md):
     `hull_speed_kn` 12.9 kept, her best in 25 kn inside her accounts' band at every hull speed of
     12.5-13.9 (12.09 to 12.67 kn, measured before the jib's mend); `gm_m` 2.1 kept (no account
-    gives her heel); `clr_x_m`, tuned for her helm (+0.3 to +0.1), is not read by the polar.
+    gives her heel); `clr_x_m`, tuned for her helm (+0.3 to -0.6), is not read by the polar (at
+    B2c's re-tune, +0.1 to -0.6, every cell of her polar the same to the last bit; her sailed
+    beam reach 8.29 kn as before).
     Beside her, by the same arithmetic: the frigate-36 4.62, 8.19 and 11.63 kn at her best (90, 90
     and 100 degrees), the brig-sloop 4.57, 7.92 and 10.97 (100 degrees), the topsail schooner
     4.59, 7.92 and 10.95 (100, 90, 90). Her closest angle, 40 degrees, the schooners', inside the
@@ -1320,65 +1323,56 @@ def test_truth_7_193_her_polars_best_point_from_her_accounts():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason=(
-        "A recorded departure: her fore staysail at 46 m2, the triangle that fits forward of the "
-        "fore mast, gives her +3.95 deg of weather helm close-hauled at clr_x_m +0.1, outside "
-        "step 5's band; no lead now holds both of step 5's bands, and the re-tune is the lead's "
-        "(docs/dev/TuningNotes.md, 'Her ruled fixes (B2b, 2026-11-08)')."
-    ),
-)
 def test_her_helm_as_tuned_is_balanced_close_hauled():
     """Step 5's close-hauled band (Neuf-D §9's knob, `clr_x_m`, tuned with her rig whole in the
     topsail schooner's way: "at +0.5 m she is balanced close-hauled in 15 kn";
     docs/dev/TuningNotes.md, old beside new), measured at seed 7 in fifteen knots under plain
     sail, the yards and sheets trimmed, 60 degrees off (her `beat_deg`; the topsail schooner's
-    -0.04): -1.0 to +1.5 degrees of weather helm. **Known to fail since B2b** (strict, so that a
-    re-tune which brings her into the band says so): at **+0.1 m**, with her fore staysail the
-    triangle that fits forward of the fore mast, 46 m2 (the lead's ruling of 2026-11-07, package
-    75's B2b), she carries +3.95 degrees close-hauled, +4.30 at six points and +2.81 at seven;
-    +5.09 at 60 degrees in 25 kn. Old beside new, with the working 93 m2: +1.11, +2.11 and +1.49;
-    +1.75 in 25 kn, inside the band. The 47 m2 taken from forward of her mast gives her the weather
-    helm; her helm falls from close-hauled to the beam where the schooner's rises, so that no lead
-    now holds both of step 5's bands (her lead swept with the new staysail: -0.3 m gives +2.66
+    -0.04): **-1.0 to +1.7 degrees** of weather helm, step 5's -1.0 to +1.5 widened by 0.2
+    degrees by the owner's ruling for the lead of 2026-11-08 ("Re-tune, widen bands 0.2
+    degrees"; package 75, B2c). The reason: her fore staysail corrected to the 46 m2 that fits
+    forward of her fore mast (the lead's ruling of 2026-11-07, B2b) gives her the weather helm
+    close-hauled, and her helm falls from close-hauled to the beam where the schooner's rises, so
+    that no single lead holds both of step 5's bands (swept at B2b: -0.3 m gives +2.66
     close-hauled and +0.92 abeam, -0.6 +1.65 and +0.39, -0.9 +0.60 and -0.17, -1.2 -0.50 and
-    -0.75): the lead is kept as tuned and its re-tuning is the lead's (docs/dev/TuningNotes.md,
-    B2b). At B2b this band was moved to her measure, +2.5 to +5.0, and the test renamed for her
-    weather helm; the review of 2026-11-08 restored step 5's band as a recorded departure, no
-    ruling having accepted the helm. Before the reviews of 2026-11-07 moved her jib's centre aft
-    to its triangle's (from above its stay), she was tuned to +2.0 against the lee helm the
-    misplaced jib gave her."""
+    -0.75). At **-0.6 m** she carries +1.65 degrees close-hauled, +2.25 at six points and +1.30
+    at seven; +2.44 at 60 degrees in 25 kn. Old beside new: at +0.1 (B2b's) +3.95, +4.30
+    and +2.81, +5.09 in 25 kn, this test then a strict known failure (from the review of
+    2026-11-08 to B2c, its band moved to her measure, +2.5 to +5.0, at B2b's build); with the
+    working 93 m2 at +0.1, +1.11, +2.11 and +1.49, +1.75 in 25 kn, inside step 5's band. Before
+    the reviews of 2026-11-07 moved her jib's centre aft to its triangle's (from above its stay),
+    she was tuned to +2.0 against the lee helm the misplaced jib gave her."""
     from tests.test_known_truths import reading, under_plain_sail
 
     close_hauled = reading(under_plain_sail(HER, 300.0))["weather_helm"]
-    assert -1.0 <= close_hauled <= 1.5, close_hauled
+    assert -1.0 <= close_hauled <= 1.7, close_hauled
 
 
 def test_her_helm_as_tuned_abeam_and_at_ten_points():
-    """Step 5's band abeam and at ten points, +0.5 to +4.0 degrees of weather helm, measured as
-    the close-hauled band (the test above) at seed 7 in fifteen knots under plain sail, the yards
-    and sheets trimmed, with `clr_x_m` as tuned, **+0.1 m**: +1.61 abeam (the frigate-36 +1.99,
-    the brig-sloop +1.57, the topsail schooner +4.30) and +2.10 at ten points, +3.16 at twelve;
-    +1.60 abeam in 25 kn, with her fore staysail the triangle that fits, 46 m2 (B2b). Old beside
-    new, with the working 93 m2: +0.78, +1.84 and +3.20; +0.73 in 25 kn. Split from the
-    close-hauled band at the review of 2026-11-08, so that this half stays live while that one is
-    a recorded departure."""
+    """Step 5's band abeam and at ten points, **+0.3 to +4.0 degrees** of weather helm (+0.5 to
+    +4.0, its lower bound widened by 0.2 degrees by the owner's ruling for the lead of 2026-11-08;
+    package 75, B2c, the test above), measured as the close-hauled band at seed 7 in fifteen
+    knots under plain sail, the yards and sheets trimmed, with `clr_x_m` as tuned, **-0.6 m**:
+    +0.39 abeam (the frigate-36 +1.99, the brig-sloop +1.57, the topsail schooner +4.30) and +1.39
+    at ten points, +3.06 at twelve; +0.07 abeam in 25 kn. Old beside new: at +0.1 (B2b's)
+    +1.61, +2.10 and +3.16, +1.60 in 25 kn; with the working 93 m2 at +0.1, +0.78, +1.84 and
+    +3.20, +0.73 in 25 kn. Split from the close-hauled band at the review of 2026-11-08, while
+    that one was a recorded departure."""
     from tests.test_known_truths import reading, under_plain_sail
 
     for off in (90.0, 112.5):
         helm = reading(under_plain_sail(HER, 360.0 - off))["weather_helm"]
-        assert 0.5 <= helm <= 4.0, (off, helm)
-    assert load_spec(HER).hull.clr_x_m == 0.1
+        assert 0.3 <= helm <= 4.0, (off, helm)
+    assert load_spec(HER).hull.clr_x_m == -0.6
 
 
 def test_truth_6_her_headsails_and_her_mainsail_set_her_helm():
     """Truth 6's form on her file as tuned (tests/test_known_truths.py), abeam in 15 kn, seed 7:
-    +1.61 degrees of weather helm under plain sail, +5.29 with the headsails in, -11.24 (lee
-    helm) with the headsails set and the mainsail, her driving sail, in (with the working 93 m2
-    fore staysail before B2b: +0.78, +5.13, -11.73; at the start's `clr_x_m` +0.3 then: +1.13,
-    +5.39, -11.24)."""
+    +0.39 degrees of weather helm under plain sail, +4.23 with the headsails in, -13.02 (lee
+    helm) with the headsails set and the mainsail, her driving sail, in, at `clr_x_m` -0.6 (the
+    owner's ruling for the lead of 2026-11-08, B2c; at +0.1 before it: +1.61, +5.29, -11.24; with
+    the working 93 m2 fore staysail before B2b: +0.78, +5.13, -11.73; at the start's `clr_x_m`
+    +0.3 then: +1.13, +5.39, -11.24)."""
     from tests.test_known_truths import run, under_plain_sail
 
     world = under_plain_sail(HER, 270.0)
@@ -1421,13 +1415,15 @@ def test_she_stays_quickly_her_light_main_yards_hauled_short():
     """Truth 10's form on her file as tuned, measured at seed 7 in 15 kn, beside trial A's on this
     tree (the topsail schooner with a fore course, settled 2,400 s: tacked in 149 s; Eng §3.3)
     and the main topgallant's fixture (172 s with it set, 164 s furled; B3.4, ruling 1). From
-    292.5 degrees she tacks in 261 s (from 290 and 295: 269 and 268 s), gaining 144 m to
-    windward: "Main-topsail haul." at 50 s, hanging in stays at 62 s, and "Rise fore tack and
-    sheet. Let go and haul." at 75 s, her light main yards swung in 25 s (the short swing's 20 by
-    the weather and the hands), and no "Mainsail haul". Old beside new, her fore staysail the
-    working 93 m2 before it was corrected to the triangle that fits forward of the fore mast, 46
-    (the lead's ruling of 2026-11-07, B2b): 182 s (184 and 181), gaining 118 m, the words at 49 and
-    74 s, never in stays. At the start's `clr_x_m` +0.3 she tacked then in 198 s (229 and 224),
+    292.5 degrees she tacks in 189 s (from 290 and 295: 192 and 193 s), gaining 114 m to
+    windward: "Main-topsail haul." at 53 s, hanging in stays at 63 s, and "Rise fore tack and
+    sheet. Let go and haul." at 77 s, her light main yards swung in 24 s (the short swing's 20 by
+    the weather and the hands), and no "Mainsail haul"; at `clr_x_m` -0.6, the owner's ruling for
+    the lead of 2026-11-08 (B2c). Old beside new: at +0.1 before it, 261 s (269 and 268), gaining
+    144 m, the words at 50 and 75 s, hanging in stays at 62 s; with her fore staysail the working
+    93 m2 before it was corrected to the triangle that fits forward of the fore mast, 46 (the
+    lead's ruling of 2026-11-07, B2b), 182 s (184 and 181), gaining 118 m, the words at 49 and 74
+    s, never in stays. At the start's `clr_x_m` +0.3 she tacked then in 198 s (229 and 224),
     gaining 129 m (docs/dev/TuningNotes.md). Old beside new, words only, every tick the same:
     "Rise tacks and sheets. Main-topsail haul." and "Let go and haul." until B3.4b, where her
     fore tack is kept fast at the haul and risen apart before her head yards are hauled (the
@@ -1455,14 +1451,16 @@ def test_she_stays_quickly_her_light_main_yards_hauled_short():
 
 def test_she_wears_and_lies_to_as_a_fore_and_after_with_a_square_fore():
     """Truths 11 and 12's forms on her file as tuned, measured at seed 7 in 15 kn, beside trial
-    A's (wore in 449 s; hove to 50.2 degrees off at 2.65 kn; Eng §3.3). She wears in 521 s
-    keeping her mainsail ("Up helm; brace in the after yards"), 241 m to leeward. Hove to the
+    A's (wore in 449 s; hove to 50.2 degrees off at 2.65 kn; Eng §3.3). She wears in 452 s
+    keeping her mainsail ("Up helm; brace in the after yards"), 249 m to leeward. Hove to the
     fore-and-after's way (the mainsail sheet flat aft, the fore staysail to windward, the fore
-    topsail aback, the helm a-lee) she lies 49.1 degrees off forereaching 2.59 kn, inside truth
+    topsail aback, the helm a-lee) she lies 51.3 degrees off forereaching 3.12 kn, inside truth
     12's band of angle (45-65) and above its 1.6 kn, as trial A is. With her main topgallant set
     abaft the backed fore (the heave-to clews up the light sails forward of the backed yards only:
-    Neuf-D §12.2 item 8's second finding) she lies 49.0 degrees off at 2.56 kn, the sail still set,
-    within truth 12's band. Old beside new, her fore staysail the working 93 m2 before it was
+    Neuf-D §12.2 item 8's second finding) she lies 51.3 degrees off at 3.09 kn, the sail still set,
+    within truth 12's band. At `clr_x_m` -0.6, the owner's ruling for the lead of 2026-11-08
+    (B2c); old beside new: at +0.1 before it, 521 s and 241 m, 49.1 degrees at 2.59 kn, 49.0 at
+    2.56 with the main topgallant set; her fore staysail the working 93 m2 before it was
     corrected to the triangle that fits forward of the fore mast, 46 (the lead's ruling of
     2026-11-07, B2b): 461 s and 255 m; 51.1 degrees at 3.01 kn, 51.0 at 2.98 with the main
     topgallant set; at the start's `clr_x_m` +0.3 then: 467 s, 50.4 degrees at 2.86 kn."""
@@ -1505,7 +1503,8 @@ def test_she_gets_under_way_from_her_anchor_as_a_schooner():
     north, her head south-west, "get under way" after a quarter of an hour at her best bower):
     she casts on the starboard tack under her fore topsail, her mainsail and her jib, the topsail
     yard abox, as the rule has a fore-and-after with yards on her fore cast, and is under way in
-    1,465 s (trial A 1,475 s), 5.8 kn full and by."""
+    1,465 s (trial A 1,475 s), 5.8 kn full and by (at `clr_x_m` -0.6, B2c; 1,466 s and 5.8 kn
+    at +0.1 before it)."""
     from datetime import datetime
 
     from freesail.api.session import make_world
@@ -1565,18 +1564,26 @@ def test_her_gale_reefs_her_fore_course_twice_and_keeps_her_mainsail():
     fore-and-after with topsails reefs her course once as the topsails take their second reef and
     once more at the third, her two reef bands then taken, and takes in nothing after: her
     mainsail, her driving sail, is kept whole, no line of "shorten sail" reefing a fore-and-
-    after's gaff mainsail (the closely reefed mainsail not built, the lead's). Beside ruling 4,
-    the lead's ruling (3)(e) of 2026-11-07 (package 75, B2b): her fore gaff sail, a boomless gaff
-    sail on the mast that crosses her course, is taken in with the topsails' second reef, as she
-    took hers in when it made bad weather lying to (Cobb 1841 p. 79). Old: the course's reef alone,
-    her fore gaff sail kept whole throughout. Sailed in the gale of B3.4's reviews (15 kn rising to
-    44, "shorten sail" at six winds, "lie a-try"; measured, docs/dev/TuningNotes.md, B2b): the
-    fore gaff sail taken in at 4,487 s and the course reefed at 4,622 s and again at 5,581 s, the
-    fore topsail close-reefed, the jib in at 30 kn; lying a-try at 7,664 s under the fore topsail,
-    the mainsail and the fore staysail, the course taken in by "lie a-try" (old: the course
-    reefed at 4,628 and 5,616 s, the fore storm staysail set at 34 kn, lying a-try at 7,674 s,
-    and at 8,400 s 39.7 degrees off at 2.45 kn under the fore topsail, the storm staysail, the
-    fore gaff sail and the mainsail whole)."""
+    after's gaff mainsail (the closely reefed mainsail not built, the lead's). Her fore gaff sail,
+    a boomless gaff sail on the mast that crosses her course, is not taken in by the gale's
+    reduction but when she lies a-try, as Cobb has it (1841 p. 79): the owner's ruling for the
+    lead of 2026-11-08 ("At lie a-try"; package 75, B2c). At B2b (the lead's ruling (3)(e) of
+    2026-11-07) it was taken in with the topsails' second reef ("take in the fore sail" beside
+    the course's line from her topsails' first reef on), and once the jib was in she griped up to
+    37-38 degrees off at about 2 kn with the helm hard over until she lay a-try. Sailed in the
+    gale of B3.4's reviews (15 kn rising to 44, "shorten sail" at six winds, "lie a-try" at 7,200
+    s; measured, docs/dev/TuningNotes.md, B2c), at `clr_x_m` -0.6: the course reefed at 4,625 s
+    and again at 5,600 s, the fore topsail close-reefed, the jib in at 30 kn (5,364 s), after it a
+    luff of three minutes to 47 degrees off and then 65-69 degrees off at 10-11 kn with the helm
+    19-24 degrees over until lie a-try, the fore storm
+    staysail set at 34 kn (6,780 s); lying a-try at 7,677 s under the fore topsail, the mainsail
+    and the staysails, the course and the fore gaff sail taken in by "lie a-try", and at 8,400 s
+    38.9 degrees off at 3.26 kn under the fore topsail, the mainsail and the storm staysail. Old
+    beside new: at B2b, the fore gaff sail in at 4,487 s, the course reefed at 4,622 and 5,581 s,
+    lying a-try at 7,664 s, and at 8,400 s 36.1 degrees off at 5.29 kn; before B2b, with her fore
+    staysail the working 93 m2, the course reefed at 4,628 and 5,616 s, the fore storm staysail
+    set at 34 kn, lying a-try at 7,674 s, and at 8,400 s 39.7 degrees off at 2.45 kn under the
+    fore topsail, the storm staysail, the fore gaff sail and the mainsail whole."""
     from freesail.orders.storm import _after_sail_lines
 
     ship = load_ship(HER)
@@ -1587,22 +1594,21 @@ def test_her_gale_reefs_her_fore_course_twice_and_keeps_her_mainsail():
     assert not _square_rigged(ship)
     assert _after_sail_lines(ship) == []
     topsail.reefs = 1
-    take_in = "take in the fore sail"  # her fore gaff sail by its parts' words, as the course's
-    assert _after_sail_lines(ship) == ["reef the fore course, one reef", take_in]
+    assert _after_sail_lines(ship) == ["reef the fore course, one reef"]
     course.reefs, topsail.reefs = 1, 2
-    assert _after_sail_lines(ship) == ["reef the fore course, one reef", take_in]
+    assert _after_sail_lines(ship) == ["reef the fore course, one reef"]
     course.reefs = 2
-    assert _after_sail_lines(ship) == [take_in]
-    ship.sails["fore.sail"].state = SailState.IN_THE_GEAR
     assert _after_sail_lines(ship) == []
+    assert ship.sails["fore.sail"].is_set  # handed at lie a-try, not by the gale's reduction
     assert ship.sails["main.sail"].is_set and ship.sails["main.sail"].reefs == 0
 
 
 def test_only_she_has_a_boomless_gaff_sail_beside_a_course():
-    """The guard of the lead's ruling (3)(e) of 2026-11-07 (package 75, B2b): the gale's take-in and
-    lie a-try's handing of a boomless gaff sail on a mast that crosses a course
-    (`scripts.gaff_sails_beside_a_course`) are hers alone of the files, her fore gaff sail abaft
-    her fore course. The schooners' fore gaff sails are boomless too, but their fore masts cross
+    """The guard of the lead's ruling (3)(e) of 2026-11-07 (package 75, B2b): lie a-try's handing of
+    a boomless gaff sail on a mast that crosses a course (`scripts.gaff_sails_beside_a_course`)
+    is hers alone of the files, her fore gaff sail abaft her fore course (the gale's take-in of it
+    at the topsails' second reef, B2b's, moved to lie a-try by the owner's ruling for the lead of
+    2026-11-08, B2c). The schooners' fore gaff sails are boomless too, but their fore masts cross
     no course; every other gaff sail is on its boom."""
     found = {}
     for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
@@ -1621,7 +1627,10 @@ def test_she_lies_a_try_under_her_mainsail_her_fore_gaff_sail_taken_in():
     mainsail and the staysails, the fore-and-aft foresail taken in, helm a-lee." Old: "Lying
     a-try under the fore topsail and the staysails, helm a-lee.", whatever was set, her two gaff
     sails standing whole beside it. Every other file's line is as it was ("the main topsail and
-    the staysails" on the frigate, truth 28's)."""
+    the staysails" on the frigate, truth 28's). Since the owner's ruling for the lead of
+    2026-11-08 ("At lie a-try"; B2c) this is where her fore gaff sail is taken in, as Cobb has
+    it (1841 p. 79), and not at the topsails' second reef; the handing and the line as built at
+    B2b."""
     from tests.test_known_truths import run, under_plain_sail
 
     world = under_plain_sail(HER, 300.0)
@@ -1644,11 +1653,13 @@ def test_truth_9_she_carries_plain_sail_in_twenty_knots_and_her_light_sails_go_i
     game, her lines scaled per mast): under plain sail in 20 kn nothing carries away and no line
     parts, her worst strain her fore topgallant yard's 0.54 of its rating (0.88 in 25 kn, the
     frigate-36's main topgallant yard 1.05); under all sail in 35 kn her light sails and yards go,
-    each said urgently: the main topmast and the fore royal yard carried away (measured, seed 7).
-    Old beside new, her fore staysail the working 93 m2 before package 75's B2b corrected it to
-    the triangle that fits forward of the fore mast, 46, and her head's rope scaled down with it
-    (1.455 to 1.314): 0.53 and 0.87; the fore royal mast, the main topgallant mast, the main
-    topmast and the fore topgallant yard carried away."""
+    each said urgently: the fore royal mast and the main topmast carried away (measured, seed 7,
+    at `clr_x_m` -0.6, the owner's ruling for the lead of 2026-11-08, B2c; at +0.1 before it the
+    main topmast and the fore royal yard, the strains the same). Old beside new, her fore
+    staysail the working 93 m2 before package 75's B2b corrected it to the triangle that fits
+    forward of the fore mast, 46, and her head's rope scaled down with it (1.455 to 1.314): 0.53
+    and 0.87; the fore royal mast, the main topgallant mast, the main topmast and the fore
+    topgallant yard carried away."""
     from tests.test_known_truths import CARRIED_AWAY, events, sail_in_a_wind
 
     world = sail_in_a_wind(HER, 20.0, "set plain sail")
