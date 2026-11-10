@@ -33,6 +33,10 @@ from freesail.ship.schema import (
 ROOT = Path(__file__).resolve().parents[1]
 SIXTY_FOUR = ROOT / "data" / "ships" / "sixty-four.yaml"
 SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
+# the files that carry neither key: every file but the 74's, whose step 4 writes both (her bill's
+# marines and her flag party: Design-Ship-Bellerophon.md §6.3, §17.0), held in tests/
+# test_bellerophon.py (old: every file on the shelf)
+KEYLESS_FILES = [p for p in SHIP_FILES if p.name != "seventy-four.yaml"]
 # the pickled states' keys before the stage, in their order
 BILL_STATE = ["trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling"]
 CREW_STATE = [
@@ -70,10 +74,11 @@ def test_the_marines_key_is_the_bills_last_and_the_flags_posts_are_the_posts_for
     assert FLAG_POST_KEYS == ("post", "name")
 
 
-@pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
+@pytest.mark.parametrize("path", KEYLESS_FILES, ids=[p.stem for p in KEYLESS_FILES])
 def test_no_file_carries_either_key_and_each_pickles_as_before(path):
-    """Inert: every file on the shelf reads no division kept and no flag party, and her bill's
-    and her crew's pickled states hold the keys they held before the stage, in their order."""
+    """Inert: every file on the shelf but the 74's reads no division kept and no flag party, and
+    her bill's and her crew's pickled states hold the keys they held before the stage, in their
+    order. The 74's file carries both since her step 4 (old: every file on the shelf)."""
     crew = load_ship(path).spec.crew
     if crew is None:
         return

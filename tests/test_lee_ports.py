@@ -48,6 +48,7 @@ SMACK = "data/ships/smack.yaml"
 SIXTY_FOUR = "data/ships/sixty-four.yaml"
 RAZEE = "data/ships/razee-44.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2
+SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7
 LAUNCH = "data/ships/boat-launch-31.yaml"
 # A real checkpoint of a cutter with her guns cast loose, written by the commit before package
 # 75's stage 0 (c5140483): her guns hold no deck and her hull no profile, her sills 1.5 m. A
@@ -1645,14 +1646,18 @@ LOWEST_LEE_PORT = (
     (RAZEE, "as carried 1796", "upper", 14.5, 6),
     (SIXTY_FOUR, "ardent class 1784", "lower", 10.55, 6),
     (NEUFCHATEL, "as taken 1814", "upper", 18.18, 3),
+    (SEVENTY_FOUR, "arrogant class 1795", "lower", 10.35, 6),  # package 75, B7 (10.38 at step 4)
 )
 # The razee's three decks with guns in them, as lines of the truth (§15, "Not truths, said";
 # Indf §3.4): her main battery the 64's lower deck raised by her rise, and the two above it.
 RAZEE_DECKS = (("upper", 14.5, 6), ("quarterdeck", 42.02, 1), ("forecastle", 43.84, 1))
-# The 74's lowest lee port shuts at 10.6 degrees of heel alone: the *Bellona*'s 5 ft 2 in at
-# Channel draught on 22.7 ft (Research-74-2026-10.md §13.1 answer 5, revised by the owner
-# 2026-10-28; §15's row 7-195). Her file is not built yet, so the figure is §15's and Bel's.
-SEVENTY_FOURS_SHUT_DEG = 10.6
+# The 74's lowest lee port's shut heel, heel alone: her file's, 10.35 degrees on her drawn side
+# (her truth 7-195, tests/test_bellerophon.py, package 75, B7, her step 6; the row above); old
+# beside new, the figure was §15's and Bel's 10.6 while her file was not built (the Bellona's 5 ft
+# 2 in at Channel draught on 22.7 ft moulded: Research-74-2026-10.md §13.1 answer 5), and 10.38
+# from her step 6 until the review's re-trace of her body plan (2026-11-10) put her dead flat on
+# its own line, the side at the sill 7.04 m for 7.02.
+SEVENTY_FOURS_SHUT_DEG = 10.35
 # The roll set on the World's motion for the truth's second half (judgement: a ship "rolling"
 # in the motion's words, `physics.motion.ROLL_ROLLING_DEG` 6, short of heavily).
 ROLL_SET_DEG = 4.0
@@ -1737,15 +1742,17 @@ def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_r
     `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
     digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
     14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5,
-    the 64's lower deck's 10.55 and the *Neufchatel*'s 18.18 degrees (±0.05). With no roll, no
-    port of that deck shut half a degree below that heel, and that port shut a degree above it,
-    with 4, 2, 5, 2, 1, 6, 6 and 3 of the deck's lee ports; with a roll of 4 degrees on the
-    World's motion, the same four degrees of heel sooner, a roll's amplitude, by the same
-    counts. Her weather side open throughout; upright with no roll, every port open again once
-    the minute's hold has run (the lead's ruling of 2026-11-06; at once before it). Measured on
-    the owner's machine, 2026-11-05, at L3; the *Neufchatel*'s line 2026-11-07, at her landing
-    (B2). She is built with no fit named, so that the row's fit is her file's default (since
-    L3's review: the fit was named, and the line could not fail)."""
+    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18 and the 74's lower deck's 10.35 degrees
+    (±0.05). With no roll, no port of that deck shut half a degree below that heel, and that port
+    shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3 and 6 of the deck's lee ports; with a
+    roll of 4 degrees on the World's motion, the same four degrees of heel sooner, a roll's
+    amplitude, by the same counts. Her weather side open throughout; upright with no roll, every
+    port open again once the minute's hold has run (the lead's ruling of 2026-11-06; at once
+    before it). Measured on the owner's machine, 2026-11-05, at L3; the *Neufchatel*'s line
+    2026-11-07, at her landing (B2); the 74's 2026-11-10, at her step 4 (B7) and again at its
+    review's re-trace (10.38 to 10.35), her truth 7-195
+    being her step 6's. She is built with no fit named, so that the row's fit is her file's
+    default (since L3's review: the fit was named, and the line could not fail)."""
     w = _in_a_sea(path)
     assert w.ship.fit == fit
     assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
@@ -1754,11 +1761,11 @@ def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_r
 
 def test_truth_7_190_the_frigates_lee_ports_stand_open_at_the_seventy_fours_shut_heel():
     """7-190's clause (Bel §6.1, P5, "the frigate unmoved"; `Design-Ship-Bellerophon.md` §14.3
-    leaves it to this truth). A draft for Phase 5, as above. At the 74's 10.6 degrees of heel
-    alone (`SEVENTY_FOURS_SHUT_DEG`: §15's and Bel's figure, her file not yet built) every port
-    of the frigate-36 stands open, heeled to either side, her lowest shutting at 19.7 on her
-    drawn hull (Bel's 21.0 was her first written sill); and with a roll of 4 degrees on her
-    motion as well."""
+    leaves it to this truth). A draft for Phase 5, as above. At the 74's 10.35 degrees of heel
+    alone (`SEVENTY_FOURS_SHUT_DEG`: her file's since her step 6, B7; §15's and Bel's 10.6 before
+    it) every port of the frigate-36 stands open, heeled to either side, her lowest shutting at
+    19.7 on her drawn hull (Bel's 21.0 was her first written sill); and with a roll of 4 degrees
+    on her motion as well."""
     w = _in_a_sea(FRIGATE, None)
     assert _lowest_lee(w, "upper")[1] == pytest.approx(19.7, abs=0.05)
     for tick, roll in enumerate((0.0, ROLL_SET_DEG)):
@@ -1790,16 +1797,16 @@ def test_truth_7_190_covers_every_armed_file():
     """7-190 is of every armed file: each file of `data/ships` whose default fit carries a gun
     in a port (`ports.PORT_PLACES`) is a row of `LOWEST_LEE_PORT`, and no row is of a file that
     carries none, so that a ship file added or rearmed is not passed by in silence. Today the
-    eight: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
-    razee and the 64 (since L3's review), and the *Neufchatel* (package 75, B2). A draft for
-    Phase 5, as above."""
+    nine: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
+    razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), and the 74
+    (package 75, B7; old: eight files). A draft for Phase 5, as above."""
     armed = {
         path.as_posix()
         for path in sorted(Path("data/ships").glob("*.yaml"))
         if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
     }
     assert armed == {row[0] for row in LOWEST_LEE_PORT}
-    assert len(armed) == 8
+    assert len(armed) == 9
 
 
 # -- the old saves -----------------------------------------------------------------------------
