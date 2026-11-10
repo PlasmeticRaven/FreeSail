@@ -23315,3 +23315,21 @@ modern rate and saying that the hydrographic service's atlas of the roads (SHOM)
 No other pin moved: the slow tier of the touched files and the Brest-area files (test_ports,
 test_tackle_orders, test_captains, test_ordnance, test_agents, test_captive, test_brains) passed
 on the new data, the anchored-in-the-Rade fixtures (48.345 N 4.47 W) among them.
+
+### Steps 3, 4, 5 and 7 and the lead's four additions: the suites as run
+
+At **d96dbf31** (the branch's head, the trunk merged at cae5c333 by a merge commit: package
+75's B2c and B3.3b, and 98's steps 1, 2 and 6 as merged at 985c8777), in a worktree pinned
+there, one suite at a time: the fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`)
+exit 0, 7,119 passed, 1 xfailed, 477 slow left out; the slow tier of the touched files
+(`--slow -m "not pace" -n 4`) in two runs, tests/test_known_truths.py exit 0, 341 passed, 8
+xfailed (the passages into the Bay re-measured among them), and tests/test_browser_probe.py,
+test_knowledge.py, test_orders_places.py, test_view_action.py, test_viewer_action.py,
+test_api_door.py, test_flags.py, test_tide.py, test_primer.py, test_signals.py, with the
+Brest-area files test_ports.py, test_tackle_orders.py, test_captains.py, test_ordnance.py,
+test_agents.py, test_captive.py and test_brains.py, exit 0, 1,614 passed, 1 xfailed (the nine
+probe plans met); the pace alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12
+passed. ruff check and format clean. Before it, at 4a0e07b4, the truths' slow tier found step
+5's five (above), proven by the toggle and re-measured at fd350b92; a fast tier at 4a0e07b4 (exit
+0, 7,110 passed) was measured before the trunk moved again. The tree reported differs from
+d96dbf31 by this paragraph alone.
