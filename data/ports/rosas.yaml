@@ -1,0 +1,119 @@
+# FreeSail: Rosas as a port (package 101, beside the Catalan coast's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/gulf-of-lion.yaml, at
+# its end: Rosas lies in the Gulf of Lion's region, east of 3 E, and has no harbour patch,
+# the tool adding none to a built region without rebuilding its level-2 tiles).
+#
+# Sources. Tofino 1787, Derrotero del Mediterraneo, pp. 135 to 137: the bay fit for any
+# number of vessels of every size, generally sheltered from all winds, the bottom loose mud
+# clean of stones; small vessels in 3 and 3 1/2 brazas sand abreast of the Arrabal a cable
+# and a half from the beach; to be quite safe from the SE under the east coast in 8 or 9
+# brazas NW of the castle of the Santisima Trinidad; no wind known to do more harm than the
+# N, the Tramontana, which though it comes over the land blows with much force, but being
+# fair for getting under sail even though the anchors drag, the harm it does can never be
+# great. Purdy 1826, pp. 30 to 31; Norie 1831, p. 34 (the castle 'called also the Bouton de
+# Rosas'); Michelot 1709, OCR l. 4065 to 4087 and 1715, OCR l. 2812 to 2828 (the citadel of
+# five bastions; anchor all over the bay, even a fleet). James 1837, vol. 4, pp. 385 to 386:
+# the siege of November and December 1808, Fort Trinidad held by the Excellent's and the
+# Imperieuse's men, the citadel capitulating on 5 December. No period text calls Rosas the
+# best anchorage of the coast in a northerly (Michelot gives Catalonia's best port to
+# Cadaques); Tofino's words are the pilot's here.
+#
+# The datum: UNVERIFIED (Roux's pl. 13, Heather's and Luffman's 'Bay of Roses' are read and
+# not transcribed, CC BY-NC-SA); the chart's depths are EMODnet's. No gauge on this coast;
+# the world's tide here is the Gulf's gauges' (Port-Vendres's nearest).
+#
+# The stance, dated (79a's form; data that carries its dates, decision 66): Spain's, hostile
+# to a King's ship by the nations table from 12 December 1804 (James 1837, vol. 3, p. 200);
+# France's from the citadel's capitulation of 5 December 1808 (James 1837, vol. 4, p. 386,
+# VERIFIED) to the peace of 1814 (FROM MEMORY: the Treaty of Paris of 30 May; the garrison's
+# leaving day not read). The nations table's wars are one year's picture (see
+# barcelona.yaml's head). Prices JUDGEMENT, in sterling.
+
+id: rosas
+name: Rosas
+nation:
+  - {nation: spain, until: 1808-12-04, source: "the King of Spain's; at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200)"}
+  - {nation: france, since: 1808-12-05, until: 1814-05-30, source: "the citadel capitulated on 5 December 1808 (James 1837, vol. 4, p. 386); held to the peace of 1814 (FROM MEMORY)"}
+  - {nation: spain, since: 1814-05-31, source: "Spain's again at the peace (FROM MEMORY)"}
+source: "Tofino 1787 pp. 135-137; Purdy 1826 pp. 30-31; Norie 1831 p. 34; Michelot 1709 OCR l. 4065-4087; James 1837 vol. 4 pp. 385-386"
+datum: unverified   # no period sheet read with its datum
+
+outer_road:
+  feature: rosas-road
+  name: the bay of Rosas
+  lat_deg: 42.2566
+  lon_deg: 3.1783
+  depth_fathoms: 8
+anchorage:
+  feature: rosas-road
+  name: the bay of Rosas
+  lat_deg: 42.2566
+  lon_deg: 3.1783
+mooring:
+  feature: rosas-road
+  name: under the eastern shore of Rosas bay
+  lat_deg: 42.2566
+  lon_deg: 3.1783
+  depth_fathoms: 8
+  bottom: loose mud
+shore:
+  feature: rosas-citadel
+  name: the beach of Rosas
+  lat_deg: 42.2640
+  lon_deg: 3.1730
+
+pilot:
+  station: rosas-road
+  cruising_nm: 2                 # judgement: the fishermen's boats
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a fishing boat of Rosas
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Mas, Serra, Pages, Coll, Vila, Batlle]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 170            # out to the southward (judgement)
+  words:
+    channel: "The bay is clear and deep; come in between Cape Norfeo and the Medas and stand for the castle of the Trinity on its point. Do not close the citadel at the head of the bay, there is little water off it."
+    marks: "The castle of the Trinity, a little star fort on the point east of the town; the citadel and the town at the head of the bay; Cape Norfeo high and steep beyond; the Medas islands to the south."
+    anchorage: "Anchor under the eastern shore north-west of the Trinity in eight or nine brazas of loose mud, half a mile south of the middle of the Arrabal; small craft in three brazas abreast of the town. The bay is sheltered from nearly every wind; the tramontana comes down hard off the Pyrenees, but it blows off the land and does little harm."
+    tide: "No tide to speak of; about Cape Creus the current sets hard to the south-west."
+
+tide:
+  establishment: Barcelona
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt fish, price: 20, origin: spain, note: "the fishermen's warehouses at the Bouton and the citadel (Michelot 1709, OCR l. 4070); the price JUDGEMENT"}
+    - {good: wine, price: 18, origin: spain, note: "JUDGEMENT"}
+    - {good: cork, price: 24, origin: spain, note: "JUDGEMENT; the Ampurdan's cork FROM MEMORY, no text on file naming it here"}
+    - {good: olive oil, price: 42, origin: spain, note: "JUDGEMENT"}
+    - {good: wheat, price: 30, origin: spain, note: "JUDGEMENT"}
+    - {good: salt, price: 11, origin: spain, note: "JUDGEMENT"}
+    - {good: biscuit, price: 32, origin: spain, note: "JUDGEMENT"}
+    - {good: brandy, price: 70, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 24, origin: spain, note: "JUDGEMENT"}
+    - {good: timber, price: 13, origin: spain, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 55, note: "judgement"}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  # judgement: the fishermen of the bay
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []

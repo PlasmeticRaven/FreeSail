@@ -24763,3 +24763,357 @@ at 0570a02, the fast tier was exit 0 and the slow tier found one failure, the re
 example (`aboard: remove the cask of brandy`) performed on none of the forms' test seas; mended
 at 7e50d00 (`aboard: remove the sealed packet`, the packet of the near sea) and all of it
 measured again there. The tree reported differs from 7e50d00 by this paragraph alone.
+
+## Package 101: the Catalan coast block (2026-11-10)
+
+Package 101 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 101"; built as
+`docs/dev/ChartBlocks.md` says). The region `catalan-coast` closes the hole in the chart north
+of `balearics` (40.56 N) and west of `gulf-of-lion`'s first tile column (2.6133 E), with seven
+ports: Barcelona, Tarragona with Salou and the Alfaques in the block, and Rosas, Palamós,
+Valencia's Grao and Alicante beside it in water already charted.
+
+### The sources' short pass (item 0)
+
+**On file, read and cited by printed page** (`docs/references/pilots/`, 79c's pass):
+Tofiño 1787, pp. 93 to 98 (Alicante), 108 to 109 (Valencia's Grao), 115 to 128 (the
+Alfaques to Tossa) and 131 to 141 (Palamós, Rosas, Cadaqués, Cape Creus), his positions in
+latitude and in longitude from Cadiz's meridian (about 6° 17′ 35″ east of Greenwich's by
+Purdy 1826's figures) and his enfilaciones true bearings (Purdy's bracketed true bearings
+agree); Purdy 1826 (pp. 25 to 31), Norie 1831 (pp. 28 to 35), Purdy 1840 (pp. 33 to 40 and
+its Pharonology), Michelot 1709 and 1715, Smyth 1854 (pp. 7 to 10, the table of positions
+pp. 431 to 433), and the Admiralty 1913 (pp. 205 to 225, for the heights and depths only).
+**The Derrotero of 1849 does not cover this coast** (it begins at Cape Creus).
+
+**Barcelona's meteorological table** (the Admiralty's Mediterranean Pilot vol. I, 1913, p.
+726, the Archive's PDF page 899; 79c named it and did not cut it): cut at 200 dpi, as printed,
+under `pilots/pages/`. Eleven years' wind observations (barometer and temperature 31, rain 20,
+gales and fogs 30), the "Observaciones Meteorológicas de Provincias (Spain)". The days of wind
+by month, read from the page and each column summed against the printed totals (all eight
+agree, and the gales and fogs):
+
+| month | N | NE | E | SE | S | SW | W | NW | gales | fogs |
+|---|---|---|---|---|---|---|---|---|---|---|
+| January | 2 | 4 | 3 | 1 | 2 | 5 | 10 | 4 | 0.8 | 4.0 |
+| February | 1 | 3 | 2 | 2 | 4 | 7 | 6 | 3 | 0.7 | 2.2 |
+| March | 1 | 3 | 5 | 4 | 6 | 8 | 3 | 1 | 0.8 | 1.4 |
+| April | 1 | 2 | 5 | 5 | 5 | 7 | 4 | 1 | 0.8 | 0.7 |
+| May | 0 | 2 | 7 | 5 | 6 | 8 | 2 | 1 | 0.3 | 0.3 |
+| June | 0 | 1 | 6 | 7 | 9 | 6 | 1 | 0 | 0.1 | 0.2 |
+| July | 0 | 1 | 6 | 7 | 10 | 6 | 1 | 0 | 0.2 | 0.1 |
+| August | 0 | 1 | 5 | 8 | 10 | 6 | 1 | 0 | 0.2 | 0.3 |
+| September | 1 | 4 | 6 | 6 | 6 | 6 | 1 | 0 | 0.1 | 0.6 |
+| October | 1 | 4 | 5 | 4 | 4 | 7 | 5 | 1 | 0.5 | 0.7 |
+| November | 2 | 3 | 3 | 2 | 3 | 4 | 8 | 5 | 0.4 | 2.3 |
+| December | 4 | 4 | 1 | 0 | 1 | 4 | 9 | 8 | 0.4 | 3.1 |
+| **totals as printed** | 13 | 32 | 54 | 51 | 66 | 74 | 51 | 24 | 5.3 | 15.9 |
+
+The calm column is blank; the barometer's monthly means 30.07, 30.05, 29.96, 29.92, 29.97,
+30.01, 30.02, 30.01, 30.04, 29.98, 30.00 and 30.04 inches.
+
+**The plans.** Tofiño's *Atlas Marítimo* in the Universidad de Sevilla's copy (`A062039040`,
+Public Domain Mark), seen whole in a contact sheet of 43 of its 46 leaves through the IIIF
+server (leaves 37, 40 and 44 answered 504 or timed out three times): leaf 14 is the "Carta
+esférica desde Cabo Oropesa a Cabo de Creux" (1786; "los números de la sonda son brazas de
+á 2 varas castellanas"), the coast at a small scale with the delta and the Alfaques drawn;
+**the atlas holds no harbour plan of Barcelona, Tarragona, the Alfaques, Rosas, Palamós,
+Valencia or Alicante** (its plans are Mahon's and the Atlantic ports'). The harbour plans of
+the coast are the David Rumsey Map Collection's scans on the Archive, CC BY-NC-SA 3.0, read
+and not committed as 79c had them: Roux's pl. 12 Barcelona and pl. 13 Roses (1764), Bellin's
+"Plan de Barcelone" and "Plan de Palamos" (1764), Heather's sheets of 1814 (the road of Salou
+by Ayrouard, the port of Barcelona and the bay of Roses by Michelot, Port Palamos, Le Sofa bay
+that is the Alfaques, the bay of Alicant), Luffman's "Bay of Roses" (1801) and the "Plan de
+Tarragone ... le 28 Juin 1811" (1828). The rows are in `docs/references/README.md`.
+
+**Not found.** No year first lit for any light of the coast: Michelot 1715 has Barcelona's
+mole lantern "where a Fire is kept every Night"; the one dated event is the official notice
+of 14 December 1823 of a light on the new mole then building (Norie 1831, p. 31; Purdy 1840,
+p. 36); Tarragona's mole and its 30-foot lantern are first in Purdy 1826 (p. 27, "a modern
+structure"), Tofiño naming no mole there. No rate for the coast's south-westerly set (every
+pilot gives the set, "pretty swiftly" in Michelot, none a rate). No period word of Reus's
+brandies, Tarragona's wines or the Alfaques' rice: the texts give the Alfaques' salt (Tofiño
+p. 116), Salou's "tráfico de frutos" (p. 121), the wine loaded at Villaseca (Michelot 1715),
+Barcelona's manufactures out and corn, fish and rice in (Purdy 1826 p. 28; Norie 1831 p. 30),
+Alicante's exports (Purdy and Norie). **No period text calls Rosas the best anchorage of the
+coast in a northerly**: Tofiño (p. 136) has the bay "resguardada generalmente de todos los
+vientos", the Tramontana its one harmful wind and harmless, blowing off the land; Michelot
+gives "the best port of Catalonia" to Cadaqués; only the Admiralty 1913 recommends Rosas in a
+northerly gale. Every host answered: the Internet Archive (its search, metadata, downloads and
+IIIF server), PANGAEA (TICON's zip, the same file as every block's, SHA-256
+7055f8ed1a14abf8...) and Puertos del Estado's REDMAR reports.
+
+### The seam and the tiles (items 1 and 8), as reported and as built
+
+The measurement report went to the lead before any tile was committed; the ruling (the
+lead, 2026-11-10, 11:30 UTC) accepted the seam and the tiles and four findings below. **The
+seam's answer is the how-to's plain one**: the level-2 tiles meeting the bounds are 4 rows
+(40.56 to 42.27 N) by 7 columns (0.05 to 3.04 E); the east column (2.6133 to 3.04 E,
+`west_sec` 9408) is `gulf-of-lion`'s, listed by it, so it stays the Gulf's: "tiles another
+region lists: 4 kept". The row edge 40.56 N takes in no row below (`tiles_over` starts on
+it), so nothing of `balearics`' is touched. `git status` after every build: the manifest (the
+region's entry, the chart's line and title, the sources' fetches, the build hash), the tool,
+the block's own new files, and (item 3) the two neighbours' features files and indexes;
+no tile, coast or index of another region. Nothing refused: GEBCO's extract 2.3 MB in a
+second, EMODnet's `elevation` and `elevation_max` 23.1 MB each in four seconds.
+
+| | as reported (first build) | as built (final) |
+|---|---|---|
+| level 2 | 24 written (4 kept), 3.40 MB (14 all land, 1.64 MB) | 24, 3.44 MB |
+| level 3 | 26 (Barcelona 6, Tarragona 12, the Alfaques 8), 1.49 MB | 46 (6, 12, 28), 2.55 MB |
+| coast | 46 KB | 35 KB |
+| features and index | | 36 KB |
+| **in all** | **4.94 MB** | **6.07 MB** |
+
+The difference is the Alfaques' patch widened over the Ebro's delta (below), 20 more level-3
+tiles, within the ruling's 10 MB. **The checks as printed at the final build**
+(`--region catalan-coast --reuse-world --skip-fetch`):
+
+```
+Checks for the block catalan-coast:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 45 of 45 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 45 of 45
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (40.45 to 42.4 N, 0.05 W to 3.15 E)
+  tiles another region lists: 4 kept (level 2: 4, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+  GEBCO's fill raised to the chart's datum by the world's mean level, 0.17 to 6.83 m
+  harbour patch alfaques: GEBCO's fill raised by the eleven's mean level within its box
+  the shore swept for GEBCO's fill: 1642 cells ... in 64 places of 0.05 degrees
+```
+
+The fill's 6.83 m is the eleven's, outside every block's bounds (the fetch box beyond the
+region's west and north bounds, inland) and within the Alfaques' patch; within the bounds the
+block's own water, Barcelona's 0.21 m. The sweep's largest places are the modern harbours'
+basins and the coast's small river mouths (96 cells about Tarragona's port, 83 about
+Barcelona's, 80 about Vilanova's, 78 about Cubelles, 75 about Salou), water, left so. The
+neighbours' checks, run after their marks went in: `gulf-of-lion` 126 of 126 features, "0
+kept", passing; `mediterranean-west` 107 of 107, "3 kept", passing.
+
+### The period's shore and the patches (items 2 and 3)
+
+**The Ebro's delta floods on the block's own water.** The first build (no gauge of the
+block's yet) raised GEBCO's fill by the eleven's 6.83 m over the whole block; with
+Barcelona's gauge in, the raise within the bounds is its 0.21 m, and the delta, whose land
+EMODnet does not hold and GEBCO's fifteen seconds lay under mean sea level, read as shoal
+water from Amposta to the Fangar: the sweep 34,401 cells in 89 places, its ten largest all
+on the delta (3,465 cells about 40.68 N 0.62 E, 3,241 about 40.68 N 0.68 E, 2,615 about
+40.73 N 0.83 E ...). Package 93's rule for a shore the grid smears: the Alfaques' patch,
+widened to 40.56 to 40.83 N and 0.55 to 0.92 E over the delta whole, keeps the eleven's raise
+(`fill_raise: eleven`) until a sheet is read with its datum, said in the recipe's comment;
+the delta stands, the Alfaques' bay and the Fangar's are water, rendered and checked.
+
+**No override, by the lead's ruling**: the harbour plans of the coast are the Rumsey scans
+(CC BY-NC-SA), read and cited and not transcribed; Tofiño's public-domain 'Carta esférica
+desde Cabo Oropesa a Cabo de Creux' (1786) is too small a scale for a patch. It was not laid
+under `docs/references/`: the rough figure it would give is no better than his text's,
+Cape Tortosa at 40° 43′ 55″ (the grid's tip at about 40° 43′), his longitude uncertain in
+its conversion from Cadiz's meridian by more than the delta's change. **This block's shore is
+one year's picture, the modern grid's**: the modern ports of Barcelona (the docks and the
+ground reclaimed to the Llobregat, whose mouth has been turned), Tarragona and Valencia, the
+modern delta. A later package with a public-domain plan would redraw Barcelona's old mole
+and bar, Tarragona's road and mole, the Alfaques' bay and the delta's points. Every port file
+says `datum: unverified`; the patches are the grid's level 3.
+
+**The marks**: 45 in the block, 12 in `gulf-of-lion` for Rosas and Palamós, 12 in
+`mediterranean-west` for Valencia and Alicante, drafted from the pages (two readers of the
+OCR texts, checked line by line), placed from the modern map and the pilots' bearings, and
+checked against the tiles by the features rule with a scratch script outside the
+repository: 11 moved within the rule's reach and said in `fix` (the farthest the Alfaques'
+outer road, 680 m, first placed on the Bana's sand), Tabarca 600 m to the grid's shoalest. Rendered over the tiles' land and
+water at Barcelona, Tarragona and the delta before trusting them (79c's finding). **Isles the
+grid lacks**: the Medas (33 m of water at the isle's place, no land within a kilometre) and
+Tabarca (1.9 m at its shoalest) as islands with `grid_lacks`, the Hormigas as a rock of its
+height; Palamós's rock (La Llosa, 11 feet) has no head in the grid (29 m) and stands at
+Tofiño's bearing from the windmill. **The lights, data that carries its dates**: Barcelona's
+lantern on the old mole `from` 1715 (Michelot's fire kept every night, the earliest record
+read); the new mole's light `from` 1823 (the notice of 14 December); Tarragona's mole lantern
+`from` 1826 (Purdy's first mention, the year first lit UNVERIFIED); no light at the
+Alfaques, Cape Tortosa, Salou, the Llobregat, Montjuïc, Rosas, Palamós, the Grao or Alicante
+in any period text.
+
+### The ports and their dated states (item 4)
+
+| port | region | nation by date | source |
+|---|---|---|---|
+| Barcelona | `catalan-coast` | Spain's to 28 Feb 1808; France's 29 Feb 1808 to 30 May 1814; Spain's after | the seizure FROM MEMORY (Oman or Napier would verify); the end FROM MEMORY (the Treaty of Paris) |
+| Tarragona | `catalan-coast` | Spain's to 27 Jun 1811; France's 28 Jun 1811 to 18 Aug 1813; Spain's after | FROM MEMORY; the storm's day agrees with the Rumsey plate's title "le 28 Juin 1811" |
+| the Alfaques | `catalan-coast` | Spain's | undated: whether the French held San Carlos not read |
+| Rosas | `gulf-of-lion` | Spain's to 4 Dec 1808; France's 5 Dec 1808 to 30 May 1814; Spain's after | the citadel's capitulation VERIFIED (James 1837, vol. 4, p. 386); the end FROM MEMORY |
+| Palamós | `gulf-of-lion` | Spain's | undated (no French holding in the brief or read) |
+| Valencia | `mediterranean-west` | Spain's to 8 Jan 1812; France's 9 Jan 1812 to 4 Jul 1813; Spain's after | FROM MEMORY (Blake's capitulation, Suchet's leaving) |
+| Alicante | `mediterranean-west` | Spain's | never taken (FROM MEMORY) |
+
+Spain at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, VERIFIED); the
+junta's war on France of 4 June 1808 and "hostilities cease between England and Spain"
+(vol. 4, pp. 294 to 295, VERIFIED): the brief's "Britain's ally from the summer of 1808"
+stands. **But the wars table is one year's picture** (below, "Found on the way"), so every
+Spanish port reads hostile on any day. The markets by the period's trades the texts give
+(the lead's ruling: the sources win over the brief): the Alfaques' salt (Tofiño p. 116),
+Salou's fruits (p. 121) and the wine loaded at Villaseca (Michelot 1715), Barcelona's corn,
+fish and rice in and wine, brandy, cork and silk out (Purdy 1826 p. 28; Norie 1831 p. 30),
+Valencia's rice (Tofiño p. 107) and silk (Norie p. 27), Alicante's barilla, wine, soap and
+salt (Purdy p. 21); Reus's brandies, the Alfaques' rice and Valencia's oranges marked FROM
+MEMORY in their notes and kept out of every truth. The region's routes at seed 7 in June 1805,
+best first: salt the Alfaques to Barcelona (2.0), salt the Alfaques to Tarragona (1.83, refused
+by the guard), wine Tarragona to Barcelona (1.63), brandy Tarragona to the Alfaques and to
+Barcelona (1.35), rice and wine the Alfaques to Barcelona (1.3). **The business needed the
+ports' tracks**: without them four routes were refused by the far-detail guard (the Alfaques'
+haven behind the Bana, Tarragona's straight line to Barcelona across the Garraf) and the
+region drew one trader in a day, outward bound; with `tracks:` for Barcelona, Tarragona and
+the Alfaques it draws its salt and wine to Barcelona within hours. No King's yard on the
+coast; each port a chandlers' with topmast and water, ten goods and more, the three ratings,
+the pilot's four words (`test_ports.py`). Every road and anchorage within three kilometres of
+a note of the bottom (`test_tackle_orders.py`).
+
+### The tide (item 5)
+
+Barcelona's gauge from TICON (41.342 N 2.163 E, 1993 to 2015; M2 4.6 cm, 213.5°), its mean
+level 0.21 m above the lowest astronomical tide from REDMAR 3758 (NMM 30 cm, LAT 9 cm),
+`block: catalan-coast`, 38 miles from the Gulf's seam and 46 from 40.56 N, so serving its own
+block alone. **Not added, by the lead's ruling**: Valencia's (TICON 39.46 N 0.33 W, REDMAR
+3651: NMM 12 cm, LAT −8 cm, 0.20 m), Sagunto's and Gandía's, in a built region whose water
+and tiles' fill a gauge would move. **None at Tarragona** (REDMAR 3756 gives its levels, NMM
+30 cm and LAT 10 cm, 0.20 m, but no constants are on file) **nor at Alicante** (in neither
+TICON nor REDMAR's list). The eleven do not move. The master's epitome gains Barcelona, its
+hour the gauge's establishment (7h 25m) and a foot of rise, JUDGEMENT, Smyth 1854 (p. 176)
+for the coast's "most moderate" tides; the block's other ports and Rosas and Palamós take it
+as the nearest place, Valencia Ivica's and Alicante Cartagena's. The streams: the coast's
+south-westerly set (Michelot 1715; Purdy 1826 p. 28; Smyth 1854 p. 162, "so sluggish as to be
+almost imperceptible") as a current in a band about ten miles wide from Tossa to the
+Alfaques, half a knot JUDGEMENT, no text giving a rate; the block's open sea still; the set
+onto the Ebro's mouths with sea winds (Tofiño p. 119) said in the book and not modelled (it
+follows the wind); the block's box appended to `book_limits`. No recorded passage's water is
+within a thousand miles of the polygons.
+
+### The weather (item 6): a box of its own
+
+Barcelona's table against the Gulf's box (Marseille's), the quarters' shares in per cent of
+the days (each half-point's days split between its two quarters):
+
+| month | Barcelona W E S N | the Gulf's box W E S N | largest difference |
+|---|---|---|---|
+| 1 | 47 18 16 19 | 24 34 10 29 | 23 |
+| 4 | 27 28 37 8 | 37 22 18 20 | 19 |
+| 7 | 13 32 53 2 | 45 15 18 19 | 35 |
+| 10 | 29 29 31 11 | 31 27 15 24 | 16 |
+
+The months differ by 16 to 37 points (the coast's summer southerly and its winter westerly,
+where Marseille has the mistral), beyond the fit's noise of five: **a box of the block's
+own**, `catalan-coast`, over the region's bounds. Its check rows Barcelona's quarters scaled to
+nine tenths (79c's rule); the generator's figures fitted by a scratch search outside the
+repository (from the Mediterranean west's rows, 500 trials of 60 months a month, January and
+October 800 more of 120), then the check tool's `run` with the box the default, 1,200 months
+at seed 7:
+
+| month | W (table) | E (table) | S (table) | N (table) | none | F6+ days (table) | F9+ days (table) |
+|---|---|---|---|---|---|---|---|
+| 1 | 42.5 (42) | 16.2 (16) | 15.4 (15) | 17.1 (17) | 8.9 | 0.5 (2.4) | 0.00 (0.4) |
+| 2 | 35.5 (35) | 15.2 (14) | 24.9 (27) | 12.7 (13) | 11.7 | 1.6 (2.1) | 0.05 (0.35) |
+| 3 | 20.3 (22) | 21.0 (25) | 36.3 (35) | 8.6 (9) | 13.8 | 8.2 (2.4) | 0.43 (0.4) |
+| 4 | 20.0 (24) | 26.8 (26) | 31.1 (33) | 8.7 (8) | 13.5 | 3.4 (2.4) | 0.07 (0.4) |
+| 5 | 16.5 (19) | 28.0 (30) | 35.9 (36) | 7.6 (4) | 12.1 | 4.4 (0.9) | 0.25 (0.15) |
+| 6 | 11.6 (12) | 29.7 (30) | 47.5 (46) | 4.4 (2) | 6.8 | 0.7 (0.3) | 0.00 (0.05) |
+| 7 | 9.7 (12) | 30.1 (29) | 47.7 (48) | 5.6 (1) | 6.9 | 2.5 (0.6) | 0.25 (0.1) |
+| 8 | 10.7 (12) | 28.4 (28) | 51.3 (49) | 3.9 (1) | 5.8 | 1.6 (0.6) | 0.08 (0.1) |
+| 9 | 13.0 (12) | 31.3 (33) | 36.5 (36) | 10.6 (9) | 8.6 | 1.8 (0.3) | 0.04 (0.05) |
+| 10 | 23.7 (26) | 25.2 (26) | 25.0 (28) | 9.2 (10) | 16.9 | 1.3 (1.5) | 0.06 (0.25) |
+| 11 | 38.1 (38) | 15.6 (16) | 18.1 (18) | 18.4 (18) | 9.8 | 1.8 (1.2) | 0.02 (0.2) |
+| 12 | 44.5 (44) | 7.7 (9) | 8.6 (9) | 25.9 (29) | 13.3 | 1.1 (1.2) | 0.00 (0.2) |
+
+Every month within five points of the westerly and easterly shares, and of the southerly
+and northerly too. **The gale days the fit does not reach**: the winter's strong
+breezes and gales below the table's rule (January's 0.5 days against 2.4), March's and May's
+above; the quarters were the search's aim. PROVISIONAL in every row, one year's picture (the
+observations of about 1880 to 1912).
+
+### The scenario, sailed once (item 7: `data/scenarios/tarragona.yaml`, seed 7)
+
+The frigate off the mouth of Port Mahon at 05:00 on 12 May 1809, the weather pinned (an
+easterly at fourteen knots veering south-easterly and southerly), a short book. She weighed
+at 05:28, rounded the Isla del Aire, ran west along Minorca's south coast (noon by
+observation 39° 50′ N, the account a mile out), through the channel between the islands at
+12:50, fixed by the Puig Major and Mount Toro at 18:30, crossed 40.56 N in the night, at 05:00
+on the 13th fixed by the Puig Major, the Montsia and the Monsein, made Tarragona's offing at
+11:26 and anchored in the road at 12:29 in 18 fathoms, brought up at 12:46 with 91 fathoms of
+cable, the lead giving seventeen and eighteen fathoms of soft brown mud. Forty hours: 1,640
+lines, digest `6813044e15ccfa2d` (`tools/day_log.py data/scenarios/tarragona.yaml --hours 40
+--reckoning`, this container); no grounding, no beam ends, no order refused. Not a gate's, not
+pinned. **The first runs, kept for the book**: "the starboard tack and steer S" with the wind
+east was the wrong tack, and she stood onto the ledges of the mouth (run 1); the hourly course
+for the crossing held only within 130 miles of a mark 129 miles off, so it never fired and she
+ran dead before an easterly onto Majorca's Cape Formentor (run 2); an east-south-easterly
+would not let her lay south out of the mouth (run 3); the hourly course for the channel stayed
+within its reach after the channel was passed and turned her back each hour (run 4, 79c's
+lesson again: every hourly course holds only while the mark beyond is far). **In 1809 the
+road's port reads hostile to her** (the wars table, below); she anchors and does not go in.
+
+### The truths (item 9): 7-490 to 7-499
+
+7-490 the chart answers over the old gap on a tenth of a degree and along the main from Cape
+Palos to Cape Creus on every twentieth of latitude; 7-491 and 7-492 the seams at 40.56 N and 3 E
+crossed within the hour with the region, the tide (Barcelona's gauge) and the business carried,
+the weather's box changing at 40.5 N where the boxes meet, the Montsia kept in sight, the depth
+not stepping; 7-493 Montjuïc, Montserrat and the Monsein at twelve leagues, the lantern and La
+Merced from the road; 7-494 a frigate at anchor in Rosas bay through a northerly (Tofiño's
+words; the brief's "best anchorage of the coast" dropped by the lead's ruling); 7-495
+Valencia's road an open beach to leeward of an easterly, its pilot's words the period's; 7-496
+Barcelona and Rosas hostile as Spain's in 1805 and as France's in 1809 by their dated nations
+(the brief's "Tarragona receives her in 1809" dropped by the ruling: the wars table); 7-497 the
+coast's lights carrying their dates; 7-498 the Alfaques' salt carried to Barcelona; 7-499 the
+scenario sailed. States, counts and bands; no digest pinned.
+
+### Decision 66: which of the block's data carries its dates
+
+**Carries its dates in its rows**: the ports' nations (Barcelona, Rosas, Tarragona, Valencia
+by date); the lights (`lit: from`). **One year's picture**: the chart's shore (the modern
+grid, EMODnet 2024 and GEBCO 2025: the modern ports and delta), the marks' places (the modern
+frame); the weather box (about 1880 to 1912); the tide (the gauges' 1993 to 2015 series); the
+markets (judgement on the period's trades, undated); the pilots' words (Tofiño's 1787 survey
+with Purdy's 1826 and Norie's 1831); and the nations table's wars, one picture of June 1805
+for every day (below).
+
+### Found on the way (package 101), for others and not mended
+
+- **The nations table's wars are one year's picture** (`data/nations.yaml` `wars:` has
+  `since` and no `until`; `Nations.at_war`, `freesail/world/nations.py` line 109, reads no
+  date): Britain is at war with Spain on every day after 1804, so in 1809 every Spanish port
+  is hostile to a King's ship. A scenario's `nations:` block (package 75) can state its day's
+  wars, but the World reads it for nothing yet (`freesail/core/world.py`, the Scenario's
+  `nations`, lines 269 to 278). For the owner (decision 66; the range's review, package 103):
+  whether a dated war is read as the state on the day a game begins or against the running
+  clock. The lead's ruling: not touched here.
+- **A gauge for the Valencian coast**: the world's tide off Valencia and Alicante is the
+  Alboran gauges' blend (an M2 of 13 cm, its hour 1h 57m) where Valencia's own is 1.7 cm;
+  TICON's Valencia, Sagunto and Gandía are on file, with REDMAR's levels, for a package that
+  rebuilds `mediterranean-west`'s tiles on them.
+- **The tide steps at 40.56 N**: the Balearics' blend (M2 3 cm) to Barcelona's gauge (4.6 cm)
+  across the seam, a seam far from every gauge (package 94's finding: a step, not tapered).
+- **The weather boxes meet at 40.5 N, the regions at 40.56 N**: the strip between takes
+  the nearest box, now Barcelona's.
+- **The fit's winter gales**: one track of lows a month gives the quarters and not the
+  winter's strong breezes and gales of Barcelona's table (a finding of the weather's lows,
+  with 79d's).
+- **Rosas, Palamós, Valencia and Alicante have no `tracks:`**: their regions' business is
+  not tested here; the guard may refuse their routes as it did the block's.
+- **The Admiralty's Mediterranean Pilot vol. I PDF's page for p. 726 is 899** (the offset
+  varies through the volume: p. 618 is 745, p. 717 is 890).
+
+### The suites, as run (package 101)
+
+At `d2f0b34` (the trunk merged at `229d024` by the merge commit `95841e1`; what met, the M7
+records, the schooner's gate 5b re-pin and runs 62's and 63's figures, no file of the
+block's), in a worktree pinned there, this container, four workers. `ruff check .` and `ruff
+format --check .` clean (378 files). **The fast tier** whole (`python3 -m pytest -n 4 -q -p
+no:cacheprovider`): exit 0, 7,200 passed, 1 xfailed, 489 slow left out. An earlier fast tier at
+`9416ca2` exited 1 on one failure of this package's, `test_geo.py`'s list of the chart's
+regions without the block's (79c met the same test); mended at `d2f0b34` and the whole tier
+run again there. **The slow tier of the touched files** (`--slow -m "not pace" -n 4` on
+`test_chart.py`, `test_ports.py`, `test_tide.py`, `test_weather.py`, `test_nations.py`,
+`test_scenarios.py`, `test_known_truths.py` whole, `test_geo.py`, `test_ordnance.py`,
+`test_tackle_orders.py`, `test_log_lines.py`): exit 0, 664 passed, 8 xfailed; the recorded
+passages' tests among them, every pinned digest, line count and tick held. **The recorded
+passages by name** (`--slow -k "gate_5b or gate_5c"` on `test_known_truths.py`): exit 0, the
+one test the names select passed to its digest. **No pin moved.** **The pace**, alone and
+last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The
+tree reported differs from `d2f0b34` by this paragraph alone.

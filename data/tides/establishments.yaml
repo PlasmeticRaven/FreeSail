@@ -204,6 +204,12 @@ tables:
       - {name: Melilla, lat_deg: 35.293, lon_deg: -2.935, hw_h: 2, hw_m: 10, spring_rise_ft: 1, note: "Purdy 1826, p. 322: at the Zafarines the tide rises very little; the hour Melilla's held gauge's establishment (TICON), JUDGEMENT"}
       - {name: Oran, lat_deg: 35.713, lon_deg: -0.642, hw_h: 2, hw_m: 20, spring_rise_ft: 1, note: "no period figure; the rise JUDGEMENT with Melilla's and Algiers'; the hour Melilla's held gauge's establishment, 114 miles off, JUDGEMENT"}
       - {name: Algiers, lat_deg: 36.786, lon_deg: 3.069, hw_h: 7, hw_m: 20, spring_rise_ft: 1, note: "Bérard 1837, pp. 76 to 77: the tide scale set up in the port of Algiers in 1831 ranged sixteen inches at the most, its rise and fall tied to the wind and the glass; the hour Palma's held gauge's establishment, 168 miles off, JUDGEMENT"}
+      # package 101, the Catalan coast's block: no period tide-hour for the coast (Smyth
+      # 1854, p. 176: on the Spanish coast within the Mediterranean the tides are of the
+      # most moderate order); the hour the block's own gauge's establishment by the tide's
+      # rule (Barcelona's, TICON's M2), the rise a foot, JUDGEMENT, as the Mediterranean
+      # west's; the block's other places and the ports beside it take it as the nearest
+      - {name: Barcelona, lat_deg: 41.374, lon_deg: 2.188, hw_h: 7, hw_m: 25, spring_rise_ft: 1, note: "Smyth 1854, p. 176: the tides on the Spanish coast inside the Mediterranean of the most moderate order; the hour Barcelona's gauge's establishment (TICON), JUDGEMENT, its spring range 0.12 m"}
       # package 79d, the Gulf of Lion's block: the period's tide-hour for the shores of
       # France, Smyth 1854's ("the most exact observations giving only a foot or two of
       # rise ... the tide-hours at Toulon, Spezzia, and Naples ... 3h 30m, 1h 45m and 11h

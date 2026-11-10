@@ -1,6 +1,26 @@
 {
 "cell_deg": 0.25,
 "cells": {
+"167,12": [
+"palamos",
+"molino-point",
+"palamos-port",
+"palamos-road",
+"palamos-rock",
+"hormigas",
+"cape-san-sebastian"
+],
+"168,12": [
+"medas-islands"
+],
+"168,13": [
+"cape-norfeo"
+],
+"169,12": [
+"rosas-citadel",
+"trinidad-castle",
+"rosas-road"
+],
 "169,13": [
 "cape-creus"
 ],
