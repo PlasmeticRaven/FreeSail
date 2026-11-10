@@ -15089,3 +15089,24 @@ def test_truth_7_459_go_ashore_from_aloft_refused_and_the_owners_world_order_his
 
     test_go_ashore_from_the_tops_is_refused_until_he_comes_down()
     test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is()
+
+
+def test_truth_7_460_a_second_world_reads_nothing_of_a_dead_worlds_set():
+    """Package 98, step 8 (a determinism defect found by package 74, proven by the lead): the
+    set's last course is the World's own; a second convoy made after the first is dropped,
+    with a stale course planted where the old module table would have held it, keeps the
+    first's stations every ten minutes and its count of lines."""
+    from tests.test_squadrons import test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses
+
+    test_a_second_world_reads_nothing_of_a_dead_worlds_last_courses()
+
+
+def test_truth_7_461_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint(tmp_path):
+    """Package 98, step 8: a set whose commodore lies stopped, her head fallen off her last
+    course, saved by a checkpoint and resumed, keeps the uninterrupted run's stations and
+    count of lines over the next hour."""
+    from tests.test_squadrons import (
+        test_a_stopped_commodores_set_keeps_its_stations_across_a_checkpoint as case,
+    )
+
+    case(tmp_path)
