@@ -4188,9 +4188,15 @@ GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
     16200,
     96540,  # package 45 (94380 at 37p, 96240 before package 37j)
 ]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise
+# Package 98, step 5 (the Goulet the narrows, the Rade de Brest its own stream of two knots
+# at springs where the Goulet's four and a half ran over the whole bay): from the mouth of the
+# Goulet in she carries less stream, anchors in the Bay 360 s later in fifteen fathoms (14),
+# the pilot put off 2,760 s sooner and the tin sold 1,438 s later; four lines fewer; every
+# figure to the road of Bertheaume the same. The old stream restored (data/tides/streams.yaml
+# as at 28f7788e) gives every old figure, the toggle (docs/dev/TuningNotes.md, package 98).
 GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
     18300,
-    121620,  # package 45c (121500 at 45, 121380 at 37p)
+    118860,  # package 98, step 5: the Rade's own stream (121620 at 45c, 121500 at 45)
 ]  # Mr Tregenza put off beyond the outer road, the ship hove to for it; Mr Le Floch at the
 # anchor in the Bay of Brest, from the quay (package 37h)
 GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
@@ -4202,7 +4208,7 @@ GATE_5C_MERCHANT_IROISE_CAST_TICK = 90318  # package 45 (90241 at 37p)
 GATE_5C_MERCHANT_ANCHORED_TICKS = [
     57,
     100616,  # package 45 (98515 at 37p, 98814 before it)
-    115547,  # package 45c, the Bay's road moved onto its twelve fathoms (116411 at 45)
+    115907,  # package 98, step 5: the Rade's own stream, in fifteen (115547 at 45c, in 14)
 ]  # Carrick Road; the road of Bertheaume on the 13th; the Bay
 GATE_5C_MERCHANT_FLOOD_TICK = (
     108960  # the turn to the flood at Bertheaume, 11:16 on the 13th, by daylight
@@ -4215,7 +4221,7 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
 GATE_5C_MERCHANT_GOULET_TICK = 112142  # the mouth of the Goulet (112189 at 37p)
-GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125387 at 45)
+GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 125387 at 45)
 # Package 37m (2026-10-09): every tick stands; at anchor in the Bay at 129600 the hourly
 # course for the Iroise, on the other tack with no way on her, is refused as keeping her
 # full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
@@ -4238,7 +4244,7 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
 # closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
-GATE_5C_MERCHANT_LINES = 3107  # 65 step 3 (3100 at 58b, 3099 at 68, 3098 at 56, 3080 at 57)
+GATE_5C_MERCHANT_LINES = 3103  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4246,7 +4252,7 @@ GATE_5C_MERCHANT_LINES = 3107  # 65 step 3 (3100 at 58b, 3099 at 68, 3098 at 56,
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
-GATE_5C_MERCHANT_DIGEST = "6436eb06a665f379"  # package 65, step 3 (6abbbff4d7fa1a57 at 58b)
+GATE_5C_MERCHANT_DIGEST = "40bcef34afd0cec4"  # package 98, step 5 (6436eb06a665f379 at 65)
 
 
 def _people(world) -> list[dict]:
@@ -4706,7 +4712,7 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # package 68, riding: 8eead2f4521f2a61 (90061f779b7db484 before)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave b498761052da0862; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_INTENT_DIGEST = "8744d3e56cfc9508"  # package 65, step 3 (585c52675f10e590 at 58b)
+GATE_6A_INTENT_DIGEST = "9d9efe6b21c17060"  # package 98, step 5 (8744d3e56cfc9508 at 65)
 
 
 @pytest.fixture(scope="module")
@@ -4891,7 +4897,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "7076e667c2bc41e3"  # package 65, step 3 (1c9a985bfd5dce0f at 58b)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "c0bf4b51621ad91f"  # package 98, step 5 (7076e667c2bc41e3 at 65)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
