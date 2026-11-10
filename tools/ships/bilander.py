@@ -2077,14 +2077,10 @@ SWIVELS_NOTE = (
     "house sets a swivel (Build-Ships.md §5.3); on its yoke, no port; its half hundredweight the "
     "house's (judgement); one man each, from whoever is spare."
 )
-CHARGES_NOTE = (
-    "A cartridge's powder in pounds, to the ounce: the engine's shares of the shot "
-    "(freesail/ship/parts.py, charge_lb), a long gun a third and a swivel a half. The long "
-    "3-pounder's 1 lb is the Regulations 1806 (1808 printing) Table No. 29's service charge to "
-    "the ounce (Build-Ships.md §10, read on the page image); the half-pounder swivel's 4 oz is "
-    "the engine's half, where the table gives 2 oz, which the shared table enters with SW-1 "
-    "(Build-Ships.md §10)."
-)
+# Her cartridges' powder (Bil-D §5.3): the Regulations' Table No. 29 through `charge_lb` and the
+# shared note since the shared work SW-1 filled the table (Build-Ships.md §10): the long
+# 3-pounder's 1 lb, as the share gave it, and the half-pounder swivel's 2 oz, where the engine's
+# half gave 4 oz. Her own note, which said so until then, is gone.
 
 
 def her_guns(profile: dict) -> list:
@@ -2159,11 +2155,10 @@ def check_guns(guns: list, profile: dict) -> None:
 def armament(b, guns) -> None:
     """Her fits (Bil-D §5.1, §5.3): `unarmed` the default and the armed merchant, its magazine
     the merchant brig's (`g.MERCHANT_ROUNDS`, 20 round and 4 grape a gun; `g.SWIVEL_ROUNDS`, 40
-    a swivel; judgement), no charges for exercise (a King's fit's only), the charges' note her
-    own."""
+    a swivel; judgement), no charges for exercise (a King's fit's only), the charges Table No.
+    29's under the shared note (SW-1)."""
     magazine = g.fit_magazine(guns, {"long": g.MERCHANT_ROUNDS, "swivel": g.SWIVEL_ROUNDS})
     b.armament(GUNS_NOTE, g.UNARMED, [(ARMED_FIT, FIT_SOURCE, guns, magazine, FIT_NOTE)])
-    b.armament_notes[("magazine", ARMED_FIT, "charges")] = CHARGES_NOTE
 
 
 # Her company, eight (D43; Bil-D §6.1): the posts her wardroom file's, the master and the mate

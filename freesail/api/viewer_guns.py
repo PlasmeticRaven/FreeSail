@@ -25,7 +25,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from freesail.ship.parts import charge_lb
+from freesail.ship.parts import filed_charge_lb
 from freesail.ship.profile import interp, ports_of, rail_at
 
 FT = 0.3048
@@ -396,9 +396,16 @@ def contract(profile: Any, guns: Iterable[Any]) -> list[str]:
     return sorted(set(lacks))
 
 
-def served(profile: Any, guns: Iterable[Any]) -> dict[str, Any]:
+def served(
+    profile: Any,
+    guns: Iterable[Any],
+    charges: Mapping[tuple[str, float], float] | None = None,
+) -> dict[str, Any]:
     """The graph's `guns` and `ports` for the viewer (§7): each gun with its placing and figure,
-    or why it is not drawn; each port with the guns that stand in it."""
+    or why it is not drawn; each port with the guns that stand in it. A gun's `charge_lb` is its
+    own, the fit's `charges` (package 75, SW-1: `parts.filed_charge_lb`, the shares as filed
+    where the fit has none, as the magazine reads them), so the eight files' guns are served
+    their files' charges and the new ships' Table No. 29's."""
     guns = list(guns)
     placings = [place(profile, g) for g in guns]
     out_guns = []
@@ -429,7 +436,7 @@ def served(profile: Any, guns: Iterable[Any]) -> dict[str, Any]:
                     "bore_m": round(f.bore_m, 4),
                     "breech_m": round(f.breech_m, 3),
                     "muzzle_m": round(f.muzzle_m, 3),
-                    "charge_lb": charge_lb(g.kind, g.pounder),
+                    "charge_lb": filed_charge_lb(charges, g.kind, g.pounder),
                 }
             )
         out_guns.append(entry)

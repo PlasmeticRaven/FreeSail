@@ -781,10 +781,11 @@ class FitSpec:
     """A fit of guns with its magazine: the guns, the filled cartridges by the gun's kind and
     calibre, the shot by calibre and kind, and the source the generator names for the whole;
     and (practice and resupply, between packages 72 and 73) a cartridge's charge in pounds by
-    kind and calibre (None: `ship.parts.charge_lb`'s), the powder below in barrels, and a
-    King's fit's allowance of charges for exercise a month (the Regulations 1806, the
-    Gunner, Art. XXI, l.13122-13144). A fit pickled before them has calibre-keyed
-    `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits the keys)."""
+    kind and calibre (None: the shares as filed, `ship.parts.filed_charge_lb`'s), the powder
+    below in barrels, and a King's fit's allowance of charges for exercise a month (the
+    Regulations 1806, the Gunner, Art. XXI, l.13122-13144). A fit pickled before them has
+    calibre-keyed `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits
+    the keys)."""
 
     name: str
     guns: list[GunSpec]

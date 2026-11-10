@@ -1371,12 +1371,12 @@ armament:
           3: 104
         swivel:
           0.5: 176
-      # A cartridge's powder in pounds, to the ounce: the engine's shares of the shot (freesail/ship/parts.py, charge_lb), a long gun a third and a swivel a half. The long 3-pounder's 1 lb is the Regulations 1806 (1808 printing) Table No. 29's service charge to the ounce (Build-Ships.md §10, read on the page image); the half-pounder swivel's 4 oz is the engine's half, where the table gives 2 oz, which the shared table enters with SW-1 (Build-Ships.md §10).
+      # A cartridge's powder in pounds: the service charge of cylinder powder for one shot by the gun's kind and calibre, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10; the OCR has its title at l.27498-27502 and lost its figures; freesail/ship/charges.py): a third of the shot's weight for a gun and a twelfth for a carronade, rounded down to the ounce, and 2 oz for the half-pounder swivel. A gun the table does not name takes its kind's share of the shot to the nearest ounce (freesail/ship/parts.py, charge_lb).
       charges:
         long:
           3: 1.0
         swivel:
-          0.5: 0.25
+          0.5: 0.125
       # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 1
       shot:

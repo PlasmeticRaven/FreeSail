@@ -17056,6 +17056,203 @@ data were as run throughout.
   same, message for message (two xfails, two Playwright skips). Green, no known failure.
 - **ruff** check and format over the tree: clean, 367 files. Every changed file is LF.
 
+## Table No. 29's charges (package 75, SW-1) (2026-11-09)
+
+**The step.** `docs/design/Build-Ships.md` §10 whole, its §2.2 and §16.1 rows, and the
+*Bellerophon*'s §5.4 and §0 (her long 32's charge waits on it): the Regulations 1806 (1808
+printing), Table No. 29, "A Table shewing the quantities of Gunpowder to be used with different
+natures of Ordnance", its service column with one shot, read on the page image (IA
+b22017033_0001, leaf n533; the OCR has the title at
+`docs/references/admiralty/regulations-and-instructions-1808-ocr.txt:27498-27502` and lost the
+figures), entered by kind and calibre and read by `charge_lb`. The image was looked at again for
+this step: §10's reading stands figure for figure, and the column's head gives the guns' charge as
+a third of the shot.
+
+**As built.**
+- `freesail/ship/charges.py`: `CHARGE_TABLE_LB`, eighteen figures in pounds under twenty keys.
+  Guns, the table's one row, as long guns: 42-pdr 14 lb, 32 10 lb 10 oz, 24 8 lb, 18 6 lb, 12 4
+  lb, 9 3 lb, 6 2 lb, 4 1 lb 5 oz, 3 1 lb, 2 10 oz, 1 5 oz, 1/2 2 oz; its half-pounder as the game's
+  swivel, 2 oz, and its 1-pounder for the swivel too, 5 oz (the row names no mount, so its two
+  least calibres serve both kinds; no file carries a swivel of a pound or a long half-pounder:
+  the review's mend). Carronades: 68-pdr 5 lb 10 oz, 42 3 lb 8 oz, 32 2 lb 10 oz, 24 2 lb, 18 1 lb 8
+  oz, 12 1 lb. The docstring cites the table in place of "UNVERIFIED", gives the lead's rule below,
+  its readers and what is left out.
+- `freesail/ship/parts.py`: `share_charge_lb`, a kind's share of the shot to the nearest ounce,
+  split out of `charge_lb`, which calls it where the table names no such gun (a French 36 or 8, a
+  swivel above a pound: the share, as before, said in both docstrings). `filed_charge_lb`, a gun's
+  charge as its fit's file gives it, the fit's `charges` else the shares as filed, which
+  `Magazine.charge_of` and `_charges_of` read (the review's mend: a fit without charges, an old
+  save's, is one of the eight). The comment above `CHARGE_SHARE` confirms the third and the
+  twelfth in place of "UNVERIFIED"; `schema.FitSpec`'s docstring names the default.
+- `freesail/api/viewer_guns.py` (package 81's file) and `freesail/api/queries.py`: `served(profile,
+  guns, charges=None)` serves each gun `filed_charge_lb(charges, ...)`, and `ship_graph` passes the
+  ship's fit's `charges` (the review's mend; Design-ViewerAction.md's as-built line).
+- `tools/gen_ships.py`: `fit_magazine(..., as_filed=False)`, the charges `charge_lb`'s (the
+  table); `as_filed=True` writes `share_charge_lb`'s and returns a `MagazineAsFiled`, over whose
+  charges `Builder.armament` writes `charges_as_filed_note` (the shares, the rule that keeps them,
+  and where the table differs in that fit, or that it gives each charge the same).
+  `MAGAZINE_NOTES["charges"]` cites the table. The eight files' ten calls pass `as_filed=True`.
+- The new ships' modules: the *Indefatigable*'s `CHARGES_NOTE` is gone, as Indf §5.4 settled
+  ("the override holds only until ... SW-1 lands"); the bilander's is gone, since it said the
+  swivel's 4 oz; the *Neufchatel*'s is kept, carrying Adye's p. 72 beside the table, its comment
+  re-said and its citation of the shares moved from `charge_lb`, which now gives the table first,
+  to `CHARGE_SHARE` (the review's mend). No module asks for the table: it is the default.
+
+**Confirmed.** Every figure is a third of the shot for a gun (the half-pounder too) and a twelfth
+for a carronade, rounded down to the ounce. The share rounds to the nearest ounce, and so gives an
+ounce more in five places: the long 32 (10 lb 11 oz), the long 2 (11 oz), the long half-pounder (3
+oz), the 68-pdr carronade (5 lb 11 oz) and the 32-pdr carronade (2 lb 11 oz). The swivel's half
+(judgement) gives 4 oz where the table gives 2, and 8 for a swivel of a pound where it gives 5.
+The *Indefatigable*'s four fits come out the same to the ounce, and so do the *Neufchatel*'s two
+calibres.
+
+**The gate, and the lead's rule.** The stage 0 read of 2026-10-28, item 1
+(`docs/dev/M7-WorkPackages.md`) reads: "if a figure of the eight would move, the table serves the
+new ships alone (keyed so, or read only where a file asks), and the eight's charges stay as filed
+until a package of their own re-measures them old beside new". The lead restated it for SW-1 on
+2026-10-29 (item 20), and the *Bellerophon*'s §5.4 carries it. The gate was measured by running
+the generator with the table serving every file. Five of the eight files moved a figure, in six
+fits:
+
+| File, fit | Key | As filed | With the table |
+|---|---|---|---|
+| frigate-36, amazon class 1795 | `charges.carronade.32` | 2.6875 | 2.625 |
+| brig, diligence class 1796 | `charges.carronade.32` | 2.6875 | 2.625 |
+| cutter, long guns | `charges.swivel.0.5`; `powder_barrels` | 0.25; 3 | 0.125; 2 |
+| privateer-schooner, long tom | `charges.swivel.0.5` | 0.25 | 0.125 |
+| privateer-schooner, letter of marque | `charges.swivel.0.5` | 0.25 | 0.125 |
+| topsail-schooner, letter of marque | `charges.swivel.0.5` | 0.25 | 0.125 |
+
+So the table serves the new ships alone, and every figure of the eight stays as filed. **A
+departure from the step's text, for the lead.** §10's "Moved" and §16.1's row expected the eight's
+charges to move, and the hull step's standing comparisons, 86's truths 7-161 to 7-171 and two rows
+of `test_magazine` with them. Under the rule, of those only the two rows move, because they pin
+the function rather than a file; the bilander's fit moves besides (below). If the lead would
+rather the table served the eight too, the change is to drop `as_filed=True` from the ten calls
+and have `filed_charge_lb` fall back to `charge_lb`. The table above is then what moves, together
+with an old save's charges, the viewer's plume and whatever pins read those figures, re-measured
+in a package of their own.
+
+**Bytes moved** (generated in scratch, `cmp`'d file by file, then into `data/ships/`; the five
+boats byte for byte):
+
+| File | Lines | What |
+|---|---|---|
+| frigate-36, brig, lugger, merchant-brig, smack | 1 each | the charges' note: the shares as filed, the rule, the table's difference (the frigate's and the brig's 32-pdr carronade) or "each charge here the same" |
+| cutter, privateer-schooner, topsail-schooner | 2 each | the same note on each fit (the swivel's difference on the cutter's "long guns", both privateer fits and the topsail schooner's "letter of marque") |
+| sixty-four, razee-44 | 2 each | her own note gives way to the shared note, which cites the table |
+| bilander | 2 | the shared note; `charges.swivel.0.5` 0.25 → **0.125** (`powder_barrels` 1 still: 126 lb filled, was 148) |
+| hermaphrodite-brig (the *Neufchatel*) | 1 | her own charges' note, the shares cited at `parts.py`'s `CHARGE_SHARE` where it said `charge_lb` (the review's mend) |
+
+**Pins moved, old beside new, bisected.** Each old form passes at the base (5af283de; the base's
+junit) and fails on this step. Each new form passes on this step and fails at the base: the
+function's pins with the table emptied as it was there, the bilander's on her base file (0.25):
+- `tests/test_magazine.py`, the build design's table: `("carronade", 32, 2.6875, 160)` →
+  `("carronade", 32, 2.625, 159)` (`fill_seconds` 159.375) and `("swivel", 0.5, 0.25, 124)` →
+  `("swivel", 0.5, 0.125, 122)` (121.875), both against ±0.5 s; the docstring now cites the table.
+- `tests/test_bilander.py`, her fit: `("swivel", 0.5): 0.25` → `0.125`, the docstring re-said.
+
+`test_an_old_fit_and_an_old_bill_read_their_plain_defaults` keeps the base's pin, the privateer's
+swivel 0.25: the first pass had moved it to the table's 0.125, and the review's mend puts it back
+(a fit pickled without charges is one of the eight, so it keeps the shares as filed, Build §16.2's
+as built). Its docstring now says why. `tests/test_ordnance.py`'s `fake_magazine` takes its
+fit's charges (`filed_charge_lb`), as the magazine does, where it took `charge_lb`'s.
+
+**Not moved** (measured): no figure of the eight. So the hull step's standing comparisons
+(`tests/test_hull_frigate.py`, `_brig`, `_cutter` and `_schooner`, which read the parsed document
+and so not its notes) stay as they are, with nothing to rebase. `test_magazine`'s frigate filling
+(`fill_seconds(2.6875)`, her file's) holds, as do 86's truths 7-161 to 7-171 and every other truth:
+7-162 to 7-165 and 7-169 in the fast tier, 7-161, 7-166 to 7-168, 7-170 and 7-171 in the slow (the
+first pass's record had them all in its fast run of `test_known_truths`, where the slow six are
+not), the replay truths 7-170, 7-171 and 7-183 among them (§16.2), each passing as at the base.
+The four whole logs (first action, the encounter, the lee shore and the gale trials) are the
+base's, line for line and digest for digest (`digests-final.json`): 497, 229, 1,561 and 1,722
+lines. An old save of the eight fills at her file's charges, and the viewer serves the eight's
+guns their files' charges, as at the base.
+
+**The runs, against the base's junit** (once, on the final tree with the review's mends, one suite
+at a time from the tree root, `-n 4`; the base B2c's and B3.3b's final runs at 5af283de):
+- **The slow candidates** (B4's 84 files, `--slow -m slow`): 294 passed, 9 failed, 9 xfailed, 1
+  skipped, of 313, against the base's 292, 11, 9 and 1. Two outcomes changed, both failure →
+  passed and both wall-clock floors, not figures:
+  `test_the_pace_on_the_day_under_systems_holds_truth_51s_floor` and
+  `test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor` (at least 500 ticks
+  a second; the base's run measured 489 and 473 under a heavier load, its slow run taking 52
+  minutes to this one's 31). The nine failures are the base's, message for message: the three
+  captain's trials below, truths 77, 78 and 79, the merchant passage's and the schooner's
+  constants at seed 7, and the schooner's passage (767 lines to 766).
+- **The captain's trials** (`--slow`): 4 passed, 3 failed, the base's three on this machine's
+  digests (8df0ab2beba93320, df5f02eb6e6ce68a, 8dac97a4c9bdfe43). No trial's pin moved, none
+  re-pinned.
+- **The four whole logs** (`log_digests.py`): the base's in every field.
+- **The generator** into scratch: all 17 files `cmp` the same as `data/ships/`.
+  `tools/check_viewer_guns.py`: clean.
+- **The fast tier, the whole**: 7,063 passed, 2 skipped (Playwright), 1 xfailed, against the
+  base's 7,038, 2 and 1. Changed outcome none. In the base only: the two re-pinned rows of
+  `test_the_charges_and_the_filling_times_are_the_build_designs_table`, whose ids carry their
+  figures (`[carronade-32-2.6875-160]`, `[swivel-0.5-0.25-124]`); new only: 27 cases, all
+  `test_magazine`'s and all passing (those two rows as re-pinned, the twenty figures, and the set,
+  rounding, unnamed-gun, eight-files and viewer tests).
+- **ruff** check and format over the tree: clean, 367 files. Every changed file is LF.
+
+**The new tests** (`tests/test_magazine.py`), each able to fail. With the table emptied, as at the
+base, 26 of the 27 new cases failed (measured on the final tree); the unnamed gun's holds with or
+without the table, as it should, and fails if a key it names is entered. The figure, set and
+rounding tests each failed with one figure moved an ounce or a figure added:
+- `test_table_no_29_is_the_designs_reading_figure_by_figure`, twenty cases typed from §10's two
+  tables in pounds and ounces as printed (the guns' 1-pounder and half-pounder for both kinds),
+  each in `CHARGE_TABLE_LB` and through `charge_lb`;
+- `test_table_no_29_has_the_designs_figures_and_no_others`: twenty keys, eighteen figures;
+- `test_the_table_confirms_a_third_and_a_twelfth_rounded_down_to_the_ounce`, in exact fractions,
+  with the seven keys where the share differs;
+- `test_a_gun_the_table_does_not_name_keeps_its_kinds_share` (a French 36 and 8, a 2-pounder
+  swivel);
+- `test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_table`, over every
+  file of `data/ships/`; it fails on the gate's files, at the brig's 32-pdr carronade;
+- `test_the_viewer_and_an_old_fit_read_a_guns_charge_as_its_file_gives_it` (the review's mend):
+  the graph's served `charge_lb` and the magazine's charge, the frigate's 32-pdr carronade 2 lb 11
+  oz and the privateer's swivel 4 oz as filed, the bilander's swivel the table's 2 oz, and an old
+  privateer fit without charges the shares, in both.
+
+The review's mends were bisected in-process: with `filed_charge_lb` falling back to `charge_lb`
+as the first pass had it, the old fit's case and the viewer's test fail and nothing else in
+`test_magazine` or `test_ordnance`; with the two keys the mend entered taken out, the two figure
+cases, the set test and the rounding test fail and nothing else.
+
+**Left out, said** (charges.py; Build §10): the table's charges with two shots (a double-shotted
+round draws one service cartridge), for salutes and scaling, and its advice to restrain two shots
+in guns after twenty rounds. Each changes the gunnery's cycle, which is 77's. The frigate-36's
+quarterdeck guns are not touched: her charges' note alone moved.
+
+**The review's findings** (2026-11-09), each reproduced first:
+1. An old save of the eight took the table's charge (a fit pickled without charges read
+   `charge_lb`): reproduced, the privateer's swivel 0.125 against her file's 0.25 and the
+   frigate's and the brig's 32-pdr carronades 2.625 against 2.6875. Mended: `filed_charge_lb`,
+   the shares as filed; the old fit's pin back to the base's; the ordnance tests' fake the same.
+2. The viewer served the table to the eight's guns: reproduced, the same three. Mended in
+   package 81's file, under the lead's rule ("read only where a file asks"): the fit's charges.
+3. The record said 86's truths 7-161 to 7-171 passed in the fast run, but 7-161, 7-166, 7-167,
+   7-168, 7-170 and 7-171 are slow (the review named three): true. Mended above ("Not moved" and
+   the runs), from the slow run.
+4. The bilander's §5.3 as-built gave her swivel 4 oz: true; an as-built line added.
+5. The *Neufchatel*'s note cited `charge_lb` for the shares: true since the table; mended, one
+   note line of her file.
+6. "his" for Robins in `parts.py`'s new comment: true; "the allowance then".
+7. The guns' 1-pounder and half-pounder tied to one kind each: reproduced, a swivel of a pound 8
+   oz and a long half-pounder 3 oz where the row prints 5 and 2. Mended: both entered for both
+   kinds; no file carries either.
+8. Build-PracticeAndResupply.md's table and item 1, and the *Bellerophon*'s §0 row, unmarked:
+   true; as-built lines added. The test keeps its name, since the design's table now carries the
+   amended rows.
+
+**For the lead.**
+1. The rule was applied as above: the step's expected moves of the eight were not made.
+2. The viewer (`freesail/api/viewer_guns.py`, package 81's file) now serves each gun its fit's
+   charge, so the eight's plumes are drawn as at the base and the bilander's swivels at her file's
+   2 oz. To serve the table to every gun instead, `served` would read `charge_lb` again.
+3. An old save's fit pickled without charges fills at the shares as filed, so nothing of an old
+   game of the eight moves (§16.2's as built).
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

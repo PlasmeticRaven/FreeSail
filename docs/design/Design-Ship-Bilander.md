@@ -881,6 +881,13 @@ by 70's rule is 8 lb, not 7**: `far_ship` counts one side's broadside guns and e
 broadside, so all four swivels count (2 lb), as `Build-Ships.md` §9.1's review found for the
 lugger's rail guns.*
 
+*As built (SW-1, 2026-11-09; `Build-Ships.md` §10): the charges are Table No. 29's through
+`charge_lb`, under the shared note, which cites the table; her own note is gone. The long
+3-pounder's 1 lb as before; the swivel's 4 oz → **2 oz**, the table's half-pounder. One barrel
+below still, 126 lb filled where it was 148. `tests/test_bilander.py`'s fit pin moved old beside
+new (`("swivel", 0.5): 0.25` → `0.125`), and the viewer serves her swivels the same 2 oz, her fit's
+charge. The broadside by 70's rule counts shot, not powder, and is unmoved.*
+
 ### 5.4 The quarter bill (set against the armed fit, as `Build-Ships.md` §9.1 sets an unarmed default's)
 
 | | Figure | Basis |

@@ -2321,15 +2321,17 @@ CHASERS_NOTE = (
     "Her two aftmost ports a side stand empty, by the cabin trunk and the tiller under the main "
     "boom (judgement): 'mounting 18' in 22 ports leaves four empty."
 )
-# Her cartridges' powder (Neuf-D §5.4): the engine's shares give the Regulations' Table No. 29
-# exactly for her two calibres, the figures not overridden; her own note cites the table as read
-# (Build-Ships.md §10), where the shared one waits on it, as the Indefatigable's does.
+# Her cartridges' powder (Neuf-D §5.4): the Regulations' Table No. 29 through `charge_lb` since
+# the shared work SW-1 filled the table (Build-Ships.md §10), the same to the ounce as the
+# engine's shares gave her two calibres before it; the figures not overridden. Her own note,
+# which cites the table as read, is kept over the shared one for Adye's page beside it, the
+# shares cited at `CHARGE_SHARE`, since `charge_lb` now gives the table first.
 CHARGES_NOTE = (
     "A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one "
     "shot, the Regulations 1806 (1808 printing), Table No. 29, read on the page image "
     "(Build-Ships.md §10): the long 6-pounder 2 lb, the 12-pounder carronade 1 lb, which Adye 1804 "
     "p. 72 gives too. The engine's shares of the shot, a third for a long gun and a twelfth for a "
-    "carronade (freesail/ship/parts.py, charge_lb), give each of them to the ounce."
+    "carronade (freesail/ship/parts.py, CHARGE_SHARE), give each of them to the ounce."
 )
 
 

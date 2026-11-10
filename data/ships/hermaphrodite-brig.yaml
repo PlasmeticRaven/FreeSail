@@ -1825,7 +1825,7 @@ armament:
           12: 880
         long:
           6: 110
-      # A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one shot, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10): the long 6-pounder 2 lb, the 12-pounder carronade 1 lb, which Adye 1804 p. 72 gives too. The engine's shares of the shot, a third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, charge_lb), give each of them to the ounce.
+      # A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for one shot, the Regulations 1806 (1808 printing), Table No. 29, read on the page image (Build-Ships.md §10): the long 6-pounder 2 lb, the 12-pounder carronade 1 lb, which Adye 1804 p. 72 gives too. The engine's shares of the shot, a third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, CHARGE_SHARE), give each of them to the ounce.
       charges:
         carronade:
           12: 1.0

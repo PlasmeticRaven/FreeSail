@@ -909,8 +909,9 @@ def test_her_fits_are_unarmed_by_default_and_the_armed_merchant_is_elizabeths_gu
     Adye's 7 cwt 1 qr and Falconer's three men; and four half-pounder swivels on the quarterdeck
     rail, two a side, each at the rail's height at its own x (`rail_at`'s rule), one man each
     (judgement). The merchant brig's magazine (20 round and 4 grape a gun, 40 a swivel), no charges
-    for exercise; the long 3-pounder's charge Table No. 29's 1 lb, the swivel's the engine's half
-    (4 oz) until SW-1 enters the table's 2 oz; one man filling (Falconer 1780, QUARTER-GUNNER)."""
+    for exercise; the charges Table No. 29's since SW-1, the long 3-pounder's 1 lb and the
+    swivel's 2 oz (the engine's half, 4 oz, before it); one man filling (Falconer 1780,
+    QUARTER-GUNNER)."""
     from freesail.ship.profile import ports_of, rail_at
 
     spec = load_spec(HER)
@@ -946,7 +947,10 @@ def test_her_fits_are_unarmed_by_default_and_the_armed_merchant_is_elizabeths_gu
     ]
     assert fit.exercise_charges == 0
     assert fit.cartridges == {("long", 3.0): 26 * 4, ("swivel", 0.5): 44 * 4}
-    assert fit.charges == {("long", 3.0): 1.0, ("swivel", 0.5): 0.25}
+    # package 75, SW-1 (Build-Ships.md §10), old beside new: the swivel's Table No. 29's 2 oz
+    # (was {("long", 3.0): 1.0, ("swivel", 0.5): 0.25}); her barrel the same, 126 lb filled
+    # where it was 148
+    assert fit.charges == {("long", 3.0): 1.0, ("swivel", 0.5): 0.125}
     assert fit.shot == {3.0: {"round": 80, "grape": 16}, 0.5: {"round": 160}}
     assert fit.powder_barrels == 1
     assert spec.crew.quarter_bill.filling == 1
