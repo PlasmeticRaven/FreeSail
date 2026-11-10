@@ -24870,3 +24870,19 @@ the trunk's 229d024 and step 2's c95d191 twice each, it passed every time (the c
 noise about the floor, as at step 1). Before it, at 17fdd64, the fast tier was exit 1 on the one
 test moved above, and nothing else. The tree reported differs from c95d191 by this paragraph
 alone.
+
+**Step 2: the final measure, at the lead's word of 2026-11-10 (15:20).** The trunk merged
+again at e5977db by a merge commit (cbe039c: package 74's step 5, the prize court, and 100's
+step 1 as merged at 41216bbc; the conflicts the same two appends, resolved in the trunk's own
+order, 98's truths 7-460 and 7-461 above this package's and no line of the trunk's lost), and
+the kept save of before with a letter in hand added (31ebdf0, above). At **31ebdf0**, in a
+worktree pinned there, one suite at a time: ruff check and ruff format --check clean; the fast
+tier exit 0, 7,253 passed, 1 xfailed, 487 slow left out; the slow tier (`--slow -m "not pace"
+-n 4`) of tests/test_known_truths.py whole with the recorded passages and the kept saves by
+name (test_captain_trials.py, test_replay.py, test_checkpoint.py, test_lee_ports.py,
+test_hulls.py, test_agents.py, test_harbour.py, test_boat_director.py) and the touched files
+(test_letters.py, test_people.py, test_knowledge.py, test_ports.py, test_ships.py,
+test_world_orders.py, test_director.py, test_primer.py, test_in_world.py) exit 0, 2,151
+passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace alone and last
+(`--slow -m pace -n 0`, the same files) exit 0, 13 passed. The tree reported differs from
+31ebdf0 by this paragraph alone.
