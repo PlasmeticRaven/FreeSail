@@ -3915,8 +3915,7 @@ for a key that takes no weak reference, which neither a World nor a hull is.
 **The builder's suites at 453ed374:** the fast tier exit 0, 7,133 passed, 1 xfailed; the slow
 of the touched files exit 0, 442 passed, 8 xfailed; the pace alone and last exit 0, 13
 passed; ruff clean. **The lead's merge:** the trial on 09222043 clean and lint-clean; no model
-or vendor name in the diff; the fast tier whole on it exit 0, 7,192 passed by the dots and 1 xfailed, 09:51 to 10:56 UTC; the whole suite in
-the cloud dispatched after run 62, the figures to follow.
+or vendor name in the diff; the fast tier whole on it exit 0, 7,192 passed by the dots and 1 xfailed, 09:51 to 10:56 UTC; the whole suite in the cloud, run 63 (2026-11-10, 11:04 to 12:00 UTC, on 4016629e, the trunk with this step and the lead's re-pin of the schooner's gate 5b passage after run 62): lint green; the six shards green, none failed of the 7,664 tests they hold by the pace job's count (the re-pinned passage among them), the longest shard 48 minutes; the pace job 14 of 14 in 5 minutes 48.
 
 **Package 98 closed:** eight steps, truths 7-446 to 7-461, from the owner's play of 2026-11-09
 (his nine notes and three saves): the browser probe a kept tool; a man's own readings,
