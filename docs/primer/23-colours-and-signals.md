@@ -2,6 +2,8 @@
 
 The voice between ships, in the player's words. Before a gun is fired a captain of 1805 knew whom he had to deal with by three means and no more: the colours she showed, the private signal of the month, and the hail within the trumpet's reach; and he worked his consorts and his convoy by the signal book. The game has each as a thing of the ship's state, seen by the lookout at the range the thing carries, and nothing is refused for being unwise: a shot under false colours is a pirate's act, and the log says so.
 
+The colours, the signals, the private signal, the lights and a hail are **the deck's orders**, as the sails and the helm are (chapter 14): given from the quarterdeck, and refused below and ashore in the same words (*You are in the cabin; go on deck to give an order of the deck.*). Their readings (`the colours`, `the signals`, `the private signal`) are answered wherever you are, with where they are to be had. A visitor aboard another ship may hail and signal from her deck. Passing the word from the cabin for the officer of the watch to make a signal is a later step of the game's.
+
 ## The colours
 
 Your colours are a state the other ships' lookouts read: shown (your own ensign), none, false (another nation's, the ruse the law allowed until the first shot), struck, or the ensign union down in distress. The lookout of every ship, far or near, reads the nation *shown*, never the true one, so a French privateer under British colours is "British colours, the red ensign" to the King's captain who makes her out at two miles (three with the glass aloft), and the truth is the director's alone.

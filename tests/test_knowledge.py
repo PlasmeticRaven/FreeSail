@@ -9,6 +9,7 @@ fired as the officer's call; `knowledge: all`. Truths 7-370 (in part), 7-373, 7-
 
 from __future__ import annotations
 
+import dataclasses
 import pathlib
 import re
 from datetime import datetime
@@ -19,6 +20,7 @@ import pytest
 from freesail.agents import Fake, Harness, SamplingPolicy, call, reply, tools
 from freesail.agents.agent import PLACE_KNOWLEDGE_WORDS, captain, lookout, officer
 from freesail.agents.model import DATA, OPERATOR
+from freesail.agents.seat import seat_player
 from freesail.api import readings as R
 from freesail.api.session import make_world
 from freesail.core.events import Event, Severity
@@ -1921,3 +1923,106 @@ def test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places():
     assert e.kind == "agent.spoke", e.text
     assert e.text == f"{bowen.name}, a visitor of the Amazon, in the cabin: good day to you"
     assert e.data["where"] == "in the cabin"
+
+
+# -- the player's own lines (package 98, step 2; the owner's ruling of 2026-11-09) ------------
+
+
+def _shown_kinds(sent: list[dict]) -> list[str]:
+    return [str((m.get("event") or m.get("rollup") or {}).get("kind")) for m in sent]
+
+
+def test_the_players_own_lines_reach_him_wherever_he_stands_and_the_worlds_deeds_do_not():
+    """Truths 7-446 and 7-447: what is not in the world is always shown the man who made it,
+    wherever he stands (the owner's ruling of 2026-11-09): in the cabin, his readings
+    (`query.*`), his refusals (`order.rejected`) and his own word to a station (`agent.told`,
+    which before reached the station and not him) are sent to the pages, kept in the pages'
+    reach-back (a reload) and shown at the console; a sleeper's own line too. What is done
+    in the world out of his sight is not: a standing order's sail work on deck while he is
+    below reaches him as the sound overhead and never as the deck's figure, and a rule's or
+    a model station's line is no line of his (`his_own` by the actor)."""
+    from freesail.ui.server import Driver
+
+    w = world_at()
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    d.submit("go below")
+    d.tick(60)
+    assert K.players_senses(w).has(K.CABIN) and not K.players_senses(w).has(K.DECK)
+    own = []
+    for line, kind in (
+        ("the time", "query.reading"),
+        ("the heading", "query.reading"),
+        ("the speed", "query.reading"),  # the deck's reading: its words where it is had
+        ("set the royals", "order.rejected"),
+        ("say to the master: good morning", "agent.told"),
+    ):
+        sent.clear()
+        e = d.submit(line)
+        assert e.kind == kind, (line, e.kind, e.text)
+        assert kind in _shown_kinds(sent), (line, _shown_kinds(sent))
+        assert d.hears(e) and K.his_own(e, "captain")
+        own.append(e)
+    assert "go on deck" in own[3].text
+    # the reach-back the page is sent at its hello and a reload
+    reach_back = {(x.get("kind"), x.get("text")) for x in d.shown_log(400)}
+    assert all((e.kind, e.text) in reach_back for e in own)
+    # the console's own play log, by the same rule
+    con, _out = _console(w)
+    assert all(con.hears(e) for e in own)
+    # the world's deeds out of his sight: none is his own, and the deck's sail work is the
+    # sound overhead in the cabin and nothing ashore
+    deed = Event(
+        tick=w.clock.tick,
+        ship_time=w.clock.ship_time,
+        severity=Severity.ROUTINE,
+        kind="sail.set",
+        text="The fore royal set.",
+        actor="captain",
+        data={"sail": "fore royal"},
+    )
+    assert not K.his_own(deed, "captain")
+    for actor in ("captain's rule 'the reckoning'", "standing order 'royals'", "officer"):
+        ruled = Event(
+            tick=w.clock.tick,
+            ship_time=w.clock.ship_time,
+            severity=Severity.ROUTINE,
+            kind="query.reading",
+            text="The time: 4 bells.",
+            actor=actor,
+        )
+        assert not K.his_own(ruled, "captain") and not d.hears(ruled), actor
+    # a sleeper's own line wakes him and is answered him (an hour on his feet first: the
+    # needs refuse a sleep within the hour of waking)
+    d.tick(3600)
+    assert d.submit("sleep").kind == "needs.answer"
+    assert K.players_senses(w).asleep
+    sent.clear()
+    e = d.submit("the time")
+    assert e.kind == "query.reading" and "query.reading" in _shown_kinds(sent)
+
+
+def test_the_seats_own_refusal_and_reading_reach_the_seated_player_below():
+    """Truth 7-446, at a seat: the player seated at the master's station, in the gunroom,
+    has his readings (`the master (the player)`'s actor) and the seat's own refusal (the
+    driver's line of the seat, `agent.refused`) shown him; the captain's line is not his."""
+    from freesail.agents.seat import seat_actor
+    from freesail.ui.server import Driver
+
+    w = world_at()
+    seat_player(w, "master", door="browser")
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    d.submit("go to the gunroom")
+    d.tick(60)
+    assert K.players_station(w) == "master"
+    sent.clear()
+    e = d.submit("the time")
+    assert e.actor == seat_actor("master") and "query.reading" in _shown_kinds(sent)
+    sent.clear()
+    e = d.submit("set the royals")
+    assert e.kind == "agent.refused" and "agent.refused" in _shown_kinds(sent), e.text
+    captains = dataclasses.replace(e, actor="captain", data={})
+    assert not K.his_own(captains, "master")

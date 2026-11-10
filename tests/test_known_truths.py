@@ -14716,3 +14716,88 @@ def test_truth_7_357_the_prisoners_are_landed_to_the_ports_agent_and_a_cartel_br
     )
 
     test_the_prisoners_are_landed_to_the_agent_at_brest_and_a_cartel_brings_the_captive_home()
+
+
+# -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
+
+
+def test_truth_7_446_the_players_own_lines_reach_him_wherever_he_stands():
+    """Package 98, step 2 (the owner's ruling of 2026-11-09): what is not in the world is
+    always shown the man who made it, wherever he stands: in the cabin his readings, his
+    refusals and his own word to a station reach the pages, their reach-back and the
+    console, asleep or awake; at a seat, the seat's readings and its own refusals."""
+    from tests.test_knowledge import (
+        test_the_players_own_lines_reach_him_wherever_he_stands_and_the_worlds_deeds_do_not,
+        test_the_seats_own_refusal_and_reading_reach_the_seated_player_below,
+    )
+
+    test_the_players_own_lines_reach_him_wherever_he_stands_and_the_worlds_deeds_do_not()
+    test_the_seats_own_refusal_and_reading_reach_the_seated_player_below()
+
+
+def test_truth_7_447_what_is_done_in_the_world_out_of_his_sight_is_not_his_own():
+    """Package 98, step 2, the ruling's other half: a line of the world (a sail set, a
+    rule's reading, a standing order's, a model station's) is never the player's own by the
+    actor, and reaches him only by his place as before; nothing is reported of itself."""
+    from dataclasses import replace
+
+    from freesail.core.events import Event
+    from freesail.world import knowledge as K
+
+    t = datetime(1805, 6, 10, 10, 0)
+    for kind, actor in (
+        ("sail.set", "captain"),
+        ("colours.changed", "captain"),
+        ("query.reading", "captain's rule 'the reckoning'"),
+        ("order.accepted", "standing order 'royals'"),
+        ("agent.told", "officer of the watch"),
+    ):
+        e = Event(tick=0, ship_time=t, severity=Severity.ROUTINE, kind=kind, text=".", actor=actor)
+        assert not K.his_own(e, "captain"), (kind, actor)
+    for kind in ("query.reading", "order.rejected", "order.accepted", "agent.told", "person.spoke"):
+        e = Event(tick=0, ship_time=t, severity=Severity.ROUTINE, kind=kind, text=".")
+        assert K.his_own(replace(e, actor="captain"), "captain"), kind
+        assert K.his_own(replace(e, actor="the master (the player)"), "master"), kind
+        assert not K.his_own(replace(e, actor="captain"), "master"), kind
+
+
+@pytest.mark.slow
+def test_truth_7_448_every_line_typed_ashore_and_below_is_answered_in_the_page(tmp_path):
+    """Package 98, steps 1 and 2: the browser probe's plans ashore (the quay, the market and
+    the tavern) and aboard (the deck, the cabin, the gunroom and aloft) played at the real
+    page in Chromium: every line typed is answered in its log pane, `go below`, `go aloft`
+    and `go ashore` reach the game, `go` and `hold` alone are the clock's. Skipped where
+    Playwright or its browser is missing (`tests/test_browser_probe.py`)."""
+    pytest.importorskip("playwright.sync_api", reason="Playwright is not installed")
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import browser_probe as B
+
+    try:
+        pw, browser = B.launch_browser()
+    except Exception as e:  # noqa: BLE001
+        pytest.skip(f"no browser for Playwright here: {e}")
+    try:
+        for name in ("ashore", "deck-and-below"):
+            plan = B.load_plan(B.PLANS / f"{name}.yaml")
+            r = B.run_plan(
+                plan, browser, tmp_path / name, say=lambda _s: None, scratch=tmp_path / f"g-{name}"
+            )
+            assert r.ok, "\n".join(r.failures)
+            typed = [x for x in r.records if "text" in x and not x.get("setup")]
+            assert len(typed) >= 25 and all(
+                x["mark"] != "UNSHOWN" or x["sent"] == "driver" for x in typed
+            )
+    finally:
+        browser.close()
+        pw.stop()
+
+
+def test_truth_7_449_the_colours_and_the_signals_are_the_decks_orders():
+    """Package 98, step 6 (the owner's ruling of 2026-11-09): the colours, the signals, the
+    lights and a hail are refused below and ashore in the words the other deck orders get;
+    their readings answered below; done again from the deck."""
+    from tests.test_orders_places import (
+        test_the_colours_and_the_signals_are_the_decks_refused_below_and_ashore_in_its_words,
+    )
+
+    test_the_colours_and_the_signals_are_the_decks_refused_below_and_ashore_in_its_words()

@@ -381,7 +381,11 @@
       openLibrary(text.slice(words[0].length).trim());
       return;
     }
-    if (DRIVER_WORDS[head] && words.length <= 2) {
+    // "go" is the clock's alone or with a number, and an order otherwise: "go below", "go
+    // aloft" and "go ashore" are the ship's (package 98, step 2; the owner's play of
+    // 2026-11-09, where the page kept them as the clock's and they never reached the game)
+    var clockGo = head !== "go" || words.length === 1 || !isNaN(Number(words[1]));
+    if (DRIVER_WORDS[head] && words.length <= 2 && clockGo) {
       var value = words[1] !== undefined ? Number(words[1]) : undefined;
       if (words.length === 2 && isNaN(value)) {
         note("Say '" + head + " 30'.");

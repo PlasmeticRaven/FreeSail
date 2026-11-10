@@ -40,6 +40,8 @@ SLOW_THRESHOLD_S = 5.0  # judgement: the fast tier in a few minutes on four load
 # build, and is charged to whichever of its tests happens to run first, so every test
 # that reads one is slow whatever its own time.
 DAY_FIXTURES: dict[str, frozenset[str]] = {
+    # package 98, step 1: the browser probe's plans, each a game served and played in Chromium
+    "test_browser_probe.py": frozenset({"probe_browser"}),
     "test_known_truths.py": frozenset(
         {
             "frigate_polar",

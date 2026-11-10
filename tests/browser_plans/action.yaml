@@ -1,0 +1,24 @@
+# The first action (package 98, step 1): the King's cutter Sherbourne at quarters with the
+# Renard in sight; the player's readings and orders of the gun deck answered, and a move
+# below refused in words while the guns are manned.
+name: In action off the Lizard, at quarters
+scenario: data/scenarios/first-action.yaml
+steps:
+  - {label: "ON DECK, cleared for action"}
+  - {say: beat to quarters, setup: true}
+  - {tick: 120}
+  - the guns
+  - the enemy
+  - the range
+  - the bill
+  - the damage
+  - {say: cast loose the guns, expect: answered}
+  - {label: "BELOW, at quarters"}
+  - {say: go below, expect: {sent: order, answered: true}}
+  - {say: go to the cabin, setup: true}  # the move made whatever the page did with the line above
+  - {tick: 30}
+  - where am I
+  - the guns
+  - the range
+  - {say: engage her to starboard, expect: answered}
+  - {say: hold your fire, expect: answered}
