@@ -1301,6 +1301,44 @@ at quarters is 1.5-1.6 times her cleared tack, where the frigate's is 0.98-1.24 
 (Bel §7.4): B7.c's case, for the lead's word at step 7. Measured again after B7.b at step 6, the
 marines' division standing: the same to the second, the same 175 hands lent (TuningNotes).*
 
+*As built (B7.c, 2026-11-11), on the lead's word ((4) of the answers to her §17.2 in
+`docs/dev/M7-WorkPackages.md`: "B7.c, its own commit, bisected, old beside new for 7-136 and every
+file's tack at quarters"), in `freesail/evolutions/runner.py` alone, the file allotted for the step.
+Every all-hands request at quarters (the manoeuvres, the masts and the all-hands sail work alike, as
+the share's branch it replaces had them) is given a party (`_quarters_party`): the hands the same
+work takes at sea in one watch, read as the watch bill has the deck with no call (the watch on deck
+and, by day, the idlers; `_one_watch`), each fit for the work, or the file's own party where that is
+less; the guns' own work (`QUARTERS_OWN`) as before. `_rob_the_guns` loses the share's branch: an
+all-hands request with hands enough returns at once (the one condition), and one short is lent by
+§6.4's order, whole crews from the end that bears least, only what its party wants beyond the hands
+idle at their quarters. Under "guns before sail" nothing is lent and the tack goes short of its
+party, said. The tack's script reads only the crew factor the runner hands it, so nothing of
+`evolutions/scripts.py` changed. **Measured** in truth 7-136's world (seed 7, fifteen knots, 04:22,
+the starboard watch on deck; `docs/dev/TuningNotes.md`, "B7.c, the tack at quarters"), from 290,
+292.5 and 295 degrees: her tack at quarters under "sail before guns" is her cleared tack to the
+second, 237, 243 and 258 s, her party of 268 made up by 72 hands from the poop's, the upper deck's
+and the quarterdeck's after crews, her lower deck untouched (before: 382, 386 and 405 s with 175 lent,
+1.57-1.61 times); under "guns before sail" 331, 334 and 391 s, short 196 of 268 (before 479, 531 and
+556). The 64 the same: her cleared tack's 244, 251 and 266 s with 39 lent (before 362, 368 and 401
+with 135); 295, 298 and 350 (before 437, 500 and 520). The frigate-36: 334, 468 and 469 with 44 lent
+(before 424, 436 and 455 with 84), her crew factor 1.0 through the tack and her state at the order a
+little off her cleared state's; under "guns before sail" 436, 433 and 453 (before 614, 642 and 660).
+The razee lends 29 and tacks as cleared; the brig, the hermaphrodite brig and the cutter lend
+nothing, their hands idle at quarters making a watch, and tack at quarters as cleared under either
+priority. **Truth 7-136 moved**, old beside new in its docstring: the 44 hands lent within 35 (the
+rest of the watch) and 84 (half of every crew), named from the bow chasers and the guns; under "guns
+before sail" the tack short 76 of 111, said, and tacked within 285-600 s, where 642 s stood within
+"at least 1.25 times cleared": from 292.5 degrees the slower braces carry her through stays in 433 s
+against 447 cleared (from 290 and 295, 1.27 and 1.22 times). **Judgement, said:** "one watch" read as
+the bill's deck with one watch, not the watch with the third of the watch below that the routine turns
+up at once (158 hands in the frigate at the call). **Truth 7-196's crewed clause moved with it:** her
+74s engage the frigate there and work their manoeuvres at quarters, and S2 stands 6.21 miles off at
+the third timed thousand against `CREWED_NM`'s 4 (3.59 before), so it fails here; her world's places
+not re-settled, for the lead (TuningNotes). **Left as the engine had it, for the lead:** the
+hands idle at quarters beside the trimmers and the marines' division (the helm, the powder, the
+carpenter's crew and the surgeon's mates) are in the pool of any sail work there, numbered or all
+hands, as before.*
+
 ### 6.8 The people file (B7's, hand-written data)
 
 `data/people/seventy-four.yaml` in `sixty-four.yaml`'s form: the sixteen posts in order; the drawn

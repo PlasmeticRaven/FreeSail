@@ -16,7 +16,8 @@ its words and its rank; and the generator's report. Her road's step 5 adds her h
 handling as tuned (Bel-D §9), her sailed checks against the Vanguard's log and the Bellona's
 reports, truth 7-194, a cruiser and a King's frigate meeting her, her round trip under her rules
 captain and her checkpoint at quarters; step 6 her bill by deck (B7.b, Bel-D §6.4, with §12.5's
-checks on every armed file) and truths 7-195 and 7-196.
+checks on every armed file) and truths 7-195 and 7-196; step 7 her tack at quarters (B7.c, Bel-D
+§6.7), with the 64's and the brig's.
 
 The figures quoted as measured were measured at seed 7 on the owner's machine (Windows 11,
 2026-11-10); the bands are the sources' or judgement where they say so.
@@ -1966,6 +1967,87 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
         "ports are shut; the sea is at their sills."
     )
     assert b.single == []
+
+
+# ---------------------------------------------------------------------------
+# Her tack at quarters (B7.c: Bel-D §6.7, §12.5; her road's step 7)
+# ---------------------------------------------------------------------------
+
+# At the order to tack in truth 7-136's world (seed 7, 15 kn, close-hauled on the starboard tack
+# at 292.5 degrees, 04:22 ship's time: the starboard watch on deck, the idlers below), the guns
+# run out: one watch, the tack's party; the hands idle at their quarters; the hands lent under
+# `sail before guns` (measured on B7.c). Before it each lent half of every crew (175, 135 and 22
+# hands) and the tack wanted every fit hand aboard (574, 477 and 113).
+TACK_AT_QUARTERS = {
+    SEVENTY_FOUR: (268, 196, 72),
+    SIXTY_FOUR: (218, 181, 39),
+    "data/ships/brig.yaml": (48, 61, 0),
+}
+
+
+def _close_hauled_at_quarters(path, priority):
+    """Truth 7-136's world at quarters, the guns run out under the priority given."""
+    from tests.test_known_truths import _guns_ready, close_hauled_on_starboard
+
+    w = close_hauled_on_starboard(path, heading=292.5)
+    _guns_ready(w)
+    w.run(40)
+    w.submit("run out the guns")
+    assert w.submit(priority).kind == "guns.priority"
+    w.run(120)
+    return w
+
+
+@pytest.mark.parametrize("priority", ["sail before guns", "guns before sail"])
+@pytest.mark.parametrize("path", list(TACK_AT_QUARTERS))
+def test_a_tack_at_quarters_takes_one_watch_the_guns_giving_only_the_rest(path, priority):
+    """Bel-D §6.7, B7.c: an all-hands manoeuvre at quarters is worked first by the hands idle at
+    their quarters and takes from the guns, by the robbing order of §6.4 (whole crews from the end
+    that bears least, her lower deck last), only what its party wants beyond them; its party the
+    hands the same work takes at sea in one watch. Under `guns before sail` nothing is lent and the
+    tack goes short of its party, said; where the idle hands are a watch (the brig's 61), nothing
+    is lent under either and the tack is not short."""
+    watch, idle, lent = TACK_AT_QUARTERS[path]
+    w = _close_hauled_at_quarters(path, priority)
+    t0 = w.clock.tick
+    said = w.submit("tack ship")
+    assert said.kind == "order.accepted", said.text
+    tack = next(i for i in w.ship.extra["evolutions"].instances if i.evo.id == "tack")
+    got = tack.assignment
+    assert (got.party, got.wanted) == (watch, watch)
+    w.run(1)  # the ship's lines reach the log at the tick
+    robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
+    short = [e for e in w.log if e.tick > t0 and e.kind == "evolution.short_handed"]
+    if priority == "sail before guns" and lent:
+        assert [e.data["hands"] for e in robbed] == [lent], [e.text for e in robbed]
+        assert watch - idle <= lent
+        assert "half of each crew" not in robbed[0].text and "lower deck" not in robbed[0].text
+        assert (got.got, got.outcome, short) == (watch, "enough", [])
+    elif idle >= watch:
+        assert (robbed, short, got.got, got.outcome) == ([], [], watch, "enough")
+    else:
+        assert not robbed
+        assert (got.got, got.outcome) == (idle, "short")
+        assert [(e.data["hands_got"], e.data["hands_wanted"]) for e in short] == [(idle, watch)]
+
+
+def test_her_tack_at_quarters_under_sail_before_guns_is_her_cleared_tack():
+    """Bel-D §6.7, B7.c, measured in truth 7-136's world: cleared she tacks in 243 s; at quarters
+    under `sail before guns`, her party of one watch made up from the guns (72 hands, the poop's,
+    the upper deck's and the quarterdeck's after crews), in 243 s too, her crew factor 1.0 through
+    the tack. Before B7.c she lent half of every crew (175 hands) and took 386 s, 1.59 times."""
+    from tests.test_known_truths import close_hauled_on_starboard, until
+
+    def tacked(w):
+        w.submit("tack ship")
+        done, seconds = until(w, ("ship.tacked", "ship.missed_stays"), 1200)
+        assert done and done[0].kind == "ship.tacked", [e.text for e in done]
+        return seconds
+
+    cleared = tacked(close_hauled_on_starboard(SEVENTY_FOUR, heading=292.5))
+    at_quarters = tacked(_close_hauled_at_quarters(SEVENTY_FOUR, "sail before guns"))
+    assert 210 <= cleared <= 300, cleared
+    assert at_quarters <= cleared * 1.05, f"{at_quarters} s against {cleared} s cleared"
 
 
 # ---------------------------------------------------------------------------

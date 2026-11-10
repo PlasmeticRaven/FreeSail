@@ -17882,6 +17882,172 @@ base's runs throughout (the slow candidates 2,878 s against 1,874; the captain's
 Junit: `scratchpad/b7/final-slow.xml`, `scratchpad/b7/final-fast.xml`; the logs and comparisons under
 `scratchpad/b7/final/`. Not run: the pace tier beyond the slow candidates' pace tests.
 
+### B7.c, the tack at quarters (2026-11-11)
+
+**The step**, on the lead's word ((4) of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md`:
+"B7.c, its own commit, bisected, old beside new for 7-136 and every file's tack at quarters; the lead
+reads the moved pins before the merge"): Bel-D §6.7's rule in `freesail/evolutions/runner.py`, the file
+allotted for the step, returned at its merge.
+
+- **The party** (`_quarters_party`): every all-hands request at quarters (a manoeuvre, the masts and
+  all-hands sail work, every request the share's branch took) is given a party, the hands the same work
+  takes at sea in one watch: the watch on deck and, by day, the idlers, as the watch bill has the deck
+  with no call (`_one_watch`: `bill.watch_on_deck`, `bill.idlers_up`), each fit for the work
+  (`hands.can_work`), or the file's own party where that is less. The guns' own work (`QUARTERS_OWN`)
+  as before. The instance's own request is untouched; the party rides on the assignment, as package
+  31b's does, so nothing new is pickled.
+- **The one condition** (`_rob_the_guns`): an all-hands request with hands enough returns at once,
+  and one short is lent by the numbered path, §6.4's order (the swivels and the chasers, then whole
+  crews from the end that bears least, a `lower` deck last), only what its party wants beyond the hands
+  idle at their quarters. The share's branch (half of every crew, `TOLD_OFF_SHARE`) is gone from it.
+- **Under "guns before sail"** nothing is lent, as before; the tack goes short of its party and says so
+  ("Only 76 hands to tack ship; there are no more on deck.").
+- **The tack's script** (`TackScript`) reads the crew factor the runner hands it and nothing of the
+  hands, so nothing of `evolutions/scripts.py` changed. With exactly its party the factor is 1.0, the
+  cleared tack's.
+- **Nothing away from quarters moves:** both methods return what they were given unless the ship is at
+  quarters, and a numbered request at quarters goes as before (its condition was already this one).
+  Every file's cleared tack below is the same to the second before and after.
+
+**Judgement, said:** "one watch" is read as the bill's deck with one watch. The call at sea turns up a
+third of the watch below at once, so a cleared tack begins with more (the frigate 158 against her watch
+of 111, the 74 370 against 268); read so, the frigate's tack would want 82 from her guns, not 35.
+
+**Every armed file's tack at quarters, before and after** (truth 7-136's world: seed 7, 15 kn,
+close-hauled on the starboard tack, the guns cast loose, loaded and run out, the priority given and two
+minutes run, then "tack ship"; 04:22 ship's time, the starboard watch on deck, the idlers below;
+seconds from 290, 292.5 and 295 degrees, the hands lent in brackets; before on the head 9c812f43, after
+on the same tree with this step's `runner.py`, by the same script, `scratchpad/s7/tackq.py`):
+
+| File | Party (one watch) / idle at quarters | Cleared | Sail before guns, before | After | Guns before sail, before | After |
+|---|---|---|---|---|---|---|
+| seventy-four | 268 / 196 | 237, 243, 258 | 382, 386, 405 (175) | 237, 243, 258 (72) | 479, 531, 556 | 331, 334, 391 |
+| sixty-four | 218 / 181 | 244, 251, 266 | 362, 368, 401 (135) | 244, 251, 266 (39) | 437, 500, 520 | 295, 298, 350 |
+| frigate-36 | 111 / 76 | 343, 447, 370 | 424, 436, 455 (84) | 334, 468, 469 (44) | 614, 642, 660 | 436, 433, 453 |
+| razee-44 | 146 / 125 | 435, 427, 484 | 534, 536, 538 (89) | 435, 427, 484 (29) | 567, 558, 560 | 499, 501, 502 |
+| brig | 48 / 61 | 440, 454, 455 | 494, 494, 495 (22) | 440, 454, 455 (none) | 269, 551, 552 | 440, 454, 455 |
+| hermaphrodite-brig | 55 / 76 | 192, 189, 193 | 173, 172, 178 (20) | 192, 189, 193 (none) | 229, 229, 221 | 192, 189, 193 |
+| cutter | 12 / 15 | 107, 106, 106 | 116, 114, 115 (6) | 107, 106, 106 (none) | 129, 129, 128 | 107, 106, 106 |
+| privateer-schooner | 17 / 16 | 142, 142, 142 | 154, 155, 157 (8) | 142, 142, 142 (1) | 178, 177, 176 | 142, 142, 142 |
+| merchant-brig | — | no tack ended in 1,200 s | the same | the same | the same | the same |
+
+**Her tack at quarters** under "sail before guns" is her cleared tack to the second (1.57-1.61 times
+before), gaining to windward as cleared (105, 95 and 69 m; before 32, 28 and -23); under "guns before
+sail" 1.37-1.52 times (2.02-2.19 before), gaining 75, 71 and -7 m (before -63, -99 and -130). The 64 as
+she: 1.00 and 1.19-1.32 times (before 1.47-1.51 and 1.79-1.99). The robbed lines from 292.5 degrees,
+after: hers "Tacking ship at quarters: 72 hands taken from the poop, Nos. 39 to 41, the upper deck, Nos.
+25 to 28, and the quarterdeck, Nos. 32 to 35; the guns go on short-handed." (her lower deck untouched);
+the 64's "39 hands taken from the upper deck, Nos. 24 to 26, and the quarterdeck, Nos. 30 to 31"; the
+frigate's "44 hands taken from the bow chasers and the guns, Nos. 12 to 13 and 16 to 17"; the razee's
+"29 hands taken from the bow chasers and the guns, Nos. 13 and 19"; the privateer's "one hand taken from
+the swivels". Before, every one "N hands taken from the guns, half of each crew", and each tack began
+short, wanting every fit hand aboard (the 74 574, the frigate 252). The brig, the hermaphrodite brig and
+the cutter lend nothing now: the hands idle at their quarters make a watch. The merchant brig's tack
+never begins in this world, before or after (her plain sail still setting short-handed, the tack
+waiting), and is no measure of the rule.
+
+**The frigate's knife-edge:** her crew factor is 1.0 through both her cleared tack and her tack at
+quarters, but her state at the order is not quite the cleared one's (from 292.5 degrees heeled 3.567
+against 3.593 degrees, 2.613 against 2.575 m/s, after six minutes more sailing with her guns run out),
+and her way out of stays is truth 10's knife-edge: 334, 468 and 469 s against 343, 447 and 370. The
+razee's state at the order is her cleared state to the third place, and so are her tacks.
+
+**Truth 7-136, old beside new** (`tests/test_known_truths.py`; slow by `tests/conftest.py`'s
+`SLOW_TESTS`, run by its node id):
+
+- Cleared 447 s, banded 285-600 s: the same.
+- "Sail before guns": 84 hands lent, "taken from the guns" (half of each crew), 436 s within 1.15 times
+  cleared, **to** 44 hands, asserted from 35 (the rest of the watch, 111 less 76) to under 84 (half of
+  every crew), "taken from the bow chasers and the guns, Nos.", no short line, 468 s within 1.15 times
+  cleared (held).
+- "Guns before sail": nothing lent, 642 s at least 1.25 times cleared, **to** nothing lent, the tack
+  short 76 of 111 (the line's figures asserted), 433 s, asserted within 285-600 s (truth 10's band).
+  The old clause cannot hold: from 292.5 degrees the factor 111/76 = 1.46 on her braces carries her
+  through stays in 433 s against 447 cleared; from 290 and 295 she is 1.27 and 1.22 times cleared.
+- Its docstring carries the figures, old and new.
+
+**Pins moved, old beside new:** truth 7-136 (above). **New** (`tests/test_bellerophon.py`, "Her tack at
+quarters"): the party and the hands lent at the order for her, the 64 and the brig under both
+priorities (six cases, 2.8-3.9 s at four workers), and her tack at quarters beside her cleared tack, 243 and 243
+s, asserted within 1.05 times (7.3 s alone, so in `SLOW_TESTS`); her module's docstring names step 7.
+
+**Bisected:** the head 9c812f43 and this commit differ in code by `runner.py` alone; every "before"
+figure above is the head's, every "after" this step's tree, by the same script and seed.
+
+**Truth 7-196's crewed clause moved by the step** (`tests/test_bellerophon.py`, routed to the pace run):
+her 74s engage the frigate there (no private signal aboard her, Bel-D §14.4) and work their manoeuvres
+at quarters; under B7.c S0's tack lends 124 hands (the forecastle's, the upper deck's and the
+quarterdeck's after crews) and S1's wear 120, where they lent half of every crew (175 and 167), and the
+world goes otherwise. At the end of the three timed thousands the 74s stood at most 1.02, 1.78 and 3.59
+miles from her (96, 101 and 105 ticks a second); now 1.42, 3.87 and 6.21 (89, 89 and 92): S2, who
+works no manoeuvre in the measure, stands 6.21 miles off at the third, over `CREWED_NM` (4), and the
+clause fails here, the crewed count 3 throughout and the pace over its 60. Bisected on the head's tree
+(a scratch worktree at 9c812f43) and this step's, by one script (`scratchpad/s7/probe7196.py`). Not
+re-settled: her world's places were settled by measurement and are the lead's to move; measured for the
+lead, S2 put at 49 55.0 N 5 10.5 W (from 49 52.5 N 5 11.0 W) holds 0.30-3.07 miles at 86-96 ticks a
+second, at 49 54.5 N 5 13.5 W 0.15-1.92 miles at 70-83. `tools/pace.py`'s mode for her carries the same
+places.
+
+### For the lead (B7.c)
+
+- **Truth 7-196's crewed clause** (above): it fails here after B7.c on S2's distance alone. Re-settle
+  her third 74 (both `tests/test_bellerophon.py` and `tools/pace.py`), at 49 55.0 N 5 10.5 W as
+  measured, or leave it for your word.
+- **The pool at quarters, left as the engine had it:** the hands idle at quarters, which the party
+  takes first, are not the trimmers and the marines' division alone (Bel-D §6.7's words) but every
+  division not at a gun: the frigate's 76 are the trimmers 44, the powder 22, the carpenter's crew 6,
+  the helm 2 and the surgeon's mates 2; hers 196 the marines 95, the trimmers 55, the powder 31, the
+  carpenter's crew 11, the helm 2 and the surgeon's mates 2. The request ranks them by rating, so the
+  helm's able men go before the marines and the idlers last (nine of the frigate's stay at their
+  stations, seven of the powder and the surgeon's two mates; none of hers). Numbered sail work at quarters draws on the same pool, as before. Keeping the helm, the
+  powder, the carpenter's crew and the surgeon's mates out of all sail work at quarters would raise the
+  tack's want of the guns to 67 in the frigate (35 now) and 118 in her (72 now). Not built.
+- **`crew/quarters.py` (B7's):** `TOLD_OFF_SHARE`, `lend`'s `share` and `_share_words` are read by
+  nothing after this step, and the constant's comment still says an all-hands manoeuvre takes half of
+  each crew. A tidy of her own file, not made in this step, whose file was `runner.py`.
+- **"Guns before sail" is quicker for every ship:** the tack wants one watch, not every fit hand aboard,
+  so its factor is the watch over the idle hands (the frigate's 111/76, hers 268/196) where it was the
+  company over them (252/76, 574/196); her tack under it is 1.37-1.52 times cleared (2.02-2.19 before).
+  From 292.5 degrees the frigate's is 0.97 times cleared (433 against 447 s), so the spec's "a tack with
+  the guns run out takes longer than the same tack cleared" holds in truth 7-136's world under "sail
+  before guns" (468 s) by her state at the order, and under "guns before sail" from 290 and 295 degrees,
+  not from 292.5.
+- **"One watch"** is the lean built (above); the call's first third of the watch below beside it would
+  ask 82 of the frigate's guns.
+
+### The suites, as run (B7.c)
+
+Once, on the final tree (branch `claude/pkg-75` at 9c812f43, the step uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run.
+
+- **(a) The step's files, fast** (`test_bellerophon`, `test_indefatigable`, `test_known_truths`,
+  `test_evolutions`, `test_staying`): **410 passed** (743 s). Against `b7/final-fast.xml`'s same files
+  (404): no outcome changed; six new, her party's cases, passed.
+- **(b) The moved truth and the files' slow tests** (truth 7-136 by its node id; `--slow -m slow` over
+  `test_bellerophon`, `test_evolutions`, `test_staying` and `test_indefatigable`): **25 passed, 2 failed**
+  (89 s). Truth 7-136 and her tack beside her cleared tack passed; truth 7-196's floor clause failed at
+  481 ticks a second (478 at the base), as known; truth 7-196's crewed clause, passed at the base, failed
+  on S2's 6.21 miles (above).
+- **(c) The captain's trials** (`--slow`): 3 failed, 4 passed (326 s), the three on the known digests
+  (8df0ab2beba93320, df5f02eb6e6ce68a, 8dac97a4c9bdfe43), the base's messages.
+- **(d) The four whole logs** (`log_digests.py`): all four the same as `b2/digests-final.json`.
+- **(e) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`).
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- **Beyond the step's list:** the fast tier of the seventeen files that beat to quarters or test the
+  hands (`test_bilander`, `test_captive`, `test_crews`, `test_dumb_show`, `test_fight`, `test_filling`,
+  `test_flags`, `test_hands`, `test_health`, `test_lee_ports`, `test_neufchatel`, `test_practice`,
+  `test_practice_orders`, `test_profile`, `test_stand_by_words_and_action_flow`, `test_subtypes`,
+  `test_viewer_action`): 748 passed, as at the base; eighteen action truths of the slow tier by name
+  (7-133, 7-135, 7-137, 7-138, 7-143, 7-144, 7-148, 7-149, 7-153, 7-161, 7-166, 7-167, 7-171, 7-342,
+  7-352, 7-353, 7-426, 7-435) and the slow tests of `test_crews` (truths 87 and 88), `test_bilander`,
+  `test_neufchatel` and `test_subtypes` (10): all passed, as at the base.
+
+Junit and logs under `scratchpad/s7/run/`; the measurements `scratchpad/s7/tackq_base.json` and
+`tackq_new.json`. Not run: the whole fast tier, the slow tier beyond the above, the pace tier beyond
+the files' pace tests.
+
 ## Table No. 29's charges (package 75, SW-1) (2026-11-09)
 
 **The step.** `docs/design/Build-Ships.md` §10 whole, its §2.2 and §16.1 rows, and the

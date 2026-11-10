@@ -61,10 +61,13 @@ called all hands himself. An all-hands *sail* evolution names its party
 the three topsails of "reef the topsails" are manned together, each up to
 its party in the order's order, the surplus to the next job and then to
 whatever else waits for hands; the manoeuvres and the masts, with no party,
-take everyone. Only a manoeuvre (its file says ``belays: true``:
-tack, wear, box-haul, lie a-try) also belays the step-list work in hand,
-which holds its progress and resumes, hands permitting, when the all-hands
-work is done: the owner's ruling of 2026-09-29 at gate 4c (spec M3 §3.4).
+take everyone. At quarters every all-hands request is bounded so (package 75,
+B7.c): its party is the hands the same work takes at sea in one watch, and the
+guns are robbed only for what it wants beyond the hands idle at their quarters
+(`Runner._quarters_party`, `Runner._rob_the_guns`). Only a manoeuvre (its file
+says ``belays: true``: tack, wear, box-haul, lie a-try) also belays the step-list
+work in hand, which holds its progress and resumes, hands permitting, when the
+all-hands work is done: the owner's ruling of 2026-09-29 at gate 4c (spec M3 §3.4).
 Sending down the topgallant masts belays the work on those masts' sails
 alone, which it clears away (`Script.clears`).
 Who is on deck is the
@@ -81,14 +84,14 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
 from freesail.crew import bill, hands
-from freesail.crew.model import Crew, number_words
+from freesail.crew.model import Crew, Station, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
@@ -1136,6 +1139,7 @@ class Runner:
         self._top_up_all_hands(crew)
         if want.all_hands:
             self._call_all_hands(ship, inst, crew)
+        want = self._quarters_party(ship, inst, crew, want)
         got = hands.request(
             crew,
             self._pool(crew, inst),
@@ -1174,17 +1178,21 @@ class Runner:
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
     ) -> hands.Assignment:
         """At quarters, sail work short of hands takes them from the guns by the fighting
-        book's priority (package 70, spec M7 §8a; `crew/quarters.py`, `lend`): a numbered
-        request the crews from the end that bears least, whole crews first; an all-hands
-        manoeuvre the share of each crew told off for the sails. The hands freed are taken
-        by a second request, and the line says from where. Under `guns before sail` nothing
-        is lent and the work waits or goes short, as the design has it."""
+        book's priority (package 70, spec M7 §8a; `crew/quarters.py`, `lend`): the crews
+        from the end that bears least, whole crews first, for what the work wants beyond
+        the hands idle at their quarters. An all-hands request is bounded there by its
+        party (`_quarters_party`), so a manoeuvre is worked by the trimmers, the marines'
+        division and the others not at a gun, and takes from the guns only the rest of
+        one watch (package 75, B7.c: `docs/design/Design-Ship-Bellerophon.md` §6.7; before
+        it, half of every crew whatever stood idle). The hands freed are taken by a second
+        request, and the line says from where. Under `guns before sail` nothing is lent
+        and the work waits or goes short, as the design has it."""
         quarters = ship.extra.get("quarters")
         if quarters is None or not getattr(quarters, "at_quarters", False):
             return got
         if inst.evo.id in QUARTERS_OWN:
             return got  # the guns' own work (cast loose, secured): the crews do it
-        if got.outcome == hands.ENOUGH and not want.all_hands:
+        if got.outcome == hands.ENOUGH:
             return got
         aloft = self._aloft(inst)
         battery = ship.extra.get("battery")
@@ -1192,15 +1200,8 @@ class Runner:
         relative = getattr(battery, "target_relative_rad", None) if battery is not None else None
         if relative is not None:
             bearing_fwd = abs(relative) < 1.5707963
-        if want.all_hands:
-            from freesail.crew.quarters import TOLD_OFF_SHARE
-
-            freed, where = quarters.lend(
-                len(crew.sailors), aloft, bearing_fwd, share=TOLD_OFF_SHARE
-            )
-        else:
-            need = max(0, got.wanted - (got.got if got.outcome != hands.TOO_FEW else 0))
-            freed, where = quarters.lend(need, aloft, bearing_fwd)
+        need = max(0, got.wanted - (got.got if got.outcome != hands.TOO_FEW else 0))
+        freed, where = quarters.lend(need, aloft, bearing_fwd)
         if not freed:
             return got
         if got.outcome != hands.TOO_FEW:
@@ -1224,6 +1225,36 @@ class Runner:
                 {"evolution": inst.evo.id, "hands": n, "from": where},
             )
         return again
+
+    def _quarters_party(
+        self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest
+    ) -> hands.CrewRequest:
+        """An all-hands request at quarters, bounded by a party (package 75, B7.c; Bel-D
+        §6.7): the hands the same work takes at sea in one watch (`_one_watch`, the engine's
+        own measure of enough), or the file's own party where that is less. So the hands
+        idle at their quarters work it first and the guns give only the rest (`_rob_the_guns`),
+        under either priority. Any other request, or one not at quarters, as it was; the
+        instance's own request is not changed."""
+        if not want.all_hands or not _at_quarters(ship) or inst.evo.id in QUARTERS_OWN:
+            return want
+        party = self._one_watch(crew, self._aloft(inst))
+        if want.party is not None:
+            party = min(party, want.party)
+        return replace(want, party=max(1, party))
+
+    def _one_watch(self, crew: Crew, aloft: bool) -> int:
+        """The hands on deck in one watch, as the watch bill has them with no call
+        (`crew/bill.py`): the watch on deck and, by day, the idlers, each fit for the work
+        (`hands.can_work`)."""
+        when = bill.when_of(self.clock if self.clock is not None else DEFAULT_WATCH_TIME)
+        watch = bill.watch_on_deck(crew, when)
+        up = bill.idlers_up(when)
+        return sum(
+            1
+            for s in crew.sailors
+            if (s.watch is watch or (up and s.station is Station.IDLERS))
+            and hands.can_work(s, aloft)
+        )
 
     def _note_short(self, ship: Ship, inst: Instance, got: hands.Assignment) -> None:
         if inst.short_logged:

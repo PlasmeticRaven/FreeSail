@@ -553,6 +553,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "[cruiser]",
         "test_bellerophon.py::test_she_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails",
         "test_bellerophon.py::test_her_posts_draw_at_muster_the_second_master_and_the_chaplain_as_the_others",
+        # package 75, B7.c: her tack cleared beside her tack at quarters, two tacks of a 74 and
+        # her guns made ready (7.3 s alone, her file in one process), 2026-11-11
+        "test_bellerophon.py::test_her_tack_at_quarters_under_sail_before_guns_is_her_cleared_tack",
     }
 )
 
