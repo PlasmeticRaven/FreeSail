@@ -264,6 +264,14 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "what": "a hermaphrodite brig, a brig's foremast and a schooner's main, long and low, "
         "pierced for eleven guns a side",
     },
+    # package 75 (docs/design/Design-Ship-Bilander.md §8; D16 (a)): the British coasting
+    # bilander under a settee main; the tops make out a bilander by her settee's yard, the
+    # glass a merchantman
+    "bilander": {
+        "file": "data/ships/bilander.yaml",
+        "rig": "a bilander",
+        "what": "a bilander, a merchantman under a settee main, deep laden",
+    },
 }
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
@@ -324,6 +332,12 @@ _DESCRIPTION_WORDS = {
     "an hermaphrodite brig": "hermaphrodite brig",
     "a privateer brig": "hermaphrodite brig",
     "privateer brig": "hermaphrodite brig",
+    # package 75 (Design-Ship-Bilander.md §8): her rig's word, and Lloyd's Register's key's
+    # spelling ("Br, - Billander", the keys of 1781 to 1789: Research-Bilander-2026-10.md §2.2)
+    "a bilander": "bilander",
+    "bilander": "bilander",
+    "a billander": "bilander",
+    "billander": "bilander",
 }
 
 

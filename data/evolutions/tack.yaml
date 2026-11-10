@@ -4,11 +4,15 @@
 #   sheets let fly, the spanker (or main) sheet hauled aft
 #   "Mainsail haul" within a point of the wind, the after yards swing (brace_s; a
 #   schooner's light main yards light_after_swing_s, the short after swing); "Main-topsail
-#   haul" when the main course is not set (Luce 1884 p. 417), and "Rise tacks and sheets"
-#   before it only while a course is set
+#   haul" when the main course is not set (Luce 1884 p. 417), "Rise tacks and sheets"
+#   before "Mainsail haul" with both courses set and "Rise main tack and sheet" with the
+#   main alone (Luce pp. 417, 421 and 446)
 #   "Let go and haul" head through the wind and the after yards round, the head yards
-#   swing (brace_s); the head sheets drawn on the new tack
-#   steady on the new close-hauled course, the sheets trimmed: ship.tacked.
+#   swing (brace_s); the head sheets drawn on the new tack; with the fore course set and
+#   the main not, its tack kept fast till now: "Rise fore tack and sheet. Let go and haul."
+#   (Luce pp. 421, 428 and 446)
+#   steady on the new close-hauled course, the sheets trimmed: ship.tacked (at
+#   steady_timeout_s, the line names the tack she lies on, read from her).
 # Her way is gone when she makes less than way_gone_fraction of her speed at "helm's
 # a-lee" or fewer than way_gone_lengths_per_min of her lengths a minute, whichever is the
 # more. Way gone with her head more than a point off the wind is a plain miss; within a

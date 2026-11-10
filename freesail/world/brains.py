@@ -158,20 +158,57 @@ SUB_TYPE_ROWS: tuple[str, ...] = (
     "coasting cutter",
     "privateer lugger",
 )
+# The rows sailed before package 75 gave the descriptions their roles, which keep the intent's
+# rules they had (`role_of_vessel`), so that no far ship's book moves. Every other row that
+# files roles sails by its first where the intent's kind names none: the sub-types above, and
+# the whole files package 75 adds, the *Neufchatel* the first (B2b, the lead's ruling of
+# 2026-11-07: a privateer, where her wardroom's captain made her a King's ship).
+INTENT_RULED_ROWS: tuple[str, ...] = (
+    "frigate",
+    "schooner",
+    "privateer schooner",
+    "cutter",
+    "brig-sloop",
+    "merchant brig",
+    "lugger",
+    "smack",
+)
 
 
 def sub_type_role(vessel: Any) -> str:
-    """Her description's first role, read from her file, where she is one of the sub-types
-    (`SUB_TYPE_ROWS`); "" for every other vessel. Her far brain takes it where the intent's
-    kind names no role (`role_of_vessel`), and her crewed captain the same (`fold_in`, then
-    `captains.role_for`)."""
-    key = str(getattr(vessel, "description", "") or "")
-    if key not in SUB_TYPE_ROWS:
-        return ""
-    from freesail.world.ships import description
+    """Her description's first role, read from her file, for every description that files
+    roles but the rows that keep the intent's rules (`INTENT_RULED_ROWS`): the sub-types
+    (`SUB_TYPE_ROWS`) and the whole files package 75 adds; "" for every other vessel. Her far
+    brain takes it where the intent's kind names no role (`role_of_vessel`), and her crewed
+    captain the same (`fold_in`, then `captains.role_for`)."""
+    return description_role(str(getattr(vessel, "description", "") or ""))
 
+
+def description_role(key: str) -> str:
+    """The first role of the description `key` by `sub_type_role`'s rule; "" for a key that
+    is no description's, for a row that keeps the intent's rules and for one with no roles."""
+    from freesail.world.ships import DESCRIPTIONS, description
+
+    if key not in DESCRIPTIONS or key in INTENT_RULED_ROWS:
+        return ""
     roles = description(key).get("roles") or []
     return str(roles[0]) if roles else ""
+
+
+def own_sub_type_role(world: Any) -> str:
+    """The first role, by `sub_type_role`'s rule, of the description her own ship file is the
+    first row of (the row the player's shadow takes, `Vessels.player_shadow`): the crewed
+    World's captain's where no far brain carried one in (B2b: the player's *Neufchatel* a
+    privateer); "" for every other file and a World with no ship file."""
+    spec = getattr(getattr(world, "ship", None), "spec", None)
+    source = str(getattr(spec, "source", "") or "").replace("\\", "/")
+    if not source:
+        return ""
+    from freesail.world.ships import DESCRIPTIONS
+
+    name = source.split("/")[-1]
+    rows = [k for k, d in DESCRIPTIONS.items() if d["file"].split("/")[-1] == name]
+    return description_role(rows[0]) if rows else ""
 
 
 def role_of_vessel(vessel: Any, intent: Intent | None) -> str:

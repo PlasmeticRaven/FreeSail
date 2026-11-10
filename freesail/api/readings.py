@@ -2436,10 +2436,12 @@ def ship_words(world: Any) -> str:
     ports = getattr(world, "dealings", None)
     nations = getattr(world, "nations", None)
     nation_id = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
-    nation = ""
+    nation = adjective = ""
     if nation_id:
         try:
-            nation = nations.get(nation_id).name if nations is not None else nation_id
+            found = nations.get(nation_id) if nations is not None else None
+            nation = found.name if found is not None else nation_id
+            adjective = str(getattr(found, "adjective", "") or "")
         except KeyError:
             nation = nation_id.replace("-", " ")
     captain = getattr(world, "captain", None)
@@ -2454,7 +2456,11 @@ def ship_words(world: Any) -> str:
     # merchantman that is armed, named by her book's word (data/captains/indiaman.yaml)
     duty = ", in the service of the Customs" if role == "revenue" else ""
     if kings:
-        service = "a King's ship" if nation in ("", "Britain") else f"a ship of the {nation} navy"
+        # a navy by its nation's adjective (package 75, B2b, the lead's ruling of 2026-11-07):
+        # "a ship of the French navy", where the name read "the France navy" and "the the
+        # United States navy"
+        navy = adjective or nation
+        service = "a King's ship" if nation in ("", "Britain") else f"a ship of the {navy} navy"
     else:
         service = {
             "privateer": "a privateer",

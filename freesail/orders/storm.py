@@ -401,7 +401,14 @@ def _after_sail_lines(ship: Ship) -> list[str]:
     in by this list, and her gaff or boom mainsail, her driving sail, is neither taken in
     nor reefed by it; a course, on whatever mast, is reefed once as any rig's with topsails
     (the polacre probe's main course, which is her mainsail, among them). A course with no
-    reef bands is not named, as before the ruling."""
+    reef bands is not named, as before the ruling.
+
+    Beside ruling 4: a boomless gaff sail on a mast that crosses a course (the *Neufchatel*'s
+    fore gaff sail abaft her fore course, `scripts.gaff_sails_beside_a_course`) is not named by
+    this list at any reef; she hands it when she lies a-try (`LieATryScript`), as Cobb has her
+    take it in (1841 p. 79). The owner's ruling for the lead of 2026-11-08 (package 75, B2c):
+    B2b had it taken in with the topsails' second reef, and the rigs in memory with one griped up
+    with the helm hard over once the jib was in, as she did."""
     from freesail.evolutions.scripts import after_gaff_sails
     from freesail.physics.sails import _square_rigged
 

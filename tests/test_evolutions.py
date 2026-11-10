@@ -702,14 +702,15 @@ SET, UP = SailState.SET, SailState.IN_THE_GEAR
     ("path", "fore", "main", "said"),
     [
         (FRIGATE, SET, SET, "Rise tacks and sheets. Mainsail haul"),
-        (FRIGATE, UP, SET, "Rise tacks and sheets. Mainsail haul"),
-        (FRIGATE, SET, UP, "Rise tacks and sheets. Main-topsail haul"),
+        (FRIGATE, UP, SET, "Rise main tack and sheet. Mainsail haul"),
+        (FRIGATE, SET, UP, "Main-topsail haul"),
         (FRIGATE, UP, UP, "Main-topsail haul"),
         (FRIGATE, SailState.FURLED, SailState.FURLED, "Main-topsail haul"),
-        (FRIGATE, UP, SailState.GOOSE_WINGED, "Rise tacks and sheets. Mainsail haul"),
-        (FRIGATE, SET, SailState.BLOWN_OUT, "Rise tacks and sheets. Main-topsail haul"),
+        (FRIGATE, UP, SailState.GOOSE_WINGED, "Rise main tack and sheet. Mainsail haul"),
+        (FRIGATE, SET, SailState.BLOWN_OUT, "Main-topsail haul"),
         (BRIG, SET, SET, "Rise tacks and sheets. Mainsail haul"),
-        (BRIG, SET, UP, "Rise tacks and sheets. Main-topsail haul"),
+        (BRIG, UP, SET, "Rise main tack and sheet. Mainsail haul"),
+        (BRIG, SET, UP, "Main-topsail haul"),
         (BRIG, UP, UP, "Main-topsail haul"),
     ],
     ids=[
@@ -721,6 +722,7 @@ SET, UP = SailState.SET, SailState.IN_THE_GEAR
         "frigate main goose-winged",
         "frigate main blown out",
         "brig both set",
+        "brig fore hauled up",
         "brig main hauled up",
         "brig both hauled up",
     ],
@@ -728,10 +730,16 @@ SET, UP = SailState.SET, SailState.IN_THE_GEAR
 def test_the_word_at_the_after_yards_haul_is_luces_by_the_main_course(path, fore, main, said):
     """Luce 1884 pp. 416-417 (package 75, the lead's ruling 2 of 2026-11-06): "Rise tacks and
     sheets! ... Mainsail haul!" with the mainsail, the main course, set; "Main-topsail haul!"
-    when it is not (hauled up, furled, blown out); "Rise tacks and sheets" while any course is
-    set, and not with none (their clews up already); goose-winged, drawing by its weather clew,
-    counts as set (judgement). Before the ruling every one of these said "Rise tacks and sheets.
-    Mainsail haul"."""
+    when it is not (hauled up, furled, blown out); goose-winged, drawing by its weather clew,
+    counts as set (judgement). Each course risen apart by its name, the lead's ruling (2) of
+    2026-11-07 (B3.4b): the main alone set, "Rise main tack and sheet. Mainsail haul" (p. 417,
+    "RISE MAIN TACK AND SHEET!" with the fore tack kept fast; pp. 421, 446); the fore alone set,
+    "Main-topsail haul" at the haul, the fore tack kept fast and risen at "let go and haul"
+    (pp. 421, 428, 446; the next test). Old beside new: B3.4's ruling 2 said "Rise tacks and
+    sheets. Mainsail haul" for the main alone and "Rise tacks and sheets. Main-topsail haul"
+    for the fore alone (the frigate's fore hauled up, main hauled up, main goose-winged, main
+    blown out; the brig's main hauled up; the brig's fore hauled up new here), and before the
+    ruling every one of these said "Rise tacks and sheets. Mainsail haul"."""
     from freesail.evolutions import scripts
 
     ship = load_ship(path)
@@ -740,38 +748,131 @@ def test_the_word_at_the_after_yards_haul_is_luces_by_the_main_course(path, fore
     assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == said
 
 
+@pytest.mark.parametrize(
+    ("fore", "main", "haul", "let_go"),
+    [
+        (SET, SET, "Rise tacks and sheets. Mainsail haul.", "Let go and haul."),
+        (UP, SET, "Rise main tack and sheet. Mainsail haul.", "Let go and haul."),
+        (SET, UP, "Main-topsail haul.", "Rise fore tack and sheet. Let go and haul."),
+        (UP, UP, "Main-topsail haul.", "Let go and haul."),
+    ],
+    ids=["both set", "fore hauled up", "main hauled up", "both hauled up"],
+)
+def test_each_course_is_risen_apart_by_its_name_in_the_tack(fore, main, haul, let_go):
+    """The lead's ruling (2) of 2026-11-07 (B3.4b), the word's two cases, words only, in the
+    frigate's tack in the stub world: with her fore course set and her main not, "Main-topsail
+    haul." as the after yards are hauled, the fore tack kept fast, and "Rise fore tack and sheet.
+    Let go and haul." as the head yards follow (Luce 1884 p. 421, "RISE FORE TACK AND SHEET! and
+    when the after sails fill, Haul well taut! LET GO AND HAUL!"; p. 428, the fore tack not
+    eased "until after 'mainsail haul'"; p. 446, "RISE FORE TACK! and LET GO AND HAUL!"); with
+    her main set and her fore not, "Rise main tack and sheet. Mainsail haul." (p. 417). Both set
+    and neither, the lines of ruling 2. Old beside new: "Rise tacks and sheets. Main-topsail
+    haul." and "Let go and haul." with the main hauled up, "Rise tacks and sheets. Mainsail haul."
+    with the fore; every tick the same (the tuning notes, B3.4b)."""
+    ship = load_ship(FRIGATE)
+    ship.sails["fore.course"].state = fore
+    ship.sails["main.course"].state = main
+    runner = Runner(ship)
+    wind = make_wind(from_deg=90.0, knots=10.0)
+    close_hauled_on_starboard(ship, wind)
+    for y in ship.spars.values():
+        if y.is_yard:
+            y.brace_angle = y.brace_limit  # braced up on the starboard tack
+    runner.start(ship, "tack", "ship")
+    _, notes = run(runner, ship, wind, turner(0.4))
+    words = texts(notes)
+    assert kinds(notes)[-1] == "ship.tacked"
+    assert words.index(haul) < words.index(let_go)
+    assert sum("Mainsail haul" in w or "Main-topsail haul" in w for w in words) == 1
+    assert sum("Let go and haul" in w for w in words) == 1
+    assert sum("Rise" in w for w in words) == (0 if (fore, main) == (UP, UP) else 1)
+
+
+def test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on():
+    """The lead's ruling (3) of 2026-11-07 (B3.4b): the tack ended by `steady_timeout_s` (300 s on
+    the new course order), not steady on her course, names the tack she lies on, read from the
+    ship, and not the one she was put about for. In the stub world the frigate is turned through
+    the wind and, her head yards swung, falls back on the old tack and lies there (the stub's
+    physics), four knots of way and 55 degrees off on the starboard tack: at the timeout the line
+    is "Tacked; braced up on the starboard tack, heading SSE (158°).", where it said "the
+    larboard tack" (the main topgallant's rig with her fore yards shot away, sailed with the
+    lead's ruling 3 of 2026-11-06 switched off, the same: the tuning notes, B3.4b). A tack ended
+    steady on her course says the new tack as before (the tests above)."""
+    from freesail.evolutions import scripts
+
+    ship = load_ship(FRIGATE)
+    runner = Runner(ship)
+    wind = make_wind(from_deg=90.0, knots=10.0)
+    close_hauled_on_starboard(ship, wind)
+    old_heading = ship.dyn.heading
+    for y in ship.spars.values():
+        if y.is_yard:
+            y.brace_angle = y.brace_limit  # braced up on the starboard tack
+    runner.start(ship, "tack", "ship")
+    tack = runner.instances[0].script
+    assert isinstance(tack, scripts.TackScript)
+    turn = turner(0.4, speed_kn=4.0)
+    steady_ticks = 0
+
+    def falls_back(s, dt, w) -> None:
+        nonlocal steady_ticks
+        if tack.phase == "steady":
+            steady_ticks += 1
+            s.dyn.heading = old_heading  # fallen back on the old tack, and lying there
+            s.dyn.speed = units.knots_to_ms(4.0)
+            deck_reading(s, w)
+        else:
+            turn(s, dt, w)
+
+    _, notes = run(runner, ship, wind, falls_back)
+    assert kinds(notes)[-1] == "ship.tacked"
+    assert ship.dyn.tack == "starboard"
+    assert texts(notes)[-1] == "Tacked; braced up on the starboard tack, heading SSE (158°)."
+    # the tick her head yards' swing ended, and then the timeout's 300 s
+    assert steady_ticks == EVOLUTIONS["tack"].timing["steady_timeout_s"] + 1
+
+
 @pytest.mark.parametrize("how", ["wrecked", "sent_down"], ids=["shot away", "sent down"])
 def test_the_main_yard_shot_away_takes_the_mainsail_with_it_from_the_word(how):
     """The main yard shot away (or sent down), its course is no longer set, whatever its state:
-    the after yards left are hauled by "Main-topsail haul"."""
+    the after yards left are hauled by "Main-topsail haul", the fore course's tack kept fast for
+    "let go and haul" (the lead's ruling (2) of 2026-11-07, B3.4b; "Rise tacks and sheets.
+    Main-topsail haul" before it)."""
     from freesail.evolutions import scripts
 
     ship = load_ship(FRIGATE)
     for sid in ("fore.course", "main.course"):
         ship.sails[sid].state = SailState.SET
     setattr(ship.spars["main.yard"], how, True)
-    assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == (
-        "Rise tacks and sheets. Main-topsail haul"
-    )
+    tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
+    assert tack._haul_words() == "Main-topsail haul"
+    assert tack._courses_drawing() == (True, False)
 
 
 @pytest.mark.parametrize(
     ("fore", "settee", "said"),
     [
-        (SET, SET, "Rise tacks and sheets. Mainsail haul"),
-        (UP, SET, "Rise tacks and sheets. Mainsail haul"),
-        (SET, UP, "Rise tacks and sheets. Main-topsail haul"),
+        (SET, SET, "Main-topsail haul"),
+        (UP, SET, "Main-topsail haul"),
+        (SET, UP, "Main-topsail haul"),
         (UP, UP, "Main-topsail haul"),
     ],
     ids=["both set", "fore hauled up", "settee lowered", "both down"],
 )
-def test_the_bilanders_settee_is_her_main_course_to_the_word(fore, settee, said):
+def test_the_bilanders_settee_is_no_course_hauled_at_the_word(fore, settee, said):
     """The bilander of `tests/rig_fixtures.py` has a settee bent on her main in place of the main
-    course, in her "courses" group and named her mainsail, her main yard dry: the word reads the
-    courses as her file names them (the review of the lead's ruling 2, 2026-11-07), so her settee
-    set is her mainsail set. Before that mend the word read the square courses alone and never
-    saw the settee: the first two cases said "Rise tacks and sheets. Main-topsail haul" and
-    "Main-topsail haul", the last two as here."""
+    course, in her "courses" group and named her mainsail, her main yard dry. The word reads the
+    courses as her file names them (the review of the lead's ruling 2, 2026-11-07), but since the
+    engine's settee step (package 75, B3.3: D3(b)) the settee is kept drawing in stays as a ship's
+    mizen, its tack not risen, and changed last: it is no course hauled at the order and counts
+    for neither words. The lead's ruling (2)(d) of 2026-11-07 holds the word: her after yards are
+    hauled by "Main-topsail haul" at every tack, "none bent" meaning no square course bent to her
+    dry main yard. With her fore course set its tack is kept fast for "let go and haul" (the
+    ruling's (2)(a), B3.4b: the next test). Old beside new: "Rise tacks and sheets. Main-topsail
+    haul" with her fore course set, B3.3 to B3.4b; B3.4's review read the settee set as her
+    mainsail set, the first case "Rise tacks and sheets. Mainsail haul" and the second the same,
+    while the settee was lowered at "helm's a-lee" and so never set at the haul; before that mend
+    the word read the square courses alone."""
     from rig_fixtures import brig_with_settee
 
     from freesail.evolutions import scripts
@@ -779,15 +880,24 @@ def test_the_bilanders_settee_is_her_main_course_to_the_word(fore, settee, said)
     ship = brig_with_settee()
     ship.sails["fore.course"].state = fore
     ship.sails["main.settee"].state = settee
-    assert scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)._haul_words() == said
+    tack = scripts.TackScript(ship, {}, EVOLUTIONS["tack"].timing)
+    assert tack._haul_words() == said
+    assert tack._courses_drawing() == (fore is SET, False)
 
 
-def test_the_bilander_tacks_with_her_settee_lowered_and_hauls_by_main_topsail_haul():
-    """In the tack her settee, a dipping sail, is lowered at "helm's a-lee" ("lower the
-    mainsail") and dipped round after the haul, so her main course is not set when the after
-    yards are hauled: "Rise tacks and sheets. Main-topsail haul.", her fore course's tacks and
-    sheets risen with it (the lead's ruling 2; "Rise tacks and sheets. Mainsail haul." before
-    it), then "Dip the mainsail" and "Let go and haul.". The stub's turn, the frigate's above."""
+def test_the_bilander_tacks_with_her_settee_kept_drawing_and_hauls_by_main_topsail_haul():
+    """In the tack her settee is kept drawing as a ship's mizen, its sheet hauled aft and its
+    ourse braced to leeward at "helm's a-lee", and changed last, once the head yards are swung
+    (D3(b); package 75, B3.3): her after yards are hauled by "Main-topsail haul." (the lead's
+    rulings 2 of 2026-11-06 and (2)(d) of 2026-11-07), her fore tack kept fast and risen apart
+    before the head yards are hauled, "Rise fore tack and sheet. Let go and haul." (the ruling's
+    (2)(a), B3.4b; Luce 1884 pp. 421, 428, 446), and, the head yards swung, "Dip the mainsail:
+    lower the yard ...". The stub's turn, the frigate's above. Old beside new: "Rise tacks and
+    sheets. Main-topsail haul." and "Let go and haul." from ruling 2 to B3.4b ("Rise tacks and
+    sheets. Mainsail haul." before ruling 2); until B3.3 the settee was lowered at "helm's
+    a-lee" ("Ready about. Helm's a-lee; lower the mainsail.") and dipped through the wind ("Dip
+    the mainsail; shift the tacks to the weather bow.", before "Let go and haul."), as the
+    lugger's lugs are."""
     from rig_fixtures import brig_with_settee
 
     ship = brig_with_settee()
@@ -803,10 +913,15 @@ def test_the_bilander_tacks_with_her_settee_lowered_and_hauls_by_main_topsail_ha
     ticks, notes = run(runner, ship, wind, turner(0.4))
     words = texts(notes)
     assert kinds(notes)[-1] == "ship.tacked"
-    assert words[0] == "Ready about. Helm's a-lee; lower the mainsail."
-    haul = words.index("Rise tacks and sheets. Main-topsail haul.")
-    assert haul < words.index("Dip the mainsail; shift the tacks to the weather bow.")
-    assert haul < words.index("Let go and haul.")
+    assert words[0] == (
+        "Ready about. Helm's a-lee; haul aft the mainsail sheet and brace the ourse to leeward."
+    )
+    haul = words.index("Main-topsail haul.")
+    dip = words.index(
+        "Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the "
+        "weather bow."
+    )
+    assert haul < words.index("Rise fore tack and sheet. Let go and haul.") < dip
     assert not any("Mainsail haul" in w for w in words)
     assert 240 <= ticks <= 600
 
@@ -958,6 +1073,96 @@ def test_heave_to_and_fill_away(path, backed_sail, backed_yard):
     assert yard.brace_angle == pytest.approx(yard.brace_limit)
     assert ship.dyn.helm_mode is HelmMode.HEADING
     assert "hove_to" not in ship.extra
+
+
+def _dismasted_trial_b():
+    """Trial B (`tests/rig_fixtures.py`, the topsail schooner with a main topsail) under plain
+    sail with her three fore yards shot away: no head yards, her main topsail yard her after
+    yard (the lead's ruling 3 of 2026-11-06), no yards to lay aback."""
+    from rig_fixtures import schooner_with_main_topsail
+
+    ship = schooner_with_main_topsail()
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    for yid in ("fore.yard", "fore.topsail.yard", "fore.topgallant.yard"):
+        ship.spars[yid].wrecked = True
+    return ship
+
+
+def _as_loaded(path):
+    return lambda: load_ship(path)
+
+
+@pytest.mark.parametrize(
+    ("build", "said"),
+    [
+        (
+            _as_loaded(FRIGATE),
+            "Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up.",
+        ),
+        (_dismasted_trial_b, "Wind aft. Shifted over the sheets; hauled out and braced up."),
+        (
+            _as_loaded("data/ships/lugger.yaml"),
+            "Wind aft. Shifted over the sheets; hauled out and braced up.",
+        ),
+    ],
+    ids=["the frigate", "trial B with her fore yards shot away", "the lugger"],
+)
+def test_with_no_head_yards_the_wear_squares_none(build, said):
+    """The lead's ruling (3) of 2026-11-07 (B3.4b): with the wind aft Luce lays the head yards
+    square and shifts over the head sheets (1884 p. 424), the after yards braced in as she fell
+    off (p. 423, "BRACE IN THE AFTER YARDS!", the up-helm line's words) and braced up as she comes
+    to. With no head yards (trial B with her fore yards shot away, her main topsail yard her one
+    after yard; the lugger, whose lug yards are no braced yards) the line says nothing of
+    squaring them. Old beside new: "Wind aft. Squared the head yards; shifted over the sheets;
+    hauled out and braced up." whatever she had; the frigate's line as it was. In the stub world
+    as the wears above."""
+    from freesail.evolutions import scripts
+
+    ship = build()
+    runner = Runner(ship)
+    wind = make_wind(from_deg=90.0, knots=10.0)
+    close_hauled_on_starboard(ship, wind, off_deg=67.5)
+    for y in scripts.working_yards(ship):
+        y.brace_angle = y.brace_limit
+    runner.start(ship, "wear", "ship")
+    _, notes = run(runner, ship, wind, turner(0.5))
+    aft = [w for w in texts(notes) if w.startswith("Wind aft")]
+    assert aft == [said]
+    assert kinds(notes)[-1] == "ship.wore"
+
+
+@pytest.mark.parametrize("dismasted", [False, True], ids=["the schooner", "trial B dismasted"])
+def test_hove_to_with_no_yards_to_lay_aback_she_lies_under_her_fore_and_aft_canvas(dismasted):
+    """The lead's ruling (3) of 2026-11-07 (B3.4b): hove to the fore-and-after's way with no
+    square sail laid aback, her main sheet flat aft and her staysail's sheet to windward (Luce
+    1884, ch. XXXIV, 'To Heave to'), she lies under her fore-and-aft canvas, and the line says
+    so: "Hove to on the starboard tack, under her fore-and-aft canvas, fore staysail sheet to
+    windward, helm a-lee.". The topsail schooner with her fore staysail set and no topsail, and
+    trial B under plain sail with her fore yards shot away, in the stub world as the heave-to
+    above. Old beside new: "Hove to on the starboard tack, fore staysail sheet to windward, to the
+    mast, helm a-lee." (a fore-and-after with no topsail set, the lugger, the smack and the
+    dismasted rigs the same; the tuning notes, B3.4b)."""
+    if dismasted:
+        ship = _dismasted_trial_b()
+        runner = Runner(ship)
+        wind = make_wind(from_deg=90.0, knots=10.0)
+    else:
+        ship = load_ship(SCHOONER)
+        runner = Runner(ship)
+        wind = make_wind(from_deg=90.0, knots=10.0)
+        set_sail(runner, ship, wind, "fore.staysail")
+    close_hauled_on_starboard(ship, wind)
+    runner.start(ship, "heave_to", "ship")
+    _, notes = run(runner, ship, wind)
+    assert kinds(notes)[-1] == "ship.hove_to"
+    assert texts(notes)[-1] == (
+        "Hove to on the starboard tack, under her fore-and-aft canvas, fore staysail sheet to "
+        "windward, helm a-lee."
+    )
+    assert ship.extra["hove_to"]["yards"] == [] and ship.extra["hove_to"]["headsail"] == (
+        "fore.staysail"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,64 @@
+# FreeSail: the afterguard of the bilander Hopewell (spec M6 §2; package 40; package 75, B4,
+# docs/design/Design-Ship-Bilander.md §6.2). Her station holders as people: the master, who
+# commands her, and the mate, with a boy to carry the word, the smack's form
+# (data/people/smack.yaml) for a coasting trader of about 130 tons and eight hands. Each with
+# their rank, their station aboard, their place when nothing calls them elsewhere, and a
+# character outline (a few traits, a line of history and a station brief), as data, in the
+# form of data/people/frigate-36.yaml. Read by freesail/world/people.py, which gives each
+# person their outline and binds the harness's stations to a person by role, and by
+# tools/ships/bilander.py, which draws the posts and the people below into the ship file's
+# `crew.posts` and `crew.people`.
+#
+# The outlines are judgement (D26 (b)), bred in the Poole and Newfoundland trade that the
+# register's bilanders of Poole sailed in (Lloyd's Register 1776 and 1779: the Hopewell, the
+# Speedwell and the Vigilant; Research-Bilander-2026-10.md §2.2, read), and name no one: the
+# names are the muster's, drawn under the seed from the english list. A scenario names her
+# people by `people:` (a role and a name).
+#
+# The form of an entry is the frigate-36's file's (role, post, drawn, messenger, rank, station,
+# place, traits, history, brief, note).
+
+ship: data/ships/bilander.yaml
+
+# The harness's stations bound to a person by role: in a vessel whose master commands, the
+# officer of the watch is the mate (spec M5 §29), and so is the master's station, as the
+# smack's and the merchant brig's (a trader carries no master beside the one who commands her).
+stations:
+  captain: master
+  officer of the watch: mate
+  master: mate
+
+wardroom:
+  - role: master
+    post: true
+    rank: master
+    station: the command
+    place: quarterdeck
+    traits: [close-mouthed, careful of the owners' money, knows the Channel's headlands by their loom]
+    history: "Bred to the sea in the Poole and Newfoundland trade; master of this bilander four voyages."
+    brief: >-
+      The vessel, her cargo and her people under her owners' instructions: the course and the
+      standing orders, the pilot taken or declined, the freights and the market. Works the
+      reckoning when the mate has the deck.
+  - role: mate
+    post: true
+    rank: mate
+    station: the mate's
+    place: quarterdeck
+    traits: [steady, a seaman first, sparing of words]
+    history: "Before the mast in the Newfoundland fishery out of Poole; mate of this bilander two years."
+    brief: >-
+      The deck in the mate's watch under the master's standing orders, the hands at their work,
+      the cargo stowed and the log kept; reports every sail and every shift of wind, and takes
+      the deck when the master gives it.
+  - role: boy
+    drawn: {station: afterguard, rating: ordinary}
+    messenger: true
+    rank: boy
+    station: the master's messenger
+    place: quarterdeck
+    traits: [small, sharp-eyed, homesick]
+    history: "Bound apprentice to the master at Poole; this voyage the first."
+    brief: >-
+      Carries the master's word about the vessel (pass the word for, send for).
+    note: An apprentice boy as the messenger (judgement), as the smack's.

@@ -248,9 +248,14 @@ KEEL_HALF_SIDING_FT = 0.36
 # before the stem (measured).
 HEAD = ((108.87, 6.66), (115.79, 8.99))
 # The transom (Neuf-D §3.5, measured): its face raking from its foot (STERN's third point) to the
-# taffrail with no counter; on the body plan 16.1 ft across its top corners and 15.8 ft at its
-# foot (the half-breadths written as the design's, 2.46 and 2.41 m), its top arched about 0.35 ft.
-TRANSOM_HB_FT = (8.07, 7.90)
+# taffrail with no counter; on the body plan 16.1 ft across its top corners and 16.6 ft at its
+# knuckle, its top arched about 0.35 ft, so that it tumbles home above the knuckle as every
+# transom does. The knuckle's breadth is the re-reading at the knuckle's height (B2's, taken by
+# the lead's ruling of 2026-11-07): the sides near plumb, 16.6-16.8 ft across from 4.0 to 7.0 ft
+# above her water, the horizontal line at 4.6-5.1 ft where her knuckle stands (4.65 ft); the
+# first reading's 15.8 ft was taken at 3.2-3.9 ft, below the knuckle, where the outline rounds in
+# (the half-breadths 2.46 and 2.41 m before, 2.46 and 2.53 now).
+TRANSOM_HB_FT = (8.07, 8.30)
 TRANSOM_ROUND_UP_FT = 0.35
 
 # -- her ports (Neuf §2.7; Neuf-D §3.3) ------------------------------------------------------
@@ -382,15 +387,16 @@ MAINSAIL_FT = {"head": 35.0, "foot": 62.0}
 LOWER_STUNS_FT = (19.0, 35.0)
 # The flying jib (task 5's reading on ZAZ6179, Neuf-D §3.7: the tuning notes): its tack at the
 # flying jibboom's end, its head 41.3 ft above the tack and 54.1 ft abaft it, its clew level with
-# the tack and 21.0 ft abaft it, the foot's roach 17 sq ft over its chord. The jib's and the fore
-# staysail's clews are not read: their areas the design's working figures (Neuf-D §4.3: 93 and
-# 121 m2, judgement, closing Fincham's remainder of 2,200-2,400 sq ft for the jib and the fore
-# topmast staysail, Neuf §2.8).
+# the tack and 21.0 ft abaft it, the foot's roach 17 sq ft over its chord. The jib's clew is not
+# read: its area the design's working figure (Neuf-D §4.3: 121 m2, judgement, with the fore
+# staysail's working 93 closing Fincham's remainder of 2,200-2,400 sq ft for the jib and the fore
+# topmast staysail, Neuf §2.8). The fore staysail's clew is not read either, and its working 93
+# m2 was that same derivation of the design's own, not her sail plan's figure: as a triangle with
+# a level foot from its tack up the fore stay to the fore hounds its clew stood 7.4 m abaft the
+# fore mast. Corrected by the lead's ruling of 2026-11-07 to the triangle that fits, its leech
+# down the fore mast to its foot (`head_sails`): 46 m2.
 FLYING_JIB_FT = {"head_above": 41.3, "head_aft": 54.1, "clew_aft": 21.0, "roach_sqft": 17.0}
-HEADSAIL_WORKING_M2 = {"fore.staysail": 93, "jib": 121}
-# The topsail schooner's feet for the two (Fincham as Chapelle 1930 pp. 160-161 gives him: the
-# staysail's 0.4 of the waterline, the jib's 0.35; gen_ships.schooner()).
-SCHOONER_FOOT_OF_LWL = {"fore.staysail": 0.4, "jib": 0.35}
+HEADSAIL_WORKING_M2 = {"jib": 121}
 # The staysails between the masts (task 5's reading on ZAZ6179): the main staysail's stay from
 # the main mast's hounds to the fore mast 13 ft above her water, its head on it 47.4 ft above her
 # water, its clew 8.1 ft above her water and 6.9 ft forward of the head; the main topmast
@@ -715,7 +721,7 @@ HULL_FIGURES = {
     "draught_m": round(10.36 * FT, 2),
     "displacement_kg": 288000.0,
     "gm_m": 2.1,
-    "clr_x_m": 0.1,
+    "clr_x_m": -0.6,
     "lateral_area_m2": 102.0,
     "hull_speed_kn": 12.9,
     "deck_height_m": DATUM_M,
@@ -744,10 +750,12 @@ HULL_NOTES = {
     "2.0-2.2 (Neuf-D §9): no account gives her heel (docs/dev/TuningNotes.md).",
     "clr_x_m": "Tuned against the helm (Neuf-D §9; docs/dev/TuningNotes.md, old beside new), so "
     "that she carries a little weather helm close-hauled in 15 kn and a little with the wind "
-    "abeam, as near the topsail schooner's tuning as her rig allows (judgement): ahead of the "
-    "geometric centre of the plane the file counts, -0.80 m without the rudder (measured, Neuf "
-    "§2.6), by 0.9 m, a little short of the topsail schooner's lead of 3.5% of her waterline, "
-    "+0.3 to start, which gave her nearly two degrees of weather helm close-hauled.",
+    "abeam (judgement): ahead of the geometric centre of the plane the file counts, -0.80 m "
+    "without the rudder (measured, Neuf §2.6), by 0.2 m. Her helm falls from close-hauled to the "
+    "beam, so that with her fore staysail the 46 m2 that fits forward of her fore mast no single "
+    "figure holds both of the helm's bands as first set: each band is widened by 0.2 degrees and "
+    "the centre re-tuned to this figure (the owner's ruling for the lead, 2026-11-08). +0.3 to "
+    "start; +0.1 before the fore staysail was corrected from its working 93 m2.",
     "lateral_area_m2": "1,100 sq ft to the false keel's bottom, keel, gripe and post counted and "
     "the rudder not (measured, +-5%: Neuf §2.6; D29 (b)); 97 m2 on the faint line and 105 with "
     "the rudder.",
@@ -845,9 +853,13 @@ PROFILE_NOTES = {
     "knee.",
     "profile.form.stern": "A flat transom along stern_m's rake with no counter (Build-Ships.md "
     "§5.1, raked; measured on ZAZ6177): its foot 4.65 ft above her water just abaft the post's "
-    "head, 16.1 ft across its top corners and 15.8 ft at its foot on the body plan, its top arched "
-    "about 0.35 ft (measured; the checker reads 16.0-16.6 ft on both body plans). Reed's modern "
-    "model (Winfield pp. 335-336's photograph) shows the same raked transom, for the eye only.",
+    "head, 16.1 ft across its top corners and 16.6 ft at its knuckle on the body plan, so that it "
+    "tumbles home above the knuckle, its top arched about 0.35 ft (measured; the checker reads "
+    "16.0-16.6 ft on both body plans). The knuckle's breadth is read at the knuckle's height, the "
+    "sides near plumb at 16.6-16.8 ft from 4.0 to 7.0 ft above her water (re-read on ZAZ6177's "
+    "body plan); the first reading's 15.8 ft, below the knuckle, made the transom wider at its "
+    "top than at its foot (2.46 and 2.41 m before, 2.46 and 2.53 now). Reed's modern model "
+    "(Winfield pp. 335-336's photograph) shows the same raked transom, for the eye only.",
     "profile.form.head": "A knee: its head rails are drawn; a small terminal at its top is not "
     "resolved at 1280 px, so no billet, scroll or figure is drawn (Build-Ships.md §5.0 principle "
     "9: nothing invented).",
@@ -1071,15 +1083,17 @@ def head_spars(p):
 def head_sails(p, root, head):
     """Her three headsails (Neuf-D §4.6), each {area m2, centre x and z above her water}: the
     flying jib as read on ZAZ6179 by task 5 (placed from the flying jibboom's end as drawn, its
-    centre its corners', the foot's roach added to their area); the jib and the fore staysail the
-    design's working figures cut on her spars (judgement, until task 5 reads them), the fore
-    staysail tacked where the bowsprit lies over the stem and the jib at the jibboom's end, each
-    centre's height the centroid's of a triangle from its tack up its stay to the stay's head and
-    aft along a level foot. The fore staysail's centre is the topsail schooner's rule's, 0.35 of
-    its foot abaft its tack, the foot the schooner's share of her waterline (0.4: Fincham as
-    Chapelle gives him), and stands inside the sail. The jib's is that same triangle's, its clew
-    where the jib's area puts it (the reviews of 2026-11-07): the schooner's rule, 0.35 of a foot
-    of 0.35 of her waterline, put it above its own stay and forward of the flying jib's."""
+    centre its corners', the foot's roach added to their area); the jib and the fore staysail cut
+    on her spars as triangles from the tack up the stay to the stay's head and aft along a level
+    foot (judgement, until task 5 reads their clews), the fore staysail tacked where the bowsprit
+    lies over the stem and the jib at the jibboom's end, each centre its triangle's centroid. The
+    jib's area is the design's working figure, its clew where that area puts it (the reviews of
+    2026-11-07: the schooner's rule, 0.35 of a foot of 0.35 of her waterline, put its centre above
+    its own stay and forward of the flying jib's). The fore staysail's is the triangle that fits
+    forward of the fore mast, its clew on the mast at the tack's height (the lead's ruling of
+    2026-11-07: the working 93 m2, a derivation of the design's own, put its clew 7.4 m abaft the
+    mast, its centre by the schooner's rule 0.35 of a foot of 0.4 of her waterline abaft the
+    tack)."""
     fx, fz, _ = head["flying_jib_boom"]
     jx, jz, _ = head["jib_boom"]
     fj = FLYING_JIB_FT
@@ -1094,12 +1108,14 @@ def head_sails(p, root, head):
         ("jib", (jx, jz), p.hounds["fore.topmast"]),
         ("fore.staysail", (root[0], z_m(BOWSPRIT_AT_STEM_FT)), p.hounds["fore.mast"]),
     ):
-        area = float(HEADSAIL_WORKING_M2[sid])
         top = (mast_at(p, "fore", stay_head), stay_head)
         if sid == "jib":
-            x = (tack[0] + top[0] + tack[0] - 2.0 * area / (top[1] - tack[1])) / 3.0
+            area = float(HEADSAIL_WORKING_M2[sid])
+            clew_x = tack[0] - 2.0 * area / (top[1] - tack[1])
         else:
-            x = tack[0] - 0.35 * z_m(SCHOONER_FOOT_OF_LWL[sid] * LWL_FT)
+            clew_x = mast_at(p, "fore", tack[1])
+            area = 0.5 * (tack[0] - clew_x) * (top[1] - tack[1])
+        x = (tack[0] + top[0] + clew_x) / 3.0
         out[sid] = {"area": area, "x": x, "z": (2.0 * tack[1] + top[1]) / 3.0, "stay": (tack, top)}
     check_head_sails(p, out)
     return out
@@ -1698,13 +1714,14 @@ HEAD_WORDS = {
     "without reef bands, the storm jib standing in, and reported for a later package (Neuf-D "
     "§17, lead item 7).",
     "fore.staysail": "the fore staysail on the fore stay, tacked where the bowsprit lies over "
-    "the stem at the height ZAZ6179 draws it (judgement), its clew not read: its area the "
-    "design's working figure, 93 m2, cut by the topsail schooner's rule on her spars "
-    "(judgement, Neuf-D §4.3 and §4.6, until task 5 reads it): its centre 0.35 of its foot "
-    "abaft its tack, the foot 0.4 of her waterline (Fincham), its height a triangle's up its "
-    "stay, which stands inside the sail; with the jib it closes Fincham's remainder for the jib "
-    "and the fore topmast staysail (Neuf §2.8). As a triangle with a level foot forward of the "
-    "fore mast it would hold about half that area (judgement, until task 5 reads it).",
+    "the stem at the height ZAZ6179 draws it (judgement), its clew not read: cut as the triangle "
+    "that fits forward of the fore mast, its luff up the fore stay to the fore hounds, its foot "
+    "level from the tack to the mast and its leech down the mast (judgement, until task 5 reads "
+    "it), its centre that triangle's. The design's working 93 m2 (Neuf-D §4.3, §4.6) was a "
+    "derivation of its own, closing Fincham's remainder for the jib and the fore topmast "
+    "staysail with the jib (Neuf §2.8), not her sail plan's figure, which is not read: so "
+    "triangled its clew stood 7.4 m abaft the fore mast. Corrected to the triangle that fits, "
+    "the lead's ruling of 2026-11-07.",
 }
 
 
@@ -2631,8 +2648,8 @@ def quarter_bill(b, guns):
                 "forecastle",
                 TRIMMERS["forecastle"],
                 "The trimmers: the brig-sloop's twenty-seven (brig.yaml's bill) carried by her "
-                "plain sail against the brig's, a third more (Neuf-D §6.4; the arithmetic in the "
-                "generator's report), split by each mast's work (judgement). Of the "
+                "plain sail against the brig's, a quarter more (Neuf-D §6.4; the arithmetic in "
+                "the generator's report), split by each mast's work (judgement). Of the "
                 "forecastlemen, for the headsails and the fore tacks and sheets.",
             ),
             ("fore_top", TRIMMERS["fore_top"], "Of the fore topmen, for her four fore yards."),

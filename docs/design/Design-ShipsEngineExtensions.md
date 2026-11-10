@@ -586,6 +586,17 @@ The short-handed rule begins a request with half its hands, slower in proportion
 (`SHORT_HANDED_SHARE`, `hands.py:95`). Every settee request is six, which a company of eight
 meets with a watch on deck of four (D43; B4 checks each starts).
 
+*As built (B3.3, 2026-11-07):* §5.2's routing and words as tabled; the brace orders name it
+("The main settee has no braces to its yard; a settee is trimmed with its sheet."). The four files
+as tabled, `set_settee` with a zero-time step that puts a yard never hoisted on the lee side and a
+hoist for one left on deck, `furl_settee` furling one on deck there and hoisting it. A step's
+`sets:` value is read as an expression from its text, so the files quote `"true"` and `"false"`:
+a bare YAML `false` arrives as the word "False" and is assigned as true (found in the build, pinned
+by `tests/test_settee.py`). A company of eight with a main-top pair begins each request
+short-handed from a watch of four (the test). The review's mend: the opening lines from the gear
+are true of a yard on deck as of one aloft, since the `from:` map reads the state and not
+`yard_lowered` ("Man the mainsail tack and sheet."; "Hands to furl the mainsail."). Figures in `docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)".
+
 ### 5.4 Every lug-keyed path, and the settee there
 
 Two helpers in `scripts.py`: `lugger_lugs(ship)`, the set dipping lugs that are not settees,
@@ -615,6 +626,28 @@ and `settees(ship)`, the set settees.
 fill, fill away, come to anchor, furl all, loose sails to dry. B3 runs each once on the
 bilander's file and on the fixture, and records what the settee does. A guard is added only
 where one misbehaves, keyed on `settee` alone.
+
+*As built (B3.3, 2026-11-07), on the fixture* (her file is B4's, the lead's ruling on her §17
+item 8): every path of the table as tabled. Two guards added, keyed on the settee: box-hauling and
+wearing short round (one script) lower it as the mainsail is hauled up and hoist it on the new lee
+once its time is done and she is coming to, as the mainsail is set again, as in wearing (left set,
+it went round drawing and ended against its mast with no word said); backing and filling clews it
+up aloft with her courses (left drawing, it took her head through the wind at the first board and
+she was forced round). Scud, fill away, come to anchor, furl all and loosing to dry run to their
+ends with no guard; a settee kept hove to is among the after sails the watch regulates and filling
+away draws (`_kept_after_sails`); at "brought up" no driver she has not got is brailed up. *The
+review's mends (2026-11-07):* boxed off from aback, the case the helm and the captains box her off
+for, a settee on the weather side of her tack is lowered as the mainsail is hauled up and hoisted
+on its lee when the after sails take (left, it stayed against its mast with no word); gone round
+by the stern instead, it takes the other tack's lee as in box-hauling. The box-haul's hoist waits
+for her coming to: on the wind on the new side alone it opened with her head through the wind by
+the bow on the sternboard (in 8 kn, 91 s before "Wind aft"), and where her head went so the line
+says no word of the stern (her head goes through the wind by the bow at the settle in 8 to 20 kn,
+the brig's as filed too: the engine's box-haul, for the lead). Lying a-try clews it up aloft with
+her courses, by the lean of §5.1 and E15 (one of her courses, a square-rigger's after sail, as the
+gale has it in before): left standing, the line named the main topsail and the staysails alone;
+kept and named is the other way, the lead's (the figures in the tuning notes). Each run in
+`docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)", "The untried manoeuvres".
 
 ### 5.5 Going about: the tack under D3(b)
 
@@ -661,6 +694,27 @@ shift the mizen"). Open for the owner to confirm (§14).
 The time, 120 s, is the lugger's in-manoeuvre 90 s (`timing_value("dip_s", 90.0)`, 1122)
 lengthened for the longer yard (judgement); the dip order's own 180 s is `dip_settee`'s.
 
+*As built (B3.3, 2026-11-07):* as designed, the change begun at the steady phase, the code's time
+`SETTEE_DIP_S` (120 s) unless the tack's file gives `settee_dip_s`; the tack holds the settee
+while it is changed. On the fixture at seed 7 from close-hauled: set at its floor at helm's a-lee
++ 1 tick; lowered when the head yards' swing ends, 155 s and 161 s in 15 and 20 kn; down 159 and
+181 ticks; "Tacked" at 318 s and 342 s, against 290 s and 233 s when it was lowered at helm's
+a-lee and dipped through the wind; at +400 s on the new tack within a degree of close-hauled.
+**The word at the haul:** `_haul_words` (B3.4's review mend) read the settee in her "courses" as
+her main course, on the premise that it was lowered at helm's a-lee; set there now, it counts for
+neither words, being no course hauled at the order (its tack not risen, changed last, her main
+yard dry), and her line stays "Rise tacks and sheets. Main-topsail haul." (judgement, for the
+lead; the other way says "Mainsail haul"). *The lead's ruling (2)(d) of 2026-11-07 holds the word,
+"none bent" meaning no square course bent to her dry main yard; since B3.4b her fore course's tack
+is kept fast at the haul and risen apart, "Main-topsail haul." and then "Rise fore tack and sheet.
+Let go and haul." (the ruling's (2)(a); the bilander's design §12.2 item 3).* Rule 5's half of
+truth 7-198: below, §5.10. *The
+review's mends (2026-11-07), where step 5 says nothing:* a settee whose yard hangs on the new lee
+side already (left on the weather side before the tack) is to leeward of its mast once she is
+through and is not changed, as the dip order leaves it ("Tacked" at 261 s in 15 kn, where it was
+lowered and "passed round" to the side it was on and she tacked at 318 s); for the lead to
+confirm. The served estimate counts the change still to come until it is begun.
+
 ### 5.6 Wearing (D46(d), rule 4 as reworded)
 
 - **"Up helm"** (`_up_helm`, 1460-1501): `settee_change.lower()` beside the driver's brailing,
@@ -677,6 +731,13 @@ lengthened for the longer yard (judgement); the dip order's own 180 s is `dip_se
 - **The difference from the lugger.** 43b's lugs keep drawing until the wind is aft; only a
   settee comes down at "up helm", which is D46(d)'s wording. The gate on the wind is stricter
   than a time alone: Steel's mizen is hauled out "as soon as the stern has passed the wind".
+
+*As built (B3.3, 2026-11-07):* as designed; a course worn for trims the settee hoisted again with
+the other sheets. On the fixture at seed 7: lowered at "up helm" + 1 tick, the wind across the
+stern at 66 s and 55 s (15 and 20 kn), hoisted at 152 s and 168 s with the wind 99.6 and 133.6
+degrees on the new side, "Wore" at 478 s and 520 s (480 s and 522 s with the lugger's dip at "wind
+aft"). If she never brings the wind past her stern the wear fails on its timeout with the yard on
+deck, where "set the mainsail" hoists it.
 
 ### 5.7 Heaving to (D4(a))
 
@@ -701,6 +762,57 @@ lengthened for the longer yard (judgement); the dip order's own 180 s is `dip_se
   stays within the heave-to's four to seven points (`heave_to.yaml:50-51`), it stands. If not,
   both figures go to the lead and the owner; no truth pins the heave-to before that.
 
+*As built (B3.3, 2026-11-07), by the lead's ruling on §14 item 3* ("the engine's driver rule holds
+for the settee hove to unless the measured figures say otherwise, and then D4(a)"): `heave_to_aback`
+read by `yards_to_back`, the main topsail to the mast; the settee never lowered, kept with its sheet
+eased where the backed yards are on her aftermost mast with yards, else clewed up aloft
+(`SETTEE_KEPT_HOVE_TO`, true; false clews it up there too). Measured on the fixture at seed 7, 15
+and 20 kn: kept, 63.5 degrees off at 1.8 and 2.4 kn from +300 s to +900 s, inside the band; clewed
+up aloft, 67.9 and 68.4 degrees at +300 s, then past seven points (80.6 and 88.8 at +600 s, 93.3 and
+98.4 at the most), as the brig falls off with her driver brailed. The figures do not say otherwise:
+the driver rule stands; D4(a)'s clewing up does not hold her in the band. Kept, she goes 26-34%
+faster through the water than the brig as filed (1.21-2.92 kn from 10 to 25 kn against her
+0.96-2.18; ahead 1.11-2.64 against 0.77-1.60), the forereach D1(c) counted against a standing
+settee (2.9 kn in 25 kn); clewed up, the brig's way (the review's measure). Both to the lead and the
+owner; her file's are B4's. Figures in `docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)".
+
+*As built (B3.3b, 2026-11-08), the follow-up the bilander's design §17 lead item 8 provides for,
+keyed on `settee` alone (her review found the need on her file):* kept hove to, the settee's yard
+hangs where she hove to; forced round through the wind lying to, `_judge_lying_to` changes the
+record's tack and yards, not its side, and its yard is on her weather side, against its mast. Fill
+away drew it there and never dipped it (at seed 7 in 15 kn after a shift of eight points, the
+fixture's drawing 57.2 m² to the end where 85.8 drew clear, hers 41.3 where 61.8 did, 3.38 and 3.21
+kn at +600 s, and no line said so). Now `FillAwayScript` dips a settee set on the weather side of
+the tack she is to be filled on first, as she lies (its phase `dip_settee`; judgement, for the lead,
+in place of the tack's way of changing it last): lowered at the order
+("Dip the mainsail: lower the yard, pass it round abaft the mast and shift the tack to the weather
+bow."), hoisted on her lee once `settee_dip_s` is done by the crew's factor ("Dipped the mainsail;
+hoisted on the starboard side, to leeward of the mast."), its sheet drawn for the wind she will have
+full and by, as the tack hoists it (§5.5's change, D3(b)), and never trimmed again by the fill away
+(judgement, for the lead), her hands tending the helm and the head sheets meanwhile as the watch
+does; then she is let fall off and filled away as from any heave-to.
+One on her lee is left as it is; a ship with no settee set is not touched (the trace of seven
+committed files, identical). Dipped as she fell off instead, the settee down while she had a knot of
+way, her file came head to the wind when it was hoisted and went astern after "Filled away" in 15
+and 20 kn (aback at +254 s in 15): not kept. As built, in 8 to 20 kn on both: filled away 133-183 s
+later, nothing aback, the settee clear of its mast; 4.08 and 5.36 kn at +900 s on her file in 15 and
+20 kn (3.21 and 4.24 before), about as before in 8 kn. Figures in `docs/dev/TuningNotes.md`, "B3.3b,
+the settee kept and forced round hove to".
+
+*The review's mends (2026-11-09):* with a settee set, whether it is dipped is read at the first
+tick from the wind itself, as the fill away reads her tack, and not at the order from the deck's
+reading, which lags a ship just come round (by the deck's alone, one on her lee by the wind was
+lowered and hoisted again where it hung, and one on her weather side was found only after she had
+been let fall off, the head sheets' line said twice); belayed while it is being dipped, the
+settee is said to be left on deck ("... the yards left as they stand; the mainsail lowered on
+deck, not yet dipped."). On her file and the fixture every tick's state as before, the order's
+first line now said after "Fill away; man the after braces." in the order's tick; the files with
+no settee line for line as before. Her polar and 7-197's rule-1 clause the same to the last bit on
+8b327687, B3.3b and the mends. Found, for the lead: the settee's hold while it is changed (the
+tack's, the wear's and the fill away's) is not seen by the runner, which reads an evolution's
+holds once, at the order. Figures in `docs/dev/TuningNotes.md`, "B2c and B3.3b, the review's
+mends".
+
 ### 5.8 Getting under way, rounding to, the gale
 
 - **Getting under way.** With `_lugs_all` leaving out settees, she takes the ship's path:
@@ -717,6 +829,16 @@ lengthened for the longer yard (judgement); the dip order's own 180 s is `dip_se
   to her great sail by judgement). She is square-rigged by her fore and main yards, so the rule
   reaches her (`storm.py:382-384`).
 
+*As built (B3.3, 2026-11-07):* as designed. On the fixture at seed 7: got under way from Falmouth's
+outer road as a ship in 1,475 s and 1,342 s (15 and 10 kn), "set the mainsail" after the cast (the
+lugger's path, before, 1,453 s and 1,333 s under the mainsail and the jib, "set the mizen"; the
+trial's failed at 1,842 s); the settee loosed aloft with the topsails (the review's mend: it went
+from furled to set at the cast), the times as before; rounded to and brought up in Carrick Road
+with the settee clewed up aloft, no guard needed, the words at "brought up" naming no driver (let
+go at 298 s and brought up at 1,246 s in 12 kn, trimmed after the first tick, the brig's 296 s and
+1,244 s; the review found the first measure's trim refused); in the gale reefed at the topsails'
+second reef and taken in, clewed up aloft, at their third, lying a-try under the main topsail.
+
 ### 5.9 The physics: curve, mast and sheet
 
 - **Nothing in the physics changes.** The curve is the lug's (D44(a); `sail_classes.yaml:81-91`),
@@ -728,6 +850,16 @@ lengthened for the longer yard (judgement); the dip order's own 180 s is `dip_se
   check that this block falls near the taffrail. **If it falls more than a fathom from it**, B3
   adds a settee branch in `sheet_geometry` (371-395): the foot from the corners' tack→clew, the
   block at the taffrail on the centreline. About ten lines, keyed on `settee`, held in reserve.
+  *Ruled by the lead (2026-10-29, `docs/dev/M7-WorkPackages.md`, "5. The bilander (her §17)",
+  item 4): the reserve branch from the start, the foot from the corners with the block a fathom
+  abaft the clew and abreast of it, the trim reading no part of the profile. The taffrail block
+  above is the one approved and this is the departure from it:* **one block for a settee's cut,
+  the other for every other** *sail with no boom, a fathom abaft the clew of the proxy's foot.*
+  *As built (B3.3, 2026-11-07):* so, in `trim.sheet_geometry`. On the fixture the foot is 12.24 m
+  against the proxy's 7.42 m, the block 2.21 m inside her taffrail where the proxy's lay 6.98 m
+  inside it; on the bilander's cut, her design's 0.03 m, B4's to check. The physics' lateral
+  offset for a sail with no boom (half of 0.8√A) understates the settee's by about 40% (3.71 m
+  against the fixture's half-foot of 6.12 m), unchanged under the gate, in `docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)".
 - **Rule 1** (a point nearer the wind than square sails: Steel 1794 I p. 237; Lescallier p. 380)
   is read off her polar. Measured at this head: the brig's `closest_deg` is 50° and her
   `beat_deg(15)` 60°, 4.26 kn at 60° in 15 kn (`world/ships.py:337-348, 423-447`).
@@ -759,6 +891,19 @@ one laid flat aback. The design:
    row in `data/sail_classes.yaml` read through `curve_class` ("settee" for a settee). It changes
    no equation and no existing ship, and moves `tests/test_sails.py:65-74` (the set of curves),
    shown old beside new.
+
+*As built (B3.3, 2026-11-07), measured on the fixture* (her file's measure is B4's, the lead's
+ruling on the bilander's §17 item 8): the engine's resultant coefficients are the table's columns
+to the third place. In the engine's load per square metre the main topsail, set higher, feels the
+stronger wind: held aback by its sheet, the settee presses the mast harder than the topsail below
+about 34 degrees clear of the mast and 27 against it (39 and 30 on the coefficients, as tabled),
+and less laid flat aback. In her own tack at seed 7 (15 and 20 kn) the settee is never aback: its
+single sheet lies it to leeward of the wind, and it is held aback only if she hangs in stays; the
+main topsail is aback 40 and 36 ticks. A shift of one or two points close-hauled backs neither (the
+settee's sheet at 26 degrees, the topsail's chord at 29). So the case that holds is the static one,
+the settee held aback near its trim; neither case the design named puts it aback in the engine.
+Truth 7-198 is drafted without rule 5's clause, that half to the lead; no `settee` row is added.
+The table in `docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)", "Rule 5 against the tables".
 
 ---
 
@@ -862,6 +1007,41 @@ a yard under the bowsprit, so no existing ship draws differently.
 - **The sling** stays a third along throat→peak (D5(a)), which the corners' contract puts on
   the mast (§5.1).
 - The vangs, ourses and derrick are not drawn, to the current standard.
+
+*As built (B5.4, 2026-11-07), on the fixture* `brig_with_settee()` (the bilander's file is B4's):
+`lugHoisted` as designed, the yard aloft unless `yard_lowered`; the slings a third along
+throat→peak, on the main mast's raked line (the fixture's 0.001 m off it). Set, the cut swung about
+its slings by the sheet's angle to the lee of the tack, **the slings on the side its yard hangs**
+(`lug_side`): through the wind, until it is dipped, the yard hangs on the weather side and the one
+sheet lies the cloth to leeward (§5.5 step 3; `read_sheet`), so it is drawn against the mast, its
+slings a mast's half-diameter to windward (judgement, keyed on the settee: a lug is drawn wholly on
+its yard's side, which the lugger's lowering at helm's a-lee keeps from showing). Its one sheet
+held over to windward (hung in stays, §5.5 step 2, or hauled to windward by order), the cloth is
+still drawn to leeward, as every fore-and-aft sail is: the snapshot serves no sheet's side
+(serving it would be a §6.4 change, for the lead). **The yard is drawn as its head**, throat to
+peak, as every lug's; its `length_m` reaches only the frame, so the drawing needs the yard to span
+the head and says so (Bil §4.4): her 16.59-m yard on her 15.67-m head would be drawn 0.92 m short,
+and by Bil §4.4 her yard is cut to the head, recorded (B4's; the other way, the yard carried beyond
+both ends keyed on `settee`, for the lead). In the gear aloft,
+`gathered` under the yard, its festoons straight down by IN_GEAR_DEPTH of the clew's distance from
+the head (8.75 m on the fixture, a 3.06-m hang), not of the leech (12.24 m, 4.28 m, near the slings
+almost down to the tack), the clew in the after festoon (judgement); furled, the bundle along the
+yard aloft; lowered, on deck as a lug. **The sheet**, by the lead's ruling on the bilander's §17 lead
+item 4 (§5.9), not to the taffrail on the centreline as above: to the block a fathom abaft the clew
+at the sail's floor and abreast of it, on the lee side, on the drawn deck, by the trim's floor and
+lead (`SETTEE_SHEET_FLOOR`, `SETTEE_LEAD_AFT_M`), the clew taken as the drawing swings the cut; on
+the fixture x −14.20 m, 1.38 m off the centreline, 2.27 m inside the taffrail, 0.33 m from the
+trim's own block, which swings the clew about the tack on the centreline. **The derrick**: every
+yard's lifts are drawn since B5.1 (the owner's answer), so the derrick, a `lift`, is drawn, from
+two-thirds of the way from the slings to the peak as the mizen yard's (§6.1); "not drawn" above was
+the standard before B5.1 (judgement, for the lead). The vangs and ourses are not drawn. §6.4 was
+served from stage 0E; §6.5's cases in `tests/test_view_geometry.py` (25), every committed file drawn
+figure for figure as before. **For the lead:** the dry main yard is drawn where every lower yard is,
+5.40 m above the slings on the fixture; braced sharp up with the settee trimmed by the same wind the
+two yards cross wherever sheet and brace sum near 90 degrees: by the wind at the engine's own trim
+(sheet 26.4, brace 62) 0.05 m apart, and 0.03 m with the bilander's dry yard (12.44 m, 1.02 m above
+the slings; her §4.4, §12.3's "without the two crossing"). The trims are the engine's, not the
+drawing's. Figures and pictures in `docs/dev/TuningNotes.md`, "The settee drawn (package 75, B5.4)".
 
 ### 6.4 What is served
 
@@ -1089,6 +1269,20 @@ On the fixtures, then on the files when they land.
   - every settee request begins with her company of eight;
   - the lugger's every path gives the same log lines and ticks (the trace).
 
+  *As built (B3.3, 2026-11-07):* `tests/test_settee.py`, 56 tests on the fixture after the
+  review (51 before it), each of the above, with the tack's hang and miss, the heave-to both ways,
+  the sheet's block, the settee against its mast at two-thirds, the brace orders' words and the
+  lugger's tack and wear pinned line for line and tick for tick from the trace; the review added
+  the box off from aback and gone round by the stern, the box-haul in 8 kn, the tack with the
+  settee on either side, getting under way's loosing and the lines from the deck. The trace itself
+  (the lugger's tack, wear and heave-to, the frigate's and the brig's tack, wear and heave-to at
+  seed 7, 900 s each, every line, tick and the state every 30 s) is identical on the tree before
+  the step and after, and so, after the review, are ten files' lying a-try, box off from the
+  settle and from aback, box-haul, wear short round, tack and getting under way; an old checkpoint
+  taken mid-tack, mid-wear, mid-box-haul, mid-box-off and mid-lie-a-try loads and runs on as the
+  old tree's own continuation. Two of B3.4's pins on this fixture moved, old beside new (`tests/test_evolutions.py`:
+  the word at the haul and her tack's lines), and the library's count 104 to 108; in `docs/dev/TuningNotes.md`, "The settee in the engine (package 75, B3.3)".
+
 ### 10.3 The truth candidates (numbered by the build document within 7-185 to 7-199)
 
 *Numbered by `Build-Ships.md` §15:* item 1 is 7-198, with item 3's rule 5 as its clause if the
@@ -1123,6 +1317,12 @@ rule is carried over from a ship's mizen, the lug or the lateen by judgement.
 
 The bilander's heave-to (D4(a)) is a test, not a truth: no source says how a bilander lay to
 (Bil §4).
+
+*As built (B3.3, 2026-11-07):* items 1 and 2 drafted as 7-198 and 7-199 in `tests/test_settee.py`,
+measured on the fixture at seed 7 in 15 and 20 kn, each judged by her heading and tack at a set time
+(+400 s, +600 s), to be measured again on the bilander's file by B4 and moved in Phase 5. Item 1
+without rule 5's clause: in her own tack the settee is never aback in the engine (§5.10's as-built
+note), so that half goes to the lead. Item 3 is B4's on her file.
 
 ### 10.4 Pace and checkpoints
 

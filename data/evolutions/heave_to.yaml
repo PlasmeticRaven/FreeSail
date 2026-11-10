@@ -7,7 +7,9 @@
 # to': "Haul flat aft the main sheet, putting the helm down, and haul the staysail sheet
 # to windward"): her main sheet flat aft, her innermost head sail's sheet held to
 # windward, her topsail to the mast if it is set, and her mainsail kept, being her driving
-# sail.
+# sail. With no topsail set, or no yards (a lugger, a schooner whose fore yards are all shot
+# away), she is hove to under her fore-and-aft canvas, and the line says so and not "to the
+# mast".
 #
 # Her way is taken off first. The helm is not lashed a-lee: it is tended from the first,
 # eased and righted as she comes up, so that the way she carries does not take her head
@@ -65,7 +67,7 @@ timing:
   abaft_s: 120            # for this long
   keep_hands: 4           # the hands the tending costs the watch: the spanker and head sheets
 on_start: {log: "Hands to the after braces; heave to."}
-on_complete: {log: "Hove to on the {hove_tack} tack, {backed} to the mast, helm a-lee{drifting}.", kind: ship.hove_to, severity: notable}
+on_complete: {log: "Hove to on the {hove_tack} tack, {lying}, helm a-lee{drifting}.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').

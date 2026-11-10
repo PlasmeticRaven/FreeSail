@@ -336,7 +336,12 @@ def hand_on_her(world: Any, actor: str | None) -> bool:
     visitor's aboard another ship, are a person's own and never a hand on her captain
     (package 74, the owner's play of 2026-11-09: a prisoner's 'say to Captain Penrose Yes.'
     stood the captor's captain aside, and she lay aback and took the ground with nobody
-    commanding her). True where no person stands behind the actor, as before."""
+    commanding her). True where no person stands behind the actor, as before; and where
+    the people have not been mustered (`_mustered`: nobody has moved, so nobody is a captive
+    or a visitor, and asking for her captain would muster them for nothing and change a
+    world in which nobody moves: truth 7-279's passage took the ground by it)."""
+    if not _mustered(world):
+        return True
     person = person_of_actor(world, actor)
     if person is None:
         return True

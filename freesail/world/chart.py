@@ -496,13 +496,15 @@ class Grounding:
     @property
     def words(self) -> str:
         """'She has taken the ground forward, on sand: two fathoms and a half of water by
-        the chart, and she draws fifteen feet.'"""
+        the chart, and she draws fifteen feet.'; on a rock that dries, 'no water by the
+        chart' (package 75, B2b: it read 'no water of water')."""
         ground = f", on {self.bottom}" if self.bottom else ""
         feet = units.m_to_feet(self.draught_m)
+        depth = _fathoms_words(max(0.0, self.depth_m))
+        water = depth if depth == "no water" else f"{depth} of water"
         return (
-            f"She has taken the ground {self.where}{ground}: "
-            f"{_fathoms_words(max(0.0, self.depth_m))} of water by the chart, and she draws "
-            f"{feet:.0f} feet."
+            f"She has taken the ground {self.where}{ground}: {water} by the chart, and she "
+            f"draws {feet:.0f} feet."
         )
 
     def to_dict(self) -> dict[str, Any]:

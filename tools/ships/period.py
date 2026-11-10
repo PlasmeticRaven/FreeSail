@@ -115,3 +115,10 @@ STEEL_ANCHORS[14] = {
     "bower_cable_in": 13.5,
     "stream_cable_in": 8.0,
 }
+
+# -- the bilander's append (package 75, B4; Design-Ship-Bilander.md §3.6 task 6, §5.3). Adye 1804
+# p. 155, "Length and Weight of English Iron Guns" (the page image, IA leaf n178, read for her
+# window): the long 3-pounder of 18.6 calibres, 4 ft 6 in, 7 cwt 1 qr; the page's own proportion
+# of metal to shot, 270, the check (7 cwt 1 qr of 112 lb over 3 lb). The shared table's 7 cwt
+# (`gen_ships.LONG_GUN_CWT[3]`), from memory, feeds the eight files and stays as it is.
+ADYE_LONG_GUN_CWT[3] = {(4, 6): 7.25}
