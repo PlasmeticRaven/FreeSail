@@ -268,3 +268,54 @@ def test_a_stranger_answers_the_challenge_made_in_her_own_form_and_no_other():
     made = [h.form_nation for h in S.locker_of(w.ship).made if h.book == "private"]
     assert made == ["britain", "denmark"]
     assert w.captain.recognised["ship-1"]["enemy"] is False
+
+
+def test_the_flags_of_command_come_down_by_their_names_and_the_flags_read_what_flies():
+    """Truth 7-457 (package 98, step 7; the owner's further note of 2026-11-09): the broad
+    pendant, the jack and a second ensign, hoisted, are read by `the flags` at their places
+    beside the ensign (it said none with all three flying); each comes down by its name
+    (haul down, strike, lower), the colours left flying, and is refused in words when it is
+    not flying; the signal hoist is read after them; `the colours` reads the ensign as
+    before; from the cabin each is refused as the deck's, the reading answered where it is
+    had."""
+    from freesail.api.session import make_world
+
+    w = make_world(7, "data/ships/hermaphrodite-brig.yaml")
+    colours = w.submit("the colours").text
+    ensign = "American colours, the stars and stripes at the peak"
+    assert w.submit("the flags").text == f"The flags: {ensign}."
+    for line in ("hoist the broad pendant", "hoist the jack", "hoist a second ensign at the main"):
+        assert w.submit(line).kind == "flags.changed", line
+    said = w.submit("the flags").text
+    assert "broad pendant at the main truck" in said
+    assert "jack, the union of stars at the fore truck" in said
+    assert said.count("stars and stripes at the") == 2  # the ensign doubled
+    assert w.submit("the colours").text == colours
+    # the signal hoist read after them
+    assert w.submit("make the signal to chase").kind == "signal.ordered"
+    for _ in range(10):
+        w.run(30)
+        if "signal flying" in w.submit("the flags").text:
+            break
+    said = w.submit("the flags").text
+    assert "; the signal flying: " in said and said.index("signal flying") > said.index("jack")
+    # each by its name, the colours left flying
+    for line, gone in (
+        ("haul down the jack", "jack"),
+        ("strike the broad pendant", "broad pendant"),
+        ("lower the second ensign", "main topgallant masthead"),
+    ):
+        e = w.submit(line)
+        assert e.kind == "flags.changed" and "hauled down" in e.text, (line, e.text)
+        assert gone not in w.submit("the flags").text, line
+    assert w.submit("the flags").text.startswith(f"The flags: {ensign}; the signal flying")
+    assert w.submit("the colours").text == colours
+    for line in ("haul down the jack", "lower the broad pendant", "haul down the second ensign"):
+        e = w.submit(line)
+        assert e.kind == "order.rejected" and "is flying: there is none to haul down" in e.text
+    # by the deck's rule (step 6): from the cabin refused, the reading where it is had
+    w.submit("hoist the jack")
+    w.submit("go below")
+    e = w.submit("haul down the jack")
+    assert e.kind == "order.rejected" and "go on deck to give an order of the deck" in e.text
+    assert w.submit("the flags").text.endswith("you are in the cabin.")

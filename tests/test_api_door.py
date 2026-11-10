@@ -594,3 +594,177 @@ def test_the_terminal_says_a_fold_only_for_the_handover_and_not_for_a_sample_add
     )
     m._say_folds([*turns, handover])
     assert len(said) == 1 and said[0].startswith("The conversation was folded at Morning watch")
+
+
+# ---------------------------------------------------------------------------
+# Package 98, step 4: the picture at the OpenRouter door (a stub door, no provider called)
+# ---------------------------------------------------------------------------
+
+OR_MODEL = "made-up/model-9"
+
+
+def _or_call(name: str, **args) -> dict:
+    return {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+            {
+                "id": f"c-{name}",
+                "type": "function",
+                "function": {"name": name, "arguments": json.dumps(args)},
+            }
+        ],
+    }
+
+
+def _openrouter_stub(inputs: list[str] | None, replies: list[dict]):
+    """OpenRouter's two paths on a mock transport: the models list naming the model's inputs
+    (`architecture.input_modalities`, left out where `inputs` is None) and the chat
+    completions answering `replies` in turn, every body kept."""
+    bodies: list[dict] = []
+    queue = list(replies)
+
+    def server(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/v1/models":
+            entry: dict = {"id": OR_MODEL, "context_length": 32000}
+            if inputs is not None:
+                entry["architecture"] = {"input_modalities": inputs}
+            return httpx.Response(200, json={"data": [entry]})
+        if request.url.path == "/api/v1/chat/completions":
+            body = json.loads(request.content)
+            bodies.append(body)
+            msg = queue.pop(0) if queue else _or_call("stand_by", until="a glass")
+            return httpx.Response(200, json={"model": OR_MODEL, "choices": [{"message": msg}]})
+        return httpx.Response(404)
+
+    return httpx.MockTransport(server), bodies
+
+
+def _openrouter_door(game: Game, transport, tmp_path: Path) -> dict:
+    import io
+    import threading
+
+    got: dict = {"out": io.StringIO()}
+
+    def run() -> None:
+        got["code"] = api.main(
+            [
+                "--game",
+                "http://testserver",
+                "--dialect",
+                "openrouter",
+                "--model",
+                OR_MODEL,
+                "--session",
+                "test",
+                "--base-url",
+                "https://openrouter.test/api",
+            ],
+            inp=io.StringIO("\n"),
+            out=got["out"],
+            game_http=game.http,
+            poll_wait=0.5,
+            environ={"FREESAIL_OPENROUTER_KEY": KEY},
+            transport=transport,
+        )
+
+    got["thread"] = threading.Thread(target=run, daemon=True)
+    got["thread"].start()
+    return got
+
+
+@pytest.mark.parametrize("reads", [True, False])
+def test_the_openrouter_door_sends_the_picture_only_where_its_model_reads_one(
+    monkeypatch, tmp_path, reads
+):
+    """Truth 7-455 (package 98, step 4; the owner's note 7 of 2026-11-09): at the OpenRouter
+    door the picture tools are offered only where the models list says the model reads an
+    image (its `input_modalities`), and there the chart's picture is fetched from the game and
+    sent as an image part after the tool's result, whose words keep their size and leave the
+    readings out; where it reads none, no picture tool is offered at all, and the door says so
+    at its start. A stub door: no provider is called."""
+    fake_store(monkeypatch)
+    game = Game(tmp_path)
+    game.page()
+    replies = [_or_call("answer", text="Yes, I am willing.")]
+    if reads:
+        replies += [_or_call("chart"), {"role": "assistant", "content": "The chart agrees."}]
+    transport, bodies = _openrouter_stub(["text", "image"] if reads else ["text"], replies)
+    got = _openrouter_door(game, transport, tmp_path)
+    try:
+        game.wait_for(lambda: game.harness is not None and len(bodies) >= (3 if reads else 2), 120)
+    except AssertionError:
+        said = got["out"].getvalue()
+        raise AssertionError(f"{len(bodies)} requests; the door said:\n{said}") from None
+    with game.driver.lock:
+        game.world.submit("stand down the watcher")
+    got["thread"].join(timeout=120)
+    out = got["out"].getvalue()
+    station = bodies[1]
+    names = {t["function"]["name"] for t in station.get("tools", [])}
+    if not reads:
+        assert not names & {"chart", "ship_view"}
+        assert "The picture tools are not offered" in out
+        return
+    assert {"chart", "ship_view"} <= names and "The picture tools are offered" in out
+    after = bodies[2]["messages"]
+    tool = next(m for m in after if m["role"] == "tool")
+    said = json.loads(tool["content"])
+    assert "4 by 3 pixels" in said["words"] and "readings" not in said
+    images = [m for m in after if m["role"] == "user" and isinstance(m["content"], list)]
+    assert images and images[-1]["content"][1]["type"] == "image_url"
+    import base64
+
+    url = images[-1]["content"][1]["image_url"]["url"]
+    assert base64.standard_b64decode(url.split(",", 1)[1]) == png(4, 3)
+
+
+def test_a_picture_not_shown_says_so_and_gives_its_readings_never_its_size():
+    """Truth 7-456 (package 98, step 4): wherever a picture cannot be shown (a door that
+    sends none, a picture the game no longer holds) the tool's words say it was not shown and
+    why, and give the readings it shows, never "a picture of N by M pixels"; at the local
+    runner's shape (the OpenRouter door's) and at the Messages API's."""
+    from freesail.agents import local, tools
+    from freesail.agents import pictures as P
+    from freesail.api.session import make_world
+
+    # the game sends the readings a picture shows beside it, for a door that cannot show it
+    w = make_world(7, "data/ships/frigate-36.yaml")
+
+    class Painter:
+        def paint(self, view, facing, stamp, span=""):
+            return P.Picture("p1", "image/png", png(4, 3), 4, 3, view, facing, stamp, span)
+
+        def get(self, pid):
+            return None
+
+    P.set_painter(w, Painter())
+    made = tools._picture(w, P.CHART)
+    assert made["picture"]["id"] == "p1" and made["readings"]
+    assert set(made["readings"]) <= set(P.CHART_WORDS)
+    P.set_painter(w, None)
+
+    value = {
+        "picture": {"id": "p1", "view": "chart", "span": "", "stamp": "10:00", "width": 1200},
+        "words": "The chart, at 10:00: a picture of 1200 by 900 pixels. It is a book ...",
+        "readings": {"position": "49 50 N 5 10 W by account"},
+    }
+    turns = [
+        Turn(OPERATOR, "The brief."),
+        Turn(MODEL_ROLE, Reply(text="", calls=(ToolCall("chart", {}),))),
+        Turn(DATA, {"tool_results": [{"name": "chart", "result": value}]}),
+    ]
+    for fetch, why in ((None, P.NOT_SENT), (lambda pid: None, P.NOT_FETCHED)):
+        m = local.LocalModel("http://local.test", model="m")
+        m.fetch_picture = fetch
+        msgs = m.messages(turns)
+        tool = next(x for x in msgs if x["role"] == "tool")
+        said = json.loads(tool["content"])
+        assert "pixels" not in tool["content"] and why in said["words"]
+        assert "not shown to you" in said["words"]
+        assert said["readings"] == value["readings"]
+        a = api.ApiModel(MODEL, KEY, base_url="http://api.test", fetch_picture=fetch)
+        block = a._picture(value)
+        assert len(block) == 1 and block[0]["type"] == "text"
+        assert "pixels" not in block[0]["text"] and why in block[0]["text"]
+        assert "49 50 N" in block[0]["text"]

@@ -62,8 +62,10 @@ __all__ = [
     "all_known",
     "as_heard",
     "elsewhere_words",
+    "as_the_owner_sees",
     "hears",
     "his_own",
+    "owners_world_order",
     "is_asleep",
     "player_hull",
     "players_person",
@@ -925,11 +927,40 @@ OWN_FAMILIES: tuple[str, ...] = ("query.", "order.")
 SEAT_ACTOR_SUFFIX = " (the player)"  # `agents.seat.seat_actor`'s: "the master (the player)"
 
 
+# The owner's world order typed at his prompt (package 98, the lead's addition (d) of
+# 2026-11-10): `world.order` with this source (`ui.console.LIVE_WORLD_ORDER_SOURCE`), his own
+# line, shown him as given with its outcome; for the record to every other reader (decision
+# 46), and a director's orders, of another source, never shown the player.
+OWNER_SOURCE = "the owner"
+WORLD_ORDER_KIND = "world.order"
+
+
+def owners_world_order(e: Any) -> bool:
+    """Whether a line is the owner's own world order, typed at his prompt."""
+    data = getattr(e, "data", None) or {}
+    return getattr(e, "kind", "") == WORLD_ORDER_KIND and data.get("source") == OWNER_SOURCE
+
+
+def as_the_owner_sees(e: Any) -> Any:
+    """The owner's world order as his play log shows it: the order as he gave it, then its
+    outcome ('Your world order 'ship "X": ...': not carried out: ...'); any other line as it
+    is. A copy: the log's own line is unchanged."""
+    if not owners_world_order(e):
+        return e
+    import dataclasses
+
+    order = str((e.data or {}).get("order") or "")
+    outcome = str(e.text).split(": ", 1)[1] if ": " in str(e.text) else str(e.text)
+    return dataclasses.replace(e, text=f"Your world order '{order}': {outcome}")
+
+
 def his_own(e: Any, station: str = "captain") -> bool:
     """Whether a line is the player's own at the prompt (`OWN_FAMILIES`, the words he said,
     his seat's lines), by its actor: the captain's at the captain's prompt, the seat's
     actor at a station's, the driver's for the seat's own refusals and answers. A rule
     captain, a standing order and a station held by a model each have their own actor."""
+    if owners_world_order(e):
+        return True
     kind = str(getattr(e, "kind", "") or "")
     actor = str(getattr(e, "actor", "") or "")
     data = getattr(e, "data", None) or {}

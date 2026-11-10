@@ -284,3 +284,31 @@ def paint(world: Any, view: str, facing: str = "", span: str = "") -> Picture | 
     except TypeError:
         # a painter of a test's own, from before the span (package 45)
         return painter.paint(view, facing, stamp)
+
+
+# Why a picture is not shown by a door (package 98, step 4), for `not_shown`.
+NOT_SENT = "this door sends no picture to its model"
+NOT_FETCHED = "the game no longer holds it; ask for it again"
+
+
+def not_shown(value: dict[str, Any], why: str) -> dict[str, Any]:
+    """A picture tool's result as a door gives it where the picture cannot be shown (package
+    98, step 4): the words say so, and why, and give the readings the picture shows, never
+    its size in pixels as if it had been sent."""
+    pic = value.get("picture") if isinstance(value.get("picture"), dict) else {}
+    if pic.get("view") == CHART:
+        what = f"the chart ({SPAN_WORDS.get(str(pic.get('span') or ''), 'as the page has it')})"
+    else:
+        what = f"the ship seen from {pic.get('facing') or 'abeam'}"
+    stamp = f" at {pic['stamp']}" if pic.get("stamp") else ""
+    return {
+        "words": f"A picture of {what}{stamp} was drawn, but it is not shown to you: {why}. "
+        "The readings it shows, in words, instead.",
+        "readings": dict(value.get("readings") or {}),
+    }
+
+
+def shown_result(value: dict[str, Any]) -> dict[str, Any]:
+    """A picture tool's result as a door sends it beside the image it shows: the readings
+    left out, the picture being there to read (package 98, step 4)."""
+    return {k: v for k, v in value.items() if k != "readings"}

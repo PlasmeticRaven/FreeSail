@@ -24,6 +24,7 @@ COLOUR_WORDS = ("red", "white", "blue", "yellow", "green", "black", "orange")
 PLAIN_CLOTH = "cloth"  # a word naming no colour: the plain cloth's (style.css)
 SHOWING = ("shown", "false", "distress")
 TRUCE = "truce"
+TRUCE_PLACE = "fore truck"  # where a flag of truce flies (data/signals/basic/colours.yaml)
 
 
 def field_colour(flag_word: str) -> str:
@@ -74,9 +75,11 @@ def flags(world: Any, ship: Any) -> list[dict[str, Any]]:
     colours = getattr(locker, "colours", None)
     state = getattr(colours, "state", "shown") if colours is not None else "shown"
     if state == TRUCE:
+        # the white at the fore (package 98, step 3: the basic file's occasion `under truce`,
+        # "the flag of truce at the fore"; the fallback had it at the peak)
         return [
             {
-                "place": "peak",
+                "place": TRUCE_PLACE,
                 "name": "flag of truce",
                 "words": "a flag of truce",
                 "drawing": plain("white"),

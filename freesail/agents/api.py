@@ -212,9 +212,6 @@ PLATFORM_HEADERS: tuple[str, ...] = (
     "X-Stainless-Async",
 )
 
-# A picture's words in a tool result when it cannot be shown (the door cannot fetch it).
-PICTURE_GONE = "The picture is no longer held by the game; ask for it again."
-
 
 class KeyError_(Exception):  # noqa: N801  (not the builtin: a key the door cannot use)
     """No key to be had, or one the door will not use; the message says why, in words
@@ -698,7 +695,12 @@ class ApiModel:
             except Exception:  # noqa: BLE001  (a game gone, a picture dropped)
                 got = None
         if got is None:
-            return [{"type": "text", "text": f"{words} {PICTURE_GONE}".strip()}]
+            # not shown: said so, with the readings it shows (package 98, step 4)
+            from freesail.agents import pictures as P
+
+            why = P.NOT_SENT if self.fetch_picture is None else P.NOT_FETCHED
+            told = P.not_shown(value, why)
+            return [{"type": "text", "text": json.dumps(told, ensure_ascii=False)}]
         media, data = got
         image = {
             "type": "image",
@@ -948,6 +950,13 @@ def _said(e: Any) -> str:
 # ---------------------------------------------------------------------------
 
 OPENROUTER_BASE = "https://openrouter.ai/api"
+# What the door says of the pictures at its start (package 98, step 4), by whether the model
+# reads an image as OpenRouter's models list has it
+OPENROUTER_PICTURES_WORDS = {
+    True: "The picture tools are offered: OpenRouter lists the model as reading an image.",
+    False: "The picture tools are not offered: OpenRouter does not list the model as reading "
+    "an image.",
+}
 
 
 class OpenRouterModel(local.LocalModel):
@@ -973,13 +982,28 @@ class OpenRouterModel(local.LocalModel):
         if r.status_code != 200:
             raise local.DoorError(f"OpenRouter's models list answered {r.status_code}.")
         try:
-            ids = {str(m.get("id", "")) for m in r.json().get("data") or []}
+            listed = {str(m.get("id", "")): m for m in r.json().get("data") or []}
         except (ValueError, AttributeError):
-            ids = set()
-        if self.model not in ids:
+            listed = {}
+        if self.model not in listed:
             raise local.DoorError(f"OpenRouter lists no model '{self.model}'.")
         self._served_name = self.model
+        # what the model takes in, as the list says (package 98, step 4): the picture tools
+        # are offered and the pictures fetched only where it reads an image
+        arch = (
+            listed[self.model].get("architecture") if isinstance(listed[self.model], dict) else None
+        )
+        inputs = arch.get("input_modalities") if isinstance(arch, dict) else None
+        self._inputs = [str(x) for x in inputs] if isinstance(inputs, list) else None
         return self.model
+
+    def reads_pictures(self) -> bool | None:  # type: ignore[override]
+        """Whether the model reads an image, by the models list's `input_modalities`
+        (read by `identity`): None where the list does not say."""
+        inputs = getattr(self, "_inputs", None)
+        if inputs is None:
+            return None
+        return "image" in inputs
 
     def _read(self, r: Any) -> Any:  # type: ignore[override]
         got = local.LocalModel._read(r)
@@ -1144,6 +1168,7 @@ def main(
             exchanges_file=args.exchanges,
             client=client,
         )
+    pictures: bool | None = None  # the API's door carries an image (Anthropic's dialect)
     try:
         identity = model.identity()
         server = model.server_words()
@@ -1151,6 +1176,12 @@ def main(
         if openrouter:
             runtime = f"FreeSail's game at {args.game}, through {DOOR_WORDS}, {server}"
             print(model.check_context(identity, runtime, args.station), file=out, flush=True)
+            # the picture at the OpenRouter door (package 98, step 4): fetched and sent where
+            # the model reads an image, and the picture tools not offered where it does not
+            pictures = bool(model.reads_pictures())
+            if pictures:
+                model.fetch_picture = fetch
+            print(OPENROUTER_PICTURES_WORDS[pictures], file=out, flush=True)
     except local.DoorError as e:
         show(str(e))
         return local.EXIT_UNREACHABLE
@@ -1185,6 +1216,7 @@ def main(
             handover_reserve=reserve,
             cadence=args.cadence or "",
             budget_tokens=budget,
+            pictures=pictures,
         )
     except GameError as e:
         show(e.words)
