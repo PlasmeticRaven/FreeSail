@@ -23590,8 +23590,7 @@ conflict. Checked on the merged tree before the tiers: the step's own files (`te
 `test_prizes`, `test_captive`, `test_far_action`, `test_ordnance`, `test_officer`) pass as they
 stood, so the court's figures (the brig's guns £320, her powder and shot £13) are not moved by
 the charges' table or the regenerated files; the officer's conversation at his seat measures
-13,516 tokens, as before the merge. The step's figures are the ones measured at that tree,
-below.
+13,516 tokens, as before the merge.
 
 **Measured at eb9e9dc** (that merge and these notes; a worktree pinned there; ruff check and
 format clean): the fast tier whole **exit 0** (10:37:44 to 11:28:29; 7,203 passed and the
@@ -23607,6 +23606,22 @@ visitor's word to this package's rule of mend (v) (`kind != "person.spoke"`), wh
 `squadrons.py` has 98's last course kept in the world beside this step's three lines of the
 cut-out's strike hook, untouched by either hand in the other's lines. The step's figures are
 the ones measured at that tree, below.
+
+**The suites on the step's final tree** (bc22961, one hash, the trunk at 61b170d merged in it;
+a worktree pinned there; ruff check and format clean; every run started in the harness's
+background mode, the tiers as separate tasks under its two-hour cap; 2026-11-10 UTC): the slow
+tier of the known truths, the profile and the Indefatigable **exit 0** (11:57:39 to 12:46:46;
+520 passed and the trunk's eight expected failures); the slow tier of the touched files
+(`test_prize_court`, `test_business`, `test_ports`, `test_ordnance`, `test_far_action`,
+`test_captive`, `test_prizes`, `test_brains`, `test_far_hail`, `test_squadrons`,
+`test_captains`, `test_captain_trials`, `test_officer`, `test_crews`, `test_fight`,
+`test_between_hulls`, `test_signals`, `test_standing`, `test_orders_places`, `test_places`,
+`test_knowledge`, `test_director`, `test_world_orders`, `test_readings`, `test_subtypes`,
+`test_primer`, `test_in_world`) **exit 0** (12:46:46 to 13:10:06; 1,996 passed); the fast tier
+whole **exit 0** (13:10:25 to 14:04:58; 7,207 passed and the trunk's one expected failure, 486
+slow tests left out); the pace tests alone and last **exit 0** (14:04:58 to 14:10:54; 14
+passed, no floor lowered). Nothing skipped in any tier. The trunk gained one line of the
+lead's records while these ran (229d024, the work packages' page alone) and was not chased.
 
 ## Package 76: the signal books built out (2026-11-07)
 
