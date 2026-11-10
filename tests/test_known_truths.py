@@ -15190,8 +15190,9 @@ def test_truth_7_491_a_ship_from_the_balearics_crosses_40_56_n_into_the_catalan_
     """The brief's item 9: the schooner standing north from the Balearics' water before a
     southerly crosses 40.56 N within the hour; her region, her tide and her weather's box
     change (the Balearics' blend to Barcelona's gauge at the seam, the Mediterranean west's
-    box to Barcelona's table at 40.5 N, where the boxes meet), the business follows her and peoples the new region once, the
-    lookout keeps the Montsia across the seam, and the depth does not step."""
+    box to Barcelona's table at 40.5 N, where the boxes meet), the business follows her and
+    peoples the new region once, the lookout keeps the Montsia across the seam, and the
+    depth does not step."""
     from freesail.world.geo import Position
     from freesail.world.weather import load_climatology
 
