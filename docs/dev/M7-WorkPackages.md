@@ -82,7 +82,7 @@ on these packages; that is the owner's choice.
 | 99 | Opus (a design note first) | **The views under the knowledge rule** (the owner's note 3): the chart and the ship view show what the person knows, the last value he learned with its hour where he lacks the live one; the captive's cabin and its senses ruled with it | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
 | 100 | Opus | **Letters and things as one system** (the owner's note 8): a letter a thing with words, written, carried, handed, read, sealed and destroyed by anyone by one road; the director's things with a description, removed by his form; the letters by boat and by cutter carried as things | booked 2026-11-09 (below); **held by the owner (2026-11-09) for the moment** |
 | 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **to run after 74 closes (the owner, 2026-11-09: "it's good to let 74 close cleanly before starting anything else major")**, the design note and the building both; the brief to be put to the owner for approval then |
-| 101 | Opus | **The Catalan coast block** (the owner, 2026-11-10: the gap in the chart on the eastern Iberian coast): a new region of `atlantic-east` between `balearics`' north bound (40.56 N) and `gulf-of-lion`'s west bound (3.0 E), the Ebro's mouths and the Alfaques, Salou, Tarragona, Barcelona and Mataró to the coast's crossing of 3 E near Tossa; with it the ports the coast lacks, in the block and in the charted water beside it | **proposed 2026-11-10, the gap measured by the lead** (the chart probed on a tenth of a degree): nothing at all (no depth, no land, no coast, no region) north of 40.56 N and west of 2.61 E as far as the land; the Gulf's first tile column gives depth from 2.61 E to 3.0 E, which no region owns; the sea so missing is a wedge of some 80 miles north and south by 110 east and west at its foot, from the coast at 0.5 E on 40.56 N to the coast's crossing of 3 E at 41.75 N. A box of 40.56 to about 41.9 N and about 0.3 to 3.0 E is some 3.6 square degrees, the smallest of the Mediterranean's blocks (about 28 level-2 tiles, 4 to 6 MB by the others' sizes, far under the 40 MB rule); the seam's exact meridian (3.0 E or the Gulf's tile edge) the builder's first measurement by `docs/dev/ChartBlocks.md`. **No port file exists between Cartagena and Marseille on the main**: in the block Barcelona, Tarragona (with Salou's road) and the Alfaques; beside it in water already charted Rosas and Palamós (`gulf-of-lion`), Valencia's Grao and Alicante (`mediterranean-west`). The brief to follow on the owner's choice of ports and of when it runs |
+| 101 | Opus | **The Catalan coast block** (the owner, 2026-11-10: the gap in the chart on the eastern Iberian coast): a new region of `atlantic-east` between `balearics`' north bound (40.56 N) and `gulf-of-lion`'s west bound (3.0 E), the Ebro's mouths and the Alfaques, Salou, Tarragona, Barcelona and Mataró to the coast's crossing of 3 E near Tossa; with it the ports the coast lacks, in the block and in the charted water beside it | proposed 2026-11-10, **the gap measured by the lead** (the chart probed on a tenth of a degree): nothing at all (no depth, no land, no coast, no region) north of 40.56 N and west of 2.61 E as far as the land; the Gulf's first tile column gives depth from 2.61 E to 3.0 E, which no region owns; the sea so missing is a wedge of some 80 miles north and south by 110 east and west at its foot, from the coast at 0.5 E on 40.56 N to the coast's crossing of 3 E at 41.75 N. A box of 40.56 to about 41.9 N and about 0.3 to 3.0 E is some 3.6 square degrees, the smallest of the Mediterranean's blocks (about 28 level-2 tiles, 4 to 6 MB by the others' sizes, far under the 40 MB rule); the seam's exact meridian (3.0 E or the Gulf's tile edge) the builder's first measurement by `docs/dev/ChartBlocks.md`. **No port file exists between Cartagena and Marseille on the main**: in the block Barcelona, Tarragona (with Salou's road) and the Alfaques; beside it in water already charted Rosas and Palamós (`gulf-of-lion`), Valencia's Grao and Alicante (`mediterranean-west`). **Approved by the owner 2026-11-10: all seven ports, launched at the close of package 98**; briefed 2026-11-10 (below), truths 7-490 to 7-499 |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -6497,6 +6497,157 @@ later. The note is written after 74 closes, on the trunk as it then stands.
 and then the steps in order; nothing of it starts while 74 is open. **Rules:** the standing
 ones; every save and checkpoint from before loads and replays as it did (the kept saves are the
 proof); no pin moved but old beside new with its proof.
+
+## Package 101: the Catalan coast block (`catalan-coast`; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index and manifest entry, `features/catalan-coast.yaml`, `overrides/catalan-coast/`; `features/gulf-of-lion.yaml` and `features/mediterranean-west.yaml` with their indexes only for the four ports beside the block, by the how-to's road for a mark added; `data/ports/*.yaml` seven new; `data/nations.yaml` the ports' index and their dated states; `data/tides/constituents.yaml`, `streams.yaml`, `establishments.yaml`; `data/weather/climatology.yaml` the coast's box; `data/business.yaml` only where a port's market needs a good; `data/scenarios/tarragona.yaml` new; `docs/references/README.md`; `docs/dev/ChartBlocks.md` where the how-to proves wrong; `docs/TechnicalSpec-M7.md` §28's pointer as built; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_ports.py`, `test_tide.py`, `test_weather.py`, `test_scenarios.py`, `test_known_truths.py` truths 7-490 to 7-499)
+
+Opus. The gap in the chart on the eastern Iberian coast (the owner, 2026-11-10: "a very
+noticeable gap", which "makes western Mediterranean play a bit iffy"), closed by one small
+block, and with it the ports the Spanish main lacks from Cartagena to the French border:
+**all seven, by the owner's word of 2026-11-10**. Built as `docs/dev/ChartBlocks.md` says
+(read it whole first, with the recipe form over `REGIONS` in `tools/build_charts.py`, and
+79c's and 79d's sections of it and of the tuning notes as the latest Mediterranean blocks:
+their findings are this block's starting point, the 40 MB rule, the world's tide over the
+Mediterranean, the Spanish gauges' reports, the isles the grid lacks, the draft positions
+that miss by a kilometre, the business that wants a price ratio, among them). It changes
+no byte of any other region's level-2 tiles or coast.
+
+**The gap as the lead measured it** (the chart probed on a tenth of a degree, 2026-11-10):
+nothing at all, no depth, no land, no coast, no region, north of 40.56 N (`balearics`' north
+bound and its tiles' edge) and west of 2.6133 E (9,408 seconds of arc, the west edge of
+`gulf-of-lion`'s first tile column) as far as the land; from 2.6133 E to 3.0 E (the Gulf's
+west bound) the Gulf's tiles give depth and no region owns the water. The coast stands at
+about 0.5 E on 40.56 N and crosses 3 E at about 41.75 N, near Tossa: the sea so missing is
+a wedge of some 80 miles north and south by 110 east and west at its foot.
+
+0. **The sources, a short pass and no new research** (its report first in the tuning notes'
+   section): what `docs/references/pilots/` already holds for this coast, read and cited by
+   page: Tofiño's *Derrotero* of 1787 (the coast from Cape San Antonio to Cape Creus), the
+   *Derrotero* of 1849, Michelot, Purdy 1826 and 1840, Norie 1831, Smyth 1854, the
+   Admiralty's *Mediterranean Pilot* vol. I with **Barcelona's meteorological table (p. 726,
+   named by 79c's pass as outside its blocks and not cut)**; Roux's plates of Barcelona and
+   Roses (79c's pass read pls. 12 to 39) and Heather's of 1814; Tofiño's plans of Barcelona,
+   Tarragona and Salou, the Alfaques, Rosas, Palamós, Valencia's road and Alicante where
+   they can be fetched. What is not found is said so with the host's answer, and nothing is
+   invented in its place. Every source is data: read, never run.
+1. **The region** `catalan-coast`: the main from the Sénia's mouth and the Alfaques by the
+   Ebro's delta and Cape Tortosa, the Coll de Balaguer, Cambrils, Cape Salou, Tarragona,
+   the coast of Garraf, the Llobregat, Barcelona with Montjuïc, Mataró and the Maresme to
+   Blanes and Tossa. **Bounds 40.56 N to about 41.9 N and about 0.3 E to 3.0 E: the south
+   bound `balearics`' north bound exactly, the east bound `gulf-of-lion`'s west bound
+   exactly**, the north and west bounds on the land (moved to a tile row's or column's edge
+   where the form asks it; the west far enough to hold the Ebro to Amposta). **The seam at
+   the east is the builder's first measurement**: the Gulf's tiles already hold 2.6133 E to
+   3.0 E, so by the how-to's seam rule the block either lists the Gulf's tiles there and
+   writes none of its own east of 2.6133 E, or the rule gives another answer; say which,
+   with `git status` showing no change to any tile the Gulf lists. East of 1 W no corridor
+   lies under the block, so every tile is written, land and sea alike (79c's finding).
+   **Before the tiles are committed, report their count and bytes to the lead** (the lead
+   expects some 28 tiles and 4 to 6 MB; past 40 MB stop at the report). Said in the notes
+   and the chart's title: the open sea east of 4.5 E between Minorca and Sardinia, and the
+   Algerian coast east of Algiers, are still no block's.
+2. **The period's shore.** The Ebro's delta as Tofiño drew it and not as it is (it has
+   grown and changed its mouths: the period's Cape Tortosa, the Alfaques' bay and its bar
+   by the plan, by the overrides' road, with the residuals said); Barcelona's mole and
+   lantern, the Barceloneta, the citadel and Montjuïc as 1805 had them, and no modern
+   harbour works there or at Tarragona (its mole was building); the lights of 1805 dated,
+   the towers marks by day. The marks from seaward by the directions: Montserrat, Montjuïc,
+   Montseny, the castle of the Coll de Balaguer, Cape Salou, the towers of the coast.
+   Render each harbour with its marks over the tiles' land and water before trusting a
+   position (79c's finding).
+3. **The harbour patches** (level 3, about 15′ by 15′ each) **in the block**: Barcelona;
+   Tarragona with Salou's road; the Alfaques (the port of San Carlos). **Beside the block,
+   in water already charted, the four ports get their marks and roads at level 2 by the
+   how-to's road for a mark added to a built region** (the features file and its index
+   alone; no level-2 tile, coast or other mark of that region changed, shown by `git
+   status` and the region's checks): Rosas bay with the citadel and the Trinity castle,
+   and Palamós, in `gulf-of-lion`; Valencia's Grao and Alicante with its castle, in
+   `mediterranean-west`. **A level-3 patch for any of the four only if the tool adds one to
+   a built region without rebuilding its level-2 tiles**; if it cannot, say so in the
+   report and make none: the lead rules. Where a datum cannot be read the port file says
+   `datum: unverified` and no patch is made, as the how-to has it.
+4. **The seven ports**, each a file on package 35's machinery, entered in the nations'
+   index and `test_ports.py`'s list: **Barcelona** (the Principality's capital, the
+   captain general's seat; a mole harbour of little water, the road open), **Tarragona**
+   (with Salou, where the brandies of Reus were shipped), **the Alfaques** (a road and
+   San Carlos's canal port: a small file), **Rosas** (the bay the best anchorage of the
+   coast in a northerly), **Palamós** (a small mole), **Valencia's Grao** (an open road off
+   the beach, dangerous in an easterly), **Alicante** (the bay and the mole under the
+   castle of Santa Bárbara). Each with its nation and its state by 79a's dated form: Spain
+   hostile to a King's ship from December 1804 and Britain's ally from the summer of 1808;
+   **the French in Barcelona from February 1808 to 1814, in Rosas from December 1808, in
+   Tarragona from June 1811 to 1813 and in Valencia from January 1812 to 1813, Alicante
+   never taken: these dates are the lead's memory and are to be verified from James and
+   the sources on file before a row is written, each row with its source or FROM MEMORY
+   said**, in the form Genoa's file uses for a port that changes hands. Its road, pilot's
+   station, market, pool and the pilot's four words, every `feature:` spot with its
+   position beside it; no King's yard on this coast (Cartagena's is the arsenal). The
+   markets so that the business can people the region (79c's finding, a price ratio of 1.3
+   at least between two ports): the period's trades from the sources (the brandies and
+   wines of Salou and Tarragona, Valencia's fruit, rice and silk, Alicante's barilla and
+   wine, Barcelona buying grain and salt fish and selling her manufactures), each good one
+   the business file already has or a row added in its form.
+5. **The tide.** As 79c found it: the sea's is a foot, the world's over it a far gauge's,
+   and the block keeps the world's level as the Strait's recipe does (`fill_to_chart_datum`,
+   the land above that tide's high water). The gauges of the coast (Puertos del Estado's
+   REDMAR reports give the mean level and the lowest astronomical tide: Barcelona,
+   Tarragona, and for the two ports beside the block Valencia and Alicante if their
+   regions lack them; TICON's read as every block's are) go in by package 89's form with
+   their `block:`; the eleven do not move. The streams by the directions: the set along the
+   coast to the south-west as the pilots give it, with `current:` where the period gives a
+   set and no tide, the Ebro's outflow off its mouths if a pilot gives it a rate, an area
+   over the block's whole box after them, the box appended to `book_limits`; the master's
+   epitome places with the period's rise where a pilot gives one. The polygons kept off
+   the water the recorded passages sail (none reaches the block; say so).
+6. **The weather.** No box of `climatology.yaml` holds the block (`mediterranean-west`
+   ends at 40.5 N, `gulf-of-lion` begins at 3.0 E), so `box_at` answers with the nearest,
+   which is one or the other by the mile. **A box of the block's own** from Barcelona's
+   table (the *Mediterranean Pilot* vol. I, p. 726, read from the PDF's page upright and
+   each month checked against the printed totals, as 79c read the others), its generator's
+   figures fitted by simulated months with the checking tool; or, if the table's months do
+   not differ from the Gulf's box beyond the fit's noise, the Gulf's box widened west to
+   hold the block, the comparison printed. Either way said, and `test_weather.py` holding
+   the rows to the file's form.
+7. **A scenario** `tarragona.yaml`: the frigate from Port Mahon to Tarragona's road in
+   1809, Spain the ally and the French in Barcelona, by the Balearic channel and the coast,
+   `chart: atlantic-east`, sailed once at seed 7 to the anchor by a short book, its figures
+   in the notes; not pinned. It crosses the seam at 40.56 N, which is the point.
+8. **The build**: `python tools/build_charts.py --region catalan-coast` through the proxy,
+   the checks printed and passing, the tiles committed within item 1's rule, the manifest
+   with every other entry carried over, the region appended to
+   `CHARTS["atlantic-east"]["regions"]` and the chart's title amended to name the coast,
+   and after the build `git status` showing no change to any tile, coast or index another
+   region lists but the two features files and indexes item 3 names. Build early, to
+   fetch; rebuild with `--skip-fetch` after the marks are written. If a source the build
+   needs is refused by the network, read the environment's documentation and say exactly
+   which host and what it answered; do not work around it.
+9. **Truths 7-490 to 7-499**, each a behaviour, pinning states and counts and no digest:
+   the chart answers with depth and land along the whole main from Cape Palos to Cape
+   Creus on a walk of the coast (no point of the old gap answers nothing); a ship from
+   `balearics` crosses 40.56 N and from the Gulf crosses 3 E with her region, her tide and
+   her weather's box changing and nothing lost (the lookout's land, the business carried);
+   the lookout off Barcelona raises Montjuïc and Montserrat at the directions' distances;
+   a frigate lies at anchor in Rosas bay in a northerly and is uneasy in Valencia's road in
+   an easterly, as the pilots say of each; Barcelona refuses a King's ship in 1805 and in
+   1809 and Tarragona receives her in 1809; the business draws a trader between two of the
+   seven ports; and what the build earns.
+10. **The records**: the tuning notes' section "Package 101" (the sources' report; the
+    seam's measurement and the tiles' count and bytes; the patches' datums and residuals;
+    the checks as printed; the ports' dated states with their sources; the weather's
+    comparison; the scenario's run; what was found on the way; the suites as run);
+    `ChartBlocks.md` a section "The Catalan coast (package 101, as built)" with what the
+    next block should know; spec M7 §28's pointer.
+
+**The suites, at ONE hash, in a worktree pinned there:** the fast tier whole; the slow of
+the chart's, the ports', the tide's, the weather's, the nations' and the scenarios' tests
+and of `test_known_truths.py`; the recorded passages, `gate_5b` and `gate_5c` once by name,
+which must pass to the digest (the block touches no water they sail: a digest that moves
+is a fault to find, not a pin to move); the pace alone and last; ruff check and format.
+The figures paragraph committed, then ONE report to the lead naming the one hash. A pin
+moves only where the block's own data moves it, re-measured old beside new and proven by a
+toggle; none is expected.
+
+The hard rules as every brief has them; `claude/pkg-101`, pushed after each commit; the
+lead merges by the reported hash.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
