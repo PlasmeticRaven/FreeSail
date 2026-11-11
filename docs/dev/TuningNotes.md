@@ -26453,3 +26453,18 @@ trunk's code (commit 405fe35, before the form moved: 57 flags served plain and u
 drawn at the main truck and the peak of the frigate, 494 figures, their ids, colours and
 points to a micrometre) and the new code serves and draws every one of them the same (truth
 7-500).
+
+**Steps 0 and 1: the measure.** The trunk merged at b9b925a by a merge commit (5142098:
+package 74's step 6 and the lead's records; the two appends resolved in the trunk's own
+order, its truths and its notes above this package's, no line of the trunk's lost). At
+**5142098**, in a worktree pinned there, one suite at a time: ruff check and ruff format
+--check clean; the fast tier exit 0, 7,463 passed, 1 xfailed, 505 slow left out (a first run
+there failed on the server's tests alone, the container then lacking the `fastapi` package;
+installed, those files ran clean and the whole tier was run again); the slow tier (`--slow -m
+"not pace" -n 4`) of tests/test_known_truths.py whole with the recorded passages and the kept
+saves (test_captain_trials.py, test_replay.py, test_checkpoint.py) and the touched files
+(test_flag_drawings.py, test_flags.py, test_view_action.py, test_view_geometry.py,
+test_viewer_action.py) exit 0, 1,626 passed, 8 xfailed: no pin and no digest moved; the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12 passed. The viewer's
+geometry tests ran (Node 22 present). The tree reported differs from 5142098 by this
+paragraph alone.
