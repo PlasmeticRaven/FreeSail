@@ -4416,8 +4416,7 @@ the pace alone and last exit 0, 15 passed, no floor lowered; nothing skipped; ru
 **The lead's merge:** the trial on f3bf73d1 clean and lint-clean; no model or vendor name in
 the diff; nothing under `docs/agents/consent/`, no ship file, no physics; the two forms and
 the scenario read on the page; the fast tier whole on it exit 0, 7,461 passed, 1 xfailed,
-508 slow left out, 02:15 to 03:04 UTC; the whole suite in the cloud dispatched after run
-69, the figures to follow.
+508 slow left out, 02:15 to 03:04 UTC; the whole suite in the cloud, run 70 (2026-11-11, 03:06 to 04:26 UTC, on e544c69b): green whole, lint, the six shards and the pace job.
 
 **The package's leavings, for the lead's list (the builder's close):** a rules captain
 bound for Brest from the Iroise lays no course and beats without way near the road (the
