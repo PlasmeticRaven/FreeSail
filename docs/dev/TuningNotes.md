@@ -26409,3 +26409,231 @@ no block of the tide's, and the water is the eleven's alone: **Saint-Malo's, M2 
 mean level of 6.83 m**, as the hole had; the fill raised 6.83 m. The neighbours' water does not
 move with the regions (the eleven beyond their reach, no taper): Mahón's, Carloforte's and the
 Tyrrhenian's south edge probed alike before and after.
+
+**The lead's ruling (2026-11-11, 00:15 UTC)**: the seams, the tiles and the bounds' correction
+accepted; the tide by option (b), a block with no gauge of its own served by its neighbours'
+nearest within reach, the rule written into `ChartBlocks.md`; the sources win on every premise
+listed, none of the brief's going into a truth. Built once after it.
+
+### The tide, as ruled (item 1)
+
+Mahón's `block:` is `[balearics, sardinian-sea, tunis-coast]`, Carloforte's `[tyrrhenian,
+sardinian-sea, tunis-coast]`, Cagliari's `[tyrrhenian, tunis-coast]` (`data/tides/
+constituents.yaml`, the ruling said above Mahón's row). Over the two blocks the water is now the
+Mediterranean's: off Bougie M2 5.7 cm at 228°, off Bona 6.2 cm, off Bizerta and the Goletta 7.1
+to 7.2 cm at 238° to 239°, the level Mahón's 0.20 m (Carloforte's and Cagliari's unread), where
+it had been Saint-Malo's 3.68 m and 6.83 m. **Old beside new** in `tests/test_tide.py`: the seam
+test's `set(g.blocks[1:]) == near` becomes `== near | ruled.get(g.id, set())`, the three gauges
+named, each ruled block holding no gauge of its own (asserted), the caught set of the band
+(Portsmouth, the Isle of Aix, Cadiz) unchanged; the blocks' set gains the two. A new test proves
+nothing outside the two blocks moves: every cell probed on a tenth of a degree from 38 to 42.3 N
+and 3 to 9.2 E outside them reads the same constants with the three gauges their own blocks'
+alone, and inside them Mahón's level and an M2 under ten centimetres where the old water was
+over three metres. The master's epitome gains Bougie (8h 10m), Bona (8h 25m), Bizerta and the
+Goletta (8h 50m), the world's own establishments by the ruled gauges, JUDGEMENT, a foot of rise
+(the Admiralty's modern Bizerta, VIIIh 20m, within half an hour; Smyth 1854, p. 187: the
+Goletta's three feet "local rather than lunar").
+
+### The build as committed (items 1 and 2)
+
+Built once with the ruling (`--region <r> --reuse-world --skip-fetch`, the Sardinian sea
+first), and `tunis-coast` twice more from the cache (the chart's title in `CHARTS`, the road of
+Tunis moved): every tile byte for byte the same each time (`save_tile`), the index and the
+manifest's entry the only change. The checks passed: 26 of 26 and 34 of 34 features within the
+bounds, ids unique, sources in the references' form, "15 kept" and "13 kept", the fetch boxes
+covering the tiles.
+
+| | `sardinian-sea` | `tunis-coast` |
+|---|---|---|
+| level 2 | 75 tiles, 14.69 MB | 35 tiles, 6.14 MB |
+| level 3 | 36 tiles of five patches (Bougie 9, Djidjelli, Collo, Stora 6 each, Bona 9), 2.71 MB | 38 tiles of five (La Calle 2, Tabarka 6, Bizerta 12, Porto Farina 6, La Goletta 12), 2.40 MB |
+| coast | 0.20 MB | 0.32 MB |
+| **in all** | **17.6 MB** | **8.9 MB** |
+
+With the features and indexes (0.06 MB), 26.5 MB for the package. **The fill raise**: 0.17 to
+6.83 m and 0.20 to 6.83 m, the block's own 0.20 m within the bounds, the eleven's outside every
+block (the fetch boxes' inland margins). **The sweep** on the block's own water: 3,857 cells in
+94 places in the Sardinian sea (the marshes of the Mafragh and the Mekhada behind Bona and the
+river mouths of the Soummam and the Kebir), 26,765 in 141 in the coast of Tunis (the lake of Tunis
+1,906 and 1,793 and 1,099 cells, Porto Farina's lagoon and the Medjerda's flats 1,882, 1,032 and
+900, the lakes Tonga and Oubeira behind La Calle 1,047 and 687, Ichkeul behind Bizerta): real
+water, closed from the sea or a lagoon of a foot or three, left as water (the how-to's "marshes
+and lakes behind the shore"). The measuring build on Saint-Malo's raise had stood them up as
+land.
+
+**The marks** (item 2): 26 in the Sardinian sea and 34 in the coast of Tunis from the readers'
+pages (the short pass), placed from the modern map and the pilots, checked against the tiles by
+the features rule with a scratch script outside the repository, each move said in `fix`; three
+beyond the rule's reach where the modern port is the grid's land (the Cassarin 1,040 m, Bizerta's
+road 971 m, Porto Farina's road 1,724 m, the shore silted). **The dangers on the grid's heads**:
+the Sorelle at the grid's 0.5 m, 6 km north-west of Bérard's bearing and distance; the Fratelli
+on the grid's islet, 3.3 km east of Smyth's position; Keith's reef at the grid's 0.4 m (37° 54.5′
+N, 11° 0.8′ E), seven minutes west of the pilots' 11° 8′ (the Admiralty 1913 has 37° 50′ N, 10°
+57′ E); the Skerki at the grid's 7 m of the bank's south-western part, the pilots' nine feet its
+head. **No island of the block lacks the grid** (each was placed on the grid's land); the Dogs
+of the Galita a rock of its height on the grid's 0.2 m. **Dropped**: the cove of Sidi Yahia
+(Bérard's winter berth of the 1830s, the grid's land) and the Lion of Bona (no land within 600 m).
+**Beside the block**: Dellys and Cape Bengut in `balearics`' file, the Torre Grande, Oristano and
+Sant'Antioco in `tyrrhenian`'s, their indexes rebuilt from the files (each control first
+reproducing the committed bytes from the old file; the diffs additions only) and their manifest
+counts edited alone (89 and 126). **The lights**: none in 1805; Bona's on Cape de Garde `from`
+1844 (Lamberti, its year first lit UNVERIFIED) and Cape Carthage's `from` 1840 (the Admiralty's
+notice of 17 June 1840).
+
+### The ports (item 3) and the regency of Tunis (item 4)
+
+| port | region | nation | dated rows | source of the road |
+|---|---|---|---|---|
+| Bougie | `sardinian-sea` | Algiers' | none (the French siege of 1833 said, after the range) | Tofiño 1787 p. 155 |
+| Djidjelli | `sardinian-sea` | Algiers' | none | Bérard 1837 p. 113 |
+| Collo | `sardinian-sea` | Algiers' | none (the Company's post 1604 to 1685 said) | Bérard 1837 p. 118 |
+| Stora | `sardinian-sea` | Algiers' | none | Bérard 1837 pp. 122 to 124 |
+| Bona | `sardinian-sea` | Algiers' | none (the cession to the British African Company, 1806 or 1808, unread: said) | Bérard 1837 p. 131; Norie 1831 p. 354 |
+| La Calle | `tunis-coast` | Algiers' (Bérard's march four miles east) | none | Bérard 1837 p. 140; Derrotero 1849 p. 262 |
+| Tabarka | `tunis-coast` | Tunis's | since 1738 (Bérard p. 142) | Derrotero 1849 pp. 262 to 263 |
+| Bizerta | `tunis-coast` | Tunis's | none | Derrotero 1849 p. 266 |
+| Porto Farina | `tunis-coast` | Tunis's | none | Derrotero 1849 p. 267 |
+| the Goletta | `tunis-coast` | Tunis's | none | Purdy 1826 p. 334 |
+| Carloforte | `tyrrhenian` | Sardinia's | France's 8 January to 25 May 1793 (Smyth 1828 pp. 54, 57, 308; the first day JUDGEMENT) | Smyth 1828 p. 306 |
+| the Gulf of Palmas | `tyrrhenian` | Sardinia's | none | Smyth 1828 pp. 318 to 321 |
+| Oristano | `tyrrhenian` | Sardinia's | none | Derrotero 1849 p. 139; Smyth 1828 p. 293 |
+
+Each in the house form, `datum: unverified` (no period sheet with its datum; the plans are the
+Rumsey scans, CC BY-NC-SA, not transcribed), ten goods and more priced by the trades the texts
+give (each good's note naming its page, the rest JUDGEMENT), a chandlers' with topmast and water,
+the three ratings (no hands for a Christian ship in the regencies' ports, JUDGEMENT), the pilot's
+four words from the pilots. **The road of Tunis placed by Purdy's bearings made true** (his
+magnetic NNE ½ E or NE by N for Cape Carthage and NW by W to W for the Goletta, the variation
+about 17 W then: the cape 10° and the Goletta 254° true, the grid's 6.1 m). **The tracks**: every
+straight line between two ports of either region crossed a cape; each port's `tracks:` run out to
+a coast lane (37° 12′ N for the Algerian five; 37° 18′ to 37° 25′ N for Tunis's, north of Cape
+Serrat, the Fratelli and the Cani, a point south of Plana for Porto Farina) and the three Sardinian
+ports' round San Pietro and Sant'Antioco, every pair of offings checked by `Chart.line_shore` as
+the guard reads it (no dry ground). **The business, at seed 7 in June 1805**: the Sardinian sea's
+best routes timber from Bougie to Bona (1.8), from Djidjelli to Bona (1.64), figs Bougie to Bona,
+wheat Bona to Bougie (1.5); in twelve hours traders of timber from Djidjelli and Collo to Stora,
+wheat Stora to Djidjelli and Bona to Bougie. The coast of Tunis's wheat Bizerta to La Calle (1.64),
+oil and soap the Goletta to La Calle (1.5), coral La Calle to the Goletta (1.46); in twelve hours a
+trader of coral from Tabarka to Bizerta. Not pinned.
+
+**The regency of Tunis** in Algiers' form: its navy and corsairs from Purdy 1826 (p. 329), the
+British treaty's three per cent (p. 330), the 1798 raid on San Pietro (Smyth 1828, p. 309), not
+modelled; **its colours from Fisher [1820], plate 13** ("Tunis (Two)": stripes of red and white,
+and of blue, red and green; the page image under `signals/pages/`, leaf 30), where the first draft
+had them FROM MEMORY; the treaties' dates and the Bey's name FROM MEMORY or unread, said so. No war
+entered (the table's wars carry no dates; no truth depends on one).
+
+### The weather (item 5)
+
+Bizerta's table (the Admiralty's vol. I, 1913, p. 731, the PDF's page 904, nineteen years) and
+Tunis's (p. 732, PDF 905, twelve years' wind) cut at 200 dpi upright under `pilots/pages/`; each
+column of both summed against its printed totals, all agreeing; Bizerta's gales and fogs columns
+blank, Tunis's too. Bizerta's quarters (half-points split, the shares of the month's days)
+against the neighbouring boxes' check rows differ by 10 to 17 points from the Mediterranean
+west's, 8 to 21 from the Tyrrhenian's, 9 to 39 from the Catalan coast's: **a box of the coast of
+Tunis's own**, its check rows Bizerta's scaled to nine tenths, the north-wester the year's wind
+(111 of the 365 days). Fitted by a scratch search outside the repository from the Mediterranean
+west's rows (400 trials a month of 60 and 120 months), then confirmed by the check tool's `run`
+with the box the default, 1,200 months at seed 7:
+
+| month | W (table) | E (table) | S (table) | N (table) | none | F6+ (row) | F9+ (row) |
+|---|---|---|---|---|---|---|---|
+| 1 | 42.6 (38) | 9.4 (10) | 19.5 (22) | 18.7 (20) | 9.8 | 0.5 (5.0) | 0.00 (0.9) |
+| 2 | 36.3 (39) | 12.7 (8) | 15.2 (18) | 28.2 (26) | 7.6 | 1.1 (5.0) | 0.04 (0.8) |
+| 3 | 36.1 (36) | 14.1 (13) | 19.2 (16) | 23.5 (25) | 7.2 | 4.8 (7.0) | 0.20 (1.1) |
+| 4 | 37.8 (38) | 11.8 (14) | 12.2 (12) | 30.3 (27) | 7.9 | 3.3 (5.0) | 0.18 (0.8) |
+| 5 | 37.3 (35) | 12.1 (12) | 10.9 (10) | 31.4 (30) | 8.3 | 0.9 (3.0) | 0.00 (0.5) |
+| 6 | 31.5 (32) | 12.5 (16) | 11.3 (9) | 25.9 (30) | 18.7 | 0.3 (2.0) | 0.00 (0.3) |
+| 7 | 35.0 (32) | 15.1 (16) | 10.7 (9) | 31.5 (30) | 7.8 | 0.5 (2.0) | 0.01 (0.2) |
+| 8 | 28.9 (28) | 15.3 (20) | 7.9 (9) | 27.6 (30) | 20.3 | 1.9 (2.0) | 0.04 (0.2) |
+| 9 | 25.7 (27) | 21.9 (21) | 11.9 (14) | 20.3 (26) | 20.2 | 0.1 (2.0) | 0.00 (0.3) |
+| 10 | 34.1 (32) | 13.3 (14) | 14.6 (17) | 17.1 (23) | 20.9 | 2.5 (4.0) | 0.12 (0.6) |
+| 11 | 40.2 (36) | 8.5 (9) | 19.9 (24) | 13.8 (18) | 17.7 | 2.1 (4.0) | 0.06 (0.7) |
+| 12 | 36.5 (36) | 6.9 (9) | 21.8 (20) | 22.3 (22) | 12.4 | 1.4 (5.0) | 0.03 (0.9) |
+
+Every month within five points of the westerly and easterly shares (the closest to the
+tolerance January's westerly, 4.6, and February's and August's easterly, 4.7); the gust days
+below the Mediterranean west's rows' that stand in for Bizerta's blank columns (the weather's
+lows, 101's and 79d's finding). **The Sardinian sea**: no table in the block (none for Bougie,
+Philippeville, Bona or the open sea; Port Mahon's wind columns blank), its coast's regime the
+Mediterranean west's (the summer easterlies and winter westerlies, Bérard pp. 66 to 69): its box
+the region's bounds with the Mediterranean west's rows by the file's YAML alias (the same rows,
+not a copy), so that the nearest box's diagonals no longer answer there. PROVISIONAL in every
+row; one year's picture (the observations of about 1890 to 1912).
+
+### The streams (item 6)
+
+Four areas of the coasts' sets and two open areas, before the open Channel's statement, and the
+regions' boxes in `book_limits`: the Barbary shore Cape Sigli to Cape Bougaroun, ENE at a knot
+(Bérard's half mile to two, Tofiño's easterly; the rate JUDGEMENT within Bérard's); Cape Bougaroun
+to Bona, WSW at half a knot (Bérard p. 80: Cape Bougaroun the easterly's limit, the set west north
+of Cape de Fer); Cape Rosa to Cape Serrat with the Galita and the Sorelle, SW at a knot (Bérard pp.
+81 to 82 and 148); Cape Serrat to Cape Bon and the bay of Tunis, east at half a knot (Purdy 1826,
+pp. 151 and 334); the open Sardinian sea still (no period statement); the open sea off Tunis east
+at half a knot (Purdy p. 151; Lamberti p. 198). No tidal stream. Far from every recorded passage.
+
+### The scenario, sailed (item 7: `data/scenarios/bona.yaml`, seed 7)
+
+The frigate off the mouth of Port Mahon at 05:00 on 20 June 1805, the weather pinned (a north-
+wester of fourteen knots for the crossing, veering north and north-easterly on the last morning,
+the coast's summer easterly), a short book. She weighed at 05:28, rounded the Isla del Aire, crossed
+4.5 E into the Sardinian sea, made her landfall by the high land of the Seven Capes, Mount Edough
+and Cape de Fer, stood for the offing fourteen miles north-north-east of Cape de Garde, rounded
+the cape by a mark three miles and a half east of it and anchored under the Fort Genois at 16:08
+on the 22nd in ten fathoms and a half, brought up at 16:23 by the best bower in eleven fathoms, the
+lead giving mud mixed with sand. Sixty hours: 2,087 lines, digest `0ca83003c99d5995` (`tools/
+day_log.py data/scenarios/bona.yaml --hours 60 --reckoning`, this container); no grounding, no
+order refused but the trimming while at anchor and the fix with one mark in sight. Not pinned.
+**The first runs, kept for the book**: at 44 hours she was still seventeen miles short (run 1;
+the passage wants sixty); with a mark three miles east of the cape and the westward set from
+Cape de Fer and two days' account against her she stood onto the bank north-west of the cape
+(runs 2 and 4, aground in two fathoms and a half); the hourly course for a mark she had passed
+turned her back to it (run 3, 101's lesson again). The book that worked keeps each course only
+while the mark beyond is far and reshapes toward the cape's offing every ten minutes as the
+bearings correct her account.
+
+### The truths (item 8): 7-510 to 7-519
+
+7-510 the chart answers over the L-shaped hole on a tenth of a degree; 7-511 no level-2 tile
+listed twice, the bounds abutting the neighbours' on their own figures, the depth the same a
+cable either side of each seam, the tide's blocks changing there; 7-512 Port Mahon to Carloforte's
+road by the southern channel and Algiers to the road of Tunis by the coast lanes on charted water,
+no leg crossing dry ground; 7-513 Bougie's road under Cape Carbon, the land to the west and north,
+open a league to the east, soft mud, the pilot's words; 7-514 the road of Tunis on Purdy's
+bearings, a frigate holding through a north-easter of twenty knots for six hours; 7-515 Keith's
+reef grounds a frigate on the grid's head, its `fix` naming the pilots' 11° 8′; 7-516 the Galita
+seen at fifty miles and not at sixty (its 476 m and a masthead's 30); 7-517 no light on either
+coast in 1805, Cape Carthage's and Cape de Garde's in 1845; 7-518 Bona and the Goletta neutral to a
+King's ship in 1805, Tabarka the Bey's from 1738, Carloforte France's in March 1793 and Sardinia's
+in June; 7-519 (slow) the scenario sailed to the Fort Genois without touching ground. States,
+counts and bands; no digest pinned. **No truth rests on a premise of the brief's that fell, or on
+a war's day.**
+
+### Decision 66: which of the block's data carries its dates
+
+**Carries its dates in its rows**: Tabarka's nation (since 1738), Carloforte's (the French holding
+of 1793); the lights (`lit: from` 1840 and 1844). **Said with its years and written in no row**:
+the Compagnie d'Afrique's posts (Collo 1604 to 1685, La Calle burnt 1827), Bona's cession to the
+British African Company (1806 or 1808, unread), the French conquest of the 1830s (after the
+range). **One year's picture**: the chart's shore (EMODnet 2024, GEBCO 2025: the modern ports of
+Bejaia, Skikda, Annaba, Bizerte and La Goulette), the marks' places; the weather (Bizerta's
+observations of about 1890 to 1912; the Sardinian sea the Mediterranean west's); the tide (the
+gauges' series of 1986 to 2015); the markets (the period's trades, undated); the nations table's
+wars (June 1805's).
+
+### Found on the way (package 104), for others and not mended
+
+- **The hole east of Cape Bon** (south of 38.43 N and east of 11.15 E: Sicily's north and west,
+  Pantellaria, the Sicilian channel, Malta) stays off the chart: the lead's package 105.
+- **The Carloforte and Cagliari gauges' levels are unread**: the Tyrrhenian's water stands at the
+  eleven's 6.83 m level about them (79d's state), and they give the coast of Tunis no level (Mahón
+  gives it). ISPRA's published levels would mend both.
+- **Norie 1831's "ISOS"** (p. 354, the year of Bona's cession) wants the page image read.
+- **A table for the Algerian coast east of Algiers** (none in the Admiralty's Appendix III;
+  Bérard 1837's climates, chs. II and III, shredded by the OCR) would give the Sardinian sea rows
+  of its own.
+- **The weather's gale days** run below the rows' again (the lows' finding of 79d and 101).
+- **The modern ports are the grid's land** at the Cassarin, Bizerta's and Porto Farina's roads:
+  a public-domain plan with its datum would put back the period's shore.
+- **The Admiralty's Appendix III offsets**: p. 731 is the PDF's page 904, p. 732 is 905 (the
+  offset 173 from Barcelona's p. 726 holds).
