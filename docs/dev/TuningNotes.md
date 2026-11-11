@@ -26609,3 +26609,37 @@ test_viewer_action.py) exit 0, 1,626 passed, 8 xfailed: no pin and no digest mov
 alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12 passed. The viewer's
 geometry tests ran (Node 22 present). The tree reported differs from 5142098 by this
 paragraph alone.
+
+**The lead's rulings of 2026-11-11 (04:40), on steps 0 and 1 merged.** The salute rides
+with package 77's gunnery (the days' data will name it; no firing built here); `splice the
+main brace` waits for a stores package; which flag at which yardarm is JUDGEMENT, marked so.
+No served line or reading names the director, a package or the engine.
+
+**Step 2: every signal flag of every book drawn.** An eighth file in each root,
+`flags.yaml`, 186 rows in all: Britain 58 (23 names, four dated sets of numerals and
+substitutes, 55 `plate`), France 33 (all `plate`, Audibert's Pl. 3), Naples 27 (all `plate`,
+the 1807 plate), Spain 26 (25 `made`; the Spanish pendant the colours'), the United States
+16 (all `made`), basic 26 (all `made`, with the private tables' plain flags of every root).
+The British sets as dated: Howe's to 1792; the new arrangement 1793 to 1798 (the 1796
+leaf; Perrin has it the Mediterranean's from 1793 and Howe's kept in the Channel to 1799: the
+game reckons no station, so the leaf's set answers for every British ship in those years,
+JUDGEMENT); 1799 to 1803; 1804 to 1810; after 1810 the nearest (1804-1810), the 1810 set
+not found. A hoist's flags (`flags.hoist_flags`, uppermost first): the first written figure
+uppermost (the 1796 leaf: "the one answering to the Figure in any Number placed first in
+Writing, will be always hoisted uppermost"), Barry's units uppermost; a figure again the
+substitute, a third time the second substitute (Perrin p. 178: "one or two substitute
+flags"); Britain's No. 111 the hundred pendant over 1 and the substitute (the leaf's pendant
+"adds 100 to the Expression assigned to the Numeral Flag or Flags with which it is at the
+same Time hoisted"), there being no third 1; a table book's two flags a number, the cell's
+row the upper and its column the lower, twenty to a row (JUDGEMENT: Audibert § 71 gives the
+reading, not the numbering), the universal flag ("igual á todas", "égal à tous") for a lower
+that would repeat the upper; Spain's 401 to 420 one flag alone, 421 the universal alone, the
+made meanings from 422 the white pendant over one flag (JUDGEMENT on the book's "pendants
+outside the table, for the signals added below"); Popham's word under the telegraph flag,
+the thousands with a pendant over the hoist (1000 to 1999) or under it (2000 and above),
+which pendant not read (a plain blue, JUDGEMENT); the answer the answering pendant; a private
+signal its flag. `tools/check_signals.py` checks every flag a hoist can hold and every flag a
+book.yaml declares is drawn: all six roots pass (truth 7-501). The contact sheet of every
+row, compared by eye with the plates, held (the quarters, the diagonals, the swallow tails).
+Found for others, not mended: a table book's lookout says "two flags at the main" for
+Spain's signals of one flag (401 to 421), whose hoist is one flag; the line may not move.
