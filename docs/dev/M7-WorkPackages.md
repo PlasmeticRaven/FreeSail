@@ -89,7 +89,7 @@ on these packages; that is the owner's choice.
 | 103 | Fable (the primary review agent; subagents allowed) | **The range reviewed, and the lever designed** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | proposed 2026-11-10; **briefed 2026-11-10 (below) at the owner's word, for Fable; HELD by the owner, not launched** ("there's enough things in flight right now to let close out, and I'll sleep on it"); **the brief widened the same day at the owner's word** (Fable as the primary review agent for the date range audit and the overall design of fidelity, a wider and freer scope, subagents allowed); **consolidated with the other review and design packages (96, 92) towards the end of the order**, this one first, the three together to cover the whole range |
 | 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in; **measured and briefed 2026-11-11 for the owner's final approval and his choice of ports** ("## Package 104" below): the hole is L-shaped, its southern arm running east past Tunis and Cape Bon; two regions in one package (4.5 to 8.0 E north of 36.29 N; 8.0 to 11.15 E south of 38.5 N), some 26 to 29 MB, truths 7-510 to 7-519; **found with it and unbooked: Sicily south of 38.43 N, the Sicilian channel and Malta are off the chart**; **APPROVED by the owner 2026-11-11 with all thirteen ports as port files (decision 67)**; launched 2026-11-11 (session_01XooV49Pn562NRcnJEerNas, claude/pkg-104) |
 | 105 | Opus | **Sicily and Malta** (the owner, 2026-11-11: "Sicily and Malta shall be another package"): the chart south of 38.43 N and east of Cape Bon, found off the chart by 104's measurement: Sicily's coasts (Palermo, Trapani, Messina, Syracuse and the rest), the Sicilian channel, Pantelleria, Malta and Gozo; ports by decision 67 | booked 2026-11-11; to be measured and briefed after 104 |
-| 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build |
+| 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build; **measured 2026-11-11** ("## Package 106 ... the measurement" below): the chart ends at 32 N and holds nothing south of Madeira; six blocks proposed (the ocean layer carried south, the Canaries, Morocco's coast, the Cape Verde Islands, Senegal and Cape Verde, the desert coast), for the owner to book |
 | 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it; **surveyed 2026-11-11** ("## Package 107 ... the survey" below): 77 port files, about 240 places with a feature and no port file, ten passes proposed (Brest and the Western Approaches first), and a short step before them to settle the port file's dated form |
 | backlog (the stranger's view) | none | **A ship view of another vessel in sight** (the owner, 2026-11-11, striking the strip from 102): "a later 'stranger view' or 'enemy view' (maybe a small popout) that shows a ship view of a requested vessel that is in sight", her colours and hoists on it; under the knowledge rule, so beside or after package 99 | on the backlog, unbooked |
 
@@ -7851,6 +7851,60 @@ already is** and its watering and boat roads are what a blockading frigate uses;
 the Mediterranean fleet's anchorages of 1804 and 1805. Whether each place has sources enough
 for a port file is not checked: each pass begins with the pilots on file.
 
+
+## Package 106: the west African coast down to Cabo Verde: the measurement and the blocks proposed (2026-11-11), for the owner; nothing booked to build
+
+**The owner, 2026-11-11:** "we also want to consider the western African coast down to Cabo
+Verde for blocks to be booked." Measured by the lead the same day (read-only: the chart's
+own answers probed on a quarter of a degree from 10 N to 37 N and 27 W to 4 W, the edges by
+bisection).
+
+**What the chart holds today.** One chart, `atlantic-east`: fifteen regions (282.7 MB) and
+one coarse ocean layer, the corridor (level 1, 30 seconds of arc), from 32 N to 51 N and 32
+W to 1 W. **The chart's south limit is 32 N** (the corridor's data stops at 31.896 N), and a
+scenario that starts south of it is refused. South of the Strait: Tangier and Cape Spartel
+are charted in detail; **Larache, Sallee and Rabat, Mazagan and Safi lie on the coarse layer
+alone; Mogador has nothing; Madeira and Porto Santo are charted in detail, down to 31.6 N;
+and south of that there is nothing at all:** the Salvages, the Canaries, Cape Nun, Bojador,
+Cape Blanco and Arguin, Portendick, Saint-Louis, Gorée and Cape Verde, the Gambia, the Cape
+Verde Islands. The game has no port south of Funchal. No weather box lies south of 30 N
+(Madeira's box, "the north-east trade", would answer all the way to Cape Verde by the
+nearest-box rule); no tide gauge south of Funchal; no stream south of 35 N; Morocco, Spain
+and Portugal are in the nations' table and no African post of Britain's or France's is.
+
+**The blocks proposed, in the lead's order, each well under the 40 MB rule** (tile counts by
+the globe's grid against coast positions FROM MEMORY; sizes from the neighbours' bytes a
+tile; both to be measured by each builder before a tile is committed):
+
+| | Block | Bounds, about | Level-2 tiles | MB, about | Why a ship went there (FROM MEMORY) |
+|---|---|---|---|---|---|
+| 0 | The ocean layer carried south | 12.4 N to 32 N, 26.4 W to 9.3 W, level 1 | 16 new, 8 rebuilt | 5 | so that the open sea from Madeira to the Cape Verdes answers at all, and the detailed blocks need not write the Sahara's land |
+| a | The Canaries and the Salvages | 27.33 to 29.47 N, 18.29 to 13.17 W; one tile for the Salvages | 61 | 5 to 16 | Santa Cruz de Tenerife (Spain's, an enemy in 1805; Nelson repulsed in 1797), Orotava's wine, Las Palmas, Arrecife; every outward-bound Indiaman and West Indiaman passed them |
+| b | Morocco's Atlantic coast | 31.6 to 35.44 N, the coast and one or two tiles seaward | 55 to 64 | 9 to 11 | Larache, Sallee and Rabat, Mazagan, Safi, Mogador (the Sultan's port for European trade, with the consuls) |
+| c | The Cape Verde Islands | 14.53 to 17.52 N, 25.55 to 22.56 W | 49 | 3 to 13 | Porto Praya (water for the Indiamen; Suffren and Johnstone in 1781), Sal, Maio and Boa Vista for salt |
+| d | Senegal and Cape Verde | 14.53 to 20.08 N, the coast and one or two tiles seaward; the Gambia below it, optional (12.83 to 14.53 N) | 60 to 89 | 11 to 17 | Saint-Louis and its bar (French in 1805, British 1809 to 1817), Gorée (British in 1805), Portendick's gum trade, the Gambia (Bathurst only from 1816) |
+| e | The desert coast | 20.08 to 31.6 N, the coast and one or two tiles seaward, in three strips | 137 to 164 | 25 | Cape Nun, Juby, Bojador, the Rio de Oro, Cape Blanco and the bank of Arguin (the *Méduse*, 1816): a lee shore and a current, few places to anchor |
+
+**A strip or the whole ocean:** the coast with one tile column seaward is some 20 miles of
+water in detail; two columns take in the bank of Arguin's outer shoals. Charting the whole
+ocean in detail from the coast out to the islands would be about 1,560 tiles and 165 to 270
+MB, six or seven regions, for water that is deep and empty: **the lead recommends the ocean
+layer (0) for the open sea and detailed strips and island blocks only.** South of about 15 N
+the finer source grid may not reach (FROM MEMORY), so Gorée, the Gambia and Santiago's south
+side may be built from the coarser one alone: the builder's first measurement.
+
+**With the blocks, as 101 and 104 found for theirs:** a weather box for the trade and one
+for the coast (the harmattan), the Canary current as a stream, ports by decision 67 (each
+with its dated holder: Gorée and Saint-Louis changed hands within the range), the nations'
+table given Britain's and France's African posts, one scenario (the lead suggests an
+Indiaman's convoy from Madeira by the Canaries to Porto Praya). A source on file may serve:
+`features/madeira.yaml` cites the *Oriental Navigator* of 1801 for "Madeira, the Canaries"
+(not checked further).
+
+**For the owner:** (1) whether "Cabo Verde" is the cape (block d) or the islands as well
+(block c): both are proposed; (2) which blocks to book, and in what order: the lead's order
+is 0 with a, then b, c, d, and e last, as the coast with least play; (3) whether the Gambia
+comes with d.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
