@@ -740,7 +740,7 @@ CHARTS: dict[str, dict[str, Any]] = {
         "title": (
             "The Channel, Biscay and the Iberian coast to Madeira, the Strait, the "
             "Mediterranean west and the Balearics, the Catalan coast, the Gulf of Lion and "
-            "the Tyrrhenian"
+            "the Tyrrhenian, the Sardinian sea and the coast of Tunis"
         ),
         "regions": [
             "channel-west",

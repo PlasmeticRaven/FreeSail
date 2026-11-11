@@ -1128,6 +1128,10 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         "tyrrhenian",
         "solent",  # package 94: a tide region of the manifest, bounds and no tiles
         "catalan-coast",  # package 101
+        # package 104, the lead's ruling: the two gaugeless blocks, served by their
+        # neighbours' nearest gauges (Mahon's, Carloforte's and Cagliari's lists)
+        "sardinian-sea",
+        "tunis-coast",
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1247,6 +1251,18 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
         )
 
     names = sorted({b for g in tide.block_gauges for b in g.blocks})
+    # package 104, the lead's ruling of 2026-11-11: a block with no gauge of its own is
+    # served by its neighbours' nearest within reach, beside the seams' band. Old: every
+    # gauge's further blocks were the band's alone (`set(g.blocks[1:]) == near`). New: the
+    # band's, and for the three gauges the ruling names, the gaugeless blocks it lists;
+    # each of those blocks has no gauge of its own.
+    ruled = {
+        "mahon": {"sardinian-sea", "tunis-coast"},
+        "carloforte": {"sardinian-sea", "tunis-coast"},
+        "cagliari": {"tunis-coast"},
+    }
+    owned = {g.blocks[0] for g in tide.block_gauges}
+    assert not owned & set().union(*ruled.values())
     caught = {}
     for g in tide.block_gauges:
         own = g.blocks[0]
@@ -1255,7 +1271,7 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
             for b in names
             if b != own and any(miles(g.position, sm) <= T.SEAM_BAND_NM for sm in seams(own, b))
         }
-        assert set(g.blocks[1:]) == near, (g.id, g.blocks, near)
+        assert set(g.blocks[1:]) == near | ruled.get(g.id, set()), (g.id, g.blocks, near)
         if near:
             caught[g.id] = g.blocks
     assert caught == {
@@ -1263,3 +1279,35 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
         "ile-daix": ("biscay-north", "biscay-south"),
         "cadiz": ("portugal", "strait"),
     }
+
+
+def test_the_gaugeless_blocks_take_their_neighbours_nearest_and_nothing_outside_them_moves(tide):
+    """Package 104, the lead's ruling of 2026-11-11: TICON has no gauge in `sardinian-sea`
+    or `tunis-coast`, and by the seams' rule alone their water was the eleven's, Saint-
+    Malo's (M2 3.68 m, the mean level 6.83 m); Mahon, Carloforte and Cagliari serve them.
+    Within the two blocks the water is the Mediterranean's (an M2 under ten centimetres,
+    Mahon's level); outside them every cell probed reads as it did with the three gauges
+    their own blocks' alone, over the neighbours' water about the seams."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    old = []
+    for g in doc["gauges"]:
+        if g.get("id") in ("mahon", "carloforte", "cagliari"):
+            g = {**g, "block": g["block"][0]}
+        old.append(g)
+    streams = yaml.safe_load(open(T.STREAMS_PATH, encoding="utf-8"))
+    before = T.Tide({**doc, "gauges": old}, streams)
+    for lat, lon in ((36.85, 5.2), (38.5, 6.0), (36.9, 7.8), (37.3, 9.9), (36.8, 10.35)):
+        p = Position(lat, lon)
+        assert tide.blocks_at(p) & {"sardinian-sea", "tunis-coast"}
+        level, consts = tide.constants_at(p)
+        assert level == pytest.approx(0.20, abs=1e-6)
+        assert 0.04 < consts["M2"][0] < 0.10
+        assert before.constants_at(p)[1]["M2"][0] > 3.0  # the old water, Saint-Malo's
+    for i in range(36, 44):
+        for j in range(0, 32):
+            p = Position(38.0 + i * 0.1, 3.0 + j * 0.2)
+            if tide.blocks_at(p) & {"sardinian-sea", "tunis-coast"}:
+                continue
+            assert tide.constants_at(p) == before.constants_at(p), (p.lat_deg, p.lon_deg)
