@@ -1694,6 +1694,80 @@ def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
         assert "engaging" in states and engaged_spoken is False, (states, engaged_spoken)
 
 
+def _crewed_until(world, v, minutes, stop):
+    """Her crewed hull's captain, a minute at a time with the crewed cap as shipped: (the tick,
+    his state, the miles to her, whether a set holds the French ship) each minute she is crewed,
+    until `stop` of the rows holds or the minutes are run."""
+    from freesail.world.geo import bearing_and_distance
+
+    rows: list[tuple[int, str | None, float, bool]] = []
+    for _ in range(minutes):
+        world.run(60)
+        cap = getattr(getattr(v, "crew", None), "captain", None)
+        if cap is None:
+            continue
+        _, d = bearing_and_distance(v.position, world.position)
+        held = world.squadrons.of(v.id) is not None
+        rows.append((world.clock.tick, cap.state, d / units.NAUTICAL_MILE, held))
+        if stop(rows):
+            break
+    return rows
+
+
+def test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74():
+    """Bel-D §8.3 (B7.e's review) on a promoted hull, the crewed cap as shipped: the lone French
+    frigate keeping her station five miles north of her, hove to (the meeting above, with no
+    `far_only`), is crewed within `crews.CREWED_NM`, and her hull's captain judges her by the
+    lookout's words (`Perception.read`, `size_of_words`), the parent World's sets (`_alone`)
+    and her own id. AS FOUND: the 74's words at her rig and her colours are "a ship", a frigate's
+    class, so the two leagues do not bind; she investigates and hauls off once what she is is
+    made out (`ships.MADE_OUT_NM`, `GLASS_FACTOR` further with the glass on her: 1.92 miles at
+    seed 7), before she engages, her captain's course "hauling off from a seventy-four" in her
+    log. Whether a two-decker's rig should be told at four miles is the lead's (the tuning notes'
+    "B7.e, the review's mends")."""
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    v = _french(world, "frigate", "49 35 N 5 30 W", STATION_OFF_THE_LIZARD)
+    rows = _crewed_until(world, v, 45, lambda r: r[-1][1] == "evading")
+    states = [s for _, s, _, _ in rows]
+    assert rows and v.crew is not None and v.crew.captain.role == "kings-ship", rows
+    assert "evading" in states, rows
+    before = states[: states.index("evading")]
+    assert "investigating a stranger" in before and "engaging" not in before, rows
+    hauled = [e.text for e in v.crew.log if "hauling off from a" in e.text]
+    assert hauled and all("hauling off from a seventy-four" in t for t in hauled), hauled
+
+
+def test_a_crewed_frigate_in_a_set_does_not_haul_off_from_her_while_the_set_holds_her():
+    """Bel-D §8.3 (B7.e's review) on a promoted hull, the crewed cap as shipped: the French frigate
+    in company in a squadron of two frigates (the consort its commander, half a mile beyond her),
+    five miles north of her, is crewed and left to her commander's book while the set holds her
+    (`_alone` by the parent World's sets): in company, then engaging her as before B7.e, and never
+    evading while she is in the set. (Lost to the set later as a straggler, she is alone and the
+    rule is hers: the tuning notes' "B7.e, the review's mends".)"""
+    from freesail.world import squadrons as Q
+
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    v = _french(world, "frigate", "49 35 N 5 30 W", STATION_OFF_THE_LIZARD)
+    consort = _french(world, "frigate", "49 35.5 N 5 30 W", STATION_OFF_THE_LIZARD, name="Consort")
+    world.squadrons.add(
+        Q.Squadron(
+            id="the-set",
+            name="the set",
+            kind="squadron",
+            nation="france",
+            commander=consort.id,
+            members=[consort.id, v.id],
+            goal=STATION_OFF_THE_LIZARD,
+            formation="line ahead",
+        ),
+        world,
+    )
+    rows = _crewed_until(world, v, 60, lambda r: r[-1][1] == "engaging" and r[-1][3])
+    assert rows and v.crew is not None, rows
+    assert any(s == "engaging" and held for _, s, _, held in rows), rows
+    assert not any(s == "evading" and held for _, s, _, held in rows), rows
+
+
 # ---------------------------------------------------------------------------
 # Her round trip under her rules captain, and her checkpoint at quarters (Bel-D §11, §14.1)
 # ---------------------------------------------------------------------------

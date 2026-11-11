@@ -1554,22 +1554,42 @@ no `in company` row. Built where §8.3 left the choice, by its lean and said: th
 the same rows (without them its knob would act only where `overmatched` stood already); a set's
 commander is in the set, left to the set's book; `Captain._haul_off` runs from the ship of the line
 within three times the knob, a King's ship's `stranger_hostile_nm` being nought (the cruiser's reach is
-three times hers). Measured at seed 7 against 62cf52c6: a lone French frigate keeping her station
-five miles off her or the 64 investigates and evades where she investigated and chased; a lone
-frigate under the commodore's book a mile and a half off evades where she stood on; the player's
-frigate under her rules captain hauls off from a French 74 or 64 where she engaged; a cruiser, a
-King's 64, a frigate meeting a frigate, a frigate in a set or commanding one, and a commodore
-commanding a convoy as before. **Its reach, as found:** no shipped scenario names a ship of the line
-and the business draws none (grep), so no scenario's pin moved (the four whole logs and the captain's
-trials as at the base); one test moved, her own record of the engine's then (B7's
-`..._and_a_kings_frigate_does_not_today[kings-ship]`), renamed with its cruiser case
-`test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64`; the 64's scenario tests
-re-run, as before (B6's are not yet written). Her scenario's French frigates, alone, now keep away by
-doctrine as well as by B6's intent. The *Droits*' case stays the later refinement, recorded in the
-knob's source. For the lead: a ship of the line within hail is no superior force to `_overmatched`
-(package 43's filter, the cruiser's as well), so a frigate overhauled within hail gives up hauling off
-and engages; and a commodore whose convoy is held by package 71's least relation alone (no set) is
-alone by these words. Old beside new in the tuning notes' "B7.e, the rank-4 rule".*
+three times hers). Measured at seed 7 against 62cf52c6, with no hull promoted: a lone French frigate
+keeping her station five miles off her or the 64 investigates and evades where she investigated and
+chased; a lone frigate under the commodore's book a mile and a half off evades where she stood on;
+the player's frigate under her rules captain hauls off from a French 74 or 64 where she engaged; a
+cruiser, a King's 64, a frigate meeting a frigate, a frigate in a set or commanding one, and a
+commodore commanding a convoy as before. **Its reach, as found:** no shipped scenario names a ship of
+the line and the business draws none (grep), so no scenario's pin moved (the four whole logs and the
+captain's trials as at the base); one test moved, her own record of the engine's then (B7's
+`..._and_a_kings_frigate_does_not_today[kings-ship]`, "evading" not in her states and one of
+"investigating a stranger", "engaging" or "chasing" in them), now
+`test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64[kings-ship-the-74]`; its
+cruiser case renamed `[cruiser-the-74]` and given "investigating a stranger" before "evading"; the two
+64 cases new; the 64's scenario tests re-run, as before (B6's are not yet written). Her scenario's
+French frigates, alone, now keep away by doctrine as well as by B6's intent. The *Droits*' case stays
+the later refinement, recorded in the knob's source. For the lead: a ship of the line within hail is
+no superior force to `_overmatched` (package 43's filter, the cruiser's as well), so a frigate
+overhauled within hail gives up hauling off and engages; and a commodore whose convoy is held by
+package 71's least relation alone (no set) is alone by these words. Old beside new in the tuning
+notes' "B7.e, the rank-4 rule".*
+
+*Where it acts, and the review's mends (2026-11-11; the tuning notes' "B7.e, the review's mends"):
+not at the two leagues, and not alike on the two bodies. She is known an enemy by her colours (two
+miles, three with the glass) or by the shot, the private signal or the hail. The far brain sizes her
+by her description and hauls off where her colours are made out (3.0 miles investigating her with the
+glass, 1.8 on passage, at seed 7); the near body, every promoted hull and the player's ship under her
+rules captain, sizes her by the lookout's words, and a two-decker's words at her rig and her colours
+are "a ship", a frigate's class, so it hauls off only once what she is is made out (1.3 to 2.0 miles).
+At the crewed cap as shipped, a member of a set lost to it as a straggler while engaging her is
+alone, and evades at 0.45 miles: the King's ship's older rows from `engaging` and `taking possession`
+to `evading` on `overmatched` are live since B7.e for a lone ship of a lower class. A save keeps its
+captains' books by the checkpoint road (the rule off for them, until a new intent loads the book
+anew); a replay makes them anew under B7.e's, the rule on. For the lead, not built: whether a
+two-decker's rig-level words should name her two tiers, so that she is known a ship of the line at
+four miles, as the picture of §17.1 item 3 has a frigate turn away on sighting her; and whether a ship
+already engaged should break off for a ship of the line at close quarters. Two tests run the rule on a
+promoted hull, the crewed cap as shipped.*
 
 ---
 

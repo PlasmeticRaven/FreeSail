@@ -18279,6 +18279,12 @@ within two leagues):
   weather` unless no sea room; the `evading` book, empty before, the cruiser's three lines (trim to the
   course, tend the sheets, make all sail to haul off). No `in company` row. `stranger_hostile_nm` nought
   as before, its source's words amended (no ship of her own class or under).
+- **Rows live since B7.e, not new** (named at the step's review): both books' package 70 and 74 rows
+  `{from: engaging, on: overmatched, to: evading}` and `{from: taking possession, on: overmatched, to:
+  evading}`, and the `unless: overmatched` on every `enemy in range` row, were dormant for a King's
+  ship and a commodore before (their `stranger_hostile_nm` nought, so `overmatched` never held); for
+  a lone ship of a lower class they now act on an enemy ship of the line: she breaks off an action or
+  a prize, and does not engage her (below, "B7.e, the review's mends").
 
 **Judgement, said** (where §8.3 left a choice, its lean built):
 
@@ -18321,9 +18327,18 @@ The near frigate's second "on passage" (tick 720, the 74 0.34 miles off;
 `scratchpad/b7e/probe_near2.py`): the 74, standing the same way and faster, ranged up within hail, and
 a sail spoken is no superior force to `_overmatched` (package 43's filter, the cruiser's as well), so
 `stranger lost` ended the evasion and she engaged at tick 780, 0.22 miles off; the far frigates evaded
-before the 74 was within hail. For the lead (below). In the world the rule acts where the enemy is made
-out an enemy, her colours at two miles (three with a glass), as the cruiser's does: the two leagues
-bound the judgement, the colours the knowing.
+before the 74 was within hail. For the lead (below). **Where the rule acts on real ticks** (corrected
+at the step's review; measured in "B7.e, the review's mends", below): not at the two leagues, and not
+alike on the two bodies. She is known an enemy by her colours (`ships.COLOURS_MADE_OUT_NM`, two miles,
+three with the glass on her) or by `_known_enemy` (the shot, the private signal, the hail). The far
+brain sizes her by her description at any distance, so it hauls off where her colours are made out:
+3.0 to 3.1 miles investigating her with the glass, 1.8 on passage, in this table's runs. The near body
+(every promoted hull, French frigates within `crews.CREWED_NM` of her among them, and the player's ship
+under her rules captain) sizes her by the lookout's words (`size_of_words`), and a two-decker's words
+at her rig and her colours are "a ship" (`DESCRIPTIONS`' `rig`), a frigate's class: it hauls off only
+once what she is is made out (`ships.MADE_OUT_NM`, a mile and a half, `GLASS_FACTOR` further with the
+glass), 1.3 to 2.0 miles, from investigating her or from her passage. The two leagues bind only on the
+far body, for an enemy known beyond her colours' distance by `_known_enemy`.
 
 **What moves: the grep** (`data/scenarios/` and its trials, `data/business.yaml`, `data/regimes.yaml`,
 `tests/`, `freesail/`; the owner's scenarios folder beside them):
@@ -18333,30 +18348,46 @@ bound the judgement, the colours the knowing.
   fishers and brig-sloop cruisers; the convoy's escort a brig-sloop by `in convoy`), so no scenario puts
   a King's ship of rank 3 or less against rank 4: the four whole logs and the captain's trials as at
   62cf52c6 (below).
-- **One test moved**, her own record of the engine's then: `tests/test_bellerophon.py`'s
+- **One test moved**, her own record of the engine's then (its words corrected at the step's review):
+  `tests/test_bellerophon.py`'s
   `test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today[kings-ship]` ("evading" not
-  in her states, "investigating a stranger" or "chasing" in them) is
+  in her states, and one of "investigating a stranger", "engaging" or "chasing" in them) is
   `test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64[kings-ship-the-74]`, "evading"
-  in her states after "investigating a stranger"; its cruiser case the same, renamed; both slow node
-  ids renamed in `tests/conftest.py`'s `SLOW_TESTS`.
+  in her states after "investigating a stranger"; its cruiser case, renamed `[cruiser-the-74]`, asserts
+  "evading" as before and now also "investigating a stranger" before it; `[cruiser-the-64]` and
+  `[kings-ship-the-64]` are new; both old slow node ids renamed in `tests/conftest.py`'s `SLOW_TESTS`.
 - **The other tests that put a rank-4 ship on the sea, none moved:** her round trip (the 74 with a
   British 64 bound for Plymouth: rank 4 both, friends), the 64's round trip (`tests/test_indefatigable.py`,
   the great guns' scenario with nothing else on the sea), `tests/test_signals.py`'s British 64 hailed,
   and the words' tests (`test_ships`, `test_world_orders`, `test_subtypes`' and `test_neufchatel`'s role
   tables).
 - **Not pinned, the owner's folder:** `64-gun-in-Torbay.yaml` and `64-gun-schooner-tender.yaml` sail the
-  64 as the player's ship, British: a French frigate the director puts within two leagues of her,
-  alone, now hauls off where she closed. Five more (the four privateer brigs' and the French
-  hermaphrodite brig's) let the director put an enemy sixty-four (`enemy_heaviest: sixty-four`): a lone
-  King's frigate of the other side that meets it hauls off.
+  64 as the player's ship, British: a lone French frigate the director puts in her way now hauls off
+  once she has made her out (above), where she closed. Five more (the four privateer brigs' and the
+  French hermaphrodite brig's) let the director put an enemy sixty-four (`enemy_heaviest: sixty-four`):
+  a lone King's frigate of the other side that meets it hauls off.
+- **Not pinned, the owner's saves folder** (added at the step's review, read only): the 64's tender
+  scenario's saves (seed 7 at ticks 0, 1852, 1860, 6912, 6918 and 137600; seed 609627938 at 1867, 6929
+  and 137600) sail the British 64 with French ships of a lower class in the King's ship's role (a
+  privateer schooner at 1860, a lugger at 6912 and 6918). By the checkpoint road the rule stays off for
+  them (below, "Saves"); by the replay road it is on, and the saves whose checkpoints do not read here
+  (seed 7 at 1852, the three of seed 609627938) can take only that road. The privateers' saves whose
+  briefs let the director put an enemy sixty-four (seed 7 at 16475 and 36052) are under the same two
+  roads.
 
 **The 64's scenario tests, re-run:** `tests/test_indefatigable.py` whole (her round trip under the rules
 captain with no fit named among them) and her own round trip with the 64 in sight: as at the base
 (below). B6's scenario tests are not yet written (Phase 5).
 
-**Saves:** the doctrine is pickled with its captain (`Doctrine`, a frozen dataclass), so a save from
-before B7.e loads with its books as saved, the knob absent and read as nought, the rule off in it; a
-world made since takes it. No field added.
+**Saves** (by road, corrected at the step's review): the doctrine is pickled with its captain
+(`Doctrine`, a frozen dataclass). **By the checkpoint road** the captains a save from before B7.e holds
+keep their books as saved, the knob absent and read as nought, the rule off for them; a hull promoted
+after the load takes her far brain's (`fold_in`), so the same; a captain given a new intent loads his
+book anew (`set_intent`), and a ship made after the load (the director's, the business's) takes B7.e's,
+the rule on for them. **By the replay road** (a save with no checkpoint beside it, or one that does not
+read, or a door that replays) every captain is made anew under B7.e's books and the rule is on: the
+load's own words say a replay under another build's rules may differ (and refuse one holding a
+station's transcript unless asked, `replay_anyway`). A world made since takes it. No field added.
 
 **New** (`tests/test_bellerophon.py`, "A frigate meeting her"): the renamed meeting, four cases (the 74
 and the 64; the cruiser and the King's frigate); a lone commodore keeping away and a set left to its
@@ -18398,6 +18429,21 @@ which the base has not).
 - **The *Droits de l'Homme*'s case** (a sea that shuts a 74's lower tier, Steel 1805 p. 124's exception;
   James vol. 2 pp. 12-19), recorded in the knob's source as §8.3 has it: a later refinement.
 - **Her scenario (B6):** her French frigates, alone, now keep away by doctrine as well as by B6's intent.
+- **A two-decker made out at her rig** (added at the step's review): the near body knows her rank 4
+  only from what she is (a mile and a half, two and a quarter with the glass), her words at her rig
+  and her colours being "a ship" (`ships.DESCRIPTIONS`' `rig` for the 74 and the 64); so a lone French
+  frigate crewed beside her stands on or investigates her to 1.5 to 2.0 miles before she hauls off
+  (the player's frigate under her rules captain, a French 74 in sight, to 1.3 to 1.4), against the
+  picture §17.1 item 3 put to the owner, who agreed: "a French frigate on her own sighting the
+  *Bellerophon* turns away and makes sail". Whether a two-decker's rig-level words should name her
+  two tiers, so that `size_of_words` reads rank 4 at `RIG_MADE_OUT_NM` (four miles), is yours:
+  `world/ships.py` is not B7.e's, and it would move every served line naming a two-decker at her rig.
+  Not built.
+- **A King's ship in action, or lost to her set in action** (added at the step's review): a lone King's
+  ship of a lower class engaging, or taking possession, now breaks off for an enemy ship of the line
+  made out within two leagues (the rows live since B7.e, above), and a member lost to her set as a
+  straggler while engaging the 74 is alone and evades at 0.45 miles (below). Whether a ship already
+  engaged should break off at close quarters for a ship of the line is yours. Not built.
 
 ### The suites, as run (B7.e)
 
@@ -18427,6 +18473,109 @@ pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases 
 Junit, logs and the probes under `scratchpad/b7e/` (`run/`, `probe.py`, `probe_near.py`,
 `probe_near2.py`, `mutate.py`, `mutations.json`); the worktree of 62cf52c6 cleared after. Not run: the
 whole fast tier, the slow tier beyond her file, the pace tier beyond her file's pace tests.
+
+### B7.e, the review's mends (2026-11-11)
+
+**The review** (of 9de4ba06 since 62cf52c6, against Bel-D §8.3, §12.3's row for B7.e and the owner's
+words; the rule run on real ticks at seed 7, old beside new, the far brain alone and at the crewed cap
+as shipped) found the code the rule as offered, the design's leans built and said, and five findings,
+four in the record and one a test the rule wanted. Each was reproduced before it was mended
+(`scratchpad/b7e/fix/`: `repro.py` records the judging body's own reading of the 74 by wrapping
+`_overmatched`, no further read; `repro_player.py`; `saves_peek.py`, read only), on this tree and on a
+worktree of 62cf52c6, cleared after. **No code and no book moved**: the record, and two tests.
+
+1. **Where the rule acts** (should-fix). The record had "her colours at two miles (three with a
+   glass), as the cruiser's does"; that holds for the far brain alone. Measured, the 74 hove to off
+   the Lizard and the French ship five miles north (the review's runs at six and eight miles the same
+   within a tenth of a mile):
+
+   | Body, case | Her reading of the 74 before (level made out, nation, class) | She hauls off |
+   |---|---|---|
+   | The far brain alone, a lone frigate keeping her station | her rig, class 4 (her description) | at 3.03 miles from investigating, her colours made out with the glass |
+   | The far brain alone, the same bound for Brest | as above | at 1.80 miles from her passage, her colours by eye |
+   | Crewed (promoted at 3.99 miles), the station frigate | her rig, class 3 ("a ship") at 3.3 miles | at 1.92 miles from investigating, what she is made out (the glass) |
+   | Crewed, the same bound for Brest; the commodore's the same | her colours, class 3 at 1.87 miles | at 1.47 miles from her passage, what she is made out |
+   | The player's frigate under her rules captain, a French 74 bound for Brest | her colours, class 3 at 1.81 miles | at 1.34 miles from her passage, what she is made out |
+
+   Corrected in place (above, "Where the rule acts on real ticks"; the owner's folder's bullet), in her
+   design's §8.3 as-built note and in Build-Ships §16.1's row; the two-decker's rig-level words for the
+   lead (above), not built.
+2. **A member lost to her set** (should-fix). The old-beside-new table above is the far brain's; at the
+   crewed cap as shipped, old beside new:
+
+   | Crewed at the shipped cap | 62cf52c6 | B7.e |
+   |---|---|---|
+   | The lone frigate keeping her station | investigating, chasing at 1.92 miles, engaging at 1.32 | investigating, evading at 1.92 |
+   | The same bound for Brest | on passage, engaging at 1.22 | on passage, evading at 1.47 |
+   | A frigate under the commodore's book, bound for Brest | on passage, engaging at 1.00 | on passage, evading at 1.47 |
+   | The frigate in company in a set of two frigates, the consort commanding | in company; a straggler at tick 2100; engaging at 1.15 miles (tick 3060); lost to the set at tick 3840 ("she proceeds alone"), engaging still | the same to tick 3840; then alone (`_alone`, the knob 6), evading at 0.45 miles (tick 3900) |
+
+   The rows that make her break off, `engaging` and `taking possession` to `evading` on `overmatched`,
+   are package 70's and 74's, live since B7.e (named above, "Rows live since B7.e"); the question for
+   the lead (above), not built. Her design's §8.3 as-built note says the same.
+3. **Saves by road** (nit). The record had a save from before keep its books and the rule off; that
+   is the checkpoint road's. Read from the code (`replay.build_world` makes the world anew from the
+   scenario; `brains.fold_in` carries the far brain's doctrine into a promoted hull's captain;
+   `set_intent` loads the book anew) and measured by the review (a checkpoint written at 62cf52c6, a
+   lone King's frigate and a commodore, far brain alone, read here and run forty minutes: the base's
+   states and log digest, 65cc6bab3a7ab3ef; the books loaded anew, the frigate goes on to `evading` and
+   the commodore to `on passage`, `evading`, 569640e2f4efc4ad). The owner's saves folder read
+   (`saves_peek.py`): the saves of the 64's tender scenario and the privateers' as named above, the
+   checkpoints of seed 7 at 1852 and of seed 609627938 not reading here. Corrected in place ("Saves",
+   the saves folder's bullet), in Build-Ships §16.1's row and as a row of its §16.2.
+4. **The rule on a promoted hull** (nit). Every test of B7.e's ran the far brain alone (`far_only`) or
+   the player's own ship. Two new, with the crewed cap as shipped, in `tests/test_bellerophon.py` (both
+   slow, 14.3 s and 18.8 s alone, one process):
+   `test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74` (the lone station
+   frigate crewed, her captain's states "investigating a stranger" and then "evading" with no
+   "engaging" before it, and her log's course "hauling off from a seventy-four", what she is) and
+   `test_a_crewed_frigate_in_a_set_does_not_haul_off_from_her_while_the_set_holds_her` (the member
+   crewed, engaging her while the set holds her and never evading while it does). Each able to fail
+   (`scratchpad/b7e/fix/mutate_crewed.py`, the files restored byte for byte, the diff's digest the
+   same before and after): the knob nought in both books fails the first; `_alone` by the player's id
+   in place of her own fails the second; `_alone` by the hull's own World in place of the parent's
+   fails neither, the hull reading the World's `squadrons` under the same name
+   (`hulls.SHARED_FIELDS`), so that mutation is no fault; the size by the truth for the near body
+   fails neither, the station frigate's lookout at seed 7 reporting the 74's rig and then what she
+   is, with no report of her colours alone between (the passage's crewed run has one, above). On
+   62cf52c6, with this file: the first failed, the second passed (the member engages there too).
+5. **The moved pin's words** (nit): the old King's-ship assertion had "engaging" among its three, the
+   cruiser case gained a clause, and the two 64 cases are new. Corrected in place (above) and in her
+   design's §8.3.
+
+**The suites, as run (the review's mends).** Once, on the final tree (the package's branch at 9de4ba06,
+the mends uncommitted), from the tree root with `py`, one run at a time with no other suite running,
+the tree asserted first on `sys.path`, each pytest with `-n 4 -p no:cacheprovider -o
+addopts="--dist loadgroup"`; the bases not re-run (`scratchpad/b7e/fix/run_end.sh`).
+
+- **(a) The slow candidates** (`--slow -m slow` over the base's 86 files, `b7/final/slowlist.txt`):
+  **309 passed, 11 failed, 1 skipped, 9 xfailed** (2,975 s), junit `scratchpad/b7e/final-slow.xml`.
+  Against `s7/final-slow.xml` (324): two gone by name, the old meeting's two cases (renamed at B7.e,
+  above); eight new in `test_bellerophon`, all passed: B7.e's six slow cases and the review's two.
+  **One outcome changed**, passed to failed: truth 7-159's convoy of six at far detail against truth
+  51's floor (380 ticks a second against 500). Measured after the runs by its own measure
+  (`scratchpad/b7e/fix/pace7159.py`), alone, on this tree and on a worktree of 62cf52c6 by turns: 437,
+  439 and 437 here, 438, 440 and 454 at the base. The machine's load at the time, not the mends,
+  which move no code. Truth 7-196's floor failed as at the base (413 against 390). The other non-passes
+  as at the base, the same messages: the three captain's trials and truth 77 on their digests, the
+  merchant passage's and the schooner's intent constants, truths 78 and 79, the schooner's octant
+  passage's count; the nine marked xfail and the browser's skip.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (357 s), the three on the known digests
+  (1e59009004141b08, 41a37f0290be291a, 0b430d261669ba5a).
+- **(c) The four whole logs** (`log_digests.py`): every field the same as 62cf52c6's
+  (`s7/mend/final/digests.json`): first-action 234036cc17e6f137, encounter 732a6020db4d4755, the lee
+  shore e8c79e9947e244c3, the gale 1e59009004141b08.
+- **(d) The whole fast tier**: **7,325 passed, 2 skipped, 1 xfailed** (3,737 s), junit kept at
+  `scratchpad/b7e/final-fast.xml`. Against `s7/final-fast.xml` (7,321): **no outcome changed**, none
+  gone; seven new, B7.e's fast cases in `test_bellerophon`, all passed (the meetings with the 64, the
+  commodore alone, her rules captain's three, and the rank-4 rule by the tops' report).
+- **(e) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- Before the runs: the two new tests alone (2 passed, 33.8 s), their mutations and their run on
+  62cf52c6 (above, item 4); her file's collection 135 fast and 17 slow.
+
+Junit, logs and the probes under `scratchpad/b7e/fix/` (`final/`, `repro.py`, `repro_player.py`,
+`saves_peek.py`, `mutate_crewed.py`, `mutations-crewed.json`, `pace7159.log`); the worktree of 62cf52c6
+cleared after. Not run: the pace tier alone, and the generator (no ship file touched).
 
 ## The trim's words by the alias (package 75) (2026-11-11)
 

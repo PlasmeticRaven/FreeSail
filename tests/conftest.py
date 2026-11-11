@@ -564,6 +564,10 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_bellerophon.py::test_a_kings_64_meeting_her_closes_her_as_before",
         "test_bellerophon.py::test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line"
         "[a-frigate-in-a-set]",
+        # package 75, B7.e's review mends: the rule on a promoted hull, the crewed cap as shipped
+        # (14.3 s and 18.8 s alone, one process), 2026-11-11
+        "test_bellerophon.py::test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74",
+        "test_bellerophon.py::test_a_crewed_frigate_in_a_set_does_not_haul_off_from_her_while_the_set_holds_her",
         "test_bellerophon.py::test_she_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails",
         "test_bellerophon.py::test_her_posts_draw_at_muster_the_second_master_and_the_chaplain_as_the_others",
         # package 75, B7.c: her tack cleared beside her tack at quarters, two tacks of a 74 and
