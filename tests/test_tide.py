@@ -330,7 +330,15 @@ MED_WEST_CURRENTS = [
 ]
 # package 79d: the Mediterranean blocks' charts, whose areas carry the coasts' constant sets
 # and no tide (`current:` alone), and their areas' ids
-MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian", "catalan-coast"}  # 101
+# package 101: the Catalan coast; package 104: the Sardinian sea and the coast of Tunis
+MEDITERRANEAN = {
+    "gulf-of-lion",
+    "ligurian-sea",
+    "tyrrhenian",
+    "catalan-coast",
+    "sardinian-sea",
+    "tunis-coast",
+}
 MEDITERRANEAN_AREAS = (
     "provence-current",
     "gulf-of-lion-open",
@@ -341,6 +349,13 @@ MEDITERRANEAN_AREAS = (
     "tyrrhenian-open",
     "catalan-coast-set",  # package 101
     "catalan-coast-open",
+    # package 104
+    "barbary-bougie-coast",
+    "barbary-de-fer-coast",
+    "galita-channel",
+    "bay-of-tunis-set",
+    "sardinian-sea-open",
+    "tunis-coast-open",
 )
 
 
