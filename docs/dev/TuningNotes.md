@@ -24681,8 +24681,9 @@ library's forms table in chapter 20 and the events in chapter 11; the work packa
 97's pin. Truths 7-367 and 7-368.
 
 **The scenes' figures** (seed 7): the prize-home world order two minutes in finds the brig a full
-ship beside the frigate and takes her with Mr Ward and twenty-one hands, her 121 people prisoners
-(the brig's one file, 75's); the captive world order two minutes in promotes the Didon and takes
+ship beside the frigate and takes her with Mr Ward and eight hands, her sixteen people prisoners
+(corrected at the close-out, below: these lines had the first build's figures, twenty-one hands
+and 121 prisoners, from before the merchant brig had her own file); the captive world order two minutes in promotes the Didon and takes
 the Amazon with Mr Gordon and twenty-one hands, her 264 people prisoners, the parole asked a minute
 after in the French row's words. **Found on the way**: two frigates from one file draw the same
 wardroom names from one seed (the Didon's master's mate is a Mr Gordon as the Amazon's is), told
@@ -24720,6 +24721,52 @@ Nothing skipped in any tier. The second part of the slow tier was begun at 01:37
 three minutes in when the container was restarted; it was begun again whole at 01:41:10 on the
 same tree, and the figures are that run's. The trunk gained the lead's briefs and records
 alone while these ran (to f3bf73d, the work packages' page) and was not chased.
+
+### The close-out: two served lines that named the director, and a figure corrected (2026-11-11)
+
+The lead's finds on step 7, in one commit on top of its record. **(1) The record's `how`.**
+`orders._taken` (the forms of a scenario's start) passed `by="made a prize by the director's
+word"`, which is the record's `how` and is served: the reading `the prizes` ("the Deux Frères,
+made a prize by the director's word, under Mr Ward ..."), the possession's line, the loss in
+her captain's record and the truth's row. It is "taken" now ("struck" for the struck form, as
+it was); the director's cause is in his own reply and the journal. **(2) The parole's line.**
+`aboard the <captor>: the parole of <name> given | refused` wrote "refuses his parole (the
+director's word): ..." into the captor's log, which the captive aboard her hears. The line is
+the world's now, with no parenthesis where no one in the world gave the word; the pin in
+`tests/test_captive.py` moved, old beside new: **"Captain Bowen refuses his parole (the
+director's word): the gunroom alone is his, a sentry at the door."** to **"Captain Bowen refuses
+his parole: the gunroom alone is his, a sentry at the door."** No recorded passage holds that
+line: the form is used by that one test and by the forms' table in `test_director.py`, which
+reads its refusal for a man who is no prisoner. The parole given in his own words and by the
+captain's custom keep their parentheses, which are the world's. **(3) The figures.** The
+report's prize-home figures (Mr Ward and twenty-one hands, 121 prisoners) were the first
+build's, of 2026-11-07, when "merchant brig" took the brig-sloop's file with its muster of 121;
+since package 75's SW-4 she has her own file, and the scenario at seed 7 gives **Mr Ward and
+eight hands, sixteen prisoners**, as the lead found. The notes above are corrected; the
+captive's figures (Mr Gordon and twenty-one hands, 264 prisoners) are as measured today.
+**The assertion** (`tests/test_prize_scenarios.py`): the two scenarios loaded, begun and run
+two hundred ticks; no served line of any hull's log (the record-only lines left out, as the
+play log leaves them) and no reading of the prizes, the prisoners, the prize crew, the prize
+money or the record names the director, and the prize's `how` is the world's word. It fails on
+step 7's tree and passes here.
+
+**Seen in the same scenes and not mended, for the lead's list.** The record's `how` for a far
+possession is "struck at far detail" (`prizes.far_minute`), an engine's word served by the
+same roads, pinned by three assertions (`test_captive.py`, `test_far_action.py` twice). The
+French captor's officers have English names (the one file's wardroom, the finding above), and
+one of the Amazon's officers is addressed as "Mr master" in the prize master's asking.
+
+**The suites on the close-out's tree** (c028ed9, a worktree pinned there; ruff check and format
+clean; one task in the harness's background mode; 2026-11-11 UTC): the touched files, fast and
+slow (`test_prize_scenarios`, `test_captive`, `test_world_orders`, `test_director`,
+`test_prizes`, `test_prize_court`, `test_court`, `test_far_action`, `test_readings`,
+`test_knowledge`, `test_primer`, `test_in_world`, `test_officer`) **exit 0** (02:24:10 to
+02:34:59; 1,458 passed); the known truths, the file whole, **exit 0** (02:34:59 to 03:17:24;
+374 passed and the trunk's eight expected failures). Nothing skipped. The whole fast tier and
+the pace tests were not run again for this commit (the lead takes it with the touched files
+and the cloud's whole suite); the trunk had moved by the lead's briefs and records alone and
+was not merged for it. The officer's conversation at his seat measures 13,584 tokens, as
+before.
 
 ### The package whole: what moved, and the suites
 
