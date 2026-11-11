@@ -24756,6 +24756,18 @@ same roads, pinned by three assertions (`test_captive.py`, `test_far_action.py` 
 French captor's officers have English names (the one file's wardroom, the finding above), and
 one of the Amazon's officers is addressed as "Mr master" in the prize master's asking.
 
+**The suites on the close-out's tree** (c028ed9, a worktree pinned there; ruff check and format
+clean; one task in the harness's background mode; 2026-11-11 UTC): the touched files, fast and
+slow (`test_prize_scenarios`, `test_captive`, `test_world_orders`, `test_director`,
+`test_prizes`, `test_prize_court`, `test_court`, `test_far_action`, `test_readings`,
+`test_knowledge`, `test_primer`, `test_in_world`, `test_officer`) **exit 0** (02:24:10 to
+02:34:59; 1,458 passed); the known truths, the file whole, **exit 0** (02:34:59 to 03:17:24;
+374 passed and the trunk's eight expected failures). Nothing skipped. The whole fast tier and
+the pace tests were not run again for this commit (the lead takes it with the touched files
+and the cloud's whole suite); the trunk had moved by the lead's briefs and records alone and
+was not merged for it. The officer's conversation at his seat measures 13,584 tokens, as
+before.
+
 ### The package whole: what moved, and the suites
 
 The pins moved by the package, each with its reason, old beside new: 7-181 (step 2: the prize
