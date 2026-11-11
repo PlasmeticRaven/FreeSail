@@ -26081,3 +26081,120 @@ test_world_orders.py, test_director.py, test_primer.py, test_in_world.py) exit 0
 passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace alone and last
 (`--slow -m pace -n 0`, the same files) exit 0, 13 passed. The tree reported differs from
 31ebdf0 by this paragraph alone.
+
+## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
+
+Package 104 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 104"; built as
+`docs/dev/ChartBlocks.md` says). Two regions, `sardinian-sea` (the open sea between Minorca
+and Sardinia with the Algerian coast from Cape Carbon to Bona) and `tunis-coast` (La Calle to
+Cape Bon), closing the L-shaped hole the lead measured, with thirteen ports. The sections below
+follow the steps as they are done.
+
+### The sources' short pass (item 0)
+
+**On file, read and cited by printed page** (`docs/references/pilots/`, 79c's pass; no new
+text fetched). Three readers went through the texts by stretch of coast, their notes checked by
+spot reads of the lines cited (Bérard p. 142, Norie p. 354, Purdy 1826 p. 332):
+
+| stretch | the texts that answer | the spine |
+|---|---|---|
+| Dellys to Cape Rosa | Tofiño 1787 pp. 153 to 155 (to Bugia only); Bérard 1837 pp. 97 to 139 (the survey of 1831 to 1833, the currents pp. 77 to 81); Purdy 1826 p. 327; Norie 1831 pp. 354 to 355; the Derrotero 1849 pp. 255 to 261; Lamberti 1844 pp. 227 to 228; Smyth 1854 p. 458 (positions on Greenwich) | Bérard, after the period: what he says of 1831 is dated so |
+| La Calle to Cape Bon and the Skerki | Purdy 1826 pp. 327 to 335; Purdy 1840 pp. 192 to 199 and its Pharonology p. xxxvi; Norie 1831 pp. 345 to 354; Bérard 1837 pp. 81 to 82 and 138 to 148; the Derrotero 1849 pp. 260 to 270; Smyth 1854 pp. 90 to 94, 162 to 165, positions pp. 457 to 458; Lamberti 1844 pp. 198, 228 to 229 | Purdy 1826 and Norie 1831 |
+| Carloforte, the Gulf of Palmas, Oristano | Smyth 1828 pp. 293 to 318 (his survey of 1823 to 1824); Purdy 1826 p. 84; Norie 1831 p. 63; the Derrotero 1849 pp. 139 to 141; Lamberti 1844 pp. 330 to 333 | Smyth 1828 |
+
+**Michelot 1709 and 1715 and Faden 1793 say nothing east of Algiers bay**; Moore 1799 names
+places with their figures lost. The Admiralty 1913 (and its 1917 supplement) is read for the
+heights and depths only, never for 1805's works or lights.
+
+**Where the sources differ from the brief (the sources win):**
+
+- *La Calle*: no text puts it in British hands. Purdy and Norie (p. 354) have the French coral
+  posts of La Calle and the Seibus "evacuated, and now in ruins"; Bérard has La Calle burnt in
+  1827. **It was Bona that Norie has "ceded to the British African Company"**, in a year the OCR
+  reads "ISOS" (1806 or 1808; the page image would settle it), "no benefit was ever derived".
+- *Tabarka*: given up to the Bey of Tunis by treachery **in 1738** (Bérard p. 142, "En 1738 elle
+  fut livrée par trahison au bey de Tunis"), not 1741; the Lomellini of Genoa's before.
+- *Carloforte*: founded **1737** (Smyth 1828 p. 307; the Admiralty 1913 pp. 690 and 692). The
+  raid of 1798 (some 2,000 men from six Tunisian vessels, 850 carried off, ransomed in 1805:
+  Smyth 1828; the Admiralty calls them Algerine). **The *Vanguard*'s refit at San Pietro is in no
+  text read**: Smyth 1854 p. 242 has her dismasting in the Gulf of Lyons on 22 May 1798 and no
+  port; the refit stays FROM MEMORY and in no truth.
+- *Collo*: a post of the Compagnie d'Afrique **from 1604 to 1685** for the coral (Bérard p.
+  119), not in 1805; hides and wax are Stora's old storehouses' (Bérard pp. 122 to 124), not
+  Collo's.
+- *Bizerta*: "the Tunisian galleys are laid up" there (Purdy 1826 p. 332) and grain shipped
+  (Norie p. 351); no text calls it a corsair port. *Porto Farina*: "arsenal" in Smyth's table
+  (p. 457), a frigate laid up in 1826 (the Derrotero p. 267); "the Bey's arsenal" not in words.
+- *Bougie and Djidjelli*: no text calls either a corsair port. Bougie's road sheltered from W
+  and N (Tofiño p. 155, 6 to 8 brazas soft mud), its timber to Algiers (Tofiño; Purdy p. 327),
+  oil and wax (Norie p. 355): verified. Djidjelli a small, unsafe harbour (Bérard p. 113).
+- *Bona*: corn, wool, bees'-wax and bullocks' hides, and the coral (Purdy p. 327; Norie p.
+  354): verified; **"bullocks for the fleet" is in no text read** (Algiers' file has them as
+  judgement).
+- *The Sorelle* lie 13 to 17 miles west-south-west of the Galita (Bérard; the Derrotero), not
+  between the Galita and the Skerki.
+- *The road of Tunis*: 5 to 6 fathoms of soft mud, open to the NE, "they do not blow home"
+  (Purdy 1826 p. 334); hard clay in patches, no winter station for heavy ships (Smyth 1854 p.
+  93); the corn and oil trade (Purdy p. 330). **The consuls are in no period text read.**
+- *The Gulf of Palmas*: "safe and commodious anchorage for fleets" in the winter's westerly
+  gales (Smyth 1828 p. 318), open from SW by W to S by E (Purdy p. 84); **a watering place is
+  in no text read**. *Oristano*: "la Rada" (the Derrotero p. 139), "on the whole a bad
+  anchorage" open to the westerlies (Smyth 1828 p. 293).
+
+**The Skerki and Keith's reef**: found by Durban in the *Weazle* in 1802 (Purdy 1826; the
+"August 1822" of one passage a misprint), the *Athénienne* lost on the Skerki in October 1804;
+the pilots agree among themselves (the Skerki 37° 44′ to 46′ N, 10° 45′ to 47′ E; Keith's reef
+37° 50′ N, 11° 8′ to 9′ E, Greenwich), the reef's longitude some eleven minutes east of the
+modern chart's, to be checked against the tiles at the build. **The lights**: no period text
+names a light on either coast before the period's end (verified as the brief has it); the first
+are Cape Carthage's (the Admiralty's notice of 17 June 1840, Purdy 1840 p. xxxvi) and the Cap de
+Garde's revolving light at Bona (Lamberti 1844 p. 228; "new" in Smyth 1854 p. 458). Smyth
+1828 has Carloforte's light column "not hitherto been used". **The currents**: east along
+Barbary at about a knot to Cape Bougaroun, Bérard's limit of the easterly set (two miles an
+hour there and off Bengut, pp. 79 to 80); westward and south-westward sets from Cape de Fer by
+Bona and La Calle to the Galita (Bérard), one to three knots about the Galita and the Sorelle
+(the Admiralty 1913 p. 54); east across the bay of Tunis and by Cape Bon at half a knot to a
+knot (Purdy; Smyth 1854 p. 165). **The tides**: Algiers' gauge of 1831 sixteen inches at most
+(Bérard p. 76); Bizerta's springs a foot and a half, the Goletta's near three feet "from local
+causes" (the Admiralty 1913 pp. 430 and 442; Smyth). **The regency of Tunis**: three or four
+ships of war, the largest of 40 guns, some thirty galliots and private corsairs paying the Bey
+(Purdy 1826 p. 329), British goods at three per cent by treaty, the famine of 1805 (p. 328);
+**its flag, the Bey's name and its treaties with other powers are in no text read**.
+
+**The meteorological tables**: the Admiralty 1913, Appendix III, has **Bizerta (p. 731) and
+Tunis (p. 732)** beside Algiers (p. 730) and Cagliari (p. 738), not yet cut; none for
+Philippeville, Bona, La Calle or Carloforte. **The plans**: Roux's and Heather's plates of the
+coast are the Rumsey scans (CC BY-NC-SA), read by 79c and not committed; no public-domain plan
+of a harbour of the block is on file, so the block has no override. **Hosts**: none asked in
+this pass beyond PANGAEA (TICON's zip, the same file as every block's, SHA-256
+7055f8ed1a14abf8...) and the build's GEBCO and EMODnet, which answered.
+
+### The seam and the tiles (items 1 and 8), as measured for the report
+
+Built once each (`--region <r> --reuse-world`), `sardinian-sea` first: GEBCO's extracts 6.9 and
+3.7 MB, EMODnet's `elevation` and `elevation_max` 68.9 and 38.3 MB each, nothing refused.
+**The seams are the how-to's plain answers**: `sardinian-sea` "15 kept" (`balearics`' column
+4.32 to 4.75 E, 10; `tyrrhenian`'s column 7.73 to 8.16 E north of 38.43 N, 5); `tunis-coast` "13
+kept" (`tyrrhenian`'s row 38.43 to 38.85 N, 8; the Sardinian sea's column south of 38.43 N, 5);
+`gulf-of-lion` none (the row edge 40.56 N takes in no row). Every one of the 1,932 files under
+`data/charts/` of the other regions hashed alike before and after (SHA-256); the manifest
+changed by the two entries and the build hash alone. The chart probed on a tenth of a degree
+over the hole answers everywhere. **The bounds**: the brief's south 36.2933 lies 3.7 m below
+the row edge and its east 11.1467 past the column edge 11.14667 E, so that each would take in a
+row or a column more (`tunis-coast` 54 tiles, not 35); set 0.7 m and 7 m inside the edges.
+
+| | `sardinian-sea` | `tunis-coast` |
+|---|---|---|
+| level 2 | 75 tiles, 14.76 MB | 35 tiles, 6.20 MB |
+| level 3 | 36 tiles of five patches, 2.70 MB | 38 tiles of five patches, 2.26 MB |
+| coast | 0.18 MB | 0.26 MB |
+| **in all** | **17.6 MB** | **8.7 MB** |
+
+**The tide, for the lead's ruling before the final build**: TICON has no gauge in either
+region (searched 35.5 to 41.5 N, 3.5 to 12 E: Mahón, Carloforte, Cagliari and Porto Torres
+only). Mahón lies 10.6 miles from 4.5 E and Carloforte 14.4 from 8 E, both beyond the seams'
+band, so by the rule as `test_tide.py` holds it no gauge serves either block, the regions are
+no block of the tide's, and the water is the eleven's alone: **Saint-Malo's, M2 3.68 m and a
+mean level of 6.83 m**, as the hole had; the fill raised 6.83 m. The neighbours' water does not
+move with the regions (the eleven beyond their reach, no taper): Mahón's, Carloforte's and the
+Tyrrhenian's south edge probed alike before and after.
