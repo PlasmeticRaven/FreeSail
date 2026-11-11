@@ -26453,3 +26453,87 @@ trunk's code (commit 405fe35, before the form moved: 57 flags served plain and u
 drawn at the main truck and the peak of the frigate, 494 figures, their ids, colours and
 points to a micrometre) and the new code serves and draws every one of them the same (truth
 7-500).
+
+**Step 2: every signal flag of every book drawn.** An eighth file in each root,
+`flags.yaml`, 186 rows in all: Britain 58 (23 names, four dated sets of numerals and
+substitutes, 55 `plate`), France 33 (all `plate`, Audibert's Pl. 3), Naples 27 (all `plate`,
+the 1807 plate), Spain 26 (25 `made`; the Spanish pendant the colours'), the United States
+16 (all `made`), basic 26 (all `made`, with the private tables' plain flags of every root).
+The British sets as dated: Howe's to 1792; the new arrangement 1793 to 1798 (the 1796
+leaf; Perrin has it the Mediterranean's from 1793 and Howe's kept in the Channel to 1799: the
+game reckons no station, so the leaf's set answers for every British ship in those years,
+JUDGEMENT); 1799 to 1803; 1804 to 1810; after 1810 the nearest (1804-1810), the 1810 set
+not found. A hoist's flags (`flags.hoist_flags`, uppermost first): the first written figure
+uppermost (the 1796 leaf: "the one answering to the Figure in any Number placed first in
+Writing, will be always hoisted uppermost"), Barry's units uppermost; a figure again the
+substitute, a third time the second substitute (Perrin p. 178: "one or two substitute
+flags"); Britain's No. 111 the hundred pendant over 1 and the substitute (the leaf's pendant
+"adds 100 to the Expression assigned to the Numeral Flag or Flags with which it is at the
+same Time hoisted"), there being no third 1; a table book's two flags a number, the cell's
+row the upper and its column the lower, twenty to a row (JUDGEMENT: Audibert § 71 gives the
+reading, not the numbering), the universal flag ("igual á todas", "égal à tous") for a lower
+that would repeat the upper; Spain's 401 to 420 one flag alone, 421 the universal alone, the
+made meanings from 422 the white pendant over one flag (JUDGEMENT on the book's "pendants
+outside the table, for the signals added below"); Popham's word under the telegraph flag,
+the thousands with a pendant over the hoist (1000 to 1999) or under it (2000 and above),
+which pendant not read (a plain blue, JUDGEMENT); the answer the answering pendant; a private
+signal its flag. `tools/check_signals.py` checks every flag a hoist can hold and every flag a
+book.yaml declares is drawn: all six roots pass (truth 7-501). The contact sheet of every
+row, compared by eye with the plates, held (the quarters, the diagonals, the swallow tails).
+Found for others, not mended: a table book's lookout says "two flags at the main" for
+Spain's signals of one flag (401 to 421), whose hoist is one flag; the line may not move.
+
+**Step 3: a hoist has its place and is seen.** `Hoist.place` ('' at the main, out of the
+pickle and the record while unset); the yardarm place words (`<mast> yardarm`, `<mast>
+<yard> yardarm`, the weather arm, JUDGEMENT) beside the mastheads; an order names a place at
+the end of its words; a private signal's place is in its words ('main topmast head' the main
+top masthead, 'mizen peak' the peak, 'ensign staff' the staff). Where no place is named a
+hoist flies at the main topgallant masthead (JUDGEMENT), the truck's pendant above it. The
+player's own hoists are served (`hoists` in the snapshot; the parity table's row: the reading
+`signals`) and drawn down the halyard, a signal flag's fly 0.3 of her beam, a pendant's 0.6,
+0.15 m of halyard between (all JUDGEMENT); a private reply's ensign at its own place. No
+other ship's hoist is served (3(c) struck). The frame is not widened: on the 13 hulls with a
+hoist of four at every place, a yardarm hoist reaches 0.12 m beyond it on the
+hermaphrodite brig and 0.25 m on the two schooners, nothing elsewhere. **Seen in the
+browser** (`tests/browser_plans/signals.yaml`, the blockade's frigate): No. 153 at the main
+topgallant masthead in the 1805 set, uppermost first (white with the blue cross, yellow red
+yellow, blue with the yellow saltire), gone when hauled down; No. 16 'at the fore' at the
+fore topgallant masthead; seen nearly end on from the beam, the wind on her quarter.
+
+**Step 4: dress ship.** `data/signals/basic/dressing.yaml`, two dated fashions: 'in the
+rigging' to 1883 (Röding 1794, Babron 1817, Spain 1748 art. XXV, Perrin pp. 196-197): her
+ensigns and jack at the lower yardarms, her book's signal flags at the topsail yardarms,
+along the lower and topmast stays (three to a stay) and in the shrouds, her pendants at the
+topgallant yardarms, one flag of each, no flag at a truck; the rainbow from 1884 (Luce):
+six flags to each span from the jackstaff over the trucks to the peak, her ensign at each
+truck. Which flag at which place: JUDGEMENT (no source gives an order before 1889, "a junior
+officer's scheme"). A King's ship's stock is her colours' ensigns of the navy, her jack, her
+book's flags of the year and her pendants; a merchantman's her colours (she dresses with one
+ensign: what else she carries is package 96's locker). **Left out for package 96:** another
+nation's ensigns, which the period hung (Perrin p. 197: "including national flags of other
+nations"), are in no nation's data of hers. **Not drawn:** the waist cloths (Röding: red
+bordered white or yellow for the English; the French King's blue sown with yellow lilies,
+1765 art. CCXXXV), the viewer having no cloth on the rail. Dressed until `undress ship`,
+sunset (JUDGEMENT after Luce 1884 and the colours' sunset in Spavens 1796), or the colours
+coming down, said in the log; refused by night, with the colours down, and below. **Seen in
+the browser** (`tests/browser_plans/dressed.yaml`): the frigate's ensigns and jack at the
+lower yardarms, the numerals at the topsail yardarms, flags along the fore, main and mizen
+stays, the pendants at the topgallant yardarms, the shrouds bare (her stock spent); undressed,
+nothing but her colours.
+
+**Step 5: the nations' days.** `days.yaml` for Britain (7 days), Spain (7) and France (5),
+each dated by its years. On a day, a ship of the sea at anchor under a rules captain dresses
+of herself by day and undresses at sunset (not logged; the lookout's words of her flags say
+"she is dressed in her flags"); the player's ship does not: lying at anchor, her first
+lieutenant reminds the captain once that day ("It is the King's birthday, sir: the ships in
+harbour will be dressing"). **Stopped and reported, the salute:** the gunnery has the gun to
+leeward (one loaded gun, "the shot to strike nothing") and no blank: `charges.py` leaves the
+saluting charge out (package 77's), there is no train of guns fired at an interval, a gun
+fired is a shot from a loaded gun, and the far ships fire nothing but their far action's
+rounds. A salute wants: a blank load (powder, no shot) and its cartridge drawn from the
+magazine (the table's saluting charge), a train of N guns of a side fired one at a time at
+the interval (not read in any source held: FROM MEMORY five seconds), each reloaded with
+blank in turn, the guns heard at the guns' range by the ships about her, and the far ships'
+salutes heard as their guns; more than a short new act. **Not built, splice the main
+brace:** the stores keep provisions as days at full allowance and water in tons, no spirits
+apart; an extra issue wants a spirits store first (package 54's stores).
