@@ -15715,3 +15715,25 @@ def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_come
     c()
     if shutil.which("node"):
         b(tmp_path)
+
+
+def test_truth_7_503_a_ship_dressed_flies_the_fashion_of_the_scenarios_year_and_no_later_one():
+    """Package 102, step 4: dressed in 1792 to 1883 her flags hang in the yards, the stays and
+    the shrouds (Röding 1794, Babron 1817), none on a line from masthead to masthead and none
+    at a truck; the rainbow fashion from 1884 (Luce) and never before it."""
+    from tests.test_flag_drawings import test_the_fashion_is_the_years_and_never_a_later_one as c
+
+    c()
+
+
+def test_truth_7_504_dress_ship_holds_until_undress_ship_sunset_or_the_colours_coming_down():
+    """Package 102, step 4: `dress ship` by day hangs her flags (served and read), `undress
+    ship` takes them down, sunset and the colours coming down take them down of themselves;
+    refused by night, with her colours down, and below as the colours' orders are."""
+    from tests.test_flag_drawings import (
+        test_dress_ship_hangs_her_flags_until_undress_ship_sunset_or_the_colours_coming_down as a,
+    )
+    from tests.test_flag_drawings import test_dress_ship_is_refused_below_as_the_colours_are as b
+
+    a()
+    b()

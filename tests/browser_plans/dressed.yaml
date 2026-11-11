@@ -1,0 +1,14 @@
+# The ship dressed (package 102, step 4): the King's frigate dresses in the fashion of 1805,
+# her flags and pendants in the yards, the stays and the shrouds, and is drawn so; undressed,
+# they are gone.
+name: The ship dressed and undressed
+scenario: data/scenarios/blockade.yaml
+steps:
+  - {label: "ON DECK, dressed"}
+  - {say: dress ship, expect: {sent: order, answered: true, contains: dressed}}
+  - {tick: 30}
+  - {shot: dressed}
+  - {say: the flags, expect: {answered: true, contains: dressed}}
+  - {say: undress ship, expect: {answered: true}}
+  - {tick: 30}
+  - {shot: undressed}

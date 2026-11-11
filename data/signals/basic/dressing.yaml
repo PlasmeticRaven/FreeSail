@@ -1,0 +1,57 @@
+# FreeSail: the fashions of dressing ship (package 102, step 4; docs/design/Design-Signals.md,
+# "Dressing ship"). Read by freesail/world/flags.py (`load_dressing`): a root's own file where
+# it has one, else this one, which stands for every nation (the period's sources give one
+# fashion for Britain, France and Spain alike, and none of their own for the rest). Each
+# fashion is a dated row (decision 66): a ship dressed flies the fashion of the scenario's
+# year and never a later one; a year outside every row takes the nearest.
+#
+# A fashion's `hang` lists where the flags go, in order, each slot taking its flags from the
+# ship's stock in the order its `flags` names: `ensigns` (her nation's ensigns of her service,
+# and her jack: colours.yaml), `signal flags` (her book's flags of the year, flags.yaml, in
+# the file's order; a King's ship's only: a merchantman's stock is her colours), `pendants`
+# (her book's signal pendants, then her colours' pendant). The slots:
+#   `yardarms` with `yards`: each arm of each such yard (`lower`, `topsail`, `topgallant`,
+#     `royal`), a flag at each;
+#   `stays` with `stays` (`lower`, `topmast`, `topgallant`) and `flags_each`: that many flags
+#     hung along each such stay, evenly between its head and its foot;
+#   `rigging`: one flag in each mast's shrouds on each side;
+#   `line` with `through` (place words) and `flags_each`: flags along each span from one place
+#     to the next;
+#   `mastheads`: her ensign at each mast's truck.
+# The slots a ship lacks (a yard, a stay, a mast) take no flag; a slot whose stock is spent
+# takes none. No flag goes where it would denote a command not hers (Spain, 1748, art. XXV):
+# no slot is a truck but the later fashion's ensigns, and the colours fly as they do.
+
+fashions:
+  - name: "in the rigging"
+    words: "dressed with her flags and pendants in the yards, the stays and the shrouds"
+    dates: "-1883"
+    source: >-
+      Röding, Allgemeines Wörterbuch der Marine (1794), vol. I col. 596, FLAGGEN, "to dress a
+      ship": a ship at a solemnity hung with flags and pendants, made fast to the yards, stays,
+      shrouds, backstays and other rigging (read on the page); Babron, Précis (1817), "to dress
+      a ship with waist cloths, and a variety of flags and pendants"; the Spanish ordinances of
+      1748, art. XXV, the ships "de Gala" with their flags and pendants by custom, none where it
+      denotes a command not hers; Perrin, British Flags (1922), pp. 196-197: very few signal
+      flags carried; all the flags in a ship used, a junior officer's scheme until 1889. Which
+      flag at which yardarm and stay, and how many to a stay: JUDGEMENT (no source gives the
+      order). The waist cloths are not drawn (the viewer draws no cloth on the rail; said).
+    hang:
+      - {at: yardarms, yards: [lower], flags: [ensigns, signal flags]}
+      - {at: yardarms, yards: [topsail], flags: [signal flags]}
+      - {at: yardarms, yards: [topgallant], flags: [pendants, signal flags]}
+      - {at: stays, stays: [lower, topmast], flags_each: 3, flags: [signal flags, pendants]}
+      - {at: rigging, flags: [signal flags, ensigns]}
+  - name: "rainbow fashion"
+    words: "dressed rainbow fashion, a line of flags from the jib-boom over the mastheads to the peak"
+    dates: "1884-"
+    source: >-
+      Luce, Text-Book of Seamanship (1884), "Dressing ship": "rainbow or yard-arm fashion", the
+      rainbow an arch of flags from the water's edge to the jib-boom, the topgallant mastheads,
+      the spanker gaff and boom, the ensign at the mastheads; Perrin (1922), p. 197: the order of
+      the signal flags laid down in the Signal Manual from 1889. Not found before Luce: dated
+      from 1884 and never flown before it. The water's edge at each end not drawn (the line
+      begins at the jackstaff and ends at the peak); the flags in the file's order: JUDGEMENT.
+    hang:
+      - {at: line, through: [jackstaff, fore truck, main truck, mizen truck, peak], flags_each: 6, flags: [signal flags, pendants]}
+      - {at: mastheads, flags: [ensigns]}
