@@ -24707,6 +24707,20 @@ nothing here: the prize courts are by the port's nation, and the block's Spanish
 ports take the rows those nations had. A heading of package 98's in the truths' file, which
 this package's truths 7-362 to 7-368 stood under, stands once now, above 98's first truth.
 
+**The suites on the step's final tree, the package's close** (c36b918, one hash, the trunk at
+434c33c merged in it; a worktree pinned there; ruff check and format clean; every run started
+in the harness's background mode, the tiers as separate tasks under its two-hour cap;
+2026-11-10 and 11 UTC): the fast tier whole **exit 0** (23:53:50 to 00:43:53; 7,461 passed
+and the trunk's one expected failure, 508 slow tests left out); **the whole slow tier**, in
+two parts: the known truths, the profile and the Indefatigable, their files whole, **exit 0**
+(00:44:09 to 01:37:27; 545 passed and the trunk's eight expected failures), and every other
+file's slow tests **exit 0** (01:41:10 to 02:07:20; 297 passed and three expected failures);
+the pace tests alone and last **exit 0** (02:07:20 to 02:12:35; 15 passed, no floor lowered).
+Nothing skipped in any tier. The second part of the slow tier was begun at 01:37:55 and lost
+three minutes in when the container was restarted; it was begun again whole at 01:41:10 on the
+same tree, and the figures are that run's. The trunk gained the lead's briefs and records
+alone while these ran (to f3bf73d, the work packages' page) and was not chased.
+
 ### The package whole: what moved, and the suites
 
 The pins moved by the package, each with its reason, old beside new: 7-181 (step 2: the prize
