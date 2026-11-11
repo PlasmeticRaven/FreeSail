@@ -262,7 +262,13 @@ def test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_whi
     assert e.data.get("result") == "done", e.text
     pris = P.prisoners_of(enemy.ship)
     assert pris.parole["Captain Bowen"] == "refused"
-    assert "refuses his parole (the director's word)" in _kinds(enemy.log, "prize.parole")[0].text
+    # the captor's log's line, which the captive aboard her hears, is the world's: it names
+    # no director (old: "refuses his parole (the director's word): ...")
+    line = _kinds(enemy.log, "prize.parole")[0]
+    assert line.text == (
+        "Captain Bowen refuses his parole: the gunroom alone is his, a sentry at the door."
+    )
+    assert "director" not in line.text and "director" not in str(line.data).lower()
     e = w.world_order("aboard the Medusa: the parole of Mr Veale given", "the test")
     assert e.data.get("result") != "done" and "no prisoner aboard the Medusa" in e.text
 

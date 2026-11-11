@@ -94,6 +94,37 @@ def test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_capto
     assert any("Captain Bowen (given)" in row for row in truth["prisoners"])
 
 
+def test_no_served_line_or_reading_of_the_two_scenarios_names_the_director():
+    """85's rule over the package's two scenarios (the lead's finds of 2026-11-11): each
+    loaded, begun and run two hundred ticks, no line of any hull's log that is served (the
+    record-only lines left out, as the play log leaves them) and no reading of the prizes,
+    the prisoners, the prize crew, the prize money or the record names the director; the
+    prize's `how` is the world's word. The director's cause is in his own reply and the
+    journal."""
+    from freesail.core.events import for_the_record
+
+    for name, how in (("prize-home", "taken"), ("captive", "struck")):
+        sf = load_scenario(ROOT / "data" / "scenarios" / f"{name}.yaml")
+        w = make_scenario_world(sf)
+        begin(w, sf)
+        w.run(200)
+        prizes = [v for v in w.vessels.vessels if P.record_of(v)]
+        assert len(prizes) == 1 and P.record_of(prizes[0])["how"] == how, name
+        served = [e for hull in w.hulls.values() for e in hull.log if not for_the_record(e)]
+        if name == "captive":
+            # the player's own ship taken: the possession and the captive's lines are served
+            assert {"prize.possessed", "prize.captive"} <= {e.kind for e in served}
+        for e in served:
+            assert "director" not in e.text.lower(), (name, e.kind, e.text)
+        for hull in w.hulls.values():
+            with w.as_hull(hull):
+                for reading in ("prize", "prisoners", "prize_crew", "prize_money", "record"):
+                    words = w.readings.words(reading)
+                    assert "director" not in words.lower(), (name, hull.id, reading, words)
+        if name == "prize-home":
+            assert "the Deux Frères, taken, under " in w.readings.words("prize")
+
+
 def _by_order(w, description: str, nation: str, position, goal: str, intent: str, name: str):
     """A ship put on the sea by the director's form, so that a replay makes her again (a
     vessel a test adds by hand is in no journal)."""

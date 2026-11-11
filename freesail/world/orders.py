@@ -713,7 +713,11 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     if hull is not None and not hull.ship.extra.get("struck"):
         action.strike(hull, False, f"to the {captor.name}")
     taken.struck = True
-    by = "struck" if how.startswith("struck") else "made a prize by the director's word"
+    # the record's `how` is served (the reading `the prizes`, the possession's line, the
+    # loss in her captain's record, the truth's row): the world's word, "taken" or "struck";
+    # that it was the director's cause is in his own reply and the journal, which are the
+    # record's alone (85's rule; the lead's find of 2026-11-11)
+    by = "struck" if how.startswith("struck") else "taken"
     rec = P.possess(world, captor, taken, by=by, said=False)
     ports = getattr(getattr(world, "ports", None), "ports", {}) or {}
     goal = str(getattr(ports.get(str(rec.get("goal") or "")), "name", None) or "his company")
@@ -3354,7 +3358,9 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         parole = read_parole_form(_thing_words(body))
         if parole is not None:
             name, given = parole
-            text = set_parole(world, world, name, given, "the director's word")
+            # the line is the captor's log's, heard by the captive aboard her: it says what
+            # he did and names no director (85's rule; the lead's find of 2026-11-11)
+            text = set_parole(world, world, name, given, "")
             return text, {"parole": name, "given": given}
         tx = _transaction(body)
         if tx is not None:
