@@ -696,6 +696,11 @@ def possess(
         "role_was": role_was,
         "intent_was": intent_was,
         "men_at_start": complement,
+        # the sharers of the prize money (the design's §5.3; Lavery, p. 116): the ships at war
+        # with her in sight from her masthead at the strike, written there (`prize_court.
+        # note_in_sight`), and the captor's complement for the division
+        "in_sight": list(getattr(prize, "in_sight_at_strike", None) or []),
+        "captor_complement": _complement(captor),
         "manned": True,
         "crew": 0,
         "prisoners": complement,
@@ -763,6 +768,9 @@ def possess(
                 crew=old_crew, nation=nation_was, since=tick, parole={}
             )
             prize_hull.ship.extra["prisoners"].parole = _confine_people(prize_hull, tick)
+        from freesail.world.court import record_loss
+
+        record_loss(world, prize_hull, record)  # the loss in her captain's record (§7)
         record["crew"] = len(men)
         record["prisoners"] = (
             prisoners_of(prize_hull.ship).count if prisoners_of(prize_hull.ship) else 0
@@ -791,8 +799,30 @@ def possess(
             # from words (the design's §2.6)
             fill_far_prize(prize_hull, record, nation_was, tick)
     prize.prize = record
+    _no_enemy_now(captor, captor_hull, prize)
     _lines(world, captor, prize, record, said)
     return record
+
+
+def _no_enemy_now(captor: Any, captor_hull: Any, prize: Any) -> None:
+    """The taking clears the prize from what her captor knew her an enemy by: her shot at
+    him (`fired_on`), a pirate's act (`pirates`), the signal or the hail (`recognised`); she
+    is his prize from now and judged so (`Judgement._prize_of_ours`)."""
+    sid = str(prize.id)
+    judges = (
+        getattr(captor, "brain", None),
+        getattr(captor_hull, "captain", None) if captor_hull is not None else None,
+    )
+    for judge in judges:
+        if judge is None:
+            continue
+        for name in ("fired_on", "pirates"):
+            held = getattr(judge, name, None)
+            if isinstance(held, set):
+                held.discard(sid)
+        known = getattr(judge, "recognised", None)
+        if isinstance(known, dict) and (known.get(sid) or {}).get("enemy"):
+            known[sid] = {**known[sid], "enemy": False}
 
 
 def _service_of(captor: Any) -> str:
@@ -924,6 +954,11 @@ def fill_far_prize(hull: Any, record: dict[str, Any], nation_was: str, tick: int
     remuster(hull, new_crew)
     hull.ship.extra["prisoners"] = Prisoners(crew=old_crew, nation=nation_was, since=tick)
     hull.ship.extra["prisoners"].parole = _confine_people(hull, tick)
+    from freesail.world.court import record_loss
+
+    record_loss(
+        _root(hull.world), hull, record
+    )  # the loss in her captain's record (the design's §7)
     record["prisoners"] = old_crew_count = len(old_crew.sailors)
     people = getattr(hull, "people", None)
     master_name = str(record.get("master") or "")
@@ -1034,6 +1069,21 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
                 hull.ship.extra.pop("prisoners", None)
         _free_people(world, hull, rec, tick)
     rec["retaken"] = (how, by, tick)
+    if captor is not None:
+        rec["recaptor"] = str(captor.id)  # the salvors (the design's §5.2)
+        cb = getattr(captor, "brain", None)
+        if cb is not None:
+            # the recaptor's captain has his mark no more (package 74, step 4: wired, the
+            # far cruiser came up `engaging` and stayed so over a ship of his own nation):
+            # spoken, she is a stranger no more, and he resumes his passage
+            cb.spoken_ids.add(str(prize.id))
+            if str(getattr(cb, "_stranger", "") or "") == str(prize.id) and cb.state in (
+                "engaging",
+                "chasing",
+                "investigating a stranger",
+                "taking possession",
+            ):
+                cb._enter("on passage")
     prize.prize = rec
     _story(prize, tick, f"{how} ({by}): her own people have her again")
     if hull is not None:
@@ -1055,7 +1105,71 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
                 f"The {prize.name}, our prize, is {how} ({by}).",
                 data={"prize": str(prize.id), "how": how, "by": by},
             )
+    # the player's person his own ship's captain again: the mark of who he is is past
+    from freesail.world.captive import settle_person
+
+    settle_person(world)
     return rec
+
+
+def adversarial_seat_why(world: Any, vessel: Any, station: str) -> str | None:
+    """Why a model may not be seated at `station` of `vessel` (the design's §6): the
+    captain's station of a hull adversarial to a human, read from the world at the seating:
+    her nation at war with the nation of a hull a human holds (the player's own, or the hull
+    the player's person is on), or her holding a human's person as a prisoner (a prize
+    master's over a prize whose prisoners include him, the captor over a captive); None when
+    the seat is no such thing, or the flag `seats.ADVERSARIAL_SEATS_CONSENTED` is turned. A
+    passenger's voice aboard an enemy, a prisoner's, a lookout's fire into nobody."""
+    from freesail.agents.agent import CAPTAIN
+    from freesail.world import knowledge, seats
+    from freesail.world.captive import is_captive
+
+    if getattr(seats, "ADVERSARIAL_SEATS_CONSENTED", False) or vessel is None:
+        return None
+    if str(station or "").lower() not in (CAPTAIN, "the captain", "prize master"):
+        return None
+    root = _root(world)
+    nations = getattr(root, "nations", None)
+    hulls = getattr(root, "hulls", None) or {}
+    human_hulls: list[Any] = []
+    players = knowledge.player_hull(root)
+    if players is not None:
+        human_hulls.append(players)
+    person = None
+    try:
+        person = knowledge.players_person(root)
+    except Exception:  # noqa: BLE001
+        person = None
+    if person is not None:
+        on = hulls.get(str(getattr(person, "hull", "") or ""))
+        if on is not None and all(on is not h for h in human_hulls):
+            human_hulls.append(on)
+    her_hull = _hull(vessel)
+    human_names: list[str] = []
+    for h in human_hulls:
+        hv = getattr(h, "vessel", None)
+        if her_hull is not None and h is her_hull:
+            continue
+        his_nation = str(getattr(hv, "nation", "") or getattr(root.scenario, "nation", "") or "")
+        his_name = str(getattr(getattr(h, "ship", None), "name", "") or "the player's ship")
+        if nations is not None and his_nation and nations.at_war(str(vessel.nation), his_nation):
+            human_names.append(f"an enemy of the {his_name}'s")
+    if (
+        person is not None
+        and her_hull is not None
+        and str(getattr(person, "hull", "") or "") == str(her_hull.id)
+        and is_captive(person)
+    ):
+        human_names.append(f"who holds {person.name} her prisoner")
+    if not human_names:
+        return None
+    why = " and ".join(dict.fromkeys(human_names))
+    return (
+        "The consent brief names no role in which a model fires into a human's ship or takes "
+        "him prisoner; until it is revised and the question put again, the game seats no model "
+        f"as the captain of the {vessel.name}, {why}. Her rules-based captain and the "
+        "director's voice serve meanwhile (rule 4)."
+    )
 
 
 def _role_of(vessel: Any, intent_words: str | None) -> str:
@@ -1290,6 +1404,8 @@ def minute(hull: Any) -> None:
         from freesail.world.captive import minute as captive_minute
 
         captive_minute(hull)
+    if vessel is not None and rec:
+        _court_minute(hull, vessel, rec, tick)
     if pris is None or vessel is None or not rec or not is_prize(vessel):
         return
     if pris.in_irons(tick) or pris.count == 0:
@@ -1393,6 +1509,104 @@ def _rise(world: Any, hull: Any, vessel: Any, pris: Prisoners, rng: Any, tick: i
         )
 
 
+def _court_minute(hull: Any, vessel: Any, rec: dict[str, Any], tick: int) -> None:
+    """The prize court's road for a prize hull (the design's §5.2): lying in a port open to
+    her captor's nation she queues the port's job `prize_court`, due in the court's days by
+    the port's nation; a ship retaken by her own nation's cruiser queues the salvage sentence
+    the same; the reserved fourth is paid when its day comes."""
+    from freesail.world import prize_court as PC
+    from freesail.world.ports import Job
+
+    world = _root(hull.world)
+    if rec.get("court"):
+        due = rec.get("reserved_due")
+        if due is not None and tick >= int(due):
+            PC.pay_reserved(world, vessel)
+        return
+    if rec.get("court_due") is not None:
+        return
+    salvage = bool(rec.get("recaptor")) and not is_prize(vessel)
+    if not is_prize(vessel) and not salvage:
+        return
+    dealings = getattr(hull, "dealings", None)
+    port = dealings.in_port() if dealings is not None else None
+    if port is None:
+        return
+    nation = str(rec.get("captor_nation") or "")
+    if salvage:
+        recaptor = world.vessels.get(str(rec.get("recaptor") or ""))
+        nation = str(getattr(recaptor, "nation", "") or vessel.nation)
+    ports = getattr(world, "ports", None)
+    try:
+        stance = ports.stance(port, nation) if ports is not None else "open"
+    except Exception:  # noqa: BLE001
+        stance = "open"
+    if stance != "open":
+        if not rec.get("no_court_said"):
+            rec["no_court_said"] = tick
+            hull.record(
+                Severity.NOTABLE,
+                "prize.no_court",
+                f"{port.name} is {stance} to the captors: no court sits for the {vessel.name} "
+                "here; she lies in the road.",
+                data={"port": port.id, "stance": stance},
+            )
+        return
+    days = PC.court_days(port)
+    due = tick + days * 86400
+    rec["court_due"] = due
+    rec["court_port"] = port.id
+    dealings.jobs.append(
+        Job(
+            due,
+            "prize_court",
+            port.id,
+            {"prize": str(vessel.id), "salvage": salvage},
+            words=f"the court on the {vessel.name}",
+            hull=str(hull.id),
+        )
+    )
+    hull.record(
+        Severity.NOTABLE,
+        "prize.court_sits",
+        f"The {vessel.name} is brought in at {port.name}: {PC.court_name(port, False)} will sit "
+        f"on her in {days} days.",
+        data={"port": port.id, "due": due, "salvage": salvage},
+    )
+
+
+def _far_court(world: Any, v: Any, rec: dict[str, Any], tick: int) -> None:
+    """A far prize with no hull in her goal's road (the design's §5.2): the court sits on her
+    record in the court's days, the sentence as a hull's."""
+    from freesail.world import prize_court as PC
+
+    if rec.get("court"):
+        due = rec.get("reserved_due")
+        if due is not None and tick >= int(due):
+            PC.pay_reserved(world, v)
+        return
+    ports = getattr(world, "ports", None)
+    table = getattr(ports, "ports", {}) or {}
+    port = table.get(str(rec.get("goal") or ""))
+    if port is None or v.position is None:
+        return
+    due = rec.get("court_due")
+    if due is None:
+        _, d = _bearing_distance(v.position, port.outer_road.position)
+        if d > float(getattr(port, "reach_nm", 2.0)) * units.NAUTICAL_MILE:
+            return
+        rec["court_due"] = tick + PC.court_days(port) * 86400
+        rec["court_port"] = port.id
+        _story(v, tick, f"brought in at {port.name}: the court sits in {PC.court_days(port)} days")
+    # she lies in the road until the court has sat (a far body whose plan runs out is done
+    # and gone from the sea at the minute's end; the court's days keep her)
+    v.done = False
+    v.plan = [("lie_to", math.inf)]
+    if tick >= int(rec["court_due"]):
+        PC.sentence(world, v, port)
+        v.done = True  # her business on the sea is over: in port, sentenced
+
+
 def _over_down(vessel: Any, tick: int) -> None:
     """The captor's colours over hers hauled down after a day (the sign of a prize new taken)."""
     locker = getattr(vessel, "signals", None)
@@ -1444,7 +1658,12 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
         )
     for v in list(sea.vessels):
         rec = record_of(v)
-        if v.done or not rec or not is_prize(v) or _hull(v) is not None:
+        if not rec or not is_prize(v) or _hull(v) is not None:
+            continue
+        if v.done and not (rec.get("court_due") and not rec.get("court")):
+            continue
+        _far_court(world, v, rec, tick)
+        if v.done or not is_prize(v):
             continue
         # the counts' rising: the same odds on the record, the losses as counts
         last = int(rec.get("rising_judged", rec.get("taken_at", tick)))

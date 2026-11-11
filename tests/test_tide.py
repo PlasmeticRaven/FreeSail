@@ -330,7 +330,7 @@ MED_WEST_CURRENTS = [
 ]
 # package 79d: the Mediterranean blocks' charts, whose areas carry the coasts' constant sets
 # and no tide (`current:` alone), and their areas' ids
-MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian"}
+MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian", "catalan-coast"}  # 101
 MEDITERRANEAN_AREAS = (
     "provence-current",
     "gulf-of-lion-open",
@@ -339,6 +339,8 @@ MEDITERRANEAN_AREAS = (
     "ligurian-sea-open",
     "roman-coast-current",
     "tyrrhenian-open",
+    "catalan-coast-set",  # package 101
+    "catalan-coast-open",
 )
 
 
@@ -485,9 +487,10 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
     assert all(a.chart in names for a in tide.areas), [a.chart for a in tide.areas]
     # the Channel's areas as package 34 and 37e made them, and the blocks' beside them
     channel = [a.id for a in tide.areas if a.chart == "channel-west"]
-    # package 43b: fourteen with Torbay
+    # package 43b: fourteen with Torbay; package 98, step 5: fifteen with the Rade de Brest
+    # after the Goulet (was 14)
     assert (
-        len(channel) == 14 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
+        len(channel) == 15 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
     )
     # package 39a: the Channel east's areas lie east of 3 W, where no Channel west
     # position reaches, and come before the open Channel, whose bounds hold them
@@ -1101,7 +1104,8 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 75
+    # package 101: Barcelona's, the Catalan coast's
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 76
     for g in blocks:
         # its own block first (a list's further blocks are the rule of the seams': below)
         own = g["block"][0] if isinstance(g["block"], list) else g["block"]
@@ -1123,6 +1127,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         "ligurian-sea",
         "tyrrhenian",
         "solent",  # package 94: a tide region of the manifest, bounds and no tiles
+        "catalan-coast",  # package 101
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None

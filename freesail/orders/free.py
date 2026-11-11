@@ -42,6 +42,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
 from freesail.orders.prompt import world_of
 
@@ -51,6 +52,10 @@ Result = tuple[str, str, dict[str, Any]]
 
 # The log's kind for a free line, and the words of a line accepted as said.
 FREE_KIND = "free.line"
+# A letter's words shown its reader, and its writer's own shown him (package 100): lines of
+# the reach `reader` (`world.knowledge`), the person named and nobody else.
+READ_KIND = "free.read"
+WRITTEN_KIND = "free.written"
 AS_SAID = "as said; nothing of the ship's changed"
 
 # Each free verb phrase in the past, for the log's line in the words as used.
@@ -70,7 +75,27 @@ PAST: dict[str, str] = {
     "read": "read",
     "throw": "threw",
     "toss": "tossed",
+    # package 100
+    "write": "wrote",
+    "write a letter": "wrote a letter",
+    "pen": "penned",
+    "seal": "sealed",
+    "seal up": "sealed up",
+    "examine": "examined",
+    "look at": "looked at",
+    "inspect": "inspected",
+    "look over": "looked over",
+    "burn": "burnt",
+    "tear up": "tore up",
+    "tear": "tore",
+    "rip up": "ripped up",
+    "destroy": "destroyed",
 }
+
+# The verbs of a thing with words (package 100), carried out by `_letter_act`.
+LETTER_VERBS = frozenset({"write", "seal", "open", "read", "examine", "burn", "tear up"})
+# How a thing destroyed went, by the verb as said.
+_GONE_WORDS = {"burn": "burnt", "destroy": "destroyed"}
 
 # The words a thing is put in, on or under something by (stow, hide, put).
 _PUT_PREPS = ("in", "into", "on", "onto", "under", "inside", "behind", "beneath", "upon", "at")
@@ -119,7 +144,22 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
     rest, done = _said_words(text, phrase)
     if not rest:
         raise OrderError(f"{phrase.capitalize()} what? Say the words after '{phrase}'.")
-    moved, outcome, why, thing, to = _carry_out(world, person, verb, rest)
+    act = _letter_act(ship, world, person, verb, phrase, rest)
+    said_as = " ".join(str(text).split())
+    then: list[tuple[Any, ...]] = []
+    if act is not None:
+        moved, outcome, why, thing, to = (
+            act["moved"],
+            act["outcome"],
+            act["why"],
+            act["thing"],
+            None,
+        )
+        done = act.get("done") or done
+        said_as = act.get("said") or said_as
+        then = act.get("then") or []
+    else:
+        moved, outcome, why, thing, to = _carry_out(world, person, verb, rest)
     where = movement.where_words(world, person)
     who = _who(world, person)
     if moved:
@@ -132,7 +172,7 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
     here = TH._where_of_person(world, person)
     data: dict[str, Any] = {
         "verb": verb,
-        "said": " ".join(str(text).split()),
+        "said": said_as,
         "person": person.name,
         "place": here[0],
         "moved": moved,
@@ -143,6 +183,14 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
         data["thing"] = thing.id
     if to is not None:
         data["to"] = to.name
+    if said_as != " ".join(str(text).split()):
+        from freesail.core.world import ORDER_AS_SAID
+
+        data[ORDER_AS_SAID] = said_as  # the order said without the letter's words
+    if then:
+        from freesail.core.world import THEN_LINES
+
+        data[THEN_LINES] = then
     return FREE_KIND, line, data
 
 
@@ -304,6 +352,149 @@ def _carry_out(world: Any, person: Any, verb: str, rest: str) -> tuple[bool, str
         return False, "", why, thing, None
     TH.put(thing, where)
     return True, f"{thing.the} is {TH.where_words(world, thing)}", "", thing, None
+
+
+# ---------------------------------------------------------------------------
+# A thing with words (package 100)
+# ---------------------------------------------------------------------------
+
+_WRITE = re.compile(
+    r"^(?:(?:a|the)\s+)?(?:letter\s+)?(?:to|for)\s+(?P<to>[^:]+?)\s*:\s*(?P<words>.+)$", re.I
+)
+_QUOTED = "\"'“”‘’"
+
+
+def _letter_act(
+    ship: Any, world: Any, person: Any, verb: str, phrase: str, rest: str
+) -> dict[str, Any] | None:
+    """A free line of a thing with words (package 100): written, sealed, opened, read,
+    looked at, burnt or torn up; {moved, outcome, why, thing, done, said, then}, or None
+    where the verb is no such (and `open` and `read` of a thing that is no letter, which
+    move nothing and are said as they always were)."""
+    from freesail.world import things as TH
+
+    if verb not in LETTER_VERBS:
+        return None
+    if verb == "write":
+        return _write(ship, world, person, phrase, rest)
+    thing = _one(world, person, rest)
+    out: dict[str, Any] = {"moved": False, "outcome": "", "why": "", "thing": thing}
+    if thing is None:
+        return out
+    if verb in ("open", "read") and not thing.is_letter:
+        return None
+    why = TH.reach_why(world, person, thing)
+    if why:
+        out["why"] = why
+        return out
+    the = thing.the
+    if verb == "examine":
+        out["moved"] = True
+        out["outcome"] = TH.seen_words(world, thing)
+        return out
+    if verb == "seal":
+        if not thing.is_letter:
+            out["why"] = f"{the} is no letter to seal"
+        elif thing.broken:
+            out["why"] = "its seal is broken, and it shows; no new seal hides it"
+        elif thing.sealed:
+            out["why"] = f"{the} is sealed already"
+        else:
+            thing.sealed = True
+            out["moved"] = True
+            out["outcome"] = f"{the} is sealed"
+        return out
+    if verb == "open":
+        if thing.broken:
+            out["why"] = f"its seal is broken already; 'read the {thing.head}'"
+        elif not thing.sealed:
+            out["why"] = f"{the} is not sealed; 'read the {thing.head}'"
+        else:
+            thing.broken = True
+            out["moved"] = True
+            out["outcome"] = f"the seal of {the} is broken, and it shows"
+        return out
+    if verb == "read":
+        if thing.sealed and not thing.broken:
+            out["why"] = (
+                f"{the} is sealed; it is read only by breaking its seal ('open the "
+                f"{thing.head}'), which shows"
+            )
+            return out
+        out["moved"] = True
+        out["outcome"] = f"{the} read"
+        out["then"] = [
+            (
+                Severity.NOTABLE,
+                READ_KIND,
+                TH.letter_words(thing),
+                {"to": person.name, "thing": thing.id, "place": "", "reader": person.name},
+            )
+        ]
+        return out
+    # burn, tear up
+    if not thing.is_paper:
+        out["why"] = f"{the} is no paper to {phrase}; throw it overboard"
+        return out
+    if verb == "burn" and person.where == "boat":
+        out["why"] = "there is no fire in the boat to burn it; tear it up, or throw it overboard"
+        return out
+    gone = _GONE_WORDS.get(phrase, "burnt" if verb == "burn" else "torn up")
+    TH.put(thing, {"place": TH.GONE})
+    thing.gone = gone
+    out["moved"] = True
+    out["outcome"] = f"{the} is {gone}, and gone"
+    return out
+
+
+def _write(ship: Any, world: Any, person: Any, phrase: str, rest: str) -> dict[str, Any]:
+    """`write a letter to <whom>: "<words>"` by the drafting's road (package 100; `books`):
+    the writer's mark and the hour, the captain gone below to his table and at his writing;
+    the letter in the writer's keeping, its words shown to him, the line heard without
+    them."""
+    from freesail.world import books
+    from freesail.world import things as TH
+
+    m = _WRITE.match(rest.strip())
+    if m is None:
+        raise OrderError(
+            "Write what, and to whom? Say 'write a letter to <whom>: \"<its words>\"'."
+        )
+    to = " ".join(m.group("to").split()).strip(_QUOTED + " ")
+    words = " ".join(m.group("words").split()).strip()
+    if len(words) >= 2 and words[0] in _QUOTED and words[-1] in _QUOTED:
+        words = words[1:-1].strip()
+    if not to or not words:
+        raise OrderError(
+            "Write what, and to whom? Say 'write a letter to <whom>: \"<its words>\"'."
+        )
+    from freesail.world.captive import is_captive
+
+    if not is_captive(person):
+        books._in_the_cabin(ship, world)  # the captain's writing is done at his table
+    name = f"a letter to {to}"
+    thing = TH.Thing(TH._new_id(world, name), name)
+    thing.words, thing.author, thing.to, thing.written = words, person.name, to, books._stamp(world)
+    TH.addressed(world, thing)
+    TH.put(thing, {"keeper": person.id, "keeper_home": str(getattr(person, "home", "") or "")})
+    TH.things_of(world).append(thing)
+    said = f"{phrase} {rest[: m.start('words')].rstrip().rstrip(':').strip()}"
+    return {
+        "moved": True,
+        "outcome": f"the letter is in {_who(world, person)}'s keeping",
+        "why": "",
+        "thing": thing,
+        "done": f"wrote a letter to {to}",
+        "said": " ".join(said.split()),
+        "then": [
+            (
+                Severity.NOTABLE,
+                WRITTEN_KIND,
+                f'Your letter to {to}, as written: "{words}"',
+                {"to": person.name, "thing": thing.id, "place": "", "writer": person.name},
+            )
+        ],
+    }
 
 
 def _one(world: Any, person: Any, words: str) -> Any:

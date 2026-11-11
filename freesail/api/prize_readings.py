@@ -164,7 +164,65 @@ def _prize_crew(world: Any, _: str | None) -> dict[str, Any] | None:
     }
 
 
+def _prize_money(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The prize accounts of this ship (the design's §5.3): the last court's sentence and
+    the money paid, by the eighths; 'no prize money'."""
+    from freesail.world.prize_court import accounts_of
+
+    accounts = accounts_of(world)
+    if not accounts:
+        return {"words": "no prize money", "count": 0, "accounts": []}
+    last = accounts[-1]
+    if last.get("sentence") == "restored":
+        words = (
+            f"the {last.get('name')} restored by {last.get('court')}: costs and damages "
+            f"£{float(last.get('costs', 0.0)):,.0f} against us"
+        )
+    else:
+        shares = last.get("shares") or []
+        ours = shares[0] if shares else {}
+        classes = ", ".join(f"{n} £{p:,.0f}" for n, p in (ours.get("classes") or []))
+        words = (
+            f"the {last.get('name')} {last.get('sentence')} by {last.get('court')}: "
+            f"£{float(ours.get('pounds', 0.0)):,.0f} paid by the eighths ({classes})"
+        )
+        if float(last.get("reserved", 0.0) or 0.0):
+            words += f"; a fourth, £{float(last['reserved']):,.0f}, reserved"
+    total = sum(float((a.get("shares") or [{}])[0].get("pounds", 0.0) or 0.0) for a in accounts)
+    if len(accounts) > 1:
+        words += f"; {number_words(len(accounts))} accounts in all, £{total:,.0f} paid"
+    return {"words": words, "count": len(accounts), "paid": total, "accounts": accounts}
+
+
+def _record(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The record of the one who asks (the design's §7): the losses, the courts, the verdicts,
+    the appointments; 'no record'."""
+    from freesail.world import court as CM
+    from freesail.world.movement import person_of_actor
+
+    person = person_of_actor(world, "captain")
+    words = CM.record_words(world, person)
+    return {
+        "words": words,
+        "person": getattr(person, "name", None),
+        "entries": [dict(e) for e in CM.record_of(person)] if person is not None else [],
+    }
+
+
 def register() -> None:
+    R.REGISTRY.add(
+        R.Reading(
+            "record",
+            ("the record", "my record", "the captain's record"),
+            "state",
+            "",
+            _record,
+            description="the record of the one who asks: the losses, the courts martial and "
+            "their verdicts, the appointments; 'no record'",
+            none_words=_no_muster_words,
+            where=("deck", "cabin", "shore", "boat"),
+        )
+    )
     R.REGISTRY.add(
         R.Reading(
             "prize",
@@ -205,7 +263,23 @@ def register() -> None:
             where=("deck", "cabin"),
         )
     )
+    R.REGISTRY.add(
+        R.Reading(
+            "prize_money",
+            ("the prize money", "the prize account"),
+            "state",
+            "",
+            _prize_money,
+            description="the prize accounts of this ship: the last court's sentence and the money "
+            "paid by the eighths; 'no prize money'",
+            none_words=_no_muster_words,
+            where=("deck", "cabin"),
+        )
+    )
     R._event(R.EventSpec("she is taken", "prize.taken"))
+    R._event(R.EventSpec("the prize money", "prize.money"))
+    R._event(R.EventSpec("the court sits", "prize.court_sits"))
+    R._event(R.EventSpec("the sentence", "prize.sentenced"))
     R._event(R.EventSpec("possession taken", "prize.possessed"))
     R._event(R.EventSpec("the prisoners rising", "prize.rising"))
     R._event(R.EventSpec("the prize retaken", "prize.retaken"))
@@ -218,3 +292,10 @@ def register() -> None:
     R._event(R.EventSpec("the parole given", "prize.parole"))
     R._event(R.EventSpec("the prisoners landed", "prize.prisoners_landed"))
     R._event(R.EventSpec("the cartel", "prize.cartel"))
+    # the far fight (the design's §4.5): an action heard off the horizon
+    R._event(R.EventSpec("the sound of guns", "action.guns_heard"))
+    # the court martial and a new command (the design's §7)
+    R._event(R.EventSpec("the court martial sits", "court.sits"))
+    R._event(R.EventSpec("the verdict", "court.verdict"))
+    R._event(R.EventSpec("a new command", "command.new"))
+    R._event(R.EventSpec("the exchange", "prize.exchanged"))

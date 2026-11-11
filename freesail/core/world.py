@@ -110,6 +110,9 @@ class Scenario:
     ship_y: float = 0.0
     ship_heading_deg: float = 0.0
     ship_speed_kn: float = 0.0
+    # her name where the scenario gives one other than her file's (package 74, step 6: a
+    # new command's scenario names the ship the service gave him); None keeps the file's
+    ship_name: str | None = None
     # The sun's latitude (spec M4 §5): 50 N, the Channel. Saved and restored with the rest;
     # a save from before the sun loads with the default.
     latitude_deg: float = DEFAULT_LATITUDE_DEG
@@ -351,6 +354,10 @@ RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 # A person's own needs (package 54: `eat`, `drink`, `sleep`, `how am I`) are answered to
 # him the same way: the needs show only to the person stationed, never in the log.
 UNLOGGED_KINDS = frozenset({"query.slate", "director.answer", "needs.answer"})
+# The keys of an order's result that the World reads and takes out before the line is written
+# (package 100): the order's words as the log says them, and the lines after its own.
+ORDER_AS_SAID = "order_as_said"
+THEN_LINES = "then_lines"
 
 # The observer's refusal (package 82, item 1): an order at the hull of no ship.
 NO_SHIP_FOLLOWED = (
@@ -2061,23 +2068,32 @@ class World:
             return self.record(Severity.ROUTINE, kind, log_text, actor=actor, data=data)
         if not standing and not station:
             self.journal.append((self.clock.tick, actor, text))
+        # the order as the log says it (package 100): a letter's words are its reader's, so
+        # an order that writes one is said without them (`free.write`); the journal keeps it
+        # whole, for the replay
+        shown = str(data.pop(ORDER_AS_SAID, "") or text)
+        then = data.pop(THEN_LINES, None) or ()
         accepted = self.record(
             Severity.NOTABLE if standing and not routine else Severity.ROUTINE,
             "order.accepted",
-            f"{said}." if said else f"Order: {text}.",
+            f"{said}." if said else f"Order: {shown}.",
             actor=actor,
-            data={"order": text},
+            data={"order": shown},
         )
         captain = getattr(self, "captain", None)
         if (
             captain is not None
             and actor == "captain"
             and not kind.startswith(("agent.", "seat.", "query.", "free."))
+            and kind != "person.spoke"
+            and self._hand_on_her(actor)
         ):
             # the player's hand on an intent scenario (decision 41; package 40c): an order
             # of the ship's at the prompt, not a station's sentence nor a reading, and the
             # rules-based captain stands aside until 'captain: carry on'; a free line
-            # (package 53b) is a person's own and no order of the ship's
+            # (package 53b) is a person's own and no order of the ship's, and so is a word
+            # said, on any hull (`person.spoke`; the lead's word of 2026-11-10); nor are the
+            # words of a captive or a visitor aboard a hull that is not his (package 74)
             captain.player_hand(text)
         if kind == "evolution.started" and not data.get("failed"):
             # the evolution runner writes its own "started" line; avoid saying it twice
@@ -2088,8 +2104,17 @@ class World:
         notable = kind in NOTABLE_ORDER_KINDS or bool(data.get("notable"))
         severity = Severity.NOTABLE if notable else Severity.ROUTINE
         event = self.record(severity, kind, log_text, actor=actor, data=data)
+        for line_severity, line_kind, line_text, line_data in then:
+            # the lines that follow the order's own (package 100: a letter's words shown its
+            # reader after the line that says he read it)
+            self.record(line_severity, line_kind, line_text, actor=actor, data=line_data)
         self._after_order()
         return event
+
+    def _hand_on_her(self, actor: str) -> bool:
+        from freesail.world.movement import hand_on_her
+
+        return hand_on_her(self, actor)
 
     def record_driver(
         self,
@@ -2413,6 +2438,13 @@ class World:
             from freesail.world.prizes import minute as prize_minute
 
             prize_minute(self.own)
+            if self.is_followed and self.__dict__.get("court_martial"):
+                # a court martial sitting (package 74, step 6): dissolved in words where
+                # its accused is dead or gone from the world; a shared part of the tick, run
+                # for the followed hull alone, whose log has the court's other lines
+                from freesail.world.court import minute as court_minute
+
+                court_minute(self)
             # the fishery once a minute (package 56): the gear in the water fishing, the
             # catch's spoilage and its day line; nothing on a ship with no gear
             fishery = getattr(self, "fishery", None)

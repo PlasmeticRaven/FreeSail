@@ -40,6 +40,8 @@ SLOW_THRESHOLD_S = 5.0  # judgement: the fast tier in a few minutes on four load
 # build, and is charged to whichever of its tests happens to run first, so every test
 # that reads one is slow whatever its own time.
 DAY_FIXTURES: dict[str, frozenset[str]] = {
+    # package 98, step 1: the browser probe's plans, each a game served and played in Chromium
+    "test_browser_probe.py": frozenset({"probe_browser"}),
     "test_known_truths.py": frozenset(
         {
             "frigate_polar",
@@ -234,6 +236,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_reef_speeds_up",
         "test_known_truths.py::test_the_cutter_and_the_brig_sail_through_the_same_orders[data/ships/brig.yaml]",
         "test_known_truths.py::test_the_cutter_and_the_brig_sail_through_the_same_orders[data/ships/cutter.yaml]",
+        # package 98, step 3: every file's guns and every root's ensign at 48 views each
+        "test_known_truths.py::test_truth_7_450_a_port_guns_inboard_figures_are_behind_its_side_and_lid",
+        "test_known_truths.py::test_truth_7_451_every_roots_ensign_paints_as_one_flag_in_its_order",
         "test_known_truths.py::test_the_pace_on_the_day_under_systems_holds_truth_51s_floor",
         "test_known_truths.py::test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor",
         "test_known_truths.py::test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning",
@@ -487,6 +492,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_290_the_seam_at_5_w_is_crossed_with_the_business_carried",
         "test_known_truths.py::test_truth_7_291_the_seam_between_the_blocks_two_regions_is_crossed_likewise",
         "test_known_truths.py::test_truth_7_294_the_frigate_sails_from_gibraltar_to_port_mahon_by_her_short_book",
+        # package 101: the seams crossed with the business, the business's half day, the
+        # scenario sailed
+        "test_known_truths.py::test_truth_7_491_a_ship_from_the_balearics_crosses_40_56_n_into_the_catalan_coast",
+        "test_known_truths.py::test_truth_7_492_a_ship_from_the_gulf_crosses_3_e_into_the_catalan_coast",
+        "test_known_truths.py::test_truth_7_498_the_business_carries_the_alfaques_salt_to_barcelona",
+        "test_known_truths.py::test_truth_7_499_the_frigate_sails_from_port_mahon_to_tarragonas_road_by_her_short_book",
         # package 79d: Agincourt Sound's six hours in a north-wester (20 s alone, 2026-10-29)
         "test_known_truths.py::test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester",
         # package 82b: the door that follows its harness, a brig brought within a boat's pull

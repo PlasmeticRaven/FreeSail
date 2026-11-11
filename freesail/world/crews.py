@@ -320,7 +320,13 @@ def make_hull(world: World, vessel: Any) -> Any:
 
     world = world_of(world)  # the one World, whatever handle asks (package 97)
     temp = CrewedWorld(world, vessel)
-    return adopt_hull(world, vessel, temp)
+    hull = adopt_hull(world, vessel, temp)
+    if getattr(vessel, "damage", None):
+        # the far record's counts into her parts (package 74, step 4; the design's §4.4)
+        from freesail.combat.far_action import far_damage_into_parts
+
+        far_damage_into_parts(hull, vessel.damage)
+    return hull
 
 
 def adopt_hull(world: World, vessel: Any, temp: Any) -> Any:
@@ -588,6 +594,11 @@ def _to_full(vessel: Any) -> None:
     crew.awake = True
     vessel.detail = "crewed"
     mirror_far(crew)
+    if getattr(vessel, "damage", None):
+        # what the far rounds did to her while she slept, into her parts (package 74, step 4)
+        from freesail.combat.far_action import far_damage_into_parts
+
+        far_damage_into_parts(crew, vessel.damage)
     if _sail_state_of(crew) != vessel.sail_state:
         _set_sail(crew, vessel.sail_state)
     if crew.navigation is not None and crew.position is not None:
@@ -637,6 +648,13 @@ def write_damage(vessel: Any, crew: CrewedWorld) -> None:
     d["spars_gone"] = sum(1 for sp in ship.spars.values() if getattr(sp, "wrecked", False))
     d["sails_blown_out"] = sum(1 for sl in ship.sails.values() if sl.state == SailState.BLOWN_OUT)
     d["slept_at"] = int(crew.parent.clock.tick)
+    # what her parts show is carried in already (package 74, step 4: the far rounds' sums
+    # added while she sleeps are what the wake applies to the parts, `far_damage_into_parts`;
+    # before this the demotion's own sums were applied again at the wake, the wounded twice)
+    d["carried_in"] = {
+        k: int(d.get(k, 0) or 0)
+        for k in ("killed", "wounded", "dismounted", "holes", "holes_below", "spars_gone")
+    } | {"sail_cut": float(d.get("sail_cut", 0.0) or 0.0)}
 
 
 def demote(world: World, vessel: Any) -> None:
@@ -698,6 +716,27 @@ def release_done(world: World) -> None:
 
 def _dealing(world: World, vessel: Any) -> bool:
     return vessel.dealing_tick >= 0 and world.clock.tick - vessel.dealing_tick <= DEALING_S
+
+
+def _in_action(world: World, vessel: Any) -> bool:
+    """A vessel in an engagement (package 74, step 4; the design's §4.5): her brain or her
+    captain in `engaging` or `taking possession`, struck within the hour, or the mark of a
+    ship engaging her."""
+    from freesail.combat.far_action import ACTION_STATES, struck_within_hour
+
+    brain = getattr(vessel, "brain", None)
+    state = getattr(brain, "state", None)
+    crew = getattr(vessel, "crew", None)
+    if crew is not None and getattr(crew, "shape", "") == "full":
+        state = getattr(getattr(crew, "captain", None), "state", state)
+    if state in ACTION_STATES or struck_within_hour(world, vessel):
+        return True
+    vid = str(vessel.id)
+    for o in world.vessels.vessels:
+        ob = getattr(o, "brain", None)
+        if ob is not None and ob.state == "engaging" and str(ob._stranger or "") == vid:
+            return True
+    return False
 
 
 def enforce_budgets(world: World) -> None:
@@ -821,9 +860,11 @@ def switch(world: World) -> None:
         return _dealing(world, v) or (always and _stationed(v))
 
     def rank(v: Any) -> int:
-        # the cap's order: dealings and a hull a model holds first (package 82b), then a
-        # stationed hull, then the rest
-        if _dealing(world, v) or model_held(v):
+        # the cap's order: dealings and a hull a model holds first (package 82b), an
+        # engagement with them (package 74, step 4: a ship engaging, taking possession or
+        # struck within the hour, and the mark of an engaging ship), then a stationed hull,
+        # then the rest
+        if _dealing(world, v) or model_held(v) or _in_action(world, v):
             return 0
         return 1 if _stationed(v) else 2
 

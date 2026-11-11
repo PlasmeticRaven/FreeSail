@@ -62,7 +62,10 @@ __all__ = [
     "all_known",
     "as_heard",
     "elsewhere_words",
+    "as_the_owner_sees",
     "hears",
+    "his_own",
+    "owners_world_order",
     "is_asleep",
     "player_hull",
     "players_person",
@@ -234,7 +237,12 @@ def station_senses(world: Any, station: str, person: Any = None) -> Senses:
 #   place    within earshot of the place the line's data names, and the deck
 #   port     the persons ashore at the port the line names, and the deck of a hull there
 #   record   the record's and the driver's lines, which reach whoever the record reaches
+#   reader   the person the line names (`to`) and nobody else, asleep or awake, with no
+#            fallback to a place (package 100: a letter's words shown its reader, a
+#            writer's own words shown him)
 REACH: dict[str, str] = {
+    "free.read": "reader",
+    "free.written": "reader",
     "clock.bell": "aboard",
     "watch.relieved": "aboard",
     "watch.deck_passed": "deck",
@@ -296,7 +304,7 @@ REACH: dict[str, str] = {
     "health.invalided": "deck",
     "message.aboard": "deck",
     "message.door": "person",
-    "message.received": "person",
+    "message.received": "reader",  # the words read at the door, the captain's (package 100)
     "message.by": "person",
     "message.at": "port",
     "person.sent_for": "person",
@@ -322,6 +330,7 @@ REACH: dict[str, str] = {
     "stores.out": "aboard",
     "hold.freighted": "place",
     "thing.landed": "port",
+    "thing.handed": "port",  # a letter given from the boat to its addressee ashore (100)
     "boat.at_quay": "port",
     "market.bargain": "port",
     "market.bought": "port",
@@ -341,6 +350,12 @@ REACH: dict[str, str] = {
     "needs.answer": "person",
     "needs.felt": "person",
     "log.rollup": "record",
+    # package 74 (step 6): an appointment and an exchange are the port's news, said ashore
+    # where the man stands (each line's data names the shore and the port): he and the
+    # persons ashore at that port have them, and no ship's deck is woken by them (the
+    # `prize` family wakes a ship; these two are not her business)
+    "command.new": "said",
+    "prize.exchanged": "said",
     "log.read": "record",
     # the report, the call and the boat's report (step 3 writes them; placed first)
     "report.made": "person",
@@ -358,6 +373,10 @@ FAMILIES: dict[str, str] = {
     "action": "wakes",
     "small_arms": "wakes",
     "prize": "wakes",  # package 74: she is taken, the prisoners rising, the prize retaken
+    # package 74 (step 6): the court martial's lines are words said before the court, heard
+    # by the persons ashore at its port (each line's data names the shore and the port) and
+    # on no ship's deck
+    "court": "said",
     "marines": "aboard",
     "evolution": "aft",
     "sail": "aft",
@@ -530,6 +549,17 @@ def reaches(world: Any, senses: Senses, e: Any) -> bool:
     kind = str(getattr(e, "kind", "") or "")
     cls = reach_of(kind)
     data = getattr(e, "data", None) or {}
+    if cls == "reader":
+        # a letter's words (package 100): the reader's, whoever and wherever he is, by his
+        # name whole (a surname shared is no reader)
+        person = senses.person
+        name = str(getattr(person, "name", "") or "")
+        to = _names(data, "to")
+        if not to:
+            # a letter come aboard read at the door (`message.received`): the captain's,
+            # whose it is; nobody's beside him, wherever he reads it (step 2)
+            return person is not None and _is_captain(world, person)
+        return bool(name) and to.lower() == name.lower()
     if senses.asleep:
         # a sleeper perceives nothing but what wakes him (the brief's list: the call, all
         # hands, a gun, the ship striking, and nothing else; 54 and 66 let a word or a
@@ -827,6 +857,15 @@ def players_person(world: Any) -> Any:
     seat = _seat(world)
     if seat is not None:
         return _seat_person(root, seat)
+    from freesail.world.captive import remembered_person
+
+    remembered = remembered_person(root)
+    if remembered is not None:
+        # freed (exchanged, landed by a cartel), he is the player's person still while his
+        # own ship has a prize master for her captain (package 74, step 6): after the seat,
+        # which is the player's own choice of person, and only while the mark stands (it is
+        # past once he is her captain again, and the checks below read as they did)
+        return remembered
     hull = player_hull(root)
     if hull is None:
         return None
@@ -913,13 +952,70 @@ def players_senses(world: Any) -> Senses:
     return senses_of(root, person)
 
 
+# The player's own lines (package 98, step 2; the owner's ruling of 2026-11-09): what is not
+# in the world, made by the man at the prompt, is always shown him wherever he stands, asleep
+# or awake: his readings (`query.*`, the information calls), his orders' acknowledgements
+# and refusals (`order.*`), his own word (the words' kinds said by him: `say`, `tell` and
+# `ask`, a word said below directly to another station among them) and the seat's lines of
+# his own (a refusal by the station's authority, an answer he gave). What is done in the
+# world out of his sight is not shown him by this, and is not reported of itself.
+OWN_FAMILIES: tuple[str, ...] = ("query.", "order.")
+SEAT_ACTOR_SUFFIX = " (the player)"  # `agents.seat.seat_actor`'s: "the master (the player)"
+
+
+# The owner's world order typed at his prompt (package 98, the lead's addition (d) of
+# 2026-11-10): `world.order` with this source (`ui.console.LIVE_WORLD_ORDER_SOURCE`), his own
+# line, shown him as given with its outcome; for the record to every other reader (decision
+# 46), and a director's orders, of another source, never shown the player.
+OWNER_SOURCE = "the owner"
+WORLD_ORDER_KIND = "world.order"
+
+
+def owners_world_order(e: Any) -> bool:
+    """Whether a line is the owner's own world order, typed at his prompt."""
+    data = getattr(e, "data", None) or {}
+    return getattr(e, "kind", "") == WORLD_ORDER_KIND and data.get("source") == OWNER_SOURCE
+
+
+def as_the_owner_sees(e: Any) -> Any:
+    """The owner's world order as his play log shows it: the order as he gave it, then its
+    outcome ('Your world order 'ship "X": ...': not carried out: ...'); any other line as it
+    is. A copy: the log's own line is unchanged."""
+    if not owners_world_order(e):
+        return e
+    import dataclasses
+
+    order = str((e.data or {}).get("order") or "")
+    outcome = str(e.text).split(": ", 1)[1] if ": " in str(e.text) else str(e.text)
+    return dataclasses.replace(e, text=f"Your world order '{order}': {outcome}")
+
+
+def his_own(e: Any, station: str = "captain") -> bool:
+    """Whether a line is the player's own at the prompt (`OWN_FAMILIES`, the words he said,
+    his seat's lines), by its actor: the captain's at the captain's prompt, the seat's
+    actor at a station's, the driver's for the seat's own refusals and answers. A rule
+    captain, a standing order and a station held by a model each have their own actor."""
+    if owners_world_order(e):
+        return True
+    kind = str(getattr(e, "kind", "") or "")
+    actor = str(getattr(e, "actor", "") or "")
+    data = getattr(e, "data", None) or {}
+    mine = actor == station or actor == f"the {station}{SEAT_ACTOR_SUFFIX}"
+    if mine and (kind.startswith(OWN_FAMILIES) or kind in WORD_KINDS):
+        return True
+    return bool(data.get("seat")) and actor == "driver" and str(data.get("station")) == station
+
+
 def hears(world: Any, senses: Senses, e: Any, station: str = "captain") -> bool:
     """Whether a line reaches a person at the prompt with these senses (the console's and
-    the browser's play log, decision 59): `reaches` for every kind but the words, and for
+    the browser's play log, decision 59): his own lines wherever he stands (`his_own`, the
+    owner's ruling of 2026-11-09); `reaches` for every other kind but the words, and for
     the words 66's hearing as the harness applies it to a station (`Harness._reaches`): his
     own, a word to him, one whose hearers name his station, else one said within his
     hearing; a sleeper hears a word to him and nothing else."""
     if senses.everything:
+        return True
+    if his_own(e, station):
         return True
     kind = str(getattr(e, "kind", "") or "")
     if kind not in WORD_KINDS:

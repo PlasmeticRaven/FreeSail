@@ -1456,11 +1456,13 @@ def _picture(world: World, view: str, facing: str = "", span: str = "") -> Any:
 
     _, said = P.facing_of(facing) if view == P.SHIP else (None, "")
     made = P.paint(world, view, facing if view == P.SHIP else "", span if view == P.CHART else "")
-    if isinstance(made, P.Picture):
-        return {"picture": made.note(), "words": made.words()}
     keys = P.CHART_WORDS if view == P.CHART else P.SHIP_WORDS
     every = readings_words(world)
     shown = {k: every[k] for k in keys if k in every}
+    if isinstance(made, P.Picture):
+        # the readings it shows beside it (package 98, step 4): a door that cannot show the
+        # picture says so and gives them (`pictures.not_shown`); one that shows it drops them
+        return {"picture": made.note(), "words": made.words(), "readings": shown}
     what = "the chart" if view == P.CHART else f"the ship seen from {said}"
     return {
         "words": f"{made}, so there is no picture of {what}; the readings it would have "
@@ -1518,6 +1520,32 @@ def own_reckoning_order(world: World, text: str) -> bool:
     except OrderError:
         return False
     return order.verb in OWN_RECKONING_VERBS
+
+
+def reading_order(world: World, text: str) -> bool:
+    """Whether the words ask a reading (the registry's, `object: query`; or one said without
+    its article, 'sightings'): never refused for want of the deck, and answered by the
+    asker's place (package 98, the lead's addition (a) of 2026-11-10)."""
+    from freesail.orders import grammar as imperative
+    from freesail.orders import prompt
+    from freesail.orders.errors import UnknownVerbError
+
+    ship = world.ship
+    if not hasattr(ship, "parts"):
+        return False
+    words = " ".join(str(text).split())
+    vocab = load_vocabulary()
+    try:
+        order = imperative.parse(ship, words, vocab)
+    except UnknownVerbError:
+        bare = [w.replace("'", "") for w in prompt.normalise(words).split() if w != ","]
+        asked = prompt._without_asking(bare, vocab) if bare else []
+        verb = vocab.phrase_to_verb.get(" ".join(["the", *asked])) if asked else None
+        return verb in vocab.readings
+    except OrderError:
+        return False
+    spec = vocab.verbs.get(order.verb)
+    return order.verb in vocab.readings or getattr(spec, "object", "") == "query"
 
 
 def conversation_order(world: World, text: str) -> bool:

@@ -405,6 +405,8 @@
         // package 75 (B5.4; Ext §6.4): a settee's yard lowered on deck to be dipped, served only
         // while it is
         yard_lowered: !!s.yard_lowered,
+        // package 98, step 3: a settee's sheet held over to windward, served only while it is
+        sheet_side: s.sheet_side || null,
       };
     }
     var beamM = hull.beam_m || 8;
@@ -463,9 +465,10 @@
      *  (freesail/evolutions/trim.py's `read_sheet`; Ext §5.5 step 3): with the yard on the
      *  weather side, after she is through the wind and until it is dipped, the sail lies
      *  against the mast. Held over (hung in stays, Ext §5.5 step 2, or hauled to windward by
-     *  order) it is still drawn to leeward, as every fore-and-aft sail is: the snapshot serves
-     *  no sheet's side. And its sheet's block (`block`, SETTEE_SHEET_FLOOR). Returns {pts,
-     *  pivotMast, along, normal, onDeck, block}, or null with no cut. */
+     *  order) it is drawn on the side its sheet holds it (`sheet_side`, package 98, step 3).
+     *  And its sheet's block (`block`, SETTEE_SHEET_FLOOR), on the lee side wherever the sheet
+     *  holds the cloth. Returns {pts, pivotMast, along, normal, onDeck, block}, or null with
+     *  no cut. */
     function lugCut(spec, mastAt) {
       if (!spec || !spec.corners_m || spec.corners_m.length !== 4) return null;
       var host = spec.sheeted_to ? sailSpecs[spec.sheeted_to] : null;
@@ -478,7 +481,10 @@
       var down = !lugHoisted(spec) || (host && !lugHoisted(host));
       var a = sailDyn(host || spec).sheet_angle || 0;
       var ss = lugSideSign(spec);
-      var sw = spec.settee ? (tack === "starboard" ? -1 : 1) : ss; // the side the cloth swings to
+      // the side the cloth swings to: a settee's to the lee of the tack, or where its sheet is
+      // held over to windward (`sheet_side`, served while it is: package 98, step 3)
+      var held = spec.settee ? sailDyn(spec).sheet_side : null;
+      var sw = spec.settee ? (held ? (held === "starboard" ? 1 : -1) : tack === "starboard" ? -1 : 1) : ss;
       var ca = Math.cos(a), sa = Math.sin(a);
       var pts = spec.corners_m.map(function (q) {
         var dx = q[0] - sx;
@@ -493,7 +499,8 @@
         var cdx = spec.corners_m[3][0] - sx;
         var bx = sx + shift + cdx * Math.cos(SETTEE_SHEET_FLOOR) - SETTEE_LEAD_AFT_M;
         var bz = profile ? deckAt(profile, bx) : null;
-        block = v(bx, sw * (lugLee - cdx * Math.sin(SETTEE_SHEET_FLOOR)), bz === null ? deck : bz);
+        var leeSign = tack === "starboard" ? -1 : 1;
+        block = v(bx, leeSign * (lugLee - cdx * Math.sin(SETTEE_SHEET_FLOOR)), bz === null ? deck : bz);
       }
       return {
         pts: pts,
@@ -3710,12 +3717,40 @@
    *  a rig figure abaft it. Everything else keeps its order, the rig against the rest of the hull
    *  among it. */
   var DEPTH_TIE = 1e-3; // metres
-  var KIND_RANK = { hull: 0, line: 1, sail: 2, spar: 3 };
+  // package 98, step 3: a gun ranks with the hull's furniture, after the hull on a tie and
+  // before the rig; a flag as a sail does (§12.3)
+  var KIND_RANK = { hull: 0, gun: 0.5, line: 1, sail: 2, flag: 2, spar: 3 };
   var HULL_INSIDE = 1, HULL_STERN = 2;
   // Judgement, measured against a depth buffer on all ten files: a strip nearly edge on, the cosine
   // under this, stays at its depth, its upper and lower parts lying each way; and the stern takes
   // its layer from about 120 degrees off the bow, nearer the beam the quarter standing before it.
   var HULL_INSIDE_BY = 0.2, HULL_ABAFT = -0.5;
+  /** Each flag's figures together at its first's place, in the drawing's order (their ids'
+   *  last number), whatever lay within DEPTH_TIE of its middle (package 98, step 3). */
+  function flagsWhole(sorted) {
+    var groups = {};
+    sorted.forEach(function (f) {
+      if (f.kind === "flag" && f.of) (groups[f.of] = groups[f.of] || []).push(f);
+    });
+    var keys = Object.keys(groups);
+    if (!keys.length) return sorted;
+    keys.forEach(function (k) {
+      groups[k].sort(function (a, b) {
+        return Number(a.id.split(".").pop()) - Number(b.id.split(".").pop());
+      });
+    });
+    var out = [];
+    sorted.forEach(function (f) {
+      if (f.kind !== "flag" || !f.of) return out.push(f);
+      var g = groups[f.of];
+      if (g) {
+        out.push.apply(out, g);
+        delete groups[f.of];
+      }
+    });
+    return out;
+  }
+
   function sortFigures(figs) {
     var sorted = figs
       .map(function (f, i) {
@@ -3735,6 +3770,7 @@
       .map(function (e) {
         return e.f;
       });
+    sorted = flagsWhole(sorted);
     function inLayer(layer) {
       return sorted.filter(function (f) {
         return f.layer === layer;
@@ -3802,6 +3838,11 @@
   var OUT_SHARE = { long: 0.33, carronade: 0.25, swivel: 0.5 }; // run out: the muzzle outboard
   var RECOIL_SHARE = { long: 0.4, carronade: 0.15, swivel: 0 }; // run in: the muzzle inboard
   var HOUSED_INBOARD_M = 0.1; // secured: the muzzle just inside the side
+  // package 98, step 3 (the owner's play of 2026-11-09): a port gun's inboard figures sort with
+  // its port's strip of the side, this much farther, so that a gun secured or run in is behind
+  // her side and its lid from outboard on every file (sorted at their own middles, a steep
+  // deadrise put the strip's middle inboard of the whole gun); judgement, over DEPTH_TIE
+  var PORT_GUN_BEHIND_M = 0.01;
   var TRUNNION_SHARE = 3 / 7; // the trunnions from the base ring, of the length
   var CARRIAGE_SHARE = 0.45; // a truck carriage's length, of its gun's
   var SLIDE_SHARE = 1.6; // a carronade's or a pivot's slide, of its gun's
@@ -3997,6 +4038,18 @@
 
   /** One gun's figures, its muzzle `out` metres outboard of where its bore meets the side. */
   function gunFigures(hull, gun, st, out) {
+    var figs = gunFiguresAt(hull, gun, st, out);
+    if (gun.how !== "port") return figs;
+    var side = gun.side === "larboard" ? "larboard" : "starboard";
+    figs.forEach(function (f) {
+      if (f.piece === "outboard") return; // outboard of the side: at its own middle
+      f.sortAt = stripMid(hull, side, gun.x_m, f.sortAt);
+      f.sortBias = PORT_GUN_BEHIND_M;
+    });
+    return figs;
+  }
+
+  function gunFiguresAt(hull, gun, st, out) {
     var m = gunMount(hull, gun, st);
     var L = gun.length_m, rb = gun.breech_m / 2, rm = gun.muzzle_m / 2;
     var words = gun.name + ", a " + gun.kind_words + ": " + (st.shut ? "run in, the sea at its port" : st.state);
@@ -4174,6 +4227,13 @@
       return add(end, v(0, 0, JACKSTAFF_M));
     }
     var mast = M.byName[parts[0]];
+    if (!mast && parts[0] === "fore" && M.list.length) {
+      // a vessel of one mast flies at her fore what a ship flies at hers (package 98, step 3:
+      // the flag of truce at the fore truck); her foremost mast
+      mast = M.list.reduce(function (a, b) {
+        return (b.x_m !== undefined ? b.x_m : 0) > (a.x_m !== undefined ? a.x_m : 0) ? b : a;
+      });
+    }
     if (!mast) return null;
     var chain = mastChain(graph, mast);
     if (parts[1] === "truck") return topOf(spars[chain[chain.length - 1].id]);
@@ -4229,19 +4289,137 @@
       if (flag.place.indexOf("rigging") >= 0) at = v(at[0], weather * at[1], at[2]);
       var size = flagSize(hull, graph, flag);
       var down = v(0, 0, -size.hoist);
+      var shape = (flag.drawing && flag.drawing.shape) || "";
       function point(fx, fy) {
         var y = flag.drawing && flag.drawing.inverted ? 1 - fy : fy;
-        var taper = size.pendant ? 1 - fx * 0.9 : 1;
+        // package 102: a triangle tapers to a point at its fly (`shape`)
+        var taper = size.pendant ? 1 - fx * 0.9 : shape === "triangle" ? 1 - fx : 1;
         return add(add(at, mul(flyDir, fx * size.fly)), mul(down, 0.5 + (y - 0.5) * taper));
       }
-      var parts = (flag.drawing && flag.drawing.parts) || [{ rect: [0, 0, 1, 1], colour: "cloth" }];
-      parts.forEach(function (p, k) {
-        var r = p.rect || [0, 0, 1, 1];
-        var pts = [point(r[0], r[1]), point(r[2], r[1]), point(r[2], r[3]), point(r[0], r[3])];
-        figs.push({ kind: "flag", id: "flag." + n + "." + k, cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: (flag.words || flag.name) + ", at the " + flag.place, pts: pts, sortAt: centroid(pts) });
+      // package 98, step 3: the flag sorts as one at its middle (§12.3, "as a sail does"), its
+      // parts and its lines painted in the drawing's order (`n`, served by 76's file), so that
+      // a canton and its crosses do not come and go with the bearing
+      var middle = centroid([point(0, 0), point(1, 0), point(1, 1), point(0, 1)]);
+      var drawing = flag.drawing || {};
+      var items = (drawing.parts || [{ rect: [0, 0, 1, 1], colour: "cloth" }])
+        .concat(drawing.lines || [])
+        .concat(drawing.polys || []); // package 102: the polygons, in the drawing's order too
+      items = items
+        .map(function (p, i) {
+          return { p: p, at: p.n !== undefined ? p.n : i };
+        })
+        .sort(function (a, b) {
+          return a.at - b.at;
+        });
+      var k = 0; // each figure's number, in the drawing's order (a part cut in two takes two)
+      items.forEach(function (it) {
+        var p = it.p;
+        var polys;
+        if (p.line) {
+          var band = flagLineSquare(p, size);
+          polys = band ? [band] : [];
+        } else if (p.poly) {
+          polys = [p.poly.map(function (q) { return [Number(q[0]), Number(q[1])]; })];
+        } else {
+          var r = p.rect || [0, 0, 1, 1];
+          polys = [[[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]]];
+        }
+        if (shape === "swallowtail") polys = swallowTail(polys, drawing.cut || SWALLOWTAIL_CUT);
+        polys.forEach(function (sq) {
+          if (sq.length < 3) return;
+          var pts = sq.map(function (q) { return point(q[0], q[1]); });
+          figs.push({ kind: "flag", id: "flag." + n + "." + k, of: "flag." + n, piece: p.line ? "line" : "", cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: (flag.words || flag.name) + ", at the " + flag.place, pts: pts, sortAt: middle });
+          k += 1;
+        });
       });
     });
     return figs;
+  }
+
+  /** A drawing's line as `flagLine` cuts it, on the flag's own square ([x, y] each 0 to 1),
+   *  not yet put on the flag; null where nothing of it is left (package 102: so that an
+   *  outline may cut it before it is put). */
+  function flagLineSquare(p, size) {
+    return flagLine(p, size, function (fx, fy) {
+      return [fx, fy];
+    });
+  }
+
+  // package 102: a swallow tail's cut where the drawing gives none, a share of the fly
+  // (judgement, read off the plates; freesail/world/flags.py SWALLOWTAIL_CUT)
+  var SWALLOWTAIL_CUT = 1 / 3;
+  /** The polygons (on the flag's own square) with the swallow tail's notch taken out: the
+   *  triangle from the fly's two corners to the middle of the hoist line `cut` in from the
+   *  fly. Each comes back as its part above the middle and its part below, each cut by its
+   *  own edge of the notch. */
+  function swallowTail(polys, cut) {
+    var ax = 1 - cut, out = [];
+    polys.forEach(function (poly) {
+      // above the middle: keep the side of the edge from (ax, .5) to (1, 0) toward the hoist
+      var up = clipHalf(clipPoly(poly, 1, 0.5, -1), [ax, 0.5], [1, 0]);
+      var low = clipHalf(clipPoly(poly, 1, 0.5, 1), [1, 1], [ax, 0.5]);
+      if (up.length >= 3) out.push(up);
+      if (low.length >= 3) out.push(low);
+    });
+    return out;
+  }
+
+  /** A polygon of [x, y] cut to the left of the directed edge a to b (y down, x along the fly:
+   *  the side the hoist lies on for the notch's edges as `swallowTail` gives them). */
+  function clipHalf(poly, a, b) {
+    function side(q) {
+      return (b[0] - a[0]) * (q[1] - a[1]) - (b[1] - a[1]) * (q[0] - a[0]);
+    }
+    var out = [];
+    for (var i = 0; i < poly.length; i++) {
+      var p = poly[i], q = poly[(i + 1) % poly.length];
+      var dp = side(p), dq = side(q);
+      if (dp <= 0) out.push(p);
+      if ((dp <= 0) !== (dq <= 0)) {
+        var t = dp / (dp - dq);
+        out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]);
+      }
+    }
+    return out;
+  }
+
+  /** A drawing's line on a flag (76's `{line: [[x, y], [x, y]], width}`, on the flag's own
+   *  square, the width a share of the hoist): a band of that width about the line, cut to the
+   *  rectangle its ends span (a saltire's arm ends at the canton's corners), as a polygon put
+   *  on the flag by `point`; null where nothing of it is left. */
+  function flagLine(p, size, point) {
+    var a = p.line[0], b = p.line[1];
+    var F = size.fly || 1, H = size.hoist || 1;
+    var ax = a[0] * F, ay = a[1] * H, bx = b[0] * F, by = b[1] * H;
+    var len = Math.hypot(bx - ax, by - ay);
+    if (!(len > 0)) return null;
+    var w = ((p.width || 0.02) * H) / 2;
+    var nx = (-(by - ay) / len) * w, ny = ((bx - ax) / len) * w;
+    var poly = [[ax + nx, ay + ny], [bx + nx, by + ny], [bx - nx, by - ny], [ax - nx, ay - ny]];
+    var x0 = Math.min(ax, bx), x1 = Math.max(ax, bx), y0 = Math.min(ay, by), y1 = Math.max(ay, by);
+    poly = clipPoly(poly, 0, x0, 1);
+    poly = clipPoly(poly, 0, x1, -1);
+    poly = clipPoly(poly, 1, y0, 1);
+    poly = clipPoly(poly, 1, y1, -1);
+    if (poly.length < 3) return null;
+    return poly.map(function (q) {
+      return point(q[0] / F, q[1] / H);
+    });
+  }
+
+  /** A polygon of [x, y] cut to the half plane `sign * (q[axis] - at) >= 0`. */
+  function clipPoly(poly, axis, at, sign) {
+    var out = [];
+    for (var i = 0; i < poly.length; i++) {
+      var p = poly[i], q = poly[(i + 1) % poly.length];
+      var dp = sign * (p[axis] - at), dq = sign * (q[axis] - at);
+      if (dp >= 0) out.push(p);
+      if ((dp >= 0) !== (dq >= 0)) {
+        var t = dp / (dp - dq);
+        out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]);
+      }
+    }
+    return out;
   }
 
   /** The action's figures in ship coordinates: the ports and their lids, the guns by their

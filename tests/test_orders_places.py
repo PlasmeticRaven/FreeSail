@@ -428,3 +428,55 @@ def test_a_waterman_takes_the_captain_ashore_while_the_boat_is_away_and_brings_h
     assert events(w, "person.aboard")[-1].text.endswith("came aboard from a waterman's boat.")
     e = w.submit("hire a waterman to Narnia")
     assert e.kind == "order.rejected"
+
+
+# ---------------------------------------------------------------------------
+# The colours and the signals by the deck's rule (package 98, step 6)
+# ---------------------------------------------------------------------------
+
+
+def test_the_colours_and_the_signals_are_the_decks_refused_below_and_ashore_in_its_words():
+    """Truth 7-449 (the owner's ruling of 2026-11-09, by the current standard): the
+    colours, the signals, the lights and a hail across the water are the deck's orders,
+    given from the quarterdeck and refused below and ashore in the words the other deck
+    orders get; nothing flies or is shown by the refusal; the readings of them are
+    answered below as before (to be had on deck), and done again from the deck."""
+    w = in_falmouth()
+    assert w.submit("haul down the colours").kind == "colours.changed"
+    assert w.submit("hoist the colours").kind == "colours.changed"
+    w.submit("go below")
+    flying = w.submit("the colours").text
+    for line in (
+        "haul down the colours",
+        "hoist the colours",
+        "make the private signal",
+        "answer the private signal",
+        "show the lights",
+        "hoist the ensign union down",
+    ):
+        e = w.submit(line)
+        assert e.kind == "order.rejected", (line, e.text)
+        assert e.text.endswith("You are in the cabin; go on deck to give an order of the deck.")
+    assert w.submit("the colours").text == flying  # nothing hauled down by the refusal
+    assert w.submit("the signals").kind.startswith("query.")
+    w.submit("come on deck")
+    assert w.submit("haul down the colours").kind == "colours.changed"
+    w.submit("go ashore")
+    master = w.people.captain
+    until(w, lambda: master.where == "shore" and not w.dealings.boat.away)
+    e = w.submit("hoist the colours")
+    assert e.kind == "order.rejected" and "come aboard to give an order of the deck" in e.text
+
+
+def test_go_ashore_from_the_tops_is_refused_until_he_comes_down():
+    """Truth 7-459, (c) (package 98, the lead's addition of 2026-11-10): `go ashore` given from
+    the tops is refused in words that bring him down first; from the deck he goes."""
+    w = world_at(CARRICK_ROAD)
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(300)
+    assert w.submit("go aloft").kind == "person.moved"
+    e = w.submit("go ashore")
+    assert e.kind == "order.rejected" and "come down on deck first ('come on deck')" in e.text
+    assert w.submit("come on deck").kind == "captain.on_deck"
+    assert w.submit("go ashore").kind != "order.rejected"

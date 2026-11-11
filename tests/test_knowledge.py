@@ -9,6 +9,7 @@ fired as the officer's call; `knowledge: all`. Truths 7-370 (in part), 7-373, 7-
 
 from __future__ import annotations
 
+import dataclasses
 import pathlib
 import re
 from datetime import datetime
@@ -19,6 +20,7 @@ import pytest
 from freesail.agents import Fake, Harness, SamplingPolicy, call, reply, tools
 from freesail.agents.agent import PLACE_KNOWLEDGE_WORDS, captain, lookout, officer
 from freesail.agents.model import DATA, OPERATOR
+from freesail.agents.seat import seat_player
 from freesail.api import readings as R
 from freesail.api.session import make_world
 from freesail.core.events import Event, Severity
@@ -117,6 +119,7 @@ def test_every_kind_the_code_writes_is_placed_or_falls_to_the_deck_by_design():
         "place",
         "port",
         "record",
+        "reader",  # package 100: a letter's words, the reader's alone (`tests/test_letters.py`)
     }
 
 
@@ -1921,3 +1924,181 @@ def test_a_visitor_and_a_captive_aboard_another_hull_read_her_by_their_places():
     assert e.kind == "agent.spoke", e.text
     assert e.text == f"{bowen.name}, a visitor of the Amazon, in the cabin: good day to you"
     assert e.data["where"] == "in the cabin"
+
+
+# -- the player's own lines (package 98, step 2; the owner's ruling of 2026-11-09) ------------
+
+
+def _shown_kinds(sent: list[dict]) -> list[str]:
+    return [str((m.get("event") or m.get("rollup") or {}).get("kind")) for m in sent]
+
+
+def test_the_players_own_lines_reach_him_wherever_he_stands_and_the_worlds_deeds_do_not():
+    """Truths 7-446 and 7-447: what is not in the world is always shown the man who made it,
+    wherever he stands (the owner's ruling of 2026-11-09): in the cabin, his readings
+    (`query.*`), his refusals (`order.rejected`) and his own word to a station (`agent.told`,
+    which before reached the station and not him) are sent to the pages, kept in the pages'
+    reach-back (a reload) and shown at the console; a sleeper's own line too. What is done
+    in the world out of his sight is not: a standing order's sail work on deck while he is
+    below reaches him as the sound overhead and never as the deck's figure, and a rule's or
+    a model station's line is no line of his (`his_own` by the actor)."""
+    from freesail.ui.server import Driver
+
+    w = world_at()
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    d.submit("go below")
+    d.tick(60)
+    assert K.players_senses(w).has(K.CABIN) and not K.players_senses(w).has(K.DECK)
+    own = []
+    for line, kind in (
+        ("the time", "query.reading"),
+        ("the heading", "query.reading"),
+        ("the speed", "query.reading"),  # the deck's reading: its words where it is had
+        ("set the royals", "order.rejected"),
+        ("say to the master: good morning", "agent.told"),
+    ):
+        sent.clear()
+        e = d.submit(line)
+        assert e.kind == kind, (line, e.kind, e.text)
+        assert kind in _shown_kinds(sent), (line, _shown_kinds(sent))
+        assert d.hears(e) and K.his_own(e, "captain")
+        own.append(e)
+    assert "go on deck" in own[3].text
+    # the reach-back the page is sent at its hello and a reload
+    reach_back = {(x.get("kind"), x.get("text")) for x in d.shown_log(400)}
+    assert all((e.kind, e.text) in reach_back for e in own)
+    # the console's own play log, by the same rule
+    con, _out = _console(w)
+    assert all(con.hears(e) for e in own)
+    # the world's deeds out of his sight: none is his own, and the deck's sail work is the
+    # sound overhead in the cabin and nothing ashore
+    deed = Event(
+        tick=w.clock.tick,
+        ship_time=w.clock.ship_time,
+        severity=Severity.ROUTINE,
+        kind="sail.set",
+        text="The fore royal set.",
+        actor="captain",
+        data={"sail": "fore royal"},
+    )
+    assert not K.his_own(deed, "captain")
+    for actor in ("captain's rule 'the reckoning'", "standing order 'royals'", "officer"):
+        ruled = Event(
+            tick=w.clock.tick,
+            ship_time=w.clock.ship_time,
+            severity=Severity.ROUTINE,
+            kind="query.reading",
+            text="The time: 4 bells.",
+            actor=actor,
+        )
+        assert not K.his_own(ruled, "captain") and not d.hears(ruled), actor
+    # a sleeper's own line wakes him and is answered him (an hour on his feet first: the
+    # needs refuse a sleep within the hour of waking)
+    d.tick(3600)
+    assert d.submit("sleep").kind == "needs.answer"
+    assert K.players_senses(w).asleep
+    sent.clear()
+    e = d.submit("the time")
+    assert e.kind == "query.reading" and "query.reading" in _shown_kinds(sent)
+
+
+def test_the_seats_own_refusal_and_reading_reach_the_seated_player_below():
+    """Truth 7-446, at a seat: the player seated at the master's station, in the gunroom,
+    has his readings (`the master (the player)`'s actor) and the seat's own refusal (the
+    driver's line of the seat, `agent.refused`) shown him; the captain's line is not his."""
+    from freesail.agents.seat import seat_actor
+    from freesail.ui.server import Driver
+
+    w = world_at()
+    seat_player(w, "master", door="browser")
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    d.submit("go to the gunroom")
+    d.tick(60)
+    assert K.players_station(w) == "master"
+    sent.clear()
+    e = d.submit("the time")
+    assert e.actor == seat_actor("master") and "query.reading" in _shown_kinds(sent)
+    sent.clear()
+    e = d.submit("set the royals")
+    assert e.kind == "agent.refused" and "agent.refused" in _shown_kinds(sent), e.text
+    captains = dataclasses.replace(e, actor="captain", data={})
+    assert not K.his_own(captains, "master")
+
+
+def test_a_seat_without_the_deck_is_answered_its_readings_and_refused_its_orders():
+    """Truth 7-458, (a) (package 98, the lead's addition of 2026-11-10): the player seated at
+    the officer of the watch's station without the deck is answered his readings by his place
+    (they were refused for want of the deck), and his deck's orders still wait for 'you have
+    the deck'."""
+    w = world_at()
+    s = seat_player(w, "officer", door="browser")
+    for line in ("where am I", "the time", "the depth", "sightings"):
+        e = s.route(line)
+        assert e.kind == "query.reading", (line, e.kind, e.text)
+    e = s.route("set the royals")
+    assert e.kind == "agent.refused" and "has not the deck" in e.text
+
+
+def test_a_visitors_word_to_the_captain_goes_to_her_captain_and_is_shown_him():
+    """Truth 7-458, (b) (package 98, the lead's addition of 2026-11-10): the player a visitor
+    aboard another ship (no captive) says and asks his word to her captain, a line of her log
+    where he stands in his own name, shown him at the pages; her rules captain does not stand
+    aside for it (it is no order of the ship's); a prisoner's words are package 74's road."""
+    from freesail.ui.server import Driver
+    from freesail.world import movement
+
+    w, b, hull = _with_the_brig_x()
+    bowen = w.people.captain
+    movement.put_aboard(w, bowen, hull, place="quarterdeck")
+    assert K.players_visitor(w) is bowen
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    for line, words in (
+        ("say to the captain: good day to you", "to the captain: good day to you"),
+        ("ask the captain where she is bound", "asks the captain: where she is bound?"),
+    ):
+        sent.clear()
+        n = len(list(w.own.log))
+        e = d.submit(line)
+        assert e.kind == "person.spoke" and e.text.endswith(words), (line, e.text)
+        assert e.text.startswith(f"{bowen.name}, a visitor of the ")
+        assert "person.spoke" in _shown_kinds(sent)
+        assert not [x for x in list(w.own.log)[n:] if x.kind == "captain.aside"]
+
+
+def test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is():
+    """Truth 7-459, (d) (package 98, the lead's addition of 2026-11-10): a world order the
+    owner types at the page is his own line, shown him as he gave it with its outcome (done
+    or refused), at the pages, on a reload and at the console; a world order of another
+    source (the director's) is never shown the player; for every other reader decision 46
+    stands (the line is for the record)."""
+    from freesail.core.events import for_the_record
+    from freesail.ui.console import LIVE_WORLD_ORDER_SOURCE
+    from freesail.ui.server import Driver
+
+    assert LIVE_WORLD_ORDER_SOURCE == K.OWNER_SOURCE
+    w = world_at()
+    d = Driver(w)
+    sent: list[dict] = []
+    d.add_listener(lambda m: sent.append(m) if m.get("type") != "snapshot" else None)
+    for order, outcome in (
+        ('ship "Nobody": intent bound for Falmouth', "not carried out"),
+        ('ship: a merchant brig "X" of Britain at 49 33 N 5 30 W, bound for Falmouth', "put"),
+    ):
+        sent.clear()
+        e = d.submit(f"world: {order}")
+        assert e.kind == "world.order" and for_the_record(e) and K.owners_world_order(e)
+        shown = [m["event"]["text"] for m in sent if m.get("type") == "event"]
+        assert any(t.startswith(f"Your world order '{order}': ") and outcome in t for t in shown)
+    back = [x["text"] for x in d.shown_log(400) if x.get("kind") == "world.order"]
+    assert len(back) == 2 and all(t.startswith("Your world order '") for t in back)
+    con, _out = _console(w)
+    assert con.hears(e)
+    # the director's own: never the player's
+    theirs = dataclasses.replace(e, data={**e.data, "source": "the director"})
+    assert not K.owners_world_order(theirs) and not K.his_own(theirs, "captain")

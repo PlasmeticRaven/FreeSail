@@ -724,6 +724,27 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "a thing made, or moved when it is known; never into a held person's keeping",
     ),
     Form(
+        "aboard.letter",
+        "aboard",
+        'aboard: a letter from <whom> to <whom>, <where>[, sealed]: "<its words>"',
+        (
+            'aboard: a letter from the agent to the captain, on the cabin table, sealed: "Your '
+            'cargo waits at the quay."',
+            'aboard: a letter from Mr Veale to the first lieutenant, in the gunroom: "Ask for '
+            'me at the Ship."',
+        ),
+        "a letter with its words, read by whoever has it in reach and breaks its seal; its "
+        "words shown to its reader alone",
+    ),
+    Form(
+        "aboard.removed",
+        "aboard",
+        "aboard: remove <a thing>",
+        ("aboard: remove the sealed packet", "aboard: the packet removed"),
+        "a thing taken out of the world, as if it had never been; never out of a held "
+        "person's keeping, and doubted where it lies before a held person's eyes",
+    ),
+    Form(
         "aboard.paid_in",
         "aboard",
         "aboard: <a sum> paid into the purse by <person>[ for <what>]",
@@ -950,6 +971,78 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "steers for the hull that holds them, takes them off by the boat within hail and "
         "lands them free at her port; refused for a person nobody holds prisoner, doubted "
         "beyond a day's sail of the port",
+    ),
+    # package 74, step 7: a ship made a prize or struck at a scenario's start (the director's
+    # cause, doubted after the first minute)
+    Form(
+        "ship.prize",
+        "ship",
+        'ship "<name>": a prize of the <captor>',
+        ('ship "Harpy": a prize of the Medusa',),
+        "a ship on the sea made a prize of another's by the director's word: her captor's "
+        "prize crew and prize master aboard her, her people prisoners, bound for his port; a "
+        "scenario's start (doubted after the first minute: afterwards she strikes to the guns)",
+    ),
+    Form(
+        "ship.struck",
+        "ship",
+        'ship "<name>": struck to the <captor>',
+        ('ship "the ship": struck to the Harpy',),
+        "a ship struck to another and possessed, the player's own by her name or 'the ship' "
+        "(her captor promoted, the player a prisoner aboard her: chapter 27); a scenario's "
+        "start, doubted after the first minute",
+    ),
+    # package 74 (spec M7 §20; docs/design/Design-Prizes.md §7): the court martial as the
+    # director's proceeding, and a new command as a scenario's start
+    Form(
+        "person.exchanged",
+        "person",
+        'person: "<name>" is exchanged at <port>',
+        ('person: "Captain Bowen" is exchanged at Falmouth',),
+        "a prisoner of war landed or held is exchanged and set ashore at the port's quay, a "
+        "prisoner no more, the exchange in his record; refused for a person who is no "
+        "prisoner, doubted within a day of his landing",
+    ),
+    Form(
+        "court.sits",
+        "court",
+        "court: sits on <person> for the loss of the <ship> at <port>",
+        ("court: sits on Captain Bowen for the loss of the Amazon at Falmouth",),
+        "a court martial sat at a place of the port on a person whose record has the loss of "
+        "a ship (refused for one who lost none): the president and the judge advocate found "
+        "there, the accused before them; its questions in-world ('say as the president of the "
+        "court: ...' heard at the place, the accused's 'say to the court: ...'); doubted where "
+        "he is not ashore at a port of his own nation",
+    ),
+    Form(
+        "court.read",
+        "court",
+        "court: read the log of the action",
+        ("court: read the log of the action",),
+        "the judge advocate reads the action's lines of the lost ship's log to the court, so "
+        "that the proceeding has the facts without the director inventing them; refused while "
+        "no court sits",
+    ),
+    Form(
+        "court.verdict",
+        "court",
+        "court: the verdict on <person>: <verdict>",
+        ("court: the verdict on Captain Bowen: acquitted with honour",),
+        "the sentence (acquitted with honour, acquitted, reprimanded, dismissed the ship, "
+        "dismissed the service) entered in his record and read as the court's, the order "
+        "never shown as sent; the court rises; refused for a sentence the court does not know",
+    ),
+    Form(
+        "command.new",
+        "command",
+        'command: a new command for <person>: the <description> "<name>" at <port>',
+        ('command: a new command for Captain Bowen: the cutter "Alert" at Plymouth',),
+        "a scenario file written under the saves' folder with his name as her captain, his "
+        "people who followed him and a copy of his record in his keeping, to be given to "
+        "either driver with --scenario (the answer names it, 'saves/<name>'; the world hears "
+        "the appointment alone); refused for a man dismissed the service or where a file of "
+        "that name stands that is not this appointment's, doubted for one dismissed his ship "
+        "within the year",
     ),
 )
 
@@ -2068,6 +2161,7 @@ def _would_do(world: Any, text: str) -> str | None:
     try:
         copy = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(world))).load()
         replay._rebind(copy)
+        copy.__dict__["dry_run"] = True  # a form that writes a file writes none on the copy (74)
         e = copy._apply_world_order(text, SOURCE)
     except Exception:  # noqa: BLE001  (a world that cannot be copied: the form's word alone)
         return None

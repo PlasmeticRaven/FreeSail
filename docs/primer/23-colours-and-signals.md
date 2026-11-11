@@ -2,6 +2,8 @@
 
 The voice between ships, in the player's words. Before a gun is fired a captain of 1805 knew whom he had to deal with by three means and no more: the colours she showed, the private signal of the month, and the hail within the trumpet's reach; and he worked his consorts and his convoy by the signal book. The game has each as a thing of the ship's state, seen by the lookout at the range the thing carries, and nothing is refused for being unwise: a shot under false colours is a pirate's act, and the log says so.
 
+The colours, the signals, the private signal, the lights and a hail are **the deck's orders**, as the sails and the helm are (chapter 14): given from the quarterdeck, and refused below and ashore in the same words (*You are in the cabin; go on deck to give an order of the deck.*). Their readings (`the colours`, `the signals`, `the private signal`) are answered wherever you are, with where they are to be had. A visitor aboard another ship may hail and signal from her deck. Passing the word from the cabin for the officer of the watch to make a signal is a later step of the game's.
+
 ## The colours
 
 Your colours are a state the other ships' lookouts read: shown (your own ensign), none, false (another nation's, the ruse the law allowed until the first shot), struck, or the ensign union down in distress. The lookout of every ship, far or near, reads the nation *shown*, never the true one, so a French privateer under British colours is "British colours, the red ensign" to the King's captain who makes her out at two miles (three with the glass aloft), and the truth is the director's alone.
@@ -33,15 +35,24 @@ Beyond her colours a ship wears what her service and her captain's place give he
 hoist the broad pendant
 hoist a second ensign at the main
 hoist the jack
+the flags
+haul down the jack
+strike the broad pendant
+lower the second ensign
+# rejected: haul down the jack
 ```
 
 ```
 A commodore's broad pendant hoisted at the main.
 The red ensign hoisted at the main topgallant masthead, the ensigns doubled.
 The union jack hoisted at the fore.
+The flags: British colours, the red ensign at the peak; a commodore's broad pendant at the main truck; British colours, the red ensign at the main topgallant masthead; the union jack at the fore truck.
+The union jack hauled down.
+A commodore's broad pendant hauled down.
+The second ensign, the red ensign, hauled down from the main; her colours at the peak.
 ```
 
-The flags you order stay up with the colours and come down with them. Every nation's flags are drawn from her own colours (the British ensigns of the three squadrons with the Union of 1801 in the canton, the pendant and the jack; the French tricolour, blue at the hoist; the Spanish red and yellow of 1785, the red a quarter of the depth above and below; Portugal's white with the arms), and a nation with no colours of her own drawn wears a plain ensign of the colour her flag is named by, and a plain pendant in a ship of war.
+`the flags` says what flies where: the ensign, the pendant, the jack, the broad pendant and a second ensign, each at its place, and then the signal flying if a hoist is up (`the colours` reads the ensign alone, as before). The flags you order stay up with the colours and come down with them, or one at a time by name: `haul down the jack`, `strike the broad pendant`, `lower the second ensign`; one not flying is refused in words. They are the deck's orders, as the colours are. Every nation's flags are drawn from her own colours (the British ensigns of the three squadrons with the Union of 1801 in the canton, the pendant and the jack; the French tricolour, blue at the hoist; the Spanish red and yellow of 1785, the red a quarter of the depth above and below; Portugal's white with the arms), and a nation with no colours of her own drawn wears a plain ensign of the colour her flag is named by, and a plain pendant in a ship of war.
 
 ## The private signal
 
@@ -142,6 +153,8 @@ the lights
 | `haul down the colours` | none shown; under fire, the strike |
 | `hoist the ensign union down` | the signal of distress (with `fire a gun to leeward`) |
 | `hoist the broad pendant` / `hoist a second ensign at the main` / `hoist the jack` | a commodore's broad pendant at the main; the ensigns doubled; the jack at the fore, or the jackstaff at anchor |
+| `haul down the broad pendant` / `haul down the second ensign` / `haul down the jack` (or strike, lower) | each flag of command down by its name, the colours left flying |
+| `the flags` | what flies where, and then the signal flying |
 | `show the private signal` / `answer the private signal` | the month's challenge and reply, with a table aboard |
 | `make the Spanish private signal` / `make the private signals in succession` | another nation's challenge from her table held, or every table held one after another |
 | `make the signal <meaning>` / `make the signal No. <n>` | a signal of the book by day, the night book's lights by night, the fog book's gun in fog |

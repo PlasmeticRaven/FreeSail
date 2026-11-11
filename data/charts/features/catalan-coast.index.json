@@ -1,0 +1,82 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"162,2": [
+"montsia",
+"la-rapita",
+"alfaques-haven",
+"alfaques-outer-road",
+"point-de-la-bana",
+"amposta"
+],
+"162,3": [
+"cape-tortosa",
+"ebro-mouths"
+],
+"163,2": [
+"tortosa",
+"ampulla-gulf"
+],
+"163,3": [
+"fangar-point",
+"coll-de-balaguer"
+],
+"164,4": [
+"cambrils",
+"cape-salou",
+"salou-tower",
+"salou-road",
+"tarragona-mole",
+"tarragona-mole-light"
+],
+"164,5": [
+"tarragona",
+"tarragona-road",
+"tamarit",
+"torredembarra"
+],
+"164,6": [
+"san-cristobal-point"
+],
+"164,7": [
+"sitges"
+],
+"165,7": [
+"garraf",
+"castelldefels"
+],
+"165,8": [
+"llobregat-tower",
+"montjuic",
+"barcelona-lantern",
+"barcelona-new-mole-light",
+"merced-tower",
+"barcelona-bar",
+"barcelona-port",
+"barcelona-road",
+"badalona"
+],
+"165,9": [
+"mongat"
+],
+"166,10": [
+"arenys-ledge",
+"calella"
+],
+"166,11": [
+"blanes",
+"blanes-road",
+"lloret",
+"cape-tossa"
+],
+"166,7": [
+"montserrat"
+],
+"166,9": [
+"mataro"
+],
+"167,9": [
+"montseny"
+]
+}
+}

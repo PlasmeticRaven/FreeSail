@@ -900,6 +900,37 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     document for the lead's gate first, then the build in steps. Booked in
     `docs/dev/M7-WorkPackages.md`.
 
+66. **History is the starting state, not a rail; fidelity is a lever.** Owner, 2026-11-10,
+    on the lead's note that the build's attention had gathered on 1805 while the game's
+    purpose is any day of a wide range (1792 to 1825 as it stands, earlier and later where
+    possible). "The history must serve the play so that the elements are correct, but their
+    interactions are not necessarily what happened in history. The interesting moments will
+    come where interactions that never happened can happen, and the world can evolve in the
+    game. Historical fidelity should be a lever"; "the world must be subject to the game and
+    not vice-versa." The elements are held to the record (a ship, a gun, a coast, a port, a
+    signal book, a nation's habit, who was at war on the day a game begins); what follows
+    from them once play begins is the world's own and may differ from what happened: a port
+    that fell in 1811 need not fall, and one that never fell may. The dated record seeds a
+    scenario and does not script it. A world must function reasonably on any day of the
+    range, and where the data knows only one year's picture it answers with that and does
+    not refuse. For the briefs from here: each item says whether its data carries its dates
+    in its rows (and so answers for any day) or is one year's picture (and of which year).
+    **Left open by the owner:** how far each kind of element is dated across the range, and
+    where fidelity to the day is worth its cost; nothing is ruled on those. Recorded in
+    `docs/dev/M7-WorkPackages.md` beside the packages table.
+
+67. **Strong coverage of ports, and every port built with room for other eras.** Owner,
+    2026-11-11, approving package 104 with every port offered: "our goal should be a very
+    strong coverage as far as ports go in general, including refinement passes on existing
+    chart blocks to fill out ports that exist only now as anchorages or marks"; and "we
+    should always be keeping in mind, from now on, the extensibility of era so that ports,
+    when built for a certain era, have room for being fit properly for other eras as
+    necessary." For the briefs from here: a place a ship of the period went to is a port
+    file and not a mark where the sources can support one; and what is true of a port only
+    for some years (who holds it, its works, its lights, its trade, its garrison) is written
+    with its years, in rows that another era's rows can stand beside, never as the one
+    picture of 1805 (decision 66's rule for an element, applied to ports).
+
 ### Still open
 
-Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
+At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

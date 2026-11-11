@@ -108,6 +108,7 @@ book_limits:
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
   - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
   - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
+  - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -297,10 +298,14 @@ areas:
       strongest_h: -2.5
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout, by the owner's ruling of 2026-10-07 (no period source for the Four): the set to the nearest point, the spring rate to the half knot, the neaps at half of it, the hour the world's own unverified figure"
+  # Package 98, step 5 (the owner's play of 2026-11-09: the Goulet's 4.9 knots over the
+  # whole Rade): the Goulet the narrows alone, Petit Minou (48 20.2 N 4 36.9 W) to Portzic
+  # (48 21.5 N 4 32.0 W), and the Rade de Brest after it with its own modest rate, before
+  # the Iroise's and the Channel's.
   - id: the-goulet
     chart: channel-west
     name: the Goulet de Brest
-    polygon: [[48.29, -4.62], [48.29, -4.42], [48.37, -4.42], [48.37, -4.62]]
+    polygon: [[48.325, -4.62], [48.325, -4.53], [48.372, -4.53], [48.372, -4.62]]
     axis_deg: 80
     spring_kn: 4.5
     neap_kn: 3.0
@@ -313,6 +318,22 @@ areas:
       strongest_h: -3.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout, by the owner's ruling of 2026-10-07 (no period source for the Goulet's timing): the flood setting in to the nearest point, the spring rate to the half knot, the neaps at half of it, the flood from low water to high"
+  - id: rade-de-brest
+    chart: channel-west
+    name: the Rade de Brest
+    polygon: [[48.25, -4.53], [48.25, -4.18], [48.43, -4.18], [48.43, -4.53]]
+    axis_deg: 100
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -3.0
+    source: "Parc naturel régional d'Armorique, Document d'objectifs Natura 2000 Rade de Brest, tome 1, état des lieux (2014), p. 28: 'En situation de vive eau, ils dépassent 4 nœuds dans le goulet et 2 nœuds au centre de la rade'; p. 29 (after Salomon and Breton, IFREMER 1996): the flood's jet from the Goulet east-north-east, the greater part bending south for the centre and the south-east of the rade toward the Aulne, the ebb setting almost uniformly toward the Goulet; p. 35: at the pointe des Espagnols, coefficient 85, above 4 knots flood and ebb, the flood's axis toward the île Ronde still above 2 knots, falling sharply beyond and very weak in the anses; FVA, Livret Naviguide voile-aviron 50, Rade de Brest (2019), p. 3: 'les courants ne dépassent dans la rade que rarement, et localement, les 2 nœuds'. The spring rate the centre's 2 knots; the neaps half of it, the axis (the flood into the rade's middle, E) and the hour the Goulet's, JUDGEMENT; SHOM's atlas of the roads not read"
+    book:
+      set: E by S
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout, as the Goulet's (no period source for the rade's stream): the world's figures rounded, the rate filed 2.0 knots at springs and 1.0 at neaps, the spring rate the modern one read (above 2 knots at springs in the centre of the rade, the Natura 2000 document of objectives of the Rade de Brest, PNR d'Armorique, 2014, p. 28), the set to the nearest point, the neaps at half of it, the hour the Goulet's; the hydrographic service's atlas of the roads (SHOM) not read"
   # Package 39b (the Biscay north block): the Raz de Sein, before the Iroise whose
   # polygon holds it. The block's area by the brief, `chart: atlantic-east` (the water is
   # channel-west's region, the statement the block's).
@@ -1329,6 +1350,47 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: no constant current and no tide stated for the open Tyrrhenian (Smyth 1854, p. 178; Admiralty 1916, p. 14)"
+  # package 101, the Catalan coast's block (the region `catalan-coast`): as the Gulf's, the
+  # streams nought and the coast's set as `current:` alone: the set along the main to the
+  # south-west, in a band about ten miles wide from Tossa to the Alfaques, and the block's
+  # open water after it with none. The set onto the Ebro's mouths with sea winds (Tofino
+  # 1787, p. 119; Michelot 1715, OCR l. 2278) follows the wind and is no constant current:
+  # said in the band's statement, not modelled. The polygons lie in the Mediterranean, far
+  # from every recorded passage's water.
+  - id: catalan-coast-set
+    chart: catalan-coast
+    name: the coast of Catalonia, Tossa to the Alfaques
+    polygon: [[41.75, 2.98], [41.62, 2.72], [41.47, 2.38], [41.32, 2.06], [41.17, 1.62], [41.07, 1.20], [40.92, 0.95], [40.72, 0.95], [40.56, 0.80], [40.56, 1.05], [40.80, 1.22], [41.00, 1.47], [41.12, 1.92], [41.22, 2.22], [41.37, 2.52], [41.52, 2.86], [41.62, 3.00], [41.75, 3.00]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 225, kn: 0.5}
+    source: "Michelot 1715, OCR l. 2415 and 2471: the currents do generally set pretty swiftly to the SW all along this coast, sometimes to the N.W. according as the winds have blown; Purdy 1826, p. 28: the current on the coast generally sets to the south-westward; Smyth 1854, p. 162: so sluggish as to be almost imperceptible, reversed by strong north-westers; no text gives a rate: half a knot JUDGEMENT between Michelot's and Smyth's; no tidal stream (Smyth 1854, p. 176)"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SW, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the pilots' (Michelot 1715; Purdy 1826, p. 28), the rate JUDGEMENT; off the Ebro the current sets onto the mouths with sea winds (Tofino 1787, p. 119): give the low land two leagues"
+  - id: catalan-coast-open
+    chart: catalan-coast
+    name: the sea off Catalonia
+    polygon: [[40.56, 0.30], [41.90, 0.30], [41.90, 3.00], [40.56, 3.00]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "no constant set stated for the open sea off the coast and no tidal stream (Smyth 1854, pp. 162 and 176): the world's water still"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open sea off Catalonia"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

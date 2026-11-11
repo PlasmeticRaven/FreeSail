@@ -1,0 +1,46 @@
+# The owner's play of 2026-11-09 ashore, as the lead's prototype played it (package 98, step 1):
+# the Prince de Neufchatel at anchor in Carrick Road, the player stepping ashore at Falmouth
+# and asking, ordering and speaking at the quay, the market and the tavern.
+name: Ashore at Falmouth, at the quay, the market and the tavern
+scenario: tests/browser_plans/scenarios/neufchatel-falmouth.yaml
+steps:
+  - {label: "ON DECK, at anchor"}
+  - {say: let go the anchor, setup: true}
+  - {tick: 300}
+  - {say: step ashore, setup: true}
+  - {until: you are ashore, tick: 60, max: 90}
+  - {where: ashore}
+  - {label: "ASHORE, at the quay"}
+  - where am I
+  - the places ashore
+  - the port's places
+  - what is ashore
+  - the people
+  - the time
+  - the date
+  - the weather
+  - the wind
+  - the prices
+  - the purse
+  - the port
+  - how am I
+  - the depth
+  - set plain sail
+  - send the boat ashore
+  - tell the mate to weigh
+  - "say to the mate: good morning"
+  - {shot: quay}
+  - {label: "ASHORE, the market"}
+  - go to the market
+  - the prices
+  - buy two tons of tin
+  - the manifest
+  - {label: "ASHORE, the tavern"}
+  - go to the tavern
+  - where am I
+  - ask the pilot for the news
+  - the people
+  - {label: "ASHORE, back to the quay"}
+  - go to the quay
+  - come aboard
+  - go aboard

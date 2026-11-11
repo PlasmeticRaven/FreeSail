@@ -24,8 +24,9 @@ without a commission a pirate, prisoners victualled at two thirds, their lists t
 Prisoners, the parole), ch. IV (head money: the sentence of condemnation under the court's seal,
 the certificate of the men aboard at the beginning of the engagement, the agent's letter of
 attorney, paid though she be sunk or burnt), Sect. XIII ch. I art. VI (lieutenants of marines
-share in prizes with the warrant officers), and the Captain's art. XXXI (a prize purchased for
-the service: three fourths of the appraised value paid to the captors' agents, a fourth reserved);
+share in prizes with the warrant officers), and the Flag Officers' art. XXXI (the Commander in
+Chief's; a prize purchased for the service: three fourths of the appraised value paid to the
+captors' agents, a fourth reserved);
 Falconer 1780, ENGAGEMENT ("the defeated ship having acknowledged the victory by striking her
 colours is immediately taken possession of by the conqueror, who secures her officers and crew as
 prisoners in his own ship, and invests his principal officer with the command of the prize until a
@@ -721,8 +722,9 @@ the court's whim is a plausible cause), and the captain reads `the prize` and `t
 (`head_money_pounds` 5 a head of the men aboard her at the beginning of the engagement, the record's
 `men_at_start`: the Regulations ch. IV's certificate, on file; the five pounds the Prize Acts'
 figure FROM MEMORY, UNVERIFIED; paid though she was burnt, art. V), **three fourths now and a fourth
-reserved** where the prize is purchased for the service (the Captain's art. XXXI, on file: a King's
-ship's prize of war that the yard takes; the fourth comes with a later sentence of the court,
+reserved** where the prize is purchased for the service (the Flag Officers' art. XXXI, the
+Commander in Chief's, on file: a King's ship's prize of war that the yard takes; the fourth comes
+with a later sentence of the court,
 `court_days` more, as a second job: the owner may turn it off by `purchase_for_the_service:
 false`), the whole into the **captor's purse** by `Purse.receive(sum, by="the court", words=...)`
 with the account's lines (the valuation, the cargo good by good, the prize goods, the head money,
@@ -1228,3 +1230,138 @@ chart's and the planner's, noted for the lead); the far brain dropped its mark o
 prompt's alone); a far vessel whose plan runs out is gone from the sea at the minute's end, so the
 cartel's minute keeps her until her persons are landed. The figures and the pins are in
 `docs/dev/TuningNotes.md`, "Package 74", step 3.
+
+**The step's mends from the owner's play (2026-11-09, landed with step 4).** Five defects found
+by the lead's replay of the owner's strike save, each reproduced in the step's scene, mended and
+tested: (1) a captive's words were taken for the player's hand on his captor's captain, who
+stood aside and left her with nobody commanding (the hand is one of her own free company's
+alone: `movement.hand_on_her`); (2) a captor she had fired on before she struck engaged his own
+prize a minute after the possession (his own prize, and any of his nation's, is no enemy:
+`Judgement._prize_of_ours`; the taking clears her from what he knew her an enemy by); (3) a bare
+yes or no to the open question was not read (read now as whole words, §3.2's list beside); (4) a
+prisoner's hail was made from his captor's deck (§3.1 said "his orders of any deck refused"; the
+orders read before the vocabulary's were not: a captive's prompt performs a word said, asked or
+told, a reading, his moves within his parole, his needs and a free line, and nothing else), and
+a prize's answer to a hail named whoever stood at the hailing prompt (her captor's ship and her
+prize master now, from her record); (5) his going ashore met the free man's refusal (his own
+words now). The measures old beside new are in the notes, "Step 3's mends from the owner's play".
+
+### Step 4: the far fight on the sleeping hulls (§4; 2026-11-07)
+
+**Built as designed**: §4.2 to §4.6 (`combat/far_action.py`: the far engaging by the role
+files' rows, one round of `far.round_once` every three minutes for a pair in anger within gun's
+reach, each side's record carried in and written back, the draws from the World's `far` stream
+opened at the first round; the strike by morale as the cut-out writes it and the far possession
+after; the guns heard at the player's ship within twelve miles, the flashes to fifteen by night;
+the far ship's reply to an awake hull as the fallback where the cap has no room; the engagement
+first among the cap's reasons; the toggle `ENABLED`; the far record into the parts at `make_hull`
+and `_to_full`); truths 7-358 to 7-361 and 7-369; the primer's chapter 27 "An action off the
+horizon". **Taken another way**: the flashes' fifteen miles by night are a judgement (§4.4 gave
+the guns' twelve alone); the agreement (§4.6) is pinned as found and not tuned: the near fight of
+7-140's two cutters at a cable ends thirty-five seconds after the first shot where the design
+measured three minutes from a docstring's band, and the far rounds of the same pair end in two
+rounds (six minutes), within two rounds and not one, the far fight unable to end before its first
+round at 180 s and the coarser by design (rule 5). **Found on the way**: the far brain forgot its
+mark on entering `engaging` as it had on `taking possession`; the schooner's and the lugger's files
+give no armament (75's), so the packet's cut-out is a cutter's against a brig-sloop privateer; the
+"merchant brig" of the brig's one file carried the brig-sloop's eighteen guns (75's; mended by its
+SW-4, merged at step 2's boundary: her own file, sixteen men and four long 6s). The figures, the pins moved by the wiring measured with the toggle (the passages 7-152,
+7-153, 7-154, 7-159, 7-160) and `FALLBACK_COUNT` are in `docs/dev/TuningNotes.md`, "Package 74",
+step 4.
+
+**The pace mended at the resumption (2026-11-09).** The far fight read each side's ship file
+from disk at every minute of a far brain (`has_guns`) and again at every round (`far_ship_of`),
+which took truth 7-159 under its floor (175 ticks a second against 500) and would have taken
+7-361 under its own had it ever run: it stood on a world with no place on the chart. The file's
+figures are read once a file and fit (`far.file_figures`); 7-361 stands on the frigate of the
+brains' sea. No figure of the fight moved; the toggle's measures are in the notes, step 4.
+
+### Step 5: the prize court and the money (§5; 2026-11-07)
+
+**Built as designed**: §5.1 to §5.3 (`world/prize_court.py` and `data/business.yaml`'s four
+blocks; the valuation by the rows over the files' figures, the cargo at the port's market, the
+prize goods on 86's ordnance, the court by the port's nation sitting in its days as a port job on
+the prize hull's dealings or on a far prize's record in her goal's road, the three sentences by the
+rules with the wars' dates, the head money, the agent's five per cent and the court's fees, the
+reserved fourth of a King's ship's prize of war, the money by the eighths of the scheme in force
+at the court's date into the purse with the purse's line and the prize account's lines, the
+director's `port <id>: the court condemns | restores the <prize>` doubted against the rule, the
+reading `the prize money`, three events); truths 7-362 and 7-363; the primer's chapter 27 "The
+court and the money". **The lead's ruling of 2026-11-07 on §5.3** (Lavery, Nelson's Navy, p. 116,
+from the owner's shelf): the two British schemes are CONFIRMED and cited in the rows (the book's
+words not in the tree), the flag officer's share named as not modelled; the head money, the agent's
+commission, the hull's price a ton, the court's days, the costs and the salvage eighth stay FROM
+MEMORY, marked. **Added by the ruling** (the design lacked it): the prize money is **shared among
+every ship in sight at the moment the enemy struck**, a ship that took no part included, written
+on the record at the strike (`in_sight`, the ships at war with her in sight from her masthead, with
+their complements, by the near action's, the far rounds' and the cut-out's strike hooks) and
+divided before the eighths by their complements (the division a judgement, FROM MEMORY: Lavery
+gives the sharing), each ship's part into her purse by her own road, the purse's line saying
+"shared with the Sprightly, in sight at the strike: the Amazon's part £..."; truth 7-362 has a
+King's cutter in sight. **Taken another way**: her stores price nothing (her file lists none);
+`take her powder and shot` is not built (the goods are the court's); the `prize.lost` line at the
+court's date for a prize that does not come in is not written (nothing told the captor that his
+people cannot know); the reserved fourth is paid by the record's day from the prize's minute, not a
+second port job; the salvage is paid to the recaptors alone by their nation's court and scheme, the
+enemy's consorts in sight at the first strike sharing nothing of it. The figures and the finds are
+in `docs/dev/TuningNotes.md`, "Package 74", step 5.
+
+### Step 6: the court martial, a new command, and the consent revision drafted (§6, §7; 2026-11-07)
+
+**Built as designed**: §7.1 and §7.2 (`world/court.py`: the court sat by the form at a place of
+the port made for the sitting, the accused before it, the president and the judge advocate found
+there; the questions through `say as` heard at the place; the accused's own `say to the court:
+...`; the log of the action read by the judge advocate; the verdict one of `VERDICTS`, a world
+order journaled as every form is, the play log carrying the sentence read and never the order;
+`Person.record` kept in the save, read as `the record`; the copy of it he carries into a new
+command **a thing with words** in his keeping (package 100's letter, made by the scenario's
+`things:`; the lead's word of 2026-11-10: a paper given to an officer is a thing with words by
+that road and no kind of its own), where the design had a paper of the ship's, "the captain's
+record", so that no ship's papers move;
+`command: a new command for <person>: the <description> "<name>" at <port>` writing a scenario
+under the saves by 96's writer with his name, his followers and the record, the hooks named for
+M8), §6 (`docs/design/ConsentRevision-AdversarialSeats.md`, the text in the brief's voice and
+sections for the three roles, with a paragraph for the owner; the flag `seats.ADVERSARIAL_SEATS_
+CONSENTED` and the refusal in words at the director's seat and the desk's door, adversarial read
+from the world at the seating, the captain's station alone; nothing under `docs/agents/consent/`
+or in `docs/agents/ConsentBrief.md` touched; the suite's seats audited: none adversarial); truths
+7-364 to 7-366; the primer's chapter 27 "The court martial, and a new command"; the forms in the
+director's table and chapter 20. **Taken another way**: the accused speaks through a verb of the
+prize orders (the court is no station); the court's officers are persons of the sitting, gone at
+the verdict; the brief's `limits:` row for the verdict is not built; the exchange is a `person:`
+form of its own (`is exchanged at <port>`), doubted within a day of his landing; a scenario may
+name the player's ship (`ship.name`, honoured by the loader, nothing recorded moved). **Found on
+the way**: the player's own ship's captain is her prize master after the taking, so the freed
+player's prompt wanted a memory of who he is (`captive.PLAYERS_PERSON_KEY`); his nation for the
+court is his lost ship's, not his prize's colours; the dry run of a form that writes a file wrote
+it (the copy is marked, the form says what it would write). The figures and the finds are in
+`docs/dev/TuningNotes.md`, "Package 74", step 6.
+
+**The lead's review of the step (2026-11-10), mended in its tree**: the new command's file is
+named by its name alone (`saves/<name>`) in the log, the data, the record and the director's
+reply, a replay writes nothing, and a name that would write over another's file is refused; the
+served line is the appointment in the service's words, said ashore at the port, as the exchange
+is; a court whose accused is dead or gone is dissolved in words, and at its rising everyone at
+its place goes to the quay; its officers are of no ship's company; "the captain of the <ship>"
+is the man who commanded her; the mark of the player's person is cleared when he is his own
+ship's captain again; the adversarial seat's refusal comes before any consent record is read and
+is the live door's alone (a replay repeats the journal). Each finding old beside new in the
+tuning notes, "Step 6's mends from the lead's review".
+
+### Step 7: the records and the last truths (§8; 2026-11-07)
+
+**Built as designed**: the scenarios `prize-home.yaml` and `captive.yaml` with the starter brief
+`captive`, each loaded and begun in the fast tier (the possession and the strike the scenarios'
+own world orders two minutes in, by two forms this step adds: `ship "<name>": a prize of the
+<captor>` and `ship "<name>": struck to the <captor>`, journaled and so replayed, doubted after
+the first minute); the truth's rows for the prizes, the prisoners and their paroles, the far
+actions and the courts; the forms' dry runs in `test_director`'s table; the replay by both roads
+of a captive's passage and a far fight's (7-368); spec M7 §11a, §18 to §20 and §29 as built;
+Harness §21i; the primer's chapter 27 in-world; the forms and the events tables; the tuning notes
+whole; these postscripts; truths 7-367 and 7-368. **Taken another way**: the scenarios' starts
+are world orders rather than new scenario keys (the replay gives a world order again; a key the
+loader read at the start would have wanted a second road); the captive's brief carries the forms'
+own examples (the cartel, the parole, a gale). **Found on the way**: a vessel a test adds by hand
+is in no journal (the replay truths put theirs on the sea by the forms); two frigates of one file
+draw one seed's wardroom names. The figures are in `docs/dev/TuningNotes.md`, "Package 74", step 7
+and "The package whole".

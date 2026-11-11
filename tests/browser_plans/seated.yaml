@@ -1,0 +1,24 @@
+# The player seated at a station (package 98, step 1): the master's, which has no deck, his
+# readings, his word and his refusals answered at his station, on deck and below. (The
+# officer of the watch's seat without the deck refuses every line, readings among them, for
+# want of it: found for the seat's package, and answered in the log all the same.)
+name: Seated as the master, at anchor
+scenario: tests/browser_plans/scenarios/neufchatel-falmouth.yaml
+flags: [--seat, master]
+steps:
+  - {label: "ON DECK, the master"}
+  - {tick: 300}
+  - where am I
+  - the time
+  - the reckoning
+  - {say: set plain sail, expect: answered}
+  - "say to the captain: the anchor is holding"
+  - {label: "BELOW, the master"}
+  - {say: go below, expect: {sent: order, answered: true}}
+  - {say: go to the gunroom, setup: true}  # the move made whatever the page did with the line above
+  - {tick: 30}
+  - where am I
+  - the time
+  - the reckoning
+  - {say: set plain sail, expect: answered}
+  - "say to the captain: I am below"

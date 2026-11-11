@@ -1442,6 +1442,30 @@ verbs:
     synonyms: [toss]
     object: free
     level: 1
+  # Package 100: a letter a thing with words, and a thing destroyed. `write a letter to
+  # <whom>: "<words>"` by the drafting's road; `seal` and `open` (above) its seal; `read`
+  # (above) its words, shown to the reader alone; `examine` a thing as seen; `burn` and
+  # `tear up` a paper, gone.
+  write:
+    synonyms: [write a letter, pen]
+    object: free
+    level: 1
+  seal:
+    synonyms: [seal up]
+    object: free
+    level: 1
+  examine:
+    synonyms: [look at, inspect, look over]
+    object: free
+    level: 1
+  burn:
+    synonyms: []
+    object: free
+    level: 1
+  tear up:
+    synonyms: [tear, rip up, destroy]
+    object: free
+    level: 1
   # Milestone 7 (package 70; spec M7 §8, §8a): the quarters and the guns. The four
   # evolutions move the company between the watch bill and the quarter bill (object
   # `none`, `evolutions` below; the beat is a crew order as `call all hands` is, at once,
@@ -1703,6 +1727,13 @@ verbs:
     synonyms: [scuttle her, sink the prize, sink her, scuttle]
     object: prize
     level: 1
+  # Package 74 (spec M7 §20): the accused before a court martial speaks in his own words
+  # (`say to the court: I did my duty`), heard at the court's place; refused where no court
+  # sits on him.
+  say to the court:
+    synonyms: [tell the court, address the court, say to the court martial]
+    object: prize
+    level: 2
   bury the dead:
     synonyms: [commit the dead to the deep, read the burial service, bury the killed, commit the bodies to the deep,
                bury them]
@@ -1848,7 +1879,8 @@ verbs:
 # `free` (`freesail/orders/free.py`); `eat` and `drink` are the needs' (object `needs`,
 # package 54), of the same class and unchanged: the words after them are taken and kept in
 # the record, the answer the person's alone.
-free_lines: [give, hand, show, take, stow, hide, put, open, read, throw, eat, drink]
+free_lines: [give, hand, show, take, stow, hide, put, open, read, throw, write, seal, examine,
+  burn, tear up, eat, drink]
 
 # ---------------------------------------------------------------------------
 # Which evolution a level 1 sail verb starts, by sail class (spec §8.4).
@@ -2334,7 +2366,7 @@ reading_words:
 # two lists one.
 # ---------------------------------------------------------------------------
 world_orders:
-  channels: [weather, ship, message, port, person, captain, mark, seat, unseat, aboard, say, squadron, convoy, cartel, follow]  # mark: package 45c; seat, unseat: 43; aboard: 50; say (say as <person>:): 52; squadron, convoy: 72; cartel: 74
+  channels: [weather, ship, message, port, person, captain, mark, seat, unseat, aboard, say, squadron, convoy, cartel, court, command, follow]  # mark: package 45c; seat, unseat: 43; aboard: 50; say (say as <person>:): 52; squadron, convoy: 72; cartel, court, command: 74
   words: [world order, order to the world, order the world]
   refusal: "That is an order to the world, not to the ship: the weather, the other sail, a message, a port and the people ashore are the scenario's and the director's to order, journaled at the driver's mark; the captain orders his ship, sends the boat and reads what the lookout sees."
 

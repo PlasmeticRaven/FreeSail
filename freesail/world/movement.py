@@ -63,6 +63,7 @@ __all__ = [
     "DECK_NAVIGATION",
     "DECK_OBJECTS",
     "DECK_PLACES",
+    "SIGNALS",
     "HELM_OBJECTS",
     "MOVE_VERBS",
     "PERSON_MOVED",
@@ -100,6 +101,13 @@ MOVE_VERBS: tuple[str, ...] = (
 # `come on deck` keep theirs, `captain.below` and `captain.on_deck`).
 PERSON_MOVED = "person.moved"
 
+# The vocabulary's object of the colours and the signals (`orders.signals`, package 71).
+SIGNALS = "signals"
+
+# The places aloft (the tops and the masthead), from which a man comes down before he goes
+# down the side into the boat (package 98)
+ALOFT_PLACES: frozenset[str] = frozenset({"tops", "masthead"})
+
 # The places the deck's orders are given from (spec M7b §14: "the helm only on deck").
 DECK_PLACES: frozenset[str] = frozenset({"quarterdeck", "deck"})
 
@@ -120,6 +128,10 @@ DECK_OBJECTS: frozenset[str] = frozenset(
         "gunnery",
         "damage",  # package 73: the pumps and the carpenter's work are the deck's orders
         "fight",  # package 73: the marines and the boarders
+        # package 98, step 6 (the owner's ruling of 2026-11-09): the colours, the signals,
+        # the private signal, the lights and a hail across the water, by the deck's rule;
+        # word passed from below to the deck to make them is a later step's
+        SIGNALS,
     }
 )
 # The master's verbs that are the helm's: the course shaped, the chase given, the ship put
@@ -184,6 +196,15 @@ def person_of_actor(world: Any, actor: str | None) -> Any:
             # hull's prompt is his wherever it is, never the prize master's; another hull's
             # "captain" is her own captain's hand (the director's, a test's)
             return captive
+        if getattr(world, "is_followed", True):
+            from freesail.world.captive import remembered_person
+
+            me = remembered_person(world)
+            if me is not None and not getattr(me, "aboard", True):
+                # the player's person freed and ashore while his prompt follows the hull that
+                # held him (package 74, step 6; the design's §7): the prompt is his (decision
+                # 62), not that hull's captain's
+                return me
         visitor = knowledge.players_visitor(world)
         if visitor is not None:
             # the player aboard another ship as a visitor (decision 62; package 65, step 4):
@@ -285,6 +306,68 @@ VISITOR_VERBS = frozenset(
     {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore"}
 )
 VISITOR_OBJECTS = frozenset({"query", "needs", "free"})
+# What a captive's prompt performs (package 74; the owner's play of 2026-11-09), and nothing
+# else: his body's moves about the places his parole gives him (`_within_liberty`), his
+# needs, a question or a reading his place allows, a free line, and a word said (the
+# stations' `say to`, `ask` and `tell`: `CAPTIVE_STATION_VERBS`). He does not go ashore nor
+# aboard another ship at his own word, hails nobody, makes no signal, gives no standing
+# order and keeps none of her books.
+CAPTIVE_VERBS = frozenset({"go to", "go below", "come on deck", "go aloft"})
+CAPTIVE_STATION_VERBS = frozenset({"say", "ask", "tell"})
+CAPTIVE_LEAVING_VERBS = frozenset({"go ashore", "come aboard"})
+
+
+def _captives_own(verb: str, obj: str) -> bool:
+    return obj in VISITOR_OBJECTS or verb in CAPTIVE_VERBS
+
+
+def captive_at_prompt(ship: Any, leaving: bool = False) -> str | None:
+    """The captive's refusal for an order given at this ship's prompt, or None when its
+    giver is no captive (or no person stands behind it): for the orders that are read before
+    the vocabulary's (a hail, a signal, the colours, a standing order, a book, a station
+    stood down), which the place's `check` never sees."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    if world is None or not _mustered(world):
+        return None
+    actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+    person = person_of_actor(world, actor)
+    if person is None:
+        return None
+    from freesail.world.captive import captive_words
+    from freesail.world.hearing import own_hull
+
+    return captive_words(world, person, hull_of(world, own_hull(world)), leaving=leaving)
+
+
+def hand_on_her(world: Any, actor: str | None) -> bool:
+    """Whether an order given at this hull's prompt is the player's hand on her captain
+    (decision 41: the rules captain stands aside at it): only where its giver is one of her
+    own company and a free man. A captive's words and readings aboard his captor, and a
+    visitor's aboard another ship, are a person's own and never a hand on her captain
+    (package 74, the owner's play of 2026-11-09: a prisoner's 'say to Captain Penrose Yes.'
+    stood the captor's captain aside, and she lay aback and took the ground with nobody
+    commanding her). True where no person stands behind the actor, as before; and where
+    the people have not been mustered (`_mustered`: nobody has moved, so nobody is a captive
+    or a visitor, and asking for her captain would muster them for nothing and change a
+    world in which nobody moves: truth 7-279's passage took the ground by it)."""
+    if not _mustered(world):
+        return True
+    person = person_of_actor(world, actor)
+    if person is None:
+        return True
+    from freesail.world.captive import captive_of, is_captive
+    from freesail.world.hearing import own_hull
+
+    rec = captive_of(world)
+    if is_captive(person) or (rec is not None and rec.get("person") == person.name):
+        return False
+    here = hull_of(world, own_hull(world))
+    home_id = str(getattr(person, "home", "") or "")
+    if here is None or not home_id or is_boat_hull(here):
+        return True
+    return str(here.id) == home_id
 
 
 def _visitors_own(verb: str, obj: str) -> bool:
@@ -324,14 +407,16 @@ def check(ship: Any, verb: str, obj: str) -> None:
         return
     here = hull_of(world, getattr(person, "hull", None)) if person.aboard else None
     home_id = str(getattr(person, "home", "") or "")
-    if not _visitors_own(verb, obj):
+    if not _captives_own(verb, obj):
         # a captive (package 74, the design's §3.1): no deck is his, this one least of all,
-        # and his own ship's is a prize's; the words name his state
+        # and his own ship's is a prize's; the words name his state. His going ashore or
+        # aboard another ship is refused him in his own words too (the owner's play of
+        # 2026-11-09: 'go ashore' met the free man's "bring her to an anchor")
         from freesail.world.captive import captive_words
         from freesail.world.hearing import own_hull
 
         prompt_hull = hull_of(world, own_hull(world))
-        said = captive_words(world, person, prompt_hull)
+        said = captive_words(world, person, prompt_hull, leaving=verb in CAPTIVE_LEAVING_VERBS)
         if said:
             raise OrderError(said)
     if (
@@ -340,6 +425,7 @@ def check(ship: Any, verb: str, obj: str) -> None:
         and home_id
         and str(here.id) != home_id
         and not _visitors_own(verb, obj)
+        and obj != SIGNALS  # his own hail and signal, as the refusal below says (package 98)
     ):
         # a visitor aboard another ship (decision 62; package 65, step 4): a passenger's
         # reach, as a seated visitor's domain gives it (`agent.VISITOR_DOMAIN`)
@@ -700,6 +786,13 @@ def go_ashore(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     if person.mirror is not None and person is not world.people.captain:
         raise OrderError(
             f"You keep the reckoning, {person.name}; the master does not leave the ship."
+        )
+    aloft = str(getattr(person, "where", "") or "")  # by his own word, as `come on deck` reads
+    if aloft in ALOFT_PLACES:
+        # the boat is not reached from the tops (package 98, the lead's addition (c))
+        raise OrderError(
+            f"You are {place_words(aloft)}; come down on deck first ('come on deck') and then "
+            "go ashore."
         )
     agents = getattr(world, "agents", None) or {}
     for name, harness in agents.items():

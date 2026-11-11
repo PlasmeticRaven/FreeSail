@@ -2918,29 +2918,12 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
     assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
 
 
-def test_truth_7_196_the_seventy_four_ticks_at_the_build_machines_floor():
-    """Truth 7-196's clause alone (Bel-D §14.4; a draft for Phase 5, as above), routed to the pace
-    run by its name (tests/conftest.py): truth 51's form with her file in the frigate's place, the
-    gate's day from its scenario file (its book and first orders), a thousand ticks to settle and
-    the best of three thousands, at least `BUILD_MACHINE_FLOOR` (500) on the build machine. **Pinned
-    only if the lead's measurement on the build machine at her merge leaves a tenth's margin (550
-    or more); else recorded and reported, and no floor lowered** (the lead's answer (5)). Measured
-    on the owner's machine (2026-11-10), four runs: 474, 477, 483 and 490 ticks a second, under the
-    floor there (the frigate-36 505 and 631 and the 64 484 and 486 in the same form and runs), so
-    this clause fails on that machine as it stands, for the lead's build machine to settle."""
-    import time
-
-    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
-    from tests.test_known_truths import BUILD_MACHINE_FLOOR, GATE_DAY
-
-    sf = load_scenario(GATE_DAY)
-    world = make_scenario_world(sf, ship=SEVENTY_FOUR)
-    begin(world, sf)
-    assert world.ship.fit == FIT_1795
-    world.run(1000)
-    best = 0.0
-    for _ in range(3):
-        t0 = time.perf_counter()
-        world.run(1000)
-        best = max(best, 1000 / (time.perf_counter() - t0))
-    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+# Truth 7-196's clause alone (Bel-D §14.4: truth 51's form with her file in the frigate's place,
+# at least the build machine's floor of 500 ticks a second) is recorded and not pinned, by the
+# lead's answer (5) ("pinned only if the build machine leaves a tenth's margin, 550 or more; else
+# recorded, and no floor lowered") and the lead's measurement at her merge (2026-11-10, the build
+# machine quiet, the best of three thousands in each of three runs): 505, 476 and 492 ticks a
+# second, the frigate 524 and 516 in the same runs; on the owner's machine 474, 477, 483 and 490
+# (the frigate-36 505 and 631, the 64 484 and 486). She runs about a twentieth slower than the
+# frigate, and the frigate holds the floor by less than that. The test that asked it was taken
+# out by the lead at the merge; `tools/pace.py seventy-four` measures it still.

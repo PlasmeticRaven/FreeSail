@@ -1,0 +1,126 @@
+# FreeSail: Valencia's Grao as a port (package 101, beside the Catalan coast's block), on
+# package 35's machinery; the marks are the features file's
+# (data/charts/features/mediterranean-west.yaml, at its end: the Grao lies in the
+# Mediterranean west's region and has no harbour patch, the tool adding none to a built
+# region without rebuilding its level-2 tiles).
+#
+# Sources. Tofino 1787, Derrotero del Mediterraneo, pp. 107 to 109: from Cape Cullera the
+# low sandy coast N 17 W 18 miles to the Grao of Valencia, of little depth; the city two
+# miles and a half inland to the WNW; very dangerous in the autumn, the winds from NE to SE
+# doing most harm, and with the E there is no clawing off, the Grao being the westernmost
+# point of the gulf, so that ships parting their cables go on the beach, where a bank of
+# sand 300 varas off has only 6 feet and its breakers drown the boats' crews; much of the
+# bottom stone; the reef of the Barreta north of it, 5 and 6 brazas; anchor clear of it,
+# the cathedral tower open a little south of the church of the Barracas, in 6 brazas of
+# hard mud (the 'marca de traves' of the text, an erratum for 'marea'). Purdy 1826, p. 24:
+# highly dangerous for a vessel caught here during an easterly wind, next to impossible to
+# get out to sea; the usual anchorage before the Grao in 10 to 6 fathoms; the Grao's
+# exports the productions of which Valencia is the depot. Norie 1831, p. 27: the commerce
+# by lighters; a silk manufactory, and others, all on a small scale. Purdy 1840, p. 31:
+# a semicircular mole before the Grao, open to the S E (later than the period; Tofino,
+# Purdy 1826 and Norie 1831 name none).
+#
+# The datum: UNVERIFIED; the chart's depths are EMODnet's, the modern port of Valencia the
+# grid's land where 1805 had the open beach. The tide: no gauge is added for the Valencian
+# coast (TICON's Valencia, Sagunto and Gandia lie in a built region; the lead's ruling of
+# 2026-11-10); REDMAR 3651 (Valencia 3) gives the mean level 12 cm and the lowest
+# astronomical tide 8 cm below its zero, 0.20 m between, read and kept here. The world's
+# tide here is the Mediterranean west's gauges' blend (an M2 of 13 cm where Valencia's own
+# is 1.7 cm): a finding for others.
+#
+# The stance, dated (79a's form; data that carries its dates, decision 66): Spain's, hostile
+# to a King's ship by the nations table from 12 December 1804 (James 1837, vol. 3, p. 200);
+# France's from the capitulation of January 1812 (FROM MEMORY: Blake's, the 9th) to the
+# French leaving in July 1813 (FROM MEMORY: the 5th); a history of the Peninsular war would
+# verify both. The nations table's wars are one year's picture (see barcelona.yaml's head).
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: valencia
+name: Valencia
+nation:
+  - {nation: spain, until: 1812-01-08, source: "the King of Spain's; at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200)"}
+  - {nation: france, since: 1812-01-09, until: 1813-07-04, source: "Blake's capitulation to Suchet in January 1812 and the French evacuation in July 1813 (FROM MEMORY)"}
+  - {nation: spain, since: 1813-07-05, source: "Spain's again (FROM MEMORY)"}
+source: "Tofino 1787 pp. 107-109; Purdy 1826 p. 24; Norie 1831 p. 27; Purdy 1840 p. 31"
+datum: unverified   # no period sheet read with its datum; the modern port is the grid's
+
+outer_road:
+  feature: grao-road
+  name: the road of Valencia
+  lat_deg: 39.4500
+  lon_deg: -0.3000
+  depth_fathoms: 6
+anchorage:
+  feature: grao-road
+  name: the road of Valencia
+  lat_deg: 39.4500
+  lon_deg: -0.3000
+mooring:
+  feature: grao-road
+  name: off the Grao of Valencia
+  lat_deg: 39.4500
+  lon_deg: -0.3000
+  depth_fathoms: 6
+  bottom: hard mud
+shore:
+  feature: valencia-grao
+  name: the Grao of Valencia
+  lat_deg: 39.4620
+  lon_deg: -0.3300
+
+pilot:
+  station: grao-road
+  cruising_nm: 2                 # judgement: the lighters' boats
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a lighter's boat of the Grao
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Garcia, Martinez, Ferrer, Llorens, Sanchis, Peris, Marti]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 110            # out to the east-south-east (judgement)
+  words:
+    channel: "The beach is open and of little depth: a bank of sand three hundred varas off has only six feet and breaks. Keep clear of the Barreta, a reef of stones a mile off running north, the cathedral tower on with the church of the Barracas."
+    marks: "The great tower of the cathedral two miles and a half inland, the highest of the city; the church of the Barracas on the beach; Cape Cullera's lone head to the south."
+    anchorage: "Anchor with the cathedral tower open a little south of the Barracas in six fathoms of hard mud. With any wind from north-east round to south-east weigh in time: with an easterly there is no clawing off this bight, and ships that part their cables go on the bank."
+    tide: "No tide to speak of; the water rises with an onshore gale."
+
+tide:
+  establishment: Ivica
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: rice, price: 14, origin: spain, note: "rice loaded at the Jucar, a considerable export (Tofino 1787, p. 107; Purdy 1826, p. 23); the price JUDGEMENT, cheap against Barcelona's"}
+    - {good: silk, price: 160, origin: spain, note: "a silk manufactory (Norie 1831, p. 27); the price JUDGEMENT"}
+    - {good: wine, price: 18, origin: spain, note: "JUDGEMENT"}
+    - {good: brandy, price: 60, origin: spain, note: "Murviedro's wine and brandy (Smyth 1854, p. 8); JUDGEMENT"}
+    - {good: oranges, price: 5, origin: spain, note: "FROM MEMORY; no period text on file names them"}
+    - {good: raisins, price: 34, origin: spain, note: "the fruits the coasters load north of Murviedro (Tofino 1787, p. 109, 'frutos'); the kind FROM MEMORY"}
+    - {good: olive oil, price: 40, origin: spain, note: "JUDGEMENT"}
+    - {good: wheat, price: 30, origin: null, note: "JUDGEMENT"}
+    - {good: salt fish, price: 30, origin: null, note: "JUDGEMENT"}
+    - {good: salt, price: 10, origin: spain, note: "JUDGEMENT"}
+    - {good: biscuit, price: 30, origin: spain, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 20, pounds: 54, note: "judgement"}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.06, note: "judgement"}
+    - {item: water, hours_per_ton: 0.3, pounds_per_ton: 0.15, note: "by the lighters from the beach; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  # judgement: the Matricula de Mar takes the coast's seamen for the King of Spain's ships
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 10, pounds: 1, delay_h: 12}
+
+closed_to: []

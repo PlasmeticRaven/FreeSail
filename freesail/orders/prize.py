@@ -144,6 +144,20 @@ def _boat_ready(world: Any) -> None:
         raise OrderError(f"{name[:1].upper()}{name[1:]} is away; wait for her.")
 
 
+def as_said(text: str | None, words: str) -> str:
+    """The accused's words as he said them: the grammar's are lower-cased and its commas
+    gone, so the words are read again from the line as it was typed, after its colon, or
+    after the verb where he put none; the grammar's where the line is not to hand."""
+    raw = " ".join(str(text or "").split())
+    if ":" in raw:
+        return raw.split(":", 1)[1].strip() or words
+    low = raw.lower().rstrip(" .")
+    tail = str(words or "").strip(" .")
+    if tail and low.endswith(tail):
+        return raw.rstrip(" .")[len(low) - len(tail) :]
+    return words
+
+
 def execute(ship: Any, order: Order) -> Result:
     from freesail.world import prizes as P
     from freesail.world.movement import BOAT_BETWEEN_NM
@@ -151,6 +165,18 @@ def execute(ship: Any, order: Order) -> Result:
     verb = order.verb
     words = str(order.object or "")
     world = _world(ship, verb)
+    if verb == "say to the court":
+        # the accused's own words before the court martial (package 74, step 6; the design's
+        # §7.1): his, by the actor's person, wherever his prompt's hull lies
+        from freesail.world import court as CM
+        from freesail.world.movement import person_of_actor
+
+        actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+        person = person_of_actor(world, actor)
+        try:
+            return CM.accused_speaks(world, person, words)
+        except CM.CourtError as e:
+            raise OrderError(str(e)) from None
     if ship.extra.get("struck"):
         raise OrderError("Our own colours are struck: nothing of a prize is ours to order.")
     own = _own_vessel(world)

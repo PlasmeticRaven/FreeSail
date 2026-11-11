@@ -1,0 +1,58 @@
+# The owner's play of 2026-11-09 aboard (package 98, step 1): the Prince de Neufchatel at
+# anchor in Carrick Road, the player on deck, in the cabin, in the gunroom and aloft. Every
+# line typed is answered in the log where he stands (the owner's ruling for step 2: his
+# readings, his refusals and his own word); the page sends "go below" and its kin to the
+# server, and keeps "go" alone and "hold" for the clock.
+name: Aboard at anchor, on deck, in the cabin, the gunroom and aloft
+scenario: tests/browser_plans/scenarios/neufchatel-falmouth.yaml
+steps:
+  - {label: "ON DECK, at anchor"}
+  - {say: let go the anchor, setup: true}
+  - {tick: 300}
+  - {where: quarterdeck}
+  - where am I
+  - the time
+  - the places ashore
+  - the purse
+  - the depth
+  - {say: go, expect: {sent: driver}}
+  - {say: hold, expect: {sent: driver}}
+  - {label: "IN THE CABIN"}
+  - {say: go below, expect: {sent: order, answered: true, contains: cabin}}
+  - {say: go to the cabin, setup: true}  # the move made whatever the page did with the line above
+  - {tick: 30}
+  - {where: in the cabin}
+  - where am I
+  - the time
+  - the purse
+  - the glass
+  - the depth
+  - {say: set plain sail, expect: {answered: true, contains: on deck}}
+  - {say: weigh the anchor, expect: {answered: true, contains: on deck}}
+  - {say: hoist the colours, expect: {answered: true, kind: order.rejected}}
+  - {say: haul down the colours, expect: {answered: true, kind: order.rejected}}
+  - {say: make the private signal, expect: {answered: true, kind: order.rejected}}
+  - {say: answer the private signal, expect: {answered: true, kind: order.rejected}}
+  - make the signal 250
+  - "say to the master: good morning"
+  - tell the master to come to the cabin
+  - send for the master
+  - {shot: cabin}
+  - {label: "IN THE GUNROOM"}
+  - {say: go to the gunroom, expect: {answered: true}}
+  - {tick: 30}
+  - where am I
+  - the time
+  - the reckoning
+  - {say: brace the yards square, expect: {answered: true, contains: on deck}}
+  - {label: "ALOFT"}
+  - {say: come on deck, setup: true}
+  - {tick: 30}
+  - {say: go aloft, expect: {sent: order, answered: true}}
+  - {say: go to the tops, setup: true}  # the move made whatever the page did with the line above
+  - {tick: 60}
+  - where am I
+  - what is in sight
+  - the time
+  - {say: go ashore, expect: {sent: order, answered: true, contains: come down on deck first}}
+  - {say: come on deck, expect: {sent: order, answered: true}}

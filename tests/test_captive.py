@@ -49,12 +49,17 @@ def _scenario(position: dict | None = None) -> Scenario:
 
 
 def _struck_to_a_crewed_frigate(
-    seed: int = 7, position: dict | None = None, her_goal: str = "bound for 48 20 N 4 50 W"
+    seed: int = 7,
+    position: dict | None = None,
+    her_goal: str = "bound for 48 20 N 4 50 W",
+    fired_on_her: bool = False,
 ):
     """The player's frigate at quarters with a French frigate crewed ten metres off her beam,
     her captain engaging by his own machine; the player strikes his colours and her captain
     takes possession within the quarter hour (`taking possession`: closed, hove to, `take
-    possession of her`). Returns (the player's World, her captor's hull) at the possession."""
+    possession of her`). Returns (the player's World, her captor's hull) at the possession.
+    With `fired_on_her` the player's ship stands among her captain's enemies by her shot
+    before she strikes, as `combat.action._fired_on` writes it."""
     w = make_world(seed, FRIGATE, _scenario(position))
     w.submit("beat to quarters")
     w.run(5)
@@ -83,6 +88,10 @@ def _struck_to_a_crewed_frigate(
     w.submit("hold your fire")
     w.run(65)
     enemy.captain._enter("engaging")
+    if fired_on_her:
+        from freesail.combat.action import _own_id
+
+        enemy.captain.fired_on.add(_own_id(w))
     w.run(60)
     assert w.submit("strike the colours").kind == "action.struck"
     for _ in range(12):
@@ -253,12 +262,254 @@ def test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_whi
     assert e.data.get("result") == "done", e.text
     pris = P.prisoners_of(enemy.ship)
     assert pris.parole["Captain Bowen"] == "refused"
-    assert "refuses his parole (the director's word)" in _kinds(enemy.log, "prize.parole")[0].text
+    # the captor's log's line, which the captive aboard her hears, is the world's: it names
+    # no director (old: "refuses his parole (the director's word): ...")
+    line = _kinds(enemy.log, "prize.parole")[0]
+    assert line.text == (
+        "Captain Bowen refuses his parole: the gunroom alone is his, a sentry at the door."
+    )
+    assert "director" not in line.text and "director" not in str(line.data).lower()
     e = w.world_order("aboard the Medusa: the parole of Mr Veale given", "the test")
     assert e.data.get("result") != "done" and "no prisoner aboard the Medusa" in e.text
 
 
 # -- the far body ----------------------------------------------------------------------------------
+
+
+# -- step 3's mends from the owner's play (2026-11-09) ---------------------------------------------
+
+
+def _metres_between(a, b) -> float:
+    from freesail.world.geo import bearing_and_distance
+
+    return float(bearing_and_distance(a, b)[1])
+
+
+def test_a_captives_words_and_readings_never_stand_his_captors_captain_aside():
+    """The owner's play, the worst of five: a prisoner's 'say to Captain Penrose Yes.' was
+    taken for the player's hand on the captor's captain (`Captain.player_hand`, decision
+    41), who stood aside with his book struck; nobody commanded her, she lay aback and took
+    the ground. A captive's words, readings and moves aboard his captor are a person's own:
+    her captain commands throughout, no `captain.aside` is written, and she sails for her
+    port. The rule is the giver's (`movement.hand_on_her`): one of her own company and a
+    free man; a visitor of another ship's is no hand on her either."""
+    from freesail.world import movement as M
+
+    w, enemy = _struck_to_a_crewed_frigate()
+    cap = enemy.captain
+    w.run(120)  # he fills and shapes his course; the parole is asked
+    assert cap.state == "on passage" and not cap.aside and cap.intent_words == "bound for Brest"
+    before = enemy.position
+    for words in (
+        "say to the captain: Yes.",
+        "where am I",
+        "say to the captain: I thank you, sir.",
+        "go to the deck",
+        "go below",
+        "hail her",
+        "take a fix",
+    ):
+        w.submit(words)
+        assert not cap.aside and cap.state == "on passage", words
+    w.run(600)
+    assert not cap.aside and cap.state == "on passage" and cap.commands
+    assert not _kinds(w.log, "captain.aside") and not _kinds(enemy.log, "captain.aside")
+    assert _metres_between(before, enemy.position) > 300.0, "she does not sail for her port"
+    # the rule by its giver: the captive, a visitor of another hull's, one of her own
+    assert M.hand_on_her(w, "captain") is False
+    visitor = type("P", (), {"name": "Mr Veale", "home": "another"})
+    visitor.confined_to, visitor.liberty = "", ()
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(M, "person_of_actor", lambda world, actor: visitor())
+        assert M.hand_on_her(enemy, "captain") is False
+        visitor.home = enemy.own.id
+        assert M.hand_on_her(enemy, "captain") is True
+        mp.setattr(M, "person_of_actor", lambda world, actor: None)
+        assert M.hand_on_her(enemy, "captain") is True
+
+
+def test_a_captor_she_fired_on_before_she_struck_does_not_engage_his_own_prize():
+    """The owner's play, the second: the player had fired on her before he struck, so he
+    stood in her captain's `fired_on`; a minute after the possession Captain Penrose went
+    `engaging` again and fired into his own prize, his prize master and twenty hands aboard
+    her. His own prize, and any prize of his nation in her captor's hands, is no enemy
+    (`Judgement._prize_of_ours`), and the taking clears her from what he knew her an enemy
+    by. (Without the mend, in this scene: `engaging` at the first judgement after the
+    possession and 38 shot at her in the quarter hour, measured.)"""
+    w, enemy = _struck_to_a_crewed_frigate(fired_on_her=True)
+    cap = enemy.captain
+    me = str(w.players.id)  # the player's ship, by her id on the one sea
+    assert me not in cap.fired_on, "the taking did not clear her from his enemies"
+    taken = w.clock.tick
+    w.run(900)
+    assert cap.state == "on passage" and not cap.aside
+    states = [e for e in _kinds(enemy.log, "captain.state") if e.tick > taken]
+    assert states and not any("engaging" in e.text for e in states), [e.text for e in states]
+    assert not [e for e in _kinds(enemy.log, "action.fired") if e.tick > taken]
+    assert not [e for e in _kinds(w.players.log, "action.fired_at") if e.tick > taken]
+    # the judgement itself: she is his prize, whatever she did; given back, judged as any sail
+    assert cap._prize_of_ours(me) and cap._known_enemy({"id": me}) is False
+    cap.fired_on.add(me)
+    assert cap._known_enemy({"id": me}) is False
+    rec = P.record_of(enemy.vessels.get(me))
+    rec["retaken"] = ("retaken", "a test", w.clock.tick)
+    assert cap._known_enemy({"id": me}) is True
+    del rec["retaken"]
+
+
+def test_a_bare_yes_gives_the_parole_and_a_bare_no_refuses_it_read_as_whole_words():
+    """The owner's play, the third: 'say to Captain Penrose Yes.' left the parole asked.
+    While the question is open a bare yes, oui, sí, aye, 'I do', 'you have it' gives it and
+    a bare no, non, 'never', 'I will not' refuses it, as whole words ('not' is no 'no',
+    'yesterday' no 'yes'); both in one answer read as neither and the question stays open;
+    nothing is read once it is answered."""
+    assert all(C._whole_words(t, C.PAROLE_YES_WORDS) for t in ("yes.", "oui, monsieur", "i do"))
+    assert all(C._whole_words(t, C.PAROLE_NO_WORDS) for t in ("no.", "non", "i will not, sir"))
+    assert not C._whole_words("yesterday i did not know", C.PAROLE_YES_WORDS)
+    assert not C._whole_words("i do not know what to say, nothing", C.PAROLE_NO_WORDS)
+    w, enemy = _struck_to_a_crewed_frigate()
+    me = C.captive_person(w)
+    w.run(120)
+    pris = enemy.ship.extra["prisoners"]
+    assert pris.parole.get(me.name) == "asked"
+    for words in ("I cannot say yet.", "Yes and no.", "Yesterday I should have known."):
+        w.submit(f"say to the captain: {words}")
+        assert pris.parole.get(me.name) == "asked", words
+    w.submit("say to the captain: Yes.")
+    assert pris.parole.get(me.name) == "given"
+    assert me.liberty == C.PLACES_ON_PAROLE and not enemy.captain.aside
+    w.submit("say to the captain: No.")  # answered: nothing more is read
+    assert pris.parole.get(me.name) == "given"
+    # and the bare no, in another taking
+    w2, enemy2 = _struck_to_a_crewed_frigate()
+    me2 = C.captive_person(w2)
+    w2.run(120)
+    w2.submit("say to the captain: Non.")
+    assert enemy2.ship.extra["prisoners"].parole.get(me2.name) == "refused"
+    assert me2.liberty == C.PLACES_REFUSED
+
+
+def test_an_answer_that_holds_a_negation_is_never_read_as_the_parole_given():
+    """The lead's ruling of 2026-11-10: "I do not." and "you have it not" were read as given
+    (the plain yes's "i do" and "you have it" with a negation after them), and "you shall not
+    have my parole" by the form "my parole". An answer that holds a negation is never given,
+    by the forms or the plain words; it is refused by the refused forms and the plain no
+    alone, and otherwise the question stays open."""
+    for words in (
+        "I do not.",
+        "I do not know",
+        "I do not see why I should",
+        "you have it not",
+        "I don't give you my parole yet",
+        "I can't say",
+        "Je ne donne pas ma parole",
+        "Yes and no.",
+    ):
+        assert C.read_parole(words) is None, words
+    for words in (
+        "you shall not have my parole",
+        "No, I do not",
+        "No.",
+        "Never, sir",
+        "I refuse",
+        "I do not give it",
+    ):
+        assert C.read_parole(words) is False, words
+    for words in (
+        "I do.",
+        "You have it, sir",
+        "I give you my parole",
+        "You have my word, lieutenant",
+        "Oui",
+    ):
+        assert C.read_parole(words) is True, words
+    # at the prompt: the question stays open through the negated yes, and the refusal is read
+    w, enemy = _struck_to_a_crewed_frigate()
+    me = C.captive_person(w)
+    w.run(120)
+    pris = enemy.ship.extra["prisoners"]
+    assert pris.parole.get(me.name) == "asked"
+    for words in ("I do not.", "You have it not.", "I do not know."):
+        w.submit(f"say to the captain: {words}")
+        assert pris.parole.get(me.name) == "asked", words
+    w.submit("say to the captain: You shall not have my parole.")
+    assert pris.parole.get(me.name) == "refused"
+    assert me.liberty == C.PLACES_REFUSED
+
+
+def test_a_prisoner_hails_nobody_and_his_prompt_performs_his_own_words_moves_and_needs_alone():
+    """The owner's play, the fourth and fifth: the prisoner's 'hail her' was made by the
+    trumpet from his captor's deck, and his 'go ashore' was refused in the free man's words
+    ("bring her to an anchor"). A captive's prompt performs exactly: a word said, asked or
+    told (`movement.CAPTIVE_STATION_VERBS`), a reading or a question his place allows, his
+    body's moves within his parole (`CAPTIVE_VERBS`), his needs and a free line; every other
+    order, the ones read before the vocabulary's among them (a hail, the colours, a signal,
+    a standing order, a book, a station stood down, `captain: carry on`), is refused in the
+    words that name his state, and nothing of it is done."""
+    from freesail.world import movement as M
+
+    assert M.CAPTIVE_VERBS == {"go to", "go below", "come on deck", "go aloft"}
+    assert M.CAPTIVE_STATION_VERBS == {"say", "ask", "tell"}
+    w, enemy = _struck_to_a_crewed_frigate()
+    w.run(120)
+    hails = len(_kinds(enemy.log, "hail.made")) + len(_kinds(w.players.log, "hail.answered"))
+    for words in (
+        "hail her",
+        "hail the frigate: what ship is that?",
+        "say to the Amazon: heave to",
+        "strike the colours",
+        "hoist the colours",
+        "make the private signal",
+        # package 98's step 7, met at the trunk: the flags of command are the deck's orders
+        # by the place's check, so a prisoner is refused them by the same road as the colours
+        "haul down the broad pendant",
+        "haul down the second ensign",
+        "haul down the jack",
+        'standing order "mine": when the wind shifts then trim sails',
+        "captain: carry on",
+        "take a fix",
+        "come to anchor",
+        "beat to quarters",
+        "set the courses",
+        "heave to",
+    ):
+        out = w.submit(words)
+        assert out.kind == "order.rejected", (words, out.kind, out.text)
+        assert "You are a prisoner aboard the Medusa" in out.text, (words, out.text)
+    for words in ("go ashore", "come aboard the Amazon"):
+        out = w.submit(words)
+        assert out.kind == "order.rejected" and "you leave her where her captain lands you" in (
+            out.text
+        ), (words, out.text)
+        assert "anchor" not in out.text
+    assert (
+        len(_kinds(enemy.log, "hail.made")) + len(_kinds(w.players.log, "hail.answered")) == hails
+    )
+    assert not enemy.captain.aside
+    # what he may: his words, a reading, his needs, and (his parole given) his moves
+    assert w.submit("say to the captain: I give my parole").kind == "person.spoke"
+    assert w.submit("where am I").kind == "query.reading"
+    assert w.submit("how am i").kind != "order.rejected"
+    assert w.submit("go to the deck").kind == "person.moved"
+    assert w.submit("go below").kind == "person.moved"
+
+
+def test_a_prizes_answer_to_a_hail_names_her_captors_ship_and_her_prize_master():
+    """The owner's play, the fourth's other half: the prize answered "prize to Mr Ray's
+    ship", naming whoever stood at the hailing prompt. A prize under her prize crew answers
+    whose prize she is by her captor's ship ("prize to the Medusa") and her prize master by
+    his own name, both from her record."""
+    from freesail.world import hail as H
+
+    w, enemy = _struck_to_a_crewed_frigate()
+    prize = enemy.vessels.get(str(w.players.id))
+    rec = P.record_of(prize)
+    assert rec["captor_name"] == "Medusa" and rec["master"]
+    said = H.answer_by_table(enemy, prize, "What ship is that?", w.players)
+    assert said.startswith("The Amazon, prize to the Medusa, "), said
+    assert "'s ship" not in said
+    who = H.answer_by_table(enemy, prize, "Who commands her?", w.players)
+    assert rec["master"] in who and "prize master" in who, who
 
 
 @pytest.mark.slow

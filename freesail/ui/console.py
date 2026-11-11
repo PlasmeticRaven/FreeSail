@@ -219,7 +219,7 @@ def station_watcher(world: World, kind: str, out=None) -> Any:
 # the prefix is the owner's word, at the console and in the browser alike). Its source in
 # the journal, for the record, the save and the replay.
 LIVE_WORLD_ORDER_PREFIX = "world:"
-LIVE_WORLD_ORDER_SOURCE = "the owner"
+LIVE_WORLD_ORDER_SOURCE = knowledge.OWNER_SOURCE  # one spelling (package 98, addition (d))
 
 
 def live_world_order(line: str) -> str | None:
@@ -536,11 +536,13 @@ class Console:
             and self._alarm is None
         ):
             self._alarm = e  # eased once the tick is over (`_run`)
-        if for_the_record(e):
+        if for_the_record(e) and not knowledge.owners_world_order(e):
             # decision 46 and the director's lines (spec M7b §6; package 50): the play log
             # at the console carries a world order's effects, never the order, nor the
-            # director's coming and going; 'the director's log' reads them
+            # director's coming and going; 'the director's log' reads them; the owner's own
+            # world order is his line, shown him (package 98, addition (d))
             return
+        e = knowledge.as_the_owner_sees(e)
         if not self.hears(e):
             return  # the player reads by his place as a model does (decision 59)
         for x in self._view.feed(e, self.compression):
@@ -645,8 +647,9 @@ class Console:
                 self._print(e.text)
             except ValueError as err:
                 self._print(str(err).rstrip(".") + ".")
-        elif cmd == "look" and args[:1] == ["at"]:
-            # the observer's view moved (package 82, item 1): a driver's line
+        elif cmd == "look" and args[:1] == ["at"] and getattr(self.world, "observed", False):
+            # the observer's view moved (package 82, item 1): a driver's line, in an observed
+            # world; with a ship of the player's `look at <a thing>` is the game's (package 100)
             try:
                 e = self.world.look_at(" ".join(args[1:]))
                 self._print(e.text)
@@ -690,8 +693,8 @@ class Console:
         elif cmd == "log" and (not args or args[0].isdigit()):
             n = int(args[0]) if args else 20
             for e in self.world.log.tail(n):
-                if not for_the_record(e) and self.hears(e):
-                    self._print(e.line())
+                if (not for_the_record(e) or knowledge.owners_world_order(e)) and self.hears(e):
+                    self._print(knowledge.as_the_owner_sees(e).line())
         elif directors_log_asked(line):
             # the director's log revealed on request (spec M7b §6; package 50): a driver's
             # line for the record, which the director is told of, and the lines

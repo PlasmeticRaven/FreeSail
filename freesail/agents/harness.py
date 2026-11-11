@@ -643,6 +643,9 @@ class Harness:
     # that does not always carry an image (the local runner), when its seating says its
     # model reads one. A class default, so that a checkpoint from before loads with it.
     pictures: bool = False
+    # Package 98, step 4: the seating said its door's model reads no image (the OpenRouter
+    # door's word, from its models list): no picture tool, at any door. A class default too.
+    no_pictures: bool = False
 
     # A station's place among the inputs (package 37d): the count of the World's inputs
     # (orders given, refused and answered, and the lines a driver wrote) when the station
@@ -967,9 +970,10 @@ class Harness:
         station alone, and none of the deck's there (package 50)."""
         # the picture tools at a door that carries an image (package 42), and at the
         # local runner when its model reads one (package 45c: `pictures`, its seating's)
-        names = tools.tool_names(
-            self.door in tools.PICTURE_DOORS or self.pictures, director=self._is_directors
-        )
+        # and at a door whose seating said its model reads none, none (the OpenRouter door's
+        # word, package 98, step 4)
+        offered = (self.door in tools.PICTURE_DOORS or self.pictures) and not self.no_pictures
+        names = tools.tool_names(offered, director=self._is_directors)
         if self.allowed_tools is None:
             return names
         return tuple(n for n in names if n in self.allowed_tools)

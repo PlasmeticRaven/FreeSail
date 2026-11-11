@@ -1,0 +1,558 @@
+# The features of the Catalan coast's block (package 101, the region `catalan-coast`;
+# docs/dev/ChartBlocks.md): the main from the Alfaques and the Ebro's delta by the Coll de
+# Balaguer, Cambrils, Cape Salou and its road, Tarragona, the coast of Garraf, the Llobregat,
+# Barcelona under Montjuic, and the Maresme by Mataro to Blanes, Lloret and Tossa, with the
+# great marks inland (Montserrat, Montseny, the Montsia). North of 40.56 N, where `balearics`
+# ends, and west of 3 E, where `gulf-of-lion` begins (its column from 2.61 E holds the tiles
+# of Blanes to Tossa, the seam's: the marks are this block's, the bounds its own). The form
+# and the rules are channel-west.yaml's (its head). The sources, in the references' form
+# (docs/references/README.md; the texts under docs/references/pilots/, package 79c's pass,
+# this package's short pass in docs/dev/TuningNotes.md, "Package 101"):
+#
+#   Tofino 1787     Derrotero de las costas de Espana en el Mediterraneo: the spine, the
+#                   period's own survey, pp. 115 to 128 for this coast; his latitudes, his
+#                   longitudes from Cadiz's meridian (about 6 17' 35" east of Greenwich's by
+#                   Purdy's figures), his enfilaciones true bearings.
+#   Michelot 1715   The Mediterranean Pilot (the English of the Portulan of 1709): the coast
+#                   as the century knew it, by OCR line (its page numbers are lost).
+#   Purdy 1826      The New Sailing Directions for the Mediterranean Sea, pp. 25 to 29.
+#   Norie 1831      New Piloting Directions for the Mediterranean Sea, pp. 28 to 32.
+#   Purdy 1840      The New Sailing Directory for the Strait and the Western Division, pp.
+#                   33 to 38, and its 'Pharonology' (pp. ii and iii).
+#   Smyth 1854      The Mediterranean: pp. 8 to 10, and the table of positions pp. 432 to 433.
+#   Admiralty 1913  The Mediterranean Pilot, vol. I, pp. 205 to 225: MODERN, for the heights
+#                   and depths only, never for 1805's works or lights.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from), first placed from the modern map and the pilots' bearings and distances, then
+# checked against this block's tiles by the rule of channel-west.yaml's head (a scratch
+# script outside the repository: a land mark to the nearest land within 800 m, a light to
+# land within 400 m, an anchorage to water of half the pilot's depth within 800 m, a danger
+# to the nearest shoal within 400 m); a move is said in `fix`. Heights above the sea for the
+# horizon: Montserrat, Montseny, the Montsia and Montjuic are this coast's great marks.
+#
+# The period's shore. The tiles are the modern grid's: the Ebro's delta as it is now (grown
+# since Tofino drew it, its mouths changed), and the modern harbours of Barcelona and
+# Tarragona as the grid has them; no period sheet with its datum is read (the plans of the
+# coast are CC BY-NC-SA scans, read and not transcribed), so no override changes them, and
+# the port files say so. The marks are the period's: Barcelona's old mole and its lantern,
+# the Merced tower, Montjuic's castle; the delta's points by Tofino's words.
+#
+# The lights: a light's `lit` has `from` and `until`, so that 1805 sees what 1805 had. In
+# 1805 Barcelona's lantern on the old mole (Michelot 1715: a fire kept every night; Tofino's
+# "Linterna del Muelle"), `from` the earliest record read, no text giving the year first lit.
+# Not yet in 1805: the light on Barcelona's new mole (the official notice of 14 December 1823,
+# Norie 1831 and Purdy 1840) and Tarragona's mole lantern (first in Purdy 1826, the mole "a
+# modern structure"; Tofino names no mole there), each `from` the earliest record read and
+# its exact year UNVERIFIED. No period text names a light at the Alfaques, Cape Tortosa,
+# Salou, the Llobregat or Montjuic. `range_nm` the period lamp's, JUDGEMENT.
+
+region: catalan-coast
+features:
+  # ---------------------------------------------------------------------------
+  # The Alfaques and the Ebro's delta (the harbour patch alfaques)
+  # ---------------------------------------------------------------------------
+
+  - id: montsia
+    kind: hill
+    name: the Sierras of Montsia
+    modern: 'Serra del Montsia, the Torreta (the Admiralty''s Pare Pascual)'
+    lat_deg: 40.6480
+    lon_deg: 0.5350
+    height_m: 764
+    source: 'Tofino 1787, p. 116: the Sierras de Monsia run NNE and SSW behind La Rapita, their summit bearing W 7 30 S of it, the mark by night for the port (stand no farther north until it bears NW by N or NNW); Admiralty 1913, p. 205: Pare Pascual 2,506 feet, the height'
+    says: 'The Sierras of Montsia, a long high ridge behind the Alfaques running north and south; their summit is the mark for the haven by night.'
+
+  - id: la-rapita
+    kind: town
+    name: La Rapita, or San Carlos
+    modern: 'Sant Carles de la Rapita'
+    lat_deg: 40.6180
+    lon_deg: 0.5930
+    height_m: 10
+    source: 'Tofino 1787, p. 115: La Rapita or San Carlos in latitude 40 36 30, longitude 6 55 10 from Cadiz; p. 118: a canal lately opened from Amposta to San Carlos, no fresh water nor wood in all the port but at La Rapita, a brackish well; Purdy 1826, p. 25: Rapita, lat. 40 36 30, long. 0 37 35 E.'
+    says: 'La Rapita, the new town of San Carlos at the head of the Alfaques, with its canal begun toward the Ebro; the only water of the haven is its brackish well.'
+
+  - id: alfaques-haven
+    kind: anchorage
+    name: the haven of the Alfaques
+    modern: 'Port dels Alfacs, the inner bay'
+    lat_deg: 40.6150
+    lon_deg: 0.6500
+    height_m: 0
+    depth_fathoms: 3
+    bottom: soft mud
+    source: 'Tofino 1787, p. 116: the bottom of the port 3 to 4 brazas in general, all mud, mooring NW and SE; no ship larger than frigates or xebecs; p. 117: the NW winds, the Maestrales, the most harmful, and the mud being loose the anchors easily drag; Purdy 1826, p. 25: 3 and 3 1/2 fathoms, the bottom everywhere of mud; Michelot 1715, OCR l. 2259: 4 fathom water, soft mud, and the anchors hold well'
+    says: 'The haven of the Alfaques, a great shallow bay within the sandy point: three or four fathoms of soft mud everywhere, room for frigates; the north-westers come down hard and the anchors drag in the loose mud.'
+
+  - id: alfaques-outer-road
+    kind: anchorage
+    name: the road within Point de la Bana
+    modern: 'Port dels Alfacs, the outer part within the Punta de la Banya'
+    lat_deg: 40.6054
+    lon_deg: 0.6962
+    fix: 'moved 680 m to the grid''s water of half the pilot''s depth (the first placing read 2 m of water, on the edge of the sand within the point)'
+    height_m: 0
+    depth_fathoms: 6
+    bottom: mud
+    source: 'Tofino 1787, p. 117: a large ship sheltering from the east wind lies SSE of the Codonol tower, abreast of the Punta de Decain, in 6 or 6 1/2 brazas of mud; p. 116: steer for the tower of San Juan, the Punta de la Palma Marina running out shoal nearly three quarters of a mile toward the channel'
+    says: 'The outer road of the Alfaques within the sandy point, six fathoms on mud, where a great ship lies from the easterlies; keep clear of the shoal point of the Palma Marina going in.'
+
+  - id: point-de-la-bana
+    kind: headland
+    name: Point de la Bana
+    modern: 'Punta de la Banya (the Admiralty''s Cape Banya)'
+    lat_deg: 40.5700
+    lon_deg: 0.6500
+    height_m: 2
+    source: 'Tofino 1787, p. 117: the Punta de la Bana is the farthest south of this coast of the Alfaques, S 2 15 E of the summit of the Sierras de Monsia about 8 1/2 miles; Purdy 1826, p. 25: the point of La Banna; Admiralty 1913, p. 206: the peninsula advancing seaward, the depths decreased (the modern point grown since)'
+    says: 'Point de la Bana, a long low point of sand closing the Alfaques on the south; the land is so low that the lead is the best mark.'
+
+  - id: amposta
+    kind: town
+    name: Amposta
+    modern: Amposta
+    lat_deg: 40.7100
+    lon_deg: 0.5800
+    height_m: 10
+    source: 'Tofino 1787, p. 118: from Amposta to San Carlos a canal lately opened; the Ebro navigable for fit craft, Tortosa twenty miles within on its left bank'
+    says: 'Amposta, on the Ebro above its mouths, where the canal to San Carlos begins.'
+
+  - id: tortosa
+    kind: town
+    name: Tortosa
+    modern: Tortosa
+    lat_deg: 40.8120
+    lon_deg: 0.5220
+    height_m: 15
+    source: 'Tofino 1787, p. 118: Tortosa twenty miles up the Ebro on its left bank; Purdy 1826, p. 26: about 18,000 inhabitants'
+    says: 'Tortosa, the city on the Ebro twenty miles within its mouths, whence the river craft come down to the sea.'
+
+  - id: cape-tortosa
+    kind: headland
+    name: Cape Tortosa
+    modern: 'Cap de Tortosa, the Illa de Buda''s point (grown since the period)'
+    lat_deg: 40.7200
+    lon_deg: 0.8700
+    height_m: 1
+    source: 'Tofino 1787, p. 118: from the Bana the low coast runs NE 11 miles; the Ebro enters the sea by two mouths formed by the Isla de Buda; the Cabo de Tortosa in latitude 40 43 55 and longitude 7 12 30 from Cadiz; Purdy 1826, p. 26: the low point improperly called Cape Tortosa, which is in fact the bar of the river Ebro; Smyth 1854, table: Buda I. or Cape Tortosa 40 43 10, 0 54 7 E.; Admiralty 1913, p. 208: Buda island increases in size every year, the breakers a mile off'
+    says: 'Cape Tortosa, no cape but the low bar of the Ebro between its mouths, the island of Buda; the land is scarcely above the water and the bottom shoals far off.'
+
+  - id: ebro-mouths
+    kind: shoal
+    name: the Alfaques, the shoals off the Ebro's mouths
+    modern: 'the bar off the mouths of the Ebro'
+    lat_deg: 40.7150
+    lon_deg: 0.8950
+    height_m: 0
+    extent_m: 800
+    dries_m: -2.0
+    source: 'Tofino 1787, p. 119, ''Precaucion sobre los Alfaques'': the Alfaques are all the low coast between La Rapita and the Gulf of Ampulla, 15 miles north and south and 11 east and west; not prudent to come within two leagues of it in bad weather, and with the lead in hand; the sea breaks and alters the bottom; with sea winds the current sets onto the mouths of the Ebro; in fair weather from half a mile to a mile off a very even bottom of 4 to 6 brazas mud and sand; Michelot 1715, OCR l. 2278: the currents do generally set in for the shore by reason of the river and the lakes, several vessels cast away; the depth JUDGEMENT'
+    says: 'The bar off the mouths of the Ebro, where the sea breaks and the bottom shifts: give the low land two leagues in bad weather, with the lead going, for the current sets onto the mouths with a sea wind.'
+
+  - id: fangar-point
+    kind: headland
+    name: the point of the Fangal
+    modern: 'Punta del Fangar'
+    lat_deg: 40.7900
+    lon_deg: 0.7600
+    height_m: 1
+    source: 'Tofino 1787, pp. 118 to 119: from Cape Tortosa the beach turns NW two leagues to the Fangal, very stormy with the NW winds in autumn and winter; a channel 300 toesas wide from 17 feet of water to 6; under the point 26 feet, mud; no village nor defence; Admiralty 1913, pp. 208 to 209: Fango point advancing, threatening to close the port'
+    says: 'The point of the Fangal, a low hook of sand north of the Ebro; under it 26 feet on mud, but no village, no defence and no shelter from the north-westers.'
+
+  - id: ampulla-gulf
+    kind: anchorage
+    name: the Gulf of Ampulla
+    modern: 'the bay of L''Ampolla'
+    lat_deg: 40.8000
+    lon_deg: 0.7300
+    height_m: 0
+    depth_fathoms: 5
+    bottom: mud
+    source: 'Tofino 1787, p. 119: the Golfo de Ampulla, 4, 5 and 6 brazas mud, but without shelter, open to the E and SE winds; a brackish well at the tower of Cabo Roig'
+    says: 'The Gulf of Ampulla, five fathoms on mud north of the delta, but open to the east and south-east.'
+
+  # ---------------------------------------------------------------------------
+  # The Coll de Balaguer to Cape Salou and Tarragona (the harbour patch tarragona)
+  # ---------------------------------------------------------------------------
+
+  - id: coll-de-balaguer
+    kind: castle
+    name: the castle of the Coll de Balaguer
+    modern: 'the fort of Sant Felip at the Coll de Balaguer, in ruins'
+    lat_deg: 40.9850
+    lon_deg: 0.8850
+    height_m: 120
+    source: 'Tofino 1787, p. 120: NE 13 N of the fort of San Jorge a little more than 7 1/2 miles the coast rises, and on the easternmost hill a castle called the Coll de Balaguer, latitude 40 59 30, longitude 7 15 15; Purdy 1826, p. 26: the Fort del Coll de Valaguer, lat. 40 59 30, long. 0 58 40 E., 7 3/4 miles N 32 E from Fort S. Jorge; Admiralty 1913, p. 210: San Felipe castle in ruins (modern); height JUDGEMENT, no text giving it'
+    says: 'The castle of the Coll de Balaguer on the easternmost hill where the coast rises north of the delta, the fort over the pass of the coast road.'
+
+  - id: cambrils
+    kind: town
+    name: Cambrils
+    modern: Cambrils
+    lat_deg: 41.0660
+    lon_deg: 1.0590
+    height_m: 10
+    source: 'Tofino 1787, p. 120: from the Milamar tower a beach turning E 39 N to the town of Cambriles, 3 3/4 miles; no fit anchorage, the beach being open'
+    says: 'Cambrils, a little town on an open beach west of Cape Salou, with no anchorage.'
+
+  - id: cape-salou
+    kind: headland
+    name: Cape Salou
+    modern: 'Cap de Salou'
+    lat_deg: 41.0540
+    lon_deg: 1.1718
+    fix: 'moved 20 m to the grid''s land (the first placing read 6 m of water)'
+    height_m: 77
+    source: 'Tofino 1787, p. 120: Cape Salou in latitude 41 4 30, running out a little more than a mile, higher than the other land, lumpish and yellowish; Purdy 1826, p. 26: lat. 41 4 30, long. 1 10 15 E., and (the footnote) appearing like a low black island with spots of white sand; Michelot 1715, OCR l. 2311 and 2340: the like, and from the east Point Tamarit may be taken for it; Admiralty 1913, p. 210: the semaphore hill 253 feet, the height'
+    says: 'Cape Salou, a lumpish yellowish head standing a mile into the sea, higher than the land about it; from afar it looks a dark island with spots of white sand.'
+
+  - id: salou-tower
+    kind: tower
+    name: the Old Tower of Salou
+    modern: 'Torre Vella, Salou'
+    lat_deg: 41.0770
+    lon_deg: 1.1310
+    height_m: 15
+    source: 'Tofino 1787, p. 121: the usual berth south of the Torre Vieja in 7 brazas, about half a mile from the beach; the Torre Nueva and a small battery defend it; water from a spring in a garden near the Torre Vieja'
+    says: 'The Old Tower of Salou on the beach within the cape, the mark for the road; a spring of good water in a garden near it.'
+
+  - id: salou-road
+    kind: anchorage
+    name: the road of Salou
+    modern: 'the road of Salou, south of the Torre Vella'
+    lat_deg: 41.0690
+    lon_deg: 1.1310
+    height_m: 0
+    depth_fathoms: 7
+    bottom: sand with patches of weed
+    source: 'Tofino 1787, pp. 120 to 121: the one shelter from the levante on all this coast as far as beyond Barcelona, safe in summer only, for from the autumn gales come from the S and it is open to all the third quadrant; sand with patches of weed, clean of stones; 7 brazas south of the Torre Vieja half a mile from the beach; once the east wind moderates stand out so as to weather Cape Salou on the east tack; Purdy 1826, p. 27: in 6 1/2 fathoms half a mile from shore, the anchors hold so well they must be weighed often; Michelot 1715, OCR l. 2324: 7, 8 and 9 fathom, the ground grass and mud, exposed between ESE and WSW'
+    says: 'The road of Salou under the cape, seven fathoms on sand and weed half a mile off the Old Tower: the only shelter of this coast from an easterly, and safe in summer alone; a southerly blows straight in.'
+
+  - id: tarragona
+    kind: town
+    name: Tarragona
+    modern: 'Tarragona, the cathedral on its hill'
+    lat_deg: 41.1180
+    lon_deg: 1.2580
+    height_m: 110
+    source: 'Tofino 1787, p. 122: the city of Tarragona in latitude 41 8 50, seven miles NE 5 E of Salou, well known by its extent and by standing on a little hill; Smyth 1854, table: Tarragona cathedral 41 6 57, 1 16 10; Smyth 1854, p. 9: still surrounded by ancient Roman walls; Admiralty 1913, p. 211: the hill 361 feet, the height'
+    says: 'Tarragona, the old walled city on its hill above the shore, seen far by its extent.'
+
+  - id: tarragona-road
+    kind: anchorage
+    name: the road of Tarragona
+    modern: 'the road before Tarragona, outside the modern port'
+    lat_deg: 41.0950
+    lon_deg: 1.2500
+    height_m: 0
+    depth_fathoms: 10
+    bottom: soft brown mud
+    source: 'Tofino 1787, p. 122: only trading vessels come here, anchoring before the city to the south of it and west of the tower on the beach, clean ground, sheltered only from the winds from W to N; Purdy 1826, p. 27: in the road from 15 to 8 fathoms, the ground soft brown mud, Cape Salou W by S and Cape Gros E 3/4 S; Norie 1831, p. 29: the best berth in 15 fathoms, soft brown mud'
+    says: 'The road of Tarragona south of the city, ten fathoms on soft brown mud, sheltered only from the west round to the north.'
+
+  - id: tarragona-mole
+    kind: place
+    name: the mole of Tarragona
+    modern: 'the Moll de Llevant, Tarragona (its first length)'
+    lat_deg: 41.1050
+    lon_deg: 1.2448
+    fix: 'moved 20 m to the grid''s land (the first placing read 4 m of water)'
+    height_m: 3
+    source: 'Michelot 1715, OCR l. 2348: a small mole about 70 fathoms into the sea, a landing place and a shelter for small barks; Purdy 1826, p. 27: the mole, a modern structure, extends about three quarters of a mile into the sea, room for 100 sail of merchant shipping, 5 fathoms within; Tofino 1787, p. 122, names none (the new mole building, FROM MEMORY, from 1790)'
+    says: 'The mole of Tarragona, a landing place for barks below the city, where a new mole is building out into the road.'
+
+  - id: tarragona-mole-light
+    kind: light
+    name: the lantern on Tarragona mole
+    modern: 'the harbour light on the Moll de Llevant, Tarragona (the first)'
+    lat_deg: 41.1011
+    lon_deg: 1.2438
+    fix: 'moved 122 m to the grid''s land (the first placing read 7 m of water)'
+    height_m: 9
+    lit:
+      from: 1826
+      until: null
+      range_nm: 6
+      character: a fixed light
+    source: 'Purdy 1826, p. 27: a lantern 30 feet high at 40 fathoms within the mole-head; Purdy 1840, Pharonology, p. ii: a harbour light on the mole 30 feet above the sea, the mole and light-house nearly ruined by a gale (the year illegible in the OCR); from the earliest record read, the year first lit UNVERIFIED; range JUDGEMENT'
+    says: 'The lantern on Tarragona mole, a small harbour light: not lit in 1805, the mole then building.'
+
+  - id: tamarit
+    kind: castle
+    name: Tamarit
+    modern: 'the castle and church of Tamarit'
+    lat_deg: 41.1300
+    lon_deg: 1.3600
+    height_m: 30
+    source: 'Tofino 1787, p. 122: Torra Dembarra, and a mile before it Altafuya and Tamaris, none of these beaches sheltered; Purdy 1826, p. 27: Tamarit has a great church; Michelot 1715, OCR l. 2357: Tamarit appears at a distance like a large white citadel'
+    says: 'Tamarit on its point east of Tarragona, a castle and great church that looks from the sea like a large white citadel.'
+
+  - id: torredembarra
+    kind: town
+    name: Torra d'Embarra
+    modern: Torredembarra
+    lat_deg: 41.1450
+    lon_deg: 1.4000
+    height_m: 10
+    source: 'Tofino 1787, p. 122: E 11 N of Tarragona 6 1/2 miles Cabo Gros, higher than all the coast, with stones about it; here the town of Torra Dembarra; none of these beaches sheltered'
+    says: 'Torra d''Embarra by Cape Gros, higher than the coast about it, on an open beach.'
+
+  # ---------------------------------------------------------------------------
+  # The coast of Garraf to the Llobregat
+  # ---------------------------------------------------------------------------
+
+  - id: san-cristobal-point
+    kind: headland
+    name: the Point of San Christobal
+    modern: 'Punta de Sant Cristofol, Vilanova i la Geltru'
+    lat_deg: 41.2150
+    lon_deg: 1.7300
+    height_m: 10
+    source: 'Tofino 1787, p. 122: from Cabo Gros E 16 N a little more than 16 miles to the Point and Hermitage of San Christobal, the beach or anchorage of Villa Nueva; no anchorage to shelter from winds of the second and third quadrants'
+    says: 'The Point of San Christobal with its hermitage, before Villa Nueva''s open beach.'
+
+  - id: sitges
+    kind: town
+    name: Sitges
+    modern: Sitges
+    lat_deg: 41.2350
+    lon_deg: 1.8100
+    height_m: 15
+    source: 'Tofino 1787, pp. 122 to 123: Sitges 2 3/4 miles from the Point of San Christobal, sheltered from the westerly winds under the Cabo de los Grills'
+    says: 'Sitges under its little cape, a shelter from the westerlies for small craft.'
+
+  - id: garraf
+    kind: tower
+    name: the watch tower of Garraf
+    modern: 'the Torre de Garraf'
+    lat_deg: 41.2500
+    lon_deg: 1.9000
+    height_m: 40
+    source: 'Tofino 1787, pp. 122 to 123: the Costa de Garraf runs ENE seven miles, all high mountains with many cliffs; a small cove, Cala Morisca, and a watch tower called of Garaf; p. 124: Montjui N 58 16 E of the Torre de Garaf'
+    says: 'The watch tower of Garraf on the high cliffy coast west of the Llobregat, all mountains to the sea.'
+
+  - id: castelldefels
+    kind: castle
+    name: Castel de Fells
+    modern: 'the castle of Castelldefels'
+    lat_deg: 41.2830
+    lon_deg: 1.9780
+    height_m: 30
+    source: 'Tofino 1787, p. 123: Castel de Fells, named from a little fort about three miles from the tower of Garaf; p. 124: Montjui N 60 36 E of Castell de Fells'
+    says: 'Castel de Fells, a little fort at the foot of the Garraf mountains where the low land of the Llobregat begins.'
+
+  - id: llobregat-tower
+    kind: tower
+    name: the Tower of the River
+    modern: 'the Torre del Riu at the old mouth of the Llobregat (the river turned since)'
+    lat_deg: 41.3200
+    lon_deg: 2.1500
+    height_m: 15
+    source: 'Tofino 1787, p. 123: the beach runs ENE a little more than 7 miles to the mouth of the river, on whose point is a tower that serves for a mark, the land being very low; p. 124: Montjui N 11 10 E of the river; Smyth 1854, table: Torre del Rio 41 19 12, 2 9 45; Michelot 1715, OCR l. 2417: anchor abreast of the mouth, the tower WNW half a league, 14 and 15 fathom, a muddy clay, the tower with two good pieces of cannon; Admiralty 1913, p. 215: the sand continually advancing to the south-east'
+    says: 'The Tower of the River at the mouth of the Llobregat, the one mark of that very low shore; the sand runs off the mouth.'
+
+  # ---------------------------------------------------------------------------
+  # Barcelona (the harbour patch barcelona)
+  # ---------------------------------------------------------------------------
+
+  - id: montjuic
+    kind: castle
+    name: Montjui
+    modern: 'the castle of Montjuic'
+    lat_deg: 41.3635
+    lon_deg: 2.1665
+    height_m: 207
+    source: 'Tofino 1787, pp. 123 to 124: Barcelona well known though twelve leagues at sea by a lone hill at the shore close west of the city called Monjui, on which is a very famous castle; it bears S 50 45 W of the lantern of the mole, N 11 10 E of the Llobregat, N 60 36 E of Castell de Fells and N 58 16 E of the tower of Garaf; Purdy 1826, p. 28: seen at the distance of twelve leagues; Michelot 1715, OCR l. 2405: appearing at a distance like an island, the top extremely well fortified; Smyth 1854, table: Monjui fortress 41 21 35, 2 10 13; Admiralty 1913, p. 216: elevated 679 feet, the height'
+    says: 'Montjui, the lone round hill with its great castle close west of Barcelona, seen twelve leagues at sea like an island.'
+
+  - id: barcelona-lantern
+    kind: light
+    name: the lantern of Barcelona mole
+    modern: 'the old lighthouse at the head of the old mole (the Torre del Rellotge, Barceloneta)'
+    lat_deg: 41.3745
+    lon_deg: 2.1882
+    height_m: 25
+    lit:
+      from: 1715
+      until: null
+      range_nm: 9
+      character: a fixed light
+    source: 'Michelot 1715, OCR l. 2440 to 2445: a square tower in the form of a pyramid, on which there is a lanthorn where a fire is kept every night; Tofino 1787, p. 124: the Linterna del Muelle, the mole in latitude 41 23 8, running 407 toesas to the south from the east end of the city; Purdy 1826, p. 28: on the extremity of the mole a battery as well as a light-house; from the earliest record read, the year first lit not given by any text; range JUDGEMENT'
+    says: 'The lantern of Barcelona, on its square tower at the head of the old mole, lit every night.'
+
+  - id: barcelona-new-mole-light
+    kind: light
+    name: the light on Barcelona's new mole
+    modern: 'the light on the new mole of Barcelona of the 1820s (the modern port has overbuilt it)'
+    lat_deg: 41.3693
+    lon_deg: 2.1856
+    fix: 'moved 140 m to the grid''s land (the first placing read 2 m of water)'
+    height_m: 18
+    lit:
+      from: 1823
+      until: null
+      range_nm: 12
+      character: a fixed light
+    source: 'Norie 1831, p. 31, and Purdy 1840, p. 36: an official notice dated 14th December 1823: on the new mole of this port, then building out to the S 6 W true, a lighthouse erected 50 toises within its extreme point, the old lighthouse bearing from it N 20 W; Purdy 1840, Pharonology, p. ii: a quarter of a mile to the southward of the old lighthouse an improved light at 60 feet; from the notice, its first night UNVERIFIED; range JUDGEMENT'
+    says: 'The light on Barcelona''s new mole south of the old lantern: not lit in 1805, the new mole begun after.'
+
+  - id: merced-tower
+    kind: church
+    name: the tower of La Merced
+    modern: 'the basilica of La Merce, Barcelona'
+    lat_deg: 41.3800
+    lon_deg: 2.1790
+    height_m: 40
+    source: 'Tofino 1787, p. 125: in the road of Barcelona the marks are the lantern with the tower of La Merced, and the coast of Garaf open to the south of Montjui; Purdy 1826, p. 28: the tower of a church called La Merced'
+    says: 'The tower of La Merced in the lower town, which with the lantern gives the berth in the road.'
+
+  - id: barcelona-bar
+    kind: shoal
+    name: the bar of Barcelona
+    modern: 'the old bar between the mole''s head and Montjuic (now within the modern port)'
+    lat_deg: 41.3680
+    lon_deg: 2.1800
+    height_m: 0
+    extent_m: 500
+    dries_m: -4.6
+    source: 'Tofino 1787, p. 124: the Llobregat and the Besos have formed a bar from the point of the lantern to the foot of Montjui with only 16 feet and no channel through it, so that no ship drawing more cannot enjoy the mole, though close to it are 24 and 30 feet; the water on it diminishing with the winter gales, cleaned with pontoons in summer; Purdy 1826, p. 28: no greater depth than 14 feet, it will not admit a vessel drawing more than 12 feet; Norie 1831, p. 31: frequently not more than 10 feet; the 16 pies of Burgos (4.6 m) as the depth'
+    says: 'The bar of Barcelona across the mouth of the mole, sixteen feet at best and less after a winter''s gales: no ship of war goes in, she lies in the road.'
+
+  - id: barcelona-port
+    kind: anchorage
+    name: within Barcelona mole
+    modern: 'the old harbour within the first mole (Port Vell)'
+    lat_deg: 41.3770
+    lon_deg: 2.1850
+    height_m: 0
+    depth_fathoms: 4
+    bottom: mud
+    source: 'Tofino 1787, p. 124: the mole sheltering a good number of vessels from the winds of the second quadrant; close to it 24 and 30 feet; the vessels of greater burthen anchor outside; Purdy 1826, p. 28: within the bar 28 to 27 feet; with S S E winds a heavy sea sets into the harbour; the bottom JUDGEMENT'
+    says: 'Within Barcelona mole, four fathoms close under it for merchantmen that can cross the bar; a south-south-easter sends a sea in.'
+
+  - id: barcelona-road
+    kind: anchorage
+    name: the road of Barcelona
+    modern: 'the road off Barcelona, outside the modern port'
+    lat_deg: 41.3600
+    lon_deg: 2.1960
+    height_m: 0
+    depth_fathoms: 20
+    bottom: muddy sand
+    source: 'Tofino 1787, p. 125: in the road of Barcelona squadrons may anchor, and to guard against the winds from E and SE near the meeting of the marks, the lantern with the tower of La Merced, and the coast of Garaf open to the south of Montjui, in 18 to 25 brazas muddy sand, whence with the wind at E one may weather the Llobregat; if the S wind be not very strong, which seldom it is not, run to the eastward, the coast clean at four miles; Purdy 1826, p. 28: 16 1/2 to 23 fathoms, muddy sand; Michelot 1715, OCR l. 2463: 15, 18 and 20 fathom, good clay ground'
+    says: 'The road of Barcelona, eighteen fathoms and more on muddy sand off the mole, the lantern on with the tower of La Merced; open to the south-east and south, and a southerly comes seldom moderate.'
+
+  - id: montserrat
+    kind: hill
+    name: Montserrat
+    modern: 'Montserrat, Sant Jeroni'
+    lat_deg: 41.6060
+    lon_deg: 1.8110
+    height_m: 1235
+    source: 'Tofino 1787, p. 123: the mountains of Nuestra Senora de Monserrate stretched east and west with many pinnacles on the top, the highest bearing N 8 E of Villa Nueva, N 1 W of Sitges and NW of Montjui; Purdy 1826, p. 27: the same, and from the summit Majorca and Minorca are seen at 45 leagues; Smyth 1854, table: Monserrat centre 41 36 0, 1 48 0, 4,200 feet, an excellent sea-mark; Admiralty 1913, p. 215: rises 4,052 feet, the height'
+    says: 'Montserrat, the great jagged mountain inland of Barcelona with its many pinnacles, an excellent sea-mark seen from far out.'
+
+  - id: montseny
+    kind: hill
+    name: the mountain of Monsein
+    modern: 'the Montseny, the Turo de l''Home'
+    lat_deg: 41.7760
+    lon_deg: 2.4360
+    height_m: 1706
+    source: 'Tofino 1787, p. 125: east of Barcelona is seen the mountain of Monsein, of much height and pleasant sight, inland; it bears N 78 W of the town of Lloret and N 41 W of that of Canet; Admiralty 1913, p. 221: the remarkable Sierra del Montseny, easily known from its elevation and form; the height FROM MEMORY (1,706 m, the Turo de l''Home), no text giving it'
+    says: 'The mountain of Monsein, high and inland east of Barcelona, known from the sea by its height and form.'
+
+  - id: badalona
+    kind: town
+    name: Badalona
+    modern: Badalona
+    lat_deg: 41.4480
+    lon_deg: 2.2470
+    height_m: 10
+    source: 'Tofino 1787, p. 125: from Barcelona N 40 E 7 1/2 miles a little hill with a fort called Mongat, and a mile and a half before it the town of Badalona, and the Besos a mile and a half before that, from which runs a flat of sand with little water about two cables'
+    says: 'Badalona on the low shore beyond the Besos, whose mouth throws a flat of sand two cables out.'
+
+  - id: mongat
+    kind: castle
+    name: the fort of Mongat
+    modern: 'the castle of Mongat (ruined)'
+    lat_deg: 41.4650
+    lon_deg: 2.2800
+    height_m: 40
+    source: 'Tofino 1787, p. 125: a little hill with a fort named Mongat, 7 1/2 miles N 40 E of Barcelona; Michelot 1715, OCR l. 2479: the tower of Mongat serves for a lazaret; Admiralty 1913, p. 221: visible 15 miles (modern)'
+    says: 'The fort of Mongat on its little hill over the shore, seven miles and a half north-east of Barcelona.'
+
+  - id: mataro
+    kind: town
+    name: Mataro
+    modern: Mataro
+    lat_deg: 41.5380
+    lon_deg: 2.4450
+    height_m: 15
+    source: 'Tofino 1787, pp. 125 to 126: E 27 N of Mongat 8 1/2 miles the city of Mataro; a ledge of stones in a circle off it with a narrow channel for small craft; ships calling briefly anchor a mile south of the city; Purdy 1826, p. 29: known by three steeples; Michelot 1715, OCR l. 2499: anchor in 9 and 10 fathom, muddy ground; Smyth 1854, p. 10: 25,000 inhabitants and a thriving trade'
+    says: 'Mataro, a town of three steeples on the low shore, a ledge of stones off it; a ship anchors a mile to the south of it in nine or ten fathoms.'
+
+  - id: arenys-ledge
+    kind: ledge
+    name: the ledge off Arenys
+    modern: 'the restinga off Arenys de Mar'
+    lat_deg: 41.5650
+    lon_deg: 2.5500
+    height_m: 0
+    extent_m: 300
+    dries_m: -10.5
+    source: 'Tofino 1787, p. 126: from Mataro the low coast runs N 65 30 E near 11 miles to Calilla, with Caldetas, Arens del Mar and Canet between, without anchorage or shelter; south of Arens del Mar about a mile a ledge of stones lying east and west with 6 brazas over it; Purdy 1826, p. 29: 5 3/4 fathoms'
+    says: 'The ledge of stones a mile off Arenys, six fathoms over it: no danger to a frigate, but the lead shoals on it.'
+
+  - id: calella
+    kind: town
+    name: Calella
+    modern: Calella
+    lat_deg: 41.6140
+    lon_deg: 2.6600
+    height_m: 10
+    source: 'Tofino 1787, p. 126: the town of Calilla, near 11 miles N 65 30 E from Mataro along the low coast'
+    says: 'Calella on the low Maresme shore, without anchorage.'
+
+  - id: blanes
+    kind: town
+    name: Blanes
+    modern: Blanes
+    lat_deg: 41.6740
+    lon_deg: 2.7920
+    height_m: 15
+    source: 'Tofino 1787, pp. 126 to 127: Blanes, the Point of Santa Ana with a Capuchin convent, a dangerous stone under water to the south of it; the road sheltered from the W winds and for summer only; best berth 8 or 9 brazas sand about 3 cables SE of the town; water at a fountain; Purdy 1826, p. 29: 7 1/2 or 8 fathoms, sand; Smyth 1854, table: Blanes, fort Santa Ana 41 40 0, 2 49 47'
+    says: 'Blanes under the Point of Santa Ana and its convent, a summer road in eight fathoms on sand; mind the stone under water south of the point.'
+
+  - id: blanes-road
+    kind: anchorage
+    name: the road of Blanes
+    modern: 'the bay of Blanes'
+    lat_deg: 41.6700
+    lon_deg: 2.7970
+    height_m: 0
+    depth_fathoms: 8
+    bottom: sand
+    source: 'Tofino 1787, p. 127: 8 or 9 brazas, sand, about 3 cables SE of the town; sheltered from the W only and for summer, the second-quadrant winds tempestuous in winter; Purdy 1826, p. 29: 7 1/2 or 8 fathoms, sand'
+    says: 'The road of Blanes, eight fathoms on sand three cables off the town: a summer berth, open to the south-easters.'
+
+  - id: lloret
+    kind: town
+    name: Lloret
+    modern: 'Lloret de Mar'
+    lat_deg: 41.6990
+    lon_deg: 2.8450
+    height_m: 10
+    source: 'Tofino 1787, p. 127: the coast high and steep from Santa Ana; the town of Lloret in a small bay, on its western point a hill with an ancient fortress; no shelter here either; p. 125: Monsein N 78 W of Lloret'
+    says: 'Lloret in its little bay under steep coast, an old fort on the hill at its western point; no shelter.'
+
+  - id: cape-tossa
+    kind: headland
+    name: Cape Tosa
+    modern: 'the Cap de Tossa and its walled town'
+    lat_deg: 41.7160
+    lon_deg: 2.9340
+    height_m: 60
+    source: 'Tofino 1787, p. 127: four miles from Lloret Cape Tosa, in latitude 41 42 50 and longitude 9 11 25 from Cadiz; the cove sheltering any class of vessel from the W, the best berth 9 1/2 brazas sand, 7 brazas almost at the foot of the cape; Smyth 1854, table: Tosa church 41 42 36, 2 57 35; height JUDGEMENT'
+    says: 'Cape Tosa with its walled town on the point, the cove behind it a shelter from the westerlies in nine fathoms on sand.'

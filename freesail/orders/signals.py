@@ -206,6 +206,26 @@ _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
             r"(?:\s+to\s+(?P<to>.+))?$"
         ),
     ),
+    # package 98, step 7 (the owner's further note of 2026-11-09): each flag of command
+    # hauled down by its name, as its hoist; appended, so that the forms above keep places
+    (
+        "haul down the broad pendant",
+        re.compile(
+            r"^(?:haul down|strike|lower|take in|haul in)\s+(?:the|his|my|our)\s+"
+            r"(?:commodore's\s+)?broad (?:pendant|pennant)$"
+        ),
+    ),
+    (
+        "haul down the second ensign",
+        re.compile(
+            r"^(?:haul down|strike|lower|take in)\s+(?:the\s+)?(?:second|other)\s+"
+            r"(?:ensign|colours)(?:\s+at\s+the\s+main(?:\s+topgallant\s+mast-?head)?)?$"
+        ),
+    ),
+    (
+        "haul down the jack",
+        re.compile(r"^(?:haul down|strike|lower|take in)\s+(?:the|our)\s+(?:union\s+)?jack$"),
+    ),
 )
 # The addressee of a hail: 'her', a name, 'the <sail>' or 'a <sail>'; the words after a colon
 # or a comma, or after a space with no colon (the colon optional: 'hail the brig what ship
@@ -451,7 +471,18 @@ _FLAG_VERBS = (
     "hoist the broad pendant",
     "hoist a second ensign",
     "hoist the jack",
+    "haul down the broad pendant",
+    "haul down the second ensign",
+    "haul down the jack",
 )
+
+# The flag of command each haul-down order names (package 98, step 7), the key of
+# `world.flags.ORDERED` and the locker's `ordered_flags`.
+_HAULED_DOWN = {
+    "haul down the broad pendant": "broad pendant",
+    "haul down the second ensign": "second ensign",
+    "haul down the jack": "jack",
+}
 
 
 def execute(ship: Any, order: Order) -> Result:
@@ -536,6 +567,8 @@ def _execute(ship: Any, order: Order) -> Result:
         return "lights.changed", text, {"verb": verb, "level": 1, "lights": kind}
     if verb in ("hoist the broad pendant", "hoist a second ensign", "hoist the jack"):
         return _hoist_flag(world, locker, verb)
+    if verb in _HAULED_DOWN:
+        return _haul_down_flag(world, locker, verb)
     if verb == "make another nation's private signal":
         m = _form_of(verb).match(low)
         nid = _nation_words(world.ship, m.group("nation")) if m else None
@@ -983,6 +1016,29 @@ def _hoist_flag(world: Any, locker: Any, verb: str) -> Result:
         "jack": "at the jackstaff" if getattr(world, "at_anchor", False) else "at the fore",
     }[key]
     text = f"{_cap_first(flag.words)} hoisted {where}."
+    return "flags.changed", text, {"verb": verb, "level": 1, "flag": key, "notable": True}
+
+
+def _haul_down_flag(world: Any, locker: Any, verb: str) -> Result:
+    """A flag of command hauled down by its name (package 98, step 7): taken out of the
+    locker's ordered flags, the colours left as they are; refused in words where it is not
+    flying."""
+    from freesail.world.flags import ORDERED, file_for_nation
+
+    key = _HAULED_DOWN[verb]
+    kind = ORDERED[key][0]
+    name = "second ensign" if key == "second ensign" else kind
+    ordered = list(getattr(locker, "ordered_flags", None) or [])
+    if key not in ordered:
+        raise OrderError(f"No {name} of hers is flying: there is none to haul down.")
+    ordered.remove(key)
+    locker.ordered_flags = ordered
+    flag = file_for_nation(world.nations, locker.colours.nation).first_of(kind)
+    words = flag.words if flag is not None else f"the {name}"
+    if key == "second ensign":
+        text = f"The second ensign, {words}, hauled down from the main; her colours at the peak."
+    else:
+        text = f"{_cap_first(words)} hauled down."
     return "flags.changed", text, {"verb": verb, "level": 1, "flag": key, "notable": True}
 
 

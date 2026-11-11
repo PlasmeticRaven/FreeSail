@@ -21,6 +21,7 @@ kind and calibre (pp. 155 and 72, read on the page images), so that no key is as
 
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
@@ -42,6 +43,8 @@ PORT_FIT_M = 0.05
 OVER_THE_RAIL_M = 0.05
 
 # The figure's placing (judgement, §2 and §3; the questions to the owner's shelf, §11.2)
+# A port's top under the rail where it is cut (package 98, step 3): the viewer's `ON_LINE_M`
+TOP_UNDER_RAIL_M = 0.002
 RAIL_CLEAR_M = 0.05  # a gun over the rail: its muzzle's underside this far above the rail
 SWIVEL_YOKE_M = 0.15  # a swivel's axis above the rail (question 4)
 CHASE_TRAIN_DEG = 30.0  # a chaser trained toward its end from square to the side (question 5)
@@ -341,6 +344,29 @@ class Port:
     guns: Mapping[str, str]
 
 
+def deck_slope(profile: Any, deck: str, x: float) -> float:
+    """The slope of a deck's line at x (rise over run, over a metre), as the viewer reads it
+    for a port's edges parallel to its deck (`client/projection.js`, `deckSlope`)."""
+    pts = dict(profile.decks_m or ()).get(deck)
+    if not pts or len(pts) < 2:
+        return 0.0
+    return interp(pts, x + 0.5) - interp(pts, x - 0.5)
+
+
+def port_top(profile: Any, deck: str, x: float, sill: float, width: float, depth: float) -> float:
+    """A port's top's middle as served (§2.5; package 98, step 3, the lead's ruling of
+    2026-11-07 on 81's two rules): its sill and depth, its top tilted with its deck as the
+    viewer draws it, cut where either corner would stand over the rail at that corner's x
+    less `TOP_UNDER_RAIL_M`, so that the drawing honours the figure served."""
+    s = deck_slope(profile, deck, x)
+    w = width / 2
+    limit = min(rail_at(profile, x + c * w) - TOP_UNDER_RAIL_M - c * s * w for c in (-1.0, 1.0))
+    if limit >= sill + depth:
+        return sill + depth
+    # cut: down to the millimetre the graph serves, so that the figure served is under the rail
+    return math.floor(limit * 1000.0) / 1000.0
+
+
 def ports(profile: Any, placings: Iterable[Placing], sides: Mapping[str, str | None]) -> list[Port]:
     """Every port of the hull (§2.5): each triple that is a port by §2.2, with the guns of the
     fit placed in it by side (`sides`: each gun id's side). A triple over the rail is no port."""
@@ -361,7 +387,7 @@ def ports(profile: Any, placings: Iterable[Placing], sides: Mapping[str, str | N
             if not is_port(profile, deck, t):
                 continue
             x = float(t[0])
-            top = min(float(t[1]) + size[1], rail_at(profile, x))
+            top = port_top(profile, deck, x, float(t[1]), size[0], size[1])
             out.append(
                 Port(
                     deck,

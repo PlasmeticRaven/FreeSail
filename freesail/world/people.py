@@ -515,6 +515,10 @@ class Message:
     to: str = "captain"
     carried_by: str = "the boat"
     to_hull: str = ""  # the hull it is for when not the player's ship (package 84, step 9)
+    # the letter as a thing of the world once it is aboard (package 100, step 2): its id in
+    # the registry; "" for a letter still with its carrier, or one of a checkpoint from
+    # before, which is made a thing at the load (`letters_as_things`)
+    thing: str = ""
 
 
 class Registry:
@@ -858,6 +862,12 @@ class People:
             if found is not None:
                 if name:
                     self._rename(found, name)
+                if spec.get("record"):
+                    # his record carried from the last game (package 74, the design's §7.2:
+                    # a new command as a scenario's start)
+                    from freesail.world.court import record_of
+
+                    record_of(found).extend(dict(e) for e in spec["record"] if isinstance(e, dict))
                 if spec.get("skill") is not None:
                     found.skill = float(spec["skill"])
                     if found.mirror is not None:
@@ -868,19 +878,20 @@ class People:
             pid = (role + ("_" + name if name else "")).lower()
             pid = "".join(c if c.isalnum() else "_" for c in pid).strip("_")
             ashore = bool(spec.get("ashore")) or str(spec.get("place") or "") == "shore"
-            self.people.append(
-                Person(
-                    pid,
-                    name or _address(role, role),
-                    role,
-                    float(spec.get("skill", 0.7) or 0.7),
-                    place="shore"
-                    if ashore
-                    else str(spec.get("place") or "cabin").replace(" ", "_"),
-                    aboard=not ashore,
-                    port=str(spec.get("port")) if spec.get("port") else None,
-                )
+            made = Person(
+                pid,
+                name or _address(role, role),
+                role,
+                float(spec.get("skill", 0.7) or 0.7),
+                place="shore" if ashore else str(spec.get("place") or "cabin").replace(" ", "_"),
+                aboard=not ashore,
+                port=str(spec.get("port")) if spec.get("port") else None,
             )
+            if spec.get("record"):
+                from freesail.world.court import record_of
+
+                record_of(made).extend(dict(e) for e in spec["record"] if isinstance(e, dict))
+            self.people.append(made)
 
     def _scenario_things(self) -> None:
         """The scenario's `things:` (spec M7b §17a; package 53b): each made from its words
@@ -1337,7 +1348,9 @@ class People:
         """', a sealed packet in his keeping' (package 53b): the things a person keeps, as
         the people's words end with them; nothing for a person who keeps none, so that a
         world with no thing in it reads as it did."""
-        kept = [t.name for t in getattr(self, "things", None) or [] if t.keeper == p.id]
+        from freesail.world.things import name_words
+
+        kept = [name_words(t) for t in getattr(self, "things", None) or [] if t.keeper == p.id]
         if not kept:
             return ""
         names = kept[0] if len(kept) == 1 else f"{', '.join(kept[:-1])} and {kept[-1]}"
@@ -1499,10 +1512,20 @@ class People:
         if messenger is not None:
             messenger.occupied_until = due
             messenger.occupied_with = "message"
+        self._letter_thing(message)
         text = (
             f"A letter from {message.origin} came aboard by {message.carried_by}; "
             f"{who} took it aft for the captain, who is {place_words(captain.where)}."
         )
+        to = str(message.to or "captain").strip()
+        if to.lower() not in ("captain", "the captain"):
+            # a letter for another goes to him, not aft (package 100, step 2)
+            p = self._addressee(message)
+            text = (
+                f"A letter from {message.origin} directed to {to} came aboard by "
+                f"{message.carried_by}; {who} took it for "
+                + (f"{p.name}, who is {self.state_words(p)}." if p is not None else "the captain.")
+            )
         return [
             (
                 Severity.ROUTINE,
@@ -1511,6 +1534,55 @@ class People:
                 {"origin": message.origin, "carried_by": message.carried_by, "due_tick": due},
             )
         ]
+
+    def _letter_thing(self, message: Message) -> Any:
+        """The letter come aboard made a thing of the world (package 100, step 2): sealed,
+        with its words, its writer and its addressee, in the messenger's keeping (the
+        captain's where the ship has no messenger) until it is handed at the door. Once."""
+        from freesail.world import things as TH
+
+        known = [t for t in self.things if message.thing and t.id == message.thing]
+        if known:
+            return known[0]
+        to = str(message.to or "captain").strip()
+        to_words = "the captain" if to.lower() in ("captain", "the captain") else to
+        name = f"a letter from {message.origin}"
+        if to_words != "the captain":
+            name += f" to {to_words}"
+        thing = TH.Thing(
+            TH._new_id(self.world, name),
+            name,
+            words=message.text,
+            author=message.origin,
+            to=to_words,
+            sealed=True,
+        )
+        TH.addressed(self.world, thing)
+        holder = self.messenger or self.captain
+        TH.put(thing, {"keeper": holder.id, "keeper_home": str(getattr(holder, "home", "") or "")})
+        self.things.append(thing)
+        message.thing = thing.id
+        return thing
+
+    def letters_as_things(self) -> None:
+        """The letters in the messenger's hand of a checkpoint from before package 100 made
+        things at the load, as a letter come aboard now is (`_letter_thing`)."""
+        if not self.messages:
+            return
+        for message, _due in self.messages:
+            if not getattr(message, "thing", ""):
+                self._letter_thing(message)
+
+    def _addressee(self, message: Message) -> Person | None:
+        """The person aboard a letter is for, where it is for another than the captain and
+        its words name one of the company who is aboard (package 100, step 2); else None."""
+        to = str(message.to or "captain").strip()
+        if to.lower() in ("captain", "the captain"):
+            return None
+        p = self.find(to)
+        if p is None or p is self.captain or not p.aboard:
+            return None
+        return p
 
     # -- the tick -----------------------------------------------------------------------
 
@@ -1548,6 +1620,13 @@ class People:
                 captain = self.captain
                 messenger = self.messenger
                 who = messenger.name if messenger is not None else "the sentry"
+                letter = self._letter_thing(message)
+                to = str(message.to or "captain").strip()
+                if to.lower() not in ("captain", "the captain"):
+                    # a letter for another (package 100, step 2): handed to him sealed, or
+                    # kept by the captain for him; the captain reads no letter not his
+                    lines.extend(self._door_for_another(message, letter, who))
+                    continue
                 if captain.where == "cabin":
                     door = f"{who} knocked at the cabin door with a letter from {message.origin}."
                 else:
@@ -1563,6 +1642,10 @@ class People:
                         {"origin": message.origin, "place": captain.where},
                     )
                 )
+                # handed to him, opened and read: in his keeping with its seal broken; the
+                # words his alone (`message.received` reaches its reader, package 100)
+                self._hand(letter, captain)
+                letter.broken = True
                 lines.append(
                     (
                         Severity.NOTABLE,
@@ -1573,6 +1656,41 @@ class People:
                 )
             self.messages = left
         return lines
+
+    def _hand(self, thing: Any, person: Person) -> None:
+        from freesail.world import things as TH
+
+        TH.put(thing, {"keeper": person.id, "keeper_home": str(getattr(person, "home", "") or "")})
+
+    def _door_for_another(
+        self, message: Message, letter: Any, who: str
+    ) -> list[tuple[Severity, str, str, dict[str, Any]]]:
+        """A letter for another than the captain at its end of the chain (package 100,
+        step 2): handed to him sealed where he is aboard, the line his and the place's; else
+        given to the captain sealed to keep for him, and not read."""
+        p = self._addressee(message)
+        if p is not None:
+            self._hand(letter, p)
+            where = self.effective_place(p)
+            return [
+                (
+                    Severity.ROUTINE,
+                    "message.door",
+                    f"{who} brought {p.name} a letter from {message.origin}, sealed.",
+                    {"origin": message.origin, "place": where, "to": p.name},
+                )
+            ]
+        captain = self.captain
+        self._hand(letter, captain)
+        return [
+            (
+                Severity.ROUTINE,
+                "message.door",
+                f"{who} brought the captain a letter from {message.origin} directed to "
+                f"{letter.to}, sealed; it is not his to open, and he has it in his keeping.",
+                {"origin": message.origin, "place": captain.where},
+            )
+        ]
 
 
 def _address(role: str, name: str) -> str:
