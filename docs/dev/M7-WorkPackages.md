@@ -4371,8 +4371,7 @@ slow of the known truths, the profile and the *Indefatigable* exit 0, 540 passed
 the pace alone and last exit 0, 15 passed, no floor lowered; nothing skipped; ruff clean.
 **The lead's merge:** the trial on f94e6f3b clean and lint-clean; no model or vendor name in
 the diff; (A) and (B) read on the page in the merged tree; no ship file, no physics; the fast
-tier whole on it exit 0, 7,458 passed, 1 xfailed, 505 slow left out, 22:45 to 23:51 UTC; the whole suite in the cloud dispatched after run 68,
-the figures to follow. Next in 74: step 7 (the two scenarios, the captive's brief, the forms
+tier whole on it exit 0, 7,458 passed, 1 xfailed, 505 slow left out, 22:45 to 23:51 UTC; the whole suite in the cloud, run 69 (2026-11-10, 23:53 to 00:49 UTC, on 434c33c1): green whole, lint, the six shards and the pace job. Next in 74: step 7 (the two scenarios, the captive's brief, the forms
 `ship.prize` and `ship.struck`, truths 7-367 and 7-368, the spec, the harness page, the
 records), then the close with the whole slow tier.
 
