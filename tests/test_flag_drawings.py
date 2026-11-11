@@ -280,3 +280,148 @@ def test_a_hoist_holds_its_flags_in_order_uppermost_first():
     shown = "a blue pendant at the fore yardarm, with the ensign at the mizen peak"
     assert h("reply", "britain", shown=shown) == ["blue pendant"]
     assert h("night", "britain", shown="two lights horizontal at the mizen peak") == []
+
+
+# -- step 3: a hoist has its place and is seen ---------------------------------------------------
+
+
+def test_a_hoist_flies_at_the_main_unless_a_place_is_named_and_its_record_is_as_before():
+    """Step 3 (a): a hoist with no place is 'at the main' in the lookout's words and its
+    record (`to_dict`, the log's digest) and its pickle carry no place, as before the package;
+    one at a named place says it and records it."""
+    import pickle
+
+    h = S.Hoist(book="numerary", meaning="Tack", by="a", since=0, breaks_out=0, numbers=(16,))
+    assert h.flags_words() == "two flags at the main" and "place" not in h.to_dict()
+    assert "place" not in pickle.loads(pickle.dumps(h)).__dict__
+    h.place = "fore topgallant masthead"
+    assert h.flags_words() == "two flags at the fore"
+    assert h.to_dict()["place"] == "fore topgallant masthead"
+    h.place = "main yardarm"
+    assert h.flags_words() == "two flags at the main yardarm"
+    for w in ("fore yardarm", "main topsail yardarm", "mizen topgallant yardarm"):
+        assert F.place_ok(w)
+    assert not F.place_ok("bowsprit yardarm")
+
+
+def _signal_world():
+    from tests.test_brains import world_at
+
+    return world_at(49.5, -5.5, papers={"private_signals": True})
+
+
+def test_the_players_hoist_is_served_at_its_place_flag_by_flag_and_gone_when_hauled_down():
+    """Truth 7-502 (step 3, b): the player's own hoist, once broken out, is served in the
+    snapshot's `hoists` at its place (the main topgallant masthead when the order names none),
+    its flags in order, the uppermost first, each drawn by the scenario's year; an order may name
+    the place ('at the fore'); hauled down, it is gone from the next snapshot."""
+    from freesail.api import queries
+
+    w = _signal_world()
+    w.submit("make the signal No. 16")
+    assert queries.snapshot(w)["hoists"] == []  # the minute to run it up
+    w.run(120)
+    snap = queries.snapshot(w)
+    [h] = snap["hoists"]
+    assert h["place"] == F.HOIST_PLACE and h["words"] == "two flags at the main"
+    assert [f["name"] for f in h["flags"]] == ["numeral 1", "numeral 6"]
+    year = w.clock.ship_time.year
+    for f in h["flags"]:
+        row = F.signal_flag("britain", f["name"], year)
+        assert f["drawing"]["parts"] == row.flag.served_drawing()["parts"]
+    w.submit("haul down the signal")
+    assert queries.snapshot(w)["hoists"] == []
+    w.submit("make the signal No. 16 at the fore")
+    w.run(120)
+    [h] = queries.snapshot(w)["hoists"]
+    assert h["place"] == "fore topgallant masthead" and h["words"] == "two flags at the fore"
+    said = [e for e in w.log if e.kind == "signal.ordered"][-1]
+    assert said.data["hoist"]["place"] == "fore topgallant masthead"
+
+
+def test_no_other_ships_hoist_is_served():
+    """Step 3 (c) struck by the owner: a stranger's hoist is told as it is today, in words,
+    and nothing of it is served in the snapshot."""
+    from freesail.api import queries
+    from tests.test_brains import put
+
+    w = _signal_world()
+    v = put(w, "frigate", "britain", "49 31 N 5 30 W", "bound for Plymouth", name="Amazon")
+    books = S.load_books("britain")
+    entry, q = books.find("tack in succession")
+    h = S.make_hoist(S.vessel_locker(v), books, entry, q, v.id, int(w.clock.tick))
+    assert h.flying(int(w.clock.tick) + 120)
+    w.run(120)
+    assert queries.snapshot(w)["hoists"] == []
+
+
+@pytest.mark.skipif(not __import__("shutil").which("node"), reason="Node is not installed")
+def test_a_hoist_is_drawn_down_its_halyard_from_its_place(tmp_path):
+    """Truth 7-502, the viewer's half: each flag of a hoist hangs from its place, the uppermost
+    first, the next one hoist (and the halyard's gap) lower, its hoist along the mast; at a
+    yardarm from the yard's weather arm; nothing at a place the ship lacks."""
+    from tests.test_view_action import FRIGATE, _state
+    from tests.test_view_geometry import run_js
+
+    def flag(name):
+        row = F.signal_flag("britain", name, 1805)
+        d = row.flag.served_drawing() | {"kind": row.flag.kind}
+        return {"name": name, "words": row.words, "drawing": d}
+
+    data = _state(FRIGATE)
+    data["snap"]["hoists"] = [
+        {
+            "place": "main topgallant masthead",
+            "key": "a",
+            "words": "three flags at the main",
+            "flags": [flag("numeral 2"), flag("numeral 5"), flag("numeral 3")],
+        },
+        {
+            "place": "fore yardarm",
+            "key": "b",
+            "words": "a blue pendant",
+            "flags": [flag("blue pendant")],
+        },
+    ]
+    out = run_js(
+        tmp_path,
+        data,
+        """
+      const sk = P.buildSkeleton(d.graph, d.snap);
+      const f = sk.figures.filter(f => f.kind === 'flag');
+      const at = {};
+      for (const w of ['main topgallant masthead', 'fore yardarm'])
+        at[w] = P.flagPlace(d.graph, {}, sk.spars, w,
+                            Math.sin(d.snap.wind.apparent_angle) >= 0 ? 1 : -1);
+      const first = f.filter(x => x.id.endsWith('.0')).map(x => [x.of, x.pts]);
+      return {ofs: f.map(x => x.of), first, at, beam: d.graph.hull.beam_m};
+    """,
+    )
+    ofs = out["ofs"]
+    assert ofs[0].startswith("hoist.0.") and {
+        "hoist.0.0",
+        "hoist.0.1",
+        "hoist.0.2",
+        "hoist.1.0",
+    } <= set(ofs)
+    tops = {of: max(p[2] for p in pts) for of, pts in out["first"]}
+    top = out["at"]["main topgallant masthead"]
+    assert abs(tops["hoist.0.0"] - top[2]) < 0.05
+    assert tops["hoist.0.0"] > tops["hoist.0.1"] > tops["hoist.0.2"]
+    beam = out["beam"]
+    step = 0.3 * beam * 2 / 3 + 0.15  # a flag's hoist and the halyard's gap
+    assert abs((tops["hoist.0.0"] - tops["hoist.0.1"]) - step) < 0.05
+    arm = out["at"]["fore yardarm"]
+    hoist_b = [pts for of, pts in out["first"] if of == "hoist.1.0"][0]
+    assert min(abs(p[1] - arm[1]) + abs(p[0] - arm[0]) for p in hoist_b) < 0.05
+    # nothing at a place the ship lacks: a brig has no mizen to cross a yard
+    brig = _state("data/ships/brig.yaml")
+    brig["snap"]["hoists"] = [
+        {"place": "mizen yardarm", "key": "c", "words": "x", "flags": [flag("numeral 1")]}
+    ]
+    none = run_js(
+        tmp_path,
+        brig,
+        "return P.buildSkeleton(d.graph, d.snap).figures.filter(f => f.kind === 'flag').length;",
+    )
+    assert none == 0
