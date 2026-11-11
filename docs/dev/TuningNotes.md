@@ -26295,6 +26295,16 @@ passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace al
 
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
+**Where I stand (2026-11-11, 02:20 UTC).** Items 0 to 9 are built and pushed: the two regions
+(tiles committed, 26.5 MB), the marks, the thirteen ports, the regency of Tunis, the tide by the
+lead's ruling, the weather boxes, the streams, the scenario (sailed to the Fort Genois), truths
+7-510 to 7-519 and the how-to; the trunk merged at f3bf73d. The tree is measured at `fb3e883` in
+a pinned worktree: ruff check and format clean; the fast tier running (restarted after the
+container's restart lost the first run); the slow tier of the touched files and the pace to
+follow, then the figures paragraph and the final report. Nothing needs refetching to remake the
+tiles: `python tools/build_charts.py --region sardinian-sea --reuse-world` then `--region
+tunis-coast` (GEBCO's and EMODnet's fetches, about 220 MB, seconds through the proxy).
+
 Package 104 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 104"; built as
 `docs/dev/ChartBlocks.md` says). Two regions, `sardinian-sea` (the open sea between Minorca
 and Sardinia with the Algerian coast from Cape Carbon to Bona) and `tunis-coast` (La Calle to
