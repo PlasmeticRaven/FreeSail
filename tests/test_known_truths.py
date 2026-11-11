@@ -15600,3 +15600,26 @@ def test_truth_7_479_a_letter_travels_as_the_thing_and_an_old_message_loads_as_o
 
     a()
     b(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Package 102: the signals seen and the ship dressed (truths 7-500 to 7-509)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_500_every_colours_drawing_is_served_and_drawn_as_before_the_package(tmp_path):
+    """Package 102, step 1: the drawing's form widened (a poly, a swallow-tailed or a triangular
+    outline), and every flag of every root's colours.yaml served and drawn exactly as the trunk
+    served and drew it before, old beside new (tests/fixtures/flag_drawings_before_102.json)."""
+    import shutil
+
+    from tests.test_flag_drawings import (
+        test_every_colours_drawing_is_drawn_as_before_the_package as b,
+    )
+    from tests.test_flag_drawings import (
+        test_every_colours_drawing_is_served_as_before_the_package as a,
+    )
+
+    a()
+    if shutil.which("node"):
+        b(tmp_path)

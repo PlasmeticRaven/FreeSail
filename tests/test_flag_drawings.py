@@ -85,7 +85,7 @@ def record(tmp_path: Path) -> None:
 
 
 def test_every_colours_drawing_is_served_as_before_the_package():
-    """Truth 7-501: every flag of every root's colours.yaml served exactly as the trunk served
+    """Truth 7-500: every flag of every root's colours.yaml served exactly as the trunk served
     it before package 102 widened the form, plain and union down."""
     before = json.loads(BEFORE.read_text(encoding="utf-8"))["served"]
     now = served_now()
@@ -96,7 +96,7 @@ def test_every_colours_drawing_is_served_as_before_the_package():
 
 @pytest.mark.skipif(not __import__("shutil").which("node"), reason="Node is not installed")
 def test_every_colours_drawing_is_drawn_as_before_the_package(tmp_path):
-    """Truth 7-501, the viewer's half: each of those flags drawn at the main truck and at the
+    """Truth 7-500, the viewer's half: each of those flags drawn at the main truck and at the
     peak in the same figures, ids, colours and points as before package 102."""
     before = json.loads(BEFORE.read_text(encoding="utf-8"))["drawn"]
     now = drawn_now(tmp_path)

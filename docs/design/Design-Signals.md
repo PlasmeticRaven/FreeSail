@@ -547,7 +547,7 @@ occasions:                       # what flies where, by occasion and role
   quartered on the diagonal, a lozenge, a triangle), served under `drawing.polys`, and a flag
   may have a `shape`, `swallowtail` (with its `cut`) or `triangle`, served under
   `drawing.shape`; each key only where the flag has one, so that every drawing from before is
-  served and drawn as it was (truth 7-501, `tests/test_flag_drawings.py`).
+  served and drawn as it was (truth 7-500, `tests/test_flag_drawings.py`).
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
   two ensigns at the peak), for 74's prize when the lead rules it.
 
