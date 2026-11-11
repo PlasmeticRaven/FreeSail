@@ -70,6 +70,8 @@ Dress ship: the hands aloft with the flags, and the ship dressed with her flags 
 Undress ship: the flags hauled down from the yards and the stays, and stowed.
 ```
 
+A nation's days are kept by her ships in harbour: on the King's birthday (the 4th of June under George III), the anniversaries of his accession and coronation, the Queen's birthday, the Restoration and the Gunpowder Treason, the British ships lying at anchor dress of themselves in the morning, as the Regulations of 1806 solemnize those days; the Spanish ships on their King's and Queen's name days and birthdays and on Santiago; the French on the days of their government of the year. Your own ship does not dress of herself: lying at anchor on such a day, your first lieutenant reminds you, and the order is yours. The day's salute of guns is not fired in the game.
+
 A ship dresses by day with her own colours flying: `dress ship` is refused by night and with her colours down, struck or turned over. It is the deck's order, as the colours are. The browser's picture hangs the flags at their places.
 
 ## The private signal

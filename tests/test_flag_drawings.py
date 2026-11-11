@@ -524,3 +524,115 @@ def test_the_lookout_says_a_stranger_is_dressed():
     assert "dressed" not in F.vessel_flies_words(w, v)
     S.vessel_locker(v).dressed = True
     assert F.vessel_flies_words(w, v).endswith("she is dressed in her flags")
+
+
+# -- step 5: the nations' days ------------------------------------------------------------------
+
+
+def test_the_days_are_kept_in_their_years():
+    """Step 5: the King's birthday is 4 June under George III (the date read in Nelson's
+    letter of 1797) and 12 August under George IV; the Spanish King's name day San Carlos
+    under Charles IV and San Fernando under Ferdinand VII; the Saint-Napoléon only under the
+    Empire; a day not kept outside its years."""
+    from datetime import date
+
+    def names(root, y, m, d):
+        return [x.name for x in F.days_on(root, date(y, m, d))]
+
+    assert names("britain", 1805, 6, 4) == ["the King's birthday"]
+    assert names("britain", 1825, 6, 4) == [] and names("britain", 1825, 8, 12)
+    assert names("britain", 1805, 6, 5) == []
+    assert names("spain", 1805, 11, 4) == ["the King's name day, San Carlos"]
+    assert names("spain", 1815, 11, 4) == [] and names("spain", 1815, 5, 30)
+    assert names("france", 1805, 8, 15) == [] and names("france", 1807, 8, 15)
+    assert F.load_days("naples") == () and F.load_days("britain")[0].guns == 21
+
+
+def _harbour(day, hour=10):
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from tests.test_brains import put
+
+    sc = Scenario(
+        start_time=datetime(*day, hour, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 50.133, "lon_deg": -5.035},
+        chart="channel-west",
+        ship_speed_kn=0.0,
+        nation="britain",
+    )
+    w = make_world(7, "data/ships/topsail-schooner.yaml", sc)
+    keep = "keep the station off the Lizard within 20 miles"
+    ours = put(w, "frigate", "britain", "50 08 N 5 02 W", "bound for Plymouth", keep, name="Amazon")
+    # the French ship at anchor far out of sight of the British (on the bank, for the test)
+    theirs = put(w, "brig", "france", "49 20 N 7 30 W", "bound for Brest", keep, name="Hortense")
+    under_way = put(w, "frigate", "britain", "50 07 N 5 01 W", "bound for Plymouth", name="Naiad")
+    for v in (ours, theirs):
+        v.plan, v.sail_state = [("anchor", "")], "at anchor"  # lying at anchor, her captain's
+    return w, ours, theirs, under_way
+
+
+def test_a_fleet_in_harbour_dresses_on_its_nations_day_and_not_on_another():
+    """Truth 7-505 (step 5): on the King's birthday of 1805 a British ship lying at anchor
+    under a rules captain dresses of herself by day, and the lookout says so; a French ship at
+    anchor beside her does not, nor a British ship under way; the day after, and the same day
+    in 1825 (the next king's birthday in August), none dresses; at night none is dressed."""
+    w, ours, theirs, under_way = _harbour((1805, 6, 4), hour=19)
+    w.run(61)
+    assert S.vessel_locker(ours).dressed and not S.vessel_locker(theirs).dressed
+    assert not getattr(S.vessel_locker(under_way), "dressed", False)
+    assert F.vessel_flies_words(w, ours).endswith("she is dressed in her flags")
+    while S.light_now(w) != "night":
+        w.run(900)
+    w.run(61)
+    assert not S.vessel_locker(ours).dressed
+    for day in ((1805, 6, 5), (1825, 6, 4)):
+        w, ours, theirs, _ = _harbour(day)
+        w.run(61)
+        assert not S.vessel_locker(ours).dressed, day
+
+
+def test_the_first_lieutenant_reminds_the_captain_at_anchor_on_the_day_once():
+    """Step 5: the player's own ship does not dress of herself: lying at anchor on the King's
+    birthday her first lieutenant reminds the captain once, and the order is his; not at sea,
+    nor on another day."""
+    w, *_ = _harbour((1805, 6, 4), hour=9)
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(600)
+    assert w.at_anchor
+    said = [e for e in w.log if e.kind == "officer.reminder"]
+    assert len(said) == 1 and "the King's birthday" in said[0].text
+    assert not S.locker_of(w.ship).dressed
+    w.run(1800)
+    assert len([e for e in w.log if e.kind == "officer.reminder"]) == 1
+    w, *_ = _harbour((1805, 6, 5), hour=9)
+    w.submit("let go the best bower")
+    w.run(600)
+    assert not [e for e in w.log if e.kind == "officer.reminder"]
+
+
+def test_a_save_from_before_the_package_loads_and_replays_to_its_digests(tmp_path):
+    """Truth 7-506: the kept save of before the package (package 100's, a letter in hand)
+    loads from its checkpoint to its header's digest, its locker reading the new fields'
+    defaults (not dressed, no day said, every hoist at the main), runs on a glass, and saved
+    and loaded again keeps its digest; a locker and a hoist with nothing of the package set
+    pickle with none of its keys."""
+    import pickle
+
+    from tests.test_checkpoint import FIXTURE_SAVES, _loaded_run_saved_and_loaded_again
+
+    save = FIXTURE_SAVES / "pre-100-step-2-letter-in-hand.json"
+    world, _ = _loaded_run_saved_and_loaded_again(save, 1800, tmp_path)
+    locker = S.locker_of(world.ship)
+    assert locker.dressed is False and locker.day_said == ""
+    assert all(h.place == "" for h in locker.made)
+    state = pickle.loads(pickle.dumps(S.Locker())).__dict__
+    assert not {"dressed", "dressed_since", "day_said"} & set(state)
+    h = S.Hoist(book="numerary", meaning="", by="", since=0, breaks_out=0)
+    assert "place" not in pickle.loads(pickle.dumps(h)).__dict__

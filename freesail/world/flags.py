@@ -1107,6 +1107,120 @@ def _root_of(nations: Any, nation: str) -> str:
         return "basic"
 
 
+# ---------------------------------------------------------------------------
+# Package 102 (step 5): the nations' days
+# ---------------------------------------------------------------------------
+
+DAYS_FILE = "days.yaml"
+
+
+@dataclass(frozen=True)
+class Day:
+    name: str
+    month: int
+    day: int
+    years: str
+    does: tuple[str, ...]
+    guns: int
+    source: str
+
+    def kept(self, when: Any) -> bool:
+        return (
+            int(when.month) == self.month
+            and int(when.day) == self.day
+            and _in_dates(self.years, int(when.year))
+        )
+
+
+@cache
+def load_days(root: str, base: str | None = None) -> tuple[Day, ...]:
+    """A root's days (`data/signals/<root>/days.yaml`); none where the root has no file."""
+    path = (Path(base) if base else SIGNALS_DIR) / root / DAYS_FILE
+    if not path.exists():
+        return ()
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    out = []
+    for i, d in enumerate(raw.get("days") or []):
+        m = re.fullmatch(r"(\d\d)-(\d\d)", str(d.get("date") or ""))
+        if not d.get("name") or not m or not d.get("source"):
+            raise BookFileError(f"{path}: day {i + 1} wants a name, a date (MM-DD) and a source")
+        does = tuple(str(x) for x in d.get("does") or [])
+        if not set(does) <= {"dress"}:
+            raise BookFileError(f"{path}: day {d['name']!r}: what is done is of ('dress',)")
+        out.append(
+            Day(
+                name=str(d["name"]),
+                month=int(m.group(1)),
+                day=int(m.group(2)),
+                years=str(d.get("years") or ""),
+                does=does,
+                guns=int(d.get("guns") or 0),
+                source=str(d["source"]),
+            )
+        )
+    return tuple(out)
+
+
+def days_on(root: str, when: Any) -> list[Day]:
+    """The root's days kept on `when` (a date or datetime), in their years."""
+    return [d for d in load_days(root) if d.kept(when)]
+
+
+def _vessel_root(world: Any, vessel: Any) -> str:
+    nation = str(getattr(vessel, "nation", "") or "")
+    return _root_of(getattr(world, "nations", None), nation) if nation else "basic"
+
+
+def _harbour_dressing(world: Any, daylight: bool) -> None:
+    """The ships of the sea lying at anchor under a rules captain dress of themselves by day
+    on a day their nation keeps (in its years), and undress at sunset and the day after
+    (package 102, step 5); never logged, read by the lookout with their flags. A ship under
+    way, or one with her colours down, does not."""
+    sea = getattr(world, "vessels", None)
+    own = getattr(world, "vessel", None)
+    now = world.clock.ship_time
+    from freesail.world import signals as S
+
+    mine = S.own_id(world)
+    for v in getattr(sea, "vessels", None) or []:
+        if v is own or str(getattr(v, "id", "")) == mine:
+            continue
+        locker = getattr(v, "signals", None)
+        at_anchor = str(getattr(v, "sail_state", "")) == "at anchor"
+        ruled = getattr(v, "brain", None) is not None
+        want = False
+        if at_anchor and ruled and daylight:
+            if any("dress" in d.does for d in days_on(_vessel_root(world, v), now)):
+                locker = locker or S.vessel_locker(v)
+                want = locker.colours.shows and locker.colours.state == "shown"
+        if locker is not None and bool(getattr(locker, "dressed", False)) != want:
+            locker.dressed = want
+            locker.dressed_since = int(world.clock.tick) if want else 0
+
+
+def _the_day_reminded(world: Any, locker: Any) -> None:
+    """The first lieutenant reminds the captain once, on the morning of a day his nation keeps
+    and his ship lying at anchor, that the ships in harbour will dress; the order is his
+    (package 102, step 5). The locker keeps the day said, so that it is said once."""
+    from freesail.world import signals as S
+
+    if not bool(getattr(world, "at_anchor", False)) or S.light_now(world) == "night":
+        return
+    now = world.clock.ship_time
+    stamp = f"{now.year:04d}-{now.month:02d}-{now.day:02d}"
+    if getattr(locker, "day_said", "") == stamp:
+        return
+    days = [d for d in days_on(S.books_for(world).root, now) if "dress" in d.does]
+    if not days:
+        return
+    locker.day_said = stamp
+    text = (
+        f"The first lieutenant: 'It is {days[0].name}, sir: the ships in harbour will be "
+        "dressing.' The order to dress her is yours ('dress ship')."
+    )
+    world.record("notable", "officer.reminder", text, data={"day": days[0].name})
+
+
 def dressing_tick(world: Any) -> None:
     """Once a minute with the look (package 102, step 4): the player's ship dressed undresses
     at sunset (the period's colours came down at sunset, Spavens 1796 as Perrin prints it;
@@ -1114,13 +1228,17 @@ def dressing_tick(world: Any) -> None:
     come down, said in the log. Nothing while she is not dressed."""
     from freesail.world import signals as S
 
+    night = S.light_now(world) == "night"
+    _harbour_dressing(world, not night)
     ship = getattr(world, "ship", None)
     extra = getattr(ship, "extra", None)
     locker = extra.get("signals") if isinstance(extra, dict) else None
-    if locker is None or not getattr(locker, "dressed", False):
+    if locker is None:
+        return
+    _the_day_reminded(world, locker)
+    if not getattr(locker, "dressed", False):
         return
     down = locker.colours.state in ("none", "struck", "distress", "truce")
-    night = S.light_now(world) == "night"
     if not (down or night):
         return
     locker.dressed, locker.dressed_since = False, 0
