@@ -634,6 +634,7 @@ def answer_parole(world: Any, hull: Any, person: Any, given: bool, by: str) -> s
         return ""
     captain = _captain_of(hull)
     table = _parole_table(_nation(hull))
+    how = f" ({by})" if by else ""  # by whose word, where the world has one to say
     if given:
         pris.parole[person.name] = "given"
         person.liberty = PLACES_ON_PAROLE
@@ -647,7 +648,7 @@ def answer_parole(world: Any, hull: Any, person: Any, given: bool, by: str) -> s
             sword.keeper_home = str(getattr(person, "home", "") or "")
             returned = "; his sword is returned him"
         text = (
-            f"{person.name} gives his parole ({by}): the cabin and the gunroom are his, and "
+            f"{person.name} gives his parole{how}: the cabin and the gunroom are his, and "
             f"the quarterdeck by day{returned}."
         )
         ack = table.get("taken") or "Your word is enough, sir; the cabin is yours."
@@ -657,7 +658,7 @@ def answer_parole(world: Any, hull: Any, person: Any, given: bool, by: str) -> s
         person.confined_to = "gunroom"
         person.where = "gunroom"
         text = (
-            f"{person.name} refuses his parole ({by}): the gunroom alone is his, a sentry at "
+            f"{person.name} refuses his parole{how}: the gunroom alone is his, a sentry at "
             "the door."
         )
         ack = table.get("refused") or "As you please, sir; the sentry has his orders."
