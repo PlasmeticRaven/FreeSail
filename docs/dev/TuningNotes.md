@@ -26295,13 +26295,12 @@ passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace al
 
 ## Package 102: the signals seen and the ship dressed (2026-11-11)
 
-**Where I stand (2026-11-11, 02:20 UTC).** Steps 0 and 1 are measured at 5142098 (the trunk
-merged at b9b925a); the fast tier's first run there failed only on the server's tests for want
-of the `fastapi` package in the container (installed mid-run; those files re-run clean), and is
-being run again whole before step 0/1's report. Steps 2 to 5 are built and pushed above it
+**Where I stand (2026-11-11).** Steps 0 and 1 are reported at 4bb0b50 (5142098 and its
+figures paragraph; all suites exit 0 there). Steps 2 to 5 are built and pushed above it
 (every signal flag drawn; the hoist's place and the player's hoists drawn; `dress ship`; the
-nations' days), each step's tests passing alone, not yet measured; the salute and `splice the
-main brace` are stopped and said in step 5's paragraph below.
+nations' days), each step's tests passing, not yet measured; each will be reported at its own
+hash after the step before it is merged. The salute and `splice the main brace` are stopped
+and said in step 5's paragraph.
 
 **Step 0: the sources' pass.** Read on the page (the five new rows of
 `docs/references/README.md`, "Package 102"; every file data, never run; nothing of a modern
@@ -26462,6 +26461,20 @@ drawn at the main truck and the peak of the frigate, 494 figures, their ids, col
 points to a micrometre) and the new code serves and draws every one of them the same (truth
 7-500).
 
+**Steps 0 and 1: the measure.** The trunk merged at b9b925a by a merge commit (5142098:
+package 74's step 6 and the lead's records; the two appends resolved in the trunk's own
+order, its truths and its notes above this package's, no line of the trunk's lost). At
+**5142098**, in a worktree pinned there, one suite at a time: ruff check and ruff format
+--check clean; the fast tier exit 0, 7,463 passed, 1 xfailed, 505 slow left out (a first run
+there failed on the server's tests alone, the container then lacking the `fastapi` package;
+installed, those files ran clean and the whole tier was run again); the slow tier (`--slow -m
+"not pace" -n 4`) of tests/test_known_truths.py whole with the recorded passages and the kept
+saves (test_captain_trials.py, test_replay.py, test_checkpoint.py) and the touched files
+(test_flag_drawings.py, test_flags.py, test_view_action.py, test_view_geometry.py,
+test_viewer_action.py) exit 0, 1,626 passed, 8 xfailed: no pin and no digest moved; the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12 passed. The viewer's
+geometry tests ran (Node 22 present). The tree reported differs from 5142098 by this
+paragraph alone.
 **Step 2: every signal flag of every book drawn.** An eighth file in each root,
 `flags.yaml`, 186 rows in all: Britain 58 (23 names, four dated sets of numerals and
 substitutes, 55 `plate`), France 33 (all `plate`, Audibert's Pl. 3), Naples 27 (all `plate`,
