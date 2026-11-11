@@ -67,7 +67,10 @@ def drawn_now(tmp_path: Path) -> dict:
         for place in PLACES:
             d = flag.served_drawing(False)
             flags.append(
-                [f"{key}::{name}@{place}", {"place": place, "name": name, "words": name, "drawing": d}]
+                [
+                    f"{key}::{name}@{place}",
+                    {"place": place, "name": name, "words": name, "drawing": d},
+                ]
             )
     data["flags"] = flags
     return run_js(tmp_path, data, DRAW_EVERY)
@@ -100,3 +103,90 @@ def test_every_colours_drawing_is_drawn_as_before_the_package(tmp_path):
     assert sorted(now) == sorted(before)
     for k in before:
         assert now[k] == before[k], k
+
+
+# -- the widened form ------------------------------------------------------------------------
+
+
+def _file(tmp_path, drawing: str, extra: str = "") -> F.ColoursFile:
+    base = tmp_path / "signals"
+    (base / "x").mkdir(parents=True, exist_ok=True)
+    (base / "x" / "colours.yaml").write_text(
+        "nation: x\nsources: [made]\nflags:\n  - name: cornet\n    kind: pendant\n"
+        f"    proportion: [1, 2]\n{extra}    drawing:\n{drawing}    source: made\noccasions:\n"
+        '  - {occasion: "at sea", role: "any", flags: [{name: cornet, where: "main truck"}]}\n',
+        encoding="utf-8",
+    )
+    F.load_colours.cache_clear()
+    try:
+        return F.load_colours("x", str(base))
+    finally:
+        F.load_colours.cache_clear()
+
+
+def test_a_poly_and_a_shape_are_read_and_served_apart(tmp_path):
+    """Step 1: a `poly` part served under `polys` with its place in the drawing, the outline
+    under `shape` with its cut (the default's where the file gives none); a part that is two
+    things at once, a poly of two points and a shape not known are refused in words."""
+    f = _file(
+        tmp_path,
+        "      - {rect: [0, 0, 1, 1], colour: white}\n"
+        "      - {poly: [[0, 0], [1, 0], [0, 1]], colour: blue}\n",
+        "    shape: swallowtail\n",
+    )
+    d = f.flags["cornet"].served_drawing()
+    assert d["parts"] == [{"rect": [0, 0, 1, 1], "colour": "white", "n": 0}]
+    assert d["polys"] == [{"poly": [[0, 0], [1, 0], [0, 1]], "colour": "blue", "n": 1}]
+    assert d["shape"] == "swallowtail" and d["cut"] == pytest.approx(F.SWALLOWTAIL_CUT)
+    assert "lines" not in d
+    for bad, words in (
+        ("      - {rect: [0, 0, 1, 1], poly: [[0, 0], [1, 0], [0, 1]], colour: red}\n", "a poly"),
+        ("      - {poly: [[0, 0], [1, 0]], colour: red}\n", "a poly"),
+    ):
+        with pytest.raises(S.BookFileError, match=words):
+            _file(tmp_path, bad)
+    with pytest.raises(S.BookFileError, match="shape is one of"):
+        _file(tmp_path, "      - {rect: [0, 0, 1, 1], colour: red}\n", "    shape: ball\n")
+
+
+@pytest.mark.skipif(not __import__("shutil").which("node"), reason="Node is not installed")
+def test_a_swallow_tail_is_cut_and_a_triangle_tapers(tmp_path):
+    """Step 1, the viewer: a swallow-tailed flag's field drawn as its two halves with the notch
+    out of the fly (no point of it inside the notch), a poly drawn at its points, and a
+    triangle's fly drawn to a point at the middle of its hoist."""
+    from tests.test_view_action import FRIGATE, _state
+    from tests.test_view_geometry import run_js
+
+    field = {"rect": [0, 0, 1, 1], "colour": "blue", "n": 0}
+    half = {"poly": [[0, 0], [1, 1], [0, 1]], "colour": "white", "n": 1}
+    tail = {"proportion": [1, 2], "parts": [field], "polys": [half], "shape": "swallowtail"}
+    tail["cut"] = 0.5
+    tri = {"proportion": [1, 2], "parts": [field], "shape": "triangle"}
+    data = _state(FRIGATE)
+    data["flags"] = [
+        ["tail", {"place": "main truck", "name": "cornet", "words": "c", "drawing": tail}],
+        ["tri", {"place": "main truck", "name": "repeater", "words": "r", "drawing": tri}],
+        [
+            "plain",
+            {"place": "main truck", "name": "flag", "words": "f", "drawing": tri | {"shape": ""}},
+        ],
+    ]
+    out = run_js(tmp_path, data, DRAW_EVERY)
+    assert [f[0] for f in out["tail"]] == ["flag.0.0", "flag.0.1", "flag.0.2", "flag.0.3"]
+    assert [f[1] for f in out["tail"]] == ["colour-blue"] * 2 + ["colour-white"] * 2
+    plain = out["plain"][0][3]  # the same flag unshaped: its four corners
+    head, foot = plain[0], plain[3]  # the hoist's head and foot
+    fly_head = plain[1]
+
+    def at(fx, fy):
+        return [head[i] + fx * (fly_head[i] - head[i]) + fy * (foot[i] - head[i]) for i in range(3)]
+
+    # the notch's apex, half the fly in at the middle, is a corner of both halves of the field
+    apex = at(0.5, 0.5)
+    for piece in out["tail"][:2]:
+        assert any(all(abs(a - b) < 1e-4 for a, b in zip(p, apex, strict=True)) for p in piece[3])
+    # the triangle's fly is one point, at the middle of the hoist's height
+    tri_pts = out["tri"][0][3]
+    tip = at(1.0, 0.5)
+    assert all(abs(a - b) < 1e-4 for a, b in zip(tri_pts[1], tip, strict=True))
+    assert all(abs(a - b) < 1e-4 for a, b in zip(tri_pts[2], tip, strict=True))
