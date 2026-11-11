@@ -618,13 +618,14 @@ nations:
   # pp. 328 to 330 (from Macgill's Account of Tunis, 1811); the regency from La Calle to the
   # Biban (p. 328; Berard 1837, p. 140, puts the march with Algiers four miles east of La
   # Calle, so that La Calle is Algiers'); the famine of 1805 (p. 328). The flag, the Bey's
-  # name and the treaties' dates are in no work on file: FROM MEMORY, said so.
+  # name and the treaties' dates are in no work on file: FROM MEMORY, said so; the flag is
+  # Fisher's [1820] plate 13.
   tunis:
     name: Tunis
     adjective: Tunisian
     people: the Tunisians
     names: english               # no Tunisian names list; the pilots' names are the port files'
-    colours: "the Bey's flag of horizontal stripes, red, green and blue (FROM MEMORY; the flags flown at Tunis varied, no work on file describing them)"
+    colours: "horizontal stripes of red and white, or of blue, red and green (Fisher [1820], A Display of the Naval Flags of all Nations, plate 13, 'Tunis (Two)', the page image docs/references/signals/pages/fisher-1820-naval-flags-leaf30.jpg; fifteen years after the period)"
     flag: "the striped flag of Tunis"    # the flag's short word, for the lookout (package 36)
     letters_of_marque: false     # the corsairs are the Bey's and his adventurers', noted and not modelled
     closed_to: []

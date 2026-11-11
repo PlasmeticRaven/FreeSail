@@ -4,7 +4,7 @@
 format: 1
 built: '2026-11-11'
 tool: tools/build_charts.py
-build_hash: 02063dfcc70e4d0b
+build_hash: 1f0cc73b98108ec5
 levels:
   '0':
     cell_sec: 150.0

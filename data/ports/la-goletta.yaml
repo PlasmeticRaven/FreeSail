@@ -31,18 +31,18 @@ datum: unverified   # no period sheet read with its datum; the modern shore is t
 outer_road:
   feature: tunis-road
   name: the bay of Tunis
-  lat_deg: 36.8160
+  lat_deg: 36.8260
   lon_deg: 10.3400
   depth_fathoms: 5
 anchorage:
   feature: tunis-road
   name: the road of Tunis
-  lat_deg: 36.8160
+  lat_deg: 36.8260
   lon_deg: 10.3400
 mooring:
   feature: tunis-road
   name: off the Goletta, moored east and west
-  lat_deg: 36.8160
+  lat_deg: 36.8260
   lon_deg: 10.3400
   depth_fathoms: 5
   bottom: soft mud

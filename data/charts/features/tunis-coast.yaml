@@ -384,8 +384,9 @@ features:
     kind: anchorage
     name: the road of Tunis
     modern: 'the bay of Tunis off La Goulette'
-    lat_deg: 36.8160
+    lat_deg: 36.8260
     lon_deg: 10.3400
+    fix: 'placed by Purdy''s bearings made true (his magnetic NNE 1/2 E or NE by N for Cape Carthage, NW by W to W for the Goletta, the variation about 17 W then): the cape 10 and the Goletta 254 true; the grid''s 6.1 m, half the pilot''s depth and more (the modern bay shoaler)'
     height_m: 0
     depth_fathoms: 5
     bottom: soft mud
