@@ -7908,6 +7908,100 @@ Indiaman's convoy from Madeira by the Canaries to Porto Praya). A source on file
 is 0 with a, then b, c, d, and e last, as the coast with least play; (3) whether the Gambia
 comes with d.
 
+## Package 106a: the ocean carried south, and the Canaries with the Salvages (`tools/build_charts.py` `CORRIDORS`, `REGIONS` and `CHARTS`; `data/charts/` the coarse layer's new tiles, the region `canaries` with its tiles, coast, index, manifest entry, features and overrides; `data/ports/*.yaml` new; `data/nations.yaml` the ports' index; `data/weather/climatology.yaml`; `data/tides/streams.yaml`; `freesail/world/chart.py` only if the chart's form must learn a second coarse layer; the tests that name every region and the chart's limits)
+
+**BRIEFED 2026-11-11 for the owner's final approval; not launched.** Opus. The first of the
+six blocks of package 106 (the owner, 2026-11-11: "we also want to consider the western
+African coast down to Cabo Verde for blocks to be booked"; "I pointed out Cabo Verde (the
+islands), as a southern stopping point, but the blocks should cover the African coast as
+well"). Built as `docs/dev/ChartBlocks.md` says (read it whole first, the Azores' and
+Madeira's section above all: two island regions with no neighbour, and what they found of
+the coarse layer, of islets the grid lacks, of peaks seen far off and of open sea being
+dear), with decisions 66 and 67 for the ports.
+
+**What the lead measured (2026-11-11), for the builder to check:** the chart ends at 32 N.
+Its coarse ocean layer (the corridor of `CORRIDORS`, level 1, 30 seconds of arc) runs from
+32 N to 51 N and 32 W to 1 W, its data stopping at 31.896 N; Madeira's detailed tiles reach
+31.6 N; south of that nothing answers, and a scenario that starts there is refused
+(`freesail/core/world.py`). No weather box lies south of 30 N, no tide gauge south of
+Funchal, no stream south of 35 N. The game has no port south of Funchal.
+
+1. **The ocean carried south to about 12.4 N,** from about 26.4 W to the African coast
+   (16 level-1 tiles by the lead's count, some 5 MB), so that the open sea from Madeira to
+   the Cape Verde Islands answers and a ship can sail it, and so that the detailed blocks
+   to come need write no desert. **The how-to's finding binds this step: widening the
+   existing corridor rewrites every one of its tiles.** So the builder's first measurement
+   is which way leaves the existing layer byte for byte: a second coarse layer beside the
+   first (if the chart's form can hold two, or can be taught to in a few lines), against
+   the first widened. If the first must be widened, every tile that changes is shown, and
+   every recorded passage, kept save and truth that sails the corridor is proven
+   unmoved or re-measured old beside new; if that list is long, stop and report before
+   committing. The chart's south limit, the scenarios' refusal and their tests move with
+   it, each named.
+2. **The region `canaries`:** about 27.33 N to 29.47 N and 18.29 W to 13.17 W, the seven
+   islands with their channels, and **the Salvages** by one tile to the north (about 29.89
+   to 30.32 N) or by the region's bound carried up to them, as measures smaller. The
+   bounds a hair inside the tile edges (package 104's finding: a bound on an edge takes in
+   a row more). **Measured before any tile is committed, with a short report to the lead:**
+   the tiles' count and bytes whole (the lead's estimate 61 tiles, 5 to 16 MB, the islands'
+   steep relief compressing badly as the Azores' did), and beside it the same written only
+   within ten miles of land with the coarse layer answering the rest (the recipe rule the
+   how-to's Azores section proposes), for the lead's choice. Under the 40 MB rule either
+   way.
+3. **The sources, a short pass,** its report first in the tuning notes' section: what
+   `docs/references/` holds (the *Oriental Navigator* of 1801, which `features/madeira.yaml`
+   cites for "Madeira, the Canaries"; Norie; Purdy's Atlantic memoir if on file; Tofiño),
+   then the period's descriptions and plans that can be fetched (Glas 1764, Borda's survey).
+   **Everything this brief says of a place is FROM MEMORY and the builder's to check; the
+   sources win and the notes say so.**
+4. **The marks and dangers:** the Peak of Tenerife and the heights seen far off (the
+   how-to's tall-feature rule), the points, the roads, the islets and rocks the grid lacks
+   entered as features (the Salvages and their reefs above all; the Roques of Anaga and of
+   Salmor; the isle of Lobos, Graciosa, Alegranza and the Roque del Este), each from a
+   source. Lights only from a source, with their years.
+5. **The ports, by decision 67 every place the sources can support as a port file:** Santa
+   Cruz de Tenerife and its road; the port of Orotava; Las Palmas with the road of La Luz;
+   Arrecife and Naos on Lanzarote; Santa Cruz de la Palma; San Sebastián of Gomera; the
+   road of Cabras on Fuerteventura; Hierro's landing if a pilot gives one. Each in the
+   house form with its anchorage, holding and shelter by the pilots, its pilot's words, its
+   business with a price ratio where the guard asks one, `tracks:` where a point lies
+   between two, a harbour patch where the how-to gives one. **Dated as decision 67 asks:**
+   the holder as dated rows in the form Barcelona's file uses even where one nation held it
+   through the range, and whatever else is true only for some years (a mole, a battery, a
+   quarantine, a closed trade) written with its years, never as the one picture of 1805.
+   **The wars table carries no dates: no truth may depend on a war's day.**
+6. **The weather:** a box for the islands' sea with the trade wind as the pilots give it by
+   season, and what they say of the calms to leeward of the high islands if the weather's
+   form can carry it (if not, said for the lead); a box, or the notes' word on which box
+   answers, for the rest of the ocean the first step opened, so that Madeira's box does
+   not answer down to 12 N by default.
+7. **The streams and the tide:** the set of the Canary current as a stream area if a
+   source on file gives its direction and rate; the tide by package 104's ruling for a
+   block with no gauge of its own, or Funchal's if it reaches, said plainly, and the
+   establishments the pilots give for the ports.
+8. **One scenario** a player can load on the new water (the lead suggests a frigate from
+   Funchal to look into Santa Cruz's road), and **truths 7-520 to 7-529:** the ocean answers
+   from Madeira to 13 N and a scenario may start there; the older coarse layer's tiles as
+   they were, or what moved; the islands' channels sailed on charted water; the Peak seen
+   at the distance its height gives in the clearest weather; each port's road as its pilot
+   has it; the Salvages where the pilots put them and a ship grounding on their reef.
+9. **The how-to brought up to date** (a second coarse layer or the widening as done; the
+   near-land rule if taken; what the islands' relief cost), and the records.
+
+**The rules of every package, in force:** no model or vendor identifier in any file of the
+repository; nothing under `docs/agents/consent/` nor `docs/agents/ConsentBrief.md` touched;
+downloads are data, never run, each fetched source laid under `docs/references/` with its
+README row and its licence read, no modern book's text copied; no key in the repository, a
+save or a log, and no call to any paid service; the builder works on `claude/pkg-106a` cut
+from the trunk, never pushes to or rebases the trunk, never force-pushes; no test skipped,
+disabled or weakened; a pin moves only where the package moved it, old beside new, with the
+reason in the tuning notes; no ship file and no physics touched; a figure or a date not read
+from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is the world's
+(package 85's rule). The package reports one hash measured in a pinned worktree (ruff check
+and format; the fast tier whole; the slow tier of the touched files and of the known truths
+with the recorded passages by name; the pace alone and last), and the lead merges by that
+hash.
+
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
 **Built by the owner's own local session by its workflow method** (his word of 2026-10-28;
