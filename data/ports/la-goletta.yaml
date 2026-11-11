@@ -1,0 +1,119 @@
+# FreeSail: the Goletta and the road of Tunis as a port (package 104, the coast of Tunis's region, the
+# harbour patch la-goletta), on package 35's machinery; the marks are the features file's
+# (data/charts/features/tunis-coast.yaml).
+#
+# Sources. Purdy 1826, pp. 328 to 331 (from Macgill's Account of Tunis, 1811) and p. 334 (W. Smith's
+# directions, about 1817): the Goletta defended by two forts of considerable strength built by the
+# Spaniards under Charles V; a small port formed through a canal of stone with 15 feet at all times,
+# a due of three Spanish dollars a day to enter, so that few do; vessels loading lie off in 5 to 7
+# fathoms, good ground, served by lighters; the best anchorage in 5 to 6 fathoms, soft muddy bottom,
+# Cape Carthage NNE 1/2 E or NE by N and the Goletta castle between NW by W and W; exposed to the NE
+# winds but they do not blow home, the most sea from NE to ESE; moor east and west; a fleet might
+# remain in the most tempestuous weather; fresh water from a reservoir within the entrance; the
+# city six miles west behind the lake, above 100,000 people; its exports grain of different kinds,
+# oil, wool, hides, wax and soap, the wheat excellent but its export at times prohibited; its
+# imports French woollens, British muslins, linens, coffee, sugar, alum, tin, lead, iron and wine;
+# the English by treaty at three per cent ad valorem. Smyth 1854, pp. 92 to 93: patches of hard
+# clay that breaks short, not a winter station for heavy ships. Derrotero 1849, pp. 268 to 269: the
+# worst winds of the second quadrant; the Goletta's water worse than Porto Farina's. **The consuls**
+# (the brief) are in no text read: not written.
+#
+# The datum: UNVERIFIED; the modern canal and port of La Goulette in the grid.
+#
+# The stance. The regency of Tunis's, the Bey's (the nations table, `tunis`), neutral to a King's ship as to every flag the table has; the Bey's ships and corsairs noted and not modelled. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange, each good's note naming its source where a text names the trade.
+
+id: la-goletta
+name: the Goletta, the road of Tunis
+nation: tunis
+source: "Purdy 1826 pp. 328-334; Norie 1831 pp. 349-351; Smyth 1854 pp. 92-93, 457; Derrotero 1849 pp. 268-269; Lamberti 1844 p. 229"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: tunis-road
+  name: the bay of Tunis
+  lat_deg: 36.8160
+  lon_deg: 10.3400
+  depth_fathoms: 5
+anchorage:
+  feature: tunis-road
+  name: the road of Tunis
+  lat_deg: 36.8160
+  lon_deg: 10.3400
+mooring:
+  feature: tunis-road
+  name: off the Goletta, moored east and west
+  lat_deg: 36.8160
+  lon_deg: 10.3400
+  depth_fathoms: 5
+  bottom: soft mud
+shore:
+  feature: la-goletta
+  name: the canal of the Goletta
+  lat_deg: 36.8180
+  lon_deg: 10.3050
+
+pilot:
+  station: tunis-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Goletta's boat
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Mahmud, Ali, Hassan, Yusuf, Mustafa, Salah, Hamuda, Ahmed]   # judgement
+  skill: 0.8
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 40            # judgement
+  words:
+    channel: "From Cape Bon steer for Zembra, which may be passed a mile off on any side, then for Cape Carthage; there is no sounding with the hand-lead until abreast of it, and rocks above and under water lie off the low coast from the cape to the Goletta."
+    marks: "Cape Carthage high above the ruins; the Goletta's square fort and its batteries on the canal; the city white beyond the lake."
+    anchorage: "Anchor in five fathoms of soft mud with Cape Carthage north-north-east and the Goletta castle west, out of reach of the forts' guns; moor east and west. The north-easters do not blow home, but there are patches of hard clay that break short: look to your anchors in winter."
+    tide: "The water rises and falls near three feet with the winds, not the moon."
+
+tide:
+  establishment: the Goletta
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 13, origin: tunis, note: "grain of different kinds, the wheat excellent, its export at times prohibited (Purdy 1826, p. 330); the price JUDGEMENT"}
+    - {good: olive oil, price: 29, origin: tunis, note: "oil of various qualities (Purdy 1826, p. 330); the price JUDGEMENT, cheap"}
+    - {good: wool, price: 22, origin: tunis, note: "wool (Purdy 1826, p. 330); the price JUDGEMENT"}
+    - {good: hides, price: 34, origin: tunis, note: "hides (Purdy 1826, p. 330); the price JUDGEMENT"}
+    - {good: wax, price: 100, origin: tunis, note: "wax (Purdy 1826, p. 330); the price JUDGEMENT"}
+    - {good: soap, price: 20, origin: tunis, note: "soap (Purdy 1826, p. 330); the price JUDGEMENT, cheap"}
+    - {good: coral, price: 410, origin: null, note: "the coral sold at Tunis (Purdy 1826, p. 331); the price JUDGEMENT, dear against the fisheries'"}
+    - {good: woollens, price: 60, origin: france, note: "French woollens imported (Purdy 1826, p. 331); the price JUDGEMENT"}
+    - {good: linen, price: 48, origin: null, note: "Irish and German linens imported (Purdy 1826, p. 331); the price JUDGEMENT"}
+    - {good: coffee, price: 95, origin: france, note: "Martinique coffee imported (Purdy 1826, p. 331); the price JUDGEMENT"}
+    - {good: sugar, price: 70, origin: null, note: "sugar imported (Purdy 1826, p. 331); the price JUDGEMENT"}
+    - {good: iron, price: 28, origin: null, note: "iron imported (Purdy 1826, p. 331); the price JUDGEMENT"}
+    - {good: wine, price: 30, origin: null, note: "wine imported (Purdy 1826, p. 331); the price JUDGEMENT"}
+    - {good: fresh beef, price: 16, origin: tunis, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: tunis, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 55, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "a reservoir within the entrance of the Goletta (Purdy 1826, p. 334); the Derrotero 1849, p. 269, finds it poor; judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: Maltese and Sicilian seamen at Tunis
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [tunis-road, 36 57 N 10 24 E, 37 24 N 10 27 E]
+  from_sea: [37 24 N 10 27 E, 36 57 N 10 24 E, tunis-road]
+  in: [tunis-road]
