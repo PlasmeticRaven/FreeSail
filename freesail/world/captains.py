@@ -319,6 +319,12 @@ SIZE_RANK: dict[str, int] = {
     "hermaphrodite brig": 2,
     "bilander": 1,
 }
+# The class of a ship of the line (the sixty-four and the seventy-four above), for the rank-4
+# rule (package 75, B7.e; docs/design/Design-Ship-Bellerophon.md §8.3): a lone King's ship of a
+# lower class hauls off from an enemy of this class made out within her doctrine's
+# `line_of_battle_nm` (`Judgement._line_of_battle_nm`): Maitland held three frigates hardly a
+# match for one ship of the line (p. 78).
+LINE_OF_BATTLE_RANK = 4
 # Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
 # razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
 # the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
@@ -1990,17 +1996,58 @@ class Judgement:
                 self._enter(t.to)
                 return
 
-    def _overmatched(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+    def _alone(self) -> bool:
+        """Whether she sails in no set, neither a member of one nor its commander (package 72's
+        squadrons and convoys, the parent World's for a crewed hull): the rank-4 rule is a lone
+        ship's, and a ship in a set is left to her commander's book (package 75, B7.e)."""
+        world = getattr(self, "world", None)
+        root = getattr(world, "parent", None) or world
+        sets = getattr(root, "squadrons", None)
+        if sets is None or not hasattr(sets, "of"):
+            return True
+        return sets.of(str(self._own_vessel_id() or "the ship")) is None
+
+    def _line_of_battle_nm(self, p: Perception) -> float:
+        """The miles within which she hauls off from an enemy ship of the line (package 75,
+        B7.e, the rank-4 rule, the owner's "Yes, build the rule" of 2026-11-11): her doctrine's
+        `line_of_battle_nm` where she is of a class under `LINE_OF_BATTLE_RANK` and alone
+        (`_alone`); nought for a doctrine without the knob, a ship of the line herself, and a
+        ship in a set."""
+        d = self.doctrine
+        nm = float(d.threshold("line_of_battle_nm", 0) or 0) if d is not None else 0.0
+        if nm <= 0.0 or int(p.own_size or 0) >= LINE_OF_BATTLE_RANK or not self._alone():
+            return 0.0
+        return nm
+
+    def _overmatched(
+        self, p: Perception, within_nm: float, line_nm: float | None = None
+    ) -> dict[str, Any] | None:
         """An enemy of a bigger class than her own within `within_nm` (package 43, the
-        cruiser's judgement of a superior force), by what the tops have made out."""
+        cruiser's judgement of a superior force), by what the tops have made out; or an enemy
+        ship of the line within `line_nm` (package 75, B7.e, the rank-4 rule), by default the
+        miles her doctrine gives a lone ship of a lower class (`_line_of_battle_nm`), which
+        are nought for every doctrine but the King's ship's and the commodore's."""
+        if not p.strangers:
+            return None
+        line = self._line_of_battle_nm(p) if line_nm is None else float(line_nm)
+        own = int(p.own_size or 0)
         enemies = [
             s
             for s in p.strangers
             if self._is_enemy(s)
             and not self._spoken(s)
             and s.get("estimate_m") is not None
-            and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
-            and int(s.get("size") or 0) > int(p.own_size or 0)
+            and (
+                (
+                    float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
+                    and int(s.get("size") or 0) > own
+                )
+                or (
+                    line > 0.0
+                    and float(s["estimate_m"]) / units.NAUTICAL_MILE <= line
+                    and int(s.get("size") or 0) >= LINE_OF_BATTLE_RANK
+                )
+            )
             # package 70: a merchantman of a bigger hull is a prize, not a superior force
             and "merchant" not in str(s.get("known") or "").lower()
             # package 74: a ship that has struck is nobody's superior force
@@ -4591,11 +4638,18 @@ class Captain(Judgement):
 
     def _haul_off(self, p: Perception) -> None:
         """Evading: a course shaped for a point away from the nearest enemy, the
-        reciprocal of her bearing, by account."""
+        reciprocal of her bearing, by account. Under the rank-4 rule (package 75, B7.e) the
+        enemy run from is the ship of the line, within three times the miles she hauled off
+        at, as the cruiser's reach is three times hers (a King's ship's `stranger_hostile_nm`
+        is nought)."""
         d = self.doctrine
         enemy = self._nearest_enemy(
             p, float(d.threshold("stranger_hostile_nm", 6)) * 3 if d else 18
         )
+        line = self._line_of_battle_nm(p)
+        if line > 0.0:
+            hostile = float(d.threshold("stranger_hostile_nm", 6)) if d else 6.0
+            enemy = self._overmatched(p, hostile * 3, line * 3) or enemy
         if enemy is None:
             return
         self._stranger = enemy.get("id")

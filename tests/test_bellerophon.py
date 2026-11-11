@@ -1385,55 +1385,313 @@ def far_only(monkeypatch):
     monkeypatch.setattr(crews, "CREWED_CAP", 0)
 
 
-@pytest.mark.parametrize(
-    "description, role, keeps_away",
-    [("brig-sloop", "cruiser", True), ("frigate", "kings-ship", False)],
-    ids=["cruiser", "kings-ship"],
-)
-def test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today(
-    far_only, description, role, keeps_away
-):
-    """Bel-D §8.3 and §14.1: she is hove to off the Lizard (tests/test_brains.py's world, seed 7),
-    a French man of war on her own five miles to the north, made out with her colours. A cruiser
-    finds her an enemy of a bigger class (`overmatched`: rank 4 against her own) and evades, as
-    the cruisers' book has it; a frigate in the King's ship's role does not, and closes her: the
-    engine's today, recorded, the rank-4 rule (B7.e, the owner's "Agreed") being her road's step
-    7, not built here. **Plainly:** the design's cruiser was a frigate in the cruiser's role, which
-    no scenario may give since SW-4 (a frigate's file gives her the King's ship's and the
-    commodore's roles alone), so the cruiser is the brig-sloop, the cruisers' own description."""
+STATION_OFF_THE_LIZARD = "keep the station off the Lizard within 10 miles"
+ESCORT_TO_BREST = "escort the convoy to Brest"
+
+
+def _hove_to_off_the_lizard(ship_file):
+    """Her world (tests/test_brains.py's, seed 7): the ship of `ship_file` under plain sail a
+    quarter of an hour, then hove to off the Lizard."""
     from tests.test_brains import world_at
 
-    world = world_at(49.5, -5.5, SEVENTY_FOUR)
+    world = world_at(49.5, -5.5, ship_file)
     world.submit("set plain sail")
     world.run(900)
     world.submit("heave to")
-    world.vessels.serial += 1
-    from freesail.world.ships import vessel_from_spec
+    return world
 
-    v = vessel_from_spec(
-        world,
-        {
-            "description": description,
-            "name": "Méduse",
-            "nation": "france",
-            "position": "49 35 N 5 30 W",
-            "goal": "patrolling off the Lizard within 10 miles",
-            "intent": "keep the station off the Lizard within 10 miles",
-            "colours": "shown",
-        },
-        world.vessels.serial,
-    )
-    world.vessels.add(v)
-    assert v.brain.role == role
-    states = []
-    for _ in range(40):
-        world.run(60)
+
+def _french(world, description, position, intent, name="Méduse", goal="patrolling off the Lizard"):
+    """A French sail of `description` with `intent`, her colours shown."""
+    from tests.test_brains import put
+
+    return put(world, description, "france", position, goal, intent, name=name)
+
+
+def _states_until_evading(v, minutes=40):
+    """Her brain's states, a minute at a time, until she evades or the minutes are run."""
+    states: list[str] = []
+    for _ in range(minutes):
+        v.brain.world.run(60)
         states = [s for _, s in v.brain.history]
         if "evading" in states:
             break
+    return states
+
+
+@pytest.mark.parametrize("ship_file", [SEVENTY_FOUR, SIXTY_FOUR], ids=["the-74", "the-64"])
+@pytest.mark.parametrize(
+    "description, role",
+    [("brig-sloop", "cruiser"), ("frigate", "kings-ship")],
+    ids=["cruiser", "kings-ship"],
+)
+def test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64(
+    far_only, ship_file, description, role
+):
+    """Bel-D §8.3 and §14.1, the rank-4 rule (B7.e, the owner's "Yes, build the rule" of
+    2026-11-11): she (or the 64) is hove to off the Lizard (tests/test_brains.py's world, seed 7),
+    a French man of war on her own five miles to the north keeping her station, made out with her
+    colours. A cruiser finds her an enemy of a bigger class (`overmatched`: rank 4 against her own)
+    and evades, as the cruisers' book has it, as before; a lone frigate in the King's ship's role
+    finds her an enemy ship of the line within `line_of_battle_nm` and evades as well. OLD BESIDE
+    NEW (B7's test, `..._and_a_kings_frigate_does_not_today`): the King's frigate investigated and
+    chased her ("keeping station", "investigating a stranger", "chasing"), the engine's then;
+    now "keeping station", "investigating a stranger", "evading". **Plainly:** the design's
+    cruiser was a frigate in the cruiser's role, which no scenario may give since SW-4 (a frigate's
+    file gives her the King's ship's and the commodore's roles alone), so the cruiser is the
+    brig-sloop, the cruisers' own description."""
+    world = _hove_to_off_the_lizard(ship_file)
+    v = _french(world, description, "49 35 N 5 30 W", STATION_OFF_THE_LIZARD)
+    assert v.brain.role == role
+    states = _states_until_evading(v)
+    assert "evading" in states, states
+    assert "investigating a stranger" in states[: states.index("evading")], states
+
+
+@pytest.mark.parametrize(
+    "intent, role, set_kind, keeps_away",
+    [
+        (ESCORT_TO_BREST, "commodore", None, True),
+        (ESCORT_TO_BREST, "commodore", "convoy", False),
+        (STATION_OFF_THE_LIZARD, "kings-ship", "squadron", False),
+    ],
+    ids=["a-commodore-alone", "a-commodore-and-her-convoy", "a-frigate-commanding-a-set"],
+)
+def test_a_lone_commodore_keeps_away_from_her_and_a_set_is_left_to_its_book(
+    far_only, intent, role, set_kind, keeps_away
+):
+    """Bel-D §8.3, the rank-4 rule's other book and its bound (B7.e): a French frigate with the
+    commodore's intent, alone a mile and a half north of her where her colours are made out at
+    once, hauls off from her as the King's ship's book does; the same frigate commanding a set (a
+    convoy of one merchant brig, or a squadron of two frigates on the station) is left to the
+    set's book, unchanged: she closes or stands on as before, and never evades in the forty
+    minutes. A ship in the set below its commander is `in company` and never judges a stranger
+    (`test_the_rank_4_rule_judges_a_lone_ship_within_two_leagues_and_not_beyond`)."""
+    from freesail.world import squadrons as Q
+
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    near = "49 31.5 N 5 30 W" if role == "commodore" else "49 35 N 5 30 W"
+    goal = "bound for Brest" if role == "commodore" else "patrolling off the Lizard"
+    v = _french(world, "frigate", near, intent, goal=goal)
+    assert v.brain.role == role
+    if set_kind is not None:
+        consort = _french(
+            world,
+            "merchant brig" if set_kind == "convoy" else "frigate",
+            "49 32 N 5 31 W" if set_kind == "convoy" else "49 35.5 N 5 31 W",
+            "bound for Brest" if set_kind == "convoy" else intent,
+            name="Consort",
+            goal=goal,
+        )
+        world.squadrons.add(
+            Q.Squadron(
+                id="the-set",
+                name="the set",
+                kind=set_kind,
+                nation="france",
+                commander=v.id,
+                members=[v.id, consort.id],
+                goal=intent,
+                formation="order of sailing" if set_kind == "convoy" else "line ahead",
+            ),
+            world,
+        )
+        assert world.squadrons.of(v.id) is not None and not v.brain._alone()
+    states = _states_until_evading(v)
     assert ("evading" in states) is keeps_away, states
-    if not keeps_away:
-        assert {"investigating a stranger", "engaging", "chasing"} & set(states), states
+
+
+def test_a_kings_64_meeting_her_closes_her_as_before(far_only):
+    """Bel-D §8.3: the rule is for a ship of rank 3 or less; a French sixty-four in the King's
+    ship's role, a ship of the line herself (rank 4), meeting her five miles off as the frigate
+    does above, investigates and chases her as before B7.e, and never evades."""
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    v = _french(world, "sixty-four", "49 35 N 5 30 W", STATION_OFF_THE_LIZARD)
+    assert v.brain.role == "kings-ship"
+    states = _states_until_evading(v)
+    assert "evading" not in states, states
+    assert {"investigating a stranger", "chasing"} <= set(states), states
+
+
+def _a_stranger(description, nm, nation="britain"):
+    """The tops' report of a sail made out (`ships.Vessels.strangers`' form), `nm` miles off."""
+    from freesail.world import captains as C
+    from freesail.world.ships import DESCRIPTIONS
+
+    return {
+        "id": "the-stranger",
+        "bearing_deg": 0.0,
+        "estimate_m": round(nm * units.NAUTICAL_MILE),
+        "made_out": 3,
+        "known": DESCRIPTIONS[description]["what"],
+        "nation": nation,
+        "spoken": False,
+        "size": C.SIZE_RANK[description],
+    }
+
+
+def test_the_rank_4_rule_judges_a_lone_ship_within_two_leagues_and_not_beyond(far_only):
+    """Bel-D §8.3 (B7.e): `overmatched` by the tops' report alone, on the far brain and on her
+    rules captain (the near body), the figures the books' `line_of_battle_nm`, 6 miles. A lone
+    frigate under the King's ship's book or the commodore's finds an enemy seventy-four or
+    sixty-four a superior force at 5.9 miles and not at 6.1; an enemy frigate, her own class, at
+    none; the same frigate a member of a set or its commander at none (left to her commander's
+    book); a King's sixty-four, a ship of the line herself, at none. The cruiser keeps her own
+    figure as before: a bigger class within her `stranger_hostile_nm` of 6. Every other book reads
+    no `line_of_battle_nm`."""
+    from freesail.world import brains as B
+    from freesail.world import captains as C
+    from freesail.world import squadrons as Q
+    from freesail.world.captains import Perception
+    from tests.test_brains import put, world_at
+
+    for role in C.ROLES:
+        has = "line_of_battle_nm" in C.load_doctrine(role).thresholds
+        assert has is (role in ("kings-ship", "commodore")), role
+    world = world_at(49.5, -5.5, SEVENTY_FOUR)
+    frigate = _french(world, "frigate", "49 40 N 5 30 W", STATION_OFF_THE_LIZARD, name="A")
+    commodore = _french(world, "frigate", "49 40 N 5 40 W", ESCORT_TO_BREST, "B", "bound for Brest")
+    cruiser = _french(world, "brig-sloop", "49 40 N 5 20 W", STATION_OFF_THE_LIZARD, name="C")
+    king_64 = _french(world, "sixty-four", "49 45 N 5 30 W", STATION_OFF_THE_LIZARD, name="D")
+    assert [v.brain.role for v in (frigate, commodore, cruiser, king_64)] == [
+        "kings-ship",
+        "commodore",
+        "cruiser",
+        "kings-ship",
+    ]
+
+    def overmatched(v, description, nm):
+        p = B.perceive_vessel(world, v, v.brain)
+        p.strangers = [_a_stranger(description, nm)]
+        return v.brain._stimulus("overmatched", p)
+
+    for v in (frigate, commodore):
+        for enemy in ("seventy-four", "sixty-four"):
+            assert overmatched(v, enemy, 5.9) and overmatched(v, enemy, 1.0), (v.name, enemy)
+            assert not overmatched(v, enemy, 6.1), (v.name, enemy)
+        assert not overmatched(v, "frigate", 1.0), v.name
+    assert overmatched(cruiser, "seventy-four", 5.9) and overmatched(cruiser, "frigate", 5.9)
+    assert not overmatched(cruiser, "seventy-four", 6.1)
+    assert not overmatched(king_64, "seventy-four", 1.0)
+    # a member of a set, and its commander: the set's book's, not hers
+    world.squadrons.add(
+        Q.Squadron(
+            id="the-set",
+            name="the set",
+            kind="squadron",
+            nation="france",
+            commander=frigate.id,
+            members=[frigate.id, commodore.id],
+            goal=STATION_OFF_THE_LIZARD,
+            formation="line ahead",
+        ),
+        world,
+    )
+    for v in (frigate, commodore):
+        assert not overmatched(v, "seventy-four", 1.0), v.name
+    # her rules captain (the near body) in a frigate of her own, alone and then in a set
+    home = world_at(49.5, -5.5, FRIGATE, intent=STATION_OFF_THE_LIZARD)
+    cap = home.captain
+    p = Perception.read(home)
+    assert cap.role == "kings-ship" and p.own_size == 3
+    for enemy in ("seventy-four", "sixty-four"):
+        p.strangers = [_a_stranger(enemy, 5.9, nation="france")]
+        assert cap._stimulus("overmatched", p), enemy
+        p.strangers = [_a_stranger(enemy, 6.1, nation="france")]
+        assert not cap._stimulus("overmatched", p), enemy
+    p.strangers = [_a_stranger("seventy-four", 5.9, nation="france")]
+    mate = put(home, "brig-sloop", "britain", "49 25 N 5 30 W", "bound for Falmouth", name="Mate")
+    home.squadrons.add(
+        Q.Squadron(
+            id="ours",
+            name="our squadron",
+            kind="squadron",
+            nation="britain",
+            commander=mate.id,
+            members=[mate.id, "the ship"],
+            goal="bound for Falmouth",
+            formation="line ahead",
+        ),
+        home,
+    )
+    assert not cap._stimulus("overmatched", p)
+
+
+@pytest.mark.parametrize(
+    "ship_file, description, in_set, hauls_off",
+    [
+        (FRIGATE, "seventy-four", False, True),
+        (FRIGATE, "sixty-four", False, True),
+        (FRIGATE, "seventy-four", True, False),
+        (SIXTY_FOUR, "seventy-four", False, False),
+    ],
+    ids=["a-frigate-and-a-74", "a-frigate-and-a-64", "a-frigate-in-a-set", "the-64-and-a-74"],
+)
+def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
+    far_only, ship_file, description, in_set, hauls_off
+):
+    """Bel-D §8.3 (B7.e) on the near body: the player's frigate on her station off the Lizard
+    under her rules captain (tests/test_brains.py's world, seed 7), an enemy ship of the line
+    bound for Brest a mile and a half to the north, her colours made out at once. Alone, the
+    captain evades and shapes a course away, "hauling off from" her (`_haul_off`, its reach three
+    times the books' two leagues, a King's ship's `stranger_hostile_nm` being nought); in a set
+    (a British brig-sloop's squadron, the frigate `in company`) she is left to her commander's
+    book and engages as before; the 64 in the frigate's place, a ship of the line herself,
+    engages as before. Each engages her an enemy not yet spoken, at the engaging distance: a
+    superior force within hail is no longer `overmatched` (package 43's filter, the cruiser's as
+    well), so an engagement only after speaking her would be the rule holding her off until
+    then."""
+    from freesail.world import squadrons as Q
+    from freesail.world.captains import Perception
+    from tests.test_brains import put, world_at
+
+    world = world_at(49.5, -5.5, ship_file, intent=STATION_OFF_THE_LIZARD)
+    world.run(60)
+    assert world.captain.commands and world.captain.role == "kings-ship"
+    foe = put(
+        world,
+        description,
+        "france",
+        "49 31.5 N 5 30 W",
+        "bound for Brest",
+        "bound for Brest",
+        name="Foe",
+    )
+    if in_set:
+        mate = put(
+            world,
+            "brig-sloop",
+            "britain",
+            "49 29 N 5 31 W",
+            "bound for Falmouth",
+            "bound for Falmouth",
+            name="Mate",
+        )
+        world.squadrons.add(
+            Q.Squadron(
+                id="ours",
+                name="our squadron",
+                kind="squadron",
+                nation="britain",
+                commander=mate.id,
+                members=[mate.id, "the ship"],
+                goal="bound for Falmouth",
+                formation="line ahead",
+            ),
+            world,
+        )
+    engaged_spoken = None
+    for _ in range(15):
+        world.run(60)
+        if world.captain.state == "engaging" and engaged_spoken is None:
+            seen = [s for s in Perception.read(world).strangers if s["id"] == foe.id]
+            engaged_spoken = bool(seen and seen[0].get("spoken"))
+    states = [e.data.get("state") for e in world.log if e.kind == "captain.state"]
+    hauled = [e.text for e in world.log if "hauling off from a " + description in e.text]
+    assert ("evading" in states) is hauls_off, states
+    assert bool(hauled) is hauls_off, hauled
+    if not hauls_off:
+        assert "engaging" in states and engaged_spoken is False, (states, engaged_spoken)
 
 
 # ---------------------------------------------------------------------------

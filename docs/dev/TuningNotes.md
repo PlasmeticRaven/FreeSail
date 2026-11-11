@@ -18244,6 +18244,190 @@ Junit, logs and the measurements under `scratchpad/s7/b7d/` (`run/`, `s0/`, `pro
 `old/`). Not run: the whole fast tier, the slow tier beyond the three files, the pace tier beyond the
 files' pace tests.
 
+### B7.e, the rank-4 rule (2026-11-11)
+
+**The ruling.** Bel-D §8.3 offered the rule and put it to the owner (§17.1 item 3), who agreed on
+2026-10-29 ("Agreed.", §17.0: a frigate on her own keeps away from her) and took it on 2026-11-11:
+"Yes, build the rule". The lead's answer (10) to her §17.2 in `docs/dev/M7-WorkPackages.md`: "If the
+owner takes the rank-4 rule, B7.e owns `world/captains.py` and the two doctrine books for that step
+alone, and the 64's scenario tests are re-run." One commit; `freesail/world/captains.py`,
+`data/captains/kings-ship.yaml` and `data/captains/commodore.yaml` B7.e's for the step, returned at its
+merge.
+
+**The rule as built** (a lone King's ship of rank 3 or less hauls off from an enemy of rank 4 made out
+within two leagues):
+
+- `captains.LINE_OF_BATTLE_RANK = 4`, the class of the sixty-four and the seventy-four in `SIZE_RANK`.
+- `Judgement._line_of_battle_nm(p)`: the doctrine's `line_of_battle_nm` where her own class
+  (`p.own_size`) is under 4 and she is alone, nought otherwise; `Judgement._alone()`: in no set of
+  package 72's (`squadrons.of`, the parent World's for a crewed hull), neither a member nor its
+  commander. The knob is in the two books alone, 6 nm, its source by fact and page: Maitland p. 78 on
+  three frigates hardly a match for one ship of the line, the two leagues the cruiser's own distance
+  for a superior force (judgement), and Steel 1805 p. 124's exception and the *Droits de l'Homme*
+  (James vol. 2 pp. 12-19) as the later refinement, not built. Every other book reads nought.
+- `Judgement._overmatched(p, within_nm, line_nm=None)`: an enemy of a bigger class within `within_nm`
+  as before; or, for that case alone, an enemy of rank 4 within `line_nm`, by default
+  `_line_of_battle_nm`; the same filters for both (made out an enemy by `_is_enemy`, unspoken, not a
+  merchantman, not struck). Both bodies judge by it (the far brain and the near captain share it).
+- `Captain._haul_off` (the near body): the enemy run from is the ship of the line within three times
+  the knob, as the cruiser's reach is three times her `stranger_hostile_nm`, which on a King's ship is
+  nought: without it the near captain entered `evading` and shaped no course. The far body's
+  `evading` plan already ran from `_overmatched(p, 1e9)`.
+- The two books: the cruiser's `overmatched` rows from `on passage`, `beating`, `keeping station`,
+  `investigating a stranger` and `chasing` to `evading`, each where the cruiser has it (before the
+  stranger rows); out of it, `evading` on `stranger lost` to `on passage` and on `gale` to `hove to for
+  weather` unless no sea room; the `evading` book, empty before, the cruiser's three lines (trim to the
+  course, tend the sheets, make all sail to haul off). No `in company` row. `stranger_hostile_nm` nought
+  as before, its source's words amended (no ship of her own class or under).
+
+**Judgement, said** (where §8.3 left a choice, its lean built):
+
+1. **The commodore's book takes the rows as well as the knob.** §8.3 names the knob in both books and
+   "`overmatched` transitions in the King's ship's book"; without the rows the commodore's knob would
+   act only where `overmatched` stood already (no engaging; from engaging or taking possession to
+   evading), and a lone commodore would never haul off from her passage or her station. The
+   commodore's is a King's ship's doctrine.
+2. **A ship in a set is any member, its commander included** (`squadrons.of`): a set's commander
+   answers to the set's book (`data/squadrons/`), whose rules judge an enemy for the whole set; the
+   rest are `in company`. A ship merely under another's orders by package 71's least relation
+   (`under_the_orders_of`, no set) is alone by the design's words (for the lead, below).
+3. **Out of `evading` to `on passage`**, as the King's ship's book leaves engaging and as the cruiser's
+   leaves evading: a ship with a station takes it up again from her passage (the far body on reaching
+   it, the near by her station leg).
+4. **Rank 3 or less** is any class under 4, a hull of no description (class 0) with it.
+
+**Old beside new** (`scratchpad/b7e/probe.py` and `probe_near.py`, seed 7, tests/test_brains.py's world
+off the Lizard, the far brain alone with no crewed promotion; run on a worktree of 62cf52c6 and on this
+tree; the states in their order):
+
+| Who meets whom | 62cf52c6 | B7.e |
+|---|---|---|
+| A French frigate (King's ship) keeping her station five miles north of the player's 74, hove to | keeping station, investigating a stranger, chasing, keeping station | keeping station, investigating a stranger, evading |
+| The same, the player's 64 | as the 74's | as the 74's |
+| The same, the player's frigate-36 (her own class) | keeping station, investigating a stranger, chasing, keeping station | the same |
+| A French brig-sloop (cruiser), the 74 | keeping station, investigating a stranger, evading | the same |
+| A French sixty-four (King's ship), the 74 | keeping station, investigating a stranger, chasing, keeping station | the same |
+| The French frigate in company in a set of two frigates | in company | the same |
+| The French frigate commanding that set | keeping station, investigating a stranger, keeping station, investigating a stranger | the same |
+| A French frigate escorting the convoy to Brest (the commodore's book), alone a mile and a half north of the 74 | on passage | on passage, evading |
+| The same commanding a convoy of one merchant brig (a set) | on passage | the same |
+| The player's frigate under her rules captain on her station, a French 74 bound for Brest a mile and a half north (near body) | on passage, engaging | on passage, evading ("shaping a course for 49 09.9 n 5 29.9 w (hauling off from a seventy-four, a ship of the line, ...)"), on passage, engaging |
+| The same, a French 64 | on passage, engaging | as the 74's ("hauling off from a sixty-four, ...") |
+| The same, a French frigate | on passage, engaging | the same |
+| The player's frigate in company in a British brig-sloop's set, the 74 | in company, engaging | the same |
+| The player's 64 under her rules captain, the 74 | on passage, engaging | the same |
+
+The near frigate's second "on passage" (tick 720, the 74 0.34 miles off;
+`scratchpad/b7e/probe_near2.py`): the 74, standing the same way and faster, ranged up within hail, and
+a sail spoken is no superior force to `_overmatched` (package 43's filter, the cruiser's as well), so
+`stranger lost` ended the evasion and she engaged at tick 780, 0.22 miles off; the far frigates evaded
+before the 74 was within hail. For the lead (below). In the world the rule acts where the enemy is made
+out an enemy, her colours at two miles (three with a glass), as the cruiser's does: the two leagues
+bound the judgement, the colours the knowing.
+
+**What moves: the grep** (`data/scenarios/` and its trials, `data/business.yaml`, `data/regimes.yaml`,
+`tests/`, `freesail/`; the owner's scenarios folder beside them):
+
+- **No pinned scenario:** none of the shipped scenarios or the five trials names a sixty-four, a
+  seventy-four, a two-decker or a ship of the line, and the world's business draws none (its traders,
+  fishers and brig-sloop cruisers; the convoy's escort a brig-sloop by `in convoy`), so no scenario puts
+  a King's ship of rank 3 or less against rank 4: the four whole logs and the captain's trials as at
+  62cf52c6 (below).
+- **One test moved**, her own record of the engine's then: `tests/test_bellerophon.py`'s
+  `test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today[kings-ship]` ("evading" not
+  in her states, "investigating a stranger" or "chasing" in them) is
+  `test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64[kings-ship-the-74]`, "evading"
+  in her states after "investigating a stranger"; its cruiser case the same, renamed; both slow node
+  ids renamed in `tests/conftest.py`'s `SLOW_TESTS`.
+- **The other tests that put a rank-4 ship on the sea, none moved:** her round trip (the 74 with a
+  British 64 bound for Plymouth: rank 4 both, friends), the 64's round trip (`tests/test_indefatigable.py`,
+  the great guns' scenario with nothing else on the sea), `tests/test_signals.py`'s British 64 hailed,
+  and the words' tests (`test_ships`, `test_world_orders`, `test_subtypes`' and `test_neufchatel`'s role
+  tables).
+- **Not pinned, the owner's folder:** `64-gun-in-Torbay.yaml` and `64-gun-schooner-tender.yaml` sail the
+  64 as the player's ship, British: a French frigate the director puts within two leagues of her,
+  alone, now hauls off where she closed. Five more (the four privateer brigs' and the French
+  hermaphrodite brig's) let the director put an enemy sixty-four (`enemy_heaviest: sixty-four`): a lone
+  King's frigate of the other side that meets it hauls off.
+
+**The 64's scenario tests, re-run:** `tests/test_indefatigable.py` whole (her round trip under the rules
+captain with no fit named among them) and her own round trip with the 64 in sight: as at the base
+(below). B6's scenario tests are not yet written (Phase 5).
+
+**Saves:** the doctrine is pickled with its captain (`Doctrine`, a frozen dataclass), so a save from
+before B7.e loads with its books as saved, the knob absent and read as nought, the rule off in it; a
+world made since takes it. No field added.
+
+**New** (`tests/test_bellerophon.py`, "A frigate meeting her"): the renamed meeting, four cases (the 74
+and the 64; the cruiser and the King's frigate); a lone commodore keeping away and a set left to its
+book (a commodore alone, a commodore and her convoy, a frigate commanding a squadron); a King's 64
+meeting her closing her as before; `overmatched` by the tops' report alone on both bodies (a lone
+frigate under either book at 5.9 miles and 1 mile against a 74 and a 64, not at 6.1, not against a
+frigate; a member and a commander of a set not; a King's 64 not; the cruiser at 5.9 and not 6.1; only
+the two books carry the knob); her rules captain in a lone frigate hauling off from a 74 and a 64, and
+engaging as before in a set and in the 64, each engagement begun on an enemy not yet spoken.
+
+**Each able to fail** (`scratchpad/b7e/mutate.py`, each mutation made on the tree, the 13 cases run,
+the files restored byte for byte, the diff's digest the same before and after):
+
+| Mutation | Failed |
+|---|---|
+| M1, the knob nought in both books | the King's frigate's two meetings, the commodore alone, the near frigate's two, the perception test |
+| M2, a ship in a set judged alone | the commodore and her convoy, the frigate commanding a set, the near frigate in a set, the perception test |
+| M3, the rule on a ship of the line herself | the King's 64 meeting her, the near 64, the perception test |
+| M4, the two leagues a mile wider | the perception test (6.1 miles) |
+| M5, `_haul_off`'s reach as before | the near frigate's two (no course shaped) |
+| M6, the King's ship's rows from passage, station and investigating out | the near frigate's two (the far ones evade from `chasing`, its row kept) |
+| M7, the commodore's rows from passage, station and investigating out | the commodore alone |
+| M8, the cruiser's bigger class dropped | the cruiser's two meetings, the perception test |
+
+On 62cf52c6's worktree the new file gave 8 failed and 5 passed: the cruiser's two, the King's 64, the
+near frigate in a set and the near 64 passing, as before (the two set cases there failing on `_alone`,
+which the base has not).
+
+### For the lead (B7.e)
+
+- **A ship of the line within hail is no superior force** (`_overmatched`'s `_spoken` filter, package
+  43's, the cruiser's as well): the near frigate overhauled within hail gave up hauling off and engaged
+  her (above). Keeping an enemy spoken in `overmatched`, and out of an evasion's `stranger lost`, is a
+  few lines in `_overmatched` and `_stimulus`, and the cruiser's judgement would move with it. Not built.
+- **Package 71's least relation:** a commodore whose convoy is held by `under_the_orders_of` alone (the
+  convoy scenario's brig-sloop and her four merchant brigs, no set) is alone by the design's words, and
+  would leave them to haul off from a ship of the line. Whether that relation counts as a set for the
+  rule is yours. Not built.
+- **The *Droits de l'Homme*'s case** (a sea that shuts a 74's lower tier, Steel 1805 p. 124's exception;
+  James vol. 2 pp. 12-19), recorded in the knob's source as §8.3 has it: a later refinement.
+- **Her scenario (B6):** her French frigates, alone, now keep away by doctrine as well as by B6's intent.
+
+### The suites, as run (B7.e)
+
+Once, on the final tree (the package's branch at 62cf52c6, the step uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run.
+
+- **(a) The named files, both tiers** (`--slow` over `test_captains`, `test_brains`, `test_squadrons`,
+  `test_indefatigable`, `test_bellerophon`, `test_in_world`, and `test_subtypes` and `test_fight`, which
+  read the two books): **455 passed** (218 s). Against `s7/final-fast.xml` and `s7/final-slow.xml`'s same
+  files (444): no outcome changed but one, truth 7-196's floor clause, failed at the base by pace and
+  passing here at this run (pace alone, not this step's); two cases gone by their names (the meeting
+  renamed, above), 13 new, passed. The 64's scenario tests among them: `test_indefatigable` whole and
+  her round trip with the 64 in sight, passed as at the base.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (251 s), the three on the known digests
+  (1e59009004141b08, 41a37f0290be291a, 0b430d261669ba5a), the base's messages.
+- **(c) The four whole logs** (`log_digests.py`): all four the same as 62cf52c6's (the s7 fixer's
+  record, `s7/mend/final/digests.json`), line for line by their digests.
+- **(d) Her file alone, both tiers**, for the slow list: 150 passed (105 s). The new cases at 5 s or
+  more went into `tests/conftest.py`'s `SLOW_TESTS` (the meetings with the 74, 5.3 and 8.0 s; a
+  commodore and her convoy, 12.9; a frigate commanding a set, 6.5; a King's 64 meeting her, 6.9; her
+  rules captain in a set, 8.9); the rest, 3.2 to 4.5 s, fast.
+- **(e) The mutations and the base worktree** (above): each new case failed under at least one; the
+  new file on 62cf52c6, 8 failed and 5 passed.
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+
+Junit, logs and the probes under `scratchpad/b7e/` (`run/`, `probe.py`, `probe_near.py`,
+`probe_near2.py`, `mutate.py`, `mutations.json`); the worktree of 62cf52c6 cleared after. Not run: the
+whole fast tier, the slow tier beyond her file, the pace tier beyond her file's pace tests.
+
 ## The trim's words by the alias (package 75) (2026-11-11)
 
 **The ruling.** The lead's note of 2026-11-09, 22:56 UTC, (2), confirmed in the note of 2026-11-10,

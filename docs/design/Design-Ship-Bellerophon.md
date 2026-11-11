@@ -1540,6 +1540,37 @@ old beside new (None to "seventy-four"), the reason her row.*
   stands). Without the rule they record that a King's frigate engages her, and her scenario's French
   frigates are kept in the road by B6's intent, not by doctrine. Put to the owner (§17.1 item 3).
 
+*As built (B7.e, 2026-11-11), on the owner's "Yes, build the rule" (2026-11-11) and the lead's (10)
+of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md` ("If the owner takes the rank-4 rule,
+B7.e owns `world/captains.py` and the two doctrine books for that step alone, and the 64's scenario
+tests are re-run"), one commit. The rule as offered: `line_of_battle_nm` (6 nm) in `kings-ship.yaml`
+and `commodore.yaml` alone; `captains.LINE_OF_BATTLE_RANK` (4); `Judgement._line_of_battle_nm`, the
+knob where her own class is under 4 and she is alone (`Judgement._alone`: in no set, neither a member
+nor its commander), nought otherwise; `_overmatched` reading it for the rank-4 case alone, its other
+case and its filters as before, on both bodies. The King's ship's book takes the cruiser's
+`overmatched` rows from her five sailing states to `evading`, `evading` on `stranger lost` to `on
+passage` and on `gale` to `hove to for weather`, and the cruiser's three lines as its `evading` book;
+no `in company` row. Built where §8.3 left the choice, by its lean and said: the commodore's book takes
+the same rows (without them its knob would act only where `overmatched` stood already); a set's
+commander is in the set, left to the set's book; `Captain._haul_off` runs from the ship of the line
+within three times the knob, a King's ship's `stranger_hostile_nm` being nought (the cruiser's reach is
+three times hers). Measured at seed 7 against 62cf52c6: a lone French frigate keeping her station
+five miles off her or the 64 investigates and evades where she investigated and chased; a lone
+frigate under the commodore's book a mile and a half off evades where she stood on; the player's
+frigate under her rules captain hauls off from a French 74 or 64 where she engaged; a cruiser, a
+King's 64, a frigate meeting a frigate, a frigate in a set or commanding one, and a commodore
+commanding a convoy as before. **Its reach, as found:** no shipped scenario names a ship of the line
+and the business draws none (grep), so no scenario's pin moved (the four whole logs and the captain's
+trials as at the base); one test moved, her own record of the engine's then (B7's
+`..._and_a_kings_frigate_does_not_today[kings-ship]`), renamed with its cruiser case
+`test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64`; the 64's scenario tests
+re-run, as before (B6's are not yet written). Her scenario's French frigates, alone, now keep away by
+doctrine as well as by B6's intent. The *Droits*' case stays the later refinement, recorded in the
+knob's source. For the lead: a ship of the line within hail is no superior force to `_overmatched`
+(package 43's filter, the cruiser's as well), so a frigate overhauled within hail gives up hauling off
+and engages; and a commodore whose convoy is held by package 71's least relation alone (no set) is
+alone by these words. Old beside new in the tuning notes' "B7.e, the rank-4 rule".*
+
 ---
 
 ## 9. The polar: what B7 measures and records
