@@ -26295,15 +26295,10 @@ passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace al
 
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
-**Where I stand (2026-11-11, 02:20 UTC).** Items 0 to 9 are built and pushed: the two regions
-(tiles committed, 26.5 MB), the marks, the thirteen ports, the regency of Tunis, the tide by the
-lead's ruling, the weather boxes, the streams, the scenario (sailed to the Fort Genois), truths
-7-510 to 7-519 and the how-to; the trunk merged at f3bf73d. The tree is measured at `fb3e883` in
-a pinned worktree: ruff check and format clean; the fast tier running (restarted after the
-container's restart lost the first run); the slow tier of the touched files and the pace to
-follow, then the figures paragraph and the final report. Nothing needs refetching to remake the
-tiles: `python tools/build_charts.py --region sardinian-sea --reuse-world` then `--region
-tunis-coast` (GEBCO's and EMODnet's fetches, about 220 MB, seconds through the proxy).
+**Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
+f3bf73d, the tree measured at `c58baf7` (the suites below, every one exit 0) and reported to
+the lead. The tiles are committed; to remake them: `python tools/build_charts.py --region
+sardinian-sea --reuse-world`, then `--region tunis-coast`.
 
 Package 104 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 104"; built as
 `docs/dev/ChartBlocks.md` says). Two regions, `sardinian-sea` (the open sea between Minorca
@@ -26647,3 +26642,24 @@ wars (June 1805's).
   a public-domain plan with its datum would put back the period's shore.
 - **The Admiralty's Appendix III offsets**: p. 731 is the PDF's page 904, p. 732 is 905 (the
   offset 173 from Barcelona's p. 726 holds).
+
+### The suites, as run (package 104)
+
+At **c58baf7** (the trunk merged at f3bf73d by the merge commit 83e101b: package 74's step 6
+and the lead's records and briefs, no conflict; both appends at the ends of the truths and of
+these notes kept, the trunk's first), in a worktree pinned there, this container, four workers,
+one suite at a time. `ruff check .` and `ruff format --check .` clean (380 files). **The fast
+tier** whole (`python3 -m pytest -n 4 -q -p no:cacheprovider`): exit 0, 7,470 passed, 1 xfailed,
+506 slow left out. An earlier run at `fb3e883` exited 1: two failures of this package's, the
+counts every block extends (`test_ordnance.py`'s ports without an ordnance block, 27 + 8 + 8 +
+4 + 7 + 5 + 7 now + 13; truth 7-261's nations, 14 now 15), mended at c58baf7 with the old
+counts in their comments; and 23 of the container's (fastapi missing after its restart, the
+server extra reinstalled), none of the package's. **The slow tier of the touched files and the
+known truths whole** (`--slow -m "not pace" -n 4` on test_chart.py, test_geo.py, test_tide.py,
+test_weather.py, test_ports.py, test_nations.py, test_scenarios.py, test_known_truths.py,
+test_tackle_orders.py, test_log_lines.py, test_in_world.py, test_ordnance.py): exit 0, 787
+passed, 8 xfailed; the recorded passages among them, every pinned digest, line count and tick
+held, and truth 7-519's passage to the Fort Genois. **No pin moved.** **The pace**, alone and
+last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The tree
+reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
+
