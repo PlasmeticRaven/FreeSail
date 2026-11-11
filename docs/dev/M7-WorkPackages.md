@@ -90,7 +90,7 @@ on these packages; that is the owner's choice.
 | 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in; **measured and briefed 2026-11-11 for the owner's final approval and his choice of ports** ("## Package 104" below): the hole is L-shaped, its southern arm running east past Tunis and Cape Bon; two regions in one package (4.5 to 8.0 E north of 36.29 N; 8.0 to 11.15 E south of 38.5 N), some 26 to 29 MB, truths 7-510 to 7-519; **found with it and unbooked: Sicily south of 38.43 N, the Sicilian channel and Malta are off the chart**; **APPROVED by the owner 2026-11-11 with all thirteen ports as port files (decision 67)**; launched 2026-11-11 (session_01XooV49Pn562NRcnJEerNas, claude/pkg-104) |
 | 105 | Opus | **Sicily and Malta** (the owner, 2026-11-11: "Sicily and Malta shall be another package"): the chart south of 38.43 N and east of Cape Bon, found off the chart by 104's measurement: Sicily's coasts (Palermo, Trapani, Messina, Syracuse and the rest), the Sicilian channel, Pantelleria, Malta and Gozo; ports by decision 67 | booked 2026-11-11; to be measured and briefed after 104 |
 | 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build |
-| 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it |
+| 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it; **surveyed 2026-11-11** ("## Package 107 ... the survey" below): 77 port files, about 240 places with a feature and no port file, ten passes proposed (Brest and the Western Approaches first), and a short step before them to settle the port file's dated form |
 | backlog (the stranger's view) | none | **A ship view of another vessel in sight** (the owner, 2026-11-11, striking the strip from 102): "a later 'stranger view' or 'enemy view' (maybe a small popout) that shows a ship view of a requested vessel that is in sight", her colours and hoists on it; under the knowledge rule, so beside or after package 99 | on the backlog, unbooked |
 
 **The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
@@ -7731,6 +7731,125 @@ MEMORY or JUDGEMENT where it stands; served text is the world's (package 85's ru
 package reports one hash measured in a pinned worktree (ruff check and format; the fast tier
 whole; the slow tier of the touched files and of the known truths; the pace alone and last),
 and the lead merges by that hash.
+
+
+## Package 107: the ports filled out on the blocks already built: the survey (2026-11-11), for the owner; no pass briefed yet
+
+**Booked by the owner on 2026-11-11 (decision 67):** "refinement passes on existing chart
+blocks to fill out ports that exist only now as anchorages or marks." The lead had the
+fifteen regions' features read against the port files on 2026-11-11 (read-only, by script: a
+candidate is a feature of kind `anchorage`, or a `town` or `place` whose words speak of a
+road, a harbour, a pier, watering or anchoring, that no port file names and that lies more
+than 3 miles from every port's road, anchorage, mooring and shore). **1,672 features, 77
+port files, and about 240 places a ship of the period went to that have a feature and no
+port file** (278 candidate features, a town and its road counted once; some eight false
+positives and six inland towns among them, named below).
+
+| Region | Features | Port files | Candidate places |
+|---|---|---|---|
+| channel-west | 222 | 6 | 11 |
+| channel-mid | 123 | 7 | 8 |
+| channel-east | 137 | 8 | 21 |
+| biscay-north | 100 | 5 | 15 |
+| biscay-south | 136 | 5 | 28 |
+| portugal | 139 | 5 | 23 |
+| madeira | 28 | 2 | 2 |
+| azores | 59 | 3 | 11 |
+| strait | 100 | 5 | 9 |
+| mediterranean-west | 107 | 6 | 25 |
+| balearics | 87 | 4 | 13 |
+| gulf-of-lion | 126 | 6 | 14 |
+| ligurian-sea | 140 | 7 | 24 |
+| tyrrhenian | 123 | 5 | 25 |
+| catalan-coast | 45 | 3 | 11 |
+
+**The ports as they stand, by region:** channel-west: brest, falmouth, morlaix, plymouth,
+roscoff, st-marys. channel-mid: alderney, dartmouth, st-helier, st-malo, st-peter-port,
+torbay, weymouth. channel-east: boulogne, calais, dover, downs, dunkirk, le-havre, poole,
+portsmouth. biscay-north: la-rochelle, le-palais, lorient, paimboeuf, rochefort.
+biscay-south: corunna, ferrol, royan, santander, vigo. portugal: cadiz, lagos, lisbon,
+oporto, setubal. madeira: funchal, porto-santo. azores: angra, horta, ponta-delgada. strait:
+algeciras, ceuta, gibraltar, tangier, tarifa. mediterranean-west: alicante, almeria,
+cartagena, malaga, oran, valencia. balearics: algiers, ivica, palma, port-mahon.
+gulf-of-lion: hyeres, marseille, palamos, rosas, toulon, villefranche. ligurian-sea: ajaccio,
+bastia, genoa, leghorn, maddalena, porto-ferrajo, san-fiorenzo. tyrrhenian: alghero,
+cagliari, civita-vecchia, gaeta, naples. catalan-coast: alfaques, barcelona, tarragona.
+
+**The candidates, the likeliest of each region (each has its feature and the pilot's words in
+`data/charts/features/<region>.yaml`):** *channel-west:* Penzance with Gwavas Lake,
+Mousehole, Porthleven, St Ives, Fowey, Mevagissey, Coverack, Cadgwith, Padstow, Audierne;
+Conquet, Blanc Sablon and Camaret (Brest's own roads). *channel-mid:* Cherbourg and its road,
+Granville, Cancale, Lyme, St Ouen's Bay. *channel-east:* Dieppe, Fécamp, Honfleur,
+Gravelines, Etaples, Ambleteuse, Wissant, St Valery-sur-Somme, Le Tréport, St
+Valery-en-Caux, Ramsgate, Folkestone, the two Dungeness roads, Rye, Hastings, Newhaven,
+Seaford, Brighthelmstone, Shoreham. *biscay-north:* the Bay of Quiberon, Concarneau, the
+Glénan road, Bénodet, Pont l'Abbé, Penmarch, Sauzon, Locmaria, Le Croisic, Noirmoutier, the
+Isle Dieu, St Gilles, Les Sables d'Olonne, St Martin de Ré, La Pallice. *biscay-south:*
+Pasajes, San Sebastián, Bilbao with Portugalete, Bayonne, St Jean de Luz, Fuenterrabía,
+Guetaria, Castro, Santoña, Laredo, Gijón, Ribadeo, Vivero, Cedeira, Camariñas, Corcubión,
+Finisterre, Muros, Marín, Bayona, Arcachon. *portugal:* Peniche and the Berlenga, Figueira
+with Buarcos, Viana, Vila do Conde, Nazaré, Ericeira, Sines, Milfontes, Arrifana, Sagres,
+Portimão, Albufeira, Faro, Tavira, Ayamonte, Sanlúcar with Bonanza; Rota, El Puerto, Puerto
+Real and the Isla de León (Cadiz bay's own). *madeira:* Machico. *azores:* Praia of
+Terceira, Vila Franca, Ribeira Grande, Santa Maria, Velas, Graciosa's two, Madalena, Lajes
+do Pico, Santa Cruz of Flores. *strait:* Tetuan's road, Barbate, Zahara, Bolonia,
+Valdevaqueros, Conil, Benzú. *mediterranean-west:* Marbella, Fuengirola, Vélez-Málaga's
+road, Nerja, Almuñécar, Motril, Adra, Roquetas, San José, San Pedro's cove, Carboneras,
+Águilas, Mazarrón, Portmán, the Isla Grosa, Melilla, Alhucemas, the Peñón de Vélez, the
+Zafarinas, Arzew. *balearics:* Pollensa, Alcudia, Fornells, Ciudadela, Andratx, Porto Petro,
+Porto Colom, Cabrera, San Antonio of Ivica, Matifou's road, Cherchell, Mostaganem.
+*gulf-of-lion:* Port-Vendres with Collioure, Port de Bouc, Cassis, La Ciotat, Bandol with
+the Brusc, St Tropez, Fréjus, the Golfe-Juan, Antibes, Monaco, Menton, Ventimiglia.
+*ligurian-sea:* the Gulf of Spezia with Porto Venere, Porto Longone, Piombino, Vado, Savona,
+Finale, Alassio, San Remo, Portofino, Sestri Levante, Viareggio, Bonifacio, Porto Vecchio,
+Calvi, Valinco, the coves about Agincourt Sound. *tyrrhenian:* the Gulf of Palmas, Pula's
+road, Oristano's road, Carloforte (these last three are package 104's), Porto Torres, Porto
+Conte, Bosa, Porto Ercole, Santa Marinella, the Tiber's road, Nettuno, Terracina, Ponza,
+Baia, Pozzuoli, Castellammare, Sorrento, Capri, Amalfi, Salerno. *catalan-coast:* Blanes,
+Lloret, Mataró, Badalona, Sitges, Torredembarra, Cambrils, the Gulf of Ampolla. **False
+positives and inland towns, not ports:** Chesil Beach, the Great Russel, the Race of
+Barfleur, the Porto Santo islet, the Cala Figuera tower, Mount Portofino, the Magra, Calella,
+Tortosa, Amposta, Aigues-Mortes, Montalto, Corneto.
+
+**Places with neither a feature nor a port file (the place FROM MEMORY; the absence
+checked):** Douarnenez bay; Cowes, Yarmouth, Lymington and Southampton; Exmouth and
+Teignmouth; La Hougue; the Nore, Sheerness, Margate roads and Chatham; the Morbihan,
+Bourgneuf bay, Oléron; the ria of Arosa; Aveiro, Huelva; Dénia, Jávea, Torrevieja,
+Peñíscola, Vinaròs, Ténès, Santa Pola, Cullera, Mers-el-Kébir; Cette, Agde, Cadaqués;
+Talamone, Orbetello, Porto Santo Stefano, Ischia and Procida as ports, Terranova, Tortolì.
+Bordeaux and Larache lie outside the chart's bounds.
+
+**What a port file leaves undated today (decision 67's concern):** only five ports
+(Barcelona, Genoa, Rosas, Tarragona, Valencia) write their holder as dated rows
+(`nation:` a list of `{nation, since, until, source}`); the other 72 have one plain
+`nation:`. A port's `state:` and `blockade:` carry a free-text `since` at most; its market,
+dockyard, pilot, ordnance and works carry no dates at all. **So the lead's first proposal
+is a short step before any pass: the port file's dated form settled once** (which keys take
+dated rows and how a reader asks for a day), so that some eighty new files are written in
+it and the 77 old ones can be brought to it without a second visit.
+
+**The passes proposed, each one builder's, in the lead's order** (a new harbour patch
+changes tiles; an open road is data alone): (A) Brest and the Western Approaches, about 6:
+Douarnenez (a feature first), Camaret and the Blanc Sablon as Brest's roads, Penzance with
+Gwavas Lake, Fowey (a patch), St Ives, Audierne. (I) Sardinia and the Roman and Neapolitan
+coast, about 10 less 104's three: Pula, Porto Conte, Porto Torres, Porto Ercole, Ponza,
+Baia and Pozzuoli, Castellammare, Salerno. (B) the Channel's middle and east, about 10:
+Cherbourg (a patch likely), Granville, Cancale, Ramsgate, Dieppe, Fécamp, Honfleur,
+Newhaven, Shoreham; Cowes and the Nore want features first. (C) Biscay north, about 7:
+Quiberon, Concarneau (a patch), Les Sables, St Martin de Ré, the Isle Dieu, Le Croisic, the
+Morbihan. (D) Cantabria and Galicia, about 10: Pasajes (a patch), San Sebastián, Bilbao,
+Bayonne, Santoña, Gijón, Ribadeo, Vivero, Muros, Bayona. (E) Portugal and the
+Guadalquivir, about 8: Peniche, Figueira, Viana, Faro, Sines, Sagres, Sanlúcar; Cadiz bay's
+towns into Cadiz's file. (F) the Strait and the Barbary coast, about 6: Tetuan, Barbate,
+Melilla, Alhucemas, the Zafarinas, Arzew. (G) Spain's east coast and the Balearics, about
+10: Pollensa, Alcudia, Fornells, Ciudadela, Dénia and Jávea (features first), Marbella,
+Adra, Águilas, Blanes, Mataró. (H) Provence, Liguria and Corsica, about 12: La Ciotat,
+Bandol, St Tropez, Fréjus, the Golfe-Juan, Antibes, Spezia, Vado, Savona, Calvi, Bonifacio
+and Porto Longone (patches). (J) the Azores and Madeira, about 6: Praia, Vila Franca,
+Velas, Graciosa, Madalena, Machico. **A first, because the blockade of Brest is where play
+already is** and its watering and boat roads are what a blockading frigate uses; **then I,**
+the Mediterranean fleet's anchorages of 1804 and 1805. Whether each place has sources enough
+for a port file is not checked: each pass begins with the pilots on file.
 
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
