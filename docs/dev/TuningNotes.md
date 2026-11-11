@@ -26433,3 +26433,179 @@ test_world_orders.py, test_director.py, test_primer.py, test_in_world.py) exit 0
 passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace alone and last
 (`--slow -m pace -n 0`, the same files) exit 0, 13 passed. The tree reported differs from
 31ebdf0 by this paragraph alone.
+
+## Package 102: the signals seen and the ship dressed (2026-11-11)
+
+**Step 0: the sources' pass.** Read on the page (the five new rows of
+`docs/references/README.md`, "Package 102"; every file data, never run; nothing of a modern
+book in copyright copied). Every figure, date or practice below not read from a source is
+marked FROM MEMORY or JUDGEMENT where it stands.
+
+*(a) The signal flags.*
+
+- **Britain.** The 1796 book's leaf 31 (the numerals 1 to 0, the substitute, the hundred
+  pendant, truce) is grey on the scan, its colours inked by hand for 1, 3, 0, the substitute
+  and the hundred pendant only ("Blue flag pierced white", "Blue, White, Red horizontally
+  divided", "White, Blue diagonally divided", "red & white striped", "White with Red fly").
+  **Perrin's Plate XIII** (1922, found in colour in the PDF, page 213: "Numerary Signal Flags,
+  1790-1810") gives the numerals, the substitute, the preparative, the assent and the dissent
+  in three dated columns: **1790-1799** (Howe's), **1799-1803** (the 1799 book's: No. 1 yellow,
+  red, yellow; the substitute plain white) and **1803-1810** (the Admiralty's circular of 4
+  November 1803, painted copy enclosed; in the Mediterranean from 16 January 1804; "the ones
+  used at Trafalgar, and, in fact, until the end of 1810", pp. 179). The 1796 leaf is Howe's
+  set in the "new arrangement" of 1793 (Hood's fleet, Perrin p. 175: "1 became 4; 2, 9; 3, 7;
+  4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1"); the plate's first column through that
+  transposition gives the leaf's shapes one for one (its 1 Howe's 0, blue pierced white; its 3
+  Howe's 9; its 0 Howe's 6; its 2 the yellow edged black; its 8 the blue with the yellow
+  saltire), so the leaf's colours are read. **So Britain's numerals are four dated sets, each
+  `plate`:** 1790-1793 and the Channel's to 1799 (Howe's), 1793-1799 in the Mediterranean (the
+  new arrangement, the 1796 leaf), 1799-1803, 1803-1810; after 1810 not found (the set of 1810
+  is not on the plate). The leaf 28 and 29 figures read: the preparative striped across (blue
+  and white, Perrin p. 172 and the plate), the cornet a dark swallow tail (Perrin p. 172, "Blue
+  cornet"), the transposition flag chequered, the fireships' plain (yellow, Perrin p. 172), the
+  secret instruction half dark. **Popham's leaf 13 has no flag figures** (the column was left
+  for painting by hand and this copy's is blank): the telegraph flag is Perrin's words alone,
+  "a flag divided diagonally into white and red" (p. 178; which diagonal and which half is
+  which: JUDGEMENT); the numerical pendant that answers (Popham's note) is not described in any
+  source read; Howe's "chequered blue and yellow pendant to denote that accompanying numeral
+  flags represented figures only" (Perrin p. 173) is taken for it, JUDGEMENT, said.
+- **France.** Audibert's atlas, **Pl. 3** (table no. 3 of the text's § 68, "Tableau général
+  des pavillons, guidons & flammes", in colour): twenty flags, 1 to 10 white and red, 11 to 20
+  yellow and black (quartered on the diagonal, a cross, a saltire, chequered, halved, a lozenge,
+  pierced, bordered, three points, Maltese, "bâtons", "isolé"), the zero "égal à tous"
+  (quartered black, red, white and yellow), four guidons (swallow-tailed) and six pendants
+  (round-ended; the text: in use they were tapered as the national pendants, and he would have
+  them of one breadth). Sizes from § 68: a flag 18 ft of fly on 12 of hoist (2:3), a guidon 9
+  ft on 26, a pendant 6 on 38. It is Audibert's proposal for du Pavillon's table, of 1802; the
+  service's book of the year VI is not found, so France's flags are `plate` from Audibert,
+  said so in each row.
+- **Spain.** No figure found: Mazarredo's plan gives "veinte banderas ó gallardetes" whose
+  values are on a separate sheet (not held), the 1799 *Corrección*'s leaf 6 is a table of
+  numbers, and the 1781 leaf 14 a table of courses. **Every Spanish signal flag is `made`.**
+- **Naples.** The 1807 plate, in colour, legible: the flags 0 to 12, three swallow-tailed
+  cornets, a national cornet and a national pendant ("N."), six pendants, two substitutes.
+  Every Neapolitan flag `plate`.
+- **The United States.** No plate found (Barry's book has none in its scan; Preble describes
+  the squadron's flags of 1803-1804 in words, the colours not given): **`made`.**
+- **Basic.** All `made`, as the brief says.
+
+*(b) Dressing ship between 1790 and 1815.*
+
+- **Where the flags went, c. 1794: Röding**, vol. I col. 596 (the OCR cut it; read on the
+  page): FLAGGEN, "to dress a ship", "Pavoiser un vaisseau", "Empavezar un navio de banderas":
+  "a ship at a particular solemnity hung with flags and pendants; they are made fast to the
+  **yards, stays, shrouds, backstays and other rigging**." The same in Perrin's anecdote of the
+  *Sapphire* (First Dutch War, Narborough's journal: "the Yards, Stays, backstays and shrouds
+  being hung with ... colours and pendants variously intermixed").
+- **What else: the waist cloths.** Babron (1817), "Pavoiser, empavezar, to dress a ship with
+  waist cloths, and a variety of flags and pendants"; Falconer (1780), "PAVOISER, to spread the
+  waist-cloths"; Röding vol. II col. 425, the waist cloth about four feet broad over the rail
+  stanchions and the hammock netting, and on the tops' rails, "its colour by nation; the
+  English men-of-war a red woollen cloth, usually bordered with white or yellow"; Forfait
+  (1788): the rail abaft the tops "décorée de pavois dans les jours de cérémonie"; the French
+  ordinance of 1765 art. CCXXXV: the King's ships' pavois **blue sown with yellow lilies**
+  (the Republic's not found); art. CCXXXIX: merchantmen may be dressed on feast days with
+  pendants and ornaments of all colours, but not the pavois.
+- **Which flags.** Perrin pp. 196-197: until the nineteenth century was well advanced "both
+  men-of-war and merchantmen carried very few signal flags"; on days of rejoicing the
+  indiscriminate use of "all the flags in a ship, including national flags of other nations"
+  gave offence from time to time; before 1889 a junior officer drew up a scheme for dressing
+  ship for the captain's approval; only from 1889 is the order of the signal flags, some
+  sixty, laid down, the ensign at a masthead. Spain's ordinance of 1748 art. XXV: the ships
+  put "de Gala, largando (según costumbre) sus Vanderas, y Gallardetes", none hoisting a flag
+  "en parage que denote mando" not hers. **So the fashion of c. 1805 is: the ensigns and
+  pendants and whatever signal flags she has, hung in the yards, the stays, the shrouds and
+  backstays, with the waist cloths spread; no set order; no flag at a place of command but her
+  own.** Which flag at which yardarm and stay: not given by any source; JUDGEMENT, and said.
+- **The later fashion, dated.** Luce's *Seamanship* (1884): ships dressed "rainbow or yard-arm
+  fashion", the rainbow an arch of flags from the water's edge to the jib-boom, the
+  topgallant mastheads, the spanker gaff and boom and the water's edge astern; yard-arm fashion
+  the flags on halliards out to every yardarm; the ensign of the nation honoured at the fore,
+  her own at the main and mizen, "no other national flags"; dressed at sunrise with the colours,
+  the flags down at sunset. **The line from masthead to masthead is not found before Luce
+  (1884, the United States navy) and Perrin's 1889 (the Royal Navy's order laid down)**; it
+  stands under 1884- and is never drawn before it.
+- **The hour and its end.** The colours at sunrise and down at sunset, the evening gun at
+  eight (Spavens, *The Seaman's Narrative*, 1796, p. 127, as Perrin prints it); the dressing's
+  own hours in the period not found: JUDGEMENT that she dresses with the colours and undresses
+  at sunset (as Luce has it in 1884).
+
+*(c) The days, and the salute.*
+
+- **Britain.** The Regulations of 1806 (1808 printing), Sect. "Of Salutes", art. XX: "The
+  Anniversary days of the Birth, Accession, and Coronation, of the King; of the Birth of the
+  Queen, of the Restoration of King Charles the second, and of the Gun Powder Treason, shall be
+  solemnized by such of His Majesty's Ships as are in Port, with such a number of Guns as the
+  Commanding Officer present shall direct, not exceeding Twenty-one in each"; art. XXI, all
+  salutes from the upper deck guns. Of the dates, one read: **the King's birthday 4 June**
+  (Nelson to Mazarredo, off Cadiz, 1797: "The 4th of June being the birthday of my Royal
+  Master, Sir John Jervis intends firing a feu de joie, at eight o'clock in the evening";
+  Nicolas, vol. II). FROM MEMORY: the accession 25 October (1760), the coronation 22 September
+  (1761), the Queen's birthday kept 18 January (Charlotte's), the Restoration 29 May, the
+  Gunpowder Treason 5 November; George III's days kept 1760 to 1820 (the regency of 1811 kept
+  his), George IV's from 1820 (his birthday 12 August, FROM MEMORY). Dressing on these days is
+  not in the Regulations (they order the guns only); Perrin's "allowed, and in some cases even
+  enjoined" is the ground for it, JUDGEMENT on which days.
+- **Spain.** The ordinances of 1748 (in force until those of 1793; the 1793 volume of the
+  honours not found): art. XXV, dressed "de Gala" on the King's name day and birthday, the
+  Queen's and other festivities; art. XXXIX, on the King's name day and birthday and the
+  Queen's a **triple salute of twenty-one guns**, by every ship in a port of his dominions or a
+  foreign one, at the time the senior commander judges; art. XL, a triple salute on Corpus
+  Christi (as the procession comes out) and on Santiago, the patron of Spain, one on Easter
+  Day. FROM MEMORY: Charles IV (king 1788-1808) born 11 November, his name day San Carlos 4
+  November; Queen María Luisa born 9 December, her name day San Luis 25 August; Ferdinand VII
+  (1808, and 1814-1833) born 14 October, San Fernando 30 May; Santiago 25 July; Corpus and
+  Easter movable (the game reckons no movable feast: left out, said).
+- **France.** The ordinance of 1765 (that of 1786 not found online; Gallica refuses this
+  session): guns may be fired on "certain jours de fêtes ou de cérémonies, suivant les usages
+  anciennement établis dans la Marine" (art. CLV, CCLXVI), **the days not named**. FROM
+  MEMORY: the Saint-Louis, 25 August, under the kings (to 1792 and from 1814); the Republic's
+  fêtes nationales (14 July, 10 August, 1 vendémiaire and the rest of the law of 3 brumaire
+  an IV); the Empire's Saint-Napoléon, 15 August, from 1806, and the coronation's anniversary
+  on the first Sunday of December. Whether the navy dressed and saluted on the Republic's and
+  the Empire's days: not read; JUDGEMENT.
+- **Naples, the United States, basic.** Nothing read. FROM MEMORY: the United States' 4 July;
+  Naples under Joseph and Murat the Saint-Napoléon and the king's own days. Not built unless
+  the lead rules it; said here.
+- **The salute's form.** Britain: guns as the commanding officer directs, not above twenty-one,
+  from the upper deck (1806); Spain: three salutes of twenty-one, at the hour the senior
+  officer judges (1748). The interval between guns not read in any source held: JUDGEMENT
+  (FROM MEMORY five seconds a gun, the later practice). Jervis's of 1797 a feu de joie at 8 in
+  the evening, at sea before Cadiz.
+
+*What the sources did not give, said:* the flags' order and places in dressing beyond the
+rigging's parts; the dressing's hour; France's days and her navy's practice on them after
+1789; the Republic's pavois; any dressing in the books of Naples or the United States; a
+plate of Spain's or the United States' signal flags; the British numerals after 1810.
+
+**Step 1: the drawing's form.** The plates ask for three things the colours never did: a
+flag halved, quartered or banded on the diagonal and a lozenge or a triangle (Perrin's 0 and
+6, Audibert's 1, 7, 10, 15, 17 and the rest, the Naples 6 and 12): a **`poly`** of three or
+more points on the flag's square; a **swallow tail** (the 1796 cornet, Audibert's guidons, the
+Naples cornets): the flag's **`shape: swallowtail`**, its `cut` a share of the fly (a third
+where the file gives none, JUDGEMENT off the plates); a **triangle** (Preble's three
+repeaters): `shape: triangle`. No disc: no plate read has a ball on a flag (Popham's ball over
+a hoist is not a flag). Served under `drawing.polys` and `drawing.shape` (and `cut`) only where
+a flag has one; drawn by `flagFigures` in the drawing's order, a swallow-tailed part cut in
+two at the middle by the notch's edges (`swallowTail`, `clipHalf`), a triangle tapered by the
+same rule as a pendant to a point. **Every drawing of every root's colours.yaml served and
+drawn exactly as before**: `tests/fixtures/flag_drawings_before_102.json` was recorded at the
+trunk's code (commit 405fe35, before the form moved: 57 flags served plain and union down, 114
+drawn at the main truck and the peak of the frigate, 494 figures, their ids, colours and
+points to a micrometre) and the new code serves and draws every one of them the same (truth
+7-500).
+
+**Steps 0 and 1: the measure.** The trunk merged at b9b925a by a merge commit (5142098:
+package 74's step 6 and the lead's records; the two appends resolved in the trunk's own
+order, its truths and its notes above this package's, no line of the trunk's lost). At
+**5142098**, in a worktree pinned there, one suite at a time: ruff check and ruff format
+--check clean; the fast tier exit 0, 7,463 passed, 1 xfailed, 505 slow left out (a first run
+there failed on the server's tests alone, the container then lacking the `fastapi` package;
+installed, those files ran clean and the whole tier was run again); the slow tier (`--slow -m
+"not pace" -n 4`) of tests/test_known_truths.py whole with the recorded passages and the kept
+saves (test_captain_trials.py, test_replay.py, test_checkpoint.py) and the touched files
+(test_flag_drawings.py, test_flags.py, test_view_action.py, test_view_geometry.py,
+test_viewer_action.py) exit 0, 1,626 passed, 8 xfailed: no pin and no digest moved; the pace
+alone and last (`--slow -m pace -n 0`, the same files) exit 0, 12 passed. The viewer's
+geometry tests ran (Node 22 present). The tree reported differs from 5142098 by this
+paragraph alone.

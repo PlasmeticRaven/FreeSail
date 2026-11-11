@@ -490,7 +490,11 @@ serves both packages; **for the lead to carry to 76.**
 Stiff, as the brief has it: the cloth a flat quadrilateral with its hoist along its halyard at the
 place, its fly to leeward of the apparent wind (`windVector`), drooped `FLAG_DROOP_DEG` (15°,
 judgement) below the level; a pendant a long tapering streamer the same way; each in its drawing's
-rectangles and lines; the waving is 91's, on §6's road. **Sizes** (judgement, question 7): an
+rectangles and lines; the waving is 91's, on §6's road. Package 102 (step 1): the drawing's
+polygons (`polys`) drawn with the rest in the drawing's order; a `swallowtail` flag drawn with the
+notch taken out of its fly, each part cut in two at the middle by the notch's two edges (the cut
+`cut` of the fly, a third where the drawing gives none, judgement off the plates); a `triangle`
+tapered to a point at the middle of its fly. **Sizes** (judgement, question 7): an
 ensign's fly half her beam, a jack's half the ensign's, a pendant's length 0.6 of her main yard,
 the hoist by the drawing's proportion. In the painter's order a flag sorts at its own middle as a
 sail does. In the frame (§6): every place word's point the ship has, with the largest flag's fly

@@ -102,6 +102,38 @@ def place_ok(word: str) -> bool:
     return word in PLACES_FIXED or bool(_MASTHEAD.fullmatch(word))
 
 
+# Package 102 (step 1): the drawing's form widened by the least the plates ask. A part is a
+# `rect` ([x0, y0, x1, y1]), a `line` ([[x, y], [x, y]] with a `width`, a share of the hoist),
+# or a `poly` (three or more [x, y] points: a flag halved or quartered on the diagonal, a
+# lozenge, a triangle, a bend's band), each coloured, on the flag's own square. A flag's
+# `shape` is its outline: '' a plain rectangle (every flag before the package); 'swallowtail'
+# cut from the fly to `cut` of its length at the middle (a cornet, a guidon: the 1796 book's
+# leaf 28, the Naples plate of 1807, Audibert's Pl. 3); 'triangle' tapered to a point at the
+# fly (the United States' repeaters, Preble 1894). A pendant keeps the taper the viewer gives
+# a flag named a pendant.
+SHAPES = ("", "swallowtail", "triangle")
+# A swallow tail's cut, a share of the fly, where the drawing gives none (judgement, read off
+# the plates: the 1796 cornet and Audibert's guidons are cut about a third of their length)
+SWALLOWTAIL_CUT = 1 / 3
+
+
+def _part_ok(p: Any) -> bool:
+    """A part is exactly one of a rect, a line or a poly, coloured; a poly of three or more
+    points on the flag's square."""
+    if not isinstance(p, dict) or not p.get("colour"):
+        return False
+    if sum(k in p for k in ("rect", "line", "poly")) != 1:
+        return False
+    if "poly" in p:
+        pts = p["poly"]
+        return (
+            isinstance(pts, list)
+            and len(pts) >= 3
+            and all(isinstance(q, list) and len(q) == 2 for q in pts)
+        )
+    return True
+
+
 @dataclass(frozen=True)
 class Flag:
     name: str
@@ -114,18 +146,29 @@ class Flag:
     rank: str = ""
     dates: str = ""
     source: str = ""
+    shape: str = ""  # package 102: the outline (SHAPES); '' the plain rectangle
+    cut: float = 0.0  # a swallow tail's cut, a share of the fly; 0 the default's
 
     def served_drawing(self, inverted: bool = False) -> dict[str, Any]:
         """The drawing as the snapshot serves it to 81's viewer: `{proportion, parts}` with the
         rectangles in `parts` and the lines apart under `lines` (81 draws a part with no
         `rect` as the whole field), each with `n`, its place in the drawing, so that the
         viewer paints them in the drawing's order (package 98, step 3: the Union's crosses
-        over its saltires)."""
+        over its saltires). Package 102: the polygons apart under `polys`, and the outline
+        under `shape` (with its `cut`), each only where the flag has one, so that every
+        drawing from before is served as it was."""
         parts = [{**p, "n": i} for i, p in enumerate(self.drawing) if "rect" in p]
         lines = [{**p, "n": i} for i, p in enumerate(self.drawing) if "line" in p]
+        polys = [{**p, "n": i} for i, p in enumerate(self.drawing) if "poly" in p]
         d: dict[str, Any] = {"proportion": list(self.proportion), "parts": parts}
         if lines:
             d["lines"] = lines
+        if polys:
+            d["polys"] = polys
+        if self.shape:
+            d["shape"] = self.shape
+            if self.shape == "swallowtail":
+                d["cut"] = self.cut or SWALLOWTAIL_CUT
         if inverted:
             d["inverted"] = True
         return d
@@ -185,13 +228,14 @@ def _file(raw: dict[str, Any], path: Path, nation_default: str) -> ColoursFile:
         prop = f.get("proportion") or [1, 2]
         drawing = []
         for p in f.get("drawing") or []:
-            if (
-                not isinstance(p, dict)
-                or not (("rect" in p) ^ ("line" in p))
-                or not p.get("colour")
-            ):
-                raise BookFileError(f"{path}: flag {name!r}: a part is a rect or a line, coloured")
+            if not _part_ok(p):
+                raise BookFileError(
+                    f"{path}: flag {name!r}: a part is a rect, a line or a poly, coloured"
+                )
             drawing.append(dict(p))
+        shape = str(f.get("shape") or "")
+        if shape not in SHAPES:
+            raise BookFileError(f"{path}: flag {name!r}: shape is one of {SHAPES}")
         flags[name] = Flag(
             name=name,
             kind=kind,
@@ -203,6 +247,8 @@ def _file(raw: dict[str, Any], path: Path, nation_default: str) -> ColoursFile:
             rank=rank,
             dates=str(f.get("dates") or ""),
             source=str(f.get("source") or ""),
+            shape=shape,
+            cut=float(f.get("cut") or 0.0),
         )
     occasions = []
     for i, o in enumerate(raw.get("occasions") or []):
