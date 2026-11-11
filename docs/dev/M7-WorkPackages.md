@@ -5095,6 +5095,11 @@ and a mate); 97 pins that outcome under the fight's default draw. The prize crew
 same road, so 74 settles who leads on when he falls (the senior standing of the party, by the period's
 practice: a lieutenant, a mate, the senior midshipman) and moves the pin accordingly, old beside new.
 
+**As built by package 74 (step 2):** `combat/boarding.py`'s `party_leader` finds the senior standing
+of the party when the boarders' officer falls (a lieutenant, a mate, the senior midshipman, by the
+period's practice), and the prize crew's leader-on is the same function; 97's pin moved with it, old
+beside new, in `docs/dev/TuningNotes.md` "Package 74", step 2.
+
 ## Package 76: the signal books built out (`data/signals/<root>/` the six files a root, Spain's root new and the others as their sources are found; `data/nations.yaml` each nation's `signals:` line; `docs/references/signals/` the research pass; `freesail/world/signals.py` the loader only where a book wants a field it has not; `tools/check_signals.py` new; `docs/design/Design-Signals.md` a postscript; `docs/TechnicalSpec-M7.md` §3 as built; `docs/agents/Harness.md` §21d; `docs/primer/23-colours-and-signals.md`; `docs/dev/TuningNotes.md`; `tests/test_signals.py`, `tests/test_known_truths.py` truths 7-426 to 7-435)
 
 Opus. After 71 (merged 2026-10-24); runs beside 74 and the ships session, touching nothing

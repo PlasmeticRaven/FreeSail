@@ -24660,6 +24660,100 @@ Nothing skipped in any tier. No recorded passage moved by the named gun's mend o
 The trunk gained package 100's step 2 (the letters that travel) and the lead's records while
 these ran, and was not chased; it is merged at step 7's start.
 
+### Step 7: the records and the last truths (the design's §8)
+
+**Built**: `data/scenarios/prize-home.yaml` (the Amazon off the Lizard for Falmouth with the Deux
+Frères her prize in company, the business on, the quiet passage's brief) and `captive.yaml` (the
+Amazon struck to the Didon in the mouth of the Channel, the player her prisoner bound for Brest
+with his own ship a prize astern, the captive's starter brief `data/director/briefs/captive.yaml`
+with its causes: a gale, a cartel, a cruiser at dawn), each loaded and begun in the fast tier; the
+two forms the scenarios' starts wanted, `ship "<name>": a prize of the <captor>` and `ship
+"<name>": struck to the <captor>` (world orders, journaled, so that a replay makes the taking
+again; doubted after the first minute: afterwards a ship strikes to the guns); the director's
+truth's rows (every prize with her captor, her crew and her prisoners, where bound and in company
+or parted; every hull's prisoners with their paroles; every far action in its rounds; the courts
+pending and sat; a court martial sitting); the replay by both roads of a passage with the player
+taken, the parole exchanged and the captor under way an hour, and of a far fight's passage (the
+`far` stream opened at the first round and drawn again alike); spec M7 §11a, §18 to §20 and §29
+as built; `docs/agents/Harness.md` §21i; the primer's chapter 27 through `test_in_world.py`
+("later milestone's" and "later packages'" were not in-world and are "not yet in the game"); the
+library's forms table in chapter 20 and the events in chapter 11; the work packages' paragraph on
+97's pin. Truths 7-367 and 7-368.
+
+**The scenes' figures** (seed 7): the prize-home world order two minutes in finds the brig a full
+ship beside the frigate and takes her with Mr Ward and twenty-one hands, her 121 people prisoners
+(the brig's one file, 75's); the captive world order two minutes in promotes the Didon and takes
+the Amazon with Mr Gordon and twenty-one hands, her 264 people prisoners, the parole asked a minute
+after in the French row's words. **Found on the way**: two frigates from one file draw the same
+wardroom names from one seed (the Didon's master's mate is a Mr Gordon as the Amazon's is), told
+apart in the one registry by their homes; a vessel a test adds by hand (`tests.test_brains.put`)
+is in no journal and a replay cannot make her again, so the replay truths put their ships on the
+sea by the director's forms.
+
+**A list that grew** (found by the step's pre-check of the fast tier whole, before its measure):
+`tests/test_business.py` keeps the names of the free scenarios with the business on, and
+`prize-home.yaml` is one (a prize's passage home wants the cruisers of both sides about her:
+the retaking is the passage's hazard); its name is added. No recorded passage is among them,
+and none moved.
+
+**The trunk merged at the step's measure** (one merge, at 434c33c: package 100's step 2, the
+letters that travel; this package's step 6 as the lead merged it; his briefs and records). It
+merged without a conflict. What met: 100's step 2 sends a letter ashore by the boat's errand
+in `Dealings` (the thing itself in the boat) beside this package's court's job in `_apply_job`,
+neither in the other's lines; its `people.py` and `orders.py` stand beside the court's forms
+and the record's thing; nothing of this step's was changed for it. Before it, on step 6's mended tree, the trunk to 65c73a6 had
+brought package 101 (the Catalan coast) and package 75's B7 (the 74-gun ship), which met
+nothing here: the prize courts are by the port's nation, and the block's Spanish and French
+ports take the rows those nations had. A heading of package 98's in the truths' file, which
+this package's truths 7-362 to 7-368 stood under, stands once now, above 98's first truth.
+
+**The suites on the step's final tree, the package's close** (c36b918, one hash, the trunk at
+434c33c merged in it; a worktree pinned there; ruff check and format clean; every run started
+in the harness's background mode, the tiers as separate tasks under its two-hour cap;
+2026-11-10 and 11 UTC): the fast tier whole **exit 0** (23:53:50 to 00:43:53; 7,461 passed
+and the trunk's one expected failure, 508 slow tests left out); **the whole slow tier**, in
+two parts: the known truths, the profile and the Indefatigable, their files whole, **exit 0**
+(00:44:09 to 01:37:27; 545 passed and the trunk's eight expected failures), and every other
+file's slow tests **exit 0** (01:41:10 to 02:07:20; 297 passed and three expected failures);
+the pace tests alone and last **exit 0** (02:07:20 to 02:12:35; 15 passed, no floor lowered).
+Nothing skipped in any tier. The second part of the slow tier was begun at 01:37:55 and lost
+three minutes in when the container was restarted; it was begun again whole at 01:41:10 on the
+same tree, and the figures are that run's. The trunk gained the lead's briefs and records
+alone while these ran (to f3bf73d, the work packages' page) and was not chased.
+
+### The package whole: what moved, and the suites
+
+The pins moved by the package, each with its reason, old beside new: 7-181 (step 2: the prize
+possessed at once), 7-325 (step 2: 72's cut-out a possession on the records), 97's officer-killed
+test (step 2: the party's leader-on), 72's cut-out (7-352, step 2 and step 4), test_brains' hail
+scene (step 4: a round fired where she yielded at hail, the same possession), the agreement
+pinned as found (7-359), and the officer's handover budget in `test_officer.py` (step 5, at the
+meeting with package 98: 22,500 to 23,000, neither package moving it alone; the lead's ruling of
+2026-11-10). Steps 6 and 7 moved none. No recorded passage's digest moved for the far fight (the
+toggle, step 4).
+The two faults the wiring uncovered (the wake's doubled damage, the recaptor's state) are mended,
+not re-pinned. The suites' results on each step's final tree are recorded under the steps above.
+
+**Left for others, gathered from the steps above (the lead's list).** (1) A rules captain bound
+for Brest from the Iroise lays no course and beats without way within five miles of the road
+(the chart's and the passage planner's; step 3). (2) Two ships made from one file draw the same
+wardroom names from one seed, told apart in the one registry by their homes alone (step 7). (3)
+A vessel a test puts on the sea by hand is in no journal, and a replay cannot make her again
+(step 7; the replay truths use the director's forms). (4) The officer's standing text grows
+with every package and the handover test's budget with it (step 5; on the lead's list for the
+owner). (5) No ship file has a build year, so every hull is valued as ten years old (package
+60's note, §1.5 item 7; its condition term brings its own figures). (6) Not built here, each
+said where it stands: the prize's stores priced (her file lists none), `take her powder and
+shot` (the goods are the court's), a `prize.lost` line at the court's date for a prize that
+never comes in, the verdict's limits row, the boats' cutting out and retaking (63, 77), the
+cartel's and the captive's places and words filled out (80), the career (M8: `record_of`,
+`record_thing`, `VERDICTS` are its hooks), the consent revision applied (55: the draft is
+`docs/design/ConsentRevision-AdversarialSeats.md`, and the flag is
+`seats.ADVERSARIAL_SEATS_CONSENTED`). (7) The figures from memory, each marked where it stands
+in `data/business.yaml`: the hull's pounds a ton, the price of the guns' iron, the head
+money's five pounds, the agent's five per cent, the costs' tenth and the salvage eighth, the
+courts' names, the division among the ships in sight by their complements.
+
 ## Package 76: the signal books built out (2026-11-07)
 
 Package 76 (the brief in `docs/dev/M7-WorkPackages.md`, "Package 76"). The six files a root

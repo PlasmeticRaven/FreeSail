@@ -14877,9 +14877,6 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
     test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
 
 
-# -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
-
-
 def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
     """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
     in Falmouth's road is condemned by the court (France at war with Britain at the taking),
@@ -14983,6 +14980,52 @@ def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
         tmp_path, monkeypatch
     )
     test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
+
+
+def test_truth_7_367_the_readings_the_events_and_the_forms_perform_and_the_truth_shows_the_prizes():
+    """The design's §8: every new form has examples the director test performs in the dry run
+    and in play with its doubt (`test_director`'s forms test, run here on the forms' table);
+    the two scenarios of the package load and begin (the prize in company, the player a
+    prisoner aboard the captor); the director's truth shows every prize with her captor, her
+    crew and her prisoners, and every hull's prisoners with their paroles."""
+    from freesail.agents import director as D
+    from tests.test_director import (
+        test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs,
+    )
+    from tests.test_prize_scenarios import (
+        test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor,
+        test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her,
+    )
+
+    keys = {f.key for f in D.WORLD_ORDER_FORMS}
+    assert {
+        "prize.parole",
+        "prize.cartel",
+        "ship.prize",
+        "ship.struck",
+        "person.exchanged",
+        "court.sits",
+        "court.read",
+        "court.verdict",
+        "command.new",
+    } <= keys
+    test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs()
+    test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her()
+    test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor()
+
+
+@pytest.mark.slow
+def test_truth_7_368_a_prize_passage_and_a_far_fight_replay_by_both_roads():
+    """84's acceptance form: a passage with the player taken near, the captive aboard the captor
+    and the parole exchanged replays by its transcript and by its acts to the same digests of
+    both hulls' logs; a far fight's passage the same, to the same records."""
+    from tests.test_prize_scenarios import (
+        test_a_far_fights_passage_replays_by_both_roads_to_the_same_records,
+        test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads,
+    )
+
+    test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads()
+    test_a_far_fights_passage_replays_by_both_roads_to_the_same_records()
 
 
 # -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
