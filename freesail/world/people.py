@@ -862,6 +862,12 @@ class People:
             if found is not None:
                 if name:
                     self._rename(found, name)
+                if spec.get("record"):
+                    # his record carried from the last game (package 74, the design's §7.2:
+                    # a new command as a scenario's start)
+                    from freesail.world.court import record_of
+
+                    record_of(found).extend(dict(e) for e in spec["record"] if isinstance(e, dict))
                 if spec.get("skill") is not None:
                     found.skill = float(spec["skill"])
                     if found.mirror is not None:
@@ -872,19 +878,20 @@ class People:
             pid = (role + ("_" + name if name else "")).lower()
             pid = "".join(c if c.isalnum() else "_" for c in pid).strip("_")
             ashore = bool(spec.get("ashore")) or str(spec.get("place") or "") == "shore"
-            self.people.append(
-                Person(
-                    pid,
-                    name or _address(role, role),
-                    role,
-                    float(spec.get("skill", 0.7) or 0.7),
-                    place="shore"
-                    if ashore
-                    else str(spec.get("place") or "cabin").replace(" ", "_"),
-                    aboard=not ashore,
-                    port=str(spec.get("port")) if spec.get("port") else None,
-                )
+            made = Person(
+                pid,
+                name or _address(role, role),
+                role,
+                float(spec.get("skill", 0.7) or 0.7),
+                place="shore" if ashore else str(spec.get("place") or "cabin").replace(" ", "_"),
+                aboard=not ashore,
+                port=str(spec.get("port")) if spec.get("port") else None,
             )
+            if spec.get("record"):
+                from freesail.world.court import record_of
+
+                record_of(made).extend(dict(e) for e in spec["record"] if isinstance(e, dict))
+            self.people.append(made)
 
     def _scenario_things(self) -> None:
         """The scenario's `things:` (spec M7b §17a; package 53b): each made from its words

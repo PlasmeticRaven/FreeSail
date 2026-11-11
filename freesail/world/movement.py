@@ -196,6 +196,15 @@ def person_of_actor(world: Any, actor: str | None) -> Any:
             # hull's prompt is his wherever it is, never the prize master's; another hull's
             # "captain" is her own captain's hand (the director's, a test's)
             return captive
+        if getattr(world, "is_followed", True):
+            from freesail.world.captive import remembered_person
+
+            me = remembered_person(world)
+            if me is not None and not getattr(me, "aboard", True):
+                # the player's person freed and ashore while his prompt follows the hull that
+                # held him (package 74, step 6; the design's §7): the prompt is his (decision
+                # 62), not that hull's captain's
+                return me
         visitor = knowledge.players_visitor(world)
         if visitor is not None:
             # the player aboard another ship as a visitor (decision 62; package 65, step 4):

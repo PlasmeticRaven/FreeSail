@@ -766,6 +766,24 @@ def _fire_a_deck(ship: Any, battery: Battery, what: dict[str, Any], data: dict[s
     return "guns.fire", text + ".", data
 
 
+def _of_the_side_meant(ship: Any, battery: Battery, guns: list[str]) -> list[str]:
+    """A number names the pair (the ships session's find of 2026-11-10: 'fire No. 1 gun'
+    fired the larboard No. 1 too, away from a starboard mark, the named guns firing with no
+    check of what bears): broadside guns named with no side are the guns of the side
+    engaged, else of the side the mark is on; said with a side they are that side's (the
+    words chose already); with no side engaged and no mark, the pair as before."""
+    named = [ship.guns[g] for g in guns]
+    if any(g.place != "broadside" for g in named) or len({g.side for g in named}) < 2:
+        return guns
+    side = battery.engaged if battery.engaged in ("starboard", "larboard") else None
+    relative = battery.target_relative_rad
+    if side is None and battery.engaged is None and battery.target and relative is not None:
+        side = "starboard" if relative >= 0.0 else "larboard"
+    if side is None:
+        return guns
+    return [g.id for g in named if g.side == side]
+
+
 def _fire(ship: Any, battery: Battery, said: str) -> Result:
     what = _fire_words(ship, said)
     data: dict[str, Any] = {"verb": "fire", "level": 1}
@@ -795,12 +813,13 @@ def _fire(ship: Any, battery: Battery, said: str) -> Result:
         return _fire_a_deck(ship, battery, what, data)
     if what.get("guns"):
         names = []
-        for gid in what["guns"]:
+        guns = _of_the_side_meant(ship, battery, list(what["guns"]))
+        for gid in guns:
             if gid not in battery.single:
                 battery.serve_by_name(gid)
                 battery.single.append(gid)
             names.append(ship.guns[gid].name)
-        data["guns"] = list(what["guns"])
+        data["guns"] = guns
         return "guns.fire", f"{_cap(_and(names))} to fire as soon as ready.", data
     if battery.exercise:
         # practice and resupply: the dumb show fires no gun at the word; a gun by name and

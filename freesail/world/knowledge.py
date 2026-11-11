@@ -350,6 +350,12 @@ REACH: dict[str, str] = {
     "needs.answer": "person",
     "needs.felt": "person",
     "log.rollup": "record",
+    # package 74 (step 6): an appointment and an exchange are the port's news, said ashore
+    # where the man stands (each line's data names the shore and the port): he and the
+    # persons ashore at that port have them, and no ship's deck is woken by them (the
+    # `prize` family wakes a ship; these two are not her business)
+    "command.new": "said",
+    "prize.exchanged": "said",
     "log.read": "record",
     # the report, the call and the boat's report (step 3 writes them; placed first)
     "report.made": "person",
@@ -367,6 +373,10 @@ FAMILIES: dict[str, str] = {
     "action": "wakes",
     "small_arms": "wakes",
     "prize": "wakes",  # package 74: she is taken, the prisoners rising, the prize retaken
+    # package 74 (step 6): the court martial's lines are words said before the court, heard
+    # by the persons ashore at its port (each line's data names the shore and the port) and
+    # on no ship's deck
+    "court": "said",
     "marines": "aboard",
     "evolution": "aft",
     "sail": "aft",
@@ -847,6 +857,15 @@ def players_person(world: Any) -> Any:
     seat = _seat(world)
     if seat is not None:
         return _seat_person(root, seat)
+    from freesail.world.captive import remembered_person
+
+    remembered = remembered_person(root)
+    if remembered is not None:
+        # freed (exchanged, landed by a cartel), he is the player's person still while his
+        # own ship has a prize master for her captain (package 74, step 6): after the seat,
+        # which is the player's own choice of person, and only while the mark stands (it is
+        # past once he is her captain again, and the checks below read as they did)
+        return remembered
     hull = player_hull(root)
     if hull is None:
         return None

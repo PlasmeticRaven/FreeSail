@@ -52,7 +52,7 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b; **the design approved 2026-11-07** (nine rulings; `docs/design/Design-Prizes.md`); step 1 merged 2026-11-07 (9acab09); step 2 merged 2026-11-07 (1bb24f52), truths 7-351 to 7-354; **step 3 (the captive's channel) merged 2026-11-07 (277e9482)**, truths 7-355 to 7-357; **PAUSED 2026-11-07 at the owner's word** (the account's Fable usage at 95 percent of its weekly limit; four steps left), at step 3's boundary with nothing in flight, steps 4 to 7 built on the scratch branch `claude/pkg-74-step3` (0de652a) and waiting their tiers; resumes about 2026-11-12 19:00 UTC or when the owner says, step 4 (the far fight wired) first with 74's answer on 76's two doctrine hooks; **RESUMED 2026-11-09 at the owner's word** after the reset: step 4's two mends, and with them five defects of step 3's channel found by replaying the owner's strike save (the captive's word taken as the player's hand, so the captor's captain stood aside and she took the ground; the captor engaging his own prize; a bare yes unread; a prisoner's hail performed; the free man's refusal of "go ashore"); **step 4 (the far fight wired) and the five mends merged 2026-11-10 (9944b671)**, truths 7-358 to 7-361 and 7-369, no pin moved; five small mends given back for step 5's tree (the parole's negations, the fallback line's engine words, a loosened test, a conditional skip, the player's plain speech no hand on her); **step 5 (the prize court and the money) merged 2026-11-10 (dcd6c690)**, truths 7-362 and 7-363, with the five mends; one pin moved at the meeting with 98 (the officer's handover budget 22,500 to 23,000, by the test's own practice); most of the money's figures FROM MEMORY and marked so, for the owner's shelf; next step 6 (the court martial, a new command, the consent revision's draft), then 7 |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design; **held by the owner (2026-10-30) to run after 82 and 65 both**, one Fable package at a time; **launched 2026-11-07 on 65's close** as a Fable sibling session on `claude/pkg-74` (session_01XooV4BjeDy5Z9rXT75YZ27), the design note first, the trunk at f67640b; **the design approved 2026-11-07** (nine rulings; `docs/design/Design-Prizes.md`); step 1 merged 2026-11-07 (9acab09); step 2 merged 2026-11-07 (1bb24f52), truths 7-351 to 7-354; **step 3 (the captive's channel) merged 2026-11-07 (277e9482)**, truths 7-355 to 7-357; **PAUSED 2026-11-07 at the owner's word** (the account's Fable usage at 95 percent of its weekly limit; four steps left), at step 3's boundary with nothing in flight, steps 4 to 7 built on the scratch branch `claude/pkg-74-step3` (0de652a) and waiting their tiers; resumes about 2026-11-12 19:00 UTC or when the owner says, step 4 (the far fight wired) first with 74's answer on 76's two doctrine hooks; **RESUMED 2026-11-09 at the owner's word** after the reset: step 4's two mends, and with them five defects of step 3's channel found by replaying the owner's strike save (the captive's word taken as the player's hand, so the captor's captain stood aside and she took the ground; the captor engaging his own prize; a bare yes unread; a prisoner's hail performed; the free man's refusal of "go ashore"); **step 4 (the far fight wired) and the five mends merged 2026-11-10 (9944b671)**, truths 7-358 to 7-361 and 7-369, no pin moved; five small mends given back for step 5's tree (the parole's negations, the fallback line's engine words, a loosened test, a conditional skip, the player's plain speech no hand on her); **step 5 (the prize court and the money) merged 2026-11-10 (dcd6c690)**, truths 7-362 and 7-363, with the five mends; one pin moved at the meeting with 98 (the officer's handover budget 22,500 to 23,000, by the test's own practice); most of the money's figures FROM MEMORY and marked so, for the owner's shelf; next step 6 (the court martial, a new command, the consent revision's draft), then 7; **step 6 (the court martial, a new command, the consent revision drafted with its refusal) merged 2026-11-10 (4ee7ab2b)** after one return for the lead's review's eleven mends, truths 7-364 to 7-366, no pin moved; next step 7, then the close |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | the hull step merged 2026-10-31 (cfe48a5's record); the lee-port step (L2 and L3), the rig lines and the booms merged 2026-11-06 (8c30c8a); next B3.4 by §12.2a's rule, SW-4, the *Neufchatel*, the bilander, the 74, Phase 5; B6 to a supplemental package; the hold (SW-5) and B3.4 merged 2026-11-06 (f414ed1); SW-4 merged 2026-11-07 (73b9469); B3.4's four rulings merged 2026-11-07 (3c9df9e1); **B2 (the *Prince de Neufchatel*) with SW-4's words step and her stage 0b merged 2026-11-07 (04136d99)**, truths 7-192 and 7-193 drafted, the lead's rulings on its six points in the notes below; B3.4b (the word's two cases, the dismasted lines) owed first, then B3.3 (the settee) with B4 (the bilander); **B3.3 and B5.4 (the settee in the engine and drawn), B3.4b, B2b (the *Neufchatel*'s ruled fixes) and B4 (the bilander) merged 2026-11-09 (acdcfb56)**, truths 7-197 to 7-199 drafted, the lead's rulings in the notes below; **B2c (the owner's two rulings of 2026-11-08 on the *Neufchatel*: her fore gaff sail at lie a-try, her lead re-tuned with her bands widened) and B3.3b (the settee's forced-round guard) merged 2026-11-10 (cff8fdb1)**; **SW-1 (Table No. 29's charges) and the ruled builds of the 9th and 10th merged 2026-11-10 (09222043)**, no figure of the eight old files moved; the session's six points ruled in the notes (the bilander's short watch calls all hands for her settee; "make all sail" lists only what she has); next B7 (the 74), then Phase 5; the lead's final word on the close-out, after those, frees the session's preliminary work on 90 (the owner, 2026-11-10); **B7, the 74 (the *Bellerophon*, steps 0 to 6, the bill by deck and her review's mends) merged 2026-11-10 (31f6bb35)**, truths 7-194 to 7-196 drafted (7-196's clause alone recorded, not pinned), the lead's rulings on its seven points in the notes below; next her step 7 (B7.c, B7.d, B7.e), the trim's alias words, Phase 5 |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 (merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-76` (session_01XooV4AqyCMwqgyMVwkvG3x), beside 74 and 81, the trunk at f466051: the research pass first, the Spanish book first after the French (decision 64), a nation's book added by data alone; the research pass approved 2026-11-07; **the pass and step 1 (Britain) merged 2026-11-07 (4f3694b2)**; step 2 (France) merged 2026-11-07 (943b453f); steps 3 (Spain), 4 (the United States and Naples), 6, 7 and item 8 (the flags of command and identity) merged 2026-11-07 (649c5478), truths 7-426 to 7-435; **CLOSED 2026-11-07** (the owner has nothing to add for now on its seven shelf questions; they stand on the lead's list, each a small data step by a session the lead wakes when an answer comes) |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806); **found by package 81 (2026-11-07), for this package:** a hole above the water is made at 0.3 to 1.8 m above the waterline whatever the side's height (`combat/hits.py`, 73's), so a cutter's hole can stand above her rail: cap a hole at the side's height at its x (the profile's rail where the file gives one); and a tick on each volley (`Volley` in `combat/guns.py`) for the viewer's exact stamp of each round (81 stamps a round with its snapshot's tick meanwhile) | behind 70 and 73; **briefed 2026-11-11 for the owner's final approval** ("## Package 77" below): five steps, truths 7-201 to 7-219, launching at 75's close; the sailing evolutions' finds sorted to 78b, cutting out to 80's ground, fire aboard left out; **APPROVED by the owner 2026-11-11 as proposed, to launch at 75's close** |
@@ -85,12 +85,12 @@ on these packages; that is the owner's choice.
 | 100 | Opus | **Letters and things as one system** (the owner's note 8): a letter a thing with words, written, carried, handed, read, sealed and destroyed by anyone by one road; the director's things with a description, removed by his form; the letters by boat and by cutter carried as things | booked 2026-11-09 (below); held by the owner (2026-11-09); **approved by the owner and launched 2026-11-10** as an Opus sibling session on `claude/pkg-100` (session_01XooV47cDNM2igRU6E9FkQ4), the trunk at 2a291604; two steps, each at one hash (the thing with words; the letters that travel), truths 7-470 to 7-479; **step 1 (the thing with words) merged 2026-11-10 (41216bbc)**, truths 7-470 to 7-476, no pin moved; **step 2 (the letters that travel) merged 2026-11-10 (56e3befd)**, truths 7-477 to 7-479, one test moved old beside new (a letter's words its reader's alone); **CLOSED** |
 | 60 (from M7b) | Opus (a design note first) | **A ship bought, and the player's ship changed in play** (the owner's design goal of 2026-10-17, M7b's package 60, spec M7b §21g; brought into M7 at the owner's word, 2026-11-09): the player's own ship changed inside a running world as a journaled act, his person rehomed and his seat carried; the hands moved as a count between two hulls; a vessel's owner, price and sale as facts the port knows, with `buy the ship` and `sell the ship` through the purse; the hull valued by 74's function with her condition; an errand ashore answered by the port's facts and the director | re-briefed 2026-11-09 (below) on what 82, 84, 65 and 74 have built since, **to run after 74 closes (the owner, 2026-11-09: "it's good to let 74 close cleanly before starting anything else major")**, the design note and the building both; **the design note approved by the owner 2026-11-10 to be written now** (a document alone, `docs/design/Design-ShipBought.md`, by an Opus sibling session on `claude/pkg-60`, session_01XooV4BEMb2fNbYpMywL2G9, launched 2026-11-10 for the lead's gate); the building still after 74 closes; **the note reported 2026-11-10 and ACCEPTED AT THE GATE the same day, merged to the trunk** (`docs/design/Design-ShipBought.md`, `claude/pkg-60` at b14d46c, its section 13 the gate: the game's first hull stays fixed and a new `World._players` names the player's ship, one act `take_up` by one order, the old ship settled and never lost, ownership by her service, one valuation with her condition, the errand by a named person; found by the note and reproduced by the lead on the trunk: under `--ship` the followed ship's far body is never brought to her truth, 934 m off in five minutes and 3.8 km in twenty, mended in 60's step 1 by the owner's word of 2026-11-10: "I won't be conducting any testing before then"); **the owner's answers to its five questions, 2026-11-10, agreeing with the lead's recommendations:** (Q1) money stays the ship's until milestone 8's career, an owner's purse carried by the ledger; (Q2) a master's books and instruments stay with the hull for now; (Q3) the director's word is the only road by which a King's officer or an owner's captain takes another ship or a prize; (Q4) an owner may keep his old ship working under her mate; (Q5) in a merchant scenario that names no owner the player is her owner; **the build approved by the owner to launch at 74's close (2026-11-10), in the session that wrote the note** (session_01XooV4BEMb2fNbYpMywL2G9; "I would recommend using the same session that made the plan ... as the context of that session is already primed from building the plan") |
 | 101 | Opus | **The Catalan coast block** (the owner, 2026-11-10: the gap in the chart on the eastern Iberian coast): a new region of `atlantic-east` between `balearics`' north bound (40.56 N) and `gulf-of-lion`'s west bound (3.0 E), the Ebro's mouths and the Alfaques, Salou, Tarragona, Barcelona and Mataró to the coast's crossing of 3 E near Tossa; with it the ports the coast lacks, in the block and in the charted water beside it | proposed 2026-11-10, **the gap measured by the lead** (the chart probed on a tenth of a degree): nothing at all (no depth, no land, no coast, no region) north of 40.56 N and west of 2.61 E as far as the land; the Gulf's first tile column gives depth from 2.61 E to 3.0 E, which no region owns; the sea so missing is a wedge of some 80 miles north and south by 110 east and west at its foot, from the coast at 0.5 E on 40.56 N to the coast's crossing of 3 E at 41.75 N. A box of 40.56 to about 41.9 N and about 0.3 to 3.0 E is some 3.6 square degrees, the smallest of the Mediterranean's blocks (about 28 level-2 tiles, 4 to 6 MB by the others' sizes, far under the 40 MB rule); the seam's exact meridian (3.0 E or the Gulf's tile edge) the builder's first measurement by `docs/dev/ChartBlocks.md`. **No port file exists between Cartagena and Marseille on the main**: in the block Barcelona, Tarragona (with Salou's road) and the Alfaques; beside it in water already charted Rosas and Palamós (`gulf-of-lion`), Valencia's Grao and Alicante (`mediterranean-west`). **Approved by the owner 2026-11-10: all seven ports, to launch at the close of package 98**; briefed 2026-11-10 (below), truths 7-490 to 7-499; **launched 2026-11-10 10:56 UTC on 98's close** as an Opus sibling session on `claude/pkg-101` (session_01XooV48XGVqWYMrANqYZQEs), the trunk at 0a7c3a9d; a short measurement report (the seam, the tiles' count and bytes) before any tile is committed, then one final report at one hash; **its measurement report ruled 2026-11-10** (the seam the how-to's plain answer, the Gulf's column kept the Gulf's; 24 level-2 tiles and 26 of the three harbours', 4.94 MB in all; Barcelona's gauge the block's; no patch for the four ports beside the block, no override of the delta for want of a public-domain plan, the truths written to the pilots' own words; **found: the wars table carries `since` and no `until` and `Nations.at_war` reads no date, so Britain is at war with Spain on any day and a Spanish port reads hostile in 1809**: not the block's to mend, a case for decision 66 and package 103, to be said to the owner); **the final report merged 2026-11-10 (1a4a4337): the gap closed, 6.07 MB, seven ports, truths 7-490 to 7-499, no pin moved; CLOSED** |
-| 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design; **briefed 2026-11-11 for the owner's final approval** ("## Package 102" below): five steps, truths 7-500 to 7-509; a stranger's hoist as a strip of flags beside her in the strangers' panel, the view drawing no ship but the player's; **APPROVED by the owner 2026-11-11 with the stranger's strip struck** (a later "stranger view"); launched 2026-11-11 |
+| 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design; **briefed 2026-11-11 for the owner's final approval** ("## Package 102" below): five steps, truths 7-500 to 7-509; a stranger's hoist as a strip of flags beside her in the strangers' panel, the view drawing no ship but the player's; **APPROVED by the owner 2026-11-11 with the stranger's strip struck** (a later "stranger view"); launched 2026-11-11 (session_01XooV47u3eN1pgsWRkCiWJi, claude/pkg-102) |
 | 103 | Fable (the primary review agent; subagents allowed) | **The range reviewed, and the lever designed** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | proposed 2026-11-10; **briefed 2026-11-10 (below) at the owner's word, for Fable; HELD by the owner, not launched** ("there's enough things in flight right now to let close out, and I'll sleep on it"); **the brief widened the same day at the owner's word** (Fable as the primary review agent for the date range audit and the overall design of fidelity, a wider and freer scope, subagents allowed); **consolidated with the other review and design packages (96, 92) towards the end of the order**, this one first, the three together to cover the whole range |
-| 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in; **measured and briefed 2026-11-11 for the owner's final approval and his choice of ports** ("## Package 104" below): the hole is L-shaped, its southern arm running east past Tunis and Cape Bon; two regions in one package (4.5 to 8.0 E north of 36.29 N; 8.0 to 11.15 E south of 38.5 N), some 26 to 29 MB, truths 7-510 to 7-519; **found with it and unbooked: Sicily south of 38.43 N, the Sicilian channel and Malta are off the chart**; **APPROVED by the owner 2026-11-11 with all thirteen ports as port files (decision 67)**; launched 2026-11-11 |
-| 105 | Opus | **Sicily and Malta** (the owner, 2026-11-11: "Sicily and Malta shall be another package"): the chart south of 38.43 N and east of Cape Bon, found off the chart by 104's measurement: Sicily's coasts (Palermo, Trapani, Messina, Syracuse and the rest), the Sicilian channel, Pantelleria, Malta and Gozo; ports by decision 67 | booked 2026-11-11; to be measured and briefed after 104 |
-| 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build |
-| 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it |
+| 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in; **measured and briefed 2026-11-11 for the owner's final approval and his choice of ports** ("## Package 104" below): the hole is L-shaped, its southern arm running east past Tunis and Cape Bon; two regions in one package (4.5 to 8.0 E north of 36.29 N; 8.0 to 11.15 E south of 38.5 N), some 26 to 29 MB, truths 7-510 to 7-519; **found with it and unbooked: Sicily south of 38.43 N, the Sicilian channel and Malta are off the chart**; **APPROVED by the owner 2026-11-11 with all thirteen ports as port files (decision 67)**; launched 2026-11-11 (session_01XooV49Pn562NRcnJEerNas, claude/pkg-104) |
+| 105 | Opus | **Sicily and Malta** (the owner, 2026-11-11: "Sicily and Malta shall be another package"): the chart south of 38.43 N and east of Cape Bon, found off the chart by 104's measurement: Sicily's coasts (Palermo, Trapani, Messina, Syracuse and the rest), the Sicilian channel, Pantelleria, Malta and Gozo; ports by decision 67 | booked 2026-11-11; to be measured and briefed after 104; **measured and briefed 2026-11-11 for the owner's final approval** ("## Package 105" below): no part of Sicily is on the chart; one region of 109 tiles (35.01 to 38.5 N, 11.15 to 16.69 E), three steps, the first giving a port file dated rows for more than its holder; some two dozen ports; truths 7-530 to 7-539; launches when 104 is merged |
+| 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build; **measured 2026-11-11** ("## Package 106 ... the measurement" below): the chart ends at 32 N and holds nothing south of Madeira; six blocks proposed (the ocean layer carried south, the Canaries, Morocco's coast, the Cape Verde Islands, Senegal and Cape Verde, the desert coast), for the owner to book; **the owner, 2026-11-11: "I pointed out Cabo Verde (the islands), as a southern stopping point, but the blocks should cover the African coast as well"**: so all six blocks are the scope, the islands and the coast down to their latitude (the Gambia, south of it, left out); each block briefed for his approval in the lead's order, the ocean layer with the Canaries first; **106a (the ocean carried south, and the Canaries with the Salvages) briefed 2026-11-11 for the owner's final approval** ("## Package 106a" below), truths 7-520 to 7-529 |
+| 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it; **surveyed 2026-11-11** ("## Package 107 ... the survey" below): 77 port files, about 240 places with a feature and no port file, ten passes proposed (Brest and the Western Approaches first), and a short step before them to settle the port file's dated form; **not yet, by the owner (2026-11-11): "We don't need to run 107 yet, as we'll continue expanding before we do refinement passes"**; the port file's dated form is asked of the new blocks' briefs meanwhile |
 | backlog (the stranger's view) | none | **A ship view of another vessel in sight** (the owner, 2026-11-11, striking the strip from 102): "a later 'stranger view' or 'enemy view' (maybe a small popout) that shows a ship view of a requested vessel that is in sight", her colours and hoists on it; under the knowledge rule, so beside or after package 99 | on the backlog, unbooked |
 
 **The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
@@ -128,6 +128,8 @@ queue.
 **The owner's words of 2026-11-10, about 23:40 UTC, on what follows:** 60's build launches at 74's close in the session that wrote its note; the lead measures and briefs 104 now and briefs 102 and 77, "and I will give final approval for each on their briefs"; 78 is split in two (78a sight across land, 78b fine control of the sails and the gybe by hand, his list in its row) and collision is dropped from the milestone.
 
 **The owner's words of 2026-11-11, about 00:00 UTC, on the three briefs:** 102 approved with the stranger's strip struck (a later "stranger view"); 77 approved as proposed, after 75's close; 104 approved with every port as a port file, and with it a standing rule (decision 67 in docs/DesignProposal.md): strong coverage of ports, refinement passes on the blocks already built, and every port built with room for other eras; Sicily and Malta another package (105); the west African coast down to Cabo Verde to be considered (106); the ports' refinement booked (107).
+
+**The owner's words of 2026-11-11, about 00:30 UTC:** Cabo Verde is the islands, the southern stopping point, and the blocks cover the African coast as well; 107 waits ("we'll continue expanding before we do refinement passes"). The chart's expansion as it now stands, each block briefed for his approval before it launches: 104 (building), 105 Sicily and Malta, 106 in six blocks.
 
 **An open design question, recorded for the owner (2026-11-10): the day and the range.** The
 game's purpose is a world that can be simulated over a wide range of dates, 1792 to 1825 as
@@ -4288,6 +4290,92 @@ its seal; a reader's own reach; the letters that travel by boat and by the direc
 Package 74's record of a court martial is carried as such a thing.
 
 
+### Package 74, step 6: the court martial, a new command, and the consent revision drafted with its refusal (the design's §6 and §7), as merged (2026-11-10)
+
+**What landed:** the builder's c9f30567 (claude/pkg-74, after step 5's record 0a77835b:
+0624c2f step 6 as built, two merges of the trunk, 1e941f0 the record carried a thing with
+words, d49abab its suites; then, after the lead's review, 71f21f0 the trunk at 65c73a6 merged,
+6b84c96 the mends (A) to (K), the step's final tree, measured there; c9f30567 the suites'
+figures in the tuning notes alone), merged `--no-ff` by hash at 4ee7ab2b, a clean merge onto
+the trunk carrying package 100's step 2.
+
+**Built (`freesail/world/court.py` new; the channels `court` and `command` in
+`world/orders.py`, with `person: "<name>" is exchanged at <port>`; the verb `say to the
+court` through the prize orders; `Person.record` a list the court writes; the reading `the
+record`; `docs/design/ConsentRevision-AdversarialSeats.md`; the primer's chapters 11, 20 and
+27):** the court martial as the director's proceeding at a place of a port, made for the
+sitting and gone at the verdict; a landed prisoner exchanged at a port of his own nation by
+the director's form (doubted against the day of his landing and the port's nation); the
+accused brought before the court, the president's and the judge advocate's persons found
+there, the questions heard at the place, the accused's own words as he said them, the log of
+the action read; the verdict one of the five the period's courts gave for the loss of a ship,
+journaled as every form is; a new command written as a scenario under the saves
+(`saves/new-command-<ship>-<date>.yaml`) with his followers, the persons ashore at the same
+port whose record has the same loss; **the copy of his record carried into it a thing with
+words**, by package 100's system (read, sealed, given or burnt as a letter is), where the
+design had a paper of the ship's. **The scene (seed 7):** the frigate struck to a French
+frigate in Brest's road, her captain landed, exchanged at Falmouth, tried there and acquitted
+with honour, appointed to the cutter *Alert* at Falmouth, his first lieutenant following him.
+**Truths 7-364 to 7-366.**
+
+**The consent, as the hard rule has it:** nothing under `docs/agents/consent/` and nothing in
+`docs/agents/ConsentBrief.md` is touched (checked by the lead in the merged diff). The
+revision is a draft under `docs/design/` for package 55. The flag
+`seats.ADVERSARIAL_SEATS_CONSENTED` is off: until that package turns it, a model's seat at the
+captain of a hull at war with the player's is refused in words at the director's seat form and
+at the desk's door; the suite seats none, and the tests turn the flag only by a patch that is
+undone. **A known limit, written in the draft for 55 and not built:** a seat is looked at when
+it is given and never again, so a war declared or a hull taken after the seating is not seen.
+
+**The lead's review and the builder's mends, the step sent back once (2026-11-10, 19:23 UTC):**
+the lead had the step read by an independent reviewer, read-only and by reproduction, before
+spending a fast tier on it; eleven findings went to the builder, who reproduced every one on
+the unmended tree and mended each with a test that fails before it. **(A) the replay:** the
+new command's line, its data and the record's entry held the machine's path to the file, so
+that a replay with the saves elsewhere gave another digest, and a replay wrote the file again;
+now the file is named `saves/<name>` everywhere, a replay writes nothing and repeats what the
+journal holds (`World.replayed_orders`), and a test replays such a world from another saves
+directory to the same digest. **(B) the in-world rule:** the served line spoke of the file and
+`--scenario`; now "Captain Bowen is appointed to the cutter Alert at Falmouth; Mr Pearce
+follows him.", heard ashore at the port, the file's name in the director's own reply alone.
+**(C)** the exchange is heard by the man exchanged and the persons ashore at that port, and by
+no deck (it had woken every deck and not reached him). **(D)** a court whose accused is dead or
+gone is dissolved in words at the next minute, and a dead man is not tried (it had sat for
+ever). **(E)** "the captain of the X" finds her commander first. **(F)** the mark of the
+player's person, set at his taking, outlived his return to his own ship, so that a model seated
+at her captain's station was still answered as he; cleared at the retaking, the seat read
+before the mark. **(G)** at the verdict everyone at the court's place goes to the quay, and the
+court's officers are of no ship's company. **(H)** a second appointment whose name makes the
+same file is refused in words where it had written over the first. **(I)** a seat at an
+enemy's captain that a journal holds as done is repeated by a replay, not refused; the
+adversarial check comes before the consent read. **(J)** the truths' temporary directory and a
+scene run twice, tidied; **truth 7-364 marked slow by the builder** (two minutes), accepted.
+**(K) found by the ships session and mended here:** "fire No. 1 gun" named both guns of the
+pair and fired the far side's at nothing; a number said without a side is now the gun of the
+side engaged, else of the side the mark is on (`orders.gunnery._of_the_side_meant`); no
+recorded passage moved. A bearing check in `combat/guns.py`'s own loop stays on the lead's
+list.
+
+**Also mended in the step, the builder's own finds:** after an exchange the followed prompt
+and `where am I` fell to the captor's captain; the loss entered at the possession read the
+nation from the prize's colours; the director's dry run wrote a scenario file. **The
+citation** of the reserved fourth corrected in three places (article XXXI of the articles for
+flag officers, p. 28 of the 1808 printing).
+
+**No pin moved.** The officer's conversation at his seat measures 13,584 tokens (13,516
+before), under the test's 13,800.
+
+**The builder's suites at 6b84c96, a pinned worktree:** the fast tier whole exit 0, 7,449
+passed, 1 xfailed; the slow tier of the touched files exit 0, 3,033 passed, 1 xfailed; the
+slow of the known truths, the profile and the *Indefatigable* exit 0, 540 passed, 8 xfailed;
+the pace alone and last exit 0, 15 passed, no floor lowered; nothing skipped; ruff clean.
+**The lead's merge:** the trial on f94e6f3b clean and lint-clean; no model or vendor name in
+the diff; (A) and (B) read on the page in the merged tree; no ship file, no physics; the fast
+tier whole on it exit 0, 7,458 passed, 1 xfailed, 505 slow left out, 22:45 to 23:51 UTC; the whole suite in the cloud, run 69 (2026-11-10, 23:53 to 00:49 UTC, on 434c33c1): green whole, lint, the six shards and the pace job. Next in 74: step 7 (the two scenarios, the captive's brief, the forms
+`ship.prize` and `ship.struck`, truths 7-367 and 7-368, the spec, the harness page, the
+records), then the close with the whole slow tier.
+
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
@@ -7645,6 +7733,368 @@ package reports one hash measured in a pinned worktree (ruff check and format; t
 whole; the slow tier of the touched files and of the known truths; the pace alone and last),
 and the lead merges by that hash.
 
+
+## Package 107: the ports filled out on the blocks already built: the survey (2026-11-11), for the owner; no pass briefed yet
+
+**Booked by the owner on 2026-11-11 (decision 67):** "refinement passes on existing chart
+blocks to fill out ports that exist only now as anchorages or marks." The lead had the
+fifteen regions' features read against the port files on 2026-11-11 (read-only, by script: a
+candidate is a feature of kind `anchorage`, or a `town` or `place` whose words speak of a
+road, a harbour, a pier, watering or anchoring, that no port file names and that lies more
+than 3 miles from every port's road, anchorage, mooring and shore). **1,672 features, 77
+port files, and about 240 places a ship of the period went to that have a feature and no
+port file** (278 candidate features, a town and its road counted once; some eight false
+positives and six inland towns among them, named below).
+
+| Region | Features | Port files | Candidate places |
+|---|---|---|---|
+| channel-west | 222 | 6 | 11 |
+| channel-mid | 123 | 7 | 8 |
+| channel-east | 137 | 8 | 21 |
+| biscay-north | 100 | 5 | 15 |
+| biscay-south | 136 | 5 | 28 |
+| portugal | 139 | 5 | 23 |
+| madeira | 28 | 2 | 2 |
+| azores | 59 | 3 | 11 |
+| strait | 100 | 5 | 9 |
+| mediterranean-west | 107 | 6 | 25 |
+| balearics | 87 | 4 | 13 |
+| gulf-of-lion | 126 | 6 | 14 |
+| ligurian-sea | 140 | 7 | 24 |
+| tyrrhenian | 123 | 5 | 25 |
+| catalan-coast | 45 | 3 | 11 |
+
+**The ports as they stand, by region:** channel-west: brest, falmouth, morlaix, plymouth,
+roscoff, st-marys. channel-mid: alderney, dartmouth, st-helier, st-malo, st-peter-port,
+torbay, weymouth. channel-east: boulogne, calais, dover, downs, dunkirk, le-havre, poole,
+portsmouth. biscay-north: la-rochelle, le-palais, lorient, paimboeuf, rochefort.
+biscay-south: corunna, ferrol, royan, santander, vigo. portugal: cadiz, lagos, lisbon,
+oporto, setubal. madeira: funchal, porto-santo. azores: angra, horta, ponta-delgada. strait:
+algeciras, ceuta, gibraltar, tangier, tarifa. mediterranean-west: alicante, almeria,
+cartagena, malaga, oran, valencia. balearics: algiers, ivica, palma, port-mahon.
+gulf-of-lion: hyeres, marseille, palamos, rosas, toulon, villefranche. ligurian-sea: ajaccio,
+bastia, genoa, leghorn, maddalena, porto-ferrajo, san-fiorenzo. tyrrhenian: alghero,
+cagliari, civita-vecchia, gaeta, naples. catalan-coast: alfaques, barcelona, tarragona.
+
+**The candidates, the likeliest of each region (each has its feature and the pilot's words in
+`data/charts/features/<region>.yaml`):** *channel-west:* Penzance with Gwavas Lake,
+Mousehole, Porthleven, St Ives, Fowey, Mevagissey, Coverack, Cadgwith, Padstow, Audierne;
+Conquet, Blanc Sablon and Camaret (Brest's own roads). *channel-mid:* Cherbourg and its road,
+Granville, Cancale, Lyme, St Ouen's Bay. *channel-east:* Dieppe, Fécamp, Honfleur,
+Gravelines, Etaples, Ambleteuse, Wissant, St Valery-sur-Somme, Le Tréport, St
+Valery-en-Caux, Ramsgate, Folkestone, the two Dungeness roads, Rye, Hastings, Newhaven,
+Seaford, Brighthelmstone, Shoreham. *biscay-north:* the Bay of Quiberon, Concarneau, the
+Glénan road, Bénodet, Pont l'Abbé, Penmarch, Sauzon, Locmaria, Le Croisic, Noirmoutier, the
+Isle Dieu, St Gilles, Les Sables d'Olonne, St Martin de Ré, La Pallice. *biscay-south:*
+Pasajes, San Sebastián, Bilbao with Portugalete, Bayonne, St Jean de Luz, Fuenterrabía,
+Guetaria, Castro, Santoña, Laredo, Gijón, Ribadeo, Vivero, Cedeira, Camariñas, Corcubión,
+Finisterre, Muros, Marín, Bayona, Arcachon. *portugal:* Peniche and the Berlenga, Figueira
+with Buarcos, Viana, Vila do Conde, Nazaré, Ericeira, Sines, Milfontes, Arrifana, Sagres,
+Portimão, Albufeira, Faro, Tavira, Ayamonte, Sanlúcar with Bonanza; Rota, El Puerto, Puerto
+Real and the Isla de León (Cadiz bay's own). *madeira:* Machico. *azores:* Praia of
+Terceira, Vila Franca, Ribeira Grande, Santa Maria, Velas, Graciosa's two, Madalena, Lajes
+do Pico, Santa Cruz of Flores. *strait:* Tetuan's road, Barbate, Zahara, Bolonia,
+Valdevaqueros, Conil, Benzú. *mediterranean-west:* Marbella, Fuengirola, Vélez-Málaga's
+road, Nerja, Almuñécar, Motril, Adra, Roquetas, San José, San Pedro's cove, Carboneras,
+Águilas, Mazarrón, Portmán, the Isla Grosa, Melilla, Alhucemas, the Peñón de Vélez, the
+Zafarinas, Arzew. *balearics:* Pollensa, Alcudia, Fornells, Ciudadela, Andratx, Porto Petro,
+Porto Colom, Cabrera, San Antonio of Ivica, Matifou's road, Cherchell, Mostaganem.
+*gulf-of-lion:* Port-Vendres with Collioure, Port de Bouc, Cassis, La Ciotat, Bandol with
+the Brusc, St Tropez, Fréjus, the Golfe-Juan, Antibes, Monaco, Menton, Ventimiglia.
+*ligurian-sea:* the Gulf of Spezia with Porto Venere, Porto Longone, Piombino, Vado, Savona,
+Finale, Alassio, San Remo, Portofino, Sestri Levante, Viareggio, Bonifacio, Porto Vecchio,
+Calvi, Valinco, the coves about Agincourt Sound. *tyrrhenian:* the Gulf of Palmas, Pula's
+road, Oristano's road, Carloforte (these last three are package 104's), Porto Torres, Porto
+Conte, Bosa, Porto Ercole, Santa Marinella, the Tiber's road, Nettuno, Terracina, Ponza,
+Baia, Pozzuoli, Castellammare, Sorrento, Capri, Amalfi, Salerno. *catalan-coast:* Blanes,
+Lloret, Mataró, Badalona, Sitges, Torredembarra, Cambrils, the Gulf of Ampolla. **False
+positives and inland towns, not ports:** Chesil Beach, the Great Russel, the Race of
+Barfleur, the Porto Santo islet, the Cala Figuera tower, Mount Portofino, the Magra, Calella,
+Tortosa, Amposta, Aigues-Mortes, Montalto, Corneto.
+
+**Places with neither a feature nor a port file (the place FROM MEMORY; the absence
+checked):** Douarnenez bay; Cowes, Yarmouth, Lymington and Southampton; Exmouth and
+Teignmouth; La Hougue; the Nore, Sheerness, Margate roads and Chatham; the Morbihan,
+Bourgneuf bay, Oléron; the ria of Arosa; Aveiro, Huelva; Dénia, Jávea, Torrevieja,
+Peñíscola, Vinaròs, Ténès, Santa Pola, Cullera, Mers-el-Kébir; Cette, Agde, Cadaqués;
+Talamone, Orbetello, Porto Santo Stefano, Ischia and Procida as ports, Terranova, Tortolì.
+Bordeaux and Larache lie outside the chart's bounds.
+
+**What a port file leaves undated today (decision 67's concern):** only five ports
+(Barcelona, Genoa, Rosas, Tarragona, Valencia) write their holder as dated rows
+(`nation:` a list of `{nation, since, until, source}`); the other 72 have one plain
+`nation:`. A port's `state:` and `blockade:` carry a free-text `since` at most; its market,
+dockyard, pilot, ordnance and works carry no dates at all. **So the lead's first proposal
+is a short step before any pass: the port file's dated form settled once** (which keys take
+dated rows and how a reader asks for a day), so that some eighty new files are written in
+it and the 77 old ones can be brought to it without a second visit.
+
+**The passes proposed, each one builder's, in the lead's order** (a new harbour patch
+changes tiles; an open road is data alone): (A) Brest and the Western Approaches, about 6:
+Douarnenez (a feature first), Camaret and the Blanc Sablon as Brest's roads, Penzance with
+Gwavas Lake, Fowey (a patch), St Ives, Audierne. (I) Sardinia and the Roman and Neapolitan
+coast, about 10 less 104's three: Pula, Porto Conte, Porto Torres, Porto Ercole, Ponza,
+Baia and Pozzuoli, Castellammare, Salerno. (B) the Channel's middle and east, about 10:
+Cherbourg (a patch likely), Granville, Cancale, Ramsgate, Dieppe, Fécamp, Honfleur,
+Newhaven, Shoreham; Cowes and the Nore want features first. (C) Biscay north, about 7:
+Quiberon, Concarneau (a patch), Les Sables, St Martin de Ré, the Isle Dieu, Le Croisic, the
+Morbihan. (D) Cantabria and Galicia, about 10: Pasajes (a patch), San Sebastián, Bilbao,
+Bayonne, Santoña, Gijón, Ribadeo, Vivero, Muros, Bayona. (E) Portugal and the
+Guadalquivir, about 8: Peniche, Figueira, Viana, Faro, Sines, Sagres, Sanlúcar; Cadiz bay's
+towns into Cadiz's file. (F) the Strait and the Barbary coast, about 6: Tetuan, Barbate,
+Melilla, Alhucemas, the Zafarinas, Arzew. (G) Spain's east coast and the Balearics, about
+10: Pollensa, Alcudia, Fornells, Ciudadela, Dénia and Jávea (features first), Marbella,
+Adra, Águilas, Blanes, Mataró. (H) Provence, Liguria and Corsica, about 12: La Ciotat,
+Bandol, St Tropez, Fréjus, the Golfe-Juan, Antibes, Spezia, Vado, Savona, Calvi, Bonifacio
+and Porto Longone (patches). (J) the Azores and Madeira, about 6: Praia, Vila Franca,
+Velas, Graciosa, Madalena, Machico. **A first, because the blockade of Brest is where play
+already is** and its watering and boat roads are what a blockading frigate uses; **then I,**
+the Mediterranean fleet's anchorages of 1804 and 1805. Whether each place has sources enough
+for a port file is not checked: each pass begins with the pilots on file.
+
+
+## Package 106: the west African coast down to Cabo Verde: the measurement and the blocks proposed (2026-11-11), for the owner; nothing booked to build
+
+**The owner, 2026-11-11:** "we also want to consider the western African coast down to Cabo
+Verde for blocks to be booked." Measured by the lead the same day (read-only: the chart's
+own answers probed on a quarter of a degree from 10 N to 37 N and 27 W to 4 W, the edges by
+bisection).
+
+**What the chart holds today.** One chart, `atlantic-east`: fifteen regions (282.7 MB) and
+one coarse ocean layer, the corridor (level 1, 30 seconds of arc), from 32 N to 51 N and 32
+W to 1 W. **The chart's south limit is 32 N** (the corridor's data stops at 31.896 N), and a
+scenario that starts south of it is refused. South of the Strait: Tangier and Cape Spartel
+are charted in detail; **Larache, Sallee and Rabat, Mazagan and Safi lie on the coarse layer
+alone; Mogador has nothing; Madeira and Porto Santo are charted in detail, down to 31.6 N;
+and south of that there is nothing at all:** the Salvages, the Canaries, Cape Nun, Bojador,
+Cape Blanco and Arguin, Portendick, Saint-Louis, Gorée and Cape Verde, the Gambia, the Cape
+Verde Islands. The game has no port south of Funchal. No weather box lies south of 30 N
+(Madeira's box, "the north-east trade", would answer all the way to Cape Verde by the
+nearest-box rule); no tide gauge south of Funchal; no stream south of 35 N; Morocco, Spain
+and Portugal are in the nations' table and no African post of Britain's or France's is.
+
+**The blocks proposed, in the lead's order, each well under the 40 MB rule** (tile counts by
+the globe's grid against coast positions FROM MEMORY; sizes from the neighbours' bytes a
+tile; both to be measured by each builder before a tile is committed):
+
+| | Block | Bounds, about | Level-2 tiles | MB, about | Why a ship went there (FROM MEMORY) |
+|---|---|---|---|---|---|
+| 0 | The ocean layer carried south | 12.4 N to 32 N, 26.4 W to 9.3 W, level 1 | 16 new, 8 rebuilt | 5 | so that the open sea from Madeira to the Cape Verdes answers at all, and the detailed blocks need not write the Sahara's land |
+| a | The Canaries and the Salvages | 27.33 to 29.47 N, 18.29 to 13.17 W; one tile for the Salvages | 61 | 5 to 16 | Santa Cruz de Tenerife (Spain's, an enemy in 1805; Nelson repulsed in 1797), Orotava's wine, Las Palmas, Arrecife; every outward-bound Indiaman and West Indiaman passed them |
+| b | Morocco's Atlantic coast | 31.6 to 35.44 N, the coast and one or two tiles seaward | 55 to 64 | 9 to 11 | Larache, Sallee and Rabat, Mazagan, Safi, Mogador (the Sultan's port for European trade, with the consuls) |
+| c | The Cape Verde Islands | 14.53 to 17.52 N, 25.55 to 22.56 W | 49 | 3 to 13 | Porto Praya (water for the Indiamen; Suffren and Johnstone in 1781), Sal, Maio and Boa Vista for salt |
+| d | Senegal and Cape Verde | 14.53 to 20.08 N, the coast and one or two tiles seaward; the Gambia below it, optional (12.83 to 14.53 N) | 60 to 89 | 11 to 17 | Saint-Louis and its bar (French in 1805, British 1809 to 1817), Gorée (British in 1805), Portendick's gum trade, the Gambia (Bathurst only from 1816) |
+| e | The desert coast | 20.08 to 31.6 N, the coast and one or two tiles seaward, in three strips | 137 to 164 | 25 | Cape Nun, Juby, Bojador, the Rio de Oro, Cape Blanco and the bank of Arguin (the *Méduse*, 1816): a lee shore and a current, few places to anchor |
+
+**A strip or the whole ocean:** the coast with one tile column seaward is some 20 miles of
+water in detail; two columns take in the bank of Arguin's outer shoals. Charting the whole
+ocean in detail from the coast out to the islands would be about 1,560 tiles and 165 to 270
+MB, six or seven regions, for water that is deep and empty: **the lead recommends the ocean
+layer (0) for the open sea and detailed strips and island blocks only.** South of about 15 N
+the finer source grid may not reach (FROM MEMORY), so Gorée, the Gambia and Santiago's south
+side may be built from the coarser one alone: the builder's first measurement.
+
+**With the blocks, as 101 and 104 found for theirs:** a weather box for the trade and one
+for the coast (the harmattan), the Canary current as a stream, ports by decision 67 (each
+with its dated holder: Gorée and Saint-Louis changed hands within the range), the nations'
+table given Britain's and France's African posts, one scenario (the lead suggests an
+Indiaman's convoy from Madeira by the Canaries to Porto Praya). A source on file may serve:
+`features/madeira.yaml` cites the *Oriental Navigator* of 1801 for "Madeira, the Canaries"
+(not checked further).
+
+**For the owner:** (1) whether "Cabo Verde" is the cape (block d) or the islands as well
+(block c): both are proposed; (2) which blocks to book, and in what order: the lead's order
+is 0 with a, then b, c, d, and e last, as the coast with least play; (3) whether the Gambia
+comes with d.
+
+## Package 106a: the ocean carried south, and the Canaries with the Salvages (`tools/build_charts.py` `CORRIDORS`, `REGIONS` and `CHARTS`; `data/charts/` the coarse layer's new tiles, the region `canaries` with its tiles, coast, index, manifest entry, features and overrides; `data/ports/*.yaml` new; `data/nations.yaml` the ports' index; `data/weather/climatology.yaml`; `data/tides/streams.yaml`; `freesail/world/chart.py` only if the chart's form must learn a second coarse layer; the tests that name every region and the chart's limits)
+
+**BRIEFED 2026-11-11 for the owner's final approval; not launched.** Opus. The first of the
+six blocks of package 106 (the owner, 2026-11-11: "we also want to consider the western
+African coast down to Cabo Verde for blocks to be booked"; "I pointed out Cabo Verde (the
+islands), as a southern stopping point, but the blocks should cover the African coast as
+well"). Built as `docs/dev/ChartBlocks.md` says (read it whole first, the Azores' and
+Madeira's section above all: two island regions with no neighbour, and what they found of
+the coarse layer, of islets the grid lacks, of peaks seen far off and of open sea being
+dear), with decisions 66 and 67 for the ports.
+
+**What the lead measured (2026-11-11), for the builder to check:** the chart ends at 32 N.
+Its coarse ocean layer (the corridor of `CORRIDORS`, level 1, 30 seconds of arc) runs from
+32 N to 51 N and 32 W to 1 W, its data stopping at 31.896 N; Madeira's detailed tiles reach
+31.6 N; south of that nothing answers, and a scenario that starts there is refused
+(`freesail/core/world.py`). No weather box lies south of 30 N, no tide gauge south of
+Funchal, no stream south of 35 N. The game has no port south of Funchal.
+
+1. **The ocean carried south to about 12.4 N,** from about 26.4 W to the African coast
+   (16 level-1 tiles by the lead's count, some 5 MB), so that the open sea from Madeira to
+   the Cape Verde Islands answers and a ship can sail it, and so that the detailed blocks
+   to come need write no desert. **The how-to's finding binds this step: widening the
+   existing corridor rewrites every one of its tiles.** So the builder's first measurement
+   is which way leaves the existing layer byte for byte: a second coarse layer beside the
+   first (if the chart's form can hold two, or can be taught to in a few lines), against
+   the first widened. If the first must be widened, every tile that changes is shown, and
+   every recorded passage, kept save and truth that sails the corridor is proven
+   unmoved or re-measured old beside new; if that list is long, stop and report before
+   committing. The chart's south limit, the scenarios' refusal and their tests move with
+   it, each named.
+2. **The region `canaries`:** about 27.33 N to 29.47 N and 18.29 W to 13.17 W, the seven
+   islands with their channels, and **the Salvages** by one tile to the north (about 29.89
+   to 30.32 N) or by the region's bound carried up to them, as measures smaller. The
+   bounds a hair inside the tile edges (package 104's finding: a bound on an edge takes in
+   a row more). **Measured before any tile is committed, with a short report to the lead:**
+   the tiles' count and bytes whole (the lead's estimate 61 tiles, 5 to 16 MB, the islands'
+   steep relief compressing badly as the Azores' did), and beside it the same written only
+   within ten miles of land with the coarse layer answering the rest (the recipe rule the
+   how-to's Azores section proposes), for the lead's choice. Under the 40 MB rule either
+   way.
+3. **The sources, a short pass,** its report first in the tuning notes' section: what
+   `docs/references/` holds (the *Oriental Navigator* of 1801, which `features/madeira.yaml`
+   cites for "Madeira, the Canaries"; Norie; Purdy's Atlantic memoir if on file; Tofiño),
+   then the period's descriptions and plans that can be fetched (Glas 1764, Borda's survey).
+   **Everything this brief says of a place is FROM MEMORY and the builder's to check; the
+   sources win and the notes say so.**
+4. **The marks and dangers:** the Peak of Tenerife and the heights seen far off (the
+   how-to's tall-feature rule), the points, the roads, the islets and rocks the grid lacks
+   entered as features (the Salvages and their reefs above all; the Roques of Anaga and of
+   Salmor; the isle of Lobos, Graciosa, Alegranza and the Roque del Este), each from a
+   source. Lights only from a source, with their years.
+5. **The ports, by decision 67 every place the sources can support as a port file:** Santa
+   Cruz de Tenerife and its road; the port of Orotava; Las Palmas with the road of La Luz;
+   Arrecife and Naos on Lanzarote; Santa Cruz de la Palma; San Sebastián of Gomera; the
+   road of Cabras on Fuerteventura; Hierro's landing if a pilot gives one. Each in the
+   house form with its anchorage, holding and shelter by the pilots, its pilot's words, its
+   business with a price ratio where the guard asks one, `tracks:` where a point lies
+   between two, a harbour patch where the how-to gives one. **Dated as decision 67 asks:**
+   the holder as dated rows in the form Barcelona's file uses even where one nation held it
+   through the range, and whatever else is true only for some years (a mole, a battery, a
+   quarantine, a closed trade) written with its years, never as the one picture of 1805.
+   **The wars table carries no dates: no truth may depend on a war's day.**
+6. **The weather:** a box for the islands' sea with the trade wind as the pilots give it by
+   season, and what they say of the calms to leeward of the high islands if the weather's
+   form can carry it (if not, said for the lead); a box, or the notes' word on which box
+   answers, for the rest of the ocean the first step opened, so that Madeira's box does
+   not answer down to 12 N by default.
+7. **The streams and the tide:** the set of the Canary current as a stream area if a
+   source on file gives its direction and rate; the tide by package 104's ruling for a
+   block with no gauge of its own, or Funchal's if it reaches, said plainly, and the
+   establishments the pilots give for the ports.
+8. **One scenario** a player can load on the new water (the lead suggests a frigate from
+   Funchal to look into Santa Cruz's road), and **truths 7-520 to 7-529:** the ocean answers
+   from Madeira to 13 N and a scenario may start there; the older coarse layer's tiles as
+   they were, or what moved; the islands' channels sailed on charted water; the Peak seen
+   at the distance its height gives in the clearest weather; each port's road as its pilot
+   has it; the Salvages where the pilots put them and a ship grounding on their reef.
+9. **The how-to brought up to date** (a second coarse layer or the widening as done; the
+   near-land rule if taken; what the islands' relief cost), and the records.
+
+**The rules of every package, in force:** no model or vendor identifier in any file of the
+repository; nothing under `docs/agents/consent/` nor `docs/agents/ConsentBrief.md` touched;
+downloads are data, never run, each fetched source laid under `docs/references/` with its
+README row and its licence read, no modern book's text copied; no key in the repository, a
+save or a log, and no call to any paid service; the builder works on `claude/pkg-106a` cut
+from the trunk, never pushes to or rebases the trunk, never force-pushes; no test skipped,
+disabled or weakened; a pin moves only where the package moved it, old beside new, with the
+reason in the tuning notes; no ship file and no physics touched; a figure or a date not read
+from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is the world's
+(package 85's rule). The package reports one hash measured in a pinned worktree (ruff check
+and format; the fast tier whole; the slow tier of the touched files and of the known truths
+with the recorded passages by name; the pace alone and last), and the lead merges by that
+hash.
+
+## Package 105: Sicily and Malta (one region, working name `sicily`, or two if it measures past the rule; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index, manifest entry, features and overrides; `freesail/world/ports.py` the dated rows, step 1 alone; `data/ports/*.yaml` new; `data/nations.yaml` the Order of St John and the ports' index; `data/tides/` the gauges, the Faro's stream and `book_limits`; `data/weather/climatology.yaml`; the tests that name every region and the chart's limits)
+
+**BRIEFED 2026-11-11 for the owner's final approval; not launched; it launches when package
+104 is merged** (it meets 104's `tunis-coast` at its east edge). Opus. Booked by the owner on
+2026-11-11 ("Sicily and Malta shall be another package") on the finding of 104's
+measurement. Three steps, each at one hash. Built as `docs/dev/ChartBlocks.md` says (read it
+whole first, with the sections of 79c, 79d, 101 and 104), under decisions 66 and 67.
+
+**What the lead measured (2026-11-11), for the builder to check:** level-2 tiles answer
+only north of 38.42667 N and west of 15.84 E. **No part of Sicily is on the chart:**
+Palermo, Trapani, Milazzo, Messina and the Faro, Reggio and Scilla, Syracuse, Malta, all
+answer nothing; `features/tyrrhenian.yaml` says so in its own words ("Not here: Sicily, the
+Lipari islands and the Strait of Messina, a later block"), and no port file lies south of
+Cagliari. Of the Lipari islands, Alicudi, Filicudi, Salina, Panarea and Stromboli are in
+`tyrrhenian`'s tiles and bounds; Lipari's town (38.47 N) has tiles and lies in no region's
+bounds; Vulcano has no tile. Ustica is `tyrrhenian`'s. Calabria is charted only north of
+38.427 N and west of 15.84 E, and from 15.5 E to 15.84 E north of 38.5 N (Capo Vaticano,
+Tropea, the Gulf of Sant'Eufemia) the tiles answer and no region owns the water. The
+chart's east limit is 15.5 E, asserted in `tests/test_chart.py` and read by the scenario's
+refusal, the harbour page, the business and the whole-chart picture. No weather box and no
+tide gauge lies in the block: **the tide there today is the Atlantic's by default, 2.25 m
+of M2 at Messina and 3.68 m at Palermo and Valletta.** The nations' table has Naples and no
+Order of St John, and its wars are the picture of June 1805 without end dates.
+
+**The region proposed:** 35.01334 N to 38.5 N, 11.1466 E to 16.69332 E (a hair inside the
+tile edges, as 104 found needful): all Sicily with the Egadi, Lipari and Vulcano,
+Pantelleria, Linosa and Lampedusa with sea room south of her, Malta and Gozo, the Strait
+and Calabria's toe round to Cape Spartivento. It meets `tunis-coast` at 11.1466 E and
+`tyrrhenian` at 38.5 N (whose tile row at 38.42667 N stays its own by the seam rule). **109
+new level-2 tiles, 20 to 24 MB by the neighbours' sizes, and some 7 MB of harbour patches:
+under the 40 MB rule as one region by the estimate; if it measures past it, two regions
+split at the tile edge 14.1333 E** (western Sicily and the channel; eastern Sicily, the
+Strait and Malta).
+
+1. **The port file's dated rows, the least that Malta and Messina ask** (this step alone
+   touches the engine; its own hash, before any port is written). Today only a port's
+   holder can be dated (`nation:` as rows of `{nation, since, until, source}`, read by
+   `ports._dated_nation`); its `state`, `dockyard`, `closed_to`, `market`, `crew_pool` and
+   `pilot` cannot, so Valletta cannot become a dockyard in 1800 nor Messina take a British
+   garrison in 1806. Give those keys the same form: a key may be one value as today, or
+   rows each with its `since` and `until` and its source, the row in force on the world's
+   day read wherever the key is read. **Every port file on the trunk loads and answers
+   exactly as it did** (none is rewritten here; proven over all of them on their scenarios'
+   days), and the house form is written down in the how-to for every block after this one.
+   If a key cannot take the form without a wider change, stop on that key and report.
+2. **The region built, with Malta, eastern Sicily and the Strait.** A short measurement
+   report to the lead before any tile is committed (the seams against `tunis-coast` and
+   `tyrrhenian`, the tiles' count and bytes with the patches, one region or two; the
+   gauges: which of the tide source's gauges lie in the block or reach it by 104's ruling,
+   and the water level proposed; how `data/regimes.yaml` and the nations' table hold Naples
+   after February 1806, when the mainland was French and Sicily the Bourbons'). Then: the
+   sources' short pass (Smyth's survey above all, Purdy 1826 and 1840, Norie 1831, what
+   `docs/references/` holds; every word of a place in this brief is FROM MEMORY and the
+   sources win); the marks and dangers (the Faro's point, Scylla's rock, the Formiche and
+   the Porcelli, the Adventure bank if the pilots of the period had it, Cape Passaro and
+   its island; **no Graham's shoal, which rose in 1831**); the chart's east limit moved
+   with its tests; **the Faro's stream** as a stream area in the form the Strait of
+   Gibraltar's has, its axis, rates and hours from the pilots, the eddies it cannot carry
+   said plainly; a weather box from the pilots' tables; the Order of St John added to the
+   nations as the sources give it; and the ports: **Valletta with the Grand Harbour and
+   Marsamxett, Marsaxlokk, St Paul's Bay, Gozo's landing; Syracuse, Augusta, Catania,
+   Messina, Milazzo; Reggio and Scilla.** Each dated as step 1 allows: Malta the Order's
+   to June 1798, the French to September 1800, Britain's after; Valletta's yard from the
+   year the sources give; Messina's and Scilla's garrisons; the mainland shore French from
+   1806 to 1815. **The wars table carries no dates: no truth may depend on a war's day.**
+3. **Western Sicily, the south coast and the islands:** Palermo, Trapani with Favignana
+   and Marettimo, Marsala, Sciacca, Girgenti's marina, Licata, Terranova, Cape Passaro's
+   anchorage; Lipari, Pantelleria, Lampedusa; Cefalù and Termini if the pilots support
+   them; Ustica as a port in `tyrrhenian`'s features alone. With it one scenario on the
+   new water (the lead suggests a frigate from Valletta through the Faro to Palermo), the
+   sliver of unowned water off Calabria closed if the how-to gives a road that moves no
+   tile of `tyrrhenian`'s (else said in the notes), the how-to brought up to date, and the
+   records.
+
+**Truths 7-530 to 7-539,** drafted with each step: every older port answers on its day as
+before the dated rows; Valletta is the Order's, France's and Britain's on three days and a
+dockyard only after its year; the seams hold no gap and no overlap; a ship sails from
+Naples through the Faro to Valletta and from Tunis to Palermo on charted water; the Faro's
+stream turns and runs at the pilots' rates; the tide at Palermo, Messina and Valletta is
+the Mediterranean's; each port's road as its pilot has it.
+
+**The rules of every package, in force:** no model or vendor identifier in any file of the
+repository; nothing under `docs/agents/consent/` nor `docs/agents/ConsentBrief.md` touched;
+downloads are data, never run, each fetched source laid under `docs/references/` with its
+README row and its licence read, no modern book's text copied; no key in the repository, a
+save or a log, and no call to any paid service; the builder works on `claude/pkg-105` cut
+from the trunk, never pushes to or rebases the trunk, never force-pushes; no test skipped,
+disabled or weakened; a pin moves only where the package moved it, old beside new, with the
+reason in the tuning notes; no ship file and no physics touched; a figure or a date not read
+from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is the world's
+(package 85's rule). Each step reports one hash measured in a pinned worktree (ruff check
+and format; the fast tier whole; the slow tier of the touched files and of the known truths
+with the recorded passages by name; the pace alone and last), and the lead merges by that
+hash.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 

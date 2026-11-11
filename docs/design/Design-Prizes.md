@@ -24,8 +24,9 @@ without a commission a pirate, prisoners victualled at two thirds, their lists t
 Prisoners, the parole), ch. IV (head money: the sentence of condemnation under the court's seal,
 the certificate of the men aboard at the beginning of the engagement, the agent's letter of
 attorney, paid though she be sunk or burnt), Sect. XIII ch. I art. VI (lieutenants of marines
-share in prizes with the warrant officers), and the Captain's art. XXXI (a prize purchased for
-the service: three fourths of the appraised value paid to the captors' agents, a fourth reserved);
+share in prizes with the warrant officers), and the Flag Officers' art. XXXI (the Commander in
+Chief's; a prize purchased for the service: three fourths of the appraised value paid to the
+captors' agents, a fourth reserved);
 Falconer 1780, ENGAGEMENT ("the defeated ship having acknowledged the victory by striking her
 colours is immediately taken possession of by the conqueror, who secures her officers and crew as
 prisoners in his own ship, and invests his principal officer with the command of the prize until a
@@ -721,8 +722,9 @@ the court's whim is a plausible cause), and the captain reads `the prize` and `t
 (`head_money_pounds` 5 a head of the men aboard her at the beginning of the engagement, the record's
 `men_at_start`: the Regulations ch. IV's certificate, on file; the five pounds the Prize Acts'
 figure FROM MEMORY, UNVERIFIED; paid though she was burnt, art. V), **three fourths now and a fourth
-reserved** where the prize is purchased for the service (the Captain's art. XXXI, on file: a King's
-ship's prize of war that the yard takes; the fourth comes with a later sentence of the court,
+reserved** where the prize is purchased for the service (the Flag Officers' art. XXXI, the
+Commander in Chief's, on file: a King's ship's prize of war that the yard takes; the fourth comes
+with a later sentence of the court,
 `court_days` more, as a second job: the owner may turn it off by `purchase_for_the_service:
 false`), the whole into the **captor's purse** by `Purse.receive(sum, by="the court", words=...)`
 with the account's lines (the valuation, the cargo good by good, the prize goods, the head money,
@@ -1303,3 +1305,45 @@ people cannot know); the reserved fourth is paid by the record's day from the pr
 second port job; the salvage is paid to the recaptors alone by their nation's court and scheme, the
 enemy's consorts in sight at the first strike sharing nothing of it. The figures and the finds are
 in `docs/dev/TuningNotes.md`, "Package 74", step 5.
+
+### Step 6: the court martial, a new command, and the consent revision drafted (§6, §7; 2026-11-07)
+
+**Built as designed**: §7.1 and §7.2 (`world/court.py`: the court sat by the form at a place of
+the port made for the sitting, the accused before it, the president and the judge advocate found
+there; the questions through `say as` heard at the place; the accused's own `say to the court:
+...`; the log of the action read by the judge advocate; the verdict one of `VERDICTS`, a world
+order journaled as every form is, the play log carrying the sentence read and never the order;
+`Person.record` kept in the save, read as `the record`; the copy of it he carries into a new
+command **a thing with words** in his keeping (package 100's letter, made by the scenario's
+`things:`; the lead's word of 2026-11-10: a paper given to an officer is a thing with words by
+that road and no kind of its own), where the design had a paper of the ship's, "the captain's
+record", so that no ship's papers move;
+`command: a new command for <person>: the <description> "<name>" at <port>` writing a scenario
+under the saves by 96's writer with his name, his followers and the record, the hooks named for
+M8), §6 (`docs/design/ConsentRevision-AdversarialSeats.md`, the text in the brief's voice and
+sections for the three roles, with a paragraph for the owner; the flag `seats.ADVERSARIAL_SEATS_
+CONSENTED` and the refusal in words at the director's seat and the desk's door, adversarial read
+from the world at the seating, the captain's station alone; nothing under `docs/agents/consent/`
+or in `docs/agents/ConsentBrief.md` touched; the suite's seats audited: none adversarial); truths
+7-364 to 7-366; the primer's chapter 27 "The court martial, and a new command"; the forms in the
+director's table and chapter 20. **Taken another way**: the accused speaks through a verb of the
+prize orders (the court is no station); the court's officers are persons of the sitting, gone at
+the verdict; the brief's `limits:` row for the verdict is not built; the exchange is a `person:`
+form of its own (`is exchanged at <port>`), doubted within a day of his landing; a scenario may
+name the player's ship (`ship.name`, honoured by the loader, nothing recorded moved). **Found on
+the way**: the player's own ship's captain is her prize master after the taking, so the freed
+player's prompt wanted a memory of who he is (`captive.PLAYERS_PERSON_KEY`); his nation for the
+court is his lost ship's, not his prize's colours; the dry run of a form that writes a file wrote
+it (the copy is marked, the form says what it would write). The figures and the finds are in
+`docs/dev/TuningNotes.md`, "Package 74", step 6.
+
+**The lead's review of the step (2026-11-10), mended in its tree**: the new command's file is
+named by its name alone (`saves/<name>`) in the log, the data, the record and the director's
+reply, a replay writes nothing, and a name that would write over another's file is refused; the
+served line is the appointment in the service's words, said ashore at the port, as the exchange
+is; a court whose accused is dead or gone is dissolved in words, and at its rising everyone at
+its place goes to the quay; its officers are of no ship's company; "the captain of the <ship>"
+is the man who commanded her; the mark of the player's person is cleared when he is his own
+ship's captain again; the adversarial seat's refusal comes before any consent record is read and
+is the live door's alone (a replay repeats the journal). Each finding old beside new in the
+tuning notes, "Step 6's mends from the lead's review".
