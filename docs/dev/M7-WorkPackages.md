@@ -7137,6 +7137,44 @@ and then the steps in order; nothing of it starts while 74 is open. **Rules:** t
 ones; every save and checkpoint from before loads and replays as it did (the kept saves are the
 proof); no pin moved but old beside new with its proof.
 
+**The build, as launched (the owner, 2026-11-10: "60's build may launch at 74's close, and I
+would recommend using the same session that made the plan ... as the context of that session
+is already primed from building the plan").** The builder is the session that wrote
+`docs/design/Design-ShipBought.md`, on `claude/pkg-60`, the trunk merged into it by a merge
+commit first. **What it builds:** the note's §10, its steps in their order, **each reported
+at one hash and merged by the lead before the next is reported** (work ahead on the next
+while waiting); the note's §13 is the gate and binds: the owner's five answers (the purse
+stays the ship's until milestone 8; the books and instruments stay with the hull; the
+director's word is the only road for a King's officer or an owner's captain; an owner may
+keep his old ship working under her mate; in a merchant scenario that names no owner the
+player is her owner), the lead's rulings and two additions. **Step 1 mends the fault of the
+note's §9.2 by the owner's word** (under `--ship` the followed ship's far body is never
+brought to her truth: the lead measured 0.0 m at tick 61, 933.8 m at 361 and 3,803.4 m at
+1,261 with `tests/test_aboard_another.aboard_x`), with its own truth. Package 74 is closed
+and left general for this package `prize_court.valuation(world, vessel)`, `prizes.remuster`
+and `_station_follows`; a new command after a court martial (`freesail/world/court.py`) and
+a prize master's seat are the two earlier changes of the player's ship, and the one act of
+the note must be the act those would use. **How it works and reports:** lint with `ruff
+check .` and `ruff format --check .`; the fast tier `python3 -m pytest -n 4 -q -p
+no:cacheprovider` (over an hour; the exit code decides), the slow tier of the touched files
+and of `tests/test_known_truths.py` (`--slow -m "not pace" -n 4`), the pace tests alone and
+last (`--slow -m pace -n 0`), each long run in the harness's background mode, one at a time;
+each step's figures in `docs/dev/TuningNotes.md` under "## Package 60: a ship bought
+(2026-11-11)", committed on the measured hash; the trunk merged by a merge commit before
+each measure (appends at the ends of `tests/test_known_truths.py` and the tuning notes: keep
+both, the trunk's first). Reports go to the lead by a one-shot trigger as before, **under
+600 words** (the detail in the notes): the hash; what was built against the note; what was
+taken another way; every pin moved, old beside new, with its proof (none is expected: every
+save and checkpoint from before loads and replays as it did, the kept saves the proof);
+what was found for others; the suites with their exit codes. **The rules of every package
+bind:** no model or vendor identifier in any file; nothing under `docs/agents/consent/` nor
+`docs/agents/ConsentBrief.md`; no key and no paid call; never push to or rebase the trunk or
+another session's branch, never force-push; no test skipped, disabled or weakened; physics
+read, not changed; ship files only through `tools/gen_ships.py`; truths pin states, counts
+and bands, not digests; served text is the world's (the director's own words never reach a
+line or a reading the player is served: the lead found two such in package 74 at its
+close); a figure or a date not read from a source marked FROM MEMORY or JUDGEMENT.
+
 ## Package 101: the Catalan coast block (`catalan-coast`; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index and manifest entry, `features/catalan-coast.yaml`, `overrides/catalan-coast/`; `features/gulf-of-lion.yaml` and `features/mediterranean-west.yaml` with their indexes only for the four ports beside the block, by the how-to's road for a mark added; `data/ports/*.yaml` seven new; `data/nations.yaml` the ports' index and their dated states; `data/tides/constituents.yaml`, `streams.yaml`, `establishments.yaml`; `data/weather/climatology.yaml` the coast's box; `data/business.yaml` only where a port's market needs a good; `data/scenarios/tarragona.yaml` new; `docs/references/README.md`; `docs/dev/ChartBlocks.md` where the how-to proves wrong; `docs/TechnicalSpec-M7.md` §28's pointer as built; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_ports.py`, `test_tide.py`, `test_weather.py`, `test_scenarios.py`, `test_known_truths.py` truths 7-490 to 7-499)
 
 Opus. The gap in the chart on the eastern Iberian coast (the owner, 2026-11-10: "a very
