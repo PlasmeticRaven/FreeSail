@@ -110,6 +110,9 @@ class Scenario:
     ship_y: float = 0.0
     ship_heading_deg: float = 0.0
     ship_speed_kn: float = 0.0
+    # her name where the scenario gives one other than her file's (package 74, step 6: a
+    # new command's scenario names the ship the service gave him); None keeps the file's
+    ship_name: str | None = None
     # The sun's latitude (spec M4 §5): 50 N, the Channel. Saved and restored with the rest;
     # a save from before the sun loads with the default.
     latitude_deg: float = DEFAULT_LATITUDE_DEG
@@ -2435,6 +2438,13 @@ class World:
             from freesail.world.prizes import minute as prize_minute
 
             prize_minute(self.own)
+            if self.is_followed and self.__dict__.get("court_martial"):
+                # a court martial sitting (package 74, step 6): dissolved in words where
+                # its accused is dead or gone from the world; a shared part of the tick, run
+                # for the followed hull alone, whose log has the court's other lines
+                from freesail.world.court import minute as court_minute
+
+                court_minute(self)
             # the fishery once a minute (package 56): the gear in the water fishing, the
             # catch's spoilage and its day line; nothing on a ship with no gear
             fishery = getattr(self, "fishery", None)

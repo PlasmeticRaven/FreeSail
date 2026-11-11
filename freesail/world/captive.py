@@ -185,13 +185,45 @@ def captive_of(world: Any) -> dict[str, Any] | None:
     return rec if isinstance(rec, dict) and rec else None
 
 
-def captive_person(world: Any) -> Any:
-    """The player's person while he is a captive, found in the one registry by his id and
-    his home; None when he is free or cannot be found."""
-    rec = captive_of(world)
-    if rec is None:
-        return None
+PLAYERS_PERSON_KEY = "players_person"  # the root's memory of who the player's person is
+
+
+def remembered_person(world: Any) -> Any:
+    """The player's person as the taking remembered him (his id and his home), found in the
+    one registry: the marker outlives the captive's record, so that the man exchanged and
+    ashore is still the prompt's person while his own ship has a prize master for her
+    captain (package 74, step 6). **The mark stands only while it is needed**: where he is
+    his own ship's captain again (she is retaken, the swap back made), it is past and None
+    is answered, the seat and the model at her captain's station read as they were before
+    the taking; `settle_person` clears it then. None where nothing is remembered or he is
+    dead."""
     root = _root(world)
+    rec = root.__dict__.get(PLAYERS_PERSON_KEY)
+    if not isinstance(rec, dict) or not rec:
+        return None
+    person = _find_person(root, rec)
+    if person is None:
+        return None
+    home = _hull_of(root, rec.get("home"))
+    if home is not None and _captain_of(home) is person:
+        return None
+    return person
+
+
+def settle_person(world: Any) -> None:
+    """The mark of the player's person cleared where he is his own ship's captain again
+    (called at the retaking, `prizes.retake`); a new command is another world and has none."""
+    root = _root(world)
+    rec = root.__dict__.get(PLAYERS_PERSON_KEY)
+    if not isinstance(rec, dict) or not rec:
+        return
+    person = _find_person(root, rec)
+    home = _hull_of(root, rec.get("home"))
+    if person is None or (home is not None and _captain_of(home) is person):
+        root.__dict__.pop(PLAYERS_PERSON_KEY, None)
+
+
+def _find_person(root: Any, rec: dict[str, Any]) -> Any:
     registry = getattr(root, "registry", None)
     if registry is None:
         return None
@@ -201,6 +233,15 @@ def captive_person(world: Any) -> Any:
             if p.id == pid and p.name == rec.get("person") and not getattr(p, "dead", False):
                 return p
     return None
+
+
+def captive_person(world: Any) -> Any:
+    """The player's person while he is a captive, found in the one registry by his id and
+    his home; None when he is free or cannot be found."""
+    rec = captive_of(world)
+    if rec is None:
+        return None
+    return _find_person(_root(world), rec)
 
 
 def is_captive(person: Any) -> bool:
@@ -320,6 +361,11 @@ def player_taken(
         "captor": str(captor_hull.id),
         "since": tick,
         "sword": sword.id if sword is not None else "",
+    }
+    root.__dict__[PLAYERS_PERSON_KEY] = {
+        "person": person.name,
+        "id": person.id,
+        "home": str(prize_hull.id),
     }
     record["captive"] = person.name
     who = f"{person.name}, {_role_words(person)} the {prize_hull.ship.name},"
