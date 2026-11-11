@@ -26295,6 +26295,14 @@ passed, 9 xfailed: no pin and no digest of a recorded passage moved; the pace al
 
 ## Package 102: the signals seen and the ship dressed (2026-11-11)
 
+**Where I stand (2026-11-11, 02:20 UTC).** Steps 0 and 1 are measured at 5142098 (the trunk
+merged at b9b925a); the fast tier's first run there failed only on the server's tests for want
+of the `fastapi` package in the container (installed mid-run; those files re-run clean), and is
+being run again whole before step 0/1's report. Steps 2 to 5 are built and pushed above it
+(every signal flag drawn; the hoist's place and the player's hoists drawn; `dress ship`; the
+nations' days), each step's tests passing alone, not yet measured; the salute and `splice the
+main brace` are stopped and said in step 5's paragraph below.
+
 **Step 0: the sources' pass.** Read on the page (the five new rows of
 `docs/references/README.md`, "Package 102"; every file data, never run; nothing of a modern
 book in copyright copied). Every figure, date or practice below not read from a source is
