@@ -15683,3 +15683,13 @@ def test_truth_7_500_every_colours_drawing_is_served_and_drawn_as_before_the_pac
     a()
     if shutil.which("node"):
         b(tmp_path)
+
+
+@pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
+def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
+    """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
+    its book.yaml declares, has a drawing in its flags.yaml (or basic's), marked `plate` or
+    `made` with its source; Britain's numerals by the year from Perrin's Plate XIII."""
+    from tests.test_flag_drawings import test_every_flag_a_hoist_can_hold_has_a_drawing as c
+
+    c(root)

@@ -548,6 +548,25 @@ occasions:                       # what flies where, by occasion and role
   may have a `shape`, `swallowtail` (with its `cut`) or `triangle`, served under
   `drawing.shape`; each key only where the flag has one, so that every drawing from before is
   served and drawn as it was (truth 7-500, `tests/test_flag_drawings.py`).
+- **The signal flags drawn (package 102, step 2).** Each root has an eighth file,
+  `flags.yaml`: every flag a hoist of its books can hold, by the name the hoist holds it
+  (`flags.hoist_flags`: `numeral 1` to `numeral 0`, `substitute`, `hundred pendant`,
+  `telegraph flag`, `answering pendant`, `table flag 1` to `table flag 20`, `universal flag`,
+  the cornets, guidons and pendants by number, the private tables' plain flags by their
+  words), each with its words, its drawing in the colours' form, its `kind` (`flag` or
+  `pendant`), its `dates` (a flag drawn otherwise in another year another row of the same
+  name; a year outside every row answered by the nearest, decision 66), its `mark`, `plate`
+  where drawn from a page image and `made` where it is the builder's own, and its source by
+  leaf; `same:` names a flag of the root's colours.yaml whose drawing it is. The private
+  tables' plain flags are drawn once in basic's file and read by every root after its own.
+  Britain's numerals are four dated sets read from Perrin's Plate XIII; France's flags
+  Audibert's plate of 1802; Naples's the 1807 plate; Spain's, the United States' and basic's
+  made. A hoist's flags, uppermost first: the first written figure uppermost (the 1796 book;
+  Barry's units uppermost), a figure again the substitute, 111 the hundred pendant over 1 and
+  the substitute; a table book's two flags a number, the universal flag for the lower where it
+  would repeat the upper, Spain's signals of one flag alone; Popham's word under the telegraph
+  flag; the answer the answering pendant; a private signal its flag. `tools/check_signals.py`
+  checks that every flag a hoist can hold is drawn (truth 7-501).
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
   two ensigns at the peak), for 74's prize when the lead rules it.
 
