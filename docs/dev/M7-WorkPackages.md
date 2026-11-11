@@ -88,8 +88,8 @@ on these packages; that is the owner's choice.
 | 102 | Opus | **The signals seen and the ship dressed** (the owner, 2026-11-10, at the hundredth package: "being able to dress the ship overall and see it in the viewer", which "comes with being able to see the signals in the viewer properly"): (1) every signal flag of each nation's book given a drawing, as the colours have (today a signal flag is a number and words: no flag of any book has a drawing); (2) a hoist flying drawn in the viewer where it flies, on the player's ship and on others, **served only within the distance at which the flags are made out** (the book's `read_nm`), so that the picture tells no more than the eye could; (3) `dress ship` and `undress ship`, **in the fashion of the day, researched** (the owner and the lead both take the line of signal flags from masthead to masthead for a later fashion; the period's dressing with ensigns, jacks and flags at the mastheads and yardarms to be found in the sources and drawn as found, a later style under its own date if the sources give one); (4) the nations' days in data (the King's birthday and the like, each sourced), on which a nation's ships in harbour dress of themselves and fire the salute the day asks, so that the player may find a fleet dressed without knowing the order; (5) with it, if small, the extra issue on the day ("splice the main brace") | **booked 2026-11-10 at the owner's word, to come a bit later**; not briefed; a small package; the flags each ship holds are package 96's locker, which this reads and does not design; **briefed 2026-11-11 for the owner's final approval** ("## Package 102" below): five steps, truths 7-500 to 7-509; a stranger's hoist as a strip of flags beside her in the strangers' panel, the view drawing no ship but the player's; **APPROVED by the owner 2026-11-11 with the stranger's strip struck** (a later "stranger view"); launched 2026-11-11 (session_01XooV47u3eN1pgsWRkCiWJi, claude/pkg-102) |
 | 103 | Fable (the primary review agent; subagents allowed) | **The range reviewed, and the lever designed** (proposed by the lead, 2026-11-10, on decision 66 and the owner's word that the sources should be found "with further searches" and by "an analysis of our own full research database"): nothing built. (1) The same rules-only scenarios begun on three dates far from 1805 (a year of the first war, the peace of 1802, a year after 1815) and played by the probe and the replay, with a list of what reads wrong, what is missing and what refuses to work; (2) every dated row in the data found and classed: read against the running clock (a rail by decision 66) or read once at the start; (3) the research on file (`docs/references/`, the design notes' sources, the ships' references) mapped by element and by year from 1792 to 1825, the gaps named with where each might be filled; (4) a design note for the owner from the three: the modes of the lever with strict's rule, the line between period features, events and general features drawn through the data as it stands, and what it would cost to hold each kind of element across the range | proposed 2026-11-10; **briefed 2026-11-10 (below) at the owner's word, for Fable; HELD by the owner, not launched** ("there's enough things in flight right now to let close out, and I'll sleep on it"); **the brief widened the same day at the owner's word** (Fable as the primary review agent for the date range audit and the overall design of fidelity, a wider and freer scope, subagents allowed); **consolidated with the other review and design packages (96, 92) towards the end of the order**, this one first, the three together to cover the whole range |
 | 104 | Opus | **The sea between Minorca and Sardinia** (the owner, 2026-11-10, on the lead's finding while measuring 101's gap): the chart's second hole in the western basin, the open sea east of 4.5 E (`balearics`' east bound) and south of 40.56 N (the Gulf's south bound) as far as Sardinia at 8 E (`tyrrhenian`'s west bound), and the Algerian coast east of Algiers (Bougie, Bona) with what ports it wants; a passage from Port Mahon to Cagliari crosses it and the chart answers nothing there (probed at 38 N 6 E and 40 N 6 E) | **booked 2026-11-10 at the owner's word, a chart block subsequent to 101**; not measured in full, not briefed; its bounds, its tiles' count against the 40 MB rule (it is mostly deep water) and its ports the lead's to measure and put to the owner when 101 is in; **measured and briefed 2026-11-11 for the owner's final approval and his choice of ports** ("## Package 104" below): the hole is L-shaped, its southern arm running east past Tunis and Cape Bon; two regions in one package (4.5 to 8.0 E north of 36.29 N; 8.0 to 11.15 E south of 38.5 N), some 26 to 29 MB, truths 7-510 to 7-519; **found with it and unbooked: Sicily south of 38.43 N, the Sicilian channel and Malta are off the chart**; **APPROVED by the owner 2026-11-11 with all thirteen ports as port files (decision 67)**; launched 2026-11-11 (session_01XooV49Pn562NRcnJEerNas, claude/pkg-104) |
-| 105 | Opus | **Sicily and Malta** (the owner, 2026-11-11: "Sicily and Malta shall be another package"): the chart south of 38.43 N and east of Cape Bon, found off the chart by 104's measurement: Sicily's coasts (Palermo, Trapani, Messina, Syracuse and the rest), the Sicilian channel, Pantelleria, Malta and Gozo; ports by decision 67 | booked 2026-11-11; to be measured and briefed after 104 |
-| 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build; **measured 2026-11-11** ("## Package 106 ... the measurement" below): the chart ends at 32 N and holds nothing south of Madeira; six blocks proposed (the ocean layer carried south, the Canaries, Morocco's coast, the Cape Verde Islands, Senegal and Cape Verde, the desert coast), for the owner to book; **the owner, 2026-11-11: "I pointed out Cabo Verde (the islands), as a southern stopping point, but the blocks should cover the African coast as well"**: so all six blocks are the scope, the islands and the coast down to their latitude (the Gambia, south of it, left out); each block briefed for his approval in the lead's order, the ocean layer with the Canaries first |
+| 105 | Opus | **Sicily and Malta** (the owner, 2026-11-11: "Sicily and Malta shall be another package"): the chart south of 38.43 N and east of Cape Bon, found off the chart by 104's measurement: Sicily's coasts (Palermo, Trapani, Messina, Syracuse and the rest), the Sicilian channel, Pantelleria, Malta and Gozo; ports by decision 67 | booked 2026-11-11; to be measured and briefed after 104; **measured and briefed 2026-11-11 for the owner's final approval** ("## Package 105" below): no part of Sicily is on the chart; one region of 109 tiles (35.01 to 38.5 N, 11.15 to 16.69 E), three steps, the first giving a port file dated rows for more than its holder; some two dozen ports; truths 7-530 to 7-539; launches when 104 is merged |
+| 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build; **measured 2026-11-11** ("## Package 106 ... the measurement" below): the chart ends at 32 N and holds nothing south of Madeira; six blocks proposed (the ocean layer carried south, the Canaries, Morocco's coast, the Cape Verde Islands, Senegal and Cape Verde, the desert coast), for the owner to book; **the owner, 2026-11-11: "I pointed out Cabo Verde (the islands), as a southern stopping point, but the blocks should cover the African coast as well"**: so all six blocks are the scope, the islands and the coast down to their latitude (the Gambia, south of it, left out); each block briefed for his approval in the lead's order, the ocean layer with the Canaries first; **106a (the ocean carried south, and the Canaries with the Salvages) briefed 2026-11-11 for the owner's final approval** ("## Package 106a" below), truths 7-520 to 7-529 |
 | 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it; **surveyed 2026-11-11** ("## Package 107 ... the survey" below): 77 port files, about 240 places with a feature and no port file, ten passes proposed (Brest and the Western Approaches first), and a short step before them to settle the port file's dated form; **not yet, by the owner (2026-11-11): "We don't need to run 107 yet, as we'll continue expanding before we do refinement passes"**; the port file's dated form is asked of the new blocks' briefs meanwhile |
 | backlog (the stranger's view) | none | **A ship view of another vessel in sight** (the owner, 2026-11-11, striking the strip from 102): "a later 'stranger view' or 'enemy view' (maybe a small popout) that shows a ship view of a requested vessel that is in sight", her colours and hoists on it; under the knowledge rule, so beside or after package 99 | on the backlog, unbooked |
 
@@ -7997,6 +7997,101 @@ disabled or weakened; a pin moves only where the package moved it, old beside ne
 reason in the tuning notes; no ship file and no physics touched; a figure or a date not read
 from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is the world's
 (package 85's rule). The package reports one hash measured in a pinned worktree (ruff check
+and format; the fast tier whole; the slow tier of the touched files and of the known truths
+with the recorded passages by name; the pace alone and last), and the lead merges by that
+hash.
+
+## Package 105: Sicily and Malta (one region, working name `sicily`, or two if it measures past the rule; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index, manifest entry, features and overrides; `freesail/world/ports.py` the dated rows, step 1 alone; `data/ports/*.yaml` new; `data/nations.yaml` the Order of St John and the ports' index; `data/tides/` the gauges, the Faro's stream and `book_limits`; `data/weather/climatology.yaml`; the tests that name every region and the chart's limits)
+
+**BRIEFED 2026-11-11 for the owner's final approval; not launched; it launches when package
+104 is merged** (it meets 104's `tunis-coast` at its east edge). Opus. Booked by the owner on
+2026-11-11 ("Sicily and Malta shall be another package") on the finding of 104's
+measurement. Three steps, each at one hash. Built as `docs/dev/ChartBlocks.md` says (read it
+whole first, with the sections of 79c, 79d, 101 and 104), under decisions 66 and 67.
+
+**What the lead measured (2026-11-11), for the builder to check:** level-2 tiles answer
+only north of 38.42667 N and west of 15.84 E. **No part of Sicily is on the chart:**
+Palermo, Trapani, Milazzo, Messina and the Faro, Reggio and Scilla, Syracuse, Malta, all
+answer nothing; `features/tyrrhenian.yaml` says so in its own words ("Not here: Sicily, the
+Lipari islands and the Strait of Messina, a later block"), and no port file lies south of
+Cagliari. Of the Lipari islands, Alicudi, Filicudi, Salina, Panarea and Stromboli are in
+`tyrrhenian`'s tiles and bounds; Lipari's town (38.47 N) has tiles and lies in no region's
+bounds; Vulcano has no tile. Ustica is `tyrrhenian`'s. Calabria is charted only north of
+38.427 N and west of 15.84 E, and from 15.5 E to 15.84 E north of 38.5 N (Capo Vaticano,
+Tropea, the Gulf of Sant'Eufemia) the tiles answer and no region owns the water. The
+chart's east limit is 15.5 E, asserted in `tests/test_chart.py` and read by the scenario's
+refusal, the harbour page, the business and the whole-chart picture. No weather box and no
+tide gauge lies in the block: **the tide there today is the Atlantic's by default, 2.25 m
+of M2 at Messina and 3.68 m at Palermo and Valletta.** The nations' table has Naples and no
+Order of St John, and its wars are the picture of June 1805 without end dates.
+
+**The region proposed:** 35.01334 N to 38.5 N, 11.1466 E to 16.69332 E (a hair inside the
+tile edges, as 104 found needful): all Sicily with the Egadi, Lipari and Vulcano,
+Pantelleria, Linosa and Lampedusa with sea room south of her, Malta and Gozo, the Strait
+and Calabria's toe round to Cape Spartivento. It meets `tunis-coast` at 11.1466 E and
+`tyrrhenian` at 38.5 N (whose tile row at 38.42667 N stays its own by the seam rule). **109
+new level-2 tiles, 20 to 24 MB by the neighbours' sizes, and some 7 MB of harbour patches:
+under the 40 MB rule as one region by the estimate; if it measures past it, two regions
+split at the tile edge 14.1333 E** (western Sicily and the channel; eastern Sicily, the
+Strait and Malta).
+
+1. **The port file's dated rows, the least that Malta and Messina ask** (this step alone
+   touches the engine; its own hash, before any port is written). Today only a port's
+   holder can be dated (`nation:` as rows of `{nation, since, until, source}`, read by
+   `ports._dated_nation`); its `state`, `dockyard`, `closed_to`, `market`, `crew_pool` and
+   `pilot` cannot, so Valletta cannot become a dockyard in 1800 nor Messina take a British
+   garrison in 1806. Give those keys the same form: a key may be one value as today, or
+   rows each with its `since` and `until` and its source, the row in force on the world's
+   day read wherever the key is read. **Every port file on the trunk loads and answers
+   exactly as it did** (none is rewritten here; proven over all of them on their scenarios'
+   days), and the house form is written down in the how-to for every block after this one.
+   If a key cannot take the form without a wider change, stop on that key and report.
+2. **The region built, with Malta, eastern Sicily and the Strait.** A short measurement
+   report to the lead before any tile is committed (the seams against `tunis-coast` and
+   `tyrrhenian`, the tiles' count and bytes with the patches, one region or two; the
+   gauges: which of the tide source's gauges lie in the block or reach it by 104's ruling,
+   and the water level proposed; how `data/regimes.yaml` and the nations' table hold Naples
+   after February 1806, when the mainland was French and Sicily the Bourbons'). Then: the
+   sources' short pass (Smyth's survey above all, Purdy 1826 and 1840, Norie 1831, what
+   `docs/references/` holds; every word of a place in this brief is FROM MEMORY and the
+   sources win); the marks and dangers (the Faro's point, Scylla's rock, the Formiche and
+   the Porcelli, the Adventure bank if the pilots of the period had it, Cape Passaro and
+   its island; **no Graham's shoal, which rose in 1831**); the chart's east limit moved
+   with its tests; **the Faro's stream** as a stream area in the form the Strait of
+   Gibraltar's has, its axis, rates and hours from the pilots, the eddies it cannot carry
+   said plainly; a weather box from the pilots' tables; the Order of St John added to the
+   nations as the sources give it; and the ports: **Valletta with the Grand Harbour and
+   Marsamxett, Marsaxlokk, St Paul's Bay, Gozo's landing; Syracuse, Augusta, Catania,
+   Messina, Milazzo; Reggio and Scilla.** Each dated as step 1 allows: Malta the Order's
+   to June 1798, the French to September 1800, Britain's after; Valletta's yard from the
+   year the sources give; Messina's and Scilla's garrisons; the mainland shore French from
+   1806 to 1815. **The wars table carries no dates: no truth may depend on a war's day.**
+3. **Western Sicily, the south coast and the islands:** Palermo, Trapani with Favignana
+   and Marettimo, Marsala, Sciacca, Girgenti's marina, Licata, Terranova, Cape Passaro's
+   anchorage; Lipari, Pantelleria, Lampedusa; Cefalù and Termini if the pilots support
+   them; Ustica as a port in `tyrrhenian`'s features alone. With it one scenario on the
+   new water (the lead suggests a frigate from Valletta through the Faro to Palermo), the
+   sliver of unowned water off Calabria closed if the how-to gives a road that moves no
+   tile of `tyrrhenian`'s (else said in the notes), the how-to brought up to date, and the
+   records.
+
+**Truths 7-530 to 7-539,** drafted with each step: every older port answers on its day as
+before the dated rows; Valletta is the Order's, France's and Britain's on three days and a
+dockyard only after its year; the seams hold no gap and no overlap; a ship sails from
+Naples through the Faro to Valletta and from Tunis to Palermo on charted water; the Faro's
+stream turns and runs at the pilots' rates; the tide at Palermo, Messina and Valletta is
+the Mediterranean's; each port's road as its pilot has it.
+
+**The rules of every package, in force:** no model or vendor identifier in any file of the
+repository; nothing under `docs/agents/consent/` nor `docs/agents/ConsentBrief.md` touched;
+downloads are data, never run, each fetched source laid under `docs/references/` with its
+README row and its licence read, no modern book's text copied; no key in the repository, a
+save or a log, and no call to any paid service; the builder works on `claude/pkg-105` cut
+from the trunk, never pushes to or rebases the trunk, never force-pushes; no test skipped,
+disabled or weakened; a pin moves only where the package moved it, old beside new, with the
+reason in the tuning notes; no ship file and no physics touched; a figure or a date not read
+from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is the world's
+(package 85's rule). Each step reports one hash measured in a pinned worktree (ruff check
 and format; the fast tier whole; the slow tier of the touched files and of the known truths
 with the recorded passages by name; the pace alone and last), and the lead merges by that
 hash.
