@@ -5,17 +5,24 @@
 # and a half off (package 101's departure).
 standing order "weigh": at the anchor let go, if the distance to 39 52 N 4 19 E is under 2 miles then get under way on the larboard tack and steer S
 standing order "off the mouth": at under way, if the distance to 39 52 N 4 19 E is under 2 miles then set plain sail; shape a course for 39 45.6 N 4 25.2 E
-standing order "south-east of the Aire": when the distance to 39 45.6 N 4 25.2 E is under 1.5 miles then shape a course for 36 59 N 7 52 E
+standing order "south-east of the Aire": when the distance to 39 45.6 N 4 25.2 E is under 1.5 miles then shape a course for 37 12 N 8 00 E
 
-# Across the open sea south-south-eastward for Cape de Garde, to a mark three miles east of
-# it (Berard 1837, p. 130: low rocks a quarter cable off its east end; range it at half a
-# cable): the course shaped each hour while the mark is far and the Aire behind.
-standing order "the course for Barbary": every hour, if the distance to 39 45.6 N 4 25.2 E is over 3 miles and the distance to 36 59 N 7 52 E is over 2 miles and the distance to 36 59 N 7 52 E is under 240 miles then shape a course for 36 59 N 7 52 E
+# Across the open sea south-south-eastward for the offing of Cape de Garde, a mark fourteen
+# miles north-north-east of it and well clear: the current runs west from Cape de Fer toward
+# the cape (Berard 1837, p. 80), which looks like an island from the west (p. 130), and two
+# days' account may be leagues out (the second noon's observation moves it). The course is
+# shaped each hour while the offing is far and the mark east of the cape is not yet near
+# (package 101's lesson: every hourly course holds only while the mark beyond is far).
+standing order "the course for Barbary": every hour, if the distance to 39 45.6 N 4 25.2 E is over 3 miles and the distance to 37 12 N 8 00 E is over 3 miles and the distance to 37 12 N 8 00 E is under 240 miles and the distance to 36 58 N 7 53 E is over 10 miles then shape a course for 37 12 N 8 00 E
 
-# The gulf of Bona: she rounds Cape de Garde, closes the anchorage sounding, and anchors
-# under the Fort Genois in fourteen fathoms (Berard 1837, p. 131).
-standing order "off Cape de Garde": when the distance to 36 59 N 7 52 E is under 2 miles then shorten sail; shape a course for the anchorage of the Fort Genois
-standing order "the course for the anchorage": every 10 minutes, if the distance to the anchorage of the Fort Genois is under 6 miles and the distance to the anchorage of the Fort Genois is over 0.4 miles and the distance to 36 59 N 7 52 E is under 7 miles then shape a course for the anchorage of the Fort Genois
+# The gulf of Bona: from the offing she stands south for a mark three miles and a half east
+# of Cape de Garde (low rocks a quarter cable off its east end, Berard p. 130), the course
+# shaped every ten minutes as the bearings correct her account, then for the anchorage under
+# the Fort Genois, closing it sounding, and anchors in fourteen fathoms (Berard 1837, p. 131).
+standing order "off Cape de Garde": when the distance to 37 12 N 8 00 E is under 3 miles then shorten sail
+standing order "the course for the cape's offing": every 10 minutes, if the distance to 36 58 N 7 53 E is over 0.8 miles and the distance to 36 58 N 7 53 E is under 12 miles and the distance to 37 12 N 8 00 E is under 10 miles and the distance to the anchorage of the Fort Genois is over 3 miles then shape a course for 36 58 N 7 53 E
+standing order "round the cape": when the distance to 36 58 N 7 53 E is under 0.8 miles then shape a course for the anchorage of the Fort Genois
+standing order "the course for the anchorage": every 10 minutes, if the distance to the anchorage of the Fort Genois is under 3 miles and the distance to the anchorage of the Fort Genois is over 0.4 miles and the distance to 36 58 N 7 53 E is under 3 miles then shape a course for the anchorage of the Fort Genois
 standing order "at the anchorage": when the distance to the anchorage of the Fort Genois is under 0.4 miles then come to an anchor
 standing order "the lead off Bona": every 10 minutes, if the distance to the anchorage of the Fort Genois is under 5 miles then heave the lead
 

@@ -15899,3 +15899,36 @@ def test_truth_7_518_the_regencies_ports_and_tabarkas_and_carlofortes_dated_nati
     table = load_nations()
     assert "tunis" in table.nations and not table.enemies_of("tunis")
     assert table.nations["tunis"].adjective == "Tunisian"
+
+
+@pytest.mark.slow
+def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her_short_book():
+    """The brief's item 7: the block's scenario (`bona.yaml`, June 1805) sailed at seed 7 by
+    its short book: from off the mouth of Port Mahon round the Isla del Aire, across the seam
+    at 4.5 E and the open Sardinian sea, her landfall the high land of the Seven Capes, Mount
+    Edough and Cape de Fer, round Cape de Garde by its offing to the anchorage under the
+    Fort Genois, where she anchors on mud mixed with sand (Bérard 1837, p. 131) within two
+    days and a half (at 16:08 on the 22nd at seed 7), without touching ground."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "bona.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    regions = set()
+    for _ in range(61 * 6):
+        w.run(600)
+        regions.add(w.chart.region_at(w.position))
+        if len([e for e in w.log if e.kind == "ship.anchored"]) >= 2:
+            break
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # off Port Mahon at the start, under the Fort Genois
+    assert anchored[1].tick <= 60 * 3600
+    assert {"balearics", "sardinian-sea"} <= regions
+    _, off = bearing_and_distance(w.position, w.chart.feature("fort-genois-anchorage").position)
+    assert off < 0.6 * units.NAUTICAL_MILE
+    assert any("mud mixed with sand" in e.text for e in w.log if e.kind == "sounding")
+    seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
+    assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)

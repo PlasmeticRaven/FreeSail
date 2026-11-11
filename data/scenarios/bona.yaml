@@ -21,9 +21,10 @@
 # and printed whole, with the account against the truth, by
 #     py tools/day_log.py data/scenarios/bona.yaml --hours 44 --reckoning
 #
-# The weather is pinned (a fine June: a north-wester at fourteen knots backing westerly as
-# she crosses, a fair wind for the passage; JUDGEMENT, the summer's easterlies of the coast
-# would head her), so that the passage is the same on every machine; the sea and the motion
+# The weather is pinned (a fine June: a north-wester at fourteen knots for the crossing, a
+# fair wind, veering north and north-easterly on the last morning, the coast's summer
+# easterly (Berard 1837, p. 66: east winds from May to September), which takes her into the
+# gulf of Bona; JUDGEMENT), so that the passage is the same on every machine; the sea and the motion
 # are kept. Its figures at seed 7 are in docs/dev/TuningNotes.md (package 104), measured
 # once: not a gate's, not pinned.
 
@@ -59,9 +60,11 @@ weather:
   wind:
     - {at: 1805-06-20T04:00, from_deg: 320, knots: 14, air_mass: neutral}
     - {at: 1805-06-20T16:00, from_deg: 310, knots: 13}
-    - {at: 1805-06-21T04:00, from_deg: 290, knots: 12}
-    - {at: 1805-06-21T16:00, from_deg: 280, knots: 10}
-    - {at: 1805-06-22T04:00, from_deg: 280, knots: 8}
+    - {at: 1805-06-21T04:00, from_deg: 300, knots: 12}
+    - {at: 1805-06-21T16:00, from_deg: 320, knots: 11}
+    - {at: 1805-06-22T00:00, from_deg: 0, knots: 10}
+    - {at: 1805-06-22T08:00, from_deg: 50, knots: 10}
+    - {at: 1805-06-22T20:00, from_deg: 70, knots: 10}
   background:
     {hpa: 1016, gradient_hpa_per_100km: 0.2, high_toward_deg: 230}
   systems:
