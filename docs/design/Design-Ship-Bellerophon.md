@@ -1369,6 +1369,31 @@ hands idle at quarters beside the trimmers and the marines' division (the helm, 
 carpenter's crew and the surgeon's mates) are in the pool of any sail work there, numbered or all
 hands, as before.*
 
+*As mended at its review (2026-11-11), the rule's own words: the review read "worked first by the
+trimmers and, for the work on deck, the marines' division ... and takes from the guns ... only what its
+party wants beyond them" as binding on who works it, and it is built so, in `runner.py` (the step's
+file): an all-hands request at quarters draws on the trimmers, the marines' division, the hands the
+guns lend and any not quartered (`_quarters_pool`), the helm, the powder, the carpenter's crew and the
+surgeon's mates keeping their stations (`KEEP_THEIR_STATIONS`), at the order and as hands join; one
+short keeps the hands it has and is made up to its party from the whole crews freed (`hands.top_up`),
+the rest of a crew going back to its gun at once, and the robbed line says the hands taken. Numbered
+sail work at quarters draws on its pool as before. **Measured again**, the same world and script, the
+times the same to the second wherever the party is made up: her 118 lent (the poop's, the upper
+deck's Nos. 7 to 14 and the quarterdeck's) to her 55 trimmers and 95 marines, 237, 243 and 258 s; under
+"guns before sail" short 150 of 268, 409, 446 and 422 s (1.73, 1.84 and 1.64 times cleared). The 64's
+81 lent to her 137 trimmers; 396, 422 and 396 s short 137 of 218. The frigate-36 lends 67 to her 44
+trimmers, 334, 468 and 469 s; under "guns before sail" short 44 of 111, her crew factor 111/44, 528, 453
+and 458 s against 343, 447 and 370 cleared, so the spec's sentence holds in truth 7-136's world from
+each heading. The razee 53 (as cleared); 543, 545 and 544 s short 93 of 146. The brig 6, the cutter 3
+and the privateer schooner 6 (each as cleared); under "guns before sail" 469-471, 116-118 and 154-157
+s, short 42 of 48, 9 of 12 and 11 of 17. The hermaphrodite brig's 65 trimmers make her watch of 55:
+nothing lent and her cleared tack under either. **Truth 7-136 moved again**, old beside new in its
+docstring: 67 hands lent, exactly what her watch wants beyond her trimmers; under "guns before sail"
+short 44 of 111, the crew factor 111/44 asserted, and the tack slower than cleared asserted again, 453
+against 447 s (the band's 600 s kept above it). **Truth 7-196's crewed clause passes again** on her
+world's places as they were: her 74s at 0.08 to 3.11 miles at the ends of the timed thousands (TuningNotes,
+"Package 75, B7's review mends").*
+
 ### 6.8 The people file (B7's, hand-written data)
 
 `data/people/seventy-four.yaml` in `sixty-four.yaml`'s form: the sixteen posts in order; the drawn

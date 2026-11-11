@@ -1994,13 +1994,17 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
 
 # At the order to tack in truth 7-136's world (seed 7, 15 kn, close-hauled on the starboard tack
 # at 292.5 degrees, 04:22 ship's time: the starboard watch on deck, the idlers below), the guns
-# run out: one watch, the tack's party; the hands idle at their quarters; the hands lent under
-# `sail before guns` (measured on B7.c). Before it each lent half of every crew (175, 135 and 22
-# hands) and the tack wanted every fit hand aboard (574, 477 and 113).
+# run out: one watch, the tack's party; the trimmers and the marines' division, who work it at
+# their quarters; the hands lent under `sail before guns` (measured on B7.c as mended at its
+# review). Before B7.c each lent half of every crew (175, 135, 22 and 20 hands) and the tack
+# wanted every fit hand aboard (574, 477, 113 and 118); at B7.c before its review it drew on every
+# hand idle at quarters (196, 181, 61 and 76, the helm, the powder, the carpenter's crew and the
+# surgeon's mates among them) and lent 72, 39, none and none.
 TACK_AT_QUARTERS = {
-    SEVENTY_FOUR: (268, 196, 72),
-    SIXTY_FOUR: (218, 181, 39),
-    "data/ships/brig.yaml": (48, 61, 0),
+    SEVENTY_FOUR: (268, 150, 118),
+    SIXTY_FOUR: (218, 137, 81),
+    "data/ships/brig.yaml": (48, 42, 6),
+    "data/ships/hermaphrodite-brig.yaml": (55, 65, 0),
 }
 
 
@@ -2020,13 +2024,17 @@ def _close_hauled_at_quarters(path, priority):
 @pytest.mark.parametrize("priority", ["sail before guns", "guns before sail"])
 @pytest.mark.parametrize("path", list(TACK_AT_QUARTERS))
 def test_a_tack_at_quarters_takes_one_watch_the_guns_giving_only_the_rest(path, priority):
-    """Bel-D §6.7, B7.c: an all-hands manoeuvre at quarters is worked first by the hands idle at
-    their quarters and takes from the guns, by the robbing order of §6.4 (whole crews from the end
-    that bears least, her lower deck last), only what its party wants beyond them; its party the
-    hands the same work takes at sea in one watch. Under `guns before sail` nothing is lent and the
-    tack goes short of its party, said; where the idle hands are a watch (the brig's 61), nothing
-    is lent under either and the tack is not short."""
-    watch, idle, lent = TACK_AT_QUARTERS[path]
+    """Bel-D §6.7, B7.c as mended at its review: an all-hands manoeuvre at quarters is worked first
+    by the trimmers and, on deck, the marines' division, the helm, the powder, the carpenter's crew
+    and the surgeon's mates keeping their stations, and takes from the guns, by the robbing order of
+    §6.4 (whole crews from the end that bears least, her lower deck last), only what its party
+    wants beyond them, the rest of a crew freed going back to its gun; its party the hands the same
+    work takes at sea in one watch. Under `guns before sail` nothing is lent and the tack goes short
+    of its party, said; where the trimmers make a watch (the hermaphrodite brig's 65), nothing is
+    lent under either and the tack is not short."""
+    from freesail.evolutions.runner import KEEP_THEIR_STATIONS
+
+    watch, workers, lent = TACK_AT_QUARTERS[path]
     w = _close_hauled_at_quarters(path, priority)
     t0 = w.clock.tick
     said = w.submit("tack ship")
@@ -2034,27 +2042,32 @@ def test_a_tack_at_quarters_takes_one_watch_the_guns_giving_only_the_rest(path, 
     tack = next(i for i in w.ship.extra["evolutions"].instances if i.evo.id == "tack")
     got = tack.assignment
     assert (got.party, got.wanted) == (watch, watch)
+    stations = {s.quarters for s in got.hands}
+    assert not stations & KEEP_THEIR_STATIONS, stations
+    from_guns = sum(1 for s in got.hands if s.quarters.startswith("gun:"))
     w.run(1)  # the ship's lines reach the log at the tick
     robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
     short = [e for e in w.log if e.tick > t0 and e.kind == "evolution.short_handed"]
     if priority == "sail before guns" and lent:
-        assert [e.data["hands"] for e in robbed] == [lent], [e.text for e in robbed]
-        assert watch - idle <= lent
+        assert [e.data["hands"] for e in robbed] == [lent] == [from_guns], [e.text for e in robbed]
+        assert lent == watch - workers
         assert "half of each crew" not in robbed[0].text and "lower deck" not in robbed[0].text
         assert (got.got, got.outcome, short) == (watch, "enough", [])
-    elif idle >= watch:
-        assert (robbed, short, got.got, got.outcome) == ([], [], watch, "enough")
+    elif workers >= watch:
+        assert (robbed, short, got.got, got.outcome, from_guns) == ([], [], watch, "enough", 0)
     else:
-        assert not robbed
-        assert (got.got, got.outcome) == (idle, "short")
-        assert [(e.data["hands_got"], e.data["hands_wanted"]) for e in short] == [(idle, watch)]
+        assert not robbed and from_guns == 0
+        assert (got.got, got.outcome) == (workers, "short")
+        assert [(e.data["hands_got"], e.data["hands_wanted"]) for e in short] == [(workers, watch)]
 
 
 def test_her_tack_at_quarters_under_sail_before_guns_is_her_cleared_tack():
     """Bel-D §6.7, B7.c, measured in truth 7-136's world: cleared she tacks in 243 s; at quarters
-    under `sail before guns`, her party of one watch made up from the guns (72 hands, the poop's,
-    the upper deck's and the quarterdeck's after crews), in 243 s too, her crew factor 1.0 through
-    the tack. Before B7.c she lent half of every crew (175 hands) and took 386 s, 1.59 times."""
+    under `sail before guns`, her party of one watch, her 55 trimmers and 95 marines made up from
+    the guns (118 hands, the poop's, the upper deck's after crews and the quarterdeck's), in 243 s
+    too, her crew factor 1.0 through the tack. Before B7.c she lent half of every crew (175 hands)
+    and took 386 s, 1.59 times; at B7.c before its review she lent 72, the helm, the powder, the
+    carpenter's crew and the surgeon's mates working the tack beside them, in 243 s."""
     from tests.test_known_truths import close_hauled_on_starboard, until
 
     def tacked(w):
@@ -2524,22 +2537,25 @@ SEVENTY_FOURS_AT = ("49 55.5 N 5 12.0 W", "49 53.5 N 5 14.0 W", "49 52.5 N 5 11.
 def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
     """**A draft, for Phase 5 to move into `tests/test_known_truths.py`** (Build-Ships.md §15, row
     7-196; Bel-D §14.4): "the pace of a 74 crewed measured against the floors" (the brief, item 3).
-    Truth 88's form (tests/test_crews.py), marked `pace` by hand as truths 88 and 7-138 are, so
-    that tests/conftest.py routes it to the pace run, alone after the rest. **Its place differs
-    from truth 88's:** truth 88's frigate lies at 49 30 N 5 30 W, about thirty miles from the
-    Lizard, where 74s keeping a station off the Lizard would sail for it and pass the crewed
-    range's demotion within the measure; here the frigate lies about three miles south of it,
-    her plain sail set and then hove to (truth 88's "heave to" at the first tick is refused, no
-    sail being set: Bel-D §18 item 20), and three 74s of her file are put one to three miles from
-    her, keeping the station off the Lizard; a thousand ticks to settle, then the best of three
-    timed thousands, at the end of each the crewed ships at `CREWED_CAP` and every 74 within
-    `CREWED_NM` of her. At least `CREWED_FLOOR_TICKS_S` (60) a second on the build machine.
-    Measured on the owner's machine (seed 7, 2026-11-10): 106 ticks a second, the 74s at 0.25 to
-    3.59 miles. **Plainly:** they do not keep their places but engage her: the frigate of this
-    world carries no private signal (truth 88's world has no table aboard her), so their challenge
-    goes unanswered, and a man of war under their own colours that does not answer is an enemy by
-    the King's ship's book (world/signalling.py, package 71's rule), which fires into her; the
-    load is three crewed 74s in action, more than on their station."""
+    Truth 88's form (tests/test_crews.py), marked `pace` by hand as truths 88 and 7-138 are, so that
+    tests/conftest.py routes it to the pace run, alone after the rest. **Its place differs from
+    truth 88's:** truth 88's frigate lies at 49 30 N 5 30 W, about thirty miles from the Lizard,
+    where 74s keeping a station off the Lizard would sail for it and pass the crewed range's
+    demotion within the measure; here the frigate lies about three miles south of it, her plain sail
+    set and then hove to (truth 88's "heave to" at the first tick is refused, no sail being set:
+    Bel-D §18 item 20), and three 74s of her file are put one to three miles from her, keeping the
+    station off the Lizard; a thousand ticks to settle, then the best of three timed thousands, at
+    the end of each the crewed ships at `CREWED_CAP` and every 74 within `CREWED_NM` of her. At
+    least `CREWED_FLOOR_TICKS_S` (60) a second on the build machine. Measured on the owner's machine
+    (seed 7, 2026-11-10): 106 ticks a second, the 74s at 0.25 to 3.59 miles; after B7.c (her tack at
+    quarters, Bel-D §6.7) 89 to 92, at 0.39 to 6.21 miles, S2 over the range; after its review's
+    mend (the helm, the powder, the carpenter's crew and the surgeon's mates kept at their stations,
+    2026-11-11) 164 to 173, at 0.08 to 3.11 miles, her places as they were. **Plainly:** they do not
+    keep their places but engage her: the frigate of this world carries no private signal (truth
+    88's world has no table aboard her), so their challenge goes unanswered, and a man of war under
+    their own colours that does not answer is an enemy by the King's ship's book
+    (world/signalling.py, package 71's rule), which fires into her; the load is three crewed 74s in
+    action, more than on their station."""
     import time
 
     from freesail.world import crews as K

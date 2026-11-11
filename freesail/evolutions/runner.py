@@ -62,9 +62,11 @@ the three topsails of "reef the topsails" are manned together, each up to
 its party in the order's order, the surplus to the next job and then to
 whatever else waits for hands; the manoeuvres and the masts, with no party,
 take everyone. At quarters every all-hands request is bounded so (package 75,
-B7.c): its party is the hands the same work takes at sea in one watch, and the
-guns are robbed only for what it wants beyond the hands idle at their quarters
-(`Runner._quarters_party`, `Runner._rob_the_guns`). Only a manoeuvre (its file
+B7.c): its party is the hands the same work takes at sea in one watch, worked by
+the trimmers and the marines' division, the helm, the powder, the carpenter's
+crew and the surgeon's mates keeping their stations, and the guns are robbed
+only for what it wants beyond them (`Runner._quarters_party`,
+`Runner._quarters_pool`, `Runner._rob_the_guns`). Only a manoeuvre (its file
 says ``belays: true``: tack, wear, box-haul, lie a-try) also belays the step-list
 work in hand, which holds its progress and resumes, hands permitting, when the
 all-hands work is done: the owner's ruling of 2026-09-29 at gate 4c (spec M3 §3.4).
@@ -268,6 +270,13 @@ class Instance:
 # The evolutions that are the gun crews' own work at quarters (package 70): the bill does
 # not rob the guns for them.
 QUARTERS_OWN = frozenset({"clear_for_action", "cast_loose_guns", "secure_guns"})
+
+# The quarters whose hands keep their stations through an all-hands request at quarters
+# (package 75, B7.c, as mended at its review: Bel-D §6.7, "worked first by the trimmers and,
+# for the work on deck, the marines' division ... and takes from the guns ... only what its
+# party wants beyond them"): the helm, the powder, the carpenter's crew and the surgeon's
+# mates (`crew/quarters.py`'s divisions, by a hand's `quarters`).
+KEEP_THEIR_STATIONS = frozenset({"helm", "powder", "carpenter", "surgeon"})
 
 
 class Runner:
@@ -1142,7 +1151,7 @@ class Runner:
         want = self._quarters_party(ship, inst, crew, want)
         got = hands.request(
             crew,
-            self._pool(crew, inst),
+            self._quarters_pool(ship, inst, want, self._pool(crew, inst)),
             inst.inst_id,
             want,
             self._subject_mast(ship, inst),
@@ -1181,12 +1190,13 @@ class Runner:
         book's priority (package 70, spec M7 §8a; `crew/quarters.py`, `lend`): the crews
         from the end that bears least, whole crews first, for what the work wants beyond
         the hands idle at their quarters. An all-hands request is bounded there by its
-        party (`_quarters_party`), so a manoeuvre is worked by the trimmers, the marines'
-        division and the others not at a gun, and takes from the guns only the rest of
-        one watch (package 75, B7.c: `docs/design/Design-Ship-Bellerophon.md` §6.7; before
-        it, half of every crew whatever stood idle). The hands freed are taken by a second
-        request, and the line says from where. Under `guns before sail` nothing is lent
-        and the work waits or goes short, as the design has it."""
+        party (`_quarters_party`) and drawn from its pool (`_quarters_pool`), so a manoeuvre
+        is worked by the trimmers and the marines' division and takes from the guns only
+        the rest of one watch, made up from the hands freed (`hands.top_up`; package 75,
+        B7.c: `docs/design/Design-Ship-Bellerophon.md` §6.7; before it, half of every crew
+        whatever stood idle). A numbered request's hands freed are taken by a second
+        request. The line says how many and from where. Under `guns before sail` nothing
+        is lent and the work waits or goes short, as the design has it."""
         quarters = ship.extra.get("quarters")
         if quarters is None or not getattr(quarters, "at_quarters", False):
             return got
@@ -1204,18 +1214,33 @@ class Runner:
         freed, where = quarters.lend(need, aloft, bearing_fwd)
         if not freed:
             return got
-        if got.outcome != hands.TOO_FEW:
-            hands.release(crew, inst.inst_id)
-        again = hands.request(
-            crew,
-            self._pool(crew, inst),
-            inst.inst_id,
-            want,
-            self._subject_mast(ship, inst),
-            aloft=aloft,
-        )
-        if again.outcome != hands.TOO_FEW and where:
+        if want.all_hands:
+            # an all-hands request keeps the trimmers and the marines it has and is made up
+            # to its party from the hands freed, the best fitted first, the rest back to
+            # their guns at once (`Quarters.tick`): the guns give only what its party wants
+            # beyond them, and the line says that many (B7.c, mended at its review)
+            hands.top_up(
+                got,
+                self._quarters_pool(ship, inst, want, self._pool(crew, inst)),
+                aloft=aloft,
+                want=want,
+                subject_mast=self._subject_mast(ship, inst),
+            )
+            again = got
+            n = sum(1 for s in freed if s.at == inst.inst_id)
+        else:
+            if got.outcome != hands.TOO_FEW:
+                hands.release(crew, inst.inst_id)
+            again = hands.request(
+                crew,
+                self._pool(crew, inst),
+                inst.inst_id,
+                want,
+                self._subject_mast(ship, inst),
+                aloft=aloft,
+            )
             n = len(freed)
+        if again.outcome != hands.TOO_FEW and where and n:
             ship.note(
                 "notable",
                 "quarters.robbed",
@@ -1231,16 +1256,29 @@ class Runner:
     ) -> hands.CrewRequest:
         """An all-hands request at quarters, bounded by a party (package 75, B7.c; Bel-D
         §6.7): the hands the same work takes at sea in one watch (`_one_watch`, the engine's
-        own measure of enough), or the file's own party where that is less. So the hands
-        idle at their quarters work it first and the guns give only the rest (`_rob_the_guns`),
-        under either priority. Any other request, or one not at quarters, as it was; the
-        instance's own request is not changed."""
+        own measure of enough), or the file's own party where that is less. So the trimmers
+        and the marines' division work it first (`_quarters_pool`) and the guns give only the
+        rest (`_rob_the_guns`), under either priority. Any other request, or one not at
+        quarters, as it was; the instance's own request is not changed."""
         if not want.all_hands or not _at_quarters(ship) or inst.evo.id in QUARTERS_OWN:
             return want
         party = self._one_watch(crew, self._aloft(inst))
         if want.party is not None:
             party = min(party, want.party)
         return replace(want, party=max(1, party))
+
+    def _quarters_pool(
+        self, ship: Ship, inst: Instance, want: hands.CrewRequest, pool: list
+    ) -> list:
+        """The hands an all-hands request at quarters may draw on (package 75, B7.c, as
+        mended at its review; Bel-D §6.7): the trimmers, the marines' division (on deck
+        alone: `hands.can_work` keeps a marine off the yards), the hands the guns lend
+        (`_rob_the_guns`) and any not quartered; the helm, the powder, the carpenter's crew
+        and the surgeon's mates keep their stations (`KEEP_THEIR_STATIONS`). Any other
+        request, or one not at quarters, draws on the pool as it is."""
+        if not want.all_hands or not _at_quarters(ship) or inst.evo.id in QUARTERS_OWN:
+            return pool
+        return [s for s in pool if s.quarters not in KEEP_THEIR_STATIONS]
 
     def _one_watch(self, crew: Crew, aloft: bool) -> int:
         """The hands on deck in one watch, as the watch bill has them with no call
@@ -1313,7 +1351,7 @@ class Runner:
             if inst.assignment is not None:
                 hands.top_up(
                     inst.assignment,
-                    deck,
+                    self._quarters_pool(self.ship, inst, self._want(inst), deck),
                     aloft=self._aloft(inst),
                     want=self._want(inst),
                     subject_mast=self._subject_mast(self.ship, inst),

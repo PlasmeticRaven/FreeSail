@@ -8331,17 +8331,20 @@ def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_
     cleared", by the fighting book's priority (the design of item 1). The frigate close
     hauled on the starboard tack (truth 10's world): cleared, she tacks in 447 s at seed
     7. At quarters with the guns run out the tack is worked as package 75's B7.c has it
-    (`docs/design/Design-Ship-Bellerophon.md` §6.7): its party is one watch, 111 hands,
-    and the 76 idle at their quarters work it first. Under `sail before guns` the bill
-    lends only the rest, whole crews from the end that bears least (44 hands, the bow
-    chasers and the guns, Nos. 12 to 13 and 16 to 17, said from where), and she tacks in
-    468 s; under `guns before sail` nothing is lent, the tack goes short (76 hands of 111,
-    said), and she tacks in 433 s, the slower braces carrying her through stays from 292.5
-    degrees (from 290 and 295 degrees, 436 and 453 s against 343 and 370 cleared). Before
-    B7.c the bill lent half of every gun's crew (84 hands) and she tacked in 436 s under
-    `sail before guns` and 642 s under `guns before sail`, the tack counting every man at
-    the guns as wanted for it. The player never queues a thing: the order is given and the
-    bill finds the hands."""
+    (`docs/design/Design-Ship-Bellerophon.md` §6.7, as mended at its review): its party is
+    one watch, 111 hands, worked first by her 44 trimmers, her helm, powder, carpenter's
+    crew and surgeon's mates keeping their stations. Under `sail before guns` the bill lends
+    the rest, 67 hands, whole crews from the end that bears least (the bow chasers and the
+    guns, Nos. 10 to 13 and 15 to 17, said from where), and she tacks in 468 s; under `guns
+    before sail` nothing is lent, the tack goes short (44 hands of 111, said), its crew
+    factor 111/44 through it, and she tacks in 453 s, slower than cleared (from 290 and 295
+    degrees, 528 and 458 s against 343 and 370 cleared). Before B7.c the bill lent half of
+    every gun's crew (84 hands) and she tacked in 436 s under `sail before guns` and 642 s
+    under `guns before sail`, the tack counting every man at the guns as wanted for it; at
+    B7.c, before its review, the tack drew on every hand idle at quarters (76, the helm and
+    the powder among them), lent 44 and tacked in 468 s, and under `guns before sail` went
+    short 76 of 111 in 433 s, quicker than cleared. The player never queues a thing: the
+    order is given and the bill finds the hands."""
 
     def tack(at_quarters: bool, priority: str = "sail before guns"):
         w = close_hauled_on_starboard(FRIGATE, heading=292.5)
@@ -8354,24 +8357,28 @@ def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_
             w.run(120)
         t0 = w.clock.tick
         w.submit("tack ship")
+        runner = w.ship.extra["evolutions"]
+        inst = next(i for i in runner.instances if i.evo.id == "tack")
+        factor = runner._crew_factor(inst, False)
         done, seconds = until(w, ("ship.tacked", "ship.missed_stays"), 1200)
         assert done and done[0].kind == "ship.tacked", (priority, [e.text for e in done])
         robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
         short = [e for e in w.log if e.tick > t0 and e.kind == "evolution.short_handed"]
-        return seconds, robbed, short
+        return seconds, robbed, short, factor
 
-    cleared, none_robbed, _ = tack(False)
+    cleared, none_robbed, _, _ = tack(False)
     assert not none_robbed and 285 <= cleared <= 600
-    sail_first, robbed, short = tack(True)
-    # at least the rest of the watch (111 - 76), less than half of every crew (B7.c)
-    assert robbed and 35 <= robbed[0].data["hands"] < 84, [r.text for r in robbed]
+    sail_first, robbed, short, factor = tack(True)
+    # what the watch wants beyond the trimmers (111 - 44), not half of every crew (84)
+    assert [r.data["hands"] for r in robbed] == [111 - 44], [r.text for r in robbed]
     assert "taken from the bow chasers and the guns, Nos." in robbed[0].text, robbed[0].text
-    assert not short, [e.text for e in short]
+    assert not short and factor == pytest.approx(1.0, abs=1e-3), ([e.text for e in short], factor)
     assert sail_first <= cleared * 1.15, f"{sail_first} s against {cleared} s cleared"
-    guns_first, robbed2, short2 = tack(True, "guns before sail")
+    guns_first, robbed2, short2, factor2 = tack(True, "guns before sail")
     assert not robbed2
-    assert short2 and (short2[0].data["hands_got"], short2[0].data["hands_wanted"]) == (76, 111)
-    assert 285 <= guns_first <= 600, f"{guns_first} s against {cleared} s cleared"
+    assert short2 and (short2[0].data["hands_got"], short2[0].data["hands_wanted"]) == (44, 111)
+    assert factor2 == pytest.approx(111 / 44, abs=1e-3), factor2
+    assert cleared < guns_first <= 600, f"{guns_first} s against {cleared} s cleared"
 
 
 def test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why():

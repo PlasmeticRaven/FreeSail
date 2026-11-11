@@ -17884,6 +17884,10 @@ Junit: `scratchpad/b7/final-slow.xml`, `scratchpad/b7/final-fast.xml`; the logs 
 
 ### B7.c, the tack at quarters (2026-11-11)
 
+*Mended at its review (2026-11-11): the tack's pool kept to the trimmers and the marines' division,
+the line's count, truth 7-136 again and truth 7-196 passing on its places; below, "Package 75, B7's
+review mends". The figures here are B7.c's as committed at 69121a9e.*
+
 **The step**, on the lead's word ((4) of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md`:
 "B7.c, its own commit, bisected, old beside new for 7-136 and every file's tack at quarters; the lead
 reads the moved pins before the merge"): Bel-D §6.7's rule in `freesail/evolutions/runner.py`, the file
@@ -18391,6 +18395,174 @@ Junit, logs and the measurements under `scratchpad/s7/alias/` (`run/`, `trim_old
 `trim_new.json`, `cmptrim.txt`; `run/furled-*.json`, `run/lines-*.json`, `run/cmplines.txt`,
 `run/gates-*.json`; the base head's tree `old/`). Not run: the slow tier beyond (b) and (c), the
 pace tier.
+
+## Package 75, B7's review mends (2026-11-11)
+
+**The review** of 69121a9e (B7.c), 412658a9 and 93a15ee5 (B7.d) and 56c1174b (the trim's words)
+against 9c812f43: seven findings, each reproduced on 56c1174b first; five real and mended, two real and
+left for the lead (outside B7's files), none refuted. One commit of the mends, on the steps' files and
+the records: `freesail/evolutions/runner.py` (B7.c's), `freesail/crew/quarters.py` (B7's), her tests,
+truth 7-136, the primer's lines that quote the moved words and the harness's quote of the robbed line.
+
+**1. Truth 7-196's crewed clause, red on distance** (the blocker). Reproduced: S2 6.21 miles off at
+the third timed thousand (the probe, `scratchpad/s7/probe7196.py`, 85-88 ticks a second). **Mended by
+item 3's mend, her places unmoved:** her 74s work their manoeuvres at quarters in that world, and with
+the helm, the powder, the carpenter's crew and the surgeon's mates kept at their stations they stand at
+most 0.67, 1.27 and 3.11 miles off at the ends of the timed thousands (the least 0.08), the crewed
+count 3, 164-173 ticks a second by the probe (S0's tack lends 168 hands, S1's wear 162 and her tack
+178). The clause passes by its node id (33 s alone). `SEVENTY_FOURS_AT` in her tests and in
+`tools/pace.py` as they were; the docstring gives the figures old beside new (0.25-3.59 miles at the
+base, 0.39-6.21 after B7.c, 0.08-3.11 now).
+
+**2. Truth 7-136's band hid the spec's sentence.** Real at 56c1174b: "guns before sail" 433 s against
+447 cleared from 292.5 degrees, passing `285 <= guns_first <= 600`. After item 3's mend the tack under
+"guns before sail" has the trimmers alone, 44 of 111, its crew factor 111/44 = 2.52 through it, and is
+slower than cleared from each heading: 528, 453 and 458 s against 343, 447 and 370. **Re-pinned, old
+beside new** (`tests/test_known_truths.py`; its docstring gives the base's, B7.c's and the mend's
+figures): the hands lent, 44 within 35 to under 84, **to** exactly 67, what one watch wants beyond her
+44 trimmers; under "sail before guns" no short line and the crew factor 1.0 at the order (within a
+thousandth), 468 s within 1.15 times cleared (held); under "guns before sail" short 76 of 111 **to** 44
+of 111, the crew factor 111/44 asserted within a thousandth, and **the spec's sentence asserted
+again**, `cleared < guns_first <= 600` where the band was 285-600 s alone. **Plainly:** from 292.5
+degrees the margin is six seconds (453 against 447), the frigate's way out of stays being truth 10's
+knife-edge; the factor's clause is the one that holds the rule whatever her way.
+
+**3. The pool at quarters** (Bel-D §6.7: "worked first by the trimmers and, for the work on deck, the
+marines' division ... and takes from the guns ... only what its party wants beyond them"). Real, and
+the rule binding on it. Reproduced on 56c1174b, one tick after "tack ship" in truth 7-136's world under
+"sail before guns": the frigate's tack held her 44 trimmers, both her helmsmen, her carpenter's crew of
+6 and 15 of her 22 powder beside the 44 lent; hers held every hand idle at quarters (the trimmers 55,
+the marines 95, the powder 31, the carpenter's crew 11, the helm 2, the surgeon's mates 2) beside 72
+lent. **Mended** in `runner.py`:
+- `_quarters_pool`: an all-hands request at quarters (the test of `_quarters_party`: not the guns' own
+  work) draws on the trimmers, the marines' division (on deck alone, by `hands.can_work`), the hands the
+  guns lend and any not quartered; the hands whose `quarters` is the helm, the powder, the carpenter's
+  crew or the surgeon's mates (`KEEP_THEIR_STATIONS`) keep their stations. Read at the order, in the
+  robbing and in the top-up as hands join (`_take_hands`, `_rob_the_guns`, `_top_up_all_hands`).
+- `_rob_the_guns`: an all-hands request short of its party keeps the hands it has and is made up from
+  the whole crews freed (`hands.top_up`, the best fitted first), the rest of a crew going back to its
+  gun at once (`Quarters.tick`); a numbered request as before (released and asked again). Without this
+  the request ranked the trimmers and the freed together and could leave a trimmer idle for a gunner:
+  two of the privateer schooner's trimmers stood idle while eight of her guns' hands tacked.
+- The robbed line's count: the hands of the freed crews the all-hands work took (67 in the frigate,
+  where the crews freed held 69); a numbered request's line counts every hand freed, as before.
+- Numbered sail work at quarters draws on the pool as before (the rule is the manoeuvre's).
+
+**Every armed file's tack at quarters, B7.c (56c1174b) beside the mend** (truth 7-136's world as in
+B7.c's table, the same script, `scratchpad/s7/tackq.py`; `tackq_new.json` and `tackq_mend3.json`;
+seconds from 290, 292.5 and 295 degrees, the hands lent in brackets):
+
+| File | Party / its workers at quarters (B7.c's idle) | Cleared | Sail before guns, B7.c | Mended | Guns before sail, B7.c | Mended |
+|---|---|---|---|---|---|---|
+| seventy-four | 268 / 150 (196) | 237, 243, 258 | 237, 243, 258 (72) | the same (118) | 331, 334, 391 | 409, 446, 422 |
+| sixty-four | 218 / 137 (181) | 244, 251, 266 | 244, 251, 266 (39) | the same (81) | 295, 298, 350 | 396, 422, 396 |
+| frigate-36 | 111 / 44 (76) | 343, 447, 370 | 334, 468, 469 (44) | the same (67) | 436, 433, 453 | 528, 453, 458 |
+| razee-44 | 146 / 93 (125) | 435, 427, 484 | 435, 427, 484 (29) | the same (53) | 499, 501, 502 | 543, 545, 544 |
+| brig | 48 / 42 (61) | 440, 454, 455 | 440, 454, 455 (none) | the same (6) | 440, 454, 455 | 469, 470, 471 |
+| hermaphrodite-brig | 55 / 65 (76) | 192, 189, 193 | 192, 189, 193 (none) | the same (none) | 192, 189, 193 | the same |
+| cutter | 12 / 9 (15) | 107, 106, 106 | 107, 106, 106 (none) | the same (3) | 107, 106, 106 | 118, 116, 116 |
+| privateer-schooner | 17 / 11 (16) | 142, 142, 142 | 142, 142, 142 (1) | the same (6) | 142, 142, 142 | 154, 155, 157 |
+| merchant-brig | — | no tack ended in 1,200 s | the same | the same | the same | the same |
+
+Every cleared tack and every tack under "sail before guns" is the same to the second, the party made
+up; the hands lent are exactly the party less its workers on every file that lends. Under "guns before
+sail" each tack goes short by the hands the helm, the powder, the carpenter's crew and the surgeon's
+mates no longer give: hers 150 of 268 (1.73, 1.84 and 1.64 times cleared), the 64's 137 of 218, the
+frigate's 44 of 111, the razee's 93 of 146, the brig's 42 of 48, the cutter's 9 of 12, the privateer's
+11 of 17. The robbed lines from 292.5 degrees: hers "118 hands taken from the poop, Nos. 1 to 3, the
+upper deck, Nos. 7 to 14, and the quarterdeck, Nos. 1 to 7" (her lower deck untouched), the 64's "81
+hands taken from the upper deck, Nos. 8 to 13, and the quarterdeck, Nos. 1 to 5", the frigate's "67
+hands taken from the bow chasers and the guns, Nos. 10 to 13 and 15 to 17", the razee's "53 hands
+taken from the bow chasers and the guns, Nos. 11 to 13 and 17 to 19", the brig's "six hands taken from
+the bow chasers", the cutter's "three hands taken from No. 3 gun", the privateer's "six hands taken
+from the pivot gun and the swivels". **Bisected:** 56c1174b and the mend's tree differ in code by
+`runner.py` (this item) and `quarters.py` (item 7, read by nothing), every "B7.c" figure the head's and
+every "mended" one the tree's, by the same script and seed.
+
+Her tests moved with it, old beside new (`tests/test_bellerophon.py`, "Her tack at quarters"): the
+table's (watch, idle, lent) to (watch, workers, lent), hers (268, 196, 72) to (268, 150, 118), the
+64's (218, 181, 39) to (218, 137, 81), the brig's (48, 61, 0) to (48, 42, 6), and the hermaphrodite
+brig's (55, 65, 0) new, the case where the trimmers make a watch (two cases more, eight in all); the
+assertions tightened: the hands lent exactly the party less its workers and exactly the tack's hands
+from the guns, and none of the tack's hands of the helm, the powder, the carpenter's crew or the
+surgeon's mates. Her slow tack beside her cleared tack, 243 and 243 s, its docstring's 72 to 118.
+
+**4. The primer's tack at quarters** (`docs/primer/22-an-action.md`, served). Real: it gave the half of
+every crew, the 84 hands and the 642 s. Mended to the rule as built, in the in-world voice, with the
+frigate's lines from truth 7-136's world ("Tacking ship at quarters: 67 hands taken from the bow
+chasers and the guns, Nos. 10 to 13 and 15 to 17; the guns go on short-handed"; "Only 44 hands to tack
+ship; there are no more on deck."; 447 s cleared, 453 under "guns before sail"). The same old line
+quoted in `docs/agents/Harness.md`'s action rows, found on the way, mended to the frigate's new line.
+**Left for the lead:** `docs/TechnicalSpec-M7.md`'s two as-built passages (§8a, "under `sail before
+guns` the frigate's tack takes half of every gun's crew and keeps its pace (436 s against 447 cleared)
+... under `guns before sail` the trimmers alone have her (642 s)"; §9's truth list, "at quarters 436 s
+with 84 hands lent ... and 642 s"), yours to amend old beside new: now 67 hands lent and 468 s under
+"sail before guns", 44 of 111 and 453 s under "guns before sail".
+
+**5. The primer's trim replies** (`docs/primer/04-trimming.md` three lines, `07-a-first-passage.md`
+and `18-lessons.md` one each). Real after 56c1174b: "the sheets of the mizzen spanker, the fore topmast
+staysail and the jib" in the frigate's trim replies, where the reply now says "the spanker". Mended in
+those five lines alone; the sheet's own orders and refusals ("Eased the mizzen spanker sheet", "The
+mizzen spanker sheet is already hard in") are other replies, named by `display_name` as before.
+
+**6. The possessive after a gun's name by deck** (`combat/hits.py`, "No. 3 starboard gun of the lower
+deck's carriage struck"; `combat/guns.py`, "The No. 1 larboard gun of the upper deck's port is shut;
+the sea is at its sill."). Real, reproduced on her file. `freesail/combat/` is not B7's (Bel-D §13):
+for the lead, "the carriage of No. 3 starboard gun of the lower deck struck" and "The port of No. 1
+larboard gun of the upper deck is shut; the sea is at its sill." where `gun.by_deck`, the possessive
+kept for every other gun so that other files' lines stay byte for byte.
+
+**7. `crew/quarters.py`'s told-off share, read by nothing after B7.c.** Real; B7's file, tidied:
+`TOLD_OFF_SHARE` and its comment, `lend`'s `share` parameter and branch and `_share_words` are gone,
+and `lend`'s docstring says the all-hands manoeuvre's lending as built. Nothing called them (grep over
+`freesail`, `tests` and `tools`); nothing of a pickle moves (a module constant and a function).
+
+**Found on the way, left:** a numbered request's robbed line counts every hand of the whole crews
+freed, some of whom go back to their guns at once when the request is made up from better-fitted idle
+hands (package 70's line, older than B7.c).
+
+### The suites, as run (the review's mends)
+
+Once, on the final tree (the package's branch at 56c1174b, the mends uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run
+(`scratchpad/s7/mend/run.sh`).
+
+- **(a) The slow candidates** (`--slow -m slow` over the base's 86 files, `b7/final/slowlist.txt`):
+  **304 passed, 10 failed, 1 skipped, 9 xfailed** (2,792 s). Against `b7/final-slow.xml` (323): one
+  new, her tack beside her cleared tack (B7.c's, passed); truths 7-136 and 7-196's crewed clause
+  passed, as at the base. Three outcomes changed, failed to passed, all pace floors read under four
+  workers: the day under systems, the gate's day with the region loaded and truth 7-159's convoy of
+  six (496, 471 and 447 ticks a second at the base, 500 or more here); in the same run truth 7-196's
+  alone clause read 390 against the base's 478, the other way: the machine's load, not the code. The
+  other non-passes as at the base: the three captain's trials and truth 77 on their digests, now the
+  trim's words' (56c1174b's, reported there: 1e59009004141b08, 41a37f0290be291a and 0b430d261669ba5a;
+  63168300d93caa13); the schooner's octant passage, the merchant passage's and the schooner's intent
+  constants and truths 78 and 79 on the base's messages (the octant's but for an object's address);
+  truth 7-196's floor by pace; the nine known failures marked so and the browser's skip.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (263 s), the three on their digests,
+  the trim's words' figures above (56c1174b), the base's asserts before the digest all holding.
+- **(c) The four whole logs** (`log_digests.py`): every figure the same as `b2/digests-final.json`
+  (lines, port lines, shut ticks, roll and heel) but each digest, which is the trim's words' (56c1174b,
+  line by line there): first-action 234036cc17e6f137, encounter 732a6020db4d4755, the lee shore
+  e8c79e9947e244c3, the gale 1e59009004141b08. Nothing of the four is moved by the mends.
+- **(d) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`); `tools/check_viewer_guns.py` clean.
+- **(e) The whole fast tier**: **7,318 passed, 2 skipped, 1 xfailed** (3,018 s), junit kept at
+  `scratchpad/s7/final-fast.xml`. Against `b7/final-fast.xml` (7,277): **no outcome changed**; two gone
+  by name, B7.d's (93a15ee5: the renamed triple test and the moved phrase row); 46 new in
+  `test_bellerophon`, all passed: B7.c's six party cases (69121a9e), B7.d's 38 (412658a9 and 93a15ee5)
+  and the mends' two (the hermaphrodite brig's cases).
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- Before the runs, the moved tests by node id (her eight party cases, her slow tack, truth 7-136: 10
+  passed) and truth 7-196's crewed clause alone (passed, 33 s); the fast tier of the 23 files that beat
+  to quarters, test the hands or read the primer: 2,210 passed. After the records' last edit the files
+  that read them (`test_practice`, `test_hull_schooner`, `test_indefatigable`): 120 passed.
+
+Junit and logs under `scratchpad/s7/mend/final/` and `scratchpad/s7/final-slow.xml`,
+`scratchpad/s7/final-fast.xml`; the measurements `scratchpad/s7/tackq_mend3.json`,
+`scratchpad/s7/mend/who_mend2.log` and `scratchpad/s7/mend/p7196_mend.log`. Not run: the pace tier
+alone.
 
 ## Table No. 29's charges (package 75, SW-1) (2026-11-09)
 

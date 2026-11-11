@@ -87,11 +87,6 @@ SURGEON = "surgeon"
 # and the pumps, the surgeon's mates to the cockpit); the rest of the idlers pass powder.
 _TRADE_STATIONS = {"carpenter's crew": CARPENTER, "surgeon's mate": SURGEON}
 
-# The share of a gun crew told off for the sails at quarters (Luce 1884 ch. XX, the station
-# bill: the boarders and sail trimmers "told off from the guns' crews"; half, judgement):
-# an all-hands manoeuvre under `sail before guns` takes this much of each crew.
-TOLD_OFF_SHARE = 0.5
-
 # A gun forward of this share of the hull's length is a forward gun, abaft its negative an
 # after gun, for the stations that man it (the forecastlemen forward, the afterguard aft,
 # the waisters amidships: Luce 1884 ch. XX, the quarter bill by divisions; judgement).
@@ -341,34 +336,22 @@ class Quarters:
 
     # -- robbing by the fighting book's priority ----------------------------------------
 
-    def lend(
-        self, want: int, aloft: bool, bearing_fwd: bool | None, share: float | None = None
-    ) -> tuple[list[Sailor], str]:
+    def lend(self, want: int, aloft: bool, bearing_fwd: bool | None) -> tuple[list[Sailor], str]:
         """Free `want` hands for sail work by the priority: the swivels' and the chasers'
         crews first, then the broadside crews from the end that bears least (`bearing_fwd`
         true when the enemy is forward of the beam, so the after guns go first; None, the
-        after guns), whole crews before the next; then the marines; the powder last. With
-        `share` (an all-hands manoeuvre) each crew gives that share of its hands instead,
-        the guns going on short-handed. Returns the men freed (their `at` cleared) and the
-        words for the log ('from the larboard guns, Nos. 3 to 6' or ''); nothing under
-        `guns before sail`."""
+        after guns), whole crews before the next; then the marines; the powder last. An
+        all-hands manoeuvre is lent so too, for what its party wants beyond the trimmers and
+        the marines' division (package 75, B7.c: `evolutions/runner.py`, `_rob_the_guns`;
+        before it each crew gave half its hands, the share told off for the sails). Returns
+        the men freed (their `at` cleared) and the words for the log ('from the larboard
+        guns, Nos. 3 to 6' or ''); nothing under `guns before sail`."""
         if not self.at_quarters or want <= 0 or self.priority != "sail before guns":
             return [], ""
         from freesail.crew import hands as H
 
         freed: list[Sailor] = []
         from_guns: list[str] = []
-        if share is not None:
-            for gc in self.crews.values():
-                at = [s for s in gc.hands if H.can_work(s, aloft)]
-                n = int(len(at) * share)
-                for s in at[:n]:
-                    s.at = None
-                    freed.append(s)
-                if n:
-                    from_guns.append(gc.key)
-            words = f"from the guns, {_share_words(share)} of each crew" if freed else ""
-            return freed, words
         shut = self._shut_crews()
         order = sorted(self.crews.values(), key=lambda gc: _rob_order(gc, bearing_fwd, shut))
         for gc in order:
@@ -649,14 +632,6 @@ def _rob_order(
     # forward guns
     x = gc.x_m if bearing_fwd in (True, None) else -gc.x_m
     return (2, deck, x, key)
-
-
-def _share_words(share: float) -> str:
-    if abs(share - 0.5) < 1e-9:
-        return "half"
-    if abs(share - 1.0 / 3.0) < 1e-6:
-        return "a third"
-    return f"{share:.0%}"
 
 
 def _runs(numbers: list[int]) -> list[str]:

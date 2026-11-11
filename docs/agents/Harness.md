@@ -731,8 +731,8 @@ her range in cables by his estimate, 'struck'), `range`, `colours`, `quarter_bil
 cable, so her bearing this minute does not re-send the row. The fall of shot and the hits
 are notable lines (`action.fired`, `action.hit`), the casualties urgent ones with the named
 people's own lines (`person.hurt`), and the bill's word when hands are robbed for sail work
-(`quarters.robbed`: "Tacking ship at quarters: 84 hands taken from the guns, half of each
-crew; the guns go on short-handed").
+(`quarters.robbed`: "Tacking ship at quarters: 67 hands taken from the bow chasers and the
+guns, Nos. 10 to 13 and 15 to 17; the guns go on short-handed").
 
 **The tripwires and the events.** A stand-by may wait for `a sail within <n> cables`
 (judged by the lookout's estimate, never the truth) beside the earlier instruments, and for
