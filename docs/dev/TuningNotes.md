@@ -26984,8 +26984,9 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 ## Package 105: Sicily and Malta (2026-11-12)
 
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
-measured at 52395f9 and reported. Step 2 begins with its measurement report; Smyth's
-*Memoir* of Sicily (1824) found on the Internet Archive for it. Decision 68 (the lead's
+measured at 52395f9 and reported (7046d0b). Step 2's measurement reported to the lead
+(below); the recipe and the measuring build in the working tree, not committed; next the
+gauges, then the rebuild on the block's own water. Decision 68 (the lead's
 note of 2026-11-12) binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
@@ -27027,3 +27028,34 @@ gate-5b passage's and the merchant passage's constants, truths 49, 72, 7-283, 7-
 alone and last (`--slow -m pace -n 0`, the same files, load 0.8 at its start): exit 0, 12
 passed. The tree reported differs from 52395f9 by this paragraph and the "where I stand"
 above alone.
+
+### Step 2: the measurement (reported to the lead 2026-11-12, before any tile)
+
+The bounds as briefed (35.01334 to 38.5 N, 11.1466 to 16.69332 E). `tiles_over` gives 126
+level-2 tiles, 9 rows from 35.0133 N and 14 columns from 10.72 E; the seam rule keeps 17
+(`tyrrhenian`'s row from 38.4267 N in the columns 10.72 to 15.41 E, 12; `tunis-coast`'s
+column 10.72 to 11.1467 E from 36.29 N to 38.43 N, 5): **109 the block's own**, the lead's
+figure. The west bound abutting `tunis-coast`'s 7 m west of the column edge takes the
+column 10.72 E in, and its three rows south of 36.29 N, which no region listed, are the
+block's: the gulf of Hammamet and the Sahel to Monastir, outside every region's bounds
+(their water the eleven's tide; said, not mended). A measuring build (the eleven's raise,
+twenty harbour boxes for steps 2 and 3, `--reuse-world`): level 2 22.01 MB, level 3 76 tiles
+6.89 MB, the coast 0.43 MB, **29.3 MB: one region**. No tile, coast or index of another
+region changed. The sweep: 5,940 cells in 256 places, the largest in the three Hammamet
+tiles, off Kelibia and over the Milazzo plain.
+
+The gauges: TICON's file (the zip fetched again, SHA-256 7055f8ed...6514, the file of every
+earlier block) has six in the bounds, each GESLA-2 from ISPRA: Palermo, Porto Empedocle,
+Catania, Messina, Reggio Calabria and Lampedusa; none in Malta, and Crotone outside the east
+bound. None lies within ten miles of a seam: each serves `sicily` alone. No published mean
+level of theirs is on file; the level proposed (JUDGEMENT): each gauge's M2, S2 and N2
+amplitudes summed, the model's own lowest water at the chart's datum.
+
+Naples after February 1806: `data/regimes.yaml` holds no nation; `data/nations.yaml` one
+undated `naples`. The Sicilian ports stay `naples`'s; the mainland's (Reggio, Scilla) take
+dated `nation:` rows to `france` for the French occupation; the British garrisons are
+dated port keys.
+
+Sources: Smyth's *Memoir* of Sicily (1824) laid under `docs/references/pilots/` with its
+README row (the Getty copy, not in copyright); it describes Sicily and its islands and not
+Malta, which is read from Purdy 1826, Norie 1831 and Smyth 1854.
