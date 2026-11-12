@@ -26644,6 +26644,16 @@ row, compared by eye with the plates, held (the quarters, the diagonals, the swa
 Found for others, not mended: a table book's lookout says "two flags at the main" for
 Spain's signals of one flag (401 to 421), whose hoist is one flag; the line may not move.
 
+**Step 2: the measure.** At 79926e7 (step 2 with the trunk at 7361b42 merged by a merge
+commit, the trunk's appends first): ruff check and format clean (382 files); the fast tier
+7,494 passed, 1 xfailed, 0 failed; the slow tier of the touched files and of
+`test_known_truths` (test_flag_drawings, test_flags, test_signals, test_known_truths,
+test_captain_trials, test_replay, test_checkpoint, test_in_world; `--slow -m "not pace"`)
+593 passed, 8 xfailed, 0 failed (truth 7b-130, which failed once under load at 33e546b, held
+here); pace alone and last on the same files, 12 passed. No digest moved; no game line about
+a hoist or the colours moved (the fixture's old-beside-new tests). The tree reported differs
+from 79926e7 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
