@@ -953,6 +953,18 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     paid for it); captivity under the Barbary regencies as a risk to the player's own
     people; which treaties and courts are in the data by which year.
 
+    **Two of those ruled by the owner the same day.** *Barbary captivity:* the middle form:
+    "detailed depiction of the life and labour ashore is definitely too far for this, the
+    state should be one that does not destroy the game but rather realizes the consequences
+    and makes travel in the seas where Barbary ships are truly risky." *A slaver taken
+    before the law changed:* by the captor's nation and the day: "to simulate it at least
+    to the extent that the player can truly interact with the mechanism when sailing for
+    nations that allowed the freeing of slaves from taken slavers", and "a line and nothing
+    paid is also a reasonable implementation at least for nations with no reasonable method
+    of freeing at a certain date." So where and when a nation's law freed the people of a
+    taken slaver, the player sailing for that nation works that law; elsewhere the outcome
+    is said in a line and nothing is paid.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
