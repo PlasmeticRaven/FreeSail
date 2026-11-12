@@ -4,7 +4,7 @@
 format: 1
 built: '2026-11-12'
 tool: tools/build_charts.py
-build_hash: d9e0017e6e5307ee
+build_hash: a83bff31e044f843
 levels:
   '0':
     cell_sec: 150.0
@@ -54,6 +54,8 @@ charts:
     - catalan-coast
     - sardinian-sea
     - tunis-coast
+    - canaries
+    - salvages
     corridor: atlantic-corridor
     corridors_beside:
     - atlantic-south
@@ -4124,6 +4126,489 @@ regions:
       place: 2
       rock: 1
       town: 3
+  canaries:
+    title: The Canary Islands
+    bounds:
+      south: 27.33334
+      north: 29.46666
+      west: -18.29332
+      east: -13.17334
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 98400_-65856
+        south_sec: 98400
+        west_sec: -65856
+        min_depth_m: 0.0
+        bytes: 281664
+      - name: 98400_-64320
+        south_sec: 98400
+        west_sec: -64320
+        min_depth_m: 1220.6
+        bytes: 96616
+      - name: 98400_-62784
+        south_sec: 98400
+        west_sec: -62784
+        min_depth_m: 3343.0
+        bytes: 28242
+      - name: 98400_-61248
+        south_sec: 98400
+        west_sec: -61248
+        min_depth_m: 2469.2
+        bytes: 59017
+      - name: 98400_-59712
+        south_sec: 98400
+        west_sec: -59712
+        min_depth_m: 2987.0
+        bytes: 58213
+      - name: 98400_-58176
+        south_sec: 98400
+        west_sec: -58176
+        min_depth_m: 38.3
+        bytes: 284296
+      - name: 98400_-56640
+        south_sec: 98400
+        west_sec: -56640
+        min_depth_m: 0.0
+        bytes: 353458
+      - name: 98400_-55104
+        south_sec: 98400
+        west_sec: -55104
+        min_depth_m: 524.6
+        bytes: 258554
+      - name: 98400_-53568
+        south_sec: 98400
+        west_sec: -53568
+        min_depth_m: 2113.5
+        bytes: 219511
+      - name: 98400_-52032
+        south_sec: 98400
+        west_sec: -52032
+        min_depth_m: 1699.3
+        bytes: 264478
+      - name: 98400_-50496
+        south_sec: 98400
+        west_sec: -50496
+        min_depth_m: 85.4
+        bytes: 261208
+      - name: 98400_-48960
+        south_sec: 98400
+        west_sec: -48960
+        min_depth_m: 0.0
+        bytes: 172025
+      - name: 99936_-65856
+        south_sec: 99936
+        west_sec: -65856
+        min_depth_m: 0.0
+        bytes: 227040
+      - name: 99936_-64320
+        south_sec: 99936
+        west_sec: -64320
+        min_depth_m: 237.1
+        bytes: 323329
+      - name: 99936_-62784
+        south_sec: 99936
+        west_sec: -62784
+        min_depth_m: 0.0
+        bytes: 315312
+      - name: 99936_-61248
+        south_sec: 99936
+        west_sec: -61248
+        min_depth_m: 0.0
+        bytes: 355289
+      - name: 99936_-59712
+        south_sec: 99936
+        west_sec: -59712
+        min_depth_m: 0.0
+        bytes: 358561
+      - name: 99936_-58176
+        south_sec: 99936
+        west_sec: -58176
+        min_depth_m: 0.0
+        bytes: 340763
+      - name: 99936_-56640
+        south_sec: 99936
+        west_sec: -56640
+        min_depth_m: 0.0
+        bytes: 221239
+      - name: 99936_-55104
+        south_sec: 99936
+        west_sec: -55104
+        min_depth_m: 264.0
+        bytes: 326012
+      - name: 99936_-53568
+        south_sec: 99936
+        west_sec: -53568
+        min_depth_m: 0.0
+        bytes: 338976
+      - name: 99936_-52032
+        south_sec: 99936
+        west_sec: -52032
+        min_depth_m: 0.0
+        bytes: 309426
+      - name: 99936_-50496
+        south_sec: 99936
+        west_sec: -50496
+        min_depth_m: 25.2
+        bytes: 269988
+      - name: 99936_-48960
+        south_sec: 99936
+        west_sec: -48960
+        min_depth_m: 40.2
+        bytes: 252170
+      - name: 101472_-65856
+        south_sec: 101472
+        west_sec: -65856
+        min_depth_m: 0.1
+        bytes: 224579
+      - name: 101472_-64320
+        south_sec: 101472
+        west_sec: -64320
+        min_depth_m: 0.4
+        bytes: 348920
+      - name: 101472_-62784
+        south_sec: 101472
+        west_sec: -62784
+        min_depth_m: 0.2
+        bytes: 354327
+      - name: 101472_-61248
+        south_sec: 101472
+        west_sec: -61248
+        min_depth_m: 0.0
+        bytes: 318431
+      - name: 101472_-59712
+        south_sec: 101472
+        west_sec: -59712
+        min_depth_m: 0.0
+        bytes: 303506
+      - name: 101472_-58176
+        south_sec: 101472
+        west_sec: -58176
+        min_depth_m: 0.0
+        bytes: 303637
+      - name: 101472_-56640
+        south_sec: 101472
+        west_sec: -56640
+        min_depth_m: 21.8
+        bytes: 196893
+      - name: 101472_-55104
+        south_sec: 101472
+        west_sec: -55104
+        min_depth_m: 1256.4
+        bytes: 192539
+      - name: 101472_-53568
+        south_sec: 101472
+        west_sec: -53568
+        min_depth_m: 26.2
+        bytes: 318147
+      - name: 101472_-52032
+        south_sec: 101472
+        west_sec: -52032
+        min_depth_m: 0.0
+        bytes: 309159
+      - name: 101472_-50496
+        south_sec: 101472
+        west_sec: -50496
+        min_depth_m: 0.1
+        bytes: 242554
+      - name: 101472_-48960
+        south_sec: 101472
+        west_sec: -48960
+        min_depth_m: 144.1
+        bytes: 241674
+      - name: 103008_-65856
+        south_sec: 103008
+        west_sec: -65856
+        min_depth_m: 0.1
+        bytes: 291690
+      - name: 103008_-64320
+        south_sec: 103008
+        west_sec: -64320
+        min_depth_m: 0.1
+        bytes: 293317
+      - name: 103008_-62784
+        south_sec: 103008
+        west_sec: -62784
+        min_depth_m: 2859.4
+        bytes: 78650
+      - name: 103008_-61248
+        south_sec: 103008
+        west_sec: -61248
+        min_depth_m: 2249.0
+        bytes: 144795
+      - name: 103008_-59712
+        south_sec: 103008
+        west_sec: -59712
+        min_depth_m: 76.2
+        bytes: 196613
+      - name: 103008_-58176
+        south_sec: 103008
+        west_sec: -58176
+        min_depth_m: 0.8
+        bytes: 101813
+      - name: 103008_-56640
+        south_sec: 103008
+        west_sec: -56640
+        min_depth_m: 3474.0
+        bytes: 28794
+      - name: 103008_-55104
+        south_sec: 103008
+        west_sec: -55104
+        min_depth_m: 3507.2
+        bytes: 26556
+      - name: 103008_-53568
+        south_sec: 103008
+        west_sec: -53568
+        min_depth_m: 2313.4
+        bytes: 131206
+      - name: 103008_-52032
+        south_sec: 103008
+        west_sec: -52032
+        min_depth_m: 0.3
+        bytes: 345458
+      - name: 103008_-50496
+        south_sec: 103008
+        west_sec: -50496
+        min_depth_m: 0.0
+        bytes: 277848
+      - name: 103008_-48960
+        south_sec: 103008
+        west_sec: -48960
+        min_depth_m: 0.1
+        bytes: 264253
+      - name: 104544_-65856
+        south_sec: 104544
+        west_sec: -65856
+        min_depth_m: 2671.2
+        bytes: 44373
+      - name: 104544_-64320
+        south_sec: 104544
+        west_sec: -64320
+        min_depth_m: 3091.8
+        bytes: 33629
+      - name: 104544_-62784
+        south_sec: 104544
+        west_sec: -62784
+        min_depth_m: 3759.4
+        bytes: 27505
+      - name: 104544_-61248
+        south_sec: 104544
+        west_sec: -61248
+        min_depth_m: 3661.2
+        bytes: 30518
+      - name: 104544_-59712
+        south_sec: 104544
+        west_sec: -59712
+        min_depth_m: 3645.7
+        bytes: 20651
+      - name: 104544_-58176
+        south_sec: 104544
+        west_sec: -58176
+        min_depth_m: 3467.0
+        bytes: 22415
+      - name: 104544_-56640
+        south_sec: 104544
+        west_sec: -56640
+        min_depth_m: 3568.3
+        bytes: 22165
+      - name: 104544_-55104
+        south_sec: 104544
+        west_sec: -55104
+        min_depth_m: 3491.6
+        bytes: 27149
+      - name: 104544_-53568
+        south_sec: 104544
+        west_sec: -53568
+        min_depth_m: 3248.2
+        bytes: 31505
+      - name: 104544_-52032
+        south_sec: 104544
+        west_sec: -52032
+        min_depth_m: 2117.0
+        bytes: 118196
+      - name: 104544_-50496
+        south_sec: 104544
+        west_sec: -50496
+        min_depth_m: 0.0
+        bytes: 331795
+      - name: 104544_-48960
+        south_sec: 104544
+        west_sec: -48960
+        min_depth_m: 0.0
+        bytes: 292433
+      '3':
+      - name: 102240_-58688
+        south_sec: 102240
+        west_sec: -58688
+        min_depth_m: 0.0
+        bytes: 141518
+        harbour: santa-cruz-de-tenerife
+      - name: 102240_-58432
+        south_sec: 102240
+        west_sec: -58432
+        min_depth_m: 175.0
+        bytes: 161977
+        harbour: santa-cruz-de-tenerife
+      - name: 102496_-58688
+        south_sec: 102496
+        west_sec: -58688
+        min_depth_m: 0.0
+        bytes: 69487
+        harbour: santa-cruz-de-tenerife
+      - name: 102496_-58432
+        south_sec: 102496
+        west_sec: -58432
+        min_depth_m: 0.0
+        bytes: 118241
+        harbour: santa-cruz-de-tenerife
+      - name: 102240_-59712
+        south_sec: 102240
+        west_sec: -59712
+        min_depth_m: 0.0
+        bytes: 149981
+        harbour: orotava
+      - name: 100960_-55616
+        south_sec: 100960
+        west_sec: -55616
+        min_depth_m: 0.0
+        bytes: 84932
+        harbour: las-palmas
+      - name: 101216_-55616
+        south_sec: 101216
+        west_sec: -55616
+        min_depth_m: 0.0
+        bytes: 130399
+        harbour: las-palmas
+      - name: 104032_-48960
+        south_sec: 104032
+        west_sec: -48960
+        min_depth_m: 0.0
+        bytes: 121209
+        harbour: arrecife
+      - name: 104032_-48704
+        south_sec: 104032
+        west_sec: -48704
+        min_depth_m: 1.0
+        bytes: 144946
+        harbour: arrecife
+      - name: 104288_-48960
+        south_sec: 104288
+        west_sec: -48960
+        min_depth_m: 0.0
+        bytes: 49014
+        harbour: arrecife
+      - name: 104288_-48704
+        south_sec: 104288
+        west_sec: -48704
+        min_depth_m: 0.0
+        bytes: 99499
+        harbour: arrecife
+      - name: 103008_-64064
+        south_sec: 103008
+        west_sec: -64064
+        min_depth_m: 0.0
+        bytes: 112562
+        harbour: santa-cruz-de-la-palma
+      - name: 103264_-64064
+        south_sec: 103264
+        west_sec: -64064
+        min_depth_m: 0.0
+        bytes: 93127
+        harbour: santa-cruz-de-la-palma
+      - name: 100960_-61760
+        south_sec: 100960
+        west_sec: -61760
+        min_depth_m: 0.0
+        bytes: 117944
+        harbour: san-sebastian-de-la-gomera
+      - name: 102496_-49984
+        south_sec: 102496
+        west_sec: -49984
+        min_depth_m: 0.0
+        bytes: 93601
+        harbour: cabras
+    coast: coast/canaries.geojson
+    features: features/canaries.yaml
+    index: features/canaries.index.json
+    overrides: []
+    harbours:
+      santa-cruz-de-tenerife:
+        south: 28.45
+        north: 28.5
+        west: -16.26
+        east: -16.21
+      orotava:
+        south: 28.405
+        north: 28.43
+        west: -16.57
+        east: -16.53
+      las-palmas:
+        south: 28.09
+        north: 28.16
+        west: -15.44
+        east: -15.4
+      arrecife:
+        south: 28.945
+        north: 28.975
+        west: -13.565
+        east: -13.52
+      santa-cruz-de-la-palma:
+        south: 28.665
+        north: 28.695
+        west: -17.78
+        east: -17.75
+      san-sebastian-de-la-gomera:
+        south: 28.08
+        north: 28.1
+        west: -17.12
+        east: -17.1
+      cabras:
+        south: 28.49
+        north: 28.51
+        west: -13.87
+        east: -13.85
+    fill_to_chart_datum: true
+    feature_count: 56
+    features_by_kind:
+      anchorage: 3
+      castle: 4
+      headland: 13
+      hill: 6
+      island: 7
+      place: 6
+      road: 8
+      tower: 1
+      town: 8
+  salvages:
+    title: The Salvages
+    bounds:
+      south: 29.89334
+      north: 30.31999
+      west: -16.15999
+      east: -15.73334
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 107616_-58176
+        south_sec: 107616
+        west_sec: -58176
+        min_depth_m: 0.0
+        bytes: 376932
+      '3': []
+    coast: coast/salvages.geojson
+    features: features/salvages.yaml
+    index: features/salvages.index.json
+    overrides: []
+    harbours: {}
+    fill_to_chart_datum: true
+    feature_count: 7
+    features_by_kind:
+      island: 3
+      rock: 4
   azores:
     title: The Western Islands (the Azores)
     bounds:
@@ -12610,6 +13095,18 @@ sources:
       sha256: 23adfae8a91a3b0f5fe58a326c3a96e21c7c0a83b17db6bd22f6ff125af9ce91
       bytes: 36681414
       file: gebco_2025_s25.10_n33.83_w-22.23_e-9.23_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 27.18, ''north'':
+        29.62, ''west'': -18.45, ''east'': -13.02})'
+      retrieved: '2026-11-12'
+      sha256: c47c49ed9db05fe06d9f7c656fc2023e662315676da5a8046ba52a9c91c227b7
+      bytes: 4762881
+      file: gebco_2025_s27.18_n29.62_w-18.45_e-13.02_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 29.74, ''north'':
+        30.47, ''west'': -16.31, ''east'': -15.58})'
+      retrieved: '2026-11-12'
+      sha256: aca25420a584e7060200e064f11ca97be3e950cb9e2e5a549814f3cccd7bf31e
+      bytes: 601965
+      file: gebco_2025_s29.74_n30.47_w-16.31_e-15.58_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -12794,7 +13291,27 @@ sources:
       sha256: edb90b710f4b7293d8c2fb7d91cc32541f787b99dd2237056288d2b7520fe53a
       bytes: 38270840
       file: emodnet_dtm2024_elevation_max_36.15_38.95_7.60_11.30.nc
-    status: fetched in an earlier build
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(27.28):(29.52)%5D%5B(-18.35):(-13.12)%5D
+      retrieved: '2026-11-12'
+      sha256: 71eccf57a69cfba3ac26cbbe4ee087c4d455daf3e90a19ed74da8265f17f5c79
+      bytes: 43283356
+      file: emodnet_dtm2024_elevation_27.28_29.52_-18.35_-13.12.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(27.28):(29.52)%5D%5B(-18.35):(-13.12)%5D
+      retrieved: '2026-11-12'
+      sha256: 2865c4743e7f2ae42454d4ae50ebe9e6331abd332395c0e2fd7a91d87905cdb3
+      bytes: 43282996
+      file: emodnet_dtm2024_elevation_max_27.28_29.52_-18.35_-13.12.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(29.84):(30.37)%5D%5B(-16.21):(-15.68)%5D
+      retrieved: '2026-11-12'
+      sha256: db6cf136a8eafbfbb7ce0a8d4ad4b8dd8cb212879ebc2f99e8ddc817d9b02d68
+      bytes: 1053764
+      file: emodnet_dtm2024_elevation_29.84_30.37_-16.21_-15.68.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(29.84):(30.37)%5D%5B(-16.21):(-15.68)%5D
+      retrieved: '2026-11-12'
+      sha256: 1b0e9b03dbadd609fa1873d9db3585e141685b7a0ca74517209b1f238a4e9454
+      bytes: 1053404
+      file: emodnet_dtm2024_elevation_max_29.84_30.37_-16.21_-15.68.nc
+    status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
     licence: Licence-Ouverte-2.0

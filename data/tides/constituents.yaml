@@ -515,7 +515,7 @@ gauges:
   # Funchal by these constants is 1.97 m, Norie's seven feet (data/tides/establishments.yaml).
   - id: funchal
     name: Funchal
-    block: madeira
+    block: [madeira, salvages]  # package 106a: the Salvages have no gauge (104's ruling)
     lat_deg: 32.6400
     lon_deg: -16.9067
     record: "GESLA-2, UHSLC, 1976 to 2013"
@@ -1154,3 +1154,91 @@ gauges:
     M2: {amplitude_m: 0.046, phase_deg: 213.5}
     S2: {amplitude_m: 0.016, phase_deg: 230.8}
     N2: {amplitude_m: 0.010, phase_deg: 201.6}
+
+# THE CANARIES' GAUGES (package 106a, the regions `canaries` and `salvages`). TICON.txt read
+# 2026-11-12 by its coordinates over 25 to 31.9 N and 22.2 to 9.3 W (the zip at
+# doi.pangaea.de, SHA-256 7055f8ed1a14abf8..., the same file as every block's): seven gauges,
+# all in the Canaries, none at the Salvages. Where the file has more than one record of a
+# gauge the longest is taken; Las Palmas's three UHSLC series at 28.10 N 15.40 W (1949 to
+# 1991) have M2's phase at 0 to 2 degrees where the IEO's, Puertos del Estado's and UHSLC's
+# later series agree at 28 to 29: a clock 54 minutes early, as Vigo's (package 39c), not
+# taken. Gomera's position in the file is rounded to the degree (28.0 N, 17.0 W, at sea);
+# the gauge is placed at REDMAR's harbour (station 3463, 28.09 N 17.11 W). Hierro's is La
+# Estaca on the north-east coast (REDMAR 3459), not La Restinga. The mean levels VERIFIED
+# from Puertos del Estado's REDMAR reports (`GLOB_2_3_<code>.pdf`, "Referencias de nivel del
+# mar", read 2026-11-12): the NMM less the BMMI on the gauge's zero, the level above the
+# lowest astronomical tide. No two of the gauges lie within ten miles of a seam (the
+# Canaries' bounds meet no other block). **The Salvages have no gauge**: by package 104's
+# ruling they are served by their neighbours' nearest within the reach, Santa Cruz de
+# Tenerife (101 miles; `[canaries, salvages]`) and Funchal (159 miles; `[madeira,
+# salvages]` above), the level Santa Cruz's, Funchal's being unread.
+  - id: arrecife
+    name: Arrecife
+    block: canaries
+    lat_deg: 28.9722
+    lon_deg: -13.5300
+    record: "GESLA-2, IEO, 1949 to 2012"
+    mean_level_m: 1.60  # REDMAR 3470 (Lanzarote-Arrecife): NMM 179 cm, BMMI 19 cm
+    M2: {amplitude_m: 0.835, phase_deg: 36.6}
+    S2: {amplitude_m: 0.315, phase_deg: 59.8}
+    N2: {amplitude_m: 0.174, phase_deg: 22.2}
+  - id: puerto-de-cabras
+    name: Puerto de Cabras
+    block: canaries
+    lat_deg: 28.5000
+    lon_deg: -13.8500
+    record: "GESLA-2, Puertos del Estado, 2004 to 2015"
+    mean_level_m: 1.53  # REDMAR 3469 (Fuerteventura): NMM 152 cm, BMMI -1 cm
+    M2: {amplitude_m: 0.809, phase_deg: 33.1}
+    S2: {amplitude_m: 0.306, phase_deg: 56.7}
+    N2: {amplitude_m: 0.168, phase_deg: 18.9}
+  - id: las-palmas
+    name: Las Palmas
+    block: canaries
+    lat_deg: 28.1333
+    lon_deg: -15.4167
+    record: "GESLA-2, IEO, 1949 to 2012"
+    mean_level_m: 1.44  # REDMAR 3450 (Las Palmas 2): NMM 158 cm, BMMI 14 cm
+    M2: {amplitude_m: 0.746, phase_deg: 28.4}
+    S2: {amplitude_m: 0.285, phase_deg: 52.4}
+    N2: {amplitude_m: 0.154, phase_deg: 14.7}
+  - id: santa-cruz-de-tenerife
+    name: Santa Cruz de Tenerife
+    block: [canaries, salvages]  # the Salvages have no gauge (104's ruling)
+    lat_deg: 28.4800
+    lon_deg: -16.2400
+    record: "GESLA-2, Puertos del Estado, 1992 to 2015"
+    mean_level_m: 1.37  # REDMAR 3471 (Tenerife 2): NMM 150 cm, BMMI 13 cm
+    M2: {amplitude_m: 0.708, phase_deg: 29.3}
+    S2: {amplitude_m: 0.272, phase_deg: 52.6}
+    N2: {amplitude_m: 0.147, phase_deg: 15.6}
+  - id: santa-cruz-de-la-palma
+    name: Santa Cruz de la Palma
+    block: canaries
+    lat_deg: 28.6833
+    lon_deg: -17.7500
+    record: "GESLA-2, UHSLC, 1959 to 1981"
+    mean_level_m: 1.26  # REDMAR 3465 (La Palma): NMM 141 cm, BMMI 15 cm
+    M2: {amplitude_m: 0.651, phase_deg: 29.0}
+    S2: {amplitude_m: 0.255, phase_deg: 51.6}
+    N2: {amplitude_m: 0.136, phase_deg: 15.8}
+  - id: san-sebastian-de-la-gomera
+    name: San Sebastián de la Gomera
+    block: canaries
+    lat_deg: 28.0900  # REDMAR's; TICON's rounded to 28.0 N 17.0 W
+    lon_deg: -17.1100
+    record: "GESLA-2, Puertos del Estado, 2007 to 2015"
+    mean_level_m: 1.18  # REDMAR 3463 (La Gomera): NMM 128 cm, BMMI 10 cm
+    M2: {amplitude_m: 0.581, phase_deg: 23.6}
+    S2: {amplitude_m: 0.233, phase_deg: 46.1}
+    N2: {amplitude_m: 0.120, phase_deg: 11.3}
+  - id: la-estaca
+    name: La Estaca, Hierro
+    block: canaries
+    lat_deg: 27.7800
+    lon_deg: -17.9000
+    record: "GESLA-2, Puertos del Estado, 2004 to 2015"
+    mean_level_m: 1.17  # REDMAR 3459 (El Hierro 2, La Estaca): NMM 157 cm, BMMI 40 cm
+    M2: {amplitude_m: 0.593, phase_deg: 21.8}
+    S2: {amplitude_m: 0.242, phase_deg: 44.9}
+    N2: {amplitude_m: 0.121, phase_deg: 8.7}

@@ -1,0 +1,650 @@
+# The features of the Canary Islands (package 106a): the seven islands, their roads and
+# ports, the Peak and the heights seen far off, the points and the islets, as the period's
+# pilots give them, each with its source in the references' form (docs/references/README.md),
+# on the rules of channel-west.yaml's head, read from:
+#
+#   Purdy 1825      John Purdy, Memoir ... to accompany the new chart of the Atlantic Ocean,
+#                   1825 (docs/references/pilots/purdy-1825-memoir-atlantic-ocean-ocr.txt),
+#                   'The Canaries, or Canary Islands', pp. 210 to 220, which quotes Glas
+#                   nearly whole for the roads and the directions among the islands, and
+#                   Vancouver (1791), Krusenstern and Lisiansky (1803) for Santa Cruz.
+#   Glas 1764       George Glas, The History of the Discovery and Conquest of the Canary
+#                   Islands, with a Description of them, 1764 (pilots/glas-1764-...), the
+#                   period's own description, for what Purdy leaves out (Porto de Cabras).
+#   Norie 1805      J. W. Norie, Epitome, 1805, Table XL, the latitudes and longitudes of
+#                   the Canaries (pilots/norie-1805-..., l. 66576 to 66607).
+#   Oriental Navigator 1801   pp. 25 to 26 (pilots/oriental-navigator-1801-ocr.txt): the
+#                   road of Santa Cruz "the best in the Canaries", its calms under the Peak.
+#
+# No light stood in the islands in 1805 by any source on file, and none is entered (the
+# brief's rule: lights only from a source, with their years). Purdy's "sunken rock, laid
+# down in some charts" between Tenerife and the Grand Canary is not entered: he gives it as
+# doubtful, and the grid has 1,500 m and more of water at his place (a finding).
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the modern chart (FROM MEMORY) and the pilots' bearings, then
+# checked against the region's tiles by channel-west.yaml's rule (a headland, island, town,
+# castle or hill to the nearest land within 800 m; a rock to the nearest shoal head within
+# 400 m; an anchorage to water holding half the pilot's depth within 800 m), each move in
+# `fix`. Heights are above the sea for the horizon, the modern chart's FROM MEMORY
+# (UNVERIFIED) unless the entry says otherwise. The Peak and the islands' high land stand
+# far above the search's reach (`chart.SEARCH_HEIGHT_M`) and are seen to their own horizon
+# in clear weather; Purdy's warning that the Peak "is very often hidden by clouds" is the
+# weather's, which has no cloud on a hill (a finding, as Madeira's).
+
+region: canaries
+features:
+
+  # ---------------------------------------------------------------------------
+  # Tenerife: the Peak, Point Naga, Santa Cruz and its road, Orotava
+  # ---------------------------------------------------------------------------
+
+  - id: peak-of-tenerife
+    kind: hill
+    name: the Peak of Tenerife
+    modern: the Pico del Teide
+    lat_deg: 28.2724
+    lon_deg: -16.6425
+    height_m: 3720
+    source: "Purdy 1825, p. 214 and note: the Peak of Teyde; its height by Humboldt the mean of Borda's, Lamanon's and Cordier's measures, 1,909 toises (3,720 m); 'the Peak of Tenerife may sometimes be seen forty leagues off, but it is very often hidden by clouds' (p. 218); Norie 1805, Table XL: the Peak 28 15 38 N"
+    says: "The Peak of Tenerife, standing up alone over the clouds like a thin blue vapour: in the clearest weather it is seen forty leagues off."
+
+  - id: point-naga
+    kind: headland
+    name: Point Naga
+    modern: Punta de Anaga
+    lat_deg: 28.5850
+    lon_deg: -16.1370
+    height_m: 200
+    source: "Purdy 1825, p. 215 and p. 217: Point Naga, the N.E. point of Tenerife, very high, easily known by two large high rocks lying close to it, which appear like ships and may be seen seven or eight leagues off; it lies in 28 36 N, and the Salvages lie true north of it about 28 leagues"
+    says: "Point Naga, the high north-east end of Tenerife, with its two great rocks off it like ships."
+
+  - id: rocks-of-anaga
+    kind: island
+    name: the Rocks of Naga
+    modern: the Roques de Anaga (Roque de Dentro and Roque de Fuera)
+    lat_deg: 28.5870
+    lon_deg: -16.1520
+    height_m: 180
+    source: "Purdy 1825, p. 217: Point Naga is easily known by two large high rocks lying close to it, which appear like ships, and may be seen seven or eight leagues off; p. 215: at a short distance from Point Naga are some high perpendicular rocks"
+    says: "The Rocks of Naga, two great rocks off the north-east point of Tenerife that look like ships under sail."
+
+  - id: hidalgo-point
+    kind: headland
+    name: Hidalgo Point
+    modern: Punta del Hidalgo
+    lat_deg: 28.5767
+    lon_deg: -16.3300
+    height_m: 20
+    source: "Norie 1805, Table XL: Teneriffe, Hidalgo Point 28 40 N (the period's latitude three minutes north of the modern point)"
+    says: "Hidalgo Point, the low point of the north coast of Tenerife west of Naga."
+    fix: "moved 30 m to the grid's land"
+  - id: santa-cruz-de-tenerife-town
+    kind: town
+    name: Santa Cruz
+    modern: Santa Cruz de Tenerife
+    lat_deg: 28.4680
+    lon_deg: -16.2510
+    height_m: 15
+    source: "Purdy 1825, p. 216: on a narrow and sandy beach houses of dazzling whiteness with flat roofs stuck against a wall of black perpendicular rocks; a fine mole of free-stone and the public walk planted with poplars (Humboldt); Norie 1805, Table XL: Santa Cruz 28 27 30 N"
+    says: "Santa Cruz of Tenerife, its white flat-roofed houses on a narrow beach against black rocks, the mole before it."
+
+  - id: santa-cruz-mole
+    kind: place
+    name: the mole of Santa Cruz
+    modern: the old mole (the Muelle de Caballería's root)
+    lat_deg: 28.4670
+    lon_deg: -16.2470
+    height_m: 4
+    source: "Purdy 1825, p. 22 (the table: the mole of Santa Cruz 28 28 N) and p. 216: a fine mole built of free-stone; p. 215: the surf frequently beats on shore with great violence for several days together, and the pier is ill contrived for shelter"
+    says: "The mole of Santa Cruz, of free-stone and ill contrived for shelter: the surf beats on the beach for days together."
+
+  - id: fort-san-cristobal
+    kind: castle
+    name: Fort Christoval
+    modern: the Castillo de San Cristóbal (pulled down in 1928, FROM MEMORY; its place the Plaza de España)
+    lat_deg: 28.4680
+    lon_deg: -16.2480
+    height_m: 10
+    source: "Purdy 1825, p. 217, note (Lisiansky, 1803): moored S.S.E. and N.N.W., having Fort Christoval N 81 W, South Fort S 55 W, and St Raphael N 5 E"
+    says: "Fort Christoval, the castle on the shore in the middle of the town."
+
+  - id: paso-alto-castle
+    kind: castle
+    name: the castle north of the town
+    modern: the Castillo de San Miguel del Paso Alto (FROM MEMORY)
+    lat_deg: 28.4800
+    lon_deg: -16.2370
+    height_m: 15
+    source: "Purdy 1825, p. 215: the best road for shipping is between the middle of the town and a fort, or castle, about a mile to the northward of it"
+    says: "The castle a mile north of the town, the northern end of the best ground of the road."
+
+  - id: santa-cruz-road
+    kind: road
+    name: the road of Santa Cruz
+    modern: the anchorage off Santa Cruz de Tenerife
+    lat_deg: 28.4737
+    lon_deg: -16.2394
+    height_m: 0
+    depth_fathoms: 30
+    bottom: "dark sand and ooze with small white shells; foul in places with lost anchors"
+    source: "Purdy 1825, p. 215: the best road between the middle of the town and a fort a mile north of it; ships anchor from a cable's length from the shore in 6, 7 and 8 fathoms to half a mile in 35 or 30 fathoms; buoy the cables, the ground being in some places foul; open to the N.E., East and S.E.; Vancouver (1791) in 30 fathoms, a soft dark oozy bottom with small white shells; H.M.S. Tartar (1820) in 26 fathoms, dark sand and mud; Oriental Navigator 1801, p. 25: not remarkably fine, the best in the Canaries"
+    says: "The road of Santa Cruz: the best of the Canaries though not fine, in thirty fathoms on dark ooze between the town and the castle to the north; buoy the cables, for the ground is foul with lost anchors in places, and bring no part of the town north of west going in, for the calms under the Peak."
+
+  # Orotava and the north coast
+    fix: "moved 70 m off the grid's shore to 59 m (32 fathoms), the pilots' 30 to 35 fathoms half a mile off: the bank is steep"
+  - id: port-orotava
+    kind: town
+    name: Port Orotava
+    modern: Puerto de la Cruz
+    lat_deg: 28.4144
+    lon_deg: -16.5500
+    height_m: 10
+    source: "Purdy 1825, pp. 217 to 218: the port of Orotava on the west (north-west) side of the island, about 8 1/2 leagues south-westward of Point Naga, the next best port to Santa Cruz; a good harbour from May to the end of October, in winter ships often obliged to slip and put to sea for the N.W. wind; straggling rocks project two ships' lengths from shore; Norie 1805, Table XL: Orotava 28 23 35 N"
+    says: "Port Orotava, the town by the sea under the white villa of Orotava and its two round green hills."
+    fix: "moved 180 m to the grid's land"
+  - id: villa-of-orotava
+    kind: town
+    name: Orotava
+    modern: La Orotava (the villa)
+    lat_deg: 28.3900
+    lon_deg: -16.5230
+    height_m: 350
+    source: "Purdy 1825, p. 218: you will see a large white town (Orotava) on the side of the high land, about a league inland, with two small regular-shaped green hills under it, between which you must steer directly in, and will raise, as it were, another town out of the sea: Port Orotava"
+    says: "Orotava, the large white town high on the side of the land a league inland: steer in between the two green hills under it."
+
+  - id: orotava-road
+    kind: road
+    name: the road of Orotava
+    modern: the anchorage off Puerto de la Cruz
+    lat_deg: 28.4250
+    lon_deg: -16.5600
+    height_m: 0
+    depth_fathoms: 40
+    bottom: "sand"
+    source: "Purdy 1825, p. 217: the anchorage is in 60 fathoms, about a mile and a half from shore, with the Peak bearing S.W.; p. 218: the spot where you ride, half a league off and to the westward of the town, is very small, and you bring up in from 30 to 45 fathoms; there is little or no tide; a long northerly swell rolls in; the bottom JUDGEMENT (not given)"
+    says: "The road of Orotava, half a league off to the westward of the town in thirty to forty-five fathoms: a small berth, always a long northerly swell, and in winter a ship slips and puts to sea when the north-wester comes."
+
+  - id: garachico
+    kind: town
+    name: Garachico
+    modern: Garachico
+    lat_deg: 28.3740
+    lon_deg: -16.7640
+    height_m: 10
+    source: "Purdy 1825, p. 218: vessels that fall to leeward often lose time by mistaking Garachico for Port Orotava, four and a half leagues west of it; Garachico also has above it a white town inland, called Icod, but lies much nearer Point Teno"
+    says: "Garachico, which a ship to leeward takes for Port Orotava; but it lies nearer Point Teno and has no two green hills under its town."
+
+  - id: point-teno
+    kind: headland
+    name: Point Teno
+    modern: Punta de Teno
+    lat_deg: 28.3423
+    lon_deg: -16.9230
+    height_m: 60
+    source: "Purdy 1825, p. 218: Point Teno, the west point of the island; p. 219: the middle of Gomera lies W.S.W. about five leagues from Point Teno; p. 220: from the S.W. point of the island the current carries a ship in 24 hours to Point Teno; Norie 1805, Table XL: Tona Point 28 16 30 N"
+    says: "Point Teno, the west end of Tenerife, Gomera five leagues off to the west-south-west."
+    fix: "moved 30 m to the grid's land"
+  - id: port-christianos
+    kind: place
+    name: Port Christianos
+    modern: Los Cristianos
+    lat_deg: 28.0500
+    lon_deg: -16.7170
+    height_m: 5
+    source: "Norie 1805, Table XL: Teneriffe, Port Christianos 27 57 N 16 52 W (the period's place eight miles south of the modern bay)"
+    says: "Port Christianos, a landing on the south side of Tenerife."
+
+  # ---------------------------------------------------------------------------
+  # The Grand Canary
+  # ---------------------------------------------------------------------------
+
+  - id: canaria-high-land
+    kind: hill
+    name: the high land of Canaria
+    modern: the Pico de las Nieves
+    lat_deg: 27.9600
+    lon_deg: -15.5720
+    height_m: 1949
+    source: "Purdy 1825, p. 214: the centre of Canaria exceedingly high and full of lofty mountains, which tower so far above the clouds as to stop the north-east wind; in clear weather Canaria and Fuerteventura may each be seen from the other; the height the modern chart's (FROM MEMORY, unverified)"
+    says: "The high land of the Grand Canary, its middle above the clouds; under it to the south-west the trade falls calm."
+
+  - id: the-isleta
+    kind: headland
+    name: the Isleta
+    modern: La Isleta
+    lat_deg: 28.1700
+    lon_deg: -15.4200
+    height_m: 230
+    source: "Purdy 1825, p. 214: on the north-east end of Canaria is the peninsula called the Isleta, three leagues in circumference; the isthmus that joins it to the island about two miles long and a quarter of a mile broad at the narrowest; p. 22 (the table): the Isleta, or N.E. point; Norie 1805, Table XL: Canary N.E. Point 28 13 N"
+    says: "The Isleta, the high peninsula at the north-east end of the Grand Canary, on its low sandy isthmus."
+
+  - id: puerto-de-la-luz
+    kind: road
+    name: Puerto de la Luz
+    modern: the anchorage of La Luz (the modern port's basin)
+    lat_deg: 28.1450
+    lon_deg: -15.4150
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "sand"
+    source: "Purdy 1825, p. 214 (Glas): on the other side of the isthmus is a spacious sandy bay called Puerto de Luz, or Puerto de las Isletas, from some steep rocks or islets at the entrance of the bay toward the N.E.; a good road for shipping of any burthen with all winds except from S.E., to which it is exposed, but that wind seldom blows hard; the landing in the very bight of the bay, where a boat may lie broadside to the shore; the depth JUDGEMENT (not given)"
+    says: "Puerto de la Luz, the spacious sandy bay under the Isleta: a good road for any ship with every wind but the south-easter, which is seldom hard; land in the bight, where a boat may lie broadside to the beach."
+
+  - id: las-palmas-town
+    kind: town
+    name: the city of Palmas
+    modern: Las Palmas de Gran Canaria (Vegueta)
+    lat_deg: 28.1000
+    lon_deg: -15.4140
+    height_m: 15
+    source: "Purdy 1825, p. 214: along shore about a league to the southward of the landing is the city of Palmas, the capital of the island; ships that discharge at Palmas anchor in good weather within half a mile of the town, but that place is not a good road; Norie 1805, Table XL: Palmas 28 8 N"
+    says: "The city of Palmas, the capital of the Grand Canary, a league south of the Isleta's bay."
+
+  - id: palmas-road
+    kind: road
+    name: the road of Palmas
+    modern: the anchorage off Vegueta
+    lat_deg: 28.1000
+    lon_deg: -15.4050
+    height_m: 0
+    depth_fathoms: 15
+    bottom: "sand"
+    source: "Purdy 1825, p. 214: shipping that discharge their cargoes at Palmas generally anchor, in good weather, within half a mile of the town, for the quicker despatch; but that place is not a good road; the depth and the bottom JUDGEMENT (not given)"
+    says: "Off the city of Palmas a ship may lie within half a mile of the town in fine weather to discharge, but it is no road to trust."
+
+  - id: gando
+    kind: place
+    name: Gando
+    modern: the bay of Gando
+    lat_deg: 27.9322
+    lon_deg: -15.3697
+    height_m: 5
+    source: "Purdy 1825, p. 214: the next port of any consequence in Canaria is Gando, in the middle of the east side of the island; a good place for shipping with all winds except from the southward, and there good water and refreshments may be had"
+    says: "Gando, midway down the east side of the Grand Canary: a good place for shipping with all winds but the southerly."
+    fix: "moved 240 m to the grid's land at the bay's head"
+  - id: point-arguineguin
+    kind: headland
+    name: Point Arguineguin
+    modern: Punta de Arguineguín
+    lat_deg: 27.7550
+    lon_deg: -15.6800
+    height_m: 20
+    source: "Purdy 1825, p. 22 (the table): Pt. Arguinequi, the south point of Canaria; Norie 1805, Table XL: Canary, South West Point 27 45 N"
+    says: "Point Arguineguin, the south-west point of the Grand Canary."
+
+  - id: point-aldea
+    kind: headland
+    name: Point Aldea
+    modern: the coast of La Aldea de San Nicolás (Punta de la Aldea)
+    lat_deg: 27.9900
+    lon_deg: -15.8200
+    height_m: 50
+    source: "Purdy 1825, p. 22 (the table): Pt. Aldea, the west point of Canaria"
+    says: "Point Aldea, the west point of the Grand Canary."
+
+  # ---------------------------------------------------------------------------
+  # Lanzarote, Graciosa, Alegranza and the rocks
+  # ---------------------------------------------------------------------------
+
+  - id: puerto-de-naos
+    kind: anchorage
+    name: Puerto de Naos
+    modern: the Puerto de Naos at Arrecife
+    lat_deg: 28.9636
+    lon_deg: -13.5352
+    height_m: 0
+    depth_fathoms: 3
+    bottom: "sand and rock"
+    source: "Purdy 1825, p. 212 (Glas): Lanzarote has three good harbours, the principal Puerto de Naos on the south-east side; any vessel not drawing more than 18 feet may enter it at high water spring tides and lie secure from all winds; the harbour formed by a ridge of rocks, most of them under water, that break off the swell so that inside it is as smooth as a mill-pond; the only convenient place in the Canaries for cleaning or repairing large vessels; p. 220: not advisable for those not perfectly acquainted to attempt it, the entrances being very narrow; the bottom JUDGEMENT"
+    says: "Puerto de Naos within its ridge of sunken rocks, smooth as a mill-pond: eighteen feet over the bar at high water springs, the narrow entrance no place for a stranger; the one harbour of the islands where a large ship may careen."
+    fix: "the place FROM MEMORY is the modern port's land in the grid (its works and fill); moved 380 m to 13 m of water within the reef's line, JUDGEMENT"
+  - id: castle-of-naos
+    kind: castle
+    name: the castle between the harbours
+    modern: the Castillo de San Gabriel, Arrecife
+    lat_deg: 28.9580
+    lon_deg: -13.5470
+    height_m: 10
+    source: "Purdy 1825, p. 212 (Glas): at the west end of the harbour stands a square castle built of stone, mounted with some cannon but of no great strength; it is built upon a small island between the two harbours, joined to the land by a bridge, under which boats go from Puerto de Cavallos to Puerto de Naos"
+    says: "The square stone castle on its islet between Naos and Cavallos, joined to the shore by a bridge: some cannon, no great strength."
+
+  - id: puerto-de-cavallos
+    kind: anchorage
+    name: Puerto de Cavallos
+    modern: the Charco de San Ginés and the old harbour of Arrecife
+    lat_deg: 28.9541
+    lon_deg: -13.5523
+    height_m: 0
+    depth_fathoms: 2
+    bottom: "sand"
+    source: "Purdy 1825, p. 212 (Glas): on the west side of the castle lies another port, Puerto de Cavallos, also an excellent harbour formed by a ridge of rocks; but its entrance is shallow, no more than 12 feet of water with spring tides; the bottom JUDGEMENT"
+    says: "Puerto de Cavallos west of the castle, as snug as Naos, but twelve feet in its entrance at springs."
+    fix: "the place FROM MEMORY is the grid's land; moved 540 m to 2 m of water west of the castle"
+  - id: el-rio
+    kind: anchorage
+    name: El Rio
+    modern: El Río, the strait between Lanzarote and La Graciosa
+    lat_deg: 29.2250
+    lon_deg: -13.5000
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "sand"
+    source: "Purdy 1825, pp. 212 to 213 (Glas): at the north end of Lanzarote a large spacious harbour called El Rio, the strait dividing it from Graciosa; a ship of any burthen may pass through, keeping mid-way, in 6 or 7 fathoms; past the shallow point on the starboard hand, edge toward Graciosa and anchor in any convenient depth; a commodious place in summer for careening; heavy gusts off the high land of Lanzarote in east and south-east winds; in a south-wester run back eastward round the shallow point"
+    says: "El Rio, the strait between Lanzarote and Graciosa, six or seven fathoms mid-way: a smooth anchorage in the trade toward Graciosa, but the squalls come off the high cliff of Lanzarote in an easterly."
+
+  - id: graciosa
+    kind: island
+    name: Graciosa
+    modern: La Graciosa
+    lat_deg: 29.2500
+    lon_deg: -13.5000
+    height_m: 266
+    source: "Purdy 1825, p. 213: the island of Graciosa, on the north side of the channel El Rio, about 8 miles in length and two in breadth, destitute of water; p. 212 (Humboldt): its black mountains appeared like walls of 500 or 600 feet; Norie 1805, Table XL: I. Graciosa 29 14 N"
+    says: "Graciosa, the low black island north of El Rio, without water."
+
+  - id: montana-clara
+    kind: island
+    name: Clara
+    modern: Montaña Clara
+    lat_deg: 29.2950
+    lon_deg: -13.5370
+    height_m: 256
+    source: "Purdy 1825, p. 212: Allegranza, Clara and Graciosa are visited only for the orchilla; Clara is noted for its canary birds and yields pasture; Norie 1805, Table XL: St. Claire 29 17 N"
+    says: "Clara, the little high island between Graciosa and Alegranza."
+
+  - id: alegranza
+    kind: island
+    name: Allegranza
+    modern: Alegranza
+    lat_deg: 29.4000
+    lon_deg: -13.5000
+    height_m: 289
+    source: "Purdy 1825, p. 22 (the table): Allegranza, the island off the north end; p. 213: the little isle of Allegranza lies to the northward of Graciosa at six or seven miles; Norie 1805, Table XL: Alegranza 29 20 N"
+    says: "Allegranza, the northernmost of the Canaries, six or seven miles north of Graciosa."
+
+  - id: west-rock
+    kind: island
+    name: the West Rock
+    modern: the Roque del Oeste (Roque del Infierno)
+    lat_deg: 29.3027
+    lon_deg: -13.5385
+    height_m: 40
+    extent_m: 100
+    grid_lacks: true
+    source: "Purdy 1825, p. 212 (Humboldt, 1799): a rock near Clara on which the sea broke with violence, noted in the old charts as Infierno, or Hell Rock, a mass of lava three or four fathoms high (sic: the passage tacked between Clara and the West Rock), now generally called the West Rock; the height JUDGEMENT"
+    says: "The West Rock, Hell Rock of the old charts, a black mass of lava near Clara with the current setting on it: Humboldt's ship barely weathered it."
+    fix: "the place FROM MEMORY was in 75 m; moved to the grid's shoal head 0.2 m below the datum by Clara's north-west, where the grid smooths a rock (an island the grid lacks)"
+  - id: east-rock
+    kind: island
+    name: the East Rock
+    modern: the Roque del Este
+    lat_deg: 29.2772
+    lon_deg: -13.3349
+    height_m: 84
+    source: "Purdy 1825, p. 213: about 8 miles to the eastward of Allegranza and Graciosa is a large high rock called Roca del Este, or the East Rock; many ships have been wrecked upon these islands in the night, misled by errors in their reckoning, by the currents, and by the islands laid down in some charts twenty miles farther south than they ought to lie"
+    says: "The East Rock, a large high rock alone eight miles east of Graciosa: ships have been lost on these islands at night by their reckoning and the current."
+    fix: "moved 200 m to the grid's land: the grid holds the rock"
+  - id: punta-farion
+    kind: headland
+    name: Point Farion
+    modern: Punta Fariones, the north point of Lanzarote
+    lat_deg: 29.2350
+    lon_deg: -13.4714
+    height_m: 30
+    source: "Norie 1805, Table XL: Lanzarote, Punta del Farion 29 14 N"
+    says: "Point Farion, the north end of Lanzarote, with El Rio and Graciosa west of it."
+    fix: "moved 560 m to the grid's land"
+  - id: lanzarote-south-point
+    kind: headland
+    name: the south point of Lanzarote
+    modern: Punta Pechiguera
+    lat_deg: 28.8558
+    lon_deg: -13.8695
+    height_m: 15
+    source: "Norie 1805, Table XL: Lanzarote, S. Point 28 51 N; Purdy 1825, p. 213: the Bocayna, the channel between this island and Fortaventura"
+    says: "The south point of Lanzarote, on the Bocayna."
+    fix: "moved 260 m to the grid's land"
+  - id: lanzarote-high-land
+    kind: hill
+    name: the high land of Lanzarote
+    modern: the Peñas del Chache, Famara
+    lat_deg: 29.1250
+    lon_deg: -13.5300
+    height_m: 670
+    source: "Purdy 1825, p. 212: Lanzarote is very high, and may be discerned at a great distance; on approaching it appears black, rocky and barren; p. 213: in the Bocayna a ship that brings a high hill on Lanzarote directly to windward of her will be becalmed; the height the modern chart's (FROM MEMORY, unverified)"
+    says: "The high land of Lanzarote, black and barren, seen a great way off."
+
+  # ---------------------------------------------------------------------------
+  # Fuerteventura and Lobos
+  # ---------------------------------------------------------------------------
+
+  - id: lobos
+    kind: island
+    name: Lobos
+    modern: the Isla de Lobos
+    lat_deg: 28.7500
+    lon_deg: -13.8200
+    height_m: 127
+    source: "Purdy 1825, p. 213: on the south side of the Bocayna's eastern entrance, very near Fortaventura, the little island of Lobos, or Seal's Isle, about a league and a half in circumference, uninhabited and without water; very near Lobos the ground is foul and rocky; in a great westerly swell the sea breaks horribly on the rocks at its N.W. end (Glas: breakers nearly 60 feet high); p. 22 (the table): I. of Lobos, off the N.E. point of Fortaventura"
+    says: "Lobos, Seal's Isle, off the north end of Fuerteventura: the ground foul close to it, and in a westerly swell the sea breaks on its north-west end like thunder."
+
+  - id: lobos-road
+    kind: road
+    name: the road by Lobos
+    modern: the strait of La Bocaina off Corralejo
+    lat_deg: 28.7319
+    lon_deg: -13.8382
+    height_m: 0
+    depth_fathoms: 10
+    bottom: "fine sand"
+    source: "Purdy 1825, p. 213 (Glas): near this isle is a good road for shipping, the mark the east point of Lobos bearing nearly N.E. by N., anchor half-way between it and Fortaventura, or nearest the latter; open as it seems, very safe with the trade wind, the water smooth and the ground every where clean, a fine sandy bottom; directly ashore on Fortaventura a well of good water; the depth JUDGEMENT (Glas's 10 fathoms in the channel)"
+    says: "The road by Lobos, half-way between the isle and Fuerteventura and nearer the latter, on clean fine sand: open to look at, but safe and smooth in the trade, with a well of good water ashore."
+    fix: "moved 280 m to 9 m of water"
+  - id: porto-de-cabras
+    kind: road
+    name: Porto de Cabras
+    modern: the bay of Puerto del Rosario
+    lat_deg: 28.4958
+    lon_deg: -13.8528
+    height_m: 0
+    depth_fathoms: 8
+    bottom: "sand, the ground about it rocky and foul"
+    source: "Glas 1764, Fuertaventura (l. 8346 to 8354): about sixteen miles southward of the road near Lobos is a bay with a road where barks lie and lade corn, called Porto de Cabras; a stranger cannot find it without a pilot, for the ground all round it is rocky and foul; on the shore near the road a patch of yellow sand, which appears off at sea like a field of ripe corn, the best mark; the depth JUDGEMENT (not given)"
+    says: "Porto de Cabras, a road where the barks lade corn: find it by the patch of yellow sand on the shore like a field of ripe wheat, and take a pilot, for the ground about it is foul."
+    fix: "the place FROM MEMORY is the modern port's land in the grid; moved 320 m to 9 m of water"
+  - id: cala-de-fustes
+    kind: place
+    name: Cala de Fustes
+    modern: Caleta de Fuste (El Castillo)
+    lat_deg: 28.3920
+    lon_deg: -13.8600
+    height_m: 5
+    source: "Glas 1764, Fuertaventura (l. 8356 to 8365): two leagues further southward the port of Cala de Fustes, where corn is also shipped; fit only for small barks, secure from all winds but the south-east; a good road before the harbour where ships may ride"
+    says: "Cala de Fustes, a bark's harbour two leagues south of Cabras, with a road before it."
+
+  - id: pozzonegro
+    kind: place
+    name: Pozzonegro
+    modern: Pozo Negro
+    lat_deg: 28.3236
+    lon_deg: -13.8903
+    height_m: 5
+    source: "Purdy 1825, pp. 219 to 220 (Glas, directions among the islands): from the point of Handia or Morro Gable it is easy to beat up to Pozzonegro along the east side of the island, because the sea there is always smooth; from Pozzonegro to Lobos not so easy"
+    says: "Pozzonegro, on the smooth east side of Fuerteventura."
+    fix: "moved 150 m to the grid's land"
+  - id: point-handia
+    kind: headland
+    name: Point Handia
+    modern: Punta de Jandía
+    lat_deg: 28.0678
+    lon_deg: -14.5063
+    height_m: 20
+    source: "Purdy 1825, p. 22 (the table): Pt Handia, the S.W. point of Fortaventura; p. 214: the Isleta of Canaria lies 16 leagues N.W. by W. 1/2 W. from it; Norie 1805, Table XL: Fuerteventura, South West Point 28 4 N"
+    says: "Point Handia, the south-west end of Fuerteventura, the Grand Canary sixteen leagues off."
+    fix: "moved 420 m to the grid's land"
+  - id: morro-gable
+    kind: headland
+    name: Morro Gable
+    modern: Morro Jable
+    lat_deg: 28.0469
+    lon_deg: -14.3550
+    height_m: 30
+    source: "Purdy 1825, p. 220 (Glas): the point of Handia, or perhaps Morro Gable, the southern point of Fortaventura"
+    says: "Morro Gable, the southern point of Fuerteventura."
+    fix: "moved 210 m to the grid's land"
+  - id: point-gorda
+    kind: headland
+    name: Point Gorda
+    modern: the north-east coast of Fuerteventura by Corralejo
+    lat_deg: 28.7400
+    lon_deg: -13.8700
+    height_m: 10
+    source: "Norie 1805, Table XL: Fuerteventura, Point Gorda 28 46 N (the north point by its latitude; the modern name not certain, JUDGEMENT)"
+    says: "Point Gorda, the north end of Fuerteventura on the Bocayna."
+
+  # ---------------------------------------------------------------------------
+  # Palma
+  # ---------------------------------------------------------------------------
+
+  - id: santa-cruz-de-la-palma-town
+    kind: town
+    name: Santa Cruz of Palma
+    modern: Santa Cruz de La Palma
+    lat_deg: 28.6830
+    lon_deg: -17.7650
+    height_m: 15
+    source: "Purdy 1825, pp. 218 to 219 (Glas): the chief port Santa Cruz, on the east side; approaching, Palma appears shaped exactly like a saddle; steer for a little to windward of the lowest place till within a mile, then run along shore southward and the town shows close by the sea; a large town; near the mole a castle or battery with a few cannon; a fountain in the middle of the town; Norie 1805, Table XL: Palma, Town 28 37 N"
+    says: "Santa Cruz of Palma, close by the sea under its steep high land: steer for the middle of the saddle and run south along shore, and the town and its shipping show within a mile."
+
+  - id: santa-cruz-de-la-palma-castle
+    kind: castle
+    name: the castle by the mole of Palma
+    modern: the Castillo de Santa Catalina (FROM MEMORY)
+    lat_deg: 28.6880
+    lon_deg: -17.7640
+    height_m: 8
+    source: "Purdy 1825, p. 219 (Glas): near the mole is a castle, or battery, mounted with a few cannon, for the defence of the shipping"
+    says: "The castle by the mole of Santa Cruz of Palma, a few guns for the shipping."
+
+  - id: santa-cruz-de-la-palma-road
+    kind: road
+    name: the road of Santa Cruz of Palma
+    modern: the anchorage off Santa Cruz de La Palma
+    lat_deg: 28.6800
+    lon_deg: -17.7600
+    height_m: 0
+    depth_fathoms: 18
+    bottom: "clean and good"
+    source: "Purdy 1825, pp. 218 to 219 (Glas): the road within a musket-shot of the shore, where vessels commonly ride in 15 or 20 fathoms, exposed to easterly winds, yet with good anchors and cables safe in all winds, for the ground is clean and good and the high land facing the road repels the wind; a north-east swell comes rolling in but the wind off the land checks it; in winter the swell breaks high on the beach and stops the boats for three or four days together"
+    says: "The road of Santa Cruz of Palma, a musket-shot off in fifteen or twenty fathoms on clean ground: open to the east, but the high land throws the wind back and a ship rides with a slack cable."
+
+  - id: tazacorte
+    kind: place
+    name: Tasacorta
+    modern: Tazacorte
+    lat_deg: 28.6420
+    lon_deg: -17.9400
+    height_m: 5
+    source: "Purdy 1825, p. 219 (Glas): Tasacorta, the port next in consideration to Santa Cruz, on the S.W. part of the island, exposed to westerly winds and little frequented by any but boats; p. 22 (the table): Tasacorta, on the W. side"
+    says: "Tasacorta on the west side of Palma, a boats' landing open to the westerly winds."
+
+  - id: la-caldera
+    kind: hill
+    name: La Caldera
+    modern: the Roque de los Muchachos, on the rim of the Caldera de Taburiente
+    lat_deg: 28.7540
+    lon_deg: -17.8850
+    height_m: 2426
+    source: "Purdy 1825, p. 218: the summit of this island is higher than the general level of Tenerife, its peak excepted; p. 219: in the north-eastern part inland a remarkable high mountain called La Caldera, or the Cauldron, being hollow; the height the modern chart's (FROM MEMORY, unverified)"
+    says: "The Caldera of Palma, the great hollow mountain, its rim higher than all Tenerife but the Peak."
+
+  - id: palma-south-point
+    kind: headland
+    name: the south point of Palma
+    modern: Punta de Fuencaliente
+    lat_deg: 28.4560
+    lon_deg: -17.8420
+    height_m: 20
+    source: "Norie 1805, Table XL: Palma, South Point 28 29 30 N; Purdy 1825, p. 22 (notes): Captain Wilson's chronometer placed the south point three minutes west of Borda's"
+    says: "The south point of Palma."
+
+  # ---------------------------------------------------------------------------
+  # Gomera
+  # ---------------------------------------------------------------------------
+
+  - id: san-sebastian-gomera-town
+    kind: town
+    name: St. Sebastian
+    modern: San Sebastián de La Gomera
+    lat_deg: 28.0920
+    lon_deg: -17.1120
+    height_m: 10
+    source: "Purdy 1825, p. 219 (Glas): St. Sebastian, the principal town, close by the sea-shore in the bottom of a bay on the eastern side, the shipping land-locked from all winds but the S.E.; plenty of good water from wells; Norie 1805, Table XL: Gomero, St. Sebastian 28 5 40 N"
+    says: "St. Sebastian of Gomera at the bottom of its bay, the shipping land-locked from every wind but the south-east."
+
+  - id: san-sebastian-gomera-tower
+    kind: tower
+    name: the old round tower of St. Sebastian
+    modern: the Torre del Conde
+    lat_deg: 28.0910
+    lon_deg: -17.1110
+    height_m: 15
+    source: "Purdy 1825, p. 219 (Glas): on the south side of the mouth of the rivulet stands an old round tower; on the top of the cliff on the north side of the cove a chapel and a battery with a few guns"
+    says: "The old round tower by the rivulet's mouth at St. Sebastian."
+
+  - id: san-sebastian-gomera-road
+    kind: road
+    name: the bay of St. Sebastian
+    modern: the anchorage off San Sebastián de La Gomera
+    lat_deg: 28.0880
+    lon_deg: -17.1060
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "sand"
+    source: "Purdy 1825, p. 219 (Glas): anchor at a convenient distance from the shore in 15 to 7 fathoms; moor with a large scope, for the land wind frequently blows hard and may blow a ship out of the bay; the best berth where a full view may be had along the main street, about a cable's length from the beach; stand close in with the north point, for the land wind is too scanty to fetch the berth, better come in with the sea breeze about noon; the bottom JUDGEMENT"
+    says: "The bay of St. Sebastian: anchor a cable off the beach with the main street open, in seven to fifteen fathoms, and moor with a long scope, for the land wind blows hard out of the valley; come in on the sea breeze after noon."
+
+  - id: gomera-high-land
+    kind: hill
+    name: the high land of Gomera
+    modern: Garajonay
+    lat_deg: 28.1030
+    lon_deg: -17.2470
+    height_m: 1487
+    source: "Purdy 1825, p. 219: Gomera lies W.S.W. five leagues from Point Teno; the height the modern chart's (FROM MEMORY, unverified)"
+    says: "The high land of Gomera, five leagues west-south-west of Point Teno."
+
+  # ---------------------------------------------------------------------------
+  # Ferro
+  # ---------------------------------------------------------------------------
+
+  - id: valverde
+    kind: town
+    name: Valverde
+    modern: Valverde, El Hierro
+    lat_deg: 27.8080
+    lon_deg: -17.9150
+    height_m: 600
+    source: "Purdy 1825, p. 219: Ferro has neither road nor harbour worthy of particular description; it has one church, but the town is inconsiderable; the land rises steeply from the sea and is craggy on all sides for about a league; p. 22 (the table): the town of Valverde; Norie 1805, Table XL: Ferro, Valverde 27 47 35 N"
+    says: "Valverde, the one town of Ferro, high up behind the craggy shore: the island has no road worth the name."
+
+  - id: ferro-west-point
+    kind: headland
+    name: La Dehesa, the west point of Ferro
+    modern: Punta de Orchilla
+    lat_deg: 27.7100
+    lon_deg: -18.1470
+    height_m: 30
+    source: "Purdy 1825, p. 22 (the table): La Dehessa, or Western Point of Ferro; p. 22 (notes): Ferro suspected placed a few minutes too far west; the first meridian of the ancients"
+    says: "The west point of Ferro, the end of the Old World by the ancients' first meridian."
+
+  - id: ferro-high-land
+    kind: hill
+    name: the high land of Ferro
+    modern: the Malpaso
+    lat_deg: 27.7300
+    lon_deg: -18.0300
+    height_m: 1501
+    source: "Purdy 1825, p. 219 and Glas 1764 (Hierro, l. 11602): the land rises steep and craggy from the sea on all sides for above a league; the height the modern chart's (FROM MEMORY, unverified)"
+    says: "The high land of Ferro, rising steep and craggy from the sea on every side."

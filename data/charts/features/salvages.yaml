@@ -1,0 +1,90 @@
+# The features of the Salvages (package 106a): the Great Salvage, the Great and the Little
+# Piton and their reefs, by Purdy 1825 (docs/references/pilots/purdy-1825-memoir-atlantic-
+# ocean-ocr.txt, pp. 210 to 211, the description after Mudge's and Vidal's survey of 1820,
+# and the notes to the table, p. 22), Norie 1805 and the Oriental Navigator 1801 ("the
+# Salvages, which are very dangerous in the night", p. 25). The rules of channel-west.yaml's
+# head; positions in the modern frame, first placed FROM MEMORY and checked against the
+# region's one tile (each move in `fix`); heights the modern chart's FROM MEMORY
+# (UNVERIFIED) unless the entry says otherwise. No light stood here in 1805.
+
+region: salvages
+features:
+
+  - id: great-salvage
+    kind: island
+    name: the Great Salvage
+    modern: Selvagem Grande
+    lat_deg: 30.1430
+    lon_deg: -15.8700
+    height_m: 163
+    source: "Purdy 1825, p. 210: the Salvages consist of an island named Ilha Grande, or the Great Salvage, a larger isle named the Great Piton (sic) and a smaller called the Little Piton, with numerous rocks; the Great Salvage in 30 8 N, 15 55 or 15 56 W, of very irregular shape, with a number of rocks about it within a mile; Mudge and Vidal's survey of 1820 its south side in 30 7 39 N; p. 218: the Grand Salvage is very high and may be seen ten or twelve leagues off; Oriental Navigator 1801, p. 25: very dangerous in the night"
+    says: "The Great Salvage, high, black and irregular, with rocks about it a mile out: a danger in the night on the way from Madeira to the Canaries."
+
+  - id: great-salvage-north-shoal
+    kind: rock
+    name: the north shoal of the Great Salvage
+    modern: the shoal north of Selvagem Grande
+    lat_deg: 30.1640
+    lon_deg: -15.8760
+    height_m: 0
+    extent_m: 150
+    dries_m: -5.5
+    source: "Purdy 1825, p. 210: three shoal spots lie to the northward and eastward of the isle; the northern one about three-quarters of a mile to the northward (N.N.W.) of it; to be avoided if the swell be very heavy"
+    says: "The shoal three-quarters of a mile north of the Great Salvage, which breaks in a heavy swell."
+    fix: "the grid has 55 m here and nothing under 12 m within 400 m (EMODnet smooths the spot); left at the pilot's place, three-quarters of a mile N.N.W. of the isle, its head JUDGEMENT the eastern spots' three fathoms"
+  - id: great-salvage-ne-shoals
+    kind: rock
+    name: the north-east shoals of the Great Salvage
+    modern: the shoals north-east of Selvagem Grande
+    lat_deg: 30.1550
+    lon_deg: -15.8500
+    height_m: 0
+    extent_m: 300
+    dries_m: -5.5
+    source: "Purdy 1825, p. 210: of the three shoal spots the inner one on the N.E., 950 fathoms from the isle, and the outer in the same direction a mile and a tenth"
+    says: "The two shoal spots north-east of the Great Salvage, the outer a mile off."
+    fix: "the grid has 36 m here and nothing under 12 m within 400 m; left at the pilot's place between 950 fathoms and a mile and a tenth N.E. of the isle, its head JUDGEMENT the eastern spots' three fathoms"
+  - id: great-salvage-east-shoals
+    kind: rock
+    name: the shoals off the east shore of the Great Salvage
+    modern: the shoals east of Selvagem Grande
+    lat_deg: 30.1400
+    lon_deg: -15.8540
+    height_m: 0
+    extent_m: 200
+    depth_fathoms: 3
+    dries_m: -5.5
+    source: "Purdy 1825, p. 210: two others, with 3 and 3 1/2 fathoms, lie at about half a mile from the eastern shore"
+    says: "Two shoal heads of three fathoms half a mile off the east shore of the Great Salvage."
+    fix: "on the grid's shoal head, 0.7 m: the pilot's three fathoms the head given"
+  - id: great-piton
+    kind: island
+    name: the Great Piton
+    modern: Selvagem Pequena
+    lat_deg: 30.0350
+    lon_deg: -16.0244
+    height_m: 49
+    source: "Purdy 1825, p. 210: the Great Piton lies 8 1/2 miles W.S.W. 1/2 W. (S.W. by W. true) from Ilha Grande, a mile and three-quarters long N.E. and S.W., with a hill or peak near its centre; at a great distance looks like a sail; its southern part green, its northern barren; may be seen five or six leagues off; the whole of its eastern side rocky and dangerous"
+    says: "The Great Piton, eight miles and a half south-west of the Great Salvage, with its peak in the middle; from far off it looks like a sail, and all its eastern side is foul."
+    fix: "moved 60 m to the grid's land"
+  - id: little-piton
+    kind: island
+    name: the Little Piton
+    modern: Ilhéu de Fora
+    lat_deg: 30.0444
+    lon_deg: -16.0466
+    height_m: 18
+    source: "Purdy 1825, pp. 210 to 211: the Little Piton lies a mile from the western side of the Great, three-quarters of a mile long nearly the same way, very flat, joined to the south point of the greater by a continued ledge of rocks"
+    says: "The Little Piton, low and flat, a mile west of the Great and joined to it by a ledge of rocks."
+    fix: "moved 310 m to the grid's land"
+  - id: pitons-bank
+    kind: rock
+    name: the rocky bank of the Pitons
+    modern: the reefs west of Ilhéu de Fora
+    lat_deg: 30.0446
+    lon_deg: -16.0513
+    height_m: 0
+    extent_m: 800
+    source: "Purdy 1825, p. 210: these isles are seated upon, and surrounded by, one dangerous rocky bank, which extends from the western side of the little isle half a league to the westward"
+    says: "The rocky bank of the Pitons, which runs half a league west of the Little Piton: give it a wide berth."
+    fix: "moved 1.4 km east to the grid's shoal head 0.01 m below the datum off the Little Piton's west side; the extent laid westward over the bank the pilot gives half a league"

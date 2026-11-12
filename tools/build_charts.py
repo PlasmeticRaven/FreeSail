@@ -385,6 +385,58 @@ REGIONS: dict[str, dict[str, Any]] = {
         # are held, and the fill stands as high above that tide as above the sea's
         "fill_to_chart_datum": True,
     },
+    # package 106a: the Canaries, the seven islands with their channels, Alegranza, the
+    # Roque del Este and Lobos; a hair inside the level-2 tile edges (package 104: a bound
+    # on an edge takes in a row or a column more; the brief's 27.33 to 29.47 N and 18.29 to
+    # 13.17 W were 91 tiles, these 60). Over the coarse layer beside the corridor
+    # (`atlantic-south`), which answers the sea about them. The harbours: a level-3 patch
+    # for each port's road from EMODnet, no override (no period plan read with its datum:
+    # the port files say `datum: unverified`). The tide: the block's seven gauges (TICON,
+    # the levels from Puertos del Estado's REDMAR reports), so the fill is raised by its own
+    # water, 1.2 to 1.6 m.
+    "canaries": {
+        "title": "The Canary Islands",
+        "bounds": {"south": 27.33334, "north": 29.46666, "west": -18.29332, "east": -13.17334},
+        "fetch": {"south": 27.28, "north": 29.52, "west": -18.35, "east": -13.12},
+        "harbours": {
+            "santa-cruz-de-tenerife": {
+                "south": 28.45,
+                "north": 28.50,
+                "west": -16.26,
+                "east": -16.21,
+            },
+            "orotava": {"south": 28.405, "north": 28.43, "west": -16.57, "east": -16.53},
+            "las-palmas": {"south": 28.09, "north": 28.16, "west": -15.44, "east": -15.40},
+            "arrecife": {"south": 28.945, "north": 28.975, "west": -13.565, "east": -13.52},
+            "santa-cruz-de-la-palma": {
+                "south": 28.665,
+                "north": 28.695,
+                "west": -17.78,
+                "east": -17.75,
+            },
+            "san-sebastian-de-la-gomera": {
+                "south": 28.08,
+                "north": 28.10,
+                "west": -17.12,
+                "east": -17.10,
+            },
+            "cabras": {"south": 28.49, "north": 28.51, "west": -13.87, "east": -13.85},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
+    # package 106a: the Salvages, by one level-2 tile (29.89 to 30.32 N, 16.16 to 15.73 W)
+    # rather than the Canaries' bound carried up to them (24 tiles and 2.15 MB more): the
+    # Great Salvage, the Great and Little Pitons and their reefs. No gauge of their own: by
+    # package 104's ruling served by Santa Cruz de Tenerife's and Funchal's.
+    "salvages": {
+        "title": "The Salvages",
+        "bounds": {"south": 29.89334, "north": 30.31999, "west": -16.15999, "east": -15.73334},
+        "fetch": {"south": 29.84, "north": 30.37, "west": -16.21, "east": -15.68},
+        "harbours": {},
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
     # package 39e: the Western Islands (the Azores), 36.5 to 40 N and 31.5 to 24.5 W: the
     # nine islands, Flores and Corvo at the western bound, Santa Maria and the Formigas at
     # the south-east. The level-2 tiles that meet the bounds span 36.29 to 40.13 N and
@@ -790,6 +842,9 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 104: the Sardinian sea and the coast of Tunis, the L-shaped hole
             "sardinian-sea",
             "tunis-coast",
+            # package 106a: the Canaries and the Salvages, over the ocean carried south
+            "canaries",
+            "salvages",
         ],
         "corridor": "atlantic-corridor",
         # package 106a: coarse layers read after the corridor, each answering only where
