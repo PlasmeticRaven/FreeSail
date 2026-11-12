@@ -386,6 +386,7 @@ nations:
       etruria: "peace; JUDGEMENT"
       liguria: "peace; JUDGEMENT"
       papal-state: "peace; JUDGEMENT"
+      order-of-st-john: "UNVERIFIED; taken as peace (JUDGEMENT; package 105: the Order held no port after June 1798)"
 
   # package 79c: the regency of Algiers, for Algiers and Oran (the Mediterranean's west
   # block), data alone in Morocco's form. The Dey's corsairs (the reis's cruisers, the
@@ -654,6 +655,45 @@ nations:
       algiers: "UNVERIFIED (neighbours on the Barbary shore; no war between them read); taken as peace"
       morocco: "peace; JUDGEMENT"
 
+  # package 105: the Order of St John, sovereign of Malta, Gozo and Comino from the grant of
+  # Charles V in 1530 (Purdy 1826, p. 157) to the capitulation to Bonaparte of 12 June 1798
+  # (James 1837, vol. 2, p. 170); restored to the islands by the treaty of Amiens of 25
+  # March 1802 (vol. 3, p. 152), which Britain did not carry out. After June 1798 the Order
+  # held no port of the game's; the nation stands for Malta's ports before it (their files'
+  # dated `nation:`). No war of the Order's is entered: the wars table is June 1805's and the
+  # Order then held nothing (its standing war with the Barbary regencies, noted and not
+  # modelled).
+  order-of-st-john:
+    name: the Order of St John
+    adjective: Maltese
+    people: the Maltese
+    names: english               # no Maltese names list; the pilots' names are the port files'
+    colours: "red, with a white cross (FROM MEMORY: no plate of the Order's colours read)"
+    flag: "the red flag with the white cross"
+    letters_of_marque: false     # the Order's corsairs under its licence, noted and not modelled
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, as Tunis', package 104)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "James 1837, vol. 2, p. 170: the French took at Malta two 64-gun ships, one frigate and three galleys of the Order's; Smyth 1824, p. 287: the knights went annually with their galleys to Lampedusa; p. 202: in 1570 the Order's squadron beaten by the corsair Uluj Ali and only three vessels sent to Lepanto; not modelled beyond keeping port"
+    relations:
+      britain: "peace; JUDGEMENT (no treaty read)"
+      france: "peace until Bonaparte's landing of 10 June 1798 and the capitulation of the 12th (James 1837, vol. 2, p. 170); beyond this table's date the Order held nothing"
+      naples: "peace; the King of the Two Sicilies the islands' feudal lord (FROM MEMORY)"
+      algiers: "the Order's standing war against the Barbary corsairs (Smyth 1824, p. 202, the Order's galleys against Uluj Ali in 1570); not entered: the table is June 1805's"
+      tunis: "as Algiers'"
+
 # Who is at war with whom in June 1805, each war once, with its beginning and its source.
 wars:
   - between: [britain, france]
@@ -799,3 +839,17 @@ ports:
   carloforte: sardinia
   gulf-of-palmas: sardinia
   oristano: sardinia
+  # package 105: Sicily and Malta's step 2: Malta's four the Order's first (their files'
+  # dated `nation:` give France's and the King's); Sicily's five the King of the Two
+  # Sicilies'; Calabria's two his first (their files' rows give France's from 1806)
+  valletta: order-of-st-john
+  marsaxlokk: order-of-st-john
+  st-pauls-bay: order-of-st-john
+  mgarr: order-of-st-john
+  messina: naples
+  milazzo: naples
+  catania: naples
+  augusta: naples
+  syracuse: naples
+  reggio: naples
+  scilla: naples

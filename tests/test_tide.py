@@ -1119,8 +1119,8 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    # package 101: Barcelona's, the Catalan coast's
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 76
+    # package 101: Barcelona's, the Catalan coast's; package 105: Sicily's six (old: 76)
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 82
     for g in blocks:
         # its own block first (a list's further blocks are the rule of the seams': below)
         own = g["block"][0] if isinstance(g["block"], list) else g["block"]
@@ -1147,6 +1147,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         # neighbours' nearest gauges (Mahon's, Carloforte's and Cagliari's lists)
         "sardinian-sea",
         "tunis-coast",
+        "sicily",  # package 105: its six, TICON's in its bounds
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
