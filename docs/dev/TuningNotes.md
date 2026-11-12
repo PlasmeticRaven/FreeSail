@@ -27020,9 +27020,9 @@ field of the whole corridor, not only the tiles near new land.
 **A second layer beside the first** (a corridor of its own, `atlantic-south` the working
 name; bounds 25.21 to 31.9 N, 18.5 to 9.4 W; fetch 12.3 to 33.8 N, 26.5 to 9.25 W, so that
 its field knows Madeira's shores and the coast of Morocco): 6 tiles, three columns (22.13 to
-9.33 W) by two rows. Three are new names (25.2 to 29.47 N; 634,781 bytes); three share the
+9.33 W) by two rows. Three are new names (25.2 to 29.47 N; 733,781 bytes); three share the
 first's names in the row from 29.47 N (`106080_-79680`, `-64320`, `-48960`) and are written
-in their own folder, NODATA wherever the first has data (560,180 bytes so masked; 750,024
+in their own folder, NODATA wherever the first has data (461,180 bytes so masked; 750,024
 whole): **1,194,961 bytes in all, and no existing tile touched.** The runtime must learn it:
 a level-1 tile listed by both layers is read as the first's, its NODATA cells (elevation,
 distance and the blocks' shoalest soundings) filled from the second's at load
@@ -27030,7 +27030,7 @@ distance and the blocks' shoalest soundings) filled from the second's at load
 as it did. Of the three columns: the west from 22.13 W (Hierro's west point is 18.16 W, the
 pilots' way outside the islands 30 or 40 leagues west of them lies south of the row);
 nothing west of 22.13 W between 29.47 and 31.9 N is filled (a column more, 26.4 to 22.13 W,
-would be 1 tile of 170,625 bytes in the Canaries' row and one masked in the row above).
+would be 1 tile of 170,625 bytes in the Canaries' row and one more, masked, in the row above, not measured).
 
 **What reads the coarse layer, and whether it moves (the second layer).** The recorded
 passages and the gate's days are `region: channel-west`, whose chart has no corridor; the
