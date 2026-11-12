@@ -2516,6 +2516,12 @@ class Build:
                 "committed (spec M6 §26, the owner's ruling 5): the one level-1 folder the "
                 "repository carries, so that a clone plays the voyage; the runtime reads these "
                 "tiles under every region of a chart that names the corridor"
+            )
+            if not recipe.get("beside")
+            else (
+                f"committed beside {recipe['beside']} (package 106a): read after it, under "
+                "every region of a chart that names it in `corridors_beside`; a tile both "
+                "list is the first's, its NODATA cells filled from this layer's at load"
             ),
             "tiles": records,
             "bytes": total,

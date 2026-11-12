@@ -48,7 +48,6 @@ from __future__ import annotations
 
 import json
 import math
-import warnings
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -590,8 +589,10 @@ class Tile:
         """This tile with its NODATA cells taken from another tile of the same place and
         grid (package 106a: a coarse layer beside the corridor, whose tiles in the row
         from 29.47 N are NODATA south of 31.9 N): the elevation and the distance where
-        this one has nothing, the shoalest soundings the shoaler of the two. Where this
-        tile has data, its own cells stand, unchanged."""
+        this one has nothing, and a block's shoalest sounding from the other where this
+        one's block has none. Where this tile has data, its own cells stand, unchanged
+        (within a cell of its data's edge a bilinear read now finds its four corners known:
+        the seam)."""
         if (other.south_sec, other.west_sec, other.cell_sec) != (
             self.south_sec,
             self.west_sec,
@@ -614,9 +615,9 @@ class Tile:
             and other.min_blocks_m.shape == blocks.shape
             and other.min_block_cells == self.min_block_cells
         ):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                blocks = np.fmin(blocks, other.min_blocks_m).astype(blocks.dtype)
+            # the first's own block wherever it has one, so that nothing the first answered
+            # moves; the other's where the first's block is all NODATA
+            blocks = np.where(np.isnan(blocks), other.min_blocks_m, blocks).astype(blocks.dtype)
         return Tile(
             level=self.level,
             south_sec=self.south_sec,
@@ -626,7 +627,7 @@ class Tile:
             nodata=self.nodata,
             elevation=np.ascontiguousarray(elevation),
             dist=dist,
-            min_depth_m=float(np.fmin(self.min_depth_m, other.min_depth_m)),
+            min_depth_m=other.min_depth_m if math.isnan(self.min_depth_m) else self.min_depth_m,
             min_blocks_m=blocks,
             min_block_cells=self.min_block_cells,
         )
