@@ -18577,6 +18577,141 @@ Junit, logs and the probes under `scratchpad/b7e/fix/` (`final/`, `repro.py`, `r
 `saves_peek.py`, `mutate_crewed.py`, `mutations-crewed.json`, `pace7159.log`); the worktree of 62cf52c6
 cleared after. Not run: the pace tier alone, and the generator (no ship file touched).
 
+### B7.e and the trunk's merge (2026-11-12)
+
+**The merge.** The lead's trunk at 746c0bb7 merged onto e4797779 (B7.e's review mends) at 1282e25f;
+it brought every trunk commit since the branch last took the trunk at 7693cad5 (package 74's steps 4
+to 7 and close-out, 98, 100, 101, 102, the lead's records and the removal of truth 7-196's
+alone-pace test, its figures kept in a comment). Two fast tests failed after it, both in
+`tests/test_bellerophon.py`. Each was bisected before it was moved: worktrees of e4797779 under the
+scratch with one trunk commit merged into each (`git merge --no-ff`, no conflict in any), the
+failing case run alone on each, the tree asserted first on `sys.path`; the worktrees cleared after.
+
+**1. The bare number**
+(`test_a_bare_number_is_refused_naming_the_decks_and_one_with_its_deck_fires`).
+
+| Tree | The case |
+|---|---|
+| e4797779 with 56e3befd (the trunk before 74's step 6) | passed |
+| e4797779 with 4ee7ab2b (74's step 6 merged) | failed |
+| e4797779 with 71f21f03 (6b84c966's parent) | passed |
+| e4797779 with 6b84c966 (74's step 6, the lead's review's mends) | failed |
+
+6b84c966 gave a gun named by its number with no side the side engaged, else the side the mark is on
+(`gunnery._of_the_side_meant`), the lead's ruling (7) of 2026-11-10 at the 74's merge having sent
+the named gun's bearing check to package 74. "fire the lower deck's No. 8", her mark engaged four
+cables on the starboard beam, old beside new: "No. 8 starboard gun of the lower deck and No. 8
+larboard gun of the lower deck to fire as soon as ready." (the guns ready to fire
+`gun.lower.3.starboard`, `gun.lower.8.starboard`, `gun.lower.8.larboard`); now "No. 8 starboard gun
+of the lower deck to fire as soon as ready." (`gun.lower.3.starboard`, `gun.lower.8.starboard`). The
+trunk's reason, by its own ruling: the pin moved, the reply still pinned whole, so that the case
+fails if the deck is not named; the refusals of the bare number are as they were.
+
+**2. The 64 and a 74**
+(`test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line[the-64-and-a-74]`).
+
+| Tree | The case |
+|---|---|
+| e4797779 with 985c8777 (the trunk before 74's step 4) | passed |
+| e4797779 with 9944b671 (74's step 4 merged) | failed |
+| e4797779 alone (74's step 3, 924d1b26, already in it) | passed |
+| e4797779 with 3af179be (step 3 and a4944b87, "the far fight wired") | failed |
+
+The case's world (tests/test_brains.py's, seed 7, the far brain alone): the player's 64 under her
+rules captain on her station off the Lizard, a French 74 put a mile and a half north bound for
+Brest, both King's ships by their books (`engage_nm` a mile), each minute after she is put:
+
+| Tick | e4797779 | 1282e25f |
+|---|---|---|
+| 300 | the 64 on passage; the 74 on passage at 1.05 miles | the same |
+| 360 | the 74 on passage at 0.94 miles | the 74 `engaging`, her plan `[("chase", None, 740.8)]` |
+| 420 | the 64 `engaging`, the 74 at 0.83 miles | the 74 `done` and gone from the sea; "The seventy-four on the starboard bow is out of sight."; the 64 on passage |
+| 480 to 960 | the 64 engaging; the 74 closed to 0.04 miles at 840 | the 64 on passage throughout |
+
+**Found, a fault of the trunk's, for the lead** (package 74's step 4, a4944b87, merged at 9944b671;
+not mended here, the code being 74's and the package closed). The far brain now takes the engaging
+transition (`FarCaptain._enemy_within` returns the mark where it returned None), and the King's
+ship's rows take her into `engaging` from her plan states (`{from: on passage, on: enemy in range,
+to: engaging}`, and the rows from beating, keeping station and in company); but the far brain holds
+a mark (`_stranger`) only where `_work` sets one, investigating, chasing and evading, or taking
+possession, and `_work` has no branch for `engaging`. So a far ship of war that engages from a plan
+state has no mark in hand: `resolve_state` gives her a chase of nobody, `Vessel._target_of(None)` is
+None, the leg is dropped, the plan is empty and `Vessel.tick` marks her `done`, a 74 gone from the
+sea under a mile from an enemy she has just judged; and `far_action._pairs` finds no mark for her,
+so no round is fought. The three frigate cases see the same (the 74 `engaging` at tick 360 and gone
+at 420) and pass, the lone frigate having hauled off at 300 and the one in a set engaged at 360.
+Measured for the lead, not built: a scratch wrapper of `brains.resolve_state` that gives her the
+mark the stimulus read (`_enemy_within` at her `engage_nm`) where none is in hand, as the near
+captain's `_mark` takes it; with it the 74 chases the player's ship, closes to 0.28 miles and keeps
+there, and the 64's captain engages her at tick 420 as at e4797779: the case passes in the trunk's
+world.
+
+**The guard kept.** The 64's case alone runs with the far fight's toggle off (`far_action.ENABLED`
+False, the module's own switch for the bisection: the far brain never engages, the world B7.e
+measured; a new parameter `far_fight`, the node ids unchanged), the narrowest change to her world
+that keeps the point (a 64, a ship of the line herself, is not sent away by the rank-4 rule; she
+engages an enemy not yet spoken). Every figure of its run is e4797779's (the 64 engaging at tick
+420, the 74 at 0.83 miles). Able to fail: the rank-4 rule without its own-size clause
+(`_line_of_battle_nm` patched in the scratch to give the miles to a ship of the line) fails it, the
+64 on passage throughout. Where the far brain is mended to take her mark, the toggle can come out of
+the case. The frigates' three cases are left in the trunk's world.
+
+**3. Found by the step's run of her file whole, explained and not mended: truth 7-196's crewed
+clause** (`test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor`, marked `pace`, passed in
+the base's slow run): it fails on the places, before its clock is judged, S2 5.62 miles from the
+frigate at the end of the third thousand against `CREWED_NM` (4.0). The places are the world's and
+not the clock's (the same in one process without the clock, `scratchpad/rf/places196.py`), the three
+74s' miles from her at the end of each thousand:
+
+| Tree | 2900 (S0, S1, S2) | 3900 | 4900 |
+|---|---|---|---|
+| e4797779, and with 985c8777 or 8bfdde0a | 0.28, 0.08, 0.67 | 0.31, 1.06, 1.27 | 0.50, 0.92, 3.11 |
+| e4797779 with 9944b671 or dccbf845; 1282e25f | 0.28, 0.08, 0.67 | 1.28, 0.57, 2.74 | 3.18, 1.79, 5.62 |
+
+dccbf845 is package 74's step 4 at the resumption, with step 3's five mends from the owner's play.
+File by file on e4797779 with 8bfdde0a: its `world/captains.py` alone or its `world/prizes.py` alone
+(each with its orders, world, captive and movement changes, which alone move nothing) gives the new
+figures; on 1282e25f the two mends off by scratch patches (`Judgement._prize_of_ours` False,
+`prizes._no_enemy_now` a no-op) give e4797779's exactly. The world: the frigate carries no private
+signal table, so the three British 74s take her, and each other, for enemies (the lead's (5) of
+2026-11-10, booked to the signals' owner), and they take her at tick 2820, S1 her captor with the
+player's person a captive aboard. Before, S1 still held her prize an enemy (her challenge
+unanswered) and stayed engaging; with the two mends (a captor's own prize, and any of the captor's
+nation's, is no enemy, and the taking clears her from what made her one) S1 has no enemy left and
+goes on passage for Falmouth with her prisoners, while S0 and S2, each the other's mark, draw off as
+they fight. The trunk's behaviour is right by its own ruling (the owner's play of 2026-11-09: a
+captor engaged their own prize); what carries the 74s off is the truth's world, its want of private
+signals. Not mended here: the clause is Phase 5's to move into the known truths, and its world or
+its place bound is the lead's to rule (two ways, neither measured here: the frigate given the day's
+private signals, their want being what sets the 74s on her by the clause's own docstring; or the
+places read before the taking).
+
+**What any ship may say that this step changes:** nothing. No code, no data and no ship file moved;
+the lines that moved are the trunk's (a named pair's reply under a side engaged, every armed ship's;
+a far ship of war gone from the sea when she engages from a plan state, every far body's; a captor
+no longer engaging their own prize, every captor's).
+
+**The suites, as run.** On the final tree (1282e25f with these changes uncommitted), from the tree
+root with `py`, one run at a time, the tree asserted first on `sys.path`, each pytest with `-n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/rf/runs/run.sh`); the bases not re-run.
+
+- **Her file whole** (`tests/test_bellerophon.py --slow`): 150 passed, 1 failed (136 s), junit
+  `scratchpad/rf/runs/bel.xml`. Against the base's fast and slow junits for her file (152): truth
+  7-196's alone-pace test gone (the lead's); one outcome changed, passed to failed, the crewed
+  clause (item 3); the two moved pins passed.
+- **The files the bisection points to** (`tests/test_far_action.py` and
+  `tests/test_practice_orders.py`, `--slow`): 57 passed (39 s); against the base, no outcome
+  changed, nine new from the trunk (the far fight's eight and the bearing check's test), all passed.
+  **The far fight's truths** (`tests/test_known_truths.py --slow -k` 7-358 to 7-361 and 7-369, new
+  from the trunk): 5 passed (31 s).
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+- Before the runs: the two moved tests alone (5 passed); the 64's case able to fail (above).
+
+Not run: the whole fast tier, the slow candidates, the captain's trials, the four whole logs and the
+pace tier (no code moved; the two pins are tests), and the generator (no ship file touched). The
+bisection's worktrees and its probes under `scratchpad/rf/` (`diag64.py`, `diagset.py`,
+`mutate64.py`, `places196.py`, `logs196.py`, `mark196.py`); the worktrees cleared after.
+
 ## The trim's words by the alias (package 75) (2026-11-11)
 
 **The ruling.** The lead's note of 2026-11-09, 22:56 UTC, (2), confirmed in the note of 2026-11-10,

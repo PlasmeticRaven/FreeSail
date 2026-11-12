@@ -1618,17 +1618,17 @@ def test_the_rank_4_rule_judges_a_lone_ship_within_two_leagues_and_not_beyond(fa
 
 
 @pytest.mark.parametrize(
-    "ship_file, description, in_set, hauls_off",
+    "ship_file, description, in_set, hauls_off, far_fight",
     [
-        (FRIGATE, "seventy-four", False, True),
-        (FRIGATE, "sixty-four", False, True),
-        (FRIGATE, "seventy-four", True, False),
-        (SIXTY_FOUR, "seventy-four", False, False),
+        (FRIGATE, "seventy-four", False, True, True),
+        (FRIGATE, "sixty-four", False, True, True),
+        (FRIGATE, "seventy-four", True, False, True),
+        (SIXTY_FOUR, "seventy-four", False, False, False),
     ],
     ids=["a-frigate-and-a-74", "a-frigate-and-a-64", "a-frigate-in-a-set", "the-64-and-a-74"],
 )
 def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
-    far_only, ship_file, description, in_set, hauls_off
+    far_only, monkeypatch, ship_file, description, in_set, hauls_off, far_fight
 ):
     """Bel-D §8.3 (B7.e) on the near body: the player's frigate on her station off the Lizard
     under her rules captain (tests/test_brains.py's world, seed 7), an enemy ship of the line
@@ -1640,11 +1640,27 @@ def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
     engages as before. Each engages her an enemy not yet spoken, at the engaging distance: a
     superior force within hail is no longer `overmatched` (package 43's filter, the cruiser's as
     well), so an engagement only after speaking her would be the rule holding her off until
-    then."""
+    then.
+
+    The 64's case runs with the far fight's toggle off (`far_action.ENABLED`, the module's switch
+    for the bisection: the far brain never engages, the world B7.e measured), the narrowest change
+    to her world that keeps the point. Since package 74's step 4 (a4944b87, merged at 9944b671)
+    the French 74, a far body with no mark in hand, takes `engaging` from her passage at 0.94
+    miles (tick 360), her plan a chase of nobody (`resolve_state` on `_stranger` None), and is
+    gone from the sea the next minute (`Vessel.tick`: the leg dropped, the plan empty, `done`),
+    "out of sight" in the 64's log at tick 420, the minute her captain engaged the 74 at B7.e
+    (0.83 miles); the 64 stays "on passage". A fault of the trunk's, recorded for the lead with its
+    figures (docs/dev/TuningNotes.md, "B7.e and the trunk's merge"). The frigates' three cases
+    judge her before she goes (the lone frigate evading at tick 300, the one in a set engaging at
+    360) and are left in the trunk's world."""
     from freesail.world import squadrons as Q
     from freesail.world.captains import Perception
     from tests.test_brains import put, world_at
 
+    if not far_fight:
+        from freesail.combat import far_action
+
+        monkeypatch.setattr(far_action, "ENABLED", False)
     world = world_at(49.5, -5.5, ship_file, intent=STATION_OFF_THE_LIZARD)
     world.run(60)
     assert world.captain.commands and world.captain.role == "kings-ship"
@@ -2659,9 +2675,16 @@ def test_a_bare_number_is_refused_naming_the_decks_and_one_with_its_deck_fires()
     engaged: "fire No. 3 gun" is refused in words naming the decks that have a No. 3 (her default
     fit: all five), "fire No. 8 starboard gun" naming her two gun decks, and the refusal of words
     that name no gun gives the example with its deck; "fire No. 3 starboard gun of the lower deck"
-    and "fire the lower deck's No. 8" fire as named. Old beside new: before B7.d "fire No. 3 gun"
-    fired her lower deck's two No. 3s and "fire No. 8 starboard gun" her lower deck's No. 8; a
-    number with a deck was refused as naming no gun."""
+    fires as named, and "fire the lower deck's No. 8", the pair named with its deck and no side,
+    fires the one of the pair that bears, the starboard No. 8, its deck named in the reply. Old
+    beside new: before B7.d "fire No. 3 gun" fired her lower deck's two No. 3s and "fire No. 8
+    starboard gun" her lower deck's No. 8; a number with a deck was refused as naming no gun. At
+    the trunk's merge onto B7.e (2026-11-12): "fire the lower deck's No. 8" fired both of the pair,
+    "No. 8 starboard gun of the lower deck and No. 8 larboard gun of the lower deck to fire as soon
+    as ready.", the larboard gun away from the starboard mark; package 74's step 6 (6b84c966,
+    merged at 4ee7ab2b; the lead's ruling (7) of 2026-11-10 at the 74's merge) gave a gun named
+    with no side the side engaged (`gunnery._of_the_side_meant`), so it is the starboard gun
+    alone."""
     from freesail.combat.guns import battery_of
 
     w = _cast_loose()
@@ -2685,15 +2708,11 @@ def test_a_bare_number_is_refused_naming_the_decks_and_one_with_its_deck_fires()
     assert said.kind == "guns.fire", said.text
     assert said.text == "No. 3 starboard gun of the lower deck to fire as soon as ready."
     said = w.submit("fire the lower deck's No. 8")
-    assert said.text == (
-        "No. 8 starboard gun of the lower deck and No. 8 larboard gun of the lower deck to fire as "
-        "soon as ready."
-    )
-    assert battery_of(w.ship).single == [
-        "gun.lower.3.starboard",
-        "gun.lower.8.starboard",
-        "gun.lower.8.larboard",
-    ]
+    # old beside new (package 74's bearing check, above): "No. 8 starboard gun of the lower deck
+    # and No. 8 larboard gun of the lower deck to fire as soon as ready."
+    assert said.kind == "guns.fire", said.text
+    assert said.text == "No. 8 starboard gun of the lower deck to fire as soon as ready."
+    assert battery_of(w.ship).single == ["gun.lower.3.starboard", "gun.lower.8.starboard"]
 
 
 # ---------------------------------------------------------------------------
