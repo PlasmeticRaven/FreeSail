@@ -26983,14 +26983,12 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 
 ## Package 106a: the ocean carried south, and the Canaries with the Salvages (2026-11-12)
 
-**Where I stand (2026-11-12):** measurement (A), the ocean layer, done and reported to the
-lead: a second coarse layer beside the first leaves every existing corridor tile byte for
-byte; widening the first rewrites all 48. Nothing committed under `data/charts/` yet.
-Measurement (B), the region, done and reported. The runtime's second layer
-(`chart.Tile.filled_from`, `Level.beside`, the chart's `corridors_beside`) and the tool's
-(`CORRIDORS["atlantic-south"]`, its `beside`) written, not yet committed; the sources'
-pass begun (the *Oriental Navigator* of 1801, Glas 1764 and Purdy's Atlantic memoir of
-1825 and 1829 fetched, not yet laid under `docs/references/`).
+**Where I stand (2026-11-12):** built whole, the trunk merged (its records only), measured at
+the final hash in a pinned worktree (the figures below; the suites in the final report).
+Reports (A) and (B) ruled by the lead the same day: the second layer beside the corridor, no
+column from 26.4 W, the reach to 12.4 N recorded and not built; the region's bounds a hair
+inside the edges, the Salvages a region of one tile, written whole, the seven gauges, the
+Salvages served by Santa Cruz's and Funchal's.
 
 ### (A) The ocean layer: a second coarse layer against the first widened
 
@@ -27125,3 +27123,87 @@ Madeira's water unmoved since the membership is by bounds), the level the blend'
 that have one (Funchal's is null, so Santa Cruz's 1.37 m). The two regions share no seam.
 **Outside the blocks** the ocean between them reads the eleven alone, the nearest of them
 (Le Conquet's, 1,300 miles off) as Madeira's ocean does today: the rule, said for the lead.
+
+### (C) What was built, item by item
+
+1. **The ocean carried south**: `atlantic-south`, 6 level-1 tiles, 1,191,415 bytes, beside the
+   corridor (`tools/build_charts.py` `CORRIDORS`, `CHARTS["atlantic-east"]["corridors_beside"]`;
+   `freesail/world/chart.py` `Tile.filled_from`, `Level.beside`, the chart's layers beside,
+   some fifty lines with their words). Every committed corridor tile is byte for byte as it
+   was; truth 7-521 reads its every cell through the new path. Proof of the merge on 10,000
+   random points over the corridor and the new water, the manifest with and without the
+   layer: elevation, distance, the nearest shore and the floor equal at every point the
+   corridor answered, except 14 points on 31 54 N, within a 30" cell of the corridor's data
+   edge, whose bilinear read and gradient now find their corners known (the seam); the
+   blocks' floor first taken as the shoaler of the two layers moved 259 points as far as
+   32 24 N, and was changed to the corridor's own block wherever it has one. The chart's
+   south limit is 25.2001 N (`tests/test_chart.py`: the envelope and its words moved with it,
+   and its point "beyond the corridor" moved from 31 N 10 W, now the new layer's, to 31 N
+   25 W, still NODATA; the tracked-folder test takes the layer's folder).
+2. **The regions**: `canaries`, 60 level-2 tiles 12,513,080 bytes, seven harbour patches 15
+   level-3 tiles 1,688,437 bytes, coast 683 pieces; `salvages`, 1 tile 376,932 bytes, coast 25
+   pieces; both built on the block's own tide (the raise 1.17 to 1.60 m) after a first build
+   on the eleven's 3.98 m (package 101's lesson). The sweep: 2,731 cells in 206 places,
+   the largest 144 cells at the foot of Los Cristianos' shore, Anaga's, the Bocayna's, all
+   small cliff-foot clusters; the Salvages 14 cells. "0 kept" both. 14.58 MB of tiles for
+   the two, 15.8 MB with the second layer: under the 40 MB rule.
+3. **The sources**: Purdy 1825 (the Canaries, pp. 210 to 220, quoting Glas whole for the
+   roads, Vancouver, Krusenstern and Lisiansky for Santa Cruz, Mudge and Vidal's survey of the
+   Salvages of 1820, Rennell on the currents, pp. 94 to 96), Glas 1764 (Fuerteventura's Porto
+   de Cabras and Cala de Fustes; Hierro), the Oriental Navigator 1801 (the Salvages, the
+   sunken rock, the road of Santa Cruz, the trade winds), Norie 1805 (Table XL's positions,
+   Table XLI's "Canary Island, 3h 0m" read from the page image p. 248): laid under
+   `docs/references/pilots/` with their rows. Tofiño's Derrotero of 1789 does not reach the
+   Canaries; Borda's survey (1776) was not found on the Internet Archive by its search, and
+   no period plan of a road was read: every port `datum: unverified`, no override.
+4. **The marks**: 56 features in `canaries.yaml`, 7 in `salvages.yaml`, each with its
+   source; positions FROM MEMORY checked against the tiles, 22 moved (each `fix`). The Peak
+   at Borda's, Lamanon's and Cordier's 1,909 toises (3,720 m), seen at 120 and 130 miles in
+   the clearest weather and not at 140 (truth 7-523; Purdy: "sometimes forty leagues off").
+   Islets: the Rocks of Naga, Graciosa, Clara, Alegranza, Lobos and the East Rock the grid
+   holds; the West Rock (Hell Rock) an island the grid lacks on its shoal head. The Salvages:
+   the Great Salvage and the Pitons the grid holds; the Pitons' rocky bank a danger on the
+   grid's head (a frigate grounds on it at any tide, truth 7-525); the Great Salvage's north
+   and north-east shoal spots EMODnet smooths away (36 to 55 m at the pilot's places), left
+   at the pilot's places, their head JUDGEMENT (the eastern spots' three fathoms). **No light**
+   in 1805 by any source on file, none entered. Purdy's doubtful sunken rock between Tenerife
+   and Canaria not entered (the grid has 1,500 m there).
+5. **The ports**: seven files, each the King of Spain's by one dated row (barcelona's form),
+   with its anchorage, bottom, pilot's four words, market of 11 to 13 goods priced so the
+   islands trade (corn from Lanzarote and Fuerteventura west, timber and wine east: 68 routes),
+   yard, crew pool and `tracks:` to a common mark north of Tenerife (every pair of the 42
+   clear of the land guard; 40 were refused before). Santa Cruz de Tenerife, Port Orotava,
+   Las Palmas (the road of La Luz), Arrecife (Naos and Cavallos), Santa Cruz de la Palma, San
+   Sebastián de la Gomera, Porto de Cabras. **Hierro has none**: Purdy (p. 219) "neither road
+   or harbour worthy of particular description", Glas describes no landing. Gando, the road
+   by Lobos, El Rio, Cala de Fustes and Tasacorte are marks, not ports. Rows waiting for
+   105's dated rows, written in the files' own words: Santa Cruz's quarantine of 1816; the
+   growth of Arrecife's town; Orotava's summer moorings in the creek. Norie's Canary Island
+   placed at Palmas in the master's table.
+6. **The weather**: a box `canaries` (25.2 to 30 N, 22.13 to 9 W), after Madeira's, PROVISIONAL
+   and judgement in every row from the Oriental Navigator's and Purdy's words on the trade and
+   its winter westerlies. The island lee's calms are said in its head, not carried. The
+   Salvages (30.1 N) stay in Madeira's box.
+7. **The streams and the tide**: two areas, `canaries-among` (south, half a knot,
+   JUDGEMENT on Rennell's "less regular") and `canary-current` (S.S.E., three-quarters of a
+   knot, Rennell's sixteen to nineteen miles a day), a `book_limits` box over the new water;
+   no tidal stream (Purdy: "little or no tide" at Orotava). The tide by the block's own seven
+   gauges and the Salvages' ruling (report B).
+8. **The scenario** `canaries.yaml`: a King's frigate from Funchal off Point Naga at
+   daybreak, down the east side of Tenerife to look into Santa Cruz road and on to the
+   south; sailed at seed 7 without touching ground (truth 7-529: 1.34 miles from her mark by
+   the truth, 2.96 from the road). The first book's hourly re-shaping sent her back for the
+   town after she had hove to, and she drove ashore under it: each leg is now shaped once.
+   **Truths 7-520 to 7-529**, the brief's list as step 1 cut it (the ocean to 25.2 N, not 13 N).
+9. **The how-to**: `docs/dev/ChartBlocks.md`, "The ocean carried south, the Canaries and the
+   Salvages".
+
+### Found for others, not mended
+
+- The open ocean's tide is the nearest of the eleven (Le Conquet's, M2 about 2 m) over the
+  new layer's water outside the two blocks (the lead's list).
+- Madeira's peaks and the Peak are seen through cloud the weather does not put on a hill.
+- The Canaries' book: a standing order "when the time is 13:00" is refused ("the time is
+  compared in bells"); a book wanting a clock hour has no word for it.
+- The wars table's undated war makes the islands hostile to a King's ship after 1808, as
+  Barcelona's head says.
