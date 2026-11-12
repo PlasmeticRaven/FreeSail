@@ -4,7 +4,7 @@
 format: 1
 built: '2026-11-12'
 tool: tools/build_charts.py
-build_hash: d5cb862b50ae5436
+build_hash: 70e5051fe128729b
 levels:
   '0':
     cell_sec: 150.0
@@ -12083,12 +12083,12 @@ regions:
         south_sec: 126048
         west_sec: 38592
         min_depth_m: 0.0
-        bytes: 94105
+        bytes: 95646
       - name: '126048_40128'
         south_sec: 126048
         west_sec: 40128
         min_depth_m: 0.0
-        bytes: 96004
+        bytes: 95938
       - name: '126048_41664'
         south_sec: 126048
         west_sec: 41664
@@ -12153,7 +12153,7 @@ regions:
         south_sec: 127584
         west_sec: 38592
         min_depth_m: 0.0
-        bytes: 121274
+        bytes: 121605
       - name: '127584_40128'
         south_sec: 127584
         west_sec: 40128
@@ -13511,13 +13511,6 @@ tide_regions:
       north: 51.0
       west: -2.2
       east: -1.0
-  gulf-of-hammamet:
-    title: 'The gulf of Hammamet and the Sahel: a tide region, no tiles'
-    bounds:
-      south: 35.01334
-      north: 36.29334
-      west: 10.72
-      east: 11.1466
 world:
   level: 0
   bounds:

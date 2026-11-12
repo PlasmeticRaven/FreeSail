@@ -776,15 +776,6 @@ TIDE_REGIONS: dict[str, dict[str, Any]] = {
         "title": "The Solent, Spithead and Poole bay: a tide region, no tiles",
         "bounds": {"south": 50.62, "north": 51.0, "west": -2.2, "east": -1.0},
     },
-    # package 105: the three level-2 tiles of `sicily` west of its bounds (the column 10.72
-    # to 11.1467 E south of `tunis-coast`'s 36.29 N, which no region listed: the gulf of
-    # Hammamet and the Sahel to Monastir), whose water no region's bounds hold and which
-    # would read the eleven's tide, Saint-Malo's; served as a gaugeless block is (package
-    # 104's ruling), by its neighbours' nearest gauges, Lampedusa's and the coast of Tunis's
-    "gulf-of-hammamet": {
-        "title": "The gulf of Hammamet and the Sahel: a tide region, no tiles",
-        "bounds": {"south": 35.01334, "north": 36.29334, "west": 10.72, "east": 11.1466},
-    },
 }
 
 # The charts (spec M6 §26; package 38): each names the regions it holds, in the order
