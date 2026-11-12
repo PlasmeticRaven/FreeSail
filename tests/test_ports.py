@@ -165,6 +165,21 @@ TYRRHENIAN_PORTS = ["alghero", "cagliari", "civita-vecchia", "gaeta", "naples"]
 # package 101: the Catalan coast's three and the four beside it (Rosas and Palamos in the
 # Gulf of Lion's region, Valencia and Alicante in the Mediterranean west's)
 CATALAN_PORTS = ["alfaques", "alicante", "barcelona", "palamos", "rosas", "tarragona", "valencia"]
+# package 104: the Sardinian sea's five and the coast of Tunis's five, and the three beside
+# them on Sardinia (in the Tyrrhenian's region)
+BARBARY_PORTS = [
+    "bizerta",
+    "bona",
+    "bougie",
+    "collo",
+    "djidjelli",
+    "la-calle",
+    "la-goletta",
+    "porto-farina",
+    "stora",
+    "tabarka",
+]
+SARDINIA_WEST_PORTS = ["carloforte", "gulf-of-palmas", "oristano"]
 ALL_PORTS = sorted(
     ALL_PORTS
     + PORTUGAL_PORTS
@@ -176,6 +191,8 @@ ALL_PORTS = sorted(
     + LIGURIAN_PORTS
     + TYRRHENIAN_PORTS
     + CATALAN_PORTS
+    + BARBARY_PORTS
+    + SARDINIA_WEST_PORTS
 )
 
 
@@ -357,6 +374,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # the Catalan coast's and the four beside it (package 101): Spain's in this world's
     # year, hostile
     french_ports |= set(CATALAN_PORTS)
+    # package 104: the regencies' ports and the King of Sardinia's three, neutral
+    neutral_ports |= set(BARBARY_PORTS) | set(SARDINIA_WEST_PORTS)
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS
@@ -2118,7 +2137,17 @@ def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_f
     ]
     # package 101: Barcelona, Rosas, Tarragona and Valencia, Spain's and France's by date;
     # Spain's in every recorded passage's year, so none reads anything new
-    assert sorted(dated) == ["barcelona", "genoa", "rosas", "tarragona", "valencia"]
+    # package 104: Tabarka the Bey's from 1738 and Carloforte the King of Sardinia's but for
+    # the French holding of 1793, each the same nation in every recorded passage's year
+    assert sorted(dated) == [
+        "barcelona",
+        "carloforte",
+        "genoa",
+        "rosas",
+        "tabarka",
+        "tarragona",
+        "valencia",
+    ]
     for when, british, french in (
         (datetime(1805, 6, 3, 18), "neutral", "neutral"),
         (datetime(1805, 6, 4, 6), "hostile", "open"),

@@ -1,0 +1,109 @@
+# FreeSail: Collo as a port (package 104, the Sardinian sea's region, the harbour patch collo), on
+# package 35's machinery; the marks are the features file's (data/charts/features/sardinian-sea.yaml).
+#
+# Sources. Berard 1837, pp. 118 to 121 (the survey of the 1830s): the bay sheltered from the NW round
+# to the W, small craft before the town from almost every wind, a bottom of very good holding,
+# anchor in 14 and 15 brasses of mud with the mosque NNW; the north-easters send in a heavy swell;
+# the people Moors living by the coasting trade, the Kabyles of the mountains resisting every Bey;
+# provisions to be had only by night; p. 119: the Compagnie d'Afrique had a post here from 1604 to
+# 1685, for the inland trade and the coral; p. 120: timber the Dey sent for to the yards of Algiers.
+# Purdy 1826, p. 327, and Norie 1831, p. 355: the French formerly had an establishment for the coral
+# fishery. The brief's "a post of the Compagnie d'Afrique, hides and wax" holds for 1604 to 1685
+# only, and its hides and wax are Stora's (the sources win). Derrotero 1849, p. 257; Lamberti 1844,
+# p. 228.
+#
+# The datum: UNVERIFIED; the modern port in the grid.
+#
+# The stance. The regency of Algiers' (the nations table, `algiers`), neutral to a King's ship as to every flag the table has. Its corsairs noted and not modelled. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange, each good's note naming its source where a text names the trade. Decision 67: what is true of the port only for some years is said with its years; the French conquest of the 1830s, after the range, is said and not written as a row.
+
+id: collo
+name: Collo
+nation: algiers
+source: "Berard 1837 pp. 118-121; Purdy 1826 p. 327; Norie 1831 p. 355; Derrotero 1849 p. 257; Lamberti 1844 p. 228"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: collo-road
+  name: the bay of Collo
+  lat_deg: 36.9964
+  lon_deg: 6.5848
+  depth_fathoms: 13
+anchorage:
+  feature: collo-road
+  name: the bay of Collo
+  lat_deg: 36.9964
+  lon_deg: 6.5848
+mooring:
+  feature: collo-road
+  name: in the bay, the mosque bearing NNW
+  lat_deg: 36.9964
+  lon_deg: 6.5848
+  depth_fathoms: 13
+  bottom: mud
+shore:
+  feature: collo
+  name: the beach of Collo
+  lat_deg: 37.0040
+  lon_deg: 6.5670
+
+pilot:
+  station: collo-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a coaster's boat of Collo
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Hamida, Ali, Mustafa, Hassan, Murad, Mohammed, Omar, Yahia]   # judgement
+  skill: 0.7
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 90            # judgement
+  words:
+    channel: "From Cape Bougaroun steer south-west into the bay; the passage inside the island of Collo is clean."
+    marks: "The great mountain behind the bay; the town of stone houses with tiled roofs, its mosque."
+    anchorage: "Anchor in thirteen fathoms of mud with the mosque bearing north-north-west; the holding is very good and the westerlies cannot reach you, but a north-easter sends in a great swell."
+    tide: "No tide to speak of; the current outside runs east along the coast to Cape Bougaroun and fails there."
+
+tide:
+  establishment: Bougie
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: timber, price: 12, origin: algiers, note: "the oak of the lagoon's hills the Dey sent for to the yards of Algiers (Berard 1837, p. 120); the price JUDGEMENT"}
+    - {good: wheat, price: 17, origin: algiers, note: "JUDGEMENT"}
+    - {good: barley, price: 12, origin: algiers, note: "JUDGEMENT"}
+    - {good: olive oil, price: 40, origin: algiers, note: "JUDGEMENT"}
+    - {good: wax, price: 118, origin: algiers, note: "JUDGEMENT"}
+    - {good: hides, price: 41, origin: algiers, note: "JUDGEMENT"}
+    - {good: coral, price: 420, origin: null, note: "the coral fished off the Seven Capes by the Genoese and other boats (Berard 1837, pp. 117 to 118); the price JUDGEMENT"}
+    - {good: fresh beef, price: 18, origin: algiers, note: "JUDGEMENT"}
+    - {good: fowls, price: 2, origin: algiers, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: algiers, note: "JUDGEMENT"}
+    - {good: fresh fish, price: 4, origin: algiers, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 55, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: no hands for a Christian ship
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [collo-road, 37 02 N 6 39 E, 37 12 N 6 42 E]
+  from_sea: [37 12 N 6 42 E, 37 02 N 6 39 E, collo-road]
+  in: [collo-road]

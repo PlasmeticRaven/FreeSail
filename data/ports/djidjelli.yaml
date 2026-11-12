@@ -1,0 +1,108 @@
+# FreeSail: Djidjelli as a port (package 104, the Sardinian sea's region, the harbour patch djidjelli),
+# on package 35's machinery; the marks are the features file's (data/charts/features/sardinian-sea.yaml).
+#
+# Sources. Berard 1837, pp. 113 to 115 (the survey of the 1830s): the port like Tripoli's of Barbary,
+# smaller and less safe, for the fine season only (May to October); anchor south of the highest
+# islet of the entry about a cable off in 10 to 12 brasses on sand and gravel; the rocks set up a
+# surge and rolling stones that chafe the cables; a building slip west of the town, nine coasters
+# on the stocks, the oak of the country famous; held by France from 23 July to 30 October 1664; its
+# people in a manner independent. Norie 1831, p. 355: a village with a small port before it where
+# vessels drawing little water may find anchorage between the islets and the shore. Derrotero 1849,
+# p. 256: the same as Berard's. No text read calls Djidjelli a corsair harbour (the brief's memory)
+# and none names a good of its trade but its boats and timber.
+#
+# The datum: UNVERIFIED. The modern port of Jijel's works are in the grid where 1805 had the reef.
+#
+# The stance. The regency of Algiers' (the nations table, `algiers`), neutral to a King's ship as to every flag the table has. Its corsairs noted and not modelled. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange, each good's note naming its source where a text names the trade. Decision 67: what is true of the port only for some years is said with its years; the French conquest of the 1830s, after the range, is said and not written as a row.
+
+id: djidjelli
+name: Djidjelli
+nation: algiers
+source: "Berard 1837 pp. 113-115; Norie 1831 p. 355; Derrotero 1849 p. 256"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: djidjelli-anchorage
+  name: off Djidjelli
+  lat_deg: 36.8283
+  lon_deg: 5.7757
+  depth_fathoms: 10
+anchorage:
+  feature: djidjelli-anchorage
+  name: the port of Djidjelli
+  lat_deg: 36.8283
+  lon_deg: 5.7757
+mooring:
+  feature: djidjelli-anchorage
+  name: south of the highest islet of the reef
+  lat_deg: 36.8283
+  lon_deg: 5.7757
+  depth_fathoms: 10
+  bottom: sand and gravel
+shore:
+  feature: djidjelli
+  name: the landing of Djidjelli
+  lat_deg: 36.8210
+  lon_deg: 5.7660
+
+pilot:
+  station: djidjelli-anchorage
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of Djidjelli
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Hamida, Ali, Mustafa, Hassan, Murad, Mohammed, Omar, Yahia]   # judgement
+  skill: 0.7
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 0            # judgement
+  words:
+    channel: "Come in by the widest gap of the reef, on the town's side, in five to seven fathoms; keep nearer the rocks than the south beach, for a shoal lies off the marabout's rock."
+    marks: "The town on its rocky peninsula with its square tower; the line of reefs before it; the highest islet of the entry, which shuts in Cape Bougaroun when you are at the berth."
+    anchorage: "Anchor a cable south of the highest islet in ten fathoms, sand and gravel. It is a berth for the fine season only: the surge through the gaps chafes the cables and rolls the stones."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Bougie
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: timber, price: 11, origin: algiers, note: "the oak of the country, famous (Berard 1837, p. 114); the price JUDGEMENT"}
+    - {good: wheat, price: 17, origin: algiers, note: "JUDGEMENT"}
+    - {good: barley, price: 12, origin: algiers, note: "JUDGEMENT"}
+    - {good: olive oil, price: 40, origin: algiers, note: "JUDGEMENT"}
+    - {good: wax, price: 120, origin: algiers, note: "JUDGEMENT"}
+    - {good: hides, price: 42, origin: algiers, note: "JUDGEMENT"}
+    - {good: figs, price: 9, origin: algiers, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 18, origin: algiers, note: "JUDGEMENT"}
+    - {good: fowls, price: 2, origin: algiers, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: algiers, note: "JUDGEMENT"}
+    - {good: fresh fish, price: 4, origin: algiers, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 55, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: no hands for a Christian ship
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [djidjelli-anchorage, 36 54 N 5 47 E, 37 12 N 5 48 E]
+  from_sea: [37 12 N 5 48 E, 36 54 N 5 47 E, djidjelli-anchorage]
+  in: [djidjelli-anchorage]

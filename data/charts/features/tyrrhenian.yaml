@@ -1404,3 +1404,40 @@ features:
     fix: moved 225 m to the grid's land (the first placing read 52 m of water)
     source: 'Purdy 1826, p. 114: Port Palinuro, 8 leagues S.E. 1/2 S. from Cape Licosa, has a fort, off which you may anchor in 7 or 8 fathoms, sheltered by a projecting point from the south and east but quite exposed to the S.W., west and N.W.; Norie 1831, p. 107: Port Palinuro 39 59 10 N; Derrotero 1849, p. 87: Cape Palinuro, after forming a rounded morro, ends in the sea in a low point; Smyth 1854, table of positions, p. 441: Port Palinuro, torre Prodese; Admiralty 1916, p. 407: the western extreme of a promontory with a smooth summit, 656 feet high, steep cliffs on the west and south (the light on its summit is later, no date read: not entered)'
     says: 'Cape Palinuro, the round-backed promontory with steep cliffs to seaward; the little port and its fort lie on its north side, open to the westerly winds.'
+
+  # ---------------------------------------------------------------------------
+  # package 104: the shore marks of three ports beside the coast of Tunis's block, Oristano
+  # (the Torre Grande and the city), and the Gulf of Palmas (the town of Sant'Antioco); in
+  # this region's bounds, its index rebuilt from the file and its manifest counts edited
+  # alone; no tile or coast touched
+  # ---------------------------------------------------------------------------
+
+  - id: torre-grande
+    kind: tower
+    name: the Torre Grande of Oristano
+    modern: 'Torre Grande, Oristano'
+    lat_deg: 39.9050
+    lon_deg: 8.5220
+    height_m: 15
+    source: 'Smyth 1828, p. 294: the Torre Grande, 39 53 55 N, 8 28 40 E; p. 297: a well constructed tower redoubt with magazines, where the produce of the plain and the coarse pottery of Oristano are embarked; p. 293: cattle and refreshments in any quantity embarked at the Torre Grande; Lamberti 1844, p. 330: anchor off the magazine by the tower; height JUDGEMENT'
+    says: 'The Torre Grande, the redoubt and magazines on the beach of Oristano''s bay, where the produce of the plain is shipped.'
+
+  - id: oristano
+    kind: town
+    name: Oristano
+    modern: Oristano
+    lat_deg: 39.9030
+    lon_deg: 8.5920
+    height_m: 10
+    source: 'Smyth 1828, p. 294: a busy and commercial place of 4,500 inhabitants, reckoned wealthy, on a low plain between the Tirsi and Santa Giusta, no good water; p. 295: deadly air in summer; Smyth 1854, p. 439: the belfry 39 53 47 N, 8 33 20 E; Purdy 1826, p. 84: the town fortified but thinly peopled (Norie 1831, p. 62: not fortified)'
+    says: 'Oristano, a busy little city on its plain three miles within the beach, wealthy and unwholesome in summer.'
+
+  - id: sant-antioco-town
+    kind: town
+    name: Sant'Antioco
+    modern: 'Sant''Antioco, the town'
+    lat_deg: 39.0660
+    lon_deg: 8.4550
+    height_m: 20
+    source: 'Smyth 1828, p. 316: the town of Sant''Antioco with 1800 inhabitants and an old castle on its highest part, joined to the main by a rough stone bridge of 300 yards; Admiralty 1913, p. 684: a fort at the causeway'
+    says: 'The town of Sant''Antioco with its old castle above the causeway to the main, at the head of the gulf of Palmas.'
