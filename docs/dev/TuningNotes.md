@@ -27071,3 +27071,61 @@ went beyond the measurement the lead accepted (it touched Mahon's, Carloforte's 
 Cagliari's lists) and was taken out before this build. Probed: Palermo 0.18 m and an M2 of
 11 cm, Messina 0.03 m and 1.5 cm, Valletta 0.09 m and 2.6 cm (the six's blend), where the
 eleven's had given 2.25 to 3.68 m of M2.
+
+### Step 2: the sources' short pass, and what they gave against the brief
+
+Read for Malta: Purdy 1826 (pp. 157 to 166), Norie 1831 (pp. 142 to 146), Lamberti 1844 (p.
+197), Smyth 1854 (pp. 33, 251, 420, 445), James 1837 (vol. 2, pp. 170, 211 to 213, 437, 445;
+vol. 3, p. 152) and Nicolas (vol. 1, p. 12). For Sicily and the Faro: Smyth 1824 (his survey
+of 1814 to 1816, laid under the references by this package: the coasts, the Appendix's
+hydrographical description and his table of positions), Purdy 1826 (pp. 115 to 116, 134 to
+144), Norie 1831 (pp. 110, 133 to 136), Smyth 1854 (pp. 179 to 181, 250, 442 to 445), James
+1837 (vol. 4, pp. 122 to 126, 294). Three reading passes were made in parallel and each
+figure spot-checked against its OCR line before it was written.
+
+Against the brief (the lead's memory): **Malta the Order's to June 1798, the French to
+September 1800, Britain's after**: so, to the day (James: the capitulation of 12 June 1798;
+the surrender of 5 September 1800; the blockade effective from 12 October 1798). **Valletta's
+yard from the year the sources give**: no source on file gives the King's dockyard's year;
+Smyth's chronometers were rated "at the Anchor Wharf, in the dock-yard" from 1816, the first
+year given, and the row starts there (JUDGEMENT; the yard is surely older). The Order's
+arsenal is a name (the Galley Port) and not described. **Messina's and Scilla's garrisons**:
+James gives the British at Messina from early 1806 and Scylla's British garrison from after
+Maida to its evacuation on 17 February 1808; Smyth 1824 the English garrison of the citadel
+and the Flotilla's arsenal in 1814; no source gives the garrison's last day (the row ends at
+the end of 1815, JUDGEMENT). **The mainland French from 1806 to 1815**: James gives March
+1806; the end in May 1815 is FROM MEMORY; James also puts a British and Neapolitan garrison
+in Reggio's fortress to January 1808 without the day it was taken (said in Reggio's file, not
+modelled). **The Adventure bank**: no period pilot on file names it (Smyth surveyed it in the
+Adventure after his Memoir); not entered. **The Formiche and the Porcelli**: Milazzo's
+Porcelli (Smyth 1824, p. vii) are step 2's; the Formiche and Trapani's Porcelli are the west's
+(step 3). **Decision 68**: the one plain statement on file is Smyth 1824's of 1570, the Order's
+galleys with several hundred enslaved men aboard freed by Uluj Ali (p. 202); it is in
+Valletta's pilot's words under the Order's row, with its year. No source on file speaks of a
+slave prison or a trade in captives at Malta; nothing more is said.
+
+Where the sources disagree among themselves (said in the files): the Grand Harbour's entrance
+250 fathoms (Purdy) or 350 (Norie); Messina's 500 yards (Purdy) or 700 (Smyth); Filfla a
+mile long (Purdy) or two cables (the Admiralty, modern); the Benhisa reef's breaking wind.
+
+**The tide**: the six gauges serve `sicily` (block lists `sicily` alone); their levels
+JUDGEMENT by the lead's ruling; Palermo 0.18 m with an M2 of 11 cm, Messina 0.03 m and 1.5 cm,
+Valletta 0.09 m and 2.6 cm. The epitome gains the Faro and Messina at Smyth's hours (6h 56m,
+8h 10m) and Milazzo, Reggio, Catania, Syracuse and Valletta at the world's own; the world's
+hour at Messina is eight hours from Smyth's (the modern gauges' amphidrome), said.
+
+**The Faro's stream**: two areas (the channel bends), the flood northward, four knots at
+springs and two at neaps (JUDGEMENT within Smyth's two to five), strongest three hours before
+high water (JUDGEMENT); measured: 3.9 knots along the axis at springs, four turns in a day
+and a night, 2.3 at neaps. What it cannot carry is said in the file: the shores' counter-sets
+(the refoli), Charybdis's eddies, the slack, the wind's hold, the set onto the Torre di
+Cavallo's rocks. The rest of the block sets east-south-east at half a knot.
+
+**The marks**: 58, placed on the grid by the scratch rule (land marks on its land, roads on
+water of half to half again the pilot's depth, dangers on its shoal head; every move in
+`fix`). The grid lacks Messina's Braccio and Filfla: four islands the grid lacks.
+
+**The ports**: eleven (Valletta, Marsa Scirocco, St Paul's Bay, Port Miggiaro; Messina,
+Milazzo, Catania, Augusta, Syracuse; Reggio, Scilla), each with ten goods and more priced to
+differ, its tracks out to sea clear of the land by `Chart.line_shore` (Marsa Scirocco's and
+Augusta's first drafts crossed Delimara and the harbour's shore and were redrawn).
