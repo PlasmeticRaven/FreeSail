@@ -16092,13 +16092,14 @@ def test_truth_7_481_the_followed_ships_far_body_stands_at_her_truth():
 
 
 @pytest.mark.slow
-def test_truth_7_482_a_save_with_a_change_of_ship_replays_across_the_two_ships():
-    """A save written after the change replays to the same log of each ship, its first block
-    the game's first hull's (the frigate's file), the player's ship the Fly again and his
-    person hers; a save with no change carries no `player_ship`."""
+def test_truth_7_482_a_save_with_a_change_of_ship_replays_across_the_two_ships(tmp_path):
+    """A save written after the change, with his orders after it, replays to the same log of
+    each ship, its first block the game's first hull's (the frigate's file), the player's ship
+    the Fly again and his person hers; a checkpoint taken after the change carries on to the
+    same logs; a save with no change carries no `player_ship`."""
     from tests import test_ship_changed as T
 
-    T.test_the_save_replays_across_the_two_ships_its_first_block_the_first_hulls()
+    T.test_the_save_replays_across_the_two_ships_its_first_block_the_first_hulls(tmp_path)
     T.test_a_save_with_no_change_carries_no_player_ship_and_the_split_reads_as_before()
 
 

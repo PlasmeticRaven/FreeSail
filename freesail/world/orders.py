@@ -96,7 +96,7 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.world.hulls import is_observer
+from freesail.world.hulls import is_observer, players_id
 
 __all__ = [
     "CHANNELS",
@@ -701,7 +701,6 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     player's ship is the one struck, so that the captive is aboard a real hull."""
     from freesail.combat import action
     from freesail.world import prizes as P
-    from freesail.world.hulls import players_id
 
     taken, captor, how = _taken_parts(world, m)
     if P.is_prize(taken):
@@ -945,7 +944,9 @@ def _orders_of(world: Any, vessel: Any, boss: str) -> tuple[str, dict[str, Any]]
             "under_orders_of": "",
         }
     if low in ("the ship", "us", "me", "the player", "the player's ship", "our ship"):
-        boss_id, boss_words = "the ship", "the ship"
+        # the player's ship by her id (package 60): "the ship" until he takes command of
+        # another, hers after it (her own id, as the signals read `own_id`)
+        boss_id, boss_words = players_id(world), "the ship"
     else:
         other = world.vessels.find(who.removeprefix("the ").removeprefix("The "))
         if other is None:

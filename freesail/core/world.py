@@ -30,6 +30,9 @@ from freesail.world.reckoning import NAVIGATION_KINDS
 
 ENGINE_VERSION = "0.0.1"
 SAVE_FORMAT = 1
+# The save's word that the followed hull's far body is kept at her truth (package 60): a save
+# from before has no `followed_body`, and the format does not move for it.
+FOLLOWED_BODY = "at her truth"
 
 # The build's stamp (package 37d; the review of gate 5c's playtests, section 9 under
 # "Replay"): a save and its checkpoint say which build wrote them. `BUILD_NAME` is set by
@@ -2668,6 +2671,11 @@ class World:
             # journals, her book and her bindings, as the World's own are above; her log is
             # rebuilt by the replay as the World's is, and the checkpoint keeps it
             "hulls": self._hull_blocks(),
+            # the followed hull's far body kept at her truth (package 60, the design's §9.2):
+            # a save without it is from before, and one of those played aboard another ship
+            # than the first parts from its game as played when it is loaded here (the
+            # loader says so, `replay.followed_body_words`)
+            "followed_body": FOLLOWED_BODY,
         }
 
     def _agents_seated_on(self, hull_id: str) -> list[Any]:

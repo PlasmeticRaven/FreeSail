@@ -790,14 +790,19 @@ class Vessel:
         (metres a second east and north): the player's ship (`captains.PLAYER_ID`), or
         another vessel; None when she is gone."""
         from freesail.world.brains import PLAYER_ID
+        from freesail.world.hulls import players_id
 
-        if target_id == PLAYER_ID:
+        # the game's first hull is the player's ship until he takes command of another
+        # (package 60): after it, a chase of hers steers for her own body, not his new ship
+        if target_id == PLAYER_ID and players_id(world) == PLAYER_ID:
             pos = world.position
             if pos is None:
                 return None
             east, north = _ship_velocity(world)
             return pos, east, north
         other = world.vessels.get(str(target_id)) if target_id else None
+        if other is None and target_id == PLAYER_ID:
+            other = world.vessels.player_shadow(world)
         if other is None or other.done:
             return None
         ms = units.knots_to_ms(other.speed_kn)

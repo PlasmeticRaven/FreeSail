@@ -234,9 +234,9 @@ def take_up(
             "to displace."
         )
     for h in (old, hull):
-        said = _in_a_set(root, h)
-        if said:
-            raise CommandError(said)
+        in_a_set = _in_a_set(root, h)
+        if in_a_set:
+            raise CommandError(in_a_set)
     how, left_to, port = _settlement(root, old, how, officer)
     if intent and how == LAID_UP:
         raise CommandError("A ship laid up sails for nothing; leave her to an officer to sail her.")
@@ -253,6 +253,11 @@ def take_up(
     if registry is not None:
         registry.rehome(person, str(hull.id))
     person.confined_to = ""
+    captain = getattr(hull, "captain", None)
+    if captain is not None and getattr(captain, "commands", False):
+        # before the command passes, so that the man who gives her up is her own late
+        # captain, never the player
+        captain.give_up(person.name, _late_captain(hull, person))
     hull.people.command_passed_to = person.id
     stations = getattr(hull, "stations", None)
     if stations is not None:
@@ -260,9 +265,6 @@ def take_up(
             stations.bind(CAPTAIN, person, quiet=True)
         except ValueError:
             pass
-    captain = getattr(hull, "captain", None)
-    if captain is not None and getattr(captain, "commands", False):
-        captain.player_hand(f"take command of the {_name(hull)}")
     vessel = getattr(hull, "vessel", None)
     if vessel is not None:
         vessel.brain = None  # the player's ship is awake always (crews.crewed)
@@ -274,6 +276,7 @@ def take_up(
 
     # the old ship settled (§4)
     old_line = _settle(root, old, how, left_to, port, intent, person, hull)
+    _boats_home(root, hull)
     text = f"{person.name} takes command of the {_name(hull)}; the {_name(old)} {old_line}."
     data = {
         "person": person.name,
@@ -346,3 +349,41 @@ def _settle(
         _give_intent(root, vessel, intent, role)
         words += f" to {intent}"
     return words
+
+
+def _boats_home(root: Any, hull: Any) -> None:
+    """A boat of another ship's lying fast alongside her for his coming back (the boat that
+    brought him across, `boats.board_from_boat`) pulls home to her own ship and is hoisted in
+    there (`boats.come_alongside`): he will not come back, she is his home now."""
+    from freesail.world import boats
+
+    for boat in list((getattr(root, "hulls", None) or {}).values()):
+        if boat is hull or not boats.is_boat(boat):
+            continue
+        oars = boats._oars(boat)
+        mark = dict(getattr(oars, "pulling_for", None) or {})
+        if not (mark.get("fast") and str(mark.get("hull") or "") == str(hull.id)):
+            continue
+        ship_hull = boats.ship_of(root, boat)
+        if ship_hull is None or ship_hull is hull:
+            continue
+        text = boats.come_alongside(root, boat, "")
+        boat.record(
+            Severity.NOTABLE,
+            "boat.mark",
+            f"Cast off from the {_name(hull)}, nobody to wait for; {text[0].lower()}{text[1:]}",
+            data={"hull": str(ship_hull.id), "home": True},
+        )
+
+
+def _late_captain(hull: Any, person: Any) -> str:
+    """The name of the man who commanded her before him: her captain or commander, else her
+    master; never the player's person (who is among her people as he comes aboard)."""
+    people = list(getattr(getattr(hull, "people", None), "people", None) or [])
+    for roles in (("captain", "commander"), ("master",)):
+        for p in people:
+            if p is person or getattr(p, "dead", False) or p.role not in roles:
+                continue
+            if str(getattr(p, "home", "") or hull.id) == str(hull.id):
+                return str(p.name)
+    return "Her master"

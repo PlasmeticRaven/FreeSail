@@ -1068,7 +1068,9 @@ def put_aboard(
         return "person.aboard", f"{person.name} is aboard the {hull_name(hull)} already.", {}
     whence = ""
     if was is not None:
-        whence = f" from the {hull_name(was)}"
+        came_from = hull_name(was)  # "the Amazon's launch" carries its own article
+        the = "" if came_from.lower().startswith("the ") else "the "
+        whence = f" from {the}{came_from}"
     elif was_where in ("boat", "cutter"):
         home = hull_of(world, getattr(person, "home", ""))
         whence = f" from the {hull_name(home)}'s boat" if home is not None else " from the boat"

@@ -853,7 +853,15 @@ def switch(world: World) -> None:
     cap, within_nm, demote_nm = settings(world)
     vessels = world.vessels
     with_brain = [v for v in vessels.vessels if v.brain is not None and not v.done]
-    if not with_brain and not vessels.crewed_ids:
+    # a hull kept with no far brain (the old ship left or laid up, the game's first hull
+    # once he has left her) put to sleep beyond the range wakes within it like any other
+    # (package 60: built from `with_brain` alone she slept for good)
+    kept_asleep = [
+        v
+        for v in vessels.vessels
+        if v.kept_hull() and not v.done and not v.crew.awake and v.position is not None
+    ]
+    if not with_brain and not kept_asleep and not vessels.crewed_ids:
         return
     far_nm: dict[str, float] = {}
     for v in with_brain:
@@ -902,6 +910,7 @@ def switch(world: World) -> None:
         and (v.brain.state or "on passage") not in _NOT_CREWED_STATES
         and getattr(v.brain, "role", "") not in FAR_ONLY_ROLES
     ]
+    wanted += [v for v in kept_asleep if far_nm.get(v.id, math.inf) <= within_nm]
     wanted.sort(key=lambda v: (rank(v), far_nm[v.id]))
     for v in wanted:
         held = crewed(world)

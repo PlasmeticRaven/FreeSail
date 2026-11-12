@@ -750,6 +750,49 @@ def command_doubt(world: Any, body: str) -> str | None:
                 f"{person.name} was dismissed his ship {ago // 86400} days ago: a new command "
                 "within the year wants a cause (interest, a friend at the Admiralty)"
             )
+    return _in_play_doubt(root, _ship, _port)
+
+
+def _in_play_doubt(root: Any, ship_name: str, port: Any) -> str | None:
+    """The ship given in play (package 60) where she is no ship of his service's to give: of
+    another nation, an enemy's, or a prize the court has not condemned. The director's word
+    stays the road (the owner's answer 3); the doubt says what wants a cause."""
+    from freesail.world import prizes as P
+    from freesail.world.command import ship_at_port
+    from freesail.world.signals import own_nation
+
+    vessel = ship_at_port(root, ship_name, port)
+    if vessel is None:
+        return None
+    mine = own_nation(getattr(root, "players", root))
+    hers = str(getattr(vessel, "nation", "") or "")
+    rec = P.record_of(vessel)
+    if rec and P.is_prize(vessel):
+        court = rec.get("court") or {}
+        if str(court.get("sentence") or "") != "condemned":
+            return (
+                f"the {vessel.name} is a prize the court has not condemned: she is no ship to "
+                "give until she is condemned and bought in"
+            )
+        return None
+    if hers and hers != mine:
+        from freesail.world.prize_court import _people
+
+        nations = getattr(root, "nations", None)
+        at_war = False
+        try:
+            at_war = bool(nations is not None and nations.at_war(mine, hers))
+        except (KeyError, ValueError):
+            at_war = False
+        if at_war:
+            return (
+                f"the {vessel.name} is an enemy's ship ({_people(nations, hers)}'s), lying at "
+                f"{port.name}: she is taken, not given"
+            )
+        return (
+            f"the {vessel.name} is a ship of {_people(nations, hers)}, lying at {port.name}: "
+            f"she is not {_people(nations, mine)}'s to give"
+        )
     return None
 
 
