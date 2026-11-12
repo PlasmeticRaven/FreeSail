@@ -712,6 +712,29 @@ CORRIDORS: dict[str, dict[str, Any]] = {
         "source": "gebco_2025",
         "folder": "tiles/1/atlantic-corridor",
     },
+    # package 106a: the ocean carried south to the Canaries' own row of the level-1 grid
+    # (25.2 to 29.47 N), from 22.13 W (Hierro's west point is 18.16 W) to the African
+    # coast, and the water between 29.47 and 31.9 N that the corridor's south row holds as
+    # NODATA (beyond its fetch): the Salvages and the passage from Madeira. A second layer
+    # BESIDE the first (`beside`), not the first widened: widening rewrote every one of the
+    # corridor's 48 tiles (its distance field is taken at the block's middle latitude, and
+    # its half-metre ties broke the other way; docs/dev/TuningNotes.md, 106a). A tile whose
+    # name the first lists is written in this layer's own folder, NODATA wherever the
+    # first's committed tile has data, and the runtime fills the first's NODATA from it
+    # (`chart.Level`); where the first answers, it answers alone. The north bound is where
+    # the first's data begins (its fetch's south, 31.9 N), below Madeira's south bound, so
+    # that the tide's open edges (`tide.charted_bounds`) see no charted water beyond it.
+    # The fetch reaches 33.8 N so that the field knows Madeira's and Morocco's shores.
+    "atlantic-south": {
+        "title": "The ocean south: from Madeira to the Canaries and the African coast",
+        "level": 1,
+        "bounds": {"south": 25.2001, "north": 31.9, "west": -22.13, "east": -9.34},
+        "fetch": {"south": 25.1, "north": 33.83, "west": -22.23, "east": -9.23},
+        "datum": "mean sea level",
+        "source": "gebco_2025",
+        "folder": "tiles/1/atlantic-south",
+        "beside": "atlantic-corridor",
+    },
 }
 
 # The tide's regions (package 94): bounds and no tiles, for the gauges' membership alone
@@ -769,6 +792,9 @@ CHARTS: dict[str, dict[str, Any]] = {
             "tunis-coast",
         ],
         "corridor": "atlantic-corridor",
+        # package 106a: coarse layers read after the corridor, each answering only where
+        # the layers before it have nothing (`CORRIDORS[...]["beside"]`)
+        "corridors_beside": ["atlantic-south"],
     },
 }
 
@@ -1335,6 +1361,12 @@ def save_tile(path: Path, **arrays: Any) -> None:
             info.compress_type = zipfile.ZIP_DEFLATED
             with z.open(info, "w") as f:
                 np.lib.format.write_array(f, np.asanyarray(value), allow_pickle=False)
+
+
+def undifferenced(values: np.ndarray) -> np.ndarray:
+    """The elevation as written undone (`differenced`; int16 wraps exactly), as the
+    runtime reads it (`chart.Tile.load`)."""
+    return np.cumsum(values.view(np.uint16), axis=1, dtype=np.uint16).view(np.int16)
 
 
 def differenced(values: np.ndarray) -> np.ndarray:
@@ -2386,14 +2418,29 @@ class Build:
         folder.mkdir(parents=True, exist_ok=True)
         for old in folder.glob("*.npz"):
             old.unlink()  # the corridor is rebuilt whole
+        # a layer beside another (package 106a): where the first's committed tile of the
+        # same name has data, this layer writes NODATA (the first answers there alone)
+        first_folder = None
+        if recipe.get("beside"):
+            first_folder = CHARTS_DIR / str(CORRIDORS[str(recipe["beside"])]["folder"])
         records = []
         for s, w in tiles:
             r0 = int(round((s - south0) / cell_sec))
             c0 = int(round((w - west0) / cell_sec))
             block = elev[r0 : r0 + TILE, c0 : c0 + TILE]
+            dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
+            first = first_folder / f"{tile_name(s, w)}.npz" if first_folder else None
+            if first is not None and first.exists():
+                with np.load(first) as z:
+                    known = undifferenced(z["elevation"]) != int(z["nodata"])
+                block = np.where(known, np.nan, block)
+                dblock = np.where(known, 0.0, dblock)
+                self.log(
+                    f"    {tile_name(s, w)}: beside {recipe['beside']}'s tile, "
+                    f"{int(known.sum())} cells its own"
+                )
             if np.all(np.isnan(block)):
                 continue
-            dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
             sea = (block < 0.0) & ~np.isnan(block)
             min_depth = float(-np.max(block[sea])) if sea.any() else float("nan")
             dist_cells = np.clip(np.rint(dblock / cell_ns), 0, 65535).astype(np.uint16)
@@ -2463,6 +2510,7 @@ class Build:
             "fetched_sha256": fetched.sha256,
             "folder": recipe["folder"],
             "committed": True,
+            **({"beside": recipe["beside"]} if recipe.get("beside") else {}),
             "built_by": f"python tools/build_charts.py --corridor {name}",
             "note": (
                 "committed (spec M6 §26, the owner's ruling 5): the one level-1 folder the "
@@ -2635,10 +2683,15 @@ class Build:
             if corridor and corridor not in corridors:
                 self.log(f"The chart {cname} names the corridor {corridor}, not built: left out.")
                 corridor = None
+            beside = [c for c in cspec.get("corridors_beside") or [] if c in corridors]
+            for c in cspec.get("corridors_beside") or []:
+                if c not in corridors:
+                    self.log(f"The chart {cname} names the corridor {c}, not built: left out.")
             charts[cname] = {
                 "title": cspec["title"],
                 "regions": present,
                 **({"corridor": corridor} if corridor else {}),
+                **({"corridors_beside": beside} if corridor and beside else {}),
                 **({"regions_not_built": absent} if absent else {}),
             }
         sources = {}
