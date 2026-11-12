@@ -93,6 +93,7 @@ on these packages; that is the owner's choice.
 | 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it; **surveyed 2026-11-11** ("## Package 107 ... the survey" below): 77 port files, about 240 places with a feature and no port file, ten passes proposed (Brest and the Western Approaches first), and a short step before them to settle the port file's dated form; **not yet, by the owner (2026-11-11): "We don't need to run 107 yet, as we'll continue expanding before we do refinement passes"**; the port file's dated form is asked of the new blocks' briefs meanwhile |
 | backlog (the stranger's view) | none | **A ship view of another vessel in sight** (the owner, 2026-11-11, striking the strip from 102): "a later 'stranger view' or 'enemy view' (maybe a small popout) that shows a ship view of a requested vessel that is in sight", her colours and hoists on it; under the knowledge rule, so beside or after package 99 | on the backlog, unbooked |
 | 108 | to be decided (a design note first) | **A scenario generated from a request in plain words** (the owner, 2026-11-11: "a 'scenario generation' feature that calls one of the APIs, or can be called from the MCP, to generate a scenario to an open free-text scenario request. This might streamline the actual play flow, when we get beyond testing, with the full manual scenario editor retained and refined/filled out alongside"). The lead's first shape, for the owner: the generator writes **a scenario file in the editor's own form**, never a thing of its own, so that what it makes is loaded, checked and edited as any scenario is; it chooses only from **what the game holds for the day asked** (the ports, ship files and fits, nations and their wars, roles, briefs: one description of the form with its allowed values, which the editor, the checker and the generator all read); what it could not honour it says in words; two fronts over the same three acts (the menu for a day, the check with its refusals in words, the save): the MCP first (the model the player already talks to writes it: no key, no cost of the game's), a provider's door second (the key in the environment alone, the cost shown before the call). The seats it may write are the consent rules' as for any scenario. **The owner's two answers (2026-11-11):** (1) both routes at once, "simply through both routes that already exist in the code. This will basically functionally be a station 'outside of the game', for the purposes of scenario generation, and so that it can make a second/multiple passes for revision": so the generator is a seat like the stations' and the director's, held through the MCP or a provider's door alike, that stands outside any world, with the menu, the check and the save as its readings and orders, and a conversation it can revise in; (2) whether a director is expected is "one toggleable option in the scenario generation interface, so that the generating model knows whether a director is expected or not". **On consent (the owner, 2026-11-11):** "I'm not sure whether this seat needs to sit within the consent framework, simply because it is as close to 'expected' work that any model might interface with, but for consistency we might include it. It needn't confuse the general consent briefing, though, since this is an 'out of the game' station, it's mostly just a de facto station." So the design note gives it a short paragraph of its own for consistency and leaves the general brief as it is; that a generated scenario seats nobody the doors would refuse is the checker's rule, not a matter of consent. | considered 2026-11-11; booked for a design note beside or after package 96 (which settles the scenario's form); not briefed |
+| 109 | Opus | **The mends from the owner's play of 2026-11-12** (his third notes, ten, with five saves: the bilander free in Torbay, the 74's encounter, the frigate's free patrol): the free order that answered "as said" and did nothing (notes 9, 4, 10), a reading of his own keeping (5), the boat that waited two hours on a short watch and could not be belayed (1), the director's dry run that reported success where the copy of the world had failed (2), the page drawing his first ship while he was aboard another (6), vessels sailing across the land on the legs never checked (8) | **briefed 2026-11-12 for the owner's final approval** ("## Package 109" below): five steps, truths 7-540 to 7-549; note 7 (clear for action) put to him for package 77, the readings' leak for package 99 |
 
 **The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
 on, not a ruling: every launch still waits for the owner's word).** *In flight (as of 11:00 UTC, 98 closed and 60's note merged):* 74 (Fable;
@@ -8345,6 +8346,93 @@ from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is
 and format; the fast tier whole; the slow tier of the touched files and of the known truths
 with the recorded passages by name; the pace alone and last), and the lead merges by that
 hash.
+
+## Package 109: the mends from the owner's play of 2026-11-12 (`freesail/orders/free.py`, `orders/__init__.py`, `freesail/world/things.py` the words that did nothing; `freesail/api/readings.py` the keeping; `freesail/world/dealings.py`, `movement.py`, `crew/hands.py` the boat and the short watch; `freesail/agents/director.py`, `core/replay.py` the dry run; `client/app.js`, `ui/server.py` the ship followed; `freesail/world/ships.py`, `business.py` the legs across the land)
+
+**BRIEFED 2026-11-12 for the owner's final approval; not launched.** Opus. From the owner's
+third set of play notes (ten notes and five saves of 2026-11-11 and 12: the bilander free in
+Torbay, twice; the 74's encounter, twice; the frigate's free patrol with an officer of the
+watch seated). The lead had the saves replayed and read against the code on 2026-11-12
+(read-only; the saves stay with the lead and are in no builder's hands: every case below is
+reproduced from a scenario on the trunk). Five steps, each at one hash. **Not this
+package's, for the owner's word:** note 7 (clear for action made true, and its reverse) to
+package 77; the readings' leak of note 5 to package 99's design; note 3 (a model's log
+showing the truth shelved) recorded and not acted on, by his word.
+
+1. **The words that did nothing (notes 9, 4, 10 and the first half of 5).** A free order is
+   taken "as said" whenever its verb is a free one, though it found no thing and moved
+   nothing (`orders/free.py`: the line "..., as said; nothing of the ship's changed"). In
+   the saves that answered, as if done: "open the gunports", "take posession of the Renard",
+   "take command of the prize", "take a sight for the latitude", "put Test Book on the
+   table", "read the letter" and five ways of opening the director's letter. **The owner:
+   "A refusal of some kind would be better when nothing actually happens, rather than a
+   false-success. It worked well as a general acceptance syntax for a working order as with
+   eating and drinking anything, but it shouldn't accept an order that will do nothing at
+   all."** (a) A free order is accepted only where it resolved a thing or a person, or is a
+   person's own act the world records (eating, drinking and the like, as today); where the
+   words matched nothing it is refused in words that say what was not found and what the
+   game does know by that name. (b) Words that are an order of the dialect go to the dialect
+   first (`take a sight`, `take possession`, `take command`), and one that names what
+   happens of itself is answered so ("the ports open as the guns are run out"). (c) **The
+   name the game shows is a name the game takes:** the director's letter was made rightly
+   and listed as "a sealed letter from Mr Weston to the master", and `things.find` did not
+   know it by those words; a thing is found by its listed name with or without its state's
+   words. (d) **Two things of one name** (two "letters to the captain" in the patrol's
+   save, whose giving did nothing and said nothing): the order is refused naming both by
+   what tells them apart (who wrote each and when, whose keeping, the first words), and
+   taken with any of those, or "the first", "the second", "the other". (e) **What he holds
+   and what lies here:** a reading of his own keeping and of the things in the place he
+   stands in (he tried "the things", "what I have", "inventory", "my keeping", "what is in
+   my keeping", "the letters", all refused), in the dialect's and the vocabulary's forms.
+2. **The boat and the short watch (note 1).** In the bilander `go ashore` put him in the
+   boat, the boat's work then waited two hours for a watch with hands enough ("Not hands
+   enough on deck to send boat; there are but two to spare"), and from the boat every deck
+   order was refused, the belay among them. (a) Where the watch on deck is too few to send a
+   boat, all hands are called for it, the road the lead ruled for her settee (package 75,
+   2026-11-10), said in the log and piped down after; no other ship's boat work changes
+   (the kept saves and the recorded passages the proof). (b) A person in a boat that has
+   not left the ship's side may belay it and is on deck again (`dealings._boat_kept` already
+   stands a boat down). (c) He is not put in the boat before there are hands to man it, if
+   that is the smaller change; else (b) answers it.
+3. **The director's dry run (note 2).** In play the dry run answered "would be performed as
+   said" for orders the game then refused (a lugger with "no intent a captain knows").
+   Replayed without a live seat, the same dry runs refuse rightly: `director._would_do`
+   tries the order on a copy of the world, **and where the copy cannot be made it swallows
+   the error and the dry run reports success.** (a) A dry run that could not be tried says
+   so in words and never says it would be performed. (b) Find what in a world with a model
+   seated at a provider's door cannot be copied (the lead's guesses: a lock or a client
+   object the checkpoint's pickler does not strip), and mend it, proven on a stub door with
+   a seat mid-turn. (c) A test over every form of the director's table on a seated world:
+   the dry run's word and the real order's agree.
+4. **The view follows the hull he is aboard (note 6).** The server already follows his body
+   ("The drivers follow Captain Bowen aboard the Renard") and serves her snapshot; the page
+   kept the first ship's drawing, so it drew the *Bellerophon*'s rig with the *Renard*'s
+   state. The page takes the followed hull's drawing when the followed hull changes, and
+   her name. Said plainly where it cannot: a hull in the far shape (her sails are her
+   file's, not her state's), a boat, a hull with no spars. Seen in the browser by the probe.
+5. **Vessels kept off the land (note 8).** Sampled every ten minutes of the patrol's save,
+   15 of 57 vessels stood on land at some sample (the Plymouth pilot cutter over Rame Head;
+   six of a convoy across the east end of the Isle of Wight; traders across Guernsey and
+   Alderney); none was put there, each sailed there: a far body moves on a straight line,
+   and the land is looked for only when a plan of plain positions is made
+   (`ships.land_crossing`), never on a leg to a ship, in company, on a station of a set, in
+   chase or going home, nor when a plan is made again. Those legs and the re-made plans are
+   checked as the others are and led round by the road the plain legs already take. **If
+   that road cannot serve them, stop and report with what it would take: the general
+   router is package 61's.** A truth that samples a busy sea for a day and finds no vessel
+   on the land.
+
+**Truths 7-540 to 7-549**, drafted with each step. **What must not move:** every recorded
+passage and kept save (a line every ship may say is not changed; the free order's
+acceptance line stays where an act was done). The rules of every package bind (no model or
+vendor identifier in any file; nothing under `docs/agents/consent/` nor
+`docs/agents/ConsentBrief.md`; no key, no paid call; never push to or rebase the trunk,
+never force-push; no test skipped, disabled or weakened; a pin moves only old beside new
+with its proof; physics read, not changed; ship files only through the generator; served
+text the world's). The builder works on `claude/pkg-109`; each step reports one hash
+measured in a pinned worktree (ruff; the fast tier whole; the slow tier of the touched files
+and of the known truths; the pace alone and last), under 600 words, and the lead merges by
+that hash.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
