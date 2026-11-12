@@ -91,7 +91,7 @@ def execute(ship: Any, order: Order) -> Result:
         if hull is root:
             hull = root.players
     try:
-        text, data = take_up(root, person, hull, how=how, officer=who, intent=intent)
+        text, data = take_up(root, person, hull, how=how, officer=who, intent=intent, said=False)
     except CommandError as e:
         raise OrderError(str(e)) from None
     return "ship.taken_up", text, {"verb": order.verb, "level": 1, **data}

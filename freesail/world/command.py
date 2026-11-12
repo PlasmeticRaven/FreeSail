@@ -201,9 +201,11 @@ def take_up(
     officer: str = "",
     intent: str = "",
     by: str = "the captain",
+    said: bool = True,
 ) -> tuple[str, dict[str, Any]]:
     """The player's person takes command of `hull` (the design's §2.3): returns her line and
-    its data; raises `CommandError` in words, nothing changed."""
+    its data; raises `CommandError` in words, nothing changed. `said` False leaves her line to
+    the order that called it (its reply is the line)."""
     root = _root(world)
     if getattr(root, "observed", False):
         raise CommandError("There is no ship of the player's in this world to leave.")
@@ -287,7 +289,9 @@ def take_up(
         f"{person.name} leaves the {_name(old)} for the {_name(hull)}; she {old_line}.",
         data=dict(data),
     )
-    hull.record(Severity.NOTABLE, TAKEN_UP, text, data=dict(data))
+    if said:
+        # the order's own reply is her line where an order gave it (`orders.command`)
+        hull.record(Severity.NOTABLE, TAKEN_UP, text, data=dict(data))
     return text, data
 
 

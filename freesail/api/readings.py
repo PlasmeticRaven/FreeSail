@@ -4222,13 +4222,18 @@ def _truth_prizes(world: Any) -> dict[str, Any]:
 
 
 def director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
-    """The truth as the director reads it (`_director_readings`), the player's ship current
-    for it (package 60: the director's station is kept on the game's first hull, and the
-    player's ship is his now, `World.players`; one hull in every game before)."""
-    from freesail.world.ships import players_current
+    """The truth as the director reads it (`_director_readings`): from the world as given,
+    except that from the director's own station's hull, the game's first hull since package
+    60, it is read from the player's ship now (`World.players`; one hull in every game
+    before, so that every recorded passage reads as it did)."""
+    from freesail.world.hulls import Hull
 
-    with players_current(world) as here:
-        return _director_readings(here, within_nm)
+    if isinstance(world, Hull) and world is world.world.first_hull:
+        # the director's own station's hull: the player's ship's block, his ship now
+        players = world.world.players
+        if players is not world:
+            return _director_readings(players, within_nm)
+    return _director_readings(world, within_nm)
 
 
 def _director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
