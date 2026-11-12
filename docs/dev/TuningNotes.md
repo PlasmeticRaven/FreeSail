@@ -26986,9 +26986,11 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 **Where I stand (2026-11-12):** measurement (A), the ocean layer, done and reported to the
 lead: a second coarse layer beside the first leaves every existing corridor tile byte for
 byte; widening the first rewrites all 48. Nothing committed under `data/charts/` yet.
-Measurement (B), the region, next; the sources' pass begun (the *Oriental Navigator* of
-1801, Glas 1764 and Purdy's Atlantic memoir of 1825 and 1829 fetched, not yet laid under
-`docs/references/`).
+Measurement (B), the region, done and reported. The runtime's second layer
+(`chart.Tile.filled_from`, `Level.beside`, the chart's `corridors_beside`) and the tool's
+(`CORRIDORS["atlantic-south"]`, its `beside`) written, not yet committed; the sources'
+pass begun (the *Oriental Navigator* of 1801, Glas 1764 and Purdy's Atlantic memoir of
+1825 and 1829 fetched, not yet laid under `docs/references/`).
 
 ### (A) The ocean layer: a second coarse layer against the first widened
 
@@ -27052,3 +27054,74 @@ three columns (26.4 to 13.6 W; the coast lies west of 13.6 W from 25.2 N down): 
 1,881,628 bytes; with the Canaries' row's column from 26.4 W, 10 tiles and 2,052,253 bytes.
 By the second layer's way none of the first's tiles moves for it either; by the widening's,
 it would be the same 48 rewritten and 24 tiles more over the whole width (32 to 1 W).
+
+### (B) The region: the Canaries, and the Salvages
+
+Built into a scratch folder by the tool at the head (the trunk's manifest copied beside
+it, so that the seam read the trunk's regions: "0 kept"), from one fetch for the three
+variants (EMODnet 27.28 to 30.37 N, 18.35 to 13.12 W; GEBCO's fill raised by the eleven's
+3.98 m, no gauge of the block's yet: the bytes move a little when the block's own tide is
+in, and the region is rebuilt then, package 101's lesson).
+
+**The bounds.** The brief's 27.33 to 29.47 N and 18.29 to 13.17 W take 91 level-2 tiles: 27.33
+is below the row edge 27.33333, 29.47 above 29.46667, and 13.17 W east of the column edge
+13.17333 (package 104's finding). A hair inside the edges, **27.33334 to 29.46666 N,
+18.29332 to 13.17334 W: 60 tiles (5 rows by 12), 12,496,201 bytes**, 208 KB a tile; the
+coast 688 pieces, 250,001 bytes. Every island lies inside: Hierro's south point (27.64 N)
+and west point (18.16 W), Alegranza (29.40 N), the Roque del Este (13.33 W).
+
+**The Salvages: by one tile, the smaller.** The two islands and their islets lie in one
+level-2 tile (29.89333 to 30.32 N, 16.16 to 15.73333 W): **one tile, 376,201 bytes** (the
+steepest relief of the block), its coast 8,096 bytes. The bound carried up to 30.31999 N
+instead takes 84 tiles, 14,647,521 bytes: 24 tiles and 2.15 MB more against 0.38 MB. A
+region's recipe is one box, so the one tile is a region of its own, **`salvages`**, bounds
+29.89334 to 30.31999 N, 16.15999 to 15.73334 W (no code; its features file its own); the
+ocean between it and the islands is the second coarse layer's.
+
+**Written whole, or within ten miles of land.** Of the 60, 38 tiles hold water within ten
+miles of land (10,575,498 bytes) and 22 do not (1,920,703 bytes, 87 KB a tile): **the rule
+would save 1.9 MB of 12.5**, the deep water round these islands compressing well and the
+dear tiles being the steep shores, unlike the Azores' (260 KB a tile of open sea). It
+would also hand the middles of the wider channels to the coarse layer's 30" cells. The
+Salvages' tile is within ten miles of land either way. **Recommended: whole** (the lead's
+choice).
+
+**The source grid.** EMODnet's DTM answers over the sea of every tile of both regions: the
+cells GEBCO alone fills are the land and, at most, 2.7% of a tile's sea cells (sampled one
+in sixteen; the shore of Gran Canaria's south-west tile), so the tiles are EMODnet's at
+3.75" over the water, GEBCO's under the land, as every block's. The finer grid reaches the
+Canaries and the Salvages.
+
+**Under the 40 MB rule:** the two regions 12.87 MB of level-2 tiles and 0.26 MB of coast;
+with the second coarse layer (1.19 MB), 14.3 MB, before any harbour patch.
+
+**The gauges** (TICON's file, the same zip as package 39b's, SHA-256 7055f8ed...6514, read by
+the stations' coordinates, the longest record of each; the mean level above the chart's
+datum from Puertos del Estado's REDMAR reports, `bancodatos.puertos.es/BD/informes/
+globales/GLOB_2_3_<code>.pdf`, the codes in `INT_3.pdf`, the level the difference of the
+NMM and the BMMI on the gauge's zero, "Referencias de nivel del mar"):
+
+| Gauge | TICON position | Record (longest) | M2 cm, deg | S2 | N2 | REDMAR | NMM - BMMI |
+|---|---|---|---|---|---|---|---|
+| Arrecife, Lanzarote | 28.9722, -13.5300 | IEO 1949 to 2012 | 83.5, 36.6 | 31.5, 59.8 | 17.4, 22.2 | 3470, 2009 to 2017 | 179 - 19 = 1.60 m |
+| Puerto del Rosario, Fuerteventura | 28.5000, -13.8500 | PdE 2004 to 2015 | 80.9, 33.1 | 30.6, 56.7 | 16.8, 18.9 | 3469, 2004 to 2017 | 152 - (-1) = 1.53 m |
+| Las Palmas | 28.1333, -15.4167 | IEO 1949 to 2012 | 74.6, 28.4 | 28.5, 52.4 | 15.4, 14.7 | 3450, 1992 to 2017 | 158 - 14 = 1.44 m |
+| Santa Cruz de Tenerife | 28.4800, -16.2400 | PdE 1992 to 2015 | 70.8, 29.3 | 27.2, 52.6 | 14.7, 15.6 | 3471, 1992 to 2017 | 150 - 13 = 1.37 m |
+| Santa Cruz de la Palma | 28.6833, -17.7500 | UHSLC 1959 to 1981 | 65.1, 29.0 | 25.5, 51.6 | 13.6, 15.8 | 3465, 2007 to 2017 | 141 - 15 = 1.26 m |
+| San Sebastián, Gomera | 28.0000, -17.0000 (rounded) | PdE 2007 to 2015 | 58.1, 23.6 | 23.3, 46.1 | 12.0, 11.3 | 3463 (28.09, -17.11), 2007 to 2017 | 128 - 10 = 1.18 m |
+| La Estaca, Hierro | 27.7800, -17.9000 | PdE 2004 to 2015 | 59.3, 21.8 | 24.2, 44.9 | 12.1, 8.7 | 3459, 2004 to 2017 | 157 - 40 = 1.17 m |
+
+Las Palmas's UHSLC series at 28.10 N, -15.40 (1949 to 1991, three records) has M2's phase
+at 0 to 2 degrees where the IEO's, Puertos del Estado's and UHSLC's own later series agree at
+28 to 29: a clock 27 degrees (54 minutes) early, as Vigo's (package 39c); not taken.
+Gomera's TICON position is rounded to the degree (28.0 N, 17.0 W, at sea nine miles from
+San Sebastián); REDMAR's 28.09 N, 17.11 W is the harbour's, and the gauge is placed there.
+El Hierro's station is La Estaca on the north-east coast (REDMAR's report), not La
+Restinga. **The Salvages have no gauge** (none in TICON's file between 29.47 and 31.9 N):
+by package 104's ruling a block with none is served by its neighbours' nearest gauges within
+the reach, each listing it after its own: Santa Cruz de Tenerife (101 miles; `[canaries,
+salvages]`) and Funchal (159 miles; `[madeira, salvages]`, the gauge's figures unmoved,
+Madeira's water unmoved since the membership is by bounds), the level the blend's of those
+that have one (Funchal's is null, so Santa Cruz's 1.37 m). The two regions share no seam.
+**Outside the blocks** the ocean between them reads the eleven alone, the nearest of them
+(Le Conquet's, 1,300 miles off) as Madeira's ocean does today: the rule, said for the lead.
