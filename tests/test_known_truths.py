@@ -16057,3 +16057,298 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("mud mixed with sand" in e.text for e in w.log if e.kind == "sounding")
     seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
+
+
+# Package 106a: the ocean carried south, and the Canaries with the Salvages (truths 7-520 to
+# 7-529). States, counts and bands; no digest.
+# ---------------------------------------------------------------------------
+
+CANARIES_PORTS = [
+    "santa-cruz-de-tenerife",
+    "orotava",
+    "las-palmas",
+    "arrecife",
+    "santa-cruz-de-la-palma",
+    "san-sebastian-de-la-gomera",
+    "cabras",
+]
+
+
+def _can_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart over the Canaries' sea at seed 7, the seven ports loaded,
+    the north-east trade steady (from the north-north-east unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 25.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 14.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", CANARIES_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts_there():
+    """The brief's item 1 as the owner's goal cut it: the coarse layer carried south to the
+    Canaries' own row of the level-1 grid. From Madeira's tiles to 25.2 N, between 22.13 W
+    and the African coast, every tenth of a degree answers a depth (the Salvages' passage
+    and the crossing among them, which the corridor's south row held as NODATA); the chart's
+    south limit is 25.2 N, a scenario may start south of the old 32 N, and one south of the
+    new limit is refused in words."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    assert chart.bounds[0] == pytest.approx(25.2, abs=0.001)
+    holes = []
+    for i in range(int((31.9 - 25.3) / 0.1) + 1):
+        lat = 25.3 + 0.1 * i
+        for j in range(int((22.0 - 9.5) / 0.1) + 1):
+            p = Position(lat, -22.0 + 0.1 * j)
+            if chart.depth_at(p) is None:
+                holes.append(p)
+    assert holes == []
+    # between Madeira and the Salvages, where the corridor's tile was NODATA
+    w = _can_at(31.0, -16.0, datetime(1805, 6, 20, 12, 0))
+    assert w.chart.level_at(w.position) == 1 and w.chart.depth_at(w.position) > 3000.0
+    with pytest.raises(ValueError, match="outside the chart"):
+        _can_at(25.1, -20.0, datetime(1805, 6, 20, 12, 0))
+
+
+def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as_before():
+    """The brief's item 1 and the lead's word on report (A): no existing tile is touched,
+    and where the corridor answers it answers alone. Every committed corridor tile read
+    through the runtime's path with the layer beside it equals its own cells: the elevation
+    and the distance wherever the corridor has data, the blocks' shoalest soundings wherever
+    the corridor's block has one; the new layer fills the corridor's NODATA only, in the
+    three tiles of the row from 29.47 N that both list."""
+    import numpy as np
+
+    from freesail.world.chart import Tile, load_chart
+
+    chart = load_chart("atlantic-east")
+    level1 = next(lv for lv in chart.levels if lv.level == 1)
+    root = Path(__file__).resolve().parents[1] / "data" / "charts" / "tiles" / "1"
+    corridor = sorted((root / "atlantic-corridor").glob("*.npz"))
+    assert len(corridor) == 48
+    assert sorted(level1.beside) == ["106080_-48960", "106080_-64320", "106080_-79680"]
+    filled = 0
+    for path in corridor:
+        own = Tile.load(path)
+        read = level1.tile(own.south_sec, own.west_sec)
+        known = own.elevation != own.nodata
+        assert np.array_equal(read.elevation[known], own.elevation[known]), path.stem
+        assert np.array_equal(read.dist[known], own.dist[known]), path.stem
+        has = ~np.isnan(own.min_blocks_m)
+        assert np.array_equal(read.min_blocks_m[has], own.min_blocks_m[has]), path.stem
+        filled += int(((read.elevation != own.nodata) & ~known).sum())
+    assert filled == 3 * 149504  # the three tiles' cells south of 31.9 N, the new layer's
+
+
+def test_truth_7_522_the_islands_channels_are_charted_water_in_detail():
+    """The brief's item 2: the seven islands with their channels in one region at 3": the
+    Bocayna between Lanzarote and Fuerteventura (Glas: deep in the middle), El Rio between
+    Lanzarote and Graciosa (six or seven fathoms mid-way), the channels between Tenerife and
+    the Grand Canary, Tenerife and Gomera, Gomera and Hierro, Palma and Gomera, Fuerteventura
+    and the Grand Canary, each at the region's level and deep enough for any ship; the
+    Salvages a region of their own."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    channels = {
+        "the Bocayna": (28.81, -13.85, 30.0),
+        "El Rio": (29.225, -13.50, 8.0),
+        "Tenerife and Canaria": (28.25, -15.85, 1000.0),
+        "Tenerife and Gomera": (28.15, -16.95, 1000.0),
+        "Gomera and Hierro": (27.90, -17.70, 1000.0),
+        "Palma and Gomera": (28.40, -17.45, 1000.0),
+        "Fuerteventura and Canaria": (28.10, -14.90, 1000.0),
+    }
+    for name, (lat, lon, least) in channels.items():
+        p = Position(lat, lon)
+        assert chart.region_at(p) == "canaries" and chart.level_at(p) == 2, name
+        assert chart.depth_at(p) > least, name
+    el_rio = chart.depth_at(Position(29.225, -13.50))
+    assert 8.0 < el_rio < 16.0  # Glas's six or seven fathoms, 11 to 13 m
+    assert chart.region_at(Position(30.14, -15.87)) == "salvages"
+
+
+def test_truth_7_523_the_peak_of_tenerife_is_seen_forty_leagues_off_in_the_clearest_weather():
+    """The brief's item 4, the how-to's tall-feature rule: the Peak, 1,909 toises by Borda's,
+    Lamanon's and Cordier's measures (3,720 m; Purdy 1825, p. 214), 'may sometimes be seen
+    forty leagues off' (p. 218): in the clearest weather a lookout fifteen metres up sees it
+    at 120 miles (and at 130), and not at 140, beyond its own horizon and hers."""
+    from freesail.world.chart import CLEAR_VISIBILITY_NM, load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    peak = chart.feature("peak-of-tenerife")
+    assert peak.height_m == 3720
+    when = datetime(1805, 6, 20, 12, 0)
+
+    def seen(nm: float) -> bool:
+        p = Position(peak.position.lat_deg + nm / 60.0, peak.position.lon_deg)
+        sights = chart.in_sight(p, 15.0, CLEAR_VISIBILITY_NM, "day", when)
+        return "peak-of-tenerife" in {s.feature.id for s in sights}
+
+    assert seen(120.0) and seen(130.0) and not seen(140.0)
+
+
+def test_truth_7_524_each_ports_road_is_as_its_pilot_has_it():
+    """The brief's item 5: the seven roads in the pilots' depths and bottoms (Purdy 1825 and
+    Glas 1764): Santa Cruz of Tenerife's thirty fathoms and more on dark ooze, steep (the
+    grid's 60 m); Orotava's deep berth, thirty to forty-five fathoms and more; the sandy bay
+    of La Luz; Naos within its reef; Santa Cruz of Palma's fifteen or twenty fathoms and
+    deeper on clean ground; St Sebastian's seven to fifteen; the barks' road at Cabras; each
+    the King of Spain's, hostile to a King's ship in June 1805, and Hierro without a port."""
+    w = _can_at(28.6, -16.1, datetime(1805, 6, 20, 12, 0))
+    bands = {
+        "santa-cruz-de-tenerife": (40.0, 80.0, "ooze"),
+        "orotava": (55.0, 200.0, "sand"),
+        "las-palmas": (8.0, 25.0, "sand"),
+        "arrecife": (4.0, 14.0, "sand"),
+        "santa-cruz-de-la-palma": (25.0, 90.0, "clean"),
+        "san-sebastian-de-la-gomera": (10.0, 30.0, "sand"),
+        "cabras": (6.0, 16.0, "sand"),
+    }
+    assert sorted(w.ports.ports) == sorted(CANARIES_PORTS)
+    for pid, (lo, hi, bottom) in bands.items():
+        port = w.ports.ports[pid]
+        depth = w.chart.depth_at(port.anchorage.position)
+        assert lo < depth < hi, (pid, depth)
+        assert bottom in (w.chart.bottom_near(port.anchorage.position) or ""), pid
+        assert port.nation_on(w.clock.ship_time) == "spain"
+        assert w.dealings.stance(port) == "hostile", pid
+    assert not [p for p in w.ports.ports if "hierro" in p or "valverde" in p]
+
+
+def test_truth_7_525_the_salvages_where_the_pilots_put_them_and_a_ship_takes_their_reef():
+    """The brief's item 8: the Great Salvage in 30 8 N (Purdy 1825, p. 210; Mudge and Vidal's
+    south side 30 7 39 N), the period's longitude, 15 55 or 15 56 W, three or four minutes west
+    of the grid's island (the island the grid holds, 15 52 W, as package 104 found the
+    period's longitudes out); the Great Piton eight miles and a half south-west of it (ten in the
+    grid between the features' places, the Great Salvage's mark at the island's middle); and a
+    frigate drawing eighteen feet over the rocky bank of the Pitons takes the ground at any
+    tide."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import bearing_and_distance
+
+    chart = load_chart("atlantic-east")
+    great = chart.feature("great-salvage").position
+    assert abs(great.lat_deg - (30 + 8 / 60)) < 2.0 / 60
+    assert 2.0 / 60 < (15 + 55.5 / 60) - abs(great.lon_deg) < 5.0 / 60
+    assert chart.depth_at(great) < 0.0  # the grid's own land
+    bearing, dist = bearing_and_distance(great, chart.feature("great-piton").position)
+    assert 200.0 < bearing < 250.0 and 7.0 < dist / units.NAUTICAL_MILE < 11.0
+    bank = chart.feature("pitons-bank")
+    for tide_m in (0.0, 1.4, 2.8):
+        hit = chart.danger_under(bank.position, 0.0, 40.0, 5.5, tide_m=tide_m)
+        assert hit is not None and "Pitons" in hit.bottom
+
+
+def test_truth_7_526_the_tide_is_the_islands_own_and_the_master_has_norie_s_canary_island():
+    """The brief's item 7: the block's seven gauges (TICON; the levels Puertos del Estado's
+    REDMAR) give the road of Santa Cruz its own water, mean level 1.37 m above the datum and
+    an M2 of 0.71 m; Arrecife's larger, 0.84 m on 1.60; the Salvages, with no gauge, read
+    Santa Cruz's and Funchal's blend, Santa Cruz's level; Funchal's water as it was. Norie's
+    Table XLI of 1805 has 'Canary Island, 3h 0m' and no rise, the rise the world's spring
+    range, judgement."""
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    level, k = tide.constants_at(Position(28.4737, -16.2394))
+    assert level == pytest.approx(1.37, abs=0.01) and k["M2"][0] == pytest.approx(0.708, abs=0.005)
+    level, k = tide.constants_at(Position(28.9636, -13.5352))
+    assert level == pytest.approx(1.60, abs=0.01) and k["M2"][0] == pytest.approx(0.835, abs=0.005)
+    level, k = tide.constants_at(Position(30.14, -15.87))
+    assert level == pytest.approx(1.37, abs=0.01) and 0.70 < k["M2"][0] < 0.72
+    level, k = tide.constants_at(Position(32.64, -16.9067))
+    assert k["M2"] == pytest.approx((0.719, 45.8), abs=0.001)  # Funchal's, unmoved
+    canary = T.Epitome.load("norie").by_name("Canary Island")
+    assert (canary.hw_h, canary.hw_m) == (3, 0) and canary.rise_judgement
+    assert canary.spring_rise_ft == 7.0
+
+
+def test_truth_7_527_the_trade_has_a_box_south_of_madeira_and_rennells_current_sets_south():
+    """The brief's item 6 and 7: Madeira's box no longer answers south of 30 N; the
+    Canaries' box does, from 25.2 N, the trade from N.N.E. to East its summer's rows; Rennell's
+    current (Purdy 1825, pp. 95 to 96) sets S.S.E. three-quarters of a knot in the open sea
+    between Madeira and the islands and south half a knot among them; Funchal's water has
+    no current, as before."""
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+    from freesail.world.weather import load_climatology
+
+    clim = load_climatology()
+    assert clim.box_at(28.47, -16.24).name == "canaries"
+    assert clim.box_at(26.0, -15.0).name == "canaries"
+    assert clim.box_at(32.64, -16.91).name == "madeira"
+    july = clim.boxes["canaries"].month(7).check
+    assert july["northerly_pct"] + july["easterly_pct"] >= 90.0
+    tide = T.load_tide()
+    open_sea = tide.area_at(Position(30.8, -16.0))
+    assert open_sea.id == "canary-current"
+    assert (open_sea.current_toward_deg, open_sea.current_kn) == (158.0, 0.75)
+    among = tide.area_at(Position(28.25, -15.85))
+    assert among.id == "canaries-among" and among.current_kn == 0.5
+    funchal = tide.area_at(Position(32.638, -16.906))
+    assert funchal is None or funchal.current_kn == 0.0
+
+
+def test_truth_7_528_the_business_trades_corn_west_and_timber_and_wine_east_among_the_islands():
+    """The brief's item 5 for a region the business can people: Lanzarote's and
+    Fuerteventura's corn dear on Tenerife and Palma (Glas: the barks lade corn at Cabras;
+    Naos's magazines of corn for export), Palma's and Gomera's wood and Tenerife's wine dear
+    in the eastern islands; every port's track to the common mark north of Tenerife clear of
+    the land, so that no route between the seven is refused."""
+    from freesail.world.business import Business
+
+    w = _can_at(28.85, -16.4, datetime(1805, 6, 20, 12, 0), business="on")
+    assert isinstance(w.business, Business) and w.business.region == "canaries"
+    routes = {(a.id, b.id, good) for _r, a, b, good in w.business.routes()}
+    assert ("cabras", "santa-cruz-de-tenerife", "wheat") in routes
+    assert ("arrecife", "santa-cruz-de-la-palma", "barley") in routes
+    assert ("santa-cruz-de-la-palma", "arrecife", "timber") in routes
+    assert ("orotava", "arrecife", "wine") in routes
+    assert w.business.refused == set()
+    assert all(
+        w.business._leaves_clear(p) and w.business._arrives_clear(p) for p in w.business.ports()
+    )
+
+
+@pytest.mark.slow
+def test_truth_7_529_the_frigate_from_funchal_looks_into_santa_cruz_road_by_her_short_book():
+    """The brief's item 8: the block's scenario (`canaries.yaml`, June 1805) sailed at seed 7 by
+    its short book: from three miles north-east of Point Naga round the point and down the
+    east side of Tenerife to two miles off the town, the Peak and the Rocks of Naga in sight,
+    fixed by cross bearings on the land, then on to the south, all within the morning and
+    without touching ground."""
+    from freesail.world.geo import Position, bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "canaries.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 5
+    look_in = Position(28.455, -16.205)
+    road = w.chart.feature("santa-cruz-road").position
+    closest, nearest_road = float("inf"), float("inf")
+    for _ in range(6 * 60):
+        w.run(60)
+        closest = min(closest, bearing_and_distance(w.position, look_in)[1])
+        nearest_road = min(nearest_road, bearing_and_distance(w.position, road)[1])
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    # measured at seed 7: 1.34 miles from her mark by the truth (under one by her account,
+    # when she bore away), 2.96 from the road; at noon in 27 58 N, on to the south
+    assert closest < 2.0 * units.NAUTICAL_MILE
+    assert 2.0 * units.NAUTICAL_MILE < nearest_road < 3.5 * units.NAUTICAL_MILE
+    assert w.position.lat_deg < 28.30
+    seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
+    assert any("Peak of Tenerife" in t for t in seen) and any("Rocks of Naga" in t for t in seen)
+    assert any("Fixed by cross bearings" in e.text for e in w.log if e.kind == "reckoning.fix")
