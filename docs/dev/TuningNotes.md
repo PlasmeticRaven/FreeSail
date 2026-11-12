@@ -27198,6 +27198,15 @@ that have one (Funchal's is null, so Santa Cruz's 1.37 m). The two regions share
 9. **The how-to**: `docs/dev/ChartBlocks.md`, "The ocean carried south, the Canaries and the
    Salvages".
 
+**Decision 68** (the owner's, on the trunk at the second merge): the sources on file were
+searched (Glas 1764, Purdy 1825, the Oriental Navigator 1801) for the islands' part in
+slavery. Glas alone speaks of it: the Count of Gomera kept about a thousand enslaved Africans
+on his sugar lands at Adeje on Tenerife, and several gentlemen of Tenerife a few (p. 353, OCR
+l. 14740; l. 10373 to 10381; of the 1760s). Said plainly with its years and source in the
+heads of `santa-cruz-de-tenerife.yaml` and `san-sebastian-de-la-gomera.yaml`; no person in
+any market or the business; no scenario on it. A port file has no served field for such a
+statement: it stands in the file's head (a finding for the design note).
+
 ### Found for others, not mended
 
 - The open ocean's tide is the nearest of the eleven (Le Conquet's, M2 about 2 m) over the
