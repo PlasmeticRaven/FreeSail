@@ -2,9 +2,9 @@
 # Every source with its licence, attribution, URL, retrieval date and checksum; the
 # regions and their tiles; the attribution block the game shows in its about text.
 format: 1
-built: '2026-11-11'
+built: '2026-11-12'
 tool: tools/build_charts.py
-build_hash: 1f0cc73b98108ec5
+build_hash: d9e0017e6e5307ee
 levels:
   '0':
     cell_sec: 150.0
@@ -55,6 +55,8 @@ charts:
     - sardinian-sea
     - tunis-coast
     corridor: atlantic-corridor
+    corridors_beside:
+    - atlantic-south
 regions:
   channel-west:
     title: The western Channel and the Western Approaches, Falmouth to Ushant
@@ -12380,6 +12382,68 @@ corridors:
       bytes: 31361
       sha256: 9f5b168b6c6ad98bec3ece64aa32bad45d0ce10bd7230fec596d443d083f7203
     bytes: 9746887
+  atlantic-south:
+    title: 'The ocean south: from Madeira to the Canaries and the African coast'
+    level: 1
+    bounds:
+      south: 25.2001
+      north: 31.9
+      west: -22.13
+      east: -9.34
+    fetch:
+      south: 25.1
+      north: 33.83
+      west: -22.23
+      east: -9.23
+    datum: mean sea level
+    source: gebco_2025
+    licence: public-domain
+    fetched_sha256: 23adfae8a91a3b0f5fe58a326c3a96e21c7c0a83b17db6bd22f6ff125af9ce91
+    folder: tiles/1/atlantic-south
+    committed: true
+    beside: atlantic-corridor
+    built_by: python tools/build_charts.py --corridor atlantic-south
+    note: 'committed beside atlantic-corridor (package 106a): read after it, under every region of a chart
+      that names it in `corridors_beside`; a tile both list is the first''s, its NODATA cells filled from
+      this layer''s at load'
+    tiles:
+    - name: 90720_-79680
+      south_sec: 90720
+      west_sec: -79680
+      min_depth_m: 1.3
+      bytes: 209065
+      sha256: e377bc933d251d4ffd53e7f9717d00a7313f3951cbe93e365d62d8ccb8b7415f
+    - name: 90720_-64320
+      south_sec: 90720
+      west_sec: -64320
+      min_depth_m: 0.0
+      bytes: 298974
+      sha256: b439ef963c8ccd83699dc8bcc0333fe740cdde478c56524b5240ef467d69f0b4
+    - name: 90720_-48960
+      south_sec: 90720
+      west_sec: -48960
+      min_depth_m: 0.0
+      bytes: 225814
+      sha256: 99d0216013e643a303857163e4dee10b18387ebb4889749534722315d3c60539
+    - name: 106080_-79680
+      south_sec: 106080
+      west_sec: -79680
+      min_depth_m: 4058.0
+      bytes: 121249
+      sha256: ccd6f1b2c6d90370e9ba04a1652b26c595c2f38913f06d375cfc0390f0c01088
+    - name: 106080_-64320
+      south_sec: 106080
+      west_sec: -64320
+      min_depth_m: 2.0
+      bytes: 150596
+      sha256: 1756650fedb0bf462c562f4545c19ed7478e5abaf07e1df5d776c20e3f87af3e
+    - name: 106080_-48960
+      south_sec: 106080
+      west_sec: -48960
+      min_depth_m: 0.0
+      bytes: 185717
+      sha256: 28e9c2369019673bc8310cb9310e95eef46becad9f2ac10dc962ed64b0a9601d
+    bytes: 1191415
 tide_regions:
   solent:
     title: 'The Solent, Spithead and Poole bay: a tide region, no tiles'
@@ -12540,6 +12604,12 @@ sources:
       sha256: 3929dd24f8dc9e29ed887cd257abf921d83f86bef0cc237881bbea5ba73fbb51
       bytes: 3654039
       file: gebco_2025_s36.05_n39.05_w7.50_e11.40_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 25.1, ''north'':
+        33.83, ''west'': -22.23, ''east'': -9.23})'
+      retrieved: '2026-11-12'
+      sha256: 23adfae8a91a3b0f5fe58a326c3a96e21c7c0a83b17db6bd22f6ff125af9ce91
+      bytes: 36681414
+      file: gebco_2025_s25.10_n33.83_w-22.23_e-9.23_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -12724,7 +12794,7 @@ sources:
       sha256: edb90b710f4b7293d8c2fb7d91cc32541f787b99dd2237056288d2b7520fe53a
       bytes: 38270840
       file: emodnet_dtm2024_elevation_max_36.15_38.95_7.60_11.30.nc
-    status: fetched
+    status: fetched in an earlier build
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
     licence: Licence-Ouverte-2.0
