@@ -27045,3 +27045,58 @@ test_facade_readers, test_far_action, test_grammar_book, test_hulls, test_in_wor
 test_known_truths, test_observer, test_primer, test_prize_court, test_prizes, test_readings,
 test_replay, test_ship_changed, test_world_orders); the pace tests of the same files alone and last
 (`--slow -m pace -n 0`) exit 0. No pin moved.
+
+### Step 1, the lead's mends (2026-11-12)
+
+The lead's read-only review of 46fe724, by reproduction, sent step 1 back with eight items. Each
+was reproduced here, and each mend has a test in `tests/test_ship_changed.py` that fails on
+2370a2d (all eleven new tests run there failed, all pass on the mended code):
+
+1. **`said` overwritten** by the set's check in `command.take_up`: a direct call wrote no line in
+   the new ship's log. The check's result has a name of its own.
+2. **The launch left alongside**: reproduced (she lay fast alongside the Fly with her coxswain and
+   oarsmen). At the act a boat of another ship's lying fast alongside her for his coming back
+   pulls home by her own `come alongside` (`command._boats_home`): in the test case she left the
+   Fly at tick 2100, a mile from the Amazon, and was hoisted in at tick 3264.
+3. **"Captain Bowen stands aside at your order"**: reproduced; and the player, a visitor carrying
+   the captain's role, was among her people, so her captain read him. Her rules captain now
+   stands down by `Captain.give_up` before the command passes, in her late master's name
+   (`command._late_captain`): "Mr Bradley gives up her command to Captain Bowen, and his book
+   'in port' is struck."
+4. **A French brig given at Falmouth**: reproduced. The director's `command:` form stays the road
+   (the owner's answer 3); `court.command_doubt` now doubts a ship in play of another nation
+   ("not Britain's to give"), an enemy's ("taken, not given") or a prize the court has not
+   condemned.
+5. **Readers of the first hull as the player's**: `ships.Vessel._target_of` (a chase of
+   `PLAYER_ID` steers for the first hull's body once he has changed ships) and
+   `combat.action._witnessed` (the player's ship as witness by `players_id`; before it, his new
+   ship's own fire made her a pirate in her own captain's eyes, and the lead says so under
+   `--ship` on the trunk too) mended. Signals and sets: `ship "X": under the orders of the
+   ship` now names the player's ship by her id (`players_id`), her body's id on the sea, by
+   which her hoists are read (`signals.commanded_by`); a set's every reader takes `PLAYER_ID` for the player's ship (some
+   fifteen places in `squadrons.py`), so a set of his (`commander` or a member "the ship" or
+   "us") is refused in words after a change (`Squadron.from_spec`), as the act refuses a ship
+   in a set or with ships under her orders; `signals.py`'s `under_orders_of == "the ship"`
+   (the company leg) is reached after a change only by a vessel put under the first hull's
+   orders before it, which the act refuses. The set's command carried to another hull is left
+   to a later package.
+6. **A kept hull asleep for good**: reproduced (`crews.switch`'s promotions came from the ships
+   with a far brain alone); a kept hull asleep within the range is now among them. **The weigh
+   swallowed**: reproduced at tick 2571, but not the act's: `evolutions.scripts.
+   _belay_held_work` belays every order waiting its turn when a coming to anchor finishes,
+   aboard any ship. A weigh or an unmoor is anchor work, not sail work, and now waits on with
+   the boat's errand (`ANCHOR_WORK_KEPT`): his "weigh anchor" is begun at 2571, "All hands up
+   anchor!".
+7. **Truth 7-482** now gives an order after the act (`weigh anchor`, then `where am i`) and takes a
+   checkpoint between, the resumed world's logs of both ships equal to the game's.
+8. **Saves from before, played aboard another ship**: the lead's measure (a trunk checkpoint
+   taken aboard another ship from the start agrees at 600 ticks and parts by 3,600) is accepted
+   as the price of the §9.2 mend, by the owner's word that the `--ship` fault may be fixed
+   here, with no legacy mode. Not measured again here. It is the one exception to "every save
+   from before replays as it did", and it is said: every save now carries `followed_body`, and
+   the loader (`replay.followed_body_words`, by the checkpoint and by the replay) tells a save
+   without it whose inputs hold a `--ship` line (`driver.left`) or a `follow` of another hull
+   that it parts from its game as played.
+
+Found on the way and mended, small: "came aboard from the the Amazon's launch" (`movement.
+put_aboard`, a boat's name carries its own article).

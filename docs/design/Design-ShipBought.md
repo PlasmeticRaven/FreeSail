@@ -1169,3 +1169,24 @@ order's reply carries the line the act would have written in the new ship's log,
 **Found:** a ship in ordinary has no captain, so no hull can be made for her nor can she be boarded
 (the test's ship is a merchant brig under an intent instead); the listings of step 3 must give a
 ship in ordinary a hull another way, or list only ships with a master.
+
+**Mended at the lead's review (2026-11-12)**, each with a test that fails on 2370a2d (the tuning
+notes give the measures): the act's own line kept for a direct call (step 3's purchase calls it
+so); the boat that brought him across pulls home and is hoisted in; her late master gives her up
+in his own name before the command passes (§2.3, item 3: never the player "standing aside"); the
+`command:` form doubted for a ship of another nation, an enemy's or a prize not condemned (§5.5:
+the director's word stays the road); a chase of `PLAYER_ID` steers for the first hull's body after
+a change, and the player's ship is the witness of another's fire by `players_id` (§9.1); "under
+the orders of the ship" is the player's ship by her id, and a set of his is refused in words
+after a change (§2.5: a set's command is not carried to another hull yet, and every reader of a
+set takes `PLAYER_ID` for the player's); a kept hull asleep wakes within the range (§4.2); a weigh
+waiting on the furling of a coming to anchor is no longer belayed (a fault of every ship's, met
+at the act); truth 7-482 with an order after the act and a checkpoint between.
+
+**The one exception to "every save from before replays as it did"** (the lead's ruling): a save
+or checkpoint from before this step that was played aboard another ship than the first (`--ship`,
+or `follow` of another hull) parts from its game as played, since the followed ship's far body
+stood off her hull then and stands at it now (§9.2), so the ships about her see another sea: the
+lead's trunk checkpoint agreed at 600 ticks and parted by 3,600. No legacy mode keeps the drift;
+the save of this build carries `followed_body`, and the loader says so in words of a save without
+it whose inputs show it was played aboard another ship (`replay.followed_body_words`).
