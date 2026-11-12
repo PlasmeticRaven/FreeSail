@@ -1574,20 +1574,25 @@ def test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away
 
 
 def test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_with_hands():
-    """The review of the lead's ruling (3)(i) of 2026-11-10, on her file as her watch plays it: from
-    her settle at 00:00 (all hands kept up), hove to, the hands piped down at 00:46, the larboard
-    watch's two on deck, 60 s, and the shift of eight points. Forced round at +20 s; hove to no
-    longer at +155 s, her after yards full, and the settee lies against its mast. The watch's dip
-    wants six and begins with three (`hands.SHORT_HANDED_SHARE`): with two it waits for hands, and
-    the line says the mainsail is to be dipped, the runner's "Not hands enough on deck" after it,
-    no word that the watch dips it. When there are hands it begins: all hands called at +160 s,
-    begun at +161 s with the four on deck, dipped at +555 s, on her lee, drawing whole. Before
-    (caf1d329), the line said "The watch dips the mainsail, lying against its mast." on the tick
-    the dip was found to wait for hands. Left to the watch (hove to 600 s, as the tuning notes
-    measure it), the dip waits to the watch's end: at +1,800 s the settee lies against its mast, at
-    41.2 m2 and 2.54 kn, as it lay before the ruling; begun as the starboard watch relieves the
-    deck at 04:00 and dipped 680 s after (docs/dev/TuningNotes.md, "The review's mends of the two
-    builds")."""
+    """The review of the lead's ruling (3)(i) of 2026-11-10, on her file as her watch plays it, and
+    the lead's ruling (1) of the same day (the bilander's short watch): from her settle at 00:00
+    (all hands kept up), hove to, the hands piped down at 00:46, the larboard watch's two on deck,
+    60 s, and the shift of eight points. Forced round at +20 s; hove to no longer at +155 s, her
+    after yards full, and the settee lies against its mast. The watch's dip wants six and begins
+    with three (`hands.SHORT_HANDED_SHARE`); the two on deck are too few to begin it, so it calls
+    all hands for it (`too_few: all hands`, the settee's files alone): the line says "The watch
+    calls all hands to dip the mainsail, lying against its mast.", the call's "All hands! (to dip
+    the mainsail)" and the dip's own first line after it on the same tick, all hands on deck at
+    +245 s, dipped at +423 s and piped down on that tick, on her lee, drawing whole; at +900 s
+    61.7 m2 and 2.74 kn.
+    Old (before the ruling (1), 9e04b9fa): the line said "The mainsail, lying against its mast,
+    is to be dipped.", the runner's "Not hands enough on deck to dip the mainsail; there are but
+    two to spare." after it, and the dip waited for hands; begun at +161 s when all hands were
+    called by order at +160 s, dipped at +555 s; left to the watch (hove to 600 s, as the tuning
+    notes measure it) it waited to the watch's end, the settee against its mast at +1,800 s at
+    41.2 m2. Before (caf1d329), the line said "The watch dips the mainsail, lying against its
+    mast." on the tick the dip was found to wait for hands (docs/dev/TuningNotes.md, "The review's
+    mends of the two builds" and "The lead's rulings of 2026-11-10, built")."""
     from datetime import datetime
 
     from freesail.evolutions import trim as yard_trim
@@ -1622,28 +1627,26 @@ def test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_
     assert abs(at - 155) <= 15 and filled.severity.value == "urgent"
     assert filled.text.endswith(
         "hove to no longer. The helm keeps her full and by. "
-        "The mainsail, lying against its mast, is to be dipped."
+        "The watch calls all hands to dip the mainsail, lying against its mast."
     ), filled.text
-    assert "The watch dips" not in filled.text and "settees_dipped" not in filled.data
-    assert filled.data["settees_to_be_dipped"] == [SETTEE]
-    waiting = [e for e in _after(world, start) if e.kind == "evolution.waiting"]
-    assert [(e.tick - start, e.text) for e in waiting] == [
-        (at, "Not hands enough on deck to dip the mainsail; there are but two to spare.")
+    assert filled.data["settees_dipped"] == [SETTEE] and filled.data["all_hands_called"]
+    assert "settees_to_be_dipped" not in filled.data
+    assert not [e for e in _after(world, start) if e.kind == "evolution.waiting"]
+    said = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    i = said.index((at, "ship.filled", filled.text))
+    assert said[i + 1 : i + 3] == [
+        (at, "crew.all_hands", "All hands! (to dip the mainsail)"),
+        (at, "evolution.started", "Dip the mainsail! Hands to the jeers and the tack."),
     ]
-    said = [e.kind for e in _after(world, start)]
-    assert said.index("evolution.waiting") > said.index("ship.filled")  # after the line
     (dip,) = [i for i in runner.instances if i.evo.id == "dip_settee"]
-    assert dip.waiting and dip.waiting_for == "hands"
-    world.run(160 - (world.clock.tick - start))
-    assert dip.waiting and settee.lug_side == "larboard" and not settee.yard_lowered
-    assert world.submit("call all hands").kind == "crew.order"
+    assert not dip.waiting and dip.all_hands and dip.want.party == 6
     for _ in range(900):
         world.tick()
         if not runner.in_progress():
             break
-    begun = _first_tick(world, start, "Dip the mainsail! Hands to the jeers and the tack.")
     up = _first_tick(world, start, "Dipped the mainsail; it stands to leeward of the mast.")
-    assert begun == 161 and up is not None and abs(up - 555) <= 20
+    assert up is not None and abs(up - 423) <= 20
+    assert _first_tick(world, start, "Piped down; the larboard watch has the deck.") == up
     lies = yard_trim.read_sheet(world.ship, settee).side
     assert settee.is_set and settee.lug_side == "starboard" and not settee.yard_lowered
     assert lies == 1 and not P.against_the_mast(settee, lies)
@@ -1653,7 +1656,7 @@ def test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_
 
 @pytest.mark.parametrize(
     "hour, watch, wore_s, taken_in_s",
-    [(0, "larboard", 558, None), (4, "starboard", 501, 643)],
+    [(4, "starboard", 501, 643)],
 )
 def test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_the_order(
     hour, watch, wore_s, taken_in_s
@@ -1663,19 +1666,13 @@ def test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_th
     (`Runner._settees_only`): the wear begins at the order, as a manoeuvre that belays the step-list
     work in hand does (decision 25), and the settee's order is not begun while she wears. From her
     settle (all hands kept up), the hands piped down, 30 s, "take in the mainsail", and 29 s later
-    "wear ship"; seed 7, 15 kn.
-    - Her larboard watch by night (00:45, two on deck): the take in waits for hands; the wear
-      calls all hands at the order and wears her at +558 s; the take in waits for the wear, and
-      after it for hands again (the watch of two), kept: all hands called, it is begun at once.
-      Before (caf1d329) the wear waited behind the take in, itself waiting for hands, and nothing
-      more was said to +1,200 s, she on the starboard tack still; before the ruling (8bceb1cb) it
-      wore her at +558 s and the take in was lost at +30 s ("The mainsail is in the gear; there is
-      nothing to take in.", the wear lowering it), the settee hoisted again on the new lee.
-    - Her starboard watch (04:45, three on deck): the take in is begun short-handed, and the wear
-      belays it at the order ("Belayed taking in the mainsail: stations for wearing ship."), wears
-      her at +501 s, and the take in is taken up again after: "Took in the mainsail" at +643 s, as
-      before the ruling. Before (caf1d329) the wear waited for the take in to +169 s and wore her
-      at +637 s."""
+    "wear ship"; seed 7, 15 kn. Her starboard watch (04:45, three on deck): the take in is begun
+    short-handed, and the wear belays it at the order ("Belayed taking in the mainsail: stations
+    for wearing ship."), wears her at +501 s, and the take in is taken up again after: "Took in
+    the mainsail" at +643 s, as before the ruling. Before (caf1d329) the wear waited for the take
+    in to +169 s and wore her at +637 s. Her larboard watch's case, the take in calling all hands
+    since the lead's ruling (1) of 2026-11-10, is the next test (this case's `[0-larboard-558-
+    None]` until then)."""
     from datetime import datetime
 
     world = _her_settle(15.0, start_time=datetime(1805, 6, 1, hour, 0))
@@ -1687,14 +1684,11 @@ def test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_th
     assert world.submit("take in the mainsail").kind == "order.accepted"
     world.run(29)
     (take_in,) = [i for i in runner.instances if i.evo.id == "take_in_settee"]
-    assert take_in.waiting == (watch == "larboard") and not take_in.paused
+    assert not take_in.waiting and not take_in.paused and not take_in.all_hands
     assert world.submit("wear ship").kind == "order.accepted"
     (wear,) = [i for i in runner.instances if i.evo.id == "wear"]
     assert not wear.waiting and SETTEE in wear.holds and SETTEE in take_in.holds
-    if watch == "larboard":
-        assert take_in.waiting and take_in.waiting_for == "hands"
-    else:
-        assert take_in.paused  # belayed by the wear
+    assert take_in.paused  # belayed by the wear
     for _ in range(900):
         world.tick()
         if any(e.kind == "ship.wore" for e in _after(world, start)):
@@ -1705,28 +1699,70 @@ def test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_th
     assert abs(wore - wore_s) <= 15 and world.ship.dyn.tack == "larboard"
     assert not [e for e in after if e.kind in ("sail.taken_in", "evolution.done_already")]
     belayed = [e.text for e in after if e.kind == "evolution.belayed"]
-    if watch == "larboard":
-        assert belayed == []
-        world.run(5)
-        assert take_in in runner.instances and take_in.waiting_for == "hands"  # kept, not lost
-        assert settee.is_set and settee.lug_side == "starboard"  # hoisted on the new lee
-        assert world.submit("call all hands").kind == "crew.order"
-        mark = world.clock.tick - start
-        for _ in range(300):
-            world.tick()
-            if not runner.in_progress():
-                break
-        taken = _first_tick(world, start, "Took in the mainsail")
-        assert taken is not None and mark < taken <= mark + 150
-    else:
-        assert belayed == ["Belayed taking in the mainsail: stations for wearing ship."]
-        for _ in range(300):
-            world.tick()
-            if not runner.in_progress():
-                break
-        taken = _first_tick(world, start, "Took in the mainsail")
-        assert taken is not None and abs(taken - taken_in_s) <= 15
+    assert belayed == ["Belayed taking in the mainsail: stations for wearing ship."]
+    for _ in range(300):
+        world.tick()
+        if not runner.in_progress():
+            break
+    taken = _first_tick(world, start, "Took in the mainsail")
+    assert taken is not None and abs(taken - taken_in_s) <= 15
     assert settee.state is SailState.IN_THE_GEAR and not runner.in_progress()
+
+
+def test_in_her_larboard_watch_a_take_in_of_her_settee_calls_all_hands_and_a_wear_follows_it():
+    """The lead's ruling (1) of 2026-11-10 (the bilander's short watch) on the case of the test
+    before: from her settle at 00:00 (all hands kept up), the hands piped down, 30 s, "take in the
+    mainsail", and 29 s later "wear ship"; seed 7, 15 kn; her larboard watch (00:45), two on deck.
+    The take in wants six and begins with three; the two are too few to begin it, so it calls all
+    hands for it ("All hands! (to take in the mainsail)" at +1 s, begun on that tick) and is
+    all-hands work, its party its six. The wear, all-hands work too, waits for it as two all-hands
+    works always have (spec M3 §3.4; its line, "Not hands enough on deck to wear ship; the watch is
+    taking in the mainsail.", the runner's), so no pipe-down falls between them: "Took in the
+    mainsail" at +87 s, the wear begun on that tick ("Stations for wearing ship."), wore her at
+    +614 s, the settee in the gear, and the hands piped down on that tick, once.
+    Old (9e04b9fa): the take in waited for hands ("there are but two to spare"); the wear called
+    all hands at the order (+30 s), lowered and hoisted the settee about its mast as she wore and
+    wore her at +558 s; the take in waited for the wear and after it for hands again, kept, and
+    was begun only when all hands were called by order."""
+    from datetime import datetime
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(30)
+    runner = world.ship.extra["evolutions"]
+    settee = world.ship.sails[SETTEE]
+    start = world.clock.tick
+    assert world.submit("take in the mainsail").kind == "order.accepted"
+    world.run(29)
+    (take_in,) = [i for i in runner.instances if i.evo.id == "take_in_settee"]
+    assert not take_in.waiting and take_in.all_hands and take_in.want.party == 6
+    assert world.submit("wear ship").kind == "order.accepted"
+    (wear,) = [i for i in runner.instances if i.evo.id == "wear"]
+    for _ in range(900):
+        world.tick()
+        if not runner.in_progress():
+            break
+    after = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    assert after[:3] == [
+        (1, "crew.all_hands", "All hands! (to take in the mainsail)"),
+        (1, "evolution.started", "Hands to the mainsail clewlines and buntlines."),
+        (29, "order.accepted", "Order: wear ship."),
+    ]
+    assert (
+        30,
+        "evolution.waiting",
+        "Not hands enough on deck to wear ship; the watch is taking in the mainsail.",
+    ) in after
+    taken = _first_tick(world, start, "Took in the mainsail")
+    stations = _first_tick(world, start, "Stations for wearing ship.")
+    assert taken is not None and abs(taken - 87) <= 10 and stations == taken
+    (wore,) = [t for t, kind, _ in after if kind == "ship.wore"]
+    assert abs(wore - 614) <= 15 and world.ship.dyn.tack == "larboard"
+    piped = [t for t, kind, _ in after if kind == "crew.piped_down"]
+    assert piped == [wore]
+    assert not [e for e in after if e[1] in ("evolution.belayed", "evolution.failed")]
+    assert settee.state is SailState.IN_THE_GEAR and not runner.in_progress()
+    assert wear not in runner.instances
 
 
 def test_its_sheet_leads_a_fathom_abaft_its_clew_and_within_a_fathom_of_her_taffrail():
@@ -1853,6 +1889,14 @@ REQUESTS = {
     ],
     ("larboard", True): [("too few", 5, 0), ("short", 6, 3), ("too few", 5, 0), ("short", 6, 3)],
 }
+# whether the watch on deck is too few to begin each, and so calls all hands for it since the
+# lead's ruling (1) of 2026-11-10 (`hands.too_few_on_deck`, the settee files' `too_few: all hands`)
+CALLS_ALL_HANDS = {
+    ("starboard", False): [False, False, False, False],
+    ("starboard", True): [False, False, False, False],
+    ("larboard", False): [True, True, True, True],
+    ("larboard", True): [True, False, True, False],
+}
 
 
 def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_with_the_larboard():
@@ -1868,11 +1912,13 @@ def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_wi
       watch alone (all hands piped down) at 04:00, clewed up in 169 s, set from the gear in 183 s,
       furled from set in 490 s and set from furled in 316 s, its third hand the boy, a landsman
       since the lead's ruling (8) of 2026-11-09 (old, an able seaman: 118, 128, 343 and 221 s);
-    - the larboard watch's two begin none by night: "Not hands enough on deck"; by day, the cook
-      up, the take in and the dip begin with three (clewed up in 184 s, set from the gear in 199 s
-      sailed, its two topmen both able since the ruling; old, an able and an ordinary: 197 and
-      213 s), and the furl and the loosing aloft wait for all hands ("there are but two to
-      spare").
+    - the larboard watch's two begin none by night; by day, the cook up, the take in and the dip
+      begin with three (clewed up in 184 s, set from the gear in 199 s sailed, its two topmen both
+      able since the ruling; old, an able and an ordinary: 197 and 213 s), and the furl and the
+      loosing aloft are too few. Each request the watch is too few to begin calls all hands for
+      it since the lead's ruling (1) of 2026-11-10 (`CALLS_ALL_HANDS`; sailed in the next test);
+      before it, each waited ("Not hands enough on deck ...; there are but two to spare.") for
+      the watch's end or all hands called by order.
     The ruling's (9), the boy's hand to the larboard watch, is not built: it makes the watches two
     and three, not three and three, and measured in scratch the larboard then begins every request
     and the starboard none by night (docs/dev/TuningNotes.md, for the lead).
@@ -1897,6 +1943,7 @@ def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_wi
             and (s.watch is Watch(watch) or (day and s.station is Station.IDLERS))
         ]
         got = []
+        calls = []
         for eid in ("set_settee", "take_in_settee", "furl_settee", "dip_settee"):
             evo = EVOLUTIONS[eid]
             request = hands.CrewRequest.from_mapping(evo.crew)
@@ -1907,7 +1954,70 @@ def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_wi
             got.append((done.outcome, done.wanted, done.got))
             if done.got and aloft:
                 assert done.hands[0].station is Station.MAIN_TOP, (watch, eid)
+            calls.append(
+                request.calls_all_hands and hands.too_few_on_deck(crew, deck, request, aloft)
+            )
         assert got == want, (watch, day, got)
+        assert calls == CALLS_ALL_HANDS[(watch, day)], (watch, day, calls)
+
+
+@pytest.mark.parametrize(
+    "hour, called, times",
+    [
+        (0, [True, True, True, True], [87, 100, 338, 225]),
+        (8, [False, False, True, True], [183, 198, 275, 176]),
+    ],
+    ids=["00:00", "08:00"],
+)
+def test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after(
+    hour, called, times
+):
+    """The lead's ruling (1) of 2026-11-10 (the bilander's short watch), sailed: from her settle
+    (all hands kept up), the hands piped down and 30 s, her larboard watch on deck, "take in the
+    mainsail", "set the mainsail" (from the gear), "furl the mainsail" and "set the mainsail" (from
+    furled), each to its end and 30 s after; seed 7, 15 kn. Where the watch on deck is too few to
+    begin the work (the two by night every time; by day, the cook up, the furl and the loosing
+    aloft), the request calls all hands for it, "All hands! (to furl the mainsail)", begun on that
+    tick and worked as all-hands work, its party its six, and pipes down at its end: "Piped down;
+    the larboard watch has the deck." Where the watch can begin it, it begins with three as before
+    and calls nobody. Measured: by night 87, 100, 338 and 225 s; by day 183 and 198 s with three,
+    and 275 and 176 s with all hands. Old (9e04b9fa): by night the take in waited for hands ("there
+    are but two to spare") to the watch's end, and the rest with it; by day the furl waited so.
+    Her starboard watch's three begin every one (the test before): no call, as before."""
+    from datetime import datetime
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, hour, 0))
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(30)
+    runner = world.ship.extra["evolutions"]
+    settee = world.ship.sails[SETTEE]
+    orders = ("take in the mainsail", "set the mainsail", "furl the mainsail", "set the mainsail")
+    ends = (SailState.IN_THE_GEAR, SailState.SET, SailState.FURLED, SailState.SET)
+    work = ("take in", "set", "furl", "set")
+    for order, end, did, call, secs in zip(orders, ends, work, called, times, strict=True):
+        start = world.clock.tick
+        assert world.submit(order).kind == "order.accepted", order
+        for _ in range(900):
+            world.tick()
+            if not runner.in_progress():
+                break
+        took = world.clock.tick - start
+        lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+        alls = [(t, text) for t, kind, text in lines if kind == "crew.all_hands"]
+        piped = [(t, text) for t, kind, text in lines if kind == "crew.piped_down"]
+        assert settee.state is end and abs(took - secs) <= 10, (order, took)
+        assert not [ln for ln in lines if ln[1] in ("evolution.waiting", "evolution.failed")]
+        if call:
+            assert alls == [(1, f"All hands! (to {did} the mainsail)")], (order, alls)
+            assert piped == [(took, "Piped down; the larboard watch has the deck.")], order
+        else:
+            assert alls == [] and piped == [], order
+            assert (
+                1,
+                "evolution.short_handed",
+                "Only three hands to the mainsail; there are no more on deck.",
+            ) in lines, order
+        world.run(30)
 
 
 @pytest.mark.parametrize(

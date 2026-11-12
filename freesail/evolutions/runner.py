@@ -1158,6 +1158,21 @@ class Runner:
             aloft=self._aloft(inst),
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
+        if got.outcome == hands.TOO_FEW and self._watch_too_few(ship, inst, crew, want):
+            # a watch too few for the work calls all hands for it, where its file says so
+            # (package 75, the lead's ruling (1) of 2026-11-10: a small company's work at her
+            # great sail, the settee's files alone); it is all-hands work from here, its party
+            # its own number, and pipes down when it ends (`_after_all_hands`)
+            want = inst.want = want.as_all_hands()
+            self._call_all_hands(ship, inst, crew)
+            got = hands.request(
+                crew,
+                self._pool(crew, inst),
+                inst.inst_id,
+                want,
+                self._subject_mast(ship, inst),
+                aloft=self._aloft(inst),
+            )
         if got.outcome == hands.TOO_FEW:
             inst.waiting = True
             inst.waiting_for = WAITING_FOR_HANDS
@@ -1182,6 +1197,21 @@ class Runner:
         if got.outcome == hands.SHORT:
             self._note_short(ship, inst, got)
         return True
+
+    def _watch_too_few(
+        self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest
+    ) -> bool:
+        """Whether this work calls all hands because the watch on deck is too few to begin it
+        (package 75, the lead's ruling (1) of 2026-11-10; `hands.CrewRequest.calls_all_hands`):
+        its file says so, the hands on deck are too few for it counting those at other work
+        (`hands.too_few_on_deck`), all hands are not up already, the ship is not at quarters,
+        and the order named no party of its own (`hands_from`, which `_check_party` judges).
+        Any other request waits for hands, as before."""
+        if not want.calls_all_hands or crew.all_hands_called or _at_quarters(ship):
+            return False
+        if inst.params.get("hands_from"):
+            return False
+        return hands.too_few_on_deck(crew, self._pool(crew, inst), want, self._aloft(inst))
 
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment

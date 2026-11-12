@@ -232,6 +232,25 @@ def test_the_settees_files_say_what_they_are():
     assert scripts.SETTEE_DIP_S == 120.0
 
 
+def test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few():
+    """The lead's ruling (1) of 2026-11-10 (the bilander's short watch), on her file or her
+    evolutions' data alone so that no other ship's work changes: the four settee files, and no
+    other evolution file, say `too_few: all hands` (`hands.CrewRequest.calls_all_hands`), and of the
+    committed ship files only the bilander carries a settee. The fixture's settee brig, a brig's
+    company, keeps watches of 48 hands (38 who go aloft), never too few for six."""
+    from pathlib import Path
+
+    calling = {eid for eid, evo in EVOLUTIONS.items() if "too_few" in evo.crew}
+    assert calling == set(SETTEE_FILES)
+    for eid in calling:
+        assert hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).calls_all_hands, eid
+    with_settee = set()
+    for path in sorted(Path("data/ships").glob("*.yaml")):
+        if any(sl.settee for sl in load_ship(path.as_posix()).sails.values()):
+            with_settee.add(path.name)
+    assert with_settee == {"bilander.yaml"}
+
+
 def test_each_settee_evolution_runs_to_its_end_and_only_a_dip_lowers_its_yard():
     """Ext §5.3, E11: set from furled (loosed aloft), clewed up, set from the gear, reefed and its
     reef shaken out as a lug's, dipped, furled on its yard: each to its end in its file's time.

@@ -24,6 +24,15 @@ to the party. Its numbers term is the party over the hands at it, so more hands 
 up to the party and no faster beyond it. A file without a party (a manoeuvre, the masts)
 takes everyone, as before.
 
+**A numbered request may call all hands where the watch is too few** (package 75, the lead's
+ruling (1) of 2026-11-10, built on the settee's files alone): a file that says ``too_few: all
+hands`` beside its number, ``crew: {hands: 6, rating: able, stations: [...], too_few: all
+hands}``, is begun as any numbered request where the hands on deck are enough for it; where
+they are too few to begin it at all (`too_few_on_deck`), counting those at other work, the
+runner calls all hands for it and works it as all-hands work whose party is its number
+(`CrewRequest.as_all_hands`), piped down when it ends. A file without the key waits for hands,
+as before.
+
 
 The order hands are taken in (spec §3.1, with the judgement noted at `_tier`):
 
@@ -129,6 +138,10 @@ class CrewRequest:
     stations: tuple[str, ...] = ()
     # all hands: the most any one job of this kind uses (package 31b); None takes everyone
     party: int | None = None
+    # a numbered request whose file says `too_few: all hands`: where the hands on deck are too
+    # few to begin it, all hands are called for it (`too_few_on_deck`, `as_all_hands`; package
+    # 75, the lead's ruling (1) of 2026-11-10, a small company's work at her great sail)
+    calls_all_hands: bool = False
 
     @property
     def all_hands(self) -> bool:
@@ -137,6 +150,13 @@ class CrewRequest:
     @property
     def wants_none(self) -> bool:
         return self.hands == 0
+
+    def as_all_hands(self) -> CrewRequest:
+        """This request called as all-hands work (`calls_all_hands`): a pool action of the same
+        rating and stations whose party is its own number of hands, so that it turns the watch
+        below up, begins with the hands idle on deck and takes those who come up to its number,
+        and pipes down when it ends (the runner's `_after_all_hands`)."""
+        return CrewRequest(hands=None, rating=self.rating, stations=self.stations, party=self.hands)
 
     @classmethod
     def from_mapping(cls, mapping: Mapping[str, Any] | None) -> CrewRequest:
@@ -170,13 +190,29 @@ class CrewRequest:
                     "bounds an all-hands evolution (hands: all), and a number is its own bound."
                 )
             party = raw_party
+        raw_too_few = mapping.get("too_few")
+        calls = False
+        if raw_too_few is not None:
+            if str(raw_too_few).strip().lower() != ALL_HANDS:
+                raise CrewRequestError(
+                    f"The crew line says {raw_too_few!r} for too few hands; say 'all hands', "
+                    "or leave it out and the work waits for hands."
+                )
+            if not hands:
+                raise CrewRequestError(
+                    "The crew line calls all hands where too few are on deck, beside "
+                    f"{'all' if hands is None else 'no'} hands; that is said of a number of hands."
+                )
+            calls = True
         raw_rating = str(mapping.get("rating") or DEFAULT_RATING.value)
         rating = _rating_named(raw_rating)
         raw_stations = mapping.get("stations") or []
         if isinstance(raw_stations, str):
             raw_stations = [raw_stations]
         stations = tuple(_station_word(str(s)) for s in raw_stations)
-        return cls(hands=hands, rating=rating, stations=stations, party=party)
+        return cls(
+            hands=hands, rating=rating, stations=stations, party=party, calls_all_hands=calls
+        )
 
 
 def _rating_named(name: str) -> Rating:
@@ -349,6 +385,21 @@ def _ranked(
 def _deck_for(on_deck: Iterable[Sailor], aloft: bool) -> int:
     """How many hands on deck could be put to the work, idle or at other work."""
     return sum(1 for s in on_deck if can_work(s, aloft))
+
+
+def too_few_on_deck(
+    crew: Crew, on_deck: Iterable[Sailor], want: CrewRequest, aloft: bool = False
+) -> bool:
+    """Whether the hands on deck, idle or at other work, are too few to begin a numbered
+    request at all: fewer than `SHORT_HANDED_SHARE` of the hands it wants, after the company's
+    clamp, as `request` judges too few. Hands at other work are counted, so that work which
+    waits only for the deck's earlier work waits as before (package 75, the lead's ruling (1)
+    of 2026-11-10: a watch too few for the work calls all hands, `CrewRequest.calls_all_hands`;
+    a watch busy at other work does not)."""
+    if want.all_hands or not want.hands:
+        return False
+    wanted = min(int(want.hands), company_can_give(crew, aloft))
+    return wanted > 0 and _deck_for(on_deck, aloft) < wanted * SHORT_HANDED_SHARE
 
 
 def top_up(

@@ -971,6 +971,43 @@ def test_a_party_is_a_number_beside_hands_all_and_nothing_else():
         assert CrewRequest.from_mapping(EVOLUTIONS[eid].crew).party is None, eid
 
 
+def test_a_numbered_request_may_call_all_hands_where_the_deck_is_too_few_and_nothing_else():
+    """Package 75, the lead's ruling (1) of 2026-11-10 (the bilander's short watch): a file's
+    ``too_few: all hands`` beside a number (`CrewRequest.calls_all_hands`) is read; the deck is too
+    few for it where its hands, idle or at other work, are fewer than half its number after the
+    company's clamp (`hands.too_few_on_deck`), so that a watch busy at other work is not too few;
+    called, it is all-hands work of the same rating and stations, its party its number
+    (`as_all_hands`). Any other word, or the key beside all hands or none, is refused in words;
+    no file but the settee's four carries it (`tests/test_settee.py`)."""
+    crew = small_company()
+    want = CrewRequest.from_mapping(
+        {
+            "hands": 6,
+            "rating": "able",
+            "stations": ["forecastle", "afterguard"],
+            "too_few": "all hands",
+        }
+    )
+    assert want.calls_all_hands and want.hands == 6 and not want.all_hands
+    called = want.as_all_hands()
+    assert called.all_hands and called.party == 6 and not called.calls_all_hands
+    assert (called.rating, called.stations) == (want.rating, want.stations)
+    assert not CrewRequest.from_mapping({"hands": 6}).calls_all_hands
+    deck = crew.sailors[:2]
+    assert hands.too_few_on_deck(crew, deck, want)  # two of six: fewer than half
+    assert not hands.too_few_on_deck(crew, crew.sailors[:3], want)  # three: begun short-handed
+    for s in crew.sailors[:3]:
+        s.at = "brace#1"  # at other work: waits for it, as before, and calls nobody
+    assert not hands.too_few_on_deck(crew, crew.sailors[:3], want)
+    assert not hands.too_few_on_deck(crew, deck, called)
+    with pytest.raises(CrewRequestError, match="say 'all hands', or leave it out"):
+        CrewRequest.from_mapping({"hands": 6, "too_few": "wait"})
+    with pytest.raises(CrewRequestError, match="beside all hands"):
+        CrewRequest.from_mapping({"hands": "all", "too_few": "all hands"})
+    with pytest.raises(CrewRequestError, match="beside no hands"):
+        CrewRequest.from_mapping({"hands": 0, "too_few": "all hands"})
+
+
 def test_three_topsails_are_reefed_together_each_up_to_its_party_and_the_surplus_goes_on():
     """Playtest 11's finding 14 and the owner's ruling (decision 28): "reef the topsails"
     on the frigate begins all three reefs on the one tick, forty hands each (the file's

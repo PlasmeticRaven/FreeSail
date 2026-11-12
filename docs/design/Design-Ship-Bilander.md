@@ -984,6 +984,31 @@ three, the larboard then beginning every settee request and the starboard none b
 in scratch); "three and three" wants six. No muster's line is written and no settee file's hands
 changed. Figures in docs/dev/TuningNotes.md, "The lead's ruled builds of 2026-11-09 and 11-10".*
 
+*At the lead's ruling (1) of 2026-11-10, 09:55 (built 2026-11-12): **her short watch calls all
+hands for her great sail.** Her company and her watches stay as they are (no sixth seaman, no
+engine change to who is a hand); where the watch on deck is too few to begin a work of her settee
+(its dip, its set, its take in or its furl: fewer than half the six its file wants, counting the
+hands at other work), the request calls all hands for it, "All hands! (to furl the mainsail)", is
+worked as all-hands work whose party is its six, and pipes down at its end ("Piped down; the
+larboard watch has the deck."), as a small coaster's company was turned up for any work of her
+great sail (the lead's judgement; her research and her sources read for it say nothing of her
+watches, so it stands). Built on the settee's four evolution files alone (`too_few: all hands`,
+read by `crew/hands.py` and `Runner._watch_too_few`), so that no other ship's work changes: no
+other committed file carries a settee. Measured at seed 7 in 15 kn from her settle, the hands piped
+down: her larboard watch by night now takes in her settee in 87 s, sets it from the gear in 100,
+furls it in 338 and sets it from furled in 225 (old: each waited for hands, "there are but two to
+spare", to the watch's end); by day, the cook up, the take in and the set from the gear begin with
+three as before (183 and 198 s) and the furl and the loosing aloft call all hands (275 and 176 s;
+old, waited). Her starboard watch's three begin every one as before, and call nobody. Forced round
+by night (her (3)), the watch now calls all hands to dip it: "The watch calls all hands to dip the
+mainsail, lying against its mast." at +155 s, dipped at +423 s and piped down (hove to 60 s
+before the shift; hove to 600 s, +424 s in 15 and in 20 kn), and at +1,800 s 61.7 m² drawing and
+2.74 kn full and by in 15 kn, 61.1 m² and 3.63 kn in 20 kn (old: it waited to the watch's end
+against its mast, 41.2 m² and 2.58 kn; 40.8 m² and 3.42 kn). A wear ordered 29 s after a
+take in in her larboard watch now follows it, the take in being all-hands work as the wear is (worn
+at +614 s; old, the wear at once and worn at +558 s, the take in kept waiting). Figures in
+docs/dev/TuningNotes.md, "The lead's rulings of 2026-11-10, built (package 75)".*
+
 ### 6.2 The people file (`data/people/bilander.yaml`, hand-written data)
 
 The smack's form: the master (post, the command), the mate (post), the boy (drawn, afterguard,

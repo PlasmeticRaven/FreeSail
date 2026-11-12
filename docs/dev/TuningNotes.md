@@ -19843,6 +19843,143 @@ again):
 - **with these records written**, the files that read the documents (B2c's fourteen, as in "The
   settee and the runner"): 1,619 passed in 5:28, every outcome as in the fast tier above.
 
+## The lead's rulings of 2026-11-10, built (package 75) (2026-11-12)
+
+The lead's notes to the ships session of 2026-11-10 at 09:55 UTC ((1), the bilander's watches; (6),
+"make all sail") and at 19:30 UTC ((1), lie a-try from way on; the 64's and the razee's `marines`;
+(2), the mizen course's tack in the design note), `docs/dev/M7-WorkPackages.md` on the tree, built in
+three local commits on the package's branch after the trunk's merge (1282e25f) and its two pins (9e04b9fa),
+a subsection here for each. Measured on the owner's machine at seed 7, the scripts in the session's
+scratch (`rf/rul/`), outside the repository: before on a worktree of 9e04b9fa, after on the tree, each
+script the same on both. Every ship file came out of the generator (`py tools/gen_ships.py` into
+scratch, compared byte for byte); the suites ran once on the three together, recorded with the
+third step.
+
+### 1. The bilander's short watch, and "make all sail" (09:55 (1) and (6))
+
+**(1) The ruling, and how it is read.** "Where the watch on deck is too few to begin a settee's dip
+or settle, the request calls all hands for it ... as a small coaster did for any work of her great
+sail". Read with its own "any work of her great sail": every work of her settee's own files, its dip,
+its set (from the gear or from furled), its take in and its furl. Her settee's sheet is trimmed by
+`trim_lug_sheet`, the lug's file, which the lugger shares; it is not given the key, so that no other
+ship's work changes (her settle's last sheet trim by night still waits on the larboard's two, as
+before: recorded, nothing built). **The source:** the lead's judgement, no source read for it; her
+research (`Research-Bilander-2026-10.md`: Steel's going about costing her "more time and hands than
+a brig of her size", nothing of her watches) and her sources say nothing of a coaster's watches, so
+it stands, and the served notes say "judgement".
+
+**As built.** `crew: {hands: 6, ..., too_few: all hands}` on the settee's four evolution files
+(`set_settee`, `take_in_settee`, `furl_settee`, `dip_settee`), each with a served sentence in its
+notes. `crew/hands.py`: `CrewRequest.calls_all_hands` read from the key (refused in words for any
+other word, and beside all hands or none); `too_few_on_deck`, the hands on deck fit for the work,
+idle or at other work, fewer than `SHORT_HANDED_SHARE` of the number wanted after the company's
+clamp (so a watch busy at other work waits for it, as before, and calls nobody); `as_all_hands`, the
+same rating and stations as all-hands work, its party its number. `Runner._take_hands`: a request
+that comes out too few, where `_watch_too_few` holds (the key; all hands not up already; not at
+quarters; no party named by the order, which `_check_party` judges), calls all hands for it through
+the routine ("All hands! (to furl the mainsail)", `_call_all_hands`, which belays nothing for a work
+that is no manoeuvre), takes the hands idle on deck and those who come up to its six (the top-up),
+and at its end pipes down unless the captain called them (`_after_all_hands`): the all-hands path
+every pool action takes, with its crew factor (the company's pace, the numbers term to the party).
+`scripts._hove_to_no_longer`: a dip begun so is said "The watch calls all hands to dip the mainsail,
+lying against its mast." (data `all_hands_called`), its call's own line after it; "The watch dips
+..." where the watch begins it, as before. No other committed file carries a settee
+(`tests/test_settee.py`: the key on the settee's four files alone, the bilander the one file with a
+settee); the fixture's settee brig keeps watches of 48 (38 who go aloft), never too few for six.
+
+*Measured: her four orders sailed* (her test's `_her_settle` in 15 kn, the hands piped down and 30 s,
+then "take in the mainsail", "set the mainsail" from the gear, "furl the mainsail" and "set the
+mainsail" from furled, each to its end; seconds from the order):
+
+| Watch on deck | take in | set from the gear | furl | set from furled |
+|---|---|---|---|---|
+| larboard by night (her 00:00 settle), two | 87, all hands (old: waits for hands) | 100, all hands (old: refused, still set) | 338, all hands (old: waits) | 225, all hands (old: refused) |
+| larboard by day (her 08:00 settle), two and the cook | 183, three (as before) | 198, three (as before) | 275, all hands (old: waits) | 176, all hands (old: refused) |
+| starboard (04:00 and 12:00, B4's harness), three | as before, 169 and 154 | 183 and 167 | 490 | 316 |
+
+B4's harness (`r10/m/bil/req.py`, her settle piped down at 2,300 s) gives the larboard's within four
+seconds (87, 100, 341 and 229 s by night; 274 and 176 by day, the take in and the set from the gear
+184 and 199 with three, as before). Each called work says "All hands! (to take in the mainsail)" at +1 s with its first line on that
+tick, "All hands on deck." at +90 s where it runs so long, and "Piped down; the larboard watch has
+the deck." on the tick it ends; no "Not hands enough on deck" line. (Old: "Not hands enough on deck
+to take in the mainsail; there are but two to spare.", the work waiting to the watch's end, and the
+later orders refused, the settee set still, or queued behind it.) The static table of her requests
+by watch (`REQUESTS`) is unchanged cell for cell; beside it `CALLS_ALL_HANDS`: the larboard by night
+all four, by day the furl and the loosing aloft (two topmen for five aloft), the starboard none.
+
+*Forced round in her larboard watch by night* (her (3)(i), as her test has it: hove to from her
+settle at 00:00, piped down, 60 s, the shift of eight points): "hove to no longer" at +155 s, the line
+now "... The helm keeps her full and by. The watch calls all hands to dip the mainsail, lying against
+its mast." (old "... The mainsail, lying against its mast, is to be dipped." and the runner's "Not
+hands enough on deck to dip the mainsail; there are but two to spare."), the call and "Dip the
+mainsail! Hands to the jeers and the tack." on that tick, all hands up at +245 s, dipped and piped
+down at +423 s (old: begun only when the test called all hands at +160 s, dipped at +555 s). Hove to
+600 s, the tuning notes' measure: dipped at +424 s in 15 and in 20 kn; at +1,800 s the settee
+drawing 61.7 m² and she 2.74 kn full and by in 15 kn, 61.1 m² and 3.63 kn in 20 kn (old: against its
+mast to the end, 41.2 m² and 2.58 kn; 40.8 m² and 3.42 kn).
+
+*A wear after a take in, her larboard watch* (her (3)(iii)'s case, 00:45): the take in now calls all
+hands at +1 s and is all-hands work, so the wear ordered at +29 s waits for it as two all-hands works
+always have (spec M3 §3.4): "Not hands enough on deck to wear ship; the watch is taking in the
+mainsail." at +30 s, "Took in the mainsail" at +87 s and the wear begun on that tick, worn at +614 s,
+piped down once, there (old: the wear at once at +30 s, "lower the mainsail" in its helm line, worn at
++558 s, the take in waiting and kept, begun when all hands were called by order). Her starboard
+watch's case line for line as before (worn at +501 s, the take in after at +643 s). **For the lead,
+a judgement:** the called work is all-hands work, so a manoeuvre ordered while it is in hand follows
+it rather than belaying it (57 s here); the manoeuvre belaying it, and the work's own call to come
+again after, would want the runner's belay to treat called work as the watch's, not built.
+
+*Her gale* (B4's script, all hands called by order from her settle and never piped down): every line,
+the trace and every reply the same before and after (120 lines): the call is never made with all
+hands up. Her other tests as before but the two moved below.
+
+**Lines any ship may say that this changes:** the bilander's alone: her settee's work in a watch too
+few to begin it (the call, the work at the company's pace, the pipe-down, and the waiting lines no
+longer said), her forced round's line, and her manoeuvres ordered while called work is in hand.
+
+**(6) "make all sail" lists the square sail only where she has one.** *As built*
+(`freesail/orders/storm.py`, `orders/__init__.py`): `storm.listed_lines` drops `make all sail`'s "set
+the square sail" (`SET_SQUARE_SAIL_LINE`) where the ship has no `square_sail` part, as it drops
+`shorten sail`'s "take in the square sail", and `_group_evolution` takes `make all sail`'s list
+through it. *Measured* ("make all sail" at the prompt in every committed sailing file, seed 7, 10 kn,
+all hands called): three replies move, the *Neufchatel*'s, the topsail schooner's and the privateer
+schooner's, whose "Not done" loses "'set the square sail': 'set' was understood, but 'square' belongs
+with 'brace'"; the cutter and the smack keep the line and set their square sail; every other file
+passed it over before as a noun she lacks, and its reply is the same. **Lines any ship may say that
+this changes:** a "Make all sail" reply or line of those three (the player's, a standing order's "make
+all sail to haul off" in every captain's book, a signal's "make all sail", a hail's "she will not"),
+its "Not done" list; where the square sail's refusal was the only thing not done, the "Not done"
+goes. **A recorded passage this moves, for the lead's re-pin:** the captain's trial "the merchant
+hauls off from a privateer and waits in the road for a wind" (`trial-trade-stranger`, the topsail
+schooner under the merchant's book; `TRIAL_TRADE_STRANGER_DIGEST`, `tests/test_captain_trials.py`):
+sailed on both trees, 1,594 lines each and every tick the same, three lines differ, the standing
+order "make all sail to haul off"'s at ticks 14,631 ("Make all sail: ...", begun) and 15,216 and
+29,000 ("... order not carried out ('make all sail'): Could not make all sail: ..."), each losing
+"'set the square sail': 'set' was understood, but 'square' belongs with 'brace'; " and nothing else.
+**The toggle:** on the tree with `storm.SET_SQUARE_SAIL_LINE` made a line none is, the trial gives
+the old log byte for byte. On this machine the digest 0b430d261669ba5a (as at e4797779 and
+9e04b9fa) is now 13432e4b2659bcaf; the pin, aa04702e062bc64b, is the build machine's and fails here
+already, so the new figure is the build machine's to take. Her other recorded passages, sailed on
+both trees here: the schooner's of gate 5b (767 lines, cae2b06446ea86c3), the merchant's of gate 5c
+(2,909, 2e93986c2989d831), the intent's of gate 6a (2,098, af28debbc98516ae) and the fake captain's
+(2,921, 3211d917eda5f4af) line for line, and the trial in thick weather digest for digest
+(41a37f0290be291a), the same: none says "make all sail" where the square sail's refusal was listed.
+
+**Pins moved, old beside new** (each in its test's words): `tests/test_bilander.py`, her forced
+round in the larboard watch by night (the line, the call, dipped at +423 s where it waited and was
+dipped at +555 s after a call by order), and her wear after a take in, the larboard case
+(`[0-larboard-558-None]`) out of the parametrized test into its own,
+`test_in_her_larboard_watch_a_take_in_of_her_settee_calls_all_hands_and_a_wear_follows_it` (worn at
++614 s, old +558 s). **New:** `tests/test_bilander.py`, her larboard watch's four orders by night and
+by day (`test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after`) and
+`CALLS_ALL_HANDS` in the requests' test; `tests/test_hands.py`, the key read and refused and the deck
+too few; `tests/test_settee.py`, the key on the settee's files alone; `tests/test_gale.py`, "make all
+sail" by the part.
+
+**Found on the way, for the lead (not built):** the runner's waiting line says "the watch is" while
+all hands are being called and not yet up (`_waiting_line` reads `crew.all_hands_called`, set only
+when the last is up): every ship's, a second all-hands work in a call's first ninety seconds.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
