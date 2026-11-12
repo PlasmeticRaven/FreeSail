@@ -16059,6 +16059,24 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
 
 
+# package 105's ports (step 2: Malta's four, eastern Sicily's five, Calabria's two)
+PACKAGE_105_PORTS = frozenset(
+    {
+        "valletta",
+        "marsaxlokk",
+        "st-pauls-bay",
+        "mgarr",
+        "messina",
+        "milazzo",
+        "catania",
+        "augusta",
+        "syracuse",
+        "reggio",
+        "scilla",
+    }
+)
+
+
 def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
     """Package 105, step 1: a port file's `state`, `dockyard`, `closed_to`, `market`,
     `crew_pool` and `pilot` may be dated rows; no port file before 105 gives any of them so,
@@ -16073,7 +16091,200 @@ def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_row
     assert len(files) >= 90
     days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
     for pid, path in files.items():
+        if pid in PACKAGE_105_PORTS:  # 105's own, whose rows are their truths' (7-531 on)
+            continue
         loads = [load_port(path, chart, None, when) for when in days]
         assert loads[0].dated == (), pid
         for key in DATED_KEYS:
             assert all(getattr(p, key) == getattr(loads[0], key) for p in loads[1:]), (pid, key)
+
+
+def test_truth_7_531_valletta_is_the_orders_frances_and_the_kings_and_a_yard_after_its_year():
+    """Package 105, step 2: Valletta's holder by its dated rows, the Order of St John's to
+    the capitulation of 12 June 1798, France's to the surrender of 5 September 1800 (James
+    1837, vol. 2, pp. 170 and 445), the King's after; blockaded by the British from 12
+    October 1798 (pp. 211 to 213) and open after; the merchants' stores until the King's
+    yard of the first year the sources give (Smyth 1854, p. 420: 1816); under the Order its
+    pilot says plainly that the Order's galleys were rowed by enslaved men (Smyth 1824, p.
+    202; decision 68), and no person is a good of its market."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    path = port_files()["valletta"]
+    days = {
+        "order": datetime(1797, 6, 1, 12),
+        "france": datetime(1798, 7, 1, 12),
+        "blockade": datetime(1799, 6, 1, 12),
+        "king": datetime(1805, 6, 20, 12),
+        "yard": datetime(1816, 6, 1, 12),
+    }
+    ports = {k: load_port(path, chart, None, d) for k, d in days.items()}
+    assert ports["order"].nation == "order-of-st-john"
+    assert ports["france"].nation == ports["blockade"].nation == "france"
+    assert ports["king"].nation == ports["yard"].nation == "britain"
+    assert ports["france"].state == "open" and ports["blockade"].blockaded_by == "britain"
+    assert ports["king"].state == "open" and ports["king"].blockade is None
+    assert [ports[k].dockyard.kind for k in days] == ["chandlers"] * 4 + ["yard"]
+    assert "topmast" in ports["yard"].dockyard.items and "water" in ports["order"].dockyard.items
+    assert "enslaved" in ports["order"].pilot.words["marks"]
+    assert "enslaved" not in ports["king"].pilot.words["marks"]
+    for port in ports.values():
+        assert not {"slaves", "slave", "captives"} & set(port.market.goods)
+    # Malta's other three by their own rows: Gozo's castle capitulated on 28 October 1798
+    gozo = port_files()["mgarr"]
+    assert load_port(gozo, chart, None, datetime(1798, 10, 28)).nation == "france"
+    assert load_port(gozo, chart, None, datetime(1798, 10, 29)).nation == "britain"
+
+
+def test_truth_7_532_sicilys_seams_hold_no_gap_and_no_overlap():
+    """Package 105, step 2: the region `sicily` (35.01334 to 38.5 N, 11.1466 to 16.69332 E)
+    abuts `tunis-coast` at 11.1466 E and `tyrrhenian` at 38.5 N; the tiles each lists are
+    its own (17 of the block's are its neighbours', kept by the seam rule), the chart answers
+    on either side of each seam, and its east limit is the block's."""
+    from freesail.world.chart import load_chart, load_manifest
+    from freesail.world.geo import Position
+
+    manifest = load_manifest()
+    regions = manifest["regions"]
+    sicily = regions["sicily"]["bounds"]
+    assert sicily == {"south": 35.01334, "north": 38.5, "west": 11.1466, "east": 16.69332}
+    assert regions["tunis-coast"]["bounds"]["east"] == sicily["west"]
+    assert regions["tyrrhenian"]["bounds"]["south"] == sicily["north"]
+    names = {}
+    for rid, spec in regions.items():
+        for t in (spec.get("tiles") or {}).get("2") or []:
+            assert t["name"] not in names, (t["name"], rid, names.get(t["name"]))
+            names[t["name"]] = rid
+    assert sum(1 for r in names.values() if r == "sicily") == 109
+    whole = load_chart("atlantic-east")
+    assert whole.bounds[3] == 16.69332
+    for lat in (36.5, 37.0, 37.5, 38.0, 38.4):
+        assert whole.region_at(Position(lat, 11.14)) == "tunis-coast"
+        assert whole.region_at(Position(lat, 11.15)) == "sicily"
+        for lon in (11.14, 11.15):
+            assert whole.depth_at(Position(lat, lon)) is not None
+    for lon in (11.5, 12.5, 13.5, 14.5, 15.3):
+        assert whole.region_at(Position(38.49, lon)) == "sicily"
+        assert whole.region_at(Position(38.51, lon)) == "tyrrhenian"
+        for lat in (38.49, 38.51):
+            assert whole.depth_at(Position(lat, lon)) is not None
+
+
+def test_truth_7_533_the_faros_stream_turns_and_runs_at_the_pilots_rates():
+    """Package 105, step 2: in the Faro of Messina the stream runs north and south by turns,
+    six hours each way, at four knots at springs and two at neaps (JUDGEMENT within Smyth
+    1824's two to five miles an hour, p. 110), along the channel's two reaches; the master's
+    book says the same water and its sense, the flood the northward stream."""
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_directions, load_tide
+
+    tide = load_tide()
+    north, south = Position(38.24, 15.62), Position(38.08, 15.60)
+    assert tide.area_at(north).id == "faro-north" and tide.area_at(south).id == "faro-south"
+    start = datetime(1805, 6, 12, 0, 0)  # springs
+    for here in (north, south):
+        states = [tide.at(here, start + timedelta(minutes=10 * i)) for i in range(150)]
+        rates = [s.rate_kn for s in states]
+        assert 3.5 <= max(rates) <= 4.5
+        ns = [s.stream_north_ms for s in states]
+        turns = sum(1 for a, b in zip(ns, ns[1:], strict=False) if (a > 0) != (b > 0))
+        assert 3 <= turns <= 5  # four turns in a day and a night, six hours each way
+    neaps = tide.at(north, datetime(1805, 6, 19, 0, 0))
+    assert 1.5 <= neaps.rate_kn <= 2.6
+    book = load_directions()
+    said = book.area_at(north)
+    assert said.id == "faro-north" and said.spring_kn == 4.0 and said.neap_kn == 2.0
+    assert "Smyth 1824" in said.source and book.area_at(south).set_point == "NNW"
+    assert (35.01334, 38.5, 11.1466, 16.69332) in book.boxes
+
+
+def test_truth_7_534_the_tide_at_palermo_messina_and_valletta_is_the_mediterraneans():
+    """Package 105, step 2: the block's six gauges (TICON's, block `sicily`) give the water
+    its own tide: at Palermo, Messina and Valletta an M2 of centimetres and a mean level
+    under a third of a metre, where the eleven's alone had given the Atlantic's (an M2 of
+    two to four metres, Saint-Malo's level)."""
+    import yaml
+
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    streams = yaml.safe_load(open(T.STREAMS_PATH, encoding="utf-8"))
+    eleven = T.Tide({**doc, "gauges": [g for g in doc["gauges"] if "block" not in g]}, streams)
+    for lat, lon in ((38.13, 13.37), (38.19, 15.56), (35.90, 14.52)):
+        level, consts = tide.constants_at(Position(lat, lon))
+        assert 0.0 < level < 0.3 and consts["M2"][0] < 0.15, (lat, lon)
+        assert eleven.constants_at(Position(lat, lon))[1]["M2"][0] > 2.0, (lat, lon)
+    gauges = [g for g in tide.block_gauges if "sicily" in g.blocks]
+    assert sorted(g.id for g in gauges) == [
+        "catania",
+        "lampedusa",
+        "messina",
+        "palermo",
+        "porto-empedocle",
+        "reggio-calabria",
+    ]
+
+
+def test_truth_7_535_each_of_steps_two_ports_road_is_as_its_pilot_has_it():
+    """Package 105, step 2: each port's road lies on the chart's water within half to
+    half again its pilot's depth (the marks placed on the grid, the moves said in the
+    features file), with a note of the bottom within three kilometres; Messina's harbour
+    within the Braccio, which the grid lacks and the features carry as ground; and every
+    port's track out to sea crosses no land."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    for pid in sorted(PACKAGE_105_PORTS):
+        port = load_port(port_files()[pid], chart, None, datetime(1805, 6, 20, 12))
+        road = port.outer_road
+        depth = chart.depth_at(road.position)
+        assert depth is not None and road.depth_m is not None, pid
+        assert 0.5 * road.depth_m <= depth <= 1.6 * road.depth_m, (pid, depth, road.depth_m)
+        assert chart.bottom_near(port.anchorage.position), pid
+    braccio = [chart.feature(f) for f in ("braccio-south", "braccio-middle", "braccio-point")]
+    assert all(f.grid_lacks and f.is_ground for f in braccio)
+    assert chart.danger_under(braccio[1].position, 0.0, 30.0, 3.0) is not None
+
+
+def test_truth_7_536_a_ship_may_sail_from_naples_through_the_faro_to_valletta_on_charted_water():
+    """Package 105, step 2: the passage from Naples's road by the Tyrrhenian, the Faro
+    between the Faro point and Scylla, the channel past Messina to Cape dell'Armi, round
+    Cape Passaro to Valletta's outer road lies on charted water every leg, no leg crossing
+    the land; the mainland's ports France's from 1806 by their rows (Reggio's, Scilla's
+    with the British garrison of 1806 to 1808, James 1837, vol. 4, pp. 125 to 126 and 294)
+    and Messina's British years in its pilot's words and its yard."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    legs = [
+        chart.feature("naples-road").position,
+        Position(40.55, 14.15),
+        Position(38.40, 15.55),
+        Position(38.275, 15.68),
+        Position(38.20, 15.60),
+        Position(38.05, 15.60),
+        Position(37.90, 15.65),
+        Position(36.60, 15.25),
+        chart.feature("valletta-outer-road").position,
+    ]
+    for a, b in zip(legs, legs[1:], strict=False):
+        crossing = chart.line_shore(a, b, 0.0, 185.0, 185.0)
+        assert crossing is None or not crossing[2], (a, b)
+        assert chart.depth_at(b) is not None and chart.depth_at(b) > 0
+    files = port_files()
+    on = {y: datetime(y, 6, 1, 12) for y in (1805, 1807, 1810, 1817)}
+    scilla = [load_port(files["scilla"], chart, None, d).nation for d in on.values()]
+    assert scilla == ["naples", "britain", "france", "naples"]
+    reggio = [load_port(files["reggio"], chart, None, d).nation for d in on.values()]
+    assert reggio == ["naples", "france", "france", "naples"]
+    messina = {y: load_port(files["messina"], chart, None, d) for y, d in on.items()}
+    assert messina[1805].dockyard.kind == "chandlers" and messina[1810].dockyard.kind == "yard"
+    assert "British garrison" in messina[1807].pilot.words["marks"]
+    assert "British" not in messina[1805].pilot.words["marks"]
+    assert {p.nation for p in messina.values()} == {"naples"}

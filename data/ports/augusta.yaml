@@ -103,6 +103,6 @@ crew_pool:
 closed_to: []
 
 tracks:
-  to_sea: [augusta-harbour, 37 12 N 15 15 E, 37 12 N 15 20 E]
-  from_sea: [37 12 N 15 20 E, 37 12 N 15 15 E, augusta-harbour]
+  to_sea: [augusta-harbour, 37 11 42 N 15 12 36 E, 37 10 12 N 15 15 36 E]
+  from_sea: [37 10 12 N 15 15 36 E, 37 11 42 N 15 12 36 E, augusta-harbour]
   in: [augusta-harbour]

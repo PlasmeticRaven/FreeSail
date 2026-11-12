@@ -111,6 +111,7 @@ book_limits:
   - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
   - {south: 36.29334, north: 40.56, west: 4.5, east: 8.0}  # the Sardinian sea's block (package 104)
   - {south: 36.29334, north: 38.5, west: 8.0, east: 11.1466}  # the coast of Tunis's block (package 104)
+  - {south: 35.01334, north: 38.5, west: 11.1466, east: 16.69332}  # Sicily and Malta's block (package 105)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1508,6 +1509,87 @@ areas:
       current: {set: E, kn: 0.5}
       judgement: [set, rates, hour, current]
       source: "the set the period's own (Purdy 1826, p. 151), the rate JUDGEMENT; about the Skerki with a south-easter the current sweeps away north at a knot and a half (Smyth 1854, p. 165)"
+  # Package 105: Sicily and Malta's block. THE FARO OF MESSINA, its tidal stream in the form
+  # the Strait of Gibraltar's has (a rectilinear stream by area), from Smyth 1824, pp. 109 to
+  # 110, the first authority: "in settled seasons there is a central stream, running north
+  # and south, at the rate of from two to five miles an hour; and which ... when uninfluenced
+  # by strong winds, is governed by the moon"; "when the main current runs to the northward,
+  # it is called the ascending or flood, and the contrary, the descending or ebb"; "an
+  # interval of from about fifteen to sixty minutes between the changes; and the tide runs
+  # six hours each way", a south-east gale having kept it running north upwards of eight;
+  # high water at full and change off the Faro point 6h 56m, in Messina's harbour 8h 10m.
+  # Mr Blyth's notes (Norie 1831, pp. 133 to 134): the flood six hours and the ebb seven.
+  # An older account (Purdy 1826, p. 135) had six to eight knots, which Smyth's survey does
+  # not bear out. So the flood is the northward stream along the channel's axis, four knots
+  # at springs (JUDGEMENT within Smyth's two to five) and two at neaps, strongest three hours
+  # before high water (JUDGEMENT: the period gives no hour of the strength), the axis the
+  # channel's from Cape dell'Armi by Messina to the Faro. WHAT IT CANNOT CARRY, said
+  # plainly: the counter-sets along each shore (Smyth's lateral returning sets, the refoli
+  # of Smyth 1854, p. 179: on the Sicilian shore with the descending stream, on the
+  # Calabrian with the ascending), Charybdis's eddies off the Braccio (a mark of the
+  # features file, not a stream), the slack of a quarter to a whole hour, the wind's hold on
+  # the stream (the south-easter's eight hours), the set onto the rocks under the Torre di
+  # Cavallo, and the stream's turn into the Tyrrhenian past the Faro and Scylla: one stream,
+  # one axis, over each of the channel's two reaches, the north-north-westerly from Cape dell'Armi to
+  # Messina and the north-easterly from Messina by the Faro to Scylla (the channel's bend: two
+  # areas, one stream). Far from every recorded passage's water.
+  - id: faro-north
+    chart: sicily
+    name: the Faro of Messina, from Messina to the Faro and Scylla
+    polygon: [[38.2900, 15.6200], [38.2900, 15.7400], [38.2350, 15.7000], [38.1700, 15.6650], [38.1700, 15.5450], [38.2300, 15.5800], [38.2700, 15.6050]]
+    axis_deg: 40
+    spring_kn: 4.0
+    neap_kn: 2.0
+    phase_h: -3.0
+    source: "Smyth 1824, pp. 109 to 110: a central stream north and south at two to five miles an hour, governed by the moon; the northward the ascending or flood, the southward the descending or ebb; six hours each way, a slack of fifteen to sixty minutes; counter-sets along each shore, often forming eddies; high water at full and change off the Faro 6h 56m, at Messina 8h 10m; Norie 1831, pp. 133 to 134 (Mr Blyth): the flood six hours, the ebb seven; Smyth 1854, pp. 179 to 180: the refoli, the rema montante and scendente; the rates JUDGEMENT within Smyth's two to five, the hour JUDGEMENT"
+    book:
+      set: NE
+      spring_kn: 4.0
+      neap_kn: 2.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "the stream's sense the period's own (Smyth 1824, p. 110: the ascending or flood to the northward, six hours each way); the set the channel's to the point, the rates JUDGEMENT within Smyth's two to five miles an hour, the hour JUDGEMENT; keep over to the Sicilian side, where the beaches are steep and the stream lets a ship glide along them (p. 111)"
+  - id: faro-south
+    chart: sicily
+    name: the Faro of Messina, from Cape dell'Armi to Messina
+    polygon: [[38.1700, 15.5450], [38.1700, 15.6650], [38.0500, 15.6600], [37.9400, 15.6900], [37.9400, 15.5800], [38.0500, 15.5000], [38.1500, 15.5300]]
+    axis_deg: 340
+    spring_kn: 4.0
+    neap_kn: 2.0
+    phase_h: -3.0
+    source: "Smyth 1824, pp. 109 to 110: a central stream north and south at two to five miles an hour, governed by the moon; the northward the ascending or flood, the southward the descending or ebb; six hours each way, a slack of fifteen to sixty minutes; counter-sets along each shore, often forming eddies; high water at full and change off the Faro 6h 56m, at Messina 8h 10m; Norie 1831, pp. 133 to 134 (Mr Blyth): the flood six hours, the ebb seven; Smyth 1854, pp. 179 to 180: the refoli, the rema montante and scendente; the rates JUDGEMENT within Smyth's two to five, the hour JUDGEMENT"
+    book:
+      set: NNW
+      spring_kn: 4.0
+      neap_kn: 2.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "the stream's sense the period's own (Smyth 1824, p. 110: the ascending or flood to the northward, six hours each way); the set the channel's to the point, the rates JUDGEMENT within Smyth's two to five miles an hour, the hour JUDGEMENT; keep over to the Sicilian side, where the beaches are steep and the stream lets a ship glide along them (p. 111)"
+  # The rest of the block: no tide stream (Purdy 1826, p. 151, after Smyth: the tides on
+  # Sicily's south coast observe no regularity, rising a foot or two with the weather); the
+  # current between Sicily and Africa eastward at half a mile to a mile an hour in settled
+  # weather (Purdy 1826, p. 151), off Filfla to the south and east (p. 166), and the
+  # Malta channel's set to the south-east, for which a ship from Cape Passaro to Valletta
+  # keeps a point higher (Smyth 1824, p. 185): east-south-east at half a knot over the
+  # block, the lower rate, JUDGEMENT.
+  - id: sicily-open
+    chart: sicily
+    name: the seas about Sicily and Malta
+    polygon: [[35.01334, 11.1466], [38.50, 11.1466], [38.50, 16.69332], [35.01334, 16.69332]]
+    axis_deg: 112
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 112, kn: 0.5}
+    source: "Purdy 1826, p. 151 (Smyth): in long settled weather the currents between Sicily and the African shore run to the eastward at half a mile to a mile an hour; the tides of the south coast observe no regularity, a foot or two with the weather; p. 166: off Filfla the current mostly to the south and east; Smyth 1824, p. 185: from Cape Passaro to Valletta keep a point higher for the south-easterly set; the rate half a knot, the lower, JUDGEMENT"
+    book:
+      set: ESE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: ESE, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the period's own between east and south-east (Purdy 1826, pp. 151 and 166; Smyth 1824, p. 185: from Cape Passaro to Valletta keep a point higher); the rate JUDGEMENT, the lower of the half mile to a mile"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

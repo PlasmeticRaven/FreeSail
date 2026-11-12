@@ -338,6 +338,7 @@ MEDITERRANEAN = {
     "catalan-coast",
     "sardinian-sea",
     "tunis-coast",
+    "sicily",  # package 105: the Faro's tidal stream beside the open water's set
 }
 MEDITERRANEAN_AREAS = (
     "provence-current",
@@ -356,6 +357,10 @@ MEDITERRANEAN_AREAS = (
     "bay-of-tunis-set",
     "sardinian-sea-open",
     "tunis-coast-open",
+    # package 105
+    "faro-north",
+    "faro-south",
+    "sicily-open",
 )
 
 
