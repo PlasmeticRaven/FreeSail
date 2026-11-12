@@ -1119,8 +1119,8 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    # package 101: Barcelona's, the Catalan coast's
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 76
+    # package 101: Barcelona's, the Catalan coast's; package 106a: the Canaries' seven
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 83
     for g in blocks:
         # its own block first (a list's further blocks are the rule of the seams': below)
         own = g["block"][0] if isinstance(g["block"], list) else g["block"]
@@ -1147,6 +1147,10 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         # neighbours' nearest gauges (Mahon's, Carloforte's and Cagliari's lists)
         "sardinian-sea",
         "tunis-coast",
+        # package 106a: the Canaries' seven, and the gaugeless Salvages served by Santa
+        # Cruz de Tenerife's and Funchal's lists (the lead's ruling of 2026-11-12)
+        "canaries",
+        "salvages",
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1275,6 +1279,10 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
         "mahon": {"sardinian-sea", "tunis-coast"},
         "carloforte": {"sardinian-sea", "tunis-coast"},
         "cagliari": {"tunis-coast"},
+        # package 106a, the lead's ruling of 2026-11-12: the Salvages, gaugeless, served by
+        # Santa Cruz de Tenerife's and Funchal's, their neighbours' nearest within reach
+        "santa-cruz-de-tenerife": {"salvages"},
+        "funchal": {"salvages"},
     }
     owned = {g.blocks[0] for g in tide.block_gauges}
     assert not owned & set().union(*ruled.values())

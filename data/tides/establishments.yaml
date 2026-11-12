@@ -136,6 +136,11 @@ tables:
       - {name: Funchal, lat_deg: 32.640, lon_deg: -16.907, hw_h: 12, hw_m: 4, spring_rise_ft: 7, note: "Norie 1805, Table XLI p. 250 (the page image): Funchal, Madeira, 12h 4m, 7 feet; the Oriental Navigator 1801 p. 24: the tides rise and fall about 7 1/2 feet"}
       - {name: Angra Bay, lat_deg: 38.652, lon_deg: -27.215, hw_h: 11, hw_m: 45, spring_rise_ft: 8, note: "Norie 1805, Table XLI p. 248 (the page image): Angra Bay, Terceira, 11h 45m, 8 feet"}
       - {name: Fayal Road, lat_deg: 38.530, lon_deg: -28.612, hw_h: 2, hw_m: 20, spring_rise_ft: 4.5, note: "Norie 1805, Table XLI p. 249 (the page image, the hour's first figure faint): Fayal Road, Azores, 2h 20m, 4 1/2 feet; Tofiño 1789 p. 224 has half past twelve and eight Spanish feet"}
+      # package 106a: Norie 1805's one row for the Canaries, Table XLI p. 248 (the page image):
+      # "Canary Island, Atlant. Ocean, 3h 0m", no rise; placed at the Grand Canary's road of
+      # Palmas (JUDGEMENT: which island he meant is not said); the rise the world's spring
+      # range there by the 37j rule, the block's own gauges', JUDGEMENT
+      - {name: Canary Island, lat_deg: 28.100, lon_deg: -15.410, hw_h: 3, hw_m: 0, spring_rise_ft: 7, rise_judgement: true, note: "Norie 1805, Table XLI p. 248 (the page image): Canary Island, 3h 0m, no rise given; the rise the world's spring range at Palmas, 6.8 feet, JUDGEMENT; Purdy 1825 p. 218 at Orotava: little or no tide"}
       # package 39f, the Strait: Tofiño 1787's hours (his survey's own observations, the
       # period's best for these waters) and Purdy 1826's where Tofiño gives none (p. 8, read
       # from the page image); Tofiño's feet are the pie de Burgos (0.279 m), turned to

@@ -198,13 +198,15 @@ def test_the_islands_gauges_are_read_and_serve_the_islands_and_norie_gives_their
     Funchal 12h 4m and 7 feet, Angra Bay 11h 45m and 8, Fayal Road 2h 20m and 4 1/2 (read
     from the page images)."""
     doc = yaml.safe_load(T.CONSTITUENTS_PATH.read_text(encoding="utf-8"))
-    held = {g["id"]: g for g in doc["gauges"] if g["lon_deg"] < -15.0}
+    # the Western Islands' and Madeira's (package 106a's Canaries lie south of 30 N)
+    held = {g["id"]: g for g in doc["gauges"] if g["lon_deg"] < -15.0 and g["lat_deg"] > 30.0}
     assert list(held) == ["funchal", "ponta-delgada", "angra", "horta", "santa-cruz-das-flores"]
     for g in held.values():
         assert g["mean_level_m"] is None and g["record"].startswith("GESLA-2, UHSLC")
         for name in ("M2", "S2", "N2"):
             assert 0.05 < g[name]["amplitude_m"] < 0.8 and 25.0 < g[name]["phase_deg"] < 90.0
-    assert held["funchal"]["block"] == "madeira"
+    # package 106a: Funchal serves the Salvages too, which have no gauge (104's ruling)
+    assert held["funchal"]["block"] == ["madeira", "salvages"]
     assert all(held[g]["block"] == "azores" for g in list(held)[1:])
     eleven = [g for g in doc["gauges"] if "block" not in g]
     assert len(eleven) == 11 and not set(held) & {g["id"] for g in eleven}

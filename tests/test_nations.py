@@ -268,6 +268,14 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "carloforte": "sardinia",
         "gulf-of-palmas": "sardinia",
         "oristano": "sardinia",
+        # package 106a: the Canaries, the King of Spain's
+        "santa-cruz-de-tenerife": "spain",
+        "orotava": "spain",
+        "las-palmas": "spain",
+        "arrecife": "spain",
+        "santa-cruz-de-la-palma": "spain",
+        "san-sebastian-de-la-gomera": "spain",
+        "cabras": "spain",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]
