@@ -10939,8 +10939,8 @@ def test_truth_7_261_every_knob_of_the_regimes_and_the_nations_has_its_source_or
                 if isinstance(entry, dict) and "source" in entry:
                     naval.append((f"{nid}.{kind}.{entry['port']}", entry["source"]))
     # package 79c: the regency of Algiers the ninth; package 79d: the Italian states and the
-    # King of Sardinia, five more
-    assert len(nations) == 14 and len(naval) > 50
+    # King of Sardinia, five more; package 104: the regency of Tunis the fifteenth (was 14)
+    assert len(nations) == 15 and len(naval) > 50
     for where, said in knobs + naval:
         assert said and _SOURCE_FORM.search(said), (where, said)
         if not re.search(r"(James|Nicolas|Niles|Regulations 1806|Falconer 1780) ", said):
@@ -15726,6 +15726,337 @@ def test_truth_7_500_every_colours_drawing_is_served_and_drawn_as_before_the_pac
     a()
     if shutil.which("node"):
         b(tmp_path)
+
+
+# Package 104: the Sardinian sea and the coast from Bougie to Cape Bon, the L-shaped hole
+# closed, thirteen ports and the regency of Tunis (truths 7-510 to 7-519). States, counts
+# and bands; no digest.
+# ---------------------------------------------------------------------------
+
+BARBARY_PORTS = [
+    "port-mahon",
+    "algiers",
+    "bougie",
+    "djidjelli",
+    "collo",
+    "stora",
+    "bona",
+    "la-calle",
+    "tabarka",
+    "bizerta",
+    "porto-farina",
+    "la-goletta",
+    "carloforte",
+    "gulf-of-palmas",
+    "oristano",
+]
+
+
+def _barb_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart over the Sardinian sea or the coast of Tunis at seed 7,
+    the thirteen ports with Port Mahon and Algiers loaded, a steady breeze (from the west
+    unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 270.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", BARBARY_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_510_the_chart_answers_over_the_l_shaped_hole_on_a_tenth_of_a_degree():
+    """The brief's items 1 and 8: the hole the lead measured, the open sea between Minorca
+    and Sardinia (4.75 to 7.73 E north of 38.43 N) and the arm along Barbary to Cape Bon
+    (to 11.15 E south of it), answers everywhere on a tenth of a degree with a depth or a
+    height and a region; the two regions' own tiles are where the neighbours' are not."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    regions: dict[str, int] = {}
+    for i in range(43):  # 36.3 to 40.5 N
+        lat = 36.3 + 0.1 * i
+        for j in range(67):  # 4.5 to 11.1 E
+            lon = 4.5 + 0.1 * j
+            if lat > 38.5 and lon > 8.0:
+                continue  # the Tyrrhenian's water, charted before
+            p = Position(lat, lon)
+            assert chart.elevation_at(p) is not None, p
+            r = chart.region_at(p)
+            assert r is not None, p
+            regions[r] = regions.get(r, 0) + 1
+    assert set(regions) == {"sardinian-sea", "tunis-coast", "balearics", "tyrrhenian"}
+    assert regions["sardinian-sea"] > regions["tunis-coast"] > 10 * regions["balearics"]
+
+
+def test_truth_7_511_the_seams_hold_no_gap_and_no_overlap_and_the_depth_does_not_step():
+    """The brief's items 1 and 8, the seam rule (docs/dev/ChartBlocks.md): no level-2 tile is
+    listed by two regions of the manifest; the regions' bounds abut their neighbours' on
+    the neighbours' own figures (4.5 E, 40.56 N, 8.0 E, 38.5 N); a cable either side of
+    each seam the chart answers with the same water within a twentieth, and the tide's
+    blocks change there (the two blocks served by their neighbours' gauges, the lead's
+    ruling)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    manifest = yaml.safe_load(open("data/charts/manifest.yaml", encoding="utf-8"))
+    seen: dict[str, str] = {}
+    for name, spec in manifest["regions"].items():
+        for t in (spec.get("tiles") or {}).get("2") or []:
+            assert t["name"] not in seen, (t["name"], seen.get(t["name"]), name)
+            seen[t["name"]] = name
+    b = {r: manifest["regions"][r]["bounds"] for r in manifest["regions"]}
+    assert b["sardinian-sea"]["west"] == b["balearics"]["east"] == 4.5
+    assert b["sardinian-sea"]["north"] == b["gulf-of-lion"]["south"] == 40.56
+    assert b["sardinian-sea"]["east"] == b["tyrrhenian"]["west"] == b["tunis-coast"]["west"]
+    assert b["tunis-coast"]["north"] == b["tyrrhenian"]["south"] == 38.5
+    chart = load_chart("atlantic-east")
+    w = _barb_at(38.0, 6.0, datetime(1805, 6, 20, 12, 0))
+    for (a, c), (ra, rc) in (
+        (((38.0, 4.495), (38.0, 4.505)), ({"balearics"}, {"sardinian-sea"})),
+        (((37.5, 7.995), (37.5, 8.005)), ({"sardinian-sea"}, {"tunis-coast"})),
+        (((38.495, 9.5), (38.505, 9.5)), ({"tunis-coast"}, {"tyrrhenian"})),
+    ):
+        pa, pc = Position(*a), Position(*c)
+        da, dc = chart.depth_at(pa), chart.depth_at(pc)
+        assert da is not None and dc is not None and abs(da - dc) < 0.05 * da, (a, da, dc)
+        assert w.tide.blocks_at(pa) == ra and w.tide.blocks_at(pc) == rc
+
+
+def test_truth_7_512_a_ship_sails_from_port_mahon_to_carloforte_and_from_algiers_to_tunis():
+    """The brief's item 9: on charted water the whole way, no leg crossing dry ground: from
+    off the mouth of Port Mahon south of the Isla del Aire, across the Sardinian sea and into
+    San Pietro's road by its southern channel (Smyth 1828, p. 306); and from Algiers road
+    along the Barbary shore by the coast lanes the ports' tracks keep, north of Cape
+    Bougaroun and Cape de Fer, past the Galita and the Fratelli and Cape Farina, to the road
+    of Tunis."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position, bearing_and_distance
+
+    chart = load_chart("atlantic-east")
+    passages = {
+        "carloforte": [(39.86, 4.317), (39.76, 4.42), (39.04, 8.30), (39.138, 8.3198)],
+        "tunis": [
+            (36.774, 3.12),
+            (36.95, 3.30),
+            (37.20, 5.30),
+            (37.20, 7.85),
+            (37.30, 8.80),
+            (37.42, 9.95),
+            (37.40, 10.45),
+            (36.95, 10.40),
+            (36.826, 10.34),
+        ],
+    }
+    for name, legs in passages.items():
+        miles = 0.0
+        for a, b in zip(legs, legs[1:], strict=False):
+            pa, pb = Position(*a), Position(*b)
+            hit = chart.line_shore(
+                pa, pb, units.CABLE, skip_start_m=units.CABLE, skip_end_m=units.CABLE
+            )
+            assert hit is None or not hit[2], (name, a, b, hit)
+            _, d = bearing_and_distance(pa, pb)
+            n = max(2, int(d / units.CABLE))
+            for k in range(n + 1):
+                p = Position(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n)
+                assert chart.elevation_at(p) is not None, (name, p)
+            miles += d / units.NAUTICAL_MILE
+        assert miles > 190.0, (name, miles)
+
+
+def test_truth_7_513_bougies_road_lies_under_the_cape_sheltered_west_and_open_to_the_east():
+    """The brief's item 3, to the pilots' words (Tofiño 1787, p. 155; Norie 1831, p. 355):
+    the road of Bougie lies south of Cape Carbon in seven fathoms or so of soft mud, the land
+    close to the west and north of it and open sea to the east; its port file says so, and
+    the bottom is read at the berth."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.ports import load_port, port_files
+
+    road = (36.7560, 5.1021)  # features/sardinian-sea.yaml's `bougie-road`
+    w = _barb_at(*road, datetime(1805, 6, 20, 12, 0))
+    assert 5.0 < w.chart.depth_at(w.position) < 25.0
+    _, to_cape = bearing_and_distance(w.position, w.chart.feature("cape-carbon").position)
+    assert to_cape < 1.5 * units.NAUTICAL_MILE
+    shore = w.chart.nearest_shore(w.position)
+    assert shore is not None and shore.distance_m < units.NAUTICAL_MILE
+    # open to the east: no land a league to the eastward of the berth
+    from freesail.world.geo import Position
+
+    for k in range(1, 30):
+        p = Position(road[0], road[1] + k * 0.005)
+        assert (w.chart.elevation_at(p) or 0.0) < 0.0, p
+    bougie = load_port(port_files()["bougie"], w.chart)
+    words = bougie.pilot.words["anchorage"]
+    assert "sheltered from the west" in words and "easterly" in words
+    assert w.chart.bottom_near(w.position) == "soft mud"
+
+
+def test_truth_7_514_the_road_of_tunis_is_soft_mud_open_to_the_north_east():
+    """The brief's item 3, to Purdy 1826 (p. 334, W. Smith's directions): the best anchorage
+    in five to six fathoms of soft mud with Cape Carthage to the north-north-east and the
+    Goletta to the west; the bay open to the north-east but the north-easters not blowing
+    home; a frigate brought up there by the best bower holds through a north-easter of
+    twenty knots for six hours."""
+    from freesail.world.geo import bearing_and_distance
+
+    road = (36.826, 10.34)  # features/tunis-coast.yaml's `tunis-road`
+    w = _barb_at(
+        *road,
+        datetime(1805, 6, 20, 12, 0),
+        wind_from_deg=45.0,
+        wind_speed_kn=20.0,
+        ship_heading_deg=45.0,
+    )
+    assert 5.0 < w.chart.depth_at(w.position) < 15.0
+    cape = w.chart.feature("cape-carthage").position
+    goletta = w.chart.feature("la-goletta").position
+    b_cape, _ = bearing_and_distance(w.position, cape)
+    b_gol, _ = bearing_and_distance(w.position, goletta)
+    # Purdy's magnetic bearings made true (the variation about 17 W then): the cape between
+    # 11 and 17 degrees, the Goletta between 253 and 276, each within five
+    assert 5.0 <= b_cape <= 22.0 and 248.0 <= b_gol <= 281.0
+    w.submit("let go the best bower")
+    w.run(600)
+    assert any(e.kind == "ship.brought_up" for e in w.log)
+    brought = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log if "drag" in e.kind or "aground" in e.kind]
+    _, moved = bearing_and_distance(brought, w.position)
+    assert moved < 0.2 * units.NAUTICAL_MILE
+
+
+def test_truth_7_515_keiths_reef_grounds_a_frigate_and_stands_where_the_grid_has_its_head():
+    """The brief's item 9, the Skerki and Keith's reef (found by Durban in the Weazle in
+    1802; the Athénienne lost on them in October 1804): the reef nearly awash stands on the
+    grid's shoal head of the bank, some seven minutes west of the pilots' longitude (Norie
+    1831, p. 195; Smyth 1854, p. 457: 37 50 N, 11 8 E), which its `fix` says; a frigate
+    there touches it, and a cable off the bank's deep side she does not."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    reef = chart.feature("keiths-reef")
+    raw = yaml.safe_load(open("data/charts/features/tunis-coast.yaml", encoding="utf-8"))
+    entry = next(f for f in raw["features"] if f["id"] == "keiths-reef")
+    assert reef.kind == "ledge" and "Athenienne" in entry["source"] and "11 8" in entry["fix"]
+    assert chart.region_at(reef.position) == "tunis-coast"
+    assert abs(chart.elevation_at(reef.position)) < 3.0
+    assert chart.danger_under(reef.position, 0.0, 40.0, 5.5) is not None
+    deep = Position(reef.position.lat_deg, reef.position.lon_deg + 0.03)
+    assert chart.danger_under(deep, 0.0, 40.0, 5.5) is None
+    skerki = chart.feature("skerki")
+    assert skerki.kind == "bank" and skerki.dries_m == pytest.approx(-2.7)
+
+
+def test_truth_7_516_the_galita_is_seen_at_the_distance_its_height_gives():
+    """The brief's item 9: the Galita, 476 m (Bérard 1837, pp. 144 to 145), the landfall from
+    Bona to Tunis, is above the lookout's search height and seen to its own geographic
+    horizon in the clearest weather: from a frigate's masthead fifty miles off it is in
+    sight, sixty miles off it is below the horizon."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position, horizon_nm
+
+    chart = load_chart("atlantic-east")
+    galita = chart.feature("galita")
+    reach = horizon_nm(30.0, galita.height_m)
+    assert 55.0 < reach < 58.0
+    noon = datetime(1805, 6, 20, 12, 0)
+
+    def seen(miles: float) -> bool:
+        p = Position(galita.position.lat_deg - miles / 60.0, galita.position.lon_deg)
+        return "galita" in {s.feature.id for s in chart.in_sight(p, 30.0, None, "day", noon)}
+
+    assert seen(50.0) and not seen(60.0)
+
+
+def test_truth_7_517_no_light_on_either_coast_in_1805_and_cape_carthages_by_1845():
+    """The brief's item 2, the lights with their dates: no period text names a light from
+    Dellys to Cape Bon (Tofiño 1787 the lanterns of Mers-el-Kebir and Algiers only; Bérard
+    1837 none east of Algiers): by night in 1805 off Bona and off the Goletta no light is in
+    sight; in 1845 Cape Carthage's (the Admiralty's notice of 17 June 1840) and Bona's on
+    Cape de Garde (Lamberti 1844) show."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    off_bona, off_tunis = Position(37.05, 7.85), Position(36.95, 10.45)
+
+    def lights(p, year):
+        night = datetime(year, 6, 20, 23, 30)
+        return {
+            s.feature.id
+            for s in chart.in_sight(p, 20.0, None, "night", night)
+            if s.feature.kind == "light"
+        }
+
+    assert lights(off_bona, 1805) == set() and lights(off_tunis, 1805) == set()
+    assert lights(off_bona, 1845) == {"cape-de-garde-light"}
+    assert lights(off_tunis, 1845) == {"cape-carthage-light"}
+
+
+def test_truth_7_518_the_regencies_ports_and_tabarkas_and_carlofortes_dated_nations():
+    """The brief's items 3 and 4: in June 1805 Bona and the Goletta are neutral to a King's
+    ship (the Dey and the Bey at peace with Britain); Tabarka is the Bey's, its nation dated
+    from the island's surrender in 1738 (Bérard 1837, p. 142); Carloforte is the King of
+    Sardinia's in 1805 and France's in March 1793 (taken by the French fleet and held till
+    25 May, Smyth 1828, pp. 57 and 308); the regency of Tunis is in the nations table at
+    peace with all."""
+    from freesail.world.nations import load_nations
+
+    when = datetime(1805, 6, 20, 12, 0)
+    w = _barb_at(37.0, 8.0, when)
+    for pid, nation in (("bona", "algiers"), ("la-goletta", "tunis"), ("tabarka", "tunis")):
+        port = w.ports.ports[pid]
+        assert port.nation_on(when) == nation and w.dealings.stance(port) == "neutral", pid
+    carloforte = w.ports.ports["carloforte"]
+    assert carloforte.nation_on(when) == "sardinia"
+    assert carloforte.nation_on(datetime(1793, 3, 1, 12, 0)) == "france"
+    assert carloforte.nation_on(datetime(1793, 6, 1, 12, 0)) == "sardinia"
+    assert w.ports.ports["tabarka"].nation_on(datetime(1792, 1, 1)) == "tunis"
+    table = load_nations()
+    assert "tunis" in table.nations and not table.enemies_of("tunis")
+    assert table.nations["tunis"].adjective == "Tunisian"
+
+
+@pytest.mark.slow
+def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her_short_book():
+    """The brief's item 7: the block's scenario (`bona.yaml`, June 1805) sailed at seed 7 by
+    its short book: from off the mouth of Port Mahon round the Isla del Aire, across the seam
+    at 4.5 E and the open Sardinian sea, her landfall the high land of the Seven Capes, Mount
+    Edough and Cape de Fer, round Cape de Garde by its offing to the anchorage under the
+    Fort Genois, where she anchors on mud mixed with sand (Bérard 1837, p. 131) within two
+    days and a half (at 16:08 on the 22nd at seed 7), without touching ground."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "bona.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    regions = set()
+    for _ in range(61 * 6):
+        w.run(600)
+        regions.add(w.chart.region_at(w.position))
+        if len([e for e in w.log if e.kind == "ship.anchored"]) >= 2:
+            break
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # off Port Mahon at the start, under the Fort Genois
+    assert anchored[1].tick <= 60 * 3600
+    assert {"balearics", "sardinian-sea"} <= regions
+    _, off = bearing_and_distance(w.position, w.chart.feature("fort-genois-anchorage").position)
+    assert off < 0.6 * units.NAUTICAL_MILE
+    assert any("mud mixed with sand" in e.text for e in w.log if e.kind == "sounding")
+    seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
+    assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
 
 
 @pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])

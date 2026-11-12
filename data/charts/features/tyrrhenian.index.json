@@ -15,7 +15,8 @@
 "san-pietro-island",
 "carloforte",
 "carloforte-road",
-"sant-antioco-island"
+"sant-antioco-island",
+"sant-antioco-town"
 ],
 "156,34": [
 "gulf-of-palmas"
@@ -51,6 +52,10 @@
 "cape-san-marco",
 "oristano-road",
 "cape-frasca"
+],
+"159,34": [
+"torre-grande",
+"oristano"
 ],
 "159,38": [
 "cape-bellavista"

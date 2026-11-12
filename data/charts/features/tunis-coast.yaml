@@ -1,0 +1,470 @@
+# The features of the coast of Tunis's block (package 104, the region `tunis-coast`;
+# docs/dev/ChartBlocks.md): Cape Rosa and La Calle, the old seat of the French coral
+# concession at the regencies' march, Tabarka, Cape Negro and Cape Serrat, the Galita and
+# its rocks with the Sorelle, the Fratelli, Cape Blanc and Bizerta behind its lakes, the
+# Cani, Cape Farina, Plana and Porto Farina, the Gulf of Tunis with Cape Carthage and the
+# Goletta, Zembra, Zembretta and Cape Bon, and out to the north-east the Skerki and Keith's
+# reef. East of 8 E, where `sardinian-sea` ends; south of 38.5 N, where `tyrrhenian`
+# begins; west of the column edge 11.15 E. The form and the rules are channel-west.yaml's
+# (its head). The sources, in the references' form (docs/references/README.md; the texts
+# under docs/references/pilots/, this package's short pass in docs/dev/TuningNotes.md,
+# "Package 104"):
+#
+#   Purdy 1826      The New Sailing Directions for the Mediterranean Sea, pp. 327 to 335 (its
+#                   Tunis matter from Macgill's Account of Tunis, 1811; the bay of Tunis by
+#                   W. Smith, about 1817): the spine, bearings magnetic with the true in
+#                   brackets.
+#   Norie 1831      New Piloting Directions for the Mediterranean Sea, pp. 195, 345 to 354:
+#                   the coast from south to north, Greenwich, bearings true.
+#   Berard 1837     Description nautique des cotes de l'Algerie, pp. 81 to 82 and 138 to 148
+#                   (La Calle, Tabarka, Cape Negro, Serrat, the Galita, the Sorelle; the
+#                   survey of 1831 to 1833, after the period).
+#   Purdy 1840      The New Sailing Directory for the Strait and the Western Division, pp.
+#                   192 to 199 and its Pharonology p. xxxvi.
+#   Derrotero 1849  Derrotero de las costas de Europa y Africa en el Mediterraneo, pp. 260 to
+#                   270 (from a French survey; longitudes from Cadiz; after the period).
+#   Lamberti 1844   Portolano del mare Mediterraneo, pp. 198, 228 to 229.
+#   Smyth 1854      The Mediterranean: pp. 90 to 94, 162 to 165, 187, 296, 334; the table of
+#                   positions pp. 457 to 458 (his own observations of 1816 to 1824).
+#   Admiralty 1913  The Mediterranean Pilot, vol. I, chs. VI and VII, and its supplement of
+#                   1917: MODERN, for the heights and depths only.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid), first placed from
+# the modern map and the pilots' bearings, then checked against this block's tiles by the
+# rule of channel-west.yaml's head (a scratch script outside the repository); a move is
+# said in `fix`. **The Skerki and Keith's reef**: the pilots agree among themselves (the
+# Skerki at 37 44 to 46 N, 10 45 to 47 E; Keith's reef at 37 50 N, 11 8 to 9 E, Greenwich),
+# but the modern grid's shoal head of the bank, nearly awash, lies at 37 54.5 N, 11 0.8 E
+# (the Admiralty 1913, p. 482, has the Keith reef at 37 50 N, 10 57 E), seven minutes
+# west of the pilots' longitude: the marks stand where the grid has the shoal, the pilots'
+# places said in `fix` (the period's longitudes off by that much is no surprise).
+#
+# The period's shore. The tiles are the modern grid's: the canal and lake of Bizerta
+# dredged for the French arsenal, the canal of the Goletta and the port of Tunis, the
+# Medjerda's mouth moved and Porto Farina's lagoon silted to a foot or three. No period
+# sheet with its datum is read; no override changes them, and the port files say so.
+#
+# The lights. No period text names a light on this coast before the period's end; the
+# first dated is Cape Carthage's, the Tunisian government's lighthouse of the Admiralty's
+# notice of 17 June 1840 (Purdy 1840, p. xxxvi), entered `from` 1840 so that the period's
+# years see none. Cape Blanc had a watch and signal house, Cape Bon a square building
+# (Norie 1831, p. 352; the Derrotero 1849, p. 269): marks by day, no light.
+
+region: tunis-coast
+features:
+  # ---------------------------------------------------------------------------
+  # Cape Rosa and La Calle (the harbour patch la-calle)
+  # ---------------------------------------------------------------------------
+
+  - id: cape-rosa
+    kind: headland
+    name: Cape Rosa
+    modern: 'Cap Rosa'
+    lat_deg: 36.9512
+    lon_deg: 8.2380
+    fix: 'moved 200 m to the grid''s land'
+    height_m: 90
+    source: 'Berard 1837, p. 138: formed of low land, the mamelon within it 330 m, the cliffed cape only 90 m, brush only; the point of the coast of Africa where the finest coral is fished, in 40 to 50 brasses, the coral boats 4 to 5 miles NNW of it in 1833; the Anse du Prisonnier west of it with the ruins of a magazine of the Bastion de France; Purdy 1826, p. 328: known by its reddish colour; Norie 1831, p. 354: Cape Bufahal or Rosa, W by N 1/2 N three leagues from La Cala; Smyth 1854, p. 458: 36 55 15 N, 8 13 0 E, steep-to'
+    says: 'Cape Rosa, low and reddish, cliffed at the sea; off it lie the finest coral beds of the coast.'
+
+  - id: la-calle
+    kind: town
+    name: La Calle
+    modern: 'El Kala (La Calle)'
+    lat_deg: 36.8960
+    lon_deg: 8.4430
+    height_m: 10
+    source: 'Berard 1837, p. 140: the old establishment of the Compagnie d''Afrique, a cove of 200 toises sheltered from the N and NE by a peninsula on which all the magazines were built, burnt in 1827 at the declaration of war between Algiers and France; a fortified mill on a hillock at the west side of the entry served of old as a mark; p. 139: the old Bastion de France abandoned to form La Calle; Purdy 1826, p. 327: the Bastion of France and La Cala, establishments of the French, both abandoned and in ruins; Norie 1831, pp. 353 to 354: where the territory of Tunis terminates; the establishments evacuated and in ruins; Smyth 1854, p. 458: Alkalah, or La Cala, 36 51 57 N, 8 24 43 E'
+    says: 'La Calle, the coral concession''s little town on its peninsula, its magazines along the cove, the old mill on the hill to the westward of the entry.'
+
+  - id: la-calle-cove
+    kind: anchorage
+    name: the cove of La Calle
+    modern: 'the old port of El Kala'
+    lat_deg: 36.9019
+    lon_deg: 8.4420
+    fix: 'moved 325 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 2
+    bottom: sand
+    source: 'Berard 1837, p. 140: 20 feet at the entrance, 10 or 11 in the middle, on sand; open to the NW, in fresh north-westers the coral boats must haul ashore; Derrotero 1849, pp. 261 to 262: mouth 50 toesas, 20 feet at the entrance, 10 in the middle, 5 near the beach, the entrance point strewn with rocks; small craft moored four ways with chains to the quays'
+    says: 'The cove of La Calle, ten feet of water on sand, for the coral boats and small craft only; a fresh north-wester puts them on the beach.'
+
+  - id: la-calle-road
+    kind: anchorage
+    name: the road under Cape Gros
+    modern: 'the anchorage off El Kala, under Cap Gros'
+    lat_deg: 36.9100
+    lon_deg: 8.4300
+    height_m: 0
+    depth_fathoms: 9
+    bottom: sand
+    source: 'Derrotero 1849, p. 262: in need anchor outside under Cape Gros in 15 to 17 brazas on sand, sheltered from the southern quadrant; Admiralty 1913, pp. 412 to 413: the outer anchorage in 11 to 13 fathoms, sand and gravel, to be left on the first sign of bad weather (the depths)'
+    says: 'The road outside La Calle, nine fathoms of sand under Cape Gros, to be left at the first sign of a blow from the sea.'
+
+  # ---------------------------------------------------------------------------
+  # Tabarka (the harbour patch tabarka)
+  # ---------------------------------------------------------------------------
+
+  - id: tabarka-island
+    kind: island
+    name: the island of Tabarka
+    modern: 'the island of Tabarka'
+    lat_deg: 36.9600
+    lon_deg: 8.7560
+    height_m: 64
+    extent_m: 400
+    source: 'Purdy 1826, p. 331: a mile and a half round, off the little river Wad el Berber; on its north end a castle with several towers and corn magazines, built by the Genoese; a ledge from the main with two fathoms over its extremity, always breaking; Berard 1837, p. 141: a sterile rock crowned with fortifications; p. 143: joined at its south point to the main by a bank of sand said to have formed on a dyke the Bey''s troops built to take it; pp. 141 to 142: the Lomellini of Genoa''s for several centuries, given up by treachery to the Bey of Tunis in 1738; Admiralty 1913, p. 417: 210 feet, the height'
+    says: 'The island of Tabarka, a barren rock crowned with the Genoese castle and its towers, near joined to the main by a bank of sand on its south side.'
+
+  - id: tabarka-castle
+    kind: castle
+    name: the castle of Tabarka
+    modern: 'the Genoese fort of Tabarka'
+    lat_deg: 36.9620
+    lon_deg: 8.7560
+    height_m: 64
+    source: 'Purdy 1826, p. 331: on its north end a castle with several towers and corn magazines, built by the Genoese; Norie 1831, pp. 352 to 353: the castle with four or five towers, two corn magazines on the main; Smyth 1854, p. 458: the castle, 36 56 25 N, 8 42 19 E'
+    says: 'The Genoese castle of Tabarka with its four or five towers, now the Bey''s.'
+
+  - id: tabarka-road
+    kind: anchorage
+    name: the road of Tabarka
+    modern: 'the anchorage east of Tabarka island'
+    lat_deg: 36.9593
+    lon_deg: 8.7713
+    fix: 'moved 498 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 8
+    bottom: fine sand with weed
+    source: 'Derrotero 1849, pp. 262 to 263: anchor east of the island half a mile off, the main seen past the sentry box of its south point, in 9 or 10 brazas of fine sand mixed with weed, very good holding; good with winds NW, W, S and SE; open NNW, N and NNE; never use the inner channel, a bar of rocks; Berard 1837, p. 142: the east bay for vessels of every size in the fine season, sheltered from the W and NW, 7 to 9 brasses hard sand; the ruined mole with 14 or 15 feet within, where ships came to load corn; Norie 1831, p. 353: ships of 18 or 20 feet draught outside in 8 or 9 fathoms, sheltered in westerlies but not in north or north-north-westerly winds; fire a gun and a pilot comes off; Purdy 1826, p. 331: north-east of the island good sand in 6 or 7 fathoms'
+    says: 'The road east of Tabarka, eight fathoms of fine sand and weed of very good holding, good in a westerly; open to the north, and never try the rocky channel inside the island. Fire a gun and a pilot will come off.'
+
+  - id: cape-negro-tunis
+    kind: headland
+    name: Cape Negro
+    modern: 'Cap Negro'
+    lat_deg: 37.1050
+    lon_deg: 8.9900
+    height_m: 100
+    source: 'Purdy 1826, p. 331: Cape Negro 13 miles NE by E 3/4 E from Tabarca; Norie 1831, p. 352: 13 miles; Berard 1837, p. 144: the Compagnie d''Afrique had a station at Cape Negro from 1604 for grain, wool, hides and wax; the Galita 25 miles north of it; height JUDGEMENT'
+    says: 'Cape Negro, where the French Company had a trading station of old.'
+
+  - id: cape-serrat
+    kind: headland
+    name: Cape Serrat
+    modern: 'Cap Serrat (Ras el Mancher)'
+    lat_deg: 37.2330
+    lon_deg: 9.2100
+    height_m: 185
+    source: 'Purdy 1826, p. 331: five leagues ENE 1/4 E from Cape Negro, with several rocks about it above and under water extending eastward; Berard 1837, p. 144: two rounded hillocks that look like two islands, a bay east of it for small craft; Derrotero 1849, p. 263: ends in little round knolls that from afar seem islands, the nearest point of Africa to the Galita; Smyth 1854, p. 458: 37 13 54 N, 9 10 0 E; Admiralty 1913, p. 419: 607 feet, the height'
+    says: 'Cape Serrat, two round knolls that look like islands from afar, with rocks above and under water off it to the eastward.'
+
+  # ---------------------------------------------------------------------------
+  # The Galita and its rocks, the Sorelle
+  # ---------------------------------------------------------------------------
+
+  - id: galita
+    kind: island
+    name: the Galita
+    modern: 'La Galite'
+    lat_deg: 37.5260
+    lon_deg: 8.9380
+    height_m: 476
+    source: 'Purdy 1826, p. 331: about a league in length, uninhabited, of moderate height; 47 miles NE by E 1/2 E from Cape Bufahal and 25 miles N by E 1/2 E from Cape Negro; Berard 1837, pp. 144 to 145: the east peak, the pic de la Galite, 377 m like a sugar loaf, the highest summit 476 m near the middle; p. 147: often the refuge of pirates and corsairs, and in the wars of the Empire the English cruisers kept look-outs on it; Derrotero 1849, p. 263: very high, the landfall from Bona to Tunis; Admiralty 1913, p. 414: the Sugar-loaf seen isolated at 30 or 35 miles'
+    says: 'The Galita, a high lone island a league long, uninhabited, its eastern peak a sugar loaf; the landfall of the whole coast from Bona to Tunis.'
+
+  - id: galitona
+    kind: island
+    name: the Galitona and the Aguglia
+    modern: 'Galiton de l''Ouest and the Aiguille'
+    lat_deg: 37.4960
+    lon_deg: 8.8820
+    height_m: 158
+    extent_m: 400
+    source: 'Purdy 1826, p. 331: half a league off the south-west end two others, Agugliae; Norie 1831, p. 352: off the SW Galitona and Agulia; Berard 1837, p. 145: SW a mile and a half off, the Galiton of the west and the Aiguille with a third low rock; Smyth 1854, p. 457: Galitona 37 29 45 N, 8 52 54 E; Admiralty 1913, p. 415: Galitona 518 feet, Aguglia 420 (the heights)'
+    says: 'The Galitona and its needle off the south-west end of the Galita; a ship may pass between them and the island.'
+
+  - id: galita-dogs
+    kind: rock
+    name: the Dogs of the Galita
+    modern: 'the Canis of La Galite (Gallo)'
+    lat_deg: 37.5547
+    lon_deg: 8.9582
+    fix: 'moved 391 m to the grid''s shoal head (0.2 m); the rocks above it the grid lacks, a rock of its height'
+    height_m: 20
+    extent_m: 300
+    source: 'Purdy 1826, p. 331: off the NE end some high rocks, the Galitons, with a sunken rock more to the northward; Norie 1831, p. 352: off the NE the Sandfori and the Dog, a sunken rock in 3 fathoms; Berard 1837, p. 145: NE three islets, the Canis, the largest a mile out; Smyth 1854, p. 457: Gallo rock 37 33 7 N, 8 57 38 E; Admiralty 1913, p. 415: a 3 1/4 fathom patch half a mile north of the Canis (the depth); height JUDGEMENT'
+    says: 'The Dogs, three rocky islets off the north-east end of the Galita, with a sunken rock beyond them.'
+
+  - id: galita-road
+    kind: anchorage
+    name: the road of the Galita
+    modern: 'the south bay of La Galite'
+    lat_deg: 37.5139
+    lon_deg: 8.9358
+    fix: 'moved 146 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 10
+    bottom: sand and weed
+    source: 'Purdy 1826, pp. 331 to 332: round the Galitons in 9 or 10 fathoms to within a cable of the east point, then west to the middle of the south coast; anchor off a gray spot of land by the westernmost of two creeks in 10 or 11 fathoms on sandy ground, very near the shore, sheltered from NE, N, NW and W; in northerly gales the sea runs round and heavy gusts come off the peak; Berard 1837, pp. 145 to 146: good all summer, fear only the SW round by S to SE, extremely rare in summer; 10 to 14 brasses sand and weed one or two cables off the shingle beach; p. 146: water in a low grotto east of the great shingle beach'
+    says: 'The road of the Galita off the south shore, ten fathoms of sand and weed close in, sheltered from the north; water in a low cave east of the shingle beach.'
+
+  - id: sorelle
+    kind: ledge
+    name: the Sorelle
+    modern: 'the Sorelle rocks (Avenger shoal)'
+    lat_deg: 37.4452
+    lon_deg: 8.5956
+    fix: 'placed at the grid''s shoal head (0.5 m), 6 km north-west of the first placing by Berard''s bearing and distance; 17 miles W by S of the Galita''s peak'
+    height_m: 0
+    dries_m: -1.5
+    extent_m: 300
+    source: 'Berard 1837, pp. 147 to 148: S 65 30 W of the peak of the Galita 17 1/2 miles, one head with 5 feet of water about a cable across, a second with 4 fathoms a little less than two miles off; the west side steep, the lead falling from 1 to 40 brasses; Purdy 1826, p. 332: 13 miles W 3/4 S from the west end of the Galita, a great depth round; Norie 1831, p. 352: two rocks a mile and a half apart, no warning by the lead, 100 fathoms a mile and a half west; Derrotero 1849, p. 263: 4 feet; Smyth 1854, p. 334: two heads nearly awash, a Tunisian cruiser lost on them in 1820; pp. 81 to 82 and 148 (Berard): the current about them west or south-west a mile an hour, two or three on the danger'
+    says: 'The Sorelle, two sunken heads with five feet on the shoalest, seventeen miles west-south-west of the Galita: the lead gives no warning, and the current sets onto them.'
+
+  # ---------------------------------------------------------------------------
+  # The Fratelli, Cape Blanc and Bizerta (the harbour patch bizerta)
+  # ---------------------------------------------------------------------------
+
+  - id: fratelli
+    kind: island
+    name: the Fratelli
+    modern: 'les Freres (Jazair el Akhouine)'
+    lat_deg: 37.3040
+    lon_deg: 9.4103
+    fix: 'placed on the grid''s islet (6.6 m), 3.3 km east of Smyth''s position (his longitude of 1823 two minutes west)'
+    height_m: 92
+    extent_m: 300
+    source: 'Purdy 1826, p. 331: two rocky islets about two miles from the shore, 10 1/2 miles E 1/2 N from Cape Serrat, 23 or 24 fathoms between them and the shore; Norie 1831, p. 352: two or three rocky islets; Derrotero 1849, p. 265: two enormous rocks cut sheer, the larger pyramidal with a cave, often taken for a ship under sail; Smyth 1854, p. 457: 37 18 14 N, 9 22 24 E; Admiralty 1913, p. 421: 302 and 131 feet (the heights)'
+    says: 'The Fratelli, two great sheer rocks two miles off the shore, the larger often taken for a ship under sail.'
+
+  - id: cape-blanc
+    kind: headland
+    name: Cape Blanc
+    modern: 'Ras el Abiad (Cap Blanc)'
+    lat_deg: 37.3358
+    lon_deg: 9.8500
+    fix: 'moved 25 m to the grid''s land'
+    height_m: 250
+    source: 'Purdy 1826, p. 332: Cape Bianco with its look-out house, which marks the entrance to the lake of Bizerta, 10 miles E by S from Ras al Krun; Norie 1831, p. 352: a watch and signal house; Derrotero 1849, p. 265: an enormous cape with a round summit and a watch tower on it, a great white triangular patch, called the Guard of Bizerta; height JUDGEMENT from the Admiralty 1913, p. 422'
+    says: 'Cape Blanc, the guard of Bizerta, a great round-topped cape with a white patch and its watch house.'
+
+  - id: bizerta
+    kind: town
+    name: Bizerta
+    modern: 'Bizerte'
+    lat_deg: 37.2740
+    lon_deg: 9.8710
+    height_m: 15
+    source: 'Purdy 1826, p. 332: the town on the south-west side of the bay; the port good, and here the Tunisian galleys are laid up; Norie 1831, pp. 351 to 352: about a mile round, defended by several castles and batteries; formerly one of the best ports of Tunis, now seldom frequented but by small vessels; grain principally shipped and exported here; the lake within, its entrance very narrow over a bar; Derrotero 1849, p. 266: walled, joined by a double wall to the citadel on a hill, the Bastion of the Marina on a rock point to the north, a narrow canal from the lake dividing the town; Smyth 1854, p. 93: the Venice of Barbary, two interior lakes, the inner fresh; p. 457: the castle 37 16 36 N, 9 49 20 E'
+    says: 'Bizerta, the Venice of Barbary, walled about its canal from the lake, where the Bey''s galleys are laid up and the corn of the country shipped.'
+
+  - id: bizerta-road
+    kind: anchorage
+    name: the road of Bizerta
+    modern: 'the bay of Bizerte east of the old town'
+    lat_deg: 37.2849
+    lon_deg: 9.8990
+    fix: 'moved 971 m, beyond the rule''s reach, to the nearest water of half the pilot''s depth: the modern port''s works are the grid''s land'
+    height_m: 0
+    depth_fathoms: 8
+    bottom: fine sand and weed
+    source: 'Derrotero 1849, p. 266: open to the NE but an excellent shelter from the NNW round by W to S; anchor east of the Bastion of the Marina in 9 or 10 brazas of fine sand and weed a long mile off; water from the town''s fountains at the canal''s mouth; the coast from Cape Guardia foul, points of rock a quarter mile under water; Purdy 1826, p. 332: anchorage at a distance from shore in 5, 6 and 7 fathoms; Norie 1831, p. 352: fresh water from the rivulet at the bottom of the bay'
+    says: 'The road of Bizerta, eight fathoms of fine sand and weed a long mile east of the Marina bastion, sheltered from the westward and open to the north-east; water from the fountains by the canal.'
+
+  - id: jebel-ishkeul
+    kind: hill
+    name: Jebel Ishkeul
+    modern: 'Jebel Ichkeul'
+    lat_deg: 37.1266
+    lon_deg: 9.6565
+    fix: 'moved 2.9 km to the grid''s summit (391 m in the smoothed grid; the height Smyth''s)'
+    height_m: 533
+    source: 'Smyth 1854, p. 457: Jebel Ishkel, 37 7 12 N, 9 36 0 E, 1,750 feet, the mark for the inner lake'
+    says: 'Jebel Ishkeul, the lone hill beside the inner lake of Bizerta.'
+
+  # ---------------------------------------------------------------------------
+  # The Cani, Cape Farina, Plana and Porto Farina (the harbour patch porto-farina)
+  # ---------------------------------------------------------------------------
+
+  - id: cani-islets
+    kind: island
+    name: the Cani
+    modern: 'les Iles Cani'
+    lat_deg: 37.3530
+    lon_deg: 10.1178
+    fix: 'moved 75 m to the grid''s land'
+    height_m: 20
+    extent_m: 300
+    source: 'Purdy 1826, p. 332: two rocky islets 4 miles NE 5/8 N from Cape Zibeeb, low and dangerous, but a good passage between them and the shore, 13 fathoms in mid-channel shoaling to 5 on each side; Norie 1831, p. 351: very dangerous, several rocks under water about them; Derrotero 1849, pp. 265 to 266: 14 miles east of Cape Blanco, small rocks, keep nearer the coast; Smyth 1854, p. 457: 37 21 12 N, 10 4 15 E, broken ground; Admiralty 1913, p. 433: the larger about 65 feet (the height)'
+    says: 'The Cani, two low rocky islets with rocks under water about them; there is a good passage of thirteen fathoms between them and the shore.'
+
+  - id: cape-farina
+    kind: headland
+    name: Cape Farina
+    modern: 'Ras Sidi Ali el Mekki (Cap Farina)'
+    lat_deg: 37.1780
+    lon_deg: 10.2650
+    height_m: 120
+    source: 'Purdy 1826, pp. 332 to 333: Cape Farina, Plana a low sandy isle two miles from it, 9 fathoms in the channel; Port Farina 3 or 4 miles within it to the SW; Norie 1831, p. 351: a 4 1/2 fathom spot NNE of the cape; Smyth 1854, p. 457: the marabout of Cape Farina 37 10 43 N, 10 14 25 E; height JUDGEMENT'
+    says: 'Cape Farina, the north point of the gulf of Tunis, with the low isle of Plana off it.'
+
+  - id: plana
+    kind: island
+    name: Plana
+    modern: 'Ile Plane (Kamla)'
+    lat_deg: 37.1784
+    lon_deg: 10.3289
+    fix: 'moved 388 m to the grid''s land'
+    height_m: 9
+    extent_m: 500
+    source: 'Purdy 1826, p. 332: a low sandy isle two miles from the cape, 9 fathoms in the channel, to be approached to 4 fathoms all round, rounded in 12 or 10 fathoms with care at night; Derrotero 1849, p. 267: very low, arid, blackish, reefs off its ends halving the channel to about a mile with 5 to 8 brazas; use it only with a fair wind; Smyth 1854, p. 457: Kamla; Admiralty 1913, p. 434: about 29 feet (the height)'
+    says: 'Plana, a low black sandy isle off Cape Farina; the channel inside it is halved by reefs, a passage only with a fair wind.'
+
+  - id: porto-farina
+    kind: town
+    name: Porto Farina
+    modern: 'Ghar el Melh (Porto Farina)'
+    lat_deg: 37.1700
+    lon_deg: 10.1900
+    height_m: 10
+    source: 'Purdy 1826, p. 333: Port Farina 3 or 4 miles within Cape Farina to the SW; Norie 1831, p. 351: a large but shallow inlet that will not admit large vessels, the Medjerdah falling into the sea here; Derrotero 1849, p. 267: vast, sheltered from every wind, but of very little depth; a frigate laid up there in 1826; Smyth 1854, p. 93: Farina or Ghar el Milh, fast filling up with the alluvia of the Majerdah; p. 457: Port Farina, the arsenal, 37 10 10 N, 10 8 10 E'
+    says: 'Porto Farina, the arsenal on its shallow lagoon behind Cape Farina, silting with the river''s floods.'
+
+  - id: porto-farina-road
+    kind: anchorage
+    name: the road of Porto Farina
+    modern: 'the anchorage off Ghar el Melh, south of Cap Farina'
+    lat_deg: 37.1524
+    lon_deg: 10.2469
+    fix: 'moved 1,724 m, beyond the rule''s reach, to the nearest water of half the pilot''s depth: the shore has silted since the period'
+    height_m: 0
+    depth_fathoms: 5
+    bottom: fine sand
+    source: 'Purdy 1826, p. 333: before Port Farina a roadstead nearly as safe and commodious as that of Tunis; Derrotero 1849, p. 267: large ships anchor outside east of the fort on the left-hand point entering, in 5 or 6 brazas of fine sand, a long mile off the beach; p. 269: its water the best of the bay; Admiralty 1913, p. 435: the best anchorage of the gulf south of Cap Farina, open ENE to E (the modern)'
+    says: 'The road of Porto Farina, five fathoms of fine sand a mile off the beach, nearly as safe as Tunis road; the best water of the bay is here.'
+
+  # ---------------------------------------------------------------------------
+  # Cape Carthage, the Goletta and the road of Tunis (the harbour patch la-goletta)
+  # ---------------------------------------------------------------------------
+
+  - id: cape-carthage
+    kind: headland
+    name: Cape Carthage
+    modern: 'Cap Carthage (Sidi Bou Said)'
+    lat_deg: 36.8720
+    lon_deg: 10.3500
+    height_m: 120
+    source: 'Purdy 1826, p. 333: from the east end of Plana Cape Carthage bears S by W 3/4 W six leagues, the road of Tunis four miles SSW of it; p. 334: no sounding with the hand-lead until abreast of the cape, then 20, 18 and 15 fathoms; Derrotero 1849, p. 268: rocks above and under water off the low coast from the cape to the Goletta, especially near the cape; Smyth 1854, p. 457: 36 52 3 N, 10 19 29 E; height JUDGEMENT'
+    says: 'Cape Carthage, the high point above the ruins, the mark for the road of Tunis.'
+
+  - id: cape-carthage-light
+    kind: light
+    name: the light of Cape Carthage
+    modern: 'the lighthouse of Sidi Bou Said'
+    lat_deg: 36.8720
+    lon_deg: 10.3490
+    height_m: 124
+    lit: {from: 1840, until: null, range_nm: 18, character: "revolving once in three minutes"}
+    source: 'Purdy 1840, p. xxxvi: a notice dated Admiralty, 17th June 1840, that the Tunisian government have erected a lighthouse on Cape Carthage, revolving once in every three minutes; Lamberti 1844, p. 229: the light of Tunis on Cape Carthage, seen 18 miles; Smyth 1854, p. 457: light, 406 feet'
+    says: 'The light of Cape Carthage, revolving once in three minutes, seen six leagues.'
+
+  - id: la-goletta
+    kind: castle
+    name: the Goletta
+    modern: 'La Goulette (Halq el Oued), the fort'
+    lat_deg: 36.8180
+    lon_deg: 10.3050
+    height_m: 15
+    source: 'Purdy 1826, p. 328: the Goletta defended by two forts of considerable strength, built by the Spaniards in the reign of Charles V; a small port formed through a canal of stone with at all times 15 feet of water, a due of three Spanish dollars a day to enter it (p. 329); Smyth 1854, p. 92: a narrow fortified channel, the Goletta to seamen, Halk el Wad to the Moors; p. 457: the fort 36 48 25 N, 10 16 40 E; Derrotero 1849, p. 268: a square fortress surrounded by low batteries'
+    says: 'The Goletta, the Spanish forts on the canal into the lake of Tunis, where a ship pays three dollars a day to lie within.'
+
+  - id: tunis-road
+    kind: anchorage
+    name: the road of Tunis
+    modern: 'the bay of Tunis off La Goulette'
+    lat_deg: 36.8260
+    lon_deg: 10.3400
+    fix: 'placed by Purdy''s bearings made true (his magnetic NNE 1/2 E or NE by N for Cape Carthage, NW by W to W for the Goletta, the variation about 17 W then): the cape 10 and the Goletta 254 true; the grid''s 6.1 m, half the pilot''s depth and more (the modern bay shoaler)'
+    height_m: 0
+    depth_fathoms: 5
+    bottom: soft mud
+    source: 'Purdy 1826, p. 334 (W. Smith, about 1817): the best anchorage in 5 to 6 fathoms, soft muddy bottom, Cape Carthage bearing NNE 1/2 E or NE by N and the Goletta castle between NW by W and W; the bay exposed to the NE winds, but they do not blow home, the most sea from NE to ESE; moor the best bower E and the small bower W; a fleet might remain here in the most tempestuous weather, out of reach of the shore''s guns; p. 328: ships loading lie off in 5 to 7 fathoms, good ground, served by lighters; Smyth 1854, pp. 92 to 93: large patches of hard clay that breaks short, not a winter station for heavy ships; Derrotero 1849, pp. 268 to 269: the worst winds of the second quadrant; p. 334: fresh water from a reservoir within the entrance of the Goletta (Purdy; the Derrotero p. 269 finds it worse than Porto Farina''s)'
+    says: 'The road of Tunis, five fathoms of soft mud with Cape Carthage north-north-east and the Goletta west; the north-easters do not blow home, but mind the patches of hard clay, and moor east and west.'
+
+  - id: tunis
+    kind: town
+    name: Tunis
+    modern: Tunis
+    lat_deg: 36.8000
+    lon_deg: 10.1700
+    height_m: 20
+    source: 'Purdy 1826, p. 328: the city six miles west of the gulf behind the lake, mud and stone walls with five gates, above 100,000 people, its casba built by the Spaniards; p. 330: its exports grain of different kinds, oil of various qualities, wool, hides, wax and soap, the wheat excellent but its export at times prohibited; Smyth 1854, p. 92: little short of 150,000; Norie 1831, p. 350: 120,000'
+    says: 'Tunis, the Bey''s great city behind its lake, the mart of the regency''s corn, oil, wool, hides and wax.'
+
+  # ---------------------------------------------------------------------------
+  # Zembra, Zembretta and Cape Bon
+  # ---------------------------------------------------------------------------
+
+  - id: zembra
+    kind: island
+    name: Zembra
+    modern: 'Zembra'
+    lat_deg: 37.1200
+    lon_deg: 10.8050
+    height_m: 433
+    source: 'Purdy 1826, p. 333: Zembra 37 7 N, 10 49 E, 8 leagues SE by E 1/2 E from Plana and 7 miles from Ras al Amar, a good passage between, but an islet and rocks, Zembretta, nearly in mid-channel; p. 334: also high, and may be passed at a mile on any side; Norie 1831, p. 349: a triangular island 11 miles W by N from Cape Bon, uninhabited; Smyth 1854, p. 93: the largest 517 feet; p. 296: the Aigle frigate of 36 guns ran upon Zembra and was wrecked in July 1797; the height the Admiralty 1913''s, p. 445, 1,421 feet (Smyth''s figure much smaller)'
+    says: 'Zembra, a high triangular island at the mouth of the gulf of Tunis; it may be passed at a mile on any side.'
+
+  - id: zembretta
+    kind: island
+    name: Zembretta
+    modern: 'Zembretta'
+    lat_deg: 37.1082
+    lon_deg: 10.8730
+    fix: 'moved 200 m to the grid''s land'
+    height_m: 53
+    extent_m: 300
+    source: 'Purdy 1826, p. 333: an islet and some rocks, Zembratta, nearly in mid-channel between Zembra and the main; Norie 1831, p. 349: a little islet with some rocks, ESE of Zembra; Admiralty 1913, p. 445: 175 feet (the height)'
+    says: 'Zembretta, a little islet with rocks about it nearly in mid-channel between Zembra and the main.'
+
+  - id: cape-bon
+    kind: headland
+    name: Cape Bon
+    modern: 'Cap Bon (Ras Addar)'
+    lat_deg: 37.0800
+    lon_deg: 11.0450
+    height_m: 388
+    source: 'Purdy 1826, p. 334: high, and in clear weather seen at 15 or 16 leagues, at first like an island; the coast west of it to Ras al Amar foul, a rock some distance without the cape; Gauttier''s summit 37 4 45 N, 11 3 45 E; Derrotero 1849, p. 269: a chain of rocks visible and invisible extending it north, give it a wide berth; a square building on it; Smyth 1854, p. 457: the summit tower 37 4 50 N, 11 3 36 E; Admiralty 1913, p. 446: 1,273 feet (the height)'
+    says: 'Cape Bon, high and seen fifteen leagues, at first like an island; a chain of rocks runs off it to the north: give it a wide berth.'
+
+  # ---------------------------------------------------------------------------
+  # The Skerki and Keith's reef
+  # ---------------------------------------------------------------------------
+
+  - id: keiths-reef
+    kind: ledge
+    name: Keith's reef
+    modern: 'the Keith reef, the shoalest of the Skerki bank'
+    lat_deg: 37.9085
+    lon_deg: 11.0137
+    height_m: 0
+    dries_m: 0.0
+    extent_m: 300
+    fix: 'placed at the grid''s shoal head of the bank (0.4 m), 10 km north-east of the Admiralty 1913''s 37 50 N 10 57 E; the pilots put it at 37 50 N, 11 8 to 9 E (Norie 1831, p. 195; Smyth 1854, p. 457), eight minutes east of the grid''s head'
+    source: 'Purdy 1826, p. 332: 5 leagues E by S from the northern Skerki, running nearly east and west, three cables long and 5/8 of a cable broad; its east end partly dry, its west end 2 1/2 to 4 fathoms, 25 to 37 fathoms near it; Norie 1831, p. 195: first discovered by Captain Durban in H.M.S. Weasel in 1802, since explored by Captain W. H. Smyth in 1821; Smyth 1854, pp. 93 and 334: H.M.S. Athenienne, 64, lost on the Skerki in October 1804, 351 officers and men killed or drowned; till then much doubt of the reef''s existence; Admiralty 1913, p. 482: the Keith reef, the shoalest spot of the Skerki bank, nearly awash, 17 fathoms at two cables (the depths)'
+    says: 'Keith''s reef, the shoalest of the Skerki, nearly awash with deep water close round it; the Athenienne was lost on these rocks.'
+
+  - id: skerki
+    kind: bank
+    name: the Skerki
+    modern: 'the Skerki bank, its south-western patches'
+    lat_deg: 37.7683
+    lon_deg: 10.8194
+    height_m: 0
+    dries_m: -2.7
+    extent_m: 800
+    fix: 'placed at the shoalest of the bank''s south-western part in the grid (7.0 m); the Weazle anchored by the southern reef at 37 44 N, 10 45 E (Purdy 1826, p. 332), five miles west-south-west; the 9 feet on the rocks the pilots'''
+    source: 'Purdy 1826, p. 332: two reefs called the Skerki, occupying a space of three miles and a half nearly north and south and one in breadth, a channel a mile wide between them; on the southern 3 fathoms marked but the water found to shoal to 9 feet on the rocks, the bottom seen in 25 to 30 fathoms; found in 1802 by Captain Durban in the Weazle; Norie 1831, p. 195: about 37 46 N, 10 47 E, 9 feet on the rocks; Smyth 1854, p. 457: 37 44 53 N, 10 45 15 E; Admiralty 1913, p. 482: the bank less than 100 fathoms over 36 miles NE and SW (the depths)'
+    says: 'The Skerki, reefs with nine feet on them in the fairway between Sicily and Cape Bon; the bottom may be seen in thirty fathoms.'

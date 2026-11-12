@@ -454,3 +454,41 @@ def test_tarragona_is_a_passage_from_port_mahon_across_the_seam_to_tarragonas_ro
     assert clim.box_at(41.10, 1.25).name == "catalan-coast"
     assert begin(world, sf) >= 10
     assert not [e for e in world.log if e.kind == "order.rejected"]
+
+
+BONA = ROOT / "data" / "scenarios" / "bona.yaml"
+
+
+def test_bona_is_a_passage_from_port_mahon_across_the_seam_to_the_fort_genois():
+    """Package 104 (item 7): the block's scenario on the whole chart, June 1805, a frigate
+    weighing from off the mouth of Port Mahon (the Balearics' patch) for the corn of Bona,
+    its mark the anchorage under the Fort Genois in the Sardinian sea's patch, some two
+    hundred and thirty miles direct across the seam at 4.5 E, where her region and her tide
+    change; Port Mahon, Algiers and the block's ports loaded, Bona neutral to her (the Dey
+    at peace with Britain), every order of her own book taken."""
+    sf = load_scenario(BONA)
+    sc = sf.scenario
+    assert sc.chart == "atlantic-east" and sf.seed == 7 and sc.nation == "britain"
+    assert sc.start_time.year == 1805
+    assert sf.standing_orders == ["data/scenarios/bona.orders"]
+    world = make_scenario_world(sf)
+    chart = world.chart
+    start = world.position
+    assert chart.region_at(start) == "balearics" and chart.level_at(start) == 3
+    assert list(world.dealings.ports) == [
+        "port-mahon",
+        "algiers",
+        "bougie",
+        "stora",
+        "bona",
+        "la-calle",
+    ]
+    assert world.dealings.stance(world.dealings.ports["bona"]) == "neutral"
+    road = chart.find_feature("the anchorage of the Fort Genois")
+    assert road is not None and road.id == "fort-genois-anchorage"
+    assert chart.level_at(road.position) == 3 and chart.region_at(road.position) == "sardinian-sea"
+    _, run_m = bearing_and_distance(start, road.position)
+    assert 215.0 < run_m / 1852.0 < 245.0  # some two hundred and thirty miles direct
+    assert world.tide.blocks_at(road.position) == {"sardinian-sea"}
+    assert begin(world, sf) >= 10
+    assert not [e for e in world.log if e.kind == "order.rejected"]
