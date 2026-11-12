@@ -112,3 +112,13 @@ crew_pool:
   landsman: {hands: 3, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT.
+tracks:
+  to_sea: [puerto-de-naos, 28 55.8 N 13 31.2 W, 28 48.0 N 13 45.0 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 48.0 N 13 45.0 W, 28 55.8 N 13 31.2 W, puerto-de-naos]
+  in: [puerto-de-naos]
