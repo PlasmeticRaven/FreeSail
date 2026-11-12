@@ -931,6 +931,28 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     with its years, in rows that another era's rows can stand beside, never as the one
     picture of 1805 (decision 66's rule for an element, applied to ports).
 
+68. **Slavery is a real fact of the world, told with respect for the history; the player's
+    part in it, if any, is its suppression.** Owner, 2026-11-12, as the charts reached the
+    African coast: "we need to address slavery, at least as far as it's necessary for the
+    context of the period. I'm comfortable with the depiction of anti-slavery efforts, but
+    I'm not particularly interested in the depiction of slaving as an actual gameplay loop";
+    and, ruling: "as long as we keep a grounded and respectful-to-the-history basis, we can
+    include it as a real fact of the world, while acknowledging that we're interested, if in
+    anything, in the depiction of the efforts to suppress it as far as the player is
+    concerned. Ignoring it totally, while the easier and more comfortable option by some
+    amount, is also dishonest to reality." For the briefs from here, until the design note
+    that settles the rest: a port, a coast or a vessel is said to be what the sources say it
+    was, in plain words and with its years, never in the period's dehumanising language;
+    people are never a cargo of the trade the player works (nothing to buy, carry or sell,
+    no price, no profit) and no player and no seated model is put at a slaver's station;
+    the suppression of the trade is what may be played, where and when the law of the day
+    gave it (decision 66's dates); no money is reckoned for a person but the bounty the law
+    gave for freeing one. **Left for the design note and the owner:** what the game says of
+    an enemy slaver taken before the law changed, when the courts of the day treated the
+    people aboard as property (the lead's default: the outcome said in a line and nothing
+    paid for it); captivity under the Barbary regencies as a risk to the player's own
+    people; which treaties and courts are in the data by which year.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
