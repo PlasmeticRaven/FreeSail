@@ -4456,7 +4456,7 @@ merge:** the trial on the trunk clean and lint-clean; no model or vendor name in
 the reading read again by the lead's own probe; the touched files and their neighbours
 (`test_prize_scenarios`, `test_captive`, `test_prizes`, `test_court`, `test_prize_court`,
 `test_in_world`, `test_director`, `test_world_orders`), fast and slow, green on it; the
-whole suite in the cloud dispatched after run 70, the figures to follow.
+whole suite in the cloud, run 71 (2026-11-11, 04:38 to 06:02 UTC, on 746c0bb7): green whole, lint, the six shards and the pace job.
 
 **Package 74 closed:** seven steps and a close-out, truths 7-350 to 7-369: the strike and
 the possession, the prize crew and the prisoners, the parole, the captive player, the
@@ -4519,8 +4519,7 @@ the viewer's geometry tests ran (Node present); ruff clean. **The lead's merge:*
 on 6380cf4f clean and lint-clean; no model or vendor name in the diff (the sweep's three
 hits are words of the old French text); no ship file, no physics, nothing under
 `docs/agents/`; the form's change read on the page; the fast tier whole on it exit 0, 7,467
-passed, 1 xfailed, 508 slow left out, 03:46 to 04:35 UTC; the whole suite in the cloud
-dispatched after run 70, the figures to follow. Next: step 2 (every book's flags drawn),
+passed, 1 xfailed, 508 slow left out, 03:46 to 04:35 UTC; the whole suite in the cloud, run 71 (2026-11-11, 04:38 to 06:02 UTC, on 746c0bb7): green whole, lint, the six shards and the pace job. Next: step 2 (every book's flags drawn),
 then 3 (a hoist's place, drawn on the player's ship), 4 (dress ship), 5 (the days), each at
 its own hash; the builder has them built ahead and unmeasured.
 
