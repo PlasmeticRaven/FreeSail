@@ -4558,16 +4558,20 @@ def at_the_guns(guns, marines):
 def quarter_bill(b, p, guns):
     """Her quarter bill set against the default fit (Indf §6.4): the trimmers what her seamen
     leave when one side's guns, the chasers and the wheel are manned, the marines taking the
-    carronades first, split by the frigate-36's shares; the bill leaves the marines not at the
-    carronades for their division, which the beat to quarters does not (crew/quarters.py; her
-    tests hold what it does at muster)."""
+    carronades first, split by the frigate-36's shares; the bill's `marines` (the 74's stage 0c
+    key, Bel-D §12.1) the marines it leaves for their division, the rest of them, written after
+    the generator's call, which takes no such key, as the 74's module writes hers (the lead's
+    answer of 2026-11-10 at 19:30: the 64's 84 and the razee's 14, so that the beat to quarters
+    forms their divisions and their trimmers meet the bill; crew/quarters.py; her tests hold what
+    it does at muster)."""
     co = COMPANY[p.key]
     seamen = sum(co["seamen"].values())
     men, marines_at = at_the_guns(guns, co["marines"])
     total = seamen - (men - marines_at) - HELM
     trimmers = shares(total, TRIMMER_SHARES)
     fit = DEFAULT_FIT[p.key]
-    REPORT.setdefault(p.key, {})["bill"] = (seamen, fit, men, marines_at, total)
+    kept = co["marines"] - marines_at
+    REPORT.setdefault(p.key, {})["bill"] = (seamen, fit, men, marines_at, total, kept)
     b.quarter_bill(
         g.QUARTER_BILL_NOTE,
         [
@@ -4579,9 +4583,8 @@ def quarter_bill(b, p, guns):
                 "split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of "
                 "44 (Indf §6.4; judgement). The bill leaves the marines not wanted at the "
                 "carronades for their division, as Falconer quarters them on the poop and "
-                "forecastle or gangway (1780, QUARTERS); the beat to quarters (crew/quarters.py) "
-                "takes the marines to the long guns before the topmen (Indf §6.4; the station "
-                "order is the engine's, open for the lead). Of the "
+                "forecastle or gangway (1780, QUARTERS), and keeps them there by its marines "
+                "below. Of the "
                 "forecastlemen, for the head sails and the fore braces (Luce 1884 ch. XX: the "
                 "forecastlemen 'the best older seamen').",
             ),
@@ -4626,6 +4629,19 @@ def quarter_bill(b, p, guns):
         g.FILLING_NOTE + f" Her {g.filling_party(guns)} are the Regulations' quarter gunners of "
         f"the {period.REGULATIONS_COLUMNS[co['column']]} column (p. 165: Ind §4.2), the period's "
         "figure twice over (Indf §5.4)."
+    )
+    b.doc["crew"]["quarter_bill"]["marines"] = kept
+    b.crew_notes[("quarter_bill", "marines")] = (
+        "The marines the bill keeps in their division at the beat (the 74's key, Bel-D §12.1): "
+        + (
+            "all her marines, the default fit carrying no carronade"
+            if not marines_at
+            else f"her marines but the {marines_at} at the default fit's carronades"
+        )
+        + ", quartered on the poop and the forecastle or gangway, at the great guns only in "
+        "distant cannonading (Falconer 1780, QUARTERS), so that the beat forms their division and "
+        "her trimmers meet the bill's; before it the beat took her marines to the long guns before "
+        "the topmen (Indf §6.4)."
     )
 
 
@@ -5067,10 +5083,11 @@ def her_report() -> str:
             plain, scale = r["rope"]
             out.append(f"{key}: plain sail {plain:.0f} m2, her rope's scale {scale:.3f}.")
         if "bill" in r:
-            seamen, fit, men, marines, total = r["bill"]
+            seamen, fit, men, marines, total, kept = r["bill"]
             out.append(
                 f"{key}: the quarter bill on '{fit}': her {seamen} seamen, {men} men at the guns, "
-                f"{marines} of them marines, and {HELM} at the wheel leave {total} trimmers."
+                f"{marines} of them marines, and {HELM} at the wheel leave {total} trimmers; the "
+                f"bill keeps {kept} marines in their division."
             )
         if "upper_works" in r:
             out.append(f"{key}: {r['upper_works']}")

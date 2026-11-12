@@ -19852,8 +19852,8 @@ three local commits on the package's branch after the trunk's merge (1282e25f) a
 a subsection here for each. Measured on the owner's machine at seed 7, the scripts in the session's
 scratch (`rf/rul/`), outside the repository: before on a worktree of 9e04b9fa, after on the tree, each
 script the same on both. Every ship file came out of the generator (`py tools/gen_ships.py` into
-scratch, compared byte for byte); the suites ran once on the three together, recorded with the
-third step.
+scratch, compared byte for byte); the suites ran once on the three together ("The suites, as run",
+the last subsection).
 
 ### 1. The bilander's short watch, and "make all sail" (09:55 (1) and (6))
 
@@ -20071,6 +20071,126 @@ other file's and evolution's its own, and refused in words
 64); from rest in truth 28's form
 (`test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their_lee_helm`, both); the four
 sailed ones slow (24.0, 21.9, 12.7 and 13.1 s at four workers; `tests/conftest.py`'s `SLOW_TESTS`).
+
+### 3. B1: the 64's and the razee's `marines`, and the design note's words (19:30)
+
+**The ruling.** "The 64's and the razee's `marines` (84 and 14 would form their divisions and meet
+their bills exactly): BUILD with step 7 as a generator's change to B1's two files, each file's beat
+old beside new, and say whether any recorded passage of the 64's moves (a line every ship of two
+decks may say)." And (2): "The mizen course's tack: as built, 9 ft above the poop ... the design's
+'quarterdeck' was the slip. Steel's 'within 6 or 7 feet' stays in the note as the general rule beside
+it. Mend the design note's words".
+
+**As built** (`tools/ships/indefatigable.py`): `quarter_bill` writes the bill's `marines` after the
+generator's call, as the 74's module writes hers, each file's marines less its default fit's
+carronades' crews (`at_the_guns`): the 64's **84** (her 'ardent class 1784' carries no carronade),
+the razee's **14** (her 'as carried 1796' carronades take 36 of her 50), each with a note; the
+forecastle trimmers' note no longer says the beat takes the marines to the long guns; the generator's
+report adds "the bill keeps 84 (14) marines in their division". Both files by the generator, the
+64's two lines (the key and its note) and the note's words, the razee's the same; every other file
+byte for byte.
+
+*The beat at muster, every fit* (`Quarters.beat`, seed 7, `tests/test_brains.py`'s world off the
+Lizard; old beside new):
+
+| File, fit | Crews filled | Marines at the long guns | at the carronades | in their division | Trimmers |
+|---|---|---|---|---|---|
+| the 64, 'ardent class 1784' (default) | 32 of 32, both | 84 → **0** | 0 → 0 | 0 → **84** | 137 → **53** |
+| the 64, 'ardent class 1794' | 36 of 36 → **33 of 36** | 76 → **0** | 8 → **0** | 0 → **84** | 121 → **53** |
+| the razee, 'as carried 1796' (default) | 24 of 24, both | 18 → **0** | 32 → **36** | 0 → **14** | 93 → **79** |
+| the razee, 'as razeed 1795' | 22 of 22 → **19 of 22** | 46 → **0** | 4 → **12** | 0 → **38** | 89 → **79** |
+
+The helm 2 and the powder 29 (the razee's 22) on each, old and new. Their lines, old beside new: the
+64's "Beat to quarters! Quarters: 32 gun crews manned, the trimmers 137, the helm 2, the powder 29."
+now "... the trimmers 53, the helm 2, the powder 29, the marines 84.", her four deck lines as before
+man for man; the razee's "... 24 gun crews manned, the trimmers 93, the helm 2, the powder 22." now
+"... the trimmers 79, the helm 2, the powder 22, the marines 14.". On the default fits the divisions
+form and the trimmers meet the bills, 53 and 79, as B7 measured with the key in memory. **For the
+lead:** the key is the bill's, set against the default fit as the trimmers are, and on the other fit
+of each the long guns now take no marine where her seamen run short: the 64's 'ardent class 1794'
+leaves her lower deck's No. 13 8 of 11 and her upper deck's No. 13 and her poop's No. 3 unmanned
+("Not hands enough for every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand
+unmanned."), the razee's 'as razeed 1795' her Nos. 12 and 13 unmanned and No. 17 1 of 7 ("... the
+guns, Nos. 12 to 13 and 17 stand unmanned."), where before both filled every crew with marines at the
+long guns. Falconer's marines at the great guns "only in distant cannonading" is the engine's rule
+since B7.b; a key by fit, or the long guns taking marines where the seamen run out, is yours. The
+74's three fits fill every crew with hers (B7.b), her company larger.
+
+**Whether a recorded passage of the 64's moves:** none holds her or the razee. No shipped scenario
+names a ship of the line, and the business draws none (B7.e's finding, looked for again: outside
+the ships' own files and their people no file of `data/` names one, the captains' books but for the
+rank-4 rule's knob); the pinned passages are the frigate's, the schooner's and the merchant's (the
+known truths' gates, the captain's trials, the regatta and the replays); the four whole logs are as they were
+and no captain's trial moves for this step ("The suites, as run"). **Lines any ship may say that this
+changes:** the two files' alone, at quarters: the "Beat to quarters!" line and the readings of their
+quarters (their trimmers and their marines' division), and what follows from who is at quarters
+(the sail work's hands at quarters, `Runner._quarters_pool` and the robbing's line, the marines'
+muskets); on the other fit of each, the line of the guns unmanned. A ship of two decks says them
+only where her file carries the key: the 74's since B7.b, now the 64's.
+
+**(2) The design note's words** (`docs/design/Design-Ship-Bellerophon.md`): the rows of "How the two
+drafts were judged" and "Decisions taken" (item 11) (the tack 9 ft above the deck the mast stands through, the poop, the design's "quarterdeck" the
+slip, Steel's "within 6 or 7 feet" beside it), §4.5's tack (the deck named the poop, the figures as
+built, the quarterdeck's arithmetic kept and marked as the slip's), its "Plainly" (Steel's rule kept
+as the general rule beside the built figure; the clew figures marked as taken from the quarterdeck),
+a ruled note after its as-built note, §4.6's jaws (the same deck), and §17.2 item 13's question
+pointed to the ruling. Nothing built moves: the file's tack has stood 9 ft above the poop since B7.
+
+**Pins moved, old beside new** (each in its test's words): `tests/test_indefatigable.py`, the beat
+at muster on the default fits (the marines at the long guns 84 and 18 to none, the divisions none to
+84 and 14, the trimmers 137 and 93 to 53 and 79) and the generator's report's two bill lines (now
+with the marines kept); `tests/test_bellerophon.py`, `BEAT_LINE`'s two rows (the 64's and the
+razee's, old in the comment) and the one-gun-deck test's razee (her division 14, where none);
+`tests/test_bill_marines_and_flag.py`, the keyless files (the 64's and the razee's out of them: they
+carry the marines and no flag) and the pickled bill read back (the 64's, its marines left out, as a
+pickle from before the stage). **New:** `tests/test_indefatigable.py`, the other fits' beats
+(`test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short`).
+
+### The suites, as run (the three steps together)
+
+Once, on the final tree (9e04b9fa with the three steps uncommitted), from the tree root with `py`,
+one run at a time with nothing else running, the tree asserted first on `sys.path`
+(`freesail.__file__` under FreeSail-pkg-75), each pytest with `-n 4 -p no:cacheprovider -o
+addopts="--dist loadgroup"` (`scratchpad/rf/rul/run/run.sh`); the bases not run again: the fast and
+slow junits at e4797779 (`b7e/final-fast.xml`, `b7e/final-slow.xml`), the four whole logs as at
+e4797779 (b7e's record), and the captain's trials as run on 9e04b9fa before any change.
+
+- **The generator,** `py tools/gen_ships.py` into scratch: eighteen of eighteen files byte for byte
+  as in `data/ships/`, the 74's, the 64's and the razee's as these steps write them.
+- **The files** (`--slow`: every touched test file, `test_bilander`, `test_settee`,
+  `test_bellerophon`, `test_indefatigable`, `test_gale`, `test_lying_to`, `test_in_world`,
+  `test_hands`, `test_bill_marines_and_flag`, and the files the steps could reach: `test_catalogue`,
+  `test_evolutions`, `test_profile`, `test_profiles`, `test_neufchatel`, `test_schooner_mast`,
+  `test_orders`, `test_ships`, `test_lee_ports`, `test_driver`, `test_subtypes`, `test_brains`,
+  `test_captains`, `test_practice_orders`, `test_view_geometry`, `test_view_action`,
+  `test_viewer_action`, `test_hull_form`, `test_magazine`, `test_rig_classing`, `test_wardroom`; 30
+  files): **3,647 passed, 1 failed, 1 xfailed** (779 s). Against the base's junits restricted to these files (3,568 cases): one
+  outcome changed, truth 7-196's crewed clause, passed to failed on S2's 5.62 miles, the trunk's
+  (B7.e and the trunk's merge, item 3), as found; only in the base, six: the five named above as
+  moved (the larboard wear's case, the default fits' beat under their old parameters, the 64 and the
+  razee out of the keyless files) and the trunk's removed alone-pace test; only in this run, 87:
+  these steps' 15 (the default fits' beat two of them, under their new parameters), the trunk's 57
+  (package 98's viewer cases in `test_view_action`, 56; package 74's bearing check, 1), and the slow
+  cases of `test_hands` (9) and `test_lying_to` (6), outside the base's slow list, all passed; the
+  xfail the same.
+- **The four whole logs** (`log_digests.py`): all four as at e4797779 in every field (the first
+  action 497 lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the station's lee shore
+  1,561, e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08), and as on 9e04b9fa before
+  any change: the trunk's merge moved none of them.
+- **The captain's trials** (`--slow`): 5 passed, 3 failed (325 s), as on 9e04b9fa before any
+  change outcome for outcome; two on the machine's digests as there and at e4797779 (the station's
+  gale 1e59009004141b08, the trade's thick weather 41a37f0290be291a), and the trade's stranger on
+  0b430d261669ba5a there and **13432e4b2659bcaf** here: ruling (6)'s three lines (subsection 1),
+  its pin the build machine's to take again.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files). Every
+  changed file LF with a final newline.
+
+Measured besides, before and after: her gale (B4's script) line for line; the schooner's recorded
+passage of gate 5b line for line (on this machine); "make all sail" in every sailing file; "heave
+to" on B7's path digest for digest on both two-deckers. Not run: the whole fast tier and the slow
+candidates beyond these files (the steps reach the bilander's settee work, three files' "make all
+sail", the two two-deckers' lie a-try and their beat, each measured and looked for above); the pace
+tier.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

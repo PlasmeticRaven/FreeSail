@@ -36,7 +36,10 @@ SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
 # the files that carry neither key: every file but the 74's, whose step 4 writes both (her bill's
 # marines and her flag party: Design-Ship-Bellerophon.md §6.3, §17.0), held in tests/
 # test_bellerophon.py (old: every file on the shelf)
-KEYLESS_FILES = [p for p in SHIP_FILES if p.name != "seventy-four.yaml"]
+# the files whose bills carry the marines: the 74's since her step 4, the 64's and the razee's since
+# the lead's answer of 2026-11-10 at 19:30 (B1's module)
+KEYED_FILES = ("seventy-four.yaml", "sixty-four.yaml", "razee-44.yaml")
+KEYLESS_FILES = [p for p in SHIP_FILES if p.name not in KEYED_FILES]
 # the pickled states' keys before the stage, in their order
 BILL_STATE = ["trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling"]
 CREW_STATE = [
@@ -76,9 +79,11 @@ def test_the_marines_key_is_the_bills_last_and_the_flags_posts_are_the_posts_for
 
 @pytest.mark.parametrize("path", KEYLESS_FILES, ids=[p.stem for p in KEYLESS_FILES])
 def test_no_file_carries_either_key_and_each_pickles_as_before(path):
-    """Inert: every file on the shelf but the 74's reads no division kept and no flag party, and
-    her bill's and her crew's pickled states hold the keys they held before the stage, in their
-    order. The 74's file carries both since her step 4 (old: every file on the shelf)."""
+    """Inert: every file on the shelf but the 74's, the 64's and the razee's reads no division kept
+    and no flag party, and her bill's and her crew's pickled states hold the keys they held before
+    the stage, in their order. The 74's file carries both since her step 4 (old: every file on the
+    shelf); the 64's and the razee's the marines since the lead's answer of 2026-11-10 at 19:30,
+    and no flag."""
     crew = load_ship(path).spec.crew
     if crew is None:
         return
@@ -94,11 +99,18 @@ def test_no_file_carries_either_key_and_each_pickles_as_before(path):
 
 
 def test_a_bill_and_a_crew_pickled_before_the_stage_read_their_plain_defaults():
+    """The 64's bill and crew pickled with the keys they held before the stage. Her bill carries
+    the marines since the lead's answer of 2026-11-10 at 19:30 (84): the bill read back is hers
+    with none kept."""
+    import dataclasses
+
     crew = load_ship(SIXTY_FOUR).spec.crew
     was_bill = QuarterBillSpec.__new__(QuarterBillSpec)
     was_bill.__dict__.update({k: copy.deepcopy(getattr(crew.quarter_bill, k)) for k in BILL_STATE})
     was_bill = pickle.loads(pickle.dumps(was_bill))
-    assert was_bill.marines is None and was_bill == crew.quarter_bill
+    assert crew.quarter_bill.marines == 84
+    assert was_bill.marines is None
+    assert was_bill == dataclasses.replace(crew.quarter_bill, marines=None)
     was_crew = CrewSpec.__new__(CrewSpec)
     was_crew.__dict__.update({k: copy.deepcopy(getattr(crew, k)) for k in CREW_STATE})
     was_crew = pickle.loads(pickle.dumps(was_crew))

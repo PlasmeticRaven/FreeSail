@@ -860,6 +860,24 @@ check on both files (*settled by `Build-Ships.md` §4.1*: no builder edits a sha
   records whether every gun crew fills, how many marines go to the carronades, and the marines'
   division left. That answers Eng §8's item 6 on her own figures.
 
+*The bills' `marines`, at the lead's answer of 2026-11-10 at 19:30 (built 2026-11-12, B1's module
+through the generator): the 74's key (Bel-D §12.1) on both bills, each file's marines less the
+default fit's carronades' crews, **84** (the 64's, no carronade) and **14** (the razee's, 36 at her
+carronades), written after the generator's call with a note, as the 74's module writes hers. The
+beat at muster (seed 7, `tests/test_brains.py`'s world), old beside new, on the default fits: the
+64 fills her 32 crews as before, no marine at a long gun (old 84 there), her division 84 (none) and
+her trimmers 53, the bill's (137): "Quarters: 32 gun crews manned, the trimmers 53, the helm 2, the
+powder 29, the marines 84." with her deck lines as before; the razee fills her 24, her carronades'
+36 marines (32) and none at a long gun (18), her division 14 (none) and her trimmers 79, the bill's
+(93): "Quarters: 24 gun crews manned, the trimmers 79, the helm 2, the powder 22, the marines 14."
+**For the lead:** the key is set against the default fit, as the trimmers are, and on the other fit
+of each the long guns now take no marine where her seamen run short: the 64's 'ardent class 1794'
+fills 33 of her 36 crews (the lower deck's No. 13 8 of 11, the upper deck's No. 13 and the poop's
+No. 3 unmanned; old 36 of 36, 76 marines at the long guns), and the razee's 'as razeed 1795' 19 of
+22 (Nos. 12 and 13 unmanned, No. 17 1 of 7; old 22 of 22, 46 marines at the long guns), the beat
+saying "Not hands enough for every gun: ... stand unmanned."; a key by fit, or the long guns
+taking marines where the seamen run out, is yours. No recorded passage holds either ship.*
+
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores

@@ -2079,7 +2079,10 @@ ARMED = (
 )
 # Each armed file's beat at muster, its first line, as it was before her bill by deck and as it
 # is (measured at seed 7 in tests/test_brains.py's world, the code before B7.b and after, line
-# for line and man for man): none of them carries the bill's `marines`, so none keeps a division.
+# for line and man for man): none of them carried the bill's `marines`, so none kept a division.
+# Since the lead's answer of 2026-11-10 at 19:30 the 64's and the razee's bills carry it (84 and
+# 14, B1's module), their lines with their divisions (old: "32 gun crews manned, the trimmers 137,
+# the helm 2, the powder 29" and "24 gun crews manned, the trimmers 93, the helm 2, the powder 22")
 BEAT_LINE = {
     "data/ships/brig.yaml": "ten gun crews manned, the trimmers 42, the helm 2, the powder 13",
     "data/ships/cutter.yaml": "three gun crews manned, the trimmers 9, the helm 1, the powder 4",
@@ -2093,9 +2096,13 @@ BEAT_LINE = {
     "data/ships/privateer-schooner.yaml": (
         "seven gun crews manned, the trimmers 11, the helm 1, the powder 3"
     ),
-    "data/ships/razee-44.yaml": "24 gun crews manned, the trimmers 93, the helm 2, the powder 22",
-    SIXTY_FOUR: "32 gun crews manned, the trimmers 137, the helm 2, the powder 29",
+    "data/ships/razee-44.yaml": (
+        "24 gun crews manned, the trimmers 79, the helm 2, the powder 22, the marines 14"
+    ),
+    SIXTY_FOUR: "32 gun crews manned, the trimmers 53, the helm 2, the powder 29, the marines 84",
 }
+# the files whose bills keep their marines in their division (the 74's is her own test's)
+MARINES_KEPT = {"data/ships/razee-44.yaml": 14, SIXTY_FOUR: 84}
 # The 64's deck lines, new beside her old beat, which had none (B7.b item 2, keyed on two gun
 # decks: the lead's answer (2))
 SIXTY_FOURS_DECK_LINES = [
@@ -2169,7 +2176,9 @@ def test_her_beat_says_her_decks_and_the_64s_with_her():
     """B7.b item 2 (Bel-D §6.4): on a ship whose broadside guns stand on the lower and the upper
     deck, the beat says each deck's crews and men, from below, the poop as "the poop": hers on
     the default fit, and the 64's, old beside new (her old beat had no deck line; her crews and
-    divisions man for man as before, the lines alone new: measured)."""
+    divisions man for man as before, the lines alone new: measured). Her bill's `marines`, 84
+    since the lead's answer of 2026-11-10 at 19:30, keeps her division at the beat (the first
+    line's "the marines 84"); her deck lines as they were, man for man."""
     _w, said, q = _beaten(SEVENTY_FOUR)
     lines = q.describe()
     assert lines[1:6] == [
@@ -2195,7 +2204,8 @@ def test_nothing_of_a_one_gun_deck_file_moves_at_the_beat(path):
     the razee): its beat as it was, line for line (`BEAT_LINE`, measured before B7.b and after:
     every crew's men and every division the same, man for man); no deck line; no crew keeping a
     deck, so that its quarters pickle as before (measured byte for byte); no marines' division,
-    since its bill has no `marines`."""
+    since its bill has no `marines`; the razee's, since the lead's answer of 2026-11-10 at 19:30,
+    her bill's 14 (old: no division, the trimmers 93)."""
     from freesail.crew.quarters import MARINES
 
     _w, said, q = _beaten(path)
@@ -2203,8 +2213,9 @@ def test_nothing_of_a_one_gun_deck_file_moves_at_the_beat(path):
     assert q.describe()[0] == f"Quarters: {BEAT_LINE[path]}."
     assert not any(line.startswith("The ") and " deck: " in line for line in q.describe())
     assert all(gc.deck is None and "deck" not in gc.__getstate__() for gc in q.crews.values())
-    assert getattr(load_spec(path).crew.quarter_bill, "marines", None) is None
-    assert not q.divisions.get(MARINES)
+    kept = MARINES_KEPT.get(path)
+    assert getattr(load_spec(path).crew.quarter_bill, "marines", None) == kept
+    assert len(q.divisions.get(MARINES) or ()) == (kept or 0)
 
 
 def _old_rob_order(gc, bearing_fwd):

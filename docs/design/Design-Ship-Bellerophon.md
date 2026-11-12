@@ -85,7 +85,7 @@ orders.
 | The displacement band's citation | corrected | Bel §3.2.5 prints 2,530-2,600 t at WL1. The buildability draft cited its own conversion of the tons of 35 (2,515-2,584 t) to Bel. Both conversions are given (§2.1) |
 | The topgallant masts | fidelity: Steel p. 42's long pole-head, put to the owner for both ships | The OCR (vol. I l. 2934-2942, 4701-4702) bears the reading: a pole-head is set up from the stop, a long one two-thirds of the length to it |
 | The mizen topgallant mast | buildability (Steel's 24-6 × 0.973) | The rule for a mast Table 10 lacks; the room table re-measured on it here |
-| The mizen course's tack | neither: 9 ft above the quarterdeck, where I32's throat (about 42 ft above it) less Steel's 11-yard fore leech puts it | The fidelity draft's 6 ft 6 in (Steel's general "within 6 or 7 feet"; B1's `MIZEN_TACK_ABOVE_DECK_FT = 6.5`) ends the course's level foot inside her judged poop, and leaves her driver failing both of Ext §17.2's checks (§4.5, §4.6). The buildability draft's "3 ft, as the 64's" was stale |
+| The mizen course's tack | neither: 9 ft above the deck the mast stands through, her poop (written "quarterdeck" here at first, the slip: the lead's ruling (2) of 2026-11-10), where I32's throat (about 42 ft above it) less Steel's 11-yard fore leech puts it; Steel's general "within 6 or 7 feet" beside it | The fidelity draft's 6 ft 6 in (Steel's general "within 6 or 7 feet"; B1's `MIZEN_TACK_ABOVE_DECK_FT = 6.5`) ends the course's level foot inside her judged poop, and leaves her driver failing both of Ext §17.2's checks (§4.5, §4.6). The buildability draft's "3 ft, as the 64's" was stale |
 | The driver's boom | neither, corrected | Both drafts took Ext §17.2's jaws (2.7 m above the quarterdeck, measured on I32's 42-ft throat) beside a course whose throat stood 2½ ft lower. The throat is the course's, so Steel's fore leech puts the jaws at the course's tack. On I32's throat the boom must be raised about 5¼ ft to clear the judged poop by 6 ft; task 5 measures the poop before the cut (§4.6) |
 | The fits | buildability's (the 1812 fit of 78 pieces), with fidelity's forecastle 9s of 8 ft 6 in | The owner chose the *Bellona*'s list of 78. The fidelity draft mounted 76, leaving out two 12-pdr carronades by judgement under "Plainly" alone |
 | The fits' names | buildability | The "ardent class 1784" precedent |
@@ -118,7 +118,7 @@ orders.
 | 8 | Masts and yards: *Dragon*'s (Lavery p. 19, Table 10), her class's own; Steel 1794 p. 49's 74 column where Table 10 lacks a spar, a mast scaled 0.973 and a yard 1.00 | The ladder (S before R); Bel §13.4 |
 | 9 | **Topgallant masts with Steel's long pole-head set up above their listed length**; the topgallants and royals cut to the spars so read | Steel 1794 vol. I pp. 41-42 (§4.2). Put to the owner for both ships (§17.1 item 2) |
 | 10 | Sails: Steel's table IV, 74 column, unscaled; Lavery's Table 15 (1773) the check | Her yards are Steel's within 1% (Bel §13.4) |
-| 11 | The mizen course on its lateen yard through `mizen_yard.py`; the yard 86 ft 6 in; the tack 9 ft above the quarterdeck, under I32's throat | Ext §2, §3.4, §17.2; Bel §13.5 (§4.5) |
+| 11 | The mizen course on its lateen yard through `mizen_yard.py`; the yard 86 ft 6 in; the tack 9 ft above the poop, the deck the mast stands through ("the quarterdeck" here at first, the slip), under I32's throat | Ext §2, §3.4, §17.2; Bel §13.5 (§4.5) |
 | 12 | Steel's driver boomsail through `mizen_yard.driver()`, unscaled; its boom 70 ft 6 in; its jaws set by her measured poop and taffrail | Ext §17.2, §17.8 (§4.6) |
 | 13 | Spritsail and sprit-topsail yards through `spritsail_yards.py`, out of "plain sail" | D8 (b); Ext §4.1 |
 | 14 | Three fits: "arrogant class 1793" (74 pieces), **"arrogant class 1795"** (82, the default), "as the bellona 1812" (78) | Answer 3 as revised (Bel §13.5); names for the lead |
@@ -752,14 +752,19 @@ cut to her yards is Steel's.
 - **The sail** `mizzen.course`: class `lateen`, `cut_at_mast: true`, roles `yard` and `mast`, cut
   by `mizen_yard.py` from Steel's cloths and leeches (16 and 17 cloths; fore leech 11 yd, after
   leech 21 yd): about 138 m², its head rising 30 ft over 30 ft (Ext §2's table, measured there).
-- **Its tack** 9 ft above her quarterdeck at the mizen, so that the throat stands where Lavery's
-  I32 draws it, about 42 ft above the deck (measured by eye on the owner's photograph: Ext §2,
-  §17.1), with Steel's 11-yard fore leech below it. The quarterdeck there stands 5.58 m above her
-  water (18.6 ft above WL1, interpolated between 19.24 ft aft and 17.72 ft at 60 ft: measured
-  here), so the tack stands 8.32 m above her water (27.6 ft above WL1) and the throat about 15.2 m
-  above the datum. Ext §17.2's figures for her driver were measured on this throat.
+- **Its tack** 9 ft above the deck the mast stands through at the mizen, so that the throat
+  stands where Lavery's I32 draws it, about 42 ft above that deck (measured by eye on the owner's
+  photograph: Ext §2, §17.1), with Steel's 11-yard fore leech below it. That deck is her poop:
+  task 5 measured the poop over the mizen (§3.5), and the tack stands 10.24 m above her water, the
+  throat 20.30 m (as built, below). *Corrected (the lead's ruling (2) of 2026-11-10 at 19:30):
+  this bullet first named the deck her quarterdeck, the slip; the 9 ft is I32's throat less
+  Steel's fore leech, measured from the deck the mast stands through. On her quarterdeck, 5.58 m
+  above her water there (18.6 ft above WL1, interpolated between 19.24 ft aft and 17.72 ft at 60
+  ft: measured here), it put the tack 8.32 m above her water (27.6 ft above WL1) and the throat
+  about 15.2 m above the datum, on which Ext §17.2's figures for her driver were measured.*
 - **Plainly:** Steel has the fore leech "attached to the mizen-mast within 6 or 7 feet of the deck"
-  (OCR l. 11441-11442), a rule for every ship, and B1's 64 takes 6 ft 6 in
+  (OCR l. 11441-11442), a rule for every ship, kept here beside her 9 ft as the general rule (the
+  lead's ruling (2) of 2026-11-10 at 19:30), and B1's 64 takes 6 ft 6 in
   (`MIZEN_TACK_ABOVE_DECK_FT = 6.5`, `indefatigable.py:398`). The drawing of her class's mizen is
   taken before his general words, for two reasons on her own profile (measured here,
   `probe/mend_figs.py`, the poop judged as §3.5). Cut by B1's rule, the foot level at the tack
@@ -767,7 +772,9 @@ cut to her yards is Steel's.
   1.4 ft inside her judged poop deck there, at 9 ft about 1.1 ft clear of it. And the driver,
   whose throat is the course's (Ext §17.2), cannot be cut within Ext §17.2's checks under the
   lower throat (§4.6). Steel's 6 ft 6 in and the 2½ ft between go in the note; task 5's poop
-  checks the clew again (§1.5). The course's corners are physics: the higher tack lifts its centre
+  checks the clew again (§1.5). (Those clew figures were taken from the quarterdeck, the slip
+  above; from the poop the course's foot stands 2.32 m over it at the least, and Steel's 6 ft 6 in
+  above the poop 1.56 m: the as-built note below.) The course's corners are physics: the higher tack lifts its centre
   by 0.76 m, recorded in her polar notes.
 - One reef band; canvas No. 2; one unsided sheet to the taffrail, one tack; the storm mizzen
   `in_place_of` it.
@@ -782,6 +789,12 @@ line at the mast, 10.24 m above her water**, the throat 20.30 m, the foot 2.32 m
 the least; 137 m², its centre 17.7 m. The other readings, in the generator's report: 9 ft above the
 quarterdeck as written here, the tack 8.33 m and the foot 0.42 m over the poop's middle line;
 Steel's 6 ft 6 in above the poop, 9.48 m and 1.56 m. The lead's to rule.*
+
+*Ruled (the lead's (2) of 2026-11-10 at 19:30): as built, 9 ft above the poop. The design's 9 ft
+was I32's throat less Steel's fore leech, measured from the deck the mast stands through; that
+deck is the poop, so the design's own derivation gives the built figure, and its "quarterdeck" was
+the slip. Steel's "within 6 or 7 feet" stays as the general rule beside it. The words above
+mended so (package 75, B1's marines step, 2026-11-12); nothing built moved.*
 
 ### 4.6 The driver (Ext §17; the owner's choice)
 
@@ -802,8 +815,9 @@ driver; no driver unless the course is cut at the mast):
 **The jaws' height, set by her measured poop (task 5).** Ext §17.2 fixes the boom's height first,
 clear of the quarterdeck rail, the roundhouse and the taffrail, and cuts the sail to it. The
 driver's throat is the course's, and its fore leech at Steel's 11 yards is the course's too, so
-Steel's leech puts her jaws at the course's tack: 9 ft (2.74 m) above her quarterdeck at the
-mizen, 27.6 ft above WL1 (§4.5), as Ext §17.2 found on I32 (about 2.7 m). Against her profile
+Steel's leech puts her jaws at the course's tack: 9 ft (2.74 m) above the deck the mast stands
+through, written here her quarterdeck at the mizen, 27.6 ft above WL1 (§4.5; the poop as built and
+ruled, the quarterdeck the slip), as Ext §17.2 found on I32 (about 2.7 m). Against her profile
 (measured, Bel §3.3, ±0.2 ft on the rails; the poop judged, §3.5; measured here):
 - the taffrail stands 28.1 ft above WL1, so a level boom at Steel's leech passes about 6 in under
   its top;
@@ -1168,6 +1182,12 @@ powder 31 on each: §6.3's arithmetic to the man. The 64's and the razee's bills
 at their marines less their carronades' crews (84 and 14), a division of 84 and 14 forms, every crew
 fills, and their trimmers come to their bills' 53 and 79 exactly (measured, for the lead's answer (1):
 the key on their bills is the lead's to place).*
+
+*Placed (the lead's answer of 2026-11-10 at 19:30, built 2026-11-12): B1's module writes the key on
+both bills, 84 and 14, through the generator; on their default fits the beat forms their divisions
+and their trimmers meet their bills, 53 and 79, as measured here; on their other fits the long guns
+take no marine and three crews go short on each (`Design-Ship-Indefatigable.md` §6.4, for the
+lead).*
 
 ### 6.4 The bill by deck (answer 9): what is built, B7.b
 
@@ -2269,7 +2289,8 @@ quarters (recorded); her scenario's round trip and first hour (B6's tests).
 12. **The close-hauled gap** against the *Bellona*'s reports (9-10 kn against the engine's about 7½),
     which the frigate's file likely shares: book it to a later package of the physics?
 13. **The mizen course's tack, and the driver's jaws** (§4.5, §4.6). Her tack at 9 ft above the
-    quarterdeck, under I32's throat, against Steel's general 6 or 7 ft and the 64's 6 ft 6 in: at
+    quarterdeck (the poop, the deck the mast stands through: the lead's ruling (2) of 2026-11-10 at
+    19:30, §4.5), under I32's throat, against Steel's general 6 or 7 ft and the 64's 6 ft 6 in: at
     6 ft 6 in her course's clew ends inside her judged poop and her driver fails both of Ext §17.2's
     checks. On I32's throat both hold, the after leech by 0.10 m. If the measured poop breaks a
     check: less head room (to 5 ft), a driver cut more than 10% under Steel's area, or `DRIVER =

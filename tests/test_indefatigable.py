@@ -834,11 +834,11 @@ def test_the_generators_report_prints_what_her_notes_no_longer_carry(tmp_path):
         assert (ROOT / path).read_bytes() == (tmp_path / Path(path).name).read_bytes()
     assert (
         "her 351 seamen, 296 men at the guns, 0 of them marines, and 2 at the wheel leave 53"
-        in said
+        " trimmers; the bill keeps 84 marines in their division." in said
     )
     assert (
         "her 238 seamen, 193 men at the guns, 36 of them marines, and 2 at the wheel leave 79"
-        in said
+        " trimmers; the bill keeps 14 marines in their division." in said
     )
     assert "razee: her taffrail 7.15 m above her water" in said
     assert "sixty-four: mizen course: tack 8.73 m above her water, 6.5 ft above" in said
@@ -1187,17 +1187,22 @@ def test_her_companies_hold_the_regulations_columns(sixty_four, razee):
 
 
 @pytest.mark.parametrize(
-    "path, marines, at_long_guns, trimmers",
-    [(SIXTY_FOUR, 84, 84, 137), (RAZEE, 50, 18, 93)],
+    "path, at_carronades, division, trimmers",
+    [(SIXTY_FOUR, 0, 84, 53), (RAZEE, 36, 14, 79)],
 )
 def test_her_quarters_at_the_beat_fill_every_gun_and_leave_the_trimmers_measured(
-    path, marines, at_long_guns, trimmers
+    path, at_carronades, division, trimmers
 ):
     """Indf §6.4 and §16 item 5: `Quarters.beat` measured at muster on each default fit (the
-    generator's report gives the bill's arithmetic). Every gun crew fills; the beat takes the
-    marines to the long guns before the topmen (crew/quarters.py; the engine's order, open for the
-    lead), so no marines' division forms, as on the frigate-36 (Indf §18 item 13), and the topmen
-    the guns leave fall to the trimmers, above the bill's 53 and 79. Measured at seed 7."""
+    generator's report gives the bill's arithmetic). Every gun crew fills. Since the lead's answer
+    of 2026-11-10 at 19:30 her bill carries the 74's `marines` (Bel-D §12.1; B1's module writes it,
+    her marines less her default fit's carronades' crews, the 64's 84 and the razee's 14): the beat
+    keeps that many in their division before the guns draw, the carronades take the rest of her
+    marines first and the long guns none, and her trimmers meet the bill's 53 and 79 exactly; its
+    line, "... the powder 29, the marines 84." (the razee's "... the powder 22, the marines 14.").
+    Old (9e04b9fa), no key: the beat took her marines to the long guns before the topmen (the 64's
+    84 all at the long guns, the razee's 18 there and 32 at the carronades), no division formed,
+    and the topmen the guns left fell to the trimmers, 137 and 93. Measured at seed 7."""
     from freesail.crew.model import Station
     from freesail.crew.quarters import MARINES, TRIMMERS, quarters_of
     from tests.test_brains import world_at
@@ -1211,11 +1216,57 @@ def test_her_quarters_at_the_beat_fill_every_gun_and_leave_the_trimmers_measured
     at_guns = [
         gc.kind for gc in q.crews.values() for s in gc.members if s.station is Station.MARINES
     ]
-    assert (len(at_guns), at_guns.count("long")) == (marines, at_long_guns)
-    assert not q.divisions.get(MARINES)
+    assert (at_guns.count("long"), at_guns.count("carronade")) == (0, at_carronades)
+    assert len(at_guns) == at_carronades
+    assert len(q.divisions[MARINES]) == division
+    assert all(s.station is Station.MARINES for s in q.divisions[MARINES])
     assert len(q.divisions[TRIMMERS]) == trimmers
-    bill = doc_of(path)["crew"]["quarter_bill"]["trimmers"]
-    assert sum(bill.values()) == {SIXTY_FOUR: 53, RAZEE: 79}[path]
+    bill = doc_of(path)["crew"]["quarter_bill"]
+    assert sum(bill["trimmers"].values()) == trimmers and bill["marines"] == division
+
+
+@pytest.mark.parametrize(
+    "path, fit, filled, crews, division, trimmers, unmanned",
+    [
+        (
+            SIXTY_FOUR,
+            "ardent class 1794",
+            33,
+            36,
+            84,
+            53,
+            "the upper deck, No. 13 gun, and the poop, No. 3 gun",
+        ),
+        (RAZEE, "as razeed 1795", 19, 22, 38, 79, "the guns, Nos. 12 to 13 and 17"),
+    ],
+)
+def test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short(
+    path, fit, filled, crews, division, trimmers, unmanned
+):
+    """The bill's `marines` is set against the default fit, as its trimmers are (the lead's answer
+    of 2026-11-10 at 19:30, built): on her other fit the beat keeps the same marines in their
+    division and the long guns take none, so her seamen fall short of the guns. Measured at seed 7,
+    for the lead: the 64's 'ardent class 1794' fills 33 of 36 crews (the lower deck's No. 13 8 of
+    11, the upper deck's No. 13 and the poop's No. 3 unmanned; old, all 36, 76 marines at the long
+    guns and 8 at the carronades, the trimmers 121); the razee's 'as razeed 1795' 19 of 22 (Nos. 12
+    and 13 unmanned and No. 17 1 of 7, her 12 carronade marines at their guns and 38 in the
+    division; old, all 22, 46 marines at the long guns and 4 at the carronades, the trimmers 89).
+    The beat says it: "Not hands enough for every gun: ... stand unmanned." A key by fit, or the
+    long guns taking marines where the seamen run out, is the lead's to rule."""
+    from freesail.crew.quarters import MARINES, TRIMMERS, quarters_of
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, path, fit=fit)
+    assert w.ship.fit == fit
+    w.run(10)
+    said = w.submit("beat to quarters")
+    w.run(30)
+    q = quarters_of(w.ship)
+    assert sum(1 for gc in q.crews.values() if len(gc.members) == gc.wanted) == filled
+    assert len(q.crews) == crews
+    assert len(q.divisions[MARINES]) == division
+    assert len(q.divisions[TRIMMERS]) == trimmers
+    assert f"Not hands enough for every gun: {unmanned} stand unmanned." in said.text
 
 
 @pytest.mark.parametrize("path", [SIXTY_FOUR, RAZEE])
