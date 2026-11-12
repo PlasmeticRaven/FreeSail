@@ -26985,8 +26985,10 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
 measured at 52395f9 and reported (7046d0b). Step 2's measurement reported to the lead
-(below); the recipe and the measuring build in the working tree, not committed; next the
-gauges, then the rebuild on the block's own water. Decision 68 (the lead's
+(below). The six gauges in, with the tide region `gulf-of-hammamet` for the three tiles
+west of the bounds; the region rebuilt on the block's own water and committed (a working
+commit: the tests that name every region, the weather box, the marks, the stream, the
+Order and the ports follow, and the step is measured at its own hash). Decision 68 (the lead's
 note of 2026-11-12) binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
@@ -27059,3 +27061,15 @@ dated port keys.
 Sources: Smyth's *Memoir* of Sicily (1824) laid under `docs/references/pilots/` with its
 README row (the Getty copy, not in copyright); it describes Sicily and its islands and not
 Malta, which is read from Purdy 1826, Norie 1831 and Smyth 1854.
+
+**The rebuild on the block's own water** (`--skip-fetch --reuse-world`, after the six
+gauges and the tide region): 109 level-2 tiles, 21.96 MB; the sweep 13,256 cells in 367
+places, the ten largest all in the three tiles west of the bounds (the Sahel's flats and
+salt marshes from Monastir to Mahdia, 35.1 to 35.6 N), real shallows the grid's fill reads
+as water: left as water. The tide region `gulf-of-hammamet` (35.01334 to 36.29334 N, 10.72
+to 11.1466 E; `TIDE_REGIONS`) gives those tiles the Mediterranean's water by package 104's
+ruling for a gaugeless block, its neighbours' nearest (Lampedusa's, Mahon's, Carloforte's
+and Cagliari's lists name it), where the eleven's alone would have been Saint-Malo's: a
+JUDGEMENT of this package's, reported to the lead. Probed: Palermo 0.18 m and an M2 of
+11 cm, Messina 0.03 m and 1.5 cm, Valletta 0.09 m and 2.6 cm (the six's blend), where the
+eleven's had given 2.25 to 3.68 m of M2.

@@ -1,0 +1,4 @@
+# The features of Sicily and Malta's block (package 105, the region `sicily`;
+# docs/dev/ChartBlocks.md). The measuring build's file: the marks follow with the step.
+region: sicily
+features: []

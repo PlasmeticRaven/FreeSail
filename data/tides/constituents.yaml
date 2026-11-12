@@ -815,7 +815,7 @@ gauges:
   # the membership by bounds, the eleven beyond their reach and no taper (tests/test_tide.py).
   - id: mahon
     name: Mahón
-    block: [balearics, sardinian-sea, tunis-coast]  # package 104, the lead's ruling: a gaugeless block's neighbours' nearest
+    block: [balearics, sardinian-sea, tunis-coast, gulf-of-hammamet]  # package 104, the lead's ruling: a gaugeless block's neighbours' nearest; package 105 the gulf of Hammamet's alike
     lat_deg: 39.8930
     lon_deg: 4.2706
     record: "GESLA-2, Puertos del Estado, 2009 to 2015"
@@ -1017,7 +1017,7 @@ gauges:
   # Le Conquet's alone; blended they would move no recorded passage.
   - id: carloforte
     name: Carloforte (San Pietro)
-    block: [tyrrhenian, sardinian-sea, tunis-coast]  # package 104, the lead's ruling (above)
+    block: [tyrrhenian, sardinian-sea, tunis-coast, gulf-of-hammamet]  # package 104, the lead's ruling (above); package 105 the gulf of Hammamet's
     lat_deg: 39.1480
     lon_deg: 8.3095
     record: "GESLA-2, ISPRA (idromare), 1988 to 2010"
@@ -1027,7 +1027,7 @@ gauges:
     N2: {amplitude_m: 0.013, phase_deg: 220.8}
   - id: cagliari
     name: Cagliari
-    block: [tyrrhenian, tunis-coast]  # package 104, the lead's ruling (above)
+    block: [tyrrhenian, tunis-coast, gulf-of-hammamet]  # package 104, the lead's ruling (above); package 105 the gulf of Hammamet's
     lat_deg: 39.2102
     lon_deg: 9.1143
     record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
@@ -1154,3 +1154,78 @@ gauges:
     M2: {amplitude_m: 0.046, phase_deg: 213.5}
     S2: {amplitude_m: 0.016, phase_deg: 230.8}
     N2: {amplitude_m: 0.010, phase_deg: 201.6}
+
+# SICILY AND MALTA'S GAUGES (package 105, the region `sicily`). TICON.txt read again
+# 2026-11-12 by its coordinates over 34 to 39.5 N and 10 to 17.5 E (the zip at doi.pangaea.de,
+# SHA-256 7055f8ed1a14abf8..., 1,621,262 bytes, the same file as every block's): six in the
+# block's bounds, each GESLA-2 from ISPRA (idromare), below; **none in Malta** (Valletta
+# reads their blend), Crotone (39.08 N 17.14 E) beyond the east bound. None lies within ten
+# miles of a seam (Messina the nearest, 18 miles from 38.5 N), so each serves its own block
+# alone, and the block has gauges of its own (package 104's ruling for a gaugeless block
+# does not apply). Messina's M2 of a centimetre and a half and Reggio's of six, the phases
+# a hundred degrees apart across the Strait: the Faro's amphidrome, the record's and real.
+# **The mean levels are JUDGEMENT**: no published level above the chart's datum is on file
+# for any of the six (ISPRA's are to the IGM's zero, not the lowest tide), and a blend of
+# null levels falls back to the eleven's, the Atlantic's; each is the sum of its own M2, S2
+# and N2 amplitudes, the model's lowest water of the three on the chart's datum (Mahon's
+# published 0.20 m beside them). A published level replaces it.
+  - id: palermo
+    name: Palermo
+    block: sicily
+    lat_deg: 38.1214
+    lon_deg: 13.3714
+    record: "GESLA-2, ISPRA (idromare), 1992 to 2010"
+    mean_level_m: 0.18  # JUDGEMENT: M2 + S2 + N2 (0.110 + 0.042 + 0.023); no published level read
+    M2: {amplitude_m: 0.110, phase_deg: 238.3}
+    S2: {amplitude_m: 0.042, phase_deg: 262.6}
+    N2: {amplitude_m: 0.023, phase_deg: 221.5}
+  - id: porto-empedocle
+    name: Porto Empedocle
+    block: sicily
+    lat_deg: 37.2864
+    lon_deg: 13.5270
+    record: "GESLA-2, ISPRA (idromare), 1973 to 2010"
+    mean_level_m: 0.07  # JUDGEMENT: M2 + S2 + N2 (0.035 + 0.025 + 0.007); no published level read
+    M2: {amplitude_m: 0.035, phase_deg: 61.9}
+    S2: {amplitude_m: 0.025, phase_deg: 54.5}
+    N2: {amplitude_m: 0.007, phase_deg: 67.5}
+  - id: catania
+    name: Catania
+    block: sicily
+    lat_deg: 37.4980
+    lon_deg: 15.0939
+    record: "GESLA-2, ISPRA (idromare), 1971 to 2010"
+    mean_level_m: 0.04  # JUDGEMENT: M2 + S2 + N2 (0.024 + 0.013 + 0.005); no published level read
+    M2: {amplitude_m: 0.024, phase_deg: 43.5}
+    S2: {amplitude_m: 0.013, phase_deg: 47.3}
+    N2: {amplitude_m: 0.005, phase_deg: 39.8}
+  - id: messina
+    name: Messina
+    block: sicily
+    lat_deg: 38.1962
+    lon_deg: 15.5633
+    record: "GESLA-2, ISPRA (idromare), 1973 to 2010"
+    mean_level_m: 0.03  # JUDGEMENT: M2 + S2 + N2 (0.015 + 0.010 + 0.002); no published level read
+    M2: {amplitude_m: 0.015, phase_deg: 318.6}
+    S2: {amplitude_m: 0.010, phase_deg: 345.0}
+    N2: {amplitude_m: 0.002, phase_deg: 254.8}
+  - id: reggio-calabria
+    name: Reggio Calabria
+    block: sicily
+    lat_deg: 38.1214
+    lon_deg: 15.6489
+    record: "GESLA-2, ISPRA (idromare), 1998 to 2010"
+    mean_level_m: 0.10  # JUDGEMENT: M2 + S2 + N2 (0.063 + 0.030 + 0.012); no published level read
+    M2: {amplitude_m: 0.063, phase_deg: 63.4}
+    S2: {amplitude_m: 0.030, phase_deg: 66.9}
+    N2: {amplitude_m: 0.012, phase_deg: 66.1}
+  - id: lampedusa
+    name: Lampedusa
+    block: [sicily, gulf-of-hammamet]  # and the tide region west of the bounds (above)
+    lat_deg: 35.4998
+    lon_deg: 12.6045
+    record: "GESLA-2, ISPRA (idromare), 1998 to 2010"
+    mean_level_m: 0.14  # JUDGEMENT: M2 + S2 + N2 (0.075 + 0.050 + 0.011); no published level read
+    M2: {amplitude_m: 0.075, phase_deg: 41.6}
+    S2: {amplitude_m: 0.050, phase_deg: 56.4}
+    N2: {amplitude_m: 0.011, phase_deg: 48.3}
