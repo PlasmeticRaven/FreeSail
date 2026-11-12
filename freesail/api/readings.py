@@ -4222,6 +4222,16 @@ def _truth_prizes(world: Any) -> dict[str, Any]:
 
 
 def director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
+    """The truth as the director reads it (`_director_readings`), the player's ship current
+    for it (package 60: the director's station is kept on the game's first hull, and the
+    player's ship is his now, `World.players`; one hull in every game before)."""
+    from freesail.world.ships import players_current
+
+    with players_current(world) as here:
+        return _director_readings(here, within_nm)
+
+
+def _director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
     """The truth as the director reads it: every ship's true position, heading, speed,
     sail and state (the player's first, by her name, then every vessel on the sea with her
     captain's intent and her brain's state where she has one); the weather as it is at
@@ -4309,7 +4319,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             continue
         if getattr(v, "crew", None) is current and current is not None:
             continue  # the hull read as the own above: the followed one (package 82, item 2)
-        if v is getattr(world.vessels, "own", None) and (current is None or current is players):
+        if v is getattr(players, "vessel", None) and (current is None or current is players):
             continue  # the player's own vessel is `own` above (package 84, step 7)
         d: dict[str, Any] = {
             "name": v.name,

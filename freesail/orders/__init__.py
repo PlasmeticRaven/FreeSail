@@ -311,6 +311,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import fight
 
         return fight.execute(ship, order)
+    if vocab.verbs[order.verb].object == "command":
+        # the change of the player's ship (package 60; `world.command.take_up`)
+        from freesail.orders import command as command_orders
+
+        return command_orders.execute(ship, order)
     if vocab.verbs[order.verb].object == "prize":
         # the prize taken possession of, her prisoners, the prize burnt (spec M7 §18; package 74)
         from freesail.orders import prize as prize_orders

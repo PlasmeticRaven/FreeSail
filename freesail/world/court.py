@@ -810,6 +810,14 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         )
     if sitting(root) is not None and sitting(root).get("person") == person.name:
         raise CourtError(f"The court martial sits on {person.name} still: its verdict first.")
+    from freesail.world.command import ship_at_port
+
+    lying = ship_at_port(root, ship_name, port)
+    if lying is not None:
+        # package 60 (docs/design/Design-ShipBought.md §5.5): the ship lies at the port in this
+        # world, so she is given him in play, to take up by `take command of her` once he is
+        # aboard her; no scenario is written
+        return _command_in_play(root, person, key, lying, port)
     followers = _followers(root, person, port)
     when = root.clock.ship_time + timedelta(days=1)
     start = when.replace(hour=8, minute=0, second=0, microsecond=0)
@@ -918,6 +926,49 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         "scenario": shown,
         "followers": [f.name for f in followers],
     }
+
+
+def _command_in_play(
+    root: Any, person: Any, key: str, vessel: Any, port: Any
+) -> tuple[str, dict[str, Any]]:
+    """The `command:` form where the ship lies at the port (package 60): she is given him
+    (`command.give`), his record has the appointment, and the served line is the service's
+    words, heard ashore at the port; the director's reply says how he takes her up."""
+    from freesail.world.command import give
+
+    if root.__dict__.get("dry_run"):
+        return (
+            f"a new command for {person.name}: the {vessel.name}, lying at {port.name}, given "
+            "him in play",
+            {"person": person.name, "ship": str(vessel.id), "port": port.id, "dry_run": True},
+        )
+    give(root, vessel, person, by="the director")
+    note(
+        root,
+        person,
+        "command",
+        f"appointed to the {key} {vessel.name} at {port.name}",
+        ship_name=str(vessel.name),
+        port=port.id,
+    )
+    served = f"{person.name} is appointed to the {key} {vessel.name}, lying at {port.name}."
+    root.record(
+        Severity.NOTABLE,
+        "command.new",
+        served,
+        data={
+            "person": person.name,
+            "ship": str(vessel.name),
+            "port": port.id,
+            "place": "shore",
+            "given": str(vessel.id),
+        },
+    )
+    reply = (
+        f"a new command for {person.name}: the {vessel.name}, lying at {port.name}, given him in "
+        "play; he takes her up by 'take command of her' aboard her"
+    )
+    return reply, {"person": person.name, "ship": str(vessel.id), "port": port.id, "given": True}
 
 
 def _and_names(persons: list[Any]) -> str:

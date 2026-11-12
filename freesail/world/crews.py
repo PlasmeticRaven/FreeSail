@@ -531,7 +531,7 @@ def mirror(vessel: Any, crew: CrewedWorld, minute: bool) -> None:
         brain = vessel.brain
         if brain is not None and state and (not brain.history or brain.history[-1][1] != state):
             # the brain's record runs on through the near body (one brain, two bodies)
-            brain.history.append((crew.parent.clock.tick, state))
+            brain.history.append((crew.clock.tick, state))
             brain.state = state
         vessel.state = state
 
@@ -702,9 +702,14 @@ def demote(world: World, vessel: Any) -> None:
 def release_done(world: World) -> None:
     """A vessel gone from the sea (`done`) gives up her World (package 84, step 5): her
     persons and the things they keep out of the one registry, as the drop did before."""
+    first = world.__dict__.get("_own") if hasattr(world, "__dict__") else None
     for v in world.vessels.vessels:
         crew = v.crew
         if crew is None or not v.done:
+            continue
+        if first is not None and crew is first:
+            # the game's first hull is never given up (package 60, the design's §4.2): she
+            # keeps the sea and the save's first block; her body done, her hull stays
             continue
         people = getattr(crew, "people", None)
         if people is not None and hasattr(people, "discharge"):
@@ -853,6 +858,12 @@ def switch(world: World) -> None:
     far_nm: dict[str, float] = {}
     for v in with_brain:
         far_nm[v.id] = bearing_and_distance(centre, v.position)[1] / units.NAUTICAL_MILE
+    for v in vessels.vessels:
+        # every crewed body by her own position, a brain or none (package 60, the design's
+        # §4.2: a hull with no far brain, the old ship laid up beside him, was "beyond the
+        # range" alongside and put to sleep at once)
+        if v.id not in far_nm and v.crew is not None and not v.done and v.position is not None:
+            far_nm[v.id] = bearing_and_distance(centre, v.position)[1] / units.NAUTICAL_MILE
     always = stationed_always(world)
 
     def held_fast(v: Any) -> bool:

@@ -54,6 +54,7 @@ __all__ = [
     "world_of",
     "lift_old_state",
     "own_id",
+    "players_id",
 ]
 
 _MISSING = object()
@@ -202,6 +203,17 @@ def world_of(handle: Any) -> Any:
         return handle
     world = getattr(handle, "__dict__", {}).get("world")
     return world if isinstance(world, World) else handle
+
+
+def players_id(world: Any) -> str:
+    """The id of the player's ship now (package 60; `docs/design/Design-ShipBought.md` §2):
+    the hull `World.players` names, the first hull's `own_id()` until the player takes
+    command of another; what a reader that means "the player's ship" compares a vessel's id
+    with, where `own_id()` is the first hull's own and never moves."""
+    root = world_of(world)
+    players = getattr(root, "players", None) if root is not None else None
+    hid = str(getattr(players, "id", "") or "")
+    return hid or own_id()
 
 
 def own_id() -> str:

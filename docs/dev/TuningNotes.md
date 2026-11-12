@@ -26980,3 +26980,57 @@ held, and truth 7-519's passage to the Fort Genois. **No pin moved.** **The pace
 last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The tree
 reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
 
+
+## Package 60: a ship bought (2026-11-11)
+
+The design is `docs/design/Design-ShipBought.md` (gated 2026-11-10, its §13 binding); the steps
+are its §10, each reported at one hash. Every figure here is measured in this container at the
+hash named, or marked JUDGEMENT where it is a choice.
+
+### Step 1: the player's ship changed in play, and the followed ship's far body
+
+**The four floors of the design's §4.2, first, each with its own test** (`tests/
+test_ship_changed.py`): a crewed hull with no far brain and an empty plan rides at her anchor
+where she lies at one and lies to where she does not (`Vessel.kept_hull`, `world/ships.py`), never
+`done` and so never discharged by `crews.release_done`; a far brain may be given to any ship but
+the player's now (`prizes._give_intent` reads `hulls.players_id`); the game's first hull is never
+released by `release_done`; the switch measures every crewed body by her own position, a brain or
+none (`crews.switch`).
+
+**The followed ship's far body** (the design's §9.2, by the owner's word; truth 7-481): the
+followed hull's far body is mirrored to her truth on every tick of hers where she is another
+hull than the first (`World._tick_vessels`, `crews.mirror`, whose brain's history now reads the
+one clock through the hull rather than the parent the followed hull has not got). Measured with
+`tests/test_ship_changed.followed_body_off_m` (the brig X under `--ship`, the royals set, every
+five minutes for twenty), old beside new:
+
+| minutes | before, on the trunk (m: the lead's at 5 and 20, mine at 10 and 15) | after (m) |
+|---|---|---|
+| 5 | 933.8 | 0 |
+| 10 | 1,892 | 0 |
+| 15 | 2,848 | 0 |
+| 20 | 3,803.4 | 0 |
+
+The truth's band is under fifty metres (JUDGEMENT: the mirror is exact at every tick; the band
+leaves room for a body's minute move between two of the followed hull's ticks).
+
+**The split** (the design's §2): `World._players` (a hull id; None in every save and checkpoint
+from before) and `World.players` reading it, `World.first_hull` the game's first hull; the save's
+first block written from the first hull, `"player_ship"` beside `"hulls"` for the reader only
+when the field is set; the acts' `""` key given to the first hull (`core/acts.act_target_of`);
+the director's station and log on the first hull (`agents/director.director_hull`, the harness's
+note); the director's truth read with the player's ship current (`api/readings.director_readings`);
+`players_current` the player's ship now and `first_hull_current` the shadow's own block;
+`hulls.players_id` for every reader of "the player's ship" by id that the design's §9.1 sorts P
+(the prize's captive channel and its brain, the far fight's "our own action", the hail spoken, the
+taking by a world order, the sea's dealings and hail, the truth's ship list, the station's
+sail named).
+
+**The act** (`world/command.take_up`, the order `take command of` in `orders/command.py` and
+`data/vocabulary.yaml`, a visitor's own order): the ship given him by the director's `command:`
+form where she lies at the named port (`court._command_in_play`, recorded in
+`World.ships_given`); his person rehomed and her command passed to him, her captain's station
+bound, her rules captain standing aside, her far brain dropped, his seat carried with no home kept,
+the old ship left to her senior officer (the default for a King's ship) or laid up at the port's
+anchorage, said in both logs (`ship.taken_up`, placed in the knowledge table as the ship's whole
+company hears it).

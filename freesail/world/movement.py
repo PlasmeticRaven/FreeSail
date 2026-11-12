@@ -303,7 +303,8 @@ def where_words(world: Any, person: Any) -> str:
 # moves, his needs, a question or a reading, a free line, a word said (the stations'
 # sentences are not orders of the vocabulary and come another way).
 VISITOR_VERBS = frozenset(
-    {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore"}
+    # package 60: `take command of` her is given aboard her as a visitor, the act's own
+    {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore", "take command of"}
 )
 VISITOR_OBJECTS = frozenset({"query", "needs", "free"})
 # What a captive's prompt performs (package 74; the owner's play of 2026-11-09), and nothing

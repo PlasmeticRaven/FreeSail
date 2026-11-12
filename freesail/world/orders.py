@@ -670,7 +670,8 @@ def _taken_parts(world: Any, m: re.Match[str]) -> tuple[Any, Any, str]:
     sea = world.vessels
     name = m.group("name").strip()
     captor_words = m.group("captor").strip().strip('"')
-    own = getattr(sea, "own", None)
+    # the player's ship's vessel (package 60: his now; the first hull's shadow until then)
+    own = getattr(getattr(world, "players", None), "vessel", None) or getattr(sea, "own", None)
     own_name = str(
         getattr(getattr(world, "players", None), "ship", None) and world.players.ship.name or ""
     )
@@ -700,12 +701,12 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     player's ship is the one struck, so that the captive is aboard a real hull."""
     from freesail.combat import action
     from freesail.world import prizes as P
-    from freesail.world.ships import PLAYER_ID
+    from freesail.world.hulls import players_id
 
     taken, captor, how = _taken_parts(world, m)
     if P.is_prize(taken):
         raise WorldOrderError(f"{taken.name} is a prize already.")
-    if str(taken.id) == PLAYER_ID and getattr(captor, "crew", None) is None:
+    if str(taken.id) == players_id(world) and getattr(captor, "crew", None) is None:
         from freesail.world.crews import promote
 
         promote(world, captor)
