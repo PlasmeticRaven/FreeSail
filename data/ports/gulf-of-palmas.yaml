@@ -1,0 +1,110 @@
+# FreeSail: the Gulf of Palmas as a port (package 104, beside the coast of Tunis's block, in the
+# Tyrrhenian's region; no patch), on package 35's machinery; the marks are the Tyrrhenian's features
+# file's (data/charts/features/tyrrhenian.yaml).
+#
+# Sources. Smyth 1828, pp. 318 to 321: a spacious bay offering safe and commodious anchorage for
+# fleets in the violent SW, W and NW gales of winter, much esteemed by Lord Nelson for those
+# qualities and for the facility of supplies; of remarkably easy access, capital anchorage all over
+# it, especially in seven or eight fathoms on the western side; the country affords provisions and
+# refreshments for any number of ships; p. 54: Truguet's eleven sail sheltered here in December
+# 1792. Purdy 1826, p. 84, and Norie 1831, p. 63: open to the winds from SW by W to S by E, room for
+# a whole fleet in 18 to 4 fathoms, muddy ground holding well. Derrotero 1849, pp. 140 to 141, and
+# Lamberti 1844, p. 333: off Sant'Antioco the anchors drag; better holding on the Sardinian side.
+# James 1837, vol. 3, pp. 338 to 340: Nelson's fleet here in March 1805, its victuallers lying in the
+# gulf, and on 1 April removed to Pula for water. **A watering place in the gulf** (the brief) is in
+# no text read: the yard's water is carried as provisions are, judgement, said so.
+#
+# The datum: UNVERIFIED; the Tyrrhenian's tiles, no patch.
+#
+# The stance. The King of Sardinia's, neutral to a King's ship. Prices FROM MEMORY or JUDGEMENT.
+
+id: gulf-of-palmas
+name: the Gulf of Palmas
+nation: sardinia
+source: "Smyth 1828 pp. 54, 316, 318-321; Purdy 1826 p. 84; Norie 1831 p. 63; Derrotero 1849 pp. 140-141; Lamberti 1844 p. 333; James 1837 vol. 3 pp. 338-340"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: gulf-of-palmas
+  name: the gulf of Palmas
+  lat_deg: 39.0050
+  lon_deg: 8.5300
+  depth_fathoms: 7
+anchorage:
+  feature: gulf-of-palmas
+  name: the gulf of Palmas
+  lat_deg: 39.0050
+  lon_deg: 8.5300
+mooring:
+  feature: gulf-of-palmas
+  name: "on the gulf's western side"
+  lat_deg: 39.0050
+  lon_deg: 8.5300
+  depth_fathoms: 7
+  bottom: sand
+shore:
+  feature: sant-antioco-town
+  name: "the causeway of Sant'Antioco"
+  lat_deg: 39.0660
+  lon_deg: 8.4550
+
+pilot:
+  station: gulf-of-palmas
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a fishing boat of Sant'Antioco
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Porcile, Rombi, Pomata, Ferraro, Biggio, Rivano, Cappai, Melis]   # judgement
+  skill: 0.75
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 200            # judgement
+  words:
+    channel: "Enter by Cape Speroni or between the Vacca and the Toro; the Vacca may be passed a cable off on its south side in seventeen fathoms, but two rocks with three feet on them lie between it and the point."
+    marks: "The Toro and the Vacca at the entrance; Cape Teulada high on the eastern hand; the town of Sant'Antioco with its old castle at the head of the gulf."
+    anchorage: "Anchor anywhere in seven fathoms of sand, best on the Sardinian side, for off Sant'Antioco the anchors drag. It is the fleets' anchorage in the westerly gales of winter, open only from south-west by west to south by east."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: fresh beef, price: 14, origin: sardinia, note: "provisions and refreshments for any number of ships (Smyth 1828, p. 321); the price JUDGEMENT"}
+    - {good: cattle, price: 12, origin: sardinia, note: "JUDGEMENT, with Smyth's provisions"}
+    - {good: vegetables, price: 2, origin: sardinia, note: "JUDGEMENT"}
+    - {good: fowls, price: 2, origin: sardinia, note: "JUDGEMENT"}
+    - {good: cheese, price: 20, origin: sardinia, note: "JUDGEMENT"}
+    - {good: wine, price: 16, origin: sardinia, note: "JUDGEMENT"}
+    - {good: wheat, price: 18, origin: sardinia, note: "JUDGEMENT"}
+    - {good: salt, price: 6, origin: sardinia, note: "JUDGEMENT"}
+    - {good: salt fish, price: 18, origin: sardinia, note: "the tonnaras of Porto Botte and Porto Pino (Smyth 1828, pp. 319 to 320); the price JUDGEMENT"}
+    - {good: fresh fish, price: 3, origin: sardinia, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 65, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "no watering place in the gulf in a text read; Nelson's fleet went to Pula for water (James 1837 vol. 3 p. 340); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [gulf-of-palmas, 38 54 N 8 31 E, 38 48 N 8 06 E]
+  from_sea: [38 48 N 8 06 E, 38 54 N 8 31 E, gulf-of-palmas]
+  in: [gulf-of-palmas]

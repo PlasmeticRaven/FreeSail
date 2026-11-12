@@ -43,6 +43,8 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
         "etruria",
         "liguria",
         "papal-state",
+        # package 104: the regency of Tunis
+        "tunis",
     ]
     assert table.at_war("britain", "france") and table.at_war("france", "britain")
     assert table.at_war("britain", "spain") and table.at_war("britain", "batavian-republic")
@@ -249,6 +251,23 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "palamos": "spain",
         "valencia": "spain",
         "alicante": "spain",
+        # package 104: the Algerian coast's six the regency of Algiers' (La Calle by Berard's
+        # march), the coast of Tunis's four the Bey's (Tabarka's file dated from 1738), and
+        # the three on Sardinia the King's (Carloforte's file dated through the French
+        # holding of 1793)
+        "bougie": "algiers",
+        "djidjelli": "algiers",
+        "collo": "algiers",
+        "stora": "algiers",
+        "bona": "algiers",
+        "la-calle": "algiers",
+        "tabarka": "tunis",
+        "bizerta": "tunis",
+        "porto-farina": "tunis",
+        "la-goletta": "tunis",
+        "carloforte": "sardinia",
+        "gulf-of-palmas": "sardinia",
+        "oristano": "sardinia",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

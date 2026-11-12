@@ -1,0 +1,110 @@
+# FreeSail: Bizerta as a port (package 104, the coast of Tunis's region, the harbour patch bizerta),
+# on package 35's machinery; the marks are the features file's (data/charts/features/tunis-coast.yaml).
+#
+# Sources. Purdy 1826, p. 332: the bay between Capes Bianco and Zibeeb four miles deep, the town on
+# its south-west side, anchorage at a distance from the shore in 5, 6 and 7 fathoms; the port good,
+# and here the Tunisian galleys are laid up. Norie 1831, pp. 351 to 352: formerly one of the best
+# ports of Tunis, now seldom frequented but by small vessels; the town a mile round, defended by
+# castles and batteries; grain principally shipped and exported here; the lake of great depth
+# within a very narrow entrance over a bar; fresh water from the rivulet at the bottom of the bay.
+# Derrotero 1849, p. 266: open to the NE, an excellent shelter from the NNW round by W to S; anchor
+# east of the Bastion of the Marina in 9 or 10 brazas of fine sand and weed a long mile off; water at
+# the town's fountains by the canal. Smyth 1854, p. 93: the Venice of Barbary, two lakes, the inner
+# fresh, the fisheries farmed at a high price. No text read calls Bizerta a corsair port (the
+# brief's memory); the galleys laid up are the Bey's (Purdy).
+#
+# The datum: UNVERIFIED; the canal and lake as the modern French arsenal dredged them are the grid's.
+#
+# The stance. The regency of Tunis's, the Bey's (the nations table, `tunis`), neutral to a King's ship as to every flag the table has; the Bey's ships and corsairs noted and not modelled. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange, each good's note naming its source where a text names the trade.
+
+id: bizerta
+name: Bizerta
+nation: tunis
+source: "Purdy 1826 p. 332; Norie 1831 pp. 351-352; Derrotero 1849 p. 266; Smyth 1854 pp. 93, 457"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: bizerta-road
+  name: the bay of Bizerta
+  lat_deg: 37.2849
+  lon_deg: 9.8990
+  depth_fathoms: 8
+anchorage:
+  feature: bizerta-road
+  name: the road of Bizerta
+  lat_deg: 37.2849
+  lon_deg: 9.8990
+mooring:
+  feature: bizerta-road
+  name: east of the Marina bastion, a long mile off
+  lat_deg: 37.2849
+  lon_deg: 9.8990
+  depth_fathoms: 8
+  bottom: fine sand and weed
+shore:
+  feature: bizerta
+  name: "the canal's mouth at Bizerta"
+  lat_deg: 37.2740
+  lon_deg: 9.8710
+
+pilot:
+  station: bizerta-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the reis's boat of Bizerta
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Mahmud, Ali, Hassan, Yusuf, Mustafa, Salah, Hamuda, Ahmed]   # judgement
+  skill: 0.8
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 60            # judgement
+  words:
+    channel: "The coast from Cape Blanc to the town is foul, points of rock running a quarter mile under water; keep the offing until the town bears south-west."
+    marks: "Cape Blanc, the guard of Bizerta, with its watch house and its white patch; the walled town about its canal and the citadel on the hill joined to it by a double wall."
+    anchorage: "Anchor a long mile east of the Marina bastion in eight fathoms of fine sand and weed; it is sheltered from the westward and open to the north-east. Water from the fountains by the canal's mouth."
+    tide: "A little tide, a foot or so, with the winds and the lakes."
+
+tide:
+  establishment: Bizerta
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 11, origin: tunis, note: "grain principally shipped and exported here (Norie 1831, p. 351); the price JUDGEMENT, cheap"}
+    - {good: barley, price: 8, origin: tunis, note: "JUDGEMENT"}
+    - {good: fresh fish, price: 3, origin: tunis, note: "the fisheries of the lakes, farmed at a high price (Smyth 1854, p. 93); the price JUDGEMENT"}
+    - {good: salt fish, price: 16, origin: tunis, note: "JUDGEMENT"}
+    - {good: olive oil, price: 34, origin: tunis, note: "JUDGEMENT"}
+    - {good: wool, price: 21, origin: tunis, note: "JUDGEMENT"}
+    - {good: hides, price: 33, origin: tunis, note: "JUDGEMENT"}
+    - {good: wax, price: 98, origin: tunis, note: "JUDGEMENT"}
+    - {good: coral, price: 390, origin: null, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 15, origin: tunis, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: tunis, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "the town's fountains at the canal's mouth (Derrotero 1849, p. 266); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: no hands for a Christian ship
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [bizerta-road, 37 22 N 9 57 E, 37 25 N 9 57 E]
+  from_sea: [37 25 N 9 57 E, 37 22 N 9 57 E, bizerta-road]
+  in: [bizerta-road]
