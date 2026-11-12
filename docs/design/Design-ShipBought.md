@@ -1147,5 +1147,25 @@ stand here; where they differ from the text above, this section governs.
 
 ## As built (the postscripts, step by step)
 
-Nothing is built yet. Each step's postscript will say here what was built, what was taken another way
-and what was found.
+Each step's postscript says here what was built, what was taken another way and what was found.
+
+### Step 1 (2026-11-12, built at 2370a2d)
+
+**Built as the note says:** the four floors of §4.2, each with its test; the followed ship's far
+body mirrored to her truth (§9.2: 934 m off after five minutes and 3,803 m after twenty on the
+trunk, none now; truth 7-481); the split of §2 (`World._players`, `players`, `first_hull`, the
+save's first block from the first hull and `"player_ship"` only when set, the acts' `""` key and
+the director's station on the first hull, `hulls.players_id` for the P readers of §9.1); the act
+(`world/command.take_up`, the order `take command of`, the director's `command:` form giving a ship
+lying at the named port in play); truths 7-480 to 7-483. Nothing in the note had to change after
+package 74 closed but its line numbers.
+
+**Taken another way:** a ship laid up keeps her company aboard in this step, her paying off left to
+steps 2 and 3; the refusal for a squadron is made also when the new ship is in a set or has ships
+under her orders; the director's truth reads the player's ship only when called on the director's
+own station's hull (the first hull), so that a reader of another hull reads that hull still; the
+order's reply carries the line the act would have written in the new ship's log, written once.
+
+**Found:** a ship in ordinary has no captain, so no hull can be made for her nor can she be boarded
+(the test's ship is a merchant brig under an intent instead); the listings of step 3 must give a
+ship in ordinary a hull another way, or list only ships with a master.

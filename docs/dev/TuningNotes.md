@@ -27034,3 +27034,14 @@ bound, her rules captain standing aside, her far brain dropped, his seat carried
 the old ship left to her senior officer (the default for a King's ship) or laid up at the port's
 anchorage, said in both logs (`ship.taken_up`, placed in the knowledge table as the ship's whole
 company hears it).
+
+**The suites, as run** at 2370a2d (the code of this step; this paragraph and the design note's
+postscript are committed after it, text only): `ruff check .` and `ruff format --check .` clean;
+the fast tier (`-n 4`) exit 0, the slow left out, one expected failure and two picture tests
+skipped for want of Playwright under this interpreter, as before; the slow tier (`--slow -m "not
+pace" -n 4`) of the touched files and `tests/test_known_truths.py` exit 0 (tests/test_aboard_another,
+test_boat_hull, test_brains, test_captive, test_checkpoint, test_court, test_crews, test_director,
+test_facade_readers, test_far_action, test_grammar_book, test_hulls, test_in_world, test_knowledge,
+test_known_truths, test_observer, test_primer, test_prize_court, test_prizes, test_readings,
+test_replay, test_ship_changed, test_world_orders); the pace tests of the same files alone and last
+(`--slow -m pace -n 0`) exit 0. No pin moved.
