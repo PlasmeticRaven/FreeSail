@@ -111,6 +111,7 @@ book_limits:
   - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
   - {south: 36.29334, north: 40.56, west: 4.5, east: 8.0}  # the Sardinian sea's block (package 104)
   - {south: 36.29334, north: 38.5, west: 8.0, east: 11.1466}  # the coast of Tunis's block (package 104)
+  - {south: 25.2001, north: 31.9, west: -22.13, east: -9.34}  # the ocean carried south, the Canaries and the Salvages (package 106a)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1508,6 +1509,52 @@ areas:
       current: {set: E, kn: 0.5}
       judgement: [set, rates, hour, current]
       source: "the set the period's own (Purdy 1826, p. 151), the rate JUDGEMENT; about the Skerki with a south-easter the current sweeps away north at a knot and a half (Smyth 1854, p. 165)"
+  # Package 106a: the Canaries and the ocean carried south. No tidal stream is given by the
+  # period (Purdy 1825, p. 218: at Orotava "there is little or no tide"); the period's
+  # current is Rennell's (Purdy 1825, pp. 95 to 96, 'Major Rennell's Remarks on the Currents
+  # between Cape Finisterre and the Canary Islands'): beyond the Strait's mouth the current
+  # "again becomes S.E. or rather more southerly ... and continues as far as the parallel of
+  # 25 degrees", felt beyond Madeira westward; its rate from twelve to twenty or more miles a
+  # day, sixteen "rather below the mean" (two-thirds of a knot); "amongst the Canary Islands,
+  # and between them and the Coast of Barbary, the currents are less regular"; Sir Erasmus
+  # Gower found a constant current to the southward a mile an hour between Madeira and
+  # Tenerife (p. 94). The islands' area first (first-match), then the open sea's.
+  - id: canaries-among
+    chart: canaries
+    name: among the Canary Islands
+    polygon: [[27.33334, -18.29332], [29.46666, -18.29332], [29.46666, -13.17334], [27.33334, -13.17334]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 180, kn: 0.5}
+    source: "Purdy 1825, p. 96 (Rennell): amongst the Canary Islands and between them and the coast of Barbary the currents are less regular; p. 218: little or no tide at Orotava; Glas (Purdy p. 220): a ship off the S.W. point of Tenerife carried by the current to Point Teno in 24 hours (the island's own eddy, not carried); the set southward and the half knot JUDGEMENT, below the open sea's"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: S, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "Rennell's 'less regular' among the islands (Purdy 1825, p. 96): the set and the rate JUDGEMENT; no tide to speak of (Purdy p. 218)"
+  - id: canary-current
+    chart: canaries
+    name: the open sea between Madeira and the Canaries
+    polygon: [[25.2001, -22.13], [31.9, -22.13], [31.9, -9.34], [25.2001, -9.34]]
+    axis_deg: 158
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 158, kn: 0.75}
+    source: "Purdy 1825, pp. 95 to 96 (Rennell): beyond the Strait's mouth the current becomes S.E. or rather more southerly and continues to the parallel of 25 degrees, felt 130 leagues off the coast of Africa; twelve to twenty or more miles a day, sixteen rather below the mean; a ship bound to Tenerife carried to Allegranza or Fortaventura; p. 94: Gower's constant current to the southward between Madeira and Tenerife; the set S.S.E. (between S.E. and 'rather more southerly') and three-quarters of a knot (eighteen miles a day) JUDGEMENT within Rennell's figures"
+    book:
+      set: SSE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SSE, kn: 0.75}
+      judgement: [set, rates, hour, current]
+      source: "Rennell's remarks (Purdy 1825, pp. 95 to 96): S.E. or rather more southerly, sixteen miles a day rather below the mean; every ship bound to the Canaries without a time-keeper to add easting to each day's reckoning; the point and the rate JUDGEMENT within his"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

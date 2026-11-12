@@ -3195,3 +3195,267 @@ boxes:
         life_h: {"min": 36, "max": 90}
         high: {"probability": 0.95, "bearing_deg": {"mean": 260, "spread": 76}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
         check: {"westerly_pct": 36, "easterly_pct": 9, "southerly_pct": 20, "northerly_pct": 22, "gust31_days": 5, "gust54_days": 0.9}
+  # package 106a: the Canaries' sea and the ocean carried south (25.2 to 30 N, from 22.13 W
+  # to the African coast), so that Madeira's box no longer answers south of 30 N by the
+  # nearest-box rule; after Madeira's, which keeps 30 N where the two meet. The north-east
+  # trade as the period gives it: "from the 28th degree of north latitude to the Line ...
+  # the trade-winds, which blow from the N.N.E. to East during the whole year ... liable to
+  # many exceptions near the coasts and islands"; "though the Canary Islands lie within the
+  # tract of the trade-winds, yet westerly and south-westerly winds sometimes prevail there,
+  # which may continue for eight days successively" (the Oriental Navigator 1801, 'Of the
+  # winds', OCR l. 2088 to 2108); westerly and south-westerly winds "common in the months of
+  # January and February", with a heavy swell (Purdy 1825, p. 210); the winds that "mostly
+  # prevail from North and N.N.E." at El Rio (Purdy p. 213). PROVISIONAL and JUDGEMENT in
+  # every figure (each row's `note`), the check rows what a thousand months should give,
+  # not run. NOT CARRIED, said for the lead: the calms and the south-westerly eddies to
+  # leeward of the high islands (Purdy p. 214: when the north-east blows hard on the north
+  # side of Canaria's mountains "it is either quite calm on the other side, or a gentle
+  # breeze blows upon it from the S.W."; p. 213: the Bocayna's calm under Lanzarote's hill;
+  # p. 215: the calms under the Peak at Santa Cruz): the weather's form is synoptic systems
+  # over a box and has no field shaped by an island's height.
+  canaries:
+    title: "the Canaries' sea and the ocean south of Madeira, with the north-east trade"
+    bounds: {south: 25.2, north: 30.0, west: -22.13, east: -9.0}
+    provisional: true
+    source: "judgement from the Oriental Navigator 1801 ('Of the winds') and Purdy 1825 (pp. 210 to 214) for the trade and its winter westerlies; the figures FROM MEMORY of the pilot charts' roses for the 25 to 30 N squares (NOT READ); package 106a"
+    months:
+      1:
+        name: January
+        note: "judgement: the north-east trade over the Canaries, weaker and broken in winter by westerly and south-westerly spells of up to eight days (the Oriental Navigator 1801; Purdy 1825 p. 210: common in January and February); a low far to the north"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.2, high_toward_deg: 330}
+        lows_per_month: 1.0
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 330, spread: 70}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 16, easterly_pct: 16, southerly_pct: 14, northerly_pct: 48, gust31_days: 3, gust54_days: 0}
+      2:
+        name: February
+        note: "judgement: the north-east trade over the Canaries, weaker and broken in winter by westerly and south-westerly spells of up to eight days (the Oriental Navigator 1801; Purdy 1825 p. 210: common in January and February); a low far to the north"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.2, high_toward_deg: 330}
+        lows_per_month: 1.0
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 330, spread: 70}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 16, easterly_pct: 16, southerly_pct: 14, northerly_pct: 48, gust31_days: 3, gust54_days: 0}
+      3:
+        name: March
+        note: "judgement: the north-east trade over the Canaries, weaker and broken in winter by westerly and south-westerly spells of up to eight days (the Oriental Navigator 1801; Purdy 1825 p. 210: common in January and February); a low far to the north"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.22, high_toward_deg: 335}
+        lows_per_month: 0.7
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 335, spread: 70}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 10, easterly_pct: 18, southerly_pct: 10, northerly_pct: 55, gust31_days: 2, gust54_days: 0}
+      4:
+        name: April
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.28, high_toward_deg: 340}
+        lows_per_month: 0.4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 340, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 5, easterly_pct: 22, southerly_pct: 5, northerly_pct: 62, gust31_days: 2, gust54_days: 0}
+      5:
+        name: May
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.3, high_toward_deg: 340}
+        lows_per_month: 0.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 340, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 3, easterly_pct: 22, southerly_pct: 3, northerly_pct: 68, gust31_days: 2, gust54_days: 0}
+      6:
+        name: June
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.32, high_toward_deg: 345}
+        lows_per_month: 0.1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 345, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 2, easterly_pct: 22, southerly_pct: 2, northerly_pct: 72, gust31_days: 2, gust54_days: 0}
+      7:
+        name: July
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.32, high_toward_deg: 345}
+        lows_per_month: 0.1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 345, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 2, easterly_pct: 22, southerly_pct: 2, northerly_pct: 72, gust31_days: 3, gust54_days: 0}
+      8:
+        name: August
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.3, high_toward_deg: 345}
+        lows_per_month: 0.1
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 345, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 2, easterly_pct: 22, southerly_pct: 2, northerly_pct: 72, gust31_days: 3, gust54_days: 0}
+      9:
+        name: September
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.28, high_toward_deg: 340}
+        lows_per_month: 0.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 340, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 3, easterly_pct: 22, southerly_pct: 3, northerly_pct: 66, gust31_days: 2, gust54_days: 0}
+      10:
+        name: October
+        note: "judgement: the north-east trade over the Canaries, steady from N.N.E. to East (the Oriental Navigator 1801: from 28 N to the Line the whole year), strongest in summer under the Azores high; a low rare"
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.22, high_toward_deg: 335}
+        lows_per_month: 0.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.9
+          bearing_deg: {mean: 335, spread: 40}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 8, northerly_pct: 58, gust31_days: 2, gust54_days: 0}
+      11:
+        name: November
+        note: "judgement: the north-east trade over the Canaries, weaker and broken in winter by westerly and south-westerly spells of up to eight days (the Oriental Navigator 1801; Purdy 1825 p. 210: common in January and February); a low far to the north"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.2, high_toward_deg: 330}
+        lows_per_month: 0.8
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 330, spread: 70}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 12, easterly_pct: 18, southerly_pct: 12, northerly_pct: 52, gust31_days: 2, gust54_days: 0}
+      12:
+        name: December
+        note: "judgement: the north-east trade over the Canaries, weaker and broken in winter by westerly and south-westerly spells of up to eight days (the Oriental Navigator 1801; Purdy 1825 p. 210: common in January and February); a low far to the north"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.2, high_toward_deg: 330}
+        lows_per_month: 1.0
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 1200, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1002, spread: 6, floor: 988}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.8
+          bearing_deg: {mean: 330, spread: 70}
+          distance_km: {min: 900, max: 1600}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 16, easterly_pct: 16, southerly_pct: 14, northerly_pct: 48, gust31_days: 3, gust54_days: 0}

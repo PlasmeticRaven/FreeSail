@@ -899,6 +899,10 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         "strait-west-approach",
         # package 79c: the Mediterranean west's currents, some 900 miles from the Channel
         *MED_WEST_CURRENTS,
+        # package 106a: Rennell's current among the Canaries and in the open sea south of
+        # Madeira (Purdy 1825, pp. 94 to 96)
+        "canaries-among",
+        "canary-current",
     ]
     start = datetime(1805, 6, 12, 0, 0)  # springs
     states = [tide.at(MID_STRAIT, start + timedelta(minutes=10 * i)) for i in range(6 * 25)]
@@ -923,7 +927,7 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
     assert all(
         a.current_kn == 0.0
         for a in tide.areas
-        if a.chart not in {"strait", *MEDITERRANEAN}  # package 79d
+        if a.chart not in {"strait", "canaries", *MEDITERRANEAN}  # package 79d; 106a
         and a.id not in MED_WEST_CURRENTS  # package 79c
     )
 
@@ -947,6 +951,7 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
         a.current_kn == 0.0
         for a in book.areas
         if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
+        and a.id not in {"canaries-among", "canary-current"}  # package 106a: Rennell's
         and a.id not in MED_WEST_CURRENTS  # package 79c
         and not a.id.startswith(MEDITERRANEAN_AREAS)
     )
