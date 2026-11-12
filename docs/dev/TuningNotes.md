@@ -26980,3 +26980,75 @@ held, and truth 7-519's passage to the Fort Genois. **No pin moved.** **The pace
 last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The tree
 reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
 
+
+## Package 106a: the ocean carried south, and the Canaries with the Salvages (2026-11-12)
+
+**Where I stand (2026-11-12):** measurement (A), the ocean layer, done and reported to the
+lead: a second coarse layer beside the first leaves every existing corridor tile byte for
+byte; widening the first rewrites all 48. Nothing committed under `data/charts/` yet.
+Measurement (B), the region, next; the sources' pass begun (the *Oriental Navigator* of
+1801, Glas 1764 and Purdy's Atlantic memoir of 1825 and 1829 fetched, not yet laid under
+`docs/references/`).
+
+### (A) The ocean layer: a second coarse layer against the first widened
+
+**What the chart holds.** The corridor `atlantic-corridor` is 48 level-1 tiles (9,746,887
+bytes), its bounds 32 to 51 N, 32 to 1 W, its fetch 31.9 to 51.1 N. A level-1 tile is
+4.2667 degrees (512 cells of 30"), so its southern row already runs from **29.4667 N** to
+33.7333 N: its eight tiles of that row are NODATA south of 31.9 N (149,504 of 262,144 cells
+each). The Canaries' own row of the grid is 25.2 to 29.4667 N. **The Salvages (30.0 to
+30.2 N) and the whole crossing from Madeira to the islands between 29.47 and 31.9 N lie in
+the existing tiles' NODATA**: a second layer cannot be new tiles alone; it shares the names
+of three of the first's tiles.
+
+**The control.** The tool at the trunk's head, run on a fresh GEBCO extract of the
+corridor's own fetch box (the extract's zip has another checksum, `d59228b0...` against the
+manifest's `69c4dbf9...`; its grid is the same), writes all 48 committed tiles byte for
+byte. Every difference below is the widening's.
+
+**The first widened** (bounds south 25.21 N, fetch 25.1 N, the rest as built): 56 tiles,
+12,512,736 bytes; **8 new tiles (1,731,872 bytes) and all 48 existing tiles rewritten, none
+byte-identical.** The south row's eight have their NODATA filled (149,504 cells each, 50,224
+in the westernmost). In every one of the 48: the elevation's half-metre ties broken the
+other way (2 to 2,381 cells a tile, never more than 1 m; 19 land and sea flips in all, on
+the Iberian and Biscay coasts), and the distance field changed over most of every tile (up
+to all 262,144 cells, even in the row at 50.8 N): the build's east-west cell is taken at
+the block's middle latitude, which the widening moves, so every distance in the block
+changes. The how-to's finding (package 39e), confirmed and worse: the widening moves the
+field of the whole corridor, not only the tiles near new land.
+
+**A second layer beside the first** (a corridor of its own, `atlantic-south` the working
+name; bounds 25.21 to 31.9 N, 18.5 to 9.4 W; fetch 12.3 to 33.8 N, 26.5 to 9.25 W, so that
+its field knows Madeira's shores and the coast of Morocco): 6 tiles, three columns (22.13 to
+9.33 W) by two rows. Three are new names (25.2 to 29.47 N; 634,781 bytes); three share the
+first's names in the row from 29.47 N (`106080_-79680`, `-64320`, `-48960`) and are written
+in their own folder, NODATA wherever the first has data (560,180 bytes so masked; 750,024
+whole): **1,194,961 bytes in all, and no existing tile touched.** The runtime must learn it:
+a level-1 tile listed by both layers is read as the first's, its NODATA cells (elevation,
+distance and the blocks' shoalest soundings) filled from the second's at load
+(`chart.Tile`, `Level.tile`; about thirty lines). Where the first answers, it answers alone,
+as it did. Of the three columns: the west from 22.13 W (Hierro's west point is 18.16 W, the
+pilots' way outside the islands 30 or 40 leagues west of them lies south of the row);
+nothing west of 22.13 W between 29.47 and 31.9 N is filled (a column more, 26.4 to 22.13 W,
+would be 1 tile of 170,625 bytes in the Canaries' row and one masked in the row above).
+
+**What reads the coarse layer, and whether it moves (the second layer).** The recorded
+passages and the gate's days are `region: channel-west`, whose chart has no corridor; the
+five kept saves of `tests/fixtures/saves/` are all `channel-west`: none reads the corridor.
+Twelve scenarios name `chart: atlantic-east`, and every one starts inside a region's bounds
+(none within 10 miles of an edge of the chart but Spithead's, to the north): their tiles are
+unchanged, and the new tiles answer only where the first had nothing. What does move with
+the second layer is **the chart's envelope**: its south limit 32 N to the new layer's 25.21
+N (`Chart.bounds`, read by the scenario's refusal, `bounds_words`, the harbour page and
+`/api/chart`, the business's bounds where a scenario starts in no region, none does, and
+the lookout's "the chart has nothing to the south" within 10 miles of 32 N, which a ship
+south of Madeira no longer hears). `tests/test_chart.py` asserts the envelope (32.0) and is
+moved with it. The tide's open edges read the corridors' bounds (`charted_bounds`): with the
+new layer's north bound at 31.9 N, below Madeira's south bound, Madeira's south edge stays
+closed and its tide unmoved (the proof by the truths at the final hash).
+
+**Carried on to 12.4 N, measured and not built:** the three rows below (12.4 to 25.2 N) by
+three columns (26.4 to 13.6 W; the coast lies west of 13.6 W from 25.2 N down): 9 tiles,
+1,881,628 bytes; with the Canaries' row's column from 26.4 W, 10 tiles and 2,052,253 bytes.
+By the second layer's way none of the first's tiles moves for it either; by the widening's,
+it would be the same 48 rewritten and 24 tiles more over the whole width (32 to 1 W).
