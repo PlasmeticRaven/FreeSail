@@ -27129,3 +27129,16 @@ water of half to half again the pilot's depth, dangers on its shoal head; every 
 Milazzo, Catania, Augusta, Syracuse; Reggio, Scilla), each with ten goods and more priced to
 differ, its tracks out to sea clear of the land by `Chart.line_shore` (Marsa Scirocco's and
 Augusta's first drafts crossed Delimara and the harbour's shore and were redrawn).
+
+**The weather box** `sicily` (the block's bounds): Malta's table (the Mediterranean Pilot vol. I,
+1913, p. 734, 26 years of 1852 to 1886, read from the item's leaf 906, the column totals
+checked: N 20, NE 72, E 19, SE 52, S 10, SW 34, W 23, NW 126, the calm 9) for the check rows;
+the generator's figures the coast of Tunis's with each month's gradient and lows searched by
+simulated months (a coarse search of 288 candidates at 36 months, then a local search of 140
+at 120 months for the months outside, then 400 months at seed 11). Eight months within four
+points of the row's westerly and easterly shares; **four outside, said in their notes**:
+April (the easterly 13 against 21), May (18 against 25), December (9 against 15) and July (the
+westerly 17 against 23, the northerly 48 against 39). The generator's easterly share does not
+rise to Malta's gregale and levanter months without spoiling the other quarters: a finding for
+whoever fits the eastern boxes, not mended. No test holds a box to its row by simulation (as
+before); the test holds the rows to the table.
