@@ -2050,7 +2050,9 @@ class World:
                 "order.rejected",
                 f"{head} not carried out ({text!r}): {e}",
                 actor=actor,
-                data={"order": text, "reason": str(e)},
+                # the things a refusal named apart, where it named some (package 109:
+                # `free.Several`), for 'the first' and 'the other' said after it
+                data={"order": text, "reason": str(e), **(getattr(e, "data", None) or {})},
             )
         if kind in UNLOGGED_KINDS:
             # a reading for the one who asked and for nobody else (package 40b: the
