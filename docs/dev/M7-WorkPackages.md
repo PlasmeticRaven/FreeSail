@@ -142,6 +142,8 @@ queue.
 
 **Ruled by the owner, 2026-11-12 (decision 68 in docs/DesignProposal.md):** slavery is a real fact of the world, told on "a grounded and respectful-to-the-history basis"; the player's interest is "the depiction of the efforts to suppress it"; "ignoring it totally ... is also dishonest to reality." The interim rule went to the chart builders the same day; package 110 is booked for the design note.
 
+**A standing rule of the owner's (2026-11-12), on old saves and old tests:** "In general, I accept changes which might affect saves from older versions, or which might invalidate an older test by design rather than by accident and supersede them." So: a change made on purpose may alter how a save from an older build replays, and may replace an older test or truth, **where it is by design and said**: the brief or the lead's ruling names it, the old stands beside the new with the reason in the tuning notes and the record, and the loader says in words that a save from before may replay otherwise where that is so. No legacy mode is kept to preserve a fault. What does not change: a save or a pin that moves **by accident** is a fault to find; no test is skipped, disabled or weakened to get a green run; and a builder who finds a save or a pin must move says so and stops for the lead's word unless the brief already gave it.
+
 **An open design question, recorded for the owner (2026-11-10): the day and the range.** The
 game's purpose is a world that can be simulated over a wide range of dates, 1792 to 1825 as
 it stands, and earlier and later where possible; the build's attention has gathered on 1805
