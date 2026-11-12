@@ -270,8 +270,6 @@ def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
         return {GROUND_TACKLE[verb]}
     if verb == "trim":
         return {str(vocab.evolutions["brace"])}
-    if verb == "send the boat":
-        return {"send_boat"}  # `belay the boat` (package 109): the port's boat, on her errand
     from freesail.orders import ground_tackle  # local import: it imports the verbs
 
     if verb in ground_tackle._EVOLUTIONS:
