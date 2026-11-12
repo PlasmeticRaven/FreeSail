@@ -584,6 +584,17 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 75, B7.c: her tack cleared beside her tack at quarters, two tacks of a 74 and
         # her guns made ready (7.3 s alone, her file in one process), 2026-11-11
         "test_bellerophon.py::test_her_tack_at_quarters_under_sail_before_guns_is_her_cleared_tack",
+        # package 75, B7, the lead's ruling (1) of 2026-11-10 at 19:30: the two-deckers lying a-try
+        # from way on (24.0 s and 21.9 s) and from rest (12.7 s and 13.1 s), four workers,
+        # 2026-11-12
+        "test_bellerophon.py::test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points"
+        "_under_two_knots[the-74]",
+        "test_bellerophon.py::test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points"
+        "_under_two_knots[the-64]",
+        "test_bellerophon.py::test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their"
+        "_lee_helm[the-74]",
+        "test_bellerophon.py::test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their"
+        "_lee_helm[the-64]",
     }
 )
 

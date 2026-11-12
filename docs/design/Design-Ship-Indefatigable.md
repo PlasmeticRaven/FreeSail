@@ -967,6 +967,16 @@ the brace limits, only with a source. Each tuned figure is recorded beside its s
 not pacing:** if she is still not faster, B1 reports it with the figures and does not force it.
 The frigate-36's Luce-ruled sail areas are the lead's file, not B1's.
 
+*Lying a-try, the lead's ruling (1) of 2026-11-10 at 19:30 (the 74's B7, built 2026-11-12): from way
+on in a gale, after "shorten sail" five times from plain sail in 35 kn, the 64 at her `clr_x_m` of
+4.8 lay 89.3 to 103.6 degrees off at 3.67 kn, and 90.7 at 3.60 with what it hands furled, where
+from rest she lies about five points (53.4 to 56.4 degrees at 1.45 kn). Her file now gives
+`lie_a_try` her own lee helm, 32 degrees where the evolution gives 5 (`timing:`, written by B1's
+module; the 74's 20): furled, she settles 71.1 to 71.5 degrees off at 1.69 kn, inside five to six
+and a half points; from rest she comes up and falls off, 43.5 to 79.4 at 1.36, inside truth 28's
+form; "heave to" as it was. The razee keeps the evolution's own. The sweep and its figures in
+docs/dev/TuningNotes.md, "The lead's rulings of 2026-11-10, built (package 75)".*
+
 ---
 
 ## 10. The lee ports: what her files supply

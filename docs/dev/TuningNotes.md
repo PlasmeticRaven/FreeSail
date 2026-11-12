@@ -19980,6 +19980,98 @@ sail" by the part.
 all hands are being called and not yet up (`_waiting_line` reads `crew.all_hands_called`, set only
 when the last is up): every ship's, a second all-hands work in a call's first ninety seconds.
 
+### 2. B7: the two-deckers lie a-try from way on (19:30 (1))
+
+**The ruling.** `clr_x_m` stays 4.8 and truth 17 is not re-ruled; "BUILD ... on the 74's and the
+64's files alone if the files can carry it in the timings' own form: the figure that brings her up
+from way on, in your path's 35 kn, to between five and six and a half points and under 2 kn, with
+truth 28's form from rest still holding and 'heave to' on the path as it lies today; every other
+file and its logs untouched ... If the helm alone will not hold both (your sweep will say), stop
+...; no change to the script's logic in B7." **Read so:** the path is B7's review's (her record,
+"Lie a-try from way on"): plain sail at 300 degrees in 35 kn, "shorten sail" five times 400 s apart,
+"lie a-try", then the courses, the fore and mizzen topsails and the topgallants furled, as truth 28's
+own form furls what lie a-try hands; her lie judged on the settled half hour (2,700 to 4,500 s after
+the furls). Truth 28's form holding is the truth's own bounds on her (30 to 95 degrees off, under 2
+kn on the hour's mean, nothing carried away, the lying line), from rest in 35 kn (B7's review's
+`try35.py`, the topgallant masts left up) and in 45 kn (truth 28 itself, the frigate's). No ship file
+could carry a timing before this step: the runner gave a script its evolution file's `timing:`
+alone. **The helm alone holds both, on each file** (the sweep below), so it is built.
+
+**As built.** A ship file's top-level `timing:` (`ShipSpec.timing`, `schema._parse_timing`: an
+evolution's id to a mapping of its timing's keys to figures, refused in words where it is not), read
+by `Runner._timing`, which gives the script its evolution file's timing with the ship's figures for
+that evolution over it; every other ship and evolution its file's own (the same object). The
+script's logic is unchanged: `LieATryScript` reads `timing_value("helm_deg", 5.0)` as before. The
+generator's `Builder.timing` writes the section last in the file with its note; the 74's module
+`lie_a_try: {helm_deg: 20}` (`LIE_A_TRY_HELM_DEG`, its judgement in a comment), B1's module the 64's
+32 and nothing for the razee. Every other file's bytes the generator's as before (sixteen of
+eighteen byte for byte; the two with the section added and its note, four lines each). A spec pickled
+before reads as one with no timing (`getattr`).
+
+*The sweep* (seed 7, the wind steady at 35 kn; `lie_a_try`'s `helm_deg` patched in the process on a
+worktree of 9e04b9fa, nothing in the tree changed; degrees off the wind, least to most, at the mean
+knots; "not furled" the half hour from 4,200 s after "lie a-try", "furled" the half hour from 2,700 s
+after the furls, "from rest" the hour of `try35.py`'s form in 35 kn):
+
+| helm_deg | the 74 not furled | the 74 furled | the 74 from rest | the 64 not furled | the 64 furled | the 64 from rest |
+|---|---|---|---|---|---|---|
+| 5 (the file's) | 89.9 at 3.48 | 87.6 at 3.52 | 56.2-57.7 at 1.30 | 92.2 at 3.60 | 90.7 at 3.60 | 53.4-56.4 at 1.45 |
+| 10 | 84.6-84.7 at 2.59 | 78.8-79.7 at 2.55 | 56.2-57.2 at 1.24 | 86.0 at 2.63 | 81.5 at 2.58 | 53.9-56.1 at 1.42 |
+| 15 | 81.5-84.3 at 2.28 | 71.1-74.3 at 2.08 | 55.6-57.2 at 1.21 | 83.7-84.0 at 2.27 | 76.3-79.6 at 2.17 | 54.0-56.5 at 1.39 |
+| 17.5 | 72.1-92.4 at 2.23 | **70.5-70.6 at 1.96** | 54.9-58.4 at 1.20 | | | |
+| 19 | 68.3-95.2 at 2.15 | **68.9 at 1.91** | 53.8-59.1 at 1.19 | | | |
+| **20 (hers)** | 66.3-96.7 at 2.09 | **67.6 at 1.88** | 52.7-59.9 at 1.17 | 78.6-86.7 at 2.08 | 70.9-78.5 at 1.94 | 51.7-58.1 at 1.38 |
+| 22.5 | 61.1-101.8 at 2.10 | **66.2-66.5 at 1.83** | 53.5-60.8 at 1.22 | 70.9-93.5 at 2.05 | 70.6-76.8 at 1.86 | 49.8-60.1 at 1.37 |
+| 25 | 58.4-104.3 at 2.02 | **65.7-66.2 at 1.79** | 46.8-90.0 at 1.21 | 67.5-96.0 at 2.01 | 70.4-75.2 at 1.79 | 52.2-62.3 at 1.38 |
+| 28 | | | | 62.4-100.4 at 1.95 | 70.6-73.5 at 1.74 | 49.2-89.7 at 1.36 |
+| 29 | | | | 60.9-101.9 at 1.89 | **70.7-73.0 at 1.73** | 47.2-91.3 at 1.37 |
+| 30 | 55.8-106.0 at 1.96 | **64.9-66.1 at 1.73** | 42.1-87.5 at 1.19 | 59.8-103.0 at 1.87 | **70.7-72.5 at 1.71** | 45.7-86.9 at 1.37 |
+| **32 (the 64's)** | | | | 58.1-104.7 at 1.91 | **71.1-71.5 at 1.69** | 43.5-79.4 at 1.36 |
+| 35 (hard a-lee) | 54.3-106.7 at 1.87 | **64.1-66.2 at 1.69** | 39.1-86.0 at 1.16 | 56.5-106.0 at 1.84 | **70.7 at 1.66** | 41.0-75.0 at 1.34 |
+
+Bold: inside five to six and a half points (56.25 to 73.125 degrees) and under 2 kn. **Not furled**,
+the courses, the fore and mizzen topsails and the topgallants hanging in the gear, no helm settles
+either ship in the band: to 15 she lies steady eight to seven and a half points off at 2.3 kn and
+more, from 17.5 (the 64 from 20) she comes up and falls off, between about 55 and 106 degrees at
+the most, at about 2 kn: the band is reached when the hands furl what lie a-try handed. **Furled**,
+the 74 from 17.5 and the 64 from 29. **From rest** every figure holds truth 28's form in 35 kn (30
+to 95 degrees, under 2 kn); the 74 steady near five points to 22.5, coming up and falling off from
+25; the 64 near five points to 26 and coming up and falling off from 27 and 28 (as truth 28's
+frigate does, 33 to 87 degrees). **Taken (judgement):** the 74 **20** (settled 67.6 degrees, six points, at 1.88
+kn, her lie from rest nearly as it was, 52.7 to 59.9 at 1.17 against 56.2 to 57.7 at 1.30), and the
+64 **32** (settled 71.1 to 71.5 at 1.69, a degree and a half inside six and a half points where 29
+and 30 hold it by 0.1 and 0.6 degrees; from rest 43.5 to 79.4 at 1.36). Each the file's own; the 74
+at 32 would come up and fall off from rest (42 to 88 at 30), the 64 at 20 lies outside the band.
+
+*As built, measured on the tree* (the figures the sweep gave, to the hundredth): her path's "Lying
+a-try under the main topsail and the staysails, helm a-lee." at tick 3,275 (the 64 3,272), as before;
+furled, the 74 67.6 degrees at 1.88 kn and the 64 71.1 to 71.5 at 1.69 (old 87.6 at 3.52 and 90.7 at
+3.60); her lying-to line an hour on "Lying to on the starboard tack, her head six points from the
+wind; the watch tending the helm and the sheets." (old "eight points"); her log on the path 367
+lines where it was 267 (the 64's 349), the more her leeway's lines as she comes up and falls off
+before the furls (in a longer run of the path, 6,000 s lying and 6,300 s furled: `ship.leeway` 120
+lines where it was 20, every other kind as many and the same). From
+rest in 35 kn, truth 28's form: as the sweep. In 45 kn, truth 28 itself on her: 50.6 to 83.9 degrees
+at 1.37 kn, nothing carried away (old 54.4 to 91.4 at 1.79); the 64 there carries away her main
+topsail sheet and blows out her mizzen topsail before she lies a-try, at every helm and before this
+step alike (her log digest for digest the same), not her truth. **"Heave to" on the path:** each
+file's log line for line and digest for digest as before (the 74 256 lines, ecfb97653106ca59; the 64
+256, 17f0502076e2b12b), the heave-to's own `helm_deg` untouched.
+
+**Lines any ship may say that this changes:** the 74's and the 64's lying a-try alone: where she lies
+and her way, her lying-to line's points, and her leeway's lines as she comes up and falls off. No
+other file carries a timing (her test), so no other ship's lie a-try, heave-to or any scripted
+manoeuvre moves; no recorded passage holds either ship (the four whole logs as before, and no
+captain's trial moved by this step: "The suites, as run").
+
+**Pins:** none moved. **New** (`tests/test_bellerophon.py`): the timing on the two files alone, every
+other file's and evolution's its own, and refused in words
+(`test_her_and_the_64s_lee_helm_lying_a_try_is_their_files_alone`); from way on in the band
+(`test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points_under_two_knots`, the 74 and the
+64); from rest in truth 28's form
+(`test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their_lee_helm`, both); the four
+sailed ones slow (24.0, 21.9, 12.7 and 13.1 s at four workers; `tests/conftest.py`'s `SLOW_TESTS`).
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

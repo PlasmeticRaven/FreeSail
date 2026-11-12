@@ -1685,6 +1685,26 @@ under way is aback from 4.9 in 16 kn. No one lead holds both on this path; the c
 two-deckers with truth 17's case re-ruled, or a harder lee helm in `LieATryScript`, measured on her,
 the 64 and the frigate) is the lead's (`docs/dev/TuningNotes.md`, her review's mends).*
 
+*Built at the lead's ruling (1) of 2026-11-10 at 19:30 (2026-11-12): `clr_x_m` stays 4.8 and truth
+17 is not re-ruled; the lee helm lying a-try is her file's and the 64's alone, in the timing's own
+form (`timing: {lie_a_try: {helm_deg: 20}}`, the 64's 32, written by the generator; `ShipSpec.timing`
+read by `Runner._timing` over the evolution's 5 degrees; the script's logic unchanged, every other
+file and evolution its own timing). Swept on the path (seed 7, 35 kn) from 5 to 35 degrees: with
+what lie a-try hands furled, she settles inside five to six and a half points under 2 kn from 17.5
+(70.6 degrees at 1.96 kn), at 19 68.9 at 1.91 and at 20 67.6 at 1.88, the figure taken (judgement);
+the 64 from 29 (70.7 to 73.0 at 1.73), at her 32 71.1 to 71.5 at 1.69. Before the furls, the
+courses, the fore and mizzen topsails and the topgallants hanging in the gear, no helm settles
+either in the band (she comes up and falls off, at 20 between 61.6 and 100.9 degrees at 2.14 kn;
+at 25 and over between about 55 and 106): the band is reached once the hands furl what lie a-try
+handed, as truth 28's form furls it. From rest truth 28's form holds at every figure swept: in 35
+kn she lies 52.7 to 59.9 at 1.17 kn (old 56.2 to 57.7 at 1.30), the 64 coming up and falling off
+43.5 to 79.4 at 1.36 (old 53.4 to 56.4 at 1.45), each inside the truth's 30 to 95 degrees and 2 kn;
+in 45 kn with the topgallant masts down (the truth itself) she lies 50.6 to 83.9 at 1.37 (old 54.4
+to 91.4 at 1.79), and the 64 carries away her main topsail sheet before she lies a-try, at every
+helm, as before. "Heave to" on the path lies as it did (its own `helm_deg`): the same log, digest
+for digest, on both files. Figures in `docs/dev/TuningNotes.md`, "The lead's rulings of 2026-11-10,
+built (package 75)".*
+
 ---
 
 ## 10. The lee ports: what her file supplies

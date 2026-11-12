@@ -3530,6 +3530,24 @@ DESCRIPTION = (
 # The file
 # ---------------------------------------------------------------------------
 
+# Her lee helm lying a-try (the lead's ruling (1) of 2026-11-10 at 19:30, B7: lie a-try from way
+# on), `lie_a_try`'s own timing key on her file (`ShipSpec.timing`): the evolution's 5 degrees
+# left her lying 86.5 to 101.4 degrees off at 3.57 kn from way on in 35 kn, and 87.6 at 3.52 with
+# what it hands furled, where she lies about five points at 1.30 kn from rest. Measured (seed 7;
+# docs/dev/TuningNotes.md, "The lead's rulings of 2026-11-10, built"): with what lie a-try hands
+# furled, the least helm that settles her inside five to six and a half points under 2 kn is 17.5
+# (70.6 at 1.96 kn), 19 lies 68.9 at 1.91 and 20 lies 67.6 at 1.88; from rest truth 28's form
+# holds at every figure to 35. 20 taken (judgement), Luce's "helm a-lee" a little more than the
+# frigate's: her clr_x_m (4.8) and truth 17 as the lead has them.
+LIE_A_TRY_HELM_DEG = 20
+LIE_A_TRY_NOTE = (
+    "Her own figure for an evolution's timing, over its file's (the runner's): lying a-try, the "
+    "helm a-lee 20 degrees where the evolution's file gives 5, the figure that brings her up from "
+    "way on in a gale to six points with under 2 knots of way once what it hands is furled, where "
+    "at 5 she lay eight points off at 3.5 knots; from rest she lies five points as before "
+    "(measured: docs/dev/TuningNotes.md; judgement)."
+)
+
 ERA_NOTES = (
     "HMS Bellerophon, a 74-gun ship of the Arrogant class (Slade's design of 1758 on the Bellona's "
     "lines): ordered 1782, launched by Graves at Frindsbury in 1786, at the Glorious First of "
@@ -3977,6 +3995,7 @@ def write(out_dir):
     check_company(b)
     boats_pumps_hold(b)
     b.descriptions([DESCRIPTION])
+    b.timing(LIE_A_TRY_NOTE, {"lie_a_try": {"helm_deg": LIE_A_TRY_HELM_DEG}})
     b.dump(os.path.join(out_dir, "seventy-four.yaml"), HEADER)
 
 

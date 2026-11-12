@@ -94,6 +94,13 @@ and `flag:`, the flag party a flagship bears beyond her company when a scenario 
 not in the complement. No file carries either yet; nothing reads them until her bill by deck
 (the marines) and the flag's own package (the flag party); a bill and a crew pickle as before
 while they hold neither.
+
+Package 75's B7, the lead's ruling (1) of 2026-11-10 at 19:30 (lie a-try from way on), adds a
+top-level `timing:`: the ship's own figures for a scripted evolution's timing, by its id and in
+its file's own keys (`lie_a_try: {helm_deg: 20}`), which the runner gives the script over the
+evolution file's (`Runner._timing`); the script's logic is unchanged. Only the 74's and the 64's
+files carry it; a file without it has every evolution's own timing, and a spec pickled before it
+reads as one with none.
 """
 
 from __future__ import annotations
@@ -1038,6 +1045,10 @@ class ShipSpec:
     armament: ArmamentSpec | None = None  # None: no guns, and the gunnery refused in words
     pumps: list[PumpSpec] = field(default_factory=list)  # none: no pumps (package 73)
     oars: OarsSpec | None = None  # None: no oars; a boat's file has them (package 82)
+    # the ship's own figures for a scripted evolution's timing, {evolution id: {key: figure}},
+    # taken over the evolution file's (package 75, the lead's ruling (1) of 2026-11-10 at 19:30:
+    # the two-deckers' lee helm lying a-try); none: every evolution's own timing
+    timing: dict[str, dict[str, float]] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -1112,9 +1123,30 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         ),
         pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
         oars=_parse_oars(data["oars"], source) if data.get("oars") is not None else None,
+        timing=_parse_timing(data["timing"], source) if data.get("timing") is not None else {},
     )
     validate(spec)
     return spec
+
+
+def _parse_timing(raw: Any, source: str) -> dict[str, dict[str, float]]:
+    """The `timing:` section (package 75, the lead's ruling (1) of 2026-11-10 at 19:30): for each
+    scripted evolution named by its id, the ship's own figures for keys of its timing, each a
+    number, read by the runner over the evolution file's own (`Runner._timing`). Which ids and
+    keys an evolution has is its file's, and the files' tests hold every ship file's to them;
+    here the shape alone, refused in words."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: 'timing' is not a mapping of evolutions to their figures.")
+    out: dict[str, dict[str, float]] = {}
+    for eid, figures in raw.items():
+        if not isinstance(figures, dict) or not figures:
+            raise ShipFileError(
+                f"{source}: the timing for '{eid}' is not a mapping of its keys to figures."
+            )
+        out[str(eid)] = {
+            str(k): _num(figures, k, f"the timing for '{eid}'", source) for k in figures
+        }
+    return out
 
 
 def _parse_pumps(raw: Any, source: str) -> list[PumpSpec]:

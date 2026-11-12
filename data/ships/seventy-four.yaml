@@ -5720,3 +5720,7 @@ boats:
   oars: 6
   crew: 7
   tons: 0.2
+# Her own figure for an evolution's timing, over its file's (the runner's): lying a-try, the helm a-lee 20 degrees where the evolution's file gives 5, the figure that brings her up from way on in a gale to six points with under 2 knots of way once what it hands is furled, where at 5 she lay eight points off at 3.5 knots; from rest she lies five points as before (measured: docs/dev/TuningNotes.md; judgement).
+timing:
+  lie_a_try:
+    helm_deg: 20

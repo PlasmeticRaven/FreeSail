@@ -335,7 +335,7 @@ class Runner:
             script_cls = SCRIPTS.get(evo.script)
             if script_cls is None:
                 raise OrderError(f"'{evolution_id}' names an unknown script '{evo.script}'.")
-            inst.script = script_cls(ship, merged, evo.timing)
+            inst.script = script_cls(ship, merged, self._timing(ship, evo))
         inst.holds = self._holds(ship, inst)
         if self._crew(ship) is not None:
             try:
@@ -534,6 +534,16 @@ class Runner:
         if isinstance(subject, Line):
             return f"the {name} left {subject.state.value}"
         return f"the {name} left as it stands"
+
+    @staticmethod
+    def _timing(ship: Ship, evo: registry.Evolution) -> dict[str, float]:
+        """A script's timing: its evolution file's, with the ship file's own figures for that
+        evolution over it where her file gives them (`ShipSpec.timing`; package 75, the lead's
+        ruling (1) of 2026-11-10 at 19:30: the 74's and the 64's lee helm lying a-try, `helm_deg`).
+        Every other ship and evolution, the file's own."""
+        spec = getattr(ship, "spec", None)
+        own = (getattr(spec, "timing", None) or {}).get(evo.id)
+        return {**evo.timing, **own} if own else evo.timing
 
     def _check_party(self, ship: Ship, inst: Instance) -> None:
         """An order that names its hands (`with the idlers`, `send the starboard watch

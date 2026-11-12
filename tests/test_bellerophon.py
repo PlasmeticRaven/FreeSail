@@ -1249,6 +1249,190 @@ def _driver_bent_file(tmp_path):
     return str(path)
 
 
+# Lie a-try from way on (the lead's ruling (1) of 2026-11-10 at 19:30, B7): each two-decker's own
+# lee helm lying a-try, her file's `timing:` over the evolution's 5 degrees (`ShipSpec.timing`,
+# `Runner._timing`); five points and six and a half, the band the ruling names
+LIE_A_TRY_HELM_DEG = {SEVENTY_FOUR: 20.0, SIXTY_FOUR: 32.0}
+FIVE_POINTS, SIX_AND_A_HALF_POINTS = 56.25, 73.125
+
+
+def test_her_and_the_64s_lee_helm_lying_a_try_is_their_files_alone():
+    """The lead's ruling (1) of 2026-11-10 at 19:30: the figure that brings the two-deckers up
+    from way on lying a-try is carried on the 74's and the 64's files alone, in the timing's own
+    form (`timing: {lie_a_try: {helm_deg: ...}}`, the generator's), over `lie_a_try`'s 5 degrees;
+    the script's logic is unchanged. Every other evolution of theirs keeps its file's timing (the
+    heave-to's `helm_deg` its own, so that "heave to" lies as it did), and no other committed
+    file carries a timing; a file's timing names a scripted evolution and only keys its file's
+    timing gives. A timing that is not figures is refused in words."""
+    from freesail.evolutions import EVOLUTIONS
+    from freesail.ship.loader import spec_from_dict
+    from freesail.ship.schema import ShipFileError
+
+    lie, heave = EVOLUTIONS["lie_a_try"], EVOLUTIONS["heave_to"]
+    assert lie.timing["helm_deg"] == 5.0 and heave.timing.get("helm_deg") is not None
+    for path in sorted(Path("data/ships").glob("*.yaml")):
+        ship = load_ship(path.as_posix())
+        rel = path.as_posix()
+        for eid, figures in ship.spec.timing.items():
+            assert EVOLUTIONS[eid].script is not None, (rel, eid)
+            assert set(figures) <= set(EVOLUTIONS[eid].timing), (rel, eid)
+        if rel in LIE_A_TRY_HELM_DEG:
+            assert ship.spec.timing == {"lie_a_try": {"helm_deg": LIE_A_TRY_HELM_DEG[rel]}}
+            timing = Runner._timing(ship, lie)
+            assert timing == {**lie.timing, "helm_deg": LIE_A_TRY_HELM_DEG[rel]}, rel
+        else:
+            assert ship.spec.timing == {}, rel
+            assert Runner._timing(ship, lie) is lie.timing, rel
+        assert Runner._timing(ship, heave) is heave.timing, rel
+    import yaml
+
+    doc = yaml.safe_load(Path(FRIGATE).read_text(encoding="utf-8"))
+    doc["timing"] = {"lie_a_try": {"helm_deg": "hard"}}
+    with pytest.raises(ShipFileError, match="is not a number"):
+        spec_from_dict(doc)
+    doc["timing"] = {"lie_a_try": 20}
+    with pytest.raises(ShipFileError, match="not a mapping of its keys to figures"):
+        spec_from_dict(doc)
+
+
+def _lying_a_try_from_way_on(path):
+    """Her path of B7's review (docs/dev/TuningNotes.md, "Lie a-try from way on"): seed 7, the
+    wind north at 35 kn steady, plain sail at 300 degrees and 4 kn trimmed every two minutes for
+    600 s, "shorten sail" five times 400 s apart, 300 s, "lie a-try" and 600 s, then the courses,
+    the fore and mizzen topsails and the topgallants furled. Returns the world and her degrees off
+    the wind and knots in the half hour from 600 s after "lie a-try" (not furled) and in the half
+    hour from 2,700 s after the furls (furled, settled)."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from tests.test_known_truths import knots, off_wind
+
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=35.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=300.0,
+        ship_speed_kn=4.0,
+    )
+    world = make_world(7, path, scenario)
+    world.submit("set plain sail")
+    for i in range(600):
+        if i % 120 == 60:
+            world.submit("trim sails")
+        world.tick()
+    for _ in range(5):
+        world.submit("shorten sail")
+        world.run(400)
+    world.run(300)
+    world.submit("lie a-try")
+    world.run(600)
+
+    def half_hour():
+        off, kn = [], []
+        for _ in range(1800):
+            world.tick()
+            off.append(off_wind(world))
+            kn.append(knots(world))
+        return off, kn
+
+    lying = half_hour()
+    for order in (
+        "furl the courses",
+        "furl the fore topsail",
+        "furl the mizzen topsail",
+        "furl the topgallants",
+    ):
+        world.submit(order)
+    world.run(900 + 1800)
+    return world, lying, half_hour()
+
+
+@pytest.mark.parametrize("path", [SEVENTY_FOUR, SIXTY_FOUR], ids=["the-74", "the-64"])
+def test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points_under_two_knots(path):
+    """The lead's ruling (1) of 2026-11-10 at 19:30, on B7's review's path (its helper
+    `_lying_a_try_from_way_on`): with her file's lee helm, 20 degrees the 74's and 32 the 64's,
+    she comes up from way on and, what lie a-try hands furled, settles between five and six and a
+    half points off under 2 kn: the 74 67.6 degrees at 1.88 kn, the 64 71.1 to 71.5 at 1.69.
+    "Lying a-try under the main topsail and the staysails, helm a-lee." at tick 3275 (the 64
+    3272), as before. Before the furls, the courses, the fore and mizzen topsails and the
+    topgallants hanging in the gear, she comes up and falls off (the 74 61.6 to 100.9 at 2.14 kn,
+    the 64 57.5 to 105.2 at 1.84): no helm settles her in the band so (the sweep in
+    docs/dev/TuningNotes.md). Old, at the evolution's 5 degrees (9e04b9fa): the 74 86.5 to 101.4
+    at 3.57 kn, furled 87.6 at 3.52; the 64 89.3 to 103.6 at 3.67, furled 90.7 at 3.60."""
+    from tests.test_known_truths import events
+
+    world, lying, furled = _lying_a_try_from_way_on(path)
+    (line,) = events(world, "ship.hove_to")
+    assert line.text == "Lying a-try under the main topsail and the staysails, helm a-lee."
+    assert abs(line.tick - (3275 if path == SEVENTY_FOUR else 3272)) <= 5
+    off, kn = furled
+    assert FIVE_POINTS < min(off) and max(off) < SIX_AND_A_HALF_POINTS, (min(off), max(off))
+    assert sum(kn) / len(kn) < 2.0
+    settled = {SEVENTY_FOUR: (67.6, 1.88), SIXTY_FOUR: (71.3, 1.69)}[path]
+    assert sum(off) / len(off) == pytest.approx(settled[0], abs=1.0)
+    assert sum(kn) / len(kn) == pytest.approx(settled[1], abs=0.1)
+    assert max(lying[0]) > SIX_AND_A_HALF_POINTS  # not furled, she falls off past the band
+    assert world.ship.extra["hove_to"]["how"] == "a-try"
+
+
+@pytest.mark.parametrize("path", [SEVENTY_FOUR, SIXTY_FOUR], ids=["the-74", "the-64"])
+def test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their_lee_helm(path):
+    """The lead's ruling (1) of 2026-11-10 at 19:30: truth 28's form from rest still holding with
+    the two-deckers' lee helm (B7's review's form: truth 28's sequence from rest in 35 kn, the
+    topgallant masts left up, the hour after the fore and mizzen topsails are furled): inside
+    truth 28's own bounds, 30 to 95 degrees off and under 2 kn on the hour's mean, nothing carried
+    away. The 74 52.7 to 59.9 degrees at 1.17 kn (old, at 5 degrees, 56.2 to 57.7 at 1.30); the
+    64, coming up and falling off as truth 28's frigate does, 43.5 to 79.4 at 1.36 (old 53.4 to
+    56.4 at 1.45). In 45 kn with the topgallant masts down (truth 28 itself, the frigate's) the
+    74 lies 50.6 to 83.9 at 1.37 (old 54.4 to 91.4 at 1.79); the 64 carries away her main topsail
+    sheet before she lies a-try there, at any helm, as before (not her truth)."""
+    from tests.test_known_truths import (
+        CARRIED_AWAY,
+        events,
+        from_rest,
+        knots,
+        off_wind,
+        run,
+        until_idle,
+    )
+
+    world = from_rest(path, knots_=35.0)
+    world.submit("call all hands")
+    run(world, 90)
+    for text in (
+        "bend the fore storm staysail",
+        "bend the mizzen storm staysail",
+        "brace sharp up on the starboard tack",
+    ):
+        world.submit(text)
+    until_idle(world, 3600)
+    world.submit("set the topsails")
+    until_idle(world, 3600)
+    world.submit("close reef the topsails")
+    until_idle(world, 3600)
+    world.submit("set the fore storm staysail")
+    world.submit("set the mizzen storm staysail")
+    until_idle(world, 1800)
+    world.submit("lie a-try")
+    until_idle(world, 1800)
+    world.submit("furl the fore topsail")
+    world.submit("furl the mizzen topsail")
+    until_idle(world, 1800)
+    off, kn = [], []
+    for _ in range(3600):
+        world.tick()
+        off.append(off_wind(world))
+        kn.append(knots(world))
+    lying = events(world, "ship.hove_to")
+    assert lying and lying[-1].text.startswith("Lying a-try under the main topsail")
+    assert [e.text for e in world.log if e.kind in (*CARRIED_AWAY, "line.parted")] == []
+    assert 30.0 <= min(off) and max(off) <= 95.0
+    assert sum(kn) / len(kn) < 2.0
+    band = {SEVENTY_FOUR: (52.7, 59.9, 1.17), SIXTY_FOUR: (43.5, 79.4, 1.36)}[path]
+    assert (min(off), max(off)) == pytest.approx(band[:2], abs=1.5)
+    assert sum(kn) / len(kn) == pytest.approx(band[2], abs=0.1)
+
+
 def test_she_sails_as_the_vanguard_and_the_bellona_were_reported(tmp_path):
     """Bel-D §9's sailed checks, at seed 7 with the yards trimmed, half an hour settled. The
     *Vanguard*, an Arrogant, on 1 August 1798: 5 kn 4 f a point abaft the beam in moderate

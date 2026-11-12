@@ -2476,6 +2476,8 @@ def write(out_dir, p):
     quarter_bill(b, p, guns)
     boats_pumps_hold(b)
     b.descriptions([DESCRIPTIONS[p.key]])
+    if p.key in LIE_A_TRY_HELM_DEG:
+        b.timing(LIE_A_TRY_NOTE, {"lie_a_try": {"helm_deg": LIE_A_TRY_HELM_DEG[p.key]}})
     b.dump(os.path.join(out_dir, p.file), p.header)
 
 
@@ -4497,6 +4499,26 @@ COMPANY = {
         "(judgement; D32 (a))",
     },
 }
+# The 64's lee helm lying a-try (the lead's ruling (1) of 2026-11-10 at 19:30, B7: lie a-try from
+# way on, on the 74's and the 64's files alone), `lie_a_try`'s own timing key on her file
+# (`ShipSpec.timing`): the evolution's 5 degrees left her lying 89.3 to 103.6 degrees off at 3.67
+# kn from way on in 35 kn, and 90.7 at 3.60 with what it hands furled, where she lies about five
+# points at 1.45 kn from rest. Measured (seed 7; docs/dev/TuningNotes.md, "The lead's rulings of
+# 2026-11-10, built"): with what lie a-try hands furled, the least helm that settles her inside
+# five to six and a half points under 2 kn is 29 (70.7 to 73.0 at 1.73 kn), 30 lies 70.7 to 72.5
+# at 1.71 and 32 lies 71.1 to 71.5 at 1.69, all but steady; from rest truth 28's form holds at every
+# figure to 35, coming up and falling off from 28 (43.5 to 79.4 degrees at 32, 1.36 kn). 32 taken
+# (judgement): her settled lie a degree and a half inside the six and a half points. The razee
+# keeps the evolution's own.
+LIE_A_TRY_HELM_DEG = {"sixty-four": 32}
+LIE_A_TRY_NOTE = (
+    "Her own figure for an evolution's timing, over its file's (the runner's): lying a-try, the "
+    "helm a-lee 32 degrees where the evolution's file gives 5, the figure that brings her up from "
+    "way on in a gale to six points and a third with under 2 knots of way once what it hands is "
+    "furled, where at 5 she lay eight points off at 3.6 knots; from rest she lies about five "
+    "points as before, coming up and falling off (measured: docs/dev/TuningNotes.md; judgement)."
+)
+
 # The quarter bill's figures beyond the trimmers (Indf §6.4): the frigate-36's two at the helm
 # and no powder beyond the idlers; her small-arms men the frigate-36's share of her seamen, 20 of
 # 182; her boarders a quarter of the seamen (`gen_ships.BOARDERS_NOTE`); all judgement as hers.
