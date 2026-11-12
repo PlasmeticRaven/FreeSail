@@ -26983,9 +26983,10 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 
 ## Package 105: Sicily and Malta (2026-11-12)
 
-**Where I stand:** step 1 (a port file's dated rows for more than its holder) built and
-measured; reported to the lead at its hash. Step 2 (the measurement report, then the region
-with Malta, eastern Sicily and the Strait) not begun.
+**Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
+measured at 52395f9 and reported. Step 2 begins with its measurement report; Smyth's
+*Memoir* of Sicily (1824) found on the Internet Archive for it. Decision 68 (the lead's
+note of 2026-11-12) binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
 
@@ -27014,3 +27015,15 @@ file's `dated` empty, its six keys equal on no day, 1700, June 1805 and 1900); f
 `tests/test_ports.py` pin the form on a file written for them (each key by day, both ends
 counted in, the day's turn by the tick, the scenario's entry over every row, the refusals).
 The house form is written in `docs/dev/ChartBlocks.md`, item 5 of the steps.
+
+**Step 1's figures** (measured in a pinned worktree at 52395f9, the step's commit edb4d71
+with the trunk at d11ac5a merged by a merge commit; no file of the trunk's conflicted).
+`ruff check .` and `ruff format --check .` (ruff 0.15.8, the pin): clean, 382 files. **The
+fast tier** (`-n 4`): exit 0, 509 slow tests left out. **The slow tier** of the touched
+files, `tests/test_ports.py` and `tests/test_known_truths.py` (`--slow -m "not pace" -n
+4`): exit 0, 442 passed, 8 xfailed in 58 minutes; the recorded passages among them (the
+gate-5b passage's and the merchant passage's constants, truths 49, 72, 7-283, 7-314,
+7-378, 7-399, 7-476 and the rest replayed to their digests). **No pin moved.** **The pace**
+alone and last (`--slow -m pace -n 0`, the same files, load 0.8 at its start): exit 0, 12
+passed. The tree reported differs from 52395f9 by this paragraph and the "where I stand"
+above alone.
