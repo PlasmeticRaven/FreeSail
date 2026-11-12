@@ -26648,6 +26648,16 @@ row, compared by eye with the plates, held (the quarters, the diagonals, the swa
 Found for others, not mended: a table book's lookout says "two flags at the main" for
 Spain's signals of one flag (401 to 421), whose hoist is one flag; the line may not move.
 
+**Step 2: the measure.** At 79926e7 (step 2 with the trunk at 7361b42 merged by a merge
+commit, the trunk's appends first): ruff check and format clean (382 files); the fast tier
+7,494 passed, 1 xfailed, 0 failed; the slow tier of the touched files and of
+`test_known_truths` (test_flag_drawings, test_flags, test_signals, test_known_truths,
+test_captain_trials, test_replay, test_checkpoint, test_in_world; `--slow -m "not pace"`)
+593 passed, 8 xfailed, 0 failed (truth 7b-130, which failed once under load at 33e546b, held
+here); pace alone and last on the same files, 12 passed. No digest moved; no game line about
+a hoist or the colours moved (the fixture's old-beside-new tests). The tree reported differs
+from 79926e7 by this paragraph alone.
+
 **Step 3: a hoist has its place and is seen.** `Hoist.place` ('' at the main, out of the
 pickle and the record while unset); the yardarm place words (`<mast> yardarm`, `<mast>
 <yard> yardarm`, the weather arm, JUDGEMENT) beside the mastheads; an order names a place at
