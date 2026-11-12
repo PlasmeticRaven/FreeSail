@@ -26980,3 +26980,53 @@ held, and truth 7-519's passage to the Fort Genois. **No pin moved.** **The pace
 last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The tree
 reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
 
+
+## Package 109: the mends from the owner's play of 2026-11-12
+
+### Step 1: the words that did nothing (notes 9, 4, 10 and the first half of 5)
+
+**What was built.** A free order (`orders/free.py`) is now accepted only where its words found a
+thing (or it writes one, `write a letter`); where they found none it is refused
+(`order.rejected`, nothing journaled), in words that say what was not found and what the game
+knows by that name: a thing of that name gone over the side or destroyed, a person who is no
+thing, an order of the dialect the words were near (`difflib` over the vocabulary's phrases of
+two words or more, ratio 0.88: `take posession of the renard` is answered with `take possession
+of`), and what is in his keeping and lying where he stands by their listed names, or "You keep
+nothing, and nothing lies here." A line whose words found a thing and moved nothing (shown, out
+of reach, opened when it is no letter) is the world's as it was: "as said; nothing of the
+ship's changed" with its reason; every line that did an act is unchanged. **The dialect first:**
+`take a sight for the latitude` and five like forms are synonyms of `observe the sun`; a bare
+`take a sight` is answered with the two sights; `open the gunports` and ten like forms ("the
+ports open as the guns are run out ...") and `take command`, `assume command` ("her prize master
+... by 'take possession of her'; ... 'go to the boat' and 'pull for' her") are
+`refused_phrases`. **The name shown is a name taken** (`things.find`): a thing is found by its
+name or its listed name (`name_words`) with the articles anywhere left out, and a letter by its
+keys without the words of its state (sealed, open, broken) and with its writer's or addressee's
+title left off (`the letter from Weston`). The director's letter of the bilander's save is found
+by the nine forms the test tries. **Two of one name:** where the words name several things in
+his reach, the order is refused (`free.Several`) naming them apart (listed name, writer's hand
+and hour, where it is, the first six words of one he may read: never a sealed letter's), and
+the refusal's data keeps their ids (`choices`; `core/world.py` merges an error's `data` into the
+rejected order's, the one line there); `the first`, `the second`, `the last` with or without the
+noun, and `the other` (the one his last free line did not name) take one. **The keeping read:**
+a per-asker reading `my keeping` (`api/readings.py`, `keeping`, left out of the readings' dict
+as `where am I` is, so no sample changes), with the aliases `the things`, `what I have`,
+`inventory`, `what is in my keeping`, `the letters` and eleven more. The director's say-as
+(`free.spoken`) is left as it was: a line naming nothing is said there, as before.
+
+**Pins moved, old beside new** (each the brief's change itself, the toggle the trunk's code):
+truth 7b-115 (package 53b's, "a free line naming nothing known is as said") was ten lines each a
+notable `free.line` ending "as said; nothing of the ship's changed." and journaled; it is now
+the same ten lines each `order.rejected`, "Nothing of that name is known", nothing journaled,
+the things, purse, hold and people the same (renamed `..._is_refused_and_eat_and_drink_as_
+before`). `test_people.py`: "gave the letter to the pilot, as said ..." now refused; "take the
+packet" after it went over the side, "... as said" now refused saying "The sealed packet went
+over the side."; "handed the chart to the master, as said" now refused; the hearing check's
+"read the orders" (no thing) now "read the packet" (out of reach, said). `test_letters.py`:
+"read the letter" after it was burnt, not moved, now refused; "examine the brandy", "... as
+said", now refused. The primer's chapter 14 paragraph and its table say the new rule; the
+grammar book's test wanted `my keeping` named there. No recorded passage's digest and no kept
+save moved (none holds a free line).
+
+**Truths 7-540 and 7-541** (`tests/test_known_truths.py`) and `tests/test_mends_109.py` (32
+cases, each failing on the trunk as the brief describes).
