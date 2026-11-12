@@ -2109,6 +2109,22 @@ the figures are in `docs/dev/TuningNotes.md`.
    `tyrrhenian` (Naples' table). The scenario `agincourt-sound.yaml`: the frigate from the
    Maddalena to look into Toulon and back.
    Figures in `docs/dev/TuningNotes.md`.
+   **As built (package 101, 2026-11-10), the Catalan coast.** The hole the chart had north of
+   `balearics` (40.56 N) and west of `gulf-of-lion`'s first tile column (2.61 E) closed by
+   one region, `catalan-coast` (40.56 to 41.9 N, 0.3 to 3 E, abutting both): 24 level-2 tiles
+   written and the Gulf's column of 4 kept by the seam rule, 46 level-3 tiles (Barcelona,
+   Tarragona with Salou, and the Alfaques over the Ebro's delta, whose land GEBCO lays under
+   mean sea level and which keeps the eleven's raise by package 93's rule), 6.07 MB with the
+   coast and the features; 45 marks from Tofiño 1787 with Michelot, Purdy, Norie and Smyth,
+   and twelve each for Rosas and Palamós (`gulf-of-lion`) and Valencia and Alicante
+   (`mediterranean-west`) by the features files and their indexes alone; Barcelona's lantern
+   lit in 1805, its new mole's (1823) and Tarragona's mole lantern (1826) dated after; no
+   patch from a sheet, the modern ports and delta the grid's. Seven port files, Spain's and
+   hostile in 1805, Barcelona, Rosas, Tarragona and Valencia France's by dated nations for the
+   French holding. The tide: Barcelona's gauge (TICON, REDMAR's level); the coast's
+   south-westerly set as a current. The weather box `catalan-coast` from Barcelona's table
+   (Admiralty 1913, p. 726). The scenario `tarragona.yaml`: the frigate from Port Mahon to
+   Tarragona's road in May 1809. Figures in `docs/dev/TuningNotes.md`, "Package 101".
 
 Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period
 sheet can be read, the features file's marks with their sources in the references'

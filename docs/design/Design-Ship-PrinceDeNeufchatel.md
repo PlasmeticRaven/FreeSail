@@ -1250,6 +1250,13 @@ As built at B2b), a quarter more than the brig-sloop's 766 where the design's wa
 carries the brig's 27 trimmers to 33.8; the bill's 35 is kept as written, its note in her file
 saying a quarter more since the review of 2026-11-08 (for the lead: 34 by the rule).*
 
+*At the lead's ruling (6) of 2026-11-09 (built 2026-11-10): **34 by the rule, through the generator**
+(`trimmers`): the brig's 27 by her plain sail, 33.8, rounded, shared out on this section's 9, 11 and
+15 by largest remainder, the muster's own rule: forecastle 9, fore top 11, afterguard **14** (old
+15). Measured at the beat (seed 7): every gun crew fills, ten crews of 42; at the carronades her
+sixteen marines and sixteen of the afterguard (old fifteen and a waister); the trimmers 65 as
+before, the tiller one, the powder eight; the log's line the same.*
+
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores

@@ -509,6 +509,9 @@ flags:                           # the nation's flags by name
       - {rect: [0, 0, 1, 1], colour: red}
       - {rect: [0, 0, 0.5, 0.5], colour: blue}
       - {line: [[0, 0], [0.5, 0.5]], width: 0.05, colour: white}   # width in the hoist's units
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: blue}   # package 102: three or more points
+    shape: ""                    # package 102: the outline: "" a rectangle, swallowtail, triangle
+    cut: 0.33                    # a swallow tail's cut, a share of the fly (1/3 when not given)
     dates: "1801-"               # the years it flew: "1801-", "1785-1808", "-1800"
     source: "..."                # the page the flag is drawn from, or `made` and why
 occasions:                       # what flies where, by occasion and role
@@ -539,7 +542,12 @@ occasions:                       # what flies where, by occasion and role
 - **The snapshot** serves `flags` as 81 reads them, `{place, name, words, drawing}`, the
   drawing as `{proportion, parts}` with the rectangles in `parts`; the lines go under
   `drawing.lines` beside them (81's viewer draws a part without `rect` as the whole field,
-  so a line among the parts would cover the flag; 81 draws `lines` when it can).
+  so a line among the parts would cover the flag; 81 draws `lines` when it can). Package 102
+  widened the form by the least the plates ask: a part may be a `poly` (a flag halved or
+  quartered on the diagonal, a lozenge, a triangle), served under `drawing.polys`, and a flag
+  may have a `shape`, `swallowtail` (with its `cut`) or `triangle`, served under
+  `drawing.shape`; each key only where the flag has one, so that every drawing from before is
+  served and drawn as it was (truth 7-500, `tests/test_flag_drawings.py`).
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
   two ensigns at the peak), for 74's prize when the lead rules it.
 

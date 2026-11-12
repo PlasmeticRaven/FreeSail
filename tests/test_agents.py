@@ -2190,9 +2190,16 @@ def test_a_letter_sent_by_world_order_is_seen_in_no_sample_before_the_boat_bring
     world.run(60)
     world.submit("let go the best bower")
     world.run(300)
+    # the captain's station: a letter's words are its reader's alone (package 100, step 2;
+    # the owner's rule of 2026-11-09), so the station that sees them when the boat brings
+    # the letter is its reader's (a station on deck, bound to nobody, saw them read aloud)
     h, fake, _ = stationed(
-        world, [Reply("Aye.")] * 2, st=station(every=300), when_done=Reply("Nothing new.")
+        world,
+        [Reply("Aye.")] * 2,
+        st=station(every=300, name="captain"),
+        when_done=Reply("Nothing new."),
     )
+    assert h._line_person() is world.people.captain
     e = world.world_order(f'message: at Brest from the Prefect maritime: "{letter}"', "the test")
     assert e.kind == "world.order" and for_the_record(e) and e in world.log.all()
     world.run(600)

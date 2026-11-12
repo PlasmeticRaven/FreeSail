@@ -82,6 +82,16 @@ DEFAULT_FULLNESS = (1.0, 1.0)
 # The knuckle, the transom's foot, where a square or raked stern gives none: the water
 # (judgement; a file with a transom names its knuckle, Build-Ships.md §5.1).
 DEFAULT_KNUCKLE_Z_M = 0.0
+# A round stern's counter (package 75, the lead's ruling (11) of 2026-11-09 on the bilander): where
+# the file gives `counter_hb_m`, the side at each height above the counter's foot holds out to the
+# counter's half-breadth there and rounds in to the middle line on the stern's line over this
+# share of it, fore and aft, straight from the aftmost station to that corner and from the corner
+# to the line (judgement: a quarter, so that her taffrail, 1.55 m a side by Gwyn's stern view,
+# rounds in over 0.39 m, an arc of about 3.3 m radius). Drawn on stations over the counter
+# (`_counter_stations`), one at the corner of each height of the counter's and the stern's line;
+# the closure stays on the middle line, the stern round. A round stern giving none closes
+# straight from the aftmost station to the middle line, as before.
+ROUND_STERN_DEPTH_SHARE = 0.25
 # Recorded beside the file, never moved (§5.0 principle 8): a drawn displacement more than this
 # share off the filed one, and a port triple more than this off the drawn side at its sill
 # (§5.2: the generator's check, not a refusal).
@@ -261,12 +271,16 @@ def check(spec: HullSpec) -> list[str]:
 class _Built:
     """A profile drawn: its stations as served (the closures first and last, the stations at
     rail points beyond the others next to them), the regular sections the side is drawn
-    straight between, the greatest section's x, and the profile itself."""
+    straight between, the greatest section's x, and the profile itself; for a round stern
+    giving `counter_hb_m`, the counter as drawn (`_counter`) and the stations abaft the regular
+    ones, over the counter (`_counter_stations`), the side drawn through them."""
 
     profile: HullProfile
     stations: tuple[Station, ...]
     regular: tuple[Station, ...]
     x_greatest: float
+    counter: tuple[tuple[float, float], ...] = ()
+    abaft: tuple[Station, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -309,11 +323,16 @@ def _build(p: HullProfile, draught: float, length: float) -> _Built:
     aft = _stern_closure(rule, regular[0])
     fore = _stem_closure(rule, regular[-1])
     abaft, before = _end_stations(p, aft, regular, fore)
+    counter = _counter(p)
+    if counter:
+        abaft = _counter_stations(p, aft, regular[0], counter)
     return _Built(
         profile=p,
         stations=(aft, *abaft, *regular, *before, fore),
         regular=tuple(regular),
         x_greatest=rule.x_greatest,
+        counter=counter,
+        abaft=tuple(abaft) if counter else (),
     )
 
 
@@ -778,6 +797,114 @@ def _end_station(p: HullProfile, end: Station, station: Station, x: float) -> St
 
 
 # ---------------------------------------------------------------------------
+# A round stern's counter (the lead's ruling (11) of 2026-11-09; `ROUND_STERN_DEPTH_SHARE`)
+# ---------------------------------------------------------------------------
+
+
+def _counter(p: HullProfile) -> tuple[tuple[float, float], ...]:
+    """A round stern's counter as drawn, (z, hb) low to high: from its foot, where it is nothing
+    (`knuckle_z_m`, else the water), up through the file's `counter_hb_m`; none where the stern
+    is not round or gives none."""
+    stern = p.form.stern if p.form is not None else None
+    if stern is None or stern.type != "round" or not stern.counter_hb_m or not p.stern_m:
+        return ()
+    foot = stern.knuckle_z_m if stern.knuckle_z_m is not None else DEFAULT_KNUCKLE_Z_M
+    return ((foot, 0.0), *stern.counter_hb_m)
+
+
+def _counter_hb(counter: tuple[tuple[float, float], ...], z: float) -> float:
+    """The counter's half-breadth at height z: nothing at its foot and below, straight between
+    its points, held above the highest."""
+    if not counter or z <= counter[0][0]:
+        return 0.0
+    return interp(counter, z)
+
+
+def _round_hb(
+    aft: Station, station: Station, counter: tuple[tuple[float, float], ...], x: float, z: float
+) -> float:
+    """The side abaft the aftmost station at x and z over a round counter: from the station's
+    half-breadth straight to the counter's at its corner, `ROUND_STERN_DEPTH_SHARE` of it forward
+    of the stern's line, and from there straight in to the middle line on the line; below the
+    counter's foot, and where the corner would stand at or forward of the station, straight from
+    the station to the line as a round stern closes without one."""
+    x_s, x_line = station[0][0], _x_on(aft, z)
+    if x - x_line <= _EPS:
+        return 0.0
+    hb_s = _hb_on(station, z)
+    c = _counter_hb(counter, z)
+    depth = ROUND_STERN_DEPTH_SHARE * c
+    corner = x_line + depth
+    if c <= 0.0 or corner >= x_s - _EPS:
+        return hb_s * min(1.0, (x - x_line) / (x_s - x_line))
+    if x <= corner:
+        return c * (x - x_line) / depth
+    return c + (hb_s - c) * (x - corner) / (x_s - corner)
+
+
+def _counter_stations(
+    p: HullProfile, aft: Station, station: Station, counter: tuple[tuple[float, float], ...]
+) -> list[Station]:
+    """The stations over a round counter, aft to forward: one at the counter's corner for each
+    height of the counter's points and of the stern's line above its foot, and one at each rail
+    point abaft the aftmost station (as `_end_stations` stands them), each from where the stern's
+    line crosses its x up to the top of the side, its half-breadths by `_round_hb` at its own,
+    the stern's, the station's and the counter's heights. None at or forward of the station."""
+    x_s, foot, taffrail = station[0][0], counter[0][0], aft[-1][1]
+    heights = {z for z, _hb in counter[1:]} | {pt[1] for pt in aft if foot < pt[1] <= taffrail}
+    xs = [_x_on(aft, z) + ROUND_STERN_DEPTH_SHARE * _counter_hb(counter, z) for z in heights]
+    xs += [x for x, _z in p.rail_m if x < x_s]
+    out: list[Station] = []
+    for x in sorted(xs):
+        if x >= x_s - _EPS or (out and x - out[-1][0][0] < CLOSURE_LEVEL_M):
+            continue
+        top = _top_at(p, x)
+        if x - _x_on(aft, top) <= _EPS:
+            continue  # on or beyond the stern's line at the top of the side
+        low = station[0][1]
+        for (x0, z0, _h0), (x1, z1, _h1) in zip(aft, aft[1:], strict=False):
+            if x0 <= x:
+                low = max(low, z0)
+                break
+            if x1 <= x:
+                low = max(low, z0 + (z1 - z0) * (x - x0) / (x1 - x0))
+                break
+        if low >= top - _EPS:
+            continue
+        levels = {low, top} | {pt[1] for pt in aft + station if low < pt[1] < top}
+        levels |= {z for z, _hb in counter if low < z < top} | {z for z in heights if low < z < top}
+        out.append(tuple((x, z, _round_hb(aft, station, counter, x, z)) for z in sorted(levels)))
+    return out
+
+
+def _counter_side(built: _Built, x: float, z: float) -> float:
+    """The drawn side abaft the aftmost station over a round counter, as the viewer draws it
+    (client/projection.js, `formHull`'s `hbAt`): at height z straight from the stern's line
+    through each station over the counter that stands there (held at its top) to the aftmost
+    station; nothing above the top of the side, under the side's foot, or abaft the line."""
+    p, aft, station = built.profile, built.stations[0], built.regular[0]
+    if z > _top_at(p, x) + _EPS:
+        return 0.0
+    x_line = _x_on(aft, z)
+    if x < x_line - _EPS:
+        return 0.0
+    if z < _toward(station[0][1], aft[0][1], x, station[0][0], aft[0][0]) - _EPS:
+        return 0.0
+    line: list[tuple[float, float]] = []
+    if aft[0][1] - _EPS <= z <= aft[-1][1] + _EPS:
+        line.append((x_line, 0.0))
+    for s in built.abaft:
+        if z < s[0][1] - _EPS:
+            continue
+        if not line or s[0][0] > line[-1][0] + _EPS:
+            line.append((s[0][0], _hb_on(s, min(z, s[-1][1]))))
+    line.append((station[0][0], _hb_on(station, z)))
+    if x < line[0][0] - _EPS:
+        return 0.0
+    return interp(line, x)
+
+
+# ---------------------------------------------------------------------------
 # Reading the drawn hull
 # ---------------------------------------------------------------------------
 
@@ -817,6 +944,8 @@ def _station_at(built: _Built, x: float) -> Station:
 def _half_breadth(built: _Built, x: float, z: float) -> float:
     regular = built.regular
     xs = [s[0][0] for s in regular]
+    if x < xs[0] and built.counter:
+        return _counter_side(built, x, z)
     if x < xs[0]:
         return _toward_end(built.stations[0], regular[0], x, z, built.profile)
     if x > xs[-1]:

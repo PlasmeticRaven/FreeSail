@@ -1261,8 +1261,9 @@ def test_her_descriptions_name_her_files_and_rank_the_razee_a_frigate():
         ("a French razee", "razee"),
     ):
         assert S.description_key(words) == key, words
-    # "a ship of the line" is the 74's words, not hers (Indf §8; tests/test_ships.py:99)
-    assert S.description_key("a ship of the line") is None
+    # "a ship of the line" is the 74's words, not hers (Indf §8; tests/test_ships.py:99): her
+    # description since package 75's B7 filed her row (old: None, no file's words then)
+    assert S.description_key("a ship of the line") == "seventy-four"
     for key, path, rank in (("sixty-four", SIXTY_FOUR, 4), ("razee", RAZEE, 3)):
         d = S.description(key)
         assert d["file"] == path and d["rig"] == "a ship"  # three masts square-rigged

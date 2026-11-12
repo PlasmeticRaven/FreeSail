@@ -237,7 +237,12 @@ def station_senses(world: Any, station: str, person: Any = None) -> Senses:
 #   place    within earshot of the place the line's data names, and the deck
 #   port     the persons ashore at the port the line names, and the deck of a hull there
 #   record   the record's and the driver's lines, which reach whoever the record reaches
+#   reader   the person the line names (`to`) and nobody else, asleep or awake, with no
+#            fallback to a place (package 100: a letter's words shown its reader, a
+#            writer's own words shown him)
 REACH: dict[str, str] = {
+    "free.read": "reader",
+    "free.written": "reader",
     "clock.bell": "aboard",
     "watch.relieved": "aboard",
     "watch.deck_passed": "deck",
@@ -299,7 +304,7 @@ REACH: dict[str, str] = {
     "health.invalided": "deck",
     "message.aboard": "deck",
     "message.door": "person",
-    "message.received": "person",
+    "message.received": "reader",  # the words read at the door, the captain's (package 100)
     "message.by": "person",
     "message.at": "port",
     "person.sent_for": "person",
@@ -325,6 +330,7 @@ REACH: dict[str, str] = {
     "stores.out": "aboard",
     "hold.freighted": "place",
     "thing.landed": "port",
+    "thing.handed": "port",  # a letter given from the boat to its addressee ashore (100)
     "boat.at_quay": "port",
     "market.bargain": "port",
     "market.bought": "port",
@@ -344,6 +350,12 @@ REACH: dict[str, str] = {
     "needs.answer": "person",
     "needs.felt": "person",
     "log.rollup": "record",
+    # package 74 (step 6): an appointment and an exchange are the port's news, said ashore
+    # where the man stands (each line's data names the shore and the port): he and the
+    # persons ashore at that port have them, and no ship's deck is woken by them (the
+    # `prize` family wakes a ship; these two are not her business)
+    "command.new": "said",
+    "prize.exchanged": "said",
     "log.read": "record",
     # the report, the call and the boat's report (step 3 writes them; placed first)
     "report.made": "person",
@@ -361,6 +373,10 @@ FAMILIES: dict[str, str] = {
     "action": "wakes",
     "small_arms": "wakes",
     "prize": "wakes",  # package 74: she is taken, the prisoners rising, the prize retaken
+    # package 74 (step 6): the court martial's lines are words said before the court, heard
+    # by the persons ashore at its port (each line's data names the shore and the port) and
+    # on no ship's deck
+    "court": "said",
     "marines": "aboard",
     "evolution": "aft",
     "sail": "aft",
@@ -533,6 +549,17 @@ def reaches(world: Any, senses: Senses, e: Any) -> bool:
     kind = str(getattr(e, "kind", "") or "")
     cls = reach_of(kind)
     data = getattr(e, "data", None) or {}
+    if cls == "reader":
+        # a letter's words (package 100): the reader's, whoever and wherever he is, by his
+        # name whole (a surname shared is no reader)
+        person = senses.person
+        name = str(getattr(person, "name", "") or "")
+        to = _names(data, "to")
+        if not to:
+            # a letter come aboard read at the door (`message.received`): the captain's,
+            # whose it is; nobody's beside him, wherever he reads it (step 2)
+            return person is not None and _is_captain(world, person)
+        return bool(name) and to.lower() == name.lower()
     if senses.asleep:
         # a sleeper perceives nothing but what wakes him (the brief's list: the call, all
         # hands, a gun, the ship striking, and nothing else; 54 and 66 let a word or a
@@ -830,6 +857,15 @@ def players_person(world: Any) -> Any:
     seat = _seat(world)
     if seat is not None:
         return _seat_person(root, seat)
+    from freesail.world.captive import remembered_person
+
+    remembered = remembered_person(root)
+    if remembered is not None:
+        # freed (exchanged, landed by a cartel), he is the player's person still while his
+        # own ship has a prize master for her captain (package 74, step 6): after the seat,
+        # which is the player's own choice of person, and only while the mark stands (it is
+        # past once he is her captain again, and the checks below read as they did)
+        return remembered
     hull = player_hull(root)
     if hull is None:
         return None

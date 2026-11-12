@@ -502,6 +502,15 @@ class Desk:
                     f"There is no station '{name}' aboard; the stations: "
                     f"{', '.join(stations_aboard(world))}.",
                 )
+            if vessel_id:
+                # a seat at the captain of a hull adversarial to a human (package 74, item
+                # 6; the design's §6): refused in words before any station is made or any
+                # consent record read, until the brief is revised
+                from freesail.world.prizes import adversarial_seat_why
+
+                why = adversarial_seat_why(parent, vessel, name)
+                if why:
+                    raise DeskError(403, why)
             # the desk reads the seat (package 67; spec M7b §2a): a door for a model at a
             # station the director holds a seat at for that model is admitted under the
             # seat's budget; any other is admitted as before

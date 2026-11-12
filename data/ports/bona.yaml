@@ -1,0 +1,116 @@
+# FreeSail: Bona as a port (package 104, the Sardinian sea's region, the harbour patch bona), on
+# package 35's machinery; the marks are the features file's (data/charts/features/sardinian-sea.yaml).
+#
+# Sources. Norie 1831, p. 354: a considerable sea-port, the town of jujubes, near the ruins of Hippo,
+# a place of great trade from its communication with Constantina; its exports wool, bees-wax,
+# bullocks-hides and corn, with the very profitable trade of the coral fishery adjacent; the old
+# harbours east of the town and under its walls nearly choked up; Port Genovese, 15 to 7 fathoms
+# under a small fort, quite exposed to the NE and easterly winds; "the French intercourse having
+# ceased, it was in 180[6 or 8] ceded to the British African Company; but we believe no benefit was
+# ever derived from the possession" (the year's last figure lost in the OCR, "ISOS"; the page
+# image would settle it); and since, the French again by conquest. Purdy 1826, p. 327: corn, wool,
+# hides and wax; the French formerly had an establishment here. Berard 1837, pp. 130 to 136: four
+# anchorages; the Marseille insurers knew only the Fort Genois's for winter (15 September to 15 May)
+# and the Cassarin for summer; a good watering place in the ravine at the south end of the
+# beach; the north-easterly gale of 24 and 25 January 1835 that wrecked eleven ships; the old
+# Compagnie d'Afrique always kept one of its principal agents here. The brief's "bullocks for the
+# fleet" is in no text read (the hides are); "the coral fishery's base" holds in part (the richest
+# coral off Cape Rosa, Berard p. 138). Lamberti 1844, p. 228; Derrotero 1849, pp. 259 to 260.
+#
+# The datum: UNVERIFIED; the modern port of Annaba is the grid's land where the Cassarin lay, and the
+# mooring stands at the nearest water of its depth.
+#
+# The stance. The regency of Algiers' (the nations table, `algiers`), neutral to a King's ship as to every flag the table has. Its corsairs noted and not modelled. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange, each good's note naming its source where a text names the trade. Decision 67: what is true of the port only for some years is said with its years; the French conquest of the 1830s, after the range, is said and not written as a row. The cession to the British African Company (Norie: 1806 or 1808) is of the trade, not of the town, and the year is unread: noted here, no dated row until the year is read.
+
+id: bona
+name: Bona
+nation: algiers
+source: "Norie 1831 p. 354; Purdy 1826 p. 327; Berard 1837 pp. 130-136; Derrotero 1849 pp. 259-260; Lamberti 1844 p. 228"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: fort-genois-anchorage
+  name: the gulf of Bona
+  lat_deg: 36.9473
+  lon_deg: 7.7901
+  depth_fathoms: 14
+anchorage:
+  feature: fort-genois-anchorage
+  name: the anchorage of the Fort Genois
+  lat_deg: 36.9473
+  lon_deg: 7.7901
+mooring:
+  feature: cassarin-anchorage
+  name: the Cassarin, before the town
+  lat_deg: 36.9114
+  lon_deg: 7.7845
+  depth_fathoms: 5
+  bottom: sand over mud
+shore:
+  feature: bona
+  name: the landing of Bona
+  lat_deg: 36.9000
+  lon_deg: 7.7600
+
+pilot:
+  station: fort-genois-anchorage
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a coral boat of Bona
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Hamida, Ali, Mustafa, Hassan, Murad, Mohammed, Omar, Yahia]   # judgement
+  skill: 0.75
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 20            # judgement
+  words:
+    channel: "Cape de Garde looks like an island coming from the west; range it at half a cable, for low rocks run under water a quarter of a cable off its east end. The gulf is clear within."
+    marks: "Cape de Garde with the ruined tower on its second summit; the Genoese fort on its point inside it; the walled town of Bona on its hill with the casba; Mount Edough behind."
+    anchorage: "In winter lie under the Fort Genois in fourteen fathoms of mud and sand, the fort bearing north-north-east, two cables and a half off the shore: it is the safest berth, though a fresh easterly sends in a heavy swell. In summer the Cassarin before the town, five fathoms of sand over mud; a north-easter in winter drives ships ashore there."
+    tide: "No tide to speak of; off the anchorages the water sets to the north-north-east on summer mornings."
+
+tide:
+  establishment: Bona
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 12, origin: algiers, note: "the corn of Constantine's country (Purdy 1826, p. 327; Norie 1831, p. 354); the price JUDGEMENT, cheap"}
+    - {good: wool, price: 19, origin: algiers, note: "wool (Purdy 1826, p. 327; Norie 1831, p. 354); the price JUDGEMENT"}
+    - {good: wax, price: 96, origin: algiers, note: "bees-wax (Norie 1831, p. 354); the price JUDGEMENT"}
+    - {good: hides, price: 31, origin: algiers, note: "bullocks' hides (Norie 1831, p. 354); the price JUDGEMENT"}
+    - {good: coral, price: 300, origin: null, note: "the coral fishery adjacent (Norie 1831, p. 354; Berard 1837, p. 132, the coral boats repaired at the Caroubiers); the price JUDGEMENT"}
+    - {good: cattle, price: 14, origin: algiers, note: "JUDGEMENT; Smyth 1854, p. 94: live stock of all kinds among Algeria's exports (no text read names bullocks for a fleet at Bona)"}
+    - {good: fresh beef, price: 16, origin: algiers, note: "JUDGEMENT"}
+    - {good: barley, price: 9, origin: algiers, note: "JUDGEMENT"}
+    - {good: olive oil, price: 46, origin: algiers, note: "JUDGEMENT: dearer than at Bougie"}
+    - {good: timber, price: 18, origin: algiers, note: "JUDGEMENT: dearer than on the timber coast west of the Seven Capes"}
+    - {good: figs, price: 11, origin: algiers, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: algiers, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 70, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "the good watering place in the ravine at the south end of the beach between Cape de Garde and the fort (Berard 1837, pp. 130 to 131); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: no hands for a Christian ship
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [fort-genois-anchorage, 37 00 N 7 50 E, 37 12 N 7 51 E]
+  from_sea: [37 12 N 7 51 E, 37 00 N 7 50 E, fort-genois-anchorage]
+  in: [fort-genois-anchorage]

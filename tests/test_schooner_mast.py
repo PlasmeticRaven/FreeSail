@@ -192,13 +192,13 @@ def test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast(pat
     assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == named
 
 
-def test_the_guard_reads_seventeen_files_her_three_parts_and_the_brigs_main_yards_among_them():
-    """The guard is not empty: the seventeen files of the tree (the *Neufchatel*'s the sixteenth,
+def test_the_guard_reads_eighteen_files_her_three_parts_and_the_brigs_main_yards_among_them():
+    """The guard is not empty: the eighteen files of the tree (the *Neufchatel*'s the sixteenth,
     package 75, B2; the bilander's the seventeenth, B4, her main crossing her dry yard on its lower
-    mast, so that the rule names none of hers), her three parts named, and the brig's main
-    topsail, topgallant and royal yards, which a rule without its lower-yard test would name. Old:
-    sixteen files."""
-    assert len(SHIP_FILES) == 17
+    mast, so that the rule names none of hers; the 74's the eighteenth, B7, a ship's three masts),
+    her three parts named, and the brig's main topsail, topgallant and royal yards, which a rule
+    without its lower-yard test would name. Old: seventeen files."""
+    assert len(SHIP_FILES) == 18
     assert set(ON_A_SCHOONERS_MAST) <= {p.stem for p in SHIP_FILES}
     bilander = load_ship(ROOT / "data" / "ships" / "bilander.yaml")
     assert bilander.spars["main.crossjack.yard"].parent == "main.mast"

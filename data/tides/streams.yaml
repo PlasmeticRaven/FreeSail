@@ -108,6 +108,9 @@ book_limits:
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
   - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
   - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
+  - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
+  - {south: 36.29334, north: 40.56, west: 4.5, east: 8.0}  # the Sardinian sea's block (package 104)
+  - {south: 36.29334, north: 38.5, west: 8.0, east: 11.1466}  # the coast of Tunis's block (package 104)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1349,6 +1352,162 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: no constant current and no tide stated for the open Tyrrhenian (Smyth 1854, p. 178; Admiralty 1916, p. 14)"
+  # package 101, the Catalan coast's block (the region `catalan-coast`): as the Gulf's, the
+  # streams nought and the coast's set as `current:` alone: the set along the main to the
+  # south-west, in a band about ten miles wide from Tossa to the Alfaques, and the block's
+  # open water after it with none. The set onto the Ebro's mouths with sea winds (Tofino
+  # 1787, p. 119; Michelot 1715, OCR l. 2278) follows the wind and is no constant current:
+  # said in the band's statement, not modelled. The polygons lie in the Mediterranean, far
+  # from every recorded passage's water.
+  - id: catalan-coast-set
+    chart: catalan-coast
+    name: the coast of Catalonia, Tossa to the Alfaques
+    polygon: [[41.75, 2.98], [41.62, 2.72], [41.47, 2.38], [41.32, 2.06], [41.17, 1.62], [41.07, 1.20], [40.92, 0.95], [40.72, 0.95], [40.56, 0.80], [40.56, 1.05], [40.80, 1.22], [41.00, 1.47], [41.12, 1.92], [41.22, 2.22], [41.37, 2.52], [41.52, 2.86], [41.62, 3.00], [41.75, 3.00]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 225, kn: 0.5}
+    source: "Michelot 1715, OCR l. 2415 and 2471: the currents do generally set pretty swiftly to the SW all along this coast, sometimes to the N.W. according as the winds have blown; Purdy 1826, p. 28: the current on the coast generally sets to the south-westward; Smyth 1854, p. 162: so sluggish as to be almost imperceptible, reversed by strong north-westers; no text gives a rate: half a knot JUDGEMENT between Michelot's and Smyth's; no tidal stream (Smyth 1854, p. 176)"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SW, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the pilots' (Michelot 1715; Purdy 1826, p. 28), the rate JUDGEMENT; off the Ebro the current sets onto the mouths with sea winds (Tofino 1787, p. 119): give the low land two leagues"
+  - id: catalan-coast-open
+    chart: catalan-coast
+    name: the sea off Catalonia
+    polygon: [[40.56, 0.30], [41.90, 0.30], [41.90, 3.00], [40.56, 3.00]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "no constant set stated for the open sea off the coast and no tidal stream (Smyth 1854, pp. 162 and 176): the world's water still"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open sea off Catalonia"
+  # package 104, the Sardinian sea's and the coast of Tunis's blocks: as the Gulf's, the
+  # streams nought and the coasts' sets as `current:` alone. Berard 1837 (ch. IV, pp. 74 to
+  # 82, his observations of May to October 1831 to 1833) is the one source of rates: the
+  # general current east along Barbary to Cape Bougaroun, his limit of it, westward sets
+  # from Cape de Fer by Bona and La Calle to the Galita, south-westward about the Galita
+  # and the Sorelle; east across the bay of Tunis and by Cape Bon in settled weather
+  # (Purdy 1826, pp. 151 and 334; Smyth 1854, pp. 161 to 165). The open sea between
+  # Minorca and Sardinia has no constant set in a period text (Tofino 1787, p. 208: in the
+  # Balearic channels the currents follow the wind). Far from every recorded passage.
+  - id: barbary-bougie-coast
+    chart: sardinian-sea
+    name: the Barbary shore from Cape Sigli by Bougie and Djidjelli to Cape Bougaroun
+    polygon: [[36.85, 4.50], [37.05, 4.50], [37.02, 5.10], [37.02, 5.60], [37.08, 5.85], [37.30, 6.45], [37.20, 6.62], [37.00, 6.45], [36.85, 5.85], [36.70, 5.60], [36.68, 5.00], [36.80, 4.50]]
+    axis_deg: 70
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 70, kn: 1.0}
+    source: "Berard 1837, ch. IV, pp. 77 to 79: east along the coast, Matifu to Dellys half a mile an hour, close in off Bengut two miles, at Pisan a mile, round Cape Carbon irregular and strong, off Cape Bougaroun two miles an hour parallel to the coast; Tofino 1787, p. 155: from Bingut to Cape Carbon the currents regularly east along the coast; Smyth 1854, pp. 161 to 162: strongly east along the African coast; the Admiralty 1913, p. 53: about a knot to Cape Bougaroni (modern); the rate a knot, JUDGEMENT within Berard's half mile and two"
+    book:
+      set: ENE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: ENE, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the set the period's own (Tofino 1787 p. 155), the rate JUDGEMENT within Berard's; within a mile of the shore in the gulf of Bougie it often sets west (Berard p. 79); a ship cannot beat round Cape Bougaroun against it with a westerly"
+  - id: barbary-de-fer-coast
+    chart: sardinian-sea
+    name: the Barbary shore from Cape Bougaroun by Stora and Cape de Fer to Bona
+    polygon: [[37.00, 6.62], [37.20, 6.62], [37.25, 7.20], [37.10, 7.60], [37.10, 8.00], [36.80, 8.00], [36.80, 7.60], [36.85, 7.10], [36.85, 6.62]]
+    axis_deg: 250
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 250, kn: 0.5}
+    source: "Berard 1837, ch. IV, p. 80: Cape Bougaroun seems the limit of the general easterly current; north of Cape de Fer the set is west, curving south-west and south into the gulf of Stora, contrary to the general belief; pp. 80 to 81: from Cape de Fer to the Galita mostly west, near Cape de Garde and Rosa more often east; at Bona's anchorages north-north-east, 0.4 to a mile an hour on summer mornings; the rate half a knot, JUDGEMENT"
+    book:
+      set: WSW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: WSW, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set Berard's (1837, p. 80), after the period, against the older belief of an easterly all along Barbary (Smyth 1854, p. 161); the rate JUDGEMENT"
+  - id: galita-channel
+    chart: tunis-coast
+    name: the coast from Cape Rosa by La Calle and Tabarka to Cape Serrat, with the Galita and the Sorelle
+    polygon: [[36.85, 8.00], [37.70, 8.00], [37.70, 9.30], [37.20, 9.30], [36.90, 8.80], [36.85, 8.40]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 225, kn: 1.0}
+    source: "Berard 1837, pp. 81 to 82 and 148: about the Galita and the Sorelle the current always west or south-west at about a mile an hour, two or three on the danger itself; off La Calle near the land west; two miles north of Tabarka about 0.3 a mile an hour north-north-west; an old tradition not to beat to the east of the Galita, for the island draws ships to it; the Admiralty 1913, p. 54: south-westward at one to three knots near the Galita and the Sorelle (modern); the rate Berard's"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SW, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the set and the rate Berard's (1837, pp. 81 to 82, 148), after the period: give the Sorelle a wide berth, for the current sets onto them"
+  - id: bay-of-tunis-set
+    chart: tunis-coast
+    name: the coast from Cape Serrat by Bizerta and the bay of Tunis to Cape Bon
+    polygon: [[36.75, 9.30], [37.60, 9.30], [37.60, 11.1466], [36.75, 11.1466]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Purdy 1826, p. 334: in settled weather the current mostly sets to the eastward near the north shore and across the bay of Tunis, varying with the wind; Purdy 1826, p. 151 (Smyth): between Sicily and the African shore and west of the Galita eastward from half a mile to a mile an hour; Smyth 1854, pp. 161 to 162 and 165; Lamberti 1844, p. 198: from Maritimo to the gulf of Tunis the waters draw east; the rate half a knot, the lower of Purdy's"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the period's own (Purdy 1826, pp. 151 and 334); the rate JUDGEMENT, the lower of the half mile to a mile; with a south-easter Durban found it set north-north-west off Cape Bon at a mile and three quarters (Purdy p. 334)"
+  - id: sardinian-sea-open
+    chart: sardinian-sea
+    name: the open sea between Minorca, Sardinia and Barbary
+    polygon: [[36.29334, 4.50], [40.56, 4.50], [40.56, 8.00], [36.29334, 8.00]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "no constant set stated for the open sea between Minorca and Sardinia in a period text (Tofino 1787, p. 208: in the Balearic channels the currents follow the wind; Lamberti 1844, p. 198: from Sardinia toward Barbary the waters draw east, a word, no rate); no tidal stream: the world's water still"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open sea between Minorca and Sardinia"
+  - id: tunis-coast-open
+    chart: tunis-coast
+    name: the sea between Sardinia and the coast of Tunis
+    polygon: [[36.29334, 8.00], [38.50, 8.00], [38.50, 11.1466], [36.29334, 11.1466]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Purdy 1826, p. 151 (Smyth): in long settled weather the currents between Sicily and the African shore, and even westward of the Galita, run to the eastward at half a mile to a mile an hour; Lamberti 1844, p. 198: from Sardinia toward Barbary the waters draw east; the rate half a knot, the lower"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the set the period's own (Purdy 1826, p. 151), the rate JUDGEMENT; about the Skerki with a south-easter the current sweeps away north at a knot and a half (Smyth 1854, p. 165)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

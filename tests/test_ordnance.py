@@ -29,7 +29,7 @@ import yaml
 
 from freesail.api.session import make_world
 from freesail.core.world import Scenario
-from freesail.ship.parts import BARREL_LB, Magazine, Wanting, charge_lb, fit_levels
+from freesail.ship.parts import BARREL_LB, Magazine, Wanting, filed_charge_lb, fit_levels
 from freesail.world import ordnance as OR
 from freesail.world import places as PL
 from freesail.world import ports as PT
@@ -106,7 +106,8 @@ class FakeMagazine(Magazine):
 
 def fake_magazine(ship, filled=None, powder_lb=None, shot=None, reserve_barrels=None):
     """A fake of the ship's fit: filled to its level (or `filled`, by kind and calibre),
-    the barrels below at the reserve (or `powder_lb`), the lockers full (or `shot`); set in
+    the barrels below at the reserve (or `powder_lb`), the lockers full (or `shot`), the
+    charges its file's (`filed_charge_lb`, as the magazine reads them); set in
     `ship.extra["magazine"]`, as `magazine(ship)` finds it."""
     fit = ship.fit_spec
     level = fit_levels(fit)
@@ -116,7 +117,7 @@ def fake_magazine(ship, filled=None, powder_lb=None, shot=None, reserve_barrels=
         shot={float(p): dict(k) for p, k in (shot or fit.shot).items()},
         layout=2,
         level=dict(level),
-        charges={k: charge_lb(*k) for k in level},
+        charges={k: filed_charge_lb(fit.charges, *k) for k in level},
         shot_level={float(p): dict(k) for p, k in fit.shot.items()},
         reserve_lb=reserve,
         powder_lb=reserve if powder_lb is None else float(powder_lb),
@@ -205,7 +206,10 @@ def test_the_eleven_ports_have_their_blocks_and_the_others_none():
     # the other twenty-seven, the Channel's east block's eight (package 79b), the
     # Mediterranean west's eight (package 79c), and the Gulf of Lion's four, the Ligurian
     # sea's seven and the Tyrrhenian's five (package 79d), none
-    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 8 + 4 + 7 + 5
+    # and the Catalan coast's seven (package 101), none; package 104: the Sardinian sea's
+    # five, the coast of Tunis's five and the three beside them on Sardinia, none (was
+    # 27 + 8 + 8 + 4 + 7 + 5 + 7 before it)
+    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13
     for pid, (kind, sells, roads, hours, barrel, ton) in BLOCKS.items():
         block = w.dealings.ports[pid].ordnance
         assert (block["kind"], block["sells"], block["roads"]) == (kind, sells, roads), pid

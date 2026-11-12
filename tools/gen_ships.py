@@ -1328,7 +1328,7 @@ class Builder:
         a King's fit's charges for exercise, the shot by calibre and kind; practice and
         resupply, between packages 72 and 73); the note above the section, each fit's
         above its name, a gun's above its line, `MAGAZINE_NOTES` above the magazine's
-        keys."""
+        keys (`charges_as_filed_note` above the charges of a `MagazineAsFiled`)."""
         self.doc["armament"] = {
             "default": default,
             "fits": {
@@ -1346,6 +1346,10 @@ class Builder:
             for key in magazine:
                 if key in MAGAZINE_NOTES:
                     self.armament_notes[("magazine", name, key)] = MAGAZINE_NOTES[key]
+            if isinstance(magazine, MagazineAsFiled):
+                self.armament_notes[("magazine", name, "charges")] = charges_as_filed_note(
+                    magazine["charges"]
+                )
 
     def quarter_bill(
         self,
@@ -4290,19 +4294,28 @@ SWIVEL_ROUNDS = {"round": 40}
 BLANK_SHARE = 0.1
 
 
-def fit_magazine(guns, rounds_by_kind, exercise_charges=0):
+class MagazineAsFiled(dict):
+    """A fit's magazine whose charges are the shares as filed (`fit_magazine(...,
+    as_filed=True)`): `Builder.armament` writes `charges_as_filed_note` above its charges in
+    place of `MAGAZINE_NOTES["charges"]`. The file gets the plain mapping."""
+
+
+def fit_magazine(guns, rounds_by_kind, exercise_charges=0, as_filed=False):
     """A fit's magazine for its guns, each gun with the allowance of its kind
     (`rounds_by_kind`: {"long"|"carronade"|"swivel": {kind: n}}), as a mapping in the
     file's order (practice and resupply, between packages 72 and 73; the build design's
     §1.2): `cartridges`, filled, by the gun's kind and calibre, a round each and a tenth
-    over (`BLANK_SHARE`); `charges`, a cartridge's powder by kind and calibre
-    (`freesail.ship.parts.charge_lb`, the shares UNVERIFIED until package 75 reads the
-    Regulations' Table No. 29); `powder_barrels`, the powder below in barrels of a hundred
-    pounds, `RESERVE_SHARE` of the filled powder rounded up; `exercise_charges`, a King's
-    fit's allowance for exercise a month (`exercise_allowance`), written only when above
-    nought; and `shot` by calibre and kind."""
-    from freesail.ship.parts import BARREL_LB, RESERVE_SHARE, charge_lb
+    over (`BLANK_SHARE`); `charges`, a cartridge's powder by kind and calibre, the
+    Regulations' Table No. 29 (`freesail.ship.parts.charge_lb`; package 75, SW-1), or,
+    `as_filed`, the shares an eight file of the packages before 75 was filed with and keeps
+    (`share_charge_lb`; the lead's rule, `freesail/ship/charges.py`), a `MagazineAsFiled`;
+    `powder_barrels`, the powder below in barrels of a hundred pounds, `RESERVE_SHARE` of the
+    filled powder rounded up; `exercise_charges`, a King's fit's allowance for exercise a
+    month (`exercise_allowance`), written only when above nought; and `shot` by calibre and
+    kind."""
+    from freesail.ship.parts import BARREL_LB, RESERVE_SHARE, charge_lb, share_charge_lb
 
+    charge = share_charge_lb if as_filed else charge_lb
     cartridges: dict = {}
     charges: dict = {}
     shot: dict = {}
@@ -4312,7 +4325,7 @@ def fit_magazine(guns, rounds_by_kind, exercise_charges=0):
         total = sum(allowance.values())
         filled = cartridges.setdefault(kind, {})
         filled[p] = filled.get(p, 0) + int(round(total * (1.0 + BLANK_SHARE)))
-        charges.setdefault(kind, {})[p] = charge_lb(kind, p)
+        charges.setdefault(kind, {})[p] = charge(kind, p)
         by = shot.setdefault(p, {})
         for k, n in allowance.items():
             by[k] = by.get(k, 0) + n
@@ -4325,7 +4338,55 @@ def fit_magazine(guns, rounds_by_kind, exercise_charges=0):
     if exercise_charges > 0:
         out["exercise_charges"] = exercise_charges
     out["shot"] = shot
-    return out
+    return MagazineAsFiled(out) if as_filed else out
+
+
+def _lb_oz_words(lb):
+    """A charge in words, pounds and ounces: 2.625 '2 lb 10 oz', 0.125 '2 oz', 6.0 '6 lb'."""
+    ounces = int(round(lb * 16.0))
+    pounds, oz = divmod(ounces, 16)
+    words = [f"{pounds} lb"] if pounds else []
+    if oz or not pounds:
+        words.append(f"{oz} oz")
+    return " ".join(words)
+
+
+def _gun_words(kind, pounder):
+    """'the long 18-pounder', 'the 32-pounder carronade', 'the half-pounder swivel'."""
+    calibre = "half" if pounder == 0.5 else f"{pounder:g}"
+    if kind == "long":
+        return f"the long {calibre}-pounder"
+    return f"the {calibre}-pounder {kind}"
+
+
+def charges_as_filed_note(charges):
+    """The note above an eight file's charges, kept as filed (`fit_magazine(...,
+    as_filed=True)`): the shares, the lead's rule that keeps them, and where Table No. 29
+    differs among this fit's guns, or that it gives each of them the same."""
+    from freesail.ship.charges import CHARGE_TABLE_LB
+
+    differ = []
+    for kind, by in charges.items():
+        for p, lb in by.items():
+            table = CHARGE_TABLE_LB.get((kind, float(p)))
+            if table is not None and table != lb:
+                differ.append(
+                    f"{_gun_words(kind, p)} {_lb_oz_words(table)} where the share gives "
+                    f"{_lb_oz_words(lb)}"
+                )
+    table_says = (
+        "it gives " + " and ".join(differ) if differ else "it gives each charge here the same"
+    )
+    return (
+        "A cartridge's powder in pounds, to the nearest ounce: a long gun a third of its "
+        "shot's weight, a carronade a twelfth, a swivel a half (Falconer 1780's smaller "
+        "pieces, l.4827: judgement), the shares this file was filed with and keeps until a "
+        "package of its own re-measures them (the lead's rule for the eight files before "
+        "package 75: freesail/ship/charges.py). The Regulations 1806 (1808 printing), Table "
+        "No. 29, read on the page image (Build-Ships.md §10; its title at OCR "
+        "l.27498-27502), confirms the third and the twelfth, rounded down to the ounce: "
+        f"{table_says}."
+    )
 
 
 def exercise_allowance(upper_deck_guns, decks=1):
@@ -4356,13 +4417,16 @@ MAGAZINE_NOTES = {
         "gun of the allowance below and a tenth over for the blank charges (judgement); the "
         "gunner fills more from the powder below as they are fired (combat/filling.py)."
     ),
+    # package 75, SW-1 (Build-Ships.md §10): the table, in place of the shares from memory;
+    # an eight file's fits, kept as filed, take `charges_as_filed_note` instead
     "charges": (
-        "A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's "
-        "weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' "
-        "would be an advantage; the service charge of 1805 a third from memory, "
-        "UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half "
-        "(Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the "
-        "Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost."
+        "A cartridge's powder in pounds: the service charge of cylinder powder for one shot "
+        "by the gun's kind and calibre, the Regulations 1806 (1808 printing), Table No. 29, "
+        "read on the page image (Build-Ships.md §10; the OCR has its title at l.27498-27502 "
+        "and lost its figures; freesail/ship/charges.py): a third of the shot's weight for a "
+        "gun and a twelfth for a carronade, rounded down to the ounce, and 2 oz for the "
+        "half-pounder swivel. A gun the table does not name takes its kind's share of the "
+        "shot to the nearest ounce (freesail/ship/parts.py, charge_lb)."
     ),
     "powder_barrels": (
         "The powder below in barrels of a hundred pounds (Falconer 1780, the French "
@@ -4706,6 +4770,7 @@ def frigate_armament(b, sill):
         guns,
         {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS, "swivel": SWIVEL_ROUNDS},
         exercise_allowance(26),
+        as_filed=True,
     )
     b.armament(
         "The armament (spec M7 7; package 70): the guns as parts of the graph by their place, "
@@ -4844,9 +4909,14 @@ def cutter_armament(b):
     # the Admiralty's carronades a King's fit, with the allowance for exercise (practice and
     # resupply); the revenue's and the hired cutters' long guns none
     carr_magazine = fit_magazine(
-        carronades, {"carronade": HIRED_ROUNDS}, exercise_allowance(len(carronades))
+        carronades,
+        {"carronade": HIRED_ROUNDS},
+        exercise_allowance(len(carronades)),
+        as_filed=True,
     )
-    long_magazine = fit_magazine(long_guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+    long_magazine = fit_magazine(
+        long_guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS}, as_filed=True
+    )
     b.armament(
         "The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: "
         "{fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its "
@@ -4995,7 +5065,7 @@ def letter_of_marque_fit(hull, provisional):
             round_to=0.01,
         ),
     )
-    return guns, fit_magazine(guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+    return guns, fit_magazine(guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS}, as_filed=True)
 
 
 # The pages as the held OCR has them (SW-4's reviews): the day in April 1813 on p. 81, the
@@ -5092,7 +5162,9 @@ def schooner_armament(b):
         )
     tom += on_the_rail(hull, swivels(4, [10.0, -10.0], 0.0, None, round_to=0.01))
     tom_magazine = fit_magazine(
-        tom, {"long": HIRED_ROUNDS, "carronade": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS}
+        tom,
+        {"long": HIRED_ROUNDS, "carronade": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS},
+        as_filed=True,
     )
     b.armament(
         "The armament (spec M7 7; package 70's shape): the owner's ask of 2026-10-25, its fits "
@@ -5226,6 +5298,7 @@ def topsail_schooner_armament(b):
         navy,
         {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS},
         exercise_charges=exercise_allowance(len(navy)),
+        as_filed=True,
     )
     b.armament(
         "The armament (spec M7 7; package 70's shape; package 75, Build-Ships.md §9.1): "
@@ -5344,7 +5417,10 @@ def brig_armament(b):
     # a King's fit: the allowance for exercise a fourth of her guns, all on the flush deck
     # (practice and resupply)
     magazine = fit_magazine(
-        guns, {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS}, exercise_allowance(len(guns))
+        guns,
+        {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS},
+        exercise_allowance(len(guns)),
+        as_filed=True,
     )
     b.armament(
         "The armament (spec M7 7; package 70): the guns as parts of the graph by their place, "
@@ -5421,7 +5497,7 @@ def merchant_brig_armament(b):
         )
     for g, _ in guns:
         g["crew"] = 4  # the merchant's own quarter bill, short of Douglas's figure (judgement)
-    magazine = fit_magazine(guns, {"long": MERCHANT_ROUNDS})
+    magazine = fit_magazine(guns, {"long": MERCHANT_ROUNDS}, as_filed=True)
     b.armament(
         "The armament (spec M7 7; package 70): the merchant brig's few guns, one fit, her "
         "magazine a trader's (twenty round and a little grape a gun: judgement). Every "
@@ -9637,7 +9713,7 @@ def lugger_armament(b):
                 "RMG ZAZ6306, the caption (read: three 18-pounders, the calibre's second digit "
                 "probable); the places over the rail a judgement; the weights from memory",
                 guns,
-                fit_magazine(guns, {"long": HIRED_ROUNDS}),
+                fit_magazine(guns, {"long": HIRED_ROUNDS}, as_filed=True),
                 "The gun lugger's fit: three long 18-pounders over the rail. Ten men to each by "
                 "the gun's rule, thirty in all against her company of thirty (judgement both): "
                 "short-handed at quarters, as the log will say.",
@@ -9708,7 +9784,7 @@ def smack_armament(b):
                 "Charnock 1802 vol. III p. 274 (Culloden, 2 guns, 8 men); the calibre and the "
                 "places a judgement; the weights from memory",
                 guns,
-                fit_magazine(guns, {"long": KINGS_ROUNDS}),
+                fit_magazine(guns, {"long": KINGS_ROUNDS}, as_filed=True),
                 "The Navy's smack's fit: two long 3-pounders over the rail.",
             ),
         ],

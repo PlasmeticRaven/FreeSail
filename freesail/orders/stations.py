@@ -712,7 +712,7 @@ def _visitor_to_the_captain(
         line = f"{who}, to the captain: {words}"
     for h in _hearers(world, place):
         h.hear(line)
-    data = {"station": CAPTAIN, "words": words, "place": place, "visitor": True}
+    data = {"station": CAPTAIN, "words": words, "place": place}
     return "person.spoke", line, data
 
 

@@ -500,6 +500,9 @@ def strike(world: Any, by_rule: bool, words: str = "") -> str:
     vessel = getattr(world, "vessel", None)
     if vessel is not None:
         vessel.struck = True
+        from freesail.world.prize_court import note_in_sight
+
+        note_in_sight(world, vessel)  # the sharers of the prize money (package 74, §5.3)
     m = ship.extra.get("morale")
     if by_rule:
         why = m.reasons if m is not None else "the hands will not stand to the guns"

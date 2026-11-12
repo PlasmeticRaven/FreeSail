@@ -2690,6 +2690,14 @@ class Dealings:
         port = self.ports.get(job.port_id)
         if port is None:
             return
+        if job.kind == "prize_court":
+            # the prize court's sentence on a prize lying here (package 74, step 5)
+            from freesail.world import prize_court as PC
+
+            prize = world.vessels.get(str(job.payload.get("prize") or ""))
+            if prize is not None and not getattr(prize, "done", False):
+                PC.sentence(world, prize, port)
+            return
         if job.kind == "waterman":
             # the waterman's pull done (package 68): landed at the quay, or aboard
             p = world.people.find(str(job.payload.get("person") or ""))
@@ -2974,7 +2982,13 @@ class Dealings:
         carrying: list[dict[str, Any]] = []
         if "letter" in low or "message" in low or "dispatch" in low or "despatch" in low:
             errand = "message"
-            carrying.append({"kind": "letter_out", "text": words})
+            letter = self._letter_named(words)
+            if letter is None:
+                carrying.append({"kind": "letter_out", "text": words})
+            else:
+                # the letter itself in the boat (package 100, step 2): the thing, from the
+                # captain's reach to the boat, and ashore to its addressee
+                carrying.append({"kind": "letter_out", "text": words, "thing": letter.id})
         for person in self._passengers(words):
             if not person.aboard:
                 raise OrderError(f"{person.name} is {world.people.state_words(person)}.")
@@ -2989,6 +3003,79 @@ class Dealings:
             errand = "yard"
         text = self._send_boat(port, errand, carrying, people)
         return text, {"port": port.id, "errand": errand, "people": people}
+
+    def _letter_thing(self, tid: str) -> Any:
+        from freesail.world import things as TH
+
+        for t in TH.things_of(self.world):
+            if t.id == tid:
+                return t
+        return None
+
+    def _letter_in_boat(self, tid: str) -> None:
+        """The letter sent ashore put in the boat as she goes away (package 100, step 2)."""
+        from freesail.world import things as TH
+        from freesail.world.hearing import own_hull
+
+        t = self._letter_thing(tid)
+        if t is not None and t.place not in (TH.OVERBOARD, TH.GONE):
+            TH.put(t, {"place": TH.IN_THE_BOAT, "spot": "", "hull": own_hull(self.world)})
+
+    def _letter_ashore(
+        self, tid: str, port: Port
+    ) -> list[tuple[Severity, str, str, dict[str, Any]]]:
+        """The letter at the quay (package 100, step 2): handed to its addressee where he
+        is ashore at the port; else it is landed on the quay as any thing in the boat is
+        (`_land_and_take_off`), there for whoever comes for it."""
+        from freesail.world import things as TH
+
+        t = self._letter_thing(tid)
+        if t is None or t.place != TH.IN_THE_BOAT:
+            return []
+        people = getattr(self.world, "people", None)
+        finder = getattr(people, "find_anywhere", None)
+        p = finder(t.to) if finder is not None and t.to else None
+        if p is None or p.where != "shore" or getattr(p, "port", None) != port.id:
+            return []
+        TH.put(t, {"keeper": p.id, "keeper_home": str(getattr(p, "home", "") or "")})
+        return [
+            (
+                Severity.ROUTINE,
+                "thing.handed",
+                f"{t.the[:1].upper()}{t.the[1:]} given from the boat into {p.name}'s hand at "
+                f"{port.shore.name}.",
+                {"thing": t.id, "port": port.id, "person": p.name},
+            )
+        ]
+
+    def _letter_named(self, words: str) -> Any:
+        """The letter `send the boat ashore with <the letter>` names (package 100, step 2):
+        a thing with words or an addressee within the captain's reach that the words after
+        'with' name, alone; None where they name none (the order's words carried, as before),
+        and the order refused in words where they name a letter he cannot lay hands on."""
+        from freesail.orders.errors import OrderError
+        from freesail.world import things as TH
+
+        low = " " + " ".join(str(words).split())
+        i = low.lower().find(" with ")
+        if i < 0:
+            return None
+        phrase = low[i + len(" with ") :].strip(" .")
+        found = [t for t in TH.find(self.world, phrase) if t.is_letter]
+        if not found:
+            return None
+        captain = self.world.people.captain
+        reachable = [t for t in found if TH.reach_why(self.world, captain, t) is None]
+        if not reachable:
+            why = TH.reach_why(self.world, captain, found[0])
+            raise OrderError(f"{why[:1].upper()}{why[1:]}; the boat is not sent.")
+        if len(reachable) > 1:
+            raise OrderError(
+                f"'{phrase}' names {len(reachable)} letters: "
+                + "; ".join(TH.name_words(t) for t in reachable)
+                + "; say which, and the boat goes."
+            )
+        return reachable[0]
 
     def _passengers(self, words: str) -> list[Any]:
         """The people named after 'with' in `send the boat ashore with ...` (package 68;
@@ -3112,6 +3199,9 @@ class Dealings:
                     {"port": port.id, "errand": self.boat.errand},
                 )
             )
+            for item in self.boat.carrying:
+                if item.get("kind") == "letter_out" and item.get("thing"):
+                    self._letter_in_boat(str(item["thing"]))
         elif phase == "ashore":
             lines.append(
                 (
@@ -3125,6 +3215,9 @@ class Dealings:
                 p = world.people.find(pid)
                 if p is not None:
                     p.where = "shore"
+            for item in self.boat.carrying:
+                if item.get("kind") == "letter_out" and item.get("thing"):
+                    lines.extend(self._letter_ashore(str(item["thing"]), port))
             lines.extend(self._land_and_take_off(port))
             # the business ashore: the purser's list, the letters waiting, a purchase
             self.boat.bringing = []

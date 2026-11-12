@@ -916,6 +916,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 79c: the Mediterranean west in two regions (the lead's ruling)
     regions += ["mediterranean-west", "balearics"]
     regions += [GULF, LIGURIAN, TYRRHENIAN]  # package 79d: the Mediterranean after the Strait
+    regions += ["catalan-coast"]  # package 101: the hole between the Balearics and the Gulf
+    # package 104: the L-shaped hole, the Sardinian sea and the coast of Tunis
+    regions += ["sardinian-sea", "tunis-coast"]
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -945,6 +948,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     gulf = load_chart(GULF)  # package 79d
     ligurian = load_chart(LIGURIAN)
     tyrrhenian = load_chart(TYRRHENIAN)
+    catalan = load_chart("catalan-coast")  # package 101
+    sardinian = load_chart("sardinian-sea")  # package 104
+    tunis = load_chart("tunis-coast")  # package 104
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -959,6 +965,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | gulf.features.keys()
         | ligurian.features.keys()
         | tyrrhenian.features.keys()
+        | catalan.features.keys()
+        | sardinian.features.keys()
+        | tunis.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -973,6 +982,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert all(whole.region_of[fid] == GULF for fid in gulf.features)  # package 79d
     assert all(whole.region_of[fid] == LIGURIAN for fid in ligurian.features)
     assert all(whole.region_of[fid] == TYRRHENIAN for fid in tyrrhenian.features)
+    assert all(whole.region_of[fid] == "catalan-coast" for fid in catalan.features)
+    assert all(whole.region_of[fid] == "sardinian-sea" for fid in sardinian.features)  # 104
+    assert all(whole.region_of[fid] == "tunis-coast" for fid in tunis.features)  # 104
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -990,6 +1002,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(gulf.coast_lines())
         + len(ligurian.coast_lines())
         + len(tyrrhenian.coast_lines())
+        + len(catalan.coast_lines())
+        + len(sardinian.coast_lines())
+        + len(tunis.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -2231,7 +2246,8 @@ def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
     assert all(f.height_m and 0 < f.extent_m < 1000 for f in lacking)
     regions = {whole.region_of[f.id] for f in lacking}
     assert regions == {MEDW, BALEARICS, "gulf-of-lion", "ligurian-sea", "tyrrhenian"}
-    assert len(lacking) == 19
+    # package 101: the Medas off the Ter and Tabarca off Cape Santa Pola, two more
+    assert len(lacking) == 21
     for f in lacking:
         assert whole.depth_at(f.position) is not None, f.id
         assert whole.danger_under(f.position, 0.0, 30.0, 3.0) is not None, f.id

@@ -804,9 +804,18 @@ gauges:
     M2: {amplitude_m: 0.047, phase_deg: 218.3}
     S2: {amplitude_m: 0.018, phase_deg: 238.2}
     N2: {amplitude_m: 0.010, phase_deg: 206.1}
+  # PACKAGE 104, THE LEAD'S RULING OF 2026-11-11 (a block with no gauge of its own): TICON has
+  # no gauge in `sardinian-sea` or `tunis-coast` (searched 35.5 to 41.5 N, 3.5 to 12 E), and
+  # Mahon (10.6 miles from 4.5 E) and Carloforte (14.4 from 8 E) lie beyond the seams' band;
+  # by the seams' rule alone the two blocks were no block of the tide's and their water the
+  # eleven's, Saint-Malo's (M2 3.68 m, a mean level of 6.83 m). So a block with no gauge of
+  # its own is served by its neighbours' nearest within reach: Mahon serves the Sardinian sea
+  # and the coast of Tunis, Carloforte both, Cagliari the coast of Tunis. The level there is
+  # Mahon's 0.20 m (Carloforte's and Cagliari's unread). Nothing outside the two blocks moves:
+  # the membership by bounds, the eleven beyond their reach and no taper (tests/test_tide.py).
   - id: mahon
     name: Mahón
-    block: balearics
+    block: [balearics, sardinian-sea, tunis-coast]  # package 104, the lead's ruling: a gaugeless block's neighbours' nearest
     lat_deg: 39.8930
     lon_deg: 4.2706
     record: "GESLA-2, Puertos del Estado, 2009 to 2015"
@@ -1008,7 +1017,7 @@ gauges:
   # Le Conquet's alone; blended they would move no recorded passage.
   - id: carloforte
     name: Carloforte (San Pietro)
-    block: tyrrhenian
+    block: [tyrrhenian, sardinian-sea, tunis-coast]  # package 104, the lead's ruling (above)
     lat_deg: 39.1480
     lon_deg: 8.3095
     record: "GESLA-2, ISPRA (idromare), 1988 to 2010"
@@ -1018,7 +1027,7 @@ gauges:
     N2: {amplitude_m: 0.013, phase_deg: 220.8}
   - id: cagliari
     name: Cagliari
-    block: tyrrhenian
+    block: [tyrrhenian, tunis-coast]  # package 104, the lead's ruling (above)
     lat_deg: 39.2102
     lon_deg: 9.1143
     record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
@@ -1119,3 +1128,29 @@ gauges:
     M2: {amplitude_m: 1.410, phase_deg: 326.7}
     S2: {amplitude_m: 0.436, phase_deg: 13.4}
     N2: {amplitude_m: 0.276, phase_deg: 303.9}
+
+# THE CATALAN COAST'S GAUGE (package 101, the region `catalan-coast`). TICON.txt read again
+# 2026-11-10 by its coordinates over 37.9 to 42.5 N and 1 W to 3.4 E (the zip at
+# doi.pangaea.de, SHA-256 7055f8ed1a14abf8..., 1,621,262 bytes, the same file as every
+# block's): Barcelona below; Valencia (39.46 N 0.33 W, 1992 to 2015), Sagunto and Gandía
+# lie in `mediterranean-west`, a built region, and are NOT added (the lead's ruling of
+# 2026-11-10: a new gauge in a built region changes its water and, by package 93's rule,
+# its tiles' fill; a gauge for the Valencian coast is another package's); Ibiza and Palma
+# already above. **No gauge at Tarragona** (REDMAR 3756 gives its levels, NMM 30 cm and LAT 10 cm above its zero,
+# but no constants are on file, and a gauge without them is not in the table's form) **nor
+# at Alicante** (neither in TICON nor in REDMAR's station list, INT_3.pdf). The mean levels
+# VERIFIED from Puertos del Estado's REDMAR reports (`GLOB_2_3_<code>.pdf`, "Niveles respecto
+# al cero REDMAR", read 2026-11-10): the NMM above the lowest astronomical tide. Barcelona
+# lies 38 miles from the block's seam with the Gulf at 3 E and 46 from 40.56 N, so it serves
+# its own block alone. The water is the Mediterranean's,
+# an M2 of five centimetres.
+  - id: barcelona
+    name: Barcelona
+    block: catalan-coast
+    lat_deg: 41.3420
+    lon_deg: 2.1630
+    record: "GESLA-2, Puertos del Estado, 1993 to 2015"
+    mean_level_m: 0.21  # REDMAR 3758: NMM 30 cm, LAT 9 cm
+    M2: {amplitude_m: 0.046, phase_deg: 213.5}
+    S2: {amplitude_m: 0.016, phase_deg: 230.8}
+    N2: {amplitude_m: 0.010, phase_deg: 201.6}

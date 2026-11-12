@@ -813,6 +813,36 @@ tack's, the wear's and the fill away's) is not seen by the runner, which reads a
 holds once, at the order. Figures in `docs/dev/TuningNotes.md`, "B2c and B3.3b, the review's
 mends".
 
+*The lead's ruled builds of 2026-11-10, (3)(i) to (v) (built 2026-11-10):* **(i)** forced round
+lying to and left to herself, hove to no longer in the record's forced-round branch
+(`_judge_lying_to`, `_hove_to_no_longer`), a settee lying against its mast is dipped by the watch
+and the line says so ("... The helm keeps her full and by. The watch dips the mainsail, lying
+against its mast."): the settee's own dip ordered (`dip_settee`, its hands from the watch on deck,
+its times, words and holds), its sheet as it lies, two judgements for the lead; on the fixture the
+settee drawing whole again 200-269 s after "hove to no longer" (57 m² against its mast before, 86
+now; 3.14 kn at +1,800 s in 15 kn, 2.76 before), on her file 357-405 s with all hands kept up (41
+m² before, 62 now; 2.70 kn, 2.54). *The review's mends:* the line is worded once the dip is given,
+on what it does: waiting for hands or its turn, "The mainsail, lying against its mast, is to be
+dipped.", the runner's line after it; refused, nothing of a dip. As her watches play it by night,
+the hands piped down, her starboard watch's three dip it in 684 s (15 kn) and 776 s (20 kn), and
+her larboard watch's two cannot begin it: it waits for hands, the settee against its mast as
+before. **(ii)** paying off to a course a kept settee is trimmed with the boom sails
+(`_pay_off`, `_kept_after_sails`); the pay-off draws every sheet for the true wind's angle on her
+bow, so the settee is eased to 65° on a beam course where the deck's reading wants 44-45°, 0.47-0.68
+kn slower than left (the pay-off's sheets, every ship's, for the lead). **(iii)** the tack, the
+wear, the box-haul (with the box-off and wearing short round) and the fill away hold the settees set
+from the order (`settees_held`), so that no order of the settee's is begun while it may be changed;
+the trace of the eleven committed files without one through every manoeuvre, identical in 99 runs.
+*The review's mend:* a manoeuvre that belays the step-list work in hand (decision 25, with a crew)
+is not kept waiting by an order of the settee's given before it on the settee alone
+(`Runner._settees_only`): it begins and belays it, or the order, still waiting, waits for it.
+Held otherwise, a wear ordered behind a take in waiting for hands was never begun.
+**(iv)** a trim's sheets line names only its sails still set (`Runner._group_done`), every ship's:
+the four whole logs and the captain's trials as before; the *Neufchatel*'s gale's two lines and the
+schooners' one move. **(v)** her light-air fill away from a short heave-to recorded, nothing built.
+Figures in `docs/dev/TuningNotes.md`, "The settee and the runner" and "The review's mends of the two
+builds".
+
 ### 5.8 Getting under way, rounding to, the gale
 
 - **Getting under way.** With `_lugs_all` leaving out settees, she takes the ship's path:
@@ -1006,7 +1036,10 @@ a yard under the bowsprit, so no existing ship draws differently.
   the shared work's profile lands (`profileHullFigures`), else −0.52 L.
 - **The sling** stays a third along throat→peak (D5(a)), which the corners' contract puts on
   the mast (§5.1).
-- The vangs, ourses and derrick are not drawn, to the current standard.
+- The vangs and ourses are not drawn, to the current standard. The derrick is drawn: it is a
+  `lift`, and every yard's lifts are drawn since B5.1 (amended by the lead's ruling of 2026-11-09
+  on B5.4, which accepted the derrick as drawn; "the vangs, ourses and derrick are not drawn" was
+  the standard before B5.1).
 
 *As built (B5.4, 2026-11-07), on the fixture* `brig_with_settee()` (the bilander's file is B4's):
 `lugHoisted` as designed, the yard aloft unless `yard_lowered`; the slings a third along
@@ -1034,9 +1067,10 @@ the fixture x −14.20 m, 1.38 m off the centreline, 2.27 m inside the taffrail,
 trim's own block, which swings the clew about the tack on the centreline. **The derrick**: every
 yard's lifts are drawn since B5.1 (the owner's answer), so the derrick, a `lift`, is drawn, from
 two-thirds of the way from the slings to the peak as the mizen yard's (§6.1); "not drawn" above was
-the standard before B5.1 (judgement, for the lead). The vangs and ourses are not drawn. §6.4 was
-served from stage 0E; §6.5's cases in `tests/test_view_geometry.py` (25), every committed file drawn
-figure for figure as before. **For the lead:** the dry main yard is drawn where every lower yard is,
+the standard before B5.1 (judgement, for the lead; accepted, the lead's ruling of 2026-11-09,
+and the bullet above amended). The vangs and ourses are not drawn. §6.4 was served from stage 0E;
+§6.5's cases in `tests/test_view_geometry.py` (25), every committed file drawn figure for figure as
+before. **For the lead:** the dry main yard is drawn where every lower yard is,
 5.40 m above the slings on the fixture; braced sharp up with the settee trimmed by the same wind the
 two yards cross wherever sheet and brace sum near 90 degrees: by the wind at the engine's own trim
 (sheet 26.4, brace 62) 0.05 m apart, and 0.03 m with the bilander's dry yard (12.44 m, 1.02 m above

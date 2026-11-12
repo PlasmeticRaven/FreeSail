@@ -272,6 +272,9 @@ def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_lo
         "gulf-of-lion",  # package 79d
         "ligurian-sea",
         "tyrrhenian",
+        "catalan-coast",  # package 101
+        "sardinian-sea",  # package 104
+        "tunis-coast",  # package 104
     ]
     data = both.save()
     assert data["scenario"]["chart"] == "atlantic-east"

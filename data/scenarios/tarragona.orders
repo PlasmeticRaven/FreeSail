@@ -1,0 +1,29 @@
+# FreeSail: the captain's orders for the Catalan coast, Port Mahon to the road of Tarragona
+# (package 101). A short book: the frigate's own, the starter book not loaded.
+
+# The departure: from off the mouth of Port Mahon south round the Isla del Aire, a league
+# and a half off, then west along Minorca's south coast to the channel between the islands.
+standing order "weigh": at the anchor let go, if the distance to 39 52 N 4 19 E is under 2 miles then get under way on the larboard tack and steer S
+standing order "off the mouth": at under way, if the distance to 39 52 N 4 19 E is under 2 miles then set plain sail; shape a course for 39 45.6 N 4 25.2 E
+standing order "south-east of the Aire": when the distance to 39 45.6 N 4 25.2 E is under 1.5 miles then shape a course for 39 52 N 3 40 E
+
+# Through the channel between Minorca and Majorca and north-west across the open sea for
+# the coast of Catalonia, to four miles south-east of Tarragona's road (Tofino 1787,
+# p. 122): the course shaped each hour while the next mark is far and the last behind.
+standing order "the course for the channel": every hour, if the distance to 39 45.6 N 4 25.2 E is over 3 miles and the distance to 39 52 N 3 40 E is over 2 miles and the distance to 39 52 N 3 40 E is under 40 miles and the distance to 41 03 N 1 18 E is over 130 miles then shape a course for 39 52 N 3 40 E
+standing order "in the channel": when the distance to 39 52 N 3 40 E is under 2 miles then shape a course for 41 03 N 1 18 E
+standing order "the course for Catalonia": every hour, if the distance to 39 52 N 3 40 E is over 3 miles and the distance to 41 03 N 1 18 E is over 2 miles and the distance to 41 03 N 1 18 E is under 140 miles then shape a course for 41 03 N 1 18 E
+
+# The road of Tarragona: she closes the road, sounding, and anchors before the city in ten
+# fathoms of soft brown mud, the hostile port before her (the nations table's one year's
+# picture: see the scenario's head), so she does not go in.
+standing order "off Tarragona": when the distance to 41 03 N 1 18 E is under 2 miles then shorten sail; shape a course for the road of Tarragona
+standing order "the course for the road": every 10 minutes, if the distance to the road of Tarragona is under 5 miles and the distance to the road of Tarragona is over 0.4 miles and the distance to 41 03 N 1 18 E is under 6 miles then shape a course for the road of Tarragona
+standing order "in the road": when the distance to the road of Tarragona is under 0.4 miles then come to an anchor
+standing order "the lead off Tarragona": every 10 minutes, if the distance to the road of Tarragona is under 5 miles then heave the lead
+
+# The yards and the sheets, the bearings.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix

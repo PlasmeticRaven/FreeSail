@@ -726,6 +726,9 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
         # package 79d: the Gulf of Lion's, Marseille's table its check
         "gulf-of-lion",
         "tyrrhenian",  # Naples' table its check
+        "catalan-coast",  # package 101: Barcelona's table its check
+        "sardinian-sea",  # package 104: the Mediterranean west's rows
+        "tunis-coast",  # package 104: Bizerta's table its check
     ]
     channel = clim.boxes["channel"]
     # package 79b: the east bound at 2.5 E, so that the Channel's east block is the Channel's
@@ -783,6 +786,87 @@ def test_the_mediterranean_west_has_a_box_of_its_own_checked_against_a_printed_t
         assert clim.box_at(lat, lon).name == "mediterranean-west", (lat, lon)
     assert clim.box_at(36.1, -5.5).name == "portugal"
     assert clim.box_at(38.7, -9.5).name == "portugal"
+
+
+def test_the_catalan_coast_has_a_box_of_its_own_checked_against_barcelonas_table():
+    """Package 101 (item 6): no box held the Catalan coast, whose water took the nearest box
+    by the mile (the Mediterranean west's or the Gulf's); the block's box is its region's
+    bounds, its check rows Barcelona's table (the Mediterranean Pilot vol. I, 1913, Appendix
+    III, p. 726, read from the page image), each month's eight points summed against the
+    printed totals, the shares scaled to nine tenths, the generator's figures judgement
+    fitted to them, every row saying so: the westerlies ahead in winter, the southerlies
+    ahead in summer (the coast's sea breeze), the north a fiftieth in summer."""
+    clim = load_climatology()
+    box = clim.boxes["catalan-coast"]
+    assert box.bounds == (40.56, 41.9, 0.3, 3.0) and box.provisional
+    assert "Barcelona" in box.source and "Appendix III" in box.source
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    # the printed totals of Barcelona's table, the eight points summed over the year
+    points = {"N": 0, "NE": 0, "E": 0, "SE": 0, "S": 0, "SW": 0, "W": 0, "NW": 0}
+    for m, row in raw["boxes"]["catalan-coast"]["months"].items():
+        assert row["note"].startswith("judgement") and "p. 726" in row["note"], m
+        check = row["check"]
+        quarters = sum(check[k] for k in ("westerly_pct", "easterly_pct", "southerly_pct"))
+        assert 88 <= quarters + check["northerly_pct"] <= 92, m  # a tenth of days with none
+        for word in row["note"].split(": N ", 1)[1].split(", the calm")[0].split(", "):
+            point, days = word.rsplit(" ", 1) if " " in word else ("N", word)
+            points[point] += int(days)
+    assert points == {"N": 13, "NE": 32, "E": 54, "SE": 51, "S": 66, "SW": 74, "W": 51, "NW": 24}
+    january, july = box.month(1).check, box.month(7).check
+    assert january["westerly_pct"] > 2 * january["easterly_pct"]
+    assert july["southerly_pct"] > july["easterly_pct"] > july["westerly_pct"]
+    assert july["northerly_pct"] <= 2
+    # by position: Barcelona, Tarragona and the Alfaques are the block's; Port Mahon the
+    # Mediterranean west's still, the Gulf's water from 3 E
+    for lat, lon in ((41.36, 2.20), (41.10, 1.25), (40.61, 0.65), (41.0, 2.0)):
+        assert clim.box_at(lat, lon).name == "catalan-coast", (lat, lon)
+    assert clim.box_at(39.86, 4.32).name == "mediterranean-west"
+    assert clim.box_at(42.25, 3.18).name == "gulf-of-lion"
+
+
+def test_the_sardinian_sea_and_the_coast_of_tunis_have_boxes_and_bizertas_table_checks_one():
+    """Package 104 (item 5): no box held the L-shaped hole, whose water took the nearest box
+    along diagonals that follow no region's bound. The coast of Tunis's box is its region's
+    bounds, its check rows Bizerta's table (the Mediterranean Pilot vol. I, 1913, Appendix
+    III, p. 731, read from the page image), each month's eight points summed against the
+    printed totals, the shares scaled to nine tenths, the generator's figures judgement
+    fitted to them: the westerly ahead in every month and the north-wester's quarter a
+    third of the days in summer. The Sardinian sea's box is its region's bounds with the
+    Mediterranean west's rows (no table in the block), the same rows by the file's alias."""
+    clim = load_climatology()
+    tunis = clim.boxes["tunis-coast"]
+    assert tunis.bounds == (36.29334, 38.5, 8.0, 11.1466) and tunis.provisional
+    assert "Bizerta" in tunis.source and "Appendix III" in tunis.source
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    points = {"N": 0, "NE": 0, "E": 0, "SE": 0, "S": 0, "SW": 0, "W": 0, "NW": 0}
+    for m, row in raw["boxes"]["tunis-coast"]["months"].items():
+        assert row["note"].startswith("judgement") and "p. 731" in row["note"], m
+        check = row["check"]
+        quarters = sum(check[k] for k in ("westerly_pct", "easterly_pct", "southerly_pct"))
+        # a tenth of days with none, and Bizerta's day of calm in the months that have one
+        assert 86 <= quarters + check["northerly_pct"] <= 92, m
+        assert check["westerly_pct"] > check["easterly_pct"], m
+        for word in row["note"].split(": N ", 1)[1].split(", the calm")[0].split(", "):
+            point, days = word.rsplit(" ", 1) if " " in word else ("N", word)
+            points[point] += int(days)
+    assert points == {"N": 32, "NE": 33, "E": 27, "SE": 23, "S": 20, "SW": 58, "W": 53, "NW": 111}
+    july = tunis.month(7).check
+    assert july["northerly_pct"] >= 28 and july["southerly_pct"] <= 10
+    sardinian = clim.boxes["sardinian-sea"]
+    assert sardinian.bounds == (36.29334, 40.56, 4.5, 8.0)
+    medw = clim.boxes["mediterranean-west"]
+    for m in range(1, 13):
+        assert sardinian.month(m).check == medw.month(m).check
+        assert sardinian.month(m).track_bearing_deg == medw.month(m).track_bearing_deg
+    # by position: Bona, the open sea and the Algerian coast are the Sardinian sea's;
+    # Bizerta, the Goletta and the Galita the coast of Tunis's; Port Mahon the Mediterranean
+    # west's still and Carloforte the Tyrrhenian's
+    for lat, lon in ((36.95, 7.79), (38.5, 6.0), (36.76, 5.10)):
+        assert clim.box_at(lat, lon).name == "sardinian-sea", (lat, lon)
+    for lat, lon in ((37.28, 9.90), (36.83, 10.34), (37.51, 8.94)):
+        assert clim.box_at(lat, lon).name == "tunis-coast", (lat, lon)
+    assert clim.box_at(39.86, 4.32).name == "mediterranean-west"
+    assert clim.box_at(39.14, 8.31).name == "tyrrhenian"
 
 
 def test_a_scenario_is_seeded_from_the_box_she_starts_in_and_the_channel_draws_as_before():

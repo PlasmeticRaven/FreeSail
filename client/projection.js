@@ -4289,9 +4289,11 @@
       if (flag.place.indexOf("rigging") >= 0) at = v(at[0], weather * at[1], at[2]);
       var size = flagSize(hull, graph, flag);
       var down = v(0, 0, -size.hoist);
+      var shape = (flag.drawing && flag.drawing.shape) || "";
       function point(fx, fy) {
         var y = flag.drawing && flag.drawing.inverted ? 1 - fy : fy;
-        var taper = size.pendant ? 1 - fx * 0.9 : 1;
+        // package 102: a triangle tapers to a point at its fly (`shape`)
+        var taper = size.pendant ? 1 - fx * 0.9 : shape === "triangle" ? 1 - fx : 1;
         return add(add(at, mul(flyDir, fx * size.fly)), mul(down, 0.5 + (y - 0.5) * taper));
       }
       // package 98, step 3: the flag sorts as one at its middle (§12.3, "as a sail does"), its
@@ -4299,7 +4301,9 @@
       // a canton and its crosses do not come and go with the bearing
       var middle = centroid([point(0, 0), point(1, 0), point(1, 1), point(0, 1)]);
       var drawing = flag.drawing || {};
-      var items = (drawing.parts || [{ rect: [0, 0, 1, 1], colour: "cloth" }]).concat(drawing.lines || []);
+      var items = (drawing.parts || [{ rect: [0, 0, 1, 1], colour: "cloth" }])
+        .concat(drawing.lines || [])
+        .concat(drawing.polys || []); // package 102: the polygons, in the drawing's order too
       items = items
         .map(function (p, i) {
           return { p: p, at: p.n !== undefined ? p.n : i };
@@ -4307,18 +4311,76 @@
         .sort(function (a, b) {
           return a.at - b.at;
         });
-      items.forEach(function (it, k) {
+      var k = 0; // each figure's number, in the drawing's order (a part cut in two takes two)
+      items.forEach(function (it) {
         var p = it.p;
-        var pts = p.line ? flagLine(p, size, point) : null;
-        if (!p.line) {
+        var polys;
+        if (p.line) {
+          var band = flagLineSquare(p, size);
+          polys = band ? [band] : [];
+        } else if (p.poly) {
+          polys = [p.poly.map(function (q) { return [Number(q[0]), Number(q[1])]; })];
+        } else {
           var r = p.rect || [0, 0, 1, 1];
-          pts = [point(r[0], r[1]), point(r[2], r[1]), point(r[2], r[3]), point(r[0], r[3])];
+          polys = [[[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]]];
         }
-        if (!pts) return;
-        figs.push({ kind: "flag", id: "flag." + n + "." + k, of: "flag." + n, piece: p.line ? "line" : "", cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: (flag.words || flag.name) + ", at the " + flag.place, pts: pts, sortAt: middle });
+        if (shape === "swallowtail") polys = swallowTail(polys, drawing.cut || SWALLOWTAIL_CUT);
+        polys.forEach(function (sq) {
+          if (sq.length < 3) return;
+          var pts = sq.map(function (q) { return point(q[0], q[1]); });
+          figs.push({ kind: "flag", id: "flag." + n + "." + k, of: "flag." + n, piece: p.line ? "line" : "", cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: (flag.words || flag.name) + ", at the " + flag.place, pts: pts, sortAt: middle });
+          k += 1;
+        });
       });
     });
     return figs;
+  }
+
+  /** A drawing's line as `flagLine` cuts it, on the flag's own square ([x, y] each 0 to 1),
+   *  not yet put on the flag; null where nothing of it is left (package 102: so that an
+   *  outline may cut it before it is put). */
+  function flagLineSquare(p, size) {
+    return flagLine(p, size, function (fx, fy) {
+      return [fx, fy];
+    });
+  }
+
+  // package 102: a swallow tail's cut where the drawing gives none, a share of the fly
+  // (judgement, read off the plates; freesail/world/flags.py SWALLOWTAIL_CUT)
+  var SWALLOWTAIL_CUT = 1 / 3;
+  /** The polygons (on the flag's own square) with the swallow tail's notch taken out: the
+   *  triangle from the fly's two corners to the middle of the hoist line `cut` in from the
+   *  fly. Each comes back as its part above the middle and its part below, each cut by its
+   *  own edge of the notch. */
+  function swallowTail(polys, cut) {
+    var ax = 1 - cut, out = [];
+    polys.forEach(function (poly) {
+      // above the middle: keep the side of the edge from (ax, .5) to (1, 0) toward the hoist
+      var up = clipHalf(clipPoly(poly, 1, 0.5, -1), [ax, 0.5], [1, 0]);
+      var low = clipHalf(clipPoly(poly, 1, 0.5, 1), [1, 1], [ax, 0.5]);
+      if (up.length >= 3) out.push(up);
+      if (low.length >= 3) out.push(low);
+    });
+    return out;
+  }
+
+  /** A polygon of [x, y] cut to the left of the directed edge a to b (y down, x along the fly:
+   *  the side the hoist lies on for the notch's edges as `swallowTail` gives them). */
+  function clipHalf(poly, a, b) {
+    function side(q) {
+      return (b[0] - a[0]) * (q[1] - a[1]) - (b[1] - a[1]) * (q[0] - a[0]);
+    }
+    var out = [];
+    for (var i = 0; i < poly.length; i++) {
+      var p = poly[i], q = poly[(i + 1) % poly.length];
+      var dp = side(p), dq = side(q);
+      if (dp <= 0) out.push(p);
+      if ((dp <= 0) !== (dq <= 0)) {
+        var t = dp / (dp - dq);
+        out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]);
+      }
+    }
+    return out;
   }
 
   /** A drawing's line on a flag (76's `{line: [[x, y], [x, y]], width}`, on the flag's own

@@ -1,0 +1,31 @@
+# Package 100, step 1: a letter as the player sees it at the page. The frigate at anchor in
+# Carrick Road: a letter written (the captain goes below to his table), sealed, looked at,
+# its seal broken and read (its words shown him), handed to the master; a second written
+# and burnt. Every line answered where he stands; the words of a letter only in the rows of
+# its writing and its reading, never in the free line that says what he did.
+name: A letter written, sealed, read, handed and burnt
+scenario: tests/browser_plans/scenarios/frigate-falmouth.yaml
+steps:
+  - {label: "AT ANCHOR, ON DECK"}
+  - {say: let go the best bower, setup: true}
+  - {tick: 300}
+  - {label: "THE LETTER WRITTEN, AT THE CABIN TABLE"}
+  - say: 'write a letter to the port admiral: "The Harpy is in Carrick Road and wants water."'
+    expect: {answered: true, contains: [wrote a letter to the port admiral, "as written: \"The Harpy is in Carrick Road"]}
+  - {where: in the cabin}
+  - {say: seal the letter, expect: {answered: true, contains: is sealed, absent: wants water}}
+  - {say: read the letter, expect: {answered: true, contains: read only by breaking its seal, absent: wants water}}
+  - {say: look at the letter, expect: {answered: true, contains: "sealed;", absent: wants water}}
+  - {say: open the letter, expect: {answered: true, contains: "is broken, and it shows", absent: wants water}}
+  - {say: read the letter, expect: {answered: true, contains: [the letter to the port admiral read, wants water]}}
+  - {label: "HANDED TO THE MASTER, ON DECK"}
+  - {say: come on deck, setup: true}
+  - {tick: 30}
+  - {say: give the letter to the master, expect: {answered: true, contains: keeping, absent: wants water}}
+  - {say: read the letter, expect: {answered: true, contains: keeping, absent: wants water}}
+  - {label: "A SECOND LETTER, BURNT"}
+  - say: 'write a letter to Mr Veale: "Burn this when read."'
+    expect: {answered: true, contains: wrote a letter to Mr Veale}
+  - {tick: 330}
+  - {say: burn the letter to Mr Veale, expect: {answered: true, contains: "is burnt, and gone"}}
+  - {say: read the letter to Mr Veale, expect: {answered: true, contains: as said}}

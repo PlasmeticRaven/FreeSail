@@ -512,6 +512,35 @@ def test_an_order_at_the_prompt_makes_the_captain_stand_aside_and_carry_on_gives
         apply(w, parse("captain: carry on"))
 
 
+def test_a_word_said_at_the_prompt_is_the_players_own_and_no_hand_on_the_ship(monkeypatch):
+    """A word said is a person's own and no order of the ship's, as a free line is (the
+    lead's word of 2026-11-10): on his own ship the player's `say` and `tell` leave her
+    rules-based captain commanding (measured: they are `agent.spoke` and `agent.told`
+    there, never a hand), and so does a word recorded as `person.spoke` by whatever road
+    gives one (a captive's and a visitor's are; the rule is stated for the kind); an order
+    of the ship's after them is the hand it always was."""
+    w = intent_world()
+    cap = w.captain
+    assert cap.commands and cap.state == "on passage"
+    for line in ("say good morning to you all", "tell the master: mind the tide"):
+        e = w.submit(line)
+        assert e.kind in ("agent.spoke", "agent.told"), (line, e.kind, e.text)
+        assert cap.commands and not cap.aside, line
+    real = w.ship.handle_order
+    monkeypatch.setattr(
+        w.ship,
+        "handle_order",
+        lambda text: ("person.spoke", f"The captain, on the quarterdeck: {text}", {}),
+    )
+    e = w.submit("good morning to you, Mr Ward")
+    assert e.kind == "person.spoke"
+    assert cap.commands and not cap.aside
+    monkeypatch.setattr(w.ship, "handle_order", real)
+    assert not [x for x in w.log if x.kind == "captain.aside"]
+    e = w.submit("steer S")
+    assert e.kind != "order.rejected" and cap.aside and not cap.commands
+
+
 def test_the_players_hand_replays_with_him_aside():
     from freesail.api.session import ship_factory
     from freesail.core import replay as replay_mod

@@ -85,6 +85,15 @@ water, the stern and the head: a `HullForm`) and each line's one-word `marks`. `
 turns them into the drawn hull; nothing the physics, the guns or the lee ports read is taken from
 them (§5.0 principle 8). No file of the eight carries any of them, and a profile pickles as
 before while it holds none.
+
+Package 75's stage 0c, the 74's (docs/design/Design-Ship-Bellerophon.md §12.1, §17.0; the lead's
+answers to her §17.2, items 1 and 15) adds two keys to the crew: the quarter bill's `marines`, the
+marines it keeps in their division at the beat, a whole number no more than the file's marines;
+and `flag:`, the flag party a flagship bears beyond her company when a scenario hoists a flag
+(the rear-admiral and their people, each a post in the posts' form), counted in no station and
+not in the complement. No file carries either yet; nothing reads them until her bill by deck
+(the marines) and the flag's own package (the flag party); a bill and a crew pickle as before
+while they hold neither.
 """
 
 from __future__ import annotations
@@ -267,8 +276,18 @@ ARMAMENT_KEYS = ("default", "fits")
 # The quarter bill beyond the gun crews (spec M7 §8a; `docs/design/Design-WorkInAction.md`):
 # the sail trimmers by station, the hands at the helm, the powder, and the fighting book's
 # priority between the sails and the guns when hands are short; package 73's small-arms
-# men and boarders; and (practice and resupply) the men of the powder who fill cartridges.
-QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling")
+# men and boarders; (practice and resupply) the men of the powder who fill cartridges; and
+# (package 75, the 74's stage 0c) the marines kept in their division, last.
+QUARTER_BILL_KEYS = (
+    "trimmers",
+    "helm",
+    "powder",
+    "priority",
+    "small_arms",
+    "boarders",
+    "filling",
+    "marines",
+)
 PRIORITIES = ("sail before guns", "guns before sail")
 
 # The hull's profile (package 75; docs/design/Build-Ships.md §5.1): the side, the decks and the
@@ -310,7 +329,15 @@ SHAPE_KEYS = PROFILE_KEYS[PROFILE_KEYS.index("head_m") :]
 # the ladder of evidence's one word a line (§5.0 principles 3 and 4): sourced (S), stand-in (S†),
 # rule (R) and judged (T).
 FORM_KEYS = ("fullness", "stern", "head")
-STERN_KEYS = ("type", "knuckle_z_m", "transom_hb_m", "round_up_m", "galleries_m", "lights_m")
+STERN_KEYS = (
+    "type",
+    "knuckle_z_m",
+    "transom_hb_m",
+    "counter_hb_m",
+    "round_up_m",
+    "galleries_m",
+    "lights_m",
+)
 STERN_TYPES = ("square", "raked", "round")
 HEAD_WORDS = ("none", "knee", "scroll", "billet", "figure")
 MARK_WORDS = ("sourced", "stand-in", "rule", "judged")
@@ -434,15 +461,19 @@ class RudderSpec:
 class HullStern:
     """The stern as the profile's `form` gives it (stage 0H; docs/design/Build-Ships.md §5.1),
     drawn only: its type (`STERN_TYPES`); the knuckle, the transom's foot, metres above the
-    waterline; the transom's half-breadths at the taffrail and at the knuckle (a square or raked
-    stern's; a round stern has no transom); the transom's round up; each tier of galleries
-    [x_aft, x_fore, z_low, z_high], drawn on both quarters; and each band of lights
-    [z_low, z_high, n, hb], n lights across the stern's face within ±hb. None or empty where the
-    file gives none."""
+    waterline (a round stern's counter's foot, where it gives `counter_hb_m`); the transom's
+    half-breadths at the taffrail and at the knuckle (a square or raked stern's; a round stern
+    has no transom); a round stern's half-breadths at its counter by height, each [z, hb], low to
+    high (package 75, the lead's ruling of 2026-11-09: the half-breadth at which, at that height,
+    the side rounds in to the middle line on the stern's line; `freesail.ship.form`); the
+    transom's round up; each tier of galleries [x_aft, x_fore, z_low, z_high], drawn on both
+    quarters; and each band of lights [z_low, z_high, n, hb], n lights across the stern's face
+    within ±hb. None or empty where the file gives none."""
 
     type: str
     knuckle_z_m: float | None = None
     transom_hb_m: tuple[float, float] | None = None
+    counter_hb_m: tuple[tuple[float, float], ...] | None = None
     round_up_m: float | None = None
     galleries_m: tuple[tuple[float, float, float, float], ...] = ()
     lights_m: tuple[tuple[float, float, int, float], ...] = ()
@@ -718,6 +749,20 @@ class QuarterBillSpec:
     # QUARTER-GUNNER, l.14283-14289); None, reckoned so from the guns (`combat.filling`). A
     # plain default, so that a bill pickled before it loads.
     filling: int | None = None
+    # package 75, the 74's stage 0c (docs/design/Design-Ship-Bellerophon.md §6.3, §12.1): the
+    # marines the bill keeps in their division at the beat, on the poop and the forecastle or
+    # the gangway (Falconer 1780, QUARTERS), the rest drawn to the guns; no more than the file's
+    # marines. None, a bill that keeps none apart, as every bill before it. Read by nothing
+    # until her bill by deck (B7.b). A plain default, left out of the pickle while None.
+    marines: int | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the marines only where the bill keeps a division
+        (package 75), so that a bill without one is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("marines") is None:
+            state.pop("marines", None)
+        return state
 
 
 @dataclass
@@ -734,10 +779,26 @@ class CrewSpec:
     people: list[PersonRoleSpec] = field(default_factory=list)  # package 35
     ration: RationSpec = field(default_factory=RationSpec)  # package 54
     quarter_bill: QuarterBillSpec | None = None  # package 70; None: the bill is reckoned
+    # package 75, the 74's stage 0c (docs/design/Design-Ship-Bellerophon.md §12.1, §17.0; the
+    # lead's answer to her §17.2 item 15): the flag party she bears beyond her company when a
+    # scenario hoists a flag in her (the rear-admiral, their flag lieutenant and secretary and
+    # their servants), each a post in the posts' form, whose place and outline a people file
+    # gives as it gives every post's; counted in no station and not in the complement, so that
+    # while no flag flies her company is as filed. () for none. Read by nothing until the
+    # flag's own package. A plain default, left out of the pickle while empty.
+    flag: tuple[PostSpec, ...] = ()
 
     @property
     def seamen(self) -> int:
         return sum(self.stations[s] for s in SEAMAN_STATIONS)
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the flag party only where the file gives one
+        (package 75), so that a crew without one is pickled as before it."""
+        state = dict(self.__dict__)
+        if not state.get("flag"):
+            state.pop("flag", None)
+        return state
 
 
 @dataclass
@@ -781,10 +842,11 @@ class FitSpec:
     """A fit of guns with its magazine: the guns, the filled cartridges by the gun's kind and
     calibre, the shot by calibre and kind, and the source the generator names for the whole;
     and (practice and resupply, between packages 72 and 73) a cartridge's charge in pounds by
-    kind and calibre (None: `ship.parts.charge_lb`'s), the powder below in barrels, and a
-    King's fit's allowance of charges for exercise a month (the Regulations 1806, the
-    Gunner, Art. XXI, l.13122-13144). A fit pickled before them has calibre-keyed
-    `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits the keys)."""
+    kind and calibre (None: the shares as filed, `ship.parts.filed_charge_lb`'s), the powder
+    below in barrels, and a King's fit's allowance of charges for exercise a month (the
+    Regulations 1806, the Gunner, Art. XXI, l.13122-13144). A fit pickled before them has
+    calibre-keyed `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits
+    the keys)."""
 
     name: str
     guns: list[GunSpec]
@@ -930,6 +992,8 @@ BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons", "file")
 # the one new key for the one new figure, the oar force a boat's hull is driven by.
 OARS_KEYS = ("number", "thrust_n", "power_w", "tiring_h")
 PERSON_ROLE_KEYS = ("role", "station", "rating", "messenger")
+# A post of the crew's `flag:` party (package 75, the 74's stage 0c): the posts' own form.
+FLAG_POST_KEYS = ("post", "name")
 
 
 @dataclass
@@ -1340,6 +1404,7 @@ def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
             f"{', '.join(PRIORITIES)}."
         )
     filling = raw.get("filling")
+    marines = raw.get("marines")  # package 75, the 74's stage 0c: no more than her marines
     return QuarterBillSpec(
         trimmers=trimmers,
         helm=_count(raw.get("helm", 2), "the hands at the helm", source),
@@ -1349,6 +1414,9 @@ def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
         boarders=_count(raw.get("boarders", 0), "the boarders", source),
         filling=_count(filling, "the hands filling cartridges", source)
         if filling is not None
+        else None,
+        marines=_count(marines, "the marines kept in their division", source)
+        if marines is not None
         else None,
     )
 
@@ -1811,11 +1879,19 @@ def _parse_stern(raw: Any, stern_line: tuple[tuple[float, ...], ...], source: st
                 f"({taffrail:g} m, stern_m's top); the knuckle is the transom's foot."
             )
     transom = None
+    counter = None
+    if kind != "round" and raw.get("counter_hb_m") is not None:
+        raise ShipFileError(
+            f"{source}: {where} is {kind} and gives counter_hb_m; a {kind} stern gives its "
+            "transom's half-breadths in transom_hb_m, and counter_hb_m is a round stern's."
+        )
     if kind == "round":
         if raw.get("transom_hb_m") is not None:
             raise ShipFileError(
                 f"{source}: {where} is round and gives transom_hb_m; a round stern has no transom."
             )
+        if raw.get("counter_hb_m") is not None:
+            counter = _parse_counter(raw["counter_hb_m"], knuckle, stern_line, source)
     elif raw.get("transom_hb_m") is None:
         raise ShipFileError(
             f"{source}: {where} is {kind} and gives no transom_hb_m; a {kind} stern gives its "
@@ -1872,10 +1948,46 @@ def _parse_stern(raw: Any, stern_line: tuple[tuple[float, ...], ...], source: st
         type=kind,
         knuckle_z_m=knuckle,
         transom_hb_m=transom,
+        counter_hb_m=counter,
         round_up_m=round_up,
         galleries_m=tuple(galleries),
         lights_m=tuple(lights),
     )
+
+
+def _parse_counter(
+    raw: Any, knuckle: float | None, stern_line: tuple[tuple[float, ...], ...], source: str
+) -> tuple[tuple[float, float], ...]:
+    """A round stern's `counter_hb_m` (package 75, the lead's ruling of 2026-11-09): its
+    half-breadths at its counter by height, [z, hb] low to high, each above the counter's foot
+    (`knuckle_z_m`, else the water) and at or below the taffrail, each half-breadth more than
+    nothing."""
+    what = "form.stern.counter_hb_m"
+    foot = knuckle if knuckle is not None else 0.0
+    taffrail = stern_line[-1][1]
+    out: list[tuple[float, float]] = []
+    for p in _form_list(raw, "counter_hb_m", source):
+        z, hb = _profile_point(p, 2, "z, hb", what, source)
+        if not foot < z <= taffrail:
+            raise ShipFileError(
+                f"{source}: the profile's {what} has the point {p!r}; a point of the counter "
+                f"stands above its foot ({foot:g} m) and no higher than the taffrail "
+                f"({taffrail:g} m, stern_m's top)."
+            )
+        if out and not z > out[-1][0]:
+            raise ShipFileError(
+                f"{source}: the profile's {what} goes from z {out[-1][0]:g} to {z:g}; its points "
+                "run low to high, each z greater than the last."
+            )
+        if not hb > 0.0:
+            raise ShipFileError(
+                f"{source}: the profile's {what} has a half-breadth of {hb:g} m; a half-breadth "
+                "is more than nothing."
+            )
+        out.append((z, hb))
+    if not out:
+        raise ShipFileError(f"{source}: the profile's {what} gives no point; give [z, hb] or none.")
+    return tuple(out)
 
 
 def _form_list(raw: Any, key: str, source: str) -> list[Any]:
@@ -2630,6 +2742,7 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
             "people",  # package 35
             "ration",  # package 54
             "quarter_bill",  # package 70
+            "flag",  # package 75, the 74's stage 0c: the flag party, beyond her company
         ):
             raise ShipFileError(f"{source}: the crew section has '{key}', which it does not take.")
 
@@ -2766,6 +2879,18 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
             )
         )
 
+    ration = _parse_ration(c.get("ration"), source)
+    bill = (
+        _parse_quarter_bill(c["quarter_bill"], source)
+        if c.get("quarter_bill") is not None
+        else None
+    )
+    if bill is not None and bill.marines is not None and bill.marines > stations["marines"]:
+        raise ShipFileError(
+            f"{source}: the quarter bill keeps {bill.marines} marines in their division, but "
+            f"the crew has {stations['marines']}; it cannot keep more marines than she bears."
+        )
+
     return CrewSpec(
         complement=complement,
         names=names,
@@ -2775,13 +2900,34 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         idlers_by_trade=trades,
         stores=stores,
         people=people,
-        ration=_parse_ration(c.get("ration"), source),
-        quarter_bill=(
-            _parse_quarter_bill(c["quarter_bill"], source)
-            if c.get("quarter_bill") is not None
-            else None
-        ),
+        ration=ration,
+        quarter_bill=bill,
+        flag=_parse_flag(c.get("flag"), source),
     )
+
+
+def _parse_flag(raw: Any, source: str) -> tuple[PostSpec, ...]:
+    """The crew's `flag:` list (package 75, the 74's stage 0c): the flag party she bears
+    beyond her company when a flag is hoisted in her, each a post in the posts' form (the
+    post, and a name when the file gives one); absent or empty, none."""
+    if raw is None:
+        return ()
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: the crew's 'flag' is not a list of posts.")
+    flag: list[PostSpec] = []
+    for i, p in enumerate(raw):
+        where = f"post #{i + 1} of the crew's flag"
+        if not isinstance(p, dict) or not str(p.get("post") or "").strip():
+            raise ShipFileError(f"{source}: {where} does not say which post it is.")
+        for key in p:
+            if key not in FLAG_POST_KEYS:
+                raise ShipFileError(
+                    f"{source}: {where} has '{key}', which a post of the flag does not take "
+                    f"({', '.join(FLAG_POST_KEYS)})."
+                )
+        name = p.get("name")
+        flag.append(PostSpec(post=str(p["post"]).strip(), name=str(name).strip() if name else None))
+    return tuple(flag)
 
 
 def _parse_ration(r: Any, source: str) -> RationSpec:

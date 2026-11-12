@@ -121,3 +121,79 @@ rumours:
   within_nm: 250
   how_many: [2, 3]
   ratio: 1.3
+
+# Package 74 (spec M7 §18 and §20; docs/design/Design-Prizes.md §5): the prize court and the
+# money. Every figure's source stands beside it; a figure FROM MEMORY is so marked for the
+# owner's references through the lead (the lead's ruling 3 of 2026-11-07).
+prize_values:
+  # the hull's price a ton burthen by her kind, worn by age; the guns by the hundredweight
+  merchant_hull_pounds_per_ton: 8.0     # FROM MEMORY of the Lloyd's sales of prizes in the war years; unverified
+  man_of_war_hull_pounds_per_ton: 12.0  # FROM MEMORY of the Navy Board's purchases of prizes; unverified
+  wear_per_year: 0.02                   # two per cent a year from her build year (judgement)
+  age_years_unknown: 10                 # a file with no build year is taken as ten years old (judgement)
+  guns_pounds_per_cwt: 4.0              # the Ordnance's price of iron; FROM MEMORY, unverified
+  worth_least_pounds: 400.0             # under it a prize is not worth her prize crew (the design's §2.7; judgement)
+prize_courts:
+  # the court sits where she is brought in, in so many days (the Vice-Admiralty courts'
+  # summary condemnations of the war; the High Court's months are not modelled: judgement)
+  britain: {days: 7, name: "the Vice-Admiralty court", home_name: "the High Court of Admiralty", source: "the Vice-Admiralty courts' summary condemnations of the war; the names from the period's usage, FROM MEMORY"}
+  france: {days: 7, name: "le Conseil des prises", source: "the period's usage, FROM MEMORY"}
+  spain: {days: 10, name: "el Tribunal de presas", source: "judgement; decision 64's row; the name from the period's usage, FROM MEMORY"}
+  default: {days: 7, name: "the prize court", source: "judgement"}
+prize_money:
+  agent_share: 0.05          # the prize agents' five per cent; FROM MEMORY, unverified
+  court_fees_pounds: 20.0    # a sentence's fees; judgement
+  head_money_pounds: 5.0     # a head of the men aboard a ship of war or a privateer at the start of the engagement; the Prize Acts' figure FROM MEMORY, unverified
+  costs_share: 0.1           # costs and damages against the captor for a neutral wrongly taken: a tenth of her valuation; FROM MEMORY of the Admiralty court's awards, unverified
+  salvage_share: 0.125       # an eighth to the recaptors of a ship of their own nation retaken; FROM MEMORY, unverified
+  purchase_for_the_service: true   # a King's ship's prize of war taken up by the yard: three fourths now, a fourth with a later sentence (the Regulations, For Flag Officers, art. XXXI, the Commander in Chief's order, p. 28, on file)
+  reserved_share: 0.25
+  # the sharing among all the ships in sight at the moment the enemy surrendered, a ship that
+  # took no part included (Lavery, Nelson's Navy, p. 116: the sharing; the division among them
+  # by their complements is judgement, FROM MEMORY of the period's practice, the source gives
+  # the sharing and not the division)
+  in_sight_shared: true
+  in_sight_division: complements
+prize_shares:
+  # the eighths by date, the scheme in force at the court's date read. The classes and the
+  # figures of the two British schemes are CONFIRMED by Lavery, Nelson's Navy: The Ships, Men
+  # and Organization, 1793-1815, p. 116 (the book's words are not copied here); the shares
+  # within the petty officers' and the crew's half from 1808 are not in that source and stay
+  # FROM MEMORY. Lavery notes special rules for captures by small ships or ships with reduced
+  # crews: not modelled.
+  - nation: britain
+    from: 1708-01-01
+    until: 1808-01-01
+    source: "Lavery, Nelson's Navy, p. 116 (the Act of 1708, 6 Anne c. 13, in force in 1805)"
+    classes:
+      - {name: "the captain", share: 0.375, note: "three eighths; one of them to the flag officer when he sails under an admiral's orders, kept under orders direct from the Admiralty (not modelled: no flag)"}
+      - {name: "the captains of marines and of land forces, the sea lieutenants and the masters", share: 0.125, note: "one eighth, divided equally among them"}
+      - {name: "the lieutenants and quartermasters of marines, the officers of land forces, the boatswain, the gunner, the purser, the carpenter, the master's mates, the surgeons and the chaplains", share: 0.125, note: "one eighth"}
+      - {name: "the midshipmen, the surgeon's mates, the sergeants of marines and the petty officers", share: 0.125, note: "one eighth"}
+      - {name: "the crew and the marines", share: 0.25, note: "the remaining quarter"}
+  - nation: britain
+    from: 1808-01-01
+    until: 1900-01-01
+    source: "Lavery, Nelson's Navy, p. 116 (the Order in Council of 1808)"
+    classes:
+      - {name: "the captain", share: 0.25, note: "two eighths; a third of it to the flag officer where there is one (not modelled: no flag)"}
+      - {name: "the commissioned officers' class", share: 0.125, note: "one eighth, as before"}
+      - {name: "the warrant officers' class", share: 0.125, note: "one eighth, as before"}
+      - {name: "the petty officers and the crew", share: 0.5, note: "four eighths between them; the shares within that half are not in the source and stay FROM MEMORY: the midshipmen and the principal petty officers four shares and a half each, the able seamen three, the ordinary two, the landsmen and the boys one"}
+  - nation: privateer
+    from: 1700-01-01
+    until: 1900-01-01
+    source: "FROM MEMORY of the Channel privateers' articles, unverified: the owners and the crew by halves"
+    classes:
+      - {name: "the owners", share: 0.5, note: "by the articles"}
+      - {name: "the crew", share: 0.5, note: "by the articles, among them by their shares"}
+  - nation: france
+    from: 1700-01-01
+    until: 1900-01-01
+    source: "the French distribution not read; the British eighths of the date kept until a source is (decision 64: the row present and honest)"
+    classes: british
+  - nation: spain
+    from: 1700-01-01
+    until: 1900-01-01
+    source: "the Spanish distribution not read; the British eighths of the date kept until a source is (decision 64: the row present and honest)"
+    classes: british

@@ -1,0 +1,87 @@
+# FreeSail: the Catalan coast, Port Mahon to the road of Tarragona (package 101). A free
+# passage of the block's water, not a gate's and not pinned: the frigate weighs from the
+# anchorage off the mouth of Port Mahon, rounds the Isla del Aire, runs west along Minorca's
+# south coast and up through the channel between Minorca and Majorca, and crosses the open
+# sea north-west to the coast of Catalonia, past Cape Salou to Tarragona's road, where she
+# anchors before the city in ten fathoms of soft brown mud (Tofino 1787, p. 122; Purdy
+# 1826, p. 27); on the whole chart (`chart: atlantic-east`), so that she crosses the seam
+# at 40.56 N from `balearics` into `catalan-coast`, her region, her tide and her weather's
+# box changing.
+#
+# May 1809: Spain is Britain's ally against France since the summer of 1808 (James 1837,
+# vol. 4, pp. 294 to 295), and the French hold Barcelona (its file's dated nation). BUT the
+# world does not know it: the nations table's wars are one year's picture (data/nations.yaml
+# `wars:`, Britain at war with Spain since 12 December 1804 and no end date; `Nations.at_war`,
+# freesail/world/nations.py line 109, reads no date), so Tarragona reads as HOSTILE to her
+# in 1809, as Port Mahon and every Spanish port do. A scenario's own `nations:` block (package
+# 75; freesail/world/scenarios.py) can state the wars of its day, but the World reads it for
+# nothing yet (freesail/core/world.py, the Scenario's `nations` field, line 269 to 278:
+# "READ BY NOTHING YET"), so it is not given here. A finding for the owner (decision 66 and
+# the range's review, package 103), by the lead's ruling of 2026-11-10; she anchors in the
+# road and does not go in.
+#
+# Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/tarragona.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/tarragona.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/tarragona.yaml --hours 40 --reckoning
+#
+# The weather is pinned (a fine May: an easterly at fourteen knots veering
+# south-easterly and southerly as she crosses, the coast's summer southerly; Barcelona's
+# table gives May's days of wind from the south and east a third each), so that the passage is the
+# same on every machine; the sea and the motion are kept. Its figures at seed 7 are in
+# docs/dev/TuningNotes.md (package 101), measured once: not a gate's, not pinned.
+
+name: The Catalan coast, Port Mahon to the road of Tarragona
+seed: 7
+start: 1809-05-12T05:00
+position: {lat_deg: 39.8600, lon_deg: 4.3170}   # off the mouth of Port Mahon (features/balearics.yaml `mahon-outer-road`)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 180
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1808}
+  epitome: norie                  # a ship of war's
+  almanac: 1809
+
+cargo:
+  purse_pounds: 200
+
+ports: [port-mahon, palma, barcelona, tarragona, alfaques]
+
+weather:
+  wind:
+    - {at: 1809-05-12T04:00, from_deg: 80, knots: 14, air_mass: neutral}
+    - {at: 1809-05-12T10:00, from_deg: 100, knots: 13}
+    - {at: 1809-05-12T13:00, from_deg: 150, knots: 13}
+    - {at: 1809-05-12T20:00, from_deg: 170, knots: 12}
+    - {at: 1809-05-13T08:00, from_deg: 180, knots: 11}
+    - {at: 1809-05-13T20:00, from_deg: 200, knots: 9}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.2, high_toward_deg: 90}
+  systems:
+    - name: the high over Sardinia
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1809-05-11T12:00, x_km: 500, y_km: -100, hpa: 1024}
+        - {at: 1809-05-14T12:00, x_km: 700, y_km: 0, hpa: 1022}
+  sky: {sky: detached clouds, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/tarragona.orders
+
+orders:
+  - let go the best bower

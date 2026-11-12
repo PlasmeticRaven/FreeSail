@@ -262,7 +262,13 @@ def test_the_director_sets_a_parole_for_a_captive_nobody_asks_and_is_doubted_whi
     assert e.data.get("result") == "done", e.text
     pris = P.prisoners_of(enemy.ship)
     assert pris.parole["Captain Bowen"] == "refused"
-    assert "refuses his parole (the director's word)" in _kinds(enemy.log, "prize.parole")[0].text
+    # the captor's log's line, which the captive aboard her hears, is the world's: it names
+    # no director (old: "refuses his parole (the director's word): ...")
+    line = _kinds(enemy.log, "prize.parole")[0]
+    assert line.text == (
+        "Captain Bowen refuses his parole: the gunroom alone is his, a sentry at the door."
+    )
+    assert "director" not in line.text and "director" not in str(line.data).lower()
     e = w.world_order("aboard the Medusa: the parole of Mr Veale given", "the test")
     assert e.data.get("result") != "done" and "no prisoner aboard the Medusa" in e.text
 
@@ -383,6 +389,54 @@ def test_a_bare_yes_gives_the_parole_and_a_bare_no_refuses_it_read_as_whole_word
     assert me2.liberty == C.PLACES_REFUSED
 
 
+def test_an_answer_that_holds_a_negation_is_never_read_as_the_parole_given():
+    """The lead's ruling of 2026-11-10: "I do not." and "you have it not" were read as given
+    (the plain yes's "i do" and "you have it" with a negation after them), and "you shall not
+    have my parole" by the form "my parole". An answer that holds a negation is never given,
+    by the forms or the plain words; it is refused by the refused forms and the plain no
+    alone, and otherwise the question stays open."""
+    for words in (
+        "I do not.",
+        "I do not know",
+        "I do not see why I should",
+        "you have it not",
+        "I don't give you my parole yet",
+        "I can't say",
+        "Je ne donne pas ma parole",
+        "Yes and no.",
+    ):
+        assert C.read_parole(words) is None, words
+    for words in (
+        "you shall not have my parole",
+        "No, I do not",
+        "No.",
+        "Never, sir",
+        "I refuse",
+        "I do not give it",
+    ):
+        assert C.read_parole(words) is False, words
+    for words in (
+        "I do.",
+        "You have it, sir",
+        "I give you my parole",
+        "You have my word, lieutenant",
+        "Oui",
+    ):
+        assert C.read_parole(words) is True, words
+    # at the prompt: the question stays open through the negated yes, and the refusal is read
+    w, enemy = _struck_to_a_crewed_frigate()
+    me = C.captive_person(w)
+    w.run(120)
+    pris = enemy.ship.extra["prisoners"]
+    assert pris.parole.get(me.name) == "asked"
+    for words in ("I do not.", "You have it not.", "I do not know."):
+        w.submit(f"say to the captain: {words}")
+        assert pris.parole.get(me.name) == "asked", words
+    w.submit("say to the captain: You shall not have my parole.")
+    assert pris.parole.get(me.name) == "refused"
+    assert me.liberty == C.PLACES_REFUSED
+
+
 def test_a_prisoner_hails_nobody_and_his_prompt_performs_his_own_words_moves_and_needs_alone():
     """The owner's play, the fourth and fifth: the prisoner's 'hail her' was made by the
     trumpet from his captor's deck, and his 'go ashore' was refused in the free man's words
@@ -406,6 +460,11 @@ def test_a_prisoner_hails_nobody_and_his_prompt_performs_his_own_words_moves_and
         "strike the colours",
         "hoist the colours",
         "make the private signal",
+        # package 98's step 7, met at the trunk: the flags of command are the deck's orders
+        # by the place's check, so a prisoner is refused them by the same road as the colours
+        "haul down the broad pendant",
+        "haul down the second ensign",
+        "haul down the jack",
         'standing order "mine": when the wind shifts then trim sails',
         "captain: carry on",
         "take a fix",

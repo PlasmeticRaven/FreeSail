@@ -60,6 +60,7 @@ __all__ = [
     "PAROLE_ASK_AGAIN_S",
     "PAROLE_BY_RULE_S",
     "PAROLE_GIVEN_WORDS",
+    "PAROLE_NEGATIONS",
     "PAROLE_REFUSED_WORDS",
     "PLACES_ON_PAROLE",
     "PLACES_ON_PAROLE_NIGHT",
@@ -107,6 +108,8 @@ PAROLE_REFUSED_WORDS: tuple[str, ...] = (
     "refuse",
     "will not give",
     "shall not give",
+    "shall not have",
+    "will not have",
     "no parole",
     "i decline",
     "do not give",
@@ -117,6 +120,44 @@ PAROLE_REFUSED_WORDS: tuple[str, ...] = (
 # as neither, and the question stays open
 PAROLE_YES_WORDS: tuple[str, ...] = ("yes", "oui", "sí", "si", "aye", "i do", "you have it")
 PAROLE_NO_WORDS: tuple[str, ...] = ("no", "non", "never", "i will not")
+# a negation in the answer (the lead's ruling of 2026-11-10: "I do not." and "you shall not
+# have my parole" were read as given): an answer that holds one is never read as given, by
+# the forms or by the plain words; it is refused by the refused forms and the plain no alone,
+# and otherwise the question stays open. Whole words, after the apostrophes are taken out
+# (don't is "dont"); the French ne ... pas and jamais, the Spanish nunca and jamás beside.
+PAROLE_NEGATIONS: tuple[str, ...] = (
+    "not",
+    "no",
+    "non",
+    "never",
+    "nor",
+    "neither",
+    "cannot",
+    "ne",
+    "pas",
+    "jamais",
+    "nunca",
+    "jamás",
+    "jamas",
+    "dont",
+    "wont",
+    "cant",
+    "shant",
+    "wouldnt",
+    "couldnt",
+    "shouldnt",
+    "isnt",
+    "arent",
+    "wasnt",
+    "werent",
+    "doesnt",
+    "didnt",
+    "havent",
+    "hasnt",
+    "hadnt",
+    "mustnt",
+    "neednt",
+)
 # the cartel's errand
 CARTEL_HAIL_M = 4.0 * units.CABLE  # within hail of the holder: the persons taken off
 CARTEL_DAY_NM = 100.0  # a day's sail from her port, beyond which the form is doubted
@@ -144,13 +185,45 @@ def captive_of(world: Any) -> dict[str, Any] | None:
     return rec if isinstance(rec, dict) and rec else None
 
 
-def captive_person(world: Any) -> Any:
-    """The player's person while he is a captive, found in the one registry by his id and
-    his home; None when he is free or cannot be found."""
-    rec = captive_of(world)
-    if rec is None:
-        return None
+PLAYERS_PERSON_KEY = "players_person"  # the root's memory of who the player's person is
+
+
+def remembered_person(world: Any) -> Any:
+    """The player's person as the taking remembered him (his id and his home), found in the
+    one registry: the marker outlives the captive's record, so that the man exchanged and
+    ashore is still the prompt's person while his own ship has a prize master for her
+    captain (package 74, step 6). **The mark stands only while it is needed**: where he is
+    his own ship's captain again (she is retaken, the swap back made), it is past and None
+    is answered, the seat and the model at her captain's station read as they were before
+    the taking; `settle_person` clears it then. None where nothing is remembered or he is
+    dead."""
     root = _root(world)
+    rec = root.__dict__.get(PLAYERS_PERSON_KEY)
+    if not isinstance(rec, dict) or not rec:
+        return None
+    person = _find_person(root, rec)
+    if person is None:
+        return None
+    home = _hull_of(root, rec.get("home"))
+    if home is not None and _captain_of(home) is person:
+        return None
+    return person
+
+
+def settle_person(world: Any) -> None:
+    """The mark of the player's person cleared where he is his own ship's captain again
+    (called at the retaking, `prizes.retake`); a new command is another world and has none."""
+    root = _root(world)
+    rec = root.__dict__.get(PLAYERS_PERSON_KEY)
+    if not isinstance(rec, dict) or not rec:
+        return
+    person = _find_person(root, rec)
+    home = _hull_of(root, rec.get("home"))
+    if person is None or (home is not None and _captain_of(home) is person):
+        root.__dict__.pop(PLAYERS_PERSON_KEY, None)
+
+
+def _find_person(root: Any, rec: dict[str, Any]) -> Any:
     registry = getattr(root, "registry", None)
     if registry is None:
         return None
@@ -160,6 +233,15 @@ def captive_person(world: Any) -> Any:
             if p.id == pid and p.name == rec.get("person") and not getattr(p, "dead", False):
                 return p
     return None
+
+
+def captive_person(world: Any) -> Any:
+    """The player's person while he is a captive, found in the one registry by his id and
+    his home; None when he is free or cannot be found."""
+    rec = captive_of(world)
+    if rec is None:
+        return None
+    return _find_person(_root(world), rec)
 
 
 def is_captive(person: Any) -> bool:
@@ -279,6 +361,11 @@ def player_taken(
         "captor": str(captor_hull.id),
         "since": tick,
         "sword": sword.id if sword is not None else "",
+    }
+    root.__dict__[PLAYERS_PERSON_KEY] = {
+        "person": person.name,
+        "id": person.id,
+        "home": str(prize_hull.id),
     }
     record["captive"] = person.name
     who = f"{person.name}, {_role_words(person)} the {prize_hull.ship.name},"
@@ -547,6 +634,7 @@ def answer_parole(world: Any, hull: Any, person: Any, given: bool, by: str) -> s
         return ""
     captain = _captain_of(hull)
     table = _parole_table(_nation(hull))
+    how = f" ({by})" if by else ""  # by whose word, where the world has one to say
     if given:
         pris.parole[person.name] = "given"
         person.liberty = PLACES_ON_PAROLE
@@ -560,7 +648,7 @@ def answer_parole(world: Any, hull: Any, person: Any, given: bool, by: str) -> s
             sword.keeper_home = str(getattr(person, "home", "") or "")
             returned = "; his sword is returned him"
         text = (
-            f"{person.name} gives his parole ({by}): the cabin and the gunroom are his, and "
+            f"{person.name} gives his parole{how}: the cabin and the gunroom are his, and "
             f"the quarterdeck by day{returned}."
         )
         ack = table.get("taken") or "Your word is enough, sir; the cabin is yours."
@@ -570,7 +658,7 @@ def answer_parole(world: Any, hull: Any, person: Any, given: bool, by: str) -> s
         person.confined_to = "gunroom"
         person.where = "gunroom"
         text = (
-            f"{person.name} refuses his parole ({by}): the gunroom alone is his, a sentry at "
+            f"{person.name} refuses his parole{how}: the gunroom alone is his, a sentry at "
             "the door."
         )
         ack = table.get("refused") or "As you please, sir; the sentry has his orders."
@@ -614,23 +702,42 @@ def hear_parole(world: Any, hull: Any, person: Any, words: str) -> bool:
     pris = _prisoners(hull)
     if pris is None or pris.parole.get(person.name) != "asked":
         return False
-    low = " ".join(str(words).lower().replace("'", "").split())
+    read = read_parole(words)
+    if read is None:
+        return False
+    answer_parole(world, hull, person, read, "in his own words")
+    return True
+
+
+def read_parole(words: str) -> bool | None:
+    """An answer to the parole's question read: True given, False refused, None neither (the
+    question stays open). The refused forms first; an answer that holds a negation is never
+    given, and is refused by the plain no alone, unless a plain yes stands beside it un-negated
+    ("yes and no": neither); with no negation the given forms and the plain yes give it."""
+    low = " ".join(str(words).lower().replace("'", "").replace("\u2019", "").split())
     if any(w in low for w in PAROLE_REFUSED_WORDS):
-        answer_parole(world, hull, person, False, "in his own words")
+        return False
+    if _whole_words(low, PAROLE_NEGATIONS):
+        no = _whole_words(low, PAROLE_NO_WORDS)
+        return False if no and not _plain_yes(low) else None
+    if any(w in low for w in PAROLE_GIVEN_WORDS) or _whole_words(low, PAROLE_YES_WORDS):
         return True
-    if any(w in low for w in PAROLE_GIVEN_WORDS):
-        answer_parole(world, hull, person, True, "in his own words")
-        return True
-    yes, no = _whole_words(low, PAROLE_YES_WORDS), _whole_words(low, PAROLE_NO_WORDS)
-    if yes != no:
-        answer_parole(world, hull, person, yes, "in his own words")
-        return True
-    return False
+    return None
 
 
 def _whole_words(low: str, forms: tuple[str, ...]) -> bool:
     """Whether any of the forms stands in the words as whole words ('no', not 'not')."""
     return any(re.search(rf"(?<!\w){re.escape(f)}(?!\w)", low) for f in forms)
+
+
+def _plain_yes(low: str) -> bool:
+    """A plain yes that no negation follows at once ('yes and no'; never 'I do not', 'you
+    have it not')."""
+    negated = "|".join(re.escape(n) for n in PAROLE_NEGATIONS)
+    return any(
+        re.search(rf"(?<!\w){re.escape(f)}(?!\w)(?!\W+(?:{negated})(?!\w))", low)
+        for f in PAROLE_YES_WORDS
+    )
 
 
 def set_parole(world: Any, hull: Any, name: str, given: bool, by: str) -> str:

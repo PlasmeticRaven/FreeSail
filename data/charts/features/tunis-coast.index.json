@@ -1,0 +1,79 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"147,32": [
+"cape-rosa"
+],
+"147,33": [
+"la-calle",
+"la-calle-cove",
+"la-calle-road"
+],
+"147,35": [
+"tabarka-island",
+"tabarka-castle",
+"tabarka-road"
+],
+"147,40": [
+"tunis"
+],
+"147,41": [
+"cape-carthage",
+"cape-carthage-light",
+"la-goletta",
+"tunis-road"
+],
+"148,35": [
+"cape-negro-tunis"
+],
+"148,36": [
+"cape-serrat"
+],
+"148,38": [
+"jebel-ishkeul"
+],
+"148,40": [
+"porto-farina",
+"porto-farina-road"
+],
+"148,41": [
+"cape-farina",
+"plana"
+],
+"148,43": [
+"zembra",
+"zembretta"
+],
+"148,44": [
+"cape-bon"
+],
+"149,34": [
+"sorelle"
+],
+"149,35": [
+"galitona"
+],
+"149,37": [
+"fratelli"
+],
+"149,39": [
+"cape-blanc",
+"bizerta",
+"bizerta-road"
+],
+"149,40": [
+"cani-islets"
+],
+"150,35": [
+"galita",
+"galita-dogs",
+"galita-road"
+],
+"151,43": [
+"skerki"
+],
+"151,44": [
+"keiths-reef"
+]
+}
+}
