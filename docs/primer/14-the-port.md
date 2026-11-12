@@ -318,16 +318,18 @@ burn the letter
 **Money is paid, not said.** Mr Veale may say he pays twenty guineas; the purse is what it was until the sum is paid, and the purser's books then say who paid it and what the purse holds after (*Paid into the purse by Mr Veale, twenty guineas (£21); the purse £55.*). A freight comes off by the port's lighter at no price and is written in the manifest with whose it is and where it goes; a debt is entered in the purser's books and moves no money. These are the director's to give (chapter 20), never a figure set: `the purse` reads the pounds, and the sums and debts with their causes once there are any.
 
 ```orders frigate plain-sail
-give the packet to Mr Veale
-hand the letter to the master
-take the packet
-put the packet on the table
-hide the letter in the bread locker
-stow the cask in the hold
-show the chart to the master
-open the packet
-read the letter
-throw the empty bottle overboard
+# a ship with no thing aboard: each line names nothing known, and is refused saying so
+# (package 109; until then each was taken "as said; nothing of the ship's changed")
+# rejected: give the packet to Mr Veale
+# rejected: hand the letter to the master
+# rejected: take the packet
+# rejected: put the packet on the table
+# rejected: hide the letter in the bread locker
+# rejected: stow the cask in the hold
+# rejected: show the chart to the master
+# rejected: open the packet
+# rejected: read the letter
+# rejected: throw the empty bottle overboard
 eat a fine meal
 drink three cups of wine
 # rejected: give
