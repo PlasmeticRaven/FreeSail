@@ -319,7 +319,6 @@ burn the letter
 
 ```orders frigate plain-sail
 # a ship with no thing aboard: each line names nothing known, and is refused saying so
-# (package 109; until then each was taken "as said; nothing of the ship's changed")
 # rejected: give the packet to Mr Veale
 # rejected: hand the letter to the master
 # rejected: take the packet
