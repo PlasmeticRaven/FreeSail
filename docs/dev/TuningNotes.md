@@ -26736,7 +26736,9 @@ Saint-Louis again) are read as the calendar's, by the lead's word ("a king's bir
 calendar's"). Nothing in step 5 reads who is at war or who holds a port: a ship dresses on
 her own nation's day wherever she lies at anchor, at home, abroad or off an enemy's coast,
 and the first lieutenant's word is said wherever the player's ship lies at anchor; no line
-asks whose the port is. Left for package 103's design, said not built: when a state can
+asks whose the port is. The scenario's `follows_history` (the trunk's calendar step) is not
+read: the days are the calendar's, kept alike whether the record seeds the world or is
+followed. Left for package 103's design, said not built: when a state can
 change its government in play, which house reigns is the world's own, and the days' years
 would then be read against that state and not the date (the French days from 1792 are the
 plainest case).
