@@ -21522,6 +21522,174 @@ Run: `test_settee`, `test_hands`, `test_mends_109`, `test_bilander`, `test_boat_
 `test_boat_hull`, `test_checkpoint` and `test_routine`, 277 passed; ruff clean. The whole tiers
 follow in the next step's gate (ruling 11), on this commit.
 
+## The lead's rulings 8 and 11, the working officers and the bilander's nine (package 75) (2026-11-13)
+
+The lead's note of 2026-11-13 at 14:32 UTC (`docs/dev/M7-WorkPackages.md`, at its end; nudge
+number 4) accepts ruling 9's measure and does not build its wider form, which moved the topsail
+schooner's recorded passages. Ruling (11) is the narrower form: a merchantman's master or mate is
+counted a hand of their own watch for deck work only where the watch's whole number is under the
+work's want (a watch too small for the job, not a watch that is busy). Everything else is as
+ruling 9's probe had it. It is built without going back to the lead if, and only if, (a) no
+recorded passage, digest, truth or test of the schooner, the smack or the merchant brig moves
+(test_studding's two strict xfails stay xfail), (b) the only tests that move are the bilander's
+own, each old beside new, and (c) at nine either watch of the bilander begins every watch's deck
+work by night and by day. Ruling (8) of 01:15, her nine, is built on it. Two local commits on a
+branch cut from bfb10c6f: ruling 11 first, the engine with the three other traders' people files;
+then her nine with her own people file.
+
+### Ruling 11: what was built, and where
+
+- **The rule** (`Runner._working_posts`, `freesail/evolutions/runner.py`). A post that heads a
+  watch is put in a request's pool only where that watch's whole number is under the work's want.
+  As ruling 9's probe had it, the request must be numbered and on deck (never aloft, never all
+  hands), she must not be at quarters, the work must not be one of the twelve manoeuvres
+  (`scripts.HELM_MANOEUVRES`) and none may be in hand (the officer of the deck gives it), all hands
+  must not be called or coming, the post's watch must have the deck (for a party an order names,
+  that watch), and the post's person must be aboard, well, free and on deck
+  (`People.works_on_deck`). In the pool the post is taken after every hand of it (`hands._tier`,
+  a sixth tier). A manoeuvre begun takes a post from the work they hold back to the conn
+  (`Runner._to_the_conn`): the work goes on short, or under half its hands is held as belayed work
+  is until hands come. A post away in the boat stays with her, and the other gives the manoeuvre.
+- **"The watch's whole number"** (`Runner._watch_whole`). Every hand of the watch (`Sailor.watch`)
+  fit for work on deck, as `hands.can_work(s, aloft=False)` counts a hand: fit and not of the
+  quarterdeck, so a hand hurt at light duty counts and the sick, the wounded and the dead do not.
+  Whatever they are doing they count: idle, at other work, below, at the pumps. A hand away in the
+  boat is not on board and is not counted: one held by work whose crew is out of the ship
+  (`Script.crew_away`, true for the boat from her pull out to her pull back; hoisting her out or in
+  is deck work). The post is not counted in it: the whole is the hands', and the post makes it up.
+  **Why:** the ruling's own gloss, "a watch too small for the job, not a watch that is busy".
+  Counting the hands at other work makes a busy watch big enough, so it waits as before; leaving
+  out only the unfit and those not aboard makes the count the watch's size as she stands.
+- **"The work's want"**: the request's own `wanted` for work on deck, the file's number of hands no
+  more than the whole company could ever put to it, `min(want.hands, hands.company_can_give(crew,
+  aloft=False))`, as `hands.request` clamps it. **Why:** it is the number the request itself
+  measures the deck against (enough, short or too few). A file's figure beyond the company, such
+  as the twelve of a topsail set from the gear in a company of seven, is no want the watch could
+  be measured against. It is the want, not half of it: a watch of three for a jib that wants four
+  is under it, and the post makes the fourth.
+- **Where the watch a post heads is written.** A post's wardroom entry in the ship's people file
+  says `watch: larboard` or `watch: starboard` (`world/people.post_watches`, refused in words for
+  any other word or for a role that is no post). It is read at the muster into
+  `Crew.post_watches` (`api.session.attach_crew`), set on that crew alone. `hands.post_watch`
+  reads it, and the post's own `Sailor.watch` stays the bill's, none. **The master the larboard
+  and the mate the starboard, JUDGEMENT**: the mate's is the watch the people's turn already keeps
+  them in (`world/people.WATCH_KEEPERS`). The merchant brig's, the smack's and the topsail
+  schooner's people files say so in this commit; the bilander's in the next.
+- **A departure from ruling 9's unapplied diff (`proposed9.diff`), for the lead.** The diff wrote
+  the watch into the ship files' `crew.posts` through the generator and into the posts'
+  `Sailor.watch` at the muster. Built that way (measured on this tree, the merchant files'
+  and crew tests run whole), four tests of the three other traders moved on the data's placement
+  alone, so condition (a) failed:
+  - `tests/test_crew_model.py`, `test_watches_split_each_station_evenly_odd_one_to_starboard` (the
+    schooner's quarterdeck keeps no watch);
+  - `tests/test_crew_model.py`, `test_all_hands_at_work_turned_up_and_the_routines_watch` (the
+    schooner's starboard watch's first member became her mate);
+  - `tests/test_hull_smack.py`, `test_her_file_but_for_her_lines_is_what_it_was_against_git`;
+  - `tests/test_hull_brig.py`, `test_no_figure_the_physics_or_the_gunnery_reads_moved[merchant-brig]`.
+
+  Read from the people files instead, no ship file of theirs changes (the generator's eighteen
+  files byte for byte, the bilander's alone moving in the next commit), the muster and its draws
+  are untouched, and a crew from a checkpoint written before holds no `post_watches`, so a save
+  from before loads with the company it holds, its posts heading none. Every other crew is
+  mustered and pickled as before, since the attribute is set only where a file gives a watch. The
+  diff's `Runner.people` is not built either: the people are read through the standing runtime the
+  World attaches to her (`scripts._world_of`), so every runner pickles as before.
+- **Lines.** `freesail/crew/hands.py` (the module's note, `post_watch`, the `posts` flag of
+  `can_work`, `request`, `_deck_for` and `too_few_on_deck`, the sixth tier),
+  `freesail/evolutions/runner.py` (`_working_posts`, `_watch_whole`, `_watch_word`,
+  `_to_the_conn`, the pool and the party an order names, the piped-down deck, the four requests
+  and two too-few checks passed as the runner's pools), `freesail/evolutions/scripts.py`
+  (`Script.crew_away`, `SendBoatScript`'s), `freesail/world/people.py` (`post_watches`,
+  `People.works_on_deck`), `freesail/api/session.py` (the muster's three lines), the three people
+  files, and five tests in `tests/test_hands.py`.
+
+### Ruling 11 measured: condition (a), the three other traders
+
+Measured on the tree at this commit (the bilander's files as at bfb10c6f, her eight), against the
+r10 bases (`final-fast.xml`, `final-slow.xml`, run at 4df85dc7), with a count, by ship, of every
+post the rule put in a pool and took (a scratch pytest plugin wrapping `Runner._working_posts` and
+`hands.request`, the tree untouched):
+
+- **Their watches as mustered at seed 7.** The merchant brig's are seven and three (each of her
+  stations odd, the odd hand to the starboard by the muster's rule), the smack's three and two,
+  the topsail schooner's seventeen and sixteen. The schooner's are over the want of every request
+  that is a watch's work on deck by her files (twelve at the most, a topsail set from the gear),
+  by night and by day, so her post is never counted for it (pinned:
+  `test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work`). Beyond a
+  watch's work, two anchor files want twenty hands (`cat_and_fish_anchor`, `back_anchor`), over
+  either of her watches: her post would be counted there if all hands were not up (for the lead,
+  below). The smack's and the merchant brig's are under nearly every want, so their posts work.
+- **The merchant vessels' and the crew files, the settee's, 109's, the generator's and the guards
+  that list every file, with ruling 9's fast movers** (29 files whole and 78 tests by node id:
+  test_bilander, test_fishing, test_hands, test_crews, test_crew_orders, test_crew_model,
+  test_routine, test_hull_smack, test_hull_brig, test_hull_schooner, test_people, test_water,
+  test_bill_marines_and_flag, test_settee, test_mends_109, test_ship_particulars,
+  test_check_viewer_guns, test_anchor, test_catalogue, test_profiles, test_driver,
+  test_view_geometry, test_ship_loader, test_places, test_fight, test_subtypes, test_wardroom,
+  test_scenarios, test_checkpoint; `-n 4`): **2,098 passed, 1 xfailed** (16 minutes). Against the
+  bases no outcome changed but `test_settee`'s file-set test, failed at 4df85dc7 and passed since
+  bfb10c6f (not ruling 11's). The xfail is the base's own (`test_catalogue`'s backing and
+  filling). A post was put in a pool in 21 tests, every one passing: the merchant brig in her own
+  files' tests (`test_ordnance`'s three, `test_scenarios`' free sailing: taken at most once), the
+  smack in `test_fishing`'s two (taken once), the crewed merchant brigs of `test_crews` (truths
+  87 and 88 among them, with the pace held), `test_people`, `test_ports`, `test_squadrons`,
+  `test_subtypes`' truth 7-191 and `test_world_orders`, and the five new tests. No topsail
+  schooner's post was put in a pool in any test.
+- **Ruling 9's slow movers** (every test where its wider form took an officer in the slow tier,
+  and its second round's: 61 by node id, `--slow`, `-n 4`): **50 passed, 8 failed, 3 xfailed**
+  (19 minutes). No outcome changed against the base. The eight failures are the base's own, each
+  with the same assertion: the digests and constants the lead re-pins on the build machine (the
+  trade trials' stranger and thick weather, gates 5b, 5c and 6a, truths 77 to 79); the gate 5b
+  case's message differs only by an object's address, its assertion the base's (767 lines against
+  766). **test_studding's two strict xfails stay xfail.** A post was put in a pool in 20 of them,
+  each passing or failing as at the base: the smack in truth 73 extended (taken 163 times), the
+  seine, the maker's scenario and the harbour; the crewed merchant brigs and the other far
+  traders (truths 7-137, 7-144, 7-157, 7-168, 7-191, 7-320, 7-378, 7-399, 7-491, `test_crews`,
+  `test_director`, `test_knowledge`, `test_observer`). No topsail schooner's post was put in a
+  pool.
+- **The five recorded passages ruling 9 sailed whole** (the topsail schooner's, begun as the trials
+  and the whole logs begin them and ticked to the end, in memory), old being ruling 9's base runs
+  of them, which give the pinned digests (truth 77's 2e93986c2989d831, `TRIAL_TRADE_STRANGER_DIGEST`
+  13432e4b2659bcaf), and new this tree, with the posts' count:
+
+  | Passage | Seconds | Lines old, new | Digest old, new | Posts pooled |
+  |---|---|---|---|---|
+  | gate 5b's schooner | 61,200 | 767, 767 | cae2b06446ea86c3, the same | 0 |
+  | the trade stranger | 72,000 | 1,594, 1,594 | 13432e4b2659bcaf, the same | 0 |
+  | the trade in thick weather | 72,000 | 426, 426 | 41a37f0290be291a, the same | 0 |
+  | the merchant passage | 129,600 | 2,909, 2,909 | 2e93986c2989d831, the same | 0 |
+  | the merchant intent | 129,600 | 2,098, 2,098 | af28debbc98516ae, the same | 0 |
+
+  Nothing of them moved, line for line. **The four whole logs and the captain's trials** (King's
+  ships' worlds and the three trials) did not move under ruling 9's wider form, and no post of a
+  King's ship is ever counted; the whole tiers follow in the step's gate.
+- **Asked by the lead, and left as she is:** the schooner of the merchant passage takes the ground
+  first at tick 101,155. She let go her best bower at 100,918 in three fathoms and a half off Point
+  Bertheaume, in the road of Bertheaume, veering to seventeen fathoms with the warning that she
+  would swing within a cable of the land to the NNW; fixed at 101,100 by cross bearings at 48° 20'
+  N, 4° 42' W, Point Bertheaume NE by N three cables. At 101,155: "She has taken the ground
+  forward, on sand and mud: two fathoms of water by the chart, and she draws 11 feet; she struck at
+  two knots, heeling 3 degrees, the tide falling." Thirteen times in all as recorded, the last
+  at 119,562, and never with one more hand under ruling 11, her post never counted.
+
+### For the lead (ruling 11)
+
+- **The data's placement** above: the four tests of the three other traders that ruling 9's diff
+  would have moved, and why the people files carry the watch instead.
+- **The boat.** A post counted for the boat's crew (the bilander's at nine by night, below) is
+  held by her errand and goes away in her with the hands, as a trader's mate often went in the
+  boat; their person in the people's model is not moved and stays at their place aboard. A post
+  away in her is never taken to the conn. Whether a post goes in the boat, or the boat calls all
+  hands to man her where only the post makes her number, is the lead's to rule; as built, the
+  post goes.
+- **The topsail schooner's anchor work.** Two files want twenty hands (`cat_and_fish_anchor`,
+  `back_anchor`), over her watches of seventeen and sixteen, so her post would be counted for them
+  if all hands were not up. In none of the tests run nor the five recorded passages was her post
+  put in a pool.
+- **The merchant brig's watches** are seven and three as mustered (each of her stations odd, the
+  odd hand to the starboard), so her master works with the larboard's three at nearly every
+  request: her own lines of who hauls, no test or truth of hers moved.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

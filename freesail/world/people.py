@@ -320,6 +320,45 @@ def load_wardroom(ship_file: str | Path | None) -> Wardroom | None:
     return _wardroom(str(p)) if p is not None else None
 
 
+# The watches a post may head (package 75, the lead's ruling 11 of 2026-11-13).
+POST_WATCHES = ("starboard", "larboard")
+
+
+@functools.lru_cache(maxsize=16)
+def _post_watches(path: str) -> tuple[tuple[str, str], ...]:
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    out: list[tuple[str, str]] = []
+    for i, entry in enumerate(raw.get("wardroom") or []):
+        if not isinstance(entry, dict) or entry.get("watch") is None:
+            continue
+        heads = " ".join(str(entry["watch"]).lower().split())
+        role = " ".join(str(entry.get("role") or "").lower().split())
+        if not entry.get("post"):
+            raise ValueError(
+                f"{path}, wardroom {i + 1}: the {role} heads the {heads} watch, but only a post "
+                "heads a watch (the merchantman's master and mate)."
+            )
+        if heads not in POST_WATCHES:
+            raise ValueError(
+                f"{path}, wardroom {i + 1}: the {role} heads the {heads!r} watch; say starboard "
+                "or larboard."
+            )
+        out.append((role, heads))
+    return tuple(out)
+
+
+def post_watches(ship_file: str | Path | None) -> dict[str, str]:
+    """The watch each post heads where the ship's wardroom file gives one, {post: "starboard" or
+    "larboard"} (package 75, the lead's ruling 11 of 2026-11-13: a merchantman's master and mate,
+    who haul with it on deck where its whole number is under the work's want; the master the
+    larboard and the mate the starboard, JUDGEMENT, the mate's as the people's turn keeps them,
+    `WATCH_KEEPERS`). Read at the muster into `Crew.post_watches` (`api.session.attach_crew`);
+    empty for a ship without a wardroom file or whose posts keep no watch. Raises ValueError in
+    words for a watch that is not one, or one given to a role that is no post."""
+    p = wardroom_path(ship_file)
+    return dict(_post_watches(str(p))) if p is not None else {}
+
+
 # A person made as aboard before a registry has adopted him (package 84, step 2): he is
 # aboard his home hull, whichever that proves to be when `People.add` or `People._build`
 # adopts him; the sentinel is never a hull's id and never outlives the adoption.
@@ -934,6 +973,20 @@ class People:
             sailor = crew.by_id.get(p.sailor_id)
             if sailor is not None:
                 sailor.name = bare or name
+
+    def works_on_deck(self, sailor: Any) -> bool:
+        """Whether the person who is this post is aboard, well, free and on deck, so that they may
+        work with their watch (package 75, the lead's ruling 11 of 2026-11-13, on ruling 9's probe;
+        `Runner._working_posts`): True before the people are made (none has moved yet) and for a
+        post no person is."""
+        if not self._built:
+            return True
+        p = next((x for x in self.people if x.sailor_id == sailor.id), None)
+        if p is None:
+            return True
+        if not p.aboard or p.sick or p.dead or p.confined_to or p.occupied or p.pending:
+            return False
+        return p.where in ("quarterdeck", "deck")
 
     # -- finding ------------------------------------------------------------------
 

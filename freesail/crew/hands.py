@@ -35,6 +35,15 @@ until manned`` (the boat's: the lead's ruling 10 of 2026-11-13, one road with pa
 keeps its number: the runner calls all hands to man it and pipes them down once it is manned
 (`CrewRequest.until_manned`). A file without the key waits for hands, as before.
 
+**A merchantman's master and mate haul where the watch is too small** (package 75, the lead's
+ruling 11 of 2026-11-13, the narrower form of ruling 9, by the owner's word): a post whose people
+file gives it a watch to head (`post_watch`, read at the muster into `Crew.post_watches`) is put
+in a request's pool by the runner (`Runner._working_posts`) only where that watch's whole number,
+every hand of it on board and fit whatever they are doing, is under the work's want: a watch too
+small for the job, not a watch that is busy. Such a pool is passed with `posts` (`request`,
+`too_few_on_deck`); the post is taken after every hand of it (`_tier`), on deck alone, never for
+all hands. Everywhere else the quarterdeck is never in the hands' pool, as before.
+
 
 The order hands are taken in (spec §3.1, with the judgement noted at `_tier`):
 
@@ -54,7 +63,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from freesail.crew.model import RATING_SKILL, TOPS, Crew, Rating, Sailor, Station
+from freesail.crew.model import RATING_SKILL, TOPS, Crew, Rating, Sailor, Station, Watch
 
 # The crew factor (spec M3 §3.3). A hand done in (fatigue 1) works half again as slowly;
 # soft, per the owner, and tuned from here.
@@ -122,6 +131,19 @@ TOP_OF_MAST: dict[str, Station] = {
 
 # Stations that are never in the hands' pool: the officers give orders and do not haul.
 _NOT_HANDS = (Station.QUARTERDECK,)
+
+
+def post_watch(crew: Crew, sailor: Sailor) -> Watch | None:
+    """The watch a post heads, where their ship's people file gives one (package 75, the lead's
+    ruling 11 of 2026-11-13: a merchantman's master and mate, the master the larboard and the mate
+    the starboard, JUDGEMENT), as read at the muster into `Crew.post_watches`; None for any other
+    sailor, for a post of a ship whose posts keep no watch, and for a crew from a checkpoint written
+    before it (its posts keep none). Their own `watch` stays the bill's: none."""
+    if sailor.station is not Station.QUARTERDECK or not sailor.post:
+        return None
+    heads = (getattr(crew, "post_watches", None) or {}).get(sailor.post)
+    return Watch(heads) if heads else None
+
 
 # How a request came out (spec M3 §3.2).
 ENOUGH = "enough"
@@ -280,9 +302,13 @@ def rating_skill(rating: Rating, aloft: bool) -> float:
     return up if aloft else deck
 
 
-def can_work(sailor: Sailor, aloft: bool) -> bool:
+def can_work(sailor: Sailor, aloft: bool, posts: bool = False) -> bool:
     """Whether a sailor can be put to this work at all: fit, not an officer, and, aloft,
-    of a rating that goes aloft (never a marine or an idler)."""
+    of a rating that goes aloft (never a marine or an idler). With `posts` (the runner's pool for
+    one request, where a post stands only when the runner counted them a hand for it:
+    `Runner._working_posts`, the lead's ruling 11), a post too, fit, for work on deck alone."""
+    if posts and not aloft and sailor.station is Station.QUARTERDECK:
+        return sailor.fit
     if not sailor.fit or sailor.station in _NOT_HANDS:
         return False
     if aloft and getattr(sailor, "hurt", "") == "hurt":
@@ -331,6 +357,8 @@ def _tier(sailor: Sailor, preferred: list[Station], want_skill: float, aloft: bo
         tier = 2 if in_pref else 3
     else:
         tier = 4 if in_pref else 5
+    if sailor.station is Station.QUARTERDECK:
+        tier = 6  # a post makes up their watch after every hand of it (the lead's ruling 11)
     station_rank = preferred.index(sailor.station) if in_pref else len(preferred)
     return (
         tier,
@@ -348,15 +376,18 @@ def request(
     want: CrewRequest,
     subject_mast: str | None,
     aloft: bool = False,
+    posts: bool = False,
 ) -> Assignment:
     """Fill a request from the hands on deck, fit and idle (spec M3 §3.1, §3.2).
 
     `aloft` is true when any of the evolution's steps is aloft: then only hands who go
-    aloft can be taken. Enough or short but workable: the hands taken are marked
-    ``at = inst_id``. Too few: nobody is taken, and the assignment says how many there were.
+    aloft can be taken. `posts`: the pool is the runner's, a post in it counted a hand for this
+    request (`can_work`; the lead's ruling 11). Enough or short but workable: the hands taken
+    are marked ``at = inst_id``. Too few: nobody is taken, and the assignment says how many
+    there were.
     """
     on_deck = list(on_deck)
-    idle = [s for s in on_deck if s.at is None and can_work(s, aloft)]
+    idle = [s for s in on_deck if s.at is None and can_work(s, aloft, posts)]
     if want.all_hands:
         # A pool action (the owner's ruling of 2026-09-29 at gate 4c): the idle hands now,
         # and the rest of the deck as its earlier work finishes (`top_up`). Wanted is every
@@ -364,7 +395,7 @@ def request(
         # with a party (package 31b) it is the party, and the job takes that many of the
         # idle hands, ranked as a numbered request is (the subject's own top first), and
         # leaves the rest idle for the next job.
-        wanted = _deck_for(on_deck, aloft)
+        wanted = _deck_for(on_deck, aloft, posts)
         taken = list(idle)
         if want.party is not None:
             wanted = min(want.party, wanted)
@@ -398,13 +429,17 @@ def _ranked(
     return sorted(idle, key=lambda s: _tier(s, preferred, want_skill, aloft))
 
 
-def _deck_for(on_deck: Iterable[Sailor], aloft: bool) -> int:
+def _deck_for(on_deck: Iterable[Sailor], aloft: bool, posts: bool = False) -> int:
     """How many hands on deck could be put to the work, idle or at other work."""
-    return sum(1 for s in on_deck if can_work(s, aloft))
+    return sum(1 for s in on_deck if can_work(s, aloft, posts))
 
 
 def too_few_on_deck(
-    crew: Crew, on_deck: Iterable[Sailor], want: CrewRequest, aloft: bool = False
+    crew: Crew,
+    on_deck: Iterable[Sailor],
+    want: CrewRequest,
+    aloft: bool = False,
+    posts: bool = False,
 ) -> bool:
     """Whether the hands on deck, idle or at other work, are too few to begin a numbered
     request at all: fewer than `SHORT_HANDED_SHARE` of the hands it wants, after the company's
@@ -415,7 +450,7 @@ def too_few_on_deck(
     if want.all_hands or not want.hands:
         return False
     wanted = min(int(want.hands), company_can_give(crew, aloft))
-    return wanted > 0 and _deck_for(on_deck, aloft) < wanted * SHORT_HANDED_SHARE
+    return wanted > 0 and _deck_for(on_deck, aloft, posts) < wanted * SHORT_HANDED_SHARE
 
 
 def top_up(

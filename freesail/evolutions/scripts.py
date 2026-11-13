@@ -982,6 +982,13 @@ class Script:
     # the settees a manoeuvre holds from the order (`_hold_settees`), read by the runner
     order_settees: frozenset[str] = frozenset()
 
+    @property
+    def crew_away(self) -> bool:
+        """Whether the hands this work holds are out of the ship now (the boat away from her
+        side: `SendBoatScript`), so not on board for a watch's whole number (`Runner._watch_whole`;
+        package 75, the lead's ruling 11 of 2026-11-13). No other work takes its hands away."""
+        return False
+
     def holds(self) -> set[str]:
         return {self.ship.name}
 
@@ -8868,6 +8875,13 @@ class SendBoatScript(Script):
         self.ashore_s = 0.0
         self.boat_name = "the boat"
         self.ports: Any = None
+
+    # the phases with her crew in her, away from the ship's side (hoisting out and in is deck work)
+    CREW_AWAY_PHASES = ("pull_out", "ashore", "pull_back")
+
+    @property
+    def crew_away(self) -> bool:
+        return self.phase in self.CREW_AWAY_PHASES
 
     def holds(self) -> set[str]:
         return {"the boat"}

@@ -1160,3 +1160,226 @@ def test_a_reef_short_of_its_party_begins_short_and_fills_as_hands_come_free():
     (masts,) = runner.in_progress()
     assert masts["id"] == "send_down_topgallant_masts"
     assert masts["hands"] == sum(1 for s in bill.on_deck(crew, w.clock) if hands.can_work(s, True))
+
+
+# ---------------------------------------------------------------------------
+# A merchantman's master and mate, where the watch is too small (package 75, the lead's ruling 11)
+# ---------------------------------------------------------------------------
+
+BRIG = "data/ships/merchant-brig.yaml"
+
+
+def trader_at(ship_file: str, hour: int, watch: Watch):
+    """A trader at seed 7 off the Lizard (tests/test_brains.py's world, its start at `hour`), her
+    people made, `watch` given the deck by the bill's own override, all hands not called."""
+    from freesail.api.session import make_world as made
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, hour, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.5, "lon_deg": -5.5},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+    )
+    w = made(SEED, ship_file, sc)
+    _ = w.people.all
+    crew = w.ship.extra["crew"]
+    crew.watch_on_deck = watch
+    return w, crew, w.ship.extra["evolutions"]
+
+
+def asked(w, eid: str, sid: str | None, state: str | None = None):
+    """The request made as `Runner.start` makes it, not yet given its hands."""
+    from freesail.evolutions.runner import Instance
+    from freesail.evolutions.scripts import SCRIPTS
+
+    ship, runner = w.ship, w.ship.extra["evolutions"]
+    if sid is not None and state is not None:
+        ship.sails[sid].state = SailState(state)
+    subject, subject_id = runner._resolve_subject(ship, sid or "her")
+    evo = registry.get(eid)
+    params = dict(evo.params)
+    inst = Instance(evo=evo, subject=subject, subject_id=subject_id, params=params)
+    if evo.script is not None:
+        inst.script = SCRIPTS[evo.script](ship, params, runner._timing(ship, evo))
+    inst.holds = runner._holds(ship, inst)
+    inst.want = CrewRequest.from_mapping(evo.crew)
+    runner.instances.append(inst)
+    return inst
+
+
+def taken(w, inst) -> list[str]:
+    """Who the request takes: a post by its post, a hand by station and rating."""
+    runner, crew = w.ship.extra["evolutions"], w.ship.extra["crew"]
+    assert runner._take_hands(w.ship, inst, crew), inst.wait_line
+    return [s.post or f"{s.station.value} {s.rating.value}" for s in inst.assignment.hands]
+
+
+def test_a_merchantmans_post_hauls_only_where_the_watchs_whole_number_is_under_the_works_want():
+    """The lead's ruling 11 of 2026-11-13 (the narrower form of ruling 9's probe), on the merchant
+    brig at seed 7: her master and mate head the larboard and the starboard watch (her people file,
+    read at the muster into `Crew.post_watches`; JUDGEMENT, the mate the starboard; their own
+    `watch` stays the bill's, none), her watches seven and three hands as mustered. A
+    post is counted a hand of their own watch for work on deck only where the watch's whole number
+    (every hand of it on board and fit, whatever they are doing: `Runner._watch_whole`) is under the
+    work's want (the request's own `wanted`, its file's number no more than the company could put to
+    it), taken after every hand of the pool (`hands._tier`). By night in her larboard watch the jib
+    from the gear wants six: the three are under it, so the master makes four. Her starboard's
+    seven set it with six hands, the mate not counted; the braces want eight, so the mate makes
+    the eighth. A watch busy at other work is not too small: with four of the starboard's seven at
+    other work the jib is begun short with the three idle, the mate not taken (old, before the
+    ruling, every case without the post: the larboard's three short, the brace's seven short)."""
+    w, crew, runner = trader_at(BRIG, 2, Watch.LARBOARD)
+    by = {s.post: s for s in crew.sailors if s.post}
+    assert crew.post_watches == {"master": "larboard", "mate": "starboard"}
+    heads = {p: hands.post_watch(crew, by[p]) for p in ("master", "mate", "second mate")}
+    assert heads == {"master": Watch.LARBOARD, "mate": Watch.STARBOARD, "second mate": None}
+    assert all(s.watch is Watch.NONE for s in crew.sailors if s.post)
+    wholes = [runner._watch_whole(crew, w) for w in (Watch.STARBOARD, Watch.LARBOARD)]
+    assert wholes == [7, 3]
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert taken(w, jib) == ["forecastle able", "fore_top able", "main_top able", "master"]
+    assert jib.assignment.outcome == hands.SHORT and jib.assignment.wanted == 6
+
+    w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert "mate" not in taken(w, jib) and jib.assignment.outcome == hands.ENOUGH
+    brace = asked(w, "brace", None)
+    hands.release(crew, jib.inst_id)
+    by_brace = taken(w, brace)
+    assert len(by_brace) == 8 and by_brace[-1] == "mate"
+
+    w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
+    busy = [s for s in crew.sailors if s.watch is Watch.STARBOARD and not s.post][:4]
+    for s in busy:
+        s.at = "other#1"
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert runner._working_posts(crew, jib) == []
+    assert len(taken(w, jib)) == 3 and jib.assignment.outcome == hands.SHORT
+
+
+def test_a_merchantmans_post_never_hauls_aloft_for_all_hands_for_a_manoeuvre_or_at_quarters():
+    """Ruling 11, everything else as ruling 9's probe had it: a post is never counted for work
+    aloft (her fore topsail furled: the larboard's three alone), for all-hands work, while all hands
+    are called, for any of the twelve manoeuvres (`scripts.HELM_MANOEUVRES`) or while one is in
+    hand, the officer of the deck giving it; and a manoeuvre begun takes a post from the work they
+    hold back to the conn, the work going on short (`Runner._to_the_conn`). A post whose person is
+    not free on deck (below, at a task) is not counted (`People.works_on_deck`)."""
+    from freesail.evolutions.scripts import HELM_MANOEUVRES
+
+    assert len(HELM_MANOEUVRES) == 12
+    w, crew, runner = trader_at(BRIG, 2, Watch.LARBOARD)
+    furl = asked(w, "furl_square", "fore.topsail", "in_the_gear")
+    assert runner._aloft(furl) and runner._working_posts(crew, furl) == []
+    heave = asked(w, "heave_to", None)
+    assert runner._working_posts(crew, heave) == []
+    runner.instances.remove(heave)
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert [s.post for s in runner._working_posts(crew, jib)] == ["master"]
+    crew.all_hands_called = True
+    assert runner._working_posts(crew, jib) == []
+    crew.all_hands_called = False
+    master = w.people.find("the master")
+    master.where = "below"
+    assert runner._working_posts(crew, jib) == []
+    master.where = "quarterdeck"
+    assert "master" in taken(w, jib)
+    runner._to_the_conn(crew)  # as `Runner._begin` calls it for every manoeuvre begun
+    assert next(s for s in crew.sailors if s.post == "master").at is None
+    assert jib.assignment is not None and "master" not in [s.post for s in jib.assignment.hands]
+    assert jib.assignment.outcome == hands.SHORT and not jib.paused
+
+
+def test_a_post_is_counted_where_the_watch_is_small_on_board_and_not_where_it_is_away_working():
+    """Ruling 11's whole number reads the hands on board: a hand away in the boat (held by work
+    whose crew is out of the ship, `Script.crew_away`: the boat from her pull out to her pull back)
+    is not on board, and one hoisting her out is. The merchant brig's starboard watch by night,
+    the boat holding three of its seven: hoisting out, the whole is seven and the jib is the six's
+    without the mate; pulling for the shore, the whole is four, under six, and the mate is
+    counted."""
+    w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
+    boat = asked(w, "send_boat", None)
+    boat.script.phase = "hoist_out"
+    for s in [s for s in crew.sailors if s.watch is Watch.STARBOARD and not s.post][:3]:
+        s.at = boat.inst_id
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert runner._watch_whole(crew, Watch.STARBOARD) == 7
+    assert runner._working_posts(crew, jib) == []
+    boat.script.phase = "pull_out"
+    assert boat.script.crew_away and runner._watch_whole(crew, Watch.STARBOARD) == 4
+    assert [s.post for s in runner._working_posts(crew, jib)] == ["mate"]
+
+
+def test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work():
+    """Ruling 11's condition (a), at its root: the topsail schooner's watches are seventeen and
+    sixteen hands as mustered at seed 7, each over the want of every request that is a watch's work
+    on deck by her files, so that her master and mate are never counted for it, by night or by day
+    (old: ruling 9's wider form took her mate where work at once used up her watch, and moved her
+    passages). The armed schooner has no people file, and her posts head no watch."""
+    from freesail.world import people as PE
+
+    cases = [
+        ("set_square", "fore.topsail", "in_the_gear"),
+        ("take_in_square", "fore.topsail", "set"),
+        ("set_gaff", "main.sail", "furled"),
+        ("take_in_gaff", "main.sail", "set"),
+        ("set_jibheaded", "jib", "furled"),
+        ("take_in_jibheaded", "jib", "set"),
+        ("set_studding", "fore.topmast.studdingsail.starboard", "furled"),
+        ("brace", None, None),
+        ("send_boat", None, None),
+    ]
+    for watch in (Watch.STARBOARD, Watch.LARBOARD):
+        for hour in (2, 12):
+            w, crew, runner = trader_at(SCHOONER, hour, watch)
+            whole = runner._watch_whole(crew, watch)
+            assert whole == (17 if watch is Watch.STARBOARD else 16)
+            for eid, sid, state in cases:
+                inst = asked(w, eid, sid, state)
+                assert inst.want.hands <= whole and runner._working_posts(crew, inst) == [], eid
+    assert PE.post_watches("data/ships/privateer-schooner.yaml") == {}
+
+
+def test_a_posts_watch_is_read_from_the_people_file_in_words_and_a_save_from_before_has_none(
+    tmp_path,
+):
+    """Ruling 11's data: the watch a post heads is its people file's (`watch:` on the post's
+    wardroom entry, "starboard" or "larboard"), read at the muster into `Crew.post_watches`
+    (`world.people.post_watches`, `api.session.attach_crew`), and set on that crew alone, so that
+    every other crew is mustered and pickled as before: the four traders' files give the master
+    the larboard and the mate the starboard (JUDGEMENT), every King's ship none. Anything else is
+    refused in words, as is a watch on a role that is no post. A crew from a checkpoint written
+    before it holds no watch for its posts to head, so a save from before loads with the company
+    it holds and no post hauls."""
+    import pickle
+
+    from freesail.world import people as PE
+
+    heads = {"master": "larboard", "mate": "starboard"}
+    for stem in ("merchant-brig", "smack", "topsail-schooner"):
+        assert PE.post_watches(f"data/ships/{stem}.yaml") == heads, stem
+    for stem in ("frigate-36", "seventy-four", "cutter", "brig", "privateer-schooner"):
+        assert PE.post_watches(f"data/ships/{stem}.yaml") == {}, stem
+    king = make_world(SEED, FRIGATE, Scenario()).ship.extra["crew"]
+    assert not hasattr(king, "post_watches")
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(
+        "wardroom:\n  - role: master\n    post: true\n    watch: port\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="the master heads the 'port' watch; say starboard or"):
+        PE._post_watches(str(bad))
+    boy = tmp_path / "boy.yaml"
+    boy.write_text("wardroom:\n  - role: boy\n    watch: larboard\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="only a post heads a watch"):
+        PE._post_watches(str(boy))
+    w, crew, runner = trader_at(BRIG, 2, Watch.LARBOARD)
+    again = pickle.loads(pickle.dumps(crew))
+    assert again.post_watches == heads
+    del crew.post_watches  # as a checkpoint from before holds its crew
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert hands.post_watch(crew, next(s for s in crew.sailors if s.post == "master")) is None
+    assert runner._working_posts(crew, jib) == []

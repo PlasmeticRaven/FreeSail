@@ -93,13 +93,14 @@ from typing import TYPE_CHECKING, Any
 
 from freesail import units
 from freesail.crew import bill, hands
-from freesail.crew.model import Crew, Station, number_words
+from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
     HELM_MANOEUVRES,
     SCRIPTS,
     Script,
+    _world_of,
     keep_full_and_by,
     keep_lying_to,
     lying_to_hands_off,
@@ -603,12 +604,15 @@ class Runner:
             return
         aloft = self._aloft(inst)
         wanted = min(int(want.hands), hands.company_can_give(crew, aloft))
+        # a post the lead's ruling 11 counts a hand of the watch named (`_working_posts`)
+        posts = {s.id for s in self._working_posts(crew, inst, named=True)}
         party = [
             s
             for s in crew.sailors
-            if pick in (s.watch.value, s.station.value) and hands.can_work(s, aloft=False)
+            if pick in (self._watch_word(crew, s), s.station.value)
+            and (hands.can_work(s, aloft=False) or s.id in posts)
         ]
-        able = [s for s in party if hands.can_work(s, aloft)]
+        able = [s for s in party if hands.can_work(s, aloft) or s.id in posts]
         if wanted <= 0 or len(able) >= wanted * hands.SHORT_HANDED_SHARE:
             return
         who = _PARTY_WORDS.get(pick, pick.replace("_", " "))
@@ -844,6 +848,8 @@ class Runner:
             lying_to_hands_off(ship)
         if crew is not None and not self._take_hands(ship, inst, crew):
             return False
+        if crew is not None and inst.evo.id in HELM_MANOEUVRES:
+            self._to_the_conn(crew)
         inst.waiting = False
         inst.waiting_for = None
         inst.step_index = -1
@@ -855,6 +861,30 @@ class Runner:
             self._note(ship, inst, inst.evo.on_start)
         self._enter_next_step(ship, inst)
         return True
+
+    def _to_the_conn(self, crew: Crew) -> None:
+        """A manoeuvre begun takes a post who works with the watch from the work they hold to
+        the conn (package 75, the lead's ruling 11 of 2026-11-13, as ruling 9's probe had it: never
+        taken from the conn while the ship is under a manoeuvre they give): the work goes on short,
+        or, under half its hands, is held as belayed work is until hands come (`_try_resume`). One
+        away in the boat stays with her (`Script.crew_away`): the other gives the manoeuvre."""
+        for s in crew.by_station.get(Station.QUARTERDECK, ()):
+            if s.at is None or hands.post_watch(crew, s) is None:
+                continue
+            work = next((i for i in self.instances if i.inst_id == s.at), None)
+            if work is not None and getattr(work.script, "crew_away", False):
+                continue
+            s.at = None
+            a = work.assignment if work is not None else None
+            if a is None:
+                continue
+            a.hands[:] = [h for h in a.hands if h is not s]
+            if a.got < a.wanted * hands.SHORT_HANDED_SHARE:
+                work.paused = True
+                hands.release(crew, work.inst_id)
+                work.assignment = None
+            elif a.outcome == hands.ENOUGH and a.got < a.wanted:
+                a.outcome = hands.SHORT
 
     def _start_waiting(self, ship: Ship) -> None:
         # Start waiting evolutions in the order they were given, when free.
@@ -1140,7 +1170,84 @@ class Runner:
         (``params["hands_from"]``, package 20), else all of them."""
         pick = inst.params.get("hands_from")
         deck = self._on_deck(crew)
-        return [s for s in deck if pick in (s.watch.value, s.station.value)] if pick else deck
+        posts = self._working_posts(crew, inst)  # the lead's ruling 11
+        if posts:
+            deck = sorted(deck + posts, key=lambda s: s.id)
+        if not pick:
+            return deck
+        return [s for s in deck if pick in (self._watch_word(crew, s), s.station.value)]
+
+    @staticmethod
+    def _watch_word(crew: Crew, sailor: Any) -> str:
+        """The watch a sailor is of, as an order names it: their own, or for a post the watch
+        they head (`hands.post_watch`; the lead's ruling 11 of 2026-11-13)."""
+        heads = hands.post_watch(crew, sailor)
+        return heads.value if heads is not None else sailor.watch.value
+
+    def _working_posts(
+        self, crew: Crew, inst: Instance, piped_down: bool = False, named: bool = False
+    ) -> list:
+        """The posts counted hands of their own watch for this request
+        (`hands.post_watch`; package 75, the lead's ruling 11 of 2026-11-13, the narrower form of
+        ruling 9's probe): a merchantman's master or mate, only where the watch's whole
+        number (`_watch_whole`) is under the work's want, which is the request's own `wanted` for
+        deck work: the file's number of hands, no more than the whole company could ever put to it
+        (`hands.company_can_give`, as `hands.request` clamps it). A watch too small for the job,
+        not a watch that is busy: hands at other work count in the whole, so a watch busy
+        elsewhere waits as before.
+
+        Everything else as ruling 9's probe had it: a numbered request wanting no hand aloft, not
+        at quarters, never for a manoeuvre nor while one is in hand (the officer of the deck gives
+        it), nor while all hands are called or coming; each while their watch has the deck (for a
+        party an order names, `named`, whichever watch) and their person is aboard, well, free and
+        on deck (`People.works_on_deck`)."""
+        heads = {
+            s.id: w
+            for s in crew.by_station.get(Station.QUARTERDECK, ())
+            if s.fit and (w := hands.post_watch(crew, s)) is not None
+        }
+        if not heads:
+            return []
+        want = self._want(inst)
+        if want.all_hands or not want.hands or self._aloft(inst) or _at_quarters(self.ship):
+            return []
+        if inst.evo.id in HELM_MANOEUVRES or any(
+            i.evo.id in HELM_MANOEUVRES and not i.waiting for i in self.instances
+        ):
+            return []
+        routine = self.ship.extra.get("routine")
+        if not piped_down and (crew.all_hands_called or getattr(routine, "calling", False)):
+            return []
+        wanted = min(int(want.hands), hands.company_can_give(crew, aloft=False))
+        when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
+        watch = bill.watch_on_deck(crew, when)
+        # where the post's person is: the world's people, through the standing runtime the World
+        # attaches to her (`scripts._world_of`); none for a ship alone
+        free = getattr(getattr(_world_of(self.ship), "people", None), "works_on_deck", None)
+        return [
+            s
+            for s in crew.by_station.get(Station.QUARTERDECK, ())
+            if s.id in heads
+            and (named or heads[s.id] is watch)
+            and self._watch_whole(crew, heads[s.id]) < wanted
+            and (free is None or free(s))
+        ]
+
+    def _watch_whole(self, crew: Crew, watch: Watch) -> int:
+        """A watch's whole number (the lead's ruling 11 of 2026-11-13): every hand of it on board
+        and fit, whatever they are doing, idle, at other work or below, counted as `hands.can_work`
+        counts a hand for work on deck (fit, not of the quarterdeck: hurt at light duty counts,
+        the sick, the wounded and the dead do not). A hand away in the boat (held by work whose
+        crew is out of the ship, `Script.crew_away`) is not on board; one hoisting her out or in
+        is. The posts are not counted: the whole is the hands', and the post makes it up."""
+        away = {i.inst_id for i in self.instances if getattr(i.script, "crew_away", False)}
+        return sum(
+            1
+            for s in crew.sailors
+            if s.watch is watch
+            and hands.can_work(s, aloft=False)
+            and (s.at is None or s.at not in away)
+        )
 
     def _aloft(self, inst: Instance) -> bool:
         """Whether any of the work is aloft: then only hands who go aloft are taken. A
@@ -1210,6 +1317,7 @@ class Runner:
             want,
             self._subject_mast(ship, inst),
             aloft=self._aloft(inst),
+            posts=True,
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
         if (
@@ -1240,6 +1348,7 @@ class Runner:
                 want,
                 self._subject_mast(ship, inst),
                 aloft=self._aloft(inst),
+                posts=True,
             )
         if got.outcome == hands.TOO_FEW and self._manning(ship, inst):
             # called to man it: it waits for the hands still coming up, said by the call
@@ -1306,20 +1415,22 @@ class Runner:
             return False
         if want.until_manned:
             return not self._other_work(inst)
-        return hands.too_few_on_deck(crew, self._pool(crew, inst), want, self._aloft(inst))
+        pool = self._pool(crew, inst)
+        return hands.too_few_on_deck(crew, pool, want, self._aloft(inst), posts=True)
 
     def _too_few_piped_down(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
         """Whether work waiting its turn would call all hands for itself the moment the hands
         were piped down: `_watch_too_few`'s rule read on the deck as the pipe-down would leave
         it (`bill.on_deck_piped_down`), all hands not called and nobody turned up. Read by
         `_after_all_hands` before it pipes down (package 75, the review of the lead's ruling (1)
-        of 2026-11-10)."""
+        of 2026-11-10), with the post of the watch then on deck where it would be counted
+        (`_working_posts`; the lead's ruling 11 of 2026-11-13)."""
         want = self._want(inst)
         if not want.calls_all_hands or _at_quarters(ship) or inst.params.get("hands_from"):
             return False
         when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
-        deck = bill.on_deck_piped_down(crew, when)
-        return hands.too_few_on_deck(crew, deck, want, self._aloft(inst))
+        deck = bill.on_deck_piped_down(crew, when) + self._working_posts(crew, inst, True)
+        return hands.too_few_on_deck(crew, deck, want, self._aloft(inst), posts=True)
 
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
@@ -1376,6 +1487,7 @@ class Runner:
                 want,
                 self._subject_mast(ship, inst),
                 aloft=aloft,
+                posts=True,
             )
             n = len(freed)
         if again.outcome != hands.TOO_FEW and where and n:
@@ -1548,6 +1660,7 @@ class Runner:
             self._want(inst),
             self._subject_mast(ship, inst),
             aloft=self._aloft(inst),
+            posts=True,
         )
         if got.outcome == hands.TOO_FEW:
             return
