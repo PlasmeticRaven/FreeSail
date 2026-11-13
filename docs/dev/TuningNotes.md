@@ -27347,3 +27347,13 @@ tide region it lacks is a finding, `c-no-sea:<region>`, and its tide is not judg
 block names its sea. The table stays in the tool until package 112's `seas.yaml` becomes its
 source. A planted test (a box over the Canaries) proves the finding, and another holds the
 table to name every region and tide region of the manifest. The full sweep finds nothing new.
+
+**The suites at c806489** (step 2a's measured hash; the report's hash differs from it by this
+paragraph only), in a clean worktree pinned there. Ruff check and format: clean. The fast
+tier whole: 7,559 passed, 1 xfailed, exit 0 (54 minutes on a loaded machine). Its first run,
+at e496ec3, failed one test: `tests/test_islands.py` pinned the islands' stream book box at
+(36.5, 40.0, -31.5, -24.5). Step 2a had drawn that box to the Azores' bounds, so the test now
+pins the new box, with the old one beside it. The slow tier of the touched files (test_islands,
+test_chart_audit, test_chart, test_tide, test_ports, test_weather, test_scenarios,
+test_business, test_tackle_orders) and of the known truths: 212 passed, 8 xfailed, exit 0. The
+pace tests, alone and last: 15 passed, exit 0.
