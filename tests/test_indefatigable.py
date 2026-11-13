@@ -1291,6 +1291,53 @@ def test_her_other_fits_beat_keeps_the_fits_own_marines(
         assert f"Not hands enough for every gun: {unmanned} stand unmanned." in said.text
 
 
+@pytest.mark.parametrize(
+    "path, fit, kept, back, at_carronades",
+    [
+        (SIXTY_FOUR, "ardent class 1794", 68, "16", 16),
+        (RAZEE, "as razeed 1795", 38, "twelve", 12),
+    ],
+)
+def test_her_marines_back_from_their_muskets_go_to_the_carronades_alone(
+    path, fit, kept, back, at_carronades
+):
+    """The review's mends of the lead's notes of 12 and 13 November (the lead's ruling (4) of
+    2026-11-13: "the long guns do not take marines (B7.b's rule stands: the bill keeps them for the
+    small arms)"): after the marines' musketry, "marines hold your fire" sends them back to the
+    carronades alone (`Quarters.marines_to_guns`, by the fit's or the bill's kept marines), as at
+    the beat; a long gun short of hands stays short, and the division keeps the rest for the small
+    arms. Measured at seed 7 (beat, cast loose, fire by volley, hold your fire, two minutes apart):
+    the 64's 'ardent class 1794' "16 back to the carronades." as before (every crew full); the
+    razee's 'as razeed 1795' "twelve back to the carronades.", the long guns' Nos. 12, 13 and 17
+    short as at the beat. OLD (dfbe4031): the razee's "Marines, hold your fire! The muskets
+    grounded; 40 back to the carronades.", 28 marines to her long guns (Nos. 12 and 13 eleven each,
+    No. 17 six) out of her division."""
+    from freesail.crew.model import Station
+    from freesail.crew.quarters import MARINES, quarters_of
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, path, fit=fit)
+    w.run(10)
+    said = None
+    for order in (
+        "beat to quarters",
+        "cast loose the guns",
+        "marines fire by volley",
+        "marines hold your fire",
+    ):
+        said = w.submit(order)
+        w.run(120)
+    assert said.text == (
+        f"Marines, hold your fire! The muskets grounded; {back} back to the carronades."
+    )
+    q = quarters_of(w.ship)
+    at_guns = [
+        gc.kind for gc in q.crews.values() for s in gc.members if s.station is Station.MARINES
+    ]
+    assert (at_guns.count("long"), at_guns.count("carronade")) == (0, at_carronades)
+    assert len(q.divisions[MARINES]) == kept
+
+
 @pytest.mark.parametrize("path", [SIXTY_FOUR, RAZEE])
 def test_her_ship_files_posts_and_people_agree_with_her_wardroom_files(path):
     """tests/test_wardroom.py's check (:42-57) on her two files: the generator draws the posts

@@ -20372,7 +20372,9 @@ named by deck in the struck carriage and the shut port, with the 12th's ask (ii)
 scratch (`s13/mend/`, `s13/s196/`, `s13/marines/`, `s13/orders/`, `s13/possessive/`), outside the
 repository, each run on the tree and on an export of the commit before (for the first, 94bfac27:
 `freesail/world/brains.py` as it was there, nothing else differing in the code). The rest of the
-four notes (the 13th's (3) and (5) to (9), the 12th's other asks) are not these commits'.
+four notes (the 13th's (3) and (5) to (9), the 12th's other asks) are not these commits'. The two
+reviews of the five commits and their mends, in one commit after them, are subsection 6
+(`s13/mends/`).
 
 ### 1. A far ship of war engaging from her passage keeps her mark (01:05 (2))
 
@@ -20396,20 +20398,23 @@ her `done`: gone from the sea the minute after she judged her enemy, and no roun
 - `FarCaptain._engaging_mark(p)`: the near captain's `_mark` on the far body: the mark in hand while
   she is in sight, else the nearest enemy within the breaking-off distance (`_enemy_within` at
   `break_off_nm`, which is the enemy the `enemy in range` stimulus read at `engage_nm`).
-- `FarCaptain._take_mark(p)`, run each minute in `engaging` from `_work` (the branch it lacked):
-  none in hand or the mark lost from sight, the nearest enemy within the breaking-off distance is
-  taken and the chase leg laid to her at the doctrine's range, as chasing takes the nearest stranger;
-  with none in sight the mark in hand is kept while she is on the sea (the leg follows her truth until
-  `enemy out of range` ends the action); with no mark on the sea at all she lies to where she is
-  (`_on_the_sea`: the player's ship while she has a place, another vessel while she is not `done`),
-  so that no chase of nobody is laid.
+- `FarCaptain._take_mark(p)`, run each minute in `engaging` from `_work` (the branch it lacked; on
+  the road from a plan state alone since the review's mends, subsection 6 (a)): none in hand or the
+  mark lost from sight, the nearest enemy within the breaking-off distance is taken and the chase
+  leg laid to her at the doctrine's range, as chasing takes the nearest stranger; with none in sight
+  the mark in hand is kept while she is on the sea (the leg follows her truth until `enemy out of
+  range` ends the action); with no mark on the sea at all she lies to where she is (`_on_the_sea`:
+  the player's ship while she has a place, another vessel while she is not `done`), so that no chase
+  of nobody is laid.
 - `resolve_state`'s `engaging`: with no mark in hand she takes one there (`_take_mark` on a
   perception of the minute, `perceive_vessel`, as `running for shelter` reads one), so that a state
-  entered outside the minute's judgement (the fold-back at a demotion) lays no chase of nobody either;
-  with a mark in hand the leg as before. Its docstring's "in distress and engaging she lies to"
-  (package 74's step 4 made engaging a chase) brought to the code.
+  entered outside the minute's judgement (the fold-back at a demotion) lays no chase of nobody
+  either; with a mark in hand the leg as before. Its docstring's "in distress and engaging she lies
+  to" (package 74's step 4 made engaging a chase) brought to the code.
 - No new attribute: a checkpoint pickled before loads and runs as it did (the methods are the
-  class's); a far brain pickled in `engaging` with no mark takes one at her next judgement.
+  class's); a far brain pickled in `engaging` with no mark (94bfac27's chase of nobody) leaves the
+  sea as she did there (corrected by the review's mends, subsection 6 (a), where this line said she
+  takes one at her next judgement).
 
 **Its truth's number: 7-231.** The package's truths are 7-185 to 7-199 by Build-Ships.md §15 (the
 table's 7-199 the last of the block), and the lead's ruling on the gate (2026-10-28, Ext §14 item 11,
@@ -20457,18 +20462,19 @@ of a mile from 900, the strike at 1200 after seven rounds a side, the possession
 4.2 s); `tests/test_known_truths.py`, truth 7-231 (slow), calling both, after 7-369.
 
 **Found, for the lead, not built: after the action her passage is not taken up.** `engaging` is no
-detour in `resolve_state` (`_DETOUR_STATES`): going engaging from a plan state her plan is not saved,
-and leaving `engaging` for a plan state nothing is taken up. Measured with the mend: the Hero gone
-from the sea, the Foudroyant lies to and, at `enemy out of range` (840), is "on passage" lying to for
-good; the Hero hidden, she is "on passage" with the chase leg of the Hero still laid; and after the
-possession, bound for Brest, she is "on passage" chasing her prize at the engaging range (the plan
-saved at `taking possession` is the action's chase leg), 0.08 to 0.18 miles from her three hours on,
-the prize in company on her. Package 74's own road (engaging from `chasing`, the passage saved at the
-chase) saves the action's chase leg at `taking possession` in the same way; truth 7-358's frigate,
-on a station, lays her square again at `keeping station`, so it does not show there. A few lines would
-make `engaging` a detour for the plan (saved on going engaging from a plan state, taken up on leaving
-it, not overwritten by the detours after it); that moves package 74's road after the action as well,
-and is the lead's to rule.
+detour in `resolve_state` (`_DETOUR_STATES`): going engaging from a plan state her plan is not
+saved, and leaving `engaging` for a plan state nothing is taken up. Measured with the mend: the Hero
+gone from the sea, the Foudroyant lies to and, at `enemy out of range` (840), is "on passage" lying
+to for good; the Hero hidden, she is "on passage" with the chase leg of the Hero still laid; and
+after the possession, bound for Brest, she is "on passage" chasing her prize at the engaging range
+(the plan saved at `taking possession` is the action's chase leg), 0.08 to 0.18 miles from her three
+hours on, the prize in company on her. Package 74's own road (engaging from `chasing`, the passage
+saved at the chase) saves the action's chase leg at `taking possession` in the same way; truth
+7-358's frigate, on a station, lays her square again at `keeping station`, so it does not show
+there. A few lines would make `engaging` a detour for the plan (saved on going engaging from a plan
+state, taken up on leaving it, not overwritten by the detours after it); that moves package 74's
+road after the action as well, and is the lead's to rule. (Built for the plan-state road alone by
+the review's mends, subsection 6 (a); package 74's road is still the lead's.)
 
 **What any ship may say that this step changes.** A far ship of war (or an armed merchantman, packet
 or Indiaman under their books' `enemy in range` rows) that goes engaging from a plan state no longer
@@ -20549,12 +20555,13 @@ the test lays it, her plain sail set and hove to at 900, the 74s put at 900 wher
 | **The three in the frigate's squadron, under her orders (built)** | 1.31, 0.54, 0.29; 0.88, 0.91, 1.41; 0.99, 1.42, 2.79 | 2.79 (S2, from 1900) | nobody challenged, nothing judged, no shot; each `in company` from her first judgement to the end |
 
 The day's private signals alone do not make the world honest: the frigate under no rules captain
-answers a challenge only by her officer's order, and three King's ships challenging in one minute are
-not all answered by it, nor do they answer one another so. The book's own road does: in a set under
-the frigate's orders the three are no strangers to her (package 71's least relation: a ship under the
-challenger's own orders is none to challenge, `signalling._challenge_strangers`, the set writing it on
-each member, package 72), a member in company challenges nobody and has no stranger row, and keeps
-her station on her commander.
+answers a challenge only by her officer's order, and three King's ships challenging in one minute
+are not all answered by it, nor do they answer one another so. The book's own road does: in a set
+under the frigate's orders the three are no strangers to her (package 71's least relation: a ship
+under the challenger's own orders is none to challenge, `signalling._challenge_strangers`, the set
+writing it on each member, package 72), a member in company challenges nobody and has no stranger
+row, and is given her station on her commander (which she does not keep while the frigate lies to:
+the review's mends, subsection 6 (e)).
 
 **As built** (`tests/test_bellerophon.py` alone): the 74s put where they were (`SEVENTY_FOURS_AT`
 unmoved), then "our squadron" added before the settle (`squadrons.Squadron`, a squadron of Britain,
@@ -20799,10 +20806,10 @@ line more: a ship with a vessel under her orders on the sea is not alone) is the
 | The same, crewed | investigating a stranger at tick 1560 (3.94 miles), chasing at 2400 (1.96), evading at 2640 (1.40) | the same to 2400, engaging at 2760 (1.12) |
 
 **For the lead, not built:** under the relation alone her commander's book makes no signal for her.
-With her commander alone (under nobody's orders, in no set) he hauls off by the rule and she, under
-his orders, stands on and engages the ship of the line by her own book (the consort's case); with
-the player's ship hove to she fights her alone and strikes. In a set the set's book judges the enemy
-for the whole set (B7.e).
+With her commander alone (under nobody's orders, in no set) she hauls off by the rule and the ship
+under her orders stands on and engages the ship of the line by her own book (the consort's case);
+with the player's ship hove to she fights her alone and strikes. In a set the set's book judges the
+enemy for the whole set (B7.e).
 
 **Tests.** New in `tests/test_bellerophon.py`, both slow (8.3 s each alone; `tests/conftest.py`'s
 `SLOW_TESTS`): `test_a_frigate_under_her_consorts_orders_and_in_no_set_is_left_to_her_commanders_book`
@@ -20817,8 +20824,10 @@ class under the orders of another and in no set, meeting an enemy ship of the li
 leagues: her hauling off is no longer said ("By the captain, evading: shaping a course for ...
 (hauling off from a seventy-four, ...)"), and what her own book does with the enemy is
 (investigating, chasing, engaging, and the lines of an action that follows). No shipped scenario has
-such a ship: `convoy.yaml`'s ships under orders are brainless merchant brigs, and no other file of
-`data/` names the relation.
+such a ship: `convoy.yaml`'s ships under orders are brainless merchant brigs, and `tender.yaml`'s
+Raven, a cutter under the merchant's book (no `line_of_battle_nm`), is the only other; nothing of
+hers moves (the review's mends, subsection 6 (g), where this line said no other file names the
+relation).
 
 **The suites, as run.** Once, on 26473408 with this step uncommitted, from the tree root with `py`,
 one run at a time, the branch and the tree asserted first, each pytest with `-n 4 -p no:cacheprovider
@@ -20923,7 +20932,9 @@ ship.
 pumps, as the 64's and the razee's; given idle hands she mans all six with 20 hands, 350 tons an
 hour); the water's code is (`world/water.py`: the pumps take only the hands idle on deck at the
 order, down to one man, in the file's order, and nothing adds hands while she is manned), so no
-commit here: the mend goes to package 77's brief, item 4a(d), as the lead's note has it.
+commit here: the mend goes to package 77's brief, item 4a(d), as the lead's note has it. The owner's
+29 tons an hour is the first chain pump (her file's first) worked by four tired idlers, and the
+reading names every pump she has: subsection 6 (f).
 
 ### The suites, as run (subsections 3 to 5 together)
 
@@ -20967,6 +20978,226 @@ no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/possessive/afte
 77's digest and the gates' constants failing on this machine as at the base with the same figures),
 so there is nothing for the lead to re-pin by them; what moved is each step's behaviour alone, the
 worlds measured above.
+
+### 6. The review's mends (subsections 1 to 5)
+
+Two reviews read the five commits (f5102fae, ff58e07d, 26473408, 65b757b9, dfbe4031): one word by
+word against the four notes, one on real ticks. Each finding was reproduced first on the tree at
+dfbe4031, by the reviewers' scripts and the session's own (`scratchpad/s13/rev2/`, `s13/rvw/py/`,
+`s13/mends/`), then mended in one commit or said here where it is not this branch's; the old beside
+the new is an export of dfbe4031 (`s13/mends/head`), at seed 7.
+
+**(a) The plan-state road: her passage held and taken up** (`freesail/world/brains.py`). Found:
+since subsection 1 a far ship that went engaging from a plan state never took up her passage again
+(`engaging` saved no plan, and `taking possession` then saved the action's chase leg), so she was
+"on passage" for good, chasing her prize, chasing a mark lost from sight by its truth, or lying to
+where her mark had left the sea; and `_work`'s new `engaging` branch reached package 74's own road
+too (engaging from a detour, the mark in hand), which subsection 1 did not record. Mended on the
+plan-state road alone: a key of the brain's business, `PASSAGE_HELD` (no new attribute: `_business`
+pickles already), set by `resolve_state` when she goes `engaging` from a plan state, which saves her
+plan there as a detour's is; while it is set no detour of the action (taking possession, evading,
+in distress) saves over it, and her next plan state takes the plan up and drops the key; `_work`
+keeps her mark in hand each minute (`_take_mark`) only while it is set; the fold-back at a demotion
+drops it (the plan is laid afresh there). `resolve_state` still takes a mark where none is in hand
+on any road, so that no chase of nobody is laid. Package 74's road is as it was at 94bfac27.
+
+| World (seed 7) | dfbe4031 | Mended |
+|---|---|---|
+| A French 74 bound for Brest and a British frigate bound for Falmouth a mile apart, twelve miles south of the frigate hove to, the cap nought (`rvw/py/farfrig.py`, 200 minutes): the 74 engaging from her passage at 120, the frigate struck at 5880, possessed, the 74 `on passage` at 6300 | "on passage" with the chase leg of her prize, 0.11 to 0.12 miles from her to tick 10,920, her latitude 49.282 to 49.273 N (the reviewer's run: so to tick 34,320) | `on passage` with her passage to Brest from 6300 (the soundings seven leagues south-west of Ushant first), her latitude 49.282 to 49.126 N by 10,920, her prize in company 0.77 to 0.81 miles |
+| Truth 7-231's two 74s (`s13/mends/after/pass231.py`): the Hero possessed at 1260 | "on passage" chasing her prize at the engaging range for good (subsection 1: 0.08 to 0.18 miles three hours on) | `on passage` at 1320 with the plan she held at 120, its first mark 65.37 miles off and 60.97 at 3420, her prize in company 0.14 to 0.45 miles |
+| The same, engaged, the Hero hidden, or gone from the sea | at 840 "on passage" with the chase leg of the hidden Hero, or lying to, for good | at 840 `on passage` with the plan she held |
+| Package 74's road: the two put chasing each other at 60, engaging from `chasing` at 120; the Hero then gone from the sea (`rev2/road74.py gone`) | lying to, `engaging` with no mark, from 240 | as at 94bfac27: her plan empty at 240, gone from the sea at 300 |
+| The same, the Hero hidden and a British frigate put 1.5 miles off (`road74.py other`) | the frigate her mark at 240 | as at 94bfac27: the Hero kept in hand, her chase leg as she entered |
+| Truth 7-358's world (`s13/mend/anger358.py`) | — | line for line as at 94bfac27 over that script's run to tick 7,320 (state, plan, saved plan, mark and range) |
+| A checkpoint of the 64's case written on 94bfac27 at tick 300 (the reviewer's `rvw/saves/m94`), the French 74 `engaging` with a chase of nobody | — | loads (by the checkpoint), and she leaves the sea at 360 as on 94bfac27 |
+
+**Corrected, subsection 1's words.** "A far brain pickled in `engaging` with no mark takes one at
+her next judgement" was not so: such a brain (94bfac27's chase of nobody, only in the minute she
+went engaging) leaves the sea as she did there, near detail or far (the row above). And the "Found,
+for the lead" paragraph there is built for the plan-state road by this subsection; its package
+74's road is still the lead's (below).
+
+**(b) A commander gone or struck** (`freesail/world/captains.py`). Found: subsection 4's `_alone`
+read the relation `under_orders_of` whether or not the ship it names still commands, and nothing
+clears it when she goes (only the release order, the release signal and a set's dissolution do),
+so a ship whose commander had struck or left the sea was never alone again. Mended: the relation
+counts only while her commander is on the sea, not `done` and not struck (`_commander_on_the_sea`;
+the player's ship while she has a place). Measured (`rvw/py/orphan.py`: a far British frigate under
+the orders of another, no set, her commander gone from the sea at 180, a French 74 put three miles
+north of her at 240, the cap nought): at dfbe4031 not alone, engaging at 900, struck at 2160 and
+taken; mended, alone, evading at 600 and 2.01 miles off at the end, as she did before subsection 4.
+
+**(c) The far ship's reply at a cap of nought** (`freesail/combat/far_action.py`). Found: at a
+crewed cap of nought (`crewed: {cap: 0}`: `tender.yaml`, the drivers' `--crewed-cap 0`, the tests'
+`far_only`), a far ship engaging the player's ship lay alongside her and never fired:
+`_fallback_reply` returned at `cap <= 0` as if the cap had room to wake her, and a cap of nought
+wakes nobody. Before subsection 1 such a ship left the sea the minute after she went engaging from
+her passage, so it did not show there (package 74's road at a cap of nought had it already).
+Mended: a cap of nought has never room, so she replies by the tables, the fallback of the lead's
+ruling 4 (`if cap > 0 and len(crewed(root)) < cap: return`). Measured, the 64's case with the cap
+nought (`rvw/py/scene64.py`, an hour): at dfbe4031 the French 74 engaging from 360 and at 0.26 miles
+by 1920, no `action.far_reply` and no shot into the 64, the 64's guns firing 23 times; mended, "The
+Foe fires her broadside at us from 9 cables: none of her 63 shot strike us." at 360, ten of 89 at
+540 and a broadside every three minutes after (19 in the hour, each with its `action.hit` line but
+the first), the 64's butcher's bill 145 killed and 346 wounded by 3600, her own guns firing once.
+Truth 7-200, the tender's day at a cap of nought, passes as before. **For the lead, not built:** the
+far body never strikes to the player's shot (`hits._far_hit` counts it into `damage["hits"]`, which
+nothing reads), so a far ship engaging an awake hull at a cap of nought, or under a full cap, fights
+on until the hull strikes or the range opens: package 74's open half.
+
+**(d) The marines back from their muskets** (`freesail/crew/quarters.py`). Found: `marines_to_guns`
+(package 73's) made up every short crew from the marines' division when they held their fire, the
+long guns too, against B7.b's rule as the lead's ruling (4) of 01:05 restates it ("the long guns do
+not take marines"); subsection 3's "the long guns take none either way" held at the beat alone.
+Mended: where her fit or her bill keeps marines (`_marines_kept`, the beat's own reading, now one
+function), the carronades alone take them back. Measured (`rvw/py/musket.py`: beat, cast loose,
+fire by volley, hold your fire): the razee's 'as razeed 1795', at dfbe4031 "Marines, hold your
+fire! The muskets grounded; 40 back to the carronades." and 28 marines at her long guns (Nos. 12 and
+13 eleven each, No. 17 six); mended "... twelve back to the carronades.", the carronades' twelve
+alone, the long guns short as at the beat, 38 in the division. The 64's 'ardent class 1794' "16
+back to the carronades." both ways (every crew full). A ship without kept marines (every other
+file) as before. The same line moves on the 74, the 64 and the razee wherever a long gun's crew is
+short when the marines hold their fire.
+
+**(e) Truth 7-196: the 74s do not keep their stations** (`tests/test_bellerophon.py`'s docstring and
+comment, subsection 2's words and Build-Ships', Bel-D §14.4). Found: subsection 2 said each 74 in
+company "keeps her station on her commander"; she does not. The frigate lies to, heading NW by N at
+a knot and a half; a crewed member ahead of her station steers the flag's course and shortens sail
+to drop back (`orders/station.py`), which drops her back only on a flag with way on; so the three
+straggle by the set's own lines (`squadron.straggler`: S0 at tick 1560, S1 at 3060, S2 at 3840, the
+last two inside the measure), and S2, reefed, opens on the frigate's heading at about six knots:
+1.41 miles at 3900, 2.79 at 4900, 3.87 at 8400 and 4.18 at 8650 (`rvw/w196long_head.txt`;
+`s13/mends/w196/why.txt`, her own log "two miles ahead of her station" from 3840). The clause holds
+within its 4,900 ticks, and that is its margin: at the third end S2 is 1.21 miles inside
+`CREWED_NM`. Corrected in the records; the test's assertions unchanged. A world under way was
+measured (`s13/mends/w196/way.py`: the frigate steering south under plain sail shortened once, the
+74s put at or near their stations in her line): the three straggle within the measure there too (S1
+and S2 to 1.89 and 2.12 miles from her, each a mile and a half out of station at 2400) and regain
+their stations only from 4320, so it is no better within the clause's ticks and was not taken. **For
+the lead (package 72's station keeping):** a crewed member does not keep a line-ahead station on a
+commander lying to. The docstring, old beside new: old "a member in company challenges nobody and
+keeps her station on her commander, the frigate. ... Before, three crewed 74s in action against her:
+106 ticks a second (2026-11-10), 89 to 92 after B7.c, 164 to 173 after its review's mend, and in the
+thousand before the taking on this tree (ticks 1820 to 2820) 165, 166 and 167 in three runs; the old
+world and its figures, ..."; new "a member in company challenges nobody. **They do not keep their
+stations** (the review's mends): the frigate lies to, ... the clause holds within its 4,900 ticks,
+and that is its margin. ... The old world and its figures, old beside new, in
+docs/dev/TuningNotes.md, ...": the in-action figures are subsection 2's, as the lead's ruling (1)
+has them, and no longer the docstring's. Its comment gains the JUDGEMENT that the frigate commanding
+three 74s is the test's world.
+
+**(f) The 74's pumps, the owner's figure** (subsection 5's last paragraph). The verdict stands (the
+water's code, not her file), and the owner's reading is now explained: the pumps' men go to the
+pumps in her file's order, and her file lists the four chain pumps first, so four hands work the
+first chain pump. The owner's 29 tons an hour is that chain pump worked by four tired idlers: 80
+tons × 0.3/0.6 (an idler's deck skill against the ordinary seaman's, `crew/model.py`'s
+`RATING_SKILL`) ÷ (1 + 0.5 × (0.8 − 0.05)) (`hands.FATIGUE_WEIGHT` and `FATIGUE_FRESH` at a fatigue
+of 0.8) = 29.1 (`s13/pumps/notes.md`, reproduced at anchor in Plymouth Sound: "four chain pumps and
+two hand pumps manned by 4 of 20 hands, lifting 29 tons an hour"). The chain pumps were not idle:
+the reading names every pump she has (`Pumps.describe`), which reads as if the two hand pumps were
+the ones manned; two hand pumps fresh would lift 30. For package 77's item 4a(d), beside the hands
+filled up as they come free, the fallback ranked (seamen before idlers) and all hands called to the
+pumps when the deck cannot man them: the reading should name the pumps worked, one by one.
+
+**(g) Words.** The commander is a ship: "he hauls off ... under his orders" in subsection 4, "the
+ship under his orders" in Bel-D §8.3's postscript and "the ships under his orders" in Build-Ships
+§16.1 now read "her". Subsection 4 and its Build-Ships row said no other file of `data/` names the
+relation: `tender.yaml`'s Raven does (its world order 'ship "Raven": under the orders of the
+ship'), a cutter under the merchant's book with no `line_of_battle_nm`, so that `_alone`, false for
+her now and true at 94bfac27, moves nothing of hers (`rvw/py/tender.py`). Design-Prizes' step 4
+postscript said "the passages that moved by the toggle of `brains.py` alone are in" the notes: none
+moved.
+
+**Tests, old beside new.** `tests/test_far_action.py`: truth 7-231's body now asserts the passage
+held at 120 and taken up at 1320, its first mark closed each minute of the half hour after, the
+prize in company (old: it stopped at the possession, the passage "for the lead"); the three
+mark-in-hand cases assert the passage held, and taken up at 840 where the action ends; new,
+`test_package_74s_road_from_a_chase_keeps_the_mark_it_entered_with_as_it_did` and
+`test_a_far_ship_replies_to_the_players_ship_by_the_tables_at_a_cap_of_nought` (slow). New in
+`tests/test_bellerophon.py`,
+`test_a_frigate_whose_commander_is_struck_or_gone_from_the_sea_is_alone_again`; in
+`tests/test_indefatigable.py`, `test_her_marines_back_from_their_muskets_go_to_the_carronades_alone`
+(the 64's 1794 and the razee's 1795). Each of them fails on dfbe4031's code but the 64's case of the
+marines, which passes both ways (`s13/mends/headtests`); no assertion of an existing test is
+weakened.
+
+**What any ship may say that this step changes:**
+- A far ship of war (or an armed trader, packet or Indiaman under her book's `enemy in range` rows)
+  that went engaging from a plan state sails her passage again when the action ends, where she lay
+  to or chased her prize or her mark for good: the far story, the lookout's sightings of her and of
+  her prize, and her arrival where she was bound follow her passage.
+- Package 74's road (engaging from a detour) as at 94bfac27: a ship whose mark leaves the sea leaves
+  it after her; a mark lost from sight is kept, another enemy in sight not taken.
+- A ship under the orders of a commander who has struck or left the sea is alone again: her "By the
+  captain, evading: shaping a course for ... (hauling off from a seventy-four, ...)" is said again
+  where her own book's lines were.
+- At a crewed cap of nought, a far ship engaging the player's ship fires by the tables within her
+  reach every three minutes: `action.far_reply` ("The Foe fires her broadside at us from 9 cables:
+  none of her 63 shot strike us.") and, where shot strike, the minute's `action.hit` and all that
+  follows from shot in her parts (the wounded, the damage, the butcher's bill).
+- The 74, the 64 and the razee: "Marines, hold your fire! The muskets grounded; N back to the
+  carronades." where a long gun's crew is short, N now the carronades' marines alone (the razee's
+  1795 fit "twelve" for "40").
+
+**For the lead:** (1) package 74's road after the action: a captor that went engaging from a chase
+(the passage saved at the chase) saves the action's chase leg at `taking possession` and follows her
+prize "on passage" for good (`s13/mends/after/captor74.py`: the Foudroyant 0.09 to 0.14 miles from
+her prize from 1860 to 4860, her latitude 49.290 to 49.242 N); with `engaging` among
+`_DETOUR_STATES` (the reviewer's one word, measured on a copy, `s13/mends/alt`) she takes up her
+passage instead (49.290 to 49.163 N by 4860, her prize in company 0.26 to 0.56 miles), which moves
+package 74's road and is yours to rule. (2) The far body's strike to the player's shot, (c) above.
+(3) A crewed member's station on a commander lying to, (e) above.
+
+**The suites, as run.** Once, on dfbe4031 with this subsection's code, tests and notes uncommitted
+(this paragraph written after), from the tree root with `py`, one run at a time with nothing else of
+the session's running, the branch and the tree asserted first, each pytest with `-n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/final/run.sh`), 08:24 to 10:32
+UTC; against the bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`,
+`rf/fix/final/trials.xml`, `rf/fix/final/digests.json`).
+- **The slow candidates** (`--slow -m slow`, the base's 86 files and `tests/test_far_action.py`,
+  touched here; `s13/final-slow.xml`): 333 passed, 12 failed, 2 skipped, 9 xfailed (53 minutes).
+  Against the base (346), two outcomes changed: truth 7-196's crewed clause, failed to passed
+  (ff58e07d, subsection 2); the gate's day with the region loaded, passed to failed, a pace test
+  (472 ticks a second against 500), which run alone afterwards with nothing else running fails on
+  every tree alike (this tree 476 and 473, dfbe4031's export 473, 94bfac27's 471), so it is the
+  machine's hour and not the code (it passed alone on both trees after subsection 1's run). Only in
+  this run, ten, all passed: truth 7-231 (f5102fae), subsection 4's two (65b757b9), the trunk's
+  truth 7-519 (package 104's d776537a), and six slow cases of `tests/test_far_action.py`, the file
+  in this list for the first time (this subsection's cap of nought, 7-231's body of f5102fae and
+  package 74's four of a4944b87). The twelve failures are the base's with the same figures, the
+  pace aside: the captain's three trials' digests, truth 77's 2e93986c2989d831, the merchant's
+  [16200, 96480], the schooner on an intent, the schooner's 767 lines, truths 78 and 79's [57,
+  100918], the day under the systems (499 ticks a second, 492 at the base) and truth 7-159 (450,
+  448 at the base), with the gate's day above.
+- **The captain's trials** (`--slow`, `s13/final/trials.xml`): 5 passed, 3 failed, as at the base
+  outcome for outcome and digest for digest (the station's gale 1e59009004141b08, the trade's thick
+  weather 41a37f0290be291a, the trade's stranger 13432e4b2659bcaf: `TRIAL_TRADE_STRANGER_DIGEST`
+  unmoved).
+- **The four whole logs** (`log_digests.py`, `s13/final/digests.json`): every field as recorded at
+  7b9d7c29 (the first action 497 lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the
+  station's lee shore 1,561, e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08).
+- **The generator** into scratch: eighteen of eighteen files byte for byte;
+  `tools/check_viewer_guns.py` clean.
+- **The whole fast tier** (`s13/final-fast.xml`, the next base): **7,599 passed, 2 skipped, 1
+  xfailed**, exit 0 (63 minutes). Against the base (7,529): **no outcome changed.** Only in the
+  base, three: the strict expected failure made one with the 64's case at f5102fae and the other
+  fits' two old cases (renamed at 26473408); only in this run, 76, all passed: this subsection's
+  four (the commander struck or gone, package 74's road, the marines back on two fits), the earlier
+  steps' 45 (f5102fae's three, 26473408's 26, dfbe4031's 16) and the trunk's 27 (subsection 1). The
+  commander's case ran 7.3 s, over the tier's 5 s judgement (`tests/conftest.py`), as the two
+  consort cases beside it do; it is left in the fast tier so that this run is the next base, for
+  the lead's `SLOW_TESTS` sweep.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+  Every changed file LF with a final newline.
+- After this paragraph and the last words of the designs, the 27 files that read the notes or the
+  designs (`test_bellerophon`, `test_indefatigable`, `test_known_truths`, `test_practice`, the
+  hulls', the profiles' and the scenarios' among them; the fast tier, `-n 4`,
+  `s13/final/docs-readers.xml`): 2,497 passed (20 minutes).
+
+**Moved by this subsection:** no recorded passage, digest, line count or tick (the four whole logs,
+the captain's trials, `TRIAL_TRADE_STRANGER_DIGEST`, truth 77's digest and the gates' constants as
+at the base), so there is nothing for the lead to re-pin by it; what moved is the behaviour named
+above and the pins of this subsection's own tests.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

@@ -1861,6 +1861,21 @@ STIMULI: tuple[str, ...] = (
 )
 
 
+def _commander_on_the_sea(root: Any, boss: str) -> bool:
+    """Whether the ship named by `under_orders_of` still commands (package 75, the review's mends
+    of B7.e): the player's ship while she has a place; another while she is on the sea, not
+    `done` (gone into port, sunk or taken from it) and not struck."""
+    if boss == "the ship":  # the player's ship (`ships.PLAYER_ID`)
+        return getattr(root, "position", None) is not None
+    sea = getattr(root, "vessels", None)
+    other = sea.get(boss) if sea is not None and hasattr(sea, "get") else None
+    return (
+        other is not None
+        and not getattr(other, "done", False)
+        and not getattr(other, "struck", False)
+    )
+
+
 class Judgement:
     """The brain's judgement, shared by the two bodies (spec M6 §4, "one brain, two
     bodies"; package 43): the weather's trend and the doctrine's transitions on a
@@ -2002,15 +2017,17 @@ class Judgement:
         (package 71's least relation, the far body's own or the crewed hull's, as
         `signals.commanded_by` reads it): the rank-4 rule is a lone ship's, and a ship in a set,
         or under the orders of another, set or no set, is left to her commander's book (package
-        75, B7.e; the lead's ruling (3)(b) of 2026-11-12)."""
+        75, B7.e; the lead's ruling (3)(b) of 2026-11-12), while that commander is on the sea and
+        has not struck (`_commander_on_the_sea`; the review's mends: nothing clears the relation
+        when the commander goes, and a commander gone or struck has no book to leave her to)."""
         world = getattr(self, "world", None)
         body = getattr(self, "vessel", None)
         boss = getattr(body if body is not None else world, "under_orders_of", None)
         if boss is None:
             boss = getattr(getattr(world, "vessel", None), "under_orders_of", None)
-        if boss:
-            return False
         root = getattr(world, "parent", None) or world
+        if boss and _commander_on_the_sea(root, str(boss)):
+            return False
         sets = getattr(root, "squadrons", None)
         if sets is None or not hasattr(sets, "of"):
             return True

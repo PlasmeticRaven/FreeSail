@@ -1737,6 +1737,27 @@ def test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not_haul_
     assert "engaging" in states and "evading" not in states, rows
 
 
+def test_a_frigate_whose_commander_is_struck_or_gone_from_the_sea_is_alone_again(far_only):
+    """The review's mends of B7.e (the lead's ruling (3)(b) of 2026-11-12): the relation leaves her
+    to her commander's book only while that commander commands (`captains._commander_on_the_sea`:
+    on the sea, not `done`, not struck), since nothing clears `under_orders_of` when the commander
+    goes. The frigate under her consort's orders and in no set (above): her consort struck, or
+    gone from the sea, she is alone again, and the rank-4 rule is hers: she evades the 74 as a lone
+    frigate does, and never engages her. OLD BESIDE NEW: at 65b757b9 she was never alone again,
+    and stood on by her own book against the ship of the line."""
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    v, consort = _under_her_consorts_orders(world)
+    assert not v.brain._alone()
+    consort.struck = True
+    assert v.brain._alone()
+    consort.struck = False
+    assert not v.brain._alone()
+    consort.done = True
+    assert v.brain._alone() and v.under_orders_of == consort.id
+    states = _states_until_evading(v)
+    assert "evading" in states and "engaging" not in states, states
+
+
 def test_a_kings_64_meeting_her_closes_her_as_before(far_only):
     """Bel-D §8.3: the rule is for a ship of rank 3 or less; a French sixty-four in the King's
     ship's role, a ship of the line herself (rank 4), meeting her five miles off as the frigate
@@ -3279,7 +3300,8 @@ def test_truth_7_195_her_lee_lower_deck_guns_shut_by_the_rules_count():
 # (49.959 N 5.207 W, data/charts/features/channel-west.yaml), and the 74s one to three miles from
 # her, put in her squadron under her orders (settled by measurement: within the crewed range at the
 # end of each timed thousand, and at every tick of the three since the lead's ruling (1) of
-# 2026-11-13)
+# 2026-11-13). JUDGEMENT: the frigate commanding three 74s is the test's world, no claim of the
+# period (the narrowest world measured in which the three know her by the book).
 OFF_THE_LIZARD = (49.9, -5.21)
 SEVENTY_FOURS_AT = ("49 55.5 N 5 12.0 W", "49 53.5 N 5 14.0 W", "49 52.5 N 5 11.0 W")
 
@@ -3306,15 +3328,18 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
     signals and answering each challenge by order, she is still judged unanswered by one of three
     challenging her in one minute (each reply goes to the last challenge read), and one 74 judges
     another so. In her squadron, under her orders, the three know her by the book's own road
-    (package 71's least relation, package 72's set): a member in company challenges nobody and keeps
-    her station on her commander, the frigate. Measured on the owner's machine (seed 7, 2026-11-13):
-    the best of three thousands 150, 151 and 147 ticks a second in three runs; the 74s at 0.29 to
-    2.79 miles at the ends of the thousands and at most 2.79 at any tick of them, in company
-    throughout, no shot fired. Before, three crewed 74s in action against her: 106 ticks a second
-    (2026-11-10), 89 to 92 after B7.c, 164 to 173 after its review's mend, and in the thousand
-    before the taking on this tree (ticks 1820 to 2820) 165, 166 and 167 in three runs; the old
-    world and its figures, old beside new, in docs/dev/TuningNotes.md, "The lead's notes of
-    2026-11-12 and 13, built"."""
+    (package 71's least relation, package 72's set): a member in company challenges nobody. **They
+    do not keep their stations** (the review's mends): the frigate lies to, heading NW by N at a
+    knot and a half, and a crewed member ahead of her station steers the flag's course with her sail
+    shortened, which drops her back only on a flag with way on; so the three straggle by the set's
+    own lines (S0 at tick 1560, S1 at 3060, S2 at 3840), and S2 opens on the frigate's heading at
+    about six knots, 2.79 miles at the third end, past `CREWED_NM` between ticks 8,400 and 8,650
+    (3.87 and 4.18 miles): the clause holds within its 4,900 ticks, and that is its margin.
+    Measured on the owner's machine (seed 7, 2026-11-13): the best of three thousands 150, 151 and
+    147 ticks a second in three runs; the 74s at 0.29 to 2.79 miles at the ends of the thousands
+    and at most 2.79 at any tick of them, in company throughout, no shot fired. The old world and
+    its figures, old beside new, in docs/dev/TuningNotes.md, "The lead's notes of 2026-11-12 and
+    13, built"."""
     import time
 
     from freesail.world import crews as K

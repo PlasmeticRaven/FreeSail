@@ -176,12 +176,18 @@ class Quarters:
 
     def marines_to_guns(self) -> int:
         """The marines back to the carronades from their muskets: each short crew made up
-        from the division, the carronades first. Returns how many moved."""
+        from the division, the carronades first. Where her fit or her bill keeps marines in
+        their division (`_marines_kept`, package 75, B7.b and B1), the carronades alone take
+        them back, as at the beat: the long guns do not take marines (the lead's ruling (4) of
+        2026-11-13; the review's mends: before it every short crew, long guns too, drew from
+        the division). Returns how many moved."""
         division = self.divisions.get(MARINES, [])
         if not division:
             return 0
         moved = 0
         crews = sorted(self.crews.values(), key=lambda gc: (gc.kind != "carronade", gc.key))
+        if _marines_kept(self.ship) is not None:
+            crews = [gc for gc in crews if gc.kind == "carronade"]
         for gc in crews:
             while len(gc.members) < gc.wanted and division:
                 s = division.pop(0)
@@ -244,9 +250,7 @@ class Quarters:
             divisions[HELM] += take(rest, helm_n - len(divisions[HELM]), HELM)
         # the marines the bill keeps in their division (package 75, B7.b: the bill's `marines`),
         # before the gun crews draw; her fit's own where it gives them (package 75, B1)
-        kept = getattr(getattr(ship, "fit_spec", None), "marines", None)
-        if kept is None:
-            kept = getattr(bill, "marines", None)
+        kept = _marines_kept(ship)
         if kept is not None:
             divisions[MARINES] += take(by_station[Station.MARINES], int(kept), MARINES)
         # the gun crews, forward first, chasers next, the swivels last
@@ -581,6 +585,17 @@ def _decks_words(parts: list[str], crews: list[GunCrew], shut: frozenset[str]) -
     if len(said) == 1:
         return said[0]
     return ", ".join(said[:-1]) + ", and " + said[-1]
+
+
+def _marines_kept(ship: Any) -> int | None:
+    """The marines the quarter bill keeps in their division at the beat: her fit's own `marines`
+    (package 75, B1), else the bill's (B7.b); None where neither gives them, as on every ship
+    but the 74, the 64 and the razee."""
+    kept = getattr(getattr(ship, "fit_spec", None), "marines", None)
+    if kept is None:
+        spec = getattr(getattr(ship, "spec", None), "crew", None)
+        kept = getattr(getattr(spec, "quarter_bill", None), "marines", None)
+    return kept
 
 
 def _preferred_stations(

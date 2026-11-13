@@ -1640,11 +1640,13 @@ package 71's least relation as `signals.commanded_by` reads it, six lines), so t
 not send her away on her own; a ship commanding others by the relation alone, in no set, is alone as
 before. Measured at seed 7: a French frigate under her consort's orders and in no set, five miles
 north of her, investigates, chases and engages her where she evaded (far and crewed), her consort,
-alone, evading; `convoy.yaml`'s escort, the player's brig-sloop under nobody's orders, hauls off from
-a French 74 put 2.5 miles north as before, her four brainless brigs keeping company on her. For the
-lead: under the relation alone her commander's book makes no signal for her, so a commander alone
-hauls off and the ship under his orders stands on. The tuning notes, "The lead's notes of 2026-11-12
-and 13, built", subsection 4.*
+alone, evading; `convoy.yaml`'s escort, the player's brig-sloop under nobody's orders, hauls off
+from a French 74 put 2.5 miles north as before, her four brainless brigs keeping company on her. For
+the lead: under the relation alone her commander's book makes no signal for her, so a commander
+alone hauls off and the ship under her orders stands on. The relation counts only while her
+commander is on the sea and has not struck (the review's mends: a ship whose commander is gone is
+alone again). The tuning notes, "The lead's notes of 2026-11-12 and 13, built", subsections 4 and
+6.*
 
 ---
 
@@ -2137,15 +2139,19 @@ floor lowered).*
 
 *Her world made honest (the lead's ruling (1) of 2026-11-13): truth 88's frigate, without private
 signals and under no rules captain, was taken by the three for a man of war under false colours and
-fired into, and since package 74's mends her captor goes home with her prize, so the action no longer
-lasted the measure (S2 5.62 miles off at the third thousand). The day's private signals alone did not
-mend it (she answers only by order, and three challenging in one minute are not all answered); the
-three are now put in her squadron under her orders, where a member in company challenges nobody and
-keeps her station on the frigate: in company throughout, no shot fired, at most 2.79 miles off at any
-tick of the three thousands, the best of three 147 to 151 ticks a second on the owner's machine (seed
-7, 2026-11-13) against the floor of 60. `CREWED_NM`, `CREWED_CAP` and `CREWED_FLOOR_TICKS_S` as they
-were. The pace of three crewed 74s in action, in the thousand before the taking, 165 to 167, is
-recorded, not pinned, in the tuning notes' "The lead's notes of 2026-11-12 and 13, built".*
+fired into, and since package 74's mends her captor goes home with her prize, so the action no
+longer lasted the measure (S2 5.62 miles off at the third thousand). The day's private signals alone
+did not mend it (she answers only by order, and three challenging in one minute are not all
+answered); the three are now put in her squadron under her orders, where a member in company
+challenges nobody: in company throughout, no shot fired, at most 2.79 miles off at any tick of the
+three thousands (they do not keep their stations while the frigate lies to, a crewed member ahead of
+hers steering the flag's course under shortened sail; they straggle by the set's own lines, S2
+opening at about six knots to pass `CREWED_NM` at about tick 8,500, so the clause holds within its
+4,900 ticks: the review's mends, for the lead as package 72's station keeping), the best of three
+147 to 151 ticks a second on the owner's machine (seed 7, 2026-11-13) against the floor of 60.
+`CREWED_NM`, `CREWED_CAP` and `CREWED_FLOOR_TICKS_S` as they were. The pace of three crewed 74s in
+action, in the thousand before the taking, 165 to 167, is recorded, not pinned, in the tuning notes'
+"The lead's notes of 2026-11-12 and 13, built".*
 
 **Not truths:** her polar (no pinned point until the close-hauled gap is compared); her tack at
 quarters (recorded); her scenario's round trip and first hour (B6's tests).

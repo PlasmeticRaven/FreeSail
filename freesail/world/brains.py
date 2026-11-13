@@ -267,6 +267,13 @@ _DETOUR_STATES = frozenset(
     }
 )
 _PLAN_STATES = frozenset({"on passage", "beating", "keeping station", "in company"})
+# The key of the brain's business that marks the plan-state road into an action (package 75,
+# the review's mends of the lead's notes of 12 and 13 November): a far ship gone `engaging`
+# from a plan state holds the plan she had (`saved_plan`), which no detour of the action
+# (taking possession, evading, in distress) overwrites and which she takes up at her next plan
+# state; while it is set her mark is kept in hand each minute (`FarCaptain._take_mark`).
+# Package 74's road into an action (engaging from a detour) never sets it, and is as it was.
+PASSAGE_HELD = "passage_held"
 
 
 def _plan_of_legs(legs: list[Leg]) -> list[tuple[Any, ...]]:
@@ -628,7 +635,9 @@ class FarCaptain(Judgement):
             if enemy is not None:
                 self._stranger = enemy.get("id")
                 self.vessel.plan = [("away", self._stranger)]
-        elif state == "engaging":
+        elif state == "engaging" and self._business.get(PASSAGE_HELD):
+            # gone engaging from a plan state alone (package 75); package 74's road from a
+            # detour keeps the chase leg of the mark it entered with, as it did
             self._take_mark(p)
         elif state == "at anchor":
             since = self._state_entered or 0
@@ -667,7 +676,9 @@ class FarCaptain(Judgement):
         her at the doctrine's range; with none in sight the mark in hand is kept while she is
         on the sea, the leg following her until `enemy out of range` ends the action; with no
         mark on the sea at all she lies to where she is, so that no chase of nobody is laid
-        (`Vessel.tick` drops such a leg and, the plan empty, takes her from the sea)."""
+        (`Vessel.tick` drops such a leg and, the plan empty, takes her from the sea). On the
+        road from a plan state alone (`PASSAGE_HELD`, the review's mends): her passage is held
+        and taken up when the action ends."""
         from freesail.combat.far_action import engage_range_m
 
         mark = self._engaging_mark(p)
@@ -975,6 +986,8 @@ class FarCaptain(Judgement):
             state = "on passage"
         self.planned = False
         self.vessel.saved_plan = None
+        # a passage held from before the promotion (package 75) is laid afresh by the plan
+        self._business.pop(PASSAGE_HELD, None)
         self.state = None
         self.last_judged = -1
         self._enter(state)
@@ -1025,7 +1038,9 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
     stranger in hand to hailing distance; a course away from her; the nearest open road
     and the anchor; the anchor where she is); in port she lies at anchor; in distress she
     lies to; engaging, a chase of her mark to the doctrine's range (package 74), the mark the
-    stimulus read taken where none is in hand (package 75), and with none at all she lies to.
+    stimulus read taken where none is in hand (package 75), and with none at all she lies to;
+    gone engaging from a plan state, her plan is held and taken up at the next plan state, the
+    detours of the action between saving nothing over it (package 75, `PASSAGE_HELD`).
     Returns whether the state was resolved."""
     if state not in STATES:
         raise ValueError(f"'{state}' is no state of the machine.")
@@ -1051,10 +1066,14 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
         vessel.state = state
         return True
     was = vessel.state
-    if state in _DETOUR_STATES and was not in _DETOUR_STATES:
+    business = brain._business
+    if state in _DETOUR_STATES and was not in _DETOUR_STATES and not business.get(PASSAGE_HELD):
         vessel.saved_plan = list(vessel.plan)
     if state in _PLAN_STATES:
-        if was in _DETOUR_STATES and vessel.saved_plan is not None:
+        # package 75 (the review's mends): the passage held when she went engaging from a plan
+        # state is taken up as a detour's plan is, whatever the state she leaves for it
+        held = bool(business.pop(PASSAGE_HELD, False))
+        if (was in _DETOUR_STATES or held) and vessel.saved_plan is not None:
             vessel.plan = list(vessel.saved_plan)
             vessel.saved_plan = None
             vessel.lying_to_s = 0.0
@@ -1100,6 +1119,12 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
         # are `combat/far_action.py`'s once a minute
         from freesail.combat.far_action import engage_range_m
 
+        if was in _PLAN_STATES:
+            # package 75 (the review's mends of the lead's notes of 12 and 13 November): gone
+            # engaging from a plan state, her plan is held for the action's end, as a detour's
+            # is, and her mark kept in hand each minute (`PASSAGE_HELD`)
+            vessel.saved_plan = list(vessel.plan)
+            business[PASSAGE_HELD] = True
         if brain._stranger is None:
             # package 75 (the lead's ruling (2) of 2026-11-13): gone engaging from a plan
             # state (the books' `enemy in range` rows from on passage, beating, keeping station

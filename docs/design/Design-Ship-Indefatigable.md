@@ -892,7 +892,10 @@ carronade marines at their guns (none) and 68 in the division (84), "Quarters: 3
 the trimmers 53, the helm 2, the powder 29, the marines 68."; the razee's 1795 fit the same men man
 for man, still three crews short, her trimmers set against 1796 (for the lead: a trimmers figure by
 fit would be the same kind of key). The default fits as before. The tuning notes, "The lead's notes
-of 2026-11-12 and 13, built", subsection 3.*
+of 2026-11-12 and 13, built", subsection 3. By the review's mends (subsection 6 there), the marines
+back from their muskets at "hold your fire" go to the carronades alone where the fit or the bill
+keeps marines, as at the beat: the razee's 1795 "twelve back to the carronades" (old "40", 28 of
+them to her long guns).*
 
 ---
 

@@ -1285,11 +1285,15 @@ the minute after with no round fought (found at package 75's merge of the trunk,
 the player's 64 and a French 74). She now takes the mark the stimulus read, as the near captain's
 `_mark` takes theirs, and keeps one in hand as chasing does (`FarCaptain._engaging_mark`, `_take_mark`,
 `resolve_state`'s `engaging`), lying to where no mark is on the sea: truth 7-231. 7-358's world is
-line for line as before; the passages that moved by the toggle of `brains.py` alone are in
-`docs/dev/TuningNotes.md`, "The lead's notes of 2026-11-12 and 13, built". **Open for the lead:**
-after the action her passage is not taken up, `engaging` being no detour for the plan (a captor bound
-on a passage follows her prize at the engaging range; a ship whose mark is gone lies to "on
-passage").
+line for line as before; no recorded passage moved by the toggle of `brains.py` alone
+(`docs/dev/TuningNotes.md`, "The lead's notes of 2026-11-12 and 13, built"). By the review's mends
+(subsection 6 there) she holds her passage when she goes engaging from a plan state and takes it up
+when the action is done (`PASSAGE_HELD`), and her mark is kept each minute on that road alone, so
+§4.2's road from a detour is as package 74 built it; and at a crewed cap of nought a far ship
+engaging the player's ship replies by the tables (`_fallback_reply`: a cap of nought has never
+room). **Open for the lead:** on §4.2's road from a detour the passage is still not taken up after
+the action (a captor that went engaging from a chase follows her prize at the engaging range,
+`engaging` being no detour for the plan); and the far body does not strike to the player's shot.
 
 ### Step 5: the prize court and the money (§5; 2026-11-07)
 
