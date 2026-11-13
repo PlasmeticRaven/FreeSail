@@ -27949,6 +27949,16 @@ skipped; the thirteenth ran in my fast tier. From here the browser file is run w
 and their draws never ask St Malo's ways. The redrawn channel-west tracks (Dartmouth, Morlaix,
 St Mary's) are clear as before.
 
+**The suites at 2782252** (the trunk at b7a96da merged; measured in a clean worktree pinned at
+that hash). Ruff check and format were clean. The fast tier, whole: 7,617 passed and 1 xfailed,
+exit 0. The browser file, whole under `--slow -m "not pace"`: 13 passed, none skipped. The slow
+tier of the touched modules and the known truths: 234 passed and the same 8 xfailed as in every
+earlier run, none skipped, exit 0. The nine busy scenarios, played again, drew the same as at the
+last measure with the tracks in, vessel for vessel (prize-home 22 to 24, smack-falmouth 21 to
+22, the-channel-observed 22 to 24). The pace tests ran alone and last, at the final hash. The
+trunk's next commits touched only `docs/dev/M7-WorkPackages.md`; they and this paragraph are all
+that the final hash adds, so its code and data are byte for byte those measured.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the
