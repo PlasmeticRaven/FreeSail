@@ -492,3 +492,41 @@ def test_bona_is_a_passage_from_port_mahon_across_the_seam_to_the_fort_genois():
     assert world.tide.blocks_at(road.position) == {"sardinian-sea"}
     assert begin(world, sf) >= 10
     assert not [e for e in world.log if e.kind == "order.rejected"]
+
+
+THE_FARO = ROOT / "data" / "scenarios" / "the-faro.yaml"
+
+
+def test_the_faro_is_a_passage_from_valletta_through_the_strait_to_palermo():
+    """Package 105, step 3: the block's scenario on the whole chart, April 1808, a frigate
+    weighing from off the mouth of the Grand Harbour (Valletta's patch) for the road of
+    Palermo (Palermo's patch), some two hundred and eighty miles by the Faro of Messina,
+    within `sicily`'s water from end to end; Valletta the King's, Palermo the King of the
+    Two Sicilies' and neutral to her, every order of her own book taken."""
+    sf = load_scenario(THE_FARO)
+    sc = sf.scenario
+    assert sc.chart == "atlantic-east" and sf.seed == 7 and sc.nation == "britain"
+    assert sc.start_time.year == 1808
+    assert sf.standing_orders == ["data/scenarios/the-faro.orders"]
+    world = make_scenario_world(sf)
+    chart = world.chart
+    start = world.position
+    assert chart.region_at(start) == "sicily" and chart.level_at(start) == 3
+    assert list(world.dealings.ports) == [
+        "valletta",
+        "syracuse",
+        "messina",
+        "milazzo",
+        "lipari",
+        "palermo",
+    ]
+    assert world.dealings.ports["valletta"].nation == "britain"
+    assert world.dealings.stance(world.dealings.ports["palermo"]) == "neutral"
+    road = chart.find_feature("the road of Palermo")
+    assert road is not None and road.id == "palermo-road"
+    assert chart.level_at(road.position) == 3 and chart.region_at(road.position) == "sicily"
+    _, run_m = bearing_and_distance(start, road.position)
+    assert 135.0 < run_m / 1852.0 < 155.0  # some hundred and forty-five miles direct
+    assert world.tide.blocks_at(road.position) == {"sicily"}
+    assert begin(world, sf) >= 10
+    assert not [e for e in world.log if e.kind == "order.rejected"]

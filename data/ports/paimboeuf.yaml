@@ -45,8 +45,8 @@ anchorage:
   lon_deg: -2.0592
 mooring:
   name: the quay of Paimboeuf
-  lat_deg: 47.2905
-  lon_deg: -2.0310       # under the town, on the south shore (judgement)
+  lat_deg: 47.29369
+  lon_deg: -2.03100       # under the town, on the south shore (judgement)
   bottom: mud
   deep_draught_ft: 12    # judgement: a deeper ship lies in the road
 shore:

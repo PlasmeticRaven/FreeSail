@@ -410,3 +410,30 @@ def test_every_form_of_the_directors_table_dry_runs_as_it_is_performed(tmp_path)
             if a != b or a == "untried":
                 differ.append((x, dry, real))
     assert not differ, differ
+
+
+# -- Step 4: the view follows the hull he is aboard (note 6) --------------------------------
+
+
+def test_the_drawing_served_is_the_followed_hulls_or_says_why_she_is_not_drawn():
+    """`/api/ship` and the hello serve the drawing of the hull the drivers follow
+    (`server.ship_drawing`): her own graph aboard his ship; in the boat, a boat under oars
+    with no rig; a hull in the far shape, her name and why she is not drawn as she stands.
+    The page takes it when the followed hull changes (the probe's plan `boat-and-visitor`)."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.server import ship_drawing
+
+    w = frigate()
+    w.submit("let go the anchor")
+    w.run(300)
+    graph = ship_drawing(w)
+    assert graph is not None and "undrawn" not in graph and graph["spars"]
+    own = graph["name"]
+    w.submit("go to the boat")
+    w.run(60)
+    boat = ship_drawing(w)
+    assert boat is not None and boat["undrawn"] == "a boat under oars, with no rig to draw"
+    assert boat["name"] != own
+    w.own.awake = False  # as a sleeping hull is, the far shape's
+    far = ship_drawing(w)
+    assert far is not None and "far shape" in far["undrawn"], far

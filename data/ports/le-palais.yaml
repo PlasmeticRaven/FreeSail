@@ -38,8 +38,8 @@ anchorage:
   lon_deg: -3.1420
 mooring:
   name: the harbour of Palais
-  lat_deg: 47.3480
-  lon_deg: -3.1520       # the harbour under the citadel (SHOM's RAM station 'Le Palais')
+  lat_deg: 47.34800
+  lon_deg: -3.15089       # the harbour under the citadel (SHOM's RAM station 'Le Palais')
   bottom: mud
   deep_draught_ft: 9     # judgement: a deeper ship lies in the road
 shore:
