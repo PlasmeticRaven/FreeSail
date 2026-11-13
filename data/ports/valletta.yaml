@@ -1,0 +1,177 @@
+# FreeSail: Valletta as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch valletta). Step 2 of the package.
+#
+# Sources. Purdy 1826, pp. 157 to 166: the islands' history, the Grand Port and Marsa Muscetto
+# either side of the city, St Elmo on the point, the entrance 250 fathoms (Norie 1831, p.
+# 144: 350), the reef of 17 feet off Punta del Orsa, the leading mark the stone sentry-box
+# on Point Sanglea open south of the Valletta shore, anchor off in 15 to 20 fathoms and
+# warp in, a pilot on making the usual signal; the men-of-war above Sanglea Point in 10 and
+# 11 fathoms; water by hose from pipes at the wharf; wood dear, all from Sicily; the trade.
+# Norie 1831, pp. 142 to 146 (the quarantine dues of 1 January 1830). Lamberti 1844, p. 197.
+# Smyth 1854, p. 251: the gregale rakes the harbours of Valletta. James 1837, vol. 2, pp.
+# 170, 211 to 213 and 445; vol. 3, p. 152.
+#
+# The holder, dated (decision 66; package 79d's form): the Order of St John's to the
+# capitulation to Bonaparte of 12 June 1798, France's to the surrender of 5 September 1800,
+# the King's after. The state, dated (package 105's form): blockaded by the British and
+# the Portuguese from 12 October 1798 to the surrender (James 1837, vol. 2, pp. 211 to 213
+# and 445). The yard, dated: no source on file gives the year the King's dockyard was
+# established at Valletta; Smyth's chronometers were rated "at the Anchor Wharf, in the
+# dock-yard" on all his runs from 1816 (1854, p. 420), the first year the sources give, so
+# a yard from 1816 and the merchants' stores before it (JUDGEMENT: the yard was surely
+# older; a source for its year would move the row). The Order's arsenal by the Galley Port
+# (Purdy 1826, p. 164, the name alone) is not described in any source on file: under the
+# Order the port is the merchants' stores.
+#
+# Decision 68: under the Order the pilot's words say plainly what Smyth 1824 says of the
+# Order's galleys: in 1570 the corsair Uluj Ali took two of them, with several hundred
+# enslaved men held aboard, whom he freed (p. 202). No source on file says more of
+# captivity at Malta; nothing more is said. No person is a good of the market.
+#
+# The tide: no gauge in Malta; the block's six's blend, the hour the world's own. Prices
+# FROM MEMORY or JUDGEMENT, in sterling, as the period's merchants priced them.
+
+id: valletta
+name: Valletta
+nation:
+  - {nation: order-of-st-john, until: 1798-06-11, source: "the Order of St John's from the grant of Charles V in 1530 (Purdy 1826, p. 157)"}
+  - {nation: france, since: 1798-06-12, until: 1800-09-04, source: "surrendered to the French by capitulation on 12 June 1798 (James 1837, vol. 2, p. 170); Valletta and its dependencies surrendered to the British on 5 September 1800 (vol. 2, p. 445)"}
+  - {nation: britain, since: 1800-09-05, source: "the King's from the capitulation of 5 September 1800 (James 1837, vol. 2, p. 445), kept against the treaty of Amiens' article restoring it to the Order (vol. 3, p. 152); Malta ceded at the general peace (Smyth 1854, p. 33)"}
+source: "Purdy 1826 pp. 157-166; Norie 1831 pp. 142-146; Lamberti 1844 p. 197; Smyth 1854 pp. 251, 420, 445; James 1837 vol. 2 pp. 170, 211-213, 445"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: valletta-outer-road
+  name: off the mouth of the Grand Harbour
+  lat_deg: 35.9035
+  lon_deg: 14.5300
+  depth_fathoms: 18
+anchorage:
+  feature: grand-harbour
+  name: the Grand Harbour above Senglea point
+  lat_deg: 35.8870
+  lon_deg: 14.5130
+mooring:
+  feature: grand-harbour
+  name: the Grand Harbour above Senglea point
+  lat_deg: 35.8870
+  lon_deg: 14.5130
+  depth_fathoms: 10
+  bottom: mud
+shore:
+  feature: valletta
+  name: the Marina of Valletta
+  lat_deg: 35.8983
+  lon_deg: 14.5129
+
+pilot:
+  - pilot:
+      station: valletta-outer-road
+      cruising_nm: 2
+      comes_off_by_night: false
+      cutter: data/ships/cutter.yaml
+      vessel:
+        kind: a boat
+        name: a Maltese pilot's boat
+        under: oars and a lateen sail
+        note: "judgement"
+      names: [Giuseppe Camilleri, Salvatore Borg, Michele Zammit, Paolo Farrugia, Antonio Grech, Lorenzo Vella]   # judgement
+      skill: 0.85
+      fee_pounds: 2                  # judgement; unverified
+      cast: starboard
+      course_out_deg: 45            # judgement
+      words:
+        channel: "The mouth of the Grand Harbour is narrow and the wind about it variable: do not try to turn in. Anchor off in fifteen or twenty fathoms and warp in between the warping buoys. Keep off St Elmo's spit, marked by its can-buoy, and the reef of seventeen feet under Ricasoli."
+        marks: "Fort St Elmo on the point between the two harbours, its round tower like a sail from seaward; Fort Ricasoli on the eastern point; the stone sentry-box on Senglea point open south of the Valletta shore leads in. Up the harbour under St Angelo is the Galley Port, where the Order keeps its galleys; the Order's galleys are rowed by enslaved men, and in 1570 the corsair Uluj Ali took two of them off the coast of Sicily and set free the several hundred held aboard."
+        anchorage: "Men-of-war lie above Senglea point in ten and eleven fathoms, the merchantmen along the Valletta side from the Pratique Office to Floriana. A gregale sends a heavy swell into the harbours; Bighi bay is for the summer only. A ship from a foul port goes into Marsamxett and lies above the lazaretto."
+        tide: "No tide to speak of; the water rises a foot or so with the weather."
+    until: 1798-06-11
+    source: "the Order's pilots; the words of the galleys Smyth 1824, p. 202 (decision 68)"
+  - pilot:
+      station: valletta-outer-road
+      cruising_nm: 2
+      comes_off_by_night: false
+      cutter: data/ships/cutter.yaml
+      vessel:
+        kind: a boat
+        name: a Maltese pilot's boat
+        under: oars and a lateen sail
+        note: "judgement"
+      names: [Giuseppe Camilleri, Salvatore Borg, Michele Zammit, Paolo Farrugia, Antonio Grech, Lorenzo Vella]   # judgement
+      skill: 0.85
+      fee_pounds: 2                  # judgement; unverified
+      cast: starboard
+      course_out_deg: 45            # judgement
+      words:
+        channel: "The mouth of the Grand Harbour is narrow and the wind about it variable: do not try to turn in. Anchor off in fifteen or twenty fathoms and warp in between the warping buoys. Keep off St Elmo's spit, marked by its can-buoy, and the reef of seventeen feet under Ricasoli."
+        marks: "Fort St Elmo on the point between the two harbours, its round tower like a sail from seaward; Fort Ricasoli on the eastern point; the stone sentry-box on Senglea point open south of the Valletta shore leads in."
+        anchorage: "Men-of-war lie above Senglea point in ten and eleven fathoms, the merchantmen along the Valletta side from the Pratique Office to Floriana. A gregale sends a heavy swell into the harbours; Bighi bay is for the summer only. A ship from a foul port goes into Marsamxett and lies above the lazaretto."
+        tide: "No tide to speak of; the water rises a foot or so with the weather."
+    since: 1798-06-12
+    source: "Purdy 1826, p. 164: a pilot always to be had on making the usual signal off the harbour"
+
+tide:
+  establishment: Valletta
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: cotton, price: 38, origin: null, note: "Malta's chief export (Purdy 1826, pp. 159 to 160); the price JUDGEMENT, cheap"}
+    - {good: oranges, price: 8, origin: null, note: "oranges and lemons exported (Purdy 1826, p. 160); the price JUDGEMENT"}
+    - {good: stone, price: 3, origin: null, note: "Maltese stone exported (Purdy 1826, p. 160); the price JUDGEMENT"}
+    - {good: honey, price: 40, origin: null, note: "honey exported (Purdy 1826, p. 160); the price JUDGEMENT"}
+    - {good: wheat, price: 22, origin: naples, note: "Malta grows corn for a third of its people and buys the rest, from Sicily (Purdy 1826, p. 159; Smyth 1854, p. 33: the corn lasts five months); the price JUDGEMENT, dear"}
+    - {good: wine, price: 30, origin: naples, note: "imported (Purdy 1826, p. 159); the price JUDGEMENT"}
+    - {good: olive oil, price: 52, origin: naples, note: "imported (Purdy 1826, p. 159); the price JUDGEMENT, dear"}
+    - {good: brandy, price: 60, origin: null, note: "imported (Purdy 1826, p. 159); the price JUDGEMENT"}
+    - {good: timber, price: 26, origin: naples, note: "wood dear, all of it from Sicily (Purdy 1826, p. 165); the price JUDGEMENT"}
+    - {good: fresh beef, price: 18, origin: null, note: "beef 4d. a pound in 1821 (Smyth 1854, p. 104); Gozo fattens cattle for Malta (Purdy 1826, p. 162); the price JUDGEMENT"}
+    - {good: fresh fish, price: 6, origin: null, note: "fish abundant and cheap (Purdy 1826, p. 158); the price JUDGEMENT"}
+    - {good: biscuit, price: 24, origin: null, note: "flour 2 1/2d. a pound in 1821 (Smyth 1854, p. 104); the price JUDGEMENT"}
+    - {good: vegetables, price: 4, origin: null, note: "JUDGEMENT"}
+
+dockyard:
+  - dockyard:
+      kind: chandlers
+      items:
+        - {item: topmast, hours: 30, pounds: 70, note: "a spar from the merchants' stores, the wood all from Sicily (Purdy 1826, p. 165), the Order's arsenal not described in any source on file; judgement"}
+        - {item: cordage, hours: 4, pounds_per_fathom: 0.08, note: "judgement"}
+        - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "water in any quantity, filled in the boats by hose from pipes at the wharf (Purdy 1826, p. 165; Norie 1831, p. 144); judgement"}
+        - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+    until: 1815-12-31
+    source: "the merchants' stores; no source on file gives the King's dockyard before 1816, nor describes the Order's arsenal (JUDGEMENT)"
+  - dockyard:
+      kind: yard
+      items:
+        - {item: topmast, hours: 8, pounds: 45, note: "the King's yard at Valletta, its Anchor Wharf (Smyth 1854, p. 420: his chronometers rated in the dock-yard from 1816); the hours and the price judgement"}
+        - {item: suit of sails, hours: 30, pounds_per_100m2: 13, note: "judgement"}
+        - {item: cordage, hours: 4, pounds_per_fathom: 0.08, note: "judgement"}
+        - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "water in any quantity, filled in the boats by hose from pipes at the wharf (Purdy 1826, p. 165; Norie 1831, p. 144); judgement"}
+        - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+    since: 1816-01-01
+    source: "Smyth 1854, p. 420: from 1816 his chronometers rated at the Anchor Wharf, in the dock-yard (the first year the sources give; the yard's founding year not read)"
+
+crew_pool:
+  # judgement: Maltese seamen served in the King's ships (Nicolas 1845, vol. 1, p. 464: Maltese in the Agamemnon, 1794)
+  able: {hands: 6, pounds: 2, delay_h: 12}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 12}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+state:
+  - {state: open, until: 1798-10-11, source: "the Order's and then the French's, open"}
+  - state: blockaded
+    blockade: {by: britain, since: "12 October 1798", station: {lat_deg: 35.92, lon_deg: 14.55, name: "off the Grand Harbour"}, source: "James 1837, vol. 2, pp. 211 to 213: Ball's blockade with the Portuguese effective from 12 October 1798; p. 437; the station JUDGEMENT"}
+    since: 1798-10-12
+    until: 1800-09-04
+    source: "James 1837, vol. 2, pp. 211 to 213 and 445: the blockade from 12 October 1798 to the surrender of 5 September 1800"
+  - {state: open, since: 1800-09-05, source: "the King's, open (James 1837, vol. 2, p. 445)"}
+
+tracks:
+  to_sea: [valletta-outer-road, 35 58 N 14 36 E]
+  from_sea: [35 58 N 14 36 E, valletta-outer-road]
+  in: [valletta-outer-road, grand-harbour]
