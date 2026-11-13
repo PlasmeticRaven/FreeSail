@@ -130,6 +130,8 @@ closed_to: []
 # game's land guard passes in and out; read against the pilot's channel: up the middle of
 # the mouth, Philipet to starboard and St Philip to larboard, the south shore inside the
 # Lazareto and the Isla del Rey, as the pilot has it.
+# Its least depth along the way, by the grid at its datum: 9.3 m, drawn through
+# water of 3 m and more on every leg.
 tracks:
   to_sea: [39 52.71 N 4 17.79 E, 39 52.39 N 4 18.23 E, 39 52.33 N 4 18.39 E, 39 51.60 N 4 19.02 E, 39 52.75 N 4 22.63 E]
   from_sea: [39 52.75 N 4 22.63 E, mahon-outer-road]

@@ -116,6 +116,8 @@ closed_to: []
 # game's land guard passes in and out; read against the pilot's channel: from the Great Road
 # to the Brothers on with Balaguier, clear of the Tasse four cables, then for the town, as
 # the pilot has it.
+# Its least depth along the way, by the grid at its datum: 7.9 m, drawn through
+# water of 3 m and more on every leg.
 # The tracks before, which the guard refused:
 #   to_sea: [toulon-inner-road, toulon-great-road, 43 02 N 5 56 E]
 #   from_sea: [43 02 N 5 56 E, toulon-great-road, toulon-inner-road]

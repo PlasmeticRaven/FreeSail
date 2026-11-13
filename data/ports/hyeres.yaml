@@ -108,13 +108,15 @@ closed_to: []
 # Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
 # grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
 # game's land guard passes in and out; read against the pilot's channel: by the Great Pass
-# between Porquerolles and Port-Cros, then along Porquerolles' north side, as the pilot has
-# it.
+# between Porquerolles and Port-Cros, Porquerolles 9 cables to larboard and the Sarraniers
+# 13, then along Porquerolles' north side, as the pilot has it.
+# Its least depth along the way, by the grid at its datum: 3.3 m, drawn through
+# water of 3 m and more on every leg.
 # The tracks before, which the guard refused:
 #   to_sea: [hyeres-road, porquerolles-anchorage, 42 58 N 6 18 E]
 #   from_sea: [42 58 N 6 18 E, porquerolles-anchorage, hyeres-road]
 #   in: [hyeres-road]
 tracks:
-  to_sea: [43 00.90 N 6 12.24 E, 43 01.38 N 6 14.70 E, 43 00.00 N 6 18.60 E, 42 58.00 N 6 18.00 E]
-  from_sea: [42 58.00 N 6 18.00 E, 43 00.00 N 6 18.60 E, 43 01.38 N 6 14.50 E, porquerolles-anchorage]
+  to_sea: [43 00.90 N 6 12.24 E, 43 01.38 N 6 14.56 E, 43 00.00 N 6 18.60 E, 42 58.00 N 6 18.00 E]
+  from_sea: [42 58.00 N 6 18.00 E, 43 00.00 N 6 18.60 E, 43 01.38 N 6 14.56 E, porquerolles-anchorage]
   in: [porquerolles-anchorage, hyeres-road]

@@ -111,7 +111,10 @@ closed_to: []
 # grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
 # game's land guard passes in and out; read against the pilot's channel: by Outão, three
 # cables off its tower; the pilot's marks are transits of buildings the chart lacks.
+# Its least depth along the way, by the grid at its datum: 2.1 m, on the leg to
+# 38 28.45 N 8 56.60 W (5 of 11 legs under 3 m): the grid has no deeper way within the
+# pilot's sides, so the track stands and the audit lists it (f-shallow).
 tracks:
-  to_sea: [38 26.53 N 9 00.18 W, 38 23.63 N 9 04.72 W]
+  to_sea: [38 27.97 N 8 57.94 W, 38 25.97 N 9 04.10 W, 38 26.27 N 9 06.02 W, 38 26.40 N 9 06.18 W, 38 23.63 N 9 04.72 W]
   from_sea: [38 23.63 N 9 04.72 W, sesimbra-road]
-  in: [sesimbra-road, 38 26.03 N 9 04.42 W, 38 25.97 N 9 03.75 W, 38 29.10 N 8 55.77 W, setubal-road]
+  in: [sesimbra-road, 38 26.02 N 9 04.46 W, 38 25.97 N 9 03.72 W, 38 28.45 N 8 56.60 W, setubal-road]

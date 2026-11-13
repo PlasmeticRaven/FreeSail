@@ -27792,6 +27792,96 @@ cleanly; the full sweep finds the 97 entries exactly), in a clean worktree pinne
 
 The tree reported differs from c0f46d7 by this paragraph alone.
 
+### Step 2b again (the chart session's reading, the lead's rulings of 2026-11-13, 19:05 UTC)
+
+The chart session read the tracks against the pilots' texts and the grid's depth along each
+leg. The method of sides was accepted. What was owed, done:
+
+**St Peter Port, the wrong side of Roustel.** Faden 1793, p. 32
+(`docs/references/pilots/faden-1793-le-petit-neptune-francois-ocr.txt`, lines 4234 to 4254)
+puts the way between La Rousse and Roustel: "steer pretty close [to La Rousse], leaving it on
+your larboard hand ... Roustel ... lies 500 yards W N W from Rousse", "entered into the Little
+Russel, between La Rousse and Roustel". The track had Roustel to larboard and crossed the grid's
+drying head at 49°29.15′N 2°29.90′W. It now passes between them: Roustel 1.2 cables to
+starboard, the least depth 4.2 m. La Rousse is not among the chart's features; it is placed by
+Faden's bearing taken as magnetic, about 22 degrees west then, so about east of Roustel
+(JUDGEMENT). Faden's "never come nearer than [?00] yards to Roustel" is unreadable in the OCR.
+
+**St Malo, not built.** The way along the coast from La Fresnaye is Faden's fourth passage, the
+Décollées, "very difficult, and frequented by none but small vessels" (line 4606). St Malo keeps
+its tracks as they were, refused, and is listed beside Genoa, Cartagena and Oran with that reason.
+Twenty-one tracks are built, and four ports are shut.
+
+**The guard judges land, not depth.** The game's guard looks for the shore at a cable's grain
+and skips a cable at each end of a leg. Setúbal's built track crossed ground 16.5 m above the
+datum inside such a skip. So:
+- *(a) The audit's new check.* `f-shallow:<port>` reads every port's tracks, old and new, in
+  `tools/audit_chart.py` (`_least_depth`). It reads the way in as the business plans it and the
+  way out by the track to sea, each leg sampled every 20 m for the grid's least depth at its
+  datum. A leg under 3 m is a finding (JUDGEMENT: about a laden trader's ten feet at the datum,
+  near the lowest water), and its count is the number of legs under 3 m. A planted test
+  (Plymouth led over the Sound's east shoal, 0.9 m) proves it. `docs/dev/ChartBlocks.md` has the
+  line: a track is the way the land allows, not a sounded channel.
+- *(b) One pass at the 21.* Each was drawn again over the lattice with its depth floor raised:
+  water of 3 m and more, a quarter cable off the land, any water only within half a cable of
+  the file's road and anchorage. Each leg was simplified only where the guard passes it and its
+  water keeps the floor, through the same pilot's points. A redraw was taken only where it raised
+  the least depth, and each was read again for its pilot's sides.
+  - **Fifteen** have 3 m and more on every leg, with the least depth in metres:
+
+    | port | least depth |
+    |---|---|
+    | Alghero | 17.2 |
+    | Dartmouth | 3.0 |
+    | Ferrol | 3.0 |
+    | Gaeta | 5.2 |
+    | Hyères | 3.3 |
+    | Lisbon | 3.0 |
+    | Morlaix | 3.0 |
+    | Palma | 3.1 |
+    | Port Mahon | 9.3 |
+    | Santander | 3.0 |
+    | St Mary's | 3.5 |
+    | St Peter Port | 4.2 |
+    | Toulon | 7.9 |
+    | Villefranche | 15.0 |
+    | the Maddalena | 5.5 |
+
+    Ten of these were redrawn; Port Mahon, Toulon, Villefranche, Alghero and Gaeta were deep
+    already.
+  - Rochefort's deeper way first passed north of Aix, against its pilot. It was drawn again
+    through the gap between Aix and the Boyart, Aix 6.7 cables to larboard and the Boyart 9.2 to
+    starboard.
+  - **Six stand under 3 m**, the grid having no deeper way within their pilots' sides:
+
+    | port | built track's least | as built now |
+    |---|---|---|
+    | Setúbal | ground 16.5 m above the datum | 2.1 m, at a 2 m floor |
+    | Paimboeuf | drying | 2.0 m |
+    | Rochefort | drying | 2.0 m |
+    | Poole | 0.1 m | 1.0 m, at a 1 m floor; its pilot gives the bar six to eight feet at low water |
+    | Oporto | 1.0 m | as built: no way at 2 m, none deeper at 1 m |
+    | Civita Vecchia | drying 0.6 m | as built: no way at 1 m |
+
+    Each file says its least depth beside its tracks, and each is listed.
+- *(c) No other port's track was mended; twelve are listed.* Calais, Dunkirk, Genoa and St Malo
+  (its old tracks, the ground drying 8.7 m); Bougie and the Goletta; Catania, Messina, Syracuse,
+  Palermo, Lampedusa and Porto Paolo. Each is owned by its block's package.
+
+**The known list**: 117 entries. The 41 ways mended are out (43 less St Malo's two). The 18
+`f-shallow` findings are in. Truth 7-563, old beside new: the ways in and out refused are 24
+and 24 before, then 3 and 3, now 4 and 4 (St Malo with Genoa, Cartagena and Oran). Its opens
+stay {royan}.
+
+**The browser plans.** The trunk's browser job (`tests/test_browser_probe.py` under `-m "not
+pace"`) collects 13 tests: the twelve plans, and `test_the_plans_are_found_and_each_names_its_game`,
+which is not marked slow. My slow tier (`-m "slow and not pace"`) played all twelve plans, none
+skipped; the thirteenth ran in my fast tier. From here the browser file is run whole besides.
+
+**The busy draws.** St Malo figures in no busy scenario's draw: all nine are channel-west's,
+and their draws never ask St Malo's ways. The redrawn channel-west tracks (Dartmouth, Morlaix,
+St Mary's) are clear as before.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the

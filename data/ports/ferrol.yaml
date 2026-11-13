@@ -133,7 +133,9 @@ closed_to: []
 # grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
 # game's land guard passes in and out; read against the pilot's channel: south of Cape
 # Prioriño and up mid-channel, the Muela a cable and a half off, as the pilot has it.
+# Its least depth along the way, by the grid at its datum: 3.0 m, drawn through
+# water of 3 m and more on every leg.
 tracks:
-  to_sea: [43 26.66 N 8 20.93 W, 43 26.11 N 8 22.82 W]
+  to_sea: [43 27.61 N 8 17.45 W, 43 27.78 N 8 19.38 W, 43 26.11 N 8 22.82 W]
   from_sea: [43 26.11 N 8 22.82 W, carino-road]
-  in: [carino-road, 43 27.61 N 8 17.07 W, 43 28.31 N 8 14.97 W, ferrol-road]
+  in: [carino-road, 43 27.61 N 8 17.21 W, ferrol-road]

@@ -139,14 +139,18 @@ closed_to: []
 # Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
 # grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
 # game's land guard passes in and out; read against the pilot's channel: from the north down
-# the Little Russel, Roustel to larboard and Brehon off, as the pilot comes; which side of
-# Roustel he means is read from 'keep the Rousse close aboard on the larboard hand'
-# (JUDGEMENT).
+# the Little Russel between La Rousse and Roustel, Roustel 1.2 cables to starboard: Faden
+# 1793, p. 32, 'steer pretty close [to La Rousse], leaving it on your larboard hand ...
+# Roustel lies 500 yards W N W from Rousse'; La Rousse is not among the chart's features and
+# is placed by that bearing taken as magnetic, 22 degrees west then (JUDGEMENT), the way
+# passing three cables west of it.
+# Its least depth along the way, by the grid at its datum: 4.2 m, drawn through
+# water of 3 m and more on every leg.
 # The tracks before, which the guard refused:
 #   to_sea: [guernsey-great-road, the-little-russel, 49 32 N 2 27 W]
 #   from_sea: [49 32 N 2 27 W, the-little-russel, guernsey-great-road]
 #   in: [guernsey-great-road]
 tracks:
-  to_sea: [49 28.50 N 2 30.30 W, 49 29.01 N 2 30.03 W, 49 29.63 N 2 29.34 W, 49 29.82 N 2 29.22 W, 49 32.00 N 2 27.00 W]
-  from_sea: [49 32.00 N 2 27.00 W, 49 29.82 N 2 29.22 W, 49 29.36 N 2 29.68 W, 49 29.03 N 2 30.03 W, 49 29.01 N 2 30.03 W, the-little-russel]
+  to_sea: [49 28.50 N 2 30.30 W, 49 29.04 N 2 29.40 W, 49 29.82 N 2 29.22 W, 49 32.00 N 2 27.00 W]
+  from_sea: [49 32.00 N 2 27.00 W, 49 29.82 N 2 29.22 W, 49 29.04 N 2 29.40 W, the-little-russel]
   in: [the-little-russel, guernsey-great-road]

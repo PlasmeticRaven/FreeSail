@@ -120,11 +120,13 @@ closed_to: []
 # game's land guard passes in and out; read against the pilot's channel: the river's mouth
 # from the north; no mark of the pilot's (the beacons, the Reguel islands, Women's Island)
 # is among the chart's features, so his sides are not checked.
+# Its least depth along the way, by the grid at its datum: 3.0 m, drawn through
+# water of 3 m and more on every leg.
 # The tracks before, which the guard refused:
 #   to_sea: [morlaix-river, 48 42 N 3 53 W]
 #   from_sea: [48 42 N 3 53 W, morlaix-river]
 #   in: [morlaix-river]
 tracks:
-  to_sea: [48 41.12 N 3 53.33 W, 48 41.60 N 3 53.33 W, 48 45.00 N 3 52.80 W]
+  to_sea: [48 41.07 N 3 53.33 W, 48 41.62 N 3 53.37 W, 48 42.00 N 3 52.80 W, 48 45.00 N 3 52.80 W]
   from_sea: [48 45.00 N 3 52.80 W, 48 42.00 N 3 52.80 W]
-  in: [48 42.00 N 3 52.80 W, 48 41.57 N 3 53.33 W, 48 40.55 N 3 53.29 W, morlaix-river]
+  in: [48 42.00 N 3 52.80 W, 48 41.62 N 3 53.33 W, 48 40.90 N 3 53.37 W, 48 40.67 N 3 53.07 W, morlaix-river]
