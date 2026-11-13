@@ -193,9 +193,10 @@ def ship_drawing(world: Any) -> dict[str, Any] | None:
     """The drawing of the hull the drivers follow (package 109; the owner's play of
     2026-11-12, note 6: the page drew his first ship's rig with the state of the one he was
     aboard): her graph (`queries.ship_graph`); or her name and the words that say why she is
-    not drawn as she stands (`undrawn`): a hull in the far shape (her sails her file's, not
-    her state's), a boat under oars, a hull with no spars standing; None where the world
-    has no ship file (the point ship, an observer's view)."""
+    not drawn as she stands (`undrawn`): a hull asleep (her sails as her ship is rigged, not
+    as they are set; the words say she is not seen closely enough), a boat under oars, a
+    hull with no spars standing; None where the world has no ship file (the point ship, an
+    observer's view)."""
     from freesail.world.boats import is_boat
 
     hull = getattr(world, "own", None)
@@ -204,8 +205,7 @@ def ship_drawing(world: Any) -> dict[str, Any] | None:
         return None
     name = str(getattr(ship, "name", "") or "")
     if hull is not None and getattr(hull, "awake", True) is False:
-        undrawn = "she is not drawn as she stands; she sails in the far shape, her sails her "
-        undrawn += "file's and not as they are set"
+        undrawn = "she is not seen closely enough to draw her sails as they are set"
     elif is_boat(world):
         undrawn = "a boat under oars, with no rig to draw"
     elif not ship.spars:
