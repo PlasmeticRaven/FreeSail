@@ -28244,3 +28244,12 @@ The two playtest saves loaded and run on a watch give the same digests both ways
 43bb3a263fc9 at load, c48ff0d9e542 after four hours, 114 lines; m5c's cutter afec5325e32a,
 db9942cb5136, 52 lines): their run-on stays in channel-west's water, and the chart's wider
 reach answers nothing they read in that watch. No recorded passage is a checkpoint's load.
+
+**The suites, at 0d093aeb** (the trunk merged at b7a96da7; the dev and server extras
+installed): `ruff check .` and `ruff format --check .` clean; the fast tier whole (`-n 4`):
+exit 0, 7,618 passed, 1 xfailed, 515 slow left out; the slow tier of the checkpoint,
+replay, chart and kept-save tests with the browser plans (`--slow -m "slow and not pace"`,
+`test_checkpoint`, `test_replay`, `test_chart`, `test_browser_probe`, `test_hulls`,
+`test_lee_ports`, `test_letters`, `test_bellerophon`, `test_flag_drawings`): exit 0, 32
+passed, none skipped; the pace alone and last: 15 passed, exit 0. The tree reported
+differs from 0d093aeb by the documents alone.
