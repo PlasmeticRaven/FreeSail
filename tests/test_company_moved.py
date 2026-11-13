@@ -57,6 +57,25 @@ def cutter_and_the_fly_taken_up():
     return w, cutter, hull, me
 
 
+def test_a_ship_taken_up_from_ordinary_wakes_at_her_anchor_and_is_workable():
+    """Step 1, the lead's reading of ab0ade58 (item 1): the Fly laid in ordinary by the
+    director's word sleeps in the far shape; taken up, she is his ship and is woken at once,
+    riding at her anchor in Carrick Road as her far body lay, and forty minutes on she is
+    awake, at her anchor where she was, and nothing failed in her (no box-off of a ship
+    adrift)."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    v = fly.vessel
+    assert v.crew.awake and v.crew.shape == "full"
+    assert fly.at_anchor
+    where = fly.position
+    w.run(2400)
+    assert v.crew.awake and v.crew.shape == "full" and w.players is fly
+    assert fly.at_anchor
+    assert TR._between_m(fly, type("P", (), {"position": where})()) < 100.0
+    assert not [x for x in fly.log if x.kind == "evolution.failed"]
+    assert fly.dealings.in_port() is not None
+
+
 def _came_aboard(hull, since=0):
     return [x for x in hull.log if x.kind == "company.came_aboard" and x.tick >= since]
 
