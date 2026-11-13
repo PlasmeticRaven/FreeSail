@@ -1,0 +1,110 @@
+# FreeSail: Alicata as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch licata). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 199 to 200 and App. p. xxi: nearly eleven thousand people, a considerable caricatore for grain and sulphur, two tolerable forts and decayed walls; no port, nowhere on the south-east coast is the want of one felt more (his plan of a mole on the two reefs offered at Palermo); vessels anchor about a mile S W of the town in seven to twelve fathoms of good clay, exposed in winter to all winds from east to west round southerly; the berth eight and a half fathoms of mud a mile off (Purdy 1826, p. 155); the flagstaff of the sea castle well east of the Fonducello hillock coming in; cables buoyed in light winds; Port Nicolo for small craft; the Salso's bar. Lamberti 1844, p. 194: grain loaded.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: licata
+name: Alicata
+nation: naples
+source: "Smyth 1824 pp. 199-200, App. p. xxi; Purdy 1826 pp. 154-155; Norie 1831 p. 131"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: licata-road
+  name: the road of Alicata
+  lat_deg: 37.0888
+  lon_deg: 13.9214
+  depth_fathoms: 8.5
+anchorage:
+  feature: licata-road
+  name: the road of Alicata
+  lat_deg: 37.0888
+  lon_deg: 13.9214
+mooring:
+  feature: licata-road
+  name: the road of Alicata, a mile off
+  lat_deg: 37.0888
+  lon_deg: 13.9214
+  depth_fathoms: 8.5
+  bottom: mud
+shore:
+  feature: licata
+  name: the beach under the sea castle
+  lat_deg: 37.1040
+  lon_deg: 13.9370
+
+pilot:
+  station: licata-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of Alicata
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Angelo Cammilleri, Rosario Licata, Giuseppe Peritore, Vincenzo Incorvaia]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 200            # judgement
+  words:
+    channel: "Stand in by the lead, bringing the flagstaff of the sea castle well east of the Fonducello hillock. The Salso has a bar of nearly a mile before its mouth with a heavy surf in southerly winds; the bank off Point Tenda has seven fathoms and slight overfalls."
+    marks: "Alicata under its hill, the old Ecnomus; the sea castle with its flagstaff and the upper castle; the round white tower of Palu on the brow of the hill to the west."
+    anchorage: "About a mile south-west of the town in seven to twelve fathoms, eight and a half of mud the berth; buoy the cables in light winds. In winter the road is open to every wind from east round south to west."
+    tide: "No tide to reckon on: the currents of this coast rise a foot or two with the wind, a north-wester setting them strongly to the south-east."
+
+tide:
+  establishment: Girgenti
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 8.5, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 14.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 360.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 55.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 5.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 20.0, origin: naples, note: "JUDGEMENT"}
+    - {good: sulphur, price: 5, origin: naples, note: "a caricatore for sulphur (Smyth 1824, p. 199); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 48, pounds: 80, note: "no stores named; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "water at the tower of San Nicola (Lamberti 1844, p. 194); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 36}
+  landsman: {hands: 2, pounds: 1, delay_h: 36}
+
+closed_to: []
+
+tracks:
+  to_sea: [licata-road, 37 02 N 13 54 E]
+  from_sea: [37 02 N 13 54 E, licata-road]
+  in: [licata-road]

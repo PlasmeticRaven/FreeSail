@@ -1199,9 +1199,16 @@ def _harbour_dressing(world: Any, daylight: bool) -> None:
 
 
 def _the_day_reminded(world: Any, locker: Any) -> None:
-    """The first lieutenant reminds the captain once, on the morning of a day his nation keeps
-    and his ship lying at anchor, that the ships in harbour will dress; the order is his
-    (package 102, step 5). The locker keeps the day said, so that it is said once."""
+    """The ship's own officer (`officer_rank`: the first lieutenant in a frigate, the
+    lieutenant in a brig-sloop, the mate in a cutter, a schooner or a trader) reminds the
+    captain once, on the morning of a day his nation keeps and his ship lying at anchor, that
+    the ships in harbour will dress; the order is his (package 102, step 5). Where a party is
+    seated at the officer's station no words are put in his mouth: the day is said to the deck
+    with no speaker, for him to say to the captain himself (no line spoken as the officer had
+    a rule for a seated one before; the lead's word of 2026-11-13). The locker keeps the day
+    said, so that it is said once."""
+    from freesail.agents.agent import OFFICER, officer_rank
+    from freesail.agents.harness import holder_of
     from freesail.world import signals as S
 
     if not bool(getattr(world, "at_anchor", False)) or S.light_now(world) == "night":
@@ -1214,11 +1221,18 @@ def _the_day_reminded(world: Any, locker: Any) -> None:
     if not days:
         return
     locker.day_said = stamp
+    day = days[0].name
+    if holder_of(world, OFFICER) is not None:
+        text = f"It is {day}: the ships in harbour will be dressing."
+        world.record("notable", "colours.day", text, data={"day": day})
+        return
+    who = officer_rank(world)[0]
+    who = who[:1].upper() + who[1:]
     text = (
-        f"The first lieutenant: 'It is {days[0].name}, sir: the ships in harbour will be "
-        "dressing.' The order to dress her is yours ('dress ship')."
+        f"{who}: 'It is {day}, sir: the ships in harbour will be dressing.' The order to "
+        "dress her is yours ('dress ship')."
     )
-    world.record("notable", "officer.reminder", text, data={"day": days[0].name})
+    world.record("notable", "officer.reminder", text, data={"day": day, "person": who})
 
 
 def dressing_tick(world: Any) -> None:
