@@ -2,21 +2,21 @@
 # (package 105, step 3). A short book: the frigate's own, the starter book not loaded.
 
 standing order "weigh": at the anchor let go, if the distance to 35 54.2 N 14 31.8 E is under 2 miles then get under way on the starboard tack and steer NNE
-standing order "off Valletta": at under way, if the distance to 35 54.2 N 14 31.8 E is under 2 miles then set plain sail; shape a course for 36 40 N 15 25 E
+standing order "off Valletta": at under way, if the distance to 35 54.2 N 14 31.8 E is under 2 miles then set plain sail; shape a course for 36 40 N 15 35 E
 
 # The departure: from off the mouth of the Grand Harbour, north-north-east across the
-# channel of Malta for the offing of Cape Passaro, ten miles east of the cape; ships crossing
+# channel of Malta for the offing of Cape Passaro, eighteen miles east of the cape, well clear of it by night; ships crossing
 # from Passaro to Valletta keep a point higher for the current (Smyth 1824, p. 185). Each
 # open leg's course is shaped again every hour while she is within the leg's length of both its
 # ends and short of its mark (the mark beyond still farther than the leg after it).
-standing order "the course for Passaro": every hour, if the distance to 36 40 N 15 25 E is over 3 miles and the distance to 36 40 N 15 25 E is under 63.7 miles and the distance to 35 54.2 N 14 31.8 E is under 64.7 miles and the distance to 37 30 N 15 30 E is over 51.7 miles then shape a course for 36 40 N 15 25 E
-standing order "off Passaro": when the distance to 36 40 N 15 25 E is under 3 miles then shape a course for 37 30 N 15 30 E
+standing order "the course for Passaro": every hour, if the distance to 36 40 N 15 35 E is over 3 miles and the distance to 36 40 N 15 35 E is under 69.5 miles and the distance to 35 54.2 N 14 31.8 E is under 70.5 miles and the distance to 37 30 N 15 35 E is over 51.5 miles then shape a course for 36 40 N 15 35 E
+standing order "off Passaro": when the distance to 36 40 N 15 35 E is under 3 miles then shape a course for 37 30 N 15 35 E
 
-# Up the east coast outside Syracuse, Augusta and Catania, eight miles off, to the mouth of
+# Up the east coast outside Syracuse, Augusta and Catania, fifteen miles off, to the mouth of
 # the Faro.
-standing order "the course for Catania": every hour, if the distance to 37 30 N 15 30 E is over 3 miles and the distance to 37 30 N 15 30 E is under 51.2 miles and the distance to 36 40 N 15 25 E is under 52.2 miles and the distance to 37 55 N 15 32 E is over 26.6 miles and the distance to 35 54.2 N 14 31.8 E is over 61.7 miles then shape a course for 37 30 N 15 30 E
-standing order "off Catania": when the distance to 37 30 N 15 30 E is under 3 miles then shape a course for 37 55 N 15 32 E
-standing order "the course for the Faro's mouth": every hour, if the distance to 37 55 N 15 32 E is over 2 miles and the distance to 37 55 N 15 32 E is under 26.1 miles and the distance to 37 30 N 15 30 E is under 27.1 miles and the distance to 38 03 N 15 37 E is over 10.4 miles and the distance to 36 40 N 15 25 E is over 49.2 miles then shape a course for 37 55 N 15 32 E
+standing order "the course for Catania": every hour, if the distance to 37 30 N 15 35 E is over 3 miles and the distance to 37 30 N 15 35 E is under 51.0 miles and the distance to 36 40 N 15 35 E is under 52.0 miles and the distance to 37 55 N 15 32 E is over 26.6 miles and the distance to 35 54.2 N 14 31.8 E is over 67.5 miles then shape a course for 37 30 N 15 35 E
+standing order "off Catania": when the distance to 37 30 N 15 35 E is under 3 miles then shape a course for 37 55 N 15 32 E
+standing order "the course for the Faro's mouth": every hour, if the distance to 37 55 N 15 32 E is over 2 miles and the distance to 37 55 N 15 32 E is under 26.1 miles and the distance to 37 30 N 15 35 E is under 27.1 miles and the distance to 38 03 N 15 37 E is over 10.4 miles and the distance to 36 40 N 15 35 E is over 49.0 miles then shape a course for 37 55 N 15 32 E
 standing order "off the Faro's mouth": when the distance to 37 55 N 15 32 E is under 2 miles then shape a course for 38 03 N 15 37 E
 
 # The Faro: up the middle of the channel past Reggio and Messina, close round the Faro point
@@ -24,7 +24,7 @@ standing order "off the Faro's mouth": when the distance to 37 55 N 15 32 E is u
 # taken as often as the land serves (Smyth 1824, pp. 107 to 110 and App. p. xii: the stream
 # six hours north and six south, two to five miles an hour; give the rocks under the Torre
 # di Cavallo a wide berth, for the current sets onto them).
-standing order "the course for Reggio": every 10 minutes, if the distance to 38 03 N 15 37 E is over 1.5 miles and the distance to 38 03 N 15 37 E is under 9.4 miles and the distance to 37 55 N 15 32 E is under 9.4 miles and the distance to 38 12 N 15 36.3 E is over 9.0 miles and the distance to 37 30 N 15 30 E is over 24.8 miles then shape a course for 38 03 N 15 37 E
+standing order "the course for Reggio": every 10 minutes, if the distance to 38 03 N 15 37 E is over 1.5 miles and the distance to 38 03 N 15 37 E is under 9.4 miles and the distance to 37 55 N 15 32 E is under 9.4 miles and the distance to 38 12 N 15 36.3 E is over 9.0 miles and the distance to 37 30 N 15 35 E is over 24.8 miles then shape a course for 38 03 N 15 37 E
 standing order "off Reggio": when the distance to 38 03 N 15 37 E is under 1.5 miles then shape a course for 38 12 N 15 36.3 E
 standing order "the course for Messina": every 10 minutes, if the distance to 38 12 N 15 36.3 E is over 1.0 miles and the distance to 38 12 N 15 36.3 E is under 9.5 miles and the distance to 38 03 N 15 37 E is under 9.5 miles and the distance to 38 14.1 N 15 36.4 E is over 2.1 miles and the distance to 37 55 N 15 32 E is over 8.6 miles then shape a course for 38 12 N 15 36.3 E
 standing order "off Messina": when the distance to 38 12 N 15 36.3 E is under 1.0 miles then shape a course for 38 14.1 N 15 36.4 E
