@@ -16766,3 +16766,150 @@ def test_truth_7_536_a_ship_may_sail_from_naples_through_the_faro_to_valletta_on
     assert "British garrison" in messina[1807].pilot.words["marks"]
     assert "British" not in messina[1805].pilot.words["marks"]
     assert {p.nation for p in messina.values()} == {"naples"}
+
+
+# package 105's step 3 ports: western Sicily, the south coast, the islands and Ustica
+PACKAGE_105_WEST_PORTS = frozenset(
+    {
+        "palermo",
+        "trapani",
+        "favignana",
+        "marsala",
+        "sciacca",
+        "girgenti",
+        "licata",
+        "terranova",
+        "porto-palo",
+        "lipari",
+        "pantelleria",
+        "lampedusa",
+        "ustica",
+    }
+)
+
+
+def test_truth_7_537_a_ship_may_sail_from_tunis_to_palermo_on_charted_water():
+    """Package 105, step 3: the passage from the road of Tunis by Cape Bon, across the
+    channel south of Maritimo and the Egadi, round Cape St Vito and Cape di Gallo into the
+    gulf of Palermo to the road off the mole lies on charted water every leg, no leg crossing
+    the land, from
+    `tunis-coast` into `sicily` and along the seam with `tyrrhenian`; the thirteen ports of
+    the step load, each the King of the Two Sicilies' and neutral to a British ship, Ustica
+    in `tyrrhenian`'s bounds and features, the rest in `sicily`'s; Cefalù and Termini marks
+    and not ports (Smyth 1824, App. p. v: a summer anchorage for coasters; a road for boats
+    that can be beached)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+    from freesail.world.nations import load_nations
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    legs = [
+        chart.feature("tunis-road").position,
+        Position(37.15, 10.60),
+        Position(37.20, 11.10),
+        Position(37.80, 11.95),
+        Position(38.25, 12.55),
+        Position(38.25, 12.85),
+        Position(38.25, 13.25),
+        Position(38.20, 13.40),
+        chart.feature("palermo-road").position,
+    ]
+    regions = set()
+    for a, b in zip(legs, legs[1:], strict=False):
+        crossing = chart.line_shore(a, b, 0.0, 185.0, 185.0)
+        assert crossing is None or not crossing[2], (a, b)
+        assert chart.depth_at(b) is not None and chart.depth_at(b) > 0
+        regions.add(chart.region_at(b))
+    assert {"tunis-coast", "sicily"} <= regions
+    files = port_files()
+    table = load_nations()
+    assert PACKAGE_105_WEST_PORTS <= set(files)
+    assert not {"cefalu", "termini"} & set(files)
+    assert chart.feature("cefalu").kind == "town" and chart.feature("termini").kind == "town"
+    for pid in sorted(PACKAGE_105_WEST_PORTS):
+        port = load_port(files[pid], chart, None, datetime(1808, 4, 20, 12))
+        assert port.nation == "naples" == table.port_nations[pid], pid
+        assert table.stance("britain", port.nation) == "neutral", pid
+        want = "tyrrhenian" if pid == "ustica" else "sicily"
+        assert chart.region_at(port.anchorage.position) == want, pid
+        assert chart.region_of[port.anchorage.feature_id] == want, pid
+
+
+def test_truth_7_538_each_of_step_threes_roads_is_as_its_pilot_has_it_and_its_words_say_plainly():
+    """Package 105, step 3: each port's road lies on the chart's water within half to half
+    again its pilot's depth, with a note of the bottom within three kilometres; the reefs
+    and the islet the grid lacks are carried by the features (the Porcelli, the Bentinck
+    shoal, Lampion, an island the grid lacks and so ground); where the sources say a port
+    held convicts or saw its people carried off as captives, its pilot's words say so
+    (decision 68: Palermo's and Girgenti's galley slaves, convicts once chained to the oars,
+    Smyth 1824, App. p. v and p. 203; Favignana's convicts, p. 246; Lipari's captives of
+    1544, p. 264; Pantellaria's thousand carried into slavery, p. 281); and the Calabria
+    sliver closed, 15.5 to 15.84 E north of 38.5 N `tyrrhenian`'s by its bound moved to its
+    last column's edge, with no tile of its written."""
+    from freesail.world.chart import load_chart, load_manifest
+    from freesail.world.geo import Position
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    files = port_files()
+    ports = {
+        pid: load_port(files[pid], chart, None, datetime(1808, 4, 20, 12))
+        for pid in PACKAGE_105_WEST_PORTS
+    }
+    for pid, port in sorted(ports.items()):
+        road = port.outer_road
+        depth = chart.depth_at(road.position)
+        assert depth is not None and road.depth_m is not None, pid
+        assert 0.5 * road.depth_m <= depth <= 1.6 * road.depth_m, (pid, depth, road.depth_m)
+        assert chart.bottom_near(port.anchorage.position), pid
+    for fid in ("porcelli-trapani", "bentinck-shoal"):
+        f = chart.feature(fid)
+        assert f.is_hazard and f.dries_m is not None and f.dries_m > -5.0, fid
+    lampione = chart.feature("lampione")
+    assert lampione.grid_lacks and lampione.is_ground
+    words = {pid: " ".join(p.pilot.words.values()) for pid, p in ports.items()}
+    assert "galley slaves" in words["palermo"] and "convicts" in words["palermo"]
+    assert "galley slaves" in words["girgenti"] and "chained" in words["girgenti"]
+    assert "convicts" in words["favignana"]
+    assert "captives" in words["lipari"] and "1544" in words["lipari"]
+    assert "slavery" in words["pantelleria"]
+    regions = load_manifest()["regions"]
+    assert regions["tyrrhenian"]["bounds"]["east"] == 15.83999
+    assert len(regions["tyrrhenian"]["tiles"]["2"]) == 158  # as before the bound moved
+    for lat in (38.55, 38.7, 39.0):
+        assert chart.region_at(Position(lat, 15.7)) == "tyrrhenian"
+        assert chart.depth_at(Position(lat, 15.7)) is not None
+
+
+@pytest.mark.slow
+def test_truth_7_539_the_frigate_sails_from_valletta_through_the_faro_to_palermo():
+    """Package 105, step 3: the block's scenario (`the-faro.yaml`, April 1808) sailed at seed
+    7 by its short book: from off the mouth of the Grand Harbour across the channel of Malta
+    to Cape Passaro's offing, up the east coast, through the Faro past Messina and the Faro
+    point, west along the north coast south of Vulcano to the gulf of Palermo, where she
+    anchors in the road off the mole on stiff clay (Smyth 1824, App. p. iv), without touching
+    ground."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "the-faro.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    near_faro = False
+    for _ in range(96 * 6):
+        w.run(600)
+        _, off = bearing_and_distance(w.position, w.chart.feature("faro-point").position)
+        near_faro = near_faro or off < 2.0 * units.NAUTICAL_MILE
+        if len([e for e in w.log if e.kind == "ship.anchored"]) >= 2:
+            break
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # off Valletta at the start, in the road of Palermo
+    assert near_faro
+    _, off = bearing_and_distance(w.position, w.chart.feature("palermo-road").position)
+    assert off < 0.6 * units.NAUTICAL_MILE
+    # the road shelves steeply (the hand lead finds no bottom at twenty fathoms a few cables
+    # out): the bottom where she lies is the pilot's, by the chart's note
+    assert w.chart.bottom_near(w.position) == "stiff clay"
