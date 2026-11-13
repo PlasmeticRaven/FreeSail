@@ -27446,3 +27446,18 @@ trunk's `client/app.js` and `ui/server.py` the same plan fails both later checks
 the X's graph and name aboard her) and the step's test in `tests/test_mends_109.py`.
 
 **Pins:** none moved (to be confirmed by the suites at the hash).
+
+**The suites, as run (step 4).** At **128741b** (the trunk merged by merge commit: package 109's
+step 3 as merged and the trunk's work since, the signal flags' `client/app.js` among it, merged
+without a conflict; the appended ends kept, the trunk's first), in a worktree pinned there, this
+container, four workers, one suite at a time (the first run lost to a restart of the
+container, the second's chain to the time a background job may run; each suite run again
+whole). `ruff check .` and `ruff format --check .` clean. **The fast tier** whole: exit 0,
+7,589 run, no failure, 1 skipped, 513 slow left out. **The slow tier of the touched files,
+the browser plans and the known truths whole** (`--slow -m "not pace" -n 4` on
+test_mends_109.py, test_known_truths.py, test_browser_probe.py, test_server.py,
+test_in_world.py): exit 0, 627 run, no failure, 8 skipped; every browser plan played and
+passed, `boat-and-visitor`'s three new checks among them; the recorded passages among them,
+every pinned digest, line count and tick held. **No digest moved, no kept save and no pin.**
+**The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 1.4 at its start):
+exit 0, 12 passed. The tree reported differs from 128741b by this paragraph alone.
