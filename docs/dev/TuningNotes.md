@@ -27023,3 +27023,53 @@ passed, 8 xfailed; the recorded passages among them, every pinned digest, line c
 held, and truth 7-519's passage to the Fort Genois. **No pin moved.** **The pace**, alone and
 last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 passed. The tree
 reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
+
+
+
+
+## Package 105: Sicily and Malta (2026-11-12)
+
+**Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
+measured at 52395f9 and reported. Step 2 begins with its measurement report; Smyth's
+*Memoir* of Sicily (1824) found on the Internet Archive for it. Decision 68 (the lead's
+note of 2026-11-12) binds step 2's and step 3's port words.
+
+### Step 1: the dated rows
+
+`freesail/world/ports.py`: `state`, `dockyard`, `closed_to`, `market`, `crew_pool` and
+`pilot` (`DATED_KEYS`) each take one value as before, or rows of `{<key>: value, since,
+until, source}` (`_dated_rows`), the form of the holder's `nation:` rows. Each key's parsing
+moved out of `load_port` into its own function unchanged (`_pilot`, `_market`, `_dockyard`,
+`_crew_pool`, `_closed`, and `_state_row` over `_port_state`), so that a row is parsed as the
+one value was. The row in force on the scenario's first day goes into the field at load; the
+Port keeps its rows (`Port.dated`, a plain class default, so a checkpoint from before loads)
+and `Ports.tick` puts each dated key to the world's day when the day turns (`Port.on_day`), so
+every reader of `port.dockyard`, `port.state` and the rest reads the day's row without
+change. A day in no row reads the key as if the file gave none; no day, the first row (as the
+first nation). Overlapping rows, a row with no source, a day not ISO and a row ending before
+it begins are refused in words. No key needed a wider change: none stopped on.
+
+**The proof that every port answers as it did.** Before the change, a script (in the
+scratchpad, not the tree) loaded every port file (90) on every scenario's first day with that
+scenario's own `ports:` entry (61 scenario files: `data/scenarios/` with its trials,
+`docs/playtests/`'s and `tests/browser_plans/`'s), and every file again on each distinct
+scenario day and on no day, on the chart `atlantic-east`, and wrote the repr of each Port's
+24 fields hashed: 3,516 answers. After the change the same script gave the same 3,516 lines,
+`diff` empty. No port file is rewritten; no file on the trunk gives a key as rows, so every
+`Port.dated` is empty and `Ports.tick` touches none. Truth 7-530 pins it in the tree (every
+file's `dated` empty, its six keys equal on no day, 1700, June 1805 and 1900); four tests in
+`tests/test_ports.py` pin the form on a file written for them (each key by day, both ends
+counted in, the day's turn by the tick, the scenario's entry over every row, the refusals).
+The house form is written in `docs/dev/ChartBlocks.md`, item 5 of the steps.
+
+**Step 1's figures** (measured in a pinned worktree at 52395f9, the step's commit edb4d71
+with the trunk at d11ac5a merged by a merge commit; no file of the trunk's conflicted).
+`ruff check .` and `ruff format --check .` (ruff 0.15.8, the pin): clean, 382 files. **The
+fast tier** (`-n 4`): exit 0, 509 slow tests left out. **The slow tier** of the touched
+files, `tests/test_ports.py` and `tests/test_known_truths.py` (`--slow -m "not pace" -n
+4`): exit 0, 442 passed, 8 xfailed in 58 minutes; the recorded passages among them (the
+gate-5b passage's and the merchant passage's constants, truths 49, 72, 7-283, 7-314,
+7-378, 7-399, 7-476 and the rest replayed to their digests). **No pin moved.** **The pace**
+alone and last (`--slow -m pace -n 0`, the same files, load 0.8 at its start): exit 0, 12
+passed. The tree reported differs from 52395f9 by this paragraph and the "where I stand"
+above alone.
