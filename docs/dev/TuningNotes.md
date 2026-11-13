@@ -28349,3 +28349,18 @@ with; the Swift unchanged (going home across the land, 69 m: the steering's, pac
 not seen closely enough to draw her sails as they are set" (was "she is not drawn as she
 stands; she sails in the far shape, her sails her file's and not as they are set": the
 engine's words on the player's page); the one test pinning them moved, old beside new.
+
+**The suites, as run (step 5).** At **aea989e** (the trunk merged by merge commit: package
+109's step 4 as merged, packages 102 and 106a closed; the appended ends kept, the trunk's
+first), in a worktree pinned there, this container, four workers, one suite at a time.
+`ruff check .` and `ruff format --check .` clean (390 files). **The fast tier** whole: exit 0,
+7,618 run, no failure, 1 skipped, 515 slow left out. **The slow tier** (`--slow -m "not pace"
+-n 4`), in two runs for the time a background job may run: test_mends_109.py,
+test_known_truths.py, test_browser_probe.py, test_server.py, test_in_world.py: exit 0, 649 run,
+no failure, 8 skipped, every browser plan played and passed; test_captain_trials.py,
+test_squadrons.py, test_brains.py, test_scenarios.py, test_ships.py: exit 0, 87 run, no
+failure. The recorded passages and trials among them, every pinned digest, line count and
+tick held. **No digest moved, no kept save; the one pin moved is the sleeping hull's words,
+old beside new.** **The pace**, alone and last (`--slow -m pace -n 0`, the same ten files, load
+3.1 at its start): exit 0, 12 passed. The tree reported differs from aea989e by this paragraph
+alone.
