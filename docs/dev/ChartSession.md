@@ -274,3 +274,11 @@ not yet, by the owner; no block beyond 105, 106a and 106b without his word.
   wanted before the measure, so that the tide and weather moved there by design are named.
 - **Level 0's extent** (the whole world, or 70 S to 75 N and 100 W to 40 E) is the lead's
   choice from the measure, as the brief says; I would measure both.
+
+**The owner's word of 2026-11-13, through the lead** (the section "Workflows, mechanism and
+reports" above, merged from the trunk at 2ce738bb): workflows of several agents only for
+sourced research and port passes, a drafter and an independent checker against the page;
+no new key, loader rule, tool or harness beyond a brief without the lead's approval; reports
+the hash, what differs, what moved, what is asked. Bearing on my notes above: the single
+ordered list of layers I raised for 112 is such a mechanism, so it waits for the lead's
+approval like the rest of that list.
