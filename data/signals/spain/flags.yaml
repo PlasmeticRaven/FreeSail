@@ -1,0 +1,280 @@
+# FreeSail: the Spanish signal flags drawn (package 102, step 2; docs/design/Design-Signals.md,
+# "The signal flags drawn"). The shape of data/signals/britain/flags.yaml (its head says the
+# fields). No figure of Mazarredo's flags was found (his plan puts their values on a separate
+# sheet, not held), so **every flag here is made**, each said so: the twenty of the table, the
+# universal flag, the two cornets, the white pendant for the signals added below the table, an
+# answering pendant. A table hoist flies two of the twenty, the upper the cell's row and the
+# lower its column; the universal for the lower where they would be the same flag (the plan's
+# own use of it); a signal of one flag (Nos. 401 to 420) that flag alone.
+
+nation: spain
+sources:
+  - "Mazarredo, Instrucciones y señales, Cádiz 1781 (the plan: the twenty flags, the universal flag, the cornets, the pendants); no figure found"
+flags:
+  - name: "table flag 1"
+    kind: flag
+    words: "the flag 1 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 2"
+    kind: flag
+    words: "the flag 2 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 3"
+    kind: flag
+    words: "the flag 3 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 4"
+    kind: flag
+    words: "the flag 4 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 5"
+    kind: flag
+    words: "the flag 5 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 6"
+    kind: flag
+    words: "the flag 6 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: yellow}
+      - {rect: [0, 0.5, 1, 1.0], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 7"
+    kind: flag
+    words: "the flag 7 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: red}
+      - {rect: [0.5, 0, 1.0, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 8"
+    kind: flag
+    words: "the flag 8 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: blue}
+      - {rect: [0.5, 0, 1.0, 1], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 9"
+    kind: flag
+    words: "the flag 9 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 10"
+    kind: flag
+    words: "the flag 10 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0, 0.4, 1, 0.6], colour: white}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 11"
+    kind: flag
+    words: "the flag 11 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {line: [[0, 0], [1, 1]], width: 0.2, colour: red}
+      - {line: [[0, 1], [1, 0]], width: 0.2, colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 12"
+    kind: flag
+    words: "the flag 12 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {line: [[0, 0], [1, 1]], width: 0.2, colour: blue}
+      - {line: [[0, 1], [1, 0]], width: 0.2, colour: blue}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 13"
+    kind: flag
+    words: "the flag 13 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 14"
+    kind: flag
+    words: "the flag 14 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {rect: [0.5, 0, 1, 0.5], colour: yellow}
+      - {rect: [0, 0.5, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0.5, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 15"
+    kind: flag
+    words: "the flag 15 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 16"
+    kind: flag
+    words: "the flag 16 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 17"
+    kind: flag
+    words: "the flag 17 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 18"
+    kind: flag
+    words: "the flag 18 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 19"
+    kind: flag
+    words: "the flag 19 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: red}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "table flag 20"
+    kind: flag
+    words: "the flag 20 of the table"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: no figure of Mazarredo's twenty flags found (their values 'on a separate sheet', not held; his 1781 leaf 14 and 1799 leaf 6 are tables of numbers); drawn after the period's common designs, in the Spanish navy's colours of the ensign (red and yellow) with white and blue: JUDGEMENT"
+  - name: "universal flag"
+    kind: flag
+    words: "the universal flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0.0, 0.0, 0.25, 0.3333], colour: red}
+      - {rect: [0.5, 0.0, 0.75, 0.3333], colour: red}
+      - {rect: [0.25, 0.3333, 0.5, 0.6667], colour: red}
+      - {rect: [0.75, 0.3333, 1.0, 0.6667], colour: red}
+      - {rect: [0.0, 0.6667, 0.25, 1.0], colour: red}
+      - {rect: [0.5, 0.6667, 0.75, 1.0], colour: red}
+    dates: ""
+    mark: made
+    source: "Mazarredo 1781: the flag 'universal ó igual á todas', standing for the flag it flies with, alone the annulment; its figure not found: made, chequered red and yellow, JUDGEMENT"
+  - name: "cornet 1"
+    kind: flag
+    words: "the first cornet"
+    proportion: [1, 2]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "Mazarredo 1781: a cornet over a number makes it a ship's number, two cornets and sixteen flags the courses (leaf 14, 'Corneta 1a superior', '2a'); their figures not found: made, JUDGEMENT"
+  - name: "cornet 2"
+    kind: flag
+    words: "the second cornet"
+    proportion: [1, 2]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "Mazarredo 1781: a cornet over a number makes it a ship's number, two cornets and sixteen flags the courses (leaf 14, 'Corneta 1a superior', '2a'); their figures not found: made, JUDGEMENT"
+  - name: "added pendant"
+    kind: pendant
+    words: "the white pendant"
+    proportion: [1, 8]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "Mazarredo 1781: 'the Spanish and the white pendants, outside the table, for the signals added below' (book.yaml); the white pendant, plain white: made"
+  - name: "Spanish pendant"
+    kind: flag
+    words: "the Spanish pendant"
+    same: "Spanish pendant"
+    dates: ""
+    mark: plate
+    source: "data/signals/spain/colours.yaml, the Spanish pendant"
+  - name: "answering pendant"
+    kind: pendant
+    words: "the answering pendant"
+    proportion: [1, 8]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: made
+    source: "no answering pendant in Mazarredo's plan read (the signal understood is No. 412, a flag); made, red over yellow, JUDGEMENT"

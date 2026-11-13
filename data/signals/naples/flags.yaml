@@ -1,0 +1,298 @@
+# FreeSail: the Neapolitan signal flags drawn (package 102, step 2; docs/design/Design-Signals.md,
+# "The signal flags drawn"). The shape of data/signals/britain/flags.yaml (its head says the
+# fields). Every flag from the plate of the flotilla's book of 1807 (Joseph's kingdom), in
+# colour: the flags 0 to 12 (0 the general flag, alone the annulment; 0 to 9 the figures of a
+# numbered signal, `numeral 0` to `numeral 9`), the three cornets and the national one, the
+# six pendants and the national one, the two substitutes; the plate's flags drawn 2:3.
+
+nation: naples
+sources:
+  - "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour)"
+flags:
+  - name: "numeral 0"
+    kind: flag
+    words: "the flag 0, yellow"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 0 (the general flag; alone the annulment)"
+  - name: "numeral 1"
+    kind: flag
+    words: "the flag 1, red, white and blue"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: red}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 1"
+  - name: "numeral 2"
+    kind: flag
+    words: "the flag 2, chequered red and white"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.0, 0.0, 0.25, 0.3333], colour: white}
+      - {rect: [0.5, 0.0, 0.75, 0.3333], colour: white}
+      - {rect: [0.25, 0.3333, 0.5, 0.6667], colour: white}
+      - {rect: [0.75, 0.3333, 1.0, 0.6667], colour: white}
+      - {rect: [0.0, 0.6667, 0.25, 1.0], colour: white}
+      - {rect: [0.5, 0.6667, 0.75, 1.0], colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 2"
+  - name: "numeral 3"
+    kind: flag
+    words: "the flag 3, blue pierced white"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 3"
+  - name: "numeral 4"
+    kind: flag
+    words: "the flag 4, red pierced white"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 4"
+  - name: "numeral 5"
+    kind: flag
+    words: "the flag 5, white with a red cross"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.44, 1, 0.56], colour: red}
+      - {rect: [0.46, 0, 0.54, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 5"
+  - name: "numeral 6"
+    kind: flag
+    words: "the flag 6, red and white on the diagonals"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [0.5, 0.5], [0, 1]], colour: red}
+      - {poly: [[1, 0], [0.5, 0.5], [1, 1]], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 6"
+  - name: "numeral 7"
+    kind: flag
+    words: "the flag 7, blue with a white saltire"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {line: [[0, 0], [1, 1]], width: 0.1, colour: white}
+      - {line: [[0, 1], [1, 0]], width: 0.1, colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 7"
+  - name: "numeral 8"
+    kind: flag
+    words: "the flag 8, red with a white cross"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0.45, 1, 0.55], colour: white}
+      - {rect: [0.4667, 0, 0.5333, 1], colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 8"
+  - name: "numeral 9"
+    kind: flag
+    words: "the flag 9, blue pierced white and red"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.36, 0.38, 0.64, 0.62], colour: white}
+      - {rect: [0.43, 0.44, 0.57, 0.56], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 9"
+  - name: "flag 10"
+    kind: flag
+    words: "the flag 10, blue, white and blue"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: blue}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 10"
+  - name: "flag 11"
+    kind: flag
+    words: "the flag 11, red over white"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 11"
+  - name: "flag 12"
+    kind: flag
+    words: "the flag 12, white and blue on the diagonal"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [1, 1], [0, 1]], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), No. 12"
+  - name: "cornet 1"
+    kind: flag
+    words: "the cornet 1, red, white and blue"
+    proportion: [1, 3]
+    shape: swallowtail
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: red}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the cornets ('N.' the national)"
+  - name: "cornet 2"
+    kind: flag
+    words: "the cornet 2, yellow"
+    proportion: [1, 3]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the cornets ('N.' the national)"
+  - name: "cornet 3"
+    kind: flag
+    words: "the cornet 3, blue"
+    proportion: [1, 3]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the cornets ('N.' the national)"
+  - name: "national cornet"
+    kind: flag
+    words: "the national cornet, blue, white and red"
+    proportion: [1, 3]
+    shape: swallowtail
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the cornets ('N.' the national)"
+  - name: "pendant 1"
+    kind: pendant
+    words: "the pendant 1, white and red"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: white}
+      - {rect: [0.5, 0, 1.0, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "pendant 2"
+    kind: pendant
+    words: "the pendant 2, white, blue and red"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.35, 1], colour: white}
+      - {rect: [0.35, 0, 0.55, 1], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "pendant 3"
+    kind: pendant
+    words: "the pendant 3, blue"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "pendant 4"
+    kind: pendant
+    words: "the pendant 4, white and blue"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: white}
+      - {rect: [0.5, 0, 1.0, 1], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "pendant 5"
+    kind: pendant
+    words: "the pendant 5, red"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "pendant 6"
+    kind: pendant
+    words: "the pendant 6, blue, white and red"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: blue}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "national pendant"
+    kind: pendant
+    words: "the national pendant, blue, white and red"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0, 0.25, 1], colour: blue}
+      - {rect: [0.25, 0, 0.55, 1], colour: white}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendants 1 to 6 and 'N.' the national"
+  - name: "substitute"
+    kind: flag
+    words: "the first substitute, white over red"
+    proportion: [1, 2]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 1, 1.0], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the first of the two marked '0' (the substitutes, book.yaml), a short broad pendant, white over red, drawn as a flag"
+  - name: "second substitute"
+    kind: flag
+    words: "the second substitute, blue"
+    proportion: [1, 2]
+    shape: triangle
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0.3], [1, 0.5], [0, 1]], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the second of the two marked '0', a triangle blue below and white above"
+  - name: "answering pendant"
+    kind: pendant
+    words: "the answering pendant"
+    proportion: [1, 5]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: white}
+      - {rect: [0.5, 0, 1.0, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Segnali di giorno, e di notte ... per uso della flottiglia di S. M., Naples 1807, the plate 'Bandiere dei segnali' (leaf 2, in colour), the pendant No. 1; that it answers: JUDGEMENT (the book's 'understood' is the white and blue flag)"
