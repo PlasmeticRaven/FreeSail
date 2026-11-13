@@ -1731,6 +1731,13 @@ verbs:
     synonyms: [scuttle her, sink the prize, sink her, scuttle]
     object: prize
     level: 1
+  # Package 60 (docs/design/Design-ShipBought.md §2.6): the player's person takes command of
+  # a ship that is his to take (given him by the director's word in this step), aboard her;
+  # the old ship laid up or left to her officer by the tail (`orders/command.py`).
+  take command of:
+    synonyms: [take command, take up command of, shift into, take her up as my ship]
+    object: command
+    level: 1
   # Package 74 (spec M7 §20): the accused before a court martial speaks in his own words
   # (`say to the court: I did my duty`), heard at the court's place; refused where no court
   # sits on him.
@@ -2289,6 +2296,8 @@ work_nouns:
   bending: bend
   shift: shift
   wreck: cut away
+  # package 109: `belay the boat` from the deck, or from the boat while she is at the side
+  boat: send the boat
 # Words between "send the ... " and the order: "aloft to", "forward to", "to".
 send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, into the rigging]
 

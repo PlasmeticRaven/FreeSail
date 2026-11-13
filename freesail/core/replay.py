@@ -861,14 +861,16 @@ def load_report(
                     transcripts=transcripts_in(data),
                 )
                 if not same_build(written_by):
-                    report.words = [
+                    report.words += [
                         f"The checkpoint was written by another build "
                         f"({build_words(written_by)}) and is read by this one "
                         f"({build_words(build_stamp())}): the game goes on from where it "
                         "was saved, under this build's rules."
                     ]
+                report.words += followed_body_words(data, "checkpoint")
                 return world, report
     report = check_replay(data, path, replay_anyway, why)
+    report.words += followed_body_words(data, "replay")
     world = replay(data, ship_factory, until_tick=until_tick, road=report.road)
     if until_tick is not None and until_tick < int(data["end_tick"]):
         report.words.append(
@@ -906,3 +908,39 @@ def load(
     whole report; the rule and the refusal are its)."""
     world, report = load_report(path, ship_factory, replay_anyway)
     return world, report.how
+
+
+def followed_body_words(data: dict[str, Any], how: str) -> list[str]:
+    """The loader's words for a save from before the followed hull's far body was kept at
+    her truth (package 60, the design's §9.2; the lead's ruling of 2026-11-12) that was
+    played aboard another ship than her first (`--ship`, or `follow` of another hull): her
+    body stood off her hull there and stands at it here, so the ships about her see another
+    sea and the game parts from the one played. No legacy mode: said, not hidden."""
+    if data.get("followed_body"):
+        return []
+    away = False
+    for entry in data.get("inputs") or []:
+        line = entry.get("line") if isinstance(entry, dict) else None
+        if not isinstance(line, dict):
+            continue
+        kind = str(line.get("kind") or "")
+        ship = (line.get("data") or {}).get("ship")
+        if kind == "driver.left" or (
+            kind == "driver.follow" and ship not in (None, "", "the ship")
+        ):
+            away = True
+            break
+    if not away:
+        return []
+    goes_on = (
+        "the game goes on from where it was saved, and from here it is not the game that build "
+        "would have played"
+        if how == "checkpoint"
+        else "the replay agrees with the game as played for its first minutes aboard her and "
+        "parts from it after"
+    )
+    return [
+        "This save is from a build before the followed ship's body was kept at her truth, and "
+        "was played aboard another ship than her first: her body stood off her hull then and "
+        f"stands at it now, so the ships about her see another sea; {goes_on}."
+    ]

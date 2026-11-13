@@ -1,0 +1,389 @@
+EXTRACT, not the whole volume (FreeSail package 110). Richard Peters, ed., The Public Statutes at Large of the United States of America, vol. I, Boston, Little and Brown, 1848 printing.
+The whole volume's OCR: https://archive.org/details/sim_united-states-united-states-statutes-at-large_1789-1799_1 (its _djvu.txt). Only the passages the design note
+docs/design/Design-SlaveryAndSuppression.md cites are kept, each whole, with the page
+heads as the OCR gives them; the line numbers are those of the whole volume's OCR text.
+
+===== the Act of 22 March 1794, pp. 347 to 349, the whole Act with the editor's notes (The Antelope among them); lines 75695 to 76075 of the whole OCR =====
+
+
+
+
+
+
+Srature L 
+
+
+Cuap. XI.—An Act to prohibit the carrying on the Slave Trade from the United yfarch 22, 1794. 
+States to any foreign place or couniry.(a) ——___————_ 
+
+
+Section 1. Be it enacted by the Senate and House of Representatives Forfeiture of 
+
+
+of the United States of America in Congress assembled, That no citizen > on aaa 
+or citizens of the United States, or foreigner, or any other person com- trade. 
+
+
+(a) The acts prohibiting and punishing the Slave trade, are: An act to prohibit the carrying on the 
+slave trade from the United States to any foreign place or country, March 22, 1794, chap. 11; an act in 
+addition to the act entitled, ‘‘ An act to prohibit the carrying on the slave trade from the United States to 
+any foreign place or country,” May 10, 1800; an act to prevent the introduction of certain persons into 
+certain states, where by the laws thereof their admission is prohibited, February 28, 1803, chap. 10; an 
+act to prohibit the importation of slaves into any port or place within the jurisdiction of the United States 
+from and after the first of January one thousand eight hundred and eight, March 2, 1807, chap. 22; an 
+act in addition to an act entitled, ‘‘ An act to prohibit the importation of slaves within the jurisdiction of 
+the United States from and after the first day of January one thousand eight hundred and eight,”’ April 
+20, 1818, chap. 91; an act to continue in force ‘‘an act to protect the commerce of the United States, 
+and punish the crime of piracy,” and also to make further provision for punishing the crime of piracy, 
+May 15, 1820, chap. 113, sec. 4, 5. 
+
+Decisions of the Courts of the United States on the acts prohibiting and punishing the Slave Trade—A 
+libel or information under the 9th section of the slave trade act of March 2, 1797, alleging that the ves- 
+sel sailed from the port of New York and Perth Amboy, without the captain having delivered the mani- 
+fest required by law, to the collector or surveyor of the port of New York and Perth Amboy, is defective; 
+the act requiring the manifest to be delivered to the collector or surveyor of a single port. The Mary 
+Ann, 8 Wheat. 380; 5 Cond. Rep. 471. 
+
+Under the same section, the libel must charge the vessel to be of the burthen of forty tons or more. 
+In general it is sufficient to charge the offence in the words directing the forfeiture. But if the words are 
+general, embracing a whole class of individual subjects, they must necessarily be so construed as to em- 
+brace only a subdivision of that class; the allegation must conform to the legislative sense and meaning. 
+Ibid. 
+
+The prohibitions in the slave trade acts of May 10, 1800, and April 20, 1818, extend as well to carry- 
+ing slaves on freight, as to cases where the persons transported are the property of the United States; 
+and the carrying of them from one port to another of the same foreign empire, as well as from one 
+foreign country to another. The Merino, 9 Wheat. 391; 5 Cond. Rep. 623. 
+
+Under the 4th section of the act of May 10, 1800, the owner of the slaves transported contrary to the 
+
+rovisions of that act, cannot claim the same in a court of the United States, although, according to the 
+lagen of his own country, they may be held in servitude. But if at the time of capture by a commis- 
+sioned vessel, the offending ship was in the possession of a non-commissioned captor, who had made a 
+seizure for the same offence, the owner of the slaves may claim them; the section only applying to per- 
+sons interested in the enterprise or voyage in which the ship was employed, at the time of such capture. 
+Ibid. 
+
+Under the slave trade act of 1794, sec. 1, it is not necessary, in order to incur the forfeiture, that the 
+vessel shall be completely fitted and ready for sea. As soon as the preparations have proceeded so far 
+as clearly to manifest the intention, the right of seizure attaches. The Emily and Caroline, 9 Wheat. 
+381; 5 Cond. Rep. 623. 
+
+The African slave trade is a trade which has been authorized and protected by the laws of all com- 
+mercial nations. The right to carry it on has been claimed by each, and exercised by each ; and it there. 
+fore cannot be considered as contrary to the laws of nations. The slave trade remains lawful to those 
+nations which have not forbidden it. The Antelope, 10 Wheat. 66; 6 Cond. Rep. 30. 
+
+If the slave trade is not contrary to the laws of nations, it cannot be piracy, unless so declared by 
+statute ; and the obligations of such statute cannot exceed the power of the state which has enacted it. 
+Thid. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+348 THIRD CONGRESS. Sess. I. Cu. 11. 1794, 
+
+
+No vessels to ing into, or residing within the same, shall, for himself or any other 
+
+
+be built or fitted Z , i 
+‘tn ere. Coe whatsoever, either as master, factor or owner, build, fit, equip, 
+
+
+the slave trade. load or otherwise prepare any ship or vessel, within any port or place of 
+the said United States, nor shall cause any ship or vessel to sail from 
+
+
+A foreign vessel engaged in the slave trade, captured on the high seas, in time of peace, by an Ameri- 
+can cruiser, and brought in for adjudication, will be restored, even where the vessel belongs to a nation 
+which has prohibited the trade. Ibid. 
+
+The right of visitation and search does not exist in time of peace. A vessel engaged in the slave trade 
+in time of peace, even if belonging to a nation which has prohibited the trade, cannot, for that cause 
+alone, be seizec 1 on the high seas, and brought in for adjudication in the courts of another country. But 
+if the laws of that other country be violated, or the proceeding be authorized by treaty, the capture is not 
+illegal, Ibid. 
+
+Africans who are first captured by a belligerent privateer. fitted out in violation of our neutrality, or 
+by a pirate, and then recaptured and brought into the ports of the United States, under a reasonable 
+suspicion that a violation of the slave trade acts was inte nded, are not to be re stored without full proof 
+of the propriet: ury interests; for in such a case the capture is lawful. And whether in such a case resti- 
+tution ought to be decreed or not, was a question on which the court was equally divided. Ibid. 
+
+The District Courts have jurisdiction under the slave trade acts, to determine who are the actual cap- 
+tors, under a state law made in pursuance of the 4th section of the slave trade act of 1807; and direct- 
+ing the proceeds of the negroes to be paid, ‘‘one moiety for the use of the commanding officer of the 
+capturing vessel,” &c. The Josefa Segunda, 10 Wheat. 312; 6 Cond. Rep. 111. 
+
+Under the 7th section of the slave trade act of 1807, the entire proceeds of the vessel are forfeited to 
+the use of the United States; unless the seizure be made by armed vessels of the navy, or by revenue 
+cutters; in which case distribution is to be made in the same manner as prizes taken from the ene my. 
+Ibid. 
+
+Upon an indictment under the slave trade act of April 20, 1818, against the owner of the ship, testimony 
+of the declarations of the master, being a part of the res geste, connected with acts in furtherance of the 
+voyage and within the scope of his authority as the agent of the owner, in the conduct of the guilty enter- 
+prise, is admissible. Upon such an indictment against the owner, charging him with fitting out the ship, 
+with an intent to employ her in the illegal voyage, evidence is admissible that her commander authorized, 
+and directed the fitment through the instrumentality of his agent, without being personally present. The 
+United States v. Gooding, 12 Wheat. 460 ; 6 Cond. Rep. 572. 
+
+It is not essential to constitute the fitting out, under the acts of Congress, that every equipment 
+necessary for a slave voyage, or any equipment peculiarly adapted to such a voyage, should be taken on 
+board. It is sufficient if the vessel is actually fitted out with intent to be employ ed in the illegal voyage. 
+The offence may be Jaid in the words of the statute. Ibid. 
+
+Nor is it necessary that there should be some principal offender, to whom the defendant might be aid- 
+ing and abetting. Those terms in the statute do not refer to the relation of principal and accessory in 
+cases of felony, but to the actor; and they who aid and abet the act, are considered as principals. The 
+offence must be alleged to have been committed within the United States. Ibid. 
+
+Under the act of March 22, 1794, prohibiting the slave trade, if the original object and equipment of 
+the voyage from the United St: ates, was tocarry on the African slave trade, the forfeiture attaches, whether 
+the vessel was then owned by American citizens or by foreigners. It is equally unimportant if the act 
+was done by the party, suo jure, or for the benefit of another. The Margaret, 9 Wheat. 421; 5 Cond. 
+Rep. 638. 
+
+Even if the equipments are innocent, and adapted to ordinary voyages, if there is positive proof of a 
+guilty intention, forfeiture will attach. Nor is it necessary that the equipments shall have been com- 
+pleted. It is sufficient if any preparations have been made for the unlawful voyage. Ibid. 
+
+Under the 2d and 3d sections of the act of April, 1818, the offence of sailing from a port to engage in 
+the slave trade, is not committed unless the vessel sails out of the port. United States v. La Coste, 2 
+Mason’s C. C. R. 129. 
+
+If a foreign claimant of a vessel seized for being engaged in the slave trade, sets up a title derived 
+from an American owner, he must prove affirmatively that the case has no admixture of American owner- 
+ship. United States v. La Jeune Eugenia, 2 Mason’s C. C. R. 409. 
+
+The Ist section of the slave trade act of May 10, 1800, prohibits not only the transportation of slaves, 
+but the being employed on the business of the elave trade; and therefore a vessel caught in such trade, 
+one before she has taken on board any slaves, is liable to forfeiture. The Alexander, 3 Mason’s C. 
+
+. R. 175. 
+
+“The offence against the law of the United States, under the 7th section of the act of March 2, 1807, 
+is not that of importing or bringing into the United States persons of colour, with intent to ‘hold or sell 
+those persons as slaves, but that of hovering on the coast of the United States with such intent; and 
+althouzh it forfeits the vessel and any goods or effects found on board, it is silent as to disposing of any 
+persons found on board, any further than to impose a duty upon the officers of any armed vessels, who 
+make the capture, to keep them safely, to be delivered to the overseers of the poor, or to the governor 
+of the state, or persons appointed by ‘the re spective states to receive them, United States v. Preston, 3 
+Peters, 57. 
+
+Certain persons who were slaves in Louisiana, were, by their owners, taken to France as servants, and 
+after some time, they, by their own consent, were sent back to Louisiana, The ships in which these 
+persons were passengers, were, after the arrival of the vessels in the United States, libelled for alleged 
+breaches of the act of Congress of April 20, 1818, prohibiting the importation of slaves into the United 
+States. Held that the provisions of the act of Congress do not apply to such cases, The United States 
+v. Garonne, 1] Peters, 73. 
+
+The act of March 22, 1794, was intended to prohibit any citizen or resident of the United States from 
+equipping vessels within the U nited States, carrying on trade or traffic in slaves to any foreign country. 
+The Tryphemen, 1 Wash. C. C. R. 52 
+
+The act of May 10, 1800, extends the prohibitions to citizens of the United States, in any manner con- 
+
+
+
+
+
+
+
+
+THIRD CONGRESS. Szss.I. Ca. 11. 1794. 
+
+
+any port or place within the same, for the purpose of carrying on any 
+trade or traffic in slaves, to any foreign country; or for the purpose of 
+procuring, from any foreign kingdom, place or country, the inhabitants 
+of such kingdom, place or country, to be transported to any foreign 1800, ch. 51. 
+country, port, or place whatever, to be sold or disposed of, as slaves: 
+And if any ship or vessel shall be so fitted out, as aforesaid, for the said 
+purposes, or shall be caused to sail, so as aforesaid, every such ship or vessel, 
+her tackle, furniture, apparel and other appurtenances, shall be forfeited 
+to the United States; and shall be liable to be seized, prosecuted and 
+condemned, in any of the circuit courts, or district court for the district 
+where the said ship or vessel may be found and seized. 
+
+Sec. 2. And be it further enacted, That all and every person, so Forfeiture on 
+building, fitting out, equipping, loading, or otherwise preparing, or send- Persons aiding 
+ing away, any ship or vessel, knowing or intending that the same shall map aodibees 
+be employed in such trade or business, contrary to the true intent and 
+meaning of this act, or any ways aiding or abetting therein, shall seve- 
+rally forfeit and pay the sum of two thousand dollars, one moiety thereof 
+to the use of the United States, and the other moiety thereof to the use 
+of him or her who shall sue for and prosecute the same. 
+
+Sec. 3. And be it further enacted, That the owner, master or factor _‘In what cases 
+of each and every foreign ship or vessel, clearing out: for any of the ower oo 
+coasts or kingdoms of Africa, or suspected to be intended for the slave shall aon tent 
+trade, and the suspicion being declared to the officer of the customs, by 
+any citizen, on oath or affirmation, and such information being to the 
+satisfaction of the said officer, shall first give bond with sufficient sure- 
+ties, to the treasurer of the United States, that none of the natives of 
+Africa, or any other foreign country or place, shall be taken on board 
+the said ship or vessel, to be transported, or sold as slaves, in any other 
+foreign port or place whatever, within nine months thereafter. 
+
+Sec. 4. And be it further enacted, That if any citizen or citizens of —_ Forfeiture for 
+the United States shall, contrary to the true intent and meaning of this receiving per- 
+act, take on board, receive or transport any such persons, as above pay: Banged a ven 
+described, in this act, for the purpose of selling them as slaves, as afore- gjayes. 
+said, he or they shall forfeit and pay, for each and every person, so 
+received on board, transported, or sold as aforesaid, the sum of two 
+hundred dollars, to be recovered in any court of the United States pro- 
+per to try the same; the one moiety thereof to the use of the United 
+States, and the other moiety to the use of such person or persons, who 
+shall sue for and prosecute the same. 
+
+Approvep, March 22, 1794. 
+
+
+cerned in this kind of traffic, either by personal service on board of American or foreign vessels wherever 
+equipped, and to the owners of such vessels, citizens of the United States. Ibid, 
+
+The act of Congress declares that ‘‘no person shall build, fit, equip, load, or otherwise prepare any 
+ship or vessel, to sail from any port of the United States, for the purpose of carrying on any trade or 
+traffic in slaves to any foreign country.’? And it declares that “if any ship or vessel shall be so fitted 
+out as aforesaid, or shall be caused to sail as aforesaid, such ship or vessel shall be forfeited to the United 
+States.”» And the 2d section inflicts a penalty of two thousand dollars on any person who shall build, fit 
+out, &c., any ship or vessel knowing or intending that the same shall be so employed. Held, 1. That 
+the forfeiture of the vessel is not incurred by the building of the vessel for the illegal purpose aforesaid, 
+but only for the fitting out and causing her to sail as aforesaid. 2. An information against the vessel 
+which charges that ‘ she was built, fitted, equipped, loaded, or otherwise prepared, or caused to sail,’ 
+&c., is bad for uncertainty as to which of the several offences is charged, and on such information, a for- 
+feiture ought not to be pronounced. The Brig Caroline, 1 Brockenb. C. C, R. 384. 
+
+The act of Congress of February 28, 1803, forbidding any master or captain of a ship or vessel, to 
+import or bring into any port of the United States, any negro, mulatto, or person of colour, under cer- 
+tain penalties, where the admission of such persons is prohibited by the laws of such state, does not 
+apply to coloured seamen employed in navigating such ship or vessel. The Brig Wilson, 1 Brockenb. C. 
+C. R. 423. 
+
+If under the act of April 22, 1818, sec. 2, 3, the offence of causing a vessel to sail from the United 
+States, with an intent, be alleged in an indictment to be on a day now last past, and on divers days before 
+and since that day, the allegation is sufficient. United States v. La Coste, 2 Mason's C.C. R 129. 
+
+It is not necessary in an indictment on the act of 1818, to aver the defendant knowingly committed the 
+offence. United States v, Smith, 2 Mason’s C. C. R. 143. 
+
+2G 
+
+
+

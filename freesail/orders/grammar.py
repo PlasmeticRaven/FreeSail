@@ -193,6 +193,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "fight",  # package 73: the marines, the small arms and the boarders
         "boat",  # package 82: the boat's mark to pull for
         "prize",  # package 74: the ship taken possession of, the prisoners, the prize burnt
+        "command",  # package 60: the ship he takes command of, the old ship settled
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by

@@ -50,7 +50,7 @@ from typing import Any
 from freesail import units
 from freesail.core.events import Severity
 from freesail.crew.model import Crew, Rating, Sailor, Station, Watch, number_words
-from freesail.world.ships import PLAYER_ID
+from freesail.world.hulls import players_id
 
 __all__ = [
     "COVER_NM",
@@ -616,8 +616,8 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
 
     vessel.role = role
     brain = getattr(vessel, "brain", None)
-    if brain is None and str(getattr(vessel, "id", "")) == PLAYER_ID:
-        brain = None  # the player's own hull is awake always: no far brain for her
+    if brain is None and str(getattr(vessel, "id", "")) == players_id(world):
+        brain = None  # the player's ship is awake always: no far brain for her (60: his now)
     elif brain is None:
         brain = FarCaptain(_root(world), vessel, words, role=role)
         vessel.brain = brain
@@ -671,7 +671,7 @@ def possess(
     if rec and is_prize(prize) and str(rec.get("nation_was")) == str(captor.nation):
         return retake(world, prize, by=f"{captor.name} coming up", how="retaken", captor=captor)
     captor_hull, prize_hull = _hull(captor), _hull(prize)
-    if str(prize.id) == PLAYER_ID and captor_hull is None:
+    if str(prize.id) == players_id(world) and captor_hull is None:
         # the player's ship taken by a far body (the design's §3.1): her captor is made a
         # hull and woken, a dealing of the first rank under the cap, so that the captive is
         # aboard a real hull with places, a company and a log
@@ -758,7 +758,7 @@ def possess(
             s.at = None
             s.quarters = ""
         remuster(prize_hull, new_crew)
-        if str(prize.id) == PLAYER_ID:
+        if str(prize.id) == players_id(world):
             # the player's person taken aboard the captor (the captive's channel, §3.1)
             from freesail.world.captive import player_taken
 
