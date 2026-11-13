@@ -4205,7 +4205,7 @@
 
   /** The point of a flag's place word on the drawn spars (the top of its hoist), or null where
    *  the ship has no such place (§12.2). */
-  function flagPlace(graph, hull, spars, word) {
+  function flagPlace(graph, hull, spars, word, side) {
     var M = mastsByName(graph);
     var parts = word.split(" ");
     if (word === "peak") {
@@ -4236,6 +4236,23 @@
     }
     if (!mast) return null;
     var chain = mastChain(graph, mast);
+    if (parts[parts.length - 1] === "yardarm") {
+      // package 102 (step 3): a yard's arm, the lower yard's or the named one's ('fore
+      // topsail yardarm'), the arm on `side` (the weather's, as the caller gives it; else
+      // the starboard's); null where the mast crosses no such yard
+      var named = parts.length === 3 ? parts[1] : "";
+      var onMast = chain.map(function (s) {
+        return s.id;
+      });
+      var yard = graph.spars.filter(function (s) {
+        if (s.class !== "yard" || onMast.indexOf(s.parent) < 0) return false;
+        return named ? s.id.indexOf("." + named + ".") > 0 : s.parent === mast.id;
+      })[0];
+      var ry = yard && spars[yard.id];
+      if (!ry || !ry.a || !ry.b) return null;
+      var sgn = side < 0 ? -1 : 1;
+      return sgn * ry.a[1] >= sgn * ry.b[1] ? ry.a : ry.b;
+    }
     if (parts[1] === "truck") return topOf(spars[chain[chain.length - 1].id]);
     if (parts[parts.length - 1] === "masthead") {
       var cls = FLAG_PIECES[parts[1]] || parts[1] + "_mast";
@@ -4252,6 +4269,22 @@
       return v(mid[0], hb * 0.9, mid[2]); // the weather side's sign is set by the caller
     }
     return null;
+  }
+
+  // package 102 (step 3): a signal flag's fly a share of her beam, a signal pendant's longer,
+  // each hoist by its drawing's proportion; the flags of a hoist bent on one under another
+  // with this much of the halyard between (judgement, Design-ViewerAction.md §12.3)
+  var SIGNAL_FLY_OF_BEAM = 0.3, SIGNAL_PENDANT_OF_BEAM = 0.6, SIGNAL_GAP_M = 0.15;
+  function signalSize(hull, flag) {
+    var beam = hull.beam_m || 6;
+    var d = flag.drawing || {};
+    var p = d.proportion || [2, 3];
+    if (d.kind === "pendant") {
+      var pf = beam * SIGNAL_PENDANT_OF_BEAM;
+      return { fly: pf, hoist: (pf * p[0]) / p[1], pendant: true };
+    }
+    var f = beam * SIGNAL_FLY_OF_BEAM;
+    return { fly: f, hoist: (f * p[0]) / p[1] };
   }
 
   function flagSize(hull, graph, flag) {
@@ -4274,7 +4307,7 @@
    *  drooped FLAG_DROOP_DEG, in its drawing's rectangles; nothing at a place the ship lacks. */
   function flagFigures(graph, hull, spars, snapshot) {
     var flags = (snapshot && snapshot.flags) || [];
-    if (!flags.length) return [];
+    if (!flags.length && !((snapshot && snapshot.hoists) || []).length) return [];
     var app = snapshot.wind ? snapshot.wind.apparent_angle : 0;
     var w = windVector(app);
     var lee = norm(v(w[0], w[1], 0));
@@ -4287,7 +4320,23 @@
       var at = flagPlace(graph, hull, spars, flag.place);
       if (!at) return;
       if (flag.place.indexOf("rigging") >= 0) at = v(at[0], weather * at[1], at[2]);
-      var size = flagSize(hull, graph, flag);
+      drawFlag(flag, at, flagSize(hull, graph, flag), "flag." + n, (flag.words || flag.name) + ", at the " + flag.place);
+    });
+    // package 102 (step 3): the signals flying on her own ship (`snapshot.hoists`), each
+    // down its halyard from its place, the uppermost flag first, one under another
+    ((snapshot && snapshot.hoists) || []).forEach(function (h, hn) {
+      var at = flagPlace(graph, hull, spars, h.place, weather);
+      if (!at) return;
+      if (h.place.indexOf("rigging") >= 0) at = v(at[0], weather * at[1], at[2]);
+      var drop = 0;
+      (h.flags || []).forEach(function (flag, j) {
+        var size = signalSize(hull, flag);
+        var words = (flag.words || flag.name) + ", in the hoist " + (h.words || "") + " at the " + h.place;
+        drawFlag(flag, add(at, v(0, 0, -drop)), size, "hoist." + hn + "." + j, words);
+        drop += size.hoist + SIGNAL_GAP_M;
+      });
+    });
+    function drawFlag(flag, at, size, of, words) {
       var down = v(0, 0, -size.hoist);
       var shape = (flag.drawing && flag.drawing.shape) || "";
       function point(fx, fy) {
@@ -4328,11 +4377,11 @@
         polys.forEach(function (sq) {
           if (sq.length < 3) return;
           var pts = sq.map(function (q) { return point(q[0], q[1]); });
-          figs.push({ kind: "flag", id: "flag." + n + "." + k, of: "flag." + n, piece: p.line ? "line" : "", cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: (flag.words || flag.name) + ", at the " + flag.place, pts: pts, sortAt: middle });
+          figs.push({ kind: "flag", id: of + "." + k, of: of, piece: p.line ? "line" : "", cls: "colour-" + (p.colour || "cloth"), part: flag.name, words: words, pts: pts, sortAt: middle });
           k += 1;
         });
       });
-    });
+    }
     return figs;
   }
 
