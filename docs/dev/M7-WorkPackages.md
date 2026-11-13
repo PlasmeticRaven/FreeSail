@@ -4657,8 +4657,7 @@ the fast tier exit 0, the slow tier of the touched files and the known truths 44
 and 8 xfailed with the recorded passages to their digests, the pace 12; the lead's fast
 tier on the merged trial (2026-11-13, 00:38 to 01:34 UTC, begun again after the container
 was replaced) 7,502 passed and 1 xfailed, exit 0; lint and the name sweep clean; the
-loader's change read by the lead. **No pin moved.** The whole suite in the cloud after run
-74, the figures to follow. **Next: step 2** (the region; its measurement accepted on
+loader's change read by the lead. **No pin moved.** The whole suite in the cloud, run 74 (2026-11-13, 02:10 to 03:18 UTC, on 5c334d22): green whole, lint, the six shards and the pace job. **Next: step 2** (the region; its measurement accepted on
 2026-11-12: one region of 29.3 MB, six gauges).
 
 ### Package 109, step 1 (the words that did nothing), as merged (2026-11-13)
