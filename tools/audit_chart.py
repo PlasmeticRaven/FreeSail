@@ -98,7 +98,11 @@ FULL_STEP_DEG = 0.05
 # The seas a region's tide is of (JUDGEMENT, from the gauges' ranges as the constituents'
 # file gives them: the Channel's and Biscay's and Portugal's metres, the islands' half
 # metre, the Mediterranean's centimetres). A gauge's sea is its first block's; the eleven
-# are the Channel's. The Strait meets both the Atlantic and the Mediterranean.
+# are the Channel's. The Strait meets both the Atlantic and the Mediterranean. Every region
+# of the manifest and every tide region is named here, so that each new block names its sea
+# as it comes in: a region the table lacks is a finding (`c-no-sea`), its water's tide not
+# judged, never taken for a sea it is not of (the lead's word, package 111; package 112's
+# seas will be its source later).
 SEAS: dict[str, str] = {
     "channel-west": "atlantic",
     "channel-mid": "atlantic",
@@ -110,8 +114,17 @@ SEAS: dict[str, str] = {
     "strait": "strait",
     "madeira": "madeira",
     "azores": "azores",
+    "mediterranean-west": "mediterranean",
+    "balearics": "mediterranean",
+    "gulf-of-lion": "mediterranean",
+    "ligurian-sea": "mediterranean",
+    "tyrrhenian": "mediterranean",
+    "catalan-coast": "mediterranean",
+    "sardinian-sea": "mediterranean",
+    "tunis-coast": "mediterranean",
+    "asinara-west": "mediterranean",
 }
-MEDITERRANEAN = "mediterranean"  # every region the table above does not name
+MEDITERRANEAN = "mediterranean"
 SEAS_THAT_MEET = {"strait": {"atlantic", "mediterranean", "strait"}}
 # A share of the blend's weight from gauges of another sea above which the water's tide
 # is called another sea's (JUDGEMENT: the larger part).
@@ -231,8 +244,9 @@ def in_box(lat: float, lon: float, b: tuple[float, float, float, float]) -> bool
     return b[0] <= lat <= b[1] and b[2] <= lon <= b[3]
 
 
-def sea_of(region: str) -> str:
-    return SEAS.get(region, MEDITERRANEAN)
+def sea_of(region: str) -> str | None:
+    """The sea a region's tide is of, or None where `SEAS` does not name it."""
+    return SEAS.get(region)
 
 
 def grid_points(box: tuple[float, float, float, float], step: float) -> list[tuple[float, float]]:
@@ -605,10 +619,38 @@ def check_tide(audit: Audit, chart: Chart, tide: T.Tide, water: Water, step: flo
     gauge_sea: dict[str, str] = {}
     for g in tide.gauges:
         gauge_sea[g.id] = "atlantic"
+    unnamed: dict[str, list[str]] = defaultdict(list)
     for g in tide.block_gauges:
-        gauge_sea[g.id] = sea_of(g.blocks[0])
+        sea_g = sea_of(g.blocks[0])
+        if sea_g is None:
+            unnamed[g.blocks[0]].append(g.id)
+        gauge_sea[g.id] = sea_g or f"(no sea named: {g.blocks[0]})"
+    for block, ids in sorted(unnamed.items()):
+        if block not in chart.regions:
+            audit.add(
+                Finding(
+                    "c",
+                    f"c-no-sea:{block}",
+                    block,
+                    len(ids),
+                    f"the tide region {block}, whose gauges are {', '.join(ids)}, names no "
+                    "sea in the audit's table of seas (`SEAS`): its gauges' sea is not judged",
+                )
+            )
     for region in chart.regions:
         sea = sea_of(region)
+        if sea is None:
+            audit.add(
+                Finding(
+                    "c",
+                    f"c-no-sea:{region}",
+                    region,
+                    1,
+                    f"{region} names no sea in the audit's table of seas (`SEAS`): its "
+                    "tide is not judged until the block names its sea",
+                )
+            )
+            continue
         accept = SEAS_THAT_MEET.get(sea, {sea})
         far: list[tuple[float, float, float]] = []
         other: list[tuple[float, float, float]] = []

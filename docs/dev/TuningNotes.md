@@ -27337,3 +27337,13 @@ and stream counts (the bigger regions), the overlap 1,443 to 1,503, ligurian-sea
 4,992 to 5,120, the Tyrrhenian's level 7,260 to 7,171. Truths 7-560 and 7-564 moved, old
 beside new in their docstrings: three moorings on the ground where there were thirteen and a
 road, one shore afloat, and the Ligurian sea among the split and the boxless.
+
+**The seas named, not defaulted** (the lead's word for 2a, 2026-11-13). The audit's table of
+seas (`SEAS` in `tools/audit_chart.py`) had called every region it did not name the
+Mediterranean's. The Canaries, the Salvages and the Moroccan blocks now building would then
+have been held to the Mediterranean's level ceiling and told their own gauges were another
+sea's. The table now names every region of the manifest and every tide region. A region or
+tide region it lacks is a finding, `c-no-sea:<region>`, and its tide is not judged until the
+block names its sea. The table stays in the tool until package 112's `seas.yaml` becomes its
+source. A planted test (a box over the Canaries) proves the finding, and another holds the
+table to name every region and tide region of the manifest. The full sweep finds nothing new.
