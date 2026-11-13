@@ -35,9 +35,10 @@ anchorage:
   lon_deg: 14.2638
   depth_fathoms: 16
 mooring:
+  # package 111 (the lead's ruling): moved onto its sounding
   name: within the mole
-  lat_deg: 40.8350     # the grid's 3 m within the mole (judgement)
-  lon_deg: 14.2587
+  lat_deg: 40.83417     # the grid's 7.5 m within the mole, 116 m from the 3 m of before
+  lon_deg: 14.25953
   depth_fathoms: 4
   bottom: mud
 shore:
