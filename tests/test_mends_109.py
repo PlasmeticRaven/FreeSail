@@ -418,4 +418,9 @@ def test_the_drawing_served_is_the_followed_hulls_or_says_why_she_is_not_drawn()
     assert boat["name"] != own
     w.own.awake = False  # as a sleeping hull is, the far shape's
     far = ship_drawing(w)
-    assert far is not None and "far shape" in far["undrawn"], far
+    # her words the world's (the lead's ruling with step 5), was "she is not drawn as she
+    # stands; she sails in the far shape, her sails her file's and not as they are set"
+    assert far is not None and far["undrawn"] == (
+        "she is not seen closely enough to draw her sails as they are set"
+    ), far
+    assert "far shape" not in far["undrawn"] and "file" not in far["undrawn"]
