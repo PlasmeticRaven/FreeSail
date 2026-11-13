@@ -26680,6 +26680,37 @@ moved; no game line about a hoist or the colours moved (a hoist with no place sa
 main" as before; the record and the pickle carry no place while unset). The tree reported
 differs from 97d4650 by this paragraph alone.
 
+**Step 4: dress ship.** `data/signals/basic/dressing.yaml`, two dated fashions: 'in the
+rigging' to 1883 (Röding 1794, Babron 1817, Spain 1748 art. XXV, Perrin pp. 196-197): her
+ensigns and jack at the lower yardarms, her book's signal flags at the topsail yardarms,
+along the lower and topmast stays (three to a stay) and in the shrouds, her pendants at the
+topgallant yardarms, one flag of each, no flag at a truck; the rainbow from 1884 (Luce):
+six flags to each span from the jackstaff over the trucks to the peak, her ensign at each
+truck. Which flag at which place: JUDGEMENT (no source gives an order before 1889, "a junior
+officer's scheme"). A King's ship's stock is her colours' ensigns of the navy, her jack, her
+book's flags of the year and her pendants; a merchantman's her colours (she dresses with one
+ensign: what else she carries is package 96's locker). **Left out for package 96:** another
+nation's ensigns, which the period hung (Perrin p. 197: "including national flags of other
+nations"), are in no nation's data of hers. **Not drawn:** the waist cloths (Röding: red
+bordered white or yellow for the English; the French King's blue sown with yellow lilies,
+1765 art. CCXXXV), the viewer having no cloth on the rail. Dressed until `undress ship`,
+sunset (JUDGEMENT after Luce 1884 and the colours' sunset in Spavens 1796), or the colours
+coming down, said in the log; refused by night, with the colours down, and below. **Seen in
+the browser** (`tests/browser_plans/dressed.yaml`): the frigate's ensigns and jack at the
+lower yardarms, the numerals at the topsail yardarms, flags along the fore, main and mizen
+stays, the pendants at the topgallant yardarms, the shrouds bare (her stock spent); undressed,
+nothing but her colours.
+
+**Step 4: the measure.** At 01885a5 (step 4 with the trunk at 90cb075, step 3 merged as
+d01d1a4, merged by a merge commit; the step's paragraph above): ruff check and format clean
+(385 files); the fast tier 7,572 passed, 1 xfailed, 0 failed (the trunk's chart audit
+among them, untouched); the slow tier of the touched files and of `test_known_truths`
+(step 3's nine and test_primer, whose orders block dresses and undresses a ship; `--slow -m
+"not pace"`) 1,714 passed, 8 xfailed, 0 failed; pace alone and last on the same files, 12
+passed. No digest moved; no game line about a hoist or the colours moved (the locker's
+`dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
+records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
