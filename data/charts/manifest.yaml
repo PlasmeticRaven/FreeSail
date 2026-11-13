@@ -3934,10 +3934,10 @@ regions:
   madeira:
     title: Madeira, Porto Santo and the Desertas
     bounds:
-      south: 32.0
-      north: 33.5
-      west: -17.5
-      east: -16.0
+      south: 31.60001
+      north: 33.73333
+      west: -17.86666
+      east: -15.73334
     levels:
     - 2
     - 3
@@ -4613,10 +4613,10 @@ regions:
   azores:
     title: The Western Islands (the Azores)
     bounds:
-      south: 36.5
-      north: 40.0
-      west: -31.5
-      east: -24.5
+      south: 36.29334
+      north: 40.13333
+      west: -31.51999
+      east: -24.26667
     levels:
     - 2
     - 3
@@ -8536,7 +8536,7 @@ regions:
       south: 40.56
       north: 44.5
       west: 3.0
-      east: 7.73
+      east: 7.73333
     levels:
     - 2
     - 3
@@ -9382,8 +9382,8 @@ regions:
     bounds:
       south: 41.0
       north: 44.5
-      west: 7.74
-      east: 11.0
+      west: 7.73334
+      east: 11.1466
     levels:
     - 2
     - 3
@@ -14085,6 +14085,13 @@ tide_regions:
       north: 38.85333
       west: 15.84
       east: 16.69332
+  asinara-west:
+    title: 'The sea west of the Asinara: a tide region, no tiles'
+    bounds:
+      south: 40.56
+      north: 41.0
+      west: 7.73334
+      east: 8.0
 world:
   level: 0
   bounds:

@@ -246,7 +246,9 @@ def test_fayals_channel_is_in_the_directions_and_the_open_sea_between_has_no_sta
     assert book.area_at(Position(38.0, -27.0)) is None  # the islands' box, no area
     assert book.area_at(Position(40.0, -15.0)) is None  # the ocean between
     assert book.area_at(Position(49.3, -5.0)).id == "mid-channel"  # the Channel as before
-    assert (36.5, 40.0, -31.5, -24.5) in book.boxes
+    # package 111's step 2a drew the islands' box to the region's own bounds (its tiles'
+    # edges); it was (36.5, 40.0, -31.5, -24.5)
+    assert (36.29334, 40.13333, -31.51999, -24.26667) in book.boxes
 
 
 def test_a_tile_is_written_with_its_entries_dated_alike_so_the_same_arrays_give_the_same_bytes(

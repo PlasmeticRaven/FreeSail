@@ -273,3 +273,22 @@ def test_the_report_is_by_region_and_marks_what_the_list_lacks(sampled):
     text = A.report(sampled, known)
     assert "== tyrrhenian" in text and "== seconds:" in text
     assert "\n! " not in text  # nothing unlisted
+
+
+def test_a_region_with_no_sea_named_is_a_finding_and_not_the_mediterraneans(chart):
+    """(c) A block whose sea the audit's table does not name is said so (`c-no-sea`) and its
+    tide not judged, never held to the Mediterranean's ceiling by default (the lead's word,
+    package 111): a box over the Canaries' water under a name the table does not hold, as a
+    block building there would bring (the Canaries' own name the table's since package 106a)."""
+    from freesail.world import tide as T
+
+    assert "unnamed-block" not in A.SEAS
+    fake_chart = SimpleNamespace(
+        regions=["unnamed-block"], region_bounds={"unnamed-block": (28.0, 28.5, -16.5, -16.0)}
+    )
+    audit = A.Audit()
+    A.check_tide(audit, fake_chart, T.load_tide(), A.Water(chart), 0.25)
+    assert [f.key for f in audit.findings] == ["c-no-sea:unnamed-block"]
+    named = set(A.SEAS)
+    manifest = A.load_manifest()
+    assert set(manifest["regions"]) | set(manifest.get("tide_regions") or {}) <= named

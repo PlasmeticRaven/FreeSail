@@ -866,6 +866,33 @@ their tile edges (104's finding). What it found, for the next blocks:
   Messina's British years in its pilot's words and its yard; Reggio's and Scilla's holders
   France's from 1806 by their rows, Scilla's castle British from 1806 to February 1808.
 
+## What a new block runs before it reports (package 111)
+
+**The audit, clean or declared.** `python tools/audit_chart.py --known` reads the whole
+chart as the game reads it and prints its findings by region, each marked `!` that
+`data/charts/audit-known.yaml` lacks; `--full` is the slow tier's sweep. A block runs it
+after its build and before its report, and comes in in one of two ways: **clean** (no `!`,
+and `tests/test_chart_audit.py` green in both tiers), or **declared**: each finding its
+block adds entered in the known list with its key, its place, its reason in a line, its
+owner (the package) and its count as `most`, and named in the report for the lead to rule.
+A block that mends a listed finding takes its entry out (the slow tier fails on a listed
+finding no longer found) and lowers a count's ceiling where it shrinks it. The list is
+findings owned, never a way round a failure.
+
+What the eight checks ask of a block, so that it comes in clean: (a) its bounds on its
+tiles' edges where open water lies beyond, and abutting its neighbours' exactly (no water
+of its tiles that no region's bounds hold; no two regions claiming one box); (b) no water
+of its bounds that only the corridor answers, and its coast meeting its neighbours' at the
+seam; (c) a gauge of its own sea with its level read, or its neighbours' by the rule of the
+seams and the gaugeless blocks; (d) its water in a box of the climatology, and the box's
+edges on the region's; (e) its box in `book_limits` and a statement and a stream area over
+all its water; (f) every port's spots on water that fits the file (a drying harbour no
+higher than the file has it), its shore by the land, its depths within the band of the
+grid's or the spot on its sounding, and its way in and out clear of the land by the game's
+own guard (`tracks:` where a straight line is not); (g) no mark of the land afloat nor
+danger ashore beyond the grid's grain, an islet the grid lacks given as one, every light
+dated; (h) its scenario starting on its water.
+
 ## The ocean carried south, the Canaries and the Salvages (package 106a, as built)
 
 `canaries` (27.33334 to 29.46666 N, 18.29332 to 13.17334 W, 60 level-2 tiles, 12.5 MB) and
@@ -886,9 +913,11 @@ next blocks (106b's African coast first):
   only where the corridor's block has none. Truth 7-521 reads every corridor cell through
   the new path and finds it its own. Within a cell of the corridor's data edge a bilinear
   read now finds its four corners known: the seam, 14 points of 10,000 sampled, all on
-  31 54 N. The layer's north bound sits at the corridor's data edge (31.9 N), below
-  Madeira's south bound, so that the tide's open edges (`charted_bounds`) see no new
-  charted water beyond Madeira. `.gitignore` lets its folder through as the corridor's.
+  31 54 N. The layer's north bound sits at the corridor's data edge (31.9 N). Since package
+  111's step 2a Madeira's south bound is 31.60001 N and the layer opens that edge to the
+  tide (`charted_bounds`); Madeira's tide does not move (11,449 points old beside new), the
+  seam's taper being laid only where the eleven are within reach, and they are 1,300 miles
+  off. `.gitignore` lets its folder through as the corridor's.
   **Carry it further the same way**: to 12.4 N (the Cape Verde Islands) it measured 9 tiles
   and 1.9 MB more (10 and 2.05 MB with a column from 26.4 W), none of the corridor's moved.
 - **The bound a hair inside the tile edges** (104's rule) took the brief's 91 tiles to 60.

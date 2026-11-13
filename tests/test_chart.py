@@ -937,8 +937,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # Tyrrhenian's block 15.5 E (package 79d), Sicily and Malta's 16.69332 E (package 105:
     # Calabria's toe to Cape Spartivento; old: 15.5 E, the Tyrrhenian's)
     west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
-    # package 106a: the south limit the ocean carried south's, the Canaries' row of the
-    # level-1 grid a hair inside its edge (25.2 N); it was 32 N, the corridor's
+    # package 111's step 2a: Madeira's south bound to its tiles' edge, 31.60001 N (was 32.0);
+    # package 105: the east to 16.69332 E (was 15.5); package 106a: the south limit the ocean
+    # carried south's, the Canaries' row of the level-1 grid a hair inside its edge (25.2 N)
     assert manifest["charts"][WHOLE]["corridors_beside"] == ["atlantic-south"]
     assert whole.bounds == (25.2001, 51.5, west, 16.69332)
     assert whole.bounds_words() == f"25.2001 to 51.5 N, {abs(west):g} W to 16.6933 E"

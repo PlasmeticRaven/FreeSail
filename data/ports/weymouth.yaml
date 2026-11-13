@@ -47,8 +47,8 @@ anchorage:
   depth_fathoms: 7
 mooring:
   name: Weymouth harbour
-  lat_deg: 50.6085     # the harbour's mouth between the piers (judgement)
-  lon_deg: -2.4500
+  lat_deg: 50.60961     # the harbour's mouth between the piers (judgement)
+  lon_deg: -2.44458
   depth_fathoms: 1.2   # 'about 7 feet at low ... water spring-tides' within (Imray)
   bottom: soft mud
   deep_draught_ft: 10  # Imray: convenient for vessels not drawing more than 10 feet
