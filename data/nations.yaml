@@ -868,3 +868,12 @@ ports:
   pantelleria: naples
   lampedusa: naples
   ustica: naples
+
+  # the Canaries (package 106a): the King of Spain's through the range (each file's dated row)
+  santa-cruz-de-tenerife: spain
+  orotava: spain
+  las-palmas: spain
+  arrecife: spain
+  santa-cruz-de-la-palma: spain
+  san-sebastian-de-la-gomera: spain
+  cabras: spain

@@ -1,0 +1,16 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"120,-64": [
+"great-salvage",
+"great-salvage-north-shoal",
+"great-salvage-ne-shoals",
+"great-salvage-east-shoals"
+],
+"120,-65": [
+"great-piton",
+"little-piton",
+"pitons-bank"
+]
+}
+}

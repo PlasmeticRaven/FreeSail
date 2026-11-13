@@ -784,6 +784,9 @@ class Locker:
     # loads as it did
     dressed: bool = False
     dressed_since: int = 0
+    # the day the first lieutenant last reminded the captain of a day his nation keeps
+    # (package 102, step 5: 'YYYY-MM-DD'); '' for none, left out of the pickle while ''
+    day_said: str = ""
 
     def __getstate__(self) -> dict[str, Any]:
         """Its state for the checkpoint, the dressing only while she is dressed (package
@@ -792,6 +795,8 @@ class Locker:
         if not state.get("dressed"):
             state.pop("dressed", None)
             state.pop("dressed_since", None)
+        if not state.get("day_said"):
+            state.pop("day_said", None)
         return state
 
     def next_serial(self) -> int:

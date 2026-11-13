@@ -1,0 +1,59 @@
+# FreeSail: the Spanish days on which the King's ships dress (package 102, step 5;
+# docs/design/Design-Signals.md, "The nations' days"). The shape of
+# data/signals/britain/days.yaml (its head says the fields).
+#
+# The Ordenanzas de Su Magestad para su Real Armada (Madrid, 1748; in force until those of
+# 1793, whose volume of the honours and salutes was not found): art. XXV, "En los dias de mi
+# Nombre, Cumple-Años, en los de la Reyna, y otras Festividades, se pondrán los Navios de Gala,
+# largando (segun costumbre) sus Vanderas, y Gallardetes"; art. XXXIX, on the King's name day
+# and birthday and the Queen's, "triplicada Salva de veinte y un Cañonazos cada una" by every
+# ship in a port of his dominions or a foreign one, at the time the senior commander judges;
+# art. XL, a triple salute on Corpus Christi and on Santiago, one on Easter Day (Corpus and
+# Easter are movable feasts the game does not reckon: left out). The salute is not fired by
+# the game (the tuning notes, package 102, step 5). The kings' and queens' days and the years
+# of their reigns FROM MEMORY; Santiago's day, 25 July, FROM MEMORY.
+
+nation: spain
+days:
+  - name: "the King's name day, San Carlos"
+    date: "11-04"
+    years: "1789-1807"
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XXV (dressed 'de Gala') and XXXIX (a triple salute of twenty-one); Charles IV's name day and reign FROM MEMORY"
+  - name: "the King's birthday"
+    date: "11-11"
+    years: "1789-1807"
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XXV and XXXIX; Charles IV's birthday (11 November 1748) FROM MEMORY"
+  - name: "the Queen's name day, San Luis"
+    date: "08-25"
+    years: "1789-1807"
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XXV and XXXIX ('en los de la Reyna'); María Luisa's name day FROM MEMORY"
+  - name: "the Queen's birthday"
+    date: "12-09"
+    years: "1789-1807"
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XXV and XXXIX; María Luisa's birthday (9 December 1751) FROM MEMORY"
+  - name: "the King's name day, San Fernando"
+    date: "05-30"
+    years: "1808-1833"
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XXV and XXXIX; Ferdinand VII's name day, and his days kept by the juntas in his name from 1808, FROM MEMORY"
+  - name: "the King's birthday"
+    date: "10-14"
+    years: "1808-1833"
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XXV and XXXIX; Ferdinand VII's birthday (14 October 1784) FROM MEMORY"
+  - name: "Santiago, the patron of Spain"
+    date: "07-25"
+    years: ""
+    does: [dress]
+    guns: 63
+    source: "the Ordenanzas of 1748, art. XL (a triple salute on Santiago); that the ships dressed on it, art. XXV's 'otras Festividades', JUDGEMENT; the date FROM MEMORY"

@@ -1,0 +1,147 @@
+# FreeSail: Santa Cruz of Tenerife and its road (package 106a), on package 35's machinery;
+# the marks are the features file's (data/charts/features/canaries.yaml).
+#
+# Sources. Purdy 1825, pp. 215 to 217 (docs/references/pilots/purdy-1825-memoir-atlantic-
+# ocean-ocr.txt): the road the most frequented of the Canaries; the best ground between the
+# middle of the town and a fort a mile north of it, from a cable's length off in 6 to 8
+# fathoms to half a mile off in 35 or 30; bring no part of the town north of west going in,
+# for the calms under the Peak, or drive ashore with no ground for the anchor on the other
+# side (the Oriental Navigator 1801, p. 25, the same words); buoy the cables, the ground foul
+# in places and full of lost anchors (Vancouver 1791; Krusenstern and Lisiansky 1803, who
+# moored in 24 to 30 fathoms eastward of the road on the Captain of the Port's advice, and
+# found the Spaniards alone moor with four anchors by an ancient law); open to the N.E., East
+# and S.E., but a hard blow from them not once in four or five years; the surf beats on the
+# beach for days together and the pier is ill contrived for shelter; water easily had when
+# the surf is down; wine good and plentiful, fruit, vegetables and stock dear (Vancouver,
+# Krusenstern: everything extremely dear, twenty per cent commission, a cask of water a
+# piastre); H.M.S. Tartar (1820) in 26 fathoms, dark sand and mud. Norie 1805, Table XL: Santa
+# Cruz 28 27 30 N; Table XLI p. 248: "Canary Island", high water at 3h on the full and change,
+# no rise given.
+#
+# The datum: UNVERIFIED. No period plan of the road was read; the road is EMODnet's depths
+# at LAT, on its level-3 patch; the gauge's mean level is REDMAR's (data/tides/).
+#
+# FOR SOME YEARS ONLY, in words until 105's dated rows (the rows that wait for them): the
+# quarantine "very rigorously enforced", a bill of health indispensable, from the advices of
+# November 1816 (Purdy p. 217: the regulations then); the town's defence against Nelson's
+# boats in July 1797 (FROM MEMORY, no source on file). Prices FROM MEMORY or JUDGEMENT, in
+# sterling; Krusenstern's of 1803 where the entry says.
+# Slavery (decision 68): Glas 1764 says that several gentlemen of Tenerife held a few
+# enslaved Africans as servants, and that the Count of Gomera kept about a thousand on his
+# lands at Adeje on the island's south-west coast, planting sugar-cane and making sugar (Glas
+# 1764, the description of the islands, p. 353, OCR l. 14740, and l. 10373 to 10381, of the
+# 1760s; the island's law let an enslaved person ill-used by a master oblige him to sell
+# him, p. 353).
+# Said here with its years and its source; no person is a cargo of this port's market or of
+# the business, and no scenario is built on it.
+# The holder, dated (79a's form, `nation:`, one row: Spain's through the whole range; decision
+# 67): Spanish from the conquest to the end of the range and after. Hostile to a King's ship by
+# the nations table's war of December 1804; NOTE (as data/ports/barcelona.yaml's): the table's
+# wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
+# ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
+# mended here, and no truth depends on a war's day. What is true of the port only for some
+# years is written below in its own words, with its years: a port file can date its holder
+# alone until package 105's step 1 (the dated rows for `state`, `closed_to`, `market` and the
+# rest) is on the trunk; the rows waiting for it are named in the head of each file.
+
+nation:
+  - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
+id: santa-cruz-de-tenerife
+name: Santa Cruz de Tenerife
+source: "Purdy 1825, pp. 215 to 217; the Oriental Navigator 1801, p. 25; Norie 1805, Tables XL and XLI"
+datum: unverified
+
+outer_road:
+  feature: santa-cruz-road
+  name: the road of Santa Cruz
+  lat_deg: 28.4737
+  lon_deg: -16.2394
+  depth_fathoms: 30
+anchorage:
+  feature: santa-cruz-road
+  name: the road of Santa Cruz
+  lat_deg: 28.4737
+  lon_deg: -16.2394
+mooring:
+  name: the berth between the town and the castle to the north
+  lat_deg: 28.4740
+  lon_deg: -16.2390    # 200 m east of the modern breakwater the grid holds (the chart's audit, package 111)
+  bottom: dark sand and ooze, foul in places with lost anchors
+  deep_draught_ft: 22    # judgement: deep water close in; the berth for any ship
+shore:
+  feature: santa-cruz-mole
+  name: the mole of Santa Cruz
+  lat_deg: 28.4670
+  lon_deg: -16.2470
+
+pilot:
+  station: santa-cruz-road
+  cruising_nm: 3                 # judgement: the port's boat meets a ship off the road
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the boat of the Captain of the Port
+    under: oars
+    note: "Purdy 1825, p. 216 (Krusenstern, 1803): Don Carlos Adam, Lieutenant of the Spanish Navy and Captain of the Port, came immediately on board and recommended us to keep to the eastward of the road"
+  names: [Hernández, González, Rodríguez, Pérez, Martín, Díaz, Afonso, Delgado]   # names of the islands: judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 110            # off the road to the east-south-east, clear of the land's calms (judgement)
+  words:
+    channel: "Round Point Naga close and come down the east side of the island near in; get bottom as soon as you can with a heavy lead, for the shore is so high it deceives you and you are nearer than you think."
+    marks: "Keep between the middle of the town and the castle a mile to the north of it, and never bring any part of the town to the northward of west going in: under the Peak the wind dies and she will drive on the rocks with no ground for her anchor."
+    anchorage: "Anchor in thirty fathoms on dark ooze half a mile off, or nearer in six to eight fathoms a cable from the shore; buoy your cables with casks, for the ground is foul in places with lost anchors. Our own people moor with four anchors, two to the north-east and two to the south-west."
+    tide: "There is little tide in the road: high water about three o'clock on the full and change, a rise of six or seven feet. The surf on the beach is the thing to watch; when it runs, nothing lands."
+
+tide:
+  establishment: Canary Island
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 45, origin: spain, season: {10: 0.9, 11: 0.9}, note: "Teneriffe wine (the Vidonia) by the ton; Krusenstern 1803 (Purdy p. 216): ninety piastres the pipe for what used to be sixty, very good and improving on a long voyage, not equal to Madeira; the sterling JUDGEMENT"}
+    - {good: brandy, price: 35, origin: spain, note: "Krusenstern 1803 (Purdy p. 216): the brandy made here is very bad, sent to Spanish America; JUDGEMENT the price"}
+    - {good: fresh beef, price: 40, origin: spain, note: "Krusenstern 1803 (Purdy p. 216): beef dear, eightpence the pound; Vancouver found it exceedingly good"}
+    - {good: vegetables, price: 18, origin: spain, note: "the Oriental Navigator 1801 p. 25: all the vegetables of Europe easily procured, cabbages excepted; JUDGEMENT"}
+    - {good: oranges, price: 14, origin: spain, note: "Krusenstern 1803: grapes, peaches, citrons, oranges and melons in abundance, extremely dear; JUDGEMENT"}
+    - {good: wheat, price: 14, origin: spain, note: "the island imports its corn from Lanzarote and Fuerteventura (Glas 1764, the corn of those islands shipped to the others); JUDGEMENT, dear here"}
+    - {good: barley, price: 11, origin: spain, note: "as the wheat; JUDGEMENT"}
+    - {good: salt fish, price: 26, origin: spain, note: "the islands' fishery on the coast of Barbary (Glas 1764, FROM MEMORY of his chapter, unverified); JUDGEMENT"}
+    - {good: canvas, price: 70, origin: britain, note: "imported; FROM MEMORY"}
+    - {good: cordage, price: 80, origin: britain, note: "imported; FROM MEMORY"}
+    - {good: timber, price: 9, origin: spain, note: "the island's pine, JUDGEMENT"}
+    - {good: salt beef, price: 75, origin: null, note: "imported; JUDGEMENT"}
+    - {good: tobacco, price: 95, origin: spain, note: "the Crown's monopoly; FROM MEMORY"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 45, note: "a spar of the island's pine (JUDGEMENT)"}
+    - {item: yard, hours: 10, pounds: 28}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.08}
+    - {item: water, hours_per_ton: 0.4, pounds_per_ton: 0.3, note: "Purdy 1825 p. 216: easily procured when the surf is not great on the beach; Krusenstern 1803, a piastre the cask"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.09}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 6, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT. Santa Cruz's road lies within the
+# grid's modern breakwaters (EMODnet's port works north and east of it, not the road of 1805):
+# the track leaves it to the south-east, the one way the grid leaves open, and rounds Point Naga
+# three miles off.
+tracks:
+  to_sea: [santa-cruz-road, 28 28.2 N 16 13.8 W, 28 28.2 N 16 10.2 W, 28 32.4 N 16 04.2 W, 28 37.8 N 16 04.2 W, 28 40.8 N 16 15.0 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 40.8 N 16 15.0 W, 28 37.8 N 16 04.2 W, 28 32.4 N 16 04.2 W, 28 28.2 N 16 10.2 W, 28 28.2 N 16 13.8 W, santa-cruz-road]
+  in: [santa-cruz-road]
