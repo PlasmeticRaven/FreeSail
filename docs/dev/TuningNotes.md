@@ -26680,6 +26680,37 @@ moved; no game line about a hoist or the colours moved (a hoist with no place sa
 main" as before; the record and the pickle carry no place while unset). The tree reported
 differs from 97d4650 by this paragraph alone.
 
+**Step 4: dress ship.** `data/signals/basic/dressing.yaml`, two dated fashions: 'in the
+rigging' to 1883 (Röding 1794, Babron 1817, Spain 1748 art. XXV, Perrin pp. 196-197): her
+ensigns and jack at the lower yardarms, her book's signal flags at the topsail yardarms,
+along the lower and topmast stays (three to a stay) and in the shrouds, her pendants at the
+topgallant yardarms, one flag of each, no flag at a truck; the rainbow from 1884 (Luce):
+six flags to each span from the jackstaff over the trucks to the peak, her ensign at each
+truck. Which flag at which place: JUDGEMENT (no source gives an order before 1889, "a junior
+officer's scheme"). A King's ship's stock is her colours' ensigns of the navy, her jack, her
+book's flags of the year and her pendants; a merchantman's her colours (she dresses with one
+ensign: what else she carries is package 96's locker). **Left out for package 96:** another
+nation's ensigns, which the period hung (Perrin p. 197: "including national flags of other
+nations"), are in no nation's data of hers. **Not drawn:** the waist cloths (Röding: red
+bordered white or yellow for the English; the French King's blue sown with yellow lilies,
+1765 art. CCXXXV), the viewer having no cloth on the rail. Dressed until `undress ship`,
+sunset (JUDGEMENT after Luce 1884 and the colours' sunset in Spavens 1796), or the colours
+coming down, said in the log; refused by night, with the colours down, and below. **Seen in
+the browser** (`tests/browser_plans/dressed.yaml`): the frigate's ensigns and jack at the
+lower yardarms, the numerals at the topsail yardarms, flags along the fore, main and mizen
+stays, the pendants at the topgallant yardarms, the shrouds bare (her stock spent); undressed,
+nothing but her colours.
+
+**Step 4: the measure.** At 01885a5 (step 4 with the trunk at 90cb075, step 3 merged as
+d01d1a4, merged by a merge commit; the step's paragraph above): ruff check and format clean
+(385 files); the fast tier 7,572 passed, 1 xfailed, 0 failed (the trunk's chart audit
+among them, untouched); the slow tier of the touched files and of `test_known_truths`
+(step 3's nine and test_primer, whose orders block dresses and undresses a ship; `--slow -m
+"not pace"`) 1,714 passed, 8 xfailed, 0 failed; pace alone and last on the same files, 12
+passed. No digest moved; no game line about a hoist or the colours moved (the locker's
+`dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
+records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
@@ -27275,6 +27306,7 @@ command of the prize') and `test_take_command_of_a_ship_his_to_take_is_package_6
 
 
 
+
 ## Package 105: Sicily and Malta (2026-11-12)
 
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
@@ -27484,3 +27516,92 @@ the known truths (`--slow -m "slow and not pace"`, `tests/test_chart_audit.py` a
 them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No pin moved;
 no data file changed.** The tree reported differs from cd46734 by this paragraph and the
 pace's above alone.
+
+### Step 2: the boat and the short watch (note 1)
+
+**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
+the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
+watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
+boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
+boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
+the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
+as the boat").
+
+**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
+the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
+other work has the hands, she is not at quarters and all hands are not up already, all hands
+are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
+(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
+told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
+order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
+send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
+the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
+Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
+ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
+not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
+the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
+work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
+Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
+is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
+`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
+not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
+answers the case where she still waits.
+
+**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
+
+**The suites, as run (step 2).** At **929280d** (the trunk merged by merge commit: package 109's
+step 1 and package 105's step 1 as merged, the appended ends of the known truths and these
+notes kept, the trunk's first), in a worktree pinned there, this container, four workers, one
+suite at a time. `ruff check .` and `ruff format --check .` clean (388 files). **The fast tier**
+whole: exit 0, 7,545 run, no failure, 1 skipped, 509 slow left out. **The slow tier of the
+touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
+test_known_truths.py, test_captain_trials.py, test_hands.py, test_boat_hull.py,
+test_boat_director.py, test_orders_places.py, test_ports.py, test_crew_orders.py,
+test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages among them, every
+pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
+pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
+passed. The tree reported differs from 929280d by this paragraph alone.
+
+## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
+
+**What changed.** A port's dated record seeds the port on the scenario's first day and the
+port is then the world's. `Ports.tick` applies no row unless the scenario says
+`follows_history: true` (`Scenario.follows_history`, false where absent, kept out of the
+save when false so that every save reads as before); then each row of a dated key, and of
+the holder, that begins or ends on a day is that day's event (`Port.on_events`, the days
+since the last turn, so that a clock that jumps a day still takes it), and a key with no
+event keeps what play has made of it. `Ports.stance` reads the port's own holder
+(`port.nation`), as the market's prices and the prize court already did, where it read the
+running day's (`nation_on`). The regimes' dated blockades (`business._blockades`, package
+79a) are read on the scenario's first day, and by the running day only where it follows
+history. The scenario says it in its lines and on the harbour's list in the world's words
+(`scenarios.HISTORY_WORDS`). **Left on the calendar:** a light's years, the private signal
+tables' months, the market's season, a hull's wear. **Until the review designs one (packages
+103b and 92), nothing in play writes a port's holder or a war:** the director's port order
+closes and opens a port to a nation and sets a price; `Nations.declare_war` and `make_peace`
+are called by tests alone.
+
+**Superseded by design, old beside new** (the owner's standing rule of 2026-11-12):
+`tests/test_ports.py`'s `test_dated_rows_turn_with_the_worlds_day` (package 105: begun on
+4 September 1800 and run into the 5th, the test port open with a yard) is now two tests:
+without the key it stays blockaded with the chandlers'; with it, open with a yard, as
+before. In `test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_frances`
+(package 79d) the stance run from 3 June 1805 into the 4th was hostile; it is now neutral
+without the key and hostile with it. Truth 7-299, truth 7-530 and every truth that loads a
+port by its start day stand unchanged. **The fault mended:** a director's `closed_to` on a
+port with dated `closed_to` rows was overwritten at the next day's turn (truth 7-582).
+
+**What moves:** no port file on the trunk gives a key as dated rows, and the dated holders
+(Genoa, Barcelona, Rosas, Tarragona, Valencia, Tabarka, Carloforte) change only where a game
+runs across a row's day; no recorded passage does (they are `channel-west`'s, business off).
+The blockade reader moves only a region entered after the first day, its blockades now the
+first day's. Truths 7-580 to 7-584.
+
+**The suites, at 65a7df86:** `ruff check .` and `ruff format --check .` clean; the fast tier
+whole (`-n 4`): exit 0, 7,569 passed, 1 xfailed, 512 slow left out; the slow tier of the
+touched files, the audit's full sweep, the browser plans and the known truths with the
+recorded passages (`--slow -m "slow and not pace"`, `test_ports`, `test_scenarios`,
+`test_harbour`, `test_business`, `test_nations`, `test_chart_audit`, `test_browser_probe`,
+`test_known_truths`): exit 0, 218 passed, 8 xfailed; the pace alone and last (`--slow -m pace
+-n 0`): 15 passed. No recorded passage's digest moved; no pin moved but the two superseded
+above. The tree reported differs from 65a7df86 by this paragraph alone.

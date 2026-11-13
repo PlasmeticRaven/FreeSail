@@ -448,6 +448,11 @@ def check(ship: Any, verb: str, obj: str) -> None:
             "(hail her, make a signal or send a letter); 'go to the boat' takes you off in "
             "your own boat where she lies alongside, 'come aboard' sends hers for you."
         )
+    if verb in BELAY_VERBS and _in_the_boat_at_the_side(world, person):
+        # a person in the boat that has not left the ship's side (package 109; the owner's
+        # play of 2026-11-12, note 1) may belay her, and is on deck again when she is stood
+        # down (`dealings._boat_kept`)
+        return
     if is_deck_order(verb, obj):
         # where he went by his own word: the master's reckoning takes him below to his
         # sights and his day's work by its own rule (his mirror), which is not his going
@@ -472,6 +477,23 @@ def check(ship: Any, verb: str, obj: str) -> None:
             f"You are {where_words(world, person)}; you cannot {what} from there. 'come "
             "aboard' sends the boat for you."
         )
+
+
+# The verbs that belay work (`data/vocabulary.yaml`, package 29c), which a person in the
+# boat at the ship's side may give of her (package 109).
+BELAY_VERBS = frozenset({"belay that", "belay the work", "belay all work"})
+
+
+def _in_the_boat_at_the_side(world: Any, person: Any) -> bool:
+    """Whether the person sits in the ship's boat on an errand that has not left her side:
+    waiting for her hands, or hoisting out (package 109)."""
+    if person.aboard or person.where != "boat":
+        return False
+    dealings = getattr(world, "dealings", None)
+    boat = getattr(dealings, "boat", None)
+    if boat is None or not boat.away or boat.phase != "hoisting out":
+        return False
+    return str(person.id) in {str(p) for p in boat.people}
 
 
 def market_way(world: Any, actor: str | None) -> Any:

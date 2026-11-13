@@ -138,6 +138,13 @@ class Scenario:
     # region, so that every scenario and save before this field works unchanged. A save
     # from before loads with None.
     chart: str | None = None
+    # Whether the world follows the historical course (decision 69; the lead's ruling of
+    # 2026-11-13, "the calendar and the world"): False, the dated record seeds the world on
+    # the first day (a port's holder and its dated keys as they stood) and the world is then
+    # its own; True, each dated row of a port, and a regime's dated blockade, is an event of
+    # the day it begins or ends, applied that day and not on every day, so that what play
+    # changed lasts until the record's next event. A save from before loads with False.
+    follows_history: bool = False
     # The weather script (spec M4 §19, `freesail.world.weather_script`): waypoints as plain
     # dictionaries ({"at": ISO time, "from_deg": degrees, "knots": knots}), saved with the
     # scenario and so followed again by a replay. Empty: the fixed wind above. With a
@@ -315,6 +322,8 @@ class Scenario:
             d.pop("things", None)
         if not d.get("fit"):
             d.pop("fit", None)
+        if not d.get("follows_history"):
+            d.pop("follows_history", None)
         if not d.get("observed"):
             d.pop("observed", None)
         if d.get("knowledge", "place") == "place":

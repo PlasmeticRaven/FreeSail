@@ -2306,6 +2306,8 @@ work_nouns:
   bending: bend
   shift: shift
   wreck: cut away
+  # package 109: `belay the boat` from the deck, or from the boat while she is at the side
+  boat: send the boat
 # Words between "send the ... " and the order: "aloft to", "forward to", "to".
 send_directions: [aloft, up aloft, up, forward, aft, on deck, into the tops, into the rigging]
 
