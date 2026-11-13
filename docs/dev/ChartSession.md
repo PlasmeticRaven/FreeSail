@@ -513,3 +513,12 @@ charts (`replay._rebind`).
     `chart_holding`.
   - A one-line mend proposed; test_checkpoint's run-on moves by design.
   - The lead's to rule.
+
+### 2026-11-13, 22:20: the owner's word on this session's tier (through the lead)
+
+This session stays as it is: the lead rules design and merges every chart hash; this
+session's own rulings go to the lead in a line each; the arrangement is looked at again by
+the owner and the lead together. The cloud environment's setup script now installs the
+`dev` and `server` extras in new sessions; running sessions (this one, 106b's, 112's) run
+`python3 -m pip install -e ".[dev,server]"` once, and each report says the browser plans
+played with none skipped.
