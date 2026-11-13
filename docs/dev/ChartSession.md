@@ -311,9 +311,54 @@ not yet, by the owner; no block beyond 105, 106a and 106b without his word.
   choice from the measure, as the brief says; I would measure both.
 
 **The owner's word of 2026-11-13, through the lead** (the section "Workflows, mechanism and
-reports" above, merged from the trunk at 2ce738bb): workflows of several agents only for
-sourced research and port passes, a drafter and an independent checker against the page;
-no new key, loader rule, tool or harness beyond a brief without the lead's approval; reports
-the hash, what differs, what moved, what is asked. Bearing on my notes above: the single
-ordered list of layers I raised for 112 is such a mechanism, so it waits for the lead's
-approval like the rest of that list.
+reports" above, from the trunk at 2ce738bb, and the builder sessions' paragraph at 0f7a74b1):
+workflows of several agents only for sourced research and port passes; no new mechanism
+beyond a brief without the lead's approval; concise reports; builder sessions of my own for
+approved packages only, three at most, never two on one region, the hash reported by me.
+The lead's rulings on my first report are in their own section above; the single list of
+layers is now 112's step 1 as briefed (ruling c).
+
+### The builders' briefs, prepared (not launched; each at the lead's word at 106a's merge)
+
+Each builder gets the text below with the package's own brief in
+`docs/dev/M7-WorkPackages.md` named as its scope, and this file named for the rules
+("What is settled", "How a step reaches the trunk", "Workflows, mechanism and reports",
+"The rules of every package"). Each reports to this session, not to the lead.
+
+**106b, Morocco's Atlantic coast** (`claude/pkg-106b`, cut from the trunk after 106a's merge).
+Read whole first: this file's settled rules, `docs/dev/ChartBlocks.md` with the sections of
+101, 104, 105 and 106a, and "## Package 106b" in the work packages. Changed by the lead's
+rulings: `morocco-north`'s north bound is the Strait's bound, **35.5 N**, not its tiles' row
+edge; `morocco-south`'s west bound is `canaries`' east bound (−13.17334) where they meet;
+each region **names its sea** for the audit (by the form 111's step 2a gives; a region with
+no sea is a failure); the 40 MB rule is MiB. **Step 0, a measurement to this session before
+anything is committed under `data/charts/`:** the sources on file (the Oriental Navigator,
+Purdy's Atlantic memoir, Glas, as 106a filed them; Jackson 1809 if it can be fetched), the
+seams against `strait`, `canaries` and the coarse layers, the tiles and MiB for one column
+seaward and for two, which source grid reaches, the gauges by the how-to's rule for a block
+with none, and the audit's findings the two regions would add. Then the build by the brief;
+dated port rows in 105's form; decision 68 as the brief says; truths 7-550 to 7-559; the
+audit clean or each finding listed with its owner (package 106b).
+
+**112, the coarse seas** (`claude/pkg-112`, cut from the trunk after 106a's merge). Read
+whole first: this file's settled rules and the lead's rulings (a) to (e), `docs/dev/ChartBlocks.md`
+with 39e's and 106a's sections, 106a's `corridors_beside` and `Tile.filled_from` in
+`freesail/world/chart.py`, and "## Package 112". **Step 0, the measurement to this session,
+nothing committed:** the brief's (a) to (d); the open Atlantic's level measured, not settled
+(how the tiles' raise and the game's level combine today, what the islands' gauges read,
+what each choice does to the depths); the list of saves, truths, passages and scenarios that
+read `atlantic-east`'s open water, checking 106a's first count (five kept saves all
+`channel-west`; twelve `atlantic-east` scenarios, each starting inside a region's bounds).
+**Step 1, its own hash, an engine step:** one ordered list of layers a level, generalising
+`corridor` and `corridors_beside`, proven cell for cell over every existing tile; the
+manifest's existing entries byte for byte. Then the layers the lead chooses, `seas.yaml` as
+the one source of seas the audit reads (a sea owns open water outside every region; a group
+of water nobody owns leaves the list only where its sea's tide is its own and not the
+eleven's), and the plan for the Atlantic on paper. **Step 4 (the chart's words inshore on a
+coarse layer) is not the builder's:** this session builds it last, after the lead has the
+lines proposed. Truths 7-570 to 7-579.
+
+**Running them:** 106b and 112 touch different files but both touch the manifest,
+`build_charts.py`, the climatology and the tides; they are not on the same region or tiles,
+so they may run side by side, the second to merge taking the first's manifest by
+`--skip-fetch` rebuild as the how-to says.
