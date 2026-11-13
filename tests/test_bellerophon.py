@@ -1685,6 +1685,58 @@ def test_a_lone_commodore_keeps_away_from_her_and_a_set_is_left_to_its_book(
     assert ("evading" in states) is keeps_away, states
 
 
+def _under_her_consorts_orders(world):
+    """The lone French frigate keeping her station five miles north of her (the meeting above),
+    her consort, a French frigate on the same station, half a mile beyond her, and she under her
+    consort's orders by package 71's least relation alone (`under_orders_of`, no set)."""
+    v = _french(world, "frigate", "49 35 N 5 30 W", STATION_OFF_THE_LIZARD)
+    consort = _french(world, "frigate", "49 35.5 N 5 30 W", STATION_OFF_THE_LIZARD, name="Consort")
+    v.under_orders_of = consort.id
+    assert world.squadrons.of(v.id) is None and world.squadrons.of(consort.id) is None
+    return v, consort
+
+
+def test_a_frigate_under_her_consorts_orders_and_in_no_set_is_left_to_her_commanders_book(
+    far_only,
+):
+    """B7.e, the lead's ruling (3)(b) of 2026-11-12: a ship under the orders of another, set or no
+    set, is left to her commander's book as a ship in a set is (`_alone`, the far body's own
+    `under_orders_of`): the French frigate under her consort's orders, in no set, never hauls off
+    from her in the forty minutes, and stands on to engage her by her own book (her states
+    "keeping station", "investigating a stranger" and so, "chasing", "engaging"). Her consort,
+    under nobody's orders and in no set, is alone, and the rank-4 rule is hers: she evades. OLD
+    BESIDE NEW (B7.e as built): the frigate under her consort's orders was alone by the design's
+    words and evaded, as her consort does ("keeping station", "investigating a stranger",
+    "keeping station", "investigating a stranger", "evading"). Measured at seed 7."""
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    v, consort = _under_her_consorts_orders(world)
+    assert v.brain.role == consort.brain.role == "kings-ship"
+    assert not v.brain._alone() and consort.brain._alone()
+    for _ in range(40):
+        world.run(60)
+    states = [s for _, s in v.brain.history]
+    assert "evading" not in states, states
+    assert "engaging" in states, states
+    assert "evading" in [s for _, s in consort.brain.history]
+
+
+def test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not_haul_off_from_her():
+    """B7.e, the lead's ruling (3)(b) of 2026-11-12, on a promoted hull with the crewed cap as
+    shipped: the frigate under her consort's orders and in no set (above) is crewed, and her
+    hull's captain reads the relation from her vessel (`_alone`, as `signals.commanded_by` reads
+    it): never alone, she investigates, chases and engages her and never evades. OLD BESIDE NEW
+    (B7.e as built, measured at seed 7): investigating at tick 1560 (3.94 miles), chasing at 2400
+    (1.96), evading at 2640 (1.40); now investigating at 1560 and chasing at 2400 as before, and
+    engaging at 2760 (1.12)."""
+    world = _hove_to_off_the_lizard(SEVENTY_FOUR)
+    v, _consort = _under_her_consorts_orders(world)
+    rows = _crewed_until(world, v, 60, lambda r: r[-1][1] in ("engaging", "evading"))
+    states = [s for _, s, _, _ in rows]
+    assert rows and v.crew is not None and v.crew.captain.role == "kings-ship", rows
+    assert not v.crew.captain._alone()
+    assert "engaging" in states and "evading" not in states, rows
+
+
 def test_a_kings_64_meeting_her_closes_her_as_before(far_only):
     """Bel-D §8.3: the rule is for a ship of rank 3 or less; a French sixty-four in the King's
     ship's role, a ship of the line herself (rank 4), meeting her five miles off as the frigate

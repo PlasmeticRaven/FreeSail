@@ -20366,11 +20366,12 @@ The lead's notes to the ships session of 2026-11-12 at 21:20 UTC and of 2026-11-
 and 01:25 UTC (`docs/dev/M7-WorkPackages.md` on the tree), whose rulings are built here in local
 commits on the package's branch after the trunk's second merge (94bfac27), a subsection for each:
 (2) of 01:05, the far brain's mark; (1) of 01:05, truth 7-196's crewed world; (4) of 01:05, the
-marines by fit. Measured on the owner's machine at seed 7, the scripts in the session's scratch
-(`s13/mend/`, `s13/s196/`, `s13/marines/`), outside the repository, each run on the tree and on an
-export of the commit before (for the first, 94bfac27: `freesail/world/brains.py` as it was there,
-nothing else differing in the code). The rest of the four notes (the 13th's (3) and (5) to (9), the
-12th's asks) are not these commits'.
+marines by fit; (3)(b) of the 12th at 21:20, a ship under another's orders. Measured on the owner's
+machine at seed 7, the scripts in the session's scratch (`s13/mend/`, `s13/s196/`, `s13/marines/`,
+`s13/orders/`), outside the repository, each run on the tree and on an export of the commit before
+(for the first, 94bfac27: `freesail/world/brains.py` as it was there, nothing else differing in the
+code). The rest of the four notes (the 13th's (3) and (5) to (9), the 12th's other asks) are not
+these commits'.
 
 ### 1. A far ship of war engaging from her passage keeps her mark (01:05 (2))
 
@@ -20749,6 +20750,97 @@ the bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`):
 - **The generator** into scratch: eighteen of eighteen files byte for byte with `data/ships/`, the
   64's and the razee's as written here; `tools/check_viewer_guns.py` clean. **ruff** `check` and
   `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+### 4. B7.e: a ship under the orders of another left to her commander's book (21:20 of the 12th, (3)(b))
+
+**The ruling.** "(b) A ship under the orders of another, set or no set, is left to her commander's
+book as a ship in a set is: BUILD if it is a few lines, and say what `convoy.yaml`'s escort then
+does."
+
+**Built, six lines** in `Judgement._alone` (`freesail/world/captains.py`; its docstring and
+`_line_of_battle_nm`'s brought to it): a ship whose `under_orders_of` names another (package 71's
+least relation: the scenario's `under_the_orders_of`, the director's order, a signal; a set writes
+it on each member, package 72) is not alone, the relation read as `signals.commanded_by` reads it,
+the far body's vessel's own, and for a crewed hull's captain the hull's World's, else her vessel's.
+So `_line_of_battle_nm` is nought for her and the rank-4 rule does not send her away on her own; her
+book's other rows are as before. A ship that commands others by the relation, under nobody's orders
+and in no set, is alone as before. The two books' words (`data/captains/kings-ship.yaml` and
+`commodore.yaml`, the head's comment and the knob's source) say it; no figure or row moved. No
+attribute is added, so a checkpoint from before loads as it was (the relation is the vessel's since
+package 71).
+
+**`convoy.yaml`'s escort, measured.** The scenario as shipped has no enemy, and no ship of it that
+the rule reads is under another's orders: its four merchant brigs are under the orders of the
+player's ship and have no brain (`brain` None: they keep company at far detail by the company leg),
+and the escort, the player's *Harpy* brig-sloop under her rules captain (the commodore's book),
+commands them and is under nobody's orders, in no set. So nothing of it moves. With a French
+seventy-four bound for Brest put 2.5 miles north of her a minute after the start
+(`s13/orders/probe_orders.py`, seed 7, forty minutes), at ff58e07d's export and on the tree alike:
+she is "on passage" at tick 300 and "evading" at 900, "By the captain, evading: shaping a course for
+49 25.0 n 5 17.8 w (hauling off from a seventy-four, a ship of the line, fourteen ports a tier,
+standing to the south-eastward (SSE), under plain sail; French colours, the tricolour)." and two
+courses more so; her four brigs, keeping company on her, go with her, each 0.2 miles from her at the
+end, the 74 2.13 miles off. **Plainly:** the escort hauls off from a ship of the line as before and
+takes her convoy with her; the ruling's road reaches the ships under her orders, which have no book.
+Whether a commodore whose convoy is held by the relation alone, no set, should keep with it (one
+line more: a ship with a vessel under her orders on the sea is not alone) is the lead's.
+
+**Measured, old beside new** (seed 7; ff58e07d's export with the rule stood in by hand on
+`Judgement._alone`, and the tree after it, line for line the same; `s13/orders/probe_orders.py` and
+`probe_test_world.py`):
+
+| World | ff58e07d | The rule |
+|---|---|---|
+| A British frigate in company with the player's 74 (hove to) and under her orders, no set; a French 74 bound for Brest a mile and a half north of her; the far brain alone | on passage, evading | on passage, engaging, struck, in company (her prize master's): she engages the 74 alone, the player's 74 hove to and making no signal, and is taken |
+| The same in the player's set, for the comparison (B7.e's road) | in company, engaging, struck, in company | the same |
+| The first, crewed (the cap as shipped) | evading, engaging (the 74 overhauling her within hail: the spoken filter, B7.e's finding) | on passage, engaging |
+| The tests' world: a French frigate on her station five miles north of the player's 74 hove to, under her consort's orders (a French frigate half a mile beyond her), no set, the far brain alone | keeping station, investigating a stranger, keeping station, investigating a stranger, evading | the same to the fourth, then chasing, engaging; her consort, alone, evading in both |
+| The same, crewed | investigating a stranger at tick 1560 (3.94 miles), chasing at 2400 (1.96), evading at 2640 (1.40) | the same to 2400, engaging at 2760 (1.12) |
+
+**For the lead, not built:** under the relation alone her commander's book makes no signal for her.
+With her commander alone (under nobody's orders, in no set) he hauls off by the rule and she, under
+his orders, stands on and engages the ship of the line by her own book (the consort's case); with
+the player's ship hove to she fights her alone and strikes. In a set the set's book judges the enemy
+for the whole set (B7.e).
+
+**Tests.** New in `tests/test_bellerophon.py`, both slow (8.3 s each alone; `tests/conftest.py`'s
+`SLOW_TESTS`): `test_a_frigate_under_her_consorts_orders_and_in_no_set_is_left_to_her_commanders_book`
+(the far brain: never evading, engaging; her consort alone and evading) and
+`test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not_haul_off_from_her` (crewed:
+engaging, never evading). Both fail at ff58e07d (`_alone` true for her); the crewed one fails with the
+fallback to the hull's vessel taken out (a scratch mutation, the file restored byte for byte), the
+far one passing then. No pin moved.
+
+**What any ship may say that this step changes:** a King's ship, or a commodore's ship, of a lower
+class under the orders of another and in no set, meeting an enemy ship of the line within two
+leagues: her hauling off is no longer said ("By the captain, evading: shaping a course for ...
+(hauling off from a seventy-four, ...)"), and what her own book does with the enemy is
+(investigating, chasing, engaging, and the lines of an action that follows). No shipped scenario has
+such a ship: `convoy.yaml`'s ships under orders are brainless merchant brigs, and no other file of
+`data/` names the relation.
+
+**The suites, as run.** Once, on 26473408 with this step uncommitted, from the tree root with `py`,
+one run at a time, the branch and the tree asserted first, each pytest with `-n 4 -p no:cacheprovider
+-o addopts="--dist loadgroup"` (`scratchpad/s13/orders/after/run.sh`), 04:31 to 05:18 UTC, against
+the bases at 7b9d7c29, not run again:
+- **The files** (`--slow -m "not pace"`: `test_bellerophon`, `test_indefatigable`, `test_in_world`,
+  `test_brains`, `test_captain`, `test_captain_rules`, `test_captains`, `test_crews`,
+  `test_far_action`, `test_far_hail`, `test_squadrons`, `test_signals`, `test_sail_by_name`,
+  `test_prizes`, `test_prize_scenarios`; the captains, the far brain, the sets, the signals and the
+  prizes): **493 passed** (340 s). Against the bases restricted to them (481): **no outcome
+  changed**; only in the bases, the strict expected failure made one at f5102fae, the old other
+  fits' beat (renamed at 26473408), and two pace tests outside `not pace` (truth 7-196's crewed
+  clause, truth 88 with the cap full); only in this run, 17: this step's two, the marines' two
+  renamed, truth 7-231's four bodies and nine slow cases of `test_far_action`, `test_prizes` and
+  `test_prize_scenarios` outside the base's slow list, all passed.
+- **`tests/test_known_truths.py` whole but the pace** (`--slow -m "not pace"`): 385 passed, 6
+  failed, 1 skipped, 8 xfailed (2,469 s). Against the bases (395): **no outcome changed**; the six
+  failures are the base's with the same figures (the merchant's constants [16200, 96480], the
+  schooner on an intent alone, the schooner's 767 lines, truth 77's digest 2e93986c2989d831, truths
+  78 and 79's [57, 100918]), each a passage this machine runs as it ran at the base; only in the
+  bases, the twelve pace tests; only in this run, the trunk's sixteen (truths 7-501, 7-510 to 7-519)
+  and truth 7-231, all passed. The convoy's truths (7-143 onward) pass as at the base.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

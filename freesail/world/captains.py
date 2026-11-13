@@ -1998,9 +1998,18 @@ class Judgement:
 
     def _alone(self) -> bool:
         """Whether she sails in no set, neither a member of one nor its commander (package 72's
-        squadrons and convoys, the parent World's for a crewed hull): the rank-4 rule is a lone
-        ship's, and a ship in a set is left to her commander's book (package 75, B7.e)."""
+        squadrons and convoys, the parent World's for a crewed hull), and under nobody's orders
+        (package 71's least relation, the far body's own or the crewed hull's, as
+        `signals.commanded_by` reads it): the rank-4 rule is a lone ship's, and a ship in a set,
+        or under the orders of another, set or no set, is left to her commander's book (package
+        75, B7.e; the lead's ruling (3)(b) of 2026-11-12)."""
         world = getattr(self, "world", None)
+        body = getattr(self, "vessel", None)
+        boss = getattr(body if body is not None else world, "under_orders_of", None)
+        if boss is None:
+            boss = getattr(getattr(world, "vessel", None), "under_orders_of", None)
+        if boss:
+            return False
         root = getattr(world, "parent", None) or world
         sets = getattr(root, "squadrons", None)
         if sets is None or not hasattr(sets, "of"):
@@ -2011,8 +2020,8 @@ class Judgement:
         """The miles within which she hauls off from an enemy ship of the line (package 75,
         B7.e, the rank-4 rule, the owner's "Yes, build the rule" of 2026-11-11): her doctrine's
         `line_of_battle_nm` where she is of a class under `LINE_OF_BATTLE_RANK` and alone
-        (`_alone`); nought for a doctrine without the knob, a ship of the line herself, and a
-        ship in a set."""
+        (`_alone`); nought for a doctrine without the knob, a ship of the line herself, a ship
+        in a set and a ship under the orders of another."""
         d = self.doctrine
         nm = float(d.threshold("line_of_battle_nm", 0) or 0) if d is not None else 0.0
         if nm <= 0.0 or int(p.own_size or 0) >= LINE_OF_BATTLE_RANK or not self._alone():

@@ -579,6 +579,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # (14.3 s and 18.8 s alone, one process), 2026-11-11
         "test_bellerophon.py::test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74",
         "test_bellerophon.py::test_a_crewed_frigate_in_a_set_does_not_haul_off_from_her_while_the_set_holds_her",
+        # package 75, B7.e, the lead's ruling (3)(b) of 2026-11-12: a frigate under her consort's
+        # orders and in no set, far and crewed (8.3 s each alone, one process), 2026-11-13
+        "test_bellerophon.py::test_a_frigate_under_her_consorts_orders_and_in_no_set_is_left_to_her"
+        "_commanders_book",
+        "test_bellerophon.py::test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not"
+        "_haul_off_from_her",
         "test_bellerophon.py::test_she_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails",
         "test_bellerophon.py::test_her_posts_draw_at_muster_the_second_master_and_the_chaplain_as_the_others",
         # package 75, B7.c: her tack cleared beside her tack at quarters, two tacks of a 74 and

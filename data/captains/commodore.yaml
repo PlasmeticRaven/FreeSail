@@ -8,7 +8,8 @@
 # King's ship does. The placeholders and the stimuli are merchant.yaml's. The commodore's
 # ship alone, her convoy no set, hauls off from an enemy ship of the line made out within
 # two leagues as the King's ship does (package 75, B7.e, the rank-4 rule:
-# `line_of_battle_nm`); commanding a set, the set's book decides.
+# `line_of_battle_nm`); commanding a set, the set's book decides; under the orders of
+# another, her commander's.
 
 role: commodore
 name: the commodore of a convoy
@@ -76,7 +77,7 @@ thresholds:
   shelter_land_nm: {value: 0, source: "an escort keeps the sea; nought turns the stimulus off"}
   shelter_within_nm: {value: 0, source: "none"}
   stranger_hostile_nm: {value: 0, source: "the commodore's ship hauls off from no ship of her own class or under (a ship of the line is line_of_battle_nm's); nought turns the stimulus off"}
-  line_of_battle_nm: {value: 6, source: "package 75, B7.e, the rank-4 rule (docs/design/Design-Ship-Bellerophon.md §8.3; the owner's 'Yes, build the rule' of 2026-11-11): a lone King's ship of a lower class than a ship of the line (the sixty-four and the seventy-four, `captains.LINE_OF_BATTLE_RANK`) hauls off from an enemy one made out within two leagues; Maitland held three frigates hardly a match for one ship of the line (p. 78, read (OCR)); the two leagues the cruiser's own distance for a superior force (cruiser.yaml stranger_hostile_nm), judgement. Read by `_overmatched` for that case alone; a ship in a set is left to her commander's book. Steel 1805 p. 124 names the exception, a crank 74 a frigate may take, and James vol. 2 pp. 12-19 the Droits de l'Homme engaged by two frigates in a sea that kept her lower ports shut: a later refinement, not built; as kings-ship.yaml"}
+  line_of_battle_nm: {value: 6, source: "package 75, B7.e, the rank-4 rule (docs/design/Design-Ship-Bellerophon.md §8.3; the owner's 'Yes, build the rule' of 2026-11-11): a lone King's ship of a lower class than a ship of the line (the sixty-four and the seventy-four, `captains.LINE_OF_BATTLE_RANK`) hauls off from an enemy one made out within two leagues; Maitland held three frigates hardly a match for one ship of the line (p. 78, read (OCR)); the two leagues the cruiser's own distance for a superior force (cruiser.yaml stranger_hostile_nm), judgement. Read by `_overmatched` for that case alone; a ship in a set, or under the orders of another, set or no set, is left to her commander's book. Steel 1805 p. 124 names the exception, a crank 74 a frigate may take, and James vol. 2 pp. 12-19 the Droits de l'Homme engaged by two frigates in a sea that kept her lower ports shut: a later refinement, not built; as kings-ship.yaml"}
   chase_stale_hours: {value: 1, source: "package 72: an hour of covering a straggler without gaining on the privateer, and he comes back to his convoy (the escort not to leave the convoy to chase; judgement on the hour)"}
   stranger_chase_nm: {value: 0, source: "the commodore chases nobody; nought turns the stimulus off"}
   offing_nm: {value: 3, source: "a league; judgement"}

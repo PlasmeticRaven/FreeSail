@@ -1621,6 +1621,18 @@ lead's ruling (2) of 2026-11-13; truth 7-231; the tuning notes' "The lead's note
 (tick 360), chases her to 0.28 miles and keeps the sea, and the 64's captain engages her at tick 420
 as at B7.e. The toggle is out and the two cases are one.*
 
+*A ship under the orders of another (the lead's ruling (3)(b) of 2026-11-12, built 2026-11-13): set
+or no set, she is left to her commander's book as a ship in a set is (`Judgement._alone` reads
+package 71's least relation as `signals.commanded_by` reads it, six lines), so the rank-4 rule does
+not send her away on her own; a ship commanding others by the relation alone, in no set, is alone as
+before. Measured at seed 7: a French frigate under her consort's orders and in no set, five miles
+north of her, investigates, chases and engages her where she evaded (far and crewed), her consort,
+alone, evading; `convoy.yaml`'s escort, the player's brig-sloop under nobody's orders, hauls off from
+a French 74 put 2.5 miles north as before, her four brainless brigs keeping company on her. For the
+lead: under the relation alone her commander's book makes no signal for her, so a commander alone
+hauls off and the ship under his orders stands on. The tuning notes, "The lead's notes of 2026-11-12
+and 13, built", subsection 4.*
+
 ---
 
 ## 9. The polar: what B7 measures and records
