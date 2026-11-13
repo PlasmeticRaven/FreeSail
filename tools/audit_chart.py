@@ -123,6 +123,11 @@ SEAS: dict[str, str] = {
     "sardinian-sea": "mediterranean",
     "tunis-coast": "mediterranean",
     "asinara-west": "mediterranean",
+    # package 105: Sicily and Malta, and the two tide regions over its tiles' water that no
+    # region's bounds hold
+    "sicily": "mediterranean",
+    "gulf-of-hammamet": "mediterranean",
+    "calabria-north": "mediterranean",
 }
 MEDITERRANEAN = "mediterranean"
 SEAS_THAT_MEET = {"strait": {"atlantic", "mediterranean", "strait"}}
