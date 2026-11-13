@@ -27408,7 +27408,9 @@ Hammamet tiles), each reading the Atlantic's tide. The trunk merged (bd9a79a); t
   tyrrhenian's: `a-unowned:tyrrhenian:north` 396199 to 490855 (the strip north of 42.5 N now
   runs to 15.84 E), `c-level:tyrrhenian` 7260 to 7513 and `d-split:tyrrhenian` 8703 to 8956
   (the sliver's 253 points of the full sweep). They were proven by the bound's toggle: at
-  432c45d's parent the full sweep gave the old figures.
+  f0f6a84 with the four bounds put back to 15.5 E, the full sweep gives 396199, 7260 and 8703
+  and finds `tyrrhenian:east` (1009585) and `north-east` (94656) again, the old entries' own
+  counts; `south` and `south-east` stay mended by `sicily`'s bounds.
 - **Two tide tests** take the new regions: the set of the blocks' names gains them, and the
   ruled list of gauges that serve a block beyond the seam band gains the six (old: package
   104's three alone).
