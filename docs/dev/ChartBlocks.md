@@ -185,7 +185,10 @@ region's, its tide and its weather are rows in tables that already reach its wat
    at Brest's distance entered it at Falmouth and moved every recorded passage's digest).
    The loader refuses a `block:` that names no region or a region the manifest does not
    name, and a gauge with neither a block nor a mean level. A gauge's mean level not read
-   stays null and is said unverified: it gives the blend its constants and not its level,
+   stays null and is said unverified (or, as Sicily's six by the lead's interim answer of
+   2026-11-13, is judged as M2 + S2 + N2 and marked JUDGEMENT where it stands, to be
+   replaced by a published level when one is read; whether the older blocks take the same
+   is settled at package 111's close, the levels measured first): it gives the blend its constants and not its level,
    and where no gauge of the blend has a level (the Strait's, the islands') the level is
    the eleven's there, as it was, which is the level the tiles' fill was raised by
    ("GEBCO's fill", below). **The fill raise reads the same water** (`mean_level_grid`,
