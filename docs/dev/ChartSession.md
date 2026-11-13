@@ -103,6 +103,12 @@ and a builder's work it would send back twice.
    never push to the trunk (`claude/dreamy-darwin-d77nty`), never rebase it, never
    force-push, and open no pull request.**
 
+**A session that waits is a session that can be lost (the lead, 2026-11-13).** Three
+builders were found idle and disconnected for four to five hours, each waiting on a suite
+whose run had gone with a replaced container, and none woke itself. While a long run is in
+flight, a session arms a check-in of its own (a scheduled message to itself in thirty
+minutes, armed again at each), and says so to any builder it makes.
+
 ## Workflows, mechanism and reports (the owner, 2026-11-13)
 
 - **Workflows of several agents are approved for sourced research and for port passes:**
