@@ -449,3 +449,13 @@ gaugeless south. **For 112:** the island seas (`madeira`, `azores`, `canaries`, 
 to be one sea or met in `seas.yaml`. Left for the lead: the seven Canaries port heads' stale
 words about rows waiting for 105's step 1; decision 68's words are comments only (a served
 field is package 110's to design).
+
+### 2026-11-13, 18:55: 111 step 2b's tracks read for the lead (65fa7b2)
+
+St Peter Port's track is on the wrong side of Roustel by Faden 1793 p. 32 (between La Rousse
+and Roustel, the Rousse to larboard) and crosses the grid's drying head at 49°29.15′N
+2°29.90′W; St Malo's way from La Fresnaye is Faden's Décollées, "frequented by none but
+small vessels" (both reported, the lead's to rule). The other six and a sample of four have
+their sides right. The land guard judges land and not depth: several tracks cross under a
+frigate's draught at low water. **For 106b:** its tracks read the same way from the first,
+the depth along each leg reported.
