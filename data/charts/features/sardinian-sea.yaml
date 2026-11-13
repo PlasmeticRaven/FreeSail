@@ -1,0 +1,361 @@
+# The features of the Sardinian sea's block (package 104, the region `sardinian-sea`;
+# docs/dev/ChartBlocks.md): the open sea between Minorca and Sardinia, and the Barbary coast
+# of the regency of Algiers from the islet of Pisan and Cape Carbon by Bougie, Cape Cavallo,
+# Djidjelli, the Seven Capes and Cape Bougaroun, Collo, Stora and Cape de Fer to Cape de
+# Garde and Bona. East of 4.5 E, where `balearics` ends (its column to 4.75 E holds the sea
+# off Dellys, the seam's), south of 40.56 N, where `gulf-of-lion` begins, and west of 8 E,
+# where `tyrrhenian` and `tunis-coast` begin (Cape Rosa and La Calle are the coast of
+# Tunis's block). The form and the rules are channel-west.yaml's (its head). The sources,
+# in the references' form (docs/references/README.md; the texts under
+# docs/references/pilots/, this package's short pass in docs/dev/TuningNotes.md, "Package
+# 104"):
+#
+#   Tofino 1787     Derrotero de las costas de Espana en el Mediterraneo, y su
+#                   correspondiente de Africa, pp. 154 to 155: the coast to Bugia, the
+#                   period's own; longitudes from Cadiz, bearings true, depths in brazas.
+#   Berard 1837     Description nautique des cotes de l'Algerie (the French survey of 1831
+#                   to 1833): the spine for the coast east of Bougie, after the period;
+#                   heights in metres, depths in brasses (1.624 m); what it says of the
+#                   French works and of the 1830s is not 1805's.
+#   Purdy 1826      The New Sailing Directions for the Mediterranean Sea, p. 327.
+#   Purdy 1840      The New Sailing Directory for the Strait and the Western Division, pp.
+#                   191 to 192 and its Pharonology (pp. xxix, xxxiv to xxxvi: Berard's
+#                   positions and heights on Greenwich, Dellys to Cape Bougaroun).
+#   Norie 1831      New Piloting Directions for the Mediterranean Sea, pp. 354 to 355.
+#   Derrotero 1849  Derrotero de las costas de Europa y Africa en el Mediterraneo, pp. 255
+#                   to 260 (translated from the French survey; after the period).
+#   Lamberti 1844   Portolano del mare Mediterraneo, pp. 227 to 228.
+#   Smyth 1854      The Mediterranean: pp. 94 to 95, 161 to 162; the table of positions p.
+#                   458 (Greenwich).
+#   Admiralty 1913  The Mediterranean Pilot, vol. I, ch. VI: MODERN, for the heights and
+#                   depths only, never for 1805's works or lights.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from), first placed from the modern map and the pilots' bearings and distances, then
+# checked against this block's tiles by the rule of channel-west.yaml's head (a scratch
+# script outside the repository); a move is said in `fix`. Heights above the sea for the
+# horizon: Bérard's in metres where he gives one (Goureya, the Seven Capes, the Pic of Cape
+# de Fer), else the Admiralty's.
+#
+# The period's shore. The tiles are the modern grid's: the French and Algerian ports of
+# Bejaia, Jijel, Skikda and Annaba as the grid has them, where 1805 had an open road, a
+# reef-sheltered cove, a fishing beach and an old harbour "nearly choked up" (Norie). No
+# period sheet with its datum is read, so no override changes them, and the port files say
+# so. The marks are the period's: the castles, the marabouts, the capes as the pilots name
+# them.
+#
+# The lights. No period text names a light on this coast before the period's end (Tofino
+# 1787 names lanterns at Mers-el-Kebir and Algiers only; Berard 1837 none east of Algiers;
+# Purdy 1840's Pharonology none); the first named is Bona's, on Cape de Garde, a revolving
+# light seen twenty miles, in Lamberti 1844 (p. 228), "new" in Smyth 1854 (p. 458): entered
+# `from` 1844, the earliest record read, its exact year UNVERIFIED, so that the period's
+# years see no light here.
+
+region: sardinian-sea
+features:
+  # ---------------------------------------------------------------------------
+  # Pisan, Cape Carbon and the road of Bougie (the harbour patch bougie)
+  # ---------------------------------------------------------------------------
+
+  - id: pisan-island
+    kind: island
+    name: the island of Pisan
+    modern: 'Ilot Pisan (El Euch), west of Cap Carbon'
+    lat_deg: 36.8275
+    lon_deg: 4.9990
+    fix: 'moved 175 m to the grid''s land (the first placing on the water north of the islet)'
+    height_m: 50
+    extent_m: 250
+    source: 'Tofino 1787, pp. 154 to 155: the islands of Pisan, small and near the coast, 10 miles N 70 W of Cape Carbon, the larger like the Escombrera but flatter, the smaller half a mile east, anchorage at both with very little shelter; Berard 1837, p. 104: a rock 500 m long, its top 50 m high sloping west, rocks just over a cable north and then great depth, a rock awash half a mile N 51 W of it (do not pass between); Purdy 1840, p. xxix: its west end 36 49 45 N, 4 59 55 E'
+    says: 'The island of Pisan, a small flat rock near the coast west of Cape Carbon: some shelter for small craft, and a rock awash half a mile to the north-westward of it.'
+
+  - id: mount-goureya
+    kind: hill
+    name: Mount Goureya
+    modern: 'Jebel Gouraya, above Bejaia'
+    lat_deg: 36.7650
+    lon_deg: 5.0790
+    height_m: 671
+    source: 'Berard 1837, p. 105: the summit of Cape Carbon, the Goureya, with a marabout, 671 metres; from SE by E and NW by W like a sugar loaf; Purdy 1840, p. xxix: Mount Goureya 36 46 34 N, 5 4 58 E (Berard''s)'
+    says: 'Mount Goureya over Bougie, a sugar loaf with a marabout on its summit, the mark of Cape Carbon.'
+
+  - id: cape-carbon
+    kind: headland
+    name: Cape Carbon
+    modern: 'Cap Carbon'
+    lat_deg: 36.7750
+    lon_deg: 5.1030
+    height_m: 192
+    source: 'Tofino 1787, pp. 154 to 155: it falls to the sea from a high fronton and ends in a little hillock; Berard 1837, p. 105: the point pierced north and south, the country boats passing through; vertical cliffs and great caves from Pisan to the cape (pp. 104 to 105); Purdy 1826, p. 327: steep-to, distinguished by several white hillocks within it; Norie 1831, p. 355: steep-to, and may be rounded at a small distance; Lamberti 1844, p. 227: high and steep with a great hole through the rock; Smyth 1854, p. 458: 630 feet, the height; the currents about it strong and irregular (Berard 1837, pp. 78 to 79)'
+    says: 'Cape Carbon, high, steep-to and pierced through by a great cave; it may be rounded close, but the currents about it are strong and uncertain.'
+
+  - id: bougie
+    kind: town
+    name: Bougie
+    modern: 'Bejaia (Bougie)'
+    lat_deg: 36.7550
+    lon_deg: 5.0860
+    height_m: 20
+    source: 'Tofino 1787, p. 155: a small castle on the hillock, another farther south, and the town by a river by which the ship timber comes down for Algiers; Purdy 1826, p. 327: the port by which most of the timber used in ship-building at Algier is brought from the interior; Norie 1831, p. 355: fortified, a castle on a hill commanding the town and the road, the old mole destroyed; oil, wax and other produce of the interior exported'
+    says: 'Bougie, a walled town under its hill with a castle above, whence the Dey''s ship timber comes down to Algiers.'
+
+  - id: bougie-castle
+    kind: castle
+    name: the castle of Bougie
+    modern: 'the Casbah and Fort Barral above Bejaia'
+    lat_deg: 36.7590
+    lon_deg: 5.0820
+    height_m: 146
+    source: 'Norie 1831, p. 355: a castle on the summit of a hill, which commands both the town and its roadstead; Tofino 1787, p. 155: the Guardia de Bugia, a small castle on the hillock; Berard 1837, p. 107: a fort dominating the town, probably of Spanish building, and the casba on the shore; Smyth 1854, p. 458: the castle, 480 feet, the height'
+    says: 'The castle of Bougie on its hill, commanding the town and the road.'
+
+  - id: bougie-road
+    kind: anchorage
+    name: the road of Bougie
+    modern: 'the bay of Bejaia off the old town'
+    lat_deg: 36.7560
+    lon_deg: 5.1021
+    fix: 'moved 100 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 7
+    bottom: soft mud
+    source: 'Tofino 1787, p. 155: anchor south of Cape Bugia before a marabout or mosque in 6 to 8 brazas of soft mud, moored in two north and south; weigh the anchors every eight days at least, for they bury themselves; a good anchorage, better sheltered from the winds of the third and fourth quadrants than of the first and second, the easterlies raising some sea; Purdy 1826, p. 327: anchorage in 8 and 10 fathoms; Norie 1831, p. 355: good anchorage off the town in 10 or 6 fathoms, but northerly and north-easterly winds occasion a heavy swell'
+    says: 'The road of Bougie, south of the cape before the marabout, seven fathoms of soft mud: sheltered from the west and north, but an easterly sends in a swell; weigh your anchors every week or they bury themselves.'
+
+  - id: cape-cavallo
+    kind: headland
+    name: Cape Cavallo
+    modern: 'Cap Cavallo'
+    lat_deg: 36.7740
+    lon_deg: 5.5914
+    fix: 'moved 257 m to the grid''s land'
+    height_m: 60
+    source: 'Berard 1837, p. 110: the islet near Cape Cavallo, about 20 m, of prisms of trachyte, a station of the survey; p. 111: the Cavallo islands; Norie 1831, p. 355: do not attempt to go between them and the shore; height JUDGEMENT'
+    says: 'Cape Cavallo with its islets: do not try to pass between them and the shore.'
+
+  - id: salamandre-bank
+    kind: ledge
+    name: the Salamandre bank
+    modern: 'the Salamandre shoal, between Cap Cavallo and Jijel'
+    lat_deg: 36.8492
+    lon_deg: 5.6414
+    fix: 'moved 391 m to the grid''s shoal head (2.8 m)'
+    height_m: 0
+    dries_m: -4.0
+    extent_m: 200
+    source: 'Berard 1837, p. 112: a bank of rock with 13 feet, found lately by Lieutenant Leon Duparc, on the line from the Jigelli mountain (374 m) to the east part of the Afia point, two miles from Afia; Purdy 1840, p. xxxv: 13 feet water, Cape Cavallo SW by W 1/2 W 4 1/2 miles and Point Jijeli E by S 5 miles; p. xxix: 36 50 50 N, 5 38 16 E; Derrotero 1849, pp. 255 to 256: two miles off the coast, half-way from Caballo to Jigeli. Found in the 1830s: a danger of the sea in every year, unnamed before'
+    says: 'A bank of rock with thirteen feet on it two miles off the coast half-way from Cape Cavallo to Djidjelli; give the coast a berth.'
+
+  - id: djidjelli
+    kind: town
+    name: Djidjelli
+    modern: 'Jijel (Djidjelli)'
+    lat_deg: 36.8210
+    lon_deg: 5.7660
+    height_m: 15
+    source: 'Berard 1837, p. 113: built on a rocky peninsula, defended landward by a square tower and walls, poor ramparts to seaward; its people in a manner independent; p. 114: a building slip in a cove west of the town, nine coasters on the stocks, the oak of the country famous; held by France from 23 July to 30 October 1664; Norie 1831, p. 355: a village having a small port before it; Purdy 1840, p. xxix: the mosque 36 49 54 N, 5 44 45 E'
+    says: 'Djidjelli on its rocky peninsula, a village of boat-builders behind a line of reefs.'
+
+  - id: djidjelli-anchorage
+    kind: anchorage
+    name: the port of Djidjelli
+    modern: 'the old harbour of Jijel within the reef'
+    lat_deg: 36.8283
+    lon_deg: 5.7757
+    fix: 'moved 498 m to the grid''s water of half the pilot''s depth (the first placing on the modern harbour''s works)'
+    height_m: 0
+    depth_fathoms: 10
+    bottom: sand and gravel
+    source: 'Berard 1837, p. 113: like the port of Tripoli of Barbary but smaller and less safe, for the fine season only; anchor south of the highest islet of the entry about a cable off in 10, 11 and 12 brasses on sand and gravel, the islet shutting in Cape Bougaroni; the widest gap in the rocks on the town side with 5 to 7 brasses; pp. 114 to 115: no wintering without a mole, the rocks setting up a heavy surge and rolling stones that chafe the cables; May to October the season; Derrotero 1849, p. 256: the same; Norie 1831, p. 355: vessels drawing little water may find anchorage between some islets and the shore'
+    says: 'The port of Djidjelli, ten fathoms of sand and gravel south of the highest islet of its reef: for the fine season only, for the surge through the gaps chafes the cables.'
+
+  - id: djidjelli-reef
+    kind: ledge
+    name: the reef of Djidjelli
+    modern: 'the rocks off Jijel''s old harbour'
+    lat_deg: 36.8290
+    lon_deg: 5.7800
+    height_m: 1
+    extent_m: 500
+    source: 'Berard 1837, p. 113: a line of rocks shelters the port from northerly storms, the gaps letting the sea in; Derrotero 1849, p. 256: a chain of reefs running about a mile east of the town a third to half a mile off; Berard 1837, pp. 114 to 115: a large shoal north-east of the marabout''s rock half a mile south of the town, the Chimere grounded on it in 1836'
+    says: 'The line of rocks before Djidjelli, with gaps in it that let in the sea.'
+
+  # ---------------------------------------------------------------------------
+  # The Seven Capes, Cape Bougaroun and Collo (the harbour patch collo)
+  # ---------------------------------------------------------------------------
+
+  - id: seven-capes
+    kind: hill
+    name: the high land of the Seven Capes
+    modern: 'the massif of Collo, behind the Ras Bougaroun'
+    lat_deg: 37.0300
+    lon_deg: 6.4000
+    height_m: 1090
+    fix: 'the summit''s place JUDGEMENT from Berard''s words (near the centre of the sixteen miles); the height his'
+    source: 'Berard 1837, p. 117: the Moors call it Sebba Rous, the seven capes, the most northern point of all the coast of Algeria; more than 16 miles east and west, its highest summit 1,090 m near the centre; its tribes never subdued by any Dey; Derrotero 1849, p. 256: seven principal points, hence the name; Purdy 1840, p. xxxv: bold and steep-to'
+    says: 'The high land of the Seven Capes, the most northern of the Barbary shore, whose mountain people no Dey has ever brought under.'
+
+  - id: cape-bougaroun
+    kind: headland
+    name: Cape Bougaroun
+    modern: 'Ras Bougaroun'
+    lat_deg: 37.0880
+    lon_deg: 6.4680
+    height_m: 150
+    source: 'Berard 1837, p. 117: the northernmost point of the coast; pp. 117 to 118: deep water close in on the west and north-west, the coral boats fishing there; the Italian name from the Genoese coral fishers; p. 79: off it the current east at two miles an hour, ships unable to beat round it with westerly winds; Smyth 1854, p. 458: Ras al Ferjan (Bujaroni), the northernmost of the seven capes, 37 6 58 N, 6 28 6 E; Purdy 1826, p. 327: Cape Bagaron; height JUDGEMENT'
+    says: 'Cape Bougaroun, the northern point of the Seven Capes, bold and steep-to; off it the current runs east at two knots, and a westerly will not let a ship beat round it.'
+
+  - id: collo
+    kind: town
+    name: Collo
+    modern: Collo
+    lat_deg: 37.0040
+    lon_deg: 6.5670
+    height_m: 15
+    source: 'Berard 1837, p. 118: stone houses with tiled roofs, the people Moors who live by the coasting trade, the Kabyles of the mountains resisting every Bey sent to tax them; p. 119: the Compagnie d''Afrique had a post at Collo from 1604 to 1685 for the inland trade and the coral; p. 120: timber the Dey sent for to the yards of Algiers; Purdy 1826, p. 327: Kollo, the antient Kullu, where the French had formerly an establishment for the coral fishery; Smyth 1854, p. 458: the Hussein chapel, 37 0 59 N, 6 34 55 E'
+    says: 'Collo, a little town of Moorish coasters in its bay below the mountains, where the French had their coral post of old.'
+
+  - id: collo-road
+    kind: anchorage
+    name: the bay of Collo
+    modern: 'the bay of Collo'
+    lat_deg: 36.9964
+    lon_deg: 6.5848
+    fix: 'moved 460 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 13
+    bottom: mud
+    source: 'Berard 1837, p. 118: the bay of Collo gives shelter from the NW round to the W; small craft before the town sheltered from almost all winds; a bottom of very good holding; anchor in 14 and 15 brasses of mud, the mosque bearing NNW; the north-easters send in a great swell; Purdy 1840, p. xxxv: good shelter for small vessels with N.W. and westerly winds, the ground holds well; Derrotero 1849, p. 257: 15 to 18 brazas sand and mud; Lamberti 1844, p. 228: moored to the shore in 14 braccia, weed and gravel'
+    says: 'The bay of Collo, thirteen fathoms of mud of very good holding, sheltered from the westerlies; a north-easter sends in a great swell.'
+
+  # ---------------------------------------------------------------------------
+  # Stora and Cape de Fer (the harbour patch stora)
+  # ---------------------------------------------------------------------------
+
+  - id: srigina
+    kind: island
+    name: the island of Srigina
+    modern: 'Ile Srigina, off Stora'
+    lat_deg: 36.9380
+    lon_deg: 6.8890
+    height_m: 30
+    extent_m: 200
+    source: 'Berard 1837, p. 122: Srigina, less than half a mile off the coast, a bare rock ringed by low rocks; a ship may pass inside it in need, with water for any vessel; Derrotero 1849, pp. 257 to 258: the port of Stora between the Pelado and the island; height JUDGEMENT'
+    says: 'The island of Srigina, a bare rock off Stora ringed with low rocks; in need there is water for any ship inside it.'
+
+  - id: stora
+    kind: town
+    name: Stora
+    modern: 'Stora, west of Skikda (Philippeville)'
+    lat_deg: 36.9020
+    lon_deg: 6.8800
+    height_m: 10
+    source: 'Purdy 1826, p. 327: the little town of Storo, on a bay of the same name, about half-way between Kollo and Cape Ferro; Berard 1837, p. 123: the old ruin by the beach the Moors call the magazines, where were long gathered the corn, the hides and the wax the Arabs of the interior would sell to the Europeans or send to Algiers; Rusicada the port nearest Constantine; p. 124: the Company''s ships came of old to load corn; Derrotero 1849, p. 257: the castle of Stora, small and square, and a hamlet of huts; Smyth 1854, p. 458: the old pier, 36 54 53 N, 6 53 5 E'
+    says: 'Stora, a hamlet and a little square castle by the old magazines where the corn, hides and wax of Constantine''s country were brought down for the ships.'
+
+  - id: stora-anchorage
+    kind: anchorage
+    name: the cove of Stora
+    modern: 'the anse de Stora'
+    lat_deg: 36.9016
+    lon_deg: 6.8923
+    fix: 'moved 506 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 9
+    bottom: sand and mud
+    source: 'Berard 1837, p. 122: a small cove where brigs and even corvettes might lie sheltered in winter, moored four ways close in, 9 and 10 brasses in the middle; p. 124: the Company''s ships lay in 5 or 6 brasses sheltered from the winds of the offing and watered in the ravine by the magazines, the Moors calling it the safest of the regency; p. 123: in the fine season anchor in the bay on good ground, the NW and NE winds sending in a strong swell; Derrotero 1849, p. 257: open to the NE, an excellent shelter from the NNW and W round to the S, 15, 10 and 6 brazas beyond musket-shot of the shore; p. 259: water, wood and game, the natives hostile. The bottom JUDGEMENT from the Admiralty 1913, p. 394: muddy sand, good holding'
+    says: 'The cove of Stora, nine fathoms close under the hills, where the Company''s corn ships lay; water in the ravine by the old magazines, and a north-easter is the wind to fear.'
+
+  - id: cape-de-fer
+    kind: headland
+    name: Cape de Fer
+    modern: 'Ras el Hadid (Cap de Fer)'
+    lat_deg: 37.0819
+    lon_deg: 7.1731
+    fix: 'moved 165 m to the grid''s land'
+    height_m: 370
+    source: 'Berard 1837, p. 126: a narrow high mass of grey bare rock; on its south side the Pic, 370 m, conical, the mark of the cape, the highest summit 480 m; islets out to half a mile and no hidden danger; p. 127: from the west it appears like an island; Norie 1831, p. 354: the little island of Ferro off it, no vessel ought to go between it and the main (Berard pp. 127 to 128: one may pass); Smyth 1854, p. 458: 37 5 10 N, 7 10 57 E'
+    says: 'Cape de Fer, a narrow mass of grey bare rock with a conical peak, like an island from the westward.'
+
+  # ---------------------------------------------------------------------------
+  # Cape de Garde and Bona (the harbour patch bona)
+  # ---------------------------------------------------------------------------
+
+  - id: mount-edough
+    kind: hill
+    name: Mount Edough
+    modern: 'the Edough, behind Annaba'
+    lat_deg: 36.9000
+    lon_deg: 7.6600
+    height_m: 975
+    source: 'Berard 1837, p. 126 note: Mount Edough seen from the anchorage of Collo at 52 miles; pp. 66 to 67: clouds capping the Edough, Cape de Fer and the Goureya foretell easterly winds; Admiralty 1913, p. 403: the ridge inland 3,198 feet, the height'
+    says: 'Mount Edough, the high ridge behind Bona; clouds on its summit foretell an easterly.'
+
+  - id: cape-de-garde
+    kind: headland
+    name: Cape de Garde
+    modern: 'Ras el Hamra (Cap de Garde)'
+    lat_deg: 36.9660
+    lon_deg: 7.7900
+    height_m: 140
+    source: 'Berard 1837, p. 130: appears like an island when first seen coming from the west; ruins of an old castle or tower on its second summit; low rocks under water a quarter cable off its east end, to be ranged at half a cable; Derrotero 1849, p. 259: Haz el Humera, Guardia or the Guardias of Bona, with a ruined tower; Purdy 1826, p. 327: Cape Mavera; Smyth 1854, p. 458: 36 57 58 N, 7 49 30 E; height JUDGEMENT'
+    says: 'Cape de Garde, the guard of Bona, like an island from the westward, a ruined tower on its second summit.'
+
+  - id: cape-de-garde-light
+    kind: light
+    name: Bona's light on Cape de Garde
+    modern: 'the lighthouse of Cap de Garde'
+    lat_deg: 36.9660
+    lon_deg: 7.7890
+    height_m: 142
+    lit: {from: 1844, until: null, range_nm: 20, character: "revolving"}
+    fix: 'from 1844, the earliest record read (Lamberti 1844); the year first lit UNVERIFIED, after the period by every text'
+    source: 'Lamberti 1844, p. 228: the light of Bona is on Cape Guardia and revolves, seen 20 miles off; Smyth 1854, p. 458: Guardia, new lighthouse, 466 feet; no earlier text names it (Berard 1837 names no light east of Algiers)'
+    says: 'Bona''s light on Cape de Garde, revolving, seen five or six leagues.'
+
+  - id: fort-genois
+    kind: castle
+    name: the Fort Genois
+    modern: 'Fort Genois (Borj el Genouiz), La Caroube'
+    lat_deg: 36.9520
+    lon_deg: 7.7810
+    height_m: 30
+    source: 'Berard 1837, p. 131: the very good anchorage under the Fort Genois; Norie 1831, p. 354: Port Genovese, under the protection of a small fort; Derrotero 1849, p. 259: the Fuerte Genoves; height JUDGEMENT'
+    says: 'The Genoese fort on its point inside Cape de Garde, over the winter berth of Bona.'
+
+  - id: fort-genois-anchorage
+    kind: anchorage
+    name: the anchorage of the Fort Genois
+    modern: 'the anchorage off Fort Genois'
+    lat_deg: 36.9473
+    lon_deg: 7.7901
+    fix: 'moved 285 m to the grid''s water of half the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 14
+    bottom: mud mixed with sand
+    source: 'Berard 1837, p. 131: a very good anchorage in 15 or 16 brasses, mud mixed with sand, the Fort Genois bearing N 20 E, two and a half cables from the shore; only a heavy swell with fresh easterlies; exposed in winter gales but the safest; westerly gusts; pp. 130 to 131: a good watering place in the ravine at the south end of the beach; pp. 132 to 133: the Marseille insurers knew only it for winter (15 September to 15 May) and the Cassarin for summer; Norie 1831, p. 354: 15 to 7 fathoms, quite exposed to N.E. and easterly winds; Derrotero 1849, pp. 259 to 260: the best berth of the gulf, sand and weed with patches of sand and mud'
+    says: 'The anchorage of the Fort Genois, fourteen fathoms of mud and sand under the fort, the winter berth of Bona and its safest; water in the ravine at the south end of the beach.'
+
+  - id: bona
+    kind: town
+    name: Bona
+    modern: 'Annaba (Bone)'
+    lat_deg: 36.9000
+    lon_deg: 7.7600
+    height_m: 30
+    source: 'Norie 1831, p. 354: a considerable sea-port, Blaid el Aneb, the town of jujubes, near the ruins of Hippo, a place of great trade from its communication with Constantina; its exports wool, bees-wax, bullocks-hides and corn, with the coral fishery adjacent; the old harbour east of the town and the small port under its walls nearly choked up; the town 36 53 30 N, 7 48 30 E; Purdy 1826, p. 327: corn, wool, hides and wax, a port under the walls grown up; Berard 1837, p. 136: walled; the old Compagnie d''Afrique always had one of its principal agents at Bona; Smyth 1854, p. 458: the citadel 36 54 2 N, 7 47 53 E, 398 feet'
+    says: 'Bona, a walled town on its hill with its casba, the market of Constantine''s corn, wool, hides and wax; its old harbours are choked.'
+
+  - id: cassarin-anchorage
+    kind: anchorage
+    name: the Cassarin
+    modern: 'the road off Annaba, south of the Lion'
+    lat_deg: 36.9114
+    lon_deg: 7.7845
+    fix: 'moved 1,040 m, beyond the rule''s reach, to the nearest water of half the pilot''s depth: the modern port of Annaba is the grid''s land where the Cassarin lay'
+    height_m: 0
+    depth_fathoms: 5
+    bottom: sand over mud
+    source: 'Berard 1837, p. 134: off the coast between the Lion and Point Cigogne, half a mile off at most, in 5, 6 and 7 brasses of sand over mud; the summer berth by the insurers'' rule (pp. 132 to 133), called the well by the Company''s agents (p. 133); p. 135: the north-easterly gale of 24 and 25 January 1835 drove eleven ships ashore there and at the Caroubiers; p. 135: the berth of a ship of the line or a frigate in 9 brasses of mud, the Lion N 40 W three quarters of a mile; Derrotero 1849, p. 260: 5 to 7 brazas fine sand and mud, very bad in winter'
+    says: 'The Cassarin, the summer road before Bona, five fathoms of sand over mud; a north-easter in winter drives ships ashore here.'
+

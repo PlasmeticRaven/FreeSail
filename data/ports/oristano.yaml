@@ -1,0 +1,114 @@
+# FreeSail: Oristano's road as a port (package 104, beside the coast of Tunis's block, in the
+# Tyrrhenian's region; no patch), on package 35's machinery; the marks are the Tyrrhenian's features
+# file's (data/charts/features/tyrrhenian.yaml).
+#
+# Sources. Smyth 1828, pp. 293 to 298: the extensive bay of Oristano between San Marco and La Frasca,
+# excellent anchorage during all the shore winds, but the westerlies blow full in with a great sea
+# and surf; two or three vessels may lie securely in six or seven fathoms by rounding San Marco and
+# bringing up east of the two towers; three shoals off the Tirsi; with the difficulty of wood and of
+# water in summer, its unhealthiness and exposure to westerly winds, on the whole a bad anchorage;
+# cattle and refreshments in any quantity, embarked at the Torre Grande; the city a busy and
+# commercial place of 4,500 people, reckoned wealthy, its air deadly in summer; the Torre Grande a
+# well constructed tower redoubt with magazines, where the produce of the plain and the coarse
+# pottery are embarked; p. 113: the salterns 4,000 salms; p. 114: linseed in the greatest
+# abundance. Purdy 1826, p. 84: the largest and best bay of the west coast but open to westerly
+# winds, a commodious rendezvous for a fleet. Norie 1831, p. 62: not always to be recommended.
+# Derrotero 1849, pp. 138 to 139: the Rada east of Cape Frasca in ten brazas, excellent holding of
+# ooze, capable of the most numerous squadron. Lamberti 1844, pp. 330 to 332: wine loaded at Marceddi
+# from Terralba. The corn of the brief's memory is in no period text read (grain only in the
+# Admiralty 1913): JUDGEMENT in its note.
+#
+# The datum: UNVERIFIED; the Tyrrhenian's tiles, no patch.
+#
+# The stance. The King of Sardinia's, neutral to a King's ship. Prices FROM MEMORY or JUDGEMENT.
+
+id: oristano
+name: Oristano
+nation: sardinia
+source: "Smyth 1828 pp. 113-114, 293-298; Purdy 1826 p. 84; Norie 1831 p. 62; Derrotero 1849 pp. 138-139; Lamberti 1844 pp. 330-332"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: oristano-road
+  name: the bay of Oristano
+  lat_deg: 39.7750
+  lon_deg: 8.4850
+  depth_fathoms: 7
+anchorage:
+  feature: oristano-road
+  name: "Oristano's road"
+  lat_deg: 39.7750
+  lon_deg: 8.4850
+mooring:
+  feature: oristano-road
+  name: east of Cape Frasca
+  lat_deg: 39.7750
+  lon_deg: 8.4850
+  depth_fathoms: 7
+  bottom: ooze
+shore:
+  feature: torre-grande
+  name: the beach at the Torre Grande
+  lat_deg: 39.9050
+  lon_deg: 8.5220
+
+pilot:
+  station: oristano-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the Torre Grande
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Porcile, Rombi, Pomata, Ferraro, Biggio, Rivano, Cappai, Melis]   # judgement
+  skill: 0.75
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 270            # judgement
+  words:
+    channel: "The bay lies between Cape San Marco and Cape Frasca, five miles apart, with reefs off each point and three shoals off the mouth of the Tirsi."
+    marks: "Cape San Marco and its tower; Cape Frasca; the Torre Grande on the beach; Monte Arcuentu inland; the belfry of the city on its plain."
+    anchorage: "Anchor east of Cape Frasca in seven fathoms of ooze, very good holding, room for a squadron; with a southerly lie inside La Frasca, with the shore winds anywhere. The westerlies blow full in with a great sea: it is no winter berth."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt, price: 6, origin: sardinia, note: "the salterns (Smyth 1828, p. 113); the price JUDGEMENT"}
+    - {good: cattle, price: 11, origin: sardinia, note: "cattle in any quantity embarked at the Torre Grande (Smyth 1828, p. 293); the price JUDGEMENT"}
+    - {good: fresh beef, price: 14, origin: sardinia, note: "refreshments in any quantity (Smyth 1828, p. 293); the price JUDGEMENT"}
+    - {good: wine, price: 15, origin: sardinia, note: "the wine of Terralba loaded at Marceddi (Lamberti 1844, p. 332); the price JUDGEMENT"}
+    - {good: wheat, price: 16, origin: sardinia, note: "JUDGEMENT; the corn of the plain in no period text read (the Admiralty 1913, p. 700, grain)"}
+    - {good: cheese, price: 18, origin: sardinia, note: "JUDGEMENT"}
+    - {good: hides, price: 34, origin: sardinia, note: "JUDGEMENT"}
+    - {good: wool, price: 22, origin: sardinia, note: "JUDGEMENT"}
+    - {good: vegetables, price: 2, origin: sardinia, note: "JUDGEMENT"}
+    - {good: fowls, price: 2, origin: sardinia, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 65, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "no good water (Smyth 1828, p. 294: the Scilli well and cisterns), hard to get in summer (p. 293); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [oristano-road, 39 48 N 8 21 E, 39 42 N 8 06 E]
+  from_sea: [39 42 N 8 06 E, 39 48 N 8 21 E, oristano-road]
+  in: [oristano-road]

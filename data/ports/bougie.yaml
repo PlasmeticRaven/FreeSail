@@ -1,0 +1,112 @@
+# FreeSail: Bougie as a port (package 104, the Sardinian sea's region, the harbour patch bougie), on
+# package 35's machinery; the marks are the features file's (data/charts/features/sardinian-sea.yaml).
+#
+# Sources. Tofino 1787, p. 155: anchor south of Cape Bugia before a marabout in 6 to 8 brazas of soft
+# mud, moored north and south; weigh every eight days, for the anchors bury themselves; better
+# sheltered from the winds of the third and fourth quadrants than from the first and second; the
+# town by a river down which the ship timber comes for Algiers. Purdy 1826, p. 327: the timber used
+# in ship-building at Algier brought from the interior here; anchorage in 8 and 10 fathoms. Norie
+# 1831, p. 355: fortified, a castle on a hill commanding town and road; oil, wax and many articles of
+# the interior exported; north and north-easterly winds occasion a heavy swell. Berard 1837, pp. 105
+# to 108 (the survey of the 1830s): the cove of Sidi Yahia the one safe winter berth; the town's
+# road no shelter at all in winter; the only point between Algiers and Bona where a damaged ship
+# finds safety. Purdy 1840, p. xxxv (Campbell, 1835): oil, soap, dried figs, and above all
+# carpenters' wood. No text read calls Bougie a corsair port (the brief's memory; the sources win).
+#
+# The datum: UNVERIFIED. No period sheet is patched; the chart is EMODnet's at the lowest
+# astronomical tide, the modern port of Bejaia in the grid where 1805 had an open road.
+#
+# The stance. The regency of Algiers' (the nations table, `algiers`), neutral to a King's ship as to every flag the table has. Its corsairs noted and not modelled. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange, each good's note naming its source where a text names the trade. Decision 67: what is true of the port only for some years is said with its years; the French conquest of the 1830s, after the range, is said and not written as a row. The French took the town in 1833 (Purdy 1840, p. xxxv, its last siege).
+
+id: bougie
+name: Bougie
+nation: algiers
+source: "Tofino 1787 p. 155; Purdy 1826 p. 327; Norie 1831 p. 355; Berard 1837 pp. 105-108; Purdy 1840 p. xxxv"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: bougie-road
+  name: the bay of Bougie
+  lat_deg: 36.7560
+  lon_deg: 5.1021
+  depth_fathoms: 7
+anchorage:
+  feature: bougie-road
+  name: the road of Bougie
+  lat_deg: 36.7560
+  lon_deg: 5.1021
+mooring:
+  feature: bougie-road
+  name: before the marabout, south of the cape
+  lat_deg: 36.7560
+  lon_deg: 5.1021
+  depth_fathoms: 7
+  bottom: soft mud
+shore:
+  feature: bougie
+  name: the beach of Bougie
+  lat_deg: 36.7550
+  lon_deg: 5.0860
+
+pilot:
+  station: bougie-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the reis's boat of Bougie
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Hamida, Ali, Mustafa, Hassan, Murad, Mohammed, Omar, Yahia]   # judgement
+  skill: 0.75
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 45            # judgement
+  words:
+    channel: "The bay of Bougie lies within Cape Carbon, which is steep-to and may be rounded close; the currents about the cape are strong and uncertain, and in a calm they set a ship toward it."
+    marks: "Mount Goureya over the town like a sugar loaf with a marabout on its summit; the castle on its hill commanding the town and the road; Cape Carbon pierced through by a great cave."
+    anchorage: "Anchor south of the cape before the marabout in seven fathoms of soft mud, moored north and south; it is sheltered from the west and north, but an easterly sends in a swell. Weigh your anchors every week, for they bury themselves."
+    tide: "There is next to no tide; the water rises and falls with the wind and the glass."
+
+tide:
+  establishment: Bougie
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: timber, price: 10, origin: algiers, note: "the ship timber brought down the river for the yards of Algiers (Tofino 1787, p. 155; Purdy 1826, p. 327); the price JUDGEMENT, cheap"}
+    - {good: olive oil, price: 33, origin: algiers, note: "oil exported (Norie 1831, p. 355); the price JUDGEMENT"}
+    - {good: wax, price: 92, origin: algiers, note: "wax exported (Norie 1831, p. 355); the price JUDGEMENT"}
+    - {good: figs, price: 7, origin: algiers, note: "dried figs (Purdy 1840, p. xxxv, 1835); the price JUDGEMENT"}
+    - {good: soap, price: 26, origin: algiers, note: "soap (Purdy 1840, p. xxxv, 1835); the price JUDGEMENT"}
+    - {good: iron, price: 30, origin: null, note: "the people make iron implements (Norie 1831, p. 355); the price JUDGEMENT"}
+    - {good: wheat, price: 18, origin: algiers, note: "JUDGEMENT: dearer than at Stora and Bona, whence the corn of the country is shipped"}
+    - {good: hides, price: 44, origin: algiers, note: "JUDGEMENT"}
+    - {good: wool, price: 28, origin: algiers, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 20, origin: algiers, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: algiers, note: "JUDGEMENT"}
+    - {good: charcoal, price: 6, origin: algiers, note: "JUDGEMENT; the charcoal of this coast loaded for Algiers at Mers el Fahm (Berard 1837, p. 101)"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "no watering place named in any text; the river south of the town (Tofino 1787, p. 155); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: no hands for a Christian ship among the Dey's people
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [bougie-road, 36 45 N 5 08 E, 36 49 N 5 10 E, 37 12 N 5 18 E]
+  from_sea: [37 12 N 5 18 E, 36 49 N 5 10 E, 36 45 N 5 08 E, bougie-road]
+  in: [bougie-road]
