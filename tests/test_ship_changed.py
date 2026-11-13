@@ -298,6 +298,38 @@ def movement_boat(hull) -> bool:
     return is_boat_hull(hull)
 
 
+def test_a_third_ships_boat_alongside_her_waits_on_when_he_takes_command():
+    """The lead's review of 1eb18434 (B): a boat of a third ship's lying fast alongside the Fly,
+    which did not bring him, is not sent home by his taking command (`_boats_home` sent every
+    other ship's boat alongside her home); the launch that brought him is."""
+    from freesail.world import boats
+
+    w, fly = fly_given_at_falmouth()
+    me = knowledge.players_person(w)
+    assert w.submit("go to the boat").kind == "person.aboard"
+    assert w.submit("come alongside the Fly").kind == "boat.alongside"
+    for _ in range(60):
+        w.run(60)
+        if str(me.hull) == str(fly.id):
+            break
+    _wo(
+        w,
+        'ship: a merchant brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(60)
+    hind = w.hulls[str(w.sea_vessels.find("Hind").id)]
+    hind.ship.dyn.u = 0.0  # her way off her, by hand, for the boat to be hoisted out
+    jolly, _said = boats.man_boat(w, hind, "")
+    boats.board_from_boat(w, jolly, w.hulls[str(fly.id)])
+    assert w.submit("take command of her").kind == "ship.taken_up"
+    w.run(600)
+    mark = dict(boats._oars(jolly).pulling_for or {})
+    assert str(jolly.id) in w.hulls and mark.get("fast") and mark.get("hull") == str(fly.id)
+    launch = next(h for h in w.hulls.values() if movement_boat(h) and h is not jolly)
+    assert any(x.kind == "boat.mark" and "nobody to wait for" in x.text for x in launch.log)
+
+
 def test_the_man_who_gives_her_up_is_her_late_master_never_the_player():
     """Item 3: her rules captain stands down in his own name, before the command passes; the
     line named the player standing aside at his own order."""
@@ -330,15 +362,28 @@ def test_the_director_doubts_a_ship_not_his_services_to_give():
     assert "a prize the court has not condemned" in str(WO.doubt(w, order))
 
 
-def test_a_kept_hull_asleep_wakes_when_she_is_near_again():
-    """Item 6: a crewed hull with no far brain, once put to sleep, is woken within the range;
-    the promotions were built from the ships with a brain alone."""
-    w, b, hull = _frigate_and_the_brig_x_on_the_sea()
-    b.brain = None
-    crews.demote(w, b)
-    assert not hull.awake
+def test_the_hull_he_left_asleep_wakes_when_she_is_near_again_and_no_other_hull_does():
+    """Item 6, as the lead's review of 1eb18434 narrowed it: the hull he left, kept with no far
+    brain and put to sleep, is woken within the range (built from the ships with a brain
+    alone, she slept for good); a hull he never commanded with no far brain (the Hind's, put
+    to sleep by hand) is not woken by it: the switch woke any such hull."""
+    w, fly, me, e = fly_taken_up()
+    old = w.first_hull
+    crews.demote(w, old.vessel)
+    assert not old.awake
     crews.switch(w)
-    assert hull.awake
+    assert old.awake
+    _wo(
+        w,
+        'ship: a merchant brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(60)
+    hind = w.sea_vessels.find("Hind")
+    hind.brain = None
+    crews.demote(w, hind)
+    crews.switch(w)
+    assert not w.hulls[str(hind.id)].awake
 
 
 def test_his_weigh_anchor_waits_for_the_furling_and_is_not_belayed():
@@ -352,6 +397,25 @@ def test_his_weigh_anchor_waits_for_the_furling_and_is_not_belayed():
     assert any(
         x.kind == "evolution.started" and x.tick > act and "up anchor" in x.text for x in hull.log
     )
+
+
+def test_a_weigh_given_as_she_comes_to_an_anchor_says_at_the_order_that_it_waits():
+    """The lead's review of 1eb18434 (A), every ship's: the frigate coming to an anchor under
+    plain sail is ordered to weigh at tick 300; the weigh waits for the anchor, and the log
+    says so at the order (it ran at 1482, as she was brought up, with no word)."""
+    from tests.test_anchor import road_world
+
+    w = road_world(speed_kn=3.0)
+    w.submit("set plain sail")
+    w.run(240)
+    assert w.submit("come to an anchor").kind == "order.accepted"
+    w.run(60)
+    given = w.clock.tick
+    assert w.submit("weigh anchor").kind == "order.accepted"
+    w.run(2)
+    said = [x for x in w.log if x.kind == "evolution.waiting" and x.tick >= given]
+    assert said and "The weigh waits for the anchor" in said[0].text
+    assert said[0].tick <= given + 1
 
 
 def test_a_chase_of_the_first_hull_steers_for_her_body_after_the_change():

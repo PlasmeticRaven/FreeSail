@@ -853,14 +853,24 @@ def switch(world: World) -> None:
     cap, within_nm, demote_nm = settings(world)
     vessels = world.vessels
     with_brain = [v for v in vessels.vessels if v.brain is not None and not v.done]
-    # a hull kept with no far brain (the old ship left or laid up, the game's first hull
-    # once he has left her) put to sleep beyond the range wakes within it like any other
-    # (package 60: built from `with_brain` alone she slept for good)
-    kept_asleep = [
-        v
-        for v in vessels.vessels
-        if v.kept_hull() and not v.done and not v.crew.awake and v.position is not None
-    ]
+    # the hull he left (package 60), kept with no far brain, left or laid up, the game's first
+    # hull among them, put to sleep beyond the range wakes within it like any other (built
+    # from `with_brain` alone she slept for good); no other hull without one is woken by it
+    # (the lead's review of 1eb18434: one laid in ordinary by the director)
+    left = set((getattr(world, "__dict__", None) or {}).get("_hulls_left") or ())
+    kept_asleep = (
+        [
+            v
+            for v in vessels.vessels
+            if str(v.id) in left
+            and v.kept_hull()
+            and not v.done
+            and not v.crew.awake
+            and v.position is not None
+        ]
+        if left
+        else []
+    )
     if not with_brain and not kept_asleep and not vessels.crewed_ids:
         return
     far_nm: dict[str, float] = {}

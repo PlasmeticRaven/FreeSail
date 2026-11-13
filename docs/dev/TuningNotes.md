@@ -27160,3 +27160,36 @@ test_captain, test_captain_rules, test_ships, test_the_ship_herself, test_boat_d
 test_view_action, test_fight, test_between_hulls, test_flag_drawings); the pace tests of the same
 files alone and last (`--slow -m pace -n 0`, load 2.3 at its start) exit 0, 14 passed. No pin
 moved. The tree reported differs from a2976b5a by this paragraph alone.
+
+### Step 2, first: owed from the lead's review of 1eb18434 (2026-11-13)
+
+The lead's review by reproduction found the eight items mended and three things owed at the head
+of step 2, one commit, each with a test in `tests/test_ship_changed.py` that fails without the
+mend (the three run with the code of 1eb18434 and these tests: 3 failed; with the mends, 3
+passed):
+
+- **(A) A weigh given as she comes to an anchor** (every ship's): since `ANCHOR_WORK_KEPT` it is
+  begun as she is brought up, and the order said nothing of it (the runner's "will follow" line
+  is returned to the order and not logged, for any work that waits its turn). Reproduced: the
+  frigate under plain sail in Carrick Road, `come to an anchor` at 240, `weigh anchor` at 300,
+  brought up at 1482, "All hands up anchor!" at 1482, aweigh at 2399, and no line at 300. Now
+  `ground_tackle._waits_for_the_anchor` notes at the order (tick 301), notable: "The weigh waits
+  for the anchor: she is coming to an anchor, and it is begun as soon as she is brought up." (the
+  same for an unmoor, and behind a let-go or a moor).
+- **(B) `_boats_home` sent home every other ship's boat fast alongside the new ship.** Reproduced:
+  the Hind's jolly boat made fast alongside the Fly before the act, nobody in her for her, was
+  cast off "nobody to wait for" and pulled for the Hind. Now only the boat whose last
+  `boat.alongside` line at her put him aboard (`_brought_him`) goes home; the jolly boat lies on
+  fast alongside, the launch goes home as before.
+- **(C) `crews.switch` woke any crewed hull with no far brain within the range.** Reproduced: the
+  Hind, her brain taken off and put to sleep by hand, was woken. Now the take up keeps the ids of
+  the hulls he has left (`command.HULLS_LEFT`, the hull's and her body's) and the switch wakes
+  those alone; the old ship, put to sleep, is woken as before, the Hind is not. The item 6 test
+  is narrowed to that rule (it put the brig X, no hull of his, to sleep and asked her woken).
+
+**Changes to ordinary games** (no change of ship in them), said as the lead asks: the witness
+rule's mend (`action._witnessed`: in a game played aboard another ship under `--ship`, the first
+hull's captain, not the firing hull's own, now marks her when she fires); `followed_body` written
+to every save; the "came aboard from the the ..." line read "from the ...". And from this commit:
+the weigh's line at the order in (A), and (from step 1's item 6) a weigh or an unmoor given while
+she comes to an anchor is begun when she is brought up, not belayed with no word.

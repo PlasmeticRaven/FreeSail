@@ -42,6 +42,8 @@ __all__ = [
 ]
 
 TAKEN_UP = "ship.taken_up"  # the line in both ships' logs
+# The world's list of the ids of the hulls he has left (the hull and her body), for the switch.
+HULLS_LEFT = "_hulls_left"
 LAID_UP = "laid up"
 LEFT = "left"
 
@@ -270,13 +272,21 @@ def take_up(
         vessel.brain = None  # the player's ship is awake always (crews.crewed)
     _seat_follows(root, person, hull)
     root.__dict__["_players"] = str(hull.id)
+    # the hull he left, kept with no far brain, is woken within the range again
+    # (`crews.switch`; the lead's review of 1eb18434: that hull alone, not any hull without one)
+    left = list(root.__dict__.get(HULLS_LEFT) or [])
+    old_vessel = getattr(old, "vessel", None)
+    for hid in (str(old.id), str(getattr(old_vessel, "id", "") or "")):
+        if hid and hid not in left:
+            left.append(hid)
+    root.__dict__[HULLS_LEFT] = left
     root.__dict__.pop("_player_hull_read", None)
     given = root.__dict__.get("ships_given") or {}
     given.pop(str(hull.id), None)
 
     # the old ship settled (§4)
     old_line = _settle(root, old, how, left_to, port, intent, person, hull)
-    _boats_home(root, hull)
+    _boats_home(root, hull, person)
     text = f"{person.name} takes command of the {_name(hull)}; the {_name(old)} {old_line}."
     data = {
         "person": person.name,
@@ -351,10 +361,24 @@ def _settle(
     return words
 
 
-def _boats_home(root: Any, hull: Any) -> None:
-    """A boat of another ship's lying fast alongside her for his coming back (the boat that
-    brought him across, `boats.board_from_boat`) pulls home to her own ship and is hoisted in
-    there (`boats.come_alongside`): he will not come back, she is his home now."""
+def _brought_him(boat: Any, hull: Any, person: Any) -> bool:
+    """Whether the boat's last coming alongside her put him aboard her
+    (`boats.board_from_boat`'s `boat.alongside` line names who went aboard)."""
+    for x in reversed(list(getattr(boat, "log", None) or [])):
+        if x.kind != "boat.alongside":
+            continue
+        data = dict(getattr(x, "data", None) or {})
+        return str(data.get("ship") or "") == str(hull.id) and person.name in (
+            data.get("people") or []
+        )
+    return False
+
+
+def _boats_home(root: Any, hull: Any, person: Any) -> None:
+    """The boat that brought him across (`boats.board_from_boat`), lying fast alongside her
+    for his coming back, pulls home to her own ship and is hoisted in there
+    (`boats.come_alongside`): he will not come back, she is his home now. Another boat
+    alongside her, waiting for its own visitor, waits on (the lead's review of 1eb18434)."""
     from freesail.world import boats
 
     for boat in list((getattr(root, "hulls", None) or {}).values()):
@@ -365,7 +389,7 @@ def _boats_home(root: Any, hull: Any) -> None:
         if not (mark.get("fast") and str(mark.get("hull") or "") == str(hull.id)):
             continue
         ship_hull = boats.ship_of(root, boat)
-        if ship_hull is None or ship_hull is hull:
+        if ship_hull is None or ship_hull is hull or not _brought_him(boat, hull, person):
             continue
         text = boats.come_alongside(root, boat, "")
         boat.record(
