@@ -410,6 +410,9 @@ class Harbour:
             with contextlib.suppress(OSError, yaml.YAMLError, AttributeError):
                 doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
                 name = str(doc.get("name") or path.stem)
+                if doc.get("follows_history") is True:
+                    # decision 69: said on the harbour's page in the world's words
+                    name += ", keeping to the course of history"
             Harbour._names[key] = (mtime, name)
             cached = Harbour._names[key]
         return {"path": _rel(path) if not own else str(path), "name": cached[1], "own": own}

@@ -806,9 +806,10 @@ class Lookout:
     def _refresh_flags(world: Any) -> None:
         """What flies where on the ship (package 76, item 8): the locker's list set from the
         nation's colours.yaml once a minute with the look (`flags.refresh_world`)."""
-        from freesail.world.flags import refresh_world
+        from freesail.world.flags import dressing_tick, refresh_world
 
         refresh_world(world)
+        dressing_tick(world)  # package 102: the dressing down at sunset or with the colours
 
     def _colours_changed(
         self, v: Any, fid: str, level: int

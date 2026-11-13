@@ -779,6 +779,20 @@ class Locker:
     # beside the file's (`hoist the broad pendant`, `... a second ensign`, `... the jack`)
     flies: list[dict[str, Any]] | None = None
     ordered_flags: list[str] = field(default_factory=list)
+    # package 102 (step 4): whether she is dressed (`dress ship`), and the tick she dressed;
+    # plain defaults, left out of the pickle while she is not, so that a save from before
+    # loads as it did
+    dressed: bool = False
+    dressed_since: int = 0
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the dressing only while she is dressed (package
+        102)."""
+        state = dict(self.__dict__)
+        if not state.get("dressed"):
+            state.pop("dressed", None)
+            state.pop("dressed_since", None)
+        return state
 
     def next_serial(self) -> int:
         self.serial += 1

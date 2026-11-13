@@ -16363,3 +16363,163 @@ def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_b
     w.run(120)
     assert w.people.captain.aboard
     assert [e.kind for e in w.log].count("boat.stood_down") == 1
+
+
+def test_truth_7_503_a_ship_dressed_flies_the_fashion_of_the_scenarios_year_and_no_later_one():
+    """Package 102, step 4: dressed in 1792 to 1883 her flags hang in the yards, the stays and
+    the shrouds (Röding 1794, Babron 1817), none on a line from masthead to masthead and none
+    at a truck; the rainbow fashion from 1884 (Luce) and never before it."""
+    from tests.test_flag_drawings import test_the_fashion_is_the_years_and_never_a_later_one as c
+
+    c()
+
+
+def test_truth_7_504_dress_ship_holds_until_undress_ship_sunset_or_the_colours_coming_down():
+    """Package 102, step 4: `dress ship` by day hangs her flags (served and read), `undress
+    ship` takes them down, sunset and the colours coming down take them down of themselves;
+    refused by night, with her colours down, and below as the colours' orders are."""
+    from tests.test_flag_drawings import (
+        test_dress_ship_hangs_her_flags_until_undress_ship_sunset_or_the_colours_coming_down as a,
+    )
+    from tests.test_flag_drawings import test_dress_ship_is_refused_below_as_the_colours_are as b
+
+    a()
+    b()
+
+
+# -- decision 69: the calendar and the world (the lead's ruling of 2026-11-13), 7-580 to 7-584
+
+
+def _genoa_world(follows_history: bool, nation: str = "britain", ship: str = FRIGATE):
+    """Genoa's road on the evening of 3 June 1805, the eve of the annexation (its file's
+    dated nation, package 79d), at seed 7 on the whole chart."""
+    road = (44.3880, 8.9150)  # features/ligurian-sea.yaml's `genoa-road`
+    return _gulf_at(
+        *road,
+        datetime(1805, 6, 3, 22),
+        ship=ship,
+        nation=nation,
+        ports=LIGURIAN_PORTS,
+        follows_history=follows_history,
+    )
+
+
+def test_truth_7_580_the_record_seeds_the_port_and_the_world_keeps_it():
+    """Decision 69: a port's dated record seeds it on the scenario's first day and the port
+    is then the world's. Begun at Genoa on the eve of the annexation and run into the 4th,
+    the port is still the Ligurian Republic's: neutral to a King's ship, its prices reckoned
+    for the same holder its stance reads (`port.nation`, which the stance, the market and the
+    prize court all read)."""
+    w = _genoa_world(follows_history=False)
+    genoa = w.ports.ports["genoa"]
+    assert genoa.nation == "liguria" and w.dealings.stance(genoa) == "neutral"
+    w.run(4 * 3600)
+    assert w.clock.ship_time.date() == datetime(1805, 6, 4).date()
+    assert genoa.nation == "liguria" and w.dealings.stance(genoa) == "neutral"
+    # a game begun on the 4th is seeded France's, as the record has it on its first day
+    later = _gulf_at(44.3880, 8.9150, datetime(1805, 6, 4, 6), ports=LIGURIAN_PORTS)
+    assert later.ports.ports["genoa"].nation == "france"
+    assert later.dealings.stance(later.ports.ports["genoa"]) == "hostile"
+
+
+def test_truth_7_581_a_scenario_that_follows_history_has_the_records_events_on_their_days():
+    """Decision 69: where the scenario says `follows_history: true`, each dated row is the
+    event of the day it begins or ends. Begun on the eve and run into the 4th, Genoa is
+    France's: hostile to a King's ship, open to a French one, neutral to an American."""
+    for nation, ship, then in (
+        ("britain", FRIGATE, "hostile"),
+        ("france", SCHOONER, "open"),
+        ("united-states", SCHOONER, "neutral"),
+    ):
+        w = _genoa_world(follows_history=True, nation=nation, ship=ship)
+        assert w.ports.ports["genoa"].nation == "liguria"
+        w.run(4 * 3600)
+        assert w.ports.ports["genoa"].nation == "france"
+        assert w.dealings.stance(w.ports.ports["genoa"]) == then, nation
+
+
+def test_truth_7_582_what_play_makes_of_a_port_lasts_until_the_records_next_event(tmp_path):
+    """Decision 69, and the fault the chart session found: a director's closure of a port
+    whose `closed_to` is dated rows was overwritten at the day's turn by the row in force.
+    Now it lasts: without the key for good; with `follows_history` until the record's next
+    event of that key (the row closing the port to Britain ends on 4 September 1800, and on
+    the 5th the record's state, open to all, is that day's event)."""
+    from freesail.world import orders as O
+    from freesail.world.ports import load_port
+    from tests.test_ports import _dated_port
+
+    path = _dated_port(tmp_path)
+    for follows, after in ((False, ["britain", "spain"]), (True, [])):
+        w = _gulf_at(
+            44.3880,
+            8.9150,
+            datetime(1800, 9, 4, 22),
+            ports=LIGURIAN_PORTS,
+            follows_history=follows,
+        )
+        w.ports.ports["testport"] = load_port(path, w.chart, None, datetime(1800, 9, 4, 22))
+        port = w.ports.ports["testport"]
+        assert port.closed_to == ["britain"]
+        O.apply(w, O.parse("port testport: closed to Spain"))
+        assert port.closed_to == ["britain", "spain"]
+        w.run(3600)
+        assert port.closed_to == ["britain", "spain"]  # the same day: nothing moves
+        w.run(3 * 3600)
+        assert port.closed_to == after, follows
+
+
+def test_truth_7_583_the_scenario_says_it_follows_history_and_old_saves_read_as_before(tmp_path):
+    """Decision 69: the key is the scenario's (`follows_history`, false where absent), said
+    in its lines and on the harbour's list in the world's words; a value not true or false
+    is refused in words; a scenario that does not say it saves exactly as before (the save
+    carries no such key), and one that says it carries it through the save."""
+    from freesail.core.world import Scenario as Sc
+    from freesail.ui.harbour import Harbour
+    from freesail.world.scenarios import HISTORY_WORDS, ScenarioError, load_scenario
+
+    text = (
+        "name: The record kept\nstart: 1805-06-03T22:00\nchart: atlantic-east\n"
+        "position: {lat_deg: 44.388, lon_deg: 8.915}\nfollows_history: true\n"
+    )
+    path = tmp_path / "kept.yaml"
+    path.write_text(text, encoding="utf-8")
+    sf = load_scenario(path)
+    assert sf.scenario.follows_history is True and HISTORY_WORDS in sf.lines()
+    for word in ("package", "engine", "test", "director"):
+        assert word not in HISTORY_WORDS.lower()
+    entry = Harbour._scenario_entry(Harbour.__new__(Harbour), path, own=True)
+    assert entry["name"] == "The record kept, keeping to the course of history"
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(text.replace("true", "sometimes"), encoding="utf-8")
+    with pytest.raises(ScenarioError, match="true or false"):
+        load_scenario(bad)
+    plain = Sc()
+    assert plain.follows_history is False and "follows_history" not in plain.to_dict()
+    assert Sc.from_dict(sf.scenario.to_dict()).follows_history is True
+
+
+def test_truth_7_584_the_regimes_dated_blockade_is_the_first_days_unless_history_is_followed():
+    """Decision 69, the regimes' blockade stations by the lead's leave (package 79a's dated
+    blockades of `data/nations.yaml`, the one reader by the running day): a world begun on 1
+    May 1805, between Orde's blockade of Cadiz and the watch from 31 May (James vol. 3 pp.
+    341 and 375), drawing its blockades again on 12 June draws none where the record only
+    seeded the world, and the watch of Cadiz where the scenario follows history."""
+    for follows, drawn in ((False, False), (True, True)):
+        sc = Scenario(
+            start_time=datetime(1805, 5, 1, 10),
+            wind_from_deg=270.0,
+            wind_speed_kn=14.0,
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": 36.4, "lon_deg": -6.8},
+            region="portugal",
+            ports=["cadiz", "lisbon", "lagos"],
+            nation="britain",
+            business="on",
+            follows_history=follows,
+        )
+        w = make_world(SEED, "data/ships/topsail-schooner.yaml", sc)
+        assert w.squadrons.find("the blockade of Cadiz") is None
+        w.clock.tick = int((datetime(1805, 6, 12, 10) - sc.start_time).total_seconds())
+        w.business._blockades()
+        assert (w.squadrons.find("the blockade of Cadiz") is not None) == drawn, follows

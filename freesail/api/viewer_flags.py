@@ -178,3 +178,29 @@ def hoists(world: Any, ship: Any) -> list[dict[str, Any]]:
                     }
                 )
     return out
+
+
+def dressed(world: Any, ship: Any) -> list[dict[str, Any]]:
+    """What the player's ship hangs where while she is dressed (package 102, step 4), for the
+    snapshot: each place of the year's fashion with its flag (`flags.dressing_flies`), drawn
+    as a hoist of one flag is; [] while she is not dressed. Pure and read-only."""
+    extra = getattr(ship, "extra", None)
+    locker = extra.get("signals") if isinstance(extra, dict) else None
+    if locker is None or not getattr(locker, "dressed", False):
+        return []
+    from freesail.api import queries
+    from freesail.world import flags as F
+
+    colours = getattr(locker, "colours", None)
+    nation = str(getattr(colours, "nation", "") or "") or _own_nation(world)
+    try:
+        year = int(world.clock.ship_time.year)
+    except AttributeError:
+        year = 1805
+    return F.dressing_flies(
+        queries.ship_graph(ship),
+        getattr(world, "nations", None),
+        nation,
+        F.world_role(world),
+        year,
+    )
