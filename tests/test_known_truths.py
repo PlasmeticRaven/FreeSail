@@ -16175,6 +16175,166 @@ def test_truth_7_541_a_thing_is_taken_by_its_listed_name_two_are_told_apart_and_
     assert e.data["thing"] == "letter_from_the_admiralty_to_the_captain" and e.data["moved"]
 
 
+# ---------------------------------------------------------------------------
+# Package 111: the chart's audit (truths 7-560 to 7-565)
+# ---------------------------------------------------------------------------
+
+
+def _audit_tool():
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("audit_chart", root / "tools" / "audit_chart.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("audit_chart", mod)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_truth_7_560_every_port_lies_on_the_chart_in_a_region_its_nations_in_the_table():
+    """Package 111 (f): every port file loads on the whole chart; its road, anchorage and
+    mooring answer the chart; every spot lies inside its feature's region's bounds or
+    harbours (or inside some region's); every nation it names, dated, blockading or closed
+    to, is in the nations' table; its dated rows run whole, no overlap and no day between.
+    The spots on the grid's ground are the known list's: thirteen moorings and Cartagena's
+    road, each in a basin, a river or behind a mole the grid has as land."""
+    A = _audit_tool()
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart))
+    kinds = {f.key.split(":", 1)[0] for f in audit.findings}
+    assert not kinds & {"f-load", "f-off-chart", "f-region", "f-nation", "f-dated"}
+    dry = sorted(f.key for f in audit.findings if f.key.startswith("f-dry:"))
+    assert len(dry) == 14 and dry.count("f-dry:cartagena:outer_road") == 1
+    assert all(k.endswith(":mooring") for k in dry if k != "f-dry:cartagena:outer_road")
+    assert len(list(A.PORTS_DIR.glob("*.yaml"))) >= 90
+
+
+def test_truth_7_561_every_scenario_starts_on_its_charts_water_and_names_only_ports_on_file():
+    """Package 111 (h): every scenario file loads; each that names a chart starts inside it,
+    on water; every port it names has its file."""
+    A = _audit_tool()
+    audit = A.Audit()
+    A.check_scenarios(audit)
+    assert audit.findings == []
+
+
+def test_truth_7_562_the_tides_level_by_sea_and_the_four_blocks_that_read_the_elevens():
+    """Package 111 (c): the world's mean level over a region's water is its sea's where a
+    gauge of the blend has its level read: the Channel's and Biscay's metres, the
+    Mediterranean's few decimetres; over the four blocks whose gauges have none read it is
+    the eleven's (the how-to's rule): the Tyrrhenian Saint-Malo's 6.83 m or Dover's 3.7 m by
+    the place, the Strait and
+    Madeira Le Conquet's 3.98 m, the Azores 3.2 to 4 m. No region's water reads a gauge
+    beyond the reach or mostly another sea's."""
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_tide
+
+    A = _audit_tool()
+    tide = load_tide()
+
+    def level(lat, lon):
+        return tide.constants_at(Position(lat, lon))[0]
+
+    assert 2.5 < level(50.0, -4.0) < 4.5  # the Channel off the Eddystone
+    assert 2.5 < level(46.5, -2.0) < 4.5  # Biscay off the Sables
+    assert level(41.3, 2.3) < 0.5 and level(43.0, 5.0) < 0.6 and level(39.0, 3.0) < 0.3
+    assert 3.6 < level(40.7, 14.0) < 3.8  # off Naples: Dover's
+    assert 6.7 < level(40.0, 12.0) < 6.9  # the open Tyrrhenian: Saint-Malo's
+    assert 3.9 < level(36.0, -5.6) < 4.0  # the Strait off Tarifa: Le Conquet's
+    assert 3.9 < level(32.62, -16.92) < 4.0  # Funchal road
+    assert 3.0 < level(38.5, -28.0) < 4.0  # the Azores' channel
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_tide(audit, chart, tide, A.Water(chart), A.SAMPLED_STEP_DEG)
+    assert {f.key for f in audit.findings} == {
+        "c-level:tyrrhenian",
+        "c-level:strait",
+        "c-level:madeira",
+        "c-level:azores",
+    }
+
+
+def test_truth_7_563_the_ways_in_the_land_guard_refuses():
+    """Package 111 (f), reachable: of the ninety ports, the business's way in from the sea
+    (`ships.approach_plan`, the land guard `ships.land_crossing`) crosses the grid's land for
+    twenty-four and the way out by the track to sea for twenty-four (St Malo's, Dartmouth's,
+    Toulon's, Lisbon's among them); every other port has a way in and out clear of the land,
+    and every way in but Paimboeuf's and Royan's begins with open water in reach."""
+    A = _audit_tool()
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart))
+    ins = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-in:")}
+    outs = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-out:")}
+    opens = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-open:")}
+    assert len(ins) == 24 and len(outs) == 24
+    assert {"st-malo", "dartmouth", "toulon", "lisbon"} <= ins & outs
+    assert "maddalena" in outs - ins and "hyeres" in ins - outs
+    assert opens == {"paimboeuf", "royan"}
+    for pid in ("falmouth", "plymouth", "brest", "cadiz", "gibraltar", "bona", "barcelona"):
+        assert pid not in ins | outs, pid
+
+
+def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
+    """Package 111 (d): the regions whose water more than one box of the climatology answers
+    are Biscay north (the channel box's edge at 47.5 N), Biscay south (portugal's at 43.5 N),
+    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E) and the Balearics (its strip to
+    40.56 N); water in no box lies only in the Balearics' strip, the Cantabrian coast east of
+    5 W below 43.5 N and the Strait south of 36 N west of 5 W."""
+    A = _audit_tool()
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_weather(audit, chart, A.load_climatology(), A.Water(chart), A.FULL_STEP_DEG)
+    keys = {f.key for f in audit.findings}
+    assert {k for k in keys if k.startswith("d-split:")} == {
+        "d-split:biscay-north",
+        "d-split:biscay-south",
+        "d-split:strait",
+        "d-split:tyrrhenian",
+        "d-split:balearics",
+    }
+    assert {k for k in keys if k.startswith("d-no-box:")} == {
+        "d-no-box:balearics",
+        "d-no-box:biscay-south",
+        "d-no-box:strait",
+    }
+
+
+@pytest.mark.slow
+def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
+    """Package 111, the ratchet: the audit's full sweep over every region finds exactly the
+    findings `data/charts/audit-known.yaml` owns, each within its count's ceiling."""
+    A = _audit_tool()
+    audit = A.run(A.FULL_STEP_DEG)
+    known = A.load_known()
+    assert not A.unlisted(audit, known)
+    assert audit.keys() == set(known)
+    assert not A.over_ceiling(audit, known)
+
+
+def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_comes_down(tmp_path):
+    """Package 102, step 3: the player's own hoist, broken out, served at its place (the main
+    topgallant masthead, or the place its order names) flag by flag, the uppermost first, and
+    drawn down its halyard from there; gone when it is hauled down; no stranger's served."""
+    import shutil
+
+    from tests.test_flag_drawings import (
+        test_a_hoist_is_drawn_down_its_halyard_from_its_place as b,
+    )
+    from tests.test_flag_drawings import (
+        test_no_other_ships_hoist_is_served as c,
+    )
+    from tests.test_flag_drawings import (
+        test_the_players_hoist_is_served_at_its_place_flag_by_flag_and_gone_when_hauled_down as a,
+    )
+
+    a()
+    c()
+    if shutil.which("node"):
+        b(tmp_path)
+
+
 def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
     """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
     the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for

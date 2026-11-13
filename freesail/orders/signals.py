@@ -760,6 +760,16 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
     books = S.books_for(world)
     light = S.light_now(world)
     book = book_said or S.BOOKS_BY_LIGHT[light]
+    # package 102 (step 3): a flag signal may name where it flies ('make the signal to tack
+    # at the fore', '... at the main yardarm'); the words before the place are the signal's
+    place = ""
+    m_at = _AT_PLACE.search(words) if book in ("numerary", "convoy") else None
+    if m_at is not None:
+        from freesail.world.flags import place_of_words
+
+        place = place_of_words(m_at.group("place"))
+        if place:
+            words = words[: m_at.start()].rstrip(" ,;")
     if book == "numerary" and _convoy_commodore(world):
         found = books.find(words, "convoy") or books.find(words, "numerary")
     else:
@@ -791,6 +801,8 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
         v = world.vessels.find(str(qualifiers["ship"]))
         to = v.id if v is not None else None
     hoist = S.make_hoist(locker, books, entry, qualifiers, S.own_id(world), tick, to=to)
+    if place and entry.book in ("numerary", "convoy"):
+        hoist.place = place
     if entry.book == "fog":
         # a gun is the signal: the battery fires it when it is ready (the gunnery's), and
         # the flags are not to be seen; the hoist is heard when the gun fires
@@ -808,6 +820,15 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
         "minute to run it up)."
     )
     return "signal.ordered", text, {"verb": "make the signal", "level": 1, "hoist": hoist.to_dict()}
+
+
+# A flag signal's place named at the end of its words (package 102): 'at the fore', 'at the
+# mizen topgallant masthead', 'at the main yardarm', 'at the fore topsail yardarm', 'at the peak'
+_AT_PLACE = re.compile(
+    r"\s+(?:at|from)\s+(?P<place>the\s+(?:(?:fore|main|mizen|mizzen)(?:\s+(?:top|topgallant|royal)"
+    r"\s*mast\s*-?\s*head|\s+(?:(?:topsail|topgallant|royal)\s+)?yard\s*-?\s*arm)?|peak))\s*$",
+    re.IGNORECASE,
+)
 
 
 def _convoy_commodore(world: Any) -> bool:
