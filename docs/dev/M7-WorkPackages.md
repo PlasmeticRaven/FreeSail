@@ -4771,8 +4771,7 @@ but nothing is built until the lead has that table. **Package 109 is mending the
 land guard never checked (the owner's note 8): merge the trunk before 2b and say what its
 step changes of your count.** **Not step 2's, kept in the list:** the four levels and the
 rocks the grid lacks (a package of their own, put to the owner as 113; **the owner, 2026-11-13: "Shouldn't we let 111 finish before booking anything that comes from it, so that whatever we do book has all the information and leads?": so nothing is booked from the audit until package 111 is closed, and what it leaves is gathered then**); the coasts' misses
-(a rebuild); the tiles' reach into open water (package 112's seas). The whole suite in the
-cloud on the trunk after its next run, the figures to follow.
+(a rebuild); the tiles' reach into open water (package 112's seas). The whole suite in the cloud, run 77 (2026-11-13, 03:43 to 05:39 UTC, on d89211c2): green in lint, the six shards and the pace job, the browser plans skipped there as in every run before it; the plans played in the cloud from run 81.
 
 ### Package 102, step 3 (a hoist has its place and is seen), as merged (2026-11-13)
 
