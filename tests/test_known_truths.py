@@ -16111,3 +16111,13 @@ def test_truth_7_483_the_old_ship_is_settled_and_never_lost_from_the_world():
 
     T.test_the_old_ship_is_kept_in_the_world_with_her_company()
     T.test_the_old_ship_laid_up_at_falmouth()
+
+
+@pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
+def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
+    """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
+    its book.yaml declares, has a drawing in its flags.yaml (or basic's), marked `plate` or
+    `made` with its source; Britain's numerals by the year from Perrin's Plate XIII."""
+    from tests.test_flag_drawings import test_every_flag_a_hoist_can_hold_has_a_drawing as c
+
+    c(root)

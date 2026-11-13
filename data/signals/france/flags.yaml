@@ -1,0 +1,370 @@
+# FreeSail: the French signal flags drawn (package 102, step 2; docs/design/Design-Signals.md,
+# "The signal flags drawn"). The shape of data/signals/britain/flags.yaml (its head says the
+# fields). Every flag from Audibert Ramatuelle's plate of 1802 (the atlas's Pl. 3, in colour;
+# docs/references/signals/pages/), the twenty flags of du Pavillon's table as he proposes them
+# (1 to 10 white and red, 11 to 20 yellow and black), the zero 'égal à tous', four guidons and
+# six pendants, 2:3 as his § 68 gives them. It is his proposal, not the service's book of the
+# year VI, which is not found: said in each row. A table hoist flies two of the twenty, the
+# upper the cell's row and the lower its column (`flags.table_flags`).
+
+nation: france
+sources:
+  - "Audibert Ramatuelle, Cours élémentaire de tactique navale, Paris 1802, the atlas, Pl. 3, and the text, ch. IV § 67 to 68"
+flags:
+  - name: "table flag 1"
+    kind: flag
+    words: "the flag écartelé rouge et blanc"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [0.5, 0.5], [0, 1]], colour: red}
+      - {poly: [[1, 0], [0.5, 0.5], [1, 1]], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 1; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 2"
+    kind: flag
+    words: "the flag rouge à croix blanche"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0.37, 1, 0.63], colour: white}
+      - {rect: [0.4133, 0, 0.5867, 1], colour: white}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 2; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 3"
+    kind: flag
+    words: "the flag blanc à sautoir rouge"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {line: [[0, 0], [1, 1]], width: 0.22, colour: red}
+      - {line: [[0, 1], [1, 0]], width: 0.22, colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 3; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 4"
+    kind: flag
+    words: "the flag à carreaux rouges et blancs"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.0, 0.0, 0.3333, 0.3333], colour: white}
+      - {rect: [0.6667, 0.0, 1.0, 0.3333], colour: white}
+      - {rect: [0.3333, 0.3333, 0.6667, 0.6667], colour: white}
+      - {rect: [0.0, 0.6667, 0.3333, 1.0], colour: white}
+      - {rect: [0.6667, 0.6667, 1.0, 1.0], colour: white}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 4; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 5"
+    kind: flag
+    words: "the flag mi-parti rouge et blanc"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 1, 1.0], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 5; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 6"
+    kind: flag
+    words: "the flag vertical rouge et blanc"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: white}
+      - {rect: [0.5, 0, 1.0, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 6; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 7"
+    kind: flag
+    words: "the flag deux triangles, rouge et blanc"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [1, 1], [0, 1]], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 7; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 8"
+    kind: flag
+    words: "the flag bandelé rouge et blanc"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [0.2857, 0.0], [0.0, 0.2857]], colour: red}
+      - {poly: [[0.5714, 0.0], [0.8571, 0.0], [0.0, 0.8571], [0.0, 0.5714]], colour: red}
+      - {poly: [[1.0, 0.1429], [1.0, 0.4286], [0.4286, 1.0], [0.1429, 1.0]], colour: red}
+      - {poly: [[1.0, 0.7143], [1, 1], [0.7143, 1.0]], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 8; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 9"
+    kind: flag
+    words: "the flag blanc bordé de rouge"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.1067, 0.16, 0.8933, 0.84], colour: white}
+      - {rect: [0.38, 0.4, 0.62, 0.6], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 9; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 10"
+    kind: flag
+    words: "the flag losangé blanc et rouge"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0.5, 0], [1, 0.5], [0.5, 1], [0, 0.5]], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 10; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 11"
+    kind: flag
+    words: "the flag écartelé jaune et noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {poly: [[0, 0], [0.5, 0.5], [0, 1]], colour: black}
+      - {poly: [[1, 0], [0.5, 0.5], [1, 1]], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 11; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 12"
+    kind: flag
+    words: "the flag jaune à croix noire"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: black}
+      - {rect: [0, 0.37, 1, 0.63], colour: yellow}
+      - {rect: [0.4133, 0, 0.5867, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 12; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 13"
+    kind: flag
+    words: "the flag jaune à sautoir noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {line: [[0, 0], [1, 1]], width: 0.22, colour: black}
+      - {line: [[0, 1], [1, 0]], width: 0.22, colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 13; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 14"
+    kind: flag
+    words: "the flag à carreaux jaunes et noirs"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: black}
+      - {rect: [0.0, 0.0, 0.3333, 0.3333], colour: yellow}
+      - {rect: [0.6667, 0.0, 1.0, 0.3333], colour: yellow}
+      - {rect: [0.3333, 0.3333, 0.6667, 0.6667], colour: yellow}
+      - {rect: [0.0, 0.6667, 0.3333, 1.0], colour: yellow}
+      - {rect: [0.6667, 0.6667, 1.0, 1.0], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 14; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 15"
+    kind: flag
+    words: "the flag mi-parti jaune et noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: yellow}
+      - {rect: [0, 0.5, 1, 1.0], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 15; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 16"
+    kind: flag
+    words: "the flag vertical jaune et noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0, 1.0, 1], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 16; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 17"
+    kind: flag
+    words: "the flag deux triangles, jaune et noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: black}
+      - {poly: [[0, 0], [1, 1], [0, 1]], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 17; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 18"
+    kind: flag
+    words: "the flag bandelé jaune et noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {poly: [[0, 0], [0.2857, 0.0], [0.0, 0.2857]], colour: black}
+      - {poly: [[0.5714, 0.0], [0.8571, 0.0], [0.0, 0.8571], [0.0, 0.5714]], colour: black}
+      - {poly: [[1.0, 0.1429], [1.0, 0.4286], [0.4286, 1.0], [0.1429, 1.0]], colour: black}
+      - {poly: [[1.0, 0.7143], [1, 1], [0.7143, 1.0]], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 18; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 19"
+    kind: flag
+    words: "the flag jaune bordé de noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: black}
+      - {rect: [0.1067, 0.16, 0.8933, 0.84], colour: yellow}
+      - {rect: [0.38, 0.4, 0.62, 0.6], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 19; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "table flag 20"
+    kind: flag
+    words: "the flag losangé jaune et noir"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {poly: [[0.5, 0], [1, 0.5], [0.5, 1], [0, 0.5]], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', No. 20; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "universal flag"
+    kind: flag
+    words: "the flag equal to all"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: black}
+      - {rect: [0.5, 0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', 'égal à tous', the zero: quartered black, red, white and yellow; flown as the lower flag where the cell's two are the same (JUDGEMENT on its use, as Mazarredo's universal flag); Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "guidon 1"
+    kind: flag
+    words: "the guidon blanc à queue rouge"
+    proportion: [9, 26]
+    shape: swallowtail
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: white}
+      - {rect: [0.5, 0, 1.0, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', guidon No. 1; the proportion his § 68 (9 ft of hoist on 26 of fly); Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "guidon 2"
+    kind: flag
+    words: "the guidon mi-parti jaune et rouge"
+    proportion: [9, 26]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', guidon No. 2; the proportion his § 68 (9 ft of hoist on 26 of fly); Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "guidon 3"
+    kind: flag
+    words: "the guidon trois couleurs"
+    proportion: [9, 26]
+    shape: swallowtail
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: red}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', guidon No. 3; the proportion his § 68 (9 ft of hoist on 26 of fly); Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "guidon 4"
+    kind: flag
+    words: "the guidon jaune"
+    proportion: [9, 26]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', guidon No. 4; the proportion his § 68 (9 ft of hoist on 26 of fly); Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "pendant 1"
+    kind: pendant
+    words: "the pendant rouge"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 1; the proportion his § 68 (6 ft on 38); drawn tapering as the service's were (§ 68: 'on est dans l'usage d'effiler les flammes'), not round-ended as he proposes; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "pendant 2"
+    kind: pendant
+    words: "the pendant jaune"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 2; the proportion his § 68 (6 ft on 38); drawn tapering as the service's were (§ 68: 'on est dans l'usage d'effiler les flammes'), not round-ended as he proposes; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "pendant 3"
+    kind: pendant
+    words: "the pendant blanche à queue rouge et noire"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0.5, 0, 1, 0.5], colour: red}
+      - {rect: [0.5, 0.5, 1, 1], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 3; the proportion his § 68 (6 ft on 38); drawn tapering as the service's were (§ 68: 'on est dans l'usage d'effiler les flammes'), not round-ended as he proposes; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "pendant 4"
+    kind: pendant
+    words: "the pendant chinoise"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [0.1667, 0.0], [0.0, 0.1667]], colour: black}
+      - {poly: [[0.3333, 0.0], [0.5, 0.0], [0.0, 0.5], [0.0, 0.3333]], colour: black}
+      - {poly: [[0.6667, 0.0], [0.8333, 0.0], [0.0, 0.8333], [0.0, 0.6667]], colour: black}
+      - {poly: [[1.0, 0.0], [1, 0], [1.0, 0.1667], [0.1667, 1.0], [0, 1], [0.0, 1.0]], colour: black}
+      - {poly: [[1.0, 0.3333], [1.0, 0.5], [0.5, 1.0], [0.3333, 1.0]], colour: black}
+      - {poly: [[1.0, 0.6667], [1.0, 0.8333], [0.8333, 1.0], [0.6667, 1.0]], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 4; the proportion his § 68 (6 ft on 38); drawn tapering as the service's were (§ 68: 'on est dans l'usage d'effiler les flammes'), not round-ended as he proposes; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found; the 'chinoise' banded black, white, red and yellow on the plate, drawn black and white: JUDGEMENT"
+  - name: "pendant 5"
+    kind: pendant
+    words: "the pendant mi-partie jaune et noir"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: black}
+      - {rect: [0, 0.5, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 5; the proportion his § 68 (6 ft on 38); drawn tapering as the service's were (§ 68: 'on est dans l'usage d'effiler les flammes'), not round-ended as he proposes; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "pendant 6"
+    kind: pendant
+    words: "the pendant noire"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: black}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 6; the proportion his § 68 (6 ft on 38); drawn tapering as the service's were (§ 68: 'on est dans l'usage d'effiler les flammes'), not round-ended as he proposes; Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "answering pendant"
+    kind: pendant
+    words: "the answering pendant"
+    proportion: [3, 19]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "Audibert Ramatuelle, Cours élémentaire de tactique navale (1802), the atlas, Pl. 3, 'Tableau général des pavillons, guidons & flammes', pendant No. 1 (rouge); that it answers: JUDGEMENT (Audibert names no answering pendant); Audibert's proposal for du Pavillon's table, the service's book of the year VI not found"
+  - name: "tricolour pendant"
+    kind: flag
+    words: "the tricolour pendant"
+    same: "French pendant"
+    dates: ""
+    mark: plate
+    source: "data/signals/france/colours.yaml, the French pendant (the law of 1790)"

@@ -12,7 +12,9 @@ qualifier is one the engine fills, and an order's blanks are among them; when ev
 names its source, and an entry whose source calls itself made is marked made and an entry not
 marked made cites a page of the period; when the private form draws a table and names roles
 the captains have; and when every nation whose line names the root reads it under her own
-name. Prints each failure in words; exits 1 when there is one. The same as a test
+name; and (package 102) when every flag a hoist of its books can hold, and every flag its
+book.yaml declares, has a drawing in its flags.yaml or basic's, each marked `plate` or `made`
+with its source. Prints each failure in words; exits 1 when there is one. The same as a test
 parametrized over the roots (`tests/test_signals.py`), so a root added later is checked by
 tests that do not know its name.
 """
@@ -142,10 +144,93 @@ def check_root(
         )
     if books.telegraph and not books.words:
         out.append(f"{root}: the telegraph flag declared and no dictionary")
+    out += signal_flags_problems(root, books)
     for n in load_nations().nations.values():
         if n.signals_root == root and root != "basic":
             if books.nation != n.id:
                 out.append(f"{root}: {n.id} reads it, and it declares the nation '{books.nation}'")
+    return out
+
+
+def declared_flags(books: Any) -> set[str]:
+    """The names of the flags the root's book.yaml declares (its `flags:`), as its flags.yaml
+    names them (package 102, step 2)."""
+    f = dict(books.flags or {})
+    names: set[str] = set()
+    n = int(f.get("numerals") or 0)
+    names |= {f"numeral {k % 10}" for k in range(min(n, 10))}
+    names |= {f"flag {k}" for k in range(10, n)}
+    for key, name in (
+        ("substitute", "substitute"),
+        ("hundred_pendant", "hundred pendant"),
+        ("preparative", "preparative"),
+        ("telegraph", "telegraph flag"),
+        ("answering_pennant", "answering pendant"),
+        ("truce", "truce"),
+        ("universal", "universal flag"),
+        ("diptote", "diptote"),
+        ("cornet", "cornet"),
+    ):
+        if f.get(key) is True:
+            names.add(name)
+    names |= {f"table flag {k}" for k in range(1, int(f.get("table_flags") or 0) + 1)}
+    for key, word, many in (("cornets", "cornet", 2), ("pendants", "pendant", 6)):
+        v = f.get(key)
+        count = v if isinstance(v, int) and not isinstance(v, bool) else (many if v else 0)
+        if books.root == "spain" and key == "pendants" and v:
+            names |= {"Spanish pendant", "added pendant"}
+            continue
+        names |= {f"{word} {k}" for k in range(1, count + 1)}
+    if f.get("guidons") is True:
+        names |= {f"guidon {k}" for k in range(1, 5)}
+    if f.get("understood") is True:
+        names.add("flag 10")  # the white and blue flag striped across (the Naples plate)
+    return names
+
+
+def hoist_flag_names(books: Any) -> set[str]:
+    """Every flag a hoist of the root's books can hold (`flags.hoist_flags`): each numbered
+    signal of the day and convoy books, each word and letter of the dictionary, the answer,
+    and each flag of the private table's day form."""
+    from freesail.world import flags as F
+    from freesail.world.signals import Hoist
+
+    names: set[str] = set()
+    form = books.hoist_form
+    for book in ("numerary", "convoy"):
+        for e in books.book(book):
+            if e.number is not None:
+                h = Hoist(book=book, meaning="", by="", since=0, breaks_out=0, root=books.root)
+                h.numbers, h.form = (int(e.number),), form
+                names |= set(F.hoist_flags(h))
+    for n in [*books.words, *books.alphabet.values()]:
+        names |= set(F.telegraphic_word_flags(int(n)))
+    names.add(F.ANSWERING)
+    pools = ((books.private_form or {}).get("day") or {}).get("pools") or {}
+    names |= {str(x) for x in pools.get("flag") or []}
+    return names
+
+
+def signal_flags_problems(root: str, books: Any) -> list[str]:
+    """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
+    its book.yaml declares, has a drawing in its flags.yaml (or basic's, after it); each row
+    marked `plate` or `made` with its source (the loader refuses one without), its points on
+    its square."""
+    from freesail.world import flags as F
+
+    out: list[str] = []
+    try:
+        own = F.load_signal_flags(root)
+    except Exception as exc:  # noqa: BLE001 - the loader's refusal, said in words
+        return [f"{root}, flags.yaml: {exc}"]
+    for name in sorted(hoist_flag_names(books) | declared_flags(books)):
+        if F.signal_flag(root, name, 1805) is None:
+            out.append(f"{root}: a hoist may hold the {name!r} and no flags.yaml draws it")
+    for row in own.rows:
+        for p in row.flag.drawing:
+            pts = p.get("rect") or [v for pt in (p.get("line") or p.get("poly") or []) for v in pt]
+            if not all(0.0 <= float(v) <= 1.0 for v in pts):
+                out.append(f"{root}, flags.yaml: {row.name!r} ({row.dates}) draws off its square")
     return out
 
 
