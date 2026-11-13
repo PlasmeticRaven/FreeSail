@@ -115,6 +115,9 @@ HAIL_NM = 0.4
 # A vessel making for the ship closes to this part of the distance asked (judgement: a
 # cutter rounding to under a frigate's lee comes a cable and a half when two were named).
 ARRIVE_FRACTION = 0.75
+# package 109, step 5: a goal square's mark on the land, or whose leg crosses it, laid in
+# the nearest clear water with so much water under her (metres)
+OFF_THE_LAND_DEPTH_M = 10.0
 # Under reefed topsails with the courses in she makes this part of her plain-sail speed
 # (judgement: the starter book's "shorten sail for weather" at thirty knots, the loss a
 # reef and the courses cost); lying to she drifts to leeward at a knot (truth 28: lying a
@@ -1277,6 +1280,46 @@ def place_position(world: Any, words: str) -> tuple[Position, str] | None:
         return None
 
 
+def _off_the_land(world: Any, marks: list[Position], reach_nm: float) -> list[Position]:
+    """A goal's square laid where the water is (package 109, step 5): each mark that stands
+    on dry ground, or whose leg from the mark before it crosses the land (`land_crossing`),
+    laid at the nearest point, sought in rings a quarter-mile apart every 15 degrees out to
+    `reach_nm`, with `OFF_THE_LAND_DEPTH_M` under her and both its legs (from the mark
+    before, and to the mark after where that one stands in water) clear of the land; the
+    mark as it was where none is found. Every other mark as package 43 laid it."""
+    from freesail.world.geo import destination
+
+    chart = getattr(world, "chart", None)
+    if chart is None or len(marks) < 2:
+        return marks
+
+    def wet(at: Position) -> bool:
+        d = chart.depth_at(at)
+        return d is None or d >= OFF_THE_LAND_DEPTH_M
+
+    def clear(a: Position, b: Position) -> bool:
+        return not land_crossing(world, a, [("to", b, "")])
+
+    out = list(marks)
+    n = len(out)
+    for k in range(n):
+        prev, here, nxt = out[k - 1], out[k], out[(k + 1) % n]
+        if wet(here) and clear(prev, here):
+            continue
+        ring = 1
+        found = None
+        while found is None and ring * 0.25 <= reach_nm:
+            for b in range(24):
+                at = destination(here, b * 15.0, ring * 0.25 * units.NAUTICAL_MILE)
+                if wet(at) and clear(prev, at) and (not wet(nxt) or clear(at, nxt)):
+                    found = at
+                    break
+            ring += 1
+        if found is not None:
+            out[k] = found
+    return out
+
+
 def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, ...]], bool, str]:
     """The legs a goal's words make: (plan, cycles, the goal's words as kept).
 
@@ -1319,6 +1362,8 @@ def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, 
             from freesail.world.geo import destination
 
             marks.append(("to", destination(p[0], bearing, radius_nm * units.NAUTICAL_MILE), p[1]))
+        laid = _off_the_land(world, [m[1] for m in marks], 2.0 * radius_nm)
+        marks = [("to", at, p[1]) for at in laid]
         return marks, True, f"patrolling off {p[1]} within {radius_nm:g} miles"
     m = re.match(r"^(?:running|run)\s+home\s+(?:to|for)\s+(.+)$", text)
     if m:
