@@ -120,6 +120,16 @@ and a builder's work it would send back twice.
   differs from the brief, what moved, what is asked. Detail goes in the tuning notes and is
   pointed to, not repeated.
 
+- **Builder sessions of its own, for work that the test suites would otherwise queue** (the
+  owner, 2026-11-13: it "may use subordinate cloud sessions for parallelization where test
+  suite parallelization is the blocker (multiple pre-approved chart blocks, for instance)").
+  The lead agrees, on these terms: only for packages already approved, each on its own
+  branch `claude/pkg-NN` cut from the trunk, each bound by every rule of this file and told
+  so in its brief; not more than three at once, since each step still passes one at a time
+  through the lead's trial and merge; two that touch the same region or the same tiles are
+  never run side by side; and the session, not its builder, reports the hash to the lead
+  after reading the work itself.
+
 ## Speaking with the lead
 
 The lead is `session_01DTAvj6mwzAZMm2fER1Bi3U`. To the lead: a one-shot scheduled message
@@ -153,6 +163,31 @@ package, test, engine or director. The owner's saves are never asked for.
 
 The builders now mid-step (105, 106a, 111) finish under the lead; the session takes their
 ground as each closes.
+
+## The lead's rulings to the session
+
+**2026-11-13, on its first report (a47d63ff).** (1) Package 106b's `morocco-north` abuts
+the Strait's bound at 35.5 N, not its tile row's edge: brief it so. (2) The audit's seas:
+package 111's builder is told to make a region with no sea named a failure and not a
+Mediterranean one (its step 2a); package 112's `seas.yaml` then becomes the one source,
+which the audit reads. Package 106a's regions name their sea at its merge. (3) The 40 MB
+rule is read in MiB, as you read it; say the unit in the how-to with your first step. (4)
+Yes: the water-level question is the audit's four findings of a level. (5) Noted: the
+Oriental Navigator comes on the trunk with 106a. **Before package 112's measure:** (a) a
+sea owns the open water outside every region's bounds, for the tide, the weather and the
+audit's check (a); a group of water nobody owns is retired from the list only where its
+sea gives it a tide of its own and not the eleven's; the ten slivers beside a neighbour's
+bounds are closed by bounds, in package 111's step 2a, not by a sea. (b) The open
+Atlantic's level is 112's to MEASURE and report, not to settle: how the tiles' raise and
+the game's level combine today, what the islands' gauges read, and what each choice would
+do to the depths; the lead rules on the report. The four older blocks' own levels wait for
+package 111's close, by the owner's word. (c) One ordered list of layers for a level is
+112's step 1 as briefed: an engine step at its own hash, narrow, proven cell for cell over
+every existing tile. (d) Step 4's words are yours to build as a step of its own, last,
+after you have sent me the lines proposed and where each is said; the world's words, no
+package or engine named. (e) The list of saves, truths and passages that sail
+`atlantic-east`'s open water is part of your step 0's report (package 106a's notes hold a
+first count: check it).
 
 ## The session's standing notes
 
