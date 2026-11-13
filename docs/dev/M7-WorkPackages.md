@@ -9006,6 +9006,25 @@ the Atlantic necessary to sail fairly freely to all the charted points off the c
 Built as `docs/dev/ChartBlocks.md` says (read it whole first, with the sections of 101,
 104, 105 and 106a), under decisions 66 and 67.
 
+**Corrected by the chart session (2026-11-13, at its launch, on the lead's rulings and its
+readings of 106a and 111):** (1) `morocco-north`'s north bound is the Strait's bound,
+**35.5 N**, not its tiles' row edge 35.44 N (the row stays the Strait's by the seam rule).
+(2) **The weather:** Morocco's water east of 9 W from 30 N to 36 N lies in no box (`madeira`
+and `canaries` end at 9 W, `portugal` begins at 36 N): the block's box covers it, from a
+source or marked PROVISIONAL; and its water east of 9.34 W wants a box of its own in
+`book_limits`. (3) **The sea's name:** each region is named in the audit's `SEAS`
+(`tools/audit_chart.py`; a region unnamed is a finding); the canaries' gauges, whose sea is
+`canaries`, will serve the gaugeless south, so name the regions' sea so that their tide is
+not called another sea's (`canaries`, or a sea of the coast's own with `SEAS_THAT_MEET`), and
+say which. (4) **The tracks:** every port's `tracks:` read against its pilot's channel
+words, by the hand each named mark falls on going in, and the least depth at datum along
+each leg reported (package 111's step 2b's check, under 3 m a finding, JUDGEMENT); a way the
+pilot reserves for small craft is not a way for every trader. (5) **Dated rows** in package
+105's form, which since decision 69 seed the port on the scenario's first day and move only
+where the scenario follows history: truths load each port on its start day. (6) Any step that
+touches `data/charts/audit-known.yaml` merges after package 111's step 2b and re-merges the
+trunk.
+
 **What the lead measured (2026-11-11), for the builder to check:** south of the Strait the
 detailed tiles stop at 35.44 N and 6.7733 W; Tangier and Cape Spartel are charted (`strait`);
 Larache, Sallee and Rabat, Mazagan and Safi lie on the coarse layer alone; Mogador had
