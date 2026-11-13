@@ -439,3 +439,13 @@ so they may run side by side, the second to merge taking the first's manifest by
   only under `follows_history` (decision 69), so its truths load each port on its start
   day. 112 reads 111's `SEAS` as the table its `seas.yaml` replaces, with `sicily` and the
   four tide regions in it.
+
+### 2026-11-13, 17:37: 106a's final read for the lead (f2799ec)
+
+Nothing blocking. **For 106b's brief when it launches:** a weather box over Morocco's water
+east of 9 W from 30 to 36 N (in no box today); a `book_limits` box east of 9.34 W; its sea
+in `SEAS` either `canaries` or with `SEAS_THAT_MEET`, since the canaries' gauges serve its
+gaugeless south. **For 112:** the island seas (`madeira`, `azores`, `canaries`, `salvages`)
+to be one sea or met in `seas.yaml`. Left for the lead: the seven Canaries port heads' stale
+words about rows waiting for 105's step 1; decision 68's words are comments only (a served
+field is package 110's to design).
