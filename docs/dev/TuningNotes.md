@@ -27259,6 +27259,20 @@ Found on the way and mended: a ship laid in ordinary by the director and given h
 ordinary once he had taken command of her (her keepers alone wanted to work her); `take_up` now
 takes her out of ordinary in his hands.
 
+### Step 1 reconciled with package 109 (2026-11-13)
+
+The lead found 1eb18434 failing 13 of its own tests on the trunk as it stood (truths 7-480 and
+7-483 and eleven of `tests/test_ship_changed.py`), by one cause: package 109's step 1, merged
+after the trunk step 1 took, made "take command" and "assume command" refused phrases in
+`data/vocabulary.yaml` ("Command of a prize is not taken by words ... 'take possession of her'"),
+so `take command of her` was refused before it was read. Reconciled, the verb being 60's: the two
+refused phrases are gone from the vocabulary, "assume command [of]" is a synonym of `take command
+of`, and the order says 109's sentence itself (`orders.command.PRIZE_WORDS`) where it would refuse
+anyway: words that name a prize ('take command of the prize'), and a ship that is a prize the
+court has not condemned. 109's case moves out of its table in `tests/test_mends_109.py`, old
+beside new and named: `test_take_command_of_the_prize_is_answered_by_its_road` (and 'assume
+command of the prize') and `test_take_command_of_a_ship_his_to_take_is_package_60s_order`.
+
 
 
 ## Package 105: Sicily and Malta (2026-11-12)

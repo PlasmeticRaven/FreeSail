@@ -34,6 +34,14 @@ _TRANSFER = re.compile(
     re.I,
 )
 
+# Package 109's words for a prize (its refused phrase 'take command', made this order's own
+# refusal by package 60): command of a prize is taken by possession, not by words.
+PRIZE_WORDS = (
+    "Command of a prize is not taken by words: her prize master and prize crew are put aboard "
+    "her by 'take possession of her'; to go aboard another ship yourself, 'go to the boat' and "
+    "'pull for' her."
+)
+
 _HER = frozenset({"", "her", "this ship", "this one", "the ship she is", "it"})
 _LAY = re.compile(
     r"^(?:lay|laying)\s+(?:the\s+)?(?P<ship>.+?)\s+up"
@@ -88,6 +96,8 @@ def execute(ship: Any, order: Order) -> Result:
         raise OrderError("Nobody of yours is at the prompt to take command of a ship.")
     words, how, who, intent = parse(order.object or "")
     key = words.lower().removeprefix("the ")
+    if key == "prize" or key.endswith(" prize") or key.startswith("prize "):
+        raise OrderError(PRIZE_WORDS)
     if key in _HER:
         hull = hull_of(root, getattr(person, "hull", None))
         if hull is None:
@@ -99,6 +109,8 @@ def execute(ship: Any, order: Order) -> Result:
             raise OrderError(str(e).rstrip(".") + ".") from None
         if hull is root:
             hull = root.players
+    if _prize_not_condemned(hull):
+        raise OrderError(PRIZE_WORDS)
     try:
         text, data = take_up(root, person, hull, how=how, officer=who, intent=intent, said=False)
     except CommandError as e:
@@ -149,3 +161,14 @@ def _transfer(ship: Any, order: Order) -> Result:
     except TransferError as e:
         raise OrderError(str(e)) from None
     return "company.transfer", said, {"verb": order.verb, "level": 1, **data}
+
+
+def _prize_not_condemned(hull: Any) -> bool:
+    """A prize the court has not condemned (74's record): taken by possession, not by words."""
+    from freesail.world import prizes as P
+
+    vessel = getattr(hull, "vessel", None)
+    if vessel is None or not P.is_prize(vessel):
+        return False
+    rec = P.record_of(vessel) or {}
+    return str((rec.get("court") or {}).get("sentence") or "") != "condemned"
