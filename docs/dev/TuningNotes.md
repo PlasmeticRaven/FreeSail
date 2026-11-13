@@ -27465,6 +27465,26 @@ test_chart_audit, test_chart, test_tide, test_ports, test_weather, test_scenario
 test_business, test_tackle_orders) and of the known truths: 212 passed, 8 xfailed, exit 0. The
 pace tests, alone and last: 15 passed, exit 0.
 
+**Step 2a again, after package 105's step 2 (Sicily) merged first (the lead's order of
+2026-11-13).** The trunk merged at dade4a17 and after (merge commit 969a8be). Sicily's block
+adds two tide regions over its tiles' water that no region holds, `gulf-of-hammamet` and
+`calabria-north`. The audit's table of seas names them and `sicily` (Mediterranean); without
+that, the step's own `c-no-sea` check would have found all three. In the merge, the stream
+book keeps 2a's bounds beside Sicily's box and the Tyrrhenian's east at 15.83999 E. The
+chart's envelope is 31.60001 to 51.5 N and to 16.69332 E, old beside new in `test_chart`. The
+full sweep finds no finding the list lacks and none it no longer finds. The known list has 140
+entries (2a's 142, less the Tyrrhenian's four unowned groups that Sicily closed, with Sicily's
+two). Two ceilings are raised by Sicily's 253 points beside 2a's strip: `c-level:tyrrhenian`
+from 7,171 to 7,424 and `d-split:tyrrhenian` from 8,703 to 8,956. Truths 7-560 to 7-565
+are unchanged and pass in both tiers. **The suites at 969a8be**, in a clean worktree pinned there:
+- ruff check and format: clean;
+- the fast tier whole: 7,594 passed, 1 xfailed, exit 0 (59 minutes);
+- the slow tier of the touched files, the known truths and the twelve browser plans
+  (`tests/test_browser_probe.py`): 224 passed, 8 xfailed, none skipped, exit 0;
+- the pace tests, alone and last: 15 passed, exit 0.
+
+The tree reported differs from 969a8be by this paragraph alone.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the
