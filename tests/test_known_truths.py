@@ -16667,4 +16667,6 @@ def test_truth_7_539_the_frigate_sails_from_valletta_through_the_faro_to_palermo
     assert near_faro
     _, off = bearing_and_distance(w.position, w.chart.feature("palermo-road").position)
     assert off < 0.6 * units.NAUTICAL_MILE
-    assert any("stiff clay" in e.text for e in w.log if e.kind == "sounding")
+    # the road shelves steeply (the hand lead finds no bottom at twenty fathoms a few cables
+    # out): the bottom where she lies is the pilot's, by the chart's note
+    assert w.chart.bottom_near(w.position) == "stiff clay"
