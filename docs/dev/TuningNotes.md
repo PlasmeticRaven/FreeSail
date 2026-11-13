@@ -27348,3 +27348,26 @@ passed; the recorded passages among them, every pinned digest, line count and ti
 digest moved, no kept save and no pin.** **The pace**, alone and last (`--slow -m pace -n 0`,
 the same files, load 3.5 at its start): exit 0, 12 passed. The tree reported differs from
 1a6b1dc by this paragraph alone.
+
+### Step 4: the view follows the hull he is aboard (note 6)
+
+**What was built.** The server already serves the followed hull (`World.ship` is the followed
+hull's since package 84, step 10) and says which in every snapshot (`driver.followed.id`); the
+page fetched her drawing once, at the hello. `client/app.js` now keeps the id of the hull its
+drawing is of (`state.shipFor`) and, when a snapshot's followed hull differs, takes
+`/api/ship` again: her graph, her name and rig over the view and in the title. `ui/server.py`'s
+`ship_drawing` (the hello and `/api/ship`) serves the graph, or her name and the words that say
+why she is not drawn as she stands: a hull in the far shape ("she is not drawn as she stands;
+she sails in the far shape, her sails her file's and not as they are set"), a boat ("a boat
+under oars, with no rig to draw"), a hull with no spars; the page then clears the drawing and
+shows the words. **Seen in the browser** by the probe (`tools/browser_probe.py`'s new `drawn:`
+step: the name over the view and the drawing's caption): the plan `boat-and-visitor` checks the
+Amazon drawn on deck, "the Amazon's launch: a boat under oars, with no rig to draw" in the boat,
+and the X's drawing and name ("X (brig)", not the Amazon's) aboard her. **The toggle:** with the
+trunk's `client/app.js` and `ui/server.py` the same plan fails both later checks (the view
+"Amazon (ship)" throughout, the X's state drawn on the Amazon's rig); with them, it passes.
+
+**Truth 7-544** (the same passage in the world: the frigate's graph on deck, the launch's words,
+the X's graph and name aboard her) and the step's test in `tests/test_mends_109.py`.
+
+**Pins:** none moved (to be confirmed by the suites at the hash).

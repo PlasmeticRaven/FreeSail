@@ -16384,3 +16384,38 @@ def test_truth_7_543_the_directors_dry_run_on_his_hull_is_the_orders_word_and_ne
     assert "No ship named 'Harpy' is on the sea" in dry
     real = T.world_order(h.world, DIRECTOR, order)
     assert "No ship named 'Harpy' is on the sea" in str(real)
+
+
+def test_truth_7_544_the_ships_view_is_drawn_from_the_hull_he_is_in_or_aboard():
+    """Package 109, step 4 (the owner's note 6): the ship's view is served from the hull the
+    drivers follow (`ui.server.ship_drawing`, the hello and `/api/ship`): the frigate's own
+    drawing on her deck; in her launch, "a boat under oars, with no rig to draw"; aboard the
+    merchant brig X as a visitor, the X's drawing and name, not the frigate's (on the trunk
+    the page kept the drawing of the hello's ship throughout; seen in the browser by the
+    plan `boat-and-visitor`)."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.server import ship_drawing
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario("tests/browser_plans/scenarios/frigate-falmouth.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    first = ship_drawing(w)
+    assert first is not None and "undrawn" not in first and first["spars"]
+    w.submit("let go the anchor")
+    w.run(300)
+    w.world_order('ship: a merchant brig "X" of Britain at 50 9.6 N 5 2.0 W, bound for Falmouth')
+    w.world_order('ship "X": intent bound for Falmouth')
+    w.run(61)
+    w.world_order('ship "X": order heave to for a watch')
+    w.run(60)
+    w.submit("go to the boat")
+    w.run(30)
+    boat = ship_drawing(w)
+    assert boat is not None and boat["undrawn"] == "a boat under oars, with no rig to draw"
+    w.submit("set plain sail")
+    w.submit("come alongside the X")
+    w.run(1800)
+    aboard = ship_drawing(w)
+    assert aboard is not None and "undrawn" not in aboard
+    assert aboard["name"] != first["name"] and "X" in aboard["name"], aboard["name"]
