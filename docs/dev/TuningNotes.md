@@ -27208,6 +27208,51 @@ digest moved and no kept save; the pins moved are those listed above, each the r
 **The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
 exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
 
+### Step 2: the boat and the short watch (note 1)
+
+**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
+the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
+watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
+boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
+boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
+the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
+as the boat").
+
+**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
+the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
+other work has the hands, she is not at quarters and all hands are not up already, all hands
+are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
+(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
+told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
+order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
+send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
+the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
+Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
+ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
+not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
+the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
+work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
+Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
+is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
+`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
+not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
+answers the case where she still waits.
+
+**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
+
+**The suites, as run (step 2).** At **929280d** (the trunk merged by merge commit: package 109's
+step 1 and package 105's step 1 as merged, the appended ends of the known truths and these
+notes kept, the trunk's first), in a worktree pinned there, this container, four workers, one
+suite at a time. `ruff check .` and `ruff format --check .` clean (388 files). **The fast tier**
+whole: exit 0, 7,545 run, no failure, 1 skipped, 509 slow left out. **The slow tier of the
+touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
+test_known_truths.py, test_captain_trials.py, test_hands.py, test_boat_hull.py,
+test_boat_director.py, test_orders_places.py, test_ports.py, test_crew_orders.py,
+test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages among them, every
+pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
+pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
+passed. The tree reported differs from 929280d by this paragraph alone.
+
 ## Package 111: the chart's audit (2026-11-13)
 
 ### Step 1: the audit as a tool, its tests and its ratchet (no data changed)
@@ -27299,50 +27344,146 @@ them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No p
 no data file changed.** The tree reported differs from cd46734 by this paragraph and the
 pace's above alone.
 
-### Step 2: the boat and the short watch (note 1)
+### Step 2a: the mends that move no passage, save or truth (the lead's rulings of 2026-11-13)
 
-**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
-the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
-watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
-boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
-boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
-the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
-as the boat").
+**(1) The islands' bounds to their tiles' edges** (`data/charts/manifest.yaml` and the recipes
+in `tools/build_charts.py`, each within its edge by under a metre): Madeira 32 to 33.5 N by
+17.5 to 16 W became 31.60001 to 33.73333 N by 17.86666 to 15.73334 W; the Azores 36.5 to 40 N
+by 31.5 to 24.5 W became 36.29334 to 40.13333 N by 31.51999 to 24.26667 W. The tiles the new
+bounds take in are the regions' own, the same 25 and 153 (`tiles_over`, measured), and
+`--check` passes. The sixteen groups of water nobody owns about the islands are gone, and
+Funchal's and the islands' gauges serve the water instead of Le Conquet's M2 of 2 m. The
+chart's envelope moves south from 32 to 31.60001 N, so `Chart.bounds_words` reads "31.6 to
+51.5 N" (`tests/test_chart.py`'s pin moved, old beside new). The business draws its traders
+at a region's own bounds, so in these two regions they come in a few miles farther out.
+Channel-west's bounds are not touched.
 
-**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
-the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
-other work has the hands, she is not at quarters and all hands are not up already, all hands
-are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
-(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
-told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
-order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
-send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
-the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
-Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
-ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
-not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
-the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
-work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
-Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
-is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
-`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
-not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
-answers the case where she still waits.
+**(2) The Mediterranean slivers.** gulf-of-lion's east bound went from 7.73 to 7.73333 E and
+ligurian-sea's west from 7.74 to 7.73334 E: they meet at the column's edge, 0.9 m apart,
+each within its own column (the 104 rule). ligurian-sea's east went from 11.0 to 11.1466 E.
+The piece west of 8 E between 40.56 and 41 N is now the tide region `asinara-west` (on
+`solent`'s pattern: `TIDE_REGIONS`, the manifest's `tide_regions:`), served by Porto Torres
+`[tyrrhenian, asinara-west]` and Carloforte (its list given `asinara-west` too). Its M2 is
+now the gauges' 7 cm, where Saint-Malo's was 3.7 m. Its level stays the eleven's: neither
+gauge has a level read (Ajaccio's 0.47 m would give one; not ruled). `test_tide.py` names
+the two gauges in its ruled list and skips the region in the gaugeless test, as it does the
+other two gaugeless blocks. The piece stays listed as owned by no region, with its reason.
+**The overlap of the Ligurian sea and the Tyrrhenian** stays listed. What answers there today:
+`region_at` gives ligurian-sea (first in the chart's order); the tide blends both blocks'
+gauges; the weather is the Gulf's box (first in the file's order); the directions take both
+boxes and the first statement whose polygon holds it. With the Ligurian sea's east bound at
+11.1466 E, the water 41 to 42.5 N by 11 to 11.15 E (the Argentario's offing) is now
+ligurian-sea's by `region_at` and blends the Ligurian gauges: 89 points of the full sweep
+read a Ligurian level and no longer the eleven's. The strip 42.5 to 42.68 N east of 11 E, now
+the Ligurian sea's, lies in no weather box and has no statement or stream area: five new
+findings, listed with their reasons.
 
-**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
+**(3) The weather's boxes: none moved.** The ruling's proof is that each strip is answered
+today by the box it would move into; for all three it fails, measured on a grid of 0.005° by
+0.02° over each strip's water:
 
-**The suites, as run (step 2).** At **929280d** (the trunk merged by merge commit: package 109's
-step 1 and package 105's step 1 as merged, the appended ends of the known truths and these
-notes kept, the trunk's first), in a worktree pinned there, this container, four workers, one
-suite at a time. `ruff check .` and `ruff format --check .` clean (388 files). **The fast tier**
-whole: exit 0, 7,545 run, no failure, 1 skipped, 509 slow left out. **The slow tier of the
-touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
-test_known_truths.py, test_captain_trials.py, test_hands.py, test_boat_hull.py,
-test_boat_director.py, test_orders_places.py, test_ports.py, test_crew_orders.py,
-test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages among them, every
-pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
-pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
-passed. The tree reported differs from 929280d by this paragraph alone.
+| box moved | strip | water points | box changed | answered today by |
+|---|---|---|---|---|
+| mediterranean-west north to 40.56 N | 40.5 to 40.56 N, 5 W to 4.5 E | 2,385 | 1,193 | catalan-coast 738, gulf-of-lion 445, sardinian-sea 10 |
+| biscay south to 43.3 N | 43.3 to 43.5 N, 20 W to 1 W | 26,674 | 23,340 | portugal |
+| portugal south to 35.5 N | 35.5 to 36 N, 20 W to 5 W | 72,653 | 57,579 | madeira 56,538, mediterranean-west 1,041 |
+
+My proposal was wrong for the second and third: each box runs the width of the ocean, so
+moving its edge moves weather far from the strip. All three strips stay listed.
+
+**(4) The directions' limits** (`data/tides/streams.yaml` `book_limits`): Madeira's box was added
+at the region's new bounds; the Mediterranean west's box went north to 40.56 N; and the
+Azores', the Gulf's and the Ligurian sea's boxes now follow their regions' new bounds (beyond
+the ruling's letter, so that no water the mends gave a region falls outside its book; nothing
+the recorded passages read). Madeira's and the Balearic strip's water is now inside the
+limits with no statement there: two new findings, listed.
+
+**(5) The spots on the land** (old beside new, the distance moved). The audit first learned to
+read a drying harbour by its file: a spot whose file has it dry is a finding only where the
+grid's ground stands more than a metre (JUDGEMENT) above the file's figure. Alderney's,
+Dover's and Roscoff's moorings fit their files and were never wrong; step 1 counted them.
+
+| port, spot | old | new | moved |
+|---|---|---|---|
+| Boulogne, mooring (dries 0.9 m) | 50.7265 N 1.595 E (ground 2.1 m) | 50.72678 N 1.59472 E (0.9 m) | 37 m |
+| Le Palais, mooring | 47.348 N 3.152 W (ground 8.2 m) | 47.348 N 3.15089 W (2.8 m water) | 84 m |
+| Paimboeuf, mooring | 47.2905 N 2.031 W (ground 5.9 m) | 47.29369 N 2.031 W (water) | 354 m |
+| Poole, mooring (1.5 fathoms) | 50.711 N 1.985 W (ground 1.6 m) | 50.70739 N 1.98069 W (2.7 m) | 503 m |
+| St Helier, mooring (dries 1.8 m) | 49.181 N 2.112 W (ground 7.9 m) | 49.17808 N 2.11256 W (2.1 m water) | 327 m |
+| St Malo, mooring (dries 2.7 m) | 48.647 N 2.03 W (ground 10.3 m) | 48.64686 N 2.03028 W (2.5 m) | 26 m |
+| Weymouth, mooring (1.2 fathoms) | 50.6085 N 2.45 W (ground 6.9 m) | 50.60961 N 2.44458 W (2.7 m) | 402 m |
+| Cartagena, outer road | on the mark podadera-fort, ashore | its own position in the file, 27.5 m | 625 m |
+| San Fiorenzo, shore | 42.681 N 9.3025 E (4.4 m water) | 42.681 N 9.30778 E (ground) | 431 m |
+
+Left listed, each with its reason: La Rochelle's mooring (the nearest water 1,452 m off),
+Dunkirk's (793 m) and Morlaix's (none within 2.5 km), beyond a move of 600 m (JUDGEMENT:
+farther is another berth, not the file's). Corunna's shore also stays: it is given on the
+castle of San Antón, and package 39c's rule (`test_ports.py`) keeps every spot of Biscay
+south on a mark. No spot moved is a scenario's start (none lies within 3 km of one), and no
+truth names one.
+
+**(6) The depths: none rewritten.** Four spots moved onto their soundings, where the grid has
+the file's depth within two cables. Each left its mark (the mark stays where the pilot gave
+it) with the mark's depth and bottom written into the spot:
+
+| port, spot | file | grid before | moved | grid after |
+|---|---|---|---|---|
+| Gaeta, mooring (off gaeta-port) | 5 fathoms | 4.5 m | 136 m | 9.4 m |
+| L'Orient, mooring (off pennemane-road) | 4 fathoms | 0.6 m | 301 m | 7.5 m |
+| Naples, mooring | 4 fathoms | 3.0 m | 116 m | 7.5 m |
+| St Malo, anchorage (off st-malo-road) | 4.5 fathoms | 4.1 m | 87 m | 8.3 m |
+
+Left listed with both figures: Gaeta's road (the grid has no 11 fathoms within two cables),
+Brest's mooring in the Penfeld, and Paimboeuf's road. Santander's road also stays listed: it
+has its 10 fathoms 149 m off, but Biscay south's rule keeps it on its mark.
+
+**The known list** went from 174 entries to 142: 39 taken out by the mends, 6 added by them (the
+Ligurian strip's five and Madeira's statement, the Balearic strip's statement in place of its
+book), 1 back (Corunna). The ceilings moved with the regions: the Azores' and Madeira's level
+and stream counts (the bigger regions), the overlap 1,443 to 1,503, ligurian-sea's south
+4,992 to 5,120, the Tyrrhenian's level 7,260 to 7,171. Truths 7-560 and 7-564 moved, old
+beside new in their docstrings: three moorings on the ground where there were thirteen and a
+road, one shore afloat, and the Ligurian sea among the split and the boxless.
+
+**The seas named, not defaulted** (the lead's word for 2a, 2026-11-13). The audit's table of
+seas (`SEAS` in `tools/audit_chart.py`) had called every region it did not name the
+Mediterranean's. The Canaries, the Salvages and the Moroccan blocks now building would then
+have been held to the Mediterranean's level ceiling and told their own gauges were another
+sea's. The table now names every region of the manifest and every tide region. A region or
+tide region it lacks is a finding, `c-no-sea:<region>`, and its tide is not judged until the
+block names its sea. The table stays in the tool until package 112's `seas.yaml` becomes its
+source. A planted test (a box over the Canaries) proves the finding, and another holds the
+table to name every region and tide region of the manifest. The full sweep finds nothing new.
+
+**The suites at c806489** (step 2a's measured hash; the report's hash differs from it by this
+paragraph only), in a clean worktree pinned there. Ruff check and format: clean. The fast
+tier whole: 7,559 passed, 1 xfailed, exit 0 (54 minutes on a loaded machine). Its first run,
+at e496ec3, failed one test: `tests/test_islands.py` pinned the islands' stream book box at
+(36.5, 40.0, -31.5, -24.5). Step 2a had drawn that box to the Azores' bounds, so the test now
+pins the new box, with the old one beside it. The slow tier of the touched files (test_islands,
+test_chart_audit, test_chart, test_tide, test_ports, test_weather, test_scenarios,
+test_business, test_tackle_orders) and of the known truths: 212 passed, 8 xfailed, exit 0. The
+pace tests, alone and last: 15 passed, exit 0.
+
+**Step 2a again, after package 105's step 2 (Sicily) merged first (the lead's order of
+2026-11-13).** The trunk merged at dade4a17 and after (merge commit 969a8be). Sicily's block
+adds two tide regions over its tiles' water that no region holds, `gulf-of-hammamet` and
+`calabria-north`. The audit's table of seas names them and `sicily` (Mediterranean); without
+that, the step's own `c-no-sea` check would have found all three. In the merge, the stream
+book keeps 2a's bounds beside Sicily's box and the Tyrrhenian's east at 15.83999 E. The
+chart's envelope is 31.60001 to 51.5 N and to 16.69332 E, old beside new in `test_chart`. The
+full sweep finds no finding the list lacks and none it no longer finds. The known list has 140
+entries (2a's 142, less the Tyrrhenian's four unowned groups that Sicily closed, with Sicily's
+two). Two ceilings are raised by Sicily's 253 points beside 2a's strip: `c-level:tyrrhenian`
+from 7,171 to 7,424 and `d-split:tyrrhenian` from 8,703 to 8,956. Truths 7-560 to 7-565
+are unchanged and pass in both tiers. **The suites at 969a8be**, in a clean worktree pinned there:
+- ruff check and format: clean;
+- the fast tier whole: 7,594 passed, 1 xfailed, exit 0 (59 minutes);
+- the slow tier of the touched files, the known truths and the twelve browser plans
+  (`tests/test_browser_probe.py`): 224 passed, 8 xfailed, none skipped, exit 0;
+- the pace tests, alone and last: 15 passed, exit 0.
+
+The tree reported differs from 969a8be by this paragraph alone.
 
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 

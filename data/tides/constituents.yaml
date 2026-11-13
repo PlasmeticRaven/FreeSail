@@ -1017,7 +1017,7 @@ gauges:
   # Le Conquet's alone; blended they would move no recorded passage.
   - id: carloforte
     name: Carloforte (San Pietro)
-    block: [tyrrhenian, sardinian-sea, tunis-coast]  # package 104, the lead's ruling (above)
+    block: [tyrrhenian, sardinian-sea, tunis-coast, asinara-west]  # package 104, the lead's ruling (above); package 111's (asinara-west)
     lat_deg: 39.1480
     lon_deg: 8.3095
     record: "GESLA-2, ISPRA (idromare), 1988 to 2010"
@@ -1037,7 +1037,7 @@ gauges:
     N2: {amplitude_m: 0.017, phase_deg: 229.2}
   - id: porto-torres
     name: Porto Torres
-    block: tyrrhenian
+    block: [tyrrhenian, asinara-west]  # package 111, the lead's ruling: the tide region west of the Asinara
     lat_deg: 40.8422
     lon_deg: 8.4039
     record: "GESLA-2, ISPRA (idromare), 1985 to 2010"

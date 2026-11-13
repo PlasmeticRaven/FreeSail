@@ -865,3 +865,30 @@ their tile edges (104's finding). What it found, for the next blocks:
   saying plainly what Smyth says of the Order's galleys' enslaved rowers (decision 68);
   Messina's British years in its pilot's words and its yard; Reggio's and Scilla's holders
   France's from 1806 by their rows, Scilla's castle British from 1806 to February 1808.
+
+## What a new block runs before it reports (package 111)
+
+**The audit, clean or declared.** `python tools/audit_chart.py --known` reads the whole
+chart as the game reads it and prints its findings by region, each marked `!` that
+`data/charts/audit-known.yaml` lacks; `--full` is the slow tier's sweep. A block runs it
+after its build and before its report, and comes in in one of two ways: **clean** (no `!`,
+and `tests/test_chart_audit.py` green in both tiers), or **declared**: each finding its
+block adds entered in the known list with its key, its place, its reason in a line, its
+owner (the package) and its count as `most`, and named in the report for the lead to rule.
+A block that mends a listed finding takes its entry out (the slow tier fails on a listed
+finding no longer found) and lowers a count's ceiling where it shrinks it. The list is
+findings owned, never a way round a failure.
+
+What the eight checks ask of a block, so that it comes in clean: (a) its bounds on its
+tiles' edges where open water lies beyond, and abutting its neighbours' exactly (no water
+of its tiles that no region's bounds hold; no two regions claiming one box); (b) no water
+of its bounds that only the corridor answers, and its coast meeting its neighbours' at the
+seam; (c) a gauge of its own sea with its level read, or its neighbours' by the rule of the
+seams and the gaugeless blocks; (d) its water in a box of the climatology, and the box's
+edges on the region's; (e) its box in `book_limits` and a statement and a stream area over
+all its water; (f) every port's spots on water that fits the file (a drying harbour no
+higher than the file has it), its shore by the land, its depths within the band of the
+grid's or the spot on its sounding, and its way in and out clear of the land by the game's
+own guard (`tracks:` where a straight line is not); (g) no mark of the land afloat nor
+danger ashore beyond the grid's grain, an islet the grid lacks given as one, every light
+dated; (h) its scenario starting on its water.

@@ -373,7 +373,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # 15.73 W; the fetch covers them whole (`--check`).
     "madeira": {
         "title": "Madeira, Porto Santo and the Desertas",
-        "bounds": {"south": 32.0, "north": 33.5, "west": -17.5, "east": -16.0},
+        # package 111, the lead's ruling: the bounds to the tiles' own edges (was 32 to 33.5 N,
+        # 17.5 to 16 W), so that the island's gauge serves the water its tiles answer
+        "bounds": {"south": 31.60001, "north": 33.73333, "west": -17.86666, "east": -15.73334},
         "fetch": {"south": 31.5, "north": 33.85, "west": -17.95, "east": -15.65},
         "harbours": {
             "funchal": {"south": 32.62, "north": 32.66, "west": -16.95, "east": -16.87},
@@ -391,7 +393,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # 31.52 to 24.27 W (153 tiles, most of them the deep sea between the islands).
     "azores": {
         "title": "The Western Islands (the Azores)",
-        "bounds": {"south": 36.5, "north": 40.0, "west": -31.5, "east": -24.5},
+        # package 111, the lead's ruling: the bounds to the tiles' own edges (was 36.5 to 40 N,
+        # 31.5 to 24.5 W), so that the islands' gauges serve the water their tiles answer
+        "bounds": {"south": 36.29334, "north": 40.13333, "west": -31.51999, "east": -24.26667},
         "fetch": {"south": 36.2, "north": 40.25, "west": -31.6, "east": -24.15},
         "harbours": {
             "angra": {"south": 38.63, "north": 38.67, "west": -27.25, "east": -27.19},
@@ -523,7 +527,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # 7.7333 E so that the column beyond is `ligurian-sea`'s, the seam between the two.
     "gulf-of-lion": {
         "title": "The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche",
-        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73},
+        # package 111, the lead's ruling: the east bound at its column's edge (7.73333 E,
+        # within it; was 7.73), meeting the Ligurian sea's west (7.73334 E)
+        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73333},
         "fetch": {"south": 40.45, "north": 44.95, "west": 2.5, "east": 7.85},
         "harbours": {
             "toulon": {"south": 43.02, "north": 43.13, "west": 5.85, "east": 6.05},
@@ -546,7 +552,10 @@ REGIONS: dict[str, dict[str, Any]] = {
     # this block's (the boundary at the row edge 40.99 N west of 11.15 E).
     "ligurian-sea": {
         "title": "The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena",
-        "bounds": {"south": 41.0, "north": 44.5, "west": 7.74, "east": 11.0},
+        # package 111, the lead's ruling: the west bound at its column's edge (7.73334 E,
+        # within it; was 7.74), meeting the Gulf's east, and the east bound at its tiles'
+        # edge (11.1466 E, as the coast of Tunis's; was 11.0)
+        "bounds": {"south": 41.0, "north": 44.5, "west": 7.73334, "east": 11.1466},
         "fetch": {"south": 40.85, "north": 44.95, "west": 2.5, "east": 11.3},
         "harbours": {
             "genoa": {"south": 44.38, "north": 44.43, "west": 8.86, "east": 8.96},
@@ -788,6 +797,15 @@ TIDE_REGIONS: dict[str, dict[str, Any]] = {
     "calabria-north": {
         "title": "Calabria from Pizzo to the gulf of Squillace: a tide region, no tiles",
         "bounds": {"south": 38.5, "north": 38.85333, "west": 15.84, "east": 16.69332},
+    },
+    # package 111, the lead's ruling: the sea west of the Asinara, the piece of the
+    # Tyrrhenian's tiles west of its bound (8 E) between the Sardinian sea's north bound
+    # (40.56 N) and the Ligurian sea's south (41 N), east of the Gulf's (7.73334 E), which no
+    # region's bounds hold; served by Porto Torres and Carloforte, so that its tide is the
+    # sea's and not the eleven's (Saint-Malo's M2 of 3.7 m there before)
+    "asinara-west": {
+        "title": "The sea west of the Asinara: a tide region, no tiles",
+        "bounds": {"south": 40.56, "north": 41.0, "west": 7.73334, "east": 8.0},
     },
 }
 

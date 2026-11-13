@@ -39,8 +39,8 @@ mooring:
   bottom: ooze
 shore:
   name: the landing at San Fiorenzo
-  lat_deg: 42.6810
-  lon_deg: 9.3025
+  lat_deg: 42.68100
+  lon_deg: 9.30778
 
 pilot:
   station: mortella-road
