@@ -1,0 +1,108 @@
+# FreeSail: Augusta as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch augusta). Step 2 of the package.
+#
+# Sources. Smyth 1824, pp. xiv to xv and 160 to 162: the ledge 180 yards south of Grossa Longa; pass three quarters of a mile south of the light, which stands on the reef where H.M.S. Electra was lost in 1808, the channel 14 to 17 fathoms; the Hybla shoal of 3 1/4 to 5 fathoms on hard rock; anchor abreast the town in 8 to 11 fathoms, moor north and south in 10 of stiff clay; the westerly winds off the land trouble ships in winter, easterly and southerly gales send in a swell; the forts Garcia and Vittoria, the Torre d'Avalos with a miserable light; about 8,000 people, exporting salt, oil, honey and wine. Purdy 1826, p. 141: the Hybla shoal in the middle of the entrance.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: augusta
+name: Augusta
+nation: naples
+source: "Smyth 1824 pp. xiv-xv, 160-162; Purdy 1826 p. 141"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: augusta-harbour
+  name: the harbour of Augusta
+  lat_deg: 37.2232
+  lon_deg: 15.2075
+  depth_fathoms: 10
+anchorage:
+  feature: augusta-harbour
+  name: the harbour of Augusta
+  lat_deg: 37.2232
+  lon_deg: 15.2075
+mooring:
+  feature: augusta-harbour
+  name: abreast the town of Augusta
+  lat_deg: 37.2232
+  lon_deg: 15.2075
+  depth_fathoms: 10
+  bottom: stiff clay
+shore:
+  feature: augusta
+  name: the mole of Augusta
+  lat_deg: 37.2300
+  lon_deg: 15.2210
+
+pilot:
+  station: augusta-harbour
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of Augusta
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Salvatore Russo, Giuseppe Bonanno, Gaetano Arena, Francesco Cannizzaro]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 150            # judgement
+  words:
+    channel: "Pass three quarters of a mile south of the light on its reef, fourteen to seventeen fathoms, and mind the Hybla shoal, three fathoms and a quarter on hard rock in the middle of the entrance."
+    marks: "The Torre d'Avalos and its poor light; the forts Garcia and Vittoria at the north-west end of the town; Magnisi and its martello tower to the south."
+    anchorage: "Abreast the town in eight to eleven fathoms of stiff clay; moor north and south. The winter's westerlies come off the land; easterly and southerly gales send in a swell."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Syracuse
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 12.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 13.5, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 34.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 2.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 330.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 53.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+    - {good: honey, price: 30, origin: naples, note: "honey exported (Smyth 1824, p. 160); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the merchants' stores; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "JUDGEMENT"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 2, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [augusta-harbour, 37 11 42 N 15 12 36 E, 37 10 12 N 15 15 36 E]
+  from_sea: [37 10 12 N 15 15 36 E, 37 11 42 N 15 12 36 E, augusta-harbour]
+  in: [augusta-harbour]

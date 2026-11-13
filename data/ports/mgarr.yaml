@@ -1,0 +1,108 @@
+# FreeSail: Port Miggiaro (Mgarr), Gozo's landing as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the harbour patch gozo-mgarr).
+# Step 2 of the package.
+#
+# Sources. Purdy 1826, pp. 162 to 163: Port Miggiaro on the south-east side of Gozo with its salt-works, Fort Chambray above it; the Comino channels both good, 12 to 30 fathoms, keep the middle; Gozo fattens cattle for Malta. Admiralty 1913, p. 486 (modern): temporary anchorage off Mgarr in 10 fathoms, sand, exposed to easterly, westerly and southerly winds. The castle of Goza's capitulation of 28 October 1798 (James 1837, vol. 2, p. 213) dates its holder.
+#
+# The holder, dated (decision 66): the Order of St John's to 12 June 1798, France's to the
+# blockade's beginning (12 October 1798), when the country outside Valletta's walls was in
+# arms against the French, and the King's after (James 1837, vol. 2, pp. 170, 211 to 213
+# and 445); the holder outside the walls during the blockade JUDGEMENT. No yard: the
+# merchants' stores and Valletta's yard at hand. Prices FROM MEMORY or JUDGEMENT, in
+# sterling; Malta's trade (Purdy 1826, pp. 159 to 160) with the small place's own.
+
+id: mgarr
+name: Port Miggiaro
+nation:
+  - {nation: order-of-st-john, until: 1798-06-11, source: "the Order of St John's from 1530 (Purdy 1826, p. 157)"}
+  - {nation: france, since: 1798-06-12, until: 1798-10-28, source: "the islands surrendered to the French on 12 June 1798 (James 1837, vol. 2, p. 170); the castle of Goza capitulated on 28 October 1798 (vol. 2, p. 213)"}
+  - {nation: britain, since: 1798-10-29, source: "the castle's capitulation to the blockading force (James 1837, vol. 2, p. 213); the King's after 5 September 1800 (p. 445); the holder in the blockade's years JUDGEMENT"}
+source: "Purdy 1826 pp. 162-163; Lamberti 1844 p. 198; Admiralty 1913 p. 486 (depths); James 1837 vol. 2 pp. 170, 213, 445"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: mgarr
+  name: off Port Miggiaro
+  lat_deg: 36.0230
+  lon_deg: 14.3020
+  depth_fathoms: 10
+anchorage:
+  feature: mgarr
+  name: off Port Miggiaro
+  lat_deg: 36.0230
+  lon_deg: 14.3020
+mooring:
+  feature: mgarr
+  name: off Port Miggiaro
+  lat_deg: 36.0230
+  lon_deg: 14.3020
+  depth_fathoms: 10
+  bottom: sand
+shore:
+  name: the landing at Miggiaro
+  lat_deg: 36.0255
+  lon_deg: 14.2985
+
+pilot:
+  station: mgarr
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a Gozo boat
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Giovanni Attard, Francesco Xuereb, Pietro Mizzi, Carlo Cassar]   # judgement
+  skill: 0.75
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 135            # judgement
+  words:
+    channel: "Either channel by Comino is good, twelve to thirty fathoms of fine sand: keep the middle, and give the reef off Comino's south-west point a musket-shot's berth."
+    marks: "Fort Chambray on the height over the landing; Comino and its tower to the south-east; Gozo's castle on its hill inland."
+    anchorage: "Off the landing in ten fathoms of sand, for a short stay: it is open to the east, the west and the south."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Valletta
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: cotton, price: 36.0, origin: null, note: "Malta's chief export (Purdy 1826, pp. 159 to 160); the price JUDGEMENT, cheap"}
+    - {good: oranges, price: 8.0, origin: null, note: "oranges and lemons exported (Purdy 1826, p. 160); the price JUDGEMENT"}
+    - {good: stone, price: 4.0, origin: null, note: "Maltese stone exported (Purdy 1826, p. 160); the price JUDGEMENT"}
+    - {good: honey, price: 34.0, origin: null, note: "honey exported (Purdy 1826, p. 160); the price JUDGEMENT"}
+    - {good: wheat, price: 22.0, origin: naples, note: "Malta grows corn for a third of its people and buys the rest, from Sicily (Purdy 1826, p. 159; Smyth 1854, p. 33: the corn lasts five months); the price JUDGEMENT, dear"}
+    - {good: wine, price: 30.0, origin: naples, note: "imported (Purdy 1826, p. 159); the price JUDGEMENT"}
+    - {good: olive oil, price: 52.0, origin: naples, note: "imported (Purdy 1826, p. 159); the price JUDGEMENT, dear"}
+    - {good: brandy, price: 60.0, origin: null, note: "imported (Purdy 1826, p. 159); the price JUDGEMENT"}
+    - {good: timber, price: 26.0, origin: naples, note: "wood dear, all of it from Sicily (Purdy 1826, p. 165); the price JUDGEMENT"}
+    - {good: fresh beef, price: 13.5, origin: null, note: "beef 4d. a pound in 1821 (Smyth 1854, p. 104); Gozo fattens cattle for Malta (Purdy 1826, p. 162); the price JUDGEMENT"}
+    - {good: fresh fish, price: 6.0, origin: null, note: "fish abundant and cheap (Purdy 1826, p. 158); the price JUDGEMENT"}
+    - {good: biscuit, price: 24.0, origin: null, note: "flour 2 1/2d. a pound in 1821 (Smyth 1854, p. 104); the price JUDGEMENT"}
+    - {good: vegetables, price: 4.0, origin: null, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 30, pounds: 70, note: "a spar from the merchants' stores, the wood all from Sicily (Purdy 1826, p. 165); judgement"}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "water in any quantity, filled in the boats by hose from pipes at the wharf (Purdy 1826, p. 165; Norie 1831, p. 144); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  # judgement: Gozo's boatmen
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 2, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [mgarr, 36 01 N 14 21 E, 35 58 N 14 24 E]
+  from_sea: [35 58 N 14 24 E, 36 01 N 14 21 E, mgarr]
+  in: [mgarr]
