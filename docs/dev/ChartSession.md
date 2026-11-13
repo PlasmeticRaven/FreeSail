@@ -459,3 +459,18 @@ small vessels" (both reported, the lead's to rule). The other six and a sample o
 their sides right. The land guard judges land and not depth: several tracks cross under a
 frigate's draught at low water. **For 106b:** its tracks read the same way from the first,
 the depth along each leg reported.
+
+### 2026-11-13, 19:45: 106b and 112 launched; 106b's step 0 ruled
+
+- 106b's brief corrected at 4b7f7bc5 (the lead told). Builders: 106b session_01XooV49b9SbG99RDtAXZ8Y7
+  on `claude/pkg-106b`, 112 session_01XooV496THRAAMyqk2wCsnr on `claude/pkg-112`; a check-in
+  armed at 20:29 UTC.
+- **106b's measure (174c849), ruled by this session:** four regions, coast plus two columns
+  (88 to 104 tiles, 15 to 19 MiB by the builder's count), split at the row edges 34.16, 31.6
+  and 29.46666 N: `morocco-larache`, `morocco-sallee`, `morocco-mogador`, `morocco-noun`.
+  Gauges the Atlantic's only (Cadiz and Huelva north, Arrecife and Puerto de Cabras south;
+  Tarifa and Ceuta left out as the Strait's inner water, JUDGEMENT; Tarifa's REDMAR level not
+  read, which would move the Strait's water). Sea `morocco`, meeting atlantic and canaries.
+  One weather box `morocco` over the four and the gap east of 9 W from 30 to 36 N.
+- My own small step at 32e7b093 (the seven Canaries port heads' stale words; the how-to on a
+  judged gauge level): the fast tier running.
