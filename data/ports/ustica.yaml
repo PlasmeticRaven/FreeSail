@@ -1,0 +1,109 @@
+# FreeSail: Ustica as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/tyrrhenian.yaml, Ustica's section, the
+# harbour patch none: on tyrrhenian's level-2 tiles). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 279 to 281 and App. p. xxxiii: forty miles north by west of Palermo; the town settled only in 1761 above the sandy beach at the head of the cove of Santa Maria, large enough for the trading feluccas, secure in all winds but the scirocco, when vessels shift round to the Cala Giaconi; the Falconara with its fort and prison, garrisoned by a company of invalids and a few militia; seventeen hundred people besides the garrison and the prisoners; no springs, rain-water in cisterns; charcoal and wood from Cefalù and Palermo, a weekly packet to Palermo; coral and fish on the banks (p. 280); its soda the finest in Europe (p. 15); a grotto a retreat for the fishermen on the approach of Barbary cruisers (p. 281); the north shoal of a fathom and a half a mile and a quarter off. Purdy 1826, pp. 117 to 118: the cove a tenth of a mile wide with five fathoms in the middle; Walker's Rocks of nine feet; an excellent mark for ships bound to Palermo. Ustica lies in `tyrrhenian`'s bounds and features (the brief: a port in tyrrhenian's features alone); its tide is that region's (the eleven's level while tyrrhenian's gauges have none, a known finding of package 111's audit).
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: ustica
+name: Ustica
+nation: naples
+source: "Smyth 1824 pp. 15, 279-281, App. p. xxxiii; Purdy 1826 pp. 117-118; Norie 1831 pp. 116-117"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: santa-maria-ustica
+  name: the cove of Santa Maria
+  lat_deg: 38.7065
+  lon_deg: 13.1960
+  depth_fathoms: 5
+anchorage:
+  feature: santa-maria-ustica
+  name: the cove of Santa Maria
+  lat_deg: 38.7065
+  lon_deg: 13.1960
+mooring:
+  feature: santa-maria-ustica
+  name: the cove of Santa Maria
+  lat_deg: 38.7065
+  lon_deg: 13.1960
+  depth_fathoms: 5
+  bottom: sand
+shore:
+  name: the beach at the head of the cove
+  lat_deg: 38.7070
+  lon_deg: 13.1935
+
+pilot:
+  station: santa-maria-ustica
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a felucca of Ustica
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Antonino Licciardi, Vito Caserta, Bartolomeo Tranchina]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 110            # judgement
+  words:
+    channel: "The island is safe on all sides but the north, where Walker's rocks carry nine feet a mile and a quarter off the land; ships pass close because the shores are bold, so mind them. In a scirocco shift round to the Cala Giaconi."
+    marks: "The island like two small islands from afar, with its three summits; the Falconara's fort and prison on its hill above the cove; the tower of three guns on the cove's west side; the Spalmadora tower at the west point."
+    anchorage: "In the cove of Santa Maria, a tenth of a mile wide, five fathoms of sand in the middle, secure in all winds but the scirocco; room for the trading feluccas."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Palermo
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 15.5, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 17.5, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 47.5, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 4.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 405.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: cotton, price: 62.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 5.5, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 22.5, origin: naples, note: "JUDGEMENT"}
+    - {good: coral, price: 280, origin: naples, note: "excellent high-coloured coral from the banks (Smyth 1824, p. 280); the price JUDGEMENT"}
+    - {good: barilla, price: 9, origin: naples, note: "the soda of Ustica the finest in Europe (Smyth 1824, p. 15); the price JUDGEMENT"}
+    - {good: charcoal, price: 9, origin: naples, note: "charcoal and firewood brought from Cefalù and Palermo (Smyth 1824, p. 280); the price JUDGEMENT, dear"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 48, pounds: 90, note: "no stores; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "rain-water in cisterns only, enough for the people and their cattle (Smyth 1824, p. 280); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 0, pounds: 2, delay_h: 72}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 72}
+  landsman: {hands: 1, pounds: 1, delay_h: 72}
+
+closed_to: []
+
+tracks:
+  to_sea: [santa-maria-ustica, 38 41 N 13 14 E]
+  from_sea: [38 41 N 13 14 E, santa-maria-ustica]
+  in: [santa-maria-ustica]

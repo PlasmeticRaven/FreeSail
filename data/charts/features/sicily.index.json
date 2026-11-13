@@ -1,6 +1,22 @@
 {
 "cell_deg": 0.25,
 "cells": {
+"141,50": [
+"lampedusa-road",
+"lampedusa-harbour"
+],
+"142,49": [
+"lampione"
+],
+"142,50": [
+"lampedusa",
+"cape-ponente",
+"lampedusa-castle",
+"rabbit-island"
+],
+"143,51": [
+"linosa"
+],
 "143,57": [
 "st-pauls-bay",
 "salmonetta",
@@ -30,7 +46,27 @@
 "146,60": [
 "passaro-island",
 "cape-passaro",
-"passaro-anchorage"
+"passaro-anchorage",
+"porto-palo",
+"marzamemi"
+],
+"147,47": [
+"pantelleria",
+"pantelleria-town",
+"pantelleria-road"
+],
+"148,54": [
+"melville-shoal"
+],
+"148,55": [
+"licata",
+"licata-road"
+],
+"148,56": [
+"terranova-road"
+],
+"148,57": [
+"terranova"
 ],
 "148,60": [
 "magnisi",
@@ -45,18 +81,89 @@
 "plemmyrium-shoal",
 "syracuse-harbour"
 ],
+"149,52": [
+"cape-st-marco-sciacca",
+"sciacca-road"
+],
+"149,53": [
+"capo-bianco",
+"capo-bianco-reef"
+],
+"149,54": [
+"girgenti",
+"girgenti-mole",
+"girgenti-light",
+"girgenti-road"
+],
 "149,60": [
 "catania-port",
 "catania-road"
 ],
+"150,50": [
+"capo-granitola"
+],
+"150,52": [
+"sciacca"
+],
 "150,60": [
 "catania"
+],
+"151,48": [
+"marettimo",
+"marettimo-castle"
+],
+"151,49": [
+"formica",
+"favignana",
+"santa-caterina",
+"favignana-road",
+"cala-rossa",
+"st-catherine-bank",
+"marsala",
+"cape-boeo",
+"boeo-shoals",
+"marsala-road"
+],
+"151,54": [
+"termini"
 ],
 "151,62": [
 "capo-dell-armi"
 ],
 "151,64": [
 "capo-spartivento"
+],
+"152,49": [
+"porcelli-trapani",
+"levanzo"
+],
+"152,50": [
+"capo-san-vito",
+"monte-san-giuliano",
+"trapani",
+"colombaia",
+"colombaia-light",
+"trapani-harbour"
+],
+"152,53": [
+"monte-pellegrino",
+"capo-gallo",
+"palermo",
+"palermo-mole",
+"palermo-light",
+"palermo-road",
+"palermo-mole-harbour",
+"cala-felice"
+],
+"152,54": [
+"capo-zafferano",
+"solanto-reefs"
+],
+"152,56": [
+"cefalu"
+],
+"152,58": [
+"capo-orlando"
 ],
 "152,60": [
 "milazzo-castle",
@@ -77,6 +184,12 @@
 "reggio",
 "reggio-road",
 "punta-pellaro"
+],
+"153,59": [
+"lipari",
+"lipari-anchorage",
+"bentinck-shoal",
+"vulcano"
 ],
 "153,60": [
 "capo-milazzo",

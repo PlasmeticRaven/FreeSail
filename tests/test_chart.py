@@ -2258,7 +2258,8 @@ def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
     # package 105: the Braccio of Messina's three and Filfla (old: the five regions, 21)
     assert regions == {MEDW, BALEARICS, "gulf-of-lion", "ligurian-sea", "tyrrhenian", "sicily"}
     # package 101: the Medas off the Ter and Tabarca off Cape Santa Pola, two more
-    assert len(lacking) == 25
+    # package 105, step 3: Lampion, one more (old: 25)
+    assert len(lacking) == 26
     for f in lacking:
         assert whole.depth_at(f.position) is not None, f.id
         assert whole.danger_under(f.position, 0.0, 30.0, 3.0) is not None, f.id

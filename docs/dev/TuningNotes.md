@@ -27093,7 +27093,9 @@ region `sicily`: Malta, eastern Sicily and the Strait) built on the block's own 
 lead accepted it, the trunk merged after step 1 (296aa59), measured and reported (0d21bf3);
 held by the lead for package 111's audit, the trunk merged again, the audit's two findings
 owned and the Hammamet and Calabrian water given the block's tide, measured at e3d2ce8 and
-reported at the hash that adds its figures. Step 3 built beside it on a local branch. Decision 68 (the lead's note of 2026-11-12)
+merged as dade4a1. Step 3 (the west, the south coast and the islands, the scenario, the
+sliver closed in step 2's hash) built, the trunk merged after decision 69, measured at
+bdf4442 and reported at the hash that adds its figures. Decision 68 (the lead's note of 2026-11-12)
 binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
@@ -28056,3 +28058,82 @@ three measured alone nine times a tree, alternately: the trunk 477 to 584 (media
 296aa59 448 to 677 (545), e3d2ce8 400 to 598 (536). The floor sits inside the machine's
 spread for that truth on every tree; a finding for the lead, not mended. The tree reported
 differs from e3d2ce8 by this paragraph and the "where I stand" above alone.
+
+### Step 3: the west, the south coast and the islands (as built)
+
+**The sources' pass.** Smyth 1824's west and south coasts and islands (chs. V to VII) and the
+Appendix (pp. iv to vi, xvii to xxxv, the table of positions pp. xxxvii to xl), with Purdy
+1826, Norie 1831, Smyth 1854's table (pp. 442 to 444) and Lamberti 1844 (after the period,
+sparingly), read place by place; every figure in the files cites its page, the rest marked
+FROM MEMORY or JUDGEMENT. Against the brief: **Cefalù and Termini are marks, not ports**
+(Smyth 1824, App. p. v: Cefalù's bay a summer anchorage for coasters with a pier for fishing
+vessels; Termini's road frequented only by boats that can be beached); **Favignana a port**
+(the fleet's road between it and Levanso and Cala Rossa, App. pp. xxvi to xxvii) and
+**Maritimo marks alone** (its landing for boats, its castle a state prison). No source names
+a pilot or his fee at any of the step's ports (the boats and their people JUDGEMENT), nor
+Ingham's house at Marsala (Woodhouse's mole and ballio are Smyth's), nor a year for any light
+(Palermo's and Trapani's entered lit from 1700, JUDGEMENT as Messina's; Girgenti's from 1756,
+its mole's year; Marsala's mole-light Smyth 1854's and not entered). Lampedusa is the
+Tommasi princes' fief (Smyth 1824, p. 285), so `naples`; Mr Fernandez's lease (about 1812 to
+1814 by "ten or twelve years ago", JUDGEMENT) a private one, not a holder.
+
+**Built.** Sixty-five marks in `features/sicily.yaml` (the north coast from Cape Orlando to
+Palermo, the west and the Egadi, the south coast to Terranova, Porto Paolo, Pantellaria,
+Lampedusa with Linosa and Lampion, Lipari with Vulcano) and Ustica's four in
+`features/tyrrhenian.yaml`, each index rebuilt from its file and the manifest's counts
+edited; no tile written. The grid lacks the Porcelli and the Bentinck shoal (placed by the
+pilots' bearings and Smyth's table) and Lampion (an island the grid lacks); Formica and
+Maritimo's castle moved 2.3 and 2.4 km to the grid's land, said in `fix`. Thirteen ports
+(Palermo, Trapani, Favignana, Marsala, Sciacca, the Mole of Girgenti, Alicata, Terranova,
+Porto Paolo, Lipari, Pantellaria, Lampedusa, Ustica), each `naples`, with tracks clear of the
+land by `Chart.line_shore` and the audit's way in (Porto Paolo is its own road: the road north
+of Passaro put its way in across the cape, the audit's f-in). Lipari's and Ustica's roads
+are their anchorages (thirty to two hundred fathoms a cable off). Decision 68's words at
+Palermo and Girgenti (the convicts called galley slaves, once chained to the oars, App. p. v
+and p. 203), Favignana (its convicts, p. 246), Lipari (Barbarossa's captives of 1544, p. 264)
+and Pantellaria (a thousand carried into slavery by Dragut, p. 281, the year printed 1583 and
+doubtful: the words give none). The epitome gains Trapani's and Mazzara's hours (Smyth's
+own) and Palermo's, Sciacca's, Girgenti's, Lipari's, Pantellaria's and Lampedusa's (the
+world's, JUDGEMENT). Truths 7-537 (Tunis to Palermo on charted water, the thirteen's holders),
+7-538 (each road as its pilot has it, the words, the sliver), 7-539 (slow: the scenario).
+
+**The scenario** `the-faro.yaml` (April 1808, seed 7): Valletta, the channel of Malta,
+outside Syracuse and Catania, the Faro past Messina, Ganzirri and the Faro point, west south
+of Vulcano, the road of Palermo; she anchors in fourteen fathoms 0.13 miles from the road
+some forty-eight hours out, on the chart's stiff clay. Taken another way while building it:
+her book is generated from its legs (a scratch script), each open leg re-shaped hourly only
+within its own leg's length of both its ends and short of its mark, each of the strait's
+every ten minutes on the same rule, no two at once (checked along the route); she starts at
+14:00 so as to enter the strait by day, with its marks for fixes; the open legs stand
+fifteen to eighteen miles off the Sicilian shore, where her account by night ran ten miles
+west of the truth; the scirocco is pinned backing south (by the second day) so that the
+Faro point's turn north-east is not close-hauled. The road shelves past the hand lead (no
+bottom at twenty fathoms a few cables out, fourteen at the anchor), so the truth holds the
+bottom where she lies by the chart's note, not a sounding.
+
+**Pins moved by the step's own additions**, each a count of what it adds: `tests/test_ordnance.py`,
+the ports with no powder block, old `... + 13 + 11`, new `... + 13 + 11 + 13`; `tests/test_chart.py`,
+the islands the grid lacks, old 25, new 26 (Lampion). The port lists of `tests/test_ports.py`
+and `tests/test_nations.py` gain the thirteen.
+
+**Findings for others.** The order words take decimal minutes, not seconds; a scenario
+through a strait wants daylight for its fixes and legs that cannot overlap; marks on a
+neighbour's kept tile row are placed on the whole chart (the how-to has them).
+
+### Step 3: the figures (measured at bdf4442, the trunk merged after step 2 and decision 69)
+
+In a worktree pinned at bdf4442. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 514 slow tests left out.
+**The audit** (package 111's tool) sampled and full: 0 findings the known list lacks, exit 0
+both. **The slow tier** of the touched files (`tests/test_ports.py`, `test_known_truths.py`,
+`test_tide.py`, `test_chart.py`, `test_weather.py`, `test_nations.py`, `test_geo.py`,
+`test_ordnance.py`, `test_chart_audit.py`, `test_scenarios.py`; `--slow -m "not pace" -n
+4`): exit 0, 688 passed, 8 xfailed, the recorded passages replayed to their digests and the
+scenario sailed to the road of Palermo (truth 7-539). **The pace** alone and last (`--slow -m
+pace -n 0`, the same files), run alternately with the same set at the trunk's 774b6dd on the
+same machine: this tree 12 passed twice; the trunk failed once on the gate's day with the
+region loaded (459 ticks a second) and once on truth 7-159 (477), the machine's spread about
+truth 51's floor (step 2's finding). Decision 69 (the trunk's): step 3's ports have no dated
+rows, and its truths read the holders on the day each loads; none expects a holder to change
+by the calendar. The tree reported differs from bdf4442 by this paragraph and the "where I
+stand" above alone.
