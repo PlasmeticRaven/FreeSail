@@ -27562,6 +27562,134 @@ channel-west.
 - **No recorded passage, no kept save's digest and no other truth moves.** The busy draws that
   move are pinned by no test: they are the world as it should be, by the owner's standing rule.
 
+**The busy draws, old beside new** (the lead's word of 2026-11-13: every scenario a track
+moves). Each busy scenario is played three hours from its own seed and start, first without the
+tracks and then with all 22, at ea1b3bc (the trunk with 2a merged). The draws are the same as
+at 8886f37, before Sicily. A vessel is named by its serial; only the vessels whose draw differs
+are listed. Every difference is channel-west's tracks (Morlaix's, St Mary's): the draw's stream
+reshuffles every vessel drawn after the first that a newly open port takes.
+
+*dispatches-falmouth.yaml*: the draw is the same, 14 vessels in three hours.
+
+*lugger-roscoff.yaml* (16 vessels drawn in three hours before, 16 after; 10 differ):
+
+| vessel | without the tracks | with them |
+|---|---|---|
+| business-1 | trade, at anchor in the Bay of Brest | trade, at anchor in the river of Morlaix |
+| business-2 | trade, at anchor in Carrick Road | trade, at anchor in the river of Morlaix |
+| business-6 | trade, at the edge, 48° 02' N, 6° 42' W | trade, at the edge, 50° 24' N, 6° 57' W |
+| business-7 | fishing, on the soundings south-west of Ushant | fishing, on the Passage de l'Iroise |
+| business-8 | fishing, on the oozy ground off the Eddystone | fishing, on the Passage de l'Iroise |
+| business-9 | fishing, on the oozy ground off the Eddystone | fishing, on the soundings seven leagues south-west of Ushant |
+| business-10 | fishing, on the soundings south-west of Ushant | fishing, on the oozy ground off the Eddystone |
+| business-11 | cruiser, on her station off Ushant | cruiser, on her station off the Lizard |
+| business-12 | cruiser, on her station off the Isle of Bas | cruiser, on her station off the Seven Islands |
+| business-16 | trade, at anchor in the Bay of Brest | trade, at anchor in Carrick Road |
+
+*merchant-brig.yaml* (16 vessels drawn in three hours before, 16 after; 12 differ):
+
+| vessel | without the tracks | with them |
+|---|---|---|
+| business-1 | trade, at anchor in Carrick Road | trade, at anchor in St Mary's Road |
+| business-3 | trade, at anchor in Carrick Road | trade, at anchor in the anchorage in the Sound |
+| business-4 | trade, at the edge, 48° 02' N, 6° 42' W | trade, at the edge, 49° 41' N, 6° 57' W |
+| business-5 | trade, at the edge, 48° 42' N, 6° 57' W | trade, at the edge, 49° 12' N, 6° 57' W |
+| business-6 | trade, at the edge, 49° 37' N, 6° 57' W | trade, at the edge, 48° 34' N, 6° 57' W |
+| business-7 | fishing, on the Poll Bank | fishing, on the soundings seven leagues south-west of Ushant |
+| business-8 | fishing, on the Passage de l'Iroise | fishing, on the soundings south-west of Ushant |
+| business-9 | fishing, on the soundings seven leagues south-west of Ushant | fishing, on the oozy ground off the Eddystone |
+| business-10 | fishing, on the oozy ground off the Eddystone | fishing, on the Poll Bank |
+| business-11 | cruiser, on her station off the Lizard | cruiser, on her station off the Start |
+| business-12 | cruiser, on her station off the Seven Islands | cruiser, on her station off the Lizard |
+| business-16 | trade, at anchor in Carrick Road | trade, at anchor in St Mary's Road |
+
+*merchant-cutter.yaml* (21 vessels drawn in three hours before, 16 after; 20 differ):
+
+| vessel | without the tracks | with them |
+|---|---|---|
+| business-1 | trade, at anchor in Carrick Road | trade, at anchor in St Mary's Road |
+| business-3 | trade, at anchor in Carrick Road | trade, at anchor in the anchorage in the Sound |
+| business-4 | trade, at the edge, 48° 02' N, 6° 42' W | trade, at the edge, 49° 41' N, 6° 57' W |
+| business-5 | trade, at the edge, 48° 42' N, 6° 57' W | trade, at the edge, 49° 12' N, 6° 57' W |
+| business-6 | trade, at the edge, 49° 37' N, 6° 57' W | trade, at the edge, 48° 34' N, 6° 57' W |
+| business-7 | fishing, on the Poll Bank | fishing, on the soundings seven leagues south-west of Ushant |
+| business-8 | fishing, on the Passage de l'Iroise | fishing, on the soundings south-west of Ushant |
+| business-9 | fishing, on the soundings seven leagues south-west of Ushant | fishing, on the oozy ground off the Eddystone |
+| business-10 | fishing, on the oozy ground off the Eddystone | fishing, on the Poll Bank |
+| business-11 | cruiser, on her station off the Lizard | cruiser, on her station off the Start |
+| business-12 | cruiser, on her station off the Seven Islands | cruiser, on her station off the Lizard |
+| business-13 | escort, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | blockade, on the blockade of Brest, the offshore station off Ushant |
+| business-14 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | blockade, on the blockade of Brest, the inshore station |
+| business-15 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | ordinary, in ordinary at Brest |
+| business-16 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | trade, at anchor in St Mary's Road |
+| business-17 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | not drawn |
+| business-18 | blockade, on the blockade of Brest, the offshore station off Ushant | not drawn |
+| business-19 | blockade, on the blockade of Brest, the inshore station | not drawn |
+| business-20 | ordinary, in ordinary at Brest | not drawn |
+| business-21 | trade, at the edge, 48° 07' N, 6° 57' W | not drawn |
+
+*merchant-schooner-plymouth.yaml* (21 vessels drawn in three hours before, 16 after; 20 differ):
+
+| vessel | without the tracks | with them |
+|---|---|---|
+| business-1 | trade, at anchor in Carrick Road | trade, at anchor in St Mary's Road |
+| business-3 | trade, at anchor in Carrick Road | trade, at anchor in the anchorage in the Sound |
+| business-4 | trade, at the edge, 48° 02' N, 6° 42' W | trade, at the edge, 49° 41' N, 6° 57' W |
+| business-5 | trade, at the edge, 48° 42' N, 6° 57' W | trade, at the edge, 49° 12' N, 6° 57' W |
+| business-6 | trade, at the edge, 49° 37' N, 6° 57' W | trade, at the edge, 48° 34' N, 6° 57' W |
+| business-7 | fishing, on the Poll Bank | fishing, on the soundings seven leagues south-west of Ushant |
+| business-8 | fishing, on the Passage de l'Iroise | fishing, on the soundings south-west of Ushant |
+| business-9 | fishing, on the soundings seven leagues south-west of Ushant | fishing, on the oozy ground off the Eddystone |
+| business-10 | fishing, on the oozy ground off the Eddystone | fishing, on the Poll Bank |
+| business-11 | cruiser, on her station off the Lizard | cruiser, on her station off the Start |
+| business-12 | cruiser, on her station off the Seven Islands | cruiser, on her station off the Lizard |
+| business-13 | escort, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | blockade, on the blockade of Brest, the offshore station off Ushant |
+| business-14 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | blockade, on the blockade of Brest, the inshore station |
+| business-15 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | ordinary, in ordinary at Brest |
+| business-16 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | trade, at anchor in St Mary's Road |
+| business-17 | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in | not drawn |
+| business-18 | blockade, on the blockade of Brest, the offshore station off Ushant | not drawn |
+| business-19 | blockade, on the blockade of Brest, the inshore station | not drawn |
+| business-20 | ordinary, in ordinary at Brest | not drawn |
+| business-21 | trade, at the edge, 48° 07' N, 6° 57' W | not drawn |
+
+*merchant-ship.yaml* (21 vessels drawn in three hours before, 21 after; 3 differ):
+
+| vessel | without the tracks | with them |
+|---|---|---|
+| business-1 | trade, at anchor in Carrick Road | trade, at anchor in the anchorage in the Sound |
+| business-2 | trade, at anchor in the anchorage in the Sound | trade, at anchor in St Mary's Road |
+| business-6 | trade, at the edge, 48° 42' N, 6° 57' W | trade, at the edge, 50° 58' N, 4° 41' W |
+
+*prize-home.yaml*: the draw is the same, 24 vessels in three hours.
+
+*smack-falmouth.yaml* (15 vessels drawn in three hours before, 22 after; 20 differ):
+
+| vessel | without the tracks | with them |
+|---|---|---|
+| business-1 | trade, at anchor in Carrick Road | trade, at anchor in the anchorage in the Sound |
+| business-3 | trade, at anchor in Carrick Road | trade, at anchor in St Mary's Road |
+| business-4 | trade, at the edge, 49° 44' N, 6° 57' W | trade, at the edge, 48° 02' N, 6° 42' W |
+| business-5 | trade, at the edge, 49° 35' N, 6° 57' W | trade, at the edge, 48° 42' N, 6° 57' W |
+| business-6 | trade, at the edge, 48° 35' N, 6° 57' W | trade, at the edge, 50° 02' N, 3° 03' W |
+| business-7 | fishing, on the Passage de l'Iroise | fishing, on the soundings south-west of Ushant |
+| business-8 | fishing, on the soundings south-west of Ushant | fishing, on the oozy ground off the Eddystone |
+| business-9 | fishing, on the Poll Bank | fishing, on the soundings south-west of Ushant |
+| business-10 | fishing, on the Poll Bank | fishing, on the Passage de l'Iroise |
+| business-11 | cruiser, on her station off Ushant | cruiser, on her station off the Lizard |
+| business-13 | blockade, on the blockade of Brest, the offshore station off Ushant | escort, at the edge, 48° 02' N, 6° 33' W, the convoy bound in |
+| business-14 | blockade, on the blockade of Brest, the inshore station | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in |
+| business-15 | ordinary, in ordinary at Brest | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in |
+| business-16 | not drawn | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in |
+| business-17 | not drawn | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in |
+| business-18 | not drawn | convoy, at the edge, 48° 02' N, 6° 33' W, the convoy bound in |
+| business-19 | not drawn | blockade, on the blockade of Brest, the offshore station off Ushant |
+| business-20 | not drawn | blockade, on the blockade of Brest, the inshore station |
+| business-21 | not drawn | ordinary, in ordinary at Brest |
+| business-22 | not drawn | trade, at the edge, 49° 17' N, 6° 57' W |
+
+*the-channel-observed.yaml*: the draw is the same, 24 vessels in three hours.
+
 **What building them would change of the audit's own**: 43 entries (21 ways in, 21 out, Paimboeuf's open) out of the known list;
 truth 7-563's ways in and out refused from 24 to 3 each (Genoa, Cartagena, Oran), and its opens
 from {paimboeuf, royan} to {royan}.
