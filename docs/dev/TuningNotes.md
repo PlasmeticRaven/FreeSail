@@ -27388,6 +27388,21 @@ assertion that could not fail is gone; a fast checkpoint test with a load in the
 slow replay; and alongside, `from X`, the lay-up tail, a receiver gone, two King's ships, way on
 her, beyond the pull, a prisoner, an observed world and a ship not his.
 
+**The suites at 2deccd29** (items 1 to 7 and the lead's conditions, 3aa95ab6, with the trunk at
+c010814d merged, clean): ruff check and ruff format --check clean; the fast tier (`-n 4`) exit
+0, 7,658 passed and 1 xfailed, the 516 slow left out; the road's own check first (package 109's
+tests, truth 7-542, the boat's suites, replay, checkpoint and parity, slow included) exit 0,
+1,439 passed. The slow tier (`--slow -m "not pace" -n 4`) of the touched files,
+`tests/test_known_truths.py` and `tests/test_browser_probe.py`, with test_orders, test_parity,
+test_subtypes, test_replay and test_checkpoint for the queries and readings touched, run in two
+halves for the two-hour limit on a background job: the half with the truths and the browser
+plans exit 1 at its first run, one failure, truth 7b-130 (the director's seat at the API door:
+the door's exit code read as `None` the moment its state read "ended", under four workers'
+load), which passed alone twice, and the half whole again exit 0, 1,050 passed and 8 xfailed,
+none skipped; the other half exit 0, 2,279 passed. The pace tests of the same files alone and
+last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved but truth 7-484, this package's
+own, moved to the road's terms. The tree reported differs from 2deccd29 by this paragraph alone.
+
 
 
 
