@@ -27777,6 +27777,21 @@ scratch trees. The six tracks drawn again are none of channel-west's.
   Maddalena, Hyères).
 - The full sweep finds the list exactly.
 
+**The suites at c0f46d7** (the trunk merged at 18ea281 with package 105's step 3, western Sicily,
+cleanly; the full sweep finds the 97 entries exactly), in a clean worktree pinned there:
+- ruff check and format: clean;
+- the fast tier whole: 7,597 passed, 1 xfailed, exit 0 (63 minutes);
+- the slow tier: 245 passed, 8 xfailed, none skipped, exit 0. It covered the known truths, the
+  kept saves, the business, the captains, the chart, the ports, the sailing by name, the
+  squadrons, the letters, the lee ports, the court, the Bellerophon, the observer, the audit,
+  the islands, the tide, the weather, the scenarios, the nations and the twelve browser plans.
+  Its first run was cut off at the two-hour limit after the fast tier, 243 passed and none
+  failed, and was run again whole;
+- the nine busy scenarios played three hours again: each draws exactly as measured;
+- the pace tests, alone and last: 15 passed, exit 0.
+
+The tree reported differs from c0f46d7 by this paragraph alone.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the
