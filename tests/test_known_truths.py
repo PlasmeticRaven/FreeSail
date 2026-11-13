@@ -16311,3 +16311,25 @@ def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     assert not A.unlisted(audit, known)
     assert audit.keys() == set(known)
     assert not A.over_ceiling(audit, known)
+
+
+def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_comes_down(tmp_path):
+    """Package 102, step 3: the player's own hoist, broken out, served at its place (the main
+    topgallant masthead, or the place its order names) flag by flag, the uppermost first, and
+    drawn down its halyard from there; gone when it is hauled down; no stranger's served."""
+    import shutil
+
+    from tests.test_flag_drawings import (
+        test_a_hoist_is_drawn_down_its_halyard_from_its_place as b,
+    )
+    from tests.test_flag_drawings import (
+        test_no_other_ships_hoist_is_served as c,
+    )
+    from tests.test_flag_drawings import (
+        test_the_players_hoist_is_served_at_its_place_flag_by_flag_and_gone_when_hauled_down as a,
+    )
+
+    a()
+    c()
+    if shutil.which("node"):
+        b(tmp_path)

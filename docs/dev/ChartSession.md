@@ -103,6 +103,23 @@ and a builder's work it would send back twice.
    never push to the trunk (`claude/dreamy-darwin-d77nty`), never rebase it, never
    force-push, and open no pull request.**
 
+## Workflows, mechanism and reports (the owner, 2026-11-13)
+
+- **Workflows of several agents are approved for sourced research and for port passes:**
+  one agent drafting a port, a mark or a block's facts from the sources and another,
+  independent of it, checking every figure, date and position against the page. They are
+  **not used for coordination** (reading a builder's measure, a routine ruling, a report to
+  the lead), **for engine steps, or for small corrections.** The owner leaves the standing
+  orchestration setting off and will see how workflows are used without it; use one where
+  it is really needed and not otherwise, since they are usually more than a task wants.
+- **No new mechanism beyond what a brief asks, without the lead's approval:** no new key in
+  a data file's form, no new loader rule, no new tool or test harness of its own design.
+  Where a brief cannot be met without one, say what is wanted and why in a short message
+  first.
+- **Reports are concise.** The limits above are ceilings, not targets: the hash, what
+  differs from the brief, what moved, what is asked. Detail goes in the tuning notes and is
+  pointed to, not repeated.
+
 ## Speaking with the lead
 
 The lead is `session_01DTAvj6mwzAZMm2fER1Bi3U`. To the lead: a one-shot scheduled message

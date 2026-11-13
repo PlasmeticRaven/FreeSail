@@ -67,6 +67,23 @@ PLACES_FIXED = (
     "mizen rigging",
 )
 _MASTHEAD = re.compile(r"(fore|main|mizen) (top|topgallant|royal) masthead")
+# package 102 (step 3): the yardarm places beside the mastheads: a mast's lower yard's arm
+# ('main yardarm') or a named yard's ('fore topsail yardarm'), the arm to windward
+# (JUDGEMENT, as the rigging's flags are drawn on the weather side). The 1796 book's private
+# ships' table flies its first signal 'at the topsail or topgallant yard arm' (leaf 77, in
+# ink) and the private tables name 'the fore yardarm' and 'the main yardarm'.
+_YARDARM = re.compile(r"(fore|main|mizen)(?: (topsail|topgallant|royal))? yardarm")
+# Where a hoist flies when no order and no book's practice names a place: 'at the main', the
+# signal halyards at the main topgallant masthead (JUDGEMENT; the viewer falls back to the
+# mast's truck where she has no such piece, Design-ViewerAction.md §12.2)
+HOIST_PLACE = "main topgallant masthead"
+# A hoist's place words as an order or a private table names them, to the place words
+_PLACE_WORDS = {
+    "mizen peak": "peak",
+    "peak": "peak",
+    "ensign staff": "staff",
+    "the ensign staff": "staff",
+}
 
 # The captain's roles (`captains.ROLES`) as the colours read them (judgement: a sloop, a
 # hired cutter and a revenue cutter wear the King's pendant; a packet, a fisherman and an
@@ -98,8 +115,25 @@ ORDERED = {
 
 
 def place_ok(word: str) -> bool:
-    """Whether `word` is one of 81's place words."""
-    return word in PLACES_FIXED or bool(_MASTHEAD.fullmatch(word))
+    """Whether `word` is one of 81's place words (package 102: or a yardarm's)."""
+    return word in PLACES_FIXED or bool(_MASTHEAD.fullmatch(word)) or bool(_YARDARM.fullmatch(word))
+
+
+def place_of_words(words: str) -> str:
+    """The place word for a place as an order or a private table says it ('main topmast
+    head' the main top masthead, 'mizen peak' the peak, 'ensign staff' the staff, 'the fore'
+    the fore topgallant masthead, 'fore yardarm' as it is); '' for words naming none."""
+    w = " ".join(str(words or "").lower().replace("-", " ").split())
+    w = w.removeprefix("the ")
+    if w in _PLACE_WORDS:
+        return _PLACE_WORDS[w]
+    m = re.fullmatch(r"(fore|main|mizen|mizzen) (top|topgallant|royal) ?mast ?head", w)
+    if m:
+        return f"{m.group(1).replace('mizzen', 'mizen')} {m.group(2)} masthead"
+    if w in ("fore", "main", "mizen", "mizzen"):
+        return f"{w.replace('mizzen', 'mizen')} topgallant masthead"
+    w = w.replace("mizzen", "mizen").replace("yard arm", "yardarm")
+    return w if place_ok(w) else ""
 
 
 # Package 102 (step 1): the drawing's form widened by the least the plates ask. A part is a
