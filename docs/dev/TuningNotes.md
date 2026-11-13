@@ -27191,3 +27191,30 @@ test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages 
 pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
 pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
 passed. The tree reported differs from 929280d by this paragraph alone.
+
+### Step 3: the director's dry run (note 2)
+
+**What was found** (b), and it is not the lead's guess: nothing in a seated world fails to
+pickle. A director seated at the API door (the tests' local server speaking the Messages API's
+shape, `tests/messages_api.py`, a made-up key, no network) copies at rest and after a run; but
+mid-turn his tools hold **his hull** (`Harness.world` is `world.own`, package 97), the dry run
+was given the hull, and `checkpoint_bytes(hull)` made a pickle rooted at the Hull: unpickled, the
+Hull is rebuilt before its World, and `World.__setstate__` → `hulls.bind_to_hull` read
+`hull.world` before it was set (`AttributeError: world`). `_would_do` swallowed it and the dry
+run said "it would be performed as said". Measured on the stub door: `ship "Harpy": order heave
+to` (no Harpy on the sea) dry-ran "would be performed as said (ship)" and was then refused
+("No ship named 'Harpy' is on the sea"). Replayed without a seat, `director.dry_run(World,
+...)` copies the World and refuses rightly, which is what the lead saw.
+
+**The mend.** `_would_do` copies `hulls.world_of(world)`, the World whatever handle it is given.
+(a) Where the copy cannot be made, or the order raises on the copy, it returns `NOT_TRIED` and
+the reason, and `dry_run` says "it could not be tried: ... What it would do is not known until it
+is entered ..." and never that it would be performed; the old "would be performed as said
+({channel})" for a copy not made is gone. (c) `tests/test_mends_109.py`: every example of every
+form of the director's table (96) on a world with the director seated, dry run and order through
+his own tool on his hull: the dry run's word (performed, doubted, refused) is the order's, and
+none is "could not be tried".
+
+**Truth 7-543** and the step's tests in `tests/test_mends_109.py`. **The toggle:** with the trunk's
+`agents/director.py` truth 7-543 fails (the dry run on his hull: "it would be performed as said
+(ship)"); with it, it passes.

@@ -16203,3 +16203,24 @@ def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_b
     w.run(120)
     assert w.people.captain.aboard
     assert [e.kind for e in w.log].count("boat.stood_down") == 1
+
+
+def test_truth_7_543_the_directors_dry_run_on_his_hull_is_the_orders_word_and_never_untried():
+    """Package 109, step 3 (the owner's note 2): with the director seated, his tools hold
+    his hull; a dry run there copies the World and tries the order on it, so its word is the
+    order's: an order naming no ship on the sea is refused in the dry run as it is entered
+    (on the trunk the copy rooted at the hull could not be loaded, and the dry run said it
+    "would be performed as said")."""
+    import tests.test_director as TD
+    from freesail.agents import director as D
+    from freesail.agents import tools as T
+    from freesail.agents.agent import DIRECTOR
+
+    w = TD.directed()
+    h = TD.seat_director(w, [])
+    order = 'ship "Harpy": order heave to'
+    dry = T.world_order(h.world, DIRECTOR, order, dry_run="true")
+    assert dry.startswith(D.DRY_RUN_HEAD) and "would be performed" not in dry
+    assert "No ship named 'Harpy' is on the sea" in dry
+    real = T.world_order(h.world, DIRECTOR, order)
+    assert "No ship named 'Harpy' is on the sea" in str(real)
