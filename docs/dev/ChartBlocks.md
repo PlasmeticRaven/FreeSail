@@ -146,9 +146,14 @@ region's, its tide and its weather are rows in tables that already reach its wat
      - {state: blockaded, blockade: {by: britain, since: "1798"}, since: 1798-09-01, until: 1800-09-04, source: "..."}
    ```
 
-   The row in force on the scenario's first day is loaded into the port's field, and the
-   ports' tick puts each dated key to the world's day when the day turns (`Port.on_day`),
-   so everything that reads the key reads the day's row. A day that no row covers reads
+   The row in force on the scenario's first day is loaded into the port's field: **the
+   record seeds the port, and the port is then the world's** (decision 69, the lead's
+   ruling of 2026-11-13; package 105 had the ports' tick put each key to the running day).
+   Only a scenario that says `follows_history: true` has the record's rows as events: each
+   row that begins or ends on a day is applied that day (`Port.on_events`, from
+   `Ports.tick`), the holder's rows with them, and a key with no event keeps what play has
+   made of it (a director's closure) until the next. Write the rows so that the first day
+   of any year reads true; what follows in play is the world's. A day that no row covers reads
    the key as if the file gave none (no closures; the port open; the defaults of a pilot,
    a market, a chandler's and a pool with nothing in them): write a row for every year the
    game may be set in, or say why not. With no day (the harbour's lists) the first row is
@@ -295,7 +300,9 @@ region's, its tide and its weather are rows in tables that already reach its wat
    `git status` shows no change to any tile, coast or index file another region lists.
    The tiles are committed (the owner's ruling 5; a region is about 12 to 18 MB, but a
    region that is mostly open sea costs more: the Azores' 153 level-2 tiles are 40 MB,
-   package 39e, below). **Every tile is written by `save_tile`** (package 39e), its zip
+   package 39e, below). **The 40 MB rule is in MiB** (the lead's ruling of 2026-11-13): a
+   region's level-2 and level-3 tiles by the manifest's bytes, under 40 × 1,048,576 (the
+   Azores' 40.3 million bytes are 38.4 MiB). **Every tile is written by `save_tile`** (package 39e), its zip
    entries dated alike, so that the same arrays give the same bytes: from 39e on a
    rebuild's byte-identity means array-identity, and a tile that changed in its bytes
    changed in its arrays. The tiles written before it keep their bytes (numpy's
@@ -719,7 +726,8 @@ where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea
   table draw no trader at all. Give each port its own produce cheap and its wants dear.
 - **A port's nation may be dated** (`nation:` a list of `{nation, since, until}`, 79a's
   form; package 79d for Genoa's annexation of June 1805): the loader takes the entry in
-  force on the scenario's first day, `Ports.stance` the world's day.
+  force on the scenario's first day, and `Ports.stance` reads that holder (decision 69:
+  the running day moves it only where the scenario follows history).
 - **The weather's box for a sea without one**: a printed table's days of wind by the eight
   points (the Admiralty's Mediterranean Pilot of 1913 and 1916 has them for Marseille,
   Genoa, Leghorn, Naples, Ajaccio and Cagliari) give the check row, each half-point's days
@@ -805,3 +813,55 @@ What it found, for the next blocks:
 - **The pilots' bearings on this coast are magnetic** (Purdy's, with the true in brackets;
   the variation about 17 to 18 degrees west then): the road of Tunis placed by Purdy's
   bearings made true.
+
+## Sicily and Malta (package 105, as built: step 2)
+
+`sicily` (35.01334 to 38.5 N, 11.1466 to 16.69332 E): all Sicily with its islands, the Sicilian
+channel, Malta and Gozo, the Faro of Messina and Calabria's toe to Cape Spartivento, the chart's
+east limit moved from 15.5 E to 16.69332 E. Its west bound is `tunis-coast`'s east bound
+exactly, its north bound `tyrrhenian`'s south bound; the south and east 0.7 m and 4 m inside
+their tile edges (104's finding). What it found, for the next blocks:
+
+- **A bound that abuts a neighbour's bound 7 m short of a tile edge takes the column in
+  beyond the neighbour's rows.** `tunis-coast` ends at 11.1466 E inside the column edge
+  11.14667; abutting it, `sicily`'s tiles take in that column (10.72 to 11.15 E), whose rows
+  from 36.29 N north are the coast of Tunis's ("5 kept") and whose three rows south of it no
+  region had listed: they are written as `sicily`'s, the gulf of Hammamet and the Sahel to
+  Monastir, outside every region's bounds, their water the eleven's tide (the lead's ruling
+  of 2026-11-12: a later block's water). 126 tiles over the bounds, 17 kept, 109 written;
+  22 MB of level 2, 76 level-3 tiles of 6.9 MB for twenty harbour boxes, 29.3 MB in all: one
+  region.
+- **The grid smooths a narrow mole away.** EMODnet's cells of some 115 m read 13 to 40 m of
+  water over Messina's Braccio of San Raineri, the sickle that makes the harbour; GEBCO's
+  fill under it cannot raise what EMODnet calls water. The sickle is three islands the grid
+  lacks (package 94's rule, `grid_lacks: true`, each 130 m), the harbour's mouth left open
+  to the north; Filfla off Malta is another. A block with a mole or a spit narrower than two
+  cells looks for it in the grid before placing its port.
+- **A block with gauges of its own, and none of a level.** TICON has six in the bounds
+  (Palermo, Porto Empedocle, Catania, Messina, Reggio, Lampedusa; none in Malta) and no
+  published mean level of theirs is on file; with every level null the blend's level falls
+  back to the eleven's, Saint-Malo's 6.83 m. Each gauge's level is the sum of its M2, S2 and
+  N2 amplitudes (the lead's ruling of 2026-11-12, JUDGEMENT: the model's lowest water on the
+  chart's datum), 0.03 to 0.18 m, until a published level replaces it. Build after the
+  gauges go in: the fill raise follows the tide.
+- **The period's establishment and the world's may stand eight hours apart.** Smyth's high
+  water at full and change off the Faro (6h 56m) and at Messina (8h 10m) are the epitome's;
+  the world's by the modern gauges is 2h 17m and 0h 1m (the Strait's amphidrome). The
+  master's tide is the period's; with an M2 of centimetres the error costs him nothing.
+- **A strait that bends wants two stream areas.** The Faro runs north-north-west from Cape
+  dell'Armi to Messina and north-east past the Faro point to Scylla: one axis is out by
+  more than the book's half-point, so the stream is two areas of the same rates and hour
+  (`faro-north`, `faro-south`), the block's set (`sicily-open`) after them.
+- **A weather box fitted to a printed table** (Malta's, the Mediterranean Pilot vol. I,
+  1913, p. 734, read from the item's leaf 906 through the Archive's IIIF server at its full
+  size: `iiif.archive.org/iiif/<item>$<leaf>/full/max/0/default.jpg`, a scale over 100 per
+  cent refused; the leaf from the item's `_page_numbers.json`): the fit by simulated months
+  must give the candidate months to the box the weather reads (`Climatology.boxes[name]`,
+  not the top-level `months`), or every candidate scores alike and the search keeps its
+  first.
+- **The ports' dated rows in use** (step 1's form): Valletta's holder in three rows (the
+  Order, France, the King), its state blockaded from 12 October 1798 to the surrender, its
+  yard from the first year the sources give (1816), and under the Order its pilot's words
+  saying plainly what Smyth says of the Order's galleys' enslaved rowers (decision 68);
+  Messina's British years in its pilot's words and its yard; Reggio's and Scilla's holders
+  France's from 1806 by their rows, Scilla's castle British from 1806 to February 1808.

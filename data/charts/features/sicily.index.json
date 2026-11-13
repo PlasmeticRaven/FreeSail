@@ -1,0 +1,93 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"143,57": [
+"st-pauls-bay",
+"salmonetta",
+"filfla"
+],
+"143,58": [
+"valletta",
+"st-elmo",
+"fort-ricasoli",
+"ricasoli-reef",
+"valletta-outer-road",
+"grand-harbour",
+"marsamxett",
+"manoel-lazaretto",
+"marsaxlokk",
+"benghisa-reef",
+"munxar-reef"
+],
+"144,56": [
+"gozo"
+],
+"144,57": [
+"comino",
+"mgarr",
+"fort-chambray"
+],
+"146,60": [
+"passaro-island",
+"cape-passaro",
+"passaro-anchorage"
+],
+"148,60": [
+"magnisi",
+"hybla-shoal",
+"augusta",
+"augusta-harbour"
+],
+"148,61": [
+"cape-murro-di-porco",
+"syracuse",
+"maniace",
+"plemmyrium-shoal",
+"syracuse-harbour"
+],
+"149,60": [
+"catania-port",
+"catania-road"
+],
+"150,60": [
+"catania"
+],
+"151,62": [
+"capo-dell-armi"
+],
+"151,64": [
+"capo-spartivento"
+],
+"152,60": [
+"milazzo-castle",
+"milazzo-road"
+],
+"152,62": [
+"messina",
+"messina-citadel",
+"braccio-south",
+"braccio-middle",
+"braccio-point",
+"messina-light",
+"messina-harbour",
+"messina-road",
+"charybdis",
+"punta-pezzo",
+"torre-cavallo",
+"reggio",
+"reggio-road",
+"punta-pellaro"
+],
+"153,60": [
+"capo-milazzo",
+"porcelli-milazzo"
+],
+"153,62": [
+"faro-point",
+"faro-light",
+"faro-anchorage",
+"scylla",
+"scilla-anchorage"
+]
+}
+}

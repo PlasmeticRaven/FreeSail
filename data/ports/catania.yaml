@@ -1,0 +1,109 @@
+# FreeSail: Catania as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch catania). Step 2 of the package.
+#
+# Sources. Smyth 1824, pp. xiii to xiv and 134 to 135: the road between Point Armisi and Sciarra point in 7 to 12 fathoms, rocky, for a temporary stay; the little port within a stream of lava and two short piers, 3 1/2 fathoms at most, where transports have lain; rode in 21 fathoms two miles off, a fresh E N E wind not blowing home; the trade corn, maccaroni, silk, wine, oil, soda, manna, amber, snow and lava; Etna's snow shipped to Malta and Italy. Purdy 1826, p. 140: 74,000 people.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: catania
+name: Catania
+nation: naples
+source: "Smyth 1824 pp. xiii-xiv, 134-135; Purdy 1826 p. 140"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: catania-road
+  name: the road of Catania
+  lat_deg: 37.4950
+  lon_deg: 15.1050
+  depth_fathoms: 10
+anchorage:
+  feature: catania-road
+  name: the road of Catania
+  lat_deg: 37.4950
+  lon_deg: 15.1050
+mooring:
+  feature: catania-port
+  name: within the mole of Catania
+  lat_deg: 37.4992
+  lon_deg: 15.0980
+  depth_fathoms: 3
+  bottom: sand
+  deep_draught_ft: 18
+shore:
+  feature: catania
+  name: the Marina of Catania
+  lat_deg: 37.5030
+  lon_deg: 15.0870
+
+pilot:
+  station: catania-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the Marina
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Gaetano Arena, Francesco Cannizzaro, Antonino Lombardo, Vincenzo Rizzo]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 110            # judgement
+  words:
+    channel: "The road lies open between Point Armisi and Sciarra point; the little port is within the lava and the two piers, three fathoms and a half at most."
+    marks: "Etna over everything; the town's domes; the black lava of the shore and the little mole."
+    anchorage: "Seven to twelve fathoms on rock in the road, for a short stay only; a ship drawing more than eighteen feet stays out. Within the mole small ships lie safe."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Catania
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 11.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 13.5, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 255.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 50.5, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+    - {good: barilla, price: 14, origin: naples, note: "soda among the exports (Smyth 1824, p. 135); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from Etna's forests; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "JUDGEMENT"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [catania-road, 37 29 N 15 10 E]
+  from_sea: [37 29 N 15 10 E, catania-road]
+  in: [catania-road, catania-port]

@@ -1,0 +1,121 @@
+# FreeSail: Reggio as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch faro). Step 2 of the package.
+#
+# Sources. Purdy 1826, p. 115: the anchorage close to the shore, the edge of the bank steep; half a league N E of Cape Pellaro 15 to 20 fathoms; stockings and gloves made in the town. Norie 1831, p. 110: anchor in 20 to 10 fathoms half a mile to three quarters off; wine, oil and fruit exported. Smyth 1854, p. 442: the Marina fountain 38 5 42 N, 15 39 47 E.
+#
+# NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# The holder, dated (the lead's ruling of 2026-11-12: the mainland's ports by dated rows to
+# `france` for the French occupation; Joseph's and Murat's kingdom has no nation of its own
+# in the table yet, and France's is its nearest stance, hostile to a King's ship). James
+# 1837, vol. 4, p. 122: Joseph entered Naples on 15 February 1806, and "before the end of
+# March" the French had garrisons in Scylla and the whole kingdom but Gaeta and Civitella.
+# The end of the French kingdom in May 1815 is FROM MEMORY (the convention of Casalanza,
+# 20 May 1815, not read).
+# After Maida (4 July 1806) the French evacuated both Calabrias and recovered nearly every
+# post by the year's end but Scylla (vol. 4, pp. 125 to 126); a British and Neapolitan
+# garrison held Reggio's fortress until early 1808, when Regnier's success obliged it to
+# retire on Scylla (vol. 4, p. 294). The days of its
+# taking are not read: the rows keep France's from March 1806, said and not modelled.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: reggio
+name: Reggio
+nation:
+  - {nation: naples, until: 1806-03-30, source: "the King of the Two Sicilies' (James 1837, vol. 4, p. 122)"}
+  - {nation: france, since: 1806-03-31, until: 1815-05-20, source: "the French in possession of the kingdom by the end of March 1806 (James 1837, vol. 4, p. 122); the end FROM MEMORY"}
+  - {nation: naples, since: 1815-05-21, source: "the King's again (FROM MEMORY)"}
+source: "Purdy 1826 p. 115; Norie 1831 p. 110; Smyth 1854 p. 442; James 1837 vol. 4 pp. 122-126, 294"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: reggio-road
+  name: the road of Reggio
+  lat_deg: 38.1084
+  lon_deg: 15.6406
+  depth_fathoms: 15
+anchorage:
+  feature: reggio-road
+  name: the road of Reggio
+  lat_deg: 38.1084
+  lon_deg: 15.6406
+mooring:
+  feature: reggio-road
+  name: the road of Reggio
+  lat_deg: 38.1084
+  lon_deg: 15.6406
+  depth_fathoms: 15
+  bottom: sand
+shore:
+  feature: reggio
+  name: the Marina of Reggio
+  lat_deg: 38.1100
+  lon_deg: 15.6520
+
+pilot:
+  station: reggio-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the Marina
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Domenico Laganà, Bruno Morabito, Carmelo Romeo, Pasquale Calabrò]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 250            # judgement
+  words:
+    channel: "The shore is clear and steep; the bank's edge falls away fast, so anchor close in."
+    marks: "The town along its Marina with the cathedral; Cape Pellaro to the south; Messina across the strait."
+    anchorage: "Ten to twenty fathoms half a mile to three quarters off the shore; the bank is steep-to."
+    tide: "The Faro's stream runs off the town, north and south by turns."
+
+tide:
+  establishment: Reggio
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 12.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 12.5, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 34.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.5, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 270.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 55.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+    - {good: stockings, price: 60, origin: naples, note: "stockings and gloves made in the town (Purdy 1826, p. 115); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the Aspromonte's timber; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "JUDGEMENT"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [reggio-road, 38 06 N 15 36 E]
+  from_sea: [38 06 N 15 36 E, reggio-road]
+  in: [reggio-road]

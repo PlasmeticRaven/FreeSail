@@ -466,8 +466,10 @@ in 1824, Shaler p. 235; a Roman prize in 1824, p. 241).
 **Where they took ships:** the Atlantic off Cape St Vincent and Lisbon (Foss's ship 25 leagues west
 of the cape, 1793; Carey), the Strait and the passage from Malta to Gibraltar (the *Edwin*, Niles),
 Sardinia (Smyth), the Roman coast (Shaler); in the months from May to November in every capture
-dated (the seasons NOT FOUND as a rule). Their force: before 1816 a ship of 38 guns, sloops of 20 to
-30, a brig and some 30 gunboats at Algiers, 3,000 seamen (Shaler pp. 36 to 37); Tunis three or four
+dated (the seasons NOT FOUND as a rule). Their force: Algiers' navy, "formerly" of "row-gallies and xebecs", before the peace of June
+1815 four frigates of 44 to 50 guns, one of 38, sloops of war of 30, 26, 22 and 20 guns, a brig of
+20, a galley of five guns and about thirty gun and mortar boats, destroyed in August 1816 and
+since restored (Shaler pp. 36 to 37); 3,000 seamen (p. 37); Tunis three or four
 ships and some thirty galliots (Purdy p. 329).
 
 ### 7.2 How a taking happens in the game's own terms
@@ -553,8 +555,11 @@ own process, as `ConsentRevision-AdversarialSeats.md` was.
   refuses an adversarial seat today (`seats.py`, `ADVERSARIAL_SEATS_CONSENTED`), and the regency's
   captain is the rules', voiced by the director in the errand's words. A corsair's station at war
   with a human's ship is an adversarial seat as well, so both questions are put to it.
-- **A player at a corsair's station was not asked**, and stays closed: no door seats a human there,
-  and the note proposes nothing for it.
+- **A player at a corsair's station stays closed for now, on a condition.** The owner, 2026-11-13:
+  "I'm not going to decide on the player in control of a corsair, as long as no vessel type is
+  specifically restricted to corsairs and restricting the player wouldn't keep them from sailing a
+  certain vessel type, it's probably OK to restrict." So no door seats a human at a regency's
+  cruiser's station, **and no kind of vessel is thereby kept from the player** (§8.2).
 - **A model at a station of the player's ship** (an officer, the master) boards, reads her papers and
   reports in the game's words; is asked to do nothing that touches the people but to report them in
   that one sentence; and in a captivity stands down as package 74's captive does, idle through the
@@ -602,6 +607,24 @@ errand ended in people held for ransom, knowing that in full, with the game's ow
 what it will never be asked to do. It asks nothing of a slaver's station, which stays closed to every
 player and every model (decision 68).
 
+### 8.2 The regencies' hull kinds, each open to the player under another flag
+
+The kinds the sources give the regencies' cruisers, and the game's ship file for each:
+
+| The regency's kind (source) | The game's file | Open to the player under |
+|---|---|---|
+| frigates of 38 to 50 guns, Algiers before 1816 (Shaler p. 36); Tunis's largest of not more than forty guns (Purdy 1826 p. 329) | `frigate-36.yaml`; `razee-44.yaml` for the heaviest | any flag a scenario gives her (the ship files carry no nation) |
+| sloops of war of 20 to 30 guns (Shaler p. 36) | none of its own yet: the nearest is `brig.yaml` | a ship-sloop's file, when one is built, under any naval flag |
+| a brig of 20 guns (Shaler p. 36) | `brig.yaml` | any naval flag |
+| gun and mortar boats (Shaler p. 36) | none yet | a gunboat's file, when built, under the flags that kept them (FROM MEMORY: Spain's, Britain's, the Italian states') |
+| a galley; "row-gallies and xebecs" formerly (Shaler p. 36); galliots at Tunis (Purdy p. 329) | none yet | when built, under the Christian flags that sailed them: the King of Sardinia's galleys and half-galleys and the Pope's galleys (`data/nations.yaml`, their entries, there JUDGEMENT); xebecs Spain's and France's (FROM MEMORY) |
+
+**The rule for the build:** a regency's cruiser is a hull of the world under the regency's flag,
+never a kind of hull; every ship file a regency's cruiser uses is a file any flag may sail, and a
+new file built for a regency's kind (a xebec, a galliot, a gunboat) is built as the kind and given
+to the player under at least one other flag the sources support, or the closure is put back to the
+owner. What the player is kept from is the regency's commission, not a vessel.
+
 ## 9. What else it touches (item 8)
 
 - **The ports' words** (104, 105, 106a, 106b, and 106's c and d): decision 68's interim rule stands;
@@ -644,7 +667,8 @@ Each answerable in a word or a line, the recommendation first.
 
 ## 11. The owner's answers (2026-11-13)
 
-Given through the lead the same day.
+Given through the lead the same day, and recorded in decision 68's postscript in
+`docs/DesignProposal.md`, whose words these follow.
 
 1. **France 1794 to 1802 and the United States before 1819:** the line form, saying truthfully what
    their law and practice did (as recommended).
@@ -658,11 +682,16 @@ Given through the lead the same day.
    brief on the matter, a model should be able to decide whether they are willing to be seated at a
    corsair when that corsair might take part in slaving." So a model may hold a corsair's station,
    only under a brief that says plainly and in full what the station is and may do, the model
-   deciding for itself (§8, §8.1). A slaver's station stays closed to every player and every model
-   (decision 68; not asked). A player at a corsair's station was not asked and stays closed.
-6. **The people aboard a vessel of the trade:** a count with one plain sentence on her record (as
+   deciding for itself (§8, §8.1); the consent documents are revised only by the owner's own process.
+   A slaver's station stays closed to every player and every model. **On a player at a corsair's
+   station**, the same day: "I'm not going to decide on the player in control of a corsair, as long
+   as no vessel type is specifically restricted to corsairs and restricting the player wouldn't keep
+   them from sailing a certain vessel type, it's probably OK to restrict." So it stays closed for
+   now, on the condition that no kind of vessel is thereby kept from the player (§8.2).
+6. **The people aboard a vessel of the trade:** a count with one plain sentence on her record,
+   never persons the systems act on (as recommended).
+7. **The Southampton scans:** scans under a non-commercial licence are cited and not kept (as
    recommended).
-7. **The Southampton scans:** cited and not kept (as recommended).
 8. **The words of §3.2:** approved as they stand (as recommended).
 9. **The coast from the Gambia to the Bight:** left unbooked for now, the court's sentence arriving
    from off the chart (as recommended).
@@ -694,6 +723,8 @@ no sum (answer 3).
 captive's state and its roads, the redemption told as the captive's nation's act with no sum (answer
 4); and the corsair's seat **gated and refused in words** until the owner's process has written the
 brief of §8.1 into the consent documents and put the question (answer 5), as the adversarial seats
-are gated today. The seat's opening is the owner's, not a package's.
+are gated today. The seat's opening is the owner's, not a package's. The regencies' cruisers use
+ship files any flag may sail (§8.2); a new file for a regency's kind (a xebec, a galliot, a gunboat)
+is given to the player under another flag, or the closure goes back to the owner.
 
 None of it touches the consent documents, and no step opens a slaver's station to anyone.
