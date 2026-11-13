@@ -26701,6 +26701,16 @@ lower yardarms, the numerals at the topsail yardarms, flags along the fore, main
 stays, the pendants at the topgallant yardarms, the shrouds bare (her stock spent); undressed,
 nothing but her colours.
 
+**Step 4: the measure.** At 01885a5 (step 4 with the trunk at 90cb075, step 3 merged as
+d01d1a4, merged by a merge commit; the step's paragraph above): ruff check and format clean
+(385 files); the fast tier 7,572 passed, 1 xfailed, 0 failed (the trunk's chart audit
+among them, untouched); the slow tier of the touched files and of `test_known_truths`
+(step 3's nine and test_primer, whose orders block dresses and undresses a ship; `--slow -m
+"not pace"`) 1,714 passed, 8 xfailed, 0 failed; pace alone and last on the same files, 12
+passed. No digest moved; no game line about a hoist or the colours moved (the locker's
+`dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
+records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
