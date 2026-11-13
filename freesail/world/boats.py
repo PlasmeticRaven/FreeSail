@@ -935,6 +935,13 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
         if vessel is not None:
             vessel.done = True
         release_done(world)
+    saved = ""
+    if getattr(state, "load_of", 0):
+        # a load of a transfer in her or told off for her (package 60): never lost from every
+        # muster and log, nor a person left nowhere (`transfer.boat_lost`)
+        from freesail.world.transfer import boat_lost
+
+        saved = boat_lost(_root(world), ship_hull, state)
     when = world.clock.ship_time
     dealings.boat = BoatState(
         boat_name=name,
@@ -944,7 +951,7 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
         lost_words=f"{how} on the {when.day}{_th(when.day)}",
     )
     people_words = f"; {', '.join(lost)} lost with her" if lost else ""
-    text = f"{_cap(name)} {words or how}{people_words}. A new one is the yard's."
+    text = f"{_cap(name)} {words or how}{people_words}{saved}. A new one is the yard's."
     ship_hull.record(
         Severity.URGENT, "boat.lost", text, data={"how": how, "lost": lost, "boat": state.boat_id}
     )

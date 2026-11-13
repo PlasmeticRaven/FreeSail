@@ -3598,7 +3598,8 @@ class Dealings:
             return
         if stage == "back":
             if moving and self.boat.loads and target is not None and not self._in_the_boat():
-                # the next load away at once: the boat not hoisted in between
+                # the next load away at once by the road's own trip, which hoists her in and
+                # out again as every trip does (its timing the road's, unchanged)
                 self._next_load(target)
                 return
             lines: list[tuple[Severity, str, str, dict[str, Any]]] = [
@@ -3616,7 +3617,9 @@ class Dealings:
                 from freesail.world.musters import join
 
                 back = list(self.boat.hands)
-                join(own, back)
+                # told apart from a man of the same id come aboard meanwhile (a transfer the
+                # other way), by the ship they were bound for
+                join(own, back, came_from=str(self.boat.to_hull))
                 lines.append(
                     (
                         Severity.NOTABLE,
@@ -3706,8 +3709,8 @@ class Dealings:
         self._record(
             Severity.ROUTINE,
             "boat.away",
-            f"{name[:1].upper()}{name[1:]} away again for {hull_name(target)} with the "
-            f"{_ordinal_words(n)} load: {who}.",
+            f"{name[:1].upper()}{name[1:]} away again for the "
+            f"{hull_name(target).removeprefix('the ')} with the {_ordinal_words(n)} load: {who}.",
             {"ship": str(target.id), "errand": "to_ship", "people": [p.id for p in persons]},
         )
 
@@ -3719,7 +3722,7 @@ class Dealings:
         men = [s for hands, _ in self.boat.loads for s in hands]
         self.boat.loads = ()
         if men:
-            join(self.world.own, men)
+            join(self.world.own, men, came_from=str(self.boat.to_hull))
             self._record(
                 Severity.NOTABLE,
                 "company.came_back",

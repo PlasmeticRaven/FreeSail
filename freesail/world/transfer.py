@@ -184,10 +184,8 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
     every, by_rating, count, rest = False, {}, 0, []
     for part in parts:
         low = part.lower()
-        if low in ("the hands", "all the hands", "all hands", "the people and the hands"):
+        if low in ("the hands", "all the hands", "all hands"):
             every = True
-            if "people" in low:
-                rest.append("the people")
             continue
         if low in ("the people", "all the people", "her people"):
             rest.append("the people")
@@ -212,8 +210,9 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
 
 
 def _split_and(text: str) -> list[str]:
-    """The list's parts at its commas and its 'and's; 'the people and the hands' is one part,
-    and so is a number said with its 'and' ('a hundred and twenty hands')."""
+    """The list's parts at its commas and its 'and's ('Mr Pascoe, Richd. Oliver and two hands':
+    three parts; 'the people and two hands': two), a number said with its 'and' ('a hundred and
+    twenty hands') one part."""
     from freesail.orders import numbers
 
     out: list[str] = []
@@ -221,12 +220,10 @@ def _split_and(text: str) -> list[str]:
         words = chunk.split()
         cur: list[str] = []
         for w in words:
-            if w.lower() == "and" and cur:
-                said = " ".join(cur).lower()
-                if said != "the people" and numbers.read_all(cur) is None:
-                    out.append(" ".join(cur))
-                    cur = []
-                    continue
+            if w.lower() == "and" and cur and numbers.read_all(cur) is None:
+                out.append(" ".join(cur))
+                cur = []
+                continue
             cur.append(w)
         out.append(" ".join(cur))
     return [x.removeprefix("and ").strip() for x in out]
@@ -348,7 +345,8 @@ def _by_the_boat(
         # in the dealings' own words (`Dealings._send_boat`); the road to another hull has no
         # check of its own of a boat lost, and the lead's ruling keeps that road as it is
         raise TransferError(
-            f"{boat.boat_name[:1].upper()}{boat.boat_name[1:]} is lost: {boat.words()}."
+            f"{boat.boat_name[:1].upper()}{boat.boat_name[1:]} was "
+            f"{boat.lost_words or boat.lost}; a new one is the yard's."
         )
     try:
         sent, _ = giver.dealings.send_boat_to(
@@ -405,6 +403,81 @@ def _by_the_gangway(
         "loads": 1,
         "alongside": True,
     }
+
+
+def boat_lost(root: Any, giver: Any, state: Any) -> str:
+    """The giving ship's boat lost with a transfer's load in her or told off for her (the
+    lead's ruling on the second reading of 4dda3dfe): the men told off and not yet embarked
+    back in their watches; the men and the persons in her picked up by the nearer of the two
+    ships (JUDGEMENT: `boats.lose_boat` gives the script's boat's own crew no fate, being no
+    persons, and no drowning is invented here), the hands into her watches and the persons
+    aboard her, a person bound for the receiver of her company when she is the one; each said
+    in that ship's log. Returns the words for the giver's line of the loss."""
+    from freesail.world.movement import hull_of, put_aboard
+    from freesail.world.musters import join
+
+    receiver = hull_of(root, str(getattr(state, "to_hull", "") or ""))
+    if receiver is not None and getattr(getattr(receiver, "vessel", None), "done", False):
+        receiver = None
+    waiting = [s for hands, _ in state.loads for s in hands]
+    if waiting:
+        join(giver, waiting, came_from=str(getattr(state, "to_hull", "") or ""))
+    nearer = _nearer(giver, receiver, state, int(root.clock.tick))
+    men = list(state.hands)
+    registry = getattr(root, "registry", None)
+    everyone = list(registry.persons()) if registry is not None else []
+    persons = [
+        p
+        for p in everyone
+        if p.id in state.people
+        and p.hull is None
+        and p.where == "boat"
+        and str(getattr(p, "home", "") or "") in (str(giver.id), str(getattr(receiver, "id", "")))
+    ]
+    if men:
+        bound = str(getattr(state, "to_hull", "") or "")
+        join(nearer, men, came_from=str(giver.id) if nearer is not giver else bound)
+    for p in persons:
+        if nearer is receiver and p.id in state.joining and registry is not None:
+            registry.rehome(p, str(receiver.id))
+        put_aboard(root, p, nearer, "deck", by="picked up", said=False)
+    parts: list[str] = []
+    picked = _who_words(men, persons)
+    if men or persons:
+        where = "her own side" if nearer is giver else f"the {_name(nearer)}"
+        line = f"{picked[:1].upper()}{picked[1:]} picked up out of the water by {where}"
+        nearer.record(
+            Severity.URGENT,
+            "company.picked_up",
+            f"{line}." if nearer is giver else f"{line}, from the {_name(giver)}'s boat.",
+            data={"from": str(giver.id), "hands": len(men), "persons": [p.name for p in persons]},
+        )
+        parts.append(f"{picked} picked up by {where}")
+    if waiting:
+        parts.append(f"{_count_words(len(waiting))} told off for her stand down")
+    return ("; " + "; ".join(parts)) if parts else ""
+
+
+def _nearer(giver: Any, receiver: Any, state: Any, now: int) -> Any:
+    """The ship nearer the boat when she is lost (JUDGEMENT, by her stage of the trip): pulling
+    for the other ship, the other once she is more than half way there; alongside her, the
+    other; pulling back, her own once more than half way home."""
+    if receiver is None:
+        return giver
+    phase = str(getattr(state, "phase", "") or "")
+    if phase.startswith("alongside"):
+        return receiver
+    jobs = [j for j in giver.dealings.jobs if j.kind == "boat_to"]
+    due = {j.payload.get("stage"): int(j.due_tick) for j in jobs}
+    since = int(getattr(state, "since_tick", 0) or 0)
+    if phase.startswith("pulling for") and "alongside" in due:
+        span = max(1, due["alongside"] - since)
+        return receiver if (now - since) * 2 > span else giver
+    if phase.startswith("pulling back") and "back" in due:
+        start = due.get("alongside", since)
+        span = max(1, due["back"] - start)
+        return giver if (now - start) * 2 > span else receiver
+    return giver
 
 
 def say_came_aboard(
@@ -559,10 +632,13 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
 
 
 def _answers_to(person: Any, key: str) -> bool:
-    name = str(getattr(person, "name", "")).lower()
+    """A name as said ('Mr Pascoe', 'Richd. Oliver', 'Oliver') or a role ('the boatswain'):
+    the stops of a name's contraction read away on both sides."""
+    name = " ".join(str(getattr(person, "name", "")).lower().replace(".", " ").split())
     role = str(getattr(person, "role", "")).lower()
+    key = " ".join(key.replace(".", " ").split())
     bare = key.removeprefix("the ")
-    return key == name or bare == role or (len(key) > 3 and name.endswith(key.split()[-1]))
+    return key == name or bare == role or (len(key) > 3 and name.endswith(" " + key.split()[-1]))
 
 
 def _draw(
@@ -627,15 +703,6 @@ def _between_m(a: Any, b: Any) -> float | None:
     if pa is None or pb is None:
         return None
     return float(bearing_and_distance(pa, pb)[1])
-
-
-def _under_way(hull: Any) -> bool:
-    from freesail.world.boats import HOIST_OUT_WAY_MS
-
-    if getattr(hull, "at_anchor", False):
-        return False
-    dyn = getattr(getattr(hull, "ship", None), "dyn", None)
-    return abs(float(getattr(dyn, "u", 0.0) or 0.0)) > HOIST_OUT_WAY_MS
 
 
 def _name(hull: Any) -> str:

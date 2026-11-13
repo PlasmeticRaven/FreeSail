@@ -84,7 +84,6 @@ def execute(ship: Any, order: Order) -> Result:
     from freesail.world.command import CommandError, take_up
     from freesail.world.hulls import world_of as root_of
     from freesail.world.movement import hull_of
-    from freesail.world.orders import WorldOrderError, hull_named
 
     if order.verb == "transfer":
         return _transfer(ship, order)
@@ -104,12 +103,7 @@ def execute(ship: Any, order: Order) -> Result:
         if hull is None:
             raise OrderError("You are aboard no ship; name the ship you take command of.")
     else:
-        try:
-            hull = hull_named(root, words, make=False)
-        except WorldOrderError as e:
-            raise OrderError(_his_words(e, words)) from None
-        if hull is root:
-            hull = root.players
+        hull = ship_for_him(root, words)
     if _prize_not_condemned(hull):
         raise OrderError(PRIZE_WORDS)
     try:
@@ -123,7 +117,6 @@ def _transfer(ship: Any, order: Order) -> Result:
     """`transfer ... to the "Fly"` (step 2; `world.transfer.transfer`)."""
     from freesail.world import knowledge
     from freesail.world.hulls import world_of as root_of
-    from freesail.world.orders import WorldOrderError, hull_named
     from freesail.world.transfer import TransferError, transfer
 
     world = world_of(ship)
@@ -133,7 +126,15 @@ def _transfer(ship: Any, order: Order) -> Result:
     person = knowledge.players_person(root)
     if person is None:
         raise OrderError("You are aboard no ship here to move her people.")
-    text = " ".join(str(order.object or "").split()).strip().rstrip(".")
+    # the words after the verb as said, their commas kept (the order's `object` has them read
+    # away, and a list of names is read by them: the lead's second reading of 4dda3dfe)
+    said = str(order.text or "")
+    phrase = str(order.verb_phrase or "")
+    if phrase and said.lower().startswith(phrase.lower()):
+        said = said[len(phrase) :]
+    else:
+        said = str(order.object or "")
+    text = " ".join(said.split()).strip().rstrip(".")
     m = _TRANSFER.match(text)
     if m is None:
         mine = _ship_name(root)
@@ -143,12 +144,7 @@ def _transfer(ship: Any, order: Order) -> Result:
         )
 
     def named(words: str) -> Any:
-        words = " ".join(words.replace('"', " ").split())
-        try:
-            hull = hull_named(root, words, make=False)
-        except WorldOrderError as e:
-            raise OrderError(_his_words(e, words)) from None
-        return root.players if hull is root else hull
+        return ship_for_him(root, words)
 
     receiver = named(m.group("to"))
     giver = named(m.group("giver")) if m.group("giver") else None
@@ -173,17 +169,35 @@ def _ship_name(root: Any) -> str:
     return hull_name(players).removeprefix("the ") if players is not None else "ship"
 
 
-def _his_words(e: Exception, words: str) -> str:
-    """A ship's name the world's reader could not give him, said in his words: the reader's
-    own sentence where it is the world's, and none of the director's (an observed world, a
-    hull not made yet)."""
-    said = str(e).rstrip(".")
-    name = " ".join(words.replace('"', " ").split()) or "that ship"
-    if "observed" in said:
-        return "You command no ship here."
-    if "no hull of her own yet" in said:
-        return f"The {name.removeprefix('the ')} lies too far off for a boat to reach her."
-    return said + "."
+def ship_for_him(root: Any, words: str) -> Any:
+    """The ship his order names (package 60, the lead's second reading of 4dda3dfe, item 4):
+    the ship he commands by her name or 'the ship'; another by her hull's id, her name, or as
+    her lookout names her in sight; refused in the world's words, naming no sail he has not
+    seen: a name he knows of no ship by, a ship with no hull of her own (beyond a boat's reach,
+    asleep and never boarded), an observed world."""
+    from freesail.world.lookout import vessel_in_sight
+
+    said = " ".join(str(words).replace('"', " ").split())
+    key = said.lower().removeprefix("the ")
+    if getattr(root, "observed", False):
+        raise OrderError("You command no ship here.")
+    players = getattr(root, "players", None)
+    own = _ship_name(root).lower()
+    if key in ("ship", "us", "her", "this ship", "our ship", own):
+        return players
+    hulls = getattr(root, "hulls", None) or {}
+    if key in hulls:
+        return hulls[key]
+    vessels = getattr(root, "vessels", None)
+    vessel = vessels.find(said) if vessels is not None else None
+    if vessel is None:
+        vessel = vessel_in_sight(root, said)
+    name = " ".join(w[:1].upper() + w[1:] for w in key.split()) or "that ship"
+    if vessel is None or vessel.done:
+        raise OrderError(f"You know of no ship called the {name} hereabouts.")
+    if vessel.crew is None:
+        raise OrderError(f"The {vessel.name} lies beyond a boat's reach of you.")
+    return vessel.crew
 
 
 def _prize_not_condemned(hull: Any) -> bool:

@@ -319,31 +319,15 @@ def take_up(
 def _woken_at_her_anchor(root: Any, hull: Any, vessel: Any) -> None:
     """The ship he takes up woken at once, if she sleeps in the far shape (the player's own
     ship is awake always, and `crews.switch` wakes no hull that is his: the lead's reading of
-    ab0ade58, item 1); and, where her far body rode at an anchor (her plan ends at one), her
-    best anchor let go where she lies, in the depth there, the cable veered to the scope the
-    depth wants: the far body's anchor made the near body's, as she lay."""
+    ab0ade58, item 1), riding as her far body lay (`crews.rides_as_she_lay`: at her anchor
+    where it rode at one, nothing set)."""
     from freesail.world import crews
 
     crew = getattr(vessel, "crew", None)
     if crew is not None and not getattr(crew, "awake", True):
         crews.promote(root, vessel)
-    anchored = bool(vessel.plan) and vessel.plan[0][0] == "anchor"
-    if not anchored or getattr(hull, "at_anchor", False):
-        return
-    from freesail.evolutions.scripts import _let_go, _scope_plan, _water_depth, can_let_go
-
-    ship = hull.ship
-    tackle = (getattr(ship, "extra", None) or {}).get("ground_tackle")
-    depth = _water_depth(ship)
-    if tackle is None or depth is None:
-        return
-    anchor = next((a for a in tackle.anchors if can_let_go(a)), None)
-    if anchor is None:
-        return
-    _let_go(ship, anchor, depth)
-    anchor.scope_m = _scope_plan(anchor, depth, None)[0]
-    anchor.brought_up = True
-    ship.dyn.u = ship.dyn.v = 0.0
+    else:
+        crews.rides_as_she_lay(vessel, crew)
 
 
 def _seat_follows(root: Any, person: Any, hull: Any) -> None:

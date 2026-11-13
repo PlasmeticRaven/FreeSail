@@ -25,10 +25,11 @@ from tests.test_ordnance import at_anchor_in
 from tests.test_ship_changed import _wo
 
 
-def cutter_and_the_fly_taken_up(settle: str = ", and lay the Sherbourne up"):
+def cutter_and_the_fly_taken_up(settle: str = ", and lay the Sherbourne up", **kw):
     """(the world, the cutter, the Fly, his person): the Fly his, the cutter laid up (or as
-    `settle` says), the boat that brought him home at the booms."""
-    w = at_anchor_in(CARRICK_ROAD)
+    `settle` says), the boat that brought him home at the booms; `kw` the cutter's world's
+    (`papers=` for her service)."""
+    w = at_anchor_in(CARRICK_ROAD, **kw)
     _wo(
         w,
         'ship: a schooner "Fly" of Britain at 50 09.9 N 5 02.3 W, bound for Falmouth, '
@@ -134,7 +135,8 @@ def test_a_lost_boat_carries_nobody():
     hands = len(TR._hands(cutter))
     e = w.submit("transfer two hands from the Sherbourne to the Fly")
     assert e.kind == "order.rejected", e.text
-    assert "lost" in e.text
+    assert " was swamped on the " in e.text and "a new one is the yard's" in e.text, e.text
+    assert "lost: the" not in e.text
     assert cutter.dealings.boat.lost and len(TR._hands(cutter)) == hands
 
 
@@ -201,6 +203,131 @@ def test_a_receiver_gone_is_said_and_the_men_come_home():
     assert said and "Sherbourne" in said[-1].text
     assert len(TR._hands(fly)) == hands
     assert str(cutter.id) not in (w.__dict__.get(HULLS_LEFT) or [])
+
+
+def test_a_ship_in_ordinary_he_is_aboard_lies_at_her_anchor_with_nothing_set():
+    """The lead's second reading of 4dda3dfe, item 3: aboard the laid-up Fly half an hour
+    before he takes command, she lies at her anchor with nothing set (before, she was stepped
+    asleep under her file's plain sail, could not be boxed off and moved 516 m); after he takes
+    command nothing is set that he did not order."""
+    from freesail.ship.parts import ground_tackle
+    from freesail.world.geo import bearing_and_distance
+
+    w = at_anchor_in(CARRICK_ROAD)
+    _wo(
+        w,
+        'ship: a schooner "Fly" of Britain at 50 09.9 N 5 02.3 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(60)
+    fly = w.sea_vessels.find("Fly")
+    _wo(w, 'ship "Fly": in ordinary at Falmouth')
+    w.run(1800)
+    _wo(w, 'command: a new command for the master: the schooner "Fly" at Falmouth')
+    me = knowledge.players_person(w)
+    w.submit("go to the boat")
+    w.submit("come alongside the Fly")
+    for _ in range(30):
+        w.run(60)
+        if str(me.hull) == str(fly.id):
+            break
+    hull = w.hulls[str(fly.id)]
+
+    def set_sails():
+        return [s for s, x in hull.ship.sails.items() if x.is_set]
+
+    assert fly.crew.awake and hull.at_anchor and not set_sails()
+    where = hull.position
+    w.run(1800)
+    assert fly.regime == "in ordinary" and hull.at_anchor and not set_sails()
+    scope = ground_tackle(hull.ship).riding_by().scope_m
+    assert bearing_and_distance(where, hull.position)[1] < scope + 30.0
+    assert not [x for x in hull.log if x.kind == "evolution.failed"]
+    assert w.submit("take command of her, and lay the Sherbourne up").kind == "ship.taken_up"
+    w.run(600)
+    assert hull.at_anchor and not set_sails()
+
+
+def test_a_boat_lost_with_a_load_in_her_loses_nobody_from_every_muster():
+    """The lead's second reading of 4dda3dfe, item 1: the boat swamped two minutes out with Mr
+    Pascoe and eleven hands in her and four told off: the four back in their watches, the
+    eleven and Mr Pascoe picked up by the nearer ship (her own side, so soon), each said; no
+    man in no muster, no person nowhere."""
+    from freesail.world.boats import lose_boat
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    total = len(TR._hands(cutter)) + len(TR._hands(fly))
+    pascoe = next(p for p in w.registry.persons() if p.name == "Mr Pascoe")
+    e = w.submit("transfer fifteen hands and Mr Pascoe from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    w.run(120)
+    assert len(cutter.dealings.boat.hands) == 11
+    lose_boat(w, cutter, "swamped")
+    assert len(TR._hands(cutter)) + len(TR._hands(fly)) == total
+    assert str(pascoe.hull) == str(cutter.id) and str(pascoe.home) == str(cutter.id)
+    lost = [x for x in cutter.log if x.kind == "boat.lost"][-1].text
+    assert "Mr Pascoe and eleven hands picked up by her own side" in lost, lost
+    assert "four hands told off for her stand down" in lost
+    assert [x for x in cutter.log if x.kind == "company.picked_up"]
+
+
+def test_a_boat_lost_nearer_the_other_ship_is_picked_up_by_her():
+    """Item 1, the boat more than half way to the Fly when she is swamped: the men and Mr
+    Pascoe picked up by the Fly, he of her company as the order meant, said in her log."""
+    from freesail.world.boats import lose_boat
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    total = len(TR._hands(cutter)) + len(TR._hands(fly))
+    pascoe = next(p for p in w.registry.persons() if p.name == "Mr Pascoe")
+    e = w.submit("transfer two hands and Mr Pascoe from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    w.run(_due(cutter, "alongside") - w.clock.tick - 20)
+    lose_boat(w, cutter, "swamped")
+    assert len(TR._hands(cutter)) + len(TR._hands(fly)) == total
+    assert str(pascoe.hull) == str(fly.id) and str(pascoe.home) == str(fly.id)
+    said = [x.text for x in fly.log if x.kind == "company.picked_up"]
+    assert said and "from the Sherbourne's boat" in said[-1]
+
+
+def test_a_list_of_names_is_read_as_a_list():
+    """The lead's second reading of 4dda3dfe, item 2: 'Mr Pascoe, Richd. Oliver and two hands'
+    moves both, and 'the people and two hands' is read as two parts; a list with a name nobody
+    answers to is refused naming that one, nothing changed."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    hands = len(TR._hands(cutter))
+    e = w.submit("transfer Mr Pascoe, Mr Nobody and two hands from the Sherbourne to the Fly")
+    assert e.kind == "order.rejected" and "answers to 'Mr Nobody'" in e.text, e.text
+    assert len(TR._hands(cutter)) == hands and not cutter.dealings.boat.away
+    e = w.submit("transfer Mr Pascoe, Richd. Oliver and two hands from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    assert e.text.startswith("Mr Pascoe, Richd. Oliver and two hands told off for the Fly")
+    _until_home(w, cutter)
+    homes = {p.name: str(p.home) for p in w.registry.persons()}
+    assert homes["Mr Pascoe"] == homes["Richd. Oliver"] == str(fly.id)
+    w2, cutter2, fly2, _ = cutter_and_the_fly_taken_up()
+    e = w2.submit("transfer the people and two hands from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    assert "two hands" in e.text and "Mr Pascoe" in e.text and "Mr Pearce" not in e.text
+
+
+def test_men_coming_home_are_told_apart_from_men_come_aboard_meanwhile():
+    """The lead's second reading of 4dda3dfe, item 5: the Sherbourne's two hands go to the Fly
+    while the Fly's two go the other way; the Sherbourne gone before the Fly's boat is alongside
+    her, the Fly's men come home to find two men of their ids aboard, and are told apart."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    e = w.submit("transfer two hands from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    w.run(60)
+    e = w.submit("transfer two hands to the Sherbourne")
+    assert e.kind == "company.transfer", e.text
+    w.run(_due(cutter, "alongside") - w.clock.tick + 1)
+    assert len(_came_aboard(fly)) == 1
+    cutter.vessel.done = True
+    _until_home(w, fly)
+    crew = fly.ship.extra["crew"]
+    assert len({s.id for s in crew.sailors}) == len(crew.sailors)
+    later = [x.text for x in fly.log if x.kind == "boat.away"]
+    assert all(" for Fly" not in x and " for Sherbourne" not in x for x in later)
 
 
 def _came_aboard(hull, since=0):
@@ -368,12 +495,83 @@ def test_the_refusals_name_the_ships_that_are_here_in_the_worlds_words():
     w, cutter, fly, me = cutter_and_the_fly_taken_up()
     e = w.submit("transfer some of the men")
     assert e.kind == "order.rejected" and "'transfer twenty hands to the Fly'" in e.text, e.text
+    texts = [e.text]
     e = w.submit("take command of the Sherbourne, and leave her")
     assert e.kind == "order.rejected" and "Say how the Fly is left" in e.text, e.text
-    for said in (e.text,):
-        assert "Amazon" not in said and "prompt" not in said and "world" not in said
+    texts.append(e.text)
+    for order in (
+        "transfer two hands to the Nonesuch",
+        "transfer Mr Nobody to the Sherbourne",
+        "transfer twenty hands from the Sherbourne to the Fly",
+        "transfer two hands to the Sherbourne, and lay the Fly up",
+        "transfer to the Sherbourne",
+        "take command of the Nonesuch",
+    ):
+        e = w.submit(order)
+        assert e.kind == "order.rejected", order
+        texts.append(e.text)
+    for said in texts:
+        reason = said.split("): ", 1)[-1]
+        assert "Amazon" not in reason and "prompt" not in reason and "world" not in reason, said
     with pytest.raises(TR.TransferError, match="^You command no ship here"):
         TR.transfer(types.SimpleNamespace(observed=True), me, fly, "two hands")
+
+
+def test_a_ships_name_is_answered_in_the_orders_own_words():
+    """The lead's second reading of 4dda3dfe, item 4: an unknown name is refused in the order's
+    words, naming no sail on the sea; a ship with no hull of her own, beyond his reach; an
+    observed world, none of his. Each branch played or called."""
+    import types
+
+    from freesail.orders.command import ship_for_him
+    from freesail.orders.errors import OrderError
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    e = w.submit("transfer two hands to the Nonesuch")
+    assert e.kind == "order.rejected"
+    assert "You know of no ship called the Nonesuch hereabouts." in e.text, e.text
+    assert "the sail" not in e.text and "Sherbourne" not in e.text
+    e = w.submit("take command of the Nonesuch")
+    assert "You know of no ship called the Nonesuch hereabouts." in e.text, e.text
+    _wo(
+        w,
+        'ship: a brig "Distant" of Britain at 49 00 N 6 30 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(60)
+    assert w.sea_vessels.find("Distant").crew is None
+    e = w.submit("transfer two hands to the Distant")
+    assert e.kind == "order.rejected" and "The Distant lies beyond a boat's reach of you." in (
+        e.text
+    ), e.text
+    with pytest.raises(OrderError, match="^You command no ship here"):
+        ship_for_him(types.SimpleNamespace(observed=True), "the Fly")
+    assert ship_for_him(w, "the ship") is fly and ship_for_him(w, "Fly") is fly
+
+
+def test_the_refusals_played_by_the_order():
+    """The lead's second reading, item 6, played and not patched: a King's ship's company is
+    turned over by the Admiralty's order (the Sherbourne a King's cutter by her papers, the
+    Fly's hands refused her); a prisoner gives no order to a company; a ship not his is not
+    his to man; each by the order at his prompt, nothing changed."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(papers={"service": "kings"})
+    was = len(TR._hands(cutter)), len(TR._hands(fly))
+    e = w.submit("transfer two hands to the Sherbourne")
+    assert e.kind == "order.rejected"
+    assert "turned over to the Sherbourne by the Admiralty's order" in e.text, e.text
+    _wo(
+        w,
+        'ship: a brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(60)
+    e = w.submit("transfer two hands to the Hind")
+    assert e.kind == "order.rejected" and "The Hind is not yours to man" in e.text, e.text
+    me.confined_to = "the hold"
+    e = w.submit("transfer two hands to the Sherbourne")
+    assert e.kind == "order.rejected", e.text
+    me.confined_to = ""
+    assert (len(TR._hands(cutter)), len(TR._hands(fly))) == was
 
 
 def test_alongside_the_men_cross_by_the_gangway_at_the_order():

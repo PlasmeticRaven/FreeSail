@@ -27403,6 +27403,61 @@ none skipped; the other half exit 0, 2,279 passed. The pace tests of the same fi
 last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved but truth 7-484, this package's
 own, moved to the road's terms. The tree reported differs from 2deccd29 by this paragraph alone.
 
+### The second reading of 4dda3dfe (2026-11-13)
+
+A second independent reading (`docs/dev/M7-WorkPackages.md`, "Package 60 as reported again at
+4dda3dfe") found six of the seven mends holding by running, the road's old trips unmoved, and
+seven things owed. Each mend has a test that fails on 4dda3dfe.
+
+**7, made general, a commit of its own (63108591):** a far ship riding at an anchor woken to
+full detail had no near anchor down and her file's sail set (`crews._to_full` set her sail
+"at anchor", the topsails drawing, and let go nothing; a hull made at full from her file came
+under plain sail). `crews.rides_as_she_lay`, called wherever a far body is woken (`promote`,
+both paths, and the station's hull made at full): where her far plan's leg is the anchor, her
+first anchor that can be let go goes down where she lies, veered to the depth's scope, brought
+up; every sail set is furled; her way taken off. The cutter in Carrick Road under a rules
+captain bound for Falmouth: before, woken under plain sail and driven 2.6 km before her captain
+brought her to again; after, at her anchor with nothing set, swinging within her cable. Its
+measure by toggle is below.
+
+1. **A boat lost with a load in her** (`boats.lose_boat` replaced her state, dropping her hands
+   and loads): `transfer.boat_lost`, called by `lose_boat` only where she carries a transfer.
+   The men told off and not embarked go back to their watches; those in her, and the persons,
+   are picked up by the nearer ship by her stage of the trip (JUDGEMENT: `lose_boat` gives the
+   script's boat's own crew no fate, they being no persons, and no drowning is invented here),
+   a person bound for the receiver of her company where she picks him up; said in that ship's
+   log and in the giver's line of the loss ("...; Mr Pascoe and eleven hands picked up by her
+   own side; four hands told off for her stand down.").
+2. **A list of names is read as a list**: the order's words are read from its text, where the
+   commas stand (its `object` has them read away); every 'and' parts the list but a number's;
+   a name's contraction read with its stop or without ('Richd. Oliver'); a list with a name
+   nobody answers to is refused naming that one.
+3. **The ship in ordinary he is aboard** was followed and stepped while asleep, under her file's
+   plain sail with no anchor down (she moved 516 m and could not be boxed off): a sleeping hull
+   his person goes aboard is woken (`movement`, where the drivers come to follow him), and so
+   rides as her far body lay by 7's mend; `take_up` uses the same function. After take-up
+   nothing is set that he did not order.
+4. **A ship's name is read in the order's own words** (`orders.command.ship_for_him`): an
+   unknown name, "You know of no ship called the Nonesuch hereabouts." (the sail on the sea no
+   longer listed); a ship with no hull of her own, beyond a boat's reach of him; an observed
+   world, none of his. The two branches that matched another module's sentence by substring
+   are gone, and each branch has a test.
+5. **Small**: "away again for the Fly"; the lost boat's refusal "The long-boat was swamped on
+   the 13th; a new one is the yard's."; the comment made to agree with the code (each load is
+   the road's own trip, hoisted in and out); `_under_way` removed; men coming home are told
+   apart from men come aboard meanwhile (`musters.join(..., came_from=)`, a cross-transfer
+   test that fails without it: 40 ids for 42 men).
+6. **Tests played, not patched**: the King's branch by a King's Sherbourne (her papers), the
+   ship not his and the prisoner by the order at his prompt; the refusals' words checked over
+   eight refusals. Still patched, and why: two King's ships both his (a ship's service is her
+   captain's role, which no world order gives a ship of his; the branch is the same code as
+   the merchant-into-King's case played), alongside (two hulls within 30 m wants a mooring
+   the fixture has not), and beyond the pull (see the finding below).
+
+**Found, not mended, for the lead**: the Sherbourne left to Mr Pearce "to cruise off the Lizard
+within 10 miles" lies at her anchor, her captain "in port" with the intent, and does not get
+under way in two hours (step 1's leaving; probed, not traced).
+
 
 
 
