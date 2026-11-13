@@ -27239,6 +27239,11 @@ them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No p
 no data file changed.** The tree reported differs from cd46734 by this paragraph and the
 pace's above alone.
 
+## Package 105: Sicily and Malta, continued (step 2 and after)
+
+The section's head and step 1 stand above, before packages 109 and 111 (the trunk's order at
+the merge of 2026-11-13).
+
 ### Step 2: the measurement (reported to the lead 2026-11-12, before any tile)
 
 The bounds as briefed (35.01334 to 38.5 N, 11.1466 to 16.69332 E). `tiles_over` gives 126
