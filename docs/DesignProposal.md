@@ -965,6 +965,32 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     taken slaver, the player sailing for that nation works that law; elsewhere the outcome
     is said in a line and nothing is paid.
 
+    **The owner's answers to the design note's questions (2026-11-13;
+    , package 110).** The sources overturned
+    part of what the lead had told him from memory (France from 1794 to 1802 freed the
+    people of a taken slaver in law and not in fact; the United States not before 1819),
+    and he agreed with the note's recommendations: (1) for those nations and years the
+    line, saying truthfully what was done; (2) an enemy slaver taken before the law
+    changed is paid as an ordinary prize for her hull and goods, the line saying that the
+    people were not reckoned; (3) a captain may land the people free without the law, as
+    an act entered in his record with no sum either way; (4) a Barbary ransom is told as
+    the captive's nation's act, its sum never charged to the purse nor said as the price
+    of a person; (6) the people aboard a slaver are a count with one plain sentence on her
+    record, never persons the systems act on; (7) scans under a non-commercial licence are
+    cited and not kept; (8) the note's words approved as they stand; (9) the coast where
+    the suppression was done is left unbooked for now, the court's sentence arriving from
+    off the chart. **On (5) he ruled otherwise:** "with a completely transparent brief on
+    the matter, a model should be able to decide whether they are willing to be seated at
+    a corsair when that corsair might take part in slaving." So a corsair's station may be
+    held by a model under a brief that says plainly and in full what the station is and
+    may do, the model deciding for itself; the consent documents are revised only by the
+    owner's own process. A slaver's station stays closed to every player and model. **On
+    a player at a corsair's station (the same day):** "I'm not going to decide on the
+    player in control of a corsair, as long as no vessel type is specifically restricted
+    to corsairs and restricting the player wouldn't keep them from sailing a certain
+    vessel type, it's probably OK to restrict." So it stays closed for now, on the
+    condition that no kind of vessel is thereby kept from the player.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
