@@ -16321,3 +16321,55 @@ def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     assert not A.unlisted(audit, known)
     assert audit.keys() == set(known)
     assert not A.over_ceiling(audit, known)
+
+
+def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_comes_down(tmp_path):
+    """Package 102, step 3: the player's own hoist, broken out, served at its place (the main
+    topgallant masthead, or the place its order names) flag by flag, the uppermost first, and
+    drawn down its halyard from there; gone when it is hauled down; no stranger's served."""
+    import shutil
+
+    from tests.test_flag_drawings import (
+        test_a_hoist_is_drawn_down_its_halyard_from_its_place as b,
+    )
+    from tests.test_flag_drawings import (
+        test_no_other_ships_hoist_is_served as c,
+    )
+    from tests.test_flag_drawings import (
+        test_the_players_hoist_is_served_at_its_place_flag_by_flag_and_gone_when_hauled_down as a,
+    )
+
+    a()
+    c()
+    if shutil.which("node"):
+        b(tmp_path)
+
+
+def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
+    """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
+    the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for
+    the boat ("All hands! (to send boat)"), she is manned, the hands are piped down and she
+    is away within ten minutes, where on the trunk she waited until the watch changed at
+    06:00; and a person in the boat that has not left the ship's side belays her, and is
+    on deck again."""
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(7800)
+    n = len(w.log)
+    w.submit("go ashore")
+    w.run(600)
+    kinds = [e.kind for e in list(w.log)[n:]]
+    assert "evolution.waiting" not in kinds
+    assert ["crew.all_hands", "crew.piped_down"] == [
+        k for k in kinds if k in ("crew.all_hands", "crew.piped_down")
+    ]
+    assert "boat.away" in kinds
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(600)
+    w.submit("go ashore")
+    assert w.people.captain.where == "boat"
+    assert w.submit("belay that").kind == "work.belayed"
+    w.run(120)
+    assert w.people.captain.aboard
+    assert [e.kind for e in w.log].count("boat.stood_down") == 1

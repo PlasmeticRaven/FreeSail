@@ -567,6 +567,14 @@ occasions:                       # what flies where, by occasion and role
   would repeat the upper, Spain's signals of one flag alone; Popham's word under the telegraph
   flag; the answer the answering pendant; a private signal its flag. `tools/check_signals.py`
   checks that every flag a hoist can hold is drawn (truth 7-501).
+- **A hoist's place (package 102, step 3).** `Hoist.place`, one of the colours' place words
+  (with the yardarms: `<mast> yardarm`, `<mast> <yard> yardarm`); '' at the main, as every hoist
+  was before, left out of the pickle and of the record while unset, so that no save and no
+  digest moves. An order names it at the end of its words ('make the signal to tack at the
+  fore', '... at the main yardarm'); a private signal's is in its words. The lookout says it
+  ('two flags at the fore'); at the main the words are as they were. The player's own hoists
+  are served in the snapshot's `hoists` and drawn (Design-ViewerAction.md §12.3); a stranger's
+  are told in words as before and served nowhere.
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
   two ensigns at the peak), for 74's prize when the lead rules it.
 

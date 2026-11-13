@@ -26654,6 +26654,32 @@ here); pace alone and last on the same files, 12 passed. No digest moved; no gam
 a hoist or the colours moved (the fixture's old-beside-new tests). The tree reported differs
 from 79926e7 by this paragraph alone.
 
+**Step 3: a hoist has its place and is seen.** `Hoist.place` ('' at the main, out of the
+pickle and the record while unset); the yardarm place words (`<mast> yardarm`, `<mast>
+<yard> yardarm`, the weather arm, JUDGEMENT) beside the mastheads; an order names a place at
+the end of its words; a private signal's place is in its words ('main topmast head' the main
+top masthead, 'mizen peak' the peak, 'ensign staff' the staff). Where no place is named a
+hoist flies at the main topgallant masthead (JUDGEMENT), the truck's pendant above it. The
+player's own hoists are served (`hoists` in the snapshot; the parity table's row: the reading
+`signals`) and drawn down the halyard, a signal flag's fly 0.3 of her beam, a pendant's 0.6,
+0.15 m of halyard between (all JUDGEMENT); a private reply's ensign at its own place. No
+other ship's hoist is served (3(c) struck). The frame is not widened: on the 13 hulls with a
+hoist of four at every place, a yardarm hoist reaches 0.12 m beyond it on the
+hermaphrodite brig and 0.25 m on the two schooners, nothing elsewhere. **Seen in the
+browser** (`tests/browser_plans/signals.yaml`, the blockade's frigate): No. 153 at the main
+topgallant masthead in the 1805 set, uppermost first (white with the blue cross, yellow red
+yellow, blue with the yellow saltire), gone when hauled down; No. 16 'at the fore' at the
+fore topgallant masthead; seen nearly end on from the beam, the wind on her quarter.
+
+**Step 3: the measure.** At 97d4650 (step 3 with the trunk at 06e1418, step 2 merged as
+7a3edd5, merged by a merge commit; the step's paragraph above): ruff check and format clean
+(382 files); the fast tier 7,499 passed, 1 xfailed, 0 failed; the slow tier of the touched
+files and of `test_known_truths` (step 2's eight and test_parity; `--slow -m "not pace"`) 604
+passed, 8 xfailed, 0 failed; pace alone and last on the same files, 12 passed. No digest
+moved; no game line about a hoist or the colours moved (a hoist with no place says "at the
+main" as before; the record and the pickle carry no place while unset). The tree reported
+differs from 97d4650 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
@@ -27027,6 +27053,7 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 
 
 
+
 ## Package 105: Sicily and Malta (2026-11-12)
 
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
@@ -27145,6 +27172,51 @@ skipped; the recorded passages among them, every pinned digest, line count and t
 digest moved and no kept save; the pins moved are those listed above, each the ruling's.**
 **The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
 exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
+
+### Step 2: the boat and the short watch (note 1)
+
+**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
+the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
+watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
+boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
+boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
+the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
+as the boat").
+
+**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
+the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
+other work has the hands, she is not at quarters and all hands are not up already, all hands
+are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
+(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
+told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
+order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
+send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
+the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
+Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
+ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
+not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
+the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
+work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
+Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
+is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
+`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
+not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
+answers the case where she still waits.
+
+**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
+
+**The suites, as run (step 2).** At **929280d** (the trunk merged by merge commit: package 109's
+step 1 and package 105's step 1 as merged, the appended ends of the known truths and these
+notes kept, the trunk's first), in a worktree pinned there, this container, four workers, one
+suite at a time. `ruff check .` and `ruff format --check .` clean (388 files). **The fast tier**
+whole: exit 0, 7,545 run, no failure, 1 skipped, 509 slow left out. **The slow tier of the
+touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
+test_known_truths.py, test_captain_trials.py, test_hands.py, test_boat_hull.py,
+test_boat_director.py, test_orders_places.py, test_ports.py, test_crew_orders.py,
+test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages among them, every
+pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
+pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
+passed. The tree reported differs from 929280d by this paragraph alone.
 
 ## Package 111: the chart's audit (2026-11-13)
 

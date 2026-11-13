@@ -10,6 +10,8 @@ name: whole suite
 #     stays whole on one machine), each shard on all its runner's cores;
 #   - the pace tests alone and last, on one runner, serial, as the release does, their
 #     result informative and not gating (the floors are the build machine's);
+#   - the browser plans, in a job of their own with a browser installed (from run 81; before
+#     it every test that wants a browser skipped here);
 #   - the lint once.
 # Linux by default (the recorded passages are pinned on Linux); Windows as well when
 # asked, for the owner's platform (package 69 has the five cross-platform pins).
@@ -70,6 +72,33 @@ jobs:
       - run: python -m pip install -e ".[dev,server]"
       - name: The slow tier, this shard, without the pace tests
         run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider
+
+  browser:
+    # The browser plans (the lead, 2026-11-13). The runners have Playwright the package and
+    # no browser, so every test that wants one skipped here in every run up to 77, and a
+    # plan broken by a merge (the letter's, at package 109's step 1) passed unseen: run 77
+    # was green on a tree where that plan failed. This job installs Chromium and plays the
+    # plans, which judge the game's words and not its pixels; it fails if a plan is skipped.
+    # The pictures' test and the truths that read pixels stay the build machines' (their
+    # pins are the pre-installed browser's).
+    name: the browser plans
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONUTF8: "1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,server]"
+      - run: python -m playwright install --with-deps chromium
+      - name: The browser plans, none skipped
+        run: |
+          python -m pytest --slow -m "not pace" -rfEs -p no:cacheprovider tests/test_browser_probe.py | tee browser.txt
+          if grep -q "SKIPPED" browser.txt; then echo "a browser plan was skipped"; exit 1; fi
 
   pace:
     # informative, not gating: the floors are the build machine's (truth 51), and a shared

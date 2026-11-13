@@ -206,3 +206,59 @@ def test_his_keeping_and_what_lies_here_is_a_reading(words):
     assert e.kind.startswith("query."), (e.kind, e.text)
     assert "In your keeping: a snuffbox." in e.text, e.text
     assert "Lying here: a sealed packet." in e.text, e.text
+
+
+# -- Step 2: the boat and the short watch (note 1) ------------------------------------------
+
+
+def _anchored_bilander(watch_of_two: bool = True):
+    """The bilander at anchor in Brixham road; with `watch_of_two`, run on into the morning
+    watch, when her larboard watch of two has the deck (the owner's case)."""
+    w = bilander()
+    w.submit("let go the anchor")
+    w.run(7800 if watch_of_two else 600)
+    return w
+
+
+def _since(w, n):
+    return [e for e in list(w.log)[n:]]
+
+
+def test_the_watch_too_few_to_send_the_boat_calls_all_hands_and_pipes_down():
+    """On the trunk 'go ashore' in the morning watch waited two hours ("Not hands enough on
+    deck to send boat; there are but two to spare") and he sat in the boat. Now all hands
+    are called for her, she is manned and hoisted out, and the hands are piped down."""
+    w = _anchored_bilander()
+    n = len(w.log)
+    assert w.submit("go ashore").kind == "order.accepted"
+    w.run(1200)
+    kinds = [e.kind for e in _since(w, n)]
+    assert "evolution.waiting" not in kinds
+    called = next(e for e in _since(w, n) if e.kind == "crew.all_hands")
+    assert called.text == "All hands! (to send boat)"
+    assert kinds.index("crew.all_hands") < kinds.index("crew.piped_down")
+    assert kinds.index("crew.piped_down") <= kinds.index("evolution.started")
+    assert "boat.away" in kinds
+    crew = w.ship.extra["crew"]
+    assert not crew.all_hands_called
+
+
+def test_the_boat_at_the_side_is_belayed_from_her_and_he_is_on_deck_again():
+    """A person in the boat that has not left the ship's side may belay her ('belay that',
+    'belay the boat'), and is on deck again; once she has left the side, he may not."""
+    for words in ("belay that", "belay the boat"):
+        w = _anchored_bilander(watch_of_two=False)
+        w.submit("go ashore")
+        cap = w.people.captain
+        assert cap.where == "boat"
+        e = w.submit(words)
+        assert e.kind == "work.belayed", (words, e.text)
+        w.run(120)
+        assert cap.aboard and cap.where in ("deck", "quarterdeck"), cap.where
+        stood = [e for e in w.log if e.kind == "boat.stood_down"]
+        assert stood and "Mr Bowen on deck again" in stood[-1].text
+    w = _anchored_bilander(watch_of_two=False)
+    w.submit("go ashore")
+    w.run(900)
+    assert w.dealings.boat.phase != "hoisting out"
+    assert w.submit("belay that").kind == "order.rejected"
