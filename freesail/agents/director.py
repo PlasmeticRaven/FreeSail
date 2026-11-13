@@ -2132,6 +2132,15 @@ def dry_run(world: Any, text: str) -> str:
         return f"{DRY_RUN_HEAD} the game has no way to do this as said: {malformed.rstrip('.')}."
     doubted = world_orders.doubt(world, order)
     would = _would_do(world, order.text)
+    if would.startswith(NOT_TRIED):
+        # an order that could not be tried is never said to be performed (package 109)
+        why = would.removeprefix(NOT_TRIED)
+        head = f"it would be doubted: {doubted}. " if doubted else ""
+        return (
+            f"{DRY_RUN_HEAD} {head}it could not be tried: {why}. What it would do is not "
+            "known until it is entered; entered, it is judged as every order is, and its "
+            "answer says what it did."
+        )
     if doubted:
         tail = (
             f" Entered, it is doubted on the record; entered again as '{order.text} [reason: "
@@ -2140,8 +2149,6 @@ def dry_run(world: Any, text: str) -> str:
             + "."
         )
         return f"{DRY_RUN_HEAD} it would be doubted: {doubted}.{tail}"
-    if would is None:
-        return f"{DRY_RUN_HEAD} it would be performed as said ({order.channel})."
     if would.startswith("not carried out: "):
         why = would.removeprefix("not carried out: ")
         return f"{DRY_RUN_HEAD} the game has no way to do this as said: {why}."
@@ -2152,21 +2159,33 @@ def dry_run(world: Any, text: str) -> str:
     )
 
 
-def _would_do(world: Any, text: str) -> str | None:
+# The dry run's word where the order could not be tried on a copy of the world (package
+# 109; the owner's play of 2026-11-12, note 2): never that it would be performed.
+NOT_TRIED = "not tried: "
+
+
+def _would_do(world: Any, text: str) -> str:
     """The words a world order would leave in the driver's line, read by performing it
     on a copy of the world (the checkpoint's own pickling, `core.replay`), which is let
-    go; None when no copy can be made."""
+    go; `NOT_TRIED` and the reason where it could not be tried. The copy is of the World
+    whatever handle the dry run was given: the director's tools hold his hull (package 97),
+    and a pickle rooted at a hull made the hull before its World, whose rebinding then
+    failed, so that every dry run said 'would be performed' in play (package 109)."""
     import io
 
     from freesail.core import replay
+    from freesail.world.hulls import world_of
 
     try:
-        copy = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(world))).load()
+        copy = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(world_of(world)))).load()
         replay._rebind(copy)
-        copy.__dict__["dry_run"] = True  # a form that writes a file writes none on the copy (74)
+    except Exception as e:  # noqa: BLE001  (a world that cannot be copied: said so)
+        return f"{NOT_TRIED}the world could not be copied to try it ({type(e).__name__})"
+    copy.__dict__["dry_run"] = True  # a form that writes a file writes none on the copy (74)
+    try:
         e = copy._apply_world_order(text, SOURCE)
-    except Exception:  # noqa: BLE001  (a world that cannot be copied: the form's word alone)
-        return None
+    except Exception as e:  # noqa: BLE001  (the order failed on the copy: said so)
+        return f"{NOT_TRIED}it failed when it was tried ({type(e).__name__})"
     return e.text.removeprefix(f"World order ({SOURCE}): ").rstrip(".")
 
 

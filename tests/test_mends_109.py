@@ -280,3 +280,133 @@ def test_the_boat_at_the_side_is_belayed_from_her_and_he_is_on_deck_again():
     w.run(900)
     assert w.dealings.boat.phase != "hoisting out"
     assert w.submit("belay that").kind == "order.rejected"
+
+
+# -- Step 3: the director's dry run (note 2) ------------------------------------------------
+
+
+def _dry_category(said: str) -> str:
+    from freesail.agents import director as D
+
+    s = said.removeprefix(D.DRY_RUN_HEAD).strip()
+    if "could not be tried" in s:
+        return "untried"
+    low = s.lower()
+    if "it would be doubted" in low or low.startswith("doubted"):
+        return "doubted"
+    if (
+        "no way to do this" in low
+        or "would be refused" in low
+        or "would not be given" in low
+        or low.startswith("refused")
+    ):
+        return "refused"
+    return "performed"
+
+
+def test_a_dry_run_that_could_not_be_tried_says_so_and_never_that_it_would_be_performed(
+    monkeypatch,
+):
+    """Where the copy of the world cannot be made, the dry run says it could not be tried,
+    and never 'would be performed' (on the trunk the error was swallowed and it said so)."""
+    import tests.test_director as TD
+    from freesail.agents import director as D
+    from freesail.core import replay
+
+    w = TD.directed()
+
+    def cannot(_world):
+        raise RuntimeError("no copy")
+
+    monkeypatch.setattr(replay, "checkpoint_bytes", cannot)
+    said = D.dry_run(w, 'ship "Harpy": order heave to')
+    assert "could not be tried" in said and "would be performed" not in said, said
+
+
+def test_a_dry_run_on_the_directors_own_hull_tries_the_order_on_a_copy_of_the_world():
+    """The director's tools hold his hull: the dry run given the hull copies the World and
+    tries the order there (on the trunk the pickle rooted at the hull could not be loaded,
+    and 'ship "Harpy": order heave to' was 'would be performed as said')."""
+    import tests.test_director as TD
+    from freesail.agents import director as D
+    from freesail.agents import tools as T
+    from freesail.agents.agent import DIRECTOR
+
+    w = TD.directed()
+    h = TD.seat_director(w, [])
+    assert h.world is not w  # the hull
+    said = T.world_order(h.world, DIRECTOR, 'ship "Harpy": order heave to', dry_run="true")
+    assert said == (
+        f"{D.DRY_RUN_HEAD} the game has no way to do this as said: No ship named 'Harpy' is "
+        "on the sea."
+    )
+
+
+def test_the_dry_run_on_a_stub_door_mid_turn_agrees_with_the_order():
+    """A director seated at the API door (a local stub server speaking the Messages API's
+    shape, a made-up key, no network), mid-turn: his dry run of an order and the order
+    itself, both his tool calls in one turn, give the same word."""
+    pytest.importorskip("anthropic")
+    pytest.importorskip("httpx")
+    import json
+
+    import tests.test_director as TD
+    from freesail.agents import api
+    from freesail.agents.agent import DIRECTOR, SESSION_DIRECTOR, STATION_FACTORIES, SamplingPolicy
+    from freesail.agents.harness import Harness
+    from tests.messages_api import MODEL, MessagesServer
+
+    key = "made-up" + "-key-" + "0" * 16
+    order = 'ship "Harpy": order heave to'
+
+    def call(**args):
+        return {"type": "tool_use", "name": "world_order", "input": args}
+
+    replies = [
+        {"content": [call(text=order, dry_run="true")], "stop_reason": "tool_use"},
+        {"content": [call(text=order)], "stop_reason": "tool_use"},
+        {"content": [{"type": "text", "text": "Done."}]},
+    ]
+    w = TD.directed()
+    with MessagesServer(key, replies) as srv:
+        m = api.ApiModel(MODEL, key, base_url=srv.url)
+        m.identity()
+        st = STATION_FACTORIES[DIRECTOR](
+            SamplingPolicy.in_lockstep(60, "notable", "urgent"), world=w
+        )
+        h = Harness(w, st, m, session_kind=SESSION_DIRECTOR, save=lambda w, why: None)
+        h.model_name, h.door = MODEL, "api"
+        h.start()
+        w.run(600)
+        bodies = srv.bodies()
+    results = []
+    for b in bodies[1:3]:
+        for c in b["messages"][-1]["content"]:
+            if c.get("type") == "tool_result":
+                results.append(json.dumps(c["content"]))
+    dry, real = results
+    assert "would be performed" not in dry, dry
+    assert _dry_category(json.loads(dry)) == _dry_category(json.loads(real)) == "refused"
+
+
+def test_every_form_of_the_directors_table_dry_runs_as_it_is_performed(tmp_path):
+    """Every example of every form of the director's table, on a world with the director
+    seated (his tools on his hull): the dry run's word (performed, doubted, refused) is the
+    order's own when it is then entered, and none is 'could not be tried'."""
+    import tests.test_director as TD
+    from freesail.agents import director as D
+    from freesail.agents import tools as T
+    from freesail.agents.agent import DIRECTOR
+
+    differ = []
+    for f in D.WORLD_ORDER_FORMS:
+        for x in f.examples:
+            w = TD.directed()
+            w.__dict__["saves_dir"] = str(tmp_path)  # a new command's file is written here
+            h = TD.seat_director(w, [])
+            dry = T.world_order(h.world, DIRECTOR, x, dry_run="true")
+            real = T.world_order(h.world, DIRECTOR, x)
+            a, b = _dry_category(dry), _dry_category(real)
+            if a != b or a == "untried":
+                differ.append((x, dry, real))
+    assert not differ, differ

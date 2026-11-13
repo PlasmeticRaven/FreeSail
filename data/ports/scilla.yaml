@@ -1,0 +1,122 @@
+# FreeSail: Scilla as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch faro). Step 2 of the package.
+#
+# Sources. Smyth 1824, pp. 107 to 108: Scylla a common rock of bold approach, a castle on its top and a sandy bay each side; in 1783 a wave carried off more than 2,000 people from the south beach; lightning often strikes the castle. Purdy 1826, p. 115: the town in nine rows of houses; its only danger wind and current opposed. Smyth 1854, p. 442: anchorage in the bay, with caution for the currents; p. 250: the castle nearly destroyed by lightning in the spring of 1815.
+#
+# NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# The holder, dated (the lead's ruling of 2026-11-12: the mainland's ports by dated rows to
+# `france` for the French occupation; Joseph's and Murat's kingdom has no nation of its own
+# in the table yet, and France's is its nearest stance, hostile to a King's ship). James
+# 1837, vol. 4, p. 122: Joseph entered Naples on 15 February 1806, and "before the end of
+# March" the French had garrisons in Scylla and the whole kingdom but Gaeta and Civitella.
+# The end of the French kingdom in May 1815 is FROM MEMORY (the convention of Casalanza,
+# 20 May 1815, not read).
+# The castle, dated: the French garrison of March 1806; after Maida "the garrison of Scylla"
+# was British by the end of July 1806 (James 1837, vol. 4, p. 125: by the end of July the
+# whole British army withdrawn from Calabria except the garrison of Scylla; the day it was
+# taken not given, the row from 1 August JUDGEMENT), which with Messina gave the entire
+# command of the strait (p. 126); evacuated on 17 February 1808, not more than 200 of the
+# garrison British (James 1837, vol. 4, p. 294).
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: scilla
+name: Scilla
+nation:
+  - {nation: naples, until: 1806-03-30, source: "the King of the Two Sicilies' (James 1837, vol. 4, p. 122)"}
+  - {nation: france, since: 1806-03-31, until: 1806-07-31, source: "a French garrison in Scylla before the end of March 1806 (James 1837, vol. 4, p. 122)"}
+  - {nation: britain, since: 1806-08-01, until: 1808-02-17, source: "the British garrison of Scylla after Maida (James 1837, vol. 4, pp. 125 to 126; the first day JUDGEMENT) to the evacuation of 17 February 1808 (James 1837, vol. 4, p. 294)"}
+  - {nation: france, since: 1808-02-18, until: 1815-05-20, source: "the French after the evacuation (James 1837, vol. 4, p. 294); the end FROM MEMORY"}
+  - {nation: naples, since: 1815-05-21, source: "the King's again (FROM MEMORY)"}
+source: "Smyth 1824 pp. 107-108; Purdy 1826 p. 115; Smyth 1854 pp. 250, 442; James 1837 vol. 4 pp. 122-126, 294"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: scilla-anchorage
+  name: the bay of Scilla
+  lat_deg: 38.2535
+  lon_deg: 15.7100
+  depth_fathoms: 12
+anchorage:
+  feature: scilla-anchorage
+  name: the bay of Scilla
+  lat_deg: 38.2535
+  lon_deg: 15.7100
+mooring:
+  feature: scilla-anchorage
+  name: the bay of Scilla
+  lat_deg: 38.2535
+  lon_deg: 15.7100
+  depth_fathoms: 12
+  bottom: sand
+shore:
+  name: the beach of Scilla
+  lat_deg: 38.2525
+  lon_deg: 15.7140
+
+pilot:
+  station: scilla-anchorage
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a sword-fish boat of Scilla
+    under: oars
+    note: "judgement"
+  names: [Rocco Bellantoni, Antonio Ruggiero, Giuseppe Bova, Nicola Fondacaro]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 315            # judgement
+  words:
+    channel: "The rock is bold and may be closed; the only danger is the wind against the stream. Keep off the Torre di Cavallo to the south-west, where the current sets onto the rocks."
+    marks: "The rock of Scylla with its castle on the top; the town in its rows of houses up the hill; the Faro's light across the strait."
+    anchorage: "In the bay west of the rock for a short stay, minding the stream."
+    tide: "The Faro's stream runs past the rock, north and south by turns, and the eddies of the shore against it."
+
+tide:
+  establishment: the Faro
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 14.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 14.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 255.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 57.5, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 18.5, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the Aspromonte's timber; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "JUDGEMENT"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the sword-fish fishermen
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 2, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [scilla-anchorage, 38 17 N 15 41 E]
+  from_sea: [38 17 N 15 41 E, scilla-anchorage]
+  in: [scilla-anchorage]
