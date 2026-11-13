@@ -461,6 +461,11 @@ known:
   reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 8 legs, the least 2.0 m on the leg to 45 59.98 N 1 09.36 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 111
   most: 8
+- key: f-shallow:santa-cruz-de-tenerife
+  place: 28°28.4′N 16°14.2′W
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 0.8 m on the leg to the road of Santa Cruz: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 106a
+  most: 2
 - key: f-shallow:setubal
   place: 38°28.0′N 8°57.9′W
   reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 5 legs, the least 2.1 m on the leg to 38 28.45 N 8 56.60 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'

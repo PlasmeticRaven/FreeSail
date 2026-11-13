@@ -27929,12 +27929,14 @@ datum inside such a skip. So:
     | Civita Vecchia | drying 0.6 m | as built: no way at 1 m |
 
     Each file says its least depth beside its tracks, and each is listed.
-- *(c) No other port's track was mended; twelve are listed.* Calais, Dunkirk, Genoa and St Malo
+- *(c) No other port's track was mended; thirteen are listed.* Calais, Dunkirk, Genoa and St Malo
   (its old tracks, the ground drying 8.7 m); Bougie and the Goletta; Catania, Messina, Syracuse,
-  Palermo, Lampedusa and Porto Paolo. Each is owned by its block's package.
+  Palermo, Lampedusa and Porto Paolo; and, with package 106a merged, Santa Cruz de Tenerife
+  (ground drying 0.8 m on the leg to its road). Each is owned by its block's package.
 
-**The known list**: 117 entries. The 41 ways mended are out (43 less St Malo's two). The 18
-`f-shallow` findings are in. Truth 7-563, old beside new: the ways in and out refused are 24
+**The known list**: 120 entries with the trunk's packages 102 and 106a merged. The 41 ways
+mended are out (43 less St Malo's two). The 19 `f-shallow` findings are in, Santa Cruz's among
+them. Truth 7-563, old beside new: the ways in and out refused are 24
 and 24 before, then 3 and 3, now 4 and 4 (St Malo with Genoa, Cartagena and Oran). Its opens
 stay {royan}.
 
