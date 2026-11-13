@@ -708,6 +708,35 @@ def test_the_far_shape_works_the_coarse_acts_on_her_dealings_and_the_one_registr
     assert captain.hull == v.id and captain.aboard and not crew.dealings.boat.away
 
 
+def test_a_far_ship_riding_at_her_anchor_wakes_at_it_with_nothing_set():
+    """Package 60 (the lead's second reading of 4dda3dfe, the builder's note made general): a
+    far ship under a rules captain whose far body rides at an anchor in Carrick Road, woken to
+    full detail, has her anchor down where she lay and no sail set, and twenty minutes on lies
+    at it within her cable's scope, nothing set and nothing planned anew. Before, she woke under
+    plain sail with no anchor down and drove 2.6 km before her captain brought her to again."""
+    from freesail.world.geo import bearing_and_distance
+
+    w = hove_to_world()
+    falmouth = w.ports.find("Falmouth")
+    v, crew = _held_far_cutter(w, falmouth.anchorage.position)
+    assert crew.submit("come to an anchor", actor="the captain").kind == "ship.anchored"
+    assert w.world_order('ship "Raven": intent bound for Falmouth').data["result"] == "done"
+    crew.captain.seated = False  # a rules captain's ship, come to the port she is bound for
+    w._position = falmouth.anchorage.position
+    K.promote(w, v)
+    assert crew.shape == "full" and crew.at_anchor
+    assert not [s for s in crew.ship.sails.values() if s.is_set]
+    where = crew.position
+    w.run(1200)
+    assert crew.shape == "full" and crew.at_anchor and v.plan[0][0] == "anchor"
+    assert not [s for s in crew.ship.sails.values() if s.is_set]
+    from freesail.ship.parts import ground_tackle
+
+    scope = ground_tackle(crew.ship).riding_by().scope_m
+    assert bearing_and_distance(where, crew.position)[1] < scope + 30.0
+    assert not [x for x in crew.log if x.kind == "captain.plan"]
+
+
 def test_the_far_course_for_a_port_is_laid_by_the_tracks_and_ends_at_her_anchor():
     """Package 84, step 4: `shape a course for <port>` on a sleeping hull is the planner's
     passage for it (the far brain's own way), out of the port she lies in by its track to
