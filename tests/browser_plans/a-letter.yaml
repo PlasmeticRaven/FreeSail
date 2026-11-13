@@ -28,4 +28,6 @@ steps:
     expect: {answered: true, contains: wrote a letter to Mr Veale}
   - {tick: 330}
   - {say: burn the letter to Mr Veale, expect: {answered: true, contains: "is burnt, and gone"}}
-  - {say: read the letter to Mr Veale, expect: {answered: true, contains: as said}}
+  # a burnt letter read: refused in words, saying it is burnt and gone (was: answered
+  # 'as said', the order done on nothing)
+  - {say: read the letter to Mr Veale, expect: {answered: true, contains: "is burnt, and gone", absent: as said}}
