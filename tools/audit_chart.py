@@ -128,9 +128,17 @@ SEAS: dict[str, str] = {
     "sicily": "mediterranean",
     "gulf-of-hammamet": "mediterranean",
     "calabria-north": "mediterranean",
+    # package 106a: the Canaries and the Salvages, an ocean's tide of their own
+    "canaries": "canaries",
+    "salvages": "salvages",
 }
 MEDITERRANEAN = "mediterranean"
-SEAS_THAT_MEET = {"strait": {"atlantic", "mediterranean", "strait"}}
+# The Salvages, between Madeira and the Canaries, are served by both groups' gauges (package
+# 106a's ruling: Santa Cruz of Tenerife's and Funchal's).
+SEAS_THAT_MEET = {
+    "strait": {"atlantic", "mediterranean", "strait"},
+    "salvages": {"madeira", "canaries", "salvages"},
+}
 # A share of the blend's weight from gauges of another sea above which the water's tide
 # is called another sea's (JUDGEMENT: the larger part).
 OTHER_SEA_SHARE = 0.5

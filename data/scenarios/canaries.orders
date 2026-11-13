@@ -1,0 +1,21 @@
+# FreeSail: the frigate's book for the Canaries (data/scenarios/canaries.yaml; package 106a),
+# from off Point Naga down the east side of Tenerife to look into Santa Cruz road. Short: the
+# points of the passage by the account, the sails trimmed, the land's bearings, the lead. The
+# starter book is not loaded.
+
+# Round Point Naga two or three miles off (Purdy 1825, p. 217: the point very high, its two
+# great rocks like ships), then down the east side for a point two miles off San Andrés, then
+# for a point two miles off the town, where she looks into the road and takes her bearings
+# of it; then off to the south, the town never north of west (Purdy p. 215). Each leg is shaped once, at
+# the mark before it (the first runs, in the notes: the hourly re-shaping of package 39f's
+# books sent her back for the town after she had hove to, and she drove ashore under it;
+# hove to off the road she drifted back within the mile and hove to again).
+standing order "past the point": when the distance to 28 33.6 N 16 04.2 W is under 1.2 miles then shape a course for 28 30 N 16 07.2 W
+standing order "off San Andres": when the distance to 28 30 N 16 07.2 W is under 1.2 miles then shape a course for 28 27.3 N 16 12.3 W
+standing order "look into the road": when the distance to 28 27.3 N 16 12.3 W is under 1 mile then take a bearing of the land; shape a course for 28 22 N 16 10 W
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead": every 15 minutes, if the distance to 28 27.3 N 16 12.3 W is under 3 miles then heave the lead

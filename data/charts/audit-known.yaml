@@ -245,6 +245,12 @@ known:
   reason: the Ligurian sea's water east of 11 E (its bound moved by package 111) is the Tyrrhenian box's south of 42.5 N; the Gulf's box answers the rest
   owner: the lead's list
   most: 3461
+
+- key: d-split:salvages
+  place: salvages
+  reason: madeira's box begins at 30 N and the canaries' ends there; the Salvages run from 29.89 to 30.32 N, the same north-east trade in both
+  owner: package 106a
+  most: 64
 - key: d-split:strait
   place: strait
   reason: portugal's box ends at 5 W and mediterranean-west's begins there; the region runs to 5 W from 6.5 W
@@ -564,6 +570,11 @@ known:
   place: 49°54.3′N 6°18.3′W
   reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
   owner: package 32
+  most: 1
+- key: g-afloat:point-handia
+  place: 28°04.1′N 14°30.4′W
+  reason: "the grid holds Jandía's low point as water, 2.5 m, and its nearest land a kilometre north-east (JUDGEMENT the cause, the mark's fix made against the region's build before its gauges' levels were laid); the mark is left at the pilot's place"
+  owner: package 106a
   most: 1
 - key: g-afloat:san-anton-castle
   place: 43°21.9′N 8°23.3′W

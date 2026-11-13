@@ -211,7 +211,8 @@ def test_the_eleven_ports_have_their_blocks_and_the_others_none():
     # 27 + 8 + 8 + 4 + 7 + 5 + 7 before it); package 105: Sicily and Malta's eleven, none
     # (was 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 before it)
     # and step 3's thirteen, none (was 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 + 11 before it)
-    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 + 11 + 13
+    # package 106a: the Canaries' seven, none
+    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 + 11 + 13 + 7
     for pid, (kind, sells, roads, hours, barrel, ton) in BLOCKS.items():
         block = w.dealings.ports[pid].ordnance
         assert (block["kind"], block["sells"], block["roads"]) == (kind, sells, roads), pid
