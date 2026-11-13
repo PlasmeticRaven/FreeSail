@@ -27144,3 +27144,19 @@ was reproduced here, and each mend has a test in `tests/test_ship_changed.py` th
 
 Found on the way and mended, small: "came aboard from the the Amazon's launch" (`movement.
 put_aboard`, a boat's name carries its own article).
+
+Found at the first fast tier of the mends (664b7ca3), and mended in 67532719: the guard refusing a
+set of the player's after a change of ship stood between `Squadron.from_spec`'s commander alias
+and its `else`, so a scenario whose set the first hull commands found "no ship named 'the ship'"
+(test_squadrons' scenario set, test_the_ship_herself's reading: 2 failed). The guard now stands
+before the alias.
+
+**The suites at a2976b5a** (the mends, that guard, and the trunk at 0dcaea30 merged): ruff check
+and ruff format --check clean; the fast tier (`-n 4`) exit 0, 7,520 passed and 1 xfailed, the 500
+slow left out; the slow tier (`--slow -m "not pace" -n 4`) of the touched files and
+`tests/test_known_truths.py` exit 0, 2,326 passed, 1 skipped and 8 xfailed (the first round's 23
+files and test_squadrons, test_signals, test_evolutions, test_anchor, test_captains,
+test_captain, test_captain_rules, test_ships, test_the_ship_herself, test_boat_director,
+test_view_action, test_fight, test_between_hulls, test_flag_drawings); the pace tests of the same
+files alone and last (`--slow -m pace -n 0`, load 2.3 at its start) exit 0, 14 passed. No pin
+moved. The tree reported differs from a2976b5a by this paragraph alone.
