@@ -46,7 +46,7 @@ from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
 from freesail.orders.prompt import world_of
 
-__all__ = ["AS_SAID", "FREE_KIND", "PAST", "execute", "hand_line"]
+__all__ = ["AS_SAID", "FREE_KIND", "PAST", "Several", "execute", "hand_line", "not_found"]
 
 Result = tuple[str, str, dict[str, Any]]
 
@@ -97,6 +97,13 @@ LETTER_VERBS = frozenset({"write", "seal", "open", "read", "examine", "burn", "t
 # How a thing destroyed went, by the verb as said.
 _GONE_WORDS = {"burn": "burnt", "destroy": "destroyed"}
 
+# Words of a free verb that are an order of the dialect said short (package 109), answered
+# with the orders they may mean ('take a sight for the latitude' is the dialect's own).
+_ANSWERED = {
+    "take a sight": "Which sight? Say 'observe the sun' for the latitude at noon, or 'take a "
+    "sight for the longitude' for the time sight.",
+}
+
 # The words a thing is put in, on or under something by (stow, hide, put).
 _PUT_PREPS = ("in", "into", "on", "onto", "under", "inside", "behind", "beneath", "upon", "at")
 _OVERBOARD = re.compile(
@@ -142,6 +149,9 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
             "standing order, a rule and the director have no hands aboard."
         )
     rest, done = _said_words(text, phrase)
+    answer = _ANSWERED.get(" ".join(str(text).lower().split()).rstrip("."))
+    if answer is not None:
+        raise OrderError(answer)
     if not rest:
         raise OrderError(f"{phrase.capitalize()} what? Say the words after '{phrase}'.")
     act = _letter_act(ship, world, person, verb, phrase, rest)
@@ -160,6 +170,10 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
         then = act.get("then") or []
     else:
         moved, outcome, why, thing, to = _carry_out(world, person, verb, rest)
+    if thing is None:
+        # the words found nothing (package 109, the owner's note 9): refused, saying what
+        # was not found and what the game does know by that name, never 'as said'
+        raise OrderError(not_found(world, person, phrase, rest, text))
     where = movement.where_words(world, person)
     who = _who(world, person)
     if moved:
@@ -221,7 +235,11 @@ def spoken(world: Any, person: Any, words: str) -> tuple[str, str, dict[str, Any
     verb = m.group("verb").lower().rstrip("s")
     verb = "give" if verb == "hand" else verb
     rest = m.group("rest")
-    moved, outcome, why, thing, to = _carry_out(world, person, verb, rest)
+    try:
+        moved, outcome, why, thing, to = _carry_out(world, person, verb, rest)
+    except Several:
+        # the director's say-as is answered as it was (package 109 left it): said
+        moved, outcome, why, thing, to = False, "", "", None, None
     where = movement.where_words(world, person)
     done = f"{PAST.get(verb, verb)} {rest}"
     if moved:
@@ -260,7 +278,7 @@ def _carry_out(world: Any, person: Any, verb: str, rest: str) -> tuple[bool, str
     from freesail.world import things as TH
 
     if verb in ("give", "show"):
-        thing, to = _thing_and_person(world, rest)
+        thing, to = _thing_and_person(world, rest, person)
         if thing is None:
             return False, "", "", None, to
         if to is None:
@@ -497,58 +515,295 @@ def _write(ship: Any, world: Any, person: Any, phrase: str, rest: str) -> dict[s
     }
 
 
-def _one(world: Any, person: Any, words: str) -> Any:
-    """The one thing the words name, the one within his reach where they name several;
-    None when they name none, or several within reach."""
+class Several(OrderError):
+    """Words that name more than one thing within reach (package 109): refused naming
+    them apart; `things` the things named."""
+
+    def __init__(self, message: str, things: list[Any]) -> None:
+        super().__init__(message)
+        self.things = things
+        self.data = {CHOICES: [t.id for t in things]}
+
+
+# The rejected order's data that keeps the things a refusal named apart (package 109), so
+# that 'the first', 'the second' and 'the other' said after it take one of them.
+CHOICES = "choices"
+_ORDINAL = re.compile(
+    r"^(?:the\s+)?(?P<ord>first|second|third|fourth|last|other)\b\s*(?P<rest>.*)$", re.I
+)
+_ORDINALS = {"first": 0, "second": 1, "third": 2, "fourth": 3, "last": -1}
+_COUNT = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
+
+
+def _in_reach(world: Any, person: Any, things: list[Any]) -> list[Any]:
     from freesail.world import things as TH
 
+    return [t for t in things if TH.reach_why(world, person, t) is None]
+
+
+def _pick(world: Any, person: Any, words: str) -> tuple[Any, list[Any]]:
+    """(the one thing the words name, or None; the things they name apart where they name
+    several within reach, or none of them in reach): 'the first letter', 'the other', 'the
+    second' after a refusal that named two (package 109); else the one found, or the one
+    of several within his reach."""
+    from freesail.world import things as TH
+
+    m = _ORDINAL.match(" ".join(str(words).split()))
+    if m is not None and person is not None:
+        noun = m.group("rest").strip()
+        if noun:
+            found = TH.find(world, noun)
+            cands = _in_reach(world, person, found) or found
+        else:
+            cands = _last_choices(world, person)
+        chosen = _by_ordinal(world, person, m.group("ord").lower(), cands)
+        if chosen is not None:
+            return chosen, []
     found = TH.find(world, words)
     if len(found) <= 1:
-        return found[0] if found else None
-    near = [t for t in found if TH.reach_why(world, person, t) is None]
-    return near[0] if len(near) == 1 else None
+        return (found[0] if found else None), []
+    if person is None:
+        return None, found
+    near = _in_reach(world, person, found)
+    if len(near) == 1:
+        return near[0], []
+    return None, near or found
 
 
-def _thing_and_person(world: Any, rest: str) -> tuple[Any, Any]:
-    """(the thing, the person) of 'the packet to Mr Veale' or 'Mr Veale the packet'; either
-    None where the words name none."""
+def _by_ordinal(world: Any, person: Any, word: str, cands: list[Any]) -> Any:
+    if len(cands) < 2:
+        return None
+    if word == "other":
+        last = _last_handled(world, person, cands)
+        others = [t for t in cands if t.id != last]
+        return others[0] if len(others) == 1 else None
+    i = _ORDINALS[word]
+    return cands[i] if -len(cands) <= i < len(cands) else None
+
+
+def _recent(world: Any, n: int = 2000):
+    log = getattr(world, "log", None)
+    if log is None:
+        return
+    for i in range(len(log) - 1, max(-1, len(log) - 1 - n), -1):
+        yield log[i]
+
+
+def _last_handled(world: Any, person: Any, cands: list[Any]) -> str:
+    """The id of the one of these things the person's last free line named."""
+    ids = {t.id for t in cands}
+    for e in _recent(world):
+        if e.kind == FREE_KIND and e.data.get("person") == person.name:
+            if e.data.get("thing") in ids:
+                return str(e.data["thing"])
+    return ""
+
+
+def _last_choices(world: Any, person: Any) -> list[Any]:
+    """The things the person's last refusal named apart, still known (package 109)."""
     from freesail.world import things as TH
 
+    actor = _actor_of(world)
+    for e in _recent(world):
+        if e.kind == "order.rejected" and e.actor == actor and e.data.get(CHOICES):
+            ids = list(e.data[CHOICES])
+            known = {t.id: t for t in TH.things_of(world)}
+            return [known[i] for i in ids if i in known]
+    return []
+
+
+def _actor_of(world: Any) -> str:
+    extra = getattr(getattr(world, "ship", None), "extra", None)
+    if not isinstance(extra, dict):
+        return "captain"
+    return str(extra.get("order_actor") or "captain")
+
+
+def _one(world: Any, person: Any, words: str) -> Any:
+    """The one thing the words name, the one within his reach where they name several;
+    None when they name none; refused naming them apart (`Several`) where they name
+    several within his reach (package 109)."""
+    thing, several = _pick(world, person, words)
+    if thing is None and several:
+        raise Several(several_words(world, person, words, several), several)
+    return thing
+
+
+def _thing_and_person(world: Any, rest: str, giver: Any = None) -> tuple[Any, Any]:
+    """(the thing, the person) of 'the packet to Mr Veale' or 'Mr Veale the packet'; either
+    None where the words name none; refused naming them apart where the thing's words name
+    several within the giver's reach (package 109)."""
     people = world.people
     words = rest.split()
     low = [w.lower() for w in words]
     thing = person = None
+    several: list[Any] = []
+    said = rest
     for i in range(len(words) - 1, 0, -1):
         if low[i] != "to":
             continue
-        t = TH.find(world, " ".join(words[:i]))
+        t, sev = _pick(world, giver, " ".join(words[:i]))
         p = people.find_anywhere(" ".join(words[i + 1 :]))
-        if t or p:
-            thing = thing or (t[0] if len(t) == 1 else None)
+        if t or sev or p:
+            thing = thing or t
             person = person or p
-        if len(t) == 1 and p is not None:
-            return t[0], p
+            if sev and not several:
+                several, said = sev, " ".join(words[:i])
+        if t is not None and p is not None:
+            return t, p
     for i in range(1, len(words)):
         p = people.find_anywhere(" ".join(words[:i]))
-        t = TH.find(world, " ".join(words[i:]))
-        if p is not None and len(t) == 1:
-            return t[0], p
-    if thing is None:
-        t = TH.find(world, rest)
-        thing = t[0] if len(t) == 1 else None
+        t, sev = _pick(world, giver, " ".join(words[i:]))
+        if p is not None and t is not None:
+            return t, p
+        if p is not None and sev and not several:
+            several, said = sev, " ".join(words[i:])
+    if thing is None and not several:
+        thing, several = _pick(world, giver, rest)
+    if thing is None and several:
+        raise Several(several_words(world, giver, said, several), several)
     return thing, person
 
 
 def _thing_and_dest(world: Any, person: Any, rest: str) -> tuple[Any, str]:
     """(the thing, the words of where it goes) of 'the packet in the bread locker'."""
     words = rest.split()
+    several: list[Any] = []
+    said = rest
     for i in range(1, len(words)):
         if words[i].lower() not in _PUT_PREPS:
             continue
-        thing = _one(world, person, " ".join(words[:i]))
+        thing, sev = _pick(world, person, " ".join(words[:i]))
         if thing is not None:
             return thing, " ".join(words[i:])
-    return _one(world, person, rest), ""
+        if sev and not several:
+            several, said = sev, " ".join(words[:i])
+    if not several:
+        return _one(world, person, rest), ""
+    raise Several(several_words(world, person, said, several), several)
+
+
+# ---------------------------------------------------------------------------
+# The refusals in words (package 109)
+# ---------------------------------------------------------------------------
+
+
+def several_words(world: Any, person: Any, words: str, things: list[Any]) -> str:
+    """Several things named by one name, told apart by what tells them apart: a letter's
+    writer and its hour, whose keeping or where it lies, and the first words of one he may
+    read; and how to say which."""
+    from freesail.world import things as TH
+
+    n = len(things)
+    heads = {t.head for t in things}
+    noun = (things[0].head + "s") if len(heads) == 1 and things[0].head else "things"
+    parts = []
+    for i, t in enumerate(things):
+        bits = [TH.name_words(t)]
+        if t.is_letter:
+            if t.author and " from " not in t.name.lower():
+                bits.append(f"in {t.author}'s hand")
+            if t.written:
+                bits.append(f"written {t.written}")
+        bits.append(TH.where_words(world, t))
+        if t.is_letter and t.words and (not t.sealed or t.broken):
+            first = " ".join(t.words.split()[:6])
+            more = "..." if len(t.words.split()) > 6 else ""
+            bits.append(f'beginning "{first}{more}"')
+        ordinal = ("the first", "the second", "the third", "the fourth")[i] if i < 4 else ""
+        parts.append((f"{ordinal}, " if ordinal else "") + ", ".join(bits))
+    said = " ".join(str(words).split())
+    return (
+        f"'{said}' names {_COUNT.get(n, str(n))} {noun}: "
+        + "; ".join(parts)
+        + ". Say which: by its writer or what it is ('the letter from ...'), or 'the first',"
+        " 'the second'" + (", 'the other'" if n == 2 else "") + "."
+    )
+
+
+def _gone_words(world: Any, words: str) -> str:
+    from freesail.world import things as TH
+
+    gone = [t for t in TH.find(world, words, gone=True) if t.place in (TH.OVERBOARD, TH.GONE)]
+    if not gone:
+        return ""
+    t = gone[-1]
+    if t.place == TH.OVERBOARD:
+        return f"{t.the} went over the side"
+    return f"{t.the} is {t.gone or 'destroyed'}, and gone"
+
+
+def _near_order(text: str) -> str:
+    """An order of the dialect the words were near ('take posession of' for 'take
+    possession of'), or ""."""
+    import difflib
+
+    from freesail.orders.vocabulary import key, load_vocabulary
+
+    said = key(text).split()
+    vocab = load_vocabulary()
+    best, best_r = "", 0.0
+    for phrase, verb in vocab.phrase_to_verb.items():
+        spec = vocab.verbs.get(verb)
+        if spec is None or spec.object == "free" or verb in vocab.readings:
+            continue
+        n = len(phrase.split())
+        if n < 2 or len(said) < n:
+            continue
+        head = " ".join(said[:n])
+        if head == phrase:
+            continue
+        r = difflib.SequenceMatcher(None, head, phrase).ratio()
+        if r > best_r:
+            best, best_r = phrase, r
+    return best if best_r >= 0.88 else ""
+
+
+def reach_words(world: Any, person: Any) -> str:
+    """What is in the person's keeping and what lies where he stands, by their listed
+    names: 'in your keeping: a purse; lying here: a sealed packet'; "" for nothing."""
+    from freesail.world import things as TH
+
+    kept = TH.kept_by(world, person)
+    here = TH._where_of_person(world, person)
+    lying = [
+        t
+        for t in TH.things_of(world)
+        if not t.keeper
+        and t.place not in (TH.OVERBOARD, TH.GONE)
+        and TH.same_place(here, TH.place_of(world, t))
+    ]
+    parts = []
+    if kept:
+        parts.append("in your keeping: " + ", ".join(TH.name_words(t) for t in kept))
+    if lying:
+        parts.append("lying here: " + ", ".join(TH.lying_words(t) for t in lying))
+    return "; ".join(parts)
+
+
+def not_found(world: Any, person: Any, phrase: str, rest: str, text: str) -> str:
+    """The refusal of a free order whose words found nothing (package 109): what was not
+    found, and what the game does know by that name: a thing gone, a person, an order of
+    the dialect the words were near, and the things in his reach."""
+    words = " ".join(str(rest).split())
+    m = _OVERBOARD.match(words)
+    words = m.group("thing") if m is not None else words
+    head = re.split(r"\s+(?:to|in|into|on|onto|under|from|overboard)\s+", words, maxsplit=1)[0]
+    bare = re.sub(r"^(?:the|a|an|some|my|his|your)\s+", "", head, flags=re.I) or head
+    out = f"Nothing of that name is known: there is no {bare} that you know of."
+    more = []
+    gone = _gone_words(world, head)
+    if gone:
+        more.append(f"{gone[:1].upper()}{gone[1:]}.")
+    who = world.people.find_anywhere(head) if getattr(world, "people", None) else None
+    if who is not None:
+        more.append(f"{who.name} is one of the people, not a thing to {phrase}.")
+    near = _near_order(text)
+    if near:
+        more.append(f"The ship's orders know '{near}'.")
+    reach = reach_words(world, person)
+    more.append(f"You have {reach}." if reach else "You keep nothing, and nothing lies here.")
+    return " ".join([out, *more])
 
 
 def _destination(world: Any, person: Any, dest: str) -> tuple[dict[str, Any] | None, str]:
