@@ -104,7 +104,7 @@ on these packages; that is the owner's choice.
 
 **Held for the review (the owner, 2026-11-13: "I agree with holding the packages listed as waiting for the review"):** 78a, 78b, 80, 87, 91, 107, package 110's three building packages, 108, 99, and what the chart's audit leaves when 111 closes. Package 90's preliminaries go on in the ships session (its row).
 
-**The calendar and the world (the owner, 2026-11-13, on decision 69):** "the running clock should not override the state of the world itself, we'll want to consider that, besides at the start, or in a scenario intended to run the actual historical course specifically, factors like port data will need to rely on the world rather than the date." To be settled between the owner, the lead and the chart session: a port's dated rows seed the port at the scenario's first day and the port is then the world's; the calendar applies them only where a scenario runs the historical course. The chart session reports the readers and the smallest change; the lead rules; the change is an engine step of the chart session's.
+**The calendar and the world (the owner, 2026-11-13, on decision 69):** "the running clock should not override the state of the world itself, we'll want to consider that, besides at the start, or in a scenario intended to run the actual historical course specifically, factors like port data will need to rely on the world rather than the date." To be settled between the owner, the lead and the chart session: a port's dated rows seed the port at the scenario's first day and the port is then the world's; the calendar applies them only where a scenario runs the historical course. The chart session reports the readers and the smallest change; the lead rules; the change is an engine step of the chart session's. **Built and merged 2026-11-13 (4e079c31, from the session's 3a30a85c): the record seeds; a scenario may follow history; truths 7-580 to 7-584.**
 
 **The review portion approved (the owner, 2026-11-13):** "All these reviews will be Fable, and they are approved as such." So packages 114 (the cold review), 103a (the range's audit), 103b (the design after it), 96 (the harbour and the ship's configuration) and 92 (the career and the world that moves under it) are approved and are Fable's, each launched in its turn on his word. The lead had proposed 103a for Opus beside the cold review: by his word it is Fable's; and, on the standing rule of one Fable package at a time: "We can run multiple Fable packages at a time in this case." So 103a runs beside 114, neither reading the other, and 103b, 96 and 92 follow as the lead orders them, more than one at a time where their grounds do not meet.
 
@@ -4863,6 +4863,42 @@ played on the lead's machine, 34 passed, none skipped; lint and the name sweep c
 order's and the state's changes read. **No digest and no line the game says of a hoist or
 of the colours moved.** The whole suite in the cloud on the trunk after the next run, the
 figures to follow. **Next: step 5** (the nations' days).
+
+### The chart session's first step: the calendar and the world (decision 69), as merged (2026-11-13)
+
+Merged by hash 3a30a85c as 4e079c31 (`--no-ff`, the two end-of-file appends kept both).
+**Tried in the cloud under the mended workflow:** run 82 (2026-11-13, 07:06 to 08:04 UTC,
+on `claude/trial` at 89172424, the trunk with package 102's step 4 and this step merged)
+green in lint, the six shards, the browser plans and the pace job; the trunk after the
+merge equal to that tree in every file of the code, the data, the tests, the tools and the
+client. The owner (2026-11-13): "the running clock should not override the state of the
+world itself ... besides at the start, or in a scenario intended to run the actual
+historical course specifically, factors like port data will need to rely on the world
+rather than the date." **What it built, by the lead's ruling on the session's own
+report:** (1) **a port's dated rows seed the port on the scenario's first day and the port
+is then the world's:** `Ports.tick` applies nothing by the day. (2) **A scenario may say
+it follows history** (`follows_history: true`; false where absent, left out of a save
+when false; said in the scenario's own lines and on the harbour's list, "keeping to the
+course of history"): then each row of a port, and its holder's, is **an event of the day
+it begins or ends** (`Port.on_events`), every day since the last turn counted, so that
+what play changed lasts until the record's next event. (3) `Ports.stance` reads the port's
+own holder (`port.nation`), as the prices and the prize court already did, so that the
+two no longer disagree after a change. (4) The regimes' dated blockades are read by the
+scenario's first day unless it follows history (`business.py`, that one reader). (5) A
+fault it found is mended by (1): a director's `closed_to` on a port with dated rows was
+overwritten at the next day's turn. **Truths 7-580 to 7-584.** **Superseded by design,
+old beside new (the owner's standing rule of 2026-11-12):** `test_ports`' day-turn test
+(held without the key, turning with it), and package 79d's Genoa test, whose stance
+turned hostile overnight on the annexation's date and is now neutral without the key and
+hostile with it; truth 7-299 and truth 7-530 stand. **No recorded passage moved** (no
+port on the trunk has rows of the six keys yet). The how-to is brought up to date, with
+the 40 MB rule said in MiB. **Left unbuilt on purpose, for the review portion (packages
+103b and 92):** nothing in play yet changes a port's holder or begins a war; the
+director may close or open a port and set a price, and `declare_war` and `make_peace` are
+called by tests alone. **The measure:** the session's, ruff clean and the name sweep, the
+fast tier 7,569 passed and 1 xfailed, the slow tier of the touched files with the audit's
+full sweep, the browser plans and the known truths 218 passed and 8 xfailed, the pace 15;
+the engine's changes read by the lead; lint and the name sweep clean on the trial.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
