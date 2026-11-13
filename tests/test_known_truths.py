@@ -16547,8 +16547,9 @@ PACKAGE_105_WEST_PORTS = frozenset(
 
 def test_truth_7_537_a_ship_may_sail_from_tunis_to_palermo_on_charted_water():
     """Package 105, step 3: the passage from the road of Tunis by Cape Bon, across the
-    channel south of Maritimo and the Egadi, round Cape St Vito and Cape di Gallo into the gulf of Palermo
-    to the road off the mole lies on charted water every leg, no leg crossing the land, from
+    channel south of Maritimo and the Egadi, round Cape St Vito and Cape di Gallo into the
+    gulf of Palermo to the road off the mole lies on charted water every leg, no leg crossing
+    the land, from
     `tunis-coast` into `sicily` and along the seam with `tyrrhenian`; the thirteen ports of
     the step load, each the King of the Two Sicilies' and neutral to a British ship, Ustica
     in `tyrrhenian`'s bounds and features, the rest in `sicily`'s; Cefalù and Termini marks
