@@ -1,0 +1,62 @@
+# FreeSail: the British days on which a King's ship in port dresses (package 102, step 5;
+# docs/design/Design-Signals.md, "The nations' days"). Read by freesail/world/flags.py
+# (`days_on`). Each day: its name, its date in the year (month-day), the years it was kept
+# (decision 66: a king's birthday ends with the king), what is done and its source.
+#
+# The Regulations and Instructions of 1806 (1808 printing), "Of Salutes", art. XX: "The
+# Anniversary days of the Birth, Accession, and Coronation, of the King; of the Birth of the
+# Queen, of the Restoration of King Charles the second, and of the Gun Powder Treason, shall be
+# solemnized by such of His Majesty's Ships as are in Port, with such a number of Guns as the
+# Commanding Officer present shall direct, not exceeding Twenty-one in each" (art. XXI: from the
+# upper deck guns). The Regulations order the guns, not the dressing: that the ships dressed on
+# these days is Perrin's "the display of numerous flags by ships in harbour on holy days and
+# days of national rejoicing was allowed, and in some cases even enjoined" (1922, p. 196),
+# taken for all six: JUDGEMENT. The salute is not fired by the game (said in the tuning notes,
+# package 102, step 5); `guns` records the most the Regulations allow. Of the dates one is
+# read: the King's birthday, 4 June (Nelson to Mazarredo, off Cadiz, 1797, Nicolas vol. II);
+# the rest FROM MEMORY, and the years of each FROM MEMORY.
+
+nation: britain
+days:
+  - name: "the King's birthday"
+    date: "06-04"
+    years: "1760-1819"
+    does: [dress]
+    guns: 21
+    source: "the Regulations of 1806, art. XX (the King's birth); the date Nicolas, Dispatches and Letters of Nelson, vol. II (1797: 'The 4th of June being the birthday of my Royal Master'); George III's reign FROM MEMORY"
+  - name: "the anniversary of the King's accession"
+    date: "10-25"
+    years: "1761-1819"
+    does: [dress]
+    guns: 21
+    source: "the Regulations of 1806, art. XX; the date (25 October 1760) and the years FROM MEMORY"
+  - name: "the anniversary of the King's coronation"
+    date: "09-22"
+    years: "1762-1819"
+    does: [dress]
+    guns: 21
+    source: "the Regulations of 1806, art. XX; the date (22 September 1761) and the years FROM MEMORY"
+  - name: "the Queen's birthday"
+    date: "01-18"
+    years: "1762-1818"
+    does: [dress]
+    guns: 21
+    source: "the Regulations of 1806, art. XX (the birth of the Queen); Queen Charlotte's birthday kept on 18 January, and the years, FROM MEMORY"
+  - name: "the anniversary of the Restoration"
+    date: "05-29"
+    years: "1661-1859"
+    does: [dress]
+    guns: 21
+    source: "the Regulations of 1806, art. XX (the Restoration of King Charles the second); the date (29 May 1660) and the years FROM MEMORY"
+  - name: "the Gunpowder Treason"
+    date: "11-05"
+    years: "1606-1859"
+    does: [dress]
+    guns: 21
+    source: "the Regulations of 1806, art. XX (the Gun Powder Treason); the date (5 November 1605) and the years FROM MEMORY"
+  - name: "the King's birthday"
+    date: "08-12"
+    years: "1820-1829"
+    does: [dress]
+    guns: 21
+    source: "George IV's birthday kept as the King's under the Regulations' article; the date (12 August) and the years FROM MEMORY"

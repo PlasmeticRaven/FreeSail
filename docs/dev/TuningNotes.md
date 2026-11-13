@@ -26711,6 +26711,71 @@ passed. No digest moved; no game line about a hoist or the colours moved (the lo
 `dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
 records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
 
+**Step 5: the nations' days.** `days.yaml` for Britain (7 days), Spain (7) and France (5),
+each dated by its years. On a day, a ship of the sea at anchor under a rules captain dresses
+of herself by day and undresses at sunset (not logged; the lookout's words of her flags say
+"she is dressed in her flags"); the player's ship does not: lying at anchor, her first
+lieutenant reminds the captain once that day ("It is the King's birthday, sir: the ships in
+harbour will be dressing"). **Stopped and reported, the salute:** the gunnery has the gun to
+leeward (one loaded gun, "the shot to strike nothing") and no blank: `charges.py` leaves the
+saluting charge out (package 77's), there is no train of guns fired at an interval, a gun
+fired is a shot from a loaded gun, and the far ships fire nothing but their far action's
+rounds. A salute wants: a blank load (powder, no shot) and its cartridge drawn from the
+magazine (the table's saluting charge), a train of N guns of a side fired one at a time at
+the interval (not read in any source held: FROM MEMORY five seconds), each reloaded with
+blank in turn, the guns heard at the guns' range by the ships about her, and the far ships'
+salutes heard as their guns; more than a short new act. **Not built, splice the main
+brace:** the stores keep provisions as days at full allowance and water in tons, no spirits
+apart; an extra issue wants a spirits store first (package 54's stores).
+
+**Step 5 and decision 69 (the lead's word of 2026-11-13).** The days are read by the date of
+the world's own clock (`world.clock.ship_time`), as the calendar carries them: a day is kept
+in its `years`, and the reigns those years follow (a king's birthday ends with the king; the
+French days pass from the Saint-Louis to the Republic's fêtes, the Saint-Napoléon and the
+Saint-Louis again) are read as the calendar's, by the lead's word ("a king's birthday is the
+calendar's"). Nothing in step 5 reads who is at war or who holds a port: a ship dresses on
+her own nation's day wherever she lies at anchor, at home, abroad or off an enemy's coast,
+and the first lieutenant's word is said wherever the player's ship lies at anchor; no line
+asks whose the port is. The scenario's `follows_history` (the trunk's calendar step) is not
+read: the days are the calendar's, kept alike whether the record seeds the world or is
+followed. Left for package 103's design, said not built: when a state can
+change its government in play, which house reigns is the world's own, and the days' years
+would then be read against that state and not the date (the French days from 1792 are the
+plainest case).
+
+**Step 5: the measure.** At 09fd157 (step 5 with the trunk at 788cb3c, step 4 merged as
+c0bd2ac, merged by a merge commit, then the trunk at ce4b78e the same way, the two truths
+appends kept with the trunk's first; the reach of the first lieutenant's word placed, which
+the trunk's truth 7-380 asks of every kind): ruff check and format clean (385 files); the
+fast tier 7,599 passed, 1 xfailed, 0 failed; the slow tier of the touched files and of
+`test_known_truths` (step 4's ten, test_knowledge and the browser plans, test_browser_probe's
+13 with none skipped; `--slow -m "not pace"`) 1,789 passed, 8 xfailed, 0 failed; pace alone
+and last on the same files, 13 passed. No digest moved; no game line about a hoist or the
+colours moved (the locker's `day_said` out of the pickle while unset; a ship at anchor on no
+day records nothing new). The tree reported differs from 09fd157 by this paragraph alone.
+
+**Step 5: the lead's two mends (2026-11-13, before the trial).** (1) The word of the day is
+the ship's own officer's (`agent.officer_rank`, a lazy import): the first lieutenant in a
+frigate, the lieutenant in a brig-sloop, the mate in a cutter, a schooner or a trader (a
+smack's master at anchor at Falmouth on the 4th of June is reminded by the mate), named as
+the station's binding names him; the record's data carries `person`. (2) No words in a
+seated officer's mouth. **Found:** no line the game speaks as the officer had a rule for a
+seated one (the officer's name is read by `reports` for whose deck it is, and the lines
+`world/captive.py` speaks are the captain's, heard by the seated stations within earshot):
+no precedent, so, as the lead said, where `holder_of(world, "officer of the watch")` is held
+the day is said to the deck with no speaker, "It is the King's birthday: the ships in
+harbour will be dressing." (kind `colours.day`, of the `colours` family: the deck), for the
+seated officer to say to the captain himself; once, as before. Tests: a frigate and a smack,
+each with her own officer's word; a frigate with a fake officer seated (truth 7-505 widened
+to both).
+
+**Step 5, the mends: the measure.** At 4a1a70c (the mends, 606d780, with the trunk at 18ea281
+merged by a merge commit, the truths appends kept with the trunk's first): ruff check and
+format clean (385 files); the fast tier whole 7,605 passed, 1 xfailed, 0 failed; the slow
+tier of the step's files (as at 09fd157: test_browser_probe's 13 played, none skipped, and
+test_knowledge; `--slow -m "not pace"`) 1,794 passed, 8 xfailed, 0 failed. The tree
+reported differs from 4a1a70c by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
