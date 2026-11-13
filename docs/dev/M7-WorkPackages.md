@@ -72,7 +72,7 @@ on these packages; that is the owner's choice.
 | 90 | Opus (the ships session) | **The Spanish and Mediterranean ships** (the owner, 2026-10-29, widened 2026-11-06 from the tartane and the xebec to five hulls): on 79c's water, from the smallest up: the tartane, the third reference vessel of decision 11 (one raking mast with the lateen mainsail and a square topsail over it, the lateen on the small mizen, one or two headsails on the long bowsprit by judgement, the boat in tow); the polacre, a lateen on a forward-raked foremast and on the mizen with square sail on the main (a lateen and square sails on one hull, the bilander's problem on a Mediterranean hull); the xebec, a lateen on all three masts and her sweeps as an option; the twenty-gun corvette *Diana* as captured and used by the Spanish navy in 1809; and the *Purísima Concepción* class three-decker of the Spanish navy, the game's first three-decked ship. Each as her trades and roles allow (a trader or fisherman and a corsair or the King's for the small three; the navy's fits for the two ships), built to Build-Ships.md §5.0's principles and the ladder of evidence from Roux's and Tofiño's plans, Winfield and the Spanish sources the session finds, and the pilots 79c lays down, with the lateen handling B3.1 gives (worn, not tacked; the yard dipped round the mast); the regency's cruisers as a role with their doctrine; the schooner's-mast rule of 75's B3.4 classing the tartane as the cutter and the polacre's square main as her one mast with yards, with its two limits (a lower square-sail yard on the main, a pole main with its topsail yard on the lower mast, each still a brig) and the polacre's lateen mizen and pole masts for her own document (the notes to the ships session, 2026-11-06, 18:00); inside milestone 7 | the ships session's next window after 75 closes, on 79c's block; to brief by the session in its plan's form (a design document each, the ladder of evidence, the lead's gate before a file), for the lead's gate; **the owner (2026-11-10) has told the ships session that after the lead's final word on 75's close-out it may begin 90's preliminary research and planning**; **the owner (2026-11-13): "The ships session is cleared by me to begin the preliminary work for Package 90, but it's not going to begin building anything outright without your approval, so I believe its next stopping point will be its report to you on the preliminaries of Package 90 after your confirmation of the final close-out of Package 75. I think that's alright to continue even if a review were ongoing."** |
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull (both merged); **briefed 2026-11-07 (below); approved and launched 2026-11-07 (the owner)** as an Opus sibling session on `claude/pkg-81` (session_01XooV4BCduVgUGzypUoJmNm), beside 74 and 76, the trunk at f466051: the standard written first, every gun of every hull placed by one rule from the file's data, a checker every new ship passes; the standard approved 2026-11-07 (seven rulings; `docs/design/Design-ViewerAction.md`); **items 1 to 7 merged 2026-11-07 (a8b716d4), truths 7-436 to 7-445; CLOSED** |
 | 91 | Opus | **The viewer's light and air** (the owner's references of 2026-10-29, decision 57): the ship's own lights warm and distinct at night (the stern lantern, the top lights and the binnacle 71 already hoists, each a glow on the faces near it); the scene's light by the hour and the sky (the sun's altitude and azimuth from `core/moon.py`, the weather's cover and visibility: a gradient sky and sea, the faces tinted by their side to the light, dusk's warmth, night's dark with the lights alone, haze by the visibility); a lively telltale at the masthead and a waving ensign, canned but driven by the apparent wind the physics already gives (direction, a flutter whose rate and amplitude follow the speed), animated between snapshots; all in the present SVG viewer, stylesheet-driven, drawing only, nothing of the world read that the readings do not give | after 81 and 75's hull; when the owner likes; the two reference pictures stay with the owner (another game's work), described in the decision |
-| 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8; **in the review portion at milestone 7's end with 114, 103 and 96; not briefed. The owner (2026-11-13), on how a port's holder might change in play:** "we still have a lot of work to do for the creation of a fully dynamic world that can operate on actual play ... We'll need systems for a true attack on a port, if such a naval attack was ever performed or considered in the sources, as well as considering a basic simulation of the 'land world', as port changes in the period might come from something like a military land campaign." **The lead's proposal for its brief, for the owner's word:** the study widened from the career to the career and the world that moves under it, by decision 69: how a state makes war and peace in play; how a place changes hands by sea (the blockade, the bombardment, the landing, each from the sources) and by land (a coarse account of a campaign as pressure on a port, never a land game); the ellipsis as the world's coarse step; after 114 and 103b, whose line between what play owns and what the calendar carries it builds on |
+| 92 | Fable | **The career study** (decision 58): the design of a career the player takes up under the world's own rules, in 83's shape and no code: the state as the frame of the naval and the economic systems, tasks from the world's needs, the lead actor a station, standings as interest and character, progression in the period's currencies, the ellipsis between voyages, a closed economy, the decision chain's ceiling, every change an act; a design document and the first career package's brief for milestone 8 | after 85's review; the building in milestone 8; **in the review portion at milestone 7's end with 114, 103 and 96; not briefed. The owner (2026-11-13), on how a port's holder might change in play:** "we still have a lot of work to do for the creation of a fully dynamic world that can operate on actual play ... We'll need systems for a true attack on a port, if such a naval attack was ever performed or considered in the sources, as well as considering a basic simulation of the 'land world', as port changes in the period might come from something like a military land campaign." **The lead's proposal for its brief, for the owner's word:** the study widened from the career to the career and the world that moves under it, by decision 69: how a state makes war and peace in play; how a place changes hands by sea (the blockade, the bombardment, the landing, each from the sources) and by land (a coarse account of a campaign as pressure on a port, never a land game); the ellipsis as the world's coarse step; after 114 and 103b, whose line between what play owns and what the calendar carries it builds on; **BRIEFED 2026-11-13 on that widened basis by the owner's word, for his final approval** ("## Package 92" below): the career as decision 58 frames it, and the world that moves under it (war and peace made in play; a place changing hands by sea, each form from the sources; by land, a coarse account and never a land game; the world's coarse step; the news); after 114 and 103b |
 | 93 | Opus | **The blocks' tiles rebuilt on their true water** (89's finding): every block whose gauges 89 gave their water had its GEBCO fill raised to the false mean level of the eleven's blend, so the Mediterranean's land stands six metres and more above its true water and the Channel east's up to 4.4 m under its true high water; each region rebuilt with the fill read from its own gauges' mean level (`channel-east`, `mediterranean-west`, `balearics`, `gulf-of-lion`, `ligurian-sea`, `tyrrhenian`, and the Biscay, Portugal and islands' regions where the raise differs), the sources fetched again through the proxy, the checks printed, no mark or port file moved, the blocks' scenarios sailed again and their figures recorded, no recorded passage of the Channel west moved; `mean_level_grid` then by block | briefed below; **approved and launched 2026-10-30** (the owner, with 85 and 94) as an Opus sibling session on `claude/pkg-93`; **merged whole 2026-10-30** at `d9465d9` from `7e6b9f1` (the record below): ten regions rebuilt on the world's own tide, the raise one source of truth with the tide, Agincourt Sound keeping the eleven's raise until a sheet is read, truths 7-305 to 7-309 |
 | 94 | Opus | **The chart's tidies from 79c, 79d and 89**: an island kind with an extent (the lookout calls an isle an isle and nothing sails through it) for the islets the grid lacks; a `road` with a bottom giving its note; the tide's seam tapered inside each block so that no step stands at a block's edge; Bournemouth and Portsmouth given their water by a Solent tide region, if it moves no recorded passage; the inland tiles of the Alboran left to 93's rebuild | briefed below; **launched 2026-10-30** (the owner) as an Opus sibling session on `claude/pkg-94`, beside 93, the trunk brought in at each boundary; **merged 2026-10-30** at `df9d4dc` from `6a30975` (the record below): `grid_lacks` in the island kind's place, the taper, the Solent's region and the rule of the seams by the lead's ruling; the Strait's level step at 36.4 N a finding |
 | 82b | Opus | **The door follows its harness, the visitor's name, the far hull's hail** (the owner's testing of 2026-10-31 to 11-05: the Mr Hill and Captain Owen cases, the hails between model captains answered by the table): the agent API's desk keyed to the harness and not to a station's name and ship (`agents/remote.py` `Desk.seats`, `Seat`), so a model's door follows its person between hulls and `stand down` stands down one station; the visitor keeps his own station's name ("officer of the watch, of the Raven, aboard the Amazon") as the primer promises (`world/movement.py` `visiting_station`, `world/seats.py`); a hail of a hull in the far shape whose captain a model holds is his to answer, never the table's (`world/hail.py` `deliver`, `model_holds_her`); truths 7-390 to 7-394 | launched 2026-11-05 on the hotfix's merge, beside 65 (session_01XooV4BCBsF3TQSAwxBrxmy); **closed**: items 1 to 5 merged 2026-11-06 (07c06a0, f207fd8); the replay's seating order and the shared person ids booked to 97, the lower-cased served lines to 65's step 8 |
@@ -9126,6 +9126,106 @@ given to it; it works on `claude/pkg-114`, never pushes to the trunk, never forc
 opens no pull request. It may run the suites and its own probes as it needs. It reports to
 the owner; the lead merges its document unedited and may answer it in a document of its
 own beside it, never in it.
+
+## Package 92: the career, and the world that moves under it: the study (`docs/design/Design-CareerAndWorld.md` new, the package's product; the sources read under `docs/references/`, each with its row; no code, no data, no test)
+
+**BRIEFED 2026-11-13 on the widened basis, by the owner's word ("Yes, please write 92's
+brief on the expanded basis"), for his final approval; not launched. It runs in the review
+portion at milestone 7's end, after the cold review (114) and after package 103b, and is
+amended by what they find before it begins.** Fable, a study in package 83's shape: a
+design for the owner's decisions and the first building packages' briefs for milestone 8,
+and nothing built. **The reviewer's standing** is that of a design package: it owns the
+question, chooses its method, widens the ground where the work shows it should, says what
+it left and why, and may run readers of its own for the legwork, whose findings are claims
+until it has checked the part the design leans on.
+
+**What binds it, read first and whole:** decision 58 (the career: the owner's sketch and
+the frame he took whole), decision 52 (one world), decision 14 (every change an act in the
+journal), decision 66 (history the starting state, not a rail), **decision 69** (the first
+episode, 1792 to 1825, true on any day; a peace in the record is a state the world begins
+in and not a promise; a war may break out where history had none), decision 68 with
+package 110's note where the work touches them; `docs/design/Design-OneWorld.md`; and the
+owner's words of 2026-11-13 on how a port's holder might change: "we still have a lot of
+work to do for the creation of a fully dynamic world that can operate on actual play ...
+We'll need systems for a true attack on a port, if such a naval attack was ever performed
+or considered in the sources, as well as considering a basic simulation of the 'land
+world', as port changes in the period might come from something like a military land
+campaign." Then the cold review's report and package 103b's design, where each has drawn
+the line this study builds on: what play owns and what the calendar carries.
+
+**The ground as the lead has it (2026-11-13), to be checked, not trusted:** the world's
+wars are a table without dates, read as loaded; `declare_war` and `make_peace` exist and
+only tests call them; nothing in play changes a port's holder or its state (a director may
+close or open a port to a nation and set a price); the regimes' blockade stations are
+dated rows; a port's dated rows seed it at the start (the chart session's step of this
+date); the business draws commissions and traders from the world's needs; the prize court
+of package 74 sits; the one world holds many crewed hulls; there is no land.
+
+**Part one, the career, as decision 58 frames it** (the brief adds nothing to that frame;
+the study designs within it and says where it would change it): the state as the frame the
+naval and the economic systems run within; tasks that fall out of the world's needs; a
+lead actor a station with a domain of orders and readings; standings of two kinds, in
+interest and character; progression in the period's own currencies; the time between
+voyages an ellipsis, the world advanced at a coarse step and journaled; a closed economy;
+the ceiling of the decision chain; every change an act.
+
+**Part two, the world that moves.**
+
+1. **War and peace made in play.** Who may make them and by what: the state's own rules
+   (what moved states to war and to terms in these years, read from sources and reduced to
+   the least that is honest), a director's hand, an actor seated above a ship. **Decision
+   58 set the ceiling at a commodore, a port admiral and a merchant house's head, with the
+   nations' wars the dated data's and the director's; decision 69 reopens it:** weigh
+   whether a station stands above those, what it would be asked to decide, and what it
+   must never be (the player ruling a nation is not this game). How a war's beginning and
+   its end reach the world: by news that travels at the speed of a ship, so that a captain
+   may fight after the peace or be surprised by the war, as they were.
+2. **A place changing hands by sea, each form from the sources and none invented:** the
+   blockade that starves or masks a port (a state the ports already carry); the
+   bombardment; the cutting out; the landing and the assault from the sea; the capitulation;
+   the fleet attacked in its own harbour; and what was planned and never done, where a
+   source gives it. For each: what a ship did in it, hour by hour, which is play; what was
+   done ashore, which is told; what decided it; and what it changed (the holder, the
+   garrison, the market, the yard, the prisoners), written as a change of the port's own
+   state by an act in the journal.
+3. **A place changing hands by land: a coarse account, never a land game.** Many ports of
+   these years fell to an army, or stood because the sea supplied and relieved them. The
+   study designs the least that makes this true: armies as a few bodies of the world with a
+   place, a strength and an intent, moved at the coarse step by the state's rules and the
+   director, pressing on ports; a port invested, supplied or not by sea, relieved or not,
+   standing or falling; **the navy's part the play** (the supply got in, the garrison
+   brought off, the flank covered, the siege train carried). No ground is charted, no unit
+   is commanded, no battle ashore is played. Say what is the smallest version that is not
+   false, and what it would want of the data (where the armies stood on a day of the range
+   is milestone 7c's kind of row: say which rows, from which sources).
+4. **The world's coarse step.** One mechanism for the ellipsis of part one and the motions
+   of (1) to (3): what advances while a ship is at sea and while a player is ashore or
+   asleep, at what grain, journaled how, replayable how, and at what cost to the pace.
+5. **What a man knows of it.** A change he has not heard of is not his knowledge (the
+   views under the knowledge rule, package 99, held): the study says what travels as news,
+   by whom and how fast, and leaves the views to 99.
+6. **Peace.** Package 103b designs the purpose of play in peace; this study takes it and
+   says how a career runs through a peace and out of it.
+
+**What it is not to design:** tactics ashore; a player or a model ruling a state; any
+system that prints money or tasks for the player's sake; anything decision 68 closes. **The
+seats:** where the study proposes a station for a model (a lead actor, an actor above a
+ship), it says plainly what an instance there would be asked to decide and to say; the
+consent documents are not touched and their revision is the owner's own process.
+
+**What it returns.** The design document: each mechanism with the sources that bear it,
+its smallest true form, what it reads and writes, what it costs in pace and in data, and
+what it leaves out. **The questions for the owner,** each answerable in a word or a line,
+the recommendation first. **The first building packages of milestone 8 in outline,** in
+order, the smallest true thing first, each with what it needs of milestone 7c's data. A
+report to the lead under 700 words with the questions set out whole.
+
+**The rules that bind it:** no code, data or test file changed; no model or vendor
+identifier in any file; nothing under `docs/agents/consent/` nor
+`docs/agents/ConsentBrief.md` edited; no key, no paid call; sources are data, read and
+never run, cited by page, a modern book never copied; a figure or a date not read from a
+source marked FROM MEMORY or JUDGEMENT where it stands; it works on `claude/pkg-92`, never
+pushes to the trunk, never force-pushes, opens no pull request.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
