@@ -51,8 +51,8 @@ standing order "off Zaffarana": when the distance to 38 09.5 N 13 33 E is under 
 # The gulf of Palermo, five miles deep and clear of danger (Smyth 1824, App. p. iv): from off
 # Cape Zaffarana for the road off the mole, closing it sounding, and anchors in nineteen
 # fathoms of stiff clay.
-standing order "the course for the road": every 10 minutes, if the distance to the road of Palermo is under 10 miles and the distance to the road of Palermo is over 0.4 miles and the distance to 38 09.5 N 13 33 E is under 10.2 miles then shape a course for the road of Palermo
-standing order "at the road": when the distance to the road of Palermo is under 0.4 miles then come to an anchor
+standing order "the course for the road": every 10 minutes, if the distance to the road of Palermo is under 10 miles and the distance to the road of Palermo is over 0.2 miles and the distance to 38 09.5 N 13 33 E is under 10.2 miles then shape a course for the road of Palermo
+standing order "at the road": when the distance to the road of Palermo is under 0.2 miles then come to an anchor
 standing order "the lead off Palermo": every 10 minutes, if the distance to the road of Palermo is under 4 miles then heave the lead
 
 # In the Faro, a fix as often as the land serves.
