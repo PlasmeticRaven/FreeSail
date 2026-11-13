@@ -4923,8 +4923,7 @@ the builder's, ruff clean, the fast tier 7,572 run and none failed, the slow tie
 files with the browser plans 613 run and none failed, the pace 12; the lead's on the
 merged trial (2026-11-13): the fast tier 08:08 to 09:23 UTC, 7,586 passed and 1 xfailed,
 exit 0; the browser plans, the step's and the director's slow tests on the lead's
-machine, 108 passed, none skipped; lint and the name sweep clean; the change read. The
-whole suite in the cloud on the trunk after the next run, the figures to follow. **Next:
+machine, 108 passed, none skipped; lint and the name sweep clean; the change read. The whole suite in the cloud, run 85 (2026-11-13, 10:29 to 11:56 UTC, on 774b6dda, the trunk with this step and package 105's step 2): green in lint, the six shards, the browser plans and the pace job. **Next:
 step 4** (the view follows the hull), **and step 5** (vessels sailing across the land:
 the builder measured 8 of 35 and 6 of 24 on the land on two busy seas, and stops to say
 which digest moves before it builds).
