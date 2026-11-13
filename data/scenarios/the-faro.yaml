@@ -30,7 +30,7 @@
 
 name: Sicily and Malta, Valletta through the Faro to Palermo
 seed: 7
-start: 1808-04-20T06:00
+start: 1808-04-20T14:00
 position: {lat_deg: 35.9035, lon_deg: 14.5300}   # off the mouth of the Grand Harbour (features/sicily.yaml `valletta-outer-road`)
 chart: atlantic-east
 nation: britain

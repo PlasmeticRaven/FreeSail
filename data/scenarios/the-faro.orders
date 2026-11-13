@@ -14,19 +14,19 @@ standing order "off Passaro": when the distance to 36 40 N 15 25 E is under 3 mi
 
 # Up the east coast outside Syracuse, Augusta and Catania, eight miles off, to the mouth of
 # the Faro.
-standing order "the course for Catania": every hour, if the distance to 37 30 N 15 30 E is over 3 miles and the distance to 37 30 N 15 30 E is under 56 miles and the distance to 37 55 N 15 30 E is over 26 miles then shape a course for 37 30 N 15 30 E
-standing order "off Catania": when the distance to 37 30 N 15 30 E is under 3 miles then shape a course for 37 55 N 15 30 E
-standing order "the course for the Faro's mouth": every hour, if the distance to 37 55 N 15 30 E is over 2 miles and the distance to 37 55 N 15 30 E is under 30 miles and the distance to 38 03 N 15 36 E is over 10 miles then shape a course for 37 55 N 15 30 E
-standing order "off the Faro's mouth": when the distance to 37 55 N 15 30 E is under 2 miles then shape a course for 38 03 N 15 36 E
+standing order "the course for Catania": every hour, if the distance to 37 30 N 15 30 E is over 3 miles and the distance to 37 30 N 15 30 E is under 56 miles and the distance to 37 55 N 15 32 E is over 26 miles then shape a course for 37 30 N 15 30 E
+standing order "off Catania": when the distance to 37 30 N 15 30 E is under 3 miles then shape a course for 37 55 N 15 32 E
+standing order "the course for the Faro's mouth": every hour, if the distance to 37 55 N 15 32 E is over 2 miles and the distance to 37 55 N 15 32 E is under 31 miles and the distance to 38 03 N 15 37 E is over 10 miles then shape a course for 37 55 N 15 32 E
+standing order "off the Faro's mouth": when the distance to 37 55 N 15 32 E is under 2 miles then shape a course for 38 03 N 15 37 E
 
 # The Faro: up the middle of the channel past Reggio and Messina, the course shaped every ten
 # minutes and a fix taken as often as the land serves, for the stream sets her (Smyth 1824,
 # pp. 107 to 110 and App. p. xii: six hours north and six south, two to five miles an hour;
 # give the rocks under the Torre di Cavallo a wide berth, for the current sets onto them).
-standing order "the course for Reggio": every 10 minutes, if the distance to 38 03 N 15 36 E is over 1 miles and the distance to 38 03 N 15 36 E is under 15 miles and the distance to 38 12 N 15 36 E is over 10 miles then shape a course for 38 03 N 15 36 E
-standing order "off Reggio": when the distance to 38 03 N 15 36 E is under 1 miles then shape a course for 38 12 N 15 36 E
-standing order "the course for Messina": every 10 minutes, if the distance to 38 12 N 15 36 E is over 0.8 miles and the distance to 38 12 N 15 36 E is under 15 miles and the distance to 38 16.5 N 15 40.8 E is over 7 miles then shape a course for 38 12 N 15 36 E
-standing order "off Messina": when the distance to 38 12 N 15 36 E is under 0.8 miles then shape a course for 38 16.5 N 15 40.8 E
+standing order "the course for Reggio": every 10 minutes, if the distance to 38 03 N 15 37 E is over 1 miles and the distance to 38 03 N 15 37 E is under 14 miles and the distance to 38 12 N 15 36.5 E is over 10 miles then shape a course for 38 03 N 15 37 E
+standing order "off Reggio": when the distance to 38 03 N 15 37 E is under 1 miles then shape a course for 38 12 N 15 36.5 E
+standing order "the course for Messina": every 10 minutes, if the distance to 38 12 N 15 36.5 E is over 0.8 miles and the distance to 38 12 N 15 36.5 E is under 15 miles and the distance to 38 16.5 N 15 40.8 E is over 7 miles then shape a course for 38 12 N 15 36.5 E
+standing order "off Messina": when the distance to 38 12 N 15 36.5 E is under 0.8 miles then shape a course for 38 16.5 N 15 40.8 E
 standing order "the course for the Faro point": every 10 minutes, if the distance to 38 16.5 N 15 40.8 E is over 0.6 miles and the distance to 38 16.5 N 15 40.8 E is under 11 miles and the distance to 38 24 N 15 33 E is over 11 miles then shape a course for 38 16.5 N 15 40.8 E
 standing order "off the Faro point": when the distance to 38 16.5 N 15 40.8 E is under 0.6 miles then shape a course for 38 24 N 15 33 E
 standing order "the course for the Faro's north mouth": every 10 minutes, if the distance to 38 24 N 15 33 E is over 1 miles and the distance to 38 24 N 15 33 E is under 15 miles and the distance to 38 21 N 15 12 E is over 18 miles then shape a course for 38 24 N 15 33 E
@@ -53,7 +53,7 @@ standing order "at the road": when the distance to the road of Palermo is under 
 standing order "the lead off Palermo": every 10 minutes, if the distance to the road of Palermo is under 4 miles then heave the lead
 
 # In the Faro, a fix as often as the land serves.
-standing order "fixes in the Faro": every 10 minutes, if the land is in sight and the distance to 38 12 N 15 36 E is under 14 miles then take a bearing of the land; take a fix
+standing order "fixes in the Faro": every 10 minutes, if the land is in sight and the distance to 38 12 N 15 36.5 E is under 14 miles then take a bearing of the land; take a fix
 
 # The yards and the sheets, the bearings.
 standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
