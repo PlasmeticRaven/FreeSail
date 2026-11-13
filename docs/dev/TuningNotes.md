@@ -27012,9 +27012,12 @@ and Portugal one Atlantic; the Strait meeting both; each island block its own; t
 Mediterranean), another sea's tide where its gauges carry over half the blend's weight; a
 Mediterranean level over 1 m; a coast line's end met within a cell and a half.
 
-**The pace.** On this machine, the sampled audit (the fast tier) about 30 s with the chart's
-load, most of it reading every level-2 tile once and (a)'s 408 tiles that reach past their
-bounds; the full sweep (the slow tier) about 45 s. The planting tests a few seconds each.
+**The pace** (measured at cd46734, one worker, `--durations`): the fast tier gains about 68 s
+of serial time, run on one worker under `-n 4`: the sampled audit's fixture 32.8 s (the
+chart's load and reading every level-2 tile once, with (a)'s 408 tiles that reach past their
+bounds), the planting tests 9 s together, truths 7-560 to 7-564 26 s together. The slow tier
+gains about 89 s: the full sweep twice, 43.9 s in `test_chart_audit.py` and 44.8 s in truth
+7-565.
 
 **The findings by check** (the full sweep):
 
@@ -27060,3 +27063,12 @@ through the lighthouse.
 6. *Not cheap, kept in the list*: the four levels (a gauge's level read), the coasts' misses
    (a rebuild), the marks on isles the grid lacks (a features file and its index), the
    ocean margins elsewhere (the corridor answers there by design).
+
+**The suites, at cd46734, in a worktree pinned there:** `ruff check .` and `ruff format
+--check .` clean; the fast tier whole (`python3 -m pytest -n 4 -q -p no:cacheprovider`): exit
+0, 7,496 passed, 1 xfailed, 511 slow tests left out; the slow tier of the touched files and of
+the known truths (`--slow -m "slow and not pace"`, `tests/test_chart_audit.py` and
+`tests/test_known_truths.py`): exit 0, 188 passed, 8 xfailed, the recorded passages among
+them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No pin moved;
+no data file changed.** The tree reported differs from cd46734 by this paragraph and the
+pace's above alone.
