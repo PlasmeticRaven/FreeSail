@@ -1,0 +1,20 @@
+# FreeSail: the brig's book for Morocco's coast (data/scenarios/morocco.yaml; package 106b),
+# from off El Araiche down the coast to Mogador road. Short: the points of the passage by the
+# account, the sails trimmed, the land's bearings, the lead. The starter book is not loaded.
+
+# Out to the offing west of Sallee (twenty miles off the Tower of Hassan), then to the mark ten
+# miles west of Cape Cantin (Purdy 1825, p. 155: keep well to the westward of the cape for the
+# rocks about it), then down to the offing fifteen miles west of Mogador, where she heaves to with
+# the town and its island in sight to wait for a boat or the day (her account, sailed, ran five
+# miles to the westward of the truth over the two days; shaped for the road itself she drove
+# onto the bank south of the island). Each leg is shaped once, at the mark before it, the ring
+# of the two offings ten miles (package 106a's lesson).
+standing order "off Sallee": when the distance to 33 54 N 7 54 W is under 10 miles then shape a course for 32 36 N 9 36 W
+standing order "off Cape Cantin": when the distance to 32 36 N 9 36 W is under 10 miles then shape a course for 31 31 N 10 06 W
+standing order "off Mogador": when the distance to 31 31 N 10 06 W is under 6 miles then heave to
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead": every 15 minutes, if the distance to 31 31 N 10 06 W is under 5 miles then heave the lead

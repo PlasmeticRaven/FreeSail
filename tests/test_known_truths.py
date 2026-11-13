@@ -17283,3 +17283,314 @@ def test_truth_7_529_the_frigate_from_funchal_looks_into_santa_cruz_road_by_her_
     seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
     assert any("Peak of Tenerife" in t for t in seen) and any("Rocks of Naga" in t for t in seen)
     assert any("Fixed by cross bearings" in e.text for e in w.log if e.kind == "reckoning.fix")
+
+
+# ---------------------------------------------------------------------------
+# Package 106b: Morocco's Atlantic coast, Cape Spartel to Cape Juby, as four regions (truths
+# 7-550 to 7-559). States, counts and bands; no digest.
+# ---------------------------------------------------------------------------
+
+MOROCCO_REGIONS = ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
+MOROCCO_PORTS = ["larache", "rabat", "mazagan", "safi", "mogador", "agadir"]
+
+
+def _mor_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart off Morocco's coast at seed 7, the six ports loaded, the
+    summer's wind along the coast from the north-north-east (Purdy 1825, p. 152)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 20.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 14.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", MOROCCO_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_550_the_four_regions_abut_each_other_and_their_neighbours_with_no_gap():
+    """The brief's item 6, the seams: the four regions' bounds meet each other's exactly
+    (34.16 N, 31.6 N, 29.46666 N), the northernmost the Strait's 35.5 N and the southernmost
+    the Canaries' east bound; no probe of their water lies in two regions' bounds, every one
+    answers a region's depth at level 2 or 3, and the tiles the Strait and the Canaries list
+    are theirs and in none of the four's lists."""
+    import yaml
+
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    b = {r: chart.region_bounds[r] for r in [*MOROCCO_REGIONS, "strait", "canaries"]}
+    assert b["morocco-larache"][1] == b["strait"][0] == 35.5
+    assert b["morocco-larache"][0] == b["morocco-sallee"][1] == 34.16
+    assert b["morocco-sallee"][0] == b["morocco-mogador"][1] == 31.6
+    assert b["morocco-mogador"][0] == b["morocco-noun"][1] == 29.46666
+    assert b["morocco-noun"][2] == b["canaries"][3] == -13.17334
+    holes, doubles = [], []
+    for r in MOROCCO_REGIONS:
+        s, n, w, e = b[r]
+        for i in range(1, 20):
+            for j in range(1, 20):
+                p = Position(s + (n - s) * i / 20, w + (e - w) * j / 20)
+                depth = chart.depth_at(p)
+                if depth is None or depth <= 0.0:
+                    continue
+                if chart.level_at(p) < 2:
+                    holes.append((r, p))
+                held = [
+                    x
+                    for x, (s2, n2, w2, e2) in chart.region_bounds.items()
+                    if s2 < p.lat_deg < n2 and w2 < p.lon_deg < e2
+                ]
+                if len(held) != 1:
+                    doubles.append((r, p, held))
+    assert not holes and not doubles
+    manifest = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data/charts/manifest.yaml").read_text("utf-8")
+    )
+    mine = {t["name"] for r in MOROCCO_REGIONS for t in manifest["regions"][r]["tiles"]["2"]}
+    for neighbour in ("strait", "canaries"):
+        theirs = {t["name"] for t in manifest["regions"][neighbour]["tiles"]["2"]}
+        assert not mine & theirs
+
+
+def test_truth_7_551_tangier_to_mogador_and_mogador_to_lanzarote_on_charted_water():
+    """The brief's item 6: a ship's way from Tangier road round Cape Spartel, down the coast
+    by the offing of Sallee and the mark west of Cape Cantin to Mogador road, and from Mogador
+    by the open sea to the Puerto de Naos of Lanzarote, answers a depth of water every 200th
+    of each leg, on the regions' tiles or the coarse layer, and never less than eight metres."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    ways = {
+        "tangier to mogador": [
+            (35.80, -5.79),
+            (35.86, -5.95),
+            (35.25, -6.40),
+            (33.9, -7.9),
+            (32.6, -9.6),
+            (31.515, -9.80),
+        ],
+        "mogador to lanzarote": [
+            (31.515, -9.80),
+            (31.3, -10.1),
+            (28.8, -13.75),
+            (28.93, -13.52),
+            (28.9636, -13.5352),
+        ],
+    }
+    for name, pts in ways.items():
+        least, levels = float("inf"), set()
+        for (a1, o1), (a2, o2) in zip(pts, pts[1:], strict=False):
+            for i in range(201):
+                t = i / 200
+                p = Position(a1 + (a2 - a1) * t, o1 + (o2 - o1) * t)
+                depth = chart.depth_at(p)
+                assert depth is not None, (name, p)
+                least = min(least, depth)
+                levels.add(chart.level_at(p))
+        # measured: 24.6 m (off Tangier) and 8.0 m (in the Puerto de Naos)
+        assert least >= 7.5, name
+        assert 2 in levels
+    assert 1 in {chart.level_at(Position(30.0, -11.5))}  # the open sea the coarse layer's
+
+
+def test_truth_7_552_the_bar_of_el_araiche_refuses_a_frigate_at_low_water():
+    """The brief's item 6: the bar of El Araiche's river admits vessels of a hundred tons at
+    high water (Purdy 1825, p. 152). On the world's own tide at springs (June 1805, Huelva's
+    and Cadiz's water) a frigate drawing eighteen feet has too little over the bar at low
+    water and a vessel of a hundred tons (eight feet, JUDGEMENT) crosses at high water; the
+    river within is the grid's land (the block's finding)."""
+    from freesail.world import tide as T
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    tide = T.load_tide()
+    bar = chart.feature("larache-bar").position
+    depth = chart.depth_at(bar)
+    assert 1.5 < depth < 3.5
+    heights = [
+        tide.height_at(bar, datetime(1805, 6, 12) + timedelta(minutes=10 * i))
+        for i in range(6 * 25)
+    ]
+    frigate, hundred_tons = 18 * 0.3048, 8 * 0.3048
+    assert depth + min(heights) < frigate
+    assert depth + max(heights) > hundred_tons + 1.0
+    assert chart.depth_at(Position(35.195, -6.140)) < 0.0  # within: the grid's land
+
+
+def test_truth_7_553_each_ports_road_is_as_its_pilot_has_it_and_its_holder_on_its_day():
+    """The brief's item 3: the six roads in the pilots' depths and bottoms (Purdy 1825 and
+    Jackson 1809): El Araiche's seven fathoms off the bar, Sallee's road foul with lost anchors,
+    Mazagan's clear sand two miles off, Saffi's summer road in sixteen fathoms of fine grey sand,
+    Mogador's a mile and a half west of the Long Battery, Agadeer's under the mountain; each the
+    Emperor's and neutral to a King's ship in June 1805 but El Araiche and Agadeer, closed to the
+    Europeans' trade since 1780 and 1773; Mazagan Portugal's on a day of 1768."""
+    w = _mor_at(33.5, -8.0, datetime(1805, 6, 15, 12, 0))
+    bands = {
+        "larache": (8.0, 18.0, "sand"),
+        "rabat": (18.0, 35.0, "anchors"),
+        "mazagan": (15.0, 30.0, "clear sand"),
+        "safi": (22.0, 35.0, "grey sand"),
+        "mogador": (25.0, 45.0, "sand"),
+        "agadir": (6.0, 14.0, "ledge"),
+    }
+    assert sorted(w.ports.ports) == sorted(MOROCCO_PORTS)
+    for pid, (lo, hi, bottom) in bands.items():
+        port = w.ports.ports[pid]
+        depth = w.chart.depth_at(port.anchorage.position)
+        assert lo < depth < hi, (pid, depth)
+        assert bottom in (w.chart.bottom_near(port.anchorage.position) or ""), pid
+        assert port.nation == "morocco"
+        want = "closed" if pid in ("larache", "agadir") else "neutral"
+        assert w.dealings.stance(port) == want, pid
+    old = _mor_at(33.5, -8.0, datetime(1768, 6, 15, 12, 0))
+    assert old.ports.ports["mazagan"].nation == "portugal"
+    assert old.ports.ports["larache"].closed_to == []
+    assert old.ports.ports["agadir"].closed_to == []
+
+
+def test_truth_7_554_the_coasts_tide_is_the_atlantics_and_the_master_has_its_two_places():
+    """The brief's item 5, by the rule for a block with no gauge (the chart session's ruling):
+    the northern two read Cadiz's and Huelva's water, an M2 of 1.03 m on Huelva's level 1.96 m;
+    the southern two Arrecife's and Puerto de Cabras's, 0.82 m on 1.57 m; the Strait's inner
+    gauges serve none of them. The master's Norie has Mogador at four o'clock and ten to twelve
+    feet (Purdy 1825, p. 155) and the coast to the north at the world's hour, judgement."""
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    for lat, lon in ((35.215, -6.165), (34.045, -6.86), (32.3039, -9.2746)):
+        level, k = tide.constants_at(Position(lat, lon))
+        assert level == pytest.approx(1.96, abs=0.01)
+        assert k["M2"][0] == pytest.approx(1.035, abs=0.005)
+    for lat, lon in ((31.515, -9.80), (30.402, -9.628), (28.9, -10.6)):
+        level, k = tide.constants_at(Position(lat, lon))
+        assert 1.55 < level < 1.60 and 0.81 < k["M2"][0] < 0.83
+    served = {b for g in tide.block_gauges for b in g.blocks[1:] if b.startswith("morocco")}
+    assert served == set(MOROCCO_REGIONS)
+    for g in tide.block_gauges:
+        if g.id in ("tarifa", "ceuta", "gibraltar", "algeciras"):
+            assert not [b for b in g.blocks if b.startswith("morocco")]
+    mogador = T.Epitome.load("norie").by_name("Mogador")
+    assert (mogador.hw_h, mogador.hw_m, mogador.spring_rise_ft) == (4, 0, 11.0)
+    coast = T.Epitome.load("norie").by_name("Coast of Marocco")
+    assert coast.rise_judgement and coast.spring_rise_ft == 9.0
+
+
+def test_truth_7_555_the_weather_box_takes_no_water_another_box_answers_and_the_set_is_south():
+    """The brief's item 4 and 5: the box `morocco`, last in the file, answers the coast's water
+    east of 9 W from Spartel to Safi, which lay in no box; the coast's water west of 9 W is
+    Madeira's and the Canaries' boxes' as before; Purdy's current sets S.W. by S. a knot along
+    the coast north of Cantin and southward a knot south of Mogador."""
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+    from freesail.world.weather import load_climatology
+
+    clim = load_climatology()
+    assert list(clim.boxes)[-1] == "morocco"
+    assert clim.box_at(34.05, -6.9).name == "morocco"
+    assert clim.box_at(32.3, -9.27).name == "madeira"
+    assert clim.box_at(30.4, -9.7).name == "madeira"
+    assert clim.box_at(28.9, -10.6).name == "canaries"
+    assert clim.box_at(38.7, -9.5).name == "portugal"
+    tide = T.load_tide()
+    north = tide.area_at(Position(33.5, -8.0))
+    south = tide.area_at(Position(30.0, -10.5))
+    assert north.id == "morocco-coast-north" and (north.current_toward_deg, north.current_kn) == (
+        214.0,
+        1.0,
+    )
+    assert south.id == "morocco-coast-south" and south.current_toward_deg == 180.0
+    book = T.load_directions()
+    assert book.area_at(Position(33.5, -8.0)).current_point == "SW by S"
+
+
+def test_truth_7_556_the_business_trades_cotton_south_and_almonds_and_fish_north():
+    """The brief's item 3 for regions the business can people: Rabat's cotton dear at Saffi and
+    Saffi's almonds dear at Rabat, in the region of Sallee; Agadeer's dried fish dear at Mogador
+    in Mogador's; no route refused, every port's tracks clear of the land."""
+    w = _mor_at(33.5, -8.0, datetime(1805, 6, 15, 12, 0), business="on")
+    assert w.business.region == "morocco-sallee"
+    routes = {(a.id, b.id, good) for _r, a, b, good in w.business.routes()}
+    assert ("rabat", "safi", "cotton") in routes and ("safi", "rabat", "almonds") in routes
+    assert w.business.refused == set()
+    s = _mor_at(31.0, -10.0, datetime(1805, 6, 15, 12, 0), business="on")
+    assert s.business.region == "morocco-mogador"
+    assert ("agadir", "mogador", "salt fish") in {
+        (a.id, b.id, good) for _r, a, b, good in s.business.routes()
+    }
+    assert all(
+        b.business._leaves_clear(p) and b.business._arrives_clear(p)
+        for b in (w, s)
+        for p in b.business.ports()
+    )
+
+
+def test_truth_7_557_the_ports_rows_seed_each_port_on_its_day():
+    """The brief's item 3 and decision 69: each port's dated rows read on a scenario's first
+    day, the port then the world's. Saffi's and Mazagan's corn cheap under Sidi Mohammed and
+    dear since Soliman forbade its export (Jackson 1809, l. 4524 to 4527); Mogador's market
+    from its founding in 1760; El Araiche open to the Europeans in 1775 and closed in 1805."""
+    from freesail.world import ports as PT
+
+    root = Path(__file__).resolve().parents[1] / "data" / "ports"
+    for pid in ("safi", "mazagan"):
+        before = PT.load_port(root / f"{pid}.yaml", when=datetime(1785, 6, 1))
+        after = PT.load_port(root / f"{pid}.yaml", when=datetime(1805, 6, 1))
+        assert after.market.goods["wheat"].price >= 1.5 * before.market.goods["wheat"].price
+    assert "almonds" in PT.load_port(root / "mogador.yaml", when=datetime(1805, 6, 1)).market.goods
+    assert not PT.load_port(root / "mogador.yaml", when=datetime(1750, 6, 1)).market.goods
+    larache = root / "larache.yaml"
+    assert PT.load_port(larache, when=datetime(1775, 6, 1)).closed_to == []
+    assert "britain" in PT.load_port(larache, when=datetime(1805, 6, 1)).closed_to
+
+
+def test_truth_7_558_the_tower_of_hassan_is_seen_and_the_ledges_take_a_frigate():
+    """The brief's item 2: the Tower of Hassan, a hundred and eighty feet (Purdy 1825, p. 153),
+    is a mark of the lookout's; a frigate drawing eighteen feet over the ledge off Cape Cantin
+    or off Mazagan's west point takes the ground at low water."""
+    from freesail.world.chart import load_chart
+
+    chart = load_chart("atlantic-east")
+    tower = chart.feature("tower-of-hassan")
+    assert tower.kind == "tower" and tower.height_m == 55.0
+    for fid in ("cantin-ledge", "mazagan-ledge"):
+        f = chart.feature(fid)
+        hit = chart.danger_under(f.position, 0.0, 40.0, 5.5, tide_m=0.5)
+        assert hit is not None, fid
+
+
+@pytest.mark.slow
+def test_truth_7_559_the_brig_from_gibraltar_heaves_to_off_mogador_by_her_short_book():
+    """The brief's item 6: the block's scenario (`morocco.yaml`, June 1805) sailed at seed 7 by
+    its short book: from off El Araiche down the coast by the offing of Sallee and the mark west
+    of Cape Cantin, with the land in sight, to heave to fifteen miles west of Mogador on the
+    second day, through the two northern regions and without touching ground."""
+    from freesail.world.geo import Position, bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "morocco.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 5
+    regions = set()
+    for _ in range(46):
+        w.run(3600)
+        regions.add(w.chart.region_at(w.position))
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    # measured at seed 7: hove to in 31 39 N, a mile north of Mogador's region
+    assert {"morocco-larache", "morocco-sallee"} <= regions
+    hove = [e for e in w.log if "By standing order 'off Mogador'" in e.text]
+    # measured at seed 7: hove to at 41.4 hours, 15 miles west of the town
+    assert hove and 36 * 3600 < hove[0].tick < 46 * 3600
+    _b, dist = bearing_and_distance(w.position, Position(31.513, -9.77))
+    assert 8.0 * units.NAUTICAL_MILE < dist < 25.0 * units.NAUTICAL_MILE
+    seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
+    assert any("Cape Cantin" in t for t in seen)

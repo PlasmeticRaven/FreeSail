@@ -120,6 +120,7 @@ market:
         - {good: iron, price: 34, origin: null, note: "Jackson 1809, l. 9455: 10,661 bars in 1804; JUDGEMENT"}
         - {good: sugar, price: 100, origin: null, note: "Jackson 1809, ch. XI: loaf sugar 56,219 lb in 1804; JUDGEMENT"}
         - {good: tea, price: 260, origin: britain, note: "Jackson 1809, ch. XI: tea among the imports; JUDGEMENT"}
+        - {good: salt fish, price: 20, origin: morocco, note: "JUDGEMENT: the town grows nothing (Purdy 1825 p. 155) and Agadeer's fish is dried for the interior"}
     since: 1760-01-01
     source: "Jackson 1809, l. 4716 to 4920 and ch. XI: the port's trade from its founding in 1760; the figures of 1804; the day JUDGEMENT"
 

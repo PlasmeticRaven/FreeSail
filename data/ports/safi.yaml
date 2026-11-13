@@ -89,6 +89,7 @@ market:
         - {good: linen, price: 88, origin: null, note: "imported; JUDGEMENT"}
         - {good: woollens, price: 86, origin: britain, note: "imported; JUDGEMENT"}
         - {good: iron, price: 33, origin: null, note: "imported; JUDGEMENT"}
+        - {good: cotton, price: 60, origin: morocco, note: "JUDGEMENT: Rabat's cotton (Jackson 1809, l. 4415 to 4418) brought down the coast"}
     until: 1792-02-29
     source: "Jackson 1809, l. 4686 to 4692: a place of considerable trade, particularly in corn; the end of the row the accession of Soliman, FROM MEMORY"
   - market:
@@ -105,6 +106,7 @@ market:
         - {good: linen, price: 88, origin: null, note: "imported; JUDGEMENT"}
         - {good: woollens, price: 86, origin: britain, note: "imported; JUDGEMENT"}
         - {good: iron, price: 33, origin: null, note: "imported; JUDGEMENT"}
+        - {good: cotton, price: 60, origin: morocco, note: "JUDGEMENT: Rabat's cotton (Jackson 1809, l. 4415 to 4418) brought down the coast"}
     since: 1792-03-01
     source: "Jackson 1809, l. 4524 to 4527: the export of grain prohibited since the present Emperor's accession; the day FROM MEMORY"
 

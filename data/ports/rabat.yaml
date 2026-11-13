@@ -101,6 +101,7 @@ market:
     - {good: woollens, price: 88, origin: britain, note: "imported; JUDGEMENT"}
     - {good: iron, price: 33, origin: null, note: "imported; JUDGEMENT"}
     - {good: tea, price: 270, origin: britain, note: "imported; JUDGEMENT"}
+    - {good: almonds, price: 28, origin: morocco, note: "JUDGEMENT: brought up the coast from Saffi and the south"}
 
 dockyard:
   kind: yard
