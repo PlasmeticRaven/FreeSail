@@ -16,16 +16,21 @@ polar beside the brig's, with rule 1's clause of truth 7-197 drafted on it. Her 
 (Bil-D §5-§8): her two fits, unarmed by default and the armed merchant, its guns against Lloyd's,
 Adye and Falconer, each on its port or on her rail, and the builder's checklist for the viewer
 (Build-Ships.md §6's postscript); her broadside by 70's rule; her armed fit's lowest lee port by
-7-190's form; her company of eight and her wardroom file; the beat to quarters on the armed fit,
-measured; her ground tackle, boat, pumps, hold, stores and ration; her description in her file
-and through the index, and her role by every intent. Her road's step 4 (Bil-D §9, §14): her polar
-recorded beside the brig-sloop's and the merchant brig's, §9's knobs each beside its start and its
-bound (`clr_x_m` tuned for her helm, the rest kept), her helm and truth 6's form, and truth 7-197
-whole. Her road's step 5, on the engine's settee (B3.3; Bil-D §12.2, §14; Ext §5): her heave-to
-both ways, her sheet's block against her taffrail, rule 5's measure on her file, her settee
-requests at eight by watch, truths 7-198 and 7-199 on her file, and her first hour at seed 7 with
-no fit named; each judged by her heading and tack a set time after, never by "Tacked" (D13 (a)).
+7-190's form; her company (nine since the lead's ruling 8 of 2026-11-13; eight before) and her
+wardroom file; the beat to quarters on the armed fit, measured; her ground tackle, boat, pumps,
+hold, stores and ration; her description in her file and through the index, and her role by every
+intent. Her road's step 4 (Bil-D §9, §14): her polar recorded beside the brig-sloop's and the
+merchant brig's, §9's knobs each beside its start and its bound (`clr_x_m` tuned for her helm, the
+rest kept), her helm and truth 6's form, and truth 7-197 whole. Her road's step 5, on the engine's
+settee (B3.3; Bil-D §12.2, §14; Ext §5): her heave-to both ways, her sheet's block against her
+taffrail, rule 5's measure on her file, her settee requests at eight by watch, truths 7-198 and
+7-199 on her file, and her first hour at seed 7 with no fit named; each judged by her heading and
+tack a set time after, never by "Tacked" (D13 (a)).
 And B3.3b's guard on her file: forced round hove to, her settee dipped first at "fill away".
+The lead's rulings 8 and 11 of 2026-11-13: at her nine either watch begins every watch's work on
+deck by night and by day, with the master or the mate where its three are under the work's want
+(the tests named "at nine"); the settee's road where a watch is too few, sailed on her eight as a
+save from before holds it (`_her_eight`).
 The untried manoeuvres, run once on her file, are recorded in docs/dev/TuningNotes.md.
 
 The figures quoted as measured were measured on the owner's machine (Windows 11, 2026-11-08);
@@ -614,7 +619,9 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     ruling (11) of 2026-11-09, `form.stern.counter_hb_m`), 0.99 m off the middle line 0.4 m inside
     the taffrail and 1.84 m 0.8 m inside, against Gwyn's 1.55 m at the taffrail and 2.02 m at the
     wale (old: 0.35 and 0.91 m, the round stern closed straight to the middle line, recorded and
-    not drawn). Her file comes out as it stands."""
+    not drawn). Since her nine (the lead's ruling 8 of 2026-11-13, on ruling 11), the quarter
+    bill's arithmetic counts 7 hands off the quarterdeck (old: 6), her guns wanting 10 as before.
+    Her file comes out as it stands."""
     done = subprocess.run(
         [sys.executable, "-c", REPORT_PROBE, str(tmp_path)],
         cwd=ROOT,
@@ -642,7 +649,7 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     assert "118.0 tons on her waterline and 128.0 on her length taffrail to stem head" in said
     assert "the collier's stem head at her scale 2.53 m above her water" in said
     assert (
-        "bilander: the quarter bill on 'armed merchant': of her 6 hands off the quarterdeck the "
+        "bilander: the quarter bill on 'armed merchant': of her 7 hands off the quarterdeck the "
         "bill tells off 2 trimmers and 1 at the helm first, and her guns want 10" in said
     )
     assert "give 7.7 cwt on her 128 tons, against the house's 6.4." in said
@@ -723,7 +730,11 @@ def test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned():
     (the lead's ruling (8) of 2026-11-09), sailed in this harness she makes 6.20 kn abeam, within
     half a knot of her polar's 6.62, and her helm under plain sail at its end is 0.02 of lee helm
     (old: 1.09), the headsails taken in +0.44 (old +0.36), the settee taken in -3.29 (old -3.28):
-    her company's work at the trims changed, measured and not tuned, her polar the same."""
+    her company's work at the trims changed, measured and not tuned, her polar the same. At her nine
+    (the lead's rulings 8 and 11 of 2026-11-13) she makes 6.52 kn abeam again, her helm under plain
+    sail 1.07 of lee helm, the headsails taken in +0.36, the settee taken in -3.29 (old, her eight
+    with the landsman boy: 6.20 kn, -0.02, +0.44 and -3.29), her trims done by three a watch and
+    the post: measured and not tuned, her polar the same."""
     from tests.test_known_truths import knots, make, run, settle, tack_for
 
     p = polar_of(HER)
@@ -746,7 +757,7 @@ def test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned():
         return math.degrees(w.ship.dyn.weather_helm)
 
     plain_helm = helm()
-    assert plain_helm == pytest.approx(-0.02, abs=0.3)
+    assert plain_helm == pytest.approx(-1.07, abs=0.3)  # old (her eight): -0.02
     w.submit("take in the headsails")
     run(w, 900, trim_every=120)
     no_headsails = helm()
@@ -756,7 +767,7 @@ def test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_tuned():
     no_settee = helm()
     assert w.ship.sails["main.settee"].state is SailState.IN_THE_GEAR
     assert no_headsails > plain_helm > no_settee, (no_headsails, plain_helm, no_settee)
-    assert no_headsails == pytest.approx(0.44, abs=0.3)
+    assert no_headsails == pytest.approx(0.36, abs=0.3)  # old (her eight): 0.44
     assert no_settee == pytest.approx(-3.29, abs=0.3)
 
 
@@ -821,8 +832,9 @@ def test_truth_7_197_her_particulars_hold_their_sources_and_she_lies_as_close_as
     - her rig to Gwyn's shares above the waist rail: the main top 0.35 (+- 0.02), the main truck
       0.95 and the fore truck 0.85 (+- 0.03); Chapman's yards: the fore yard 12.44 m, the topsail
       yards 9.14 and 9.36 m (+- 0.2); a dry yard on the main and no royal (D40 (a));
-    - her company of eight, two in the main top (D43; Ext §5.1); `heave_to_aback` on the main mast
-      and no other (D4 (a));
+    - her company of nine, two in the main top (the lead's ruling 8 of 2026-11-13, on ruling 11,
+      JUDGEMENT within the sourced eight to nine; old: eight, D43; Ext §5.1); `heave_to_aback` on
+      the main mast and no other (D4 (a));
     - her fits: unarmed by default (the brief, item 3), the armed merchant four long 3-pounders and
       four half-pounder swivels (Lloyd's Elizabeth, "4-3 P."; D41 (a));
     - her description at rank 1, "merchant" in what she is made out to be (D16 (a));
@@ -878,7 +890,7 @@ def test_truth_7_197_her_particulars_hold_their_sources_and_she_lies_as_close_as
     ):
         assert abs(spars[yid].length_m - metres) <= 0.2, yid
     assert "main.crossjack.yard" in spars and not [s for s in spars if "royal" in s]
-    assert spec.crew.complement == 8 and spec.crew.stations["main_top"] == 2
+    assert spec.crew.complement == 9 and spec.crew.stations["main_top"] == 2  # old: 8
     assert [s.id for s in ship.spars.values() if s.heave_to_aback] == ["main.mast"]
     arm = spec.armament
     assert arm.default == "unarmed" and arm.fit(None) is None
@@ -1021,19 +1033,42 @@ def test_her_armed_fits_lowest_lee_port_shuts_at_twenty_two_degrees():
 # ---------------------------------------------------------------------------
 
 
-def test_her_company_is_eight_with_two_in_the_main_top():
-    """Bil-D §6.1 (D43): eight, the master and the mate (the smack's posts), two in each top (the
-    main top's for the settee aloft: Ext §5.1 and its risk 10), the boy in the afterguard as the
-    messenger, the cook; no forecastle station; her shares by rating 0.80 able and 0.20 landsmen,
-    the boy drawn a landsman (the lead's ruling (8) of 2026-11-09; old: the merchant brig's shares,
-    0.70, 0.20 and 0.10, the boy drawn an ordinary seaman); the english list. The quarter bill
-    (§5.4): a topman of each top trimming, one at the helm, the powder the cook's, sail before
-    guns, two small-arms men and three boarders (judgement)."""
+def test_her_company_is_nine_with_two_in_the_main_top():
+    """Bil-D §6.1 as the lead's ruling 8 of 2026-11-13 has it, built on ruling 11: nine, the master
+    and the mate (the smack's posts), who head the larboard and the starboard watch and haul with
+    it where its whole number is under the work's want (JUDGEMENT, the mate the starboard), two in
+    each top (the main top's for the settee aloft: Ext §5.1 and its risk 10), two in the afterguard,
+    an able seaman and the boy, the messenger, one to each watch, the cook; six seamen, three and
+    three; no forecastle station; her shares by rating 0.80 able and 0.20 landsmen, the boy drawn a
+    landsman (the lead's ruling (8) of 2026-11-09; old: the merchant brig's shares, 0.70, 0.20 and
+    0.10, the boy drawn an ordinary seaman); the english list. Nine is JUDGEMENT within the sourced
+    range of eight to nine, the sources set beside it in her file's note (Macpherson's tons a man,
+    the Transport Board's rule of 1797, the prize papers' medians). The quarter bill (§5.4): a
+    topman of each top trimming, one at the helm, the powder the cook's, sail before guns, two
+    small-arms men and three boarders (judgement). Old (D43, this test as
+    `test_her_company_is_eight_with_two_in_the_main_top`): eight, five seamen, the afterguard the
+    boy alone, the posts keeping no watch."""
+    from freesail.world import people as PE
+
     crew = load_spec(HER).crew
-    assert (crew.complement, crew.names, crew.seamen) == (8, "english", 5)
+    assert (crew.complement, crew.names, crew.seamen) == (9, "english", 6)  # old (8, english, 5)
     assert [p.post for p in crew.posts] == ["master", "mate"]
+    assert PE.post_watches(HER) == {"master": "larboard", "mate": "starboard"}  # her people file
     st = {k: v for k, v in crew.stations.items() if v}
-    assert st == {"fore_top": 2, "main_top": 2, "afterguard": 1, "idlers": 1}
+    assert st == {"fore_top": 2, "main_top": 2, "afterguard": 2, "idlers": 1}  # old afterguard 1
+    raw = yaml.safe_load((ROOT / HER).read_text(encoding="utf-8"))["crew"]
+    assert raw["complement"] == 9
+    note = (ROOT / HER).read_text(encoding="utf-8").split("\n  complement:")[0].rsplit("\n", 1)[1]
+    for source in (
+        "JUDGEMENT within the sourced range of eight to nine",
+        "Macpherson, Annals of Commerce (1805) vol. 4, pp. 287 and 331",
+        "13.8 and 14.0 tons a man, so 9.3 and 9.1 at her 128 tons",
+        "the Transport Board's rule of 1797",
+        "R. K. Sutcliffe 2013, p. 30, citing TNA ADM 1/3733), eight at her tons",
+        "TNA HCA 32, the prize papers' catalogue for 1776-83",
+        "a median of 8 in the short-sea trades and 10 on Atlantic voyages",
+    ):
+        assert source in note, source
     assert crew.stations["forecastle"] == 0
     assert len(crew.posts) + sum(st.values()) == crew.complement
     assert crew.idlers_by_trade == {"cook": 1}
@@ -1084,29 +1119,40 @@ def _her_world(fit=None):
 
 
 def test_her_muster_at_seed_7_puts_four_topmen_aloft_and_the_boy_aft():
-    """Her muster at seed 7 (crew/muster.py): the master and the mate on the quarterdeck; her five
-    seamen by the shares (four able, one landsman: the lead's ruling (8) of 2026-11-09), the tops
-    filled first (`FILL_ORDER`), four able topmen aloft; the afterguard's one hand the landsman,
-    and the boy drawn from it (world/people.py), as the merchant brig's boy is rated; the cook.
-    Old: by the merchant brig's shares (four able, one ordinary) three able and the ordinary aloft
-    and the afterguard's hand able, the boy, drawn wanting `ordinary` and finding none there,
-    mustered an able seaman (B4, for the lead)."""
+    """Her muster at seed 7 (crew/muster.py): the master and the mate on the quarterdeck, the
+    master heading the larboard watch and the mate the starboard (the lead's ruling 11 of
+    2026-11-13, JUDGEMENT); her six seamen by the shares (five able, one landsman: the lead's ruling
+    (8) of 2026-11-09), the tops filled first (`FILL_ORDER`), four able topmen aloft; the
+    afterguard's two an able seaman and the landsman, and the boy drawn from the landsman
+    (world/people.py), as the merchant brig's boy is rated; the cook. Her watches three and three,
+    each a fore topman, a main topman and an afterguard hand (the lead's ruling 8 of 2026-11-13),
+    the starboard's the able seaman and the larboard's the boy. Old (her eight): five seamen, the
+    afterguard's one hand the landsman and the boy, her watches three (the starboard, the boy its
+    third) and two, the posts keeping no watch. Older: by the merchant brig's shares (four able,
+    one ordinary) three able and the ordinary aloft and the afterguard's hand able, the boy, drawn
+    wanting `ordinary` and finding none there, mustered an able seaman (B4, for the lead)."""
     w = _her_world()
-    by = [(s.station.value, s.rating.value) for s in w.ship.extra["crew"].sailors]
+    crew = w.ship.extra["crew"]
+    by = [(s.station.value, s.rating.value, s.watch.value) for s in crew.sailors]
     assert by == [
-        ("quarterdeck", "officer"),
-        ("quarterdeck", "officer"),
-        ("fore_top", "able"),
-        ("fore_top", "able"),
-        ("main_top", "able"),
-        ("main_top", "able"),
-        ("afterguard", "landsman"),
-        ("idlers", "idler"),
+        ("quarterdeck", "officer", "none"),
+        ("quarterdeck", "officer", "none"),
+        ("fore_top", "able", "starboard"),
+        ("fore_top", "able", "larboard"),
+        ("main_top", "able", "starboard"),
+        ("main_top", "able", "larboard"),
+        ("afterguard", "able", "starboard"),
+        ("afterguard", "landsman", "larboard"),
+        ("idlers", "idler", "none"),
     ]
+    assert [s.post for s in crew.sailors[:2]] == ["master", "mate"]
+    assert crew.post_watches == {"master": "larboard", "mate": "starboard"}
     boy = w.people.find("the boy")
     assert boy is not None and boy.messenger
     assert boy.sailor_id == next(
-        s.id for s in w.ship.extra["crew"].sailors if s.station.value == "afterguard"
+        s.id
+        for s in crew.sailors
+        if s.station.value == "afterguard" and s.rating.value == "landsman"
     )
     assert [p.role for p in w.people.all] == ["master", "mate", "boy"]
 
@@ -1123,7 +1169,13 @@ def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
     left, one short (old: the two topmen left), and No. 2 and the swivels stand unmanned, as the
     log says; her design's 'one gun or none', recorded as the period's numbers give it and not
     forced. Unarmed, no gun crew forms and the three topmen and the boy are the trimmers (old: the
-    four topmen). The log's lines are the same."""
+    four topmen). The log's lines are the same.
+    At her nine (the lead's rulings 8 and 11 of 2026-11-13; old beside new, her eight's figures
+    above): seven hands off the quarterdeck, the helm takes the afterguard's able seaman, and
+    unarmed the four topmen and the boy are the trimmers, five ("the trimmers 5"; old 4: the three
+    topmen and the boy, a fore topman at the helm); armed, No. 1 forward is manned whole by the
+    boy, a fore topman and a main topman (old: the boy and a main topman, one short), No. 2 and the
+    swivels unmanned and the log's line the same."""
     from freesail.crew.quarters import HELM, POWDER, TRIMMERS, quarters_of
 
     w = _her_world(fit)
@@ -1137,14 +1189,14 @@ def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
     if fit is None:
         assert manned == {}
         assert sizes == {
-            TRIMMERS: ["fore_top", "main_top", "main_top", "afterguard"],
-            HELM: ["fore_top"],
+            TRIMMERS: ["fore_top", "main_top", "fore_top", "main_top", "afterguard"],
+            HELM: ["afterguard"],
             POWDER: ["idlers"],
-        }
+        }  # old (her eight): the trimmers fore_top, main_top, main_top, afterguard; helm fore_top
         assert said == [
-            "Beat to quarters! Quarters: no gun crews manned, the trimmers 4, the helm 1, the "
+            "Beat to quarters! Quarters: no gun crews manned, the trimmers 5, the helm 1, the "
             "powder 1."
-        ]
+        ]  # old: "the trimmers 4"
     else:
         assert {k: gc.wanted for k, gc in q.crews.items()} == {
             "gun:1": 3,
@@ -1154,12 +1206,14 @@ def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
             "gun:swivel.2.larboard": 1,
             "gun:swivel.2.starboard": 1,
         }
-        assert {k: v for k, v in manned.items() if v} == {"gun:1": ["afterguard", "main_top"]}
+        assert {k: v for k, v in manned.items() if v} == {
+            "gun:1": ["afterguard", "fore_top", "main_top"]
+        }  # old (her eight): ["afterguard", "main_top"], one short
         assert sizes == {
             TRIMMERS: ["fore_top", "main_top"],
-            HELM: ["fore_top"],
+            HELM: ["afterguard"],
             POWDER: ["idlers"],
-        }
+        }  # old: the helm a fore topman
         assert said == [
             "Beat to quarters! Quarters: one gun crew manned, the trimmers 2, the helm 1, the "
             "powder 1. Not hands enough for every gun: the swivels and No. 2 gun stand unmanned."
@@ -1207,8 +1261,9 @@ def test_her_boat_pumps_hold_and_stores():
     assert spec.hold.capacity_tons == 64.0
     stores = spec.crew.stores
     assert (stores.water_tons, stores.provisions_days) == (3.0, 60.0)
-    # eight men a gallon a day for sixty days, at 252 gallons to the ton (data/crew/ration.yaml)
-    assert 8 * 60 / 252.0 < stores.water_tons < 2 * 8 * 60 / 252.0
+    # nine men a gallon a day for sixty days, at 252 gallons to the ton (data/crew/ration.yaml;
+    # old: eight, her company before the lead's ruling 8 of 2026-11-13; three tons either way)
+    assert 9 * 60 / 252.0 < stores.water_tons < 2 * 9 * 60 / 252.0
     assert (stores.cordage_fathoms, stores.shot_plugs, stores.spars) == (80.0, 2.0, {"yard": 1})
     assert [s.kind for s in stores.sails] == [
         "fore.topsail",
@@ -1351,16 +1406,44 @@ FOUR_POINTS, SEVEN_POINTS = 45.0, 78.75  # the heave-to's band (data/evolutions/
 LUG_FLOOR_DEG = 8.0
 
 
-def _her_settle(knots=15.0, **scenario):
+def _her_eight(world):
+    """Her company of eight as a save from before the lead's ruling 8 of 2026-11-13 holds it (the
+    ruling: a save from before loads with the company it holds, and its crew holds no watch for
+    its posts to head, `Crew.post_watches` being read at the muster): mustered afresh at the
+    world's seed from her crew section as it was (complement 8, the afterguard the boy alone, the
+    master and the mate heading no watch), before any tick, the world's muster stream left where
+    her eight's muster left it, and her watch routine made on it. Her eight's watches are three
+    and two, the posts never counted, so that the settee's road (the lead's ruling (1) of
+    2026-11-10: a watch too few calls all hands for her great sail) is sailed as it was built."""
+    import dataclasses
+    import hashlib
+    import random
+
+    from freesail.crew.muster import muster
+    from freesail.crew.routine import Routine
+
+    spec = world.ship.spec.crew
+    eight = dataclasses.replace(spec, complement=8, stations={**spec.stations, "afterguard": 1})
+    digest = hashlib.sha256(f"{world.seed}:muster".encode()).digest()
+    stream = random.Random(int.from_bytes(digest[:8], "big"))
+    world.rng._streams["muster"] = stream
+    crew = muster(eight, stream, ship_name=world.ship.name)
+    world.ship.extra["crew"] = crew
+    world.ship.extra["routine"] = Routine(crew, world.clock)
+    return world
+
+
+def _her_settle(knots=15.0, eight=False, **scenario):
     """B3.4's settle on her file, as tests/test_settee.py settles the fixture (docs/dev/
     TuningNotes.md, "The schooner's mast"): seed 7, the wind from the north, no gusts, her head
     292.5 degrees (67.5 off on the starboard tack) at 5 kn; plain sail set and braced sharp up,
-    settled 2,400 s, trimmed every two minutes after 300 s. Two changes for her company of eight,
-    each judgement (her step 5): all hands called first and kept up (a watch of two or three sets
-    her plain sail one sail at a time: all hands set it by about 1,650 s in 15 kn and 1,800 in 20),
-    and the trim ordered only while her hands are free, the settle ending once their work in hand
-    is done (trimmed every two minutes regardless, her eight fall behind, the trims queue, and a
-    heave-to ordered after them waits on them: measured at her step 5)."""
+    settled 2,400 s, trimmed every two minutes after 300 s. Two changes for her small company,
+    each judgement (her step 5, at eight): all hands called first and kept up (a watch of two or
+    three sets her plain sail one sail at a time: all hands set it by about 1,650 s in 15 kn and
+    1,800 in 20), and the trim ordered only while her hands are free, the settle ending once their
+    work in hand is done (trimmed every two minutes regardless, her eight fell behind, the trims
+    queued, and a heave-to ordered after them waited on them: measured at her step 5). With
+    `eight`, her company of eight as a save from before holds it (`_her_eight`)."""
     from freesail.api.session import make_world
     from freesail.core.world import Scenario
 
@@ -1374,6 +1457,8 @@ def _her_settle(knots=15.0, **scenario):
         **scenario,
     )
     world = make_world(7, HER, sc)
+    if eight:
+        _her_eight(world)
     for order in ("call all hands", "set plain sail", "brace sharp up on the starboard tack"):
         world.submit(order)
     runner = world.ship.extra["evolutions"]
@@ -1421,8 +1506,12 @@ HOVE_TO = {
 # Her helm at the settle's end, measured again with her boy a landsman (the lead's ruling (8) of
 # 2026-11-09): her company's work at the settle's trims changed, the settle ends at another
 # moment of her trim (in 15 kn at 2,667 s, old 2,580; in 20 kn at 2,432, old 2,536), and the
-# figure moves (old: -2.02, -2.02 and +0.25), her lie hove to within its old figures' bounds
-CLOSE_HAULED_HELM = {8.0: -1.14, 15.0: 0.43, 20.0: -4.91}
+# figure moves (old: -2.02, -2.02 and +0.25), her lie hove to within its old figures' bounds.
+# Measured again at her nine (the lead's rulings 8 and 11 of 2026-11-13): her trims at the settle
+# done by three a watch and the post, the settle ends in 8 and 15 kn at 2,400 s and in 20 kn at
+# 2,652 s, and the figure moves again (old, her eight: -1.14, +0.43 and -4.91), her lie hove to
+# within its figures' bounds as before.
+CLOSE_HAULED_HELM = {8.0: -2.26, 15.0: -0.74, 20.0: 0.45}
 
 
 @pytest.mark.parametrize(
@@ -1460,7 +1549,14 @@ def test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways(
     (`CLOSE_HAULED_HELM`), and her lie hove to within two degrees of the figures above (8 kn kept
     47.5, 69.5, 64.7-69.5 at 0.54 kn; 15 kn kept 61.4, 65.2, 65.1-65.4; clewed up 66.9, 67.9,
     67.9-68.9; 20 kn kept 65.3, 62.6, 62.6-63.6; clewed up 73.5, 67.2, 67.2-69.3; each headway
-    the same to the hundredth)."""
+    the same to the hundredth). At her nine (the lead's rulings 8 and 11 of 2026-11-13) her helm
+    close-hauled is 2.26 of lee helm in 8 kn, 0.74 of lee helm in 15 and 0.45 of weather helm in
+    20 (`CLOSE_HAULED_HELM`; her eight's 1.14, 0.43 and 4.91 the old), and her lie hove to within
+    half a degree of the figures above (8 kn kept 46.1, 69.9, 64.8-69.9 at 0.54 kn; 15 kn kept
+    61.5, 65.2, 65.1-65.4; clewed up 67.0, 67.9, 67.9-68.9; 20 kn kept 65.4, 62.7, 62.8-63.6;
+    clewed up 73.5, 67.3, 67.3-69.3; each headway the same to the hundredth); in 20 kn her settle
+    ends with the trim done, so the other yards are braced up at the heave-to at every wind again
+    (old, her eight: none braced up in 20 kn)."""
     from freesail.evolutions import scripts
 
     monkeypatch.setattr(scripts, "SETTEE_KEPT_HOVE_TO", kept)
@@ -1483,10 +1579,11 @@ def test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways(
     texts = [e.text for e in _after(world, start)]
     words = "eased off the mainsail sheet" if kept else "clewed up the mainsail"
     assert f"Hauled up the courses; {words}." in texts, texts
-    # in 20 kn her settle now ends with her yards braced sharp up to their limits, its last trim
-    # not yet ordered (her boy a landsman, the lead's ruling (8) of 2026-11-09), so that none is
-    # braced up at the heave-to (old: "braced up the other yards" at every wind)
-    braced = "" if knots == 20.0 else " braced up the other yards;"
+    # at her nine her settle ends with the trim done at every wind, so the other yards are braced
+    # up at the heave-to (the lead's rulings 8 and 11 of 2026-11-13; old, her eight with her boy a
+    # landsman: in 20 kn the settle ended with her yards braced sharp up to their limits, its last
+    # trim not yet ordered, and none was braced up; before that, at every wind, as now)
+    braced = " braced up the other yards;"
     assert (
         f"Braced the main topsail aback;{braced} hauled aft the head sheets; helm a-lee." in texts
     )
@@ -1592,13 +1689,18 @@ def test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_
     notes measure it) it waited to the watch's end, the settee against its mast at +1,800 s at
     41.2 m2. Before (caf1d329), the line said "The watch dips the mainsail, lying against its
     mast." on the tick the dip was found to wait for hands (docs/dev/TuningNotes.md, "The review's
-    mends of the two builds" and "The lead's rulings of 2026-11-10, built")."""
+    mends of the two builds" and "The lead's rulings of 2026-11-10, built").
+    **Sailed on her eight as a save from before holds it** (`_her_eight`; the lead's ruling 8 of
+    2026-11-13, a save from before loading with the company it holds), every figure above as it
+    was: at nine her larboard watch of three with the master dips it and calls nobody
+    (`test_forced_round_at_nine_her_larboard_watch_dips_the_settee_with_the_master`). Old (before
+    the ruling): her file's own company, the eight."""
     from datetime import datetime
 
     from freesail.evolutions import trim as yard_trim
     from freesail.physics import sails as P
 
-    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    world = _her_settle(15.0, eight=True, start_time=datetime(1805, 6, 1, 0, 0))
     runner = world.ship.extra["evolutions"]
     settee = world.ship.sails[SETTEE]
     whole = settee.area_effective_m2  # clear of its mast, at her settle
@@ -1654,9 +1756,78 @@ def test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_
     assert not [e for e in _after(world, start) if e.kind == "evolution.failed"]
 
 
+def test_forced_round_at_nine_her_larboard_watch_dips_the_settee_with_the_master():
+    """The test before's case at her nine (the lead's rulings 8 and 11 of 2026-11-13): from her
+    settle at 00:00 (all hands kept up), hove to, the hands piped down, her larboard watch on deck,
+    60 s, and the shift of eight points. Forced round, hove to no longer at +155 s, her after yards
+    full, the settee against its mast: the watch's three with the master begin the dip, which wants
+    six, and nobody is called: the line says "The watch dips the mainsail, lying against its mast."
+    (no `all_hands_called` in its data), the dip begun on that tick by the fore topman, the main
+    topman, the boy and the master, dipped at +618 s, and at +900 s the settee on her lee clear of
+    its mast, 61.7 m2 and 2.68 kn. Old (her eight, the test before, now on her eight as a save from
+    before holds it): the watch's two too few, all hands called to dip it, dipped at +423 s and
+    piped down."""
+    from datetime import datetime
+
+    from freesail.evolutions import trim as yard_trim
+    from freesail.physics import sails as P
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    runner = world.ship.extra["evolutions"]
+    settee = world.ship.sails[SETTEE]
+    whole = settee.area_effective_m2
+    world.submit("heave to")
+    for _ in range(600):
+        world.tick()
+        if "hove_to" in world.ship.extra:
+            break
+    for _ in range(600):
+        if not runner.in_progress():
+            break
+        world.tick()
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(60)
+    assert world.ship.extra["hove_to"]["sign"] == 1.0 and settee.lug_side == "larboard"
+    start = world.clock.tick
+    wind = world.wind
+    wind.follow(units.wrap_2pi(wind.base_direction - 8.0 * units.POINT), wind.base_speed)
+    world.scenario.wind_from_deg = math.degrees(wind.base_direction)
+    for _ in range(600):
+        world.tick()
+        if "hove_to" not in world.ship.extra:
+            break
+    (filled,) = [e for e in _after(world, start) if e.kind == "ship.filled"]
+    at = filled.tick - start
+    assert abs(at - 155) <= 15 and filled.severity.value == "urgent"
+    assert filled.text.endswith(
+        "hove to no longer. The helm keeps her full and by. "
+        "The watch dips the mainsail, lying against its mast."
+    ), filled.text
+    assert filled.data["settees_dipped"] == [SETTEE] and "all_hands_called" not in filled.data
+    (dip,) = [i for i in runner.instances if i.evo.id == "dip_settee"]
+    assert not dip.waiting and not dip.all_hands
+    by = sorted(h.post or h.station.value for h in dip.assignment.hands)
+    assert by == ["afterguard", "fore_top", "main_top", "master"]
+    for _ in range(900):
+        world.tick()
+        if not runner.in_progress():
+            break
+    up = _first_tick(world, start, "Dipped the mainsail; it stands to leeward of the mast.")
+    assert up is not None and abs(up - 618) <= 20
+    after = _after(world, start)
+    assert not [e for e in after if e.kind in ("crew.all_hands", "crew.piped_down")]
+    assert not [e for e in after if e.kind in ("evolution.waiting", "evolution.failed")]
+    world.run(max(0, 900 - (world.clock.tick - start)))
+    lies = yard_trim.read_sheet(world.ship, settee).side
+    assert settee.is_set and settee.lug_side == "starboard" and not settee.yard_lowered
+    assert lies == 1 and not P.against_the_mast(settee, lies)
+    assert settee.area_effective_m2 == pytest.approx(whole, rel=0.01)
+    assert units.ms_to_knots(world.ship.dyn.u) == pytest.approx(2.68, abs=0.3)
+
+
 @pytest.mark.parametrize(
     "hour, watch, wore_s, taken_in_s",
-    [(4, "starboard", 501, 643)],
+    [(4, "starboard", 501, 559), (0, "larboard", 549, 636)],
 )
 def test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_the_order(
     hour, watch, wore_s, taken_in_s
@@ -1672,7 +1843,13 @@ def test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_th
     the mainsail" at +643 s, as before the ruling. Before (caf1d329) the wear waited for the take
     in to +169 s and wore her at +637 s. Her larboard watch's case, the take in calling all hands
     since the lead's ruling (1) of 2026-11-10, is the next test (this case's `[0-larboard-558-
-    None]` until then)."""
+    None]` until then).
+    At her nine (the lead's rulings 8 and 11 of 2026-11-13) the take in is begun by the watch's
+    three with the mate, or by night in the larboard watch with the master; the wear belays it as
+    before and the post goes to the conn: the starboard watch wore her at +501 s as before and took
+    in the settee at +559 s (old, her eight's three: +643 s), and the larboard watch, whose take in
+    called all hands at her eight (the next test, now on her eight as a save from before holds it),
+    begins it and wears her at +549 s, taken in at +636 s (`[0-larboard-549-636]`, new)."""
     from datetime import datetime
 
     world = _her_settle(15.0, start_time=datetime(1805, 6, 1, hour, 0))
@@ -1723,10 +1900,15 @@ def test_in_her_larboard_watch_a_take_in_of_her_settee_calls_all_hands_and_a_wea
     Old (9e04b9fa): the take in waited for hands ("there are but two to spare"); the wear called
     all hands at the order (+30 s), lowered and hoisted the settee about its mast as she wore and
     wore her at +558 s; the take in waited for the wear and after it for hands again, kept, and
-    was begun only when all hands were called by order."""
+    was begun only when all hands were called by order.
+    **Sailed on her eight as a save from before holds it** (`_her_eight`; the lead's ruling 8 of
+    2026-11-13), every figure above as it was: at nine her larboard watch of three with the master
+    begins the take in and the wear belays it, as her starboard watch's case
+    (`test_a_wear_ordered_after_an_order_of_her_settee_begins_at_once_and_keeps_the_order`, its
+    larboard case). Old (before the ruling): her file's own company, the eight."""
     from datetime import datetime
 
-    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    world = _her_settle(15.0, eight=True, start_time=datetime(1805, 6, 1, 0, 0))
     assert world.submit("pipe down").kind == "crew.piped_down"
     world.run(30)
     runner = world.ship.extra["evolutions"]
@@ -1925,12 +2107,17 @@ def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_wi
     Her design's claim ("a company of eight meets with a watch on deck of four", Ext §5.3) does
     not hold for her watches of three and two: recorded as measured and nothing tuned to make her
     quicker (§16 risk 7); for the lead. Her main-top pair is there for the loosing and the furling
-    aloft (Ext §5.1): each watch's main topman is the first taken aloft."""
+    aloft (Ext §5.1): each watch's main topman is the first taken aloft.
+    **Taken on her eight as a save from before holds it** (`_her_eight`; the lead's ruling 8 of
+    2026-11-13), every figure above as it was, the posts heading no watch: at nine with the master
+    and the mate counted where the watch is too small (the lead's ruling 11), either watch begins
+    every one (`test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_
+    mate`). Old (before the ruling): her file's own company, the eight."""
     from freesail.crew import hands
     from freesail.crew.model import Station, Watch
     from freesail.evolutions import EVOLUTIONS
 
-    w = _her_world()
+    w = _her_eight(_her_world())
     crew = w.ship.extra["crew"]
     by_watch = Counter(s.watch.value for s in crew.sailors if s.station is not Station.QUARTERDECK)
     assert by_watch == {"starboard": 3, "larboard": 2, "none": 1}  # the cook keeps no watch
@@ -1961,6 +2148,135 @@ def test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_wi
         assert calls == CALLS_ALL_HANDS[(watch, day)], (watch, day, calls)
 
 
+# Her watches' deck work at nine (the lead's rulings 8 and 11 of 2026-11-13, condition (c)): each
+# request a watch's work on deck by her files, its sail's state, and what it wants of the deck by
+# her company (the file's number no more than her company could give: seven, or the head sails'
+# six and four, the settee's six).
+NINE_DECK = [
+    ("set_square", "fore.course", "in_the_gear", 7),
+    ("take_in_square", "fore.course", "set", 7),
+    ("set_square", "fore.topsail", "in_the_gear", 7),
+    ("take_in_square", "fore.topsail", "set", 7),
+    ("set_square", "main.topsail", "in_the_gear", 7),
+    ("take_in_square", "main.topsail", "set", 7),
+    ("set_jibheaded", "jib", "in_the_gear", 6),
+    ("take_in_jibheaded", "jib", "set", 4),
+    ("set_jibheaded", "fore.topmast_staysail", "in_the_gear", 6),
+    ("take_in_jibheaded", "fore.topmast_staysail", "set", 4),
+    ("brace", None, None, 7),
+    ("send_boat", None, None, 7),
+    ("set_settee", SETTEE, "in_the_gear", 6),
+    ("take_in_settee", SETTEE, "set", 6),
+    ("dip_settee", SETTEE, "set", 6),
+]
+# her work aloft beside it: no post goes aloft (loosing and furling, the settee from furled)
+NINE_ALOFT = [
+    ("set_square", "fore.topsail", "furled", 6),
+    ("furl_square", "fore.topsail", "in_the_gear", 6),
+    ("set_settee", SETTEE, "furled", 6),
+    ("furl_settee", SETTEE, "in_the_gear", 6),
+]
+
+
+def _her_watch_at(hour: int, watch: str):
+    """Her World at seed 7 off the Lizard at `hour` (tests/test_brains.py's world, its start set to
+    the hour), her people made, `watch` given the deck by the bill's own override."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from freesail.crew.model import Watch
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, hour, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.5, "lon_deg": -5.5},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+    )
+    w = make_world(7, HER, sc)
+    _ = w.people.all
+    w.ship.extra["crew"].watch_on_deck = Watch(watch)
+    return w
+
+
+def _her_request(w, eid: str, sid: str | None, state: str | None):
+    """The request as `Runner.start` makes it, asked for its hands by the runner's own
+    `_take_hands` (the all-hands call where its file says `too_few`): begun or not, and by whom."""
+    from freesail.crew.hands import CrewRequest
+    from freesail.evolutions import registry
+    from freesail.evolutions.runner import Instance
+    from freesail.evolutions.scripts import SCRIPTS
+
+    ship, runner, crew = w.ship, w.ship.extra["evolutions"], w.ship.extra["crew"]
+    if sid is not None:
+        ship.sails[sid].state = SailState(state)
+    subject, subject_id = runner._resolve_subject(ship, sid or "her")
+    evo = registry.get(eid)
+    params = dict(evo.params)
+    inst = Instance(evo=evo, subject=subject, subject_id=subject_id, params=params)
+    if evo.script is not None:
+        inst.script = SCRIPTS[evo.script](ship, params, runner._timing(ship, evo))
+    inst.holds = runner._holds(ship, inst)
+    inst.want = CrewRequest.from_mapping(evo.crew)
+    runner.instances.append(inst)
+    began = runner._take_hands(ship, inst, crew)
+    by = [s.post or s.station.value for s in inst.assignment.hands] if began else []
+    return began, inst, by, crew.all_hands_called or ship.extra["routine"].calling
+
+
+@pytest.mark.parametrize("hour", [2, 12], ids=["night", "day"])
+@pytest.mark.parametrize("watch", ["starboard", "larboard"])
+def test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_mate(
+    watch, hour
+):
+    """The lead's ruling 11 of 2026-11-13, its condition (c), with ruling 8's nine: either watch of
+    hers begins every request that is a watch's work on deck by her files, by night (02:00, the
+    idlers below) and by day (12:00, the cook up), with the master (the larboard) or the mate (the
+    starboard) where the watch's three are under the work's want, taken after every hand. Each
+    request is made as `Runner.start` makes it and asked for its hands by the runner's own road,
+    all hands not called: her courses and topsails from the gear and taken in, her head sails from
+    the gear and taken in, the braces, the boat, her settee from the gear, taken in and dipped.
+    Each wants seven of her deck (the file's number, no more than her company could give: her six
+    seamen and the cook), six (a head sail set, the settee) or four (a head sail taken in): by
+    night the watch's three and the post begin it, four (enough for a take in of four); by day the
+    three, the cook and the post, five (a take in of four enough with the three and the cook, the
+    post not taken). Nothing calls all hands. Her work aloft (loosing and furling, the settee from
+    furled) is begun short by the watch's three alone, no post going aloft.
+    Old (her eight, bfb10c6f; docs/dev/TuningNotes.md, "The lead's rulings 8 and 11"): the
+    starboard watch's three began every one of these short (four by day with the cook); the
+    larboard's two by night began none but a head sail's take in, the settee's calling all hands
+    and the boat calling them until she was manned, and by day began the deck work with the cook
+    while its aloft work waited, the settee's calling all hands. The test of her eight's settee
+    requests by watch (`test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_
+    with_the_larboard`) is this test's old form."""
+    post = "mate" if watch == "starboard" else "master"
+    for eid, sid, state, wanted in NINE_DECK:
+        w = _her_watch_at(hour, watch)
+        began, inst, by, called = _her_request(w, eid, sid, state)
+        label = (eid, sid, watch, hour)
+        assert began and not called and not inst.want.all_hands, label
+        assert inst.assignment.wanted == wanted, label
+        hands_of_watch = [b for b in by if b not in ("master", "mate", "idlers")]
+        assert len(hands_of_watch) == 3, (label, by)
+        cook = hour == 12
+        assert ("idlers" in by) == cook, (label, by)
+        expect_post = 3 + int(cook) < wanted
+        assert (post in by) == expect_post and (by[-1] == post) == expect_post, (label, by)
+        other = "master" if post == "mate" else "mate"
+        assert other not in by, (label, by)
+    for eid, sid, state, wanted in NINE_ALOFT:
+        w = _her_watch_at(hour, watch)
+        began, inst, by, called = _her_request(w, eid, sid, state)
+        label = (eid, sid, watch, hour)
+        assert began and not called and inst.assignment.wanted == wanted, label
+        assert len(by) == 3 and not {"master", "mate", "idlers"} & set(by), (label, by)
+
+
 @pytest.mark.parametrize(
     "hour, called, times",
     [
@@ -1983,10 +2299,15 @@ def test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after(
     and calls nobody. Measured: by night 87, 100, 338 and 225 s; by day 183 and 198 s with three,
     and 275 and 176 s with all hands. Old (9e04b9fa): by night the take in waited for hands ("there
     are but two to spare") to the watch's end, and the rest with it; by day the furl waited so.
-    Her starboard watch's three begin every one (the test before): no call, as before."""
+    Her starboard watch's three begin every one (the test before): no call, as before.
+    **Sailed on her eight as a save from before holds it** (`_her_eight`; the lead's ruling 8 of
+    2026-11-13), every figure above as it was: at nine her larboard watch of three, with the master
+    on deck, begins every one and calls nobody
+    (`test_at_nine_her_larboard_watch_works_her_settee_with_the_master_and_calls_nobody`). Old
+    (before the ruling): her file's own company, the eight."""
     from datetime import datetime
 
-    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, hour, 0))
+    world = _her_settle(15.0, eight=True, start_time=datetime(1805, 6, 1, hour, 0))
     assert world.submit("pipe down").kind == "crew.piped_down"
     world.run(30)
     runner = world.ship.extra["evolutions"]
@@ -2017,6 +2338,58 @@ def test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after(
                 "evolution.short_handed",
                 "Only three hands to the mainsail; there are no more on deck.",
             ) in lines, order
+        world.run(30)
+
+
+@pytest.mark.parametrize(
+    "hour, times, deck",
+    [(0, [115, 125, 587, 377], "four"), (8, [111, 120, 587, 377], "five")],
+    ids=["00:00", "08:00"],
+)
+def test_at_nine_her_larboard_watch_works_her_settee_with_the_master_and_calls_nobody(
+    hour, times, deck
+):
+    """The lead's rulings 8 and 11 of 2026-11-13 sailed, the case of the test before at her nine:
+    from her settle (all hands kept up), the hands piped down and 30 s, her larboard watch on deck,
+    "take in the mainsail", "set the mainsail" (from the gear), "furl the mainsail" and "set the
+    mainsail" (from furled), each to its end and 30 s after; seed 7, 15 kn. Her larboard watch's
+    three (a fore topman, a main topman and the boy) begin every one and nothing calls all hands
+    or pipes down: the take in and the set from the gear with the master, who heads the watch and
+    is counted where its three are under the six the settee's work wants (by night four, "Only four
+    hands to the mainsail"; by day with the cook five), and the furl and the loosing aloft with the
+    three alone, no post going aloft ("Only three hands"). Measured: by night 115, 125, 587 and
+    377 s; by day 111, 120, 587 and 377 s. Old (her eight's two, the test before, now on her eight
+    as a save from before holds it): all hands called every time by night (87, 100, 338 and 225 s)
+    and for the furl and the loosing by day (275 and 176 s), the take in and the set by day begun
+    by three with the cook (183 and 198 s)."""
+    from datetime import datetime
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, hour, 0))
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(30)
+    runner = world.ship.extra["evolutions"]
+    settee = world.ship.sails[SETTEE]
+    orders = ("take in the mainsail", "set the mainsail", "furl the mainsail", "set the mainsail")
+    ends = (SailState.IN_THE_GEAR, SailState.SET, SailState.FURLED, SailState.SET)
+    aloft = (False, False, True, True)
+    for order, end, up, secs in zip(orders, ends, aloft, times, strict=True):
+        start = world.clock.tick
+        assert world.submit(order).kind == "order.accepted", order
+        (work,) = [i for i in runner.instances if i.evo.id.endswith("_settee")]
+        posts = [h.post for h in work.assignment.hands if h.post]
+        assert posts == ([] if up else ["master"]), (order, posts)
+        for _ in range(900):
+            world.tick()
+            if not runner.in_progress():
+                break
+        took = world.clock.tick - start
+        lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+        assert settee.state is end and abs(took - secs) <= 10, (order, took)
+        assert not [ln for ln in lines if ln[1] in ("crew.all_hands", "crew.piped_down")], order
+        assert not [ln for ln in lines if ln[1] in ("evolution.waiting", "evolution.failed")]
+        n = "three" if up else deck
+        said = f"Only {n} hands to the mainsail; there are no more on deck."
+        assert (1, "evolution.short_handed", said) in lines, (order, lines[:4])
         world.run(30)
 
 
@@ -2058,10 +2431,14 @@ def test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again(
     in behind the furl had one call and one pipe-down before too, the pipe-down said before the
     take in's "done already" on that tick, where now after it; it guards the mend's second clause:
     with the conversion alone, the take in held the hands up and, done already, left them up
-    (measured in scratch)."""
+    (measured in scratch).
+    **Sailed on her eight as a save from before holds it** (`_her_eight`; the lead's ruling 8 of
+    2026-11-13), every figure above as it was: at nine her larboard watch of three with the master
+    begins each and nothing is called, so the road is pinned where a watch is too few, as here.
+    Old (before the ruling): her file's own company, the eight."""
     from datetime import datetime
 
-    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    world = _her_settle(15.0, eight=True, start_time=datetime(1805, 6, 1, 0, 0))
     assert world.submit("pipe down").kind == "crew.piped_down"
     world.run(30)
     runner = world.ship.extra["evolutions"]
@@ -2128,10 +2505,13 @@ def test_truth_7_198_her_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_an
     tick recorded and not pinned, only its order after the hoist (D13 (a); her review); at +400 s
     on the larboard tack 67.4 and 66.5 degrees off. **Rule 2's hands:** six at
     her dip, the tack's all hands (her two fore topmen, her two main topmen, the afterguard's hand
-    and the cook), the master and the mate on the quarterdeck. **Rule 5 in stays:** her settee is
-    never aback from helm's a-lee to "Tacked", where her main topsail is (the static case,
-    `test_rule_5_...`). Judged by her heading and tack at a set time, never by the "Tacked" line
-    (D13 (a))."""
+    and the cook), the master and the mate on the quarterdeck. At her nine (the lead's rulings 8
+    and 11 of 2026-11-13) seven, the afterguard's two among them, the posts still on the
+    quarterdeck (a manoeuvre is never a post's work), every other figure within its band (haul 92
+    and 93 s, lowered 151 and 159 s, down 161 and 182 ticks, at +400 s 67.4 and 66.6 off).
+    **Rule 5 in stays:** her settee is never aback from helm's a-lee to "Tacked", where her main
+    topsail is (the static case, `test_rule_5_...`). Judged by her heading and tack at a set
+    time, never by the "Tacked" line (D13 (a))."""
     from freesail.evolutions import scripts
 
     world = _her_settle(knots)
@@ -2172,8 +2552,8 @@ def test_truth_7_198_her_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_an
     assert sides[0] == "larboard" and sides[-1] == "starboard"
     assert hoisted is not None and tacked is not None and tacked >= hoisted  # the order alone
     assert at_dip == {
-        ("afterguard", "fore_top", "fore_top", "idlers", "main_top", "main_top")
-    }  # rule 2: six of her eight, the posts on the quarterdeck
+        ("afterguard", "afterguard", "fore_top", "fore_top", "idlers", "main_top", "main_top")
+    }  # rule 2: seven of her nine, the posts on the quarterdeck (old: six of her eight)
     assert backed == 0  # rule 5: never aback in her tack
     assert at_400[0] == "larboard" and abs(at_400[1] - 67.5) <= 5.0
 

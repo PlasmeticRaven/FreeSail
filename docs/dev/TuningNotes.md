@@ -21690,6 +21690,151 @@ post the rule put in a pool and took (a scratch pytest plugin wrapping `Runner._
   odd hand to the starboard), so her master works with the larboard's three at nearly every
   request: her own lines of who hauls, no test or truth of hers moved.
 
+### Ruling 8 on ruling 11: the bilander's nine (the second commit)
+
+- **Her company** (`tools/ships/bilander.py`, through the generator; her file alone of the
+  eighteen moves, every other byte for byte): complement 9 (old 8); her stations two in each top,
+  two in the afterguard (old one, the boy alone) and the cook; her shares as they were, so her six
+  seamen muster five able and the landsman boy. Her notes: the complement's (nine, JUDGEMENT within
+  the sourced range of eight to nine, the three sources by page: Macpherson, Annals of Commerce
+  vol. 4, pp. 287 and 331, England in 1793 and 1794, 13.8 and 14.0 tons a man, 9.3 and 9.1 at her
+  128 tons; the Transport Board's rule of 1797, Sutcliffe 2013 p. 30 citing TNA ADM 1/3733, eight
+  at her tons; TNA HCA 32's catalogue for 1776-83, British traders of 100 to 160 tons, a median of
+  8 short-sea and 10 Atlantic; D43's eight and the Nancy of Boston kept beside them as the old),
+  the afterguard's, the shares', the water's (nine men, three tons as before), the powder's and the
+  armed fit's words ("Her nine cannot man a side's guns, the helm and the sails together", as
+  measured: her guns want ten of her seven off the quarterdeck), and her description's "a trader of
+  nine hands" (old "eight"). The generator's report: "of her 7 hands off the quarterdeck the bill
+  tells off 2 trimmers and 1 at the helm first, and her guns want 10" (old 6).
+- **Her people file** (`data/people/bilander.yaml`): `watch: larboard` on the master and `watch:
+  starboard` on the mate (ruling 11, JUDGEMENT), its header "nine hands".
+- **Her watches as mustered at seed 7**: the starboard a fore topman, a main topman and the
+  afterguard's able seaman, the mate heading it; the larboard a fore topman, a main topman and the
+  boy, the master heading it; the cook keeps none (old: three, the boy the starboard's third, and
+  two).
+
+### Condition (c), measured: her watches' work, old (eight, bfb10c6f) beside new (nine)
+
+In memory at seed 7 off the Lizard, a fresh World for each cell (tests/test_brains.py's world, its
+start at the hour), the watch given the deck by the bill's override, all hands not called, her
+people made; each request made as `Runner.start` makes it and asked for its hands by the runner's
+own `_take_hands` (the all-hands call where its file says `too_few`), nothing ticked. "Short n/w":
+begun short-handed with n of the w it wants of her deck. By night (02:00) the idlers are below, by
+day (12:00) the cook is up.
+
+| Work (her files) | Wants, eight / nine | Starboard, night | Starboard, day | Larboard, night | Larboard, day |
+|---|---|---|---|---|---|
+| fore course, fore and main topsails, fore topgallant: set from the gear, taken in | 6 / 7 | 3/6 / 4/7 with the mate | 4/6 / 5/7 with the cook and the mate | waits (two) / 4/7 with the master | 3/6 (two and the cook) / 5/7 with the cook and the master |
+| jib, fore topmast staysail: set from the gear (the jib from furled alike) | 6 / 6 | 3/6 / 4/6, the mate | 4/6 / 5/6, the mate | waits / 4/6, the master | 3/6 / 5/6, the master |
+| jib, fore topmast staysail: taken in | 4 / 4 | 3/4 / 4/4 whole, the mate | 4/4 whole / 4/4 whole, no post | 2/4 / 4/4 whole, the master | 3/4 / 4/4 whole, no post |
+| the braces | 6 / 7 | 3/6 / 4/7, the mate | 4/6 / 5/7, the mate | waits / 4/7, the master | 3/6 / 5/7, the master |
+| the boat | 6 / 7 | 3/6 / 4/7, the mate | 4/6 / 5/7, the mate | all hands called to man her (ruling 10), waits / 4/7, the master | 3/6 / 5/7, the master |
+| the settee: set from the gear, taken in, dipped | 6 / 6 | 3/6 / 4/6, the mate | 4/6 / 5/6, the mate | all hands called, begun as all-hands work / 4/6, the master | 3/6 / 5/6, the master |
+| aloft: a topsail or the fore course loosed, a topsail furled | 5 / 6 | 3/5 / 3/6 | 3/5 / 3/6 | waits / 3/6 | waits / 3/6 |
+| aloft: the settee set from furled, furled | 5 / 6 | 3/5 / 3/6 | 3/5 / 3/6 | all hands called / 3/6 | all hands called / 3/6 |
+
+**Either watch at nine begins every request that is a watch's work on deck, by night and by day,
+with the master or the mate where its three are under the want** (taken after every hand, the
+cook first by day), and the work aloft with its three alone: condition (c) holds. Pinned:
+`test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_mate`, each
+watch by night and by day. Sailed at nine from her settle (15 kn), her larboard watch by night
+takes in her settee in 115 s, sets it from the gear in 125, furls it in 587 and sets it from
+furled in 377, and by day in 111, 120, 587 and 377 s, calling nobody (old, her eight: by night all
+hands called for each, 87, 100, 338 and 225 s; by day the take in and the set by three with the
+cook, 183 and 198, and the furl and the loosing with all hands, 275 and 176). Forced round hove to
+by night, the watch's three with the master dip the settee ("The watch dips the mainsail, lying
+against its mast.", dipped at +618 s; old, all hands called, +423 s), on her lee at +900 s, 61.7 m²
+and 2.68 kn. A wear ordered 29 s after "take in the mainsail" belays it in either watch and the
+post goes to the conn: the starboard wore her at +501 s and took in the settee at +559 s (old
++643), the larboard at +549 and +636 (old: the take in called all hands and the wear waited for
+it, +614).
+
+**What still calls all hands in her.** With her watches whole, nothing of a watch's work, on deck or
+aloft. The settee's `too_few: all hands` and the boat's `until manned` stay, for a watch short: with
+the afterguard's hand of the watch on deck sick (measured in memory, each watch by night and by
+day), her work on deck still begins with the two and the post; the settee set from furled and its
+furl, aloft where no post goes, call all hands (two of the six, under half); her square sails
+loosed or furled aloft wait for hands, their files carrying no key, as before.
+
+**A save from before loads with the company it holds.** A save of hers written at bfb10c6f (seed 7
+off the Lizard at 00:00, all hands called and plain sail set, piped down at 1,800 s, saved at
+1,860 s) loads in this tree from its checkpoint ("written by another build ... the game goes on
+from where it was saved, under this build's rules"): eight, its crew holding no watch for its posts
+to head, and "take in the mainsail" sailed 600 s on from it gives the old tree's lines, line for
+line. Replayed from its journal alone (no checkpoint, or one that cannot be read) she is mustered
+from her file as it is now: nine.
+
+### Condition (b): the tests that moved, every one the bilander's own (`tests/test_bilander.py`)
+
+Each with its old beside its new in its docstring or at its assertion.
+
+- **Her company:** `test_her_company_is_eight_with_two_in_the_main_top`, renamed
+  `test_her_company_is_nine_with_two_in_the_main_top`: (complement, names, seamen) (8, english, 5)
+  to (9, english, 6); the afterguard 1 to 2; her people file's watches and the complement note's
+  three sources asserted (new). `test_truth_7_197_...`'s company clause: 8 to 9.
+  `test_her_muster_at_seed_7_puts_four_topmen_aloft_and_the_boy_aft`: eight rows to nine, the
+  afterguard's able seaman added, each with its watch, the boy found as the afterguard's landsman,
+  the crew's watches for its posts. `test_her_boat_pumps_hold_and_stores`: the water's words for
+  nine men (its bound held at eight too).
+- **The generator's report:** `test_the_generator_writes_her_file_as_committed_and_reports_its_
+  checks`: "of her 6 hands off the quarterdeck" to "of her 7".
+- **Her quarters:** `test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit`, both
+  fits: unarmed, the trimmers four to five and the helm a fore topman to the afterguard's able
+  seaman ("the trimmers 4" to "the trimmers 5"); armed, No. 1 manned by the boy and a main topman
+  (one short) to the boy, a fore topman and a main topman (whole), the log's line the same. Its
+  name kept.
+- **Her helm and lie:** `test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways`
+  (its five cases): `CLOSE_HAULED_HELM` -1.14, +0.43, -4.91 to -2.26, -0.74, +0.45; her lie hove to
+  within its bands as before, figures recorded; in 20 kn the other yards braced up at the
+  heave-to again (old none). `test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_
+  tuned` (slow): her helm under plain sail -0.02 to -1.07, the headsails taken in +0.44 to +0.36,
+  6.52 kn abeam (old 6.20), the settee's -3.29 the same; her figures before the boy was a landsman,
+  as it happens.
+- **Truth 7-198's dip:** six of her eight to seven of her nine, the afterguard's two among them,
+  the posts on the quarterdeck; every other figure within its band.
+- **The wear after a settee order:** `test_a_wear_ordered_after_an_order_of_her_settee_begins_at_
+  once_and_keeps_the_order`: `[4-starboard-501-643]` to `[4-starboard-501-559]`, and
+  `[0-larboard-549-636]` new (her larboard watch now begins the take in).
+- **The settee's road where a watch is too few, sailed on her eight as a save from before holds it**
+  (`_her_eight`, a helper new; `_her_settle`'s `eight`), every figure and line as before:
+  `test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_with_hands`,
+  `test_in_her_larboard_watch_a_take_in_of_her_settee_calls_all_hands_and_a_wear_follows_it`,
+  `test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_with_the_larboard`,
+  `test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after` (both hours) and
+  `test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again` (its three cases).
+  At nine none of these cases calls all hands, so the road is pinned where a watch is too few: her
+  eight, which a save from before still is.
+- **New:** `test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_mate`
+  (each watch by night and by day), `test_at_nine_her_larboard_watch_works_her_settee_with_the_
+  master_and_calls_nobody` (00:00 and 08:00) and `test_forced_round_at_nine_her_larboard_watch_
+  dips_the_settee_with_the_master`.
+
+### The suites at the second commit
+
+- `tests/test_bilander.py` whole with the slow (`--slow`, `-n 4`): **76 passed** (1 minute).
+- The first commit's 29 files again, with `test_practice` (it reads these notes): **2,034 passed**
+  (6 minutes). Against the bases no outcome changed but `test_settee`'s file-set test (bfb10c6f's,
+  as before); the bilander's ten node ids not in the base are her renamed and new ones above. A
+  post was put in a pool in her own tests, the merchant brig's, the smack's and the crewed traders',
+  never the topsail schooner's.
+- The generator: the eighteen files byte for byte but hers; `tools/check_viewer_guns.py`'s test
+  and the guards that list every file among the 29. **ruff** `check` and `format --check` over
+  `freesail`, `tests` and `tools`: clean (385 files). Every changed file LF.
+- The whole tiers, the captain's trials and the four whole logs follow in the step's gate.
+
+### For the lead (ruling 8)
+
+- **Nine is JUDGEMENT**, within the sourced eight to nine; the sources bear on a trader of her tons
+  in her years, none on a bilander.
+- **With a hand of a watch short,** her square sails loosed or furled aloft wait for hands, as
+  every file without the key does; the settee's aloft work calls all hands. Whether a short watch
+  should call all hands for any sail aloft is not asked of this step.
+- **Her helm close-hauled and in the polar harness** are back at the figures of before the boy was a
+  landsman (1.07 of lee helm against 1.09, +0.36 with the headsails in): her trims done by three a
+  watch and the post. Measured, not tuned.
+- **The gate's generator check** ("every file but the bilander's identical") holds: with the posts'
+  watches in the people files no other ship file moves.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

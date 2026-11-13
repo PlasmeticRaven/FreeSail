@@ -1019,6 +1019,30 @@ order (old +316, two calls). With a group order the settee's call is still its o
 by night sets the settee with all hands and pipes down, its fore course and topsails waiting for the
 watch's two as before (for the lead). Figures in the same tuning notes, "The review's mends".*
 
+*At the lead's rulings 8 and 11 of 2026-11-13 (built 2026-11-13): **nine, her master and mate
+hauling where her watch is too small.** Her company is nine (ruling 8 of 01:15, built on ruling 11
+of 14:32): the master and the mate, six seamen (two in each top and two in the afterguard, an able
+seaman and the boy) and the cook, so that her watches are three and three, each a fore topman, a
+main topman and an afterguard hand. Nine is JUDGEMENT within the sourced range of eight to nine,
+the sources set beside it in her file's note: Macpherson's register figures for England in 1793
+and 1794 (Annals of Commerce, vol. 4, pp. 287 and 331: 13.8 and 14.0 tons a man, so 9.3 and 9.1
+at her 128 tons), the Transport Board's rule of 1797 (Sutcliffe 2013, p. 30, citing TNA ADM
+1/3733: eight at her tons), and the prize papers' catalogue for 1776-83 (TNA HCA 32: British
+traders of 100 to 160 tons, a median of eight men short-sea and ten on Atlantic voyages). Her
+master heads the larboard watch and her mate the starboard (her people file, JUDGEMENT), each
+counted a hand of it for work on deck only where the watch's three are under the work's want,
+never aloft, never for all hands, the manoeuvres or quarters (`Runner._working_posts`). Measured
+in memory at seed 7, each watch by night and by day, every request that is a watch's work on deck
+by her files begins with the watch: her courses and topsails from the gear and taken in, her head
+sails, the braces, the boat, her settee set from the gear, taken in and dipped, four by night with
+the post and five by day with the cook and the post (a head sail's take in of four begun whole).
+Her work aloft (loosing and furling, the settee from furled) is begun short by the watch's three
+alone. Nothing calls all hands with her watches whole; the settee's `too_few: all hands` stays,
+and with a hand of the watch sick its loosing and furling aloft call all hands (her square sails'
+waiting for hands, their files carrying no key). A save from before loads with the company it
+holds, her eight, its posts heading no watch. Figures in docs/dev/TuningNotes.md, "The lead's
+rulings 8 and 11, the working officers and the bilander's nine (package 75)".*
+
 ### 6.2 The people file (`data/people/bilander.yaml`, hand-written data)
 
 The smack's form: the master (post, the command), the mate (post), the boy (drawn, afterguard,
