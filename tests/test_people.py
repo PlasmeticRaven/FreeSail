@@ -652,9 +652,10 @@ def test_a_thing_is_made_from_words_with_a_place_and_nothing_more_and_shows_wher
 
 def test_free_lines_move_a_thing_within_reach_and_say_as_said_where_they_do_not():
     """`take`, `put`, `stow`, `hide`, `give`, `throw ... overboard` move a thing the words
-    name within the giver's reach; the rest, and every line that names nothing known or a
-    thing out of reach, is logged 'as said; nothing of the ship's changed' and moves
-    nothing. Each is a notable line in the words as used, journaled as the order it is."""
+    name within the giver's reach; the rest, and every line that names a thing out of reach,
+    is logged 'as said; nothing of the ship's changed' and moves nothing; a line that names
+    nothing known is refused (package 109). Each is a notable line in the words as used,
+    journaled as the order it is."""
     w = world_for()
     cap = w.people.captain
     packet = _packet(w)
@@ -666,10 +667,10 @@ def test_free_lines_move_a_thing_within_reach_and_say_as_said_where_they_do_not(
     )
     assert packet.place == "cabin" and not packet.keeper
     e = w.submit("give the letter to the pilot")
-    assert e.text == (
-        "By the captain, on the quarterdeck: gave the letter to the pilot, as said; nothing of "
-        "the ship's changed."
-    )
+    # package 109: no letter is known, and the order is refused saying so; it was "By the
+    # captain, on the quarterdeck: gave the letter to the pilot, as said; nothing of the
+    # ship's changed."
+    assert e.kind == "order.rejected" and "there is no letter that you know of" in e.text
     w.submit("go below")
     e = w.submit("Take the packet.")
     assert e.text == (
@@ -697,14 +698,19 @@ def test_free_lines_move_a_thing_within_reach_and_say_as_said_where_they_do_not(
     e = w.submit("throw the packet overboard")
     assert e.text.endswith("threw the packet overboard; the sealed packet went over the side.")
     assert packet.place == "overboard" and not packet.keeper
-    assert w.submit("take the packet").text.endswith("nothing of the ship's changed.")
+    # package 109: the packet over the side is found by no free line, and the refusal says
+    # where it went (it was "..., as said; nothing of the ship's changed.")
+    e = w.submit("take the packet")
+    assert e.kind == "order.rejected" and "The sealed packet went over the side." in e.text
     # journaled as orders, so that a replay says them again
     said = [t for _, a, t in w.journal if a == "captain"]
     assert "Take the packet." in said and "throw the packet overboard" in said
     # the sail's 'hand' is the sail's still, and 'hand ... to ...' a giving
     assert w.submit("hand the fore topsail").kind != "free.line"
     e = w.submit("hand the chart to the master")
-    assert e.kind == "free.line" and "handed the chart to the master, as said" in e.text
+    # package 109: no chart is a thing known, and the giving is refused (it was "handed the
+    # chart to the master, as said; ..."): 'hand ... to ...' is a giving still, not the sail's
+    assert e.kind == "order.rejected" and "there is no chart that you know of" in e.text
 
 
 def test_a_thing_given_goes_where_its_keeper_goes_and_a_held_person_takes_it_by_his_own_hand():
@@ -748,7 +754,9 @@ def test_a_thing_given_goes_where_its_keeper_goes_and_a_held_person_takes_it_by_
     # out of earshot: the officer below hears nothing of the captain's line on deck
     tools.call(w, OFFICER, "submit_order", {"text": "go below"})
     heard = len(h.agent.heard)
-    e = w.submit("read the orders")
+    # (package 109: 'read the orders' named no thing and is refused now; the packet in the
+    # officer's keeping is named, out of the captain's reach, and said)
+    e = w.submit("read the packet")
     assert e.data["heard_by"] == [] and len(h.agent.heard) == heard
 
 
