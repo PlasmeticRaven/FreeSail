@@ -16330,11 +16330,15 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
         "d-split:balearics",
         "d-split:ligurian-sea",  # package 111's step 2a: its east bound to 11.1466 E
         "d-split:salvages",
+        # package 106b: the box `morocco` last in the file, taking no water another box answers:
+        # the two regions west of 9 W split with Madeira's and the Canaries' boxes, by design
+        "d-split:morocco-sallee",
+        "d-split:morocco-mogador",
     }
+    # package 106b: "d-no-box:strait" no longer found, its water the box `morocco`'s (old: listed)
     assert {k for k in keys if k.startswith("d-no-box:")} == {
         "d-no-box:balearics",
         "d-no-box:biscay-south",
-        "d-no-box:strait",
         "d-no-box:ligurian-sea",  # package 111's step 2a: the strip 42.5 to 42.68 N east of 11 E
     }
 
