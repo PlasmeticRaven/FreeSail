@@ -21,11 +21,11 @@ source: "Smyth 1824 pp. 180-186, App. pp. xvii-xix; Purdy 1826 pp. 144-145; Nori
 datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
 
 outer_road:
-  feature: passaro-anchorage
-  name: the road north of Passaro
-  lat_deg: 36.7052
-  lon_deg: 15.1454
-  depth_fathoms: 12
+  feature: porto-palo
+  name: the entrance of Porto Paolo
+  lat_deg: 36.6697
+  lon_deg: 15.1239
+  depth_fathoms: 5
 anchorage:
   feature: porto-palo
   name: Porto Paolo
@@ -45,7 +45,7 @@ shore:
   lon_deg: 15.1330
 
 pilot:
-  station: passaro-anchorage
+  station: porto-palo
   cruising_nm: 2
   comes_off_by_night: false
   cutter: data/ships/cutter.yaml
@@ -103,6 +103,6 @@ crew_pool:
 closed_to: []
 
 tracks:
-  to_sea: [porto-palo, 36 38 N 15 08 E]
-  from_sea: [36 38 N 15 08 E, porto-palo]
+  to_sea: [porto-palo, 36 39 N 15 09 E, 36 38 N 15 10 E]
+  from_sea: [36 38 N 15 10 E, 36 39 N 15 09 E, porto-palo]
   in: [porto-palo]
