@@ -481,6 +481,7 @@ top of the highest spar stepped on it as drawn (a struck topmast's lower head, a
 | `main topgallant masthead` (and the others by mast and piece) | that piece's head | its mast's truck |
 | `jackstaff` | the bowsprit's cap end, `JACKSTAFF_M` (1.5 m, judgement) above it | not drawn, said |
 | `main rigging` (and the fore's, the mizen's) | halfway up that mast's weather shrouds, lashed flat to them | not drawn, said |
+| `main yardarm` (the lower yard's), `fore topsail yardarm` (a named yard's) | package 102: that yard's weather arm as drawn | not drawn |
 
 The words are 81's, offered to 76 through the lead for `colours.yaml`'s `where`, so that one shape
 serves both packages; **for the lead to carry to 76.**
@@ -494,7 +495,18 @@ rectangles and lines; the waving is 91's, on §6's road. Package 102 (step 1): t
 polygons (`polys`) drawn with the rest in the drawing's order; a `swallowtail` flag drawn with the
 notch taken out of its fly, each part cut in two at the middle by the notch's two edges (the cut
 `cut` of the fly, a third where the drawing gives none, judgement off the plates); a `triangle`
-tapered to a point at the middle of its fly. **Sizes** (judgement, question 7): an
+tapered to a point at the middle of its fly.
+
+**The signals flying (package 102, step 3).** The snapshot's `hoists` (the player's own ship's
+alone; no other ship's signals are served, the owner's ruling of 2026-11-11): each `{place, key,
+words, flags}`, its place word (the order's, 'make the signal No. 16 at the fore'; the private
+table's, 'at the fore yardarm'; else `main topgallant masthead`, judgement), the lookout's words
+for it, its flags uppermost first, each `{name, words, drawing}` with `drawing.kind` `flag` or
+`pendant`. Drawn down its halyard from its place, each flag one hoist and `SIGNAL_GAP_M` (0.15 m)
+under the one above; a signal flag's fly `SIGNAL_FLY_OF_BEAM` (0.3) of her beam, a signal
+pendant's `SIGNAL_PENDANT_OF_BEAM` (0.6), each hoist by its proportion (judgement). Gone with the
+next snapshot after it comes down. The frame is not widened for them: a hoist at a yardarm of
+the schooners and the hermaphrodite brig reaches up to a quarter of a metre beyond it. **Sizes** (judgement, question 7): an
 ensign's fly half her beam, a jack's half the ensign's, a pendant's length 0.6 of her main yard,
 the hoist by the drawing's proportion. In the painter's order a flag sorts at its own middle as a
 sail does. In the frame (§6): every place word's point the ship has, with the largest flag's fly

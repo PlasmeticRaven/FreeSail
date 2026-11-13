@@ -26654,6 +26654,32 @@ here); pace alone and last on the same files, 12 passed. No digest moved; no gam
 a hoist or the colours moved (the fixture's old-beside-new tests). The tree reported differs
 from 79926e7 by this paragraph alone.
 
+**Step 3: a hoist has its place and is seen.** `Hoist.place` ('' at the main, out of the
+pickle and the record while unset); the yardarm place words (`<mast> yardarm`, `<mast>
+<yard> yardarm`, the weather arm, JUDGEMENT) beside the mastheads; an order names a place at
+the end of its words; a private signal's place is in its words ('main topmast head' the main
+top masthead, 'mizen peak' the peak, 'ensign staff' the staff). Where no place is named a
+hoist flies at the main topgallant masthead (JUDGEMENT), the truck's pendant above it. The
+player's own hoists are served (`hoists` in the snapshot; the parity table's row: the reading
+`signals`) and drawn down the halyard, a signal flag's fly 0.3 of her beam, a pendant's 0.6,
+0.15 m of halyard between (all JUDGEMENT); a private reply's ensign at its own place. No
+other ship's hoist is served (3(c) struck). The frame is not widened: on the 13 hulls with a
+hoist of four at every place, a yardarm hoist reaches 0.12 m beyond it on the
+hermaphrodite brig and 0.25 m on the two schooners, nothing elsewhere. **Seen in the
+browser** (`tests/browser_plans/signals.yaml`, the blockade's frigate): No. 153 at the main
+topgallant masthead in the 1805 set, uppermost first (white with the blue cross, yellow red
+yellow, blue with the yellow saltire), gone when hauled down; No. 16 'at the fore' at the
+fore topgallant masthead; seen nearly end on from the beam, the wind on her quarter.
+
+**Step 3: the measure.** At 97d4650 (step 3 with the trunk at 06e1418, step 2 merged as
+7a3edd5, merged by a merge commit; the step's paragraph above): ruff check and format clean
+(382 files); the fast tier 7,499 passed, 1 xfailed, 0 failed; the slow tier of the touched
+files and of `test_known_truths` (step 2's eight and test_parity; `--slow -m "not pace"`) 604
+passed, 8 xfailed, 0 failed; pace alone and last on the same files, 12 passed. No digest
+moved; no game line about a hoist or the colours moved (a hoist with no place says "at the
+main" as before; the record and the pickle carry no place while unset). The tree reported
+differs from 97d4650 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
