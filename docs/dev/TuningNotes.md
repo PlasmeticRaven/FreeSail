@@ -28371,8 +28371,10 @@ huts", l. 4518), Arzila ("no trade carried on", l. 4206), Azamor ("not adapted t
 between Santa Cruz and Cape Bojador", which neither pilot names, l. 5007). **Dated rows**
 (package 105's form, seeding the port on its day): El Araiche's `closed_to` from 1780 and Santa
 Cruz's from 1773 (the Europeans and the Americans; Jackson's years, the days JUDGEMENT); Mazagan's
-holder Portugal's until 1769 (the day FROM MEMORY); Saffi's and Mazagan's markets, the corn cheap
-until Soliman's accession and dear after (the day FROM MEMORY); Mogador's market, pilot, yard and
+holder Portugal's until 1769 (the day FROM MEMORY); Saffi's and Mazagan's markets, the corn shipped
+abroad until Soliman's accession and cheap at home after his ban (Jackson l. 4524 to 4533; the
+day FROM MEMORY; first drafted the other way and corrected by the independent check of every
+citation, which found 12 of some 160 wanting, all mended); Mogador's market, pilot, yard and
 pool from its founding in 1760. **Decision 68**, in the heads of Rabat (Sallee's corsairs and the
 dungeon of its European captives; Rabat's walls built by enslaved Spaniards; Muley Ismael's black
 troops), Mogador (the ransom of the crews wrecked on the desert coast; the caravans' enslaved

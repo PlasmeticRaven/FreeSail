@@ -2,35 +2,35 @@
 # 106b, Morocco's Atlantic coast), on package 35's machinery; the marks are the features file's
 # (data/charts/features/morocco-mogador.yaml).
 #
-# Sources. Jackson 1809, l. 4722 to 4926: built by the Emperor Sidi Mohammed ben Abdallah in
-# 1760, its proper name Saweera; to draw the merchants he gave them ground to build on and let
-# them ship produce free of duty; the only port of the empire with a regular and uninterrupted
-# commerce with Europe, every person in it supported directly or indirectly by it; the island
-# south of the town about two miles round, the passage within it where ships anchor in ten or
-# twelve feet at ebb, ships of war and of great burden lying about a mile and a half west of the
-# Long Battery; a winter seldom passes without ships driven ashore by the south-west winds in
-# the Liali (l. 4922 to 4926: 20 December to 30 January old style; Purdy's 8 December to 18
-# January). Purdy 1825, pp. 155 to 156: the north passage between the town and the island,
-# close by the rocks in five fathoms; the best anchorage under the island; going out along the
-# bank on the south side, soon 4 then 10 fathoms; the tide at full and change at 4h, rising 10
-# to 12 feet (OCR doubtful), the current scarcely perceptible; Paddock (1800): a tenth taken of
-# every cargo landed, spirits and wine at a particular duty, the export duties paid at the gate;
-# the export of horses forbidden, mules, asses and horned cattle allowed at a duty; population
-# 10,000. Jackson ch. XI (l. 9341 to 10366), from the custom-house books: the exports of 1804
+# Sources. Jackson 1809, l. 4722 to 4926: built by the Emperor Sidi Mohammed ben Abdallah in 1760,
+# its proper name Saweera; to draw the merchants he gave them ground to build on and let them ship
+# produce free of duty; the only port of the empire with a regular and uninterrupted commerce with
+# Europe, every person in it supported directly or indirectly by it; the island south of the town
+# about two miles round, the passage within it where ships anchor in ten or twelve feet at ebb,
+# ships of war and of great burden lying about a mile and a half west of the Long Battery; a
+# winter seldom passes without ships driven ashore by the south-west winds in the Liali (l. 4922
+# to 4926: 20 December to 30 January old style; Purdy's 8 December to 18 January). Purdy 1825, pp.
+# 155 to 156: the north passage between the town and the island, close by the rocks in five
+# fathoms; the best anchorage under the island; going out along the bank on the south side, soon 4
+# then 10 fathoms; the tide at full and change at 4h, rising 10 to 12 feet (OCR doubtful), the
+# current scarcely perceptible; Paddock (1800): a tenth taken of every cargo landed, spirits and
+# wine at a particular duty, the export duties paid at the gate; and, Purdy's own, the export of
+# horses forbidden, mules, asses and horned cattle allowed at a duty, and the population computed
+# at 10,000. Jackson ch. XI (l. 9341 to 10366), from the custom-house books: the exports of 1804
 # (almonds, gum Barbary and gum of Soudan, bees' wax, goat skins, olive oil, cow and calf skins,
 # wool, ostrich feathers, elephants' teeth, dates) worth 127,679 pounds in Europe; the imports
 # (cloths, linens, iron, loaf sugar, tea, alum, copperas, Dutch knives, spices, Mexico dollars);
 # l. 10388 to 10413: the trade falling into the hands of a few Jews, subjects of the Emperor, the
-# French houses withdrawn for the British cruisers, the Americans' trade impeded in 1804 and
-# 1805 by a dispute with the Emperor and now resumed.
+# French houses withdrawn for the British cruisers, the Americans' trade impeded in 1804 and 1805
+# by a dispute with the Emperor and now resumed.
 #
 # What the sources say of captivity and slavery here, plainly (decision 68): Mogador was where
 # the crews wrecked on the desert coast to the south were brought when they were ransomed from
 # the Arabs who held them as slaves, the ransom paid through the British consul and the
 # merchants, often after one to five years (Jackson 1809, l. 10897 to 11178: of some two hundred
 # English seamen wrecked between 1790 and 1806, eighty redeemed; a hundred and fifty dollars
-# would buy each man's freedom; the present Emperor gives them up to the consul without
-# remuneration); and the caravans that brought the gum and the gold of Soudan to the port's
+# would buy each man's freedom if a fund were deposited at Mogodor for it; the present Emperor
+# gives them up to the consul without requiring an embassy and presents); and the caravans that brought the gum and the gold of Soudan to the port's
 # trade also brought enslaved Africans bought at Timbuctoo, sold in the markets of Fas and
 # Marocco (l. 11543 to 11650). People are no cargo of this market, and no scenario is built on it.
 #
@@ -114,13 +114,13 @@ market:
         - {good: wool, price: 17, origin: morocco, note: "Jackson 1809, ch. XI; JUDGEMENT"}
         - {good: gum, price: 45, origin: morocco, note: "Jackson 1809, ch. XI: gum Barbary 362,606 lb in 1804, and gum of Soudan by the caravans; JUDGEMENT"}
         - {good: dates, price: 14, origin: morocco, note: "Jackson 1809, ch. XI: Tafilelt dates; JUDGEMENT"}
-        - {good: cattle, price: 8, origin: morocco, note: "Purdy 1825 p. 156 (Paddock): horned cattle exported at a duty; JUDGEMENT"}
+        - {good: cattle, price: 8, origin: morocco, note: "Purdy 1825 p. 155: mules, asses and horned cattle permitted to be exported after a duty; JUDGEMENT"}
         - {good: woollens, price: 90, origin: britain, note: "Jackson 1809, ch. XI: cloths among the imports; JUDGEMENT"}
         - {good: linen, price: 92, origin: null, note: "Jackson 1809, ch. XI: linens, plattilias and creas; JUDGEMENT"}
         - {good: iron, price: 34, origin: null, note: "Jackson 1809, l. 9455: 10,661 bars in 1804; JUDGEMENT"}
         - {good: sugar, price: 100, origin: null, note: "Jackson 1809, ch. XI: loaf sugar 56,219 lb in 1804; JUDGEMENT"}
         - {good: tea, price: 260, origin: britain, note: "Jackson 1809, ch. XI: tea among the imports; JUDGEMENT"}
-        - {good: salt fish, price: 20, origin: morocco, note: "JUDGEMENT: the town grows nothing (Purdy 1825 p. 155) and Agadeer's fish is dried for the interior"}
+        - {good: salt fish, price: 20, origin: morocco, note: "JUDGEMENT: nothing grows at the town in sufficient quantity to supply the inhabitants (Purdy 1825 p. 155) and Agadeer's fish is dried for the interior"}
     since: 1760-01-01
     source: "Jackson 1809, l. 4716 to 4920 and ch. XI: the port's trade from its founding in 1760; the figures of 1804; the day JUDGEMENT"
 

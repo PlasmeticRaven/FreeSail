@@ -17535,8 +17535,9 @@ def test_truth_7_556_the_business_trades_cotton_south_and_almonds_and_fish_north
 
 def test_truth_7_557_the_ports_rows_seed_each_port_on_its_day():
     """The brief's item 3 and decision 69: each port's dated rows read on a scenario's first
-    day, the port then the world's. Saffi's and Mazagan's corn cheap under Sidi Mohammed and
-    dear since Soliman forbade its export (Jackson 1809, l. 4524 to 4527); Mogador's market
+    day, the port then the world's. Saffi's and Mazagan's corn shipped abroad under Sidi Mohammed
+    and cheap at home since Soliman forbade its export, the land lying fallow (Jackson 1809, l.
+    4524 to 4533); Mogador's market
     from its founding in 1760; El Araiche open to the Europeans in 1775 and closed in 1805."""
     from freesail.world import ports as PT
 
@@ -17544,7 +17545,7 @@ def test_truth_7_557_the_ports_rows_seed_each_port_on_its_day():
     for pid in ("safi", "mazagan"):
         before = PT.load_port(root / f"{pid}.yaml", when=datetime(1785, 6, 1))
         after = PT.load_port(root / f"{pid}.yaml", when=datetime(1805, 6, 1))
-        assert after.market.goods["wheat"].price >= 1.5 * before.market.goods["wheat"].price
+        assert before.market.goods["wheat"].price >= 1.5 * after.market.goods["wheat"].price
     assert "almonds" in PT.load_port(root / "mogador.yaml", when=datetime(1805, 6, 1)).market.goods
     assert not PT.load_port(root / "mogador.yaml", when=datetime(1750, 6, 1)).market.goods
     larache = root / "larache.yaml"

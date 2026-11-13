@@ -7,7 +7,7 @@
 #                   'Tangier to Rabat' and 'Rabat to Mogodor', 'Mogodor to Cape Noon', pp. 152
 #                   to 157 (l. 22171 to 22620), cited by page; it quotes Jackson for Sallee.
 #   Jackson 1809    James Grey Jackson, An Account of the Empire of Marocco, 1809
-#                   (pilots/jackson-1809-account-empire-marocco-ocr.txt), ch. V, the seaports
+#                   (pilots/jackson-1809-account-empire-marocco-ocr.txt), ch. VII, the seaports
 #                   (l. 4055 to 5065), cited by line of the OCR (the pages are not printed in it).
 #
 # No light stood on this coast in 1805 by any source on file, and none is entered. Positions
@@ -87,7 +87,7 @@ features:
     height_m: 0
     depth_fathoms: 6
     bottom: "sand"
-    source: "Jackson 1809, l. 4512 to 4514 (Purdy 1825, p. 153): the only road, with Agadeer's, where ships may ride in security in winter; Purdy p. 153: from the S.W. end of Fedala a rocky bank stretches about three miles W.N.W., with 15 to 30 fathoms, rocky ground, 2 to 5 miles off; the depth the grid's and the bottom JUDGEMENT"
+    source: "Jackson 1809, l. 4512 to 4514 (Purdy 1825, p. 153): the only road, with Agadeer's, where ships may ride in security in winter; Purdy p. 153: from the S.W. end of Fedala a rocky bank stretches about three miles to the west [W.S.W.], with 15 to 30 fathoms, rocky ground, 2 to 5 miles off; the depth the grid's and the bottom JUDGEMENT"
     says: "Fedala road under the peninsula, sheltered in winter for small vessels; a rocky bank runs three miles west-north-west from its south-west end."
     fix: "under the peninsula in the grid's 11 m (6 fathoms), JUDGEMENT"
   - id: dar-el-beida
@@ -106,7 +106,7 @@ features:
     lat_deg: 33.2900
     lon_deg: -8.3420
     height_m: 20
-    source: "Jackson 1809, l. 4541 to 4548: forty-four miles south of Dar el Beida, at the entrance of the Morbeya, not adapted to commerce, the entrance being dangerous; Purdy 1825, p. 154: the shore flat, not above 8 or 10 fathoms for a league or a league and a half from shore, and foul rocky ground, so that it is not safe to anchor hereabout"
+    source: "Jackson 1809, l. 4541 to 4548: forty-four miles south of Dar el Beida, at some distance from the mouth of the Morbeya, not adapted to commerce, the entrance of the river being dangerous; Purdy 1825, p. 154: the town at the entrance of the river Morbeya; the shore flat, not above 8 or 10 fathoms for a league or a league and a half from shore, and foul rocky ground, so that it is not safe to anchor hereabout"
     says: "Azamor at the Morbeya's mouth, a dangerous entrance: the shore flat and foul, no anchorage off it."
   - id: mazagan
     kind: town
@@ -166,7 +166,7 @@ features:
     lon_deg: -9.2600
     height_m: 0
     extent_m: 300
-    source: "Purdy 1825, p. 154: a ledge of rocks projecting from the cape; p. 155: if bound to Asfee from the northward, shape a course well to the westward of Cape Cantin to avoid the rocks about that cape; the head at the datum, the pilot giving no figure"
+    source: "Purdy 1825, p. 154: a ledge of rocks projecting from the cape; p. 154: if bound to Asfee from the northward, shape a course well to the westward of Cape Cantin to avoid the rocks about that cape; the head at the datum, the pilot giving no figure"
     says: "The rocks off Cape Cantin: keep well to the westward of the cape."
     fix: "the grid's shoal head north-east of the cape (2.8 m)"
   - id: safi
@@ -186,6 +186,6 @@ features:
     height_m: 0
     depth_fathoms: 16
     bottom: "fine grey sand"
-    source: "Purdy 1825, pp. 154 to 155: the bay nearly three leagues wide; to anchor in the road bring the North point, with its low tower, a little north of N.N.E., the high castle S.E. by E. or S.E., in 16 to 18 fathoms, fine grey sand; anchorage within in 15 fathoms; these the summer roads, in winter anchor farther off in 20 or 22 fathoms; Jackson 1809, l. 4646 to 4649: safe in summer, but in winter with the wind south or south-west vessels must run to sea, some several times in a month while loading"
+    source: "Purdy 1825, p. 154: the bay nearly three leagues wide; to anchor in the road bring the North point, with its low tower, a little north of N.N.E., the high castle S.E. by E. or S.E., in 16 to 18 fathoms, fine grey sand; anchorage within in 15 fathoms; these the summer roads, in winter anchor farther off in 20 or 22 fathoms; Jackson 1809, l. 4646 to 4649: safe in summer, but in winter with the wind south or south-west vessels must run to sea, some several times in a month while loading"
     says: "Saffi's summer road in sixteen to eighteen fathoms, fine grey sand, the castle south-east: in winter lie out in twenty, and be ready to run when it blows from the south-west."
     fix: "moved 800 m west of the first place to the grid's 28 m (15.5 fathoms)"

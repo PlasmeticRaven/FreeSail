@@ -1,7 +1,7 @@
 # FreeSail: Saffi, or Asfee (package 106b, Morocco's Atlantic coast), on package 35's
 # machinery; the marks are the features file's (data/charts/features/morocco-sallee.yaml).
 #
-# Sources. Purdy 1825, pp. 154 to 155: the antient town in lat 32 20 between two hills; the road
+# Sources. Purdy 1825, p. 154: the antient town in lat 32 20 between two hills; the road
 # safe in summer, but in winter with the wind south or south-west vessels are frequently obliged
 # to make off to sea; the bay nearly three leagues wide; the summer road with the North point and
 # its low tower a little north of N.N.E. and the high castle S.E. by E. or S.E., in 16 to 18
@@ -14,14 +14,15 @@
 # known run to sea several times in a month while loading; l. 3728: 12,000 people.
 #
 # The datum: UNVERIFIED (no period plan read). Dated rows (decision 67, package 105's form;
-# decision 69): the market's corn cheap until Soliman's accession and dear after, his
-# prohibition of the export of grain (Jackson 1809, l. 4524 to 4527; the day FROM MEMORY,
+# decision 69): the market's corn shipped abroad until Soliman's accession and cheap at home
+# after his prohibition of the export of grain (Jackson 1809, l. 4524 to 4533: the land lying
+# fallow, corn so cheap after 1800 that husbandmen let their crops stand; the day FROM MEMORY,
 # UNVERIFIED), as Mazagan's. Prices FROM MEMORY or JUDGEMENT, in sterling.
 
 id: safi
 name: Saffi
 nation: morocco
-source: "Purdy 1825, pp. 154 to 155; Jackson 1809, l. 4634 to 4692"
+source: "Purdy 1825, p. 154; Jackson 1809, l. 4634 to 4692"
 datum: unverified
 
 outer_road:
@@ -78,7 +79,7 @@ market:
   - market:
       currency: pounds
       goods:
-        - {good: wheat, price: 7, origin: morocco, note: "Purdy 1825 p. 154 and Jackson 1809 l. 4686 to 4692: the country abounds in corn; a place of considerable trade in it; JUDGEMENT"}
+        - {good: wheat, price: 11, origin: morocco, note: "Purdy 1825 p. 154 and Jackson 1809 l. 4686 to 4692: the country abounds in corn; a place of considerable trade in it; the price, with the shippers' demand, JUDGEMENT"}
         - {good: barley, price: 5, origin: morocco, note: "JUDGEMENT"}
         - {good: wax, price: 70, origin: morocco, note: "JUDGEMENT"}
         - {good: wool, price: 17, origin: morocco, note: "JUDGEMENT"}
@@ -95,7 +96,7 @@ market:
   - market:
       currency: pounds
       goods:
-        - {good: wheat, price: 14, origin: morocco, note: "Jackson 1809, l. 4524 to 4527: the export of grain prohibited since the present Emperor's accession; the price JUDGEMENT"}
+        - {good: wheat, price: 6, origin: morocco, note: "Jackson 1809, l. 4524 to 4533: the export of grain prohibited since the present Emperor's accession, the land lying fallow, and after the famine of 1800 corn so cheap that husbandmen let their crops stand; the price JUDGEMENT"}
         - {good: barley, price: 8, origin: morocco, note: "JUDGEMENT"}
         - {good: wax, price: 70, origin: morocco, note: "JUDGEMENT"}
         - {good: wool, price: 17, origin: morocco, note: "JUDGEMENT"}

@@ -15,8 +15,8 @@
 # The datum: UNVERIFIED (no period plan read). Dated rows (decision 67, package 105's form;
 # decision 69: they seed the port on the scenario's first day): the holder Portugal's until the
 # evacuation of 1769 (the year Jackson's; the day, 11 March, FROM MEMORY, UNVERIFIED) and the
-# Emperor's after; the market's corn cheap under Sidi Mohammed and dear since his son
-# Soliman's accession forbade its export (Jackson 1809, l. 4524 to 4527; the day of the
+# Emperor's after; the market's corn shipped abroad under Sidi Mohammed and cheap at home since
+# his son Soliman's accession forbade its export (Jackson 1809, l. 4524 to 4533; the day of the
 # accession, 1 March 1792, FROM MEMORY, UNVERIFIED; the reign of Yazid between is the first
 # row's). Prices FROM MEMORY or JUDGEMENT, in sterling.
 
@@ -82,7 +82,7 @@ market:
   - market:
       currency: pounds
       goods:
-        - {good: wheat, price: 7, origin: morocco, note: "Jackson 1809, l. 4594 to 4596: the export of corn very considerable in Sidi Mohammed's time; JUDGEMENT"}
+        - {good: wheat, price: 11, origin: morocco, note: "Jackson 1809, l. 4594 to 4596: the export of corn very considerable in Sidi Mohammed's time; the price, with the shippers' demand, JUDGEMENT"}
         - {good: barley, price: 5, origin: morocco, note: "JUDGEMENT"}
         - {good: wax, price: 70, origin: morocco, note: "Jackson 1809, l. 4594 to 4596: the export of wax very considerable; JUDGEMENT"}
         - {good: hides, price: 20, origin: morocco, note: "JUDGEMENT"}
@@ -98,7 +98,7 @@ market:
   - market:
       currency: pounds
       goods:
-        - {good: wheat, price: 14, origin: morocco, note: "Jackson 1809, l. 4524 to 4527: the export of grain prohibited since the present Emperor's accession, the land lying fallow; the price JUDGEMENT"}
+        - {good: wheat, price: 6, origin: morocco, note: "Jackson 1809, l. 4524 to 4533: the export of grain prohibited since the present Emperor's accession, the land lying fallow, and after the famine of 1800 corn so cheap that husbandmen let their crops stand; the price JUDGEMENT"}
         - {good: barley, price: 8, origin: morocco, note: "JUDGEMENT"}
         - {good: wax, price: 70, origin: morocco, note: "JUDGEMENT"}
         - {good: hides, price: 20, origin: morocco, note: "JUDGEMENT"}

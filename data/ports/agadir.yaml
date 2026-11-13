@@ -5,7 +5,7 @@
 # Sources. Purdy 1825, p. 157: the town about 5 leagues south-eastward of Cape Geer at the
 # bottom of its bay, on the summit of a mountain, strong by nature, its principal battery below
 # guarding a spring of fresh water close to the sea, the Portuguese Fonte at the foot; the bay
-# the best road on the coast of Marocco, large and well sheltered, abounding in fish, dried in
+# the best road on the coast of Marocco, large and well sheltered, abounding in fish, prepared in
 # ovens for the interior; owing to the jealousy of its government Agadeer has ceased to be a
 # place of trade, though formerly the centre of a very extensive commerce, the caravans
 # constantly passing to and from Timbuctoo; the road's directions (the features file). Jackson
@@ -14,8 +14,8 @@
 # '177s', the last digit uncertain) when the inhabitants became refractory and the governor Talb
 # Solh refused to deliver it up; after its surrender the merchants were allowed a short time to
 # collect their effects and ordered to Mogodor; l. 4512 to 4514: with Fedala's the only road
-# where ships ride in security in winter; l. 1101 and 11409: Jackson himself resided three years
-# at Santa Cruz; l. 3731: 300 people.
+# where ships ride in security in winter; l. 1101: Jackson himself resided three years
+# at Santa Cruz, and l. 11409 had a commercial establishment at Agadeer; l. 3731: 300 people.
 #
 # What the sources say of captivity and slavery here, plainly (decision 68): the caravans that
 # made Agadeer's commerce under Muley Ismael passed to and from Timbuctoo, and the returns from
@@ -121,11 +121,12 @@ closed_to:
   - {closed_to: [britain, france, spain, portugal, batavian-republic, united-states, denmark, sardinia, naples, etruria, liguria, papal-state, order-of-st-john], since: 1773-01-01, source: "Jackson 1809, l. 4966 to 4991 (Purdy 1825, p. 157): after the governor's refusal to deliver it up in 1773 (the OCR's last digit uncertain) the merchants were ordered to Mogodor, and Agadeer ceased to be a place of trade; the day JUDGEMENT"}
 
 # The tracks (package 40's form; packages 101 and 104's lesson: a coast of capes wants every
-# port's way out to a lane): the coast bulges seaward at Cape Cantin, and a straight line from
-# the northern ports to this one crosses it; out by the road to the offing west of Cape Geer (30 36 N 10 12 W, JUDGEMENT, clear of its reef) and to the common mark off Cape Cantin
-# (32 36 N 9 36 W, JUDGEMENT, ten miles west of the cape and its ledge), and in by the same way
-# reversed, each leg checked clear of the shore by a cable with `Chart.line_shore` as the
-# business's guard reads it; the least depth at datum along each leg in docs/dev/TuningNotes.md.
+# port's way out to a lane): the coast bulges seaward at Cape Cantin, and a straight line from the
+# northern ports to this one crosses it; out by the road to the offing west of Cape Geer (30 36 N
+# 10 12 W, JUDGEMENT, clear of its reef) and to the common mark off Cape Cantin (32 36 N 9 36 W,
+# JUDGEMENT, ten miles west of the cape and its ledge), and in by the same way reversed, each leg
+# checked clear of the shore by a cable with `Chart.line_shore` as the business's guard reads it;
+# the least depth at datum along each leg in docs/dev/TuningNotes.md.
 tracks:
   to_sea: [agadir-road, 30 36.0 N 10 12.0 W, 32 36.0 N 9 36.0 W]
   from_sea: [32 36.0 N 9 36.0 W, 30 36.0 N 10 12.0 W, agadir-road]
