@@ -21,7 +21,7 @@ lookout and the orders say.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -568,3 +568,269 @@ def vessel_flies_words(world: Any, vessel: Any) -> str:
     if not c.shows or not c.nation:
         return ""
     return flies_words(vessel_flies(world, vessel), getattr(world, "nations", None), c.nation)
+
+
+# ---------------------------------------------------------------------------
+# Package 102 (step 2): the signal flags of every book, drawn
+# ---------------------------------------------------------------------------
+
+SIGNAL_FLAGS_FILE = "flags.yaml"
+# How a flag's drawing was had: from a page image of the period's or of Perrin's plates
+# (`plate`), or the builder's own from the book's words or from nothing (`made`)
+MARKS = ("plate", "made")
+# A signal flag is a flag or a pendant (a pendant drawn tapering, as the colours' pendant is)
+SIGNAL_KINDS = ("flag", "pendant")
+
+
+@dataclass(frozen=True)
+class SignalFlag:
+    """One drawing of a signal flag: its name in the root's file (the name a hoist holds),
+    its words, its drawing in the colours' form, the years it was flown by that drawing (one
+    flag may have several, each its own row: Britain's numerals changed in 1793, 1799 and
+    1803), whether it was drawn from a plate or made, and its source by leaf."""
+
+    name: str
+    words: str
+    flag: Flag  # the drawing, in colours.yaml's form (its kind 'pendant' for a pendant's taper)
+    dates: str
+    mark: str
+    source: str
+
+    def flown_in(self, year: int) -> bool:
+        return _in_dates(self.dates, year)
+
+
+def _in_dates(dates: str, year: int) -> bool:
+    """Whether `year` falls in "1799-1803", "1804-", "-1792", "1805" or "" (always)."""
+    d = str(dates or "").strip()
+    if not d:
+        return True
+    lo, sep, hi = d.partition("-")
+    if not sep:
+        return int(lo) == year
+    return (not lo or year >= int(lo)) and (not hi or year <= int(hi))
+
+
+def _dates_distance(dates: str, year: int) -> int:
+    """How many years `year` lies outside the dates (0 within them)."""
+    d = str(dates or "").strip()
+    if not d:
+        return 0
+    lo, sep, hi = d.partition("-")
+    lo_y = int(lo) if lo else -(10**6)
+    hi_y = (int(hi) if hi else 10**6) if sep else lo_y
+    return max(0, lo_y - year, year - hi_y)
+
+
+@dataclass(frozen=True)
+class SignalFlagsFile:
+    root: str
+    sources: tuple[str, ...]
+    rows: tuple[SignalFlag, ...]
+
+    def names(self) -> set[str]:
+        return {r.name for r in self.rows}
+
+    def drawing_of(self, name: str, year: int) -> SignalFlag | None:
+        """The flag's drawing in `year`: the row whose dates hold it, else the nearest (a
+        world on a day the data does not date answers with the nearest picture and does not
+        refuse: decision 66); None where the file has no such flag."""
+        rows = [r for r in self.rows if r.name == name]
+        if not rows:
+            return None
+        return min(rows, key=lambda r: (_dates_distance(r.dates, year), -_first_year(r.dates)))
+
+
+def _first_year(dates: str) -> int:
+    lo = str(dates or "").partition("-")[0].strip()
+    return int(lo) if lo else 0
+
+
+@cache
+def load_signal_flags(root: str = "basic", base: str | None = None) -> SignalFlagsFile:
+    """A root's signal flags (`data/signals/<root>/flags.yaml`), read once; a root with no
+    file has none of its own (the basic root's are read after it, `signal_flag`)."""
+    folder = (Path(base) if base else SIGNALS_DIR) / root
+    path = folder / SIGNAL_FLAGS_FILE
+    if not path.exists():
+        return SignalFlagsFile(root=root, sources=(), rows=())
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    colours = None
+    rows = []
+    for i, f in enumerate(raw.get("flags") or []):
+        if not isinstance(f, dict) or not f.get("name"):
+            raise BookFileError(f"{path}: flag {i + 1} wants a name")
+        name = str(f["name"])
+        mark = str(f.get("mark") or "")
+        if mark not in MARKS:
+            raise BookFileError(f"{path}: flag {name!r}: mark is one of {MARKS}, not {mark!r}")
+        if not f.get("source"):
+            raise BookFileError(f"{path}: flag {name!r} wants its source")
+        same = str(f.get("same") or "")
+        if same:
+            # the drawing of a flag of the colours (the union jack, an ensign)
+            colours = colours or load_colours(root, base)
+            if same not in colours.flags:
+                raise BookFileError(f"{path}: flag {name!r}: the colours have no {same!r}")
+            drawn = colours.flags[same]
+        else:
+            kind = str(f.get("kind") or "flag")
+            if kind not in SIGNAL_KINDS:
+                raise BookFileError(f"{path}: flag {name!r}: kind is one of {SIGNAL_KINDS}")
+            # read in the colours' form (its parts, its shape), then given its own kind
+            one = _file({"flags": [{**f, "kind": "truce"}]}, path, root).flags[name]
+            drawn = replace(one, kind=kind)
+        rows.append(
+            SignalFlag(
+                name=name,
+                words=str(f.get("words") or name),
+                flag=drawn,
+                dates=str(f.get("dates") or ""),
+                mark=mark,
+                source=str(f["source"]),
+            )
+        )
+    for r in rows:
+        if r.dates:
+            lo, _, hi = r.dates.partition("-")
+            for y in (lo, hi):
+                if y and not y.strip().isdigit():
+                    raise BookFileError(f"{path}: flag {r.name!r}: dates {r.dates!r} not years")
+    return SignalFlagsFile(
+        root=root, sources=tuple(str(s) for s in raw.get("sources") or []), rows=tuple(rows)
+    )
+
+
+def signal_flag(root: str, name: str, year: int) -> SignalFlag | None:
+    """A signal flag's drawing in `year`, from the root's own file and, failing it, the basic
+    root's (the private tables' plain flags are drawn once there)."""
+    found = load_signal_flags(root).drawing_of(name, year)
+    if found is None and root != "basic":
+        found = load_signal_flags("basic").drawing_of(name, year)
+    return found
+
+
+# The names a hoist's flags go by in every root's flags.yaml
+NUMERAL = "numeral {}"  # 'numeral 1' ... 'numeral 0'
+SUBSTITUTES = ("substitute", "second substitute", "third substitute")
+TABLE_FLAG = "table flag {}"  # 'table flag 1' ... 'table flag 20' (France, Spain)
+# a repeated table flag: Mazarredo's universal flag "igual á todas" (the plan), Audibert's
+# zero "égal à tous" (Pl. 3): the one flag that stands for the flag it flies with
+UNIVERSAL = "universal flag"
+ANSWERING = "answering pendant"
+TELEGRAPH = "telegraph flag"
+HUNDRED = "hundred pendant"
+THOUSAND = "thousand pendant"
+ADDED = "added pendant"  # Spain's: the signals added below the table (book.yaml), JUDGEMENT
+# The private signal's words: 'a blue pendant at the fore yardarm' (each root's private.yaml)
+_PRIVATE = re.compile(
+    r"^an? (?P<flag>.+?) at the (?P<place>[a-z ]+?)"
+    r"(?:, with the ensign at the (?P<ensign>[a-z ]+))?$"
+)
+
+
+def _digits(number: int, units_first: bool = False) -> list[str]:
+    """A number as numeral flags, the first written figure uppermost (the 1796 book, leaf 31:
+    "the one answering to the Figure in any Number placed first in Writing, will be always
+    hoisted uppermost"); Barry's book the units uppermost (his Essay, No. 214 by the red for
+    the unit over the blue for the tens over the yellow for the hundreds). A figure a second
+    time the substitute, a third time the second substitute (Perrin p. 178: "one or two
+    substitute flags"; the United States' three repeaters)."""
+    figures = list(str(int(number)))
+    if units_first:
+        figures.reverse()
+    out: list[str] = []
+    seen: dict[str, int] = {}
+    for f in figures:
+        n = seen.get(f, 0)
+        seen[f] = n + 1
+        out.append(NUMERAL.format(f) if n == 0 else SUBSTITUTES[min(n - 1, 2)])
+    return out
+
+
+def numerary_flags(root: str, number: int) -> list[str]:
+    """The flags of a numbered signal in a book of the numerary form, uppermost first."""
+    if root == "united-states":
+        return _digits(number, units_first=True)
+    if root == "britain" and int(number) == 111:
+        # the hundred pendant over 1 and the substitute (the 1796 book, leaf 31: the pendant
+        # "adds 100 to the Expression assigned to the Numeral Flag or Flags with which it is
+        # at the same Time hoisted"), the one set of numerals holding no third 1
+        return [HUNDRED, *_digits(11)]
+    return _digits(number)
+
+
+def table_flags(root: str, number: int) -> list[str]:
+    """The flags of a numbered signal in a book of the table form (France's, Spain's), the
+    upper over the lower: the cell's row the upper and its column the lower, twenty to a row
+    (JUDGEMENT: Audibert § 71 reads the cell by the upper flag's row and the lower's column
+    and gives no numbering; the rows taken in order); the lower the universal where it would
+    be the upper again. Spain: 401 to 420 one flag alone (Mazarredo's signals of one flag),
+    421 the universal alone (the annulment), and the meanings added after (made) the added
+    pendant over one flag (JUDGEMENT on the book's "pendants outside the table, for the
+    signals added below")."""
+    n = int(number)
+    if root == "spain" and 400 < n <= 420:
+        return [TABLE_FLAG.format(n - 400)]
+    if root == "spain" and n == 421:
+        return [UNIVERSAL]
+    if root == "spain" and n > 421:
+        return [ADDED, TABLE_FLAG.format((n - 421 - 1) % 20 + 1)]
+    upper, lower = (n - 1) // 20 % 20 + 1, (n - 1) % 20 + 1
+    return [TABLE_FLAG.format(upper), UNIVERSAL if lower == upper else TABLE_FLAG.format(lower)]
+
+
+def telegraphic_word_flags(number: int) -> list[str]:
+    """Popham's word: its numerals under the telegraph flag; a number of the thousands with a
+    pendant over the hoist (Perrin p. 178: "numbers between 1000 and 2000 by a ball or pendant
+    placed above the hoist ... and numbers above 2000 by a similar ball or pendant placed
+    below"; which pendant not read: JUDGEMENT, `thousand pendant`)."""
+    n = int(number)
+    if n >= 2000:
+        return [TELEGRAPH, *_digits(n % 1000), THOUSAND]
+    if n >= 1000:
+        return [TELEGRAPH, THOUSAND, *_digits(n % 1000)]
+    return [TELEGRAPH, *_digits(n)]
+
+
+def private_parts(shown: str) -> tuple[str, str, str]:
+    """(the flag's words, its place's words, the ensign's place's words or '') from a private
+    signal's words ('a blue pendant at the fore yardarm, with the ensign at the mizen peak');
+    ('', '', '') when the words are none of that form (a light by night)."""
+    m = _PRIVATE.match(str(shown or "").strip())
+    if not m:
+        return "", "", ""
+    return m.group("flag"), m.group("place"), m.group("ensign") or ""
+
+
+def hoist_flags(hoist: Any, tick: int | None = None) -> list[str]:
+    """The names of the flags a hoist holds, uppermost first, as its root's flags.yaml names
+    them: the numerals of its number (the first number: the lookout's words count those), two
+    table flags a number in a table book, the telegraph flag over the word now flying, the
+    answering pendant, the private signal's flag; [] for the night's lights and the fog's guns,
+    which are no flags."""
+    book = str(getattr(hoist, "book", ""))
+    root = str(getattr(hoist, "root", "basic") or "basic")
+    numbers = tuple(getattr(hoist, "numbers", ()) or ())
+    if book in ("numerary", "convoy") and numbers:
+        if str(getattr(hoist, "form", "numerary")) == "table":
+            out: list[str] = []
+            for n in numbers:
+                out += table_flags(root, n)
+            return out
+        return numerary_flags(root, numbers[0])
+    if book == "telegraphic" and numbers:
+        # a word a hoist, each a hoist's minute after the one before (`_telegraphic`), the
+        # word before hauled down as the next goes up; the last kept until the whole comes down
+        i = len(numbers) - 1
+        if tick is not None and len(numbers) > 1:
+            first = int(getattr(hoist, "breaks_out", 0))
+            step = max(1, (int(getattr(hoist, "done_at", first)) - first) // (len(numbers) - 1))
+            i = max(0, min(len(numbers) - 1, (int(tick) - first) // step))
+        return telegraphic_word_flags(numbers[i])
+    if book == "answer":
+        return [ANSWERING]
+    if book in ("private", "reply"):
+        flag, _, _ = private_parts(str(getattr(hoist, "shown", "")))
+        return [flag] if flag else []
+    return []

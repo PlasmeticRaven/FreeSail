@@ -16064,6 +16064,16 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
 
 
+@pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
+def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
+    """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
+    its book.yaml declares, has a drawing in its flags.yaml (or basic's), marked `plate` or
+    `made` with its source; Britain's numerals by the year from Perrin's Plate XIII."""
+    from tests.test_flag_drawings import test_every_flag_a_hoist_can_hold_has_a_drawing as c
+
+    c(root)
+
+
 # -- Package 109: the mends from the owner's play of 2026-11-12 -----------------------------
 
 

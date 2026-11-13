@@ -1,0 +1,174 @@
+# FreeSail: the United States' signal flags drawn (package 102, step 2;
+# docs/design/Design-Signals.md, "The signal flags drawn"). The shape of
+# data/signals/britain/flags.yaml (its head says the fields). No figure was found: **every flag
+# here is made**, from Barry's words (his example's red unit, blue tens and yellow hundreds) and
+# Preble's account of the squadron's books of 1803-1804 (ten numerals, three triangles as
+# repeaters, a cornet, an answering flag, the diptote). A numbered signal flies its units
+# uppermost, as Barry's Essay has it.
+
+nation: united-states
+sources:
+  - "Barry, A Set of Signals, Norfolk 1800 (no figure)"
+  - "Preble, History of the Flag of the United States, Boston 1894 (the flags named, not drawn)"
+flags:
+  - name: "numeral 1"
+    kind: flag
+    words: "the numeral flag one"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 2"
+    kind: flag
+    words: "the numeral flag two"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 3"
+    kind: flag
+    words: "the numeral flag three"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 4"
+    kind: flag
+    words: "the numeral flag four"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 5"
+    kind: flag
+    words: "the numeral flag five"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 6"
+    kind: flag
+    words: "the numeral flag six"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: blue}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 7"
+    kind: flag
+    words: "the numeral flag seven"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: red}
+      - {rect: [0.5, 0, 1.0, 1], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 8"
+    kind: flag
+    words: "the numeral flag eight"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 9"
+    kind: flag
+    words: "the numeral flag nine"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "numeral 0"
+    kind: flag
+    words: "the cypher flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: ""
+    mark: made
+    source: "made: no figure found (Barry 1800 has no plate in the scan; Preble 1894 names the squadron's flags of 1803-1804 in words, not their colours); Barry's own example the colours' (No. 214: a red flag the unit, a blue the tens, a yellow the hundreds), the rest JUDGEMENT"
+  - name: "substitute"
+    kind: flag
+    words: "the first repeater"
+    proportion: [1, 2]
+    shape: triangle
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "Preble 1894: the squadron's books of 1803-1804 had 'three triangles as repeaters'; their colours not read: made, JUDGEMENT"
+  - name: "second substitute"
+    kind: flag
+    words: "the second repeater"
+    proportion: [1, 2]
+    shape: triangle
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "Preble 1894: the squadron's books of 1803-1804 had 'three triangles as repeaters'; their colours not read: made, JUDGEMENT"
+  - name: "third substitute"
+    kind: flag
+    words: "the third repeater"
+    proportion: [1, 2]
+    shape: triangle
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "Preble 1894: the squadron's books of 1803-1804 had 'three triangles as repeaters'; their colours not read: made, JUDGEMENT"
+  - name: "cornet"
+    kind: flag
+    words: "the cornet"
+    proportion: [1, 2]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: red}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: ""
+    mark: made
+    source: "Preble 1894: a cornet makes a hoist a bare number or the answer to a question; its colours not read: made"
+  - name: "answering pendant"
+    kind: pendant
+    words: "the answering flag"
+    proportion: [1, 6]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: blue}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: made
+    source: "Preble 1894: 'an answering flag'; its colours not read: made, drawn a pendant as the game's answers are"
+  - name: "diptote"
+    kind: flag
+    words: "the diptote"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: blue}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "Preble 1894: the diptote, which postpones a signal and doubles the value of the flags above it; its colours not read: made"

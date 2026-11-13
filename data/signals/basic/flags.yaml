@@ -1,0 +1,283 @@
+# FreeSail: the basic book's signal flags drawn, and the private tables' plain flags of every
+# root (package 102, step 2; docs/design/Design-Signals.md, "The signal flags drawn"). The shape
+# of data/signals/britain/flags.yaml (its head says the fields). The basic book's flags are
+# made, as its numbers are; the private tables' flags ('a blue pendant', 'a red and white
+# flag': every root's private.yaml, themselves made) are drawn once here from their words and
+# read by every root after its own file.
+
+nation: basic
+sources:
+  - "the common form of the period's books (made)"
+flags:
+  - name: "numeral 1"
+    kind: flag
+    words: "the numeral flag one"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 2"
+    kind: flag
+    words: "the numeral flag two"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 3"
+    kind: flag
+    words: "the numeral flag three"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 4"
+    kind: flag
+    words: "the numeral flag four"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: blue}
+      - {rect: [0, 0.5, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 5"
+    kind: flag
+    words: "the numeral flag five"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 6"
+    kind: flag
+    words: "the numeral flag six"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 7"
+    kind: flag
+    words: "the numeral flag seven"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 8"
+    kind: flag
+    words: "the numeral flag eight"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0, 1.0, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 9"
+    kind: flag
+    words: "the numeral flag nine"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "numeral 0"
+    kind: flag
+    words: "the cypher flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "substitute"
+    kind: flag
+    words: "the substitute"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.2], colour: red}
+      - {rect: [0, 0.2, 1, 0.4], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: red}
+      - {rect: [0, 0.6, 1, 0.8], colour: white}
+      - {rect: [0, 0.8, 1, 1.0], colour: red}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "second substitute"
+    kind: flag
+    words: "the second substitute"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: yellow}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: black}
+      - {rect: [0, 0.6667, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172); a figure a third time (no book number of the basic root needs it)"
+  - name: "preparative"
+    kind: flag
+    words: "the preparative flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.2], colour: blue}
+      - {rect: [0, 0.2, 1, 0.4], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0, 0.6, 1, 0.8], colour: white}
+      - {rect: [0, 0.8, 1, 1.0], colour: blue}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "answering pendant"
+    kind: pendant
+    words: "the answering pendant"
+    proportion: [1, 6]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: red}
+      - {rect: [0.5, 0, 1.0, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "made: the basic book's flags are the builder's (book.yaml), in the common designs of the period's books (Howe's, Kempenfelt's, Perrin pp. 169 to 172)"
+  - name: "blue flag"
+    kind: flag
+    words: "a blue flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "red flag"
+    kind: flag
+    words: "a red flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "white flag"
+    kind: flag
+    words: "a white flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "yellow flag"
+    kind: flag
+    words: "a yellow flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "blue and yellow flag"
+    kind: flag
+    words: "a blue and yellow flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: blue}
+      - {rect: [0, 0.5, 1, 1.0], colour: yellow}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "red and white flag"
+    kind: flag
+    words: "a red and white flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: red}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "blue and white flag"
+    kind: flag
+    words: "a blue and white flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.5], colour: blue}
+      - {rect: [0, 0.5, 1, 1.0], colour: white}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "chequered flag"
+    kind: flag
+    words: "a chequered flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0.0, 0.0, 0.25, 0.3333], colour: red}
+      - {rect: [0.5, 0.0, 0.75, 0.3333], colour: red}
+      - {rect: [0.25, 0.3333, 0.5, 0.6667], colour: red}
+      - {rect: [0.75, 0.3333, 1.0, 0.6667], colour: red}
+      - {rect: [0.0, 0.6667, 0.25, 1.0], colour: red}
+      - {rect: [0.5, 0.6667, 0.75, 1.0], colour: red}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "chequered blue and white flag"
+    kind: flag
+    words: "a chequered blue and white flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0.0, 0.0, 0.25, 0.3333], colour: blue}
+      - {rect: [0.5, 0.0, 0.75, 0.3333], colour: blue}
+      - {rect: [0.25, 0.3333, 0.5, 0.6667], colour: blue}
+      - {rect: [0.75, 0.3333, 1.0, 0.6667], colour: blue}
+      - {rect: [0.0, 0.6667, 0.25, 1.0], colour: blue}
+      - {rect: [0.5, 0.6667, 0.75, 1.0], colour: blue}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words; a flag of two colours halved across, the first above; the chequered flag's colours unnamed, red and white: JUDGEMENT"
+  - name: "blue pendant"
+    kind: pendant
+    words: "a blue pendant"
+    proportion: [1, 8]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words"
+  - name: "red pendant"
+    kind: pendant
+    words: "a red pendant"
+    proportion: [1, 8]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words"
+  - name: "white pendant"
+    kind: pendant
+    words: "a white pendant"
+    proportion: [1, 8]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: made
+    source: "the private tables' flags (every root's private.yaml, made), drawn from their words"
